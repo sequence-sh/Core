@@ -1,0 +1,376 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Processes</name>
+    </assembly>
+    <members>
+        <member name="T:Processes.conditions.Condition">
+            <summary>
+            A condition that is required for the process to execute
+            </summary>
+        </member>
+        <member name="M:Processes.conditions.Condition.GetDescription">
+            <summary>
+            Description of this condition
+            </summary>
+        </member>
+        <member name="M:Processes.conditions.Condition.ToString">
+            <summary>
+            String representation of this Description
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Processes.conditions.Condition.IsMet">
+            <summary>
+            Is this condition met
+            </summary>
+        </member>
+        <member name="T:Processes.conditions.FileExists">
+            <summary>
+            A condition that requires that a particular file exists
+            </summary>
+        </member>
+        <member name="P:Processes.conditions.FileExists.FilePath">
+            <summary>
+            The path of the file to check
+            </summary>
+        </member>
+        <member name="M:Processes.conditions.FileExists.GetDescription">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:Processes.conditions.FileExists.IsMet">
+            <summary>
+            Does the file exist
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Processes.conditions.FileExists.GetHashCode">
+            <inheritdoc />
+        </member>
+        <member name="M:Processes.conditions.FileExists.Equals(System.Object)">
+            <inheritdoc />
+        </member>
+        <member name="T:Processes.enumerations.Collection">
+            <summary>
+            Enumerates through elements of a list
+            </summary>
+        </member>
+        <member name="P:Processes.enumerations.Collection.Members">
+            <summary>
+            The elements to iterate over
+            </summary>
+        </member>
+        <member name="T:Processes.enumerations.Directory">
+            <summary>
+            Enumerates through files in a directory
+            </summary>
+        </member>
+        <member name="P:Processes.enumerations.Directory.Path">
+            <summary>
+            The path to the directory
+            </summary>
+        </member>
+        <member name="T:Processes.enumerations.Enumeration">
+            <summary>
+            Represents a list of elements
+            </summary>
+        </member>
+        <member name="M:Processes.enumerations.Enumeration.ToString">
+            <inheritdoc />
+        </member>
+        <member name="M:Processes.enumerations.Enumeration.Equals(System.Object)">
+            <inheritdoc />
+        </member>
+        <member name="M:Processes.enumerations.Enumeration.GetHashCode">
+            <inheritdoc />
+        </member>
+        <member name="T:Processes.EnumMethods">
+            <summary>
+            Helper methods.
+            </summary>
+        </member>
+        <member name="M:Processes.EnumMethods.GetDescription(System.Enum)">
+            <summary>
+            Gets the description of an enum value from the Description Attribute.
+            </summary>
+            <param name="value"></param>
+            <returns></returns>
+        </member>
+        <member name="T:Processes.ExternalProcessHelper">
+            <summary>
+            Runs external processes.
+            </summary>
+        </member>
+        <member name="M:Processes.ExternalProcessHelper.RunExternalProcess(System.String,System.Collections.Generic.IEnumerable{System.String})">
+            <summary>
+            Runs an external process and returns the output and errors
+            </summary>
+            <param name="processPath">The path to the process</param>
+            <param name="arguments">The arguments to provide to the process</param>
+            <returns>The output of the process</returns>
+        </member>
+        <member name="T:Processes.IStreamReader">
+            <summary>
+            Anything that implements ReadLineAsync
+            </summary>
+        </member>
+        <member name="M:Processes.IStreamReader.ReadLineAsync">
+            <summary>
+            Reads a line of characters asynchronously and returns the data as a string
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:Processes.MultiStreamReader">
+            <summary>
+            Reads lines from several StreamReaders in the order that they arrive
+            </summary>
+        </member>
+        <member name="M:Processes.MultiStreamReader.#ctor(System.Collections.Generic.IEnumerable{Processes.IStreamReader})">
+            <summary>
+            Create a new MultiStreamReader
+            </summary>
+            <param name="streamReaders"></param>
+        </member>
+        <member name="M:Processes.MultiStreamReader.ReadLineAsync">
+            <summary>
+            Read the next line from any of these stream readers. Returns null if all of them are finished
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:Processes.ProcessModuleAttribute">
+            <summary>
+            Use this attribute if your solution contains orchestration processes
+            </summary>
+        </member>
+        <member name="T:Processes.process.Branch">
+            <summary>
+            Executes all sub-processes whose conditions are met.
+            </summary>
+        </member>
+        <member name="M:Processes.process.Branch.GetName">
+            <summary>
+            The name of this process
+            </summary>
+        </member>
+        <member name="P:Processes.process.Branch.Options">
+            <summary>
+            Processes which will be executed as part of this process if their conditions are met
+            </summary>
+        </member>
+        <member name="M:Processes.process.Branch.Execute">
+            <summary>
+            Execute this process.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Processes.process.Branch.Equals(System.Object)">
+            <inheritdoc />
+        </member>
+        <member name="M:Processes.process.Branch.GetHashCode">
+            <inheritdoc />
+        </member>
+        <member name="M:Processes.process.Branch.GetArgumentErrors">
+            <inheritdoc />
+        </member>
+        <member name="T:Processes.process.DeleteFile">
+            <summary>
+            Delete a file or a directory
+            </summary>
+        </member>
+        <member name="P:Processes.process.DeleteFile.FilePath">
+            <summary>
+            The path to the file to delete
+            </summary>
+        </member>
+        <member name="M:Processes.process.DeleteFile.GetArgumentErrors">
+            <inheritdoc />
+        </member>
+        <member name="M:Processes.process.DeleteFile.GetName">
+            <inheritdoc />
+        </member>
+        <member name="M:Processes.process.DeleteFile.Execute">
+            <inheritdoc />
+        </member>
+        <member name="T:Processes.process.ForEach">
+            <summary>
+            Performs a nested process once for each element in an enumeration
+            </summary>
+        </member>
+        <member name="M:Processes.process.ForEach.GetArgumentErrors">
+            <inheritdoc />
+        </member>
+        <member name="M:Processes.process.ForEach.GetName">
+            <inheritdoc />
+        </member>
+        <member name="P:Processes.process.ForEach.Enumeration">
+            <summary>
+            The enumeration to iterate through.
+            </summary>
+        </member>
+        <member name="P:Processes.process.ForEach.PropertyToInject">
+            <summary>
+            The property of the subProcess to inject with the element of enumeration
+            </summary>
+        </member>
+        <member name="P:Processes.process.ForEach.Template">
+            <summary>
+            The template to apply to the element before injection.
+            If null the element will be used without modification
+            The string '$s' in the template will be replaced with the element
+            </summary>
+        </member>
+        <member name="P:Processes.process.ForEach.SubProcess">
+            <summary>
+            The process to run once for each element
+            </summary>
+        </member>
+        <member name="M:Processes.process.ForEach.Execute">
+            <inheritdoc />
+        </member>
+        <member name="T:Processes.process.Process">
+            <summary>
+            A process. Can contain one or more steps
+            </summary>
+        </member>
+        <member name="M:Processes.process.Process.GetArgumentErrors">
+            <summary>
+            Get argument errors
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="P:Processes.process.Process.Conditions">
+            <summary>
+            Conditions which must be true for this process to be executed
+            </summary>
+        </member>
+        <member name="M:Processes.process.Process.GetName">
+            <summary>
+            The name of this process
+            </summary>
+        </member>
+        <member name="M:Processes.process.Process.Execute">
+            <summary>
+            Executes this process. Should only be called if all conditions are met
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Processes.process.Process.ToString">
+            <summary>
+            String representation of this process
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:Processes.process.ProcessState">
+            <summary>
+            Represents the current state of a running process
+            </summary>
+        </member>
+        <member name="F:Processes.process.ProcessState.Artifacts">
+            <summary>
+            Artifacts of this process
+            </summary>
+        </member>
+        <member name="T:Processes.process.RunExternalProcess">
+            <summary>
+            Runs an external process
+            </summary>
+        </member>
+        <member name="P:Processes.process.RunExternalProcess.ProcessPath">
+            <summary>
+            The path to the process to run
+            </summary>
+        </member>
+        <member name="P:Processes.process.RunExternalProcess.Parameters">
+            <summary>
+            Pairs of parameters to give to the process
+            </summary>
+        </member>
+        <member name="P:Processes.process.RunExternalProcess.ExtraParameterName">
+            <summary>
+            The name of an additional parameter.
+            This is intended for use with injection.
+            </summary>
+        </member>
+        <member name="P:Processes.process.RunExternalProcess.ExtraParameterValue">
+            <summary>
+            The value of the additional parameter.
+            This is intended for use with injection.
+            </summary>
+        </member>
+        <member name="M:Processes.process.RunExternalProcess.GetArgumentErrors">
+            <inheritdoc />
+        </member>
+        <member name="M:Processes.process.RunExternalProcess.GetName">
+            <inheritdoc />
+        </member>
+        <member name="M:Processes.process.RunExternalProcess.Execute">
+            <inheritdoc />
+        </member>
+        <member name="T:Processes.process.Sequence">
+            <summary>
+            Executes each step in sequence until a condition is not met or a process fails.
+            </summary>
+        </member>
+        <member name="M:Processes.process.Sequence.GetName">
+            <summary>
+            The name of this process
+            </summary>
+        </member>
+        <member name="P:Processes.process.Sequence.Steps">
+            <summary>
+            Steps that make up this process. To be executed in order
+            </summary>
+        </member>
+        <member name="M:Processes.process.Sequence.Execute">
+            <summary>
+            Execute the steps in this process until a condition is not met or a step fails 
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Processes.process.Sequence.Equals(System.Object)">
+            <inheritdoc />
+        </member>
+        <member name="M:Processes.process.Sequence.GetHashCode">
+            <inheritdoc />
+        </member>
+        <member name="M:Processes.process.Sequence.GetArgumentErrors">
+            <inheritdoc />
+        </member>
+        <member name="T:Processes.YamlHelper">
+            <summary>
+            Contains methods for serializing and deserializing yaml
+            </summary>
+        </member>
+        <member name="M:Processes.YamlHelper.ConvertToYaml(Processes.process.Process)">
+            <summary>
+            Creates a Yaml string representing a process.
+            </summary>
+        </member>
+        <member name="M:Processes.YamlHelper.TryMakeFromYaml(System.String)">
+            <summary>
+            Tries to create a process from a Yaml string.
+            </summary>
+        </member>
+        <member name="T:Processes.YamlRunner">
+            <summary>
+            Runs processes from Yaml
+            </summary>
+        </member>
+        <member name="M:Processes.YamlRunner.RunProcessFromYamlString(System.String)">
+            <summary>
+            Run process defined in yaml
+            </summary>
+            <param name="yamlString">Yaml representing the process</param>
+            <returns></returns>
+        </member>
+        <member name="M:Processes.YamlRunner.RunProcessFromYaml(System.String)">
+            <summary>
+            Run process defined in yaml found at a particular path
+            </summary>
+            <param name="yamlPath">Path to the yaml</param>
+            <returns></returns>
+        </member>
+    </members>
+</doc>
