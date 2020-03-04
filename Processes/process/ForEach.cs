@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Runtime.Serialization;
@@ -32,23 +33,7 @@ namespace Processes.process
 #pragma warning disable CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
         public Enumeration Enumeration { get; set; }
 
-        /// <summary>
-        /// The property of the subProcess to inject with the element of enumeration
-        /// </summary>
-        [Required]
-        [DataMember]
-        [YamlMember(Order = 3)]
-        public string PropertyToInject { get; set; }
-
-
-        /// <summary>
-        /// The template to apply to the element before injection.
-        /// If null the element will be used without modification
-        /// The string '$s' in the template will be replaced with the element
-        /// </summary>
-        [DataMember]
-        [YamlMember(Order = 4)]
-        public string? Template { get; set; }
+        
 
         /// <summary>
         /// The process to run once for each element
@@ -62,21 +47,57 @@ namespace Processes.process
         /// <inheritdoc />
         public override async IAsyncEnumerable<Result<string>> Execute()
         {
-            foreach (var element in Enumeration.Elements.ToList())
+            foreach (var injectionList in Enumeration.Elements.ToList())
             {
-                var elementS = Template == null ? element : Template.Replace("$s", element);
-
                 var subProcess = SubProcess; //TODO if we ever try to run these in parallel we will need to clone the process
 
-                var property = subProcess.GetType().GetProperty(PropertyToInject); //TODO handle dots and array indexes in this argument
-
-                if (property == null)
+                foreach (var (element, injection) in injectionList)
                 {
-                    yield return Result.Failure<string>($"Could not find property '{PropertyToInject}'");
-                    break;
-                }
 
-                property.SetValue(subProcess, elementS);
+                    var property = subProcess.GetType().GetProperty(injection.PropertyToInject); //TODO handle dots and array indexes in this argument
+
+                    if (property == null)
+                    {
+                        yield return Result.Failure<string>($"Could not find property '{injection.PropertyToInject}'");
+                        break;
+                    }
+
+                    var (_, isFailure, value, error1) = injection.GetPropertyValue(element);
+
+                    if (isFailure)
+                    {
+                        yield return Result.Failure<string>(error1);
+                        break;
+                    }
+
+                    object v;
+                    if (property.PropertyType == typeof(string))
+                    {
+                        v = value;
+                    }
+                    else
+                    {
+                        string? error = null;
+                        try
+                        {
+                            v = Convert.ChangeType(value, property.PropertyType);
+                        }
+                        catch (InvalidCastException e)
+                        {
+                            v = "";
+                            error = e.Message;
+                        }
+
+                        if (error != null)
+                        {
+                            yield return Result.Failure<string>($"Could not find property '{injection.PropertyToInject}'");
+                            break;
+                        }
+                    }
+
+                    property.SetValue(subProcess, v);
+                }
+                
 
                 if (!(subProcess.Conditions ?? Enumerable.Empty<Condition>()).All(x => x.IsMet())) continue;
 

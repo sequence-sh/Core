@@ -7,9 +7,8 @@ namespace Processes.enumerations
     /// </summary>
     public abstract class Enumeration
     {
-        internal abstract IEnumerable<string> Elements { get; }
+        internal abstract IEnumerable<IReadOnlyCollection<(string element, Injection injection)>> Elements { get; }
         internal abstract string Name { get; }
-
 
         /// <inheritdoc />
         public override string ToString()

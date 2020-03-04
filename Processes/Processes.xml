@@ -57,7 +57,7 @@
             Enumerates through elements of a list
             </summary>
         </member>
-        <member name="P:Processes.enumerations.Collection.Members">
+        <member name="P:Processes.enumerations.Collection.Elements">
             <summary>
             The elements to iterate over
             </summary>
