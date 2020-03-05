@@ -36,6 +36,8 @@ namespace Processes.process
         /// <inheritdoc />
         public override string GetName() => $"Foreach in {Enumeration}, {SubProcess}";
 
+        
+
         /// <summary>
         /// The enumeration to iterate through.
         /// </summary>
@@ -85,6 +87,25 @@ namespace Processes.process
                 await foreach (var rl in resultLines)
                     yield return rl;
             }
+        }
+
+
+        /// <inheritdoc />
+        public override bool Equals(object? obj)
+        {
+            return obj is ForEach fe && GetName() == fe.GetName();
+        }
+
+        /// <inheritdoc />
+        public override int GetHashCode()
+        {
+            return GetName().GetHashCode();
+        }
+
+        /// <inheritdoc />
+        public override string ToString()
+        {
+            return GetName();
         }
     }
 }
