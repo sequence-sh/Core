@@ -2,6 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Runtime.Serialization;
+using CSharpFunctionalExtensions;
 using YamlDotNet.Serialization;
 
 namespace Processes.enumerations
@@ -13,16 +14,18 @@ namespace Processes.enumerations
     {
         internal override string Name => $"'{Path}'";
 
-        internal override IEnumerable<IReadOnlyCollection<(string element, Injection injection)>> Elements
+        internal override Result<IReadOnlyCollection<IProcessInjector>,ErrorList> Elements
         {
             get
             {
                 if (!System.IO.Directory.Exists(Path))
-                    return Enumerable.Empty<IReadOnlyCollection<(string element, Injection injection)>>();
+                    return Result.Failure<IReadOnlyCollection<IProcessInjector>,ErrorList>(
+                        new ErrorList(){$"Directory '{Path}' does not exist"});
 
 
                 var files = System.IO.Directory.GetFiles(Path);
-                return files.Select(f => Injections.Select(i => (f, i)).ToList());
+                return Result.Success<IReadOnlyCollection<IProcessInjector>,ErrorList>
+                    ( files.Select(f => new ProcessInjector(Injections.Select(i => (f, i)))).ToList());
             }
         }
 

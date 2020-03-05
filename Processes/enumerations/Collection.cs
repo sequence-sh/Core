@@ -2,6 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Runtime.Serialization;
+using CSharpFunctionalExtensions;
 using YamlDotNet.Serialization;
 
 namespace Processes.enumerations
@@ -11,8 +12,9 @@ namespace Processes.enumerations
     /// </summary>
     public class Collection : Enumeration
     {
-        internal override IEnumerable<IReadOnlyCollection<(string element, Injection injection)>> Elements =>
-            Members.Select(m => Injections.Select(i => (m, i)).ToList());
+        internal override Result<IReadOnlyCollection<IProcessInjector>,ErrorList> Elements =>
+            Result.Success<IReadOnlyCollection<IProcessInjector>,ErrorList>
+                (Members.Select(m => new ProcessInjector(Injections.Select(i => (m, i)))).ToList());
         internal override string Name => $"[{string.Join(", ", Members)}]";
 
         /// <summary>

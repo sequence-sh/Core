@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using CSharpFunctionalExtensions;
 
 namespace Processes.enumerations
 {
@@ -7,7 +8,7 @@ namespace Processes.enumerations
     /// </summary>
     public abstract class Enumeration
     {
-        internal abstract IEnumerable<IReadOnlyCollection<(string element, Injection injection)>> Elements { get; }
+        internal abstract Result<IReadOnlyCollection<IProcessInjector>,ErrorList>  Elements { get; }
         internal abstract string Name { get; }
 
         /// <inheritdoc />

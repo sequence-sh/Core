@@ -6,7 +6,7 @@ using YamlDotNet.Serialization;
 namespace Processes.enumerations
 {
     /// <summary>
-    /// Injects a value from the enumerator into a process in a foreach loop
+    /// Injects a value from the enumerator into a process property in a foreach loop
     /// </summary>
     public class Injection
     {
@@ -15,7 +15,7 @@ namespace Processes.enumerations
         /// </summary>
         [Required]
         [DataMember]
-        [YamlMember(Order = 1)]
+        [YamlMember(Order = 2)]
 #pragma warning disable CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
         public string PropertyToInject { get; set; }
 #pragma warning restore CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
@@ -26,7 +26,7 @@ namespace Processes.enumerations
         /// Will be ignored if null.
         /// </summary>
         [DataMember]
-        [YamlMember(Order = 2)]
+        [YamlMember(Order = 3)]
         public string? Regex { get; set; }
 
         /// <summary>
@@ -36,10 +36,8 @@ namespace Processes.enumerations
         /// Is applied after the Regex.
         /// </summary>
         [DataMember]
-        [YamlMember(Order = 3)]
+        [YamlMember(Order = 4)]
         public string? Template { get; set; }
-
-
 
         internal Result<string> GetPropertyValue(string s)
         {
