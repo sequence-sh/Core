@@ -1,6 +1,7 @@
 ﻿using System.Data;
 using System.IO;
 using System.Linq;
+using System.Text;
 using CSharpFunctionalExtensions;
 using Microsoft.VisualBasic.FileIO;
 
@@ -9,21 +10,40 @@ namespace Processes
     internal static class CsvReader
     {
 
-        public static Result<DataTable, ErrorList> TryReadCsv(
+        public static Result<DataTable, ErrorList> TryReadCSVFromFile(
             string filePath, string delimiter, string? commentToken, bool enclosedInQuotes)
+        {
+            if(filePath == null)
+                return Result.Failure<DataTable, ErrorList>(new ErrorList(){"File path is null."});
+            if (!File.Exists(filePath))
+                return Result.Failure<DataTable, ErrorList>(new ErrorList(){$"'{filePath}' does not exist."});
+            
+            using var csvParser = new TextFieldParser(filePath);
+
+            return TryReadCSV(csvParser, delimiter, commentToken, enclosedInQuotes);
+        }
+
+        public static Result<DataTable, ErrorList> TryReadCSVFromString(
+            string csvString, string delimiter, string? commentToken, bool enclosedInQuotes)
+        {
+            if(csvString == null)
+                return Result.Failure<DataTable, ErrorList>(new ErrorList{"CSV string is null."});
+
+            var byteArray = Encoding.UTF8.GetBytes( csvString );
+            var stream = new MemoryStream( byteArray );
+            
+            using var csvParser = new TextFieldParser(stream);
+
+            return TryReadCSV(csvParser, delimiter, commentToken, enclosedInQuotes);
+        }
+
+
+
+        public static Result<DataTable, ErrorList> TryReadCSV(TextFieldParser csvParser,
+            string delimiter, string? commentToken, bool enclosedInQuotes)
         {
             var errorsSoFar = new ErrorList();
 
-            if(filePath == null)
-                errorsSoFar.Add("File path is null.");
-            else if (!File.Exists(filePath))
-                errorsSoFar.Add($"'{filePath}' does not exist.");
-
-            if(errorsSoFar.Any())
-                return Result.Failure<DataTable, ErrorList>(errorsSoFar);
-
-
-            using var csvParser = new TextFieldParser(filePath);
             if(commentToken != null)
                 csvParser.CommentTokens = new[] {commentToken};
 
@@ -70,6 +90,8 @@ namespace Processes
 
             return Result.Success<DataTable, ErrorList>(dataTable);
         }
+
+        
 
     }
 }

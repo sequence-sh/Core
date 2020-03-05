@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
@@ -13,6 +12,65 @@ namespace ProcessesTests
 {
     public class ForeachTests
     {
+        [Test]
+        public async Task TestCSV()
+        {
+            var csv = string.Join("\r\n", new []
+            {
+                "Text,Number,Color",
+                "#Comment",
+                "Correct,1,Red",
+                "Horse,2,Yellow",
+                "Battery,3,Green",
+                "Staple,4,Blue",
+            });
+
+            var expected = new List<string>()
+            {
+                "Correct1", "Horse2", "Battery3", "Staple4"
+            };
+
+            var forEachProcess = new ForEach
+            {
+                Enumeration = new CSVEnumeration
+                {
+                    CSVText = csv,
+                    CommentToken = "#",
+                    Delimiter = ",",
+                    ColumnInjections = new List<ColumnInjection>
+                    {
+                        new ColumnInjection()
+                        {
+                            Header = "Text",
+                            PropertyToInject = nameof(EmitProcess.Term)
+                        },
+                        new ColumnInjection()
+                        {
+                            Header = "Number",
+                            PropertyToInject = nameof(EmitProcess.Number)
+                        },
+                    }
+                },
+
+                SubProcess = new EmitProcess()
+            };
+
+            var realList = new List<string>();
+
+            CollectionAssert.IsEmpty(forEachProcess.GetArgumentErrors());
+
+            var resultList = forEachProcess.Execute();
+
+            await foreach (var (isSuccess, _, value, error) in resultList)
+            {
+                Assert.IsTrue(isSuccess, error);
+                realList.Add(value);
+            }
+
+            CollectionAssert.AreEqual(expected, realList);
+
+        }
+
         [Test]
         public async Task TestForeachProcess()
         {
@@ -31,12 +89,12 @@ namespace ProcessesTests
                     {
                         new Injection
                         {
-                            PropertyToInject = nameof(EmitTermProcess.Term),
+                            PropertyToInject = nameof(EmitProcess.Term),
                             Template = "'$s'",
                         }
                     }
                 },
-                SubProcess = new EmitTermProcess()
+                SubProcess = new EmitProcess()
             };
 
             var realList = new List<string>();
@@ -70,11 +128,11 @@ namespace ProcessesTests
                     {
                         new Injection
                         {
-                            PropertyToInject = nameof(EmitIntProcess.Number)
+                            PropertyToInject = nameof(EmitProcess.Number)
                         }
                     }
                 },
-                SubProcess = new EmitIntProcess()
+                SubProcess = new EmitProcess()
             };
 
             var realList = new List<string>();
@@ -90,14 +148,16 @@ namespace ProcessesTests
             CollectionAssert.AreEqual(expected, realList);
         }
 
-        private class EmitIntProcess : Process
+
+        private class EmitProcess : Process
         {
             [UsedImplicitly]
             [YamlMember]
-            [Required]
-#pragma warning disable CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
-            public int Number { get; set; }
-#pragma warning restore CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
+            public string? Term { get; set; }
+
+            [UsedImplicitly]
+            [YamlMember]
+            public int? Number { get; set; }
 
             public override IEnumerable<string> GetArgumentErrors()
             {
@@ -106,41 +166,14 @@ namespace ProcessesTests
 
             public override string GetName()
             {
-                return "Emit Number";
+                return "Emit";
             }
 
 #pragma warning disable 1998
             public override async IAsyncEnumerable<Result<string>> Execute()
 #pragma warning restore 1998
             {
-                yield return Result.Success(Number.ToString());
-            }
-        }
-
-        private class EmitTermProcess : Process
-        {
-            [UsedImplicitly]
-            [YamlMember]
-            [Required]
-#pragma warning disable CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
-            public string Term { get; set; }
-#pragma warning restore CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
-
-            public override IEnumerable<string> GetArgumentErrors()
-            {
-                yield break;
-            }
-
-            public override string GetName()
-            {
-                return "Emit Term";
-            }
-
-#pragma warning disable 1998
-            public override async IAsyncEnumerable<Result<string>> Execute()
-#pragma warning restore 1998
-            {
-                yield return Result.Success(Term);
+                yield return Result.Success(Term + Number);
             }
         }
 

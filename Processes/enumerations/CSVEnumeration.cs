@@ -11,80 +11,129 @@ namespace Processes.enumerations
     /// <summary>
     /// Enumerates through a CSV file 
     /// </summary>
-    public class CsvEnumeration : Enumeration
+    public class CSVEnumeration : Enumeration
     {
-        internal override Result<IReadOnlyCollection<IProcessInjector>,
-            ErrorList> Elements
+        internal override Result<IReadOnlyCollection<IProcessInjector>, ErrorList> Elements
         {
             get
             {
-                var csvResult = CsvReader.TryReadCsv(FilePath, Delimiter, CommentToken, HasFieldsEnclosedInQuotes);
+                Result<DataTable, ErrorList> csvResult;
 
-                return csvResult.Bind(TryConvert);
+                if(CSVFilePath != null)
+                    if(CSVText != null)
+                        return Result.Failure<IReadOnlyCollection<IProcessInjector>, ErrorList>(new ErrorList{$"Both {nameof(CSVFilePath)} and {nameof(CSVText)} are set."});
+                    else
+                        csvResult = CsvReader.TryReadCSVFromFile(CSVFilePath, Delimiter, CommentToken, HasFieldsEnclosedInQuotes);
+                else if (CSVText != null)
+                    csvResult = CsvReader.TryReadCSVFromString(CSVText, Delimiter, CommentToken, HasFieldsEnclosedInQuotes);
+                else
+                    return Result.Failure<IReadOnlyCollection<IProcessInjector>, ErrorList>(new ErrorList{$"Either {nameof(CSVFilePath)} or {nameof(CSVText)} should be set."});
 
-                Result<IReadOnlyCollection<IProcessInjector>,
-                    ErrorList>
-                    TryConvert
-                    (DataTable dataTable)
+                if (csvResult.IsFailure)
+                    return csvResult.ConvertFailure<IReadOnlyCollection<IProcessInjector>>();
+
+
+                using var dataTable = csvResult.Value;
+                var errors = new ErrorList();
+                var injectors = new List<IProcessInjector>();
+
+                var columnInjections = new List<(Injection injection, DataColumn column)>();
+
+                foreach (var hi in ColumnInjections)
                 {
-                    var errors = new ErrorList();
-                    var injectors = new List<IProcessInjector>();
-
-                    var columnInjections = new List<(Injection injection, DataColumn column)>();
-
-                    foreach (var hi in HeaderInjections)
-                    {
-                        var column = dataTable.Columns[hi.Header];
-                        if (column == null) errors.Add($"Could not find column '{hi.Header}'");
-                        else
-                            columnInjections.Add((hi, column));
-                    }
-
-                    if (errors.Any())
-                        return Result
-                            .Failure<IReadOnlyCollection<IProcessInjector>,
-                                ErrorList>(errors);
-
-#pragma warning disable CS8606 // Possible null reference assignment to iteration variable
-                    foreach (DataRow dataTableRow in dataTable.Rows)
-#pragma warning restore CS8606 // Possible null reference assignment to iteration variable
-                    {
-                        if (dataTableRow != null)
-                        {
-                            var processInjector = new ProcessInjector();
-                            foreach (var (injection, column) in columnInjections)
-                            {
-                                var val = dataTableRow[column];
-                                processInjector.Add(val?.ToString()??string.Empty, injection);
-                            }
-                            injectors.Add(processInjector);
-                        }
-                    }
-
-                    return Result.Success<IReadOnlyCollection<IProcessInjector>, ErrorList>(injectors);
+                    var column = dataTable.Columns[hi.Header];
+                    if (column == null) errors.Add($"Could not find column '{hi.Header}'");
+                    else
+                        columnInjections.Add((hi, column));
                 }
+
+                if (errors.Any())
+                    return Result
+                        .Failure<IReadOnlyCollection<IProcessInjector>,
+                            ErrorList>(errors);
+
+
+                foreach (var dataTableRow in dataTable.Rows.Cast<DataRow>())
+                {
+                    if (dataTableRow == null) continue;
+                    var processInjector = new ProcessInjector();
+                    foreach (var (injection, column) in columnInjections)
+                    {
+                        var val = dataTableRow[column];
+                        processInjector.Add(val?.ToString()??string.Empty, injection);
+                    }
+                    injectors.Add(processInjector);
+                }
+                return Result.Success<IReadOnlyCollection<IProcessInjector>, ErrorList>(injectors);
             }
         }
 
 
-        internal override string Name => FilePath;
+        internal override string Name
+        {
+            get
+            {
+                if (CSVFilePath != null)
+                    return $"Csv from '{CSVFilePath}'";
+
+                else if (CSVText != null)
+                    return CSVText.Split("\n")[0];
+
+                return "CSV";
+            }
+        }
+
+        internal override IEnumerable<string> GetArgumentErrors()
+        {
+            Result<DataTable, ErrorList> csvResult;
+
+            if(CSVFilePath != null)
+                if (CSVText != null)
+                {
+                    yield return $"Both {nameof(CSVFilePath)} and {nameof(CSVText)} are set.";
+                    yield break;
+                }
+                else
+                    csvResult = CsvReader.TryReadCSVFromFile(CSVFilePath, Delimiter, CommentToken, HasFieldsEnclosedInQuotes);
+            else if (CSVText != null)
+                csvResult = CsvReader.TryReadCSVFromString(CSVText, Delimiter, CommentToken, HasFieldsEnclosedInQuotes);
+            else
+            {
+                yield return $"Either {nameof(CSVFilePath)} or {nameof(CSVText)} should be set.";
+                yield break;
+            }
+
+            if (csvResult.IsFailure)
+                foreach (var errorString in csvResult.Error)
+                    yield return errorString;
+
+        }
 
         /// <summary>
-        /// The path to the CSV file
+        /// The path to the CSV file.
+        /// Either this or CSVText must be set (but not both).
         /// </summary>
-        [Required]
         [DataMember]
         [YamlMember]
-#pragma warning disable CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
-        public string FilePath { get; set; }
+        public string? CSVFilePath { get; set; }
+        
+        /// <summary>
+        /// Raw Csv.
+        /// Either this or CSVFilePath must be set (but not both).
+        /// </summary>
+        [DataMember]
+        [YamlMember]
+        public string? CSVText { get; set; }
 
+
+#pragma warning disable CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
         /// <summary>
         /// List of mappings from headers to property injections
         /// </summary>
         [Required]
         [DataMember]
         [YamlMember]
-        public List<ColumnInjection> HeaderInjections { get; set; }
+        public List<ColumnInjection> ColumnInjections { get; set; }
 
         /// <summary>
         /// The delimiter used in the CSV file

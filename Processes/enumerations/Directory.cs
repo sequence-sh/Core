@@ -13,6 +13,11 @@ namespace Processes.enumerations
     public class Directory : Enumeration
     {
         internal override string Name => $"'{Path}'";
+        internal override IEnumerable<string> GetArgumentErrors()
+        {
+            if (!System.IO.Directory.Exists(Path))
+                yield return $"Directory '{Path}' does not exist";
+        }
 
         internal override Result<IReadOnlyCollection<IProcessInjector>,ErrorList> Elements
         {

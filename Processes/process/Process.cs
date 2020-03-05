@@ -11,7 +11,7 @@ namespace Processes.process
     public abstract class Process
     {
         /// <summary>
-        /// Get argument errors
+        /// Get errors in the properties of this process that may prevent it from running properly.
         /// </summary>
         /// <returns></returns>
         public abstract IEnumerable<string> GetArgumentErrors();

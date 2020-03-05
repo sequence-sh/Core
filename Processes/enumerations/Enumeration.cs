@@ -11,6 +11,11 @@ namespace Processes.enumerations
         internal abstract Result<IReadOnlyCollection<IProcessInjector>,ErrorList>  Elements { get; }
         internal abstract string Name { get; }
 
+        /// <summary>
+        /// Get errors in the properties of this enumeration.
+        /// </summary>
+        internal abstract IEnumerable<string> GetArgumentErrors();
+
         /// <inheritdoc />
         public override string ToString()
         {

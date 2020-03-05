@@ -59,7 +59,10 @@ namespace Processes.enumerations
                     string? error = null;
                     try
                     {
-                        v = Convert.ChangeType(value, property.PropertyType);
+                        var underlyingType = Nullable.GetUnderlyingType(property.PropertyType) ??
+                                           property.PropertyType;
+
+                        v = Convert.ChangeType(value, underlyingType);
                     }
                     catch (InvalidCastException e)
                     {
@@ -69,7 +72,7 @@ namespace Processes.enumerations
 
                     if (error != null)
                     {
-                        return Result.Failure($"Could not find property '{injection.PropertyToInject}'");
+                        return Result.Failure($"Could not cast '{value}' to type '{injection.PropertyToInject}'");
                     }
                 }
 

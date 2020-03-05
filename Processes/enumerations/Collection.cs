@@ -16,6 +16,11 @@ namespace Processes.enumerations
             Result.Success<IReadOnlyCollection<IProcessInjector>,ErrorList>
                 (Members.Select(m => new ProcessInjector(Injections.Select(i => (m, i)))).ToList());
         internal override string Name => $"[{string.Join(", ", Members)}]";
+        internal override IEnumerable<string> GetArgumentErrors()
+        {
+            if (Members == null)
+                yield return $"{nameof(Members)} is null";
+        }
 
         /// <summary>
         /// The elements to iterate over

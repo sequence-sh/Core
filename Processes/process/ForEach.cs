@@ -17,7 +17,20 @@ namespace Processes.process
         /// <inheritdoc />
         public override IEnumerable<string> GetArgumentErrors()
         {
-            return SubProcess.GetArgumentErrors(); //TODO look at this - its problematic. There seems to be no way to check the injected argument
+            if (SubProcess == null)
+                yield return $"{nameof(SubProcess)} is null";
+            else
+            {
+                //foreach (var argumentError in SubProcess.GetArgumentErrors()) //TODO look at this - its problematic. There seems to be no way to check the injected argument
+                //    yield return argumentError;
+            }
+                
+
+            if(Enumeration == null)
+                yield return $"{nameof(Enumeration)} is null";
+            else
+                foreach (var argumentError in Enumeration.GetArgumentErrors())
+                    yield return argumentError;
         }
 
         /// <inheritdoc />
