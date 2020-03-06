@@ -10,6 +10,13 @@ namespace Processes
     /// </summary>
     public static class ExternalProcessHelper
     {
+
+        private enum Source
+        {
+            Output,
+            Error
+        }
+
         /// <summary>
         /// Runs an external process and returns the output and errors
         /// </summary>
@@ -42,10 +49,10 @@ namespace Processes
             };
             pProcess.Start();
 
-            var multiStreamReader = new MultiStreamReader(new[]
+            var multiStreamReader = new MultiStreamReader<(string line, Source source)>(new IStreamReader<(string, Source)>[]
             {
-                new WrappedStreamReader(pProcess.StandardOutput),
-                new WrappedStreamReader(pProcess.StandardError),
+                new StreamReaderWithSource<Source>(pProcess.StandardOutput, Source.Output),
+                new StreamReaderWithSource<Source>(pProcess.StandardError, Source.Error),
             });
 
             //Read the output one line at a time
@@ -54,7 +61,12 @@ namespace Processes
                 var line = await multiStreamReader.ReadLineAsync();
                 if (line == null) //We've reached the end of the file
                     break;
-                yield return Result.Success(line);
+                if (line.Value.source == Source.Error)
+                {
+                    yield return Result.Failure<string>(line.Value.line);
+                }
+
+                yield return Result.Success(line.Value.line);
             }
 
             pProcess.WaitForExit();

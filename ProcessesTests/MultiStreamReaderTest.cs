@@ -8,13 +8,21 @@ namespace ProcessesTests
 {
     public class MultiStreamReaderTest
     {
+
+        public enum StreamReaderSource
+        {
+            StreamReaderOne,
+            StreamReaderTwo,
+            StreamReaderThree
+        }
+
         [Test]
         public async Task TestReadingEmptyStream()
         {
-            var reader1 = new Mock<IStreamReader>(MockBehavior.Strict);
-            var multiStreamReader = new MultiStreamReader(new[] { reader1.Object });
+            var reader1 = new Mock<IStreamReader<(string, StreamReaderSource)>>(MockBehavior.Strict);
+            var multiStreamReader = new MultiStreamReader<(string, StreamReaderSource)>(new[] { reader1.Object });
 
-            reader1.Setup(m => m.ReadLineAsync()).ReturnsAsync(null as string);
+            reader1.Setup(m => m.ReadLineAsync()).ReturnsAsync(null as (string, StreamReaderSource)?);
 
             var n1 = await multiStreamReader.ReadLineAsync();
             Assert.IsNull(n1);
@@ -28,18 +36,20 @@ namespace ProcessesTests
         [Test]
         public async Task TestReadingTextFromStream()
         {
-            var reader1 = new Mock<IStreamReader>(MockBehavior.Strict);
-            var multiStreamReader = new MultiStreamReader(new[] { reader1.Object });
+            var reader1 = new Mock<IStreamReader<(string, StreamReaderSource)>>(MockBehavior.Strict);
+            var multiStreamReader = new MultiStreamReader<(string, StreamReaderSource)>(new[] { reader1.Object });
 
             foreach (var str in new[]{String1, String2, String3})
             {
-                reader1.Setup(m => m.ReadLineAsync()).ReturnsAsync(str);
+                var pair = (str, SROne: StreamReaderSource.StreamReaderOne);
+
+                reader1.Setup(m => m.ReadLineAsync()).ReturnsAsync(pair);
                 var a = await multiStreamReader.ReadLineAsync();
-                Assert.AreEqual(str, a);
+                Assert.AreEqual(pair, a);
                 reader1.VerifyAll();
             }
 
-            reader1.Setup(m => m.ReadLineAsync()).ReturnsAsync(null as string);
+            reader1.Setup(m => m.ReadLineAsync()).ReturnsAsync(null as (string, StreamReaderSource)?);
             var n1 = await multiStreamReader.ReadLineAsync();
             Assert.IsNull(n1);
 
@@ -56,8 +66,8 @@ namespace ProcessesTests
         [Test]
         public async Task TestReadingTwoStreams()
         {
-            var reader1 = new Mock<IStreamReader>(MockBehavior.Strict);
-            var reader2 = new Mock<IStreamReader>(MockBehavior.Strict);
+            var reader1 = new Mock<IStreamReader<(string, StreamReaderSource)>>(MockBehavior.Strict);
+            var reader2 = new Mock<IStreamReader<(string, StreamReaderSource)>>(MockBehavior.Strict);
 
             var semaphore1 = new SemaphoreSlim(1);
             semaphore1.Wait();
@@ -65,43 +75,43 @@ namespace ProcessesTests
             semaphore2.Wait();
 
             reader1.Setup(m => m.ReadLineAsync())
-                .Returns(()=> ReturnStringAfter(String1, semaphore1));
+                .Returns(()=> ReturnsEntityAfter<(string, StreamReaderSource)?>((String1, StreamReaderSource.StreamReaderOne), semaphore1));
 
             reader2.Setup(m => m.ReadLineAsync())
-                .Returns(() => ReturnStringAfter(String3, semaphore2));
+                .Returns(() => ReturnsEntityAfter<(string, StreamReaderSource)?>((String3, StreamReaderSource.StreamReaderThree), semaphore2));
             
 
-            var multiStreamReader = new MultiStreamReader(new[] {reader1.Object, reader2.Object});
+            var multiStreamReader = new MultiStreamReader<(string, StreamReaderSource)>(new[] {reader1.Object, reader2.Object});
 
             semaphore1.Release();
 
             var r1 = await multiStreamReader.ReadLineAsync();
-            Assert.AreEqual(String1, r1);
+            Assert.AreEqual((String1, StreamReaderSource.StreamReaderOne), r1);
 
             reader1.VerifyAll();
             reader2.VerifyAll();
 
             reader1.Setup(m => m.ReadLineAsync())
-                .ReturnsAsync(String2);
+                .ReturnsAsync((String2,StreamReaderSource.StreamReaderTwo));
 
             var r2 = await multiStreamReader.ReadLineAsync();
-            Assert.AreEqual(String2, r2);
+            Assert.AreEqual((String2, StreamReaderSource.StreamReaderTwo), r2);
             reader1.VerifyAll();
             reader2.VerifyAll();
 
             reader1.Setup(m => m.ReadLineAsync())
-                .ReturnsAsync(null as string);
+                .ReturnsAsync(null as (string, StreamReaderSource)?);
 
             semaphore2.Release();
                 
             var r3 = await multiStreamReader.ReadLineAsync();
 
-            Assert.AreEqual(String3, r3);
+            Assert.AreEqual((String3, StreamReaderSource.StreamReaderThree), r3);
             reader1.VerifyAll();
             reader2.VerifyAll();
 
             reader2.Setup(m => m.ReadLineAsync())
-                .ReturnsAsync(null as string);
+                .ReturnsAsync(null as (string, StreamReaderSource)?);
 
 
             var n1 = await multiStreamReader.ReadLineAsync();
@@ -112,12 +122,12 @@ namespace ProcessesTests
         }
 
 
-        private static async Task<string?> ReturnStringAfter(string? str, SemaphoreSlim semaphore)
+        private static async Task<T> ReturnsEntityAfter<T>(T entity, SemaphoreSlim semaphore)
         {
             await semaphore.WaitAsync();
 
             semaphore.Release();
-            return str;
+            return entity;
         }
 
        

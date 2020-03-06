@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -9,54 +10,62 @@ namespace Processes
     /// <summary>
     /// Anything that implements ReadLineAsync
     /// </summary>
-    internal interface IStreamReader
+    internal interface IStreamReader<T> where T : struct
     {
         /// <summary>
-        /// Reads a line of characters asynchronously and returns the data as a string
+        /// Reads a line of characters asynchronously and returns the data as a string and the source.
         /// </summary>
         /// <returns></returns>
-        Task<string?> ReadLineAsync();
+        Task<T?> ReadLineAsync();
     }
 
-    internal class WrappedStreamReader : IStreamReader
+    internal class StreamReaderWithSource<TEnum> : IStreamReader<(string line, TEnum source)>
+        where TEnum : Enum
     {
         private readonly StreamReader _underlying;
+        private readonly TEnum _source;
 
-        public WrappedStreamReader(StreamReader underlying)
+        public StreamReaderWithSource(StreamReader underlying, TEnum source)
         {
             _underlying = underlying;
+            _source = source;
         }
 
-        public async Task<string?> ReadLineAsync()
+        public async Task<(string line, TEnum source)?> ReadLineAsync()
         {
-            return await _underlying.ReadLineAsync();
+            var line = await _underlying.ReadLineAsync();
+
+            if (line == null)
+                return null;
+
+            return (line, _source);
         }
     }
 
     /// <summary>
     /// Reads lines from several StreamReaders in the order that they arrive
     /// </summary>
-    internal class MultiStreamReader : IStreamReader
+    internal class MultiStreamReader<T> : IStreamReader<T>
+    where T : struct
     {
-        private readonly List<(IStreamReader streamReader, Task<string?>? task)> _streamReaderTaskPairs;
+        private readonly List<(IStreamReader<T> streamReader, Task<T?>? task)> _streamReaderTaskPairs;
 
         /// <summary>
         /// Create a new MultiStreamReader
         /// </summary>
         /// <param name="streamReaders"></param>
-        public MultiStreamReader(IEnumerable<IStreamReader> streamReaders)
+        public MultiStreamReader(IEnumerable<IStreamReader<T>> streamReaders)
         {
-            _streamReaderTaskPairs = streamReaders.Select(x => (x, null as Task<string?>)).ToList();
+            _streamReaderTaskPairs = streamReaders.Select(x => (x, null as Task<T?>)).ToList();
         }
-
 
         /// <summary>
         /// Read the next line from any of these stream readers. Returns null if all of them are finished
         /// </summary>
         /// <returns></returns>
-        public async Task<string?> ReadLineAsync()
+        public async Task<T?> ReadLineAsync()
         {
-            var awaitingTasks = new List<Task<string?>>();
+            var awaitingTasks = new List<Task<T?>>();
 
             for (var i = 0; i < _streamReaderTaskPairs.Count; i++) //go through all stream readers
             {
@@ -65,7 +74,6 @@ namespace Processes
                 {
                     //this stream reader has no yet been asked for the next line
                     var task = streamReader.ReadLineAsync();
-                    //task.Start();
 
                     _streamReaderTaskPairs[i] = (streamReader, task);
 
