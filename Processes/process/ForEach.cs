@@ -21,7 +21,7 @@ namespace Processes.process
                 yield return $"{nameof(SubProcess)} is null";
             else
             {
-                //foreach (var argumentError in SubProcess.GetArgumentErrors()) //TODO look at this - its problematic. There seems to be no way to check the injected argument
+                //foreach (var argumentError in SubProcess.GetArgumentErrors(settings)) //TODO look at this - its problematic. There seems to be no way to check the injected argument
                 //    yield return argumentError;
             }
                 
@@ -32,6 +32,14 @@ namespace Processes.process
                 foreach (var argumentError in Enumeration.GetArgumentErrors())
                     yield return argumentError;
         }
+
+        /// <inheritdoc />
+        public override IEnumerable<string> GetSettingsErrors(IProcessSettings processSettings)
+        {
+            return SubProcess.GetSettingsErrors(processSettings);
+        }
+
+
 
         /// <inheritdoc />
         public override string GetName() => $"Foreach in {Enumeration}, {SubProcess}";
@@ -57,7 +65,7 @@ namespace Processes.process
 #pragma warning restore CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
 
         /// <inheritdoc />
-        public override async IAsyncEnumerable<Result<string>> Execute()
+        public override async IAsyncEnumerable<Result<string>> Execute(IProcessSettings processSettings)
         {
             var (_, enumerationSuccess, elements, enumerationError) = Enumeration.Elements;
 
@@ -82,7 +90,7 @@ namespace Processes.process
 
                 if (!(subProcess.Conditions ?? Enumerable.Empty<Condition>()).All(x => x.IsMet())) continue;
 
-                var resultLines = subProcess.Execute();
+                var resultLines = subProcess.Execute(processSettings);
 
                 await foreach (var rl in resultLines)
                     yield return rl;

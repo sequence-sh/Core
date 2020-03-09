@@ -12,6 +12,8 @@ namespace ProcessesTests
 {
     public class ForeachTests
     {
+        private readonly IProcessSettings _processSettings = new EmptySettings();
+
         [Test]
         public async Task TestCSV()
         {
@@ -59,7 +61,7 @@ namespace ProcessesTests
 
             CollectionAssert.IsEmpty(forEachProcess.GetArgumentErrors());
 
-            var resultList = forEachProcess.Execute();
+            var resultList = forEachProcess.Execute(_processSettings);
 
             await foreach (var (isSuccess, _, value, error) in resultList)
             {
@@ -99,7 +101,7 @@ namespace ProcessesTests
 
             var realList = new List<string>();
 
-            var resultList = forEachProcess.Execute();
+            var resultList = forEachProcess.Execute(_processSettings);
 
             await foreach (var (isSuccess, _, value, error) in resultList)
             {
@@ -137,7 +139,7 @@ namespace ProcessesTests
 
             var realList = new List<string>();
 
-            var resultList = forEachProcess.Execute();
+            var resultList = forEachProcess.Execute(_processSettings);
 
             await foreach (var (isSuccess, _, value, error) in resultList)
             {
@@ -164,13 +166,19 @@ namespace ProcessesTests
                 yield break;
             }
 
+            public override IEnumerable<string> GetSettingsErrors(IProcessSettings processSettings)
+            {
+                yield break;
+            }
+
             public override string GetName()
             {
                 return "Emit";
             }
 
+
 #pragma warning disable 1998
-            public override async IAsyncEnumerable<Result<string>> Execute()
+            public override async IAsyncEnumerable<Result<string>> Execute(IProcessSettings processSettings)
 #pragma warning restore 1998
             {
                 yield return Result.Success(Term + Number);

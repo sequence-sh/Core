@@ -5,21 +5,35 @@ using System.Linq;
 using CSharpFunctionalExtensions;
 using JetBrains.Annotations;
 using Processes.conditions;
+using Processes.process;
 
 namespace Processes
 {
     /// <summary>
     /// Runs processes from Yaml
     /// </summary>
-    public static class YamlRunner
+    public class YamlRunner
     {
+        /// <summary>
+        /// Creates a new Yaml Runner
+        /// </summary>
+        /// <param name="processSettings"></param>
+        public YamlRunner(IProcessSettings processSettings)
+        {
+            _processSettings = processSettings;
+        }
+
+        private readonly IProcessSettings _processSettings;
+
+        
+
         /// <summary>
         /// Run process defined in yaml
         /// </summary>
         /// <param name="yamlString">Yaml representing the process</param>
         /// <returns></returns>
         [UsedImplicitly]
-        public static async IAsyncEnumerable<Result<string>> RunProcessFromYamlString(string yamlString)
+        public async IAsyncEnumerable<Result<string>> RunProcessFromYamlString(string yamlString)
         {
             var yamlResult = YamlHelper.TryMakeFromYaml(yamlString);
 
@@ -40,7 +54,7 @@ namespace Processes
                 }
             }
 
-            var resultLines = yamlResult.Value.Execute();
+            var resultLines = yamlResult.Value.Execute(_processSettings);
             await foreach (var resultLine in resultLines)
             {
                 yield return resultLine;
@@ -53,7 +67,7 @@ namespace Processes
         /// <param name="yamlPath">Path to the yaml</param>
         /// <returns></returns>
         [UsedImplicitly]
-        public static async IAsyncEnumerable<Result<string>> RunProcessFromYaml(string yamlPath)
+        public async IAsyncEnumerable<Result<string>> RunProcessFromYaml(string yamlPath)
         {
             string? text;
             string? errorMessage;

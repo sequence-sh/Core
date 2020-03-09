@@ -35,14 +35,14 @@ namespace Processes.process
         /// Execute this process.
         /// </summary>
         /// <returns></returns>
-        public override async IAsyncEnumerable<Result<string>> Execute()
+        public override async IAsyncEnumerable<Result<string>> Execute(IProcessSettings processSettings)
         {
             foreach (var process in Options)
             {
                 if (process.Conditions.All(c => c.IsMet()))
                 {
                     yield return Result.Success($"Executing '{process.GetName()}'");
-                    var results = process.Execute();
+                    var results = process.Execute(processSettings);
 
                     await foreach (var result in results)
                     {
@@ -75,6 +75,12 @@ namespace Processes.process
         public override IEnumerable<string> GetArgumentErrors()
         {
             return Options.SelectMany(process => process.GetArgumentErrors());
+        }
+
+        /// <inheritdoc />
+        public override IEnumerable<string> GetSettingsErrors(IProcessSettings processSettings)
+        {
+            return Options.SelectMany(process => process.GetSettingsErrors(processSettings));
         }
     }
 }

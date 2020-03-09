@@ -30,11 +30,17 @@ namespace Processes.process
         }
 
         /// <inheritdoc />
+        public override IEnumerable<string> GetSettingsErrors(IProcessSettings processSettings)
+        {
+            yield break;
+        }
+
+        /// <inheritdoc />
         public override string GetName() => $"Delete {FilePath}";
 
         /// <inheritdoc />
 #pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously - needs to be async to return IAsyncEnumerable
-        public override async IAsyncEnumerable<Result<string>> Execute()
+        public override async IAsyncEnumerable<Result<string>> Execute(IProcessSettings processSettings)
 #pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
         {
             if (File.Exists(FilePath))

@@ -59,6 +59,12 @@ namespace Processes.process
         }
 
         /// <inheritdoc />
+        public override IEnumerable<string> GetSettingsErrors(IProcessSettings processSettings)
+        {
+            yield break;
+        }
+
+        /// <inheritdoc />
         public override string GetName()
         {
             return $"{ProcessPath} {string.Join(" ", Parameters.Select((k, v) => $"-{k} {v}"))}" +
@@ -68,9 +74,9 @@ namespace Processes.process
         }
 
         /// <inheritdoc />
-        public override async IAsyncEnumerable<Result<string>> Execute()
+        public override async IAsyncEnumerable<Result<string>> Execute(IProcessSettings processSettings)
         {
-            var argumentErrors = GetArgumentErrors().ToList();
+            var argumentErrors = GetArgumentErrors().Concat(GetSettingsErrors(processSettings)).ToList();
 
             if (argumentErrors.Any())
             {

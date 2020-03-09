@@ -35,7 +35,7 @@ namespace Processes.process
         /// Execute the steps in this process until a condition is not met or a step fails 
         /// </summary>
         /// <returns></returns>
-        public override async IAsyncEnumerable<Result<string>> Execute() 
+        public override async IAsyncEnumerable<Result<string>> Execute(IProcessSettings processSettings) 
         {
             foreach (var process in Steps)
             {
@@ -52,7 +52,7 @@ namespace Processes.process
 
                 yield return Result.Success($"Executing '{process.GetName()}'");
                 var allGood = true;
-                var resultLines = process.Execute();
+                var resultLines = process.Execute(processSettings);
                 await foreach (var resultLine in resultLines)
                 {
                     yield return resultLine;
@@ -82,6 +82,12 @@ namespace Processes.process
         public override IEnumerable<string> GetArgumentErrors()
         {
             return Steps.SelectMany(process => process.GetArgumentErrors());
+        }
+
+        /// <inheritdoc />
+        public override IEnumerable<string> GetSettingsErrors(IProcessSettings processSettings)
+        {
+            return Steps.SelectMany(process => process.GetSettingsErrors(processSettings));
         }
     }
 }
