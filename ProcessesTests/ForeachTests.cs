@@ -2,11 +2,9 @@
 using System.Linq;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
-using JetBrains.Annotations;
 using NUnit.Framework;
 using Processes.enumerations;
 using Processes.process;
-using YamlDotNet.Serialization;
 
 namespace ProcessesTests
 {
@@ -27,7 +25,7 @@ namespace ProcessesTests
                 "Staple,4,Blue",
             });
 
-            var expected = new List<string>()
+            var expected = new List<string>
             {
                 "Correct1", "Horse2", "Battery3", "Staple4"
             };
@@ -137,53 +135,12 @@ namespace ProcessesTests
                 SubProcess = new EmitProcess()
             };
 
-            var realList = new List<string>();
 
             var resultList = forEachProcess.Execute(_processSettings);
 
-            await foreach (var (isSuccess, _, value, error) in resultList)
-            {
-                Assert.IsTrue(isSuccess, error);
-                realList.Add(value);
-            }
+            var realList = await TestHelpers.AssertNoErrors(resultList);
 
             CollectionAssert.AreEqual(expected, realList);
         }
-
-
-        private class EmitProcess : Process
-        {
-            [UsedImplicitly]
-            [YamlMember]
-            public string? Term { get; set; }
-
-            [UsedImplicitly]
-            [YamlMember]
-            public int? Number { get; set; }
-
-            public override IEnumerable<string> GetArgumentErrors()
-            {
-                yield break;
-            }
-
-            public override IEnumerable<string> GetSettingsErrors(IProcessSettings processSettings)
-            {
-                yield break;
-            }
-
-            public override string GetName()
-            {
-                return "Emit";
-            }
-
-
-#pragma warning disable 1998
-            public override async IAsyncEnumerable<Result<string>> Execute(IProcessSettings processSettings)
-#pragma warning restore 1998
-            {
-                yield return Result.Success(Term + Number);
-            }
-        }
-
     }
 }

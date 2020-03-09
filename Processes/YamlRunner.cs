@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using CSharpFunctionalExtensions;
 using JetBrains.Annotations;
-using Processes.conditions;
 using Processes.process;
 
 namespace Processes
@@ -41,17 +39,6 @@ namespace Processes
             {
                 yield return yamlResult.ConvertFailure<string>();
                 yield break;
-            }
-
-            foreach (var processCondition in yamlResult.Value.Conditions ?? Enumerable.Empty<Condition>())
-            {
-                if (processCondition.IsMet())
-                    yield return Result.Success(processCondition.GetDescription());
-                else
-                {
-                    yield return Result.Failure<string>($"CONDITION NOT MET: [{processCondition.GetDescription()}]");
-                    yield break;
-                }
             }
 
             var resultLines = yamlResult.Value.Execute(_processSettings);

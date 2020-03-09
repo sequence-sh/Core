@@ -1,7 +1,5 @@
 ﻿using System.Collections.Generic;
 using CSharpFunctionalExtensions;
-using Processes.conditions;
-using YamlDotNet.Serialization;
 
 namespace Processes.process
 {
@@ -38,11 +36,11 @@ namespace Processes.process
         public abstract IEnumerable<string> GetSettingsErrors(IProcessSettings processSettings);
         
 
-        /// <summary>
-        /// Conditions which must be true for this process to be executed
-        /// </summary>
-        [YamlMember(Order = 1)]
-        public List<Condition>? Conditions { get; set; }
+        ///// <summary>
+        ///// Conditions which must be true for this process to be executed
+        ///// </summary>
+        //[YamlMember(Order = 1)]
+        //public List<Condition>? Conditions { get; set; }
 
         /// <summary>
         /// The name of this process

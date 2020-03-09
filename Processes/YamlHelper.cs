@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using CSharpFunctionalExtensions;
-using Processes.conditions;
 using Processes.enumerations;
 using Processes.process;
 using YamlDotNet.Serialization;
@@ -26,8 +25,7 @@ namespace Processes
                 var types = assemblies
                     .SelectMany(s => s.GetTypes())
                     .Where(type => 
-                        typeof(Process).IsAssignableFrom(type) 
-                        || typeof(Condition).IsAssignableFrom(type) 
+                        typeof(Process).IsAssignableFrom(type)
                         || typeof(Enumeration).IsAssignableFrom(type))
                     .Where(x=>!x.IsAbstract && ! x.IsInterface)
                     .ToList();

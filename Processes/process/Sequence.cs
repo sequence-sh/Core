@@ -3,7 +3,6 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Runtime.Serialization;
 using CSharpFunctionalExtensions;
-using Processes.conditions;
 using YamlDotNet.Serialization;
 
 namespace Processes.process
@@ -39,17 +38,6 @@ namespace Processes.process
         {
             foreach (var process in Steps)
             {
-                foreach (var processCondition in process.Conditions?? Enumerable.Empty<Condition>())
-                {
-                    if (processCondition.IsMet())
-                        yield return Result.Success(processCondition.GetDescription());
-                    else
-                    {
-                        yield return Result.Failure<string>($"CONDITION NOT MET: [{processCondition.GetDescription()}]");
-                        yield break;
-                    }
-                }
-
                 yield return Result.Success($"Executing '{process.GetName()}'");
                 var allGood = true;
                 var resultLines = process.Execute(processSettings);
@@ -66,9 +54,7 @@ namespace Processes.process
         /// <inheritdoc />
         public override bool Equals(object? obj)
         {
-            var r = obj is Sequence msp && (Conditions??Enumerable.Empty<Condition>()).SequenceEqual(msp.Conditions??Enumerable.Empty<Condition>())
-                                                       && Steps.SequenceEqual(msp.Steps);
-
+            var r = obj is Sequence msp && Steps.SequenceEqual(msp.Steps);
             return r;
         }
 

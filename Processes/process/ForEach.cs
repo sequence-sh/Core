@@ -1,9 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
 using System.Runtime.Serialization;
 using CSharpFunctionalExtensions;
-using Processes.conditions;
 using Processes.enumerations;
 using YamlDotNet.Serialization;
 
@@ -87,9 +85,7 @@ namespace Processes.process
                     yield return injectionResult.ConvertFailure<string>();
                     yield break;
                 }
-
-                if (!(subProcess.Conditions ?? Enumerable.Empty<Condition>()).All(x => x.IsMet())) continue;
-
+                
                 var resultLines = subProcess.Execute(processSettings);
 
                 await foreach (var rl in resultLines)
