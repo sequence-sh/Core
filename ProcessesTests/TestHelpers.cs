@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using NUnit.Framework;
 
-namespace ProcessesTests
+namespace Reductech.EDR.Utilities.Processes.Tests
 {
     public static class TestHelpers
     {

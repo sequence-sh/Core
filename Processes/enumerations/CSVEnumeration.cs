@@ -6,7 +6,7 @@ using System.Runtime.Serialization;
 using CSharpFunctionalExtensions;
 using YamlDotNet.Serialization;
 
-namespace Processes.enumerations
+namespace Reductech.EDR.Utilities.Processes.enumerations
 {
     /// <summary>
     /// Enumerates through a CSV file 

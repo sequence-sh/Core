@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 
-namespace Processes
+namespace Reductech.EDR.Utilities.Processes
 {
     /// <summary>
     /// Helper methods.

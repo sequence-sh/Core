@@ -3,7 +3,7 @@ using System.IO;
 using System.Linq;
 using CSharpFunctionalExtensions;
 
-namespace Processes
+namespace Reductech.EDR.Utilities.Processes
 {
     /// <summary>
     /// Runs external processes.

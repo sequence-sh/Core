@@ -2,11 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using CSharpFunctionalExtensions;
-using Processes.enumerations;
-using Processes.process;
+using Reductech.EDR.Utilities.Processes.enumerations;
 using YamlDotNet.Serialization;
 
-namespace Processes
+namespace Reductech.EDR.Utilities.Processes
 {
     /// <summary>
     /// Contains methods for serializing and deserializing yaml

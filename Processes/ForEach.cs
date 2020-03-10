@@ -2,10 +2,10 @@
 using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 using CSharpFunctionalExtensions;
-using Processes.enumerations;
+using Reductech.EDR.Utilities.Processes.enumerations;
 using YamlDotNet.Serialization;
 
-namespace Processes.process
+namespace Reductech.EDR.Utilities.Processes
 {
     /// <summary>
     /// Performs a nested process once for each element in an enumeration

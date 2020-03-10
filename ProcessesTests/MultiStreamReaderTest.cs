@@ -2,9 +2,8 @@
 using System.Threading.Tasks;
 using Moq;
 using NUnit.Framework;
-using Processes;
 
-namespace ProcessesTests
+namespace Reductech.EDR.Utilities.Processes.Tests
 {
     public class MultiStreamReaderTest
     {

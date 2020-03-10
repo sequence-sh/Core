@@ -5,7 +5,7 @@ using System.Text;
 using CSharpFunctionalExtensions;
 using Microsoft.VisualBasic.FileIO;
 
-namespace Processes
+namespace Reductech.EDR.Utilities.Processes
 {
     internal static class CsvReader
     {

@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Processes.process
+namespace Reductech.EDR.Utilities.Processes
 {
     /// <summary>
     /// Represents the current state of a running process

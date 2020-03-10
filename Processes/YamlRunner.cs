@@ -3,9 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using CSharpFunctionalExtensions;
 using JetBrains.Annotations;
-using Processes.process;
 
-namespace Processes
+namespace Reductech.EDR.Utilities.Processes
 {
     /// <summary>
     /// Runs processes from Yaml

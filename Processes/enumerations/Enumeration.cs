@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using CSharpFunctionalExtensions;
 
-namespace Processes.enumerations
+namespace Reductech.EDR.Utilities.Processes.enumerations
 {
     /// <summary>
     /// Represents a list of elements

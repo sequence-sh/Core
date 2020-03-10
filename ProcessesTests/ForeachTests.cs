@@ -3,10 +3,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using NUnit.Framework;
-using Processes.enumerations;
-using Processes.process;
+using Reductech.EDR.Utilities.Processes.enumerations;
 
-namespace ProcessesTests
+namespace Reductech.EDR.Utilities.Processes.Tests
 {
     public class ForeachTests
     {

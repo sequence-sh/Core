@@ -1,5 +1,5 @@
 ﻿using System.Runtime.CompilerServices;
-using Processes;
+using Reductech.EDR.Utilities.Processes;
 
 [assembly: InternalsVisibleTo("ProcessesTests")]
 [assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]

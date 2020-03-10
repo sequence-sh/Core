@@ -2,7 +2,7 @@
 using System.Runtime.Serialization;
 using YamlDotNet.Serialization;
 
-namespace Processes.enumerations
+namespace Reductech.EDR.Utilities.Processes.enumerations
 {
     /// <summary>
     /// Inject the values from a particular column

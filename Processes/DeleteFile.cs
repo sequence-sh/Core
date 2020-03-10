@@ -5,7 +5,7 @@ using System.Runtime.Serialization;
 using CSharpFunctionalExtensions;
 using YamlDotNet.Serialization;
 
-namespace Processes.process
+namespace Reductech.EDR.Utilities.Processes
 {
     /// <summary>
     /// Deletes a file or a directory.

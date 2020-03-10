@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Processes
+namespace Reductech.EDR.Utilities.Processes
 {
     /// <summary>
     /// Use this attribute if your solution contains orchestration processes

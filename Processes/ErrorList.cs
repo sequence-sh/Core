@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Processes
+namespace Reductech.EDR.Utilities.Processes
 {
     internal class ErrorList : IEnumerable<string>
     {

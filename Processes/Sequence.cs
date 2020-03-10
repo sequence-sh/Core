@@ -5,7 +5,7 @@ using System.Runtime.Serialization;
 using CSharpFunctionalExtensions;
 using YamlDotNet.Serialization;
 
-namespace Processes.process
+namespace Reductech.EDR.Utilities.Processes
 {
     /// <summary>
     /// Executes each step in sequence until a condition is not met or a process fails.

@@ -2,9 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using CSharpFunctionalExtensions;
-using Processes.process;
 
-namespace Processes.enumerations
+namespace Reductech.EDR.Utilities.Processes.enumerations
 {
     internal interface IProcessInjector
     {

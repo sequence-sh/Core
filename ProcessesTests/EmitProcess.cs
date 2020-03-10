@@ -1,10 +1,9 @@
 ﻿using System.Collections.Generic;
 using CSharpFunctionalExtensions;
 using JetBrains.Annotations;
-using Processes.process;
 using YamlDotNet.Serialization;
 
-namespace ProcessesTests
+namespace Reductech.EDR.Utilities.Processes.Tests
 {
     public class EmitProcess : Process
     {

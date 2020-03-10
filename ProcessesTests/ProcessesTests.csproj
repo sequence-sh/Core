@@ -6,6 +6,8 @@
     <IsPackable>false</IsPackable>
 
     <Nullable>enable</Nullable>
+
+    <RootNamespace>Reductech.EDR.Utilities.Processes.Tests</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>

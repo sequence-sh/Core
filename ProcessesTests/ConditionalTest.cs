@@ -3,10 +3,9 @@ using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 using CSharpFunctionalExtensions;
 using NUnit.Framework;
-using Processes.process;
 using YamlDotNet.Serialization;
 
-namespace ProcessesTests
+namespace Reductech.EDR.Utilities.Processes.Tests
 {
     public class ConditionalTest
     {
