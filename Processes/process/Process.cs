@@ -34,13 +34,6 @@ namespace Processes.process
         /// Get errors in the process settings.
         /// </summary>
         public abstract IEnumerable<string> GetSettingsErrors(IProcessSettings processSettings);
-        
-
-        ///// <summary>
-        ///// Conditions which must be true for this process to be executed
-        ///// </summary>
-        //[YamlMember(Order = 1)]
-        //public List<Condition>? Conditions { get; set; }
 
         /// <summary>
         /// The name of this process

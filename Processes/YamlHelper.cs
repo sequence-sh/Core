@@ -24,7 +24,7 @@ namespace Processes
 
                 var types = assemblies
                     .SelectMany(s => s.GetTypes())
-                    .Where(type => 
+                    .Where(type =>  
                         typeof(Process).IsAssignableFrom(type)
                         || typeof(Enumeration).IsAssignableFrom(type))
                     .Where(x=>!x.IsAbstract && ! x.IsInterface)
@@ -37,6 +37,7 @@ namespace Processes
         private static readonly Lazy<IDeserializer> Deserializer = new Lazy<IDeserializer>(() =>
         {
             var deSerializerBuilder = new DeserializerBuilder();
+
             deSerializerBuilder =
                 SpecialTypes.Aggregate(deSerializerBuilder, (current, specialType) => current.WithTagMapping("!" + specialType.Name, specialType));
 

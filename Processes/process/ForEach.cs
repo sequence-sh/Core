@@ -58,7 +58,7 @@ namespace Processes.process
         /// </summary>
         [Required]
         [DataMember]
-        [YamlMember(Order = 5)]
+        [YamlMember(Order = 5, Alias = "RunProcess")]
         public Process SubProcess { get; set; }
 #pragma warning restore CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
 

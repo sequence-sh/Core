@@ -30,7 +30,7 @@
             A condition that requires that a particular file exists
             </summary>
         </member>
-        <member name="P:Processes.conditions.FileExists.FilePath">
+        <member name="P:Processes.conditions.FileExists.Path">
             <summary>
             The path of the file to check
             </summary>
@@ -179,7 +179,7 @@
             Delete a file or a directory
             </summary>
         </member>
-        <member name="P:Processes.process.DeleteFile.FilePath">
+        <member name="P:Processes.process.DeleteFile.Path">
             <summary>
             The path to the file to delete
             </summary>
