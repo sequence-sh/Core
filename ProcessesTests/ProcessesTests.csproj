@@ -8,6 +8,28 @@
     <Nullable>enable</Nullable>
 
     <RootNamespace>Reductech.EDR.Utilities.Processes.Tests</RootNamespace>
+
+    <Authors>Mark Wainwright</Authors>
+
+    <Company>Reductech</Company>
+
+    <Product>EDR</Product>
+
+    <Description>Tests for processes.</Description>
+
+    <Copyright>©2020 Reductech Ltd.</Copyright>
+
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
+
+    <PackageProjectUrl>https://reductech.io/</PackageProjectUrl>
+
+    <PackageTags>ediscovery,forensics,automation,orchestration,edrm, unittests</PackageTags>
+
+    <PackageReleaseNotes>First Release</PackageReleaseNotes>
+
+    <AssemblyVersion>0.1.0.0</AssemblyVersion>
+
+    <FileVersion>0.1.0.0</FileVersion>
   </PropertyGroup>
 
   <ItemGroup>
@@ -22,6 +44,13 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Processes\Processes.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\LICENSE">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
   </ItemGroup>
 
 </Project>
