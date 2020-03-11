@@ -6,7 +6,7 @@ using YamlDotNet.Serialization;
 namespace Reductech.EDR.Utilities.Processes.enumerations
 {
     /// <summary>
-    /// Injects a value from the enumerator into a process property in a foreach loop
+    /// Injects a value from the enumerator into a property of a loop's process.
     /// </summary>
     public class Injection
     {
@@ -16,6 +16,7 @@ namespace Reductech.EDR.Utilities.Processes.enumerations
         [Required]
         [DataMember]
         [YamlMember(Order = 2)]
+        [ExampleValue("SearchTerm")]
 #pragma warning disable CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
         public string Property { get; set; }
 #pragma warning restore CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
@@ -23,20 +24,22 @@ namespace Reductech.EDR.Utilities.Processes.enumerations
         /// <summary>
         /// The regex to use to extract the useful part of the element.
         /// The first match of the regex will be used.
-        /// Will be ignored if null.
         /// </summary>
         [DataMember]
         [YamlMember(Order = 3)]
+        [DefaultValueExplanation("The entire value will be injected.")]
+        [ExampleValue("prefix-(.+)")]
         public string? Regex { get; set; }
 
         /// <summary>
         /// The template to apply to the element before injection.
-        /// If null the element will be used without modification.
         /// The string '$s' in the template will be replaced with the element.
-        /// Is applied after the Regex.
+        /// The template will be applied after the Regex.
         /// </summary>
         [DataMember]
         [YamlMember(Order = 4)]
+        [ExampleValue("$s.txt")]
+        [DefaultValueExplanation("The value will be injected on its own.")]
         public string? Template { get; set; }
 
         internal Result<string> GetPropertyValue(string s)
