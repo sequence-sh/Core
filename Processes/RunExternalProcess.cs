@@ -8,7 +8,7 @@ using YamlDotNet.Serialization;
 namespace Reductech.EDR.Utilities.Processes
 {
     /// <summary>
-    /// Runs an external process
+    /// Runs an external process.
     /// </summary>
     public class RunExternalProcess : Process
     {
@@ -28,19 +28,6 @@ namespace Reductech.EDR.Utilities.Processes
         public Dictionary<string, string> Parameters { get; set; }
 #pragma warning restore CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
 
-        /// <summary>
-        /// The name of an additional parameter.
-        /// This is intended for use with injection.
-        /// </summary>
-        [YamlMember(Order = 4)]
-        public string? ExtraParameterName { get; set; }
-
-        /// <summary>
-        /// The value of the additional parameter.
-        /// This is intended for use with injection.
-        /// </summary>
-        [YamlMember(Order = 5)]
-        public string? ExtraParameterValue { get; set; }
 
         /// <inheritdoc />
         public override IEnumerable<string> GetArgumentErrors()
@@ -51,11 +38,6 @@ namespace Reductech.EDR.Utilities.Processes
                 yield return $"'{ProcessPath}' does not point to an executable file.";
             if (!File.Exists(ProcessPath))
                 yield return $"'{ProcessPath}' does not exist.";
-
-            if (ExtraParameterName != null && ExtraParameterValue == null)
-                yield return $"{nameof(ExtraParameterValue)} is null.";
-            if (ExtraParameterName == null && ExtraParameterValue != null)
-                yield return $"{nameof(ExtraParameterName)} is null.";
         }
 
         /// <inheritdoc />
@@ -67,10 +49,7 @@ namespace Reductech.EDR.Utilities.Processes
         /// <inheritdoc />
         public override string GetName()
         {
-            return $"{ProcessPath} {string.Join(" ", Parameters.Select((k, v) => $"-{k} {v}"))}" +
-                   (ExtraParameterName != null && ExtraParameterValue != null
-                       ? $" -{ExtraParameterName} {ExtraParameterValue}"
-                       : "");
+            return $"{ProcessPath} {string.Join(" ", Parameters.Select((k, v) => $"-{k} {v}"))}";
         }
 
         /// <inheritdoc />
@@ -93,11 +72,6 @@ namespace Reductech.EDR.Utilities.Processes
                 args.Add(value);
             }
 
-            if (ExtraParameterName != null && ExtraParameterValue != null)
-            {
-                args.Add($"-{ExtraParameterName}");
-                args.Add(ExtraParameterValue);
-            }
             var result = ExternalProcessHelper.RunExternalProcess(ProcessPath, args);
 
             await foreach (var line in result)

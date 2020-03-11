@@ -8,7 +8,7 @@ using YamlDotNet.Serialization;
 namespace Reductech.EDR.Utilities.Processes
 {
     /// <summary>
-    /// Performs a nested process once for each element in an enumeration
+    /// Performs a nested process once for each element in an enumeration.
     /// </summary>
     public class Loop : Process
     {
@@ -44,7 +44,7 @@ namespace Reductech.EDR.Utilities.Processes
         public Enumeration For { get; set; }
 
         /// <summary>
-        /// The process to run once for each element
+        /// The process to run once for each element.
         /// </summary>
         [Required]
         [DataMember]
