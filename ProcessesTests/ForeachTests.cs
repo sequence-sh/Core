@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using NUnit.Framework;
 using Reductech.EDR.Utilities.Processes.enumerations;
+using List = Reductech.EDR.Utilities.Processes.enumerations.List;
 
 namespace Reductech.EDR.Utilities.Processes.Tests
 {
@@ -14,45 +15,49 @@ namespace Reductech.EDR.Utilities.Processes.Tests
         [Test]
         public async Task TestCSV()
         {
-            var csv = string.Join("\r\n", new []
-            {
-                "Text,Number,Color",
-                "#Comment",
-                "Correct,1,Red",
-                "Horse,2,Yellow",
-                "Battery,3,Green",
-                "Staple,4,Blue",
-            });
+            var csv = string.Join("\r\n", "Text,Number,Color", "#Comment", "Correct,1,Red", "Horse,2,Yellow", "Battery,3,Green", "Staple,4,Blue");
 
             var expected = new List<string>
             {
                 "Correct1", "Horse2", "Battery3", "Staple4"
             };
 
-            var forEachProcess = new ForEach
+            var forEachProcess = new Loop
             {
-                Enumeration = new CSVEnumeration
+                For = new CSV
                 {
                     CSVText = csv,
                     CommentToken = "#",
                     Delimiter = ",",
-                    ColumnInjections = new List<ColumnInjection>
+                    InjectColumn = new Dictionary<string, Injection>
                     {
-                        new ColumnInjection()
                         {
-                            Header = "Text",
-                            PropertyToInject = nameof(EmitProcess.Term)
-                        },
-                        new ColumnInjection()
+                            "Text",
+                            new Injection
+                            {
+                                Property = nameof(EmitProcess.Term),
+                                Regex = "(.+)",
+                                Template = "$s"
+                            }
+                        }
+                        ,
                         {
-                            Header = "Number",
-                            PropertyToInject = nameof(EmitProcess.Number)
-                        },
+                            "Number",
+                            new Injection
+                            {
+                                Property = nameof(EmitProcess.Number)
+                            }
+                        }
+                        
                     }
                 },
 
-                SubProcess = new EmitProcess()
+                Do = new EmitProcess()
             };
+
+            var yaml = YamlHelper.ConvertToYaml(forEachProcess);
+
+            Assert.IsNotEmpty(yaml);
 
             var realList = new List<string>();
 
@@ -79,21 +84,21 @@ namespace Reductech.EDR.Utilities.Processes.Tests
             };
             var expected = list.Select(s => $"'{s}'").ToList();
 
-            var forEachProcess = new ForEach
+            var forEachProcess = new Loop
             {
-                Enumeration = new Collection
+                For = new List
                 {
                     Members = list,
-                    Injections = new List<Injection>
+                    Inject = new List<Injection>
                     {
                         new Injection
                         {
-                            PropertyToInject = nameof(EmitProcess.Term),
-                            Template = "'$s'",
+                            Property = nameof(EmitProcess.Term),
+                            Template = "'$s'"
                         }
                     }
                 },
-                SubProcess = new EmitProcess()
+                Do = new EmitProcess()
             };
 
             var realList = new List<string>();
@@ -118,20 +123,20 @@ namespace Reductech.EDR.Utilities.Processes.Tests
             };
             var expected = list.ToList();
 
-            var forEachProcess = new ForEach
+            var forEachProcess = new Loop
             {
-                Enumeration = new Collection
+                For = new List
                 {
                     Members = list,
-                    Injections = new List<Injection>
+                    Inject = new List<Injection>
                     {
                         new Injection
                         {
-                            PropertyToInject = nameof(EmitProcess.Number)
+                            Property = nameof(EmitProcess.Number)
                         }
                     }
                 },
-                SubProcess = new EmitProcess()
+                Do = new EmitProcess()
             };
 
 

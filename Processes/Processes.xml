@@ -72,18 +72,18 @@
             The path to the directory
             </summary>
         </member>
-        <member name="T:Processes.enumerations.Enumeration">
+        <member name="T:Processes.enumerations.For">
             <summary>
             Represents a list of elements
             </summary>
         </member>
-        <member name="M:Processes.enumerations.Enumeration.ToString">
+        <member name="M:Processes.enumerations.For.ToString">
             <inheritdoc />
         </member>
-        <member name="M:Processes.enumerations.Enumeration.Equals(System.Object)">
+        <member name="M:Processes.enumerations.For.Equals(System.Object)">
             <inheritdoc />
         </member>
-        <member name="M:Processes.enumerations.Enumeration.GetHashCode">
+        <member name="M:Processes.enumerations.For.GetHashCode">
             <inheritdoc />
         </member>
         <member name="T:Processes.EnumMethods">
@@ -174,59 +174,59 @@
         <member name="M:Processes.process.Branch.GetArgumentErrors">
             <inheritdoc />
         </member>
-        <member name="T:Processes.process.DeleteFile">
+        <member name="T:Processes.process.DeleteItem">
             <summary>
             Delete a file or a directory
             </summary>
         </member>
-        <member name="P:Processes.process.DeleteFile.Path">
+        <member name="P:Processes.process.DeleteItem.Path">
             <summary>
             The path to the file to delete
             </summary>
         </member>
-        <member name="M:Processes.process.DeleteFile.GetArgumentErrors">
+        <member name="M:Processes.process.DeleteItem.GetArgumentErrors">
             <inheritdoc />
         </member>
-        <member name="M:Processes.process.DeleteFile.GetName">
+        <member name="M:Processes.process.DeleteItem.GetName">
             <inheritdoc />
         </member>
-        <member name="M:Processes.process.DeleteFile.Execute">
+        <member name="M:Processes.process.DeleteItem.Execute">
             <inheritdoc />
         </member>
-        <member name="T:Processes.process.ForEach">
+        <member name="T:Processes.process.Loop">
             <summary>
             Performs a nested process once for each element in an enumeration
             </summary>
         </member>
-        <member name="M:Processes.process.ForEach.GetArgumentErrors">
+        <member name="M:Processes.process.Loop.GetArgumentErrors">
             <inheritdoc />
         </member>
-        <member name="M:Processes.process.ForEach.GetName">
+        <member name="M:Processes.process.Loop.GetName">
             <inheritdoc />
         </member>
-        <member name="P:Processes.process.ForEach.Enumeration">
+        <member name="P:Processes.process.Loop.For">
             <summary>
             The enumeration to iterate through.
             </summary>
         </member>
-        <member name="P:Processes.process.ForEach.PropertyToInject">
+        <member name="P:Processes.process.Loop.Propertyion">
             <summary>
-            The property of the subProcess to inject with the element of enumeration
+            The property of the subProcess to injection with the element of enumeration
             </summary>
         </member>
-        <member name="P:Processes.process.ForEach.Template">
+        <member name="P:Processes.process.Loop.Template">
             <summary>
             The template to apply to the element before injection.
             If null the element will be used without modification
             The string '$s' in the template will be replaced with the element
             </summary>
         </member>
-        <member name="P:Processes.process.ForEach.SubProcess">
+        <member name="P:Processes.process.Loop.Do">
             <summary>
             The process to run once for each element
             </summary>
         </member>
-        <member name="M:Processes.process.ForEach.Execute">
+        <member name="M:Processes.process.Loop.Execute">
             <inheritdoc />
         </member>
         <member name="T:Processes.process.Process">

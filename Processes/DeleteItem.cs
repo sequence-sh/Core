@@ -10,7 +10,7 @@ namespace Reductech.EDR.Utilities.Processes
     /// <summary>
     /// Deletes a file or a directory.
     /// </summary>
-    public class DeleteFile : Process
+    public class DeleteItem : Process
     {
         /// <summary>
         /// The path to the file or directory to delete.

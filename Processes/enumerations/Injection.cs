@@ -11,13 +11,13 @@ namespace Reductech.EDR.Utilities.Processes.enumerations
     public class Injection
     {
         /// <summary>
-        /// The property of the subProcess to inject with the element of enumeration
+        /// The property of the subProcess to injection with the element of enumeration
         /// </summary>
         [Required]
         [DataMember]
         [YamlMember(Order = 2)]
 #pragma warning disable CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
-        public string PropertyToInject { get; set; }
+        public string Property { get; set; }
 #pragma warning restore CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
 
         /// <summary>

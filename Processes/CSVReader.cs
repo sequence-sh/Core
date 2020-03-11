@@ -37,8 +37,6 @@ namespace Reductech.EDR.Utilities.Processes
             return TryReadCSV(csvParser, delimiter, commentToken, enclosedInQuotes);
         }
 
-
-
         public static Result<DataTable, ErrorList> TryReadCSV(TextFieldParser csvParser,
             string delimiter, string? commentToken, bool enclosedInQuotes)
         {

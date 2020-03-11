@@ -30,7 +30,7 @@ namespace Reductech.EDR.Utilities.Processes.enumerations
 
                 var files = System.IO.Directory.GetFiles(Path);
                 return Result.Success<IReadOnlyCollection<IProcessInjector>,ErrorList>
-                    ( files.Select(f => new ProcessInjector(Injections.Select(i => (f, i)))).ToList());
+                    ( files.Select(f => new ProcessInjector(Injection.Select(i => (f, i)))).ToList());
             }
         }
 
@@ -44,12 +44,12 @@ namespace Reductech.EDR.Utilities.Processes.enumerations
         public string Path { get; set; }
 
         /// <summary>
-        /// Injections to use on the elements of the list
+        /// Injection to use on the elements of the list
         /// </summary>
         [Required]
         [DataMember]
         [YamlMember(Order = 2)]
-        public List<Injection> Injections { get; set; }
+        public List<Injection> Injection { get; set; }
 #pragma warning restore CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
     }
 }

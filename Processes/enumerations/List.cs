@@ -10,11 +10,11 @@ namespace Reductech.EDR.Utilities.Processes.enumerations
     /// <summary>
     /// Enumerates through elements of a list
     /// </summary>
-    public class Collection : Enumeration
+    public class List : Enumeration
     {
         internal override Result<IReadOnlyCollection<IProcessInjector>,ErrorList> Elements =>
             Result.Success<IReadOnlyCollection<IProcessInjector>,ErrorList>
-                (Members.Select(m => new ProcessInjector(Injections.Select(i => (m, i)))).ToList());
+                (Members.Select(m => new ProcessInjector(Inject.Select(i => (m, i)))).ToList());
         internal override string Name => $"[{string.Join(", ", Members)}]";
         internal override IEnumerable<string> GetArgumentErrors()
         {
@@ -32,12 +32,12 @@ namespace Reductech.EDR.Utilities.Processes.enumerations
         public List<string> Members { get; set; }
 
         /// <summary>
-        /// Injections to use on the elements of the list
+        /// Injection to use on the elements of the list
         /// </summary>
         [Required]
         [DataMember]
         [YamlMember(Order = 2)]
-        public List<Injection> Injections { get; set; }
+        public List<Injection> Inject { get; set; }
 #pragma warning restore CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
     }
 }

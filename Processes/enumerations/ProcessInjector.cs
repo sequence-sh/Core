@@ -34,11 +34,11 @@ namespace Reductech.EDR.Utilities.Processes.enumerations
             foreach (var (element, injection) in _injections)
             {
 
-                var property = process.GetType().GetProperty(injection.PropertyToInject); //TODO handle dots and array indexes in this argument
+                var property = process.GetType().GetProperty(injection.Property); //TODO handle dots and array indexes in this argument
 
                 if (property == null)
                 {
-                    return Result.Failure($"Could not find property '{injection.PropertyToInject}'");
+                    return Result.Failure($"Could not find property '{injection.Property}'");
                 }
 
                 var (_, isFailure, value, error1) = injection.GetPropertyValue(element);
@@ -71,7 +71,7 @@ namespace Reductech.EDR.Utilities.Processes.enumerations
 
                     if (error != null)
                     {
-                        return Result.Failure($"Could not cast '{value}' to type '{injection.PropertyToInject}'");
+                        return Result.Failure($"Could not cast '{value}' to type '{injection.Property}'");
                     }
                 }
 
