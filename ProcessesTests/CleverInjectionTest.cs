@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using CSharpFunctionalExtensions;
 using NUnit.Framework;
-using Reductech.EDR.Utilities.Processes.enumerations;
+using Reductech.EDR.Utilities.Processes.injection;
 using List = Reductech.EDR.Utilities.Processes.enumerations.List;
 
 namespace Reductech.EDR.Utilities.Processes.Tests
@@ -62,14 +60,20 @@ namespace Reductech.EDR.Utilities.Processes.Tests
         {
             var process = new Loop
             {
-                For = new List()
+                For = new List
+                {
+                    Members = new List<string>
+                    {
+                        "Orange"
+                    }
+                },
             };
 
             var injector = new ProcessInjector(new List<(string element, Injection injection)>()
             {
                 ("Pink", new Injection
                 {
-                    Property = $"{nameof(Loop.For)}.{nameof(List.Members)})[0]" 
+                    Property = $"{nameof(Loop.For)}.{nameof(List.Members)}[0]" 
                 } )
             });
 

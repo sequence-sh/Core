@@ -3,7 +3,7 @@ using System.Runtime.Serialization;
 using CSharpFunctionalExtensions;
 using YamlDotNet.Serialization;
 
-namespace Reductech.EDR.Utilities.Processes.enumerations
+namespace Reductech.EDR.Utilities.Processes.injection
 {
     /// <summary>
     /// Injects a value from the enumerator into a property of a loop's process.

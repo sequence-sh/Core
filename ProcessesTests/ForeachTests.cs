@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using NUnit.Framework;
 using Reductech.EDR.Utilities.Processes.enumerations;
+using Reductech.EDR.Utilities.Processes.injection;
 using List = Reductech.EDR.Utilities.Processes.enumerations.List;
 
 namespace Reductech.EDR.Utilities.Processes.Tests
