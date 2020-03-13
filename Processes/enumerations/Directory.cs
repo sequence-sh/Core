@@ -9,7 +9,7 @@ using YamlDotNet.Serialization;
 namespace Reductech.EDR.Utilities.Processes.enumerations
 {
     /// <summary>
-    /// Enumerates through files in a directory
+    /// Enumerates through files in a directory.
     /// </summary>
     public class Directory : Enumeration
     {
@@ -36,19 +36,19 @@ namespace Reductech.EDR.Utilities.Processes.enumerations
         }
 
         /// <summary>
-        /// The path to the directory
+        /// The path to the directory.
         /// </summary>
         [Required]
-        [DataMember]
+        
         [YamlMember(Order = 1)]
 #pragma warning disable CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
         public string Path { get; set; }
 
         /// <summary>
-        /// Injection to use on the elements of the list
+        /// Property injections to use.
         /// </summary>
         [Required]
-        [DataMember]
+        
         [YamlMember(Order = 2)]
         public List<Injection> Injection { get; set; }
 #pragma warning restore CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.

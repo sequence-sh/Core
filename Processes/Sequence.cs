@@ -8,7 +8,8 @@ using YamlDotNet.Serialization;
 namespace Reductech.EDR.Utilities.Processes
 {
     /// <summary>
-    /// Executes each step in sequence until a condition is not met or a process fails.
+    /// Executes each step, one after the another.
+    /// Will stop if a process fails.
     /// </summary>
     public class Sequence : Process
     {
@@ -21,10 +22,10 @@ namespace Reductech.EDR.Utilities.Processes
         }
 
         /// <summary>
-        /// Steps that make up this process. To be executed in order
+        /// Steps that make up this process.
         /// </summary>
         [Required]
-        [DataMember]
+        
         [YamlMember(Order = 3)]
 #pragma warning disable CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
         public List<Process> Steps { get; set; }

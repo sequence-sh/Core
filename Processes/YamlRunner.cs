@@ -25,9 +25,9 @@ namespace Reductech.EDR.Utilities.Processes
         
 
         /// <summary>
-        /// Run process defined in yaml
+        /// Run process defined in a yaml string.
         /// </summary>
-        /// <param name="yamlString">Yaml representing the process</param>
+        /// <param name="yamlString">Yaml representing the process.</param>
         /// <returns></returns>
         [UsedImplicitly]
         public async IAsyncEnumerable<Result<string>> RunProcessFromYamlString(string yamlString)
@@ -48,9 +48,9 @@ namespace Reductech.EDR.Utilities.Processes
         }
 
         /// <summary>
-        /// Run process defined in yaml found at a particular path
+        /// Run process defined in a yaml file.
         /// </summary>
-        /// <param name="yamlPath">Path to the yaml</param>
+        /// <param name="yamlPath">Path to the yaml file.</param>
         /// <returns></returns>
         [UsedImplicitly]
         public async IAsyncEnumerable<Result<string>> RunProcessFromYaml(string yamlPath)

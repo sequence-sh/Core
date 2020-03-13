@@ -89,7 +89,7 @@ namespace Reductech.EDR.Utilities.Processes.Tests
             else yield return Result.Failure<string>("Failed");
         }
 
-        [DataMember]
+        
         [YamlMember]
         [Required]
         public bool Success { get; set; }

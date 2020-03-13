@@ -38,7 +38,7 @@ namespace Reductech.EDR.Utilities.Processes
         /// The enumeration to iterate through.
         /// </summary>
         [Required]
-        [DataMember]
+        
         [YamlMember(Order = 2)]
 #pragma warning disable CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
         public Enumeration For { get; set; }
@@ -47,7 +47,7 @@ namespace Reductech.EDR.Utilities.Processes
         /// The process to run once for each element.
         /// </summary>
         [Required]
-        [DataMember]
+        
         [YamlMember(Order = 5, Alias = "RunProcess")]
         public Process Do { get; set; }
 #pragma warning restore CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.

@@ -30,7 +30,7 @@ namespace Reductech.EDR.Utilities.Processes.Tests
                     CSVText = csv,
                     CommentToken = "#",
                     Delimiter = ",",
-                    InjectColumn = new Dictionary<string, Injection>
+                    InjectColumns = new Dictionary<string, Injection>
                     {
                         {
                             "Text",

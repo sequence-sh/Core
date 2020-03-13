@@ -9,7 +9,7 @@ using YamlDotNet.Serialization;
 namespace Reductech.EDR.Utilities.Processes.enumerations
 {
     /// <summary>
-    /// Enumerates through elements of a list
+    /// Enumerates through elements of a list.
     /// </summary>
     public class List : Enumeration
     {
@@ -24,19 +24,19 @@ namespace Reductech.EDR.Utilities.Processes.enumerations
         }
 
         /// <summary>
-        /// The elements to iterate over
+        /// The elements to iterate over.
         /// </summary>
         [Required]
-        [DataMember]
+        
         [YamlMember(Order = 1)]
 #pragma warning disable CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
         public List<string> Members { get; set; }
 
         /// <summary>
-        /// Injection to use on the elements of the list
+        /// Property injections to use.
         /// </summary>
         [Required]
-        [DataMember]
+        
         [YamlMember(Order = 2)]
         public List<Injection> Inject { get; set; }
 #pragma warning restore CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.

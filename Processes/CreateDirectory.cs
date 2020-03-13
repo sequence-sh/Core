@@ -10,7 +10,7 @@ using YamlDotNet.Serialization;
 namespace Reductech.EDR.Utilities.Processes
 {
     /// <summary>
-    /// Creates a new directory
+    /// Creates a new directory in the file system.
     /// </summary>
     public class CreateDirectory : Process
     {
@@ -64,7 +64,7 @@ namespace Reductech.EDR.Utilities.Processes
         /// </summary>
         [YamlMember(Order = 2)]
         [Required]
-        [DataMember]
+        
 #pragma warning disable CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
         public string Path { get; set; }
 #pragma warning restore CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.

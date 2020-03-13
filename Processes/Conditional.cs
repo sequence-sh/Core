@@ -8,15 +8,15 @@ using YamlDotNet.Serialization;
 namespace Reductech.EDR.Utilities.Processes
 {
     /// <summary>
-    /// A process that runs a process depending on the success of an assertion.
+    /// Runs the 'If' process. If it completed successfully then run the 'Then' process, otherwise run the 'Else' process.
     /// </summary>
     public class Conditional : Process
     {
         /// <summary>
-        /// The process to use as the assertion
+        /// The process to use as the assertion.
         /// </summary>
         [Required]
-        [DataMember]
+        
         [YamlMember(Order = 1)]
 #pragma warning disable CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
         public Process If { get; set; }
@@ -25,7 +25,7 @@ namespace Reductech.EDR.Utilities.Processes
         /// If the 'If' process was successful then run this.
         /// </summary>
         [Required]
-        [DataMember]
+        
         [YamlMember(Order = 2)]
         public Process Then { get; set; }
 #pragma warning restore CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
@@ -33,7 +33,7 @@ namespace Reductech.EDR.Utilities.Processes
         /// <summary>
         /// If the 'If' process was unsuccessful then run this.
         /// </summary>
-        [DataMember]
+        
         [YamlMember(Order = 3)]
         public Process? Else { get; set; }
 

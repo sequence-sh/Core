@@ -13,7 +13,7 @@ namespace Reductech.EDR.Utilities.Processes
     public class RunExternalProcess : Process
     {
         /// <summary>
-        /// The path to the process to run
+        /// The path to the process to run.
         /// </summary>
         [YamlMember(Order = 2)]
         [Required]
@@ -21,7 +21,7 @@ namespace Reductech.EDR.Utilities.Processes
         public string ProcessPath { get; set; }
 
         /// <summary>
-        /// Pairs of parameters to give to the process
+        /// Pairs of parameters to give to the process.
         /// </summary>
         [YamlMember(Order = 3)]
         [Required]

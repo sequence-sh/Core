@@ -10,7 +10,7 @@ using YamlDotNet.Serialization;
 namespace Reductech.EDR.Utilities.Processes.enumerations
 {
     /// <summary>
-    /// Enumerates through a CSV file 
+    /// Enumerates through a CSV file.
     /// </summary>
     public class CSV : Enumeration
     {
@@ -40,7 +40,7 @@ namespace Reductech.EDR.Utilities.Processes.enumerations
 
                 var columnInjections = new List<(Injection injection, DataColumn column)>();
 
-                foreach (var hi in InjectColumn)
+                foreach (var hi in InjectColumns)
                 {
                     var column = dataTable.Columns[hi.Key];
                     if (column == null) errors.Add($"Could not find column '{hi.Key}'");
@@ -114,33 +114,33 @@ namespace Reductech.EDR.Utilities.Processes.enumerations
         /// The path to the CSV file.
         /// Either this or CSVText must be set (but not both).
         /// </summary>
-        [DataMember]
+        
         [YamlMember]
         public string? CSVFilePath { get; set; }
         
         /// <summary>
-        /// Raw Csv.
+        /// Raw CSV.
         /// Either this or CSVFilePath must be set (but not both).
         /// </summary>
-        [DataMember]
+        
         [YamlMember]
         public string? CSVText { get; set; }
 
 
 #pragma warning disable CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
         /// <summary>
-        /// List of mappings from headers to property injection
+        /// List of mappings from CSV headers to property injection.
         /// </summary>
         [Required]
-        [DataMember]
+        
         [YamlMember]
-        public Dictionary<string, Injection>  InjectColumn { get; set; }
+        public Dictionary<string, Injection>  InjectColumns { get; set; }
 
         /// <summary>
-        /// The delimiter used in the CSV file
+        /// The delimiter used in the CSV file.
         /// </summary>
         [Required]
-        [DataMember]
+        
         [YamlMember]
         public string Delimiter { get; set; } = ",";
 #pragma warning restore CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
@@ -148,14 +148,14 @@ namespace Reductech.EDR.Utilities.Processes.enumerations
         /// <summary>
         /// A string that, when placed at the beginning of a line, indicates that the line is a comment and should be ignored by the parser.
         /// </summary>
-        [DataMember]
+        
         [YamlMember]
         public string? CommentToken { get; set; }
 
         /// <summary>
         /// Determines whether fields are enclosed in quotation marks.
         /// </summary>
-        [DataMember]
+        
         [YamlMember]
         public bool HasFieldsEnclosedInQuotes { get; set; } = false;
     }
