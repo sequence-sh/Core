@@ -229,10 +229,12 @@ namespace Reductech.EDR.Utilities.Processes.injection
                     {
                         o.SetValue(previous, value, new[] {indexConvertResult.Value});
                     }
+#pragma warning disable CA1031 // Do not catch general exception types
                     catch (Exception e)
                     {
                         return Result.Failure(GetInnermostMessage(e));
                     }
+#pragma warning restore CA1031 // Do not catch general exception types
 
                     return Result.Success();
                 }
@@ -243,10 +245,12 @@ namespace Reductech.EDR.Utilities.Processes.injection
                 {
                     nextObject = o.GetValue(previous, new[] {indexConvertResult.Value});
                 }
+#pragma warning disable CA1031 // Do not catch general exception types
                 catch (Exception e)
                 {
                     return Result.Failure(GetInnermostMessage(e)); 
                 }
+#pragma warning restore CA1031 // Do not catch general exception types
 
                 return nextObject == null ? 
                     Result.Failure($"Item at index '{Index}' is null.") :
