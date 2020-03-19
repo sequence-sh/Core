@@ -78,8 +78,15 @@ namespace Reductech.EDR.Utilities.Processes
                 
                 var resultLines = subProcess.Execute(processSettings);
 
+                var success = true;
+
                 await foreach (var rl in resultLines)
+                {
+                    if (rl.IsFailure) success = false;
                     yield return rl;
+                }
+                if(!success)
+                    break;
             }
         }
 
