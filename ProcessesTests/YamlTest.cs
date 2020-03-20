@@ -6,13 +6,18 @@ namespace Reductech.EDR.Utilities.Processes.Tests
     public class YamlTest
     {
         [Test]
-        public async Task TestDeserializeIgnore()
+        public async Task TestDeserializeDefaults()
         {
             const string text = 
-                @"
-!EmitProcess
-    Ignore: &t Word
-    Term: *t";
+@"
+!Sequence
+Defaults: {Term: Word}    
+Steps:
+    - !EmitProcess
+        Number: 1
+    - !EmitProcess
+        Number: 2
+";
 
             var result = YamlHelper.TryMakeFromYaml(text);
 
@@ -23,7 +28,36 @@ namespace Reductech.EDR.Utilities.Processes.Tests
             var l = await TestHelpers.AssertNoErrors(lines);
 
 
-            CollectionAssert.AreEquivalent(new[] {"Word"}, l);
+            CollectionAssert.Contains(l, "Word1");
+            CollectionAssert.Contains(l, "Word2");
+        }
+
+
+        [Test]
+        public async Task TestDeserializeIgnore()
+        {
+            //Ignore can either be a list or a property
+
+            const string text = 
+                @"
+!EmitProcess
+    Ignore:
+        - &t Word
+    Term: *t
+    Ignore: &n 1
+    Number: *n
+    ";
+
+            var result = YamlHelper.TryMakeFromYaml(text);
+
+            var process = result.AssertSuccess();
+
+            var lines = process.Execute(new EmptySettings());
+
+            var l = await TestHelpers.AssertNoErrors(lines);
+
+
+            CollectionAssert.AreEquivalent(new[] {"Word1"}, l);
         }
 
 

@@ -35,21 +35,26 @@ namespace Reductech.EDR.Utilities.Processes
             }
         }
 
-        private static readonly Lazy<IDeserializer> Deserializer = new Lazy<IDeserializer>(() =>
+        internal static readonly Lazy<ISet<Type>> SpecialTypesSet = new Lazy<ISet<Type>>(()=> new HashSet<Type>(SpecialTypes));
+
+        /// <summary>
+        /// Makes a new deserializer
+        /// </summary>
+        private static IDeserializer Deserializer
         {
-            var deSerializerBuilder = new DeserializerBuilder();
+            get
+            {
+                var deSerializerBuilder = new DeserializerBuilder();
+                deSerializerBuilder =
+                    SpecialTypes.Aggregate(deSerializerBuilder, 
+                        (current, specialType) => current.WithTagMapping("!" + specialType.Name, specialType));
 
-            deSerializerBuilder =
-                SpecialTypes.Aggregate(deSerializerBuilder, 
-                    (current, specialType) => current.WithTagMapping("!" + specialType.Name, specialType));
+                var deserializer = new EdrNodeDeserializer(new CachedTypeInspector(new ReadablePropertiesTypeInspector(new DynamicTypeResolver())));
+                deSerializerBuilder.WithNodeDeserializer(deserializer);
 
-
-            var deserializer = new IgnoreIgnoreNodeDeserializer(new CachedTypeInspector(new ReadablePropertiesTypeInspector(new DynamicTypeResolver())));
-
-            deSerializerBuilder.WithNodeDeserializer(deserializer);
-
-            return  deSerializerBuilder.Build();
-        });
+                return  deSerializerBuilder.Build();
+            }
+        }
 
         private static readonly Lazy<ISerializer> Serializer = new Lazy<ISerializer>(() =>
         {
@@ -67,7 +72,6 @@ namespace Reductech.EDR.Utilities.Processes
         public static string ConvertToYaml(Process process)
         {
             var r = Serializer.Value.Serialize(process);
-
             return r;
         }
 
@@ -76,7 +80,7 @@ namespace Reductech.EDR.Utilities.Processes
         /// </summary>
         public static Result<Process> TryMakeFromYaml(string yaml)
         {
-            return  Result.Try(() => Deserializer.Value.Deserialize<Process>(yaml), GetInnermostExceptionMessage);
+            return  Result.Try(() => Deserializer.Deserialize<Process>(yaml), GetInnermostExceptionMessage);
         }
 
         private static string GetInnermostExceptionMessage(Exception e)

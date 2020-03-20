@@ -93,9 +93,9 @@
         </member>
         <member name="M:Processes.EnumMethods.GetDescription(System.Enum)">
             <summary>
-            Gets the description of an enum value from the Description Attribute.
+            Gets the description of an enum resultValue from the Description Attribute.
             </summary>
-            <param name="value"></param>
+            <param name="resultValue"></param>
             <returns></returns>
         </member>
         <member name="T:Processes.ExternalProcessHelper">
@@ -295,7 +295,7 @@
         </member>
         <member name="P:Processes.process.RunExternalProcess.ExtraParameterValue">
             <summary>
-            The value of the additional parameter.
+            The resultValue of the additional parameter.
             This is intended for use with injection.
             </summary>
         </member>

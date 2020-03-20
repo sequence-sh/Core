@@ -20,7 +20,7 @@ namespace Reductech.EDR.Utilities.Processes
         {
             return string.Join(" then ", Steps.Select(s=>s.GetName()));
         }
-
+        
         /// <summary>
         /// Steps that make up this process.
         /// </summary>
