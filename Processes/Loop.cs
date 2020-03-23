@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Runtime.Serialization;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Utilities.Processes.enumerations;
 using YamlDotNet.Serialization;
