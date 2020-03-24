@@ -63,7 +63,8 @@ namespace Reductech.EDR.Utilities.Processes
                     break;
                 if (line.Value.source == Source.Error)
                 {
-                    yield return Result.Failure<string>(line.Value.line);
+                    if(!string.IsNullOrWhiteSpace(line.Value.line))
+                        yield return Result.Failure<string>(line.Value.line);
                 }
 
                 yield return Result.Success(line.Value.line);
