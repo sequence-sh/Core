@@ -7,7 +7,7 @@ using Superpower.Display;
 using Superpower.Parsers;
 using Superpower.Tokenizers;
 
-namespace Reductech.EDR.Utilities.Processes.injection
+namespace Reductech.EDR.Utilities.Processes.mutable.injection
 {
     internal interface IInjectionPath
     {

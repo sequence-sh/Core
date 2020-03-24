@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using NUnit.Framework;
+using Reductech.EDR.Utilities.Processes.mutable;
 
 namespace Reductech.EDR.Utilities.Processes.Tests
 {
@@ -23,10 +24,11 @@ Steps:
 
             var process = result.AssertSuccess();
 
-            var lines = process.Execute(new EmptySettings());
+            var frozenProcess = process.TryFreeze(EmptySettings.Instance).AssertSuccess();
+
+            var lines = frozenProcess.Execute();
 
             var l = await TestHelpers.AssertNoErrors(lines);
-
 
             CollectionAssert.Contains(l, "Word1");
             CollectionAssert.Contains(l, "Word2");
@@ -52,7 +54,9 @@ Steps:
 
             var process = result.AssertSuccess();
 
-            var lines = process.Execute(new EmptySettings());
+            var immutableProcess = process.TryFreeze(EmptySettings.Instance).AssertSuccess();
+
+            var lines = immutableProcess.Execute();
 
             var l = await TestHelpers.AssertNoErrors(lines);
 

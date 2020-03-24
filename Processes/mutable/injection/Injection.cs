@@ -1,9 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.Runtime.Serialization;
 using CSharpFunctionalExtensions;
 using YamlDotNet.Serialization;
 
-namespace Reductech.EDR.Utilities.Processes.injection
+namespace Reductech.EDR.Utilities.Processes.mutable.injection
 {
     /// <summary>
     /// Injects a value from the enumerator into a property of a loop's process.

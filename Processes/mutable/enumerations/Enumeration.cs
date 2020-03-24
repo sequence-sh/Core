@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using CSharpFunctionalExtensions;
-using Reductech.EDR.Utilities.Processes.injection;
+using Reductech.EDR.Utilities.Processes.mutable.injection;
 
-namespace Reductech.EDR.Utilities.Processes.enumerations
+namespace Reductech.EDR.Utilities.Processes.mutable.enumerations
 {
     /// <summary>
     /// Represents a list of elements
@@ -30,9 +30,6 @@ namespace Reductech.EDR.Utilities.Processes.enumerations
         }
         
         /// <inheritdoc />
-        public override int GetHashCode()
-        {
-            return Name.GetHashCode();
-        }
+        public override int GetHashCode() => Name.GetHashCode();
     }
 }

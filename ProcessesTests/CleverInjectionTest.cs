@@ -2,8 +2,9 @@
 using System.Linq;
 using CSharpFunctionalExtensions;
 using NUnit.Framework;
-using Reductech.EDR.Utilities.Processes.injection;
-using List = Reductech.EDR.Utilities.Processes.enumerations.List;
+using Reductech.EDR.Utilities.Processes.mutable;
+using Reductech.EDR.Utilities.Processes.mutable.injection;
+using List = Reductech.EDR.Utilities.Processes.mutable.enumerations.List;
 
 namespace Reductech.EDR.Utilities.Processes.Tests
 {

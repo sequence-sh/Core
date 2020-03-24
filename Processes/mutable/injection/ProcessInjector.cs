@@ -2,7 +2,7 @@
 using System.Linq;
 using CSharpFunctionalExtensions;
 
-namespace Reductech.EDR.Utilities.Processes.injection
+namespace Reductech.EDR.Utilities.Processes.mutable.injection
 {
     internal interface IProcessInjector
     {

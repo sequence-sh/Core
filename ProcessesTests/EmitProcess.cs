@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using CSharpFunctionalExtensions;
 using JetBrains.Annotations;
+using Reductech.EDR.Utilities.Processes.immutable;
+using Reductech.EDR.Utilities.Processes.mutable;
 using YamlDotNet.Serialization;
 
 namespace Reductech.EDR.Utilities.Processes.Tests
@@ -15,27 +17,37 @@ namespace Reductech.EDR.Utilities.Processes.Tests
         [YamlMember]
         public int? Number { get; set; }
 
-        public override IEnumerable<string> GetArgumentErrors()
-        {
-            yield break;
-        }
-
-        public override IEnumerable<string> GetSettingsErrors(IProcessSettings processSettings)
-        {
-            yield break;
-        }
-
         public override string GetName()
         {
-            return "Emit";
+            return ("Emit " + Term + Number).Trim();
         }
 
-
-#pragma warning disable 1998
-        public override async IAsyncEnumerable<Result<string>> Execute(IProcessSettings processSettings)
-#pragma warning restore 1998
+        /// <inheritdoc />
+        public override Result<ImmutableProcess, ErrorList> TryFreeze(IProcessSettings processSettings)
         {
-            yield return Result.Success(Term + Number);
+            return Result.Success<ImmutableProcess, ErrorList>(new FrozenEmitProcess(GetName(), Term, Number));
+        }
+    }
+
+    public class FrozenEmitProcess : ImmutableProcess
+    {
+        /// <inheritdoc />
+        public FrozenEmitProcess(string name, string? term, int? number) : base(name)
+        {
+            _term = term;
+            _number = number;
+        }
+
+        private readonly string? _term;
+
+        private readonly int? _number;
+
+        /// <inheritdoc />
+#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
+        public override async IAsyncEnumerable<Result<string>> Execute()
+#pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
+        {
+            yield return Result.Success(_term + _number);
         }
     }
 }

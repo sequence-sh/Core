@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using CSharpFunctionalExtensions;
 using JetBrains.Annotations;
+using Reductech.EDR.Utilities.Processes.mutable;
 
 namespace Reductech.EDR.Utilities.Processes
 {
@@ -40,8 +41,13 @@ namespace Reductech.EDR.Utilities.Processes
                 yield break;
             }
 
-            var resultLines = yamlResult.Value.Execute(_processSettings);
-            await foreach (var resultLine in resultLines)
+            var (_, freezeFailure, immutableProcess, freezeError) = yamlResult.Value.TryFreeze(_processSettings);
+
+            if (freezeFailure)
+                foreach (var e in freezeError)
+                    yield return Result.Failure<string>(e);
+
+            await foreach (var resultLine in immutableProcess.Execute())
             {
                 yield return resultLine;
             }

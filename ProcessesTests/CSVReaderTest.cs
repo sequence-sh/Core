@@ -2,8 +2,9 @@
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using NUnit.Framework;
-using Reductech.EDR.Utilities.Processes.enumerations;
-using Reductech.EDR.Utilities.Processes.injection;
+using Reductech.EDR.Utilities.Processes.mutable;
+using Reductech.EDR.Utilities.Processes.mutable.enumerations;
+using Reductech.EDR.Utilities.Processes.mutable.injection;
 
 namespace Reductech.EDR.Utilities.Processes.Tests
 {
@@ -42,9 +43,9 @@ namespace Reductech.EDR.Utilities.Processes.Tests
 
             var actualList = new List<string>();
 
-            CollectionAssert.IsEmpty(l.GetArgumentErrors());
+            var process = l.TryFreeze(EmptySettings.Instance).AssertSuccess();
 
-            var resultList = l.Execute(new EmptySettings());
+            var resultList = process.Execute();
 
             await foreach (var (isSuccess, _, value, error) in resultList)
             {

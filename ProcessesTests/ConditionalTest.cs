@@ -1,9 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Runtime.Serialization;
 using CSharpFunctionalExtensions;
 using NUnit.Framework;
+using Reductech.EDR.Utilities.Processes.immutable;
+using Reductech.EDR.Utilities.Processes.mutable;
 using YamlDotNet.Serialization;
+using Conditional = Reductech.EDR.Utilities.Processes.mutable.Conditional;
 
 namespace Reductech.EDR.Utilities.Processes.Tests
 {
@@ -29,7 +31,8 @@ namespace Reductech.EDR.Utilities.Processes.Tests
                 }
             };
 
-            var results = process.Execute(new EmptySettings());
+            var immutableProcess = process.TryFreeze(EmptySettings.Instance).AssertSuccess();
+            var results = immutableProcess.Execute();
 
             var resultList = TestHelpers.AssertNoErrors(results).Result;
 
@@ -55,7 +58,9 @@ namespace Reductech.EDR.Utilities.Processes.Tests
                 }
             };
 
-            var results = process.Execute(new EmptySettings());
+            var immutableProcess = process.TryFreeze(EmptySettings.Instance).AssertSuccess();
+
+            var results = immutableProcess.Execute();
 
             var resultList = TestHelpers.AssertNoErrors(results).Result;
 
@@ -68,30 +73,39 @@ namespace Reductech.EDR.Utilities.Processes.Tests
 
     public class Assertion : Process
     {
-        public override IEnumerable<string> GetArgumentErrors()
-        {
-            yield break;
-        }
-
-        public override IEnumerable<string> GetSettingsErrors(IProcessSettings processSettings)
-        {
-            yield break;
-        }
 
         public override string GetName() => Success.ToString();
 
-#pragma warning disable 1998
-        public override async IAsyncEnumerable<Result<string>> Execute(IProcessSettings processSettings)
-#pragma warning restore 1998
+        /// <inheritdoc />
+        public override Result<ImmutableProcess, ErrorList> TryFreeze(IProcessSettings processSettings)
         {
-            if (Success)
-                yield return Result.Success("Succeeded");
-            else yield return Result.Failure<string>("Failed");
+            return Result.Success<ImmutableProcess, ErrorList>(new ImmutableAssertion(GetName(), Success));
         }
 
-        
+
         [YamlMember]
         [Required]
         public bool Success { get; set; }
+    }
+
+    public class ImmutableAssertion : ImmutableProcess
+    {
+        /// <inheritdoc />
+        public ImmutableAssertion(string name, bool success) : base(name)
+        {
+            _success = success;
+        }
+
+        private readonly bool _success;
+
+        /// <inheritdoc />
+#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
+        public override async IAsyncEnumerable<Result<string>> Execute()
+#pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
+        {
+            if (_success)
+                yield return Result.Success("Succeeded");
+            else yield return Result.Failure<string>("Failed");
+        }
     }
 }

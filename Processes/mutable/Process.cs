@@ -1,13 +1,23 @@
-﻿using System.Collections.Generic;
-using CSharpFunctionalExtensions;
+﻿using CSharpFunctionalExtensions;
+using Reductech.EDR.Utilities.Processes.immutable;
 
-namespace Reductech.EDR.Utilities.Processes
+namespace Reductech.EDR.Utilities.Processes.mutable
 {
     /// <summary>
     /// A settings object with no fields.
     /// </summary>
     public class EmptySettings : IProcessSettings
     {
+        /// <summary>
+        /// Gets the instance of EmptySettings.
+        /// </summary>
+        public static IProcessSettings Instance = new EmptySettings();
+
+
+        private EmptySettings()
+        {
+
+        }
 
     }
 
@@ -25,17 +35,6 @@ namespace Reductech.EDR.Utilities.Processes
     public abstract class Process
     {
         /// <summary>
-        /// Get errors in the properties of this process that may prevent it from running properly.
-        /// </summary>
-        /// <returns></returns>
-        public abstract IEnumerable<string> GetArgumentErrors();
-
-        /// <summary>
-        /// Get errors in the process settings.
-        /// </summary>
-        public abstract IEnumerable<string> GetSettingsErrors(IProcessSettings processSettings);
-
-        /// <summary>
         /// The name of this process
         /// </summary>
         public abstract string GetName();
@@ -44,7 +43,7 @@ namespace Reductech.EDR.Utilities.Processes
         /// Executes this process. Should only be called if all conditions are met
         /// </summary>
         /// <returns></returns>
-        public abstract IAsyncEnumerable<Result<string>> Execute(IProcessSettings processSettings);
+        public abstract Result<ImmutableProcess, ErrorList> TryFreeze(IProcessSettings processSettings);
 
         /// <summary>
         /// String representation of this process

@@ -54,7 +54,7 @@
         </member>
         <member name="T:Processes.enumerations.Collection">
             <summary>
-            Enumerates through elements of a list
+            Enumerates through elements of a strings
             </summary>
         </member>
         <member name="P:Processes.enumerations.Collection.Elements">
@@ -74,7 +74,7 @@
         </member>
         <member name="T:Processes.enumerations.For">
             <summary>
-            Represents a list of elements
+            Represents a strings of elements
             </summary>
         </member>
         <member name="M:Processes.enumerations.For.ToString">

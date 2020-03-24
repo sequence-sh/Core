@@ -11,9 +11,20 @@ namespace Reductech.EDR.Utilities.Processes.Tests
 
         public static T AssertSuccess<T>(this Result<T> r)
         {
-            if (r.IsSuccess)
-                return r.Value;
-            Assert.Fail(r.Error);
+            var (isSuccess, _, value, error) = r;
+            if (isSuccess)
+                return value;
+            Assert.Fail(error);
+
+            throw new Exception();
+        }
+
+        public static T AssertSuccess<T, E>(this Result<T, E> r)
+        {
+            var (isSuccess, _, value, error) = r;
+            if (isSuccess)
+                return value;
+            Assert.Fail(error.ToString());
 
             throw new Exception();
         }

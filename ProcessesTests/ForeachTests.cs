@@ -3,15 +3,16 @@ using System.Linq;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using NUnit.Framework;
-using Reductech.EDR.Utilities.Processes.enumerations;
-using Reductech.EDR.Utilities.Processes.injection;
-using List = Reductech.EDR.Utilities.Processes.enumerations.List;
+using Reductech.EDR.Utilities.Processes.mutable;
+using Reductech.EDR.Utilities.Processes.mutable.enumerations;
+using Reductech.EDR.Utilities.Processes.mutable.injection;
+using List = Reductech.EDR.Utilities.Processes.mutable.enumerations.List;
 
 namespace Reductech.EDR.Utilities.Processes.Tests
 {
     public class ForeachTests
     {
-        private readonly IProcessSettings _processSettings = new EmptySettings();
+        private readonly IProcessSettings _processSettings = EmptySettings.Instance;
 
         [Test]
         public async Task TestCSV()
@@ -62,9 +63,9 @@ namespace Reductech.EDR.Utilities.Processes.Tests
 
             var realList = new List<string>();
 
-            CollectionAssert.IsEmpty(forEachProcess.GetArgumentErrors());
+            var immutableProcess = forEachProcess.TryFreeze(_processSettings).AssertSuccess();
 
-            var resultList = forEachProcess.Execute(_processSettings);
+            var resultList = immutableProcess.Execute();
 
             await foreach (var (isSuccess, _, value, error) in resultList)
             {
@@ -104,7 +105,10 @@ namespace Reductech.EDR.Utilities.Processes.Tests
 
             var realList = new List<string>();
 
-            var resultList = forEachProcess.Execute(_processSettings);
+            var frozenProcess = forEachProcess.TryFreeze(_processSettings).AssertSuccess();
+
+
+            var resultList = frozenProcess.Execute();
 
             await foreach (var (isSuccess, _, value, error) in resultList)
             {
@@ -140,8 +144,7 @@ namespace Reductech.EDR.Utilities.Processes.Tests
                 Do = new EmitProcess()
             };
 
-
-            var resultList = forEachProcess.Execute(_processSettings);
+            var resultList = forEachProcess.TryFreeze(_processSettings).AssertSuccess().Execute();
 
             var realList = await TestHelpers.AssertNoErrors(resultList);
 
