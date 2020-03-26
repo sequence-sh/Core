@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using CSharpFunctionalExtensions;
 
 namespace Reductech.EDR.Utilities.Processes
@@ -21,7 +22,7 @@ namespace Reductech.EDR.Utilities.Processes
         /// Runs an external process and returns the output and errors
         /// </summary>
         /// <param name="processPath">The path to the process</param>
-        /// <param name="arguments">The arguments to provide to the process</param>
+        /// <param name="arguments">The arguments to provide to the process. These will all be escaped</param>
         /// <returns>The output of the process</returns>
         public static async IAsyncEnumerable<Result<string>> RunExternalProcess(string processPath, IEnumerable<string> arguments)
         {
@@ -31,7 +32,7 @@ namespace Reductech.EDR.Utilities.Processes
                 yield break;
             }
             
-            var argumentString = string.Join(' ', arguments.Select(a => a.Contains(" ") ? $@"""{a}""": a));
+            var argumentString = string.Join(' ', arguments.Select(EncodeParameterArgument));
             using var pProcess = new System.Diagnostics.Process
             {
                 StartInfo =
@@ -72,5 +73,20 @@ namespace Reductech.EDR.Utilities.Processes
 
             pProcess.WaitForExit();
         }
+
+        private static readonly Regex BackslashRegex = new Regex(@"(\\*)" + "\"", RegexOptions.Compiled);
+        private static readonly Regex TermWithSpaceRegex = new Regex(@"^(.*\s.*?)(\\*)$", RegexOptions.Compiled | RegexOptions.Singleline);
+
+        private static string EncodeParameterArgument(string original)
+        {
+            if (string.IsNullOrEmpty(original))
+                return $"\"{original}\"";
+            string value = BackslashRegex.Replace(original, @"$1\$0");
+
+             
+            value = TermWithSpaceRegex.Replace(value, "\"$1$2$2\"");
+            return value;
+        }
+
     }
 }
