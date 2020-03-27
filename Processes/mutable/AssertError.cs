@@ -5,12 +5,10 @@ using YamlDotNet.Serialization;
 
 namespace Reductech.EDR.Utilities.Processes.mutable
 {
-    
-
     /// <summary>
-    /// Asserts that a particular process will fail.
+    /// Asserts that a particular process will produce an error.
     /// </summary>
-    public class AssertFail : Process
+    public class AssertError : Process
     {
         /// <summary>
         /// The process that is expected to fail.
@@ -21,6 +19,9 @@ namespace Reductech.EDR.Utilities.Processes.mutable
         public Process Process { get; set; }
 #pragma warning restore CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
 
+
+        /// <inheritdoc />
+        public override string GetReturnTypeInfo() => nameof(Unit);
 
         /// <inheritdoc />
         public override string GetName()
@@ -38,7 +39,7 @@ namespace Reductech.EDR.Utilities.Processes.mutable
 
             if (subProcessFreezeResult.IsFailure) return subProcessFreezeResult;
 
-            var r = new immutable.AssertFail(GetName(), subProcessFreezeResult.Value);
+            var r = new immutable.AssertError(GetName(), subProcessFreezeResult.Value);
 
             return Result.Success<ImmutableProcess, ErrorList>(r);
         }

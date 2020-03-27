@@ -2,7 +2,7 @@
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
-using CSharpFunctionalExtensions;
+using Reductech.EDR.Utilities.Processes.output;
 
 namespace Reductech.EDR.Utilities.Processes
 {
@@ -11,7 +11,6 @@ namespace Reductech.EDR.Utilities.Processes
     /// </summary>
     public static class ExternalProcessHelper
     {
-
         private enum Source
         {
             Output,
@@ -24,11 +23,11 @@ namespace Reductech.EDR.Utilities.Processes
         /// <param name="processPath">The path to the process</param>
         /// <param name="arguments">The arguments to provide to the process. These will all be escaped</param>
         /// <returns>The output of the process</returns>
-        public static async IAsyncEnumerable<Result<string>> RunExternalProcess(string processPath, IEnumerable<string> arguments)
+        public static async IAsyncEnumerable<IProcessOutput<Unit>> RunExternalProcess(string processPath, IEnumerable<string> arguments)
         {
             if (!File.Exists(processPath))
             {
-                yield return Result.Failure<string>($"Could not find '{processPath}'");
+                yield return ProcessOutput<Unit>.Error($"Could not find '{processPath}'");
                 yield break;
             }
             
@@ -64,11 +63,11 @@ namespace Reductech.EDR.Utilities.Processes
                     break;
                 if (line.Value.source == Source.Error)
                 {
-                    if(!string.IsNullOrWhiteSpace(line.Value.line))
-                        yield return Result.Failure<string>(line.Value.line);
+                    var errorText = string.IsNullOrWhiteSpace(line.Value.line) ? "Unknown Error" : line.Value.line;
+                    
+                    yield return ProcessOutput<Unit>.Error(errorText);
                 }
-
-                yield return Result.Success(line.Value.line);
+                yield return ProcessOutput<Unit>.Message(line.Value.line);
             }
 
             pProcess.WaitForExit();
@@ -81,7 +80,7 @@ namespace Reductech.EDR.Utilities.Processes
         {
             if (string.IsNullOrEmpty(original))
                 return $"\"{original}\"";
-            string value = BackslashRegex.Replace(original, @"$1\$0");
+            var value = BackslashRegex.Replace(original, @"$1\$0");
 
              
             value = TermWithSpaceRegex.Replace(value, "\"$1$2$2\"");

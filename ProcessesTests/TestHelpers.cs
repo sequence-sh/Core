@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using NUnit.Framework;
+using Reductech.EDR.Utilities.Processes.output;
 
 namespace Reductech.EDR.Utilities.Processes.Tests
 {
@@ -19,28 +20,26 @@ namespace Reductech.EDR.Utilities.Processes.Tests
             throw new Exception();
         }
 
-        public static T AssertSuccess<T, E>(this Result<T, E> r)
+        public static T AssertSuccess<T, TE>(this Result<T, TE> r)
         {
             var (isSuccess, _, value, error) = r;
-            if (isSuccess)
-                return value;
-            Assert.Fail(error.ToString());
+            Assert.IsTrue(isSuccess, error?.ToString());
 
-            throw new Exception();
+            return value;
         }
 
-        public static async Task<IReadOnlyCollection<string>> AssertNoErrors(IAsyncEnumerable<Result<string>> lines)
+        public static async Task<IReadOnlyCollection<string>> AssertNoErrors(IAsyncEnumerable<IProcessOutput> output)
         {
             var errors = new List<string>();
             var results = new List<string>();
 
-            await foreach (var (_, isFailure, data, error) in lines)
+            await foreach (var o in output)
             {
-                if (isFailure)
-                    errors.Add(error);
+                if (o.OutputType == OutputType.Error)
+                    errors.Add(o.Text);
                 else
                 {
-                    results.Add(data);
+                    results.Add(o.Text);
                 }
             }
             

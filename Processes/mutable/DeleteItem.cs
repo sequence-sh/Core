@@ -22,6 +22,9 @@ namespace Reductech.EDR.Utilities.Processes.mutable
 
 
         /// <inheritdoc />
+        public override string GetReturnTypeInfo() => nameof(Unit);
+
+        /// <inheritdoc />
         public override string GetName() => $"Delete {Path}";
 
         /// <inheritdoc />

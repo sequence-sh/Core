@@ -35,7 +35,7 @@ namespace Reductech.EDR.Utilities.Processes.mutable
 
             if (isEnumerationFailure) return Result.Failure<ImmutableProcess, ErrorList>(enumerationError);
 
-            var finalProcesses = new List<ImmutableProcess>();
+            var finalProcesses = new List<ImmutableProcess<Unit>>();
 
             foreach (var processInjector in elements)
             {
@@ -50,7 +50,13 @@ namespace Reductech.EDR.Utilities.Processes.mutable
 
                 if (freezeResult.IsFailure) return freezeResult;
 
-                finalProcesses.Add(freezeResult.Value);
+                if(freezeResult.Value is ImmutableProcess<Unit> unitProcess)
+                    finalProcesses.Add(unitProcess);
+                else
+                {
+                    return Result.Failure<ImmutableProcess, ErrorList>(new ErrorList(
+                        $"Process '{freezeResult.Value.Name}' has result type {freezeResult.Value.ResultType.Name} but members of a loop should have result type void."));
+                }
             }
 
             var finalSequence = ImmutableSequence.CombineSteps(finalProcesses);
@@ -58,7 +64,10 @@ namespace Reductech.EDR.Utilities.Processes.mutable
             return Result.Success<ImmutableProcess, ErrorList>(finalSequence);
         }
 
-        
+
+        /// <inheritdoc />
+        public override string GetReturnTypeInfo() => nameof(Unit);
+
         /// <inheritdoc />
         public override string GetName() => $"Foreach in {For}, {Do}";
         

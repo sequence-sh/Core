@@ -1,55 +1,69 @@
 ﻿using System.Collections.Generic;
-using CSharpFunctionalExtensions;
+using Reductech.EDR.Utilities.Processes.output;
 
 namespace Reductech.EDR.Utilities.Processes.immutable
 {
-    internal class Conditional : ImmutableProcess
+    internal class Conditional<T> : ImmutableProcess<T>
     {
         /// <inheritdoc />
-        public Conditional(string name, ImmutableProcess @if, ImmutableProcess then, ImmutableProcess @else) : base(name)
+        public Conditional(string name, ImmutableProcess<bool> @if, ImmutableProcess<T> then, ImmutableProcess<T> @else) : base(name)
         {
             _if = @if;
             _then = then;
             _else = @else;
         }
 
-        private readonly ImmutableProcess _if;
-        private readonly ImmutableProcess _then;
-        private readonly ImmutableProcess _else;
+        private readonly ImmutableProcess<bool> _if;
+        private readonly ImmutableProcess<T> _then;
+        private readonly ImmutableProcess<T> _else;
 
         /// <inheritdoc />
-        public override async IAsyncEnumerable<Result<string>> Execute()
+        public override async IAsyncEnumerable<IProcessOutput<T>> Execute()
         {
-            yield return Result.Success($"Testing {_if}");
+            yield return ProcessOutput<T>.Message($"Testing {_if}");
 
-            var success = true;
+            bool? success = null;
+            var anyErrors = false;
+
             await foreach (var r in _if.Execute())
             {
-                if (r.IsSuccess)
-                    yield return r;
+                if (r.OutputType == OutputType.Success)
+                {
+                    success = r.Value;
+                }
                 else
                 {
-                    success = false;
-                    yield return Result.Success(r.Error); //These methods failing is expected so it should not produce an error
+                    if (r.OutputType == OutputType.Error)
+                        anyErrors = true;
+
+                    yield return r.ConvertTo<T>(); //These methods failing is expected so it should not produce an error
                 }
             }
 
-            if (success)
+            if (!anyErrors)
             {
-                yield return Result.Success($"Assertion Succeeded, executing {_then}");
+                if (success.HasValue)
+                {
+                    if (success.Value)
+                    {
+                        yield return ProcessOutput<T>.Message($"Condition met, executing {_then}");
 
-                await foreach (var r in _then.Execute())
-                    yield return r;
-            }
-            else if (_else != null)
-            {
-                yield return Result.Success($"Assertion Failed, executing {_else}");
+                        await foreach (var r in _then.Execute())
+                            yield return r;
+                    }
+                    else if (_else != null)
+                    {
+                        yield return ProcessOutput<T>.Message($"Condition not met, executing {_else}");
 
-                await foreach (var r in _else.Execute())
-                    yield return r;
+                        await foreach (var r in _else.Execute())
+                            yield return r;
+                    }
+                }
+                else
+                    yield return ProcessOutput<T>.Error("Could not determine result of conditional");
             }
-            else
-                yield return Result.Success("Assertion Failed");
+
+            
         }
     }
 }

@@ -2,9 +2,12 @@
 using System.Linq;
 using CSharpFunctionalExtensions;
 using NUnit.Framework;
+using Reductech.EDR.Utilities.Processes.immutable;
 using Reductech.EDR.Utilities.Processes.mutable;
 using Reductech.EDR.Utilities.Processes.mutable.injection;
+using YamlDotNet.Serialization;
 using List = Reductech.EDR.Utilities.Processes.mutable.enumerations.List;
+using RunExternalProcess = Reductech.EDR.Utilities.Processes.mutable.RunExternalProcess;
 
 namespace Reductech.EDR.Utilities.Processes.Tests
 {
@@ -88,7 +91,7 @@ namespace Reductech.EDR.Utilities.Processes.Tests
         [Test]
         public void TestDictionaryAccessInjection()
         {
-            var process = new RunExternalProcess()
+            var process = new DictionaryTestProcess()
             { 
                 Parameters = new Dictionary<string, string>{{"Arg1", "Blue"}}
             };
@@ -97,7 +100,7 @@ namespace Reductech.EDR.Utilities.Processes.Tests
             {
                 ("Pink", new Injection
                 {
-                    Property = $"{nameof(RunExternalProcess.Parameters)}[Arg1]" 
+                    Property = $"{nameof(DictionaryTestProcess.Parameters)}[Arg1]" 
                 } )
             });
 
@@ -106,6 +109,29 @@ namespace Reductech.EDR.Utilities.Processes.Tests
             Assert.IsTrue(isSuccess, error);
 
             Assert.AreEqual("Pink", process.Parameters["Arg1"]);
+        }
+        /// <summary>
+        /// Just used for this test
+        /// </summary>
+        private class DictionaryTestProcess : Process
+        {
+            [YamlMember]
+            public Dictionary<string, string> Parameters { get; set; } = new Dictionary<string, string>();
+
+            /// <inheritdoc />
+            public override string GetReturnTypeInfo() => nameof(Unit);
+
+            /// <inheritdoc />
+            public override string GetName()
+            {
+                return "Dictionary";
+            }
+
+            /// <inheritdoc />
+            public override Result<ImmutableProcess, ErrorList> TryFreeze(IProcessSettings processSettings)
+            {
+                throw new System.NotImplementedException(); //Don't need this for this test
+            }
         }
 
     }

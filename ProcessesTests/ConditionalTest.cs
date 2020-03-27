@@ -4,6 +4,7 @@ using CSharpFunctionalExtensions;
 using NUnit.Framework;
 using Reductech.EDR.Utilities.Processes.immutable;
 using Reductech.EDR.Utilities.Processes.mutable;
+using Reductech.EDR.Utilities.Processes.output;
 using YamlDotNet.Serialization;
 using Conditional = Reductech.EDR.Utilities.Processes.mutable.Conditional;
 
@@ -32,7 +33,7 @@ namespace Reductech.EDR.Utilities.Processes.Tests
             };
 
             var immutableProcess = process.TryFreeze(EmptySettings.Instance).AssertSuccess();
-            var results = immutableProcess.Execute();
+            var results = immutableProcess.ExecuteUntyped();
 
             var resultList = TestHelpers.AssertNoErrors(results).Result;
 
@@ -60,20 +61,18 @@ namespace Reductech.EDR.Utilities.Processes.Tests
 
             var immutableProcess = process.TryFreeze(EmptySettings.Instance).AssertSuccess();
 
-            var results = immutableProcess.Execute();
+            var results = immutableProcess.ExecuteUntyped();
 
             var resultList = TestHelpers.AssertNoErrors(results).Result;
 
             CollectionAssert.Contains(resultList, "No");
         }
-
-
     }
-
 
     public class Assertion : Process
     {
-
+        /// <inheritdoc />
+        public override string GetReturnTypeInfo() => nameof(Unit);
         public override string GetName() => Success.ToString();
 
         /// <inheritdoc />
@@ -88,7 +87,7 @@ namespace Reductech.EDR.Utilities.Processes.Tests
         public bool Success { get; set; }
     }
 
-    public class ImmutableAssertion : ImmutableProcess
+    public class ImmutableAssertion : ImmutableProcess<Unit>
     {
         /// <inheritdoc />
         public ImmutableAssertion(string name, bool success) : base(name)
@@ -100,12 +99,12 @@ namespace Reductech.EDR.Utilities.Processes.Tests
 
         /// <inheritdoc />
 #pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
-        public override async IAsyncEnumerable<Result<string>> Execute()
+        public override async IAsyncEnumerable<IProcessOutput<Unit>> Execute()
 #pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
         {
             if (_success)
-                yield return Result.Success("Succeeded");
-            else yield return Result.Failure<string>("Failed");
+                yield return ProcessOutput<Unit>.Success(Unit.Instance);
+            else yield return ProcessOutput<Unit>.Error("Assertion failed.");
         }
     }
 }

@@ -1,37 +1,41 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using CSharpFunctionalExtensions;
+using Reductech.EDR.Utilities.Processes.output;
 
 namespace Reductech.EDR.Utilities.Processes.immutable
 {
-    internal class ImmutableSequence : ImmutableProcess
+    internal class ImmutableSequence : ImmutableProcess<Unit>
     {
-        private readonly IReadOnlyCollection<ImmutableProcess> _steps;
+        private readonly IReadOnlyCollection<ImmutableProcess<Unit>> _steps;
 
         /// <inheritdoc />
-        public ImmutableSequence(string name, IReadOnlyCollection<ImmutableProcess> steps) : base(name)
+        public ImmutableSequence(string name, IReadOnlyCollection<ImmutableProcess<Unit>> steps) : base(name)
         {
             _steps = steps;
         }
 
         /// <summary>
-        /// Execute the steps in this process until a condition is not met or a step fails 
+        /// Execute the steps in this process until a condition is not met or a step fails.
         /// </summary>
         /// <returns></returns>
-        public override async IAsyncEnumerable<Result<string>> Execute()
+        public override async IAsyncEnumerable<IProcessOutput<Unit>> Execute()
         {
             foreach (var process in _steps)
             {
                 var allGood = true;
-                var resultLines = process.Execute();
+                var resultLines = process.ExecuteUntyped();
                 await foreach (var resultLine in resultLines)
                 {
-                    yield return resultLine;
-                    allGood &= resultLine.IsSuccess;
+                    if(resultLine.OutputType != OutputType.Success)
+                        yield return resultLine.ConvertTo<Unit>();
+                    allGood &= resultLine.OutputType != OutputType.Error;
                 }
                 if(!allGood)
                     yield break;
             }
+
+            yield return ProcessOutput<Unit>.Success(Unit.Instance);
         }
 
         /// <inheritdoc />
@@ -47,34 +51,30 @@ namespace Reductech.EDR.Utilities.Processes.immutable
         }
 
         /// <inheritdoc />
-        public override Result<ImmutableProcess> TryCombine(ImmutableProcess nextProcess)
+        public override Result<ImmutableProcess<Unit>> TryCombine(ImmutableProcess<Unit> nextProcess)
         {
             if (_steps.Count == 0)
             {
                 return Result.Success(nextProcess);
             }
-            else if (nextProcess is ImmutableSequence nextSequence)
+            else
             {
-                var allSteps = _steps.Concat(nextSequence._steps);
+
+                var allSteps =
+                    nextProcess is ImmutableSequence nextSequence?  _steps.Concat(nextSequence._steps) :
+                        _steps.Concat(new[] {nextProcess});
 
                 var r = CombineSteps(allSteps);
 
-                return Result.Success<ImmutableProcess>(r);
-            }
-            else
-            {
-                var r = CombineSteps(_steps.Concat(new[]{nextProcess}));
-
-                return Result.Success<ImmutableProcess>(r);
-
+                return Result.Success<ImmutableProcess<Unit>>(r);
             }
         }
 
-        public static ImmutableSequence CombineSteps(IEnumerable<ImmutableProcess> steps)
+        public static ImmutableSequence CombineSteps(IEnumerable<ImmutableProcess<Unit>> steps)
         {
-            var combinedProcesses = new List<ImmutableProcess>();
+            var combinedProcesses = new List<ImmutableProcess<Unit>>();
 
-            ImmutableProcess? current = null;
+            ImmutableProcess<Unit>? current = null;
 
             foreach (var step in steps)
             {

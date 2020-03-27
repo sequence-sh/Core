@@ -26,7 +26,7 @@ Steps:
 
             var frozenProcess = process.TryFreeze(EmptySettings.Instance).AssertSuccess();
 
-            var lines = frozenProcess.Execute();
+            var lines = frozenProcess.ExecuteUntyped();
 
             var l = await TestHelpers.AssertNoErrors(lines);
 
@@ -56,7 +56,7 @@ Steps:
 
             var immutableProcess = process.TryFreeze(EmptySettings.Instance).AssertSuccess();
 
-            var lines = immutableProcess.Execute();
+            var lines = immutableProcess.ExecuteUntyped();
 
             var l = await TestHelpers.AssertNoErrors(lines);
 

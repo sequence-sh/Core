@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.IO.Compression;
 using System.Threading.Tasks;
-using CSharpFunctionalExtensions;
+using Reductech.EDR.Utilities.Processes.output;
 
 namespace Reductech.EDR.Utilities.Processes.immutable
 {
-    internal class Unzip : ImmutableProcess
+    internal class Unzip : ImmutableProcess<Unit>
     {
         /// <inheritdoc />
         public Unzip(string name, string archiveFilePath, string destinationDirectory, bool overwriteFiles) : base(name)
@@ -23,16 +23,16 @@ namespace Reductech.EDR.Utilities.Processes.immutable
         private readonly bool _overwriteFiles;
 
         /// <inheritdoc />
-        public override async IAsyncEnumerable<Result<string>> Execute()
+        public override async IAsyncEnumerable<IProcessOutput<Unit>> Execute()
         {
-            yield return Result.Success($"Unzipping + '{nameof(_archiveFilePath)}' to '{nameof(_destinationDirectory)}'");
+            yield return ProcessOutput<Unit>.Message($"Unzipping + '{nameof(_archiveFilePath)}' to '{nameof(_destinationDirectory)}'");
 
             var error = await Task.Run(() => Extract(_archiveFilePath, _destinationDirectory, _overwriteFiles));
 
             if(error != null)
-                yield return Result.Failure<string>(error);
+                yield return ProcessOutput<Unit>.Error(error);
 
-            yield return Result.Success("File Unzipped");
+            yield return ProcessOutput<Unit>.Success(Unit.Instance);
         }
 
         private static string? Extract(string archiveFilePath, string destinationDirectory, bool overwriteFile)

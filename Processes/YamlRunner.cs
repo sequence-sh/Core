@@ -4,6 +4,7 @@ using System.IO;
 using CSharpFunctionalExtensions;
 using JetBrains.Annotations;
 using Reductech.EDR.Utilities.Processes.mutable;
+using Reductech.EDR.Utilities.Processes.output;
 
 namespace Reductech.EDR.Utilities.Processes
 {
@@ -47,9 +48,18 @@ namespace Reductech.EDR.Utilities.Processes
                 foreach (var e in freezeError)
                     yield return Result.Failure<string>(e);
 
-            await foreach (var resultLine in immutableProcess.Execute())
+            await foreach (var output in immutableProcess.ExecuteUntyped())
             {
-                yield return resultLine;
+                var r = output.OutputType switch
+                {
+                    OutputType.Error => Result.Failure<string>(output.Text),
+                    OutputType.Warning => Result.Success(output.Text),
+                    OutputType.Message => Result.Success(output.Text),
+                    OutputType.Success => Result.Success(output.Text),
+                    _ => throw new ArgumentOutOfRangeException()
+                };
+
+                yield return r;
             }
         }
 

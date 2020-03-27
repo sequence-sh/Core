@@ -13,6 +13,9 @@ namespace Reductech.EDR.Utilities.Processes.mutable
     /// </summary>
     public class Sequence : Process
     {
+        /// <inheritdoc />
+        public override string GetReturnTypeInfo() => nameof(Unit);
+
         /// <summary>
         /// The name of this process
         /// </summary>
@@ -23,6 +26,7 @@ namespace Reductech.EDR.Utilities.Processes.mutable
 
         /// <summary>
         /// Steps that make up this process.
+        /// These should all have result type void.
         /// </summary>
         [Required]
         
@@ -40,7 +44,22 @@ namespace Reductech.EDR.Utilities.Processes.mutable
             if (r.IsFailure)
                 return r.ConvertFailure<ImmutableProcess>();
 
-            var immutableSequence = ImmutableSequence.CombineSteps(r.Value);
+            var steps = r.Value;
+            var unitSteps = new List<ImmutableProcess<Unit>>();
+
+            foreach (var s in steps)
+            {
+                if(s is ImmutableProcess<Unit> ipu)
+                    unitSteps.Add(ipu);
+                else
+                {
+                    return Result.Failure<ImmutableProcess, ErrorList>(new ErrorList(
+                        $"Process '{s.Name}' has result type {s.ResultType.Name} but members of a sequence should have result type void."));
+                }
+            }
+
+
+            var immutableSequence = ImmutableSequence.CombineSteps(unitSteps);
 
             return Result.Success<ImmutableProcess, ErrorList>(immutableSequence);
 

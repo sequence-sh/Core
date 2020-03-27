@@ -1,38 +1,28 @@
 ﻿using System.Collections.Generic;
-using CSharpFunctionalExtensions;
+using Reductech.EDR.Utilities.Processes.output;
 
 namespace Reductech.EDR.Utilities.Processes.immutable
 {
-    internal class RunExternalProcess : ImmutableProcess
+    internal class RunExternalProcess : ImmutableProcess<Unit>
     {
         /// <inheritdoc />
-        public RunExternalProcess(string name, string processPath, IReadOnlyDictionary<string, string> parameters) : base(name)
+        public RunExternalProcess(string name, string processPath, IReadOnlyCollection<string> arguments) : base(name)
         {
             _processPath = processPath;
-            _parameters = parameters;
+            _arguments = arguments;
         }
 
         private readonly string _processPath;
 
-        private readonly IReadOnlyDictionary<string,string> _parameters;
+        private readonly IReadOnlyCollection<string> _arguments;
 
         /// <inheritdoc />
-        public override async IAsyncEnumerable<Result<string>> Execute()
+        public override async IAsyncEnumerable<IProcessOutput<Unit>> Execute()
         {
-            var args = new List<string>();
-
-            foreach (var (key, value) in _parameters)
-            {
-                args.Add($"-{key}");
-                args.Add(value);
-            }
-
-            var result = ExternalProcessHelper.RunExternalProcess(_processPath, args);
+            var result = ExternalProcessHelper.RunExternalProcess(_processPath, _arguments);
 
             await foreach (var line in result)
-            {
                 yield return line;
-            }
         }
     }
 }

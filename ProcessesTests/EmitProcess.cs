@@ -3,6 +3,7 @@ using CSharpFunctionalExtensions;
 using JetBrains.Annotations;
 using Reductech.EDR.Utilities.Processes.immutable;
 using Reductech.EDR.Utilities.Processes.mutable;
+using Reductech.EDR.Utilities.Processes.output;
 using YamlDotNet.Serialization;
 
 namespace Reductech.EDR.Utilities.Processes.Tests
@@ -17,6 +18,9 @@ namespace Reductech.EDR.Utilities.Processes.Tests
         [YamlMember]
         public int? Number { get; set; }
 
+        /// <inheritdoc />
+        public override string GetReturnTypeInfo() => nameof(Unit);
+
         public override string GetName()
         {
             return ("Emit " + Term + Number).Trim();
@@ -29,7 +33,7 @@ namespace Reductech.EDR.Utilities.Processes.Tests
         }
     }
 
-    public class FrozenEmitProcess : ImmutableProcess
+    public class FrozenEmitProcess : ImmutableProcess<Unit>
     {
         /// <inheritdoc />
         public FrozenEmitProcess(string name, string? term, int? number) : base(name)
@@ -44,10 +48,10 @@ namespace Reductech.EDR.Utilities.Processes.Tests
 
         /// <inheritdoc />
 #pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
-        public override async IAsyncEnumerable<Result<string>> Execute()
+        public override async IAsyncEnumerable<IProcessOutput<Unit>> Execute()
 #pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
         {
-            yield return Result.Success(_term + _number);
+            yield return ProcessOutput<Unit>.Message(_term + _number);
         }
     }
 }

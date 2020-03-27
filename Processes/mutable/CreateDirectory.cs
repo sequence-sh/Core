@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.IO;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Utilities.Processes.immutable;
 using YamlDotNet.Serialization;
@@ -14,6 +10,9 @@ namespace Reductech.EDR.Utilities.Processes.mutable
     /// </summary>
     public class CreateDirectory : Process
     {
+        /// <inheritdoc />
+        public override string GetReturnTypeInfo() => nameof(Unit);
+
         /// <inheritdoc />
         public override string GetName() => $"Create Directory {Path}";
 

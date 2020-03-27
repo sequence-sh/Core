@@ -22,17 +22,20 @@ namespace Reductech.EDR.Utilities.Processes.mutable
         public string ProcessPath { get; set; }
 
         /// <summary>
-        /// Pairs of parameters to give to the process.
+        /// Arguments to give to the process.
         /// </summary>
         [YamlMember(Order = 3)]
         [Required]
-        public Dictionary<string, string> Parameters { get; set; } = new Dictionary<string, string>();
+        public List<string> Arguments { get; set; } = new List<string>();
 #pragma warning restore CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
+
+        /// <inheritdoc />
+        public override string GetReturnTypeInfo() => nameof(Unit);
 
         /// <inheritdoc />
         public override string GetName()
         {
-            return $"{ProcessPath} {string.Join(" ", Parameters.Select((k, v) => $"-{k} {v}"))}";
+            return $"{ProcessPath} {string.Join(" ", Arguments)}";
         }
 
         /// <inheritdoc />
@@ -50,7 +53,7 @@ namespace Reductech.EDR.Utilities.Processes.mutable
             if (errors.Any())
                 return Result.Failure<ImmutableProcess, ErrorList>(new ErrorList(errors));
             
-            var ip = new immutable.RunExternalProcess(GetName(), ProcessPath, Parameters);
+            var ip = new immutable.RunExternalProcess(GetName(), ProcessPath, Arguments);
 
             return Result.Success<ImmutableProcess, ErrorList>(ip);
         }

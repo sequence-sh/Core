@@ -36,6 +36,9 @@ namespace Reductech.EDR.Utilities.Processes.mutable
         public bool OverwriteFiles { get; } = false;
 
         /// <inheritdoc />
+        public override string GetReturnTypeInfo() => nameof(Unit);
+
+        /// <inheritdoc />
         public override string GetName() => $"Unzip {nameof(ArchiveFilePath)}";
 
         /// <inheritdoc />

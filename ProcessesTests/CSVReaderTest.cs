@@ -5,6 +5,7 @@ using NUnit.Framework;
 using Reductech.EDR.Utilities.Processes.mutable;
 using Reductech.EDR.Utilities.Processes.mutable.enumerations;
 using Reductech.EDR.Utilities.Processes.mutable.injection;
+using Reductech.EDR.Utilities.Processes.output;
 
 namespace Reductech.EDR.Utilities.Processes.Tests
 {
@@ -45,12 +46,14 @@ namespace Reductech.EDR.Utilities.Processes.Tests
 
             var process = l.TryFreeze(EmptySettings.Instance).AssertSuccess();
 
-            var resultList = process.Execute();
+            var output = process.ExecuteUntyped();
 
-            await foreach (var (isSuccess, _, value, error) in resultList)
+            await foreach (var o in output)
             {
-                Assert.IsTrue(isSuccess, error);
-                actualList.Add(value);
+                Assert.IsTrue(o.OutputType != OutputType.Error, o.Text);
+
+                if(o.OutputType == OutputType.Message)
+                    actualList.Add(o.Text);
             }
 
             CollectionAssert.AreEqual(testCase.ExpectedResults, actualList);

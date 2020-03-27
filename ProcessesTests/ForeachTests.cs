@@ -1,11 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using CSharpFunctionalExtensions;
 using NUnit.Framework;
 using Reductech.EDR.Utilities.Processes.mutable;
 using Reductech.EDR.Utilities.Processes.mutable.enumerations;
 using Reductech.EDR.Utilities.Processes.mutable.injection;
+using Reductech.EDR.Utilities.Processes.output;
 using List = Reductech.EDR.Utilities.Processes.mutable.enumerations.List;
 
 namespace Reductech.EDR.Utilities.Processes.Tests
@@ -65,12 +65,13 @@ namespace Reductech.EDR.Utilities.Processes.Tests
 
             var immutableProcess = forEachProcess.TryFreeze(_processSettings).AssertSuccess();
 
-            var resultList = immutableProcess.Execute();
+            var output = immutableProcess.ExecuteUntyped();
 
-            await foreach (var (isSuccess, _, value, error) in resultList)
+            await foreach (var o in output)
             {
-                Assert.IsTrue(isSuccess, error);
-                realList.Add(value);
+                Assert.IsTrue(o.OutputType != OutputType.Error, o.Text);
+                if(o.OutputType == OutputType.Message)
+                    realList.Add(o.Text);
             }
 
             CollectionAssert.AreEqual(expected, realList);
@@ -108,12 +109,13 @@ namespace Reductech.EDR.Utilities.Processes.Tests
             var frozenProcess = forEachProcess.TryFreeze(_processSettings).AssertSuccess();
 
 
-            var resultList = frozenProcess.Execute();
+            var output = frozenProcess.ExecuteUntyped();
 
-            await foreach (var (isSuccess, _, value, error) in resultList)
+            await foreach (var o in output)
             {
-                Assert.IsTrue(isSuccess, error);
-                realList.Add(value);
+                Assert.IsTrue(o.OutputType != OutputType.Error, o.Text);
+                if(o.OutputType == OutputType.Message)
+                    realList.Add(o.Text);
             }
 
             CollectionAssert.AreEqual(expected, realList);
@@ -144,7 +146,7 @@ namespace Reductech.EDR.Utilities.Processes.Tests
                 Do = new EmitProcess()
             };
 
-            var resultList = forEachProcess.TryFreeze(_processSettings).AssertSuccess().Execute();
+            var resultList = forEachProcess.TryFreeze(_processSettings).AssertSuccess().ExecuteUntyped();
 
             var realList = await TestHelpers.AssertNoErrors(resultList);
 

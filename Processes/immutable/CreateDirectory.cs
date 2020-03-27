@@ -2,14 +2,14 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
-using CSharpFunctionalExtensions;
+using Reductech.EDR.Utilities.Processes.output;
 
 namespace Reductech.EDR.Utilities.Processes.immutable
 {
     /// <summary>
     /// Creates a new directory in the file system.
     /// </summary>
-    internal class CreateDirectory : ImmutableProcess
+    internal class CreateDirectory : ImmutableProcess<Unit>
     {
         /// <inheritdoc />
         public CreateDirectory(string name, string path) : base(name)
@@ -20,10 +20,10 @@ namespace Reductech.EDR.Utilities.Processes.immutable
         private readonly string _path;
 
         /// <inheritdoc />
-        public override async IAsyncEnumerable<Result<string>> Execute()
+        public override async IAsyncEnumerable<IProcessOutput<Unit>> Execute()
         {
             if (string.IsNullOrWhiteSpace(_path))
-                yield return Result.Failure<string>("Path is empty");
+                yield return ProcessOutput<Unit>.Message("Path is empty");
             else
             {
                 var r = await Task.Run(() => TryCreateDirectory(_path));
@@ -31,7 +31,7 @@ namespace Reductech.EDR.Utilities.Processes.immutable
             }
         }
 
-        private static Result<string> TryCreateDirectory(string path)
+        private static IProcessOutput<Unit> TryCreateDirectory(string path)
         {
             string? error;
             try
@@ -45,7 +45,10 @@ namespace Reductech.EDR.Utilities.Processes.immutable
                 error = e.Message;
             }
 #pragma warning restore CA1031 // Do not catch general exception types
-            return error != null ? Result.Failure<string>(error) : Result.Success("Directory Created");
+
+            if (error != null)
+                return ProcessOutput<Unit>.Error(error);
+            return ProcessOutput<Unit>.Success(Unit.Instance);
         }
     }
 }

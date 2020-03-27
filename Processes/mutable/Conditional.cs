@@ -12,6 +12,7 @@ namespace Reductech.EDR.Utilities.Processes.mutable
     {
         /// <summary>
         /// The process to use as the assertion.
+        /// Must have the boolean result type.
         /// </summary>
         [Required]
         [YamlMember(Order = 1)]
@@ -20,6 +21,7 @@ namespace Reductech.EDR.Utilities.Processes.mutable
 
         /// <summary>
         /// If the 'If' process was successful then run this.
+        /// Must have the same result type as the 'Else' process, if there is one and the void type otherwise.
         /// </summary>
         [Required]
         [YamlMember(Order = 2)]
@@ -28,8 +30,8 @@ namespace Reductech.EDR.Utilities.Processes.mutable
 
         /// <summary>
         /// If the 'If' process was unsuccessful then run this.
+        /// Must have the same result type as the 'Then' process.
         /// </summary>
-        
         [YamlMember(Order = 3)]
         public Process? Else { get; set; }
 
@@ -45,10 +47,14 @@ namespace Reductech.EDR.Utilities.Processes.mutable
             var combinedResult = Result.Combine(ErrorList.Compose, ifResult, thenResult, elseResult);
 
             if (combinedResult.IsFailure) return combinedResult.ConvertFailure<ImmutableProcess>();
-            var newProcess = new immutable.Conditional(GetName(), ifResult.Value, thenResult.Value, elseResult.Value);
 
-            return Result.Success<ImmutableProcess, ErrorList>(newProcess);
+            var result = ImmutableProcessBuilder.CreateImmutableProcess(GetName(), ifResult.Value, thenResult.Value, elseResult.Value);
+
+            return result;
         }
+
+        /// <inheritdoc />
+        public override string GetReturnTypeInfo() => "Returns the same type as the 'Then' and 'Else' processes. Returns void if there is no Else process.";
 
         /// <inheritdoc />
         public override string GetName() => Else == null? $"If ({If}) then ({Then})" : $"If ({If}) then ({Then}) else ({Else})";
