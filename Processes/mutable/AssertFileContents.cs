@@ -32,7 +32,7 @@ namespace Reductech.EDR.Utilities.Processes.mutable
         public override string GetReturnTypeInfo() => nameof(Unit);
 
         /// <inheritdoc />
-        public override string GetName() => ProcessNameHelper.GetAssertFileContainsProcess();
+        public override string GetName() => ProcessNameHelper.GetAssertFileContainsProcessName();
 
         /// <inheritdoc />
         public override Result<ImmutableProcess, ErrorList> TryFreeze(IProcessSettings processSettings)

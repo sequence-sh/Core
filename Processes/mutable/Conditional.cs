@@ -38,8 +38,8 @@ namespace Reductech.EDR.Utilities.Processes.mutable
         /// <inheritdoc />
         public override Result<ImmutableProcess, ErrorList> TryFreeze(IProcessSettings processSettings)
         {
-            var ifResult = If.TryFreeze(processSettings);
-            var thenResult = Then.TryFreeze(processSettings);
+            var ifResult = If?.TryFreeze(processSettings)?? Result.Failure<ImmutableProcess, ErrorList>(new ErrorList($"'{nameof(If)}' must be set."));
+            var thenResult = Then?.TryFreeze(processSettings)?? Result.Failure<ImmutableProcess, ErrorList>(new ErrorList($"'{nameof(Then)}' must be set."));
 
 
             var elseResult = Else?.TryFreeze(processSettings) ?? Result.Success<ImmutableProcess, ErrorList>(DoNothing.Instance);

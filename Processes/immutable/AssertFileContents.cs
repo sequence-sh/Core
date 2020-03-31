@@ -36,6 +36,6 @@ namespace Reductech.EDR.Utilities.Processes.immutable
         }
 
         /// <inheritdoc />
-        public override string Name => ProcessNameHelper.GetAssertFileContainsProcess();
+        public override string Name => ProcessNameHelper.GetAssertFileContainsProcessName();
     }
 }

@@ -12,15 +12,10 @@ namespace Reductech.EDR.Utilities.Processes
     {
         //TODO support different languages
 
-        public static string GetConditionalName(string ifName, string thenName, string? elseName)
-        {
-            return elseName == null? $"If ({ifName}) then ({thenName})" : $"If ({ifName}) then ({thenName}) else ({elseName})";
-        }
+        public static string GetConditionalName(string ifName, string thenName, string? elseName) => 
+            elseName == null? $"If ({ifName}) then ({thenName})" : $"If ({ifName}) then ({thenName}) else ({elseName})";
 
-        public static string GetAssertErrorName(string subProcessName)
-        {
-            return $"Assert Fail: {subProcessName}";
-        }
+        public static string GetAssertErrorName(string subProcessName) => $"Assert Fail: {subProcessName}";
 
         public static string GetSequenceName(IEnumerable<string> stepNames)
         {
@@ -37,6 +32,9 @@ namespace Reductech.EDR.Utilities.Processes
 
         public static string GetRunExternalProcessName() => "Run External Process";
 
-        public static string GetAssertFileContainsProcess() => "Assert File Contains";
+        public static string GetAssertFileContainsProcessName() => "Assert File Contains";
+
+        public static string GetAssertCountProcessName(string countProcessName) => $"Assert count of {countProcessName}";
+        public static string GetAssertBoolProcessName(string bProcessName, bool b) => $"Assert {bProcessName} returns {b}";
     }
 }
