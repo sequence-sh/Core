@@ -23,11 +23,13 @@ namespace Reductech.EDR.Utilities.Processes.immutable
 
             var results = _subProcess.ExecuteUntyped();
             await foreach (var line in results)
-            {
-                if (line.OutputType != OutputType.Success)
+            {             
+                if (line.OutputType == OutputType.Message || line.OutputType == OutputType.Warning)
                     yield return line.ConvertTo<Unit>();
-                else //we don't need to see the error message.
+                else if(line.OutputType == OutputType.Error) //we don't need to see the error message.
                     failed = true;
+                else if (line.OutputType == OutputType.Success) //we don't need to see the error message.
+                    failed = false;
             }
 
             if (failed)
