@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using CSharpFunctionalExtensions;
+using Reductech.EDR.Utilities.Processes.mutable;
 using Reductech.EDR.Utilities.Processes.output;
 
 namespace Reductech.EDR.Utilities.Processes.immutable
@@ -51,7 +52,7 @@ namespace Reductech.EDR.Utilities.Processes.immutable
         }
 
         /// <inheritdoc />
-        public override Result<ImmutableProcess<Unit>> TryCombine(ImmutableProcess<Unit> nextProcess)
+        public override Result<ImmutableProcess<Unit>> TryCombine(ImmutableProcess<Unit> nextProcess, IProcessSettings processSettings)
         {
             if (_steps.Count == 0)
             {
@@ -64,13 +65,13 @@ namespace Reductech.EDR.Utilities.Processes.immutable
                     nextProcess is ImmutableSequence nextSequence?  _steps.Concat(nextSequence._steps) :
                         _steps.Concat(new[] {nextProcess});
 
-                var r = CombineSteps(allSteps);
+                var r = CombineSteps(allSteps, processSettings);
 
                 return Result.Success<ImmutableProcess<Unit>>(r);
             }
         }
 
-        public static ImmutableSequence CombineSteps(IEnumerable<ImmutableProcess<Unit>> steps)
+        public static ImmutableSequence CombineSteps(IEnumerable<ImmutableProcess<Unit>> steps, IProcessSettings processSettings)
         {
             var combinedProcesses = new List<ImmutableProcess<Unit>>();
 
@@ -81,7 +82,7 @@ namespace Reductech.EDR.Utilities.Processes.immutable
                 if (current == null) current = step;
                 else
                 {
-                    var (isSuccess, _, value) = current.TryCombine(step);
+                    var (isSuccess, _, value) = current.TryCombine(step, processSettings);
                     if (isSuccess)
                         current = value;
                     else
@@ -98,5 +99,8 @@ namespace Reductech.EDR.Utilities.Processes.immutable
 
         /// <inheritdoc />
         public override string Name => ProcessNameHelper.GetSequenceName(_steps.Select(x => x.Name));
+
+        /// <inheritdoc />
+        public override IProcessConverter? ProcessConverter => null;
     }
 }

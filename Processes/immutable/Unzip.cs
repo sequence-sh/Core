@@ -53,5 +53,8 @@ namespace Reductech.EDR.Utilities.Processes.immutable
 
         /// <inheritdoc />
         public override string Name => ProcessNameHelper.GetUnzipName();
+
+        /// <inheritdoc />
+        public override IProcessConverter? ProcessConverter => null;
     }
 }

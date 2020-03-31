@@ -69,5 +69,8 @@ namespace Reductech.EDR.Utilities.Processes.immutable
         /// <inheritdoc />
         public override string Name => 
             ProcessNameHelper.GetConditionalName(_if.Name, _then.Name, _else?.Name);
+
+        /// <inheritdoc />
+        public override IProcessConverter? ProcessConverter => null;
     }
 }

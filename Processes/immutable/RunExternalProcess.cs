@@ -27,5 +27,8 @@ namespace Reductech.EDR.Utilities.Processes.immutable
 
         /// <inheritdoc />
         public override string Name => ProcessNameHelper.GetRunExternalProcessName();
+
+        /// <inheritdoc />
+        public override IProcessConverter? ProcessConverter => null;
     }
 }

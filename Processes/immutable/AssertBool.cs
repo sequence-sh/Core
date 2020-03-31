@@ -15,8 +15,13 @@ namespace Reductech.EDR.Utilities.Processes.immutable
             _expectedResult = expectedResult;
         }
 
+        
+
         /// <inheritdoc />
         public override string Name => ProcessNameHelper.GetAssertBoolProcessName(_subProcess.Name, _expectedResult);
+
+        /// <inheritdoc />
+        public override IProcessConverter? ProcessConverter => null;
 
         /// <inheritdoc />
         public override async IAsyncEnumerable<IProcessOutput<Unit>> Execute()

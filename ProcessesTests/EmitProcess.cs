@@ -56,5 +56,8 @@ namespace Reductech.EDR.Utilities.Processes.Tests
 
         /// <inheritdoc />
         public override string Name => "Emit";
+
+        /// <inheritdoc />
+        public override IProcessConverter? ProcessConverter => null;
     }
 }

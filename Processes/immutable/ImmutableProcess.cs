@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using CSharpFunctionalExtensions;
+using Reductech.EDR.Utilities.Processes.mutable;
 using Reductech.EDR.Utilities.Processes.output;
 
 namespace Reductech.EDR.Utilities.Processes.immutable
@@ -31,6 +32,11 @@ namespace Reductech.EDR.Utilities.Processes.immutable
         /// </summary>
         /// <returns></returns>
         public abstract IAsyncEnumerable<IProcessOutput> ExecuteUntyped();
+
+        /// <summary>
+        /// The process converter for combining with this process.
+        /// </summary>
+        public abstract IProcessConverter? ProcessConverter { get; }
     }
 
     /// <summary>
@@ -54,10 +60,22 @@ namespace Reductech.EDR.Utilities.Processes.immutable
         /// Try to create a process that is this process combined with the next process.
         /// Should only work for unit processes.
         /// </summary>
-        /// <param name="nextProcess"></param>
-        /// <returns></returns>
-        public virtual Result<ImmutableProcess<Unit>> TryCombine(ImmutableProcess<Unit> nextProcess)
+        public virtual Result<ImmutableProcess<Unit>> TryCombine(ImmutableProcess<Unit> nextProcess, IProcessSettings processSettings)
         {
+            // ReSharper disable once PatternNeverMatches - I think there is a bug in resharper here
+            // ReSharper disable once ConditionIsAlwaysTrueOrFalse
+            if (this is ImmutableProcess<Unit> thisAsUnitProcess && nextProcess.ProcessConverter != null)
+                // ReSharper disable HeuristicUnreachableCode
+            {
+                var (isSuccess, _, value) = nextProcess.ProcessConverter.TryConvert(thisAsUnitProcess, processSettings);
+
+                if (isSuccess)
+                {
+                    return value.TryCombine(nextProcess, processSettings);
+                }
+            }
+            // ReSharper restore HeuristicUnreachableCode
+
             return Result.Failure<ImmutableProcess<Unit>>("Could not combine");
         }
 

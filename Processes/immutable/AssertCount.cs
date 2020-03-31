@@ -20,6 +20,9 @@ namespace Reductech.EDR.Utilities.Processes.immutable
         public override string Name => ProcessNameHelper.GetAssertCountProcessName(_countProcess.Name);
 
         /// <inheritdoc />
+        public override IProcessConverter? ProcessConverter => null;
+
+        /// <inheritdoc />
         public override async IAsyncEnumerable<IProcessOutput<Unit>> Execute()
         {
             bool? successState = null;

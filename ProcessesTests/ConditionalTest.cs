@@ -108,5 +108,8 @@ namespace Reductech.EDR.Utilities.Processes.Tests
 
         /// <inheritdoc />
         public override string Name => _value.ToString();
+
+        /// <inheritdoc />
+        public override IProcessConverter? ProcessConverter => null;
     }
 }
