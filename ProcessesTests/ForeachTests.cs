@@ -150,7 +150,7 @@ namespace Reductech.EDR.Utilities.Processes.Tests
 
             var realList = await TestHelpers.AssertNoErrors(resultList);
 
-            CollectionAssert.AreEqual(expected, realList);
+            CollectionAssert.IsSupersetOf(realList, expected);
         }
     }
 }

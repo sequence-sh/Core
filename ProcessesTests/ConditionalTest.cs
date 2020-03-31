@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using CSharpFunctionalExtensions;
 using NUnit.Framework;
@@ -18,9 +19,9 @@ namespace Reductech.EDR.Utilities.Processes.Tests
         {
             var process = new Conditional
             {
-                If = new Assertion
+                If = new ReturnBool
                 {
-                    Success = true
+                    Value = true
                 } ,
                 Then = new EmitProcess
                 {
@@ -45,9 +46,9 @@ namespace Reductech.EDR.Utilities.Processes.Tests
         {
             var process = new Conditional
             {
-                If = new Assertion
+                If = new ReturnBool
                 {
-                    Success = false
+                    Value = false
                 } ,
                 Then = new EmitProcess
                 {
@@ -69,45 +70,43 @@ namespace Reductech.EDR.Utilities.Processes.Tests
         }
     }
 
-    public class Assertion : Process
+    public class ReturnBool : Process
     {
         /// <inheritdoc />
-        public override string GetReturnTypeInfo() => nameof(Unit);
-        public override string GetName() => Success.ToString();
+        public override string GetReturnTypeInfo() => nameof(Boolean);
+        public override string GetName() => Value.ToString();
 
         /// <inheritdoc />
         public override Result<ImmutableProcess, ErrorList> TryFreeze(IProcessSettings processSettings)
         {
-            return Result.Success<ImmutableProcess, ErrorList>(new ImmutableAssertion( Success));
+            return Result.Success<ImmutableProcess, ErrorList>(new ImmutableReturnBool( Value));
         }
 
 
         [YamlMember]
         [Required]
-        public bool Success { get; set; }
+        public bool Value { get; set; }
     }
 
-    public class ImmutableAssertion : ImmutableProcess<Unit>
+    public class ImmutableReturnBool : ImmutableProcess<bool>
     {
         /// <inheritdoc />
-        public ImmutableAssertion(bool success)
+        public ImmutableReturnBool(bool value)
         {
-            _success = success;
+            _value = value;
         }
 
-        private readonly bool _success;
+        private readonly bool _value;
 
         /// <inheritdoc />
 #pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
-        public override async IAsyncEnumerable<IProcessOutput<Unit>> Execute()
+        public override async IAsyncEnumerable<IProcessOutput<bool>> Execute()
 #pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
         {
-            if (_success)
-                yield return ProcessOutput<Unit>.Success(Unit.Instance);
-            else yield return ProcessOutput<Unit>.Error("Assertion failed.");
+                yield return ProcessOutput<bool>.Success(_value);
         }
 
         /// <inheritdoc />
-        public override string Name => _success.ToString();
+        public override string Name => _value.ToString();
     }
 }
