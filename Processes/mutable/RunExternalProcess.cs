@@ -33,10 +33,7 @@ namespace Reductech.EDR.Utilities.Processes.mutable
         public override string GetReturnTypeInfo() => nameof(Unit);
 
         /// <inheritdoc />
-        public override string GetName()
-        {
-            return $"{ProcessPath} {string.Join(" ", Arguments)}";
-        }
+        public override string GetName() =>ProcessNameHelper.GetRunExternalProcessName();
 
         /// <inheritdoc />
         public override Result<ImmutableProcess, ErrorList> TryFreeze(IProcessSettings processSettings)
@@ -53,7 +50,7 @@ namespace Reductech.EDR.Utilities.Processes.mutable
             if (errors.Any())
                 return Result.Failure<ImmutableProcess, ErrorList>(new ErrorList(errors));
             
-            var ip = new immutable.RunExternalProcess(GetName(), ProcessPath, Arguments);
+            var ip = new immutable.RunExternalProcess(ProcessPath, Arguments);
 
             return Result.Success<ImmutableProcess, ErrorList>(ip);
         }

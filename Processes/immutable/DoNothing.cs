@@ -11,7 +11,7 @@ namespace Reductech.EDR.Utilities.Processes.immutable
         public static readonly ImmutableProcess Instance = new DoNothing();
 
         /// <inheritdoc />
-        private DoNothing() : base("Do Nothing")
+        private DoNothing()
         {
         }
 
@@ -22,5 +22,8 @@ namespace Reductech.EDR.Utilities.Processes.immutable
         {
             yield return ProcessOutput<Unit>.Success(Unit.Instance);
         }
+
+        /// <inheritdoc />
+        public override string Name => ProcessNameHelper.GetDoNothingName();
     }
 }

@@ -7,7 +7,7 @@ namespace Reductech.EDR.Utilities.Processes.immutable
     internal class DeleteItem : ImmutableProcess<Unit>
     {
         /// <inheritdoc />
-        public DeleteItem(string name, string path) : base(name)
+        public DeleteItem(string path) 
         {
             _path = path;
         }
@@ -35,5 +35,8 @@ namespace Reductech.EDR.Utilities.Processes.immutable
             }
             yield return ProcessOutput<Unit>.Success(Unit.Instance);
         }
+
+        /// <inheritdoc />
+        public override string Name => ProcessNameHelper.GetDeleteItemName();
     }
 }

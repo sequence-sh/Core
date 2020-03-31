@@ -14,7 +14,7 @@ namespace Reductech.EDR.Utilities.Processes.mutable
         public override string GetReturnTypeInfo() => nameof(Unit);
 
         /// <inheritdoc />
-        public override string GetName() => $"Create Directory {Path}";
+        public override string GetName() => ProcessNameHelper.GetCreateDirectoryName();
 
         /// <inheritdoc />
         public override Result<ImmutableProcess, ErrorList> TryFreeze(IProcessSettings processSettings)
@@ -22,7 +22,7 @@ namespace Reductech.EDR.Utilities.Processes.mutable
             if (string.IsNullOrWhiteSpace(Path))
                 return Result.Failure<ImmutableProcess, ErrorList>(new ErrorList("Path must not be empty"));
 
-            return Result.Success<ImmutableProcess, ErrorList>(new immutable.CreateDirectory(GetName(), Path));
+            return Result.Success<ImmutableProcess, ErrorList>(new immutable.CreateDirectory(Path));
         }
 
 

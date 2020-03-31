@@ -78,7 +78,7 @@ namespace Reductech.EDR.Utilities.Processes.Tests
         /// <inheritdoc />
         public override Result<ImmutableProcess, ErrorList> TryFreeze(IProcessSettings processSettings)
         {
-            return Result.Success<ImmutableProcess, ErrorList>(new ImmutableAssertion(GetName(), Success));
+            return Result.Success<ImmutableProcess, ErrorList>(new ImmutableAssertion( Success));
         }
 
 
@@ -90,7 +90,7 @@ namespace Reductech.EDR.Utilities.Processes.Tests
     public class ImmutableAssertion : ImmutableProcess<Unit>
     {
         /// <inheritdoc />
-        public ImmutableAssertion(string name, bool success) : base(name)
+        public ImmutableAssertion(bool success)
         {
             _success = success;
         }
@@ -106,5 +106,8 @@ namespace Reductech.EDR.Utilities.Processes.Tests
                 yield return ProcessOutput<Unit>.Success(Unit.Instance);
             else yield return ProcessOutput<Unit>.Error("Assertion failed.");
         }
+
+        /// <inheritdoc />
+        public override string Name => _success.ToString();
     }
 }

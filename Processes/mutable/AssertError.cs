@@ -24,10 +24,7 @@ namespace Reductech.EDR.Utilities.Processes.mutable
         public override string GetReturnTypeInfo() => nameof(Unit);
 
         /// <inheritdoc />
-        public override string GetName()
-        {
-            return $"Assert Fail: {Process?.GetName()}";
-        }
+        public override string GetName() => ProcessNameHelper.GetAssertErrorName(Process?.GetName()??"");
 
         /// <inheritdoc />
         public override Result<ImmutableProcess, ErrorList> TryFreeze(IProcessSettings processSettings)
@@ -39,7 +36,7 @@ namespace Reductech.EDR.Utilities.Processes.mutable
 
             if (subProcessFreezeResult.IsFailure) return subProcessFreezeResult;
 
-            var r = new immutable.AssertError(GetName(), subProcessFreezeResult.Value);
+            var r = new immutable.AssertError( subProcessFreezeResult.Value);
 
             return Result.Success<ImmutableProcess, ErrorList>(r);
         }

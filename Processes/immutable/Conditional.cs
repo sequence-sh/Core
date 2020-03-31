@@ -6,7 +6,7 @@ namespace Reductech.EDR.Utilities.Processes.immutable
     internal class Conditional<T> : ImmutableProcess<T>
     {
         /// <inheritdoc />
-        public Conditional(string name, ImmutableProcess<bool> @if, ImmutableProcess<T> then, ImmutableProcess<T> @else) : base(name)
+        public Conditional(ImmutableProcess<bool> @if, ImmutableProcess<T> then, ImmutableProcess<T> @else)
         {
             _if = @if;
             _then = then;
@@ -65,5 +65,9 @@ namespace Reductech.EDR.Utilities.Processes.immutable
 
             
         }
+
+        /// <inheritdoc />
+        public override string Name => 
+            ProcessNameHelper.GetConditionalName(_if.Name, _then.Name, _else?.Name);
     }
 }

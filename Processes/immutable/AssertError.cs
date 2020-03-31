@@ -11,7 +11,7 @@ namespace Reductech.EDR.Utilities.Processes.immutable
         private readonly ImmutableProcess _subProcess;
 
         /// <inheritdoc />
-        public AssertError(string name, ImmutableProcess subProcess) : base(name)
+        public AssertError(ImmutableProcess subProcess)
         {
             _subProcess = subProcess;
         }
@@ -37,5 +37,8 @@ namespace Reductech.EDR.Utilities.Processes.immutable
                 yield return ProcessOutput<Unit>.Error("Assertion Failed - Process was unexpectedly successful");
             }
         }
+
+        /// <inheritdoc />
+        public override string Name => ProcessNameHelper.GetAssertErrorName(_subProcess.Name);
     }
 }

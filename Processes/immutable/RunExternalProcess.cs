@@ -6,7 +6,7 @@ namespace Reductech.EDR.Utilities.Processes.immutable
     internal class RunExternalProcess : ImmutableProcess<Unit>
     {
         /// <inheritdoc />
-        public RunExternalProcess(string name, string processPath, IReadOnlyCollection<string> arguments) : base(name)
+        public RunExternalProcess( string processPath, IReadOnlyCollection<string> arguments)
         {
             _processPath = processPath;
             _arguments = arguments;
@@ -24,5 +24,8 @@ namespace Reductech.EDR.Utilities.Processes.immutable
             await foreach (var line in result)
                 yield return line;
         }
+
+        /// <inheritdoc />
+        public override string Name => ProcessNameHelper.GetRunExternalProcessName();
     }
 }

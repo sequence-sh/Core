@@ -23,20 +23,20 @@ namespace Reductech.EDR.Utilities.Processes.Tests
 
         public override string GetName()
         {
-            return ("Emit " + Term + Number).Trim();
+            return "Emit";
         }
 
         /// <inheritdoc />
         public override Result<ImmutableProcess, ErrorList> TryFreeze(IProcessSettings processSettings)
         {
-            return Result.Success<ImmutableProcess, ErrorList>(new FrozenEmitProcess(GetName(), Term, Number));
+            return Result.Success<ImmutableProcess, ErrorList>(new ImmutableEmitProcess( Term, Number));
         }
     }
 
-    public class FrozenEmitProcess : ImmutableProcess<Unit>
+    public class ImmutableEmitProcess : ImmutableProcess<Unit>
     {
         /// <inheritdoc />
-        public FrozenEmitProcess(string name, string? term, int? number) : base(name)
+        public ImmutableEmitProcess(string? term, int? number)
         {
             _term = term;
             _number = number;
@@ -53,5 +53,8 @@ namespace Reductech.EDR.Utilities.Processes.Tests
         {
             yield return ProcessOutput<Unit>.Message(_term + _number);
         }
+
+        /// <inheritdoc />
+        public override string Name => "Emit";
     }
 }

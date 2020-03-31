@@ -9,7 +9,7 @@ namespace Reductech.EDR.Utilities.Processes.immutable
     internal class Unzip : ImmutableProcess<Unit>
     {
         /// <inheritdoc />
-        public Unzip(string name, string archiveFilePath, string destinationDirectory, bool overwriteFiles) : base(name)
+        public Unzip(string archiveFilePath, string destinationDirectory, bool overwriteFiles)
         {
             _archiveFilePath = archiveFilePath;
             _destinationDirectory = destinationDirectory;
@@ -50,5 +50,8 @@ namespace Reductech.EDR.Utilities.Processes.immutable
 
             return error;
         }
+
+        /// <inheritdoc />
+        public override string Name => ProcessNameHelper.GetUnzipName();
     }
 }

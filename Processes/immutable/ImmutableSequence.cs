@@ -10,7 +10,7 @@ namespace Reductech.EDR.Utilities.Processes.immutable
         private readonly IReadOnlyCollection<ImmutableProcess<Unit>> _steps;
 
         /// <inheritdoc />
-        public ImmutableSequence(string name, IReadOnlyCollection<ImmutableProcess<Unit>> steps) : base(name)
+        public ImmutableSequence(IReadOnlyCollection<ImmutableProcess<Unit>> steps)
         {
             _steps = steps;
         }
@@ -93,9 +93,10 @@ namespace Reductech.EDR.Utilities.Processes.immutable
             }
             if(current != null) combinedProcesses.Add(current);
 
-            var newName = string.Join(" then ", combinedProcesses.Select(cp => cp.Name));
-
-            return new ImmutableSequence(newName, combinedProcesses);
+            return new ImmutableSequence(combinedProcesses);
         }
+
+        /// <inheritdoc />
+        public override string Name => ProcessNameHelper.GetSequenceName(_steps.Select(x => x.Name));
     }
 }

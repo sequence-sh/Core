@@ -6,7 +6,7 @@ namespace Reductech.EDR.Utilities.Processes.immutable
 {
     internal static class ImmutableProcessBuilder
     {
-        public static Result<ImmutableProcess, ErrorList> CreateImmutableProcess(string name, ImmutableProcess @if,
+        public static Result<ImmutableProcess, ErrorList> CreateImmutableProcess(ImmutableProcess @if,
             ImmutableProcess then, ImmutableProcess @else)
         {
             var errors = new ErrorList();
@@ -22,7 +22,7 @@ namespace Reductech.EDR.Utilities.Processes.immutable
 
                 try
                 {
-                    ip = CreateConditional(name, ifProcess, then as dynamic, @else as dynamic);
+                    ip = CreateConditional(ifProcess, then as dynamic, @else as dynamic);
                 }
                 catch (Exception e)
                 {
@@ -39,9 +39,9 @@ namespace Reductech.EDR.Utilities.Processes.immutable
             }
         }
 
-        private static ImmutableProcess CreateConditional<T>(string name, ImmutableProcess<bool> ifP, ImmutableProcess<T> thenP, ImmutableProcess<T> elseP)
+        private static ImmutableProcess CreateConditional<T>(ImmutableProcess<bool> ifP, ImmutableProcess<T> thenP, ImmutableProcess<T> elseP)
         {
-            return new Conditional<T>(name, ifP, thenP, elseP);
+            return new Conditional<T>(ifP, thenP, elseP);
         }
     }
 }

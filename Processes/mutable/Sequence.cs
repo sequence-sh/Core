@@ -21,7 +21,7 @@ namespace Reductech.EDR.Utilities.Processes.mutable
         /// </summary>
         public override string GetName()
         {
-            return string.Join(" then ", Steps.Select(s=>s.GetName()));
+            return ProcessNameHelper.GetSequenceName(Steps.Select(s => s.GetName()));
         }
 
         /// <summary>

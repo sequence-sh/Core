@@ -25,7 +25,7 @@ namespace Reductech.EDR.Utilities.Processes.mutable
         public override string GetReturnTypeInfo() => nameof(Unit);
 
         /// <inheritdoc />
-        public override string GetName() => $"Delete {Path}";
+        public override string GetName() => ProcessNameHelper.GetDeleteItemName();
 
         /// <inheritdoc />
         public override Result<ImmutableProcess, ErrorList> TryFreeze(IProcessSettings processSettings)
@@ -33,7 +33,7 @@ namespace Reductech.EDR.Utilities.Processes.mutable
             if (string.IsNullOrWhiteSpace(Path))
                 return Result.Failure<ImmutableProcess, ErrorList>(new ErrorList("File Path is empty"));
 
-            return Result.Success<ImmutableProcess, ErrorList>(new immutable.DeleteItem(GetName(), Path));
+            return Result.Success<ImmutableProcess, ErrorList>(new immutable.DeleteItem(Path));
         }
     }
 }

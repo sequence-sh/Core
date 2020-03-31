@@ -48,7 +48,7 @@ namespace Reductech.EDR.Utilities.Processes.mutable
 
             if (combinedResult.IsFailure) return combinedResult.ConvertFailure<ImmutableProcess>();
 
-            var result = ImmutableProcessBuilder.CreateImmutableProcess(GetName(), ifResult.Value, thenResult.Value, elseResult.Value);
+            var result = ImmutableProcessBuilder.CreateImmutableProcess(ifResult.Value, thenResult.Value, elseResult.Value);
 
             return result;
         }
@@ -57,6 +57,8 @@ namespace Reductech.EDR.Utilities.Processes.mutable
         public override string GetReturnTypeInfo() => "Returns the same type as the 'Then' and 'Else' processes. Returns void if there is no Else process.";
 
         /// <inheritdoc />
-        public override string GetName() => Else == null? $"If ({If}) then ({Then})" : $"If ({If}) then ({Then}) else ({Else})";
+        public override string GetName() =>
+            ProcessNameHelper.GetConditionalName(If.GetName(), Then.GetName(), Else?.GetName());
+
     }
 }

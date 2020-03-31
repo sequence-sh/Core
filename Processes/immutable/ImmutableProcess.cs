@@ -11,19 +11,9 @@ namespace Reductech.EDR.Utilities.Processes.immutable
     public abstract class ImmutableProcess
     {
         /// <summary>
-        /// Create a new immutable process
-        /// </summary>
-        /// <param name="name"></param>
-        protected ImmutableProcess(string name)
-        {
-            Name = name;
-        }
-
-        //TODO make this calculated rather than set from the constructor
-        /// <summary>
         /// The name of this process.
         /// </summary>
-        public string Name { get; }
+        public abstract string Name { get; }
 
         /// <summary>
         /// The type of this process' final results.
@@ -48,11 +38,6 @@ namespace Reductech.EDR.Utilities.Processes.immutable
     /// </summary>
     public abstract class ImmutableProcess<T> : ImmutableProcess
     {
-        /// <inheritdoc />
-        protected ImmutableProcess(string name) : base(name)
-        {
-        }
-
         /// <inheritdoc />
         public override IAsyncEnumerable<IProcessOutput> ExecuteUntyped()
         {

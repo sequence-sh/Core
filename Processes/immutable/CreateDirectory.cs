@@ -12,7 +12,7 @@ namespace Reductech.EDR.Utilities.Processes.immutable
     internal class CreateDirectory : ImmutableProcess<Unit>
     {
         /// <inheritdoc />
-        public CreateDirectory(string name, string path) : base(name)
+        public CreateDirectory(string path)
         {
             _path = path;
         }
@@ -50,5 +50,8 @@ namespace Reductech.EDR.Utilities.Processes.immutable
                 return ProcessOutput<Unit>.Error(error);
             return ProcessOutput<Unit>.Success(Unit.Instance);
         }
+
+        /// <inheritdoc />
+        public override string Name => ProcessNameHelper.GetCreateDirectoryName();
     }
 }
