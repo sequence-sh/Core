@@ -12,6 +12,6 @@ namespace Reductech.EDR.Utilities.Processes
         /// <summary>
         /// Tries to convert this process to a process of a different type.
         /// </summary>
-        public Result<ImmutableProcess<Unit>> TryConvert(ImmutableProcess<Unit> immutableProcess, IProcessSettings processSettings);
+        public Result<ImmutableProcess<T>> TryConvert<T>(ImmutableProcess<T> immutableProcess, IProcessSettings processSettings);
     }
 }

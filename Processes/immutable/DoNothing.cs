@@ -6,8 +6,12 @@ namespace Reductech.EDR.Utilities.Processes.immutable
     /// <summary>
     /// A process that does nothing;
     /// </summary>
-    internal class DoNothing : ImmutableProcess<Unit>
+    public class DoNothing : ImmutableProcess<Unit>
     {
+
+        /// <summary>
+        /// The instance of the DoNothing Process
+        /// </summary>
         public static readonly ImmutableProcess Instance = new DoNothing();
 
         /// <inheritdoc />

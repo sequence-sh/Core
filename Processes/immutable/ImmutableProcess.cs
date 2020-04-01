@@ -62,19 +62,15 @@ namespace Reductech.EDR.Utilities.Processes.immutable
         /// </summary>
         public virtual Result<ImmutableProcess<Unit>> TryCombine(ImmutableProcess<Unit> nextProcess, IProcessSettings processSettings)
         {
-            // ReSharper disable once PatternNeverMatches - I think there is a bug in resharper here
-            // ReSharper disable once ConditionIsAlwaysTrueOrFalse
-            if (this is ImmutableProcess<Unit> thisAsUnitProcess && nextProcess.ProcessConverter != null)
-                // ReSharper disable HeuristicUnreachableCode
+            if (nextProcess.ProcessConverter != null)
             {
-                var (isSuccess, _, value) = nextProcess.ProcessConverter.TryConvert(thisAsUnitProcess, processSettings);
+                var (isSuccess, _, value) = nextProcess.ProcessConverter.TryConvert(this, processSettings);
 
                 if (isSuccess)
                 {
                     return value.TryCombine(nextProcess, processSettings);
                 }
             }
-            // ReSharper restore HeuristicUnreachableCode
 
             return Result.Failure<ImmutableProcess<Unit>>("Could not combine");
         }

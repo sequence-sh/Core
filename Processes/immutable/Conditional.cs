@@ -3,29 +3,42 @@ using Reductech.EDR.Utilities.Processes.output;
 
 namespace Reductech.EDR.Utilities.Processes.immutable
 {
-    internal class Conditional<T> : ImmutableProcess<T>
+    /// <summary>
+    /// Immutable version of a conditional process.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    public class Conditional<T> : ImmutableProcess<T>
     {
         /// <inheritdoc />
         public Conditional(ImmutableProcess<bool> @if, ImmutableProcess<T> then, ImmutableProcess<T> @else)
         {
-            _if = @if;
-            _then = then;
-            _else = @else;
+            If = @if;
+            Then = then;
+            Else = @else;
         }
+        /// <summary>
+        /// The process determining which branch should be chosen.
+        /// </summary>
+        public readonly ImmutableProcess<bool> If;
 
-        private readonly ImmutableProcess<bool> _if;
-        private readonly ImmutableProcess<T> _then;
-        private readonly ImmutableProcess<T> _else;
+        /// <summary>
+        /// The process to run if the condition is successful.
+        /// </summary>
+        public readonly ImmutableProcess<T> Then;
+        /// <summary>
+        /// The process to run if the condition is unsuccessful.
+        /// </summary>
+        public readonly ImmutableProcess<T> Else;
 
         /// <inheritdoc />
         public override async IAsyncEnumerable<IProcessOutput<T>> Execute()
         {
-            yield return ProcessOutput<T>.Message($"Testing {_if}");
+            yield return ProcessOutput<T>.Message($"Testing {If}");
 
             bool? success = null;
             var anyErrors = false;
 
-            await foreach (var r in _if.Execute())
+            await foreach (var r in If.Execute())
             {
                 if (r.OutputType == OutputType.Success)
                 {
@@ -46,16 +59,16 @@ namespace Reductech.EDR.Utilities.Processes.immutable
                 {
                     if (success.Value)
                     {
-                        yield return ProcessOutput<T>.Message($"Condition met, executing {_then}");
+                        yield return ProcessOutput<T>.Message($"Condition met, executing {Then}");
 
-                        await foreach (var r in _then.Execute())
+                        await foreach (var r in Then.Execute())
                             yield return r;
                     }
-                    else if (_else != null)
+                    else if (Else != null)
                     {
-                        yield return ProcessOutput<T>.Message($"Condition not met, executing {_else}");
+                        yield return ProcessOutput<T>.Message($"Condition not met, executing {Else}");
 
-                        await foreach (var r in _else.Execute())
+                        await foreach (var r in Else.Execute())
                             yield return r;
                     }
                 }
@@ -68,7 +81,7 @@ namespace Reductech.EDR.Utilities.Processes.immutable
 
         /// <inheritdoc />
         public override string Name => 
-            ProcessNameHelper.GetConditionalName(_if.Name, _then.Name, _else?.Name);
+            ProcessNameHelper.GetConditionalName(If.Name, Then.Name, Else?.Name);
 
         /// <inheritdoc />
         public override IProcessConverter? ProcessConverter => null;

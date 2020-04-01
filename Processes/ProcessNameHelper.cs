@@ -17,7 +17,7 @@ namespace Reductech.EDR.Utilities.Processes
 
         public static string GetAssertErrorName(string subProcessName) => $"Assert Fail: {subProcessName}";
 
-        public static string GetSequenceName(IEnumerable<string> stepNames)
+        public static string GetSequenceName(IEnumerable<string> stepNames) //TODO allow names like "Search and Tag 17 times"
         {
             var r = string.Join(" then ", stepNames);
 
