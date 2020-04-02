@@ -3,13 +3,13 @@ using Reductech.EDR.Utilities.Processes.output;
 
 namespace Reductech.EDR.Utilities.Processes.immutable
 {
-    internal class AssertCount : ImmutableProcess<Unit>
+    internal class CheckNumber : ImmutableProcess<bool>
     {
         private readonly int? _minimum;
         private readonly int? _maximum;
         private readonly ImmutableProcess<int> _countProcess;
 
-        public AssertCount(int? minimum, int? maximum, ImmutableProcess<int> countProcess)
+        public CheckNumber(int? minimum, int? maximum, ImmutableProcess<int> countProcess)
         {
             _minimum = minimum;
             _maximum = maximum;
@@ -17,13 +17,13 @@ namespace Reductech.EDR.Utilities.Processes.immutable
         }
 
         /// <inheritdoc />
-        public override string Name => ProcessNameHelper.GetAssertCountProcessName(_countProcess.Name);
+        public override string Name => ProcessNameHelper.GetCheckNumberProcessName(_countProcess.Name);
 
         /// <inheritdoc />
         public override IProcessConverter? ProcessConverter => null;
 
         /// <inheritdoc />
-        public override async IAsyncEnumerable<IProcessOutput<Unit>> Execute()
+        public override async IAsyncEnumerable<IProcessOutput<bool>> Execute()
         {
             bool? successState = null;
             int? value = null;
@@ -40,32 +40,20 @@ namespace Reductech.EDR.Utilities.Processes.immutable
                 else
                 {
                     if (countOutput.OutputType == OutputType.Error) successState = false;
-                    yield return countOutput.ConvertTo<Unit>();
+                    yield return countOutput.ConvertTo<bool>();
                 }
             }
 
             switch (successState)
             {
                 case true:
-                    yield return ProcessOutput<Unit>.Success(Unit.Instance);
+                    yield return ProcessOutput<bool>.Success(true);
                     break;
                 case false when value.HasValue:
-                {
-                    string expected;
-                    if (_minimum.HasValue && _maximum.HasValue)
-                        expected = $"between {_minimum.Value} and {_maximum.Value}";
-                    else if (_minimum.HasValue)
-                        expected = $"greater than {_minimum}";
-                    else if (_maximum.HasValue)
-                        expected = $"less than {_maximum}";
-                    else expected = "unknown";
-
-                    yield return ProcessOutput<Unit>.Error(
-                        $"Assertion failed, value was {value.Value} but expected {expected}");
+                    yield return ProcessOutput<bool>.Success(false);
                     break;
-                }
                 default:
-                    yield return ProcessOutput<Unit>.Error("$Assertion failed - inconclusive");
+                    yield return ProcessOutput<bool>.Error("Check failed - inconclusive");
                     break;
             }
 

@@ -1,13 +1,14 @@
-﻿using CSharpFunctionalExtensions;
+﻿using System;
+using CSharpFunctionalExtensions;
 using Reductech.EDR.Utilities.Processes.immutable;
 using YamlDotNet.Serialization;
 
 namespace Reductech.EDR.Utilities.Processes.mutable
 {
     /// <summary>
-    /// Asserts that the count of the SubProcess is within a particular range.
+    /// Checks that the count of the SubProcess is within a particular range.
     /// </summary>
-    public class AssertCount : Process
+    public class CheckNumber : Process
     {
         /// <summary>
         /// Inclusive minimum of the expected range.
@@ -35,10 +36,10 @@ namespace Reductech.EDR.Utilities.Processes.mutable
 #pragma warning restore CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
 
         /// <inheritdoc />
-        public override string GetReturnTypeInfo() => nameof(Unit);
+        public override string GetReturnTypeInfo() => nameof(Boolean);
 
         /// <inheritdoc />
-        public override string GetName() => ProcessNameHelper.GetAssertCountProcessName(SubProcess?.GetName() ?? "");
+        public override string GetName() => ProcessNameHelper.GetCheckNumberProcessName(SubProcess?.GetName() ?? "");
 
         /// <inheritdoc />
         public override Result<ImmutableProcess, ErrorList> TryFreeze(IProcessSettings processSettings)
@@ -53,7 +54,7 @@ namespace Reductech.EDR.Utilities.Processes.mutable
                 return frozenCount;
 
             if (frozenCount.Value is ImmutableProcess<int> icp)
-                return Result.Success<ImmutableProcess, ErrorList>(new immutable.AssertCount(Minimum, Maximum, icp));
+                return Result.Success<ImmutableProcess, ErrorList>(new immutable.CheckNumber(Minimum, Maximum, icp));
 
             return Result.Failure<ImmutableProcess, ErrorList>(new ErrorList(
                 $"'{nameof(SubProcess)}' must have return type 'int'."));

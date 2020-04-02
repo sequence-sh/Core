@@ -34,7 +34,7 @@ namespace Reductech.EDR.Utilities.Processes
 
         public static string GetAssertFileContainsProcessName() => "Assert File Contains";
 
-        public static string GetAssertCountProcessName(string countProcessName) => $"Assert count of {countProcessName}";
+        public static string GetCheckNumberProcessName(string countProcessName) => $"Check result of {countProcessName}";
         public static string GetAssertBoolProcessName(string bProcessName, bool b) => $"Assert {bProcessName} returns {b}";
     }
 }
