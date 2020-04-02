@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using CSharpFunctionalExtensions;
@@ -8,9 +9,9 @@ using YamlDotNet.Serialization;
 namespace Reductech.EDR.Utilities.Processes.mutable
 {
     /// <summary>
-    /// Asserts that a particular file contains a particular string.
+    /// Checks whether a particular file contains a particular string.
     /// </summary>
-    public class AssertFileContents : Process
+    public class DoesFileContain : Process
     {
         /// <summary>
         /// The path to the file to check.
@@ -29,7 +30,7 @@ namespace Reductech.EDR.Utilities.Processes.mutable
         public string ExpectedContents { get; set; }
 
         /// <inheritdoc />
-        public override string GetReturnTypeInfo() => nameof(Unit);
+        public override string GetReturnTypeInfo() => nameof(Boolean);
 
         /// <inheritdoc />
         public override string GetName() => ProcessNameHelper.GetAssertFileContainsProcessName();
@@ -45,7 +46,7 @@ namespace Reductech.EDR.Utilities.Processes.mutable
             if (errors.Any())
                 return Result.Failure<ImmutableProcess, ErrorList>(new ErrorList(errors));
 
-            return Result.Success<ImmutableProcess, ErrorList>(new ImmutableAssertFileContents(FilePath, ExpectedContents));
+            return Result.Success<ImmutableProcess, ErrorList>(new immutable.DoesFileContain(FilePath, ExpectedContents));
         }
     }
 }

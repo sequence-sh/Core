@@ -59,7 +59,7 @@ namespace Reductech.EDR.Utilities.Processes.mutable
             }
 
 
-            var immutableSequence = ImmutableSequence.CombineSteps(unitSteps, processSettings);
+            var immutableSequence = immutable.Sequence.CombineSteps(unitSteps, processSettings);
 
             return Result.Success<ImmutableProcess, ErrorList>(immutableSequence);
 

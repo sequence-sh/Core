@@ -4,10 +4,10 @@ using Reductech.EDR.Utilities.Processes.output;
 
 namespace Reductech.EDR.Utilities.Processes.immutable
 {
-    internal class ImmutableAssertFileContents : ImmutableProcess<Unit> //TODO move into processes
+    internal class DoesFileContain : ImmutableProcess<bool>
     {
         /// <inheritdoc />
-        public ImmutableAssertFileContents(string filePath, string expectedContents) 
+        public DoesFileContain(string filePath, string expectedContents) 
         {
             _filePath = filePath;
             _expectedContents = expectedContents;
@@ -18,19 +18,19 @@ namespace Reductech.EDR.Utilities.Processes.immutable
         private readonly string _expectedContents;
 
         /// <inheritdoc />
-        public override async IAsyncEnumerable<IProcessOutput<Unit>> Execute()
+        public override async IAsyncEnumerable<IProcessOutput<bool>> Execute()
         {
             if (!File.Exists(_filePath))
-                yield return ProcessOutput<Unit>.Error("File does not exist");
+                yield return ProcessOutput<bool>.Error("File does not exist");
             else
             {
                 var text = await File.ReadAllTextAsync(_filePath);
 
                 if (text.Contains(_expectedContents))
-                    yield return ProcessOutput<Unit>.Success(Unit.Instance);
+                    yield return ProcessOutput<bool>.Success(true);
                 else
                 {
-                    yield return ProcessOutput<Unit>.Error("Contents do not match");
+                    yield return ProcessOutput<bool>.Success(false);
                 }
             }
         }

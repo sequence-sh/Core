@@ -6,12 +6,12 @@ using Reductech.EDR.Utilities.Processes.output;
 
 namespace Reductech.EDR.Utilities.Processes.immutable
 {
-    internal class ImmutableSequence : ImmutableProcess<Unit>
+    internal class Sequence : ImmutableProcess<Unit>
     {
         private readonly IReadOnlyCollection<ImmutableProcess<Unit>> _steps;
 
         /// <inheritdoc />
-        public ImmutableSequence(IReadOnlyCollection<ImmutableProcess<Unit>> steps)
+        public Sequence(IReadOnlyCollection<ImmutableProcess<Unit>> steps)
         {
             _steps = steps;
         }
@@ -48,7 +48,7 @@ namespace Reductech.EDR.Utilities.Processes.immutable
         /// <inheritdoc />
         public override bool Equals(object? obj)
         {
-            return obj is ImmutableSequence imSeq && _steps.Equals(imSeq._steps);
+            return obj is Sequence imSeq && _steps.Equals(imSeq._steps);
         }
 
         /// <inheritdoc />
@@ -62,7 +62,7 @@ namespace Reductech.EDR.Utilities.Processes.immutable
             {
 
                 var allSteps =
-                    nextProcess is ImmutableSequence nextSequence?  _steps.Concat(nextSequence._steps) :
+                    nextProcess is Sequence nextSequence?  _steps.Concat(nextSequence._steps) :
                         _steps.Concat(new[] {nextProcess});
 
                 var r = CombineSteps(allSteps, processSettings);
@@ -71,7 +71,7 @@ namespace Reductech.EDR.Utilities.Processes.immutable
             }
         }
 
-        public static ImmutableSequence CombineSteps(IEnumerable<ImmutableProcess<Unit>> steps, IProcessSettings processSettings)
+        public static Sequence CombineSteps(IEnumerable<ImmutableProcess<Unit>> steps, IProcessSettings processSettings)
         {
             var combinedProcesses = new List<ImmutableProcess<Unit>>();
 
@@ -94,7 +94,7 @@ namespace Reductech.EDR.Utilities.Processes.immutable
             }
             if(current != null) combinedProcesses.Add(current);
 
-            return new ImmutableSequence(combinedProcesses);
+            return new Sequence(combinedProcesses);
         }
 
         /// <inheritdoc />

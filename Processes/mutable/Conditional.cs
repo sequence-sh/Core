@@ -1,4 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Utilities.Processes.immutable;
 using YamlDotNet.Serialization;
@@ -48,7 +50,7 @@ namespace Reductech.EDR.Utilities.Processes.mutable
 
             if (combinedResult.IsFailure) return combinedResult.ConvertFailure<ImmutableProcess>();
 
-            var result = ImmutableProcessBuilder.CreateImmutableProcess(ifResult.Value, thenResult.Value, elseResult.Value);
+            var result = CreateImmutableProcess(ifResult.Value, thenResult.Value, elseResult.Value);
 
             return result;
         }
@@ -59,6 +61,46 @@ namespace Reductech.EDR.Utilities.Processes.mutable
         /// <inheritdoc />
         public override string GetName() =>
             ProcessNameHelper.GetConditionalName(If.GetName(), Then.GetName(), Else?.GetName());
+
+
+
+        private static Result<ImmutableProcess, ErrorList> CreateImmutableProcess(ImmutableProcess @if,
+            ImmutableProcess then, ImmutableProcess @else)
+        {
+            var errors = new ErrorList();
+            if (then.ResultType != @else.ResultType)
+                errors.Add($"Then and Else should have the same type, but their types are '{then.ResultType}' and '{@else.ResultType}'");
+
+            if (@if is ImmutableProcess<bool> ifProcess)
+            {
+                if(errors.Any())
+                    return Result.Failure<ImmutableProcess, ErrorList>(errors);
+
+                ImmutableProcess ip;
+
+                try
+                {
+                    ip = CreateImmutableConditional(ifProcess, then as dynamic, @else as dynamic);
+                }
+                catch (Exception e)
+                {
+                    errors.Add(e.Message);
+                    return Result.Failure<ImmutableProcess, ErrorList>(errors);
+                }
+
+                return Result.Success<ImmutableProcess, ErrorList>(ip);
+            }
+            else
+            {
+                errors.Add($"If process should have type bool");
+                return Result.Failure<ImmutableProcess, ErrorList>(errors);
+            }
+        }
+
+        private static ImmutableProcess CreateImmutableConditional<T>(ImmutableProcess<bool> ifP, ImmutableProcess<T> thenP, ImmutableProcess<T> elseP)
+        {
+            return new Conditional<T>(ifP, thenP, elseP);
+        }
 
     }
 }
