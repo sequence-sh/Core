@@ -5,7 +5,7 @@ using YamlDotNet.Serialization;
 namespace Reductech.EDR.Utilities.Processes.mutable
 {
     /// <summary>
-    /// Asserts that the SubProcess will return true.
+    /// Asserts that the Check will return true.
     /// </summary>
     public class AssertTrue : AssertBool
     {
@@ -14,7 +14,7 @@ namespace Reductech.EDR.Utilities.Processes.mutable
     }
 
     /// <summary>
-    /// Asserts that the SubProcess will return false.
+    /// Asserts that the Check will return false.
     /// </summary>
     public class AssertFalse : AssertBool
     {
@@ -23,7 +23,7 @@ namespace Reductech.EDR.Utilities.Processes.mutable
     }
 
     /// <summary>
-    /// Asserts that the SubProcess will return a particular value.
+    /// Asserts that the Check will return a particular value.
     /// </summary>
     public abstract class AssertBool : Process
     {
@@ -33,11 +33,11 @@ namespace Reductech.EDR.Utilities.Processes.mutable
         /// </summary>
         [YamlMember(Order = 4 )]
 #pragma warning disable CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
-        public Process SubProcess { get; set; }
+        public Process ResultOf { get; set; }
 #pragma warning restore CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
 
         /// <summary>
-        /// The expected result of the SubProcess.
+        /// The expected result of the Check.
         /// </summary>
         /// <returns></returns>
         protected abstract bool GetExpectedResult();
@@ -46,13 +46,13 @@ namespace Reductech.EDR.Utilities.Processes.mutable
         public override string GetReturnTypeInfo() => nameof(Unit);
 
         /// <inheritdoc />
-        public override string GetName() => ProcessNameHelper.GetAssertBoolProcessName(SubProcess?.GetName() ?? "", GetExpectedResult());
+        public override string GetName() => ProcessNameHelper.GetAssertBoolProcessName(ResultOf?.GetName() ?? "", GetExpectedResult());
 
         /// <inheritdoc />
         public override Result<ImmutableProcess, ErrorList> TryFreeze(IProcessSettings processSettings)
         {
             var frozenProcess =
-                SubProcess?.TryFreeze(processSettings)??Result.Failure<ImmutableProcess, ErrorList>(new ErrorList($"'{nameof(SubProcess)}' must be set."));
+                ResultOf?.TryFreeze(processSettings)??Result.Failure<ImmutableProcess, ErrorList>(new ErrorList($"'{nameof(ResultOf)}' must be set."));
 
             if (frozenProcess.IsFailure)
                 return frozenProcess;
@@ -61,7 +61,7 @@ namespace Reductech.EDR.Utilities.Processes.mutable
                 return Result.Success<ImmutableProcess, ErrorList>(new immutable.AssertBool( icp, GetExpectedResult()));
 
             return Result.Failure<ImmutableProcess, ErrorList>(new ErrorList(
-                $"'{nameof(SubProcess)}' must have return type 'bool'."));
+                $"'{nameof(ResultOf)}' must have return type 'bool'."));
 
         }
     }

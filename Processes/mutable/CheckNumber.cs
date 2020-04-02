@@ -6,7 +6,7 @@ using YamlDotNet.Serialization;
 namespace Reductech.EDR.Utilities.Processes.mutable
 {
     /// <summary>
-    /// Checks that the count of the SubProcess is within a particular range.
+    /// Checks that the count of the Check is within a particular range.
     /// </summary>
     public class CheckNumber : Process
     {
@@ -32,23 +32,23 @@ namespace Reductech.EDR.Utilities.Processes.mutable
         /// </summary>
         [YamlMember(Order = 4 )]
 #pragma warning disable CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
-        public Process SubProcess { get; set; }
+        public Process Check { get; set; }
 #pragma warning restore CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
 
         /// <inheritdoc />
         public override string GetReturnTypeInfo() => nameof(Boolean);
 
         /// <inheritdoc />
-        public override string GetName() => ProcessNameHelper.GetCheckNumberProcessName(SubProcess?.GetName() ?? "");
+        public override string GetName() => ProcessNameHelper.GetCheckNumberProcessName(Check?.GetName() ?? "");
 
         /// <inheritdoc />
         public override Result<ImmutableProcess, ErrorList> TryFreeze(IProcessSettings processSettings)
         {
-            if (Minimum == null || Maximum == null)
+            if (Minimum == null && Maximum == null)
                 return Result.Failure<ImmutableProcess, ErrorList>(new ErrorList($"Either {nameof(Minimum)} or {nameof(Maximum)} must be set."));
 
             var frozenCount =
-                SubProcess?.TryFreeze(processSettings)??Result.Failure<ImmutableProcess, ErrorList>(new ErrorList($"'{nameof(SubProcess)}' must be set."));
+                Check?.TryFreeze(processSettings)??Result.Failure<ImmutableProcess, ErrorList>(new ErrorList($"'{nameof(Check)}' must be set."));
 
             if (frozenCount.IsFailure)
                 return frozenCount;
@@ -57,7 +57,7 @@ namespace Reductech.EDR.Utilities.Processes.mutable
                 return Result.Success<ImmutableProcess, ErrorList>(new immutable.CheckNumber(Minimum, Maximum, icp));
 
             return Result.Failure<ImmutableProcess, ErrorList>(new ErrorList(
-                $"'{nameof(SubProcess)}' must have return type 'int'."));
+                $"'{nameof(Check)}' must have return type 'int'."));
 
         }
     }
