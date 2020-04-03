@@ -3,22 +3,37 @@ using Reductech.EDR.Utilities.Processes.output;
 
 namespace Reductech.EDR.Utilities.Processes.immutable
 {
-    internal class AssertBool : ImmutableProcess<Unit>
+    /// <summary>
+    /// Assert that a particular process with produce true.
+    /// </summary>
+    public class AssertBool : ImmutableProcess<Unit>
     {
-        private readonly bool _expectedResult;
+        /// <summary>
+        /// The expected result of the sub process.
+        /// </summary>
+        public readonly bool ExpectedResult;
 
-        private readonly ImmutableProcess<bool> _subProcess;
 
+        /// <summary>
+        /// The subprocess.
+        /// </summary>
+        public readonly ImmutableProcess<bool> SubProcess;
+
+        /// <summary>
+        /// Creates a new AssertBool process.
+        /// </summary>
+        /// <param name="subProcess"></param>
+        /// <param name="expectedResult"></param>
         public AssertBool(ImmutableProcess<bool> subProcess, bool expectedResult)
         {
-            _subProcess = subProcess;
-            _expectedResult = expectedResult;
+            SubProcess = subProcess;
+            ExpectedResult = expectedResult;
         }
 
         
 
         /// <inheritdoc />
-        public override string Name => ProcessNameHelper.GetAssertBoolProcessName(_subProcess.Name, _expectedResult);
+        public override string Name => ProcessNameHelper.GetAssertBoolProcessName(SubProcess.Name, ExpectedResult);
 
         /// <inheritdoc />
         public override IProcessConverter? ProcessConverter => null;
@@ -29,11 +44,11 @@ namespace Reductech.EDR.Utilities.Processes.immutable
             bool? successState = null;
             bool? value = null;
 
-            await foreach (var processOutput in _subProcess.Execute())
+            await foreach (var processOutput in SubProcess.Execute())
             {
                 if (processOutput.OutputType == OutputType.Success && successState != false)
                 {
-                    successState = processOutput.Value == _expectedResult;
+                    successState = processOutput.Value == ExpectedResult;
                     value = processOutput.Value;
                 }
                 else
@@ -51,7 +66,7 @@ namespace Reductech.EDR.Utilities.Processes.immutable
                 case false when value.HasValue:
                 {
                     yield return ProcessOutput<Unit>.Error(
-                        $"Assertion failed, value was {value.Value} but expected {_expectedResult}");
+                        $"Assertion failed, value was {value.Value} but expected {ExpectedResult}");
                     break;
                 }
                 default:

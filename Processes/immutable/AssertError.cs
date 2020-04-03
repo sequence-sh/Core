@@ -6,14 +6,17 @@ namespace Reductech.EDR.Utilities.Processes.immutable
     /// <summary>
     /// Asserts that a particular process will produce an error.
     /// </summary>
-    internal class AssertError : ImmutableProcess<Unit>
+    public class AssertError : ImmutableProcess<Unit>
     {
-        private readonly ImmutableProcess _subProcess;
+        /// <summary>
+        /// The process that is expected to produce an error.
+        /// </summary>
+        public readonly ImmutableProcess<Unit> SubProcess;
 
         /// <inheritdoc />
-        public AssertError(ImmutableProcess subProcess)
+        public AssertError(ImmutableProcess<Unit> subProcess)
         {
-            _subProcess = subProcess;
+            SubProcess = subProcess;
         }
 
         /// <inheritdoc />
@@ -21,7 +24,7 @@ namespace Reductech.EDR.Utilities.Processes.immutable
         {
             var failed = false;
 
-            var results = _subProcess.ExecuteUntyped();
+            var results = SubProcess.Execute();
             await foreach (var line in results)
             {             
                 if (line.OutputType == OutputType.Message || line.OutputType == OutputType.Warning)
@@ -41,7 +44,7 @@ namespace Reductech.EDR.Utilities.Processes.immutable
         }
 
         /// <inheritdoc />
-        public override string Name => ProcessNameHelper.GetAssertErrorName(_subProcess.Name);
+        public override string Name => ProcessNameHelper.GetAssertErrorName(SubProcess.Name);
 
         /// <inheritdoc />
         public override IProcessConverter? ProcessConverter => null;

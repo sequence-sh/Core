@@ -3,21 +3,33 @@ using Reductech.EDR.Utilities.Processes.output;
 
 namespace Reductech.EDR.Utilities.Processes.immutable
 {
-    internal class CheckNumber : ImmutableProcess<bool>
+    /// <summary>
+    /// Returns whether a particular process produced a number within a particular range.
+    /// </summary>
+    public class CheckNumber : ImmutableProcess<bool>
     {
-        private readonly int? _minimum;
-        private readonly int? _maximum;
-        private readonly ImmutableProcess<int> _countProcess;
+        public readonly int? Minimum;
+        public readonly int? Maximum;
+        /// <summary>
+        /// The process that returns the number.
+        /// </summary>
+        public readonly ImmutableProcess<int> CountProcess;
 
+        /// <summary>
+        /// Create a new CheckNumber process
+        /// </summary>
+        /// <param name="minimum"></param>
+        /// <param name="maximum"></param>
+        /// <param name="countProcess"></param>
         public CheckNumber(int? minimum, int? maximum, ImmutableProcess<int> countProcess)
         {
-            _minimum = minimum;
-            _maximum = maximum;
-            _countProcess = countProcess;
+            Minimum = minimum;
+            Maximum = maximum;
+            CountProcess = countProcess;
         }
 
         /// <inheritdoc />
-        public override string Name => ProcessNameHelper.GetCheckNumberProcessName(_countProcess.Name);
+        public override string Name => ProcessNameHelper.GetCheckNumberProcessName(CountProcess.Name);
 
         /// <inheritdoc />
         public override IProcessConverter? ProcessConverter => null;
@@ -28,13 +40,13 @@ namespace Reductech.EDR.Utilities.Processes.immutable
             bool? successState = null;
             int? value = null;
 
-            await foreach (var countOutput in _countProcess.Execute())
+            await foreach (var countOutput in CountProcess.Execute())
             {
                 if (countOutput.OutputType == OutputType.Success && successState != false)
                 {
                     successState =
-                        (!_minimum.HasValue || _minimum <= countOutput.Value) &&
-                        (!_maximum.HasValue || _maximum >= countOutput.Value);
+                        (!Minimum.HasValue || Minimum <= countOutput.Value) &&
+                        (!Maximum.HasValue || Maximum >= countOutput.Value);
                     value = countOutput.Value;
                 }
                 else

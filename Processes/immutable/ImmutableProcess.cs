@@ -66,7 +66,7 @@ namespace Reductech.EDR.Utilities.Processes.immutable
             {
                 var (isSuccess, _, value) = nextProcess.ProcessConverter.TryConvert(this, processSettings);
 
-                if (isSuccess)
+                if (isSuccess && this != value)
                 {
                     return value.TryCombine(nextProcess, processSettings);
                 }

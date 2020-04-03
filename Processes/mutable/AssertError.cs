@@ -36,9 +36,15 @@ namespace Reductech.EDR.Utilities.Processes.mutable
 
             if (subProcessFreezeResult.IsFailure) return subProcessFreezeResult;
 
-            var r = new immutable.AssertError( subProcessFreezeResult.Value);
+            if (subProcessFreezeResult.Value is ImmutableProcess<Unit> unitProcess)
+            {
+                var r = new immutable.AssertError( unitProcess);
 
-            return Result.Success<ImmutableProcess, ErrorList>(r);
+                return Result.Success<ImmutableProcess, ErrorList>(r);
+            }
+
+            return Result.Failure<ImmutableProcess, ErrorList>(new ErrorList($"'{nameof(Process)}' must have return type void."));
+            
         }
     }
 }
