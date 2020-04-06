@@ -15,31 +15,45 @@ namespace Reductech.EDR.Utilities.Processes
     /// </summary>
     public static class YamlHelper
     {
-        private static IEnumerable<Type> SpecialTypes
+        private static IReadOnlyDictionary<string, Type> GetSpecialTypes(bool includeAliases)
         {
-            get
+            var assemblies = AppDomain.CurrentDomain
+                .GetAssemblies()
+                .Where(x => x.CustomAttributes.Any(y => y.AttributeType == typeof(ProcessModuleAttribute)))
+                .ToList();
+
+            var types = assemblies
+                .SelectMany(s => s.GetTypes())
+                .Where(type =>  
+                    typeof(Process).IsAssignableFrom(type)
+                    || typeof(Enumeration).IsAssignableFrom(type))
+                .Where(x=>!x.IsAbstract && ! x.IsInterface)
+
+                .SelectMany(t=> GetAllNames(t).Select(n=>(t,n)))
+                .ToDictionary(x=>x.n, x=>x.t);
+
+            return types;
+
+            IEnumerable<string> GetAllNames(Type t)
             {
-                var assemblies = AppDomain.CurrentDomain
-                    .GetAssemblies()
-                    .Where(x => x.CustomAttributes.Any(y => y.AttributeType == typeof(ProcessModuleAttribute)))
-                    .ToList();
+                yield return t.Name;
 
-                var types = assemblies
-                    .SelectMany(s => s.GetTypes())
-                    .Where(type =>  
-                        typeof(Process).IsAssignableFrom(type)
-                        || typeof(Enumeration).IsAssignableFrom(type))
-                    .Where(x=>!x.IsAbstract && ! x.IsInterface)
-                    .ToList();
-
-                return types;
+                if(includeAliases)
+                    foreach (var name in t.GetCustomAttributes(typeof(YamlProcessAttribute), true)
+                    .OfType<YamlProcessAttribute>()
+                    .Select(x=>x.Alias)
+                    .Where(x=> !string.IsNullOrWhiteSpace(x))
+                    .Distinct())
+                    yield return name;
             }
         }
 
-        internal static readonly Lazy<ISet<Type>> SpecialTypesSet = new Lazy<ISet<Type>>(()=> new HashSet<Type>(SpecialTypes));
+        internal static readonly Lazy<ISet<Type>> SpecialTypesSet = new Lazy<ISet<Type>>(()=> new HashSet<Type>(GetSpecialTypes(false).Values));
 
         /// <summary>
-        /// Makes a new deserializer
+        /// Makes a new deserializer.
+        /// ONLY USE THIS ONCE
+        /// We have to make a new one each time to keep track of defaults properly.
         /// </summary>
         private static IDeserializer Deserializer
         {
@@ -47,10 +61,18 @@ namespace Reductech.EDR.Utilities.Processes
             {
                 var deSerializerBuilder = new DeserializerBuilder();
                 deSerializerBuilder =
-                    SpecialTypes.Aggregate(deSerializerBuilder, 
-                        (current, specialType) => current.WithTagMapping("!" + specialType.Name, specialType));
+                    GetSpecialTypes(true)
+                        .Aggregate(deSerializerBuilder, 
+                        (current, specialType) => current.WithTagMapping("!" + specialType.Key, specialType.Value));
 
-                var deserializer = new EdrNodeDeserializer(new CachedTypeInspector(new ReadablePropertiesTypeInspector(new DynamicTypeResolver())));
+                var deserializer = 
+
+
+                new EdrNodeDeserializer(new CachedTypeInspector(
+                    new CompositeTypeInspector(
+                        new YamlAttributesTypeInspector(new ReadablePropertiesTypeInspector(new DynamicTypeResolver()))
+                        ))
+                );
                 deSerializerBuilder.WithNodeDeserializer(deserializer);
 
                 return  deSerializerBuilder.Build();
@@ -61,8 +83,8 @@ namespace Reductech.EDR.Utilities.Processes
         {
             var serializerBuilder = new SerializerBuilder();
             serializerBuilder =
-                SpecialTypes.Aggregate(serializerBuilder, 
-                    (current, specialType) => current.WithTagMapping("!" + specialType.Name, specialType));
+                GetSpecialTypes(false).Aggregate(serializerBuilder, 
+                    (current, specialType) => current.WithTagMapping("!" + specialType.Key, specialType.Value));
             serializerBuilder.ConfigureDefaultValuesHandling(DefaultValuesHandling.OmitNull);
             return serializerBuilder.Build();
         });
