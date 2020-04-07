@@ -48,5 +48,11 @@ namespace Reductech.EDR.Utilities.Processes.mutable
 
             return Result.Success<ImmutableProcess, ErrorList>(new immutable.DoesFileContain(FilePath, ExpectedContents));
         }
+
+        /// <inheritdoc />
+        public override IEnumerable<string> GetRequirements()
+        {
+            yield break;
+        }
     }
 }

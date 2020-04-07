@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Utilities.Processes.immutable;
 using YamlDotNet.Serialization;
@@ -59,6 +60,12 @@ namespace Reductech.EDR.Utilities.Processes.mutable
             return Result.Failure<ImmutableProcess, ErrorList>(new ErrorList(
                 $"'{nameof(Check)}' must have return type 'int'."));
 
+        }
+
+        /// <inheritdoc />
+        public override IEnumerable<string> GetRequirements()
+        {
+            yield break;
         }
     }
 }

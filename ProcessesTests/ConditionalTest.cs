@@ -86,6 +86,12 @@ namespace Reductech.EDR.Utilities.Processes.Tests
         [YamlMember]
         [Required]
         public bool Value { get; set; }
+
+        /// <inheritdoc />
+        public override IEnumerable<string> GetRequirements()
+        {
+            yield break;
+        }
     }
 
     public class ImmutableReturnBool : ImmutableProcess<bool>

@@ -60,5 +60,11 @@ namespace Reductech.EDR.Utilities.Processes.mutable
             return Result.Success<ImmutableProcess, ErrorList>(ip);
 
         }
+
+        /// <inheritdoc />
+        public override IEnumerable<string> GetRequirements()
+        {
+            yield break;
+        }
     }
 }

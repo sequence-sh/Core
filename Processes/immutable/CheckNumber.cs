@@ -8,7 +8,13 @@ namespace Reductech.EDR.Utilities.Processes.immutable
     /// </summary>
     public class CheckNumber : ImmutableProcess<bool>
     {
+        /// <summary>
+        /// Inclusive minimum of the expected range.
+        /// </summary>
         public readonly int? Minimum;
+        /// <summary>
+        /// Inclusive maximum of the expected range.
+        /// </summary>
         public readonly int? Maximum;
         /// <summary>
         /// The process that returns the number.

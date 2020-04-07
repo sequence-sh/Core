@@ -44,7 +44,7 @@ namespace Reductech.EDR.Utilities.Processes
                     .Select(x=>x.Alias)
                     .Where(x=> !string.IsNullOrWhiteSpace(x))
                     .Distinct())
-                    yield return name;
+                    yield return name??"";
             }
         }
 

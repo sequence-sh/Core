@@ -95,5 +95,11 @@ namespace Reductech.EDR.Utilities.Processes.mutable
         {
             return GetName();
         }
+
+        /// <inheritdoc />
+        public override IEnumerable<string> GetRequirements()
+        {
+            yield break;
+        }
     }
 }
