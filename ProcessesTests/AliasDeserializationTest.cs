@@ -63,5 +63,11 @@ namespace Reductech.EDR.Utilities.Processes.Tests
         {
             throw new NotImplementedException();
         }
+
+        /// <inheritdoc />
+        public override IEnumerable<string> GetRequirements()
+        {
+            yield break;
+        }
     }
 }
