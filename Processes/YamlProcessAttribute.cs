@@ -8,6 +8,9 @@ namespace Reductech.EDR.Utilities.Processes
     [AttributeUsage(AttributeTargets.Class)]
     public sealed class YamlProcessAttribute : Attribute
     {
-        public string Alias { get; set; }
+        /// <summary>
+        /// The new name for this process.
+        /// </summary>
+        public string? Alias { get; set; }
     }
 }

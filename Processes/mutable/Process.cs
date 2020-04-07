@@ -1,6 +1,5 @@
 ﻿using CSharpFunctionalExtensions;
 using Reductech.EDR.Utilities.Processes.immutable;
-using YamlDotNet.Serialization;
 
 namespace Reductech.EDR.Utilities.Processes.mutable
 {

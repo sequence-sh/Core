@@ -43,10 +43,12 @@ namespace Reductech.EDR.Utilities.Processes.immutable
                 ZipFile.ExtractToDirectory(archiveFilePath, destinationDirectory, overwriteFile);
                 error = null;
             }
+#pragma warning disable CA1031 // Do not catch general exception types
             catch (Exception e)
             {
                 error = e.Message ?? "Unknown Error";
             }
+#pragma warning restore CA1031 // Do not catch general exception types
 
             return error;
         }

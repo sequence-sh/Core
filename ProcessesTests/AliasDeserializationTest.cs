@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using CSharpFunctionalExtensions;
 using NUnit.Framework;
 using Reductech.EDR.Utilities.Processes.immutable;
@@ -41,9 +40,11 @@ namespace Reductech.EDR.Utilities.Processes.Tests
     [YamlProcess(Alias = "TestProcessTwo")]
     public class TestProcess : Process
     {
-        
+        /// <summary>
+        /// Data on this test process
+        /// </summary>
         [YamlMember(Alias = "DataTwo")]
-        public string Data { get; set; }
+        public string? Data { get; set; }
 
         /// <inheritdoc />
         public override string GetReturnTypeInfo()
