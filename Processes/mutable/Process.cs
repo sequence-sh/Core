@@ -1,4 +1,5 @@
-﻿using CSharpFunctionalExtensions;
+﻿using System.Collections.Generic;
+using CSharpFunctionalExtensions;
 using Reductech.EDR.Utilities.Processes.immutable;
 
 namespace Reductech.EDR.Utilities.Processes.mutable
@@ -14,20 +15,23 @@ namespace Reductech.EDR.Utilities.Processes.mutable
         public abstract string GetReturnTypeInfo();
 
         /// <summary>
-        /// The name of this process
+        /// The name of this process.
         /// </summary>
         public abstract string GetName();
 
         /// <summary>
-        /// Executes this process. Should only be called if all conditions are met
+        /// Executes this process. Should only be called if all conditions are met.
         /// </summary>
         /// <returns></returns>
         public abstract Result<ImmutableProcess, ErrorList> TryFreeze(IProcessSettings processSettings);
 
         /// <summary>
-        /// String representation of this process
+        /// Gets special requirements for the process.
         /// </summary>
         /// <returns></returns>
+        public abstract IEnumerable<string> GetRequirements();
+
+        /// <inheritdoc />
         public override string ToString()
         {
             return GetName();

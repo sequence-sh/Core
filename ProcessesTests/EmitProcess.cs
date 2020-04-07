@@ -31,6 +31,12 @@ namespace Reductech.EDR.Utilities.Processes.Tests
         {
             return Result.Success<ImmutableProcess, ErrorList>(new ImmutableEmitProcess( Term, Number));
         }
+
+        /// <inheritdoc />
+        public override IEnumerable<string> GetRequirements()
+        {
+            yield break;
+        }
     }
 
     public class ImmutableEmitProcess : ImmutableProcess<Unit>

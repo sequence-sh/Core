@@ -1,4 +1,5 @@
-﻿using CSharpFunctionalExtensions;
+﻿using System.Collections.Generic;
+using CSharpFunctionalExtensions;
 using Reductech.EDR.Utilities.Processes.immutable;
 using YamlDotNet.Serialization;
 
@@ -63,6 +64,12 @@ namespace Reductech.EDR.Utilities.Processes.mutable
             return Result.Failure<ImmutableProcess, ErrorList>(new ErrorList(
                 $"'{nameof(ResultOf)}' must have return type 'bool'."));
 
+        }
+
+        /// <inheritdoc />
+        public override IEnumerable<string> GetRequirements()
+        {
+            yield break;
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using CSharpFunctionalExtensions;
@@ -53,6 +54,12 @@ namespace Reductech.EDR.Utilities.Processes.mutable
             var result = CreateImmutableProcess(ifResult.Value, thenResult.Value, elseResult.Value);
 
             return result;
+        }
+
+        /// <inheritdoc />
+        public override IEnumerable<string> GetRequirements()
+        {
+            yield break;
         }
 
         /// <inheritdoc />

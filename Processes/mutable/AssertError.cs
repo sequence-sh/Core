@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Utilities.Processes.immutable;
 using YamlDotNet.Serialization;
@@ -44,7 +45,12 @@ namespace Reductech.EDR.Utilities.Processes.mutable
             }
 
             return Result.Failure<ImmutableProcess, ErrorList>(new ErrorList($"'{nameof(Process)}' must have return type void."));
-            
+        }
+
+        /// <inheritdoc />
+        public override IEnumerable<string> GetRequirements()
+        {
+            yield break;
         }
     }
 }
