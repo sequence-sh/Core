@@ -59,7 +59,8 @@ namespace Reductech.EDR.Utilities.Processes.mutable
         /// <inheritdoc />
         public override IEnumerable<string> GetRequirements()
         {
-            yield break;
+            return If.GetRequirements().Concat(Then.GetRequirements())
+                .Concat(Else?.GetRequirements() ?? Enumerable.Empty<string>()).Distinct();
         }
 
         /// <inheritdoc />
