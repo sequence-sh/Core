@@ -24,8 +24,6 @@ namespace Reductech.EDR.Utilities.Processes
 
         private readonly IProcessSettings _processSettings;
 
-        
-
         /// <summary>
         /// Run process defined in a yaml string.
         /// </summary>
@@ -47,19 +45,21 @@ namespace Reductech.EDR.Utilities.Processes
             if (freezeFailure)
                 foreach (var e in freezeError)
                     yield return Result.Failure<string>(e);
-
-            await foreach (var output in immutableProcess.ExecuteUntyped())
+            else
             {
-                var r = output.OutputType switch
+                await foreach (var output in immutableProcess.ExecuteUntyped())
                 {
-                    OutputType.Error => Result.Failure<string>(output.Text),
-                    OutputType.Warning => Result.Success(output.Text),
-                    OutputType.Message => Result.Success(output.Text),
-                    OutputType.Success => Result.Success(output.Text),
-                    _ => throw new ArgumentOutOfRangeException()
-                };
+                    var r = output.OutputType switch
+                    {
+                        OutputType.Error => Result.Failure<string>(output.Text),
+                        OutputType.Warning => Result.Success(output.Text),
+                        OutputType.Message => Result.Success(output.Text),
+                        OutputType.Success => Result.Success(output.Text),
+                        _ => throw new ArgumentOutOfRangeException()
+                    };
 
-                yield return r;
+                    yield return r;
+                }
             }
         }
 
@@ -101,6 +101,5 @@ namespace Reductech.EDR.Utilities.Processes
                 yield return Result.Failure<string>("File is empty");
             }
         }
-
     }
 }
