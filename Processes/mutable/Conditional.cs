@@ -44,16 +44,15 @@ namespace Reductech.EDR.Utilities.Processes.mutable
             var ifResult = If?.TryFreeze(processSettings)?? Result.Failure<ImmutableProcess, ErrorList>(new ErrorList($"'{nameof(If)}' must be set."));
             var thenResult = Then?.TryFreeze(processSettings)?? Result.Failure<ImmutableProcess, ErrorList>(new ErrorList($"'{nameof(Then)}' must be set."));
 
-
             var elseResult = Else?.TryFreeze(processSettings) ?? Result.Success<ImmutableProcess, ErrorList>(DoNothing.Instance);
 
             var combinedResult = Result.Combine(ErrorList.Compose, ifResult, thenResult, elseResult);
 
             if (combinedResult.IsFailure) return combinedResult.ConvertFailure<ImmutableProcess>();
 
-            var result = CreateImmutableProcess(ifResult.Value, thenResult.Value, elseResult.Value);
+            var createResult = CreateImmutableProcess(ifResult.Value, thenResult.Value, elseResult.Value, processSettings);
 
-            return result;
+            return createResult;
         }
 
         /// <inheritdoc />
@@ -73,7 +72,7 @@ namespace Reductech.EDR.Utilities.Processes.mutable
 
 
         private static Result<ImmutableProcess, ErrorList> CreateImmutableProcess(ImmutableProcess @if,
-            ImmutableProcess then, ImmutableProcess @else)
+            ImmutableProcess then, ImmutableProcess @else, IProcessSettings processSettings)
         {
             var errors = new ErrorList();
             if (then.ResultType != @else.ResultType)
@@ -88,7 +87,7 @@ namespace Reductech.EDR.Utilities.Processes.mutable
 
                 try
                 {
-                    ip = CreateImmutableConditional(ifProcess, then as dynamic, @else as dynamic);
+                    ip = CreateImmutableConditional(ifProcess, then as dynamic, @else as dynamic, processSettings);
                 }
 #pragma warning disable CA1031 // Do not catch general exception types
                 catch (Exception e)
@@ -97,6 +96,9 @@ namespace Reductech.EDR.Utilities.Processes.mutable
                     return Result.Failure<ImmutableProcess, ErrorList>(errors);
                 }
 #pragma warning restore CA1031 // Do not catch general exception types
+
+
+
 
                 return Result.Success<ImmutableProcess, ErrorList>(ip);
             }
@@ -107,9 +109,19 @@ namespace Reductech.EDR.Utilities.Processes.mutable
             }
         }
 
-        private static ImmutableProcess CreateImmutableConditional<T>(ImmutableProcess<bool> ifP, ImmutableProcess<T> thenP, ImmutableProcess<T> elseP)
+        private static ImmutableProcess CreateImmutableConditional<T>(ImmutableProcess<bool> ifP, ImmutableProcess<T> thenP, ImmutableProcess<T> elseP, IProcessSettings processSettings)
         {
-            return new Conditional<T>(ifP, thenP, elseP);
+            var conditional =  new Conditional<T>(ifP, thenP, elseP);
+
+            if (ifP.ProcessConverter == null) return conditional;
+
+            //Try converting this process
+            var (isSuccess, _, value) = ifP.ProcessConverter.TryConvert(conditional, processSettings);
+
+            if (isSuccess)
+                return value;
+
+            return conditional;
         }
 
     }

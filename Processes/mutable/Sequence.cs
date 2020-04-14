@@ -25,7 +25,7 @@ namespace Reductech.EDR.Utilities.Processes.mutable
         }
 
         /// <summary>
-        /// Steps that make up this process.
+        /// Steps that make up this sequence.
         /// These should all have result type void.
         /// </summary>
         [Required]
@@ -59,9 +59,10 @@ namespace Reductech.EDR.Utilities.Processes.mutable
             }
 
 
-            var immutableSequence = immutable.Sequence.CombineSteps(unitSteps, processSettings);
+            var immutableProcess = immutable.Sequence.CombineSteps(unitSteps, processSettings);
 
-            return Result.Success<ImmutableProcess, ErrorList>(immutableSequence);
+
+            return Result.Success<ImmutableProcess, ErrorList>(immutableProcess);
 
         }
 

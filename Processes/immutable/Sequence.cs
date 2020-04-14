@@ -6,14 +6,21 @@ using Reductech.EDR.Utilities.Processes.output;
 
 namespace Reductech.EDR.Utilities.Processes.immutable
 {
-    internal class Sequence : ImmutableProcess<Unit>
+    /// <summary>
+    /// Executes each step, one after the another.
+    /// Will stop if a process fails.
+    /// </summary>
+    public class Sequence : ImmutableProcess<Unit>
     {
-        private readonly IReadOnlyCollection<ImmutableProcess<Unit>> _steps;
+        /// <summary>
+        /// Steps that make up this sequence.
+        /// </summary>
+        public readonly IReadOnlyCollection<ImmutableProcess<Unit>> Steps;
 
         /// <inheritdoc />
         public Sequence(IReadOnlyCollection<ImmutableProcess<Unit>> steps)
         {
-            _steps = steps;
+            Steps = steps;
         }
 
         /// <summary>
@@ -22,7 +29,7 @@ namespace Reductech.EDR.Utilities.Processes.immutable
         /// <returns></returns>
         public override async IAsyncEnumerable<IProcessOutput<Unit>> Execute()
         {
-            foreach (var process in _steps)
+            foreach (var process in Steps)
             {
                 var allGood = true;
                 var resultLines = process.ExecuteUntyped();
@@ -48,13 +55,13 @@ namespace Reductech.EDR.Utilities.Processes.immutable
         /// <inheritdoc />
         public override bool Equals(object? obj)
         {
-            return obj is Sequence imSeq && _steps.Equals(imSeq._steps);
+            return obj is Sequence imSeq && Steps.Equals(imSeq.Steps);
         }
 
         /// <inheritdoc />
         public override Result<ImmutableProcess<Unit>> TryCombine(ImmutableProcess<Unit> nextProcess, IProcessSettings processSettings)
         {
-            if (_steps.Count == 0)
+            if (Steps.Count == 0)
             {
                 return Result.Success(nextProcess);
             }
@@ -62,16 +69,19 @@ namespace Reductech.EDR.Utilities.Processes.immutable
             {
 
                 var allSteps =
-                    nextProcess is Sequence nextSequence?  _steps.Concat(nextSequence._steps) :
-                        _steps.Concat(new[] {nextProcess});
+                    nextProcess is Sequence nextSequence?  Steps.Concat(nextSequence.Steps) :
+                        Steps.Concat(new[] {nextProcess});
 
                 var r = CombineSteps(allSteps, processSettings);
 
-                return Result.Success<ImmutableProcess<Unit>>(r);
+                return Result.Success(r);
             }
         }
 
-        public static Sequence CombineSteps(IEnumerable<ImmutableProcess<Unit>> steps, IProcessSettings processSettings)
+        /// <summary>
+        /// Combines steps to produce a sequence
+        /// </summary>
+        public static  ImmutableProcess<Unit> CombineSteps(IEnumerable<ImmutableProcess<Unit>> steps, IProcessSettings processSettings)
         {
             var combinedProcesses = new List<ImmutableProcess<Unit>>();
 
@@ -94,11 +104,14 @@ namespace Reductech.EDR.Utilities.Processes.immutable
             }
             if(current != null) combinedProcesses.Add(current);
 
+            if (combinedProcesses.Count == 1)
+                return combinedProcesses.Single();
+
             return new Sequence(combinedProcesses);
         }
 
         /// <inheritdoc />
-        public override string Name => ProcessNameHelper.GetSequenceName(_steps.Select(x => x.Name));
+        public override string Name => ProcessNameHelper.GetSequenceName(Steps.Select(x => x.Name));
 
         /// <inheritdoc />
         public override IProcessConverter? ProcessConverter => null;
