@@ -8,6 +8,11 @@ using YamlDotNet.Serialization;
 
 namespace Reductech.EDR.Utilities.Processes.mutable.enumerations
 {
+    interface interface IEnumerationElements
+    {
+        
+    }
+
     /// <summary>
     /// Enumerates through a CSV file.
     /// </summary>
@@ -111,7 +116,7 @@ namespace Reductech.EDR.Utilities.Processes.mutable.enumerations
 
         /// <summary>
         /// The path to the CSV file.
-        /// Either this or CSVText must be set (but not both).
+        /// Either this, CSVText, or CSVProcess must be set (but not more than one).
         /// </summary>
         
         [YamlMember]
@@ -119,11 +124,18 @@ namespace Reductech.EDR.Utilities.Processes.mutable.enumerations
         
         /// <summary>
         /// Raw CSV.
-        /// Either this or CSVFilePath must be set (but not both).
+        /// Either this, CSVFilePath, or CSVProcess must be set (but not more than one).
         /// </summary>
         
         [YamlMember]
         public string? CSVText { get; set; }
+
+        /// <summary>
+        /// A process which produces a string in CSV format.
+        /// Either this, CSVFilePath, or CSVText must be set (but not more than one).
+        /// </summary>
+        [YamlMember]
+        public Process? CSVProcess { get; set; }
 
 
 #pragma warning disable CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
