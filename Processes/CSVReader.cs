@@ -14,9 +14,9 @@ namespace Reductech.EDR.Utilities.Processes
             string filePath, string delimiter, string? commentToken, bool enclosedInQuotes)
         {
             if(filePath == null)
-                return Result.Failure<DataTable, ErrorList>(new ErrorList(){"File path is null."});
+                return Result.Failure<DataTable, ErrorList>(new ErrorList {"File path is null."});
             if (!File.Exists(filePath))
-                return Result.Failure<DataTable, ErrorList>(new ErrorList(){$"'{filePath}' does not exist."});
+                return Result.Failure<DataTable, ErrorList>(new ErrorList {$"'{filePath}' does not exist."});
             
             using var csvParser = new TextFieldParser(filePath);
 
@@ -85,6 +85,9 @@ namespace Reductech.EDR.Utilities.Processes
 
                 rowNumber++;
             }
+
+            if (errorsSoFar.Any())
+                return Result.Failure<DataTable, ErrorList>(errorsSoFar);
 
             return Result.Success<DataTable, ErrorList>(dataTable);
         }

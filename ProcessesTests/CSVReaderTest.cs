@@ -59,6 +59,33 @@ namespace Reductech.EDR.Utilities.Processes.Tests
             CollectionAssert.AreEqual(testCase.ExpectedResults, actualList);
         }
 
+        [Test]
+        public void TestCSVError()
+        {
+            var l = new Loop
+            {
+                Do = new EmitProcess(),
+                For = new CSV
+                {
+                    CSVText = @"H1,H2
+t,2,abc
+t,4,def",
+                    InjectColumns = new Dictionary<string, Injection>
+                    {
+                        {"H1", new Injection {Property = nameof(EmitProcess.Term)} },
+                        {"H2", new Injection {Property = nameof(EmitProcess.Number)} },
+                    },
+                    Delimiter = ",",
+                    HasFieldsEnclosedInQuotes = true
+                }
+            };
+
+            var freezeResult = l.TryFreeze(EmptySettings.Instance);
+
+            Assert.IsFalse(freezeResult.IsSuccess, "Should not have been able to freeze");
+
+        }
+
 
         public class TestCase
         {

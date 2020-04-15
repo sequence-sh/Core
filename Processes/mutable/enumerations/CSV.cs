@@ -2,7 +2,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.Data;
 using System.Linq;
-using System.Runtime.Serialization;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Utilities.Processes.mutable.injection;
 using YamlDotNet.Serialization;
@@ -40,12 +39,12 @@ namespace Reductech.EDR.Utilities.Processes.mutable.enumerations
 
                 var columnInjections = new List<(Injection injection, DataColumn column)>();
 
-                foreach (var hi in InjectColumns)
+                foreach (var (columnName, value) in InjectColumns)
                 {
-                    var column = dataTable.Columns[hi.Key];
-                    if (column == null) errors.Add($"Could not find column '{hi.Key}'");
+                    var column = dataTable.Columns[columnName];
+                    if (column == null) errors.Add($"Could not find column '{columnName}'");
                     else
-                        columnInjections.Add((hi.Value, column));
+                        columnInjections.Add((value, column));
                 }
 
                 if (errors.Any())
