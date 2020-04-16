@@ -28,11 +28,6 @@ namespace Reductech.EDR.Utilities.Processes.mutable.enumerations
         }
 
         internal override string Name => $"'{Path}'";
-        internal override IEnumerable<string> GetArgumentErrors()
-        {
-            if (!System.IO.Directory.Exists(Path))
-                yield return $"Directory '{Path}' does not exist";
-        }
 
         /// <summary>
         /// The path to the directory.

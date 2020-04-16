@@ -15,6 +15,9 @@ namespace Reductech.EDR.Utilities.Processes.mutable.enumerations
         /// <inheritdoc />
         internal override Result<IEnumerationElements, ErrorList> TryGetElements(IProcessSettings processSettings)
         {
+            if(Members == null)
+                return Result.Failure<IEnumerationElements,ErrorList>(new ErrorList( $"{nameof(Members)} is null"));
+
             var elements =
                 new EagerEnumerationElements(Members.Select(m => new ProcessInjector(Inject.Select(i => (m, i))))
                     .ToList());
@@ -22,11 +25,6 @@ namespace Reductech.EDR.Utilities.Processes.mutable.enumerations
         }
 
         internal override string Name => $"[{string.Join(", ", Members)}]";
-        internal override IEnumerable<string> GetArgumentErrors()
-        {
-            if (Members == null)
-                yield return $"{nameof(Members)} is null";
-        }
 
         /// <summary>
         /// The elements to iterate over.

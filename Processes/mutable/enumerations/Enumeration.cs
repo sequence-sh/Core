@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using CSharpFunctionalExtensions;
+﻿using CSharpFunctionalExtensions;
 
 namespace Reductech.EDR.Utilities.Processes.mutable.enumerations
 {
@@ -16,11 +15,6 @@ namespace Reductech.EDR.Utilities.Processes.mutable.enumerations
         /// <returns></returns>
         internal abstract Result<IEnumerationElements, ErrorList> TryGetElements(IProcessSettings processSettings);
         internal abstract string Name { get; }
-
-        /// <summary>
-        /// Get errors in the properties of this enumeration.
-        /// </summary>
-        internal abstract IEnumerable<string> GetArgumentErrors();
 
         /// <inheritdoc />
         public override string ToString()

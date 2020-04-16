@@ -1,7 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using NUnit.Framework;
+using Reductech.EDR.Utilities.Processes.immutable;
 using Reductech.EDR.Utilities.Processes.mutable;
 using Reductech.EDR.Utilities.Processes.mutable.enumerations;
 using Reductech.EDR.Utilities.Processes.mutable.injection;
@@ -59,6 +62,44 @@ namespace Reductech.EDR.Utilities.Processes.Tests
             CollectionAssert.AreEqual(testCase.ExpectedResults, actualList);
         }
 
+        [TestCaseSource(nameof(TestCases))]
+        [Test]
+        public async Task TestLazyCSVReader(TestCase testCase)
+        {
+            var l = new Loop
+            {
+                Do = new EmitProcess(),
+                For = new CSV
+                {
+                    CSVProcess = new EmitStringProcess(){Output = testCase.CSVText},
+                    InjectColumns = new Dictionary<string, Injection>
+                    {
+                        {"H1", new Injection {Property = nameof(EmitProcess.Term)} },
+                        {"H2", new Injection {Property = nameof(EmitProcess.Number)} },
+                    },
+                    CommentToken = testCase.CommentToken,
+                    Delimiter = testCase.Delimiter,
+                    HasFieldsEnclosedInQuotes = testCase.HasFieldsEncasedInQuotes
+                }
+            };
+
+            var actualList = new List<string>();
+
+            var process = l.TryFreeze(EmptySettings.Instance).AssertSuccess();
+
+            var output = process.ExecuteUntyped();
+
+            await foreach (var o in output)
+            {
+                Assert.IsTrue(o.OutputType != OutputType.Error, o.Text);
+
+                if(o.OutputType == OutputType.Message)
+                    actualList.Add(o.Text);
+            }
+
+            CollectionAssert.AreEqual(testCase.ExpectedResults, actualList);
+        }
+
         [Test]
         public void TestCSVError()
         {
@@ -85,6 +126,7 @@ t,4,def",
             Assert.IsFalse(freezeResult.IsSuccess, "Should not have been able to freeze");
 
         }
+
 
 
         public class TestCase
@@ -117,6 +159,54 @@ t,4,def",
                 return Name;
             }
         }
+
+        public class EmitStringProcess : Process
+        {
+            /// <inheritdoc />
+            public override string GetReturnTypeInfo()
+            {
+                return nameof(String);
+            }
+
+            /// <inheritdoc />
+            public override string GetName() => "Emit String";
+
+            /// <inheritdoc />
+            public override Result<ImmutableProcess, ErrorList> TryFreeze(IProcessSettings processSettings)
+            {
+                return Result.Success<ImmutableProcess, ErrorList>(new ImmutableEmitString(Output));
+            }
+
+            /// <inheritdoc />
+            public override IEnumerable<string> GetRequirements() => Enumerable.Empty<string>();
+
+            public string Output { get; set; }
+
+            internal class ImmutableEmitString : ImmutableProcess<string>
+            {
+                public readonly string Output;
+
+                public ImmutableEmitString(string output)
+                {
+                    Output = output;
+                }
+
+                /// <inheritdoc />
+                public override string Name => "Emit String";
+
+                /// <inheritdoc />
+                public override IProcessConverter? ProcessConverter => null;
+
+                /// <inheritdoc />
+#pragma warning disable 1998
+                public override async IAsyncEnumerable<IProcessOutput<string>> Execute()
+#pragma warning restore 1998
+                {
+                    yield return ProcessOutput<string>.Success(Output);
+                }
+            }
+        }
+
 
     }
 }

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using NUnit.Framework;
 using Reductech.EDR.Utilities.Processes.mutable;
 using Reductech.EDR.Utilities.Processes.mutable.enumerations;
@@ -64,16 +63,16 @@ Do: !EmitProcess
             var loop = process as Loop;
             Assert.IsNotNull(loop);
     
-            Assert.IsInstanceOf<CSV>(loop.For);
-            var csv = loop.For as CSV;
+            // ReSharper disable ConstantConditionalAccessQualifier
+            Assert.IsInstanceOf<CSV>(loop?.For);
+            
+            var csv = loop?.For as CSV;
             Assert.IsNotNull(csv);
 
-            Assert.AreEqual("Path", csv.CSVFilePath);
-            Assert.AreEqual(",", csv.Delimiter);
-            Assert.AreEqual(true, csv.HasFieldsEnclosedInQuotes);
-
-
-
+            Assert.AreEqual("Path", csv?.CSVFilePath);
+            Assert.AreEqual(",", csv?.Delimiter);
+            Assert.AreEqual(true, csv?.HasFieldsEnclosedInQuotes);
+            // ReSharper restore ConstantConditionalAccessQualifier
         }
 
 

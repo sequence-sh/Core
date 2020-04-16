@@ -18,18 +18,12 @@ namespace Reductech.EDR.Utilities.Processes.mutable
         {
             var initialErrors = new ErrorList();
 
-            if (Do == null)
-                initialErrors.Add($"{nameof(Do)} is null");
+            if (Do == null) initialErrors.Add($"{nameof(Do)} is null");
 
-            if(For == null)
-                initialErrors.Add($"{nameof(For)} is null");
-            else
-                initialErrors.AddRange(For.GetArgumentErrors());
+            if(For == null) initialErrors.Add($"{nameof(For)} is null");
 
             if (initialErrors.Any() || For == null || Do == null)
                 return Result.Failure<ImmutableProcess, ErrorList>(initialErrors);
-            
-            //TODO Allow loop to be compiled lazily
 
             var (_, isEnumerationFailure, elements, enumerationError) = For.TryGetElements(processSettings);
 
@@ -65,8 +59,7 @@ namespace Reductech.EDR.Utilities.Processes.mutable
                 if (freezeResult.Value is ImmutableProcess<Unit> unitProcess)
                     finalProcesses.Add(unitProcess);
                 else
-                {
-                    return Result.Failure<ImmutableProcess, ErrorList>(new ErrorList(
+                { return Result.Failure<ImmutableProcess, ErrorList>(new ErrorList(
                         $"Process '{freezeResult.Value.Name}' has result type {freezeResult.Value.ResultType.Name} but members of a loop should have result type void."));
                 }
             }

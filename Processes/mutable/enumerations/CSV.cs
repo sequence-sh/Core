@@ -130,31 +130,31 @@ namespace Reductech.EDR.Utilities.Processes.mutable.enumerations
             }
         }
 
-        internal override IEnumerable<string> GetArgumentErrors()
-        {
-            Result<DataTable, ErrorList> csvResult;
+        //internal override IEnumerable<string> GetArgumentErrors()
+        //{
+        //    Result<DataTable, ErrorList> csvResult;
 
-            if(CSVFilePath != null)
-                if (CSVText != null)
-                {
-                    yield return $"Both {nameof(CSVFilePath)} and {nameof(CSVText)} are set.";
-                    yield break;
-                }
-                else
-                    csvResult = CsvReader.TryReadCSVFromFile(CSVFilePath, Delimiter, CommentToken, HasFieldsEnclosedInQuotes);
-            else if (CSVText != null)
-                csvResult = CsvReader.TryReadCSVFromString(CSVText, Delimiter, CommentToken, HasFieldsEnclosedInQuotes);
-            else
-            {
-                yield return $"Either {nameof(CSVFilePath)} or {nameof(CSVText)} should be set.";
-                yield break;
-            }
+        //    if(CSVFilePath != null)
+        //        if (CSVText != null)
+        //        {
+        //            yield return $"Both {nameof(CSVFilePath)} and {nameof(CSVText)} are set.";
+        //            yield break;
+        //        }
+        //        else
+        //            csvResult = CsvReader.TryReadCSVFromFile(CSVFilePath, Delimiter, CommentToken, HasFieldsEnclosedInQuotes);
+        //    else if (CSVText != null)
+        //        csvResult = CsvReader.TryReadCSVFromString(CSVText, Delimiter, CommentToken, HasFieldsEnclosedInQuotes);
+        //    else
+        //    {
+        //        yield return $"Either {nameof(CSVFilePath)} or {nameof(CSVText)} should be set.";
+        //        yield break;
+        //    }
 
-            if (csvResult.IsFailure)
-                foreach (var errorString in csvResult.Error)
-                    yield return errorString;
+        //    if (csvResult.IsFailure)
+        //        foreach (var errorString in csvResult.Error)
+        //            yield return errorString;
 
-        }
+        //}
 
         /// <summary>
         /// The path to the CSV file.
