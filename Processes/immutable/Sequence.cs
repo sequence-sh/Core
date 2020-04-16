@@ -47,10 +47,7 @@ namespace Reductech.EDR.Utilities.Processes.immutable
         }
 
         /// <inheritdoc />
-        public override int GetHashCode()
-        {
-            return Name.GetHashCode();
-        }
+        public override int GetHashCode() => Name.GetHashCode();
 
         /// <inheritdoc />
         public override bool Equals(object? obj)

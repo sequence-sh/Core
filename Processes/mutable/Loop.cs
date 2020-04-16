@@ -31,15 +31,27 @@ namespace Reductech.EDR.Utilities.Processes.mutable
             
             //TODO Allow loop to be compiled lazily
 
-            var (_, isEnumerationFailure, elements, enumerationError) = For.Elements;
+            var (_, isEnumerationFailure, elements, enumerationError) = For.TryGetElements(processSettings);
 
             if (isEnumerationFailure) return Result.Failure<ImmutableProcess, ErrorList>(enumerationError);
 
+            return elements switch
+            {
+                EagerEnumerationElements eagerEnumerationElements => GetFreezeResultFromEagerElements(processSettings,
+                    eagerEnumerationElements, Do),
+                LazyEnumerationElements lazyEnumerationElements => Result.Success<ImmutableProcess, ErrorList>(
+                    new LazyLoop(lazyEnumerationElements, Do, processSettings)),
+                _ => Result.Failure<ImmutableProcess, ErrorList>(new ErrorList("Could not handle enumeration elements"))
+            };
+        }
+
+        internal static Result<ImmutableProcess, ErrorList> GetFreezeResultFromEagerElements(IProcessSettings processSettings, EagerEnumerationElements eagerEnumerationElements, Process @do)
+        {
             var finalProcesses = new List<ImmutableProcess<Unit>>();
 
-            foreach (var processInjector in elements)
+            foreach (var processInjector in eagerEnumerationElements.Injectors)
             {
-                var subProcess = Do;
+                var subProcess = @do;
 
                 var (_, isInjectionFailure, injectionError) = processInjector.Inject(subProcess);
 
@@ -50,7 +62,7 @@ namespace Reductech.EDR.Utilities.Processes.mutable
 
                 if (freezeResult.IsFailure) return freezeResult;
 
-                if(freezeResult.Value is ImmutableProcess<Unit> unitProcess)
+                if (freezeResult.Value is ImmutableProcess<Unit> unitProcess)
                     finalProcesses.Add(unitProcess);
                 else
                 {
@@ -69,7 +81,7 @@ namespace Reductech.EDR.Utilities.Processes.mutable
         public override string GetReturnTypeInfo() => nameof(Unit);
 
         /// <inheritdoc />
-        public override string GetName() => $"Foreach in {For}, {Do}";
+        public override string GetName() => ProcessNameHelper.GetLoopName(For.Name, Do.GetName());
         
         /// <summary>
         /// The enumeration to iterate through.

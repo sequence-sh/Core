@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using CSharpFunctionalExtensions;
-using Reductech.EDR.Utilities.Processes.mutable.injection;
 
 namespace Reductech.EDR.Utilities.Processes.mutable.enumerations
 {
@@ -9,7 +8,13 @@ namespace Reductech.EDR.Utilities.Processes.mutable.enumerations
     /// </summary>
     public abstract class Enumeration
     {
-        internal abstract Result<IReadOnlyCollection<IProcessInjector>,ErrorList>  Elements { get; }
+        /// <summary>
+        /// Try to get the elements of this enumeration.
+        /// They will either be EagerEnumerationElements or Lazy EnumerationElements
+        /// </summary>
+        /// <param name="processSettings"></param>
+        /// <returns></returns>
+        internal abstract Result<IEnumerationElements, ErrorList> TryGetElements(IProcessSettings processSettings);
         internal abstract string Name { get; }
 
         /// <summary>

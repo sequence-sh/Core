@@ -1,78 +1,120 @@
 ﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
 using System.Data;
 using System.Linq;
 using CSharpFunctionalExtensions;
+using Reductech.EDR.Utilities.Processes.immutable;
 using Reductech.EDR.Utilities.Processes.mutable.injection;
 using YamlDotNet.Serialization;
 
 namespace Reductech.EDR.Utilities.Processes.mutable.enumerations
 {
-    interface interface IEnumerationElements
-    {
-        
-    }
-
     /// <summary>
     /// Enumerates through a CSV file.
     /// </summary>
     public class CSV : Enumeration
     {
-        internal override Result<IReadOnlyCollection<IProcessInjector>, ErrorList> Elements
+
+        private enum CSVSource
         {
-            get
-            {
-                Result<DataTable, ErrorList> csvResult;
-
-                if(CSVFilePath != null)
-                    if(CSVText != null)
-                        return Result.Failure<IReadOnlyCollection<IProcessInjector>, ErrorList>(new ErrorList{$"Both {nameof(CSVFilePath)} and {nameof(CSVText)} are set."});
-                    else
-                        csvResult = CsvReader.TryReadCSVFromFile(CSVFilePath, Delimiter, CommentToken, HasFieldsEnclosedInQuotes);
-                else if (CSVText != null)
-                    csvResult = CsvReader.TryReadCSVFromString(CSVText, Delimiter, CommentToken, HasFieldsEnclosedInQuotes);
-                else
-                    return Result.Failure<IReadOnlyCollection<IProcessInjector>, ErrorList>(new ErrorList{$"Either {nameof(CSVFilePath)} or {nameof(CSVText)} should be set."});
-
-                if (csvResult.IsFailure)
-                    return csvResult.ConvertFailure<IReadOnlyCollection<IProcessInjector>>();
-
-
-                using var dataTable = csvResult.Value;
-                var errors = new ErrorList();
-                var injectors = new List<IProcessInjector>();
-
-                var columnInjections = new List<(Injection injection, DataColumn column)>();
-
-                foreach (var (columnName, value) in InjectColumns)
-                {
-                    var column = dataTable.Columns[columnName];
-                    if (column == null) errors.Add($"Could not find column '{columnName}'");
-                    else
-                        columnInjections.Add((value, column));
-                }
-
-                if (errors.Any())
-                    return Result
-                        .Failure<IReadOnlyCollection<IProcessInjector>,
-                            ErrorList>(errors);
-
-
-                foreach (var dataTableRow in dataTable.Rows.Cast<DataRow>())
-                {
-                    if (dataTableRow == null) continue;
-                    var processInjector = new ProcessInjector();
-                    foreach (var (injection, column) in columnInjections)
-                    {
-                        var val = dataTableRow[column];
-                        processInjector.Add(val?.ToString()??string.Empty, injection);
-                    }
-                    injectors.Add(processInjector);
-                }
-                return Result.Success<IReadOnlyCollection<IProcessInjector>, ErrorList>(injectors);
-            }
+            File, Text, Process   
         }
 
+        internal static Result<EagerEnumerationElements, ErrorList> ConvertDataTable (DataTable dataTable, IReadOnlyDictionary<string, Injection> injectColumns)
+        {
+            var errors = new ErrorList();
+            var injectors = new List<IProcessInjector>();
+
+            var columnInjections = new List<(Injection injection, DataColumn column)>();
+
+            foreach (var (columnName, value) in injectColumns)
+            {
+                var column = dataTable.Columns[columnName];
+                if (column == null) errors.Add($"Could not find column '{columnName}'");
+                else
+                    columnInjections.Add((value, column));
+            }
+
+            if (errors.Any())
+                return Result.Failure<EagerEnumerationElements, ErrorList>(errors);
+
+            foreach (var dataTableRow in dataTable.Rows.Cast<DataRow>())
+            {
+                if (dataTableRow == null) continue;
+                var processInjector = new ProcessInjector();
+                foreach (var (injection, column) in columnInjections)
+                {
+                    var val = dataTableRow[column];
+                    processInjector.Add(val?.ToString()??string.Empty, injection);
+                }
+                injectors.Add(processInjector);
+            }
+            return Result.Success<EagerEnumerationElements, ErrorList>(new EagerEnumerationElements(injectors));
+        }
+
+
+        /// <inheritdoc />
+        internal override Result<IEnumerationElements, ErrorList> TryGetElements(IProcessSettings processSettings)
+        {
+            var sources = new List<CSVSource>();
+
+                if(CSVFilePath != null) sources.Add(CSVSource.File);
+                if(CSVText != null) sources.Add(CSVSource.Text);
+                if(CSVProcess != null) sources.Add(CSVSource.Process);
+
+                if (sources.Count == 0)
+                    return Result.Failure<IEnumerationElements, ErrorList>(new ErrorList
+                        {$"Either {nameof(CSVFilePath)}, {nameof(CSVText)}, or {nameof(CSVProcess)} should be set."});
+                if (sources.Count > 1)
+                    return Result.Failure<IEnumerationElements, ErrorList>(new ErrorList
+                    {
+                        $"Only one of {nameof(CSVFilePath)}, {nameof(CSVText)}, and {nameof(CSVProcess)} may be set."
+                    });
+
+
+                Result<DataTable, ErrorList> csvResult;
+
+                switch (sources.Single())
+                {
+                    case CSVSource.File when CSVFilePath != null:
+                    {
+                        csvResult = CsvReader.TryReadCSVFromFile(CSVFilePath, Delimiter, CommentToken, HasFieldsEnclosedInQuotes); }
+                        break;
+                    case CSVSource.Text when CSVText != null:
+                        csvResult = CsvReader.TryReadCSVFromString(CSVText, Delimiter, CommentToken, HasFieldsEnclosedInQuotes);
+                        break;
+                    case CSVSource.Process when CSVProcess != null:
+                    {
+                        var subProcessFreezeResult = CSVProcess.TryFreeze(processSettings);
+
+                        if (subProcessFreezeResult.IsFailure) return subProcessFreezeResult.ConvertFailure<IEnumerationElements>();
+                        switch (subProcessFreezeResult.Value)
+                        {
+                            case ImmutableProcess<string> stringProcess:
+                            {
+                                var lazyElements = new LazyEnumerationElements(stringProcess, Delimiter, CommentToken, HasFieldsEnclosedInQuotes, 
+                                    new ReadOnlyDictionary<string, Injection>(InjectColumns));
+                                return Result.Success<IEnumerationElements, ErrorList>(lazyElements);
+                            }
+                            default:
+                                return Result.Failure<IEnumerationElements, ErrorList>(new ErrorList
+                                {
+                                    $"{nameof(CSVProcess)} should have type string"
+                                });
+                        }
+                    }
+                    default: return Result.Failure<IEnumerationElements, ErrorList>(new ErrorList
+                    {
+                        "Something went wrong getting CSV elements"
+                    });
+                }
+
+                using var dataTable = csvResult.Value;
+
+                var r = ConvertDataTable(dataTable, InjectColumns);
+                return r.Map(x => x as IEnumerationElements);
+        }
 
         internal override string Name
         {
@@ -143,7 +185,6 @@ namespace Reductech.EDR.Utilities.Processes.mutable.enumerations
         /// List of mappings from CSV headers to property injection.
         /// </summary>
         [Required]
-        
         [YamlMember]
         public Dictionary<string, Injection>  InjectColumns { get; set; }
 

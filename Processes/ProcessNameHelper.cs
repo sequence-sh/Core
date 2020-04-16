@@ -24,6 +24,8 @@ namespace Reductech.EDR.Utilities.Processes
             return string.IsNullOrWhiteSpace(r) ? GetDoNothingName() : r;
         }
 
+        public static string GetLoopName(string @for, string @do) => $"Foreach in {@for}, {@do}";
+
         public static string GetCreateDirectoryName() => "Create Directory";
         public static string GetDeleteItemName() => "Delete Item";
         public static string GetDoNothingName() => "Do Nothing";

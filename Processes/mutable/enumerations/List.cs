@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
-using System.Runtime.Serialization;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Utilities.Processes.mutable.injection;
 using YamlDotNet.Serialization;
@@ -13,9 +12,15 @@ namespace Reductech.EDR.Utilities.Processes.mutable.enumerations
     /// </summary>
     public class List : Enumeration
     {
-        internal override Result<IReadOnlyCollection<IProcessInjector>,ErrorList> Elements =>
-            Result.Success<IReadOnlyCollection<IProcessInjector>,ErrorList>
-                (Members.Select(m => new ProcessInjector(Inject.Select(i => (m, i)))).ToList());
+        /// <inheritdoc />
+        internal override Result<IEnumerationElements, ErrorList> TryGetElements(IProcessSettings processSettings)
+        {
+            var elements =
+                new EagerEnumerationElements(Members.Select(m => new ProcessInjector(Inject.Select(i => (m, i))))
+                    .ToList());
+            return Result.Success<IEnumerationElements,ErrorList>(elements);
+        }
+
         internal override string Name => $"[{string.Join(", ", Members)}]";
         internal override IEnumerable<string> GetArgumentErrors()
         {
