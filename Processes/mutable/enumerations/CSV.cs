@@ -110,6 +110,8 @@ namespace Reductech.EDR.Utilities.Processes.mutable.enumerations
                     });
                 }
 
+                if (csvResult.IsFailure) return csvResult.ConvertFailure<IEnumerationElements>();
+
                 using var dataTable = csvResult.Value;
 
                 var r = ConvertDataTable(dataTable, InjectColumns);
