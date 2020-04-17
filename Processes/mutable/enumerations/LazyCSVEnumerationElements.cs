@@ -5,15 +5,16 @@ using Reductech.EDR.Utilities.Processes.output;
 
 namespace Reductech.EDR.Utilities.Processes.mutable.enumerations
 {
-    internal class LazyEnumerationElements : ImmutableProcess<EagerEnumerationElements>, IEnumerationElements
+    internal class LazyCSVEnumerationElements : ImmutableProcess<EagerEnumerationElements>, IEnumerationElements
     {
-        public LazyEnumerationElements(ImmutableProcess<string> subProcess, string delimiter, string? commentToken, bool hasFieldsEnclosedInQuotes, IReadOnlyDictionary<string, Injection> injectColumns)
+        public LazyCSVEnumerationElements(ImmutableProcess<string> subProcess, string delimiter, string? commentToken, bool hasFieldsEnclosedInQuotes, IReadOnlyDictionary<string, Injection> injectColumns, bool distinct)
         {
             _subProcess = subProcess;
             Delimiter = delimiter;
             CommentToken = commentToken;
             HasFieldsEnclosedInQuotes = hasFieldsEnclosedInQuotes;
             InjectColumns = injectColumns;
+            Distinct = distinct;
         }
 
 
@@ -59,7 +60,7 @@ namespace Reductech.EDR.Utilities.Processes.mutable.enumerations
                     {
                         using var dataTable = csvResult.Value;
 
-                        var elementsResult = CSV.ConvertDataTable(dataTable, InjectColumns);
+                        var elementsResult = CSV.ConvertDataTable(dataTable, InjectColumns, Distinct);
                         if (elementsResult.IsSuccess)
                         {
                             yield return ProcessOutput<EagerEnumerationElements>.Success(elementsResult.Value);
@@ -87,5 +88,7 @@ namespace Reductech.EDR.Utilities.Processes.mutable.enumerations
         public string Delimiter { get; }
 
         private readonly ImmutableProcess<string> _subProcess;
+
+        public bool Distinct { get; }
     }
 }

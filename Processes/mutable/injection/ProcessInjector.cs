@@ -49,5 +49,26 @@ namespace Reductech.EDR.Utilities.Processes.mutable.injection
 
             return Result.Success();
         }
+
+        /// <inheritdoc />
+        public override bool Equals(object? obj)
+        {
+            return obj is ProcessInjector pi &&
+                   _injections.Select(x => (x.element, x.injection.Property))
+                       .OrderBy(x=>x.Property)
+                       .SequenceEqual(
+                           pi._injections.Select(x => (x.element, x.injection.Property))
+                           .OrderBy(x=>x.Property));
+        }
+
+
+        /// <inheritdoc />
+        public override int GetHashCode()
+        {
+            //TODO improve this hash code
+            var s = string.Join("", _injections.Select(i => i.element + i.injection.Property));
+
+            return s.GetHashCode();
+        }
     }
 }
