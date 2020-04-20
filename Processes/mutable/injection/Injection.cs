@@ -5,6 +5,24 @@ using YamlDotNet.Serialization;
 namespace Reductech.EDR.Utilities.Processes.mutable.injection
 {
     /// <summary>
+    /// Injects values from a CSV column into a property of a loop's process.
+    /// </summary>
+    public sealed class ColumnInjection : Injection
+    {
+        /// <summary>
+        /// The column in the CSV to get the values from.
+        /// </summary>
+        [Required]
+        [YamlMember(Order = 2)]
+        [ExampleValue("SearchTerm")]
+#pragma warning disable CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
+        public string Column { get; set; }
+#pragma warning restore CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
+
+    }
+
+
+    /// <summary>
     /// Injects a value from the enumerator into a property of a loop's process.
     /// </summary>
     public class Injection

@@ -31,26 +31,20 @@ namespace Reductech.EDR.Utilities.Processes.Tests
                     CSVText = csv,
                     CommentToken = "#",
                     Delimiter = ",",
-                    InjectColumns = new Dictionary<string, Injection>
+                    ColumnInjections = new List<ColumnInjection>
                     {
+                        new ColumnInjection
                         {
-                            "Text",
-                            new Injection
-                            {
-                                Property = nameof(EmitProcess.Term),
-                                Regex = "(.+)",
-                                Template = "$s"
-                            }
-                        }
-                        ,
+                            Column = "Text",
+                            Property = nameof(EmitProcess.Term),
+                            Regex = "(.+)",
+                            Template = "$s"
+                        },
+                        new ColumnInjection
                         {
-                            "Number",
-                            new Injection
-                            {
-                                Property = nameof(EmitProcess.Number)
-                            }
+                            Column = "Number",
+                            Property = nameof(EmitProcess.Number)
                         }
-                        
                     }
                 },
 

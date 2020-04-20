@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
 using System.Data;
 using System.Linq;
@@ -22,20 +21,20 @@ namespace Reductech.EDR.Utilities.Processes.mutable.enumerations
         }
 
         internal static Result<EagerEnumerationElements, ErrorList> ConvertDataTable 
-            (DataTable dataTable, IReadOnlyDictionary<string, Injection> injectColumns, bool distinct)
+            (DataTable dataTable, IReadOnlyCollection<ColumnInjection> columnInjections, bool distinct)
         {
             var errors = new ErrorList();
             var injectors = new List<IProcessInjector>();
             var usedInjectors = distinct ? new HashSet<ProcessInjector>() : null; 
 
-            var columnInjections = new List<(Injection injection, DataColumn column)>();
+            var injectionsWithColumns = new List<(Injection injection, DataColumn column)>();
 
-            foreach (var (columnName, value) in injectColumns)
+            foreach (var injectColumn in columnInjections)
             {
-                var column = dataTable.Columns[columnName];
-                if (column == null) errors.Add($"Could not find column '{columnName}'");
+                var column = dataTable.Columns[injectColumn.Column];
+                if (column == null) errors.Add($"Could not find column '{injectColumn.Column}'");
                 else
-                    columnInjections.Add((value, column));
+                    injectionsWithColumns.Add((injectColumn, column));
             }
 
             if (errors.Any())
@@ -45,7 +44,7 @@ namespace Reductech.EDR.Utilities.Processes.mutable.enumerations
             {
                 if (dataTableRow == null) continue;
                 var processInjector = new ProcessInjector();
-                foreach (var (injection, column) in columnInjections)
+                foreach (var (injection, column) in injectionsWithColumns)
                 {
                     var val = dataTableRow[column];
                     var stringValue = val?.ToString() ?? string.Empty;
@@ -100,7 +99,7 @@ namespace Reductech.EDR.Utilities.Processes.mutable.enumerations
                             case ImmutableProcess<string> stringProcess:
                             {
                                 var lazyElements = new LazyCSVEnumerationElements(stringProcess, Delimiter, CommentToken, HasFieldsEnclosedInQuotes, 
-                                    new ReadOnlyDictionary<string, Injection>(InjectColumns), Distinct);
+                                    ColumnInjections, Distinct);
                                 return Result.Success<IEnumerationElements, ErrorList>(lazyElements);
                             }
                             default:
@@ -120,7 +119,7 @@ namespace Reductech.EDR.Utilities.Processes.mutable.enumerations
 
                 using var dataTable = csvResult.Value;
 
-                var r = ConvertDataTable(dataTable, InjectColumns, Distinct);
+                var r = ConvertDataTable(dataTable, ColumnInjections, Distinct);
                 return r.Map(x => x as IEnumerationElements);
         }
 
@@ -164,11 +163,11 @@ namespace Reductech.EDR.Utilities.Processes.mutable.enumerations
 
 #pragma warning disable CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
         /// <summary>
-        /// List of mappings from CSV headers to property injection.
+        /// List of columns and properties to inject.
         /// </summary>
         [Required]
         [YamlMember]
-        public Dictionary<string, Injection>  InjectColumns { get; set; }
+        public List<ColumnInjection>  ColumnInjections { get; set; }
 
         /// <summary>
         /// The delimiter used in the CSV file.
