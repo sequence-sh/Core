@@ -38,7 +38,7 @@ namespace Reductech.EDR.Utilities.Processes.Tests
                             Column = "Text",
                             Property = nameof(EmitProcess.Term),
                             Regex = "(.+)",
-                            Template = "$s"
+                            Template = "$1"
                         },
                         new ColumnInjection
                         {
@@ -91,7 +91,7 @@ namespace Reductech.EDR.Utilities.Processes.Tests
                         new Injection
                         {
                             Property = nameof(EmitProcess.Term),
-                            Template = "'$s'"
+                            Template = "'$1'"
                         }
                     }
                 },
