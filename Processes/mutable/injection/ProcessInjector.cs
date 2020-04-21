@@ -28,6 +28,8 @@ namespace Reductech.EDR.Utilities.Processes.mutable.injection
             _injections = injections.ToList();
         }
 
+        public bool IsValid => _injections.All(x => x.injection.GetPropertyValue(x.element).IsSuccess);
+
         public Result Inject(Process process)
         {
             foreach (var (element, injection) in _injections)

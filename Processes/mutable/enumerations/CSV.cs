@@ -52,7 +52,7 @@ namespace Reductech.EDR.Utilities.Processes.mutable.enumerations
                     processInjector.Add(stringValue, injection);
                 }
 
-                if(usedInjectors == null || usedInjectors.Add(processInjector))
+                if(processInjector.IsValid && usedInjectors == null || usedInjectors.Add(processInjector))
                     injectors.Add(processInjector);
             }
             return Result.Success<EagerEnumerationElements, ErrorList>(new EagerEnumerationElements(injectors));
