@@ -40,7 +40,7 @@ namespace Reductech.EDR.Utilities.Processes.immutable
         public override string Name => ProcessNameHelper.GetWriteFileProcessName(TextProcess.Name);
 
         /// <inheritdoc />
-        public override IProcessConverter? ProcessConverter => null;
+        public override IProcessConverter? ProcessConverter => TextProcess.ProcessConverter;
 
         /// <inheritdoc />
         public override async IAsyncEnumerable<IProcessOutput<Unit>> Execute()
