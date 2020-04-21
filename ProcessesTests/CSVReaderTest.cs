@@ -34,10 +34,10 @@ namespace Reductech.EDR.Utilities.Processes.Tests
                 For = new CSV
                 {
                     CSVText = testCase.CSVText,
-                    InjectColumns = new Dictionary<string, Injection>
+                    ColumnInjections = new List<ColumnInjection>
                     {
-                        {"H1", new Injection {Property = nameof(EmitProcess.Term)} },
-                        {"H2", new Injection {Property = nameof(EmitProcess.Number)} },
+                        new ColumnInjection{Column = "H1",Property = nameof(EmitProcess.Term)},
+                        new ColumnInjection{Column = "H2",Property = nameof(EmitProcess.Number)}
                     },
                     CommentToken = testCase.CommentToken,
                     Delimiter = testCase.Delimiter,
@@ -71,11 +71,11 @@ namespace Reductech.EDR.Utilities.Processes.Tests
                 Do = new EmitProcess(),
                 For = new CSV
                 {
-                    CSVProcess = new EmitStringProcess(){Output = testCase.CSVText},
-                    InjectColumns = new Dictionary<string, Injection>
+                    CSVProcess = new EmitStringProcess {Output = testCase.CSVText},
+                    ColumnInjections = new List<ColumnInjection>
                     {
-                        {"H1", new Injection {Property = nameof(EmitProcess.Term)} },
-                        {"H2", new Injection {Property = nameof(EmitProcess.Number)} },
+                        new ColumnInjection{Column = "H1",Property = nameof(EmitProcess.Term)},
+                        new ColumnInjection{Column = "H2",Property = nameof(EmitProcess.Number)}
                     },
                     CommentToken = testCase.CommentToken,
                     Delimiter = testCase.Delimiter,
@@ -111,11 +111,11 @@ namespace Reductech.EDR.Utilities.Processes.Tests
                     CSVText = @"H1,H2
 t,2,abc
 t,4,def",
-                    InjectColumns = new Dictionary<string, Injection>
-                    {
-                        {"H1", new Injection {Property = nameof(EmitProcess.Term)} },
-                        {"H2", new Injection {Property = nameof(EmitProcess.Number)} },
-                    },
+                    ColumnInjections = new List<ColumnInjection>()
+                        {
+                            new ColumnInjection{Column = "H1",Property = nameof(EmitProcess.Term)},
+                            new ColumnInjection{Column = "H2",Property = nameof(EmitProcess.Number)}
+                        },
                     Delimiter = ",",
                     HasFieldsEnclosedInQuotes = true
                 }

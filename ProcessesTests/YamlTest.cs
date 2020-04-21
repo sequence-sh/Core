@@ -43,11 +43,11 @@ Steps:
 !Loop
 For: !CSV
     CSVFilePath: Path
-    InjectColumns:
-      Number:
-        Property: Number
-      Term:
-        Property: Term
+    ColumnInjections:
+    - Column: Term
+      Property: Term
+    - Column: Number
+      Property: Number
     Delimiter: ','
     HasFieldsEnclosedInQuotes: true
 Do: !EmitProcess

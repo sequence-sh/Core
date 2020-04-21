@@ -33,7 +33,7 @@ namespace Reductech.EDR.Utilities.Processes.mutable
             {
                 EagerEnumerationElements eagerEnumerationElements => GetFreezeResultFromEagerElements(processSettings,
                     eagerEnumerationElements, Do),
-                LazyEnumerationElements lazyEnumerationElements => Result.Success<ImmutableProcess, ErrorList>(
+                LazyCSVEnumerationElements lazyEnumerationElements => Result.Success<ImmutableProcess, ErrorList>(
                     new LazyLoop(lazyEnumerationElements, Do, processSettings)),
                 _ => Result.Failure<ImmutableProcess, ErrorList>(new ErrorList("Could not handle enumeration elements"))
             };

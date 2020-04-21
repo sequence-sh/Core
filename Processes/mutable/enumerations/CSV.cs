@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
 using System.Data;
 using System.Linq;
@@ -21,19 +20,21 @@ namespace Reductech.EDR.Utilities.Processes.mutable.enumerations
             File, Text, Process   
         }
 
-        internal static Result<EagerEnumerationElements, ErrorList> ConvertDataTable (DataTable dataTable, IReadOnlyDictionary<string, Injection> injectColumns)
+        internal static Result<EagerEnumerationElements, ErrorList> ConvertDataTable 
+            (DataTable dataTable, IReadOnlyCollection<ColumnInjection> columnInjections, bool distinct)
         {
             var errors = new ErrorList();
             var injectors = new List<IProcessInjector>();
+            var usedInjectors = distinct ? new HashSet<ProcessInjector>() : null; 
 
-            var columnInjections = new List<(Injection injection, DataColumn column)>();
+            var injectionsWithColumns = new List<(Injection injection, DataColumn column)>();
 
-            foreach (var (columnName, value) in injectColumns)
+            foreach (var injectColumn in columnInjections)
             {
-                var column = dataTable.Columns[columnName];
-                if (column == null) errors.Add($"Could not find column '{columnName}'");
+                var column = dataTable.Columns[injectColumn.Column];
+                if (column == null) errors.Add($"Could not find column '{injectColumn.Column}'");
                 else
-                    columnInjections.Add((value, column));
+                    injectionsWithColumns.Add((injectColumn, column));
             }
 
             if (errors.Any())
@@ -43,12 +44,16 @@ namespace Reductech.EDR.Utilities.Processes.mutable.enumerations
             {
                 if (dataTableRow == null) continue;
                 var processInjector = new ProcessInjector();
-                foreach (var (injection, column) in columnInjections)
+                foreach (var (injection, column) in injectionsWithColumns)
                 {
                     var val = dataTableRow[column];
-                    processInjector.Add(val?.ToString()??string.Empty, injection);
+                    var stringValue = val?.ToString() ?? string.Empty;
+
+                    processInjector.Add(stringValue, injection);
                 }
-                injectors.Add(processInjector);
+
+                if(usedInjectors == null || usedInjectors.Add(processInjector))
+                    injectors.Add(processInjector);
             }
             return Result.Success<EagerEnumerationElements, ErrorList>(new EagerEnumerationElements(injectors));
         }
@@ -93,8 +98,8 @@ namespace Reductech.EDR.Utilities.Processes.mutable.enumerations
                         {
                             case ImmutableProcess<string> stringProcess:
                             {
-                                var lazyElements = new LazyEnumerationElements(stringProcess, Delimiter, CommentToken, HasFieldsEnclosedInQuotes, 
-                                    new ReadOnlyDictionary<string, Injection>(InjectColumns));
+                                var lazyElements = new LazyCSVEnumerationElements(stringProcess, Delimiter, CommentToken, HasFieldsEnclosedInQuotes, 
+                                    ColumnInjections, Distinct);
                                 return Result.Success<IEnumerationElements, ErrorList>(lazyElements);
                             }
                             default:
@@ -114,7 +119,7 @@ namespace Reductech.EDR.Utilities.Processes.mutable.enumerations
 
                 using var dataTable = csvResult.Value;
 
-                var r = ConvertDataTable(dataTable, InjectColumns);
+                var r = ConvertDataTable(dataTable, ColumnInjections, Distinct);
                 return r.Map(x => x as IEnumerationElements);
         }
 
@@ -131,32 +136,6 @@ namespace Reductech.EDR.Utilities.Processes.mutable.enumerations
                 return "CSV";
             }
         }
-
-        //internal override IEnumerable<string> GetArgumentErrors()
-        //{
-        //    Result<DataTable, ErrorList> csvResult;
-
-        //    if(CSVFilePath != null)
-        //        if (CSVText != null)
-        //        {
-        //            yield return $"Both {nameof(CSVFilePath)} and {nameof(CSVText)} are set.";
-        //            yield break;
-        //        }
-        //        else
-        //            csvResult = CsvReader.TryReadCSVFromFile(CSVFilePath, Delimiter, CommentToken, HasFieldsEnclosedInQuotes);
-        //    else if (CSVText != null)
-        //        csvResult = CsvReader.TryReadCSVFromString(CSVText, Delimiter, CommentToken, HasFieldsEnclosedInQuotes);
-        //    else
-        //    {
-        //        yield return $"Either {nameof(CSVFilePath)} or {nameof(CSVText)} should be set.";
-        //        yield break;
-        //    }
-
-        //    if (csvResult.IsFailure)
-        //        foreach (var errorString in csvResult.Error)
-        //            yield return errorString;
-
-        //}
 
         /// <summary>
         /// The path to the CSV file.
@@ -184,11 +163,11 @@ namespace Reductech.EDR.Utilities.Processes.mutable.enumerations
 
 #pragma warning disable CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
         /// <summary>
-        /// List of mappings from CSV headers to property injection.
+        /// List of columns and properties to inject.
         /// </summary>
         [Required]
         [YamlMember]
-        public Dictionary<string, Injection>  InjectColumns { get; set; }
+        public List<ColumnInjection>  ColumnInjections { get; set; }
 
         /// <summary>
         /// The delimiter used in the CSV file.
@@ -212,5 +191,12 @@ namespace Reductech.EDR.Utilities.Processes.mutable.enumerations
         
         [YamlMember]
         public bool HasFieldsEnclosedInQuotes { get; set; } = false;
+
+        /// <summary>
+        /// Whether to only enumerate unique values from the CSV.
+        /// Uniqueness is determined only from the columns which are being injected.
+        /// </summary>
+        [YamlMember]
+        public bool Distinct { get; set; }
     }
 }
