@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using CSharpFunctionalExtensions;
@@ -69,6 +70,9 @@ namespace Reductech.EDR.Utilities.Processes.mutable
         /// <inheritdoc />
         public override IEnumerable<string> GetRequirements()
         {
+            if (Steps == null)
+                return Enumerable.Empty<string>();
+
             return Steps.SelectMany(x => x.GetRequirements()).Distinct();
         }
     }

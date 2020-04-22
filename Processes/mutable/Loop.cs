@@ -104,6 +104,9 @@ namespace Reductech.EDR.Utilities.Processes.mutable
         /// <inheritdoc />
         public override IEnumerable<string> GetRequirements()
         {
+            if (Do == null)
+                return Enumerable.Empty<string>();
+
             return Do.GetRequirements();
         }
     }

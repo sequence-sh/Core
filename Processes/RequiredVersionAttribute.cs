@@ -29,5 +29,15 @@ namespace Reductech.EDR.Utilities.Processes
         /// </summary>
         public Version RequiredVersion { get; }
 
+        /// <summary>
+        /// The required version in human readable form.
+        /// </summary>
+        public string Text => $"{SoftwareName} {RequiredVersion}";
+
+        /// <inheritdoc />
+        public override string ToString()
+        {
+            return Text;
+        }
     }
 }
