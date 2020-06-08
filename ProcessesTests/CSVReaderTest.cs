@@ -129,7 +129,9 @@ t,4,def",
 
 
 
+#pragma warning disable CA1034 // Nested types should not be visible
         public class TestCase
+#pragma warning restore CA1034 // Nested types should not be visible
         {
             public TestCase(string name, string csvText, string delimiter, string? commentToken, bool hasFieldsEncasedInQuotes, params string[] expectedResults)
             {
@@ -160,7 +162,9 @@ t,4,def",
             }
         }
 
+#pragma warning disable CA1034 // Nested types should not be visible
         public class EmitStringProcess : Process
+#pragma warning restore CA1034 // Nested types should not be visible
         {
             /// <inheritdoc />
             public override string GetReturnTypeInfo()
@@ -180,7 +184,9 @@ t,4,def",
             /// <inheritdoc />
             public override IEnumerable<string> GetRequirements() => Enumerable.Empty<string>();
 
+#pragma warning disable CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
             public string Output { get; set; }
+#pragma warning restore CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
 
             internal class ImmutableEmitString : ImmutableProcess<string>
             {
