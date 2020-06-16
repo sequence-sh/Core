@@ -32,11 +32,11 @@ namespace Reductech.EDR.Utilities.Processes.immutable
             foreach (var process in Steps)
             {
                 var allGood = true;
-                var resultLines = process.ExecuteUntyped();
+                var resultLines = process.Execute();
                 await foreach (var resultLine in resultLines)
                 {
                     if(resultLine.OutputType != OutputType.Success)
-                        yield return resultLine.ConvertTo<Unit>();
+                        yield return resultLine;
                     allGood &= resultLine.OutputType != OutputType.Error;
                 }
                 if(!allGood)
@@ -59,20 +59,15 @@ namespace Reductech.EDR.Utilities.Processes.immutable
         public override Result<ImmutableProcess<Unit>> TryCombine(ImmutableProcess<Unit> nextProcess, IProcessSettings processSettings)
         {
             if (Steps.Count == 0)
-            {
                 return Result.Success(nextProcess);
-            }
-            else
-            {
 
-                var allSteps =
-                    nextProcess is Sequence nextSequence?  Steps.Concat(nextSequence.Steps) :
-                        Steps.Concat(new[] {nextProcess});
+            var allSteps =
+                nextProcess is Sequence nextSequence?  Steps.Concat(nextSequence.Steps) :
+                    Steps.Concat(new[] {nextProcess});
 
-                var r = CombineSteps(allSteps, processSettings);
+            var r = CombineSteps(allSteps, processSettings);
 
-                return Result.Success(r);
-            }
+            return Result.Success(r);
         }
 
         /// <summary>

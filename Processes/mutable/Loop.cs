@@ -75,12 +75,11 @@ namespace Reductech.EDR.Utilities.Processes.mutable
 
         /// <inheritdoc />
         public override string GetName() => ProcessNameHelper.GetLoopName(For.Name, Do.GetName());
-        
+
         /// <summary>
         /// The enumeration to iterate through.
         /// </summary>
         [Required]
-        
         [YamlMember(Order = 2)]
 #pragma warning disable CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
         public Enumeration For { get; set; }
@@ -89,7 +88,6 @@ namespace Reductech.EDR.Utilities.Processes.mutable
         /// The process to run once for each element.
         /// </summary>
         [Required]
-        
         [YamlMember(Order = 5)]
         public Process Do { get; set; }
 #pragma warning restore CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.

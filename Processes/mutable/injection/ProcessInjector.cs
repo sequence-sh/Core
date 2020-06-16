@@ -42,7 +42,7 @@ namespace Reductech.EDR.Utilities.Processes.mutable.injection
                 var propertyValueResult = injection.GetPropertyValue(element);
                 if (propertyValueResult.IsFailure)
                     return propertyValueResult;
-                
+
                 var setResult = pathResult.Value.TrySetValue(process, propertyValueResult.Value);
 
                 if (setResult.IsFailure)

@@ -12,10 +12,18 @@ namespace Reductech.EDR.Utilities.Processes
     {
         //TODO support different languages
 
-        public static string GetConditionalName(string ifName, string thenName, string? elseName) => 
+        public static string GetConditionalName(string ifName, string thenName, string? elseName) =>
             elseName == null? $"If ({ifName}) then ({thenName})" : $"If ({ifName}) then ({thenName}) else ({elseName})";
 
         public static string GetAssertErrorName(string subProcessName) => $"Assert Fail: {subProcessName}";
+
+        public static string GetChainName(string processName, string? nextName)
+        {
+            if (string.IsNullOrWhiteSpace(nextName))
+                return processName;
+
+            return processName + " then " + nextName;
+        }
 
         public static string GetSequenceName(IEnumerable<string> stepNames) //TODO allow names like "Search and Tag 17 times"
         {

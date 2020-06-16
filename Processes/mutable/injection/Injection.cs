@@ -31,7 +31,6 @@ namespace Reductech.EDR.Utilities.Processes.mutable.injection
         /// The property of the subProcess to inject.
         /// </summary>
         [Required]
-        
         [YamlMember(Order = 2)]
         [ExampleValue("SearchTerm")]
 #pragma warning disable CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
@@ -42,7 +41,6 @@ namespace Reductech.EDR.Utilities.Processes.mutable.injection
         /// The regex to use to extract the useful part of the element.
         /// The first match of the regex will be used.
         /// </summary>
-        
         [YamlMember(Order = 3)]
         [DefaultValueExplanation("The entire value will be injected.")]
         [ExampleValue(@"\w+")]
@@ -53,7 +51,6 @@ namespace Reductech.EDR.Utilities.Processes.mutable.injection
         /// The string '$1' in the template will be replaced with the element.
         /// The template will be applied after the Regex.
         /// </summary>
-        
         [YamlMember(Order = 4)]
         [ExampleValue("$1.txt")]
         [DefaultValueExplanation("The value will be injected on its own.")]

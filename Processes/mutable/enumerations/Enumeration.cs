@@ -27,7 +27,7 @@ namespace Reductech.EDR.Utilities.Processes.mutable.enumerations
         {
             return obj is Enumeration e && e.Name == Name && GetType() == e.GetType();
         }
-        
+
         /// <inheritdoc />
         public override int GetHashCode() => Name.GetHashCode();
     }

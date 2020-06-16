@@ -23,16 +23,13 @@ namespace Reductech.EDR.Utilities.Processes.immutable
         /// <inheritdoc />
         public override async IAsyncEnumerable<IProcessOutput<Unit>> Execute()
         {
-            
             EagerEnumerationElements? elements = null;
             var anyErrors = false;
 
             await foreach (var r in LazyCSVEnumerationElements.Execute())
             {
                 if (r.OutputType == OutputType.Success)
-                {
                     elements = r.Value;
-                }
                 else
                 {
                     if (r.OutputType == OutputType.Error)
@@ -45,9 +42,7 @@ namespace Reductech.EDR.Utilities.Processes.immutable
             if (!anyErrors)
             {
                 if (elements == null)
-                {
                     yield return ProcessOutput<Unit>.Error("Could not evaluate elements");
-                }
                 else
                 {
                     var freezeResult = Loop.GetFreezeResultFromEagerElements(ProcessSettings, elements, Do);
@@ -55,17 +50,11 @@ namespace Reductech.EDR.Utilities.Processes.immutable
                     if (freezeResult.IsSuccess)
                     {
                         if (freezeResult.Value is ImmutableProcess<Unit> unitProcess)
-                        {
                             await foreach (var r in unitProcess.Execute())
-                            {
                                 yield return r;
-                            }
-                        }
                         else
-                        {
                             yield return ProcessOutput<Unit>.Error(
                                 $"Process '{freezeResult.Value.Name}' has result type {freezeResult.Value.ResultType.Name} but members of a loop should have result type void.");
-                        }
                     }
                     else
                         foreach (var freezeError in freezeResult.Error)
