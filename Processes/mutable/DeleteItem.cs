@@ -16,7 +16,7 @@ namespace Reductech.EDR.Utilities.Processes.mutable
         /// </summary>
         [YamlMember(Order = 2)]
         [Required]
-        
+
 #pragma warning disable CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
         public string Path { get; set; }
 #pragma warning restore CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
@@ -29,12 +29,12 @@ namespace Reductech.EDR.Utilities.Processes.mutable
         public override string GetName() => ProcessNameHelper.GetDeleteItemName();
 
         /// <inheritdoc />
-        public override Result<ImmutableProcess, ErrorList> TryFreeze(IProcessSettings processSettings)
+        public override Result<ImmutableProcess> TryFreeze(IProcessSettings processSettings)
         {
             if (string.IsNullOrWhiteSpace(Path))
-                return Result.Failure<ImmutableProcess, ErrorList>(new ErrorList("File Path is empty"));
+                return Result.Failure<ImmutableProcess>("File Path is empty");
 
-            return Result.Success<ImmutableProcess, ErrorList>(new immutable.DeleteItem(Path));
+            return Result.Success<ImmutableProcess>(new immutable.DeleteItem(Path));
         }
 
         /// <inheritdoc />

@@ -16,7 +16,6 @@ namespace Reductech.EDR.Utilities.Processes.mutable
         /// Inclusive minimum of the expected range.
         /// Either this, Maximum, or both must be set.
         /// </summary>
-        
         [YamlMember(Order = 2 )]
         public int? Minimum { get; set; }
 
@@ -24,7 +23,6 @@ namespace Reductech.EDR.Utilities.Processes.mutable
         /// Inclusive maximum of the expected range.
         /// Either this, Minimum, or both must be set.
         /// </summary>
-        
         [YamlMember(Order = 3 )]
         public int? Maximum { get; set; }
 
@@ -44,22 +42,21 @@ namespace Reductech.EDR.Utilities.Processes.mutable
         public override string GetName() => ProcessNameHelper.GetCheckNumberProcessName(Check?.GetName() ?? "");
 
         /// <inheritdoc />
-        public override Result<ImmutableProcess, ErrorList> TryFreeze(IProcessSettings processSettings)
+        public override Result<ImmutableProcess> TryFreeze(IProcessSettings processSettings)
         {
             if (Minimum == null && Maximum == null)
-                return Result.Failure<ImmutableProcess, ErrorList>(new ErrorList($"Either {nameof(Minimum)} or {nameof(Maximum)} must be set."));
+                return Result.Failure<ImmutableProcess>($"Either {nameof(Minimum)} or {nameof(Maximum)} must be set.");
 
             var frozenCount =
-                Check?.TryFreeze(processSettings)??Result.Failure<ImmutableProcess, ErrorList>(new ErrorList($"'{nameof(Check)}' must be set."));
+                Check?.TryFreeze(processSettings)??Result.Failure<ImmutableProcess>($"'{nameof(Check)}' must be set.");
 
             if (frozenCount.IsFailure)
                 return frozenCount;
 
             if (frozenCount.Value is ImmutableProcess<int> icp)
-                return Result.Success<ImmutableProcess, ErrorList>(new immutable.CheckNumber(Minimum, Maximum, icp));
+                return Result.Success<ImmutableProcess>(new immutable.CheckNumber(Minimum, Maximum, icp));
 
-            return Result.Failure<ImmutableProcess, ErrorList>(new ErrorList(
-                $"'{nameof(Check)}' must have return type 'int'."));
+            return Result.Failure<ImmutableProcess>($"'{nameof(Check)}' must have return type 'int'.");
 
         }
 

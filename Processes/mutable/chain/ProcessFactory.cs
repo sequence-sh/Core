@@ -17,7 +17,7 @@ namespace Reductech.EDR.Utilities.Processes.mutable.chain
         /// </summary>
         /// <param name="input"></param>
         /// <returns></returns>
-        protected abstract Result<TImmutableProcess, ErrorList> GetProcess(TInput input);
+        protected abstract Result<TImmutableProcess> GetProcess(TInput input);
 
         /// <summary>
         /// The name of the process.
@@ -33,7 +33,7 @@ namespace Reductech.EDR.Utilities.Processes.mutable.chain
         /// <summary>
         /// Tries to create a new process from the input.
         /// </summary>
-        public Result<TImmutableProcess, ErrorList> TryCreate(TInput input)
+        public Result<TImmutableProcess> TryCreate(TInput input)
         {
             var mutableProcess = GetProcess(input);
 
@@ -85,7 +85,7 @@ namespace Reductech.EDR.Utilities.Processes.mutable.chain
         }//TODO freeze the process immediately - fail fast
 
         /// <inheritdoc />
-        protected override Result<TImmutableProcess, ErrorList> GetProcess(Unit input)
+        protected override Result<TImmutableProcess> GetProcess(Unit input)
         {
             var frozenProcess = Process.TryFreeze(ProcessSettings);
 
@@ -93,9 +93,9 @@ namespace Reductech.EDR.Utilities.Processes.mutable.chain
                 return frozenProcess.ConvertFailure<TImmutableProcess>();
 
             if (frozenProcess.Value is TImmutableProcess process)
-                return Result.Success<TImmutableProcess, ErrorList>(process);
+                return Result.Success<TImmutableProcess>(process);
 
-            return Result.Failure<TImmutableProcess, ErrorList>(new ErrorList($"'{frozenProcess.Value.Name}' does not have output type '{typeof(TOutput).Name}'."));
+            return Result.Failure<TImmutableProcess>(new ErrorList($"'{frozenProcess.Value.Name}' does not have output type '{typeof(TOutput).Name}'."));
         }
     }
 
@@ -116,11 +116,11 @@ namespace Reductech.EDR.Utilities.Processes.mutable.chain
         }
 
         /// <inheritdoc />
-        protected override Result<TImmutableProcess, ErrorList> GetProcess(TInput input)
+        protected override Result<TImmutableProcess> GetProcess(TInput input)
         {
             var injectionResult = Injection.TryInject(input.ToString(), Process);
             if (injectionResult.IsFailure)
-                return Result.Failure<TImmutableProcess, ErrorList>(new ErrorList(injectionResult.Error));
+                return Result.Failure<TImmutableProcess>(new ErrorList(injectionResult.Error));
 
             var frozenProcess = Process.TryFreeze(ProcessSettings);
 
@@ -128,9 +128,9 @@ namespace Reductech.EDR.Utilities.Processes.mutable.chain
                 return frozenProcess.ConvertFailure<TImmutableProcess>();
 
             if (frozenProcess.Value is TImmutableProcess process)
-                return Result.Success<TImmutableProcess, ErrorList>(process);
+                return Result.Success<TImmutableProcess>(process);
 
-            return Result.Failure<TImmutableProcess, ErrorList>(new ErrorList($"'{frozenProcess.Value.Name}' does not have output type '{typeof(TOutput).Name}'."));
+            return Result.Failure<TImmutableProcess>(new ErrorList($"'{frozenProcess.Value.Name}' does not have output type '{typeof(TOutput).Name}'."));
         }
 
         /// <summary>

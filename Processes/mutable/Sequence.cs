@@ -43,7 +43,7 @@ namespace Reductech.EDR.Utilities.Processes.mutable
 
 
         /// <inheritdoc />
-        public override Result<ImmutableProcess, ErrorList> TryFreeze(IProcessSettings processSettings)
+        public override Result<ImmutableProcess> TryFreeze(IProcessSettings processSettings)
         {
             var r = Steps.Select(s => s.TryFreeze(processSettings)).Combine(ErrorList.Compose);
 
@@ -57,11 +57,11 @@ namespace Reductech.EDR.Utilities.Processes.mutable
                 if (s is ImmutableProcess<Unit> ipu)
                     unitSteps.Add(ipu);
                 else
-                    return Result.Failure<ImmutableProcess, ErrorList>(new ErrorList(
+                    return Result.Failure<ImmutableProcess>(new ErrorList(
                         $"Process '{s.Name}' has result type {s.ResultType.Name} but members of a sequence should have result type void."));
             var immutableProcess = immutable.Sequence.CombineSteps(unitSteps, processSettings);
 
-            return Result.Success<ImmutableProcess, ErrorList>(immutableProcess);
+            return Result.Success<ImmutableProcess>(immutableProcess);
         }
 
         /// <inheritdoc />

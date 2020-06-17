@@ -29,10 +29,10 @@ namespace Reductech.EDR.Utilities.Processes.mutable
         public override string GetName() => ProcessNameHelper.GetAssertErrorName(Process?.GetName()??"");
 
         /// <inheritdoc />
-        public override Result<ImmutableProcess, ErrorList> TryFreeze(IProcessSettings processSettings)
+        public override Result<ImmutableProcess> TryFreeze(IProcessSettings processSettings)
         {
             if (Process == null)
-                return Result.Failure<ImmutableProcess, ErrorList>(new ErrorList($"{nameof(Process)} is null."));
+                return Result.Failure<ImmutableProcess>($"{nameof(Process)} is null.");
 
             var subProcessFreezeResult = Process.TryFreeze(processSettings);
 
@@ -42,10 +42,10 @@ namespace Reductech.EDR.Utilities.Processes.mutable
             {
                 var r = new immutable.AssertError( unitProcess);
 
-                return Result.Success<ImmutableProcess, ErrorList>(r);
+                return Result.Success<ImmutableProcess>(r);
             }
 
-            return Result.Failure<ImmutableProcess, ErrorList>(new ErrorList($"'{nameof(Process)}' must have return type void."));
+            return Result.Failure<ImmutableProcess>($"'{nameof(Process)}' must have return type void.");
         }
 
         /// <inheritdoc />

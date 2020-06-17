@@ -14,7 +14,7 @@ namespace Reductech.EDR.Utilities.Processes.mutable
     public class Loop : Process
     {
         /// <inheritdoc />
-        public override Result<ImmutableProcess, ErrorList> TryFreeze(IProcessSettings processSettings)
+        public override Result<ImmutableProcess> TryFreeze(IProcessSettings processSettings)
         {
             var initialErrors = new ErrorList();
 
@@ -23,23 +23,23 @@ namespace Reductech.EDR.Utilities.Processes.mutable
             if(For == null) initialErrors.Add($"{nameof(For)} is null");
 
             if (initialErrors.Any() || For == null || Do == null)
-                return Result.Failure<ImmutableProcess, ErrorList>(initialErrors);
+                return Result.Failure<ImmutableProcess>(initialErrors);
 
             var (_, isEnumerationFailure, elements, enumerationError) = For.TryGetElements(processSettings);
 
-            if (isEnumerationFailure) return Result.Failure<ImmutableProcess, ErrorList>(enumerationError);
+            if (isEnumerationFailure) return Result.Failure<ImmutableProcess>(enumerationError);
 
             return elements switch
             {
                 EagerEnumerationElements eagerEnumerationElements => GetFreezeResultFromEagerElements(processSettings,
                     eagerEnumerationElements, Do),
-                LazyCSVEnumerationElements lazyEnumerationElements => Result.Success<ImmutableProcess, ErrorList>(
+                LazyCSVEnumerationElements lazyEnumerationElements => Result.Success<ImmutableProcess>(
                     new LazyLoop(lazyEnumerationElements, Do, processSettings)),
-                _ => Result.Failure<ImmutableProcess, ErrorList>(new ErrorList("Could not handle enumeration elements"))
+                _ => Result.Failure<ImmutableProcess>(new ErrorList("Could not handle enumeration elements"))
             };
         }
 
-        internal static Result<ImmutableProcess, ErrorList> GetFreezeResultFromEagerElements(IProcessSettings processSettings, EagerEnumerationElements eagerEnumerationElements, Process @do)
+        internal static Result<ImmutableProcess> GetFreezeResultFromEagerElements(IProcessSettings processSettings, EagerEnumerationElements eagerEnumerationElements, Process @do)
         {
             var finalProcesses = new List<ImmutableProcess<Unit>>();
 
@@ -50,7 +50,7 @@ namespace Reductech.EDR.Utilities.Processes.mutable
                 var (_, isInjectionFailure, injectionError) = processInjector.Inject(subProcess);
 
                 if (isInjectionFailure)
-                    return Result.Failure<ImmutableProcess, ErrorList>(new ErrorList(injectionError));
+                    return Result.Failure<ImmutableProcess>(new ErrorList(injectionError));
 
                 var freezeResult = subProcess.TryFreeze(processSettings);
 
@@ -59,14 +59,14 @@ namespace Reductech.EDR.Utilities.Processes.mutable
                 if (freezeResult.Value is ImmutableProcess<Unit> unitProcess)
                     finalProcesses.Add(unitProcess);
                 else
-                { return Result.Failure<ImmutableProcess, ErrorList>(new ErrorList(
+                { return Result.Failure<ImmutableProcess>(new ErrorList(
                         $"Process '{freezeResult.Value.Name}' has result type {freezeResult.Value.ResultType.Name} but members of a loop should have result type void."));
                 }
             }
 
             var finalSequence = immutable.Sequence.CombineSteps(finalProcesses, processSettings);
 
-            return Result.Success<ImmutableProcess, ErrorList>(finalSequence);
+            return Result.Success<ImmutableProcess>(finalSequence);
         }
 
 

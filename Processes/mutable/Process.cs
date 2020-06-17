@@ -24,7 +24,7 @@ namespace Reductech.EDR.Utilities.Processes.mutable
         /// Executes this process. Should only be called if all conditions are met.
         /// </summary>
         /// <returns></returns>
-        public abstract Result<ImmutableProcess, ErrorList> TryFreeze(IProcessSettings processSettings);
+        public abstract Result<ImmutableProcess> TryFreeze(IProcessSettings processSettings);
 
         /// <summary>
         /// Gets special requirements for the process.

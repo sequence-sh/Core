@@ -9,13 +9,13 @@ namespace Reductech.EDR.Utilities.Processes.immutable.chain
     /// <summary>
     /// A link in a immutableChain.
     /// </summary>
-    public class ImmutableChainLink<TInput, TOutput, TFinal, TProcess> : IImmutableChainLink<TInput, TFinal>
-        where TProcess : ImmutableProcess<TOutput>
+    public class ImmutableChainLink<TInput, TOutput, TFinal, TImmutableProcess> : IImmutableChainLink<TInput, TFinal>
+        where TImmutableProcess : ImmutableProcess<TOutput>
     {
         /// <summary>
         /// Creates a new ImmutableChainLink
         /// </summary>
-        public ImmutableChainLink(ProcessFactory<TInput, TOutput, TProcess> processFactory, IImmutableChainLink<TOutput, TFinal> nextLink)
+        public ImmutableChainLink(ProcessFactory<TInput, TOutput, TImmutableProcess> processFactory, IImmutableChainLink<TOutput, TFinal> nextLink)
         {
             ProcessFactory = processFactory;
             NextLink = nextLink;
@@ -24,7 +24,7 @@ namespace Reductech.EDR.Utilities.Processes.immutable.chain
         /// <summary>
         /// Gets the process.
         /// </summary>
-        public ProcessFactory<TInput, TOutput, TProcess> ProcessFactory { get; }
+        public ProcessFactory<TInput, TOutput, TImmutableProcess> ProcessFactory { get; }
 
         /// <summary>
         /// The next link in the immutableChain.

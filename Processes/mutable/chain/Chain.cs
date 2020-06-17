@@ -43,32 +43,30 @@ namespace Reductech.EDR.Utilities.Processes.mutable.chain
         }
 
         /// <inheritdoc />
-        public override Result<ImmutableProcess, ErrorList> TryFreeze(IProcessSettings processSettings)
+        public override Result<ImmutableProcess> TryFreeze(IProcessSettings processSettings)
         {
-            var linkResult = TryFreeze<Unit>(processSettings);
+            var linkResult = TryCreateChainLink(processSettings);
 
             if (linkResult.IsFailure)
                 return linkResult.ConvertFailure<ImmutableProcess>();
 
-            return linkResult.Value.AsImmutableProcess();
+            return linkResult.Value;
         }
 
-        public Result<IImmutableChainLink<TInput, TFinal>, ErrorList> TryCreateChainLink<TInput, TFinal>(IProcessSettings processSettings)
+        public Result<IImmutableChainLink<TInput, TFinal>> TryCreateChainLink<TInput, TFinal>(IProcessSettings processSettings)
         {
             var chainLinkBuilder = Process.CreateChainLinkBuilder<TInput, TFinal>();
-
-            chainLinkBuilder.CreateChainLink(Into, processSettings, null);
 
 
             if (Into == null)
             {
-                var chainLink = chainLinkBuilder.CreateFinalChainLink(processSettings);
-                return Result.Success<IImmutableChainLink<TInput>, ErrorList>(chainLink);
+                var chainLink = chainLinkBuilder.CreateChainLink(null, processSettings, null);
+                return Result.Success<IImmutableChainLink<TInput>>(chainLink);
             }
             else
             {
                 var chainLink = chainLinkBuilder.CreateChainLink(Into, processSettings);
-                return Result.Success<IImmutableChainLink<TInput>, ErrorList>(chainLink);
+                return Result.Success<IImmutableChainLink<TInput>>(chainLink);
             }
         }
 

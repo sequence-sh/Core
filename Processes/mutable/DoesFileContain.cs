@@ -24,7 +24,7 @@ namespace Reductech.EDR.Utilities.Processes.mutable
         /// <summary>
         /// The file must contain this string.
         /// </summary>
-        
+
         [Required]
         [YamlMember]
         public string ExpectedContents { get; set; }
@@ -36,7 +36,7 @@ namespace Reductech.EDR.Utilities.Processes.mutable
         public override string GetName() => ProcessNameHelper.GetAssertFileContainsProcessName();
 
         /// <inheritdoc />
-        public override Result<ImmutableProcess, ErrorList> TryFreeze(IProcessSettings processSettings)
+        public override Result<ImmutableProcess> TryFreeze(IProcessSettings processSettings)
         {
             var errors = new List<string>();
 
@@ -44,9 +44,9 @@ namespace Reductech.EDR.Utilities.Processes.mutable
             if(string.IsNullOrWhiteSpace(ExpectedContents)) errors.Add("ExpectedContents is empty");
 
             if (errors.Any())
-                return Result.Failure<ImmutableProcess, ErrorList>(new ErrorList(errors));
+                return Result.Failure<ImmutableProcess>(string.Join("\r\n", errors));
 
-            return Result.Success<ImmutableProcess, ErrorList>(new immutable.DoesFileContain(FilePath, ExpectedContents));
+            return Result.Success<ImmutableProcess>(new immutable.DoesFileContain(FilePath, ExpectedContents));
         }
 
         /// <inheritdoc />

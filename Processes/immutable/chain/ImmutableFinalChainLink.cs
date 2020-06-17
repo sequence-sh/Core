@@ -8,14 +8,14 @@ namespace Reductech.EDR.Utilities.Processes.immutable.chain
     /// <summary>
     /// The final link in the immutableChain.
     /// </summary>
-    public class ImmutableFinalChainLink<TInput, TFinal, TProcess> : IImmutableChainLink<TInput, TFinal>
-        where TProcess : ImmutableProcess<TFinal>
+    public class ImmutableFinalChainLink<TInput, TFinal, TImmutableProcess> : IImmutableChainLink<TInput, TFinal>
+        where TImmutableProcess : ImmutableProcess<TFinal>
     {
         /// <summary>
         /// The final link in the immutableChain.
         /// </summary>
         /// <param name="processFactory"></param>
-        public ImmutableFinalChainLink(ProcessFactory<TInput, TFinal, TProcess> processFactory)
+        public ImmutableFinalChainLink(ProcessFactory<TInput, TFinal, TImmutableProcess> processFactory)
         {
             ProcessFactory = processFactory;
         }
@@ -23,18 +23,17 @@ namespace Reductech.EDR.Utilities.Processes.immutable.chain
         /// <summary>
         /// Gets the process.
         /// </summary>
-        public ProcessFactory<TInput, TFinal, TProcess> ProcessFactory { get; }
+        public ProcessFactory<TInput, TFinal, TImmutableProcess> ProcessFactory { get; }
 
         /// <inheritdoc />
         public async IAsyncEnumerable<IProcessOutput<TFinal>> Execute(TInput input)
         {
-            var (_, isFailure, process, errorList) = ProcessFactory.TryCreate(input);
+            var (_, isFailure, immutableProcess, error) = ProcessFactory.TryCreate(input);
 
             if (isFailure)
-                foreach (var errorLine in errorList)
-                    yield return ProcessOutput<TFinal>.Error(errorLine);
+                yield return ProcessOutput<TFinal>.Error(error);
             else
-                await foreach (var line in process.Execute())
+                await foreach (var line in immutableProcess.Execute())
                     yield return line;
         }
 

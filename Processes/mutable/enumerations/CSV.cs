@@ -20,7 +20,7 @@ namespace Reductech.EDR.Utilities.Processes.mutable.enumerations
             File, Text, Process   
         }
 
-        internal static Result<EagerEnumerationElements, ErrorList> ConvertDataTable 
+        internal static Result<EagerEnumerationElements> ConvertDataTable 
             (DataTable dataTable, IReadOnlyCollection<ColumnInjection> columnInjections, bool distinct)
         {
             var errors = new ErrorList();
@@ -38,7 +38,7 @@ namespace Reductech.EDR.Utilities.Processes.mutable.enumerations
             }
 
             if (errors.Any())
-                return Result.Failure<EagerEnumerationElements, ErrorList>(errors);
+                return Result.Failure<EagerEnumerationElements>(errors);
 
             foreach (var dataTableRow in dataTable.Rows.Cast<DataRow>())
             {
@@ -55,12 +55,12 @@ namespace Reductech.EDR.Utilities.Processes.mutable.enumerations
                 if(processInjector.IsValid && (usedInjectors == null || usedInjectors.Add(processInjector)))
                     injectors.Add(processInjector);
             }
-            return Result.Success<EagerEnumerationElements, ErrorList>(new EagerEnumerationElements(injectors));
+            return Result.Success<EagerEnumerationElements>(new EagerEnumerationElements(injectors));
         }
 
 
         /// <inheritdoc />
-        internal override Result<IEnumerationElements, ErrorList> TryGetElements(IProcessSettings processSettings)
+        internal override Result<IEnumerationElements> TryGetElements(IProcessSettings processSettings)
         {
             var sources = new List<CSVSource>();
 
@@ -69,16 +69,16 @@ namespace Reductech.EDR.Utilities.Processes.mutable.enumerations
                 if(CSVProcess != null) sources.Add(CSVSource.Process);
 
                 if (sources.Count == 0)
-                    return Result.Failure<IEnumerationElements, ErrorList>(new ErrorList
+                    return Result.Failure<IEnumerationElements>(new ErrorList
                         {$"Either {nameof(CSVFilePath)}, {nameof(CSVText)}, or {nameof(CSVProcess)} should be set."});
                 if (sources.Count > 1)
-                    return Result.Failure<IEnumerationElements, ErrorList>(new ErrorList
+                    return Result.Failure<IEnumerationElements>(new ErrorList
                     {
                         $"Only one of {nameof(CSVFilePath)}, {nameof(CSVText)}, and {nameof(CSVProcess)} may be set."
                     });
 
 
-                Result<DataTable, ErrorList> csvResult;
+                Result<DataTable> csvResult;
 
                 switch (sources.Single())
                 {
@@ -100,16 +100,16 @@ namespace Reductech.EDR.Utilities.Processes.mutable.enumerations
                             {
                                 var lazyElements = new LazyCSVEnumerationElements(stringProcess, Delimiter, CommentToken, HasFieldsEnclosedInQuotes, 
                                     ColumnInjections, Distinct);
-                                return Result.Success<IEnumerationElements, ErrorList>(lazyElements);
+                                return Result.Success<IEnumerationElements>(lazyElements);
                             }
                             default:
-                                return Result.Failure<IEnumerationElements, ErrorList>(new ErrorList
+                                return Result.Failure<IEnumerationElements>(new ErrorList
                                 {
                                     $"{nameof(CSVProcess)} should have type string"
                                 });
                         }
                     }
-                    default: return Result.Failure<IEnumerationElements, ErrorList>(new ErrorList
+                    default: return Result.Failure<IEnumerationElements>(new ErrorList
                     {
                         "Something went wrong getting CSV elements"
                     });

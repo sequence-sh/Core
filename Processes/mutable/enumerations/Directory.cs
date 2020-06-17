@@ -13,7 +13,7 @@ namespace Reductech.EDR.Utilities.Processes.mutable.enumerations
     public class Directory : Enumeration
     {
         /// <inheritdoc />
-        internal override Result<IEnumerationElements, ErrorList> TryGetElements(IProcessSettings processSettings)
+        internal override Result<IEnumerationElements> TryGetElements(IProcessSettings processSettings)
         {
             if (!System.IO.Directory.Exists(Path))
                 return Result.Failure<IEnumerationElements,ErrorList>(

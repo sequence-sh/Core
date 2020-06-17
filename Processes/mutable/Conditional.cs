@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Text;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Utilities.Processes.immutable;
 using YamlDotNet.Serialization;
@@ -39,14 +40,14 @@ namespace Reductech.EDR.Utilities.Processes.mutable
         public Process? Else { get; set; }
 
         /// <inheritdoc />
-        public override Result<ImmutableProcess, ErrorList> TryFreeze(IProcessSettings processSettings)
+        public override Result<ImmutableProcess> TryFreeze(IProcessSettings processSettings)
         {
-            var ifResult = If?.TryFreeze(processSettings)?? Result.Failure<ImmutableProcess, ErrorList>(new ErrorList($"'{nameof(If)}' must be set."));
-            var thenResult = Then?.TryFreeze(processSettings)?? Result.Failure<ImmutableProcess, ErrorList>(new ErrorList($"'{nameof(Then)}' must be set."));
+            var ifResult = If?.TryFreeze(processSettings)?? Result.Failure<ImmutableProcess>($"'{nameof(If)}' must be set.");
+            var thenResult = Then?.TryFreeze(processSettings)?? Result.Failure<ImmutableProcess>($"'{nameof(Then)}' must be set.");
 
-            var elseResult = Else?.TryFreeze(processSettings) ?? Result.Success<ImmutableProcess, ErrorList>(DoNothing.Instance);
+            var elseResult = Else?.TryFreeze(processSettings) ?? Result.Success(DoNothing.Instance);
 
-            var combinedResult = Result.Combine(ErrorList.Compose, ifResult, thenResult, elseResult);
+            var combinedResult = Result.Combine(new []{ifResult, thenResult, elseResult}, "\r\n");
 
             if (combinedResult.IsFailure) return combinedResult.ConvertFailure<ImmutableProcess>();
 
@@ -74,17 +75,17 @@ namespace Reductech.EDR.Utilities.Processes.mutable
 
 
 
-        private static Result<ImmutableProcess, ErrorList> CreateImmutableProcess(ImmutableProcess @if,
+        private static Result<ImmutableProcess> CreateImmutableProcess(ImmutableProcess @if,
             ImmutableProcess then, ImmutableProcess @else, IProcessSettings processSettings)
         {
-            var errors = new ErrorList();
+            var errors = new StringBuilder();
             if (then.ResultType != @else.ResultType)
-                errors.Add($"Then and Else should have the same type, but their types are '{then.ResultType}' and '{@else.ResultType}'");
+                errors.AppendLine($"Then and Else should have the same type, but their types are '{then.ResultType}' and '{@else.ResultType}'");
 
             if (@if is ImmutableProcess<bool> ifProcess)
             {
-                if(errors.Any())
-                    return Result.Failure<ImmutableProcess, ErrorList>(errors);
+                if(!string.IsNullOrWhiteSpace(errors.ToString()))
+                    return Result.Failure<ImmutableProcess>(errors.ToString());
 
                 ImmutableProcess ip;
 
@@ -95,20 +96,17 @@ namespace Reductech.EDR.Utilities.Processes.mutable
 #pragma warning disable CA1031 // Do not catch general exception types
                 catch (Exception e)
                 {
-                    errors.Add(e.Message);
-                    return Result.Failure<ImmutableProcess, ErrorList>(errors);
+                    errors.AppendLine(e.Message);
+                    return Result.Failure<ImmutableProcess>(errors.ToString());
                 }
 #pragma warning restore CA1031 // Do not catch general exception types
 
-
-
-
-                return Result.Success<ImmutableProcess, ErrorList>(ip);
+                return ip;
             }
             else
             {
-                errors.Add($"If process should have type bool");
-                return Result.Failure<ImmutableProcess, ErrorList>(errors);
+                errors.AppendLine($"If process should have type bool");
+                return Result.Failure<ImmutableProcess>(errors.ToString());
             }
         }
 

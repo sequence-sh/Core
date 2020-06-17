@@ -20,15 +20,4 @@ namespace Reductech.EDR.Utilities.Processes.immutable.chain
         /// </summary>
         string Name { get; }
     }
-
-    ///// <summary>
-    ///// A immutableChain link where the output type is not defined.
-    ///// </summary>
-    //public interface IImmutableChainLink<in TInput>
-    //{
-    //    /// <summary>
-    //    /// The name of this link in the immutableChain. Will include the names from subsequent links.
-    //    /// </summary>
-    //    string Name { get; }
-    //}
 }

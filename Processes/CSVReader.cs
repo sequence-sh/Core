@@ -10,24 +10,24 @@ namespace Reductech.EDR.Utilities.Processes
     internal static class CsvReader
     {
 
-        public static Result<DataTable, ErrorList> TryReadCSVFromFile(
+        public static Result<DataTable> TryReadCSVFromFile(
             string filePath, string delimiter, string? commentToken, bool enclosedInQuotes)
         {
             if(filePath == null)
-                return Result.Failure<DataTable, ErrorList>(new ErrorList {"File path is null."});
+                return Result.Failure<DataTable>(new ErrorList {"File path is null."});
             if (!File.Exists(filePath))
-                return Result.Failure<DataTable, ErrorList>(new ErrorList {$"'{filePath}' does not exist."});
+                return Result.Failure<DataTable>(new ErrorList {$"'{filePath}' does not exist."});
             
             using var csvParser = new TextFieldParser(filePath);
 
             return TryReadCSV(csvParser, delimiter, commentToken, enclosedInQuotes);
         }
 
-        public static Result<DataTable, ErrorList> TryReadCSVFromString(
+        public static Result<DataTable> TryReadCSVFromString(
             string csvString, string delimiter, string? commentToken, bool enclosedInQuotes)
         {
             if(csvString == null)
-                return Result.Failure<DataTable, ErrorList>(new ErrorList{"CSV string is null."});
+                return Result.Failure<DataTable>(new ErrorList{"CSV string is null."});
 
             var byteArray = Encoding.UTF8.GetBytes( csvString );
             var stream = new MemoryStream( byteArray );
@@ -37,7 +37,7 @@ namespace Reductech.EDR.Utilities.Processes
             return TryReadCSV(csvParser, delimiter, commentToken, enclosedInQuotes);
         }
 
-        public static Result<DataTable, ErrorList> TryReadCSV(TextFieldParser csvParser,
+        public static Result<DataTable> TryReadCSV(TextFieldParser csvParser,
             string delimiter, string? commentToken, bool enclosedInQuotes)
         {
             var errorsSoFar = new ErrorList();
@@ -58,7 +58,7 @@ namespace Reductech.EDR.Utilities.Processes
             }
             catch (MalformedLineException e)
             {
-                return Result.Failure<DataTable, ErrorList>(new ErrorList{e.Message});
+                return Result.Failure<DataTable>(new ErrorList{e.Message});
             }
 
             var rowNumber = 1;
@@ -87,9 +87,9 @@ namespace Reductech.EDR.Utilities.Processes
             }
 
             if (errorsSoFar.Any())
-                return Result.Failure<DataTable, ErrorList>(errorsSoFar);
+                return Result.Failure<DataTable>(errorsSoFar);
 
-            return Result.Success<DataTable, ErrorList>(dataTable);
+            return Result.Success<DataTable>(dataTable);
         }
 
         

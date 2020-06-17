@@ -40,16 +40,16 @@ namespace Reductech.EDR.Utilities.Processes.mutable
         }
 
         /// <inheritdoc />
-        public override Result<ImmutableProcess, ErrorList> TryFreeze(IProcessSettings processSettings)
+        public override Result<ImmutableProcess> TryFreeze(IProcessSettings processSettings)
         {
             var textFreezeResult = Text.TryFreeze(processSettings);
             if (textFreezeResult.IsFailure)
                 return textFreezeResult.ConvertFailure<ImmutableProcess>();
 
             if (textFreezeResult.Value is ImmutableProcess<string> ips)
-                return Result.Success<ImmutableProcess, ErrorList>(new immutable.WriteFile( ips, Folder, FileName));
+                return Result.Success<ImmutableProcess>(new immutable.WriteFile( ips, Folder, FileName));
 
-            return Result.Failure<ImmutableProcess, ErrorList>(new ErrorList(
+            return Result.Failure<ImmutableProcess>(new ErrorList(
                 $"'{nameof(textFreezeResult.Value)}' must have return type 'string'."));
 
         }
