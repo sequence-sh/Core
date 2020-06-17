@@ -20,6 +20,17 @@ namespace Reductech.EDR.Utilities.Processes.Tests
             throw new Exception();
         }
 
+        public static void AssertFailure<T>(this Result<T> r)
+        {
+            var (_, isFailure, _, _) = r;
+            if (isFailure) return;
+
+            Assert.Fail("Expected failure but got success.");
+
+            throw new Exception();
+        }
+
+
         public static T AssertSuccess<T, TE>(this Result<T, TE> r)
         {
             var (isSuccess, _, value, error) = r;
@@ -42,7 +53,6 @@ namespace Reductech.EDR.Utilities.Processes.Tests
                     results.Add(o.Text);
                 }
             }
-            
             CollectionAssert.IsEmpty(errors);
 
             return results;

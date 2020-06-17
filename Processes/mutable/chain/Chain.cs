@@ -46,6 +46,10 @@ namespace Reductech.EDR.Utilities.Processes.mutable.chain
         /// <inheritdoc />
         public override Result<ImmutableProcess<TFinal>> TryFreeze<TFinal>(IProcessSettings processSettings)
         {
+            if (Process == null)
+                return Result.Failure<ImmutableProcess<TFinal>>($"{nameof(Process)} must not be null");
+
+
             var linkResult = Process.TryCreateChainLinkBuilder<Unit, TFinal>().Bind(clb=> clb.CreateFirstChainLink(Into, processSettings));
 
             if (linkResult.IsFailure)
