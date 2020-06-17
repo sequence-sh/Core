@@ -6,6 +6,7 @@ using CSharpFunctionalExtensions;
 using NUnit.Framework;
 using Reductech.EDR.Utilities.Processes.immutable;
 using Reductech.EDR.Utilities.Processes.mutable;
+using Reductech.EDR.Utilities.Processes.mutable.chain;
 using Reductech.EDR.Utilities.Processes.mutable.enumerations;
 using Reductech.EDR.Utilities.Processes.mutable.injection;
 using Reductech.EDR.Utilities.Processes.output;
@@ -47,11 +48,10 @@ namespace Reductech.EDR.Utilities.Processes.Tests
 
             var actualList = new List<string>();
 
-            var process = l.TryFreeze(EmptySettings.Instance).AssertSuccess();
+            var process = l.TryFreeze<Unit>(EmptySettings.Instance).AssertSuccess();
 
-            var output = process.ExecuteUntyped();
 
-            await foreach (var o in output)
+            await foreach (var o in process.Execute())
             {
                 Assert.IsTrue(o.OutputType != OutputType.Error, o.Text);
 
@@ -85,11 +85,9 @@ namespace Reductech.EDR.Utilities.Processes.Tests
 
             var actualList = new List<string>();
 
-            var process = l.TryFreeze(EmptySettings.Instance).AssertSuccess();
+            var process = l.TryFreeze<Unit>(EmptySettings.Instance).AssertSuccess();
 
-            var output = process.ExecuteUntyped();
-
-            await foreach (var o in output)
+            await foreach (var o in process.Execute())
             {
                 Assert.IsTrue(o.OutputType != OutputType.Error, o.Text);
 
@@ -121,7 +119,7 @@ t,4,def",
                 }
             };
 
-            var freezeResult = l.TryFreeze(EmptySettings.Instance);
+            var freezeResult = l.TryFreeze<Unit>(EmptySettings.Instance);
 
             Assert.IsFalse(freezeResult.IsSuccess, "Should not have been able to freeze");
 
@@ -176,13 +174,24 @@ t,4,def",
             public override string GetName() => "Emit String";
 
             /// <inheritdoc />
-            public override Result<ImmutableProcess, ErrorList> TryFreeze(IProcessSettings processSettings)
+            public override Result<ImmutableProcess<TOutput>> TryFreeze<TOutput>(IProcessSettings processSettings)
             {
-                return Result.Success<ImmutableProcess, ErrorList>(new ImmutableEmitString(Output));
+                return TryConvertFreezeResult<TOutput, string>(TryFreeze());
+            }
+
+            private Result<ImmutableProcess<string>> TryFreeze()
+            {
+                return new ImmutableEmitString(Output);
             }
 
             /// <inheritdoc />
             public override IEnumerable<string> GetRequirements() => Enumerable.Empty<string>();
+
+            /// <inheritdoc />
+            public override Result<ChainLinkBuilder<TInput, TFinal>> TryCreateChainLinkBuilder<TInput, TFinal>()
+            {
+                return new ChainLinkBuilder<TInput, string, TFinal,ImmutableEmitString, EmitStringProcess>(this);
+            }
 
 #pragma warning disable CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
             public string Output { get; set; }

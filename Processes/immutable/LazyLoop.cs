@@ -49,16 +49,11 @@ namespace Reductech.EDR.Utilities.Processes.immutable
 
                     if (freezeResult.IsSuccess)
                     {
-                        if (freezeResult.Value is ImmutableProcess<Unit> unitProcess)
-                            await foreach (var r in unitProcess.Execute())
-                                yield return r;
-                        else
-                            yield return ProcessOutput<Unit>.Error(
-                                $"Process '{freezeResult.Value.Name}' has result type {freezeResult.Value.ResultType.Name} but members of a loop should have result type void.");
+                        await foreach (var r in freezeResult.Value.Execute())
+                            yield return r;
                     }
                     else
-                        foreach (var freezeError in freezeResult.Error)
-                            yield return ProcessOutput<Unit>.Error(freezeError);
+                        yield return ProcessOutput<Unit>.Error(freezeResult.Error);
                 }
             }
         }

@@ -2,6 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Utilities.Processes.immutable;
+using Reductech.EDR.Utilities.Processes.mutable.chain;
 using YamlDotNet.Serialization;
 
 namespace Reductech.EDR.Utilities.Processes.mutable
@@ -29,18 +30,29 @@ namespace Reductech.EDR.Utilities.Processes.mutable
         public override string GetName() => ProcessNameHelper.GetDeleteItemName();
 
         /// <inheritdoc />
-        public override Result<ImmutableProcess> TryFreeze(IProcessSettings processSettings)
+        public override Result<ImmutableProcess<TOutput>> TryFreeze<TOutput>(IProcessSettings processSettings)
+        {
+            return TryConvertFreezeResult<TOutput, Unit>(TryFreeze());
+        }
+
+        private Result<ImmutableProcess<Unit>> TryFreeze()
         {
             if (string.IsNullOrWhiteSpace(Path))
-                return Result.Failure<ImmutableProcess>("File Path is empty");
+                return Result.Failure<ImmutableProcess<Unit>>("File Path is empty");
 
-            return Result.Success<ImmutableProcess>(new immutable.DeleteItem(Path));
+            return new immutable.DeleteItem(Path);
         }
 
         /// <inheritdoc />
         public override IEnumerable<string> GetRequirements()
         {
             yield break;
+        }
+
+        /// <inheritdoc />
+        public override Result<ChainLinkBuilder<TInput, TFinal>> TryCreateChainLinkBuilder<TInput, TFinal>()
+        {
+            return new ChainLinkBuilder<TInput,Unit,TFinal,immutable.DeleteItem,DeleteItem>(this);
         }
     }
 }

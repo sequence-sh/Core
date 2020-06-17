@@ -16,15 +16,19 @@ namespace Reductech.EDR.Utilities.Processes.mutable.enumerations
         internal override Result<IEnumerationElements> TryGetElements(IProcessSettings processSettings)
         {
             if(Members == null)
-                return Result.Failure<IEnumerationElements,ErrorList>(new ErrorList( $"{nameof(Members)} is null"));
+                return Result.Failure<IEnumerationElements>($"{nameof(Members)} is null");
 
             var elements =
                 new EagerEnumerationElements(Members.Select(m => new ProcessInjector(Inject.Select(i => (m, i))))
                     .ToList());
-            return Result.Success<IEnumerationElements,ErrorList>(elements);
+
+            return elements;
         }
 
         internal override string Name => $"[{string.Join(", ", Members)}]";
+
+        /// <inheritdoc />
+        public override EnumerationStyle EnumerationStyle => EnumerationStyle.Eager;
 
         /// <summary>
         /// The elements to iterate over.

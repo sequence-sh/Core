@@ -5,6 +5,7 @@ using CSharpFunctionalExtensions;
 using NUnit.Framework;
 using Reductech.EDR.Utilities.Processes.immutable;
 using Reductech.EDR.Utilities.Processes.mutable;
+using Reductech.EDR.Utilities.Processes.mutable.chain;
 using Reductech.EDR.Utilities.Processes.output;
 using YamlDotNet.Serialization;
 using Conditional = Reductech.EDR.Utilities.Processes.mutable.Conditional;
@@ -33,8 +34,8 @@ namespace Reductech.EDR.Utilities.Processes.Tests
                 }
             };
 
-            var immutableProcess = process.TryFreeze(EmptySettings.Instance).AssertSuccess();
-            var results = immutableProcess.ExecuteUntyped();
+            var immutableProcess = process.TryFreeze<Unit>(EmptySettings.Instance).AssertSuccess();
+            var results = immutableProcess.Execute();
 
             var resultList = TestHelpers.AssertNoErrors(results).Result;
 
@@ -60,9 +61,9 @@ namespace Reductech.EDR.Utilities.Processes.Tests
                 }
             };
 
-            var immutableProcess = process.TryFreeze(EmptySettings.Instance).AssertSuccess();
+            var immutableProcess = process.TryFreeze<Unit>(EmptySettings.Instance).AssertSuccess();
 
-            var results = immutableProcess.ExecuteUntyped();
+            var results = immutableProcess.Execute();
 
             var resultList = TestHelpers.AssertNoErrors(results).Result;
 
@@ -77,9 +78,9 @@ namespace Reductech.EDR.Utilities.Processes.Tests
         public override string GetName() => Value.ToString();
 
         /// <inheritdoc />
-        public override Result<ImmutableProcess, ErrorList> TryFreeze(IProcessSettings processSettings)
+        public override Result<ImmutableProcess<TFinal>> TryFreeze<TFinal>(IProcessSettings processSettings)
         {
-            return Result.Success<ImmutableProcess, ErrorList>(new ImmutableReturnBool( Value));
+            return TryConvertFreezeResult<TFinal, bool>(new ImmutableReturnBool(Value));
         }
 
 
@@ -91,6 +92,12 @@ namespace Reductech.EDR.Utilities.Processes.Tests
         public override IEnumerable<string> GetRequirements()
         {
             yield break;
+        }
+
+        /// <inheritdoc />
+        public override Result<ChainLinkBuilder<TInput, TFinal>> TryCreateChainLinkBuilder<TInput, TFinal>()
+        {
+            throw new NotImplementedException();
         }
     }
 

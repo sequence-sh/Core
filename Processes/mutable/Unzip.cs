@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Utilities.Processes.immutable;
+using Reductech.EDR.Utilities.Processes.mutable.chain;
 using YamlDotNet.Serialization;
 
 namespace Reductech.EDR.Utilities.Processes.mutable
@@ -22,7 +23,7 @@ namespace Reductech.EDR.Utilities.Processes.mutable
 
 
         /// <summary>
-        /// The path to the directory in which to place the extracted files. 
+        /// The path to the directory in which to place the extracted files.
         /// </summary>
         [Required]
         [YamlMember(Order = 2)]
@@ -42,29 +43,39 @@ namespace Reductech.EDR.Utilities.Processes.mutable
         public override string GetName() => ProcessNameHelper.GetUnzipName();
 
         /// <inheritdoc />
-        public override Result<ImmutableProcess> TryFreeze(IProcessSettings processSettings)
+        public override Result<ImmutableProcess<TOutput>> TryFreeze<TOutput>(IProcessSettings processSettings)
+        {
+            return TryConvertFreezeResult<TOutput, Unit>(TryFreeze());
+        }
+
+        private Result<ImmutableProcess<Unit>> TryFreeze()
         {
             var errors = new List<string>();
 
-            if (string.IsNullOrWhiteSpace(ArchiveFilePath)) 
+            if (string.IsNullOrWhiteSpace(ArchiveFilePath))
                 errors.Add($"{nameof(ArchiveFilePath)} is empty.");
 
-            if (string.IsNullOrWhiteSpace(DestinationDirectory)) 
+            if (string.IsNullOrWhiteSpace(DestinationDirectory))
                 errors.Add($"{nameof(DestinationDirectory)} is empty.");
 
             if (errors.Any())
-                return Result.Failure<ImmutableProcess>(new ErrorList(errors));
+                return Result.Failure<ImmutableProcess<Unit>>(string.Join("\r\n", errors));
 
             var ip = new immutable.Unzip(ArchiveFilePath, DestinationDirectory, OverwriteFiles);
 
-            return Result.Success<ImmutableProcess>(ip);
-
+            return Result.Success<ImmutableProcess<Unit>>(ip);
         }
 
         /// <inheritdoc />
         public override IEnumerable<string> GetRequirements()
         {
             yield break;
+        }
+
+        /// <inheritdoc />
+        public override Result<ChainLinkBuilder<TInput, TFinal>> TryCreateChainLinkBuilder<TInput, TFinal>()
+        {
+            return new ChainLinkBuilder<TInput,Unit,TFinal,immutable.Unzip,Unzip>(this);
         }
     }
 }

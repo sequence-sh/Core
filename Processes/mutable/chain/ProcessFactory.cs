@@ -87,15 +87,15 @@ namespace Reductech.EDR.Utilities.Processes.mutable.chain
         /// <inheritdoc />
         protected override Result<TImmutableProcess> GetProcess(Unit input)
         {
-            var frozenProcess = Process.TryFreeze(ProcessSettings);
+            var frozenProcess = Process.TryFreeze<TOutput>(ProcessSettings);
 
             if (frozenProcess.IsFailure)
                 return frozenProcess.ConvertFailure<TImmutableProcess>();
 
             if (frozenProcess.Value is TImmutableProcess process)
-                return Result.Success<TImmutableProcess>(process);
+                return Result.Success(process);
 
-            return Result.Failure<TImmutableProcess>(new ErrorList($"'{frozenProcess.Value.Name}' does not have output type '{typeof(TOutput).Name}'."));
+            return Result.Failure<TImmutableProcess>($"'{frozenProcess.Value.Name}' does not have output type '{typeof(TOutput).Name}'.");
         }
     }
 
@@ -118,19 +118,19 @@ namespace Reductech.EDR.Utilities.Processes.mutable.chain
         /// <inheritdoc />
         protected override Result<TImmutableProcess> GetProcess(TInput input)
         {
-            var injectionResult = Injection.TryInject(input.ToString(), Process);
+            var injectionResult = Injection.TryInject(input?.ToString()??"", Process);//This is a bit dodgy - try and find a way around it
             if (injectionResult.IsFailure)
-                return Result.Failure<TImmutableProcess>(new ErrorList(injectionResult.Error));
+                return injectionResult.ConvertFailure<TImmutableProcess>();
 
-            var frozenProcess = Process.TryFreeze(ProcessSettings);
+            var frozenProcess = Process.TryFreeze<TOutput>(ProcessSettings);
 
             if (frozenProcess.IsFailure)
                 return frozenProcess.ConvertFailure<TImmutableProcess>();
 
             if (frozenProcess.Value is TImmutableProcess process)
-                return Result.Success<TImmutableProcess>(process);
+                return process;
 
-            return Result.Failure<TImmutableProcess>(new ErrorList($"'{frozenProcess.Value.Name}' does not have output type '{typeof(TOutput).Name}'."));
+            return Result.Failure<TImmutableProcess>($"'{frozenProcess.Value.Name}' does not have output type '{typeof(TOutput).Name}'.");
         }
 
         /// <summary>

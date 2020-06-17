@@ -4,6 +4,7 @@ using System.Linq;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Utilities.Processes.immutable;
 using Reductech.EDR.Utilities.Processes.immutable.chain;
+using Reductech.EDR.Utilities.Processes.mutable.injection;
 using YamlDotNet.Serialization;
 
 namespace Reductech.EDR.Utilities.Processes.mutable.chain
@@ -43,33 +44,17 @@ namespace Reductech.EDR.Utilities.Processes.mutable.chain
         }
 
         /// <inheritdoc />
-        public override Result<ImmutableProcess> TryFreeze(IProcessSettings processSettings)
+        public override Result<ImmutableProcess<TFinal>> TryFreeze<TFinal>(IProcessSettings processSettings)
         {
-            var linkResult = TryCreateChainLink(processSettings);
+            var linkResult = Process.TryCreateChainLinkBuilder<Unit, TFinal>().Bind(clb=> clb.CreateFirstChainLink(Into, processSettings));
 
             if (linkResult.IsFailure)
-                return linkResult.ConvertFailure<ImmutableProcess>();
+                return linkResult.ConvertFailure<ImmutableProcess<TFinal>>();
 
-            return linkResult.Value;
+            var process = new ImmutableChainProcess<TFinal>(linkResult.Value);
+
+            return process;
         }
-
-        public Result<IImmutableChainLink<TInput, TFinal>> TryCreateChainLink<TInput, TFinal>(IProcessSettings processSettings)
-        {
-            var chainLinkBuilder = Process.CreateChainLinkBuilder<TInput, TFinal>();
-
-
-            if (Into == null)
-            {
-                var chainLink = chainLinkBuilder.CreateChainLink(null, processSettings, null);
-                return Result.Success<IImmutableChainLink<TInput>>(chainLink);
-            }
-            else
-            {
-                var chainLink = chainLinkBuilder.CreateChainLink(Into, processSettings);
-                return Result.Success<IImmutableChainLink<TInput>>(chainLink);
-            }
-        }
-
 
         /// <inheritdoc />
         public override IEnumerable<string> GetRequirements()
@@ -79,5 +64,40 @@ namespace Reductech.EDR.Utilities.Processes.mutable.chain
                 Process.GetRequirements().Concat(Into.GetRequirements()).Distinct();
         }
 
+        /// <inheritdoc />
+        public override Result<ChainLinkBuilder<TInput, TFinal>> TryCreateChainLinkBuilder<TInput, TFinal>()
+        {
+            return Result.Failure<ChainLinkBuilder<TInput, TFinal>>("Cannot nest a chain within a chain");
+        }
+    }
+
+
+    /// <summary>
+    /// A step in the immutableChain other than the first.
+    /// </summary>
+    public class ChainLink : Chain
+    {
+        /// <summary>
+        /// The injection to inject the result of the previous method.
+        /// </summary>
+        [YamlMember(Order = 3)]
+        [Required]
+#pragma warning disable CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
+        public Injection Inject { get; set; }
+#pragma warning restore CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
+
+        /// <summary>
+        /// Creates a link in a chain.
+        /// </summary>
+        public Result<IImmutableChainLink<TInput, TFinal>> TryCreateChainLink<TInput, TFinal>(IProcessSettings processSettings)
+        {
+            if (Inject == null)
+                return Result.Failure<IImmutableChainLink<TInput, TFinal>>($"{nameof(Inject)} must be set.");
+
+            var chainLinkBuilder = Process.TryCreateChainLinkBuilder<TInput, TFinal>();
+            var chainLink = chainLinkBuilder.Bind(clb=> clb.CreateChainLink(Into, processSettings, Inject)) ;
+
+            return chainLink;
+        }
     }
 }

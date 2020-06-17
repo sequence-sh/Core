@@ -24,7 +24,7 @@ namespace Reductech.EDR.Utilities.Processes.mutable
         /// Executes this process. Should only be called if all conditions are met.
         /// </summary>
         /// <returns></returns>
-        public abstract Result<ImmutableProcess> TryFreeze(IProcessSettings processSettings);
+        public abstract Result<ImmutableProcess<TOutput>> TryFreeze<TOutput>(IProcessSettings processSettings);
 
         /// <summary>
         /// Gets special requirements for the process.
@@ -35,12 +35,29 @@ namespace Reductech.EDR.Utilities.Processes.mutable
         /// <summary>
         /// Creates a immutableChain link builder.
         /// </summary>
-        public abstract ChainLinkBuilder<TInput, TFinal> CreateChainLinkBuilder<TInput, TFinal>();
+        public abstract Result<ChainLinkBuilder<TInput, TFinal>> TryCreateChainLinkBuilder<TInput, TFinal>();
 
         /// <inheritdoc />
         public override string ToString()
         {
             return GetName();
         }
+
+        /// <summary>
+        /// Converts the result of freezing to the appropriate type.
+        /// </summary>
+        /// <typeparam name="TOutput"></typeparam>
+        /// <typeparam name="TActual"></typeparam>
+        /// <param name="result"></param>
+        /// <returns></returns>
+        protected Result<ImmutableProcess<TOutput>> TryConvertFreezeResult<TOutput, TActual>(Result<ImmutableProcess<TActual>> result)
+        {
+            if (result.IsFailure) return result.ConvertFailure<ImmutableProcess<TOutput>>();
+
+            if (result.Value is ImmutableProcess<TOutput> process) return process;
+
+            return Result.Failure<ImmutableProcess<TOutput>>($"{GetName()} has output type: '{typeof(TActual).Name}', not '{typeof(TOutput).Name}'.");
+        }
+
     }
 }

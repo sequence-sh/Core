@@ -2,6 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Utilities.Processes.immutable;
+using Reductech.EDR.Utilities.Processes.mutable.chain;
 using YamlDotNet.Serialization;
 
 namespace Reductech.EDR.Utilities.Processes.mutable
@@ -17,15 +18,26 @@ namespace Reductech.EDR.Utilities.Processes.mutable
         /// <inheritdoc />
         public override string GetName() => ProcessNameHelper.GetCreateDirectoryName();
 
-        /// <inheritdoc />
-        public override Result<ImmutableProcess> TryFreeze(IProcessSettings processSettings)
-        {
-            if (string.IsNullOrWhiteSpace(Path))
-                return Result.Failure<ImmutableProcess>("Path must not be empty");
 
-            return Result.Success<ImmutableProcess>(new immutable.CreateDirectory(Path));
+        /// <inheritdoc />
+        public override Result<ImmutableProcess<TOutput>> TryFreeze<TOutput>(IProcessSettings processSettings)
+        {
+            return TryConvertFreezeResult<TOutput, Unit>(TryFreeze());
         }
 
+        private Result<ImmutableProcess<Unit>> TryFreeze()
+        {
+            if (string.IsNullOrWhiteSpace(Path))
+                return Result.Failure<ImmutableProcess<Unit>>("Path must not be empty");
+
+            return Result.Success<ImmutableProcess<Unit>>(new immutable.CreateDirectory(Path));
+        }
+
+        /// <inheritdoc />
+        public override Result<ChainLinkBuilder<TInput, TFinal>> TryCreateChainLinkBuilder<TInput, TFinal>()
+        {
+            return new ChainLinkBuilder<TInput,Unit,TFinal,immutable.CreateDirectory,CreateDirectory>(this);
+        }
 
         /// <summary>
         /// The path to the directory to create.

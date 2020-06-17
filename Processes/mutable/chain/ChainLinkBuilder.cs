@@ -10,11 +10,18 @@ namespace Reductech.EDR.Utilities.Processes.mutable.chain
     /// </summary>
     public abstract class ChainLinkBuilder<TInput, TFinal>
     {
-
         /// <summary>
         /// Creates a chain link.
         /// </summary>
         public abstract Result<IImmutableChainLink<TInput, TFinal>> CreateChainLink(ChainLink? next, IProcessSettings processSettings, Injection injection);
+
+        /// <summary>
+        /// Creates the first link in a chain.
+        /// </summary>
+        /// <param name="next"></param>
+        /// <param name="processSettings"></param>
+        /// <returns></returns>
+        public abstract Result<IImmutableChainLink<Unit, TFinal>> CreateFirstChainLink(ChainLink? next, IProcessSettings processSettings);
     }
 
     /// <summary>
@@ -58,6 +65,30 @@ namespace Reductech.EDR.Utilities.Processes.mutable.chain
                 if (nextLink.IsFailure)
                     return nextLink.ConvertFailure<IImmutableChainLink<TInput, TFinal>>();
                 var thisLink = new ImmutableChainLink<TInput, TOutput, TFinal, TImmutableProcess>(processFactory, nextLink.Value);
+                return thisLink;
+            }
+        }
+
+        /// <inheritdoc />
+        public override Result<IImmutableChainLink<Unit, TFinal>> CreateFirstChainLink(ChainLink? next, IProcessSettings processSettings)
+        {
+            var processFactory = new UnitProcessFactory<TOutput,TImmutableProcess, TProcess>(Process, processSettings);
+
+            if (next == null)
+            {
+                var finalChainLink = new ImmutableFinalChainLink<Unit, TOutput, TImmutableProcess>(processFactory);
+
+                if (finalChainLink is IImmutableChainLink<Unit, TFinal> fcl)
+                    return Result.Success(fcl);
+                else
+                    return Result.Failure<IImmutableChainLink<Unit, TFinal>>($"{Process.GetName()} does not have return type {typeof(TFinal).Name}");
+            }
+            else
+            {
+                var nextLink = next.TryCreateChainLink<TOutput, TFinal>(processSettings);
+                if (nextLink.IsFailure)
+                    return nextLink.ConvertFailure<IImmutableChainLink<Unit, TFinal>>();
+                var thisLink = new ImmutableChainLink<Unit, TOutput, TFinal, TImmutableProcess>(processFactory, nextLink.Value);
                 return thisLink;
             }
         }

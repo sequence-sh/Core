@@ -2,6 +2,7 @@
 using System.Linq;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Utilities.Processes.immutable;
+using Reductech.EDR.Utilities.Processes.mutable.chain;
 using YamlDotNet.Serialization;
 
 namespace Reductech.EDR.Utilities.Processes.mutable
@@ -22,6 +23,7 @@ namespace Reductech.EDR.Utilities.Processes.mutable
     {
         /// <inheritdoc />
         protected override bool GetExpectedResult() => false;
+
     }
 
     /// <summary>
@@ -51,19 +53,23 @@ namespace Reductech.EDR.Utilities.Processes.mutable
         public override string GetName() => ProcessNameHelper.GetAssertBoolProcessName(ResultOf?.GetName() ?? "", GetExpectedResult());
 
         /// <inheritdoc />
-        public override Result<ImmutableProcess> TryFreeze(IProcessSettings processSettings)
+        public override Result<ImmutableProcess<TOutput>> TryFreeze<TOutput>(IProcessSettings processSettings)
+        {
+            var r = TryFreeze(processSettings);
+
+            return TryConvertFreezeResult<TOutput, Unit>(r);
+
+        }
+
+        private Result<ImmutableProcess<Unit>> TryFreeze(IProcessSettings processSettings)
         {
             var frozenProcess =
-                ResultOf?.TryFreeze(processSettings)??Result.Failure<ImmutableProcess>($"'{nameof(ResultOf)}' must be set.");
+                ResultOf?.TryFreeze<bool>(processSettings)??Result.Failure<ImmutableProcess<bool>>($"'{nameof(ResultOf)}' must be set.");
 
             if (frozenProcess.IsFailure)
-                return frozenProcess;
+                return frozenProcess.ConvertFailure<ImmutableProcess<Unit>>();
 
-            if (frozenProcess.Value is ImmutableProcess<bool> icp)
-                return Result.Success<ImmutableProcess>(new immutable.AssertBool( icp, GetExpectedResult()));
-
-            return Result.Failure<ImmutableProcess>($"'{nameof(ResultOf)}' must have return type 'bool'.");
-
+            return new immutable.AssertBool( frozenProcess.Value, GetExpectedResult());
         }
 
         /// <inheritdoc />
@@ -73,6 +79,12 @@ namespace Reductech.EDR.Utilities.Processes.mutable
                 return Enumerable.Empty<string>();
 
             return ResultOf.GetRequirements();
+        }
+
+        /// <inheritdoc />
+        public override Result<ChainLinkBuilder<TInput, TFinal>> TryCreateChainLinkBuilder<TInput, TFinal>()
+        {
+            return new ChainLinkBuilder<TInput,Unit,TFinal,immutable.AssertBool,AssertBool>(this);
         }
     }
 }

@@ -8,7 +8,8 @@ namespace Reductech.EDR.Utilities.Processes.immutable.chain
     /// <summary>
     /// The final link in the immutableChain.
     /// </summary>
-    public class ImmutableFinalChainLink<TInput, TFinal, TImmutableProcess> : IImmutableChainLink<TInput, TFinal>
+    public class ImmutableFinalChainLink<TInput, TFinal, TImmutableProcess> :
+        IImmutableChainLink<TInput, TFinal>
         where TImmutableProcess : ImmutableProcess<TFinal>
     {
         /// <summary>

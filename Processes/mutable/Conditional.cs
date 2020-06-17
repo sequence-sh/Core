@@ -1,10 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Utilities.Processes.immutable;
+using Reductech.EDR.Utilities.Processes.mutable.chain;
 using YamlDotNet.Serialization;
 
 namespace Reductech.EDR.Utilities.Processes.mutable
@@ -40,18 +40,33 @@ namespace Reductech.EDR.Utilities.Processes.mutable
         public Process? Else { get; set; }
 
         /// <inheritdoc />
-        public override Result<ImmutableProcess> TryFreeze(IProcessSettings processSettings)
+        public override Result<ImmutableProcess<TOutput>> TryFreeze<TOutput>(IProcessSettings processSettings)
         {
-            var ifResult = If?.TryFreeze(processSettings)?? Result.Failure<ImmutableProcess>($"'{nameof(If)}' must be set.");
-            var thenResult = Then?.TryFreeze(processSettings)?? Result.Failure<ImmutableProcess>($"'{nameof(Then)}' must be set.");
+            var ifResult = If?.TryFreeze<bool>(processSettings)?? Result.Failure<ImmutableProcess<bool>>($"'{nameof(If)}' must be set.");
+            var thenResult = Then?.TryFreeze<TOutput>(processSettings)?? Result.Failure<ImmutableProcess<TOutput>>($"'{nameof(Then)}' must be set.");
+            var elseResult1 = Else?.TryFreeze<TOutput>(processSettings);// ?? Result.Success(DoNothing.Instance);
 
-            var elseResult = Else?.TryFreeze(processSettings) ?? Result.Success(DoNothing.Instance);
+            Result<ImmutableProcess<TOutput>> elseResult;
+            if (elseResult1 == null)
+            {
+                if (DoNothing.Instance is ImmutableProcess<TOutput> doNothing)
+                    elseResult = doNothing;
+                else
+                    elseResult =
+                        Result.Failure<ImmutableProcess<TOutput>>(
+                            $"'{nameof(Else)}' must be set in typed conditionals.");
+            }
+            else elseResult = elseResult1.Value;
 
-            var combinedResult = Result.Combine(new []{ifResult, thenResult, elseResult}, "\r\n");
+            var combinedError = new StringBuilder();
+            if (ifResult.IsFailure) combinedError.AppendLine(ifResult.Error);
+            if (thenResult.IsFailure) combinedError.AppendLine(thenResult.Error);
+            if (elseResult.IsFailure) combinedError.AppendLine(elseResult.Error);
 
-            if (combinedResult.IsFailure) return combinedResult.ConvertFailure<ImmutableProcess>();
 
-            var createResult = CreateImmutableProcess(ifResult.Value, thenResult.Value, elseResult.Value, processSettings);
+            if (!string.IsNullOrWhiteSpace(combinedError.ToString())) return Result.Failure<ImmutableProcess<TOutput>>(combinedError.ToString());
+
+            var createResult = CreateImmutableConditional(ifResult.Value, thenResult.Value, elseResult.Value, processSettings);
 
             return createResult;
         }
@@ -67,50 +82,18 @@ namespace Reductech.EDR.Utilities.Processes.mutable
         }
 
         /// <inheritdoc />
+        public override Result<ChainLinkBuilder<TInput, TFinal>> TryCreateChainLinkBuilder<TInput, TFinal>()
+        {
+            return Result.Failure<ChainLinkBuilder<TInput, TFinal>>("Cannot nest a chain within a chain"); //TODO find a way to do this. It should be possible
+        }
+
+        /// <inheritdoc />
         public override string GetReturnTypeInfo() => "Returns the same type as the 'Then' and 'Else' processes. Returns void if there is no Else process.";
 
         /// <inheritdoc />
-        public override string GetName() =>
-            ProcessNameHelper.GetConditionalName(If.GetName(), Then.GetName(), Else?.GetName());
+        public override string GetName() => ProcessNameHelper.GetConditionalName(If.GetName(), Then.GetName(), Else?.GetName());
 
-
-
-        private static Result<ImmutableProcess> CreateImmutableProcess(ImmutableProcess @if,
-            ImmutableProcess then, ImmutableProcess @else, IProcessSettings processSettings)
-        {
-            var errors = new StringBuilder();
-            if (then.ResultType != @else.ResultType)
-                errors.AppendLine($"Then and Else should have the same type, but their types are '{then.ResultType}' and '{@else.ResultType}'");
-
-            if (@if is ImmutableProcess<bool> ifProcess)
-            {
-                if(!string.IsNullOrWhiteSpace(errors.ToString()))
-                    return Result.Failure<ImmutableProcess>(errors.ToString());
-
-                ImmutableProcess ip;
-
-                try
-                {
-                    ip = CreateImmutableConditional(ifProcess, then as dynamic, @else as dynamic, processSettings);
-                }
-#pragma warning disable CA1031 // Do not catch general exception types
-                catch (Exception e)
-                {
-                    errors.AppendLine(e.Message);
-                    return Result.Failure<ImmutableProcess>(errors.ToString());
-                }
-#pragma warning restore CA1031 // Do not catch general exception types
-
-                return ip;
-            }
-            else
-            {
-                errors.AppendLine($"If process should have type bool");
-                return Result.Failure<ImmutableProcess>(errors.ToString());
-            }
-        }
-
-        private static ImmutableProcess CreateImmutableConditional<T>(ImmutableProcess<bool> ifP, ImmutableProcess<T> thenP, ImmutableProcess<T> elseP, IProcessSettings processSettings)
+        private static ImmutableProcess<T> CreateImmutableConditional<T>(ImmutableProcess<bool> ifP, ImmutableProcess<T> thenP, ImmutableProcess<T> elseP, IProcessSettings processSettings)
         {
             var conditional =  new Conditional<T>(ifP, thenP, elseP);
 

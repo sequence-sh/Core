@@ -1,18 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Utilities.Processes.immutable;
-using Reductech.EDR.Utilities.Processes.mutable.injection;
-using Reductech.EDR.Utilities.Processes.output;
+using Reductech.EDR.Utilities.Processes.mutable.chain;
 using YamlDotNet.Serialization;
 
 namespace Reductech.EDR.Utilities.Processes.mutable
 {
-    
-
-
     /// <summary>
     /// Executes each step, one after the another.
     /// Will stop if a process fails.
@@ -43,25 +38,24 @@ namespace Reductech.EDR.Utilities.Processes.mutable
 
 
         /// <inheritdoc />
-        public override Result<ImmutableProcess> TryFreeze(IProcessSettings processSettings)
+        public override Result<ImmutableProcess<TOutput>> TryFreeze<TOutput>(IProcessSettings processSettings)
         {
-            var r = Steps.Select(s => s.TryFreeze(processSettings)).Combine(ErrorList.Compose);
+            return TryConvertFreezeResult<TOutput, Unit>(TryFreeze(processSettings));
+        }
+
+        private Result<ImmutableProcess<Unit>> TryFreeze(IProcessSettings processSettings)
+        {
+            var r = Steps.Select(s => s.TryFreeze<Unit>(processSettings))
+                .Combine("\r\n");
 
             if (r.IsFailure)
-                return r.ConvertFailure<ImmutableProcess>();
+                return r.ConvertFailure<ImmutableProcess<Unit>>();
 
             var steps = r.Value;
-            var unitSteps = new List<ImmutableProcess<Unit>>();
 
-            foreach (var s in steps)
-                if (s is ImmutableProcess<Unit> ipu)
-                    unitSteps.Add(ipu);
-                else
-                    return Result.Failure<ImmutableProcess>(new ErrorList(
-                        $"Process '{s.Name}' has result type {s.ResultType.Name} but members of a sequence should have result type void."));
-            var immutableProcess = immutable.Sequence.CombineSteps(unitSteps, processSettings);
+            var p = new immutable.Sequence(steps.ToList());
 
-            return Result.Success<ImmutableProcess>(immutableProcess);
+            return p;
         }
 
         /// <inheritdoc />
@@ -71,6 +65,12 @@ namespace Reductech.EDR.Utilities.Processes.mutable
                 return Enumerable.Empty<string>();
 
             return Steps.SelectMany(x => x.GetRequirements()).Distinct();
+        }
+
+        /// <inheritdoc />
+        public override Result<ChainLinkBuilder<TInput, TFinal>> TryCreateChainLinkBuilder<TInput, TFinal>()
+        {
+            return new ChainLinkBuilder<TInput,Unit,TFinal,immutable.Sequence,Sequence>(this);
         }
     }
 }

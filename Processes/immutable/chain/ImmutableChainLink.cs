@@ -43,11 +43,10 @@ namespace Reductech.EDR.Utilities.Processes.immutable.chain
         /// <inheritdoc />
         public async IAsyncEnumerable<IProcessOutput<TFinal>> Execute(TInput input)
         {
-            var (_, isFailure, process, errorList) = ProcessFactory.TryCreate(input);
+            var (_, isFailure, process, error) = ProcessFactory.TryCreate(input);
 
             if (isFailure)
-                foreach (var errorLine in errorList)
-                    yield return ProcessOutput<TFinal>.Error(errorLine);
+                yield return ProcessOutput<TFinal>.Error(error);
             else
             {
                 var failed = false;

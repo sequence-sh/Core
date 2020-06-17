@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Utilities.Processes.mutable;
 using Reductech.EDR.Utilities.Processes.output;
@@ -16,22 +15,16 @@ namespace Reductech.EDR.Utilities.Processes.immutable
         /// </summary>
         public abstract string Name { get; }
 
-        /// <summary>
-        /// The type of this process' final results.
-        /// </summary>
-        public abstract Type ResultType { get; }
+        ///// <summary>
+        ///// The type of this process' final results.
+        ///// </summary>
+        //public abstract Type ResultType { get; }
 
         /// <inheritdoc />
         public override string ToString()
         {
             return Name;
         }
-
-        /// <summary>
-        /// Executes this process.
-        /// </summary>
-        /// <returns></returns>
-        public abstract IAsyncEnumerable<IProcessOutput> ExecuteUntyped();
 
         /// <summary>
         /// The process converter for combining with this process.
@@ -44,11 +37,11 @@ namespace Reductech.EDR.Utilities.Processes.immutable
     /// </summary>
     public abstract class ImmutableProcess<T> : ImmutableProcess
     {
-        /// <inheritdoc />
-        public override IAsyncEnumerable<IProcessOutput> ExecuteUntyped()
-        {
-            return Execute();
-        }
+        ///// <inheritdoc />
+        //public override IAsyncEnumerable<IProcessOutput> ExecuteUntyped()
+        //{
+        //    return Execute();
+        //}
 
         /// <summary>
         /// Executes this process.
@@ -74,8 +67,5 @@ namespace Reductech.EDR.Utilities.Processes.immutable
 
             return Result.Failure<ImmutableProcess<Unit>>("Could not combine");
         }
-
-        /// <inheritdoc />
-        public override Type ResultType => typeof(T);
     }
 }

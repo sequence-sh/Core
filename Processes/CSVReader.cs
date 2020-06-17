@@ -1,4 +1,5 @@
-﻿using System.Data;
+﻿using System.Collections.Generic;
+using System.Data;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -14,10 +15,10 @@ namespace Reductech.EDR.Utilities.Processes
             string filePath, string delimiter, string? commentToken, bool enclosedInQuotes)
         {
             if(filePath == null)
-                return Result.Failure<DataTable>(new ErrorList {"File path is null."});
+                return Result.Failure<DataTable>("File path is null.");
             if (!File.Exists(filePath))
-                return Result.Failure<DataTable>(new ErrorList {$"'{filePath}' does not exist."});
-            
+                return Result.Failure<DataTable>($"'{filePath}' does not exist.");
+
             using var csvParser = new TextFieldParser(filePath);
 
             return TryReadCSV(csvParser, delimiter, commentToken, enclosedInQuotes);
@@ -27,11 +28,11 @@ namespace Reductech.EDR.Utilities.Processes
             string csvString, string delimiter, string? commentToken, bool enclosedInQuotes)
         {
             if(csvString == null)
-                return Result.Failure<DataTable>(new ErrorList{"CSV string is null."});
+                return Result.Failure<DataTable>("CSV string is null.");
 
             var byteArray = Encoding.UTF8.GetBytes( csvString );
             var stream = new MemoryStream( byteArray );
-            
+
             using var csvParser = new TextFieldParser(stream);
 
             return TryReadCSV(csvParser, delimiter, commentToken, enclosedInQuotes);
@@ -40,7 +41,7 @@ namespace Reductech.EDR.Utilities.Processes
         public static Result<DataTable> TryReadCSV(TextFieldParser csvParser,
             string delimiter, string? commentToken, bool enclosedInQuotes)
         {
-            var errorsSoFar = new ErrorList();
+            var errorsSoFar = new List<string>();
 
             if(commentToken != null)
                 csvParser.CommentTokens = new[] {commentToken};
@@ -58,7 +59,7 @@ namespace Reductech.EDR.Utilities.Processes
             }
             catch (MalformedLineException e)
             {
-                return Result.Failure<DataTable>(new ErrorList{e.Message});
+                return Result.Failure<DataTable>(e.Message);
             }
 
             var rowNumber = 1;
@@ -70,12 +71,9 @@ namespace Reductech.EDR.Utilities.Processes
                     var fields = csvParser.ReadFields();
 
                     if (fields.Length != dataTable.Columns.Count)
-                        errorsSoFar.Add(
-                            $"There were {fields.Length} columns in row {rowNumber} but we expected {dataTable.Columns.Count}.");
+                        errorsSoFar.Add($"There were {fields.Length} columns in row {rowNumber} but we expected {dataTable.Columns.Count}.");
                     else
-                    {
                         dataTable.Rows.Add(fields.ToArray<object>());
-                    }
 
                 }
                 catch (MalformedLineException e)
@@ -87,12 +85,9 @@ namespace Reductech.EDR.Utilities.Processes
             }
 
             if (errorsSoFar.Any())
-                return Result.Failure<DataTable>(errorsSoFar);
+                return Result.Failure<DataTable>(string.Join("\r\n", errorsSoFar));
 
-            return Result.Success<DataTable>(dataTable);
+            return Result.Success(dataTable);
         }
-
-        
-
     }
 }

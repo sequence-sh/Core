@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Utilities.Processes.immutable;
+using Reductech.EDR.Utilities.Processes.mutable.chain;
 using YamlDotNet.Serialization;
 
 namespace Reductech.EDR.Utilities.Processes.mutable
@@ -41,22 +42,25 @@ namespace Reductech.EDR.Utilities.Processes.mutable
         /// <inheritdoc />
         public override string GetName() => ProcessNameHelper.GetCheckNumberProcessName(Check?.GetName() ?? "");
 
+
         /// <inheritdoc />
-        public override Result<ImmutableProcess> TryFreeze(IProcessSettings processSettings)
+        public override Result<ImmutableProcess<TOutput>> TryFreeze<TOutput>(IProcessSettings processSettings)
+        {
+            return TryConvertFreezeResult<TOutput, bool>(TryFreeze(processSettings));
+        }
+
+        private Result<ImmutableProcess<bool>> TryFreeze(IProcessSettings processSettings)
         {
             if (Minimum == null && Maximum == null)
-                return Result.Failure<ImmutableProcess>($"Either {nameof(Minimum)} or {nameof(Maximum)} must be set.");
+                return Result.Failure<ImmutableProcess<bool>>($"Either {nameof(Minimum)} or {nameof(Maximum)} must be set.");
 
             var frozenCount =
-                Check?.TryFreeze(processSettings)??Result.Failure<ImmutableProcess>($"'{nameof(Check)}' must be set.");
+                Check?.TryFreeze<int>(processSettings)??Result.Failure<ImmutableProcess<int>>($"'{nameof(Check)}' must be set.");
 
             if (frozenCount.IsFailure)
-                return frozenCount;
+                return frozenCount.ConvertFailure<ImmutableProcess<bool>>();
 
-            if (frozenCount.Value is ImmutableProcess<int> icp)
-                return Result.Success<ImmutableProcess>(new immutable.CheckNumber(Minimum, Maximum, icp));
-
-            return Result.Failure<ImmutableProcess>($"'{nameof(Check)}' must have return type 'int'.");
+            return Result.Success<ImmutableProcess<bool>>(new immutable.CheckNumber(Minimum, Maximum, frozenCount.Value));
 
         }
 
@@ -67,6 +71,12 @@ namespace Reductech.EDR.Utilities.Processes.mutable
                 return Enumerable.Empty<string>();
 
             return Check.GetRequirements();
+        }
+
+        /// <inheritdoc />
+        public override Result<ChainLinkBuilder<TInput, TFinal>> TryCreateChainLinkBuilder<TInput, TFinal>()
+        {
+            return new ChainLinkBuilder<TInput,bool,TFinal,immutable.CheckNumber,CheckNumber>(this);
         }
     }
 }
