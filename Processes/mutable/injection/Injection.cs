@@ -69,5 +69,24 @@ namespace Reductech.EDR.Utilities.Processes.mutable.injection
 
             return Result.Success(s);
         }
+
+        /// <summary>
+        /// Injects the element into the process.
+        /// </summary>
+        internal Result TryInject(string element, Process process)
+        {
+            var pathResult = InjectionParser.TryParse(Property);
+
+            if (pathResult.IsFailure)
+                return pathResult;
+
+            var propertyValueResult = GetPropertyValue(element);
+            if (propertyValueResult.IsFailure)
+                return propertyValueResult;
+
+            var setResult = pathResult.Value.TrySetValue(process, propertyValueResult.Value);
+
+            return setResult;
+        }
     }
 }

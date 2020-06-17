@@ -34,16 +34,7 @@ namespace Reductech.EDR.Utilities.Processes.mutable.injection
         {
             foreach (var (element, injection) in _injections)
             {
-                var pathResult = InjectionParser.TryParse(injection.Property);
-
-                if (pathResult.IsFailure)
-                    return pathResult;
-
-                var propertyValueResult = injection.GetPropertyValue(element);
-                if (propertyValueResult.IsFailure)
-                    return propertyValueResult;
-
-                var setResult = pathResult.Value.TrySetValue(process, propertyValueResult.Value);
+                var setResult = injection.TryInject(element, process);
 
                 if (setResult.IsFailure)
                     return setResult;

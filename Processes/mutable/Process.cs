@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Utilities.Processes.immutable;
+using Reductech.EDR.Utilities.Processes.mutable.chain;
 
 namespace Reductech.EDR.Utilities.Processes.mutable
 {
@@ -30,6 +31,11 @@ namespace Reductech.EDR.Utilities.Processes.mutable
         /// </summary>
         /// <returns></returns>
         public abstract IEnumerable<string> GetRequirements();
+
+        /// <summary>
+        /// Creates a immutableChain link builder.
+        /// </summary>
+        public abstract ChainLinkBuilder<TInput, TFinal> CreateChainLinkBuilder<TInput, TFinal>();
 
         /// <inheritdoc />
         public override string ToString()
