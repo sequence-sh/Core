@@ -10,7 +10,7 @@ namespace Reductech.EDR.Utilities.Processes.Tests
         [Test]
         public async Task TestDeserializeDefaults()
         {
-            const string text = 
+            const string text =
 @"
 !Sequence
 Defaults: {Term: Word}    
@@ -25,9 +25,9 @@ Steps:
 
             var process = result.AssertSuccess();
 
-            var frozenProcess = process.TryFreeze(EmptySettings.Instance).AssertSuccess();
+            var frozenProcess = process.TryFreeze<Unit>(EmptySettings.Instance).AssertSuccess();
 
-            var lines = frozenProcess.ExecuteUntyped();
+            var lines = frozenProcess.Execute();
 
             var l = await TestHelpers.AssertNoErrors(lines);
 
@@ -38,7 +38,7 @@ Steps:
         [Test]
         public void TestDeserializeProperties()
         {
-            const string text = 
+            const string text =
                 @"
 !Loop
 For: !CSV
@@ -53,19 +53,19 @@ For: !CSV
 Do: !EmitProcess
     Number: 1
     Term: T";
-            
+
             var result = YamlHelper.TryMakeFromYaml(text);
 
             var process = result.AssertSuccess();
-            
+
             Assert.IsInstanceOf<Loop>(process);
 
             var loop = process as Loop;
             Assert.IsNotNull(loop);
-    
+
             // ReSharper disable ConstantConditionalAccessQualifier
             Assert.IsInstanceOf<CSV>(loop?.For);
-            
+
             var csv = loop?.For as CSV;
             Assert.IsNotNull(csv);
 
@@ -81,7 +81,7 @@ Do: !EmitProcess
         {
             //Ignore can either be a list or a property
 
-            const string text = 
+            const string text =
                 @"
 !EmitProcess
     Ignore:
@@ -95,9 +95,9 @@ Do: !EmitProcess
 
             var process = result.AssertSuccess();
 
-            var immutableProcess = process.TryFreeze(EmptySettings.Instance).AssertSuccess();
+            var immutableProcess = process.TryFreeze<Unit>(EmptySettings.Instance).AssertSuccess();
 
-            var lines = immutableProcess.ExecuteUntyped();
+            var lines = immutableProcess.Execute();
 
             var l = await TestHelpers.AssertNoErrors(lines);
 

@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Utilities.Processes.immutable;
+using Reductech.EDR.Utilities.Processes.mutable.chain;
 using YamlDotNet.Serialization;
 
 namespace Reductech.EDR.Utilities.Processes.mutable
@@ -33,10 +34,15 @@ namespace Reductech.EDR.Utilities.Processes.mutable
         public override string GetReturnTypeInfo() => nameof(Unit);
 
         /// <inheritdoc />
-        public override string GetName() =>ProcessNameHelper.GetRunExternalProcessName();
+        public override string GetName() => ProcessNameHelper.GetRunExternalProcessName();
 
         /// <inheritdoc />
-        public override Result<ImmutableProcess, ErrorList> TryFreeze(IProcessSettings processSettings)
+        public override Result<ImmutableProcess<TOutput>> TryFreeze<TOutput>(IProcessSettings processSettings)
+        {
+            return TryConvertFreezeResult<TOutput, Unit>(TryFreeze());
+        }
+
+        private Result<ImmutableProcess<Unit>> TryFreeze()
         {
             var errors = new List<string>();
 
@@ -48,17 +54,23 @@ namespace Reductech.EDR.Utilities.Processes.mutable
                 errors.Add($"'{ProcessPath}' does not exist.");
 
             if (errors.Any())
-                return Result.Failure<ImmutableProcess, ErrorList>(new ErrorList(errors));
-            
+                return Result.Failure<ImmutableProcess<Unit>>(string.Join("\r\n", errors));
+
             var ip = new immutable.RunExternalProcess(ProcessPath, Arguments);
 
-            return Result.Success<ImmutableProcess, ErrorList>(ip);
+            return Result.Success<ImmutableProcess<Unit>>(ip);
         }
 
         /// <inheritdoc />
         public override IEnumerable<string> GetRequirements()
         {
             yield break;
+        }
+
+        /// <inheritdoc />
+        public override Result<ChainLinkBuilder<TInput, TFinal>> TryCreateChainLinkBuilder<TInput, TFinal>()
+        {
+            return new ChainLinkBuilder<TInput,Unit,TFinal,immutable.RunExternalProcess,RunExternalProcess>(this);
         }
     }
 }

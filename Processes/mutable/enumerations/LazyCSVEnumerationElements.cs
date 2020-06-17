@@ -8,11 +8,11 @@ namespace Reductech.EDR.Utilities.Processes.mutable.enumerations
     internal class LazyCSVEnumerationElements : ImmutableProcess<EagerEnumerationElements>, IEnumerationElements
     {
         public LazyCSVEnumerationElements(
-            ImmutableProcess<string> subProcess, 
-            string delimiter, 
-            string? commentToken, 
-            bool hasFieldsEnclosedInQuotes, 
-            IReadOnlyCollection<ColumnInjection> columnInjections, 
+            ImmutableProcess<string> subProcess,
+            string delimiter,
+            string? commentToken,
+            bool hasFieldsEnclosedInQuotes,
+            IReadOnlyCollection<ColumnInjection> columnInjections,
             bool distinct)
         {
             _subProcess = subProcess;
@@ -58,30 +58,20 @@ namespace Reductech.EDR.Utilities.Processes.mutable.enumerations
                     var csvResult = CsvReader.TryReadCSVFromString(text, Delimiter, CommentToken, HasFieldsEnclosedInQuotes);
 
                     if (csvResult.IsFailure)
-                    {
-                        foreach (var eMessage in csvResult.Error)
-                            yield return ProcessOutput<EagerEnumerationElements>.Error(eMessage);
-                    }
+                        yield return ProcessOutput<EagerEnumerationElements>.Error(csvResult.Error);
                     else
                     {
                         using var dataTable = csvResult.Value;
 
                         var elementsResult = CSV.ConvertDataTable(dataTable, ColumnInjections, Distinct);
                         if (elementsResult.IsSuccess)
-                        {
                             yield return ProcessOutput<EagerEnumerationElements>.Success(elementsResult.Value);
-                        }
                         else
-                        {
-                            foreach (var eMessage in elementsResult.Error)
-                                yield return ProcessOutput<EagerEnumerationElements>.Error(eMessage);
-                        }
+                            yield return ProcessOutput<EagerEnumerationElements>.Error(elementsResult.Error);
                     }
                 }
                 else
-                {
                     yield return ProcessOutput<EagerEnumerationElements>.Error("A CSV string was not returned");
-                }
             }
         }
 

@@ -74,7 +74,7 @@ namespace Reductech.EDR.Utilities.Processes.mutable.injection
         private static readonly Regex PropertyRegex = new Regex(@"\.(?<propertyName>[_\-a-z]+)", RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
 
-        private static readonly Tokenizer<PathToken> Tokenizer 
+        private static readonly Tokenizer<PathToken> Tokenizer
             = new TokenizerBuilder<PathToken>()
                 .Match(Span.Regex(IndexerRegex.ToString(), IndexerRegex.Options), PathToken.Indexer)
                 .Match(Span.Regex(PropertyRegex.ToString(), IndexerRegex.Options), PathToken.DotProperty)
@@ -213,7 +213,7 @@ namespace Reductech.EDR.Utilities.Processes.mutable.injection
 
                 if (o == null)
                     return Result.Failure($"The type '{previous.GetType().Name}' cannot be accessed by index.");
-                
+
                 var parameterType = o.GetIndexParameters().FirstOrDefault()?.ParameterType;
                 if (parameterType == null)
                     return Result.Failure($"The type '{previous.GetType().Name}' cannot be accessed by index.");
@@ -248,11 +248,11 @@ namespace Reductech.EDR.Utilities.Processes.mutable.injection
 #pragma warning disable CA1031 // Do not catch general exception types
                 catch (Exception e)
                 {
-                    return Result.Failure(GetInnermostMessage(e)); 
+                    return Result.Failure(GetInnermostMessage(e));
                 }
 #pragma warning restore CA1031 // Do not catch general exception types
 
-                return nextObject == null ? 
+                return nextObject == null ?
                     Result.Failure($"Item at index '{Index}' is null.") :
                     NextStep.TrySetValue(nextObject, value);
 

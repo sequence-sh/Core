@@ -57,9 +57,9 @@ namespace Reductech.EDR.Utilities.Processes.Tests
 
             var realList = new List<string>();
 
-            var immutableProcess = forEachProcess.TryFreeze(_processSettings).AssertSuccess();
+            var immutableProcess = forEachProcess.TryFreeze<Unit>(_processSettings).AssertSuccess();
 
-            var output = immutableProcess.ExecuteUntyped();
+            var output = immutableProcess.Execute();
 
             await foreach (var o in output)
             {
@@ -99,13 +99,9 @@ namespace Reductech.EDR.Utilities.Processes.Tests
             };
 
             var realList = new List<string>();
+            var frozenProcess = forEachProcess.TryFreeze<Unit>(_processSettings).AssertSuccess();
 
-            var frozenProcess = forEachProcess.TryFreeze(_processSettings).AssertSuccess();
-
-
-            var output = frozenProcess.ExecuteUntyped();
-
-            await foreach (var o in output)
+            await foreach (var o in  frozenProcess.Execute())
             {
                 Assert.IsTrue(o.OutputType != OutputType.Error, o.Text);
                 if(o.OutputType == OutputType.Message)
@@ -140,7 +136,7 @@ namespace Reductech.EDR.Utilities.Processes.Tests
                 Do = new EmitProcess()
             };
 
-            var resultList = forEachProcess.TryFreeze(_processSettings).AssertSuccess().ExecuteUntyped();
+            var resultList = forEachProcess.TryFreeze<Unit>(_processSettings).AssertSuccess().Execute();
 
             var realList = await TestHelpers.AssertNoErrors(resultList);
 

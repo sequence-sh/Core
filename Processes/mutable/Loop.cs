@@ -1,8 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Text;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Utilities.Processes.immutable;
+using Reductech.EDR.Utilities.Processes.mutable.chain;
 using Reductech.EDR.Utilities.Processes.mutable.enumerations;
 using YamlDotNet.Serialization;
 
@@ -14,32 +17,37 @@ namespace Reductech.EDR.Utilities.Processes.mutable
     public class Loop : Process
     {
         /// <inheritdoc />
-        public override Result<ImmutableProcess, ErrorList> TryFreeze(IProcessSettings processSettings)
+        public override Result<ImmutableProcess<TOutput>> TryFreeze<TOutput>(IProcessSettings processSettings)
         {
-            var initialErrors = new ErrorList();
+            return TryConvertFreezeResult<TOutput, Unit>(TryFreeze(processSettings));
+        }
 
-            if (Do == null) initialErrors.Add($"{nameof(Do)} is null");
+        private Result<ImmutableProcess<Unit>> TryFreeze(IProcessSettings processSettings)
+        {
+            var initialErrors = new StringBuilder();
 
-            if(For == null) initialErrors.Add($"{nameof(For)} is null");
+            if (Do == null) initialErrors.AppendLine($"{nameof(Do)} is null");
 
-            if (initialErrors.Any() || For == null || Do == null)
-                return Result.Failure<ImmutableProcess, ErrorList>(initialErrors);
+            if(For == null) initialErrors.AppendLine($"{nameof(For)} is null");
+
+            if (!string.IsNullOrWhiteSpace(initialErrors.ToString())  || For == null || Do == null)
+                return Result.Failure<ImmutableProcess<Unit>>(initialErrors.ToString());
 
             var (_, isEnumerationFailure, elements, enumerationError) = For.TryGetElements(processSettings);
 
-            if (isEnumerationFailure) return Result.Failure<ImmutableProcess, ErrorList>(enumerationError);
+            if (isEnumerationFailure) return Result.Failure<ImmutableProcess<Unit>>(enumerationError);
 
             return elements switch
             {
                 EagerEnumerationElements eagerEnumerationElements => GetFreezeResultFromEagerElements(processSettings,
                     eagerEnumerationElements, Do),
-                LazyCSVEnumerationElements lazyEnumerationElements => Result.Success<ImmutableProcess, ErrorList>(
+                LazyCSVEnumerationElements lazyEnumerationElements => Result.Success<ImmutableProcess<Unit>>(
                     new LazyLoop(lazyEnumerationElements, Do, processSettings)),
-                _ => Result.Failure<ImmutableProcess, ErrorList>(new ErrorList("Could not handle enumeration elements"))
+                _ => Result.Failure<ImmutableProcess<Unit>>("Could not handle enumeration elements")
             };
         }
 
-        internal static Result<ImmutableProcess, ErrorList> GetFreezeResultFromEagerElements(IProcessSettings processSettings, EagerEnumerationElements eagerEnumerationElements, Process @do)
+        internal static Result<ImmutableProcess<Unit>> GetFreezeResultFromEagerElements(IProcessSettings processSettings, EagerEnumerationElements eagerEnumerationElements, Process @do)
         {
             var finalProcesses = new List<ImmutableProcess<Unit>>();
 
@@ -47,26 +55,32 @@ namespace Reductech.EDR.Utilities.Processes.mutable
             {
                 var subProcess = @do;
 
-                var (_, isInjectionFailure, injectionError) = processInjector.Inject(subProcess);
+                var injectionResult = processInjector.Inject(subProcess);
 
-                if (isInjectionFailure)
-                    return Result.Failure<ImmutableProcess, ErrorList>(new ErrorList(injectionError));
+                if (injectionResult.IsFailure)
+                    return injectionResult.ConvertFailure<ImmutableProcess<Unit>>();
 
-                var freezeResult = subProcess.TryFreeze(processSettings);
+                var freezeResult = subProcess.TryFreeze<Unit>(processSettings);
 
                 if (freezeResult.IsFailure) return freezeResult;
 
-                if (freezeResult.Value is ImmutableProcess<Unit> unitProcess)
-                    finalProcesses.Add(unitProcess);
-                else
-                { return Result.Failure<ImmutableProcess, ErrorList>(new ErrorList(
-                        $"Process '{freezeResult.Value.Name}' has result type {freezeResult.Value.ResultType.Name} but members of a loop should have result type void."));
-                }
+                finalProcesses.Add(freezeResult.Value);
             }
 
             var finalSequence = immutable.Sequence.CombineSteps(finalProcesses, processSettings);
 
-            return Result.Success<ImmutableProcess, ErrorList>(finalSequence);
+            return finalSequence;
+        }
+
+        /// <inheritdoc />
+        public override Result<ChainLinkBuilder<TInput, TFinal>> TryCreateChainLinkBuilder<TInput, TFinal>()
+        {
+            return For.EnumerationStyle switch
+            {
+                EnumerationStyle.Lazy => new ChainLinkBuilder<TInput, Unit, TFinal, LazyLoop, Loop>(this),
+                EnumerationStyle.Eager => new ChainLinkBuilder<TInput, Unit, TFinal, immutable.Sequence, Loop>(this),
+                _ => throw new ArgumentOutOfRangeException()
+            };
         }
 
 
@@ -75,12 +89,11 @@ namespace Reductech.EDR.Utilities.Processes.mutable
 
         /// <inheritdoc />
         public override string GetName() => ProcessNameHelper.GetLoopName(For.Name, Do.GetName());
-        
+
         /// <summary>
         /// The enumeration to iterate through.
         /// </summary>
         [Required]
-        
         [YamlMember(Order = 2)]
 #pragma warning disable CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
         public Enumeration For { get; set; }
@@ -89,11 +102,9 @@ namespace Reductech.EDR.Utilities.Processes.mutable
         /// The process to run once for each element.
         /// </summary>
         [Required]
-        
         [YamlMember(Order = 5)]
         public Process Do { get; set; }
 #pragma warning restore CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
-
 
         /// <inheritdoc />
         public override string ToString()

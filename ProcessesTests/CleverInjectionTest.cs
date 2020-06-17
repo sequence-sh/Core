@@ -4,6 +4,7 @@ using CSharpFunctionalExtensions;
 using NUnit.Framework;
 using Reductech.EDR.Utilities.Processes.immutable;
 using Reductech.EDR.Utilities.Processes.mutable;
+using Reductech.EDR.Utilities.Processes.mutable.chain;
 using Reductech.EDR.Utilities.Processes.mutable.injection;
 using YamlDotNet.Serialization;
 using List = Reductech.EDR.Utilities.Processes.mutable.enumerations.List;
@@ -77,7 +78,7 @@ namespace Reductech.EDR.Utilities.Processes.Tests
             {
                 ("Pink", new Injection
                 {
-                    Property = $"{nameof(Loop.For)}.{nameof(List.Members)}[0]" 
+                    Property = $"{nameof(Loop.For)}.{nameof(List.Members)}[0]"
                 } )
             });
 
@@ -91,8 +92,8 @@ namespace Reductech.EDR.Utilities.Processes.Tests
         [Test]
         public void TestDictionaryAccessInjection()
         {
-            var process = new DictionaryTestProcess()
-            { 
+            var process = new DictionaryTestProcess
+            {
                 Parameters = new Dictionary<string, string>{{"Arg1", "Blue"}}
             };
 
@@ -100,7 +101,7 @@ namespace Reductech.EDR.Utilities.Processes.Tests
             {
                 ("Pink", new Injection
                 {
-                    Property = $"{nameof(DictionaryTestProcess.Parameters)}[Arg1]" 
+                    Property = $"{nameof(DictionaryTestProcess.Parameters)}[Arg1]"
                 } )
             });
 
@@ -128,15 +129,21 @@ namespace Reductech.EDR.Utilities.Processes.Tests
             }
 
             /// <inheritdoc />
-            public override Result<ImmutableProcess, ErrorList> TryFreeze(IProcessSettings processSettings)
+            public override Result<ImmutableProcess<TOutput>> TryFreeze<TOutput>(IProcessSettings processSettings)
             {
-                throw new System.NotImplementedException(); //Don't need this for this test
+                throw new System.NotImplementedException();
             }
 
             /// <inheritdoc />
             public override IEnumerable<string> GetRequirements()
             {
                 yield break;
+            }
+
+            /// <inheritdoc />
+            public override Result<ChainLinkBuilder<TInput, TFinal>> TryCreateChainLinkBuilder<TInput, TFinal>()
+            {
+                throw new System.NotImplementedException();
             }
         }
 

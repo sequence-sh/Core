@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Utilities.Processes.immutable;
+using Reductech.EDR.Utilities.Processes.mutable.chain;
 using YamlDotNet.Serialization;
 
 namespace Reductech.EDR.Utilities.Processes.mutable
@@ -24,7 +25,7 @@ namespace Reductech.EDR.Utilities.Processes.mutable
         /// <summary>
         /// The file must contain this string.
         /// </summary>
-        
+
         [Required]
         [YamlMember]
         public string ExpectedContents { get; set; }
@@ -35,8 +36,14 @@ namespace Reductech.EDR.Utilities.Processes.mutable
         /// <inheritdoc />
         public override string GetName() => ProcessNameHelper.GetAssertFileContainsProcessName();
 
+
         /// <inheritdoc />
-        public override Result<ImmutableProcess, ErrorList> TryFreeze(IProcessSettings processSettings)
+        public override Result<ImmutableProcess<TOutput>> TryFreeze<TOutput>(IProcessSettings processSettings)
+        {
+            return TryConvertFreezeResult<TOutput, bool>(TryFreeze());
+        }
+
+        private Result<ImmutableProcess<bool>> TryFreeze()
         {
             var errors = new List<string>();
 
@@ -44,9 +51,15 @@ namespace Reductech.EDR.Utilities.Processes.mutable
             if(string.IsNullOrWhiteSpace(ExpectedContents)) errors.Add("ExpectedContents is empty");
 
             if (errors.Any())
-                return Result.Failure<ImmutableProcess, ErrorList>(new ErrorList(errors));
+                return Result.Failure<ImmutableProcess<bool>>(string.Join("\r\n", errors));
 
-            return Result.Success<ImmutableProcess, ErrorList>(new immutable.DoesFileContain(FilePath, ExpectedContents));
+            return Result.Success<ImmutableProcess<bool>>(new immutable.DoesFileContain(FilePath, ExpectedContents));
+        }
+
+        /// <inheritdoc />
+        public override Result<ChainLinkBuilder<TInput, TFinal>> TryCreateChainLinkBuilder<TInput, TFinal>()
+        {
+            return new ChainLinkBuilder<TInput,bool,TFinal,immutable.DoesFileContain,DoesFileContain>(this);
         }
 
         /// <inheritdoc />

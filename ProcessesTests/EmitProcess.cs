@@ -3,6 +3,7 @@ using CSharpFunctionalExtensions;
 using JetBrains.Annotations;
 using Reductech.EDR.Utilities.Processes.immutable;
 using Reductech.EDR.Utilities.Processes.mutable;
+using Reductech.EDR.Utilities.Processes.mutable.chain;
 using Reductech.EDR.Utilities.Processes.output;
 using YamlDotNet.Serialization;
 
@@ -27,15 +28,23 @@ namespace Reductech.EDR.Utilities.Processes.Tests
         }
 
         /// <inheritdoc />
-        public override Result<ImmutableProcess, ErrorList> TryFreeze(IProcessSettings processSettings)
+        public override Result<ImmutableProcess<TFinal>> TryFreeze<TFinal>(IProcessSettings processSettings)
         {
-            return Result.Success<ImmutableProcess, ErrorList>(new ImmutableEmitProcess( Term, Number));
+            var iep = new ImmutableEmitProcess(Term, Number);
+
+            return TryConvertFreezeResult<TFinal, Unit>(iep) ;
         }
 
         /// <inheritdoc />
         public override IEnumerable<string> GetRequirements()
         {
             yield break;
+        }
+
+        /// <inheritdoc />
+        public override Result<ChainLinkBuilder<TInput, TFinal>> TryCreateChainLinkBuilder<TInput, TFinal>()
+        {
+            return new ChainLinkBuilder<TInput, Unit,TFinal, ImmutableEmitProcess, EmitProcess>(this);
         }
     }
 
