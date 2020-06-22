@@ -129,7 +129,7 @@ namespace Reductech.EDR.Utilities.Processes.Tests
             }
 
             /// <inheritdoc />
-            public override Result<ImmutableProcess<TOutput>> TryFreeze<TOutput>(IProcessSettings processSettings)
+            public override Result<IImmutableProcess<TOutput>> TryFreeze<TOutput>(IProcessSettings processSettings)
             {
                 throw new System.NotImplementedException();
             }

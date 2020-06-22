@@ -20,17 +20,17 @@ namespace Reductech.EDR.Utilities.Processes.mutable
 
 
         /// <inheritdoc />
-        public override Result<ImmutableProcess<TOutput>> TryFreeze<TOutput>(IProcessSettings processSettings)
+        public override Result<IImmutableProcess<TOutput>> TryFreeze<TOutput>(IProcessSettings processSettings)
         {
             return TryConvertFreezeResult<TOutput, Unit>(TryFreeze());
         }
 
-        private Result<ImmutableProcess<Unit>> TryFreeze()
+        private Result<IImmutableProcess<Unit>> TryFreeze()
         {
             if (string.IsNullOrWhiteSpace(Path))
-                return Result.Failure<ImmutableProcess<Unit>>("Path must not be empty");
+                return Result.Failure<IImmutableProcess<Unit>>("Path must not be empty");
 
-            return Result.Success<ImmutableProcess<Unit>>(new immutable.CreateDirectory(Path));
+            return Result.Success<IImmutableProcess<Unit>>(new immutable.CreateDirectory(Path));
         }
 
         /// <inheritdoc />

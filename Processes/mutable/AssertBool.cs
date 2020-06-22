@@ -53,7 +53,7 @@ namespace Reductech.EDR.Utilities.Processes.mutable
         public override string GetName() => ProcessNameHelper.GetAssertBoolProcessName(ResultOf?.GetName() ?? "", GetExpectedResult());
 
         /// <inheritdoc />
-        public override Result<ImmutableProcess<TOutput>> TryFreeze<TOutput>(IProcessSettings processSettings)
+        public override Result<IImmutableProcess<TOutput>> TryFreeze<TOutput>(IProcessSettings processSettings)
         {
             var r = TryFreeze(processSettings);
 
@@ -61,13 +61,13 @@ namespace Reductech.EDR.Utilities.Processes.mutable
 
         }
 
-        private Result<ImmutableProcess<Unit>> TryFreeze(IProcessSettings processSettings)
+        private Result<IImmutableProcess<Unit>> TryFreeze(IProcessSettings processSettings)
         {
             var frozenProcess =
-                ResultOf?.TryFreeze<bool>(processSettings)??Result.Failure<ImmutableProcess<bool>>($"'{nameof(ResultOf)}' must be set.");
+                ResultOf?.TryFreeze<bool>(processSettings)??Result.Failure<IImmutableProcess<bool>>($"'{nameof(ResultOf)}' must be set.");
 
             if (frozenProcess.IsFailure)
-                return frozenProcess.ConvertFailure<ImmutableProcess<Unit>>();
+                return frozenProcess.ConvertFailure<IImmutableProcess<Unit>>();
 
             return new immutable.AssertBool( frozenProcess.Value, GetExpectedResult());
         }

@@ -17,12 +17,14 @@ namespace Reductech.EDR.Utilities.Processes.mutable
     public class Loop : Process
     {
         /// <inheritdoc />
-        public override Result<ImmutableProcess<TOutput>> TryFreeze<TOutput>(IProcessSettings processSettings)
+        public override Result<IImmutableProcess<TOutput>> TryFreeze<TOutput>(IProcessSettings processSettings)
         {
-            return TryConvertFreezeResult<TOutput, Unit>(TryFreeze(processSettings));
+            var freezeResult = TryFreeze(processSettings);
+
+            return TryConvertFreezeResult<TOutput, Unit>(freezeResult);
         }
 
-        private Result<ImmutableProcess<Unit>> TryFreeze(IProcessSettings processSettings)
+        private Result<IImmutableProcess<Unit>> TryFreeze(IProcessSettings processSettings)
         {
             var initialErrors = new StringBuilder();
 
@@ -31,25 +33,25 @@ namespace Reductech.EDR.Utilities.Processes.mutable
             if(For == null) initialErrors.AppendLine($"{nameof(For)} is null");
 
             if (!string.IsNullOrWhiteSpace(initialErrors.ToString())  || For == null || Do == null)
-                return Result.Failure<ImmutableProcess<Unit>>(initialErrors.ToString());
+                return Result.Failure<IImmutableProcess<Unit>>(initialErrors.ToString());
 
             var (_, isEnumerationFailure, elements, enumerationError) = For.TryGetElements(processSettings);
 
-            if (isEnumerationFailure) return Result.Failure<ImmutableProcess<Unit>>(enumerationError);
+            if (isEnumerationFailure) return Result.Failure<IImmutableProcess<Unit>>(enumerationError);
 
             return elements switch
             {
                 EagerEnumerationElements eagerEnumerationElements => GetFreezeResultFromEagerElements(processSettings,
                     eagerEnumerationElements, Do),
-                LazyCSVEnumerationElements lazyEnumerationElements => Result.Success<ImmutableProcess<Unit>>(
+                LazyCSVEnumerationElements lazyEnumerationElements => Result.Success<IImmutableProcess<Unit>>(
                     new LazyLoop(lazyEnumerationElements, Do, processSettings)),
-                _ => Result.Failure<ImmutableProcess<Unit>>("Could not handle enumeration elements")
+                _ => Result.Failure<IImmutableProcess<Unit>>("Could not handle enumeration elements")
             };
         }
 
-        internal static Result<ImmutableProcess<Unit>> GetFreezeResultFromEagerElements(IProcessSettings processSettings, EagerEnumerationElements eagerEnumerationElements, Process @do)
+        internal static Result<IImmutableProcess<Unit>> GetFreezeResultFromEagerElements(IProcessSettings processSettings, EagerEnumerationElements eagerEnumerationElements, Process @do)
         {
-            var finalProcesses = new List<ImmutableProcess<Unit>>();
+            var finalProcesses = new List<IImmutableProcess<Unit>>();
 
             foreach (var processInjector in eagerEnumerationElements.Injectors)
             {
@@ -58,7 +60,7 @@ namespace Reductech.EDR.Utilities.Processes.mutable
                 var injectionResult = processInjector.Inject(subProcess);
 
                 if (injectionResult.IsFailure)
-                    return injectionResult.ConvertFailure<ImmutableProcess<Unit>>();
+                    return injectionResult.ConvertFailure<IImmutableProcess<Unit>>();
 
                 var freezeResult = subProcess.TryFreeze<Unit>(processSettings);
 
@@ -69,20 +71,19 @@ namespace Reductech.EDR.Utilities.Processes.mutable
 
             var finalSequence = immutable.Sequence.CombineSteps(finalProcesses, processSettings);
 
-            return finalSequence;
+            return Result.Success(finalSequence);
         }
 
         /// <inheritdoc />
         public override Result<ChainLinkBuilder<TInput, TFinal>> TryCreateChainLinkBuilder<TInput, TFinal>()
         {
-            return For.EnumerationStyle switch
+            return For.GetEnumerationStyle() switch
             {
                 EnumerationStyle.Lazy => new ChainLinkBuilder<TInput, Unit, TFinal, LazyLoop, Loop>(this),
                 EnumerationStyle.Eager => new ChainLinkBuilder<TInput, Unit, TFinal, immutable.Sequence, Loop>(this),
                 _ => throw new ArgumentOutOfRangeException()
             };
         }
-
 
         /// <inheritdoc />
         public override string GetReturnTypeInfo() => nameof(Unit);

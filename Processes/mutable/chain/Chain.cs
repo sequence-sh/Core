@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using CSharpFunctionalExtensions;
@@ -33,7 +34,11 @@ namespace Reductech.EDR.Utilities.Processes.mutable.chain
         public override string GetReturnTypeInfo()
         {
             if (Into == null)
-                return Process.GetReturnTypeInfo();
+            {
+                if (Process == null)
+                    return "The same as the type of the final process in the chain.";
+                else return Process.GetReturnTypeInfo();
+            }
             else return Into.GetReturnTypeInfo();
         }
 
@@ -44,16 +49,16 @@ namespace Reductech.EDR.Utilities.Processes.mutable.chain
         }
 
         /// <inheritdoc />
-        public override Result<ImmutableProcess<TFinal>> TryFreeze<TFinal>(IProcessSettings processSettings)
+        public override Result<IImmutableProcess<TFinal>> TryFreeze<TFinal>(IProcessSettings processSettings)
         {
             if (Process == null)
-                return Result.Failure<ImmutableProcess<TFinal>>($"{nameof(Process)} must not be null");
+                return Result.Failure<IImmutableProcess<TFinal>>($"{nameof(Process)} must not be null");
 
 
             var linkResult = Process.TryCreateChainLinkBuilder<Unit, TFinal>().Bind(clb=> clb.CreateFirstChainLink(Into, processSettings));
 
             if (linkResult.IsFailure)
-                return linkResult.ConvertFailure<ImmutableProcess<TFinal>>();
+                return linkResult.ConvertFailure<IImmutableProcess<TFinal>>();
 
             var process = new ImmutableChainProcess<TFinal>(linkResult.Value);
 
@@ -63,6 +68,8 @@ namespace Reductech.EDR.Utilities.Processes.mutable.chain
         /// <inheritdoc />
         public override IEnumerable<string> GetRequirements()
         {
+            if (Process == null) return Enumerable.Empty<string>();
+
             return Into == null ?
                 Process.GetRequirements() :
                 Process.GetRequirements().Concat(Into.GetRequirements()).Distinct();

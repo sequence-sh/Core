@@ -15,10 +15,10 @@ namespace Reductech.EDR.Utilities.Processes.immutable
         /// <summary>
         /// Steps that make up this sequence.
         /// </summary>
-        public readonly IReadOnlyCollection<ImmutableProcess<Unit>> Steps;
+        public readonly IReadOnlyCollection<IImmutableProcess<Unit>> Steps;
 
         /// <inheritdoc />
-        public Sequence(IReadOnlyCollection<ImmutableProcess<Unit>> steps)
+        public Sequence(IReadOnlyCollection<IImmutableProcess<Unit>> steps)
         {
             Steps = steps;
         }
@@ -56,7 +56,7 @@ namespace Reductech.EDR.Utilities.Processes.immutable
         }
 
         /// <inheritdoc />
-        public override Result<ImmutableProcess<Unit>> TryCombine(ImmutableProcess<Unit> nextProcess, IProcessSettings processSettings)
+        public override Result<IImmutableProcess<Unit>> TryCombine(IImmutableProcess<Unit> nextProcess, IProcessSettings processSettings)
         {
             if (Steps.Count == 0)
                 return Result.Success(nextProcess);
@@ -73,11 +73,11 @@ namespace Reductech.EDR.Utilities.Processes.immutable
         /// <summary>
         /// Combines steps to produce a sequence
         /// </summary>
-        public static  ImmutableProcess<Unit> CombineSteps(IEnumerable<ImmutableProcess<Unit>> steps, IProcessSettings processSettings)
+        public static IImmutableProcess<Unit> CombineSteps(IEnumerable<IImmutableProcess<Unit>> steps, IProcessSettings processSettings)
         {
-            var combinedProcesses = new List<ImmutableProcess<Unit>>();
+            var combinedProcesses = new List<IImmutableProcess<Unit>>();
 
-            ImmutableProcess<Unit>? current = null;
+            IImmutableProcess<Unit>? current = null;
 
             foreach (var step in steps)
             {

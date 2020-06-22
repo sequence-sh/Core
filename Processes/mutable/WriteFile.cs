@@ -41,19 +41,18 @@ namespace Reductech.EDR.Utilities.Processes.mutable
         }
 
         /// <inheritdoc />
-        public override Result<ImmutableProcess<TOutput>> TryFreeze<TOutput>(IProcessSettings processSettings)
+        public override Result<IImmutableProcess<TOutput>> TryFreeze<TOutput>(IProcessSettings processSettings)
         {
             return TryConvertFreezeResult<TOutput, Unit>(TryFreeze(processSettings));
         }
 
-
-        private Result<ImmutableProcess<Unit>> TryFreeze(IProcessSettings processSettings)
+        private Result<IImmutableProcess<Unit>> TryFreeze(IProcessSettings processSettings)
         {
             var textFreezeResult = Text.TryFreeze<string>(processSettings);
             if (textFreezeResult.IsFailure)
-                return textFreezeResult.ConvertFailure<ImmutableProcess<Unit>>();
+                return textFreezeResult.ConvertFailure<IImmutableProcess<Unit>>();
 
-            return Result.Success<ImmutableProcess<Unit>>(new immutable.WriteFile( textFreezeResult.Value, Folder, FileName));
+            return Result.Success<IImmutableProcess<Unit>>(new immutable.WriteFile( textFreezeResult.Value, Folder, FileName));
 
         }
 

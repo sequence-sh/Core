@@ -38,12 +38,12 @@ namespace Reductech.EDR.Utilities.Processes.mutable
 
 
         /// <inheritdoc />
-        public override Result<ImmutableProcess<TOutput>> TryFreeze<TOutput>(IProcessSettings processSettings)
+        public override Result<IImmutableProcess<TOutput>> TryFreeze<TOutput>(IProcessSettings processSettings)
         {
             return TryConvertFreezeResult<TOutput, bool>(TryFreeze());
         }
 
-        private Result<ImmutableProcess<bool>> TryFreeze()
+        private Result<IImmutableProcess<bool>> TryFreeze()
         {
             var errors = new List<string>();
 
@@ -51,9 +51,9 @@ namespace Reductech.EDR.Utilities.Processes.mutable
             if(string.IsNullOrWhiteSpace(ExpectedContents)) errors.Add("ExpectedContents is empty");
 
             if (errors.Any())
-                return Result.Failure<ImmutableProcess<bool>>(string.Join("\r\n", errors));
+                return Result.Failure<IImmutableProcess<bool>>(string.Join("\r\n", errors));
 
-            return Result.Success<ImmutableProcess<bool>>(new immutable.DoesFileContain(FilePath, ExpectedContents));
+            return Result.Success<IImmutableProcess<bool>>(new immutable.DoesFileContain(FilePath, ExpectedContents));
         }
 
         /// <inheritdoc />

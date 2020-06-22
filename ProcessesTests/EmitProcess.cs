@@ -28,7 +28,7 @@ namespace Reductech.EDR.Utilities.Processes.Tests
         }
 
         /// <inheritdoc />
-        public override Result<ImmutableProcess<TFinal>> TryFreeze<TFinal>(IProcessSettings processSettings)
+        public override Result<IImmutableProcess<TFinal>> TryFreeze<TFinal>(IProcessSettings processSettings)
         {
             var iep = new ImmutableEmitProcess(Term, Number);
 

@@ -44,23 +44,23 @@ namespace Reductech.EDR.Utilities.Processes.mutable
 
 
         /// <inheritdoc />
-        public override Result<ImmutableProcess<TOutput>> TryFreeze<TOutput>(IProcessSettings processSettings)
+        public override Result<IImmutableProcess<TOutput>> TryFreeze<TOutput>(IProcessSettings processSettings)
         {
             return TryConvertFreezeResult<TOutput, bool>(TryFreeze(processSettings));
         }
 
-        private Result<ImmutableProcess<bool>> TryFreeze(IProcessSettings processSettings)
+        private Result<IImmutableProcess<bool>> TryFreeze(IProcessSettings processSettings)
         {
             if (Minimum == null && Maximum == null)
-                return Result.Failure<ImmutableProcess<bool>>($"Either {nameof(Minimum)} or {nameof(Maximum)} must be set.");
+                return Result.Failure<IImmutableProcess<bool>>($"Either {nameof(Minimum)} or {nameof(Maximum)} must be set.");
 
             var frozenCount =
-                Check?.TryFreeze<int>(processSettings)??Result.Failure<ImmutableProcess<int>>($"'{nameof(Check)}' must be set.");
+                Check?.TryFreeze<int>(processSettings)??Result.Failure<IImmutableProcess<int>>($"'{nameof(Check)}' must be set.");
 
             if (frozenCount.IsFailure)
-                return frozenCount.ConvertFailure<ImmutableProcess<bool>>();
+                return frozenCount.ConvertFailure<IImmutableProcess<bool>>();
 
-            return Result.Success<ImmutableProcess<bool>>(new immutable.CheckNumber(Minimum, Maximum, frozenCount.Value));
+            return Result.Success<IImmutableProcess<bool>>(new immutable.CheckNumber(Minimum, Maximum, frozenCount.Value));
 
         }
 

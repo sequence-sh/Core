@@ -37,12 +37,12 @@ namespace Reductech.EDR.Utilities.Processes.mutable
         public override string GetName() => ProcessNameHelper.GetRunExternalProcessName();
 
         /// <inheritdoc />
-        public override Result<ImmutableProcess<TOutput>> TryFreeze<TOutput>(IProcessSettings processSettings)
+        public override Result<IImmutableProcess<TOutput>> TryFreeze<TOutput>(IProcessSettings processSettings)
         {
             return TryConvertFreezeResult<TOutput, Unit>(TryFreeze());
         }
 
-        private Result<ImmutableProcess<Unit>> TryFreeze()
+        private Result<IImmutableProcess<Unit>> TryFreeze()
         {
             var errors = new List<string>();
 
@@ -54,11 +54,11 @@ namespace Reductech.EDR.Utilities.Processes.mutable
                 errors.Add($"'{ProcessPath}' does not exist.");
 
             if (errors.Any())
-                return Result.Failure<ImmutableProcess<Unit>>(string.Join("\r\n", errors));
+                return Result.Failure<IImmutableProcess<Unit>>(string.Join("\r\n", errors));
 
             var ip = new immutable.RunExternalProcess(ProcessPath, Arguments);
 
-            return Result.Success<ImmutableProcess<Unit>>(ip);
+            return Result.Success<IImmutableProcess<Unit>>(ip);
         }
 
         /// <inheritdoc />

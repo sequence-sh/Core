@@ -174,12 +174,12 @@ t,4,def",
             public override string GetName() => "Emit String";
 
             /// <inheritdoc />
-            public override Result<ImmutableProcess<TOutput>> TryFreeze<TOutput>(IProcessSettings processSettings)
+            public override Result<IImmutableProcess<TOutput>> TryFreeze<TOutput>(IProcessSettings processSettings)
             {
                 return TryConvertFreezeResult<TOutput, string>(TryFreeze());
             }
 
-            private Result<ImmutableProcess<string>> TryFreeze()
+            private Result<IImmutableProcess<string>> TryFreeze()
             {
                 return new ImmutableEmitString(Output);
             }

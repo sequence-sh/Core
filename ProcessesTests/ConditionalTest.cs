@@ -101,7 +101,6 @@ namespace Reductech.EDR.Utilities.Processes.Tests
                     },
                     Process = new CSVReaderTest.EmitStringProcess{Output = "No"}
                 }
-
             };
 
             var immutableProcess = process.TryFreeze<string>(EmptySettings.Instance).AssertSuccess();
@@ -111,7 +110,6 @@ namespace Reductech.EDR.Utilities.Processes.Tests
 
             resultList.Should().Contain(x=>x.Contains("You are welcome"));
         }
-
     }
 
 
@@ -181,7 +179,7 @@ namespace Reductech.EDR.Utilities.Processes.Tests
         public override string GetName() => Value.ToString();
 
         /// <inheritdoc />
-        public override Result<ImmutableProcess<TFinal>> TryFreeze<TFinal>(IProcessSettings processSettings)
+        public override Result<IImmutableProcess<TFinal>> TryFreeze<TFinal>(IProcessSettings processSettings)
         {
             return TryConvertFreezeResult<TFinal, bool>(new ImmutableReturnBool(Value));
         }

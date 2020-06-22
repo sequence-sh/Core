@@ -7,7 +7,7 @@ namespace Reductech.EDR.Utilities.Processes.immutable
     internal class DoesFileContain : ImmutableProcess<bool>
     {
         /// <inheritdoc />
-        public DoesFileContain(string filePath, string expectedContents) 
+        public DoesFileContain(string filePath, string expectedContents)
         {
             _filePath = filePath;
             _expectedContents = expectedContents;
