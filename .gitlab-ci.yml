@@ -34,7 +34,7 @@ build dev:
   variables:
     CONFIG: $CONFIG_DEV
   script:
-    - dotnet nuget add source -n gitlab -u $GITLAB_NUGET_USERNAME -p $GITLAB_NUGET_PAT --store-password-in-clear-text $NUGET_REGISTRY
+    - dotnet nuget add source -n gitlab --username $GITLAB_NUGET_USERNAME --password $GITLAB_NUGET_PAT --store-password-in-clear-text $NUGET_REGISTRY
     - dotnet restore --packages ./packages
     - dotnet build -c $CONFIG --no-restore
   artifacts:
@@ -105,8 +105,7 @@ package dll:
 push to nuget:
   stage: push
   script:
-    - dotnet nuget add source -n gitlab -u $GITLAB_NUGET_USERNAME
-      -p $GITLAB_NUGET_PAT --store-password-in-clear-text $NUGET_REGISTRY
+    - dotnet nuget add source -n gitlab --username $GITLAB_NUGET_USERNAME --password $GITLAB_NUGET_PAT --store-password-in-clear-text $NUGET_REGISTRY
     - dotnet nuget push --source gitlab *.nupkg
     - dotnet nuget remove source gitlab
   rules: *rules_push
