@@ -57,6 +57,9 @@ namespace Reductech.EDR.Utilities.Processes.mutable
 
             if (result.Value is IImmutableProcess<TOutput> process) return Result.Success(process);
 
+            var wrapper = new ProcessObjectTypeWrapper<TActual>(result.Value); //This is a special case for value types being cast to object
+            if (wrapper is IImmutableProcess<TOutput> wrapper2) return Result.Success(wrapper2);
+
             return Result.Failure<IImmutableProcess<TOutput>>($"{GetName()} has output type: '{typeof(TActual).Name}', not '{typeof(TOutput).Name}'.");
         }
     }
@@ -78,12 +81,15 @@ namespace Reductech.EDR.Utilities.Processes.mutable
             {
                 if (line is IProcessOutput<object> l) yield return l;
 
-#pragma warning disable CS8604 // Possible null reference argument. Value must have a value because the output type is success
                 else if (line.OutputType == OutputType.Success) yield return ProcessOutput<object>.Success(line.Value);
-#pragma warning restore CS8604 // Possible null reference argument.
                 else yield return line.ConvertTo<object>();
             }
         }
 
+        /// <inheritdoc />
+        public string Name => Process.Name;
+
+        /// <inheritdoc />
+        public IProcessConverter? ProcessConverter => Process.ProcessConverter;
     }
 }
