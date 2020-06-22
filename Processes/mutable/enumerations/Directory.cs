@@ -27,7 +27,10 @@ namespace Reductech.EDR.Utilities.Processes.mutable.enumerations
         internal override string Name => $"'{Path}'";
 
         /// <inheritdoc />
-        public override EnumerationStyle EnumerationStyle => EnumerationStyle.Eager;
+        public override EnumerationStyle GetEnumerationStyle()
+        {
+            return EnumerationStyle.Eager;
+        }
 
         /// <summary>
         /// The path to the directory.

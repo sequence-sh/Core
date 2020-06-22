@@ -19,7 +19,7 @@ namespace Reductech.EDR.Utilities.Processes.immutable
         /// <summary>
         /// The process that returns the number.
         /// </summary>
-        public readonly ImmutableProcess<int> CountProcess;
+        public readonly IImmutableProcess<int> CountProcess;
 
         /// <summary>
         /// Create a new CheckNumber process
@@ -27,7 +27,7 @@ namespace Reductech.EDR.Utilities.Processes.immutable
         /// <param name="minimum"></param>
         /// <param name="maximum"></param>
         /// <param name="countProcess"></param>
-        public CheckNumber(int? minimum, int? maximum, ImmutableProcess<int> countProcess)
+        public CheckNumber(int? minimum, int? maximum, IImmutableProcess<int> countProcess)
         {
             Minimum = minimum;
             Maximum = maximum;

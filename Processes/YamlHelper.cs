@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using CSharpFunctionalExtensions;
+using Reductech.EDR.Utilities.Processes.attributes;
 using Reductech.EDR.Utilities.Processes.mutable;
 using Reductech.EDR.Utilities.Processes.mutable.enumerations;
 using YamlDotNet.Serialization;
@@ -24,7 +26,7 @@ namespace Reductech.EDR.Utilities.Processes
 
             var types = assemblies
                 .SelectMany(s => s.GetTypes())
-                .Where(type =>  
+                .Where(type =>
                     typeof(Process).IsAssignableFrom(type)
                     || typeof(Enumeration).IsAssignableFrom(type))
                 .Where(x=>!x.IsAbstract && ! x.IsInterface)
@@ -62,10 +64,10 @@ namespace Reductech.EDR.Utilities.Processes
                 var deSerializerBuilder = new DeserializerBuilder();
                 deSerializerBuilder =
                     GetSpecialTypes(true)
-                        .Aggregate(deSerializerBuilder, 
+                        .Aggregate(deSerializerBuilder,
                         (current, specialType) => current.WithTagMapping("!" + specialType.Key, specialType.Value));
 
-                var deserializer = 
+                var deserializer =
 
 
                 new EdrNodeDeserializer(new CachedTypeInspector(
@@ -83,7 +85,7 @@ namespace Reductech.EDR.Utilities.Processes
         {
             var serializerBuilder = new SerializerBuilder();
             serializerBuilder =
-                GetSpecialTypes(false).Aggregate(serializerBuilder, 
+                GetSpecialTypes(false).Aggregate(serializerBuilder,
                     (current, specialType) => current.WithTagMapping("!" + specialType.Key, specialType.Value));
             serializerBuilder.ConfigureDefaultValuesHandling(DefaultValuesHandling.OmitNull);
             return serializerBuilder.Build();
@@ -103,16 +105,21 @@ namespace Reductech.EDR.Utilities.Processes
         /// </summary>
         public static Result<Process> TryMakeFromYaml(string yaml)
         {
-            return  Result.Try(() => Deserializer.Deserialize<Process>(yaml), GetInnermostExceptionMessage);
+            return  Result.Try(() => Deserializer.Deserialize<Process>(yaml), GetFullErrorMessage);
         }
 
-        private static string GetInnermostExceptionMessage(Exception e)
+        private static string GetFullErrorMessage(Exception e)
         {
+            var sb = new StringBuilder();
+
             while (true)
             {
-                if (e.InnerException == null) return e.Message;
+                sb.AppendLine(e.Message);
+                if (e.InnerException == null) break;
                 e = e.InnerException;
             }
+
+            return sb.ToString();
         }
     }
 }

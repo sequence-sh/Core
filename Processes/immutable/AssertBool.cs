@@ -17,14 +17,14 @@ namespace Reductech.EDR.Utilities.Processes.immutable
         /// <summary>
         /// The subprocess.
         /// </summary>
-        public readonly ImmutableProcess<bool> SubProcess;
+        public readonly IImmutableProcess<bool> SubProcess;
 
         /// <summary>
         /// Creates a new AssertBool process.
         /// </summary>
         /// <param name="subProcess"></param>
         /// <param name="expectedResult"></param>
-        public AssertBool(ImmutableProcess<bool> subProcess, bool expectedResult)
+        public AssertBool(IImmutableProcess<bool> subProcess, bool expectedResult)
         {
             SubProcess = subProcess;
             ExpectedResult = expectedResult;

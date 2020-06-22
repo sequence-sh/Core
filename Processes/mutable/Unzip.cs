@@ -43,12 +43,12 @@ namespace Reductech.EDR.Utilities.Processes.mutable
         public override string GetName() => ProcessNameHelper.GetUnzipName();
 
         /// <inheritdoc />
-        public override Result<ImmutableProcess<TOutput>> TryFreeze<TOutput>(IProcessSettings processSettings)
+        public override Result<IImmutableProcess<TOutput>> TryFreeze<TOutput>(IProcessSettings processSettings)
         {
             return TryConvertFreezeResult<TOutput, Unit>(TryFreeze());
         }
 
-        private Result<ImmutableProcess<Unit>> TryFreeze()
+        private Result<IImmutableProcess<Unit>> TryFreeze()
         {
             var errors = new List<string>();
 
@@ -59,11 +59,11 @@ namespace Reductech.EDR.Utilities.Processes.mutable
                 errors.Add($"{nameof(DestinationDirectory)} is empty.");
 
             if (errors.Any())
-                return Result.Failure<ImmutableProcess<Unit>>(string.Join("\r\n", errors));
+                return Result.Failure<IImmutableProcess<Unit>>(string.Join("\r\n", errors));
 
             var ip = new immutable.Unzip(ArchiveFilePath, DestinationDirectory, OverwriteFiles);
 
-            return Result.Success<ImmutableProcess<Unit>>(ip);
+            return Result.Success<IImmutableProcess<Unit>>(ip);
         }
 
         /// <inheritdoc />

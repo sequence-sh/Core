@@ -24,7 +24,7 @@ namespace Reductech.EDR.Utilities.Processes.mutable
         /// Executes this process. Should only be called if all conditions are met.
         /// </summary>
         /// <returns></returns>
-        public abstract Result<ImmutableProcess<TOutput>> TryFreeze<TOutput>(IProcessSettings processSettings);
+        public abstract Result<IImmutableProcess<TOutput>> TryFreeze<TOutput>(IProcessSettings processSettings);
 
         /// <summary>
         /// Gets special requirements for the process.
@@ -50,13 +50,13 @@ namespace Reductech.EDR.Utilities.Processes.mutable
         /// <typeparam name="TActual"></typeparam>
         /// <param name="result"></param>
         /// <returns></returns>
-        protected Result<ImmutableProcess<TOutput>> TryConvertFreezeResult<TOutput, TActual>(Result<ImmutableProcess<TActual>> result)
+        protected Result<IImmutableProcess<TOutput>> TryConvertFreezeResult<TOutput, TActual>(Result<IImmutableProcess<TActual>> result)
         {
-            if (result.IsFailure) return result.ConvertFailure<ImmutableProcess<TOutput>>();
+            if (result.IsFailure) return result.ConvertFailure<IImmutableProcess<TOutput>>();
 
-            if (result.Value is ImmutableProcess<TOutput> process) return process;
+            if (result.Value is IImmutableProcess<TOutput> process) return Result.Success(process);
 
-            return Result.Failure<ImmutableProcess<TOutput>>($"{GetName()} has output type: '{typeof(TActual).Name}', not '{typeof(TOutput).Name}'.");
+            return Result.Failure<IImmutableProcess<TOutput>>($"{GetName()} has output type: '{typeof(TActual).Name}', not '{typeof(TOutput).Name}'.");
         }
 
     }

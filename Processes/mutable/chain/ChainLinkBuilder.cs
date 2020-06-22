@@ -28,7 +28,7 @@ namespace Reductech.EDR.Utilities.Processes.mutable.chain
     /// Creates chain links.
     /// </summary>
     public class ChainLinkBuilder<TInput, TOutput, TFinal, TImmutableProcess, TProcess> : ChainLinkBuilder<TInput, TFinal>
-        where TImmutableProcess : ImmutableProcess<TOutput>
+        where TImmutableProcess : IImmutableProcess<TOutput>
         where TProcess : Process
     {
         /// <summary>

@@ -40,20 +40,20 @@ namespace Reductech.EDR.Utilities.Processes.mutable
         public Process? Else { get; set; }
 
         /// <inheritdoc />
-        public override Result<ImmutableProcess<TOutput>> TryFreeze<TOutput>(IProcessSettings processSettings)
+        public override Result<IImmutableProcess<TOutput>> TryFreeze<TOutput>(IProcessSettings processSettings)
         {
-            var ifResult = If?.TryFreeze<bool>(processSettings)?? Result.Failure<ImmutableProcess<bool>>($"'{nameof(If)}' must be set.");
-            var thenResult = Then?.TryFreeze<TOutput>(processSettings)?? Result.Failure<ImmutableProcess<TOutput>>($"'{nameof(Then)}' must be set.");
+            var ifResult = If?.TryFreeze<bool>(processSettings)?? Result.Failure<IImmutableProcess<bool>>($"'{nameof(If)}' must be set.");
+            var thenResult = Then?.TryFreeze<TOutput>(processSettings)?? Result.Failure<IImmutableProcess<TOutput>>($"'{nameof(Then)}' must be set.");
             var elseResult1 = Else?.TryFreeze<TOutput>(processSettings);// ?? Result.Success(DoNothing.Instance);
 
-            Result<ImmutableProcess<TOutput>> elseResult;
+            Result<IImmutableProcess<TOutput>> elseResult;
             if (elseResult1 == null)
             {
-                if (DoNothing.Instance is ImmutableProcess<TOutput> doNothing)
-                    elseResult = doNothing;
+                if (DoNothing.Instance is IImmutableProcess<TOutput> doNothing)
+                    elseResult = Result.Success(doNothing);
                 else
                     elseResult =
-                        Result.Failure<ImmutableProcess<TOutput>>(
+                        Result.Failure<IImmutableProcess<TOutput>>(
                             $"'{nameof(Else)}' must be set in typed conditionals.");
             }
             else elseResult = elseResult1.Value;
@@ -64,11 +64,11 @@ namespace Reductech.EDR.Utilities.Processes.mutable
             if (elseResult.IsFailure) combinedError.AppendLine(elseResult.Error);
 
 
-            if (!string.IsNullOrWhiteSpace(combinedError.ToString())) return Result.Failure<ImmutableProcess<TOutput>>(combinedError.ToString());
+            if (!string.IsNullOrWhiteSpace(combinedError.ToString())) return Result.Failure<IImmutableProcess<TOutput>>(combinedError.ToString());
 
             var createResult = CreateImmutableConditional(ifResult.Value, thenResult.Value, elseResult.Value, processSettings);
 
-            return createResult;
+            return Result.Success(createResult);
         }
 
         /// <inheritdoc />
@@ -93,7 +93,7 @@ namespace Reductech.EDR.Utilities.Processes.mutable
         /// <inheritdoc />
         public override string GetName() => ProcessNameHelper.GetConditionalName(If.GetName(), Then.GetName(), Else?.GetName());
 
-        private static ImmutableProcess<T> CreateImmutableConditional<T>(ImmutableProcess<bool> ifP, ImmutableProcess<T> thenP, ImmutableProcess<T> elseP, IProcessSettings processSettings)
+        private static IImmutableProcess<T> CreateImmutableConditional<T>(IImmutableProcess<bool> ifP, IImmutableProcess<T> thenP, IImmutableProcess<T> elseP, IProcessSettings processSettings)
         {
             var conditional =  new Conditional<T>(ifP, thenP, elseP);
 

@@ -38,24 +38,23 @@ namespace Reductech.EDR.Utilities.Processes.mutable
 
 
         /// <inheritdoc />
-        public override Result<ImmutableProcess<TOutput>> TryFreeze<TOutput>(IProcessSettings processSettings)
+        public override Result<IImmutableProcess<TOutput>> TryFreeze<TOutput>(IProcessSettings processSettings)
         {
             return TryConvertFreezeResult<TOutput, Unit>(TryFreeze(processSettings));
         }
 
-        private Result<ImmutableProcess<Unit>> TryFreeze(IProcessSettings processSettings)
+        private Result<IImmutableProcess<Unit>> TryFreeze(IProcessSettings processSettings)
         {
             var r = Steps.Select(s => s.TryFreeze<Unit>(processSettings))
                 .Combine("\r\n");
 
             if (r.IsFailure)
-                return r.ConvertFailure<ImmutableProcess<Unit>>();
+                return r.ConvertFailure<IImmutableProcess<Unit>>();
 
             var steps = r.Value;
+            var p = immutable.Sequence.CombineSteps(steps, processSettings);
 
-            var p = new immutable.Sequence(steps.ToList());
-
-            return p;
+            return Result.Success(p);
         }
 
         /// <inheritdoc />

@@ -8,52 +8,19 @@ namespace Reductech.EDR.Utilities.Processes.immutable
     /// <summary>
     /// A process whose parameters can no longer be altered.
     /// </summary>
-    public abstract class ImmutableProcess
+    public interface IImmutableProcess<out T>
     {
-        /// <summary>
-        /// The name of this process.
-        /// </summary>
-        public abstract string Name { get; }
-
-        ///// <summary>
-        ///// The type of this process' final results.
-        ///// </summary>
-        //public abstract Type ResultType { get; }
-
-        /// <inheritdoc />
-        public override string ToString()
-        {
-            return Name;
-        }
-
-        /// <summary>
-        /// The process converter for combining with this process.
-        /// </summary>
-        public abstract IProcessConverter? ProcessConverter { get; }
-    }
-
-    /// <summary>
-    /// A process whose parameters can no longer be altered.
-    /// </summary>
-    public abstract class ImmutableProcess<T> : ImmutableProcess
-    {
-        ///// <inheritdoc />
-        //public override IAsyncEnumerable<IProcessOutput> ExecuteUntyped()
-        //{
-        //    return Execute();
-        //}
-
         /// <summary>
         /// Executes this process.
         /// </summary>
         /// <returns></returns>
-        public abstract IAsyncEnumerable<IProcessOutput<T>> Execute();
+        IAsyncEnumerable<IProcessOutput<T>> Execute();
 
         /// <summary>
         /// Try to create a process that is this process combined with the next process.
         /// Should only work for unit processes.
         /// </summary>
-        public virtual Result<ImmutableProcess<Unit>> TryCombine(ImmutableProcess<Unit> nextProcess, IProcessSettings processSettings)
+        Result<IImmutableProcess<Unit>> TryCombine(IImmutableProcess<Unit> nextProcess, IProcessSettings processSettings)
         {
             if (nextProcess.ProcessConverter != null)
             {
@@ -65,7 +32,66 @@ namespace Reductech.EDR.Utilities.Processes.immutable
                 }
             }
 
-            return Result.Failure<ImmutableProcess<Unit>>("Could not combine");
+            return Result.Failure<IImmutableProcess<Unit>>("Could not combine");
         }
+
+        /// <summary>
+        /// The name of this process.
+        /// </summary>
+        string Name { get; }
+
+        /// <summary>
+        /// The process converter for combining with this process.
+        /// </summary>
+        IProcessConverter? ProcessConverter { get; }
+
+    }
+
+
+    /// <summary>
+    /// A process whose parameters can no longer be altered.
+    /// </summary>
+    public abstract class ImmutableProcess<T> : IImmutableProcess<T>
+    {
+        /// <summary>
+        /// Executes this process.
+        /// </summary>
+        /// <returns></returns>
+        public abstract IAsyncEnumerable<IProcessOutput<T>> Execute();
+
+        /// <summary>
+        /// Try to create a process that is this process combined with the next process.
+        /// Should only work for unit processes.
+        /// </summary>
+        public virtual Result<IImmutableProcess<Unit>> TryCombine(IImmutableProcess<Unit> nextProcess, IProcessSettings processSettings)
+        {
+            if (nextProcess.ProcessConverter != null)
+            {
+                var (isSuccess, _, value) = nextProcess.ProcessConverter.TryConvert(this, processSettings);
+
+                if (isSuccess && this != value)
+                {
+                    return value.TryCombine(nextProcess, processSettings);
+                }
+            }
+
+            return Result.Failure<IImmutableProcess<Unit>>("Could not combine");
+        }
+
+        /// <summary>
+        /// The name of this process.
+        /// </summary>
+        public abstract string Name { get; }
+
+        /// <inheritdoc />
+        public override string ToString()
+        {
+            return Name;
+        }
+
+        /// <summary>
+        /// The process converter for combining with this process.
+        /// </summary>
+        public abstract IProcessConverter? ProcessConverter { get; }
     }
 }

@@ -28,7 +28,10 @@ namespace Reductech.EDR.Utilities.Processes.mutable.enumerations
         internal override string Name => $"[{string.Join(", ", Members)}]";
 
         /// <inheritdoc />
-        public override EnumerationStyle EnumerationStyle => EnumerationStyle.Eager;
+        public override EnumerationStyle GetEnumerationStyle()
+        {
+            return EnumerationStyle.Eager;
+        }
 
         /// <summary>
         /// The elements to iterate over.

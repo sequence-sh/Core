@@ -8,7 +8,7 @@ namespace Reductech.EDR.Utilities.Processes.mutable.enumerations
     internal class LazyCSVEnumerationElements : ImmutableProcess<EagerEnumerationElements>, IEnumerationElements
     {
         public LazyCSVEnumerationElements(
-            ImmutableProcess<string> subProcess,
+            IImmutableProcess<string> subProcess,
             string delimiter,
             string? commentToken,
             bool hasFieldsEnclosedInQuotes,
@@ -82,7 +82,7 @@ namespace Reductech.EDR.Utilities.Processes.mutable.enumerations
 
         public string Delimiter { get; }
 
-        private readonly ImmutableProcess<string> _subProcess;
+        private readonly IImmutableProcess<string> _subProcess;
 
         public bool Distinct { get; }
     }

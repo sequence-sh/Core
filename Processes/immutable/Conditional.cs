@@ -10,7 +10,7 @@ namespace Reductech.EDR.Utilities.Processes.immutable
     public class Conditional<T> : ImmutableProcess<T>
     {
         /// <inheritdoc />
-        public Conditional(ImmutableProcess<bool> @if, ImmutableProcess<T> then, ImmutableProcess<T> @else)
+        public Conditional(IImmutableProcess<bool> @if, IImmutableProcess<T> then, IImmutableProcess<T> @else)
         {
             If = @if;
             Then = then;
@@ -19,16 +19,16 @@ namespace Reductech.EDR.Utilities.Processes.immutable
         /// <summary>
         /// The process determining which branch should be chosen.
         /// </summary>
-        public readonly ImmutableProcess<bool> If;
+        public readonly IImmutableProcess<bool> If;
 
         /// <summary>
         /// The process to run if the condition is successful.
         /// </summary>
-        public readonly ImmutableProcess<T> Then;
+        public readonly IImmutableProcess<T> Then;
         /// <summary>
         /// The process to run if the condition is unsuccessful.
         /// </summary>
-        public readonly ImmutableProcess<T> Else;
+        public readonly IImmutableProcess<T> Else;
 
         /// <inheritdoc />
         public override async IAsyncEnumerable<IProcessOutput<T>> Execute()
@@ -76,11 +76,11 @@ namespace Reductech.EDR.Utilities.Processes.immutable
                     yield return ProcessOutput<T>.Error("Could not determine result of conditional");
             }
 
-            
+
         }
 
         /// <inheritdoc />
-        public override string Name => 
+        public override string Name =>
             ProcessNameHelper.GetConditionalName(If.Name, Then.Name, Else?.Name);
 
         /// <inheritdoc />

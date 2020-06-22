@@ -7,7 +7,7 @@ namespace Reductech.EDR.Utilities.Processes.immutable
     internal class DeleteItem : ImmutableProcess<Unit>
     {
         /// <inheritdoc />
-        public DeleteItem(string path) 
+        public DeleteItem(string path)
         {
             _path = path;
         }

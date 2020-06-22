@@ -9,7 +9,7 @@ namespace Reductech.EDR.Utilities.Processes.mutable.chain
     /// Creates a process from an input.
     /// </summary>
     public abstract class ProcessFactory<TInput, TOutput, TImmutableProcess>
-        where TImmutableProcess : ImmutableProcess<TOutput>
+        where TImmutableProcess : IImmutableProcess<TOutput>
     {
 
         /// <summary>
@@ -46,7 +46,7 @@ namespace Reductech.EDR.Utilities.Processes.mutable.chain
     /// </summary>
     public abstract class ProcessFactory<TInput, TOutput, TImmutableProcess, TProcess> :
         ProcessFactory<TInput, TOutput, TImmutableProcess>
-        where TImmutableProcess : ImmutableProcess<TOutput>
+        where TImmutableProcess : IImmutableProcess<TOutput>
         where TProcess : Process
     {
         /// <summary>
@@ -76,7 +76,7 @@ namespace Reductech.EDR.Utilities.Processes.mutable.chain
     /// For use in Chains.
     /// </summary>
     public class UnitProcessFactory<TOutput, TImmutableProcess, TProcess> : ProcessFactory<Unit, TOutput, TImmutableProcess, TProcess>
-        where TImmutableProcess : ImmutableProcess<TOutput>
+        where TImmutableProcess : IImmutableProcess<TOutput>
         where TProcess : Process
     {
         /// <inheritdoc />
@@ -104,7 +104,7 @@ namespace Reductech.EDR.Utilities.Processes.mutable.chain
     /// </summary>
     public class InjectionProcessFactory<TInput, TOutput, TImmutableProcess, TProcess> :
         ProcessFactory<TInput, TOutput, TImmutableProcess, TProcess>
-        where TImmutableProcess : ImmutableProcess<TOutput>
+        where TImmutableProcess : IImmutableProcess<TOutput>
         where TProcess : Process
     {
         /// <summary>

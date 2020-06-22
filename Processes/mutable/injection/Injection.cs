@@ -25,7 +25,7 @@ namespace Reductech.EDR.Utilities.Processes.mutable.injection
     /// <summary>
     /// Injects a value from the enumerator into a property of a loop's process.
     /// </summary>
-    public class Injection
+    public class  Injection
     {
         /// <summary>
         /// The property of the subProcess to inject.

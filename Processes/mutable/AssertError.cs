@@ -30,16 +30,16 @@ namespace Reductech.EDR.Utilities.Processes.mutable
         public override string GetName() => ProcessNameHelper.GetAssertErrorName(Process?.GetName()??"");
 
         /// <inheritdoc />
-        public override Result<ImmutableProcess<TOutput>> TryFreeze<TOutput>(IProcessSettings processSettings)
+        public override Result<IImmutableProcess<TOutput>> TryFreeze<TOutput>(IProcessSettings processSettings)
         {
             var r = TryFreeze(processSettings);
             return TryConvertFreezeResult<TOutput, Unit>(r);
         }
 
-        private Result<ImmutableProcess<Unit>> TryFreeze(IProcessSettings processSettings)
+        private Result<IImmutableProcess<Unit>> TryFreeze(IProcessSettings processSettings)
         {
             if (Process == null)
-                return Result.Failure<ImmutableProcess<Unit>>($"{nameof(Process)} is null.");
+                return Result.Failure<IImmutableProcess<Unit>>($"{nameof(Process)} is null.");
 
             var subProcessFreezeResult = Process.TryFreeze<Unit>(processSettings);
 
