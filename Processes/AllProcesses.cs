@@ -9,13 +9,13 @@ using Reductech.Utilities.InstantConsole;
 namespace Reductech.EDR.Utilities.Processes
 {
     /// <summary>
-    /// All nuix processes.
+    /// All processes for runners.
     /// </summary>
     public static class AllProcesses
     {
 
         /// <summary>
-        /// All nuix processes.
+        /// Gets all processes for process settings.
         /// </summary>
         public static IReadOnlyCollection<IDocumented> GetProcesses(IProcessSettings processSettings)
         {

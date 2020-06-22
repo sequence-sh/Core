@@ -2,6 +2,7 @@
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Utilities.Processes.immutable;
 using Reductech.EDR.Utilities.Processes.mutable.chain;
+using Reductech.EDR.Utilities.Processes.output;
 
 namespace Reductech.EDR.Utilities.Processes.mutable
 {
@@ -56,8 +57,39 @@ namespace Reductech.EDR.Utilities.Processes.mutable
 
             if (result.Value is IImmutableProcess<TOutput> process) return Result.Success(process);
 
+            var wrapper = new ProcessObjectTypeWrapper<TActual>(result.Value); //This is a special case for value types being cast to object
+            if (wrapper is IImmutableProcess<TOutput> wrapper2) return Result.Success(wrapper2);
+
             return Result.Failure<IImmutableProcess<TOutput>>($"{GetName()} has output type: '{typeof(TActual).Name}', not '{typeof(TOutput).Name}'.");
         }
+    }
 
+
+    internal class ProcessObjectTypeWrapper<T> : IImmutableProcess<object>
+    {
+        public ProcessObjectTypeWrapper(IImmutableProcess<T> process)
+        {
+            Process = process;
+        }
+
+        public IImmutableProcess<T> Process { get; }
+
+        /// <inheritdoc />
+        public async IAsyncEnumerable<IProcessOutput<object>> Execute()
+        {
+            await foreach (var line in Process.Execute())
+            {
+                if (line is IProcessOutput<object> l) yield return l;
+
+                else if (line.OutputType == OutputType.Success) yield return ProcessOutput<object>.Success(line.Value);
+                else yield return line.ConvertTo<object>();
+            }
+        }
+
+        /// <inheritdoc />
+        public string Name => Process.Name;
+
+        /// <inheritdoc />
+        public IProcessConverter? ProcessConverter => Process.ProcessConverter;
     }
 }
