@@ -58,6 +58,31 @@ namespace Reductech.EDR.Utilities.Processes.mutable
 
             return Result.Failure<IImmutableProcess<TOutput>>($"{GetName()} has output type: '{typeof(TActual).Name}', not '{typeof(TOutput).Name}'.");
         }
+    }
+
+
+    internal class ProcessObjectTypeWrapper<T> : IImmutableProcess<object>
+    {
+        public ProcessObjectTypeWrapper(IImmutableProcess<T> process)
+        {
+            Process = process;
+        }
+
+        public IImmutableProcess<T> Process { get; }
+
+        /// <inheritdoc />
+        public async IAsyncEnumerable<IProcessOutput<object>> Execute()
+        {
+            await foreach (var line in Process.Execute())
+            {
+                if (line is IProcessOutput<object> l) yield return l;
+
+#pragma warning disable CS8604 // Possible null reference argument. Value must have a value because the output type is success
+                else if (line.OutputType == OutputType.Success) yield return ProcessOutput<object>.Success(line.Value);
+#pragma warning restore CS8604 // Possible null reference argument.
+                else yield return line.ConvertTo<object>();
+            }
+        }
 
     }
 }

@@ -22,6 +22,19 @@ namespace Reductech.EDR.Utilities.Processes.output
             return new ProcessOutput<T>(message, OutputType.Success, value );
         }
 
+        /// <inheritdoc />
+        public override string ToString()
+        {
+            return OutputType switch
+            {
+                OutputType.Error => Text,
+                OutputType.Warning => Text,
+                OutputType.Message => Text,
+                OutputType.Success => (Value?.ToString() ?? ""),
+                _ => throw new ArgumentOutOfRangeException()
+            };
+        }
+
 
 #pragma warning disable CS8604 // Possible null reference argument.
 
@@ -34,7 +47,6 @@ namespace Reductech.EDR.Utilities.Processes.output
 
             return new ProcessOutput<T>(error, OutputType.Message, default );
         }
-
 
         /// <summary>
         /// Creates a new warning output.
@@ -79,19 +91,17 @@ namespace Reductech.EDR.Utilities.Processes.output
         /// <inheritdoc />
         public OutputType OutputType { get; }
 
-        
-
         private readonly T _value;
 
         /// <inheritdoc />
-        public T Value => OutputType == OutputType.Success ? _value : 
+        public T Value => OutputType == OutputType.Success ? _value :
             throw new InvalidOperationException("Cannot access outputType for ProcessOutput which is not of Success type");
 
         /// <inheritdoc />
         public override bool Equals(object? obj)
         {
-            return obj is ProcessOutput<T> pot && 
-                   Text == pot.Text && 
+            return obj is ProcessOutput<T> pot &&
+                   Text == pot.Text &&
                    OutputType == pot.OutputType;
         }
 
