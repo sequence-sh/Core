@@ -1,18 +1,133 @@
 image: mcr.microsoft.com/dotnet/core/sdk:3.1
 
 stages:
-    - build
-    - test
+  - build
+  - test
+  - package
+  - push
 
-build:
-    stage: build
-    script:
-        - "dotnet build"
-    artifacts:
-      paths:
-        - bin/
+workflow:
+  rules:
+    - if: $CI_COMMIT_BRANCH == 'master'
+    - if: $CI_MERGE_REQUEST_ID
+    - if: $CI_COMMIT_BRANCH !~ /^\d+-/
+    - if: $CI_COMMIT_TAG
+
+variables:
+  CONFIG_DEV: Debug
+  CONFIG_RELEASE: Release
+  NUGET_REGISTRY: https://gitlab.com/api/v4/projects/18697166/packages/nuget/index.json
+
+.defaults:
+  rules_dev: &rules_dev
+    - if: $CI_COMMIT_TAG !~ /^release-v[\d\.]+/i
+  rules_release: &rules_release
+    - if: $CI_COMMIT_TAG =~ /^release-v[\d\.]+/i
+  rules_push: &rules_push
+    - if: $CI_COMMIT_TAG =~ /^release-v[\d\.]+/i || $CI_COMMIT_BRANCH == 'master'
+      when: on_success
+    - when: manual
+      allow_failure: true
+
+build dev:
+  stage: build
+  variables:
+    CONFIG: $CONFIG_DEV
+  script:
+    - dotnet nuget add source -n gitlab -u $GITLAB_NUGET_USERNAME -p $GITLAB_NUGET_PAT --store-password-in-clear-text $NUGET_REGISTRY
+    - dotnet restore --packages ./packages
+    - dotnet build -c $CONFIG --no-restore
+  artifacts:
+    paths:
+      - '*/bin'
+      - '*/obj'
+      - packages/
+    expire_in: 30 mins
+  rules: *rules_dev
+
+build release:
+  extends: build dev
+  variables:
+    CONFIG: $CONFIG_RELEASE
+  rules: *rules_release
 
 test:
-    stage: test
-    script: 
-        - "dotnet test"
+  stage: test
+  variables:
+    CONFIG: $CONFIG_DEV
+  script:
+    - dotnet test  --filter Category!=\"Integration\" --no-build -c $CONFIG --collect:"XPlat Code Coverage" --results-directory ./
+    - >
+      pwsh -Command '[xml]$xml = Get-Content */coverage.cobertura.xml -Raw ;
+      Write-Host "Coverage (Branch) : $([double]($xml.coverage."branch-rate") * 100)%";
+      Write-Host "Coverage (Line)   : $([double]($xml.coverage."line-rate") * 100)%"'
+  coverage: /Coverage \(Branch\)[\s:]+(\d+)%/
+  artifacts:
+    reports:
+      cobertura: '*/coverage.cobertura.xml'
+  rules: *rules_dev
+
+test release:
+  extends: test
+  variables:
+    CONFIG: $CONFIG_RELEASE
+  rules: *rules_release
+
+package nuget release:
+  stage: package
+  script:
+    - dotnet pack --no-build -c $CONFIG_RELEASE -o ./
+  artifacts:
+    name: "$CI_PROJECT_NAME-$CI_COMMIT_REF_SLUG"
+    paths:
+      - '*.nupkg'
+    expire_in: 1 month
+  rules: *rules_release
+
+package nuget dev:
+  extends: package nuget release
+  script:
+    - COMMIT_SHA=${CI_MERGE_REQUEST_SOURCE_BRANCH_SHA:-$CI_COMMIT_SHA}
+    - SHORT_SHA=${COMMIT_SHA:0:8}
+    - dotnet pack --no-build -c $CONFIG_DEV -o ./
+  rules: *rules_dev
+
+package dll:
+  stage: package
+  script:
+    - dotnet publish --no-build -c $CONFIG_RELEASE -o "./$CI_PROJECT_NAME-$CI_COMMIT_REF_SLUG"
+  artifacts:
+    name: "$CI_PROJECT_NAME-$CI_COMMIT_REF_SLUG"
+    paths:
+      - $CI_PROJECT_NAME-$CI_COMMIT_REF_SLUG/
+  rules: *rules_release
+
+push to nuget:
+  stage: push
+  script:
+    - dotnet nuget add source -n gitlab -u $GITLAB_NUGET_USERNAME
+      -p $GITLAB_NUGET_PAT --store-password-in-clear-text $NUGET_REGISTRY
+    - dotnet nuget push --source gitlab *.nupkg
+    - dotnet nuget remove source gitlab
+  rules: *rules_push
+
+.code_quality:
+  stage: test
+  image: docker:stable
+  variables:
+    DOCKER_DRIVER: overlay2
+    SP_VERSION: 0.85.9
+  allow_failure: true
+  services:
+    - docker:stable-dind
+  script:
+    - docker run
+        --env SOURCE_CODE="$PWD"
+        --volume "$PWD":/code
+        --volume /var/run/docker.sock:/var/run/docker.sock
+        "registry.gitlab.com/gitlab-org/ci-cd/codequality:$SP_VERSION" /code
+  artifacts:
+    reports:
+      codequality: gl-code-quality-report.json
+  rules:
+    - if: $CI_MERGE_REQUEST_ID
