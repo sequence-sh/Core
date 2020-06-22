@@ -1,15 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
-using Namotion.Reflection;
 using Reductech.EDR.Utilities.Processes.mutable;
 using Reductech.EDR.Utilities.Processes.mutable.chain;
 using Reductech.EDR.Utilities.Processes.mutable.enumerations;
 using Reductech.EDR.Utilities.Processes.mutable.injection;
 using Reductech.Utilities.InstantConsole;
-using YamlDotNet.Serialization;
 
 namespace Reductech.EDR.Utilities.Processes
 {
@@ -22,7 +17,14 @@ namespace Reductech.EDR.Utilities.Processes
         /// <summary>
         /// All nuix processes.
         /// </summary>
-        public static readonly IReadOnlyCollection<IDocumented> Processes = new List<Process>
+        public static IReadOnlyCollection<IDocumented> GetProcesses(IProcessSettings processSettings)
+        {
+            return Processes.Select(x =>
+                new ProcessWrapper<IProcessSettings>(x.GetType(), processSettings,
+                    new DocumentationCategory("General Processes", typeof(Process)))).ToList();
+        }
+
+        private static readonly IReadOnlyCollection<Process> Processes = new List<Process>
         {
             new ChainLink(),
             new Chain(),
@@ -39,8 +41,7 @@ namespace Reductech.EDR.Utilities.Processes
             new Sequence(),
             new Unzip(),
             new WriteFile()
-        }.Select(x=> new YamlObjectWrapper(x.GetType(), new DocumentationCategory("General Processes", typeof(Process))))
-                .ToList();
+        };
 
         /// <summary>
         /// Objects that are useful to processes.
