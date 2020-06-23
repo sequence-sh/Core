@@ -13,7 +13,7 @@ namespace Reductech.EDR.Utilities.Processes.mutable.enumerations
     public class Directory : Enumeration
     {
         /// <inheritdoc />
-        protected override Result<IEnumerationElements> TryGetElements(IProcessSettings processSettings)
+        public override Result<IEnumerationElements> TryGetElements(IProcessSettings processSettings)
         {
             if (!System.IO.Directory.Exists(Path))
                 return Result.Failure<IEnumerationElements>($"Directory '{Path}' does not exist");
@@ -25,7 +25,7 @@ namespace Reductech.EDR.Utilities.Processes.mutable.enumerations
         }
 
         /// <inheritdoc />
-        protected override string Name => $"'{Path}'";
+        public override string Name => $"'{Path}'";
 
         /// <inheritdoc />
         public override EnumerationStyle GetEnumerationStyle()

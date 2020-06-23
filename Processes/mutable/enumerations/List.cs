@@ -13,7 +13,7 @@ namespace Reductech.EDR.Utilities.Processes.mutable.enumerations
     public class List : Enumeration
     {
         /// <inheritdoc />
-        protected override Result<IEnumerationElements> TryGetElements(IProcessSettings processSettings)
+        public override Result<IEnumerationElements> TryGetElements(IProcessSettings processSettings)
         {
             if(Members == null)
                 return Result.Failure<IEnumerationElements>($"{nameof(Members)} is null");
@@ -26,7 +26,7 @@ namespace Reductech.EDR.Utilities.Processes.mutable.enumerations
         }
 
         /// <inheritdoc />
-        protected override string Name => $"[{string.Join(", ", Members)}]";
+        public override string Name => $"[{string.Join(", ", Members)}]";
 
         /// <inheritdoc />
         public override EnumerationStyle GetEnumerationStyle()

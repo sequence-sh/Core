@@ -59,7 +59,7 @@ namespace Reductech.EDR.Utilities.Processes.mutable.enumerations
 
 
         /// <inheritdoc />
-        protected override Result<IEnumerationElements> TryGetElements(IProcessSettings processSettings)
+        public override Result<IEnumerationElements> TryGetElements(IProcessSettings processSettings)
         {
             var sources = new List<CSVSource>();
 
@@ -106,7 +106,7 @@ namespace Reductech.EDR.Utilities.Processes.mutable.enumerations
         }
 
         /// <inheritdoc />
-        protected override string Name
+        public override string Name
         {
             get
             {

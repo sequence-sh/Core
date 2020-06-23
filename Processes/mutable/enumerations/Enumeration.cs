@@ -13,12 +13,12 @@ namespace Reductech.EDR.Utilities.Processes.mutable.enumerations
         /// </summary>
         /// <param name="processSettings"></param>
         /// <returns></returns>
-        protected abstract Result<IEnumerationElements> TryGetElements(IProcessSettings processSettings);
+        public abstract Result<IEnumerationElements> TryGetElements(IProcessSettings processSettings);
 
         /// <summary>
         /// The name of this enumeration.
         /// </summary>
-        protected abstract string Name { get; }
+        public abstract string Name { get; }
 
         /// <inheritdoc />
         public override string ToString()
