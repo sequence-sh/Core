@@ -60,7 +60,7 @@ namespace Reductech.EDR.Utilities.Processes.mutable
             var objectWrapper = new ProcessObjectTypeWrapper<TActual>(result.Value); //This is a special case for value types being cast to object
             if (objectWrapper is IImmutableProcess<TOutput> objectWrapper2) return Result.Success(objectWrapper2);
 
-            var unitWrapper = new ProcessObjectTypeWrapper<TActual>(result.Value);
+            var unitWrapper = new ProcessUnitTypeWrapper<TActual>(result.Value);
             if (unitWrapper is IImmutableProcess<TOutput> unitWrapper2) return Result.Success(unitWrapper2);
 
             return Result.Failure<IImmutableProcess<TOutput>>($"{GetName()} has output type: '{typeof(TActual).Name}', not '{typeof(TOutput).Name}'.");
