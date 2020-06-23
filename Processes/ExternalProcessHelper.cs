@@ -30,7 +30,7 @@ namespace Reductech.EDR.Utilities.Processes
                 yield return ProcessOutput<Unit>.Error($"Could not find '{processPath}'");
                 yield break;
             }
-            
+
             var argumentString = string.Join(' ', arguments.Select(EncodeParameterArgument));
             using var pProcess = new System.Diagnostics.Process
             {
@@ -64,7 +64,6 @@ namespace Reductech.EDR.Utilities.Processes
                 if (line.Value.source == Source.Error)
                 {
                     var errorText = string.IsNullOrWhiteSpace(line.Value.line) ? "Unknown Error" : line.Value.line;
-                    
                     yield return ProcessOutput<Unit>.Error(errorText);
                 }
                 yield return ProcessOutput<Unit>.Message(line.Value.line);
@@ -82,7 +81,6 @@ namespace Reductech.EDR.Utilities.Processes
                 return $"\"{original}\"";
             var value = BackslashRegex.Replace(original, @"$1\$0");
 
-             
             value = TermWithSpaceRegex.Replace(value, "\"$1$2$2\"");
             return value;
         }

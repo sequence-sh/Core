@@ -41,15 +41,15 @@ namespace Reductech.EDR.Utilities.Processes.mutable
 
             return elements switch
             {
-                EagerEnumerationElements eagerEnumerationElements => GetFreezeResultFromEagerElements(processSettings,
-                    eagerEnumerationElements, Do),
-                LazyCSVEnumerationElements lazyEnumerationElements => Result.Success<IImmutableProcess<Unit>>(
-                    new LazyLoop(lazyEnumerationElements, Do, processSettings)),
+                IEagerEnumerationElements eagerEnumerationElements =>
+                GetFreezeResultFromEagerElements(processSettings, eagerEnumerationElements, Do),
+                ILazyEnumerationElements lazyEnumerationElements =>
+                Result.Success<IImmutableProcess<Unit>>(new LazyLoop(lazyEnumerationElements, Do, processSettings)),
                 _ => Result.Failure<IImmutableProcess<Unit>>("Could not handle enumeration elements")
             };
         }
 
-        internal static Result<IImmutableProcess<Unit>> GetFreezeResultFromEagerElements(IProcessSettings processSettings, EagerEnumerationElements eagerEnumerationElements, Process @do)
+        internal static Result<IImmutableProcess<Unit>> GetFreezeResultFromEagerElements(IProcessSettings processSettings, IEagerEnumerationElements eagerEnumerationElements, Process @do)
         {
             var finalProcesses = new List<IImmutableProcess<Unit>>();
 
