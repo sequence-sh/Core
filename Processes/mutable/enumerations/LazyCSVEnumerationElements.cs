@@ -5,7 +5,7 @@ using Reductech.EDR.Utilities.Processes.output;
 
 namespace Reductech.EDR.Utilities.Processes.mutable.enumerations
 {
-    internal class LazyCSVEnumerationElements : ImmutableProcess<EagerEnumerationElements>, IEnumerationElements
+    internal class LazyCSVEnumerationElements : ImmutableProcess<IEagerEnumerationElements>, ILazyEnumerationElements
     {
         public LazyCSVEnumerationElements(
             IImmutableProcess<string> subProcess,
@@ -31,7 +31,7 @@ namespace Reductech.EDR.Utilities.Processes.mutable.enumerations
         public override IProcessConverter? ProcessConverter => null;
 
         /// <inheritdoc />
-        public override async IAsyncEnumerable<IProcessOutput<EagerEnumerationElements>> Execute()
+        public override async IAsyncEnumerable<IProcessOutput<IEagerEnumerationElements>> Execute()
         {
             string? text = null;
             var anyErrors = false;
@@ -47,7 +47,7 @@ namespace Reductech.EDR.Utilities.Processes.mutable.enumerations
                     if (r.OutputType == OutputType.Error)
                         anyErrors = true;
 
-                    yield return r.ConvertTo<EagerEnumerationElements>(); //These methods failing is expected so it should not produce an error
+                    yield return r.ConvertTo<IEagerEnumerationElements>(); //These methods failing is expected so it should not produce an error
                 }
             }
 
@@ -58,20 +58,20 @@ namespace Reductech.EDR.Utilities.Processes.mutable.enumerations
                     var csvResult = CsvReader.TryReadCSVFromString(text, Delimiter, CommentToken, HasFieldsEnclosedInQuotes);
 
                     if (csvResult.IsFailure)
-                        yield return ProcessOutput<EagerEnumerationElements>.Error(csvResult.Error);
+                        yield return ProcessOutput<IEagerEnumerationElements>.Error(csvResult.Error);
                     else
                     {
                         using var dataTable = csvResult.Value;
 
                         var elementsResult = CSV.ConvertDataTable(dataTable, ColumnInjections, Distinct);
                         if (elementsResult.IsSuccess)
-                            yield return ProcessOutput<EagerEnumerationElements>.Success(elementsResult.Value);
+                            yield return ProcessOutput<IEagerEnumerationElements>.Success(elementsResult.Value);
                         else
-                            yield return ProcessOutput<EagerEnumerationElements>.Error(elementsResult.Error);
+                            yield return ProcessOutput<IEagerEnumerationElements>.Error(elementsResult.Error);
                     }
                 }
                 else
-                    yield return ProcessOutput<EagerEnumerationElements>.Error("A CSV string was not returned");
+                    yield return ProcessOutput<IEagerEnumerationElements>.Error("A CSV string was not returned");
             }
         }
 

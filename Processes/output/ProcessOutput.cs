@@ -22,35 +22,41 @@ namespace Reductech.EDR.Utilities.Processes.output
             return new ProcessOutput<T>(message, OutputType.Success, value );
         }
 
+        /// <inheritdoc />
+        public override string ToString()
+        {
+            return OutputType switch
+            {
+                OutputType.Error => Text,
+                OutputType.Warning => Text,
+                OutputType.Message => Text,
+                OutputType.Success => (Value?.ToString() ?? ""),
+                _ => throw new ArgumentOutOfRangeException()
+            };
+        }
+
 
 #pragma warning disable CS8604 // Possible null reference argument.
 
         /// <summary>
         /// Creates a new message output.
         /// </summary>
-        /// <param name="error"></param>
-        /// <returns></returns>
-        public static IProcessOutput<T> Message(string error) {
+        public static IProcessOutput<T> Message(string message) {
 
-            return new ProcessOutput<T>(error, OutputType.Message, default );
+            return new ProcessOutput<T>(message, OutputType.Message, default );
         }
-
 
         /// <summary>
         /// Creates a new warning output.
         /// </summary>
-        /// <param name="error"></param>
-        /// <returns></returns>
-        public static IProcessOutput<T> Warning(string error) {
+        public static IProcessOutput<T> Warning(string warning) {
 
-            return new ProcessOutput<T>(error, OutputType.Warning, default );
+            return new ProcessOutput<T>(warning, OutputType.Warning, default );
         }
 
         /// <summary>
         /// Creates a new error output.
         /// </summary>
-        /// <param name="error"></param>
-        /// <returns></returns>
         public static IProcessOutput<T> Error(string error) {
 
             return new ProcessOutput<T>(error, OutputType.Error, default );
@@ -79,19 +85,17 @@ namespace Reductech.EDR.Utilities.Processes.output
         /// <inheritdoc />
         public OutputType OutputType { get; }
 
-        
-
         private readonly T _value;
 
         /// <inheritdoc />
-        public T Value => OutputType == OutputType.Success ? _value : 
+        public T Value => OutputType == OutputType.Success ? _value :
             throw new InvalidOperationException("Cannot access outputType for ProcessOutput which is not of Success type");
 
         /// <inheritdoc />
         public override bool Equals(object? obj)
         {
-            return obj is ProcessOutput<T> pot && 
-                   Text == pot.Text && 
+            return obj is ProcessOutput<T> pot &&
+                   Text == pot.Text &&
                    OutputType == pot.OutputType;
         }
 

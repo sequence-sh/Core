@@ -7,15 +7,15 @@ namespace Reductech.EDR.Utilities.Processes.immutable
 {
     internal class LazyLoop : ImmutableProcess<Unit>
     {
-        public LazyLoop(LazyCSVEnumerationElements lazyCSVEnumerationElements, Process @do, IProcessSettings processSettings)
+        public LazyLoop(ILazyEnumerationElements lazyEnumerationElements, Process @do, IProcessSettings processSettings)
         {
-            LazyCSVEnumerationElements = lazyCSVEnumerationElements;
+            LazyEnumerationElements = lazyEnumerationElements;
             Do = @do;
             ProcessSettings = processSettings;
         }
 
         /// <inheritdoc />
-        public override string Name => ProcessNameHelper.GetLoopName(LazyCSVEnumerationElements.Name, Do.GetName());
+        public override string Name => ProcessNameHelper.GetLoopName(LazyEnumerationElements.Name, Do.GetName());
 
         /// <inheritdoc />
         public override IProcessConverter? ProcessConverter => null;
@@ -23,10 +23,10 @@ namespace Reductech.EDR.Utilities.Processes.immutable
         /// <inheritdoc />
         public override async IAsyncEnumerable<IProcessOutput<Unit>> Execute()
         {
-            EagerEnumerationElements? elements = null;
+            IEagerEnumerationElements? elements = null;
             var anyErrors = false;
 
-            await foreach (var r in LazyCSVEnumerationElements.Execute())
+            await foreach (var r in LazyEnumerationElements.Execute())
             {
                 if (r.OutputType == OutputType.Success)
                     elements = r.Value;
@@ -62,6 +62,6 @@ namespace Reductech.EDR.Utilities.Processes.immutable
 
         public Process Do { get; }
 
-        public LazyCSVEnumerationElements LazyCSVEnumerationElements { get; }
+        public ILazyEnumerationElements LazyEnumerationElements { get; }
     }
 }

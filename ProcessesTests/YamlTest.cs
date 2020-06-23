@@ -1,4 +1,6 @@
 ﻿using System.Threading.Tasks;
+using CSharpFunctionalExtensions;
+using FluentAssertions;
 using NUnit.Framework;
 using Reductech.EDR.Utilities.Processes.mutable;
 using Reductech.EDR.Utilities.Processes.mutable.enumerations;
@@ -13,7 +15,7 @@ namespace Reductech.EDR.Utilities.Processes.Tests
             const string text =
 @"
 !Sequence
-Defaults: {Term: Word}    
+Defaults: {Term: Word}
 Steps:
     - !EmitProcess
         Number: 1
@@ -22,13 +24,9 @@ Steps:
 ";
 
             var result = YamlHelper.TryMakeFromYaml(text);
-
             var process = result.AssertSuccess();
-
             var frozenProcess = process.TryFreeze<Unit>(EmptySettings.Instance).AssertSuccess();
-
             var lines = frozenProcess.Execute();
-
             var l = await TestHelpers.AssertNoErrors(lines);
 
             CollectionAssert.Contains(l, "Word1");
@@ -92,17 +90,31 @@ Do: !EmitProcess
     ";
 
             var result = YamlHelper.TryMakeFromYaml(text);
-
             var process = result.AssertSuccess();
-
             var immutableProcess = process.TryFreeze<Unit>(EmptySettings.Instance).AssertSuccess();
-
             var lines = immutableProcess.Execute();
-
             var l = await TestHelpers.AssertNoErrors(lines);
 
-
             CollectionAssert.AreEquivalent(new[] {"Word1"}, l);
+        }
+
+        [Test]
+        public void TestSerialization()
+        {
+            var process = new EmitProcess
+            {
+                Term = "Hello World"
+            };
+
+            var yaml = YamlHelper.ConvertToYaml(process);
+
+            var (_, isFailure, _, error) = YamlHelper.TryMakeFromYaml(yaml);
+
+            if (isFailure)
+            {
+                error.Should().BeEmpty();
+                false.Should().BeTrue("Failed but error was empty.");
+            }
         }
 
 

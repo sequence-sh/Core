@@ -25,6 +25,11 @@ namespace Reductech.EDR.Utilities.Processes
             return processName + " then " + nextName;
         }
 
+        public static string GetReadFileName()
+        {
+            return "Read File";
+        }
+
         public static string GetSequenceName(IEnumerable<string> stepNames) //TODO allow names like "Search and Tag 17 times"
         {
             var r = string.Join(" then ", stepNames);
