@@ -29,3 +29,5 @@ bld/
 msbuild.log
 msbuild.err
 msbuild.wrn
+/.vs/Processes/v16/TestStore/0/testlog.manifest
+/.vs/Processes/v16/TestStore/0/001.testlog
