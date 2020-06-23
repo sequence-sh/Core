@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Utilities.Processes.immutable;
+using Reductech.EDR.Utilities.Processes.mutable.chain;
 using YamlDotNet.Serialization;
 
 namespace Reductech.EDR.Utilities.Processes.mutable
@@ -40,17 +41,18 @@ namespace Reductech.EDR.Utilities.Processes.mutable
         }
 
         /// <inheritdoc />
-        public override Result<ImmutableProcess, ErrorList> TryFreeze(IProcessSettings processSettings)
+        public override Result<IImmutableProcess<TOutput>> TryFreeze<TOutput>(IProcessSettings processSettings)
         {
-            var textFreezeResult = Text.TryFreeze(processSettings);
+            return TryConvertFreezeResult<TOutput, Unit>(TryFreeze(processSettings));
+        }
+
+        private Result<IImmutableProcess<Unit>> TryFreeze(IProcessSettings processSettings)
+        {
+            var textFreezeResult = Text.TryFreeze<string>(processSettings);
             if (textFreezeResult.IsFailure)
-                return textFreezeResult.ConvertFailure<ImmutableProcess>();
+                return textFreezeResult.ConvertFailure<IImmutableProcess<Unit>>();
 
-            if (textFreezeResult.Value is ImmutableProcess<string> ips)
-                return Result.Success<ImmutableProcess, ErrorList>(new immutable.WriteFile( ips, Folder, FileName));
-
-            return Result.Failure<ImmutableProcess, ErrorList>(new ErrorList(
-                $"'{nameof(textFreezeResult.Value)}' must have return type 'string'."));
+            return Result.Success<IImmutableProcess<Unit>>(new immutable.WriteFile( textFreezeResult.Value, Folder, FileName));
 
         }
 
@@ -58,6 +60,12 @@ namespace Reductech.EDR.Utilities.Processes.mutable
         public override IEnumerable<string> GetRequirements()
         {
             yield break;
+        }
+
+        /// <inheritdoc />
+        public override Result<ChainLinkBuilder<TInput, TFinal>> TryCreateChainLinkBuilder<TInput, TFinal>()
+        {
+            return new ChainLinkBuilder<TInput,Unit,TFinal,immutable.WriteFile,WriteFile>(this);
         }
     }
 }

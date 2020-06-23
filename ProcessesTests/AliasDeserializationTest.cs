@@ -4,6 +4,7 @@ using CSharpFunctionalExtensions;
 using NUnit.Framework;
 using Reductech.EDR.Utilities.Processes.immutable;
 using Reductech.EDR.Utilities.Processes.mutable;
+using Reductech.EDR.Utilities.Processes.mutable.chain;
 using YamlDotNet.Serialization;
 
 namespace Reductech.EDR.Utilities.Processes.Tests
@@ -59,7 +60,7 @@ namespace Reductech.EDR.Utilities.Processes.Tests
         }
 
         /// <inheritdoc />
-        public override Result<ImmutableProcess, ErrorList> TryFreeze(IProcessSettings processSettings)
+        public override Result<IImmutableProcess<TFinal>> TryFreeze<TFinal>(IProcessSettings processSettings)
         {
             throw new NotImplementedException();
         }
@@ -68,6 +69,12 @@ namespace Reductech.EDR.Utilities.Processes.Tests
         public override IEnumerable<string> GetRequirements()
         {
             yield break;
+        }
+
+        /// <inheritdoc />
+        public override Result<ChainLinkBuilder<TInput, TFinal>> TryCreateChainLinkBuilder<TInput, TFinal>()
+        {
+            throw new NotImplementedException();
         }
     }
 }

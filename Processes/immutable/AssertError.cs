@@ -11,10 +11,10 @@ namespace Reductech.EDR.Utilities.Processes.immutable
         /// <summary>
         /// The process that is expected to produce an error.
         /// </summary>
-        public readonly ImmutableProcess<Unit> SubProcess;
+        public readonly IImmutableProcess<Unit> SubProcess;
 
         /// <inheritdoc />
-        public AssertError(ImmutableProcess<Unit> subProcess)
+        public AssertError(IImmutableProcess<Unit> subProcess)
         {
             SubProcess = subProcess;
         }
@@ -26,7 +26,7 @@ namespace Reductech.EDR.Utilities.Processes.immutable
 
             var results = SubProcess.Execute();
             await foreach (var line in results)
-            {             
+            {
                 if (line.OutputType == OutputType.Message || line.OutputType == OutputType.Warning)
                     yield return line.ConvertTo<Unit>();
                 else if(line.OutputType == OutputType.Error) //we don't need to see the error message.

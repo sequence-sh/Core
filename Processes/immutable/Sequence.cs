@@ -15,10 +15,10 @@ namespace Reductech.EDR.Utilities.Processes.immutable
         /// <summary>
         /// Steps that make up this sequence.
         /// </summary>
-        public readonly IReadOnlyCollection<ImmutableProcess<Unit>> Steps;
+        public readonly IReadOnlyCollection<IImmutableProcess<Unit>> Steps;
 
         /// <inheritdoc />
-        public Sequence(IReadOnlyCollection<ImmutableProcess<Unit>> steps)
+        public Sequence(IReadOnlyCollection<IImmutableProcess<Unit>> steps)
         {
             Steps = steps;
         }
@@ -32,11 +32,11 @@ namespace Reductech.EDR.Utilities.Processes.immutable
             foreach (var process in Steps)
             {
                 var allGood = true;
-                var resultLines = process.ExecuteUntyped();
+                var resultLines = process.Execute();
                 await foreach (var resultLine in resultLines)
                 {
                     if(resultLine.OutputType != OutputType.Success)
-                        yield return resultLine.ConvertTo<Unit>();
+                        yield return resultLine;
                     allGood &= resultLine.OutputType != OutputType.Error;
                 }
                 if(!allGood)
@@ -56,33 +56,28 @@ namespace Reductech.EDR.Utilities.Processes.immutable
         }
 
         /// <inheritdoc />
-        public override Result<ImmutableProcess<Unit>> TryCombine(ImmutableProcess<Unit> nextProcess, IProcessSettings processSettings)
+        public override Result<IImmutableProcess<Unit>> TryCombine(IImmutableProcess<Unit> nextProcess, IProcessSettings processSettings)
         {
             if (Steps.Count == 0)
-            {
                 return Result.Success(nextProcess);
-            }
-            else
-            {
 
-                var allSteps =
-                    nextProcess is Sequence nextSequence?  Steps.Concat(nextSequence.Steps) :
-                        Steps.Concat(new[] {nextProcess});
+            var allSteps =
+                nextProcess is Sequence nextSequence?  Steps.Concat(nextSequence.Steps) :
+                    Steps.Concat(new[] {nextProcess});
 
-                var r = CombineSteps(allSteps, processSettings);
+            var r = CombineSteps(allSteps, processSettings);
 
-                return Result.Success(r);
-            }
+            return Result.Success(r);
         }
 
         /// <summary>
         /// Combines steps to produce a sequence
         /// </summary>
-        public static  ImmutableProcess<Unit> CombineSteps(IEnumerable<ImmutableProcess<Unit>> steps, IProcessSettings processSettings)
+        public static IImmutableProcess<Unit> CombineSteps(IEnumerable<IImmutableProcess<Unit>> steps, IProcessSettings processSettings)
         {
-            var combinedProcesses = new List<ImmutableProcess<Unit>>();
+            var combinedProcesses = new List<IImmutableProcess<Unit>>();
 
-            ImmutableProcess<Unit>? current = null;
+            IImmutableProcess<Unit>? current = null;
 
             foreach (var step in steps)
             {

@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Utilities.Processes.immutable;
+using Reductech.EDR.Utilities.Processes.mutable.chain;
 using YamlDotNet.Serialization;
 
 namespace Reductech.EDR.Utilities.Processes.mutable
@@ -29,23 +30,24 @@ namespace Reductech.EDR.Utilities.Processes.mutable
         public override string GetName() => ProcessNameHelper.GetAssertErrorName(Process?.GetName()??"");
 
         /// <inheritdoc />
-        public override Result<ImmutableProcess, ErrorList> TryFreeze(IProcessSettings processSettings)
+        public override Result<IImmutableProcess<TOutput>> TryFreeze<TOutput>(IProcessSettings processSettings)
+        {
+            var r = TryFreeze(processSettings);
+            return TryConvertFreezeResult<TOutput, Unit>(r);
+        }
+
+        private Result<IImmutableProcess<Unit>> TryFreeze(IProcessSettings processSettings)
         {
             if (Process == null)
-                return Result.Failure<ImmutableProcess, ErrorList>(new ErrorList($"{nameof(Process)} is null."));
+                return Result.Failure<IImmutableProcess<Unit>>($"{nameof(Process)} is null.");
 
-            var subProcessFreezeResult = Process.TryFreeze(processSettings);
+            var subProcessFreezeResult = Process.TryFreeze<Unit>(processSettings);
 
             if (subProcessFreezeResult.IsFailure) return subProcessFreezeResult;
 
-            if (subProcessFreezeResult.Value is ImmutableProcess<Unit> unitProcess)
-            {
-                var r = new immutable.AssertError( unitProcess);
+            var r = new immutable.AssertError( subProcessFreezeResult.Value);
 
-                return Result.Success<ImmutableProcess, ErrorList>(r);
-            }
-
-            return Result.Failure<ImmutableProcess, ErrorList>(new ErrorList($"'{nameof(Process)}' must have return type void."));
+            return r;
         }
 
         /// <inheritdoc />
@@ -55,6 +57,12 @@ namespace Reductech.EDR.Utilities.Processes.mutable
                 return Enumerable.Empty<string>();
 
             return Process.GetRequirements();
+        }
+
+        /// <inheritdoc />
+        public override Result<ChainLinkBuilder<TInput, TFinal>> TryCreateChainLinkBuilder<TInput, TFinal>()
+        {
+            return new ChainLinkBuilder<TInput,Unit,TFinal,immutable.AssertError,AssertError>(this);
         }
     }
 }

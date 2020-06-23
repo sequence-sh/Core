@@ -40,14 +40,13 @@ namespace Reductech.EDR.Utilities.Processes
                 yield break;
             }
 
-            var (_, freezeFailure, immutableProcess, freezeError) = yamlResult.Value.TryFreeze(_processSettings);
+            var (_, freezeFailure, immutableProcess, freezeError) = yamlResult.Value.TryFreeze<Unit>(_processSettings);
 
             if (freezeFailure)
-                foreach (var e in freezeError)
-                    yield return Result.Failure<string>(e);
+                yield return Result.Failure<string>(freezeError);
             else
             {
-                await foreach (var output in immutableProcess.ExecuteUntyped())
+                await foreach (var output in immutableProcess.Execute())
                 {
                     var r = output.OutputType switch
                     {

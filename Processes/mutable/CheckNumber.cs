@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Utilities.Processes.immutable;
+using Reductech.EDR.Utilities.Processes.mutable.chain;
 using YamlDotNet.Serialization;
 
 namespace Reductech.EDR.Utilities.Processes.mutable
@@ -16,7 +17,6 @@ namespace Reductech.EDR.Utilities.Processes.mutable
         /// Inclusive minimum of the expected range.
         /// Either this, Maximum, or both must be set.
         /// </summary>
-        
         [YamlMember(Order = 2 )]
         public int? Minimum { get; set; }
 
@@ -24,7 +24,6 @@ namespace Reductech.EDR.Utilities.Processes.mutable
         /// Inclusive maximum of the expected range.
         /// Either this, Minimum, or both must be set.
         /// </summary>
-        
         [YamlMember(Order = 3 )]
         public int? Maximum { get; set; }
 
@@ -43,23 +42,25 @@ namespace Reductech.EDR.Utilities.Processes.mutable
         /// <inheritdoc />
         public override string GetName() => ProcessNameHelper.GetCheckNumberProcessName(Check?.GetName() ?? "");
 
+
         /// <inheritdoc />
-        public override Result<ImmutableProcess, ErrorList> TryFreeze(IProcessSettings processSettings)
+        public override Result<IImmutableProcess<TOutput>> TryFreeze<TOutput>(IProcessSettings processSettings)
+        {
+            return TryConvertFreezeResult<TOutput, bool>(TryFreeze(processSettings));
+        }
+
+        private Result<IImmutableProcess<bool>> TryFreeze(IProcessSettings processSettings)
         {
             if (Minimum == null && Maximum == null)
-                return Result.Failure<ImmutableProcess, ErrorList>(new ErrorList($"Either {nameof(Minimum)} or {nameof(Maximum)} must be set."));
+                return Result.Failure<IImmutableProcess<bool>>($"Either {nameof(Minimum)} or {nameof(Maximum)} must be set.");
 
             var frozenCount =
-                Check?.TryFreeze(processSettings)??Result.Failure<ImmutableProcess, ErrorList>(new ErrorList($"'{nameof(Check)}' must be set."));
+                Check?.TryFreeze<int>(processSettings)??Result.Failure<IImmutableProcess<int>>($"'{nameof(Check)}' must be set.");
 
             if (frozenCount.IsFailure)
-                return frozenCount;
+                return frozenCount.ConvertFailure<IImmutableProcess<bool>>();
 
-            if (frozenCount.Value is ImmutableProcess<int> icp)
-                return Result.Success<ImmutableProcess, ErrorList>(new immutable.CheckNumber(Minimum, Maximum, icp));
-
-            return Result.Failure<ImmutableProcess, ErrorList>(new ErrorList(
-                $"'{nameof(Check)}' must have return type 'int'."));
+            return Result.Success<IImmutableProcess<bool>>(new immutable.CheckNumber(Minimum, Maximum, frozenCount.Value));
 
         }
 
@@ -70,6 +71,12 @@ namespace Reductech.EDR.Utilities.Processes.mutable
                 return Enumerable.Empty<string>();
 
             return Check.GetRequirements();
+        }
+
+        /// <inheritdoc />
+        public override Result<ChainLinkBuilder<TInput, TFinal>> TryCreateChainLinkBuilder<TInput, TFinal>()
+        {
+            return new ChainLinkBuilder<TInput,bool,TFinal,immutable.CheckNumber,CheckNumber>(this);
         }
     }
 }

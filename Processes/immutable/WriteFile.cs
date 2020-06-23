@@ -13,7 +13,7 @@ namespace Reductech.EDR.Utilities.Processes.immutable
         /// <summary>
         /// A process which outputs the text to write.
         /// </summary>
-        public readonly ImmutableProcess<string> TextProcess;
+        public readonly IImmutableProcess<string> TextProcess;
 
         /// <summary>
         /// The folder to create the file in.
@@ -28,7 +28,7 @@ namespace Reductech.EDR.Utilities.Processes.immutable
         /// <summary>
         /// Creates a new WriteFile.
         /// </summary>
-        public WriteFile(ImmutableProcess<string> textProcess, string folder, string fileName)
+        public WriteFile(IImmutableProcess<string> textProcess, string folder, string fileName)
         {
             TextProcess = textProcess;
             Folder = folder;
@@ -86,7 +86,7 @@ namespace Reductech.EDR.Utilities.Processes.immutable
                     else yield return ProcessOutput<Unit>.Error(error);
                     break;
                 }
-                    
+
                 case false: //Do nothing
                     break;
                 default:
