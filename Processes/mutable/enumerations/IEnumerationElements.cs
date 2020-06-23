@@ -3,8 +3,7 @@
     /// <summary>
     /// Will be either EagerEnumerationElements or LazyCSVEnumerationElements
     /// </summary>
-    internal interface IEnumerationElements
+    public interface IEnumerationElements
     {
-        
     }
 }
