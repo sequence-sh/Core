@@ -41,28 +41,22 @@ namespace Reductech.EDR.Utilities.Processes.output
         /// <summary>
         /// Creates a new message output.
         /// </summary>
-        /// <param name="error"></param>
-        /// <returns></returns>
-        public static IProcessOutput<T> Message(string error) {
+        public static IProcessOutput<T> Message(string message) {
 
-            return new ProcessOutput<T>(error, OutputType.Message, default );
+            return new ProcessOutput<T>(message, OutputType.Message, default );
         }
 
         /// <summary>
         /// Creates a new warning output.
         /// </summary>
-        /// <param name="error"></param>
-        /// <returns></returns>
-        public static IProcessOutput<T> Warning(string error) {
+        public static IProcessOutput<T> Warning(string warning) {
 
-            return new ProcessOutput<T>(error, OutputType.Warning, default );
+            return new ProcessOutput<T>(warning, OutputType.Warning, default );
         }
 
         /// <summary>
         /// Creates a new error output.
         /// </summary>
-        /// <param name="error"></param>
-        /// <returns></returns>
         public static IProcessOutput<T> Error(string error) {
 
             return new ProcessOutput<T>(error, OutputType.Error, default );
