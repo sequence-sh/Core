@@ -34,7 +34,7 @@ namespace Reductech.EDR.Utilities.Processes.mutable
         /// Should files be overwritten in the destination directory.
         /// </summary>
         [YamlMember(Order = 3)]
-        public bool OverwriteFiles { get; } = false;
+        public bool OverwriteFiles { get; set; } = false;
 
         /// <inheritdoc />
         public override string GetReturnTypeInfo() => nameof(Unit);
