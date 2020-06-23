@@ -109,6 +109,7 @@ namespace Reductech.EDR.Utilities.Processes.mutable.enumerations
         }
 
         /// <inheritdoc />
+        [YamlIgnore]
         public override string Name
         {
             get
