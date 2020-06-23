@@ -5,7 +5,7 @@ using Reductech.EDR.Utilities.Processes.output;
 
 namespace Reductech.EDR.Utilities.Processes.mutable.enumerations
 {
-    internal class LazyCSVEnumerationElements : ImmutableProcess<IEagerEnumerationElements>, IEnumerationElements
+    internal class LazyCSVEnumerationElements : ImmutableProcess<IEagerEnumerationElements>, ILazyEnumerationElements
     {
         public LazyCSVEnumerationElements(
             IImmutableProcess<string> subProcess,
