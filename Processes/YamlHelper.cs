@@ -88,7 +88,6 @@ namespace Reductech.EDR.Utilities.Processes
                 GetSpecialTypes(false).Aggregate(serializerBuilder,
                     (current, specialType) => current.WithTagMapping("!" + specialType.Key, specialType.Value));
             serializerBuilder.ConfigureDefaultValuesHandling(DefaultValuesHandling.OmitNull);
-            serializerBuilder
             return serializerBuilder.Build();
         });
 
