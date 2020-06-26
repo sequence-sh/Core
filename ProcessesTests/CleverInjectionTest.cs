@@ -20,18 +20,17 @@ namespace Reductech.EDR.Utilities.Processes.Tests
         {
             var process = new RunExternalProcess();
 
-            var injector = new ProcessInjector(new List<(string element, Injection injection)>()
+            var injections = new List<(object element, Injection injection)>
             {
-                ("Pink", new Injection()
+                ("Pink", new Injection
                 {
                     Property = nameof(RunExternalProcess.ProcessPath)
-                } )
-            });
+                })
+            };
 
+            var injector = new ProcessInjector(injections);
             var (isSuccess, _, error) = injector.Inject(process);
-
             Assert.IsTrue(isSuccess, error);
-
             Assert.AreEqual("Pink", process.ProcessPath);
         }
 
@@ -43,7 +42,7 @@ namespace Reductech.EDR.Utilities.Processes.Tests
                 Do = new RunExternalProcess()
             };
 
-            var injector = new ProcessInjector(new List<(string element, Injection injection)>()
+            var injector = new ProcessInjector(new List<(object element, Injection injection)>
             {
                 ("Pink", new Injection
                 {
@@ -74,7 +73,7 @@ namespace Reductech.EDR.Utilities.Processes.Tests
                 },
             };
 
-            var injector = new ProcessInjector(new List<(string element, Injection injection)>()
+            var injector = new ProcessInjector(new List<(object element, Injection injection)>
             {
                 ("Pink", new Injection
                 {
@@ -97,7 +96,7 @@ namespace Reductech.EDR.Utilities.Processes.Tests
                 Parameters = new Dictionary<string, string>{{"Arg1", "Blue"}}
             };
 
-            var injector = new ProcessInjector(new List<(string element, Injection injection)>()
+            var injector = new ProcessInjector(new List<(object element, Injection injection)>
             {
                 ("Pink", new Injection
                 {

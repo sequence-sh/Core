@@ -19,7 +19,7 @@ namespace Reductech.EDR.Utilities.Processes.mutable.enumerations
                 return Result.Failure<IEnumerationElements>($"{nameof(Members)} is null");
 
             var elements =
-                new EagerEnumerationElements(Members.Select(m => new ProcessInjector(Inject.Select(i => (m, i))))
+                new EagerEnumerationElements(Members.Select(m => new ProcessInjector(Inject.Select(i => (m as object, i))))
                     .ToList());
 
             return elements;

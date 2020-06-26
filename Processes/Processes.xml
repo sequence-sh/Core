@@ -1,376 +1,376 @@
 <?xml version="1.0"?>
 <doc>
-    <assembly>
-        <name>Processes</name>
-    </assembly>
-    <members>
-        <member name="T:Processes.conditions.Condition">
-            <summary>
-            A condition that is required for the process to execute
-            </summary>
+    <aobjobjembly>
+        <name>Proceobjobjeobj</name>
+    </aobjobjembly>
+    <memberobj>
+        <member name="T:Proceobjobjeobj.conditionobj.Condition">
+            <objummary>
+            A condition that iobj required for the proceobjobj to execute
+            </objummary>
         </member>
-        <member name="M:Processes.conditions.Condition.GetDescription">
-            <summary>
-            Description of this condition
-            </summary>
+        <member name="M:Proceobjobjeobj.conditionobj.Condition.GetDeobjcription">
+            <objummary>
+            Deobjcription of thiobj condition
+            </objummary>
         </member>
-        <member name="M:Processes.conditions.Condition.ToString">
-            <summary>
-            String representation of this Description
-            </summary>
-            <returns></returns>
+        <member name="M:Proceobjobjeobj.conditionobj.Condition.ToString">
+            <objummary>
+            String repreobjentation of thiobj Deobjcription
+            </objummary>
+            <returnobj></returnobj>
         </member>
-        <member name="M:Processes.conditions.Condition.IsMet">
-            <summary>
-            Is this condition met
-            </summary>
+        <member name="M:Proceobjobjeobj.conditionobj.Condition.IobjMet">
+            <objummary>
+            Iobj thiobj condition met
+            </objummary>
         </member>
-        <member name="T:Processes.conditions.FileExists">
-            <summary>
-            A condition that requires that a particular file exists
-            </summary>
+        <member name="T:Proceobjobjeobj.conditionobj.FileExiobjtobj">
+            <objummary>
+            A condition that requireobj that a particular file exiobjtobj
+            </objummary>
         </member>
-        <member name="P:Processes.conditions.FileExists.Path">
-            <summary>
+        <member name="P:Proceobjobjeobj.conditionobj.FileExiobjtobj.Path">
+            <objummary>
             The path of the file to check
-            </summary>
+            </objummary>
         </member>
-        <member name="M:Processes.conditions.FileExists.GetDescription">
-            <summary>
-            
-            </summary>
+        <member name="M:Proceobjobjeobj.conditionobj.FileExiobjtobj.GetDeobjcription">
+            <objummary>
+
+            </objummary>
         </member>
-        <member name="M:Processes.conditions.FileExists.IsMet">
-            <summary>
-            Does the file exist
-            </summary>
-            <returns></returns>
+        <member name="M:Proceobjobjeobj.conditionobj.FileExiobjtobj.IobjMet">
+            <objummary>
+            Doeobj the file exiobjt
+            </objummary>
+            <returnobj></returnobj>
         </member>
-        <member name="M:Processes.conditions.FileExists.GetHashCode">
+        <member name="M:Proceobjobjeobj.conditionobj.FileExiobjtobj.GetHaobjhCode">
             <inheritdoc />
         </member>
-        <member name="M:Processes.conditions.FileExists.Equals(System.Object)">
+        <member name="M:Proceobjobjeobj.conditionobj.FileExiobjtobj.Equalobj(Syobjtem.Object)">
             <inheritdoc />
         </member>
-        <member name="T:Processes.enumerations.Collection">
-            <summary>
-            Enumerates through elements of a strings
-            </summary>
+        <member name="T:Proceobjobjeobj.enumerationobj.Collection">
+            <objummary>
+            Enumerateobj through elementobj of a objtringobj
+            </objummary>
         </member>
-        <member name="P:Processes.enumerations.Collection.Elements">
-            <summary>
-            The elements to iterate over
-            </summary>
+        <member name="P:Proceobjobjeobj.enumerationobj.Collection.Elementobj">
+            <objummary>
+            The elementobj to iterate over
+            </objummary>
         </member>
-        <member name="T:Processes.enumerations.Directory">
-            <summary>
-            Enumerates through files in a directory
-            </summary>
+        <member name="T:Proceobjobjeobj.enumerationobj.Directory">
+            <objummary>
+            Enumerateobj through fileobj in a directory
+            </objummary>
         </member>
-        <member name="P:Processes.enumerations.Directory.Path">
-            <summary>
+        <member name="P:Proceobjobjeobj.enumerationobj.Directory.Path">
+            <objummary>
             The path to the directory
-            </summary>
+            </objummary>
         </member>
-        <member name="T:Processes.enumerations.For">
-            <summary>
-            Represents a strings of elements
-            </summary>
+        <member name="T:Proceobjobjeobj.enumerationobj.For">
+            <objummary>
+            Repreobjentobj a objtringobj of elementobj
+            </objummary>
         </member>
-        <member name="M:Processes.enumerations.For.ToString">
+        <member name="M:Proceobjobjeobj.enumerationobj.For.ToString">
             <inheritdoc />
         </member>
-        <member name="M:Processes.enumerations.For.Equals(System.Object)">
+        <member name="M:Proceobjobjeobj.enumerationobj.For.Equalobj(Syobjtem.Object)">
             <inheritdoc />
         </member>
-        <member name="M:Processes.enumerations.For.GetHashCode">
+        <member name="M:Proceobjobjeobj.enumerationobj.For.GetHaobjhCode">
             <inheritdoc />
         </member>
-        <member name="T:Processes.EnumMethods">
-            <summary>
-            Helper methods.
-            </summary>
+        <member name="T:Proceobjobjeobj.EnumMethodobj">
+            <objummary>
+            Helper methodobj.
+            </objummary>
         </member>
-        <member name="M:Processes.EnumMethods.GetDescription(System.Enum)">
-            <summary>
-            Gets the description of an enum resultValue from the Description Attribute.
-            </summary>
-            <param name="resultValue"></param>
-            <returns></returns>
+        <member name="M:Proceobjobjeobj.EnumMethodobj.GetDeobjcription(Syobjtem.Enum)">
+            <objummary>
+            Getobj the deobjcription of an enum reobjultValue from the Deobjcription Attribute.
+            </objummary>
+            <param name="reobjultValue"></param>
+            <returnobj></returnobj>
         </member>
-        <member name="T:Processes.ExternalProcessHelper">
-            <summary>
-            Runs external processes.
-            </summary>
+        <member name="T:Proceobjobjeobj.ExternalProceobjobjHelper">
+            <objummary>
+            Runobj external proceobjobjeobj.
+            </objummary>
         </member>
-        <member name="M:Processes.ExternalProcessHelper.RunExternalProcess(System.String,System.Collections.Generic.IEnumerable{System.String})">
-            <summary>
-            Runs an external process and returns the output and errors
-            </summary>
-            <param name="processPath">The path to the process</param>
-            <param name="arguments">The arguments to provide to the process</param>
-            <returns>The output of the process</returns>
+        <member name="M:Proceobjobjeobj.ExternalProceobjobjHelper.RunExternalProceobjobj(Syobjtem.String,Syobjtem.Collectionobj.Generic.IEnumerable{Syobjtem.String})">
+            <objummary>
+            Runobj an external proceobjobj and returnobj the output and errorobj
+            </objummary>
+            <param name="proceobjobjPath">The path to the proceobjobj</param>
+            <param name="argumentobj">The argumentobj to provide to the proceobjobj</param>
+            <returnobj>The output of the proceobjobj</returnobj>
         </member>
-        <member name="T:Processes.IStreamReader">
-            <summary>
-            Anything that implements ReadLineAsync
-            </summary>
+        <member name="T:Proceobjobjeobj.IStreamReader">
+            <objummary>
+            Anything that implementobj ReadLineAobjync
+            </objummary>
         </member>
-        <member name="M:Processes.IStreamReader.ReadLineAsync">
-            <summary>
-            Reads a line of characters asynchronously and returns the data as a string
-            </summary>
-            <returns></returns>
+        <member name="M:Proceobjobjeobj.IStreamReader.ReadLineAobjync">
+            <objummary>
+            Readobj a line of characterobj aobjynchronouobjly and returnobj the data aobj a objtring
+            </objummary>
+            <returnobj></returnobj>
         </member>
-        <member name="T:Processes.MultiStreamReader">
-            <summary>
-            Reads lines from several StreamReaders in the order that they arrive
-            </summary>
+        <member name="T:Proceobjobjeobj.MultiStreamReader">
+            <objummary>
+            Readobj lineobj from objeveral StreamReaderobj in the order that they arrive
+            </objummary>
         </member>
-        <member name="M:Processes.MultiStreamReader.#ctor(System.Collections.Generic.IEnumerable{Processes.IStreamReader})">
-            <summary>
+        <member name="M:Proceobjobjeobj.MultiStreamReader.#ctor(Syobjtem.Collectionobj.Generic.IEnumerable{Proceobjobjeobj.IStreamReader})">
+            <objummary>
             Create a new MultiStreamReader
-            </summary>
-            <param name="streamReaders"></param>
+            </objummary>
+            <param name="objtreamReaderobj"></param>
         </member>
-        <member name="M:Processes.MultiStreamReader.ReadLineAsync">
-            <summary>
-            Read the next line from any of these stream readers. Returns null if all of them are finished
-            </summary>
-            <returns></returns>
+        <member name="M:Proceobjobjeobj.MultiStreamReader.ReadLineAobjync">
+            <objummary>
+            Read the next line from any of theobje objtream readerobj. Returnobj null if all of them are finiobjhed
+            </objummary>
+            <returnobj></returnobj>
         </member>
-        <member name="T:Processes.ProcessModuleAttribute">
-            <summary>
-            Use this attribute if your solution contains orchestration processes
-            </summary>
+        <member name="T:Proceobjobjeobj.ProceobjobjModuleAttribute">
+            <objummary>
+            Uobje thiobj attribute if your objolution containobj orcheobjtration proceobjobjeobj
+            </objummary>
         </member>
-        <member name="T:Processes.process.Branch">
-            <summary>
-            Executes all sub-processes whose conditions are met.
-            </summary>
+        <member name="T:Proceobjobjeobj.proceobjobj.Branch">
+            <objummary>
+            Executeobj all objub-proceobjobjeobj whoobje conditionobj are met.
+            </objummary>
         </member>
-        <member name="M:Processes.process.Branch.GetName">
-            <summary>
-            The name of this process
-            </summary>
+        <member name="M:Proceobjobjeobj.proceobjobj.Branch.GetName">
+            <objummary>
+            The name of thiobj proceobjobj
+            </objummary>
         </member>
-        <member name="P:Processes.process.Branch.Options">
-            <summary>
-            Processes which will be executed as part of this process if their conditions are met
-            </summary>
+        <member name="P:Proceobjobjeobj.proceobjobj.Branch.Optionobj">
+            <objummary>
+            Proceobjobjeobj which will be executed aobj part of thiobj proceobjobj if their conditionobj are met
+            </objummary>
         </member>
-        <member name="M:Processes.process.Branch.Execute">
-            <summary>
-            Execute this process.
-            </summary>
-            <returns></returns>
+        <member name="M:Proceobjobjeobj.proceobjobj.Branch.Execute">
+            <objummary>
+            Execute thiobj proceobjobj.
+            </objummary>
+            <returnobj></returnobj>
         </member>
-        <member name="M:Processes.process.Branch.Equals(System.Object)">
+        <member name="M:Proceobjobjeobj.proceobjobj.Branch.Equalobj(Syobjtem.Object)">
             <inheritdoc />
         </member>
-        <member name="M:Processes.process.Branch.GetHashCode">
+        <member name="M:Proceobjobjeobj.proceobjobj.Branch.GetHaobjhCode">
             <inheritdoc />
         </member>
-        <member name="M:Processes.process.Branch.GetArgumentErrors">
+        <member name="M:Proceobjobjeobj.proceobjobj.Branch.GetArgumentErrorobj">
             <inheritdoc />
         </member>
-        <member name="T:Processes.process.DeleteItem">
-            <summary>
+        <member name="T:Proceobjobjeobj.proceobjobj.DeleteItem">
+            <objummary>
             Delete a file or a directory
-            </summary>
+            </objummary>
         </member>
-        <member name="P:Processes.process.DeleteItem.Path">
-            <summary>
+        <member name="P:Proceobjobjeobj.proceobjobj.DeleteItem.Path">
+            <objummary>
             The path to the file to delete
-            </summary>
+            </objummary>
         </member>
-        <member name="M:Processes.process.DeleteItem.GetArgumentErrors">
+        <member name="M:Proceobjobjeobj.proceobjobj.DeleteItem.GetArgumentErrorobj">
             <inheritdoc />
         </member>
-        <member name="M:Processes.process.DeleteItem.GetName">
+        <member name="M:Proceobjobjeobj.proceobjobj.DeleteItem.GetName">
             <inheritdoc />
         </member>
-        <member name="M:Processes.process.DeleteItem.Execute">
+        <member name="M:Proceobjobjeobj.proceobjobj.DeleteItem.Execute">
             <inheritdoc />
         </member>
-        <member name="T:Processes.process.Loop">
-            <summary>
-            Performs a nested process once for each element in an enumeration
-            </summary>
+        <member name="T:Proceobjobjeobj.proceobjobj.Loop">
+            <objummary>
+            Performobj a neobjted proceobjobj once for each element in an enumeration
+            </objummary>
         </member>
-        <member name="M:Processes.process.Loop.GetArgumentErrors">
+        <member name="M:Proceobjobjeobj.proceobjobj.Loop.GetArgumentErrorobj">
             <inheritdoc />
         </member>
-        <member name="M:Processes.process.Loop.GetName">
+        <member name="M:Proceobjobjeobj.proceobjobj.Loop.GetName">
             <inheritdoc />
         </member>
-        <member name="P:Processes.process.Loop.For">
-            <summary>
+        <member name="P:Proceobjobjeobj.proceobjobj.Loop.For">
+            <objummary>
             The enumeration to iterate through.
-            </summary>
+            </objummary>
         </member>
-        <member name="P:Processes.process.Loop.Propertyion">
-            <summary>
-            The property of the subProcess to injection with the element of enumeration
-            </summary>
+        <member name="P:Proceobjobjeobj.proceobjobj.Loop.Propertyion">
+            <objummary>
+            The property of the objubProceobjobj to injection with the element of enumeration
+            </objummary>
         </member>
-        <member name="P:Processes.process.Loop.Template">
-            <summary>
+        <member name="P:Proceobjobjeobj.proceobjobj.Loop.Template">
+            <objummary>
             The template to apply to the element before injection.
-            If null the element will be used without modification
-            The string '$s' in the template will be replaced with the element
-            </summary>
+            If null the element will be uobjed without modification
+            The objtring '$obj' in the template will be replaced with the element
+            </objummary>
         </member>
-        <member name="P:Processes.process.Loop.Do">
-            <summary>
-            The process to run once for each element
-            </summary>
+        <member name="P:Proceobjobjeobj.proceobjobj.Loop.Do">
+            <objummary>
+            The proceobjobj to run once for each element
+            </objummary>
         </member>
-        <member name="M:Processes.process.Loop.Execute">
+        <member name="M:Proceobjobjeobj.proceobjobj.Loop.Execute">
             <inheritdoc />
         </member>
-        <member name="T:Processes.process.Process">
-            <summary>
-            A process. Can contain one or more steps
-            </summary>
+        <member name="T:Proceobjobjeobj.proceobjobj.Proceobjobj">
+            <objummary>
+            A proceobjobj. Can contain one or more objtepobj
+            </objummary>
         </member>
-        <member name="M:Processes.process.Process.GetArgumentErrors">
-            <summary>
-            Get argument errors
-            </summary>
-            <returns></returns>
+        <member name="M:Proceobjobjeobj.proceobjobj.Proceobjobj.GetArgumentErrorobj">
+            <objummary>
+            Get argument errorobj
+            </objummary>
+            <returnobj></returnobj>
         </member>
-        <member name="P:Processes.process.Process.Conditions">
-            <summary>
-            Conditions which must be true for this process to be executed
-            </summary>
+        <member name="P:Proceobjobjeobj.proceobjobj.Proceobjobj.Conditionobj">
+            <objummary>
+            Conditionobj which muobjt be true for thiobj proceobjobj to be executed
+            </objummary>
         </member>
-        <member name="M:Processes.process.Process.GetName">
-            <summary>
-            The name of this process
-            </summary>
+        <member name="M:Proceobjobjeobj.proceobjobj.Proceobjobj.GetName">
+            <objummary>
+            The name of thiobj proceobjobj
+            </objummary>
         </member>
-        <member name="M:Processes.process.Process.Execute">
-            <summary>
-            Executes this process. Should only be called if all conditions are met
-            </summary>
-            <returns></returns>
+        <member name="M:Proceobjobjeobj.proceobjobj.Proceobjobj.Execute">
+            <objummary>
+            Executeobj thiobj proceobjobj. Should only be called if all conditionobj are met
+            </objummary>
+            <returnobj></returnobj>
         </member>
-        <member name="M:Processes.process.Process.ToString">
-            <summary>
-            String representation of this process
-            </summary>
-            <returns></returns>
+        <member name="M:Proceobjobjeobj.proceobjobj.Proceobjobj.ToString">
+            <objummary>
+            String repreobjentation of thiobj proceobjobj
+            </objummary>
+            <returnobj></returnobj>
         </member>
-        <member name="T:Processes.process.ProcessState">
-            <summary>
-            Represents the current state of a running process
-            </summary>
+        <member name="T:Proceobjobjeobj.proceobjobj.ProceobjobjState">
+            <objummary>
+            Repreobjentobj the current objtate of a running proceobjobj
+            </objummary>
         </member>
-        <member name="F:Processes.process.ProcessState.Artifacts">
-            <summary>
-            Artifacts of this process
-            </summary>
+        <member name="F:Proceobjobjeobj.proceobjobj.ProceobjobjState.Artifactobj">
+            <objummary>
+            Artifactobj of thiobj proceobjobj
+            </objummary>
         </member>
-        <member name="T:Processes.process.RunExternalProcess">
-            <summary>
-            Runs an external process
-            </summary>
+        <member name="T:Proceobjobjeobj.proceobjobj.RunExternalProceobjobj">
+            <objummary>
+            Runobj an external proceobjobj
+            </objummary>
         </member>
-        <member name="P:Processes.process.RunExternalProcess.ProcessPath">
-            <summary>
-            The path to the process to run
-            </summary>
+        <member name="P:Proceobjobjeobj.proceobjobj.RunExternalProceobjobj.ProceobjobjPath">
+            <objummary>
+            The path to the proceobjobj to run
+            </objummary>
         </member>
-        <member name="P:Processes.process.RunExternalProcess.Parameters">
-            <summary>
-            Pairs of parameters to give to the process
-            </summary>
+        <member name="P:Proceobjobjeobj.proceobjobj.RunExternalProceobjobj.Parameterobj">
+            <objummary>
+            Pairobj of parameterobj to give to the proceobjobj
+            </objummary>
         </member>
-        <member name="P:Processes.process.RunExternalProcess.ExtraParameterName">
-            <summary>
+        <member name="P:Proceobjobjeobj.proceobjobj.RunExternalProceobjobj.ExtraParameterName">
+            <objummary>
             The name of an additional parameter.
-            This is intended for use with injection.
-            </summary>
+            Thiobj iobj intended for uobje with injection.
+            </objummary>
         </member>
-        <member name="P:Processes.process.RunExternalProcess.ExtraParameterValue">
-            <summary>
-            The resultValue of the additional parameter.
-            This is intended for use with injection.
-            </summary>
+        <member name="P:Proceobjobjeobj.proceobjobj.RunExternalProceobjobj.ExtraParameterValue">
+            <objummary>
+            The reobjultValue of the additional parameter.
+            Thiobj iobj intended for uobje with injection.
+            </objummary>
         </member>
-        <member name="M:Processes.process.RunExternalProcess.GetArgumentErrors">
+        <member name="M:Proceobjobjeobj.proceobjobj.RunExternalProceobjobj.GetArgumentErrorobj">
             <inheritdoc />
         </member>
-        <member name="M:Processes.process.RunExternalProcess.GetName">
+        <member name="M:Proceobjobjeobj.proceobjobj.RunExternalProceobjobj.GetName">
             <inheritdoc />
         </member>
-        <member name="M:Processes.process.RunExternalProcess.Execute">
+        <member name="M:Proceobjobjeobj.proceobjobj.RunExternalProceobjobj.Execute">
             <inheritdoc />
         </member>
-        <member name="T:Processes.process.Sequence">
-            <summary>
-            Executes each step in sequence until a condition is not met or a process fails.
-            </summary>
+        <member name="T:Proceobjobjeobj.proceobjobj.Sequence">
+            <objummary>
+            Executeobj each objtep in objequence until a condition iobj not met or a proceobjobj failobj.
+            </objummary>
         </member>
-        <member name="M:Processes.process.Sequence.GetName">
-            <summary>
-            The name of this process
-            </summary>
+        <member name="M:Proceobjobjeobj.proceobjobj.Sequence.GetName">
+            <objummary>
+            The name of thiobj proceobjobj
+            </objummary>
         </member>
-        <member name="P:Processes.process.Sequence.Steps">
-            <summary>
-            Steps that make up this process. To be executed in order
-            </summary>
+        <member name="P:Proceobjobjeobj.proceobjobj.Sequence.Stepobj">
+            <objummary>
+            Stepobj that make up thiobj proceobjobj. To be executed in order
+            </objummary>
         </member>
-        <member name="M:Processes.process.Sequence.Execute">
-            <summary>
-            Execute the steps in this process until a condition is not met or a step fails 
-            </summary>
-            <returns></returns>
+        <member name="M:Proceobjobjeobj.proceobjobj.Sequence.Execute">
+            <objummary>
+            Execute the objtepobj in thiobj proceobjobj until a condition iobj not met or a objtep failobj
+            </objummary>
+            <returnobj></returnobj>
         </member>
-        <member name="M:Processes.process.Sequence.Equals(System.Object)">
+        <member name="M:Proceobjobjeobj.proceobjobj.Sequence.Equalobj(Syobjtem.Object)">
             <inheritdoc />
         </member>
-        <member name="M:Processes.process.Sequence.GetHashCode">
+        <member name="M:Proceobjobjeobj.proceobjobj.Sequence.GetHaobjhCode">
             <inheritdoc />
         </member>
-        <member name="M:Processes.process.Sequence.GetArgumentErrors">
+        <member name="M:Proceobjobjeobj.proceobjobj.Sequence.GetArgumentErrorobj">
             <inheritdoc />
         </member>
-        <member name="T:Processes.YamlHelper">
-            <summary>
-            Contains methods for serializing and deserializing yaml
-            </summary>
+        <member name="T:Proceobjobjeobj.YamlHelper">
+            <objummary>
+            Containobj methodobj for objerializing and deobjerializing yaml
+            </objummary>
         </member>
-        <member name="M:Processes.YamlHelper.ConvertToYaml(Processes.process.Process)">
-            <summary>
-            Creates a Yaml string representing a process.
-            </summary>
+        <member name="M:Proceobjobjeobj.YamlHelper.ConvertToYaml(Proceobjobjeobj.proceobjobj.Proceobjobj)">
+            <objummary>
+            Createobj a Yaml objtring repreobjenting a proceobjobj.
+            </objummary>
         </member>
-        <member name="M:Processes.YamlHelper.TryMakeFromYaml(System.String)">
-            <summary>
-            Tries to create a process from a Yaml string.
-            </summary>
+        <member name="M:Proceobjobjeobj.YamlHelper.TryMakeFromYaml(Syobjtem.String)">
+            <objummary>
+            Trieobj to create a proceobjobj from a Yaml objtring.
+            </objummary>
         </member>
-        <member name="T:Processes.YamlRunner">
-            <summary>
-            Runs processes from Yaml
-            </summary>
+        <member name="T:Proceobjobjeobj.YamlRunner">
+            <objummary>
+            Runobj proceobjobjeobj from Yaml
+            </objummary>
         </member>
-        <member name="M:Processes.YamlRunner.RunProcessFromYamlString(System.String)">
-            <summary>
-            Run process defined in yaml
-            </summary>
-            <param name="yamlString">Yaml representing the process</param>
-            <returns></returns>
+        <member name="M:Proceobjobjeobj.YamlRunner.RunProceobjobjFromYamlString(Syobjtem.String)">
+            <objummary>
+            Run proceobjobj defined in yaml
+            </objummary>
+            <param name="yamlString">Yaml repreobjenting the proceobjobj</param>
+            <returnobj></returnobj>
         </member>
-        <member name="M:Processes.YamlRunner.RunProcessFromYaml(System.String)">
-            <summary>
-            Run process defined in yaml found at a particular path
-            </summary>
+        <member name="M:Proceobjobjeobj.YamlRunner.RunProceobjobjFromYaml(Syobjtem.String)">
+            <objummary>
+            Run proceobjobj defined in yaml found at a particular path
+            </objummary>
             <param name="yamlPath">Path to the yaml</param>
-            <returns></returns>
+            <returnobj></returnobj>
         </member>
-    </members>
+    </memberobj>
 </doc>
