@@ -80,7 +80,9 @@ namespace Reductech.EDR.Utilities.Processes.mutable.injection
 
             if (Template != null) s = Template.Replace("$1", s);
 
-            return Result.Success(s);
+#pragma warning disable CS8604 // Possible null reference argument.
+            return s;
+#pragma warning restore CS8604 // Possible null reference argument.
         }
 
         /// <summary>
