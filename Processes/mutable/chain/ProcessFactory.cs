@@ -118,7 +118,10 @@ namespace Reductech.EDR.Utilities.Processes.mutable.chain
         /// <inheritdoc />
         protected override Result<TImmutableProcess> GetProcess(TInput input)
         {
-            var injectionResult = Injection.TryInject(input?.ToString()??"", Process);//This is a bit dodgy - try and find a way around it
+            if (input == null)
+                return Result.Failure<TImmutableProcess>("Process input is empty.");
+
+            var injectionResult = Injection.TryInject(input, Process);
             if (injectionResult.IsFailure)
                 return injectionResult.ConvertFailure<TImmutableProcess>();
 

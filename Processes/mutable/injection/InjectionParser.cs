@@ -13,7 +13,7 @@ namespace Reductech.EDR.Utilities.Processes.mutable.injection
     {
         IInjectionPath WithStep(IInjectionPath next);
 
-        Result TrySetValue(object previous, string value);
+        Result TrySetValue(object previous, object value);
     }
 
     internal enum PathToken
@@ -110,7 +110,7 @@ namespace Reductech.EDR.Utilities.Processes.mutable.injection
             }
 
             /// <inheritdoc />
-            public Result TrySetValue(object previous, string value)
+            public Result TrySetValue(object previous, object value)
             {
                 var property = previous.GetType().GetProperty(PropertyName);
 
@@ -147,7 +147,20 @@ namespace Reductech.EDR.Utilities.Processes.mutable.injection
                         }
                     }
 
-                    property.SetValue(previous, v);
+                    var conversionResult = TryConvertToType(v, property.PropertyType);
+
+                    if (conversionResult.IsFailure)
+                        return conversionResult;
+
+                    try
+                    {
+                        property.SetValue(previous, conversionResult.Value);
+                    }
+                    catch (ArgumentException e)
+                    {
+                        return Result.Failure(e.Message);
+                    }
+
                     return Result.Success();
                 }
                 else
@@ -160,6 +173,21 @@ namespace Reductech.EDR.Utilities.Processes.mutable.injection
                     return NextStep.TrySetValue(thisPropertyValue, value);
                 }
             }
+        }
+
+        private static Result<object> TryConvertToType(object v, Type type)
+        {
+            var currentType = v.GetType();
+
+            if (type.IsAssignableFrom(currentType))
+                return v;
+
+            if (type == typeof(string)) return v?.ToString()??"";
+            if(type == typeof(int))
+                return int.TryParse(v?.ToString(), out var i)? i : Result.Failure<object>($"Cannot convert '{v}' to int for injection.");
+
+
+            return Result.Failure<object>($"Cannot convert '{v}' to {type.Name} for injection.");
         }
 
         internal class IndexAccess : IInjectionPath
@@ -207,7 +235,7 @@ namespace Reductech.EDR.Utilities.Processes.mutable.injection
             }
 
             /// <inheritdoc />
-            public Result TrySetValue(object previous, string value)
+            public Result TrySetValue(object previous, object value)
             {
                 var o = previous.GetType().GetProperty("Item");
 
