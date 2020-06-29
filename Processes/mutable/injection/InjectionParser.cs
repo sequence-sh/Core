@@ -120,32 +120,6 @@ namespace Reductech.EDR.Utilities.Processes.mutable.injection
 
                 if (NextStep == null)
                 {
-                    //if (property.PropertyType == typeof(string))
-                    //{
-                    //    v = value.ToString();
-                    //}
-                    //else
-                    //{
-                    //    var underlyingType = Nullable.GetUnderlyingType(property.PropertyType) ??
-                    //                         property.PropertyType;
-
-                    //    string? error = null;
-                    //    try
-                    //    {
-                    //        v = Convert.ChangeType(value, underlyingType);
-                    //    }
-                    //    catch (InvalidCastException e)
-                    //    {
-                    //        v = "";
-                    //        error = e.Message;
-                    //    }
-
-                    //    if (error != null)
-                    //    {
-                    //        return Result.Failure($"Could not cast '{value}' to type '{underlyingType}'");
-                    //    }
-                    //}
-
                     var conversionResult = TryConvertToType(value, property.PropertyType);
 
                     if (conversionResult.IsFailure)
@@ -177,18 +151,19 @@ namespace Reductech.EDR.Utilities.Processes.mutable.injection
         private static Result<object> TryConvertToType(object v, Type type)
         {
             var currentType = v.GetType();
+            var underlyingType = Nullable.GetUnderlyingType(type) ??type;
 
-            if (type.IsAssignableFrom(currentType))
+            if (underlyingType.IsAssignableFrom(currentType))
                 return v;
 
-            if (type == typeof(string)) return v?.ToString()??"";
-            if(type == typeof(int))
+            if (underlyingType == typeof(string)) return v?.ToString()??"";
+            if(underlyingType == typeof(int))
                 return int.TryParse(v?.ToString(), out var i)? i : Result.Failure<object>($"Cannot convert '{v}' to int for injection.");
 
             string? error = null;
             try
             {
-                v = Convert.ChangeType(v, type);
+                v = Convert.ChangeType(v, underlyingType);
             }
             catch (InvalidCastException e)
             {
@@ -197,7 +172,7 @@ namespace Reductech.EDR.Utilities.Processes.mutable.injection
             }
 
             if (error != null)
-                return Result.Failure($"Cannot convert '{v}' to {type.Name} for injection.");
+                return Result.Failure($"Cannot convert '{v}' to {underlyingType.Name} for injection.");
 
             return v;
         }
