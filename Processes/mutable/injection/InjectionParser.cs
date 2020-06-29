@@ -123,7 +123,7 @@ namespace Reductech.EDR.Utilities.Processes.mutable.injection
                     object v;
                     if (property.PropertyType == typeof(string))
                     {
-                        v = value;
+                        v = value.ToString();
                     }
                     else
                     {

@@ -58,18 +58,12 @@ namespace Reductech.EDR.Utilities.Processes.mutable.injection
         [DefaultValueExplanation("The value will be injected on its own.")]
         public string? Template { get; set; }
 
-        /// <summary>
-        /// Gets the property value of the object.
-        /// If Regex of Template is set, the object will be converted to a string.
-        /// </summary>
-        /// <param name="obj"></param>
-        /// <returns></returns>
-        internal Result<object> GetPropertyValue(object obj)
+        internal Result<object> GetPropertyValue(object element)
         {
             if (Regex == null && Template == null)
-                return obj;
+                return element;
 
-            var s = obj.ToString();
+            var s = element?.ToString() ?? "";
 
             if (Regex != null)
             {
