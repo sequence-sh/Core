@@ -20,7 +20,7 @@ namespace Reductech.EDR.Utilities.Processes.mutable.injection
     /// </summary>
     public class ProcessInjector : IProcessInjector
     {
-        private readonly List<(string element, Injection injection)> _injections;
+        private readonly List<(object element, Injection injection)> _injections;
 
 
         /// <summary>
@@ -28,7 +28,7 @@ namespace Reductech.EDR.Utilities.Processes.mutable.injection
         /// </summary>
         /// <param name="element"></param>
         /// <param name="injection"></param>
-        public void Add(string element, Injection injection)
+        public void Add(object element, Injection injection)
         {
             _injections.Add((element, injection));
         }
@@ -38,13 +38,13 @@ namespace Reductech.EDR.Utilities.Processes.mutable.injection
         /// </summary>
         public ProcessInjector()
         {
-            _injections = new List<(string element, Injection injection)>();
+            _injections = new List<(object element, Injection injection)>();
         }
 
         /// <summary>
         /// Create a new ProcessInjector.
         /// </summary>
-        public ProcessInjector(IEnumerable<(string element, Injection injection)> injections)
+        public ProcessInjector(IEnumerable<(object element, Injection injection)> injections)
         {
             _injections = injections.ToList();
         }

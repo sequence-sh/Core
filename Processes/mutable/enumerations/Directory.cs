@@ -19,7 +19,7 @@ namespace Reductech.EDR.Utilities.Processes.mutable.enumerations
                 return Result.Failure<IEnumerationElements>($"Directory '{Path}' does not exist");
 
             var files = System.IO.Directory.GetFiles(Path);
-            var injectors = files.Select(f => new ProcessInjector(Injection.Select(i => (f, i)))).ToList();
+            var injectors = files.Select(f => new ProcessInjector(Injection.Select(i => (f as object, i)))).ToList();
 
             return Result.Success<IEnumerationElements>(new EagerEnumerationElements(injectors));
         }

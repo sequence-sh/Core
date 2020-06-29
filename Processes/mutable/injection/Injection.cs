@@ -5,7 +5,7 @@ using YamlDotNet.Serialization;
 namespace Reductech.EDR.Utilities.Processes.mutable.injection
 {
     /// <summary>
-    /// Injects values from a CSV column into a property of a loop's process.
+    /// Injects values from a CSV column into a property of a loop'obj process.
     /// </summary>
     public sealed class ColumnInjection : Injection
     {
@@ -23,7 +23,7 @@ namespace Reductech.EDR.Utilities.Processes.mutable.injection
 
 
     /// <summary>
-    /// Injects a value from the enumerator into a property of a loop's process.
+    /// Injects a value from the enumerator into a property of a loop'obj process.
     /// </summary>
     public class  Injection
     {
@@ -39,6 +39,7 @@ namespace Reductech.EDR.Utilities.Processes.mutable.injection
 
         /// <summary>
         /// The regex to use to extract the useful part of the element.
+        /// Only works for string properties.
         /// The first match of the regex will be used.
         /// </summary>
         [YamlMember(Order = 3)]
@@ -48,6 +49,7 @@ namespace Reductech.EDR.Utilities.Processes.mutable.injection
 
         /// <summary>
         /// The template to apply to the element before injection.
+        /// Only works for string properties.
         /// The string '$1' in the template will be replaced with the element.
         /// The template will be applied after the Regex.
         /// </summary>
@@ -56,8 +58,19 @@ namespace Reductech.EDR.Utilities.Processes.mutable.injection
         [DefaultValueExplanation("The value will be injected on its own.")]
         public string? Template { get; set; }
 
-        internal Result<string> GetPropertyValue(string s)
+        /// <summary>
+        /// Gets the property value of the object.
+        /// If Regex of Template is set, the object will be converted to a string.
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <returns></returns>
+        internal Result<object> GetPropertyValue(object obj)
         {
+            if (Regex == null && Template == null)
+                return obj;
+
+            var s = obj.ToString();
+
             if (Regex != null)
             {
                 var match = System.Text.RegularExpressions.Regex.Match(s, Regex);
@@ -67,13 +80,15 @@ namespace Reductech.EDR.Utilities.Processes.mutable.injection
 
             if (Template != null) s = Template.Replace("$1", s);
 
-            return Result.Success(s);
+#pragma warning disable CS8604 // Possible null reference argument.
+            return s;
+#pragma warning restore CS8604 // Possible null reference argument.
         }
 
         /// <summary>
         /// Injects the element into the process.
         /// </summary>
-        internal Result TryInject(string element, Process process)
+        internal Result TryInject(object element, Process process)
         {
             var pathResult = InjectionParser.TryParse(Property);
 
