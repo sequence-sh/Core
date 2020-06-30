@@ -1,4 +1,4 @@
-﻿namespace Reductech.EDR.Utilities.Processes.output
+﻿namespace Reductech.EDR.Processes.Output
 {
     /// <summary>
     /// The type of this result

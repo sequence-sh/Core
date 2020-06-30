@@ -4,15 +4,15 @@ using System.ComponentModel.DataAnnotations;
 using CSharpFunctionalExtensions;
 using FluentAssertions;
 using NUnit.Framework;
-using Reductech.EDR.Utilities.Processes.immutable;
-using Reductech.EDR.Utilities.Processes.mutable;
-using Reductech.EDR.Utilities.Processes.mutable.chain;
-using Reductech.EDR.Utilities.Processes.mutable.injection;
-using Reductech.EDR.Utilities.Processes.output;
+using Reductech.EDR.Processes.Immutable;
+using Reductech.EDR.Processes.Mutable;
+using Reductech.EDR.Processes.Mutable.Chain;
+using Reductech.EDR.Processes.Mutable.Injections;
+using Reductech.EDR.Processes.Output;
 using YamlDotNet.Serialization;
-using Conditional = Reductech.EDR.Utilities.Processes.mutable.Conditional;
+using Conditional = Reductech.EDR.Processes.Mutable.Conditional;
 
-namespace Reductech.EDR.Utilities.Processes.Tests
+namespace Reductech.EDR.Processes.Tests
 {
     public class ChainTest
     {

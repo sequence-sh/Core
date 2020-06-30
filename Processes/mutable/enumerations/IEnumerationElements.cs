@@ -1,4 +1,4 @@
-﻿namespace Reductech.EDR.Utilities.Processes.mutable.enumerations
+﻿namespace Reductech.EDR.Processes.Mutable.Enumerations
 {
     /// <summary>
     /// Will be either EagerEnumerationElements or LazyEnumerationElements

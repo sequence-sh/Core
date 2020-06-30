@@ -2,13 +2,13 @@
 using System.Linq;
 using System.Threading.Tasks;
 using NUnit.Framework;
-using Reductech.EDR.Utilities.Processes.mutable;
-using Reductech.EDR.Utilities.Processes.mutable.enumerations;
-using Reductech.EDR.Utilities.Processes.mutable.injection;
-using Reductech.EDR.Utilities.Processes.output;
-using List = Reductech.EDR.Utilities.Processes.mutable.enumerations.List;
+using Reductech.EDR.Processes.Mutable;
+using Reductech.EDR.Processes.Mutable.Enumerations;
+using Reductech.EDR.Processes.Mutable.Injections;
+using Reductech.EDR.Processes.Output;
+using List = Reductech.EDR.Processes.Mutable.Enumerations.List;
 
-namespace Reductech.EDR.Utilities.Processes.Tests
+namespace Reductech.EDR.Processes.Tests
 {
     public class ForeachTests
     {

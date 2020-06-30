@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using CSharpFunctionalExtensions;
-using Reductech.EDR.Utilities.Processes.mutable.chain;
-using Reductech.EDR.Utilities.Processes.output;
+using Reductech.EDR.Processes.Mutable.Chain;
+using Reductech.EDR.Processes.Output;
 
-namespace Reductech.EDR.Utilities.Processes.immutable.chain
+namespace Reductech.EDR.Processes.Immutable.Chain
 {
     /// <summary>
     /// The final link in the immutableChain.

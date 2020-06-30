@@ -1,9 +1,9 @@
 ﻿using CSharpFunctionalExtensions;
-using Reductech.EDR.Utilities.Processes.immutable;
-using Reductech.EDR.Utilities.Processes.immutable.chain;
-using Reductech.EDR.Utilities.Processes.mutable.injection;
+using Reductech.EDR.Processes.Immutable;
+using Reductech.EDR.Processes.Immutable.Chain;
+using Reductech.EDR.Processes.Mutable.Injections;
 
-namespace Reductech.EDR.Utilities.Processes.mutable.chain
+namespace Reductech.EDR.Processes.Mutable.Chain
 {
     /// <summary>
     /// Creates chain links.

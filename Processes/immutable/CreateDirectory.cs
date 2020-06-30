@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
-using Reductech.EDR.Utilities.Processes.output;
+using Reductech.EDR.Processes.Output;
 
-namespace Reductech.EDR.Utilities.Processes.immutable
+namespace Reductech.EDR.Processes.Immutable
 {
     /// <summary>
     /// Creates a new directory in the file system.

@@ -1,8 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-
-namespace Reductech.EDR.Utilities.Processes
+﻿namespace Reductech.EDR.Processes
 {
     ///// <summary>
     ///// A strings of different error messages.

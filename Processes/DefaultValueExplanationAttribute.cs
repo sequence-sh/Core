@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Reductech.EDR.Utilities.Processes
+namespace Reductech.EDR.Processes
 {
     /// <summary>
     /// Use this attribute to explain the meaning of the default value.

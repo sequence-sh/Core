@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Reductech.EDR.Utilities.Processes
+namespace Reductech.EDR.Processes.Attributes
 {
     /// <summary>
     /// Use this attribute to denote the required version of some software.

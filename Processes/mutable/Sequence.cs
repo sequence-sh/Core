@@ -2,11 +2,11 @@
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using CSharpFunctionalExtensions;
-using Reductech.EDR.Utilities.Processes.immutable;
-using Reductech.EDR.Utilities.Processes.mutable.chain;
+using Reductech.EDR.Processes.Immutable;
+using Reductech.EDR.Processes.Mutable.Chain;
 using YamlDotNet.Serialization;
 
-namespace Reductech.EDR.Utilities.Processes.mutable
+namespace Reductech.EDR.Processes.Mutable
 {
     /// <summary>
     /// Executes each step, one after the another.
@@ -52,7 +52,7 @@ namespace Reductech.EDR.Utilities.Processes.mutable
                 return r.ConvertFailure<IImmutableProcess<Unit>>();
 
             var steps = r.Value;
-            var p = immutable.Sequence.CombineSteps(steps, processSettings);
+            var p = Immutable.Sequence.CombineSteps(steps, processSettings);
 
             return Result.Success(p);
         }
@@ -69,7 +69,7 @@ namespace Reductech.EDR.Utilities.Processes.mutable
         /// <inheritdoc />
         public override Result<ChainLinkBuilder<TInput, TFinal>> TryCreateChainLinkBuilder<TInput, TFinal>()
         {
-            return new ChainLinkBuilder<TInput,Unit,TFinal,immutable.Sequence,Sequence>(this);
+            return new ChainLinkBuilder<TInput,Unit,TFinal,Immutable.Sequence,Sequence>(this);
         }
     }
 }

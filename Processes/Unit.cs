@@ -1,9 +1,9 @@
-﻿namespace Reductech.EDR.Utilities.Processes
+﻿namespace Reductech.EDR.Processes
 {
     /// <summary>
     /// Represents the output of a void method.
     /// </summary>
-    public class Unit
+    public sealed class Unit
     {
         /// <summary>
         /// The instance of Unit.

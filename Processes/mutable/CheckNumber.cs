@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using CSharpFunctionalExtensions;
-using Reductech.EDR.Utilities.Processes.immutable;
-using Reductech.EDR.Utilities.Processes.mutable.chain;
+using Reductech.EDR.Processes.Immutable;
+using Reductech.EDR.Processes.Mutable.Chain;
 using YamlDotNet.Serialization;
 
-namespace Reductech.EDR.Utilities.Processes.mutable
+namespace Reductech.EDR.Processes.Mutable
 {
     /// <summary>
     /// Checks that the count of the Check is within a particular range.
@@ -60,7 +60,7 @@ namespace Reductech.EDR.Utilities.Processes.mutable
             if (frozenCount.IsFailure)
                 return frozenCount.ConvertFailure<IImmutableProcess<bool>>();
 
-            return Result.Success<IImmutableProcess<bool>>(new immutable.CheckNumber(Minimum, Maximum, frozenCount.Value));
+            return Result.Success<IImmutableProcess<bool>>(new Immutable.CheckNumber(Minimum, Maximum, frozenCount.Value));
 
         }
 
@@ -76,7 +76,7 @@ namespace Reductech.EDR.Utilities.Processes.mutable
         /// <inheritdoc />
         public override Result<ChainLinkBuilder<TInput, TFinal>> TryCreateChainLinkBuilder<TInput, TFinal>()
         {
-            return new ChainLinkBuilder<TInput,bool,TFinal,immutable.CheckNumber,CheckNumber>(this);
+            return new ChainLinkBuilder<TInput,bool,TFinal,Immutable.CheckNumber,CheckNumber>(this);
         }
     }
 }

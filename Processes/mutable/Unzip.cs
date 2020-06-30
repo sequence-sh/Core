@@ -2,11 +2,11 @@
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using CSharpFunctionalExtensions;
-using Reductech.EDR.Utilities.Processes.immutable;
-using Reductech.EDR.Utilities.Processes.mutable.chain;
+using Reductech.EDR.Processes.Immutable;
+using Reductech.EDR.Processes.Mutable.Chain;
 using YamlDotNet.Serialization;
 
-namespace Reductech.EDR.Utilities.Processes.mutable
+namespace Reductech.EDR.Processes.Mutable
 {
     /// <summary>
     /// Unzips a file.
@@ -61,7 +61,7 @@ namespace Reductech.EDR.Utilities.Processes.mutable
             if (errors.Any())
                 return Result.Failure<IImmutableProcess<Unit>>(string.Join("\r\n", errors));
 
-            var ip = new immutable.Unzip(ArchiveFilePath, DestinationDirectory, OverwriteFiles);
+            var ip = new Immutable.Unzip(ArchiveFilePath, DestinationDirectory, OverwriteFiles);
 
             return Result.Success<IImmutableProcess<Unit>>(ip);
         }
@@ -75,7 +75,7 @@ namespace Reductech.EDR.Utilities.Processes.mutable
         /// <inheritdoc />
         public override Result<ChainLinkBuilder<TInput, TFinal>> TryCreateChainLinkBuilder<TInput, TFinal>()
         {
-            return new ChainLinkBuilder<TInput,Unit,TFinal,immutable.Unzip,Unzip>(this);
+            return new ChainLinkBuilder<TInput,Unit,TFinal,Immutable.Unzip,Unzip>(this);
         }
     }
 }

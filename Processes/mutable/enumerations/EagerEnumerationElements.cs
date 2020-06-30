@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using Reductech.EDR.Utilities.Processes.mutable.injection;
+using Reductech.EDR.Processes.Mutable.Injections;
 
-namespace Reductech.EDR.Utilities.Processes.mutable.enumerations
+namespace Reductech.EDR.Processes.Mutable.Enumerations
 {
     /// <summary>
     /// Elements of an enumeration, evaluated eagerly.

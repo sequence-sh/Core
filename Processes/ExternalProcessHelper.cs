@@ -2,9 +2,9 @@
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
-using Reductech.EDR.Utilities.Processes.output;
+using Reductech.EDR.Processes.Output;
 
-namespace Reductech.EDR.Utilities.Processes
+namespace Reductech.EDR.Processes
 {
     /// <summary>
     /// Runs external processes.

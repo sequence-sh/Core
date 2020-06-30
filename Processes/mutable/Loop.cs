@@ -4,12 +4,12 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using CSharpFunctionalExtensions;
-using Reductech.EDR.Utilities.Processes.immutable;
-using Reductech.EDR.Utilities.Processes.mutable.chain;
-using Reductech.EDR.Utilities.Processes.mutable.enumerations;
+using Reductech.EDR.Processes.Immutable;
+using Reductech.EDR.Processes.Mutable.Chain;
+using Reductech.EDR.Processes.Mutable.Enumerations;
 using YamlDotNet.Serialization;
 
-namespace Reductech.EDR.Utilities.Processes.mutable
+namespace Reductech.EDR.Processes.Mutable
 {
     /// <summary>
     /// Performs a nested process once for each element in an enumeration.
@@ -69,7 +69,7 @@ namespace Reductech.EDR.Utilities.Processes.mutable
                 finalProcesses.Add(freezeResult.Value);
             }
 
-            var finalSequence = immutable.Sequence.CombineSteps(finalProcesses, processSettings);
+            var finalSequence = Immutable.Sequence.CombineSteps(finalProcesses, processSettings);
 
             return Result.Success(finalSequence);
         }
@@ -80,7 +80,7 @@ namespace Reductech.EDR.Utilities.Processes.mutable
             return For.GetEnumerationStyle() switch
             {
                 EnumerationStyle.Lazy => new ChainLinkBuilder<TInput, Unit, TFinal, LazyLoop, Loop>(this),
-                EnumerationStyle.Eager => new ChainLinkBuilder<TInput, Unit, TFinal, immutable.Sequence, Loop>(this),
+                EnumerationStyle.Eager => new ChainLinkBuilder<TInput, Unit, TFinal, Immutable.Sequence, Loop>(this),
                 _ => throw new ArgumentOutOfRangeException()
             };
         }

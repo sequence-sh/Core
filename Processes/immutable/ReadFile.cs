@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Reductech.EDR.Utilities.Processes.output;
+using Reductech.EDR.Processes.Output;
 
-namespace Reductech.EDR.Utilities.Processes.immutable
+namespace Reductech.EDR.Processes.Immutable
 {
     /// <summary>
     /// Immutable process which reads a file.
@@ -36,14 +36,16 @@ namespace Reductech.EDR.Utilities.Processes.immutable
 
             try
             {
-                text = File.ReadAllText(FilePath);
+                text = await File.ReadAllTextAsync(FilePath);
             }
+#pragma warning disable CA1031 // Do not catch general exception types
             catch (Exception e)
             {
                 errors.Add("Could not read file.");
                 errors.Add(e.Message);
                 text = null;
             }
+#pragma warning restore CA1031 // Do not catch general exception types
 
 
             if (errors.Any())

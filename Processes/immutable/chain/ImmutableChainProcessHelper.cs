@@ -1,4 +1,4 @@
-﻿namespace Reductech.EDR.Utilities.Processes.immutable.chain
+﻿namespace Reductech.EDR.Processes.Immutable.Chain
 {
     ///// <summary>
     ///// Methods for converting chain links into Immutable Processes.

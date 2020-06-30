@@ -2,10 +2,10 @@
 using CSharpFunctionalExtensions;
 using FluentAssertions;
 using NUnit.Framework;
-using Reductech.EDR.Utilities.Processes.mutable;
-using Reductech.EDR.Utilities.Processes.mutable.enumerations;
+using Reductech.EDR.Processes.Mutable;
+using Reductech.EDR.Processes.Mutable.Enumerations;
 
-namespace Reductech.EDR.Utilities.Processes.Tests
+namespace Reductech.EDR.Processes.Tests
 {
     public class YamlTest
     {

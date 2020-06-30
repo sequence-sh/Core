@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using CSharpFunctionalExtensions;
-using Reductech.EDR.Utilities.Processes.mutable;
-using Reductech.EDR.Utilities.Processes.output;
+using Reductech.EDR.Processes.Mutable;
+using Reductech.EDR.Processes.Output;
 
-namespace Reductech.EDR.Utilities.Processes.immutable
+namespace Reductech.EDR.Processes.Immutable
 {
     /// <summary>
     /// A process whose parameters can no longer be altered.

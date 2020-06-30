@@ -2,7 +2,7 @@
 
 #pragma warning disable 1591 // I think the comments here would be pretty tautological
 
-namespace Reductech.EDR.Utilities.Processes
+namespace Reductech.EDR.Processes
 {
     /// <summary>
     /// Gets the names for various processes.

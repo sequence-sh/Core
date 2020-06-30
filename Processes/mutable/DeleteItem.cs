@@ -1,11 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using CSharpFunctionalExtensions;
-using Reductech.EDR.Utilities.Processes.immutable;
-using Reductech.EDR.Utilities.Processes.mutable.chain;
+using Reductech.EDR.Processes.Immutable;
+using Reductech.EDR.Processes.Mutable.Chain;
 using YamlDotNet.Serialization;
 
-namespace Reductech.EDR.Utilities.Processes.mutable
+namespace Reductech.EDR.Processes.Mutable
 {
     /// <summary>
     /// Deletes a file or a directory.
@@ -40,7 +40,7 @@ namespace Reductech.EDR.Utilities.Processes.mutable
             if (string.IsNullOrWhiteSpace(Path))
                 return Result.Failure<IImmutableProcess<Unit>>("File Path is empty");
 
-            return new immutable.DeleteItem(Path);
+            return new Immutable.DeleteItem(Path);
         }
 
         /// <inheritdoc />
@@ -52,7 +52,7 @@ namespace Reductech.EDR.Utilities.Processes.mutable
         /// <inheritdoc />
         public override Result<ChainLinkBuilder<TInput, TFinal>> TryCreateChainLinkBuilder<TInput, TFinal>()
         {
-            return new ChainLinkBuilder<TInput,Unit,TFinal,immutable.DeleteItem,DeleteItem>(this);
+            return new ChainLinkBuilder<TInput,Unit,TFinal,Immutable.DeleteItem,DeleteItem>(this);
         }
     }
 }

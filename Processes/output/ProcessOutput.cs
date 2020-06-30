@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Reductech.EDR.Utilities.Processes.output
+namespace Reductech.EDR.Processes.Output
 {
     /// <summary>
     /// The partial output of a process.

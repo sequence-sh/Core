@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Reductech.EDR.Utilities.Processes
+namespace Reductech.EDR.Processes.Attributes
 {
     /// <summary>
     /// Optional attribute allowing you to assign an alias to a process.

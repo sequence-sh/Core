@@ -2,10 +2,10 @@
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using CSharpFunctionalExtensions;
-using Reductech.EDR.Utilities.Processes.mutable.injection;
+using Reductech.EDR.Processes.Mutable.Injections;
 using YamlDotNet.Serialization;
 
-namespace Reductech.EDR.Utilities.Processes.mutable.enumerations
+namespace Reductech.EDR.Processes.Mutable.Enumerations
 {
     /// <summary>
     /// Enumerates through elements of a list.

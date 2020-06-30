@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.IO.Compression;
 using System.Threading.Tasks;
-using Reductech.EDR.Utilities.Processes.output;
+using Reductech.EDR.Processes.Output;
 
-namespace Reductech.EDR.Utilities.Processes.immutable
+namespace Reductech.EDR.Processes.Immutable
 {
     internal class Unzip : ImmutableProcess<Unit>
     {

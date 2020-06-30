@@ -1,11 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using CSharpFunctionalExtensions;
-using Reductech.EDR.Utilities.Processes.immutable;
-using Reductech.EDR.Utilities.Processes.mutable.chain;
+using Reductech.EDR.Processes.Immutable;
+using Reductech.EDR.Processes.Mutable.Chain;
 using YamlDotNet.Serialization;
 
-namespace Reductech.EDR.Utilities.Processes.mutable
+namespace Reductech.EDR.Processes.Mutable
 {
     /// <summary>
     /// Asserts that the Check will return true.
@@ -69,7 +69,7 @@ namespace Reductech.EDR.Utilities.Processes.mutable
             if (frozenProcess.IsFailure)
                 return frozenProcess.ConvertFailure<IImmutableProcess<Unit>>();
 
-            return new immutable.AssertBool( frozenProcess.Value, GetExpectedResult());
+            return new Immutable.AssertBool( frozenProcess.Value, GetExpectedResult());
         }
 
         /// <inheritdoc />
@@ -84,7 +84,7 @@ namespace Reductech.EDR.Utilities.Processes.mutable
         /// <inheritdoc />
         public override Result<ChainLinkBuilder<TInput, TFinal>> TryCreateChainLinkBuilder<TInput, TFinal>()
         {
-            return new ChainLinkBuilder<TInput,Unit,TFinal,immutable.AssertBool,AssertBool>(this);
+            return new ChainLinkBuilder<TInput,Unit,TFinal,Immutable.AssertBool,AssertBool>(this);
         }
     }
 }

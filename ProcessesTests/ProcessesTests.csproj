@@ -7,7 +7,7 @@
 
     <Nullable>enable</Nullable>
 
-    <RootNamespace>Reductech.EDR.Utilities.Processes.Tests</RootNamespace>
+    <RootNamespace>Reductech.EDR.Processes.Tests</RootNamespace>
 
     <Authors>Mark Wainwright</Authors>
 

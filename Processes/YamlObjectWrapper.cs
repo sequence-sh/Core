@@ -4,12 +4,12 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Reflection;
 using Namotion.Reflection;
-using Reductech.EDR.Utilities.Processes.attributes;
+using Reductech.EDR.Processes.Attributes;
 using Reductech.Utilities.InstantConsole;
 using YamlDotNet.Serialization;
-using Process = Reductech.EDR.Utilities.Processes.mutable.Process;
+using Process = Reductech.EDR.Processes.Mutable.Process;
 
-namespace Reductech.EDR.Utilities.Processes
+namespace Reductech.EDR.Processes
 {
     /// <summary>
     /// A wrapper for this documented object.
