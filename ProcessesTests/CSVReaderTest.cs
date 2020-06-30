@@ -4,14 +4,14 @@ using System.Linq;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using NUnit.Framework;
-using Reductech.EDR.Utilities.Processes.immutable;
-using Reductech.EDR.Utilities.Processes.mutable;
-using Reductech.EDR.Utilities.Processes.mutable.chain;
-using Reductech.EDR.Utilities.Processes.mutable.enumerations;
-using Reductech.EDR.Utilities.Processes.mutable.injection;
-using Reductech.EDR.Utilities.Processes.output;
+using Reductech.EDR.Processes.Immutable;
+using Reductech.EDR.Processes.Mutable;
+using Reductech.EDR.Processes.Mutable.Chain;
+using Reductech.EDR.Processes.Mutable.Enumerations;
+using Reductech.EDR.Processes.Mutable.Injections;
+using Reductech.EDR.Processes.Output;
 
-namespace Reductech.EDR.Utilities.Processes.Tests
+namespace Reductech.EDR.Processes.Tests
 {
     public class CSVReaderTest
     {

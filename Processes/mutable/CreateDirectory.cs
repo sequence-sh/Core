@@ -1,11 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using CSharpFunctionalExtensions;
-using Reductech.EDR.Utilities.Processes.immutable;
-using Reductech.EDR.Utilities.Processes.mutable.chain;
+using Reductech.EDR.Processes.Immutable;
+using Reductech.EDR.Processes.Mutable.Chain;
 using YamlDotNet.Serialization;
 
-namespace Reductech.EDR.Utilities.Processes.mutable
+namespace Reductech.EDR.Processes.Mutable
 {
     /// <summary>
     /// Creates a new directory in the file system.
@@ -30,13 +30,13 @@ namespace Reductech.EDR.Utilities.Processes.mutable
             if (string.IsNullOrWhiteSpace(Path))
                 return Result.Failure<IImmutableProcess<Unit>>("Path must not be empty");
 
-            return Result.Success<IImmutableProcess<Unit>>(new immutable.CreateDirectory(Path));
+            return Result.Success<IImmutableProcess<Unit>>(new Immutable.CreateDirectory(Path));
         }
 
         /// <inheritdoc />
         public override Result<ChainLinkBuilder<TInput, TFinal>> TryCreateChainLinkBuilder<TInput, TFinal>()
         {
-            return new ChainLinkBuilder<TInput,Unit,TFinal,immutable.CreateDirectory,CreateDirectory>(this);
+            return new ChainLinkBuilder<TInput,Unit,TFinal,Immutable.CreateDirectory,CreateDirectory>(this);
         }
 
         /// <summary>

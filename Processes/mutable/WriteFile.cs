@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
 using CSharpFunctionalExtensions;
-using Reductech.EDR.Utilities.Processes.immutable;
-using Reductech.EDR.Utilities.Processes.mutable.chain;
+using Reductech.EDR.Processes.Immutable;
+using Reductech.EDR.Processes.Mutable.Chain;
 using YamlDotNet.Serialization;
 
-namespace Reductech.EDR.Utilities.Processes.mutable
+namespace Reductech.EDR.Processes.Mutable
 {
     /// <summary>
     /// Writes the output of a process to a file. Will overwrite if necessary.
@@ -52,7 +52,7 @@ namespace Reductech.EDR.Utilities.Processes.mutable
             if (textFreezeResult.IsFailure)
                 return textFreezeResult.ConvertFailure<IImmutableProcess<Unit>>();
 
-            return Result.Success<IImmutableProcess<Unit>>(new immutable.WriteFile( textFreezeResult.Value, Folder, FileName));
+            return Result.Success<IImmutableProcess<Unit>>(new Immutable.WriteFile( textFreezeResult.Value, Folder, FileName));
 
         }
 
@@ -65,7 +65,7 @@ namespace Reductech.EDR.Utilities.Processes.mutable
         /// <inheritdoc />
         public override Result<ChainLinkBuilder<TInput, TFinal>> TryCreateChainLinkBuilder<TInput, TFinal>()
         {
-            return new ChainLinkBuilder<TInput,Unit,TFinal,immutable.WriteFile,WriteFile>(this);
+            return new ChainLinkBuilder<TInput,Unit,TFinal,Immutable.WriteFile,WriteFile>(this);
         }
     }
 }

@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
-using Reductech.EDR.Utilities.Processes.immutable;
-using Reductech.EDR.Utilities.Processes.mutable.injection;
-using Reductech.EDR.Utilities.Processes.output;
+using Reductech.EDR.Processes.Immutable;
+using Reductech.EDR.Processes.Mutable.Injections;
+using Reductech.EDR.Processes.Output;
 
-namespace Reductech.EDR.Utilities.Processes.mutable.enumerations
+namespace Reductech.EDR.Processes.Mutable.Enumerations
 {
     internal class LazyCSVEnumerationElements : ImmutableProcess<IEagerEnumerationElements>, ILazyEnumerationElements
     {

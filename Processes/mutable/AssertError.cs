@@ -2,11 +2,11 @@
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using CSharpFunctionalExtensions;
-using Reductech.EDR.Utilities.Processes.immutable;
-using Reductech.EDR.Utilities.Processes.mutable.chain;
+using Reductech.EDR.Processes.Immutable;
+using Reductech.EDR.Processes.Mutable.Chain;
 using YamlDotNet.Serialization;
 
-namespace Reductech.EDR.Utilities.Processes.mutable
+namespace Reductech.EDR.Processes.Mutable
 {
     /// <summary>
     /// Asserts that a particular process will produce an error.
@@ -45,7 +45,7 @@ namespace Reductech.EDR.Utilities.Processes.mutable
 
             if (subProcessFreezeResult.IsFailure) return subProcessFreezeResult;
 
-            var r = new immutable.AssertError( subProcessFreezeResult.Value);
+            var r = new Immutable.AssertError( subProcessFreezeResult.Value);
 
             return r;
         }
@@ -62,7 +62,7 @@ namespace Reductech.EDR.Utilities.Processes.mutable
         /// <inheritdoc />
         public override Result<ChainLinkBuilder<TInput, TFinal>> TryCreateChainLinkBuilder<TInput, TFinal>()
         {
-            return new ChainLinkBuilder<TInput,Unit,TFinal,immutable.AssertError,AssertError>(this);
+            return new ChainLinkBuilder<TInput,Unit,TFinal,Immutable.AssertError,AssertError>(this);
         }
     }
 }

@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
-using Reductech.EDR.Utilities.Processes.mutable;
-using Reductech.EDR.Utilities.Processes.mutable.enumerations;
-using Reductech.EDR.Utilities.Processes.mutable.injection;
+using Reductech.EDR.Processes.Mutable;
+using Reductech.EDR.Processes.Mutable.Enumerations;
+using Reductech.EDR.Processes.Mutable.Injections;
 using Reductech.Utilities.InstantConsole;
-using Process = Reductech.EDR.Utilities.Processes.mutable.Process;
+using Process = Reductech.EDR.Processes.Mutable.Process;
 
-namespace Reductech.EDR.Utilities.Processes
+namespace Reductech.EDR.Processes
 {
     /// <summary>
     /// Dynamically Gets all processes and related entities from an assembly.

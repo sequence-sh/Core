@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
-using Reductech.EDR.Utilities.Processes.immutable;
-using Reductech.EDR.Utilities.Processes.output;
+using Reductech.EDR.Processes.Immutable;
+using Reductech.EDR.Processes.Output;
 
-namespace Reductech.EDR.Utilities.Processes.Tests
+namespace Reductech.EDR.Processes.Tests
 {
     public class ImmutableReturnIntProcess : ImmutableProcess<int>
     {

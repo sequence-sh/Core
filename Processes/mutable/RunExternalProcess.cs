@@ -3,11 +3,11 @@ using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Linq;
 using CSharpFunctionalExtensions;
-using Reductech.EDR.Utilities.Processes.immutable;
-using Reductech.EDR.Utilities.Processes.mutable.chain;
+using Reductech.EDR.Processes.Immutable;
+using Reductech.EDR.Processes.Mutable.Chain;
 using YamlDotNet.Serialization;
 
-namespace Reductech.EDR.Utilities.Processes.mutable
+namespace Reductech.EDR.Processes.Mutable
 {
     /// <summary>
     /// Runs an external process.
@@ -56,7 +56,7 @@ namespace Reductech.EDR.Utilities.Processes.mutable
             if (errors.Any())
                 return Result.Failure<IImmutableProcess<Unit>>(string.Join("\r\n", errors));
 
-            var ip = new immutable.RunExternalProcess(ProcessPath, Arguments);
+            var ip = new Immutable.RunExternalProcess(ProcessPath, Arguments);
 
             return Result.Success<IImmutableProcess<Unit>>(ip);
         }
@@ -70,7 +70,7 @@ namespace Reductech.EDR.Utilities.Processes.mutable
         /// <inheritdoc />
         public override Result<ChainLinkBuilder<TInput, TFinal>> TryCreateChainLinkBuilder<TInput, TFinal>()
         {
-            return new ChainLinkBuilder<TInput,Unit,TFinal,immutable.RunExternalProcess,RunExternalProcess>(this);
+            return new ChainLinkBuilder<TInput,Unit,TFinal,Immutable.RunExternalProcess,RunExternalProcess>(this);
         }
     }
 }

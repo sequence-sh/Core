@@ -1,13 +1,13 @@
 ﻿using System.Collections.Generic;
 using CSharpFunctionalExtensions;
 using JetBrains.Annotations;
-using Reductech.EDR.Utilities.Processes.immutable;
-using Reductech.EDR.Utilities.Processes.mutable;
-using Reductech.EDR.Utilities.Processes.mutable.chain;
-using Reductech.EDR.Utilities.Processes.output;
+using Reductech.EDR.Processes.Immutable;
+using Reductech.EDR.Processes.Mutable;
+using Reductech.EDR.Processes.Mutable.Chain;
+using Reductech.EDR.Processes.Output;
 using YamlDotNet.Serialization;
 
-namespace Reductech.EDR.Utilities.Processes.Tests
+namespace Reductech.EDR.Processes.Tests
 {
     public class EmitProcess : Process
     {

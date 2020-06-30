@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using CSharpFunctionalExtensions;
-using Reductech.EDR.Utilities.Processes.immutable;
-using Reductech.EDR.Utilities.Processes.mutable.chain;
+using Reductech.EDR.Processes.Immutable;
+using Reductech.EDR.Processes.Mutable.Chain;
 using YamlDotNet.Serialization;
 
-namespace Reductech.EDR.Utilities.Processes.mutable
+namespace Reductech.EDR.Processes.Mutable
 {
     /// <summary>
     /// Checks whether a particular file contains a particular string.
@@ -53,13 +53,13 @@ namespace Reductech.EDR.Utilities.Processes.mutable
             if (errors.Any())
                 return Result.Failure<IImmutableProcess<bool>>(string.Join("\r\n", errors));
 
-            return Result.Success<IImmutableProcess<bool>>(new immutable.DoesFileContain(FilePath, ExpectedContents));
+            return Result.Success<IImmutableProcess<bool>>(new Immutable.DoesFileContain(FilePath, ExpectedContents));
         }
 
         /// <inheritdoc />
         public override Result<ChainLinkBuilder<TInput, TFinal>> TryCreateChainLinkBuilder<TInput, TFinal>()
         {
-            return new ChainLinkBuilder<TInput,bool,TFinal,immutable.DoesFileContain,DoesFileContain>(this);
+            return new ChainLinkBuilder<TInput,bool,TFinal,Immutable.DoesFileContain,DoesFileContain>(this);
         }
 
         /// <inheritdoc />

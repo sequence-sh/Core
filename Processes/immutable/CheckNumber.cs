@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using Reductech.EDR.Utilities.Processes.output;
+using Reductech.EDR.Processes.Output;
 
-namespace Reductech.EDR.Utilities.Processes.immutable
+namespace Reductech.EDR.Processes.Immutable
 {
     /// <summary>
     /// Returns whether a particular process produced a number within a particular range.

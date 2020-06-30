@@ -1,4 +1,4 @@
-﻿namespace Reductech.EDR.Utilities.Processes.mutable
+﻿namespace Reductech.EDR.Processes.Mutable
 {
     /// <summary>
     /// External settings for running the process.

@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using Reductech.EDR.Utilities.Processes.output;
+using Reductech.EDR.Processes.Output;
 
-namespace Reductech.EDR.Utilities.Processes.immutable.chain
+namespace Reductech.EDR.Processes.Immutable.Chain
 {
     /// <summary>
     /// A immutableChain link where the output type is not defined.

@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using Reductech.EDR.Utilities.Processes.output;
+using Reductech.EDR.Processes.Output;
 
-namespace Reductech.EDR.Utilities.Processes.mutable.enumerations
+namespace Reductech.EDR.Processes.Mutable.Enumerations
 {
     /// <summary>
     /// The elements of an enumeration, evaluated lazily.

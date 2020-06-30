@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Reductech.EDR.Utilities.Processes.attributes
+namespace Reductech.EDR.Processes.Attributes
 {
     /// <summary>
     /// Indicates the value to be used as a delimiter

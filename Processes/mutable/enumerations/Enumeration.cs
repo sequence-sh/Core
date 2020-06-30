@@ -1,6 +1,6 @@
 ﻿using CSharpFunctionalExtensions;
 
-namespace Reductech.EDR.Utilities.Processes.mutable.enumerations
+namespace Reductech.EDR.Processes.Mutable.Enumerations
 {
     /// <summary>
     /// Represents a list of elements

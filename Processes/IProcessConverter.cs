@@ -1,8 +1,8 @@
 ﻿using CSharpFunctionalExtensions;
-using Reductech.EDR.Utilities.Processes.immutable;
-using Reductech.EDR.Utilities.Processes.mutable;
+using Reductech.EDR.Processes.Immutable;
+using Reductech.EDR.Processes.Mutable;
 
-namespace Reductech.EDR.Utilities.Processes
+namespace Reductech.EDR.Processes
 {
     /// <summary>
     /// A converter that can convert a process to a different type.

@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.IO;
 using CSharpFunctionalExtensions;
 using JetBrains.Annotations;
-using Reductech.EDR.Utilities.Processes.mutable;
-using Reductech.EDR.Utilities.Processes.output;
+using Reductech.EDR.Processes.Mutable;
+using Reductech.EDR.Processes.Output;
 
-namespace Reductech.EDR.Utilities.Processes
+namespace Reductech.EDR.Processes
 {
     /// <summary>
     /// Runs processes from Yaml

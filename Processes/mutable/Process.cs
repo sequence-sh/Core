@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
 using CSharpFunctionalExtensions;
-using Reductech.EDR.Utilities.Processes.immutable;
-using Reductech.EDR.Utilities.Processes.mutable.chain;
-using Reductech.EDR.Utilities.Processes.output;
+using Reductech.EDR.Processes.Immutable;
+using Reductech.EDR.Processes.Mutable.Chain;
+using Reductech.EDR.Processes.Output;
 
-namespace Reductech.EDR.Utilities.Processes.mutable
+namespace Reductech.EDR.Processes.Mutable
 {
     /// <summary>
     /// Base class of all processes.
@@ -84,7 +84,11 @@ namespace Reductech.EDR.Utilities.Processes.mutable
             {
                 if (line is IProcessOutput<object> l) yield return l;
 
-                else if (line.OutputType == OutputType.Success) yield return ProcessOutput<object>.Success(line.Value);
+
+                else if (line.OutputType == OutputType.Success)
+#pragma warning disable CS8604 // Possible null reference argument.
+                    yield return ProcessOutput<object>.Success(line.Value);
+#pragma warning restore CS8604 // Possible null reference argument.
                 else yield return line.ConvertTo<object>();
             }
         }

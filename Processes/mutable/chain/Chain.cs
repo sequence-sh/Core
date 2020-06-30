@@ -1,14 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using CSharpFunctionalExtensions;
-using Reductech.EDR.Utilities.Processes.immutable;
-using Reductech.EDR.Utilities.Processes.immutable.chain;
-using Reductech.EDR.Utilities.Processes.mutable.injection;
+using Reductech.EDR.Processes.Immutable;
+using Reductech.EDR.Processes.Immutable.Chain;
+using Reductech.EDR.Processes.Mutable.Injections;
 using YamlDotNet.Serialization;
 
-namespace Reductech.EDR.Utilities.Processes.mutable.chain
+namespace Reductech.EDR.Processes.Mutable.Chain
 {
     /// <summary>
     /// A series of processes where the result of each process is fed into the following process.

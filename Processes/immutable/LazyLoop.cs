@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
-using Reductech.EDR.Utilities.Processes.mutable;
-using Reductech.EDR.Utilities.Processes.mutable.enumerations;
-using Reductech.EDR.Utilities.Processes.output;
+using Reductech.EDR.Processes.Mutable;
+using Reductech.EDR.Processes.Mutable.Enumerations;
+using Reductech.EDR.Processes.Output;
 
-namespace Reductech.EDR.Utilities.Processes.immutable
+namespace Reductech.EDR.Processes.Immutable
 {
     internal class LazyLoop : ImmutableProcess<Unit>
     {

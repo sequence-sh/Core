@@ -1,3 +1,3 @@
-﻿using Reductech.EDR.Utilities.Processes.attributes;
+﻿using Reductech.EDR.Processes.Attributes;
 
 [assembly: ProcessModule]

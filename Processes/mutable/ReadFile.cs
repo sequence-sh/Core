@@ -1,11 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using CSharpFunctionalExtensions;
-using Reductech.EDR.Utilities.Processes.immutable;
-using Reductech.EDR.Utilities.Processes.mutable.chain;
+using Reductech.EDR.Processes.Immutable;
+using Reductech.EDR.Processes.Mutable.Chain;
 using YamlDotNet.Serialization;
 
-namespace Reductech.EDR.Utilities.Processes.mutable
+namespace Reductech.EDR.Processes.Mutable
 {
     /// <summary>
     /// Reads a file and returns the contents.
@@ -39,7 +39,7 @@ namespace Reductech.EDR.Utilities.Processes.mutable
             if (string.IsNullOrWhiteSpace(FilePath))
                 return Result.Failure<IImmutableProcess<TOutput>>($"{nameof(FilePath)} must be set.");
 
-            var process = new immutable.ReadFile(FilePath);
+            var process = new Immutable.ReadFile(FilePath);
 
             var r = TryConvertFreezeResult<TOutput, string>(process);
 
@@ -55,7 +55,7 @@ namespace Reductech.EDR.Utilities.Processes.mutable
         /// <inheritdoc />
         public override Result<ChainLinkBuilder<TInput, TFinal>> TryCreateChainLinkBuilder<TInput, TFinal>()
         {
-            return new ChainLinkBuilder<TInput, string, TFinal, immutable.ReadFile, ReadFile>(this);
+            return new ChainLinkBuilder<TInput, string, TFinal, Immutable.ReadFile, ReadFile>(this);
         }
     }
 }

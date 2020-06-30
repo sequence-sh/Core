@@ -2,15 +2,15 @@
 using System.Linq;
 using CSharpFunctionalExtensions;
 using NUnit.Framework;
-using Reductech.EDR.Utilities.Processes.immutable;
-using Reductech.EDR.Utilities.Processes.mutable;
-using Reductech.EDR.Utilities.Processes.mutable.chain;
-using Reductech.EDR.Utilities.Processes.mutable.injection;
+using Reductech.EDR.Processes.Immutable;
+using Reductech.EDR.Processes.Mutable;
+using Reductech.EDR.Processes.Mutable.Chain;
+using Reductech.EDR.Processes.Mutable.Injections;
 using YamlDotNet.Serialization;
-using List = Reductech.EDR.Utilities.Processes.mutable.enumerations.List;
-using RunExternalProcess = Reductech.EDR.Utilities.Processes.mutable.RunExternalProcess;
+using List = Reductech.EDR.Processes.Mutable.Enumerations.List;
+using RunExternalProcess = Reductech.EDR.Processes.Mutable.RunExternalProcess;
 
-namespace Reductech.EDR.Utilities.Processes.Tests
+namespace Reductech.EDR.Processes.Tests
 {
     public class CleverInjectionTest
     {
