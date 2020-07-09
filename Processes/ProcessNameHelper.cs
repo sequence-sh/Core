@@ -53,5 +53,7 @@ namespace Reductech.EDR.Processes
         public static string GetAssertBoolProcessName(string bProcessName, bool b) => $"Assert {bProcessName} returns {b}";
 
         public static string GetWriteFileProcessName(string subProcessName) => $"Write file from {subProcessName}";
+
+        public static string GetReturnStringProcessName(string result) => $"Return {result}";
     }
 }
