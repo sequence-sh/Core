@@ -1,15 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using CSharpFunctionalExtensions;
-using FluentAssertions;
+﻿using FluentAssertions;
 using NUnit.Framework;
-using Reductech.EDR.Processes.Immutable;
 using Reductech.EDR.Processes.Mutable;
 using Reductech.EDR.Processes.Mutable.Chain;
 using Reductech.EDR.Processes.Mutable.Injections;
-using Reductech.EDR.Processes.Output;
-using YamlDotNet.Serialization;
 using Conditional = Reductech.EDR.Processes.Mutable.Conditional;
 
 namespace Reductech.EDR.Processes.Tests
@@ -123,8 +116,8 @@ namespace Reductech.EDR.Processes.Tests
             {
                 If = new ReturnBool
                 {
-                    Value = true
-                } ,
+                    ResultBool = true
+                },
                 Then = new EmitProcess
                 {
                     Term = "Yes"
@@ -150,7 +143,7 @@ namespace Reductech.EDR.Processes.Tests
             {
                 If = new ReturnBool
                 {
-                    Value = false
+                    ResultBool = false
                 } ,
                 Then = new EmitProcess
                 {
@@ -170,60 +163,5 @@ namespace Reductech.EDR.Processes.Tests
 
             CollectionAssert.Contains(resultList, "No");
         }
-    }
-
-    public class ReturnBool : Process
-    {
-        /// <inheritdoc />
-        public override string GetReturnTypeInfo() => nameof(Boolean);
-        public override string GetName() => Value.ToString();
-
-        /// <inheritdoc />
-        public override Result<IImmutableProcess<TFinal>> TryFreeze<TFinal>(IProcessSettings processSettings)
-        {
-            return TryConvertFreezeResult<TFinal, bool>(new ImmutableReturnBool(Value));
-        }
-
-
-        [YamlMember]
-        [Required]
-        public bool Value { get; set; }
-
-        /// <inheritdoc />
-        public override IEnumerable<string> GetRequirements()
-        {
-            yield break;
-        }
-
-        /// <inheritdoc />
-        public override Result<ChainLinkBuilder<TInput, TFinal>> TryCreateChainLinkBuilder<TInput, TFinal>()
-        {
-            throw new NotImplementedException();
-        }
-    }
-
-    public class ImmutableReturnBool : ImmutableProcess<bool>
-    {
-        /// <inheritdoc />
-        public ImmutableReturnBool(bool value)
-        {
-            _value = value;
-        }
-
-        private readonly bool _value;
-
-        /// <inheritdoc />
-#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
-        public override async IAsyncEnumerable<IProcessOutput<bool>> Execute()
-#pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
-        {
-                yield return ProcessOutput<bool>.Success(_value);
-        }
-
-        /// <inheritdoc />
-        public override string Name => _value.ToString();
-
-        /// <inheritdoc />
-        public override IProcessConverter? ProcessConverter => null;
     }
 }
