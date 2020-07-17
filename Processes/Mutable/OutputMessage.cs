@@ -1,40 +1,39 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Processes.Immutable;
 using Reductech.EDR.Processes.Mutable.Chain;
 using YamlDotNet.Serialization;
 
-
 namespace Reductech.EDR.Processes.Mutable
 {
     /// <summary>
-    /// Returns a given string. Useful for testing.
+    /// Outputs a given message. Returns a Unit. Used for logging.
     /// </summary>
-    public class ReturnString : Process
+    public class OutputMessage : Process
     {
+        /// <inheritdoc />
+        public override string GetReturnTypeInfo() => nameof(Unit);
+
         /// <summary>
-        /// The string to return.
+        /// The message to output.
         /// </summary>
-        [YamlMember(Order = 1)]
+        [YamlMember]
         [Required]
 #pragma warning disable 8618
-        public string ResultString { get; set; }
+        public string Message { get; set; }
 #pragma warning restore 8618
 
-        /// <inheritdoc />
-        public override string GetReturnTypeInfo() => nameof(String);
 
         /// <inheritdoc />
-        public override string GetName() => ProcessNameHelper.GetReturnStringProcessName(ResultString);
+        public override string GetName() => ProcessNameHelper.GetOutputMessageProcessName(Message);
 
         /// <inheritdoc />
         public override Result<IImmutableProcess<TOutput>> TryFreeze<TOutput>(IProcessSettings processSettings)
         {
-            var r=  new Immutable.ReturnString(ResultString);
+            var r = new Immutable.OutputMessage(Message);
 
-            return TryConvertFreezeResult<TOutput, string>(r);
+            return TryConvertFreezeResult<TOutput, Unit>(r);
         }
 
         /// <inheritdoc />
@@ -46,8 +45,7 @@ namespace Reductech.EDR.Processes.Mutable
         /// <inheritdoc />
         public override Result<ChainLinkBuilder<TInput, TFinal>> TryCreateChainLinkBuilder<TInput, TFinal>()
         {
-            return new ChainLinkBuilder<TInput, string, TFinal, Immutable.ReturnString, ReturnString>(this);
+            return new ChainLinkBuilder<TInput, Unit, TFinal, Immutable.OutputMessage, OutputMessage>(this);
         }
     }
-
 }

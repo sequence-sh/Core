@@ -55,5 +55,11 @@ namespace Reductech.EDR.Processes
         public static string GetWriteFileProcessName(string subProcessName) => $"Write file from {subProcessName}";
 
         public static string GetReturnStringProcessName(string result) => $"Return {result}";
+
+        public static string GetReturnBoolProcessName(bool result) => $"Return {result}";
+
+        public static string GetDelayProcessName(int milliseconds) => $"Delay {milliseconds} milliseconds";
+
+        public static string GetOutputMessageProcessName(string message) => $"Output Message {message}";
     }
 }

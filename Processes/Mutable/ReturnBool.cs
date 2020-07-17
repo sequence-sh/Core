@@ -6,35 +6,32 @@ using Reductech.EDR.Processes.Immutable;
 using Reductech.EDR.Processes.Mutable.Chain;
 using YamlDotNet.Serialization;
 
-
 namespace Reductech.EDR.Processes.Mutable
 {
     /// <summary>
-    /// Returns a given string. Useful for testing.
+    /// Returns a given boolean. Useful for testing.
     /// </summary>
-    public class ReturnString : Process
+    public class ReturnBool : Process
     {
         /// <summary>
-        /// The string to return.
+        /// The boolean value to return.
         /// </summary>
-        [YamlMember(Order = 1)]
+        [YamlMember]
         [Required]
-#pragma warning disable 8618
-        public string ResultString { get; set; }
-#pragma warning restore 8618
+        public bool ResultBool { get; set; }
 
         /// <inheritdoc />
-        public override string GetReturnTypeInfo() => nameof(String);
+        public override string GetReturnTypeInfo() => nameof(Boolean);
 
         /// <inheritdoc />
-        public override string GetName() => ProcessNameHelper.GetReturnStringProcessName(ResultString);
+        public override string GetName() => ProcessNameHelper.GetReturnBoolProcessName(ResultBool);
 
         /// <inheritdoc />
         public override Result<IImmutableProcess<TOutput>> TryFreeze<TOutput>(IProcessSettings processSettings)
         {
-            var r=  new Immutable.ReturnString(ResultString);
+            var r = new Immutable.ReturnBool(ResultBool);
 
-            return TryConvertFreezeResult<TOutput, string>(r);
+            return TryConvertFreezeResult<TOutput, bool>(r);
         }
 
         /// <inheritdoc />
@@ -46,8 +43,7 @@ namespace Reductech.EDR.Processes.Mutable
         /// <inheritdoc />
         public override Result<ChainLinkBuilder<TInput, TFinal>> TryCreateChainLinkBuilder<TInput, TFinal>()
         {
-            return new ChainLinkBuilder<TInput, string, TFinal, Immutable.ReturnString, ReturnString>(this);
+            return new ChainLinkBuilder<TInput, bool, TFinal, Immutable.ReturnBool, ReturnBool>(this);
         }
     }
-
 }

@@ -1,40 +1,37 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Processes.Immutable;
 using Reductech.EDR.Processes.Mutable.Chain;
 using YamlDotNet.Serialization;
 
-
 namespace Reductech.EDR.Processes.Mutable
 {
     /// <summary>
-    /// Returns a given string. Useful for testing.
+    /// Delays for a given amount of time.
     /// </summary>
-    public class ReturnString : Process
+    public class Delay : Process
     {
+        /// <inheritdoc />
+        public override string GetReturnTypeInfo() => nameof(Unit);
+
         /// <summary>
-        /// The string to return.
+        /// The number of milliseconds to delay
         /// </summary>
-        [YamlMember(Order = 1)]
+        [YamlMember]
         [Required]
-#pragma warning disable 8618
-        public string ResultString { get; set; }
-#pragma warning restore 8618
+        public int Milliseconds { get; set; }
+
 
         /// <inheritdoc />
-        public override string GetReturnTypeInfo() => nameof(String);
-
-        /// <inheritdoc />
-        public override string GetName() => ProcessNameHelper.GetReturnStringProcessName(ResultString);
+        public override string GetName() => ProcessNameHelper.GetDelayProcessName(Milliseconds);
 
         /// <inheritdoc />
         public override Result<IImmutableProcess<TOutput>> TryFreeze<TOutput>(IProcessSettings processSettings)
         {
-            var r=  new Immutable.ReturnString(ResultString);
+            var r = new Immutable.Delay(Milliseconds);
 
-            return TryConvertFreezeResult<TOutput, string>(r);
+            return TryConvertFreezeResult<TOutput, Unit>(r);
         }
 
         /// <inheritdoc />
@@ -46,8 +43,7 @@ namespace Reductech.EDR.Processes.Mutable
         /// <inheritdoc />
         public override Result<ChainLinkBuilder<TInput, TFinal>> TryCreateChainLinkBuilder<TInput, TFinal>()
         {
-            return new ChainLinkBuilder<TInput, string, TFinal, Immutable.ReturnString, ReturnString>(this);
+            return new ChainLinkBuilder<TInput, Unit, TFinal, Immutable.Delay, Delay>(this);
         }
     }
-
 }
