@@ -27,12 +27,6 @@ namespace Reductech.EDR.Processes.Mutable
         public bool DoNotSplit { get; set; }
 
         /// <summary>
-        /// If true, all sub processes of this process will be run on the same machine.
-        /// </summary>
-        [YamlMember(Order = 4)]
-        public bool RunOnOneMachine { get; set; }
-
-        /// <summary>
         /// The priority of this process. Processes with higher priorities will be run first.
         /// </summary>
         [YamlMember(Order = 5)]
