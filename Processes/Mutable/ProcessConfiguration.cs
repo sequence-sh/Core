@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using YamlDotNet.Serialization;
 
 namespace Reductech.EDR.Processes.Mutable
@@ -31,5 +32,34 @@ namespace Reductech.EDR.Processes.Mutable
         /// </summary>
         [YamlMember(Order = 5)]
         public double? Priority { get; set; }
+
+        /// <summary>
+        /// Combines two process configurations, deferring to the child where there is a conflict.
+        /// </summary>
+        public static ProcessConfiguration? Combine(ProcessConfiguration? parent, ProcessConfiguration? child)
+        {
+            if (parent == null)
+                return child;
+            if (child == null)
+                return parent;
+
+            return new ProcessConfiguration
+            {
+                AdditionalRequirements = Combine(parent.AdditionalRequirements, child.AdditionalRequirements, true),
+                TargetMachineTags = Combine(parent.TargetMachineTags, child.TargetMachineTags, true),
+                DoNotSplit = parent.DoNotSplit || child.DoNotSplit,
+                Priority = child.Priority?? parent.Priority
+            };
+
+        }
+
+
+        private static List<string>? Combine(List<string>? l1, List<string>? l2, bool distinct)
+        {
+            if (l1 == null) return l2;
+            if (l2 == null) return l1;
+
+            return distinct ? l1.Concat(l2).Distinct().ToList() : l1.Concat(l2).ToList();
+        }
     }
 }
