@@ -38,7 +38,7 @@ namespace Reductech.EDR.Processes
             Parameters = RelevantProperties.Select(propertyInfo =>
                 new PropertyWrapper(propertyInfo, propertyInfo.GetValue(instance)?.ToString()  )).ToList();
 
-            Requirements = instance is Process process ? process.GetRequirements() : Enumerable.Empty<string>();
+            Requirements = instance is Process process ? process.GetAllRequirements() : Enumerable.Empty<string>();
 
             TypeDetails = instance is Process process1 ? process1.GetReturnTypeInfo() : null;
         }

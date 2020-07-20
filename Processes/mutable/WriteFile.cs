@@ -57,7 +57,7 @@ namespace Reductech.EDR.Processes.Mutable
         }
 
         /// <inheritdoc />
-        public override IEnumerable<string> GetRequirements()
+        public override IEnumerable<string> GetAllRequirements()
         {
             yield break;
         }

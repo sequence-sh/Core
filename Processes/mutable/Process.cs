@@ -1,8 +1,10 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Processes.Immutable;
 using Reductech.EDR.Processes.Mutable.Chain;
 using Reductech.EDR.Processes.Output;
+using YamlDotNet.Serialization;
 
 namespace Reductech.EDR.Processes.Mutable
 {
@@ -11,6 +13,13 @@ namespace Reductech.EDR.Processes.Mutable
     /// </summary>
     public abstract class Process
     {
+        /// <summary>
+        /// Additional process configuration that may be needed in some use cases.
+        /// </summary>
+        [YamlMember(Order = 0)]
+        public ProcessConfiguration? Configuration { get; set; }
+
+
         /// <summary>
         /// The type of this process, or a description of how the type is calculated.
         /// </summary>
@@ -31,7 +40,12 @@ namespace Reductech.EDR.Processes.Mutable
         /// Gets special requirements for the process.
         /// </summary>
         /// <returns></returns>
-        public abstract IEnumerable<string> GetRequirements();
+        public virtual IEnumerable<string> GetAllRequirements()
+        {
+            if (Configuration?.AdditionalRequirements != null)
+                return Configuration.AdditionalRequirements;
+            return Enumerable.Empty<string>();
+        }
 
         /// <summary>
         /// Creates a immutableChain link builder.

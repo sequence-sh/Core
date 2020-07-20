@@ -12,7 +12,7 @@ namespace Reductech.EDR.Processes.Mutable
     /// Executes each step, one after the another.
     /// Will stop if a process fails.
     /// </summary>
-    public class Sequence : Process
+    public class Sequence : Process //TODO consider whether both sequence and chain are required
     {
         /// <inheritdoc />
         public override string GetReturnTypeInfo() => nameof(Unit);
@@ -58,12 +58,11 @@ namespace Reductech.EDR.Processes.Mutable
         }
 
         /// <inheritdoc />
-        public override IEnumerable<string> GetRequirements()
+        public override IEnumerable<string> GetAllRequirements()
         {
-            if (Steps == null)
-                return Enumerable.Empty<string>();
+            if (Steps == null) return base.GetAllRequirements();
 
-            return Steps.SelectMany(x => x.GetRequirements()).Distinct();
+            return base.GetAllRequirements().Concat(Steps.SelectMany(x => x.GetAllRequirements())).Distinct() ;
         }
 
         /// <inheritdoc />
