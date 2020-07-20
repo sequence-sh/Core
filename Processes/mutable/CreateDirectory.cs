@@ -49,7 +49,7 @@ namespace Reductech.EDR.Processes.Mutable
 #pragma warning restore CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
 
         /// <inheritdoc />
-        public override IEnumerable<string> GetRequirements()
+        public override IEnumerable<string> GetAllRequirements()
         {
             yield break;
         }

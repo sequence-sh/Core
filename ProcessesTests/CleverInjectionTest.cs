@@ -134,7 +134,7 @@ namespace Reductech.EDR.Processes.Tests
             }
 
             /// <inheritdoc />
-            public override IEnumerable<string> GetRequirements()
+            public override IEnumerable<string> GetAllRequirements()
             {
                 yield break;
             }

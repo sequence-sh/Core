@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Processes.Immutable;
 using Reductech.EDR.Processes.Mutable.Chain;
@@ -39,7 +40,12 @@ namespace Reductech.EDR.Processes.Mutable
         /// Gets special requirements for the process.
         /// </summary>
         /// <returns></returns>
-        public abstract IEnumerable<string> GetRequirements();
+        public virtual IEnumerable<string> GetAllRequirements()
+        {
+            if (Configuration?.AdditionalRequirements != null)
+                return Configuration.AdditionalRequirements;
+            return Enumerable.Empty<string>();
+        }
 
         /// <summary>
         /// Creates a immutableChain link builder.

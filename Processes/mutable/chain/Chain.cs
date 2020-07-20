@@ -65,13 +65,19 @@ namespace Reductech.EDR.Processes.Mutable.Chain
         }
 
         /// <inheritdoc />
-        public override IEnumerable<string> GetRequirements()
+        public override IEnumerable<string> GetAllRequirements()
         {
-            if (Process == null) return Enumerable.Empty<string>();
+            IEnumerable<string> additionalRequirements;
 
-            return Into == null ?
-                Process.GetRequirements() :
-                Process.GetRequirements().Concat(Into.GetRequirements()).Distinct();
+            if (Process == null) additionalRequirements = Enumerable.Empty<string>();
+            else
+            {
+                additionalRequirements = Into == null ?
+                    Process.GetAllRequirements() :
+                    Process.GetAllRequirements().Concat(Into.GetAllRequirements()).Distinct();
+            }
+
+            return base.GetAllRequirements().Concat(additionalRequirements).Distinct();
         }
 
         /// <inheritdoc />

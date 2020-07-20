@@ -185,7 +185,7 @@ t,4,def",
             }
 
             /// <inheritdoc />
-            public override IEnumerable<string> GetRequirements() => Enumerable.Empty<string>();
+            public override IEnumerable<string> GetAllRequirements() => Enumerable.Empty<string>();
 
             /// <inheritdoc />
             public override Result<ChainLinkBuilder<TInput, TFinal>> TryCreateChainLinkBuilder<TInput, TFinal>()
