@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Processes.Immutable;
 using Reductech.EDR.Processes.Mutable;
@@ -29,12 +28,6 @@ namespace Reductech.EDR.Processes.Tests
             var r = new ImmutableReturnIntProcess(Value);
 
             return TryConvertFreezeResult<TOutput, int>(r);
-        }
-
-        /// <inheritdoc />
-        public override IEnumerable<string> GetAllRequirements()
-        {
-            yield break;
         }
 
         /// <inheritdoc />

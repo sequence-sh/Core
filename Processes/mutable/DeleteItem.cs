@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Processes.Immutable;
 using Reductech.EDR.Processes.Mutable.Chain;
@@ -41,12 +40,6 @@ namespace Reductech.EDR.Processes.Mutable
                 return Result.Failure<IImmutableProcess<Unit>>("File Path is empty");
 
             return new Immutable.DeleteItem(Path);
-        }
-
-        /// <inheritdoc />
-        public override IEnumerable<string> GetAllRequirements()
-        {
-            yield break;
         }
 
         /// <inheritdoc />

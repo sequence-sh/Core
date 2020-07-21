@@ -72,13 +72,13 @@ namespace Reductech.EDR.Processes.Mutable
         }
 
         /// <inheritdoc />
-        public override IEnumerable<string> GetAllRequirements()
+        public override IEnumerable<Requirement> GetAllRequirements()
         {
             if (If == null || Then == null)
                 return base.GetAllRequirements();
 
             return base.GetAllRequirements().Concat(If.GetAllRequirements().Concat(Then.GetAllRequirements())
-                    .Concat(Else?.GetAllRequirements() ?? Enumerable.Empty<string>())).Distinct();
+                    .Concat(Else?.GetAllRequirements() ?? Enumerable.Empty<Requirement>())).Distinct();
         }
 
         /// <inheritdoc />

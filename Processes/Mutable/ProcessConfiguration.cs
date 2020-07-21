@@ -13,7 +13,7 @@ namespace Reductech.EDR.Processes.Mutable
         /// Additional requirements, beyond the default for this process.
         /// </summary>
         [YamlMember(Order = 1)]
-        public List<string>? AdditionalRequirements { get; set; }
+        public List<Requirement>? AdditionalRequirements { get; set; }
 
         /// <summary>
         /// Tags that the target machine must have (defined in a the config file) for this to be run on that machine.
@@ -54,7 +54,7 @@ namespace Reductech.EDR.Processes.Mutable
         }
 
 
-        private static List<string>? Combine(List<string>? l1, List<string>? l2, bool distinct)
+        private static List<T>? Combine<T>(List<T>? l1, List<T>? l2, bool distinct)
         {
             if (l1 == null) return l2;
             if (l2 == null) return l1;

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using NUnit.Framework;
@@ -183,9 +182,6 @@ t,4,def",
             {
                 return new ImmutableEmitString(Output);
             }
-
-            /// <inheritdoc />
-            public override IEnumerable<string> GetAllRequirements() => Enumerable.Empty<string>();
 
             /// <inheritdoc />
             public override Result<ChainLinkBuilder<TInput, TFinal>> TryCreateChainLinkBuilder<TInput, TFinal>()

@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Processes.Immutable;
 using Reductech.EDR.Processes.Mutable.Chain;
@@ -48,10 +47,5 @@ namespace Reductech.EDR.Processes.Mutable
         public string Path { get; set; }
 #pragma warning restore CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
 
-        /// <inheritdoc />
-        public override IEnumerable<string> GetAllRequirements()
-        {
-            yield break;
-        }
     }
 }

@@ -62,12 +62,6 @@ namespace Reductech.EDR.Processes.Mutable
         }
 
         /// <inheritdoc />
-        public override IEnumerable<string> GetAllRequirements()
-        {
-            yield break;
-        }
-
-        /// <inheritdoc />
         public override Result<ChainLinkBuilder<TInput, TFinal>> TryCreateChainLinkBuilder<TInput, TFinal>()
         {
             return new ChainLinkBuilder<TInput,Unit,TFinal,Immutable.RunExternalProcess,RunExternalProcess>(this);

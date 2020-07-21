@@ -40,11 +40,11 @@ namespace Reductech.EDR.Processes.Mutable
         /// Gets special requirements for the process.
         /// </summary>
         /// <returns></returns>
-        public virtual IEnumerable<string> GetAllRequirements()
+        public virtual IEnumerable<Requirement> GetAllRequirements()
         {
             if (Configuration?.AdditionalRequirements != null)
                 return Configuration.AdditionalRequirements;
-            return Enumerable.Empty<string>();
+            return Enumerable.Empty<Requirement>();
         }
 
         /// <summary>

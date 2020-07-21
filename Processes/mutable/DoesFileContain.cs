@@ -61,11 +61,5 @@ namespace Reductech.EDR.Processes.Mutable
         {
             return new ChainLinkBuilder<TInput,bool,TFinal,Immutable.DoesFileContain,DoesFileContain>(this);
         }
-
-        /// <inheritdoc />
-        public override IEnumerable<string> GetAllRequirements()
-        {
-            yield break;
-        }
     }
 }

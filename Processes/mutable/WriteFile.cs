@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using CSharpFunctionalExtensions;
+﻿using CSharpFunctionalExtensions;
 using Reductech.EDR.Processes.Immutable;
 using Reductech.EDR.Processes.Mutable.Chain;
 using YamlDotNet.Serialization;
@@ -54,12 +53,6 @@ namespace Reductech.EDR.Processes.Mutable
 
             return Result.Success<IImmutableProcess<Unit>>(new Immutable.WriteFile( textFreezeResult.Value, Folder, FileName));
 
-        }
-
-        /// <inheritdoc />
-        public override IEnumerable<string> GetAllRequirements()
-        {
-            yield break;
         }
 
         /// <inheritdoc />

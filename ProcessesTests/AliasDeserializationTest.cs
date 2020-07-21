@@ -67,12 +67,6 @@ namespace Reductech.EDR.Processes.Tests
         }
 
         /// <inheritdoc />
-        public override IEnumerable<string> GetAllRequirements()
-        {
-            yield break;
-        }
-
-        /// <inheritdoc />
         public override Result<ChainLinkBuilder<TInput, TFinal>> TryCreateChainLinkBuilder<TInput, TFinal>()
         {
             throw new NotImplementedException();
