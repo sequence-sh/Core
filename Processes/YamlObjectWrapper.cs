@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using Namotion.Reflection;
 using Reductech.EDR.Processes.Attributes;
+using Reductech.EDR.Processes.Mutable;
 using Reductech.Utilities.InstantConsole;
 using YamlDotNet.Serialization;
 using Process = Reductech.EDR.Processes.Mutable.Process;
@@ -38,7 +39,9 @@ namespace Reductech.EDR.Processes
             Parameters = RelevantProperties.Select(propertyInfo =>
                 new PropertyWrapper(propertyInfo, propertyInfo.GetValue(instance)?.ToString()  )).ToList();
 
-            Requirements = instance is Process process ? process.GetAllRequirements() : Enumerable.Empty<string>();
+            var reqObjects = instance is Process process ? process.GetAllRequirements() : Enumerable.Empty<Requirement>();
+
+            Requirements = reqObjects.Select(x => x.ToString()!).Distinct();
 
             TypeDetails = instance is Process process1 ? process1.GetReturnTypeInfo() : null;
         }

@@ -51,7 +51,7 @@ namespace Reductech.EDR.Processes.Mutable
         }
 
         /// <inheritdoc />
-        public override IEnumerable<string> GetAllRequirements()
+        public override IEnumerable<Requirement> GetAllRequirements()
         {
             if (Process == null)
                 return base.GetAllRequirements();

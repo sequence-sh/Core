@@ -17,7 +17,7 @@ namespace Reductech.EDR.Processes.Mutable.Chain
         /// <summary>
         /// The process for this step in the immutableChain.
         /// </summary>
-        [YamlMember(Order = 1)]
+        [YamlMember(Order = 2)] //NOTE: Injection has Order 1 and should go before this
         [Required]
 #pragma warning disable CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
         public Process Process { get; set; }
@@ -26,7 +26,7 @@ namespace Reductech.EDR.Processes.Mutable.Chain
         /// <summary>
         /// The next step in the immutableChain.
         /// </summary>
-        [YamlMember(Order = 3)] //NOTE: Injection has Order 2 and should go before this
+        [YamlMember(Order = 3)]
         public ChainLink? Into { get; set; }
 
         /// <inheritdoc />
@@ -65,11 +65,11 @@ namespace Reductech.EDR.Processes.Mutable.Chain
         }
 
         /// <inheritdoc />
-        public override IEnumerable<string> GetAllRequirements()
+        public override IEnumerable<Requirement> GetAllRequirements()
         {
-            IEnumerable<string> additionalRequirements;
+            IEnumerable<Requirement> additionalRequirements;
 
-            if (Process == null) additionalRequirements = Enumerable.Empty<string>();
+            if (Process == null) additionalRequirements = Enumerable.Empty<Requirement>();
             else
             {
                 additionalRequirements = Into == null ?
@@ -96,7 +96,7 @@ namespace Reductech.EDR.Processes.Mutable.Chain
         /// <summary>
         /// The injection to inject the result of the previous method.
         /// </summary>
-        [YamlMember(Order = 2)]
+        [YamlMember(Order = 1)]
         [Required]
 #pragma warning disable CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
         public Injection Inject { get; set; }
