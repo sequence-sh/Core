@@ -26,7 +26,7 @@ namespace Reductech.EDR.Processes.Mutable.Chain
         /// <summary>
         /// The next step in the immutableChain.
         /// </summary>
-        [YamlMember(Order = 2)]
+        [YamlMember(Order = 3)] //NOTE: Injection has Order 2 and should go before this
         public ChainLink? Into { get; set; }
 
         /// <inheritdoc />
@@ -96,7 +96,7 @@ namespace Reductech.EDR.Processes.Mutable.Chain
         /// <summary>
         /// The injection to inject the result of the previous method.
         /// </summary>
-        [YamlMember(Order = 3)]
+        [YamlMember(Order = 2)]
         [Required]
 #pragma warning disable CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
         public Injection Inject { get; set; }
