@@ -26,12 +26,12 @@ namespace Reductech.EDR.Processes.Mutable
         public override string GetReturnTypeInfo() => nameof(String);
 
         /// <inheritdoc />
-        public override string GetName() => ProcessNameHelper.GetReturnStringProcessName(ResultString);
+        public override string GetName() => ProcessNameHelper.GetReturnValueProcessName(ResultString);
 
         /// <inheritdoc />
         public override Result<IImmutableProcess<TOutput>> TryFreeze<TOutput>(IProcessSettings processSettings)
         {
-            var r=  new Immutable.ReturnString(ResultString);
+            var r=  new Immutable.ReturnValue<string>(ResultString);
 
             return TryConvertFreezeResult<TOutput, string>(r);
         }
@@ -39,7 +39,7 @@ namespace Reductech.EDR.Processes.Mutable
         /// <inheritdoc />
         public override Result<ChainLinkBuilder<TInput, TFinal>> TryCreateChainLinkBuilder<TInput, TFinal>()
         {
-            return new ChainLinkBuilder<TInput, string, TFinal, Immutable.ReturnString, ReturnString>(this);
+            return new ChainLinkBuilder<TInput, string, TFinal, Immutable.ReturnValue<string>, ReturnString>(this);
         }
     }
 
