@@ -29,10 +29,7 @@ namespace Reductech.EDR.Processes.Mutable.Enumerations
         public override string Name => Members != null && Members.Any()?  $"[{string.Join(", ", Members)}]" : "Empty List";
 
         /// <inheritdoc />
-        public override EnumerationStyle GetEnumerationStyle()
-        {
-            return EnumerationStyle.Eager;
-        }
+        public override EnumerationStyle EnumerationStyle => EnumerationStyle.Eager;
 
         /// <summary>
         /// The elements to iterate over.

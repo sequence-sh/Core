@@ -58,7 +58,12 @@ namespace Reductech.EDR.Processes.Mutable.Injections
         [DefaultValueExplanation("The value will be injected on its own.")]
         public string? Template { get; set; }
 
-        internal Result<object> GetPropertyValue(object element)
+        /// <summary>
+        /// Applies the regex and the template to the element.
+        /// </summary>
+        /// <param name="element"></param>
+        /// <returns></returns>
+        public Result<object> GetPropertyValue(object element)
         {
             if (Regex == null && Template == null)
                 return element;
@@ -82,7 +87,7 @@ namespace Reductech.EDR.Processes.Mutable.Injections
         /// <summary>
         /// Injects the element into the process.
         /// </summary>
-        internal Result TryInject(object element, Process process)
+        public Result TryInject(object element, Process process)
         {
             var pathResult = InjectionParser.TryParse(Property);
 
