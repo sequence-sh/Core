@@ -125,11 +125,14 @@ namespace Reductech.EDR.Processes.Mutable.Enumerations
         }
 
         /// <inheritdoc />
-        public override EnumerationStyle GetEnumerationStyle()
+        public override EnumerationStyle EnumerationStyle
         {
-            if (CSVProcess == null)
-                return EnumerationStyle.Lazy;
-            else return EnumerationStyle.Eager;
+            get
+            {
+                if (CSVProcess == null)
+                    return EnumerationStyle.Lazy;
+                else return EnumerationStyle.Eager;
+            }
         }
 
         /// <summary>

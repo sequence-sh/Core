@@ -38,7 +38,10 @@ namespace Reductech.EDR.Processes.Mutable.Enumerations
         /// <summary>
         /// Whether this will enumerate lazily or eagerly.
         /// </summary>
-        public abstract EnumerationStyle GetEnumerationStyle();
+        public abstract EnumerationStyle EnumerationStyle
+        {
+            get;
+        }
     }
 
     /// <summary>

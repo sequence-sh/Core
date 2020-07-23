@@ -36,7 +36,7 @@ namespace Reductech.EDR.Processes
             var assembly = Assembly.GetAssembly(anyAssemblyMember);
 
             Debug.Assert(assembly != null, nameof(assembly) + " != null");
-            var types =  assembly.GetTypes().Where(x => typeof(Process).IsAssignableFrom(x))
+            var types =  assembly!.GetTypes().Where(x => typeof(Process).IsAssignableFrom(x))
                 .Where(x => !x.IsAbstract && !x.IsInterface).ToList();
 
             var processes = types.Select(x => new ProcessWrapper<T>(x, settings, documentationCategory)).ToList();
@@ -49,7 +49,7 @@ namespace Reductech.EDR.Processes
             var assembly = Assembly.GetAssembly(anyAssemblyMember);
 
             Debug.Assert(assembly != null, nameof(assembly) + " != null");
-            var types =  assembly.GetTypes().Where(entityType.IsAssignableFrom)
+            var types =  assembly!.GetTypes().Where(entityType.IsAssignableFrom)
                 .Where(x => !x.IsAbstract && !x.IsInterface).ToList();
 
             var processes = types.Select(x => new YamlObjectWrapper(x, documentationCategory)).ToList();

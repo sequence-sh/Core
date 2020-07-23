@@ -31,7 +31,7 @@ namespace Reductech.EDR.Processes.Mutable
         /// The priority of this process. Processes with higher priorities will be run first.
         /// </summary>
         [YamlMember(Order = 5)]
-        public double? Priority { get; set; }
+        public byte? Priority { get; set; }
 
         /// <summary>
         /// Combines two process configurations, deferring to the child where there is a conflict.

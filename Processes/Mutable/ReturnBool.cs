@@ -28,7 +28,7 @@ namespace Reductech.EDR.Processes.Mutable
         /// <inheritdoc />
         public override Result<IImmutableProcess<TOutput>> TryFreeze<TOutput>(IProcessSettings processSettings)
         {
-            var r = new Immutable.ReturnBool(ResultBool);
+            var r = new Immutable.ReturnValue<bool>(ResultBool);
 
             return TryConvertFreezeResult<TOutput, bool>(r);
         }
@@ -36,7 +36,7 @@ namespace Reductech.EDR.Processes.Mutable
         /// <inheritdoc />
         public override Result<ChainLinkBuilder<TInput, TFinal>> TryCreateChainLinkBuilder<TInput, TFinal>()
         {
-            return new ChainLinkBuilder<TInput, bool, TFinal, Immutable.ReturnBool, ReturnBool>(this);
+            return new ChainLinkBuilder<TInput, bool, TFinal, Immutable.ReturnValue<bool>, ReturnBool>(this);
         }
     }
 }

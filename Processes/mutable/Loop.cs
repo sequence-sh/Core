@@ -77,7 +77,7 @@ namespace Reductech.EDR.Processes.Mutable
         /// <inheritdoc />
         public override Result<ChainLinkBuilder<TInput, TFinal>> TryCreateChainLinkBuilder<TInput, TFinal>()
         {
-            return For.GetEnumerationStyle() switch
+            return For.EnumerationStyle switch
             {
                 EnumerationStyle.Lazy => new ChainLinkBuilder<TInput, Unit, TFinal, LazyLoop, Loop>(this),
                 EnumerationStyle.Eager => new ChainLinkBuilder<TInput, Unit, TFinal, Immutable.Sequence, Loop>(this),

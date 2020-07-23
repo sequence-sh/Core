@@ -30,7 +30,6 @@ namespace Reductech.EDR.Processes.Mutable.Enumerations
         /// <inheritdoc />
         public override IProcessConverter? ProcessConverter => null;
 
-        /// <inheritdoc />
         public override async IAsyncEnumerable<IProcessOutput<IEagerEnumerationElements>> Execute()
         {
             string? text = null;

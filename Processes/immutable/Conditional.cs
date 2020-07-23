@@ -33,7 +33,7 @@ namespace Reductech.EDR.Processes.Immutable
         /// <inheritdoc />
         public override async IAsyncEnumerable<IProcessOutput<T>> Execute()
         {
-            yield return ProcessOutput<T>.Message($"Testing {If}");
+            //yield return ProcessOutput<T>.Message($"Testing {If}");
 
             bool? success = null;
             var anyErrors = false;
@@ -41,9 +41,7 @@ namespace Reductech.EDR.Processes.Immutable
             await foreach (var r in If.Execute())
             {
                 if (r.OutputType == OutputType.Success)
-                {
                     success = r.Value;
-                }
                 else
                 {
                     if (r.OutputType == OutputType.Error)
@@ -59,14 +57,14 @@ namespace Reductech.EDR.Processes.Immutable
                 {
                     if (success.Value)
                     {
-                        yield return ProcessOutput<T>.Message($"Condition met, executing {Then}");
+                        //yield return ProcessOutput<T>.Message($"Condition met, executing {Then}");
 
                         await foreach (var r in Then.Execute())
                             yield return r;
                     }
                     else if (Else != null)
                     {
-                        yield return ProcessOutput<T>.Message($"Condition not met, executing {Else}");
+                        //yield return ProcessOutput<T>.Message($"Condition not met, executing {Else}");
 
                         await foreach (var r in Else.Execute())
                             yield return r;
