@@ -13,7 +13,7 @@ namespace Reductech.EDR.Processes
         //TODO support different languages
 
         public static string GetConditionalName(string ifName, string thenName, string? elseName) =>
-            elseName == null? $"If ({ifName}) then ({thenName})" : $"If ({ifName}) then ({thenName}) else ({elseName})";
+            elseName == null? $"Conditional ({ifName}) then ({thenName})" : $"Conditional ({ifName}) then ({thenName}) else ({elseName})";
 
         public static string GetAssertErrorName(string subProcessName) => $"Assert Fail: {subProcessName}";
 

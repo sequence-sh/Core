@@ -22,7 +22,7 @@ namespace Reductech.EDR.Processes.Mutable
         public List<string>? TargetMachineTags { get; set; }
 
         /// <summary>
-        /// If true, this process will not be split into multiple subProcesses.
+        /// Conditional true, this process will not be split into multiple subProcesses.
         /// </summary>
         [YamlMember(Order = 3)]
         public bool DoNotSplit { get; set; }

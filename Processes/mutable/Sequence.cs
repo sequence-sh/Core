@@ -30,7 +30,6 @@ namespace Reductech.EDR.Processes.Mutable
         /// These should all have result type void.
         /// </summary>
         [Required]
-
         [YamlMember(Order = 3)]
 #pragma warning disable CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
         public List<Process> Steps { get; set; }

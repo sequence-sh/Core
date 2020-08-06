@@ -12,7 +12,7 @@ namespace Reductech.EDR.Processes
     /// <summary>
     /// Special type of Node Deserializer for EDR
     /// Ignores any property called ignore (but still parses any anchors set on it)
-    /// If it finds a dictionary called 'Defaults' it will use that dictionary to set the value of that property anywhere in the following yaml.
+    /// Conditional it finds a dictionary called 'Defaults' it will use that dictionary to set the value of that property anywhere in the following yaml.
     /// </summary>
     internal sealed class EdrNodeDeserializer : INodeDeserializer
     {

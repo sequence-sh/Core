@@ -33,7 +33,7 @@ namespace Reductech.EDR.Processes.Immutable
         /// <inheritdoc />
         public override async IAsyncEnumerable<IProcessOutput<T>> Execute()
         {
-            //yield return ProcessOutput<T>.Message($"Testing {If}");
+            //yield return ProcessOutput<T>.Message($"Testing {Conditional}");
 
             bool? success = null;
             var anyErrors = false;
