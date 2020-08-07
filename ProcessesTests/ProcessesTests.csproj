@@ -33,15 +33,32 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="AliasDeserializationTest.cs" />
+    <Compile Remove="AssemblyInfo.cs" />
+    <Compile Remove="CleverInjectionTest.cs" />
+    <Compile Remove="ConditionalTest.cs" />
+    <Compile Remove="CSVReaderTest.cs" />
+    <Compile Remove="EmitProcess.cs" />
+    <Compile Remove="ForeachTests.cs" />
+    <Compile Remove="ImmutableReturnIntProcess.cs" />
+    <Compile Remove="MultiStreamReaderTest.cs" />
+    <Compile Remove="ReturnIntProcess.cs" />
+    <Compile Remove="ReturnValueProcessTests.cs" />
+    <Compile Remove="TestHelpers.cs" />
+    <Compile Remove="WrapperTests.cs" />
+    <Compile Remove="YamlTest.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="FluentAssertions" Version="5.10.3" />
-    <PackageReference Include="Moq" Version="4.13.1" />
-    <PackageReference Include="nunit" Version="3.12.0" />
-    <PackageReference Include="NUnit3TestAdapter" Version="3.16.1">
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.6.1" />
+    <PackageReference Include="Moq" Version="4.14.5" />
+    <PackageReference Include="System.Linq.Async" Version="4.1.1" />
+    <PackageReference Include="xunit" Version="2.4.1" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.4.3">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.5.0" />
-    <PackageReference Include="System.Linq.Async" Version="4.1.1" />
   </ItemGroup>
 
   <ItemGroup>

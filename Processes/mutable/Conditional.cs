@@ -10,7 +10,7 @@ using YamlDotNet.Serialization;
 namespace Reductech.EDR.Processes.Mutable
 {
     /// <summary>
-    /// Runs the 'If' process. If it completed successfully then run the 'Then' process, otherwise run the 'Else' process.
+    /// Runs the 'Conditional' process. Conditional it completed successfully then run the 'Then' process, otherwise run the 'Else' process.
     /// </summary>
     public class Conditional : Process
     {
@@ -24,7 +24,7 @@ namespace Reductech.EDR.Processes.Mutable
         public Process If { get; set; }
 
         /// <summary>
-        /// If the 'If' process was successful then run this.
+        /// Conditional the 'Conditional' process was successful then run this.
         /// Must have the same result type as the 'Else' process, if there is one and the void type otherwise.
         /// </summary>
         [Required]
@@ -33,7 +33,7 @@ namespace Reductech.EDR.Processes.Mutable
 #pragma warning restore CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
 
         /// <summary>
-        /// If the 'If' process was unsuccessful then run this.
+        /// Conditional the 'Conditional' process was unsuccessful then run this.
         /// Must have the same result type as the 'Then' process.
         /// </summary>
         [YamlMember(Order = 3)]
