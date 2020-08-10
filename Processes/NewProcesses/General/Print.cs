@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.ComponentModel.DataAnnotations;
 using CSharpFunctionalExtensions;
+using Microsoft.Extensions.Logging;
 
 namespace Reductech.EDR.Processes.NewProcesses.General
 {
@@ -18,7 +19,7 @@ namespace Reductech.EDR.Processes.NewProcesses.General
             var r = Value.Run(processState);
             if (r.IsFailure) return r.ConvertFailure<Unit>();
 
-            Console.WriteLine(r.Value); //TODO log on the process State
+            processState.Logger.LogInformation(r.Value.ToString());
 
             return Result.Success(Unit.Default);
         }

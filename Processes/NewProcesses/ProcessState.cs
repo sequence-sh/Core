@@ -1,5 +1,6 @@
 ﻿using System.Collections.Concurrent;
 using CSharpFunctionalExtensions;
+using Microsoft.Extensions.Logging;
 
 namespace Reductech.EDR.Processes.NewProcesses
 {
@@ -8,10 +9,22 @@ namespace Reductech.EDR.Processes.NewProcesses
     /// </summary>
     public sealed class ProcessState
     {
-        //TODO logger
-        //TODO IObservable
+        //TODO IObservable?
 
         private readonly ConcurrentDictionary<string, object>  _stateDictionary = new ConcurrentDictionary<string, object>();
+
+        /// <summary>
+        /// Create a new ProcessState
+        /// </summary>
+        public ProcessState(ILogger logger)
+        {
+            Logger = logger;
+        }
+
+        /// <summary>
+        /// The logger that processes will use to output messages.
+        /// </summary>
+        public ILogger Logger { get; }
 
         /// <summary>
         /// Gets the current value of this variable.
