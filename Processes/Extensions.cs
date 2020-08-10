@@ -37,6 +37,19 @@ namespace Reductech.EDR.Processes
 #pragma warning disable 8714
         public static Result<TValue> TryFindOrFail<TKey, TValue>(this IReadOnlyDictionary<TKey, TValue> dictionary, TKey key, string? error)
             =>  dictionary.TryFind(key).ToResult(error??$"The element '{key}' was not present.");
+
+
+        /// <summary>
+        /// Tries to get this value of an enum type. Returns a failure if it is not present.
+        /// </summary>
+        public static Result<object> TryGetEnumValue(Type enumType, string value)
+        {
+            if (Enum.TryParse(enumType, value, true, out var r))
+                return r;
+
+            return Result.Failure<object>($"{enumType.Name} does not have a value '{value}'");
+
+        }
 #pragma warning restore 8714
     }
 }

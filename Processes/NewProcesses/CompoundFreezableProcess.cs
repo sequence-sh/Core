@@ -66,7 +66,7 @@ namespace Reductech.EDR.Processes.NewProcesses
         }
 
         /// <inheritdoc />
-        public string Name => ProcessFactory.GetProcessName(ProcessArguments, ProcessListArguments);
+        public string ProcessName => ProcessFactory.GetProcessName(ProcessArguments, ProcessListArguments);
 
         /// <inheritdoc />
         public Result<ITypeReference> TryGetOutputTypeReference()
@@ -105,6 +105,11 @@ namespace Reductech.EDR.Processes.NewProcesses
         /// </summary>
         public abstract string GetProcessName(IReadOnlyDictionary<string, IFreezableProcess> processArguments,
             IReadOnlyDictionary<string, IReadOnlyList<IFreezableProcess>> processListArguments);
+
+        /// <summary>
+        /// Gets all enum types used by this RunnableProcess.
+        /// </summary>
+        public abstract IEnumerable<Type> EnumTypes { get; }
 
 
         /// <summary>
@@ -222,5 +227,19 @@ namespace Reductech.EDR.Processes.NewProcesses
             return Result.Failure<IRunnableProcess>($"Could not create an instance of {outputType.Name}.");
         }
 
+        /// <summary>
+        /// Gets the name of the type, removing the backtick if it is a generic type.
+        /// </summary>
+        protected string FormatTypeName(Type type)
+        {
+            string friendlyName = type.Name;
+            if (type.IsGenericType)
+            {
+                var iBacktick = friendlyName.IndexOf('`');
+                if (iBacktick > 0) friendlyName = friendlyName.Remove(iBacktick);
+            }
+
+            return friendlyName;
+        }
     }
 }

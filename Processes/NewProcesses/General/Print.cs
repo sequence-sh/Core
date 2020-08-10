@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.ComponentModel.DataAnnotations;
 using CSharpFunctionalExtensions;
+using Microsoft.Extensions.Logging;
 
 namespace Reductech.EDR.Processes.NewProcesses.General
 {
@@ -17,7 +19,7 @@ namespace Reductech.EDR.Processes.NewProcesses.General
             var r = Value.Run(processState);
             if (r.IsFailure) return r.ConvertFailure<Unit>();
 
-            Console.WriteLine(r.Value); //TODO log on the process State
+            processState.Logger.LogInformation(r.Value.ToString());
 
             return Result.Success(Unit.Default);
         }
@@ -43,7 +45,7 @@ namespace Reductech.EDR.Processes.NewProcesses.General
         public override Result<ITypeReference> TryGetOutputTypeReference(IReadOnlyDictionary<string, IFreezableProcess> processArguments, IReadOnlyDictionary<string, IReadOnlyList<IFreezableProcess>> processListArguments) => new ActualTypeReference(typeof(Unit));
 
         /// <inheritdoc />
-        public override string TypeName => typeof(Print<>).Name;
+        public override string TypeName => FormatTypeName(typeof(Print<>));
 
         /// <inheritdoc />
         public override string GetProcessName(IReadOnlyDictionary<string, IFreezableProcess> processArguments, IReadOnlyDictionary<string, IReadOnlyList<IFreezableProcess>> processListArguments)
@@ -53,6 +55,9 @@ namespace Reductech.EDR.Processes.NewProcesses.General
 
             return NameHelper.GetPrintName(value);
         }
+
+        /// <inheritdoc />
+        public override IEnumerable<Type> EnumTypes => ImmutableArray<Type>.Empty;
 
         /// <inheritdoc />
         protected override Result<IRunnableProcess> TryCreateInstance(ProcessContext processContext, IReadOnlyDictionary<string, IFreezableProcess> processArguments,
