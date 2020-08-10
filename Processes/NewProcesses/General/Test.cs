@@ -66,7 +66,7 @@ namespace Reductech.EDR.Processes.NewProcesses.General
         }
 
         /// <inheritdoc />
-        public override string TypeName => nameof(Test<object>);
+        public override string TypeName => FormatTypeName(typeof(Test<>));
 
         /// <inheritdoc />
         public override string GetProcessName(IReadOnlyDictionary<string, IFreezableProcess> processArguments, IReadOnlyDictionary<string, IReadOnlyList<IFreezableProcess>> processListArguments)

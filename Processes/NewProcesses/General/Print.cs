@@ -43,7 +43,7 @@ namespace Reductech.EDR.Processes.NewProcesses.General
         public override Result<ITypeReference> TryGetOutputTypeReference(IReadOnlyDictionary<string, IFreezableProcess> processArguments, IReadOnlyDictionary<string, IReadOnlyList<IFreezableProcess>> processListArguments) => new ActualTypeReference(typeof(Unit));
 
         /// <inheritdoc />
-        public override string TypeName => typeof(Print<>).Name;
+        public override string TypeName => FormatTypeName(typeof(Print<>));
 
         /// <inheritdoc />
         public override string GetProcessName(IReadOnlyDictionary<string, IFreezableProcess> processArguments, IReadOnlyDictionary<string, IReadOnlyList<IFreezableProcess>> processListArguments)

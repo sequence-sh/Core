@@ -222,5 +222,19 @@ namespace Reductech.EDR.Processes.NewProcesses
             return Result.Failure<IRunnableProcess>($"Could not create an instance of {outputType.Name}.");
         }
 
+        /// <summary>
+        /// Gets the name of the type, removing the backtick if it is a generic type.
+        /// </summary>
+        protected string FormatTypeName(Type type)
+        {
+            string friendlyName = type.Name;
+            if (type.IsGenericType)
+            {
+                var iBacktick = friendlyName.IndexOf('`');
+                if (iBacktick > 0) friendlyName = friendlyName.Remove(iBacktick);
+            }
+
+            return friendlyName;
+        }
     }
 }
