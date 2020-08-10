@@ -106,6 +106,11 @@ namespace Reductech.EDR.Processes.NewProcesses
         public abstract string GetProcessName(IReadOnlyDictionary<string, IFreezableProcess> processArguments,
             IReadOnlyDictionary<string, IReadOnlyList<IFreezableProcess>> processListArguments);
 
+        /// <summary>
+        /// Gets all enum types used by this RunnableProcess.
+        /// </summary>
+        public abstract IEnumerable<Type> EnumTypes { get; }
+
 
         /// <summary>
         /// Creates an instance of this type.

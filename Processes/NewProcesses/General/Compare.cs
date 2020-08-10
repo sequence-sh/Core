@@ -74,18 +74,14 @@ namespace Reductech.EDR.Processes.NewProcesses.General
             IReadOnlyDictionary<string, IFreezableProcess> processArguments,
             IReadOnlyDictionary<string, IReadOnlyList<IFreezableProcess>> processListArguments)
         {
-            var result = processArguments.TryFindOrFail(nameof(Compare<int>.Left), "Compare Left is not set.")
-                .Bind(x => x.TryGetOutputTypeReference())
-                .Compose(() => processArguments.TryFindOrFail(nameof(Compare<int>.Right), "Compare Right is not set.")
-                    .Bind(x => x.TryGetOutputTypeReference()))
-                .Map(x => new[] { x.Item1, x.Item2 })
-                .Bind((x) => MultipleTypeReference.TryCreate(x, TypeName));
-
-            return result;
+            return new ActualTypeReference(typeof(bool));
         }
 
         /// <inheritdoc />
         public override string TypeName => FormatTypeName(typeof(Compare<>));
+
+        /// <inheritdoc />
+        public override IEnumerable<Type> EnumTypes =>new[]{typeof(CompareOperator)};
 
         /// <inheritdoc />
         public override string GetProcessName(IReadOnlyDictionary<string, IFreezableProcess> processArguments, IReadOnlyDictionary<string, IReadOnlyList<IFreezableProcess>> processListArguments)
@@ -101,8 +97,23 @@ namespace Reductech.EDR.Processes.NewProcesses.General
         /// <inheritdoc />
         protected override Result<IRunnableProcess> TryCreateInstance(ProcessContext processContext, IReadOnlyDictionary<string, IFreezableProcess> processArguments,
             IReadOnlyDictionary<string, IReadOnlyList<IFreezableProcess>> processListArguments) =>
-            TryGetOutputTypeReference(processArguments, processListArguments)
+            TryGetMemberTypeReference(processArguments, processListArguments)
                 .Bind(processContext.TryGetTypeFromReference)
                 .Bind(outputType => TryCreateGeneric(typeof(Compare<>), outputType));
+
+
+        private Result<ITypeReference> TryGetMemberTypeReference(
+            IReadOnlyDictionary<string, IFreezableProcess> processArguments,
+            IReadOnlyDictionary<string, IReadOnlyList<IFreezableProcess>> processListArguments)
+        {
+            var result = processArguments.TryFindOrFail(nameof(Compare<int>.Left), "Compare Left is not set.")
+                .Bind(x => x.TryGetOutputTypeReference())
+                .Compose(() => processArguments.TryFindOrFail(nameof(Compare<int>.Right), "Compare Right is not set.")
+                    .Bind(x => x.TryGetOutputTypeReference()))
+                .Map(x => new[] { x.Item1, x.Item2 })
+                .Bind((x) => MultipleTypeReference.TryCreate(x, TypeName));
+
+            return result;
+        }
     }
 }

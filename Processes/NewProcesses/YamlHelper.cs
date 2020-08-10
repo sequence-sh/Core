@@ -18,8 +18,11 @@ namespace Reductech.EDR.Processes.NewProcesses
         /// <summary>
         /// Creates a new ProcessFactoryStore.
         /// </summary>
-        /// <param name="dictionary"></param>
-        public ProcessFactoryStore(IReadOnlyDictionary<string, RunnableProcessFactory> dictionary) => Dictionary = dictionary;
+        public ProcessFactoryStore(IReadOnlyDictionary<string, RunnableProcessFactory> dictionary, IReadOnlyDictionary<string, Type> enumTypesDictionary)
+        {
+            Dictionary = dictionary;
+            EnumTypesDictionary = enumTypesDictionary;
+        }
 
         /// <summary>
         /// Create a process factory store using all ProcessFactories in the assembly.
@@ -27,18 +30,25 @@ namespace Reductech.EDR.Processes.NewProcesses
         /// <returns></returns>
         public static ProcessFactoryStore CreateUsingReflection()
         {
-            var dictionary = Assembly.GetAssembly(typeof(RunnableProcessFactory))!
+            var factories = Assembly.GetAssembly(typeof(RunnableProcessFactory))!
                 .GetTypes()
                 .Where(x=>!x.IsAbstract)
                 .Where(x => typeof(RunnableProcessFactory).IsAssignableFrom(x))
                 .Select(x=>x.GetProperty("Instance", BindingFlags.Public | BindingFlags.Static)!.GetValue(null))
-                .Cast<RunnableProcessFactory>()
-                .ToDictionary(x => x.TypeName);
+                .Cast<RunnableProcessFactory>().ToList();
 
-            return new ProcessFactoryStore(dictionary);
+            var dictionary = factories.ToDictionary(x => x.TypeName);
+            var enumTypesDictionary = factories.SelectMany(x => x.EnumTypes).Distinct().ToDictionary(x => x.Name!, StringComparer.OrdinalIgnoreCase);
+
+            return new ProcessFactoryStore(dictionary, enumTypesDictionary);
 
 
         }
+
+        /// <summary>
+        /// Types of enumerations that can be used by these processes.
+        /// </summary>
+        public IReadOnlyDictionary<string, Type> EnumTypesDictionary { get; }
 
         /// <summary>
         /// Dictionary mapping process names to process factories.
@@ -136,7 +146,16 @@ namespace Reductech.EDR.Processes.NewProcesses
                     ;
             else if (simpleObject is string sString3)
             {
-                if (int.TryParse(sString3, out var i))
+                if (EnumConstantRegex.TryMatch(sString3, out var m))
+                {
+                    result = processFactoryStore.EnumTypesDictionary
+                        .TryFindOrFail(m.Groups["enumName"].Value,
+                            $"Could not recognize enum '{m.Groups["enumName"].Value}'")
+                        .Bind(x => Extensions.TryGetEnumValue(x, m.Groups["enumValue"].Value))
+                        .Map(x => new Either<IFreezableProcess, IReadOnlyList<IFreezableProcess>>(new ConstantFreezableProcess(x)));
+                }
+
+                else if (int.TryParse(sString3, out var i))
                 {
                     result = Result.Success<Either<IFreezableProcess, IReadOnlyList<IFreezableProcess>>>(
                     new ConstantFreezableProcess(i));
@@ -177,12 +196,14 @@ namespace Reductech.EDR.Processes.NewProcesses
         private static readonly Regex GetVariableRegex = new Regex(@"\A<(?<variableName>[\w\d_]+)>\Z", RegexOptions.Compiled);
         private static readonly Regex SetVariableRegex = new Regex(@"\A<(?<variableName>[\w\d_]+?)>\s*=\s*(?<value>.+)\Z", RegexOptions.Compiled);
 
+        private static readonly Regex EnumConstantRegex = new Regex(@"(?<enumName>[\w\d_]+)\.(?<enumValue>[\w\d_]+)");
+
         private static object ToSimpleObject(IFreezableProcess process)
         {
             return process switch
             {
                 CompoundFreezableProcess compoundFreezableProcess => ToExpando(compoundFreezableProcess),
-                ConstantFreezableProcess constantFreezableProcess => constantFreezableProcess.Value,
+                ConstantFreezableProcess constantFreezableProcess => SimplifyConstantFreezableProcess(constantFreezableProcess),
                 GetVariableFreezableProcess getVariableFreezableProcess =>
                 "<" + getVariableFreezableProcess.VariableName + ">",
                 NameHelper.MissingProcess _ => throw new SerializationException(
@@ -209,6 +230,13 @@ namespace Reductech.EDR.Processes.NewProcesses
                 }
 
                 return expandoObject;
+            }
+
+            static string SimplifyConstantFreezableProcess(ConstantFreezableProcess constantFreezableProcess)
+            {
+                if (constantFreezableProcess.Value.GetType().IsEnum)
+                    return constantFreezableProcess.Value.GetType().Name + "." + constantFreezableProcess.Value;
+                return constantFreezableProcess.Value.ToString()??"";
             }
 
             static object SimplifySetVariable(SetVariableFreezableProcess setVariableFreezableProcess)

@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using CSharpFunctionalExtensions;
@@ -69,6 +71,9 @@ namespace Reductech.EDR.Processes.NewProcesses.General
 
             return NameHelper.GetArrayName(elementsCount);
         }
+
+        /// <inheritdoc />
+        public override IEnumerable<Type> EnumTypes => ImmutableArray<Type>.Empty;
 
         /// <inheritdoc />
         protected override Result<IRunnableProcess> TryCreateInstance(ProcessContext processContext, IReadOnlyDictionary<string, IFreezableProcess> processArguments,

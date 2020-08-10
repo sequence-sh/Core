@@ -8,11 +8,11 @@ using Xunit;
 
 namespace Reductech.EDR.Processes.Tests.NewProcessesTests
 {
-    public class Yaml : TestBase
+    public class ProcessTests : TestBase
     {
         /// <inheritdoc />
         [Theory]
-        [ClassData(typeof(Yaml))]
+        [ClassData(typeof(ProcessTests))]
         public override void Test(string key) => base.Test(key);
 
         /// <inheritdoc />
@@ -91,6 +91,23 @@ namespace Reductech.EDR.Processes.Tests.NewProcessesTests
                 deserializeResult.ShouldBeSuccessful();
 
                 deserializeResult.Value.ProcessName.Should().Be(unfrozen.ProcessName);
+
+                var processContextResult = ProcessContext.TryCreate(deserializeResult.Value);
+                processContextResult.ShouldBeSuccessful();
+
+                var freezeResult = deserializeResult.Value.TryFreeze(processContextResult.Value);
+                freezeResult.ShouldBeSuccessful();
+
+                var runnable = freezeResult.Value.As<IRunnableProcess<NewProcesses.Unit>>();
+
+                runnable.Should().NotBeNull("Process should unfreeze to runnable process of unit");
+
+                var state = new ProcessState();
+
+                var runResult = runnable.Run(state);
+
+                runResult.ShouldBeSuccessful();
+
             }
         }
     }
