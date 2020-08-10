@@ -32,6 +32,7 @@
     <PackageReference Include="CSharpFunctionalExtensions" Version="2.8.1" />
     <PackageReference Include="InstantConsole" Version="1.0.7" />
     <PackageReference Include="JetBrains.Annotations" Version="2019.1.3" />
+    <PackageReference Include="kalexi.Monads.Either" Version="1.0.14" />
     <PackageReference Include="Superpower" Version="2.3.0" />
     <PackageReference Include="YamlDotNet" Version="8.1.0" />
   </ItemGroup>

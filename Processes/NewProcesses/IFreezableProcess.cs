@@ -24,7 +24,7 @@ namespace Reductech.EDR.Processes.NewProcesses
         /// <summary>
         /// The human-readable name of this process.
         /// </summary>
-        string Name { get; }
+        string ProcessName { get; }
 
 
         /// <summary>

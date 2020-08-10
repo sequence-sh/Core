@@ -66,7 +66,7 @@ namespace Reductech.EDR.Processes.NewProcesses
         }
 
         /// <inheritdoc />
-        public string Name => ProcessFactory.GetProcessName(ProcessArguments, ProcessListArguments);
+        public string ProcessName => ProcessFactory.GetProcessName(ProcessArguments, ProcessListArguments);
 
         /// <inheritdoc />
         public Result<ITypeReference> TryGetOutputTypeReference()

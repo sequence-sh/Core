@@ -73,10 +73,10 @@ namespace Reductech.EDR.Processes.NewProcesses.General
         public override string GetProcessName(IReadOnlyDictionary<string, IFreezableProcess> processArguments,
             IReadOnlyDictionary<string, IReadOnlyList<IFreezableProcess>> processListArguments)
         {
-            var conditionName = processArguments.TryFind(nameof(Conditional.Condition)).Map(x => x.Name)
+            var conditionName = processArguments.TryFind(nameof(Conditional.Condition)).Map(x => x.ProcessName)
                 .Unwrap("Condition");
-            var thenName = processArguments.TryFind(nameof(Conditional.ThenProcess)).Map(x => x.Name).Unwrap("??");
-            var elseName = processArguments.TryFind(nameof(Conditional.ElseProcess)).Map(x => x.Name).Unwrap(null);
+            var thenName = processArguments.TryFind(nameof(Conditional.ThenProcess)).Map(x => x.ProcessName).Unwrap("??");
+            var elseName = processArguments.TryFind(nameof(Conditional.ElseProcess)).Map(x => x.ProcessName).Unwrap(null);
 
 
             return ProcessNameHelper.GetConditionalName(conditionName, thenName, elseName);

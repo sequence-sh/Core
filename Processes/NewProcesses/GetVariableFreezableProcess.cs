@@ -356,14 +356,14 @@ namespace Reductech.EDR.Processes.NewProcesses
         public IFreezableProcess Value { get; }
 
         /// <inheritdoc />
-        public string Name => NameHelper.GetSetVariableName(VariableName, Value.Name);
+        public string ProcessName => NameHelper.GetSetVariableName(VariableName, Value.ProcessName);
 
         /// <inheritdoc />
         public Result<ITypeReference> TryGetOutputTypeReference() => new ActualTypeReference(typeof(Unit));
 
 
         /// <inheritdoc />
-        public override string ToString() => Name;
+        public override string ToString() => ProcessName;
     }
 
 
@@ -408,12 +408,12 @@ namespace Reductech.EDR.Processes.NewProcesses
 
 
         /// <inheritdoc />
-        public string Name => NameHelper.GetGetVariableName(VariableName);
+        public string ProcessName => NameHelper.GetGetVariableName(VariableName);
 
         /// <inheritdoc />
         public Result<ITypeReference> TryGetOutputTypeReference() => new VariableTypeReference(VariableName);
 
         /// <inheritdoc />
-        public override string ToString() => Name;
+        public override string ToString() => ProcessName;
     }
 }

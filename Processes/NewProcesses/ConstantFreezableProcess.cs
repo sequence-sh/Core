@@ -40,7 +40,7 @@ namespace Reductech.EDR.Processes.NewProcesses
         public Result<IReadOnlyCollection<(string name, ITypeReference type)>> TryGetVariablesSet => ImmutableList<(string name, ITypeReference type)>.Empty;
 
         /// <inheritdoc />
-        public string Name => NameHelper.GetConstantName(Value);
+        public string ProcessName => NameHelper.GetConstantName(Value);
 
         /// <inheritdoc />
         public Result<ITypeReference> TryGetOutputTypeReference() => new ActualTypeReference(Value.GetType());
