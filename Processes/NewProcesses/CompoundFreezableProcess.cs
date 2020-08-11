@@ -66,7 +66,7 @@ namespace Reductech.EDR.Processes.NewProcesses
         }
 
         /// <inheritdoc />
-        public string ProcessName => ProcessFactory.GetProcessName(ProcessArguments, ProcessListArguments);
+        public string ProcessName => ProcessFactory.ProcessNameBuilder.GetFromArguments(ProcessArguments, ProcessListArguments);
 
         /// <inheritdoc />
         public Result<ITypeReference> TryGetOutputTypeReference()
@@ -101,10 +101,15 @@ namespace Reductech.EDR.Processes.NewProcesses
         }
 
         /// <summary>
-        /// Gets the name of this particular instance of the process.
+        /// Builds the name for a particular instance of a process.
         /// </summary>
-        public abstract string GetProcessName(IReadOnlyDictionary<string, IFreezableProcess> processArguments,
-            IReadOnlyDictionary<string, IReadOnlyList<IFreezableProcess>> processListArguments);
+        public abstract ProcessNameBuilder ProcessNameBuilder { get; }
+
+        ///// <summary>
+        ///// Gets the name of this particular instance of the process.
+        ///// </summary>
+        //public abstract string GetProcessName(IReadOnlyDictionary<string, IFreezableProcess> processArguments,
+        //    IReadOnlyDictionary<string, IReadOnlyList<IFreezableProcess>> processListArguments);
 
         /// <summary>
         /// Gets all enum types used by this RunnableProcess.

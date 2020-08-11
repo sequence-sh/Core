@@ -9,49 +9,9 @@ namespace Reductech.EDR.Processes.NewProcesses.General
     /// <summary>
     /// Returns one result if a condition is true and another if the condition is false.
     /// </summary>
-    public sealed class Test<T> : CompoundRunnableProcess<T>
-    {
-        /// <inheritdoc />
-        public override Result<T> Run(ProcessState processState)
-        {
-            var result = Condition.Run(processState)
-                .Bind(r => r ? ThenValue.Run(processState) : ElseValue.Run(processState));
-
-            return result;
-        }
-
-        /// <inheritdoc />
-        public override RunnableProcessFactory RunnableProcessFactory => TestSequenceFactory.Instance;
-
-
-        /// <summary>
-        /// Whether to follow the Then Branch
-        /// </summary>
-        [RunnableProcessProperty]
-        [Required]
-        public IRunnableProcess<bool> Condition { get; set; } = null!;
-
-        /// <summary>
-        /// The Then Branch.
-        /// </summary>
-        [RunnableProcessProperty]
-        [Required]
-        public IRunnableProcess<T> ThenValue { get; set; } = null!;
-
-        /// <summary>
-        /// The Else branch, if it exists.
-        /// </summary>
-        [RunnableProcessProperty]
-        public IRunnableProcess<T> ElseValue { get; set; } = null!;
-
-
-    }
-
     public sealed class TestSequenceFactory : RunnableProcessFactory
     {
-        private TestSequenceFactory()
-        {
-        }
+        private TestSequenceFactory() { }
 
         public static RunnableProcessFactory Instance { get; } = new TestSequenceFactory();
 
@@ -73,15 +33,9 @@ namespace Reductech.EDR.Processes.NewProcesses.General
         /// <inheritdoc />
         public override IEnumerable<Type> EnumTypes => ImmutableArray<Type>.Empty;
 
-        /// <inheritdoc />
-        public override string GetProcessName(IReadOnlyDictionary<string, IFreezableProcess> processArguments, IReadOnlyDictionary<string, IReadOnlyList<IFreezableProcess>> processListArguments)
-        {
-            var conditional = processArguments.TryFind(nameof(Test<object>.Condition)).Unwrap(NameHelper.MissingProcess.Instance );
-            var then = processArguments.TryFind(nameof(Test<object>.Condition)).Unwrap(NameHelper.MissingProcess.Instance);
-            var @else = processArguments.TryFind(nameof(Test<object>.Condition)).Unwrap();
 
-            return NameHelper.GetTestName(conditional, then, @else);
-        }
+        /// <inheritdoc />
+        public override ProcessNameBuilder ProcessNameBuilder { get; } = new ProcessNameBuilder($"'[{nameof(Test<object>.Condition)}]' then '[{nameof(Test<object>.ThenValue)}]' else '[{nameof(Test<object>.ElseValue)}]'");
 
         /// <inheritdoc />
         protected override Result<IRunnableProcess> TryCreateInstance(ProcessContext processContext, IReadOnlyDictionary<string, IFreezableProcess> processArguments,
@@ -89,5 +43,46 @@ namespace Reductech.EDR.Processes.NewProcesses.General
             TryGetOutputTypeReference(processArguments, processListArguments)
                 .Bind(processContext.TryGetTypeFromReference)
                 .Bind(x => TryCreateGeneric(typeof(Test<object>), x));
+
+
+
+        /// <summary>
+        /// Returns one result if a condition is true and another if the condition is false.
+        /// </summary>
+        public sealed class Test<T> : CompoundRunnableProcess<T>
+        {
+            /// <inheritdoc />
+            public override Result<T> Run(ProcessState processState)
+            {
+                var result = Condition.Run(processState)
+                    .Bind(r => r ? ThenValue.Run(processState) : ElseValue.Run(processState));
+
+                return result;
+            }
+
+            /// <inheritdoc />
+            public override RunnableProcessFactory RunnableProcessFactory => TestSequenceFactory.Instance;
+
+
+            /// <summary>
+            /// Whether to follow the Then Branch
+            /// </summary>
+            [RunnableProcessProperty]
+            [Required]
+            public IRunnableProcess<bool> Condition { get; set; } = null!;
+
+            /// <summary>
+            /// The Then Branch.
+            /// </summary>
+            [RunnableProcessProperty]
+            [Required]
+            public IRunnableProcess<T> ThenValue { get; set; } = null!;
+
+            /// <summary>
+            /// The Else branch, if it exists.
+            /// </summary>
+            [RunnableProcessProperty]
+            public IRunnableProcess<T> ElseValue { get; set; } = null!;
+        }
     }
 }

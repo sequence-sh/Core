@@ -19,7 +19,7 @@ namespace Reductech.EDR.Processes.NewProcesses
         public abstract RunnableProcessFactory RunnableProcessFactory { get; }
 
         /// <inheritdoc />
-        public string Name => RunnableProcessFactory.GetProcessName(Arguments, ListArguments);
+        public string Name => RunnableProcessFactory.ProcessNameBuilder.GetFromArguments(Arguments, ListArguments);
 
         /// <inheritdoc />
         public override string ToString() => RunnableProcessFactory.TypeName;

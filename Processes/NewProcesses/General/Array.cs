@@ -8,32 +8,6 @@ using CSharpFunctionalExtensions;
 namespace Reductech.EDR.Processes.NewProcesses.General
 {
     /// <summary>
-    /// Represents an ordered collection of objects.
-    /// </summary>
-    public sealed class Array<T> : CompoundRunnableProcess<List<T>>
-    {
-        /// <inheritdoc />
-        public override Result<List<T>> Run(ProcessState processState)
-        {
-            var result = Elements.Select(x => x.Run(processState)).Combine().Map(x => x.ToList());
-
-            return result;
-        }
-
-        /// <inheritdoc />
-        public override RunnableProcessFactory RunnableProcessFactory => ArrayProcessFactory.Instance;
-
-        /// <summary>
-        /// The elements of this array.
-        /// </summary>
-        [RunnableProcessListProperty]
-        [Required]
-        public IReadOnlyList<IRunnableProcess<T>> Elements { get; set; } = null!;
-
-
-    }
-
-    /// <summary>
     /// The factory for creating Arrays.
     /// </summary>
     public class ArrayProcessFactory : RunnableProcessFactory
@@ -65,12 +39,7 @@ namespace Reductech.EDR.Processes.NewProcesses.General
         public override string TypeName => FormatTypeName(typeof(Array<>));
 
         /// <inheritdoc />
-        public override string GetProcessName(IReadOnlyDictionary<string, IFreezableProcess> processArguments, IReadOnlyDictionary<string, IReadOnlyList<IFreezableProcess>> processListArguments)
-        {
-            var elementsCount = processListArguments.TryGetValue(nameof(Array<object>.Elements), out var elements)? elements.Count : 0;
-
-            return NameHelper.GetArrayName(elementsCount);
-        }
+        public override ProcessNameBuilder ProcessNameBuilder { get; } = new ProcessNameBuilder($"[[{nameof(Array<object>.Elements)}]]");
 
         /// <inheritdoc />
         public override IEnumerable<Type> EnumTypes => ImmutableArray<Type>.Empty;
@@ -81,6 +50,32 @@ namespace Reductech.EDR.Processes.NewProcesses.General
             GetMemberType(processListArguments)
                 .Bind(processContext.TryGetTypeFromReference)
                 .Bind(x => TryCreateGeneric(typeof(Array<>), x));
+
+
+        /// <summary>
+        /// Represents an ordered collection of objects.
+        /// </summary>
+        public sealed class Array<T> : CompoundRunnableProcess<List<T>>
+        {
+            /// <inheritdoc />
+            public override Result<List<T>> Run(ProcessState processState)
+            {
+                var result = Elements.Select(x => x.Run(processState)).Combine().Map(x => x.ToList());
+
+                return result;
+            }
+
+            /// <inheritdoc />
+            public override RunnableProcessFactory RunnableProcessFactory => ArrayProcessFactory.Instance;
+
+            /// <summary>
+            /// The elements of this array.
+            /// </summary>
+            [RunnableProcessListProperty]
+            [Required]
+            public IReadOnlyList<IRunnableProcess<T>> Elements { get; set; } = null!;
+
+        }
     }
 
 }
