@@ -15,20 +15,22 @@ namespace Reductech.EDR.Processes.NewProcesses.General
 
         public static RunnableProcessFactory Instance { get; } = new TestSequenceFactory();
 
+
         /// <inheritdoc />
-        public override Result<ITypeReference> TryGetOutputTypeReference(IReadOnlyDictionary<string, IFreezableProcess> processArguments, IReadOnlyDictionary<string, IReadOnlyList<IFreezableProcess>> processListArguments)
+        public override Result<ITypeReference> TryGetOutputTypeReference(FreezableProcessData freezableProcessData)
         {
             var result =
-            processArguments.TryFindOrFail(nameof(Test<object>.ThenValue), "Test Then not set.")
-                .Compose(() => processArguments.TryFindOrFail(nameof(Test<object>.ElseValue), "Test Else not set."))
+                freezableProcessData.GetArgument(nameof(Test<object>.ThenValue))
+                    .Compose(() => freezableProcessData.GetArgument(nameof(Test<object>.ElseValue)))
                 .Bind(x => x.Item1.TryGetOutputTypeReference().Compose(() => x.Item2.TryGetOutputTypeReference()))
-                .Bind(x => MultipleTypeReference.TryCreate(new[] {x.Item1, x.Item2}, TypeName));
+                .Bind(x => MultipleTypeReference.TryCreate(new[] { x.Item1, x.Item2 }, TypeName));
 
             return result;
         }
 
+
         /// <inheritdoc />
-        public override string TypeName => FormatTypeName(typeof(Test<>));
+        public override Type ProcessType => typeof(Test<>);
 
         /// <inheritdoc />
         public override IEnumerable<Type> EnumTypes => ImmutableArray<Type>.Empty;
@@ -37,10 +39,10 @@ namespace Reductech.EDR.Processes.NewProcesses.General
         /// <inheritdoc />
         public override ProcessNameBuilder ProcessNameBuilder { get; } = new ProcessNameBuilder($"'[{nameof(Test<object>.Condition)}]' then '[{nameof(Test<object>.ThenValue)}]' else '[{nameof(Test<object>.ElseValue)}]'");
 
+
         /// <inheritdoc />
-        protected override Result<IRunnableProcess> TryCreateInstance(ProcessContext processContext, IReadOnlyDictionary<string, IFreezableProcess> processArguments,
-            IReadOnlyDictionary<string, IReadOnlyList<IFreezableProcess>> processListArguments) =>
-            TryGetOutputTypeReference(processArguments, processListArguments)
+        protected override Result<IRunnableProcess> TryCreateInstance(ProcessContext processContext, FreezableProcessData freezableProcessData) =>
+            TryGetOutputTypeReference(freezableProcessData)
                 .Bind(processContext.TryGetTypeFromReference)
                 .Bind(x => TryCreateGeneric(typeof(Test<object>), x));
 

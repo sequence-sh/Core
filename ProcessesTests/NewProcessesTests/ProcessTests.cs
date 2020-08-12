@@ -18,43 +18,43 @@ namespace Reductech.EDR.Processes.Tests.NewProcessesTests
         public override void Test(string key) => base.Test(key);
 
         public const string HelloWorldString = "Hello World";
-        public const string FooString = "Foo";
-        public const string BarString = "Bar";
+        public static readonly VariableName FooString = new VariableName("Foo");
+        public static readonly VariableName BarString = new VariableName("Bar");
 
         /// <inheritdoc />
         protected override IEnumerable<ITestCase> TestCases
         {
             get
             {
-                yield return new TestCase(new Print<string> {Value = new ConstantRunnableProcess<string>(HelloWorldString)},new []{HelloWorldString} );
+                yield return new TestCase("Print 'Hello World'", new PrintProcessFactory.Print<string> {Value = new ConstantRunnableProcess<string>(HelloWorldString)},new []{HelloWorldString} );
 
-                yield return new TestCase(new Sequence
+                yield return new TestCase("Foo = Hello World; Print '<Foo>'",new SequenceProcessFactory.Sequence
                 {
                     Steps = new List<IRunnableProcess<NewProcesses.Unit>>
                     {
-                        new SetVariableRunnableProcess<string>(FooString, new ConstantRunnableProcess<string>(HelloWorldString)),
-                        new Print<string> {Value = new GetVariableRunnableProcess<string>(FooString)}
+                        new SetVariableProcessFactory.SetVariable<string>(FooString, new ConstantRunnableProcess<string>(HelloWorldString)),
+                        new PrintProcessFactory.Print<string> {Value = new GetVariableProcessFactory.GetVariable<string>(FooString)}
                     }
 
                 },new []{HelloWorldString});
 
-                yield return new TestCase(new Sequence
+                yield return new TestCase("Foo = Hello World; Bar = <Foo>; Print '<Bar>'",new SequenceProcessFactory.Sequence
                 {
                     Steps = new List<IRunnableProcess<NewProcesses.Unit>>
                     {
-                        new SetVariableRunnableProcess<string>(FooString, new ConstantRunnableProcess<string>(HelloWorldString)),
-                        new SetVariableRunnableProcess<string>(BarString, new GetVariableRunnableProcess<string>(FooString)),
-                        new Print<string> {Value = new GetVariableRunnableProcess<string>(BarString)}
+                        new SetVariableProcessFactory.SetVariable<string>(FooString, new ConstantRunnableProcess<string>(HelloWorldString)),
+                        new SetVariableProcessFactory.SetVariable<string>(BarString, new GetVariableProcessFactory.GetVariable<string>(FooString)),
+                        new PrintProcessFactory.Print<string> {Value = new GetVariableProcessFactory.GetVariable<string>(BarString)}
                     }
 
                 },new []{HelloWorldString});
 
 
-                yield return new TestCase(new Sequence
+                yield return new TestCase("Foo = 1 LessThan 2; Print '<Foo>'",new SequenceProcessFactory.Sequence
                 {
                     Steps = new List<IRunnableProcess<NewProcesses.Unit>>
                     {
-                        new SetVariableRunnableProcess<bool>(FooString, new Compare<int>()
+                        new SetVariableProcessFactory.SetVariable<bool>(FooString, new CompareProcessFactory.Compare<int>()
                         {
                             Left = new ConstantRunnableProcess<int>(1),
                             Operator = new ConstantRunnableProcess<CompareOperator>(CompareOperator.LessThan),
@@ -62,7 +62,7 @@ namespace Reductech.EDR.Processes.Tests.NewProcessesTests
                         }),
 
 
-                        new Print<bool> {Value = new GetVariableRunnableProcess<bool>(FooString)}
+                        new PrintProcessFactory.Print<bool> {Value = new GetVariableProcessFactory.GetVariable<bool>(FooString)}
                     }
                 },new []{true.ToString()});
             }
@@ -72,14 +72,17 @@ namespace Reductech.EDR.Processes.Tests.NewProcessesTests
 
         private class TestCase : ITestCase
         {
-            public TestCase(IRunnableProcess runnableProcess, IReadOnlyList<string> expectedLoggedValues)
+            public TestCase(string expectedName, IRunnableProcess runnableProcess, IReadOnlyList<string> expectedLoggedValues)
             {
                 RunnableProcess = runnableProcess;
                 ExpectedLoggedValues = expectedLoggedValues;
+                ExpectedName = expectedName;
             }
 
+            public string ExpectedName { get; }
+
             /// <inheritdoc />
-            public string Name => RunnableProcess.Name;
+            public string Name => ExpectedName;
 
             public IRunnableProcess RunnableProcess { get; }
 
@@ -89,6 +92,9 @@ namespace Reductech.EDR.Processes.Tests.NewProcessesTests
             /// <inheritdoc />
             public void Execute()
             {
+                RunnableProcess.Name.Should().Be(ExpectedName);
+
+
                 var unfrozen = RunnableProcess.Unfreeze();
 
                 var yaml = unfrozen.SerializeToYaml();

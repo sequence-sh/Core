@@ -15,37 +15,30 @@ namespace Reductech.EDR.Processes.NewProcesses.General
         public static RunnableProcessFactory Instance { get; } = new CompareProcessFactory();
 
         /// <inheritdoc />
-        public override Result<ITypeReference> TryGetOutputTypeReference(
-            IReadOnlyDictionary<string, IFreezableProcess> processArguments,
-            IReadOnlyDictionary<string, IReadOnlyList<IFreezableProcess>> processListArguments)
-        {
-            return new ActualTypeReference(typeof(bool));
-        }
+        public override Result<ITypeReference> TryGetOutputTypeReference(FreezableProcessData freezableProcessData) => new ActualTypeReference(typeof(bool));
 
         /// <inheritdoc />
-        public override string TypeName => FormatTypeName(typeof(Compare<>));
+        public override Type ProcessType => typeof(Compare<>);
 
         /// <inheritdoc />
         public override IEnumerable<Type> EnumTypes =>new[]{typeof(CompareOperator)};
 
         /// <inheritdoc />
-        public override ProcessNameBuilder ProcessNameBuilder { get; } = new ProcessNameBuilder($"[{nameof(Compare<int>.Left)}] [{nameof(Compare<int>.Operator)}] [{nameof(Compare<int>.Right)}]");
-
-        /// <inheritdoc />
-        protected override Result<IRunnableProcess> TryCreateInstance(ProcessContext processContext, IReadOnlyDictionary<string, IFreezableProcess> processArguments,
-            IReadOnlyDictionary<string, IReadOnlyList<IFreezableProcess>> processListArguments) =>
-            TryGetMemberTypeReference(processArguments, processListArguments)
+        protected override Result<IRunnableProcess> TryCreateInstance(ProcessContext processContext, FreezableProcessData freezableProcessData)
+        {
+            return TryGetMemberTypeReference(freezableProcessData )
                 .Bind(processContext.TryGetTypeFromReference)
                 .Bind(outputType => TryCreateGeneric(typeof(Compare<>), outputType));
+        }
 
+        /// <inheritdoc />
+        public override ProcessNameBuilder ProcessNameBuilder { get; } = new ProcessNameBuilder($"[{nameof(Compare<int>.Left)}] [{nameof(Compare<int>.Operator)}] [{nameof(Compare<int>.Right)}]");
 
-        private Result<ITypeReference> TryGetMemberTypeReference(
-            IReadOnlyDictionary<string, IFreezableProcess> processArguments,
-            IReadOnlyDictionary<string, IReadOnlyList<IFreezableProcess>> processListArguments)
+        private Result<ITypeReference> TryGetMemberTypeReference(FreezableProcessData freezableProcessData)
         {
-            var result = processArguments.TryFindOrFail(nameof(Compare<int>.Left), "Compare Left is not set.")
+            var result = freezableProcessData.GetArgument(nameof(Compare<int>.Left))
                 .Bind(x => x.TryGetOutputTypeReference())
-                .Compose(() => processArguments.TryFindOrFail(nameof(Compare<int>.Right), "Compare Right is not set.")
+                .Compose(() => freezableProcessData.GetArgument(nameof(Compare<int>.Right))
                     .Bind(x => x.TryGetOutputTypeReference()))
                 .Map(x => new[] { x.Item1, x.Item2 })
                 .Bind((x) => MultipleTypeReference.TryCreate(x, TypeName));

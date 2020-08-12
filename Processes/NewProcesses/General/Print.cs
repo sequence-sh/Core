@@ -17,10 +17,10 @@ namespace Reductech.EDR.Processes.NewProcesses.General
         public static RunnableProcessFactory Instance { get; } = new PrintProcessFactory();
 
         /// <inheritdoc />
-        public override Result<ITypeReference> TryGetOutputTypeReference(IReadOnlyDictionary<string, IFreezableProcess> processArguments, IReadOnlyDictionary<string, IReadOnlyList<IFreezableProcess>> processListArguments) => new ActualTypeReference(typeof(Unit));
+        public override Result<ITypeReference> TryGetOutputTypeReference(FreezableProcessData freezableProcessData) => new ActualTypeReference(typeof(Unit));
 
         /// <inheritdoc />
-        public override string TypeName => FormatTypeName(typeof(Print<>));
+        public override Type ProcessType  => typeof(Print<>);
 
         /// <inheritdoc />
         public override ProcessNameBuilder ProcessNameBuilder { get; } = new ProcessNameBuilder($"Print '[{nameof(Print<object>.Value)}]'");
@@ -28,10 +28,10 @@ namespace Reductech.EDR.Processes.NewProcesses.General
         /// <inheritdoc />
         public override IEnumerable<Type> EnumTypes => ImmutableArray<Type>.Empty;
 
+
         /// <inheritdoc />
-        protected override Result<IRunnableProcess> TryCreateInstance(ProcessContext processContext, IReadOnlyDictionary<string, IFreezableProcess> processArguments,
-            IReadOnlyDictionary<string, IReadOnlyList<IFreezableProcess>> processListArguments) =>
-            processArguments.TryFindOrFail(nameof(Print<object>.Value), "Could not get Print value.")
+        protected override Result<IRunnableProcess> TryCreateInstance(ProcessContext processContext, FreezableProcessData freezableProcessData) =>
+            freezableProcessData.GetArgument(nameof(Print<object>.Value))
                 .Bind(x => x.TryGetOutputTypeReference())
                 .Bind(processContext.TryGetTypeFromReference)
                 .Bind(x => TryCreateGeneric(typeof(Print<>), x));

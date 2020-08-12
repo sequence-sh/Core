@@ -14,12 +14,9 @@ namespace Reductech.EDR.Processes.NewProcesses
         /// <summary>
         /// Dictionary mapping variable names to types.
         /// </summary>
-        public IReadOnlyDictionary<string, Type> VariableTypesDictionary;
+        public IReadOnlyDictionary<VariableName, Type> VariableTypesDictionary;
 
-        private ProcessContext(IReadOnlyDictionary<string, Type> variableTypesDictionary)
-        {
-            VariableTypesDictionary = variableTypesDictionary;
-        }
+        private ProcessContext(IReadOnlyDictionary<VariableName, Type> variableTypesDictionary) => VariableTypesDictionary = variableTypesDictionary;
 
         /// <summary>
         /// Gets the type referred to by a reference.
@@ -75,18 +72,18 @@ namespace Reductech.EDR.Processes.NewProcesses
 
             return result;
 
-            static Result<IReadOnlyDictionary<string, Type>> ResolveTypes(IEnumerable<(string variableName, ITypeReference typeReference)> references)
+            static Result<IReadOnlyDictionary<VariableName, Type>> ResolveTypes(IEnumerable<(VariableName variableName, ITypeReference typeReference)> references)
             {
+                var genericReferences = references.Where(x => x.typeReference is GenericTypeReference)
+                    .SelectMany(x =>
+                        ((GenericTypeReference) x.typeReference).ChildTypes.Select((t, i) =>
+                            (variableName: x.variableName.CreateChild(i), typeReference: t)));
+
+
                 var groups = references
-                    .Concat(references.Where(x=>x.typeReference is GenericTypeReference)
-                        .SelectMany(x=>
-                            ((GenericTypeReference) x.typeReference).ChildTypes.Select((t,i)=>
-                                (variableName: x.variableName + "ARG" + i,typeReference: t) )))
-
-
-
+                    .Concat(genericReferences)
                     .GroupBy(x => x.variableName).ToList();
-                var groupingDictionary = new Dictionary<string, ImmutableHashSet<ActualTypeReference>>();
+                var groupingDictionary = new Dictionary<VariableName, ImmutableHashSet<ActualTypeReference>>();
 
 
                 foreach (var remainingGroup in groups)
@@ -106,18 +103,18 @@ namespace Reductech.EDR.Processes.NewProcesses
                         groupingDictionary[key] = newSet;
                 }
 
-                var r = groupingDictionary.Select(TryExtractType).Combine().Map(x => new Dictionary<string, Type>(x) as IReadOnlyDictionary<string, Type>);
+                var r = groupingDictionary.Select(TryExtractType).Combine().Map(x => new Dictionary<VariableName, Type>(x) as IReadOnlyDictionary<VariableName, Type>);
 
                 return r;
 
-                static Result<KeyValuePair<string, Type>> TryExtractType(KeyValuePair<string, ImmutableHashSet<ActualTypeReference>> kvp)
+                static Result<KeyValuePair<VariableName, Type>> TryExtractType(KeyValuePair<VariableName, ImmutableHashSet<ActualTypeReference>> kvp)
                 {
                     var (key, actualTypes) = kvp;
                     return actualTypes.Count switch
                     {
-                        0 => Result.Failure<KeyValuePair<string, Type>>($"The type '{key}' is never set."),
-                        1 => new KeyValuePair<string, Type>(key, actualTypes.Single().Type),
-                        _ => Result.Failure<KeyValuePair<string, Type>>(
+                        0 => Result.Failure<KeyValuePair<VariableName, Type>>($"The type '{key}' is never set."),
+                        1 => new KeyValuePair<VariableName, Type>(key, actualTypes.Single().Type),
+                        _ => Result.Failure<KeyValuePair<VariableName, Type>>(
                             $"The type '{key}' is set to more than one type - ({string.Join(", ", actualTypes.Select(x => x.Type.Name))})")
                     };
                 }

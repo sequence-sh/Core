@@ -18,16 +18,10 @@ namespace Reductech.EDR.Processes.NewProcesses.General
         /// The ArrayProcessFactory.
         /// </summary>
         public static RunnableProcessFactory Instance { get; } = new ArrayProcessFactory();
-
-        /// <inheritdoc />
-        public override Result<ITypeReference> TryGetOutputTypeReference(IReadOnlyDictionary<string, IFreezableProcess> processArguments, IReadOnlyDictionary<string, IReadOnlyList<IFreezableProcess>> processListArguments) =>
-            GetMemberType(processListArguments)
-                .Map(x => new GenericTypeReference(typeof(List<>), new[] {x}) as ITypeReference);
-
-        private Result<ITypeReference> GetMemberType(IReadOnlyDictionary<string, IReadOnlyList<IFreezableProcess>> processListArguments)
+        private Result<ITypeReference> GetMemberType(FreezableProcessData freezableProcessData)
         {
             var result =
-            processListArguments.TryFindOrFail(nameof(Array<object>.Elements), "Array elements not set.")
+            freezableProcessData.GetListArgument(nameof(Array<object>.Elements))
                 .Bind(x => x.Select(r => r.TryGetOutputTypeReference()).Combine())
                 .Bind(x => MultipleTypeReference.TryCreate(x, TypeName));
 
@@ -36,7 +30,13 @@ namespace Reductech.EDR.Processes.NewProcesses.General
         }
 
         /// <inheritdoc />
-        public override string TypeName => FormatTypeName(typeof(Array<>));
+        public override Result<ITypeReference> TryGetOutputTypeReference(FreezableProcessData freezableProcessData) =>
+            GetMemberType(freezableProcessData)
+                .Map(x => new GenericTypeReference(typeof(List<>), new[] { x }) as ITypeReference);
+
+        /// <inheritdoc />
+        public override Type ProcessType => typeof(Array<>);
+
 
         /// <inheritdoc />
         public override ProcessNameBuilder ProcessNameBuilder { get; } = new ProcessNameBuilder($"[[{nameof(Array<object>.Elements)}]]");
@@ -45,9 +45,8 @@ namespace Reductech.EDR.Processes.NewProcesses.General
         public override IEnumerable<Type> EnumTypes => ImmutableArray<Type>.Empty;
 
         /// <inheritdoc />
-        protected override Result<IRunnableProcess> TryCreateInstance(ProcessContext processContext, IReadOnlyDictionary<string, IFreezableProcess> processArguments,
-            IReadOnlyDictionary<string, IReadOnlyList<IFreezableProcess>> processListArguments) =>
-            GetMemberType(processListArguments)
+        protected override Result<IRunnableProcess> TryCreateInstance(ProcessContext processContext, FreezableProcessData freezableProcessData) =>
+            GetMemberType(freezableProcessData)
                 .Bind(processContext.TryGetTypeFromReference)
                 .Bind(x => TryCreateGeneric(typeof(Array<>), x));
 

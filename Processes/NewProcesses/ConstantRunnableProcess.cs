@@ -11,10 +11,7 @@ namespace Reductech.EDR.Processes.NewProcesses
         /// Creates a new ConstantRunnableProcess.
         /// </summary>
         /// <param name="value"></param>
-        public ConstantRunnableProcess(T value)
-        {
-            Value = value;
-        }
+        public ConstantRunnableProcess(T value) => Value = value;
 
         /// <summary>
         /// The value that this will return when run.
@@ -22,18 +19,12 @@ namespace Reductech.EDR.Processes.NewProcesses
         public T Value { get; set; }
 
         /// <inheritdoc />
-        public Result<T> Run(ProcessState processState)
-        {
-            return Value!;
-        }
+        public Result<T> Run(ProcessState processState) => Value!;
 
         /// <inheritdoc />
-        public string Name => NameHelper.GetConstantName(Value!);
+        public string Name => $"{Value}";
 
         /// <inheritdoc />
-        public IFreezableProcess Unfreeze()
-        {
-            return new ConstantFreezableProcess(Value!);
-        }
+        public IFreezableProcess Unfreeze() => new ConstantFreezableProcess(Value!);
     }
 }

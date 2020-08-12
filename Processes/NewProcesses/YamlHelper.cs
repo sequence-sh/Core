@@ -3,10 +3,8 @@ using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.Serialization;
 using System.Text.RegularExpressions;
 using CSharpFunctionalExtensions;
-using kalexi.Monads.Either.Code;
 
 namespace Reductech.EDR.Processes.NewProcesses
 {
@@ -67,7 +65,7 @@ namespace Reductech.EDR.Processes.NewProcesses
         /// </summary>
         public static string SerializeToYaml(this IFreezableProcess process)
         {
-            var obj = ToSimpleObject(process);
+            var obj = SimplifyProcess(process);
             var serializer = new YamlDotNet.Serialization.Serializer();
 
             var r = serializer.Serialize(obj);
@@ -86,32 +84,32 @@ namespace Reductech.EDR.Processes.NewProcesses
 
             var result = FromSimpleObject(o, processFactoryStore);
 
-            return result.Bind(x => x.Join(Result.Success,
-                r => Result.Failure<IFreezableProcess>("Should have a single process on the top level.")));
+            return result.Bind(x => x.AsArgument("Process"));
         }
 
         private const string TypeString = "Do";
         private const string SetString = "Set";
         private const string EqualToString = "To";
 
-        private static Result<Either<IFreezableProcess, IReadOnlyList<IFreezableProcess>>> FromSimpleObject(object simpleObject, ProcessFactoryStore processFactoryStore)
+
+        private static Result<ProcessMember> FromSimpleObject(object simpleObject, ProcessFactoryStore processFactoryStore)
         {
-            Result<Either<IFreezableProcess, IReadOnlyList<IFreezableProcess>>> result;
+            //TODO special deserializers
+
+            Result<ProcessMember> result;
 
             if (simpleObject is List<object> list)
             {
                 result = list.Select(x => FromSimpleObject(x, processFactoryStore))
-                    .Select(x => x.Bind(y => y.Join(Result.Success,
-                        r => Result.Failure<IFreezableProcess>("Cannot have a list of list"))))
+                    .Select(x => x.Bind(y => y.AsArgument("List Member")))
                     .Combine()
-                    .Map(x => new Either<IFreezableProcess, IReadOnlyList<IFreezableProcess>>(x.ToList()));
+                    .Map(x => new ProcessMember(x.ToList()));
             }
             else if (simpleObject is Dictionary<object, object> dictionary1 && dictionary1.ContainsKey(TypeString))
             {
                 result = dictionary1.TryFindOrFail(TypeString, $"Object did not have {TypeString} set.")
                     .BindCast<object, string>()
-                    .Bind(x => processFactoryStore.Dictionary.TryFindOrFail(x,
-                        $"Could not find the process: '{x}'."))
+                    .Bind(x => processFactoryStore.Dictionary.TryFindOrFail(x, $"Could not find the process: '{x}'."))
                     .Compose(() =>
                         dictionary1.Where(x => x.Key.ToString() != TypeString)
                             .Select(x =>
@@ -119,31 +117,8 @@ namespace Reductech.EDR.Processes.NewProcesses
                                     .Map(value => (x.Key.ToString(), value)))
                             .Combine())
                     .Bind(x => CreateProcess(x.Item1, x.Item2))
-                    .Map(x => new Either<IFreezableProcess, IReadOnlyList<IFreezableProcess>>(x));
+                    .Map(x => new ProcessMember(x));
             }
-            else if (simpleObject is Dictionary<object, object> dictionary2 && dictionary2.ContainsKey(SetString))
-            {
-                result = dictionary2.TryFindOrFail(SetString, $"Set Value did not have {SetString} set.")
-                    .BindCast<object, string>()
-                    .Compose(()=> dictionary2.TryFindOrFail(EqualToString, $"Set Value did not have {EqualToString} set.")
-                        .Bind(x=> FromSimpleObject(x, processFactoryStore))
-                        .Bind(UnwrapEitherToProcess)
-                    )
-                    .Map(x=> new SetVariableFreezableProcess(x.Item1, x.Item2))
-
-
-                    .Map(x => new Either<IFreezableProcess, IReadOnlyList<IFreezableProcess>>(x));
-            }
-            else if (simpleObject is string sString1 && GetVariableRegex.TryMatch(sString1, out var variableMatch))
-            {
-                result = new Either<IFreezableProcess, IReadOnlyList<IFreezableProcess>>(
-                    new GetVariableFreezableProcess(variableMatch.Groups["variableName"].Value));
-            }
-            else if (simpleObject is string sString2 && SetVariableRegex.TryMatch(sString2, out var setVariableMatch))
-                result = FromSimpleObject(setVariableMatch.Groups["value"].Value, processFactoryStore)
-                    .Bind(UnwrapEitherToProcess)
-                    .Map(x=> new Either<IFreezableProcess, IReadOnlyList<IFreezableProcess>>(new SetVariableFreezableProcess(setVariableMatch.Groups["variableName"].Value, x)))
-                    ;
             else if (simpleObject is string sString3)
             {
                 if (EnumConstantRegex.TryMatch(sString3, out var m))
@@ -152,19 +127,13 @@ namespace Reductech.EDR.Processes.NewProcesses
                         .TryFindOrFail(m.Groups["enumName"].Value,
                             $"Could not recognize enum '{m.Groups["enumName"].Value}'")
                         .Bind(x => Extensions.TryGetEnumValue(x, m.Groups["enumValue"].Value))
-                        .Map(x => new Either<IFreezableProcess, IReadOnlyList<IFreezableProcess>>(new ConstantFreezableProcess(x)));
+                        .Map(x => new ProcessMember(new ConstantFreezableProcess(x)));
                 }
 
                 else if (int.TryParse(sString3, out var i))
-                {
-                    result = Result.Success<Either<IFreezableProcess, IReadOnlyList<IFreezableProcess>>>(
-                    new ConstantFreezableProcess(i));
-                }
+                    result = Result.Success(new ProcessMember(new ConstantFreezableProcess(i)));
                 else
-                {
-                    result = Result.Success<Either<IFreezableProcess, IReadOnlyList<IFreezableProcess>>>(
-                    new ConstantFreezableProcess(sString3));
-                }
+                    result = Result.Success(new ProcessMember(new ConstantFreezableProcess(sString3)));
             }
             else
                 throw new ArgumentOutOfRangeException(nameof(simpleObject));
@@ -172,89 +141,88 @@ namespace Reductech.EDR.Processes.NewProcesses
             return result;
 
             static Result<IFreezableProcess> CreateProcess(RunnableProcessFactory factory,
-                            IEnumerable<(string key, Either<IFreezableProcess, IReadOnlyList<IFreezableProcess>> value)> arguments)
+                            IEnumerable<(string key, ProcessMember member)> arguments)
             {
-                var singleArguments = new Dictionary<string, IFreezableProcess>();
-                var listArguments = new Dictionary<string, IReadOnlyList<IFreezableProcess>>();
+                var errors = new List<string>();
 
+                var dict = new Dictionary<string, ProcessMember>();
 
-                foreach (var (key, processList) in arguments)
-                    processList.Switch(l => singleArguments.Add(key, l),
-                        r => listArguments.Add(key, r));
+                foreach (var (key, value) in arguments)
+                {
+                    var expectedMemberType = factory.GetMemberType(key);
+                    var memberType = value.MemberType;
 
+                    if (expectedMemberType == MemberType.NotAMember)
+                        errors.Add($"'{key}' is not a member of type {factory.TypeName}");
+                    else if (memberType == expectedMemberType)
+                        dict.Add(key, value);
+                    else if (expectedMemberType == MemberType.VariableName && memberType == MemberType.Process)
+                    {
+                        //Weird special case - convert this process to a variable name
+                        var newValue = value.AsArgument(key)
+                            .BindCast<IFreezableProcess, ConstantFreezableProcess>()
+                            .Map(x => new VariableName(x.Value.ToString()))
+                            .Map(x => new ProcessMember(x));
+                        if (newValue.IsFailure)
+                            errors.Add(newValue.Error);
+                        else
+                            dict.Add(key, newValue.Value);
+                    }
+                    else
+                        errors.Add($"'{key}' has the wrong type in {factory.TypeName}");
+                }
 
-                var process = new CompoundFreezableProcess(factory, singleArguments, listArguments);
+                if (errors.Any())
+                    return errors.Select(Result.Failure).Combine().ConvertFailure<IFreezableProcess>();
+
+                var data = new FreezableProcessData(dict);
+
+                var process = new CompoundFreezableProcess(factory, data);
                 return process;
             }
-
-            static Result<IFreezableProcess> UnwrapEitherToProcess(Either<IFreezableProcess, IReadOnlyList<IFreezableProcess>> either) =>
-                either.IsLeft
-                    ? Result.Success(either.Left)
-                    : Result.Failure<IFreezableProcess>("Variable cannot be list");
         }
-
-        private static readonly Regex GetVariableRegex = new Regex(@"\A<(?<variableName>[\w\d_]+)>\Z", RegexOptions.Compiled);
-        private static readonly Regex SetVariableRegex = new Regex(@"\A<(?<variableName>[\w\d_]+?)>\s*=\s*(?<value>.+)\Z", RegexOptions.Compiled);
 
         private static readonly Regex EnumConstantRegex = new Regex(@"(?<enumName>[\w\d_]+)\.(?<enumValue>[\w\d_]+)");
 
-        private static object ToSimpleObject(IFreezableProcess process)
+        private static object SimplifyProcess(IFreezableProcess process)
         {
-            return process switch
+            switch (process)
             {
-                CompoundFreezableProcess compoundFreezableProcess => ToExpando(compoundFreezableProcess),
-                ConstantFreezableProcess constantFreezableProcess => SimplifyConstantFreezableProcess(constantFreezableProcess),
-                GetVariableFreezableProcess getVariableFreezableProcess =>
-                "<" + getVariableFreezableProcess.VariableName + ">",
-                NameHelper.MissingProcess _ => throw new SerializationException(
-                    "Cannot serialize Missing Process"),
-                SetVariableFreezableProcess setVariableFreezableProcess => SimplifySetVariable(setVariableFreezableProcess)
-                 ,
-                _ => throw new ArgumentOutOfRangeException(nameof(process))
-            };
-
-            static object ToExpando(CompoundFreezableProcess compoundFreezableProcess)
-            {
-                IDictionary<string, object> expandoObject = new ExpandoObject();
-
-                expandoObject[TypeString] = compoundFreezableProcess.ProcessFactory.TypeName;
-
-                foreach (var (key, value) in compoundFreezableProcess.ProcessArguments)
-                    expandoObject[key] = ToSimpleObject(value);
-
-                foreach (var (key, value) in compoundFreezableProcess.ProcessListArguments)
-                {
-                    var list = value.Select(ToSimpleObject).ToList();
-
-                    expandoObject[key] = list;
-                }
-
-                return expandoObject;
-            }
-
-            static string SimplifyConstantFreezableProcess(ConstantFreezableProcess constantFreezableProcess)
-            {
-                if (constantFreezableProcess.Value.GetType().IsEnum)
+                case ConstantFreezableProcess constantFreezableProcess when constantFreezableProcess.Value.GetType().IsEnum:
                     return constantFreezableProcess.Value.GetType().Name + "." + constantFreezableProcess.Value;
-                return constantFreezableProcess.Value.ToString()??"";
+                case ConstantFreezableProcess constantFreezableProcess:
+                    return constantFreezableProcess.Value.ToString() ?? "";
+                case CompoundFreezableProcess compoundFreezableProcess:
+                    {
+                        IDictionary<string, object> expandoObject = new ExpandoObject();
+
+                        expandoObject[TypeString] = compoundFreezableProcess.ProcessFactory.TypeName;
+
+
+                        foreach (var (name, m) in compoundFreezableProcess.FreezableProcessData.Dictionary)
+                            expandoObject[name] = ToSimpleObject(m);
+
+                        return expandoObject;
+                    }
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(process));
             }
-
-            static object SimplifySetVariable(SetVariableFreezableProcess setVariableFreezableProcess)
-            {
-                if (!(setVariableFreezableProcess.Value is CompoundFreezableProcess)) //Basic case
-                    return "<" + setVariableFreezableProcess.VariableName + "> = " + ToSimpleObject(setVariableFreezableProcess.Value);
+        }
 
 
-                IDictionary<string, object> expandoObject = new ExpandoObject();
+        private static object ToSimpleObject(ProcessMember member)
+        {
+            //TODO special serializer for get/set etc.
 
-                expandoObject[SetString] = setVariableFreezableProcess.VariableName;
-                expandoObject[EqualToString] = ToSimpleObject(setVariableFreezableProcess.Value);
-
-
-                return expandoObject;
+            return member.Join(SimplifyVariableName, SimplifyProcess, SimplifyList);
 
 
-            }
+            static object SimplifyVariableName(VariableName variableName) => variableName.Name;
+
+
+
+            static object SimplifyList(IReadOnlyList<IFreezableProcess> list) => list.Select(SimplifyProcess).ToList();
+
         }
 
     }

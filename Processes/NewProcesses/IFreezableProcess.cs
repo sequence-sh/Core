@@ -18,7 +18,7 @@ namespace Reductech.EDR.Processes.NewProcesses
         /// <summary>
         /// Gets the variables which may be set by this process and their types.
         /// </summary>
-        Result<IReadOnlyCollection<(string name, ITypeReference type)>> TryGetVariablesSet { get; }
+        Result<IReadOnlyCollection<(VariableName VariableName, ITypeReference type)>> TryGetVariablesSet { get; }
 
 
         /// <summary>
@@ -31,9 +31,5 @@ namespace Reductech.EDR.Processes.NewProcesses
         /// The output type of this process. Will be unit if the process does not have an output.
         /// </summary>
         Result<ITypeReference> TryGetOutputTypeReference();
-
-        //TODO serialize
-
-        //TODO name
     }
 }
