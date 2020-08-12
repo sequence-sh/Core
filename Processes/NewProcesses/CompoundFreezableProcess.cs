@@ -266,7 +266,7 @@ namespace Reductech.EDR.Processes.NewProcesses
         /// <summary>
         /// Gets the type of this member.
         /// </summary>
-        public MemberType GetMemberType(string name)
+        public MemberType GetExpectedMemberType(string name)
         {
             var propertyInfo = ProcessType.GetProperty(name);
 

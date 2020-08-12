@@ -3,7 +3,6 @@ using CSharpFunctionalExtensions;
 
 namespace Reductech.EDR.Processes.NewProcesses.General
 {
-
     /// <summary>
     /// Repeat a process a set number of times.
     /// </summary>

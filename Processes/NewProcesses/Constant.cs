@@ -5,13 +5,13 @@ namespace Reductech.EDR.Processes.NewProcesses
     /// <summary>
     /// A process that returns a fixed value when run.
     /// </summary>
-    public class ConstantRunnableProcess<T> : IRunnableProcess<T>
+    public class Constant<T> : IRunnableProcess<T>
     {
         /// <summary>
-        /// Creates a new ConstantRunnableProcess.
+        /// Creates a new Constant.
         /// </summary>
         /// <param name="value"></param>
-        public ConstantRunnableProcess(T value) => Value = value;
+        public Constant(T value) => Value = value;
 
         /// <summary>
         /// The value that this will return when run.

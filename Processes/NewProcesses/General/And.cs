@@ -49,15 +49,11 @@ namespace Reductech.EDR.Processes.NewProcesses.General
     }
 
 
-    //public sealed class CountWith : CompoundRunnableProcess<Unit>
-    //{
 
-    //}
 
-    //public sealed class ForEach : CompoundRunnableProcess<Unit>
-    //{
 
-    //}
+
+
 
     //public sealed class BreakFromLoop : CompoundRunnableProcess<Unit>
     //{

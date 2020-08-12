@@ -26,7 +26,7 @@ namespace Reductech.EDR.Processes.NewProcesses
         public Result<IRunnableProcess> TryFreeze(ProcessContext _)
         {
             Type elementType = Value.GetType();
-            Type processType = typeof(ConstantRunnableProcess<>).MakeGenericType(elementType);
+            Type processType = typeof(Constant<>).MakeGenericType(elementType);
             var process = Activator.CreateInstance(processType, Value);
 
             //TODO check for exceptions here?

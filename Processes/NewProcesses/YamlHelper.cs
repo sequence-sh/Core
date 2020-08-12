@@ -36,9 +36,10 @@ namespace Reductech.EDR.Processes.NewProcesses
                 .Cast<RunnableProcessFactory>().ToList();
 
             var dictionary = factories.ToDictionary(x => x.TypeName);
-            var enumTypesDictionary = factories.SelectMany(x => x.EnumTypes).Distinct().ToDictionary(x => x.Name!, StringComparer.OrdinalIgnoreCase);
+            var enumTypesDictionary = factories.SelectMany(x => x.EnumTypes).Distinct()
+                .ToDictionary(x => x.Name??"", StringComparer.OrdinalIgnoreCase);
 
-            return new ProcessFactoryStore(dictionary, enumTypesDictionary);
+            return new ProcessFactoryStore(dictionary, enumTypesDictionary!);
 
 
         }
@@ -88,8 +89,6 @@ namespace Reductech.EDR.Processes.NewProcesses
         }
 
         private const string TypeString = "Do";
-        private const string SetString = "Set";
-        private const string EqualToString = "To";
 
 
         private static Result<ProcessMember> FromSimpleObject(object simpleObject, ProcessFactoryStore processFactoryStore)
@@ -116,7 +115,7 @@ namespace Reductech.EDR.Processes.NewProcesses
                                 FromSimpleObject(x.Value, processFactoryStore)
                                     .Map(value => (x.Key.ToString(), value)))
                             .Combine())
-                    .Bind(x => CreateProcess(x.Item1, x.Item2))
+                    .Bind(x => CreateProcess(x.Item1, x.Item2!))
                     .Map(x => new ProcessMember(x));
             }
             else if (simpleObject is string sString3)
@@ -129,7 +128,8 @@ namespace Reductech.EDR.Processes.NewProcesses
                         .Bind(x => Extensions.TryGetEnumValue(x, m.Groups["enumValue"].Value))
                         .Map(x => new ProcessMember(new ConstantFreezableProcess(x)));
                 }
-
+                else if(bool.TryParse(sString3, out var b))
+                    result = Result.Success(new ProcessMember(new ConstantFreezableProcess(b)));
                 else if (int.TryParse(sString3, out var i))
                     result = Result.Success(new ProcessMember(new ConstantFreezableProcess(i)));
                 else
@@ -149,7 +149,7 @@ namespace Reductech.EDR.Processes.NewProcesses
 
                 foreach (var (key, value) in arguments)
                 {
-                    var expectedMemberType = factory.GetMemberType(key);
+                    var expectedMemberType = factory.GetExpectedMemberType(key);
                     var memberType = value.MemberType;
 
                     if (expectedMemberType == MemberType.NotAMember)
@@ -161,7 +161,7 @@ namespace Reductech.EDR.Processes.NewProcesses
                         //Weird special case - convert this process to a variable name
                         var newValue = value.AsArgument(key)
                             .BindCast<IFreezableProcess, ConstantFreezableProcess>()
-                            .Map(x => new VariableName(x.Value.ToString()))
+                            .Map(x => new VariableName(x.Value.ToString()!))
                             .Map(x => new ProcessMember(x));
                         if (newValue.IsFailure)
                             errors.Add(newValue.Error);
@@ -210,20 +210,7 @@ namespace Reductech.EDR.Processes.NewProcesses
         }
 
 
-        private static object ToSimpleObject(ProcessMember member)
-        {
-            //TODO special serializer for get/set etc.
-
-            return member.Join(SimplifyVariableName, SimplifyProcess, SimplifyList);
-
-
-            static object SimplifyVariableName(VariableName variableName) => variableName.Name;
-
-
-
-            static object SimplifyList(IReadOnlyList<IFreezableProcess> list) => list.Select(SimplifyProcess).ToList();
-
-        }
-
+        private static object ToSimpleObject(ProcessMember member) =>
+            member.Join(x=>x.Name, SimplifyProcess, l=>l.Select(SimplifyProcess).ToList());
     }
 }

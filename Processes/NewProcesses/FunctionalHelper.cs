@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 using CSharpFunctionalExtensions;
 
@@ -25,6 +27,20 @@ namespace Reductech.EDR.Processes.NewProcesses
             if (result.Value is T2 t2) return t2;
 
             return Result.Failure<T2>($"{result.Value} is not of type '{typeof(T2).Name}'");
+        }
+
+
+        /// <summary>
+        /// Returns a single value from the sequence or a failure.
+        /// </summary>
+        public static Result<T> BindSingle<T>(this Result<IReadOnlyList<T>> result)
+        {
+            if (result.IsFailure) return result.ConvertFailure<T>();
+
+            if (result.Value.Count == 0) return Result.Failure<T>("Sequence has no elements");
+            else if(result.Value.Count > 1) return Result.Failure<T>("Sequence has more than one element");
+
+            return result.Value.Single()!;
         }
 
         /// <summary>
