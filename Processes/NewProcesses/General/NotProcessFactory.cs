@@ -3,10 +3,30 @@ using CSharpFunctionalExtensions;
 
 namespace Reductech.EDR.Processes.NewProcesses.General
 {
+
     /// <summary>
     /// Negation of a boolean value.
     /// </summary>
-    public class NotProcessFactory : SimpleRunnableProcessFactory<NotProcessFactory.Not, bool>
+    public sealed class Not : CompoundRunnableProcess<bool>
+    {
+        /// <inheritdoc />
+        public override Result<bool> Run(ProcessState processState) => Boolean.Run(processState).Map(x => !x);
+
+        /// <inheritdoc />
+        public override RunnableProcessFactory RunnableProcessFactory => NotProcessFactory.Instance;
+
+        /// <summary>
+        /// The value to negate.
+        /// </summary>
+        [RunnableProcessProperty]
+        [Required]
+        public IRunnableProcess<bool> Boolean { get; set; }
+    }
+
+    /// <summary>
+    /// Negation of a boolean value.
+    /// </summary>
+    public class NotProcessFactory : SimpleRunnableProcessFactory<Not, bool>
     {
         private NotProcessFactory() { }
 
@@ -17,23 +37,6 @@ namespace Reductech.EDR.Processes.NewProcesses.General
         protected override string ProcessNameTemplate => $"Not [{nameof(Not.Boolean)}]";
 
 
-        /// <summary>
-        /// Negation of a boolean value.
-        /// </summary>
-        public sealed class Not : CompoundRunnableProcess<bool>
-        {
-            /// <inheritdoc />
-            public override Result<bool> Run(ProcessState processState) => Boolean.Run(processState).Map(x => !x);
 
-            /// <inheritdoc />
-            public override RunnableProcessFactory RunnableProcessFactory => NotProcessFactory.Instance;
-
-            /// <summary>
-            /// The value to negate.
-            /// </summary>
-            [RunnableProcessProperty]
-            [Required]
-            public IRunnableProcess<bool> Boolean { get; set; }
-        }
     }
 }

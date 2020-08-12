@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
 using CSharpFunctionalExtensions;
 
 namespace Reductech.EDR.Processes.NewProcesses.General

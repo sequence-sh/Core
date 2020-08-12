@@ -52,10 +52,10 @@ namespace Reductech.EDR.Processes.NewProcesses.General
             var from = From.Run(processState);
             if (from.IsFailure) return from.ConvertFailure<Unit>();
 
-            var to = From.Run(processState);
+            var to = To.Run(processState);
             if (to.IsFailure) return from.ConvertFailure<Unit>();
 
-            var increment = From.Run(processState);
+            var increment = Increment.Run(processState);
             if (increment.IsFailure) return from.ConvertFailure<Unit>();
 
             var currentValue = from.Value;

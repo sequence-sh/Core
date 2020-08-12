@@ -28,7 +28,7 @@ namespace Reductech.EDR.Processes.Tests.NewProcessesTests
             {
                 yield return new TestCase("Print 'Hello World'", new Print<string> {Value = new Constant<string>(HelloWorldString)},new []{HelloWorldString} );
 
-                yield return new TestCase("Foo = Hello World; Print '<Foo>'",new SequenceProcessFactory.Sequence
+                yield return new TestCase("Foo = Hello World; Print '<Foo>'",new Sequence
                 {
                     Steps = new List<IRunnableProcess<NewProcesses.Unit>>
                     {
@@ -38,7 +38,7 @@ namespace Reductech.EDR.Processes.Tests.NewProcessesTests
 
                 }, HelloWorldString);
 
-                yield return new TestCase("Foo = Hello World; Bar = <Foo>; Print '<Bar>'",new SequenceProcessFactory.Sequence
+                yield return new TestCase("Foo = Hello World; Bar = <Foo>; Print '<Bar>'",new Sequence
                 {
                     Steps = new List<IRunnableProcess<NewProcesses.Unit>>
                     {
@@ -50,7 +50,7 @@ namespace Reductech.EDR.Processes.Tests.NewProcessesTests
                 }, HelloWorldString);
 
 
-                yield return new TestCase("Foo = 1 LessThan 2; Print '<Foo>'",new SequenceProcessFactory.Sequence
+                yield return new TestCase("Foo = 1 LessThan 2; Print '<Foo>'",new Sequence
                 {
                     Steps = new List<IRunnableProcess<NewProcesses.Unit>>
                     {
@@ -67,13 +67,23 @@ namespace Reductech.EDR.Processes.Tests.NewProcessesTests
                 }, true.ToString());
 
 
-                yield return new TestCase("Print 'True && True'",
+                yield return new TestCase("Print 'True && Not False'",
                     new Print<bool>
                     {
                         Value = new And
                         {
                             Left = new Constant<bool>(true),
-                            Right = new Constant<bool>(true)
+                            Right = new Not{Boolean =new Constant<bool>(false) }
+                        }
+                    }, true.ToString());
+
+                yield return new TestCase("Print 'False || Not False'",
+                    new Print<bool>
+                    {
+                        Value = new Or
+                        {
+                            Left = new Constant<bool>(false),
+                            Right = new Not { Boolean = new Constant<bool>(false) }
                         }
                     }, true.ToString());
 
@@ -91,8 +101,54 @@ namespace Reductech.EDR.Processes.Tests.NewProcessesTests
                             new Constant<string>("World"),
                         }},
                         VariableName = FooString
-                    }, "Hello", "World"
-                );
+                    }, "Hello", "World");
+
+                yield return new TestCase("If True then Print 'Hello World' else Print 'World Hello'",
+                    new Conditional
+                    {
+                        Condition = new Constant<bool>(true),
+                        ThenProcess = new Print<string> {Value = new Constant<string>(HelloWorldString)},
+                        ElseProcess = new Print<string> {Value = new Constant<string>("World Hello")}
+                    },
+                    HelloWorldString);
+
+
+                yield return new TestCase("For Foo = 5; Foo <= 10; += 2; Print '<Foo>'",
+                    new For
+                    {
+                        VariableName = FooString,
+                        Action = new Print<int>{Value = new GetVariable<int>(FooString)},
+                        From = new Constant<int>(5),
+                        To = new Constant<int>(10),
+                        Increment = new Constant<int>(2)
+                    },
+                    "5", "7", "9");
+
+                yield return new TestCase("Foo = True; Repeat 'Print 'Hello World'; Foo = False' while '<Foo>'",
+                    new Sequence
+                    {
+                        Steps = new List<IRunnableProcess<NewProcesses.Unit>>
+                        {
+                            new SetVariable<bool>(FooString, new Constant<bool>(true)),
+                            new RepeatWhile
+                            {
+                                Action = new Sequence
+                                {
+                                    Steps = new List<IRunnableProcess<NewProcesses.Unit>>
+                                    {
+                                        new Print<string> {Value = new Constant<string>(HelloWorldString)},
+                                        new SetVariable<bool>(FooString, new Constant<bool>(false)),
+                                    }
+                                },
+                                Condition = new GetVariable<bool>(FooString)
+                            }
+                            }
+                    },
+                    "Hello World"
+
+                    );
+
+
             }
         }
 
@@ -166,12 +222,8 @@ namespace Reductech.EDR.Processes.Tests.NewProcessesTests
         public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter)
         {
             if (state is FormattedLogValues flv)
-            {
                 foreach (var formattedLogValue in flv)
-                {
                     LoggedValues.Add(formattedLogValue.Value);
-                }
-            }
             else throw new NotImplementedException();
         }
 
