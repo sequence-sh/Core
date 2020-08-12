@@ -7,6 +7,31 @@ using CSharpFunctionalExtensions;
 
 namespace Reductech.EDR.Processes.NewProcesses.General
 {
+
+    /// <summary>
+    /// Represents an ordered collection of objects.
+    /// </summary>
+    public sealed class Array<T> : CompoundRunnableProcess<List<T>>
+    {
+        /// <inheritdoc />
+        public override Result<List<T>> Run(ProcessState processState)
+        {
+            var result = Elements.Select(x => x.Run(processState)).Combine().Map(x => x.ToList());
+
+            return result;
+        }
+
+        /// <inheritdoc />
+        public override RunnableProcessFactory RunnableProcessFactory => ArrayProcessFactory.Instance;
+
+        /// <summary>
+        /// The elements of this array.
+        /// </summary>
+        [RunnableProcessListProperty]
+        [Required]
+        public IReadOnlyList<IRunnableProcess<T>> Elements { get; set; } = null!;
+    }
+
     /// <summary>
     /// The factory for creating Arrays.
     /// </summary>
@@ -51,30 +76,9 @@ namespace Reductech.EDR.Processes.NewProcesses.General
                 .Bind(x => TryCreateGeneric(typeof(Array<>), x));
 
 
-        /// <summary>
-        /// Represents an ordered collection of objects.
-        /// </summary>
-        public sealed class Array<T> : CompoundRunnableProcess<List<T>>
-        {
-            /// <inheritdoc />
-            public override Result<List<T>> Run(ProcessState processState)
-            {
-                var result = Elements.Select(x => x.Run(processState)).Combine().Map(x => x.ToList());
 
-                return result;
-            }
-
-            /// <inheritdoc />
-            public override RunnableProcessFactory RunnableProcessFactory => ArrayProcessFactory.Instance;
-
-            /// <summary>
-            /// The elements of this array.
-            /// </summary>
-            [RunnableProcessListProperty]
-            [Required]
-            public IReadOnlyList<IRunnableProcess<T>> Elements { get; set; } = null!;
-
-        }
     }
+
+
 
 }

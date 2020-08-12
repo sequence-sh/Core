@@ -4,8 +4,49 @@ using System.Collections.Immutable;
 using System.ComponentModel.DataAnnotations;
 using CSharpFunctionalExtensions;
 
-namespace Reductech.EDR.Processes.NewProcesses
+namespace Reductech.EDR.Processes.NewProcesses.General
 {
+
+    /// <summary>
+    /// Gets the value of a named variable.
+    /// </summary>
+    public sealed class SetVariable<T> : CompoundRunnableProcess<Unit>
+    {
+        /// <summary>
+        /// Necessary Parameterless constructor
+        /// </summary>
+        public SetVariable() { }
+
+        /// <inheritdoc />
+        public SetVariable(VariableName variableName, IRunnableProcess<T> value)
+        {
+            VariableName = variableName;
+            Value = value;
+        }
+
+        /// <inheritdoc />
+        public override Result<Unit> Run(ProcessState processState) =>
+            Value.Run(processState)
+                .Bind(x => processState.SetVariable(VariableName, x))
+                .Map(() => Unit.Default);
+
+        /// <inheritdoc />
+        public override RunnableProcessFactory RunnableProcessFactory => SetVariableProcessFactory.Instance;
+
+        /// <summary>
+        /// The name of the variable to set.
+        /// </summary>
+        [VariableName]
+        [Required]
+        public VariableName VariableName { get; set; }
+
+        /// <summary>
+        /// The value to set the variable to.
+        /// </summary>
+        [RunnableProcessProperty]
+        [Required]
+        public IRunnableProcess<T> Value { get; set; }
+    }
 
     /// <summary>
     /// Sets the value of a named variable.
@@ -43,52 +84,7 @@ namespace Reductech.EDR.Processes.NewProcesses
                 .Bind(x => processContext.TryGetTypeFromReference(new VariableTypeReference(x)))
                 .Bind(x => TryCreateGeneric(typeof(SetVariable<>), x));
 
-        /// <summary>
-        /// Gets the value of a named variable.
-        /// </summary>
-        public sealed class SetVariable<T> : CompoundRunnableProcess<Unit>
-        {
-            /// <summary>
-            /// Necessary Parameterless constructor
-            /// </summary>
-            public SetVariable() { }
 
-            /// <inheritdoc />
-            public SetVariable(VariableName variableName, IRunnableProcess<T> value)
-            {
-                VariableName = variableName;
-                Value = value;
-            }
-
-            /// <inheritdoc />
-            public override Result<Unit> Run(ProcessState processState) =>
-                Value.Run(processState)
-                    .Bind(x => processState.SetVariable(VariableName, x))
-                    .Map(() => Unit.Default);
-
-            /// <inheritdoc />
-            public override RunnableProcessFactory RunnableProcessFactory => Instance;
-
-
-
-
-            /// <summary>
-            /// The name of the variable to set.
-            /// </summary>
-            [VariableName]
-            [Required]
-            public VariableName VariableName { get; set; }
-
-            /// <summary>
-            /// The value to set the variable to.
-            /// </summary>
-            [RunnableProcessProperty]
-            [Required]
-            public IRunnableProcess<T> Value { get; set; }
-
-
-
-        }
     }
 
     ///// <summary>

@@ -32,8 +32,8 @@ namespace Reductech.EDR.Processes.Tests.NewProcessesTests
                 {
                     Steps = new List<IRunnableProcess<NewProcesses.Unit>>
                     {
-                        new SetVariableProcessFactory.SetVariable<string>(FooString, new ConstantRunnableProcess<string>(HelloWorldString)),
-                        new PrintProcessFactory.Print<string> {Value = new GetVariableProcessFactory.GetVariable<string>(FooString)}
+                        new SetVariable<string>(FooString, new ConstantRunnableProcess<string>(HelloWorldString)),
+                        new PrintProcessFactory.Print<string> {Value = new GetVariable<string>(FooString)}
                     }
 
                 },new []{HelloWorldString});
@@ -42,9 +42,9 @@ namespace Reductech.EDR.Processes.Tests.NewProcessesTests
                 {
                     Steps = new List<IRunnableProcess<NewProcesses.Unit>>
                     {
-                        new SetVariableProcessFactory.SetVariable<string>(FooString, new ConstantRunnableProcess<string>(HelloWorldString)),
-                        new SetVariableProcessFactory.SetVariable<string>(BarString, new GetVariableProcessFactory.GetVariable<string>(FooString)),
-                        new PrintProcessFactory.Print<string> {Value = new GetVariableProcessFactory.GetVariable<string>(BarString)}
+                        new SetVariable<string>(FooString, new ConstantRunnableProcess<string>(HelloWorldString)),
+                        new SetVariable<string>(BarString, new GetVariable<string>(FooString)),
+                        new PrintProcessFactory.Print<string> {Value = new GetVariable<string>(BarString)}
                     }
 
                 },new []{HelloWorldString});
@@ -54,7 +54,7 @@ namespace Reductech.EDR.Processes.Tests.NewProcessesTests
                 {
                     Steps = new List<IRunnableProcess<NewProcesses.Unit>>
                     {
-                        new SetVariableProcessFactory.SetVariable<bool>(FooString, new CompareProcessFactory.Compare<int>()
+                        new SetVariable<bool>(FooString, new Compare<int>()
                         {
                             Left = new ConstantRunnableProcess<int>(1),
                             Operator = new ConstantRunnableProcess<CompareOperator>(CompareOperator.LessThan),
@@ -62,7 +62,7 @@ namespace Reductech.EDR.Processes.Tests.NewProcessesTests
                         }),
 
 
-                        new PrintProcessFactory.Print<bool> {Value = new GetVariableProcessFactory.GetVariable<bool>(FooString)}
+                        new PrintProcessFactory.Print<bool> {Value = new GetVariable<bool>(FooString)}
                     }
                 },new []{true.ToString()});
             }

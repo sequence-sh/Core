@@ -8,6 +8,63 @@ namespace Reductech.EDR.Processes.NewProcesses.General
     /// <summary>
     /// Compares two items.
     /// </summary>
+    public sealed class Compare<T> : CompoundRunnableProcess<bool> where T : IComparable
+    {
+        /// <summary>
+        /// The item to the left of the operator.
+        /// </summary>
+        [RunnableProcessProperty]
+        [Required]
+        public IRunnableProcess<T> Left { get; set; } = null!;
+
+        /// <summary>
+        /// The operator to use for comparison.
+        /// </summary>
+        [RunnableProcessProperty]
+        [Required]
+
+        public IRunnableProcess<CompareOperator> Operator { get; set; } = null!;
+
+        /// <summary>
+        /// The item to the right of the operator.
+        /// </summary>
+        [RunnableProcessProperty]
+        [Required]
+        public IRunnableProcess<T> Right { get; set; } = null!;
+
+
+        /// <inheritdoc />
+        public override Result<bool> Run(ProcessState processState)
+        {
+            var result = Left.Run(processState).Compose(() => Operator.Run(processState), () => Right.Run(processState))
+                .Bind(x => CompareItems(x.Item1, x.Item2, x.Item3));
+
+
+            return result;
+        }
+
+        /// <inheritdoc />
+        public override RunnableProcessFactory RunnableProcessFactory => CompareProcessFactory.Instance;
+
+        private static Result<bool> CompareItems(T item1, CompareOperator compareOperator, T item2)
+        {
+            return compareOperator switch
+            {
+                CompareOperator.Equals => item1.Equals(item2),
+                CompareOperator.NotEquals => !item1.Equals(item2),
+                CompareOperator.LessThan => item1.CompareTo(item2) < 0,
+                CompareOperator.LessThanOrEqual => item1.CompareTo(item2) <= 0,
+                CompareOperator.GreaterThan => item1.CompareTo(item2) > 0,
+                CompareOperator.GreaterThanOrEqual => item1.CompareTo(item2) >= 0,
+                _ => throw new ArgumentOutOfRangeException(nameof(compareOperator), compareOperator, null)
+            };
+        }
+
+    }
+
+    /// <summary>
+    /// Compares two items.
+    /// </summary>
     public sealed class CompareProcessFactory : RunnableProcessFactory
     {
         private CompareProcessFactory() { }
@@ -44,63 +101,6 @@ namespace Reductech.EDR.Processes.NewProcesses.General
                 .Bind((x) => MultipleTypeReference.TryCreate(x, TypeName));
 
             return result;
-        }
-
-        /// <summary>
-        /// Compares two items.
-        /// </summary>
-        public sealed class Compare<T> : CompoundRunnableProcess<bool> where T : IComparable
-        {
-            /// <summary>
-            /// The item to the left of the operator.
-            /// </summary>
-            [RunnableProcessProperty]
-            [Required]
-            public IRunnableProcess<T> Left { get; set; } = null!;
-
-            /// <summary>
-            /// The operator to use for comparison.
-            /// </summary>
-            [RunnableProcessProperty]
-            [Required]
-
-            public IRunnableProcess<CompareOperator> Operator { get; set; } = null!;
-
-            /// <summary>
-            /// The item to the right of the operator.
-            /// </summary>
-            [RunnableProcessProperty]
-            [Required]
-            public IRunnableProcess<T> Right { get; set; } = null!;
-
-
-            /// <inheritdoc />
-            public override Result<bool> Run(ProcessState processState)
-            {
-                var result = Left.Run(processState).Compose(() => Operator.Run(processState), () => Right.Run(processState))
-                    .Bind(x => CompareItems(x.Item1, x.Item2, x.Item3));
-
-
-                return result;
-            }
-
-            /// <inheritdoc />
-            public override RunnableProcessFactory RunnableProcessFactory => CompareProcessFactory.Instance;
-
-            private static Result<bool> CompareItems(T item1, CompareOperator compareOperator, T item2)
-            {
-                return compareOperator switch
-                {
-                    CompareOperator.Equals => item1.Equals(item2),
-                    CompareOperator.NotEquals => !item1.Equals(item2),
-                    CompareOperator.LessThan => item1.CompareTo(item2) < 0,
-                    CompareOperator.LessThanOrEqual => item1.CompareTo(item2) <= 0,
-                    CompareOperator.GreaterThan => item1.CompareTo(item2) > 0,
-                    CompareOperator.GreaterThanOrEqual => item1.CompareTo(item2) >= 0,
-                    _ => throw new ArgumentOutOfRangeException(nameof(compareOperator), compareOperator, null)
-                };
-            }
-
         }
     }
 }

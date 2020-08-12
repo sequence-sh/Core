@@ -4,8 +4,33 @@ using System.Collections.Immutable;
 using System.ComponentModel.DataAnnotations;
 using CSharpFunctionalExtensions;
 
-namespace Reductech.EDR.Processes.NewProcesses
+namespace Reductech.EDR.Processes.NewProcesses.General
 {
+
+    /// <summary>
+    /// Gets the value of a named variable.
+    /// </summary>
+    public sealed class GetVariable<T> : CompoundRunnableProcess<T>
+    {
+        /// <summary>
+        /// Necessary Parameterless constructor
+        /// </summary>
+        public GetVariable() { }
+
+        public GetVariable(VariableName variableName) => VariableName = variableName;
+
+
+        /// <inheritdoc />
+        public override Result<T> Run(ProcessState processState) => processState.GetVariable<T>(VariableName);
+
+        /// <inheritdoc />
+        public override RunnableProcessFactory RunnableProcessFactory => GetVariableProcessFactory.Instance;
+
+        [VariableName]
+        [Required]
+        public VariableName VariableName { get; set; }
+    }
+
     /// <summary>
     /// Gets the value of a named variable.
     /// </summary>
@@ -36,30 +61,5 @@ namespace Reductech.EDR.Processes.NewProcesses
                 .Bind(processContext.TryGetTypeFromReference)
                 .Bind(x => TryCreateGeneric(typeof(GetVariable<>), x));
 
-
-        /// <summary>
-        /// Gets the value of a named variable.
-        /// </summary>
-        public sealed class GetVariable<T> : CompoundRunnableProcess<T>
-        {
-            /// <summary>
-            /// Necessary Parameterless constructor
-            /// </summary>
-            public GetVariable(){}
-
-
-            public GetVariable(VariableName variableName) => VariableName = variableName;
-
-
-            /// <inheritdoc />
-            public override Result<T> Run(ProcessState processState) => processState.GetVariable<T>(VariableName);
-
-            /// <inheritdoc />
-            public override RunnableProcessFactory RunnableProcessFactory => Instance;
-
-            [VariableName]
-            [Required]
-            public VariableName VariableName { get; set; }
-        }
     }
 }
