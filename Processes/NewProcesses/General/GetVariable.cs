@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.ComponentModel.DataAnnotations;
 using CSharpFunctionalExtensions;
 
@@ -34,32 +32,26 @@ namespace Reductech.EDR.Processes.NewProcesses.General
     /// <summary>
     /// Gets the value of a named variable.
     /// </summary>
-    public class GetVariableProcessFactory : RunnableProcessFactory
+    public class GetVariableProcessFactory : GenericProcessFactory
     {
-        private GetVariableProcessFactory() {}
+        private GetVariableProcessFactory() { }
 
-        public static RunnableProcessFactory Instance { get; } = new GetVariableProcessFactory();
+        public static GenericProcessFactory Instance { get; } = new GetVariableProcessFactory();
+
 
         /// <inheritdoc />
-        public override Result<ITypeReference> TryGetOutputTypeReference(FreezableProcessData freezableProcessData) =>
-            freezableProcessData.GetVariableName(nameof(GetVariable<object>.VariableName))
-                .Map(x => new VariableTypeReference(x) as ITypeReference);
+        public override IProcessNameBuilder ProcessNameBuilder => new ProcessNameBuilderFromTemplate($"<[{nameof(GetVariable<object>.VariableName)}]>");
 
         /// <inheritdoc />
         public override Type ProcessType => typeof(GetVariable<>);
 
         /// <inheritdoc />
-        public override ProcessNameBuilder ProcessNameBuilder => new ProcessNameBuilder($"<[{nameof(GetVariable<object>.VariableName)}]>");
+        protected override ITypeReference GetOutputTypeReference(ITypeReference memberTypeReference) => memberTypeReference;
 
         /// <inheritdoc />
-        public override IEnumerable<Type> EnumTypes => ImmutableArray<Type>.Empty;
-
-
-        /// <inheritdoc />
-        protected override Result<IRunnableProcess> TryCreateInstance(ProcessContext processContext, FreezableProcessData freezableProcessData) =>
-            TryGetOutputTypeReference(freezableProcessData)
-                .Bind(processContext.TryGetTypeFromReference)
-                .Bind(x => TryCreateGeneric(typeof(GetVariable<>), x));
-
+        protected override Result<ITypeReference> GetMemberType(FreezableProcessData freezableProcessData) =>
+            freezableProcessData.GetVariableName(nameof(GetVariable<object>.VariableName))
+                .Map(x => new VariableTypeReference(x) as ITypeReference);
     }
+
 }

@@ -5,15 +5,50 @@ using CSharpFunctionalExtensions;
 namespace Reductech.EDR.Processes.NewProcesses
 {
     /// <summary>
+    /// Builds process names.
+    /// </summary>
+    public interface IProcessNameBuilder
+    {
+        /// <summary>
+        /// Gets the name of the process from the process arguments
+        /// </summary>
+        string GetFromArguments(FreezableProcessData freezableProcessData);
+    }
+
+    /// <summary>
+    /// The default process name builder
+    /// </summary>
+    public class DefaultProcessNameBuilder : IProcessNameBuilder
+    {
+        /// <summary>
+        /// The process type name.
+        /// </summary>
+        public string TypeName { get; }
+
+        /// <summary>
+        /// Creates a new DefaultProcessNameBuilder.
+        /// </summary>
+        public DefaultProcessNameBuilder(string typeName) => TypeName = typeName;
+
+        /// <inheritdoc />
+        public string GetFromArguments(FreezableProcessData freezableProcessData)
+        {
+            var args = string.Join(", ", freezableProcessData.Dictionary.Select(x => $"{x.Key}: {x.Value.MemberString}"));
+
+            return $"{TypeName}({args})";
+        }
+    }
+
+    /// <summary>
     /// Builds the name for a particular instance of a process.
     /// </summary>
-    public class ProcessNameBuilder
+    public class ProcessNameBuilderFromTemplate : IProcessNameBuilder
     {
         /// <summary>
         /// Create a new process name.
         /// </summary>
         /// <param name="templateString"></param>
-        public ProcessNameBuilder(string templateString) => TemplateString = templateString;
+        public ProcessNameBuilderFromTemplate(string templateString) => TemplateString = templateString;
 
 
         /// <summary>

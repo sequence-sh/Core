@@ -159,7 +159,7 @@ namespace Reductech.EDR.Processes.Mutable.Enumerations
 
 #pragma warning disable CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
         /// <summary>
-        /// List of columns and properties to inject.
+        /// Array of columns and properties to inject.
         /// </summary>
         [Required]
         [YamlMember]

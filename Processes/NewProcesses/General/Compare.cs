@@ -63,35 +63,44 @@ namespace Reductech.EDR.Processes.NewProcesses.General
     }
 
     /// <summary>
-    /// Compares two items.
+    /// An operator to use for comparison.
     /// </summary>
-    public sealed class CompareProcessFactory : RunnableProcessFactory
+    public enum CompareOperator
+    {
+        [Display(Name = "=")]
+#pragma warning disable 1591
+        Equals,
+
+        [Display(Name = "!=")]
+        NotEquals,
+        [Display(Name = "<")]
+        LessThan,
+        [Display(Name = "<=")]
+        LessThanOrEqual,
+        [Display(Name = ">")]
+        GreaterThan,
+        [Display(Name = ">=")]
+        GreaterThanOrEqual
+#pragma warning restore 1591
+    }
+
+    public sealed class CompareProcessFactory : GenericProcessFactory
     {
         private CompareProcessFactory() { }
 
         public static RunnableProcessFactory Instance { get; } = new CompareProcessFactory();
 
         /// <inheritdoc />
-        public override Result<ITypeReference> TryGetOutputTypeReference(FreezableProcessData freezableProcessData) => new ActualTypeReference(typeof(bool));
-
-        /// <inheritdoc />
         public override Type ProcessType => typeof(Compare<>);
 
         /// <inheritdoc />
-        public override IEnumerable<Type> EnumTypes =>new[]{typeof(CompareOperator)};
+        public override IEnumerable<Type> EnumTypes => new[] {typeof(CompareOperator)};
 
         /// <inheritdoc />
-        protected override Result<IRunnableProcess> TryCreateInstance(ProcessContext processContext, FreezableProcessData freezableProcessData)
-        {
-            return TryGetMemberTypeReference(freezableProcessData )
-                .Bind(processContext.TryGetTypeFromReference)
-                .Bind(outputType => TryCreateGeneric(typeof(Compare<>), outputType));
-        }
+        protected override ITypeReference GetOutputTypeReference(ITypeReference memberTypeReference) => new ActualTypeReference(typeof(bool));
 
         /// <inheritdoc />
-        public override ProcessNameBuilder ProcessNameBuilder { get; } = new ProcessNameBuilder($"[{nameof(Compare<int>.Left)}] [{nameof(Compare<int>.Operator)}] [{nameof(Compare<int>.Right)}]");
-
-        private Result<ITypeReference> TryGetMemberTypeReference(FreezableProcessData freezableProcessData)
+        protected override Result<ITypeReference> GetMemberType(FreezableProcessData freezableProcessData)
         {
             var result = freezableProcessData.GetArgument(nameof(Compare<int>.Left))
                 .Bind(x => x.TryGetOutputTypeReference())
@@ -102,5 +111,51 @@ namespace Reductech.EDR.Processes.NewProcesses.General
 
             return result;
         }
+
+        /// <inheritdoc />
+        public override IProcessNameBuilder ProcessNameBuilder => new ProcessNameBuilderFromTemplate($"[{nameof(Compare<int>.Left)}] [{nameof(Compare<int>.Operator)}] [{nameof(Compare<int>.Right)}]");
     }
+
+
+    ///// <summary>
+    ///// Compares two items.
+    ///// </summary>
+    //public sealed class CompareProcessFactory : RunnableProcessFactory
+    //{
+    //    private CompareProcessFactory() { }
+
+    //    public static RunnableProcessFactory Instance { get; } = new CompareProcessFactory();
+
+    //    /// <inheritdoc />
+    //    public override Result<ITypeReference> TryGetOutputTypeReference(FreezableProcessData freezableProcessData) => new ActualTypeReference(typeof(bool));
+
+    //    /// <inheritdoc />
+    //    public override Type ProcessType => typeof(Compare<>);
+
+    //    /// <inheritdoc />
+    //    public override IEnumerable<Type> EnumTypes =>new[]{typeof(CompareOperator)};
+
+    //    /// <inheritdoc />
+    //    protected override Result<IRunnableProcess> TryCreateInstance(ProcessContext processContext, FreezableProcessData freezableProcessData)
+    //    {
+    //        return TryGetMemberTypeReference(freezableProcessData )
+    //            .Bind(processContext.TryGetTypeFromReference)
+    //            .Bind(outputType => TryCreateGeneric(typeof(Compare<>), outputType));
+    //    }
+
+    //    /// <inheritdoc />
+    //    public override ProcessNameBuilder ProcessNameBuilder { get; } = new ProcessNameBuilder($"[{nameof(Compare<int>.Left)}] [{nameof(Compare<int>.Operator)}] [{nameof(Compare<int>.Right)}]");
+
+    //    private Result<ITypeReference> TryGetMemberTypeReference(FreezableProcessData freezableProcessData)
+    //    {
+    //        var result = freezableProcessData.GetArgument(nameof(Compare<int>.Left))
+    //            .Bind(x => x.TryGetOutputTypeReference())
+    //            .Compose(() => freezableProcessData.GetArgument(nameof(Compare<int>.Right))
+    //                .Bind(x => x.TryGetOutputTypeReference()))
+    //            .Map(x => new[] { x.Item1, x.Item2 })
+    //            .Bind((x) => MultipleTypeReference.TryCreate(x, TypeName));
+
+    //        return result;
+    //    }
+    //}
 }

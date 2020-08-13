@@ -43,9 +43,7 @@ namespace Reductech.EDR.Processes.NewProcesses.General
         public static RunnableProcessFactory Instance { get; } = new SequenceProcessFactory();
 
         /// <inheritdoc />
-        protected override string ProcessNameTemplate => $"[{nameof(Sequence.Steps)}]";
-
-
+        public override IProcessNameBuilder ProcessNameBuilder => new ProcessNameBuilderFromTemplate($"[{nameof(Sequence.Steps)}]");
 
     }
 }

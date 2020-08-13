@@ -33,7 +33,7 @@ namespace Reductech.EDR.Processes.NewProcesses.General
         /// </summary>
         [RunnableProcessProperty]
         [Required]
-        public IRunnableProcess<Unit> Action { get; set; }
+        public IRunnableProcess<Unit> Action { get; set; } = null!;
 
 
         /// <summary>
@@ -41,7 +41,7 @@ namespace Reductech.EDR.Processes.NewProcesses.General
         /// </summary>
         [RunnableProcessProperty]
         [Required]
-        public IRunnableProcess<bool> Condition { get; set; }
+        public IRunnableProcess<bool> Condition { get; set; } = null!;
 
         /// <inheritdoc />
         public override RunnableProcessFactory RunnableProcessFactory => RepeatWhileProcessFactory.Instance;
@@ -57,6 +57,6 @@ namespace Reductech.EDR.Processes.NewProcesses.General
         public static SimpleRunnableProcessFactory<RepeatWhile, Unit> Instance { get; } = new RepeatWhileProcessFactory();
 
         /// <inheritdoc />
-        protected override string ProcessNameTemplate => $"Repeat '[{nameof(RepeatWhile.Action)}]' while '[{nameof(RepeatWhile.Condition)}]'";
+        public override IProcessNameBuilder ProcessNameBuilder => new ProcessNameBuilderFromTemplate($"Repeat '[{nameof(RepeatWhile.Action)}]' while '[{nameof(RepeatWhile.Condition)}]'");
     }
 }

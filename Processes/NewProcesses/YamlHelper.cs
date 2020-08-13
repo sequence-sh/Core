@@ -100,7 +100,7 @@ namespace Reductech.EDR.Processes.NewProcesses
             if (simpleObject is List<object> list)
             {
                 result = list.Select(x => FromSimpleObject(x, processFactoryStore))
-                    .Select(x => x.Bind(y => y.AsArgument("List Member")))
+                    .Select(x => x.Bind(y => y.AsArgument("Array Member")))
                     .Combine()
                     .Map(x => new ProcessMember(x.ToList()));
             }

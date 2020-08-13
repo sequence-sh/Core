@@ -96,7 +96,8 @@ namespace Reductech.EDR.Processes.NewProcesses.General
         public static SimpleRunnableProcessFactory<For, Unit> Instance { get; } = new ForProcessFactory();
 
         /// <inheritdoc />
-        protected override string ProcessNameTemplate => $"For [{nameof(For.VariableName)}] = [{nameof(For.From)}]; [{nameof(For.VariableName)}] <= [{nameof(For.To)}]; += [{nameof(For.Increment)}]; [{nameof(For.Action)}]";
+        public override IProcessNameBuilder ProcessNameBuilder => new ProcessNameBuilderFromTemplate($"For [{nameof(For.VariableName)}] = [{nameof(For.From)}]; [{nameof(For.VariableName)}] <= [{nameof(For.To)}]; += [{nameof(For.Increment)}]; [{nameof(For.Action)}]");
+
 
         /// <inheritdoc />
         public override Result<Maybe<ITypeReference>> GetTypeReferencesSet(VariableName variableName, FreezableProcessData freezableProcessData) => Maybe<ITypeReference>.From(new ActualTypeReference(typeof(int)));

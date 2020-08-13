@@ -13,14 +13,16 @@ namespace Reductech.EDR.Processes.NewProcesses.General
         /// <inheritdoc />
         public override Result<ITypeReference> TryGetOutputTypeReference(FreezableProcessData freezableProcessData) => new ActualTypeReference(typeof(TOutput));
 
-
         /// <inheritdoc />
-        public override ProcessNameBuilder ProcessNameBuilder => new ProcessNameBuilder(ProcessNameTemplate);
+        public override IProcessNameBuilder ProcessNameBuilder => new DefaultProcessNameBuilder(TypeName);
 
-        /// <summary>
-        /// The template to use with the ProcessNameBuilder.
-        /// </summary>
-        protected abstract string ProcessNameTemplate { get; }
+        ///// <inheritdoc />
+        //public override ProcessNameBuilder ProcessNameBuilder => new ProcessNameBuilder(ProcessNameTemplate);
+
+        ///// <summary>
+        ///// The template to use with the ProcessNameBuilder.
+        ///// </summary>
+        //protected abstract string ProcessNameTemplate { get; }
 
         /// <inheritdoc />
         public override Type ProcessType => typeof(TProcess);

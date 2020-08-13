@@ -13,7 +13,7 @@ namespace Reductech.EDR.Processes.NewProcesses.General
         /// </summary>
         [RunnableProcessProperty]
         [Required]
-        public IRunnableProcess<bool> Left { get; set; }
+        public IRunnableProcess<bool> Left { get; set; } = null!;
 
 
         /// <summary>
@@ -21,7 +21,7 @@ namespace Reductech.EDR.Processes.NewProcesses.General
         /// </summary>
         [RunnableProcessProperty]
         [Required]
-        public IRunnableProcess<bool> Right { get; set; }
+        public IRunnableProcess<bool> Right { get; set; } = null!;
 
         /// <inheritdoc />
         public override Result<bool> Run(ProcessState processState) => Left.Run(processState).Bind(x => x ? true : Right.Run(processState));
@@ -39,9 +39,8 @@ namespace Reductech.EDR.Processes.NewProcesses.General
 
         public static SimpleRunnableProcessFactory<Or, bool> Instance { get; } = new OrProcessFactory();
 
-
         /// <inheritdoc />
-        protected override string ProcessNameTemplate => $"[{nameof(Or.Left)}] || [{nameof(Or.Right)}]";
+        public override IProcessNameBuilder ProcessNameBuilder => new ProcessNameBuilderFromTemplate($"[{nameof(Or.Left)}] || [{nameof(Or.Right)}]");
 
     }
 }

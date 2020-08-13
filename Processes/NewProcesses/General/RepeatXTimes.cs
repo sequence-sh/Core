@@ -13,14 +13,14 @@ namespace Reductech.EDR.Processes.NewProcesses.General
         /// </summary>
         [RunnableProcessProperty]
         [Required]
-        public IRunnableProcess<Unit> Action { get; set; }
+        public IRunnableProcess<Unit> Action { get; set; } = null!;
 
         /// <summary>
         /// The number of times to perform the action.
         /// </summary>
         [RunnableProcessProperty]
         [Required]
-        public IRunnableProcess<int> Number { get; set; }
+        public IRunnableProcess<int> Number { get; set; } = null!;
 
         /// <inheritdoc />
         public override Result<Unit> Run(ProcessState processState)
@@ -51,7 +51,8 @@ namespace Reductech.EDR.Processes.NewProcesses.General
 
         public static SimpleRunnableProcessFactory<RepeatXTimes, Unit> Instance { get; } = new RepeatXTimesProcessFactory();
 
+
         /// <inheritdoc />
-        protected override string ProcessNameTemplate => $"Repeat '[{nameof(RepeatXTimes.Action)}]' '[{nameof(RepeatXTimes.Number)}]' times.";
+        public override IProcessNameBuilder ProcessNameBuilder => new ProcessNameBuilderFromTemplate($"Repeat '[{nameof(RepeatXTimes.Action)}]' '[{nameof(RepeatXTimes.Number)}]' times.");
     }
 }

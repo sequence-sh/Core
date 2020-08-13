@@ -113,8 +113,13 @@ namespace Reductech.EDR.Processes.NewProcesses
             return Result.Failure<IReadOnlyList<IFreezableProcess>>($"{propertyName} was not an list argument");
         }
 
+        /// <summary>
+        /// A string representation of the member.
+        /// </summary>
+        public string MemberString => VariableName?.ToString()??Argument?.ToString()??ListArgument?.ToString()??"Unknown";
+
         /// <inheritdoc />
-        public override string ToString() => new {MemberType, Value= VariableName?.ToString()??Argument?.ToString()??ListArgument?.ToString()??"Unknown" }.ToString()!;
+        public override string ToString() => new {MemberType, Value=MemberString}.ToString()!;
     }
 
     /// <summary>
@@ -244,7 +249,7 @@ namespace Reductech.EDR.Processes.NewProcesses
         /// <summary>
         /// Builds the name for a particular instance of a process.
         /// </summary>
-        public abstract ProcessNameBuilder ProcessNameBuilder { get; }
+        public abstract IProcessNameBuilder ProcessNameBuilder { get; }
 
         /// <summary>
         /// Gets all enum types used by this RunnableProcess.

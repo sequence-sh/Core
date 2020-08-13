@@ -9,8 +9,6 @@ namespace Reductech.EDR.Processes.NewProcesses.General
     /// </summary>
     public sealed class Conditional : CompoundRunnableProcess<Unit>
     {
-
-
         /// <inheritdoc />
         public override Result<Unit> Run(ProcessState processState)
         {
@@ -63,6 +61,6 @@ namespace Reductech.EDR.Processes.NewProcesses.General
         public static ConditionalProcessFactory Instance { get; } = new ConditionalProcessFactory();
 
         /// <inheritdoc />
-        protected override string ProcessNameTemplate => $"If [{nameof(Conditional.Condition)}] then [{nameof(Conditional.ThenProcess)}] else [{nameof(Conditional.ElseProcess)}]";
+        public override IProcessNameBuilder ProcessNameBuilder => new ProcessNameBuilderFromTemplate($"If [{nameof(Conditional.Condition)}] then [{nameof(Conditional.ThenProcess)}] else [{nameof(Conditional.ElseProcess)}]");
     }
 }

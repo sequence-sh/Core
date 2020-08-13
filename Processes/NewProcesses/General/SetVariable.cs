@@ -63,8 +63,9 @@ namespace Reductech.EDR.Processes.NewProcesses.General
         /// <inheritdoc />
         public override Type ProcessType => typeof(SetVariable<>);
 
+
         /// <inheritdoc />
-        public override ProcessNameBuilder ProcessNameBuilder => new ProcessNameBuilder($"[{nameof(SetVariable<object>.VariableName)}] = [{nameof(SetVariable<object>.Value)}]");
+        public override IProcessNameBuilder ProcessNameBuilder => new ProcessNameBuilderFromTemplate($"[{nameof(SetVariable<object>.VariableName)}] = [{nameof(SetVariable<object>.Value)}]");
 
         /// <inheritdoc />
         public override IEnumerable<Type> EnumTypes => ImmutableArray<Type>.Empty;

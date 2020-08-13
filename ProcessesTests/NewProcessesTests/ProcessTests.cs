@@ -94,7 +94,7 @@ namespace Reductech.EDR.Processes.Tests.NewProcessesTests
                         {
                             Value = new GetVariable<string>(FooString)
                         },
-                        List = new Array<string>
+                        Array = new Array<string>
                         {Elements= new []
                         {
                             new Constant<string>("Hello"),

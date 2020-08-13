@@ -32,11 +32,8 @@ namespace Reductech.EDR.Processes.NewProcesses.General
 
         public static RunnableProcessFactory Instance { get; } = new NotProcessFactory();
 
-
         /// <inheritdoc />
-        protected override string ProcessNameTemplate => $"Not [{nameof(Not.Boolean)}]";
-
-
+        public override IProcessNameBuilder ProcessNameBuilder => new ProcessNameBuilderFromTemplate($"Not [{nameof(Not.Boolean)}]");
 
     }
 }
