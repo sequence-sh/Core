@@ -26,7 +26,7 @@ namespace Reductech.EDR.Processes.NewProcesses
         public Result<IRunnableProcess> TryFreeze(ProcessContext _)
         {
             Type elementType = Value.GetType();
-            Type processType = typeof(ConstantRunnableProcess<>).MakeGenericType(elementType);
+            Type processType = typeof(Constant<>).MakeGenericType(elementType);
             var process = Activator.CreateInstance(processType, Value);
 
             //TODO check for exceptions here?
@@ -37,12 +37,15 @@ namespace Reductech.EDR.Processes.NewProcesses
         }
 
         /// <inheritdoc />
-        public Result<IReadOnlyCollection<(string name, ITypeReference type)>> TryGetVariablesSet => ImmutableList<(string name, ITypeReference type)>.Empty;
+        public Result<IReadOnlyCollection<(VariableName VariableName, ITypeReference type)>> TryGetVariablesSet => ImmutableList<(VariableName VariableName, ITypeReference type)>.Empty;
 
         /// <inheritdoc />
-        public string ProcessName => NameHelper.GetConstantName(Value);
+        public string ProcessName => $"{Value}";
 
         /// <inheritdoc />
         public Result<ITypeReference> TryGetOutputTypeReference() => new ActualTypeReference(Value.GetType());
+
+        /// <inheritdoc />
+        public override string ToString() => ProcessName;
     }
 }

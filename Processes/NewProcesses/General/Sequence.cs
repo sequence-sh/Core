@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.Immutable;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using CSharpFunctionalExtensions;
 
@@ -33,42 +31,19 @@ namespace Reductech.EDR.Processes.NewProcesses.General
         [RunnableProcessListProperty]
         [Required]
         public IReadOnlyList<IRunnableProcess<Unit>> Steps { get; set; } = null!;
-
-
     }
 
-
-    public sealed class SequenceProcessFactory : RunnableProcessFactory
+    /// <summary>
+    /// A sequence of steps to be run one after the other.
+    /// </summary>
+    public sealed class SequenceProcessFactory : SimpleRunnableProcessFactory<Sequence, Unit>
     {
-        private SequenceProcessFactory()
-        {
-        }
+        private SequenceProcessFactory() { }
 
         public static RunnableProcessFactory Instance { get; } = new SequenceProcessFactory();
 
         /// <inheritdoc />
-        public override Result<ITypeReference> TryGetOutputTypeReference(
-            IReadOnlyDictionary<string, IFreezableProcess> processArguments,
-            IReadOnlyDictionary<string, IReadOnlyList<IFreezableProcess>> processListArguments) =>
-            new ActualTypeReference(typeof(Unit));
+        public override IProcessNameBuilder ProcessNameBuilder => new ProcessNameBuilderFromTemplate($"[{nameof(Sequence.Steps)}]");
 
-        /// <inheritdoc />
-        public override string TypeName => nameof(Sequence);
-
-        /// <inheritdoc />
-        public override string GetProcessName(IReadOnlyDictionary<string, IFreezableProcess> processArguments, IReadOnlyDictionary<string, IReadOnlyList<IFreezableProcess>> processListArguments)
-        {
-            var steps = processListArguments.TryFind(nameof(Sequence.Steps))
-                .Unwrap(new List<IFreezableProcess>());
-
-            return NameHelper.GetSequenceName(steps);
-        }
-
-        /// <inheritdoc />
-        public override IEnumerable<Type> EnumTypes => ImmutableArray<Type>.Empty;
-
-        /// <inheritdoc />
-        protected override Result<IRunnableProcess> TryCreateInstance(ProcessContext processContext, IReadOnlyDictionary<string, IFreezableProcess> processArguments,
-            IReadOnlyDictionary<string, IReadOnlyList<IFreezableProcess>> processListArguments) => new Sequence();
     }
 }

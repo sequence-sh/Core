@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.ComponentModel.DataAnnotations;
 using CSharpFunctionalExtensions;
 
@@ -43,51 +41,28 @@ namespace Reductech.EDR.Processes.NewProcesses.General
         /// </summary>
         [RunnableProcessProperty]
         public IRunnableProcess<T> ElseValue { get; set; } = null!;
-
-
     }
 
-    public sealed class TestSequenceFactory : RunnableProcessFactory
+    /// <summary>
+    /// Returns one result if a condition is true and another if the condition is false.
+    /// </summary>
+    public sealed class TestSequenceFactory : GenericProcessFactory
     {
-        private TestSequenceFactory()
-        {
-        }
+        private TestSequenceFactory() { }
 
-        public static RunnableProcessFactory Instance { get; } = new TestSequenceFactory();
+        public static GenericProcessFactory Instance { get; } = new TestSequenceFactory();
 
         /// <inheritdoc />
-        public override Result<ITypeReference> TryGetOutputTypeReference(IReadOnlyDictionary<string, IFreezableProcess> processArguments, IReadOnlyDictionary<string, IReadOnlyList<IFreezableProcess>> processListArguments)
-        {
-            var result =
-            processArguments.TryFindOrFail(nameof(Test<object>.ThenValue), "Test Then not set.")
-                .Compose(() => processArguments.TryFindOrFail(nameof(Test<object>.ElseValue), "Test Else not set."))
+        public override Type ProcessType => typeof(Test<>);
+
+        /// <inheritdoc />
+        protected override ITypeReference GetOutputTypeReference(ITypeReference memberTypeReference) => memberTypeReference;
+
+        /// <inheritdoc />
+        protected override Result<ITypeReference> GetMemberType(FreezableProcessData freezableProcessData) =>
+            freezableProcessData.GetArgument(nameof(Test<object>.ThenValue))
+                .Compose(() => freezableProcessData.GetArgument(nameof(Test<object>.ElseValue)))
                 .Bind(x => x.Item1.TryGetOutputTypeReference().Compose(() => x.Item2.TryGetOutputTypeReference()))
-                .Bind(x => MultipleTypeReference.TryCreate(new[] {x.Item1, x.Item2}, TypeName));
-
-            return result;
-        }
-
-        /// <inheritdoc />
-        public override string TypeName => FormatTypeName(typeof(Test<>));
-
-        /// <inheritdoc />
-        public override IEnumerable<Type> EnumTypes => ImmutableArray<Type>.Empty;
-
-        /// <inheritdoc />
-        public override string GetProcessName(IReadOnlyDictionary<string, IFreezableProcess> processArguments, IReadOnlyDictionary<string, IReadOnlyList<IFreezableProcess>> processListArguments)
-        {
-            var conditional = processArguments.TryFind(nameof(Test<object>.Condition)).Unwrap(NameHelper.MissingProcess.Instance );
-            var then = processArguments.TryFind(nameof(Test<object>.Condition)).Unwrap(NameHelper.MissingProcess.Instance);
-            var @else = processArguments.TryFind(nameof(Test<object>.Condition)).Unwrap();
-
-            return NameHelper.GetTestName(conditional, then, @else);
-        }
-
-        /// <inheritdoc />
-        protected override Result<IRunnableProcess> TryCreateInstance(ProcessContext processContext, IReadOnlyDictionary<string, IFreezableProcess> processArguments,
-            IReadOnlyDictionary<string, IReadOnlyList<IFreezableProcess>> processListArguments) =>
-            TryGetOutputTypeReference(processArguments, processListArguments)
-                .Bind(processContext.TryGetTypeFromReference)
-                .Bind(x => TryCreateGeneric(typeof(Test<object>), x));
+                .Bind(x => MultipleTypeReference.TryCreate(new[] { x.Item1, x.Item2 }, TypeName));
     }
 }

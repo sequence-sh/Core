@@ -18,53 +18,137 @@ namespace Reductech.EDR.Processes.Tests.NewProcessesTests
         public override void Test(string key) => base.Test(key);
 
         public const string HelloWorldString = "Hello World";
-        public const string FooString = "Foo";
-        public const string BarString = "Bar";
+        public static readonly VariableName FooString = new VariableName("Foo");
+        public static readonly VariableName BarString = new VariableName("Bar");
 
         /// <inheritdoc />
         protected override IEnumerable<ITestCase> TestCases
         {
             get
             {
-                yield return new TestCase(new Print<string> {Value = new ConstantRunnableProcess<string>(HelloWorldString)},new []{HelloWorldString} );
+                yield return new TestCase("Print 'Hello World'", new Print<string> {Value = new Constant<string>(HelloWorldString)},new []{HelloWorldString} );
 
-                yield return new TestCase(new Sequence
+                yield return new TestCase("Foo = Hello World; Print '<Foo>'",new Sequence
                 {
                     Steps = new List<IRunnableProcess<NewProcesses.Unit>>
                     {
-                        new SetVariableRunnableProcess<string>(FooString, new ConstantRunnableProcess<string>(HelloWorldString)),
-                        new Print<string> {Value = new GetVariableRunnableProcess<string>(FooString)}
+                        new SetVariable<string>(FooString, new Constant<string>(HelloWorldString)),
+                        new Print<string> {Value = new GetVariable<string>(FooString)}
                     }
 
-                },new []{HelloWorldString});
+                }, HelloWorldString);
 
-                yield return new TestCase(new Sequence
+                yield return new TestCase("Foo = Hello World; Bar = <Foo>; Print '<Bar>'",new Sequence
                 {
                     Steps = new List<IRunnableProcess<NewProcesses.Unit>>
                     {
-                        new SetVariableRunnableProcess<string>(FooString, new ConstantRunnableProcess<string>(HelloWorldString)),
-                        new SetVariableRunnableProcess<string>(BarString, new GetVariableRunnableProcess<string>(FooString)),
-                        new Print<string> {Value = new GetVariableRunnableProcess<string>(BarString)}
+                        new SetVariable<string>(FooString, new Constant<string>(HelloWorldString)),
+                        new SetVariable<string>(BarString, new GetVariable<string>(FooString)),
+                        new Print<string> {Value = new GetVariable<string>(BarString)}
                     }
 
-                },new []{HelloWorldString});
+                }, HelloWorldString);
 
 
-                yield return new TestCase(new Sequence
+                yield return new TestCase("Foo = 1 LessThan 2; Print '<Foo>'",new Sequence
                 {
                     Steps = new List<IRunnableProcess<NewProcesses.Unit>>
                     {
-                        new SetVariableRunnableProcess<bool>(FooString, new Compare<int>()
+                        new SetVariable<bool>(FooString, new Compare<int>
                         {
-                            Left = new ConstantRunnableProcess<int>(1),
-                            Operator = new ConstantRunnableProcess<CompareOperator>(CompareOperator.LessThan),
-                            Right = new ConstantRunnableProcess<int>(2)
+                            Left = new Constant<int>(1),
+                            Operator = new Constant<CompareOperator>(CompareOperator.LessThan),
+                            Right = new Constant<int>(2)
                         }),
 
 
-                        new Print<bool> {Value = new GetVariableRunnableProcess<bool>(FooString)}
+                        new Print<bool> {Value = new GetVariable<bool>(FooString)}
                     }
-                },new []{true.ToString()});
+                }, true.ToString());
+
+
+                yield return new TestCase("Print 'True && Not False'",
+                    new Print<bool>
+                    {
+                        Value = new And
+                        {
+                            Left = new Constant<bool>(true),
+                            Right = new Not{Boolean =new Constant<bool>(false) }
+                        }
+                    }, true.ToString());
+
+                yield return new TestCase("Print 'False || Not False'",
+                    new Print<bool>
+                    {
+                        Value = new Or
+                        {
+                            Left = new Constant<bool>(false),
+                            Right = new Not { Boolean = new Constant<bool>(false) }
+                        }
+                    }, true.ToString());
+
+                yield return new TestCase("Foreach Foo in [Hello; World]; Print '<Foo>'",
+                    new ForEach<string>
+                    {
+                        Action = new Print<string>
+                        {
+                            Value = new GetVariable<string>(FooString)
+                        },
+                        Array = new Array<string>
+                        {Elements= new []
+                        {
+                            new Constant<string>("Hello"),
+                            new Constant<string>("World"),
+                        }},
+                        VariableName = FooString
+                    }, "Hello", "World");
+
+                yield return new TestCase("If True then Print 'Hello World' else Print 'World Hello'",
+                    new Conditional
+                    {
+                        Condition = new Constant<bool>(true),
+                        ThenProcess = new Print<string> {Value = new Constant<string>(HelloWorldString)},
+                        ElseProcess = new Print<string> {Value = new Constant<string>("World Hello")}
+                    },
+                    HelloWorldString);
+
+
+                yield return new TestCase("For Foo = 5; Foo <= 10; += 2; Print '<Foo>'",
+                    new For
+                    {
+                        VariableName = FooString,
+                        Action = new Print<int>{Value = new GetVariable<int>(FooString)},
+                        From = new Constant<int>(5),
+                        To = new Constant<int>(10),
+                        Increment = new Constant<int>(2)
+                    },
+                    "5", "7", "9");
+
+                yield return new TestCase("Foo = True; Repeat 'Print 'Hello World'; Foo = False' while '<Foo>'",
+                    new Sequence
+                    {
+                        Steps = new List<IRunnableProcess<NewProcesses.Unit>>
+                        {
+                            new SetVariable<bool>(FooString, new Constant<bool>(true)),
+                            new RepeatWhile
+                            {
+                                Action = new Sequence
+                                {
+                                    Steps = new List<IRunnableProcess<NewProcesses.Unit>>
+                                    {
+                                        new Print<string> {Value = new Constant<string>(HelloWorldString)},
+                                        new SetVariable<bool>(FooString, new Constant<bool>(false)),
+                                    }
+                                },
+                                Condition = new GetVariable<bool>(FooString)
+                            }
+                            }
+                    },
+                    "Hello World"
+
+                    );
+
+
             }
         }
 
@@ -72,14 +156,17 @@ namespace Reductech.EDR.Processes.Tests.NewProcessesTests
 
         private class TestCase : ITestCase
         {
-            public TestCase(IRunnableProcess runnableProcess, IReadOnlyList<string> expectedLoggedValues)
+            public TestCase(string expectedName, IRunnableProcess runnableProcess, params string[] expectedLoggedValues)
             {
                 RunnableProcess = runnableProcess;
                 ExpectedLoggedValues = expectedLoggedValues;
+                ExpectedName = expectedName;
             }
 
+            public string ExpectedName { get; }
+
             /// <inheritdoc />
-            public string Name => RunnableProcess.Name;
+            public string Name => ExpectedName;
 
             public IRunnableProcess RunnableProcess { get; }
 
@@ -89,6 +176,9 @@ namespace Reductech.EDR.Processes.Tests.NewProcessesTests
             /// <inheritdoc />
             public void Execute()
             {
+                RunnableProcess.Name.Should().Be(ExpectedName);
+
+
                 var unfrozen = RunnableProcess.Unfreeze();
 
                 var yaml = unfrozen.SerializeToYaml();
@@ -132,12 +222,8 @@ namespace Reductech.EDR.Processes.Tests.NewProcessesTests
         public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter)
         {
             if (state is FormattedLogValues flv)
-            {
                 foreach (var formattedLogValue in flv)
-                {
                     LoggedValues.Add(formattedLogValue.Value);
-                }
-            }
             else throw new NotImplementedException();
         }
 

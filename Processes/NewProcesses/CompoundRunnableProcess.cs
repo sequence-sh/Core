@@ -19,44 +19,49 @@ namespace Reductech.EDR.Processes.NewProcesses
         public abstract RunnableProcessFactory RunnableProcessFactory { get; }
 
         /// <inheritdoc />
-        public string Name => RunnableProcessFactory.GetProcessName(Arguments, ListArguments);
+        public string Name => RunnableProcessFactory.ProcessNameBuilder.GetFromArguments(FreezableProcessData);
 
         /// <inheritdoc />
         public override string ToString() => RunnableProcessFactory.TypeName;
 
 
-        private IReadOnlyDictionary<string, IFreezableProcess> Arguments
+
+        private FreezableProcessData FreezableProcessData
         {
             get
             {
-                var result = GetType().GetProperties()
-                .Where(x => x.GetCustomAttribute<RunnableProcessPropertyAttribute>() != null)
-                .Select(x => (x.Name, process: x.GetValue(this) as IRunnableProcess))
-                .Where(x => x.process != null)
-                .ToDictionary(x => x.Name, x => x.process!.Unfreeze());
+                var variableNames = GetType().GetProperties()
+                .Where(x => x.GetCustomAttribute<VariableNameAttribute>() != null)
+                .Select(x => (x.Name, variableName: (VariableName)x.GetValue(this)))
+                .Where(x => x.variableName != null)
 
-                return result;
-            }
-        }
+                .ToDictionary(x => x.Name, x => new ProcessMember(x.variableName)  );
 
 
-        private IReadOnlyDictionary<string, IReadOnlyList<IFreezableProcess>> ListArguments
-        {
-            get
-            {
-                var result = GetType()
+                var arguments  = GetType().GetProperties()
+                 .Where(x => x.GetCustomAttribute<RunnableProcessPropertyAttribute>() != null)
+                 .Select(x => (x.Name, process: x.GetValue(this) as IRunnableProcess))
+                 .Where(x => x.process != null)
+                 .ToDictionary(x => x.Name, x => new ProcessMember(x.process!.Unfreeze()));
+
+                var listArguments = GetType()
                 .GetProperties()
                 .Where(x => x.GetCustomAttribute<RunnableProcessListPropertyAttribute>() != null)
                 .Select(x => (x.Name, list: x.GetValue(this) as IEnumerable<IRunnableProcess>))
                 .Where(x => x.list != null)
                 .ToDictionary(x => x.Name,
-                    x => x.list.Select(y => y.Unfreeze()).ToList() as IReadOnlyList<IFreezableProcess>);
+                    x => new ProcessMember( x.list.Select(y => y.Unfreeze()).ToList()));
 
-                return result;
+
+                var processMembers = variableNames.Concat(arguments).Concat(listArguments)
+                    .ToDictionary(x => x.Key, x => x.Value);
+
+
+                return new FreezableProcessData(processMembers);
             }
         }
 
         /// <inheritdoc />
-        public IFreezableProcess Unfreeze() => new CompoundFreezableProcess(RunnableProcessFactory,Arguments, ListArguments);
+        public IFreezableProcess Unfreeze() => new CompoundFreezableProcess(RunnableProcessFactory,FreezableProcessData);
     }
 }

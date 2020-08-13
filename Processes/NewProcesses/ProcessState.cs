@@ -11,15 +11,12 @@ namespace Reductech.EDR.Processes.NewProcesses
     {
         //TODO IObservable?
 
-        private readonly ConcurrentDictionary<string, object>  _stateDictionary = new ConcurrentDictionary<string, object>();
+        private readonly ConcurrentDictionary<VariableName, object>  _stateDictionary = new ConcurrentDictionary<VariableName, object>();
 
         /// <summary>
         /// Create a new ProcessState
         /// </summary>
-        public ProcessState(ILogger logger)
-        {
-            Logger = logger;
-        }
+        public ProcessState(ILogger logger) => Logger = logger;
 
         /// <summary>
         /// The logger that processes will use to output messages.
@@ -29,7 +26,7 @@ namespace Reductech.EDR.Processes.NewProcesses
         /// <summary>
         /// Gets the current value of this variable.
         /// </summary>
-        public Result<T> GetVariable<T>(string key)
+        public Result<T> GetVariable<T>(VariableName key)
         {
             if (_stateDictionary.TryGetValue(key, out var value))
             {
@@ -47,19 +44,13 @@ namespace Reductech.EDR.Processes.NewProcesses
         /// <summary>
         /// Creates or set the value of this variable.
         /// </summary>
-        public Result SetVariable<T>(string key, T variable)
+        public Result SetVariable<T>(VariableName key, T variable)
         {
             _stateDictionary.AddOrUpdate(key, _ => variable!, (_1, _2) => variable!);
 
             return Result.Success();
         }
 
-        private Result<T> Error<T>(string message)
-        {
-            //TODO log error
-
-            return Result.Failure<T>(message);
-        }
-
+        private static Result<T> Error<T>(string message) => Result.Failure<T>(message);
     }
 }

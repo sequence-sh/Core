@@ -13,12 +13,12 @@ namespace Reductech.EDR.Processes.NewProcesses
         /// Creates a new VariableTypeReference.
         /// </summary>
         /// <param name="variableName"></param>
-        public VariableTypeReference(string variableName) => VariableName = variableName;
+        public VariableTypeReference(VariableName variableName) => VariableName = variableName;
 
         /// <summary>
         /// The name of a variable with the same type as this type.
         /// </summary>
-        public string VariableName { get; }
+        public VariableName VariableName { get; }
 
         /// <inheritdoc />
         public bool Equals(ITypeReference? other)

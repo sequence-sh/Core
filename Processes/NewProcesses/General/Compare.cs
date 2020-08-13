@@ -8,7 +8,6 @@ namespace Reductech.EDR.Processes.NewProcesses.General
     /// <summary>
     /// Compares two items.
     /// </summary>
-    /// <typeparam name="T"></typeparam>
     public sealed class Compare<T> : CompoundRunnableProcess<bool> where T : IComparable
     {
         /// <summary>
@@ -24,20 +23,20 @@ namespace Reductech.EDR.Processes.NewProcesses.General
         [RunnableProcessProperty]
         [Required]
 
-        public IRunnableProcess<CompareOperator> Operator { get; set; }= null!;
+        public IRunnableProcess<CompareOperator> Operator { get; set; } = null!;
 
         /// <summary>
         /// The item to the right of the operator.
         /// </summary>
         [RunnableProcessProperty]
         [Required]
-        public IRunnableProcess<T> Right { get; set; }= null!;
+        public IRunnableProcess<T> Right { get; set; } = null!;
 
 
         /// <inheritdoc />
         public override Result<bool> Run(ProcessState processState)
         {
-            var result = Left.Run(processState).Compose(()=> Operator.Run(processState), ()=> Right.Run(processState))
+            var result = Left.Run(processState).Compose(() => Operator.Run(processState), () => Right.Run(processState))
                 .Bind(x => CompareItems(x.Item1, x.Item2, x.Item3));
 
 
@@ -63,57 +62,100 @@ namespace Reductech.EDR.Processes.NewProcesses.General
 
     }
 
-    public sealed class CompareProcessFactory : RunnableProcessFactory
+    /// <summary>
+    /// An operator to use for comparison.
+    /// </summary>
+    public enum CompareOperator
+    {
+        [Display(Name = "=")]
+#pragma warning disable 1591
+        Equals,
+
+        [Display(Name = "!=")]
+        NotEquals,
+        [Display(Name = "<")]
+        LessThan,
+        [Display(Name = "<=")]
+        LessThanOrEqual,
+        [Display(Name = ">")]
+        GreaterThan,
+        [Display(Name = ">=")]
+        GreaterThanOrEqual
+#pragma warning restore 1591
+    }
+
+    public sealed class CompareProcessFactory : GenericProcessFactory
     {
         private CompareProcessFactory() { }
 
         public static RunnableProcessFactory Instance { get; } = new CompareProcessFactory();
 
         /// <inheritdoc />
-        public override Result<ITypeReference> TryGetOutputTypeReference(
-            IReadOnlyDictionary<string, IFreezableProcess> processArguments,
-            IReadOnlyDictionary<string, IReadOnlyList<IFreezableProcess>> processListArguments)
+        public override Type ProcessType => typeof(Compare<>);
+
+        /// <inheritdoc />
+        public override IEnumerable<Type> EnumTypes => new[] {typeof(CompareOperator)};
+
+        /// <inheritdoc />
+        protected override ITypeReference GetOutputTypeReference(ITypeReference memberTypeReference) => new ActualTypeReference(typeof(bool));
+
+        /// <inheritdoc />
+        protected override Result<ITypeReference> GetMemberType(FreezableProcessData freezableProcessData)
         {
-            return new ActualTypeReference(typeof(bool));
-        }
-
-        /// <inheritdoc />
-        public override string TypeName => FormatTypeName(typeof(Compare<>));
-
-        /// <inheritdoc />
-        public override IEnumerable<Type> EnumTypes =>new[]{typeof(CompareOperator)};
-
-        /// <inheritdoc />
-        public override string GetProcessName(IReadOnlyDictionary<string, IFreezableProcess> processArguments, IReadOnlyDictionary<string, IReadOnlyList<IFreezableProcess>> processListArguments)
-        {
-            var leftName = processArguments.TryFind(nameof(Compare<int>.Left)).Unwrap(NameHelper.MissingProcess.Instance);
-            var operatorName = processArguments.TryFind(nameof(Compare<int>.Operator)).Unwrap(NameHelper.MissingProcess.Instance);
-            var rightName = processArguments.TryFind(nameof(Compare<int>.Right)).Unwrap(NameHelper.MissingProcess.Instance);
-
-
-            return NameHelper.GetCompareName(leftName, operatorName, rightName);
-        }
-
-        /// <inheritdoc />
-        protected override Result<IRunnableProcess> TryCreateInstance(ProcessContext processContext, IReadOnlyDictionary<string, IFreezableProcess> processArguments,
-            IReadOnlyDictionary<string, IReadOnlyList<IFreezableProcess>> processListArguments) =>
-            TryGetMemberTypeReference(processArguments, processListArguments)
-                .Bind(processContext.TryGetTypeFromReference)
-                .Bind(outputType => TryCreateGeneric(typeof(Compare<>), outputType));
-
-
-        private Result<ITypeReference> TryGetMemberTypeReference(
-            IReadOnlyDictionary<string, IFreezableProcess> processArguments,
-            IReadOnlyDictionary<string, IReadOnlyList<IFreezableProcess>> processListArguments)
-        {
-            var result = processArguments.TryFindOrFail(nameof(Compare<int>.Left), "Compare Left is not set.")
+            var result = freezableProcessData.GetArgument(nameof(Compare<int>.Left))
                 .Bind(x => x.TryGetOutputTypeReference())
-                .Compose(() => processArguments.TryFindOrFail(nameof(Compare<int>.Right), "Compare Right is not set.")
+                .Compose(() => freezableProcessData.GetArgument(nameof(Compare<int>.Right))
                     .Bind(x => x.TryGetOutputTypeReference()))
                 .Map(x => new[] { x.Item1, x.Item2 })
                 .Bind((x) => MultipleTypeReference.TryCreate(x, TypeName));
 
             return result;
         }
+
+        /// <inheritdoc />
+        public override IProcessNameBuilder ProcessNameBuilder => new ProcessNameBuilderFromTemplate($"[{nameof(Compare<int>.Left)}] [{nameof(Compare<int>.Operator)}] [{nameof(Compare<int>.Right)}]");
     }
+
+
+    ///// <summary>
+    ///// Compares two items.
+    ///// </summary>
+    //public sealed class CompareProcessFactory : RunnableProcessFactory
+    //{
+    //    private CompareProcessFactory() { }
+
+    //    public static RunnableProcessFactory Instance { get; } = new CompareProcessFactory();
+
+    //    /// <inheritdoc />
+    //    public override Result<ITypeReference> TryGetOutputTypeReference(FreezableProcessData freezableProcessData) => new ActualTypeReference(typeof(bool));
+
+    //    /// <inheritdoc />
+    //    public override Type ProcessType => typeof(Compare<>);
+
+    //    /// <inheritdoc />
+    //    public override IEnumerable<Type> EnumTypes =>new[]{typeof(CompareOperator)};
+
+    //    /// <inheritdoc />
+    //    protected override Result<IRunnableProcess> TryCreateInstance(ProcessContext processContext, FreezableProcessData freezableProcessData)
+    //    {
+    //        return TryGetMemberTypeReference(freezableProcessData )
+    //            .Bind(processContext.TryGetTypeFromReference)
+    //            .Bind(outputType => TryCreateGeneric(typeof(Compare<>), outputType));
+    //    }
+
+    //    /// <inheritdoc />
+    //    public override ProcessNameBuilder ProcessNameBuilder { get; } = new ProcessNameBuilder($"[{nameof(Compare<int>.Left)}] [{nameof(Compare<int>.Operator)}] [{nameof(Compare<int>.Right)}]");
+
+    //    private Result<ITypeReference> TryGetMemberTypeReference(FreezableProcessData freezableProcessData)
+    //    {
+    //        var result = freezableProcessData.GetArgument(nameof(Compare<int>.Left))
+    //            .Bind(x => x.TryGetOutputTypeReference())
+    //            .Compose(() => freezableProcessData.GetArgument(nameof(Compare<int>.Right))
+    //                .Bind(x => x.TryGetOutputTypeReference()))
+    //            .Map(x => new[] { x.Item1, x.Item2 })
+    //            .Bind((x) => MultipleTypeReference.TryCreate(x, TypeName));
+
+    //        return result;
+    //    }
+    //}
 }

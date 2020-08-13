@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using CSharpFunctionalExtensions;
 
 namespace Reductech.EDR.Processes.NewProcesses.General
 {
+
     /// <summary>
     /// Represents an ordered collection of objects.
     /// </summary>
@@ -29,58 +29,36 @@ namespace Reductech.EDR.Processes.NewProcesses.General
         [RunnableProcessListProperty]
         [Required]
         public IReadOnlyList<IRunnableProcess<T>> Elements { get; set; } = null!;
-
-
     }
 
     /// <summary>
     /// The factory for creating Arrays.
     /// </summary>
-    public class ArrayProcessFactory : RunnableProcessFactory
+    public class ArrayProcessFactory : GenericProcessFactory
     {
         private ArrayProcessFactory() {}
 
-        /// <summary>
-        /// The ArrayProcessFactory.
-        /// </summary>
-        public static RunnableProcessFactory Instance { get; } = new ArrayProcessFactory();
+        public static GenericProcessFactory Instance { get; } = new ArrayProcessFactory();
 
         /// <inheritdoc />
-        public override Result<ITypeReference> TryGetOutputTypeReference(IReadOnlyDictionary<string, IFreezableProcess> processArguments, IReadOnlyDictionary<string, IReadOnlyList<IFreezableProcess>> processListArguments) =>
-            GetMemberType(processListArguments)
-                .Map(x => new GenericTypeReference(typeof(List<>), new[] {x}) as ITypeReference);
+        public override Type ProcessType => typeof(Array<>);
 
-        private Result<ITypeReference> GetMemberType(IReadOnlyDictionary<string, IReadOnlyList<IFreezableProcess>> processListArguments)
+        /// <inheritdoc />
+        protected override ITypeReference GetOutputTypeReference(ITypeReference memberTypeReference) => new GenericTypeReference(typeof(List<>), new []{memberTypeReference});
+
+        /// <inheritdoc />
+        public override IProcessNameBuilder ProcessNameBuilder => new ProcessNameBuilderFromTemplate($"[[{nameof(Array<object>.Elements)}]]");
+
+        /// <inheritdoc />
+        protected override Result<ITypeReference> GetMemberType(FreezableProcessData freezableProcessData)
         {
             var result =
-            processListArguments.TryFindOrFail(nameof(Array<object>.Elements), "Array elements not set.")
+            freezableProcessData.GetListArgument(nameof(Array<object>.Elements))
                 .Bind(x => x.Select(r => r.TryGetOutputTypeReference()).Combine())
                 .Bind(x => MultipleTypeReference.TryCreate(x, TypeName));
 
 
             return result;
         }
-
-        /// <inheritdoc />
-        public override string TypeName => FormatTypeName(typeof(Array<>));
-
-        /// <inheritdoc />
-        public override string GetProcessName(IReadOnlyDictionary<string, IFreezableProcess> processArguments, IReadOnlyDictionary<string, IReadOnlyList<IFreezableProcess>> processListArguments)
-        {
-            var elementsCount = processListArguments.TryGetValue(nameof(Array<object>.Elements), out var elements)? elements.Count : 0;
-
-            return NameHelper.GetArrayName(elementsCount);
-        }
-
-        /// <inheritdoc />
-        public override IEnumerable<Type> EnumTypes => ImmutableArray<Type>.Empty;
-
-        /// <inheritdoc />
-        protected override Result<IRunnableProcess> TryCreateInstance(ProcessContext processContext, IReadOnlyDictionary<string, IFreezableProcess> processArguments,
-            IReadOnlyDictionary<string, IReadOnlyList<IFreezableProcess>> processListArguments) =>
-            GetMemberType(processListArguments)
-                .Bind(processContext.TryGetTypeFromReference)
-                .Bind(x => TryCreateGeneric(typeof(Array<>), x));
     }
-
 }

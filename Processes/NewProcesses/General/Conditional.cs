@@ -1,18 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.Immutable;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using CSharpFunctionalExtensions;
 
 namespace Reductech.EDR.Processes.NewProcesses.General
 {
+
     /// <summary>
     /// Executes a statement if a condition is true.
     /// </summary>
     public sealed class Conditional : CompoundRunnableProcess<Unit>
     {
-
-
         /// <inheritdoc />
         public override Result<Unit> Run(ProcessState processState)
         {
@@ -55,41 +51,16 @@ namespace Reductech.EDR.Processes.NewProcesses.General
 
     }
 
-
-    public sealed class ConditionalProcessFactory : RunnableProcessFactory
+    /// <summary>
+    /// Executes a statement if a condition is true.
+    /// </summary>
+    public sealed class ConditionalProcessFactory : SimpleRunnableProcessFactory<Conditional, Unit>
     {
         private ConditionalProcessFactory() { }
 
-        public static RunnableProcessFactory Instance { get; } = new ConditionalProcessFactory();
+        public static ConditionalProcessFactory Instance { get; } = new ConditionalProcessFactory();
 
         /// <inheritdoc />
-        public override Result<ITypeReference> TryGetOutputTypeReference(
-            IReadOnlyDictionary<string, IFreezableProcess> processArguments,
-            IReadOnlyDictionary<string, IReadOnlyList<IFreezableProcess>> processListArguments) =>
-            new ActualTypeReference(typeof(Unit));
-
-        /// <inheritdoc />
-        public override string TypeName => nameof(Conditional);
-
-        /// <inheritdoc />
-        public override string GetProcessName(IReadOnlyDictionary<string, IFreezableProcess> processArguments,
-            IReadOnlyDictionary<string, IReadOnlyList<IFreezableProcess>> processListArguments)
-        {
-            var conditionName = processArguments.TryFind(nameof(Conditional.Condition)).Map(x => x.ProcessName)
-                .Unwrap("Condition");
-            var thenName = processArguments.TryFind(nameof(Conditional.ThenProcess)).Map(x => x.ProcessName).Unwrap("??");
-            var elseName = processArguments.TryFind(nameof(Conditional.ElseProcess)).Map(x => x.ProcessName).Unwrap(null);
-
-
-            return ProcessNameHelper.GetConditionalName(conditionName, thenName, elseName);
-        }
-
-        /// <inheritdoc />
-        public override IEnumerable<Type> EnumTypes => ImmutableArray<Type>.Empty;
-
-        /// <inheritdoc />
-        protected override Result<IRunnableProcess> TryCreateInstance(ProcessContext processContext, IReadOnlyDictionary<string, IFreezableProcess> processArguments,
-            IReadOnlyDictionary<string, IReadOnlyList<IFreezableProcess>> processListArguments) => new Conditional();
-
+        public override IProcessNameBuilder ProcessNameBuilder => new ProcessNameBuilderFromTemplate($"If [{nameof(Conditional.Condition)}] then [{nameof(Conditional.ThenProcess)}] else [{nameof(Conditional.ElseProcess)}]");
     }
 }

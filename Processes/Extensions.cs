@@ -38,6 +38,11 @@ namespace Reductech.EDR.Processes
         public static Result<TValue> TryFindOrFail<TKey, TValue>(this IReadOnlyDictionary<TKey, TValue> dictionary, TKey key, string? error)
             =>  dictionary.TryFind(key).ToResult(error??$"The element '{key}' was not present.");
 
+        /// <summary>
+        /// Returns this nullable value as a maybe.
+        /// </summary>
+        public static Maybe<T> Maybe<T>(this T? str) where T : struct => str.HasValue ? CSharpFunctionalExtensions.Maybe<T>.From(str.Value) : CSharpFunctionalExtensions.Maybe<T>.None;
+
 
         /// <summary>
         /// Tries to get this value of an enum type. Returns a failure if it is not present.
@@ -45,7 +50,7 @@ namespace Reductech.EDR.Processes
         public static Result<object> TryGetEnumValue(Type enumType, string value)
         {
             if (Enum.TryParse(enumType, value, true, out var r))
-                return r;
+                return r!;
 
             return Result.Failure<object>($"{enumType.Name} does not have a value '{value}'");
 
