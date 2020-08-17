@@ -19,7 +19,7 @@ namespace Reductech.EDR.Processes.NewProcesses.General
         }
 
         /// <inheritdoc />
-        public override RunnableProcessFactory RunnableProcessFactory => TestSequenceFactory.Instance;
+        public override RunnableProcessFactory RunnableProcessFactory => TestProcessFactory.Instance;
 
 
         /// <summary>
@@ -46,11 +46,11 @@ namespace Reductech.EDR.Processes.NewProcesses.General
     /// <summary>
     /// Returns one result if a condition is true and another if the condition is false.
     /// </summary>
-    public sealed class TestSequenceFactory : GenericProcessFactory
+    public sealed class TestProcessFactory : GenericProcessFactory
     {
-        private TestSequenceFactory() { }
+        private TestProcessFactory() { }
 
-        public static GenericProcessFactory Instance { get; } = new TestSequenceFactory();
+        public static GenericProcessFactory Instance { get; } = new TestProcessFactory();
 
         /// <inheritdoc />
         public override Type ProcessType => typeof(Test<>);

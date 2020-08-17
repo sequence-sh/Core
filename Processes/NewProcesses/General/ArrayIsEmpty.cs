@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using CSharpFunctionalExtensions;
 
@@ -13,6 +14,8 @@ namespace Reductech.EDR.Processes.NewProcesses.General
         /// <summary>
         /// The array to check for emptiness.
         /// </summary>
+        [RunnableProcessProperty]
+        [Required]
         public IRunnableProcess<List<T>> Array { get; set; } = null!;
 
         /// <inheritdoc />

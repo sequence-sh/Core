@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Linq;
 
 namespace Reductech.EDR.Processes.NewProcesses
 {
@@ -50,5 +51,21 @@ namespace Reductech.EDR.Processes.NewProcesses
 
         /// <inheritdoc />
         public IEnumerable<ITypeReference> TypeArgumentReferences => ImmutableList<ITypeReference>.Empty;
+
+        /// <summary>
+        /// Creates a fixed type reference from a type
+        /// </summary>
+        public static ITypeReference Create(Type type)
+        {
+            if (type.IsGenericType)
+            {
+                var genericTypeDef = type.GetGenericTypeDefinition();
+                var arguments = type.GenericTypeArguments;
+
+                return new GenericTypeReference(genericTypeDef, arguments.Select(Create).ToList());
+            }
+            else
+                return new ActualTypeReference(type);
+        }
     }
 }

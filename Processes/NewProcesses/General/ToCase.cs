@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Globalization;
 using CSharpFunctionalExtensions;
@@ -27,7 +28,7 @@ namespace Reductech.EDR.Processes.NewProcesses.General
         /// <inheritdoc />
         public override Result<string> Run(ProcessState processState)
         {
-            return  String.Run(processState).Compose(() => Case.Run(processState))
+            return String.Run(processState).Compose(() => Case.Run(processState))
                 .Map(x => Convert(x.Item1, x.Item2));
         }
 
@@ -49,6 +50,9 @@ namespace Reductech.EDR.Processes.NewProcesses.General
         private ToCaseProcessFactory() { }
 
         public static SimpleRunnableProcessFactory<ToCase, string> Instance { get; } = new ToCaseProcessFactory();
+
+        /// <inheritdoc />
+        public override IEnumerable<Type> EnumTypes => new[] {typeof(TextCase)};
     }
 
     /// <summary>

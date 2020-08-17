@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using CSharpFunctionalExtensions;
 
@@ -50,6 +51,9 @@ namespace Reductech.EDR.Processes.NewProcesses.General
         private TrimProcessFactory() { }
 
         public static SimpleRunnableProcessFactory<Trim, string> Instance { get; } = new TrimProcessFactory();
+
+        /// <inheritdoc />
+        public override IEnumerable<Type> EnumTypes => new[] { typeof(TrimSide) };
     }
 
 

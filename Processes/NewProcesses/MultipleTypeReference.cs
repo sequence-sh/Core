@@ -21,7 +21,8 @@ namespace Reductech.EDR.Processes.NewProcesses
             switch (set.Count)
             {
                 case 0:
-                    return Result.Failure<ITypeReference>($"Could not infer type for {parentProcess} as it has no children.");
+                    return new ActualTypeReference(typeof(object)); //TODO type reference any???
+                    //return Result.Failure<ITypeReference>($"Could not infer type for {parentProcess} as it has no children.");
                 case 1:
                     return Result.Success(set.Single());
                 default:
