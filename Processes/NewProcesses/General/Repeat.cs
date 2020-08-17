@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using CSharpFunctionalExtensions;
 
@@ -13,11 +14,15 @@ namespace Reductech.EDR.Processes.NewProcesses.General
         /// <summary>
         /// The element to repeat.
         /// </summary>
+        [RunnableProcessProperty]
+        [Required]
         public IRunnableProcess<T> Element { get; set; } = null!;
 
         /// <summary>
         /// The number of times to repeat the element
         /// </summary>
+        [RunnableProcessProperty]
+        [Required]
         public IRunnableProcess<int> Number { get; set; } = null!;
 
         /// <inheritdoc />

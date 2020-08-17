@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using CSharpFunctionalExtensions;
 
 namespace Reductech.EDR.Processes.NewProcesses.General
@@ -12,6 +13,8 @@ namespace Reductech.EDR.Processes.NewProcesses.General
         /// <summary>
         /// The array to count.
         /// </summary>
+        [RunnableProcessProperty]
+        [Required]
         public IRunnableProcess<List<T>> Array { get; set; } = null!;
 
         /// <inheritdoc />

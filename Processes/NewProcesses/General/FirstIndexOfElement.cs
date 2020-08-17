@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using CSharpFunctionalExtensions;
 
 namespace Reductech.EDR.Processes.NewProcesses.General
@@ -13,11 +14,15 @@ namespace Reductech.EDR.Processes.NewProcesses.General
         /// <summary>
         /// The array to check.
         /// </summary>
+        [RunnableProcessProperty]
+        [Required]
         public IRunnableProcess<List<T>> Array { get; set; } = null!;
 
         /// <summary>
         /// The element to look for.
         /// </summary>
+        [RunnableProcessProperty]
+        [Required]
         public IRunnableProcess<T> Element { get; set; } = null!;
 
         /// <inheritdoc />
@@ -26,7 +31,7 @@ namespace Reductech.EDR.Processes.NewProcesses.General
                 .Map(x => x.Item1.IndexOf(x.Item2));
 
         /// <inheritdoc />
-        public override RunnableProcessFactory RunnableProcessFactory => FirstIndexOfProcessFactory.Instance;
+        public override RunnableProcessFactory RunnableProcessFactory => FirstIndexOfElementProcessFactory.Instance;
     }
 
     /// <summary>

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using CSharpFunctionalExtensions;
 
 namespace Reductech.EDR.Processes.NewProcesses.General
@@ -12,11 +13,15 @@ namespace Reductech.EDR.Processes.NewProcesses.General
         /// <summary>
         /// The array to check.
         /// </summary>
+        [RunnableProcessProperty]
+        [Required]
         public IRunnableProcess<List<T>> Array { get; set; } = null!;
 
         /// <summary>
         /// The index to get the element at.
         /// </summary>
+        [RunnableProcessProperty]
+        [Required]
         public IRunnableProcess<int> Index { get; set; } = null!;
 
         /// <inheritdoc />
