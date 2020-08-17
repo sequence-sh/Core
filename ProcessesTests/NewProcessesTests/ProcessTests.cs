@@ -67,23 +67,25 @@ namespace Reductech.EDR.Processes.Tests.NewProcessesTests
                 }, true.ToString());
 
 
-                yield return new TestCase("Print 'True && Not False'",
+                yield return new TestCase("Print 'True And Not False'",
                     new Print<bool>
                     {
-                        Value = new And
+                        Value = new ApplyBooleanOperator
                         {
                             Left = new Constant<bool>(true),
-                            Right = new Not{Boolean =new Constant<bool>(false) }
+                            Right = new Not{Boolean =new Constant<bool>(false) },
+                            Operator = new Constant<BooleanOperator>(BooleanOperator.And)
                         }
                     }, true.ToString());
 
-                yield return new TestCase("Print 'False || Not False'",
+                yield return new TestCase("Print 'False Or Not False'",
                     new Print<bool>
                     {
-                        Value = new Or
+                        Value = new ApplyBooleanOperator
                         {
                             Left = new Constant<bool>(false),
-                            Right = new Not { Boolean = new Constant<bool>(false) }
+                            Right = new Not { Boolean = new Constant<bool>(false) },
+                            Operator = new Constant<BooleanOperator>(BooleanOperator.Or)
                         }
                     }, true.ToString());
 
@@ -144,7 +146,19 @@ namespace Reductech.EDR.Processes.Tests.NewProcessesTests
                             }
                             }
                     },
-                    "Hello World"
+                    "Hello World");
+
+                yield return new TestCase("Print 'ApplyMathOperator(Left: 2, Operator: Times, Right: 3)'",
+                    new Print<int>
+                    {
+                        Value = new ApplyMathOperator
+                        {
+                            Left = new Constant<int>(2),
+                            Right = new Constant<int>(3),
+                            Operator = new Constant<MathOperator>(MathOperator.Times)
+                        }
+                    },
+                    "6"
 
                     );
 
