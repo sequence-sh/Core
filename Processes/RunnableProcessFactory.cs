@@ -4,11 +4,335 @@ using System.Collections.Immutable;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.Serialization;
+using System.Text.RegularExpressions;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Processes.Attributes;
 
 namespace Reductech.EDR.Processes
 {
+    /// <summary>
+    /// A custom process serializer.
+    /// </summary>
+    public interface ICustomSerializer
+    {
+        /// <summary>
+        /// Serialize this data as a process of this type.
+        /// </summary>
+        string Serialize(FreezableProcessData data);
+
+        /// <summary>
+        /// Try to deserialize this data.
+        /// </summary>
+        Result<IFreezableProcess> TryDeserialize(string s, ProcessFactoryStore processFactoryStore);
+    }
+
+    /// <summary>
+    /// A custom process serializer.
+    /// </summary>
+    public class CustomSerializer : ICustomSerializer
+    {
+        /// <summary>
+        /// Create a new CustomSerializer
+        /// </summary>
+        public CustomSerializer(string templateString, RunnableProcessFactory factory, Regex matchRegex, params IDeserializerMapping[] mappings)
+        {
+            TemplateString = templateString;
+            Factory = factory;
+            MatchRegex = matchRegex;
+            Mappings = mappings;
+        }
+
+        /// <summary>
+        /// The template string to use.
+        /// </summary>
+        public string TemplateString { get; }
+
+        /// <summary>
+        /// The process factory.
+        /// </summary>
+        public RunnableProcessFactory Factory { get; }
+
+        /// <summary>
+        /// The mappings to use.
+        /// </summary>
+        public IReadOnlyCollection<IDeserializerMapping>  Mappings { get; }
+
+        /// <summary>
+        /// A regex which matches the serialized form of this process.
+        /// </summary>
+        public Regex MatchRegex { get; }
+
+        /// <summary>
+        /// The delimiter to use for lists.
+        /// </summary>
+        public string ListDelimiter { get; } = "; ";
+
+
+        /// <inheritdoc />
+        public string Serialize(FreezableProcessData data)
+        {
+            var errors = new List<string>();
+            var replacedString = NameVariableRegex.Replace(TemplateString, GetReplacement);
+
+
+            if (errors.Any())
+                throw new SerializationException(string.Join(", ", errors));
+
+            return replacedString;
+
+            string GetReplacement(Match m)
+            {
+                var variableName = m.Groups["ArgumentName"].Value;
+
+                var p = data.Dictionary.TryFindOrFail(variableName, null)
+                    .Map(x => x.Join(vn => vn.Name,
+                        fp => fp.ProcessName,
+                        l => string.Join(ListDelimiter, l.Select(i => i.ProcessName))));
+
+                if(p.IsSuccess)
+                    return p.Value;
+
+                errors.Add(p.Error);
+                return "Unknown";
+            }
+        }
+
+        private static readonly Regex NameVariableRegex = new Regex(@"\[(?<ArgumentName>[\w_][\w\d_]*)\]", RegexOptions.Compiled);
+
+        /// <inheritdoc />
+        public Result<IFreezableProcess> TryDeserialize(string s, ProcessFactoryStore processFactoryStore)
+        {
+            if (string.IsNullOrWhiteSpace(s))
+                return Result.Failure<IFreezableProcess>("String was empty");
+
+
+            if(!MatchRegex.TryMatch(s, out var match))
+                return Result.Failure<IFreezableProcess>("Regex did not match");
+
+            var dict = new Dictionary<string, ProcessMember>();
+
+            foreach (var mapping in Mappings)
+            {
+                if (!match.Groups.TryGetValue(mapping.GroupName, out var group))
+                    return Result.Failure<IFreezableProcess>($"Regex group {mapping.GroupName} was not matched.");
+
+                var mr = mapping.TryDeserialize(group.Value, processFactoryStore);
+
+                if (mr.IsFailure) return mr.ConvertFailure<IFreezableProcess>();
+
+                dict[mapping.PropertyName] = mr.Value;
+            }
+
+            var fpd = new FreezableProcessData(dict);
+
+            return new CompoundFreezableProcess(Factory, fpd);
+        }
+    }
+
+    /// <summary>
+    /// Maps a regex group to a property
+    /// </summary>
+    public interface IDeserializerMapping
+    {
+        /// <summary>
+        /// The name of the regex group to match.
+        /// </summary>
+        string GroupName { get; }
+
+        /// <summary>
+        /// The name of the property to map to.
+        /// </summary>
+        string PropertyName { get; }
+
+        /// <summary>
+        /// Try to turn the text of the regex group into a process member.
+        /// </summary>
+        Result<ProcessMember> TryDeserialize(string groupText, ProcessFactoryStore processFactoryStore);
+    }
+
+    /// <summary>
+    /// Deserializes a regex group into a Variable Name.
+    /// </summary>
+    public class VariableNameDeserializerMapping : IDeserializerMapping
+    {
+        public VariableNameDeserializerMapping(string groupName, string propertyName)
+        {
+            GroupName = groupName;
+            PropertyName = propertyName;
+        }
+
+        /// <inheritdoc />
+        public string GroupName { get; }
+
+        /// <inheritdoc />
+        public string PropertyName { get; }
+
+        /// <inheritdoc />
+        public Result<ProcessMember> TryDeserialize(string groupText, ProcessFactoryStore processFactoryStore) => new ProcessMember(new VariableName(groupText));
+    }
+
+    /// <summary>
+    /// Deserializes a regex group into a constant of any type.
+    /// </summary>
+    public class AnyDeserializerMapping : IDeserializerMapping
+    {
+        public AnyDeserializerMapping(string groupName, string propertyName)
+        {
+            GroupName = groupName;
+            PropertyName = propertyName;
+        }
+
+        /// <inheritdoc />
+        public string GroupName { get; }
+
+        /// <inheritdoc />
+        public string PropertyName { get; }
+
+        /// <inheritdoc />
+        public Result<ProcessMember> TryDeserialize(string groupText, ProcessFactoryStore processFactoryStore) => Deserialize(groupText, processFactoryStore);
+
+
+        private static readonly Regex EnumConstantRegex = new Regex(@"(?<enumName>[\w\d_]+)\.(?<enumValue>[\w\d_]+)");
+
+
+        /// <summary>
+        /// Deserialize some text as a constant.
+        /// </summary>
+        public static ProcessMember Deserialize(string text, ProcessFactoryStore processFactoryStore)
+        {
+            if (EnumConstantRegex.TryMatch(text, out var m))
+            {
+                var result = processFactoryStore.EnumTypesDictionary
+                    .TryFindOrFail(m.Groups["enumName"].Value,
+                        $"Could not recognize enum '{m.Groups["enumName"].Value}'")
+                    .Bind(x => Extensions.TryGetEnumValue(x, m.Groups["enumValue"].Value))
+                    .Map(x => new ProcessMember(new ConstantFreezableProcess(x)));
+
+                if (result.IsSuccess)
+                    return result.Value;
+            }
+
+            if (bool.TryParse(text, out var b))
+                return new ProcessMember(new ConstantFreezableProcess(b));
+            if (int.TryParse(text, out var i))
+                return new ProcessMember(new ConstantFreezableProcess(i));
+            return new ProcessMember(new ConstantFreezableProcess(text));
+        }
+    }
+
+    /// <summary>
+    /// Deserializes a regex group into a string
+    /// </summary>
+    public class StringDeserializerMapping : IDeserializerMapping
+    {
+        public StringDeserializerMapping(string groupName, string propertyName)
+        {
+            GroupName = groupName;
+            PropertyName = propertyName;
+        }
+
+        /// <inheritdoc />
+        public string GroupName { get; }
+
+        /// <inheritdoc />
+        public string PropertyName { get; }
+
+        /// <inheritdoc />
+        public Result<ProcessMember> TryDeserialize(string groupText, ProcessFactoryStore processFactoryStore) => new ProcessMember(new ConstantFreezableProcess(groupText));
+    }
+
+    /// <summary>
+    /// Deserializes a regex group into an integer
+    /// </summary>
+    public class IntDeserializerMapping : IDeserializerMapping
+    {
+        public IntDeserializerMapping(string groupName, string propertyName)
+        {
+            GroupName = groupName;
+            PropertyName = propertyName;
+        }
+
+        /// <inheritdoc />
+        public string GroupName { get; }
+
+        /// <inheritdoc />
+        public string PropertyName { get; }
+
+        /// <inheritdoc />
+        public Result<ProcessMember> TryDeserialize(string groupText, ProcessFactoryStore processFactoryStore)
+        {
+            if (int.TryParse(groupText, out var i))
+                return new ProcessMember(new ConstantFreezableProcess(i));
+            return Result.Failure<ProcessMember>($"Could not parse '{groupText}' as an integer");
+
+
+        }
+    }
+
+    /// <summary>
+    /// Deserializes a regex group into a boolean.
+    /// </summary>
+    public class BoolDeserializerMapping : IDeserializerMapping
+    {
+        public BoolDeserializerMapping(string groupName, string propertyName)
+        {
+            GroupName = groupName;
+            PropertyName = propertyName;
+        }
+
+        /// <inheritdoc />
+        public string GroupName { get; }
+
+        /// <inheritdoc />
+        public string PropertyName { get; }
+
+        /// <inheritdoc />
+        public Result<ProcessMember> TryDeserialize(string groupText, ProcessFactoryStore processFactoryStore)
+        {
+            if (bool.TryParse(groupText, out var b))
+                return new ProcessMember(new ConstantFreezableProcess(b));
+            return Result.Failure<ProcessMember>($"Could not parse '{groupText}' as a bool");
+
+        }
+    }
+
+    /// <summary>
+    /// Deserializes a regex group into an enum.
+    /// </summary>
+    public class EnumDeserializerMapping<T> : IDeserializerMapping
+    where T: Enum
+    {
+        public EnumDeserializerMapping(string groupName, string propertyName, Func<T, string> getName)
+        {
+            GroupName = groupName;
+            PropertyName = propertyName;
+
+            Dictionary = Extensions.GetEnumValues<T>().ToDictionary(getName, x => x);
+        }
+
+        /// <inheritdoc />
+        public string GroupName { get; }
+
+        /// <inheritdoc />
+        public string PropertyName { get; }
+
+        /// <summary>
+        /// Enum mapping dictionary.
+        /// </summary>
+        public IReadOnlyDictionary<string, T> Dictionary { get; }
+
+        /// <inheritdoc />
+        public Result<ProcessMember> TryDeserialize(string groupText, ProcessFactoryStore processFactoryStore)
+        {
+            if (Dictionary.TryGetValue(groupText, out var t))
+                return new ProcessMember(new ConstantFreezableProcess(t));
+            return Result.Failure<ProcessMember>($"Could not parse '{t}' as a {typeof(T).Name}");
+        }
+    }
+
+
+
     /// <summary>
     /// A factory for creating runnable processes.
     /// </summary>
@@ -48,6 +372,11 @@ namespace Reductech.EDR.Processes
         /// </summary>
         public virtual Result<Maybe<ITypeReference>> GetTypeReferencesSet(VariableName variableName, FreezableProcessData freezableProcessData) =>
             Maybe<ITypeReference>.None;
+
+        /// <summary>
+        /// Custom serializer to use for yaml serialization and deserialization.
+        /// </summary>
+        public virtual ICustomSerializer? CustomSerializer { get; } = null;
 
 
         /// <summary>

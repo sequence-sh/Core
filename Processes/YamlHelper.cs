@@ -2,61 +2,11 @@
 using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
-using System.Reflection;
 using System.Text.RegularExpressions;
 using CSharpFunctionalExtensions;
 
 namespace Reductech.EDR.Processes
 {
-    /// <summary>
-    /// Allows you to get a process factory from a process name.
-    /// </summary>
-    public class ProcessFactoryStore
-    {
-        /// <summary>
-        /// Creates a new ProcessFactoryStore.
-        /// </summary>
-        public ProcessFactoryStore(IReadOnlyDictionary<string, RunnableProcessFactory> dictionary, IReadOnlyDictionary<string, Type> enumTypesDictionary)
-        {
-            Dictionary = dictionary;
-            EnumTypesDictionary = enumTypesDictionary;
-        }
-
-
-        /// <summary>
-        /// Create a process factory store using all ProcessFactories in the assembly.
-        /// </summary>
-        /// <returns></returns>
-        public static ProcessFactoryStore CreateUsingReflection(Type anyAssemblyMember)
-        {
-            var factories = Assembly.GetAssembly(anyAssemblyMember)!
-                .GetTypes()
-                .Where(x => !x.IsAbstract)
-                .Where(x => typeof(RunnableProcessFactory).IsAssignableFrom(x))
-                .Select(x => x.GetProperty("Instance", BindingFlags.Public | BindingFlags.Static)!.GetValue(null))
-                .Cast<RunnableProcessFactory>().ToList();
-
-            var dictionary = factories.ToDictionary(x => x.TypeName);
-            var enumTypesDictionary = factories.SelectMany(x => x.EnumTypes).Distinct()
-                .ToDictionary(x => x.Name ?? "", StringComparer.OrdinalIgnoreCase);
-
-            return new ProcessFactoryStore(dictionary, enumTypesDictionary!);
-
-
-        }
-
-        /// <summary>
-        /// Types of enumerations that can be used by these processes.
-        /// </summary>
-        public IReadOnlyDictionary<string, Type> EnumTypesDictionary { get; }
-
-        /// <summary>
-        /// Dictionary mapping process names to process factories.
-        /// </summary>
-        public IReadOnlyDictionary<string, RunnableProcessFactory> Dictionary { get; }
-    }
-
-
     /// <summary>
     /// Contains methods for converting Processes to and from Yaml.
     /// </summary>
@@ -94,7 +44,6 @@ namespace Reductech.EDR.Processes
 
         private static Result<ProcessMember> FromSimpleObject(object simpleObject, ProcessFactoryStore processFactoryStore)
         {
-            //TODO special deserializers
 
             Result<ProcessMember> result;
 
@@ -121,28 +70,19 @@ namespace Reductech.EDR.Processes
             }
             else if (simpleObject is string sString3)
             {
-                if (EnumConstantRegex.TryMatch(sString3, out var m))
-                {
-                    result = processFactoryStore.EnumTypesDictionary
-                        .TryFindOrFail(m.Groups["enumName"].Value,
-                            $"Could not recognize enum '{m.Groups["enumName"].Value}'")
-                        .Bind(x => Extensions.TryGetEnumValue(x, m.Groups["enumValue"].Value))
-                        .Map(x => new ProcessMember(new ConstantFreezableProcess(x)));
-                }
-                else if(bool.TryParse(sString3, out var b))
-                    result = Result.Success(new ProcessMember(new ConstantFreezableProcess(b)));
-                else if (int.TryParse(sString3, out var i))
-                    result = Result.Success(new ProcessMember(new ConstantFreezableProcess(i)));
+                var special = TrySpecialDeserialize(sString3, processFactoryStore);
+
+                if (special != null)
+                    result = special;
                 else
-                    result = Result.Success(new ProcessMember(new ConstantFreezableProcess(sString3)));
+                    result = AnyDeserializerMapping.Deserialize(sString3, processFactoryStore);
             }
             else
                 throw new ArgumentOutOfRangeException(nameof(simpleObject));
 
             return result;
 
-            static Result<IFreezableProcess> CreateProcess(RunnableProcessFactory factory,
-                            IEnumerable<(string key, ProcessMember member)> arguments)
+            static Result<IFreezableProcess> CreateProcess(RunnableProcessFactory factory, IEnumerable<(string key, ProcessMember member)> arguments)
             {
                 var errors = new List<string>();
 
@@ -181,9 +121,21 @@ namespace Reductech.EDR.Processes
                 var process = new CompoundFreezableProcess(factory, data);
                 return process;
             }
-        }
 
-        private static readonly Regex EnumConstantRegex = new Regex(@"(?<enumName>[\w\d_]+)\.(?<enumValue>[\w\d_]+)");
+            static ProcessMember? TrySpecialDeserialize(string s, ProcessFactoryStore processFactoryStore)
+            {
+                foreach (var customSerializer in processFactoryStore.Dictionary.Values.Select(x=>x.CustomSerializer))
+                {
+                    if (customSerializer == null) continue;
+                    var r = customSerializer.TryDeserialize(s, processFactoryStore);
+
+                    if (r.IsSuccess)
+                        return new ProcessMember(r.Value);
+                }
+
+                return null;
+            }
+        }
 
         private static object SimplifyProcess(IFreezableProcess process)
         {
@@ -194,16 +146,20 @@ namespace Reductech.EDR.Processes
                 case ConstantFreezableProcess constantFreezableProcess:
                     return constantFreezableProcess.Value.ToString() ?? "";
                 case CompoundFreezableProcess compoundFreezableProcess:
-                    {
-                        IDictionary<string, object> expandoObject = new ExpandoObject();
+                {
+                    var customSerializer = compoundFreezableProcess.ProcessFactory.CustomSerializer;
 
-                        expandoObject[TypeString] = compoundFreezableProcess.ProcessFactory.TypeName;
+                    if (customSerializer != null)
+                        return customSerializer.Serialize(compoundFreezableProcess.FreezableProcessData);
 
 
-                        foreach (var (name, m) in compoundFreezableProcess.FreezableProcessData.Dictionary)
-                            expandoObject[name] = ToSimpleObject(m);
+                    IDictionary<string, object> expandoObject = new ExpandoObject();
+                    expandoObject[TypeString] = compoundFreezableProcess.ProcessFactory.TypeName;
 
-                        return expandoObject;
+                    foreach (var (name, m) in compoundFreezableProcess.FreezableProcessData.Dictionary)
+                        expandoObject[name] = ToSimpleObject(m);
+
+                    return expandoObject;
                     }
                 default:
                     throw new ArgumentOutOfRangeException(nameof(process));

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using CSharpFunctionalExtensions;
 
 namespace Reductech.EDR.Processes
@@ -30,6 +31,11 @@ namespace Reductech.EDR.Processes
             }
             return value.ToString();
         }
+
+        /// <summary>
+        /// Gets all possible values of this enum.
+        /// </summary>
+        public static IEnumerable<T> GetEnumValues<T>() where T: Enum => Enum.GetValues(typeof(T)).Cast<T>();
 
         /// <summary>
         /// Tries to get the element. Returns a failure if it is not present.
