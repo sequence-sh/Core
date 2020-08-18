@@ -5,10 +5,8 @@ using System.Linq;
 using System.Reflection;
 using Namotion.Reflection;
 using Reductech.EDR.Processes.Attributes;
-using Reductech.EDR.Processes.Mutable;
 using Reductech.Utilities.InstantConsole;
 using YamlDotNet.Serialization;
-using Process = Reductech.EDR.Processes.Mutable.Process;
 
 namespace Reductech.EDR.Processes
 {
@@ -22,7 +20,7 @@ namespace Reductech.EDR.Processes
         /// <summary>
         /// Creates a new YamlObjectWrapper.
         /// </summary>
-        public YamlObjectWrapper(Type processType, DocumentationCategory category)
+        public YamlObjectWrapper(Type processType, DocumentationCategory category) //TODO switch to process factory
         {
             DocumentationCategory = category;
             _processType = processType;
@@ -39,11 +37,27 @@ namespace Reductech.EDR.Processes
             Parameters = RelevantProperties.Select(propertyInfo =>
                 new PropertyWrapper(propertyInfo, propertyInfo.GetValue(instance)?.ToString()  )).ToList();
 
-            var reqObjects = instance is Process process ? process.GetAllRequirements() : Enumerable.Empty<Requirement>();
 
-            Requirements = reqObjects.Select(x => x.ToString()!).Distinct();
+            if (instance is ICompoundRunnableProcess compoundRunnableProcess)
+            {
+                Requirements = compoundRunnableProcess.RunnableProcessFactory.Requirements.Select(x=>x.ToString()).ToList();// reqObjects.Select(x => x.ToString()!).Distinct();
 
-            TypeDetails = instance is Process process1 ? process1.GetReturnTypeInfo() : null;
+                TypeDetails = compoundRunnableProcess.RunnableProcessFactory.TypeName;// instance is IRunnableProcess process1 ? process1.GetReturnTypeInfo() : null;
+            }
+            else if (instance is IConstantRunnableProcess constantRunnableProcess)
+            {
+                Requirements = new List<string>();
+
+                TypeDetails = constantRunnableProcess.OutputType.Name;
+            }
+            else
+                throw new ArgumentOutOfRangeException();
+
+            //var reqObjects = instance is IRunnableProcess process ? process.GetAllRequirements() : Enumerable.Empty<Requirement>();
+
+            //Requirements = reqObjects.Select(x => x.ToString()!).Distinct();
+
+            //TypeDetails = instance is IRunnableProcess process1 ? process1 .GetReturnTypeInfo() : null;
         }
 
         /// <inheritdoc />
