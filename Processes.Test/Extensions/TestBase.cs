@@ -2,9 +2,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
-namespace Reductech.EDR.Processes.Tests.Extensions
+namespace Reductech.EDR.Processes.Test.Extensions
 {
     public interface ITestCase
     {

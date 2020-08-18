@@ -3,7 +3,7 @@ using CSharpFunctionalExtensions;
 using FluentAssertions;
 using Xunit;
 
-namespace Reductech.EDR.Processes.Tests.Extensions
+namespace Reductech.EDR.Processes.Test.Extensions
 {
     public static class TestExtensions
     {

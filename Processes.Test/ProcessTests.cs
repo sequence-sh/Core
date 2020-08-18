@@ -4,10 +4,10 @@ using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Internal;
 using Reductech.EDR.Processes.General;
-using Reductech.EDR.Processes.Tests.Extensions;
+using Reductech.EDR.Processes.Test.Extensions;
 using Xunit;
 
-namespace Reductech.EDR.Processes.Tests.NewProcessesTests
+namespace Reductech.EDR.Processes.Test
 {
     public class ProcessTests : TestBase
     {
