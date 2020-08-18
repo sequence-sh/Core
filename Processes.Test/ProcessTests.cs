@@ -9,6 +9,61 @@ using Xunit;
 
 namespace Reductech.EDR.Processes.Test
 {
+    public class YamlTests : TestBase
+    {
+
+        /// <inheritdoc />
+        [Theory]
+        [ClassData(typeof(YamlTests))]
+        public override void Test(string key) => base.Test(key);
+
+        /// <inheritdoc />
+        protected override IEnumerable<ITestCase> TestCases
+        {
+            get
+            {
+                yield return new TestCase("");
+            }
+        }
+
+
+        private sealed class TestCase : ITestCase
+        {
+            public TestCase(string yaml, params string[] expectedLoggedValues)
+            {
+                ExpectedLoggedValues = expectedLoggedValues;
+                Yaml = yaml;
+            }
+
+            /// <inheritdoc />
+            public string Name => Yaml;
+
+            /// <summary>
+            /// The yaml to test
+            /// </summary>
+            public string Yaml { get; }
+
+
+            public IReadOnlyList<string> ExpectedLoggedValues { get; }
+
+            /// <inheritdoc />
+            public void Execute()
+            {
+                var pfs = ProcessFactoryStore.CreateUsingReflection(typeof(RunnableProcessFactory));
+                var logger = new TestLogger();
+
+                var yamlRunner = new YamlRunner(EmptySettings.Instance, logger, pfs);
+
+                var runResult = yamlRunner.RunProcessFromYamlString(Yaml);
+
+                runResult.ShouldBeSuccessful();
+
+                logger.LoggedValues.Should().BeEquivalentTo(ExpectedLoggedValues);
+            }
+        }
+    }
+
+
     public class ProcessTests : TestBase
     {
         /// <inheritdoc />

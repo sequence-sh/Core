@@ -24,7 +24,7 @@ namespace Reductech.EDR.Processes
         /// <summary>
         /// Try to deserialize this data.
         /// </summary>
-        Result<IFreezableProcess> TryDeserialize(string s, ProcessFactoryStore processFactoryStore);
+        Result<IFreezableProcess> TryDeserialize(string s, ProcessFactoryStore processFactoryStore, RunnableProcessFactory factory);
     }
 
     /// <summary>
@@ -35,10 +35,9 @@ namespace Reductech.EDR.Processes
         /// <summary>
         /// Create a new CustomSerializer
         /// </summary>
-        public CustomSerializer(string templateString, RunnableProcessFactory factory, Regex matchRegex, params IDeserializerMapping[] mappings)
+        public CustomSerializer(string templateString, Regex matchRegex, params IDeserializerMapping[] mappings)
         {
             TemplateString = templateString;
-            Factory = factory;
             MatchRegex = matchRegex;
             Mappings = mappings;
         }
@@ -47,11 +46,6 @@ namespace Reductech.EDR.Processes
         /// The template string to use.
         /// </summary>
         public string TemplateString { get; }
-
-        /// <summary>
-        /// The process factory.
-        /// </summary>
-        public RunnableProcessFactory Factory { get; }
 
         /// <summary>
         /// The mappings to use.
@@ -101,7 +95,7 @@ namespace Reductech.EDR.Processes
         private static readonly Regex NameVariableRegex = new Regex(@"\[(?<ArgumentName>[\w_][\w\d_]*)\]", RegexOptions.Compiled);
 
         /// <inheritdoc />
-        public Result<IFreezableProcess> TryDeserialize(string s, ProcessFactoryStore processFactoryStore)
+        public Result<IFreezableProcess> TryDeserialize(string s, ProcessFactoryStore processFactoryStore, RunnableProcessFactory factory)
         {
             if (string.IsNullOrWhiteSpace(s))
                 return Result.Failure<IFreezableProcess>("String was empty");
@@ -126,7 +120,7 @@ namespace Reductech.EDR.Processes
 
             var fpd = new FreezableProcessData(dict);
 
-            return new CompoundFreezableProcess(Factory, fpd);
+            return new CompoundFreezableProcess(factory, fpd);
         }
     }
 

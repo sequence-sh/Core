@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
-using System.Text.RegularExpressions;
 using CSharpFunctionalExtensions;
+using Reductech.EDR.Processes.General;
 
 namespace Reductech.EDR.Processes
 {
@@ -17,7 +17,7 @@ namespace Reductech.EDR.Processes
         /// </summary>
         public static string SerializeToYaml(this IFreezableProcess process)
         {
-            var obj = SimplifyProcess(process);
+            var obj = SimplifyProcess(process, true);
             var serializer = new YamlDotNet.Serialization.Serializer();
 
             var r = serializer.Serialize(obj);
@@ -36,7 +36,14 @@ namespace Reductech.EDR.Processes
 
             var result = FromSimpleObject(o, processFactoryStore);
 
-            return result.Bind(x => x.AsArgument("Process"));
+            return result.Bind(x =>
+                x.Join(vn => Result.Failure<IFreezableProcess>("Yaml must contain a process or list of processes"),
+                        Result.Success,
+                        l => new CompoundFreezableProcess(SequenceProcessFactory.Instance,
+                            new FreezableProcessData(new Dictionary<string, ProcessMember>
+                                {{nameof(Sequence.Steps), new ProcessMember(l)}}))
+
+                    ));
         }
 
         private const string TypeString = "Do";
@@ -124,10 +131,10 @@ namespace Reductech.EDR.Processes
 
             static ProcessMember? TrySpecialDeserialize(string s, ProcessFactoryStore processFactoryStore)
             {
-                foreach (var customSerializer in processFactoryStore.Dictionary.Values.Select(x=>x.CustomSerializer))
+                foreach (var (factory, customSerializer)  in processFactoryStore.Dictionary.Values.Select(factory=> (factory,factory.CustomSerializer)))
                 {
                     if (customSerializer == null) continue;
-                    var r = customSerializer.TryDeserialize(s, processFactoryStore);
+                    var r = customSerializer.TryDeserialize(s, processFactoryStore, factory);
 
                     if (r.IsSuccess)
                         return new ProcessMember(r.Value);
@@ -137,7 +144,7 @@ namespace Reductech.EDR.Processes
             }
         }
 
-        private static object SimplifyProcess(IFreezableProcess process)
+        private static object SimplifyProcess(IFreezableProcess process, bool isTopLevel)
         {
             switch (process)
             {
@@ -147,6 +154,11 @@ namespace Reductech.EDR.Processes
                     return constantFreezableProcess.Value.ToString() ?? "";
                 case CompoundFreezableProcess compoundFreezableProcess:
                 {
+                    if (isTopLevel && compoundFreezableProcess.ProcessFactory == SequenceProcessFactory.Instance &&
+                        compoundFreezableProcess.FreezableProcessData.Dictionary.TryGetValue(nameof(Sequence.Steps), out var processMember))
+                        return ToSimpleObject(processMember);
+
+
                     var customSerializer = compoundFreezableProcess.ProcessFactory.CustomSerializer;
 
                     if (customSerializer != null)
@@ -168,6 +180,8 @@ namespace Reductech.EDR.Processes
 
 
         private static object ToSimpleObject(ProcessMember member) =>
-            member.Join(x=>x.Name, SimplifyProcess, l=>l.Select(SimplifyProcess).ToList());
+            member.Join(x=>x.Name,
+                x=> SimplifyProcess(x, false),
+                l=>l.Select(x=>SimplifyProcess(x, false)).ToList());
     }
 }
