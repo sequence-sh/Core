@@ -1,10 +1,6 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using FluentAssertions;
-using Reductech.EDR.Processes.Immutable;
-using Reductech.EDR.Processes.Output;
 using Xunit;
 
 namespace Reductech.EDR.Processes.Tests.Extensions
@@ -68,37 +64,37 @@ namespace Reductech.EDR.Processes.Tests.Extensions
                 realError.Should().Be(expectedError);
         }
 
-        public static Result<(T result, List<string> messages)> GetResultFromImmutableProcess<T>(this IImmutableProcess<T> process, bool failOnWarning)
-        {
-            var enumerateResult = process.Execute().ToListAsync().Result;
+        //public static Result<(T result, List<string> messages)> GetResultFromImmutableProcess<T>(this IImmutableProcess<T> process, bool failOnWarning)
+        //{
+        //    var enumerateResult = process.Execute().ToListAsync().Result;
 
-            var errors = enumerateResult.Where(x => x.OutputType == OutputType.Error).Select(x => x.Text).ToList();
+        //    var errors = enumerateResult.Where(x => x.OutputType == OutputType.Error).Select(x => x.Text).ToList();
 
-            if (errors.Any())
-                return Result.Failure<(T, List<string>)>(string.Join("\result\n", errors));
+        //    if (errors.Any())
+        //        return Result.Failure<(T, List<string>)>(string.Join("\result\n", errors));
 
-            if (failOnWarning)
-            {
-                var warnings = enumerateResult.Where(x => x.OutputType == OutputType.Warning).Select(x => x.Text).ToList();
+        //    if (failOnWarning)
+        //    {
+        //        var warnings = enumerateResult.Where(x => x.OutputType == OutputType.Warning).Select(x => x.Text).ToList();
 
-                if (warnings.Any())
-                    return Result.Failure<(T, List<string>)>(string.Join("\result\n", errors));
-            }
+        //        if (warnings.Any())
+        //            return Result.Failure<(T, List<string>)>(string.Join("\result\n", errors));
+        //    }
 
-            var success = enumerateResult.SingleOrDefault(x => x.OutputType == OutputType.Success);
+        //    var success = enumerateResult.SingleOrDefault(x => x.OutputType == OutputType.Success);
 
-            if (success == null)
-                return Result.Failure<(T, List<string>)>("Process had no success output");
-
-
-            var messages = enumerateResult
-                .Where(x => x.OutputType == OutputType.Message)
-                .Select(x => x.Text).ToList();
-
-            return (success.Value!, messages);
+        //    if (success == null)
+        //        return Result.Failure<(T, List<string>)>("Process had no success output");
 
 
-        }
+        //    var messages = enumerateResult
+        //        .Where(x => x.OutputType == OutputType.Message)
+        //        .Select(x => x.Text).ToList();
+
+        //    return (success.Value!, messages);
+
+
+        //}
 
 
     }

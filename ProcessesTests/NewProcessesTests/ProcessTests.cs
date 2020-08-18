@@ -3,8 +3,7 @@ using System.Collections.Generic;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Internal;
-using Reductech.EDR.Processes.NewProcesses;
-using Reductech.EDR.Processes.NewProcesses.General;
+using Reductech.EDR.Processes.General;
 using Reductech.EDR.Processes.Tests.Extensions;
 using Xunit;
 
@@ -318,7 +317,7 @@ namespace Reductech.EDR.Processes.Tests.NewProcessesTests
         private static Array<T> Array<T>(params IRunnableProcess<T>[] elements)=> new Array<T>{Elements = elements};
         private static SetVariable<T> SetVariable<T>(VariableName variableName, IRunnableProcess<T> runnableProcess) => new SetVariable<T>(variableName, runnableProcess);
 
-        private static Sequence Sequence(params IRunnableProcess<NewProcesses.Unit>[] steps)=> new Sequence{Steps = steps};
+        private static Sequence Sequence(params IRunnableProcess<Unit>[] steps)=> new Sequence{Steps = steps};
 
 
         private class TestCase : ITestCase
@@ -345,35 +344,16 @@ namespace Reductech.EDR.Processes.Tests.NewProcessesTests
             {
                 RunnableProcess.Name.Should().Be(ExpectedName);
 
-
                 var unfrozen = RunnableProcess.Unfreeze();
 
                 var yaml = unfrozen.SerializeToYaml();
 
-                var pfs = ProcessFactoryStore.CreateUsingReflection();
-
-
-                var deserializeResult = NewProcesses.YamlHelper.DeserializeFromYaml(yaml, pfs);
-
-                deserializeResult.ShouldBeSuccessful();
-
-                deserializeResult.Value.ProcessName.Should().Be(unfrozen.ProcessName);
-
-                var processContextResult = ProcessContext.TryCreate(deserializeResult.Value);
-                processContextResult.ShouldBeSuccessful();
-
-                var freezeResult = deserializeResult.Value.TryFreeze(processContextResult.Value);
-                freezeResult.ShouldBeSuccessful();
-
-                var runnable = freezeResult.Value.As<IRunnableProcess<NewProcesses.Unit>>();
-
-                runnable.Should().NotBeNull("Process should unfreeze to runnable process of unit");
-
+                var pfs = ProcessFactoryStore.CreateUsingReflection(typeof(RunnableProcessFactory));
                 var logger = new TestLogger();
 
-                var state = new ProcessState(logger );
+                var yamlRunner = new YamlRunner(EmptySettings.Instance, logger, pfs);
 
-                var runResult = runnable.Run(state);
+                var runResult = yamlRunner.RunProcessFromYamlString(yaml);
 
                 runResult.ShouldBeSuccessful();
 

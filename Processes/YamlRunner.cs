@@ -1,10 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
+using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using JetBrains.Annotations;
-using Reductech.EDR.Processes.Mutable;
-using Reductech.EDR.Processes.Output;
+using Microsoft.Extensions.Logging;
 
 namespace Reductech.EDR.Processes
 {
@@ -16,13 +15,16 @@ namespace Reductech.EDR.Processes
         /// <summary>
         /// Creates a new Yaml Runner
         /// </summary>
-        /// <param name="processSettings"></param>
-        public YamlRunner(IProcessSettings processSettings)
+        public YamlRunner(IProcessSettings processSettings, ILogger logger,  ProcessFactoryStore processFactoryStore)
         {
             _processSettings = processSettings;
+            _logger = logger;
+            _processFactoryStore = processFactoryStore;
         }
 
         private readonly IProcessSettings _processSettings;
+        private readonly ILogger _logger;
+        private readonly ProcessFactoryStore _processFactoryStore;
 
         /// <summary>
         /// Run process defined in a yaml string.
@@ -30,36 +32,15 @@ namespace Reductech.EDR.Processes
         /// <param name="yamlString">Yaml representing the process.</param>
         /// <returns></returns>
         [UsedImplicitly]
-        public async IAsyncEnumerable<Result<string>> RunProcessFromYamlString(string yamlString)
+        public Result RunProcessFromYamlString(string yamlString)
         {
-            var yamlResult = YamlHelper.TryMakeFromYaml(yamlString);
+            var result = YamlHelper.DeserializeFromYaml(yamlString, _processFactoryStore)
+                    .Bind(x=>x.TryFreeze())
+                    .BindCast<IRunnableProcess, IRunnableProcess<Unit>>()
+                    .Bind(x=> x.Run(new ProcessState(_logger, _processSettings)));
 
-            if (yamlResult.IsFailure)
-            {
-                yield return yamlResult.ConvertFailure<string>();
-                yield break;
-            }
+            return result;
 
-            var (_, freezeFailure, immutableProcess, freezeError) = yamlResult.Value.TryFreeze<Unit>(_processSettings);
-
-            if (freezeFailure)
-                yield return Result.Failure<string>(freezeError);
-            else
-            {
-                await foreach (var output in immutableProcess.Execute())
-                {
-                    var r = output.OutputType switch
-                    {
-                        OutputType.Error => Result.Failure<string>(output.Text),
-                        OutputType.Warning => Result.Success(output.Text),
-                        OutputType.Message => Result.Success(output.Text),
-                        OutputType.Success => Result.Success(output.Text),
-                        _ => throw new ArgumentOutOfRangeException()
-                    };
-
-                    yield return r;
-                }
-            }
         }
 
         /// <summary>
@@ -68,13 +49,13 @@ namespace Reductech.EDR.Processes
         /// <param name="yamlPath">Path to the yaml file.</param>
         /// <returns></returns>
         [UsedImplicitly]
-        public async IAsyncEnumerable<Result<string>> RunProcessFromYaml(string yamlPath)
+        public async Task<Result> RunProcessFromYaml(string yamlPath)
         {
             string? text;
             string? errorMessage;
             try
             {
-                text = File.ReadAllText(yamlPath);
+                text = await File.ReadAllTextAsync(yamlPath);
                 errorMessage = null;
             }
 #pragma warning disable CA1031 // Do not catch general exception types
@@ -86,19 +67,11 @@ namespace Reductech.EDR.Processes
 #pragma warning restore CA1031 // Do not catch general exception types
 
             if (errorMessage != null)
-            {
-                yield return Result.Failure<string>(errorMessage);
-            }
+                return Result.Failure<string>(errorMessage);
             else if (!string.IsNullOrWhiteSpace(text))
-            {
-                var r = RunProcessFromYamlString(text);
-                await foreach(var rl in r)
-                    yield return rl;
-            }
+                return RunProcessFromYamlString(text);
             else
-            {
-                yield return Result.Failure<string>("File is empty");
-            }
+                return Result.Failure<string>("File is empty");
         }
     }
 }
