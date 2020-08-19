@@ -2,14 +2,16 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Xunit.Abstractions;
 
 namespace Reductech.EDR.Processes.Test.Extensions
 {
     public interface ITestCase
     {
         string Name { get; }
-        void Execute();
+        void Execute(ITestOutputHelper testOutputHelper);
     }
+
 
 
     /// <summary>
@@ -17,6 +19,7 @@ namespace Reductech.EDR.Processes.Test.Extensions
     /// </summary>
     public abstract class TestBase : IEnumerable<object[]>
     {
+
         /// <summary>
         /// Override this method and add [TheoryData] and [ClassData] attributes to it
         /// </summary>
@@ -25,13 +28,15 @@ namespace Reductech.EDR.Processes.Test.Extensions
         {
             var @case = _testCaseDictionary.Value[key];
 
-            @case.Execute();
+            @case.Execute(TestOutputHelper);
         }
 
-        protected TestBase()
-        {
-            _testCaseDictionary = new Lazy<IReadOnlyDictionary<string, ITestCase>>(() => MakeDictionary(TestCases));
-        }
+
+#pragma warning disable 8618 //The constructor must be parameterless. TestOutputHelper should be set directly from the public constructor.
+        protected TestBase() => _testCaseDictionary = new Lazy<IReadOnlyDictionary<string, ITestCase>>(() => MakeDictionary(TestCases));
+#pragma warning restore 8618
+
+        public ITestOutputHelper TestOutputHelper { get; set; }
 
         private readonly Lazy<IReadOnlyDictionary<string, ITestCase>> _testCaseDictionary;
 
