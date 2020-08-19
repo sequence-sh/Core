@@ -130,7 +130,8 @@ namespace Reductech.EDR.Processes
 
             static ProcessMember? TrySpecialDeserialize(string s, ProcessFactoryStore processFactoryStore)
             {
-                foreach (var (factory, customSerializer) in processFactoryStore.Dictionary.Values.Select(factory=> (factory,factory.CustomSerializer)))
+                foreach (var (factory, customSerializer) in processFactoryStore.Dictionary.Values
+                    .SelectMany(factory=> factory.CustomSerializers.Select(customSerializer=> (factory, customSerializer))))
                 {
                     if (customSerializer == null) continue;
                     var r = customSerializer.TryDeserialize(s, processFactoryStore, factory);
@@ -143,7 +144,7 @@ namespace Reductech.EDR.Processes
             }
         }
 
-        
+
 
         private static object SimplifyProcess(IFreezableProcess process, bool isTopLevel)
         {
@@ -160,13 +161,11 @@ namespace Reductech.EDR.Processes
                         return ToSimpleObject(processMember);
 
 
-                    var customSerializer = compoundFreezableProcess.ProcessFactory.CustomSerializer;
-
-                    if (customSerializer != null)
+                    foreach (var customSerializer in compoundFreezableProcess.ProcessFactory.CustomSerializers)
                     {
-                        var sr = customSerializer.TrySerialize(compoundFreezableProcess.FreezableProcessData);
-                        if (sr.IsSuccess)
-                            return sr.Value;
+                            var sr = customSerializer.TrySerialize(compoundFreezableProcess.FreezableProcessData);
+                            if (sr.IsSuccess)
+                                return sr.Value;
                     }
 
 

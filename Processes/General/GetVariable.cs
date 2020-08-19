@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text.RegularExpressions;
 using CSharpFunctionalExtensions;
@@ -55,12 +56,15 @@ namespace Reductech.EDR.Processes.General
             freezableProcessData.GetVariableName(nameof(GetVariable<object>.VariableName))
                 .Map(x => new VariableTypeReference(x) as ITypeReference);
 
+
         /// <inheritdoc />
-        public override ICustomSerializer? CustomSerializer { get; } =
+        public override IEnumerable<ICustomSerializer> CustomSerializers { get; } = new List<ICustomSerializer>()
+        {
             new CustomSerializer($"<[{nameof(GetVariable<object>.VariableName)}]>",
                 new Regex(@"\A\s*<(?<name>[_\.\w]+)>\s*\Z", RegexOptions.Compiled),
                 new VariableNameDeserializerMapping("name", nameof(GetVariable<object>.VariableName))
-                );
+                )
+        };
     }
 
 }

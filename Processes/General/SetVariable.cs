@@ -91,10 +91,12 @@ namespace Reductech.EDR.Processes.General
 
 
         /// <inheritdoc />
-        public override ICustomSerializer? CustomSerializer { get; } = new CustomSerializer($"<[{nameof(SetVariable<object>.VariableName)}]> = '[{nameof(SetVariable<object>.Value)}]'",
+        public override IEnumerable<ICustomSerializer> CustomSerializers { get; } = new List<ICustomSerializer>()
+        {
+            new CustomSerializer($"<[{nameof(SetVariable<object>.VariableName)}]> = '[{nameof(SetVariable<object>.Value)}]'",
             new Regex(@"\A\s*<(?<VariableName>[\w_\.]+)>\s*=\s*(?:(?<Value>(?:[\w\d\._]+))|'(?<Value>.+?)')\s*\Z", RegexOptions.Compiled),
             new VariableNameDeserializerMapping("VariableName", nameof(SetVariable<object>.VariableName)),
-            new AnyDeserializerMapping("Value", nameof(SetVariable<object>.Value))
-            );
+            new AnyDeserializerMapping("Value", nameof(SetVariable<object>.Value)))
+        };
     }
 }
