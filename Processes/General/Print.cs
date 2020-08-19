@@ -1,8 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Text.RegularExpressions;
 using CSharpFunctionalExtensions;
 using Microsoft.Extensions.Logging;
 using Reductech.EDR.Processes.Attributes;
+using Reductech.EDR.Processes.Serialization;
 
 namespace Reductech.EDR.Processes.General
 {
@@ -56,36 +59,14 @@ namespace Reductech.EDR.Processes.General
         protected override Result<ITypeReference> GetMemberType(FreezableProcessData freezableProcessData) =>
             freezableProcessData.GetArgument(nameof(Print<object>.Value))
                 .Bind(x => x.TryGetOutputTypeReference());
+
+
+        /// <inheritdoc />
+        public override Maybe<ICustomSerializer> CustomSerializer { get; } =
+            Maybe<ICustomSerializer>.From(
+                new CustomSerializer(new FixedStringComponent("Print"),
+                new SpaceComponent(true),
+                new AnyPrimitiveComponent(nameof(Print<object>.Value))
+                ));
     }
-
-
-    ///// <summary>
-    ///// Prints a value to the log.
-    ///// </summary>
-    //public sealed class PrintProcessFactory : RunnableProcessFactory
-    //{
-    //    private PrintProcessFactory() { }
-
-    //    public static RunnableProcessFactory Instance { get; } = new PrintProcessFactory();
-
-    //    /// <inheritdoc />
-    //    public override Result<ITypeReference> TryGetOutputTypeReference(FreezableProcessData freezableProcessData) => new ActualTypeReference(typeof(Unit));
-
-    //    /// <inheritdoc />
-    //    public override Type ProcessType  => typeof(Print<>);
-
-    //    /// <inheritdoc />
-    //    public override ProcessNameBuilder ProcessNameBuilder { get; } = new ProcessNameBuilder($"Print '[{nameof(Print<object>.Value)}]'");
-
-    //    /// <inheritdoc />
-    //    public override IEnumerable<Type> EnumTypes => ImmutableArray<Type>.Empty;
-
-
-    //    /// <inheritdoc />
-    //    protected override Result<IRunnableProcess> TryCreateInstance(ProcessContext processContext, FreezableProcessData freezableProcessData) =>
-    //        freezableProcessData.GetArgument(nameof(Print<object>.Value))
-    //            .Bind(x => x.TryGetOutputTypeReference())
-    //            .Bind(processContext.TryGetTypeFromReference)
-    //            .Bind(x => TryCreateGeneric(typeof(Print<>), x));
-    //}
 }

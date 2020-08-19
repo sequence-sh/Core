@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Processes.Attributes;
+using Reductech.EDR.Processes.Serialization;
 
 namespace Reductech.EDR.Processes.General
 {
@@ -36,5 +37,11 @@ namespace Reductech.EDR.Processes.General
         /// <inheritdoc />
         public override IProcessNameBuilder ProcessNameBuilder => new ProcessNameBuilderFromTemplate($"Not [{nameof(Not.Boolean)}]");
 
+        /// <inheritdoc />
+        public override Maybe<ICustomSerializer> CustomSerializer => Maybe<ICustomSerializer>.From(new CustomSerializer(
+            new FixedStringComponent("not"),
+            new SpaceComponent(true),
+            new BooleanComponent(nameof(Not.Boolean))
+            ));
     }
 }

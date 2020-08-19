@@ -4,6 +4,7 @@ using System.Collections.Immutable;
 using System.ComponentModel.DataAnnotations;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Processes.Attributes;
+using Reductech.EDR.Processes.Serialization;
 
 namespace Reductech.EDR.Processes.General
 {
@@ -46,7 +47,7 @@ namespace Reductech.EDR.Processes.General
         /// </summary>
         [RunnableProcessProperty]
         [Required]
-        public IRunnableProcess<T> Value { get; set; }
+        public IRunnableProcess<T> Value { get; set; } = null!;
     }
 
     /// <summary>
@@ -75,9 +76,11 @@ namespace Reductech.EDR.Processes.General
         /// <inheritdoc />
         public override Result<Maybe<ITypeReference>> GetTypeReferencesSet(VariableName variableName, FreezableProcessData freezableProcessData)
         {
-            return freezableProcessData.GetArgument(nameof(SetVariable<object>.Value))
+            var result = freezableProcessData.GetArgument(nameof(SetVariable<object>.Value))
                 .Bind(x => x.TryGetOutputTypeReference())
                 .Map(Maybe<ITypeReference>.From);
+
+            return result;
         }
 
         /// <inheritdoc />
@@ -87,55 +90,14 @@ namespace Reductech.EDR.Processes.General
                 .Bind(x => TryCreateGeneric(typeof(SetVariable<>), x));
 
 
+        /// <inheritdoc />
+        public override Maybe<ICustomSerializer> CustomSerializer { get; } = Maybe<ICustomSerializer>.From(
+            new CustomSerializer(
+                new VariableNameComponent(nameof(SetVariable<object>.VariableName)),
+                new SpaceComponent(false),
+                new FixedStringComponent("="),
+                new SpaceComponent(false),
+                new AnyPrimitiveComponent(nameof(SetVariable<object>.Value))
+                ));
     }
-
-    ///// <summary>
-    ///// Sets the value of a particular variable.
-    ///// </summary>
-    ///// <typeparam name="T"></typeparam>
-    //public sealed class SetVariableRunnableProcess<T> : IRunnableProcess<Unit>
-    //{
-    //    /// <summary>
-    //    /// Creates a new SetVariableRunnableProcess.
-    //    /// </summary>
-    //    public SetVariableRunnableProcess(string variableName, IRunnableProcess<T> value)
-    //    {
-    //        VariableName = variableName;
-    //        Value = value;
-    //    }
-
-    //    /// <inheritdoc />
-    //    public Result<Unit> Run(ProcessState processState)
-    //    {
-    //        var valueResult = Value.Run(processState);
-
-    //        if (valueResult.IsFailure)
-    //            return valueResult.ConvertFailure<Unit>();
-
-    //        processState.SetVariable(VariableName, valueResult.Value);
-
-    //        return Unit.Default;
-    //    }
-
-    //    /// <inheritdoc />
-    //    public string Name => NameHelper.GetSetVariableName(VariableName, Value.Name);
-
-    //    /// <summary>
-    //    /// The name of the variable to set.
-    //    /// </summary>
-    //    public string VariableName { get; }
-
-    //    /// <summary>
-    //    /// The value that the variable will be set to.
-    //    /// </summary>
-    //    public IRunnableProcess<T> Value { get; }
-
-
-    //    /// <inheritdoc />
-    //    public IFreezableProcess Unfreeze() => new SetVariableFreezableProcess(VariableName, Value.Unfreeze());
-
-
-    //    /// <inheritdoc />
-    //    public override string ToString() => Name;
-    //}
 }

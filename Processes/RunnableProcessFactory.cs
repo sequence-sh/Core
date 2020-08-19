@@ -6,6 +6,7 @@ using System.Linq;
 using System.Reflection;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Processes.Attributes;
+using Reductech.EDR.Processes.Serialization;
 
 namespace Reductech.EDR.Processes
 {
@@ -48,6 +49,11 @@ namespace Reductech.EDR.Processes
         /// </summary>
         public virtual Result<Maybe<ITypeReference>> GetTypeReferencesSet(VariableName variableName, FreezableProcessData freezableProcessData) =>
             Maybe<ITypeReference>.None;
+
+        /// <summary>
+        /// Custom serializers to use for yaml serialization and deserialization.
+        /// </summary>
+        public virtual Maybe<ICustomSerializer> CustomSerializer { get; } = Maybe<ICustomSerializer>.None;
 
 
         /// <summary>

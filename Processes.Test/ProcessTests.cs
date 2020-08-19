@@ -4,17 +4,26 @@ using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Internal;
 using Reductech.EDR.Processes.General;
+using Reductech.EDR.Processes.Serialization;
 using Reductech.EDR.Processes.Test.Extensions;
 using Xunit;
+using Xunit.Abstractions;
+using ITestCase = Reductech.EDR.Processes.Test.Extensions.ITestCase;
 
 namespace Reductech.EDR.Processes.Test
 {
-    public class ProcessTests : TestBase
+    public class ProcessTest : ProcessTestCases
     {
+        public ProcessTest(ITestOutputHelper testOutputHelper) => TestOutputHelper = testOutputHelper;
+
         /// <inheritdoc />
         [Theory]
-        [ClassData(typeof(ProcessTests))]
+        [ClassData(typeof(ProcessTestCases))]
         public override void Test(string key) => base.Test(key);
+    }
+
+    public class ProcessTestCases : TestBase
+    {
 
         public const string HelloWorldString = "Hello World";
         public static readonly VariableName FooString = new VariableName("Foo");
@@ -105,12 +114,12 @@ namespace Reductech.EDR.Processes.Test
                             }),
                     HelloWorldString);
 
-                yield return new TestCase("Print 'ApplyMathOperator(Left: 2, Operator: Times, Right: 3)'",
+                yield return new TestCase("Print 'ApplyMathOperator(Left: 2, Operator: Multiply, Right: 3)'",
                     Print(new ApplyMathOperator
                     {
                         Left = Constant(2),
                         Right = Constant(3),
-                        Operator = Constant(MathOperator.Times)
+                        Operator = Constant(MathOperator.Multiply)
                     }), "6");
 
                 yield return new TestCase("Print 'ArrayCount(Array: [Hello; World])'",
@@ -340,24 +349,23 @@ namespace Reductech.EDR.Processes.Test
             public IReadOnlyList<string> ExpectedLoggedValues { get; }
 
             /// <inheritdoc />
-            public void Execute()
+            public void Execute(ITestOutputHelper outputHelper)
             {
-                RunnableProcess.Name.Should().Be(ExpectedName);
-
-                var unfrozen = RunnableProcess.Unfreeze();
-
-                var yaml = unfrozen.SerializeToYaml();
-
+                //Arrange
                 var pfs = ProcessFactoryStore.CreateUsingReflection(typeof(RunnableProcessFactory));
                 var logger = new TestLogger();
-
                 var yamlRunner = new YamlRunner(EmptySettings.Instance, logger, pfs);
 
+                //Act
+                var unfrozen = RunnableProcess.Unfreeze();
+                var yaml = unfrozen.SerializeToYaml();
+                outputHelper.WriteLine(yaml);
                 var runResult = yamlRunner.RunProcessFromYamlString(yaml);
 
+                //Assert
                 runResult.ShouldBeSuccessful();
-
                 logger.LoggedValues.Should().BeEquivalentTo(ExpectedLoggedValues);
+                RunnableProcess.Name.Should().Be(ExpectedName);
 
             }
         }

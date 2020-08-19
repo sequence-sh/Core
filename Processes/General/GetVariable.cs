@@ -1,7 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Text.RegularExpressions;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Processes.Attributes;
+using Reductech.EDR.Processes.Serialization;
 
 namespace Reductech.EDR.Processes.General
 {
@@ -53,6 +56,11 @@ namespace Reductech.EDR.Processes.General
         protected override Result<ITypeReference> GetMemberType(FreezableProcessData freezableProcessData) =>
             freezableProcessData.GetVariableName(nameof(GetVariable<object>.VariableName))
                 .Map(x => new VariableTypeReference(x) as ITypeReference);
+
+
+        /// <inheritdoc />
+        public override Maybe<ICustomSerializer> CustomSerializer { get; } = Maybe<ICustomSerializer>.From(new CustomSerializer(new VariableNameComponent(nameof(GetVariable<object>.VariableName))));
+
     }
 
 }
