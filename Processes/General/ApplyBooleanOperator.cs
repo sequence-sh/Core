@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Processes.Attributes;
+using Reductech.EDR.Processes.Serialization;
 
 namespace Reductech.EDR.Processes.General
 {
@@ -34,9 +35,6 @@ namespace Reductech.EDR.Processes.General
         [RunnableProcessProperty]
         [Required]
         public IRunnableProcess<bool> Right { get; set; }
-
-
-
 
         /// <inheritdoc />
         public override Result<bool> Run(ProcessState processState)
@@ -88,11 +86,14 @@ namespace Reductech.EDR.Processes.General
         /// <inheritdoc />
         public override IEnumerable<Type> EnumTypes => new[] {typeof(BooleanOperator)};
 
-        ///// <inheritdoc />
-        //public override IEnumerable<ICustomSerializer> CustomSerializers { get; } = new[]
-        //{
-        //    new CustomSerializer($@""),
-        //};
+        /// <inheritdoc />
+        public override Maybe<ICustomSerializer> CustomSerializer { get; } = Maybe<ICustomSerializer>.From(new CustomSerializer(
+                new BooleanComponent(nameof(ApplyBooleanOperator.Left)),
+                new SpaceComponent(false),
+                new EnumDisplayComponent<BooleanOperator>(nameof(ApplyBooleanOperator.Operator)),
+                new SpaceComponent(false),
+                new BooleanComponent(nameof(ApplyBooleanOperator.Right))
+                ));
     }
 
     /// <summary>
@@ -103,10 +104,12 @@ namespace Reductech.EDR.Processes.General
         /// <summary>
         /// Returns true if both left and right are true.
         /// </summary>
+        [Display(Name = "and")]
         And,
         /// <summary>
         /// Returns true if either left or right is true.
         /// </summary>
+        [Display(Name = "or")]
         Or
     }
 

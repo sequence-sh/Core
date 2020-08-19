@@ -17,7 +17,7 @@ namespace Reductech.EDR.Processes.Serialization
         public string PropertyName { get; }
 
         /// <inheritdoc />
-        public Result<ProcessMember> TryDeserialize(string groupText, ProcessFactoryStore processFactoryStore) => AnyPrimitiveComponent.Deserialize(groupText, processFactoryStore);
+        public Result<ProcessMember> TryDeserialize(string groupText, ProcessFactoryStore processFactoryStore) => SerializationHelper.TryDeserialize(groupText, processFactoryStore);
 
 
         /// <inheritdoc />

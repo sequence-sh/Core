@@ -82,7 +82,7 @@ namespace Reductech.EDR.Processes.Serialization
                 if (special != null)
                     result = special;
                 else
-                    result = AnyPrimitiveComponent.Deserialize(sString3, processFactoryStore);
+                    result = SerializationHelper.TryDeserialize(sString3, processFactoryStore);
             }
             else
                 throw new ArgumentOutOfRangeException(nameof(simpleObject));
@@ -149,10 +149,8 @@ namespace Reductech.EDR.Processes.Serialization
         {
             switch (process)
             {
-                case ConstantFreezableProcess enumCfp when enumCfp.Value.GetType().IsEnum:
-                    return enumCfp.Value.GetType().Name + "." + enumCfp.Value;
                 case ConstantFreezableProcess cfp:
-                    return cfp.Value.ToString()!;
+                    return SerializationHelper.SerializeConstant(cfp, false);
                 case CompoundFreezableProcess compoundFreezableProcess:
                 {
                     if (isTopLevel && compoundFreezableProcess.ProcessFactory == SequenceProcessFactory.Instance &&

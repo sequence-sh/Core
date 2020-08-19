@@ -31,6 +31,41 @@ namespace Reductech.EDR.Processes.Test
 @"- <Foo> = 'Hello World'
 - <Bar> = <Foo>
 - Print <Bar>", "Hello World");
+
+                yield return new TestCase(
+                    @"
+Do: Print
+Value: 2 * 3
+", 6.ToString());
+
+
+                yield return new TestCase(
+                    @"
+Do: Print
+Value: 2 ^ 3
+", 8.ToString());
+
+                yield return new TestCase(
+                    @"
+Do: Print
+Value: not True
+", false.ToString());
+
+
+                yield return new TestCase(
+                    @"
+Do: Print
+Value: 2 >= 3
+", false.ToString());
+
+
+                yield return new TestCase(
+                    @"
+Do: Print
+Value: True and False
+", false.ToString());
+
+
             }
         }
 
@@ -74,7 +109,7 @@ namespace Reductech.EDR.Processes.Test
 
                 var newYaml = freezeResult.Value.Unfreeze().SerializeToYaml();
 
-                newYaml.Trim().Should().Be(Yaml);
+                newYaml.Trim().Should().Be(Yaml.Trim());
             }
         }
     }

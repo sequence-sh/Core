@@ -9,7 +9,7 @@ using CSharpFunctionalExtensions;
 namespace Reductech.EDR.Processes
 {
     /// <summary>
-    /// Helper methods.
+    /// SerializationHelper methods.
     /// </summary>
     public static class Extensions
     {

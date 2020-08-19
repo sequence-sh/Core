@@ -32,7 +32,7 @@ namespace Reductech.EDR.Processes
     }
 
     /// <summary>
-    /// Helper methods for processes.
+    /// SerializationHelper methods for processes.
     /// </summary>
     public static class ProcessHelper
     {

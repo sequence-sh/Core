@@ -31,7 +31,7 @@ namespace Reductech.EDR.Processes.General
                 MathOperator.Multiply => left.Value * right.Value,
                 MathOperator.Divide => left.Value / right.Value,
                 MathOperator.Modulo => left.Value % right.Value,
-                MathOperator.Power => left.Value ^ right.Value,
+                MathOperator.Power => Convert.ToInt32(Math.Pow(left.Value, right.Value)),
                 _ => throw new ArgumentOutOfRangeException()
             };
 
