@@ -81,7 +81,7 @@ namespace Reductech.EDR.Processes
 
                 var p = data.Dictionary.TryFindOrFail(variableName, null)
                     .Bind(x => x.Join<Result<string>>(vn => vn.Name,
-                        fp => fp is ConstantFreezableProcess cp? cp.SerializeToYaml() : Result.Failure<string>("Cannot handle compound argument"),
+                        fp => fp is ConstantFreezableProcess cp? cp.SerializeToYaml().Trim() : Result.Failure<string>("Cannot handle compound argument"),
                         l => Result.Failure<string>("Cannot handle list argument")));
 
                 if(p.IsSuccess)

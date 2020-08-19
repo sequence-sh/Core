@@ -90,11 +90,11 @@ namespace Reductech.EDR.Processes.General
                 .Bind(x => TryCreateGeneric(typeof(SetVariable<>), x));
 
 
-        ///// <inheritdoc />
-        //public override ICustomSerializer? CustomSerializer { get; } = new CustomSerializer($"<[{nameof(SetVariable<object>.VariableName)}]> = [{nameof(SetVariable<object>.Value)}]",
-        //    new Regex(@"\A\s*<(?<VariableName>[\w_\.]+)>\s*=\s*(?<Value>[\w\d\._]+)\s*\Z", RegexOptions.Compiled),
-        //    new VariableNameDeserializerMapping("VariableName", nameof(SetVariable<object>.VariableName)),
-        //    new AnyDeserializerMapping("Value", nameof(SetVariable<object>.Value))
-        //    );
+        /// <inheritdoc />
+        public override ICustomSerializer? CustomSerializer { get; } = new CustomSerializer($"<[{nameof(SetVariable<object>.VariableName)}]> = '[{nameof(SetVariable<object>.Value)}]'",
+            new Regex(@"\A\s*<(?<VariableName>[\w_\.]+)>\s*=\s*(?:(?<Value>(?:[\w\d\._]+))|'(?<Value>.+?)')\s*\Z", RegexOptions.Compiled),
+            new VariableNameDeserializerMapping("VariableName", nameof(SetVariable<object>.VariableName)),
+            new AnyDeserializerMapping("Value", nameof(SetVariable<object>.Value))
+            );
     }
 }

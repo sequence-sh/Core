@@ -143,6 +143,8 @@ namespace Reductech.EDR.Processes
             }
         }
 
+        
+
         private static object SimplifyProcess(IFreezableProcess process, bool isTopLevel)
         {
             switch (process)
