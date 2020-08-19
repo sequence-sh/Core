@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using CSharpFunctionalExtensions;
 using FluentAssertions;
 using Reductech.EDR.Processes.Test.Extensions;
 using Xunit;
@@ -25,7 +26,10 @@ namespace Reductech.EDR.Processes.Test
         {
             get
             {
-                yield return new TestCase("");
+                yield return new TestCase(
+@"- <Foo> = 'Hello World'
+- <Bar> = <Foo>
+- Print <Bar>", "Hello World");
             }
         }
 
@@ -55,13 +59,21 @@ namespace Reductech.EDR.Processes.Test
                 var pfs = ProcessFactoryStore.CreateUsingReflection(typeof(RunnableProcessFactory));
                 var logger = new TestLogger();
 
-                var yamlRunner = new YamlRunner(EmptySettings.Instance, logger, pfs);
+                var freezeResult = YamlHelper.DeserializeFromYaml(Yaml, pfs)
+                    .Bind(x => x.TryFreeze())
+                    .BindCast<IRunnableProcess, IRunnableProcess<Unit>>();
 
-                var runResult = yamlRunner.RunProcessFromYamlString(Yaml);
+                freezeResult.ShouldBeSuccessful();
+
+                var runResult = freezeResult.Value.Run(new ProcessState(logger, EmptySettings.Instance));
 
                 runResult.ShouldBeSuccessful();
 
                 logger.LoggedValues.Should().BeEquivalentTo(ExpectedLoggedValues);
+
+                var newYaml = freezeResult.Value.Unfreeze().SerializeToYaml();
+
+                newYaml.Trim().Should().Be(Yaml);
             }
         }
     }
