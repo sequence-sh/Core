@@ -6,6 +6,7 @@ using System.Linq;
 using System.Reflection;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Processes.Attributes;
+using Reductech.EDR.Processes.Serialization;
 
 namespace Reductech.EDR.Processes
 {

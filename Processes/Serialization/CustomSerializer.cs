@@ -5,7 +5,7 @@ using System.Text.RegularExpressions;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Processes.General;
 
-namespace Reductech.EDR.Processes
+namespace Reductech.EDR.Processes.Serialization
 {
     /// <summary>
     /// A component of a custom serializer

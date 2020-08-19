@@ -1,6 +1,6 @@
 ﻿using CSharpFunctionalExtensions;
 
-namespace Reductech.EDR.Processes
+namespace Reductech.EDR.Processes.Serialization
 {
     /// <summary>
     /// Maps a regex group to a property

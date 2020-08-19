@@ -3,10 +3,8 @@ using System.Text.RegularExpressions;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Processes.General;
 
-namespace Reductech.EDR.Processes
+namespace Reductech.EDR.Processes.Serialization
 {
-
-
 
     /// <summary>
     /// Deserializes a regex group into a constant of any type.

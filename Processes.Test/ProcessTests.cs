@@ -4,6 +4,7 @@ using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Internal;
 using Reductech.EDR.Processes.General;
+using Reductech.EDR.Processes.Serialization;
 using Reductech.EDR.Processes.Test.Extensions;
 using Xunit;
 using Xunit.Abstractions;

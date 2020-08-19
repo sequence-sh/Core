@@ -5,7 +5,7 @@ using CSharpFunctionalExtensions;
 using JetBrains.Annotations;
 using Microsoft.Extensions.Logging;
 
-namespace Reductech.EDR.Processes
+namespace Reductech.EDR.Processes.Serialization
 {
     /// <summary>
     /// Runs processes from Yaml

@@ -8,7 +8,7 @@ using Reductech.EDR.Processes.Attributes;
 using Reductech.Utilities.InstantConsole;
 using YamlDotNet.Serialization;
 
-namespace Reductech.EDR.Processes
+namespace Reductech.EDR.Processes.Serialization
 {
     /// <summary>
     /// A wrapper for this documented object.

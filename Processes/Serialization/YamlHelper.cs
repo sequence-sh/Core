@@ -5,7 +5,7 @@ using System.Linq;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Processes.General;
 
-namespace Reductech.EDR.Processes
+namespace Reductech.EDR.Processes.Serialization
 {
     /// <summary>
     /// Contains methods for converting Processes to and from Yaml.

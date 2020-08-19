@@ -1,6 +1,4 @@
-﻿using CSharpFunctionalExtensions;
-
-namespace Reductech.EDR.Processes
+﻿namespace Reductech.EDR.Processes.Serialization
 {
     ///// <summary>
     ///// Deserializes a regex group into a boolean.

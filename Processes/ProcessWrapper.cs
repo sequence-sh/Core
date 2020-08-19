@@ -2,6 +2,7 @@
 using System.Linq;
 using CSharpFunctionalExtensions;
 using Microsoft.Extensions.Logging;
+using Reductech.EDR.Processes.Serialization;
 using Reductech.Utilities.InstantConsole;
 
 namespace Reductech.EDR.Processes

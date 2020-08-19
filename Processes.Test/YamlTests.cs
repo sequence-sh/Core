@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using CSharpFunctionalExtensions;
 using FluentAssertions;
+using Reductech.EDR.Processes.Serialization;
 using Reductech.EDR.Processes.Test.Extensions;
 using Xunit;
 using Xunit.Abstractions;
