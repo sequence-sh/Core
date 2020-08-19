@@ -19,7 +19,7 @@ namespace Reductech.EDR.Processes
         /// <summary>
         /// Serialize this data as a process of this type.
         /// </summary>
-        string Serialize(FreezableProcessData data);
+        Result<string> TrySerialize(FreezableProcessData data);
 
         /// <summary>
         /// Try to deserialize this data.
@@ -64,14 +64,14 @@ namespace Reductech.EDR.Processes
 
 
         /// <inheritdoc />
-        public string Serialize(FreezableProcessData data)
+        public Result<string> TrySerialize(FreezableProcessData data)
         {
             var errors = new List<string>();
             var replacedString = NameVariableRegex.Replace(TemplateString, GetReplacement);
 
 
             if (errors.Any())
-                throw new SerializationException(string.Join(", ", errors));
+                return Result.Failure<string>(string.Join(", ", errors));
 
             return replacedString;
 
@@ -80,9 +80,9 @@ namespace Reductech.EDR.Processes
                 var variableName = m.Groups["ArgumentName"].Value;
 
                 var p = data.Dictionary.TryFindOrFail(variableName, null)
-                    .Map(x => x.Join(vn => vn.Name,
-                        fp => fp.ProcessName,
-                        l => string.Join(ListDelimiter, l.Select(i => i.ProcessName))));
+                    .Bind(x => x.Join<Result<string>>(vn => vn.Name,
+                        fp => fp is ConstantFreezableProcess cp? cp.SerializeToYaml() : Result.Failure<string>("Cannot handle compound argument"),
+                        l => Result.Failure<string>("Cannot handle list argument")));
 
                 if(p.IsSuccess)
                     return p.Value;
@@ -101,7 +101,7 @@ namespace Reductech.EDR.Processes
                 return Result.Failure<IFreezableProcess>("String was empty");
 
 
-            if(!MatchRegex.TryMatch(s, out var match))
+            if(!MatchRegex.TryMatch(s, out var match) || match.Length < s.Length)
                 return Result.Failure<IFreezableProcess>("Regex did not match");
 
             var dict = new Dictionary<string, ProcessMember>();

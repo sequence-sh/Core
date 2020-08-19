@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Reflection;
 using CSharpFunctionalExtensions;
 
 namespace Reductech.EDR.Processes
@@ -31,6 +33,21 @@ namespace Reductech.EDR.Processes
             }
             return value.ToString();
         }
+
+
+        /// <summary>
+        /// Gets the name of an enum value from the display attribute if it is present.
+        /// </summary>
+        public static string GetDisplayName(this Enum enumValue)
+        {
+            return enumValue.GetType()
+                            .GetMember(enumValue.ToString())?
+                            .First()?
+                            .GetCustomAttribute<DisplayAttribute>()?
+                            .GetName()?? enumValue.ToString();
+        }
+
+
 
         /// <summary>
         /// Gets all possible values of this enum.

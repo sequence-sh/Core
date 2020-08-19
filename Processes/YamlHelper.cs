@@ -28,7 +28,7 @@ namespace Reductech.EDR.Processes
         /// <summary>
         /// Deserialize this yaml into a process.
         /// </summary>
-        public static Result<IFreezableProcess> DeserializeFromYaml(string yaml, ProcessFactoryStore processFactoryStore)
+        public static Result<IFreezableProcess > DeserializeFromYaml(string yaml, ProcessFactoryStore processFactoryStore)
         {
             var deserializer = new YamlDotNet.Serialization.Deserializer();
 
@@ -92,7 +92,6 @@ namespace Reductech.EDR.Processes
             static Result<IFreezableProcess> CreateProcess(RunnableProcessFactory factory, IEnumerable<(string key, ProcessMember member)> arguments)
             {
                 var errors = new List<string>();
-
                 var dict = new Dictionary<string, ProcessMember>();
 
                 foreach (var (key, value) in arguments)
@@ -131,7 +130,7 @@ namespace Reductech.EDR.Processes
 
             static ProcessMember? TrySpecialDeserialize(string s, ProcessFactoryStore processFactoryStore)
             {
-                foreach (var (factory, customSerializer)  in processFactoryStore.Dictionary.Values.Select(factory=> (factory,factory.CustomSerializer)))
+                foreach (var (factory, customSerializer) in processFactoryStore.Dictionary.Values.Select(factory=> (factory,factory.CustomSerializer)))
                 {
                     if (customSerializer == null) continue;
                     var r = customSerializer.TryDeserialize(s, processFactoryStore, factory);
@@ -162,7 +161,11 @@ namespace Reductech.EDR.Processes
                     var customSerializer = compoundFreezableProcess.ProcessFactory.CustomSerializer;
 
                     if (customSerializer != null)
-                        return customSerializer.Serialize(compoundFreezableProcess.FreezableProcessData);
+                    {
+                        var sr = customSerializer.TrySerialize(compoundFreezableProcess.FreezableProcessData);
+                        if (sr.IsSuccess)
+                            return sr.Value;
+                    }
 
 
                     IDictionary<string, object> expandoObject = new ExpandoObject();
