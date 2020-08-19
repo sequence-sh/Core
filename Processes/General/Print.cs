@@ -63,8 +63,8 @@ namespace Reductech.EDR.Processes.General
         /// <inheritdoc />
         public override IEnumerable<ICustomSerializer> CustomSerializers { get; } = new[]
         {
-            new CustomSerializer($"Print '[{nameof(Print<object>.Value)}]'",
-                new Regex(@"\A\s*Print\s+(?:(?<Value>(?:[\w\d\._]+))|'(?<Value>.+?)')\s*\Z",
+            new CustomSerializer($"Print [{nameof(Print<object>.Value)}]",
+                new Regex(@"\A\s*Print\s+(?:(?<Value>(?:[\w\d\._]+))|'(?<Value>.+?)'|(?<Value><[\w\d\._]+>))\s*\Z",
                     RegexOptions.Compiled | RegexOptions.IgnoreCase),
                 new AnyDeserializerMapping("Value", nameof(Print<object>.Value))
             ),

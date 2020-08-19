@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Text.RegularExpressions;
 using CSharpFunctionalExtensions;
+using Reductech.EDR.Processes.General;
 
 namespace Reductech.EDR.Processes
 {
@@ -58,8 +59,8 @@ namespace Reductech.EDR.Processes
                 var variableName = m.Groups["ArgumentName"].Value;
 
                 var p = data.Dictionary.TryFindOrFail(variableName, null)
-                    .Bind(x => x.Join<Result<string>>(vn => vn.Name,
-                        fp => fp is ConstantFreezableProcess cp? cp.SerializeToYaml().Trim() : Result.Failure<string>("Cannot handle compound argument"),
+                    .Bind(x => x.Join(vn => vn.Name,
+                        TrySerialize,
                         l => Result.Failure<string>("Cannot handle list argument")));
 
                 if(p.IsSuccess)
@@ -68,6 +69,21 @@ namespace Reductech.EDR.Processes
                 errors.Add(p.Error);
                 return "Unknown";
             }
+        }
+
+        private static Result<string> TrySerialize(IFreezableProcess fp)
+        {
+            if (fp is ConstantFreezableProcess cp)
+            {
+                if (cp.Value is string)
+                    return $"'{cp.Value}'";
+                return cp.SerializeToYaml().Trim();
+            }
+            else if (fp is CompoundFreezableProcess compound &&
+                     compound.ProcessFactory == GetVariableProcessFactory.Instance)
+                return fp.SerializeToYaml().Trim();
+
+            return Result.Failure<string>("Could not serialize");
         }
 
         private static readonly Regex NameVariableRegex = new Regex(@"\[(?<ArgumentName>[\w_][\w\d_]*)\]", RegexOptions.Compiled);

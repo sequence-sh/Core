@@ -350,24 +350,21 @@ namespace Reductech.EDR.Processes.Test
             /// <inheritdoc />
             public void Execute(ITestOutputHelper outputHelper)
             {
-                RunnableProcess.Name.Should().Be(ExpectedName);
-
-                var unfrozen = RunnableProcess.Unfreeze();
-
-                var yaml = unfrozen.SerializeToYaml();
-
-                outputHelper.WriteLine(yaml);
-
+                //Arrange
                 var pfs = ProcessFactoryStore.CreateUsingReflection(typeof(RunnableProcessFactory));
                 var logger = new TestLogger();
-
                 var yamlRunner = new YamlRunner(EmptySettings.Instance, logger, pfs);
 
+                //Act
+                var unfrozen = RunnableProcess.Unfreeze();
+                var yaml = unfrozen.SerializeToYaml();
+                outputHelper.WriteLine(yaml);
                 var runResult = yamlRunner.RunProcessFromYamlString(yaml);
 
+                //Assert
                 runResult.ShouldBeSuccessful();
-
                 logger.LoggedValues.Should().BeEquivalentTo(ExpectedLoggedValues);
+                RunnableProcess.Name.Should().Be(ExpectedName);
 
             }
         }

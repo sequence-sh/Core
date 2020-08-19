@@ -133,7 +133,6 @@ namespace Reductech.EDR.Processes
                 foreach (var (factory, customSerializer) in processFactoryStore.Dictionary.Values
                     .SelectMany(factory=> factory.CustomSerializers.Select(customSerializer=> (factory, customSerializer))))
                 {
-                    if (customSerializer == null) continue;
                     var r = customSerializer.TryDeserialize(s, processFactoryStore, factory);
 
                     if (r.IsSuccess)
@@ -166,7 +165,7 @@ namespace Reductech.EDR.Processes
                             var sr = customSerializer.TrySerialize(compoundFreezableProcess.FreezableProcessData);
                             if (sr.IsSuccess)
                                 return sr.Value;
-                    }
+                        }
 
 
                     IDictionary<string, object> expandoObject = new ExpandoObject();
