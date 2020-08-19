@@ -25,12 +25,12 @@ namespace Reductech.EDR.Processes.General
 
             var result = @operator.Value switch
             {
-                MathOperator.Plus => left.Value + right.Value,
-                MathOperator.Minus => left.Value - right.Value,
-                MathOperator.Times => left.Value * right.Value,
+                MathOperator.Add => left.Value + right.Value,
+                MathOperator.Subtract => left.Value - right.Value,
+                MathOperator.Multiply => left.Value * right.Value,
                 MathOperator.Divide => left.Value / right.Value,
                 MathOperator.Modulo => left.Value % right.Value,
-                MathOperator.ToThePowerOf => left.Value ^ right.Value,
+                MathOperator.Power => left.Value ^ right.Value,
                 _ => throw new ArgumentOutOfRangeException()
             };
 
@@ -82,15 +82,41 @@ namespace Reductech.EDR.Processes.General
         public override IEnumerable<Type> EnumTypes => new[] {typeof(MathOperator)};
     }
 
-
+    /// <summary>
+    /// An operator that can be applied to two numbers.
+    /// </summary>
     public enum MathOperator
     {
-        Plus,
-        Minus,
-        Times,
+        /// <summary>
+        /// Add the left and right operands.
+        /// </summary>
+        [Display(Name = "+")]
+        Add,
+        /// <summary>
+        /// Subtract the right operand from the left.
+        /// </summary>
+        [Display(Name = "-")]
+        Subtract,
+        /// <summary>
+        /// Multiply the left and right operands.
+        /// </summary>
+        [Display(Name = "*")]
+        Multiply,
+        /// <summary>
+        /// Divide the left operand by the right.
+        /// </summary>
+        [Display(Name = "/")]
         Divide,
+        /// <summary>
+        /// Reduce the left operand modulo the right.
+        /// </summary>
+        [Display(Name = "%")]
         Modulo,
-        ToThePowerOf
+        /// <summary>
+        /// Raise the left operand to the power of the right.
+        /// </summary>
+        [Display(Name = "^")]
+        Power
 
     }
 }

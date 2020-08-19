@@ -87,6 +87,12 @@ namespace Reductech.EDR.Processes.General
 
         /// <inheritdoc />
         public override IEnumerable<Type> EnumTypes => new[] {typeof(BooleanOperator)};
+
+        ///// <inheritdoc />
+        //public override IEnumerable<ICustomSerializer> CustomSerializers { get; } = new[]
+        //{
+        //    new CustomSerializer($@""),
+        //};
     }
 
     /// <summary>
@@ -104,20 +110,4 @@ namespace Reductech.EDR.Processes.General
         Or
     }
 
-
-
-
-
-
-
-    //public sealed class BreakFromLoop : CompoundRunnableProcess<Unit> //TODO implement BreakFromLoop
-    //{
-    //}
-
-    //public sealed class ContinueWithLoop : CompoundRunnableProcess<Unit> //TODO implement BreakFromLoop
-    //{
-    //}
-
-
-    ////TODO prompt
 }

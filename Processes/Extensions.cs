@@ -66,6 +66,22 @@ namespace Reductech.EDR.Processes
         /// </summary>
         public static Maybe<T> Maybe<T>(this T? str) where T : struct => str.HasValue ? CSharpFunctionalExtensions.Maybe<T>.From(str.Value) : CSharpFunctionalExtensions.Maybe<T>.None;
 
+        /// <summary>
+        /// Gets each element paired with it's index.
+        /// </summary>
+        public static IEnumerable<(T item, int index)> WithIndex<T>(this IEnumerable<T> self) => self.Select((item, index) => (item, index));
+
+
+        /// <summary>
+        /// Returns the values of elements of the sequence.
+        /// </summary>
+        public static IEnumerable<T> WhereNotNull<T>(this IEnumerable<T?> source) where T : struct => from val in source where val.HasValue select val.Value;
+
+        /// <summary>
+        /// Returns the elements of the sequence which are not null.
+        /// </summary>
+        public static IEnumerable<T> WhereNotNull<T>(this IEnumerable<T?> source) where T : class => (from val in source where val != null select val)!;
+
 
         /// <summary>
         /// Tries to get this value of an enum type. Returns a failure if it is not present.

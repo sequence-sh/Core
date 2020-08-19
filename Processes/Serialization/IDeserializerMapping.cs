@@ -10,7 +10,7 @@ namespace Reductech.EDR.Processes
         /// <summary>
         /// The name of the regex group to match.
         /// </summary>
-        string GroupName { get; }
+        string GetGroupName(int index);
 
         /// <summary>
         /// The name of the property to map to.

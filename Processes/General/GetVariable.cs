@@ -58,12 +58,9 @@ namespace Reductech.EDR.Processes.General
 
 
         /// <inheritdoc />
-        public override IEnumerable<ICustomSerializer> CustomSerializers { get; } = new List<ICustomSerializer>()
+        public override IEnumerable<ICustomSerializer> CustomSerializers { get; } = new List<ICustomSerializer>
         {
-            new CustomSerializer($"<[{nameof(GetVariable<object>.VariableName)}]>",
-                new Regex(@"\A\s*<(?<name>[_\.\w]+)>\s*\Z", RegexOptions.Compiled),
-                new VariableNameDeserializerMapping("name", nameof(GetVariable<object>.VariableName))
-                )
+            new CustomSerializer(new VariableNameComponent(nameof(GetVariable<object>.VariableName)))
         };
     }
 

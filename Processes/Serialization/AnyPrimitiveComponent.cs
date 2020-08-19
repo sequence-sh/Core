@@ -5,19 +5,18 @@ using Reductech.EDR.Processes.General;
 
 namespace Reductech.EDR.Processes
 {
+
+
+
     /// <summary>
     /// Deserializes a regex group into a constant of any type.
     /// </summary>
-    public class AnyDeserializerMapping : IDeserializerMapping
+    public class AnyPrimitiveComponent : IDeserializerMapping, ISerializerBlock, IDeserializerBlock, ICustomSerializerComponent
     {
-        public AnyDeserializerMapping(string groupName, string propertyName)
-        {
-            GroupName = groupName;
-            PropertyName = propertyName;
-        }
+        public AnyPrimitiveComponent(string propertyName) => PropertyName = propertyName;
 
         /// <inheritdoc />
-        public string GroupName { get; }
+        public string GetGroupName(int index) => "Value" + index;
 
         /// <inheritdoc />
         public string PropertyName { get; }
@@ -66,5 +65,59 @@ namespace Reductech.EDR.Processes
                 return new ProcessMember(new ConstantFreezableProcess(i));
             return new ProcessMember(new ConstantFreezableProcess(text));
         }
+
+        /// <inheritdoc />
+        public Result<string> TryGetText(FreezableProcessData data) =>
+            data.Dictionary
+                .TryFindOrFail(PropertyName, null)
+                .Bind(x => x.Join<Result<string>>(VariableNameComponent.Serialize,
+                    TrySerialize,
+                    _ => Result.Failure<string>("Cannot serialize list")
+
+                ));
+
+        private static Result<string> TrySerialize(IFreezableProcess process)
+        {
+            if (process is ConstantFreezableProcess constantFreezableProcess)
+            {
+                return SerializeConstant(constantFreezableProcess);
+            }
+            else if (process is CompoundFreezableProcess compound && compound.ProcessFactory == GetVariableProcessFactory.Instance) //Special case
+            {
+                return compound.SerializeToYaml().Trim();
+            }
+
+            return Result.Failure<string>("Cannot serialize compound as a primitive");
+        }
+
+
+        /// <summary>
+        /// Serialize a constant freezable process.
+        /// </summary>
+        /// <param name="cfp"></param>
+        /// <returns></returns>
+        public static string SerializeConstant(ConstantFreezableProcess cfp)
+        {
+            if (cfp.Value.GetType().IsEnum)
+            {
+                return cfp.Value.GetType().Name + "." + cfp.Value;
+            }
+            else if (cfp.Value is string s)
+                return $"'{s}'";
+            else return cfp.Value.ToString() ?? "";
+        }
+
+
+        /// <inheritdoc />
+        public string GetRegexText(int index) => @$"(?:(?<{GetGroupName(index)}>(?:[\w\d\._]+))|'(?<{GetGroupName(index)}>.+?)'|(?<{GetGroupName(index)}><[\w\d\._]+?>))";
+
+        /// <inheritdoc />
+        public ISerializerBlock? SerializerBlock => this;
+
+        /// <inheritdoc />
+        public IDeserializerBlock? DeserializerBlock  => this;
+
+        /// <inheritdoc />
+        public IDeserializerMapping? Mapping => this;
     }
 }

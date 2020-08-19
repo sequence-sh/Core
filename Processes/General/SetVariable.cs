@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.ComponentModel.DataAnnotations;
-using System.Text.RegularExpressions;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Processes.Attributes;
 
@@ -47,7 +46,7 @@ namespace Reductech.EDR.Processes.General
         /// </summary>
         [RunnableProcessProperty]
         [Required]
-        public IRunnableProcess<T> Value { get; set; }
+        public IRunnableProcess<T> Value { get; set; } = null!;
     }
 
     /// <summary>
@@ -93,10 +92,11 @@ namespace Reductech.EDR.Processes.General
         /// <inheritdoc />
         public override IEnumerable<ICustomSerializer> CustomSerializers { get; } = new List<ICustomSerializer>()
         {
-            new CustomSerializer($"<[{nameof(SetVariable<object>.VariableName)}]> = [{nameof(SetVariable<object>.Value)}]",
-            new Regex(@"\A\s*<(?<VariableName>[\w_\.]+)>\s*=\s*(?:(?<Value>(?:[\w\d\._]+))|'(?<Value>.+?)'|(?<Value><.+?>))\s*\Z", RegexOptions.Compiled),
-            new VariableNameDeserializerMapping("VariableName", nameof(SetVariable<object>.VariableName)),
-            new AnyDeserializerMapping("Value", nameof(SetVariable<object>.Value)))
+            new CustomSerializer(
+                new VariableNameComponent(nameof(SetVariable<object>.VariableName)),
+                new FixedStringComponent("=", FixedStringComponent.SpaceType.Optional),
+                new AnyPrimitiveComponent(nameof(SetVariable<object>.Value))
+                )
         };
     }
 }
