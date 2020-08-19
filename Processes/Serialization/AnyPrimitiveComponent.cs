@@ -68,7 +68,7 @@ namespace Reductech.EDR.Processes.Serialization
         public Result<string> TryGetText(FreezableProcessData data) =>
             data.Dictionary
                 .TryFindOrFail(PropertyName, null)
-                .Bind(x => x.Join<Result<string>>(VariableNameComponent.Serialize,
+                .Bind(x => x.Join(VariableNameComponent.Serialize,
                     TrySerialize,
                     _ => Result.Failure<string>("Cannot serialize list")
 
@@ -77,13 +77,9 @@ namespace Reductech.EDR.Processes.Serialization
         private static Result<string> TrySerialize(IFreezableProcess process)
         {
             if (process is ConstantFreezableProcess constantFreezableProcess)
-            {
                 return SerializeConstant(constantFreezableProcess);
-            }
-            else if (process is CompoundFreezableProcess compound && compound.ProcessFactory == GetVariableProcessFactory.Instance) //Special case
-            {
+            if (process is CompoundFreezableProcess compound && compound.ProcessFactory == GetVariableProcessFactory.Instance) //Special case
                 return compound.SerializeToYaml().Trim();
-            }
 
             return Result.Failure<string>("Cannot serialize compound as a primitive");
         }

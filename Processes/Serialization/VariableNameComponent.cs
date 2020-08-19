@@ -1,5 +1,4 @@
-﻿using System;
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 using CSharpFunctionalExtensions;
 
 namespace Reductech.EDR.Processes.Serialization
@@ -9,9 +8,16 @@ namespace Reductech.EDR.Processes.Serialization
     /// </summary>
     public class SpaceComponent : ICustomSerializerComponent, ISerializerBlock, IDeserializerBlock
     {
-        private SpaceComponent() { }
+        /// <summary>
+        /// Create a new Space Component.
+        /// </summary>
+        /// <param name="required"></param>
+        public SpaceComponent(bool required) => Required = required;
 
-        public static SpaceComponent Instance { get; } = new SpaceComponent();
+        /// <summary>
+        /// Whether this space is required.
+        /// </summary>
+        public bool Required { get; }
 
         /// <inheritdoc />
         public ISerializerBlock? SerializerBlock => this;
@@ -26,7 +32,7 @@ namespace Reductech.EDR.Processes.Serialization
         public Result<string> TryGetText(FreezableProcessData data) => " ";
 
         /// <inheritdoc />
-        public string GetRegexText(int index) => @"\s+";
+        public string GetRegexText(int index) => Required? @"\s+" : @"\s*";
     }
 
 
@@ -35,21 +41,12 @@ namespace Reductech.EDR.Processes.Serialization
     /// </summary>
     public class FixedStringComponent : ICustomSerializerComponent, ISerializerBlock, IDeserializerBlock
     {
-        public FixedStringComponent(string value, SpaceType spaces)
-        {
-            Value = value;
-            Spaces = spaces;
-        }
+        public FixedStringComponent(string value) => Value = value;
 
         /// <summary>
         /// The fixed value to insert.
         /// </summary>
         public string Value { get; }
-
-        /// <summary>
-        /// The type of spaces to use.
-        /// </summary>
-        public SpaceType Spaces { get; }
 
         /// <inheritdoc />
         public ISerializerBlock? SerializerBlock => this;
@@ -61,36 +58,10 @@ namespace Reductech.EDR.Processes.Serialization
         public IDeserializerMapping? Mapping => null;
 
         /// <inheritdoc />
-        public Result<string> TryGetText(FreezableProcessData data)
-        {
-            return Spaces switch
-            {
-                SpaceType.None => Value,
-                SpaceType.Required => $" {Value} ",
-                SpaceType.Optional => $" {Value} ",
-                _ => throw new ArgumentOutOfRangeException()
-            };
-        }
+        public Result<string> TryGetText(FreezableProcessData data) => Value;
 
         /// <inheritdoc />
-        public string GetRegexText(int index)
-        {
-            return Spaces switch
-            {
-                SpaceType.None => Regex.Escape(Value),
-                SpaceType.Required => $@"\s+{Regex.Escape(Value)}\s+",
-                SpaceType.Optional => $@"\s*{Regex.Escape(Value)}\s*",
-                _ => throw new ArgumentOutOfRangeException()
-            };
-        }
-
-
-        public enum SpaceType
-        {
-            None,
-            Required,
-            Optional
-        }
+        public string GetRegexText(int index) => Regex.Escape(Value);
     }
 
 

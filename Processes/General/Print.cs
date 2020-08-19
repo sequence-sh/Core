@@ -64,8 +64,8 @@ namespace Reductech.EDR.Processes.General
         /// <inheritdoc />
         public override Maybe<ICustomSerializer> CustomSerializer { get; } =
             Maybe<ICustomSerializer>.From(
-                new CustomSerializer(new FixedStringComponent("Print", FixedStringComponent.SpaceType.None),
-                SpaceComponent.Instance,
+                new CustomSerializer(new FixedStringComponent("Print"),
+                new SpaceComponent(true),
                 new AnyPrimitiveComponent(nameof(Print<object>.Value))
                 ));
     }

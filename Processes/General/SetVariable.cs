@@ -94,7 +94,9 @@ namespace Reductech.EDR.Processes.General
         public override Maybe<ICustomSerializer> CustomSerializer { get; } = Maybe<ICustomSerializer>.From(
             new CustomSerializer(
                 new VariableNameComponent(nameof(SetVariable<object>.VariableName)),
-                new FixedStringComponent("=", FixedStringComponent.SpaceType.Optional),
+                new SpaceComponent(false),
+                new FixedStringComponent("="),
+                new SpaceComponent(false),
                 new AnyPrimitiveComponent(nameof(SetVariable<object>.Value))
                 ));
     }

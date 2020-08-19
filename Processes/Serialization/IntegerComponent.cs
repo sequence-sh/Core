@@ -4,11 +4,11 @@ using Reductech.EDR.Processes.General;
 namespace Reductech.EDR.Processes.Serialization
 {
     /// <summary>
-    /// Deserializes a regex group into a bool.
+    /// Deserializes a regex group into an integer.
     /// </summary>
-    public class BooleanComponent : IDeserializerMapping, ISerializerBlock, IDeserializerBlock, ICustomSerializerComponent
+    public class IntegerComponent : IDeserializerMapping, ISerializerBlock, IDeserializerBlock, ICustomSerializerComponent
     {
-        public BooleanComponent(string propertyName) => PropertyName = propertyName;
+        public IntegerComponent(string propertyName) => PropertyName = propertyName;
 
         /// <inheritdoc />
         public string GetGroupName(int index) => "Value" + index;
@@ -32,16 +32,19 @@ namespace Reductech.EDR.Processes.Serialization
 
         private static Result<string> TrySerialize(IFreezableProcess process)
         {
-            if (process is ConstantFreezableProcess constantFreezableProcess && constantFreezableProcess.Value is bool b)
-                return b.ToString();
+            if (process is ConstantFreezableProcess constantFreezableProcess && constantFreezableProcess.Value is int i)
+                return i.ToString();
             if (process is CompoundFreezableProcess compound && compound.ProcessFactory == GetVariableProcessFactory.Instance) //Special case
                 return compound.SerializeToYaml().Trim();
 
             return Result.Failure<string>("Cannot serialize compound as a primitive");
         }
 
+
+
+
         /// <inheritdoc />
-        public string GetRegexText(int index) => @$"(?:(?<{GetGroupName(index)}>(?:true|false))|(?<{GetGroupName(index)}><[\w\d\._]+?>))";
+        public string GetRegexText(int index) => @$"(?:(?<{GetGroupName(index)}>(?:\d+))|(?<{GetGroupName(index)}><[\w\d\._]+?>))";
 
         /// <inheritdoc />
         public ISerializerBlock? SerializerBlock => this;
