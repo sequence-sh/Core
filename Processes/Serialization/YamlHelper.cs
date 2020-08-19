@@ -130,13 +130,15 @@ namespace Reductech.EDR.Processes
 
             static ProcessMember? TrySpecialDeserialize(string s, ProcessFactoryStore processFactoryStore)
             {
-                foreach (var (factory, customSerializer) in processFactoryStore.Dictionary.Values
-                    .SelectMany(factory=> factory.CustomSerializers.Select(customSerializer=> (factory, customSerializer))))
+                foreach (var factory in processFactoryStore.Dictionary.Values)
                 {
-                    var r = customSerializer.TryDeserialize(s, processFactoryStore, factory);
+                    if (factory.CustomSerializer.HasValue)
+                    {
+                        var r = factory.CustomSerializer.Value.TryDeserialize(s, processFactoryStore, factory);
 
-                    if (r.IsSuccess)
-                        return new ProcessMember(r.Value);
+                        if (r.IsSuccess)
+                            return new ProcessMember(r.Value);
+                    }
                 }
 
                 return null;
@@ -157,13 +159,13 @@ namespace Reductech.EDR.Processes
                         compoundFreezableProcess.FreezableProcessData.Dictionary.TryGetValue(nameof(Sequence.Steps), out var processMember))
                         return ToSimpleObject(processMember);
 
-
-                    foreach (var customSerializer in compoundFreezableProcess.ProcessFactory.CustomSerializers)
+                    if (compoundFreezableProcess.ProcessFactory.CustomSerializer.HasValue)
                     {
-                            var sr = customSerializer.TrySerialize(compoundFreezableProcess.FreezableProcessData);
+                            var sr = compoundFreezableProcess.ProcessFactory.CustomSerializer.Value
+                                .TrySerialize(compoundFreezableProcess.FreezableProcessData);
                             if (sr.IsSuccess)
                                 return sr.Value;
-                        }
+                    }
 
 
                     IDictionary<string, object> expandoObject = new ExpandoObject();

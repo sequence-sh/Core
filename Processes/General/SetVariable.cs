@@ -90,13 +90,11 @@ namespace Reductech.EDR.Processes.General
 
 
         /// <inheritdoc />
-        public override IEnumerable<ICustomSerializer> CustomSerializers { get; } = new List<ICustomSerializer>()
-        {
+        public override Maybe<ICustomSerializer> CustomSerializer { get; } = Maybe<ICustomSerializer>.From(
             new CustomSerializer(
                 new VariableNameComponent(nameof(SetVariable<object>.VariableName)),
                 new FixedStringComponent("=", FixedStringComponent.SpaceType.Optional),
                 new AnyPrimitiveComponent(nameof(SetVariable<object>.Value))
-                )
-        };
+                ));
     }
 }

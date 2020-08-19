@@ -52,7 +52,7 @@ namespace Reductech.EDR.Processes
         /// <summary>
         /// Custom serializers to use for yaml serialization and deserialization.
         /// </summary>
-        public virtual IEnumerable<ICustomSerializer> CustomSerializers { get; } = Enumerable.Empty<ICustomSerializer>();
+        public virtual Maybe<ICustomSerializer> CustomSerializer { get; } = Maybe<ICustomSerializer>.None;
 
 
         /// <summary>

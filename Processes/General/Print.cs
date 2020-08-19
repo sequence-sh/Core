@@ -61,18 +61,11 @@ namespace Reductech.EDR.Processes.General
 
 
         /// <inheritdoc />
-        public override IEnumerable<ICustomSerializer> CustomSerializers { get; } = new[]
-        {
-            new CustomSerializer(new FixedStringComponent("Print", FixedStringComponent.SpaceType.None),
+        public override Maybe<ICustomSerializer> CustomSerializer { get; } =
+            Maybe<ICustomSerializer>.From(
+                new CustomSerializer(new FixedStringComponent("Print", FixedStringComponent.SpaceType.None),
                 SpaceComponent.Instance,
                 new AnyPrimitiveComponent(nameof(Print<object>.Value))
-                )
-
-            //new CustomSerializer($"Print [{nameof(Print<object>.Value)}]",
-            //    new Regex(@"\A\s*Print\s+(?:(?<Value>(?:[\w\d\._]+))|'(?<Value>.+?)'|(?<Value><[\w\d\._]+>))\s*\Z",
-            //        RegexOptions.Compiled | RegexOptions.IgnoreCase),
-            //    new AnyDeserializerMapping("Value", nameof(Print<object>.Value))
-            //),
-        };
+                ));
     }
 }

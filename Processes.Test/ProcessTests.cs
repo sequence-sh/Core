@@ -113,12 +113,12 @@ namespace Reductech.EDR.Processes.Test
                             }),
                     HelloWorldString);
 
-                yield return new TestCase("Print 'ApplyMathOperator(Left: 2, Operator: Times, Right: 3)'",
+                yield return new TestCase("Print 'ApplyMathOperator(Left: 2, Operator: Multiply, Right: 3)'",
                     Print(new ApplyMathOperator
                     {
                         Left = Constant(2),
                         Right = Constant(3),
-                        Operator = Constant(MathOperator.Times)
+                        Operator = Constant(MathOperator.Multiply)
                     }), "6");
 
                 yield return new TestCase("Print 'ArrayCount(Array: [Hello; World])'",

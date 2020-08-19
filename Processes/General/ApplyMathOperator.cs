@@ -80,6 +80,8 @@ namespace Reductech.EDR.Processes.General
 
         /// <inheritdoc />
         public override IEnumerable<Type> EnumTypes => new[] {typeof(MathOperator)};
+
+
     }
 
     /// <summary>
