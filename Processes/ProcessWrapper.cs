@@ -35,10 +35,10 @@ namespace Reductech.EDR.Processes
                     x => new ProcessMember(new ConstantFreezableProcess(x)));
 
 
-            var fpd = new FreezableProcessData(dict, null);
+            var fpd = new FreezableProcessData(dict);
 
 
-            var freezableProcess = new CompoundFreezableProcess(_processFactory, fpd);
+            var freezableProcess = new CompoundFreezableProcess(_processFactory, fpd, null);
 
             var freezeResult = freezableProcess.TryFreeze();
             if (freezeResult.IsFailure)

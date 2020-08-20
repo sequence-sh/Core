@@ -78,12 +78,12 @@ namespace Reductech.EDR.Processes
                     .ToDictionary(x => x.Key, x => x.Value);
 
 
-                return new FreezableProcessData(processMembers, ProcessConfiguration);
+                return new FreezableProcessData(processMembers);
             }
         }
 
         /// <inheritdoc />
-        public IFreezableProcess Unfreeze() => new CompoundFreezableProcess(RunnableProcessFactory,FreezableProcessData);
+        public IFreezableProcess Unfreeze() => new CompoundFreezableProcess(RunnableProcessFactory,FreezableProcessData, ProcessConfiguration);
 
         /// <inheritdoc />
         public Result<object> RunUntyped(ProcessState processState) => Run(processState);

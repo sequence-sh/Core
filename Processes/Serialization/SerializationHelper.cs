@@ -58,8 +58,8 @@ namespace Reductech.EDR.Processes.Serialization
                 };
 
 
-                var fp = new FreezableProcessData(dict, null);
-                var getValueProcess = new CompoundFreezableProcess(GetVariableProcessFactory.Instance, fp);
+                var fp = new FreezableProcessData(dict);
+                var getValueProcess = new CompoundFreezableProcess(GetVariableProcessFactory.Instance, fp, null);
 
                 return new ProcessMember(getValueProcess);
             }

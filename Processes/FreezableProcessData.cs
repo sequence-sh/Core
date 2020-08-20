@@ -12,16 +12,10 @@ namespace Reductech.EDR.Processes
         /// <summary>
         /// Create a new FreezableProcessData
         /// </summary>
-        public FreezableProcessData(IReadOnlyDictionary<string, ProcessMember> dictionary, ProcessConfiguration? processConfiguration)
+        public FreezableProcessData(IReadOnlyDictionary<string, ProcessMember> dictionary)
         {
             Dictionary = dictionary;
-            ProcessConfiguration = processConfiguration;
         }
-
-        /// <summary>
-        /// Configuration for this process.
-        /// </summary>
-        public ProcessConfiguration? ProcessConfiguration { get; }
 
         /// <summary>
         /// Dictionary mapping property names to process members.

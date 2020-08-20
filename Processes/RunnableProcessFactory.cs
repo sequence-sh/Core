@@ -87,13 +87,13 @@ namespace Reductech.EDR.Processes
         /// <summary>
         /// Try to create the instance of this type and set all arguments.
         /// </summary>
-        public Result<IRunnableProcess> TryFreeze(ProcessContext processContext, FreezableProcessData freezableProcessData)
+        public Result<IRunnableProcess> TryFreeze(ProcessContext processContext, FreezableProcessData freezableProcessData, ProcessConfiguration? processConfiguration)
         {
             var instanceResult = TryCreateInstance(processContext, freezableProcessData);
 
             if (instanceResult.IsFailure) return instanceResult.Map(x=>x as IRunnableProcess);
 
-            instanceResult.Value.ProcessConfiguration = freezableProcessData.ProcessConfiguration;
+            instanceResult.Value.ProcessConfiguration = processConfiguration;
 
             var runnableProcess = instanceResult.Value;
 

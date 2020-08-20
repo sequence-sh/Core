@@ -114,7 +114,7 @@ namespace Reductech.EDR.Processes
 
                         if (major < 0 || minor < 0)
                             return Result.Failure<Version>("Major and Minor versions must both be greater than zero");
-                        else if (build < 0) version = new Version(major, minor);
+                        if (build < 0) version = new Version(major, minor);
                         else if (revision < 0) version = new Version(major, minor, build);
                         else version = new Version(major, minor, build, revision);
 

@@ -41,7 +41,7 @@ namespace Reductech.EDR.Processes.Serialization
                         Result.Success,
                         l => new CompoundFreezableProcess(SequenceProcessFactory.Instance,
                             new FreezableProcessData(new Dictionary<string, ProcessMember>
-                                {{nameof(Sequence.Steps), new ProcessMember(l)}}, null))
+                                {{nameof(Sequence.Steps), new ProcessMember(l)}}), null)
 
                     ));
         }
@@ -129,9 +129,9 @@ namespace Reductech.EDR.Processes.Serialization
                 if (errors.Any())
                     return errors.Select(Result.Failure).Combine().ConvertFailure<IFreezableProcess>();
 
-                var data = new FreezableProcessData(dict, processConfiguration);
+                var data = new FreezableProcessData(dict);
 
-                var process = new CompoundFreezableProcess(factory, data);
+                var process = new CompoundFreezableProcess(factory, data, processConfiguration);
                 return process;
             }
 
@@ -165,7 +165,7 @@ namespace Reductech.EDR.Processes.Serialization
                         return ToSimpleObject(processMember);
 
                     if (compoundFreezableProcess.ProcessFactory.CustomSerializer.HasValue &&
-                        compoundFreezableProcess.FreezableProcessData.ProcessConfiguration == null) //Don't use custom serialization if you have configuration
+                        compoundFreezableProcess.ProcessConfiguration == null) //Don't use custom serialization if you have configuration
                     {
                             var sr = compoundFreezableProcess.ProcessFactory.CustomSerializer.Value
                                 .TrySerialize(compoundFreezableProcess.FreezableProcessData);
@@ -177,8 +177,8 @@ namespace Reductech.EDR.Processes.Serialization
                     IDictionary<string, object> expandoObject = new ExpandoObject();
                     expandoObject[TypeString] = compoundFreezableProcess.ProcessFactory.TypeName;
 
-                    if(compoundFreezableProcess.FreezableProcessData.ProcessConfiguration != null)
-                        expandoObject[ConfigString]= compoundFreezableProcess.FreezableProcessData.ProcessConfiguration;
+                    if(compoundFreezableProcess.ProcessConfiguration != null)
+                        expandoObject[ConfigString]= compoundFreezableProcess.ProcessConfiguration;
 
                     foreach (var (name, m) in compoundFreezableProcess.FreezableProcessData.Dictionary)
                         expandoObject[name] = ToSimpleObject(m);

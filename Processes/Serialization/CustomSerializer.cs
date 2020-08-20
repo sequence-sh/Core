@@ -118,9 +118,9 @@ namespace Reductech.EDR.Processes.Serialization
                 }
             }
 
-            var fpd = new FreezableProcessData(dict, null);
+            var fpd = new FreezableProcessData(dict);
 
-            return new CompoundFreezableProcess(factory, fpd);
+            return new CompoundFreezableProcess(factory, fpd, null);
         }
     }
 }
