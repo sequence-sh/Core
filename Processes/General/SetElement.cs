@@ -74,6 +74,6 @@
 //                .BindSingle()
 //                .Compose(() => freezableProcessData.GetArgument(nameof(SetElement<object>.Element))
 //                    .Bind(x => x.TryGetOutputTypeReference()))
-//                .Bind(x=>MultipleTypeReference.TryCreate(new[]{x.Item1, x.Item2}, TypeName));
+//                .Bind(x=>MultipleTypeReference.TryConvert(new[]{x.Item1, x.Item2}, TypeName));
 //    }
 //}

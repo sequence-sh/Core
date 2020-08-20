@@ -52,10 +52,13 @@ namespace Reductech.EDR.Processes.Serialization
             if (VariableNameRegex.TryMatch(text, out var variableNameMatch))
             {
                 var variableName = new VariableName(variableNameMatch.Groups["variableName"].Value);
-                var fp = new FreezableProcessData(new Dictionary<string, ProcessMember>
+                var dict = new Dictionary<string, ProcessMember>
                 {
                     {nameof(GetVariable<object>.VariableName), new ProcessMember(variableName)}
-                });
+                };
+
+
+                var fp = new FreezableProcessData(dict, null);
                 var getValueProcess = new CompoundFreezableProcess(GetVariableProcessFactory.Instance, fp);
 
                 return new ProcessMember(getValueProcess);

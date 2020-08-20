@@ -15,12 +15,17 @@ namespace Reductech.EDR.Processes
         /// The factory used to create processes of this type.
         /// </summary>
         RunnableProcessFactory RunnableProcessFactory { get; }
+
+        /// <summary>
+        /// Configuration for this process.
+        /// </summary>
+        ProcessConfiguration? ProcessConfiguration { get; set; }
     }
 
     /// <summary>
     /// A runnable process that is not a constant.
     /// </summary>
-    public abstract class CompoundRunnableProcess<T> : IRunnableProcess<T>
+    public abstract class CompoundRunnableProcess<T> : IRunnableProcess<T>, ICompoundRunnableProcess
     {
         /// <inheritdoc />
         public abstract Result<T> Run(ProcessState processState);
@@ -36,6 +41,10 @@ namespace Reductech.EDR.Processes
         /// <inheritdoc />
         public override string ToString() => RunnableProcessFactory.TypeName;
 
+        /// <summary>
+        /// Configuration for this process.
+        /// </summary>
+        public ProcessConfiguration? ProcessConfiguration { get; set; }
 
 
         private FreezableProcessData FreezableProcessData
@@ -69,7 +78,7 @@ namespace Reductech.EDR.Processes
                     .ToDictionary(x => x.Key, x => x.Value);
 
 
-                return new FreezableProcessData(processMembers);
+                return new FreezableProcessData(processMembers, ProcessConfiguration);
             }
         }
 

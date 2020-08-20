@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using CSharpFunctionalExtensions;
 using YamlDotNet.Serialization;
 
 namespace Reductech.EDR.Processes
@@ -51,6 +52,47 @@ namespace Reductech.EDR.Processes
                 Priority = child.Priority?? parent.Priority
             };
 
+        }
+
+        /// <summary>
+        /// Tries to convert an object to a process configuration.
+        /// </summary>
+        public static Result<ProcessConfiguration> TryConvert(object o)
+        {
+            if (o is ProcessConfiguration pc) return pc;
+
+            if (o is IReadOnlyDictionary<object, object> dictionary)
+            {
+                var processConfiguration = new ProcessConfiguration();
+
+                var results = new List<Result>();
+
+
+                foreach (var (key, value) in dictionary.Where(x=>x.Value != null))
+                {
+                    var result = key switch
+                    {
+                        nameof(Priority)=> value.TryConvert<byte>().Tap(x=>processConfiguration.Priority = x),
+                        nameof(DoNotSplit)=> value.TryConvert<bool>().Tap(x=>processConfiguration.DoNotSplit = x),
+                        nameof(TargetMachineTags)=> value.TryCast<List<object>>()
+                            .Bind(x=>x.TryConvertElements<object, string>())
+                            .Tap(x=>processConfiguration.TargetMachineTags = x.ToList()),
+                        nameof(AdditionalRequirements)=> value.TryCast<List<object>>()
+                            .Bind(x=>x.TryConvertElements(Requirement.TryConvert))
+                            .Tap(x=>processConfiguration.AdditionalRequirements = x.ToList()),
+                        _ => Result.Failure($"Could not recognize property '{key}'.")
+                    };
+
+                    results.Add(result);
+                }
+
+                var r = results
+                    .Combine().Bind<ProcessConfiguration>(() => processConfiguration);
+
+                return r;
+
+            }
+            return Result.Failure<ProcessConfiguration>("Could not deserialize process configuration.");
         }
 
 

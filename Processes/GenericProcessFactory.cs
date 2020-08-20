@@ -25,7 +25,7 @@ namespace Reductech.EDR.Processes
         public override IEnumerable<Type> EnumTypes => ImmutableList<Type>.Empty;
 
         /// <inheritdoc />
-        protected override Result<IRunnableProcess> TryCreateInstance(ProcessContext processContext, FreezableProcessData freezableProcessData) =>
+        protected override Result<ICompoundRunnableProcess> TryCreateInstance(ProcessContext processContext, FreezableProcessData freezableProcessData) =>
             GetMemberType(freezableProcessData)
                 .Bind(processContext.TryGetTypeFromReference)
                 .Bind(x => TryCreateGeneric(ProcessType, x));

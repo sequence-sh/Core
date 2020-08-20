@@ -84,7 +84,7 @@ namespace Reductech.EDR.Processes.General
         }
 
         /// <inheritdoc />
-        protected override Result<IRunnableProcess> TryCreateInstance(ProcessContext processContext, FreezableProcessData freezableProcessData) =>
+        protected override Result<ICompoundRunnableProcess> TryCreateInstance(ProcessContext processContext, FreezableProcessData freezableProcessData) =>
             freezableProcessData.GetVariableName(nameof(SetVariable<object>.VariableName))
                 .Bind(x => processContext.TryGetTypeFromReference(new VariableTypeReference(x)))
                 .Bind(x => TryCreateGeneric(typeof(SetVariable<>), x));

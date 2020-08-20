@@ -30,9 +30,12 @@ namespace Reductech.EDR.Processes
 
         Result<IInvocation, IReadOnlyCollection<DisplayError>> IRunnable.TryGetInvocation(IReadOnlyDictionary<string, string> arguments)
         {
-            var fpd = new FreezableProcessData(arguments
+            var dict = arguments
                 .ToDictionary(x => x.Key,
-                    x => new ProcessMember(new ConstantFreezableProcess(x))));
+                    x => new ProcessMember(new ConstantFreezableProcess(x)));
+
+
+            var fpd = new FreezableProcessData(dict, null);
 
 
             var freezableProcess = new CompoundFreezableProcess(_processFactory, fpd);
