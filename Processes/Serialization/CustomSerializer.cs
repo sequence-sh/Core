@@ -3,28 +3,10 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using CSharpFunctionalExtensions;
-using Reductech.EDR.Processes.General;
+using Reductech.EDR.Processes.Internal;
 
 namespace Reductech.EDR.Processes.Serialization
 {
-    /// <summary>
-    /// A component of a custom serializer
-    /// </summary>
-    public interface ICustomSerializerComponent
-    {
-        /// <summary>
-        /// Contributes to the serialized string
-        /// </summary>
-        public ISerializerBlock? SerializerBlock { get; }
-
-        /// <summary>
-        /// Contributes to the deserialization regex
-        /// </summary>
-        public IDeserializerBlock? DeserializerBlock { get; }
-
-        public IDeserializerMapping? Mapping { get; }
-    }
-
     /// <summary>
     /// Contributes to the serialized string
     /// </summary>
@@ -56,7 +38,7 @@ namespace Reductech.EDR.Processes.Serialization
         /// <summary>
         /// Create a new CustomSerializer
         /// </summary>
-        public CustomSerializer(params ICustomSerializerComponent[] components)//string templateString, Regex matchRegex, params IDeserializerMapping[] mappings)
+        public CustomSerializer(params ICustomSerializerComponent[] components)
         {
             Components = components;
             MatchRegex = CreateRegex(Components);
@@ -88,11 +70,6 @@ namespace Reductech.EDR.Processes.Serialization
         /// </summary>
         public Regex MatchRegex { get; }
 
-        /// <summary>
-        /// The delimiter to use for lists.
-        /// </summary>
-        public string ListDelimiter { get; } = "; ";
-
 
         /// <inheritdoc />
         public Result<string> TrySerialize(FreezableProcessData data)
@@ -106,54 +83,12 @@ namespace Reductech.EDR.Processes.Serialization
                 sb.Append(r.Value);
             }
 
-
             if (sb.Length == 0)
                 return Result.Failure<string>("Serialized string was empty");
 
             return sb.ToString();
-
-            //var errors = new List<string>();
-            //var replacedString = NameVariableRegex.Replace(TemplateString, GetReplacement);
-
-
-            //if (errors.Any())
-            //    return Result.Failure<string>(string.Join(", ", errors));
-
-            //return replacedString;
-
-            //string GetReplacement(Match m)
-            //{
-            //    var variableName = m.Groups["ArgumentName"].Value;
-
-            //    var p = data.Dictionary.TryFindOrFail(variableName, null)
-            //        .Bind(x => x.Join(vn => vn.Name,
-            //            TrySerialize,
-            //            l => Result.Failure<string>("Cannot handle list argument")));
-
-            //    if(p.IsSuccess)
-            //        return p.Value;
-
-            //    errors.Add(p.Error);
-            //    return "Unknown";
-            //}
         }
 
-        private static Result<string> TrySerialize(IFreezableProcess fp)
-        {
-            if (fp is ConstantFreezableProcess cp)
-            {
-                if (cp.Value is string)
-                    return $"'{cp.Value}'";
-                return cp.SerializeToYaml().Trim();
-            }
-            else if (fp is CompoundFreezableProcess compound &&
-                     compound.ProcessFactory == GetVariableProcessFactory.Instance)
-                return fp.SerializeToYaml().Trim();
-
-            return Result.Failure<string>("Could not serialize");
-        }
-
-        //private static readonly Regex NameVariableRegex = new Regex(@"\[(?<ArgumentName>[\w_][\w\d_]*)\]", RegexOptions.Compiled);
 
         /// <inheritdoc />
         public Result<IFreezableProcess> TryDeserialize(string s, ProcessFactoryStore processFactoryStore, RunnableProcessFactory factory)
@@ -186,7 +121,7 @@ namespace Reductech.EDR.Processes.Serialization
 
             var fpd = new FreezableProcessData(dict);
 
-            return new CompoundFreezableProcess(factory, fpd);
+            return new CompoundFreezableProcess(factory, fpd, null);
         }
     }
 }

@@ -5,7 +5,7 @@ using Microsoft.Extensions.Logging;
 using Reductech.EDR.Processes.Serialization;
 using Reductech.Utilities.InstantConsole;
 
-namespace Reductech.EDR.Processes
+namespace Reductech.EDR.Processes.Internal
 {
     /// <summary>
     /// A wrapper for a runnable process.
@@ -30,12 +30,15 @@ namespace Reductech.EDR.Processes
 
         Result<IInvocation, IReadOnlyCollection<DisplayError>> IRunnable.TryGetInvocation(IReadOnlyDictionary<string, string> arguments)
         {
-            var fpd = new FreezableProcessData(arguments
+            var dict = arguments
                 .ToDictionary(x => x.Key,
-                    x => new ProcessMember(new ConstantFreezableProcess(x))));
+                    x => new ProcessMember(new ConstantFreezableProcess(x)));
 
 
-            var freezableProcess = new CompoundFreezableProcess(_processFactory, fpd);
+            var fpd = new FreezableProcessData(dict);
+
+
+            var freezableProcess = new CompoundFreezableProcess(_processFactory, fpd, null);
 
             var freezeResult = freezableProcess.TryFreeze();
             if (freezeResult.IsFailure)

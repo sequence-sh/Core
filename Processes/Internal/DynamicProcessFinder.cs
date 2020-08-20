@@ -4,7 +4,7 @@ using System.Linq;
 using Microsoft.Extensions.Logging;
 using Reductech.Utilities.InstantConsole;
 
-namespace Reductech.EDR.Processes
+namespace Reductech.EDR.Processes.Internal
 {
     /// <summary>
     /// Dynamically Gets all processes and related entities from an assembly.

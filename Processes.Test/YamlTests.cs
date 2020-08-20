@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using CSharpFunctionalExtensions;
 using FluentAssertions;
+using Reductech.EDR.Processes.Internal;
 using Reductech.EDR.Processes.Serialization;
 using Reductech.EDR.Processes.Test.Extensions;
 using Xunit;
@@ -64,6 +65,46 @@ Value: 2 >= 3
 Do: Print
 Value: True and False
 ", false.ToString());
+
+                yield return new TestCase(
+                    @"
+Do: Print
+Config:
+  AdditionalRequirements: 
+  TargetMachineTags:
+  - Tag1
+  DoNotSplit: false
+  Priority: 1
+Value: I have config", "I have config"
+                    );
+
+                yield return new TestCase(
+                    @"
+Do: Print
+Config:
+  AdditionalRequirements:
+  - Notes: ABC123
+    Name: Test
+    MinVersion:
+      Major: 1
+      Minor: 0
+      Build: -1
+      Revision: -1
+      MajorRevision: -1
+      MinorRevision: -1
+    MaxVersion:
+      Major: 2
+      Minor: 0
+      Build: -1
+      Revision: -1
+      MajorRevision: -1
+      MinorRevision: -1
+  TargetMachineTags:
+  - Tag1
+  - Tag2
+  DoNotSplit: true
+  Priority: 1
+Value: I have more config", "I have more config");
 
 
             }

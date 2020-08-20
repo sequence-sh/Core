@@ -4,6 +4,7 @@ using System.Collections.Immutable;
 using System.ComponentModel.DataAnnotations;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Processes.Attributes;
+using Reductech.EDR.Processes.Internal;
 using Reductech.EDR.Processes.Serialization;
 
 namespace Reductech.EDR.Processes.General
@@ -84,7 +85,7 @@ namespace Reductech.EDR.Processes.General
         }
 
         /// <inheritdoc />
-        protected override Result<IRunnableProcess> TryCreateInstance(ProcessContext processContext, FreezableProcessData freezableProcessData) =>
+        protected override Result<ICompoundRunnableProcess> TryCreateInstance(ProcessContext processContext, FreezableProcessData freezableProcessData) =>
             freezableProcessData.GetVariableName(nameof(SetVariable<object>.VariableName))
                 .Bind(x => processContext.TryGetTypeFromReference(new VariableTypeReference(x)))
                 .Bind(x => TryCreateGeneric(typeof(SetVariable<>), x));

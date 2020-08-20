@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using CSharpFunctionalExtensions;
 
-namespace Reductech.EDR.Processes
+namespace Reductech.EDR.Processes.Internal
 {
     /// <summary>
     /// A process which can be Runnable.

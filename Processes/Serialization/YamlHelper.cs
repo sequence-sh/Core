@@ -4,6 +4,7 @@ using System.Dynamic;
 using System.Linq;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Processes.General;
+using Reductech.EDR.Processes.Internal;
 
 namespace Reductech.EDR.Processes.Serialization
 {
@@ -41,12 +42,14 @@ namespace Reductech.EDR.Processes.Serialization
                         Result.Success,
                         l => new CompoundFreezableProcess(SequenceProcessFactory.Instance,
                             new FreezableProcessData(new Dictionary<string, ProcessMember>
-                                {{nameof(Sequence.Steps), new ProcessMember(l)}}))
+                                {{nameof(Sequence.Steps), new ProcessMember(l)}}), null)
 
                     ));
         }
 
         private const string TypeString = "Do";
+        private const string ConfigString = "Config";
+
 
 
         private static Result<ProcessMember> FromSimpleObject(object simpleObject, ProcessFactoryStore processFactoryStore)
@@ -63,16 +66,21 @@ namespace Reductech.EDR.Processes.Serialization
             }
             else if (simpleObject is Dictionary<object, object> dictionary1 && dictionary1.ContainsKey(TypeString))
             {
+                var processConfiguration = dictionary1
+                    .TryFindOrFail(ConfigString, null)
+                    .Bind(ProcessConfiguration.TryConvert)
+                    .OnFailureCompensate(x=> (null as ProcessConfiguration)!);
+
                 result = dictionary1.TryFindOrFail(TypeString, $"Object did not have {TypeString} set.")
                     .BindCast<object, string>()
                     .Bind(x => processFactoryStore.Dictionary.TryFindOrFail(x, $"Could not find the process: '{x}'."))
                     .Compose(() =>
-                        dictionary1.Where(x => x.Key.ToString() != TypeString)
+                        dictionary1.Where(x => x.Key.ToString() != TypeString && x.Key.ToString() != ConfigString)
                             .Select(x =>
                                 FromSimpleObject(x.Value, processFactoryStore)
                                     .Map(value => (x.Key.ToString(), value)))
                             .Combine())
-                    .Bind(x => CreateProcess(x.Item1, x.Item2!))
+                    .Bind(x => CreateProcess(x.Item1, x.Item2!, processConfiguration.Value))
                     .Map(x => new ProcessMember(x));
             }
             else if (simpleObject is string sString3)
@@ -89,7 +97,7 @@ namespace Reductech.EDR.Processes.Serialization
 
             return result;
 
-            static Result<IFreezableProcess> CreateProcess(RunnableProcessFactory factory, IEnumerable<(string key, ProcessMember member)> arguments)
+            static Result<IFreezableProcess> CreateProcess(RunnableProcessFactory factory, IEnumerable<(string key, ProcessMember member)> arguments, ProcessConfiguration? processConfiguration)
             {
                 var errors = new List<string>();
                 var dict = new Dictionary<string, ProcessMember>();
@@ -124,7 +132,7 @@ namespace Reductech.EDR.Processes.Serialization
 
                 var data = new FreezableProcessData(dict);
 
-                var process = new CompoundFreezableProcess(factory, data);
+                var process = new CompoundFreezableProcess(factory, data, processConfiguration);
                 return process;
             }
 
@@ -157,7 +165,8 @@ namespace Reductech.EDR.Processes.Serialization
                         compoundFreezableProcess.FreezableProcessData.Dictionary.TryGetValue(nameof(Sequence.Steps), out var processMember))
                         return ToSimpleObject(processMember);
 
-                    if (compoundFreezableProcess.ProcessFactory.CustomSerializer.HasValue)
+                    if (compoundFreezableProcess.ProcessFactory.CustomSerializer.HasValue &&
+                        compoundFreezableProcess.ProcessConfiguration == null) //Don't use custom serialization if you have configuration
                     {
                             var sr = compoundFreezableProcess.ProcessFactory.CustomSerializer.Value
                                 .TrySerialize(compoundFreezableProcess.FreezableProcessData);
@@ -168,6 +177,9 @@ namespace Reductech.EDR.Processes.Serialization
 
                     IDictionary<string, object> expandoObject = new ExpandoObject();
                     expandoObject[TypeString] = compoundFreezableProcess.ProcessFactory.TypeName;
+
+                    if(compoundFreezableProcess.ProcessConfiguration != null)
+                        expandoObject[ConfigString]= compoundFreezableProcess.ProcessConfiguration;
 
                     foreach (var (name, m) in compoundFreezableProcess.FreezableProcessData.Dictionary)
                         expandoObject[name] = ToSimpleObject(m);

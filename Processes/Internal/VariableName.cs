@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Reductech.EDR.Processes
+namespace Reductech.EDR.Processes.Internal
 {
     /// <summary>
     /// The name of a variable that can be written and read from the process state.

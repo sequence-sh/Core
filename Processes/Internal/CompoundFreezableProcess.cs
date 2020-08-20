@@ -3,7 +3,7 @@ using System.Collections.Immutable;
 using System.Linq;
 using CSharpFunctionalExtensions;
 
-namespace Reductech.EDR.Processes
+namespace Reductech.EDR.Processes.Internal
 {
     /// <summary>
     /// A process that is not a constant or a variable reference.
@@ -13,10 +13,11 @@ namespace Reductech.EDR.Processes
         /// <summary>
         /// Creates a new CompoundFreezableProcess.
         /// </summary>
-        public CompoundFreezableProcess(RunnableProcessFactory processFactory, FreezableProcessData freezableProcessData)
+        public CompoundFreezableProcess(RunnableProcessFactory processFactory, FreezableProcessData freezableProcessData, ProcessConfiguration? processConfiguration)
         {
             ProcessFactory = processFactory;
             FreezableProcessData = freezableProcessData;
+            ProcessConfiguration = processConfiguration;
         }
 
 
@@ -30,9 +31,14 @@ namespace Reductech.EDR.Processes
         /// </summary>
         public FreezableProcessData FreezableProcessData { get; }
 
+        /// <summary>
+        /// Configuration for this process.
+        /// </summary>
+        public ProcessConfiguration? ProcessConfiguration { get; }
+
 
         /// <inheritdoc />
-        public Result<IRunnableProcess> TryFreeze(ProcessContext processContext) => ProcessFactory.TryFreeze(processContext, FreezableProcessData);
+        public Result<IRunnableProcess> TryFreeze(ProcessContext processContext) => ProcessFactory.TryFreeze(processContext, FreezableProcessData, ProcessConfiguration);
 
         /// <inheritdoc />
         public Result<IReadOnlyCollection<(VariableName VariableName, ITypeReference type)>> TryGetVariablesSet

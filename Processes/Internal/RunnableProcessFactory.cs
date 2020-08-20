@@ -8,7 +8,7 @@ using CSharpFunctionalExtensions;
 using Reductech.EDR.Processes.Attributes;
 using Reductech.EDR.Processes.Serialization;
 
-namespace Reductech.EDR.Processes
+namespace Reductech.EDR.Processes.Internal
 {
     /// <summary>
     /// A factory for creating runnable processes.
@@ -64,7 +64,7 @@ namespace Reductech.EDR.Processes
         /// <summary>
         /// Creates an instance of this type.
         /// </summary>
-        protected abstract Result<IRunnableProcess> TryCreateInstance(ProcessContext processContext, FreezableProcessData freezableProcessData);
+        protected abstract Result<ICompoundRunnableProcess> TryCreateInstance(ProcessContext processContext, FreezableProcessData freezableProcessData);
 
         /// <summary>
         /// Gets the type of this member.
@@ -87,11 +87,13 @@ namespace Reductech.EDR.Processes
         /// <summary>
         /// Try to create the instance of this type and set all arguments.
         /// </summary>
-        public Result<IRunnableProcess> TryFreeze(ProcessContext processContext, FreezableProcessData freezableProcessData)
+        public Result<IRunnableProcess> TryFreeze(ProcessContext processContext, FreezableProcessData freezableProcessData, ProcessConfiguration? processConfiguration)
         {
             var instanceResult = TryCreateInstance(processContext, freezableProcessData);
 
-            if (instanceResult.IsFailure) return instanceResult;
+            if (instanceResult.IsFailure) return instanceResult.Map(x=>x as IRunnableProcess);
+
+            instanceResult.Value.ProcessConfiguration = processConfiguration;
 
             var runnableProcess = instanceResult.Value;
 
@@ -200,7 +202,7 @@ namespace Reductech.EDR.Processes
             if (errors.Any())
                 return Result.Failure<IRunnableProcess>(string.Join("\r\n", errors));
 
-            return Result.Success(runnableProcess);
+            return Result.Success<IRunnableProcess>(runnableProcess);
 
         }
 
@@ -208,16 +210,16 @@ namespace Reductech.EDR.Processes
         /// <summary>
         /// Creates a typed generic IRunnableProcess with one type argument.
         /// </summary>
-        protected static Result<IRunnableProcess> TryCreateGeneric(Type openGenericType, Type parameterType)
+        protected static Result<ICompoundRunnableProcess> TryCreateGeneric(Type openGenericType, Type parameterType)
         {
             var genericType = openGenericType.MakeGenericType(parameterType);
 
             var r = Activator.CreateInstance(genericType);
 
-            if (r is IRunnableProcess rp)
+            if (r is ICompoundRunnableProcess rp)
                 return Result.Success(rp);
 
-            return Result.Failure<IRunnableProcess>($"Could not create an instance of {openGenericType.Name}<{parameterType.Name}>");
+            return Result.Failure<ICompoundRunnableProcess>($"Could not create an instance of {openGenericType.Name}<{parameterType.Name}>");
         }
 
         /// <summary>

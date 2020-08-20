@@ -5,6 +5,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Microsoft.Extensions.Logging;
+using Reductech.EDR.Processes.Internal;
 
 namespace Reductech.EDR.Processes
 {

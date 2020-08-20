@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using CSharpFunctionalExtensions;
 
-namespace Reductech.EDR.Processes
+namespace Reductech.EDR.Processes.Internal
 {
     /// <summary>
     /// Any member of a process.

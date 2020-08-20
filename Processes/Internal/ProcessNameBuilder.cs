@@ -2,7 +2,7 @@
 using System.Text.RegularExpressions;
 using CSharpFunctionalExtensions;
 
-namespace Reductech.EDR.Processes
+namespace Reductech.EDR.Processes.Internal
 {
     /// <summary>
     /// Builds process names.

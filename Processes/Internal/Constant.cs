@@ -1,7 +1,7 @@
 ﻿using System;
 using CSharpFunctionalExtensions;
 
-namespace Reductech.EDR.Processes
+namespace Reductech.EDR.Processes.Internal
 {
     /// <summary>
     /// A process that returns a fixed value when run.

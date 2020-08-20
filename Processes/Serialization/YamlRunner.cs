@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using JetBrains.Annotations;
 using Microsoft.Extensions.Logging;
+using Reductech.EDR.Processes.Internal;
 
 namespace Reductech.EDR.Processes.Serialization
 {

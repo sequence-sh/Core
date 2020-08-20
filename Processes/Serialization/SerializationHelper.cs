@@ -2,6 +2,7 @@
 using System.Text.RegularExpressions;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Processes.General;
+using Reductech.EDR.Processes.Internal;
 
 namespace Reductech.EDR.Processes.Serialization
 {
@@ -52,11 +53,14 @@ namespace Reductech.EDR.Processes.Serialization
             if (VariableNameRegex.TryMatch(text, out var variableNameMatch))
             {
                 var variableName = new VariableName(variableNameMatch.Groups["variableName"].Value);
-                var fp = new FreezableProcessData(new Dictionary<string, ProcessMember>
+                var dict = new Dictionary<string, ProcessMember>
                 {
                     {nameof(GetVariable<object>.VariableName), new ProcessMember(variableName)}
-                });
-                var getValueProcess = new CompoundFreezableProcess(GetVariableProcessFactory.Instance, fp);
+                };
+
+
+                var fp = new FreezableProcessData(dict);
+                var getValueProcess = new CompoundFreezableProcess(GetVariableProcessFactory.Instance, fp, null);
 
                 return new ProcessMember(getValueProcess);
             }

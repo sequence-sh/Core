@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text.RegularExpressions;
 using CSharpFunctionalExtensions;
@@ -8,6 +9,9 @@ namespace Reductech.EDR.Processes
 {
     internal static class FunctionalHelper
     {
+        /// <summary>
+        /// Tries to match this regex.
+        /// </summary>
         public static bool TryMatch(this Regex regex, string s, out Match m)
         {
             m = regex.Match(s);
@@ -15,18 +19,62 @@ namespace Reductech.EDR.Processes
 
         }
 
+        public static Result<T> TryCast< T>(this object obj)
+        {
+            if (obj is T type)
+                return type;
+
+            return Result.Failure<T>($"Could not cast '{obj}' to {typeof(T).Name}");
+        }
+
+        public static Result<T> TryConvert<T>(this object obj)
+        {
+            if (obj is T objAsT)
+                return objAsT;
+
+            var converted = Convert.ChangeType(obj, typeof(T));
+
+            if (converted is T objConverted)
+                return objConverted;
+
+            return Result.Failure<T>($"Could not cast '{obj}' to {typeof(T).Name}");
+        }
+
+        public static Result<IReadOnlyCollection<T2>> TryCastElements<T1, T2>(this IReadOnlyCollection<T1> collection) where T2 : T1 =>
+            collection.Select(x => x.TryCast<T2>()).Combine().Map(x => x.ToList() as IReadOnlyCollection<T2>);
+        public static Result<IReadOnlyCollection<T2>> TryConvertElements<T1, T2>(this IReadOnlyCollection<T1> collection) where T2 : T1 =>
+            collection.Select(x => x.TryConvert<T2>()).Combine().Map(x => x.ToList() as IReadOnlyCollection<T2>);
+
+
+        public static Result<IReadOnlyCollection<T2>> TryConvertElements<T1, T2>(this IReadOnlyCollection<T1> collection, Func<T1, Result<T2>> tryConvert) where T2 : T1 =>
+            collection.Select(tryConvert).Combine().Map(x => x.ToList() as IReadOnlyCollection<T2>);
+
 
         /// <summary>
         /// Casts the result to type T2.
         /// Returns failure if this cast is not possible.
         /// </summary>
-        public static Result<T2> BindCast<T1, T2>(this Result<T1> result)
+        public static Result<T2> BindCast<T1, T2>(this Result<T1> result) where T2 : T1
         {
             if (result.IsFailure) return result.ConvertFailure<T2>();
 
             if (result.Value is T2 t2) return t2;
 
             return Result.Failure<T2>($"{result.Value} is not of type '{typeof(T2).Name}'");
+        }
+
+
+        /// <summary>
+        /// Casts the maybe to type T2.
+        /// Returns failure if this cast is not possible.
+        /// </summary>
+        public static Maybe<T2> BindCast<T1, T2>(this Maybe<T1> result)  where T2 : T1
+        {
+            if (result.HasNoValue) return Maybe<T2>.None;
+
+            if (result.Value is T2 t2) return t2;
+
+            return Maybe<T2>.None;
         }
 
 

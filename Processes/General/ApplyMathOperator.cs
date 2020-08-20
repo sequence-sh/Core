@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Processes.Attributes;
+using Reductech.EDR.Processes.Internal;
 using Reductech.EDR.Processes.Serialization;
 
 namespace Reductech.EDR.Processes.General

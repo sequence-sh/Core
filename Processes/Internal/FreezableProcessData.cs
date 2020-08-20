@@ -2,7 +2,7 @@
 using System.Linq;
 using CSharpFunctionalExtensions;
 
-namespace Reductech.EDR.Processes
+namespace Reductech.EDR.Processes.Internal
 {
     /// <summary>
     /// The data used by a Freezable Process.
@@ -12,7 +12,10 @@ namespace Reductech.EDR.Processes
         /// <summary>
         /// Create a new FreezableProcessData
         /// </summary>
-        public FreezableProcessData(IReadOnlyDictionary<string, ProcessMember> dictionary) => Dictionary = dictionary;
+        public FreezableProcessData(IReadOnlyDictionary<string, ProcessMember> dictionary)
+        {
+            Dictionary = dictionary;
+        }
 
         /// <summary>
         /// Dictionary mapping property names to process members.
