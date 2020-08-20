@@ -12,7 +12,7 @@ namespace Reductech.EDR.Processes.General
     public sealed class Test<T> : CompoundRunnableProcess<T>
     {
         /// <inheritdoc />
-        public override Result<T> Run(ProcessState processState)
+        public override Result<T, IRunErrors> Run(ProcessState processState)
         {
             var result = Condition.Run(processState)
                 .Bind(r => r ? ThenValue.Run(processState) : ElseValue.Run(processState));

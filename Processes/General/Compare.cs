@@ -37,9 +37,10 @@ namespace Reductech.EDR.Processes.General
 
 
         /// <inheritdoc />
-        public override Result<bool> Run(ProcessState processState)
+        public override Result<bool, IRunErrors> Run(ProcessState processState)
         {
-            var result = Left.Run(processState).Compose(() => Operator.Run(processState), () => Right.Run(processState))
+            var result = Left.Run(processState)
+                .Compose(() => Operator.Run(processState), () => Right.Run(processState))
                 .Bind(x => CompareItems(x.Item1, x.Item2, x.Item3));
 
 
@@ -49,7 +50,7 @@ namespace Reductech.EDR.Processes.General
         /// <inheritdoc />
         public override RunnableProcessFactory RunnableProcessFactory => CompareProcessFactory.Instance;
 
-        private static Result<bool> CompareItems(T item1, CompareOperator compareOperator, T item2)
+        private static Result<bool, IRunErrors> CompareItems(T item1, CompareOperator compareOperator, T item2)
         {
             return compareOperator switch
             {
@@ -87,10 +88,16 @@ namespace Reductech.EDR.Processes.General
 #pragma warning restore 1591
     }
 
+    /// <summary>
+    /// Compares two items.
+    /// </summary>
     public sealed class CompareProcessFactory : GenericProcessFactory
     {
         private CompareProcessFactory() { }
 
+        /// <summary>
+        /// The instance.
+        /// </summary>
         public static RunnableProcessFactory Instance { get; } = new CompareProcessFactory();
 
         /// <inheritdoc />

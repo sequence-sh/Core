@@ -32,7 +32,7 @@ namespace Reductech.EDR.Processes.Internal
         public T Value { get; set; }
 
         /// <inheritdoc />
-        public Result<T> Run(ProcessState processState) => Value!;
+        public Result<T, IRunErrors> Run(ProcessState processState) => Value!;
 
         /// <inheritdoc />
         public string Name => $"{Value}";
@@ -41,7 +41,7 @@ namespace Reductech.EDR.Processes.Internal
         public IFreezableProcess Unfreeze() => new ConstantFreezableProcess(Value!);
 
         /// <inheritdoc />
-        public Result<object> RunUntyped(ProcessState processState) => Run(processState);
+        public Result<object, IRunErrors> RunUntyped(ProcessState processState) => Run(processState);
 
         /// <inheritdoc />
         public Type OutputType => typeof(T);

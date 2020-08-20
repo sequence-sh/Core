@@ -12,7 +12,7 @@ namespace Reductech.EDR.Processes.General
     public sealed class RepeatWhile : CompoundRunnableProcess<Unit>
     {
         /// <inheritdoc />
-        public override Result<Unit> Run(ProcessState processState)
+        public override Result<Unit, IRunErrors> Run(ProcessState processState)
         {
             while (true)
             {

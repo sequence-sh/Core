@@ -28,7 +28,7 @@ namespace Reductech.EDR.Processes.Internal
     public abstract class CompoundRunnableProcess<T> : IRunnableProcess<T>, ICompoundRunnableProcess
     {
         /// <inheritdoc />
-        public abstract Result<T> Run(ProcessState processState);
+        public abstract Result<T, IRunErrors> Run(ProcessState processState);
 
         /// <summary>
         /// The factory used to create processes of this type.
@@ -86,6 +86,6 @@ namespace Reductech.EDR.Processes.Internal
         public IFreezableProcess Unfreeze() => new CompoundFreezableProcess(RunnableProcessFactory,FreezableProcessData, ProcessConfiguration);
 
         /// <inheritdoc />
-        public Result<object> RunUntyped(ProcessState processState) => Run(processState);
+        public Result<object, IRunErrors> RunUntyped(ProcessState processState) => Run(processState);
     }
 }

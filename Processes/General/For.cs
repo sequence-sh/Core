@@ -16,7 +16,7 @@ namespace Reductech.EDR.Processes.General
         /// </summary>
         [RunnableProcessProperty]
         [Required]
-        public IRunnableProcess<Unit> Action { get; set; }
+        public IRunnableProcess<Unit> Action { get; set; } = null!;
 
 
         /// <summary>
@@ -31,14 +31,14 @@ namespace Reductech.EDR.Processes.General
         /// </summary>
         [RunnableProcessProperty]
         [Required]
-        public IRunnableProcess<int> From { get; set; }
+        public IRunnableProcess<int> From { get; set; } = null!;
 
         /// <summary>
         /// The highest value of the variable to use
         /// </summary>
         [RunnableProcessProperty]
         [Required]
-        public IRunnableProcess<int> To { get; set; }
+        public IRunnableProcess<int> To { get; set; } = null!;
 
 
         /// <summary>
@@ -46,10 +46,10 @@ namespace Reductech.EDR.Processes.General
         /// </summary>
         [RunnableProcessProperty]
         [Required]
-        public IRunnableProcess<int> Increment { get; set; }
+        public IRunnableProcess<int> Increment { get; set; } = null!;
 
         /// <inheritdoc />
-        public override Result<Unit> Run(ProcessState processState)
+        public override Result<Unit, IRunErrors> Run(ProcessState processState)
         {
             var from = From.Run(processState);
             if (from.IsFailure) return from.ConvertFailure<Unit>();
@@ -71,7 +71,7 @@ namespace Reductech.EDR.Processes.General
                 if (r.IsFailure) return r;
 
 
-                var currentValueResult = processState.GetVariable<int>(VariableName);
+                var currentValueResult = processState.GetVariable<int>(VariableName, Name);
                 if (currentValueResult.IsFailure) return currentValueResult.ConvertFailure<Unit>();
                 currentValue = currentValueResult.Value;
                 currentValue += increment.Value;
@@ -95,6 +95,10 @@ namespace Reductech.EDR.Processes.General
     {
         private ForProcessFactory() { }
 
+
+        /// <summary>
+        /// The instance.
+        /// </summary>
         public static SimpleRunnableProcessFactory<For, Unit> Instance { get; } = new ForProcessFactory();
 
         /// <inheritdoc />

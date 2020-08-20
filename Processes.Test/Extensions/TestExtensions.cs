@@ -1,7 +1,9 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using FluentAssertions;
 using Xunit;
+using Xunit.Sdk;
 
 namespace Reductech.EDR.Processes.Test.Extensions
 {
@@ -37,6 +39,12 @@ namespace Reductech.EDR.Processes.Test.Extensions
             Assert.False(isFailure, error);
         }
 
+        public static void ShouldBeSuccessful<T, TE>(this Result<T,TE> result, Func<TE, string> convert)
+        {
+            var (_, isFailure, _, error) = result;
+            if(isFailure)
+                throw new XunitException(convert(error));
+        }
 
         public static void ShouldBeSuccessful<T>(this Result<T> result)
         {

@@ -144,7 +144,7 @@ Value: I have more config", "I have more config");
 
                 var runResult = freezeResult.Value.Run(new ProcessState(logger, EmptySettings.Instance));
 
-                runResult.ShouldBeSuccessful();
+                runResult.ShouldBeSuccessful(x=>x.AsString);
 
                 logger.LoggedValues.Should().BeEquivalentTo(ExpectedLoggedValues);
 

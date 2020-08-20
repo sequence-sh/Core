@@ -28,7 +28,7 @@ namespace Reductech.EDR.Processes.General
         public IRunnableProcess<TextCase> Case { get; set; } = null!;
 
         /// <inheritdoc />
-        public override Result<string> Run(ProcessState processState)
+        public override Result<string, IRunErrors> Run(ProcessState processState)
         {
             return String.Run(processState).Compose(() => Case.Run(processState))
                 .Map(x => Convert(x.Item1, x.Item2));

@@ -28,7 +28,7 @@ namespace Reductech.EDR.Processes.General
         public IRunnableProcess<int> Number { get; set; } = null!;
 
         /// <inheritdoc />
-        public override Result<List<T>> Run(ProcessState processState) =>
+        public override Result<List<T>, IRunErrors> Run(ProcessState processState) =>
             Element.Run(processState).Compose(() => Number.Run(processState))
                 .Map(x => Enumerable.Repeat(x.Item1, x.Item2).ToList());
 

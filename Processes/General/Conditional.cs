@@ -12,14 +12,14 @@ namespace Reductech.EDR.Processes.General
     public sealed class Conditional : CompoundRunnableProcess<Unit>
     {
         /// <inheritdoc />
-        public override Result<Unit> Run(ProcessState processState)
+        public override Result<Unit, IRunErrors> Run(ProcessState processState)
         {
             var result = Condition.Run(processState)
                 .Bind(r =>
                 {
                     if (r)
                         return ThenProcess.Run(processState);
-                    return ElseProcess?.Run(processState) ?? Result.Success(Unit.Default);
+                    return ElseProcess?.Run(processState) ?? Unit.Default;
                 });
 
             return result;
@@ -60,6 +60,9 @@ namespace Reductech.EDR.Processes.General
     {
         private ConditionalProcessFactory() { }
 
+        /// <summary>
+        /// The instance.
+        /// </summary>
         public static ConditionalProcessFactory Instance { get; } = new ConditionalProcessFactory();
 
         /// <inheritdoc />

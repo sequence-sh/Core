@@ -28,7 +28,7 @@ namespace Reductech.EDR.Processes.General
         public IRunnableProcess<SortOrder> Order { get; set; } = null!;
 
         /// <inheritdoc />
-        public override Result<List<T>> Run(ProcessState processState) =>
+        public override Result<List<T>, IRunErrors> Run(ProcessState processState) =>
             Array.Run(processState)
                 .Compose(() => Order.Run(processState))
                 .Map(x => Sort(x.Item1, x.Item2));

@@ -11,7 +11,7 @@ namespace Reductech.EDR.Processes.General
     public sealed class StringIsEmpty : CompoundRunnableProcess<bool>
     {
         /// <inheritdoc />
-        public override Result<bool> Run(ProcessState processState)
+        public override Result<bool, IRunErrors> Run(ProcessState processState)
         {
             var str = String.Run(processState);
             if (str.IsFailure) return str.ConvertFailure<bool>();

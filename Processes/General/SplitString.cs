@@ -28,7 +28,7 @@ namespace Reductech.EDR.Processes.General
         public IRunnableProcess<string> Delimiter { get; set; } = null!;
 
         /// <inheritdoc />
-        public override Result<List<string>> Run(ProcessState processState) =>
+        public override Result<List<string>, IRunErrors> Run(ProcessState processState) =>
             String.Run(processState).Compose(() => Delimiter.Run(processState))
                 .Map(x => x.Item1.Split(new[] {x.Item2}, StringSplitOptions.None).ToList());
 

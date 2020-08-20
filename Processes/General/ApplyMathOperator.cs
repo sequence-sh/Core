@@ -14,7 +14,7 @@ namespace Reductech.EDR.Processes.General
     public sealed class ApplyMathOperator : CompoundRunnableProcess<int>
     {
         /// <inheritdoc />
-        public override Result<int> Run(ProcessState processState)
+        public override Result<int, IRunErrors> Run(ProcessState processState)
         {
             var left = Left.Run(processState);
             if (left.IsFailure) return left;
@@ -75,6 +75,9 @@ namespace Reductech.EDR.Processes.General
     {
         private ApplyMathOperatorProcessFactory() { }
 
+        /// <summary>
+        /// The instance.
+        /// </summary>
         public static SimpleRunnableProcessFactory<ApplyMathOperator, int> Instance { get; } = new ApplyMathOperatorProcessFactory();
 
         ///// <inheritdoc />

@@ -34,17 +34,17 @@ namespace Reductech.EDR.Processes
         /// <summary>
         /// Gets the current value of this variable.
         /// </summary>
-        public Result<T> GetVariable<T>(VariableName key)
+        public Result<T,IRunErrors> GetVariable<T>(VariableName key, string processName)
         {
             if (_stateDictionary.TryGetValue(key, out var value))
             {
                 if (value is T typedValue)
                     return typedValue;
 
-                return Error<T>($"Variable '{key}' does not have type '{typeof(T)}'.");
+                return new RunError($"Variable '{key}' does not have type '{typeof(T)}'.", processName, null, ErrorCode.WrongVariableType);
             }
 
-            return Error<T>($"Variable '{key}' does not exist.");
+            return new RunError($"Variable '{key}' does not exist.", processName, null, ErrorCode.MissingVariable);
 
 
         }
@@ -52,13 +52,12 @@ namespace Reductech.EDR.Processes
         /// <summary>
         /// Creates or set the value of this variable.
         /// </summary>
-        public Result SetVariable<T>(VariableName key, T variable)
+        public Result<Unit, IRunErrors> SetVariable<T>(VariableName key, T variable)
         {
-            _stateDictionary.AddOrUpdate(key, _ => variable!, (_1, _2) => variable!);
+            _stateDictionary
+                .AddOrUpdate(key, _ => variable!, (_1, _2) => variable!);
 
-            return Result.Success();
+            return Unit.Default;
         }
-
-        private static Result<T> Error<T>(string message) => Result.Failure<T>(message);
     }
 }

@@ -25,8 +25,8 @@ namespace Reductech.EDR.Processes.General
         public IRunnableProcess<int> Amount { get; set; } = null!;
 
         /// <inheritdoc />
-        public override Result<Unit> Run(ProcessState processState) =>
-            processState.GetVariable<int>(Variable)
+        public override Result<Unit, IRunErrors> Run(ProcessState processState) =>
+            processState.GetVariable<int>(Variable, Name)
                 .Compose(() => Amount.Run(processState))
                 .Tap(x => processState.SetVariable(Variable, x.Item1 + x.Item2))
                 .Map(x => Unit.Default);
@@ -42,6 +42,9 @@ namespace Reductech.EDR.Processes.General
     {
         private IncrementVariableProcessFactory() { }
 
+        /// <summary>
+        /// The instance.
+        /// </summary>
         public static SimpleRunnableProcessFactory<IncrementVariable, int> Instance { get; } = new IncrementVariableProcessFactory();
 
         /// <inheritdoc />

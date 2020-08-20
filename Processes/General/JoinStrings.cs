@@ -26,7 +26,7 @@ namespace Reductech.EDR.Processes.General
         public IRunnableProcess<List<string>> List { get; set; } = null!;
 
         /// <inheritdoc />
-        public override Result<string> Run(ProcessState processState)
+        public override Result<string, IRunErrors> Run(ProcessState processState)
         {
             var list = List.Run(processState);
             if (list.IsFailure) return list.ConvertFailure<string>();

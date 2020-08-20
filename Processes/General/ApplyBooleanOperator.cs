@@ -19,7 +19,7 @@ namespace Reductech.EDR.Processes.General
         /// </summary>
         [RunnableProcessProperty]
         [Required]
-        public IRunnableProcess<bool> Left { get; set; }
+        public IRunnableProcess<bool> Left { get; set; } = null!;
 
 
         /// <summary>
@@ -27,7 +27,7 @@ namespace Reductech.EDR.Processes.General
         /// </summary>
         [RunnableProcessProperty]
         [Required]
-        public IRunnableProcess<BooleanOperator> Operator { get; set; }
+        public IRunnableProcess<BooleanOperator> Operator { get; set; } = null!;
 
 
         /// <summary>
@@ -35,10 +35,10 @@ namespace Reductech.EDR.Processes.General
         /// </summary>
         [RunnableProcessProperty]
         [Required]
-        public IRunnableProcess<bool> Right { get; set; }
+        public IRunnableProcess<bool> Right { get; set; } = null!;
 
         /// <inheritdoc />
-        public override Result<bool> Run(ProcessState processState)
+        public override Result<bool, IRunErrors> Run(ProcessState processState)
         {
             var l = Left.Run(processState);
             if (l.IsFailure) return l;
@@ -79,9 +79,12 @@ namespace Reductech.EDR.Processes.General
     {
         private ApplyBooleanProcessFactory() { }
 
+        /// <summary>
+        /// The instance.
+        /// </summary>
         public static RunnableProcessFactory Instance { get; } = new ApplyBooleanProcessFactory();
 
-
+        /// <inheritdoc />
         public override IProcessNameBuilder ProcessNameBuilder => new ProcessNameBuilderFromTemplate($"[{nameof(ApplyBooleanOperator.Left)}] [{nameof(ApplyBooleanOperator.Operator)}] [{nameof(ApplyBooleanOperator.Right)}]");
 
         /// <inheritdoc />

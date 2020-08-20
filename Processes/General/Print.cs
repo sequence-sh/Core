@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Text.RegularExpressions;
 using CSharpFunctionalExtensions;
 using Microsoft.Extensions.Logging;
 using Reductech.EDR.Processes.Attributes;
@@ -17,14 +15,14 @@ namespace Reductech.EDR.Processes.General
     public sealed class Print<T> : CompoundRunnableProcess<Unit>
     {
         /// <inheritdoc />
-        public override Result<Unit> Run(ProcessState processState)
+        public override Result<Unit, IRunErrors> Run(ProcessState processState)
         {
             var r = Value.Run(processState);
             if (r.IsFailure) return r.ConvertFailure<Unit>();
 
-            processState.Logger.LogInformation(r.Value.ToString());
+            processState.Logger.LogInformation(r.Value?.ToString());
 
-            return Result.Success(Unit.Default);
+            return Unit.Default;
         }
 
         /// <summary>
@@ -45,6 +43,9 @@ namespace Reductech.EDR.Processes.General
     {
         private PrintProcessFactory() { }
 
+        /// <summary>
+        /// The instance.
+        /// </summary>
         public static GenericProcessFactory Instance { get; } = new PrintProcessFactory();
 
         /// <inheritdoc />

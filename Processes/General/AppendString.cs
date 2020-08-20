@@ -26,19 +26,22 @@ namespace Reductech.EDR.Processes.General
         public IRunnableProcess<string> String { get; set; } = null!;
 
         /// <inheritdoc />
-        public override Result<Unit> Run(ProcessState processState)
+        public override Result<Unit, IRunErrors> Run(ProcessState processState)
         {
-            var currentValue = processState.GetVariable<string>(Variable);
-            if (currentValue.IsFailure) return currentValue.ConvertFailure<Unit>();
+            var currentValue = processState.GetVariable<string>(Variable, Name);
+            if (currentValue.IsFailure)
+                return currentValue.ConvertFailure<Unit>();
 
 
             var str = String.Run(processState);
-            if (str.IsFailure) return str.ConvertFailure<Unit>();
+            if (str.IsFailure)
+                return str.ConvertFailure<Unit>();
 
             var value = currentValue.Value + str.Value;
 
             var r = processState.SetVariable(Variable, value);
-            if (r.IsFailure) return r.ConvertFailure<Unit>();
+            if (r.IsFailure)
+                return r.ConvertFailure<Unit>();
 
             return Unit.Default;
         }

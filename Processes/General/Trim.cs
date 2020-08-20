@@ -28,7 +28,7 @@ namespace Reductech.EDR.Processes.General
         public IRunnableProcess<TrimSide> Side { get; set; } = null!;
 
         /// <inheritdoc />
-        public override Result<string> Run(ProcessState processState) =>
+        public override Result<string, IRunErrors> Run(ProcessState processState) =>
             String.Run(processState).Compose(() => Side.Run(processState))
                 .Map(x => TrimString(x.Item1, x.Item2));
 

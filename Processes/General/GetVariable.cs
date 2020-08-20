@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Text.RegularExpressions;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Processes.Attributes;
 using Reductech.EDR.Processes.Internal;
@@ -15,22 +13,16 @@ namespace Reductech.EDR.Processes.General
     /// </summary>
     public sealed class GetVariable<T> : CompoundRunnableProcess<T>
     {
-        /// <summary>
-        /// Necessary Parameterless constructor
-        /// </summary>
-        public GetVariable() { }
-
-        public GetVariable(VariableName variableName) => VariableName = variableName;
-
-
         /// <inheritdoc />
-        public override Result<T> Run(ProcessState processState) => processState.GetVariable<T>(VariableName);
+        public override Result<T, IRunErrors> Run(ProcessState processState) => processState.GetVariable<T>(VariableName, Name);
 
         /// <inheritdoc />
         public override RunnableProcessFactory RunnableProcessFactory => GetVariableProcessFactory.Instance;
 
-        [VariableName]
-        [Required]
+        /// <summary>
+        /// The name of the variable to get.
+        /// </summary>
+        [VariableName] [Required]
         public VariableName VariableName { get; set; }
     }
 
@@ -41,6 +33,9 @@ namespace Reductech.EDR.Processes.General
     {
         private GetVariableProcessFactory() { }
 
+        /// <summary>
+        /// The Instance.
+        /// </summary>
         public static GenericProcessFactory Instance { get; } = new GetVariableProcessFactory();
 
 

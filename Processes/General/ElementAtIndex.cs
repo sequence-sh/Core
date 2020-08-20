@@ -27,10 +27,11 @@ namespace Reductech.EDR.Processes.General
         public IRunnableProcess<int> Index { get; set; } = null!;
 
         /// <inheritdoc />
-        public override Result<T> Run(ProcessState processState) =>
+        public override Result<T, IRunErrors> Run(ProcessState processState) =>
             Array.Run(processState)
                 .Compose(() => Index.Run(processState))
-                .Ensure(x => x.Item2 >= 0 && x.Item2 < x.Item1.Count, "Index was out of the range of the array.")
+                .Ensure(x => x.Item2 >= 0 && x.Item2 < x.Item1.Count,
+                    new RunError( "Index was out of the range of the array.", Name, null, ErrorCode.IndexOutOfBounds))
                 .Map(x=>x.Item1[x.Item2]);
 
         /// <inheritdoc />
@@ -45,6 +46,9 @@ namespace Reductech.EDR.Processes.General
     {
         private ElementAtIndexProcessFactory() { }
 
+        /// <summary>
+        /// The instance.
+        /// </summary>
         public static GenericProcessFactory Instance { get; } = new ElementAtIndexProcessFactory();
 
         /// <inheritdoc />
