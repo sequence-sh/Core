@@ -2,7 +2,7 @@
 using System.Linq;
 using CSharpFunctionalExtensions;
 
-namespace Reductech.EDR.Processes
+namespace Reductech.EDR.Processes.Internal
 {
     /// <summary>
     /// The data used by a Freezable Process.

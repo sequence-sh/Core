@@ -3,7 +3,7 @@ using System.Collections.Immutable;
 using System.Linq;
 using CSharpFunctionalExtensions;
 
-namespace Reductech.EDR.Processes
+namespace Reductech.EDR.Processes.Internal
 {
     /// <summary>
     /// A process that is not a constant or a variable reference.

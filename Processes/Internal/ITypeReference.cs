@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Reductech.EDR.Processes
+namespace Reductech.EDR.Processes.Internal
 {
     /// <summary>
     /// Either a type itself, or the name of a variable with the same type.

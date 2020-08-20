@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using FluentAssertions;
 using Moq;
+using Reductech.EDR.Processes.Internal;
 using Xunit;
 
 namespace Reductech.EDR.Processes.Test

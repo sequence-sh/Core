@@ -1,6 +1,7 @@
 ﻿using System.Collections.Concurrent;
 using CSharpFunctionalExtensions;
 using Microsoft.Extensions.Logging;
+using Reductech.EDR.Processes.Internal;
 
 namespace Reductech.EDR.Processes
 {

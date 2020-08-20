@@ -4,7 +4,7 @@ using System.Reflection;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Processes.Attributes;
 
-namespace Reductech.EDR.Processes
+namespace Reductech.EDR.Processes.Internal
 {
     /// <summary>
     /// A runnable process that is not a constant.

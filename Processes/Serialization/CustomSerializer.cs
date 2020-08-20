@@ -3,6 +3,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using CSharpFunctionalExtensions;
+using Reductech.EDR.Processes.Internal;
 
 namespace Reductech.EDR.Processes.Serialization
 {

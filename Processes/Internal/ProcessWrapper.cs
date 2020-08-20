@@ -5,7 +5,7 @@ using Microsoft.Extensions.Logging;
 using Reductech.EDR.Processes.Serialization;
 using Reductech.Utilities.InstantConsole;
 
-namespace Reductech.EDR.Processes
+namespace Reductech.EDR.Processes.Internal
 {
     /// <summary>
     /// A wrapper for a runnable process.

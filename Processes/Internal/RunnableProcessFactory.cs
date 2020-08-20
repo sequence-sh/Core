@@ -8,7 +8,7 @@ using CSharpFunctionalExtensions;
 using Reductech.EDR.Processes.Attributes;
 using Reductech.EDR.Processes.Serialization;
 
-namespace Reductech.EDR.Processes
+namespace Reductech.EDR.Processes.Internal
 {
     /// <summary>
     /// A factory for creating runnable processes.
