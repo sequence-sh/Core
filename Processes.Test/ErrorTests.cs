@@ -32,8 +32,33 @@ namespace Reductech.EDR.Processes.Test
                     {
                         VariableName = FooString
                     },
-                    new RunError($"Variable 'Foo' does not exist.", "<Foo>", null, ErrorCode.MissingVariable)
+                    new RunError($"Variable 'Foo' does not exist.", "<Foo>", null, ErrorCode.MissingVariable));
+
+
+                yield return new ErrorTestCase("Get variable with wrong type",
+                    new Sequence
+                    {
+                        Steps = new IRunnableProcess<Unit>[]
+                        {
+                            new SetVariable<int>
+                            {
+                                VariableName = FooString,
+                                Value = new Constant<int>(42)
+                            },
+
+                            new Print<bool>
+                            {
+                                Value = new GetVariable<bool>()
+                            {
+                                VariableName =FooString
+                            }
+                            }
+                        }
+                    },
+                     new RunError("Variable 'Foo' does not have type 'System.Boolean'.", "<Foo>", null, ErrorCode.WrongVariableType)
                     );
+
+
             }
         }
 
