@@ -9,7 +9,7 @@ namespace Reductech.EDR.Processes
     /// <summary>
     /// Functional methods
     /// </summary>
-    public static class FunctionalHelper
+    public static class FunctionalExtensions
     {
         /// <summary>
         /// Tries to match this regex.

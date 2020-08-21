@@ -32,9 +32,9 @@ namespace Reductech.EDR.Processes.Internal
     }
 
     /// <summary>
-    /// SerializationHelper methods for processes.
+    /// SerializationMethods methods for processes.
     /// </summary>
-    public static class ProcessHelper
+    public static class FreezableProcessExtensions
     {
         /// <summary>
         /// Tries to freeze this process.

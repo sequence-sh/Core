@@ -11,7 +11,7 @@ namespace Reductech.EDR.Processes.Serialization
     /// <summary>
     /// Contains methods for converting Processes to and from Yaml.
     /// </summary>
-    public static class YamlHelper
+    public static class YamlMethods
     {
         /// <summary>
         /// Serialize this process to yaml.
@@ -90,7 +90,7 @@ namespace Reductech.EDR.Processes.Serialization
                 if (special != null)
                     result = special;
                 else
-                    result = SerializationHelper.TryDeserialize(sString3, processFactoryStore);
+                    result = SerializationMethods.TryDeserialize(sString3, processFactoryStore);
             }
             else
                 throw new ArgumentOutOfRangeException(nameof(simpleObject));
@@ -158,7 +158,7 @@ namespace Reductech.EDR.Processes.Serialization
             switch (process)
             {
                 case ConstantFreezableProcess cfp:
-                    return SerializationHelper.SerializeConstant(cfp, false);
+                    return SerializationMethods.SerializeConstant(cfp, false);
                 case CompoundFreezableProcess compoundFreezableProcess:
                 {
                     if (isTopLevel && compoundFreezableProcess.ProcessFactory == SequenceProcessFactory.Instance &&

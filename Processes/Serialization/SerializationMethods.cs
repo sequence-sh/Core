@@ -9,7 +9,7 @@ namespace Reductech.EDR.Processes.Serialization
     /// <summary>
     /// Deserializes text to primitive types.
     /// </summary>
-    public static class SerializationHelper
+    public static class SerializationMethods
     {
         private static readonly Regex EnumConstantRegex = new Regex(@"\A\s*(?<enumName>[\w\d_]+)\.(?<enumValue>[\w\d_]+)\s*\Z", RegexOptions.Compiled);
 
