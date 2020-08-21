@@ -136,7 +136,7 @@ Value: I have more config", "I have more config");
                 var pfs = ProcessFactoryStore.CreateUsingReflection(typeof(RunnableProcessFactory));
                 var logger = new TestLogger();
 
-                var freezeResult = YamlHelper.DeserializeFromYaml(Yaml, pfs)
+                var freezeResult = YamlMethods.DeserializeFromYaml(Yaml, pfs)
                     .Bind(x => x.TryFreeze())
                     .BindCast<IRunnableProcess, IRunnableProcess<Unit>>();
 

@@ -21,7 +21,7 @@ namespace Reductech.EDR.Processes.Serialization
         public string PropertyName { get; }
 
         /// <inheritdoc />
-        public Result<ProcessMember> TryDeserialize(string groupText, ProcessFactoryStore processFactoryStore) => SerializationHelper.TryDeserialize(groupText, processFactoryStore);
+        public Result<ProcessMember> TryDeserialize(string groupText, ProcessFactoryStore processFactoryStore) => SerializationMethods.TryDeserialize(groupText, processFactoryStore);
 
         /// <inheritdoc />
         public Result<string> TryGetText(FreezableProcessData data) =>
@@ -36,7 +36,7 @@ namespace Reductech.EDR.Processes.Serialization
         private static Result<string> TrySerialize(IFreezableProcess process)
         {
             if (process is ConstantFreezableProcess constantFreezableProcess)
-                return SerializationHelper.SerializeConstant(constantFreezableProcess, true);
+                return SerializationMethods.SerializeConstant(constantFreezableProcess, true);
             if (process is CompoundFreezableProcess compound && compound.ProcessFactory == GetVariableProcessFactory.Instance) //Special case
                 return compound.SerializeToYaml().Trim();
 

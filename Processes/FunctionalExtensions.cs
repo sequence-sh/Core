@@ -6,7 +6,10 @@ using CSharpFunctionalExtensions;
 
 namespace Reductech.EDR.Processes
 {
-    internal static class FunctionalHelper
+    /// <summary>
+    /// Functional methods
+    /// </summary>
+    public static class FunctionalExtensions
     {
         /// <summary>
         /// Tries to match this regex.
@@ -18,7 +21,10 @@ namespace Reductech.EDR.Processes
 
         }
 
-        public static Result<T> TryCast< T>(this object obj)
+        /// <summary>
+        /// Casts this object to type T. Returns failure if the cast fails.
+        /// </summary>
+        public static Result<T> TryCast<T>(this object obj)
         {
             if (obj is T type)
                 return type;
@@ -26,6 +32,9 @@ namespace Reductech.EDR.Processes
             return Result.Failure<T>($"Could not cast '{obj}' to {typeof(T).Name}");
         }
 
+        /// <summary>
+        /// Converts this object to type T. Returns failure if the cast fails.
+        /// </summary>
         public static Result<T> TryConvert<T>(this object obj)
         {
             if (obj is T objAsT)
@@ -39,12 +48,24 @@ namespace Reductech.EDR.Processes
             return Result.Failure<T>($"Could not cast '{obj}' to {typeof(T).Name}");
         }
 
+        /// <summary>
+        /// Casts the elements of the sequence to type T. Returns failure if the cast fails.
+        /// </summary>
         public static Result<IReadOnlyCollection<T2>> TryCastElements<T1, T2>(this IReadOnlyCollection<T1> collection) where T2 : T1 =>
-            collection.Select(x => x.TryCast<T2>()).Combine().Map(x => x.ToList() as IReadOnlyCollection<T2>);
+            collection.Select(x =>
+                x!.TryCast<T2>()).Combine().Map(x => x.ToList() as IReadOnlyCollection<T2>);
+
+
+        /// <summary>
+        /// Converts the elements of the sequence to type T2. Returns failure if the cast fails.
+        /// </summary>
         public static Result<IReadOnlyCollection<T2>> TryConvertElements<T1, T2>(this IReadOnlyCollection<T1> collection) where T2 : T1 =>
-            collection.Select(x => x.TryConvert<T2>()).Combine().Map(x => x.ToList() as IReadOnlyCollection<T2>);
+            collection.Select(x => x!.TryConvert<T2>()).Combine().Map(x => x.ToList() as IReadOnlyCollection<T2>);
 
 
+        /// <summary>
+        /// Casts the elements of the sequence to type T2. Returns failure if the cast fails.
+        /// </summary>
         public static Result<IReadOnlyCollection<T2>> TryConvertElements<T1, T2>(this IReadOnlyCollection<T1> collection, Func<T1, Result<T2>> tryConvert) where T2 : T1 =>
             collection.Select(tryConvert).Combine().Map(x => x.ToList() as IReadOnlyCollection<T2>);
 
