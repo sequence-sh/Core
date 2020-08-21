@@ -24,7 +24,7 @@ namespace Reductech.EDR.Processes.General
         public override Result<bool, IRunErrors> Run(ProcessState processState) => Array.Run(processState).Map(x => !x.Any());
 
         /// <inheritdoc />
-        public override RunnableProcessFactory RunnableProcessFactory => ArrayIsEmptyProcessFactory.Instance;
+        public override IRunnableProcessFactory RunnableProcessFactory => ArrayIsEmptyProcessFactory.Instance;
     }
 
 

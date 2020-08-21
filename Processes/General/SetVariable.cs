@@ -22,7 +22,7 @@ namespace Reductech.EDR.Processes.General
                 .Bind(x => processState.SetVariable(VariableName, x));
 
         /// <inheritdoc />
-        public override RunnableProcessFactory RunnableProcessFactory => SetVariableProcessFactory.Instance;
+        public override IRunnableProcessFactory RunnableProcessFactory => SetVariableProcessFactory.Instance;
 
         /// <summary>
         /// The name of the variable to set.

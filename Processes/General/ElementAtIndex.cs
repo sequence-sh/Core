@@ -35,7 +35,7 @@ namespace Reductech.EDR.Processes.General
                 .Map(x=>x.Item1[x.Item2]);
 
         /// <inheritdoc />
-        public override RunnableProcessFactory RunnableProcessFactory => ElementAtIndexProcessFactory.Instance;
+        public override IRunnableProcessFactory RunnableProcessFactory => ElementAtIndexProcessFactory.Instance;
     }
 
 

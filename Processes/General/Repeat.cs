@@ -33,7 +33,7 @@ namespace Reductech.EDR.Processes.General
                 .Map(x => Enumerable.Repeat(x.Item1, x.Item2).ToList());
 
         /// <inheritdoc />
-        public override RunnableProcessFactory RunnableProcessFactory => RepeatProcessFactory.Instance;
+        public override IRunnableProcessFactory RunnableProcessFactory => RepeatProcessFactory.Instance;
     }
 
     /// <summary>

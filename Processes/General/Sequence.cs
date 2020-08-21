@@ -26,7 +26,7 @@ namespace Reductech.EDR.Processes.General
         }
 
         /// <inheritdoc />
-        public override RunnableProcessFactory RunnableProcessFactory => SequenceProcessFactory.Instance;
+        public override IRunnableProcessFactory RunnableProcessFactory => SequenceProcessFactory.Instance;
 
         /// <summary>
         /// The steps of this sequence.

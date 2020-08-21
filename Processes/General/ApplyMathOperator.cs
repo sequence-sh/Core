@@ -40,7 +40,7 @@ namespace Reductech.EDR.Processes.General
         }
 
         /// <inheritdoc />
-        public override RunnableProcessFactory RunnableProcessFactory => ApplyMathOperatorProcessFactory.Instance;
+        public override IRunnableProcessFactory RunnableProcessFactory => ApplyMathOperatorProcessFactory.Instance;
 
 
         /// <summary>

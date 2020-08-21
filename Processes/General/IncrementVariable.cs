@@ -32,7 +32,7 @@ namespace Reductech.EDR.Processes.General
                 .Map(x => Unit.Default);
 
         /// <inheritdoc />
-        public override RunnableProcessFactory RunnableProcessFactory => IncrementVariableProcessFactory.Instance;
+        public override IRunnableProcessFactory RunnableProcessFactory => IncrementVariableProcessFactory.Instance;
     }
 
     /// <summary>

@@ -41,7 +41,7 @@ namespace Reductech.EDR.Processes.General
         }
 
         /// <inheritdoc />
-        public override RunnableProcessFactory RunnableProcessFactory => RepeatXTimesProcessFactory.Instance;
+        public override IRunnableProcessFactory RunnableProcessFactory => RepeatXTimesProcessFactory.Instance;
     }
 
     /// <summary>

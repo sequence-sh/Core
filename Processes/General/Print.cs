@@ -33,7 +33,7 @@ namespace Reductech.EDR.Processes.General
         public IRunnableProcess<T> Value { get; set; } = null!;
 
         /// <inheritdoc />
-        public override RunnableProcessFactory RunnableProcessFactory => PrintProcessFactory.Instance;
+        public override IRunnableProcessFactory RunnableProcessFactory => PrintProcessFactory.Instance;
     }
 
     /// <summary>

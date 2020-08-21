@@ -13,16 +13,60 @@ namespace Reductech.EDR.Processes.Internal
     /// <summary>
     /// A factory for creating runnable processes.
     /// </summary>
-    public abstract class RunnableProcessFactory
+    public interface IRunnableProcessFactory
     {
-        /// <summary>
-        /// Tries to get a reference to the output type of this process.
-        /// </summary>
-        public abstract Result<ITypeReference> TryGetOutputTypeReference(FreezableProcessData freezableProcessData);
-
         /// <summary>
         /// Unique name for this type of process.
         /// </summary>
+        public string TypeName { get; }
+
+
+        /// <summary>
+        /// Builds the name for a particular instance of a process.
+        /// </summary>
+        IProcessNameBuilder ProcessNameBuilder { get; }
+
+        /// <summary>
+        /// Tries to get a reference to the output type of this process.
+        /// </summary>
+        Result<ITypeReference> TryGetOutputTypeReference(FreezableProcessData freezableProcessData);
+
+        /// <summary>
+        /// If this variable is being set. Get the type reference it is being set to.
+        /// </summary>
+        Result<Maybe<ITypeReference>> GetTypeReferencesSet(VariableName variableName, FreezableProcessData freezableProcessData) =>
+            Maybe<ITypeReference>.None;
+
+
+        /// <summary>
+        /// Custom serializers to use for yaml serialization and deserialization.
+        /// </summary>
+        Maybe<ICustomSerializer> CustomSerializer { get; }
+
+
+        /// <summary>
+        /// Special requirements for this process.
+        /// </summary>
+        IEnumerable<Requirement> Requirements { get; }
+
+        /// <summary>
+        /// Try to create the instance of this type and set all arguments.
+        /// </summary>
+        Result<IRunnableProcess> TryFreeze(ProcessContext processContext, FreezableProcessData freezableProcessData,
+            ProcessConfiguration? processConfiguration);
+    }
+
+
+
+    /// <summary>
+    /// A factory for creating runnable processes.
+    /// </summary>
+    public abstract class RunnableProcessFactory : IRunnableProcessFactory
+    {
+        /// <inheritdoc />
+        public abstract Result<ITypeReference> TryGetOutputTypeReference(FreezableProcessData freezableProcessData);
+
+        /// <inheritdoc />
         public string TypeName => FormatTypeName(ProcessType);
 
         /// <summary>
@@ -34,9 +78,7 @@ namespace Reductech.EDR.Processes.Internal
         /// <inheritdoc />
         public override string ToString() => TypeName;
 
-        /// <summary>
-        /// Builds the name for a particular instance of a process.
-        /// </summary>
+        /// <inheritdoc />
         public abstract IProcessNameBuilder ProcessNameBuilder { get; }
 
         /// <summary>
@@ -44,21 +86,15 @@ namespace Reductech.EDR.Processes.Internal
         /// </summary>
         public abstract IEnumerable<Type> EnumTypes { get; }
 
-        /// <summary>
-        /// If this variable is being set. Get the type reference it is being set to.
-        /// </summary>
+
+        /// <inheritdoc />
         public virtual Result<Maybe<ITypeReference>> GetTypeReferencesSet(VariableName variableName, FreezableProcessData freezableProcessData) =>
             Maybe<ITypeReference>.None;
 
-        /// <summary>
-        /// Custom serializers to use for yaml serialization and deserialization.
-        /// </summary>
+        /// <inheritdoc />
         public virtual Maybe<ICustomSerializer> CustomSerializer { get; } = Maybe<ICustomSerializer>.None;
 
-
-        /// <summary>
-        /// Special requirements for this process.
-        /// </summary>
+        /// <inheritdoc />
         public virtual IEnumerable<Requirement> Requirements => ImmutableArray<Requirement>.Empty;
 
         /// <summary>
@@ -84,9 +120,7 @@ namespace Reductech.EDR.Processes.Internal
         }
 
 
-        /// <summary>
-        /// Try to create the instance of this type and set all arguments.
-        /// </summary>
+        /// <inheritdoc />
         public Result<IRunnableProcess> TryFreeze(ProcessContext processContext, FreezableProcessData freezableProcessData, ProcessConfiguration? processConfiguration)
         {
             var instanceResult = TryCreateInstance(processContext, freezableProcessData);

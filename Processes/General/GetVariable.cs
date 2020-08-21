@@ -17,7 +17,7 @@ namespace Reductech.EDR.Processes.General
         public override Result<T, IRunErrors> Run(ProcessState processState) => processState.GetVariable<T>(VariableName, Name);
 
         /// <inheritdoc />
-        public override RunnableProcessFactory RunnableProcessFactory => GetVariableProcessFactory.Instance;
+        public override IRunnableProcessFactory RunnableProcessFactory => GetVariableProcessFactory.Instance;
 
         /// <summary>
         /// The name of the variable to get.
