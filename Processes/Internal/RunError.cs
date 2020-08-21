@@ -157,7 +157,12 @@ namespace Reductech.EDR.Processes.Internal
         /// <summary>
         /// Cast failed.
         /// </summary>
-        InvalidCast
+        InvalidCast,
+
+        /// <summary>
+        /// Process settings are missing
+        /// </summary>
+        MissingProcessSettings
 
     }
 }

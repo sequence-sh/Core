@@ -29,7 +29,14 @@ namespace Reductech.EDR.Processes
         /// <summary>
         /// The settings for this process.
         /// </summary>
-        public IProcessSettings ProcessSettings { get; }
+        private IProcessSettings ProcessSettings { get; }
+
+        /// <summary>
+        /// Get process settings of a particular type.
+        /// </summary>
+        public Result<T, IRunErrors> GetProcessSettings<T>(string processName) where T : IProcessSettings =>
+            ProcessSettings.TryCast<T>()
+                .MapFailure(x => new RunError(x, processName, null, ErrorCode.MissingProcessSettings) as IRunErrors);
 
         /// <summary>
         /// Gets the current value of this variable.
