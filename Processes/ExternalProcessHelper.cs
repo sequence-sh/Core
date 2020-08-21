@@ -25,12 +25,13 @@ namespace Reductech.EDR.Processes
         /// </summary>
         /// <param name="processPath">The path to the process</param>
         /// <param name="logger"></param>
+        /// <param name="callingProcessName">The name of the calling process. For error reporting.</param>
         /// <param name="arguments">The arguments to provide to the process. These will all be escaped</param>
         /// <returns>The output of the process</returns>
-        public static async Task<Result> RunExternalProcess(string processPath, ILogger logger, IEnumerable<string> arguments)
+        public static async Task<Result<Unit, IRunErrors>> RunExternalProcess(string processPath, ILogger logger, string callingProcessName, IEnumerable<string> arguments)
         {
             if (!File.Exists(processPath))
-                return Result.Failure($"Could not find '{processPath}'");
+                return new RunError($"Could not find '{processPath}'", callingProcessName, null, ErrorCode.ExternalProcessNotFound);
 
             var argumentString = string.Join(' ', arguments.Select(EncodeParameterArgument));
             using var pProcess = new System.Diagnostics.Process
@@ -65,13 +66,13 @@ namespace Reductech.EDR.Processes
                 if (line.Value.source == Source.Error)
                 {
                     var errorText = string.IsNullOrWhiteSpace(line.Value.line) ? "Unknown Error" : line.Value.line;
-                    return Result.Failure(errorText);
+                    return new RunError(errorText, callingProcessName, null, ErrorCode.ExternalProcessError);
                 }
                 logger.LogInformation(line.Value.line);
             }
 
             pProcess.WaitForExit();
-            return Result.Success();
+            return Unit.Default;
         }
 
         private static readonly Regex BackslashRegex = new Regex(@"(\\*)" + "\"", RegexOptions.Compiled);
