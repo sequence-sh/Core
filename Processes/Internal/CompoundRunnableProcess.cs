@@ -14,7 +14,7 @@ namespace Reductech.EDR.Processes.Internal
         /// <summary>
         /// The factory used to create processes of this type.
         /// </summary>
-        RunnableProcessFactory RunnableProcessFactory { get; }
+        IRunnableProcessFactory RunnableProcessFactory { get; }
 
         /// <summary>
         /// Configuration for this process.
@@ -33,7 +33,7 @@ namespace Reductech.EDR.Processes.Internal
         /// <summary>
         /// The factory used to create processes of this type.
         /// </summary>
-        public abstract RunnableProcessFactory RunnableProcessFactory { get; }
+        public abstract IRunnableProcessFactory RunnableProcessFactory { get; }
 
         /// <inheritdoc />
         public string Name => RunnableProcessFactory.ProcessNameBuilder.GetFromArguments(FreezableProcessData);

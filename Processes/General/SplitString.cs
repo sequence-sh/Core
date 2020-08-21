@@ -33,7 +33,7 @@ namespace Reductech.EDR.Processes.General
                 .Map(x => x.Item1.Split(new[] {x.Item2}, StringSplitOptions.None).ToList());
 
         /// <inheritdoc />
-        public override RunnableProcessFactory RunnableProcessFactory => SplitStringProcessFactory.Instance;
+        public override IRunnableProcessFactory RunnableProcessFactory => SplitStringProcessFactory.Instance;
     }
 
     /// <summary>

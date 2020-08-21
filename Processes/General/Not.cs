@@ -16,7 +16,7 @@ namespace Reductech.EDR.Processes.General
         public override Result<bool, IRunErrors> Run(ProcessState processState) => Boolean.Run(processState).Map(x => !x);
 
         /// <inheritdoc />
-        public override RunnableProcessFactory RunnableProcessFactory => NotProcessFactory.Instance;
+        public override IRunnableProcessFactory RunnableProcessFactory => NotProcessFactory.Instance;
 
         /// <summary>
         /// The value to negate.

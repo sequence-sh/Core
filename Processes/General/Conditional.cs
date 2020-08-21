@@ -26,7 +26,7 @@ namespace Reductech.EDR.Processes.General
         }
 
         /// <inheritdoc />
-        public override RunnableProcessFactory RunnableProcessFactory => ConditionalProcessFactory.Instance;
+        public override IRunnableProcessFactory RunnableProcessFactory => ConditionalProcessFactory.Instance;
 
         /// <summary>
         /// Whether to follow the Then Branch

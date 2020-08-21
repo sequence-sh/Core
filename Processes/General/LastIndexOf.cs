@@ -39,7 +39,7 @@ namespace Reductech.EDR.Processes.General
         }
 
         /// <inheritdoc />
-        public override RunnableProcessFactory RunnableProcessFactory => LastIndexOfProcessFactory.Instance;
+        public override IRunnableProcessFactory RunnableProcessFactory => LastIndexOfProcessFactory.Instance;
     }
 
     /// <summary>

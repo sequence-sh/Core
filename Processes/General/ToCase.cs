@@ -44,7 +44,7 @@ namespace Reductech.EDR.Processes.General
             };
 
         /// <inheritdoc />
-        public override RunnableProcessFactory RunnableProcessFactory => ToCaseProcessFactory.Instance;
+        public override IRunnableProcessFactory RunnableProcessFactory => ToCaseProcessFactory.Instance;
     }
 
     public sealed class ToCaseProcessFactory : SimpleRunnableProcessFactory<ToCase, string>

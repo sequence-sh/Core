@@ -13,7 +13,7 @@ namespace Reductech.EDR.Processes.Internal
         /// <summary>
         /// Creates a new CompoundFreezableProcess.
         /// </summary>
-        public CompoundFreezableProcess(RunnableProcessFactory processFactory, FreezableProcessData freezableProcessData, ProcessConfiguration? processConfiguration)
+        public CompoundFreezableProcess(IRunnableProcessFactory processFactory, FreezableProcessData freezableProcessData, ProcessConfiguration? processConfiguration)
         {
             ProcessFactory = processFactory;
             FreezableProcessData = freezableProcessData;
@@ -24,7 +24,7 @@ namespace Reductech.EDR.Processes.Internal
         /// <summary>
         /// The factory for this process.
         /// </summary>
-        public RunnableProcessFactory ProcessFactory { get; }
+        public IRunnableProcessFactory ProcessFactory { get; }
 
         /// <summary>
         /// The data for this process.

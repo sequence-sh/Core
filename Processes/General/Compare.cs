@@ -48,7 +48,7 @@ namespace Reductech.EDR.Processes.General
         }
 
         /// <inheritdoc />
-        public override RunnableProcessFactory RunnableProcessFactory => CompareProcessFactory.Instance;
+        public override IRunnableProcessFactory RunnableProcessFactory => CompareProcessFactory.Instance;
 
         private static Result<bool, IRunErrors> CompareItems(T item1, CompareOperator compareOperator, T item2)
         {

@@ -33,7 +33,7 @@ namespace Reductech.EDR.Processes.General
                 .Map(x => x.Item1.IndexOf(x.Item2));
 
         /// <inheritdoc />
-        public override RunnableProcessFactory RunnableProcessFactory => FirstIndexOfElementProcessFactory.Instance;
+        public override IRunnableProcessFactory RunnableProcessFactory => FirstIndexOfElementProcessFactory.Instance;
     }
 
     /// <summary>

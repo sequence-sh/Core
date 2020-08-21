@@ -85,7 +85,7 @@ namespace Reductech.EDR.Processes.General
         }
 
         /// <inheritdoc />
-        public override RunnableProcessFactory RunnableProcessFactory => ForProcessFactory.Instance;
+        public override IRunnableProcessFactory RunnableProcessFactory => ForProcessFactory.Instance;
     }
 
     /// <summary>
