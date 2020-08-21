@@ -38,7 +38,8 @@ namespace Reductech.EDR.Processes.Serialization
             var result = YamlHelper.DeserializeFromYaml(yamlString, _processFactoryStore)
                     .Bind(x=>x.TryFreeze())
                     .BindCast<IRunnableProcess, IRunnableProcess<Unit>>()
-                    .Bind(x=> x.Run(new ProcessState(_logger, _processSettings)));
+                    .Bind(x=> x.Run(new ProcessState(_logger, _processSettings))
+                        .MapFailure(y=>y.AsString));
 
             return result;
 

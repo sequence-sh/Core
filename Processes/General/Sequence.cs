@@ -13,7 +13,7 @@ namespace Reductech.EDR.Processes.General
     public sealed class Sequence : CompoundRunnableProcess<Unit>
     {
         /// <inheritdoc />
-        public override Result<Unit> Run(ProcessState processState)
+        public override Result<Unit, IRunErrors> Run(ProcessState processState)
         {
             foreach (var runnableProcess in Steps)
             {

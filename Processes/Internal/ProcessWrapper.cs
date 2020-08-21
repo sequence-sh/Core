@@ -66,51 +66,8 @@ namespace Reductech.EDR.Processes.Internal
             }
 
             /// <inheritdoc />
-            public Result<object?> Execute() => Process.RunUntyped(ProcessState)!;
+            public Result<object?> Execute() => Process.Run<object>(ProcessState);
         }
-
-        ///// <summary>
-        ///// Gets an invocation of this process.
-        ///// </summary>
-        //public Result<Func<object?>, List<string?[]>> TryGetInvocation(IReadOnlyDictionary<string, string> dictionary)
-        //{
-
-
-
-
-        //    _processFactory.TryFreeze() .TryFreeze()
-
-        //    if (!(Activator.CreateInstance(_processType) is IRunnableProcess<Unit> instance))
-        //        return Result.Failure<Func<object?>, List<string?[]>>(new List<string?[]>{new []{"Instance must not be null"}});
-
-        //    foreach (var property in RelevantProperties)
-        //    {
-        //        if (dictionary.TryGetValue(property.Name, out var v))
-        //        {
-        //            usedArguments.Add(property.Name);
-        //            var (parsed, _, vObject ) = ArgumentHelpers.TryParseArgument(v, property.PropertyType);
-        //            if (parsed)
-        //                property.SetValue(instance, vObject);
-        //            else
-        //                errors.Add(new []{property.Name, property.PropertyType.Name, $"Could not parse '{v}'" });
-        //        }
-        //        else if (property.CustomAttributes.Any(att=>att.AttributeType == typeof(RequiredAttribute)))
-        //            errors.Add(new []{property.Name, property.PropertyType.Name, "Is required"});
-        //    }
-
-        //    var extraArguments = dictionary.Keys.Where(k => !usedArguments.Contains(k)).ToList();
-        //    errors.AddRange(extraArguments.Select(extraArgument => new[] {extraArgument, null, "Not a valid argument"}));
-
-        //    if (errors.Any())
-        //        return Result.Failure<Func<object?>, List<string?[]>>(errors);
-
-        //    var processState = new ProcessState(_logger, _processSettings);
-
-        //    var func = new Func<object?>(() => instance.Run(processState));
-
-        //    return Result.Success<Func<object?>, List<string?[]>>(func);
-        //}
-
 
     }
 }

@@ -25,7 +25,7 @@ namespace Reductech.EDR.Processes.General
         public IRunnableProcess<int> Number { get; set; } = null!;
 
         /// <inheritdoc />
-        public override Result<Unit> Run(ProcessState processState)
+        public override Result<Unit, IRunErrors> Run(ProcessState processState)
         {
             var numberResult = Number.Run(processState);
 

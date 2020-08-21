@@ -19,7 +19,7 @@
     <AssemblyVersion>0.1.0.1</AssemblyVersion>
     <FileVersion>0.1.0.0</FileVersion>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>1.1.01-NewProcesses</Version>
+    <Version>1.1.02-NewProcesses</Version>
   </PropertyGroup>
 
   <PropertyGroup>

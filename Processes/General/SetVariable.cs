@@ -15,23 +15,11 @@ namespace Reductech.EDR.Processes.General
     /// </summary>
     public sealed class SetVariable<T> : CompoundRunnableProcess<Unit>
     {
-        /// <summary>
-        /// Necessary Parameterless constructor
-        /// </summary>
-        public SetVariable() { }
 
         /// <inheritdoc />
-        public SetVariable(VariableName variableName, IRunnableProcess<T> value)
-        {
-            VariableName = variableName;
-            Value = value;
-        }
-
-        /// <inheritdoc />
-        public override Result<Unit> Run(ProcessState processState) =>
+        public override Result<Unit, IRunErrors> Run(ProcessState processState) =>
             Value.Run(processState)
-                .Bind(x => processState.SetVariable(VariableName, x))
-                .Map(() => Unit.Default);
+                .Bind(x => processState.SetVariable(VariableName, x));
 
         /// <inheritdoc />
         public override RunnableProcessFactory RunnableProcessFactory => SetVariableProcessFactory.Instance;
@@ -58,6 +46,9 @@ namespace Reductech.EDR.Processes.General
     {
         private SetVariableProcessFactory() { }
 
+        /// <summary>
+        /// The instance.
+        /// </summary>
         public static RunnableProcessFactory Instance { get; } = new SetVariableProcessFactory();
 
         /// <inheritdoc />

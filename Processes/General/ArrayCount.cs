@@ -20,7 +20,7 @@ namespace Reductech.EDR.Processes.General
         public IRunnableProcess<List<T>> Array { get; set; } = null!;
 
         /// <inheritdoc />
-        public override Result<int> Run(ProcessState processState) => Array.Run(processState).Map(x => x.Count);
+        public override Result<int, IRunErrors> Run(ProcessState processState) => Array.Run(processState).Map(x => x.Count);
 
         /// <inheritdoc />
         public override RunnableProcessFactory RunnableProcessFactory => ArrayCountProcessFactory.Instance;

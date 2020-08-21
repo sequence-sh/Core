@@ -28,7 +28,7 @@ namespace Reductech.EDR.Processes.General
         public IRunnableProcess<T> Element { get; set; } = null!;
 
         /// <inheritdoc />
-        public override Result<int> Run(ProcessState processState) =>
+        public override Result<int, IRunErrors> Run(ProcessState processState) =>
             Array.Run(processState).Compose(() => Element.Run(processState))
                 .Map(x => x.Item1.IndexOf(x.Item2));
 

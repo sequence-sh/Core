@@ -15,9 +15,11 @@ namespace Reductech.EDR.Processes.General
     public sealed class Array<T> : CompoundRunnableProcess<List<T>>
     {
         /// <inheritdoc />
-        public override Result<List<T>> Run(ProcessState processState)
+        public override Result<List<T>, IRunErrors> Run(ProcessState processState)
         {
-            var result = Elements.Select(x => x.Run(processState)).Combine().Map(x => x.ToList());
+            var result = Elements.Select(x => x.Run(processState))
+                .Combine(RunErrorList.Combine)
+                .Map(x => x.ToList());
 
             return result;
         }
@@ -40,6 +42,9 @@ namespace Reductech.EDR.Processes.General
     {
         private ArrayProcessFactory() {}
 
+        /// <summary>
+        /// The instance.
+        /// </summary>
         public static GenericProcessFactory Instance { get; } = new ArrayProcessFactory();
 
         /// <inheritdoc />

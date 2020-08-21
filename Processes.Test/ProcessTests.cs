@@ -40,11 +40,11 @@ namespace Reductech.EDR.Processes.Test
                 yield return new TestCase("Foo = Hello World; Print '<Foo>'",Sequence
                     (
                         SetVariable(FooString, Constant(HelloWorldString)),
-                        Print(new GetVariable<string>(FooString))), HelloWorldString);
+                        Print(GetVariable<string>(FooString))), HelloWorldString);
 
                 yield return new TestCase("Foo = Hello World; Bar = <Foo>; Print '<Bar>'", Sequence(SetVariable(FooString, Constant(HelloWorldString)),
-                        SetVariable(BarString, new GetVariable<string>(FooString)),
-                        Print(new GetVariable<string>(BarString))), HelloWorldString);
+                        SetVariable(BarString, GetVariable<string>(FooString)),
+                        Print(GetVariable<string>(BarString))), HelloWorldString);
 
 
                 yield return new TestCase("Foo = 1 LessThan 2; Print '<Foo>'",Sequence(
@@ -54,7 +54,7 @@ namespace Reductech.EDR.Processes.Test
                         Operator = Constant(CompareOperator.LessThan),
                         Right = Constant(2)
                     }),
-                    Print(new GetVariable<bool>(FooString))
+                    Print(GetVariable<bool>(FooString))
 
                     ), true.ToString());
 
@@ -78,7 +78,7 @@ namespace Reductech.EDR.Processes.Test
                 yield return new TestCase("Foreach Foo in [Hello; World]; Print '<Foo>'",
                     new ForEach<string>
                     {
-                        Action = Print(new GetVariable<string>(FooString)),
+                        Action = Print(GetVariable<string>(FooString)),
                         Array = Array(Constant("Hello"),
                             Constant("World")),
                         VariableName = FooString
@@ -98,7 +98,7 @@ namespace Reductech.EDR.Processes.Test
                     new For
                     {
                         VariableName = FooString,
-                        Action = Print(new GetVariable<int>(FooString)),
+                        Action = Print(GetVariable<int>(FooString)),
                         From = Constant(5),
                         To = Constant(10),
                         Increment = Constant(2)
@@ -111,7 +111,7 @@ namespace Reductech.EDR.Processes.Test
                             {
                                 Action = Sequence(Print(Constant(HelloWorldString)),
                                         SetVariable(FooString, Constant(false))),
-                                Condition = new GetVariable<bool>(FooString)
+                                Condition = GetVariable<bool>(FooString)
                             }),
                     HelloWorldString);
 
@@ -209,7 +209,7 @@ namespace Reductech.EDR.Processes.Test
                         Amount = Constant(3),
                         Variable = FooString
                     },
-                    Print(new GetVariable<int>(FooString))
+                    Print(GetVariable<int>(FooString))
                     ),
 
                     5.ToString());
@@ -299,7 +299,7 @@ namespace Reductech.EDR.Processes.Test
                     Sequence(
                         SetVariable(FooString,Constant("Hello")),
                         new AppendString{Variable = FooString, String = Constant(" World") },
-                        Print(new GetVariable<string>(FooString))
+                        Print(GetVariable<string>(FooString))
                         ), HelloWorldString);
 
                 yield return new TestCase("Print 'GetSubstring(String: Hello World, Index: 6, Length: 2)'",
@@ -361,12 +361,19 @@ namespace Reductech.EDR.Processes.Test
             }
         }
 
+        private static GetVariable<T> GetVariable<T>(VariableName variableName) => new GetVariable<T>{VariableName = variableName};
+
         private static Constant<T> Constant<T>(T element) => new Constant<T>(element);
 
         private static Print<T> Print<T>(IRunnableProcess<T> element) => new Print<T>{Value = element};
 
         private static Array<T> Array<T>(params IRunnableProcess<T>[] elements)=> new Array<T>{Elements = elements};
-        private static SetVariable<T> SetVariable<T>(VariableName variableName, IRunnableProcess<T> runnableProcess) => new SetVariable<T>(variableName, runnableProcess);
+        private static SetVariable<T> SetVariable<T>(VariableName variableName, IRunnableProcess<T> runnableProcess) =>
+            new SetVariable<T>
+            {
+                VariableName = variableName,
+                Value = runnableProcess
+            };
 
         private static Sequence Sequence(params IRunnableProcess<Unit>[] steps)=> new Sequence{Steps = steps};
 

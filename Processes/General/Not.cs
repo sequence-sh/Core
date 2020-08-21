@@ -13,7 +13,7 @@ namespace Reductech.EDR.Processes.General
     public sealed class Not : CompoundRunnableProcess<bool>
     {
         /// <inheritdoc />
-        public override Result<bool> Run(ProcessState processState) => Boolean.Run(processState).Map(x => !x);
+        public override Result<bool, IRunErrors> Run(ProcessState processState) => Boolean.Run(processState).Map(x => !x);
 
         /// <inheritdoc />
         public override RunnableProcessFactory RunnableProcessFactory => NotProcessFactory.Instance;

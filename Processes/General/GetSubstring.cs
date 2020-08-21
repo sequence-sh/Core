@@ -33,7 +33,7 @@ namespace Reductech.EDR.Processes.General
 
 
         /// <inheritdoc />
-        public override Result<string> Run(ProcessState processState)
+        public override Result<string, IRunErrors> Run(ProcessState processState)
         {
             var str = String.Run(processState);
             if (str.IsFailure) return str;
@@ -44,7 +44,7 @@ namespace Reductech.EDR.Processes.General
 
 
             if (index.Value < 0 || index.Value >= str.Value.Length)
-                return Result.Failure<string>("Index was outside the bounds of the string");
+                return new RunError("Index was outside the bounds of the string", Name, null, ErrorCode.IndexOutOfBounds);
 
             return str.Value.Substring(index.Value, length.Value);
         }
@@ -60,6 +60,9 @@ namespace Reductech.EDR.Processes.General
     {
         private GetSubstringProcessFactory() { }
 
+        /// <summary>
+        /// The instance.
+        /// </summary>
         public static SimpleRunnableProcessFactory<GetSubstring, string> Instance { get; } = new GetSubstringProcessFactory();
     }
 }
