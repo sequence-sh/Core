@@ -20,7 +20,7 @@ namespace Reductech.EDR.Processes.Internal
         /// <summary>
         /// Run this process and return the result untyped.
         /// </summary>
-        Result<object, IRunErrors> RunUntyped(ProcessState processState);
+        Result<T, IRunErrors> Run<T>(ProcessState processState);
 
     }
 

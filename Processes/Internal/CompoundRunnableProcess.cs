@@ -86,6 +86,11 @@ namespace Reductech.EDR.Processes.Internal
         public IFreezableProcess Unfreeze() => new CompoundFreezableProcess(RunnableProcessFactory,FreezableProcessData, ProcessConfiguration);
 
         /// <inheritdoc />
-        public Result<object, IRunErrors> RunUntyped(ProcessState processState) => Run(processState);
+        public Result<T1, IRunErrors> Run<T1>(ProcessState processState)
+        {
+
+
+            return Run(processState).BindCast<T, T1, IRunErrors>(new RunError($"Could not cast {typeof(T)} to {typeof(T1)}", Name, null, ErrorCode.InvalidCast));// .Bind(x => x.TryCast<T1>());
+        }
     }
 }

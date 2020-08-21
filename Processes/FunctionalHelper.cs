@@ -52,7 +52,7 @@ namespace Reductech.EDR.Processes
         /// <summary>
         /// If the result is a failure, convert the error to a string.
         /// </summary>
-        public static Result<T> ConvertErrorType<T, TE>(this Result<T, TE> result, Func<TE, string> convertError)
+        public static Result<T> MapFailure<T, TE>(this Result<T, TE> result, Func<TE, string> convertError)
         {
             if (result.IsSuccess) return result.Value!;
 
@@ -65,7 +65,7 @@ namespace Reductech.EDR.Processes
         /// <summary>
         /// If the result is a failure, convert the error to another type.
         /// </summary>
-        public static Result<T, TE> ConvertErrorType<T, TE>(this Result<T> result, Func<string, TE> convertError)
+        public static Result<T, TE> MapFailure<T, TE>(this Result<T> result, Func<string, TE> convertError)
         {
             if (result.IsSuccess) return result.Value!;
 
@@ -77,7 +77,7 @@ namespace Reductech.EDR.Processes
         /// <summary>
         /// If the result is a failure, convert the error to another type.
         /// </summary>
-        public static Result<T,TE2> ConvertErrorType<T, TE1, TE2>(this Result<T, TE1> result, Func<TE1, TE2> convertError)
+        public static Result<T,TE2> MapFailure<T, TE1, TE2>(this Result<T, TE1> result, Func<TE1, TE2> convertError)
         {
             if (result.IsSuccess) return result.Value!;
 
@@ -97,6 +97,20 @@ namespace Reductech.EDR.Processes
             if (result.Value is T2 t2) return t2;
 
             return Result.Failure<T2>($"{result.Value} is not of type '{typeof(T2).Name}'");
+        }
+
+
+        /// <summary>
+        /// Casts the result to type T2.
+        /// Returns failure if this cast is not possible.
+        /// </summary>
+        public static Result<T2, TE> BindCast<T1, T2, TE>(this Result<T1, TE> result, TE error)// where T2 : T1
+        {
+            if (result.IsFailure) return result.ConvertFailure<T2>();
+
+            if (result.Value is T2 t2) return t2;
+
+            return Result.Failure<T2, TE>(error);
         }
 
 

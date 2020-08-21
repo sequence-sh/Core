@@ -5,16 +5,51 @@ using System.Linq;
 namespace Reductech.EDR.Processes.Internal
 {
     /// <summary>
+    /// The base of run errors.
+    /// </summary>
+    public interface IRunErrorBase
+    {
+        /// <summary>
+        /// The error as a string.
+        /// </summary>
+        string AsString { get; }
+    }
+
+    /// <summary>
     /// One or more errors thrown by a running process.
     /// </summary>
-    public interface IRunErrors
+    public interface IRunErrors : IRunErrorBase
     {
         /// <summary>
         /// The errors.
         /// </summary>
-        IEnumerable<RunError> AllErrors { get; }
+        IEnumerable<IRunError> AllErrors { get; }
+    }
 
-        string AsString { get; }
+    /// <summary>
+    /// An error thrown by a running process.
+    /// </summary>
+    public interface IRunError : IRunErrorBase
+    {
+        /// <summary>
+        /// Error Message Text.
+        /// </summary>
+        public string Message { get; }
+
+        /// <summary>
+        /// The name of the process that threw this error.
+        /// </summary>
+        public string ProcessName { get; }
+
+        /// <summary>
+        /// The error that caused this error.
+        /// </summary>
+        public RunError? InnerError { get; }
+
+        /// <summary>
+        /// The error code.
+        /// </summary>
+        public ErrorCode ErrorCode { get; }
     }
 
     /// <summary>
@@ -26,10 +61,10 @@ namespace Reductech.EDR.Processes.Internal
         /// Create a new RunErrorList
         /// </summary>
         /// <param name="allErrors"></param>
-        public RunErrorList(IReadOnlyCollection<RunError> allErrors) => AllErrors = allErrors;
+        public RunErrorList(IReadOnlyCollection<IRunError> allErrors) => AllErrors = allErrors;
 
         /// <inheritdoc />
-        public IEnumerable<RunError> AllErrors { get; }
+        public IEnumerable<IRunError> AllErrors { get; }
 
         /// <inheritdoc />
         public string AsString =>
@@ -44,7 +79,7 @@ namespace Reductech.EDR.Processes.Internal
     /// <summary>
     /// An error thrown by a running process.
     /// </summary>
-    public class RunError : IRunErrors
+    public class RunError : IRunErrors, IRunError
     {
         /// <summary>
         /// Create a new RunError.
@@ -78,7 +113,7 @@ namespace Reductech.EDR.Processes.Internal
         public ErrorCode ErrorCode { get; }
 
         /// <inheritdoc />
-        public IEnumerable<RunError> AllErrors => new[] {this};
+        public IEnumerable<IRunError> AllErrors => new[] {this};
 
         /// <inheritdoc />
         public string AsString => Message;
@@ -112,6 +147,12 @@ namespace Reductech.EDR.Processes.Internal
         /// <summary>
         /// The requirements for a process were not met.
         /// </summary>
-        RequirementsNotMet
+        RequirementsNotMet,
+
+        /// <summary>
+        /// Cast failed.
+        /// </summary>
+        InvalidCast
+
     }
 }

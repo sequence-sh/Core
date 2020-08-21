@@ -39,7 +39,7 @@ namespace Reductech.EDR.Processes.Serialization
                     .Bind(x=>x.TryFreeze())
                     .BindCast<IRunnableProcess, IRunnableProcess<Unit>>()
                     .Bind(x=> x.Run(new ProcessState(_logger, _processSettings))
-                        .ConvertErrorType(y=>y.AsString));
+                        .MapFailure(y=>y.AsString));
 
             return result;
 
