@@ -2,7 +2,10 @@
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
-using Reductech.EDR.Processes.Output;
+using System.Threading.Tasks;
+using CSharpFunctionalExtensions;
+using Microsoft.Extensions.Logging;
+using Reductech.EDR.Processes.Internal;
 
 namespace Reductech.EDR.Processes
 {
@@ -21,15 +24,13 @@ namespace Reductech.EDR.Processes
         /// Runs an external process and returns the output and errors
         /// </summary>
         /// <param name="processPath">The path to the process</param>
+        /// <param name="logger"></param>
         /// <param name="arguments">The arguments to provide to the process. These will all be escaped</param>
         /// <returns>The output of the process</returns>
-        public static async IAsyncEnumerable<IProcessOutput<Unit>> RunExternalProcess(string processPath, IEnumerable<string> arguments)
+        public static async Task<Result> RunExternalProcess(string processPath, ILogger logger, IEnumerable<string> arguments)
         {
             if (!File.Exists(processPath))
-            {
-                yield return ProcessOutput<Unit>.Error($"Could not find '{processPath}'");
-                yield break;
-            }
+                return Result.Failure($"Could not find '{processPath}'");
 
             var argumentString = string.Join(' ', arguments.Select(EncodeParameterArgument));
             using var pProcess = new System.Diagnostics.Process
@@ -64,12 +65,13 @@ namespace Reductech.EDR.Processes
                 if (line.Value.source == Source.Error)
                 {
                     var errorText = string.IsNullOrWhiteSpace(line.Value.line) ? "Unknown Error" : line.Value.line;
-                    yield return ProcessOutput<Unit>.Error(errorText);
+                    return Result.Failure(errorText);
                 }
-                yield return ProcessOutput<Unit>.Message(line.Value.line);
+                logger.LogInformation(line.Value.line);
             }
 
             pProcess.WaitForExit();
+            return Result.Success();
         }
 
         private static readonly Regex BackslashRegex = new Regex(@"(\\*)" + "\"", RegexOptions.Compiled);

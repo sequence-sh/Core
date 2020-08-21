@@ -1,18 +1,15 @@
 ﻿namespace Reductech.EDR.Processes
 {
     /// <summary>
-    /// Represents the output of a void method.
+    /// The result of a process with not return value.
     /// </summary>
     public sealed class Unit
     {
         /// <summary>
-        /// The instance of Unit.
+        /// The Unit.
         /// </summary>
-        public static readonly Unit Instance = new Unit();
+        public static readonly Unit Default = new Unit();
 
-        /// <summary>
-        /// Private constructor for singleton.
-        /// </summary>
         private Unit()
         {
         }
