@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Reflection;
 using CSharpFunctionalExtensions;
@@ -20,6 +21,11 @@ namespace Reductech.EDR.Processes.Internal
         /// Configuration for this process.
         /// </summary>
         ProcessConfiguration? ProcessConfiguration { get; set; }
+
+        /// <summary>
+        /// Requirements for this process that can only be determined at runtime.
+        /// </summary>
+        IEnumerable<Requirement> RuntimeRequirements { get; }
     }
 
     /// <summary>
@@ -45,6 +51,9 @@ namespace Reductech.EDR.Processes.Internal
         /// Configuration for this process.
         /// </summary>
         public ProcessConfiguration? ProcessConfiguration { get; set; }
+
+        /// <inheritdoc />
+        public virtual IEnumerable<Requirement> RuntimeRequirements => ImmutableArray<Requirement>.Empty;
 
 
         private FreezableProcessData FreezableProcessData
