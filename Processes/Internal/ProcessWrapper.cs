@@ -66,7 +66,7 @@ namespace Reductech.EDR.Processes.Internal
             }
 
             /// <inheritdoc />
-            public Result<object?> Execute() => Process.Run<object>(ProcessState);
+            public Result<object?> Execute() => Process.Verify().Bind(_ => Process.Run<object>(ProcessState));
         }
 
     }
