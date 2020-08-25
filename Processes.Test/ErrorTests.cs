@@ -34,6 +34,12 @@ namespace Reductech.EDR.Processes.Test
                     },
                     new RunError($"Variable 'Foo' does not exist.", "<Foo>", null, ErrorCode.MissingVariable));
 
+                yield return new ErrorTestCase("Test assert",
+                    new AssertTrue
+                    {
+                        Test = new Constant<bool>(false)
+                    }, new RunError($"Assertion Failed '{false}'", "AssertTrue(Test: False)", null, ErrorCode.IndexOutOfBounds));
+
 
                 yield return new ErrorTestCase("Get variable with wrong type",
                     new Sequence

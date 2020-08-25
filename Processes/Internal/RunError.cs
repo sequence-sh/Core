@@ -177,7 +177,12 @@ namespace Reductech.EDR.Processes.Internal
         /// <summary>
         /// Parameters conflict.
         /// </summary>
-        ConflictingParameters
+        ConflictingParameters,
+
+        /// <summary>
+        /// An assertion failed
+        /// </summary>
+        AssertionFailed
 
     }
 }

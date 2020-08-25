@@ -356,6 +356,11 @@ namespace Reductech.EDR.Processes.Test
                     }
                 }, "I have more config");
 
+                yield return new TestCase("AssertTrue(Test: True)", new AssertTrue()
+                {
+                    Test = Constant(true)
+                });
+
 
 
             }

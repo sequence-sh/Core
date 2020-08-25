@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Text.RegularExpressions;
-using CSharpFunctionalExtensions;
+﻿using CSharpFunctionalExtensions;
 using Reductech.EDR.Processes.General;
 using Reductech.EDR.Processes.Internal;
 
