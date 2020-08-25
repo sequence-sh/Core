@@ -145,6 +145,11 @@ namespace Reductech.EDR.Processes.Internal
         ExternalProcessError,
 
         /// <summary>
+        /// The external process did not return an output of the expected form.
+        /// </summary>
+        ExternalProcessMissingOutput,
+
+        /// <summary>
         /// The external process was not found.
         /// </summary>
         ExternalProcessNotFound,

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -18,6 +19,87 @@ namespace Reductech.EDR.Processes
         {
             Output,
             Error
+        }
+
+
+        /// <summary>
+        /// Runs an external process and returns the output and errors
+        /// </summary>
+        /// <param name="processPath">The path to the process</param>
+        /// <param name="logger"></param>
+        /// <param name="callingProcessName">The name of the calling process. For error reporting.</param>
+        /// <param name="arguments">The arguments to provide to the process. These will all be escaped</param>
+        /// <param name="tryGetOutput">Tries to extract the final output value.</param>
+        /// <returns>The output of the process</returns>
+        public static async Task<Result<T, IRunErrors>> RunExternalProcess<T>(string processPath,
+            ILogger logger,
+            string callingProcessName,
+            IEnumerable<string> arguments,
+            Func<string, Maybe<T>> tryGetOutput)
+        {
+            if (!File.Exists(processPath))
+                return new RunError($"Could not find '{processPath}'", callingProcessName, null, ErrorCode.ExternalProcessNotFound);
+
+            var argumentString = string.Join(' ', arguments.Select(EncodeParameterArgument));
+            using var pProcess = new System.Diagnostics.Process
+            {
+                StartInfo =
+                {
+                    FileName = processPath,
+                    Arguments = argumentString,
+                    UseShellExecute = false,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden, //don't display a window
+                    CreateNoWindow = true,
+                    StandardErrorEncoding = System.Text.Encoding.UTF8,
+                    StandardOutputEncoding = System.Text.Encoding.UTF8
+                }
+            };
+            pProcess.Start();
+
+            var multiStreamReader = new MultiStreamReader<(string line, Source source)>(new IStreamReader<(string, Source)>[]
+            {
+                new StreamReaderWithSource<Source>(pProcess.StandardOutput, Source.Output),
+                new StreamReaderWithSource<Source>(pProcess.StandardError, Source.Error),
+            });
+
+            var finalOutput = Maybe<T>.None;
+
+            //Read the output one line at a time
+            while (true)
+            {
+                var line = await multiStreamReader.ReadLineAsync();
+                if (line == null) //We've reached the end of the file
+                    break;
+                if (line.Value.source == Source.Error)
+                {
+                    var errorText = string.IsNullOrWhiteSpace(line.Value.line) ? "Unknown Error" : line.Value.line;
+                    return new RunError(errorText, callingProcessName, null, ErrorCode.ExternalProcessError);
+                }
+                else
+                {
+                    if (finalOutput.HasNoValue)
+                    {
+                        var output = tryGetOutput(line.Value.line);
+                        if (output.HasValue)
+                            finalOutput = output;
+                        else
+                            logger.LogInformation(line.Value.line);
+                    }
+                    else
+                    {
+                        logger.LogInformation(line.Value.line);
+                    }
+                }
+            }
+
+            pProcess.WaitForExit();
+
+            if (finalOutput.HasValue)
+                return finalOutput.Value!;
+
+            return new RunError("No output from external process.", callingProcessName, null, ErrorCode.ExternalProcessMissingOutput);
         }
 
         /// <summary>
