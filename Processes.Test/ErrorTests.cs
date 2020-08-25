@@ -64,6 +64,15 @@ namespace Reductech.EDR.Processes.Test
                      new RunError("Variable 'Foo' does not have type 'System.Boolean'.", "<Foo>", null, ErrorCode.WrongVariableType)
                     );
 
+                yield return new ErrorTestCase("Assert Error with succeeding process",
+                    new AssertError
+                    {
+                        Test = new AssertTrue
+                        {
+                            Test = new Constant<bool>(true)
+                        }
+                    },new RunError("Expected an error but process was successful.", "AssertError(Test: AssertTrue(Test: True))", null, ErrorCode.AssertionFailed));
+
 
             }
         }
