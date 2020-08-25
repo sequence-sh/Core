@@ -162,7 +162,17 @@ namespace Reductech.EDR.Processes.Internal
         /// <summary>
         /// Process settings are missing
         /// </summary>
-        MissingProcessSettings
+        MissingProcessSettings,
+
+        /// <summary>
+        /// A required parameter was not set.
+        /// </summary>
+        MissingParameter,
+
+        /// <summary>
+        /// Parameters conflict.
+        /// </summary>
+        ConflictingParameters
 
     }
 }

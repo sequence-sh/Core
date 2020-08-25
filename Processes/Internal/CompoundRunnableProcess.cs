@@ -56,6 +56,29 @@ namespace Reductech.EDR.Processes.Internal
         public virtual IEnumerable<Requirement> RuntimeRequirements => ImmutableArray<Requirement>.Empty;
 
 
+        private IEnumerable<(string name, IRunnableProcess process) > RunnableArguments
+        {
+            get
+            {
+                return GetType().GetProperties()
+                    .Where(x => x.GetCustomAttribute<RunnableProcessPropertyAttribute>() != null)
+                    .Select(x => (x.Name, process: x.GetValue(this) as IRunnableProcess))
+                    .Where(x => x.process != null)!;
+            }
+        }
+
+        private IEnumerable<(string name, IEnumerable<IRunnableProcess> list)> RunnableListArguments
+        {
+            get
+            {
+                return GetType()
+                    .GetProperties()
+                    .Where(x => x.GetCustomAttribute<RunnableProcessListPropertyAttribute>() != null)
+                    .Select(x => (x.Name, list: x.GetValue(this) as IEnumerable<IRunnableProcess>))
+                    .Where(x => x.list != null)!;
+            }
+        }
+
         private FreezableProcessData FreezableProcessData
         {
             get
@@ -68,18 +91,11 @@ namespace Reductech.EDR.Processes.Internal
                 .ToDictionary(x => x.Name, x => new ProcessMember(x.variableName)  );
 
 
-                var arguments  = GetType().GetProperties()
-                 .Where(x => x.GetCustomAttribute<RunnableProcessPropertyAttribute>() != null)
-                 .Select(x => (x.Name, process: x.GetValue(this) as IRunnableProcess))
-                 .Where(x => x.process != null)
-                 .ToDictionary(x => x.Name, x => new ProcessMember(x.process!.Unfreeze()));
+                var arguments  = RunnableArguments
+                 .ToDictionary(x => x.name, x => new ProcessMember(x.process!.Unfreeze()));
 
-                var listArguments = GetType()
-                .GetProperties()
-                .Where(x => x.GetCustomAttribute<RunnableProcessListPropertyAttribute>() != null)
-                .Select(x => (x.Name, list: x.GetValue(this) as IEnumerable<IRunnableProcess>))
-                .Where(x => x.list != null)
-                .ToDictionary(x => x.Name,
+                var listArguments = RunnableListArguments
+                .ToDictionary(x => x.name,
                     x => new ProcessMember( x.list.Select(y => y.Unfreeze()).ToList()));
 
 
@@ -100,6 +116,27 @@ namespace Reductech.EDR.Processes.Internal
 
 
             return Run(processState).BindCast<T, T1, IRunErrors>(new RunError($"Could not cast {typeof(T)} to {typeof(T1)}", Name, null, ErrorCode.InvalidCast));// .Bind(x => x.TryCast<T1>());
+        }
+
+        /// <summary>
+        /// Check that this process meets requirements
+        /// </summary>
+        public virtual Result<Unit, IRunErrors> VerifyThis => Unit.Default;
+
+
+        /// <inheritdoc />
+        public Result<Unit, IRunErrors> Verify()
+        {
+            var r0 = new[] {VerifyThis};
+
+            var r1 = RunnableArguments.Select(x => x.process.Verify());
+            var r2 = RunnableListArguments.Select(x => x.list.Select(l => l.Verify())
+                    .Combine(RunErrorList.Combine).Map(_=>Unit.Default));
+
+
+            var finalResult = r0.Concat(r1).Concat(r2).Combine(RunErrorList.Combine).Map(_ => Unit.Default);
+
+            return finalResult;
         }
     }
 }

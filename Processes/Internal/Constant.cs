@@ -50,6 +50,9 @@ namespace Reductech.EDR.Processes.Internal
         }
 
         /// <inheritdoc />
+        public Result<Unit, IRunErrors> Verify() => Unit.Default;
+
+        /// <inheritdoc />
         public Type OutputType => typeof(T);
     }
 }

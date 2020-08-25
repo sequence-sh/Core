@@ -22,6 +22,11 @@ namespace Reductech.EDR.Processes.Internal
         /// </summary>
         Result<T, IRunErrors> Run<T>(ProcessState processState);
 
+        /// <summary>
+        /// Verify that this process can be run with the current set.
+        /// </summary>
+        Result<Unit, IRunErrors> Verify();
+
     }
 
     /// <summary>
