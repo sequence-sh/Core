@@ -34,6 +34,12 @@ namespace Reductech.EDR.Processes.Test
                     },
                     new RunError($"Variable 'Foo' does not exist.", "<Foo>", null, ErrorCode.MissingVariable));
 
+                yield return new ErrorTestCase("Test assert",
+                    new AssertTrue
+                    {
+                        Test = new Constant<bool>(false)
+                    }, new RunError($"Assertion Failed '{false}'", "AssertTrue(Test: False)", null, ErrorCode.IndexOutOfBounds));
+
 
                 yield return new ErrorTestCase("Get variable with wrong type",
                     new Sequence
@@ -57,6 +63,15 @@ namespace Reductech.EDR.Processes.Test
                     },
                      new RunError("Variable 'Foo' does not have type 'System.Boolean'.", "<Foo>", null, ErrorCode.WrongVariableType)
                     );
+
+                yield return new ErrorTestCase("Assert Error with succeeding process",
+                    new AssertError
+                    {
+                        Test = new AssertTrue
+                        {
+                            Test = new Constant<bool>(true)
+                        }
+                    },new RunError("Expected an error but process was successful.", "AssertError(Test: AssertTrue(Test: True))", null, ErrorCode.AssertionFailed));
 
 
             }

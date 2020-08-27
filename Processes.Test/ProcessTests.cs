@@ -334,18 +334,18 @@ namespace Reductech.EDR.Processes.Test
                 yield return new TestCase("Print 'I have more config'", new Print<string>()
                 {
                     Value = Constant("I have more config"),
-                    ProcessConfiguration = new ProcessConfiguration()
+                    ProcessConfiguration = new ProcessConfiguration
                     {
                         Priority = 1,
-                        TargetMachineTags = new List<string>()
+                        TargetMachineTags = new List<string>
                         {
                             "Tag1",
                             "Tag2"
                         },
                         DoNotSplit = true,
-                        AdditionalRequirements = new List<Requirement>()
+                        AdditionalRequirements = new List<Requirement>
                         {
-                            new Requirement()
+                            new Requirement
                             {
                                 MinVersion = new Version(1,0),
                                 MaxVersion = new Version(2,0),
@@ -356,7 +356,18 @@ namespace Reductech.EDR.Processes.Test
                     }
                 }, "I have more config");
 
+                yield return new TestCase("AssertTrue(Test: True)", new AssertTrue
+                {
+                    Test = Constant(true)
+                });
 
+                yield return new TestCase("AssertError(Test: AssertTrue(Test: False))", new AssertError
+                {
+                    Test = new AssertTrue
+                    {
+                        Test = Constant(false)
+                    }
+                });
 
             }
         }

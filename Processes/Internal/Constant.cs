@@ -29,7 +29,7 @@ namespace Reductech.EDR.Processes.Internal
         /// <summary>
         /// The value that this will return when run.
         /// </summary>
-        public T Value { get; set; }
+        public T Value { get; }
 
         /// <inheritdoc />
         public Result<T, IRunErrors> Run(ProcessState processState) => Value!;
@@ -43,14 +43,14 @@ namespace Reductech.EDR.Processes.Internal
         /// <inheritdoc />
         public Result<T1, IRunErrors> Run<T1>(ProcessState processState)
         {
-            var r = Value.TryConvert<T1>()
+            var r = Value!.TryConvert<T1>()
                 .MapFailure(x => new RunError(x, Name, null, ErrorCode.InvalidCast) as IRunErrors);
 
             return r;
         }
 
         /// <inheritdoc />
-        public Result<Unit, IRunErrors> Verify() => Unit.Default;
+        public Result<Unit, IRunErrors> Verify(IProcessSettings settings) => Unit.Default;
 
         /// <inheritdoc />
         public Type OutputType => typeof(T);

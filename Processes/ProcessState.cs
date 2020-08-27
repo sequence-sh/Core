@@ -29,7 +29,7 @@ namespace Reductech.EDR.Processes
         /// <summary>
         /// The settings for this process.
         /// </summary>
-        private IProcessSettings ProcessSettings { get; }
+        public IProcessSettings ProcessSettings { get; }
 
         /// <summary>
         /// Get process settings of a particular type.

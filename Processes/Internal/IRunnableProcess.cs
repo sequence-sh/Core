@@ -25,14 +25,14 @@ namespace Reductech.EDR.Processes.Internal
         /// <summary>
         /// Verify that this process can be run with the current set.
         /// </summary>
-        Result<Unit, IRunErrors> Verify();
+        public Result<Unit, IRunErrors> Verify(IProcessSettings settings);
 
     }
 
     /// <summary>
     /// A process that can be run.
     /// </summary>
-    public interface  IRunnableProcess<T> : IRunnableProcess
+    public interface IRunnableProcess<T> : IRunnableProcess
     {
         /// <summary>
         /// Run this process and return the result.

@@ -1,4 +1,7 @@
-﻿namespace Reductech.EDR.Processes
+﻿using CSharpFunctionalExtensions;
+using Reductech.EDR.Processes.Internal;
+
+namespace Reductech.EDR.Processes
 {
     /// <summary>
     /// External settings for running the process.
@@ -6,6 +9,10 @@
     public interface IProcessSettings
     {
 
+        /// <summary>
+        /// Check that the requirement is met by these settings.
+        /// </summary>
+        Result<Unit, IRunErrors> CheckRequirement(string processName, Requirement requirement);
     }
 
     /// <summary>
@@ -19,11 +26,12 @@
         public static IProcessSettings Instance = new EmptySettings();
 
 
-        private EmptySettings()
-        {
+        private EmptySettings() {}
 
-        }
-
+        /// <inheritdoc />
+        public Result<Unit, IRunErrors> CheckRequirement(string processName, Requirement requirement) =>
+            new RunError($"Requirement '{requirement}' not met.", processName, null,
+                ErrorCode.RequirementsNotMet);
     }
 
 }
