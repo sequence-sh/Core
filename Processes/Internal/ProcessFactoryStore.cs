@@ -19,15 +19,17 @@ namespace Reductech.EDR.Processes.Internal
             EnumTypesDictionary = enumTypesDictionary;
         }
 
-
         /// <summary>
         /// Create a process factory store using all ProcessFactories in the assembly.
         /// </summary>
         /// <returns></returns>
-        public static ProcessFactoryStore CreateUsingReflection(Type anyAssemblyMember)
+        public static ProcessFactoryStore CreateUsingReflection(params Type[] assemblyMemberTypes)
         {
-            var factories = Assembly.GetAssembly(anyAssemblyMember)!
-                .GetTypes()
+            var factories =
+                assemblyMemberTypes.Select(Assembly.GetAssembly)
+                        .Distinct()
+                        .SelectMany(a=>a!.GetTypes())
+                        .Distinct()
                 .Where(x => !x.IsAbstract)
                 .Where(x => typeof(RunnableProcessFactory).IsAssignableFrom(x))
                 .Select(x => x.GetProperty("Instance", BindingFlags.Public | BindingFlags.Static)!.GetValue(null))

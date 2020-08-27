@@ -125,16 +125,20 @@ namespace Reductech.EDR.Processes.Internal
 
 
         /// <inheritdoc />
-        public Result<Unit, IRunErrors> Verify()
+        public Result<Unit, IRunErrors> Verify(IProcessSettings settings)
         {
             var r0 = new[] {VerifyThis};
 
-            var r1 = RunnableArguments.Select(x => x.process.Verify());
-            var r2 = RunnableListArguments.Select(x => x.list.Select(l => l.Verify())
+            var rRequirements = RuntimeRequirements.Concat(RunnableProcessFactory.Requirements)
+                .Select(req => settings.CheckRequirement(Name, req));
+
+
+            var r1 = RunnableArguments.Select(x => x.process.Verify(settings));
+            var r2 = RunnableListArguments.Select(x => x.list.Select(l => l.Verify(settings))
                     .Combine(RunErrorList.Combine).Map(_=>Unit.Default));
 
 
-            var finalResult = r0.Concat(r1).Concat(r2).Combine(RunErrorList.Combine).Map(_ => Unit.Default);
+            var finalResult = r0.Concat(rRequirements) .Concat(r1).Concat(r2).Combine(RunErrorList.Combine).Map(_ => Unit.Default);
 
             return finalResult;
         }

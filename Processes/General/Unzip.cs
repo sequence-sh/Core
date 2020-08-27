@@ -74,7 +74,8 @@ namespace Reductech.EDR.Processes.General
         /// </summary>
         [RunnableProcessProperty]
         [Required]
-        public IRunnableProcess<bool> OverwriteFiles { get; set; } = null!;
+        [DefaultValueExplanation("false")]
+        public IRunnableProcess<bool> OverwriteFiles { get; set; } = new Constant<bool>(false);
 
         /// <inheritdoc />
         public override IRunnableProcessFactory RunnableProcessFactory => UnzipProcessFactory.Instance;
