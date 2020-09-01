@@ -15,10 +15,11 @@ namespace Reductech.EDR.Processes
         /// <summary>
         /// Create a new ProcessState
         /// </summary>
-        public ProcessState(ILogger logger, IProcessSettings processSettings)
+        public ProcessState(ILogger logger, IProcessSettings processSettings, IExternalProcessRunner externalProcessRunner)
         {
             Logger = logger;
             ProcessSettings = processSettings;
+            ExternalProcessRunner = externalProcessRunner;
         }
 
         /// <summary>
@@ -30,6 +31,11 @@ namespace Reductech.EDR.Processes
         /// The settings for this process.
         /// </summary>
         public IProcessSettings ProcessSettings { get; }
+
+        /// <summary>
+        /// The runner of external processes.
+        /// </summary>
+        public IExternalProcessRunner ExternalProcessRunner { get; }
 
         /// <summary>
         /// Get process settings of a particular type.

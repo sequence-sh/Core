@@ -101,7 +101,7 @@ namespace Reductech.EDR.Processes.Test
             /// <inheritdoc />
             public void Execute(ITestOutputHelper testOutputHelper)
             {
-                var state = new ProcessState(NullLogger.Instance, EmptySettings.Instance);
+                var state = new ProcessState(NullLogger.Instance, EmptySettings.Instance, ExternalProcessRunner.Instance);
 
                 var r = Process.Run<object>(state);
 

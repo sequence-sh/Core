@@ -5,6 +5,20 @@ using System.Linq;
 namespace Reductech.EDR.Processes.Internal
 {
     /// <summary>
+    /// Easy access to common errors.
+    /// </summary>
+    public static class ErrorHelper
+    {
+        /// <summary>
+        /// The error that should be returned when a parameter is missing.
+        /// </summary>
+        public static IRunErrors MissingParameterError(string parameterName, string processName)
+            => new RunError($"Missing Parameter '{parameterName}'", processName, null , ErrorCode.MissingParameter);
+    }
+
+
+
+    /// <summary>
     /// The base of run errors.
     /// </summary>
     public interface IRunErrorBase
@@ -73,7 +87,7 @@ namespace Reductech.EDR.Processes.Internal
         /// <summary>
         /// Combine multiple run errors.
         /// </summary>
-        public static IRunErrors Combine(IEnumerable<IRunErrors> source) => new RunErrorList(source.SelectMany(x=>x.AllErrors).ToList());
+        public static RunErrorList Combine(IEnumerable<IRunErrors> source) => new RunErrorList(source.SelectMany(x=>x.AllErrors).ToList());
     }
 
     /// <summary>

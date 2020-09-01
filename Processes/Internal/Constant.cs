@@ -53,6 +53,9 @@ namespace Reductech.EDR.Processes.Internal
         public Result<Unit, IRunErrors> Verify(IProcessSettings settings) => Unit.Default;
 
         /// <inheritdoc />
+        public ProcessConfiguration? ProcessConfiguration { get; set; } = null;
+
+        /// <inheritdoc />
         public Type OutputType => typeof(T);
     }
 }

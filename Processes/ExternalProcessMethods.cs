@@ -12,14 +12,8 @@ namespace Reductech.EDR.Processes
     /// <summary>
     /// Runs external processes.
     /// </summary>
-    public static class ExternalProcessMethods
+    public interface IExternalProcessRunner
     {
-        private enum Source
-        {
-            Output,
-            Error
-        }
-
         /// <summary>
         /// Runs an external process and returns the output and errors
         /// </summary>
@@ -28,7 +22,34 @@ namespace Reductech.EDR.Processes
         /// <param name="callingProcessName">The name of the calling process. For error reporting.</param>
         /// <param name="arguments">The arguments to provide to the process. These will all be escaped</param>
         /// <returns>The output of the process</returns>
-        public static async Task<Result<Unit, IRunErrors>> RunExternalProcess(string processPath, ILogger logger, string callingProcessName, IEnumerable<string> arguments)
+        Task<Result<Unit, IRunErrors>> RunExternalProcess(
+            string processPath,
+            ILogger logger,
+            string callingProcessName,
+            IEnumerable<string> arguments);
+    }
+
+    /// <summary>
+    /// Basic external process runner.
+    /// </summary>
+    public class ExternalProcessRunner : IExternalProcessRunner
+    {
+        private ExternalProcessRunner() { }
+
+        /// <summary>
+        /// The instance.
+        /// </summary>
+        public static IExternalProcessRunner Instance { get; } = new ExternalProcessRunner();
+
+        private enum Source
+        {
+            Output,
+            Error
+        }
+
+
+        /// <inheritdoc />
+        public async Task<Result<Unit, IRunErrors>> RunExternalProcess(string processPath, ILogger logger, string callingProcessName, IEnumerable<string> arguments)
         {
             if (!File.Exists(processPath))
                 return new RunError($"Could not find '{processPath}'", callingProcessName, null, ErrorCode.ExternalProcessNotFound);
@@ -96,6 +117,5 @@ namespace Reductech.EDR.Processes
             value = TermWithSpaceRegex.Replace(value, "\"$1$2$2\"");
             return value;
         }
-
     }
 }

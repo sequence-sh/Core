@@ -10,28 +10,7 @@ namespace Reductech.EDR.Processes.Internal
     /// <summary>
     /// A runnable process that is not a constant.
     /// </summary>
-    public interface ICompoundRunnableProcess : IRunnableProcess
-    {
-        /// <summary>
-        /// The factory used to create processes of this type.
-        /// </summary>
-        IRunnableProcessFactory RunnableProcessFactory { get; }
-
-        /// <summary>
-        /// Configuration for this process.
-        /// </summary>
-        ProcessConfiguration? ProcessConfiguration { get; set; }
-
-        /// <summary>
-        /// Requirements for this process that can only be determined at runtime.
-        /// </summary>
-        IEnumerable<Requirement> RuntimeRequirements { get; }
-    }
-
-    /// <summary>
-    /// A runnable process that is not a constant.
-    /// </summary>
-    public abstract class CompoundRunnableProcess<T> : IRunnableProcess<T>, ICompoundRunnableProcess
+    public abstract class CompoundRunnableProcess<T> : ICompoundRunnableProcess<T>
     {
         /// <inheritdoc />
         public abstract Result<T, IRunErrors> Run(ProcessState processState);
@@ -111,12 +90,8 @@ namespace Reductech.EDR.Processes.Internal
         public IFreezableProcess Unfreeze() => new CompoundFreezableProcess(RunnableProcessFactory,FreezableProcessData, ProcessConfiguration);
 
         /// <inheritdoc />
-        public Result<T1, IRunErrors> Run<T1>(ProcessState processState)
-        {
-
-
-            return Run(processState).BindCast<T, T1, IRunErrors>(new RunError($"Could not cast {typeof(T)} to {typeof(T1)}", Name, null, ErrorCode.InvalidCast));// .Bind(x => x.TryCast<T1>());
-        }
+        public Result<T1, IRunErrors> Run<T1>(ProcessState processState) =>
+            Run(processState).BindCast<T, T1, IRunErrors>(new RunError($"Could not cast {typeof(T)} to {typeof(T1)}", Name, null, ErrorCode.InvalidCast));
 
         /// <summary>
         /// Check that this process meets requirements
