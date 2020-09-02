@@ -16,6 +16,8 @@ namespace Reductech.EDR.Processes.Internal
         /// Requirements for this process that can only be determined at runtime.
         /// </summary>
         IEnumerable<Requirement> RuntimeRequirements { get; }
+
+
     }
 
     /// <summary>

@@ -15,26 +15,29 @@ namespace Reductech.EDR.Processes.General
         /// <inheritdoc />
         public override Result<Unit, IRunErrors> Run(ProcessState processState)
         {
-
             var remainingSteps = new Stack<IRunnableProcess<Unit>>(Steps.Reverse());
 
             while (remainingSteps.TryPop(out var runnableProcess))
             {
-                if (runnableProcess is ICompoundRunnableProcess compoundRunnableProcess &&
-                    compoundRunnableProcess.RunnableProcessFactory.ProcessCombiner.HasValue &&
-                    remainingSteps.TryPop(out var nextProcess))
+                if (runnableProcess.ProcessCombiners.Any() && remainingSteps.TryPop(out var nextProcess))
                 {
-                    var combineResult =
-                        compoundRunnableProcess.RunnableProcessFactory.ProcessCombiner.Value.TryCombine(runnableProcess,
-                            nextProcess);
-
-                    if (combineResult.IsSuccess)
+                    var combined = false;
+                    foreach (var processCombiner in runnableProcess.ProcessCombiners)
                     {
-                        remainingSteps.Push(combineResult.Value);
-                        continue;
+                        var combineResult = processCombiner.TryCombine(runnableProcess, nextProcess);
+                        if (combineResult.IsSuccess)
+                        {
+                            remainingSteps.Push(combineResult.Value);
+                            combined = true;
+                            break;
+                        }
                     }
-                    else
+
+                    if(!combined)
                         remainingSteps.Push(nextProcess); //put it back
+                    else
+                        continue; //try combining the combined result
+
                 }
 
                 var r = runnableProcess.Run(processState);

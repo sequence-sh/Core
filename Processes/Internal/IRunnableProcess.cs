@@ -1,4 +1,5 @@
-﻿using CSharpFunctionalExtensions;
+﻿using System.Collections.Generic;
+using CSharpFunctionalExtensions;
 
 namespace Reductech.EDR.Processes.Internal
 {
@@ -31,6 +32,11 @@ namespace Reductech.EDR.Processes.Internal
         /// Configuration for this process.
         /// </summary>
         ProcessConfiguration? ProcessConfiguration { get; set; }
+
+        /// <summary>
+        /// Process combiners that could be used for this process.
+        /// </summary>
+        IEnumerable<IProcessCombiner> ProcessCombiners { get; }
 
     }
 

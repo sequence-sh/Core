@@ -34,6 +34,17 @@ namespace Reductech.EDR.Processes.Internal
         /// <inheritdoc />
         public virtual IEnumerable<Requirement> RuntimeRequirements => ImmutableArray<Requirement>.Empty;
 
+        /// <inheritdoc />
+        public IEnumerable<IProcessCombiner> ProcessCombiners =>
+            RunnableProcessFactory.ProcessCombiner.ToList()
+                .Concat(
+                    RunnableArguments.Select(x => x.process)
+                        .Concat(RunnableListArguments.SelectMany(x => x.list))
+                        .OfType<ICompoundRunnableProcess>()
+                        .SelectMany(x => x.ProcessCombiners)
+
+                ).Distinct();
+
 
         private IEnumerable<(string name, IRunnableProcess process) > RunnableArguments
         {

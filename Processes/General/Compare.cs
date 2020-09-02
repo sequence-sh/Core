@@ -71,8 +71,8 @@ namespace Reductech.EDR.Processes.General
     /// </summary>
     public enum CompareOperator
     {
+        #pragma warning disable 1591
         [Display(Name = "==")]
-#pragma warning disable 1591
         Equals,
 
         [Display(Name = "!=")]
