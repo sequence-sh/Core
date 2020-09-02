@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Processes.Attributes;
 using Reductech.EDR.Processes.Internal;
@@ -14,11 +15,35 @@ namespace Reductech.EDR.Processes.General
         /// <inheritdoc />
         public override Result<Unit, IRunErrors> Run(ProcessState processState)
         {
-            foreach (var runnableProcess in Steps)
+            var remainingSteps = new Stack<IRunnableProcess<Unit>>(Steps.Reverse());
+
+            while (remainingSteps.TryPop(out var runnableProcess))
             {
+                if (runnableProcess.ProcessCombiners.Any() && remainingSteps.TryPop(out var nextProcess))
+                {
+                    var combined = false;
+                    foreach (var processCombiner in runnableProcess.ProcessCombiners)
+                    {
+                        var combineResult = processCombiner.TryCombine(runnableProcess, nextProcess);
+                        if (combineResult.IsSuccess)
+                        {
+                            remainingSteps.Push(combineResult.Value);
+                            combined = true;
+                            break;
+                        }
+                    }
+
+                    if(!combined)
+                        remainingSteps.Push(nextProcess); //put it back
+                    else
+                        continue; //try combining the combined result
+
+                }
+
                 var r = runnableProcess.Run(processState);
                 if (r.IsFailure)
                     return r.ConvertFailure<Unit>();
+
             }
 
             return Unit.Default;
@@ -42,6 +67,9 @@ namespace Reductech.EDR.Processes.General
     {
         private SequenceProcessFactory() { }
 
+        /// <summary>
+        /// The instance.
+        /// </summary>
         public static RunnableProcessFactory Instance { get; } = new SequenceProcessFactory();
 
         /// <inheritdoc />

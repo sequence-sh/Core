@@ -42,7 +42,7 @@ namespace Reductech.EDR.Processes
         {
             return enumValue.GetType()
                             .GetMember(enumValue.ToString())?
-                            .First()?
+                            .First(x=>x.MemberType == MemberTypes.Field)?
                             .GetCustomAttribute<DisplayAttribute>()?
                             .GetName()?? enumValue.ToString();
         }

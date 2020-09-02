@@ -43,6 +43,10 @@ namespace Reductech.EDR.Processes.Internal
         /// </summary>
         Maybe<ICustomSerializer> CustomSerializer { get; }
 
+        /// <summary>
+        /// An object which can combine a process with the next process in the sequence.
+        /// </summary>
+        Maybe<IProcessCombiner> ProcessCombiner { get; }
 
         /// <summary>
         /// Special requirements for this process.
@@ -93,6 +97,9 @@ namespace Reductech.EDR.Processes.Internal
 
         /// <inheritdoc />
         public virtual Maybe<ICustomSerializer> CustomSerializer { get; } = Maybe<ICustomSerializer>.None;
+
+        /// <inheritdoc />
+        public virtual Maybe<IProcessCombiner> ProcessCombiner => Maybe<IProcessCombiner>.None;
 
         /// <inheritdoc />
         public virtual IEnumerable<Requirement> Requirements => ImmutableArray<Requirement>.Empty;

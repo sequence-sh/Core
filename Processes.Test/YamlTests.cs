@@ -142,7 +142,7 @@ Value: I have more config", "I have more config");
 
                 freezeResult.ShouldBeSuccessful();
 
-                var runResult = freezeResult.Value.Run(new ProcessState(logger, EmptySettings.Instance));
+                var runResult = freezeResult.Value.Run(new ProcessState(logger, EmptySettings.Instance, ExternalProcessRunner.Instance));
 
                 runResult.ShouldBeSuccessful(x=>x.AsString);
 

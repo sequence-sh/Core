@@ -47,7 +47,7 @@ namespace Reductech.EDR.Processes.Internal
                     new DisplayError("Parameter", null, freezeResult.Error) //TODO named parameters in errors
                 });
 
-            return new ProcessInvocation(freezeResult.Value, new ProcessState(_logger, _processSettings));
+            return new ProcessInvocation(freezeResult.Value, new ProcessState(_logger, _processSettings, ExternalProcessRunner.Instance));
         }
 
         /// <summary>

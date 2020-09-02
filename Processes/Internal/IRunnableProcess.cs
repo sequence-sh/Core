@@ -1,4 +1,5 @@
-﻿using CSharpFunctionalExtensions;
+﻿using System.Collections.Generic;
+using CSharpFunctionalExtensions;
 
 namespace Reductech.EDR.Processes.Internal
 {
@@ -23,9 +24,19 @@ namespace Reductech.EDR.Processes.Internal
         Result<T, IRunErrors> Run<T>(ProcessState processState);
 
         /// <summary>
-        /// Verify that this process can be run with the current set.
+        /// Verify that this process can be run with the current settings.
         /// </summary>
         public Result<Unit, IRunErrors> Verify(IProcessSettings settings);
+
+        /// <summary>
+        /// Configuration for this process.
+        /// </summary>
+        ProcessConfiguration? ProcessConfiguration { get; set; }
+
+        /// <summary>
+        /// Process combiners that could be used for this process.
+        /// </summary>
+        IEnumerable<IProcessCombiner> ProcessCombiners { get; }
 
     }
 

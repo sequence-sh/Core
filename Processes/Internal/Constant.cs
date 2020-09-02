@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using CSharpFunctionalExtensions;
 
 namespace Reductech.EDR.Processes.Internal
@@ -51,6 +52,12 @@ namespace Reductech.EDR.Processes.Internal
 
         /// <inheritdoc />
         public Result<Unit, IRunErrors> Verify(IProcessSettings settings) => Unit.Default;
+
+        /// <inheritdoc />
+        public ProcessConfiguration? ProcessConfiguration { get; set; } = null;
+
+        /// <inheritdoc />
+        public IEnumerable<IProcessCombiner> ProcessCombiners => ArraySegment<IProcessCombiner>.Empty;
 
         /// <inheritdoc />
         public Type OutputType => typeof(T);
