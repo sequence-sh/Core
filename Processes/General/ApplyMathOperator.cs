@@ -102,6 +102,11 @@ namespace Reductech.EDR.Processes.General
     public enum MathOperator
     {
         /// <summary>
+        /// Sentinel value
+        /// </summary>
+        None,
+
+        /// <summary>
         /// Add the left and right operands.
         /// </summary>
         [Display(Name = "+")]

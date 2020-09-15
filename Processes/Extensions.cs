@@ -47,7 +47,29 @@ namespace Reductech.EDR.Processes
                             .GetName()?? enumValue.ToString();
         }
 
+        /// <summary>
+        /// Tries to parse the enum value. Uses both the name of the enum and the display name.
+        /// </summary>
+        public static Maybe<T> TryParseValue<T>(string s) where T : Enum
+        {
+            if (Enum.TryParse(typeof(T), s, true, out var r) && r is T t)
+            {
+                return CSharpFunctionalExtensions.Maybe<T>.From(t);
+            }
 
+            foreach (var value in Enum.GetValues(typeof(T)).Cast<T>())
+            {
+                var displayName = value.GetDisplayName();
+
+                if(displayName.Equals(s, StringComparison.OrdinalIgnoreCase))
+                {
+                    return CSharpFunctionalExtensions.Maybe<T>.From(value);
+                }
+            }
+
+            return CSharpFunctionalExtensions.Maybe<T>.None;
+
+        }
 
         /// <summary>
         /// Gets all possible values of this enum.

@@ -35,7 +35,9 @@ namespace Reductech.EDR.Processes.Serialization
 
             var o = deserializer.Deserialize<object>(yaml);
 
-            var result = FromSimpleObject(o, processFactoryStore);
+            var parser = new ProcessMemberParser(processFactoryStore);
+
+            var result = FromSimpleObject(o, parser);
 
             return result.Bind(x =>
                 x.Join(vn => Result.Failure<IFreezableProcess>("Yaml must contain a process or list of processes"),
@@ -52,14 +54,14 @@ namespace Reductech.EDR.Processes.Serialization
 
 
 
-        private static Result<ProcessMember> FromSimpleObject(object simpleObject, ProcessFactoryStore processFactoryStore)
+        private static Result<ProcessMember> FromSimpleObject(object simpleObject, ProcessMemberParser processMemberParser)
         {
 
             Result<ProcessMember> result;
 
             if (simpleObject is List<object> list)
             {
-                result = list.Select(x => FromSimpleObject(x, processFactoryStore))
+                result = list.Select(x => FromSimpleObject(x, processMemberParser))
                     .Select(x => x.Bind(y => y.AsArgument("Array Member")))
                     .Combine()
                     .Map(x => new ProcessMember(x.ToList()));
@@ -73,11 +75,11 @@ namespace Reductech.EDR.Processes.Serialization
 
                 result = dictionary1.TryFindOrFail(TypeString, $"Object did not have {TypeString} set.")
                     .BindCast<object, string>()
-                    .Bind(x => processFactoryStore.Dictionary.TryFindOrFail(x, $"Could not find the process: '{x}'."))
+                    .Bind(x => processMemberParser.ProcessFactoryStore.Dictionary.TryFindOrFail(x, $"Could not find the process: '{x}'."))
                     .Compose(() =>
                         dictionary1.Where(x => x.Key.ToString() != TypeString && x.Key.ToString() != ConfigString)
                             .Select(x =>
-                                FromSimpleObject(x.Value, processFactoryStore)
+                                FromSimpleObject(x.Value, processMemberParser)
                                     .Map(value => (x.Key.ToString(), value)))
                             .Combine())
                     .Bind(x => CreateProcess(x.Item1, x.Item2!, processConfiguration.Value))
@@ -85,12 +87,14 @@ namespace Reductech.EDR.Processes.Serialization
             }
             else if (simpleObject is string sString3)
             {
-                var special = TrySpecialDeserialize(sString3, processFactoryStore);
+                 result = processMemberParser.TryParse(sString3);
 
-                if (special != null)
-                    result = special;
-                else
-                    result = SerializationMethods.TryDeserialize(sString3, processFactoryStore);
+                //var special = TrySpecialDeserialize(sString3, processFactoryStore);
+
+                //if (special != null)
+                //    result = special;
+                //else
+                //    result = SerializationMethods.TryDeserialize(sString3, processFactoryStore);
             }
             else
                 throw new ArgumentOutOfRangeException(nameof(simpleObject));

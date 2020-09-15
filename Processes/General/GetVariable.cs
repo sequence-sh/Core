@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Processes.Attributes;
@@ -56,6 +57,22 @@ namespace Reductech.EDR.Processes.General
 
         /// <inheritdoc />
         public override Maybe<ICustomSerializer> CustomSerializer { get; } = Maybe<ICustomSerializer>.From(new CustomSerializer(new VariableNameComponent(nameof(GetVariable<object>.VariableName))));
+
+
+        /// <summary>
+        /// Create a freezable GetVariable process.
+        /// </summary>
+        public static IFreezableProcess CreateFreezable(VariableName variableName)
+        {
+            var dict = new Dictionary<string, ProcessMember>
+            {
+                {nameof(GetVariable<object>.VariableName), new ProcessMember(variableName)}
+            };
+
+            var fpd = new FreezableProcessData(dict);
+
+            return new CompoundFreezableProcess(Instance, fpd, null);
+        }
 
     }
 

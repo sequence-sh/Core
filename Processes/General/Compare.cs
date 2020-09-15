@@ -71,6 +71,10 @@ namespace Reductech.EDR.Processes.General
     /// </summary>
     public enum CompareOperator
     {
+        /// <summary>
+        /// Sentinel value.
+        /// </summary>
+        None,
         #pragma warning disable 1591
         [Display(Name = "==")]
         Equals,
