@@ -64,7 +64,7 @@ namespace Reductech.EDR.Processes.Test
                         {
                             {nameof(ApplyMathOperator.Left), new ProcessMember(new ConstantFreezableProcess(1))},
                             {nameof(ApplyMathOperator.Operator), new ProcessMember(new ConstantFreezableProcess(MathOperator.Add))},
-                            {nameof(ApplyMathOperator.Right), new ProcessMember(new VariableName("foo"))}
+                            {nameof(ApplyMathOperator.Right), GetVariablePM("foo")}
                         }), null
                         )));
 
@@ -73,12 +73,22 @@ namespace Reductech.EDR.Processes.Test
                         new FreezableProcessData(new Dictionary<string, ProcessMember>
                         {
                             {nameof(ApplyMathOperator.Operator), new ProcessMember(new ConstantFreezableProcess(MathOperator.Add))},
-                            {nameof(ApplyMathOperator.Left), new ProcessMember(new VariableName("foo"))},
+                            {nameof(ApplyMathOperator.Left), GetVariablePM("foo")},
                             {nameof(ApplyMathOperator.Right), new ProcessMember(new ConstantFreezableProcess(2))}
                         }), null
                         )));
 
             } }
+
+        private static ProcessMember GetVariablePM(string variableName)
+        {
+            return new ProcessMember(new CompoundFreezableProcess(GetVariableProcessFactory.Instance,
+                new FreezableProcessData(new Dictionary<string, ProcessMember>()
+                {
+                    {nameof(GetVariable<object>.VariableName), new ProcessMember(new VariableName(variableName)) }
+                }), null
+                ));
+        }
 
         private sealed class ProcessMemberTestCase : ITestCase
         {
