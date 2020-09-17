@@ -13,6 +13,9 @@ using Result = CSharpFunctionalExtensions.Result;
 
 namespace Reductech.EDR.Processes.Serialization
 {
+    /// <summary>
+    /// Parses strings as process members
+    /// </summary>
     public class ProcessMemberParser
     {
         private static readonly Tokenizer<ProcessToken> Tokenizer = new TokenizerBuilder<ProcessToken>()
@@ -26,6 +29,9 @@ namespace Reductech.EDR.Processes.Serialization
             .Match(Character.EqualTo(','), ProcessToken.Delimiter)
             .Match(Character.EqualTo(':'), ProcessToken.ArgumentSeparator)
 
+            //VariableName must be before comparator
+            .Match(Span.Regex("<[a-z0-9-_]+>", RegexOptions.Compiled | RegexOptions.IgnoreCase), ProcessToken.VariableName)
+
             .Match(GetSpan(MathOperator.None), ProcessToken.MathOperator)
             .Match(GetSpan(BooleanOperator.None), ProcessToken.BooleanOperator)
             .Match(GetSpan(CompareOperator.None), ProcessToken.Comparator)
@@ -33,7 +39,8 @@ namespace Reductech.EDR.Processes.Serialization
 
             .Match(Character.EqualTo('='), ProcessToken.Assignment, true)
             .Match(QuotedString.SqlStyle, ProcessToken.StringLiteral)
-            .Match(Span.Regex("<[a-z0-9-_]+>", RegexOptions.Compiled | RegexOptions.IgnoreCase), ProcessToken.VariableName)
+            .Match(QuotedString.CStyle, ProcessToken.StringLiteral)
+
             .Match(Span.EqualToIgnoreCase("true").Or(Span.EqualToIgnoreCase("false")), ProcessToken.Boolean, true)
             .Match(Span.Regex(@"[0-9]+", RegexOptions.Compiled), ProcessToken.Number)
             .Match(Span.Regex(@"[a-z0-9-_]+\.[a-z0-9-_]+", RegexOptions.Compiled | RegexOptions.IgnoreCase), ProcessToken.Enum, true)
@@ -52,13 +59,21 @@ namespace Reductech.EDR.Processes.Serialization
         {
             var tokensResult = Tokenizer.TryTokenize(s);
 
-            if(!tokensResult.HasValue)
-                return Result.Failure<ProcessMember>(tokensResult.ErrorMessage);
+            if (!tokensResult.HasValue)
+                return Result.Failure<ProcessMember>(tokensResult.FormatErrorMessageFragment());
+
+            if (!tokensResult.Remainder.IsAtEnd)
+                return Result.Failure<ProcessMember>($"Could not parse: '{s}'");
+
+
 
             var parseResult = Parser.Invoke(tokensResult.Value);
 
             if(!parseResult.HasValue)
-                return Result.Failure<ProcessMember>(parseResult.ErrorMessage);
+                return Result.Failure<ProcessMember>(parseResult.FormatErrorMessageFragment());
+
+            if(!parseResult.Remainder.IsAtEnd)
+                return Result.Failure<ProcessMember>($"Could not parse: '{s}'");
 
             return parseResult.Value;
         }
@@ -87,7 +102,6 @@ namespace Reductech.EDR.Processes.Serialization
 
 
             TokenListParser<ProcessToken, IFreezableProcess> enumConstant = CreateEnumParser(processFactoryStore);
-            TokenListParser<ProcessToken, IFreezableProcess> stringConstant = StringConstantParser;
 
             TokenListParser<ProcessToken, IFreezableProcess> setVariable =
                  from vnToken in Token.EqualTo(ProcessToken.VariableName)
@@ -167,7 +181,7 @@ namespace Reductech.EDR.Processes.Serialization
                     NumberParser
                     .Or(BoolParser)
                     .Or(enumConstant)
-                    .Or(stringConstant)
+                    .Or(StringConstantParser)
                     .Or(setVariable)
                     .Or(GetVariableParser) //Must come after setVariable
                     //.Or(Parse.Ref(()=>array.Value))
@@ -181,16 +195,17 @@ namespace Reductech.EDR.Processes.Serialization
                 NumberParser
                     .Or(BoolParser)
                     .Or(enumConstant)
-                    .Or(stringConstant)
+                    .Or(StringConstantParser)
                     .Or(setVariable)
                     //note: no getVariable here
-                    .Or(mathOperation)
-                    .Or(booleanOperation)
-                    .Or(compareOperation)
+                    //.Or(mathOperation)
+                    //.Or(booleanOperation)
+                    //.Or(compareOperation)
                     .Or(Parse.Ref(() => function.Value))
                     .Select(x=> new ProcessMember(x))
                     .Or(VariableNameParser.Select(x=> new ProcessMember(x)))
-                    .Or(array));
+                    .Or(array)
+                );
 
 
             Parser = processMember.Value;
@@ -212,7 +227,7 @@ namespace Reductech.EDR.Processes.Serialization
 
         private static readonly TokenListParser<ProcessToken, IFreezableProcess> StringConstantParser =
             from token in Token.EqualTo(ProcessToken.StringLiteral)
-            select new ConstantFreezableProcess(token.ToStringValue()) as IFreezableProcess;
+            select new ConstantFreezableProcess(token.ToStringValue()[1..^1] ) as IFreezableProcess;
 
         private static readonly TokenListParser<ProcessToken, IFreezableProcess> NumberParser =
             from token in Token.EqualTo(ProcessToken.Number)

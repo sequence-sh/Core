@@ -8,7 +8,7 @@ namespace Reductech.EDR.Processes.Internal
     /// <summary>
     /// A process that returns a fixed value when run.
     /// </summary>
-    public sealed class ConstantFreezableProcess : IFreezableProcess
+    public sealed class ConstantFreezableProcess : IFreezableProcess, IEquatable<ConstantFreezableProcess>
     {
         /// <summary>
         /// Creates a new ConstantFreezableProcess.
@@ -47,5 +47,29 @@ namespace Reductech.EDR.Processes.Internal
 
         /// <inheritdoc />
         public override string ToString() => ProcessName;
+
+        /// <inheritdoc />
+        public bool Equals(ConstantFreezableProcess? other)
+        {
+            if (ReferenceEquals(null, other)) return false;
+            if (ReferenceEquals(this, other)) return true;
+            return Value.Equals(other.Value);
+        }
+
+        /// <inheritdoc />
+        public override bool Equals(object? obj) => ReferenceEquals(this, obj) || obj is ConstantFreezableProcess other && Equals(other);
+
+        /// <inheritdoc />
+        public override int GetHashCode() => Value.GetHashCode();
+
+        /// <summary>
+        /// Equals operator.
+        /// </summary>
+        public static bool operator ==(ConstantFreezableProcess? left, ConstantFreezableProcess? right) => Equals(left, right);
+
+        /// <summary>
+        /// Not Equals operator
+        /// </summary>
+        public static bool operator !=(ConstantFreezableProcess? left, ConstantFreezableProcess? right) => !Equals(left, right);
     }
 }

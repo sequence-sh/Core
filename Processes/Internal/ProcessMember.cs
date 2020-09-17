@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using CSharpFunctionalExtensions;
 
 namespace Reductech.EDR.Processes.Internal
@@ -7,10 +8,21 @@ namespace Reductech.EDR.Processes.Internal
     /// <summary>
     /// Any member of a process.
     /// </summary>
-    public sealed class ProcessMember
+    public sealed class ProcessMember : IEquatable<ProcessMember>
     {
+        /// <summary>
+        /// Create a new VariableName ProcessMember
+        /// </summary>
         public ProcessMember(VariableName variableName) => VariableName = variableName;
+
+        /// <summary>
+        /// Create a new IFreezableProcess ProcessMember
+        /// </summary>
         public ProcessMember(IFreezableProcess argument) => Argument = argument;
+
+        /// <summary>
+        /// Create a new ListArgument ProcessMember
+        /// </summary>
         public ProcessMember(IReadOnlyList<IFreezableProcess> listArgument) => ListArgument = listArgument;
 
 
@@ -29,11 +41,12 @@ namespace Reductech.EDR.Processes.Internal
             }
         }
 
-        public VariableName? VariableName { get; set; }
+        public VariableName? VariableName { get;  }
 
-        public IFreezableProcess? Argument { get; set; }
 
-        public IReadOnlyList<IFreezableProcess>? ListArgument { get; set; }
+        public IFreezableProcess? Argument { get;  }
+
+        public IReadOnlyList<IFreezableProcess>? ListArgument { get;  }
 
 
         public T Join<T>(Func<VariableName, T> handleVariableName, Func<IFreezableProcess, T> handleArgument,
@@ -73,5 +86,50 @@ namespace Reductech.EDR.Processes.Internal
 
         /// <inheritdoc />
         public override string ToString() => new {MemberType, Value=MemberString}.ToString()!;
+
+        /// <inheritdoc />
+        public bool Equals(ProcessMember? other)
+        {
+            if (other is null) return false;
+            if (ReferenceEquals(this, other)) return true;
+            return Nullable.Equals(VariableName, other.VariableName) &&
+                   Equals(Argument, other.Argument) &&
+                   ListsAreEqual(ListArgument, other.ListArgument);
+
+            static bool ListsAreEqual(IReadOnlyList<IFreezableProcess>? a1, IReadOnlyList<IFreezableProcess>? a2)
+            {
+                if (a1 is null)
+                    return a2 is null;
+
+                if (a2 is null)
+                    return false;
+
+                return a1.SequenceEqual(a2);
+            }
+        }
+
+
+
+        /// <inheritdoc />
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is ProcessMember other && Equals(other);
+        }
+
+        /// <inheritdoc />
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(VariableName, Argument, ListArgument);
+        }
+
+        /// <summary>
+        /// Equals operator
+        /// </summary>
+        public static bool operator ==(ProcessMember? left, ProcessMember? right) => Equals(left, right);
+
+        /// <summary>
+        /// Not Equals operator
+        /// </summary>
+        public static bool operator !=(ProcessMember? left, ProcessMember? right) => !Equals(left, right);
     }
 }
