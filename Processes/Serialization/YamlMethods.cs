@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
+using System.Text;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Processes.General;
 using Reductech.EDR.Processes.Internal;
@@ -140,21 +141,21 @@ namespace Reductech.EDR.Processes.Serialization
                 return process;
             }
 
-            static ProcessMember? TrySpecialDeserialize(string s, ProcessFactoryStore processFactoryStore)
-            {
-                foreach (var factory in processFactoryStore.Dictionary.Values)
-                {
-                    if (factory.CustomSerializer.HasValue)
-                    {
-                        var r = factory.CustomSerializer.Value.TryDeserialize(s, processFactoryStore, factory);
+            //static ProcessMember? TrySpecialDeserialize(string s, ProcessFactoryStore processFactoryStore)
+            //{
+            //    foreach (var factory in processFactoryStore.Dictionary.Values)
+            //    {
+            //        if (factory.CustomSerializer.HasValue)
+            //        {
+            //            var r = factory.CustomSerializer.Value.TryDeserialize(s, processFactoryStore, factory);
 
-                        if (r.IsSuccess)
-                            return new ProcessMember(r.Value);
-                    }
-                }
+            //            if (r.IsSuccess)
+            //                return new ProcessMember(r.Value);
+            //        }
+            //    }
 
-                return null;
-            }
+            //    return null;
+            //}
         }
 
         private static object SimplifyProcess(IFreezableProcess process, bool isTopLevel)
@@ -169,13 +170,16 @@ namespace Reductech.EDR.Processes.Serialization
                         compoundFreezableProcess.FreezableProcessData.Dictionary.TryGetValue(nameof(Sequence.Steps), out var processMember))
                         return ToSimpleObject(processMember);
 
-                    if (compoundFreezableProcess.ProcessFactory.CustomSerializer.HasValue &&
-                        compoundFreezableProcess.ProcessConfiguration == null) //Don't use custom serialization if you have configuration
+                    if (compoundFreezableProcess.ProcessConfiguration == null)//Don't use custom serialization if you have configuration
                     {
+                        if (compoundFreezableProcess.ProcessFactory.CustomSerializer.HasValue)
+                        {
                             var sr = compoundFreezableProcess.ProcessFactory.CustomSerializer.Value
                                 .TrySerialize(compoundFreezableProcess.FreezableProcessData);
                             if (sr.IsSuccess)
                                 return sr.Value;
+                        }
+                        
                     }
 
 

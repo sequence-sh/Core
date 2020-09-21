@@ -34,6 +34,17 @@ namespace Reductech.EDR.Processes.Test
                 yield return new ProcessMemberTestCase("Foo", null);
                 yield return new ProcessMemberTestCase("true true", null);
 
+                yield return new ProcessMemberTestCase("not true",
+                    new ProcessMember(
+                        new CompoundFreezableProcess(NotProcessFactory.Instance,
+                            new FreezableProcessData(new Dictionary<string, ProcessMember>()
+                            {
+                                {nameof(Not.Boolean), new ProcessMember(new ConstantFreezableProcess(true))}
+                            }), null
+                        ))
+
+                    );
+
                 yield return new ProcessMemberTestCase("[true, false]", new ProcessMember(new List<IFreezableProcess>()
                 {
                     new ConstantFreezableProcess(true),
@@ -64,7 +75,7 @@ namespace Reductech.EDR.Processes.Test
                         {
                             {nameof(ApplyMathOperator.Left), new ProcessMember(new ConstantFreezableProcess(1))},
                             {nameof(ApplyMathOperator.Operator), new ProcessMember(new ConstantFreezableProcess(MathOperator.Add))},
-                            {nameof(ApplyMathOperator.Right), GetVariablePM("foo")}
+                            {nameof(ApplyMathOperator.Right), GetVariableProcessMember("foo")}
                         }), null
                         )));
 
@@ -73,14 +84,22 @@ namespace Reductech.EDR.Processes.Test
                         new FreezableProcessData(new Dictionary<string, ProcessMember>
                         {
                             {nameof(ApplyMathOperator.Operator), new ProcessMember(new ConstantFreezableProcess(MathOperator.Add))},
-                            {nameof(ApplyMathOperator.Left), GetVariablePM("foo")},
+                            {nameof(ApplyMathOperator.Left), GetVariableProcessMember("foo")},
                             {nameof(ApplyMathOperator.Right), new ProcessMember(new ConstantFreezableProcess(2))}
                         }), null
                         )));
 
+                yield return new ProcessMemberTestCase("Print(Value = 1)", new ProcessMember(
+                    new CompoundFreezableProcess(PrintProcessFactory.Instance,
+                        new FreezableProcessData(new Dictionary<string, ProcessMember>
+                        {
+                            {nameof(Print<int>.Value), new ProcessMember(new ConstantFreezableProcess(1))}
+                        }),
+                        null)));
+
             } }
 
-        private static ProcessMember GetVariablePM(string variableName)
+        private static ProcessMember GetVariableProcessMember(string variableName)
         {
             return new ProcessMember(new CompoundFreezableProcess(GetVariableProcessFactory.Instance,
                 new FreezableProcessData(new Dictionary<string, ProcessMember>()
@@ -106,7 +125,10 @@ namespace Reductech.EDR.Processes.Test
             /// <inheritdoc />
             public void Execute(ITestOutputHelper testOutputHelper)
             {
-                var parser = new ProcessMemberParser(ProcessFactoryStore.CreateUsingReflection());
+                var store = ProcessFactoryStore.CreateUsingReflection(typeof(Print<>));
+
+
+                var parser = new ProcessMemberParser(store);
 
                 var r = parser.TryParse(Name);
 

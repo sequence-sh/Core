@@ -27,7 +27,6 @@ namespace Reductech.EDR.Processes.Serialization
             .Match(Character.EqualTo('['), ProcessToken.OpenArray)
             .Match(Character.EqualTo(']'), ProcessToken.CloseArray)
             .Match(Character.EqualTo(','), ProcessToken.Delimiter)
-            .Match(Character.EqualTo(':'), ProcessToken.ArgumentSeparator)
 
             //VariableName must be before comparator
             .Match(Span.Regex("<[a-z0-9-_]+>", RegexOptions.Compiled | RegexOptions.IgnoreCase), ProcessToken.VariableName)
@@ -42,6 +41,7 @@ namespace Reductech.EDR.Processes.Serialization
             .Match(QuotedString.CStyle, ProcessToken.StringLiteral)
 
             .Match(Span.EqualToIgnoreCase("true").Or(Span.EqualToIgnoreCase("false")), ProcessToken.Boolean, true)
+            .Match(Span.EqualToIgnoreCase("not"), ProcessToken.NotOperator, true)
             .Match(Span.Regex(@"[0-9]+", RegexOptions.Compiled), ProcessToken.Number)
             .Match(Span.Regex(@"[a-z0-9-_]+\.[a-z0-9-_]+", RegexOptions.Compiled | RegexOptions.IgnoreCase), ProcessToken.Enum, true)
 
@@ -94,13 +94,6 @@ namespace Reductech.EDR.Processes.Serialization
             Lazy<TokenListParser<ProcessToken, ProcessMember>> processMember = null!;
             Lazy<TokenListParser<ProcessToken, IFreezableProcess>> freezableProcess = null!;
 
-            TokenListParser<ProcessToken, (string argumentName, ProcessMember processMember)> functionMember =
-                from a in Token.EqualTo(ProcessToken.FuncOrArgumentName)
-                from _ in Token.EqualTo(ProcessToken.ArgumentSeparator)
-                from pm in Parse.Ref(() => processMember.Value)
-                select (a.ToStringValue(), pm);
-
-
             TokenListParser<ProcessToken, IFreezableProcess> enumConstant = CreateEnumParser(processFactoryStore);
 
             var singleTermParser = NumberParser
@@ -110,12 +103,12 @@ namespace Reductech.EDR.Processes.Serialization
                 .Or(GetVariableParser);
 
             TokenListParser<ProcessToken, IFreezableProcess> setVariable =
-                 from vnToken in Token.EqualTo(ProcessToken.VariableName)
+                (from vnToken in Token.EqualTo(ProcessToken.VariableName)
                  from _ in Token.EqualTo(ProcessToken.Assignment)
                  from value in Parse.Ref(() => freezableProcess.Value)
                  select SetVariableProcessFactory.CreateFreezable(
                          new VariableName(vnToken.ToStringValue().TrimStart('<').TrimEnd('>')),
-                         value);
+                         value)).Try();
 
 
             TokenListParser<ProcessToken, ProcessMember> array =
@@ -125,6 +118,17 @@ namespace Reductech.EDR.Processes.Serialization
                     (_2,a,b)=> a.Concat(b))
                 from _3 in Token.EqualTo(ProcessToken.CloseArray)
                 select new ProcessMember(elements.ToList());
+
+
+            TokenListParser<ProcessToken, IFreezableProcess> notOperation =
+
+                (from o in Token.EqualTo(ProcessToken.NotOperator)
+                    from f1 in singleTermParser
+                    select new CompoundFreezableProcess(NotProcessFactory.Instance,
+                        new FreezableProcessData(new Dictionary<string, ProcessMember>
+                        {
+                            {nameof(Not.Boolean), new ProcessMember(f1)}
+                        }), null) as IFreezableProcess).Try();
 
             TokenListParser<ProcessToken, IFreezableProcess> mathOperation =
 
@@ -147,7 +151,7 @@ namespace Reductech.EDR.Processes.Serialization
                  from o in Token.EqualTo(ProcessToken.BooleanOperator)
                  from f2 in singleTermParser
                  select new CompoundFreezableProcess(ApplyBooleanProcessFactory.Instance,
-                     new FreezableProcessData(new Dictionary<string, ProcessMember>()
+                     new FreezableProcessData(new Dictionary<string, ProcessMember>
                      {
                         {nameof(ApplyBooleanOperator.Left), new ProcessMember(f1)},
                         {nameof(ApplyBooleanOperator.Operator),
@@ -170,29 +174,46 @@ namespace Reductech.EDR.Processes.Serialization
                         {nameof(Compare<int>.Right), new ProcessMember(f2)}
                      }), null) as IFreezableProcess).Try();
 
-            Lazy<TokenListParser<ProcessToken, IFreezableProcess>> function = new Lazy<TokenListParser<ProcessToken, IFreezableProcess>>(()=>
-                from fName in Token.EqualTo(ProcessToken.FuncOrArgumentName)
-                from _1 in Token.EqualTo(ProcessToken.OpenBracket)
+            TokenListParser<ProcessToken, (string argumentName, ProcessMember processMember)> functionMember =
+                (from a in Token.EqualTo(ProcessToken.FuncOrArgumentName)
+                 from _ in Token.EqualTo(ProcessToken.Assignment)
+                 from pm in Parse.Ref(() => processMember.Value)
+                 select (a.ToStringValue(), pm)).Try();
+
+
+            var functionArguments =
+
                 from c in Parse.Chain(Token.EqualTo(ProcessToken.Delimiter),
-                    Parse.Ref(()=> functionMember.Select(p=> new []{p})),
-                    (_2, a,b)=> a.Concat(b).ToArray())
-                from _3 in Token.EqualTo(ProcessToken.CloseBracket)
-                where processFactoryStore.Dictionary.ContainsKey(fName.ToStringValue())
-                    select new CompoundFreezableProcess(processFactoryStore.Dictionary[fName.ToStringValue()],
-                    new FreezableProcessData(c.ToDictionary(x=>x.argumentName, x=>x.processMember)), null )
-            as IFreezableProcess);
+                    functionMember.Select(p => new[] {p}),
+                    (_2, a, b) => a.Concat(b).ToArray())
+                select c;
+
+
+            Lazy<TokenListParser<ProcessToken, IFreezableProcess>> function =
+                new Lazy<TokenListParser<ProcessToken, IFreezableProcess>>(()=>
+                    (from fName in Token.EqualTo(ProcessToken.FuncOrArgumentName)
+                     from _1 in Token.EqualTo(ProcessToken.OpenBracket)
+                     from args in functionArguments
+                     from _3 in Token.EqualTo(ProcessToken.CloseBracket)
+                     where processFactoryStore.Dictionary.ContainsKey(fName.ToStringValue())
+                     select new CompoundFreezableProcess(processFactoryStore.Dictionary[fName.ToStringValue()],
+                     new FreezableProcessData(args.ToDictionary(x => x.argumentName, x => x.processMember)), null)
+             as IFreezableProcess).Try()
+                );
 
 
             freezableProcess = new Lazy<TokenListParser<ProcessToken, IFreezableProcess>>(()=>
 
                         mathOperation
-                    .Or(booleanOperation)
+                            .Or(booleanOperation)
                     .Or(compareOperation)
+                    .Or(notOperation)
                     .Or(setVariable)
                     .Or(singleTermParser) //Must come after setVariable
+                .Or(Parse.Ref(()=>function.Value))
                     //.Or(Parse.Ref(()=>array.Value))
 
-                    .Or(Parse.Ref(()=>function.Value))
+
             );
 
             processMember = new Lazy<TokenListParser<ProcessToken, ProcessMember>>(()=>
@@ -200,6 +221,7 @@ namespace Reductech.EDR.Processes.Serialization
                             mathOperation
                     .Or(booleanOperation)
                     .Or(compareOperation)
+                    .Or(notOperation)
                     .Or(NumberParser)
                     .Or(BoolParser)
                     .Or(enumConstant)
@@ -269,6 +291,7 @@ namespace Reductech.EDR.Processes.Serialization
             Extensions.GetEnumValues<T>()
                 .Except(excludedValues)
                 .Select(x => x.GetDisplayName())
+                .OrderByDescending(x=>x.Length)
                 .Select(Span.EqualTo)
                 .Aggregate((a, b) => a.Or(b));
 
@@ -295,15 +318,16 @@ namespace Reductech.EDR.Processes.Serialization
             [Token(Example = ",", Description = "Delimiter for arrays and function calls")]
             Delimiter,
 
-            [Token(Example = ":", Description = "Separates an argument name and an argument value")]
-            ArgumentSeparator,
+            //[Token(Example = ":", Description = "Separates an argument name and an argument value")]
+            //ArgumentSeparator,
+
 
             [Token(Example = "=")]
             Assignment,
 
             [Token(Example = "+")]
             MathOperator,
-            [Token(Example = "and")]
+            [Token(Example = "&&")]
             BooleanOperator,
             [Token(Example = "==")]
             Comparator,
@@ -319,7 +343,10 @@ namespace Reductech.EDR.Processes.Serialization
             Enum,
 
             [Token(Example = "WriteFile")]
-            FuncOrArgumentName
+            FuncOrArgumentName,
+
+            [Token(Example = "Not")]
+            NotOperator
 
         }
 
