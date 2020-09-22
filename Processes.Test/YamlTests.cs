@@ -49,17 +49,15 @@ namespace Reductech.EDR.Processes.Test
                 yield return new TestCase("Print(Value = ArrayIsEmpty(Array = Array(Elements = [])))", true.ToString());
 
 
-                yield return new TestCase(
-                    @"
-Do: Print
-Config:
-  AdditionalRequirements:
-  TargetMachineTags:
-  - Tag1
-  DoNotSplit: false
-  Priority: 1
-Value: I have config", "I have config"
-                    );
+    //            yield return new TestCase(
+    //                @"Do: Print
+    //Config:
+    //  TargetMachineTags:
+    //  - Tag1
+    //  DoNotSplit: false
+    //  Priority: 1
+    //Value: I have config", "I have config"
+    //                );
 
                 yield return new TestCase(
                     @"
