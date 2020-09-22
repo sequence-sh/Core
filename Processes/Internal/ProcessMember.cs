@@ -122,7 +122,17 @@ namespace Reductech.EDR.Processes.Internal
         /// <summary>
         /// A string representation of the member.
         /// </summary>
-        public string MemberString => VariableName?.ToString()??Argument?.ToString()??ListArgument?.ToString()??"Unknown";
+        public string MemberString
+        {
+            get
+            {
+                return Join(x =>
+                        x.ToString()!,
+                    x => x.ToString()!,
+                    x => x.ToString()!);
+
+            }
+        }
 
         /// <inheritdoc />
         public override string ToString() => new {MemberType, Value=MemberString}.ToString()!;

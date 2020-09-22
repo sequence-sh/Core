@@ -54,20 +54,12 @@ namespace Reductech.EDR.Processes.General
         protected override ITypeReference GetOutputTypeReference(ITypeReference memberTypeReference) => new ActualTypeReference(typeof(Unit));
 
         /// <inheritdoc />
-        public override IProcessNameBuilder ProcessNameBuilder { get; } = new ProcessNameBuilderFromTemplate($"Print '[{nameof(Print<object>.Value)}]'");
+        public override IProcessNameBuilder ProcessNameBuilder { get; } = new ProcessNameBuilderFromTemplate($"Print [{nameof(Print<object>.Value)}]");
 
         /// <inheritdoc />
         protected override Result<ITypeReference> GetMemberType(FreezableProcessData freezableProcessData) =>
             freezableProcessData.GetArgument(nameof(Print<object>.Value))
                 .Bind(x => x.TryGetOutputTypeReference());
 
-
-        ///// <inheritdoc />
-        //public override Maybe<IProcessSerializer> CustomSerializer { get; } = Maybe<IProcessSerializer>.None;
-        //    //Maybe<IProcessSerializer>.From(
-        //    //    new ProcessSerializer(new FixedStringComponent("Print"),
-        //    //    new SpaceComponent(true),
-        //    //    new AnyPrimitiveComponent(nameof(Print<object>.Value))
-        //    //    ));
     }
 }

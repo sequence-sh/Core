@@ -40,7 +40,19 @@ namespace Reductech.EDR.Processes.Internal
         public Result<IReadOnlyCollection<(VariableName VariableName, ITypeReference type)>> TryGetVariablesSet => ImmutableList<(VariableName VariableName, ITypeReference type)>.Empty;
 
         /// <inheritdoc />
-        public string ProcessName => $"{Value}";
+        public string ProcessName
+        {
+            get
+            {
+                if (Value is string s)
+                    return $"'{s}'";
+
+                if (Value is Enum e)
+                    return e.GetDisplayName();
+
+                return $"{Value}";
+            }
+        }
 
         /// <inheritdoc />
         public Result<ITypeReference> TryGetOutputTypeReference() => new ActualTypeReference(Value.GetType());

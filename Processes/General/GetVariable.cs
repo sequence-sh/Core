@@ -41,7 +41,7 @@ namespace Reductech.EDR.Processes.General
 
 
         /// <inheritdoc />
-        public override IProcessNameBuilder ProcessNameBuilder => new ProcessNameBuilderFromTemplate($"<[{nameof(GetVariable<object>.VariableName)}]>");
+        public override IProcessNameBuilder ProcessNameBuilder => new ProcessNameBuilderFromTemplate($"[{nameof(GetVariable<object>.VariableName)}]");
 
         /// <inheritdoc />
         public override Type ProcessType => typeof(GetVariable<>);
