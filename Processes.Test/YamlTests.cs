@@ -58,7 +58,7 @@ Config:
   - Tag1
   DoNotSplit: false
   Priority: 1
-Value: 'I have config'", "I have config"
+Value: I have config", "I have config"
                     );
 
                 yield return new TestCase(
