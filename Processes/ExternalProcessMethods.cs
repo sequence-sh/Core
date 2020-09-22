@@ -20,14 +20,61 @@ namespace Reductech.EDR.Processes
         /// <param name="processPath">The path to the process</param>
         /// <param name="logger"></param>
         /// <param name="callingProcessName">The name of the calling process. For error reporting.</param>
+        /// <param name="errorHandler">The error handler.</param>
         /// <param name="arguments">The arguments to provide to the process. These will all be escaped</param>
         /// <returns>The output of the process</returns>
         Task<Result<Unit, IRunErrors>> RunExternalProcess(
             string processPath,
             ILogger logger,
             string callingProcessName,
+            IErrorHandler errorHandler,
             IEnumerable<string> arguments);
     }
+
+    /// <summary>
+    /// Determines how to handle errors coming from an external process.
+    /// </summary>
+    public interface IErrorHandler
+    {
+        /// <summary>
+        /// Whether to ignore a particular error.
+        /// </summary>
+        public bool ShouldIgnoreError(string s);
+    }
+
+    /// <summary>
+    /// Does not ignore any errors.
+    /// </summary>
+    public class IgnoreNoneErrorHandler : IErrorHandler
+    {
+        private IgnoreNoneErrorHandler(){}
+
+        /// <summary>
+        /// The instance.
+        /// </summary>
+        public static IErrorHandler Instance = new IgnoreNoneErrorHandler();
+
+        /// <inheritdoc />
+        public bool ShouldIgnoreError(string s) => false;
+    }
+
+    /// <summary>
+    /// Ignores all errors.
+    /// </summary>
+    public class IgnoreAllErrorHandler : IErrorHandler
+    {
+        private IgnoreAllErrorHandler(){}
+
+        /// <summary>
+        /// The instance.
+        /// </summary>
+        public static IErrorHandler Instance = new IgnoreAllErrorHandler();
+
+        /// <inheritdoc />
+        public bool ShouldIgnoreError(string s) => true;
+    }
+
+
 
     /// <summary>
     /// Basic external process runner.
@@ -49,7 +96,7 @@ namespace Reductech.EDR.Processes
 
 
         /// <inheritdoc />
-        public async Task<Result<Unit, IRunErrors>> RunExternalProcess(string processPath, ILogger logger, string callingProcessName, IEnumerable<string> arguments)
+        public async Task<Result<Unit, IRunErrors>> RunExternalProcess(string processPath, ILogger logger, string callingProcessName, IErrorHandler errorHandler, IEnumerable<string> arguments)
         {
             if (!File.Exists(processPath))
                 return new RunError($"Could not find '{processPath}'", callingProcessName, null, ErrorCode.ExternalProcessNotFound);
@@ -89,9 +136,15 @@ namespace Reductech.EDR.Processes
                 if (line.Value.source == Source.Error)
                 {
                     var errorText = string.IsNullOrWhiteSpace(line.Value.line) ? "Unknown Error" : line.Value.line;
-                    errors.Add(new RunError(errorText, callingProcessName, null, ErrorCode.ExternalProcessError));
+
+                    if (errorHandler.ShouldIgnoreError(errorText))
+                        logger.LogWarning(line.Value.line);
+                    else
+                        errors.Add(new RunError(errorText, callingProcessName, null, ErrorCode.ExternalProcessError));
+
                 }
-                logger.LogInformation(line.Value.line);
+                else
+                    logger.LogInformation(line.Value.line);
             }
 
             pProcess.WaitForExit();
