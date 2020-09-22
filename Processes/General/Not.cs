@@ -33,16 +33,18 @@ namespace Reductech.EDR.Processes.General
     {
         private NotProcessFactory() { }
 
+        /// <summary>
+        /// The instance.
+        /// </summary>
         public static RunnableProcessFactory Instance { get; } = new NotProcessFactory();
 
         /// <inheritdoc />
         public override IProcessNameBuilder ProcessNameBuilder => new ProcessNameBuilderFromTemplate($"Not [{nameof(Not.Boolean)}]");
 
         /// <inheritdoc />
-        public override Maybe<ICustomSerializer> CustomSerializer => Maybe<ICustomSerializer>.From(new CustomSerializer(
+        public override IProcessSerializer Serializer { get; } = new ProcessSerializer(
             new FixedStringComponent("not"),
             new SpaceComponent(true),
-            new BooleanComponent(nameof(Not.Boolean))
-            ));
+            new BooleanComponent(nameof(Not.Boolean)));
     }
 }

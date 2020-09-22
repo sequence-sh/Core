@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Reductech.EDR.Processes.General;
@@ -33,7 +34,7 @@ namespace Reductech.EDR.Processes.Serialization
 
             .Match(GetSpan(MathOperator.None), ProcessToken.MathOperator)
             .Match(GetSpan(BooleanOperator.None), ProcessToken.BooleanOperator)
-            .Match(GetSpan(CompareOperator.None), ProcessToken.Comparator)
+            .Match(GetSpan(CompareOperator.None), ProcessToken.Comparator, true)
 
 
             .Match(Character.EqualTo('='), ProcessToken.Assignment, true)
@@ -87,6 +88,7 @@ namespace Reductech.EDR.Processes.Serialization
         /// <summary>
         /// Create a new ProcessMemberParser
         /// </summary>
+        [SuppressMessage("ReSharper", "AccessToModifiedClosure")]
         public ProcessMemberParser(ProcessFactoryStore processFactoryStore)
         {
             ProcessFactoryStore = processFactoryStore;
@@ -111,13 +113,23 @@ namespace Reductech.EDR.Processes.Serialization
                          value)).Try();
 
 
+
+
             TokenListParser<ProcessToken, ProcessMember> array =
-                from _1 in Token.EqualTo(ProcessToken.OpenArray)
+
+                (from _1 in Token.EqualTo(ProcessToken.OpenArray)
+                    from _2 in Token.EqualTo(ProcessToken.CloseArray)
+                    select new ProcessMember(new List<IFreezableProcess>())
+                    ).Try()
+                .Or
+
+
+                (from _1 in Token.EqualTo(ProcessToken.OpenArray)
                 from elements in Parse.Chain(Token.EqualTo(ProcessToken.Delimiter),
                     Parse.Ref(() => freezableProcess.Value).Select(x => new[]{x} as IEnumerable<IFreezableProcess>),
                     (_2,a,b)=> a.Concat(b))
                 from _3 in Token.EqualTo(ProcessToken.CloseArray)
-                select new ProcessMember(elements.ToList());
+                select new ProcessMember(elements.ToList()));
 
 
             TokenListParser<ProcessToken, IFreezableProcess> notOperation =
@@ -191,15 +203,16 @@ namespace Reductech.EDR.Processes.Serialization
 
             Lazy<TokenListParser<ProcessToken, IFreezableProcess>> function =
                 new Lazy<TokenListParser<ProcessToken, IFreezableProcess>>(()=>
+                    (from x in
                     (from fName in Token.EqualTo(ProcessToken.FuncOrArgumentName)
                      from _1 in Token.EqualTo(ProcessToken.OpenBracket)
                      from args in functionArguments
                      from _3 in Token.EqualTo(ProcessToken.CloseBracket)
-                     where processFactoryStore.Dictionary.ContainsKey(fName.ToStringValue())
-                     select new CompoundFreezableProcess(processFactoryStore.Dictionary[fName.ToStringValue()],
-                     new FreezableProcessData(args.ToDictionary(x => x.argumentName, x => x.processMember)), null)
-             as IFreezableProcess).Try()
-                );
+
+                     select TryCreateProcess(fName.ToStringValue(), processFactoryStore, args))
+                     where x.IsSuccess
+                     select x.Value).Try()
+                    );
 
 
             freezableProcess = new Lazy<TokenListParser<ProcessToken, IFreezableProcess>>(()=>
@@ -236,6 +249,34 @@ namespace Reductech.EDR.Processes.Serialization
 
 
             Parser = processMember.Value;
+        }
+
+
+        private static CSharpFunctionalExtensions.Result<IFreezableProcess> TryCreateProcess(string funcName, ProcessFactoryStore factoryStore, (string argumentName, ProcessMember processMember)[] functionArguments)
+        {
+            if (!factoryStore.Dictionary.TryGetValue(funcName, out var runnableProcessFactory))
+                return Result.Failure<IFreezableProcess>($"Could not find process '{funcName}'");
+
+
+            var dictionary = new Dictionary<string, ProcessMember>();
+
+            foreach (var (argumentName, processMember) in functionArguments)
+            {
+                var memberType = runnableProcessFactory.GetExpectedMemberType(argumentName);
+
+                var convertResult = processMember.TryConvert(memberType);
+
+                if (convertResult.IsFailure)
+                    return convertResult.ConvertFailure<IFreezableProcess>();
+
+                dictionary.Add(argumentName, convertResult.Value);
+            }
+
+            var process = new CompoundFreezableProcess(runnableProcessFactory,
+                new FreezableProcessData(dictionary), null);
+
+
+            return process;
         }
 
 
@@ -292,7 +333,7 @@ namespace Reductech.EDR.Processes.Serialization
                 .Except(excludedValues)
                 .Select(x => x.GetDisplayName())
                 .OrderByDescending(x=>x.Length)
-                .Select(Span.EqualTo)
+                .Select(x=> Span.EqualToIgnoreCase(x).Try())
                 .Aggregate((a, b) => a.Or(b));
 
         private enum ProcessToken
@@ -300,6 +341,7 @@ namespace Reductech.EDR.Processes.Serialization
             /// <summary>
             /// Sentinel Value.
             /// </summary>
+            // ReSharper disable once UnusedMember.Local
             None,
 
             [Token(Example = "<Path>")]

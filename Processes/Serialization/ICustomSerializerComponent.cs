@@ -10,11 +10,11 @@
         /// </summary>
         public ISerializerBlock? SerializerBlock { get; }
 
-        /// <summary>
-        /// Contributes to the deserialization regex
-        /// </summary>
-        public IDeserializerBlock? DeserializerBlock { get; }
+        ///// <summary>
+        ///// Contributes to the deserialization regex
+        ///// </summary>
+        //public IDeserializerBlock? DeserializerBlock { get; }
 
-        public IDeserializerMapping? Mapping { get; }
+        //public IDeserializerMapping? Mapping { get; }
     }
 }

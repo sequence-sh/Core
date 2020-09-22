@@ -4,6 +4,7 @@ using System.Linq;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Processes.Attributes;
 using Reductech.EDR.Processes.Internal;
+using Reductech.EDR.Processes.Serialization;
 
 namespace Reductech.EDR.Processes.General
 {
@@ -75,5 +76,8 @@ namespace Reductech.EDR.Processes.General
         /// <inheritdoc />
         public override IProcessNameBuilder ProcessNameBuilder => new ProcessNameBuilderFromTemplate($"[{nameof(Sequence.Steps)}]");
 
+
+        /// <inheritdoc />
+        public override IProcessSerializer Serializer => NoSpecialSerializer.Instance;
     }
 }

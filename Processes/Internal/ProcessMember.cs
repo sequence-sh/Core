@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using CSharpFunctionalExtensions;
+using Reductech.EDR.Processes.General;
 
 namespace Reductech.EDR.Processes.Internal
 {
@@ -41,14 +42,24 @@ namespace Reductech.EDR.Processes.Internal
             }
         }
 
+        /// <summary>
+        /// The ProcessMember, if it is a VariableName
+        /// </summary>
         public VariableName? VariableName { get;  }
 
-
+        /// <summary>
+        /// The ProcessMember, if it is an Argument
+        /// </summary>
         public IFreezableProcess? Argument { get;  }
 
+        /// <summary>
+        /// The ProcessMember, if it is a ListArgument
+        /// </summary>
         public IReadOnlyList<IFreezableProcess>? ListArgument { get;  }
 
-
+        /// <summary>
+        /// Use this ProcessMember.
+        /// </summary>
         public T Join<T>(Func<VariableName, T> handleVariableName, Func<IFreezableProcess, T> handleArgument,
             Func<IReadOnlyList<IFreezableProcess>, T> handleListArgument)
         {
@@ -61,22 +72,51 @@ namespace Reductech.EDR.Processes.Internal
             throw new Exception("Process Member has no property");
         }
 
+        /// <summary>
+        /// Gets the processMember if it is a VariableName.
+        /// </summary>
         public Result<VariableName> AsVariableName(string propertyName)
         {
-            if (VariableName != null) return VariableName.Value;
-            return Result.Failure<VariableName>($"{propertyName} was not a VariableName");
+            if (VariableName != null)
+                return VariableName.Value;
+            return Result.Failure<VariableName>($"{propertyName} was a {MemberType}, not a VariableName");
         }
 
+        /// <summary>
+        /// Gets the processMember if it is an argument.
+        /// </summary>
         public Result<IFreezableProcess> AsArgument(string propertyName)
         {
-            if (Argument != null) return Result.Success(Argument);
-            return Result.Failure<IFreezableProcess>($"{propertyName} was not an argument");
+            if (Argument != null)
+                return Result.Success(Argument);
+            return Result.Failure<IFreezableProcess>($"{propertyName} was a {MemberType}, not an argument");
         }
 
+        /// <summary>
+        /// Gets the processMember if it is a listArgument.
+        /// </summary>
         public Result<IReadOnlyList<IFreezableProcess>> AsListArgument(string propertyName)
         {
-            if (ListArgument != null) return Result.Success(ListArgument);
-            return Result.Failure<IReadOnlyList<IFreezableProcess>>($"{propertyName} was not an list argument");
+            if (ListArgument != null)
+                return Result.Success(ListArgument);
+            return Result.Failure<IReadOnlyList<IFreezableProcess>>($"{propertyName} was a {MemberType}, not an list argument");
+        }
+
+        /// <summary>
+        /// Tries to convert this process member to a particular type.
+        /// </summary>
+        public Result<ProcessMember> TryConvert(MemberType convertType)
+        {
+            if (MemberType == convertType) return this;
+
+            if (MemberType == MemberType.VariableName && convertType == MemberType.Process)
+            {
+                var getVariableProcess = GetVariableProcessFactory.CreateFreezable(VariableName!.Value);
+
+                return new ProcessMember(getVariableProcess);
+            }
+
+            return Result.Failure<ProcessMember>("Could not convert");
         }
 
         /// <summary>
@@ -111,16 +151,10 @@ namespace Reductech.EDR.Processes.Internal
 
 
         /// <inheritdoc />
-        public override bool Equals(object? obj)
-        {
-            return ReferenceEquals(this, obj) || obj is ProcessMember other && Equals(other);
-        }
+        public override bool Equals(object? obj) => ReferenceEquals(this, obj) || obj is ProcessMember other && Equals(other);
 
         /// <inheritdoc />
-        public override int GetHashCode()
-        {
-            return HashCode.Combine(VariableName, Argument, ListArgument);
-        }
+        public override int GetHashCode() => HashCode.Combine(VariableName, Argument, ListArgument);
 
         /// <summary>
         /// Equals operator

@@ -91,13 +91,13 @@ namespace Reductech.EDR.Processes.General
         public override IEnumerable<Type> EnumTypes => new[] {typeof(BooleanOperator)};
 
         /// <inheritdoc />
-        public override Maybe<ICustomSerializer> CustomSerializer { get; } = Maybe<ICustomSerializer>.From(new CustomSerializer(
+        public override IProcessSerializer Serializer { get; } = new ProcessSerializer(
                 new BooleanComponent(nameof(ApplyBooleanOperator.Left)),
                 new SpaceComponent(false),
                 new EnumDisplayComponent<BooleanOperator>(nameof(ApplyBooleanOperator.Operator)),
                 new SpaceComponent(false),
                 new BooleanComponent(nameof(ApplyBooleanOperator.Right))
-                ));
+                );
     }
 
     /// <summary>

@@ -29,22 +29,25 @@ namespace Reductech.EDR.Processes.Test
             get
             {
                 yield return new TestCase(
-@" - <Foo> = 'Hello World'
- - <Bar> = <Foo>
- - Print(Value = <Bar>)", "Hello World");
+@"- <Foo> = 'Hello World'
+- <Bar> = <Foo>
+- Print(Value = <Bar>)", "Hello World");
 
                 yield return new TestCase(@"Print(Value = 2 * 3)", 6.ToString());
 
 
                 yield return new TestCase(@"Print(Value = 2 ^ 3)", 8.ToString());
 
-                yield return new TestCase(@"Print(Value = not true)", false.ToString());
+                yield return new TestCase(@"Print(Value = not True)", false.ToString());
 
 
                 yield return new TestCase(@"Print(Value = 2 >= 3)", false.ToString());
 
 
-                yield return new TestCase(@"Print(Value = true && false)", false.ToString());
+                yield return new TestCase(@"Print(Value = True && False)", false.ToString());
+
+                yield return new TestCase("Print(Value = ArrayIsEmpty(Array = Array(Elements = [])))", true.ToString());
+
 
                 yield return new TestCase(
                     @"
@@ -84,7 +87,7 @@ Config:
   - Tag2
   DoNotSplit: true
   Priority: 1
-Value: 'I have more config'", "I have more config");
+Value: I have more config", "I have more config");
 
 
             }

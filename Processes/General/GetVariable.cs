@@ -56,7 +56,9 @@ namespace Reductech.EDR.Processes.General
 
 
         /// <inheritdoc />
-        public override Maybe<ICustomSerializer> CustomSerializer { get; } = Maybe<ICustomSerializer>.From(new CustomSerializer(new VariableNameComponent(nameof(GetVariable<object>.VariableName))));
+        public override IProcessSerializer Serializer { get; } = new ProcessSerializer(
+            new VariableNameComponent(nameof(GetVariable<object>.VariableName)));
+
 
 
         /// <summary>

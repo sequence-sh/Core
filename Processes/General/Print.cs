@@ -4,7 +4,6 @@ using CSharpFunctionalExtensions;
 using Microsoft.Extensions.Logging;
 using Reductech.EDR.Processes.Attributes;
 using Reductech.EDR.Processes.Internal;
-using Reductech.EDR.Processes.Serialization;
 
 namespace Reductech.EDR.Processes.General
 {
@@ -63,12 +62,12 @@ namespace Reductech.EDR.Processes.General
                 .Bind(x => x.TryGetOutputTypeReference());
 
 
-        /// <inheritdoc />
-        public override Maybe<ICustomSerializer> CustomSerializer { get; } =
-            Maybe<ICustomSerializer>.From(
-                new CustomSerializer(new FixedStringComponent("Print"),
-                new SpaceComponent(true),
-                new AnyPrimitiveComponent(nameof(Print<object>.Value))
-                ));
+        ///// <inheritdoc />
+        //public override Maybe<IProcessSerializer> CustomSerializer { get; } = Maybe<IProcessSerializer>.None;
+        //    //Maybe<IProcessSerializer>.From(
+        //    //    new ProcessSerializer(new FixedStringComponent("Print"),
+        //    //    new SpaceComponent(true),
+        //    //    new AnyPrimitiveComponent(nameof(Print<object>.Value))
+        //    //    ));
     }
 }

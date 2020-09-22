@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
-using System.Text;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Processes.General;
 using Reductech.EDR.Processes.Internal;
@@ -22,7 +21,7 @@ namespace Reductech.EDR.Processes.Serialization
             var obj = SimplifyProcess(process, true);
             var serializer = new YamlDotNet.Serialization.Serializer();
 
-            var r = serializer.Serialize(obj);
+            var r = serializer.Serialize(obj).Trim();
 
             return r;
         }
@@ -53,52 +52,49 @@ namespace Reductech.EDR.Processes.Serialization
         private const string TypeString = "Do";
         private const string ConfigString = "Config";
 
-
-
         private static Result<ProcessMember> FromSimpleObject(object simpleObject, ProcessMemberParser processMemberParser)
         {
 
             Result<ProcessMember> result;
 
-            if (simpleObject is List<object> list)
+            switch (simpleObject)
             {
-                result = list.Select(x => FromSimpleObject(x, processMemberParser))
-                    .Select(x => x.Bind(y => y.AsArgument("Array Member")))
-                    .Combine()
-                    .Map(x => new ProcessMember(x.ToList()));
-            }
-            else if (simpleObject is Dictionary<object, object> dictionary1 && dictionary1.ContainsKey(TypeString))
-            {
-                var processConfiguration = dictionary1
-                    .TryFindOrFail(ConfigString, null)
-                    .Bind(ProcessConfiguration.TryConvert)
-                    .OnFailureCompensate(x=> (null as ProcessConfiguration)!);
+                case List<object> list:
+                    result = list.Select(x => FromSimpleObject(x, processMemberParser))
+                        .Select(x => x.Bind(y => y.AsArgument("Array Member")))
+                        .Combine()
+                        .Map(x => new ProcessMember(x.ToList()));
+                    break;
+                case Dictionary<object, object> dictionary1 when dictionary1.ContainsKey(TypeString):
+                {
+                    var processConfiguration = dictionary1
+                        .TryFindOrFail(ConfigString, null)
+                        .Bind(ProcessConfiguration.TryConvert)
+                        .OnFailureCompensate(x=> (null as ProcessConfiguration)!);
 
-                result = dictionary1.TryFindOrFail(TypeString, $"Object did not have {TypeString} set.")
-                    .BindCast<object, string>()
-                    .Bind(x => processMemberParser.ProcessFactoryStore.Dictionary.TryFindOrFail(x, $"Could not find the process: '{x}'."))
-                    .Compose(() =>
-                        dictionary1.Where(x => x.Key.ToString() != TypeString && x.Key.ToString() != ConfigString)
-                            .Select(x =>
-                                FromSimpleObject(x.Value, processMemberParser)
-                                    .Map(value => (x.Key.ToString(), value)))
-                            .Combine())
-                    .Bind(x => CreateProcess(x.Item1, x.Item2!, processConfiguration.Value))
-                    .Map(x => new ProcessMember(x));
-            }
-            else if (simpleObject is string sString3)
-            {
-                 result = processMemberParser.TryParse(sString3);
+                    result = dictionary1.TryFindOrFail(TypeString, $"Object did not have {TypeString} set.")
+                        .BindCast<object, string>()
+                        .Bind(x => processMemberParser.ProcessFactoryStore.Dictionary.TryFindOrFail(x, $"Could not find the process: '{x}'."))
+                        .Compose(() =>
+                            dictionary1.Where(x => x.Key.ToString() != TypeString && x.Key.ToString() != ConfigString)
+                                .Select(x =>
+                                    FromSimpleObject(x.Value, processMemberParser)
+                                        .Map(value => (x.Key.ToString(), value)))
+                                .Combine())
+                        .Bind(x => CreateProcess(x.Item1, x.Item2!, processConfiguration.Value))
+                        .Map(x => new ProcessMember(x));
+                    break;
+                }
+                case string sString3:
+                    result = processMemberParser.TryParse(sString3);
 
-                //var special = TrySpecialDeserialize(sString3, processFactoryStore);
+                    if (result.IsFailure)
+                        return new ProcessMember(new ConstantFreezableProcess(sString3));
 
-                //if (special != null)
-                //    result = special;
-                //else
-                //    result = SerializationMethods.TryDeserialize(sString3, processFactoryStore);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(simpleObject));
             }
-            else
-                throw new ArgumentOutOfRangeException(nameof(simpleObject));
 
             return result;
 
@@ -116,20 +112,13 @@ namespace Reductech.EDR.Processes.Serialization
                         errors.Add($"'{key}' is not a member of type {factory.TypeName}");
                     else if (memberType == expectedMemberType)
                         dict.Add(key, value);
-                    else if (expectedMemberType == MemberType.VariableName && memberType == MemberType.Process)
+                    else if (expectedMemberType == MemberType.Process && memberType == MemberType.VariableName)
                     {
-                        //Weird special case - convert this process to a variable name
-                        var newValue = value.AsArgument(key)
-                            .BindCast<IFreezableProcess, ConstantFreezableProcess>()
-                            .Map(x => new VariableName(x.Value.ToString()!))
-                            .Map(x => new ProcessMember(x));
-                        if (newValue.IsFailure)
-                            errors.Add(newValue.Error);
-                        else
-                            dict.Add(key, newValue.Value);
+                        var freezableProcess = GetVariableProcessFactory.CreateFreezable(value.VariableName!.Value);
+                        dict.Add(key, new ProcessMember(freezableProcess));
                     }
                     else
-                        errors.Add($"'{key}' has the wrong type in {factory.TypeName}");
+                        errors.Add($"'{key}' has the wrong MemberType in {factory.TypeName}");
                 }
 
                 if (errors.Any())
@@ -140,22 +129,6 @@ namespace Reductech.EDR.Processes.Serialization
                 var process = new CompoundFreezableProcess(factory, data, processConfiguration);
                 return process;
             }
-
-            //static ProcessMember? TrySpecialDeserialize(string s, ProcessFactoryStore processFactoryStore)
-            //{
-            //    foreach (var factory in processFactoryStore.Dictionary.Values)
-            //    {
-            //        if (factory.CustomSerializer.HasValue)
-            //        {
-            //            var r = factory.CustomSerializer.Value.TryDeserialize(s, processFactoryStore, factory);
-
-            //            if (r.IsSuccess)
-            //                return new ProcessMember(r.Value);
-            //        }
-            //    }
-
-            //    return null;
-            //}
         }
 
         private static object SimplifyProcess(IFreezableProcess process, bool isTopLevel)
@@ -172,27 +145,24 @@ namespace Reductech.EDR.Processes.Serialization
 
                     if (compoundFreezableProcess.ProcessConfiguration == null)//Don't use custom serialization if you have configuration
                     {
-                        if (compoundFreezableProcess.ProcessFactory.CustomSerializer.HasValue)
-                        {
-                            var sr = compoundFreezableProcess.ProcessFactory.CustomSerializer.Value
-                                .TrySerialize(compoundFreezableProcess.FreezableProcessData);
-                            if (sr.IsSuccess)
+                            var sr = compoundFreezableProcess.ProcessFactory.Serializer
+                                    .TrySerialize(compoundFreezableProcess.FreezableProcessData);
+                            if (sr.IsSuccess) //Serialization will not always succeed.
                                 return sr.Value;
-                        }
-                        
-                    }
 
+                    }
 
                     IDictionary<string, object> expandoObject = new ExpandoObject();
                     expandoObject[TypeString] = compoundFreezableProcess.ProcessFactory.TypeName;
 
-                    if(compoundFreezableProcess.ProcessConfiguration != null)
-                        expandoObject[ConfigString]= compoundFreezableProcess.ProcessConfiguration;
+                    if (compoundFreezableProcess.ProcessConfiguration != null)
+                        expandoObject[ConfigString] = compoundFreezableProcess.ProcessConfiguration;
 
                     foreach (var (name, m) in compoundFreezableProcess.FreezableProcessData.Dictionary)
                         expandoObject[name] = ToSimpleObject(m);
 
                     return expandoObject;
+
                     }
                 default:
                     throw new ArgumentOutOfRangeException(nameof(process));
@@ -201,7 +171,7 @@ namespace Reductech.EDR.Processes.Serialization
 
 
         private static object ToSimpleObject(ProcessMember member) =>
-            member.Join(x=>x.Name,
+            member.Join(x=> VariableNameComponent.Serialize(x).Value,
                 x=> SimplifyProcess(x, false),
                 l=>l.Select(x=>SimplifyProcess(x, false)).ToList());
     }

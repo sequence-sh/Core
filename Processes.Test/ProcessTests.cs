@@ -202,7 +202,7 @@ namespace Reductech.EDR.Processes.Test
                         }),
                     "World");
 
-                yield return new TestCase("Foo = 2; IncrementVariable(Variable: Foo, Amount: 3); Print '<Foo>'",
+                yield return new TestCase("Foo = 2; IncrementVariable(Variable: <Foo>, Amount: 3); Print '<Foo>'",
                     Sequence(SetVariable(FooString, Constant(2)),
                     new IncrementVariable
                     {
