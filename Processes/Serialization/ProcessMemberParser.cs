@@ -66,8 +66,6 @@ namespace Reductech.EDR.Processes.Serialization
             if (!tokensResult.Remainder.IsAtEnd)
                 return Result.Failure<ProcessMember>(tokensResult.FormatErrorMessageFragment());
 
-
-
             var parseResult = Parser.TryParse(tokensResult.Value);
 
             if(!parseResult.HasValue)
@@ -112,9 +110,6 @@ namespace Reductech.EDR.Processes.Serialization
                          new VariableName(vnToken.ToStringValue().TrimStart('<').TrimEnd('>')),
                          value)).Try();
 
-
-
-
             TokenListParser<ProcessToken, ProcessMember> array =
 
                 (from _1 in Token.EqualTo(ProcessToken.OpenArray)
@@ -122,8 +117,6 @@ namespace Reductech.EDR.Processes.Serialization
                     select new ProcessMember(new List<IFreezableProcess>())
                     ).Try()
                 .Or
-
-
                 (from _1 in Token.EqualTo(ProcessToken.OpenArray)
                 from elements in Parse.Chain(Token.EqualTo(ProcessToken.Delimiter),
                     Parse.Ref(() => freezableProcess.Value).Select(x => new[]{x} as IEnumerable<IFreezableProcess>),
@@ -218,7 +211,7 @@ namespace Reductech.EDR.Processes.Serialization
             freezableProcess = new Lazy<TokenListParser<ProcessToken, IFreezableProcess>>(()=>
 
                         mathOperation
-                            .Or(booleanOperation)
+                    .Or(booleanOperation)
                     .Or(compareOperation)
                     .Or(notOperation)
                     .Or(setVariable)

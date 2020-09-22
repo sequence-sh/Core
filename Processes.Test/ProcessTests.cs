@@ -59,21 +59,21 @@ namespace Reductech.EDR.Processes.Test
                     ), true.ToString());
 
 
-                yield return new TestCase("Print 'True And Not False'",
-                    Print(new ApplyBooleanOperator
-                    {
-                        Left = Constant(true),
-                        Right = new Not { Boolean = Constant(false) },
-                        Operator = Constant(BooleanOperator.And)
-                    }), true.ToString());
+                //yield return new TestCase("Print 'True And Not False'",
+                //    Print(new ApplyBooleanOperator
+                //    {
+                //        Left = Constant(true),
+                //        Right = new Not { Boolean = Constant(false) },
+                //        Operator = Constant(BooleanOperator.And)
+                //    }), true.ToString());
 
-                yield return new TestCase("Print 'False Or Not False'",
-                    Print(new ApplyBooleanOperator
-                    {
-                        Left = Constant(false),
-                        Right = new Not { Boolean = Constant(false) },
-                        Operator = Constant(BooleanOperator.Or)
-                    }), true.ToString());
+                //yield return new TestCase("Print 'False Or Not False'",
+                //    Print(new ApplyBooleanOperator
+                //    {
+                //        Left = Constant(false),
+                //        Right = new Not { Boolean = Constant(false) },
+                //        Operator = Constant(BooleanOperator.Or)
+                //    }), true.ToString());
 
                 yield return new TestCase("Foreach Foo in [Hello; World]; Print '<Foo>'",
                     new ForEach<string>

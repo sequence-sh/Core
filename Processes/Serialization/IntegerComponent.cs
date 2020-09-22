@@ -6,7 +6,7 @@ namespace Reductech.EDR.Processes.Serialization
     /// <summary>
     /// Deserializes a regex group into an integer.
     /// </summary>
-    public class IntegerComponent :  ISerializerBlock,  ICustomSerializerComponent
+    public class IntegerComponent :  ISerializerBlock,  IProcessSerializerComponent
     {
         /// <summary>
         /// Creates a new IntegerComponent

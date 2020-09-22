@@ -7,7 +7,7 @@ namespace Reductech.EDR.Processes.Serialization
     /// <summary>
     /// Deserializes a regex group into a constant of any type.
     /// </summary>
-    public class AnyPrimitiveComponent :  ISerializerBlock,  ICustomSerializerComponent
+    public class AnyPrimitiveComponent :  ISerializerBlock,  IProcessSerializerComponent
     {
         /// <summary>
         /// Creates a new AnyPrimitiveComponent

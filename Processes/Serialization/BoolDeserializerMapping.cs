@@ -6,7 +6,7 @@ namespace Reductech.EDR.Processes.Serialization
     /// <summary>
     /// Deserializes a regex group into a bool.
     /// </summary>
-    public class BooleanComponent : ISerializerBlock, ICustomSerializerComponent
+    public class BooleanComponent : ISerializerBlock, IProcessSerializerComponent
     {
         /// <summary>
         /// Creates a new BooleanComponent
@@ -17,10 +17,6 @@ namespace Reductech.EDR.Processes.Serialization
         /// The property name
         /// </summary>
         public string PropertyName { get; }
-
-        ///// <inheritdoc />
-        //public Result<ProcessMember> TryDeserialize(string groupText, ProcessFactoryStore processFactoryStore) => SerializationMethods.TryDeserialize(groupText, processFactoryStore);
-
 
         /// <inheritdoc />
         public Result<string> TryGetText(FreezableProcessData data) =>
@@ -36,7 +32,7 @@ namespace Reductech.EDR.Processes.Serialization
         {
             if (process is ConstantFreezableProcess constantFreezableProcess && constantFreezableProcess.Value is bool b)
                 return b.ToString();
-            if (process is CompoundFreezableProcess compound && compound.ProcessConfiguration != null)
+            if (process is CompoundFreezableProcess compound && compound.ProcessConfiguration == null)
                 return compound.ProcessFactory.Serializer.TrySerialize(compound.FreezableProcessData);
 
             return Result.Failure<string>("Cannot serialize compound as a primitive");
@@ -44,11 +40,5 @@ namespace Reductech.EDR.Processes.Serialization
 
         /// <inheritdoc />
         public ISerializerBlock? SerializerBlock => this;
-
-        ///// <inheritdoc />
-        //public IDeserializerBlock? DeserializerBlock => this;
-
-        ///// <inheritdoc />
-        //public IDeserializerMapping? Mapping => this;
     }
 }

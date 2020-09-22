@@ -26,12 +26,12 @@ namespace Reductech.EDR.Processes.Serialization
         /// <summary>
         /// Create a new ProcessSerializer
         /// </summary>
-        public ProcessSerializer(params ICustomSerializerComponent[] components) => Components = components;
+        public ProcessSerializer(params IProcessSerializerComponent[] components) => Components = components;
 
         /// <summary>
         /// The component to use.
         /// </summary>
-        public IReadOnlyCollection<ICustomSerializerComponent> Components { get; }
+        public IReadOnlyCollection<IProcessSerializerComponent> Components { get; }
 
         /// <inheritdoc />
         public Result<string> TrySerialize(FreezableProcessData data)
