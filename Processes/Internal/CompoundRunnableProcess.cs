@@ -107,13 +107,13 @@ namespace Reductech.EDR.Processes.Internal
         /// <summary>
         /// Check that this process meets requirements
         /// </summary>
-        public virtual Result<Unit, IRunErrors> VerifyThis => Unit.Default;
+        public virtual Result<Unit, IRunErrors> VerifyThis(IProcessSettings settings) => Unit.Default;
 
 
         /// <inheritdoc />
         public Result<Unit, IRunErrors> Verify(IProcessSettings settings)
         {
-            var r0 = new[] {VerifyThis};
+            var r0 = new[] {VerifyThis(settings)};
 
             var rRequirements = RuntimeRequirements.Concat(RunnableProcessFactory.Requirements)
                 .Select(req => settings.CheckRequirement(Name, req));
