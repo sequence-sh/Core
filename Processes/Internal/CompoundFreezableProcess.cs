@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using CSharpFunctionalExtensions;
@@ -8,7 +9,7 @@ namespace Reductech.EDR.Processes.Internal
     /// <summary>
     /// A process that is not a constant or a variable reference.
     /// </summary>
-    public sealed class CompoundFreezableProcess : IFreezableProcess
+    public sealed class CompoundFreezableProcess : IFreezableProcess, IEquatable<CompoundFreezableProcess>
     {
         /// <summary>
         /// Creates a new CompoundFreezableProcess.
@@ -75,5 +76,31 @@ namespace Reductech.EDR.Processes.Internal
 
         /// <inheritdoc />
         public override string ToString() => ProcessName;
+
+        /// <inheritdoc />
+        public bool Equals(CompoundFreezableProcess? other)
+        {
+            if (other is null) return false;
+            if (ReferenceEquals(this, other)) return true;
+            return ProcessFactory.Equals(other.ProcessFactory) &&
+                   FreezableProcessData.Equals(other.FreezableProcessData) &&
+                   Equals(ProcessConfiguration, other.ProcessConfiguration);
+        }
+
+        /// <inheritdoc />
+        public override bool Equals(object? obj) => ReferenceEquals(this, obj) || obj is CompoundFreezableProcess other && Equals(other);
+
+        /// <inheritdoc />
+        public override int GetHashCode() => HashCode.Combine(ProcessFactory, FreezableProcessData, ProcessConfiguration);
+
+        /// <summary>
+        /// Equals Operator.
+        /// </summary>
+        public static bool operator ==(CompoundFreezableProcess? left, CompoundFreezableProcess? right) => Equals(left, right);
+
+        /// <summary>
+        /// Not Equals Operator.
+        /// </summary>
+        public static bool operator !=(CompoundFreezableProcess? left, CompoundFreezableProcess? right) => !Equals(left, right);
     }
 }

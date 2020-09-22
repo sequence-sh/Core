@@ -31,52 +31,33 @@ namespace Reductech.EDR.Processes.Test
                 yield return new TestCase(
 @"- <Foo> = 'Hello World'
 - <Bar> = <Foo>
-- Print <Bar>", "Hello World");
+- Print(Value = <Bar>)", "Hello World");
 
-                yield return new TestCase(
-                    @"
-Do: Print
-Value: 2 * 3
-", 6.ToString());
+                yield return new TestCase(@"Print(Value = 2 * 3)", 6.ToString());
 
 
-                yield return new TestCase(
-                    @"
-Do: Print
-Value: 2 ^ 3
-", 8.ToString());
+                yield return new TestCase(@"Print(Value = 2 ^ 3)", 8.ToString());
 
-                yield return new TestCase(
-                    @"
-Do: Print
-Value: not True
-", false.ToString());
+                yield return new TestCase(@"Print(Value = not True)", false.ToString());
 
 
-                yield return new TestCase(
-                    @"
-Do: Print
-Value: 2 >= 3
-", false.ToString());
+                yield return new TestCase(@"Print(Value = 2 >= 3)", false.ToString());
 
 
-                yield return new TestCase(
-                    @"
-Do: Print
-Value: True and False
-", false.ToString());
+                yield return new TestCase(@"Print(Value = True && False)", false.ToString());
 
-                yield return new TestCase(
-                    @"
-Do: Print
-Config:
-  AdditionalRequirements: 
-  TargetMachineTags:
-  - Tag1
-  DoNotSplit: false
-  Priority: 1
-Value: I have config", "I have config"
-                    );
+                yield return new TestCase("Print(Value = ArrayIsEmpty(Array = Array(Elements = [])))", true.ToString());
+
+
+    //            yield return new TestCase(
+    //                @"Do: Print
+    //Config:
+    //  TargetMachineTags:
+    //  - Tag1
+    //  DoNotSplit: false
+    //  Priority: 1
+    //Value: I have config", "I have config"
+    //                );
 
                 yield return new TestCase(
                     @"

@@ -71,6 +71,10 @@ namespace Reductech.EDR.Processes.General
     /// </summary>
     public enum CompareOperator
     {
+        /// <summary>
+        /// Sentinel value.
+        /// </summary>
+        None,
         #pragma warning disable 1591
         [Display(Name = "==")]
         Equals,
@@ -127,15 +131,13 @@ namespace Reductech.EDR.Processes.General
 
 
         /// <inheritdoc />
-        public override Maybe<ICustomSerializer> CustomSerializer { get; } = Maybe<ICustomSerializer>.From(
-            new CustomSerializer(
-                new IntegerComponent(nameof(Compare<int>.Left)),
-                new SpaceComponent(false),
-                new EnumDisplayComponent<CompareOperator>(nameof(Compare<int>.Operator)),
-                new SpaceComponent(false),
-                new IntegerComponent(nameof(Compare<int>.Right))
-                )
-            );
+        public override IProcessSerializer Serializer { get; } = new ProcessSerializer(
+            new IntegerComponent(nameof(Compare<int>.Left)),
+            new SpaceComponent(false),
+            new EnumDisplayComponent<CompareOperator>(nameof(Compare<int>.Operator)),
+            new SpaceComponent(false),
+            new IntegerComponent(nameof(Compare<int>.Right))
+        );
     }
 
 }

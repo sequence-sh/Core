@@ -33,7 +33,10 @@ namespace Reductech.EDR.Processes.Internal
         /// <inheritdoc />
         public string GetFromArguments(FreezableProcessData freezableProcessData)
         {
-            var args = string.Join(", ", freezableProcessData.Dictionary.Select(x => $"{x.Key}: {x.Value.MemberString}"));
+            var args = string.Join(", ", freezableProcessData
+                .Dictionary
+                .OrderBy(x=>x.Key)
+                .Select(x => $"{x.Key}: {x.Value.MemberString}"));
 
             return $"{TypeName}({args})";
         }
@@ -75,7 +78,7 @@ namespace Reductech.EDR.Processes.Internal
                 var variableName = m.Groups["ArgumentName"].Value;
 
                 var p = freezableProcessData.Dictionary.TryFindOrFail(variableName, null)
-                    .Map(x=>x.Join(vn=>vn.Name,
+                    .Map(x=>x.Join(vn=>vn.ToString(),
                         fp=>fp.ProcessName,
                         l=> string.Join(ListDelimiter, l.Select(i=>i.ProcessName))))
                     .OnFailureCompensate(x=>Result.Success("Unknown"));

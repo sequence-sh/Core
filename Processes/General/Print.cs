@@ -4,7 +4,6 @@ using CSharpFunctionalExtensions;
 using Microsoft.Extensions.Logging;
 using Reductech.EDR.Processes.Attributes;
 using Reductech.EDR.Processes.Internal;
-using Reductech.EDR.Processes.Serialization;
 
 namespace Reductech.EDR.Processes.General
 {
@@ -55,20 +54,12 @@ namespace Reductech.EDR.Processes.General
         protected override ITypeReference GetOutputTypeReference(ITypeReference memberTypeReference) => new ActualTypeReference(typeof(Unit));
 
         /// <inheritdoc />
-        public override IProcessNameBuilder ProcessNameBuilder { get; } = new ProcessNameBuilderFromTemplate($"Print '[{nameof(Print<object>.Value)}]'");
+        public override IProcessNameBuilder ProcessNameBuilder { get; } = new ProcessNameBuilderFromTemplate($"Print [{nameof(Print<object>.Value)}]");
 
         /// <inheritdoc />
         protected override Result<ITypeReference> GetMemberType(FreezableProcessData freezableProcessData) =>
             freezableProcessData.GetArgument(nameof(Print<object>.Value))
                 .Bind(x => x.TryGetOutputTypeReference());
 
-
-        /// <inheritdoc />
-        public override Maybe<ICustomSerializer> CustomSerializer { get; } =
-            Maybe<ICustomSerializer>.From(
-                new CustomSerializer(new FixedStringComponent("Print"),
-                new SpaceComponent(true),
-                new AnyPrimitiveComponent(nameof(Print<object>.Value))
-                ));
     }
 }

@@ -91,13 +91,13 @@ namespace Reductech.EDR.Processes.General
         public override IEnumerable<Type> EnumTypes => new[] {typeof(BooleanOperator)};
 
         /// <inheritdoc />
-        public override Maybe<ICustomSerializer> CustomSerializer { get; } = Maybe<ICustomSerializer>.From(new CustomSerializer(
+        public override IProcessSerializer Serializer { get; } = new ProcessSerializer(
                 new BooleanComponent(nameof(ApplyBooleanOperator.Left)),
                 new SpaceComponent(false),
                 new EnumDisplayComponent<BooleanOperator>(nameof(ApplyBooleanOperator.Operator)),
                 new SpaceComponent(false),
                 new BooleanComponent(nameof(ApplyBooleanOperator.Right))
-                ));
+                );
     }
 
     /// <summary>
@@ -106,14 +106,19 @@ namespace Reductech.EDR.Processes.General
     public enum BooleanOperator
     {
         /// <summary>
+        /// Sentinel value.
+        /// </summary>
+        None,
+
+        /// <summary>
         /// Returns true if both left and right are true.
         /// </summary>
-        [Display(Name = "and")]
+        [Display(Name = "&&")]
         And,
         /// <summary>
         /// Returns true if either left or right is true.
         /// </summary>
-        [Display(Name = "or")]
+        [Display(Name = "||")]
         Or
     }
 

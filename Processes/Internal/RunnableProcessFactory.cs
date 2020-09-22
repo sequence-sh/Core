@@ -37,11 +37,10 @@ namespace Reductech.EDR.Processes.Internal
         Result<Maybe<ITypeReference>> GetTypeReferencesSet(VariableName variableName, FreezableProcessData freezableProcessData) =>
             Maybe<ITypeReference>.None;
 
-
         /// <summary>
-        /// Custom serializers to use for yaml serialization and deserialization.
+        /// Serializer to use for yaml serialization.
         /// </summary>
-        Maybe<ICustomSerializer> CustomSerializer { get; }
+        IProcessSerializer Serializer { get; }
 
         /// <summary>
         /// An object which can combine a process with the next process in the sequence.
@@ -96,7 +95,8 @@ namespace Reductech.EDR.Processes.Internal
             Maybe<ITypeReference>.None;
 
         /// <inheritdoc />
-        public virtual Maybe<ICustomSerializer> CustomSerializer { get; } = Maybe<ICustomSerializer>.None;
+        public virtual IProcessSerializer Serializer => new FunctionSerializer(TypeName);
+
 
         /// <inheritdoc />
         public virtual Maybe<IProcessCombiner> ProcessCombiner => Maybe<IProcessCombiner>.None;

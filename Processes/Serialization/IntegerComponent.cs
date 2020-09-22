@@ -1,5 +1,4 @@
 ﻿using CSharpFunctionalExtensions;
-using Reductech.EDR.Processes.General;
 using Reductech.EDR.Processes.Internal;
 
 namespace Reductech.EDR.Processes.Serialization
@@ -7,19 +6,18 @@ namespace Reductech.EDR.Processes.Serialization
     /// <summary>
     /// Deserializes a regex group into an integer.
     /// </summary>
-    public class IntegerComponent : IDeserializerMapping, ISerializerBlock, IDeserializerBlock, ICustomSerializerComponent
+    public class IntegerComponent :  ISerializerBlock,  IProcessSerializerComponent
     {
+        /// <summary>
+        /// Creates a new IntegerComponent
+        /// </summary>
+        /// <param name="propertyName"></param>
         public IntegerComponent(string propertyName) => PropertyName = propertyName;
 
-        /// <inheritdoc />
-        public string GetGroupName(int index) => "Value" + index;
-
-        /// <inheritdoc />
+        /// <summary>
+        /// The name of the property.
+        /// </summary>
         public string PropertyName { get; }
-
-        /// <inheritdoc />
-        public Result<ProcessMember> TryDeserialize(string groupText, ProcessFactoryStore processFactoryStore) => SerializationMethods.TryDeserialize(groupText, processFactoryStore);
-
 
         /// <inheritdoc />
         public Result<string> TryGetText(FreezableProcessData data) =>
@@ -35,25 +33,13 @@ namespace Reductech.EDR.Processes.Serialization
         {
             if (process is ConstantFreezableProcess constantFreezableProcess && constantFreezableProcess.Value is int i)
                 return i.ToString();
-            if (process is CompoundFreezableProcess compound && compound.ProcessFactory == GetVariableProcessFactory.Instance) //Special case
-                return compound.SerializeToYaml().Trim();
+            if (process is CompoundFreezableProcess compound && compound.ProcessConfiguration == null)
+                return compound.ProcessFactory.Serializer.TrySerialize(compound.FreezableProcessData);
 
-            return Result.Failure<string>("Cannot serialize compound as a primitive");
+            return Result.Failure<string>("Cannot a process with configuration");
         }
-
-
-
-
-        /// <inheritdoc />
-        public string GetRegexText(int index) => @$"(?:(?<{GetGroupName(index)}>(?:\d+))|(?<{GetGroupName(index)}><[\w\d\._]+?>))";
 
         /// <inheritdoc />
         public ISerializerBlock? SerializerBlock => this;
-
-        /// <inheritdoc />
-        public IDeserializerBlock? DeserializerBlock => this;
-
-        /// <inheritdoc />
-        public IDeserializerMapping? Mapping => this;
     }
 }

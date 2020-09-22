@@ -37,17 +37,17 @@ namespace Reductech.EDR.Processes.Test
             {
                 yield return new TestCase("Print 'Hello World'", Print (Constant(HelloWorldString)), HelloWorldString);
 
-                yield return new TestCase("Foo = Hello World; Print '<Foo>'",Sequence
+                yield return new TestCase("<Foo> = 'Hello World'; Print <Foo>",Sequence
                     (
                         SetVariable(FooString, Constant(HelloWorldString)),
                         Print(GetVariable<string>(FooString))), HelloWorldString);
 
-                yield return new TestCase("Foo = Hello World; Bar = <Foo>; Print '<Bar>'", Sequence(SetVariable(FooString, Constant(HelloWorldString)),
+                yield return new TestCase("<Foo> = 'Hello World'; <Bar> = <Foo>; Print <Bar>", Sequence(SetVariable(FooString, Constant(HelloWorldString)),
                         SetVariable(BarString, GetVariable<string>(FooString)),
                         Print(GetVariable<string>(BarString))), HelloWorldString);
 
 
-                yield return new TestCase("Foo = 1 LessThan 2; Print '<Foo>'",Sequence(
+                yield return new TestCase("<Foo> = 1 < 2; Print <Foo>",Sequence(
                     SetVariable(FooString, new Compare<int>
                     {
                         Left = Constant(1),
@@ -59,23 +59,23 @@ namespace Reductech.EDR.Processes.Test
                     ), true.ToString());
 
 
-                yield return new TestCase("Print 'True And Not False'",
-                    Print(new ApplyBooleanOperator
-                    {
-                        Left = Constant(true),
-                        Right = new Not { Boolean = Constant(false) },
-                        Operator = Constant(BooleanOperator.And)
-                    }), true.ToString());
+                //yield return new TestCase("Print 'True And Not False'",
+                //    Print(new ApplyBooleanOperator
+                //    {
+                //        Left = Constant(true),
+                //        Right = new Not { Boolean = Constant(false) },
+                //        Operator = Constant(BooleanOperator.And)
+                //    }), true.ToString());
 
-                yield return new TestCase("Print 'False Or Not False'",
-                    Print(new ApplyBooleanOperator
-                    {
-                        Left = Constant(false),
-                        Right = new Not { Boolean = Constant(false) },
-                        Operator = Constant(BooleanOperator.Or)
-                    }), true.ToString());
+                //yield return new TestCase("Print 'False Or Not False'",
+                //    Print(new ApplyBooleanOperator
+                //    {
+                //        Left = Constant(false),
+                //        Right = new Not { Boolean = Constant(false) },
+                //        Operator = Constant(BooleanOperator.Or)
+                //    }), true.ToString());
 
-                yield return new TestCase("Foreach Foo in [Hello; World]; Print '<Foo>'",
+                yield return new TestCase("Foreach <Foo> in ['Hello'; 'World']; Print <Foo>",
                     new ForEach<string>
                     {
                         Action = Print(GetVariable<string>(FooString)),
@@ -94,7 +94,7 @@ namespace Reductech.EDR.Processes.Test
                     HelloWorldString);
 
 
-                yield return new TestCase("For Foo = 5; Foo <= 10; += 2; Print '<Foo>'",
+                yield return new TestCase("For <Foo> = 5; <Foo> <= 10; += 2; Print <Foo>",
                     new For
                     {
                         VariableName = FooString,
@@ -105,7 +105,7 @@ namespace Reductech.EDR.Processes.Test
                     },
                     "5", "7", "9");
 
-                yield return new TestCase("Foo = True; Repeat 'Print 'Hello World'; Foo = False' while '<Foo>'",
+                yield return new TestCase("<Foo> = True; Repeat 'Print 'Hello World'; <Foo> = False' while '<Foo>'",
                     Sequence(SetVariable(FooString, Constant(true)),
                             new RepeatWhile
                             {
@@ -115,7 +115,7 @@ namespace Reductech.EDR.Processes.Test
                             }),
                     HelloWorldString);
 
-                yield return new TestCase("Print 'ApplyMathOperator(Left: 2, Operator: Multiply, Right: 3)'",
+                yield return new TestCase("Print ApplyMathOperator(Left: 2, Operator: *, Right: 3)",
                     Print(new ApplyMathOperator
                     {
                         Left = Constant(2),
@@ -123,7 +123,7 @@ namespace Reductech.EDR.Processes.Test
                         Operator = Constant(MathOperator.Multiply)
                     }), "6");
 
-                yield return new TestCase("Print 'ArrayCount(Array: [Hello; World])'",
+                yield return new TestCase("Print ArrayCount(Array: ['Hello'; 'World'])",
                     Print(new ArrayCount<string>
                     {
                         Array = Array(Constant("Hello"),
@@ -132,36 +132,36 @@ namespace Reductech.EDR.Processes.Test
                     "2"
                 );
 
-                yield return new TestCase("Print 'ArrayIsEmpty(Array: [])'",
+                yield return new TestCase("Print ArrayIsEmpty(Array: [])",
                     Print(new ArrayIsEmpty<string>{Array = Array<string>()}), true.ToString());
 
-                yield return new TestCase("Print 'ArrayIsEmpty(Array: [Hello World])'",
+                yield return new TestCase("Print ArrayIsEmpty(Array: ['Hello World'])",
                     Print(new ArrayIsEmpty<string>
                     {
                         Array = Array(Constant(HelloWorldString))
                     }), false.ToString());
 
-                yield return new TestCase("Print 'Length of Hello World'",
+                yield return new TestCase("Print Length of 'Hello World'",
                     Print(new LengthOfString
                     {
                         String = Constant(HelloWorldString)
                     }), "11");
 
-                yield return new TestCase("Print ''' is empty?'",
+                yield return new TestCase("Print '''' is empty?",
                     Print(new StringIsEmpty
                     {
                         String = Constant("")
                     }),true.ToString()
                     );
 
-                yield return new TestCase("Print ''Hello World' is empty?'",
+                yield return new TestCase("Print ''Hello World'' is empty?",
                     Print(new StringIsEmpty
                     {
                         String = Constant(HelloWorldString)
                     }), false.ToString()
                     );
 
-                yield return new TestCase("Print 'FirstIndexOfElement(Array: [Hello; World], Element: World)'",
+                yield return new TestCase("Print FirstIndexOfElement(Array: ['Hello'; 'World'], Element: 'World')",
                     Print(new FirstIndexOfElement<string>
                     {
                         Array = Array(Constant("Hello"), Constant("World")),
@@ -170,7 +170,7 @@ namespace Reductech.EDR.Processes.Test
                     1.ToString()
                     );
 
-                yield return new TestCase("Print 'FirstIndexOfElement(Array: [Hello; World], Element: Goodbye)'",
+                yield return new TestCase("Print FirstIndexOfElement(Array: ['Hello'; 'World'], Element: 'Goodbye')",
                     Print(new FirstIndexOfElement<string>
                     {
                         Array = Array(Constant("Hello"), Constant("World")),
@@ -179,7 +179,7 @@ namespace Reductech.EDR.Processes.Test
                     (-1).ToString()
                     );
 
-                yield return new TestCase("Print 'Join Repeat(Element: Hello, Number: 3)'",Print(new JoinStrings
+                yield return new TestCase("Print Join Repeat(Element: 'Hello', Number: 3)",Print(new JoinStrings
                 {
                     Delimiter = Constant(", "),
                     List = new Repeat<string>
@@ -189,7 +189,7 @@ namespace Reductech.EDR.Processes.Test
                     }
                 }), "Hello, Hello, Hello");
 
-                yield return new TestCase("Print 'ElementAtIndex(Array: SplitString(String: Hello, World, Delimiter: , ), Index: 1)'",
+                yield return new TestCase("Print ElementAtIndex(Array: SplitString(Delimiter: ', ', String: 'Hello, World'), Index: 1)",
                     Print(
                         new ElementAtIndex<string>
                         {
@@ -202,7 +202,7 @@ namespace Reductech.EDR.Processes.Test
                         }),
                     "World");
 
-                yield return new TestCase("Foo = 2; IncrementVariable(Variable: Foo, Amount: 3); Print '<Foo>'",
+                yield return new TestCase("<Foo> = 2; IncrementVariable(Amount: 3, Variable: <Foo>); Print <Foo>",
                     Sequence(SetVariable(FooString, Constant(2)),
                     new IncrementVariable
                     {
@@ -214,17 +214,17 @@ namespace Reductech.EDR.Processes.Test
 
                     5.ToString());
 
-                yield return new TestCase("Print 'ToCase(String: Hello World, Case: Upper)'", Print(new ToCase{Case = Constant(TextCase.Upper), String = Constant(HelloWorldString)}),"HELLO WORLD");
-                yield return new TestCase("Print 'ToCase(String: Hello World, Case: Lower)'", Print(new ToCase{Case = Constant(TextCase.Lower), String = Constant(HelloWorldString)}),"hello world");
-                yield return new TestCase("Print 'ToCase(String: Hello World, Case: Title)'", Print(new ToCase{Case = Constant(TextCase.Title), String = Constant(HelloWorldString)}),"Hello World");
+                yield return new TestCase("Print ToCase(Case: Upper, String: 'Hello World')", Print(new ToCase{Case = Constant(TextCase.Upper), String = Constant(HelloWorldString)}),"HELLO WORLD");
+                yield return new TestCase("Print ToCase(Case: Lower, String: 'Hello World')", Print(new ToCase{Case = Constant(TextCase.Lower), String = Constant(HelloWorldString)}),"hello world");
+                yield return new TestCase("Print ToCase(Case: Title, String: 'Hello World')", Print(new ToCase{Case = Constant(TextCase.Title), String = Constant(HelloWorldString)}),"Hello World");
 
 
-                yield return new TestCase("Print 'Trim(String:   Hello World  , Side: Left)'", Print(new Trim {Side = Constant(TrimSide.Left), String = Constant("  Hello World  ")}), "Hello World  ");
-                yield return new TestCase("Print 'Trim(String:   Hello World  , Side: Right)'", Print(new Trim {Side = Constant(TrimSide.Right), String = Constant("  Hello World  ")}), "  Hello World");
-                yield return new TestCase("Print 'Trim(String:   Hello World  , Side: Both)'", Print(new Trim {Side = Constant(TrimSide.Both), String = Constant("  Hello World  ")}), HelloWorldString);
+                yield return new TestCase("Print Trim(Side: Left, String: '  Hello World  ')", Print(new Trim {Side = Constant(TrimSide.Left), String = Constant("  Hello World  ")}), "Hello World  ");
+                yield return new TestCase("Print Trim(Side: Right, String: '  Hello World  ')", Print(new Trim {Side = Constant(TrimSide.Right), String = Constant("  Hello World  ")}), "  Hello World");
+                yield return new TestCase("Print Trim(Side: Both, String: '  Hello World  ')", Print(new Trim {Side = Constant(TrimSide.Both), String = Constant("  Hello World  ")}), HelloWorldString);
 
 
-                yield return new TestCase("Print 'Test(Condition: True, ThenValue: Hello, ElseValue: World)'", Print(new Test<string>
+                yield return new TestCase("Print Test(Condition: True, ElseValue: 'World', ThenValue: 'Hello')", Print(new Test<string>
                 {
                     Condition = Constant(true),
                     ThenValue = Constant("Hello"),
@@ -232,14 +232,14 @@ namespace Reductech.EDR.Processes.Test
                 }), "Hello");
 
 
-                yield return new TestCase("Print 'Test(Condition: False, ThenValue: Hello, ElseValue: World)'", Print(new Test<string>
+                yield return new TestCase("Print Test(Condition: False, ElseValue: 'World', ThenValue: 'Hello')", Print(new Test<string>
                 {
                     Condition = Constant(false),
                     ThenValue = Constant("Hello"),
                     ElseValue = Constant("World")
                 }), "World");
 
-                yield return new TestCase("Print 'Join SortArray(Array: [B; C; A], Order: Ascending)'",
+                yield return new TestCase("Print Join SortArray(Array: ['B'; 'C'; 'A'], Order: Ascending)",
                     Print(new JoinStrings
                     {
                         Delimiter = Constant(", "),
@@ -250,7 +250,7 @@ namespace Reductech.EDR.Processes.Test
                         }
                     }), "A, B, C");
 
-                yield return new TestCase("Print 'Join SortArray(Array: [B; C; A], Order: Descending)'",
+                yield return new TestCase("Print Join SortArray(Array: ['B'; 'C'; 'A'], Order: Descending)",
                     Print(new JoinStrings
                     {
                         Delimiter = Constant(", "),
@@ -261,7 +261,7 @@ namespace Reductech.EDR.Processes.Test
                         }
                     }), "C, B, A");
 
-                yield return new TestCase("Print 'First index of 'World' in 'Hello World, Goodbye World''",
+                yield return new TestCase("Print First index of ''World'' in ''Hello World, Goodbye World''",
                     Print(new FirstIndexOf
                     {
                         String = Constant("Hello World, Goodbye World"),
@@ -270,7 +270,7 @@ namespace Reductech.EDR.Processes.Test
                     "6"
                     );
 
-                yield return new TestCase("Print 'Last index of 'World' in 'Hello World, Goodbye World''",
+                yield return new TestCase("Print Last index of ''World'' in ''Hello World, Goodbye World''",
                     Print(new LastIndexOf
                     {
                         String = Constant("Hello World, Goodbye World"),
@@ -279,7 +279,7 @@ namespace Reductech.EDR.Processes.Test
                     "21"
                     );
 
-                yield return new TestCase("Print 'Get character at index '1' in 'Hello World''",
+                yield return new TestCase("Print Get character at index '1' in ''Hello World''",
                     Print(new GetLetterAtIndex
                     {
                         Index = Constant(1),
@@ -295,14 +295,14 @@ namespace Reductech.EDR.Processes.Test
                     },HelloWorldString, HelloWorldString, HelloWorldString);
 
 
-                yield return new TestCase("Foo = Hello; Append  World to Foo; Print '<Foo>'",
+                yield return new TestCase("<Foo> = 'Hello'; Append ' World' to <Foo>; Print <Foo>",
                     Sequence(
                         SetVariable(FooString,Constant("Hello")),
                         new AppendString{Variable = FooString, String = Constant(" World") },
                         Print(GetVariable<string>(FooString))
                         ), HelloWorldString);
 
-                yield return new TestCase("Print 'GetSubstring(String: Hello World, Index: 6, Length: 2)'",
+                yield return new TestCase("Print GetSubstring(Index: 6, Length: 2, String: 'Hello World')",
                     Print(new GetSubstring
                     {
                         String = Constant(HelloWorldString),
@@ -310,7 +310,7 @@ namespace Reductech.EDR.Processes.Test
                         Length = Constant(2)
                     }), "Wo");
 
-                yield return new TestCase("Print 'ElementAtIndex(Array: [Hello; World], Index: 1)'",
+                yield return new TestCase("Print ElementAtIndex(Array: ['Hello'; 'World'], Index: 1)",
                     Print(new ElementAtIndex<string>
                     {
                         Array = Array(Constant("Hello"), Constant("World")),

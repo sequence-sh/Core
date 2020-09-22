@@ -87,13 +87,13 @@ namespace Reductech.EDR.Processes.General
         public override IEnumerable<Type> EnumTypes => new[] {typeof(MathOperator)};
 
         /// <inheritdoc />
-        public override Maybe<ICustomSerializer> CustomSerializer { get; } = Maybe<ICustomSerializer>.From(new CustomSerializer(
-                new IntegerComponent(nameof(ApplyMathOperator.Left)),
-                new SpaceComponent(false),
-                new EnumDisplayComponent<MathOperator>(nameof(ApplyMathOperator.Operator)),
-                new SpaceComponent(false),
-                new IntegerComponent(nameof(ApplyMathOperator.Right))
-                ));
+        public override IProcessSerializer Serializer { get; } = new ProcessSerializer(
+            new IntegerComponent(nameof(ApplyMathOperator.Left)),
+            new SpaceComponent(false),
+            new EnumDisplayComponent<MathOperator>(nameof(ApplyMathOperator.Operator)),
+            new SpaceComponent(false),
+            new IntegerComponent(nameof(ApplyMathOperator.Right))
+        );
     }
 
     /// <summary>
@@ -101,6 +101,11 @@ namespace Reductech.EDR.Processes.General
     /// </summary>
     public enum MathOperator
     {
+        /// <summary>
+        /// Sentinel value
+        /// </summary>
+        None,
+
         /// <summary>
         /// Add the left and right operands.
         /// </summary>

@@ -42,6 +42,6 @@ namespace Reductech.EDR.Processes.Internal
         public VariableName CreateChild(int argNumber) => new VariableName(Name + "ARG" + argNumber);
 
         /// <inheritdoc />
-        public override string ToString() => Name;
+        public override string ToString() => $"<{Name}>";
     }
 }
