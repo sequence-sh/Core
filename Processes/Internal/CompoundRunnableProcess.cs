@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Processes.Attributes;
+using Reductech.EDR.Processes.Util;
 
 namespace Reductech.EDR.Processes.Internal
 {

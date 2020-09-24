@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using CSharpFunctionalExtensions;
+using Reductech.EDR.Processes.Util;
 
 namespace Reductech.EDR.Processes.Internal
 {

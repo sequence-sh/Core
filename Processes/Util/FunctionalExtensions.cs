@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using CSharpFunctionalExtensions;
 
-namespace Reductech.EDR.Processes
+namespace Reductech.EDR.Processes.Util
 {
     /// <summary>
     /// Functional methods

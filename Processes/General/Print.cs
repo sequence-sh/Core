@@ -4,10 +4,10 @@ using CSharpFunctionalExtensions;
 using Microsoft.Extensions.Logging;
 using Reductech.EDR.Processes.Attributes;
 using Reductech.EDR.Processes.Internal;
+using Reductech.EDR.Processes.Util;
 
 namespace Reductech.EDR.Processes.General
 {
-
     /// <summary>
     /// Prints a value to the log.
     /// </summary>

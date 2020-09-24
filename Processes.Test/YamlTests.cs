@@ -4,6 +4,7 @@ using FluentAssertions;
 using Reductech.EDR.Processes.Internal;
 using Reductech.EDR.Processes.Serialization;
 using Reductech.EDR.Processes.Test.Extensions;
+using Reductech.EDR.Processes.Util;
 using Xunit;
 using Xunit.Abstractions;
 using ITestCase = Reductech.EDR.Processes.Test.Extensions.ITestCase;
@@ -35,7 +36,6 @@ namespace Reductech.EDR.Processes.Test
 
                 yield return new TestCase(@"Print(Value = 2 * 3)", 6.ToString());
 
-
                 yield return new TestCase(@"Print(Value = 2 ^ 3)", 8.ToString());
 
                 yield return new TestCase(@"Print(Value = not True)", false.ToString());
@@ -49,43 +49,44 @@ namespace Reductech.EDR.Processes.Test
                 yield return new TestCase("Print(Value = ArrayIsEmpty(Array = Array(Elements = [])))", true.ToString());
 
 
-    //            yield return new TestCase(
-    //                @"Do: Print
-    //Config:
-    //  TargetMachineTags:
-    //  - Tag1
-    //  DoNotSplit: false
-    //  Priority: 1
-    //Value: I have config", "I have config"
-    //                );
-
                 yield return new TestCase(
-                    @"
-Do: Print
+                    @"Do: Print
 Config:
-  AdditionalRequirements:
-  - Notes: ABC123
-    Name: Test
-    MinVersion:
-      Major: 1
-      Minor: 0
-      Build: -1
-      Revision: -1
-      MajorRevision: -1
-      MinorRevision: -1
-    MaxVersion:
-      Major: 2
-      Minor: 0
-      Build: -1
-      Revision: -1
-      MajorRevision: -1
-      MinorRevision: -1
+  AdditionalRequirements: 
   TargetMachineTags:
   - Tag1
-  - Tag2
-  DoNotSplit: true
+  DoNotSplit: false
   Priority: 1
-Value: I have more config", "I have more config");
+Value: I have config", "I have config"
+                    );
+
+//                yield return new TestCase(
+//                    @"
+//Do: Print
+//Config:
+//  AdditionalRequirements:
+//  - Notes: ABC123
+//    Name: Test
+//    MinVersion:
+//      Major: 1
+//      Minor: 0
+//      Build: -1
+//      Revision: -1
+//      MajorRevision: -1
+//      MinorRevision: -1
+//    MaxVersion:
+//      Major: 2
+//      Minor: 0
+//      Build: -1
+//      Revision: -1
+//      MajorRevision: -1
+//      MinorRevision: -1
+//  TargetMachineTags:
+//  - Tag1
+//  - Tag2
+//  DoNotSplit: true
+//  Priority: 1
+//Value: 'I have more config'", "I have more config");
 
 
             }

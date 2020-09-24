@@ -5,6 +5,7 @@ using CSharpFunctionalExtensions;
 using Reductech.EDR.Processes.Attributes;
 using Reductech.EDR.Processes.Internal;
 using Reductech.EDR.Processes.Serialization;
+using Reductech.EDR.Processes.Util;
 
 namespace Reductech.EDR.Processes.General
 {
@@ -79,5 +80,18 @@ namespace Reductech.EDR.Processes.General
 
         /// <inheritdoc />
         public override IProcessSerializer Serializer => NoSpecialSerializer.Instance;
+
+        /// <summary>
+        /// Create a new Freezable Sequence
+        /// </summary>
+        public static IFreezableProcess CreateFreezable(IEnumerable<IFreezableProcess> processes, ProcessConfiguration? configuration)
+        {
+            var fpd = new FreezableProcessData(new Dictionary<string, ProcessMember>()
+            {
+                {nameof(Sequence.Steps), new ProcessMember(processes.ToList())}
+            });
+
+            return new CompoundFreezableProcess(Instance, fpd, configuration);
+        }
     }
 }

@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging.Abstractions;
 using Reductech.EDR.Processes.General;
 using Reductech.EDR.Processes.Internal;
 using Reductech.EDR.Processes.Test.Extensions;
+using Reductech.EDR.Processes.Util;
 using Xunit;
 using Xunit.Abstractions;
 using ITestCase = Reductech.EDR.Processes.Test.Extensions.ITestCase;

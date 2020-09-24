@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using Reductech.EDR.Processes.General;
 using Reductech.EDR.Processes.Internal;
+using Reductech.EDR.Processes.Util;
 using Superpower;
 using Superpower.Display;
 using Superpower.Model;
@@ -19,6 +20,50 @@ namespace Reductech.EDR.Processes.Serialization
     /// </summary>
     public class ProcessMemberParser
     {
+        private enum ProcessToken
+        {
+            /// <summary>
+            /// Sentinel Value.
+            /// </summary>
+            // ReSharper disable once UnusedMember.Local
+            None,
+            [Token(Example = "<Path>")]
+            VariableName,
+            [Token(Example = "(")]
+            OpenBracket,
+            [Token(Example = ")")]
+            CloseBracket,
+            [Token(Example = "[")]
+            OpenArray,
+            [Token(Example = "]")]
+            CloseArray,
+            [Token(Example = ",", Description = "Delimiter for arrays and function calls")]
+            Delimiter,
+            //[Token(Example = ":", Description = "Separates an argument name and an argument value")]
+            //ArgumentSeparator,
+            [Token(Example = "=")]
+            Assignment,
+            [Token(Example = "+")]
+            MathOperator,
+            [Token(Example = "&&")]
+            BooleanOperator,
+            [Token(Example = "==")]
+            Comparator,
+            [Token(Example = "'Hello World'")]
+            StringLiteral,
+            [Token(Example = "123")]
+            Number,
+            [Token(Example = "true")]
+            Boolean,
+            [Token(Example = "MathOperator.And")]
+            Enum,
+            [Token(Example = "WriteFile")]
+            FuncOrArgumentName,
+            [Token(Example = "Not")]
+            NotOperator
+        }
+
+
         private static readonly Tokenizer<ProcessToken> Tokenizer = new TokenizerBuilder<ProcessToken>()
             .Ignore(Span.WhiteSpace)
 
@@ -218,9 +263,7 @@ namespace Reductech.EDR.Processes.Serialization
                     .Or(singleTermParser) //Must come after setVariable
                 .Or(Parse.Ref(()=>function.Value))
                     //.Or(Parse.Ref(()=>array.Value))
-
-
-            );
+                    );
 
             processMember = new Lazy<TokenListParser<ProcessToken, ProcessMember>>(()=>
 
@@ -328,65 +371,5 @@ namespace Reductech.EDR.Processes.Serialization
                 .OrderByDescending(x=>x.Length)
                 .Select(x=> Span.EqualToIgnoreCase(x).Try())
                 .Aggregate((a, b) => a.Or(b));
-
-        private enum ProcessToken
-        {
-            /// <summary>
-            /// Sentinel Value.
-            /// </summary>
-            // ReSharper disable once UnusedMember.Local
-            None,
-
-            [Token(Example = "<Path>")]
-            VariableName,
-
-            [Token(Example = "(")]
-            OpenBracket,
-            [Token(Example = ")")]
-            CloseBracket,
-
-            [Token(Example = "[")]
-            OpenArray,
-            [Token(Example = "]")]
-            CloseArray,
-
-            [Token(Example = ",", Description = "Delimiter for arrays and function calls")]
-            Delimiter,
-
-            //[Token(Example = ":", Description = "Separates an argument name and an argument value")]
-            //ArgumentSeparator,
-
-
-            [Token(Example = "=")]
-            Assignment,
-
-            [Token(Example = "+")]
-            MathOperator,
-            [Token(Example = "&&")]
-            BooleanOperator,
-            [Token(Example = "==")]
-            Comparator,
-
-            [Token(Example = "'Hello World'")]
-            StringLiteral,
-            [Token(Example = "123")]
-            Number,
-            [Token(Example = "true")]
-            Boolean,
-
-            [Token(Example = "MathOperator.And")]
-            Enum,
-
-            [Token(Example = "WriteFile")]
-            FuncOrArgumentName,
-
-            [Token(Example = "Not")]
-            NotOperator
-
-        }
-
     }
-
-
-
 }
