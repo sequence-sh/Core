@@ -34,6 +34,9 @@ namespace Reductech.EDR.Processes.General
     {
         private ArrayCountProcessFactory() { }
 
+        /// <summary>
+        /// The instance.
+        /// </summary>
         public static GenericProcessFactory Instance { get; } = new ArrayCountProcessFactory();
 
         /// <inheritdoc />

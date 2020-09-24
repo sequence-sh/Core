@@ -44,6 +44,9 @@ namespace Reductech.EDR.Processes.General
     {
         private RepeatProcessFactory() { }
 
+        /// <summary>
+        /// The instance.
+        /// </summary>
         public static GenericProcessFactory Instance { get; } = new RepeatProcessFactory();
 
         /// <inheritdoc />

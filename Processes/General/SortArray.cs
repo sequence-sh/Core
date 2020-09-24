@@ -53,7 +53,9 @@ namespace Reductech.EDR.Processes.General
     public sealed class SortArrayProcessFactory : GenericProcessFactory
     {
         private SortArrayProcessFactory() { }
-
+        /// <summary>
+        /// The instance.
+        /// </summary>
         public static GenericProcessFactory Instance { get; } = new SortArrayProcessFactory();
 
         /// <inheritdoc />
@@ -80,7 +82,13 @@ namespace Reductech.EDR.Processes.General
     /// </summary>
     public enum SortOrder
     {
+        /// <summary>
+        /// Sort array elements in ascending, or alphabetical order.
+        /// </summary>
         Ascending,
+        /// <summary>
+        /// Sort array elements in descending, or reverse-alphabetical order.
+        /// </summary>
         Descending
     }
 }

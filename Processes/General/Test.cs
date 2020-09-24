@@ -52,7 +52,9 @@ namespace Reductech.EDR.Processes.General
     public sealed class TestProcessFactory : GenericProcessFactory
     {
         private TestProcessFactory() { }
-
+        /// <summary>
+        /// The instance.
+        /// </summary>
         public static GenericProcessFactory Instance { get; } = new TestProcessFactory();
 
         /// <inheritdoc />

@@ -5,11 +5,10 @@ using System.Linq;
 using System.Reflection;
 using Namotion.Reflection;
 using Reductech.EDR.Processes.Attributes;
-using Reductech.EDR.Processes.Internal;
-using Reductech.Utilities.InstantConsole;
+using Reductech.EDR.Processes.Internal.Documentation.Reductech.Utilities.InstantConsole;
 using YamlDotNet.Serialization;
 
-namespace Reductech.EDR.Processes.Serialization
+namespace Reductech.EDR.Processes.Internal.Documentation
 {
     /// <summary>
     /// A wrapper for this documented object.

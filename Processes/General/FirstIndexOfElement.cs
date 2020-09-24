@@ -44,6 +44,9 @@ namespace Reductech.EDR.Processes.General
     {
         private FirstIndexOfElementProcessFactory() { }
 
+        /// <summary>
+        /// The instance.
+        /// </summary>
         public static GenericProcessFactory Instance { get; } = new FirstIndexOfElementProcessFactory();
 
         /// <inheritdoc />

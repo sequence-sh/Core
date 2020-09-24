@@ -59,6 +59,9 @@ namespace Reductech.EDR.Processes.General
     {
         private RepeatWhileProcessFactory() { }
 
+        /// <summary>
+        /// The instance.
+        /// </summary>
         public static SimpleRunnableProcessFactory<RepeatWhile, Unit> Instance { get; } = new RepeatWhileProcessFactory();
 
         /// <inheritdoc />

@@ -53,6 +53,9 @@ namespace Reductech.EDR.Processes.General
     {
         private TrimProcessFactory() { }
 
+        /// <summary>
+        /// The instance.
+        /// </summary>
         public static SimpleRunnableProcessFactory<Trim, string> Instance { get; } = new TrimProcessFactory();
 
         /// <inheritdoc />
@@ -65,8 +68,17 @@ namespace Reductech.EDR.Processes.General
     /// </summary>
     public enum TrimSide
     {
+        /// <summary>
+        /// Removes whitespace from the left side of the string.
+        /// </summary>
         Left,
+        /// <summary>
+        /// Removes whitespace from the right side of the string.
+        /// </summary>
         Right,
+        /// <summary>
+        /// Removes whitespace from both sides of the string.
+        /// </summary>
         Both
     }
 }

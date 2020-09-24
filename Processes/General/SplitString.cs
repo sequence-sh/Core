@@ -44,6 +44,9 @@ namespace Reductech.EDR.Processes.General
     {
         private SplitStringProcessFactory() { }
 
+        /// <summary>
+        /// The instance.
+        /// </summary>
         public static SimpleRunnableProcessFactory<SplitString, List<string>> Instance { get; } = new SplitStringProcessFactory();
     }
 }

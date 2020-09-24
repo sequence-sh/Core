@@ -58,6 +58,9 @@ namespace Reductech.EDR.Processes.General
     {
         private AppendStringProcessFactory() { }
 
+        /// <summary>
+        /// The instance.
+        /// </summary>
         public static SimpleRunnableProcessFactory<AppendString, Unit> Instance { get; } = new AppendStringProcessFactory();
 
         /// <inheritdoc />

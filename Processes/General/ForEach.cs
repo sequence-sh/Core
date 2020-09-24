@@ -64,6 +64,9 @@ namespace Reductech.EDR.Processes.General
     {
         private ForeachProcessFactory() { }
 
+        /// <summary>
+        /// The instance.
+        /// </summary>
         public static RunnableProcessFactory Instance { get; } = new ForeachProcessFactory();
 
         /// <inheritdoc />

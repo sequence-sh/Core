@@ -48,10 +48,15 @@ namespace Reductech.EDR.Processes.General
         public override IRunnableProcessFactory RunnableProcessFactory => ToCaseProcessFactory.Instance;
     }
 
+    /// <summary>
+    /// Converts a string to a particular case.
+    /// </summary>
     public sealed class ToCaseProcessFactory : SimpleRunnableProcessFactory<ToCase, string>
     {
         private ToCaseProcessFactory() { }
-
+        /// <summary>
+        /// The instance.
+        /// </summary>
         public static SimpleRunnableProcessFactory<ToCase, string> Instance { get; } = new ToCaseProcessFactory();
 
         /// <inheritdoc />
@@ -63,8 +68,17 @@ namespace Reductech.EDR.Processes.General
     /// </summary>
     public enum TextCase
     {
+        /// <summary>
+        /// All characters will be in upper case.
+        /// </summary>
         Upper,
+        /// <summary>
+        /// All characters will be in lower case.
+        /// </summary>
         Lower,
+        /// <summary>
+        /// Only the first character in each word will be in upper case.
+        /// </summary>
         Title
     }
 }
