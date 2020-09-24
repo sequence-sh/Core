@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Processes.General;
+using Reductech.EDR.Processes.Util;
 
 namespace Reductech.EDR.Processes.Internal
 {
@@ -14,17 +15,17 @@ namespace Reductech.EDR.Processes.Internal
         /// <summary>
         /// Create a new VariableName ProcessMember
         /// </summary>
-        public ProcessMember(VariableName variableName) => VariableName = variableName;
+        public ProcessMember(VariableName variableName) => Option = new Option<VariableName, IFreezableProcess, IReadOnlyList<IFreezableProcess>>(variableName);
 
         /// <summary>
         /// Create a new IFreezableProcess ProcessMember
         /// </summary>
-        public ProcessMember(IFreezableProcess argument) => Argument = argument;
+        public ProcessMember(IFreezableProcess argument) => Option = new Option<VariableName, IFreezableProcess, IReadOnlyList<IFreezableProcess>>(argument);
 
         /// <summary>
         /// Create a new ListArgument ProcessMember
         /// </summary>
-        public ProcessMember(IReadOnlyList<IFreezableProcess> listArgument) => ListArgument = listArgument;
+        public ProcessMember(IReadOnlyList<IFreezableProcess> listArgument) => Option = new Option<VariableName, IFreezableProcess, IReadOnlyList<IFreezableProcess>>(listArgument);
 
 
         /// <summary>
@@ -34,73 +35,40 @@ namespace Reductech.EDR.Processes.Internal
         {
             get
             {
-                if (VariableName.HasValue) return MemberType.VariableName;
-                else if (Argument != null) return MemberType.Process;
-                else if (ListArgument != null) return MemberType.ProcessList;
+                if (Option.Choice1.HasValue) return MemberType.VariableName;
+                if (Option.Choice2.HasValue) return MemberType.Process;
+                if (Option.Choice3.HasValue) return MemberType.ProcessList;
 
                 return MemberType.NotAMember;
             }
         }
 
         /// <summary>
-        /// The ProcessMember, if it is a VariableName
+        /// The chosen option.
         /// </summary>
-        public VariableName? VariableName { get;  }
-
-        /// <summary>
-        /// The ProcessMember, if it is an Argument
-        /// </summary>
-        public IFreezableProcess? Argument { get;  }
-
-        /// <summary>
-        /// The ProcessMember, if it is a ListArgument
-        /// </summary>
-        public IReadOnlyList<IFreezableProcess>? ListArgument { get;  }
+        public Option<VariableName, IFreezableProcess, IReadOnlyList<IFreezableProcess>> Option { get; }
 
         /// <summary>
         /// Use this ProcessMember.
         /// </summary>
         public T Join<T>(Func<VariableName, T> handleVariableName, Func<IFreezableProcess, T> handleArgument,
-            Func<IReadOnlyList<IFreezableProcess>, T> handleListArgument)
-        {
-            if (VariableName != null) return handleVariableName(VariableName.Value);
-
-            if(Argument!= null) return handleArgument(Argument);
-
-            if(ListArgument != null) return handleListArgument(ListArgument);
-
-            throw new Exception("Process Member has no property");
-        }
+            Func<IReadOnlyList<IFreezableProcess>, T> handleListArgument) =>
+            Option.Join(handleVariableName, handleArgument, handleListArgument);
 
         /// <summary>
         /// Gets the processMember if it is a VariableName.
         /// </summary>
-        public Result<VariableName> AsVariableName(string propertyName)
-        {
-            if (VariableName != null)
-                return VariableName.Value;
-            return Result.Failure<VariableName>($"{propertyName} was a {MemberType}, not a VariableName");
-        }
+        public Result<VariableName> AsVariableName(string propertyName) => Option.Choice1.ToResult($"{propertyName} was a {MemberType}, not a VariableName");
 
         /// <summary>
         /// Gets the processMember if it is an argument.
         /// </summary>
-        public Result<IFreezableProcess> AsArgument(string propertyName)
-        {
-            if (Argument != null)
-                return Result.Success(Argument);
-            return Result.Failure<IFreezableProcess>($"{propertyName} was a {MemberType}, not an argument");
-        }
+        public Result<IFreezableProcess> AsArgument(string propertyName) => Option.Choice2.ToResult($"{propertyName} was a {MemberType}, not an argument");
 
         /// <summary>
         /// Gets the processMember if it is a listArgument.
         /// </summary>
-        public Result<IReadOnlyList<IFreezableProcess>> AsListArgument(string propertyName)
-        {
-            if (ListArgument != null)
-                return Result.Success(ListArgument);
-            return Result.Failure<IReadOnlyList<IFreezableProcess>>($"{propertyName} was a {MemberType}, not an list argument");
-        }
+        public Result<IReadOnlyList<IFreezableProcess>> AsListArgument(string propertyName) => Option.Choice3.ToResult($"{propertyName} was a {MemberType}, not an list argument");
 
         /// <summary>
         /// Tries to convert this process member to a particular type.
@@ -109,10 +77,15 @@ namespace Reductech.EDR.Processes.Internal
         {
             if (MemberType == convertType) return this;
 
+            if (MemberType == MemberType.ProcessList && convertType == MemberType.Process)
+            {
+                var sequenceProcess = SequenceProcessFactory.CreateFreezable(Option.Choice3.Value, null);
+                return new ProcessMember(sequenceProcess);
+            }
+
             if (MemberType == MemberType.VariableName && convertType == MemberType.Process)
             {
-                var getVariableProcess = GetVariableProcessFactory.CreateFreezable(VariableName!.Value);
-
+                var getVariableProcess = GetVariableProcessFactory.CreateFreezable(Option.Choice1.Value);
                 return new ProcessMember(getVariableProcess);
             }
 
@@ -142,11 +115,13 @@ namespace Reductech.EDR.Processes.Internal
         {
             if (other is null) return false;
             if (ReferenceEquals(this, other)) return true;
-            return Nullable.Equals(VariableName, other.VariableName) &&
-                   Equals(Argument, other.Argument) &&
-                   ListsAreEqual(ListArgument, other.ListArgument);
 
-            static bool ListsAreEqual(IReadOnlyList<IFreezableProcess>? a1, IReadOnlyList<IFreezableProcess>? a2)
+            return Option.Equals(other.Option,
+                (a, b) => a.Equals(b),
+                (a, b) => a.Equals(b),
+                ListsAreEqual);
+
+            static bool ListsAreEqual(IReadOnlyList<IFreezableProcess> a1, IReadOnlyList<IFreezableProcess> a2)
             {
                 if (a1 is null)
                     return a2 is null;
@@ -164,7 +139,7 @@ namespace Reductech.EDR.Processes.Internal
         public override bool Equals(object? obj) => ReferenceEquals(this, obj) || obj is ProcessMember other && Equals(other);
 
         /// <inheritdoc />
-        public override int GetHashCode() => HashCode.Combine(VariableName, Argument, ListArgument);
+        public override int GetHashCode() => HashCode.Combine(Option.Choice1, Option.Choice2, Option.Choice3.Select(x=>x.Count));
 
         /// <summary>
         /// Equals operator

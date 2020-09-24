@@ -5,6 +5,7 @@ using CSharpFunctionalExtensions;
 using Reductech.EDR.Processes.Attributes;
 using Reductech.EDR.Processes.Internal;
 using Reductech.EDR.Processes.Serialization;
+using Reductech.EDR.Processes.Util;
 
 namespace Reductech.EDR.Processes.General
 {

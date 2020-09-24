@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using CSharpFunctionalExtensions;
+using Reductech.EDR.Processes.Util;
 
 namespace Reductech.EDR.Processes.Internal
 {

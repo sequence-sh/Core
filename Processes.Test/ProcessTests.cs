@@ -7,6 +7,7 @@ using Reductech.EDR.Processes.General;
 using Reductech.EDR.Processes.Internal;
 using Reductech.EDR.Processes.Serialization;
 using Reductech.EDR.Processes.Test.Extensions;
+using Reductech.EDR.Processes.Util;
 using Xunit;
 using Xunit.Abstractions;
 using ITestCase = Reductech.EDR.Processes.Test.Extensions.ITestCase;
@@ -331,30 +332,30 @@ namespace Reductech.EDR.Processes.Test
                     }
                 }, "I have config");
 
-                yield return new TestCase("Print 'I have more config'", new Print<string>()
-                {
-                    Value = Constant("I have more config"),
-                    ProcessConfiguration = new ProcessConfiguration
-                    {
-                        Priority = 1,
-                        TargetMachineTags = new List<string>
-                        {
-                            "Tag1",
-                            "Tag2"
-                        },
-                        DoNotSplit = true,
-                        AdditionalRequirements = new List<Requirement>
-                        {
-                            new Requirement
-                            {
-                                MinVersion = new Version(1,0),
-                                MaxVersion = new Version(2,0),
-                                Name = "Test",
-                                Notes = "ABC123"
-                            }
-                        }
-                    }
-                }, "I have more config");
+                //yield return new TestCase("Print 'I have more config'", new Print<string>()
+                //{
+                //    Value = Constant("I have more config"),
+                //    ProcessConfiguration = new ProcessConfiguration
+                //    {
+                //        Priority = 1,
+                //        TargetMachineTags = new List<string>
+                //        {
+                //            "Tag1",
+                //            "Tag2"
+                //        },
+                //        DoNotSplit = true,
+                //        AdditionalRequirements = new List<Requirement>
+                //        {
+                //            new Requirement
+                //            {
+                //                MinVersion = new Version(1,0),
+                //                MaxVersion = new Version(2,0),
+                //                Name = "Test",
+                //                Notes = "ABC123"
+                //            }
+                //        }
+                //    }
+                //}, "I have more config");
 
                 yield return new TestCase("AssertTrue(Test: True)", new AssertTrue
                 {

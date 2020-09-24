@@ -132,112 +132,120 @@ namespace Reductech.EDR.Processes.Internal
         {
             var instanceResult = TryCreateInstance(processContext, freezableProcessData);
 
-            if (instanceResult.IsFailure) return instanceResult.Map(x=>x as IRunnableProcess);
-
-            instanceResult.Value.ProcessConfiguration = processConfiguration;
+            if (instanceResult.IsFailure)
+                return instanceResult.ConvertFailure<IRunnableProcess>();
 
             var runnableProcess = instanceResult.Value;
+            runnableProcess.ProcessConfiguration = processConfiguration;
 
             var errors = new List<string>();
 
-            var instanceType = instanceResult.Value.GetType();
+            var instanceType = runnableProcess.GetType();
 
-            var remainingVariableNameProperties = instanceType
+            var variableNameProperties1 = instanceType
                 .GetProperties()
                 .Where(x => x.PropertyType == typeof(VariableName))
-                .Where(x => x.GetCustomAttribute<VariableNameAttribute>() != null)
-                .ToDictionary(x=>x.Name);
+                .Where(x => x.GetCustomAttribute<VariableNameAttribute>() != null);
 
 
-            var remainingProperties = instanceType.GetProperties()
-                .Where(x => x.GetCustomAttribute<RunnableProcessPropertyAttribute>() != null)
-                .ToDictionary(x => x.Name);
+            var simpleProperties1 = instanceType.GetProperties()
+                .Where(x => x.GetCustomAttribute<RunnableProcessPropertyAttribute>() != null);
 
-            var remainingListProperties = instanceType.GetProperties()
-                .Where(x => x.GetCustomAttribute<RunnableProcessListPropertyAttribute>() != null)
-                .ToDictionary(x => x.Name);
+            var listProperties1 = instanceType.GetProperties()
+                .Where(x => x.GetCustomAttribute<RunnableProcessListPropertyAttribute>() != null);
+
+            var remainingProperties =
+                variableNameProperties1.Select(propertyInfo => (propertyInfo,memberType: MemberType.VariableName))
+                    .Concat(simpleProperties1.Select(propertyInfo => (propertyInfo,memberType: MemberType.Process)))
+                    .Concat(listProperties1.Select(propertyInfo => (propertyInfo,memberType: MemberType.ProcessList)))
+                    .ToDictionary(x=>x.propertyInfo.Name);
 
 
             foreach (var (propertyName, processMember) in freezableProcessData.Dictionary)
             {
-                Result SetVariableName(VariableName variableName)
+                if (remainingProperties.Remove(propertyName, out var pair))
                 {
-                    if (remainingVariableNameProperties.Remove(propertyName, out var pi))
-                        pi.SetValue(instanceResult.Value, variableName);
+                    var convertResult = processMember.TryConvert(pair.memberType);
+                    if(convertResult.IsFailure)
+                        errors.Add(convertResult.Error);
                     else
-                        return Result.Failure($"The property '{propertyName}' does not exist on type '{TypeName}'.");
-                    return Result.Success();
-                }
-
-                Result SetArgument(IFreezableProcess freezableProcess)
-                {
-                    if (remainingProperties.Remove(propertyName, out var pi))
                     {
-                        var argumentFreezeResult = freezableProcess.TryFreeze(processContext);
-                        if (argumentFreezeResult.IsFailure)
-                            errors.Add(argumentFreezeResult.Error);
-                        else
+                        var result = pair.memberType switch
                         {
-                            if (pi.PropertyType.IsInstanceOfType(argumentFreezeResult.Value))
-                                pi.SetValue(runnableProcess, argumentFreezeResult.Value); //This could throw an exception but we don't expect it.
-                            else
-                                return Result.Failure($"'{pi.Name}' cannot take the value '{argumentFreezeResult.Value}'");
-                        }
-                    }
-                    else
-                        return Result.Failure($"The property '{propertyName}' does not exist on type '{TypeName}'.");
+                            MemberType.VariableName => TrySetVariableName(pair.propertyInfo, runnableProcess,
+                                convertResult.Value),
+                            MemberType.Process => TrySetProcess(pair.propertyInfo, runnableProcess, convertResult.Value,
+                                processContext),
+                            MemberType.ProcessList => TrySetProcessList(pair.propertyInfo, runnableProcess,
+                                convertResult.Value, processContext),
+                            _ => throw new ArgumentOutOfRangeException()
+                        };
 
+                        if(result.IsFailure)
+                            errors.Add(result.Error);
+                    }
+                }
+                else
+                    errors.Add($"The property '{propertyName}' does not exist on type '{TypeName}'.");
+
+
+
+                static Result TrySetVariableName(PropertyInfo propertyInfo, IRunnableProcess parentProcess, ProcessMember processMember)
+                {
+                    var r1 = processMember.AsVariableName(propertyInfo.Name);
+                    if (r1.IsFailure) return r1;
+
+                    propertyInfo.SetValue(parentProcess, r1.Value);
                     return Result.Success();
                 }
 
-                Result SetArgumentList(IReadOnlyList<IFreezableProcess> processList)
+                static Result TrySetProcess(PropertyInfo propertyInfo, IRunnableProcess parentProcess, ProcessMember processMember, ProcessContext processContext)
                 {
-                    if (remainingListProperties.Remove(propertyName, out var listInfo))
-                    {
-                        var freezeResult = processList.Select(x => x.TryFreeze(processContext)).Combine()
-                            .Map(x => x.ToImmutableArray());
-                        if (freezeResult.IsFailure)
-                            return freezeResult;
+                    var argumentFreezeResult = processMember.AsArgument(propertyInfo.Name).Bind(x=>x.TryFreeze(processContext));
+                    if (argumentFreezeResult.IsFailure)
+                        return argumentFreezeResult;
+                    if (!propertyInfo.PropertyType.IsInstanceOfType(argumentFreezeResult.Value))
+                        return Result.Failure($"'{propertyInfo.Name}' cannot take the value '{argumentFreezeResult.Value}'");
 
-                        var genericType = listInfo.PropertyType.GenericTypeArguments.Single();
-                        var listType = typeof(List<>).MakeGenericType(genericType);
-
-                        var list = Activator.CreateInstance(listType);
-
-                        foreach (var process in freezeResult.Value)
-                            if (genericType.IsInstanceOfType(process))
-                            {
-                                var addMethod = listType.GetMethod(nameof(List<object>.Add))!;
-                                addMethod.Invoke(list, new object?[] {process});
-                            }
-                            else
-                                return Result.Failure($"'{process.Name}' does not have the type '{genericType.Name}'");
-
-
-                        listInfo.SetValue(runnableProcess, list);
-
-                        return Result.Success();
-                    }
-                    else
-                        return Result.Failure($"The property '{propertyName}' does not exist on type '{TypeName}'.");
+                    propertyInfo.SetValue(parentProcess, argumentFreezeResult.Value); //This could throw an exception but we don't expect it.
+                    return Result.Success();
                 }
 
-                var r = processMember.Join(SetVariableName, SetArgument, SetArgumentList);
-                if(r.IsFailure) errors.Add(r.Error);
+                static Result TrySetProcessList(PropertyInfo propertyInfo, IRunnableProcess parentProcess, ProcessMember processMember, ProcessContext processContext)
+                {
+                    var freezeResult =
+                        processMember
+                            .AsListArgument(propertyInfo.Name)
+                            .Bind(l => l.Select(x => x.TryFreeze(processContext)).Combine()
+                                .Map(x => x.ToImmutableArray()));
+                    if (freezeResult.IsFailure)
+                        return freezeResult;
+
+                    var genericType = propertyInfo.PropertyType.GenericTypeArguments.Single();
+                    var listType = typeof(List<>).MakeGenericType(genericType);
+
+                    var list = Activator.CreateInstance(listType);
+
+                    foreach (var process in freezeResult.Value)
+                        if (genericType.IsInstanceOfType(process))
+                        {
+                            var addMethod = listType.GetMethod(nameof(List<object>.Add))!;
+                            addMethod.Invoke(list, new object?[] { process });
+                        }
+                        else
+                            return Result.Failure($"'{process.Name}' does not have the type '{genericType.Name}'");
+
+
+                    propertyInfo.SetValue(parentProcess, list);
+
+                    return Result.Success();
+                }
             }
 
-
-            errors.AddRange(remainingVariableNameProperties.Values
-                .Where(property => property.GetCustomAttribute<RequiredAttribute>() != null)
-                .Select(property => $"The property '{property.Name}' was not set on type '{GetType().Name}'."));
-
             errors.AddRange(remainingProperties.Values
-                .Where(property => property.GetCustomAttribute<RequiredAttribute>() != null)
-                .Select(property => $"The property '{property.Name}' was not set on type '{GetType().Name}'."));
-
-            errors.AddRange(remainingListProperties.Values
-                .Where(property => property.GetCustomAttribute<RequiredAttribute>() != null)
-                .Select(property => $"The property '{property.Name}' was not set on type '{GetType().Name}'."));
+                .Where(property => property.propertyInfo.GetCustomAttribute<RequiredAttribute>() != null)
+                .Select(property => $"The property '{property.propertyInfo.Name}' was not set on type '{GetType().Name}'.")
+            );
 
 
             if (errors.Any())

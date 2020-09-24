@@ -6,7 +6,7 @@ using System.Linq;
 using System.Reflection;
 using CSharpFunctionalExtensions;
 
-namespace Reductech.EDR.Processes
+namespace Reductech.EDR.Processes.Util
 {
     /// <summary>
     /// SerializationMethods methods.
@@ -32,6 +32,21 @@ namespace Reductech.EDR.Processes
                 return da.Description;
             }
             return value.ToString();
+        }
+
+        /// <summary>
+        /// Gets a full message from an exception.
+        /// </summary>
+        public static string GetFullMessage(this Exception exception)
+        {
+            if (exception.InnerException == null)
+                return exception.Message;
+
+            var innerMessage = exception.InnerException.GetFullMessage();
+
+            var message = $"{exception.Message}\r\n{innerMessage}";
+
+            return message;
         }
 
 
@@ -114,7 +129,6 @@ namespace Reductech.EDR.Processes
                 return r!;
 
             return Result.Failure<object>($"{enumType.Name} does not have a value '{value}'");
-
         }
 #pragma warning restore 8714
     }
