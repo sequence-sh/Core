@@ -196,7 +196,12 @@ namespace Reductech.EDR.Processes.Internal
         /// <summary>
         /// An assertion failed
         /// </summary>
-        AssertionFailed
+        AssertionFailed,
+
+        /// <summary>
+        /// An error reading a CSV file
+        /// </summary>
+        CSVError
 
     }
 }

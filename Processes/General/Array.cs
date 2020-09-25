@@ -8,7 +8,6 @@ using Reductech.EDR.Processes.Internal;
 
 namespace Reductech.EDR.Processes.General
 {
-
     /// <summary>
     /// Represents an ordered collection of objects.
     /// </summary>
