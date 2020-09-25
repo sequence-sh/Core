@@ -52,7 +52,7 @@ namespace Reductech.EDR.Processes.Internal
             get
             {
                 return GetType().GetProperties()
-                    .Where(x => x.GetCustomAttribute<RunnableProcessPropertyAttributeAttribute>() != null)
+                    .Where(x => x.GetCustomAttribute<RunnableProcessPropertyAttribute>() != null)
                     .Select(x => (x.Name, process: x.GetValue(this) as IRunnableProcess))
                     .Where(x => x.process != null)!;
             }
@@ -64,7 +64,7 @@ namespace Reductech.EDR.Processes.Internal
             {
                 return GetType()
                     .GetProperties()
-                    .Where(x => x.GetCustomAttribute<RunnableProcessListPropertyAttributeAttribute>() != null)
+                    .Where(x => x.GetCustomAttribute<RunnableProcessListPropertyAttribute>() != null)
                     .Select(x => (x.Name, list: x.GetValue(this) as IEnumerable<IRunnableProcess>))
                     .Where(x => x.list != null)!;
             }

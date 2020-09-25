@@ -93,14 +93,14 @@ namespace Reductech.EDR.Processes.General
         /// <summary>
         /// The text of the CSV file.
         /// </summary>
-        [RunnableProcessPropertyAttribute(Order = 1)]
+        [RunnableProcessProperty(Order = 1)]
         [Required]
         public IRunnableProcess<string> Text { get; set; } = null!;
 
         /// <summary>
         /// The delimiter to use to separate rows.
         /// </summary>
-        [RunnableProcessPropertyAttribute(Order = 2)]
+        [RunnableProcessProperty(Order = 2)]
         [Required]
         [DefaultValueExplanation(",")]
         public IRunnableProcess<string> Delimiter { get; set; } = new Constant<string>(",");
@@ -108,13 +108,13 @@ namespace Reductech.EDR.Processes.General
         /// <summary>
         /// The token to use to indicate comments.
         /// </summary>
-        [RunnableProcessPropertyAttribute(Order = 3)]
+        [RunnableProcessProperty(Order = 3)]
         public IRunnableProcess<string>? CommentToken { get; set; }
 
         /// <summary>
         /// Whether CSV fields are enclosed in quotes.
         /// </summary>
-        [RunnableProcessPropertyAttribute(Order = 4)]
+        [RunnableProcessProperty(Order = 4)]
         [DefaultValueExplanation("false")]
         [Required]
         public IRunnableProcess<bool> HasFieldsEnclosedInQuotes { get; set; } = new Constant<bool>(false);
@@ -122,7 +122,7 @@ namespace Reductech.EDR.Processes.General
         /// <summary>
         /// The csv columns to map to result columns, in order.
         /// </summary>
-        [RunnableProcessPropertyAttribute(Order = 5)]
+        [RunnableProcessProperty(Order = 5)]
         [Required]
         public IRunnableProcess<List<string>> ColumnsToMap { get; set; } = null!;
 

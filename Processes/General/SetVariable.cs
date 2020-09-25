@@ -35,7 +35,7 @@ namespace Reductech.EDR.Processes.General
         /// <summary>
         /// The value to set the variable to.
         /// </summary>
-        [RunnableProcessPropertyAttribute]
+        [RunnableProcessProperty]
         [Required]
         public IRunnableProcess<T> Value { get; set; } = null!;
     }

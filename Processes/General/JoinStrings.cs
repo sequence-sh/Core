@@ -14,14 +14,14 @@ namespace Reductech.EDR.Processes.General
         /// <summary>
         /// The delimiter to use.
         /// </summary>
-        [RunnableProcessPropertyAttribute]
+        [RunnableProcessProperty]
         [Required]
         public IRunnableProcess<string> Delimiter { get; set; } = null!;
 
         /// <summary>
         /// The elements to iterate over.
         /// </summary>
-        [RunnableProcessPropertyAttribute]
+        [RunnableProcessProperty]
         [Required]
         public IRunnableProcess<List<string>> List { get; set; } = null!;
 

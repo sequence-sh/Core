@@ -17,14 +17,14 @@ namespace Reductech.EDR.Processes.General
         /// <summary>
         /// The string to change the case of.
         /// </summary>
-        [RunnableProcessPropertyAttribute]
+        [RunnableProcessProperty]
         [Required]
         public IRunnableProcess<string> String { get; set; } = null!;
 
         /// <summary>
         /// The case to change to.
         /// </summary>
-        [RunnableProcessPropertyAttribute]
+        [RunnableProcessProperty]
         [Required]
         public IRunnableProcess<TextCase> Case { get; set; } = null!;
 

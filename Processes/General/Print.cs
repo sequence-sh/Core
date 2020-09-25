@@ -27,7 +27,7 @@ namespace Reductech.EDR.Processes.General
         /// <summary>
         /// The Value to Print.
         /// </summary>
-        [RunnableProcessPropertyAttribute]
+        [RunnableProcessProperty]
         [Required]
         public IRunnableProcess<T> Value { get; set; } = null!;
 

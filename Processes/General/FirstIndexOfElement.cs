@@ -17,14 +17,14 @@ namespace Reductech.EDR.Processes.General
         /// <summary>
         /// The array to check.
         /// </summary>
-        [RunnableProcessPropertyAttribute]
+        [RunnableProcessProperty]
         [Required]
         public IRunnableProcess<List<T>> Array { get; set; } = null!;
 
         /// <summary>
         /// The element to look for.
         /// </summary>
-        [RunnableProcessPropertyAttribute]
+        [RunnableProcessProperty]
         [Required]
         public IRunnableProcess<T> Element { get; set; } = null!;
 

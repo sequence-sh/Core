@@ -32,14 +32,14 @@ namespace Reductech.EDR.Processes.General
         /// <summary>
         /// Whether to follow the Then Branch
         /// </summary>
-        [RunnableProcessPropertyAttribute]
+        [RunnableProcessProperty]
         [Required]
         public IRunnableProcess<bool> Condition { get; set; } = null!;
 
         /// <summary>
         /// The Then Branch.
         /// </summary>
-        [RunnableProcessPropertyAttribute]
+        [RunnableProcessProperty]
         [Required]
         public IRunnableProcess<Unit> ThenProcess { get; set; } = null!;
 
@@ -49,7 +49,7 @@ namespace Reductech.EDR.Processes.General
         /// <summary>
         /// The Else branch, if it exists.
         /// </summary>
-        [RunnableProcessPropertyAttribute]
+        [RunnableProcessProperty]
         public IRunnableProcess<Unit>? ElseProcess { get; set; } = null;
 
     }

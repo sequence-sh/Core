@@ -17,14 +17,14 @@ namespace Reductech.EDR.Processes.General
         /// <summary>
         /// The array to modify.
         /// </summary>
-        [RunnableProcessPropertyAttribute]
+        [RunnableProcessProperty]
         [Required]
         public IRunnableProcess<List<T>> Array { get; set; } = null!;
 
         /// <summary>
         /// The order to use.
         /// </summary>
-        [RunnableProcessPropertyAttribute]
+        [RunnableProcessProperty]
         [Required]
         public IRunnableProcess<SortOrder> Order { get; set; } = null!;
 

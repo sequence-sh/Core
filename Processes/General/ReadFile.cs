@@ -57,14 +57,14 @@ namespace Reductech.EDR.Processes.General
         /// <summary>
         /// The name of the folder.
         /// </summary>
-        [RunnableProcessPropertyAttribute]
+        [RunnableProcessProperty]
         [Required]
         public IRunnableProcess<string> Folder { get; set; } = null!;
 
         /// <summary>
         /// The name of the file to write to.
         /// </summary>
-        [RunnableProcessPropertyAttribute]
+        [RunnableProcessProperty]
         [Required]
         public IRunnableProcess<string> FileName { get; set; } = null!;
 

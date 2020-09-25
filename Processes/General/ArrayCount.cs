@@ -16,7 +16,7 @@ namespace Reductech.EDR.Processes.General
         /// <summary>
         /// The array to count.
         /// </summary>
-        [RunnableProcessPropertyAttribute]
+        [RunnableProcessProperty]
         [Required]
         public IRunnableProcess<List<T>> Array { get; set; } = null!;
 

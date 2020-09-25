@@ -21,7 +21,7 @@ namespace Reductech.EDR.Processes.General
         /// <summary>
         /// The value to negate.
         /// </summary>
-        [RunnableProcessPropertyAttribute]
+        [RunnableProcessProperty]
         [Required]
         public IRunnableProcess<bool> Boolean { get; set; }
     }

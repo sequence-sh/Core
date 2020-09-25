@@ -46,14 +46,14 @@ namespace Reductech.EDR.Processes.General
         /// <summary>
         /// The left operand.
         /// </summary>
-        [RunnableProcessPropertyAttribute]
+        [RunnableProcessProperty]
         [Required]
         public IRunnableProcess<int> Left { get; set; } = null!;
 
         /// <summary>
         /// The operator to apply.
         /// </summary>
-        [RunnableProcessPropertyAttribute]
+        [RunnableProcessProperty]
         [Required]
 
         public IRunnableProcess<MathOperator> Operator { get; set; } = null!;
@@ -61,7 +61,7 @@ namespace Reductech.EDR.Processes.General
         /// <summary>
         /// The right operand.
         /// </summary>
-        [RunnableProcessPropertyAttribute]
+        [RunnableProcessProperty]
         [Required]
         public IRunnableProcess<int> Right { get; set; } = null!;
 

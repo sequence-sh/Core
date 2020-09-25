@@ -16,14 +16,14 @@ namespace Reductech.EDR.Processes.General
         /// <summary>
         /// The array to check.
         /// </summary>
-        [RunnableProcessPropertyAttribute]
+        [RunnableProcessProperty]
         [Required]
         public IRunnableProcess<List<T>> Array { get; set; } = null!;
 
         /// <summary>
         /// The index to get the element at.
         /// </summary>
-        [RunnableProcessPropertyAttribute]
+        [RunnableProcessProperty]
         [Required]
         public IRunnableProcess<int> Index { get; set; } = null!;
 

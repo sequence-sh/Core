@@ -16,7 +16,7 @@ namespace Reductech.EDR.Processes.General
         /// <summary>
         /// The action to perform repeatedly.
         /// </summary>
-        [RunnableProcessPropertyAttribute]
+        [RunnableProcessProperty]
         [Required]
         public IRunnableProcess<Unit> Action { get; set; } = null!;
 
@@ -31,7 +31,7 @@ namespace Reductech.EDR.Processes.General
         /// <summary>
         /// The elements to iterate over.
         /// </summary>
-        [RunnableProcessPropertyAttribute]
+        [RunnableProcessProperty]
         [Required]
         public IRunnableProcess<List<T>> Array { get; set; } = null!;
 

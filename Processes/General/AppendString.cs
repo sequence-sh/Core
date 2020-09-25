@@ -22,7 +22,7 @@ namespace Reductech.EDR.Processes.General
         /// <summary>
         /// The string to append.
         /// </summary>
-        [RunnableProcessPropertyAttribute(Order = 2)]
+        [RunnableProcessProperty(Order = 2)]
         [Required]
         public IRunnableProcess<string> String { get; set; } = null!;
 
