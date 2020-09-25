@@ -3,7 +3,7 @@
 
  ## Class Library
 
- A coonector is a C# class library.
+ A connector is a C# class library.
  It need to target the dot net core runtime.
  It needs a reference to Reductech.EDR.Processes
 
