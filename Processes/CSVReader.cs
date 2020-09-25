@@ -24,6 +24,14 @@ namespace Reductech.EDR.Processes
             return TryReadCSV(csvParser, delimiter, commentToken, enclosedInQuotes);
         }
 
+        /// <summary>
+        /// Extracts data from a CSV string
+        /// </summary>
+        /// <param name="csvString">The CSV string</param>
+        /// <param name="delimiter">The delimiter to use</param>
+        /// <param name="commentToken">The token to indicate a comment</param>
+        /// <param name="enclosedInQuotes">Whether the csv fields are enclosed in quotes</param>
+        /// <returns></returns>
         public static Result<DataTable> TryReadCSVFromString(
             string csvString, string delimiter, string? commentToken, bool enclosedInQuotes)
         {

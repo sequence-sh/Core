@@ -57,7 +57,6 @@ namespace Reductech.EDR.Processes.General
 
         }
 
-
         /// <summary>
         /// The name of the folder.
         /// </summary>
