@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Processes.Attributes;
@@ -45,7 +45,7 @@ namespace Reductech.EDR.Processes.General
             }
 
             var r =
-                ExternalProcessRunner.Instance.RunExternalProcess(pathResult.Value,
+                processState.ExternalProcessRunner.RunExternalProcess(pathResult.Value,
                     processState.Logger,
                     nameof(RunExternalProcess),
                     IgnoreNoneErrorHandler.Instance,
