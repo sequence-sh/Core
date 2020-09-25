@@ -16,7 +16,7 @@ namespace Reductech.EDR.Processes.General
         /// <summary>
         /// The array to count.
         /// </summary>
-        [RunnableProcessProperty]
+        [RunnableProcessPropertyAttribute]
         [Required]
         public IRunnableProcess<List<T>> Array { get; set; } = null!;
 
@@ -34,10 +34,16 @@ namespace Reductech.EDR.Processes.General
     {
         private ArrayCountProcessFactory() { }
 
+        /// <summary>
+        /// The instance.
+        /// </summary>
         public static GenericProcessFactory Instance { get; } = new ArrayCountProcessFactory();
 
         /// <inheritdoc />
         public override Type ProcessType => typeof(ArrayCount<>);
+
+        /// <inheritdoc />
+        public override string OutputTypeExplanation => nameof(Int32);
 
         /// <inheritdoc />
         protected override ITypeReference GetOutputTypeReference(ITypeReference memberTypeReference) => new ActualTypeReference(typeof(int));

@@ -21,7 +21,7 @@ namespace Reductech.EDR.Processes.General
         /// <summary>
         /// The amount to increment by.
         /// </summary>
-        [RunnableProcessProperty]
+        [RunnableProcessPropertyAttribute]
         [Required]
         public IRunnableProcess<int> Amount { get; set; } = null!;
 

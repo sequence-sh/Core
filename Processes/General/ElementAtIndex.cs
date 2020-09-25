@@ -16,14 +16,14 @@ namespace Reductech.EDR.Processes.General
         /// <summary>
         /// The array to check.
         /// </summary>
-        [RunnableProcessProperty]
+        [RunnableProcessPropertyAttribute]
         [Required]
         public IRunnableProcess<List<T>> Array { get; set; } = null!;
 
         /// <summary>
         /// The index to get the element at.
         /// </summary>
-        [RunnableProcessProperty]
+        [RunnableProcessPropertyAttribute]
         [Required]
         public IRunnableProcess<int> Index { get; set; } = null!;
 
@@ -54,6 +54,9 @@ namespace Reductech.EDR.Processes.General
 
         /// <inheritdoc />
         public override Type ProcessType => typeof(ElementAtIndex<>);
+
+        /// <inheritdoc />
+        public override string OutputTypeExplanation => "T";
 
         /// <inheritdoc />
         protected override ITypeReference GetOutputTypeReference(ITypeReference memberTypeReference) => memberTypeReference;

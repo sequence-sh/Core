@@ -7,7 +7,5 @@ namespace Reductech.EDR.Processes.Attributes
     /// </summary>
 
     [AttributeUsage(AttributeTargets.Property, AllowMultiple = false, Inherited = true)]
-    public sealed class RunnableProcessPropertyAttribute : Attribute
-    {
-    }
+    public sealed class RunnableProcessPropertyAttributeAttribute : ProcessPropertyAttribute{ }
 }

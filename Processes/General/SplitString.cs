@@ -17,14 +17,14 @@ namespace Reductech.EDR.Processes.General
         /// <summary>
         /// The string to split.
         /// </summary>
-        [RunnableProcessProperty]
+        [RunnableProcessPropertyAttribute]
         [Required]
         public IRunnableProcess<string> String { get; set; } = null!;
 
         /// <summary>
         /// The delimiter to use.
         /// </summary>
-        [RunnableProcessProperty]
+        [RunnableProcessPropertyAttribute]
         [Required]
         public IRunnableProcess<string> Delimiter { get; set; } = null!;
 
@@ -44,6 +44,9 @@ namespace Reductech.EDR.Processes.General
     {
         private SplitStringProcessFactory() { }
 
+        /// <summary>
+        /// The instance.
+        /// </summary>
         public static SimpleRunnableProcessFactory<SplitString, List<string>> Instance { get; } = new SplitStringProcessFactory();
     }
 }

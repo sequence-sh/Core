@@ -17,14 +17,14 @@ namespace Reductech.EDR.Processes.General
         /// <summary>
         /// The array to modify.
         /// </summary>
-        [RunnableProcessProperty]
+        [RunnableProcessPropertyAttribute]
         [Required]
         public IRunnableProcess<List<T>> Array { get; set; } = null!;
 
         /// <summary>
         /// The order to use.
         /// </summary>
-        [RunnableProcessProperty]
+        [RunnableProcessPropertyAttribute]
         [Required]
         public IRunnableProcess<SortOrder> Order { get; set; } = null!;
 
@@ -53,7 +53,9 @@ namespace Reductech.EDR.Processes.General
     public sealed class SortArrayProcessFactory : GenericProcessFactory
     {
         private SortArrayProcessFactory() { }
-
+        /// <summary>
+        /// The instance.
+        /// </summary>
         public static GenericProcessFactory Instance { get; } = new SortArrayProcessFactory();
 
         /// <inheritdoc />
@@ -64,6 +66,9 @@ namespace Reductech.EDR.Processes.General
 
         /// <inheritdoc />
         public override IEnumerable<Type> EnumTypes => new[] {typeof(SortOrder)};
+
+        /// <inheritdoc />
+        public override string OutputTypeExplanation => "List<T>";
 
 
         /// <inheritdoc />
@@ -80,7 +85,13 @@ namespace Reductech.EDR.Processes.General
     /// </summary>
     public enum SortOrder
     {
+        /// <summary>
+        /// Sort array elements in ascending, or alphabetical order.
+        /// </summary>
         Ascending,
+        /// <summary>
+        /// Sort array elements in descending, or reverse-alphabetical order.
+        /// </summary>
         Descending
     }
 }

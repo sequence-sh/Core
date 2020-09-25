@@ -16,7 +16,7 @@ namespace Reductech.EDR.Processes.General
         /// <summary>
         /// The action to perform repeatedly.
         /// </summary>
-        [RunnableProcessProperty]
+        [RunnableProcessPropertyAttribute]
         [Required]
         public IRunnableProcess<Unit> Action { get; set; } = null!;
 
@@ -31,7 +31,7 @@ namespace Reductech.EDR.Processes.General
         /// <summary>
         /// The elements to iterate over.
         /// </summary>
-        [RunnableProcessProperty]
+        [RunnableProcessPropertyAttribute]
         [Required]
         public IRunnableProcess<List<T>> Array { get; set; } = null!;
 
@@ -64,6 +64,9 @@ namespace Reductech.EDR.Processes.General
     {
         private ForeachProcessFactory() { }
 
+        /// <summary>
+        /// The instance.
+        /// </summary>
         public static RunnableProcessFactory Instance { get; } = new ForeachProcessFactory();
 
         /// <inheritdoc />
@@ -79,6 +82,9 @@ namespace Reductech.EDR.Processes.General
                 .BindCast<ITypeReference, GenericTypeReference>()
                 .Map(x => x.ChildTypes)
                 .BindSingle();
+
+        /// <inheritdoc />
+        public override string OutputTypeExplanation => nameof(Unit);
 
         /// <inheritdoc />
         public override Result<Maybe<ITypeReference>> GetTypeReferencesSet(VariableName variableName, FreezableProcessData freezableProcessData) =>

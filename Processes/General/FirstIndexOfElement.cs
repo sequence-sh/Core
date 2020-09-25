@@ -17,14 +17,14 @@ namespace Reductech.EDR.Processes.General
         /// <summary>
         /// The array to check.
         /// </summary>
-        [RunnableProcessProperty]
+        [RunnableProcessPropertyAttribute]
         [Required]
         public IRunnableProcess<List<T>> Array { get; set; } = null!;
 
         /// <summary>
         /// The element to look for.
         /// </summary>
-        [RunnableProcessProperty]
+        [RunnableProcessPropertyAttribute]
         [Required]
         public IRunnableProcess<T> Element { get; set; } = null!;
 
@@ -44,10 +44,16 @@ namespace Reductech.EDR.Processes.General
     {
         private FirstIndexOfElementProcessFactory() { }
 
+        /// <summary>
+        /// The instance.
+        /// </summary>
         public static GenericProcessFactory Instance { get; } = new FirstIndexOfElementProcessFactory();
 
         /// <inheritdoc />
         public override Type ProcessType => typeof(FirstIndexOfElement<>);
+
+        /// <inheritdoc />
+        public override string OutputTypeExplanation => nameof(Int32);
 
         /// <inheritdoc />
         protected override ITypeReference GetOutputTypeReference(ITypeReference memberTypeReference) => new ActualTypeReference(typeof(int));

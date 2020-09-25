@@ -22,7 +22,7 @@ namespace Reductech.EDR.Processes.General
         /// <summary>
         /// The string to check for being empty.
         /// </summary>
-        [RunnableProcessProperty]
+        [RunnableProcessPropertyAttribute]
         [Required]
         public IRunnableProcess<string> String { get; set; } = null!;
 

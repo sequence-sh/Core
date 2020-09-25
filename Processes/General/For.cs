@@ -15,7 +15,7 @@ namespace Reductech.EDR.Processes.General
         /// <summary>
         /// The action to perform repeatedly.
         /// </summary>
-        [RunnableProcessProperty]
+        [RunnableProcessPropertyAttribute]
         [Required]
         public IRunnableProcess<Unit> Action { get; set; } = null!;
 
@@ -30,14 +30,14 @@ namespace Reductech.EDR.Processes.General
         /// <summary>
         /// The first value of the variable to use.
         /// </summary>
-        [RunnableProcessProperty]
+        [RunnableProcessPropertyAttribute]
         [Required]
         public IRunnableProcess<int> From { get; set; } = null!;
 
         /// <summary>
         /// The highest value of the variable to use
         /// </summary>
-        [RunnableProcessProperty]
+        [RunnableProcessPropertyAttribute]
         [Required]
         public IRunnableProcess<int> To { get; set; } = null!;
 
@@ -45,7 +45,7 @@ namespace Reductech.EDR.Processes.General
         /// <summary>
         /// The amount to increment by each iteration.
         /// </summary>
-        [RunnableProcessProperty]
+        [RunnableProcessPropertyAttribute]
         [Required]
         public IRunnableProcess<int> Increment { get; set; } = null!;
 

@@ -34,14 +34,14 @@ namespace Reductech.EDR.Processes.General
         /// <summary>
         /// The condition to check before performing the action.
         /// </summary>
-        [RunnableProcessProperty]
+        [RunnableProcessPropertyAttribute]
         [Required]
         public IRunnableProcess<bool> Condition { get; set; } = null!;
 
         /// <summary>
         /// The action to perform repeatedly.
         /// </summary>
-        [RunnableProcessProperty]
+        [RunnableProcessPropertyAttribute]
         [Required]
         public IRunnableProcess<Unit> Action { get; set; } = null!;
 
@@ -59,6 +59,9 @@ namespace Reductech.EDR.Processes.General
     {
         private RepeatWhileProcessFactory() { }
 
+        /// <summary>
+        /// The instance.
+        /// </summary>
         public static SimpleRunnableProcessFactory<RepeatWhile, Unit> Instance { get; } = new RepeatWhileProcessFactory();
 
         /// <inheritdoc />

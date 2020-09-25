@@ -17,14 +17,14 @@ namespace Reductech.EDR.Processes.General
         /// <summary>
         /// The element to repeat.
         /// </summary>
-        [RunnableProcessProperty]
+        [RunnableProcessPropertyAttribute]
         [Required]
         public IRunnableProcess<T> Element { get; set; } = null!;
 
         /// <summary>
         /// The number of times to repeat the element
         /// </summary>
-        [RunnableProcessProperty]
+        [RunnableProcessPropertyAttribute]
         [Required]
         public IRunnableProcess<int> Number { get; set; } = null!;
 
@@ -44,10 +44,16 @@ namespace Reductech.EDR.Processes.General
     {
         private RepeatProcessFactory() { }
 
+        /// <summary>
+        /// The instance.
+        /// </summary>
         public static GenericProcessFactory Instance { get; } = new RepeatProcessFactory();
 
         /// <inheritdoc />
         public override Type ProcessType => typeof(Repeat<>);
+
+        /// <inheritdoc />
+        public override string OutputTypeExplanation => "List<T>";
 
         /// <inheritdoc />
         protected override ITypeReference GetOutputTypeReference(ITypeReference memberTypeReference) => new GenericTypeReference(typeof(List<>), new []{memberTypeReference});

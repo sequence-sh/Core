@@ -25,5 +25,8 @@ namespace Reductech.EDR.Processes.Internal
 
         /// <inheritdoc />
         protected override Result<ICompoundRunnableProcess> TryCreateInstance(ProcessContext processContext, FreezableProcessData freezableProcessData) => new TProcess();
+
+        /// <inheritdoc />
+        public override string OutputTypeExplanation => typeof(TOutput).Name;
     }
 }

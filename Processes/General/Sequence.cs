@@ -57,7 +57,7 @@ namespace Reductech.EDR.Processes.General
         /// <summary>
         /// The steps of this sequence.
         /// </summary>
-        [RunnableProcessListProperty]
+        [RunnableProcessListPropertyAttribute]
         [Required]
         public IReadOnlyList<IRunnableProcess<Unit>> Steps { get; set; } = null!;
     }

@@ -35,7 +35,7 @@ namespace Reductech.EDR.Processes.General
         /// <summary>
         /// The value to set the variable to.
         /// </summary>
-        [RunnableProcessProperty]
+        [RunnableProcessPropertyAttribute]
         [Required]
         public IRunnableProcess<T> Value { get; set; } = null!;
     }
@@ -64,6 +64,9 @@ namespace Reductech.EDR.Processes.General
 
         /// <inheritdoc />
         public override IEnumerable<Type> EnumTypes => ImmutableArray<Type>.Empty;
+
+        /// <inheritdoc />
+        public override string OutputTypeExplanation => nameof(Unit);
 
 
         /// <inheritdoc />

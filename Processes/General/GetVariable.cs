@@ -56,6 +56,9 @@ namespace Reductech.EDR.Processes.General
 
 
         /// <inheritdoc />
+        public override string OutputTypeExplanation => "T";
+
+        /// <inheritdoc />
         public override IProcessSerializer Serializer { get; } = new ProcessSerializer(
             new VariableNameComponent(nameof(GetVariable<object>.VariableName)));
 

@@ -81,7 +81,7 @@ namespace Reductech.EDR.Processes.Test
 
         public static readonly VariableName FooString = new VariableName("Foo");
 
-        public class ErrorTestCase : ITestCase
+        private class ErrorTestCase : ITestCase
         {
             public ErrorTestCase(string name, IRunnableProcess process, IRunErrors expectedErrors)
             {
