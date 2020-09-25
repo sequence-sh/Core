@@ -17,7 +17,7 @@ namespace Reductech.EDR.Processes.General
         /// <summary>
         /// The left operand. Will always be evaluated.
         /// </summary>
-        [RunnableProcessPropertyAttribute]
+        [RunnableProcessProperty]
         [Required]
         public IRunnableProcess<bool> Left { get; set; } = null!;
 
@@ -25,7 +25,7 @@ namespace Reductech.EDR.Processes.General
         /// <summary>
         /// The operator to apply.
         /// </summary>
-        [RunnableProcessPropertyAttribute]
+        [RunnableProcessProperty]
         [Required]
         public IRunnableProcess<BooleanOperator> Operator { get; set; } = null!;
 
@@ -33,7 +33,7 @@ namespace Reductech.EDR.Processes.General
         /// <summary>
         /// The right operand. Will not be evaluated unless necessary.
         /// </summary>
-        [RunnableProcessPropertyAttribute]
+        [RunnableProcessProperty]
         [Required]
         public IRunnableProcess<bool> Right { get; set; } = null!;
 

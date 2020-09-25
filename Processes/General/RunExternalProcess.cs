@@ -59,14 +59,14 @@ namespace Reductech.EDR.Processes.General
         /// <summary>
         /// The path to the external process
         /// </summary>
-        [RunnableProcessPropertyAttribute(Order = 1)]
+        [RunnableProcessProperty(Order = 1)]
         [Required]
         public IRunnableProcess<string> ProcessPath { get; set; } = null!;
 
         /// <summary>
         /// Arguments to the process.
         /// </summary>
-        [RunnableProcessPropertyAttribute(Order = 2)]
+        [RunnableProcessProperty(Order = 2)]
         public IRunnableProcess<List<string>>? Arguments { get; set; }
 
 

@@ -132,8 +132,8 @@ namespace Reductech.EDR.Processes.Internal
             if (propertyInfo == null) return MemberType.NotAMember;
 
             if (propertyInfo.GetCustomAttribute<VariableNameAttribute>() != null) return MemberType.VariableName;
-            if (propertyInfo.GetCustomAttribute<RunnableProcessPropertyAttributeAttribute>() != null) return MemberType.Process;
-            if (propertyInfo.GetCustomAttribute<RunnableProcessListPropertyAttributeAttribute>() != null) return MemberType.ProcessList;
+            if (propertyInfo.GetCustomAttribute<RunnableProcessPropertyAttribute>() != null) return MemberType.Process;
+            if (propertyInfo.GetCustomAttribute<RunnableProcessListPropertyAttribute>() != null) return MemberType.ProcessList;
 
             return MemberType.NotAMember;
 
@@ -162,10 +162,10 @@ namespace Reductech.EDR.Processes.Internal
 
 
             var simpleProperties1 = instanceType.GetProperties()
-                .Where(x => x.GetCustomAttribute<RunnableProcessPropertyAttributeAttribute>() != null);
+                .Where(x => x.GetCustomAttribute<RunnableProcessPropertyAttribute>() != null);
 
             var listProperties1 = instanceType.GetProperties()
-                .Where(x => x.GetCustomAttribute<RunnableProcessListPropertyAttributeAttribute>() != null);
+                .Where(x => x.GetCustomAttribute<RunnableProcessListPropertyAttribute>() != null);
 
             var remainingProperties =
                 variableNameProperties1.Select(propertyInfo => (propertyInfo,memberType: MemberType.VariableName))

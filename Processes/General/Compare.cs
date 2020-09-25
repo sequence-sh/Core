@@ -17,14 +17,14 @@ namespace Reductech.EDR.Processes.General
         /// <summary>
         /// The item to the left of the operator.
         /// </summary>
-        [RunnableProcessPropertyAttribute]
+        [RunnableProcessProperty]
         [Required]
         public IRunnableProcess<T> Left { get; set; } = null!;
 
         /// <summary>
         /// The operator to use for comparison.
         /// </summary>
-        [RunnableProcessPropertyAttribute]
+        [RunnableProcessProperty]
         [Required]
 
         public IRunnableProcess<CompareOperator> Operator { get; set; } = null!;
@@ -32,7 +32,7 @@ namespace Reductech.EDR.Processes.General
         /// <summary>
         /// The item to the right of the operator.
         /// </summary>
-        [RunnableProcessPropertyAttribute]
+        [RunnableProcessProperty]
         [Required]
         public IRunnableProcess<T> Right { get; set; } = null!;
 

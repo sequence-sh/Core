@@ -65,7 +65,7 @@ namespace Reductech.EDR.Processes.General
         /// <summary>
         /// The path to the file or folder to check.
         /// </summary>
-        [RunnableProcessPropertyAttribute]
+        [RunnableProcessProperty]
         [Required]
         public IRunnableProcess<string> Path { get; set; } = null!;
 
@@ -73,7 +73,7 @@ namespace Reductech.EDR.Processes.General
         /// <summary>
         /// The text to check for.
         /// </summary>
-        [RunnableProcessPropertyAttribute]
+        [RunnableProcessProperty]
         [Required]
         public IRunnableProcess<string> Text { get; set; } = null!;
 

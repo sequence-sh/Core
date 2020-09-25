@@ -14,14 +14,14 @@ namespace Reductech.EDR.Processes.General
         /// <summary>
         /// The string to check.
         /// </summary>
-        [RunnableProcessPropertyAttribute]
+        [RunnableProcessProperty]
         [Required]
         public IRunnableProcess<string> String { get; set; } = null!;
 
         /// <summary>
         /// The substring to find.
         /// </summary>
-        [RunnableProcessPropertyAttribute]
+        [RunnableProcessProperty]
         [Required]
         public IRunnableProcess<string> SubString { get; set; } = null!;
 

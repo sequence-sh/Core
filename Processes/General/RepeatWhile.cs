@@ -34,14 +34,14 @@ namespace Reductech.EDR.Processes.General
         /// <summary>
         /// The condition to check before performing the action.
         /// </summary>
-        [RunnableProcessPropertyAttribute]
+        [RunnableProcessProperty]
         [Required]
         public IRunnableProcess<bool> Condition { get; set; } = null!;
 
         /// <summary>
         /// The action to perform repeatedly.
         /// </summary>
-        [RunnableProcessPropertyAttribute]
+        [RunnableProcessProperty]
         [Required]
         public IRunnableProcess<Unit> Action { get; set; } = null!;
 

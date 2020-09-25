@@ -59,21 +59,21 @@ namespace Reductech.EDR.Processes.General
         /// <summary>
         /// The path to the archive to unzip.
         /// </summary>
-        [RunnableProcessPropertyAttribute]
+        [RunnableProcessProperty]
         [Required]
         public IRunnableProcess<string> ArchiveFilePath { get; set; } = null!;
 
         /// <summary>
         /// The directory to unzip to.
         /// </summary>
-        [RunnableProcessPropertyAttribute]
+        [RunnableProcessProperty]
         [Required]
         public IRunnableProcess<string> DestinationDirectory { get; set; } = null!;
 
         /// <summary>
         /// Whether to overwrite files when unzipping.
         /// </summary>
-        [RunnableProcessPropertyAttribute]
+        [RunnableProcessProperty]
         [Required]
         [DefaultValueExplanation("false")]
         public IRunnableProcess<bool> OverwriteFiles { get; set; } = new Constant<bool>(false);

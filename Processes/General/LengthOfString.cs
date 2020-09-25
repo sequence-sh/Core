@@ -13,7 +13,7 @@ namespace Reductech.EDR.Processes.General
         /// <summary>
         /// The string to measure the length of.
         /// </summary>
-        [RunnableProcessPropertyAttribute]
+        [RunnableProcessProperty]
         [Required]
         public IRunnableProcess<string> String { get; set; } = null!;
 

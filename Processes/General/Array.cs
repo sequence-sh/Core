@@ -29,7 +29,7 @@ namespace Reductech.EDR.Processes.General
         /// <summary>
         /// The elements of this array.
         /// </summary>
-        [RunnableProcessListPropertyAttribute]
+        [RunnableProcessListProperty]
         [Required]
         public IReadOnlyList<IRunnableProcess<T>> Elements { get; set; } = null!;
     }

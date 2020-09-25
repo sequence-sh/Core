@@ -13,21 +13,21 @@ namespace Reductech.EDR.Processes.General
         /// <summary>
         /// The string to extract a substring from.
         /// </summary>
-        [RunnableProcessPropertyAttribute]
+        [RunnableProcessProperty]
         [Required]
         public IRunnableProcess<string> String { get; set; } = null!;
 
         /// <summary>
         /// The index.
         /// </summary>
-        [RunnableProcessPropertyAttribute]
+        [RunnableProcessProperty]
         [Required]
         public IRunnableProcess<int> Index { get; set; } = null!;
 
         /// <summary>
         /// The length of the substring to extract.
         /// </summary>
-        [RunnableProcessPropertyAttribute]
+        [RunnableProcessProperty]
         [Required]
         public IRunnableProcess<int> Length { get; set; } = null!;
 

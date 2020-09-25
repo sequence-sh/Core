@@ -17,7 +17,7 @@ namespace Reductech.EDR.Processes.General
         /// <summary>
         /// The array to check for emptiness.
         /// </summary>
-        [RunnableProcessPropertyAttribute]
+        [RunnableProcessProperty]
         [Required]
         public IRunnableProcess<List<T>> Array { get; set; } = null!;
 

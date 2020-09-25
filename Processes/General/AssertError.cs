@@ -41,7 +41,7 @@ namespace Reductech.EDR.Processes.General
         /// <summary>
         /// The process to test.
         /// </summary>
-        [RunnableProcessPropertyAttribute]
+        [RunnableProcessProperty]
         [Required]
         public IRunnableProcess<Unit> Test { get; set; } = null!;
     }
