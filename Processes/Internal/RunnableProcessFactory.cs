@@ -20,6 +20,11 @@ namespace Reductech.EDR.Processes.Internal
         /// </summary>
         public string TypeName { get; }
 
+        /// <summary>
+        /// The type of the process to create.
+        /// </summary>
+        public Type ProcessType { get; }
+
 
         /// <summary>
         /// Builds the name for a particular instance of a process.
@@ -57,6 +62,11 @@ namespace Reductech.EDR.Processes.Internal
         /// </summary>
         Result<IRunnableProcess> TryFreeze(ProcessContext processContext, FreezableProcessData freezableProcessData,
             ProcessConfiguration? processConfiguration);
+
+        /// <summary>
+        /// Human readable explanation of the output type.
+        /// </summary>
+        string OutputTypeExplanation { get; }
     }
 
 
@@ -89,6 +99,9 @@ namespace Reductech.EDR.Processes.Internal
         /// </summary>
         public abstract IEnumerable<Type> EnumTypes { get; }
 
+        /// <inheritdoc />
+        public abstract string OutputTypeExplanation { get; }
+
 
         /// <inheritdoc />
         public virtual Result<Maybe<ITypeReference>> GetTypeReferencesSet(VariableName variableName, FreezableProcessData freezableProcessData) =>
@@ -114,13 +127,13 @@ namespace Reductech.EDR.Processes.Internal
         /// </summary>
         public MemberType GetExpectedMemberType(string name)
         {
-            var propertyInfo = ProcessType.GetProperty(name);
+            var propertyInfo = ProcessType.GetProperty(name, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
 
             if (propertyInfo == null) return MemberType.NotAMember;
 
             if (propertyInfo.GetCustomAttribute<VariableNameAttribute>() != null) return MemberType.VariableName;
-            if (propertyInfo.GetCustomAttribute<RunnableProcessPropertyAttribute>() != null) return MemberType.Process;
-            if (propertyInfo.GetCustomAttribute<RunnableProcessListPropertyAttribute>() != null) return MemberType.ProcessList;
+            if (propertyInfo.GetCustomAttribute<RunnableProcessPropertyAttributeAttribute>() != null) return MemberType.Process;
+            if (propertyInfo.GetCustomAttribute<RunnableProcessListPropertyAttributeAttribute>() != null) return MemberType.ProcessList;
 
             return MemberType.NotAMember;
 
@@ -149,21 +162,23 @@ namespace Reductech.EDR.Processes.Internal
 
 
             var simpleProperties1 = instanceType.GetProperties()
-                .Where(x => x.GetCustomAttribute<RunnableProcessPropertyAttribute>() != null);
+                .Where(x => x.GetCustomAttribute<RunnableProcessPropertyAttributeAttribute>() != null);
 
             var listProperties1 = instanceType.GetProperties()
-                .Where(x => x.GetCustomAttribute<RunnableProcessListPropertyAttribute>() != null);
+                .Where(x => x.GetCustomAttribute<RunnableProcessListPropertyAttributeAttribute>() != null);
 
             var remainingProperties =
                 variableNameProperties1.Select(propertyInfo => (propertyInfo,memberType: MemberType.VariableName))
                     .Concat(simpleProperties1.Select(propertyInfo => (propertyInfo,memberType: MemberType.Process)))
                     .Concat(listProperties1.Select(propertyInfo => (propertyInfo,memberType: MemberType.ProcessList)))
-                    .ToDictionary(x=>x.propertyInfo.Name);
+                    .ToDictionary(x=>x.propertyInfo.Name, StringComparer.OrdinalIgnoreCase);
 
 
             foreach (var (propertyName, processMember) in freezableProcessData.Dictionary)
             {
+#pragma warning disable 8714
                 if (remainingProperties.Remove(propertyName, out var pair))
+#pragma warning restore 8714
                 {
                     var convertResult = processMember.TryConvert(pair.memberType);
                     if(convertResult.IsFailure)

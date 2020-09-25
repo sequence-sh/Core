@@ -6,36 +6,16 @@ using Namotion.Reflection;
 
 namespace Reductech.EDR.Processes.Internal.Documentation
 {
-
     internal static class DocumentationCreator
     {
-
-        /// <summary>
-        /// Creates processes documentation for the given categories.
-        /// </summary>
-        public static string GetDocumentation(params (Type assemblyMember, DocumentationCategory category)[] categories)
-        {
-            var documented = categories
-                .SelectMany(x => GetAllDocumented(x.category, x.assemblyMember))
-                .Distinct().ToList();
-
-            var lines = DocumentationCreator.CreateDocumentationLines(documented);
-
-            var text = string.Join("\r\n", lines);
-
-            return text;
-        }
-
         /// <summary>
         /// Dynamically Gets all processes and related entities from an assembly.
         /// For use with InstantConsole.
         /// </summary>
-        private static IEnumerable<IDocumented> GetAllDocumented(DocumentationCategory documentationCategory, Type anyAssemblyMember)
+        public static IEnumerable<IDocumented> GetAllDocumented(DocumentationCategory documentationCategory, ProcessFactoryStore processFactoryStore)
         {
-            var pfs = ProcessFactoryStore.CreateUsingReflection(anyAssemblyMember);
-
-            var wrappers = pfs.Dictionary.Values
-                .Select(x => new YamlObjectWrapper(x.ProcessType, documentationCategory)).ToList();
+            var wrappers = processFactoryStore.Dictionary.Values
+                .Select(x => new ProcessWrapper(x, documentationCategory)).ToList();
 
             return wrappers;
         }

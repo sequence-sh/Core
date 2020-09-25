@@ -58,7 +58,7 @@ namespace Reductech.EDR.Processes.General
         /// <summary>
         /// The path to the directory to create.
         /// </summary>
-        [RunnableProcessProperty]
+        [RunnableProcessPropertyAttribute]
         [Required]
         public IRunnableProcess<string> Path { get; set; } = null!;
 

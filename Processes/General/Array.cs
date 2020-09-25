@@ -30,7 +30,7 @@ namespace Reductech.EDR.Processes.General
         /// <summary>
         /// The elements of this array.
         /// </summary>
-        [RunnableProcessListProperty]
+        [RunnableProcessListPropertyAttribute]
         [Required]
         public IReadOnlyList<IRunnableProcess<T>> Elements { get; set; } = null!;
     }
@@ -49,6 +49,9 @@ namespace Reductech.EDR.Processes.General
 
         /// <inheritdoc />
         public override Type ProcessType => typeof(Array<>);
+
+        /// <inheritdoc />
+        public override string OutputTypeExplanation => "List<T>";
 
         /// <inheritdoc />
         protected override ITypeReference GetOutputTypeReference(ITypeReference memberTypeReference) => new GenericTypeReference(typeof(List<>), new []{memberTypeReference});

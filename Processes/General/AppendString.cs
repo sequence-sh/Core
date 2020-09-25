@@ -14,7 +14,7 @@ namespace Reductech.EDR.Processes.General
         /// <summary>
         /// The variable to append to.
         /// </summary>
-        [VariableName]
+        [VariableName(Order = 1)]
         [Required]
         public VariableName Variable { get; set; }
 
@@ -22,7 +22,7 @@ namespace Reductech.EDR.Processes.General
         /// <summary>
         /// The string to append.
         /// </summary>
-        [RunnableProcessProperty]
+        [RunnableProcessPropertyAttribute(Order = 2)]
         [Required]
         public IRunnableProcess<string> String { get; set; } = null!;
 

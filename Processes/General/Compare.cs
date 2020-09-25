@@ -17,14 +17,14 @@ namespace Reductech.EDR.Processes.General
         /// <summary>
         /// The item to the left of the operator.
         /// </summary>
-        [RunnableProcessProperty]
+        [RunnableProcessPropertyAttribute]
         [Required]
         public IRunnableProcess<T> Left { get; set; } = null!;
 
         /// <summary>
         /// The operator to use for comparison.
         /// </summary>
-        [RunnableProcessProperty]
+        [RunnableProcessPropertyAttribute]
         [Required]
 
         public IRunnableProcess<CompareOperator> Operator { get; set; } = null!;
@@ -32,7 +32,7 @@ namespace Reductech.EDR.Processes.General
         /// <summary>
         /// The item to the right of the operator.
         /// </summary>
-        [RunnableProcessProperty]
+        [RunnableProcessPropertyAttribute]
         [Required]
         public IRunnableProcess<T> Right { get; set; } = null!;
 
@@ -110,6 +110,9 @@ namespace Reductech.EDR.Processes.General
 
         /// <inheritdoc />
         public override IEnumerable<Type> EnumTypes => new[] {typeof(CompareOperator)};
+
+        /// <inheritdoc />
+        public override string OutputTypeExplanation => nameof(Boolean);
 
         /// <inheritdoc />
         protected override ITypeReference GetOutputTypeReference(ITypeReference memberTypeReference) => new ActualTypeReference(typeof(bool));

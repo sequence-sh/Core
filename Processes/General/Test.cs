@@ -28,21 +28,21 @@ namespace Reductech.EDR.Processes.General
         /// <summary>
         /// Whether to follow the Then Branch
         /// </summary>
-        [RunnableProcessProperty]
+        [RunnableProcessPropertyAttribute]
         [Required]
         public IRunnableProcess<bool> Condition { get; set; } = null!;
 
         /// <summary>
         /// The Then Branch.
         /// </summary>
-        [RunnableProcessProperty]
+        [RunnableProcessPropertyAttribute]
         [Required]
         public IRunnableProcess<T> ThenValue { get; set; } = null!;
 
         /// <summary>
         /// The Else branch, if it exists.
         /// </summary>
-        [RunnableProcessProperty]
+        [RunnableProcessPropertyAttribute]
         public IRunnableProcess<T> ElseValue { get; set; } = null!;
     }
 
@@ -59,6 +59,9 @@ namespace Reductech.EDR.Processes.General
 
         /// <inheritdoc />
         public override Type ProcessType => typeof(Test<>);
+
+        /// <inheritdoc />
+        public override string OutputTypeExplanation => "T";
 
         /// <inheritdoc />
         protected override ITypeReference GetOutputTypeReference(ITypeReference memberTypeReference) => memberTypeReference;

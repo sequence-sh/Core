@@ -17,7 +17,7 @@ namespace Reductech.EDR.Processes.General
         /// <summary>
         /// The array to check for emptiness.
         /// </summary>
-        [RunnableProcessProperty]
+        [RunnableProcessPropertyAttribute]
         [Required]
         public IRunnableProcess<List<T>> Array { get; set; } = null!;
 
@@ -43,6 +43,9 @@ namespace Reductech.EDR.Processes.General
 
         /// <inheritdoc />
         public override Type ProcessType => typeof(ArrayIsEmpty<>);
+
+        /// <inheritdoc />
+        public override string OutputTypeExplanation => nameof(Boolean);
 
         /// <inheritdoc />
         protected override ITypeReference GetOutputTypeReference(ITypeReference memberTypeReference) => new ActualTypeReference(typeof(bool));

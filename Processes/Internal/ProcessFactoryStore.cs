@@ -15,8 +15,8 @@ namespace Reductech.EDR.Processes.Internal
         /// </summary>
         public ProcessFactoryStore(IReadOnlyDictionary<string, RunnableProcessFactory> dictionary, IReadOnlyDictionary<string, Type> enumTypesDictionary)
         {
-            Dictionary = dictionary;
-            EnumTypesDictionary = enumTypesDictionary;
+            Dictionary = dictionary.ToDictionary(x=>x.Key!, x=>x.Value!, StringComparer.OrdinalIgnoreCase)!;
+            EnumTypesDictionary = enumTypesDictionary.ToDictionary(x=>x.Key!, x=>x.Value!, StringComparer.OrdinalIgnoreCase)!;
         }
 
         /// <summary>

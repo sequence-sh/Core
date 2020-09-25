@@ -27,7 +27,7 @@ namespace Reductech.EDR.Processes.General
         /// <summary>
         /// The Value to Print.
         /// </summary>
-        [RunnableProcessProperty]
+        [RunnableProcessPropertyAttribute]
         [Required]
         public IRunnableProcess<T> Value { get; set; } = null!;
 
@@ -55,6 +55,9 @@ namespace Reductech.EDR.Processes.General
 
         /// <inheritdoc />
         public override IProcessNameBuilder ProcessNameBuilder { get; } = new ProcessNameBuilderFromTemplate($"Print [{nameof(Print<object>.Value)}]");
+
+        /// <inheritdoc />
+        public override string OutputTypeExplanation => nameof(Unit);
 
         /// <inheritdoc />
         protected override Result<ITypeReference> GetMemberType(FreezableProcessData freezableProcessData) =>

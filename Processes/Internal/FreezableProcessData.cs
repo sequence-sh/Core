@@ -14,7 +14,8 @@ namespace Reductech.EDR.Processes.Internal
         /// <summary>
         /// Create a new FreezableProcessData
         /// </summary>
-        public FreezableProcessData(IReadOnlyDictionary<string, ProcessMember> dictionary) => Dictionary = dictionary;
+        public FreezableProcessData(IReadOnlyDictionary<string, ProcessMember> dictionary) => Dictionary =
+            dictionary.ToDictionary(x=>x.Key, x=>x.Value, StringComparer.OrdinalIgnoreCase)!;
 
         /// <summary>
         /// Dictionary mapping property names to process members.

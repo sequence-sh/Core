@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Text;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Processes.Util;
 using YamlDotNet.Serialization;
@@ -133,7 +134,18 @@ namespace Reductech.EDR.Processes
         /// <inheritdoc />
         public override string ToString()
         {
-            return ToTuple.ToString()!;
+            var sb = new StringBuilder();
+
+            sb.Append(Name);
+            if (MinVersion != null)
+                sb.Append($" Version {MinVersion}");
+            if (MaxVersion != null)
+                sb.Append($" Version <= {MaxVersion}");
+
+            if (Notes != null)
+                sb.Append($" ({Notes})");
+
+            return sb.ToString();
         }
 
         /// <inheritdoc />

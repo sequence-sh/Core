@@ -6,52 +6,38 @@ using System.Reflection;
 using Namotion.Reflection;
 using Reductech.EDR.Processes.Attributes;
 using Reductech.EDR.Processes.Internal.Documentation.Reductech.Utilities.InstantConsole;
-using YamlDotNet.Serialization;
-
 namespace Reductech.EDR.Processes.Internal.Documentation
 {
     /// <summary>
     /// A wrapper for this documented object.
     /// </summary>
-    public class YamlObjectWrapper : IDocumented
+    public class ProcessWrapper : IDocumented
     {
-        private readonly Type _processType;
-
         /// <summary>
-        /// Creates a new YamlObjectWrapper.
+        /// Creates a new ProcessWrapper.
         /// </summary>
-        public YamlObjectWrapper(Type processType, DocumentationCategory category) //TODO switch to process factory
+        public ProcessWrapper(IRunnableProcessFactory factory, DocumentationCategory category)
         {
+            Factory = factory;
             DocumentationCategory = category;
-            _processType = processType;
 
-            RelevantProperties = processType.GetProperties()
-                .Select(p=> (p, p.GetCustomAttribute<YamlMemberAttribute>()))
-                .Where(x=>x.Item2 != null)
+            RelevantProperties = factory.ProcessType.GetProperties()
+                .Select(property=> (property, attribute: property.GetCustomAttribute<ProcessPropertyAttribute>()))
+                .Where(x=>x.attribute != null)
                 // ReSharper disable once ConstantConditionalAccessQualifier
-                .OrderBy(x=>x.Item2?.Order)
-                .ThenBy(x=>x.p.Name).Select(x=>x.p).ToList();
+                .OrderBy(x=>x.attribute!.Order)
+                .ThenBy(x=>x.property.Name)
+
+                .Select(x=>x.property).ToList();
 
 
-            var instance = Activator.CreateInstance(processType);
-            Parameters = RelevantProperties.Select(propertyInfo =>
-                new PropertyWrapper(propertyInfo, propertyInfo.GetValue(instance)?.ToString()  )).ToList();
+
+            Parameters = RelevantProperties.Select(GetPropertyWrapper).ToList();//TODO get default values
 
 
-            if (instance is ICompoundRunnableProcess compoundRunnableProcess)
-            {
-                Requirements = compoundRunnableProcess.RunnableProcessFactory.Requirements.Select(x=>x.ToString()).ToList();// reqObjects.Select(x => x.ToString()!).Distinct();
+            Requirements = factory.Requirements.Select(x => $"Requires {x}").ToList();// reqObjects.Select(x => x.ToString()!).Distinct();
 
-                TypeDetails = compoundRunnableProcess.RunnableProcessFactory.TypeName;// instance is IRunnableProcess process1 ? process1.GetReturnTypeInfo() : null;
-            }
-            else if (instance is IConstantRunnableProcess constantRunnableProcess)
-            {
-                Requirements = new List<string>();
-
-                TypeDetails = constantRunnableProcess.OutputType.Name;
-            }
-            else
-                throw new ArgumentOutOfRangeException();
+            TypeDetails = factory.OutputTypeExplanation;// instance is IRunnableProcess process1 ? process1.GetReturnTypeInfo() : null;
 
             //var reqObjects = instance is IRunnableProcess process ? process.GetAllRequirements() : Enumerable.Empty<Requirement>();
 
@@ -60,14 +46,21 @@ namespace Reductech.EDR.Processes.Internal.Documentation
             //TypeDetails = instance is IRunnableProcess process1 ? process1 .GetReturnTypeInfo() : null;
         }
 
+        private static PropertyWrapper GetPropertyWrapper(PropertyInfo propertyInfo)
+        {
+            return new PropertyWrapper(propertyInfo, null);
+        }
+
+        private IRunnableProcessFactory Factory { get; }
+
         /// <inheritdoc />
         public DocumentationCategory DocumentationCategory { get; }
 
         /// <inheritdoc />
-        public string Name => _processType.Name;
+        public string Name => Factory.ProcessType.Name;
 
         /// <inheritdoc />
-        public string Summary => _processType.GetXmlDocsSummary();
+        public string Summary => Factory.ProcessType.GetXmlDocsSummary();
 
         /// <inheritdoc />
         public string? TypeDetails { get; }
@@ -131,9 +124,10 @@ namespace Reductech.EDR.Processes.Internal.Documentation
                 AddFieldFromAttribute<SeeAlsoAttribute>("See Also", extraFields, propertyInfo, x=>x.SeeAlso);
                 AddFieldFromAttribute<ValueDelimiterAttribute>("Value Delimiter", extraFields, propertyInfo, x=>x.Delimiter);
 
-
-
                 ExtraFields = extraFields;
+
+                Type = _propertyInfo.PropertyType.IsGenericType?
+                    _propertyInfo.PropertyType.GetGenericArguments()[0] : _propertyInfo.PropertyType;
             }
 
             private static void AddFieldFromAttribute<T>(
@@ -161,7 +155,7 @@ namespace Reductech.EDR.Processes.Internal.Documentation
             /// <summary>
             /// The type of this property.
             /// </summary>
-            public Type Type => _propertyInfo.PropertyType;
+            public Type Type { get; }
 
             /// <summary>
             /// Whether this property must be set.

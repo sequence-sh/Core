@@ -56,7 +56,7 @@ namespace Reductech.EDR.Processes.General
         /// <summary>
         /// The path to the file or folder to delete.
         /// </summary>
-        [RunnableProcessProperty]
+        [RunnableProcessPropertyAttribute]
         [Required]
         public IRunnableProcess<string> Path { get; set; } = null!;
 

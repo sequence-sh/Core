@@ -14,14 +14,14 @@ namespace Reductech.EDR.Processes.General
         /// <summary>
         /// The action to perform repeatedly.
         /// </summary>
-        [RunnableProcessProperty]
+        [RunnableProcessPropertyAttribute]
         [Required]
         public IRunnableProcess<Unit> Action { get; set; } = null!;
 
         /// <summary>
         /// The number of times to perform the action.
         /// </summary>
-        [RunnableProcessProperty]
+        [RunnableProcessPropertyAttribute]
         [Required]
         public IRunnableProcess<int> Number { get; set; } = null!;
 
