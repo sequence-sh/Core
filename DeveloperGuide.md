@@ -1,13 +1,13 @@
 # Developer Guide
 *How to create a connector*
 
- ##Class Library
+ ## Class Library
 
  A coonector is a C# class library.
  It need to target the dot net core runtime.
  It needs a reference to Reductech.EDR.Processes
 
- ##Processes
+ ## Processes
 
 Every function you connector can perform is represented by a *process*.
 
@@ -15,7 +15,7 @@ A *process* is a C# class containing a property for each of its parameters, and 
 
 The class should implement `CompoundRunnableProcess<TOutput>` where `TOutput` is the output type. This could be a static type (like `string`) or a generic type.
 
-###Arguments
+### Arguments
 
 The process class will usually contain properties reprenting the process arguments.
 
@@ -38,7 +38,7 @@ public IRunnableProcess<string> Delimiter { get; set; } = new Constant<string>("
 ```
 
 
-###The Run Method
+### The Run Method
 
 `CompoundRunnableProcess<Type>` requires that you implement the method `public override Result<T, IRunErrors> Run(ProcessState processState)`
 
@@ -67,7 +67,7 @@ public override Result<int, IRunErrors> Run(ProcessState processState)
 }
 ```
 
-###The Process Factory
+### The Process Factory
 
 The other abstract property you must implement is the factory.
 
@@ -94,7 +94,7 @@ public sealed class ReadCsvProcessFactory : SimpleRunnableProcessFactory<ReadCsv
 }
 ```
 
-###The settings File
+### The settings File
 Your process may require external settings in order to work.
 
 To do this, create an interface that inherits from `IProcessSettings` and add all the required properties.
@@ -133,12 +133,12 @@ public interface INuixProcessSettings : IProcessSettings
 Your console runner (see below) will need to ensure that the settings object that is passed to the runner implements that interface.
 
 
- ###The Console Runner
+### The Console Runner
 
- To be able to use your processes you need to make them available inside your console runner.
- Your Console runner should have a reference to the CommandDotNet nuget package https://github.com/bilal-fazlani/commanddotnet
+To be able to use your processes you need to make them available inside your console runner.
+Your Console runner should have a reference to the CommandDotNet nuget package https://github.com/bilal-fazlani/commanddotnet
 
- See https://gitlab.com/reductech/edr/connectors/nuix/-/blob/master/NuixConsole/Program.cs for an example of how to do this.
+See https://gitlab.com/reductech/edr/connectors/nuix/-/blob/master/NuixConsole/Program.cs for an example of how to do this.
 
  
 
