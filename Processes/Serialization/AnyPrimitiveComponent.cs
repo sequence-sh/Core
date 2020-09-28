@@ -24,11 +24,8 @@ namespace Reductech.EDR.Processes.Serialization
         /// </summary>
         public string PropertyName { get; }
 
-        ///// <inheritdoc />
-        //public Result<ProcessMember> TryDeserialize(string groupText, ProcessFactoryStore processFactoryStore) => SerializationMethods.TryDeserialize(groupText, processFactoryStore);
-
         /// <inheritdoc />
-        public Result<string> TryGetText(FreezableProcessData data) =>
+        public Result<string> TryGetText(FreezableStepData data) =>
             data.Dictionary
                 .TryFindOrFail(PropertyName, null)
                 .Bind(x => x.Join(VariableNameComponent.Serialize,
@@ -37,27 +34,17 @@ namespace Reductech.EDR.Processes.Serialization
 
                 ));
 
-        private static Result<string> TrySerialize(IFreezableProcess process)
+        private static Result<string> TrySerialize(IFreezableStep step)
         {
-            if (process is ConstantFreezableProcess constantFreezableProcess)
+            if (step is ConstantFreezableStep constantFreezableProcess)
                 return SerializationMethods.SerializeConstant(constantFreezableProcess, true);
-            if (process is CompoundFreezableProcess compound && compound.ProcessConfiguration == null)
-                return compound.ProcessFactory.Serializer.TrySerialize(compound.FreezableProcessData);
+            if (step is CompoundFreezableStep compound && compound.StepConfiguration == null)
+                return compound.StepFactory.Serializer.TrySerialize(compound.FreezableStepData);
 
-            return Result.Failure<string>("Cannot serialize compound with a process configuration");
+            return Result.Failure<string>("Cannot serialize compound with a step configuration");
         }
-
-
-        ///// <inheritdoc />
-        //public string GetRegexText(int index) => @$"(?:(?<{GetGroupName(index)}>(?:[\w\d\._]+))|(?<{GetGroupName(index)}>[""'].*?[""'])|(?<{GetGroupName(index)}><[\w\d\._]+?>))";
 
         /// <inheritdoc />
         public ISerializerBlock? SerializerBlock => this;
-
-        ///// <inheritdoc />
-        //public IDeserializerBlock? DeserializerBlock  => this;
-
-        ///// <inheritdoc />
-        //public IDeserializerMapping? Mapping => this;
     }
 }

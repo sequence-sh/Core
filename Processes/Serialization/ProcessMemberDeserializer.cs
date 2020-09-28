@@ -9,20 +9,20 @@ using YamlDotNet.Core.Events;
 
 namespace Reductech.EDR.Processes.Serialization
 {
-    internal class ProcessMemberDeserializer : TypedYamlDeserializer<ProcessMember>
+    internal class ProcessMemberDeserializer : TypedYamlDeserializer<StepMember>
     {
         /// <summary>
         /// Creates a new ProcessMemberDeserializer
         /// </summary>
-        public ProcessMemberDeserializer(ProcessMemberParser processMemberParser) => ProcessMemberParser = processMemberParser;
+        public ProcessMemberDeserializer(StepMemberParser stepMemberParser) => StepMemberParser = stepMemberParser;
 
         /// <summary>
-        /// The process member parser
+        /// The step member parser
         /// </summary>
-        public ProcessMemberParser ProcessMemberParser { get; }
+        public StepMemberParser StepMemberParser { get; }
 
         /// <inheritdoc />
-        public override Result<ProcessMember, YamlException> TryDeserialize(IParser reader, Func<IParser, Type, object?> nestedObjectDeserializer)
+        public override Result<StepMember, YamlException> TryDeserialize(IParser reader, Func<IParser, Type, object?> nestedObjectDeserializer)
         {
             if(reader.Current == null)
                 return new YamlException("Reader is empty");
@@ -36,8 +36,8 @@ namespace Reductech.EDR.Processes.Serialization
                 case MappingStart _:
                 {
                     var r =
-                        TryDeserializeNested<IFreezableProcess>(nestedObjectDeserializer, reader)
-                            .Map(x=> new ProcessMember(x));
+                        TryDeserializeNested<IFreezableStep>(nestedObjectDeserializer, reader)
+                            .Map(x=> new StepMember(x));
 
                     return r;
 
@@ -45,12 +45,12 @@ namespace Reductech.EDR.Processes.Serialization
                 case SequenceStart _:
                 {
                     var r =
-                        TryDeserializeNested<List<ProcessMember>>(nestedObjectDeserializer, reader)
+                        TryDeserializeNested<List<StepMember>>(nestedObjectDeserializer, reader)
                             .Bind(x=>
-                                x.Select(m=>ResultExtensions.Bind<ProcessMember, IFreezableProcess>(m.TryConvert(MemberType.Process), n=>n.AsArgument("Step")))
+                                x.Select(m=>ResultExtensions.Bind<StepMember, IFreezableStep>(m.TryConvert(MemberType.Step), n=>n.AsArgument("Step")))
                                     .Combine()
                                     .MapFailure(e=> new YamlException(startMark, endMark, e)))
-                            .Map(x=> new ProcessMember(x.ToList()));
+                            .Map(x=> new StepMember(x.ToList()));
 
                     return r;
                 }
@@ -59,13 +59,13 @@ namespace Reductech.EDR.Processes.Serialization
 
                     if (scalar.IsQuotedImplicit)
                     {
-                        var member = new ProcessMember(new ConstantFreezableProcess(scalar.Value));
+                        var member = new StepMember(new ConstantFreezableStep(scalar.Value));
                         reader.MoveNext();
                         return member;
                     }
-                    //otherwise try to deserialize this a as process member
+                    //otherwise try to deserialize this a as step member
 
-                    var r = ProcessMemberParser.TryParse(scalar.Value)
+                    var r = StepMemberParser.TryParse(scalar.Value)
                         .MapFailure(e=> new YamlException(reader.Current.Start, reader.Current.End, e));
 
                     if (r.IsSuccess)
@@ -75,7 +75,7 @@ namespace Reductech.EDR.Processes.Serialization
                     }
 
                     //TODO remove this bit
-                    var member2 = new ProcessMember(new ConstantFreezableProcess(scalar.Value));
+                    var member2 = new StepMember(new ConstantFreezableStep(scalar.Value));
                     reader.MoveNext();
                     return member2;
                 }

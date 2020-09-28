@@ -12,10 +12,10 @@ namespace Reductech.EDR.Processes.Internal.Documentation
         /// Dynamically Gets all processes and related entities from an assembly.
         /// For use with InstantConsole.
         /// </summary>
-        public static IEnumerable<IDocumented> GetAllDocumented(DocumentationCategory documentationCategory, ProcessFactoryStore processFactoryStore)
+        public static IEnumerable<IDocumented> GetAllDocumented(DocumentationCategory documentationCategory, StepFactoryStore StepFactoryStore)
         {
-            var wrappers = processFactoryStore.Dictionary.Values
-                .Select(x => new ProcessWrapper(x, documentationCategory)).ToList();
+            var wrappers = StepFactoryStore.Dictionary.Values
+                .Select(x => new StepWrapper(x, documentationCategory)).ToList();
 
             return wrappers;
         }

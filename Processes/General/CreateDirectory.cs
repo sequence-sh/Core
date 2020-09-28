@@ -11,25 +11,12 @@ namespace Reductech.EDR.Processes.General
     /// <summary>
     /// Creates a new directory in the file system.
     /// </summary>
-    public class CreateDirectoryProcessFactory : SimpleRunnableProcessFactory<CreateDirectory, Unit>
-    {
-        private CreateDirectoryProcessFactory() { }
-
-        /// <summary>
-        /// The instance.
-        /// </summary>
-        public static SimpleRunnableProcessFactory<CreateDirectory, Unit> Instance { get; } = new CreateDirectoryProcessFactory();
-    }
-
-    /// <summary>
-    /// Creates a new directory in the file system.
-    /// </summary>
-    public class CreateDirectory : CompoundRunnableProcess<Unit>
+    public class CreateDirectory : CompoundStep<Unit>
     {
         /// <inheritdoc />
-        public override Result<Unit, IRunErrors> Run(ProcessState processState)
+        public override Result<Unit, IRunErrors> Run(StateMonad stateMonad)
         {
-            var pathResult = Path.Run(processState);
+            var pathResult = Path.Run(stateMonad);
             if (pathResult.IsFailure)
                 return pathResult.ConvertFailure<Unit>();
 
@@ -58,12 +45,12 @@ namespace Reductech.EDR.Processes.General
         /// <summary>
         /// The path to the directory to create.
         /// </summary>
-        [RunnableProcessProperty]
+        [StepProperty]
         [Required]
-        public IRunnableProcess<string> Path { get; set; } = null!;
+        public IStep<string> Path { get; set; } = null!;
 
 
         /// <inheritdoc />
-        public override IRunnableProcessFactory RunnableProcessFactory => CreateDirectoryProcessFactory.Instance;
+        public override IStepFactory StepFactory => CreateDirectoryStepFactory.Instance;
     }
 }

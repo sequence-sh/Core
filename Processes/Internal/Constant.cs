@@ -6,21 +6,9 @@ using Reductech.EDR.Processes.Util;
 namespace Reductech.EDR.Processes.Internal
 {
     /// <summary>
-    /// A process that returns a fixed value when run.
+    /// A step that returns a fixed value when run.
     /// </summary>
-    public interface IConstantRunnableProcess : IRunnableProcess
-    {
-        /// <summary>
-        /// The output type.
-        /// </summary>
-        Type OutputType { get; }
-    }
-
-
-    /// <summary>
-    /// A process that returns a fixed value when run.
-    /// </summary>
-    public class Constant<T> : IRunnableProcess<T>, IConstantRunnableProcess
+    public class Constant<T> : IStep<T>, IConstantStep
     {
         /// <summary>
         /// Creates a new Constant.
@@ -34,16 +22,16 @@ namespace Reductech.EDR.Processes.Internal
         public T Value { get; }
 
         /// <inheritdoc />
-        public Result<T, IRunErrors> Run(ProcessState processState) => Value!;
+        public Result<T, IRunErrors> Run(StateMonad stateMonad) => Value!;
 
         /// <inheritdoc />
         public string Name => $"{Value}";
 
         /// <inheritdoc />
-        public IFreezableProcess Unfreeze() => new ConstantFreezableProcess(Value!);
+        public IFreezableStep Unfreeze() => new ConstantFreezableStep(Value!);
 
         /// <inheritdoc />
-        public Result<T1, IRunErrors> Run<T1>(ProcessState processState)
+        public Result<T1, IRunErrors> Run<T1>(StateMonad stateMonad)
         {
             var r = Value!.TryConvert<T1>()
                 .MapFailure(x => new RunError(x, Name, null, ErrorCode.InvalidCast) as IRunErrors);
@@ -52,13 +40,13 @@ namespace Reductech.EDR.Processes.Internal
         }
 
         /// <inheritdoc />
-        public Result<Unit, IRunErrors> Verify(IProcessSettings settings) => Unit.Default;
+        public Result<Unit, IRunErrors> Verify(ISettings settings) => Unit.Default;
 
         /// <inheritdoc />
-        public ProcessConfiguration? ProcessConfiguration { get; set; } = null;
+        public Configuration? Configuration { get; set; } = null;
 
         /// <inheritdoc />
-        public IEnumerable<IProcessCombiner> ProcessCombiners => ArraySegment<IProcessCombiner>.Empty;
+        public IEnumerable<IStepCombiner> StepCombiners => ArraySegment<IStepCombiner>.Empty;
 
         /// <inheritdoc />
         public Type OutputType => typeof(T);

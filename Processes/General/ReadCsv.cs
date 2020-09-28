@@ -12,29 +12,15 @@ namespace Reductech.EDR.Processes.General
     /// <summary>
     /// Extracts elements from a CSV file
     /// </summary>
-    public sealed class ReadCsvProcessFactory : SimpleRunnableProcessFactory<ReadCsv, List<List<string>>>
-    {
-        private ReadCsvProcessFactory() { }
-
-        /// <summary>
-        /// The instance.
-        /// </summary>
-        public static SimpleRunnableProcessFactory<ReadCsv, List<List<string>>> Instance { get; } = new ReadCsvProcessFactory();
-    }
-
-
-    /// <summary>
-    /// Extracts elements from a CSV file
-    /// </summary>
-    public sealed class ReadCsv : CompoundRunnableProcess<List<List<string>>>
+    public sealed class ReadCsv : CompoundStep<List<List<string>>>
     {
         /// <inheritdoc />
-        public override Result<List<List<string>>, IRunErrors> Run(ProcessState processState)
+        public override Result<List<List<string>>, IRunErrors> Run(StateMonad stateMonad)
         {
-            var textResult = Text.Run(processState);
+            var textResult = Text.Run(stateMonad);
             if (textResult.IsFailure) return textResult.ConvertFailure<List<List<string>>>();
 
-            var delimiterResult = Delimiter.Run(processState);
+            var delimiterResult = Delimiter.Run(stateMonad);
             if (delimiterResult.IsFailure) return delimiterResult.ConvertFailure<List<List<string>>>();
 
             string? commentToken;
@@ -43,15 +29,15 @@ namespace Reductech.EDR.Processes.General
                 commentToken = null;
             else
             {
-                var commentTokenResult = CommentToken.Run(processState);
+                var commentTokenResult = CommentToken.Run(stateMonad);
                 if (commentTokenResult.IsFailure) return commentTokenResult.ConvertFailure<List<List<string>>>();
                 commentToken = commentTokenResult.Value;
             }
 
-            var fieldsEnclosedInQuotesResult = HasFieldsEnclosedInQuotes.Run(processState);
+            var fieldsEnclosedInQuotesResult = HasFieldsEnclosedInQuotes.Run(stateMonad);
             if (fieldsEnclosedInQuotesResult.IsFailure) return fieldsEnclosedInQuotesResult.ConvertFailure<List<List<string>>>();
 
-            var columnsToMapResult = ColumnsToMap.Run(processState);
+            var columnsToMapResult = ColumnsToMap.Run(stateMonad);
             if (columnsToMapResult.IsFailure) return columnsToMapResult.ConvertFailure<List<List<string>>>();
 
 
@@ -93,40 +79,40 @@ namespace Reductech.EDR.Processes.General
         /// <summary>
         /// The text of the CSV file.
         /// </summary>
-        [RunnableProcessProperty(Order = 1)]
+        [StepProperty(Order = 1)]
         [Required]
-        public IRunnableProcess<string> Text { get; set; } = null!;
+        public IStep<string> Text { get; set; } = null!;
 
         /// <summary>
         /// The delimiter to use to separate rows.
         /// </summary>
-        [RunnableProcessProperty(Order = 2)]
+        [StepProperty(Order = 2)]
         [Required]
         [DefaultValueExplanation(",")]
-        public IRunnableProcess<string> Delimiter { get; set; } = new Constant<string>(",");
+        public IStep<string> Delimiter { get; set; } = new Constant<string>(",");
 
         /// <summary>
         /// The token to use to indicate comments.
         /// </summary>
-        [RunnableProcessProperty(Order = 3)]
-        public IRunnableProcess<string>? CommentToken { get; set; }
+        [StepProperty(Order = 3)]
+        public IStep<string>? CommentToken { get; set; }
 
         /// <summary>
         /// Whether CSV fields are enclosed in quotes.
         /// </summary>
-        [RunnableProcessProperty(Order = 4)]
+        [StepProperty(Order = 4)]
         [DefaultValueExplanation("false")]
         [Required]
-        public IRunnableProcess<bool> HasFieldsEnclosedInQuotes { get; set; } = new Constant<bool>(false);
+        public IStep<bool> HasFieldsEnclosedInQuotes { get; set; } = new Constant<bool>(false);
 
         /// <summary>
         /// The csv columns to map to result columns, in order.
         /// </summary>
-        [RunnableProcessProperty(Order = 5)]
+        [StepProperty(Order = 5)]
         [Required]
-        public IRunnableProcess<List<string>> ColumnsToMap { get; set; } = null!;
+        public IStep<List<string>> ColumnsToMap { get; set; } = null!;
 
         /// <inheritdoc />
-        public override IRunnableProcessFactory RunnableProcessFactory => ReadCsvProcessFactory.Instance;
+        public override IStepFactory StepFactory => ReadCsvStepFactory.Instance;
     }
 }

@@ -8,30 +8,30 @@ namespace Reductech.EDR.Processes.General
     /// <summary>
     /// Gets the letters that appears at a specific index
     /// </summary>
-    public sealed class GetLetterAtIndex : CompoundRunnableProcess<string>
+    public sealed class GetLetterAtIndex : CompoundStep<string>
     {
         /// <summary>
         /// The string to extract a substring from.
         /// </summary>
-        [RunnableProcessProperty]
+        [StepProperty]
         [Required]
-        public IRunnableProcess<string> String { get; set; } = null!;
+        public IStep<string> String { get; set; } = null!;
 
 
         /// <summary>
         /// The index.
         /// </summary>
-        [RunnableProcessProperty]
+        [StepProperty]
         [Required]
-        public IRunnableProcess<int> Index { get; set; } = null!;
+        public IStep<int> Index { get; set; } = null!;
 
         /// <inheritdoc />
-        public override Result<string, IRunErrors> Run(ProcessState processState)
+        public override Result<string, IRunErrors> Run(StateMonad stateMonad)
         {
-            var index = Index.Run(processState);
+            var index = Index.Run(stateMonad);
             if (index.IsFailure) return index.ConvertFailure<string>();
 
-            var str = String.Run(processState);
+            var str = String.Run(stateMonad);
             if (str.IsFailure) return str;
 
             if (index.Value < 0 || index.Value >= str.Value.Length)
@@ -41,22 +41,6 @@ namespace Reductech.EDR.Processes.General
         }
 
         /// <inheritdoc />
-        public override IRunnableProcessFactory RunnableProcessFactory => GetLetterAtIndexProcessFactory.Instance;
-    }
-
-    /// <summary>
-    /// Gets the letters that appears at a specific index
-    /// </summary>
-    public sealed class GetLetterAtIndexProcessFactory : SimpleRunnableProcessFactory<GetLetterAtIndex, string>
-    {
-        private GetLetterAtIndexProcessFactory() { }
-
-        /// <summary>
-        /// The instance.
-        /// </summary>
-        public static SimpleRunnableProcessFactory<GetLetterAtIndex, string> Instance { get; } = new GetLetterAtIndexProcessFactory();
-
-        /// <inheritdoc />
-        public override IProcessNameBuilder ProcessNameBuilder => new ProcessNameBuilderFromTemplate($"Get character at index '[{nameof(GetLetterAtIndex.Index)}]' in '[{nameof(GetLetterAtIndex.String)}]'");
+        public override IStepFactory StepFactory => GetLetterAtIndexStepFactory.Instance;
     }
 }

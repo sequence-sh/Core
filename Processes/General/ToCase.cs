@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Globalization;
 using CSharpFunctionalExtensions;
@@ -12,26 +11,26 @@ namespace Reductech.EDR.Processes.General
     /// <summary>
     /// Converts a string to a particular case.
     /// </summary>
-    public sealed class ToCase : CompoundRunnableProcess<string>
+    public sealed class ToCase : CompoundStep<string>
     {
         /// <summary>
         /// The string to change the case of.
         /// </summary>
-        [RunnableProcessProperty]
+        [StepProperty]
         [Required]
-        public IRunnableProcess<string> String { get; set; } = null!;
+        public IStep<string> String { get; set; } = null!;
 
         /// <summary>
         /// The case to change to.
         /// </summary>
-        [RunnableProcessProperty]
+        [StepProperty]
         [Required]
-        public IRunnableProcess<TextCase> Case { get; set; } = null!;
+        public IStep<TextCase> Case { get; set; } = null!;
 
         /// <inheritdoc />
-        public override Result<string, IRunErrors> Run(ProcessState processState)
+        public override Result<string, IRunErrors> Run(StateMonad stateMonad)
         {
-            return String.Run(processState).Compose(() => Case.Run(processState))
+            return String.Run(stateMonad).Compose(() => Case.Run(stateMonad))
                 .Map(x => Convert(x.Item1, x.Item2));
         }
 
@@ -45,40 +44,6 @@ namespace Reductech.EDR.Processes.General
             };
 
         /// <inheritdoc />
-        public override IRunnableProcessFactory RunnableProcessFactory => ToCaseProcessFactory.Instance;
-    }
-
-    /// <summary>
-    /// Converts a string to a particular case.
-    /// </summary>
-    public sealed class ToCaseProcessFactory : SimpleRunnableProcessFactory<ToCase, string>
-    {
-        private ToCaseProcessFactory() { }
-        /// <summary>
-        /// The instance.
-        /// </summary>
-        public static SimpleRunnableProcessFactory<ToCase, string> Instance { get; } = new ToCaseProcessFactory();
-
-        /// <inheritdoc />
-        public override IEnumerable<Type> EnumTypes => new[] {typeof(TextCase)};
-    }
-
-    /// <summary>
-    /// The case to convert the text to.
-    /// </summary>
-    public enum TextCase
-    {
-        /// <summary>
-        /// All characters will be in upper case.
-        /// </summary>
-        Upper,
-        /// <summary>
-        /// All characters will be in lower case.
-        /// </summary>
-        Lower,
-        /// <summary>
-        /// Only the first character in each word will be in upper case.
-        /// </summary>
-        Title
+        public override IStepFactory StepFactory => ToCaseStepFactory.Instance;
     }
 }

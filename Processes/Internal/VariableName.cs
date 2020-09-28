@@ -3,7 +3,7 @@
 namespace Reductech.EDR.Processes.Internal
 {
     /// <summary>
-    /// The name of a variable that can be written and read from the process state.
+    /// The name of a variable that can be written and read from the step state.
     /// </summary>
     public readonly struct VariableName : IEquatable<VariableName>
     {

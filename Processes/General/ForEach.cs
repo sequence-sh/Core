@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Processes.Attributes;
@@ -11,14 +10,14 @@ namespace Reductech.EDR.Processes.General
     /// <summary>
     /// Do an action for each member of the list.
     /// </summary>
-    public sealed class ForEach<T> : CompoundRunnableProcess<Unit>
+    public sealed class ForEach<T> : CompoundStep<Unit>
     {
         /// <summary>
         /// The action to perform repeatedly.
         /// </summary>
-        [RunnableProcessProperty]
+        [StepProperty]
         [Required]
-        public IRunnableProcess<Unit> Action { get; set; } = null!;
+        public IStep<Unit> Action { get; set; } = null!;
 
 
         /// <summary>
@@ -31,22 +30,22 @@ namespace Reductech.EDR.Processes.General
         /// <summary>
         /// The elements to iterate over.
         /// </summary>
-        [RunnableProcessProperty]
+        [StepProperty]
         [Required]
-        public IRunnableProcess<List<T>> Array { get; set; } = null!;
+        public IStep<List<T>> Array { get; set; } = null!;
 
         /// <inheritdoc />
-        public override Result<Unit, IRunErrors> Run(ProcessState processState)
+        public override Result<Unit, IRunErrors> Run(StateMonad stateMonad)
         {
-            var elements = Array.Run(processState);
+            var elements = Array.Run(stateMonad);
             if (elements.IsFailure) return elements.ConvertFailure<Unit>();
 
             foreach (var element in elements.Value)
             {
-                var setResult = processState.SetVariable(VariableName, element);
+                var setResult = stateMonad.SetVariable(VariableName, element);
                 if (setResult.IsFailure) return setResult.ConvertFailure<Unit>();
 
-                var r = Action.Run(processState);
+                var r = Action.Run(stateMonad);
                 if (r.IsFailure) return r;
             }
 
@@ -54,66 +53,24 @@ namespace Reductech.EDR.Processes.General
         }
 
         /// <inheritdoc />
-        public override IRunnableProcessFactory RunnableProcessFactory => ForeachProcessFactory.Instance;
-    }
-
-    /// <summary>
-    /// Do an action for each member of the list.
-    /// </summary>
-    public sealed class ForeachProcessFactory : GenericProcessFactory
-    {
-        private ForeachProcessFactory() { }
-
-        /// <summary>
-        /// The instance.
-        /// </summary>
-        public static RunnableProcessFactory Instance { get; } = new ForeachProcessFactory();
-
-        /// <inheritdoc />
-        public override Type ProcessType => typeof(ForEach<>);
-
-        /// <inheritdoc />
-        protected override ITypeReference GetOutputTypeReference(ITypeReference memberTypeReference) => new ActualTypeReference(typeof(Unit));
-
-        /// <inheritdoc />
-        protected override Result<ITypeReference> GetMemberType(FreezableProcessData freezableProcessData) =>
-            freezableProcessData.GetArgument(nameof(ForEach<object>.Array))
-                .Bind(x => x.TryGetOutputTypeReference())
-                .BindCast<ITypeReference, GenericTypeReference>()
-                .Map(x => x.ChildTypes)
-                .BindSingle();
-
-        /// <inheritdoc />
-        public override string OutputTypeExplanation => nameof(Unit);
-
-        /// <inheritdoc />
-        public override Result<Maybe<ITypeReference>> GetTypeReferencesSet(VariableName variableName, FreezableProcessData freezableProcessData) =>
-            freezableProcessData.GetArgument(nameof(ForEach<object>.Array))
-                .Bind(x => x.TryGetOutputTypeReference())
-                .BindCast<ITypeReference, GenericTypeReference>()
-                .Map(x => x.ChildTypes)
-                .BindSingle()
-                .Map(Maybe<ITypeReference>.From);
-
-        /// <inheritdoc />
-        public override IProcessNameBuilder ProcessNameBuilder => new ProcessNameBuilderFromTemplate($"Foreach [{nameof(ForEach<object>.VariableName)}] in [{nameof(ForEach<object>.Array)}]; [{nameof(ForEach<object>.Action)}]");
+        public override IStepFactory StepFactory => ForeachStepFactory.Instance;
     }
 
     ///// <summary>
     ///// Do an action for each member of the list.
     ///// </summary>
-    //public sealed class ForeachProcessFactory : RunnableProcessFactory
+    //public sealed class ForeachStepFactory : StepFactory
     //{
-    //    private ForeachProcessFactory() { }
+    //    private ForeachStepFactory() { }
 
-    //    public static RunnableProcessFactory Instance { get; } = new ForeachProcessFactory();
-
-    //    /// <inheritdoc />
-    //    public override Result<ITypeReference> TryGetOutputTypeReference(FreezableProcessData freezableProcessData) => new ActualTypeReference(typeof(Unit));
+    //    public static StepFactory Instance { get; } = new ForeachStepFactory();
 
     //    /// <inheritdoc />
-    //    public override Result<Maybe<ITypeReference>> GetTypeReferencesSet(VariableName variableName, FreezableProcessData freezableProcessData) =>
-    //        freezableProcessData.GetArgument(nameof(ForEach<object>.Array))
+    //    public override Result<ITypeReference> TryGetOutputTypeReference(FreezableStepData freezableStepData) => new ActualTypeReference(typeof(Unit));
+
+    //    /// <inheritdoc />
+    //    public override Result<Maybe<ITypeReference>> GetTypeReferencesSet(VariableName variableName, FreezableStepData freezableStepData) =>
+    //        freezableStepData.GetArgument(nameof(ForEach<object>.Array))
     //            .Bind(x => x.TryGetOutputTypeReference())
     //            .BindCast<ITypeReference, GenericTypeReference>()
     //            .Map(x=>x.ChildTypes)
@@ -121,22 +78,22 @@ namespace Reductech.EDR.Processes.General
     //            .Map(Maybe<ITypeReference>.From);
 
     //    /// <inheritdoc />
-    //    public override Type ProcessType => typeof(ForEach<>);
+    //    public override Type StepType => typeof(ForEach<>);
 
     //    /// <inheritdoc />
-    //    public override ProcessNameBuilder ProcessNameBuilder => new ProcessNameBuilder($"Foreach [{nameof(ForEach<object>.VariableName)}] in [{nameof(ForEach<object>.Array)}]; [{nameof(ForEach<object>.Action)}]");
+    //    public override StepNameBuilder StepNameBuilder => new StepNameBuilder($"Foreach [{nameof(ForEach<object>.VariableName)}] in [{nameof(ForEach<object>.Array)}]; [{nameof(ForEach<object>.Action)}]");
 
     //    /// <inheritdoc />
     //    public override IEnumerable<Type> EnumTypes => ImmutableArray<Type>.Empty;
 
-    //    private static Result<ITypeReference> GetMemberType(FreezableProcessData freezableProcessData) =>
-    //        freezableProcessData.GetArgument(nameof(ForEach<object>.Array))
+    //    private static Result<ITypeReference> GetMemberType(FreezableStepData freezableStepData) =>
+    //        freezableStepData.GetArgument(nameof(ForEach<object>.Array))
     //            .Bind(x => x.TryGetOutputTypeReference())
     //    ;
 
     //    /// <inheritdoc />
-    //    protected override Result<IRunnableProcess> TryCreateInstance(ProcessContext processContext, FreezableProcessData freezableProcessData) =>
-    //        GetMemberType(freezableProcessData)
+    //    protected override Result<IRunnableProcess> TryCreateInstance(StepContext processContext, FreezableStepData freezableStepData) =>
+    //        GetMemberType(freezableStepData)
     //            .BindCast<ITypeReference, GenericTypeReference>()
     //            .Map(x => x.ChildTypes)
     //            .BindSingle()

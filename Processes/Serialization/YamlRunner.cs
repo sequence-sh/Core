@@ -17,29 +17,29 @@ namespace Reductech.EDR.Processes.Serialization
         /// <summary>
         /// Creates a new Yaml Runner
         /// </summary>
-        public YamlRunner(IProcessSettings processSettings, ILogger logger,  ProcessFactoryStore processFactoryStore)
+        public YamlRunner(ISettings settings, ILogger logger,  StepFactoryStore StepFactoryStore)
         {
-            _processSettings = processSettings;
+            _settings = settings;
             _logger = logger;
-            _processFactoryStore = processFactoryStore;
+            _StepFactoryStore = StepFactoryStore;
         }
 
-        private readonly IProcessSettings _processSettings;
+        private readonly ISettings _settings;
         private readonly ILogger _logger;
-        private readonly ProcessFactoryStore _processFactoryStore;
+        private readonly StepFactoryStore _StepFactoryStore;
 
         /// <summary>
-        /// Run process defined in a yaml string.
+        /// Run step defined in a yaml string.
         /// </summary>
-        /// <param name="yamlString">Yaml representing the process.</param>
+        /// <param name="yamlString">Yaml representing the step.</param>
         /// <returns></returns>
         [UsedImplicitly]
         public Result RunProcessFromYamlString(string yamlString)
         {
-            var result = YamlMethods.DeserializeFromYaml(yamlString, _processFactoryStore)
+            var result = YamlMethods.DeserializeFromYaml(yamlString, _StepFactoryStore)
                     .Bind(x=>x.TryFreeze())
-                    .BindCast<IRunnableProcess, IRunnableProcess<Unit>>()
-                    .Bind(x=> x.Run(new ProcessState(_logger, _processSettings, ExternalProcessRunner.Instance))
+                    .BindCast<IStep, IStep<Unit>>()
+                    .Bind(x=> x.Run(new StateMonad(_logger, _settings, ExternalProcessRunner.Instance))
                         .MapFailure(y=>y.AsString));
 
             return result;
@@ -47,7 +47,7 @@ namespace Reductech.EDR.Processes.Serialization
         }
 
         /// <summary>
-        /// Run process defined in a yaml file.
+        /// Run step defined in a yaml file.
         /// </summary>
         /// <param name="yamlPath">Path to the yaml file.</param>
         /// <returns></returns>

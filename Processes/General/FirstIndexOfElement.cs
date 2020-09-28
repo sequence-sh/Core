@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Processes.Attributes;
@@ -12,58 +11,28 @@ namespace Reductech.EDR.Processes.General
     /// Gets the first index of an element in an array.
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public sealed class FirstIndexOfElement<T> : CompoundRunnableProcess<int>
+    public sealed class FirstIndexOfElement<T> : CompoundStep<int>
     {
         /// <summary>
         /// The array to check.
         /// </summary>
-        [RunnableProcessProperty]
+        [StepProperty]
         [Required]
-        public IRunnableProcess<List<T>> Array { get; set; } = null!;
+        public IStep<List<T>> Array { get; set; } = null!;
 
         /// <summary>
         /// The element to look for.
         /// </summary>
-        [RunnableProcessProperty]
+        [StepProperty]
         [Required]
-        public IRunnableProcess<T> Element { get; set; } = null!;
+        public IStep<T> Element { get; set; } = null!;
 
         /// <inheritdoc />
-        public override Result<int, IRunErrors> Run(ProcessState processState) =>
-            Array.Run(processState).Compose(() => Element.Run(processState))
+        public override Result<int, IRunErrors> Run(StateMonad stateMonad) =>
+            Array.Run(stateMonad).Compose(() => Element.Run(stateMonad))
                 .Map(x => x.Item1.IndexOf(x.Item2));
 
         /// <inheritdoc />
-        public override IRunnableProcessFactory RunnableProcessFactory => FirstIndexOfElementProcessFactory.Instance;
-    }
-
-    /// <summary>
-    /// Gets the first index of an element in an array.
-    /// </summary>
-    public sealed class FirstIndexOfElementProcessFactory : GenericProcessFactory
-    {
-        private FirstIndexOfElementProcessFactory() { }
-
-        /// <summary>
-        /// The instance.
-        /// </summary>
-        public static GenericProcessFactory Instance { get; } = new FirstIndexOfElementProcessFactory();
-
-        /// <inheritdoc />
-        public override Type ProcessType => typeof(FirstIndexOfElement<>);
-
-        /// <inheritdoc />
-        public override string OutputTypeExplanation => nameof(Int32);
-
-        /// <inheritdoc />
-        protected override ITypeReference GetOutputTypeReference(ITypeReference memberTypeReference) => new ActualTypeReference(typeof(int));
-
-        /// <inheritdoc />
-        protected override Result<ITypeReference> GetMemberType(FreezableProcessData freezableProcessData) =>
-            freezableProcessData.GetArgument(nameof(FirstIndexOfElement<object>.Array))
-                .Bind(x => x.TryGetOutputTypeReference())
-                .BindCast<ITypeReference, GenericTypeReference>()
-                .Map(x => x.ChildTypes)
-                .BindSingle();
+        public override IStepFactory StepFactory => FirstIndexOfElementStepFactory.Instance;
     }
 }

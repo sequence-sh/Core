@@ -9,15 +9,15 @@ namespace Reductech.EDR.Processes.General
     /// <summary>
     /// Do an action for each value of a given variable in a range.
     /// </summary>
-    public sealed class For : CompoundRunnableProcess<Unit>
+    public sealed class For : CompoundStep<Unit>
     {
 
         /// <summary>
         /// The action to perform repeatedly.
         /// </summary>
-        [RunnableProcessProperty]
+        [StepProperty]
         [Required]
-        public IRunnableProcess<Unit> Action { get; set; } = null!;
+        public IStep<Unit> Action { get; set; } = null!;
 
 
         /// <summary>
@@ -30,54 +30,54 @@ namespace Reductech.EDR.Processes.General
         /// <summary>
         /// The first value of the variable to use.
         /// </summary>
-        [RunnableProcessProperty]
+        [StepProperty]
         [Required]
-        public IRunnableProcess<int> From { get; set; } = null!;
+        public IStep<int> From { get; set; } = null!;
 
         /// <summary>
         /// The highest value of the variable to use
         /// </summary>
-        [RunnableProcessProperty]
+        [StepProperty]
         [Required]
-        public IRunnableProcess<int> To { get; set; } = null!;
+        public IStep<int> To { get; set; } = null!;
 
 
         /// <summary>
         /// The amount to increment by each iteration.
         /// </summary>
-        [RunnableProcessProperty]
+        [StepProperty]
         [Required]
-        public IRunnableProcess<int> Increment { get; set; } = null!;
+        public IStep<int> Increment { get; set; } = null!;
 
         /// <inheritdoc />
-        public override Result<Unit, IRunErrors> Run(ProcessState processState)
+        public override Result<Unit, IRunErrors> Run(StateMonad stateMonad)
         {
-            var from = From.Run(processState);
+            var from = From.Run(stateMonad);
             if (from.IsFailure) return from.ConvertFailure<Unit>();
 
-            var to = To.Run(processState);
+            var to = To.Run(stateMonad);
             if (to.IsFailure) return from.ConvertFailure<Unit>();
 
-            var increment = Increment.Run(processState);
+            var increment = Increment.Run(stateMonad);
             if (increment.IsFailure) return from.ConvertFailure<Unit>();
 
             var currentValue = from.Value;
 
-            var setResult = processState.SetVariable(VariableName, currentValue);
+            var setResult = stateMonad.SetVariable(VariableName, currentValue);
             if (setResult.IsFailure) return setResult.ConvertFailure<Unit>();
 
             while (currentValue <= to.Value)
             {
-                var r = Action.Run(processState);
+                var r = Action.Run(stateMonad);
                 if (r.IsFailure) return r;
 
 
-                var currentValueResult = processState.GetVariable<int>(VariableName, Name);
+                var currentValueResult = stateMonad.GetVariable<int>(VariableName, Name);
                 if (currentValueResult.IsFailure) return currentValueResult.ConvertFailure<Unit>();
                 currentValue = currentValueResult.Value;
                 currentValue += increment.Value;
 
-                var setResult2 = processState.SetVariable(VariableName, currentValue);
+                var setResult2 = stateMonad.SetVariable(VariableName, currentValue);
                 if (setResult2.IsFailure) return setResult.ConvertFailure<Unit>();
             }
 
@@ -86,27 +86,6 @@ namespace Reductech.EDR.Processes.General
         }
 
         /// <inheritdoc />
-        public override IRunnableProcessFactory RunnableProcessFactory => ForProcessFactory.Instance;
-    }
-
-    /// <summary>
-    /// Do an action for each value of a given variable in a range.
-    /// </summary>
-    public class ForProcessFactory : SimpleRunnableProcessFactory<For, Unit>
-    {
-        private ForProcessFactory() { }
-
-
-        /// <summary>
-        /// The instance.
-        /// </summary>
-        public static SimpleRunnableProcessFactory<For, Unit> Instance { get; } = new ForProcessFactory();
-
-        /// <inheritdoc />
-        public override IProcessNameBuilder ProcessNameBuilder => new ProcessNameBuilderFromTemplate($"For [{nameof(For.VariableName)}] = [{nameof(For.From)}]; [{nameof(For.VariableName)}] <= [{nameof(For.To)}]; += [{nameof(For.Increment)}]; [{nameof(For.Action)}]");
-
-
-        /// <inheritdoc />
-        public override Result<Maybe<ITypeReference>> GetTypeReferencesSet(VariableName variableName, FreezableProcessData freezableProcessData) => Maybe<ITypeReference>.From(new ActualTypeReference(typeof(int)));
+        public override IStepFactory StepFactory => ForStepFactory.Instance;
     }
 }

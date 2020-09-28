@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Processes.Attributes;
 using Reductech.EDR.Processes.Internal;
-using Reductech.EDR.Processes.Serialization;
 
 namespace Reductech.EDR.Processes.General
 {
@@ -12,37 +10,37 @@ namespace Reductech.EDR.Processes.General
     /// <summary>
     /// Returns true if both operands are true
     /// </summary>
-    public sealed class ApplyBooleanOperator : CompoundRunnableProcess<bool>
+    public sealed class ApplyBooleanOperator : CompoundStep<bool>
     {
         /// <summary>
         /// The left operand. Will always be evaluated.
         /// </summary>
-        [RunnableProcessProperty]
+        [StepProperty]
         [Required]
-        public IRunnableProcess<bool> Left { get; set; } = null!;
+        public IStep<bool> Left { get; set; } = null!;
 
 
         /// <summary>
         /// The operator to apply.
         /// </summary>
-        [RunnableProcessProperty]
+        [StepProperty]
         [Required]
-        public IRunnableProcess<BooleanOperator> Operator { get; set; } = null!;
+        public IStep<BooleanOperator> Operator { get; set; } = null!;
 
 
         /// <summary>
         /// The right operand. Will not be evaluated unless necessary.
         /// </summary>
-        [RunnableProcessProperty]
+        [StepProperty]
         [Required]
-        public IRunnableProcess<bool> Right { get; set; } = null!;
+        public IStep<bool> Right { get; set; } = null!;
 
         /// <inheritdoc />
-        public override Result<bool, IRunErrors> Run(ProcessState processState)
+        public override Result<bool, IRunErrors> Run(StateMonad stateMonad)
         {
-            var l = Left.Run(processState);
+            var l = Left.Run(stateMonad);
             if (l.IsFailure) return l;
-            var op = Operator.Run(processState);
+            var op = Operator.Run(stateMonad);
             if (op.IsFailure) return op.ConvertFailure<bool>();
 
             switch (op.Value)
@@ -52,7 +50,7 @@ namespace Reductech.EDR.Processes.General
                     if (l.Value == false)
                         return false;
 
-                    var r = Right.Run(processState);
+                    var r = Right.Run(stateMonad);
                     return r;
                 }
                 case BooleanOperator.Or:
@@ -60,7 +58,7 @@ namespace Reductech.EDR.Processes.General
                     if (l.Value)
                         return true;
 
-                    var r = Right.Run(processState);
+                    var r = Right.Run(stateMonad);
                     return r;
                 }
                 default:
@@ -69,57 +67,6 @@ namespace Reductech.EDR.Processes.General
         }
 
         /// <inheritdoc />
-        public override IRunnableProcessFactory RunnableProcessFactory => ApplyBooleanProcessFactory.Instance;
+        public override IStepFactory StepFactory => ApplyBooleanStepFactory.Instance;
     }
-
-    /// <summary>
-    /// Returns true if both operands are true
-    /// </summary>
-    public sealed class ApplyBooleanProcessFactory : SimpleRunnableProcessFactory<ApplyBooleanOperator, bool>
-    {
-        private ApplyBooleanProcessFactory() { }
-
-        /// <summary>
-        /// The instance.
-        /// </summary>
-        public static RunnableProcessFactory Instance { get; } = new ApplyBooleanProcessFactory();
-
-        /// <inheritdoc />
-        public override IProcessNameBuilder ProcessNameBuilder => new ProcessNameBuilderFromTemplate($"[{nameof(ApplyBooleanOperator.Left)}] [{nameof(ApplyBooleanOperator.Operator)}] [{nameof(ApplyBooleanOperator.Right)}]");
-
-        /// <inheritdoc />
-        public override IEnumerable<Type> EnumTypes => new[] {typeof(BooleanOperator)};
-
-        /// <inheritdoc />
-        public override IProcessSerializer Serializer { get; } = new ProcessSerializer(
-                new BooleanComponent(nameof(ApplyBooleanOperator.Left)),
-                new SpaceComponent(),
-                new EnumDisplayComponent<BooleanOperator>(nameof(ApplyBooleanOperator.Operator)),
-                new SpaceComponent(),
-                new BooleanComponent(nameof(ApplyBooleanOperator.Right))
-                );
-    }
-
-    /// <summary>
-    /// A boolean operator.
-    /// </summary>
-    public enum BooleanOperator
-    {
-        /// <summary>
-        /// Sentinel value.
-        /// </summary>
-        None,
-
-        /// <summary>
-        /// Returns true if both left and right are true.
-        /// </summary>
-        [Display(Name = "&&")]
-        And,
-        /// <summary>
-        /// Returns true if either left or right is true.
-        /// </summary>
-        [Display(Name = "||")]
-        Or
-    }
-
 }

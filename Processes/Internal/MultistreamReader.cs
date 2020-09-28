@@ -1,47 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace Reductech.EDR.Processes.Internal
 {
-
-    /// <summary>
-    /// Anything that implements ReadLineAsync
-    /// </summary>
-    internal interface IStreamReader<T> where T : struct
-    {
-        /// <summary>
-        /// Reads a line of characters asynchronously and returns the data as a string and the source.
-        /// </summary>
-        /// <returns></returns>
-        Task<T?> ReadLineAsync();
-    }
-
-    internal class StreamReaderWithSource<TEnum> : IStreamReader<(string line, TEnum source)>
-        where TEnum : Enum
-    {
-        private readonly StreamReader _underlying;
-        private readonly TEnum _source;
-
-        public StreamReaderWithSource(StreamReader underlying, TEnum source)
-        {
-            _underlying = underlying;
-            _source = source;
-        }
-
-        public async Task<(string line, TEnum source)?> ReadLineAsync()
-        {
-            var line = await _underlying.ReadLineAsync();
-
-            if (line == null)
-                return null;
-
-            return (line, _source);
-        }
-    }
-
     /// <summary>
     /// Reads lines from several StreamReaders in the order that they arrive
     /// </summary>

@@ -1,97 +1,10 @@
 ﻿
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Reductech.EDR.Processes.Internal
 {
     /// <summary>
-    /// Easy access to common errors.
-    /// </summary>
-    public static class ErrorHelper
-    {
-        /// <summary>
-        /// The error that should be returned when a parameter is missing.
-        /// </summary>
-        public static IRunErrors MissingParameterError(string parameterName, string processName)
-            => new RunError($"Missing Parameter '{parameterName}'", processName, null , ErrorCode.MissingParameter);
-    }
-
-
-
-    /// <summary>
-    /// The base of run errors.
-    /// </summary>
-    public interface IRunErrorBase
-    {
-        /// <summary>
-        /// The error as a string.
-        /// </summary>
-        string AsString { get; }
-    }
-
-    /// <summary>
-    /// One or more errors thrown by a running process.
-    /// </summary>
-    public interface IRunErrors : IRunErrorBase
-    {
-        /// <summary>
-        /// The errors.
-        /// </summary>
-        IEnumerable<IRunError> AllErrors { get; }
-    }
-
-    /// <summary>
-    /// An error thrown by a running process.
-    /// </summary>
-    public interface IRunError : IRunErrorBase
-    {
-        /// <summary>
-        /// Error Message Text.
-        /// </summary>
-        public string Message { get; }
-
-        /// <summary>
-        /// The name of the process that threw this error.
-        /// </summary>
-        public string ProcessName { get; }
-
-        /// <summary>
-        /// The error that caused this error.
-        /// </summary>
-        public RunError? InnerError { get; }
-
-        /// <summary>
-        /// The error code.
-        /// </summary>
-        public ErrorCode ErrorCode { get; }
-    }
-
-    /// <summary>
-    /// A list of errors thrown by a running process.
-    /// </summary>
-    public class RunErrorList : IRunErrors
-    {
-        /// <summary>
-        /// Create a new RunErrorList
-        /// </summary>
-        /// <param name="allErrors"></param>
-        public RunErrorList(IReadOnlyCollection<IRunError> allErrors) => AllErrors = allErrors;
-
-        /// <inheritdoc />
-        public IEnumerable<IRunError> AllErrors { get; }
-
-        /// <inheritdoc />
-        public string AsString =>
-            string.Join("; ", AllErrors.Select(x => x.AsString));
-
-        /// <summary>
-        /// Combine multiple run errors.
-        /// </summary>
-        public static RunErrorList Combine(IEnumerable<IRunErrors> source) => new RunErrorList(source.SelectMany(x=>x.AllErrors).ToList());
-    }
-
-    /// <summary>
-    /// An error thrown by a running process.
+    /// An error thrown by a running step.
     /// </summary>
     public class RunError : IRunErrors, IRunError
     {
@@ -112,7 +25,7 @@ namespace Reductech.EDR.Processes.Internal
         public string Message { get; }
 
         /// <summary>
-        /// The name of the process that threw this error.
+        /// The name of the step that threw this error.
         /// </summary>
         public string ProcessName { get; }
 
@@ -131,77 +44,5 @@ namespace Reductech.EDR.Processes.Internal
 
         /// <inheritdoc />
         public string AsString => Message;
-    }
-
-    /// <summary>
-    /// Identifying code for an error message.
-    /// </summary>
-    public enum ErrorCode
-    {
-        /// <summary>
-        /// Variable does not exist.
-        /// </summary>
-        MissingVariable,
-
-        /// <summary>
-        /// Variable has the wrong type.
-        /// </summary>
-        WrongVariableType,
-
-        /// <summary>
-        /// Index was out of the range of an array or string.
-        /// </summary>
-        IndexOutOfBounds,
-
-        /// <summary>
-        /// An error in an external process.
-        /// </summary>
-        ExternalProcessError,
-
-        /// <summary>
-        /// The external process did not return an output of the expected form.
-        /// </summary>
-        ExternalProcessMissingOutput,
-
-        /// <summary>
-        /// The external process was not found.
-        /// </summary>
-        ExternalProcessNotFound,
-
-        /// <summary>
-        /// The requirements for a process were not met.
-        /// </summary>
-        RequirementsNotMet,
-
-        /// <summary>
-        /// Cast failed.
-        /// </summary>
-        InvalidCast,
-
-        /// <summary>
-        /// Process settings are missing
-        /// </summary>
-        MissingProcessSettings,
-
-        /// <summary>
-        /// A required parameter was not set.
-        /// </summary>
-        MissingParameter,
-
-        /// <summary>
-        /// Parameters conflict.
-        /// </summary>
-        ConflictingParameters,
-
-        /// <summary>
-        /// An assertion failed
-        /// </summary>
-        AssertionFailed,
-
-        /// <summary>
-        /// An error reading a CSV file
-        /// </summary>
-        CSVError
-
     }
 }

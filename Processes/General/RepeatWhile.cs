@@ -10,19 +10,19 @@ namespace Reductech.EDR.Processes.General
     /// <summary>
     /// Repeat an action while the condition is met.
     /// </summary>
-    public sealed class RepeatWhile : CompoundRunnableProcess<Unit>
+    public sealed class RepeatWhile : CompoundStep<Unit>
     {
         /// <inheritdoc />
-        public override Result<Unit, IRunErrors> Run(ProcessState processState)
+        public override Result<Unit, IRunErrors> Run(StateMonad stateMonad)
         {
             while (true)
             {
-                var conditionResult = Condition.Run(processState);
+                var conditionResult = Condition.Run(stateMonad);
                 if (conditionResult.IsFailure) return conditionResult.ConvertFailure<Unit>();
 
                 if (conditionResult.Value)
                 {
-                    var actionResult = Action.Run(processState);
+                    var actionResult = Action.Run(stateMonad);
                     if (actionResult.IsFailure) return actionResult.ConvertFailure<Unit>();
                 }
                 else break;
@@ -34,37 +34,21 @@ namespace Reductech.EDR.Processes.General
         /// <summary>
         /// The condition to check before performing the action.
         /// </summary>
-        [RunnableProcessProperty]
+        [StepProperty]
         [Required]
-        public IRunnableProcess<bool> Condition { get; set; } = null!;
+        public IStep<bool> Condition { get; set; } = null!;
 
         /// <summary>
         /// The action to perform repeatedly.
         /// </summary>
-        [RunnableProcessProperty]
+        [StepProperty]
         [Required]
-        public IRunnableProcess<Unit> Action { get; set; } = null!;
+        public IStep<Unit> Action { get; set; } = null!;
 
 
 
 
         /// <inheritdoc />
-        public override IRunnableProcessFactory RunnableProcessFactory => RepeatWhileProcessFactory.Instance;
-    }
-
-    /// <summary>
-    /// Repeat an action while the condition is met.
-    /// </summary>
-    public sealed class RepeatWhileProcessFactory : SimpleRunnableProcessFactory<RepeatWhile, Unit>
-    {
-        private RepeatWhileProcessFactory() { }
-
-        /// <summary>
-        /// The instance.
-        /// </summary>
-        public static SimpleRunnableProcessFactory<RepeatWhile, Unit> Instance { get; } = new RepeatWhileProcessFactory();
-
-        /// <inheritdoc />
-        public override IProcessNameBuilder ProcessNameBuilder => new ProcessNameBuilderFromTemplate($"Repeat '[{nameof(RepeatWhile.Action)}]' while '[{nameof(RepeatWhile.Condition)}]'");
+        public override IStepFactory StepFactory => RepeatWhileStepFactory.Instance;
     }
 }
