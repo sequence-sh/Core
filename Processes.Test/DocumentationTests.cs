@@ -31,6 +31,9 @@ namespace Reductech.EDR.Processes.Test
             {
                 yield return new DocumentationTestCase(
                     new List<IRunnableProcessFactory> {NotProcessFactory.Instance},
+                    "# Contents",
+                    "|<a name=\"Not\">Not</a>|Negation of a boolean value.|",
+                    "|:-------------------:|:--------------------------:|",
                     "# Processes",
                     "<a name=\"Not\"></a>",
                     "## Not",

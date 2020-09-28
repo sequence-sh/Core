@@ -31,7 +31,22 @@ namespace Reductech.EDR.Processes.Internal.Documentation
 
             var enumTypes = new HashSet<Type>();
 
-            var categories = entities.GroupBy(x => x.DocumentationCategory);
+            var categories = entities.GroupBy(x => x.DocumentationCategory).ToList();
+
+            lines.Add($"# Contents");
+
+            var contentsRows = categories.SelectMany(x => x)
+                .Select(x => new[]
+                {
+                    $"<a name=\"{x.Name}\">{x.Name}</a>",
+                    x.Summary
+                }).ToList();
+
+            var contentsTableLines = Prettifier.CreateMarkdownTable(contentsRows);
+
+            lines.AddRange(contentsTableLines);
+
+
 
             foreach (var category in categories)
             {
