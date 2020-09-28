@@ -82,7 +82,7 @@ namespace Reductech.EDR.Processes.Serialization
             .Match(GetSpan(CompareOperator.None), ProcessToken.Comparator, true)
 
 
-            .Match(Character.EqualTo('='), ProcessToken.Assignment, true)
+            .Match(Character.EqualTo('='), ProcessToken.Assignment, false)
             .Match(QuotedString.SqlStyle, ProcessToken.StringLiteral)
             .Match(QuotedString.CStyle, ProcessToken.StringLiteral)
 

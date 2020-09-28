@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using FluentAssertions;
 using Reductech.EDR.Processes.General;
 using Reductech.EDR.Processes.Internal;
@@ -34,8 +35,8 @@ namespace Reductech.EDR.Processes.Test
                         Steps = new List<IRunnableProcess<Unit>>
                         {
                             new SetVariable<string>{Value = new Constant<string>("Hello World"), VariableName = new VariableName("Foo")},
-                            new SetVariable<string>{Value = new GetVariable<string>(){VariableName = new VariableName("Foo")}, VariableName = new VariableName("Bar")},
-                            new Print<string>{Value = new GetVariable<string>(){VariableName = new VariableName("Bar")}}
+                            new SetVariable<string>{Value = new GetVariable<string> {VariableName = new VariableName("Foo")}, VariableName = new VariableName("Bar")},
+                            new Print<string>{Value = new GetVariable<string> {VariableName = new VariableName("Bar")}}
                         }
                     },
                     @"- <Foo> = 'Hello World'
@@ -105,9 +106,9 @@ namespace Reductech.EDR.Processes.Test
                     new Print<string>
                     {
                         Value = new Constant<string>("I have config"),
-                        ProcessConfiguration = new ProcessConfiguration()
+                        ProcessConfiguration = new ProcessConfiguration
                         {
-                            TargetMachineTags = new List<string>(){"Tag1"},
+                            TargetMachineTags = new List<string> {"Tag1"},
                             DoNotSplit = false,
                             Priority = 1
                         }
@@ -120,6 +121,50 @@ Config:
   Priority: 1
 Value: I have config");
 
+                yield return new SerializationTestCase(
+                    new Print<string>
+                    {
+                        Value = new Constant<string>("I have config too"),
+                        ProcessConfiguration = new ProcessConfiguration
+                        {
+                            TargetMachineTags = new List<string> { "Tag1" },
+                            DoNotSplit = false,
+                            Priority = 1,
+                            AdditionalRequirements = new List<Requirement>
+                            {
+                                new Requirement
+                                {
+                                    Name = "Test",
+                                    MaxVersion = new Version(1,2,3,4),
+                                    MinVersion = new Version(5,6,7,8),
+                                    Notes = "ABC123"
+                                }
+                            }
+                        }
+                    }, @"Do: Print
+Config:
+  AdditionalRequirements:
+  - Notes: ABC123
+    Name: Test
+    MinVersion:
+      Major: 5
+      Minor: 6
+      Build: 7
+      Revision: 8
+      MajorRevision: 0
+      MinorRevision: 8
+    MaxVersion:
+      Major: 1
+      Minor: 2
+      Build: 3
+      Revision: 4
+      MajorRevision: 0
+      MinorRevision: 4
+  TargetMachineTags:
+  - Tag1
+  DoNotSplit: false
+  Priority: 1
+Value: I have config too");
             }
         }
 
