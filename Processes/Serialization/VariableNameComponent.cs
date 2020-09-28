@@ -11,13 +11,11 @@ namespace Reductech.EDR.Processes.Serialization
         /// <summary>
         /// Create a new Space Component.
         /// </summary>
-        /// <param name="required"></param>
-        public SpaceComponent(bool required) => Required = required;
+        public SpaceComponent()
+        {
 
-        /// <summary>
-        /// Whether this space is required.
-        /// </summary>
-        public bool Required { get; }
+        }
+
 
         /// <inheritdoc />
         public ISerializerBlock? SerializerBlock => this;

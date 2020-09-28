@@ -93,9 +93,9 @@ namespace Reductech.EDR.Processes.General
         /// <inheritdoc />
         public override IProcessSerializer Serializer { get; } = new ProcessSerializer(
                 new BooleanComponent(nameof(ApplyBooleanOperator.Left)),
-                new SpaceComponent(false),
+                new SpaceComponent(),
                 new EnumDisplayComponent<BooleanOperator>(nameof(ApplyBooleanOperator.Operator)),
-                new SpaceComponent(false),
+                new SpaceComponent(),
                 new BooleanComponent(nameof(ApplyBooleanOperator.Right))
                 );
     }

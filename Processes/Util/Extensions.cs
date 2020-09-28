@@ -68,18 +68,17 @@ namespace Reductech.EDR.Processes.Util
         public static Maybe<T> TryParseValue<T>(string s) where T : Enum
         {
             if (Enum.TryParse(typeof(T), s, true, out var r) && r is T t)
-            {
                 return CSharpFunctionalExtensions.Maybe<T>.From(t);
-            }
 
             foreach (var value in Enum.GetValues(typeof(T)).Cast<T>())
             {
+                if(value.ToString().Equals(s, StringComparison.OrdinalIgnoreCase))
+                    return CSharpFunctionalExtensions.Maybe<T>.From(value);
+
                 var displayName = value.GetDisplayName();
 
                 if(displayName.Equals(s, StringComparison.OrdinalIgnoreCase))
-                {
                     return CSharpFunctionalExtensions.Maybe<T>.From(value);
-                }
             }
 
             return CSharpFunctionalExtensions.Maybe<T>.None;

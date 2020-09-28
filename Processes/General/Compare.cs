@@ -137,9 +137,9 @@ namespace Reductech.EDR.Processes.General
         /// <inheritdoc />
         public override IProcessSerializer Serializer { get; } = new ProcessSerializer(
             new IntegerComponent(nameof(Compare<int>.Left)),
-            new SpaceComponent(false),
+            new SpaceComponent(),
             new EnumDisplayComponent<CompareOperator>(nameof(Compare<int>.Operator)),
-            new SpaceComponent(false),
+            new SpaceComponent(),
             new IntegerComponent(nameof(Compare<int>.Right))
         );
     }
