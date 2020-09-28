@@ -29,46 +29,43 @@ namespace Reductech.EDR.Processes.Test
         {
             get
             {
-                yield return new DocumentationTestCase(@"# Processes
-<a name=""Not""></a>
-## Not
-
-**Boolean**
-
-Negation of a boolean value.
-
-|Parameter|Type  |Required|Summary             |
-|:-------:|:----:|:------:|:------------------:|
-|Boolean  |`bool`|☑️      |The value to negate.|", NotProcessFactory.Instance);
+                yield return new DocumentationTestCase(
+                    new List<IRunnableProcessFactory> {NotProcessFactory.Instance},
+                    "# Processes",
+                    "<a name=\"Not\"></a>",
+                    "## Not",
+                    "**Boolean**",
+                    "Negation of a boolean value.",
+                    "|Parameter|Type  |Required|Summary             |",
+                    "|:-------:|:----:|:------:|:------------------:|",
+                    "|Boolean  |`bool`|☑️      |The value to negate.|");
             }
         }
-
-
-
         private class DocumentationTestCase : ITestCase
         {
             /// <summary>
             /// Create a new DocumentationTestCase
             /// </summary>
-            public DocumentationTestCase(string text,
-                params IRunnableProcessFactory[] entities)
+            public DocumentationTestCase(
+                IReadOnlyCollection<IRunnableProcessFactory> factories,
+                params string[] expectedLines)
             {
-                Text = text;
-                Entities = entities;
-                Name = string.Join(" ", Entities.Select(x => x.TypeName).OrderBy(x=>x));
+                ExpectedLines = expectedLines;
+                Factories = factories;
+                Name = string.Join(" ", Factories.Select(x => x.TypeName).OrderBy(x=>x));
             }
 
             /// <inheritdoc />
             public string Name { get; }
 
-            public string Text { get; }
+            public IReadOnlyCollection<string> ExpectedLines { get; }
 
-            public IReadOnlyCollection<IRunnableProcessFactory> Entities { get; }
+            public IReadOnlyCollection<IRunnableProcessFactory> Factories { get; }
 
             /// <inheritdoc />
             public void Execute(ITestOutputHelper testOutputHelper)
             {
-                var documented = Entities.Select(x => new ProcessWrapper(x, new DocumentationCategory("Processes")));
+                var documented = Factories.Select(x => new ProcessWrapper(x, new DocumentationCategory("Processes")));
 
                 var lines = DocumentationCreator.CreateDocumentationLines(documented);
 
@@ -77,10 +74,7 @@ Negation of a boolean value.
                     testOutputHelper.WriteLine(line);
                 }
 
-                var textLines = string.Join("\r\n", lines);
-
-                textLines.Trim().Should().Be(Text.Trim());
-
+                lines.Where(x=>!string.IsNullOrWhiteSpace(x)).Should().BeEquivalentTo(ExpectedLines);
             }
         }
     }
