@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using Reductech.EDR.Processes.Internal.Documentation.Reductech.Utilities.InstantConsole;
 
 namespace Reductech.EDR.Processes.Internal.Documentation
 {

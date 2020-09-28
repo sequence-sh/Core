@@ -5,7 +5,6 @@ using System.Linq;
 using System.Reflection;
 using Namotion.Reflection;
 using Reductech.EDR.Processes.Attributes;
-using Reductech.EDR.Processes.Internal.Documentation.Reductech.Utilities.InstantConsole;
 namespace Reductech.EDR.Processes.Internal.Documentation
 {
     /// <summary>
