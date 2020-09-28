@@ -42,7 +42,7 @@ namespace Reductech.EDR.Processes.Test
 
                 yield return new DeserializationTestCase(@"Print(Value = 2 ^ 3)", 8);
 
-                yield return new DeserializationTestCase(@"Print(Value = not True)", false);
+                yield return new DeserializationTestCase(@"Print(Value = not (True))", false);
 
 
                 yield return new DeserializationTestCase(@"Print(Value = 2 >= 3)", false);
@@ -52,7 +52,7 @@ namespace Reductech.EDR.Processes.Test
 
                 yield return new DeserializationTestCase(@"Print(Value = StringIsEmpty(String = 'Hello') && StringIsEmpty(String = 'World'))", false);
 
-                yield return new DeserializationTestCase(@"Print(Value = not True && not False)", false);
+                yield return new DeserializationTestCase(@"Print(Value = not (True) && not(False))", false);
 
                 yield return new DeserializationTestCase(@"Print(Value = true && false)", false);
 

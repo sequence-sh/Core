@@ -34,7 +34,7 @@ namespace Reductech.EDR.Processes.Test
                 yield return new ProcessMemberTestCase("Foo", null);
                 yield return new ProcessMemberTestCase("true true", null);
 
-                yield return new ProcessMemberTestCase("not true",
+                yield return new ProcessMemberTestCase("not (true)",
                     new ProcessMember(
                         new CompoundFreezableProcess(NotProcessFactory.Instance,
                             new FreezableProcessData(new Dictionary<string, ProcessMember>()

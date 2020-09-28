@@ -89,9 +89,9 @@ namespace Reductech.EDR.Processes.General
         /// <inheritdoc />
         public override IProcessSerializer Serializer { get; } = new ProcessSerializer(
             new VariableNameComponent(nameof(SetVariable<object>.VariableName)),
-            new SpaceComponent(false),
+            new SpaceComponent(),
             new FixedStringComponent("="),
-            new SpaceComponent(false),
+            new SpaceComponent(),
             new AnyPrimitiveComponent(nameof(SetVariable<object>.Value))
         );
 

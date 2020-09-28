@@ -177,7 +177,9 @@ namespace Reductech.EDR.Processes.Serialization
             TokenListParser<ProcessToken, IFreezableProcess> notOperation =
 
                 (from o in Token.EqualTo(ProcessToken.NotOperator)
+                    from _1 in Token.EqualTo(ProcessToken.OpenBracket)
                     from f1 in Parse.Ref(()=> stp.Value)
+                    from _2 in Token.EqualTo(ProcessToken.CloseBracket)
                     select new CompoundFreezableProcess(NotProcessFactory.Instance,
                         new FreezableProcessData(new Dictionary<string, ProcessMember>
                         {
@@ -251,6 +253,7 @@ namespace Reductech.EDR.Processes.Serialization
 
             stp = new Lazy<TokenListParser<ProcessToken, IFreezableProcess>>(()=>
                 singleTermParser
+                    .Or(notOperation)
                 .Or(Parse.Ref(()=>function.Value))
                 );
 

@@ -23,7 +23,7 @@ namespace Reductech.EDR.Processes.General
         /// </summary>
         [RunnableProcessProperty]
         [Required]
-        public IRunnableProcess<bool> Boolean { get; set; }
+        public IRunnableProcess<bool> Boolean { get; set; } = null!;
     }
 
     /// <summary>
@@ -44,7 +44,9 @@ namespace Reductech.EDR.Processes.General
         /// <inheritdoc />
         public override IProcessSerializer Serializer { get; } = new ProcessSerializer(
             new FixedStringComponent("not"),
-            new SpaceComponent(true),
-            new BooleanComponent(nameof(Not.Boolean)));
+            new FixedStringComponent("("),
+            new BooleanComponent(nameof(Not.Boolean)),
+            new FixedStringComponent(")")
+            );
     }
 }

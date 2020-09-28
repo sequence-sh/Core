@@ -61,6 +61,21 @@ namespace Reductech.EDR.Processes.Test
                     Value = new ApplyMathOperator
                     {
                         Left = new Constant<int>(2),
+                        Operator = new Constant<MathOperator>(MathOperator.Multiply),
+                        Right = new ApplyMathOperator
+                        {
+                            Left = new Constant<int>(3),
+                            Operator = new Constant<MathOperator>(MathOperator.Add),
+                            Right = new Constant<int>(4)
+                        }
+                    }
+                }, @"Print(Value = 2 * 3 + 4)");
+
+                yield return new SerializationTestCase(new Print<int>
+                {
+                    Value = new ApplyMathOperator
+                    {
+                        Left = new Constant<int>(2),
                         Operator = new Constant<MathOperator>(MathOperator.Power),
                         Right = new Constant<int>(3)
                     }
@@ -72,7 +87,7 @@ namespace Reductech.EDR.Processes.Test
                     {
                         Boolean = new Constant<bool>(true)
                     }
-                }, @"Print(Value = not True)");
+                }, @"Print(Value = not(True))");
 
                 yield return new SerializationTestCase(new Print<bool>
                 {
@@ -113,7 +128,7 @@ namespace Reductech.EDR.Processes.Test
                         Operator = new Constant<BooleanOperator>(BooleanOperator.And),
                         Right = new Not{Boolean = new Constant<bool>(false)}
                     }
-                }, @"Print(Value = not True && not False)");
+                }, @"Print(Value = not(True) && not(False))");
 
                 yield return new SerializationTestCase(new Print<bool>
                 {
