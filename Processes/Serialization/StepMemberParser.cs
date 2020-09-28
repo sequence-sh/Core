@@ -134,7 +134,7 @@ namespace Reductech.EDR.Processes.Serialization
         [SuppressMessage("ReSharper", "AccessToModifiedClosure")]
         public StepMemberParser(StepFactoryStore stepFactoryStore)
         {
-            stepFactoryStore = StepFactoryStore;
+            StepFactoryStore = stepFactoryStore;
 
             Lazy<TokenListParser<ProcessToken, StepMember>> processMember = null!;
             Lazy<TokenListParser<ProcessToken, IFreezableStep>> freezableProcess = null!;
