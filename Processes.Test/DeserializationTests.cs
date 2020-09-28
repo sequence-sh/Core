@@ -49,6 +49,10 @@ namespace Reductech.EDR.Processes.Test
 
                 yield return new DeserializationTestCase(@"Print(Value = True && False)", false.ToString());
 
+                yield return new DeserializationTestCase(@"Print(Value = true && false)", false.ToString());
+
+                yield return new DeserializationTestCase(@"Print(Value = true and false)", false.ToString());
+
                 yield return new DeserializationTestCase("Print(Value = ArrayIsEmpty(Array = Array(Elements = [])))", true.ToString());
 
 

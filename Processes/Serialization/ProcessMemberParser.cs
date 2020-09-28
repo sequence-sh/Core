@@ -77,8 +77,8 @@ namespace Reductech.EDR.Processes.Serialization
             //VariableName must be before comparator
             .Match(Span.Regex("<[a-z0-9-_]+>", RegexOptions.Compiled | RegexOptions.IgnoreCase), ProcessToken.VariableName)
 
-            .Match(GetSpan(MathOperator.None), ProcessToken.MathOperator)
-            .Match(GetSpan(BooleanOperator.None), ProcessToken.BooleanOperator)
+            .Match(GetSpan(MathOperator.None), ProcessToken.MathOperator, true)
+            .Match(GetSpan(BooleanOperator.None), ProcessToken.BooleanOperator, true)
             .Match(GetSpan(CompareOperator.None), ProcessToken.Comparator, true)
 
 
@@ -324,7 +324,6 @@ namespace Reductech.EDR.Processes.Serialization
             from variableName in VariableNameParser
             select GetVariableProcessFactory.CreateFreezable(variableName);
 
-
         private static readonly TokenListParser<ProcessToken, IFreezableProcess> StringConstantParser =
             from token in Token.EqualTo(ProcessToken.StringLiteral)
             select new ConstantFreezableProcess(token.ToStringValue()[1..^1] ) as IFreezableProcess;
@@ -367,7 +366,7 @@ namespace Reductech.EDR.Processes.Serialization
         private static TextParser<TextSpan> GetSpan<T>(params T[] excludedValues) where T : Enum =>
             Extensions.GetEnumValues<T>()
                 .Except(excludedValues)
-                .Select(x => x.GetDisplayName())
+                .SelectMany(x => new []{x.ToString(), x.GetDisplayName()})
                 .OrderByDescending(x=>x.Length)
                 .Select(x=> Span.EqualToIgnoreCase(x).Try())
                 .Aggregate((a, b) => a.Or(b));
