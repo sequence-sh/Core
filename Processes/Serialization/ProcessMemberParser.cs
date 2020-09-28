@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text.RegularExpressions;
 using Reductech.EDR.Processes.General;
 using Reductech.EDR.Processes.Internal;
@@ -147,6 +148,9 @@ namespace Reductech.EDR.Processes.Serialization
                 .Or(StringConstantParser)
                 .Or(GetVariableParser);
 
+
+            Lazy<TokenListParser<ProcessToken, IFreezableProcess>> stp = null!;
+
             TokenListParser<ProcessToken, IFreezableProcess> setVariable =
                 (from vnToken in Token.EqualTo(ProcessToken.VariableName)
                  from _ in Token.EqualTo(ProcessToken.Assignment)
@@ -173,7 +177,7 @@ namespace Reductech.EDR.Processes.Serialization
             TokenListParser<ProcessToken, IFreezableProcess> notOperation =
 
                 (from o in Token.EqualTo(ProcessToken.NotOperator)
-                    from f1 in singleTermParser
+                    from f1 in Parse.Ref(()=> stp.Value)
                     select new CompoundFreezableProcess(NotProcessFactory.Instance,
                         new FreezableProcessData(new Dictionary<string, ProcessMember>
                         {
@@ -182,9 +186,9 @@ namespace Reductech.EDR.Processes.Serialization
 
             TokenListParser<ProcessToken, IFreezableProcess> mathOperation =
 
-                (from f1 in singleTermParser
+                (from f1 in Parse.Ref(()=> stp.Value)
                  from o in Token.EqualTo(ProcessToken.MathOperator)
-                 from f2 in singleTermParser
+                 from f2 in Parse.Ref(()=> stp.Value)
                  select new CompoundFreezableProcess(ApplyMathOperatorProcessFactory.Instance,
                      new FreezableProcessData(new Dictionary<string, ProcessMember>()
                      {
@@ -197,9 +201,9 @@ namespace Reductech.EDR.Processes.Serialization
 
 
             TokenListParser<ProcessToken, IFreezableProcess> booleanOperation =
-                (from f1 in singleTermParser
+                (from f1 in Parse.Ref(()=> stp.Value)
                  from o in Token.EqualTo(ProcessToken.BooleanOperator)
-                 from f2 in singleTermParser
+                 from f2 in Parse.Ref(()=> stp.Value)
                  select new CompoundFreezableProcess(ApplyBooleanProcessFactory.Instance,
                      new FreezableProcessData(new Dictionary<string, ProcessMember>
                      {
@@ -211,9 +215,9 @@ namespace Reductech.EDR.Processes.Serialization
                      }), null) as IFreezableProcess).Try();
 
             TokenListParser<ProcessToken, IFreezableProcess> compareOperation =
-                (from f1 in singleTermParser
+                (from f1 in Parse.Ref(()=> stp.Value)
                  from o in Token.EqualTo(ProcessToken.Comparator)
-                 from f2 in singleTermParser
+                 from f2 in Parse.Ref(()=> stp.Value)
                  select new CompoundFreezableProcess(CompareProcessFactory.Instance,
                      new FreezableProcessData(new Dictionary<string, ProcessMember>()
                      {
@@ -230,27 +234,25 @@ namespace Reductech.EDR.Processes.Serialization
                  from pm in Parse.Ref(() => processMember.Value)
                  select (a.ToStringValue(), pm)).Try();
 
-
-            var functionArguments =
-
-                from c in Parse.Chain(Token.EqualTo(ProcessToken.Delimiter),
-                    functionMember.Select(p => new[] {p}),
-                    (_2, a, b) => a.Concat(b).ToArray())
-                select c;
-
-
             Lazy<TokenListParser<ProcessToken, IFreezableProcess>> function =
                 new Lazy<TokenListParser<ProcessToken, IFreezableProcess>>(()=>
                     (from x in
                     (from fName in Token.EqualTo(ProcessToken.FuncOrArgumentName)
                      from _1 in Token.EqualTo(ProcessToken.OpenBracket)
-                     from args in functionArguments
-                     from _3 in Token.EqualTo(ProcessToken.CloseBracket)
+                     from args in functionMember
+                         .ManyDelimitedBy(Token.EqualTo(ProcessToken.Delimiter),
+                      Token.EqualTo(ProcessToken.CloseBracket))
 
                      select TryCreateProcess(fName.ToStringValue(), processFactoryStore, args))
                      where x.IsSuccess
                      select x.Value).Try()
                     );
+
+
+            stp = new Lazy<TokenListParser<ProcessToken, IFreezableProcess>>(()=>
+                singleTermParser
+                .Or(Parse.Ref(()=>function.Value))
+                );
 
 
             freezableProcess = new Lazy<TokenListParser<ProcessToken, IFreezableProcess>>(()=>

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using FluentAssertions;
 using Reductech.EDR.Processes.Internal;
 using Reductech.EDR.Processes.Serialization;
@@ -33,27 +34,31 @@ namespace Reductech.EDR.Processes.Test
 - <Bar> = <Foo>
 - Print(Value = <Bar>)", "Hello World");
 
-                yield return new DeserializationTestCase(@"Print(Value = 2 * 3)", 6.ToString());
+                yield return new DeserializationTestCase(@"Print(Value = 2 * 3)", 6);
 
-                yield return new DeserializationTestCase(@"print(value = 2 * 3)", 6.ToString());
+                yield return new DeserializationTestCase(@"print(value = 2 * 3)", 6);
 
-                yield return new DeserializationTestCase(@"print(value=2*3)", 6.ToString());
+                yield return new DeserializationTestCase(@"print(value=2*3)", 6);
 
-                yield return new DeserializationTestCase(@"Print(Value = 2 ^ 3)", 8.ToString());
+                yield return new DeserializationTestCase(@"Print(Value = 2 ^ 3)", 8);
 
-                yield return new DeserializationTestCase(@"Print(Value = not True)", false.ToString());
-
-
-                yield return new DeserializationTestCase(@"Print(Value = 2 >= 3)", false.ToString());
+                yield return new DeserializationTestCase(@"Print(Value = not True)", false);
 
 
-                yield return new DeserializationTestCase(@"Print(Value = True && False)", false.ToString());
+                yield return new DeserializationTestCase(@"Print(Value = 2 >= 3)", false);
 
-                yield return new DeserializationTestCase(@"Print(Value = true && false)", false.ToString());
 
-                yield return new DeserializationTestCase(@"Print(Value = true and false)", false.ToString());
+                yield return new DeserializationTestCase(@"Print(Value = True && False)", false);
 
-                yield return new DeserializationTestCase("Print(Value = ArrayIsEmpty(Array = Array(Elements = [])))", true.ToString());
+                yield return new DeserializationTestCase(@"Print(Value = StringIsEmpty(String = 'Hello') && StringIsEmpty(String = 'World'))", false);
+
+                yield return new DeserializationTestCase(@"Print(Value = not True && not False)", false);
+
+                yield return new DeserializationTestCase(@"Print(Value = true && false)", false);
+
+                yield return new DeserializationTestCase(@"Print(Value = true and false)", false);
+
+                yield return new DeserializationTestCase("Print(Value = ArrayIsEmpty(Array = Array(Elements = [])))", true);
 
 
                 yield return new DeserializationTestCase(
@@ -73,10 +78,10 @@ Value: I have config", "I have config"
         private class DeserializationTestCase : ITestCase
         {
 
-            public DeserializationTestCase(string yaml, params string[] expectedLoggedValues)
+            public DeserializationTestCase(string yaml, params object[] expectedLoggedValues)
             {
                 Yaml = yaml;
-                ExpectedLoggedValues = expectedLoggedValues;
+                ExpectedLoggedValues = expectedLoggedValues.Select(x=>x.ToString()!).ToList();
             }
 
             /// <inheritdoc />

@@ -94,6 +94,27 @@ namespace Reductech.EDR.Processes.Test
                     }
                 }, @"Print(Value = True && False)");
 
+
+                yield return new SerializationTestCase(new Print<bool>
+                {
+                    Value = new ApplyBooleanOperator
+                    {
+                        Left = new StringIsEmpty{String = new Constant<string>("Hello") },
+                        Operator = new Constant<BooleanOperator>(BooleanOperator.And),
+                        Right = new StringIsEmpty{String = new Constant<string>("World") }
+                    }
+                }, @"Print(Value = StringIsEmpty(String = 'Hello') && StringIsEmpty(String = 'World'))");
+
+                yield return new SerializationTestCase(new Print<bool>
+                {
+                    Value = new ApplyBooleanOperator
+                    {
+                        Left = new Not{Boolean = new Constant<bool>(true)},
+                        Operator = new Constant<BooleanOperator>(BooleanOperator.And),
+                        Right = new Not{Boolean = new Constant<bool>(false)}
+                    }
+                }, @"Print(Value = not True && not False)");
+
                 yield return new SerializationTestCase(new Print<bool>
                 {
                     Value = new ArrayIsEmpty<string>
