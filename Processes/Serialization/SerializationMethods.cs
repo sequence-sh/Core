@@ -8,9 +8,9 @@ namespace Reductech.EDR.Processes.Serialization
     public static class SerializationMethods
     {
         /// <summary>
-        /// Serialize a constant freezable process.
+        /// Serialize a constant freezable step.
         /// </summary>
-        public static string SerializeConstant(ConstantFreezableProcess cfp, bool quoteString)
+        public static string SerializeConstant(ConstantFreezableStep cfp, bool quoteString)
         {
             if (cfp.Value.GetType().IsEnum)
                 return cfp.Value.GetType().Name + "." + cfp.Value;

@@ -11,26 +11,13 @@ namespace Reductech.EDR.Processes.General
     /// <summary>
     /// Unzip a file in the file system.
     /// </summary>
-    public class UnzipProcessFactory : SimpleRunnableProcessFactory<Unzip, Unit>
-    {
-        private UnzipProcessFactory() { }
-
-        /// <summary>
-        /// The instance.
-        /// </summary>
-        public static SimpleRunnableProcessFactory<Unzip, Unit> Instance { get; } = new UnzipProcessFactory();
-    }
-
-    /// <summary>
-    /// Unzip a file in the file system.
-    /// </summary>
-    public class Unzip : CompoundRunnableProcess<Unit>
+    public class Unzip : CompoundStep<Unit>
     {
         /// <inheritdoc />
-        public override Result<Unit, IRunErrors> Run(ProcessState processState)
+        public override Result<Unit, IRunErrors> Run(StateMonad stateMonad)
         {
-            var data = ArchiveFilePath.Run(processState)
-                .Compose(() => DestinationDirectory.Run(processState), () => OverwriteFiles.Run(processState));
+            var data = ArchiveFilePath.Run(stateMonad)
+                .Compose(() => DestinationDirectory.Run(stateMonad), () => OverwriteFiles.Run(stateMonad));
 
             if (data.IsFailure)
                 return data.ConvertFailure<Unit>();
@@ -59,26 +46,26 @@ namespace Reductech.EDR.Processes.General
         /// <summary>
         /// The path to the archive to unzip.
         /// </summary>
-        [RunnableProcessProperty]
+        [StepProperty]
         [Required]
-        public IRunnableProcess<string> ArchiveFilePath { get; set; } = null!;
+        public IStep<string> ArchiveFilePath { get; set; } = null!;
 
         /// <summary>
         /// The directory to unzip to.
         /// </summary>
-        [RunnableProcessProperty]
+        [StepProperty]
         [Required]
-        public IRunnableProcess<string> DestinationDirectory { get; set; } = null!;
+        public IStep<string> DestinationDirectory { get; set; } = null!;
 
         /// <summary>
         /// Whether to overwrite files when unzipping.
         /// </summary>
-        [RunnableProcessProperty]
+        [StepProperty]
         [Required]
         [DefaultValueExplanation("false")]
-        public IRunnableProcess<bool> OverwriteFiles { get; set; } = new Constant<bool>(false);
+        public IStep<bool> OverwriteFiles { get; set; } = new Constant<bool>(false);
 
         /// <inheritdoc />
-        public override IRunnableProcessFactory RunnableProcessFactory => UnzipProcessFactory.Instance;
+        public override IStepFactory StepFactory => UnzipStepFactory.Instance;
     }
 }

@@ -8,19 +8,19 @@ namespace Reductech.EDR.Processes.General
     /// <summary>
     /// Calculates the length of the string.
     /// </summary>
-    public sealed class LengthOfString : CompoundRunnableProcess<int>
+    public sealed class LengthOfString : CompoundStep<int>
     {
         /// <summary>
         /// The string to measure the length of.
         /// </summary>
-        [RunnableProcessProperty]
+        [StepProperty]
         [Required]
-        public IRunnableProcess<string> String { get; set; } = null!;
+        public IStep<string> String { get; set; } = null!;
 
         /// <inheritdoc />
-        public override Result<int, IRunErrors> Run(ProcessState processState)
+        public override Result<int, IRunErrors> Run(StateMonad stateMonad)
         {
-            var str = String.Run(processState);
+            var str = String.Run(stateMonad);
             if (str.IsFailure) return str.ConvertFailure<int>();
 
             return str.Value.Length;
@@ -28,20 +28,6 @@ namespace Reductech.EDR.Processes.General
         }
 
         /// <inheritdoc />
-        public override IRunnableProcessFactory RunnableProcessFactory => LengthOfStringProcessFactory.Instance;
-    }
-
-    /// <summary>
-    /// Calculates the length of the string.
-    /// </summary>
-    public sealed class LengthOfStringProcessFactory : SimpleRunnableProcessFactory<LengthOfString, int>
-    {
-        private LengthOfStringProcessFactory() { }
-
-        public static SimpleRunnableProcessFactory<LengthOfString, int> Instance { get; } = new LengthOfStringProcessFactory();
-
-        /// <inheritdoc />
-        public override IProcessNameBuilder ProcessNameBuilder => new ProcessNameBuilderFromTemplate($"Length of [{nameof(LengthOfString.String)}]");
-
+        public override IStepFactory StepFactory => LengthOfStringStepFactory.Instance;
     }
 }

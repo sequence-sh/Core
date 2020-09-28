@@ -21,7 +21,7 @@ namespace Reductech.EDR.Processes.Serialization
         public string PropertyName { get; }
 
         /// <inheritdoc />
-        public Result<string> TryGetText(FreezableProcessData data) =>
+        public Result<string> TryGetText(FreezableStepData data) =>
             data.Dictionary
                 .TryFindOrFail(PropertyName, null)
                 .Bind(x => x.Join(VariableNameComponent.Serialize,
@@ -30,14 +30,14 @@ namespace Reductech.EDR.Processes.Serialization
 
                 ));
 
-        private static Result<string> TrySerialize(IFreezableProcess process)
+        private static Result<string> TrySerialize(IFreezableStep step)
         {
-            if (process is ConstantFreezableProcess constantFreezableProcess && constantFreezableProcess.Value is int i)
+            if (step is ConstantFreezableStep constantFreezableProcess && constantFreezableProcess.Value is int i)
                 return i.ToString();
-            if (process is CompoundFreezableProcess compound && compound.ProcessConfiguration == null)
-                return compound.ProcessFactory.Serializer.TrySerialize(compound.FreezableProcessData);
+            if (step is CompoundFreezableStep compound && compound.StepConfiguration == null)
+                return compound.StepFactory.Serializer.TrySerialize(compound.FreezableStepData);
 
-            return Result.Failure<string>("Cannot a process with configuration");
+            return Result.Failure<string>("Cannot a step with configuration");
         }
 
         /// <inheritdoc />

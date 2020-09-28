@@ -1,59 +1,27 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Processes.Attributes;
 using Reductech.EDR.Processes.Internal;
-using Reductech.EDR.Processes.Util;
 
 namespace Reductech.EDR.Processes.General
 {
     /// <summary>
     /// Counts the elements in an array.
     /// </summary>
-    public sealed class ArrayCount<T> : CompoundRunnableProcess<int>
+    public sealed class ArrayCount<T> : CompoundStep<int>
     {
         /// <summary>
         /// The array to count.
         /// </summary>
-        [RunnableProcessProperty]
+        [StepProperty]
         [Required]
-        public IRunnableProcess<List<T>> Array { get; set; } = null!;
+        public IStep<List<T>> Array { get; set; } = null!;
 
         /// <inheritdoc />
-        public override Result<int, IRunErrors> Run(ProcessState processState) => Array.Run(processState).Map(x => x.Count);
+        public override Result<int, IRunErrors> Run(StateMonad stateMonad) => Array.Run(stateMonad).Map(x => x.Count);
 
         /// <inheritdoc />
-        public override IRunnableProcessFactory RunnableProcessFactory => ArrayCountProcessFactory.Instance;
-    }
-
-    /// <summary>
-    /// Counts the elements in an array.
-    /// </summary>
-    public sealed class ArrayCountProcessFactory : GenericProcessFactory
-    {
-        private ArrayCountProcessFactory() { }
-
-        /// <summary>
-        /// The instance.
-        /// </summary>
-        public static GenericProcessFactory Instance { get; } = new ArrayCountProcessFactory();
-
-        /// <inheritdoc />
-        public override Type ProcessType => typeof(ArrayCount<>);
-
-        /// <inheritdoc />
-        public override string OutputTypeExplanation => nameof(Int32);
-
-        /// <inheritdoc />
-        protected override ITypeReference GetOutputTypeReference(ITypeReference memberTypeReference) => new ActualTypeReference(typeof(int));
-
-        /// <inheritdoc />
-        protected override Result<ITypeReference> GetMemberType(FreezableProcessData freezableProcessData) =>
-            freezableProcessData.GetArgument(nameof(ArrayCount<object>.Array))
-                .Bind(x => x.TryGetOutputTypeReference())
-                .BindCast<ITypeReference, GenericTypeReference>()
-                .Map(x => x.ChildTypes)
-                .BindSingle();
+        public override IStepFactory StepFactory => ArrayCountStepFactory.Instance;
     }
 }

@@ -11,25 +11,12 @@ namespace Reductech.EDR.Processes.General
     /// <summary>
     /// Deletes a file or folder from the file system.
     /// </summary>
-    public class DeleteItemProcessFactory : SimpleRunnableProcessFactory<DeleteItem, Unit>
-    {
-        private DeleteItemProcessFactory() { }
-
-        /// <summary>
-        /// The instance.
-        /// </summary>
-        public static SimpleRunnableProcessFactory<DeleteItem, Unit> Instance { get; } = new DeleteItemProcessFactory();
-    }
-
-    /// <summary>
-    /// Deletes a file or folder from the file system.
-    /// </summary>
-    public class DeleteItem : CompoundRunnableProcess<Unit>
+    public class DeleteItem : CompoundStep<Unit>
     {
         /// <inheritdoc />
-        public override Result<Unit, IRunErrors> Run(ProcessState processState)
+        public override Result<Unit, IRunErrors> Run(StateMonad stateMonad)
         {
-            var pathResult = Path.Run(processState);
+            var pathResult = Path.Run(stateMonad);
             if (pathResult.IsFailure)
                 return pathResult.ConvertFailure<Unit>();
 
@@ -39,15 +26,15 @@ namespace Reductech.EDR.Processes.General
             if (Directory.Exists(path))
             {
                 Directory.Delete(path, true);
-                processState.Logger.LogInformation($"Directory '{path}' Deleted.");
+                stateMonad.Logger.LogInformation($"Directory '{path}' Deleted.");
             }
             else if (File.Exists(path))
             {
                 File.Delete(path);
-                processState.Logger.LogInformation($"File '{path}' Deleted.");
+                stateMonad.Logger.LogInformation($"File '{path}' Deleted.");
             }
             else
-                processState.Logger.LogInformation($"Item '{path}' did not exist.");
+                stateMonad.Logger.LogInformation($"Item '{path}' did not exist.");
 
             return Unit.Default;
 
@@ -56,12 +43,12 @@ namespace Reductech.EDR.Processes.General
         /// <summary>
         /// The path to the file or folder to delete.
         /// </summary>
-        [RunnableProcessProperty]
+        [StepProperty]
         [Required]
-        public IRunnableProcess<string> Path { get; set; } = null!;
+        public IStep<string> Path { get; set; } = null!;
 
 
         /// <inheritdoc />
-        public override IRunnableProcessFactory RunnableProcessFactory => DeleteItemProcessFactory.Instance;
+        public override IStepFactory StepFactory => DeleteItemStepFactory.Instance;
     }
 }

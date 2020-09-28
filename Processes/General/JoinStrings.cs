@@ -9,29 +9,29 @@ namespace Reductech.EDR.Processes.General
     /// <summary>
     /// Join strings with a delimiter.
     /// </summary>
-    public sealed class JoinStrings : CompoundRunnableProcess<string>
+    public sealed class JoinStrings : CompoundStep<string>
     {
         /// <summary>
         /// The delimiter to use.
         /// </summary>
-        [RunnableProcessProperty]
+        [StepProperty]
         [Required]
-        public IRunnableProcess<string> Delimiter { get; set; } = null!;
+        public IStep<string> Delimiter { get; set; } = null!;
 
         /// <summary>
         /// The elements to iterate over.
         /// </summary>
-        [RunnableProcessProperty]
+        [StepProperty]
         [Required]
-        public IRunnableProcess<List<string>> List { get; set; } = null!;
+        public IStep<List<string>> List { get; set; } = null!;
 
         /// <inheritdoc />
-        public override Result<string, IRunErrors> Run(ProcessState processState)
+        public override Result<string, IRunErrors> Run(StateMonad stateMonad)
         {
-            var list = List.Run(processState);
+            var list = List.Run(stateMonad);
             if (list.IsFailure) return list.ConvertFailure<string>();
 
-            var delimiter = Delimiter.Run(processState);
+            var delimiter = Delimiter.Run(stateMonad);
             if (delimiter.IsFailure) return delimiter;
 
 
@@ -42,19 +42,6 @@ namespace Reductech.EDR.Processes.General
         }
 
         /// <inheritdoc />
-        public override IRunnableProcessFactory RunnableProcessFactory => JoinStringsProcessFactory.Instance;
-    }
-
-    /// <summary>
-    /// Join strings with a delimiter.
-    /// </summary>
-    public sealed class JoinStringsProcessFactory : SimpleRunnableProcessFactory<JoinStrings, string>
-    {
-        private JoinStringsProcessFactory() { }
-
-        public static SimpleRunnableProcessFactory<JoinStrings, string> Instance { get; } = new JoinStringsProcessFactory();
-
-        /// <inheritdoc />
-        public override IProcessNameBuilder ProcessNameBuilder => new ProcessNameBuilderFromTemplate($"Join [{nameof(JoinStrings.List)}]");
+        public override IStepFactory StepFactory => JoinStringsStepFactory.Instance;
     }
 }

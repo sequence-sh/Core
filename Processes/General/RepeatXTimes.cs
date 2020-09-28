@@ -7,34 +7,34 @@ using Reductech.EDR.Processes.Util;
 namespace Reductech.EDR.Processes.General
 {
     /// <summary>
-    /// Repeat a process a set number of times.
+    /// Repeat a step a set number of times.
     /// </summary>
-    public sealed class RepeatXTimes : CompoundRunnableProcess<Unit>
+    public sealed class RepeatXTimes : CompoundStep<Unit>
     {
         /// <summary>
         /// The action to perform repeatedly.
         /// </summary>
-        [RunnableProcessProperty]
+        [StepProperty]
         [Required]
-        public IRunnableProcess<Unit> Action { get; set; } = null!;
+        public IStep<Unit> Action { get; set; } = null!;
 
         /// <summary>
         /// The number of times to perform the action.
         /// </summary>
-        [RunnableProcessProperty]
+        [StepProperty]
         [Required]
-        public IRunnableProcess<int> Number { get; set; } = null!;
+        public IStep<int> Number { get; set; } = null!;
 
         /// <inheritdoc />
-        public override Result<Unit, IRunErrors> Run(ProcessState processState)
+        public override Result<Unit, IRunErrors> Run(StateMonad stateMonad)
         {
-            var numberResult = Number.Run(processState);
+            var numberResult = Number.Run(stateMonad);
 
             if (numberResult.IsFailure) return numberResult.ConvertFailure<Unit>();
 
             for (var i = 0; i < numberResult.Value; i++)
             {
-                var result = Action.Run(processState);
+                var result = Action.Run(stateMonad);
                 if (result.IsFailure) return result.ConvertFailure<Unit>();
             }
 
@@ -42,22 +42,6 @@ namespace Reductech.EDR.Processes.General
         }
 
         /// <inheritdoc />
-        public override IRunnableProcessFactory RunnableProcessFactory => RepeatXTimesProcessFactory.Instance;
-    }
-
-    /// <summary>
-    /// Repeat a process a set number of times.
-    /// </summary>
-    public sealed class RepeatXTimesProcessFactory : SimpleRunnableProcessFactory<RepeatXTimes, Unit>
-    {
-        private RepeatXTimesProcessFactory() { }
-        /// <summary>
-        /// The instance.
-        /// </summary>
-        public static SimpleRunnableProcessFactory<RepeatXTimes, Unit> Instance { get; } = new RepeatXTimesProcessFactory();
-
-
-        /// <inheritdoc />
-        public override IProcessNameBuilder ProcessNameBuilder => new ProcessNameBuilderFromTemplate($"Repeat '[{nameof(RepeatXTimes.Action)}]' '[{nameof(RepeatXTimes.Number)}]' times.");
+        public override IStepFactory StepFactory => RepeatXTimesStepFactory.Instance;
     }
 }

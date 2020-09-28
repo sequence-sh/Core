@@ -11,26 +11,12 @@ namespace Reductech.EDR.Processes.General
     /// <summary>
     /// Reads text from a file.
     /// </summary>
-    public sealed class ReadFileProcessFactory : SimpleRunnableProcessFactory<ReadFile, string>
-    {
-        private ReadFileProcessFactory() { }
-
-        /// <summary>
-        /// The instance.
-        /// </summary>
-        public static SimpleRunnableProcessFactory<ReadFile, string> Instance { get; } = new ReadFileProcessFactory();
-    }
-
-
-    /// <summary>
-    /// Reads text from a file.
-    /// </summary>
-    public sealed class ReadFile : CompoundRunnableProcess<string>
+    public sealed class ReadFile : CompoundStep<string>
     {
         /// <inheritdoc />
-        public override Result<string, IRunErrors> Run(ProcessState processState)
+        public override Result<string, IRunErrors> Run(StateMonad stateMonad)
         {
-            var data = Folder.Run(processState).Compose(() => FileName.Run(processState));
+            var data = Folder.Run(stateMonad).Compose(() => FileName.Run(stateMonad));
 
             if (data.IsFailure)
                 return data.ConvertFailure<string>();
@@ -57,18 +43,18 @@ namespace Reductech.EDR.Processes.General
         /// <summary>
         /// The name of the folder.
         /// </summary>
-        [RunnableProcessProperty]
+        [StepProperty]
         [Required]
-        public IRunnableProcess<string> Folder { get; set; } = null!;
+        public IStep<string> Folder { get; set; } = null!;
 
         /// <summary>
         /// The name of the file to write to.
         /// </summary>
-        [RunnableProcessProperty]
+        [StepProperty]
         [Required]
-        public IRunnableProcess<string> FileName { get; set; } = null!;
+        public IStep<string> FileName { get; set; } = null!;
 
         /// <inheritdoc />
-        public override IRunnableProcessFactory RunnableProcessFactory => ReadFileProcessFactory.Instance;
+        public override IStepFactory StepFactory => ReadFileStepFactory.Instance;
     }
 }

@@ -7,42 +7,29 @@ using Reductech.EDR.Processes.Util;
 namespace Reductech.EDR.Processes.General
 {
     /// <summary>
-    /// Returns success if the Test process returns an error and a failure otherwise.
+    /// Returns success if the Test step returns an error and a failure otherwise.
     /// </summary>
-    public sealed class AssertErrorProcessFactory : SimpleRunnableProcessFactory<AssertError, Unit>
-    {
-        private AssertErrorProcessFactory() { }
-
-        /// <summary>
-        /// The instance.
-        /// </summary>
-        public static SimpleRunnableProcessFactory<AssertError, Unit> Instance { get; } = new AssertErrorProcessFactory();
-    }
-
-    /// <summary>
-    /// Returns success if the Test process returns an error and a failure otherwise.
-    /// </summary>
-    public sealed class AssertError : CompoundRunnableProcess<Unit>
+    public sealed class AssertError : CompoundStep<Unit>
     {
         /// <inheritdoc />
-        public override Result<Unit, IRunErrors> Run(ProcessState processState)
+        public override Result<Unit, IRunErrors> Run(StateMonad stateMonad)
         {
-            var result = Test.Run(processState);
+            var result = Test.Run(stateMonad);
 
             if (result.IsFailure)
                 return Unit.Default;
 
-            return new RunError("Expected an error but process was successful.", Name, null, ErrorCode.AssertionFailed);
+            return new RunError("Expected an error but step was successful.", Name, null, ErrorCode.AssertionFailed);
         }
 
         /// <inheritdoc />
-        public override IRunnableProcessFactory RunnableProcessFactory => AssertErrorProcessFactory.Instance;
+        public override IStepFactory StepFactory => AssertErrorStepFactory.Instance;
 
         /// <summary>
-        /// The process to test.
+        /// The step to test.
         /// </summary>
-        [RunnableProcessProperty]
+        [StepProperty]
         [Required]
-        public IRunnableProcess<Unit> Test { get; set; } = null!;
+        public IStep<Unit> Test { get; set; } = null!;
     }
 }

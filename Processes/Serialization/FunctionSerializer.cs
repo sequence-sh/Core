@@ -7,27 +7,10 @@ using Reductech.EDR.Processes.Internal;
 namespace Reductech.EDR.Processes.Serialization
 {
     /// <summary>
-    /// Serializer for processes that should not use short form serialization.
-    /// </summary>
-    public sealed class NoSpecialSerializer : IProcessSerializer
-    {
-        private NoSpecialSerializer() { }
-
-        /// <summary>
-        /// The instance.
-        /// </summary>
-        public static IProcessSerializer Instance { get; } = new NoSpecialSerializer();
-
-        /// <inheritdoc />
-        public Result<string> TrySerialize(FreezableProcessData data) => Result.Failure<string>("This process does not support special serialization");
-    }
-
-
-    /// <summary>
-    /// The default process serializer for functions.
+    /// The default step serializer for functions.
     /// Produces results like: Print(Value: 'Hello World')
     /// </summary>
-    public sealed class FunctionSerializer : IProcessSerializer
+    public sealed class FunctionSerializer : IStepSerializer
     {
         /// <summary>
         /// Creates a new FunctionSerializer
@@ -41,7 +24,7 @@ namespace Reductech.EDR.Processes.Serialization
         public string Name { get; }
 
         /// <inheritdoc />
-        public Result<string> TrySerialize(FreezableProcessData data)
+        public Result<string> TrySerialize(FreezableStepData data)
         {
             var sb = new StringBuilder();
             sb.Append(Name);
@@ -78,18 +61,18 @@ namespace Reductech.EDR.Processes.Serialization
             return sb.ToString();
 
 
-            static Result<string> SerializeProcess(IFreezableProcess freezableProcess)
+            static Result<string> SerializeProcess(IFreezableStep freezableProcess)
             {
                 return freezableProcess switch
                 {
-                    ConstantFreezableProcess constant => SerializationMethods.SerializeConstant(constant, true),
-                    CompoundFreezableProcess compoundFreezableProcess => compoundFreezableProcess.ProcessFactory
-                        .Serializer.TrySerialize(compoundFreezableProcess.FreezableProcessData),
+                    ConstantFreezableStep constant => SerializationMethods.SerializeConstant(constant, true),
+                    CompoundFreezableStep compoundFreezableProcess => compoundFreezableProcess.StepFactory
+                        .Serializer.TrySerialize(compoundFreezableProcess.FreezableStepData),
                     _ => Result.Failure<string>("Cannot serialize")
                 };
             }
 
-            static Result<string> SerializeList(IReadOnlyList<IFreezableProcess> list)
+            static Result<string> SerializeList(IReadOnlyList<IFreezableStep> list)
             {
                 var elementResult = list.Select(SerializeProcess).Combine();
                 if (elementResult.IsFailure)

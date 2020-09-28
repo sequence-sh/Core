@@ -9,7 +9,7 @@ namespace Reductech.EDR.Processes.General
     /// <summary>
     /// Appends a string to an existing string variable.
     /// </summary>
-    public sealed class AppendString : CompoundRunnableProcess<Unit>
+    public sealed class AppendString : CompoundStep<Unit>
     {
         /// <summary>
         /// The variable to append to.
@@ -22,25 +22,25 @@ namespace Reductech.EDR.Processes.General
         /// <summary>
         /// The string to append.
         /// </summary>
-        [RunnableProcessProperty(Order = 2)]
+        [StepProperty(Order = 2)]
         [Required]
-        public IRunnableProcess<string> String { get; set; } = null!;
+        public IStep<string> String { get; set; } = null!;
 
         /// <inheritdoc />
-        public override Result<Unit, IRunErrors> Run(ProcessState processState)
+        public override Result<Unit, IRunErrors> Run(StateMonad stateMonad)
         {
-            var currentValue = processState.GetVariable<string>(Variable, Name);
+            var currentValue = stateMonad.GetVariable<string>(Variable, Name);
             if (currentValue.IsFailure)
                 return currentValue.ConvertFailure<Unit>();
 
 
-            var str = String.Run(processState);
+            var str = String.Run(stateMonad);
             if (str.IsFailure)
                 return str.ConvertFailure<Unit>();
 
             var value = currentValue.Value + str.Value;
 
-            var r = processState.SetVariable(Variable, value);
+            var r = stateMonad.SetVariable(Variable, value);
             if (r.IsFailure)
                 return r.ConvertFailure<Unit>();
 
@@ -48,26 +48,6 @@ namespace Reductech.EDR.Processes.General
         }
 
         /// <inheritdoc />
-        public override IRunnableProcessFactory RunnableProcessFactory => AppendStringProcessFactory.Instance;
-    }
-
-    /// <summary>
-    /// Appends a string to an existing string variable.
-    /// </summary>
-    public sealed class AppendStringProcessFactory : SimpleRunnableProcessFactory<AppendString, Unit>
-    {
-        private AppendStringProcessFactory() { }
-
-        /// <summary>
-        /// The instance.
-        /// </summary>
-        public static SimpleRunnableProcessFactory<AppendString, Unit> Instance { get; } = new AppendStringProcessFactory();
-
-        /// <inheritdoc />
-        public override Result<Maybe<ITypeReference>> GetTypeReferencesSet(VariableName variableName, FreezableProcessData freezableProcessData) => Maybe<ITypeReference>.From(new ActualTypeReference(typeof(string)));
-
-
-        /// <inheritdoc />
-        public override IProcessNameBuilder ProcessNameBuilder => new ProcessNameBuilderFromTemplate($"Append [{nameof(AppendString.String)}] to [{nameof(AppendString.Variable)}]");
+        public override IStepFactory StepFactory => AppendStringStepFactory.Instance;
     }
 }

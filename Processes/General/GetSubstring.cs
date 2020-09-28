@@ -8,38 +8,38 @@ namespace Reductech.EDR.Processes.General
     /// <summary>
     /// Gets a substring from a string.
     /// </summary>
-    public sealed class GetSubstring : CompoundRunnableProcess<string>
+    public sealed class GetSubstring : CompoundStep<string>
     {
         /// <summary>
         /// The string to extract a substring from.
         /// </summary>
-        [RunnableProcessProperty]
+        [StepProperty]
         [Required]
-        public IRunnableProcess<string> String { get; set; } = null!;
+        public IStep<string> String { get; set; } = null!;
 
         /// <summary>
         /// The index.
         /// </summary>
-        [RunnableProcessProperty]
+        [StepProperty]
         [Required]
-        public IRunnableProcess<int> Index { get; set; } = null!;
+        public IStep<int> Index { get; set; } = null!;
 
         /// <summary>
         /// The length of the substring to extract.
         /// </summary>
-        [RunnableProcessProperty]
+        [StepProperty]
         [Required]
-        public IRunnableProcess<int> Length { get; set; } = null!;
+        public IStep<int> Length { get; set; } = null!;
 
 
         /// <inheritdoc />
-        public override Result<string, IRunErrors> Run(ProcessState processState)
+        public override Result<string, IRunErrors> Run(StateMonad stateMonad)
         {
-            var str = String.Run(processState);
+            var str = String.Run(stateMonad);
             if (str.IsFailure) return str;
-            var index = Index.Run(processState);
+            var index = Index.Run(stateMonad);
             if (index.IsFailure) return index.ConvertFailure<string>();
-            var length = Length.Run(processState);
+            var length = Length.Run(stateMonad);
             if (length.IsFailure) return length.ConvertFailure<string>();
 
 
@@ -50,19 +50,6 @@ namespace Reductech.EDR.Processes.General
         }
 
         /// <inheritdoc />
-        public override IRunnableProcessFactory RunnableProcessFactory => GetSubstringProcessFactory.Instance;
-    }
-
-    /// <summary>
-    /// Gets a substring from a string.
-    /// </summary>
-    public sealed class GetSubstringProcessFactory : SimpleRunnableProcessFactory<GetSubstring, string>
-    {
-        private GetSubstringProcessFactory() { }
-
-        /// <summary>
-        /// The instance.
-        /// </summary>
-        public static SimpleRunnableProcessFactory<GetSubstring, string> Instance { get; } = new GetSubstringProcessFactory();
+        public override IStepFactory StepFactory => GetSubstringStepFactory.Instance;
     }
 }

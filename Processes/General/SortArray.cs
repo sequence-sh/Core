@@ -12,26 +12,26 @@ namespace Reductech.EDR.Processes.General
     /// <summary>
     /// Reorder an array.
     /// </summary>
-    public sealed class SortArray<T> : CompoundRunnableProcess<List<T>>
+    public sealed class SortArray<T> : CompoundStep<List<T>>
     {
         /// <summary>
         /// The array to modify.
         /// </summary>
-        [RunnableProcessProperty]
+        [StepProperty]
         [Required]
-        public IRunnableProcess<List<T>> Array { get; set; } = null!;
+        public IStep<List<T>> Array { get; set; } = null!;
 
         /// <summary>
         /// The order to use.
         /// </summary>
-        [RunnableProcessProperty]
+        [StepProperty]
         [Required]
-        public IRunnableProcess<SortOrder> Order { get; set; } = null!;
+        public IStep<SortOrder> Order { get; set; } = null!;
 
         /// <inheritdoc />
-        public override Result<List<T>, IRunErrors> Run(ProcessState processState) =>
-            Array.Run(processState)
-                .Compose(() => Order.Run(processState))
+        public override Result<List<T>, IRunErrors> Run(StateMonad stateMonad) =>
+            Array.Run(stateMonad)
+                .Compose(() => Order.Run(stateMonad))
                 .Map(x => Sort(x.Item1, x.Item2));
 
         private static List<T> Sort(IEnumerable<T> list, SortOrder sortOrder) =>
@@ -43,55 +43,6 @@ namespace Reductech.EDR.Processes.General
             };
 
         /// <inheritdoc />
-        public override IRunnableProcessFactory RunnableProcessFactory => SortArrayProcessFactory.Instance;
-    }
-
-    /// <summary>
-    /// Reorder an array.
-    /// </summary>
-
-    public sealed class SortArrayProcessFactory : GenericProcessFactory
-    {
-        private SortArrayProcessFactory() { }
-        /// <summary>
-        /// The instance.
-        /// </summary>
-        public static GenericProcessFactory Instance { get; } = new SortArrayProcessFactory();
-
-        /// <inheritdoc />
-        public override Type ProcessType => typeof(SortArray<>);
-
-        /// <inheritdoc />
-        protected override ITypeReference GetOutputTypeReference(ITypeReference memberTypeReference) => new GenericTypeReference(typeof(List<>), new []{memberTypeReference});
-
-        /// <inheritdoc />
-        public override IEnumerable<Type> EnumTypes => new[] {typeof(SortOrder)};
-
-        /// <inheritdoc />
-        public override string OutputTypeExplanation => "List<T>";
-
-
-        /// <inheritdoc />
-        protected override Result<ITypeReference> GetMemberType(FreezableProcessData freezableProcessData) =>
-            freezableProcessData.GetArgument(nameof(SortArray<object>.Array))
-                .Bind(x => x.TryGetOutputTypeReference())
-                .BindCast<ITypeReference, GenericTypeReference>()
-                .Map(x => x.ChildTypes)
-                .BindSingle();
-    }
-
-    /// <summary>
-    /// The direction to sort by.
-    /// </summary>
-    public enum SortOrder
-    {
-        /// <summary>
-        /// Sort array elements in ascending, or alphabetical order.
-        /// </summary>
-        Ascending,
-        /// <summary>
-        /// Sort array elements in descending, or reverse-alphabetical order.
-        /// </summary>
-        Descending
+        public override IStepFactory StepFactory => SortArrayStepFactory.Instance;
     }
 }

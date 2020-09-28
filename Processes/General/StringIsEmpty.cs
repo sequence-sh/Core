@@ -8,12 +8,12 @@ namespace Reductech.EDR.Processes.General
     /// <summary>
     /// Returns whether a string is empty.
     /// </summary>
-    public sealed class StringIsEmpty : CompoundRunnableProcess<bool>
+    public sealed class StringIsEmpty : CompoundStep<bool>
     {
         /// <inheritdoc />
-        public override Result<bool, IRunErrors> Run(ProcessState processState)
+        public override Result<bool, IRunErrors> Run(StateMonad stateMonad)
         {
-            var str = String.Run(processState);
+            var str = String.Run(stateMonad);
             if (str.IsFailure) return str.ConvertFailure<bool>();
 
             return string.IsNullOrWhiteSpace(str.Value);
@@ -22,25 +22,12 @@ namespace Reductech.EDR.Processes.General
         /// <summary>
         /// The string to check for being empty.
         /// </summary>
-        [RunnableProcessProperty]
+        [StepProperty]
         [Required]
-        public IRunnableProcess<string> String { get; set; } = null!;
+        public IStep<string> String { get; set; } = null!;
 
 
         /// <inheritdoc />
-        public override IRunnableProcessFactory RunnableProcessFactory => StringIsEmptyProcessFactory.Instance;
-    }
-
-    /// <summary>
-    /// Returns whether a string is empty.
-    /// </summary>
-    public sealed class StringIsEmptyProcessFactory : SimpleRunnableProcessFactory<StringIsEmpty, bool>
-    {
-        private StringIsEmptyProcessFactory() { }
-
-        public static SimpleRunnableProcessFactory<StringIsEmpty, bool> Instance { get; } = new StringIsEmptyProcessFactory();
-
-        /// <inheritdoc />
-        public override IProcessNameBuilder ProcessNameBuilder => new ProcessNameBuilderFromTemplate($"'[{nameof(LengthOfString.String)}]' is empty?");
+        public override IStepFactory StepFactory => StringIsEmptyStepFactory.Instance;
     }
 }

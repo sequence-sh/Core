@@ -11,26 +11,12 @@ namespace Reductech.EDR.Processes.General
     /// <summary>
     /// Writes a file to the local file system.
     /// </summary>
-    public sealed class WriteFileProcessFactory : SimpleRunnableProcessFactory<WriteFile, Unit>
-    {
-        private WriteFileProcessFactory() { }
-
-        /// <summary>
-        /// The instance.
-        /// </summary>
-        public static SimpleRunnableProcessFactory<WriteFile, Unit> Instance { get; } = new WriteFileProcessFactory();
-    }
-
-
-    /// <summary>
-    /// Writes a file to the local file system.
-    /// </summary>
-    public sealed class WriteFile  : CompoundRunnableProcess<Unit>
+    public sealed class WriteFile  : CompoundStep<Unit>
     {
         /// <inheritdoc />
-        public override Result<Unit, IRunErrors> Run(ProcessState processState)
+        public override Result<Unit, IRunErrors> Run(StateMonad stateMonad)
         {
-            var data = Folder.Run(processState).Compose(() => FileName.Run(processState),()=> Text.Run(processState));
+            var data = Folder.Run(stateMonad).Compose(() => FileName.Run(stateMonad),()=> Text.Run(stateMonad));
 
             if (data.IsFailure)
                 return data.ConvertFailure<Unit>();
@@ -60,26 +46,26 @@ namespace Reductech.EDR.Processes.General
         /// <summary>
         /// The name of the folder.
         /// </summary>
-        [RunnableProcessProperty]
+        [StepProperty]
         [Required]
-        public IRunnableProcess<string> Folder { get; set; } = null!;
+        public IStep<string> Folder { get; set; } = null!;
 
         /// <summary>
         /// The name of the file to write to.
         /// </summary>
-        [RunnableProcessProperty]
+        [StepProperty]
         [Required]
-        public IRunnableProcess<string> FileName { get; set; } = null!;
+        public IStep<string> FileName { get; set; } = null!;
 
         /// <summary>
         /// The text to write.
         /// </summary>
-        [RunnableProcessProperty]
+        [StepProperty]
         [Required]
-        public IRunnableProcess<string> Text { get; set; } = null!;
+        public IStep<string> Text { get; set; } = null!;
 
 
         /// <inheritdoc />
-        public override IRunnableProcessFactory RunnableProcessFactory => WriteFileProcessFactory.Instance;
+        public override IStepFactory StepFactory => WriteFileStepFactory.Instance;
     }
 }

@@ -7,36 +7,23 @@ using Reductech.EDR.Processes.Util;
 namespace Reductech.EDR.Processes.General
 {
     /// <summary>
-    /// Returns an error if the nested process does not return true.
+    /// Returns an error if the nested step does not return true.
     /// </summary>
-    public sealed class AssertTrueProcessFactory : SimpleRunnableProcessFactory<AssertTrue, Unit>
-    {
-        private AssertTrueProcessFactory() { }
-
-        /// <summary>
-        /// The instance.
-        /// </summary>
-        public static SimpleRunnableProcessFactory<AssertTrue, Unit> Instance { get; } = new AssertTrueProcessFactory();
-    }
-
-    /// <summary>
-    /// Returns an error if the nested process does not return true.
-    /// </summary>
-    public sealed class AssertTrue : CompoundRunnableProcess<Unit>
+    public sealed class AssertTrue : CompoundStep<Unit>
     {
         /// <inheritdoc />
-        public override Result<Unit, IRunErrors> Run(ProcessState processState) =>
-            Test.Run(processState).Ensure(x => x,
+        public override Result<Unit, IRunErrors> Run(StateMonad stateMonad) =>
+            Test.Run(stateMonad).Ensure(x => x,
                 new RunError($"Assertion Failed '{Test.Name}'", Name, null, ErrorCode.IndexOutOfBounds)).Map(x=> Unit.Default);
 
         /// <inheritdoc />
-        public override IRunnableProcessFactory RunnableProcessFactory => AssertTrueProcessFactory.Instance;
+        public override IStepFactory StepFactory => AssertTrueStepFactory.Instance;
 
         /// <summary>
-        /// The process to test.
+        /// The step to test.
         /// </summary>
-        [RunnableProcessProperty]
+        [StepProperty]
         [Required]
-        public IRunnableProcess<bool> Test { get; set; } = null!;
+        public IStep<bool> Test { get; set; } = null!;
     }
 }

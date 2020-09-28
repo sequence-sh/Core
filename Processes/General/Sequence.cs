@@ -4,7 +4,6 @@ using System.Linq;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Processes.Attributes;
 using Reductech.EDR.Processes.Internal;
-using Reductech.EDR.Processes.Serialization;
 using Reductech.EDR.Processes.Util;
 
 namespace Reductech.EDR.Processes.General
@@ -12,19 +11,19 @@ namespace Reductech.EDR.Processes.General
     /// <summary>
     /// A sequence of steps to be run one after the other.
     /// </summary>
-    public sealed class Sequence : CompoundRunnableProcess<Unit>
+    public sealed class Sequence : CompoundStep<Unit>
     {
         /// <inheritdoc />
-        public override Result<Unit, IRunErrors> Run(ProcessState processState)
+        public override Result<Unit, IRunErrors> Run(StateMonad stateMonad)
         {
-            var remainingSteps = new Stack<IRunnableProcess<Unit>>(Steps.Reverse());
+            var remainingSteps = new Stack<IStep<Unit>>(Steps.Reverse());
 
             while (remainingSteps.TryPop(out var runnableProcess))
             {
-                if (runnableProcess.ProcessCombiners.Any() && remainingSteps.TryPop(out var nextProcess))
+                if (runnableProcess.StepCombiners.Any() && remainingSteps.TryPop(out var nextProcess))
                 {
                     var combined = false;
-                    foreach (var processCombiner in runnableProcess.ProcessCombiners)
+                    foreach (var processCombiner in runnableProcess.StepCombiners)
                     {
                         var combineResult = processCombiner.TryCombine(runnableProcess, nextProcess);
                         if (combineResult.IsSuccess)
@@ -42,7 +41,7 @@ namespace Reductech.EDR.Processes.General
 
                 }
 
-                var r = runnableProcess.Run(processState);
+                var r = runnableProcess.Run(stateMonad);
                 if (r.IsFailure)
                     return r.ConvertFailure<Unit>();
 
@@ -52,46 +51,13 @@ namespace Reductech.EDR.Processes.General
         }
 
         /// <inheritdoc />
-        public override IRunnableProcessFactory RunnableProcessFactory => SequenceProcessFactory.Instance;
+        public override IStepFactory StepFactory => SequenceStepFactory.Instance;
 
         /// <summary>
         /// The steps of this sequence.
         /// </summary>
-        [RunnableProcessListProperty]
+        [StepListProperty]
         [Required]
-        public IReadOnlyList<IRunnableProcess<Unit>> Steps { get; set; } = null!;
-    }
-
-    /// <summary>
-    /// A sequence of steps to be run one after the other.
-    /// </summary>
-    public sealed class SequenceProcessFactory : SimpleRunnableProcessFactory<Sequence, Unit>
-    {
-        private SequenceProcessFactory() { }
-
-        /// <summary>
-        /// The instance.
-        /// </summary>
-        public static RunnableProcessFactory Instance { get; } = new SequenceProcessFactory();
-
-        /// <inheritdoc />
-        public override IProcessNameBuilder ProcessNameBuilder => new ProcessNameBuilderFromTemplate($"[{nameof(Sequence.Steps)}]");
-
-
-        /// <inheritdoc />
-        public override IProcessSerializer Serializer => NoSpecialSerializer.Instance;
-
-        /// <summary>
-        /// Create a new Freezable Sequence
-        /// </summary>
-        public static IFreezableProcess CreateFreezable(IEnumerable<IFreezableProcess> processes, ProcessConfiguration? configuration)
-        {
-            var fpd = new FreezableProcessData(new Dictionary<string, ProcessMember>()
-            {
-                {nameof(Sequence.Steps), new ProcessMember(processes.ToList())}
-            });
-
-            return new CompoundFreezableProcess(Instance, fpd, configuration);
-        }
+        public IReadOnlyList<IStep<Unit>> Steps { get; set; } = null!;
     }
 }

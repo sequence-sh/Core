@@ -10,26 +10,12 @@ namespace Reductech.EDR.Processes.General
     /// <summary>
     /// Runs an external executable program.
     /// </summary>
-    public sealed class RunExternalProcessFactory : SimpleRunnableProcessFactory<RunExternalProcess, Unit>
-    {
-        private RunExternalProcessFactory() {}
-
-        /// <summary>
-        /// The instance.
-        /// </summary>
-        public static SimpleRunnableProcessFactory<RunExternalProcess, Unit> Instance { get; } = new RunExternalProcessFactory();
-    }
-
-
-    /// <summary>
-    /// Runs an external executable program.
-    /// </summary>
-    public sealed class RunExternalProcess : CompoundRunnableProcess<Unit>
+    public sealed class RunExternalProcess : CompoundStep<Unit>
     {
         /// <inheritdoc />
-        public override Result<Unit, IRunErrors> Run(ProcessState processState)
+        public override Result<Unit, IRunErrors> Run(StateMonad stateMonad)
         {
-            var pathResult = ProcessPath.Run(processState);
+            var pathResult = ProcessPath.Run(stateMonad);
             if (pathResult.IsFailure) return pathResult.ConvertFailure<Unit>();
 
             List<string> arguments;
@@ -38,15 +24,15 @@ namespace Reductech.EDR.Processes.General
                 arguments = new List<string>();
             else
             {
-                var argsResult = Arguments.Run(processState);
+                var argsResult = Arguments.Run(stateMonad);
 
                 if (argsResult.IsFailure) return argsResult.ConvertFailure<Unit>();
                 arguments = argsResult.Value;
             }
 
             var r =
-                processState.ExternalProcessRunner.RunExternalProcess(pathResult.Value,
-                    processState.Logger,
+                stateMonad.ExternalProcessRunner.RunExternalProcess(pathResult.Value,
+                    stateMonad.Logger,
                     nameof(RunExternalProcess),
                     IgnoreNoneErrorHandler.Instance,
                     arguments).Result;
@@ -59,18 +45,18 @@ namespace Reductech.EDR.Processes.General
         /// <summary>
         /// The path to the external process
         /// </summary>
-        [RunnableProcessProperty(Order = 1)]
+        [StepProperty(Order = 1)]
         [Required]
-        public IRunnableProcess<string> ProcessPath { get; set; } = null!;
+        public IStep<string> ProcessPath { get; set; } = null!;
 
         /// <summary>
-        /// Arguments to the process.
+        /// Arguments to the step.
         /// </summary>
-        [RunnableProcessProperty(Order = 2)]
-        public IRunnableProcess<List<string>>? Arguments { get; set; }
+        [StepProperty(Order = 2)]
+        public IStep<List<string>>? Arguments { get; set; }
 
 
         /// <inheritdoc />
-        public override IRunnableProcessFactory RunnableProcessFactory => RunExternalProcessFactory.Instance;
+        public override IStepFactory StepFactory => RunExternalProcessStepFactory.Instance;
     }
 }

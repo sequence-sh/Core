@@ -10,25 +10,12 @@ namespace Reductech.EDR.Processes.General
     /// <summary>
     /// Returns whether a file on the file system contains a particular string.
     /// </summary>
-    public class DoesFileContainProcessFactory : SimpleRunnableProcessFactory<DoesFileContain, bool>
-    {
-        private DoesFileContainProcessFactory() { }
-
-        /// <summary>
-        /// The instance
-        /// </summary>
-        public static SimpleRunnableProcessFactory<DoesFileContain, bool> Instance { get; } = new DoesFileContainProcessFactory();
-    }
-
-    /// <summary>
-    /// Returns whether a file on the file system contains a particular string.
-    /// </summary>
-    public class DoesFileContain : CompoundRunnableProcess<bool>
+    public class DoesFileContain : CompoundStep<bool>
     {
         /// <inheritdoc />
-        public override Result<bool, IRunErrors> Run(ProcessState processState)
+        public override Result<bool, IRunErrors> Run(StateMonad stateMonad)
         {
-            var pathResult = Path.Run(processState);
+            var pathResult = Path.Run(stateMonad);
 
             if (pathResult.IsFailure) return pathResult.ConvertFailure<bool>();
 
@@ -36,7 +23,7 @@ namespace Reductech.EDR.Processes.General
                 return new RunError($"File '{pathResult.Value}' does not exist", Name, null,
                     ErrorCode.ExternalProcessError);
 
-            var textResult = Text.Run(processState);
+            var textResult = Text.Run(stateMonad);
             if (textResult.IsFailure) return textResult.ConvertFailure<bool>();
 
             Maybe<RunError> error;
@@ -65,20 +52,20 @@ namespace Reductech.EDR.Processes.General
         /// <summary>
         /// The path to the file or folder to check.
         /// </summary>
-        [RunnableProcessProperty]
+        [StepProperty]
         [Required]
-        public IRunnableProcess<string> Path { get; set; } = null!;
+        public IStep<string> Path { get; set; } = null!;
 
 
         /// <summary>
         /// The text to check for.
         /// </summary>
-        [RunnableProcessProperty]
+        [StepProperty]
         [Required]
-        public IRunnableProcess<string> Text { get; set; } = null!;
+        public IStep<string> Text { get; set; } = null!;
 
 
         /// <inheritdoc />
-        public override IRunnableProcessFactory RunnableProcessFactory => DoesFileContainProcessFactory.Instance;
+        public override IStepFactory StepFactory => DoesFileContainStepFactory.Instance;
     }
 }

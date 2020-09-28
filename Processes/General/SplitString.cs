@@ -12,41 +12,28 @@ namespace Reductech.EDR.Processes.General
     /// <summary>
     /// Splits a string.
     /// </summary>
-    public sealed class SplitString : CompoundRunnableProcess<List<string>>
+    public sealed class SplitString : CompoundStep<List<string>>
     {
         /// <summary>
         /// The string to split.
         /// </summary>
-        [RunnableProcessProperty]
+        [StepProperty]
         [Required]
-        public IRunnableProcess<string> String { get; set; } = null!;
+        public IStep<string> String { get; set; } = null!;
 
         /// <summary>
         /// The delimiter to use.
         /// </summary>
-        [RunnableProcessProperty]
+        [StepProperty]
         [Required]
-        public IRunnableProcess<string> Delimiter { get; set; } = null!;
+        public IStep<string> Delimiter { get; set; } = null!;
 
         /// <inheritdoc />
-        public override Result<List<string>, IRunErrors> Run(ProcessState processState) =>
-            String.Run(processState).Compose(() => Delimiter.Run(processState))
+        public override Result<List<string>, IRunErrors> Run(StateMonad stateMonad) =>
+            String.Run(stateMonad).Compose(() => Delimiter.Run(stateMonad))
                 .Map(x => x.Item1.Split(new[] {x.Item2}, StringSplitOptions.None).ToList());
 
         /// <inheritdoc />
-        public override IRunnableProcessFactory RunnableProcessFactory => SplitStringProcessFactory.Instance;
-    }
-
-    /// <summary>
-    /// Splits a string.
-    /// </summary>
-    public class SplitStringProcessFactory : SimpleRunnableProcessFactory<SplitString, List<string>>
-    {
-        private SplitStringProcessFactory() { }
-
-        /// <summary>
-        /// The instance.
-        /// </summary>
-        public static SimpleRunnableProcessFactory<SplitString, List<string>> Instance { get; } = new SplitStringProcessFactory();
+        public override IStepFactory StepFactory => SplitStringStepFactory.Instance;
     }
 }

@@ -10,7 +10,7 @@ using YamlDotNet.Serialization;
 namespace Reductech.EDR.Processes
 {
     /// <summary>
-    /// A requirement of a process.
+    /// A requirement of a step.
     /// </summary>
     public sealed class Requirement
     {

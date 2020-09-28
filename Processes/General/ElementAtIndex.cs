@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Processes.Attributes;
@@ -11,62 +10,31 @@ namespace Reductech.EDR.Processes.General
     /// <summary>
     /// Gets the array element at a particular index.
     /// </summary>
-    public sealed class ElementAtIndex<T> : CompoundRunnableProcess<T>
+    public sealed class ElementAtIndex<T> : CompoundStep<T>
     {
         /// <summary>
         /// The array to check.
         /// </summary>
-        [RunnableProcessProperty]
+        [StepProperty]
         [Required]
-        public IRunnableProcess<List<T>> Array { get; set; } = null!;
+        public IStep<List<T>> Array { get; set; } = null!;
 
         /// <summary>
         /// The index to get the element at.
         /// </summary>
-        [RunnableProcessProperty]
+        [StepProperty]
         [Required]
-        public IRunnableProcess<int> Index { get; set; } = null!;
+        public IStep<int> Index { get; set; } = null!;
 
         /// <inheritdoc />
-        public override Result<T, IRunErrors> Run(ProcessState processState) =>
-            Array.Run(processState)
-                .Compose(() => Index.Run(processState))
+        public override Result<T, IRunErrors> Run(StateMonad stateMonad) =>
+            Array.Run(stateMonad)
+                .Compose(() => Index.Run(stateMonad))
                 .Ensure(x => x.Item2 >= 0 && x.Item2 < x.Item1.Count,
                     new RunError( "Index was out of the range of the array.", Name, null, ErrorCode.IndexOutOfBounds))
                 .Map(x=>x.Item1[x.Item2]);
 
         /// <inheritdoc />
-        public override IRunnableProcessFactory RunnableProcessFactory => ElementAtIndexProcessFactory.Instance;
-    }
-
-
-    /// <summary>
-    /// Gets the array element at a particular index.
-    /// </summary>
-    public sealed class ElementAtIndexProcessFactory : GenericProcessFactory
-    {
-        private ElementAtIndexProcessFactory() { }
-
-        /// <summary>
-        /// The instance.
-        /// </summary>
-        public static GenericProcessFactory Instance { get; } = new ElementAtIndexProcessFactory();
-
-        /// <inheritdoc />
-        public override Type ProcessType => typeof(ElementAtIndex<>);
-
-        /// <inheritdoc />
-        public override string OutputTypeExplanation => "T";
-
-        /// <inheritdoc />
-        protected override ITypeReference GetOutputTypeReference(ITypeReference memberTypeReference) => memberTypeReference;
-
-        /// <inheritdoc />
-        protected override Result<ITypeReference> GetMemberType(FreezableProcessData freezableProcessData) =>
-            freezableProcessData.GetArgument(nameof(ElementAtIndex<object>.Array))
-                .Bind(x => x.TryGetOutputTypeReference())
-                .BindCast<ITypeReference, GenericTypeReference>()
-                .Map(x => x.ChildTypes)
-                .BindSingle();
+        public override IStepFactory StepFactory => ElementAtIndexStepFactory.Instance;
     }
 }

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using CSharpFunctionalExtensions;
@@ -11,12 +10,12 @@ namespace Reductech.EDR.Processes.General
     /// <summary>
     /// Represents an ordered collection of objects.
     /// </summary>
-    public sealed class Array<T> : CompoundRunnableProcess<List<T>>
+    public sealed class Array<T> : CompoundStep<List<T>>
     {
         /// <inheritdoc />
-        public override Result<List<T>, IRunErrors> Run(ProcessState processState)
+        public override Result<List<T>, IRunErrors> Run(StateMonad stateMonad)
         {
-            var result = Elements.Select(x => x.Run(processState))
+            var result = Elements.Select(x => x.Run(stateMonad))
                 .Combine(RunErrorList.Combine)
                 .Map(x => x.ToList());
 
@@ -24,50 +23,13 @@ namespace Reductech.EDR.Processes.General
         }
 
         /// <inheritdoc />
-        public override IRunnableProcessFactory RunnableProcessFactory => ArrayProcessFactory.Instance;
+        public override IStepFactory StepFactory => ArrayStepFactory.Instance;
 
         /// <summary>
         /// The elements of this array.
         /// </summary>
-        [RunnableProcessListProperty]
+        [StepListProperty]
         [Required]
-        public IReadOnlyList<IRunnableProcess<T>> Elements { get; set; } = null!;
-    }
-
-    /// <summary>
-    /// The factory for creating Arrays.
-    /// </summary>
-    public class ArrayProcessFactory : GenericProcessFactory
-    {
-        private ArrayProcessFactory() {}
-
-        /// <summary>
-        /// The instance.
-        /// </summary>
-        public static GenericProcessFactory Instance { get; } = new ArrayProcessFactory();
-
-        /// <inheritdoc />
-        public override Type ProcessType => typeof(Array<>);
-
-        /// <inheritdoc />
-        public override string OutputTypeExplanation => "List<T>";
-
-        /// <inheritdoc />
-        protected override ITypeReference GetOutputTypeReference(ITypeReference memberTypeReference) => new GenericTypeReference(typeof(List<>), new []{memberTypeReference});
-
-        /// <inheritdoc />
-        public override IProcessNameBuilder ProcessNameBuilder => new ProcessNameBuilderFromTemplate($"[[{nameof(Array<object>.Elements)}]]");
-
-        /// <inheritdoc />
-        protected override Result<ITypeReference> GetMemberType(FreezableProcessData freezableProcessData)
-        {
-            var result =
-            freezableProcessData.GetListArgument(nameof(Array<object>.Elements))
-                .Bind(x => x.Select(r => r.TryGetOutputTypeReference()).Combine())
-                .Bind(x => MultipleTypeReference.TryCreate(x, TypeName));
-
-
-            return result;
-        }
+        public IReadOnlyList<IStep<T>> Elements { get; set; } = null!;
     }
 }
