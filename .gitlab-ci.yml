@@ -145,7 +145,7 @@ mutation testing dev:
       - StrykerOutput/
       - mutation-report.html
     expire_in: 3 months
-  rules: *rules_dev
+  rules: *rules_push_dev
 
 mutation testing release:
   extends: mutation testing dev
