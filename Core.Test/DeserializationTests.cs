@@ -36,7 +36,19 @@ namespace Reductech.EDR.Core.Test
 
                 yield return new DeserializationTestFunction(@"Print(Value = 2 * 3)", 6);
 
+                yield return new DeserializationTestFunction(@"Print(Value = 3 - 2)", 1);
+
                 yield return new DeserializationTestFunction(@"print(value = 2 * 3)", 6);
+
+                yield return new DeserializationTestFunction(@"print(value = 7 % 2)", 1);
+
+                yield return new DeserializationTestFunction(@"print(value = 7 modulo 2)", 1);
+
+                yield return new DeserializationTestFunction(@"do: Print
+Value: falsetto", "falsetto"); //check 'false' delimiter
+
+                yield return new DeserializationTestFunction(@"do: Print
+Value: notable", "notable");//check 'not' delimiter
 
                 yield return new DeserializationTestFunction(@"print(value=2*3)", 6);
 
@@ -47,12 +59,18 @@ namespace Reductech.EDR.Core.Test
 
                 yield return new DeserializationTestFunction(@"Print(Value = 2 >= 3)", false);
 
+                yield return new DeserializationTestFunction(@"Print(Value = 3 > 3)", false);
+                yield return new DeserializationTestFunction(@"Print(Value = 3 < 3)", false);
+
+                yield return new DeserializationTestFunction(@"Print(Value = 3 <= 3)", true);
+
                 yield return new DeserializationTestFunction(@"Print(Value = 2 * (3 + 4))",14);
                 yield return new DeserializationTestFunction(@"Print(Value = (2 * 3) + 4)",10);
 
                 yield return new DeserializationTestFunction(@"Print(Value = (2 >= 3))", false);
 
                 yield return new DeserializationTestFunction(@"Print(Value = (2 * (3 + 4)))", 14);
+                yield return new DeserializationTestFunction(@"Print(Value = (2*(3+4)))", 14);
                 yield return new DeserializationTestFunction(@"Print(Value = ((2 * 3) + 4))", 10);
 
                 yield return new DeserializationTestFunction(@"Print(Value = True && False)", false);

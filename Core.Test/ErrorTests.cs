@@ -1,27 +1,27 @@
-﻿using Xunit;
-using Xunit.Abstractions;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using FluentAssertions;
 using Microsoft.Extensions.Logging.Abstractions;
 using Reductech.EDR.Core.General;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Test.Extensions;
 using Reductech.EDR.Core.Util;
+using Xunit;
+using Xunit.Abstractions;
 
 namespace Reductech.EDR.Core.Test
 {
 
-    public class ErrorTests : ErrorTestCases
+    public class RunErrorTests : RunErrorTestCases
     {
-        public ErrorTests(ITestOutputHelper testOutputHelper) => TestOutputHelper = testOutputHelper;
+        public RunErrorTests(ITestOutputHelper testOutputHelper) => TestOutputHelper = testOutputHelper;
 
         /// <inheritdoc />
         [Theory]
-        [ClassData(typeof(ErrorTestCases))]
+        [ClassData(typeof(RunErrorTestCases))]
         public override void Test(string key) => base.Test(key);
     }
 
-    public class ErrorTestCases : TestBase
+    public class RunErrorTestCases : TestBase
     {
         /// <inheritdoc />
         protected override IEnumerable<ITestFunction> TestCases
@@ -33,7 +33,7 @@ namespace Reductech.EDR.Core.Test
                     {
                         VariableName = FooString
                     },
-                    new RunError($"Variable '<Foo>' does not exist.", "<Foo>", null, ErrorCode.MissingVariable));
+                    new RunError("Variable '<Foo>' does not exist.", "<Foo>", null, ErrorCode.MissingVariable));
 
                 yield return new ErrorTestFunction("Test assert",
                     new AssertTrue
@@ -55,7 +55,7 @@ namespace Reductech.EDR.Core.Test
 
                             new Print<bool>
                             {
-                                Value = new GetVariable<bool>()
+                                Value = new GetVariable<bool>
                                 {
                                     VariableName =FooString
                                 }

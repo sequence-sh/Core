@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -15,6 +16,41 @@ using Result = CSharpFunctionalExtensions.Result;
 
 namespace Reductech.EDR.Core.Serialization
 {
+    /// <summary>
+    /// The error returned by a failed Step Member parsing
+    /// </summary>
+    public class StepMemberParseError
+    {
+        /// <summary>
+        /// Create a new StepMemberParseError
+        /// </summary>
+        public StepMemberParseError(string? errorMessage, Position errorPosition, ImmutableHashSet<string> expectations)
+        {
+            ErrorMessage = errorMessage;
+            ErrorPosition = errorPosition;
+            Expectations = expectations;
+        }
+
+        /// <summary>
+        /// The error message, if there is one.
+        /// </summary>
+        public string? ErrorMessage { get; }
+
+        /// <summary>
+        /// The position of the error.
+        /// </summary>
+        public Position ErrorPosition { get; }
+
+        /// <summary>
+        /// The expectations.
+        /// </summary>
+        public ImmutableHashSet<string> Expectations { get; }
+
+        /// <inheritdoc />
+        public override string ToString() => ErrorMessage ?? $"Parsing error at {ErrorPosition}";
+    }
+
+
     /// <summary>
     /// Parses strings as step members
     /// </summary>
@@ -63,6 +99,11 @@ namespace Reductech.EDR.Core.Serialization
             NotOperator
         }
 
+        private static StepMemberParseError CreateError(Result<TokenList<ProcessToken>> result) =>
+            new StepMemberParseError(result.ErrorMessage, result.ErrorPosition, (result.Expectations??Enumerable.Empty<string>()).ToImmutableHashSet());
+
+        private static StepMemberParseError CreateError(TokenListParserResult<ProcessToken, StepMember> result) =>
+            new StepMemberParseError(result.ErrorMessage, result.ErrorPosition, (result.Expectations??Enumerable.Empty<string>()).ToImmutableHashSet());
 
         private static readonly Tokenizer<ProcessToken> Tokenizer = new TokenizerBuilder<ProcessToken>()
             .Ignore(Span.WhiteSpace)
@@ -77,16 +118,16 @@ namespace Reductech.EDR.Core.Serialization
             //VariableName must be before comparator
             .Match(Span.Regex("<[a-z0-9-_]+>", RegexOptions.Compiled | RegexOptions.IgnoreCase), ProcessToken.VariableName)
 
-            .Match(GetSpan(MathOperator.None), ProcessToken.MathOperator, true)
+            .Match(GetSpan(MathOperator.None), ProcessToken.MathOperator)
             .Match(GetSpan(BooleanOperator.None), ProcessToken.BooleanOperator, true)
-            .Match(GetSpan(CompareOperator.None), ProcessToken.Comparator, true)
+            .Match(GetSpan(CompareOperator.None), ProcessToken.Comparator)
 
 
             .Match(Character.EqualTo('='), ProcessToken.Assignment)
             .Match(QuotedString.SqlStyle, ProcessToken.StringLiteral)
             .Match(QuotedString.CStyle, ProcessToken.StringLiteral)
 
-            .Match(Span.EqualToIgnoreCase("true").Or(Span.EqualToIgnoreCase("false")), ProcessToken.Boolean, true)
+            .Match(Span.EqualToIgnoreCase(true.ToString()).Or(Span.EqualToIgnoreCase(false.ToString())), ProcessToken.Boolean, true)
             .Match(Span.EqualToIgnoreCase("not"), ProcessToken.NotOperator, true)
             .Match(Span.Regex(@"[0-9]+", RegexOptions.Compiled), ProcessToken.Number)
             .Match(Span.Regex(@"[a-z0-9-_]+\.[a-z0-9-_]+", RegexOptions.Compiled | RegexOptions.IgnoreCase), ProcessToken.Enum, true)
@@ -101,26 +142,31 @@ namespace Reductech.EDR.Core.Serialization
         /// <summary>
         /// Tries to parse a string as a step member.
         /// </summary>
-        public CSharpFunctionalExtensions. Result<StepMember> TryParse(string s)
+        public CSharpFunctionalExtensions. Result<StepMember, StepMemberParseError> TryParse(string s)
         {
             var tokensResult = Tokenizer.TryTokenize(s);
 
             if (!tokensResult.HasValue)
-                return Result.Failure<StepMember>(tokensResult.FormatErrorMessageFragment());
+                return CreateError(tokensResult);
 
             if (!tokensResult.Remainder.IsAtEnd)
-                return Result.Failure<StepMember>(tokensResult.FormatErrorMessageFragment());
+                return CreateError(tokensResult);
+
+            if(ParseAsConstantString(tokensResult.Value))
+                return new StepMember(new ConstantFreezableStep(s));
 
             var parseResult = Parser.TryParse(tokensResult.Value);
 
-            if(!parseResult.HasValue)
-                return Result.Failure<StepMember>(parseResult.FormatErrorMessageFragment());
+            if (!parseResult.HasValue)
+                return CreateError(parseResult);
 
-            if(!parseResult.Remainder.IsAtEnd)
-                return Result.Failure<StepMember>(parseResult.FormatErrorMessageFragment());
+            if (!parseResult.Remainder.IsAtEnd)
+                return CreateError(parseResult);
 
             return parseResult.Value;
         }
+
+        private static bool ParseAsConstantString(TokenList<ProcessToken> tokenList) => tokenList.All(x => x.Kind == ProcessToken.FuncOrArgumentName);
 
         /// <summary>
         /// The step factory store

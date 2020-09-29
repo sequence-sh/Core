@@ -40,6 +40,9 @@ namespace Reductech.EDR.Core.Serialization
         /// </summary>
         public static Result<IFreezableStep> DeserializeFromYaml(string yaml, StepFactoryStore stepFactoryStore)
         {
+            if(string.IsNullOrWhiteSpace(yaml))
+                return Result.Failure<IFreezableStep>("Yaml is empty.");
+
             var parser = new StepMemberParser(stepFactoryStore);
 
             var nodeDeserializer = new GeneralDeserializer(new ITypedYamlDeserializer []

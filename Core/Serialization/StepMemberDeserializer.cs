@@ -6,7 +6,6 @@ using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Util;
 using YamlDotNet.Core;
 using YamlDotNet.Core.Events;
-using Version = System.Version;
 
 namespace Reductech.EDR.Core.Serialization
 {
@@ -49,7 +48,7 @@ namespace Reductech.EDR.Core.Serialization
                     var r =
                         TryDeserializeNested<List<StepMember>>(nestedObjectDeserializer, reader)
                             .Bind(x=>
-                                x.Select(m=>ResultExtensions.Bind<StepMember, IFreezableStep>(m.TryConvert(MemberType.Step), n=>n.AsArgument("Step")))
+                                x.Select(m=>m.TryConvert(MemberType.Step).Bind(n=>n.AsArgument(MemberType.Step.ToString())))
                                     .Combine()
                                     .MapFailure(e=> new YamlException(startMark, endMark, e)))
                             .Map(x=> new StepMember(x.ToList()));
@@ -68,7 +67,7 @@ namespace Reductech.EDR.Core.Serialization
                     //otherwise try to deserialize this a as step member
 
                     var r = StepMemberParser.TryParse(scalar.Value)
-                        .MapFailure(e=> new YamlException(reader.Current.Start, reader.Current.End, e));
+                        .MapFailure(e=> CreateError(reader.Current.Start, reader.Current.End, e, scalar.Value));
 
                     if (r.IsSuccess)
                     {
@@ -76,13 +75,28 @@ namespace Reductech.EDR.Core.Serialization
                         return r;
                     }
 
-                    //TODO remove this bit
-                    var member2 = new StepMember(new ConstantFreezableStep(scalar.Value));
-                    reader.MoveNext();
-                    return member2;
+                    return r;
+
+                    //return new YamlException(reader.Current.Start, reader.Current.End, $"Cannot deserialize {reader.Current}");
+
+                    ////TODO remove this bit
+                    //var member2 = new StepMember(new ConstantFreezableStep(scalar.Value));
+                    //reader.MoveNext();
+                    //return member2;
                 }
                 default: return new YamlException(reader.Current.Start, reader.Current.End, $"Cannot deserialize {reader.Current}");
             }
+        }
+
+        private static YamlException CreateError(Mark start, Mark end, StepMemberParseError error, string scalarValue)
+        {
+
+            var newStart = new Mark(start.Index + error.ErrorPosition.Absolute,
+                start.Line + error.ErrorPosition.Line - 1,
+                start.Column + error.ErrorPosition.Column - 1);
+
+            return new YamlException(newStart, end, error.ErrorMessage?? $"Could not parse '{scalarValue}'" );
+
         }
     }
 }

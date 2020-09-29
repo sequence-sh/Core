@@ -153,6 +153,50 @@ namespace Reductech.EDR.Core.Test
                 }, @"Print(Value = ArrayIsEmpty(Array = Array(Elements = [])))");
 
                 yield return new SerializationTestMethod(
+                    new Sequence
+                    {
+                        Steps = new List<IStep<Unit>>
+                        {
+                            new SetVariable<CompareOperator>()
+                            {
+                                Value = new Constant<CompareOperator>(CompareOperator.LessThan),
+                                VariableName = new VariableName("Foo")
+                            },
+
+                            new Print<bool>
+                            {
+                                Value = new Compare<int>
+                                {
+                                    Left = new Constant<int>(1),
+                                    Right = new Constant<int>(2),
+                                    Operator = new GetVariable<CompareOperator>
+                                    {
+                                        VariableName = new VariableName("Foo"),
+                                        Configuration = new Configuration
+                                        {
+                                            DoNotSplit = true
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }, @"- <Foo> = CompareOperator.LessThan
+- Do: Print
+  Value:
+    Do: Compare
+    Left: 1
+    Operator:
+      Do: GetVariable
+      Config:
+        AdditionalRequirements: 
+        TargetMachineTags: 
+        DoNotSplit: true
+        Priority: 
+      VariableName: <Foo>
+    Right: 2"
+                );
+
+                yield return new SerializationTestMethod(
                     new Print<string>
                     {
                         Value = new Constant<string>("I have config"),
