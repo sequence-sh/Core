@@ -128,7 +128,7 @@ version check:
 code_quality:
   rules: *rules_code_quality
 
-mutation testing dev:
+mutation testing:
   stage: mutation
   variables:
     PROJECT_TO_TEST: $CI_PROJECT_TITLE
@@ -144,17 +144,8 @@ mutation testing dev:
     paths:
       - StrykerOutput/
       - mutation-report.html
-    expire_in: 3 months
-  rules: *rules_push_dev
-
-mutation testing release:
-  extends: mutation testing dev
-  artifacts:
-    name: MutationTesting
-    paths:
-      - StrykerOutput/
     expire_in: never
-  rules: *rules_release
+  rules: *rules_code_quality
 
 package nuget dev:
   stage: package
