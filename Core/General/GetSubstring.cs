@@ -52,4 +52,17 @@ namespace Reductech.EDR.Core.General
         /// <inheritdoc />
         public override IStepFactory StepFactory => GetSubstringStepFactory.Instance;
     }
+
+    /// <summary>
+    /// Gets a substring from a string.
+    /// </summary>
+    public sealed class GetSubstringStepFactory : SimpleStepFactory<GetSubstring, string>
+    {
+        private GetSubstringStepFactory() { }
+
+        /// <summary>
+        /// The instance.
+        /// </summary>
+        public static SimpleStepFactory<GetSubstring, string> Instance { get; } = new GetSubstringStepFactory();
+    }
 }

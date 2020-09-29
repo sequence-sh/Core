@@ -34,11 +34,13 @@ namespace Reductech.EDR.Core.General
                 realText = File.ReadAllText(pathResult.Value);
                 error = Maybe<RunError>.None;
             }
+#pragma warning disable CA1031 // Do not catch general exception types
             catch (Exception e)
             {
                 realText = "";
                 error = Maybe<RunError>.From(new RunError(e.Message, Name, null, ErrorCode.ExternalProcessError));
             }
+#pragma warning restore CA1031 // Do not catch general exception types
 
             if (error.HasValue)
                 return error.Value;
@@ -67,5 +69,18 @@ namespace Reductech.EDR.Core.General
 
         /// <inheritdoc />
         public override IStepFactory StepFactory => DoesFileContainStepFactory.Instance;
+    }
+
+    /// <summary>
+    /// Returns whether a file on the file system contains a particular string.
+    /// </summary>
+    public class DoesFileContainStepFactory : SimpleStepFactory<DoesFileContain, bool>
+    {
+        private DoesFileContainStepFactory() { }
+
+        /// <summary>
+        /// The instance
+        /// </summary>
+        public static SimpleStepFactory<DoesFileContain, bool> Instance { get; } = new DoesFileContainStepFactory();
     }
 }

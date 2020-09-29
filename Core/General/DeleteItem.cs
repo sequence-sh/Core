@@ -51,4 +51,18 @@ namespace Reductech.EDR.Core.General
         /// <inheritdoc />
         public override IStepFactory StepFactory => DeleteItemStepFactory.Instance;
     }
+
+
+    /// <summary>
+    /// Deletes a file or folder from the file system.
+    /// </summary>
+    public class DeleteItemStepFactory : SimpleStepFactory<DeleteItem, Unit>
+    {
+        private DeleteItemStepFactory() { }
+
+        /// <summary>
+        /// The instance.
+        /// </summary>
+        public static SimpleStepFactory<DeleteItem, Unit> Instance { get; } = new DeleteItemStepFactory();
+    }
 }

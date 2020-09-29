@@ -59,4 +59,18 @@ namespace Reductech.EDR.Core.General
         /// <inheritdoc />
         public override IStepFactory StepFactory => RunExternalProcessStepFactory.Instance;
     }
+
+
+    /// <summary>
+    /// Runs an external executable program.
+    /// </summary>
+    public sealed class RunExternalProcessStepFactory : SimpleStepFactory<RunExternalProcess, Unit>
+    {
+        private RunExternalProcessStepFactory() { }
+
+        /// <summary>
+        /// The instance.
+        /// </summary>
+        public static SimpleStepFactory<RunExternalProcess, Unit> Instance { get; } = new RunExternalProcessStepFactory();
+    }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Attributes;
@@ -43,5 +44,22 @@ namespace Reductech.EDR.Core.General
 
         /// <inheritdoc />
         public override IStepFactory StepFactory => TrimStepFactory.Instance;
+    }
+
+
+    /// <summary>
+    /// Trims a string.
+    /// </summary>
+    public sealed class TrimStepFactory : SimpleStepFactory<Trim, string>
+    {
+        private TrimStepFactory() { }
+
+        /// <summary>
+        /// The instance.
+        /// </summary>
+        public static SimpleStepFactory<Trim, string> Instance { get; } = new TrimStepFactory();
+
+        /// <inheritdoc />
+        public override IEnumerable<Type> EnumTypes => new[] { typeof(TrimSide) };
     }
 }
