@@ -4,11 +4,11 @@ using FluentAssertions;
 using Reductech.EDR.Core.General;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Documentation;
-using Reductech.EDR.Core.Test.Extensions;
+using Reductech.EDR.Core.Tests.Extensions;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace Reductech.EDR.Core.Test
+namespace Reductech.EDR.Core.Tests
 {
     public class DocumentationTests : DocumentationTestCases
     {

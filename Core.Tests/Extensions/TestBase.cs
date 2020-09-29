@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Xunit.Abstractions;
 
-namespace Reductech.EDR.Core.Test.Extensions
+namespace Reductech.EDR.Core.Tests.Extensions
 {
     /// <summary>
     /// A test with multiple cases

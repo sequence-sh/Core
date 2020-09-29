@@ -3,12 +3,12 @@ using FluentAssertions;
 using Microsoft.Extensions.Logging.Abstractions;
 using Reductech.EDR.Core.General;
 using Reductech.EDR.Core.Internal;
-using Reductech.EDR.Core.Test.Extensions;
+using Reductech.EDR.Core.Tests.Extensions;
 using Reductech.EDR.Core.Util;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace Reductech.EDR.Core.Test
+namespace Reductech.EDR.Core.Tests
 {
 
     public class RunErrorTests : RunErrorTestCases

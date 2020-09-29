@@ -9,6 +9,9 @@ namespace Reductech.EDR.Core.General
     {
         private JoinStringsStepFactory() { }
 
+        /// <summary>
+        /// The instance
+        /// </summary>
         public static SimpleStepFactory<JoinStrings, string> Instance { get; } = new JoinStringsStepFactory();
 
         /// <inheritdoc />

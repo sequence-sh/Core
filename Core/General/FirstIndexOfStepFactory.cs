@@ -9,6 +9,9 @@ namespace Reductech.EDR.Core.General
     {
         private FirstIndexOfStepFactory() { }
 
+        /// <summary>
+        /// The instance
+        /// </summary>
         public static SimpleStepFactory<FirstIndexOf, int> Instance { get; } = new FirstIndexOfStepFactory();
 
         /// <inheritdoc />

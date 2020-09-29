@@ -5,7 +5,7 @@ using Moq;
 using Reductech.EDR.Core.Internal;
 using Xunit;
 
-namespace Reductech.EDR.Core.Test
+namespace Reductech.EDR.Core.Tests
 {
     public class MultiStreamReaderTests
     {

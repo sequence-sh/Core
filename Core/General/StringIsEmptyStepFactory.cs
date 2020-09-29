@@ -9,6 +9,9 @@ namespace Reductech.EDR.Core.General
     {
         private StringIsEmptyStepFactory() { }
 
+        /// <summary>
+        /// The instance
+        /// </summary>
         public static SimpleStepFactory<StringIsEmpty, bool> Instance { get; } = new StringIsEmptyStepFactory();
 
         /// <inheritdoc />

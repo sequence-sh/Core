@@ -9,6 +9,9 @@ namespace Reductech.EDR.Core.General
     {
         private LastIndexOfStepFactory() { }
 
+        /// <summary>
+        /// The instance
+        /// </summary>
         public static SimpleStepFactory<LastIndexOf, int> Instance { get; } = new LastIndexOfStepFactory();
 
         /// <inheritdoc />
