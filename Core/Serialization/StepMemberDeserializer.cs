@@ -6,9 +6,11 @@ using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Util;
 using YamlDotNet.Core;
 using YamlDotNet.Core.Events;
+using Version = System.Version;
 
 namespace Reductech.EDR.Core.Serialization
 {
+
     internal class StepMemberDeserializer : TypedYamlDeserializer<StepMember>
     {
         /// <summary>

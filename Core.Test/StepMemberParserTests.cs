@@ -67,6 +67,16 @@ namespace Reductech.EDR.Core.Test
                         }), null
                     )));
 
+                yield return new StepMemberTestFunction("(1 + 2)", new StepMember(
+                    new CompoundFreezableStep(ApplyMathOperatorStepFactory.Instance,
+                        new FreezableStepData(new Dictionary<string, StepMember>
+                        {
+                            {nameof(ApplyMathOperator.Left), new StepMember(new ConstantFreezableStep(1))},
+                            {nameof(ApplyMathOperator.Operator), new StepMember(new ConstantFreezableStep(MathOperator.Add))},
+                            {nameof(ApplyMathOperator.Right), new StepMember(new ConstantFreezableStep(2))}
+                        }), null
+                    )));
+
                 yield return new StepMemberTestFunction("1 + <foo>", new StepMember(
                     new CompoundFreezableStep(ApplyMathOperatorStepFactory.Instance,
                         new FreezableStepData(new Dictionary<string, StepMember>
