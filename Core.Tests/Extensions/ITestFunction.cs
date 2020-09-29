@@ -1,6 +1,6 @@
 ﻿using Xunit.Abstractions;
 
-namespace Reductech.EDR.Core.Test.Extensions
+namespace Reductech.EDR.Core.Tests.Extensions
 {
     public interface ITestFunction
     {

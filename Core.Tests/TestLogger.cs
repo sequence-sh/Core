@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Internal;
 
-namespace Reductech.EDR.Core.Test
+namespace Reductech.EDR.Core.Tests
 {
     public class TestLogger : ILogger
     {

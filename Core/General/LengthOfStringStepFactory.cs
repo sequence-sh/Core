@@ -9,6 +9,9 @@ namespace Reductech.EDR.Core.General
     {
         private LengthOfStringStepFactory() { }
 
+        /// <summary>
+        /// The instance
+        /// </summary>
         public static SimpleStepFactory<LengthOfString, int> Instance { get; } = new LengthOfStringStepFactory();
 
         /// <inheritdoc />

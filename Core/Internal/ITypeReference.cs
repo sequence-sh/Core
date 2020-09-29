@@ -17,7 +17,10 @@ namespace Reductech.EDR.Core.Internal
         /// </summary>
         IEnumerable<ActualTypeReference> ActualTypeReferences { get; }
 
-        IEnumerable<ITypeReference> TypeArgumentReferences { get; }
+        ///// <summary>
+        /////
+        ///// </summary>
+        //IEnumerable<ITypeReference> TypeArgumentReferences { get; }
 
     }
 }

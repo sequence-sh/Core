@@ -5,7 +5,7 @@ using FluentAssertions;
 using Xunit;
 using Xunit.Sdk;
 
-namespace Reductech.EDR.Core.Test.Extensions
+namespace Reductech.EDR.Core.Tests.Extensions
 {
     public static class TestExtensions
     {

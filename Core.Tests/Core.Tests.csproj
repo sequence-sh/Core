@@ -7,7 +7,7 @@
 
     <Nullable>enable</Nullable>
 
-    <RootNamespace>Reductech.EDR.Core.Test</RootNamespace>
+    <RootNamespace>Reductech.EDR.Core.Tests</RootNamespace>
 
     <Authors>Mark Wainwright</Authors>
 
@@ -31,7 +31,7 @@
 
     <FileVersion>0.1.0.0</FileVersion>
 
-    <AssemblyName>Core.Test</AssemblyName>
+    <AssemblyName>Core.Tests</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>
