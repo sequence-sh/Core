@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using FluentAssertions;
 using Reductech.EDR.Core.Internal;
@@ -35,7 +36,19 @@ namespace Reductech.EDR.Core.Test
 
                 yield return new DeserializationTestFunction(@"Print(Value = 2 * 3)", 6);
 
+                yield return new DeserializationTestFunction(@"Print(Value = 3 - 2)", 1);
+
                 yield return new DeserializationTestFunction(@"print(value = 2 * 3)", 6);
+
+                yield return new DeserializationTestFunction(@"print(value = 7 % 2)", 1);
+
+                yield return new DeserializationTestFunction(@"print(value = 7 modulo 2)", 1);
+
+                yield return new DeserializationTestFunction(@"do: Print
+Value: falsetto", "falsetto"); //check 'false' delimiter
+
+                yield return new DeserializationTestFunction(@"do: Print
+Value: notable", "notable");//check 'not' delimiter
 
                 yield return new DeserializationTestFunction(@"print(value=2*3)", 6);
 
@@ -46,6 +59,19 @@ namespace Reductech.EDR.Core.Test
 
                 yield return new DeserializationTestFunction(@"Print(Value = 2 >= 3)", false);
 
+                yield return new DeserializationTestFunction(@"Print(Value = 3 > 3)", false);
+                yield return new DeserializationTestFunction(@"Print(Value = 3 < 3)", false);
+
+                yield return new DeserializationTestFunction(@"Print(Value = 3 <= 3)", true);
+
+                yield return new DeserializationTestFunction(@"Print(Value = 2 * (3 + 4))",14);
+                yield return new DeserializationTestFunction(@"Print(Value = (2 * 3) + 4)",10);
+
+                yield return new DeserializationTestFunction(@"Print(Value = (2 >= 3))", false);
+
+                yield return new DeserializationTestFunction(@"Print(Value = (2 * (3 + 4)))", 14);
+                yield return new DeserializationTestFunction(@"Print(Value = (2*(3+4)))", 14);
+                yield return new DeserializationTestFunction(@"Print(Value = ((2 * 3) + 4))", 10);
 
                 yield return new DeserializationTestFunction(@"Print(Value = True && False)", false);
 
@@ -69,7 +95,49 @@ Config:
   DoNotSplit: false
   Priority: 1
 Value: I have config", "I have config"
-                );
+                )
+                {
+                    ExpectedConfiguration = new Configuration()
+                    {
+                        TargetMachineTags = new List<string>(){"Tag1"},
+                        DoNotSplit = false,
+                        Priority = 1
+                    }
+                };
+
+                yield return new DeserializationTestFunction(@"Do: Print
+Config:
+  AdditionalRequirements:
+  - Notes: ABC123
+    Name: Test
+    MinVersion: 1.2.3.4
+    MaxVersion: 5.6.7.8
+  TargetMachineTags:
+  - Tag1
+  DoNotSplit: false
+  Priority: 1
+Value: I have config too", "I have config too")
+                {
+                    ExpectedConfiguration = new Configuration()
+                    {
+                        TargetMachineTags = new List<string>() { "Tag1" },
+                        DoNotSplit = false,
+                        Priority = 1,
+                        AdditionalRequirements = new List<Requirement>()
+                        {
+                            new Requirement
+                            {
+                                MaxVersion = new Version(5,6,7,8),
+                                MinVersion = new Version(1,2,3,4),
+                                Name = "Test",
+                                Notes = "ABC123"
+                            }
+                        }
+                    }
+                }
+
+                    ;
+
             }
         }
 
@@ -87,6 +155,8 @@ Value: I have config", "I have config"
             public string Name => Yaml;
 
             private string Yaml { get; }
+
+            public Configuration? ExpectedConfiguration { get; set; } = null!;
 
             private IReadOnlyCollection<string> ExpectedLoggedValues { get; }
 
@@ -109,6 +179,11 @@ Value: I have config", "I have config"
                 runResult.ShouldBeSuccessful(x => x.AsString);
 
                 logger.LoggedValues.Should().BeEquivalentTo(ExpectedLoggedValues);
+
+                if (ExpectedConfiguration != null || freezeResult.Value.Configuration != null)
+                {
+                    freezeResult.Value.Configuration.Should().BeEquivalentTo(ExpectedConfiguration);
+                }
             }
         }
     }

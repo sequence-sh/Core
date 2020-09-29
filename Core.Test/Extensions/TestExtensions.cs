@@ -49,27 +49,36 @@ namespace Reductech.EDR.Core.Test.Extensions
         public static void ShouldBeSuccessful<T>(this Result<T> result)
         {
             var (_, isFailure, _, error) = result;
-            Assert.False(isFailure, error);
+
+            if(isFailure)
+                throw new XunitException(error);
         }
 
 
         public static void ShouldBeFailure(this Result result, string? expectedError = null)
         {
-            var (_, isFailure, realError) = result;
-            Assert.True(isFailure);
+            result.IsFailure.Should().BeTrue();
 
             if (expectedError != null)
-                realError.Should().Be(expectedError);
+                result.Error.Should().Be(expectedError);
         }
 
 
         public static void ShouldBeFailure<T>(this Result<T> result, string? expectedError = null)
         {
-            var (_, isFailure, _, realError) = result;
-            Assert.True(isFailure);
+            result.IsFailure.Should().BeTrue();
 
             if (expectedError != null)
-                realError.Should().Be(expectedError);
+                result.Error.Should().Be(expectedError);
+        }
+
+        public static void ShouldBeFailure<T, TE>(this Result<T, TE> result) => result.IsFailure.Should().BeTrue();
+
+        public static void ShouldBeFailure<T, TE>(this Result<T, TE> result, TE expectedError)
+        {
+            result.IsFailure.Should().BeTrue();
+
+            result.Error.Should().Be(expectedError);
         }
 
 

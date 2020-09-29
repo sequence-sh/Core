@@ -53,7 +53,7 @@ namespace Reductech.EDR.Core.Test
                         Operator = new Constant<MathOperator>(MathOperator.Multiply),
                         Right = new Constant<int>(3)
                     }
-                }, @"Print(Value = 2 * 3)");
+                }, @"Print(Value = (2 * 3))");
 
                 yield return new SerializationTestMethod(new Print<int>
                 {
@@ -68,7 +68,22 @@ namespace Reductech.EDR.Core.Test
                             Right = new Constant<int>(4)
                         }
                     }
-                }, @"Print(Value = 2 * 3 + 4)");
+                }, @"Print(Value = (2 * (3 + 4)))");
+
+                yield return new SerializationTestMethod(new Print<int>
+                {
+                    Value = new ApplyMathOperator
+                    {
+                        Left = new ApplyMathOperator
+                        {
+                            Left = new Constant<int>(2),
+                            Operator = new Constant<MathOperator>(MathOperator.Multiply),
+                            Right = new Constant<int>(3)
+                        },
+                        Operator = new Constant<MathOperator>(MathOperator.Add),
+                        Right  = new Constant<int>(4)
+                    }
+                }, @"Print(Value = ((2 * 3) + 4))");
 
                 yield return new SerializationTestMethod(new Print<int>
                 {
@@ -78,7 +93,7 @@ namespace Reductech.EDR.Core.Test
                         Operator = new Constant<MathOperator>(MathOperator.Power),
                         Right = new Constant<int>(3)
                     }
-                }, @"Print(Value = 2 ^ 3)");
+                }, @"Print(Value = (2 ^ 3))");
 
                 yield return new SerializationTestMethod(new Print<bool>
                 {
@@ -96,7 +111,7 @@ namespace Reductech.EDR.Core.Test
                         Operator = new Constant<CompareOperator>(CompareOperator.GreaterThanOrEqual),
                         Right = new Constant<int>(3)
                     }
-                }, @"Print(Value = 2 >= 3)");
+                }, @"Print(Value = (2 >= 3))");
 
                 yield return new SerializationTestMethod(new Print<bool>
                 {
@@ -106,7 +121,7 @@ namespace Reductech.EDR.Core.Test
                         Operator = new Constant<BooleanOperator>(BooleanOperator.And),
                         Right = new Constant<bool>(false)
                     }
-                }, @"Print(Value = True && False)");
+                }, @"Print(Value = (True && False))");
 
 
                 yield return new SerializationTestMethod(new Print<bool>
@@ -117,7 +132,7 @@ namespace Reductech.EDR.Core.Test
                         Operator = new Constant<BooleanOperator>(BooleanOperator.And),
                         Right = new StringIsEmpty{String = new Constant<string>("World") }
                     }
-                }, @"Print(Value = StringIsEmpty(String = 'Hello') && StringIsEmpty(String = 'World'))");
+                }, @"Print(Value = (StringIsEmpty(String = 'Hello') && StringIsEmpty(String = 'World')))");
 
                 yield return new SerializationTestMethod(new Print<bool>
                 {
@@ -127,7 +142,7 @@ namespace Reductech.EDR.Core.Test
                         Operator = new Constant<BooleanOperator>(BooleanOperator.And),
                         Right = new Not{Boolean = new Constant<bool>(false)}
                     }
-                }, @"Print(Value = not(True) && not(False))");
+                }, @"Print(Value = (not(True) && not(False)))");
 
                 yield return new SerializationTestMethod(new Print<bool>
                 {
@@ -136,6 +151,50 @@ namespace Reductech.EDR.Core.Test
                         Array = new Array<string>{Elements = new List<IStep<string>>()}
                     }
                 }, @"Print(Value = ArrayIsEmpty(Array = Array(Elements = [])))");
+
+                yield return new SerializationTestMethod(
+                    new Sequence
+                    {
+                        Steps = new List<IStep<Unit>>
+                        {
+                            new SetVariable<CompareOperator>()
+                            {
+                                Value = new Constant<CompareOperator>(CompareOperator.LessThan),
+                                VariableName = new VariableName("Foo")
+                            },
+
+                            new Print<bool>
+                            {
+                                Value = new Compare<int>
+                                {
+                                    Left = new Constant<int>(1),
+                                    Right = new Constant<int>(2),
+                                    Operator = new GetVariable<CompareOperator>
+                                    {
+                                        VariableName = new VariableName("Foo"),
+                                        Configuration = new Configuration
+                                        {
+                                            DoNotSplit = true
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }, @"- <Foo> = CompareOperator.LessThan
+- Do: Print
+  Value:
+    Do: Compare
+    Left: 1
+    Operator:
+      Do: GetVariable
+      Config:
+        AdditionalRequirements: 
+        TargetMachineTags: 
+        DoNotSplit: true
+        Priority: 
+      VariableName: <Foo>
+    Right: 2"
+                );
 
                 yield return new SerializationTestMethod(
                     new Print<string>
@@ -170,8 +229,8 @@ Value: I have config");
                                 new Requirement
                                 {
                                     Name = "Test",
-                                    MaxVersion = new Version(1,2,3,4),
-                                    MinVersion = new Version(5,6,7,8),
+                                    MinVersion = new Version(1,2,3,4),
+                                    MaxVersion = new Version(5,6,7,8),
                                     Notes = "ABC123"
                                 }
                             }
@@ -181,20 +240,8 @@ Config:
   AdditionalRequirements:
   - Notes: ABC123
     Name: Test
-    MinVersion:
-      Major: 5
-      Minor: 6
-      Build: 7
-      Revision: 8
-      MajorRevision: 0
-      MinorRevision: 8
-    MaxVersion:
-      Major: 1
-      Minor: 2
-      Build: 3
-      Revision: 4
-      MajorRevision: 0
-      MinorRevision: 4
+    MinVersion: 1.2.3.4
+    MaxVersion: 5.6.7.8
   TargetMachineTags:
   - Tag1
   DoNotSplit: false

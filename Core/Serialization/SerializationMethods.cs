@@ -16,7 +16,7 @@ namespace Reductech.EDR.Core.Serialization
                 return cfp.Value.GetType().Name + "." + cfp.Value;
             if (cfp.Value is string s)
                 return quoteString? $"'{s}'" : s;
-            return cfp.Value.ToString() ?? "";
+            return cfp.Value.ToString() ?? string.Empty;
         }
     }
 }

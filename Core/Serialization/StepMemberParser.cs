@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -15,6 +16,41 @@ using Result = CSharpFunctionalExtensions.Result;
 
 namespace Reductech.EDR.Core.Serialization
 {
+    /// <summary>
+    /// The error returned by a failed Step Member parsing
+    /// </summary>
+    public class StepMemberParseError
+    {
+        /// <summary>
+        /// Create a new StepMemberParseError
+        /// </summary>
+        public StepMemberParseError(string? errorMessage, Position errorPosition, ImmutableHashSet<string> expectations)
+        {
+            ErrorMessage = errorMessage;
+            ErrorPosition = errorPosition;
+            Expectations = expectations;
+        }
+
+        /// <summary>
+        /// The error message, if there is one.
+        /// </summary>
+        public string? ErrorMessage { get; }
+
+        /// <summary>
+        /// The position of the error.
+        /// </summary>
+        public Position ErrorPosition { get; }
+
+        /// <summary>
+        /// The expectations.
+        /// </summary>
+        public ImmutableHashSet<string> Expectations { get; }
+
+        /// <inheritdoc />
+        public override string ToString() => ErrorMessage ?? $"Parsing error at {ErrorPosition}";
+    }
+
+
     /// <summary>
     /// Parses strings as step members
     /// </summary>
@@ -63,6 +99,11 @@ namespace Reductech.EDR.Core.Serialization
             NotOperator
         }
 
+        private static StepMemberParseError CreateError(Result<TokenList<ProcessToken>> result) =>
+            new StepMemberParseError(result.ErrorMessage, result.ErrorPosition, (result.Expectations??Enumerable.Empty<string>()).ToImmutableHashSet());
+
+        private static StepMemberParseError CreateError(TokenListParserResult<ProcessToken, StepMember> result) =>
+            new StepMemberParseError(result.ErrorMessage, result.ErrorPosition, (result.Expectations??Enumerable.Empty<string>()).ToImmutableHashSet());
 
         private static readonly Tokenizer<ProcessToken> Tokenizer = new TokenizerBuilder<ProcessToken>()
             .Ignore(Span.WhiteSpace)
@@ -77,16 +118,16 @@ namespace Reductech.EDR.Core.Serialization
             //VariableName must be before comparator
             .Match(Span.Regex("<[a-z0-9-_]+>", RegexOptions.Compiled | RegexOptions.IgnoreCase), ProcessToken.VariableName)
 
-            .Match(GetSpan(MathOperator.None), ProcessToken.MathOperator, true)
+            .Match(GetSpan(MathOperator.None), ProcessToken.MathOperator)
             .Match(GetSpan(BooleanOperator.None), ProcessToken.BooleanOperator, true)
-            .Match(GetSpan(CompareOperator.None), ProcessToken.Comparator, true)
+            .Match(GetSpan(CompareOperator.None), ProcessToken.Comparator)
 
 
             .Match(Character.EqualTo('='), ProcessToken.Assignment)
             .Match(QuotedString.SqlStyle, ProcessToken.StringLiteral)
             .Match(QuotedString.CStyle, ProcessToken.StringLiteral)
 
-            .Match(Span.EqualToIgnoreCase("true").Or(Span.EqualToIgnoreCase("false")), ProcessToken.Boolean, true)
+            .Match(Span.EqualToIgnoreCase(true.ToString()).Or(Span.EqualToIgnoreCase(false.ToString())), ProcessToken.Boolean, true)
             .Match(Span.EqualToIgnoreCase("not"), ProcessToken.NotOperator, true)
             .Match(Span.Regex(@"[0-9]+", RegexOptions.Compiled), ProcessToken.Number)
             .Match(Span.Regex(@"[a-z0-9-_]+\.[a-z0-9-_]+", RegexOptions.Compiled | RegexOptions.IgnoreCase), ProcessToken.Enum, true)
@@ -101,26 +142,31 @@ namespace Reductech.EDR.Core.Serialization
         /// <summary>
         /// Tries to parse a string as a step member.
         /// </summary>
-        public CSharpFunctionalExtensions. Result<StepMember> TryParse(string s)
+        public CSharpFunctionalExtensions. Result<StepMember, StepMemberParseError> TryParse(string s)
         {
             var tokensResult = Tokenizer.TryTokenize(s);
 
             if (!tokensResult.HasValue)
-                return Result.Failure<StepMember>(tokensResult.FormatErrorMessageFragment());
+                return CreateError(tokensResult);
 
             if (!tokensResult.Remainder.IsAtEnd)
-                return Result.Failure<StepMember>(tokensResult.FormatErrorMessageFragment());
+                return CreateError(tokensResult);
+
+            if(ParseAsConstantString(tokensResult.Value))
+                return new StepMember(new ConstantFreezableStep(s));
 
             var parseResult = Parser.TryParse(tokensResult.Value);
 
-            if(!parseResult.HasValue)
-                return Result.Failure<StepMember>(parseResult.FormatErrorMessageFragment());
+            if (!parseResult.HasValue)
+                return CreateError(parseResult);
 
-            if(!parseResult.Remainder.IsAtEnd)
-                return Result.Failure<StepMember>(parseResult.FormatErrorMessageFragment());
+            if (!parseResult.Remainder.IsAtEnd)
+                return CreateError(parseResult);
 
             return parseResult.Value;
         }
+
+        private static bool ParseAsConstantString(TokenList<ProcessToken> tokenList) => tokenList.All(x => x.Kind == ProcessToken.FuncOrArgumentName);
 
         /// <summary>
         /// The step factory store
@@ -141,14 +187,7 @@ namespace Reductech.EDR.Core.Serialization
 
             TokenListParser<ProcessToken, IFreezableStep> enumConstant = CreateEnumParser(StepFactoryStore);
 
-            var singleTermParser = NumberParser
-                .Or(BoolParser)
-                .Or(enumConstant)
-                .Or(StringConstantParser)
-                .Or(GetVariableParser);
-
-
-            Lazy<TokenListParser<ProcessToken, IFreezableStep>> stp = null!;
+            Lazy<TokenListParser<ProcessToken, IFreezableStep>> singleTerm = null!;
 
             TokenListParser<ProcessToken, IFreezableStep> setVariable =
                 (from vnToken in Token.EqualTo(ProcessToken.VariableName)
@@ -177,7 +216,7 @@ namespace Reductech.EDR.Core.Serialization
 
                 (from o in Token.EqualTo(ProcessToken.NotOperator)
                     from _1 in Token.EqualTo(ProcessToken.OpenBracket)
-                    from f1 in Parse.Ref(()=> stp.Value)
+                    from f1 in Parse.Ref(()=> singleTerm.Value)
                     from _2 in Token.EqualTo(ProcessToken.CloseBracket)
                     select new CompoundFreezableStep(NotStepFactory.Instance,
                         new FreezableStepData(new Dictionary<string, StepMember>
@@ -187,9 +226,9 @@ namespace Reductech.EDR.Core.Serialization
 
             TokenListParser<ProcessToken, IFreezableStep> mathOperation =
 
-                (from f1 in Parse.Ref(()=> stp.Value)
+                (from f1 in Parse.Ref(()=> singleTerm.Value)
                  from o in Token.EqualTo(ProcessToken.MathOperator)
-                 from f2 in Parse.Ref(()=> stp.Value)
+                 from f2 in Parse.Ref(()=> singleTerm.Value)
                  select new CompoundFreezableStep(ApplyMathOperatorStepFactory.Instance,
                      new FreezableStepData(new Dictionary<string, StepMember>()
                      {
@@ -202,9 +241,9 @@ namespace Reductech.EDR.Core.Serialization
 
 
             TokenListParser<ProcessToken, IFreezableStep> booleanOperation =
-                (from f1 in Parse.Ref(()=> stp.Value)
+                (from f1 in Parse.Ref(()=> singleTerm.Value)
                  from o in Token.EqualTo(ProcessToken.BooleanOperator)
-                 from f2 in Parse.Ref(()=> stp.Value)
+                 from f2 in Parse.Ref(()=> singleTerm.Value)
                  select new CompoundFreezableStep(ApplyBooleanStepFactory.Instance,
                      new FreezableStepData(new Dictionary<string, StepMember>
                      {
@@ -216,9 +255,9 @@ namespace Reductech.EDR.Core.Serialization
                      }), null) as IFreezableStep).Try();
 
             TokenListParser<ProcessToken, IFreezableStep> compareOperation =
-                (from f1 in Parse.Ref(()=> stp.Value)
+                (from f1 in Parse.Ref(()=> singleTerm.Value)
                  from o in Token.EqualTo(ProcessToken.Comparator)
-                 from f2 in Parse.Ref(()=> stp.Value)
+                 from f2 in Parse.Ref(()=> singleTerm.Value)
                  select new CompoundFreezableStep(CompareStepFactory.Instance,
                      new FreezableStepData(new Dictionary<string, StepMember>()
                      {
@@ -249,31 +288,37 @@ namespace Reductech.EDR.Core.Serialization
                      select x.Value).Try()
                     );
 
+            var operation = mathOperation.Or(booleanOperation).Or(compareOperation);
 
-            stp = new Lazy<TokenListParser<ProcessToken, IFreezableStep>>(()=>
-                singleTermParser
-                    .Or(notOperation)
-                .Or(Parse.Ref(()=>function.Value))
+            var bracketedOperation =
+                from _1 in Token.EqualTo(ProcessToken.OpenBracket)
+                from o in operation
+                from _2 in Token.EqualTo(ProcessToken.CloseBracket)
+                select o;
+
+
+            singleTerm = new Lazy<TokenListParser<ProcessToken, IFreezableStep>>(()=>
+                NumberParser
+                .Or(BoolParser)
+                .Or(enumConstant)
+                .Or(StringConstantParser)
+                .Or(GetVariableParser)
+                .Or(notOperation)
+                .Or(function.Value)
+                .Or(bracketedOperation)
                 );
 
 
             freezableProcess = new Lazy<TokenListParser<ProcessToken, IFreezableStep>>(()=>
-
-                        mathOperation
-                    .Or(booleanOperation)
-                    .Or(compareOperation)
-                    .Or(notOperation)
+                    operation
                     .Or(setVariable)
-                    .Or(singleTermParser) //Must come after setVariable
-                .Or(Parse.Ref(()=>function.Value))
-                    //.Or(Parse.Ref(()=>array.Value))
+                    .Or(singleTerm.Value) //Must come after setVariable
                     );
 
             stepMember = new Lazy<TokenListParser<ProcessToken, StepMember>>(()=>
 
-                            mathOperation
-                    .Or(booleanOperation)
-                    .Or(compareOperation)
+                     operation
+                    .Or(bracketedOperation)
                     .Or(notOperation)
                     .Or(NumberParser)
                     .Or(BoolParser)

@@ -23,29 +23,38 @@ namespace Reductech.EDR.Core.Serialization
         {
             var obj = SimplifyProcess(step, true);
 
-            var serializer = new Serializer();
+            var builder = new SerializerBuilder().WithTypeConverter(VersionTypeConverter.Instance);
+
+            var serializer = builder.Build();
 
             var r = serializer.Serialize(obj).Trim();
 
             return r;
         }
 
+
+
+
         /// <summary>
         /// Deserialize this yaml into a step.
         /// </summary>
         public static Result<IFreezableStep> DeserializeFromYaml(string yaml, StepFactoryStore stepFactoryStore)
         {
+            if(string.IsNullOrWhiteSpace(yaml))
+                return Result.Failure<IFreezableStep>("Yaml is empty.");
+
             var parser = new StepMemberParser(stepFactoryStore);
 
             var nodeDeserializer = new GeneralDeserializer(new ITypedYamlDeserializer []
             {
                 new StepMemberDeserializer(parser),
-                new FreezableStepDeserializer(parser),
+                new FreezableStepDeserializer(parser)
             });
 
             var builder =
             new DeserializerBuilder()
-                .WithNodeDeserializer(nodeDeserializer);
+                .WithNodeDeserializer(nodeDeserializer)
+                .WithTypeConverter(VersionTypeConverter.Instance);
 
 
             var deserializer = builder.Build();

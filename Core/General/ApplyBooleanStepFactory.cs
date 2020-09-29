@@ -25,11 +25,13 @@ namespace Reductech.EDR.Core.General
 
         /// <inheritdoc />
         public override IStepSerializer Serializer { get; } = new StepSerializer(
+            new FixedStringComponent("("),
             new BooleanComponent(nameof(ApplyBooleanOperator.Left)),
             new SpaceComponent(),
             new EnumDisplayComponent<BooleanOperator>(nameof(ApplyBooleanOperator.Operator)),
             new SpaceComponent(),
-            new BooleanComponent(nameof(ApplyBooleanOperator.Right))
+            new BooleanComponent(nameof(ApplyBooleanOperator.Right)),
+            new FixedStringComponent(")")
         );
     }
 }

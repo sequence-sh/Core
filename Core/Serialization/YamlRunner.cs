@@ -52,29 +52,23 @@ namespace Reductech.EDR.Core.Serialization
         /// <param name="yamlPath">Path to the yaml file.</param>
         /// <returns></returns>
         [UsedImplicitly]
-        public async Task<Result> RunSequenceFromYaml(string yamlPath)
+        public async Task<Result> RunSequenceFromYamlPath(string yamlPath)
         {
-            string? text;
-            string? errorMessage;
+            Result<string> result;
             try
             {
-                text = await File.ReadAllTextAsync(yamlPath);
-                errorMessage = null;
+                result = await File.ReadAllTextAsync(yamlPath);
             }
 #pragma warning disable CA1031 // Do not catch general exception types
             catch (Exception e)
             {
-                errorMessage = e.Message;
-                text = null;
+                result = Result.Failure<string>(e.Message);
             }
 #pragma warning restore CA1031 // Do not catch general exception types
 
-            if (errorMessage != null)
-                return Result.Failure<string>(errorMessage);
-            else if (!string.IsNullOrWhiteSpace(text))
-                return RunSequenceFromYamlString(text);
-            else
-                return Result.Failure<string>("File is empty");
+            var result2 = result.Bind(RunSequenceFromYamlString);
+
+            return result2;
         }
     }
 }

@@ -29,7 +29,7 @@ namespace Reductech.EDR.Core.Test
                 yield return new StepMemberTestFunction("True", new StepMember(new ConstantFreezableStep(true)));
                 yield return new StepMemberTestFunction("1", new StepMember(new ConstantFreezableStep(1)));
                 yield return new StepMemberTestFunction("\"Hello World\"", new StepMember(new ConstantFreezableStep("Hello World")));
-                yield return new StepMemberTestFunction("Foo", null);
+                //yield return new StepMemberTestFunction("Foo", null);
                 yield return new StepMemberTestFunction("true true", null);
 
                 yield return new StepMemberTestFunction("not (true)",
@@ -58,6 +58,16 @@ namespace Reductech.EDR.Core.Test
                         }), null)));
 
                 yield return new StepMemberTestFunction("1 + 2", new StepMember(
+                    new CompoundFreezableStep(ApplyMathOperatorStepFactory.Instance,
+                        new FreezableStepData(new Dictionary<string, StepMember>
+                        {
+                            {nameof(ApplyMathOperator.Left), new StepMember(new ConstantFreezableStep(1))},
+                            {nameof(ApplyMathOperator.Operator), new StepMember(new ConstantFreezableStep(MathOperator.Add))},
+                            {nameof(ApplyMathOperator.Right), new StepMember(new ConstantFreezableStep(2))}
+                        }), null
+                    )));
+
+                yield return new StepMemberTestFunction("(1 + 2)", new StepMember(
                     new CompoundFreezableStep(ApplyMathOperatorStepFactory.Instance,
                         new FreezableStepData(new Dictionary<string, StepMember>
                         {
@@ -136,7 +146,7 @@ namespace Reductech.EDR.Core.Test
                 }
                 else
                 {
-                    r.ShouldBeSuccessful();
+                    r.ShouldBeSuccessful(x=>x.ToString());
 
                     r.Value.Should().Be(ExpectedStepMember);
                 }
