@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Globalization;
 using CSharpFunctionalExtensions;
@@ -45,5 +46,20 @@ namespace Reductech.EDR.Core.General
 
         /// <inheritdoc />
         public override IStepFactory StepFactory => ToCaseStepFactory.Instance;
+    }
+
+    /// <summary>
+    /// Converts a string to a particular case.
+    /// </summary>
+    public sealed class ToCaseStepFactory : SimpleStepFactory<ToCase, string>
+    {
+        private ToCaseStepFactory() { }
+        /// <summary>
+        /// The instance.
+        /// </summary>
+        public static SimpleStepFactory<ToCase, string> Instance { get; } = new ToCaseStepFactory();
+
+        /// <inheritdoc />
+        public override IEnumerable<Type> EnumTypes => new[] { typeof(TextCase) };
     }
 }

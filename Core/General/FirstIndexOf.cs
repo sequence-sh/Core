@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal;
+using Reductech.EDR.Core.Util;
 
 namespace Reductech.EDR.Core.General
 {
@@ -41,4 +42,23 @@ namespace Reductech.EDR.Core.General
         /// <inheritdoc />
         public override IStepFactory StepFactory => FirstIndexOfStepFactory.Instance;
     }
+
+
+    /// <summary>
+    /// Gets the first instance of substring in a string.
+    /// </summary>
+    public sealed class FirstIndexOfStepFactory : SimpleStepFactory<FirstIndexOf, int>
+    {
+        private FirstIndexOfStepFactory() { }
+
+        /// <summary>
+        /// The instance
+        /// </summary>
+        public static SimpleStepFactory<FirstIndexOf, int> Instance { get; } = new FirstIndexOfStepFactory();
+
+        /// <inheritdoc />
+        public override IStepNameBuilder StepNameBuilder => new StepNameBuilderFromTemplate($"First index of '[{nameof(FirstIndexOf.SubString)}]' in '[{nameof(FirstIndexOf.String)}]'");
+    }
+
+
 }

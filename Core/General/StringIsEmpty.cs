@@ -30,4 +30,20 @@ namespace Reductech.EDR.Core.General
         /// <inheritdoc />
         public override IStepFactory StepFactory => StringIsEmptyStepFactory.Instance;
     }
+
+    /// <summary>
+    /// Returns whether a string is empty.
+    /// </summary>
+    public sealed class StringIsEmptyStepFactory : SimpleStepFactory<StringIsEmpty, bool>
+    {
+        private StringIsEmptyStepFactory() { }
+
+        /// <summary>
+        /// The instance
+        /// </summary>
+        public static SimpleStepFactory<StringIsEmpty, bool> Instance { get; } = new StringIsEmptyStepFactory();
+
+        /// <inheritdoc />
+        public override IStepNameBuilder StepNameBuilder => new StepNameBuilderFromTemplate($"'[{nameof(LengthOfString.String)}]' is empty?");
+    }
 }

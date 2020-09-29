@@ -26,4 +26,17 @@ namespace Reductech.EDR.Core.General
         [Required]
         public IStep<bool> Test { get; set; } = null!;
     }
+
+    /// <summary>
+    /// Returns an error if the nested step does not return true.
+    /// </summary>
+    public sealed class AssertTrueStepFactory : SimpleStepFactory<AssertTrue, Unit>
+    {
+        private AssertTrueStepFactory() { }
+
+        /// <summary>
+        /// The instance.
+        /// </summary>
+        public static SimpleStepFactory<AssertTrue, Unit> Instance { get; } = new AssertTrueStepFactory();
+    }
 }

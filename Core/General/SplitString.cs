@@ -36,4 +36,17 @@ namespace Reductech.EDR.Core.General
         /// <inheritdoc />
         public override IStepFactory StepFactory => SplitStringStepFactory.Instance;
     }
+
+    /// <summary>
+    /// Splits a string.
+    /// </summary>
+    public class SplitStringStepFactory : SimpleStepFactory<SplitString, List<string>>
+    {
+        private SplitStringStepFactory() { }
+
+        /// <summary>
+        /// The instance.
+        /// </summary>
+        public static SimpleStepFactory<SplitString, List<string>> Instance { get; } = new SplitStringStepFactory();
+    }
 }
