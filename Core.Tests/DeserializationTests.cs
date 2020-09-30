@@ -4,8 +4,8 @@ using System.Linq;
 using FluentAssertions;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Serialization;
-using Reductech.EDR.Core.Tests.Extensions;
 using Reductech.EDR.Core.Util;
+using Reductech.Utilities.Testing;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -25,7 +25,7 @@ namespace Reductech.EDR.Core.Tests
     public class DeserializationTestCases : TestBase
     {
         /// <inheritdoc />
-        protected override IEnumerable<ITestFunction> TestCases
+        protected override IEnumerable<ITestBaseCase> TestCases
         {
             get
             {
@@ -146,7 +146,7 @@ Value: I have config too", "I have config too")
         }
 
 
-        private class DeserializationTestFunction : ITestFunction
+        private class DeserializationTestFunction : ITestBaseCase
         {
 
             public DeserializationTestFunction(string yaml, params object[] expectedLoggedValues)

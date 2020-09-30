@@ -4,8 +4,8 @@ using FluentAssertions;
 using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Serialization;
-using Reductech.EDR.Core.Tests.Extensions;
 using Reductech.EDR.Core.Util;
+using Reductech.Utilities.Testing;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -24,7 +24,7 @@ namespace Reductech.EDR.Core.Tests
     public class SerializationTestCases : TestBase
     {
         /// <inheritdoc />
-        protected override IEnumerable<ITestFunction> TestCases
+        protected override IEnumerable<ITestBaseCase> TestCases
         {
             get
             {
@@ -251,7 +251,7 @@ Value: I have config too");
         }
 
 
-        private class SerializationTestMethod : ITestFunction
+        private class SerializationTestMethod : ITestBaseCase
         {
             public IStep Step { get; }
             public string ExpectedYaml { get; }

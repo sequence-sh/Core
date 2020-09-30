@@ -21,7 +21,7 @@
     <PackageReleaseNotes>Please see https://gitlab.com/reductech/edr/core/-/releases</PackageReleaseNotes>
     <PackageTags>ediscovery,forensics,automation,orchestration,edrm</PackageTags>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
-    
+
     <Authors>Reductech</Authors>
     <Company>Reductech</Company>
     <Copyright>Copyright (c) 2020 Reductech Ltd</Copyright>

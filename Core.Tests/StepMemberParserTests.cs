@@ -3,7 +3,7 @@ using FluentAssertions;
 using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Serialization;
-using Reductech.EDR.Core.Tests.Extensions;
+using Reductech.Utilities.Testing;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -22,7 +22,7 @@ namespace Reductech.EDR.Core.Tests
     public class StepMemberParserTestCases : TestBase
     {
         /// <inheritdoc />
-        protected override IEnumerable<ITestFunction> TestCases {
+        protected override IEnumerable<ITestBaseCase> TestCases {
             get
             {
                 yield return new StepMemberTestFunction("true", new StepMember(new ConstantFreezableStep(true)));
@@ -117,7 +117,7 @@ namespace Reductech.EDR.Core.Tests
             ));
         }
 
-        private sealed class StepMemberTestFunction : ITestFunction
+        private sealed class StepMemberTestFunction : ITestBaseCase
         {
             public StepMemberTestFunction(string text, StepMember? expectedStepMember)
             {
