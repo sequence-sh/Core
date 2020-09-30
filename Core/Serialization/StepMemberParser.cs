@@ -85,8 +85,12 @@ namespace Reductech.EDR.Core.Serialization
             BooleanOperator,
             [Token(Example = "==")]
             Comparator,
+
+            [Token(Example = "\"Hello World\"")]
+            DoubleQuotedStringLiteral,
+
             [Token(Example = "'Hello World'")]
-            StringLiteral,
+            SingleQuotedStringLiteral,
             [Token(Example = "123")]
             Number,
             [Token(Example = "true")]
@@ -124,8 +128,8 @@ namespace Reductech.EDR.Core.Serialization
 
 
             .Match(Character.EqualTo('='), ProcessToken.Assignment)
-            .Match(QuotedString.SqlStyle, ProcessToken.StringLiteral)
-            .Match(QuotedString.CStyle, ProcessToken.StringLiteral)
+            .Match(QuotedString.SqlStyle, ProcessToken.SingleQuotedStringLiteral)
+            .Match(QuotedString.CStyle, ProcessToken.DoubleQuotedStringLiteral)
 
             .Match(Span.EqualToIgnoreCase(true.ToString()).Or(Span.EqualToIgnoreCase(false.ToString())), ProcessToken.Boolean, true)
             .Match(Span.EqualToIgnoreCase("not"), ProcessToken.NotOperator, true)
@@ -374,8 +378,23 @@ namespace Reductech.EDR.Core.Serialization
             select GetVariableStepFactory.CreateFreezable(variableName);
 
         private static readonly TokenListParser<ProcessToken, IFreezableStep> StringConstantParser =
-            from token in Token.EqualTo(ProcessToken.StringLiteral)
-            select new ConstantFreezableStep(token.ToStringValue()[1..^1] ) as IFreezableStep;
+            (from token in Token.EqualTo(ProcessToken.SingleQuotedStringLiteral)
+             select GetConstantStringSingleQuoted(token))
+            .Or(from token in Token.EqualTo(ProcessToken.DoubleQuotedStringLiteral)
+                select GetConstantStringDoubleQuoted(token));
+
+        private static IFreezableStep GetConstantStringSingleQuoted(Token<ProcessToken> token)
+        {
+            var r = QuotedString.SqlStyle.Invoke(token.Span);
+            return new ConstantFreezableStep(r.Value);
+        }
+
+        private static IFreezableStep GetConstantStringDoubleQuoted(Token<ProcessToken> token)
+        {
+            var r = QuotedString.CStyle.Invoke(token.Span);
+            return new ConstantFreezableStep(r.Value);
+        }
+
 
         private static readonly TokenListParser<ProcessToken, IFreezableStep> NumberParser =
             from token in Token.EqualTo(ProcessToken.Number)
