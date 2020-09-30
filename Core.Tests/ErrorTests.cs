@@ -3,8 +3,8 @@ using FluentAssertions;
 using Microsoft.Extensions.Logging.Abstractions;
 using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.Internal;
-using Reductech.EDR.Core.Tests.Extensions;
 using Reductech.EDR.Core.Util;
+using Reductech.Utilities.Testing;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -24,7 +24,7 @@ namespace Reductech.EDR.Core.Tests
     public class RunErrorTestCases : TestBase
     {
         /// <inheritdoc />
-        protected override IEnumerable<ITestFunction> TestCases
+        protected override IEnumerable<ITestBaseCase> TestCases
         {
             get
             {
@@ -81,7 +81,7 @@ namespace Reductech.EDR.Core.Tests
 
         public static readonly VariableName FooString = new VariableName("Foo");
 
-        private class ErrorTestFunction : ITestFunction
+        private class ErrorTestFunction : ITestBaseCase
         {
             public ErrorTestFunction(string name, IStep process, IRunErrors expectedErrors)
             {

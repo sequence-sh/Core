@@ -4,7 +4,7 @@ using FluentAssertions;
 using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Documentation;
-using Reductech.EDR.Core.Tests.Extensions;
+using Reductech.Utilities.Testing;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -24,7 +24,7 @@ namespace Reductech.EDR.Core.Tests
     public class DocumentationTestCases : TestBase
     {
         /// <inheritdoc />
-        protected override IEnumerable<ITestFunction> TestCases
+        protected override IEnumerable<ITestBaseCase> TestCases
         {
             get
             {
@@ -43,7 +43,7 @@ namespace Reductech.EDR.Core.Tests
                     "|Boolean  |`bool`|☑️      |The value to negate.|");
             }
         }
-        private class DocumentationTestCase : ITestFunction
+        private class DocumentationTestCase : ITestBaseCase
         {
             /// <summary>
             /// Create a new DocumentationTestCase

@@ -3,8 +3,8 @@ using FluentAssertions;
 using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Serialization;
-using Reductech.EDR.Core.Tests.Extensions;
 using Reductech.EDR.Core.Util;
+using Reductech.Utilities.Testing;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -29,7 +29,7 @@ namespace Reductech.EDR.Core.Tests
         public static readonly VariableName BarString = new VariableName("Bar");
 
         /// <inheritdoc />
-        protected override IEnumerable<ITestFunction> TestCases
+        protected override IEnumerable<ITestBaseCase> TestCases
         {
             get
             {
@@ -396,7 +396,7 @@ namespace Reductech.EDR.Core.Tests
         private static Sequence Sequence(params IStep<Unit>[] steps)=> new Sequence{Steps = steps};
 
 
-        private class TestFunction : ITestFunction
+        private class TestFunction : ITestBaseCase
         {
             public TestFunction(string expectedName, IStep step, params string[] expectedLoggedValues)
             {

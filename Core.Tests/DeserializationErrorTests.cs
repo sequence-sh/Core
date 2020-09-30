@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Serialization;
-using Reductech.EDR.Core.Tests.Extensions;
+using Reductech.Utilities.Testing;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -22,7 +22,7 @@ namespace Reductech.EDR.Core.Tests
     public class DeserializationErrorTestCases : TestBase
     {
         /// <inheritdoc />
-        protected override IEnumerable<ITestFunction> TestCases
+        protected override IEnumerable<ITestBaseCase> TestCases
         {
             get
             {
@@ -33,7 +33,7 @@ namespace Reductech.EDR.Core.Tests
         }
 
 
-        private class DeserializationErrorCase : ITestFunction
+        private class DeserializationErrorCase : ITestBaseCase
         {
             private readonly string _expectedError;
 
