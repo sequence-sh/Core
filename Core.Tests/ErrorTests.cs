@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using FluentAssertions;
 using Microsoft.Extensions.Logging.Abstractions;
-using Reductech.EDR.Core.General;
+using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Tests.Extensions;
 using Reductech.EDR.Core.Util;

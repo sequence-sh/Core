@@ -48,4 +48,8 @@
     <ProjectReference Include="..\Core\Core.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="StrykerOutput\" />
+  </ItemGroup>
+
 </Project>
