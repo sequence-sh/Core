@@ -138,11 +138,10 @@ mutation testing:
     - dotnet dotnet-stryker --project-file "$PROJECT_TO_TEST.csproj" --test-runner vstest
       --reporters "['cleartext','html']" --ignore-methods "['Log*','*Exception.ctor']"
     - cp ./StrykerOutput/*/reports/mutation-report.html ../
-    - mv ./StrykerOutput ../
   artifacts:
-    name: MutationTesting
+    name: MutationReport
+    expose_as: 'Mutation Report'
     paths:
-      - StrykerOutput/
       - mutation-report.html
     expire_in: never
   rules: *rules_code_quality
