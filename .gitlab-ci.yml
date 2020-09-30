@@ -7,7 +7,7 @@ include:
 stages:
   - build
   - test
-  - mutation
+  - quality
   - package
   - push
 
@@ -34,17 +34,10 @@ variables:
     - if: *not_release
   rules_release: &rules_release
     - if: *is_release
-  rules_code_quality: &rules_code_quality
+  rules_manual: &rules_manual
     - if: *is_master
     - when: manual
       allow_failure: true
-  rules_push_dev: &rules_push_dev
-    - if: *is_master
-    - if: *not_release
-      when: manual
-      allow_failure: true
-  rules_push_release: &rules_push_release
-    - if: *is_release
 
 build dev:
   stage: build
@@ -77,7 +70,7 @@ build release:
     NUGET_TOKEN: $NUGET_TOKEN_PROD
   rules: *rules_release
 
-test:
+test dev:
   stage: test
   variables:
     CONFIG: $CONFIG_DEV
@@ -99,13 +92,14 @@ test:
   rules: *rules_dev
 
 test release:
-  extends: test
+  extends: test dev
   variables:
     CONFIG: $CONFIG_RELEASE
   rules: *rules_release
 
 version check:
   stage: test
+  needs: []
   variables:
     PROJECT_PATH: ./*/*.csproj
     PROJECT_FILTER: '*Tests*'
@@ -126,12 +120,21 @@ version check:
   rules: *rules_release
 
 code_quality:
-  rules: *rules_code_quality
+  stage: quality
+  rules: *rules_manual
 
 mutation testing:
-  stage: mutation
+  stage: quality
+  needs: []
   variables:
     PROJECT_TO_TEST: $CI_PROJECT_TITLE
+    NUGET_PROJECT_ID: $NUGET_PROJECT_ID_DEV
+    NUGET_USERNAME: $NUGET_USER_DEV
+    NUGET_TOKEN: $NUGET_TOKEN_DEV
+  before_script:
+    - dotnet nuget add source --name reductech --username $NUGET_USERNAME
+      --password $NUGET_TOKEN --store-password-in-clear-text
+      "https://gitlab.com/api/v4/projects/$NUGET_PROJECT_ID/packages/nuget/index.json"
   script:
     - dotnet tool restore
     - cd "$PROJECT_TO_TEST.Tests/"
@@ -144,10 +147,13 @@ mutation testing:
     paths:
       - mutation-report.html
     expire_in: never
-  rules: *rules_code_quality
+  rules: *rules_manual
 
 package nuget dev:
   stage: package
+  needs:
+    - build dev
+    - test dev
   variables:
     BUILD_VER: "+$CI_COMMIT_SHORT_SHA"
   script:
@@ -164,6 +170,9 @@ package nuget dev:
 
 package nuget master:
   extends: package nuget dev
+  needs:
+    - build dev
+    - test dev
   script:
     - dotnet pack --no-build --configuration $CONFIG_DEV --output ./
   rules:
@@ -171,6 +180,10 @@ package nuget master:
 
 package nuget release:
   stage: package
+  needs:
+    - build release
+    - test release
+    - version check
   script:
     - dotnet pack --no-build --configuration $CONFIG_RELEASE --output ./
   artifacts:
@@ -182,6 +195,10 @@ package nuget release:
 
 package dll release:
   stage: package
+  needs:
+    - build release
+    - test release
+    - version check
   script:
     - dotnet publish --no-build --configuration $CONFIG_RELEASE --output "./$CI_PROJECT_NAME-$CI_COMMIT_REF_SLUG"
   artifacts:
@@ -193,6 +210,8 @@ package dll release:
 
 push to nuget dev:
   stage: push
+  needs:
+    - package nuget dev
   variables:
     NUGET_PROJECT_ID: $NUGET_PROJECT_ID_DEV
     NUGET_USERNAME: $NUGET_USER_DEV
@@ -203,12 +222,26 @@ push to nuget dev:
       "https://gitlab.com/api/v4/projects/$NUGET_PROJECT_ID/packages/nuget/index.json"
   script:
     - dotnet nuget push --source reductech *.nupkg
-  rules: *rules_push_dev
+  rules:
+    - if: *is_master
+      when: never
+    - if: *not_release
+      when: manual
+      allow_failure: true
+
+push to nuget master:
+  extends: push to nuget dev
+  needs:
+    - package nuget master
+  rules:
+    - if: *is_master
 
 push to nuget release:
   extends: push to nuget dev
+  needs:
+    - package nuget release
   variables:
     NUGET_PROJECT_ID: $NUGET_PROJECT_ID_RELEASE
     NUGET_USERNAME: $NUGET_USER_PROD
     NUGET_TOKEN: $NUGET_TOKEN_PROD
-  rules: *rules_push_release
+  rules: *rules_release
