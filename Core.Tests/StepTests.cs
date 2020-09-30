@@ -35,6 +35,9 @@ namespace Reductech.EDR.Core.Tests
             {
                 yield return new TestFunction("Print 'Hello World'", Print (Constant(HelloWorldString)), HelloWorldString);
 
+                yield return new TestFunction("Print 'Mark's string'", Print (Constant("Mark's string")), "Mark's string");
+
+
                 yield return new TestFunction("<Foo> = 'Hello World'; Print <Foo>",Sequence
                 (
                     SetVariable(FooString, Constant(HelloWorldString)),
@@ -55,6 +58,12 @@ namespace Reductech.EDR.Core.Tests
                     Print(GetVariable<bool>(FooString))
 
                 ), true.ToString());
+
+                yield return new TestFunction("Print +",
+                    new Print<MathOperator>
+                    {
+                        Value = new Constant<MathOperator>(MathOperator.Add)
+                    }, MathOperator.Add.ToString());
 
 
                 //yield return new TestFunction("Print 'True And Not False'",

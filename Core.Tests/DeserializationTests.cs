@@ -34,6 +34,10 @@ namespace Reductech.EDR.Core.Tests
 - <Bar> = <Foo>
 - Print(Value = <Bar>)", "Hello World");
 
+                yield return new DeserializationTestFunction(@"Print(Value = 'Mark''s string')", "Mark's string" );
+                yield return new DeserializationTestFunction(@"Print(Value = ""Mark's string"")", "Mark's string" );
+
+
                 yield return new DeserializationTestFunction(@"Print(Value = 2 * 3)", 6);
 
                 yield return new DeserializationTestFunction(@"Print(Value = 3 - 2)", 1);
