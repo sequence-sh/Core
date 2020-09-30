@@ -356,7 +356,26 @@ MigrationBackup/
 # Ionide (cross platform F# VS Code tools) working folder
 .ionide/
 
+## https://raw.githubusercontent.com/dotnet/core/master/.gitignore
+*.swp
+.DS_Store
+nupkg/
+
+# Rider
+.idea
+
+## VisualStudioCode
+## https://raw.githubusercontent.com/github/gitignore/master/Global/VisualStudioCode.gitignore
+##
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.code-workspace
+
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
-/Processes.Test/StrykerOutput
-/Core.Test/StrykerOutput
+
+####
+**/StrykerOutput/
