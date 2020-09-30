@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using CSharpFunctionalExtensions;
-using Reductech.EDR.Core.General;
+using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.Util;
 
 namespace Reductech.EDR.Core.Internal

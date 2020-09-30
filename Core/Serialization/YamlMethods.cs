@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
 using CSharpFunctionalExtensions;
-using Reductech.EDR.Core.General;
+using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Util;
 using YamlDotNet.Core;
