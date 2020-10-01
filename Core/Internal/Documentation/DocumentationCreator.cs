@@ -12,7 +12,7 @@ namespace Reductech.EDR.Core.Internal.Documentation
         /// Dynamically Gets all steps and related entities from an assembly.
         /// For use with InstantConsole.
         /// </summary>
-        public static IEnumerable<IDocumented> GetAllDocumented(DocumentationCategory documentationCategory, StepFactoryStore stepFactoryStore)
+        public static IEnumerable<IDocumented> GetAllDocumented(string documentationCategory, StepFactoryStore stepFactoryStore)
         {
             var wrappers = stepFactoryStore.Dictionary.Values
                 .Select(x => new StepWrapper(x, documentationCategory)).ToList();
@@ -40,41 +40,38 @@ namespace Reductech.EDR.Core.Internal.Documentation
                 {
                     $"<a name=\"{x.Name}\">{x.Name}</a>",
                     x.Summary
-                }).ToList();
+                })
+                .Prepend(new[]{"Step", "Summary"}) //Header row
+                .ToList();
 
             var contentsTableLines = Prettifier.CreateMarkdownTable(contentsRows);
-
             lines.AddRange(contentsTableLines);
-
-
 
             foreach (var category in categories)
             {
-                if (category.Key.Anchor != null)
-                    lines.Add($"<a name=\"{TypeNameHelper.GetHumanReadableTypeName(category.Key.Anchor)}\"></a>");
-                lines.Add($"# {category.Key.Header}");
+                lines.Add($"# {category.Key}");
 
                 foreach (var doc in category)
                 {
                     lines.Add($"<a name=\"{doc.Name}\"></a>");
                     lines.Add($"## {doc.Name}");
-                    lines.Add("");
+                    lines.Add(string.Empty);
                     if (!string.IsNullOrWhiteSpace(doc.TypeDetails))
                     {
                         lines.Add($"**{doc.TypeDetails}**");
-                        lines.Add("");
+                        lines.Add(string.Empty);
                     }
 
                     foreach (var docRequirement in doc.Requirements)
                     {
                         lines.Add($"*{docRequirement}*");
-                        lines.Add("");
+                        lines.Add(string.Empty);
                     }
 
                     if (!string.IsNullOrWhiteSpace(doc.Summary))
                     {
                         lines.Add(Escape(doc.Summary));
-                        lines.Add("");
+                        lines.Add(string.Empty);
                     }
 
                     if (doc.Parameters.Any())
@@ -108,7 +105,7 @@ namespace Reductech.EDR.Core.Internal.Documentation
 
                         var table = Prettifier.CreateMarkdownTable(parameterRows).ToList();
                         lines.AddRange(table);
-                        lines.Add("");
+                        lines.Add(string.Empty);
                         enumTypes.UnionWith(doc.Parameters.Select(x => x.Type)
                             .Select(x => Nullable.GetUnderlyingType(x) ?? x).Where(t => t.IsEnum));
                     }
@@ -127,7 +124,7 @@ namespace Reductech.EDR.Core.Internal.Documentation
                     if (!string.IsNullOrWhiteSpace(summary))
                     {
                         lines.Add(Escape(summary));
-                        lines.Add("");
+                        lines.Add(string.Empty);
                     }
 
                     var parameterRows = new List<string?[]> { new[] { "Name", "Summary" } };
@@ -137,7 +134,7 @@ namespace Reductech.EDR.Core.Internal.Documentation
 
                     var table = Prettifier.CreateMarkdownTable(parameterRows).ToList();
                     lines.AddRange(table);
-                    lines.Add("");
+                    lines.Add(string.Empty);
                 }
             }
 

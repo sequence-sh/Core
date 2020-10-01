@@ -10,7 +10,7 @@ namespace Reductech.EDR.Core.Internal.Documentation
         /// <summary>
         /// What category this item will belong in.
         /// </summary>
-        DocumentationCategory DocumentationCategory { get; }
+        string DocumentationCategory { get; }
 
 
         /// <summary>

@@ -38,7 +38,7 @@ namespace Reductech.EDR.Core.Internal
         protected void GenerateDocumentationAbstract(string path)
         {
             var documentationCategories = ConnectorTypes.Append(typeof(IStep))
-                .Select(type => (docCategory: new DocumentationCategory(type.Assembly.GetName().Name!), type)).ToList();
+                .Select(type => (docCategory: type.Assembly.GetName().Name!, type)).ToList();
 
             var documented = documentationCategories
                 .SelectMany(x =>

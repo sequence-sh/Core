@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using CSharpFunctionalExtensions;
-using Reductech.EDR.Core.Util;
 using YamlDotNet.Serialization;
 
 namespace Reductech.EDR.Core
@@ -56,46 +53,46 @@ namespace Reductech.EDR.Core
 
         }
 
-        /// <summary>
-        /// Tries to convert an object to a configuration.
-        /// </summary>
-        public static Result<Configuration> TryConvert(object o)
-        {
-            if (o is Configuration pc) return pc;
+        ///// <summary>
+        ///// Tries to convert an object to a configuration.
+        ///// </summary>
+        //public static Result<Configuration> TryConvert(object o)
+        //{
+        //    if (o is Configuration pc) return pc;
 
-            if (o is IReadOnlyDictionary<object, object> dictionary)
-            {
-                var processConfiguration = new Configuration();
+        //    if (o is IReadOnlyDictionary<object, object> dictionary)
+        //    {
+        //        var processConfiguration = new Configuration();
 
-                var results = new List<Result>();
+        //        var results = new List<Result>();
 
 
-                foreach (var (key, value) in dictionary.Where(x=>x.Value != null))
-                {
-                    var result = key switch
-                    {
-                        nameof(Priority)=> value.TryConvert<byte>().Tap(x=>processConfiguration.Priority = x),
-                        nameof(DoNotSplit)=> value.TryConvert<bool>().Tap(x=>processConfiguration.DoNotSplit = x),
-                        nameof(TargetMachineTags)=> value.TryCast<List<object>>()
-                            .Bind(x=>x.TryConvertElements<object, string>())
-                            .Tap(x=>processConfiguration.TargetMachineTags = x.ToList()),
-                        nameof(AdditionalRequirements)=> value.TryCast<List<object>>()
-                            .Bind(x=>x.TryConvertElements(Requirement.TryConvert))
-                            .Tap(x=>processConfiguration.AdditionalRequirements = x.ToList()),
-                        _ => Result.Failure($"Could not recognize property '{key}'.")
-                    };
+        //        foreach (var (key, value) in dictionary.Where(x=>x.Value != null))
+        //        {
+        //            var result = key switch
+        //            {
+        //                nameof(Priority)=> value.TryConvert<byte>().Tap(x=>processConfiguration.Priority = x),
+        //                nameof(DoNotSplit)=> value.TryConvert<bool>().Tap(x=>processConfiguration.DoNotSplit = x),
+        //                nameof(TargetMachineTags)=> value.TryCast<List<object>>()
+        //                    .Bind(x=>x.TryConvertElements<object, string>())
+        //                    .Tap(x=>processConfiguration.TargetMachineTags = x.ToList()),
+        //                nameof(AdditionalRequirements)=> value.TryCast<List<object>>()
+        //                    .Bind(x=>x.TryConvertElements(Requirement.TryConvert))
+        //                    .Tap(x=>processConfiguration.AdditionalRequirements = x.ToList()),
+        //                _ => Result.Failure($"Could not recognize property '{key}'.")
+        //            };
 
-                    results.Add(result);
-                }
+        //            results.Add(result);
+        //        }
 
-                var r = results
-                    .Combine().Bind<Configuration>(() => processConfiguration);
+        //        var r = results
+        //            .Combine().Bind<Configuration>(() => processConfiguration);
 
-                return r;
+        //        return r;
 
-            }
-            return Result.Failure<Configuration>("Could not deserialize step configuration.");
-        }
+        //    }
+        //    return Result.Failure<Configuration>("Could not deserialize step configuration.");
+        //}
 
 
         private static List<T>? Combine<T>(List<T>? l1, List<T>? l2, bool distinct)

@@ -15,7 +15,7 @@ namespace Reductech.EDR.Core.Internal.Documentation
         /// <summary>
         /// Creates a new StepWrapper.
         /// </summary>
-        public StepWrapper(IStepFactory factory, DocumentationCategory category)
+        public StepWrapper(IStepFactory factory, string category)
         {
             Factory = factory;
             DocumentationCategory = category;
@@ -47,7 +47,7 @@ namespace Reductech.EDR.Core.Internal.Documentation
         private IStepFactory Factory { get; }
 
         /// <inheritdoc />
-        public DocumentationCategory DocumentationCategory { get; }
+        public string DocumentationCategory { get; }
 
         /// <inheritdoc />
         public string Name => Factory.StepType.Name;
@@ -96,19 +96,7 @@ namespace Reductech.EDR.Core.Internal.Documentation
                 if(!string.IsNullOrWhiteSpace(dvs))
                     extraFields.Add("Default Value", dvs);
 
-                AddFieldFromAttribute<ExampleAttribute>("Example", extraFields, propertyInfo, x =>
-                {
-                    var equalsIndex = x.Example.IndexOf('=');
-
-                    if (equalsIndex >= 0 && equalsIndex != x.Example.Length)
-                    {
-                        var angleIndex = x.Example.IndexOf('<');
-                        if (angleIndex < 0 || angleIndex >= equalsIndex)
-                            return x.Example.Substring(equalsIndex + 1);
-                    }
-
-                    return x.Example;
-                });
+                AddFieldFromAttribute<ExampleAttribute>("Example", extraFields, propertyInfo, x => x.Example);
                 AddFieldFromAttribute<RequiredVersionAttribute>("Requirements", extraFields, propertyInfo, x=>x.Text);
                 AddFieldFromAttribute<DocumentationURLAttribute>("URL", extraFields, propertyInfo, x=>$"[{propertyInfo.Name}]({ x.DocumentationURL})");
                 AddFieldFromAttribute<RecommendedRangeAttribute>("Recommended Range", extraFields, propertyInfo, x=>x.RecommendedRange);
@@ -127,12 +115,12 @@ namespace Reductech.EDR.Core.Internal.Documentation
                 string name,
                 IDictionary<string, string> dictionary, MemberInfo propertyInfo, Func<T, string> getAttributeText) where T : Attribute
             {
-                var s = string.Join("\r\n", propertyInfo.GetCustomAttributes<T>().Select(getAttributeText));
+                var t = propertyInfo.GetCustomAttribute<T>();
 
-                if (!string.IsNullOrWhiteSpace(s))
-                {
-                    dictionary.Add(name, s);
-                }
+                if (t == null) return;
+
+                var attributeText = getAttributeText(t);
+                if (!string.IsNullOrWhiteSpace(attributeText)) dictionary.Add(name, attributeText);
             }
 
             /// <summary>

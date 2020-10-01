@@ -10,6 +10,7 @@ namespace Reductech.EDR.Core.Steps
 {
     /// <summary>
     /// Applies a mathematical operator to two integers.
+    /// Returns the result of the operation.
     /// </summary>
     public sealed class ApplyMathOperator : CompoundStep<int>
     {
