@@ -19,6 +19,9 @@ workflow:
     - if: $CI_COMMIT_TAG
 
 variables:
+  PACKAGE_NAME_NUGET: $CI_PROJECT_NAME
+  PACKAGE_NAME_DLL: $CI_PROJECT_NAME
+  DEFAULT_PRERELEASE_VERSION: a
   CONFIG_DEV: Debug
   CONFIG_RELEASE: Release
   NUGET_PROJECT_ID_DEV: 18697166
@@ -39,6 +42,12 @@ variables:
     - when: manual
       allow_failure: true
 
+.script defaults:
+  nuget_add_source: &nuget_add_source
+    - dotnet nuget add source --name reductech --username $NUGET_USERNAME
+      --password $NUGET_TOKEN --store-password-in-clear-text
+      "https://gitlab.com/api/v4/projects/$NUGET_PROJECT_ID/packages/nuget/index.json"
+
 build dev:
   stage: build
   variables:
@@ -46,10 +55,7 @@ build dev:
     NUGET_PROJECT_ID: $NUGET_PROJECT_ID_DEV
     NUGET_USERNAME: $NUGET_USER_DEV
     NUGET_TOKEN: $NUGET_TOKEN_DEV
-  before_script:
-    - dotnet nuget add source --name reductech --username $NUGET_USERNAME
-      --password $NUGET_TOKEN --store-password-in-clear-text
-      "https://gitlab.com/api/v4/projects/$NUGET_PROJECT_ID/packages/nuget/index.json"
+  before_script: *nuget_add_source
   script:
     - dotnet restore --packages ./packages
     - dotnet build --configuration $CONFIG --no-restore
@@ -97,7 +103,7 @@ test release:
     CONFIG: $CONFIG_RELEASE
   rules: *rules_release
 
-version check:
+version check dev:
   stage: test
   needs: []
   variables:
@@ -105,18 +111,47 @@ version check:
     PROJECT_FILTER: '*Tests*'
   script:
     - >-
-      pwsh -Command 'Write-Host "Tag version : ${env:CI_COMMIT_TAG}" ;
-      Get-ChildItem -Path $env:PROJECT_PATH -Exclude $env:PROJECT_FILTER | ForEach-Object {
+      pwsh -Command 'if ($env:CI_JOB_NAME -eq "version check release") {
+          Write-Host "Tag version : ${env:CI_COMMIT_TAG}"
+      }
+      $projects = Get-ChildItem -Path $env:PROJECT_PATH -Exclude $env:PROJECT_FILTER ;
+      if (@($projects).Count -gt 1) {
+          Write-Warning "More than one project found. The last project version will be used for the PROJECT_VERSION variable."
+      }
+      $projects | ForEach-Object {
           Write-Host "Checking $($_.BaseName)" ;
           $csproj = Get-Content $_.FullName -Raw ;
           $csproj -match "<Version>(.+?)(\$\(VersionSuffix\))?</Version>" | Out-Null ;
           $version = "v" + $Matches[1] ;
-          Write-Host "Project version: $version" ;
-          if ($version -ne $env:CI_COMMIT_TAG) {
+          Write-Host "Project version    : $version" ;
+          if ($version -match "-(.+)$") {
+              $suffix = ""
+          } else {
+              $suffix = "-" + $env:DEFAULT_PRERELEASE_VERSION
+          }
+          if ($env:CI_COMMIT_BRANCH -eq "master") {
+              $suffix += ".master"
+          } else {
+              $suffix += ".dev"
+          }
+          $timestamp = [DateTimeOffset]::Now.ToUnixTimeSeconds() ;
+          $suffix += ".$timestamp" ;
+          Write-Host "Version timestamp  : $timestamp" ;
+          Write-Host "Version suffix     : $suffix" ;
+          Write-Host "Dev/master version : ${version}${suffix}" ;
+          "PROJECT_VERSION=$version`nVERSION_SUFFIX=$suffix`nVERSION_TIMESTAMP=$timestamp" | Out-File -FilePath ./version.env -Encoding ascii ;
+          if ($env:CI_JOB_NAME -eq "version check release" -and $version -ne $env:CI_COMMIT_TAG) {
               Write-Error "The project version $version does not match the release tag version ${env:CI_COMMIT_TAG}" ;
               exit 1
           }
       }'
+  artifacts:
+    reports:
+      dotenv: version.env
+  rules: *rules_dev
+
+version check release:
+  extends: version check dev
   rules: *rules_release
 
 code_quality:
@@ -131,10 +166,7 @@ mutation testing:
     NUGET_PROJECT_ID: $NUGET_PROJECT_ID_DEV
     NUGET_USERNAME: $NUGET_USER_DEV
     NUGET_TOKEN: $NUGET_TOKEN_DEV
-  before_script:
-    - dotnet nuget add source --name reductech --username $NUGET_USERNAME
-      --password $NUGET_TOKEN --store-password-in-clear-text
-      "https://gitlab.com/api/v4/projects/$NUGET_PROJECT_ID/packages/nuget/index.json"
+  before_script: *nuget_add_source
   script:
     - dotnet tool restore
     - cd "$PROJECT_TO_TEST.Tests/"
@@ -154,14 +186,15 @@ package nuget dev:
   needs:
     - build dev
     - test dev
-  variables:
-    BUILD_VER: "+$CI_COMMIT_SHORT_SHA"
+    - version check dev
   script:
-    - dotnet pack --no-build --configuration $CONFIG_DEV --version-suffix $BUILD_VER --output ./
+    - dotnet pack --no-build --configuration $CONFIG_DEV --version-suffix $VERSION_SUFFIX --output ./
   artifacts:
-    name: "$CI_PROJECT_NAME-$CI_COMMIT_REF_SLUG"
+    name: "$PACKAGE_NAME_NUGET-$PROJECT_VERSION"
     paths:
       - '*.nupkg'
+      - LICENSE
+      - README.md
     expire_in: 3 months
   rules:
     - if: *is_master
@@ -170,11 +203,13 @@ package nuget dev:
 
 package nuget master:
   extends: package nuget dev
-  needs:
-    - build dev
-    - test dev
-  script:
-    - dotnet pack --no-build --configuration $CONFIG_DEV --output ./
+  artifacts:
+    name: "$PACKAGE_NAME_NUGET-$PROJECT_VERSION"
+    paths:
+      - '*.nupkg'
+      - LICENSE
+      - README.md
+    expire_in: never
   rules:
     - if: *is_master
 
@@ -183,13 +218,15 @@ package nuget release:
   needs:
     - build release
     - test release
-    - version check
+    - version check release
   script:
     - dotnet pack --no-build --configuration $CONFIG_RELEASE --output ./
   artifacts:
-    name: "$CI_PROJECT_NAME-$CI_COMMIT_REF_SLUG"
+    name: "$PACKAGE_NAME_NUGET-$PROJECT_VERSION"
     paths:
       - '*.nupkg'
+      - LICENSE
+      - README.md
     expire_in: never
   rules: *rules_release
 
@@ -198,13 +235,15 @@ package dll release:
   needs:
     - build release
     - test release
-    - version check
+    - version check release
   script:
-    - dotnet publish --no-build --configuration $CONFIG_RELEASE --output "./$CI_PROJECT_NAME-$CI_COMMIT_REF_SLUG"
+    - dotnet publish --no-build --configuration $CONFIG_RELEASE --output "./$PACKAGE_NAME_DLL-$PROJECT_VERSION"
+    - cp LICENSE "./$PACKAGE_NAME_DLL-$PROJECT_VERSION/"
+    - cp README.md "./$PACKAGE_NAME_DLL-$PROJECT_VERSION/"
   artifacts:
-    name: "$CI_PROJECT_NAME-$CI_COMMIT_REF_SLUG"
+    name: "$PACKAGE_NAME_DLL-$PROJECT_VERSION"
     paths:
-      - $CI_PROJECT_NAME-$CI_COMMIT_REF_SLUG/
+      - $PACKAGE_NAME_DLL-$PROJECT_VERSION/
     expire_in: never
   rules: *rules_release
 
@@ -216,10 +255,7 @@ push to nuget dev:
     NUGET_PROJECT_ID: $NUGET_PROJECT_ID_DEV
     NUGET_USERNAME: $NUGET_USER_DEV
     NUGET_TOKEN: $NUGET_TOKEN_DEV
-  before_script:
-    - dotnet nuget add source --name reductech --username $NUGET_USERNAME
-      --password $NUGET_TOKEN --store-password-in-clear-text
-      "https://gitlab.com/api/v4/projects/$NUGET_PROJECT_ID/packages/nuget/index.json"
+  before_script: *nuget_add_source
   script:
     - dotnet nuget push --source reductech *.nupkg
   rules:
@@ -245,3 +281,10 @@ push to nuget release:
     NUGET_USERNAME: $NUGET_USER_PROD
     NUGET_TOKEN: $NUGET_TOKEN_PROD
   rules: *rules_release
+
+push to nuget-dev release:
+  extends: push to nuget release
+  variables:
+    NUGET_PROJECT_ID: $NUGET_PROJECT_ID_DEV
+    NUGET_USERNAME: $NUGET_USER_DEV
+    NUGET_TOKEN: $NUGET_TOKEN_DEV
