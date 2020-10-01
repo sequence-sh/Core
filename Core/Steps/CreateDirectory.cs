@@ -16,30 +16,27 @@ namespace Reductech.EDR.Core.Steps
         /// <inheritdoc />
         public override Result<Unit, IRunErrors> Run(StateMonad stateMonad)
         {
-            var pathResult = Path.Run(stateMonad);
-            if (pathResult.IsFailure)
-                return pathResult.ConvertFailure<Unit>();
+            var result = Path.Run(stateMonad).Bind(CreateDir);
 
-            var path = pathResult.Value;
+            return result;
 
-
-            Maybe<IRunErrors> error;
-            try
+            static Result<Unit, IRunErrors> CreateDir(string path)
             {
-                Directory.CreateDirectory(path);
-                error = Maybe<IRunErrors>.None;
-            }
+                Result<Unit, IRunErrors> r;
+
+                try
+                {
+                    Directory.CreateDirectory(path);
+                    r = Result.Success<Unit, IRunErrors>(Unit.Default);
+                }
 #pragma warning disable CA1031 // Do not catch general exception types
-            catch (Exception e)
-            {
-                error = Maybe<IRunErrors>.From(new RunError(e.Message, Name, null, ErrorCode.ExternalProcessError));
+                catch (Exception e)
+                {
+                    r = new RunError(e.Message, nameof(CreateDirectory), null, ErrorCode.ExternalProcessError);
+                }
+
+                return r;
             }
-#pragma warning restore CA1031 // Do not catch general exception types
-
-            if (error.HasValue)
-                return Result.Failure<Unit, IRunErrors>(error.Value);
-
-            return Unit.Default;
         }
 
         /// <summary>

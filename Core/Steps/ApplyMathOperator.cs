@@ -31,6 +31,8 @@ namespace Reductech.EDR.Core.Steps
                 MathOperator.Add => left.Value + right.Value,
                 MathOperator.Subtract => left.Value - right.Value,
                 MathOperator.Multiply => left.Value * right.Value,
+                MathOperator.Divide when right.Value == 0 => Result.Failure<int, IRunErrors>(
+                    new RunError("Divide by Zero Error", nameof(ApplyMathOperator), null, ErrorCode.DivideByZero)),
                 MathOperator.Divide => left.Value / right.Value,
                 MathOperator.Modulo => left.Value % right.Value,
                 MathOperator.Power => Convert.ToInt32(Math.Pow(left.Value, right.Value)),

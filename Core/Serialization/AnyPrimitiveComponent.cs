@@ -37,7 +37,7 @@ namespace Reductech.EDR.Core.Serialization
         private static Result<string> TrySerialize(IFreezableStep step)
         {
             if (step is ConstantFreezableStep constantFreezableProcess)
-                return SerializationMethods.SerializeConstant(constantFreezableProcess, true);
+                return SerializationMethods.TrySerializeConstant(constantFreezableProcess, true, false);
             if (step is CompoundFreezableStep compound && compound.StepConfiguration == null)
                 return compound.StepFactory.Serializer.TrySerialize(compound.FreezableStepData);
 

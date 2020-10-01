@@ -260,11 +260,20 @@ Value: I have config too");
             {
                 Step = step;
                 ExpectedYaml = expectedYaml;
+
+                Name = GetName(ExpectedYaml);
             }
 
+            private static string GetName(string expectedYaml)
+            {
+                if (expectedYaml.Length <= 40)
+                    return expectedYaml;
+
+                return expectedYaml.Substring(0, 25) + "..." + expectedYaml.Substring(expectedYaml.Length - 10) + "(" + expectedYaml.Length + ")";
+            }
 
             /// <inheritdoc />
-            public string Name => Step.Name;
+            public string Name { get; }
 
             /// <inheritdoc />
             public void Execute(ITestOutputHelper testOutputHelper)

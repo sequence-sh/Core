@@ -52,7 +52,7 @@ namespace Reductech.EDR.Core.Steps
         }
 
         /// <summary>
-        /// The path to the file or folder to check.
+        /// The path to the file to check.
         /// </summary>
         [StepProperty]
         [Required]

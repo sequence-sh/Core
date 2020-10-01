@@ -65,7 +65,7 @@ namespace Reductech.EDR.Core.Serialization
             {
                 return freezableProcess switch
                 {
-                    ConstantFreezableStep constant => SerializationMethods.SerializeConstant(constant, true),
+                    ConstantFreezableStep constant => SerializationMethods.TrySerializeConstant(constant, true, false),
                     CompoundFreezableStep compoundFreezableProcess => compoundFreezableProcess.StepFactory
                         .Serializer.TrySerialize(compoundFreezableProcess.FreezableStepData),
                     _ => Result.Failure<string>("Cannot serialize")

@@ -85,7 +85,7 @@ namespace Reductech.EDR.Core.Serialization
             switch (step)
             {
                 case ConstantFreezableStep cfp:
-                    return SerializationMethods.SerializeConstant(cfp, false);
+                    return SerializationMethods.TrySerializeConstant(cfp, false, true).Value;
                 case CompoundFreezableStep compoundFreezableProcess:
                 {
                     if (isTopLevel && compoundFreezableProcess.StepFactory == SequenceStepFactory.Instance &&

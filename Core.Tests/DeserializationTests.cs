@@ -44,6 +44,10 @@ namespace Reductech.EDR.Core.Tests
 
                 yield return new DeserializationTestFunction(@"print(value = 2 * 3)", 6);
 
+                yield return new DeserializationTestFunction(@"print(value = 6 / 3)", 2);
+
+                yield return new DeserializationTestFunction(@"print(value = 6 ^ 2)", 36);
+
                 yield return new DeserializationTestFunction(@"print(value = 7 % 2)", 1);
 
                 yield return new DeserializationTestFunction(@"print(value = 7 modulo 2)", 1);
@@ -62,8 +66,11 @@ Value: notable", "notable");//check 'not' delimiter
 
 
                 yield return new DeserializationTestFunction(@"Print(Value = 2 >= 3)", false);
+                yield return new DeserializationTestFunction(@"Print(Value = 4 >= 3)", true);
+                yield return new DeserializationTestFunction(@"Print(Value = 3 >= 3)", true);
 
                 yield return new DeserializationTestFunction(@"Print(Value = 3 > 3)", false);
+                yield return new DeserializationTestFunction(@"Print(Value = 4 > 3)", true);
                 yield return new DeserializationTestFunction(@"Print(Value = 3 < 3)", false);
 
                 yield return new DeserializationTestFunction(@"Print(Value = 3 <= 3)", true);
@@ -101,9 +108,9 @@ Config:
 Value: I have config", "I have config"
                 )
                 {
-                    ExpectedConfiguration = new Configuration()
+                    ExpectedConfiguration = new Configuration
                     {
-                        TargetMachineTags = new List<string>(){"Tag1"},
+                        TargetMachineTags = new List<string> {"Tag1"},
                         DoNotSplit = false,
                         Priority = 1
                     }
@@ -122,12 +129,12 @@ Config:
   Priority: 1
 Value: I have config too", "I have config too")
                 {
-                    ExpectedConfiguration = new Configuration()
+                    ExpectedConfiguration = new Configuration
                     {
-                        TargetMachineTags = new List<string>() { "Tag1" },
+                        TargetMachineTags = new List<string> { "Tag1" },
                         DoNotSplit = false,
                         Priority = 1,
-                        AdditionalRequirements = new List<Requirement>()
+                        AdditionalRequirements = new List<Requirement>
                         {
                             new Requirement
                             {

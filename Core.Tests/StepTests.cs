@@ -1,8 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
 using FluentAssertions;
-using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Serialization;
+using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.Util;
 using Reductech.Utilities.Testing;
 using Xunit;
@@ -25,7 +27,7 @@ namespace Reductech.EDR.Core.Tests
     {
 
         public const string HelloWorldString = "Hello World";
-        public static readonly VariableName FooString = new VariableName("Foo");
+        public static readonly VariableName FooVariableName = new VariableName("Foo");
         public static readonly VariableName BarString = new VariableName("Bar");
 
         /// <inheritdoc />
@@ -33,29 +35,33 @@ namespace Reductech.EDR.Core.Tests
         {
             get
             {
-                yield return new TestFunction("Print 'Hello World'", Print (Constant(HelloWorldString)), HelloWorldString);
 
-                yield return new TestFunction("Print 'Mark's string'", Print (Constant("Mark's string")), "Mark's string");
+                yield return new TestFunction("Print 'Hello World'", Print(Constant(HelloWorldString)),
+                    HelloWorldString);
+
+                yield return new TestFunction("Print 'Mark's string'", Print(Constant("Mark's string")),
+                    "Mark's string");
 
 
-                yield return new TestFunction("<Foo> = 'Hello World'; Print <Foo>",Sequence
+                yield return new TestFunction("<Foo> = 'Hello World'; Print <Foo>", Sequence
                 (
-                    SetVariable(FooString, Constant(HelloWorldString)),
-                    Print(GetVariable<string>(FooString))), HelloWorldString);
+                    SetVariable(FooVariableName, Constant(HelloWorldString)),
+                    Print(GetVariable<string>(FooVariableName))), HelloWorldString);
 
-                yield return new TestFunction("<Foo> = 'Hello World'; <Bar> = <Foo>; Print <Bar>", Sequence(SetVariable(FooString, Constant(HelloWorldString)),
-                    SetVariable(BarString, GetVariable<string>(FooString)),
+                yield return new TestFunction("<Foo> = 'Hello World'; <Bar> = <Foo>; Print <Bar>", Sequence(
+                    SetVariable(FooVariableName, Constant(HelloWorldString)),
+                    SetVariable(BarString, GetVariable<string>(FooVariableName)),
                     Print(GetVariable<string>(BarString))), HelloWorldString);
 
 
-                yield return new TestFunction("<Foo> = 1 < 2; Print <Foo>",Sequence(
-                    SetVariable(FooString, new Compare<int>
+                yield return new TestFunction("<Foo> = 1 < 2; Print <Foo>", Sequence(
+                    SetVariable(FooVariableName, new Compare<int>
                     {
                         Left = Constant(1),
                         Operator = Constant(CompareOperator.LessThan),
                         Right = Constant(2)
                     }),
-                    Print(GetVariable<bool>(FooString))
+                    Print(GetVariable<bool>(FooVariableName))
 
                 ), true.ToString());
 
@@ -85,10 +91,10 @@ namespace Reductech.EDR.Core.Tests
                 yield return new TestFunction("Foreach <Foo> in ['Hello'; 'World']; Print <Foo>",
                     new ForEach<string>
                     {
-                        Action = Print(GetVariable<string>(FooString)),
+                        Action = Print(GetVariable<string>(FooVariableName)),
                         Array = Array(Constant("Hello"),
                             Constant("World")),
-                        VariableName = FooString
+                        VariableName = FooVariableName
                     }, "Hello", "World");
 
                 yield return new TestFunction("If True then Print 'Hello World' else Print 'World Hello'",
@@ -104,8 +110,8 @@ namespace Reductech.EDR.Core.Tests
                 yield return new TestFunction("For <Foo> = 5; <Foo> <= 10; += 2; Print <Foo>",
                     new For
                     {
-                        VariableName = FooString,
-                        Action = Print(GetVariable<int>(FooString)),
+                        VariableName = FooVariableName,
+                        Action = Print(GetVariable<int>(FooVariableName)),
                         From = Constant(5),
                         To = Constant(10),
                         Increment = Constant(2)
@@ -113,12 +119,12 @@ namespace Reductech.EDR.Core.Tests
                     "5", "7", "9");
 
                 yield return new TestFunction("<Foo> = True; Repeat 'Print 'Hello World'; <Foo> = False' while '<Foo>'",
-                    Sequence(SetVariable(FooString, Constant(true)),
+                    Sequence(SetVariable(FooVariableName, Constant(true)),
                         new RepeatWhile
                         {
                             Action = Sequence(Print(Constant(HelloWorldString)),
-                                SetVariable(FooString, Constant(false))),
-                            Condition = GetVariable<bool>(FooString)
+                                SetVariable(FooVariableName, Constant(false))),
+                            Condition = GetVariable<bool>(FooVariableName)
                         }),
                     HelloWorldString);
 
@@ -140,7 +146,7 @@ namespace Reductech.EDR.Core.Tests
                 );
 
                 yield return new TestFunction("Print ArrayIsEmpty(Array: [])",
-                    Print(new ArrayIsEmpty<string>{Array = Array<string>()}), true.ToString());
+                    Print(new ArrayIsEmpty<string> {Array = Array<string>()}), true.ToString());
 
                 yield return new TestFunction("Print ArrayIsEmpty(Array: ['Hello World'])",
                     Print(new ArrayIsEmpty<string>
@@ -158,7 +164,7 @@ namespace Reductech.EDR.Core.Tests
                     Print(new StringIsEmpty
                     {
                         String = Constant("")
-                    }),true.ToString()
+                    }), true.ToString()
                 );
 
                 yield return new TestFunction("Print ''Hello World'' is empty?",
@@ -177,7 +183,8 @@ namespace Reductech.EDR.Core.Tests
                     1.ToString()
                 );
 
-                yield return new TestFunction("Print FirstIndexOfElement(Array: ['Hello'; 'World'], Element: 'Goodbye')",
+                yield return new TestFunction(
+                    "Print FirstIndexOfElement(Array: ['Hello'; 'World'], Element: 'Goodbye')",
                     Print(new FirstIndexOfElement<string>
                     {
                         Array = Array(Constant("Hello"), Constant("World")),
@@ -186,7 +193,7 @@ namespace Reductech.EDR.Core.Tests
                     (-1).ToString()
                 );
 
-                yield return new TestFunction("Print Join Repeat(Element: 'Hello', Number: 3)",Print(new JoinStrings
+                yield return new TestFunction("Print Join Repeat(Element: 'Hello', Number: 3)", Print(new JoinStrings
                 {
                     Delimiter = Constant(", "),
                     List = new Repeat<string>
@@ -196,13 +203,14 @@ namespace Reductech.EDR.Core.Tests
                     }
                 }), "Hello, Hello, Hello");
 
-                yield return new TestFunction("Print ElementAtIndex(Array: SplitString(Delimiter: ', ', String: 'Hello, World'), Index: 1)",
+                yield return new TestFunction(
+                    "Print ElementAtIndex(Array: SplitString(Delimiter: ', ', String: 'Hello, World'), Index: 1)",
                     Print(
                         new ElementAtIndex<string>
                         {
                             Array = new SplitString
                             {
-                                Delimiter = Constant(", ") ,
+                                Delimiter = Constant(", "),
                                 String = Constant("Hello, World")
                             },
                             Index = Constant(1)
@@ -210,41 +218,55 @@ namespace Reductech.EDR.Core.Tests
                     "World");
 
                 yield return new TestFunction("<Foo> = 2; IncrementVariable(Amount: 3, Variable: <Foo>); Print <Foo>",
-                    Sequence(SetVariable(FooString, Constant(2)),
+                    Sequence(SetVariable(FooVariableName, Constant(2)),
                         new IncrementVariable
                         {
                             Amount = Constant(3),
-                            Variable = FooString
+                            Variable = FooVariableName
                         },
-                        Print(GetVariable<int>(FooString))
+                        Print(GetVariable<int>(FooVariableName))
                     ),
 
                     5.ToString());
 
-                yield return new TestFunction("Print ToCase(Case: Upper, String: 'Hello World')", Print(new ToCase{Case = Constant(TextCase.Upper), String = Constant(HelloWorldString)}),"HELLO WORLD");
-                yield return new TestFunction("Print ToCase(Case: Lower, String: 'Hello World')", Print(new ToCase{Case = Constant(TextCase.Lower), String = Constant(HelloWorldString)}),"hello world");
-                yield return new TestFunction("Print ToCase(Case: Title, String: 'Hello World')", Print(new ToCase{Case = Constant(TextCase.Title), String = Constant(HelloWorldString)}),"Hello World");
+                yield return new TestFunction("Print ToCase(Case: Upper, String: 'Hello World')",
+                    Print(new ToCase {Case = Constant(TextCase.Upper), String = Constant(HelloWorldString)}),
+                    "HELLO WORLD");
+                yield return new TestFunction("Print ToCase(Case: Lower, String: 'Hello World')",
+                    Print(new ToCase {Case = Constant(TextCase.Lower), String = Constant(HelloWorldString)}),
+                    "hello world");
+                yield return new TestFunction("Print ToCase(Case: Title, String: 'Hello World')",
+                    Print(new ToCase {Case = Constant(TextCase.Title), String = Constant(HelloWorldString)}),
+                    "Hello World");
 
 
-                yield return new TestFunction("Print Trim(Side: Left, String: '  Hello World  ')", Print(new Trim {Side = Constant(TrimSide.Left), String = Constant("  Hello World  ")}), "Hello World  ");
-                yield return new TestFunction("Print Trim(Side: Right, String: '  Hello World  ')", Print(new Trim {Side = Constant(TrimSide.Right), String = Constant("  Hello World  ")}), "  Hello World");
-                yield return new TestFunction("Print Trim(Side: Both, String: '  Hello World  ')", Print(new Trim {Side = Constant(TrimSide.Both), String = Constant("  Hello World  ")}), HelloWorldString);
+                yield return new TestFunction("Print Trim(Side: Left, String: '  Hello World  ')",
+                    Print(new Trim {Side = Constant(TrimSide.Left), String = Constant("  Hello World  ")}),
+                    "Hello World  ");
+                yield return new TestFunction("Print Trim(Side: Right, String: '  Hello World  ')",
+                    Print(new Trim {Side = Constant(TrimSide.Right), String = Constant("  Hello World  ")}),
+                    "  Hello World");
+                yield return new TestFunction("Print Trim(Side: Both, String: '  Hello World  ')",
+                    Print(new Trim {Side = Constant(TrimSide.Both), String = Constant("  Hello World  ")}),
+                    HelloWorldString);
 
 
-                yield return new TestFunction("Print Test(Condition: True, ElseValue: 'World', ThenValue: 'Hello')", Print(new Test<string>
-                {
-                    Condition = Constant(true),
-                    ThenValue = Constant("Hello"),
-                    ElseValue = Constant("World")
-                }), "Hello");
+                yield return new TestFunction("Print Test(Condition: True, ElseValue: 'World', ThenValue: 'Hello')",
+                    Print(new Test<string>
+                    {
+                        Condition = Constant(true),
+                        ThenValue = Constant("Hello"),
+                        ElseValue = Constant("World")
+                    }), "Hello");
 
 
-                yield return new TestFunction("Print Test(Condition: False, ElseValue: 'World', ThenValue: 'Hello')", Print(new Test<string>
-                {
-                    Condition = Constant(false),
-                    ThenValue = Constant("Hello"),
-                    ElseValue = Constant("World")
-                }), "World");
+                yield return new TestFunction("Print Test(Condition: False, ElseValue: 'World', ThenValue: 'Hello')",
+                    Print(new Test<string>
+                    {
+                        Condition = Constant(false),
+                        ThenValue = Constant("Hello"),
+                        ElseValue = Constant("World")
+                    }), "World");
 
                 yield return new TestFunction("Print Join SortArray(Array: ['B'; 'C'; 'A'], Order: Ascending)",
                     Print(new JoinStrings
@@ -272,7 +294,7 @@ namespace Reductech.EDR.Core.Tests
                     Print(new FirstIndexOf
                     {
                         String = Constant("Hello World, Goodbye World"),
-                        SubString = Constant("World" )
+                        SubString = Constant("World")
                     }),
                     "6"
                 );
@@ -299,14 +321,14 @@ namespace Reductech.EDR.Core.Tests
                     {
                         Number = Constant(3),
                         Action = Print(Constant(HelloWorldString))
-                    },HelloWorldString, HelloWorldString, HelloWorldString);
+                    }, HelloWorldString, HelloWorldString, HelloWorldString);
 
 
                 yield return new TestFunction("<Foo> = 'Hello'; Append ' World' to <Foo>; Print <Foo>",
                     Sequence(
-                        SetVariable(FooString,Constant("Hello")),
-                        new AppendString{Variable = FooString, String = Constant(" World") },
-                        Print(GetVariable<string>(FooString))
+                        SetVariable(FooVariableName, Constant("Hello")),
+                        new AppendString {Variable = FooVariableName, String = Constant(" World")},
+                        Print(GetVariable<string>(FooVariableName))
                     ), HelloWorldString);
 
                 yield return new TestFunction("Print GetSubstring(Index: 6, Length: 2, String: 'Hello World')",
@@ -325,43 +347,73 @@ namespace Reductech.EDR.Core.Tests
                     }), "World"
                 );
 
-                yield return new TestFunction("Print 'I have config'", new Print<string>()
+                yield return new TestFunction("Print 'I have config'", new Print<string>
                 {
                     Value = Constant("I have config"),
-                    Configuration = new Configuration()
+                    Configuration = new Configuration
                     {
                         Priority = 1,
-                        TargetMachineTags = new List<string>()
+                        TargetMachineTags = new List<string>
                         {
                             "Tag1"
                         }
                     }
                 }, "I have config");
 
-                //yield return new TestFunction("Print 'I have more config'", new Print<string>()
-                //{
-                //    Value = Constant("I have more config"),
-                //    Configuration = new Configuration
-                //    {
-                //        Priority = 1,
-                //        TargetMachineTags = new List<string>
-                //        {
-                //            "Tag1",
-                //            "Tag2"
-                //        },
-                //        DoNotSplit = true,
-                //        AdditionalRequirements = new List<Requirement>
-                //        {
-                //            new Requirement
-                //            {
-                //                MinVersion = new Version(1,0),
-                //                MaxVersion = new Version(2,0),
-                //                Name = "Test",
-                //                Notes = "ABC123"
-                //            }
-                //        }
-                //    }
-                //}, "I have more config");
+
+                var testFolderPath = new Constant<string>(Path.Combine(Directory.GetCurrentDirectory(), "TestFolder"));
+                var testFilePath = new Constant<string>(Path.Combine(testFolderPath.Value, "Poem.txt"));
+
+                yield return new TestFunction("Delete Folder etc",
+                    new Sequence
+                    {
+                        Steps = new List<IStep<Unit>>
+                        {
+                            new DeleteItem {Path = testFolderPath},
+                            new AssertTrue {Test = new Not {Boolean = new DirectoryExists {Path = testFolderPath}}},
+                            new CreateDirectory {Path = testFolderPath},
+                            new AssertTrue {Test = new DirectoryExists {Path = testFolderPath}},
+
+                            new CreateFile {Path = testFilePath, Text = new Constant<string>("Hello World")},
+
+                            new AssertTrue {Test = new FileExists {Path = testFilePath}},
+
+                            new AssertTrue
+                            {
+                                Test = new DoesFileContain
+                                    {Path = testFilePath, Text = new Constant<string>("Hello World")}
+                            },
+                            new DeleteItem {Path = testFilePath},
+                            new DeleteItem {Path = testFolderPath},
+                            new AssertTrue {Test = new Not {Boolean = new DirectoryExists {Path = testFolderPath}}}
+                        }
+                    }
+                ) {IgnoreName = true, IgnoreLoggedValues = true};
+
+                yield return new TestFunction("Print 'I have more config'", new Print<string>
+                {
+                    Value = Constant("I have more config"),
+                    Configuration = new Configuration
+                    {
+                        Priority = 1,
+                        TargetMachineTags = new List<string>
+                        {
+                            "Tag1",
+                            "Tag2"
+                        },
+                        DoNotSplit = true,
+                        AdditionalRequirements = new List<Requirement>
+                        {
+                            new Requirement
+                            {
+                                MinVersion = new Version(1, 0),
+                                MaxVersion = new Version(2, 0),
+                                Name = "Test",
+                                Notes = "ABC123"
+                            }
+                        }
+                    }
+                }, "I have more config");
 
                 yield return new TestFunction("AssertTrue(Test: True)", new AssertTrue
                 {
@@ -375,6 +427,71 @@ namespace Reductech.EDR.Core.Tests
                         Test = Constant(false)
                     }
                 });
+
+                yield return new TestFunction("Read CSV",
+                    new Print<string>
+                    {
+                        Value = new ElementAtIndex<string>
+                        {
+                            Array = new ElementAtIndex<List<string>>
+                            {
+                                Array = new ReadCsv
+                                {
+                                    Text = new Constant<string>(@"Name,Summary
+One,The first number
+Two,The second number"),
+                                    ColumnsToMap = new Array<string>
+                                    {
+                                        Elements = new[] { new Constant<string>("Name"), new Constant<string>("Summary") }
+                                    },
+                                    Delimiter = new Constant<string>(",")
+                                },
+                                Index = new Constant<int>(1)
+                            },
+                            Index = new Constant<int>(1)
+                        }
+                    },
+                    "The second number"){IgnoreName = true};
+
+                /*
+                yield return new TestFunction("Read CSV ForEach",
+
+                    new Sequence
+                    {
+                        Steps = new IStep<Unit>[]
+                        {
+                            new SetVariable<List<string>> //TODO this should not be necessary
+                            {
+                                VariableName = FooVariableName,
+                                Value = new Array<string>(){Elements = new []{Constant("Initial")}}
+                            },
+
+                            new ForEach<List<string>>
+                            {
+                                Array = new ReadCsv
+                                {
+                                    Text = new Constant<string>(@"Name,Summary
+One,The first number
+Two,The second number"),
+                                    ColumnsToMap = new Array<string>
+                                    {
+                                        Elements = new[] {new Constant<string>("Name"), new Constant<string>("Summary")}
+                                    },
+                                    Delimiter = new Constant<string>(",")
+                                },
+                                VariableName = FooVariableName,
+                                Action = new Print<string>
+                                {
+                                    Value = new ElementAtIndex<string>
+                                    {
+                                        Array = new GetVariable<List<string>> {VariableName = FooVariableName},
+                                        Index = new Constant<int>(1)
+                                    }
+                                }
+                            }
+                        }
+                    }) {IgnoreName = true};
+                */
 
             }
         }
@@ -415,6 +532,9 @@ namespace Reductech.EDR.Core.Tests
 
             public IReadOnlyList<string> ExpectedLoggedValues { get; }
 
+            public bool IgnoreLoggedValues { get; set; }
+            public bool IgnoreName { get; set; }
+
             /// <inheritdoc />
             public void Execute(ITestOutputHelper outputHelper)
             {
@@ -431,8 +551,11 @@ namespace Reductech.EDR.Core.Tests
 
                 //Assert
                 runResult.ShouldBeSuccessful();
-                logger.LoggedValues.Should().BeEquivalentTo(ExpectedLoggedValues);
-                Step.Name.Should().Be(ExpectedName);
+
+                if(!IgnoreLoggedValues)
+                    logger.LoggedValues.Should().BeEquivalentTo(ExpectedLoggedValues);
+                if(!IgnoreName)
+                    Step.Name.Should().Be(ExpectedName);
 
             }
         }

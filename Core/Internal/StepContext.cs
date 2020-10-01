@@ -42,7 +42,7 @@ namespace Reductech.EDR.Core.Internal
                         .Select(TryGetTypeFromReference)
                         .Combine()
                         .Map(x => x.Distinct())
-                        .Ensure(x => x.Count() == 1, $"Type has multiple actual types.")
+                        .Ensure(x => x.Count() == 1, "Type has multiple actual types.")
                         .Map(x => x.Single());
 
                     return result;
@@ -87,7 +87,10 @@ namespace Reductech.EDR.Core.Internal
 
                 foreach (var remainingGroup in groups)
                 {
-                    var keys = remainingGroup.SelectMany(x=>x.typeReference.VariableTypeReferences).Select(x=>x.VariableName).Prepend(remainingGroup.Key).ToList();
+                    var keys = remainingGroup
+                        .SelectMany(x=>x.typeReference.VariableTypeReferences)
+                        .Select(x=>x.VariableName)
+                        .Prepend(remainingGroup.Key).ToList();
 
                     var newSet = keys.Select(x =>
                             groupingDictionary.TryGetValue(x, out var hs) ? hs : Enumerable.Empty<ActualTypeReference>())
@@ -102,7 +105,9 @@ namespace Reductech.EDR.Core.Internal
                         groupingDictionary[key] = newSet;
                 }
 
-                var r = groupingDictionary.Select(TryExtractType).Combine().Map(x => new Dictionary<VariableName, Type>(x) as IReadOnlyDictionary<VariableName, Type>);
+                var r = groupingDictionary.Select(TryExtractType)
+                    .Combine()
+                    .Map(x => new Dictionary<VariableName, Type>(x) as IReadOnlyDictionary<VariableName, Type>);
 
                 return r;
 
