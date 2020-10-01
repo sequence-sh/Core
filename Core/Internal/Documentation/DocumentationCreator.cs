@@ -12,7 +12,7 @@ namespace Reductech.EDR.Core.Internal.Documentation
         /// Dynamically Gets all steps and related entities from an assembly.
         /// For use with InstantConsole.
         /// </summary>
-        public static IEnumerable<IDocumented> GetAllDocumented(DocumentationCategory documentationCategory, StepFactoryStore stepFactoryStore)
+        public static IEnumerable<IDocumented> GetAllDocumented(string documentationCategory, StepFactoryStore stepFactoryStore)
         {
             var wrappers = stepFactoryStore.Dictionary.Values
                 .Select(x => new StepWrapper(x, documentationCategory)).ToList();
@@ -49,7 +49,7 @@ namespace Reductech.EDR.Core.Internal.Documentation
 
             foreach (var category in categories)
             {
-                lines.Add($"# {category.Key.Header}");
+                lines.Add($"# {category.Key}");
 
                 foreach (var doc in category)
                 {

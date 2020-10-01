@@ -32,9 +32,9 @@ namespace Reductech.EDR.Core.Tests
             get
             {
                 yield return new DocumentationTestCase(
-                    new List<(IStepFactory stepFactory, DocumentationCategory documentationCategory)>
+                    new List<(IStepFactory stepFactory, string documentationCategory)>
                     {
-                        (NotStepFactory.Instance, new DocumentationCategory("Steps"))
+                        (NotStepFactory.Instance, "Steps")
                     },
                     "# Contents",
                     "|Step                 |Summary                     |",
@@ -49,10 +49,45 @@ namespace Reductech.EDR.Core.Tests
                     "|:-------:|:----:|:------:|:------------------:|",
                     "|Boolean  |`bool`|☑️      |The value to negate.|");
 
+
                 yield return new DocumentationTestCase(
-                    new List<(IStepFactory stepFactory, DocumentationCategory documentationCategory)>
+                    new List<(IStepFactory stepFactory, string documentationCategory)>
                     {
-                        (DocumentationExampleStepFactory.Instance, new DocumentationCategory("Examples"))
+                        (ApplyMathOperatorStepFactory.Instance, "Steps")
+                    },
+                    "# Contents",
+                    "|Step                                             |Summary                                                                              |",
+                    "|:-----------------------------------------------:|:-----------------------------------------------------------------------------------:|",
+                    "|<a name=\"ApplyMathOperator\">ApplyMathOperator</a>|Applies a mathematical operator to two integers. Returns the result of the operation.|",
+                    "# Steps",
+                    "<a name=\"ApplyMathOperator\"></a>",
+                    "## ApplyMathOperator",
+                    "**Int32**",
+                    "Applies a mathematical operator to two integers. Returns the result of the operation.",
+                    "|Parameter|Type                         |Required|Summary               |",
+                    "|:-------:|:---------------------------:|:------:|:--------------------:|",
+                    "|Left     |`int`                        |☑️      |The left operand.     |",
+                    "|Operator |[MathOperator](#MathOperator)|☑️      |The operator to apply.|",
+                    "|Right    |`int`                        |☑️      |The right operand.    |",
+                    "# Enums",
+                    "<a name=\"MathOperator\"></a>",
+                    "## MathOperator",
+                    "An operator that can be applied to two numbers.",
+                    "|Name    |Summary                                          |",
+                    "|:------:|:-----------------------------------------------:|",
+                    "|None    |Sentinel value                                   |",
+                    "|Add     |Add the left and right operands.                 |",
+                    "|Subtract|Subtract the right operand from the left.        |",
+                    "|Multiply|Multiply the left and right operands.            |",
+                    "|Divide  |Divide the left operand by the right.            |",
+                    "|Modulo  |Reduce the left operand modulo the right.        |",
+                    "|Power   |Raise the left operand to the power of the right.|"
+                );
+
+                yield return new DocumentationTestCase(
+                    new List<(IStepFactory stepFactory, string)>
+                    {
+                        (DocumentationExampleStepFactory.Instance, "Examples")
                     },
                     "# Contents",
                     "|Step                                                           |Summary|",
@@ -62,6 +97,7 @@ namespace Reductech.EDR.Core.Tests
                     "<a name=\"DocumentationExampleStep\"></a>",
                     "## DocumentationExampleStep",
                     "**String**",
+                    "*Requires Test Library Version 1.2*",
                     "|Parameter|Type                         |Required|Summary|Allowed Range |Default Value|Example|Recommended Range|Recommended Value|Requirements|See Also|URL               |Value Delimiter|",
                     "|:-------:|:---------------------------:|:------:|:-----:|:------------:|:-----------:|:-----:|:---------------:|:---------------:|:----------:|:------:|:----------------:|:-------------:|",
                     "|Alpha    |`int`                        |☑️      |       |Greater than 1|Two hundred  |1234   |100-300          |201              |Greek 2.1   |Beta    |[Alpha](alpha.com)|               |",
@@ -71,10 +107,10 @@ namespace Reductech.EDR.Core.Tests
 
 
                 yield return new DocumentationTestCase(
-                    new List<(IStepFactory stepFactory, DocumentationCategory documentationCategory)>
+                    new List<(IStepFactory stepFactory, string documentationCategory)>
                     {
-                        (NotStepFactory.Instance, new DocumentationCategory("Steps")),
-                        (DocumentationExampleStepFactory.Instance, new DocumentationCategory("Examples"))
+                        (NotStepFactory.Instance, "Steps"),
+                        (DocumentationExampleStepFactory.Instance, "Examples")
                     },
                     "# Contents",
                     "|Step                                                           |Summary                     |",
@@ -93,6 +129,7 @@ namespace Reductech.EDR.Core.Tests
                     "<a name=\"DocumentationExampleStep\"></a>",
                     "## DocumentationExampleStep",
                     "**String**",
+                    "*Requires Test Library Version 1.2*",
                     "|Parameter|Type                         |Required|Summary|Allowed Range |Default Value|Example|Recommended Range|Recommended Value|Requirements|See Also|URL               |Value Delimiter|",
                     "|:-------:|:---------------------------:|:------:|:-----:|:------------:|:-----------:|:-----:|:---------------:|:---------------:|:----------:|:------:|:----------------:|:-------------:|",
                     "|Alpha    |`int`                        |☑️      |       |Greater than 1|Two hundred  |1234   |100-300          |201              |Greek 2.1   |Beta    |[Alpha](alpha.com)|               |",
@@ -109,7 +146,7 @@ namespace Reductech.EDR.Core.Tests
             /// Create a new DocumentationTestCase
             /// </summary>
             public DocumentationTestCase(
-                IReadOnlyCollection<(IStepFactory stepFactory, DocumentationCategory documentationCategory)> factories,
+                IReadOnlyCollection<(IStepFactory stepFactory, string documentationCategory)> factories,
                 params string[] expectedLines)
             {
                 ExpectedLines = expectedLines;
@@ -124,7 +161,7 @@ namespace Reductech.EDR.Core.Tests
 
             public IReadOnlyCollection<string> ExpectedLines { get; }
 
-            public IReadOnlyCollection<(IStepFactory stepFactory, DocumentationCategory documentationCategory)> Factories { get; }
+            public IReadOnlyCollection<(IStepFactory stepFactory, string documentationCategory)> Factories { get; }
 
             /// <inheritdoc />
             public void Execute(ITestOutputHelper testOutputHelper)
@@ -151,6 +188,19 @@ namespace Reductech.EDR.Core.Tests
             private DocumentationExampleStepFactory() { }
 
             public static SimpleStepFactory<DocumentationExampleStep, string> Instance { get; } = new DocumentationExampleStepFactory();
+
+            /// <inheritdoc />
+            public override IEnumerable<Requirement> Requirements
+            {
+                get
+                {
+                    yield return new Requirement
+                    {
+                        Name = "Test Library",
+                        MinVersion = new Version(1,2)
+                    };
+                }
+            }
         }
 
         private class DocumentationExampleStep : CompoundStep<string>
