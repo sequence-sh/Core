@@ -1,8 +1,9 @@
 ﻿using System.Collections.Generic;
+using System.IO;
 using FluentAssertions;
-using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Serialization;
+using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.Util;
 using Reductech.Utilities.Testing;
 using Xunit;
@@ -325,18 +326,47 @@ namespace Reductech.EDR.Core.Tests
                     }), "World"
                 );
 
-                yield return new TestFunction("Print 'I have config'", new Print<string>()
+                yield return new TestFunction("Print 'I have config'", new Print<string>
                 {
                     Value = Constant("I have config"),
-                    Configuration = new Configuration()
+                    Configuration = new Configuration
                     {
                         Priority = 1,
-                        TargetMachineTags = new List<string>()
+                        TargetMachineTags = new List<string>
                         {
                             "Tag1"
                         }
                     }
                 }, "I have config");
+
+
+                var testFolderPath = new Constant<string>(Path.Combine(Directory.GetCurrentDirectory(), "TestFolder"));
+                var testFilePath = new Constant<string>(Path.Combine(testFolderPath.Value, "Poem.txt"));
+
+                yield return new TestFunction("Delete Folder etc",
+                    new Sequence
+                    {
+                        Steps = new List<IStep<Unit>>
+                        {
+                            new DeleteItem {Path = testFolderPath},
+                            new AssertTrue{Test = new Not {Boolean = new DirectoryExists {Path = testFolderPath}}},
+                            new CreateDirectory{Path = testFolderPath},
+                            new AssertTrue{Test = new DirectoryExists{Path = testFolderPath}},
+
+                            new CreateFile{Path = testFilePath, Text = new Constant<string>("Hello World") },
+
+                            new AssertTrue {Test = new FileExists {Path = testFilePath}},
+
+                            new AssertTrue
+                            {
+                                Test = new DoesFileContain {Path = testFilePath, Text = new Constant<string>("Hello World")}
+                            },
+                            new DeleteItem {Path = testFilePath},
+                            new DeleteItem {Path = testFolderPath},
+                            new AssertTrue{Test = new Not {Boolean = new DirectoryExists {Path = testFolderPath}}}
+                        }
+                    }
+                ){IgnoreName = true, IgnoreLoggedValues = true};
 
                 //yield return new TestFunction("Print 'I have more config'", new Print<string>()
                 //{
@@ -415,6 +445,9 @@ namespace Reductech.EDR.Core.Tests
 
             public IReadOnlyList<string> ExpectedLoggedValues { get; }
 
+            public bool IgnoreLoggedValues { get; set; }
+            public bool IgnoreName { get; set; }
+
             /// <inheritdoc />
             public void Execute(ITestOutputHelper outputHelper)
             {
@@ -431,8 +464,11 @@ namespace Reductech.EDR.Core.Tests
 
                 //Assert
                 runResult.ShouldBeSuccessful();
-                logger.LoggedValues.Should().BeEquivalentTo(ExpectedLoggedValues);
-                Step.Name.Should().Be(ExpectedName);
+
+                if(!IgnoreLoggedValues)
+                    logger.LoggedValues.Should().BeEquivalentTo(ExpectedLoggedValues);
+                if(!IgnoreName)
+                    Step.Name.Should().Be(ExpectedName);
 
             }
         }
