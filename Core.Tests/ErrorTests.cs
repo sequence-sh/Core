@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using FluentAssertions;
 using Microsoft.Extensions.Logging.Abstractions;
-using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.Internal;
+using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.Util;
 using Reductech.Utilities.Testing;
 using Xunit;
@@ -73,6 +73,69 @@ namespace Reductech.EDR.Core.Tests
                             Test = new Constant<bool>(true)
                         }
                     }, new RunError("Expected an error but step was successful.", "AssertError(Test: AssertTrue(Test: True))", null, ErrorCode.AssertionFailed));
+
+
+                yield return new ErrorTestFunction("Divide by zero",
+                    new ApplyMathOperator
+                    {
+                        Left = new Constant<int>(1),
+                        Right = new Constant<int>(0),
+                        Operator = new Constant<MathOperator>(MathOperator.Divide)
+                    },
+                    new RunError("Divide by Zero Error", nameof(ApplyMathOperator), null, ErrorCode.DivideByZero));
+
+                yield return new ErrorTestFunction("Array Index minus one",
+                    new ElementAtIndex<bool>
+                    {
+                        Array = new Array<bool>(){Elements = new []{new Constant<bool>(true)}},
+                        Index = new Constant<int>(-1)
+                    },
+                    new RunError("Index was out of the range of the array.", "ElementAtIndex(Array: [True], Index: -1)", null, ErrorCode.IndexOutOfBounds)
+                    );
+
+                yield return new ErrorTestFunction("Array Index out of bounds",
+                    new ElementAtIndex<bool>
+                    {
+                        Array = new Array<bool>
+                        {
+                            Elements = new []{new Constant<bool>(true), new Constant<bool>(false)}
+                        },
+                        Index = new Constant<int>(5)
+                    },
+                    new RunError("Index was out of the range of the array.", "ElementAtIndex(Array: [True; False], Index: 5)", null, ErrorCode.IndexOutOfBounds)
+                    );
+
+
+                yield return new ErrorTestFunction("Get letter minus one",
+                    new GetLetterAtIndex
+                    {
+                        Index = new Constant<int>(-1),
+                        String = new Constant<string>("Foo")
+                    }, new RunError("Index was outside the bounds of the string", "Get character at index '-1' in ''Foo''", null, ErrorCode.IndexOutOfBounds));
+
+                yield return new ErrorTestFunction("Get letter out of bounds",
+                    new GetLetterAtIndex
+                    {
+                        Index = new Constant<int>(5),
+                        String = new Constant<string>("Foo")
+                    }, new RunError("Index was outside the bounds of the string", "Get character at index '5' in ''Foo''", null, ErrorCode.IndexOutOfBounds));
+
+                yield return new ErrorTestFunction("Get substring minus one",
+                    new GetSubstring
+                    {
+                        Index = new Constant<int>(-1),
+                        String = new Constant<string>("Foo"),
+                        Length = new Constant<int>(10)
+                    }, new RunError("Index was outside the bounds of the string", "GetSubstring(Index: -1, Length: 10, String: 'Foo')", null, ErrorCode.IndexOutOfBounds));
+
+                yield return new ErrorTestFunction("Get substring out of bounds",
+                    new GetSubstring
+                    {
+                        Index = new Constant<int>(5),
+                        String = new Constant<string>("Foo"),
+                        Length = new Constant<int>(10)
+                    }, new RunError("Index was outside the bounds of the string", "GetSubstring(Index: 5, Length: 10, String: 'Foo')", null, ErrorCode.IndexOutOfBounds));
+
 
 
             }

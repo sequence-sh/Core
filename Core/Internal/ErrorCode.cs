@@ -51,6 +51,11 @@
         MissingStepSettings,
 
         /// <summary>
+        /// Attempt to divide by zero
+        /// </summary>
+        DivideByZero,
+
+        /// <summary>
         /// A required parameter was not set.
         /// </summary>
         MissingParameter,

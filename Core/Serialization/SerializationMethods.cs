@@ -1,5 +1,4 @@
-﻿using System.Text.Json;
-using System.Text.Json.Serialization;
+﻿using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Internal;
 
 namespace Reductech.EDR.Core.Serialization
@@ -12,14 +11,19 @@ namespace Reductech.EDR.Core.Serialization
         /// <summary>
         /// Serialize a constant freezable step.
         /// </summary>
-        public static string SerializeConstant(ConstantFreezableStep cfp, bool quoteString)
+        public static Result<string> TrySerializeConstant(ConstantFreezableStep cfp, bool quoteString, bool allowNewline)
         {
             if (cfp.Value.GetType().IsEnum)
                 return cfp.Value.GetType().Name + "." + cfp.Value;
 
 
             if (cfp.Value is string s)
-                return quoteString? $"'{Escape(s)}'" : Escape(s);
+            {
+                var newS = quoteString ? $"'{Escape(s)}'" : Escape(s);
+                if (allowNewline || !newS.Contains('\n'))
+                    return newS;
+                return Result.Failure<string>("String constant contains newline");
+            }
             return cfp.Value.ToString() ?? string.Empty;
         }
 
