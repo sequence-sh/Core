@@ -50,7 +50,7 @@ namespace Reductech.EDR.Core.Internal.Documentation
         public string DocumentationCategory { get; }
 
         /// <inheritdoc />
-        public string Name => Factory.StepType.Name;
+        public string Name => TypeNameHelper.GetHumanReadableTypeName(Factory.StepType);
 
         /// <inheritdoc />
         public string Summary => Factory.StepType.GetXmlDocsSummary();
