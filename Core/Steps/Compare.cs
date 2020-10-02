@@ -92,12 +92,13 @@ namespace Reductech.EDR.Core.Steps
         protected override ITypeReference GetOutputTypeReference(ITypeReference memberTypeReference) => new ActualTypeReference(typeof(bool));
 
         /// <inheritdoc />
-        protected override Result<ITypeReference> GetMemberType(FreezableStepData freezableStepData)
+        protected override Result<ITypeReference> GetMemberType(FreezableStepData freezableStepData,
+            TypeResolver typeResolver)
         {
             var result = freezableStepData.GetArgument(nameof(Compare<int>.Left))
-                .Bind(x => x.TryGetOutputTypeReference())
+                .Bind(x => x.TryGetOutputTypeReference(typeResolver))
                 .Compose(() => freezableStepData.GetArgument(nameof(Compare<int>.Right))
-                    .Bind(x => x.TryGetOutputTypeReference()))
+                    .Bind(x => x.TryGetOutputTypeReference(typeResolver)))
                 .Map(x => new[] { x.Item1, x.Item2 })
                 .Bind((x) => MultipleTypeReference.TryCreate(x, TypeName));
 

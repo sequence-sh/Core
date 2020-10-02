@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using CSharpFunctionalExtensions;
+using Reductech.EDR.Core.Util;
 
 namespace Reductech.EDR.Core.Internal
 {
@@ -22,7 +23,6 @@ namespace Reductech.EDR.Core.Internal
             {
                 case 0:
                     return new ActualTypeReference(typeof(object)); //TODO type reference any???
-                    //return Result.Failure<ITypeReference>($"Could not infer type for {parentStep} as it has no children.");
                 case 1:
                     return Result.Success(set.Single());
                 default:
@@ -39,10 +39,7 @@ namespace Reductech.EDR.Core.Internal
         /// Creates a new MultipleTypeReference.
         /// </summary>
         /// <param name="allReferences"></param>
-        private MultipleTypeReference(ImmutableHashSet<ITypeReference> allReferences)
-        {
-            AllReferences = allReferences.ToImmutableHashSet();
-        }
+        private MultipleTypeReference(ImmutableHashSet<ITypeReference> allReferences) => AllReferences = allReferences.ToImmutableHashSet();
 
         /// <summary>
         /// The type references.
@@ -76,9 +73,14 @@ namespace Reductech.EDR.Core.Internal
         public IEnumerable<VariableTypeReference> VariableTypeReferences => AllReferences.SelectMany(x=>x.VariableTypeReferences);
 
         /// <inheritdoc />
-        public IEnumerable<ActualTypeReference> ActualTypeReferences => AllReferences.SelectMany(x=>x.ActualTypeReferences);
+        public Result<ActualTypeReference> TryGetActualTypeReference(TypeResolver typeResolver)
+        {
+            var results = AllReferences
+                .Select(x => x.TryGetActualTypeReference(typeResolver))
+                .Combine()
+                .Bind(x=> x.Distinct().EnsureSingle("Type multiply defined")); //TODO improve this error
 
-        /// <inheritdoc />
-        public IEnumerable<ITypeReference> TypeArgumentReferences => ImmutableList<ITypeReference>.Empty;
+            return results;
+        }
     }
 }

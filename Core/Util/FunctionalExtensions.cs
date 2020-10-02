@@ -237,6 +237,19 @@ namespace Reductech.EDR.Core.Util
 
         }
 
+        /// <summary>
+        /// Returns failure unless there is exactly one element.
+        /// </summary>
+        public static Result<T> EnsureSingle<T>(this IEnumerable<T> elements, string? error)
+        {
+            var firstTwo = elements.Take(2).ToList();
+
+            if (firstTwo.Count == 0)
+                return Result.Failure<T>(error ?? "No elements");
+            if (firstTwo.Count > 1)
+                return Result.Failure<T>(error ?? "Too many elements");
+            return firstTwo.Single()!;
+        }
 
     }
 }

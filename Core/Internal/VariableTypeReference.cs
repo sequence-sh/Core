@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
+using CSharpFunctionalExtensions;
+using Reductech.EDR.Core.Util;
 
 namespace Reductech.EDR.Core.Internal
 {
@@ -47,9 +48,10 @@ namespace Reductech.EDR.Core.Internal
         IEnumerable<VariableTypeReference> ITypeReference.VariableTypeReferences => new[] {this};
 
         /// <inheritdoc />
-        IEnumerable<ActualTypeReference> ITypeReference.ActualTypeReferences => ImmutableArray<ActualTypeReference>.Empty;
-
-        /// <inheritdoc />
-        public IEnumerable<ITypeReference> TypeArgumentReferences => ImmutableList<ITypeReference>.Empty;
+        public Result<ActualTypeReference> TryGetActualTypeReference(TypeResolver tr)
+        {
+            var r = tr.Dictionary.TryFindOrFail(VariableName, null);
+            return r;
+        }
     }
 }

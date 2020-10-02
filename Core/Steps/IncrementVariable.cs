@@ -49,6 +49,7 @@ namespace Reductech.EDR.Core.Steps
         public static SimpleStepFactory<IncrementVariable, int> Instance { get; } = new IncrementVariableStepFactory();
 
         /// <inheritdoc />
-        public override Result<Maybe<ITypeReference>> GetTypeReferencesSet(VariableName variableName, FreezableStepData freezableStepData) => Maybe<ITypeReference>.From(new ActualTypeReference(typeof(int)));
+        public override Result<Maybe<ITypeReference>> GetTypeReferencesSet(VariableName variableName,
+            FreezableStepData freezableStepData, TypeResolver typeResolver) => Maybe<ITypeReference>.From(new ActualTypeReference(typeof(int)));
     }
 }

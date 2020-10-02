@@ -50,7 +50,8 @@ namespace Reductech.EDR.Core.Steps
         protected override ITypeReference GetOutputTypeReference(ITypeReference memberTypeReference) => memberTypeReference;
 
         /// <inheritdoc />
-        protected override Result<ITypeReference> GetMemberType(FreezableStepData freezableStepData) =>
+        protected override Result<ITypeReference> GetMemberType(FreezableStepData freezableStepData,
+            TypeResolver typeResolver) =>
             freezableStepData.GetVariableName(nameof(GetVariable<object>.VariableName))
                 .Map(x => new VariableTypeReference(x) as ITypeReference);
 

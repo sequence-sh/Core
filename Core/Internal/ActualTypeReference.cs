@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
+using CSharpFunctionalExtensions;
 
 namespace Reductech.EDR.Core.Internal
 {
@@ -47,10 +48,7 @@ namespace Reductech.EDR.Core.Internal
         IEnumerable<VariableTypeReference> ITypeReference.VariableTypeReferences => ImmutableArray<VariableTypeReference>.Empty;
 
         /// <inheritdoc />
-        IEnumerable<ActualTypeReference> ITypeReference.ActualTypeReferences => new[] {this};
-
-        /// <inheritdoc />
-        public IEnumerable<ITypeReference> TypeArgumentReferences => ImmutableList<ITypeReference>.Empty;
+        public Result<ActualTypeReference> TryGetActualTypeReference(TypeResolver _) => this;
 
         /// <summary>
         /// Creates a fixed type reference from a type

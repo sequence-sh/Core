@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
+using CSharpFunctionalExtensions;
 
 namespace Reductech.EDR.Core.Internal
 {
@@ -23,9 +24,38 @@ namespace Reductech.EDR.Core.Internal
         public IEnumerable<VariableTypeReference> VariableTypeReferences => ImmutableList<VariableTypeReference>.Empty;
 
         /// <inheritdoc />
-        public IEnumerable<ActualTypeReference> ActualTypeReferences => ImmutableList<ActualTypeReference>.Empty;
+        public Result<ActualTypeReference> TryGetActualTypeReference(TypeResolver typeResolver)
+        {
+            var result = ChildTypes
+                .Select(ct => ct.TryGetActualTypeReference(typeResolver))
+                .Combine()
+                .Bind(x=> Create(GenericType, x));
 
-        /// <inheritdoc />
+            return result;
+
+            static Result<ActualTypeReference> Create(Type genericType, IEnumerable<ActualTypeReference> actualTypeReferences)
+            {
+                var arguments = actualTypeReferences.Select(x => x.Type).ToArray();
+
+                try
+                {
+                    var t = genericType.MakeGenericType(arguments);
+
+                    return new ActualTypeReference(t);
+                }
+#pragma warning disable CA1031 // Do not catch general exception types
+                catch (Exception e)
+                {
+                    return Result.Failure<ActualTypeReference>(e.Message);
+                }
+#pragma warning restore CA1031 // Do not catch general exception types
+            }
+        }
+
+
+        /// <summary>
+        /// The generic type references
+        /// </summary>
         public IEnumerable<ITypeReference> TypeArgumentReferences => ChildTypes;
 
         /// <summary>

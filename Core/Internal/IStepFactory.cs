@@ -29,12 +29,13 @@ namespace Reductech.EDR.Core.Internal
         /// <summary>
         /// Tries to get a reference to the output type of this step.
         /// </summary>
-        Result<ITypeReference> TryGetOutputTypeReference(FreezableStepData freezableStepData);
+        Result<ITypeReference> TryGetOutputTypeReference(FreezableStepData freezableStepData, TypeResolver typeResolver);
 
         /// <summary>
         /// If this variable is being set. Get the type reference it is being set to.
         /// </summary>
-        Result<Maybe<ITypeReference>> GetTypeReferencesSet(VariableName variableName, FreezableStepData freezableStepData) =>
+        Result<Maybe<ITypeReference>> GetTypeReferencesSet(VariableName variableName,
+            FreezableStepData freezableStepData, TypeResolver typeResolver) =>
             Maybe<ITypeReference>.None;
 
         /// <summary>
