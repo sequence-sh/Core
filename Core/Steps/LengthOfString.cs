@@ -24,7 +24,6 @@ namespace Reductech.EDR.Core.Steps
             if (str.IsFailure) return str.ConvertFailure<int>();
 
             return str.Value.Length;
-
         }
 
         /// <inheritdoc />
