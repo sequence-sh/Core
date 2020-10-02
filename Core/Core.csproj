@@ -19,7 +19,7 @@
     <PackageProjectUrl>https://gitlab.com/reductech/edr/core</PackageProjectUrl>
     <RepositoryUrl>https://gitlab.com/reductech/edr/core</RepositoryUrl>
     <PackageReleaseNotes>Please see https://gitlab.com/reductech/edr/core/-/releases</PackageReleaseNotes>
-    <PackageTags>ediscovery,forensics,automation,orchestration,edrm</PackageTags>
+    <PackageTags>ediscovery;forensics;automation;orchestration;edrm</PackageTags>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
 
     <Authors>reductech</Authors>
