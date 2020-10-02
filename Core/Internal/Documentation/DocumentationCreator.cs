@@ -38,7 +38,7 @@ namespace Reductech.EDR.Core.Internal.Documentation
             var contentsRows = categories.SelectMany(x => x)
                 .Select(x => new[]
                 {
-                    $"<a name=\"{x.Name}\">{x.Name}</a>",
+                    $"[{x.Name}](#{x.Name})",
                     x.Summary
                 })
                 .Prepend(new[]{"Step", "Summary"}) //Header row
