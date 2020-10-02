@@ -53,6 +53,27 @@ namespace Reductech.EDR.Core.Tests
                 yield return new DocumentationTestCase(
                     new List<(IStepFactory stepFactory, string documentationCategory)>
                     {
+                        (ArrayStepFactory.Instance, "Steps")
+                    },
+                    "# Contents",
+                    "|Step                 |Summary                                     |",
+                    "|:-------------------:|:------------------------------------------:|",
+                    "|[Array<T>](#Array<T>)|Represents an ordered collection of objects.|",
+                    "# Steps",
+                    "<a name=\"Array<T>\"></a>",
+                    "## Array<T>",
+                    "**List<T>**",
+                    "Represents an ordered collection of objects.",
+                    "|Parameter|Type          |Required|Summary                    |",
+                    "|:-------:|:------------:|:------:|:-------------------------:|",
+                    "|Elements |IStep<[T](#T)>|☑️      |The elements of this array.|"
+
+                    );
+
+
+                yield return new DocumentationTestCase(
+                    new List<(IStepFactory stepFactory, string documentationCategory)>
+                    {
                         (ApplyMathOperatorStepFactory.Instance, "Steps")
                     },
                     "# Contents",
