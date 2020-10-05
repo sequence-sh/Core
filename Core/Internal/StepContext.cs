@@ -92,10 +92,30 @@ namespace Reductech.EDR.Core.Internal
         /// <summary>
         /// Tries to create a new StepContext.
         /// </summary>
+        public static Result<StepContext> TryCreate1(params IFreezableStep[] freezableSteps)
+        {
+            var typeResolver = new TypeResolver();
+
+            var remainingFreezableSteps = new Stack<IFreezableStep>(freezableSteps);
+            var stepsForLater = new List<IFreezableStep>();
+
+            while (remainingFreezableSteps.Any())
+            {
+                var step = remainingFreezableSteps.Pop();
+                var stuff = step.TryGetVariablesSet();
+            }
+
+
+        }
+
+
+        /// <summary>
+        /// Tries to create a new StepContext.
+        /// </summary>
         public static Result<StepContext> TryCreate(params IFreezableStep[] freezableSteps)
         {
             var result = freezableSteps
-                .Select(x => x.TryGetVariablesSet)
+                .Select(x => x.TryGetVariablesSet())
                 .Combine()
                 .Map(l=>l.SelectMany(y=>y))
                 .Bind(ResolveTypes)

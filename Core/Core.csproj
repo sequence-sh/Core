@@ -7,7 +7,7 @@
     <RootNamespace>Reductech.EDR.Core</RootNamespace>
     <AssemblyName>Reductech.EDR.Core</AssemblyName>
     <Nullable>enable</Nullable>
-    <Version>0.2.0-alpha$(VersionSuffix)</Version>
+    <Version>0.2.1-alpha$(VersionSuffix)</Version>
   </PropertyGroup>
 
   <PropertyGroup>

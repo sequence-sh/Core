@@ -12,7 +12,7 @@
   <PropertyGroup>
     <RepositoryUrl>https://gitlab.com/reductech/edr/core</RepositoryUrl>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
-    
+
     <Authors>reductech</Authors>
     <Company>Reductech</Company>
     <Copyright>Copyright (c) 2020 Reductech Ltd</Copyright>
