@@ -50,6 +50,19 @@ namespace Reductech.EDR.Core.Internal
         /// <inheritdoc />
         public Result<ActualTypeReference> TryGetActualTypeReference(TypeResolver _) => this;
 
+        /// <inheritdoc />
+        public Result<ActualTypeReference> TryGetGenericTypeReference(TypeResolver typeResolver, int argumentNumber)
+        {
+            if(!Type.IsGenericType)
+                return Result.Failure<ActualTypeReference>($"'{Type.Name}' is not a generic type.");
+
+            if (argumentNumber < 0 || Type.GenericTypeArguments.Length <= argumentNumber)
+                return Result.Failure<ActualTypeReference>($"'{Type.Name}' does not have an argument at index '{argumentNumber}'");
+
+            var t = Type.GenericTypeArguments[argumentNumber];
+            return new ActualTypeReference(t);
+        }
+
         /// <summary>
         /// Creates a fixed type reference from a type
         /// </summary>

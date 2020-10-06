@@ -490,7 +490,7 @@ Two,The second number"),
                                 }
                             }
                         }
-                    })
+                    }, "The first number", "The second number" )
                 { IgnoreName = true };
 
 

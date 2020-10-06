@@ -11,7 +11,7 @@ namespace Reductech.EDR.Core.Internal
         /// Tries to freeze this step.
         /// </summary>
         public static Result<IStep> TryFreeze(this IFreezableStep step) =>
-            StepContext.TryCreate(step)
+            StepContext.TryCreate1(step)
                 .Bind(step.TryFreeze);
 
 

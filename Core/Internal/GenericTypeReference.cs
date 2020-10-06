@@ -52,11 +52,22 @@ namespace Reductech.EDR.Core.Internal
             }
         }
 
+        /// <inheritdoc />
+        public Result<ActualTypeReference> TryGetGenericTypeReference(TypeResolver typeResolver, int argumentNumber)
+        {
+            if(argumentNumber < 0 || TypeArgumentReferences.Count <= argumentNumber)
+                return Result.Failure<ActualTypeReference>($"'{GenericType.Name}' does not have an argument at index '{argumentNumber}'");
+
+            var r = TypeArgumentReferences[argumentNumber].TryGetActualTypeReference(typeResolver);
+
+            return r;
+        }
+
 
         /// <summary>
         /// The generic type references
         /// </summary>
-        public IEnumerable<ITypeReference> TypeArgumentReferences => ChildTypes;
+        public IReadOnlyList<ITypeReference> TypeArgumentReferences => ChildTypes;
 
         /// <summary>
         /// The generic type.

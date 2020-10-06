@@ -5,7 +5,6 @@ using System.Linq;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal;
-using Reductech.EDR.Core.Util;
 
 namespace Reductech.EDR.Core.Steps
 {
@@ -54,8 +53,7 @@ namespace Reductech.EDR.Core.Steps
             TypeResolver typeResolver) =>
             freezableStepData.GetArgument(nameof(ArrayCount<object>.Array))
                 .Bind(x => x.TryGetOutputTypeReference(typeResolver))
-                .BindCast<ITypeReference, GenericTypeReference>()
-                .Map(x => x.ChildTypes)
-                .BindSingle();
+                .Bind(x=>x.TryGetGenericTypeReference(typeResolver, 0))
+                .Map(x=> x as ITypeReference);
     }
 }

@@ -53,5 +53,14 @@ namespace Reductech.EDR.Core.Internal
             var r = tr.Dictionary.TryFindOrFail(VariableName, null);
             return r;
         }
+
+        /// <inheritdoc />
+        public Result<ActualTypeReference> TryGetGenericTypeReference(TypeResolver typeResolver, int argumentNumber)
+        {
+            var r = typeResolver.Dictionary.TryFindOrFail(VariableName, null)
+                .Bind(x => x.TryGetGenericTypeReference(typeResolver, argumentNumber));
+
+            return r;
+        }
     }
 }

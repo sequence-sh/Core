@@ -38,7 +38,7 @@ namespace Reductech.EDR.Core.Internal
         }
 
         /// <inheritdoc />
-        public Result<IReadOnlyCollection<(VariableName VariableName, ITypeReference type)>> TryGetVariablesSet(TypeResolver typeResolver) =>
+        public Result<IReadOnlyCollection<(VariableName VariableName, ITypeReference typeReference)>> TryGetVariablesSet(TypeResolver typeResolver) =>
             ImmutableList<(VariableName VariableName, ITypeReference type)>.Empty;
 
         /// <inheritdoc />

@@ -42,7 +42,7 @@ namespace Reductech.EDR.Core.Internal
         public Result<IStep> TryFreeze(StepContext stepContext) => StepFactory.TryFreeze(stepContext, FreezableStepData, StepConfiguration);
 
         /// <inheritdoc />
-        public Result<IReadOnlyCollection<(VariableName VariableName, ITypeReference type)>> TryGetVariablesSet(TypeResolver typeResolver)
+        public Result<IReadOnlyCollection<(VariableName VariableName, ITypeReference typeReference)>> TryGetVariablesSet(TypeResolver typeResolver)
         {
             var result = FreezableStepData
                     .Dictionary.Values

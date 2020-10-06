@@ -16,7 +16,7 @@ namespace Reductech.EDR.Core.Internal
         /// <summary>
         /// Gets the variables which may be set by this step and their types.
         /// </summary>
-        Result<IReadOnlyCollection<(VariableName VariableName, ITypeReference type)>> TryGetVariablesSet(TypeResolver typeResolver);
+        Result<IReadOnlyCollection<(VariableName VariableName, ITypeReference typeReference)>> TryGetVariablesSet(TypeResolver typeResolver);
 
 
         /// <summary>

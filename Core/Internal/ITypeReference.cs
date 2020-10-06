@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
-using System.Collections.Immutable;
 using CSharpFunctionalExtensions;
+using Reductech.EDR.Core.Util;
 
 namespace Reductech.EDR.Core.Internal
 {
@@ -19,6 +19,11 @@ namespace Reductech.EDR.Core.Internal
         /// Tries to get actual type references
         /// </summary>
         Result<ActualTypeReference> TryGetActualTypeReference(TypeResolver typeResolver);
+
+        /// <summary>
+        /// Tries to get the generic member type
+        /// </summary>
+        Result<ActualTypeReference> TryGetGenericTypeReference(TypeResolver typeResolver, int argumentNumber);
     }
 
 

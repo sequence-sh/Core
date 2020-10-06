@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using CSharpFunctionalExtensions;
+using Reductech.EDR.Core.Steps;
 
 namespace Reductech.EDR.Core.Internal
 {
@@ -97,138 +98,177 @@ namespace Reductech.EDR.Core.Internal
             var typeResolver = new TypeResolver();
 
             var remainingFreezableSteps = new Stack<IFreezableStep>(freezableSteps);
-            var stepsForLater = new List<IFreezableStep>();
+            var stepsForLater = new List<(IFreezableStep step, Result error)>();
+
+            var changed = false;
 
             while (remainingFreezableSteps.Any())
             {
                 var step = remainingFreezableSteps.Pop();
-                var stuff = step.TryGetVariablesSet();
+
+                var variablesSetResult = step.TryGetVariablesSet(typeResolver);
+
+                var resolveResult = variablesSetResult.Bind(Resolve);
+
+                if (resolveResult.IsSuccess)
+                    changed = true;
+                else
+                    stepsForLater.Add((step, resolveResult));
+
+                if (!remainingFreezableSteps.Any() && changed && stepsForLater.Any())
+                {
+                    remainingFreezableSteps = new Stack<IFreezableStep>(stepsForLater.Select(x=>x.step));
+                    stepsForLater.Clear();
+                    changed = false;
+                }
             }
 
-
-        }
-
-
-        /// <summary>
-        /// Tries to create a new StepContext.
-        /// </summary>
-        public static Result<StepContext> TryCreate(params IFreezableStep[] freezableSteps)
-        {
-            var result = freezableSteps
-                .Select(x => x.TryGetVariablesSet())
-                .Combine()
-                .Map(l=>l.SelectMany(y=>y))
-                .Bind(ResolveTypes)
-                .Map(dictionary=> new StepContext(dictionary));
-
-            return result;
-
-            static Result<TypeResolver> ResolveTypes(IEnumerable<(VariableName variableName, ITypeReference typeReference)> references)
+            Result Resolve(IEnumerable<(VariableName variableName, ITypeReference typeReference)> data)
             {
-                var genericReferences = references.Where(x => x.typeReference is GenericTypeReference)
+                var genericReferences = data.Where(x => x.typeReference is GenericTypeReference)
                     .SelectMany(x =>
-                        ((GenericTypeReference) x.typeReference).ChildTypes.Select((t, i) =>
-                            (variableName: x.variableName.CreateChild(i), typeReference: t)));
+                        ((GenericTypeReference)x.typeReference).ChildTypes.Select((t, i) =>
+                           (variableName: x.variableName.CreateChild(i), typeReference: t)));
 
-                var remainingReferences = new Stack<(VariableName variableName, ITypeReference typeReference)>(genericReferences.Concat(references).Reverse());
-                var referencesForLater = new List<(VariableName variableName, ITypeReference typeReference)>();
-                var anyChanged = false;
-                var typeResolver = new TypeResolver();
+                var references = data.Concat(genericReferences);
 
+                var result = references
+                    .Select(x => (x.variableName, actualType: x.typeReference.TryGetActualTypeReference(typeResolver)))
+                    .Select(x => x.actualType.Bind(y => typeResolver.TryAddType(x.variableName, y)))
+                    .Combine();
 
-                while (remainingReferences.Any())
-                {
-                    var (variableName, typeReference) = remainingReferences.Pop();
-
-                    var r =
-                        typeReference.TryGetActualTypeReference(typeResolver)
-                            .Bind(tr=> typeResolver.TryAddType(variableName, tr));
-
-                    if (r.IsSuccess) anyChanged = true;
-                    else
-                        referencesForLater.Add((variableName, typeReference));
-
-
-                    if (!remainingReferences.Any() && anyChanged && referencesForLater.Any())
-                    {
-                        remainingReferences = new Stack<(VariableName, ITypeReference)>(referencesForLater);
-                        referencesForLater.Clear();
-                    }
-                }
-
-                if (referencesForLater.Any())
-                {
-                    var error = referencesForLater
-                        .Select(x => x.typeReference.TryGetActualTypeReference(typeResolver))
-                        .Select(x => x.ConvertFailure<TypeResolver>())
-                        .First();
-
-                    return error;
-                }
-
-                return typeResolver;
-
-
-                //var groups = references
-                //    .Concat(genericReferences)
-                //    .GroupBy(x => x.variableName).ToList();
-
-
-                //var groupingDictionary = new Dictionary<VariableName, ImmutableHashSet<ActualTypeReference>>();
-
-
-                //foreach (var remainingGroup in groups)
-                //{
-                //    var keys = remainingGroup
-                //        .SelectMany(x=>x.typeReference.VariableTypeReferences)
-                //        .Select(x=>x.VariableName)
-                //        .Prepend(remainingGroup.Key).ToList();
-
-
-                //    foreach (var (variableName, typeReference) in remainingGroup)
-                //    {
-                //        var referenceResult = typeReference.TryGetActualTypeReference(typeResolver);
-                //        if (referenceResult.IsSuccess)
-                //        {
-
-                //        }
-
-                //    }
-
-
-
-                //    var newSet = keys.Select(x =>
-                //            groupingDictionary.TryGetValue(x, out var hs) ? hs : Enumerable.Empty<ActualTypeReference>())
-                //        .Distinct()
-                //        .SelectMany(x => x)
-                //        .Concat(remainingGroup.SelectMany(x=>x.typeReference.ActualTypeReferences))
-                //        .ToImmutableHashSet(); //This is not super efficient, but who cares
-
-                //    //This set may have no elements - this is not a problem
-
-                //    foreach (var key in keys)
-                //        groupingDictionary[key] = newSet;
-                //}
-
-                //var r = groupingDictionary.Select(TryExtractType)
-                //    .Combine()
-                //    .Map(x => new Dictionary<VariableName, Type>(x) as IReadOnlyDictionary<VariableName, Type>);
-
-                //return r;
-
-                //static Result<KeyValuePair<VariableName, Type>> TryExtractType(KeyValuePair<VariableName, ImmutableHashSet<ActualTypeReference>> kvp)
-                //{
-                //    var (key, actualTypes) = kvp;
-                //    return actualTypes.Count switch
-                //    {
-                //        0 => Result.Failure<KeyValuePair<VariableName, Type>>($"The type '{key}' is never set."),
-                //        1 => new KeyValuePair<VariableName, Type>(key, actualTypes.Single().Type),
-                //        _ => Result.Failure<KeyValuePair<VariableName, Type>>(
-                //            $"The type '{key}' is set to more than one type - ({string.Join(", ", actualTypes.Select(x => x.Type.Name))})")
-                //    };
-                //}
+                return result;
             }
 
+
+
+            if (stepsForLater.Any())
+                return stepsForLater.Select(x => x.error).Combine().ConvertFailure<StepContext>();
+
+            return new StepContext(typeResolver);
         }
+
+
+        ///// <summary>
+        ///// Tries to create a new StepContext.
+        ///// </summary>
+        //public static Result<StepContext> TryCreate(params IFreezableStep[] freezableSteps)
+        //{
+        //    var result = freezableSteps
+        //        .Select(x => x.TryGetVariablesSet())
+        //        .Combine()
+        //        .Map(l=>l.SelectMany(y=>y))
+        //        .Bind(ResolveTypes)
+        //        .Map(dictionary=> new StepContext(dictionary));
+
+        //    return result;
+
+        //    static Result<TypeResolver> ResolveTypes(IEnumerable<(VariableName variableName, ITypeReference typeReference)> references)
+        //    {
+        //        var genericReferences = references.Where(x => x.typeReference is GenericTypeReference)
+        //            .SelectMany(x =>
+        //                ((GenericTypeReference) x.typeReference).ChildTypes.Select((t, i) =>
+        //                    (variableName: x.variableName.CreateChild(i), typeReference: t)));
+
+        //        var remainingReferences = new Stack<(VariableName variableName, ITypeReference typeReference)>(genericReferences.Concat(references).Reverse());
+        //        var referencesForLater = new List<(VariableName variableName, ITypeReference typeReference)>();
+        //        var anyChanged = false;
+        //        var typeResolver = new TypeResolver();
+
+
+        //        while (remainingReferences.Any())
+        //        {
+        //            var (variableName, typeReference) = remainingReferences.Pop();
+
+        //            var r =
+        //                typeReference.TryGetActualTypeReference(typeResolver)
+        //                    .Bind(tr=> typeResolver.TryAddType(variableName, tr));
+
+        //            if (r.IsSuccess) anyChanged = true;
+        //            else
+        //                referencesForLater.Add((variableName, typeReference));
+
+
+        //            if (!remainingReferences.Any() && anyChanged && referencesForLater.Any())
+        //            {
+        //                remainingReferences = new Stack<(VariableName, ITypeReference)>(referencesForLater);
+        //                referencesForLater.Clear();
+        //            }
+        //        }
+
+        //        if (referencesForLater.Any())
+        //        {
+        //            var error = referencesForLater
+        //                .Select(x => x.typeReference.TryGetActualTypeReference(typeResolver))
+        //                .Select(x => x.ConvertFailure<TypeResolver>())
+        //                .First();
+
+        //            return error;
+        //        }
+
+        //        return typeResolver;
+
+
+        //        //var groups = references
+        //        //    .Concat(genericReferences)
+        //        //    .GroupBy(x => x.variableName).ToList();
+
+
+        //        //var groupingDictionary = new Dictionary<VariableName, ImmutableHashSet<ActualTypeReference>>();
+
+
+        //        //foreach (var remainingGroup in groups)
+        //        //{
+        //        //    var keys = remainingGroup
+        //        //        .SelectMany(x=>x.typeReference.VariableTypeReferences)
+        //        //        .Select(x=>x.VariableName)
+        //        //        .Prepend(remainingGroup.Key).ToList();
+
+
+        //        //    foreach (var (variableName, typeReference) in remainingGroup)
+        //        //    {
+        //        //        var referenceResult = typeReference.TryGetActualTypeReference(typeResolver);
+        //        //        if (referenceResult.IsSuccess)
+        //        //        {
+
+        //        //        }
+
+        //        //    }
+
+
+
+        //        //    var newSet = keys.Select(x =>
+        //        //            groupingDictionary.TryGetValue(x, out var hs) ? hs : Enumerable.Empty<ActualTypeReference>())
+        //        //        .Distinct()
+        //        //        .SelectMany(x => x)
+        //        //        .Concat(remainingGroup.SelectMany(x=>x.typeReference.ActualTypeReferences))
+        //        //        .ToImmutableHashSet(); //This is not super efficient, but who cares
+
+        //        //    //This set may have no elements - this is not a problem
+
+        //        //    foreach (var key in keys)
+        //        //        groupingDictionary[key] = newSet;
+        //        //}
+
+        //        //var r = groupingDictionary.Select(TryExtractType)
+        //        //    .Combine()
+        //        //    .Map(x => new Dictionary<VariableName, Type>(x) as IReadOnlyDictionary<VariableName, Type>);
+
+        //        //return r;
+
+        //        //static Result<KeyValuePair<VariableName, Type>> TryExtractType(KeyValuePair<VariableName, ImmutableHashSet<ActualTypeReference>> kvp)
+        //        //{
+        //        //    var (key, actualTypes) = kvp;
+        //        //    return actualTypes.Count switch
+        //        //    {
+        //        //        0 => Result.Failure<KeyValuePair<VariableName, Type>>($"The type '{key}' is never set."),
+        //        //        1 => new KeyValuePair<VariableName, Type>(key, actualTypes.Single().Type),
+        //        //        _ => Result.Failure<KeyValuePair<VariableName, Type>>(
+        //        //            $"The type '{key}' is set to more than one type - ({string.Join(", ", actualTypes.Select(x => x.Type.Name))})")
+        //        //    };
+        //        //}
+        //    }
+
+        //}
     }
 }

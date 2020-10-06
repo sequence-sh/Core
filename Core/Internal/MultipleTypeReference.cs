@@ -8,7 +8,7 @@ using Reductech.EDR.Core.Util;
 namespace Reductech.EDR.Core.Internal
 {
     /// <summary>
-    /// A type that is the same a multiple different references.
+    /// A type that is the same as multiple different references.
     /// </summary>
     public sealed class MultipleTypeReference : ITypeReference, IEquatable<ITypeReference>
     {
@@ -81,6 +81,17 @@ namespace Reductech.EDR.Core.Internal
                 .Bind(x=> x.Distinct().EnsureSingle("Type multiply defined")); //TODO improve this error
 
             return results;
+        }
+
+        /// <inheritdoc />
+        public Result<ActualTypeReference> TryGetGenericTypeReference(TypeResolver typeResolver, int argumentNumber)
+        {
+            var result = AllReferences.Select(x => x.TryGetGenericTypeReference(typeResolver, argumentNumber))
+                .Combine().Map(x => x.ToHashSet())
+                .Ensure(x=>x.Count == 1, "Could not resolve unique type")
+                .Map(x=>x.Single());
+
+            return result;
         }
     }
 }

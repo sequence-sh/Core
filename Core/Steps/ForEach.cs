@@ -80,9 +80,9 @@ namespace Reductech.EDR.Core.Steps
             TypeResolver typeResolver) =>
             freezableStepData.GetArgument(nameof(ForEach<object>.Array))
                 .Bind(x => x.TryGetOutputTypeReference(typeResolver))
-                .BindCast<ITypeReference, GenericTypeReference>()
-                .Map(x => x.ChildTypes)
-                .BindSingle();
+                .Bind(x=>x.TryGetGenericTypeReference(typeResolver, 0))
+                .Map(x=> x as ITypeReference)
+        ;
 
         /// <inheritdoc />
         public override string OutputTypeExplanation => nameof(Unit);
