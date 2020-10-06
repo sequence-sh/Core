@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
+using CSharpFunctionalExtensions;
 
 namespace Reductech.EDR.Core.Internal
 {
@@ -47,10 +48,20 @@ namespace Reductech.EDR.Core.Internal
         IEnumerable<VariableTypeReference> ITypeReference.VariableTypeReferences => ImmutableArray<VariableTypeReference>.Empty;
 
         /// <inheritdoc />
-        IEnumerable<ActualTypeReference> ITypeReference.ActualTypeReferences => new[] {this};
+        public Result<ActualTypeReference> TryGetActualTypeReference(TypeResolver _) => this;
 
         /// <inheritdoc />
-        public IEnumerable<ITypeReference> TypeArgumentReferences => ImmutableList<ITypeReference>.Empty;
+        public Result<ActualTypeReference> TryGetGenericTypeReference(TypeResolver typeResolver, int argumentNumber)
+        {
+            if(!Type.IsGenericType)
+                return Result.Failure<ActualTypeReference>($"'{Type.Name}' is not a generic type.");
+
+            if (argumentNumber < 0 || Type.GenericTypeArguments.Length <= argumentNumber)
+                return Result.Failure<ActualTypeReference>($"'{Type.Name}' does not have an argument at index '{argumentNumber}'");
+
+            var t = Type.GenericTypeArguments[argumentNumber];
+            return new ActualTypeReference(t);
+        }
 
         /// <summary>
         /// Creates a fixed type reference from a type

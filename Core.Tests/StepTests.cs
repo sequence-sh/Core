@@ -453,7 +453,7 @@ Two,The second number"),
                     },
                     "The second number"){IgnoreName = true};
 
-                /*
+
                 yield return new TestFunction("Read CSV ForEach",
 
                     new Sequence
@@ -490,8 +490,9 @@ Two,The second number"),
                                 }
                             }
                         }
-                    }) {IgnoreName = true};
-                */
+                    }, "The first number", "The second number" )
+                { IgnoreName = true };
+
 
             }
         }

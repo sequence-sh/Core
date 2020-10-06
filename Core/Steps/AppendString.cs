@@ -64,7 +64,8 @@ namespace Reductech.EDR.Core.Steps
         public static SimpleStepFactory<AppendString, Unit> Instance { get; } = new AppendStringStepFactory();
 
         /// <inheritdoc />
-        public override Result<Maybe<ITypeReference>> GetTypeReferencesSet(VariableName variableName, FreezableStepData freezableStepData) => Maybe<ITypeReference>.From(new ActualTypeReference(typeof(string)));
+        public override Result<Maybe<ITypeReference>> GetTypeReferencesSet(VariableName variableName,
+            FreezableStepData freezableStepData, TypeResolver typeResolver) => Maybe<ITypeReference>.From(new ActualTypeReference(typeof(string)));
 
 
         /// <inheritdoc />

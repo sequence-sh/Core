@@ -38,7 +38,8 @@ namespace Reductech.EDR.Core.Internal
         }
 
         /// <inheritdoc />
-        public Result<IReadOnlyCollection<(VariableName VariableName, ITypeReference type)>> TryGetVariablesSet => ImmutableList<(VariableName VariableName, ITypeReference type)>.Empty;
+        public Result<IReadOnlyCollection<(VariableName VariableName, ITypeReference typeReference)>> TryGetVariablesSet(TypeResolver typeResolver) =>
+            ImmutableList<(VariableName VariableName, ITypeReference type)>.Empty;
 
         /// <inheritdoc />
         public string StepName
@@ -55,8 +56,9 @@ namespace Reductech.EDR.Core.Internal
             }
         }
 
+        /// <param name="typeResolver"></param>
         /// <inheritdoc />
-        public Result<ITypeReference> TryGetOutputTypeReference() => new ActualTypeReference(Value.GetType());
+        public Result<ITypeReference> TryGetOutputTypeReference(TypeResolver typeResolver) => new ActualTypeReference(Value.GetType());
 
         /// <inheritdoc />
         public override string ToString() => StepName;

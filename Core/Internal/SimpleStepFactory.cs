@@ -11,7 +11,8 @@ namespace Reductech.EDR.Core.Internal
     public abstract class SimpleStepFactory<TStep, TOutput> : StepFactory where TStep : ICompoundStep, new ()
     {
         /// <inheritdoc />
-        public override Result<ITypeReference> TryGetOutputTypeReference(FreezableStepData freezableStepData) => Result.Success(ActualTypeReference.Create(typeof(TOutput)));
+        public override Result<ITypeReference> TryGetOutputTypeReference(FreezableStepData freezableStepData,
+            TypeResolver typeResolver) => Result.Success(ActualTypeReference.Create(typeof(TOutput)));
 
         /// <inheritdoc />
         public override IStepNameBuilder StepNameBuilder => new DefaultStepNameBuilder(TypeName);

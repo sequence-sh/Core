@@ -16,7 +16,8 @@ namespace Reductech.EDR.Core.Internal
     public abstract class StepFactory : IStepFactory
     {
         /// <inheritdoc />
-        public abstract Result<ITypeReference> TryGetOutputTypeReference(FreezableStepData freezableStepData);
+        public abstract Result<ITypeReference> TryGetOutputTypeReference(FreezableStepData freezableStepData,
+            TypeResolver typeResolver);
 
         /// <inheritdoc />
         public string TypeName => FormatTypeName(StepType);
@@ -43,7 +44,8 @@ namespace Reductech.EDR.Core.Internal
 
 
         /// <inheritdoc />
-        public virtual Result<Maybe<ITypeReference>> GetTypeReferencesSet(VariableName variableName, FreezableStepData freezableStepData) =>
+        public virtual Result<Maybe<ITypeReference>> GetTypeReferencesSet(VariableName variableName,
+            FreezableStepData freezableStepData, TypeResolver typeResolver) =>
             Maybe<ITypeReference>.None;
 
         /// <inheritdoc />

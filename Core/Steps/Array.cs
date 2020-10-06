@@ -59,11 +59,12 @@ namespace Reductech.EDR.Core.Steps
         public override IStepNameBuilder StepNameBuilder => new StepNameBuilderFromTemplate($"[[{nameof(Array<object>.Elements)}]]");
 
         /// <inheritdoc />
-        protected override Result<ITypeReference> GetMemberType(FreezableStepData freezableStepData)
+        protected override Result<ITypeReference> GetMemberType(FreezableStepData freezableStepData,
+            TypeResolver typeResolver)
         {
             var result =
                 freezableStepData.GetListArgument(nameof(Array<object>.Elements))
-                    .Bind(x => x.Select(r => r.TryGetOutputTypeReference()).Combine())
+                    .Bind(x => x.Select(r => r.TryGetOutputTypeReference(typeResolver)).Combine())
                     .Bind(x => MultipleTypeReference.TryCreate(x, TypeName));
 
 

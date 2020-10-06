@@ -76,20 +76,22 @@ namespace Reductech.EDR.Core.Steps
         protected override ITypeReference GetOutputTypeReference(ITypeReference memberTypeReference) => new ActualTypeReference(typeof(Unit));
 
         /// <inheritdoc />
-        protected override Result<ITypeReference> GetMemberType(FreezableStepData freezableStepData) =>
+        protected override Result<ITypeReference> GetMemberType(FreezableStepData freezableStepData,
+            TypeResolver typeResolver) =>
             freezableStepData.GetArgument(nameof(ForEach<object>.Array))
-                .Bind(x => x.TryGetOutputTypeReference())
-                .BindCast<ITypeReference, GenericTypeReference>()
-                .Map(x => x.ChildTypes)
-                .BindSingle();
+                .Bind(x => x.TryGetOutputTypeReference(typeResolver))
+                .Bind(x=>x.TryGetGenericTypeReference(typeResolver, 0))
+                .Map(x=> x as ITypeReference)
+        ;
 
         /// <inheritdoc />
         public override string OutputTypeExplanation => nameof(Unit);
 
         /// <inheritdoc />
-        public override Result<Maybe<ITypeReference>> GetTypeReferencesSet(VariableName variableName, FreezableStepData freezableStepData) =>
+        public override Result<Maybe<ITypeReference>> GetTypeReferencesSet(VariableName variableName,
+            FreezableStepData freezableStepData, TypeResolver typeResolver) =>
             freezableStepData.GetArgument(nameof(ForEach<object>.Array))
-                .Bind(x => x.TryGetOutputTypeReference())
+                .Bind(x => x.TryGetOutputTypeReference(typeResolver))
                 .BindCast<ITypeReference, GenericTypeReference>()
                 .Map(x => x.ChildTypes)
                 .BindSingle()
