@@ -96,6 +96,11 @@ Value: notable", "notable");//check 'not' delimiter
 
                 yield return new DeserializationTestFunction("Print(Value = ArrayIsEmpty(Array = Array(Elements = [])))", true);
 
+                yield return new DeserializationTestFunction(@"<ArrayVar> = Array(Elements = ['abc', '123'])", new object[]{});
+
+                yield return new DeserializationTestFunction(@"
+- <ArrayVar> = Array(Elements = ['abc', '123'])
+- Print(Value = ArrayCount(Array = <ArrayVar>))",2);
 
                 yield return new DeserializationTestFunction(
                     @"Do: Print
