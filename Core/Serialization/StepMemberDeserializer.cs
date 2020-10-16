@@ -28,8 +28,8 @@ namespace Reductech.EDR.Core.Serialization
             if(reader.Current == null)
                 return new YamlException("Reader is empty");
 
-            var startMark = reader.Current.Start;
-            var endMark = reader.Current.End;
+            //var startMark = reader.Current.Start; //TODO use these
+            //var endMark = reader.Current.End;
 
 
             switch (reader.Current)
@@ -47,11 +47,8 @@ namespace Reductech.EDR.Core.Serialization
                 {
                     var r =
                         TryDeserializeNested<List<StepMember>>(nestedObjectDeserializer, reader)
-                            .Bind(x=>
-                                x.Select(m=>m.TryConvert(MemberType.Step).Bind(n=>n.AsArgument(MemberType.Step.ToString())))
-                                    .Combine()
-                                    .MapFailure(e=> new YamlException(startMark, endMark, e)))
-                            .Map(x=> new StepMember(x.ToList()));
+                            .Map(x=> x.Select(m=>m.ConvertToStep(false)).ToList())
+                            .Map(x=> new StepMember(x));
 
                     return r;
                 }
@@ -76,13 +73,6 @@ namespace Reductech.EDR.Core.Serialization
                     }
 
                     return r;
-
-                    //return new YamlException(reader.Current.Start, reader.Current.End, $"Cannot deserialize {reader.Current}");
-
-                    ////TODO remove this bit
-                    //var member2 = new StepMember(new ConstantFreezableStep(scalar.Value));
-                    //reader.MoveNext();
-                    //return member2;
                 }
                 default: return new YamlException(reader.Current.Start, reader.Current.End, $"Cannot deserialize {reader.Current}");
             }

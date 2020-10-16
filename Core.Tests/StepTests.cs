@@ -72,21 +72,21 @@ namespace Reductech.EDR.Core.Tests
                     }, MathOperator.Add.ToString());
 
 
-                //yield return new TestFunction("Print 'True And Not False'",
-                //    Print(new ApplyBooleanOperator
-                //    {
-                //        Left = Constant(true),
-                //        Right = new Not { Boolean = Constant(false) },
-                //        Operator = Constant(BooleanOperator.And)
-                //    }), true.ToString());
+                yield return new TestFunction("Print True && Not False",
+                    Print(new ApplyBooleanOperator
+                    {
+                        Left = Constant(true),
+                        Right = new Not { Boolean = Constant(false) },
+                        Operator = Constant(BooleanOperator.And)
+                    }), true.ToString());
 
-                //yield return new TestFunction("Print 'False Or Not False'",
-                //    Print(new ApplyBooleanOperator
-                //    {
-                //        Left = Constant(false),
-                //        Right = new Not { Boolean = Constant(false) },
-                //        Operator = Constant(BooleanOperator.Or)
-                //    }), true.ToString());
+                yield return new TestFunction("Print False || Not False",
+                    Print(new ApplyBooleanOperator
+                    {
+                        Left = Constant(false),
+                        Right = new Not { Boolean = Constant(false) },
+                        Operator = Constant(BooleanOperator.Or)
+                    }), true.ToString());
 
                 yield return new TestFunction("Foreach <Foo> in ['Hello'; 'World']; Print <Foo>",
                     new ForEach<string>
@@ -96,6 +96,43 @@ namespace Reductech.EDR.Core.Tests
                             Constant("World")),
                         VariableName = FooVariableName
                     }, "Hello", "World");
+
+
+                yield return new TestFunction("Foreach <Foo> in ['Hello'; 'World']; Print 'Farewell'; Print <Foo>",
+                    new ForEach<string>
+                    {
+                        Action = new Sequence
+                        {
+                            Steps = new []
+                            {
+                                Print(Constant("Farewell")),
+                                Print(GetVariable<string>(FooVariableName)),
+                            }
+                        },
+                        Array = Array(Constant("Hello"),
+                            Constant("World")),
+                        VariableName = FooVariableName
+                    }, "Farewell", "Hello", "Farewell", "World");
+
+                yield return new TestFunction("Foreach <Foo> in ['Hello'; 'World']; Print 'Goodbye'; Print <Foo>",
+                    new ForEach<string>
+                    {
+                        Action = new Sequence
+                        {
+                            Steps = new[]
+                            {
+                                Print(Constant("Goodbye")),
+                                Print(GetVariable<string>(FooVariableName)),
+                            },
+                            Configuration = new Configuration()
+                            {
+                                TargetMachineTags = new List<string>(){"My Tag"}
+                            }
+                        },
+                        Array = Array(Constant("Hello"),
+                            Constant("World")),
+                        VariableName = FooVariableName
+                    }, "Goodbye", "Hello", "Goodbye", "World");
 
                 yield return new TestFunction("If True then Print 'Hello World' else Print 'World Hello'",
                     new Conditional

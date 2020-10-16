@@ -46,7 +46,7 @@ namespace Reductech.EDR.Core.Internal
         /// <summary>
         /// The chosen option.
         /// </summary>
-        public Option<VariableName, IFreezableStep, IReadOnlyList<IFreezableStep>> Option { get; }
+        private Option<VariableName, IFreezableStep, IReadOnlyList<IFreezableStep>> Option { get; }
 
         /// <summary>
         /// Use this StepMember.
@@ -71,25 +71,50 @@ namespace Reductech.EDR.Core.Internal
         public Result<IReadOnlyList<IFreezableStep>> AsListArgument(string propertyName) => Option.Choice3.ToResult($"{propertyName} was a {MemberType}, not an list argument");
 
         /// <summary>
-        /// Tries to convert this step member to a particular type.
+        /// Tries to convert a step member of one type to one of another.
         /// </summary>
-        public Result<StepMember> TryConvert(MemberType convertType)
+        public Result<StepMember> TryConvert(MemberType newMemberType, bool convertStepListToSequence)
         {
-            if (MemberType == convertType) return this;
+            if (newMemberType == MemberType)
+                return this;
+            else if(newMemberType == MemberType.Step)
+                return new StepMember(ConvertToStep(convertStepListToSequence));
 
-            if (MemberType == MemberType.StepList && convertType == MemberType.Step)
+            return Result.Failure<StepMember>($"Could not convert {MemberType} to {newMemberType}");
+
+        }
+
+        /// <summary>
+        /// Tries to convert this step member to a FreezableStep
+        /// </summary>
+        public IFreezableStep ConvertToStep(bool convertStepListToSequence)
+        {
+
+            var r = Option.Join(MapVariableName, x => x,
+
+                x =>
+                    convertStepListToSequence ? MapStepListToSequence(x) : MapStepListToArray(x));
+
+            return r;
+
+
+            static IFreezableStep MapStepListToArray(IReadOnlyList<IFreezableStep> stepList)
             {
-                var sequence = SequenceStepFactory.CreateFreezable(Option.Choice3.Value, null);
-                return new StepMember(sequence);
+                var array = ArrayStepFactory.CreateFreezable(stepList, null);
+                return array;
             }
 
-            if (MemberType == MemberType.VariableName && convertType == MemberType.Step)
+            static IFreezableStep MapStepListToSequence(IReadOnlyList<IFreezableStep> stepList)
             {
-                var getVariableStep = GetVariableStepFactory.CreateFreezable(Option.Choice1.Value);
-                return new StepMember(getVariableStep);
+                var array = SequenceStepFactory.CreateFreezable(stepList, null);
+                return array;
             }
 
-            return Result.Failure<StepMember>("Could not convert");
+            static IFreezableStep MapVariableName(VariableName vn)
+            {
+                var getVariableStep = GetVariableStepFactory.CreateFreezable(vn);
+                return getVariableStep;
+            }
         }
 
         /// <summary>

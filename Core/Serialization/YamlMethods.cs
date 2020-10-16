@@ -69,9 +69,7 @@ namespace Reductech.EDR.Core.Serialization
             }
 
 
-            return Result.Success(stepMember)
-                .Bind(x=>x.TryConvert(MemberType.Step)
-                    .Bind(y=>y.AsArgument("Step")));
+            return Result.Success(stepMember.ConvertToStep(true));
 
         }
 

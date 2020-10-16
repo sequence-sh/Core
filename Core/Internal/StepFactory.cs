@@ -123,25 +123,16 @@ namespace Reductech.EDR.Core.Internal
                 if (remainingProperties.Remove(propertyName, out var pair))
 #pragma warning restore 8714
                 {
-                    var convertResult = stepMember.TryConvert(pair.memberType);
-                    if(convertResult.IsFailure)
-                        errors.Add(convertResult.Error);
-                    else
+                    var result = pair.memberType switch
                     {
-                        var result = pair.memberType switch
-                        {
-                            MemberType.VariableName => TrySetVariableName(pair.propertyInfo, step,
-                                convertResult.Value),
-                            MemberType.Step => TrySetStep(pair.propertyInfo, step, convertResult.Value,
-                                stepContext),
-                            MemberType.StepList => TrySetStepList(pair.propertyInfo, step,
-                                convertResult.Value, stepContext),
-                            _ => throw new ArgumentOutOfRangeException()
-                        };
+                        MemberType.VariableName => TrySetVariableName(pair.propertyInfo, step, stepMember),
+                        MemberType.Step => TrySetStep(pair.propertyInfo, step, stepMember, stepContext),
+                        MemberType.StepList => TrySetStepList(pair.propertyInfo, step, stepMember, stepContext),
+                        _ => throw new ArgumentOutOfRangeException()
+                    };
 
-                        if(result.IsFailure)
-                            errors.Add(result.Error);
-                    }
+                    if (result.IsFailure)
+                        errors.Add(result.Error);
                 }
                 else
                     errors.Add($"The property '{propertyName}' does not exist on type '{TypeName}'.");
@@ -159,7 +150,9 @@ namespace Reductech.EDR.Core.Internal
 
                 static Result TrySetStep(PropertyInfo propertyInfo, IStep parentStep, StepMember member, StepContext context)
                 {
-                    var argumentFreezeResult = member.AsArgument(propertyInfo.Name).Bind(x=>x.TryFreeze(context));
+                    var freezableStep = member.ConvertToStep(false);
+
+                    var argumentFreezeResult = freezableStep.TryFreeze(context);
                     if (argumentFreezeResult.IsFailure)
                         return argumentFreezeResult;
                     if (!propertyInfo.PropertyType.IsInstanceOfType(argumentFreezeResult.Value))

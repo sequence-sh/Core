@@ -70,5 +70,18 @@ namespace Reductech.EDR.Core.Steps
 
             return result;
         }
+
+        /// <summary>
+        /// Create a new Freezable Array
+        /// </summary>
+        public static IFreezableStep CreateFreezable(IEnumerable<IFreezableStep> elements, Configuration? configuration)
+        {
+            var fpd = new FreezableStepData(new Dictionary<string, StepMember>()
+            {
+                {nameof(Array<object>.Elements), new StepMember(elements.ToList())}
+            });
+
+            return new CompoundFreezableStep(Instance, fpd, configuration);
+        }
     }
 }
