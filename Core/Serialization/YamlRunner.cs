@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using JetBrains.Annotations;
@@ -32,17 +33,24 @@ namespace Reductech.EDR.Core.Serialization
         /// Run step defined in a yaml string.
         /// </summary>
         /// <param name="yamlString">Yaml representing the step.</param>
+        /// <param name="cancellationToken">Cancellation Token</param>
         /// <returns></returns>
         [UsedImplicitly]
-        public Result RunSequenceFromYamlString(string yamlString)
+        public async Task<Result> RunSequenceFromYamlStringAsync(string yamlString, CancellationToken cancellationToken)
         {
-            var result = YamlMethods.DeserializeFromYaml(yamlString, _stepFactoryStore)
-                    .Bind(x=>x.TryFreeze())
-                    .BindCast<IStep, IStep<Unit>>()
-                    .Bind(x=> x.Run(new StateMonad(_logger, _settings, ExternalProcessRunner.Instance))
-                        .MapFailure(y=>y.AsString));
 
-            return result;
+            var stepResult = YamlMethods.DeserializeFromYaml(yamlString, _stepFactoryStore)
+                    .Bind(x => x.TryFreeze())
+                    .BindCast<IStep, IStep<Unit>>();
+
+            if (stepResult.IsFailure)
+                return stepResult;
+
+            var stateMonad = new StateMonad(_logger, _settings, ExternalProcessRunner.Instance);
+
+            var runResult = await stepResult.Value.Run(stateMonad, cancellationToken);
+
+            return runResult.MapFailure(x => x.AsString);
 
         }
 
@@ -50,14 +58,15 @@ namespace Reductech.EDR.Core.Serialization
         /// Run step defined in a yaml file.
         /// </summary>
         /// <param name="yamlPath">Path to the yaml file.</param>
+        /// <param name="cancellationToken">The cancellation token</param>
         /// <returns></returns>
         [UsedImplicitly]
-        public async Task<Result> RunSequenceFromYamlPath(string yamlPath)
+        public async Task<Result> RunSequenceFromYamlPathAsync(string yamlPath, CancellationToken cancellationToken)
         {
             Result<string> result;
             try
             {
-                result = await File.ReadAllTextAsync(yamlPath);
+                result = await File.ReadAllTextAsync(yamlPath, cancellationToken);
             }
 #pragma warning disable CA1031 // Do not catch general exception types
             catch (Exception e)
@@ -66,7 +75,7 @@ namespace Reductech.EDR.Core.Serialization
             }
 #pragma warning restore CA1031 // Do not catch general exception types
 
-            var result2 = result.Bind(RunSequenceFromYamlString);
+            var result2 = await result.Bind(x=> RunSequenceFromYamlStringAsync(x, cancellationToken));
 
             return result2;
         }

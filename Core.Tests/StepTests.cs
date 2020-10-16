@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading;
 using FluentAssertions;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Serialization;
@@ -548,7 +549,7 @@ Two,The second number"),
                 var unfrozen = Step.Unfreeze();
                 var yaml = unfrozen.SerializeToYaml();
                 outputHelper.WriteLine(yaml);
-                var runResult = yamlRunner.RunSequenceFromYamlString(yaml);
+                var runResult = yamlRunner.RunSequenceFromYamlStringAsync(yaml, CancellationToken.None).Result;
 
                 //Assert
                 runResult.ShouldBeSuccessful();

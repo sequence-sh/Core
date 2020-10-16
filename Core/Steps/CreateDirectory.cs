@@ -1,6 +1,8 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal;
@@ -14,30 +16,30 @@ namespace Reductech.EDR.Core.Steps
     public class CreateDirectory : CompoundStep<Unit>
     {
         /// <inheritdoc />
-        public override Result<Unit, IRunErrors> Run(StateMonad stateMonad)
+        public override async Task<Result<Unit, IRunErrors>> Run(StateMonad stateMonad, CancellationToken cancellationToken)
         {
-            var result = Path.Run(stateMonad).Bind(CreateDir);
+            var path = await Path.Run(stateMonad, cancellationToken);
 
-            return result;
+            if (path.IsFailure)
+                return path.ConvertFailure<Unit>();
 
-            static Result<Unit, IRunErrors> CreateDir(string path)
+
+            Result<Unit, IRunErrors> r;
+
+            try
             {
-                Result<Unit, IRunErrors> r;
-
-                try
-                {
-                    Directory.CreateDirectory(path);
-                    r = Result.Success<Unit, IRunErrors>(Unit.Default);
-                }
-#pragma warning disable CA1031 // Do not catch general exception types
-                catch (Exception e)
-                {
-                    r = new RunError(e.Message, nameof(CreateDirectory), null, ErrorCode.ExternalProcessError);
-                }
-
-                return r;
+                Directory.CreateDirectory(path.Value);
+                r = Result.Success<Unit, IRunErrors>(Unit.Default);
             }
+#pragma warning disable CA1031 // Do not catch general exception types
+            catch (Exception e)
+            {
+                r = new RunError(e.Message, nameof(CreateDirectory), null, ErrorCode.ExternalProcessError);
+            }
+
+            return r;
         }
+
 
         /// <summary>
         /// The path to the directory to create.

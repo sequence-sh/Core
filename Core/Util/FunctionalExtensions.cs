@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 
 namespace Reductech.EDR.Core.Util
@@ -84,6 +85,16 @@ namespace Reductech.EDR.Core.Util
 
 
         /// <summary>
+        /// If the result is a failure, convert the error to a string.
+        /// </summary>
+        public static async Task<Result<T>> MapFailure<T, TE>(this Task<Result<T, TE>> result, Func<TE, string> convertError)
+        {
+            var r1 = await result;
+            return r1.MapFailure(convertError);
+        }
+
+
+        /// <summary>
         /// If the result is a failure, convert the error to another type.
         /// </summary>
         public static Result<T, TE> MapFailure<T, TE>(this Result<T> result, Func<string, TE> convertError)
@@ -95,17 +106,35 @@ namespace Reductech.EDR.Core.Util
             return error2!;
         }
 
+
+        /// <summary>
+        /// If the result is a failure, convert the error to another type.
+        /// </summary>
+        public static async Task<Result<T, TE>>  MapFailure<T, TE>(this Task<Result<T>>  result, Func<string, TE> convertError)
+        {
+            var r1 = await result;
+            return r1.MapFailure(convertError);
+        }
+
         /// <summary>
         /// If the result is a failure, convert the error to another type.
         /// </summary>
         public static Result<T,TE2> MapFailure<T, TE1, TE2>(this Result<T, TE1> result, Func<TE1, TE2> convertError)
         {
             if (result.IsSuccess) return result.Value!;
-
             var error2 = convertError(result.Error);
-
             return error2!;
         }
+
+        /// <summary>
+        /// If the result is a failure, convert the error to another type.
+        /// </summary>
+        public static async Task<Result<T, TE2>> MapFailure<T, TE1, TE2>(this Task<Result<T, TE1>>  result, Func<TE1, TE2> convertError)
+        {
+            var r1 = await result;
+            return r1.MapFailure(convertError);
+        }
+
 
         /// <summary>
         /// Casts the result to type T2.
@@ -133,6 +162,29 @@ namespace Reductech.EDR.Core.Util
 
             return Result.Failure<T2, TE>(error);
         }
+
+
+        /// <summary>
+        /// Casts the result to type T2.
+        /// Returns failure if this cast is not possible.
+        /// </summary>
+        public static async Task<Result<T2>>  BindCast<T1, T2>(this Task<Result<T1>>  result) where T2 : T1
+        {
+            var result1 = await result;
+            return result1.BindCast<T1, T2>();
+        }
+
+
+        /// <summary>
+        /// Casts the result to type T2.
+        /// Returns failure if this cast is not possible.
+        /// </summary>
+        public static async Task<Result<T2, TE>> BindCast<T1, T2, TE>(this Task<Result<T1, TE>>  result, TE error)// where T2 : T1
+        {
+            var result1 = await result;
+            return result1.BindCast<T1, T2, TE>(error);
+        }
+
 
 
         /// <summary>
@@ -168,15 +220,38 @@ namespace Reductech.EDR.Core.Util
         /// </summary>
         public static Result<(T1, T2)> Compose<T1, T2>(this Result<T1> result1, Func<Result<T2>> func2)
         {
-            if (result1.IsFailure) return result1.ConvertFailure<(T1, T2)>();
+            if (result1.IsFailure)
+                return result1.ConvertFailure<(T1, T2)>();
 
             var result2 = func2();
 
-            if (result2.IsFailure) return result2.ConvertFailure<(T1, T2)>();
+            if (result2.IsFailure)
+                return result2.ConvertFailure<(T1, T2)>();
 
             return (result1.Value, result2.Value);
 
         }
+
+
+        /// <summary>
+        /// Create a tuple with 2 results.
+        /// Func2 will not be evaluated unless result1 is success.
+        /// </summary>
+        public static async Task<Result<(T1, T2)>> Compose<T1, T2>(this Task<Result<T1>> result1, Func<Task<Result<T2>>> func2)
+        {
+            var result1A = await result1;
+
+            if (result1A.IsFailure)
+                return result1A.ConvertFailure<(T1, T2)>();
+
+            var result2A = await func2();
+
+            if (result2A.IsFailure)
+                return result2A.ConvertFailure<(T1, T2)>();
+
+            return (result1A.Value, result2A.Value);
+        }
+
 
         /// <summary>
         /// Create a tuple with 3 results.
@@ -201,6 +276,34 @@ namespace Reductech.EDR.Core.Util
 
 
         /// <summary>
+        /// Create a tuple with 3 results.
+        /// Func2 will not be evaluated unless result1 is success.
+        /// Func3 will not be evaluated unless the result of Func2 is success.
+        /// </summary>
+        public static async Task<Result<(T1, T2, T3)>>  Compose<T1, T2, T3>(this Task<Result<T1>>  result1, Func<Task<Result<T2>> > func2, Func<Task< Result<T3>>> func3)
+        {
+            var result1A = await result1;
+
+            if (result1A.IsFailure)
+                return result1A.ConvertFailure<(T1, T2, T3)>();
+
+            var result2 = await func2();
+
+            if (result2.IsFailure)
+                return result2.ConvertFailure<(T1, T2, T3)>();
+
+            var result3 = await func3();
+
+            if (result3.IsFailure)
+                return result3.ConvertFailure<(T1, T2, T3)>();
+
+            return (result1A.Value, result2.Value, result3.Value);
+
+        }
+
+
+
+        /// <summary>
         /// Create a tuple with 2 results.
         /// Func2 will not be evaluated unless result1 is success.
         /// </summary>
@@ -215,6 +318,26 @@ namespace Reductech.EDR.Core.Util
             return (result1.Value, result2.Value);
 
         }
+
+        /// <summary>
+        /// Create a tuple with 2 results.
+        /// Func2 will not be evaluated unless result1 is success.
+        /// </summary>
+        public static async Task<Result<(T1, T2), TE>> Compose<T1, T2, TE>(this Task<Result<T1, TE>> result1, Func<Task<Result<T2, TE>>> func2)
+        {
+            var result1A = await result1;
+
+            if (result1A.IsFailure)
+                return result1A.ConvertFailure<(T1, T2)>();
+
+            var result2A = await func2();
+
+            if (result2A.IsFailure)
+                return result2A.ConvertFailure<(T1, T2)>();
+
+            return (result1A.Value, result2A.Value);
+        }
+
 
         /// <summary>
         /// Create a tuple with 3 results.
@@ -236,6 +359,33 @@ namespace Reductech.EDR.Core.Util
             return (result1.Value, result2.Value, result3.Value);
 
         }
+
+        /// <summary>
+        /// Create a tuple with 3 results.
+        /// Func2 will not be evaluated unless result1 is success.
+        /// Func3 will not be evaluated unless the result of Func2 is success.
+        /// </summary>
+        public static async Task<Result<(T1, T2, T3), TE>> Compose<T1, T2, T3, TE>(this Task<Result<T1, TE>> result1, Func<Task<Result<T2, TE>>> func2, Func<Task<Result<T3, TE>>> func3)
+        {
+            var result1A = await result1;
+
+            if (result1A.IsFailure)
+                return result1A.ConvertFailure<(T1, T2, T3)>();
+
+            var result2 = await func2();
+
+            if (result2.IsFailure)
+                return result2.ConvertFailure<(T1, T2, T3)>();
+
+            var result3 = await func3();
+
+            if (result3.IsFailure)
+                return result3.ConvertFailure<(T1, T2, T3)>();
+
+            return (result1A.Value, result2.Value, result3.Value);
+
+        }
+
 
         /// <summary>
         /// Returns failure unless there is exactly one element.

@@ -2,6 +2,8 @@
 using System.Collections.Immutable;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
+using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Util;
@@ -14,7 +16,15 @@ namespace Reductech.EDR.Core.Internal
     public abstract class CompoundStep<T> : ICompoundStep<T>
     {
         /// <inheritdoc />
-        public abstract Result<T, IRunErrors> Run(StateMonad stateMonad);
+        public abstract Task<Result<T, IRunErrors>> Run(StateMonad stateMonad, CancellationToken cancellationToken);
+
+
+        /// <inheritdoc />
+        public Task<Result<T1, IRunErrors>> Run<T1>(StateMonad stateMonad, CancellationToken cancellationToken)
+        {
+            return Run(stateMonad, cancellationToken).BindCast<T, T1, IRunErrors>(
+                    new RunError($"Could not cast {typeof(T)} to {typeof(T1)}", Name, null, ErrorCode.InvalidCast));
+        }
 
         /// <summary>
         /// The factory used to create steps of this type.
@@ -101,9 +111,6 @@ namespace Reductech.EDR.Core.Internal
         /// <inheritdoc />
         public IFreezableStep Unfreeze() => new CompoundFreezableStep(StepFactory,FreezableStepData, Configuration);
 
-        /// <inheritdoc />
-        public Result<T1, IRunErrors> Run<T1>(StateMonad stateMonad) =>
-            Run(stateMonad).BindCast<T, T1, IRunErrors>(new RunError($"Could not cast {typeof(T)} to {typeof(T1)}", Name, null, ErrorCode.InvalidCast));
 
         /// <summary>
         /// Check that this step meets requirements

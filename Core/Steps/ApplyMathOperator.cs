@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Threading;
+using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal;
@@ -15,15 +17,15 @@ namespace Reductech.EDR.Core.Steps
     public sealed class ApplyMathOperator : CompoundStep<int>
     {
         /// <inheritdoc />
-        public override Result<int, IRunErrors> Run(StateMonad stateMonad)
+        public override async Task<Result<int, IRunErrors>>  Run(StateMonad stateMonad, CancellationToken cancellationToken)
         {
-            var left = Left.Run(stateMonad);
+            var left = await Left.Run(stateMonad, cancellationToken);
             if (left.IsFailure) return left;
 
-            var right = Right.Run(stateMonad);
+            var right = await Right.Run(stateMonad, cancellationToken);
             if (right.IsFailure) return right;
 
-            var @operator = Operator.Run(stateMonad);
+            var @operator = await Operator.Run(stateMonad, cancellationToken);
             if (@operator.IsFailure) return @operator.ConvertFailure<int>();
 
             var result = @operator.Value switch

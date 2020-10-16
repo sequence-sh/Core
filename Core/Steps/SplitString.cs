@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal;
@@ -29,9 +31,11 @@ namespace Reductech.EDR.Core.Steps
         public IStep<string> Delimiter { get; set; } = null!;
 
         /// <inheritdoc />
-        public override Result<List<string>, IRunErrors> Run(StateMonad stateMonad) =>
-            String.Run(stateMonad).Compose(() => Delimiter.Run(stateMonad))
+        public override async Task<Result<List<string>, IRunErrors>>  Run(StateMonad stateMonad, CancellationToken cancellationToken)
+        {
+            return await String.Run(stateMonad, cancellationToken).Compose(() => Delimiter.Run(stateMonad, cancellationToken))
                 .Map(x => x.Item1.Split(new[] {x.Item2}, StringSplitOptions.None).ToList());
+        }
 
         /// <inheritdoc />
         public override IStepFactory StepFactory => SplitStringStepFactory.Instance;

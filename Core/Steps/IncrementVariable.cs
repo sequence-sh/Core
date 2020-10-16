@@ -1,4 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Threading;
+using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal;
@@ -26,11 +28,17 @@ namespace Reductech.EDR.Core.Steps
         public IStep<int> Amount { get; set; } = null!;
 
         /// <inheritdoc />
-        public override Result<Unit, IRunErrors> Run(StateMonad stateMonad) =>
-            stateMonad.GetVariable<int>(Variable, Name)
-                .Compose(() => Amount.Run(stateMonad))
-                .Tap(x => stateMonad.SetVariable(Variable, x.Item1 + x.Item2))
-                .Map(x => Unit.Default);
+        public override async Task<Result<Unit, IRunErrors>>  Run(StateMonad stateMonad, CancellationToken cancellationToken)
+        {
+            var variable = stateMonad.GetVariable<int>(Variable, Name);
+            if (variable.IsFailure) return variable.ConvertFailure<Unit>();
+            var amount = await Amount.Run(stateMonad, cancellationToken);
+            if (amount.IsFailure) return amount.ConvertFailure<Unit>();
+
+            var r = stateMonad.SetVariable(Variable, variable.Value + amount.Value);
+
+            return r;
+        }
 
         /// <inheritdoc />
         public override IStepFactory StepFactory => IncrementVariableStepFactory.Instance;

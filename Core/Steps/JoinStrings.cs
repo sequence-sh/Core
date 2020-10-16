@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Threading;
+using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal;
@@ -26,12 +28,12 @@ namespace Reductech.EDR.Core.Steps
         public IStep<List<string>> List { get; set; } = null!;
 
         /// <inheritdoc />
-        public override Result<string, IRunErrors> Run(StateMonad stateMonad)
+        public override async Task<Result<string, IRunErrors>> Run(StateMonad stateMonad, CancellationToken cancellationToken)
         {
-            var list = List.Run(stateMonad);
+            var list = await List.Run(stateMonad, cancellationToken);
             if (list.IsFailure) return list.ConvertFailure<string>();
 
-            var delimiter = Delimiter.Run(stateMonad);
+            var delimiter = await Delimiter.Run(stateMonad, cancellationToken);
             if (delimiter.IsFailure) return delimiter;
 
 

@@ -1,4 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Threading;
+using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal;
@@ -11,9 +13,9 @@ namespace Reductech.EDR.Core.Steps
     public sealed class StringIsEmpty : CompoundStep<bool>
     {
         /// <inheritdoc />
-        public override Result<bool, IRunErrors> Run(StateMonad stateMonad)
+        public override async Task<Result<bool, IRunErrors>>  Run(StateMonad stateMonad, CancellationToken cancellationToken)
         {
-            var str = String.Run(stateMonad);
+            var str = await String.Run(stateMonad, cancellationToken);
             if (str.IsFailure) return str.ConvertFailure<bool>();
 
             return string.IsNullOrWhiteSpace(str.Value);

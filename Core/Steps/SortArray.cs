@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal;
@@ -29,10 +31,12 @@ namespace Reductech.EDR.Core.Steps
         public IStep<SortOrder> Order { get; set; } = null!;
 
         /// <inheritdoc />
-        public override Result<List<T>, IRunErrors> Run(StateMonad stateMonad) =>
-            Array.Run(stateMonad)
-                .Compose(() => Order.Run(stateMonad))
+        public override async Task<Result<List<T>, IRunErrors>> Run(StateMonad stateMonad, CancellationToken cancellationToken)
+        {
+            return await Array.Run(stateMonad, cancellationToken)
+                .Compose(() => Order.Run(stateMonad, cancellationToken))
                 .Map(x => Sort(x.Item1, x.Item2));
+        }
 
         private static List<T> Sort(IEnumerable<T> list, SortOrder sortOrder) =>
             sortOrder switch

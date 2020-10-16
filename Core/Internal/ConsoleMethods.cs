@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Microsoft.Extensions.Logging;
 using Reductech.EDR.Core.Internal.Documentation;
@@ -54,7 +56,7 @@ namespace Reductech.EDR.Core.Internal
         /// <summary>
         /// Executes yaml
         /// </summary>
-        protected void ExecuteAbstract(string? yaml, string? path)
+        protected async Task ExecuteAbstractAsync(string? yaml, string? path, CancellationToken cancellationToken)
         {
             if (string.IsNullOrWhiteSpace(yaml))
             {
@@ -63,29 +65,29 @@ namespace Reductech.EDR.Core.Internal
                     throw new ArgumentException($"Please provide either {nameof(yaml)} or {nameof(path)}");
                 }
 
-                ExecuteYamlFromPath(path);
+                await ExecuteYamlFromPathAsync(path, cancellationToken);
             }
 
             else
             {
                 if(string.IsNullOrWhiteSpace(path))
-                    ExecuteYamlString(yaml);
+                    await ExecuteYamlStringAsync(yaml, cancellationToken);
                 else
                     throw new ArgumentException($"Please provide only one of {nameof(yaml)} or {nameof(path)}");
             }
         }
 
-        private void ExecuteYamlFromPath(string path)
+        private async Task ExecuteYamlFromPathAsync(string path, CancellationToken cancellationToken)
         {
-            var text = File.ReadAllText(path);
+            var text = await File.ReadAllTextAsync(path, cancellationToken);
 
-            ExecuteYamlString(text);
+            await ExecuteYamlStringAsync(text, cancellationToken);
         }
 
         /// <summary>
         /// Runs a step defined in a yaml string
         /// </summary>
-        private void ExecuteYamlString(string yaml)
+        private async Task ExecuteYamlStringAsync(string yaml, CancellationToken cancellationToken)
         {
             var stepFactoryStore = StepFactoryStore.CreateUsingReflection(ConnectorTypes.Append(typeof(IStep)).ToArray());
 
@@ -105,7 +107,7 @@ namespace Reductech.EDR.Core.Internal
                 {
                     var stateMonad = new StateMonad(Logger, settingsResult.Value, ExternalProcessRunner.Instance);
 
-                    var runResult = freezeResult.Value.Run(stateMonad);
+                    var runResult = await freezeResult.Value.Run(stateMonad, cancellationToken);
 
                     if (runResult.IsFailure)
                         foreach (var runError in runResult.Error.AllErrors)

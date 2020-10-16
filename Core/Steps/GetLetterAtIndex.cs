@@ -1,4 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Threading;
+using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal;
@@ -26,12 +28,12 @@ namespace Reductech.EDR.Core.Steps
         public IStep<int> Index { get; set; } = null!;
 
         /// <inheritdoc />
-        public override Result<string, IRunErrors> Run(StateMonad stateMonad)
+        public override async Task<Result<string, IRunErrors>>  Run(StateMonad stateMonad, CancellationToken cancellationToken)
         {
-            var index = Index.Run(stateMonad);
+            var index = await Index.Run(stateMonad, cancellationToken);
             if (index.IsFailure) return index.ConvertFailure<string>();
 
-            var str = String.Run(stateMonad);
+            var str = await String.Run(stateMonad, cancellationToken);
             if (str.IsFailure) return str;
 
             if (index.Value < 0 || index.Value >= str.Value.Length)

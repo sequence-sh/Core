@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using FluentAssertions;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Serialization;
@@ -185,7 +186,8 @@ Value: I have config too", "I have config too")
 
                 freezeResult.ShouldBeSuccessful();
 
-                var runResult = freezeResult.Value.Run(new StateMonad(logger, EmptySettings.Instance, ExternalProcessRunner.Instance));
+                var runResult = freezeResult.Value
+                    .Run(new StateMonad(logger, EmptySettings.Instance, ExternalProcessRunner.Instance), CancellationToken.None).Result;
 
                 runResult.ShouldBeSuccessful(x => x.AsString);
 

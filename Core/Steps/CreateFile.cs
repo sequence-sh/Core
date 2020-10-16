@@ -1,6 +1,8 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal;
@@ -14,36 +16,42 @@ namespace Reductech.EDR.Core.Steps
     public class CreateFile : CompoundStep<Unit>
     {
         /// <inheritdoc />
-        public override Result<Unit, IRunErrors> Run(StateMonad stateMonad)
+        public override async Task<Result<Unit, IRunErrors>> Run(StateMonad stateMonad, CancellationToken cancellationToken)
         {
-            var result = Path.Run(stateMonad)
-                .Compose(() => Text.Run(stateMonad))
-                .Bind(a=> CreateFile1(a.Item1, a.Item2));
+            var pathResult = await Path.Run(stateMonad, cancellationToken);
+
+            if (pathResult.IsFailure)
+                return pathResult.ConvertFailure<Unit>();
+
+            var textResult = await Text.Run(stateMonad, cancellationToken);
+
+            if (textResult.IsFailure)
+                return textResult.ConvertFailure<Unit>();
+
+            var result = await CreateFile1(pathResult.Value, textResult.Value, cancellationToken);
 
             return result;
-
-            static Result<Unit, IRunErrors> CreateFile1(string path, string text)
-            {
-                Result<Unit, IRunErrors> r1;
-
-                try
-                {
-                    using var sw = File.CreateText(path);
-                    sw.Write(text);
-                    r1 = Unit.Default;
-                }
-#pragma warning disable CA1031 // Do not catch general exception types
-                catch (Exception e)
-                {
-                    r1 = new RunError(e.Message, nameof(CreateFile), null, ErrorCode.ExternalProcessError);
-                }
-#pragma warning restore CA1031 // Do not catch general exception types
-
-                return r1;
-            }
-
         }
 
+        private static async Task<Result<Unit, IRunErrors>>  CreateFile1(string path, string text, CancellationToken ca)
+        {
+            Result<Unit, IRunErrors> r1;
+
+            try
+            {
+                await using var sw = File.CreateText(path);
+                await sw.WriteAsync(text.AsMemory(), ca);
+                r1 = Unit.Default;
+            }
+#pragma warning disable CA1031 // Do not catch general exception types
+            catch (Exception e)
+            {
+                r1 = new RunError(e.Message, nameof(CreateFile), null, ErrorCode.ExternalProcessError);
+            }
+#pragma warning restore CA1031 // Do not catch general exception types
+
+            return r1;
+        }
 
         /// <summary>
         /// The path to the file to create.

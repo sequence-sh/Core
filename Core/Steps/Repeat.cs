@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal;
@@ -29,9 +31,11 @@ namespace Reductech.EDR.Core.Steps
         public IStep<int> Number { get; set; } = null!;
 
         /// <inheritdoc />
-        public override Result<List<T>, IRunErrors> Run(StateMonad stateMonad) =>
-            Element.Run(stateMonad).Compose(() => Number.Run(stateMonad))
+        public override async Task<Result<List<T>, IRunErrors>> Run(StateMonad stateMonad, CancellationToken cancellationToken)
+        {
+            return await Element.Run(stateMonad, cancellationToken).Compose(() => Number.Run(stateMonad, cancellationToken))
                 .Map(x => Enumerable.Repeat(x.Item1, x.Item2).ToList());
+        }
 
         /// <inheritdoc />
         public override IStepFactory StepFactory => RepeatStepFactory.Instance;

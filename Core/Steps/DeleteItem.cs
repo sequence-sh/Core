@@ -1,5 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Microsoft.Extensions.Logging;
 using Reductech.EDR.Core.Attributes;
@@ -14,9 +16,9 @@ namespace Reductech.EDR.Core.Steps
     public class DeleteItem : CompoundStep<Unit>
     {
         /// <inheritdoc />
-        public override Result<Unit, IRunErrors> Run(StateMonad stateMonad)
+        public override async Task<Result<Unit, IRunErrors>>  Run(StateMonad stateMonad, CancellationToken cancellationToken)
         {
-            var pathResult = Path.Run(stateMonad);
+            var pathResult = await Path.Run(stateMonad, cancellationToken);
             if (pathResult.IsFailure)
                 return pathResult.ConvertFailure<Unit>();
 

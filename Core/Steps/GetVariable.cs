@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Threading;
+using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal;
@@ -15,7 +17,9 @@ namespace Reductech.EDR.Core.Steps
     public sealed class GetVariable<T> : CompoundStep<T>
     {
         /// <inheritdoc />
-        public override Result<T, IRunErrors> Run(StateMonad stateMonad) => stateMonad.GetVariable<T>(VariableName, Name);
+#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
+        public override async Task<Result<T, IRunErrors>> Run(StateMonad stateMonad, CancellationToken cancellationToken) => stateMonad.GetVariable<T>(VariableName, Name);
+#pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
 
         /// <inheritdoc />
         public override IStepFactory StepFactory => GetVariableStepFactory.Instance;

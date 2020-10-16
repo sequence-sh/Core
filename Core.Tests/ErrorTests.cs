@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading;
 using FluentAssertions;
 using Microsoft.Extensions.Logging.Abstractions;
 using Reductech.EDR.Core.Internal;
@@ -167,7 +168,7 @@ namespace Reductech.EDR.Core.Tests
             {
                 var state = new StateMonad(NullLogger.Instance, EmptySettings.Instance, ExternalProcessRunner.Instance);
 
-                var r = Process.Run<object>(state);
+                var r = Process.Run<object>(state, CancellationToken.None).Result;
 
                 r.IsFailure.Should().BeTrue("Step should have failed");
 
