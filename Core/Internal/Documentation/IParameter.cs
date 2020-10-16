@@ -32,20 +32,5 @@ namespace Reductech.EDR.Core.Internal.Documentation
         /// Extra fields e.g. Examples, Default Values, Requirements
         /// </summary>
         IReadOnlyDictionary<string, string> ExtraFields { get; }
-
-        ///// <summary>
-        ///// An example of a valid value for this parameter.
-        ///// </summary>
-        //string? Example { get; }
-
-        ///// <summary>
-        ///// The default value of this parameter, as a human readable string, if applicable.
-        ///// </summary>
-        //string? DefaultValueString { get; }
-
-        ///// <summary>
-        ///// Requirements for using this parameter.
-        ///// </summary>
-        //string? Requirements { get; }
     }
 }

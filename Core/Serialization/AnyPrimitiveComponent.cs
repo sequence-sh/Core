@@ -16,9 +16,6 @@ namespace Reductech.EDR.Core.Serialization
         /// <param name="propertyName"></param>
         public AnyPrimitiveComponent(string propertyName) => PropertyName = propertyName;
 
-        ///// <inheritdoc />
-        //public string GetGroupName(int index) => "Value" + index;
-
         /// <summary>
         /// The property name
         /// </summary>
