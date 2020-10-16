@@ -90,11 +90,7 @@ namespace Reductech.EDR.Core.Steps
         /// <inheritdoc />
         public override Result<Maybe<ITypeReference>> GetTypeReferencesSet(VariableName variableName,
             FreezableStepData freezableStepData, TypeResolver typeResolver) =>
-            freezableStepData.GetArgument(nameof(ForEach<object>.Array))
-                .Bind(x => x.TryGetOutputTypeReference(typeResolver))
-                .BindCast<ITypeReference, GenericTypeReference>()
-                .Map(x => x.ChildTypes)
-                .BindSingle()
+            GetMemberType(freezableStepData, typeResolver)
                 .Map(Maybe<ITypeReference>.From);
 
         /// <inheritdoc />

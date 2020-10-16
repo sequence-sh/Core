@@ -5,8 +5,10 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Reflection;
 using CSharpFunctionalExtensions;
+using Namotion.Reflection;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Serialization;
+using Reductech.EDR.Core.Steps;
 
 namespace Reductech.EDR.Core.Internal
 {
@@ -217,14 +219,36 @@ namespace Reductech.EDR.Core.Internal
         /// </summary>
         protected static Result<ICompoundStep> TryCreateGeneric(Type openGenericType, Type parameterType)
         {
-            var genericType = openGenericType.MakeGenericType(parameterType);
+            object? r;
 
-            var r = Activator.CreateInstance(genericType);
+            try
+            {
+                var genericType = openGenericType.MakeGenericType(parameterType);
+                r = Activator.CreateInstance(genericType);
+            }
+            catch (ArgumentException e)
+            {
+                if (e.Message.Contains("violates the constraint of type") && openGenericType == typeof(Compare<>))
+                {
+                    var parameterTypeName = parameterType.GetDisplayName();
+                    return Result.Failure<ICompoundStep>($"Cannot compare objects of type '{parameterTypeName}'");
+                }
+
+                return Result.Failure<ICompoundStep>(e.Message);
+            }
+
+#pragma warning disable CA1031 // Do not catch general exception types
+            catch (Exception e)
+            {
+                return Result.Failure<ICompoundStep>(e.Message);
+            }
+#pragma warning restore CA1031 // Do not catch general exception types
+
 
             if (r is ICompoundStep rp)
                 return Result.Success(rp);
 
-            return Result.Failure<ICompoundStep>($"Could not create an instance of {openGenericType.Name}<{parameterType.Name}>");
+            return Result.Failure<ICompoundStep>($"Could not create an instance of {openGenericType.Name.Split("`")[0]}<{parameterType.GetDisplayName()}>");
         }
 
         /// <summary>

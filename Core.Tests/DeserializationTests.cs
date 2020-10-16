@@ -96,6 +96,50 @@ Value: notable", "notable");//check 'not' delimiter
 
                 yield return new DeserializationTestFunction("Print(Value = ArrayIsEmpty(Array = Array(Elements = [])))", true);
 
+                yield return new DeserializationTestFunction(@"<ArrayVar> = Array(Elements = ['abc', '123'])");
+
+                yield return new DeserializationTestFunction(@"
+- <ArrayVar> = Array(Elements = ['abc', '123'])
+- Print(Value = ArrayCount(Array = <ArrayVar>))",2);
+
+
+                yield return new DeserializationTestFunction(@"
+- <ArrayVar> = Array(Elements = ['abc', '123'])
+- Print(Value = ArrayIsEmpty(Array = <ArrayVar>))",false);
+
+
+
+                yield return new DeserializationTestFunction(@"
+- <ArrayVar> = Array(Elements = ['abc', '123'])
+- Print(Value = ElementAtIndex(Array = <ArrayVar>, Index = 1))", "123");
+
+                yield return new DeserializationTestFunction(@"
+- <ArrayVar> = Array(Elements = ['abc', '123'])
+- Print(Value = FirstIndexOfElement(Array = <ArrayVar>, Element = '123'))", "1");
+
+                yield return new DeserializationTestFunction(@"
+- <ArrayVar> = Array(Elements = ['abc', '123'])
+- Foreach(Array = <ArrayVar>, VariableName = <Element>, Action = Print(Value = <Element>))", "abc", "123");
+
+
+                yield return new DeserializationTestFunction(@"
+- <ArrayVar1> = Array(Elements = ['abc', '123'])
+- <ArrayVar2> = Repeat(Element = <ArrayVar1>, Number = 2)
+- Foreach(Array = <ArrayVar2>, VariableName = <Element>, Action = Print(Value = ArrayCount(Array = <Element>)))", "2", "2");
+
+                yield return new DeserializationTestFunction(@"
+- <ArrayVar> = Array(Elements = ['abc', 'def'])
+- <Sorted> = SortArray(Array = <ArrayVar>)
+- Print(Value = ElementAtIndex(Array = <Sorted>, Index = 0))", "abc");
+
+                yield return new DeserializationTestFunction(@"
+- <ConditionVar> = true
+- Conditional(Condition = <ConditionVar>, ThenStep = Print(Value = 1), ElseStep = Print(Value = 2))", "1");
+
+
+
+
+
 
                 yield return new DeserializationTestFunction(
                     @"Do: Print

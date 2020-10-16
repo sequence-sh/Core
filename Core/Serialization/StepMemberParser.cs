@@ -17,41 +17,6 @@ using Result = CSharpFunctionalExtensions.Result;
 namespace Reductech.EDR.Core.Serialization
 {
     /// <summary>
-    /// The error returned by a failed Step Member parsing
-    /// </summary>
-    public class StepMemberParseError
-    {
-        /// <summary>
-        /// Create a new StepMemberParseError
-        /// </summary>
-        public StepMemberParseError(string? errorMessage, Position errorPosition, ImmutableHashSet<string> expectations)
-        {
-            ErrorMessage = errorMessage;
-            ErrorPosition = errorPosition;
-            Expectations = expectations;
-        }
-
-        /// <summary>
-        /// The error message, if there is one.
-        /// </summary>
-        public string? ErrorMessage { get; }
-
-        /// <summary>
-        /// The position of the error.
-        /// </summary>
-        public Position ErrorPosition { get; }
-
-        /// <summary>
-        /// The expectations.
-        /// </summary>
-        public ImmutableHashSet<string> Expectations { get; }
-
-        /// <inheritdoc />
-        public override string ToString() => ErrorMessage ?? $"Parsing error at {ErrorPosition}";
-    }
-
-
-    /// <summary>
     /// Parses strings as step members
     /// </summary>
     public class StepMemberParser
@@ -75,8 +40,6 @@ namespace Reductech.EDR.Core.Serialization
             CloseArray,
             [Token(Example = ",", Description = "Delimiter for arrays and function calls")]
             Delimiter,
-            //[Token(Example = ":", Description = "Separates an argument name and an argument value")]
-            //ArgumentSeparator,
             [Token(Example = "=")]
             Assignment,
             [Token(Example = "+")]

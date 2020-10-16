@@ -25,8 +25,8 @@ namespace Reductech.EDR.Core.Steps
         /// The order to use.
         /// </summary>
         [StepProperty]
-        [Required]
-        public IStep<SortOrder> Order { get; set; } = null!;
+        [DefaultValueExplanation("Ascending")]
+        public IStep<SortOrder> Order { get; set; } = new Constant<SortOrder>(SortOrder.Ascending);
 
         /// <inheritdoc />
         public override Result<List<T>, IRunErrors> Run(StateMonad stateMonad) =>
@@ -76,8 +76,7 @@ namespace Reductech.EDR.Core.Steps
             TypeResolver typeResolver) =>
             freezableStepData.GetArgument(nameof(SortArray<object>.Array))
                 .Bind(x => x.TryGetOutputTypeReference(typeResolver))
-                .BindCast<ITypeReference, GenericTypeReference>()
-                .Map(x => x.ChildTypes)
-                .BindSingle();
+                .Bind(x => x.TryGetGenericTypeReference(typeResolver, 0))
+                .Map(x => x as ITypeReference);
     }
 }
