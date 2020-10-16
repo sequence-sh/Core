@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using FluentAssertions;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Serialization;
@@ -19,15 +20,15 @@ namespace Reductech.EDR.Core.Tests
 
 
         /// <inheritdoc />
-        [Theory(Timeout = 10000)]
+        [Theory]
         [ClassData(typeof(DeserializationTestCases))]
-        public override void Test(string key) => base.Test(key);
+        public override Task Test(string key) => base.Test(key);
     }
 
-    public class DeserializationTestCases : TestBase
+    public class DeserializationTestCases : TestBaseParallel
     {
         /// <inheritdoc />
-        protected override IEnumerable<ITestBaseCase> TestCases
+        protected override IEnumerable<ITestBaseCaseParallel> TestCases
         {
             get
             {
@@ -155,7 +156,7 @@ Value: I have config too", "I have config too")
         }
 
 
-        private class DeserializationTestFunction : ITestBaseCase
+        private class DeserializationTestFunction : ITestBaseCaseParallel
         {
 
             public DeserializationTestFunction(string yaml, params object[] expectedLoggedValues)
@@ -174,7 +175,7 @@ Value: I have config too", "I have config too")
             private IReadOnlyCollection<string> ExpectedLoggedValues { get; }
 
             /// <inheritdoc />
-            public void Execute(ITestOutputHelper testOutputHelper)
+            public async Task ExecuteAsync(ITestOutputHelper testOutputHelper)
             {
                 var pfs = StepFactoryStore.CreateUsingReflection(typeof(StepFactory));
                 var logger = new TestLogger();
@@ -187,8 +188,8 @@ Value: I have config too", "I have config too")
 
                 freezeResult.ShouldBeSuccessful();
 
-                var runResult = freezeResult.Value
-                    .Run(new StateMonad(logger, EmptySettings.Instance, ExternalProcessRunner.Instance), CancellationToken.None).Result;
+                var runResult = await freezeResult.Value
+                    .Run(new StateMonad(logger, EmptySettings.Instance, ExternalProcessRunner.Instance), CancellationToken.None);
 
                 runResult.ShouldBeSuccessful(x => x.AsString);
 

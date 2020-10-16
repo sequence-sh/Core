@@ -14,7 +14,7 @@ namespace Reductech.EDR.Core.Tests
 
 
         /// <inheritdoc />
-        [Theory(Timeout = 10000)]
+        [Theory]
         [ClassData(typeof(DeserializationErrorTestCases))]
         public override void Test(string key) => base.Test(key);
     }

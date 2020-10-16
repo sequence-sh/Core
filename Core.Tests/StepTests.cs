@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Threading;
+using System.Threading.Tasks;
 using FluentAssertions;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Serialization;
@@ -19,12 +20,12 @@ namespace Reductech.EDR.Core.Tests
         public StepTest(ITestOutputHelper testOutputHelper) => TestOutputHelper = testOutputHelper;
 
         /// <inheritdoc />
-        [Theory(Timeout = 10000)]
+        [Theory]
         [ClassData(typeof(StepTestCases))]
-        public override void Test(string key) => base.Test(key);
+        public override Task Test(string key) => base.Test(key);
     }
 
-    public class StepTestCases : TestBase
+    public class StepTestCases : TestBaseParallel
     {
 
         public const string HelloWorldString = "Hello World";
@@ -32,7 +33,7 @@ namespace Reductech.EDR.Core.Tests
         public static readonly VariableName BarString = new VariableName("Bar");
 
         /// <inheritdoc />
-        protected override IEnumerable<ITestBaseCase> TestCases
+        protected override IEnumerable<ITestBaseCaseParallel> TestCases
         {
             get
             {
@@ -515,7 +516,7 @@ Two,The second number"),
         private static Sequence Sequence(params IStep<Unit>[] steps)=> new Sequence{Steps = steps};
 
 
-        private class TestFunction : ITestBaseCase
+        private class TestFunction : ITestBaseCaseParallel
         {
             public TestFunction(string expectedName, IStep step, params string[] expectedLoggedValues)
             {
@@ -538,7 +539,7 @@ Two,The second number"),
             public bool IgnoreName { get; set; }
 
             /// <inheritdoc />
-            public void Execute(ITestOutputHelper outputHelper)
+            public async Task ExecuteAsync(ITestOutputHelper outputHelper)
             {
                 //Arrange
                 var pfs = StepFactoryStore.CreateUsingReflection(typeof(StepFactory));
@@ -549,7 +550,7 @@ Two,The second number"),
                 var unfrozen = Step.Unfreeze();
                 var yaml = unfrozen.SerializeToYaml();
                 outputHelper.WriteLine(yaml);
-                var runResult = yamlRunner.RunSequenceFromYamlStringAsync(yaml, CancellationToken.None).Result;
+                var runResult = await yamlRunner.RunSequenceFromYamlStringAsync(yaml, CancellationToken.None);
 
                 //Assert
                 runResult.ShouldBeSuccessful();

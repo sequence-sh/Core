@@ -21,7 +21,7 @@ namespace Reductech.EDR.Core.Tests
         public DocumentationTests(ITestOutputHelper testOutputHelper) => TestOutputHelper = testOutputHelper;
 
         /// <inheritdoc />
-        [Theory(Timeout = 10000)]
+        [Theory]
         [ClassData(typeof(DocumentationTestCases))]
         public override void Test(string key) => base.Test(key);
     }
