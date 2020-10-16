@@ -1,6 +1,8 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal;
@@ -14,9 +16,9 @@ namespace Reductech.EDR.Core.Steps
     public sealed class WriteFile  : CompoundStep<Unit>
     {
         /// <inheritdoc />
-        public override Result<Unit, IRunErrors> Run(StateMonad stateMonad)
+        public override async Task<Result<Unit, IRunErrors>> Run(StateMonad stateMonad, CancellationToken cancellationToken)
         {
-            var data = Folder.Run(stateMonad).Compose(() => FileName.Run(stateMonad),()=> Text.Run(stateMonad));
+            var data = await Folder.Run(stateMonad, cancellationToken).Compose(() => FileName.Run(stateMonad, cancellationToken),()=> Text.Run(stateMonad, cancellationToken));
 
             if (data.IsFailure)
                 return data.ConvertFailure<Unit>();
@@ -27,7 +29,7 @@ namespace Reductech.EDR.Core.Steps
             Maybe<IRunErrors> errors;
             try
             {
-                File.WriteAllText(path, data.Value.Item3);
+                await File.WriteAllTextAsync(path, data.Value.Item3, cancellationToken);
                 errors = Maybe<IRunErrors>.None;
             }
 #pragma warning disable CA1031 // Do not catch general exception types

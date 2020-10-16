@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Threading;
+using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal;
@@ -36,9 +38,9 @@ namespace Reductech.EDR.Core.Steps
         public IStep<List<T>> Array { get; set; } = null!;
 
         /// <inheritdoc />
-        public override Result<Unit, IRunErrors> Run(StateMonad stateMonad)
+        public override async Task<Result<Unit, IRunErrors>>  Run(StateMonad stateMonad, CancellationToken cancellationToken)
         {
-            var elements = Array.Run(stateMonad);
+            var elements = await Array.Run(stateMonad, cancellationToken);
             if (elements.IsFailure) return elements.ConvertFailure<Unit>();
 
             foreach (var element in elements.Value)
@@ -46,7 +48,7 @@ namespace Reductech.EDR.Core.Steps
                 var setResult = stateMonad.SetVariable(VariableName, element);
                 if (setResult.IsFailure) return setResult.ConvertFailure<Unit>();
 
-                var r = Action.Run(stateMonad);
+                var r = await Action.Run(stateMonad, cancellationToken);
                 if (r.IsFailure) return r;
             }
 

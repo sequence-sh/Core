@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Threading;
+using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal;
@@ -20,7 +22,10 @@ namespace Reductech.EDR.Core.Steps
         public IStep<List<T>> Array { get; set; } = null!;
 
         /// <inheritdoc />
-        public override Result<int, IRunErrors> Run(StateMonad stateMonad) => Array.Run(stateMonad).Map(x => x.Count);
+        public override async Task<Result<int, IRunErrors>>  Run(StateMonad stateMonad, CancellationToken cancellationToken)
+        {
+            return await Array.Run(stateMonad, cancellationToken).Map(x=>x.Count);
+        }
 
         /// <inheritdoc />
         public override IStepFactory StepFactory => ArrayCountStepFactory.Instance;

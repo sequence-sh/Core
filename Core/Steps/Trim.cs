@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Threading;
+using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal;
@@ -29,9 +31,11 @@ namespace Reductech.EDR.Core.Steps
         public IStep<TrimSide> Side { get; set; } = null!;
 
         /// <inheritdoc />
-        public override Result<string, IRunErrors> Run(StateMonad stateMonad) =>
-            String.Run(stateMonad).Compose(() => Side.Run(stateMonad))
+        public override async Task<Result<string, IRunErrors>>  Run(StateMonad stateMonad, CancellationToken cancellationToken)
+        {
+            return await String.Run(stateMonad, cancellationToken).Compose(() => Side.Run(stateMonad, cancellationToken))
                 .Map(x => TrimString(x.Item1, x.Item2));
+        }
 
         private static string TrimString(string s, TrimSide side) =>
             side switch

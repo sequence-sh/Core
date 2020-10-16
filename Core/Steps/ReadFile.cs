@@ -1,6 +1,8 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal;
@@ -14,9 +16,9 @@ namespace Reductech.EDR.Core.Steps
     public sealed class ReadFile : CompoundStep<string>
     {
         /// <inheritdoc />
-        public override Result<string, IRunErrors> Run(StateMonad stateMonad)
+        public override async Task<Result<string, IRunErrors>>  Run(StateMonad stateMonad, CancellationToken cancellationToken)
         {
-            var data = Folder.Run(stateMonad).Compose(() => FileName.Run(stateMonad));
+            var data = await Folder.Run(stateMonad, cancellationToken).Compose(() => FileName.Run(stateMonad, cancellationToken));
 
             if (data.IsFailure)
                 return data.ConvertFailure<string>();
@@ -27,7 +29,7 @@ namespace Reductech.EDR.Core.Steps
             Result<string, IRunErrors> result;
             try
             {
-                result = File.ReadAllText(path);
+                result = await File.ReadAllTextAsync(path, cancellationToken);
             }
 #pragma warning disable CA1031 // Do not catch general exception types
             catch (Exception e)

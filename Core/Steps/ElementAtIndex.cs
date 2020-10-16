@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Threading;
+using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal;
@@ -28,12 +30,14 @@ namespace Reductech.EDR.Core.Steps
         public IStep<int> Index { get; set; } = null!;
 
         /// <inheritdoc />
-        public override Result<T, IRunErrors> Run(StateMonad stateMonad) =>
-            Array.Run(stateMonad)
-                .Compose(() => Index.Run(stateMonad))
+        public override async Task<Result<T, IRunErrors>>  Run(StateMonad stateMonad, CancellationToken cancellationToken)
+        {
+            return await Array.Run(stateMonad, cancellationToken)
+                .Compose(() => Index.Run(stateMonad, cancellationToken))
                 .Ensure(x => x.Item2 >= 0 && x.Item2 < x.Item1.Count,
-                    new RunError( "Index was out of the range of the array.", Name, null, ErrorCode.IndexOutOfBounds))
-                .Map(x=>x.Item1[x.Item2]);
+                    new RunError("Index was out of the range of the array.", Name, null, ErrorCode.IndexOutOfBounds))
+                .Map(x => x.Item1[x.Item2]);
+        }
 
         /// <inheritdoc />
         public override IStepFactory StepFactory => ElementAtIndexStepFactory.Instance;

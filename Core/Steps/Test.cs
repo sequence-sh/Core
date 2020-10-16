@@ -1,5 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using System.Threading;
+using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal;
@@ -13,10 +15,10 @@ namespace Reductech.EDR.Core.Steps
     public sealed class Test<T> : CompoundStep<T>
     {
         /// <inheritdoc />
-        public override Result<T, IRunErrors> Run(StateMonad stateMonad)
+        public override async Task<Result<T, IRunErrors>>  Run(StateMonad stateMonad, CancellationToken cancellationToken)
         {
-            var result = Condition.Run(stateMonad)
-                .Bind(r => r ? ThenValue.Run(stateMonad) : ElseValue.Run(stateMonad));
+            var result = await Condition.Run(stateMonad, cancellationToken)
+                .Bind(r => r ? ThenValue.Run(stateMonad, cancellationToken) : ElseValue.Run(stateMonad, cancellationToken));
 
             return result;
         }

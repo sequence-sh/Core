@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.Extensions.Logging.Abstractions;
 using Reductech.EDR.Core.Internal;
@@ -17,14 +19,15 @@ namespace Reductech.EDR.Core.Tests
 
         /// <inheritdoc />
         [Theory]
+
         [ClassData(typeof(RunErrorTestCases))]
-        public override void Test(string key) => base.Test(key);
+        public override Task Test(string key) => base.Test(key);
     }
 
-    public class RunErrorTestCases : TestBase
+    public class RunErrorTestCases : TestBaseParallel
     {
         /// <inheritdoc />
-        protected override IEnumerable<ITestBaseCase> TestCases
+        protected override IEnumerable<ITestBaseCaseParallel> TestCases
         {
             get
             {
@@ -144,7 +147,7 @@ namespace Reductech.EDR.Core.Tests
 
         public static readonly VariableName FooString = new VariableName("Foo");
 
-        private class ErrorTestFunction : ITestBaseCase
+        private class ErrorTestFunction : ITestBaseCaseParallel
         {
             public ErrorTestFunction(string name, IStep process, IRunErrors expectedErrors)
             {
@@ -163,11 +166,11 @@ namespace Reductech.EDR.Core.Tests
 
 
             /// <inheritdoc />
-            public void Execute(ITestOutputHelper testOutputHelper)
+            public async Task ExecuteAsync(ITestOutputHelper testOutputHelper)
             {
                 var state = new StateMonad(NullLogger.Instance, EmptySettings.Instance, ExternalProcessRunner.Instance);
 
-                var r = Process.Run<object>(state);
+                var r = await Process.Run<object>(state, CancellationToken.None);
 
                 r.IsFailure.Should().BeTrue("Step should have failed");
 

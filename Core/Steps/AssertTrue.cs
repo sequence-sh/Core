@@ -1,4 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Threading;
+using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal;
@@ -12,9 +14,13 @@ namespace Reductech.EDR.Core.Steps
     public sealed class AssertTrue : CompoundStep<Unit>
     {
         /// <inheritdoc />
-        public override Result<Unit, IRunErrors> Run(StateMonad stateMonad) =>
-            Test.Run(stateMonad).Ensure(x => x,
-                new RunError($"Assertion Failed '{Test.Name}'", Name, null, ErrorCode.IndexOutOfBounds)).Map(x=> Unit.Default);
+        public override async Task<Result<Unit, IRunErrors>>  Run(StateMonad stateMonad, CancellationToken cancellationToken)
+        {
+
+            return await Test.Run(stateMonad, cancellationToken).Ensure(x => x,
+                    new RunError($"Assertion Failed '{Test.Name}'", Name, null, ErrorCode.IndexOutOfBounds))
+                .Map(x => Unit.Default);
+        }
 
         /// <inheritdoc />
         public override IStepFactory StepFactory => AssertTrueStepFactory.Instance;

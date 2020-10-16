@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.ComponentModel.DataAnnotations;
+using System.Threading;
+using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal;
@@ -18,9 +20,11 @@ namespace Reductech.EDR.Core.Steps
     {
 
         /// <inheritdoc />
-        public override Result<Unit, IRunErrors> Run(StateMonad stateMonad) =>
-            Value.Run(stateMonad)
+        public override async Task<Result<Unit, IRunErrors>>  Run(StateMonad stateMonad, CancellationToken cancellationToken)
+        {
+            return await Value.Run(stateMonad, cancellationToken)
                 .Bind(x => stateMonad.SetVariable(VariableName, x));
+        }
 
         /// <inheritdoc />
         public override IStepFactory StepFactory => SetVariableStepFactory.Instance;

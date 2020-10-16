@@ -1,4 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Threading;
+using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal;
@@ -27,14 +29,14 @@ namespace Reductech.EDR.Core.Steps
         public IStep<string> String { get; set; } = null!;
 
         /// <inheritdoc />
-        public override Result<Unit, IRunErrors> Run(StateMonad stateMonad)
+        public override async Task<Result<Unit, IRunErrors>>  Run(StateMonad stateMonad, CancellationToken cancellationToken)
         {
             var currentValue = stateMonad.GetVariable<string>(Variable, Name);
             if (currentValue.IsFailure)
                 return currentValue.ConvertFailure<Unit>();
 
 
-            var str = String.Run(stateMonad);
+            var str = await String.Run(stateMonad, cancellationToken);
             if (str.IsFailure)
                 return str.ConvertFailure<Unit>();
 

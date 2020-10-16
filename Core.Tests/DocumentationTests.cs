@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using FluentAssertions;
 using Reductech.EDR.Core.Attributes;
@@ -227,7 +229,9 @@ namespace Reductech.EDR.Core.Tests
         private class DocumentationExampleStep : CompoundStep<string>
         {
             /// <inheritdoc />
-            public override Result<string, IRunErrors> Run(StateMonad stateMonad)
+#pragma warning disable 1998
+            public override async Task<Result<string, IRunErrors>> Run(StateMonad stateMonad, CancellationToken cancellation)
+#pragma warning restore 1998
             {
                 throw new NotImplementedException();
             }

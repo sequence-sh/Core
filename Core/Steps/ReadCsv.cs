@@ -2,6 +2,8 @@
 using System.ComponentModel.DataAnnotations;
 using System.Data;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal;
@@ -15,13 +17,15 @@ namespace Reductech.EDR.Core.Steps
     public sealed class ReadCsv : CompoundStep<List<List<string>>>
     {
         /// <inheritdoc />
-        public override Result<List<List<string>>, IRunErrors> Run(StateMonad stateMonad)
+        public override async Task< Result<List<List<string>>, IRunErrors>> Run(StateMonad stateMonad, CancellationToken cancellationToken)
         {
-            var textResult = Text.Run(stateMonad);
-            if (textResult.IsFailure) return textResult.ConvertFailure<List<List<string>>>();
+            var textResult = await Text.Run(stateMonad, cancellationToken);
+            if (textResult.IsFailure)
+                return textResult.ConvertFailure<List<List<string>>>();
 
-            var delimiterResult = Delimiter.Run(stateMonad);
-            if (delimiterResult.IsFailure) return delimiterResult.ConvertFailure<List<List<string>>>();
+            var delimiterResult = await Delimiter.Run(stateMonad, cancellationToken);
+            if (delimiterResult.IsFailure)
+                return delimiterResult.ConvertFailure<List<List<string>>>();
 
             string? commentToken;
 
@@ -29,16 +33,19 @@ namespace Reductech.EDR.Core.Steps
                 commentToken = null;
             else
             {
-                var commentTokenResult = CommentToken.Run(stateMonad);
-                if (commentTokenResult.IsFailure) return commentTokenResult.ConvertFailure<List<List<string>>>();
+                var commentTokenResult = await CommentToken.Run(stateMonad, cancellationToken);
+                if (commentTokenResult.IsFailure)
+                    return commentTokenResult.ConvertFailure<List<List<string>>>();
                 commentToken = commentTokenResult.Value;
             }
 
-            var fieldsEnclosedInQuotesResult = HasFieldsEnclosedInQuotes.Run(stateMonad);
-            if (fieldsEnclosedInQuotesResult.IsFailure) return fieldsEnclosedInQuotesResult.ConvertFailure<List<List<string>>>();
+            var fieldsEnclosedInQuotesResult = await HasFieldsEnclosedInQuotes.Run(stateMonad, cancellationToken);
+            if (fieldsEnclosedInQuotesResult.IsFailure)
+                return fieldsEnclosedInQuotesResult.ConvertFailure<List<List<string>>>();
 
-            var columnsToMapResult = ColumnsToMap.Run(stateMonad);
-            if (columnsToMapResult.IsFailure) return columnsToMapResult.ConvertFailure<List<List<string>>>();
+            var columnsToMapResult = await ColumnsToMap.Run(stateMonad, cancellationToken);
+            if (columnsToMapResult.IsFailure)
+                return columnsToMapResult.ConvertFailure<List<List<string>>>();
 
 
             var dataTableResult = CsvReader.TryReadCSVFromString(textResult.Value, delimiterResult.Value, commentToken,

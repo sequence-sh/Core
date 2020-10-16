@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Threading;
+using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal;
@@ -38,10 +40,10 @@ namespace Reductech.EDR.Core.Steps
 
 
         /// <inheritdoc />
-        public override Result<bool, IRunErrors> Run(StateMonad stateMonad)
+        public override async Task<Result<bool, IRunErrors>> Run(StateMonad stateMonad, CancellationToken cancellationToken)
         {
-            var result = Left.Run(stateMonad)
-                .Compose(() => Operator.Run(stateMonad), () => Right.Run(stateMonad))
+            var result = await Left.Run(stateMonad, cancellationToken)
+                .Compose(() => Operator.Run(stateMonad, cancellationToken), () => Right.Run(stateMonad, cancellationToken))
                 .Bind(x => CompareItems(x.Item1, x.Item2, x.Item3));
 
 

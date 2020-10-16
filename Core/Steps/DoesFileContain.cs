@@ -1,6 +1,8 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal;
@@ -13,9 +15,9 @@ namespace Reductech.EDR.Core.Steps
     public class DoesFileContain : CompoundStep<bool>
     {
         /// <inheritdoc />
-        public override Result<bool, IRunErrors> Run(StateMonad stateMonad)
+        public override async Task<Result<bool, IRunErrors>> Run(StateMonad stateMonad, CancellationToken cancellationToken)
         {
-            var pathResult = Path.Run(stateMonad);
+            var pathResult = await Path.Run(stateMonad, cancellationToken);
 
             if (pathResult.IsFailure) return pathResult.ConvertFailure<bool>();
 
@@ -23,7 +25,7 @@ namespace Reductech.EDR.Core.Steps
                 return new RunError($"File '{pathResult.Value}' does not exist", Name, null,
                     ErrorCode.ExternalProcessError);
 
-            var textResult = Text.Run(stateMonad);
+            var textResult = await Text.Run(stateMonad, cancellationToken);
             if (textResult.IsFailure) return textResult.ConvertFailure<bool>();
 
             Maybe<RunError> error;
@@ -31,7 +33,7 @@ namespace Reductech.EDR.Core.Steps
 
             try
             {
-                realText = File.ReadAllText(pathResult.Value);
+                realText = await File.ReadAllTextAsync(pathResult.Value, cancellationToken);
                 error = Maybe<RunError>.None;
             }
 #pragma warning disable CA1031 // Do not catch general exception types

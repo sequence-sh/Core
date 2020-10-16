@@ -1,4 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Threading;
+using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal;
@@ -13,16 +15,16 @@ namespace Reductech.EDR.Core.Steps
     public sealed class RepeatWhile : CompoundStep<Unit>
     {
         /// <inheritdoc />
-        public override Result<Unit, IRunErrors> Run(StateMonad stateMonad)
+        public override async Task<Result<Unit, IRunErrors>> Run(StateMonad stateMonad, CancellationToken cancellationToken)
         {
             while (true)
             {
-                var conditionResult = Condition.Run(stateMonad);
+                var conditionResult = await Condition.Run(stateMonad, cancellationToken);
                 if (conditionResult.IsFailure) return conditionResult.ConvertFailure<Unit>();
 
                 if (conditionResult.Value)
                 {
-                    var actionResult = Action.Run(stateMonad);
+                    var actionResult = await Action.Run(stateMonad, cancellationToken);
                     if (actionResult.IsFailure) return actionResult.ConvertFailure<Unit>();
                 }
                 else break;

@@ -1,6 +1,8 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.IO.Compression;
+using System.Threading;
+using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal;
@@ -14,10 +16,10 @@ namespace Reductech.EDR.Core.Steps
     public class Unzip : CompoundStep<Unit>
     {
         /// <inheritdoc />
-        public override Result<Unit, IRunErrors> Run(StateMonad stateMonad)
+        public override async Task<Result<Unit, IRunErrors>> Run(StateMonad stateMonad, CancellationToken cancellationToken)
         {
-            var data = ArchiveFilePath.Run(stateMonad)
-                .Compose(() => DestinationDirectory.Run(stateMonad), () => OverwriteFiles.Run(stateMonad));
+            var data = await ArchiveFilePath.Run(stateMonad, cancellationToken)
+                .Compose(() => DestinationDirectory.Run(stateMonad, cancellationToken), () => OverwriteFiles.Run(stateMonad, cancellationToken));
 
             if (data.IsFailure)
                 return data.ConvertFailure<Unit>();

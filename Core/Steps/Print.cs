@@ -1,5 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using System.Threading;
+using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Microsoft.Extensions.Logging;
 using Reductech.EDR.Core.Attributes;
@@ -14,9 +16,9 @@ namespace Reductech.EDR.Core.Steps
     public sealed class Print<T> : CompoundStep<Unit>
     {
         /// <inheritdoc />
-        public override Result<Unit, IRunErrors> Run(StateMonad stateMonad)
+        public override async Task<Result<Unit, IRunErrors>>  Run(StateMonad stateMonad, CancellationToken cancellationToken)
         {
-            var r = Value.Run(stateMonad);
+            var r = await Value.Run(stateMonad, cancellationToken);
             if (r.IsFailure) return r.ConvertFailure<Unit>();
 
             stateMonad.Logger.LogInformation(r.Value?.ToString());

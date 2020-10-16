@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Threading;
+using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal;
@@ -38,11 +40,11 @@ namespace Reductech.EDR.Core.Steps
         public IStep<bool> Right { get; set; } = null!;
 
         /// <inheritdoc />
-        public override Result<bool, IRunErrors> Run(StateMonad stateMonad)
+        public override async Task<Result<bool, IRunErrors>> Run(StateMonad stateMonad, CancellationToken cancellationToken)
         {
-            var l = Left.Run(stateMonad);
+            var l = await Left.Run(stateMonad, cancellationToken);
             if (l.IsFailure) return l;
-            var op = Operator.Run(stateMonad);
+            var op = await Operator.Run(stateMonad, cancellationToken);
             if (op.IsFailure) return op.ConvertFailure<bool>();
 
             switch (op.Value)
@@ -52,7 +54,7 @@ namespace Reductech.EDR.Core.Steps
                     if (l.Value == false)
                         return false;
 
-                    var r = Right.Run(stateMonad);
+                    var r = await Right.Run(stateMonad, cancellationToken);
                     return r;
                 }
                 case BooleanOperator.Or:
@@ -60,7 +62,7 @@ namespace Reductech.EDR.Core.Steps
                     if (l.Value)
                         return true;
 
-                    var r = Right.Run(stateMonad);
+                    var r = await Right.Run(stateMonad, cancellationToken);
                     return r;
                 }
                 default:

@@ -1,5 +1,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Threading;
+using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal;
@@ -13,9 +15,9 @@ namespace Reductech.EDR.Core.Steps
     public sealed class RunExternalProcess : CompoundStep<Unit>
     {
         /// <inheritdoc />
-        public override Result<Unit, IRunErrors> Run(StateMonad stateMonad)
+        public override async Task<Result<Unit, IRunErrors>> Run(StateMonad stateMonad, CancellationToken cancellationToken)
         {
-            var pathResult = ProcessPath.Run(stateMonad);
+            var pathResult = await ProcessPath.Run(stateMonad, cancellationToken);
             if (pathResult.IsFailure) return pathResult.ConvertFailure<Unit>();
 
             List<string> arguments;
@@ -24,7 +26,7 @@ namespace Reductech.EDR.Core.Steps
                 arguments = new List<string>();
             else
             {
-                var argsResult = Arguments.Run(stateMonad);
+                var argsResult = await Arguments.Run(stateMonad, cancellationToken);
 
                 if (argsResult.IsFailure) return argsResult.ConvertFailure<Unit>();
                 arguments = argsResult.Value;

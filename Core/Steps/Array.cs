@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal;
@@ -14,9 +16,9 @@ namespace Reductech.EDR.Core.Steps
     public sealed class Array<T> : CompoundStep<List<T>>
     {
         /// <inheritdoc />
-        public override Result<List<T>, IRunErrors> Run(StateMonad stateMonad)
+        public override async Task<Result<List<T>, IRunErrors>> Run(StateMonad stateMonad, CancellationToken cancellationToken)
         {
-            var result = Elements.Select(x => x.Run(stateMonad))
+            var result = await Elements.Select(x => x.Run(stateMonad, cancellationToken))
                 .Combine(RunErrorList.Combine)
                 .Map(x => x.ToList());
 
