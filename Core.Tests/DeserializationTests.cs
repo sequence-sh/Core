@@ -102,8 +102,7 @@ Value: notable", "notable");//check 'not' delimiter
 - <ArrayVar> = Array(Elements = ['abc', '123'])
 - Print(Value = ArrayCount(Array = <ArrayVar>))",2);
 
-                yield return new DeserializationTestFunction(@"
-- Print(Value = ArrayCount(Array = ['abc', '123']))", 2);
+                yield return new DeserializationTestFunction(@"Print(Value = ArrayCount(Array = ['abc', '123']))", 2);
 
                 yield return new DeserializationTestFunction(@"
 - <ArrayVar> =  ['abc', '123']

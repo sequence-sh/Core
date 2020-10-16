@@ -273,6 +273,7 @@ namespace Reductech.EDR.Core.Serialization
                 .Or(notOperation)
                 .Or(function.Value)
                 .Or(bracketedOperation)
+                .Or(array.Select(x=>x.ConvertToStep(false)))
                 );
 
 
@@ -316,7 +317,7 @@ namespace Reductech.EDR.Core.Serialization
             {
                 var memberType = runnableStepFactory.GetExpectedMemberType(argumentName);
 
-                var convertResult = stepMember.TryConvert(memberType);
+                var convertResult = stepMember.TryConvert(memberType, false);
 
                 if (convertResult.IsFailure)
                     return convertResult.ConvertFailure<IFreezableStep>();
