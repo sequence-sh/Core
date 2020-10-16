@@ -33,8 +33,6 @@ namespace Reductech.EDR.Core.Serialization
         }
 
 
-
-
         /// <summary>
         /// Deserialize this yaml into a step.
         /// </summary>

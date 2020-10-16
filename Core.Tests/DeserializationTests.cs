@@ -105,12 +105,9 @@ Value: notable", "notable");//check 'not' delimiter
 
                 yield return new DeserializationTestFunction(@"
 - <ArrayVar> = Array(Elements = ['abc', '123'])
-- Print(Value = ArrayIsEmpty(Array = <ArrayVar>))",true);
+- Print(Value = ArrayIsEmpty(Array = <ArrayVar>))",false);
 
-                yield return new DeserializationTestFunction(@"
-- <ArrayVar1> = Array(Elements = ['abc', '123'])
-- <ArrayVar2> = Array(Elements = ['abc', '123'])
-- Print(Value = (<ArrayVar1> == <ArrayVar2>))", true);
+
 
                 yield return new DeserializationTestFunction(@"
 - <ArrayVar> = Array(Elements = ['abc', '123'])
