@@ -46,7 +46,7 @@ namespace Reductech.EDR.Core.Internal
         /// <summary>
         /// The chosen option.
         /// </summary>
-        public Option<VariableName, IFreezableStep, IReadOnlyList<IFreezableStep>> Option { get; }
+        private Option<VariableName, IFreezableStep, IReadOnlyList<IFreezableStep>> Option { get; }
 
         /// <summary>
         /// Use this StepMember.
