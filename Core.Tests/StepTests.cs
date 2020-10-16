@@ -19,7 +19,7 @@ namespace Reductech.EDR.Core.Tests
         public StepTest(ITestOutputHelper testOutputHelper) => TestOutputHelper = testOutputHelper;
 
         /// <inheritdoc />
-        [Theory]
+        [Theory(Timeout = 10000)]
         [ClassData(typeof(StepTestCases))]
         public override void Test(string key) => base.Test(key);
     }

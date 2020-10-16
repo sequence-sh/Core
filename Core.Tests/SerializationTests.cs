@@ -16,7 +16,7 @@ namespace Reductech.EDR.Core.Tests
         public SerializationTests(ITestOutputHelper testOutputHelper) => TestOutputHelper = testOutputHelper;
 
         /// <inheritdoc />
-        [Theory]
+        [Theory(Timeout = 10000)]
         [ClassData(typeof(SerializationTestCases))]
         public override void Test(string key) => base.Test(key);
     }

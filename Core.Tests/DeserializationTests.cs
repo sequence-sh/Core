@@ -10,6 +10,7 @@ using Reductech.Utilities.Testing;
 using Xunit;
 using Xunit.Abstractions;
 
+
 namespace Reductech.EDR.Core.Tests
 {
     public class DeserializationTests : DeserializationTestCases
@@ -18,7 +19,7 @@ namespace Reductech.EDR.Core.Tests
 
 
         /// <inheritdoc />
-        [Theory]
+        [Theory(Timeout = 10000)]
         [ClassData(typeof(DeserializationTestCases))]
         public override void Test(string key) => base.Test(key);
     }

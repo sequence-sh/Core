@@ -17,7 +17,8 @@ namespace Reductech.EDR.Core.Tests
         public RunErrorTests(ITestOutputHelper testOutputHelper) => TestOutputHelper = testOutputHelper;
 
         /// <inheritdoc />
-        [Theory]
+        [Theory(Timeout = 10000)]
+
         [ClassData(typeof(RunErrorTestCases))]
         public override void Test(string key) => base.Test(key);
     }

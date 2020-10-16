@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using FluentAssertions;
 using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.Internal;
@@ -7,6 +8,8 @@ using Reductech.Utilities.Testing;
 using Xunit;
 using Xunit.Abstractions;
 
+
+
 namespace Reductech.EDR.Core.Tests
 {
     public class StepMemberParserTests : StepMemberParserTestCases
@@ -14,7 +17,7 @@ namespace Reductech.EDR.Core.Tests
         public StepMemberParserTests(ITestOutputHelper testOutputHelper) => TestOutputHelper = testOutputHelper;
 
         /// <inheritdoc />
-        [Theory]
+        [Theory(Timeout = 10000)]
         [ClassData(typeof(StepMemberParserTestCases))]
         public override void Test(string key) => base.Test(key);
     }
@@ -134,7 +137,6 @@ namespace Reductech.EDR.Core.Tests
             public void Execute(ITestOutputHelper testOutputHelper)
             {
                 var store = StepFactoryStore.CreateUsingReflection(typeof(Print<>));
-
 
                 var parser = new StepMemberParser(store);
 
