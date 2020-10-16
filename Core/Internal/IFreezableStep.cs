@@ -4,7 +4,7 @@ using CSharpFunctionalExtensions;
 namespace Reductech.EDR.Core.Internal
 {
     /// <summary>
-    /// A step which can be Runnable.
+    /// A step which can be frozen.
     /// </summary>
     public interface IFreezableStep
     {
