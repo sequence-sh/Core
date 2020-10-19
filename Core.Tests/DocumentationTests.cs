@@ -123,8 +123,8 @@ namespace Reductech.EDR.Core.Tests
                     "*Requires Test Library Version 1.2*",
                     "|Parameter|Type                         |Required|Summary|Allowed Range |Default Value|Example|Recommended Range|Recommended Value|Requirements|See Also|URL               |Value Delimiter|",
                     "|:-------:|:---------------------------:|:------:|:-----:|:------------:|:-----------:|:-----:|:---------------:|:---------------:|:----------:|:------:|:----------------:|:-------------:|",
-                    "|Alpha    |`int`                        |☑️      |       |Greater than 1|Two hundred  |1234   |100-300          |201              |Greek 2.1   |Beta    |[Alpha](alpha.com)|               |",
-                    "|Beta     |`string`                     |        |       |              |             |       |                 |                 |            |Alpha   |                  |               |",
+                    "|Alpha    |`int`                        |☑️      |       |Greater than 1|             |1234   |100-300          |201              |Greek 2.1   |Beta    |[Alpha](alpha.com)|               |",
+                    "|Beta     |`string`                     |        |       |              |Two hundred  |       |                 |                 |            |Alpha   |                  |               |",
                     "|Gamma    |[VariableName](#VariableName)|        |       |              |             |       |                 |                 |            |        |                  |               |",
                     "|Delta    |IStep<`bool`>                |        |       |              |             |       |                 |                 |            |        |                  |,              |");
 
@@ -155,8 +155,8 @@ namespace Reductech.EDR.Core.Tests
                     "*Requires Test Library Version 1.2*",
                     "|Parameter|Type                         |Required|Summary|Allowed Range |Default Value|Example|Recommended Range|Recommended Value|Requirements|See Also|URL               |Value Delimiter|",
                     "|:-------:|:---------------------------:|:------:|:-----:|:------------:|:-----------:|:-----:|:---------------:|:---------------:|:----------:|:------:|:----------------:|:-------------:|",
-                    "|Alpha    |`int`                        |☑️      |       |Greater than 1|Two hundred  |1234   |100-300          |201              |Greek 2.1   |Beta    |[Alpha](alpha.com)|               |",
-                    "|Beta     |`string`                     |        |       |              |             |       |                 |                 |            |Alpha   |                  |               |",
+                    "|Alpha    |`int`                        |☑️      |       |Greater than 1|             |1234   |100-300          |201              |Greek 2.1   |Beta    |[Alpha](alpha.com)|               |",
+                    "|Beta     |`string`                     |        |       |              |Two hundred  |       |                 |                 |            |Alpha   |                  |               |",
                     "|Gamma    |[VariableName](#VariableName)|        |       |              |             |       |                 |                 |            |        |                  |               |",
                     "|Delta    |IStep<`bool`>                |        |       |              |             |       |                 |                 |            |        |                  |,              |");
 
@@ -249,7 +249,7 @@ namespace Reductech.EDR.Core.Tests
             [StepProperty(Order = 1)]
             [Required]
             [AllowedRange("Greater than 1")]
-            [DefaultValueExplanation("Two hundred")]
+
             [DocumentationURL("alpha.com")]
             [Example("1234")]
             [RecommendedRange("100-300")]
@@ -265,7 +265,8 @@ namespace Reductech.EDR.Core.Tests
             /// </summary>
             [StepProperty(Order = 2)]
             [SeeAlso("Alpha")]
-            public IStep<string> Beta { get; set; } = null!;
+            [DefaultValueExplanation("Two hundred")]
+            public IStep<string> Beta { get; set; } = new Constant<string>("Two hundred");
 
 
             /// <summary>

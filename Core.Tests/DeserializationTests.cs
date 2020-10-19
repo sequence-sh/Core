@@ -148,11 +148,6 @@ Value: notable", "notable");//check 'not' delimiter
 - <ConditionVar> = true
 - Conditional(Condition = <ConditionVar>, ThenStep = Print(Value = 1), ElseStep = Print(Value = 2))", "1");
 
-
-
-
-
-
                 yield return new DeserializationTestFunction(
                     @"Do: Print
 Config:
@@ -201,9 +196,25 @@ Value: I have config too", "I have config too")
                             }
                         }
                     }
-                }
+                };
 
-                    ;
+
+                yield return new DeserializationTestFunction(@"Do: Print
+Value:
+  Do: ElementAtIndex
+  Array:
+    Do: ElementAtIndex
+    Array:
+      Do: ReadCsv
+      Text: >-
+        Name,Summary
+
+        One,The first number
+
+        Two,The second number
+      ColumnsToMap: Array(Elements = ['Name', 'Summary'])
+    Index: 1
+  Index: 1", "The second number");
 
             }
         }
