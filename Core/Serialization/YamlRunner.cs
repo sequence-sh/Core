@@ -46,7 +46,7 @@ namespace Reductech.EDR.Core.Serialization
             if (stepResult.IsFailure)
                 return stepResult;
 
-            var stateMonad = new StateMonad(_logger, _settings, ExternalProcessRunner.Instance);
+            var stateMonad = new StateMonad(_logger, _settings, ExternalProcessRunner.Instance, _stepFactoryStore);
 
             var runResult = await stepResult.Value.Run(stateMonad, cancellationToken);
 

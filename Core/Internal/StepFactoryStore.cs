@@ -13,10 +13,22 @@ namespace Reductech.EDR.Core.Internal
         /// <summary>
         /// Creates a new StepFactoryStore.
         /// </summary>
-        public StepFactoryStore(IReadOnlyDictionary<string, StepFactory> dictionary, IReadOnlyDictionary<string, Type> enumTypesDictionary)
+        public StepFactoryStore(IReadOnlyDictionary<string, IStepFactory> dictionary, IReadOnlyDictionary<string, Type> enumTypesDictionary)
         {
             Dictionary = dictionary.ToDictionary(x=>x.Key!, x=>x.Value!, StringComparer.OrdinalIgnoreCase)!;
             EnumTypesDictionary = enumTypesDictionary.ToDictionary(x=>x.Key!, x=>x.Value!, StringComparer.OrdinalIgnoreCase)!;
+        }
+
+        /// <summary>
+        /// Creates a new StepFactoryStore.
+        /// </summary>
+        public static StepFactoryStore Create(IEnumerable<IStepFactory> factories)
+        {
+            var dictionary = factories.ToDictionary(x => x.TypeName);
+            var enumTypesDictionary = factories.SelectMany(x => x.EnumTypes).Distinct()
+                .ToDictionary(x => x.Name ?? "", StringComparer.OrdinalIgnoreCase);
+
+            return new StepFactoryStore(dictionary, enumTypesDictionary!);
         }
 
         /// <summary>
@@ -31,17 +43,11 @@ namespace Reductech.EDR.Core.Internal
                         .SelectMany(a=>a!.GetTypes())
                         .Distinct()
                 .Where(x => !x.IsAbstract)
-                .Where(x => typeof(StepFactory).IsAssignableFrom(x))
+                .Where(x => typeof(IStepFactory).IsAssignableFrom(x))
                 .Select(x => x.GetProperty("Instance", BindingFlags.Public | BindingFlags.Static)!.GetValue(null))
-                .Cast<StepFactory>().ToList();
+                .Cast<IStepFactory>().ToList();
 
-            var dictionary = factories.ToDictionary(x => x.TypeName);
-            var enumTypesDictionary = factories.SelectMany(x => x.EnumTypes).Distinct()
-                .ToDictionary(x => x.Name ?? "", StringComparer.OrdinalIgnoreCase);
-
-            return new StepFactoryStore(dictionary, enumTypesDictionary!);
-
-
+            return Create(factories);
         }
 
         /// <summary>
@@ -52,6 +58,6 @@ namespace Reductech.EDR.Core.Internal
         /// <summary>
         /// Dictionary mapping step names to step factories.
         /// </summary>
-        public IReadOnlyDictionary<string, StepFactory> Dictionary { get; }
+        public IReadOnlyDictionary<string, IStepFactory> Dictionary { get; }
     }
 }

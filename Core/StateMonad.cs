@@ -16,11 +16,12 @@ namespace Reductech.EDR.Core
         /// <summary>
         /// Create a new StateMonad
         /// </summary>
-        public StateMonad(ILogger logger, ISettings settings, IExternalProcessRunner externalProcessRunner)
+        public StateMonad(ILogger logger, ISettings settings, IExternalProcessRunner externalProcessRunner, StepFactoryStore stepFactoryStore)
         {
             Logger = logger;
             Settings = settings;
             ExternalProcessRunner = externalProcessRunner;
+            StepFactoryStore = stepFactoryStore;
         }
 
         /// <summary>
@@ -37,6 +38,11 @@ namespace Reductech.EDR.Core
         /// The runner of external processes.
         /// </summary>
         public IExternalProcessRunner ExternalProcessRunner { get; }
+
+        /// <summary>
+        /// The step factory store. Maps from step names to step factories.
+        /// </summary>
+        public StepFactoryStore StepFactoryStore { get; }
 
         /// <summary>
         /// Get settings of a particular type.

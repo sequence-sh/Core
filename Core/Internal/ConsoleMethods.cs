@@ -6,7 +6,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Microsoft.Extensions.Logging;
-using Reductech.EDR.Core.Internal.Documentation;
 using Reductech.EDR.Core.Serialization;
 using Reductech.EDR.Core.Util;
 
@@ -33,25 +32,6 @@ namespace Reductech.EDR.Core.Internal
         /// </summary>
         /// <returns></returns>
         protected abstract Result<ISettings> TryGetSettings();
-
-        /// <summary>
-        /// Generates documentation
-        /// </summary>
-        protected void GenerateDocumentationAbstract(string path)
-        {
-            var documentationCategories = ConnectorTypes.Append(typeof(IStep))
-                .Select(type => (docCategory: type.Assembly.GetName().Name!, type)).ToList();
-
-            var documented = documentationCategories
-                .SelectMany(x =>
-                    DocumentationCreator.GetAllDocumented(x.docCategory, StepFactoryStore.CreateUsingReflection(x.type)))
-                .Distinct().ToList();
-
-            var lines = DocumentationCreator.CreateDocumentationLines(documented);
-
-
-            File.WriteAllLines(path, lines);
-        }
 
         /// <summary>
         /// Executes yaml
@@ -105,7 +85,7 @@ namespace Reductech.EDR.Core.Internal
                     Logger.LogError(settingsResult.Error);
                 else
                 {
-                    var stateMonad = new StateMonad(Logger, settingsResult.Value, ExternalProcessRunner.Instance);
+                    var stateMonad = new StateMonad(Logger, settingsResult.Value, ExternalProcessRunner.Instance, stepFactoryStore);
 
                     var runResult = await freezeResult.Value.Run(stateMonad, cancellationToken);
 
