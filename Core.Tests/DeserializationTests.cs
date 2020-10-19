@@ -230,10 +230,10 @@ Value: I have config too", "I have config too")
             /// <inheritdoc />
             public async Task ExecuteAsync(ITestOutputHelper testOutputHelper)
             {
-                var pfs = StepFactoryStore.CreateUsingReflection(typeof(StepFactory));
+                var stepFactoryStore = StepFactoryStore.CreateUsingReflection(typeof(StepFactory));
                 var logger = new TestLogger();
 
-                var deserializeResult = YamlMethods.DeserializeFromYaml(Yaml, pfs);
+                var deserializeResult = YamlMethods.DeserializeFromYaml(Yaml, stepFactoryStore);
 
                 deserializeResult.ShouldBeSuccessful();
 
@@ -242,7 +242,7 @@ Value: I have config too", "I have config too")
                 freezeResult.ShouldBeSuccessful();
 
                 var runResult = await freezeResult.Value
-                    .Run(new StateMonad(logger, EmptySettings.Instance, ExternalProcessRunner.Instance), CancellationToken.None);
+                    .Run(new StateMonad(logger, EmptySettings.Instance, ExternalProcessRunner.Instance, stepFactoryStore), CancellationToken.None);
 
                 runResult.ShouldBeSuccessful(x => x.AsString);
 

@@ -9,19 +9,6 @@ namespace Reductech.EDR.Core.Internal.Documentation
     internal static class DocumentationCreator
     {
         /// <summary>
-        /// Dynamically Gets all steps and related entities from an assembly.
-        /// For use with InstantConsole.
-        /// </summary>
-        public static IEnumerable<IDocumented> GetAllDocumented(string documentationCategory, StepFactoryStore stepFactoryStore)
-        {
-            var wrappers = stepFactoryStore.Dictionary.Values
-                .Select(x => new StepWrapper(x, documentationCategory)).ToList();
-
-            return wrappers;
-        }
-
-
-        /// <summary>
         /// Creates documentation for a list of entities
         /// </summary>
         /// <param name="entities"></param>

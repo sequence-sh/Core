@@ -36,9 +36,7 @@ namespace Reductech.EDR.Core.Internal
         /// <inheritdoc />
         public abstract IStepNameBuilder StepNameBuilder { get; }
 
-        /// <summary>
-        /// Gets all enum types used by this step.
-        /// </summary>
+        /// <inheritdoc />
         public abstract IEnumerable<Type> EnumTypes { get; }
 
         /// <inheritdoc />
@@ -65,9 +63,7 @@ namespace Reductech.EDR.Core.Internal
         /// </summary>
         protected abstract Result<ICompoundStep> TryCreateInstance(StepContext stepContext, FreezableStepData freezableStepData);
 
-        /// <summary>
-        /// Gets the type of this member.
-        /// </summary>
+        /// <inheritdoc />
         public MemberType GetExpectedMemberType(string name)
         {
             var propertyInfo = StepType.GetProperty(name, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
@@ -79,7 +75,6 @@ namespace Reductech.EDR.Core.Internal
             if (propertyInfo.GetCustomAttribute<StepListPropertyAttribute>() != null) return MemberType.StepList;
 
             return MemberType.NotAMember;
-
         }
 
 
@@ -258,5 +253,19 @@ namespace Reductech.EDR.Core.Internal
 
             return friendlyName;
         }
+
+        /// <inheritdoc />
+        public virtual string Category
+        {
+            get
+            {
+                var fullName = StepType.Assembly.GetName().Name!;
+                var lastTerm = GetLastTerm(fullName);
+
+                return lastTerm;
+            }
+        }
+
+        private static string GetLastTerm(string s) => s.Split('.', StringSplitOptions.RemoveEmptyEntries).Last();
     }
 }

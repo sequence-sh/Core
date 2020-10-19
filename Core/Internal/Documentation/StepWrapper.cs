@@ -15,10 +15,10 @@ namespace Reductech.EDR.Core.Internal.Documentation
         /// <summary>
         /// Creates a new StepWrapper.
         /// </summary>
-        public StepWrapper(IStepFactory factory, string category)
+        public StepWrapper(IStepFactory factory)
         {
             Factory = factory;
-            DocumentationCategory = category;
+            DocumentationCategory = factory.Category;
 
             RelevantProperties = factory.StepType.GetProperties()
                 .Select(property=> (property, attribute: property.GetCustomAttribute<StepPropertyBaseAttribute>()))
@@ -26,9 +26,7 @@ namespace Reductech.EDR.Core.Internal.Documentation
                 // ReSharper disable once ConstantConditionalAccessQualifier
                 .OrderBy(x=>x.attribute!.Order)
                 .ThenBy(x=>x.property.Name)
-
                 .Select(x=>x.property).ToList();
-
 
 
             Parameters = RelevantProperties.Select(GetPropertyWrapper).ToList();//TODO get default values

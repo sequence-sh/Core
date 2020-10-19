@@ -168,7 +168,9 @@ namespace Reductech.EDR.Core.Tests
             /// <inheritdoc />
             public async Task ExecuteAsync(ITestOutputHelper testOutputHelper)
             {
-                var state = new StateMonad(NullLogger.Instance, EmptySettings.Instance, ExternalProcessRunner.Instance);
+                var spf = StepFactoryStore.CreateUsingReflection(typeof(IStep));
+
+                var state = new StateMonad(NullLogger.Instance, EmptySettings.Instance, ExternalProcessRunner.Instance, spf);
 
                 var r = await Process.Run<object>(state, CancellationToken.None);
 

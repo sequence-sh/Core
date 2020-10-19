@@ -6,10 +6,10 @@ using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using FluentAssertions;
+using Microsoft.Extensions.Logging.Abstractions;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.Internal;
-using Reductech.EDR.Core.Internal.Documentation;
 using Reductech.Utilities.Testing;
 using Xunit;
 using Xunit.Abstractions;
@@ -23,26 +23,26 @@ namespace Reductech.EDR.Core.Tests
         /// <inheritdoc />
         [Theory]
         [ClassData(typeof(DocumentationTestCases))]
-        public override void Test(string key) => base.Test(key);
+        public override Task Test(string key) => base.Test(key);
     }
 
-    public class DocumentationTestCases : TestBase
+    public class DocumentationTestCases : TestBaseParallel
     {
         /// <inheritdoc />
-        protected override IEnumerable<ITestBaseCase> TestCases
+        protected override IEnumerable<ITestBaseCaseParallel> TestCases
         {
             get
             {
                 yield return new DocumentationTestCase(
-                    new List<(IStepFactory stepFactory, string documentationCategory)>
+                    new List<IStepFactory>
                     {
-                        (NotStepFactory.Instance, "Steps")
+                        NotStepFactory.Instance
                     },
                     "# Contents",
                     "|Step       |Summary                     |",
                     "|:---------:|:--------------------------:|",
                     "|[Not](#Not)|Negation of a boolean value.|",
-                    "# Steps",
+                    "# Core",
                     "<a name=\"Not\"></a>",
                     "## Not",
                     "**Boolean**",
@@ -53,15 +53,15 @@ namespace Reductech.EDR.Core.Tests
 
 
                 yield return new DocumentationTestCase(
-                    new List<(IStepFactory stepFactory, string documentationCategory)>
+                    new List<IStepFactory>
                     {
-                        (ArrayStepFactory.Instance, "Steps")
+                        ArrayStepFactory.Instance
                     },
                     "# Contents",
                     "|Step                 |Summary                                     |",
                     "|:-------------------:|:------------------------------------------:|",
                     "|[Array<T>](#Array<T>)|Represents an ordered collection of objects.|",
-                    "# Steps",
+                    "# Core",
                     "<a name=\"Array<T>\"></a>",
                     "## Array<T>",
                     "**List<T>**",
@@ -74,15 +74,15 @@ namespace Reductech.EDR.Core.Tests
 
 
                 yield return new DocumentationTestCase(
-                    new List<(IStepFactory stepFactory, string documentationCategory)>
+                    new List<IStepFactory>
                     {
-                        (ApplyMathOperatorStepFactory.Instance, "Steps")
+                        ApplyMathOperatorStepFactory.Instance
                     },
                     "# Contents",
                     "|Step                                   |Summary                                                                              |",
                     "|:-------------------------------------:|:-----------------------------------------------------------------------------------:|",
                     "|[ApplyMathOperator](#ApplyMathOperator)|Applies a mathematical operator to two integers. Returns the result of the operation.|",
-                    "# Steps",
+                    "# Core",
                     "<a name=\"ApplyMathOperator\"></a>",
                     "## ApplyMathOperator",
                     "**Int32**",
@@ -108,9 +108,9 @@ namespace Reductech.EDR.Core.Tests
                 );
 
                 yield return new DocumentationTestCase(
-                    new List<(IStepFactory stepFactory, string)>
+                    new List<IStepFactory>
                     {
-                        (DocumentationExampleStepFactory.Instance, "Examples")
+                        DocumentationExampleStepFactory.Instance
                     },
                     "# Contents",
                     "|Step                                                 |Summary|",
@@ -130,17 +130,17 @@ namespace Reductech.EDR.Core.Tests
 
 
                 yield return new DocumentationTestCase(
-                    new List<(IStepFactory stepFactory, string documentationCategory)>
+                    new List<IStepFactory>
                     {
-                        (NotStepFactory.Instance, "Steps"),
-                        (DocumentationExampleStepFactory.Instance, "Examples")
+                        NotStepFactory.Instance,
+                        DocumentationExampleStepFactory.Instance
                     },
                     "# Contents",
                     "|Step                                                 |Summary                     |",
                     "|:---------------------------------------------------:|:--------------------------:|",
                     "|[Not](#Not)                                          |Negation of a boolean value.|",
                     "|[DocumentationExampleStep](#DocumentationExampleStep)|                            |",
-                    "# Steps",
+                    "# Core",
                     "<a name=\"Not\"></a>",
                     "## Not",
                     "**Boolean**",
@@ -163,19 +163,19 @@ namespace Reductech.EDR.Core.Tests
             }
         }
 
-        private class DocumentationTestCase : ITestBaseCase
+        private class DocumentationTestCase : ITestBaseCaseParallel
         {
             /// <summary>
             /// Create a new DocumentationTestCase
             /// </summary>
             public DocumentationTestCase(
-                IReadOnlyCollection<(IStepFactory stepFactory, string documentationCategory)> factories,
+                IReadOnlyCollection<IStepFactory> factories,
                 params string[] expectedLines)
             {
                 ExpectedLines = expectedLines;
                 Factories = factories;
                 Name = string.Join(" ", Factories
-                    .Select(x=>x.stepFactory.TypeName)
+                    .Select(x=>x.TypeName)
                     .OrderBy(x => x));
             }
 
@@ -184,20 +184,24 @@ namespace Reductech.EDR.Core.Tests
 
             public IReadOnlyCollection<string> ExpectedLines { get; }
 
-            public IReadOnlyCollection<(IStepFactory stepFactory, string documentationCategory)> Factories { get; }
+            public IReadOnlyCollection<IStepFactory> Factories { get; }
 
             /// <inheritdoc />
-            public void Execute(ITestOutputHelper testOutputHelper)
+            public async Task ExecuteAsync(ITestOutputHelper testOutputHelper)
             {
-                var documented = Factories
-                    .Select(x => new StepWrapper(x.stepFactory,x.documentationCategory));
+                var stepFactoryStore = StepFactoryStore.Create(Factories);
+                var step = new GenerateDocumentation();
 
-                var lines = DocumentationCreator.CreateDocumentationLines(documented);
 
-                foreach (var line in lines)
-                {
-                    testOutputHelper.WriteLine(line);
-                }
+                var monad = new StateMonad(NullLogger.Instance, EmptySettings.Instance, ExternalProcessRunner.Instance, stepFactoryStore);
+
+                var linesResult = await step.Run(monad, CancellationToken.None);
+
+                linesResult.ShouldBeSuccessful(x=>x.AsString);
+
+                var lines = linesResult.Value;
+
+                foreach (var line in lines) testOutputHelper.WriteLine(line);
 
                 lines.Where(x => !string.IsNullOrWhiteSpace(x)).Should().BeEquivalentTo(ExpectedLines);
             }
@@ -224,6 +228,9 @@ namespace Reductech.EDR.Core.Tests
                     };
                 }
             }
+
+            /// <inheritdoc />
+            public override string Category => "Examples";
         }
 
         private class DocumentationExampleStep : CompoundStep<string>

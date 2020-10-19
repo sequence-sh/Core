@@ -20,6 +20,10 @@ namespace Reductech.EDR.Core.Internal
         /// </summary>
         public Type StepType { get; }
 
+        /// <summary>
+        /// The category of the step. Used for documentation.
+        /// </summary>
+        public string Category { get; }
 
         /// <summary>
         /// Builds the name for a particular instance of a step.
@@ -63,5 +67,15 @@ namespace Reductech.EDR.Core.Internal
         /// Human readable explanation of the output type.
         /// </summary>
         string OutputTypeExplanation { get; }
+
+        /// <summary>
+        /// Gets the type of this member.
+        /// </summary>
+        MemberType GetExpectedMemberType(string name);
+
+        /// <summary>
+        /// Gets all enum types used by this step.
+        /// </summary>
+        IEnumerable<Type> EnumTypes { get; }
     }
 }
