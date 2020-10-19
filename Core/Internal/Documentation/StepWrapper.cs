@@ -84,7 +84,9 @@ namespace Reductech.EDR.Core.Internal.Documentation
                 _propertyInfo = propertyInfo;
                 Required = _propertyInfo.GetCustomAttributes<RequiredAttribute>().Any() && defaultValueString == null;
 
-                var explanation = propertyInfo.GetCustomAttribute<DefaultValueExplanationAttribute>()?.Explanation;
+                var explanation = Required?
+                    null : //Required properties should not have a default value
+                    propertyInfo.GetCustomAttribute<DefaultValueExplanationAttribute>()?.Explanation;
 
                 var extraFields = new Dictionary<string, string>();
 

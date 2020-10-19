@@ -94,7 +94,6 @@ namespace Reductech.EDR.Core.Steps
         /// The delimiter to use to separate rows.
         /// </summary>
         [StepProperty(Order = 2)]
-        [Required]
         [DefaultValueExplanation(",")]
         public IStep<string> Delimiter { get; set; } = new Constant<string>(",");
 
@@ -109,7 +108,6 @@ namespace Reductech.EDR.Core.Steps
         /// </summary>
         [StepProperty(Order = 4)]
         [DefaultValueExplanation("false")]
-        [Required]
         public IStep<bool> HasFieldsEnclosedInQuotes { get; set; } = new Constant<bool>(false);
 
         /// <summary>

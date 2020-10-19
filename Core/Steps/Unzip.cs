@@ -63,7 +63,6 @@ namespace Reductech.EDR.Core.Steps
         /// Whether to overwrite files when unzipping.
         /// </summary>
         [StepProperty]
-        [Required]
         [DefaultValueExplanation("false")]
         public IStep<bool> OverwriteFiles { get; set; } = new Constant<bool>(false);
 
