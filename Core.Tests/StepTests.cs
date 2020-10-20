@@ -126,9 +126,9 @@ namespace Reductech.EDR.Core.Tests
                                 Print(Constant("Goodbye")),
                                 Print(GetVariable<string>(FooVariableName)),
                             },
-                            Configuration = new Configuration()
+                            Configuration = new Configuration
                             {
-                                TargetMachineTags = new List<string>(){"My Tag"}
+                                TargetMachineTags = new List<string> {"My Tag"}
                             }
                         },
                         Array = Array(Constant("Hello"),
@@ -499,12 +499,6 @@ Two,The second number"),
                     {
                         Steps = new IStep<Unit>[]
                         {
-                            new SetVariable<List<string>> //TODO this should not be necessary
-                            {
-                                VariableName = FooVariableName,
-                                Value = new Array<string>(){Elements = new []{Constant("Initial")}}
-                            },
-
                             new ForEach<List<string>>
                             {
                                 Array = new ReadCsv
@@ -531,6 +525,153 @@ Two,The second number"),
                         }
                     }, "The first number", "The second number" )
                 { IgnoreName = true };
+
+
+                yield return new TestFunction("Read CSV ForEach 2",
+
+                    new Sequence
+                    {
+                        Steps = new IStep<Unit>[]
+                        {
+                            new SetVariable<string>
+                            {
+                                VariableName = new VariableName("TextVar"),
+                                Value = new Constant<string>(@"Name,Summary
+One,The first number
+Two,The second number")
+                            },
+
+                            new SetVariable<List<List<string>>>
+                            {
+                                VariableName = new VariableName("CSVVar"),
+
+                                Value = new ReadCsv
+                                {
+                                    Text = GetVariable<string>(new VariableName("TextVar")),
+
+                                    ColumnsToMap = new Array<string>
+                                    {
+                                        Elements = new[] {new Constant<string>("Name"), new Constant<string>("Summary")}
+                                    },
+                                    Delimiter = new Constant<string>(",")
+                                }
+                            },
+
+                            new ForEach<List<string>>
+                            {
+                                Array = GetVariable<List<List<string>>>(new VariableName("CSVVar")),
+                                VariableName = FooVariableName,
+                                Action = new Print<string>
+                                {
+                                    Value = new ElementAtIndex<string>
+                                    {
+                                        Array = new GetVariable<List<string>> {VariableName = FooVariableName},
+                                        Index = new Constant<int>(0)
+                                    }
+                                }
+                            }
+                        }
+                    }, "One", "Two")
+                { IgnoreName = true };
+
+                yield return new TestFunction("Read CSV ForEach 3",
+
+                    new Sequence
+                    {
+                        Steps = new IStep<Unit>[]
+                        {
+                            new SetVariable<string>
+                            {
+                                VariableName = new VariableName("TextVar"),
+                                Value = new Constant<string>(@"Name,Summary
+One,The first number
+Two,The second number")
+                            },
+
+                            new SetVariable<List<List<string>>>
+                            {
+                                VariableName = new VariableName("CSVVar"),
+
+                                Value = new ReadCsv
+                                {
+                                    Text = GetVariable<string>(new VariableName("TextVar")),
+
+                                    ColumnsToMap = new Array<string>
+                                    {
+                                        Elements = new[] {new Constant<string>("Name"), new Constant<string>("Summary")}
+                                    },
+                                    Delimiter = new Constant<string>(",")
+                                }
+                            },
+
+                            new ForEach<List<string>>
+                            {
+                                Array = GetVariable<List<List<string>>>(new VariableName("CSVVar")),
+                                VariableName = FooVariableName,
+                                Action = new Print<string>
+                                {
+                                    Value = new ElementAtIndex<string>
+                                    {
+                                        Array = new GetVariable<List<string>> {VariableName = FooVariableName},
+                                        Index = new Constant<int>(0)
+                                    }
+                                },
+                                Configuration = new Configuration
+                                {
+                                    TargetMachineTags = new List<string> {"Tag1"}
+                                }
+                            }
+                        }
+                    }, "One", "Two")
+                { IgnoreName = true };
+
+                yield return new TestFunction("Foreach nested array",
+                    new Sequence
+                    {
+                        Steps = new IStep<Unit>[]{
+                            new SetVariable<List<List<string>>>
+                            {
+                                VariableName = new VariableName("DataVar"),
+
+                                Value = new Array<List<string>>
+                                {
+                                    Elements = new []
+                                    {
+                                        new Array<string>
+                                        {
+                                            Elements = new []{Constant("One"), Constant( "The first number")}
+                                        },
+                                        new Array<string>
+                                        {
+                                            Elements = new []{Constant("Two"), Constant( "The second number")}
+                                        },
+
+                                    }
+                                }
+                            },
+
+                            new ForEach<List<string>>
+                            {
+                                Array = GetVariable<List<List<string>>>(new VariableName("DataVar")),
+                                VariableName = FooVariableName,
+                                Action = new Print<string>
+                                {
+                                    Value = new ElementAtIndex<string>
+                                    {
+                                        Array = new GetVariable<List<string>> {VariableName = FooVariableName},
+                                        Index = new Constant<int>(0)
+                                    }
+                                },
+                                Configuration = new Configuration
+                                {
+                                    TargetMachineTags = new List<string> {"Tag1"}
+                                }
+                            }
+
+                    }
+                    },"One", "Two"
+
+                    ){IgnoreName = true};
 
 
             }

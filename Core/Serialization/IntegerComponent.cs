@@ -22,7 +22,7 @@ namespace Reductech.EDR.Core.Serialization
 
         /// <inheritdoc />
         public Result<string> TryGetText(FreezableStepData data) =>
-            data.Dictionary
+            data.StepMembersDictionary
                 .TryFindOrFail(PropertyName, null)
                 .Bind(x => x.Join(VariableNameComponent.Serialize,
                     TrySerialize,

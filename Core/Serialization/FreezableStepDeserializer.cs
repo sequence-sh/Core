@@ -90,7 +90,11 @@ namespace Reductech.EDR.Core.Serialization
             if (factory == null)
                 return new YamlException(markStart, markEnd, $"The '{YamlMethods.TypeString}' property must be set.");
 
-            return new CompoundFreezableStep(factory, new FreezableStepData(dictionary), configuration);
+            var fsd = FreezableStepData.TryCreate(factory, dictionary);
+            if(fsd.IsFailure)
+                throw new YamlException(fsd.Error);
+
+            return new CompoundFreezableStep(factory, fsd.Value, configuration);
 
         }
     }

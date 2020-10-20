@@ -78,10 +78,12 @@ namespace Reductech.EDR.Core.Steps
         /// </summary>
         public static IFreezableStep CreateFreezable(IEnumerable<IFreezableStep> elements, Configuration? configuration)
         {
-            var fpd = new FreezableStepData(new Dictionary<string, StepMember>()
+            var dict = new Dictionary<string, IReadOnlyList<IFreezableStep>>
             {
-                {nameof(Array<object>.Elements), new StepMember(elements.ToList())}
-            });
+                {nameof(Array<object>.Elements), elements.ToList()}
+            };
+
+            var fpd = new FreezableStepData(null, null, dict);
 
             return new CompoundFreezableStep(Instance, fpd, configuration);
         }

@@ -45,22 +45,29 @@ namespace Reductech.EDR.Core.Internal
         public Result<IReadOnlyCollection<(VariableName VariableName, ITypeReference typeReference)>> TryGetVariablesSet(TypeResolver typeResolver)
         {
             var result = FreezableStepData
-                    .Dictionary.Values
-                    .Select(TryGetStepMemberVariablesSet)
+                .VariableNameDictionary.Values.Select(TryGetVariableNameVariablesSet)
+                .Concat(FreezableStepData.StepDictionary.Values.Select(TryGetStepVariablesSet))
+                .Concat(FreezableStepData.StepListDictionary.Values.Select(TryGetStepListVariablesSet))
                     .Combine()
                     .Map(x => x.SelectMany(y => y).ToList() as IReadOnlyCollection<(VariableName name, ITypeReference type)>);
+
+
 
             return result;
 
 
-            Result<IReadOnlyCollection<(VariableName, ITypeReference)>> TryGetStepMemberVariablesSet(StepMember stepMember) =>
-                stepMember.Join(vn =>
-                        StepFactory.GetTypeReferencesSet(vn, FreezableStepData, typeResolver)
-                            .Map(y => y.Map(x => new[] { (vn, x) } as IReadOnlyCollection<(VariableName, ITypeReference)>)
-                            .Unwrap(ImmutableArray<(VariableName, ITypeReference)>.Empty)),
-                    y => y.TryGetVariablesSet(typeResolver),
-                    y => y.Select(z => z.TryGetVariablesSet(typeResolver)).Combine().Map(x =>
-                        x.SelectMany(q => q).ToList() as IReadOnlyCollection<(VariableName, ITypeReference)>));
+            Result<IReadOnlyCollection<(VariableName, ITypeReference)>> TryGetVariableNameVariablesSet(VariableName vn) =>
+
+                StepFactory.GetTypeReferencesSet(vn, FreezableStepData, typeResolver)
+                    .Map(y => y.Map(x => new[] {(vn, x)} as IReadOnlyCollection<(VariableName, ITypeReference)>)
+                        .Unwrap(ImmutableArray<(VariableName, ITypeReference)>.Empty));
+
+            Result<IReadOnlyCollection<(VariableName, ITypeReference)>> TryGetStepVariablesSet(IFreezableStep y) => y.TryGetVariablesSet(typeResolver);
+
+            Result<IReadOnlyCollection<(VariableName, ITypeReference)>> TryGetStepListVariablesSet(IReadOnlyList<IFreezableStep> y) =>
+
+                y.Select(z => z.TryGetVariablesSet(typeResolver)).Combine().Map(x =>
+                    x.SelectMany(q => q).ToList() as IReadOnlyCollection<(VariableName, ITypeReference)>);
         }
 
 

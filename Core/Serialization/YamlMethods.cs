@@ -85,7 +85,7 @@ namespace Reductech.EDR.Core.Serialization
                 case CompoundFreezableStep compoundFreezableProcess:
                 {
                     if (isTopLevel && compoundFreezableProcess.StepFactory == SequenceStepFactory.Instance &&
-                        compoundFreezableProcess.FreezableStepData.Dictionary.TryGetValue(nameof(Sequence.Steps), out var stepMember))
+                        compoundFreezableProcess.FreezableStepData.StepMembersDictionary.TryGetValue(nameof(Sequence.Steps), out var stepMember))
                         return ToSimpleObject(stepMember);
 
                     if (compoundFreezableProcess.StepConfiguration == null)//Don't use custom serialization if you have configuration
@@ -103,7 +103,7 @@ namespace Reductech.EDR.Core.Serialization
                     if (compoundFreezableProcess.StepConfiguration != null)
                         expandoObject[ConfigString] = compoundFreezableProcess.StepConfiguration;
 
-                    foreach (var (name, m) in compoundFreezableProcess.FreezableStepData.Dictionary)
+                    foreach (var (name, m) in compoundFreezableProcess.FreezableStepData.StepMembersDictionary)
                         expandoObject[name] = ToSimpleObject(m);
 
                     return expandoObject;

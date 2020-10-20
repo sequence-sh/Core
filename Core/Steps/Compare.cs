@@ -119,7 +119,25 @@ namespace Reductech.EDR.Core.Steps
             new EnumDisplayComponent<CompareOperator>(nameof(Compare<int>.Operator)),
             new SpaceComponent(),
             new IntegerComponent(nameof(Compare<int>.Right)),
-            new FixedStringComponent(")")
-        );
+            new FixedStringComponent(")"));
+
+
+        /// <summary>
+        /// Create a freezable Compare step.
+        /// </summary>
+        public static IFreezableStep CreateFreezable(IFreezableStep left, IFreezableStep compareOperator, IFreezableStep right)
+        {
+            var dict = new Dictionary<string, IFreezableStep>
+            {
+                {nameof(Compare<int>.Left), left},
+                {nameof(Compare<int>.Operator), compareOperator},
+                {nameof(Compare<int>.Right), right},
+            };
+
+            var fpd = new FreezableStepData(dict, null, null);
+            var step = new CompoundFreezableStep(Instance, fpd, null);
+
+            return step;
+        }
     }
 }

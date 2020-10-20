@@ -50,6 +50,20 @@ namespace Reductech.EDR.Core.Util
             throw new StrongTypingException("No options are set.");
         }
 
+
+        /// <summary>
+        /// Use this option
+        /// </summary>
+        public void Match(Action<T1> f1, Action<T2> f2)
+        {
+            if (Choice1.HasValue)
+                f1(Choice1.Value);
+            else if (Choice2.HasValue)
+                f2(Choice2.Value);
+            else
+                throw new StrongTypingException("No options are set.");
+        }
+
         /// <inheritdoc />
         public override string? ToString() => Join(x => x?.ToString(), x => x?.ToString());
 
@@ -133,9 +147,24 @@ namespace Reductech.EDR.Core.Util
             if (Choice3.HasValue)
                 return f3(Choice3.Value);
 
-
             throw new StrongTypingException("No options are set.");
         }
+
+        /// <summary>
+        /// Use this option
+        /// </summary>
+        public void Match(Action<T1> f1, Action<T2> f2, Action<T3> f3)
+        {
+            if (Choice1.HasValue)
+                 f1(Choice1.Value);
+            else if (Choice2.HasValue)
+                f2(Choice2.Value);
+            else if (Choice3.HasValue)
+                f3(Choice3.Value);
+            else
+                throw new StrongTypingException("No options are set.");
+        }
+
 
         /// <inheritdoc />
         public override string? ToString() => Join(x => x?.ToString(), x => x?.ToString(), x=>x?.ToString());

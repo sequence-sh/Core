@@ -89,22 +89,18 @@ namespace Reductech.EDR.Core.Internal
                 .Select(x => (x.Name, variableName: (VariableName)x.GetValue(this)!))
                 .Where(x => x.variableName != null)
 
-                .ToDictionary(x => x.Name, x => new StepMember(x.variableName)  );
+                .ToDictionary(x => x.Name, x => x.variableName  );
 
 
-                var arguments  = RunnableArguments
-                 .ToDictionary(x => x.name, x => new StepMember(x.step!.Unfreeze()));
+                var steps  = RunnableArguments
+                 .ToDictionary(x => x.name, x => x.step.Unfreeze());
 
-                var listArguments = RunnableListArguments
+                var stepLists = RunnableListArguments
                 .ToDictionary(x => x.name,
-                    x => new StepMember( x.list.Select(y => y.Unfreeze()).ToList()));
+                    x => x.list.Select(y => y.Unfreeze()).ToList() as IReadOnlyList<IFreezableStep>);
 
 
-                var stepMembers = variableNames.Concat(arguments).Concat(listArguments)
-                    .ToDictionary(x => x.Key, x => x.Value);
-
-
-                return new FreezableStepData(stepMembers);
+                return new FreezableStepData(steps, variableNames, stepLists);
             }
         }
 

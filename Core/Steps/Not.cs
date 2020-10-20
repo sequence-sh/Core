@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
@@ -53,5 +54,22 @@ namespace Reductech.EDR.Core.Steps
             new BooleanComponent(nameof(Not.Boolean)),
             new FixedStringComponent(")")
         );
+
+
+        /// <summary>
+        /// Create a freezable Not step.
+        /// </summary>
+        public static IFreezableStep CreateFreezable(IFreezableStep boolean)
+        {
+            var dict = new Dictionary<string, IFreezableStep>
+            {
+                {nameof(Not.Boolean), boolean},
+            };
+
+            var fpd = new FreezableStepData(dict, null, null);
+            var step = new CompoundFreezableStep(Instance, fpd, null);
+
+            return step;
+        }
     }
 }

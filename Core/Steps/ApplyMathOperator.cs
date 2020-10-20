@@ -98,6 +98,25 @@ namespace Reductech.EDR.Core.Steps
             new IntegerComponent(nameof(ApplyMathOperator.Right)),
             new FixedStringComponent(")")
         );
+
+
+        /// <summary>
+        /// Create a freezable ApplyMathOperator step.
+        /// </summary>
+        public static IFreezableStep CreateFreezable(IFreezableStep left, IFreezableStep compareOperator, IFreezableStep right)
+        {
+            var dict = new Dictionary<string, IFreezableStep>
+            {
+                {nameof(ApplyMathOperator.Left), left},
+                {nameof(ApplyMathOperator.Operator), compareOperator},
+                {nameof(ApplyMathOperator.Right), right},
+            };
+
+            var fpd = new FreezableStepData(dict, null, null);
+            var step = new CompoundFreezableStep(Instance, fpd, null);
+
+            return step;
+        }
     }
 
 }

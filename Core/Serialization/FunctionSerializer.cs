@@ -34,7 +34,7 @@ namespace Reductech.EDR.Core.Serialization
 
 
             foreach (var (propertyName, value) in
-                data.Dictionary.OrderBy(x=>x.Key))
+                data.StepMembersDictionary.OrderBy(x=>x.Key))
             {
                 if (first)
                     first = false;
