@@ -25,7 +25,7 @@ namespace Reductech.EDR.Core.Serialization
 
             var builder = new SerializerBuilder()
                 .WithTypeConverter(YamlStringTypeConverter.Instance)
-                //.ConfigureDefaultValuesHandling(DefaultValuesHandling.OmitNull)
+                .ConfigureDefaultValuesHandling(DefaultValuesHandling.OmitNull)
                 .WithTypeConverter(VersionTypeConverter.Instance);
 
             var serializer = builder.Build();
