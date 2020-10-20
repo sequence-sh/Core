@@ -40,10 +40,12 @@ namespace Reductech.EDR.Core.Internal
             {
                 var variableName = m.Groups["ArgumentName"].Value;
 
-                var p = freezableStepData.Dictionary.TryFindOrFail(variableName, null)
+                var p = freezableStepData
+                    .StepMembersDictionary
+                    .TryFindOrFail(variableName, null)
                     .Map(x=>x.Join(vn=>vn.ToString(),
                         fp=>fp.StepName,
-                        l=> string.Join(ListDelimiter, Enumerable.Select<IFreezableStep, string>(l, i=>i.StepName))))
+                        l=> string.Join(ListDelimiter, l.Select(i=>i.StepName))))
                     .OnFailureCompensate(x=>Result.Success("Unknown"));
 
                 return p.Value;

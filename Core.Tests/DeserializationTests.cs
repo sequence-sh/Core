@@ -216,6 +216,48 @@ Value:
     Index: 1
   Index: 1", "The second number");
 
+
+                yield return new DeserializationTestFunction(@"- Do: SetVariable
+  VariableName: <TextVar>
+  Value: >-
+    Name,Summary
+
+    One,The first number
+
+    Two,The second number
+- <CSVVar> = ReadCsv(ColumnsToMap = Array(Elements = ['Name', 'Summary']), Delimiter = ',', HasFieldsEnclosedInQuotes = False, Text = <TextVar>)
+- ForEach(Action = Print(Value = ElementAtIndex(Array = <Foo>, Index = 0)), Array = <CSVVar>, VariableName = <Foo>)",
+                    "One", "Two"
+                    );
+
+
+
+
+                yield return new DeserializationTestFunction(@"- Do: SetVariable
+  VariableName: <TextVar>
+  Value: >-
+    Name,Summary
+
+    One,The first number
+
+    Two,The second number
+- <SearchTerms> = ReadCsv(ColumnsToMap = Array(Elements = ['Name', 'Summary']), Delimiter = ',', HasFieldsEnclosedInQuotes = False, Text = <TextVar>)
+- Do: ForEach
+  Array: <SearchTerms>
+  VariableName: <Row>
+  Action: Print(Value = ElementAtIndex(Array = <Row>, Index = 0))",
+                    "One", "Two");
+
+
+//                yield return new DeserializationTestFunction(@"- >
+//  ForEach(
+//    Array = ['a','b','c'],
+//    VariableName = <char>,
+//    Action = Print(Value = <char>)
+//  )
+//");
+
+
             }
         }
 

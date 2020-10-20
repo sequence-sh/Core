@@ -74,14 +74,15 @@ namespace Reductech.EDR.Core.Steps
         /// </summary>
         public static IFreezableStep CreateFreezable(VariableName variableName)
         {
-            var dict = new Dictionary<string, StepMember>
+            var dict = new Dictionary<string, VariableName>
             {
-                {nameof(GetVariable<object>.VariableName), new StepMember(variableName)}
+                {nameof(GetVariable<object>.VariableName), variableName}
             };
 
-            var fpd = new FreezableStepData(dict);
+            var fpd = new FreezableStepData(null, dict, null);
+            var step = new CompoundFreezableStep(Instance, fpd, null);
 
-            return new CompoundFreezableStep(Instance, fpd, null);
+            return step;
         }
 
     }

@@ -101,7 +101,6 @@ namespace Reductech.EDR.Core.Util
 
             return r.ToResult(error??$"The element '{key}' was not present.");
         }
-        
 
         /// <summary>
         /// Returns this nullable value as a maybe.

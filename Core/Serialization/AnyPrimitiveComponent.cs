@@ -23,7 +23,7 @@ namespace Reductech.EDR.Core.Serialization
 
         /// <inheritdoc />
         public Result<string> TryGetText(FreezableStepData data) =>
-            data.Dictionary
+            data.StepMembersDictionary
                 .TryFindOrFail(PropertyName, null)
                 .Bind(x => x.Join(VariableNameComponent.Serialize,
                     TrySerialize,
@@ -34,7 +34,7 @@ namespace Reductech.EDR.Core.Serialization
         private static Result<string> TrySerialize(IFreezableStep step)
         {
             if (step is ConstantFreezableStep constantFreezableProcess)
-                return SerializationMethods.TrySerializeConstant(constantFreezableProcess, true, false);
+                return SerializationMethods.TrySerializeConstant(constantFreezableProcess);
             if (step is CompoundFreezableStep compound && compound.StepConfiguration == null)
                 return compound.StepFactory.Serializer.TrySerialize(compound.FreezableStepData);
 

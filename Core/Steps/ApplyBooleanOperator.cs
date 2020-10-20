@@ -102,5 +102,25 @@ namespace Reductech.EDR.Core.Steps
             new BooleanComponent(nameof(ApplyBooleanOperator.Right)),
             new FixedStringComponent(")")
         );
+
+        /// <summary>
+        /// Create a freezable ApplyBooleanOperator step.
+        /// </summary>
+        public static IFreezableStep CreateFreezable(IFreezableStep left, IFreezableStep compareOperator, IFreezableStep right)
+        {
+            var dict = new Dictionary<string, IFreezableStep>
+            {
+                {nameof(ApplyBooleanOperator.Left), left},
+                {nameof(ApplyBooleanOperator.Operator), compareOperator},
+                {nameof(ApplyBooleanOperator.Right), right},
+            };
+
+            var fpd = new FreezableStepData(dict, null, null);
+            var step = new CompoundFreezableStep(Instance, fpd, null);
+
+            return step;
+        }
+
+
     }
 }

@@ -9,7 +9,7 @@ namespace Reductech.EDR.Core.Serialization
     /// <summary>
     /// Allows custom serialization of versions
     /// </summary>
-    public class VersionTypeConverter : IYamlTypeConverter
+    internal class VersionTypeConverter : IYamlTypeConverter
     {
         private VersionTypeConverter() { }
 

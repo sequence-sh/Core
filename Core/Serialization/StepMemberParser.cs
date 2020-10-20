@@ -13,6 +13,7 @@ using Superpower.Model;
 using Superpower.Parsers;
 using Superpower.Tokenizers;
 using Result = CSharpFunctionalExtensions.Result;
+using CSharpFunctionalExtensions;
 
 namespace Reductech.EDR.Core.Serialization
 {
@@ -66,7 +67,7 @@ namespace Reductech.EDR.Core.Serialization
             NotOperator
         }
 
-        private static StepMemberParseError CreateError(Result<TokenList<ProcessToken>> result) =>
+        private static StepMemberParseError CreateError(Superpower.Model.Result<TokenList<ProcessToken>> result) =>
             new StepMemberParseError(result.ErrorMessage, result.ErrorPosition, (result.Expectations??Enumerable.Empty<string>()).ToImmutableHashSet());
 
         private static StepMemberParseError CreateError(TokenListParserResult<ProcessToken, StepMember> result) =>
@@ -100,7 +101,7 @@ namespace Reductech.EDR.Core.Serialization
             .Match(Span.Regex(@"[a-z0-9-_]+\.[a-z0-9-_]+", RegexOptions.Compiled | RegexOptions.IgnoreCase), ProcessToken.Enum, true)
 
             .Match(Span.Regex("[a-z0-9-_]+", RegexOptions.Compiled | RegexOptions.IgnoreCase), ProcessToken.FuncOrArgumentName, true)
-            .Build(); //TODO add wildcard
+            .Build();
 
 
 
@@ -109,7 +110,7 @@ namespace Reductech.EDR.Core.Serialization
         /// <summary>
         /// Tries to parse a string as a step member.
         /// </summary>
-        public CSharpFunctionalExtensions. Result<StepMember, StepMemberParseError> TryParse(string s)
+        public  Result<StepMember, StepMemberParseError> TryParse(string s)
         {
             var tokensResult = Tokenizer.TryTokenize(s);
 
@@ -133,7 +134,8 @@ namespace Reductech.EDR.Core.Serialization
             return parseResult.Value;
         }
 
-        private static bool ParseAsConstantString(TokenList<ProcessToken> tokenList) => tokenList.All(x => x.Kind == ProcessToken.FuncOrArgumentName);
+        private static bool ParseAsConstantString(TokenList<ProcessToken> tokenList) =>
+            tokenList.All(x => x.Kind == ProcessToken.FuncOrArgumentName);
 
         /// <summary>
         /// The step factory store
@@ -185,55 +187,35 @@ namespace Reductech.EDR.Core.Serialization
                     from _1 in Token.EqualTo(ProcessToken.OpenBracket)
                     from f1 in Parse.Ref(()=> singleTerm.Value)
                     from _2 in Token.EqualTo(ProcessToken.CloseBracket)
-                    select new CompoundFreezableStep(NotStepFactory.Instance,
-                        new FreezableStepData(new Dictionary<string, StepMember>
-                        {
-                            {nameof(Not.Boolean), new StepMember(f1)}
-                        }), null) as IFreezableStep).Try();
+                    select NotStepFactory.CreateFreezable(f1)).Try();
 
             TokenListParser<ProcessToken, IFreezableStep> mathOperation =
 
                 (from f1 in Parse.Ref(()=> singleTerm.Value)
                  from o in Token.EqualTo(ProcessToken.MathOperator)
                  from f2 in Parse.Ref(()=> singleTerm.Value)
-                 select new CompoundFreezableStep(ApplyMathOperatorStepFactory.Instance,
-                     new FreezableStepData(new Dictionary<string, StepMember>()
-                     {
-                        {nameof(ApplyMathOperator.Left), new StepMember(f1)},
-                        {nameof(ApplyMathOperator.Operator),
-                            new StepMember(new ConstantFreezableStep(Extensions.TryParseValue<MathOperator>(o.ToStringValue()).Value))}
-                        ,
-                        {nameof(ApplyMathOperator.Right), new StepMember(f2)}
-                     }), null) as IFreezableStep).Try();
+                 select ApplyMathOperatorStepFactory.CreateFreezable(
+                     f1,
+                     new ConstantFreezableStep(Extensions.TryParseValue<MathOperator>(o.ToStringValue()).Value),
+                     f2
+                     )).Try();
 
 
             TokenListParser<ProcessToken, IFreezableStep> booleanOperation =
                 (from f1 in Parse.Ref(()=> singleTerm.Value)
                  from o in Token.EqualTo(ProcessToken.BooleanOperator)
                  from f2 in Parse.Ref(()=> singleTerm.Value)
-                 select new CompoundFreezableStep(ApplyBooleanStepFactory.Instance,
-                     new FreezableStepData(new Dictionary<string, StepMember>
-                     {
-                        {nameof(ApplyBooleanOperator.Left), new StepMember(f1)},
-                        {nameof(ApplyBooleanOperator.Operator),
-                            new StepMember(new ConstantFreezableStep(Extensions.TryParseValue<BooleanOperator>(o.ToStringValue()).Value))}
-                        ,
-                        {nameof(ApplyBooleanOperator.Right), new StepMember(f2)}
-                     }), null) as IFreezableStep).Try();
+                 select ApplyBooleanStepFactory.CreateFreezable(f1,
+                     new ConstantFreezableStep(Extensions.TryParseValue<BooleanOperator>(o.ToStringValue()).Value),
+                  f2)).Try();
 
             TokenListParser<ProcessToken, IFreezableStep> compareOperation =
-                (from f1 in Parse.Ref(()=> singleTerm.Value)
-                 from o in Token.EqualTo(ProcessToken.Comparator)
-                 from f2 in Parse.Ref(()=> singleTerm.Value)
-                 select new CompoundFreezableStep(CompareStepFactory.Instance,
-                     new FreezableStepData(new Dictionary<string, StepMember>()
-                     {
-                        {nameof(Compare<int>.Left), new StepMember(f1)},
-                        {nameof(Compare<int>.Operator),
-                            new StepMember(new ConstantFreezableStep(Extensions.TryParseValue<CompareOperator>(o.ToStringValue()).Value))}
-                        ,
-                        {nameof(Compare<int>.Right), new StepMember(f2)}
-                     }), null) as IFreezableStep).Try();
+                (from f1 in Parse.Ref(() => singleTerm.Value)
+                    from o in Token.EqualTo(ProcessToken.Comparator)
+                    from f2 in Parse.Ref(() => singleTerm.Value)
+                    select CompareStepFactory.CreateFreezable(f1,
+                        new ConstantFreezableStep(Extensions.TryParseValue<CompareOperator>(o.ToStringValue()).Value),
+                        f2)).Try();
 
             TokenListParser<ProcessToken, (string argumentName, StepMember stepMember)> functionMember =
                 (from a in Token.EqualTo(ProcessToken.FuncOrArgumentName)
@@ -311,25 +293,20 @@ namespace Reductech.EDR.Core.Serialization
                 return Result.Failure<IFreezableStep>($"Could not find step '{funcName}'");
 
 
-            var dictionary = new Dictionary<string, StepMember>();
+            var duplicateArguments = functionArguments
+                .GroupBy(x => x.argumentName)
+                .Where(x => x.Count() > 1).ToList();
 
-            foreach (var (argumentName, stepMember) in functionArguments)
-            {
-                var memberType = runnableStepFactory.GetExpectedMemberType(argumentName);
+            if(duplicateArguments.Any())
+                return duplicateArguments.Select(x=> Result.Failure($"Duplicate Argument '{x}'")).Combine()
+                    .ConvertFailure<IFreezableStep>();
 
-                var convertResult = stepMember.TryConvert(memberType, false);
-
-                if (convertResult.IsFailure)
-                    return convertResult.ConvertFailure<IFreezableStep>();
-
-                dictionary.Add(argumentName, convertResult.Value);
-            }
-
-            var process = new CompoundFreezableStep(runnableStepFactory,
-                new FreezableStepData(dictionary), null);
+            var dictionary = functionArguments.ToDictionary(x => x.argumentName, x => x.stepMember);
 
 
-            return process;
+            var fsd = FreezableStepData.TryCreate(runnableStepFactory, dictionary);
+
+            return fsd.Map(x => new CompoundFreezableStep(runnableStepFactory, x, null) as IFreezableStep);
         }
 
 

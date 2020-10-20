@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Threading.Tasks;
 using FluentAssertions;
 using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.Internal;
@@ -24,101 +23,61 @@ namespace Reductech.EDR.Core.Tests
 
     public class StepMemberParserTestCases : TestBase
     {
+
+        private static IFreezableStep Constant(object value) => new ConstantFreezableStep(value);
+
         /// <inheritdoc />
         protected override IEnumerable<ITestBaseCase> TestCases {
             get
             {
-                yield return new StepMemberTestFunction("true", new StepMember(new ConstantFreezableStep(true)));
-                yield return new StepMemberTestFunction("True", new StepMember(new ConstantFreezableStep(true)));
-                yield return new StepMemberTestFunction("1", new StepMember(new ConstantFreezableStep(1)));
-                yield return new StepMemberTestFunction("\"Hello World\"", new StepMember(new ConstantFreezableStep("Hello World")));
+                yield return new StepMemberTestFunction("true", new StepMember(Constant(true)));
+                yield return new StepMemberTestFunction("True", new StepMember(Constant(true)));
+                yield return new StepMemberTestFunction("1", new StepMember(Constant(1)));
+                yield return new StepMemberTestFunction("\"Hello World\"", new StepMember(Constant("Hello World")));
                 //yield return new StepMemberTestFunction("Foo", null);
                 yield return new StepMemberTestFunction("true true", null);
 
                 yield return new StepMemberTestFunction("not (true)",
                     new StepMember(
-                        new CompoundFreezableStep(NotStepFactory.Instance,
-                            new FreezableStepData(new Dictionary<string, StepMember>()
-                            {
-                                {nameof(Not.Boolean), new StepMember(new ConstantFreezableStep(true))}
-                            }), null
-                        ))
 
-                );
+                        NotStepFactory.CreateFreezable(Constant(true))
+                        ));
 
                 yield return new StepMemberTestFunction("[true, false]", new StepMember(new List<IFreezableStep>()
                 {
-                    new ConstantFreezableStep(true),
-                    new ConstantFreezableStep(false)
+                    Constant(true),
+                    Constant(false)
                 }));
 
                 yield return new StepMemberTestFunction("<foo> = 1", new StepMember(
-                    new CompoundFreezableStep(SetVariableStepFactory.Instance,
-                        new FreezableStepData(new Dictionary<string, StepMember>
-                        {
-                            {nameof(SetVariable<int>.VariableName), new StepMember( new VariableName("foo"))},
-                            {nameof(SetVariable<int>.Value), new StepMember(new ConstantFreezableStep(1))}
-                        }), null)));
+                    SetVariableStepFactory.CreateFreezable(new VariableName("foo"),Constant(1) )));
 
                 yield return new StepMemberTestFunction("1 + 2", new StepMember(
-                    new CompoundFreezableStep(ApplyMathOperatorStepFactory.Instance,
-                        new FreezableStepData(new Dictionary<string, StepMember>
-                        {
-                            {nameof(ApplyMathOperator.Left), new StepMember(new ConstantFreezableStep(1))},
-                            {nameof(ApplyMathOperator.Operator), new StepMember(new ConstantFreezableStep(MathOperator.Add))},
-                            {nameof(ApplyMathOperator.Right), new StepMember(new ConstantFreezableStep(2))}
-                        }), null
-                    )));
+                    ApplyMathOperatorStepFactory.CreateFreezable(Constant(1), Constant(MathOperator.Add), Constant(2) )));
 
                 yield return new StepMemberTestFunction("(1 + 2)", new StepMember(
-                    new CompoundFreezableStep(ApplyMathOperatorStepFactory.Instance,
-                        new FreezableStepData(new Dictionary<string, StepMember>
-                        {
-                            {nameof(ApplyMathOperator.Left), new StepMember(new ConstantFreezableStep(1))},
-                            {nameof(ApplyMathOperator.Operator), new StepMember(new ConstantFreezableStep(MathOperator.Add))},
-                            {nameof(ApplyMathOperator.Right), new StepMember(new ConstantFreezableStep(2))}
-                        }), null
-                    )));
+                        ApplyMathOperatorStepFactory.CreateFreezable(Constant(1), Constant(MathOperator.Add), Constant(2))));
 
                 yield return new StepMemberTestFunction("1 + <foo>", new StepMember(
-                    new CompoundFreezableStep(ApplyMathOperatorStepFactory.Instance,
-                        new FreezableStepData(new Dictionary<string, StepMember>
-                        {
-                            {nameof(ApplyMathOperator.Left), new StepMember(new ConstantFreezableStep(1))},
-                            {nameof(ApplyMathOperator.Operator), new StepMember(new ConstantFreezableStep(MathOperator.Add))},
-                            {nameof(ApplyMathOperator.Right), GetVariableStepMember("foo")}
-                        }), null
-                    )));
+                    ApplyMathOperatorStepFactory.CreateFreezable(Constant(1), Constant(MathOperator.Add), GetVariable("foo"))));
+
 
                 yield return new StepMemberTestFunction("<foo> + 2", new StepMember(
-                    new CompoundFreezableStep(ApplyMathOperatorStepFactory.Instance,
-                        new FreezableStepData(new Dictionary<string, StepMember>
-                        {
-                            {nameof(ApplyMathOperator.Operator), new StepMember(new ConstantFreezableStep(MathOperator.Add))},
-                            {nameof(ApplyMathOperator.Left), GetVariableStepMember("foo")},
-                            {nameof(ApplyMathOperator.Right), new StepMember(new ConstantFreezableStep(2))}
-                        }), null
-                    )));
+                    ApplyMathOperatorStepFactory.CreateFreezable(GetVariable("foo"), Constant(MathOperator.Add), Constant(2) )));
+
 
                 yield return new StepMemberTestFunction("Print(Value = 1)", new StepMember(
                     new CompoundFreezableStep(PrintStepFactory.Instance,
-                        new FreezableStepData(new Dictionary<string, StepMember>
+
+                        new FreezableStepData(new Dictionary<string, IFreezableStep>
                         {
-                            {nameof(Print<int>.Value), new StepMember(new ConstantFreezableStep(1))}
-                        }),
+                            {nameof(Print<int>.Value), Constant(1)}
+                        }, null, null),
                         null)));
 
             } }
 
-        private static StepMember GetVariableStepMember(string variableName)
-        {
-            return new StepMember(new CompoundFreezableStep(GetVariableStepFactory.Instance,
-                new FreezableStepData(new Dictionary<string, StepMember>()
-                {
-                    {nameof(GetVariable<object>.VariableName), new StepMember(new VariableName(variableName)) }
-                }), null
-            ));
-        }
+        private static IFreezableStep GetVariable(string variableName) => GetVariableStepFactory.CreateFreezable(new VariableName(variableName));
 
         private sealed class StepMemberTestFunction : ITestBaseCase
         {
@@ -131,7 +90,7 @@ namespace Reductech.EDR.Core.Tests
             /// <inheritdoc />
             public string Name { get; }
 
-            public StepMember? ExpectedStepMember { get; }
+            private StepMember? ExpectedStepMember { get; }
 
             /// <inheritdoc />
             public void Execute(ITestOutputHelper testOutputHelper)

@@ -55,6 +55,14 @@ namespace Reductech.EDR.Core.Internal
             Func<IReadOnlyList<IFreezableStep>, T> handleListArgument) =>
             Option.Join(handleVariableName, handleArgument, handleListArgument);
 
+
+        /// <summary>
+        /// Use this StepMember.
+        /// </summary>
+        public void Match(Action<VariableName> handleVariableName, Action<IFreezableStep> handleArgument,
+            Action<IReadOnlyList<IFreezableStep>> handleListArgument) =>
+            Option.Match(handleVariableName, handleArgument, handleListArgument);
+
         /// <summary>
         /// Gets the stepMember if it is a VariableName.
         /// </summary>

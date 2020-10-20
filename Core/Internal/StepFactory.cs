@@ -89,116 +89,135 @@ namespace Reductech.EDR.Core.Internal
             var step = instanceResult.Value;
             step.Configuration = configuration;
 
-            var errors = new List<string>();
+            var errors = new List<Result>();
 
             var instanceType = step.GetType();
+
+
+            var simpleProperties1 = instanceType.GetProperties()
+                .Where(x => x.GetCustomAttribute<StepPropertyAttribute>() != null)
+                .ToDictionary(x=>x.Name!, StringComparer.OrdinalIgnoreCase);
 
             var variableNameProperties1 = instanceType
                 .GetProperties()
                 .Where(x => x.PropertyType == typeof(VariableName))
-                .Where(x => x.GetCustomAttribute<VariableNameAttribute>() != null);
-
-
-            var simpleProperties1 = instanceType.GetProperties()
-                .Where(x => x.GetCustomAttribute<StepPropertyAttribute>() != null);
+                .Where(x => x.GetCustomAttribute<VariableNameAttribute>() != null)
+                .ToDictionary(x => x.Name!, StringComparer.OrdinalIgnoreCase);
 
             var listProperties1 = instanceType.GetProperties()
-                .Where(x => x.GetCustomAttribute<StepListPropertyAttribute>() != null);
-
-            var remainingProperties =
-                variableNameProperties1.Select(propertyInfo => (propertyInfo,memberType: MemberType.VariableName))
-                    .Concat(simpleProperties1.Select(propertyInfo => (propertyInfo,memberType: MemberType.Step)))
-                    .Concat(listProperties1.Select(propertyInfo => (propertyInfo,memberType: MemberType.StepList)))
-                    .ToDictionary(x=>x.propertyInfo.Name, StringComparer.OrdinalIgnoreCase);
-
-
-            foreach (var (propertyName, stepMember) in freezableStepData.Dictionary)
-            {
-#pragma warning disable 8714
-                if (remainingProperties.Remove(propertyName, out var pair))
-#pragma warning restore 8714
-                {
-                    var result = pair.memberType switch
-                    {
-                        MemberType.VariableName => TrySetVariableName(pair.propertyInfo, step, stepMember),
-                        MemberType.Step => TrySetStep(pair.propertyInfo, step, stepMember, stepContext),
-                        MemberType.StepList => TrySetStepList(pair.propertyInfo, step, stepMember, stepContext),
-                        _ => throw new ArgumentOutOfRangeException()
-                    };
-
-                    if (result.IsFailure)
-                        errors.Add(result.Error);
-                }
-                else
-                    errors.Add($"The property '{propertyName}' does not exist on type '{TypeName}'.");
+                .Where(x => x.GetCustomAttribute<StepListPropertyAttribute>() != null)
+                .ToDictionary(x=>x.Name!, StringComparer.OrdinalIgnoreCase);
 
 
 
-                static Result TrySetVariableName(PropertyInfo propertyInfo, IStep parentStep, StepMember member)
-                {
-                    var r1 = member.AsVariableName(propertyInfo.Name);
-                    if (r1.IsFailure) return r1;
+            var r1 = SetFromDictionary(freezableStepData.StepDictionary,
+                (pi, f) => TrySetStep(pi, step, f, stepContext),
+                simpleProperties1!,
+                MemberType.Step,
+                TypeName);
 
-                    propertyInfo.SetValue(parentStep, r1.Value);
-                    return Result.Success();
-                }
+            var r2 = SetFromDictionary(freezableStepData.VariableNameDictionary,
+                (pi, f) => TrySetVariableName(pi, step, f),
+                variableNameProperties1!,
+                MemberType.VariableName,
+                TypeName);
 
-                static Result TrySetStep(PropertyInfo propertyInfo, IStep parentStep, StepMember member, StepContext context)
-                {
-                    var freezableStep = member.ConvertToStep(false);
+            var r3 = SetFromDictionary(freezableStepData.StepListDictionary,
+                (pi, f) => TrySetStepList(pi, step, f, stepContext),
+                listProperties1!,
+                MemberType.StepList,
+                TypeName);
 
-                    var argumentFreezeResult = freezableStep.TryFreeze(context);
-                    if (argumentFreezeResult.IsFailure)
-                        return argumentFreezeResult;
-                    if (!propertyInfo.PropertyType.IsInstanceOfType(argumentFreezeResult.Value))
-                        return Result.Failure($"'{propertyInfo.Name}' cannot take the value '{argumentFreezeResult.Value}'");
+            errors.AddRange(r1.Concat(r2).Concat(r3).Where(x=>x.IsFailure));
 
-                    propertyInfo.SetValue(parentStep, argumentFreezeResult.Value); //This could throw an exception but we don't expect it.
-                    return Result.Success();
-                }
+            var remainingProperties = simpleProperties1
+                .Concat(variableNameProperties1)
+                .Concat(listProperties1)
+                .Select(x=>x.Value)
+                .Distinct();
 
-                static Result TrySetStepList(PropertyInfo propertyInfo, IStep parentStep, StepMember member, StepContext context)
-                {
-                    var freezeResult =
-                        member
-                            .AsListArgument(propertyInfo.Name)
-                            .Bind(l => l.Select(x => x.TryFreeze(context)).Combine()
-                                .Map(x => x.ToImmutableArray()));
-                    if (freezeResult.IsFailure)
-                        return freezeResult;
-
-                    var genericType = propertyInfo.PropertyType.GenericTypeArguments.Single();
-                    var listType = typeof(List<>).MakeGenericType(genericType);
-
-                    var list = Activator.CreateInstance(listType);
-
-                    foreach (var step1 in freezeResult.Value)
-                        if (genericType.IsInstanceOfType(step1))
-                        {
-                            var addMethod = listType.GetMethod(nameof(List<object>.Add))!;
-                            addMethod.Invoke(list, new object?[] { step1 });
-                        }
-                        else
-                            return Result.Failure($"'{step1.Name}' does not have the type '{genericType.Name}'");
-
-
-                    propertyInfo.SetValue(parentStep, list);
-
-                    return Result.Success();
-                }
-            }
-
-            errors.AddRange(remainingProperties.Values
-                .Where(property => property.propertyInfo.GetCustomAttribute<RequiredAttribute>() != null)
-                .Select(property => $"The property '{property.propertyInfo.Name}' was not set on type '{GetType().Name}'.")
+            errors.AddRange(remainingProperties
+                .Where(property => property.GetCustomAttribute<RequiredAttribute>() != null)
+                .Select(property => Result.Failure($"The property '{property.Name}' was not set on type '{GetType().Name}'."))
             );
 
 
             if (errors.Any())
-                return Result.Failure<IStep>(string.Join("\r\n", errors));
+                return errors.Combine("; ").ConvertFailure<IStep>();
 
             return Result.Success<IStep>(step);
 
+        }
+
+
+        private static IEnumerable<Result> SetFromDictionary<T>(IReadOnlyDictionary<string, T> dict,
+                Func<PropertyInfo, T, Result> trySet,
+                IDictionary<string, PropertyInfo> remaining,
+                MemberType memberType,
+                string typeName)
+        {
+            var results = new List<Result>();
+
+
+            foreach (var (propertyName, stepMember) in dict)
+            {
+#pragma warning disable 8714
+                if (remaining.Remove(propertyName, out var propertyInfo))
+#pragma warning restore 8714
+                {
+                    results.Add(trySet(propertyInfo, stepMember));
+                }
+                else
+                    results.Add(Result.Failure($"'{typeName}' does not have a property named '{propertyName}' of type '{memberType}'."));
+            }
+
+            return results;
+        }
+
+        private static Result TrySetVariableName(PropertyInfo propertyInfo, IStep parentStep, VariableName member)
+        {
+            propertyInfo.SetValue(parentStep, member);
+            return Result.Success();
+        }
+
+        private static Result TrySetStep(PropertyInfo propertyInfo, IStep parentStep, IFreezableStep freezableStep, StepContext context)
+        {
+            var argumentFreezeResult = freezableStep.TryFreeze(context);
+            if (argumentFreezeResult.IsFailure)
+                return argumentFreezeResult;
+            if (!propertyInfo.PropertyType.IsInstanceOfType(argumentFreezeResult.Value))
+                return Result.Failure($"'{propertyInfo.Name}' cannot take the value '{argumentFreezeResult.Value}'");
+
+            propertyInfo.SetValue(parentStep, argumentFreezeResult.Value); //This could throw an exception but we don't expect it.
+            return Result.Success();
+        }
+
+        private static Result TrySetStepList(PropertyInfo propertyInfo, IStep parentStep, IReadOnlyList<IFreezableStep> member, StepContext context)
+        {
+            var freezeResult =
+                member.Select(x => x.TryFreeze(context)).Combine()
+                        .Map(x => x.ToImmutableArray());
+            if (freezeResult.IsFailure)
+                return freezeResult;
+
+            var genericType = propertyInfo.PropertyType.GenericTypeArguments.Single();
+            var listType = typeof(List<>).MakeGenericType(genericType);
+
+            var list = Activator.CreateInstance(listType);
+
+            foreach (var step1 in freezeResult.Value)
+                if (genericType.IsInstanceOfType(step1))
+                {
+                    var addMethod = listType.GetMethod(nameof(List<object>.Add))!;
+                    addMethod.Invoke(list, new object?[] { step1 });
+                }
+                else
+                    return Result.Failure($"'{step1.Name}' does not have the type '{genericType.GenericTypeArguments.First().GetDisplayName()}'");
+
+
+            propertyInfo.SetValue(parentStep, list);
+
+            return Result.Success();
         }
 
 
