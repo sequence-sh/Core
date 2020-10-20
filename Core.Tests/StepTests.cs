@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
@@ -37,26 +38,41 @@ namespace Reductech.EDR.Core.Tests
         {
             get
             {
-
-                yield return new TestFunction("Print 'Hello World'", Print(Constant(HelloWorldString)),
+                foreach (var stepTestCase in TestCasesWithoutConfig)
+                {
+                    yield return stepTestCase;
+                    yield return new StepTestCase(stepTestCase.ExpectedName, stepTestCase.Step, stepTestCase.ExpectedLoggedValues.ToArray())
+                    {
+                        AddConfiguration = true,
+                        IgnoreName = stepTestCase.IgnoreName,
+                        IgnoreLoggedValues = stepTestCase.IgnoreLoggedValues
+                    };
+                }
+            }
+        }
+        private IEnumerable<StepTestCase> TestCasesWithoutConfig
+        {
+            get
+            {
+                yield return new StepTestCase("Print 'Hello World'", Print(Constant(HelloWorldString)),
                     HelloWorldString);
 
-                yield return new TestFunction("Print 'Mark's string'", Print(Constant("Mark's string")),
+                yield return new StepTestCase("Print 'Mark's string'", Print(Constant("Mark's string")),
                     "Mark's string");
 
 
-                yield return new TestFunction("<Foo> = 'Hello World'; Print <Foo>", Sequence
+                yield return new StepTestCase("<Foo> = 'Hello World'; Print <Foo>", Sequence
                 (
                     SetVariable(FooVariableName, Constant(HelloWorldString)),
                     Print(GetVariable<string>(FooVariableName))), HelloWorldString);
 
-                yield return new TestFunction("<Foo> = 'Hello World'; <Bar> = <Foo>; Print <Bar>", Sequence(
+                yield return new StepTestCase("<Foo> = 'Hello World'; <Bar> = <Foo>; Print <Bar>", Sequence(
                     SetVariable(FooVariableName, Constant(HelloWorldString)),
                     SetVariable(BarString, GetVariable<string>(FooVariableName)),
                     Print(GetVariable<string>(BarString))), HelloWorldString);
 
 
-                yield return new TestFunction("<Foo> = 1 < 2; Print <Foo>", Sequence(
+                yield return new StepTestCase("<Foo> = 1 < 2; Print <Foo>", Sequence(
                     SetVariable(FooVariableName, new Compare<int>
                     {
                         Left = Constant(1),
@@ -67,14 +83,14 @@ namespace Reductech.EDR.Core.Tests
 
                 ), true.ToString());
 
-                yield return new TestFunction("Print +",
+                yield return new StepTestCase("Print +",
                     new Print<MathOperator>
                     {
                         Value = new Constant<MathOperator>(MathOperator.Add)
                     }, MathOperator.Add.ToString());
 
 
-                yield return new TestFunction("Print True && Not False",
+                yield return new StepTestCase("Print True && Not False",
                     Print(new ApplyBooleanOperator
                     {
                         Left = Constant(true),
@@ -82,7 +98,7 @@ namespace Reductech.EDR.Core.Tests
                         Operator = Constant(BooleanOperator.And)
                     }), true.ToString());
 
-                yield return new TestFunction("Print False || Not False",
+                yield return new StepTestCase("Print False || Not False",
                     Print(new ApplyBooleanOperator
                     {
                         Left = Constant(false),
@@ -90,7 +106,7 @@ namespace Reductech.EDR.Core.Tests
                         Operator = Constant(BooleanOperator.Or)
                     }), true.ToString());
 
-                yield return new TestFunction("Foreach <Foo> in ['Hello'; 'World']; Print <Foo>",
+                yield return new StepTestCase("Foreach <Foo> in ['Hello'; 'World']; Print <Foo>",
                     new ForEach<string>
                     {
                         Action = Print(GetVariable<string>(FooVariableName)),
@@ -100,7 +116,7 @@ namespace Reductech.EDR.Core.Tests
                     }, "Hello", "World");
 
 
-                yield return new TestFunction("Foreach <Foo> in ['Hello'; 'World']; Print 'Farewell'; Print <Foo>",
+                yield return new StepTestCase("Foreach <Foo> in ['Hello'; 'World']; Print 'Farewell'; Print <Foo>",
                     new ForEach<string>
                     {
                         Action = new Sequence
@@ -116,7 +132,7 @@ namespace Reductech.EDR.Core.Tests
                         VariableName = FooVariableName
                     }, "Farewell", "Hello", "Farewell", "World");
 
-                yield return new TestFunction("Foreach <Foo> in ['Hello'; 'World']; Print 'Goodbye'; Print <Foo>",
+                yield return new StepTestCase("Foreach <Foo> in ['Hello'; 'World']; Print 'Goodbye'; Print <Foo>",
                     new ForEach<string>
                     {
                         Action = new Sequence
@@ -136,7 +152,7 @@ namespace Reductech.EDR.Core.Tests
                         VariableName = FooVariableName
                     }, "Goodbye", "Hello", "Goodbye", "World");
 
-                yield return new TestFunction("If True then Print 'Hello World' else Print 'World Hello'",
+                yield return new StepTestCase("If True then Print 'Hello World' else Print 'World Hello'",
                     new Conditional
                     {
                         Condition = Constant(true),
@@ -146,7 +162,7 @@ namespace Reductech.EDR.Core.Tests
                     HelloWorldString);
 
 
-                yield return new TestFunction("For <Foo> = 5; <Foo> <= 10; += 2; Print <Foo>",
+                yield return new StepTestCase("For <Foo> = 5; <Foo> <= 10; += 2; Print <Foo>",
                     new For
                     {
                         VariableName = FooVariableName,
@@ -157,7 +173,7 @@ namespace Reductech.EDR.Core.Tests
                     },
                     "5", "7", "9");
 
-                yield return new TestFunction("<Foo> = True; Repeat 'Print 'Hello World'; <Foo> = False' while '<Foo>'",
+                yield return new StepTestCase("<Foo> = True; Repeat 'Print 'Hello World'; <Foo> = False' while '<Foo>'",
                     Sequence(SetVariable(FooVariableName, Constant(true)),
                         new RepeatWhile
                         {
@@ -167,7 +183,7 @@ namespace Reductech.EDR.Core.Tests
                         }),
                     HelloWorldString);
 
-                yield return new TestFunction("Print ApplyMathOperator(Left: 2, Operator: *, Right: 3)",
+                yield return new StepTestCase("Print ApplyMathOperator(Left: 2, Operator: *, Right: 3)",
                     Print(new ApplyMathOperator
                     {
                         Left = Constant(2),
@@ -175,7 +191,7 @@ namespace Reductech.EDR.Core.Tests
                         Operator = Constant(MathOperator.Multiply)
                     }), "6");
 
-                yield return new TestFunction("Print ArrayCount(Array: ['Hello'; 'World'])",
+                yield return new StepTestCase("Print ArrayCount(Array: ['Hello'; 'World'])",
                     Print(new ArrayCount<string>
                     {
                         Array = Array(Constant("Hello"),
@@ -184,36 +200,36 @@ namespace Reductech.EDR.Core.Tests
                     "2"
                 );
 
-                yield return new TestFunction("Print ArrayIsEmpty(Array: [])",
+                yield return new StepTestCase("Print ArrayIsEmpty(Array: [])",
                     Print(new ArrayIsEmpty<string> {Array = Array<string>()}), true.ToString());
 
-                yield return new TestFunction("Print ArrayIsEmpty(Array: ['Hello World'])",
+                yield return new StepTestCase("Print ArrayIsEmpty(Array: ['Hello World'])",
                     Print(new ArrayIsEmpty<string>
                     {
                         Array = Array(Constant(HelloWorldString))
                     }), false.ToString());
 
-                yield return new TestFunction("Print Length of 'Hello World'",
+                yield return new StepTestCase("Print Length of 'Hello World'",
                     Print(new LengthOfString
                     {
                         String = Constant(HelloWorldString)
                     }), "11");
 
-                yield return new TestFunction("Print '''' is empty?",
+                yield return new StepTestCase("Print '''' is empty?",
                     Print(new StringIsEmpty
                     {
                         String = Constant("")
                     }), true.ToString()
                 );
 
-                yield return new TestFunction("Print ''Hello World'' is empty?",
+                yield return new StepTestCase("Print ''Hello World'' is empty?",
                     Print(new StringIsEmpty
                     {
                         String = Constant(HelloWorldString)
                     }), false.ToString()
                 );
 
-                yield return new TestFunction("Print FirstIndexOfElement(Array: ['Hello'; 'World'], Element: 'World')",
+                yield return new StepTestCase("Print FirstIndexOfElement(Array: ['Hello'; 'World'], Element: 'World')",
                     Print(new FirstIndexOfElement<string>
                     {
                         Array = Array(Constant("Hello"), Constant("World")),
@@ -222,7 +238,7 @@ namespace Reductech.EDR.Core.Tests
                     1.ToString()
                 );
 
-                yield return new TestFunction(
+                yield return new StepTestCase(
                     "Print FirstIndexOfElement(Array: ['Hello'; 'World'], Element: 'Goodbye')",
                     Print(new FirstIndexOfElement<string>
                     {
@@ -232,7 +248,7 @@ namespace Reductech.EDR.Core.Tests
                     (-1).ToString()
                 );
 
-                yield return new TestFunction("Print Join Repeat(Element: 'Hello', Number: 3)", Print(new JoinStrings
+                yield return new StepTestCase("Print Join Repeat(Element: 'Hello', Number: 3)", Print(new JoinStrings
                 {
                     Delimiter = Constant(", "),
                     List = new Repeat<string>
@@ -242,7 +258,7 @@ namespace Reductech.EDR.Core.Tests
                     }
                 }), "Hello, Hello, Hello");
 
-                yield return new TestFunction(
+                yield return new StepTestCase(
                     "Print ElementAtIndex(Array: SplitString(Delimiter: ', ', String: 'Hello, World'), Index: 1)",
                     Print(
                         new ElementAtIndex<string>
@@ -256,7 +272,7 @@ namespace Reductech.EDR.Core.Tests
                         }),
                     "World");
 
-                yield return new TestFunction("<Foo> = 2; IncrementVariable(Amount: 3, Variable: <Foo>); Print <Foo>",
+                yield return new StepTestCase("<Foo> = 2; IncrementVariable(Amount: 3, Variable: <Foo>); Print <Foo>",
                     Sequence(SetVariable(FooVariableName, Constant(2)),
                         new IncrementVariable
                         {
@@ -268,29 +284,29 @@ namespace Reductech.EDR.Core.Tests
 
                     5.ToString());
 
-                yield return new TestFunction("Print ToCase(Case: Upper, String: 'Hello World')",
+                yield return new StepTestCase("Print ToCase(Case: Upper, String: 'Hello World')",
                     Print(new ToCase {Case = Constant(TextCase.Upper), String = Constant(HelloWorldString)}),
                     "HELLO WORLD");
-                yield return new TestFunction("Print ToCase(Case: Lower, String: 'Hello World')",
+                yield return new StepTestCase("Print ToCase(Case: Lower, String: 'Hello World')",
                     Print(new ToCase {Case = Constant(TextCase.Lower), String = Constant(HelloWorldString)}),
                     "hello world");
-                yield return new TestFunction("Print ToCase(Case: Title, String: 'Hello World')",
+                yield return new StepTestCase("Print ToCase(Case: Title, String: 'Hello World')",
                     Print(new ToCase {Case = Constant(TextCase.Title), String = Constant(HelloWorldString)}),
                     "Hello World");
 
 
-                yield return new TestFunction("Print Trim(Side: Left, String: '  Hello World  ')",
+                yield return new StepTestCase("Print Trim(Side: Left, String: '  Hello World  ')",
                     Print(new Trim {Side = Constant(TrimSide.Left), String = Constant("  Hello World  ")}),
                     "Hello World  ");
-                yield return new TestFunction("Print Trim(Side: Right, String: '  Hello World  ')",
+                yield return new StepTestCase("Print Trim(Side: Right, String: '  Hello World  ')",
                     Print(new Trim {Side = Constant(TrimSide.Right), String = Constant("  Hello World  ")}),
                     "  Hello World");
-                yield return new TestFunction("Print Trim(Side: Both, String: '  Hello World  ')",
+                yield return new StepTestCase("Print Trim(Side: Both, String: '  Hello World  ')",
                     Print(new Trim {Side = Constant(TrimSide.Both), String = Constant("  Hello World  ")}),
                     HelloWorldString);
 
 
-                yield return new TestFunction("Print Test(Condition: True, ElseValue: 'World', ThenValue: 'Hello')",
+                yield return new StepTestCase("Print Test(Condition: True, ElseValue: 'World', ThenValue: 'Hello')",
                     Print(new Test<string>
                     {
                         Condition = Constant(true),
@@ -299,7 +315,7 @@ namespace Reductech.EDR.Core.Tests
                     }), "Hello");
 
 
-                yield return new TestFunction("Print Test(Condition: False, ElseValue: 'World', ThenValue: 'Hello')",
+                yield return new StepTestCase("Print Test(Condition: False, ElseValue: 'World', ThenValue: 'Hello')",
                     Print(new Test<string>
                     {
                         Condition = Constant(false),
@@ -307,7 +323,7 @@ namespace Reductech.EDR.Core.Tests
                         ElseValue = Constant("World")
                     }), "World");
 
-                yield return new TestFunction("Print Join SortArray(Array: ['B'; 'C'; 'A'], Order: Ascending)",
+                yield return new StepTestCase("Print Join SortArray(Array: ['B'; 'C'; 'A'], Order: Ascending)",
                     Print(new JoinStrings
                     {
                         Delimiter = Constant(", "),
@@ -318,7 +334,7 @@ namespace Reductech.EDR.Core.Tests
                         }
                     }), "A, B, C");
 
-                yield return new TestFunction("Print Join SortArray(Array: ['B'; 'C'; 'A'], Order: Descending)",
+                yield return new StepTestCase("Print Join SortArray(Array: ['B'; 'C'; 'A'], Order: Descending)",
                     Print(new JoinStrings
                     {
                         Delimiter = Constant(", "),
@@ -329,7 +345,7 @@ namespace Reductech.EDR.Core.Tests
                         }
                     }), "C, B, A");
 
-                yield return new TestFunction("Print First index of ''World'' in ''Hello World, Goodbye World''",
+                yield return new StepTestCase("Print First index of ''World'' in ''Hello World, Goodbye World''",
                     Print(new FirstIndexOf
                     {
                         String = Constant("Hello World, Goodbye World"),
@@ -338,7 +354,7 @@ namespace Reductech.EDR.Core.Tests
                     "6"
                 );
 
-                yield return new TestFunction("Print Last index of ''World'' in ''Hello World, Goodbye World''",
+                yield return new StepTestCase("Print Last index of ''World'' in ''Hello World, Goodbye World''",
                     Print(new LastIndexOf
                     {
                         String = Constant("Hello World, Goodbye World"),
@@ -347,7 +363,7 @@ namespace Reductech.EDR.Core.Tests
                     "21"
                 );
 
-                yield return new TestFunction("Print Get character at index '1' in ''Hello World''",
+                yield return new StepTestCase("Print Get character at index '1' in ''Hello World''",
                     Print(new GetLetterAtIndex
                     {
                         Index = Constant(1),
@@ -355,7 +371,7 @@ namespace Reductech.EDR.Core.Tests
 
                     }), "e");
 
-                yield return new TestFunction("Repeat 'Print 'Hello World'' '3' times.",
+                yield return new StepTestCase("Repeat 'Print 'Hello World'' '3' times.",
                     new RepeatXTimes
                     {
                         Number = Constant(3),
@@ -363,14 +379,14 @@ namespace Reductech.EDR.Core.Tests
                     }, HelloWorldString, HelloWorldString, HelloWorldString);
 
 
-                yield return new TestFunction("<Foo> = 'Hello'; Append ' World' to <Foo>; Print <Foo>",
+                yield return new StepTestCase("<Foo> = 'Hello'; Append ' World' to <Foo>; Print <Foo>",
                     Sequence(
                         SetVariable(FooVariableName, Constant("Hello")),
                         new AppendString {Variable = FooVariableName, String = Constant(" World")},
                         Print(GetVariable<string>(FooVariableName))
                     ), HelloWorldString);
 
-                yield return new TestFunction("Print GetSubstring(Index: 6, Length: 2, String: 'Hello World')",
+                yield return new StepTestCase("Print GetSubstring(Index: 6, Length: 2, String: 'Hello World')",
                     Print(new GetSubstring
                     {
                         String = Constant(HelloWorldString),
@@ -378,7 +394,7 @@ namespace Reductech.EDR.Core.Tests
                         Length = Constant(2)
                     }), "Wo");
 
-                yield return new TestFunction("Print ElementAtIndex(Array: ['Hello'; 'World'], Index: 1)",
+                yield return new StepTestCase("Print ElementAtIndex(Array: ['Hello'; 'World'], Index: 1)",
                     Print(new ElementAtIndex<string>
                     {
                         Array = Array(Constant("Hello"), Constant("World")),
@@ -386,7 +402,7 @@ namespace Reductech.EDR.Core.Tests
                     }), "World"
                 );
 
-                yield return new TestFunction("Print 'I have config'", new Print<string>
+                yield return new StepTestCase("Print 'I have config'", new Print<string>
                 {
                     Value = Constant("I have config"),
                     Configuration = new Configuration
@@ -403,7 +419,7 @@ namespace Reductech.EDR.Core.Tests
                 var testFolderPath = new Constant<string>(Path.Combine(Directory.GetCurrentDirectory(), "TestFolder"));
                 var testFilePath = new Constant<string>(Path.Combine(testFolderPath.Value, "Poem.txt"));
 
-                yield return new TestFunction("Delete Folder etc",
+                yield return new StepTestCase("Delete Folder etc",
                     new Sequence
                     {
                         Steps = new List<IStep<Unit>>
@@ -429,7 +445,7 @@ namespace Reductech.EDR.Core.Tests
                     }
                 ) {IgnoreName = true, IgnoreLoggedValues = true};
 
-                yield return new TestFunction("Print 'I have more config'", new Print<string>
+                yield return new StepTestCase("Print 'I have more config'", new Print<string>
                 {
                     Value = Constant("I have more config"),
                     Configuration = new Configuration
@@ -454,12 +470,12 @@ namespace Reductech.EDR.Core.Tests
                     }
                 }, "I have more config");
 
-                yield return new TestFunction("AssertTrue(Test: True)", new AssertTrue
+                yield return new StepTestCase("AssertTrue(Test: True)", new AssertTrue
                 {
                     Test = Constant(true)
                 });
 
-                yield return new TestFunction("AssertError(Test: AssertTrue(Test: False))", new AssertError
+                yield return new StepTestCase("AssertError(Test: AssertTrue(Test: False))", new AssertError
                 {
                     Test = new AssertTrue
                     {
@@ -467,7 +483,7 @@ namespace Reductech.EDR.Core.Tests
                     }
                 });
 
-                yield return new TestFunction("Read CSV",
+                yield return new StepTestCase("Read CSV",
                     new Print<string>
                     {
                         Value = new ElementAtIndex<string>
@@ -493,7 +509,7 @@ Two,The second number"),
                     "The second number"){IgnoreName = true};
 
 
-                yield return new TestFunction("Read CSV ForEach",
+                yield return new StepTestCase("Read CSV ForEach",
 
                     new Sequence
                     {
@@ -527,7 +543,7 @@ Two,The second number"),
                 { IgnoreName = true };
 
 
-                yield return new TestFunction("Read CSV ForEach 2",
+                yield return new StepTestCase("Read CSV ForEach 2",
 
                     new Sequence
                     {
@@ -574,7 +590,7 @@ Two,The second number")
                     }, "One", "Two")
                 { IgnoreName = true };
 
-                yield return new TestFunction("Read CSV ForEach 3",
+                yield return new StepTestCase("Read CSV ForEach 3",
 
                     new Sequence
                     {
@@ -625,7 +641,7 @@ Two,The second number")
                     }, "One", "Two")
                 { IgnoreName = true };
 
-                yield return new TestFunction("Foreach nested array",
+                yield return new StepTestCase("Foreach nested array",
                     new Sequence
                     {
                         Steps = new IStep<Unit>[]{
@@ -694,21 +710,28 @@ Two,The second number")
         private static Sequence Sequence(params IStep<Unit>[] steps)=> new Sequence{Steps = steps};
 
 
-        private class TestFunction : ITestBaseCaseParallel
+        private class StepTestCase : ITestBaseCaseParallel
         {
-            public TestFunction(string expectedName, IStep step, params string[] expectedLoggedValues)
+            public StepTestCase(string expectedName, IStep step, params string[] expectedLoggedValues)
             {
                 Step = step;
                 ExpectedLoggedValues = expectedLoggedValues;
                 ExpectedName = expectedName;
             }
 
+
+
             public string ExpectedName { get; }
 
             /// <inheritdoc />
-            public string Name => ExpectedName;
+            public string Name => ExpectedName + (AddConfiguration? "With Config" : "");
 
             public IStep Step { get; }
+
+            /// <summary>
+            /// If true, adds configuration to every step to test long form serialization.
+            /// </summary>
+            public bool AddConfiguration {get; set; }
 
 
             public IReadOnlyList<string> ExpectedLoggedValues { get; }
@@ -725,7 +748,14 @@ Two,The second number")
                 var yamlRunner = new YamlRunner(EmptySettings.Instance, logger, pfs);
 
                 //Act
-                var unfrozen = Step.Unfreeze();
+                IFreezableStep unfrozen = Step.Unfreeze();
+
+                if (AddConfiguration)
+                {
+                    unfrozen = AddConfigurationToAllSteps(unfrozen);
+                }
+
+
                 var yaml = unfrozen.SerializeToYaml();
                 outputHelper.WriteLine(yaml);
                 var runResult = await yamlRunner.RunSequenceFromYamlStringAsync(yaml, CancellationToken.None);
@@ -738,6 +768,34 @@ Two,The second number")
                 if(!IgnoreName)
                     Step.Name.Should().Be(ExpectedName);
 
+            }
+
+
+            private static IFreezableStep AddConfigurationToAllSteps(IFreezableStep step)
+            {
+                if (step is CompoundFreezableStep compoundFreezableStep)
+                {
+                    var newDict = compoundFreezableStep.FreezableStepData.StepMembersDictionary
+                        .Select(x => (x.Key, stepMember: x.Value.Join(
+                            vn => new StepMember(vn),
+                            s => new StepMember(AddConfigurationToAllSteps(s)),
+                            la => new StepMember(la.Select(AddConfigurationToAllSteps).ToList())
+
+                        ))).ToDictionary(x => x.Key, x => x.stepMember);
+
+
+                    var newFsd = FreezableStepData.TryCreate(compoundFreezableStep.StepFactory, newDict);
+                    newFsd.ShouldBeSuccessful();
+
+                    return new CompoundFreezableStep(compoundFreezableStep.StepFactory, newFsd.Value, new Configuration()
+                    {
+                        TargetMachineTags = new List<string>()
+                        {
+                            "Test Tag"
+                        }
+                    });
+                }
+                else return step;
             }
         }
     }
