@@ -132,26 +132,6 @@ namespace Reductech.EDR.Core.Tests
                         VariableName = FooVariableName
                     }, "Farewell", "Hello", "Farewell", "World");
 
-                yield return new StepTestCase("Foreach <Foo> in ['Hello'; 'World']; Print 'Goodbye'; Print <Foo>",
-                    new ForEach<string>
-                    {
-                        Action = new Sequence
-                        {
-                            Steps = new[]
-                            {
-                                Print(Constant("Goodbye")),
-                                Print(GetVariable<string>(FooVariableName)),
-                            },
-                            Configuration = new Configuration
-                            {
-                                TargetMachineTags = new List<string> {"My Tag"}
-                            }
-                        },
-                        Array = Array(Constant("Hello"),
-                            Constant("World")),
-                        VariableName = FooVariableName
-                    }, "Goodbye", "Hello", "Goodbye", "World");
-
                 yield return new StepTestCase("If True then Print 'Hello World' else Print 'World Hello'",
                     new Conditional
                     {
@@ -401,19 +381,6 @@ namespace Reductech.EDR.Core.Tests
                         Index = Constant(1)
                     }), "World"
                 );
-
-                yield return new StepTestCase("Print 'I have config'", new Print<string>
-                {
-                    Value = Constant("I have config"),
-                    Configuration = new Configuration
-                    {
-                        Priority = 1,
-                        TargetMachineTags = new List<string>
-                        {
-                            "Tag1"
-                        }
-                    }
-                }, "I have config");
 
 
                 var testFolderPath = new Constant<string>(Path.Combine(Directory.GetCurrentDirectory(), "TestFolder"));
@@ -750,10 +717,7 @@ Two,The second number")
                 //Act
                 IFreezableStep unfrozen = Step.Unfreeze();
 
-                if (AddConfiguration)
-                {
-                    unfrozen = AddConfigurationToAllSteps(unfrozen);
-                }
+                if (AddConfiguration) unfrozen = AddConfigurationToAllSteps(unfrozen);
 
 
                 var yaml = unfrozen.SerializeToYaml();

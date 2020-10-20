@@ -23,7 +23,10 @@ namespace Reductech.EDR.Core.Serialization
         {
             var obj = SimplifyProcess(step, true);
 
-            var builder = new SerializerBuilder().WithTypeConverter(VersionTypeConverter.Instance);
+            var builder = new SerializerBuilder()
+                .WithTypeConverter(YamlStringTypeConverter.Instance)
+                //.ConfigureDefaultValuesHandling(DefaultValuesHandling.OmitNull)
+                .WithTypeConverter(VersionTypeConverter.Instance);
 
             var serializer = builder.Build();
 
@@ -52,6 +55,7 @@ namespace Reductech.EDR.Core.Serialization
             var builder =
             new DeserializerBuilder()
                 .WithNodeDeserializer(nodeDeserializer)
+                .WithTypeConverter(YamlStringTypeConverter.Instance)
                 .WithTypeConverter(VersionTypeConverter.Instance);
 
 
@@ -81,7 +85,7 @@ namespace Reductech.EDR.Core.Serialization
             switch (step)
             {
                 case ConstantFreezableStep cfp:
-                    return SerializationMethods.TrySerializeConstant(cfp, false, true).Value;
+                    return SerializationMethods.ConvertToSerializableType(cfp);
                 case CompoundFreezableStep compoundFreezableProcess:
                 {
                     if (isTopLevel && compoundFreezableProcess.StepFactory == SequenceStepFactory.Instance &&

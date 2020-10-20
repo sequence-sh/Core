@@ -134,7 +134,8 @@ namespace Reductech.EDR.Core.Serialization
             return parseResult.Value;
         }
 
-        private static bool ParseAsConstantString(TokenList<ProcessToken> tokenList) => tokenList.All(x => x.Kind == ProcessToken.FuncOrArgumentName);
+        private static bool ParseAsConstantString(TokenList<ProcessToken> tokenList) =>
+            tokenList.All(x => x.Kind == ProcessToken.FuncOrArgumentName);
 
         /// <summary>
         /// The step factory store

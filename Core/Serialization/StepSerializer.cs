@@ -30,6 +30,10 @@ namespace Reductech.EDR.Core.Serialization
             foreach (var serializerBlock in Components.Select(x => x.SerializerBlock).WhereNotNull())
             {
                 var r = serializerBlock.TryGetText(data);
+
+
+
+
                 if (r.IsFailure)
                     return r;
                 sb.Append(r.Value);
