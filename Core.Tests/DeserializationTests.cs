@@ -249,6 +249,15 @@ Value:
                     "One", "Two");
 
 
+//                yield return new DeserializationTestFunction(@"- >
+//  ForEach(
+//    Array = ['a','b','c'],
+//    VariableName = <char>,
+//    Action = Print(Value = <char>)
+//  )
+//");
+
+
             }
         }
 

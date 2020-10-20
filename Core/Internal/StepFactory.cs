@@ -212,7 +212,7 @@ namespace Reductech.EDR.Core.Internal
                     addMethod.Invoke(list, new object?[] { step1 });
                 }
                 else
-                    return Result.Failure($"'{step1.Name}' does not have the type '{genericType.Name}'");
+                    return Result.Failure($"'{step1.Name}' does not have the type '{genericType.GenericTypeArguments.First().GetDisplayName()}'");
 
 
             propertyInfo.SetValue(parentStep, list);
