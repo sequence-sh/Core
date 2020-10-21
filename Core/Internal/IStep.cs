@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
@@ -40,6 +41,11 @@ namespace Reductech.EDR.Core.Internal
         /// Step combiners that could be used for this step.
         /// </summary>
         IEnumerable<IStepCombiner> StepCombiners { get; }
+
+        /// <summary>
+        /// The output type. Will be the generic type in IStep&lt;T&gt;
+        /// </summary>
+        Type OutputType { get; }
 
     }
 

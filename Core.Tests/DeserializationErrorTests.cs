@@ -40,6 +40,19 @@ namespace Reductech.EDR.Core.Tests
 
 
                 yield return new DeserializationErrorCase("MyMegaFunction(Value = true)", "(Line: 1, Col: 1, Idx: 0) - (Line: 1, Col: 29, Idx: 28): Could not parse 'MyMegaFunction(Value = true)'");
+
+
+                yield return new DeserializationErrorCase(@"- >
+  ForEach(
+    Array = ['a','b','c'],
+    VariableName = <char>,
+    Action = Print(Value = <char>)
+  )", @"'ForEach(
+  Array = ['a','b','c'],
+  VariableName = <char>,
+  Action = Print(Value = <char>)
+)' is a 'String' but it should be a 'Unit' to be a member of 'Sequence'");
+
             }
         }
 

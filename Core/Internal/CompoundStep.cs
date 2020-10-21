@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Reflection;
@@ -55,6 +56,9 @@ namespace Reductech.EDR.Core.Internal
                         .SelectMany(x => x.StepCombiners)
 
                 ).Distinct();
+
+        /// <inheritdoc />
+        public Type OutputType => typeof(T);
 
 
         private IEnumerable<(string name, IStep step) > RunnableArguments
