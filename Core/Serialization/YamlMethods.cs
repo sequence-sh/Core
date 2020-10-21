@@ -55,7 +55,6 @@ namespace Reductech.EDR.Core.Serialization
             var builder =
             new DeserializerBuilder()
                 .WithNodeDeserializer(nodeDeserializer)
-                .WithTypeConverter(YamlStringTypeConverter.Instance)
                 .WithTypeConverter(VersionTypeConverter.Instance);
 
 

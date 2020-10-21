@@ -249,13 +249,13 @@ Value:
                     "One", "Two");
 
 
-//                yield return new DeserializationTestFunction(@"- >
-//  ForEach(
-//    Array = ['a','b','c'],
-//    VariableName = <char>,
-//    Action = Print(Value = <char>)
-//  )
-//");
+                
+
+                yield return new DeserializationTestFunction(@"ForEach(Array = ['a','b','c'], VariableName = <char>, Action = Print(Value = <char>))", "a", "b", "c");
+                yield return new DeserializationTestFunction(@"ForEach(
+Array = ['a','b','c'],
+VariableName = <char>,
+Action = Print(Value = <char>))", "a", "b", "c");
 
 
             }
@@ -283,6 +283,9 @@ Value:
             /// <inheritdoc />
             public async Task ExecuteAsync(ITestOutputHelper testOutputHelper)
             {
+
+                testOutputHelper.WriteLine(Yaml);
+
                 var stepFactoryStore = StepFactoryStore.CreateUsingReflection(typeof(StepFactory));
                 var logger = new TestLogger();
 
@@ -300,6 +303,7 @@ Value:
                 runResult.ShouldBeSuccessful(x => x.AsString);
 
                 logger.LoggedValues.Should().BeEquivalentTo(ExpectedLoggedValues);
+
 
                 if (ExpectedConfiguration != null || freezeResult.Value.Configuration != null)
                 {

@@ -174,13 +174,13 @@ namespace Reductech.EDR.Core.Internal
             return results;
         }
 
-        private static Result TrySetVariableName(PropertyInfo propertyInfo, IStep parentStep, VariableName member)
+        private static Result TrySetVariableName(PropertyInfo propertyInfo, ICompoundStep parentStep, VariableName member)
         {
             propertyInfo.SetValue(parentStep, member);
             return Result.Success();
         }
 
-        private static Result TrySetStep(PropertyInfo propertyInfo, IStep parentStep, IFreezableStep freezableStep, StepContext context)
+        private static Result TrySetStep(PropertyInfo propertyInfo, ICompoundStep parentStep, IFreezableStep freezableStep, StepContext context)
         {
             var argumentFreezeResult = freezableStep.TryFreeze(context);
             if (argumentFreezeResult.IsFailure)
@@ -192,7 +192,7 @@ namespace Reductech.EDR.Core.Internal
             return Result.Success();
         }
 
-        private static Result TrySetStepList(PropertyInfo propertyInfo, IStep parentStep, IReadOnlyList<IFreezableStep> member, StepContext context)
+        private static Result TrySetStepList(PropertyInfo propertyInfo, ICompoundStep parentStep, IReadOnlyList<IFreezableStep> member, StepContext context)
         {
             var freezeResult =
                 member.Select(x => x.TryFreeze(context)).Combine()
@@ -212,7 +212,7 @@ namespace Reductech.EDR.Core.Internal
                     addMethod.Invoke(list, new object?[] { step1 });
                 }
                 else
-                    return Result.Failure($"'{step1.Name}' does not have the type '{genericType.GenericTypeArguments.First().GetDisplayName()}'");
+                    return Result.Failure($"'{step1.Name}' is a '{step1.OutputType.GetDisplayName()}' but it should be a '{genericType.GenericTypeArguments.First().GetDisplayName()}' to be a member of '{parentStep.StepFactory.TypeName}'");
 
 
             propertyInfo.SetValue(parentStep, list);
