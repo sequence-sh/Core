@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal;
+using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Util;
 
 namespace Reductech.EDR.Core.Steps
@@ -16,7 +17,7 @@ namespace Reductech.EDR.Core.Steps
     public class CreateFile : CompoundStep<Unit>
     {
         /// <inheritdoc />
-        public override async Task<Result<Unit, IRunErrors>> Run(StateMonad stateMonad, CancellationToken cancellationToken)
+        public override async Task<Result<Unit, IError>> Run(StateMonad stateMonad, CancellationToken cancellationToken)
         {
             var pathResult = await Path.Run(stateMonad, cancellationToken);
 
@@ -33,9 +34,9 @@ namespace Reductech.EDR.Core.Steps
             return result;
         }
 
-        private static async Task<Result<Unit, IRunErrors>>  CreateFile1(string path, string text, CancellationToken ca)
+        private static async Task<Result<Unit, IError>>  CreateFile1(string path, string text, CancellationToken ca)
         {
-            Result<Unit, IRunErrors> r1;
+            Result<Unit, IError> r1;
 
             try
             {
@@ -46,7 +47,7 @@ namespace Reductech.EDR.Core.Steps
 #pragma warning disable CA1031 // Do not catch general exception types
             catch (Exception e)
             {
-                r1 = new RunError(e.Message, nameof(CreateFile), null, ErrorCode.ExternalProcessError);
+                r1 = new SingleError(e.Message, nameof(CreateFile), null, ErrorCode.ExternalProcessError);
             }
 #pragma warning restore CA1031 // Do not catch general exception types
 

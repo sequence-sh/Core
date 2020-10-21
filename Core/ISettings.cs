@@ -1,5 +1,6 @@
 ﻿using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Internal;
+using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Util;
 
 namespace Reductech.EDR.Core
@@ -13,6 +14,6 @@ namespace Reductech.EDR.Core
         /// <summary>
         /// Check that the requirement is met by these settings.
         /// </summary>
-        Result<Unit, IRunErrors> CheckRequirement(string processName, Requirement requirement);
+        Result<Unit, IError> CheckRequirement(string processName, Requirement requirement);
     }
 }

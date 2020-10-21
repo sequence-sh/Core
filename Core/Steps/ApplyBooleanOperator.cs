@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal;
+using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Serialization;
 
 namespace Reductech.EDR.Core.Steps
@@ -40,7 +41,7 @@ namespace Reductech.EDR.Core.Steps
         public IStep<bool> Right { get; set; } = null!;
 
         /// <inheritdoc />
-        public override async Task<Result<bool, IRunErrors>> Run(StateMonad stateMonad, CancellationToken cancellationToken)
+        public override async Task<Result<bool, IError>> Run(StateMonad stateMonad, CancellationToken cancellationToken)
         {
             var l = await Left.Run(stateMonad, cancellationToken);
             if (l.IsFailure) return l;

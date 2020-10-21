@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal;
+using Reductech.EDR.Core.Internal.Errors;
 
 namespace Reductech.EDR.Core.Steps
 {
@@ -35,7 +36,7 @@ namespace Reductech.EDR.Core.Steps
 
 
         /// <inheritdoc />
-        public override async Task<Result<string, IRunErrors>>  Run(StateMonad stateMonad, CancellationToken cancellationToken)
+        public override async Task<Result<string, IError>>  Run(StateMonad stateMonad, CancellationToken cancellationToken)
         {
             var str = await String.Run(stateMonad, cancellationToken);
             if (str.IsFailure) return str;
@@ -46,7 +47,7 @@ namespace Reductech.EDR.Core.Steps
 
 
             if (index.Value < 0 || index.Value >= str.Value.Length)
-                return new RunError("Index was outside the bounds of the string", Name, null, ErrorCode.IndexOutOfBounds);
+                return new SingleError("Index was outside the bounds of the string", Name, null, ErrorCode.IndexOutOfBounds);
 
             return str.Value.Substring(index.Value, length.Value);
         }

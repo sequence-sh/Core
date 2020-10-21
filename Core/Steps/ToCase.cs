@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal;
+using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Util;
 
 namespace Reductech.EDR.Core.Steps
@@ -31,7 +32,7 @@ namespace Reductech.EDR.Core.Steps
         public IStep<TextCase> Case { get; set; } = null!;
 
         /// <inheritdoc />
-        public override async Task<Result<string, IRunErrors>>  Run(StateMonad stateMonad, CancellationToken cancellationToken)
+        public override async Task<Result<string, IError>>  Run(StateMonad stateMonad, CancellationToken cancellationToken)
         {
             return await String.Run(stateMonad, cancellationToken).Compose(() => Case.Run(stateMonad, cancellationToken))
                 .Map(x => Convert(x.Item1, x.Item2));

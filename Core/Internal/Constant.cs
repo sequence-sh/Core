@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
+using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Util;
 
 namespace Reductech.EDR.Core.Internal
@@ -33,20 +34,20 @@ namespace Reductech.EDR.Core.Internal
 
         /// <inheritdoc />
 #pragma warning disable 1998
-        public async Task<Result<T, IRunErrors>> Run(StateMonad stateMonad, CancellationToken cancellationToken) => Value!;
+        public async Task<Result<T, IError>> Run(StateMonad stateMonad, CancellationToken cancellationToken) => Value!;
 
         /// <inheritdoc />
-        public async Task<Result<T1, IRunErrors>>  Run<T1>(StateMonad stateMonad, CancellationToken cancellationToken)
+        public async Task<Result<T1, IError>>  Run<T1>(StateMonad stateMonad, CancellationToken cancellationToken)
         {
             var r = Value!.TryConvert<T1>()
-                .MapFailure(x => new RunError(x, Name, null, ErrorCode.InvalidCast) as IRunErrors);
+                .MapFailure(x => new SingleError(x, Name, null, ErrorCode.InvalidCast) as IError);
 
             return r;
         }
         #pragma warning restore 1998
 
         /// <inheritdoc />
-        public Result<Unit, IRunErrors> Verify(ISettings settings) => Unit.Default;
+        public Result<Unit, IError> Verify(ISettings settings) => Unit.Default;
 
         /// <inheritdoc />
         public Configuration? Configuration { get; set; } = null;

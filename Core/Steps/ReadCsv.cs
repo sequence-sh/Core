@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal;
+using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Util;
 
 namespace Reductech.EDR.Core.Steps
@@ -17,7 +18,7 @@ namespace Reductech.EDR.Core.Steps
     public sealed class ReadCsv : CompoundStep<List<List<string>>>
     {
         /// <inheritdoc />
-        public override async Task< Result<List<List<string>>, IRunErrors>> Run(StateMonad stateMonad, CancellationToken cancellationToken)
+        public override async Task< Result<List<List<string>>, IError>> Run(StateMonad stateMonad, CancellationToken cancellationToken)
         {
             var textResult = await Text.Run(stateMonad, cancellationToken);
             if (textResult.IsFailure)
@@ -52,16 +53,16 @@ namespace Reductech.EDR.Core.Steps
                 fieldsEnclosedInQuotesResult.Value);
 
             if (dataTableResult.IsFailure) return dataTableResult
-                .MapFailure(x=> new RunError(x, nameof(RunExternalProcess), null, ErrorCode.CSVError) as IRunErrors)
+                .MapFailure(x=> new SingleError(x, Name, null, ErrorCode.CSVError) as IError)
                 .ConvertFailure<List<List<string>>>();
 
             var missingColumnsErrors = columnsToMapResult.Value
                 .Where(x => !dataTableResult.Value.Columns.Contains(x))
-                .Select(x=> new RunError($"Missing Column: '{x}'", nameof(ReadCsv), null, ErrorCode.CSVError))
+                .Select(x=> new SingleError($"Missing Column: '{x}'", Name, null, ErrorCode.CSVError))
                 .ToList();
 
             if (missingColumnsErrors.Any())
-                return new RunErrorList(missingColumnsErrors);
+                return new ErrorList(missingColumnsErrors);
 
             var results = new List<List<string>>();
 

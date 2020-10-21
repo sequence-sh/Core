@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal;
+using Reductech.EDR.Core.Internal.Errors;
 
 namespace Reductech.EDR.Core.Steps
 {
@@ -16,10 +17,10 @@ namespace Reductech.EDR.Core.Steps
     public sealed class Array<T> : CompoundStep<List<T>>
     {
         /// <inheritdoc />
-        public override async Task<Result<List<T>, IRunErrors>> Run(StateMonad stateMonad, CancellationToken cancellationToken)
+        public override async Task<Result<List<T>, IError>> Run(StateMonad stateMonad, CancellationToken cancellationToken)
         {
             var result = await Elements.Select(x => x.Run(stateMonad, cancellationToken))
-                .Combine(RunErrorList.Combine)
+                .Combine(ErrorList.Combine)
                 .Map(x => x.ToList());
 
             return result;

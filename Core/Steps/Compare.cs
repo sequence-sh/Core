@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal;
+using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Serialization;
 using Reductech.EDR.Core.Util;
 
@@ -40,7 +41,7 @@ namespace Reductech.EDR.Core.Steps
 
 
         /// <inheritdoc />
-        public override async Task<Result<bool, IRunErrors>> Run(StateMonad stateMonad, CancellationToken cancellationToken)
+        public override async Task<Result<bool, IError>> Run(StateMonad stateMonad, CancellationToken cancellationToken)
         {
             var result = await Left.Run(stateMonad, cancellationToken)
                 .Compose(() => Operator.Run(stateMonad, cancellationToken), () => Right.Run(stateMonad, cancellationToken))
@@ -53,7 +54,7 @@ namespace Reductech.EDR.Core.Steps
         /// <inheritdoc />
         public override IStepFactory StepFactory => CompareStepFactory.Instance;
 
-        private static Result<bool, IRunErrors> CompareItems(T item1, CompareOperator compareOperator, T item2)
+        private static Result<bool, IError> CompareItems(T item1, CompareOperator compareOperator, T item2)
         {
             return compareOperator switch
             {

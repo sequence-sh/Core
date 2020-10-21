@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal;
+using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Util;
 
 namespace Reductech.EDR.Core.Steps
@@ -30,12 +31,12 @@ namespace Reductech.EDR.Core.Steps
         public IStep<int> Index { get; set; } = null!;
 
         /// <inheritdoc />
-        public override async Task<Result<T, IRunErrors>>  Run(StateMonad stateMonad, CancellationToken cancellationToken)
+        public override async Task<Result<T, IError>>  Run(StateMonad stateMonad, CancellationToken cancellationToken)
         {
             return await Array.Run(stateMonad, cancellationToken)
                 .Compose(() => Index.Run(stateMonad, cancellationToken))
                 .Ensure(x => x.Item2 >= 0 && x.Item2 < x.Item1.Count,
-                    new RunError("Index was out of the range of the array.", Name, null, ErrorCode.IndexOutOfBounds))
+                    new SingleError("Index was out of the range of the array.", Name, null, ErrorCode.IndexOutOfBounds))
                 .Map(x => x.Item1[x.Item2]);
         }
 

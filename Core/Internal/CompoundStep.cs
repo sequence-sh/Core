@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Attributes;
+using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Util;
 
 namespace Reductech.EDR.Core.Internal
@@ -17,14 +18,14 @@ namespace Reductech.EDR.Core.Internal
     public abstract class CompoundStep<T> : ICompoundStep<T>
     {
         /// <inheritdoc />
-        public abstract Task<Result<T, IRunErrors>> Run(StateMonad stateMonad, CancellationToken cancellationToken);
+        public abstract Task<Result<T, IError>> Run(StateMonad stateMonad, CancellationToken cancellationToken);
 
 
         /// <inheritdoc />
-        public Task<Result<T1, IRunErrors>> Run<T1>(StateMonad stateMonad, CancellationToken cancellationToken)
+        public Task<Result<T1, IError>> Run<T1>(StateMonad stateMonad, CancellationToken cancellationToken)
         {
-            return Run(stateMonad, cancellationToken).BindCast<T, T1, IRunErrors>(
-                    new RunError($"Could not cast {typeof(T)} to {typeof(T1)}", Name, null, ErrorCode.InvalidCast));
+            return Run(stateMonad, cancellationToken).BindCast<T, T1, IError>(
+                    new SingleError($"Could not cast {typeof(T)} to {typeof(T1)}", Name, null, ErrorCode.InvalidCast));
         }
 
         /// <summary>
@@ -115,11 +116,11 @@ namespace Reductech.EDR.Core.Internal
         /// <summary>
         /// Check that this step meets requirements
         /// </summary>
-        public virtual Result<Unit, IRunErrors> VerifyThis(ISettings settings) => Unit.Default;
+        public virtual Result<Unit, IError> VerifyThis(ISettings settings) => Unit.Default;
 
 
         /// <inheritdoc />
-        public Result<Unit, IRunErrors> Verify(ISettings settings)
+        public Result<Unit, IError> Verify(ISettings settings)
         {
             var r0 = new[] {VerifyThis(settings)};
 
@@ -129,10 +130,10 @@ namespace Reductech.EDR.Core.Internal
 
             var r1 = RunnableArguments.Select(x => x.step.Verify(settings));
             var r2 = RunnableListArguments.Select(x => x.list.Select(l => l.Verify(settings))
-                    .Combine(RunErrorList.Combine).Map(_=>Unit.Default));
+                    .Combine(ErrorList.Combine).Map(_=>Unit.Default));
 
 
-            var finalResult = r0.Concat(rRequirements) .Concat(r1).Concat(r2).Combine(RunErrorList.Combine).Map(_ => Unit.Default);
+            var finalResult = r0.Concat(rRequirements) .Concat(r1).Concat(r2).Combine(ErrorList.Combine).Map(_ => Unit.Default);
 
             return finalResult;
         }

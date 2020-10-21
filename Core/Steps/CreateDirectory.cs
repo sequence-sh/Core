@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal;
+using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Util;
 
 namespace Reductech.EDR.Core.Steps
@@ -16,7 +17,7 @@ namespace Reductech.EDR.Core.Steps
     public class CreateDirectory : CompoundStep<Unit>
     {
         /// <inheritdoc />
-        public override async Task<Result<Unit, IRunErrors>> Run(StateMonad stateMonad, CancellationToken cancellationToken)
+        public override async Task<Result<Unit, IError>> Run(StateMonad stateMonad, CancellationToken cancellationToken)
         {
             var path = await Path.Run(stateMonad, cancellationToken);
 
@@ -24,17 +25,17 @@ namespace Reductech.EDR.Core.Steps
                 return path.ConvertFailure<Unit>();
 
 
-            Result<Unit, IRunErrors> r;
+            Result<Unit, IError> r;
 
             try
             {
                 Directory.CreateDirectory(path.Value);
-                r = Result.Success<Unit, IRunErrors>(Unit.Default);
+                r = Result.Success<Unit, IError>(Unit.Default);
             }
 #pragma warning disable CA1031 // Do not catch general exception types
             catch (Exception e)
             {
-                r = new RunError(e.Message, nameof(CreateDirectory), null, ErrorCode.ExternalProcessError);
+                r = new SingleError(e.Message, nameof(CreateDirectory), null, ErrorCode.ExternalProcessError);
             }
 
             return r;

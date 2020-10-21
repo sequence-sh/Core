@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal;
+using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Util;
 
 namespace Reductech.EDR.Core.Steps
@@ -16,7 +17,7 @@ namespace Reductech.EDR.Core.Steps
     public class Unzip : CompoundStep<Unit>
     {
         /// <inheritdoc />
-        public override async Task<Result<Unit, IRunErrors>> Run(StateMonad stateMonad, CancellationToken cancellationToken)
+        public override async Task<Result<Unit, IError>> Run(StateMonad stateMonad, CancellationToken cancellationToken)
         {
             var data = await ArchiveFilePath.Run(stateMonad, cancellationToken)
                 .Compose(() => DestinationDirectory.Run(stateMonad, cancellationToken), () => OverwriteFiles.Run(stateMonad, cancellationToken));
@@ -24,21 +25,21 @@ namespace Reductech.EDR.Core.Steps
             if (data.IsFailure)
                 return data.ConvertFailure<Unit>();
 
-            Maybe<IRunErrors> error;
+            Maybe<IError> error;
             try
             {
                 ZipFile.ExtractToDirectory(data.Value.Item1, data.Value.Item2, data.Value.Item3);
-                error = Maybe<IRunErrors>.None;
+                error = Maybe<IError>.None;
             }
 #pragma warning disable CA1031 // Do not catch general exception types
             catch (Exception e)
             {
-                error = Maybe<IRunErrors>.From(new RunError(e.Message, Name, null, ErrorCode.ExternalProcessError));
+                error = Maybe<IError>.From(new SingleError(e.Message, Name, null, ErrorCode.ExternalProcessError));
             }
 #pragma warning restore CA1031 // Do not catch general exception types
 
             if (error.HasValue)
-                return Result.Failure<Unit, IRunErrors>(error.Value);
+                return Result.Failure<Unit, IError>(error.Value);
 
             return Unit.Default;
 

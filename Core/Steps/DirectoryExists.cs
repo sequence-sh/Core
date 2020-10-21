@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal;
+using Reductech.EDR.Core.Internal.Errors;
 
 namespace Reductech.EDR.Core.Steps
 {
@@ -22,13 +23,13 @@ namespace Reductech.EDR.Core.Steps
         public IStep<string> Path { get; set; } = null!;
 
         /// <inheritdoc />
-        public override async Task<Result<bool, IRunErrors>>  Run(StateMonad stateMonad, CancellationToken cancellationToken)
+        public override async Task<Result<bool, IError>>  Run(StateMonad stateMonad, CancellationToken cancellationToken)
         {
             var pathResult = await Path.Run(stateMonad, cancellationToken);
 
             if (pathResult.IsFailure) return pathResult.ConvertFailure<bool>();
 
-            Result<bool, IRunErrors> r;
+            Result<bool, IError> r;
             try
             {
                 r = Directory.Exists(pathResult.Value);
@@ -36,7 +37,7 @@ namespace Reductech.EDR.Core.Steps
 #pragma warning disable CA1031 // Do not catch general exception types
             catch (Exception e)
             {
-                r = new RunError(e.Message, nameof(DirectoryExists), null, ErrorCode.ExternalProcessError);
+                r = new SingleError(e.Message, nameof(DirectoryExists), null, ErrorCode.ExternalProcessError);
             }
 #pragma warning restore CA1031 // Do not catch general exception types
 
