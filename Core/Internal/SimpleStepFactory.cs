@@ -16,7 +16,7 @@ namespace Reductech.EDR.Core.Internal
             TypeResolver typeResolver) => Result.Success<ITypeReference, IError>(ActualTypeReference.Create(typeof(TOutput)));
 
         /// <inheritdoc />
-        public override IStepNameBuilder StepNameBuilder => new DefaultStepNameBuilder(TypeName);
+        public override IStepNameBuilder StepNameBuilder => DefaultStepNameBuilder.Instance;
 
         /// <inheritdoc />
         public override Type StepType => typeof(TStep);

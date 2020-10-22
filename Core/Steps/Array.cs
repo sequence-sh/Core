@@ -66,7 +66,7 @@ namespace Reductech.EDR.Core.Steps
         protected override Result<ITypeReference, IError> GetMemberType(FreezableStepData freezableStepData, TypeResolver typeResolver)
         {
             var result =
-                freezableStepData.GetListArgument(nameof(Array<object>.Elements))
+                freezableStepData.GetListArgument(nameof(Array<object>.Elements), TypeName)
                     .MapError(x=>x.WithLocation(this, freezableStepData))
                     .Bind(x => x.Select(r => r.TryGetOutputTypeReference(typeResolver)).Combine(ErrorList.Combine))
                     .Bind(x => MultipleTypeReference.TryCreate(x, TypeName)

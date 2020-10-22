@@ -31,7 +31,7 @@ namespace Reductech.EDR.Core.Internal
                     if (set.OfType<ActualTypeReference>().Count() > 1)
                         return new ErrorBuilder(
                             $"Could not infer type for {parentStep} as it's children have different types ({string.Join(", ", set.OfType<ActualTypeReference>().Select(x=>x.Type.Name))}).",
-                            ErrorCode.InvalidCast, null);
+                            ErrorCode.InvalidCast);
 
                     return new MultipleTypeReference(set);
                 }
@@ -82,7 +82,7 @@ namespace Reductech.EDR.Core.Internal
                 .Select(x => x.TryGetActualTypeReference(typeResolver))
                 .Combine(ErrorBuilderList.Combine)
                 .Bind(x => x.Distinct().EnsureSingle("Type multiply defined")
-                    .MapError(y => new ErrorBuilder(y, ErrorCode.AmbiguousType, null) as IErrorBuilder))
+                    .MapError(y => new ErrorBuilder(y, ErrorCode.AmbiguousType) as IErrorBuilder))
                 ; //TODO improve this error
 
             return results;
@@ -95,7 +95,7 @@ namespace Reductech.EDR.Core.Internal
                 .Select(x => x.TryGetGenericTypeReference(typeResolver, argumentNumber))
                 .Combine(ErrorBuilderList.Combine)
                 .Map(x => x.ToHashSet())
-                .Ensure(x=>x.Count == 1,new ErrorBuilder("Type multiply defined", ErrorCode.AmbiguousType, null))
+                .Ensure(x=>x.Count == 1,new ErrorBuilder("Type multiply defined", ErrorCode.AmbiguousType))
                 .Map(x=>x.Single());
 
             return result;

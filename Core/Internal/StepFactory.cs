@@ -79,6 +79,10 @@ namespace Reductech.EDR.Core.Internal
             return MemberType.NotAMember;
         }
 
+        /// <inheritdoc />
+        public IEnumerable<string> RequiredProperties =>
+            StepType.GetProperties()
+                .Where(property => property.GetCustomAttribute<RequiredAttribute>() != null).Select(property => property.Name);
 
         /// <inheritdoc />
         public Result<IStep, IError> TryFreeze(StepContext stepContext, FreezableStepData freezableStepData, Configuration? configuration)
@@ -116,21 +120,18 @@ namespace Reductech.EDR.Core.Internal
                 (pi, f) => TrySetStep(pi, step, f, stepContext),
                 simpleProperties1!,
                 step,
-                MemberType.Step,
                 TypeName);
 
             var r2 = SetFromDictionary(freezableStepData.VariableNameDictionary,
                 (pi, f) => TrySetVariableName(pi, step, f),
                 variableNameProperties1!,
                 step,
-                MemberType.VariableName,
                 TypeName);
 
             var r3 = SetFromDictionary(freezableStepData.StepListDictionary,
                 (pi, f) => TrySetStepList(pi, step, f, stepContext),
                 listProperties1!,
                 step,
-                MemberType.StepList,
                 TypeName);
 
             results.Add(r1);
@@ -147,7 +148,7 @@ namespace Reductech.EDR.Core.Internal
             foreach (var property in remainingProperties
                 .Where(property => property.GetCustomAttribute<RequiredAttribute>() != null))
             {
-                var error = new SingleError($"The property '{property.Name}' was not set on type '{GetType().Name}'.", ErrorCode.MissingParameter, new StepErrorLocation(step), null);
+                var error = new SingleError($"The property '{property.Name}' was not set on type '{GetType().Name}'.", ErrorCode.MissingParameter, new StepErrorLocation(step));
 
                 results.Add(error);
             }
@@ -162,7 +163,6 @@ namespace Reductech.EDR.Core.Internal
                 Func<PropertyInfo, T, Result<Unit, IError>> trySet,
                 IDictionary<string, PropertyInfo> remaining,
                 ICompoundStep parentStep,
-                MemberType memberType,
                 string typeName)
         {
             var results = new List<Result<Unit, IError>>();
@@ -177,8 +177,7 @@ namespace Reductech.EDR.Core.Internal
                     results.Add(trySet(propertyInfo, stepMember));
                 }
                 else
-                    results.Add(new SingleError(
-                        $"'{typeName}' does not have a property named '{propertyName}' of type '{memberType}'.", ErrorCode.InvalidProperty, new StepErrorLocation(parentStep), null));
+                    results.Add(Result.Failure<Unit, IError>(ErrorHelper.UnexpectedParameterError(propertyName, typeName).WithLocation(parentStep)));
             }
 
             return results.Combine(_=> Unit.Default, ErrorList.Combine);
@@ -196,7 +195,7 @@ namespace Reductech.EDR.Core.Internal
             if (argumentFreezeResult.IsFailure)
                 return argumentFreezeResult.ConvertFailure<Unit>();
             if (!propertyInfo.PropertyType.IsInstanceOfType(argumentFreezeResult.Value))
-                return new SingleError($"'{propertyInfo.Name}' cannot take the value '{argumentFreezeResult.Value}'", ErrorCode.InvalidCast, new StepErrorLocation(parentStep), null);
+                return new SingleError($"'{propertyInfo.Name}' cannot take the value '{argumentFreezeResult.Value}'", ErrorCode.InvalidCast, new StepErrorLocation(parentStep));
 
             propertyInfo.SetValue(parentStep, argumentFreezeResult.Value); //This could throw an exception but we don't expect it.
             return Unit.Default;
@@ -223,7 +222,9 @@ namespace Reductech.EDR.Core.Internal
                 }
                 else
                     return new SingleError(
-                        $"'{CompressSpaces(step1.Name)}' is a '{step1.OutputType.GetDisplayName()}' but it should be a '{genericType.GenericTypeArguments.First().GetDisplayName()}' to be a member of '{parentStep.StepFactory.TypeName}'", ErrorCode.InvalidCast, new StepErrorLocation(parentStep), null);
+                        $"'{CompressSpaces(step1.Name)}' is a '{step1.OutputType.GetDisplayName()}' but it should be a '{genericType.GenericTypeArguments.First().GetDisplayName()}' to be a member of '{parentStep.StepFactory.TypeName}'", 
+                        ErrorCode.InvalidCast, 
+                        new StepErrorLocation(parentStep));
 
 
             propertyInfo.SetValue(parentStep, list);
@@ -253,7 +254,7 @@ namespace Reductech.EDR.Core.Internal
                 if (e.Message.Contains("violates the constraint of type") && openGenericType == typeof(Compare<>))
                 {
                     var parameterTypeName = parameterType.GetDisplayName();
-                    return new ErrorBuilder($"Cannot compare objects of type '{parameterTypeName}'", ErrorCode.InvalidCast, null);
+                    return new ErrorBuilder($"Cannot compare objects of type '{parameterTypeName}'", ErrorCode.InvalidCast);
                 }
 
                 return new ErrorBuilder(e, ErrorCode.InvalidCast);
@@ -272,7 +273,7 @@ namespace Reductech.EDR.Core.Internal
 
             return new ErrorBuilder(
                 $"Could not create an instance of {openGenericType.Name.Split("`")[0]}<{parameterType.GetDisplayName()}>",
-                ErrorCode.InvalidCast, null);
+                ErrorCode.InvalidCast);
         }
 
         /// <summary>

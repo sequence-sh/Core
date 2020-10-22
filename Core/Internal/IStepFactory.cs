@@ -75,6 +75,11 @@ namespace Reductech.EDR.Core.Internal
         MemberType GetExpectedMemberType(string name);
 
         /// <summary>
+        /// Gets all the properties required by this step.
+        /// </summary>
+        IEnumerable<string> RequiredProperties { get; }
+
+        /// <summary>
         /// Gets all enum types used by this step.
         /// </summary>
         IEnumerable<Type> EnumTypes { get; }

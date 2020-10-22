@@ -1,8 +1,10 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using CSharpFunctionalExtensions;
+using FluentAssertions;
 using Reductech.EDR.Core.Internal;
+using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Serialization;
-using Reductech.EDR.Core.Util;
 using Reductech.Utilities.Testing;
 using Xunit;
 using Xunit.Abstractions;
@@ -28,19 +30,43 @@ namespace Reductech.EDR.Core.Tests
         {
             get
             {
-                yield return new DeserializationErrorCase("", "Yaml is empty.");
+                yield return new DeserializationErrorCase("", ("Yaml is empty.", EntireSequenceLocation.Instance.AsString));
+
+                yield return new DeserializationErrorCase("\"Print(Value = 123)\"", ("Yaml must represent a step with return type Unit", "Print(Value = 123)"));
+
+                yield return new DeserializationErrorCase("'Print(Value = 123)'", ("Yaml must represent a step with return type Unit", "Print(Value = 123)"));
+
+                yield return new DeserializationErrorCase("Print(Word = 'hello', Term = 'world')",
+                    ("Unexpected Parameter 'Word' in 'Print'", "Line: 1, Col: 1, Idx: 0 - Line: 1, Col: 38, Idx: 37"),
+                ("Unexpected Parameter 'Term' in 'Print'", "Line: 1, Col: 1, Idx: 0 - Line: 1, Col: 38, Idx: 37"),
+                ("Missing Parameter 'Value' in 'Print'", "Line: 1, Col: 1, Idx: 0 - Line: 1, Col: 38, Idx: 37"));
 
 
+                yield return new DeserializationErrorCase("Compare(Left = Print(Foo = 1), Right = Print(Foo = 2), Operator = Print(Foo = 2))",
+                    ("Unexpected Parameter 'Foo' in 'Print'", "Line: 1, Col: 1, Idx: 0 - Line: 1, Col: 82, Idx: 81"),
+                ("Missing Parameter 'Value' in 'Print'", "Line: 1, Col: 1, Idx: 0 - Line: 1, Col: 82, Idx: 81"),
+                ("Unexpected Parameter 'Foo' in 'Print'", "Line: 1, Col: 1, Idx: 0 - Line: 1, Col: 82, Idx: 81"),
+                ("Missing Parameter 'Value' in 'Print'", "Line: 1, Col: 1, Idx: 0 - Line: 1, Col: 82, Idx: 81"),
+                ("Unexpected Parameter 'Foo' in 'Print'", "Line: 1, Col: 1, Idx: 0 - Line: 1, Col: 82, Idx: 81"),
+                ("Missing Parameter 'Value' in 'Print'", "Line: 1, Col: 1, Idx: 0 - Line: 1, Col: 82, Idx: 81")
+                );
+
+
+                yield return new DeserializationErrorCase(@"- <CsvHeader> = ['a', 'b']
+- <SearchTerms> = ReadCsv(Text = ReadFile(Folder = <CurrentDir>, FileName = <SearchTagCSV>, ColumnsToMap = <CsvHeader>))",
+("Missing Parameter 'ColumnsToMap' in 'ReadCsv'", "Line: 2, Col: 3, Idx: 30 - Line: 2, Col: 121, Idx: 148")
+                    );
 
                 yield return new DeserializationErrorCase(@"
 - <ArrayVar1> = Array(Elements = ['abc', '123'])
 - <ArrayVar2> = Array(Elements = ['abc', '123'])
-- Print(Value = (<ArrayVar1> == <ArrayVar2>))", "Cannot compare objects of type 'ListOfString'");
+- Print(Value = (<ArrayVar1> == <ArrayVar2>))",
+                    ("Cannot compare objects of type 'ListOfString'", "<ArrayVar1> == <ArrayVar2>"));
 
 
 
 
-                yield return new DeserializationErrorCase("MyMegaFunction(Value = true)", "(Line: 1, Col: 1, Idx: 0) - (Line: 1, Col: 29, Idx: 28): Could not parse 'MyMegaFunction(Value = true)'");
+                yield return new DeserializationErrorCase("MyMegaFunction(Value = true)", ("The step 'MyMegaFunction' does not exist", "Line: 1, Col: 1, Idx: 0 - Line: 1, Col: 29, Idx: 28"));
 
 
                 yield return new DeserializationErrorCase(@"- >
@@ -49,7 +75,8 @@ namespace Reductech.EDR.Core.Tests
     VariableName = <char>,
     Action = Print(Value = <char>)
   )",
-@"'ForEach( Array = ['a','b','c'], VariableName = <char>, Action = Print(Value = <char>) )' is a 'String' but it should be a 'Unit' to be a member of 'Sequence'");
+                    ("'ForEach( Array = ['a','b','c'], VariableName = <char>, Action = Print(Value = <char>) )' is a 'String' but it should be a 'Unit' to be a member of 'Sequence'", "Sequence")
+                );
 
             }
         }
@@ -57,12 +84,12 @@ namespace Reductech.EDR.Core.Tests
 
         private class DeserializationErrorCase : ITestBaseCase
         {
-            private readonly string _expectedError;
+            private readonly (string error, string location)[] _expectedErrors;
 
-            public DeserializationErrorCase(string yaml, string expectedError)
+            public DeserializationErrorCase(string yaml, params (string error, string location)[] expectedErrors)
             {
                 Name = yaml;
-                _expectedError = expectedError;
+                _expectedErrors = expectedErrors;
             }
 
             /// <inheritdoc />
@@ -75,9 +102,16 @@ namespace Reductech.EDR.Core.Tests
 
                 var result = YamlMethods.DeserializeFromYaml(Name, sfs)
                     .Bind(x=>x.TryFreeze())
-                    .MapError(x=>x.AsString);
+                    .Bind(YamlRunner.ConvertToUnitStep);
 
-                result.ShouldBeFailure(_expectedError);
+                result.ShouldBeFailure();
+
+                var realErrorPairs =
+                    result.Error.GetAllErrors().Select(x => (x.Message, x.Location.AsString)).ToArray();
+
+                realErrorPairs.Should().BeEquivalentTo(_expectedErrors);
+
+
             }
         }
 

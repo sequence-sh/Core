@@ -30,7 +30,7 @@ namespace Reductech.EDR.Core.Internal
         /// <summary>
         /// Gets the name of the step from the step arguments
         /// </summary>
-        public string GetFromArguments(FreezableStepData freezableStepData)
+        public string GetFromArguments(FreezableStepData freezableStepData, IStepFactory stepFactory)
         {
             var replacedString = NameVariableRegex.Replace(TemplateString, GetReplacement);
 
@@ -46,7 +46,7 @@ namespace Reductech.EDR.Core.Internal
                     .Map(x=>x.Join(vn=>vn.ToString(),
                         fp=>fp.StepName,
                         l=> string.Join(ListDelimiter, l.Select(i=>i.StepName))))
-                    .OnFailureCompensate(x=>Result.Success("Unknown"));
+                    .OnFailureCompensate(x=>Result.Success(stepFactory.TypeName));
 
                 return p.Value;
             }

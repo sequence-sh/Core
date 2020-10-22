@@ -63,6 +63,16 @@ namespace Reductech.EDR.Core.Util
         }
 
         /// <summary>
+        /// Returns the string, unless it is null or whitespace, in which case the backup is returned.
+        /// </summary>
+        public static string DefaultIfNullOrWhitespace(this string s, string backup)
+        {
+            if (string.IsNullOrWhiteSpace(s))
+                return backup;
+            return s;
+        }
+
+        /// <summary>
         /// Tries to parse the enum value. Uses both the name of the enum and the display name.
         /// </summary>
         public static Maybe<T> TryParseValue<T>(string s) where T : Enum

@@ -6,7 +6,7 @@ using Reductech.EDR.Core.Serialization;
 using Reductech.Utilities.Testing;
 using Xunit;
 using Xunit.Abstractions;
-
+using YamlDotNet.Core;
 
 
 namespace Reductech.EDR.Core.Tests
@@ -99,7 +99,7 @@ namespace Reductech.EDR.Core.Tests
 
                 var parser = new StepMemberParser(store);
 
-                var r = parser.TryParse(Name);
+                var r = parser.TryParse(Name, Mark.Empty, Mark.Empty);
 
                 if (ExpectedStepMember == null) //Expect failure
                 {
@@ -107,7 +107,7 @@ namespace Reductech.EDR.Core.Tests
                 }
                 else
                 {
-                    r.ShouldBeSuccessful(x=>x.ToString());
+                    r.ShouldBeSuccessful(x=>x.ToString()!);
 
                     r.Value.Should().Be(ExpectedStepMember);
                 }

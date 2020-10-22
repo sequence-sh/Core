@@ -749,7 +749,7 @@ Two,The second number")
 
 
                     var newFsd = FreezableStepData.TryCreate(compoundFreezableStep.StepFactory, newDict);
-                    newFsd.ShouldBeSuccessful();
+                    newFsd.ShouldBeSuccessful(x=>x.AsString);
 
                     return new CompoundFreezableStep(compoundFreezableStep.StepFactory, newFsd.Value, new Configuration()
                     {

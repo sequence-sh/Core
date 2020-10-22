@@ -98,6 +98,30 @@
         /// <summary>
         /// The step could not be deserialized.
         /// </summary>
-        CouldNotDeserialize
+        CouldNotDeserialize,
+
+        /// <summary>
+        /// The step with the given name does not exist.
+        /// </summary>
+        StepDoesNotExist,
+
+        /// <summary>
+        /// The same argument was given more than once
+        /// </summary>
+        DuplicateParameter,
+        /// <summary>
+        /// The term could not be tokenized
+        /// </summary>
+        CouldNotTokenize,
+
+        /// <summary>
+        /// The term could not be parsed
+        /// </summary>
+        CouldNotParse,
+
+        /// <summary>
+        /// A unexpected parameter was found
+        /// </summary>
+        UnexpectedParameter
     }
 }

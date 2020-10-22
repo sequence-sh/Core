@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Internal;
-using Reductech.EDR.Core.Util;
+using Reductech.EDR.Core.Internal.Errors;
 using YamlDotNet.Core;
 using YamlDotNet.Core.Events;
 
@@ -23,15 +23,8 @@ namespace Reductech.EDR.Core.Serialization
         public StepMemberParser StepMemberParser { get; }
 
         /// <inheritdoc />
-        public override Result<StepMember, YamlException> TryDeserialize(IParser reader, Func<IParser, Type, object?> nestedObjectDeserializer)
+        public override Result<StepMember, IError> TryDeserialize(IParser reader, Func<IParser, Type, object?> nestedObjectDeserializer)
         {
-            if(reader.Current == null)
-                return new YamlException("Reader is empty");
-
-            //var startMark = reader.Current.Start; //TODO use these
-            //var endMark = reader.Current.End;
-
-
             switch (reader.Current)
             {
                 case MappingStart _:
@@ -63,8 +56,7 @@ namespace Reductech.EDR.Core.Serialization
                     }
                     //otherwise try to deserialize this a as step member
 
-                    var r = StepMemberParser.TryParse(scalar.Value)
-                        .MapError(e=> CreateError(reader.Current.Start, reader.Current.End, e, scalar.Value));
+                    var r = StepMemberParser.TryParse(scalar.Value, reader.Current.Start, reader.Current.End);
 
                     if (r.IsSuccess)
                     {
@@ -74,19 +66,10 @@ namespace Reductech.EDR.Core.Serialization
 
                     return r;
                 }
-                default: return new YamlException(reader.Current.Start, reader.Current.End, $"Cannot deserialize {reader.Current}");
+                default: return new SingleError($"Cannot deserialize {reader.Current}", ErrorCode.CouldNotParse,
+                    new YamlRegionErrorLocation(reader.Current!.Start, reader.Current.End));
             }
         }
 
-        private static YamlException CreateError(Mark start, Mark end, StepMemberParseError error, string scalarValue)
-        {
-
-            var newStart = new Mark(start.Index + error.ErrorPosition.Absolute,
-                start.Line + error.ErrorPosition.Line - 1,
-                start.Column + error.ErrorPosition.Column - 1);
-
-            return new YamlException(newStart, end, error.ErrorMessage?? $"Could not parse '{scalarValue}'" );
-
-        }
     }
 }

@@ -35,7 +35,7 @@ namespace Reductech.EDR.Core
         public async Task<Result<Unit, IErrorBuilder>> RunExternalProcess(string processPath, ILogger logger, IErrorHandler errorHandler, IEnumerable<string> arguments)
         {
             if (!File.Exists(processPath))
-                return new ErrorBuilder($"Could not find '{processPath}'", ErrorCode.ExternalProcessNotFound, null);
+                return new ErrorBuilder($"Could not find '{processPath}'", ErrorCode.ExternalProcessNotFound);
 
             var argumentString = string.Join(' ', arguments.Select(EncodeParameterArgument));
             using var pProcess = new System.Diagnostics.Process
@@ -79,7 +79,7 @@ namespace Reductech.EDR.Core
                         if (errorHandler.ShouldIgnoreError(errorText))
                             logger.LogWarning(line.Value.line);
                         else
-                            errors.Add(new ErrorBuilder(errorText, ErrorCode.ExternalProcessError, null));
+                            errors.Add(new ErrorBuilder(errorText, ErrorCode.ExternalProcessError));
 
                     }
                     else

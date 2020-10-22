@@ -50,7 +50,7 @@ namespace Reductech.EDR.Core
         /// </summary>
         public Result<T, IErrorBuilder> GetSettings<T>() where T : ISettings =>
             Settings.TryCast<T>()
-                .MapError(x => new ErrorBuilder(x, ErrorCode.MissingStepSettings, null) as IErrorBuilder);
+                .MapError(x => new ErrorBuilder(x, ErrorCode.MissingStepSettings) as IErrorBuilder);
 
         /// <summary>
         /// Gets the current value of this variable.
@@ -62,10 +62,10 @@ namespace Reductech.EDR.Core
                 if (value is T typedValue)
                     return typedValue;
 
-                return new ErrorBuilder($"Variable '{key}' does not have type '{typeof(T)}'.", ErrorCode.WrongVariableType, null);
+                return new ErrorBuilder($"Variable '{key}' does not have type '{typeof(T)}'.", ErrorCode.WrongVariableType);
             }
 
-            return new ErrorBuilder($"Variable '{key}' does not exist.", ErrorCode.MissingVariable, null);
+            return new ErrorBuilder($"Variable '{key}' does not exist.", ErrorCode.MissingVariable);
 
 
         }

@@ -66,9 +66,13 @@ namespace Reductech.EDR.Core.Serialization
             {
                 stepMember = deserializer.Deserialize<StepMember>(yaml);
             }
+            catch (GeneralSerializerYamlException e)
+            {
+                return Result.Failure<IFreezableStep, IError>(e.Error);
+            }
             catch (YamlException e)
             {
-                return new SingleError(e, ErrorCode.CouldNotDeserialize, new YamlErrorLocation(e));
+                return new SingleError(e.Message, ErrorCode.CouldNotParse, new YamlRegionErrorLocation(e.Start, e.End));
             }
 
             return Result.Success<IFreezableStep, IError>(stepMember.ConvertToStep(true));

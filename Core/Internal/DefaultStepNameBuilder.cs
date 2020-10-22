@@ -7,25 +7,23 @@ namespace Reductech.EDR.Core.Internal
     /// </summary>
     public class DefaultStepNameBuilder : IStepNameBuilder
     {
-        /// <summary>
-        /// The step type name.
-        /// </summary>
-        public string TypeName { get; }
+        private DefaultStepNameBuilder() {}
 
         /// <summary>
-        /// Creates a new DefaultStepNameBuilder.
+        /// The instance.
         /// </summary>
-        public DefaultStepNameBuilder(string typeName) => TypeName = typeName;
+        public static DefaultStepNameBuilder Instance { get; } = new DefaultStepNameBuilder();
+
 
         /// <inheritdoc />
-        public string GetFromArguments(FreezableStepData freezableStepData)
+        public string GetFromArguments(FreezableStepData freezableStepData, IStepFactory stepFactory)
         {
             var args = string.Join(", ", freezableStepData
                 .StepMembersDictionary
                 .OrderBy(x=>x.Key)
                 .Select(x => $"{x.Key}: {x.Value.MemberString}"));
 
-            return $"{TypeName}({args})";
+            return $"{stepFactory.TypeName}({args})";
         }
     }
 }

@@ -59,7 +59,7 @@ namespace Reductech.EDR.Core.Steps
         /// <inheritdoc />
         protected override Result<ITypeReference, IError> GetMemberType(FreezableStepData freezableStepData,
             TypeResolver typeResolver) =>
-            freezableStepData.GetVariableName(nameof(GetVariable<object>.VariableName))
+            freezableStepData.GetVariableName(nameof(GetVariable<object>.VariableName), TypeName)
                 .MapError(x=> x.WithLocation(new FreezableStepErrorLocation(this, freezableStepData)))
 
                 .Map(x => new VariableTypeReference(x) as ITypeReference);

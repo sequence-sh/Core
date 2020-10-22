@@ -25,7 +25,7 @@ namespace Reductech.EDR.Core.Internal
         public Task<Result<T1, IError>> Run<T1>(StateMonad stateMonad, CancellationToken cancellationToken)
         {
             return Run(stateMonad, cancellationToken).BindCast<T, T1, IError>(
-                    new SingleError($"Could not cast {typeof(T)} to {typeof(T1)}", ErrorCode.InvalidCast, new StepErrorLocation(this), null));
+                    new SingleError($"Could not cast {typeof(T)} to {typeof(T1)}", ErrorCode.InvalidCast, new StepErrorLocation(this)));
         }
 
         /// <summary>
@@ -34,7 +34,7 @@ namespace Reductech.EDR.Core.Internal
         public abstract IStepFactory StepFactory { get; }
 
         /// <inheritdoc />
-        public string Name => StepFactory.StepNameBuilder.GetFromArguments(FreezableStepData);
+        public string Name => StepFactory.StepNameBuilder.GetFromArguments(FreezableStepData, StepFactory);
 
         /// <inheritdoc />
         public override string ToString() => StepFactory.TypeName;

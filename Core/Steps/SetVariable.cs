@@ -79,7 +79,7 @@ namespace Reductech.EDR.Core.Steps
         public override Result<Maybe<ITypeReference>, IError> GetTypeReferencesSet(VariableName variableName,
             FreezableStepData freezableStepData, TypeResolver typeResolver)
         {
-            var result = freezableStepData.GetArgument(nameof(SetVariable<object>.Value))
+            var result = freezableStepData.GetArgument(nameof(SetVariable<object>.Value), TypeName)
                 .MapError(e=>e.WithLocation(this, freezableStepData))
                 .Bind(x => x.TryGetOutputTypeReference(typeResolver))
                 .Map(Maybe<ITypeReference>.From);
@@ -89,7 +89,7 @@ namespace Reductech.EDR.Core.Steps
 
         /// <inheritdoc />
         protected override Result<ICompoundStep, IError> TryCreateInstance(StepContext stepContext, FreezableStepData freezableStepData) =>
-            freezableStepData.GetVariableName(nameof(SetVariable<object>.VariableName))
+            freezableStepData.GetVariableName(nameof(SetVariable<object>.VariableName), TypeName)
                 .Bind(x => stepContext.TryGetTypeFromReference(new VariableTypeReference(x)))
                 .Bind(x => TryCreateGeneric(typeof(SetVariable<>), x))
         .MapError(e=>e.WithLocation(this, freezableStepData));

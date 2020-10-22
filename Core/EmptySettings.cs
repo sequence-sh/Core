@@ -21,6 +21,6 @@ namespace Reductech.EDR.Core
         /// <inheritdoc />
         public Result<Unit, IErrorBuilder> CheckRequirement(Requirement requirement) =>
             new ErrorBuilder($"Requirement '{requirement}' not met.",
-                ErrorCode.RequirementsNotMet, null);
+                ErrorCode.RequirementsNotMet);
     }
 }

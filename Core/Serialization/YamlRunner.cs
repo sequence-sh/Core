@@ -40,21 +40,31 @@ namespace Reductech.EDR.Core.Serialization
         public async Task<Result<Unit, IError>> RunSequenceFromYamlStringAsync(string yamlString, CancellationToken cancellationToken)
         {
             var stepResult = YamlMethods.DeserializeFromYaml(yamlString, _stepFactoryStore)
-                    .Bind(x => x.TryFreeze());
+                    .Bind(x => x.TryFreeze())
+                    .Bind(ConvertToUnitStep)
+                ;
 
             if (stepResult.IsFailure)
                 return stepResult.ConvertFailure<Unit>();
 
-            if (stepResult.Value is IStep<Unit> unitStep)
+            var stateMonad = new StateMonad(_logger, _settings, ExternalProcessRunner.Instance, _stepFactoryStore);
+
+            var runResult = await stepResult.Value.Run(stateMonad, cancellationToken);
+
+            return runResult;
+        }
+
+        /// <summary>
+        /// Converts the step to a unit step for running.
+        /// </summary>
+        public static Result<IStep<Unit>, IError> ConvertToUnitStep(IStep step)
+        {
+            if (step is IStep<Unit> unitStep)
             {
-                var stateMonad = new StateMonad(_logger, _settings, ExternalProcessRunner.Instance, _stepFactoryStore);
-
-                var runResult = await unitStep.Run(stateMonad, cancellationToken);
-
-                return runResult;
+                return Result.Success<IStep<Unit>, IError>(unitStep);
             }
 
-            return new SingleError("Yaml must represent a step with return type Unit", ErrorCode.InvalidCast, new StepErrorLocation(stepResult.Value));
+            return new SingleError("Yaml must represent a step with return type Unit", ErrorCode.InvalidCast, new StepErrorLocation(step));
         }
 
         /// <summary>

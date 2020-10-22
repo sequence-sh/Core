@@ -8,6 +8,6 @@
         /// <summary>
         /// Gets the name of the step from the step arguments
         /// </summary>
-        string GetFromArguments(FreezableStepData freezableStepData);
+        string GetFromArguments(FreezableStepData freezableStepData, IStepFactory stepFactory);
     }
 }

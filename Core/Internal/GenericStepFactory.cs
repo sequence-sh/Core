@@ -24,7 +24,7 @@ namespace Reductech.EDR.Core.Internal
         protected abstract ITypeReference GetOutputTypeReference(ITypeReference memberTypeReference);
 
         /// <inheritdoc />
-        public override IStepNameBuilder StepNameBuilder => new DefaultStepNameBuilder(TypeName);
+        public override IStepNameBuilder StepNameBuilder => DefaultStepNameBuilder.Instance;
 
         /// <inheritdoc />
         public override IEnumerable<Type> EnumTypes => ImmutableList<Type>.Empty;

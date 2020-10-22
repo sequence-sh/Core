@@ -35,7 +35,7 @@ namespace Reductech.EDR.Core.Steps
                 MathOperator.Subtract => left.Value - right.Value,
                 MathOperator.Multiply => left.Value * right.Value,
                 MathOperator.Divide when right.Value == 0 => Result.Failure<int, IError>(
-                    new SingleError("Divide by Zero Error", ErrorCode.DivideByZero, new StepErrorLocation(this), null)),
+                    new SingleError("Divide by Zero Error", ErrorCode.DivideByZero, new StepErrorLocation(this))),
                 MathOperator.Divide => left.Value / right.Value,
                 MathOperator.Modulo => left.Value % right.Value,
                 MathOperator.Power => Convert.ToInt32(Math.Pow(left.Value, right.Value)),

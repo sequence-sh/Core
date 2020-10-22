@@ -21,7 +21,7 @@ namespace Reductech.EDR.Core.Serialization
 
         /// <inheritdoc />
         public Result<string> TryGetText(FreezableStepData data) =>
-            data.GetVariableName(PropertyName).MapError(x=>x.AsString)
+            data.GetVariableName(PropertyName, "Type").MapError(x=>x.AsString)
                 .Bind(Serialize);
 
         /// <summary>

@@ -17,6 +17,9 @@ namespace Reductech.EDR.Core.Internal.Errors
         /// </summary>
         public IEnumerable<ErrorBuilder> GetErrorBuilders();
 
+        /// <summary>
+        /// String representation of this ErrorBuilder.
+        /// </summary>
         public string AsString { get; }
     }
 }

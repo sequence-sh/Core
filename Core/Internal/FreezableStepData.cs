@@ -15,28 +15,32 @@ namespace Reductech.EDR.Core.Internal
         /// <summary>
         /// Try to create a new FreezableStepData
         /// </summary>
-        public static Result<FreezableStepData> TryCreate(IStepFactory stepFactory, IReadOnlyDictionary<string, StepMember> dictionary)
+        public static Result<FreezableStepData, IErrorBuilder> TryCreate(IStepFactory stepFactory, IReadOnlyDictionary<string, StepMember> dictionary)
         {
             var stepDictionary = new Dictionary<string, IFreezableStep>();
             var variableNameDictionary = new Dictionary<string, VariableName>();
             var stepListDictionary = new Dictionary<string, IReadOnlyList<IFreezableStep>>();
 
-            var errors = new List<Result>();
+            var remainingRequiredProperties = stepFactory.RequiredProperties.ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+            var errors = new List<IErrorBuilder>();
 
             foreach (var (key, value) in dictionary)
             {
                 var mt = stepFactory.GetExpectedMemberType(key);
 
-                if(mt == MemberType.NotAMember)
-                    errors.Add(Result.Failure($"{stepFactory.StepType} does not have a property '{key}'"));
+                if (mt == MemberType.NotAMember)
+                    errors.Add(ErrorHelper.UnexpectedParameterError(key, stepFactory.TypeName));
                 else
                 {
                     var convertedMember = value.TryConvert(mt, false);
 
                     if(convertedMember.IsFailure)
-                        errors.Add(convertedMember);
+                        errors.Add(convertedMember.Error);
                     else
                     {
+                        remainingRequiredProperties.Remove(key);
+
                         convertedMember.Value
                             .Match(
                             x => variableNameDictionary.Add(key, x),
@@ -47,8 +51,11 @@ namespace Reductech.EDR.Core.Internal
                 }
             }
 
+            foreach (var remainingRequiredProperty in remainingRequiredProperties)
+                errors.Add(ErrorHelper.MissingParameterError(remainingRequiredProperty, stepFactory.TypeName));
+
             if (errors.Any())
-                return errors.Combine().ConvertFailure<FreezableStepData>();
+                return Result.Failure<FreezableStepData, IErrorBuilder>( ErrorBuilderList.Combine(errors));
 
             return new FreezableStepData(stepDictionary, variableNameDictionary, stepListDictionary);
         }
@@ -99,20 +106,20 @@ namespace Reductech.EDR.Core.Internal
         /// <summary>
         /// Gets a variable name.
         /// </summary>
-        public Result<VariableName, IErrorBuilder> GetVariableName(string name) => VariableNameDictionary.TryFindOrFail(name,
-            ()=> new ErrorBuilder($"The Property '{name}' was not set", ErrorCode.MissingParameter, null) as IErrorBuilder);
+        public Result<VariableName, IErrorBuilder> GetVariableName(string name, string typeName) => VariableNameDictionary.TryFindOrFail(name,
+            ()=> ErrorHelper.MissingParameterError(name, typeName));
 
         /// <summary>
         /// Gets an argument.
         /// </summary>
-        public Result<IFreezableStep, IErrorBuilder> GetArgument(string name) => StepDictionary.TryFindOrFail(name,
-            ()=> new ErrorBuilder($"The Property '{name}' was not set", ErrorCode.MissingParameter, null) as IErrorBuilder);
+        public Result<IFreezableStep, IErrorBuilder> GetArgument(string name, string typeName) => StepDictionary.TryFindOrFail(name,
+            ()=> ErrorHelper.MissingParameterError(name, typeName));
 
         /// <summary>
         /// Gets a list argument.
         /// </summary>
-        public Result<IReadOnlyList<IFreezableStep>, IErrorBuilder> GetListArgument(string name) => StepListDictionary.TryFindOrFail(name,
-            ()=> new ErrorBuilder($"The Property '{name}' was not set", ErrorCode.MissingParameter, null) as IErrorBuilder);
+        public Result<IReadOnlyList<IFreezableStep>, IErrorBuilder> GetListArgument(string name, string typeName) => StepListDictionary.TryFindOrFail(name,
+            ()=> ErrorHelper.MissingParameterError(name, typeName));
 
         /// <inheritdoc />
         public override string ToString()

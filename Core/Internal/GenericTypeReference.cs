@@ -57,7 +57,7 @@ namespace Reductech.EDR.Core.Internal
         public Result<ActualTypeReference, IErrorBuilder> TryGetGenericTypeReference(TypeResolver typeResolver, int argumentNumber)
         {
             if(argumentNumber < 0 || TypeArgumentReferences.Count <= argumentNumber)
-                return new ErrorBuilder($"'{GenericType.Name}' does not have an argument at index '{argumentNumber}'", ErrorCode.InvalidCast, null);
+                return new ErrorBuilder($"'{GenericType.Name}' does not have an argument at index '{argumentNumber}'", ErrorCode.InvalidCast);
 
             var r = TypeArgumentReferences[argumentNumber].TryGetActualTypeReference(typeResolver);
 

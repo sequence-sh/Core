@@ -75,7 +75,7 @@ namespace Reductech.EDR.Core.Internal
 
 
         /// <inheritdoc />
-        public string StepName => StepFactory.StepNameBuilder.GetFromArguments(FreezableStepData);
+        public string StepName => StepFactory.StepNameBuilder.GetFromArguments(FreezableStepData, StepFactory);
 
         /// <param name="typeResolver"></param>
         /// <inheritdoc />

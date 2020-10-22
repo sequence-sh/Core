@@ -43,7 +43,7 @@ namespace Reductech.EDR.Core.Internal
 
                 if (step is CompoundFreezableStep seq && seq.StepFactory == SequenceStepFactory.Instance)
                 {
-                    var stepsResult = seq.FreezableStepData.GetListArgument(nameof(Sequence.Steps));
+                    var stepsResult = seq.FreezableStepData.GetListArgument(nameof(Sequence.Steps), nameof(Sequence));
 
                     if (stepsResult.IsFailure)
                         return stepsResult.MapError(x => x.WithLocation(seq)).ConvertFailure<StepContext>();
