@@ -371,23 +371,38 @@ namespace Reductech.EDR.Core.Serialization
                 return Result.Failure<IFreezableStep, IErrorBuilder>( ErrorHelper.MissingStepError(funcName));
 
 
-            var duplicateArguments = functionArguments
-                .GroupBy(x => x.argumentName)
-                .Where(x => x.Count() > 1).ToList();
-
-            if (duplicateArguments.Any())
-                return Result.Failure<IFreezableStep, IErrorBuilder>(ErrorBuilderList.Combine(duplicateArguments.Select(
-                    x => ErrorHelper.DuplicateParameterError(x.Key))));
+            var dictionary = new Dictionary<string, StepMember>();
+            var errors = new List<IErrorBuilder>();
 
 
-            //TODO check none of the arguments are parseErrors here?
+            foreach (var argumentGroup in functionArguments.GroupBy(x=>x.argumentName))
+            {
+                if(argumentGroup.Count() > 1)
+                    errors.Add(ErrorHelper.DuplicateParameterError(argumentGroup.Key));
 
-            var dictionary = functionArguments.ToDictionary(x => x.argumentName, x => x.stepMember);
+
+                foreach (var sm in argumentGroup.Select(x=>x.stepMember))
+                {
+                    var cr = CheckForErrors(sm);
+                    if(cr.IsFailure)
+                        errors.Add(cr.Error);
+                }
+
+                dictionary.Add(argumentGroup.Key, argumentGroup.First().stepMember);
+            }
 
 
-            var fsd = FreezableStepData.TryCreate(runnableStepFactory, dictionary);
+            var fsd = FreezableStepData.TryCreate(runnableStepFactory, dictionary)
+                .Map(x => new CompoundFreezableStep(runnableStepFactory, x, null) as IFreezableStep);
 
-            return fsd.Map(x => new CompoundFreezableStep(runnableStepFactory, x, null) as IFreezableStep);
+            if (fsd.IsSuccess)
+            {
+                if (!errors.Any())
+                    return fsd;
+                return Result.Failure<IFreezableStep, IErrorBuilder>(ErrorBuilderList.Combine(errors));
+            }
+
+            return Result.Failure<IFreezableStep, IErrorBuilder>(ErrorBuilderList.Combine(errors.Prepend(fsd.Error)));
         }
 
 

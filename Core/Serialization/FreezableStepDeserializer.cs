@@ -26,7 +26,7 @@ namespace Reductech.EDR.Core.Serialization
         {
 
             var markStart = parser.Current!.Start;
-            var markEnd = parser.Current.End;
+            //var markEnd = parser.Current.End;
 
             var dictionary = new Dictionary<string, StepMember>();
 
@@ -47,58 +47,44 @@ namespace Reductech.EDR.Core.Serialization
 
                 if (keyResult.Value.Equals(YamlMethods.TypeString, StringComparison.OrdinalIgnoreCase))
                 {
-                    if (factory != null)
-                        errors.Add(ErrorHelper.DuplicateParameterError(keyResult.Value).WithLocation(markStart, markEnd));
-                    else
-                    {
-                        var typeNameResult = TryDeserializeNested<string>(nestedObjectDeserializer, parser)
+                    var typeNameResult = TryDeserializeNested<string>(nestedObjectDeserializer, parser)
                         .Bind(x => StepMemberParser
-                            .StepFactoryStore.Dictionary.TryFindOrFail(x, () => ErrorHelper.MissingStepError(x).WithLocation(markStart, markEnd))
+                            .StepFactoryStore.Dictionary.TryFindOrFail(x, () => ErrorHelper.MissingStepError(x).WithLocation(markStart, parser.Current.End))
                         );
 
-                        if (typeNameResult.IsFailure)
-                            errors.Add(typeNameResult.Error);
-                        else
-                            factory = typeNameResult.Value;
-                    }
+                    if (typeNameResult.IsFailure)
+                        errors.Add(typeNameResult.Error);
+                    else if(factory == null)
+                        factory = typeNameResult.Value;
+                    else
+                        errors.Add(ErrorHelper.DuplicateParameterError(keyResult.Value).WithLocation(markStart, parser.Current.End));
                 }
                 else if (keyResult.Value.Equals(YamlMethods.ConfigString, StringComparison.OrdinalIgnoreCase))
                 {
-                    if (configuration != null)
-                        errors.Add(ErrorHelper.DuplicateParameterError(keyResult.Value).WithLocation(markStart, markEnd));
+                    var configResult = TryDeserializeNested<Configuration>(nestedObjectDeserializer, parser);
 
+                    if (configResult.IsFailure)
+                        errors.Add(configResult.Error);
+                    else if (configuration == null)
+                        configuration = configResult.Value;
                     else
-                    {
-                        var configResult = TryDeserializeNested<Configuration>(nestedObjectDeserializer, parser);
-
-                        if (configResult.IsFailure)
-                            errors.Add(configResult.Error);
-                        else
-                            configuration = configResult.Value;
-                    }
+                        errors.Add(ErrorHelper.DuplicateParameterError(keyResult.Value).WithLocation(markStart, parser.Current.End));
                 }
                 else
                 {
-                    if (dictionary.ContainsKey(keyResult.Value))
-                    {
-                        errors.Add(ErrorHelper.DuplicateParameterError(keyResult.Value).WithLocation(markStart, markEnd));
-                    }
-                    else
-                    {
-                        var memberResult = TryDeserializeNested<StepMember>(nestedObjectDeserializer, parser);
+                    var memberResult = TryDeserializeNested<StepMember>(nestedObjectDeserializer, parser);
 
-                        if (memberResult.IsFailure)
-                            errors.Add(memberResult.Error);
-                        else
-                            dictionary.Add(keyResult.Value, memberResult.Value);
-                    }
+                    if (memberResult.IsFailure)
+                        errors.Add(memberResult.Error);
+                    else if (!dictionary.TryAdd(keyResult.Value, memberResult.Value))
+                        errors.Add(ErrorHelper.DuplicateParameterError(keyResult.Value).WithLocation(markStart, parser.Current.End));
                 }
             }
 
 
             if (factory == null)
             {
-                errors.Add(ErrorHelper.MissingParameterError(YamlMethods.TypeString, "Type Definition").WithLocation(new YamlRegionErrorLocation(markStart, markEnd)));
+                errors.Add(ErrorHelper.MissingParameterError(YamlMethods.TypeString, "Step Definition").WithLocation(new YamlRegionErrorLocation(markStart, parser.Current.End)));
             }
             else
             {
@@ -108,7 +94,7 @@ namespace Reductech.EDR.Core.Serialization
                 errors.AddRange(requiredProperties
                     .Select(missing =>
                         ErrorHelper.MissingParameterError(missing, factory.TypeName)
-                        .WithLocation(markStart, markEnd)));
+                        .WithLocation(markStart, parser.Current.End)));
             }
 
             if (errors.Any())

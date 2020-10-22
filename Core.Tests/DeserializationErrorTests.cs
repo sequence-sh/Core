@@ -36,6 +36,27 @@ namespace Reductech.EDR.Core.Tests
 
                 yield return new DeserializationErrorCase("'Print(Value = 123)'", ("Yaml must represent a step with return type Unit", "Print(Value = 123)"));
 
+                yield return new DeserializationErrorCase("Do:Nothing",("Could not tokenize 'Do:Nothing'", "Line: 1, Col: 1, Idx: 0 - Line: 1, Col: 11, Idx: 10"));
+                yield return new DeserializationErrorCase("Do: Print\nValue:Hello",
+                    ("While scanning a simple key, could not find expected ':'.", "Line: 3, Col: 1, Idx: 21 - Line: 3, Col: 1, Idx: 21"));
+
+
+                yield return new DeserializationErrorCase("Do: Print\nWord: Hello\nWord: World\nText: Goodbye",
+                    ("Duplicate Parameter 'Word'", "Line: 1, Col: 1, Idx: 0 - Line: 4, Col: 5, Idx: 38"), ("Missing Parameter 'Value' in 'Print'", "Line: 1, Col: 1, Idx: 0 - Line: 5, Col: 1, Idx: 47")
+                    );
+
+                yield return new DeserializationErrorCase("Do: Print\nDo: Print\nValue: Hello",
+                    ("Duplicate Parameter 'Do'", "Line: 1, Col: 1, Idx: 0 - Line: 3, Col: 6, Idx: 25")
+                );
+                yield return new DeserializationErrorCase("Do: Print\nValue: Hello\nConfig:\n\tDoNotSplit: false\nConfig:\n\tDoNotSplit: true",
+                    ("Duplicate Parameter 'Config'", "Line: 1, Col: 1, Idx: 0 - Line: 7, Col: 1, Idx: 75")
+                    );
+
+
+                yield return new DeserializationErrorCase("Da: Print\nValue: Hello",
+                    ("Missing Parameter 'Do' in 'Step Definition'", "Line: 1, Col: 1, Idx: 0 - Line: 3, Col: 1, Idx: 22")
+                );
+
                 yield return new DeserializationErrorCase("Print(Word = 'hello', Term = 'world')",
                     ("Unexpected Parameter 'Word' in 'Print'", "Line: 1, Col: 1, Idx: 0 - Line: 1, Col: 38, Idx: 37"),
                 ("Unexpected Parameter 'Term' in 'Print'", "Line: 1, Col: 1, Idx: 0 - Line: 1, Col: 38, Idx: 37"),
@@ -54,7 +75,8 @@ namespace Reductech.EDR.Core.Tests
 
                 yield return new DeserializationErrorCase(@"- <CsvHeader> = ['a', 'b']
 - <SearchTerms> = ReadCsv(Text = ReadFile(Folder = <CurrentDir>, FileName = <SearchTagCSV>, ColumnsToMap = <CsvHeader>))",
-("Missing Parameter 'ColumnsToMap' in 'ReadCsv'", "Line: 2, Col: 3, Idx: 30 - Line: 2, Col: 121, Idx: 148")
+("Missing Parameter 'ColumnsToMap' in 'ReadCsv'", "Line: 2, Col: 3, Idx: 30 - Line: 2, Col: 121, Idx: 148"),
+("Unexpected Parameter 'ColumnsToMap' in 'ReadFile'", "Line: 2, Col: 3, Idx: 30 - Line: 2, Col: 121, Idx: 148")
                     );
 
                 yield return new DeserializationErrorCase(@"
@@ -63,11 +85,7 @@ namespace Reductech.EDR.Core.Tests
 - Print(Value = (<ArrayVar1> == <ArrayVar2>))",
                     ("Cannot compare objects of type 'ListOfString'", "<ArrayVar1> == <ArrayVar2>"));
 
-
-
-
                 yield return new DeserializationErrorCase("MyMegaFunction(Value = true)", ("The step 'MyMegaFunction' does not exist", "Line: 1, Col: 1, Idx: 0 - Line: 1, Col: 29, Idx: 28"));
-
 
                 yield return new DeserializationErrorCase(@"- >
   ForEach(

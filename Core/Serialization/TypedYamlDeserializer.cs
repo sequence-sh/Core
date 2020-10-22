@@ -3,6 +3,7 @@ using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
 using YamlDotNet.Core;
+using YamlDotNet.Core.Events;
 
 namespace Reductech.EDR.Core.Serialization
 {
@@ -32,7 +33,7 @@ namespace Reductech.EDR.Core.Serialization
             }
             catch (YamlException e)
             {
-                return new SingleError(e.Message, ErrorCode.CouldNotParse, new YamlRegionErrorLocation(e.Start, e.End));
+                return new SingleError(e.GetRealMessage(), ErrorCode.CouldNotParse, new YamlRegionErrorLocation(e.Start, e.End));
             }
 
             var r2 = (T2) r!;

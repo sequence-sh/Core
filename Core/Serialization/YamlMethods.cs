@@ -72,7 +72,7 @@ namespace Reductech.EDR.Core.Serialization
             }
             catch (YamlException e)
             {
-                return new SingleError(e.Message, ErrorCode.CouldNotParse, new YamlRegionErrorLocation(e.Start, e.End));
+                return new SingleError(e.GetRealMessage(), ErrorCode.CouldNotParse, new YamlRegionErrorLocation(e.Start, e.End));
             }
 
             return Result.Success<IFreezableStep, IError>(stepMember.ConvertToStep(true));

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using CSharpFunctionalExtensions;
 using JetBrains.Annotations;
 using Reductech.EDR.Core.Internal.Errors;
@@ -54,5 +55,16 @@ namespace Reductech.EDR.Core.Serialization
         }
 
         public IError Error { get; }
+    }
+
+    internal static class YamlExceptionHelper
+    {
+        public static string GetRealMessage(this YamlException exception)
+        {
+            var newMessage = exception.Message.Split(exception.End.ToString()).Last()
+                .TrimStart(')', ':', ' ');
+
+            return newMessage;
+        }
     }
 }
