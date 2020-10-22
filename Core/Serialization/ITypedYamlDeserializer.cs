@@ -1,5 +1,6 @@
 ﻿using System;
 using CSharpFunctionalExtensions;
+using Reductech.EDR.Core.Internal.Errors;
 using YamlDotNet.Core;
 
 namespace Reductech.EDR.Core.Serialization
@@ -8,7 +9,7 @@ namespace Reductech.EDR.Core.Serialization
     {
         Type Type { get; }
 
-        public Result<object, YamlException> TryDeserializeObject(IParser reader,
+        public Result<object, IError> TryDeserializeObject(IParser reader,
             Func<IParser, Type, object?> nestedObjectDeserializer);
     }
 }

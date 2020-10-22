@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
 using CSharpFunctionalExtensions;
+using Reductech.EDR.Core.Internal.Errors;
+using Reductech.EDR.Core.Util;
 
 namespace Reductech.EDR.Core.Internal
 {
@@ -22,18 +24,18 @@ namespace Reductech.EDR.Core.Internal
         /// <summary>
         /// Tries to add another actual type.
         /// </summary>
-        public Result TryAddType(VariableName variable, ActualTypeReference actualTypeReference)
+        public Result<Unit, IErrorBuilder> TryAddType(VariableName variable, ActualTypeReference actualTypeReference)
         {
             if (MyDictionary.TryGetValue(variable, out var previous))
             {
                 if(previous.Equals(actualTypeReference))
-                    return Result.Success();
+                    return Unit.Default;
 
-                return Result.Failure($"The type of {variable} is ambiguous.");
+                return new ErrorBuilder($"The type of {variable} is ambiguous.", ErrorCode.AmbiguousType);
             }
 
             MyDictionary.Add(variable, actualTypeReference);
-            return Result.Success();
+            return Unit.Default;
         }
     }
 }

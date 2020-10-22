@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Documentation;
+using Reductech.EDR.Core.Internal.Errors;
 
 namespace Reductech.EDR.Core.Steps
 {
@@ -15,7 +16,7 @@ namespace Reductech.EDR.Core.Steps
     public sealed class GenerateDocumentation : CompoundStep<List<string>> //TODO maybe output a list of entities
     {
         /// <inheritdoc />
-        public override async Task<Result<List<string>, IRunErrors>> Run(StateMonad stateMonad, CancellationToken cancellationToken)
+        public override async Task<Result<List<string>, IError>> Run(StateMonad stateMonad, CancellationToken cancellationToken)
         {
             await Task.CompletedTask;
 

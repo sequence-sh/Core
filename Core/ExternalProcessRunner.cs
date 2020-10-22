@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -6,6 +7,7 @@ using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Microsoft.Extensions.Logging;
 using Reductech.EDR.Core.Internal;
+using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Util;
 
 namespace Reductech.EDR.Core
@@ -30,10 +32,10 @@ namespace Reductech.EDR.Core
 
 
         /// <inheritdoc />
-        public async Task<Result<Unit, IRunErrors>> RunExternalProcess(string processPath, ILogger logger, string callingProcessName, IErrorHandler errorHandler, IEnumerable<string> arguments)
+        public async Task<Result<Unit, IErrorBuilder>> RunExternalProcess(string processPath, ILogger logger, IErrorHandler errorHandler, IEnumerable<string> arguments)
         {
             if (!File.Exists(processPath))
-                return new RunError($"Could not find '{processPath}'", callingProcessName, null, ErrorCode.ExternalProcessNotFound);
+                return new ErrorBuilder($"Could not find '{processPath}'", ErrorCode.ExternalProcessNotFound);
 
             var argumentString = string.Join(' ', arguments.Select(EncodeParameterArgument));
             using var pProcess = new System.Diagnostics.Process
@@ -51,42 +53,53 @@ namespace Reductech.EDR.Core
                     StandardOutputEncoding = System.Text.Encoding.UTF8
                 }
             };
-            pProcess.Start();
 
-            var multiStreamReader = new MultiStreamReader<(string line, Source source)>(new IStreamReader<(string, Source)>[]
+            var errors = new List<IErrorBuilder>();
+
+            try
             {
+                pProcess.Start();
+
+                var multiStreamReader = new MultiStreamReader<(string line, Source source)>(new IStreamReader<(string, Source)>[]
+                {
                 new StreamReaderWithSource<Source>(pProcess.StandardOutput, Source.Output),
                 new StreamReaderWithSource<Source>(pProcess.StandardError, Source.Error),
-            });
+                });
 
-            var errors = new List<RunError>();
-
-            //Read the output one line at a time
-            while (true)
-            {
-                var line = await multiStreamReader.ReadLineAsync();
-                if (line == null) //We've reached the end of the file
-                    break;
-                if (line.Value.source == Source.Error)
+                //Read the output one line at a time
+                while (true)
                 {
-                    var errorText = string.IsNullOrWhiteSpace(line.Value.line) ? "Unknown Error" : line.Value.line;
+                    var line = await multiStreamReader.ReadLineAsync();
+                    if (line == null) //We've reached the end of the file
+                        break;
+                    if (line.Value.source == Source.Error)
+                    {
+                        var errorText = string.IsNullOrWhiteSpace(line.Value.line) ? "Unknown Error" : line.Value.line;
 
-                    if (errorHandler.ShouldIgnoreError(errorText))
-                        logger.LogWarning(line.Value.line);
+                        if (errorHandler.ShouldIgnoreError(errorText))
+                            logger.LogWarning(line.Value.line);
+                        else
+                            errors.Add(new ErrorBuilder(errorText, ErrorCode.ExternalProcessError));
+
+                    }
                     else
-                        errors.Add(new RunError(errorText, callingProcessName, null, ErrorCode.ExternalProcessError));
-
+                        logger.LogInformation(line.Value.line);
                 }
-                else
-                    logger.LogInformation(line.Value.line);
-            }
 
-            pProcess.WaitForExit();
+                pProcess.WaitForExit();
+            }
+#pragma warning disable CA1031 // Do not catch general exception types
+            catch (Exception e)
+            {
+                errors.Add(new ErrorBuilder(e, ErrorCode.ExternalProcessError));
+            }
+#pragma warning restore CA1031 // Do not catch general exception types
+
 
             if (errors.Any())
             {
-                var e = RunErrorList.Combine(errors);
-                return Result.Failure<Unit, IRunErrors>(e);
+                var e = ErrorBuilderList.Combine(errors);
+                return Result.Failure<Unit, IErrorBuilder>(e);
             }
 
             return Unit.Default;

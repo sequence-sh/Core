@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal;
+using Reductech.EDR.Core.Internal.Errors;
+using Reductech.EDR.Core.Util;
 
 namespace Reductech.EDR.Core.Steps
 {
@@ -16,10 +18,10 @@ namespace Reductech.EDR.Core.Steps
     public sealed class Array<T> : CompoundStep<List<T>>
     {
         /// <inheritdoc />
-        public override async Task<Result<List<T>, IRunErrors>> Run(StateMonad stateMonad, CancellationToken cancellationToken)
+        public override async Task<Result<List<T>, IError>> Run(StateMonad stateMonad, CancellationToken cancellationToken)
         {
             var result = await Elements.Select(x => x.Run(stateMonad, cancellationToken))
-                .Combine(RunErrorList.Combine)
+                .Combine(ErrorList.Combine)
                 .Map(x => x.ToList());
 
             return result;
@@ -61,13 +63,14 @@ namespace Reductech.EDR.Core.Steps
         public override IStepNameBuilder StepNameBuilder => new StepNameBuilderFromTemplate($"[[{nameof(Array<object>.Elements)}]]");
 
         /// <inheritdoc />
-        protected override Result<ITypeReference> GetMemberType(FreezableStepData freezableStepData,
-            TypeResolver typeResolver)
+        protected override Result<ITypeReference, IError> GetMemberType(FreezableStepData freezableStepData, TypeResolver typeResolver)
         {
             var result =
-                freezableStepData.GetListArgument(nameof(Array<object>.Elements))
-                    .Bind(x => x.Select(r => r.TryGetOutputTypeReference(typeResolver)).Combine())
-                    .Bind(x => MultipleTypeReference.TryCreate(x, TypeName));
+                freezableStepData.GetListArgument(nameof(Array<object>.Elements), TypeName)
+                    .MapError(x=>x.WithLocation(this, freezableStepData))
+                    .Bind(x => x.Select(r => r.TryGetOutputTypeReference(typeResolver)).Combine(ErrorList.Combine))
+                    .Bind(x => MultipleTypeReference.TryCreate(x, TypeName)
+                    .MapError(e=>e.WithLocation(this, freezableStepData)));
 
 
             return result;

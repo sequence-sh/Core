@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal;
+using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Util;
 
 namespace Reductech.EDR.Core.Steps
@@ -14,11 +15,11 @@ namespace Reductech.EDR.Core.Steps
     public sealed class AssertTrue : CompoundStep<Unit>
     {
         /// <inheritdoc />
-        public override async Task<Result<Unit, IRunErrors>>  Run(StateMonad stateMonad, CancellationToken cancellationToken)
+        public override async Task<Result<Unit, IError>>  Run(StateMonad stateMonad, CancellationToken cancellationToken)
         {
 
             return await Test.Run(stateMonad, cancellationToken).Ensure(x => x,
-                    new RunError($"Assertion Failed '{Test.Name}'", Name, null, ErrorCode.IndexOutOfBounds))
+                    new SingleError($"Assertion Failed '{Test.Name}'", ErrorCode.IndexOutOfBounds, new StepErrorLocation(this)))
                 .Map(x => Unit.Default);
         }
 

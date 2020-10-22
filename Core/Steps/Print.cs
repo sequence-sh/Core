@@ -6,6 +6,7 @@ using CSharpFunctionalExtensions;
 using Microsoft.Extensions.Logging;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal;
+using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Util;
 
 namespace Reductech.EDR.Core.Steps
@@ -16,7 +17,7 @@ namespace Reductech.EDR.Core.Steps
     public sealed class Print<T> : CompoundStep<Unit>
     {
         /// <inheritdoc />
-        public override async Task<Result<Unit, IRunErrors>>  Run(StateMonad stateMonad, CancellationToken cancellationToken)
+        public override async Task<Result<Unit, IError>>  Run(StateMonad stateMonad, CancellationToken cancellationToken)
         {
             var r = await Value.Run(stateMonad, cancellationToken);
             if (r.IsFailure) return r.ConvertFailure<Unit>();
@@ -62,10 +63,10 @@ namespace Reductech.EDR.Core.Steps
         public override string OutputTypeExplanation => nameof(Unit);
 
         /// <inheritdoc />
-        protected override Result<ITypeReference> GetMemberType(FreezableStepData freezableStepData,
+        protected override Result<ITypeReference, IError> GetMemberType(FreezableStepData freezableStepData,
             TypeResolver typeResolver) =>
-            freezableStepData.GetArgument(nameof(Print<object>.Value))
+            freezableStepData.GetArgument(nameof(Print<object>.Value), TypeName)
+                .MapError(e=>e.WithLocation(this, freezableStepData))
                 .Bind(x => x.TryGetOutputTypeReference(typeResolver));
-
     }
 }

@@ -1,5 +1,6 @@
 ﻿using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Internal;
+using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Util;
 
 namespace Reductech.EDR.Core
@@ -18,8 +19,8 @@ namespace Reductech.EDR.Core
         private EmptySettings() {}
 
         /// <inheritdoc />
-        public Result<Unit, IRunErrors> CheckRequirement(string processName, Requirement requirement) =>
-            new RunError($"Requirement '{requirement}' not met.", processName, null,
+        public Result<Unit, IErrorBuilder> CheckRequirement(Requirement requirement) =>
+            new ErrorBuilder($"Requirement '{requirement}' not met.",
                 ErrorCode.RequirementsNotMet);
     }
 }

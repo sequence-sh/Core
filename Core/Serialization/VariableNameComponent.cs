@@ -1,5 +1,6 @@
 ﻿using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Internal;
+using Reductech.EDR.Core.Util;
 
 namespace Reductech.EDR.Core.Serialization
 {
@@ -20,7 +21,7 @@ namespace Reductech.EDR.Core.Serialization
 
         /// <inheritdoc />
         public Result<string> TryGetText(FreezableStepData data) =>
-            data.GetVariableName(PropertyName)
+            data.GetVariableName(PropertyName, "Type").MapError(x=>x.AsString)
                 .Bind(Serialize);
 
         /// <summary>

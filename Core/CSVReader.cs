@@ -5,19 +5,21 @@ using System.Linq;
 using System.Text;
 using CSharpFunctionalExtensions;
 using Microsoft.VisualBasic.FileIO;
+using Reductech.EDR.Core.Internal;
+using Reductech.EDR.Core.Internal.Errors;
 
 namespace Reductech.EDR.Core
 {
     internal static class CsvReader
     {
 
-        public static Result<DataTable> TryReadCSVFromFile(
+        public static Result<DataTable, IErrorBuilder> TryReadCSVFromFile(
             string filePath, string delimiter, string? commentToken, bool enclosedInQuotes)
         {
             if(filePath == null)
-                return Result.Failure<DataTable>("File path is null.");
+                return new ErrorBuilder("File path is null.", ErrorCode.CSVError);
             if (!File.Exists(filePath))
-                return Result.Failure<DataTable>($"'{filePath}' does not exist.");
+                return new ErrorBuilder($"'{filePath}' does not exist.", ErrorCode.CSVError);
 
             using var csvParser = new TextFieldParser(filePath);
 
@@ -32,11 +34,11 @@ namespace Reductech.EDR.Core
         /// <param name="commentToken">The token to indicate a comment</param>
         /// <param name="enclosedInQuotes">Whether the csv fields are enclosed in quotes</param>
         /// <returns></returns>
-        public static Result<DataTable> TryReadCSVFromString(
+        public static Result<DataTable, IErrorBuilder> TryReadCSVFromString(
             string csvString, string delimiter, string? commentToken, bool enclosedInQuotes)
         {
             if(csvString == null)
-                return Result.Failure<DataTable>("CSV string is null.");
+                return new ErrorBuilder("CSV string is null.", ErrorCode.CSVError);
 
             var byteArray = Encoding.UTF8.GetBytes( csvString );
             var stream = new MemoryStream( byteArray );
@@ -46,10 +48,10 @@ namespace Reductech.EDR.Core
             return TryReadCSV(csvParser, delimiter, commentToken, enclosedInQuotes);
         }
 
-        public static Result<DataTable> TryReadCSV(TextFieldParser csvParser,
+        public static Result<DataTable, IErrorBuilder> TryReadCSV(TextFieldParser csvParser,
             string delimiter, string? commentToken, bool enclosedInQuotes)
         {
-            var errorsSoFar = new List<string>();
+            var errorsSoFar = new List<IErrorBuilder>();
 
             if(commentToken != null)
                 csvParser.CommentTokens = new[] {commentToken};
@@ -67,7 +69,7 @@ namespace Reductech.EDR.Core
             }
             catch (MalformedLineException e)
             {
-                return Result.Failure<DataTable>(e.Message);
+                return new ErrorBuilder(e, ErrorCode.CSVError);
             }
 
             var rowNumber = 1;
@@ -79,23 +81,24 @@ namespace Reductech.EDR.Core
                     var fields = csvParser.ReadFields();
 
                     if (fields.Length != dataTable.Columns.Count)
-                        errorsSoFar.Add($"There were {fields.Length} columns in row {rowNumber} but we expected {dataTable.Columns.Count}.");
+                        errorsSoFar.Add(
+                            new ErrorBuilder($"There were {fields.Length} columns in row {rowNumber} but we expected {dataTable.Columns.Count}.", ErrorCode.CSVError));
                     else
                         dataTable.Rows.Add(fields.ToArray<object>());
 
                 }
                 catch (MalformedLineException e)
                 {
-                    errorsSoFar.Add(e.Message);
+                    errorsSoFar.Add(new ErrorBuilder(e, ErrorCode.CSVError));
                 }
 
                 rowNumber++;
             }
 
             if (errorsSoFar.Any())
-                return Result.Failure<DataTable>(string.Join("\r\n", errorsSoFar));
+                return Result.Failure<DataTable, IErrorBuilder>(ErrorBuilderList.Combine(errorsSoFar));
 
-            return Result.Success(dataTable);
+            return dataTable;
         }
     }
 }

@@ -5,7 +5,7 @@ using System.Linq;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.Internal;
-using Reductech.EDR.Core.Util;
+using Reductech.EDR.Core.Internal.Errors;
 using YamlDotNet.Core;
 using YamlDotNet.Serialization;
 
@@ -39,10 +39,10 @@ namespace Reductech.EDR.Core.Serialization
         /// <summary>
         /// Deserialize this yaml into a step.
         /// </summary>
-        public static Result<IFreezableStep> DeserializeFromYaml(string yaml, StepFactoryStore stepFactoryStore)
+        public static Result<IFreezableStep, IError> DeserializeFromYaml(string yaml, StepFactoryStore stepFactoryStore)
         {
             if(string.IsNullOrWhiteSpace(yaml))
-                return Result.Failure<IFreezableStep>("Yaml is empty.");
+                return new SingleError("Yaml is empty.", ErrorCode.EmptySequence, EntireSequenceLocation.Instance);
 
             var parser = new StepMemberParser(stepFactoryStore);
 
@@ -66,14 +66,16 @@ namespace Reductech.EDR.Core.Serialization
             {
                 stepMember = deserializer.Deserialize<StepMember>(yaml);
             }
+            catch (GeneralSerializerYamlException e)
+            {
+                return Result.Failure<IFreezableStep, IError>(e.Error);
+            }
             catch (YamlException e)
             {
-                return Result.Failure<IFreezableStep>(e.GetFullMessage());
+                return new SingleError(e.GetRealMessage(), ErrorCode.CouldNotParse, new YamlRegionErrorLocation(e.Start, e.End));
             }
 
-
-            return Result.Success(stepMember.ConvertToStep(true));
-
+            return Result.Success<IFreezableStep, IError>(stepMember.ConvertToStep(true));
         }
 
         internal const string TypeString = "Do";

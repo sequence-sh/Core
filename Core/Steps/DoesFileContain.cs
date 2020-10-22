@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal;
+using Reductech.EDR.Core.Internal.Errors;
 
 namespace Reductech.EDR.Core.Steps
 {
@@ -15,32 +16,32 @@ namespace Reductech.EDR.Core.Steps
     public class DoesFileContain : CompoundStep<bool>
     {
         /// <inheritdoc />
-        public override async Task<Result<bool, IRunErrors>> Run(StateMonad stateMonad, CancellationToken cancellationToken)
+        public override async Task<Result<bool, IError>> Run(StateMonad stateMonad, CancellationToken cancellationToken)
         {
             var pathResult = await Path.Run(stateMonad, cancellationToken);
 
             if (pathResult.IsFailure) return pathResult.ConvertFailure<bool>();
 
             if (!File.Exists(pathResult.Value))
-                return new RunError($"File '{pathResult.Value}' does not exist", Name, null,
-                    ErrorCode.ExternalProcessError);
+                return new SingleError($"File '{pathResult.Value}' does not exist",
+                    ErrorCode.ExternalProcessError, new StepErrorLocation(this));
 
             var textResult = await Text.Run(stateMonad, cancellationToken);
             if (textResult.IsFailure) return textResult.ConvertFailure<bool>();
 
-            Maybe<RunError> error;
+            Maybe<SingleError> error;
             string realText;
 
             try
             {
                 realText = await File.ReadAllTextAsync(pathResult.Value, cancellationToken);
-                error = Maybe<RunError>.None;
+                error = Maybe<SingleError>.None;
             }
 #pragma warning disable CA1031 // Do not catch general exception types
             catch (Exception e)
             {
                 realText = "";
-                error = Maybe<RunError>.From(new RunError(e.Message, Name, null, ErrorCode.ExternalProcessError));
+                error = Maybe<SingleError>.From(new SingleError(e.Message, ErrorCode.ExternalProcessError, new StepErrorLocation(this)));
             }
 #pragma warning restore CA1031 // Do not catch general exception types
 

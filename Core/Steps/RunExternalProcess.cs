@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal;
+using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Util;
 
 namespace Reductech.EDR.Core.Steps
@@ -15,7 +16,7 @@ namespace Reductech.EDR.Core.Steps
     public sealed class RunExternalProcess : CompoundStep<Unit>
     {
         /// <inheritdoc />
-        public override async Task<Result<Unit, IRunErrors>> Run(StateMonad stateMonad, CancellationToken cancellationToken)
+        public override async Task<Result<Unit, IError>> Run(StateMonad stateMonad, CancellationToken cancellationToken)
         {
             var pathResult = await ProcessPath.Run(stateMonad, cancellationToken);
             if (pathResult.IsFailure) return pathResult.ConvertFailure<Unit>();
@@ -32,12 +33,11 @@ namespace Reductech.EDR.Core.Steps
                 arguments = argsResult.Value;
             }
 
-            var r =
+            var r = await
                 stateMonad.ExternalProcessRunner.RunExternalProcess(pathResult.Value,
                     stateMonad.Logger,
-                    nameof(RunExternalProcess),
                     IgnoreNoneErrorHandler.Instance,
-                    arguments).Result;
+                    arguments).MapError(x=>x.WithLocation(this));
 
             return r;
         }

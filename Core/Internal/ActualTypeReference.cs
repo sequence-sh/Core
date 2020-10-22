@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using CSharpFunctionalExtensions;
+using Reductech.EDR.Core.Internal.Errors;
 
 namespace Reductech.EDR.Core.Internal
 {
@@ -48,16 +49,16 @@ namespace Reductech.EDR.Core.Internal
         IEnumerable<VariableTypeReference> ITypeReference.VariableTypeReferences => ImmutableArray<VariableTypeReference>.Empty;
 
         /// <inheritdoc />
-        public Result<ActualTypeReference> TryGetActualTypeReference(TypeResolver _) => this;
+        public Result<ActualTypeReference, IErrorBuilder> TryGetActualTypeReference(TypeResolver _) => this;
 
         /// <inheritdoc />
-        public Result<ActualTypeReference> TryGetGenericTypeReference(TypeResolver typeResolver, int argumentNumber)
+        public Result<ActualTypeReference, IErrorBuilder> TryGetGenericTypeReference(TypeResolver typeResolver, int argumentNumber)
         {
             if(!Type.IsGenericType)
-                return Result.Failure<ActualTypeReference>($"'{Type.Name}' is not a generic type.");
+                return new ErrorBuilder($"'{Type.Name}' is not a generic type.", ErrorCode.InvalidCast);
 
             if (argumentNumber < 0 || Type.GenericTypeArguments.Length <= argumentNumber)
-                return Result.Failure<ActualTypeReference>($"'{Type.Name}' does not have an argument at index '{argumentNumber}'");
+                return new ErrorBuilder($"'{Type.Name}' does not have an argument at index '{argumentNumber}'", ErrorCode.InvalidCast);
 
             var t = Type.GenericTypeArguments[argumentNumber];
             return new ActualTypeReference(t);

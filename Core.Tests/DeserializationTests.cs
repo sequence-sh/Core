@@ -249,7 +249,7 @@ Value:
                     "One", "Two");
 
 
-                
+
 
                 yield return new DeserializationTestFunction(@"ForEach(Array = ['a','b','c'], VariableName = <char>, Action = Print(Value = <char>))", "a", "b", "c");
                 yield return new DeserializationTestFunction(@"ForEach(
@@ -283,7 +283,6 @@ Action = Print(Value = <char>))", "a", "b", "c");
             /// <inheritdoc />
             public async Task ExecuteAsync(ITestOutputHelper testOutputHelper)
             {
-
                 testOutputHelper.WriteLine(Yaml);
 
                 var stepFactoryStore = StepFactoryStore.CreateUsingReflection(typeof(StepFactory));
@@ -291,13 +290,18 @@ Action = Print(Value = <char>))", "a", "b", "c");
 
                 var deserializeResult = YamlMethods.DeserializeFromYaml(Yaml, stepFactoryStore);
 
-                deserializeResult.ShouldBeSuccessful();
+                deserializeResult.ShouldBeSuccessful(x=>x.AsString);
 
-                var freezeResult = deserializeResult.Value.TryFreeze().BindCast<IStep, IStep<Unit>>();
+                var freezeResult = deserializeResult.Value.TryFreeze();
 
-                freezeResult.ShouldBeSuccessful();
+                freezeResult.ShouldBeSuccessful(x=>x.AsString);
 
-                var runResult = await freezeResult.Value
+
+                var unitStep = freezeResult.Value as IStep<Unit>;
+
+                unitStep.Should().NotBeNull();
+
+                var runResult = await unitStep!
                     .Run(new StateMonad(logger, EmptySettings.Instance, ExternalProcessRunner.Instance, stepFactoryStore), CancellationToken.None);
 
                 runResult.ShouldBeSuccessful(x => x.AsString);

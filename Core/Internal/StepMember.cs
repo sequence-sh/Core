@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using CSharpFunctionalExtensions;
+using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.Util;
 
@@ -81,14 +82,14 @@ namespace Reductech.EDR.Core.Internal
         /// <summary>
         /// Tries to convert a step member of one type to one of another.
         /// </summary>
-        public Result<StepMember> TryConvert(MemberType newMemberType, bool convertStepListToSequence)
+        public Result<StepMember, IErrorBuilder> TryConvert(MemberType newMemberType, bool convertStepListToSequence)
         {
             if (newMemberType == MemberType)
                 return this;
             else if(newMemberType == MemberType.Step)
                 return new StepMember(ConvertToStep(convertStepListToSequence));
 
-            return Result.Failure<StepMember>($"Could not convert {MemberType} to {newMemberType}");
+            return new ErrorBuilder($"Could not convert {MemberType} to {newMemberType}", ErrorCode.InvalidCast);
 
         }
 

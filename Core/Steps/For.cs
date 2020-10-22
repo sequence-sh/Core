@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal;
+using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Util;
 
 namespace Reductech.EDR.Core.Steps
@@ -52,7 +53,7 @@ namespace Reductech.EDR.Core.Steps
         public IStep<int> Increment { get; set; } = null!;
 
         /// <inheritdoc />
-        public override async Task<Result<Unit, IRunErrors>>  Run(StateMonad stateMonad, CancellationToken cancellationToken)
+        public override async Task<Result<Unit, IError>>  Run(StateMonad stateMonad, CancellationToken cancellationToken)
         {
             var from = await From.Run(stateMonad, cancellationToken);
             if (from.IsFailure) return from.ConvertFailure<Unit>();
@@ -74,7 +75,7 @@ namespace Reductech.EDR.Core.Steps
                 if (r.IsFailure) return r;
 
 
-                var currentValueResult = stateMonad.GetVariable<int>(VariableName, Name);
+                var currentValueResult = stateMonad.GetVariable<int>(VariableName).MapError(e=>e.WithLocation(this));
                 if (currentValueResult.IsFailure) return currentValueResult.ConvertFailure<Unit>();
                 currentValue = currentValueResult.Value;
                 currentValue += increment.Value;
@@ -109,7 +110,7 @@ namespace Reductech.EDR.Core.Steps
 
 
         /// <inheritdoc />
-        public override Result<Maybe<ITypeReference>> GetTypeReferencesSet(VariableName variableName,
+        public override Result<Maybe<ITypeReference>, IError> GetTypeReferencesSet(VariableName variableName,
             FreezableStepData freezableStepData, TypeResolver typeResolver) => Maybe<ITypeReference>.From(new ActualTypeReference(typeof(int)));
     }
 }

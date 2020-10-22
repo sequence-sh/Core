@@ -7,9 +7,5 @@ namespace Reductech.EDR.Core.Internal
     /// </summary>
     public interface IConstantStep : IStep
     {
-        /// <summary>
-        /// The output type.
-        /// </summary>
-        Type OutputType { get; }
     }
 }

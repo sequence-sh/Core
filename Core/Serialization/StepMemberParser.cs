@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -14,6 +13,9 @@ using Superpower.Parsers;
 using Superpower.Tokenizers;
 using Result = CSharpFunctionalExtensions.Result;
 using CSharpFunctionalExtensions;
+using Reductech.EDR.Core.Internal.Errors;
+using YamlDotNet.Core;
+using Unit = Reductech.EDR.Core.Util.Unit;
 
 namespace Reductech.EDR.Core.Serialization
 {
@@ -67,11 +69,17 @@ namespace Reductech.EDR.Core.Serialization
             NotOperator
         }
 
-        private static StepMemberParseError CreateError(Superpower.Model.Result<TokenList<ProcessToken>> result) =>
-            new StepMemberParseError(result.ErrorMessage, result.ErrorPosition, (result.Expectations??Enumerable.Empty<string>()).ToImmutableHashSet());
 
-        private static StepMemberParseError CreateError(TokenListParserResult<ProcessToken, StepMember> result) =>
-            new StepMemberParseError(result.ErrorMessage, result.ErrorPosition, (result.Expectations??Enumerable.Empty<string>()).ToImmutableHashSet());
+
+        private static SingleError CreateError(Superpower.Model.Result<TokenList<ProcessToken>> result, Mark start, Mark end) =>
+            new SingleError(result.ErrorMessage.DefaultIfNullOrWhitespace($"Could not tokenize '{result.Remainder.ToStringValue()}'") ,
+                ErrorCode.CouldNotTokenize,
+                new YamlRegionErrorLocation(start, end,result.ErrorPosition));
+
+        private static SingleError CreateError(TokenListParserResult<ProcessToken, StepMember> result, Mark start, Mark end) =>
+            new SingleError(result.ErrorMessage.DefaultIfNullOrWhitespace($"Could not parse '{result.Remainder}'"),
+                ErrorCode.CouldNotParse,
+                new YamlRegionErrorLocation(start, end, result.ErrorPosition));
 
         private static readonly Tokenizer<ProcessToken> Tokenizer = new TokenizerBuilder<ProcessToken>()
             .Ignore(Span.WhiteSpace)
@@ -110,15 +118,15 @@ namespace Reductech.EDR.Core.Serialization
         /// <summary>
         /// Tries to parse a string as a step member.
         /// </summary>
-        public  Result<StepMember, StepMemberParseError> TryParse(string s)
+        public  Result<StepMember, IError> TryParse(string s, Mark start, Mark end)
         {
             var tokensResult = Tokenizer.TryTokenize(s);
 
             if (!tokensResult.HasValue)
-                return CreateError(tokensResult);
+                return CreateError(tokensResult, start, end);
 
             if (!tokensResult.Remainder.IsAtEnd)
-                return CreateError(tokensResult);
+                return CreateError(tokensResult, start, end);
 
             if(ParseAsConstantString(tokensResult.Value))
                 return new StepMember(new ConstantFreezableStep(s));
@@ -126,13 +134,56 @@ namespace Reductech.EDR.Core.Serialization
             var parseResult = Parser.TryParse(tokensResult.Value);
 
             if (!parseResult.HasValue)
-                return CreateError(parseResult);
+                return CreateError(parseResult, start, end);
 
             if (!parseResult.Remainder.IsAtEnd)
-                return CreateError(parseResult);
+                return CreateError(parseResult, start, end);
 
-            return parseResult.Value;
+            var checkResult = CheckForErrors(parseResult.Value)
+                .MapError(x=>x.WithLocation(start,end));
+
+            return checkResult;
+
         }
+
+        /// <summary>
+        /// Recursively checks the StepMember for errors.
+        /// </summary>
+        private static Result<StepMember, IErrorBuilder> CheckForErrors(StepMember stepMember)
+        {
+            var r = stepMember.Join(x => Unit.Default,
+                CheckForErrors2,
+                x=> x
+                    .Select(CheckForErrors2)
+                    .Combine(ErrorBuilderList.Combine)
+                    .Map(_=> Unit.Default))
+                    .Map(_=> stepMember);
+
+            return r;
+
+
+
+            static Result<Unit, IErrorBuilder> CheckForErrors2(IFreezableStep step)
+            {
+                if (step is ParseError parseError)
+                    return Result.Failure<Unit, IErrorBuilder>(parseError.ErrorBuilder);
+
+                else
+                {
+                    if (step is CompoundFreezableStep compoundStep)
+                    {
+                        var r1 =
+                            compoundStep.FreezableStepData.StepMembersDictionary.Values
+                                .Select(CheckForErrors)
+                                .Combine(ErrorBuilderList.Combine)
+                                .Map(_ => Unit.Default);
+                        return r1;
+                    }
+                    return Unit.Default;
+                }
+            }
+        }
+
 
         private static bool ParseAsConstantString(TokenList<ProcessToken> tokenList) =>
             tokenList.All(x => x.Kind == ProcessToken.FuncOrArgumentName);
@@ -225,16 +276,13 @@ namespace Reductech.EDR.Core.Serialization
 
             Lazy<TokenListParser<ProcessToken, IFreezableStep>> function =
                 new Lazy<TokenListParser<ProcessToken, IFreezableStep>>(()=>
-                    (from x in
                     (from fName in Token.EqualTo(ProcessToken.FuncOrArgumentName)
                      from _1 in Token.EqualTo(ProcessToken.OpenBracket)
                      from args in functionMember
                          .ManyDelimitedBy(Token.EqualTo(ProcessToken.Delimiter),
                       Token.EqualTo(ProcessToken.CloseBracket))
 
-                     select TryCreateProcess(fName.ToStringValue(), StepFactoryStore, args))
-                     where x.IsSuccess
-                     select x.Value).Try()
+                     select CreateProcess(fName.ToStringValue(), StepFactoryStore, args)).Try()
                     );
 
             var operation = mathOperation.Or(booleanOperation).Or(compareOperation);
@@ -267,7 +315,7 @@ namespace Reductech.EDR.Core.Serialization
 
             stepMember = new Lazy<TokenListParser<ProcessToken, StepMember>>(()=>
 
-                     operation
+                (operation
                     .Or(bracketedOperation)
                     .Or(notOperation)
                     .Or(NumberParser)
@@ -277,36 +325,84 @@ namespace Reductech.EDR.Core.Serialization
                     .Or(setVariable)
                     //note: no getVariable here
                     .Or(Parse.Ref(() => function.Value))
-                    .Select(x=> new StepMember(x))
-                    .Or(VariableNameParser.Select(x=> new StepMember(x)))
-                    .Or(array)
+                    .Select(x => new StepMember(x))
+                    .Or(VariableNameParser.Select(x => new StepMember(x)))
+                    .Or(array)).Try()
+
                 );
 
 
             Parser = stepMember.Value;
         }
 
+        /// <summary>
+        /// A temporary object created when there has been some problem in parsing.
+        /// </summary>
+        private sealed class ParseError : IFreezableStep
+        {
+            public ParseError(IErrorBuilder errorBuilder) => ErrorBuilder = errorBuilder;
 
-        private static CSharpFunctionalExtensions.Result<IFreezableStep> TryCreateProcess(string funcName, StepFactoryStore factoryStore, (string argumentName, StepMember stepMember)[] functionArguments)
+            public IErrorBuilder ErrorBuilder { get; }
+
+            /// <inheritdoc />
+            public Result<IStep, IError> TryFreeze(StepContext stepContext) => Result.Failure<IStep, IError>(ErrorBuilder.WithLocation(EntireSequenceLocation.Instance));
+
+            /// <inheritdoc />
+            public Result<IReadOnlyCollection<(VariableName VariableName, ITypeReference typeReference)>, IError> TryGetVariablesSet(TypeResolver typeResolver) => Result.Failure<IReadOnlyCollection<(VariableName VariableName, ITypeReference typeReference)>, IError>(ErrorBuilder.WithLocation(EntireSequenceLocation.Instance));
+
+            /// <inheritdoc />
+            public string StepName => ErrorBuilder.AsString;
+
+            /// <inheritdoc />
+            public Result<ITypeReference, IError> TryGetOutputTypeReference(TypeResolver typeResolver) => Result.Failure<ITypeReference, IError>(ErrorBuilder.WithLocation(EntireSequenceLocation.Instance));
+        }
+
+
+        private static IFreezableStep CreateProcess(string funcName, StepFactoryStore factoryStore,
+            (string argumentName, StepMember stepMember)[] functionArguments)
+        {
+            var (isSuccess, _, value, error) = TryCreateProcess2(funcName, factoryStore, functionArguments);
+            return isSuccess ? value : new ParseError(error);
+        }
+
+        private static Result<IFreezableStep, IErrorBuilder> TryCreateProcess2(string funcName, StepFactoryStore factoryStore, (string argumentName, StepMember stepMember)[] functionArguments)
         {
             if (!factoryStore.Dictionary.TryGetValue(funcName, out var runnableStepFactory))
-                return Result.Failure<IFreezableStep>($"Could not find step '{funcName}'");
+                return Result.Failure<IFreezableStep, IErrorBuilder>( ErrorHelper.MissingStepError(funcName));
 
 
-            var duplicateArguments = functionArguments
-                .GroupBy(x => x.argumentName)
-                .Where(x => x.Count() > 1).ToList();
-
-            if(duplicateArguments.Any())
-                return duplicateArguments.Select(x=> Result.Failure($"Duplicate Argument '{x}'")).Combine()
-                    .ConvertFailure<IFreezableStep>();
-
-            var dictionary = functionArguments.ToDictionary(x => x.argumentName, x => x.stepMember);
+            var dictionary = new Dictionary<string, StepMember>();
+            var errors = new List<IErrorBuilder>();
 
 
-            var fsd = FreezableStepData.TryCreate(runnableStepFactory, dictionary);
+            foreach (var argumentGroup in functionArguments.GroupBy(x=>x.argumentName))
+            {
+                if(argumentGroup.Count() > 1)
+                    errors.Add(ErrorHelper.DuplicateParameterError(argumentGroup.Key));
 
-            return fsd.Map(x => new CompoundFreezableStep(runnableStepFactory, x, null) as IFreezableStep);
+
+                foreach (var sm in argumentGroup.Select(x=>x.stepMember))
+                {
+                    var cr = CheckForErrors(sm);
+                    if(cr.IsFailure)
+                        errors.Add(cr.Error);
+                }
+
+                dictionary.Add(argumentGroup.Key, argumentGroup.First().stepMember);
+            }
+
+
+            var fsd = FreezableStepData.TryCreate(runnableStepFactory, dictionary)
+                .Map(x => new CompoundFreezableStep(runnableStepFactory, x, null) as IFreezableStep);
+
+            if (fsd.IsSuccess)
+            {
+                if (!errors.Any())
+                    return fsd;
+                return Result.Failure<IFreezableStep, IErrorBuilder>(ErrorBuilderList.Combine(errors));
+            }
+
+            return Result.Failure<IFreezableStep, IErrorBuilder>(ErrorBuilderList.Combine(errors.Prepend(fsd.Error)));
         }
 
 
@@ -379,5 +475,49 @@ namespace Reductech.EDR.Core.Serialization
                 .OrderByDescending(x=>x.Length)
                 .Select(x=> Span.EqualToIgnoreCase(x).Try())
                 .Aggregate((a, b) => a.Or(b));
+
+
+
+    }
+
+    /// <summary>
+    /// An error location that contains the relative position in a yaml string where the error occured.
+    /// </summary>
+    public class YamlRegionErrorLocation : IErrorLocation
+    {
+        /// <summary>
+        /// Create a new YamlRegionErrorLocation
+        /// </summary>
+        public YamlRegionErrorLocation(Mark start, Mark end, Position? position = null)
+        {
+            if (position == null)
+                Start = start;
+            else
+            {
+                var errorLine = Math.Max(position.Value.Line - 1, 0);
+                var errorColumn = Math.Max(position.Value.Column - 1, 0);
+                var errorAbsolute = position.Value.Absolute;
+
+
+                Start = new Mark(start.Index + errorAbsolute,
+                    start.Line + errorLine,
+                    start.Column + errorColumn);
+            }
+
+            End = end;
+        }
+
+        /// <summary>
+        /// The beginning of the region.
+        /// </summary>
+        public Mark Start { get; }
+
+        /// <summary>
+        /// The end of the region.
+        /// </summary>
+        public Mark End { get; }
+
+        /// <inheritdoc />
+        public string AsString => $"{Start} - {End}";
     }
 }

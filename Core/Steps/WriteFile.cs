@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal;
+using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Util;
 
 namespace Reductech.EDR.Core.Steps
@@ -16,7 +17,7 @@ namespace Reductech.EDR.Core.Steps
     public sealed class WriteFile  : CompoundStep<Unit>
     {
         /// <inheritdoc />
-        public override async Task<Result<Unit, IRunErrors>> Run(StateMonad stateMonad, CancellationToken cancellationToken)
+        public override async Task<Result<Unit, IError>> Run(StateMonad stateMonad, CancellationToken cancellationToken)
         {
             var data = await Folder.Run(stateMonad, cancellationToken).Compose(() => FileName.Run(stateMonad, cancellationToken),()=> Text.Run(stateMonad, cancellationToken));
 
@@ -26,21 +27,21 @@ namespace Reductech.EDR.Core.Steps
 
             var path = Path.Combine(data.Value.Item1, data.Value.Item2);
 
-            Maybe<IRunErrors> errors;
+            Maybe<IError> errors;
             try
             {
                 await File.WriteAllTextAsync(path, data.Value.Item3, cancellationToken);
-                errors = Maybe<IRunErrors>.None;
+                errors = Maybe<IError>.None;
             }
 #pragma warning disable CA1031 // Do not catch general exception types
             catch (Exception e)
             {
-                errors = Maybe<IRunErrors>.From(new RunError(e.Message, Name, null, ErrorCode.ExternalProcessError));
+                errors = Maybe<IError>.From(new SingleError(e.Message, ErrorCode.ExternalProcessError, new StepErrorLocation(this)));
             }
 #pragma warning restore CA1031 // Do not catch general exception types
 
             if (errors.HasValue)
-                return Result.Failure<Unit, IRunErrors>(errors.Value);
+                return Result.Failure<Unit, IError>(errors.Value);
             return Unit.Default;
 
         }

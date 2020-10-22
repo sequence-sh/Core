@@ -10,6 +10,7 @@ using Microsoft.Extensions.Logging.Abstractions;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.Internal;
+using Reductech.EDR.Core.Internal.Errors;
 using Reductech.Utilities.Testing;
 using Xunit;
 using Xunit.Abstractions;
@@ -237,7 +238,7 @@ namespace Reductech.EDR.Core.Tests
         {
             /// <inheritdoc />
 #pragma warning disable 1998
-            public override async Task<Result<string, IRunErrors>> Run(StateMonad stateMonad, CancellationToken cancellation)
+            public override async Task<Result<string, IError>> Run(StateMonad stateMonad, CancellationToken cancellation)
 #pragma warning restore 1998
             {
                 throw new NotImplementedException();

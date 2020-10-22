@@ -63,6 +63,16 @@ namespace Reductech.EDR.Core.Util
         }
 
         /// <summary>
+        /// Returns the string, unless it is null or whitespace, in which case the backup is returned.
+        /// </summary>
+        public static string DefaultIfNullOrWhitespace(this string s, string backup)
+        {
+            if (string.IsNullOrWhiteSpace(s))
+                return backup;
+            return s;
+        }
+
+        /// <summary>
         /// Tries to parse the enum value. Uses both the name of the enum and the display name.
         /// </summary>
         public static Maybe<T> TryParseValue<T>(string s) where T : Enum
@@ -100,6 +110,21 @@ namespace Reductech.EDR.Core.Util
             var r = dictionary.TryFind(key);
 
             return r.ToResult(error??$"The element '{key}' was not present.");
+        }
+
+
+        /// <summary>
+        /// Tries to get the element. Returns a failure if it is not present.
+        /// </summary>
+#pragma warning disable 8714
+        public static Result<TValue, TError> TryFindOrFail<TKey, TValue, TError>(this IReadOnlyDictionary<TKey, TValue> dictionary,
+            TKey key, Func<TError> error)
+        {
+            var r = dictionary.TryFind(key);
+
+            if (r.HasValue) return r.Value!;
+
+            return error()!;
         }
 
         /// <summary>

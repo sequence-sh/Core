@@ -73,7 +73,55 @@
         /// <summary>
         /// An error reading a CSV file
         /// </summary>
-        CSVError
+        CSVError,
 
+        /// <summary>
+        /// Property did not exist
+        /// </summary>
+        InvalidProperty,
+
+        /// <summary>
+        /// The variable was defined with multiple conflicting types.
+        /// </summary>
+        AmbiguousType,
+
+        /// <summary>
+        /// The type of the variable could not be resolved.
+        /// </summary>
+        CouldNotResolveVariable,
+
+        /// <summary>
+        /// The sequence was empty.
+        /// </summary>
+        EmptySequence,
+
+        /// <summary>
+        /// The step could not be deserialized.
+        /// </summary>
+        CouldNotDeserialize,
+
+        /// <summary>
+        /// The step with the given name does not exist.
+        /// </summary>
+        StepDoesNotExist,
+
+        /// <summary>
+        /// The same argument was given more than once
+        /// </summary>
+        DuplicateParameter,
+        /// <summary>
+        /// The term could not be tokenized
+        /// </summary>
+        CouldNotTokenize,
+
+        /// <summary>
+        /// The term could not be parsed
+        /// </summary>
+        CouldNotParse,
+
+        /// <summary>
+        /// A unexpected parameter was found
+        /// </summary>
+        UnexpectedParameter
     }
 }

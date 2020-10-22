@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using CSharpFunctionalExtensions;
+using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Steps;
+using Reductech.EDR.Core.Util;
 
 namespace Reductech.EDR.Core.Internal
 {
@@ -21,17 +23,17 @@ namespace Reductech.EDR.Core.Internal
         /// <summary>
         /// Gets the type referred to by a reference.
         /// </summary>
-        public Result<Type> TryGetTypeFromReference(ITypeReference typeReference) => typeReference.TryGetActualTypeReference(TypeResolver).Map(x => x.Type);
+        public Result<Type, IErrorBuilder> TryGetTypeFromReference(ITypeReference typeReference) => typeReference.TryGetActualTypeReference(TypeResolver).Map(x => x.Type);
 
         /// <summary>
         /// Tries to create a new StepContext.
         /// </summary>
-        public static Result<StepContext> TryCreate(params IFreezableStep[] freezableSteps)
+        public static Result<StepContext, IError> TryCreate(params IFreezableStep[] freezableSteps)
         {
             var typeResolver = new TypeResolver();
 
             var remainingFreezableSteps = new Stack<IFreezableStep>(freezableSteps);
-            var stepsForLater = new List<(IFreezableStep step, Result error)>();
+            var stepsForLater = new List<(IFreezableStep step, IError error)>();
 
             var changed = false;
 
@@ -41,10 +43,10 @@ namespace Reductech.EDR.Core.Internal
 
                 if (step is CompoundFreezableStep seq && seq.StepFactory == SequenceStepFactory.Instance)
                 {
-                    var stepsResult = seq.FreezableStepData.GetListArgument(nameof(Sequence.Steps));
+                    var stepsResult = seq.FreezableStepData.GetListArgument(nameof(Sequence.Steps), nameof(Sequence));
 
                     if (stepsResult.IsFailure)
-                        return stepsResult.ConvertFailure<StepContext>();
+                        return stepsResult.MapError(x => x.WithLocation(seq)).ConvertFailure<StepContext>();
 
                     foreach (var freezableStep in stepsResult.Value)
                         remainingFreezableSteps.Push(freezableStep);
@@ -59,7 +61,7 @@ namespace Reductech.EDR.Core.Internal
                 if (resolveResult.IsSuccess)
                     changed = true;
                 else
-                    stepsForLater.Add((step, resolveResult));
+                    stepsForLater.Add((step, resolveResult.Error));
 
                 if (!remainingFreezableSteps.Any() && changed && stepsForLater.Any())
                 {
@@ -69,7 +71,7 @@ namespace Reductech.EDR.Core.Internal
                 }
             }
 
-            Result Resolve(IEnumerable<(VariableName variableName, ITypeReference typeReference)> data)
+            Result<Unit, IError> Resolve(IEnumerable<(VariableName variableName, ITypeReference typeReference)> data)
             {
                 var genericReferences = data.Where(x => x.typeReference is GenericTypeReference)
                     .SelectMany(x =>
@@ -81,13 +83,18 @@ namespace Reductech.EDR.Core.Internal
                 var result = references
                     .Select(x => (x.variableName, actualType: x.typeReference.TryGetActualTypeReference(typeResolver)))
                     .Select(x => x.actualType.Bind(y => typeResolver.TryAddType(x.variableName, y)))
-                    .Combine();
+                    .Combine(ErrorBuilderList.Combine)
+                    .Map(_=> Unit.Default)
+                    .MapError(x=>x.WithLocation(EntireSequenceLocation.Instance));
 
                 return result;
             }
 
             if (stepsForLater.Any())
-                return stepsForLater.Select(x => x.error).Combine().ConvertFailure<StepContext>();
+            {
+                var error = ErrorList.Combine(stepsForLater.Select(x => x.error));
+                return error;
+            }
 
             return new StepContext(typeResolver);
         }

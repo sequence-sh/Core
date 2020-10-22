@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal;
+using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Serialization;
 using Reductech.EDR.Core.Util;
 
@@ -40,7 +41,7 @@ namespace Reductech.EDR.Core.Steps
 
 
         /// <inheritdoc />
-        public override async Task<Result<bool, IRunErrors>> Run(StateMonad stateMonad, CancellationToken cancellationToken)
+        public override async Task<Result<bool, IError>> Run(StateMonad stateMonad, CancellationToken cancellationToken)
         {
             var result = await Left.Run(stateMonad, cancellationToken)
                 .Compose(() => Operator.Run(stateMonad, cancellationToken), () => Right.Run(stateMonad, cancellationToken))
@@ -53,7 +54,7 @@ namespace Reductech.EDR.Core.Steps
         /// <inheritdoc />
         public override IStepFactory StepFactory => CompareStepFactory.Instance;
 
-        private static Result<bool, IRunErrors> CompareItems(T item1, CompareOperator compareOperator, T item2)
+        private static Result<bool, IError> CompareItems(T item1, CompareOperator compareOperator, T item2)
         {
             return compareOperator switch
             {
@@ -94,15 +95,19 @@ namespace Reductech.EDR.Core.Steps
         protected override ITypeReference GetOutputTypeReference(ITypeReference memberTypeReference) => new ActualTypeReference(typeof(bool));
 
         /// <inheritdoc />
-        protected override Result<ITypeReference> GetMemberType(FreezableStepData freezableStepData,
+        protected override Result<ITypeReference, IError> GetMemberType(FreezableStepData freezableStepData,
             TypeResolver typeResolver)
         {
-            var result = freezableStepData.GetArgument(nameof(Compare<int>.Left))
+            var result = freezableStepData.GetArgument(nameof(Compare<int>.Left), TypeName)
+                .MapError(e=>e.WithLocation(this, freezableStepData))
                 .Bind(x => x.TryGetOutputTypeReference(typeResolver))
-                .Compose(() => freezableStepData.GetArgument(nameof(Compare<int>.Right))
-                    .Bind(x => x.TryGetOutputTypeReference(typeResolver)))
+                .Compose(() => freezableStepData.GetArgument(nameof(Compare<int>.Right), TypeName)
+                .MapError(e=>e.WithLocation(this, freezableStepData))
+                    .Bind(x => x.TryGetOutputTypeReference(typeResolver))
+                )
                 .Map(x => new[] { x.Item1, x.Item2 })
-                .Bind((x) => MultipleTypeReference.TryCreate(x, TypeName));
+                .Bind((x) => MultipleTypeReference.TryCreate(x, TypeName)
+                .MapError(e=>e.WithLocation(this, freezableStepData)));
 
             return result;
         }

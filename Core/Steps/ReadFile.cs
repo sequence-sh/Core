@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal;
+using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Util;
 
 namespace Reductech.EDR.Core.Steps
@@ -16,7 +17,7 @@ namespace Reductech.EDR.Core.Steps
     public sealed class ReadFile : CompoundStep<string>
     {
         /// <inheritdoc />
-        public override async Task<Result<string, IRunErrors>>  Run(StateMonad stateMonad, CancellationToken cancellationToken)
+        public override async Task<Result<string, IError>>  Run(StateMonad stateMonad, CancellationToken cancellationToken)
         {
             var data = await Folder.Run(stateMonad, cancellationToken).Compose(() => FileName.Run(stateMonad, cancellationToken));
 
@@ -26,7 +27,7 @@ namespace Reductech.EDR.Core.Steps
 
             var path = Path.Combine(data.Value.Item1, data.Value.Item2);
 
-            Result<string, IRunErrors> result;
+            Result<string, IError> result;
             try
             {
                 result = await File.ReadAllTextAsync(path, cancellationToken);
@@ -34,7 +35,7 @@ namespace Reductech.EDR.Core.Steps
 #pragma warning disable CA1031 // Do not catch general exception types
             catch (Exception e)
             {
-                result = new RunError(e.Message, Name, null, ErrorCode.ExternalProcessError);
+                result = new SingleError(e.Message, ErrorCode.ExternalProcessError, new StepErrorLocation(this));
             }
 #pragma warning restore CA1031 // Do not catch general exception types
 

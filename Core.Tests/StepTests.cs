@@ -725,7 +725,7 @@ Two,The second number")
                 var runResult = await yamlRunner.RunSequenceFromYamlStringAsync(yaml, CancellationToken.None);
 
                 //Assert
-                runResult.ShouldBeSuccessful();
+                runResult.ShouldBeSuccessful(x=>x.AsString);
 
                 if(!IgnoreLoggedValues)
                     logger.LoggedValues.Should().BeEquivalentTo(ExpectedLoggedValues);
@@ -749,7 +749,7 @@ Two,The second number")
 
 
                     var newFsd = FreezableStepData.TryCreate(compoundFreezableStep.StepFactory, newDict);
-                    newFsd.ShouldBeSuccessful();
+                    newFsd.ShouldBeSuccessful(x=>x.AsString);
 
                     return new CompoundFreezableStep(compoundFreezableStep.StepFactory, newFsd.Value, new Configuration()
                     {

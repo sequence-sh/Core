@@ -31,9 +31,6 @@ namespace Reductech.EDR.Core.Serialization
             {
                 var r = serializerBlock.TryGetText(data);
 
-
-
-
                 if (r.IsFailure)
                     return r;
                 sb.Append(r.Value);

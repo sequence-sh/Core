@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal;
+using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Serialization;
 using Reductech.EDR.Core.Util;
 
@@ -20,7 +21,7 @@ namespace Reductech.EDR.Core.Steps
     {
 
         /// <inheritdoc />
-        public override async Task<Result<Unit, IRunErrors>>  Run(StateMonad stateMonad, CancellationToken cancellationToken)
+        public override async Task<Result<Unit, IError>>  Run(StateMonad stateMonad, CancellationToken cancellationToken)
         {
             return await Value.Run(stateMonad, cancellationToken)
                 .Bind(x => stateMonad.SetVariable(VariableName, x));
@@ -57,7 +58,7 @@ namespace Reductech.EDR.Core.Steps
         public static StepFactory Instance { get; } = new SetVariableStepFactory();
 
         /// <inheritdoc />
-        public override Result<ITypeReference> TryGetOutputTypeReference(FreezableStepData freezableStepData,
+        public override Result<ITypeReference, IError> TryGetOutputTypeReference(FreezableStepData freezableStepData,
             TypeResolver typeResolver) => new ActualTypeReference(typeof(Unit));
 
         /// <inheritdoc />
@@ -75,10 +76,11 @@ namespace Reductech.EDR.Core.Steps
 
 
         /// <inheritdoc />
-        public override Result<Maybe<ITypeReference>> GetTypeReferencesSet(VariableName variableName,
+        public override Result<Maybe<ITypeReference>, IError> GetTypeReferencesSet(VariableName variableName,
             FreezableStepData freezableStepData, TypeResolver typeResolver)
         {
-            var result = freezableStepData.GetArgument(nameof(SetVariable<object>.Value))
+            var result = freezableStepData.GetArgument(nameof(SetVariable<object>.Value), TypeName)
+                .MapError(e=>e.WithLocation(this, freezableStepData))
                 .Bind(x => x.TryGetOutputTypeReference(typeResolver))
                 .Map(Maybe<ITypeReference>.From);
 
@@ -86,10 +88,11 @@ namespace Reductech.EDR.Core.Steps
         }
 
         /// <inheritdoc />
-        protected override Result<ICompoundStep> TryCreateInstance(StepContext stepContext, FreezableStepData freezableStepData) =>
-            freezableStepData.GetVariableName(nameof(SetVariable<object>.VariableName))
+        protected override Result<ICompoundStep, IError> TryCreateInstance(StepContext stepContext, FreezableStepData freezableStepData) =>
+            freezableStepData.GetVariableName(nameof(SetVariable<object>.VariableName), TypeName)
                 .Bind(x => stepContext.TryGetTypeFromReference(new VariableTypeReference(x)))
-                .Bind(x => TryCreateGeneric(typeof(SetVariable<>), x));
+                .Bind(x => TryCreateGeneric(typeof(SetVariable<>), x))
+        .MapError(e=>e.WithLocation(this, freezableStepData));
 
 
         /// <inheritdoc />

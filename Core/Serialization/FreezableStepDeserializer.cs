@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Internal;
+using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Util;
 using YamlDotNet.Core;
 using YamlDotNet.Core.Events;
@@ -20,18 +22,18 @@ namespace Reductech.EDR.Core.Serialization
 
 
         /// <inheritdoc />
-        public override Result<IFreezableStep, YamlException> TryDeserialize(IParser parser, Func<IParser, Type, object?> nestedObjectDeserializer)
+        public override Result<IFreezableStep, IError> TryDeserialize(IParser parser, Func<IParser, Type, object?> nestedObjectDeserializer)
         {
-            if (parser.Current == null)
-                return new YamlException("Reader is empty");
 
-            var markStart = parser.Current.Start;
-            var markEnd = parser.Current.End;
+            var markStart = parser.Current!.Start;
+            //var markEnd = parser.Current.End;
 
             var dictionary = new Dictionary<string, StepMember>();
 
             IStepFactory? factory = null;
             Configuration? configuration = null;
+
+            var errors = new List<IError>();
 
             parser.Consume<MappingStart>();
             while (!parser.TryConsume<MappingEnd>(out _))
@@ -45,56 +47,65 @@ namespace Reductech.EDR.Core.Serialization
 
                 if (keyResult.Value.Equals(YamlMethods.TypeString, StringComparison.OrdinalIgnoreCase))
                 {
-                    if (factory != null)
-                        return new YamlException(markStart, markEnd, $"Duplicate property '{keyResult.Value}'");
-
                     var typeNameResult = TryDeserializeNested<string>(nestedObjectDeserializer, parser)
                         .Bind(x => StepMemberParser
-                            .StepFactoryStore.Dictionary.TryFindOrFail(x, $"'{x}' is not the name of a Step")
-                            .MapFailure(e => new YamlException(markStart, markEnd, e))
+                            .StepFactoryStore.Dictionary.TryFindOrFail(x, () => ErrorHelper.MissingStepError(x).WithLocation(markStart, parser.Current.End))
                         );
 
                     if (typeNameResult.IsFailure)
-                        return typeNameResult.ConvertFailure<IFreezableStep>();
-
-                    factory = typeNameResult.Value;
+                        errors.Add(typeNameResult.Error);
+                    else if(factory == null)
+                        factory = typeNameResult.Value;
+                    else
+                        errors.Add(ErrorHelper.DuplicateParameterError(keyResult.Value).WithLocation(markStart, parser.Current.End));
                 }
                 else if (keyResult.Value.Equals(YamlMethods.ConfigString, StringComparison.OrdinalIgnoreCase))
                 {
-                    if (configuration != null)
-                        return new YamlException(markStart, markEnd, $"Duplicate property '{keyResult.Value}'");
-
                     var configResult = TryDeserializeNested<Configuration>(nestedObjectDeserializer, parser);
 
                     if (configResult.IsFailure)
-                        return configResult.ConvertFailure<IFreezableStep>();
-
-                    configuration = configResult.Value;
+                        errors.Add(configResult.Error);
+                    else if (configuration == null)
+                        configuration = configResult.Value;
+                    else
+                        errors.Add(ErrorHelper.DuplicateParameterError(keyResult.Value).WithLocation(markStart, parser.Current.End));
                 }
                 else
                 {
-                    if (dictionary.ContainsKey(keyResult.Value))
-                        return new YamlException(markStart, markEnd, $"Duplicate property '{keyResult.Value}'");
-
-
                     var memberResult = TryDeserializeNested<StepMember>(nestedObjectDeserializer, parser);
 
                     if (memberResult.IsFailure)
-                        return memberResult.ConvertFailure<IFreezableStep>();
-
-                    dictionary.Add(keyResult.Value, memberResult.Value);
+                        errors.Add(memberResult.Error);
+                    else if (!dictionary.TryAdd(keyResult.Value, memberResult.Value))
+                        errors.Add(ErrorHelper.DuplicateParameterError(keyResult.Value).WithLocation(markStart, parser.Current.End));
                 }
             }
 
 
             if (factory == null)
-                return new YamlException(markStart, markEnd, $"The '{YamlMethods.TypeString}' property must be set.");
+            {
+                errors.Add(ErrorHelper.MissingParameterError(YamlMethods.TypeString, "Step Definition").WithLocation(new YamlRegionErrorLocation(markStart, parser.Current.End)));
+            }
+            else
+            {
+                var requiredProperties = factory.RequiredProperties.ToHashSet(StringComparer.OrdinalIgnoreCase);
+                requiredProperties.ExceptWith(dictionary.Keys);
 
-            var fsd = FreezableStepData.TryCreate(factory, dictionary);
-            if(fsd.IsFailure)
-                throw new YamlException(fsd.Error);
+                errors.AddRange(requiredProperties
+                    .Select(missing =>
+                        ErrorHelper.MissingParameterError(missing, factory.TypeName)
+                        .WithLocation(markStart, parser.Current.End)));
+            }
 
-            return new CompoundFreezableStep(factory, fsd.Value, configuration);
+            if (errors.Any())
+                return ErrorList.Combine(errors);
+
+
+            var fsd =
+                FreezableStepData.TryCreate(factory!, dictionary)
+                    .MapError(x=> x.WithLocation(new YamlRegionErrorLocation(markStart, parser.Current.End)));
+
+            return new CompoundFreezableStep(factory!, fsd.Value, configuration);
 
         }
     }
