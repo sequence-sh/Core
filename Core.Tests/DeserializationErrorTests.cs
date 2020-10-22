@@ -73,10 +73,9 @@ namespace Reductech.EDR.Core.Tests
                 );
 
 
-                yield return new DeserializationErrorCase(@"- <CsvHeader> = ['a', 'b']
-- <SearchTerms> = ReadCsv(Text = ReadFile(Folder = <CurrentDir>, FileName = <SearchTagCSV>, ColumnsToMap = <CsvHeader>))",
-("Missing Parameter 'ColumnsToMap' in 'ReadCsv'", "Line: 2, Col: 3, Idx: 30 - Line: 2, Col: 121, Idx: 148"),
-("Unexpected Parameter 'ColumnsToMap' in 'ReadFile'", "Line: 2, Col: 3, Idx: 30 - Line: 2, Col: 121, Idx: 148")
+                yield return new DeserializationErrorCase("- <CsvHeader> = ['a', 'b']\n- <SearchTerms> = ReadCsv(Text = ReadFile(Folder = <CurrentDir>, FileName = <SearchTagCSV>, ColumnsToMap = <CsvHeader>))",
+("Missing Parameter 'ColumnsToMap' in 'ReadCsv'", "Line: 2, Col: 3, Idx: 29 - Line: 2, Col: 121, Idx: 147"),
+("Unexpected Parameter 'ColumnsToMap' in 'ReadFile'", "Line: 2, Col: 3, Idx: 29 - Line: 2, Col: 121, Idx: 147")
                     );
 
                 yield return new DeserializationErrorCase(@"
