@@ -8,6 +8,7 @@ using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Serialization;
+using Reductech.EDR.Core.Util;
 
 namespace Reductech.EDR.Core.Steps
 {
@@ -19,7 +20,8 @@ namespace Reductech.EDR.Core.Steps
     {
         /// <inheritdoc />
 #pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
-        public override async Task<Result<T, IError>> Run(StateMonad stateMonad, CancellationToken cancellationToken) => stateMonad.GetVariable<T>(VariableName, Name);
+        public override async Task<Result<T, IError>> Run(StateMonad stateMonad, CancellationToken cancellationToken) =>
+            stateMonad.GetVariable<T>(VariableName).MapError(x=>x.WithLocation(this));
 #pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
 
         /// <inheritdoc />
@@ -55,9 +57,11 @@ namespace Reductech.EDR.Core.Steps
         protected override ITypeReference GetOutputTypeReference(ITypeReference memberTypeReference) => memberTypeReference;
 
         /// <inheritdoc />
-        protected override Result<ITypeReference> GetMemberType(FreezableStepData freezableStepData,
+        protected override Result<ITypeReference, IError> GetMemberType(FreezableStepData freezableStepData,
             TypeResolver typeResolver) =>
             freezableStepData.GetVariableName(nameof(GetVariable<object>.VariableName))
+                .MapError(x=> x.WithLocation(new FreezableStepErrorLocation(this, freezableStepData)))
+
                 .Map(x => new VariableTypeReference(x) as ITypeReference);
 
 

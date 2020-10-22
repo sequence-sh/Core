@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using CSharpFunctionalExtensions;
+using Reductech.EDR.Core.Internal.Errors;
 
 namespace Reductech.EDR.Core.Internal
 {
@@ -11,12 +12,12 @@ namespace Reductech.EDR.Core.Internal
         /// <summary>
         /// Try to freeze this step.
         /// </summary>
-        Result<IStep> TryFreeze(StepContext stepContext);
+        Result<IStep, IError> TryFreeze(StepContext stepContext);
 
         /// <summary>
         /// Gets the variables which may be set by this step and their types.
         /// </summary>
-        Result<IReadOnlyCollection<(VariableName VariableName, ITypeReference typeReference)>> TryGetVariablesSet(TypeResolver typeResolver);
+        Result<IReadOnlyCollection<(VariableName VariableName, ITypeReference typeReference)>, IError> TryGetVariablesSet(TypeResolver typeResolver);
 
 
         /// <summary>
@@ -29,6 +30,6 @@ namespace Reductech.EDR.Core.Internal
         /// The output type of this step. Will be unit if the step does not have an output.
         /// </summary>
         /// <param name="typeResolver"></param>
-        Result<ITypeReference> TryGetOutputTypeReference(TypeResolver typeResolver);
+        Result<ITypeReference, IError> TryGetOutputTypeReference(TypeResolver typeResolver);
     }
 }

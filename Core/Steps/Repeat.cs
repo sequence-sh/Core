@@ -64,9 +64,10 @@ namespace Reductech.EDR.Core.Steps
         protected override ITypeReference GetOutputTypeReference(ITypeReference memberTypeReference) => new GenericTypeReference(typeof(List<>), new[] { memberTypeReference });
 
         /// <inheritdoc />
-        protected override Result<ITypeReference> GetMemberType(FreezableStepData freezableStepData,
+        protected override Result<ITypeReference, IError> GetMemberType(FreezableStepData freezableStepData,
             TypeResolver typeResolver) =>
             freezableStepData.GetArgument(nameof(Repeat<object>.Element))
+                .MapError(x=>x.WithLocation(this, freezableStepData))
                 .Bind(x => x.TryGetOutputTypeReference(typeResolver));
     }
 }

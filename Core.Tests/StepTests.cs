@@ -725,7 +725,7 @@ Two,The second number")
                 var runResult = await yamlRunner.RunSequenceFromYamlStringAsync(yaml, CancellationToken.None);
 
                 //Assert
-                runResult.ShouldBeSuccessful();
+                runResult.ShouldBeSuccessful(x=>x.AsString);
 
                 if(!IgnoreLoggedValues)
                     logger.LoggedValues.Should().BeEquivalentTo(ExpectedLoggedValues);

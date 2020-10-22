@@ -19,7 +19,7 @@ namespace Reductech.EDR.Core.Steps
         {
 
             return await Test.Run(stateMonad, cancellationToken).Ensure(x => x,
-                    new SingleError($"Assertion Failed '{Test.Name}'", Name, null, ErrorCode.IndexOutOfBounds))
+                    new SingleError($"Assertion Failed '{Test.Name}'", ErrorCode.IndexOutOfBounds, new StepErrorLocation(this)))
                 .Map(x => Unit.Default);
         }
 

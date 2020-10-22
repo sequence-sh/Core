@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using CSharpFunctionalExtensions;
+using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Util;
 
 namespace Reductech.EDR.Core.Internal
@@ -48,19 +49,18 @@ namespace Reductech.EDR.Core.Internal
         IEnumerable<VariableTypeReference> ITypeReference.VariableTypeReferences => new[] {this};
 
         /// <inheritdoc />
-        public Result<ActualTypeReference> TryGetActualTypeReference(TypeResolver tr)
+        public Result<ActualTypeReference, IErrorBuilder> TryGetActualTypeReference(TypeResolver tr)
         {
-            var r = tr.Dictionary.TryFindOrFail(VariableName, null);
+            var r = tr.Dictionary.TryFindOrFail(VariableName,
+                ()=> new ErrorBuilder($"Could not resolve variable <{VariableName.Name}>", ErrorCode.CouldNotResolveVariable, null) as IErrorBuilder);
             return r;
         }
 
         /// <inheritdoc />
-        public Result<ActualTypeReference> TryGetGenericTypeReference(TypeResolver typeResolver, int argumentNumber)
+        public Result<ActualTypeReference, IErrorBuilder> TryGetGenericTypeReference(TypeResolver typeResolver, int argumentNumber)
         {
-            var r = typeResolver.Dictionary.TryFindOrFail(VariableName, null)
-                .Bind(x => x.TryGetGenericTypeReference(typeResolver, argumentNumber));
-
-            return r;
+            return TryGetActualTypeReference(typeResolver)
+                .Bind(x=> x.TryGetGenericTypeReference(typeResolver, argumentNumber) );
         }
     }
 }

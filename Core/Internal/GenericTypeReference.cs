@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using CSharpFunctionalExtensions;
+using Reductech.EDR.Core.Internal.Errors;
 
 namespace Reductech.EDR.Core.Internal
 {
@@ -24,16 +25,16 @@ namespace Reductech.EDR.Core.Internal
         public IEnumerable<VariableTypeReference> VariableTypeReferences => ImmutableList<VariableTypeReference>.Empty;
 
         /// <inheritdoc />
-        public Result<ActualTypeReference> TryGetActualTypeReference(TypeResolver typeResolver)
+        public Result<ActualTypeReference, IErrorBuilder> TryGetActualTypeReference(TypeResolver typeResolver)
         {
             var result = ChildTypes
                 .Select(ct => ct.TryGetActualTypeReference(typeResolver))
-                .Combine()
+                .Combine(ErrorBuilderList.Combine)
                 .Bind(x=> Create(GenericType, x));
 
             return result;
 
-            static Result<ActualTypeReference> Create(Type genericType, IEnumerable<ActualTypeReference> actualTypeReferences)
+            static Result<ActualTypeReference, IErrorBuilder> Create(Type genericType, IEnumerable<ActualTypeReference> actualTypeReferences)
             {
                 var arguments = actualTypeReferences.Select(x => x.Type).ToArray();
 
@@ -46,17 +47,17 @@ namespace Reductech.EDR.Core.Internal
 #pragma warning disable CA1031 // Do not catch general exception types
                 catch (Exception e)
                 {
-                    return Result.Failure<ActualTypeReference>(e.Message);
+                    return new ErrorBuilder(e, ErrorCode.InvalidCast);
                 }
 #pragma warning restore CA1031 // Do not catch general exception types
             }
         }
 
         /// <inheritdoc />
-        public Result<ActualTypeReference> TryGetGenericTypeReference(TypeResolver typeResolver, int argumentNumber)
+        public Result<ActualTypeReference, IErrorBuilder> TryGetGenericTypeReference(TypeResolver typeResolver, int argumentNumber)
         {
             if(argumentNumber < 0 || TypeArgumentReferences.Count <= argumentNumber)
-                return Result.Failure<ActualTypeReference>($"'{GenericType.Name}' does not have an argument at index '{argumentNumber}'");
+                return new ErrorBuilder($"'{GenericType.Name}' does not have an argument at index '{argumentNumber}'", ErrorCode.InvalidCast, null);
 
             var r = TypeArgumentReferences[argumentNumber].TryGetActualTypeReference(typeResolver);
 

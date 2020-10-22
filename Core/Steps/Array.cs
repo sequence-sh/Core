@@ -8,6 +8,7 @@ using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
+using Reductech.EDR.Core.Util;
 
 namespace Reductech.EDR.Core.Steps
 {
@@ -62,13 +63,14 @@ namespace Reductech.EDR.Core.Steps
         public override IStepNameBuilder StepNameBuilder => new StepNameBuilderFromTemplate($"[[{nameof(Array<object>.Elements)}]]");
 
         /// <inheritdoc />
-        protected override Result<ITypeReference> GetMemberType(FreezableStepData freezableStepData,
-            TypeResolver typeResolver)
+        protected override Result<ITypeReference, IError> GetMemberType(FreezableStepData freezableStepData, TypeResolver typeResolver)
         {
             var result =
                 freezableStepData.GetListArgument(nameof(Array<object>.Elements))
-                    .Bind(x => x.Select(r => r.TryGetOutputTypeReference(typeResolver)).Combine())
-                    .Bind(x => MultipleTypeReference.TryCreate(x, TypeName));
+                    .MapError(x=>x.WithLocation(this, freezableStepData))
+                    .Bind(x => x.Select(r => r.TryGetOutputTypeReference(typeResolver)).Combine(ErrorList.Combine))
+                    .Bind(x => MultipleTypeReference.TryCreate(x, TypeName)
+                    .MapError(e=>e.WithLocation(this, freezableStepData)));
 
 
             return result;

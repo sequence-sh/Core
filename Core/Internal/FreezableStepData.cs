@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using CSharpFunctionalExtensions;
+using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Util;
 
 namespace Reductech.EDR.Core.Internal
@@ -98,17 +99,20 @@ namespace Reductech.EDR.Core.Internal
         /// <summary>
         /// Gets a variable name.
         /// </summary>
-        public Result<VariableName> GetVariableName(string name) => VariableNameDictionary.TryFindOrFail(name, null);
+        public Result<VariableName, IErrorBuilder> GetVariableName(string name) => VariableNameDictionary.TryFindOrFail(name,
+            ()=> new ErrorBuilder($"The Property '{name}' was not set", ErrorCode.MissingParameter, null) as IErrorBuilder);
 
         /// <summary>
         /// Gets an argument.
         /// </summary>
-        public Result<IFreezableStep> GetArgument(string name) => StepDictionary.TryFindOrFail(name, null);
+        public Result<IFreezableStep, IErrorBuilder> GetArgument(string name) => StepDictionary.TryFindOrFail(name,
+            ()=> new ErrorBuilder($"The Property '{name}' was not set", ErrorCode.MissingParameter, null) as IErrorBuilder);
 
         /// <summary>
         /// Gets a list argument.
         /// </summary>
-        public Result<IReadOnlyList<IFreezableStep>> GetListArgument(string name) => StepListDictionary.TryFindOrFail(name, null);
+        public Result<IReadOnlyList<IFreezableStep>, IErrorBuilder> GetListArgument(string name) => StepListDictionary.TryFindOrFail(name,
+            ()=> new ErrorBuilder($"The Property '{name}' was not set", ErrorCode.MissingParameter, null) as IErrorBuilder);
 
         /// <inheritdoc />
         public override string ToString()

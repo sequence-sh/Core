@@ -10,7 +10,6 @@ namespace Reductech.EDR.Core.Internal
         /// <summary>
         /// The error that should be returned when a parameter is missing.
         /// </summary>
-        public static IError MissingParameterError(string parameterName, string stepName)
-            => new SingleError($"Missing Parameter '{parameterName}'", stepName, null , ErrorCode.MissingParameter);
+        public static IErrorBuilder MissingParameterError(string parameterName) => new ErrorBuilder($"Missing Parameter '{parameterName}'", ErrorCode.MissingParameter);
     }
 }

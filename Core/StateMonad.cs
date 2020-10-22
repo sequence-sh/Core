@@ -48,24 +48,24 @@ namespace Reductech.EDR.Core
         /// <summary>
         /// Get settings of a particular type.
         /// </summary>
-        public Result<T, IError> GetSettings<T>(string stepName) where T : ISettings =>
+        public Result<T, IErrorBuilder> GetSettings<T>() where T : ISettings =>
             Settings.TryCast<T>()
-                .MapFailure(x => new SingleError(x, stepName, null, ErrorCode.MissingStepSettings) as IError);
+                .MapError(x => new ErrorBuilder(x, ErrorCode.MissingStepSettings, null) as IErrorBuilder);
 
         /// <summary>
         /// Gets the current value of this variable.
         /// </summary>
-        public Result<T,IError> GetVariable<T>(VariableName key, string stepName)
+        public Result<T,IErrorBuilder> GetVariable<T>(VariableName key)
         {
             if (_stateDictionary.TryGetValue(key, out var value))
             {
                 if (value is T typedValue)
                     return typedValue;
 
-                return new SingleError($"Variable '{key}' does not have type '{typeof(T)}'.", stepName, null, ErrorCode.WrongVariableType);
+                return new ErrorBuilder($"Variable '{key}' does not have type '{typeof(T)}'.", ErrorCode.WrongVariableType, null);
             }
 
-            return new SingleError($"Variable '{key}' does not exist.", stepName, null, ErrorCode.MissingVariable);
+            return new ErrorBuilder($"Variable '{key}' does not exist.", ErrorCode.MissingVariable, null);
 
 
         }

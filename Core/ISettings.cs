@@ -14,6 +14,6 @@ namespace Reductech.EDR.Core
         /// <summary>
         /// Check that the requirement is met by these settings.
         /// </summary>
-        Result<Unit, IError> CheckRequirement(string processName, Requirement requirement);
+        Result<Unit, IErrorBuilder> CheckRequirement(Requirement requirement);
     }
 }

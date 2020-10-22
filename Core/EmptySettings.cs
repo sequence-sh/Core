@@ -19,8 +19,8 @@ namespace Reductech.EDR.Core
         private EmptySettings() {}
 
         /// <inheritdoc />
-        public Result<Unit, IError> CheckRequirement(string processName, Requirement requirement) =>
-            new SingleError($"Requirement '{requirement}' not met.", processName, null,
-                ErrorCode.RequirementsNotMet);
+        public Result<Unit, IErrorBuilder> CheckRequirement(Requirement requirement) =>
+            new ErrorBuilder($"Requirement '{requirement}' not met.",
+                ErrorCode.RequirementsNotMet, null);
     }
 }

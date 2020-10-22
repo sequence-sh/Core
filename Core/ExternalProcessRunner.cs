@@ -32,10 +32,10 @@ namespace Reductech.EDR.Core
 
 
         /// <inheritdoc />
-        public async Task<Result<Unit, IError>> RunExternalProcess(string processPath, ILogger logger, string callingProcessName, IErrorHandler errorHandler, IEnumerable<string> arguments)
+        public async Task<Result<Unit, IErrorBuilder>> RunExternalProcess(string processPath, ILogger logger, IErrorHandler errorHandler, IEnumerable<string> arguments)
         {
             if (!File.Exists(processPath))
-                return new SingleError($"Could not find '{processPath}'", callingProcessName, null, ErrorCode.ExternalProcessNotFound);
+                return new ErrorBuilder($"Could not find '{processPath}'", ErrorCode.ExternalProcessNotFound, null);
 
             var argumentString = string.Join(' ', arguments.Select(EncodeParameterArgument));
             using var pProcess = new System.Diagnostics.Process
@@ -54,7 +54,7 @@ namespace Reductech.EDR.Core
                 }
             };
 
-            var errors = new List<SingleError>();
+            var errors = new List<IErrorBuilder>();
 
             try
             {
@@ -79,7 +79,7 @@ namespace Reductech.EDR.Core
                         if (errorHandler.ShouldIgnoreError(errorText))
                             logger.LogWarning(line.Value.line);
                         else
-                            errors.Add(new SingleError(errorText, callingProcessName, null, ErrorCode.ExternalProcessError));
+                            errors.Add(new ErrorBuilder(errorText, ErrorCode.ExternalProcessError, null));
 
                     }
                     else
@@ -91,15 +91,15 @@ namespace Reductech.EDR.Core
 #pragma warning disable CA1031 // Do not catch general exception types
             catch (Exception e)
             {
-                errors.Add(new SingleError(e, callingProcessName, ErrorCode.ExternalProcessError));
+                errors.Add(new ErrorBuilder(e, ErrorCode.ExternalProcessError));
             }
 #pragma warning restore CA1031 // Do not catch general exception types
 
 
             if (errors.Any())
             {
-                var e = ErrorList.Combine(errors);
-                return Result.Failure<Unit, IError>(e);
+                var e = ErrorBuilderList.Combine(errors);
+                return Result.Failure<Unit, IErrorBuilder>(e);
             }
 
             return Unit.Default;

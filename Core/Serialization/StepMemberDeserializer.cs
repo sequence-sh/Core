@@ -64,7 +64,7 @@ namespace Reductech.EDR.Core.Serialization
                     //otherwise try to deserialize this a as step member
 
                     var r = StepMemberParser.TryParse(scalar.Value)
-                        .MapFailure(e=> CreateError(reader.Current.Start, reader.Current.End, e, scalar.Value));
+                        .MapError(e=> CreateError(reader.Current.Start, reader.Current.End, e, scalar.Value));
 
                     if (r.IsSuccess)
                     {

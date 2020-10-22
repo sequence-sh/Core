@@ -34,7 +34,7 @@ namespace Reductech.EDR.Core.Steps
             return result;
         }
 
-        private static async Task<Result<Unit, IError>>  CreateFile1(string path, string text, CancellationToken ca)
+        private async Task<Result<Unit, IError>>  CreateFile1(string path, string text, CancellationToken ca)
         {
             Result<Unit, IError> r1;
 
@@ -47,7 +47,7 @@ namespace Reductech.EDR.Core.Steps
 #pragma warning disable CA1031 // Do not catch general exception types
             catch (Exception e)
             {
-                r1 = new SingleError(e.Message, nameof(CreateFile), null, ErrorCode.ExternalProcessError);
+                r1 = new SingleError(e.Message, ErrorCode.ExternalProcessError, new StepErrorLocation(this));
             }
 #pragma warning restore CA1031 // Do not catch general exception types
 

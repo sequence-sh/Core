@@ -18,7 +18,7 @@ namespace Reductech.EDR.Core.Steps
     public sealed class ApplyMathOperator : CompoundStep<int>
     {
         /// <inheritdoc />
-        public override async Task<Result<int, IError>>  Run(StateMonad stateMonad, CancellationToken cancellationToken)
+        public override async Task<Result<int, IError>> Run(StateMonad stateMonad, CancellationToken cancellationToken)
         {
             var left = await Left.Run(stateMonad, cancellationToken);
             if (left.IsFailure) return left;
@@ -35,7 +35,7 @@ namespace Reductech.EDR.Core.Steps
                 MathOperator.Subtract => left.Value - right.Value,
                 MathOperator.Multiply => left.Value * right.Value,
                 MathOperator.Divide when right.Value == 0 => Result.Failure<int, IError>(
-                    new SingleError("Divide by Zero Error", Name, null, ErrorCode.DivideByZero)),
+                    new SingleError("Divide by Zero Error", ErrorCode.DivideByZero, new StepErrorLocation(this), null)),
                 MathOperator.Divide => left.Value / right.Value,
                 MathOperator.Modulo => left.Value % right.Value,
                 MathOperator.Power => Convert.ToInt32(Math.Pow(left.Value, right.Value)),

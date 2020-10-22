@@ -25,7 +25,7 @@ namespace Reductech.EDR.Core.Internal
         public Task<Result<T1, IError>> Run<T1>(StateMonad stateMonad, CancellationToken cancellationToken)
         {
             return Run(stateMonad, cancellationToken).BindCast<T, T1, IError>(
-                    new SingleError($"Could not cast {typeof(T)} to {typeof(T1)}", Name, null, ErrorCode.InvalidCast));
+                    new SingleError($"Could not cast {typeof(T)} to {typeof(T1)}", ErrorCode.InvalidCast, new StepErrorLocation(this), null));
         }
 
         /// <summary>
@@ -125,7 +125,7 @@ namespace Reductech.EDR.Core.Internal
             var r0 = new[] {VerifyThis(settings)};
 
             var rRequirements = RuntimeRequirements.Concat(StepFactory.Requirements)
-                .Select(req => settings.CheckRequirement(Name, req));
+                .Select(req => settings.CheckRequirement(req).MapError(x=>x.WithLocation(this)));
 
 
             var r1 = RunnableArguments.Select(x => x.step.Verify(settings));

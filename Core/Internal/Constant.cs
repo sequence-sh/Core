@@ -40,7 +40,7 @@ namespace Reductech.EDR.Core.Internal
         public async Task<Result<T1, IError>>  Run<T1>(StateMonad stateMonad, CancellationToken cancellationToken)
         {
             var r = Value!.TryConvert<T1>()
-                .MapFailure(x => new SingleError(x, Name, null, ErrorCode.InvalidCast) as IError);
+                .MapError(x => new SingleError(x, ErrorCode.InvalidCast, new StepErrorLocation(this), null) as IError);
 
             return r;
         }

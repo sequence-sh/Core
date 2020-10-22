@@ -75,7 +75,7 @@ namespace Reductech.EDR.Core.Steps
                 if (r.IsFailure) return r;
 
 
-                var currentValueResult = stateMonad.GetVariable<int>(VariableName, Name);
+                var currentValueResult = stateMonad.GetVariable<int>(VariableName).MapError(e=>e.WithLocation(this));
                 if (currentValueResult.IsFailure) return currentValueResult.ConvertFailure<Unit>();
                 currentValue = currentValueResult.Value;
                 currentValue += increment.Value;
@@ -110,7 +110,7 @@ namespace Reductech.EDR.Core.Steps
 
 
         /// <inheritdoc />
-        public override Result<Maybe<ITypeReference>> GetTypeReferencesSet(VariableName variableName,
+        public override Result<Maybe<ITypeReference>, IError> GetTypeReferencesSet(VariableName variableName,
             FreezableStepData freezableStepData, TypeResolver typeResolver) => Maybe<ITypeReference>.From(new ActualTypeReference(typeof(int)));
     }
 }

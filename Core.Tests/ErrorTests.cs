@@ -37,13 +37,13 @@ namespace Reductech.EDR.Core.Tests
                     {
                         VariableName = FooString
                     },
-                    new SingleError("Variable '<Foo>' does not exist.", "<Foo>", null, ErrorCode.MissingVariable));
+                    new ErrorBuilder("Variable '<Foo>' does not exist.", ErrorCode.MissingVariable));
 
                 yield return new ErrorTestFunction("Test assert",
                     new AssertTrue
                     {
                         Test = new Constant<bool>(false)
-                    }, new SingleError($"Assertion Failed '{false}'", "AssertTrue(Test: False)", null, ErrorCode.IndexOutOfBounds));
+                    }, new ErrorBuilder($"Assertion Failed '{false}'", ErrorCode.IndexOutOfBounds));
 
 
                 yield return new ErrorTestFunction("Get variable with wrong type",
@@ -66,7 +66,7 @@ namespace Reductech.EDR.Core.Tests
                             }
                         }
                     },
-                    new SingleError("Variable '<Foo>' does not have type 'System.Boolean'.", "<Foo>", null, ErrorCode.WrongVariableType)
+                    new ErrorBuilder("Variable '<Foo>' does not have type 'System.Boolean'.", ErrorCode.WrongVariableType)
                 );
 
                 yield return new ErrorTestFunction("Assert Error with succeeding step",
@@ -76,7 +76,7 @@ namespace Reductech.EDR.Core.Tests
                         {
                             Test = new Constant<bool>(true)
                         }
-                    }, new SingleError("Expected an error but step was successful.", "AssertError(Test: AssertTrue(Test: True))", null, ErrorCode.AssertionFailed));
+                    }, new ErrorBuilder("Expected an error but step was successful.", ErrorCode.AssertionFailed));
 
 
                 yield return new ErrorTestFunction("Divide by zero",
@@ -86,7 +86,7 @@ namespace Reductech.EDR.Core.Tests
                         Right = new Constant<int>(0),
                         Operator = new Constant<MathOperator>(MathOperator.Divide)
                     },
-                    new SingleError("Divide by Zero Error", "ApplyMathOperator(Left: 1, Operator: /, Right: 0)", null, ErrorCode.DivideByZero));
+                    new ErrorBuilder("Divide by Zero Error", ErrorCode.DivideByZero));
 
                 yield return new ErrorTestFunction("Array Index minus one",
                     new ElementAtIndex<bool>
@@ -94,7 +94,7 @@ namespace Reductech.EDR.Core.Tests
                         Array = new Array<bool>(){Elements = new []{new Constant<bool>(true)}},
                         Index = new Constant<int>(-1)
                     },
-                    new SingleError("Index was out of the range of the array.", "ElementAtIndex(Array: [True], Index: -1)", null, ErrorCode.IndexOutOfBounds)
+                    new ErrorBuilder("Index was out of the range of the array.", ErrorCode.IndexOutOfBounds)
                     );
 
                 yield return new ErrorTestFunction("Array Index out of bounds",
@@ -106,7 +106,7 @@ namespace Reductech.EDR.Core.Tests
                         },
                         Index = new Constant<int>(5)
                     },
-                    new SingleError("Index was out of the range of the array.", "ElementAtIndex(Array: [True; False], Index: 5)", null, ErrorCode.IndexOutOfBounds)
+                    new ErrorBuilder("Index was out of the range of the array.", ErrorCode.IndexOutOfBounds)
                     );
 
 
@@ -115,14 +115,14 @@ namespace Reductech.EDR.Core.Tests
                     {
                         Index = new Constant<int>(-1),
                         String = new Constant<string>("Foo")
-                    }, new SingleError("Index was outside the bounds of the string", "Get character at index '-1' in ''Foo''", null, ErrorCode.IndexOutOfBounds));
+                    }, new ErrorBuilder("Index was outside the bounds of the string", ErrorCode.IndexOutOfBounds));
 
                 yield return new ErrorTestFunction("Get letter out of bounds",
                     new GetLetterAtIndex
                     {
                         Index = new Constant<int>(5),
                         String = new Constant<string>("Foo")
-                    }, new SingleError("Index was outside the bounds of the string", "Get character at index '5' in ''Foo''", null, ErrorCode.IndexOutOfBounds));
+                    }, new ErrorBuilder("Index was outside the bounds of the string", ErrorCode.IndexOutOfBounds));
 
                 yield return new ErrorTestFunction("Get substring minus one",
                     new GetSubstring
@@ -130,7 +130,7 @@ namespace Reductech.EDR.Core.Tests
                         Index = new Constant<int>(-1),
                         String = new Constant<string>("Foo"),
                         Length = new Constant<int>(10)
-                    }, new SingleError("Index was outside the bounds of the string", "GetSubstring(Index: -1, Length: 10, String: 'Foo')", null, ErrorCode.IndexOutOfBounds));
+                    }, new ErrorBuilder("Index was outside the bounds of the string", ErrorCode.IndexOutOfBounds));
 
                 yield return new ErrorTestFunction("Get substring out of bounds",
                     new GetSubstring
@@ -138,7 +138,7 @@ namespace Reductech.EDR.Core.Tests
                         Index = new Constant<int>(5),
                         String = new Constant<string>("Foo"),
                         Length = new Constant<int>(10)
-                    }, new SingleError("Index was outside the bounds of the string", "GetSubstring(Index: 5, Length: 10, String: 'Foo')", null, ErrorCode.IndexOutOfBounds));
+                    }, new ErrorBuilder("Index was outside the bounds of the string", ErrorCode.IndexOutOfBounds));
 
 
 
@@ -150,11 +150,11 @@ namespace Reductech.EDR.Core.Tests
 
         private class ErrorTestFunction : ITestBaseCaseParallel
         {
-            public ErrorTestFunction(string name, IStep process, IError expectedErrors)
+            public ErrorTestFunction(string name, IStep process, IErrorBuilder expectedErrors)
             {
                 Name = name;
                 Process = process;
-                ExpectedErrors = expectedErrors;
+                ExpectedErrors = expectedErrors.WithLocation(process);
             }
 
             /// <inheritdoc />
@@ -177,7 +177,8 @@ namespace Reductech.EDR.Core.Tests
 
                 r.IsFailure.Should().BeTrue("Step should have failed");
 
-                r.Error.GetAllErrors().Should().BeEquivalentTo(ExpectedErrors.GetAllErrors());
+                r.Error.GetAllErrors().Should().BeEquivalentTo(ExpectedErrors.GetAllErrors(),
+                    x=>x.Excluding(se=> se.Location));
 
             }
         }

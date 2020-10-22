@@ -102,6 +102,21 @@ namespace Reductech.EDR.Core.Util
             return r.ToResult(error??$"The element '{key}' was not present.");
         }
 
+
+        /// <summary>
+        /// Tries to get the element. Returns a failure if it is not present.
+        /// </summary>
+#pragma warning disable 8714
+        public static Result<TValue, TError> TryFindOrFail<TKey, TValue, TError>(this IReadOnlyDictionary<TKey, TValue> dictionary,
+            TKey key, Func<TError> error)
+        {
+            var r = dictionary.TryFind(key);
+
+            if (r.HasValue) return r.Value!;
+
+            return error()!;
+        }
+
         /// <summary>
         /// Returns this nullable value as a maybe.
         /// </summary>

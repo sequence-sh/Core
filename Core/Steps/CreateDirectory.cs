@@ -35,7 +35,7 @@ namespace Reductech.EDR.Core.Steps
 #pragma warning disable CA1031 // Do not catch general exception types
             catch (Exception e)
             {
-                r = new SingleError(e.Message, nameof(CreateDirectory), null, ErrorCode.ExternalProcessError);
+                r = new SingleError(e.Message, ErrorCode.ExternalProcessError, new StepErrorLocation(this));
             }
 
             return r;

@@ -22,7 +22,7 @@ namespace Reductech.EDR.Core.Steps
             if (result.IsFailure)
                 return Unit.Default;
 
-            return new SingleError("Expected an error but step was successful.", Name, null, ErrorCode.AssertionFailed);
+            return new SingleError("Expected an error but step was successful.", ErrorCode.AssertionFailed, new StepErrorLocation(this));
         }
 
         /// <inheritdoc />

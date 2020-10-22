@@ -53,12 +53,12 @@ namespace Reductech.EDR.Core.Steps
                 fieldsEnclosedInQuotesResult.Value);
 
             if (dataTableResult.IsFailure) return dataTableResult
-                .MapFailure(x=> new SingleError(x, Name, null, ErrorCode.CSVError) as IError)
+                .MapError(x=> x.WithLocation(this))
                 .ConvertFailure<List<List<string>>>();
 
             var missingColumnsErrors = columnsToMapResult.Value
                 .Where(x => !dataTableResult.Value.Columns.Contains(x))
-                .Select(x=> new SingleError($"Missing Column: '{x}'", Name, null, ErrorCode.CSVError))
+                .Select(x=> new SingleError($"Missing Column: '{x}'", ErrorCode.CSVError, new StepErrorLocation(this)))
                 .ToList();
 
             if (missingColumnsErrors.Any())

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using CSharpFunctionalExtensions;
+using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Serialization;
 
 namespace Reductech.EDR.Core.Internal
@@ -33,12 +34,12 @@ namespace Reductech.EDR.Core.Internal
         /// <summary>
         /// Tries to get a reference to the output type of this step.
         /// </summary>
-        Result<ITypeReference> TryGetOutputTypeReference(FreezableStepData freezableStepData, TypeResolver typeResolver);
+        Result<ITypeReference, IError> TryGetOutputTypeReference(FreezableStepData freezableStepData, TypeResolver typeResolver);
 
         /// <summary>
         /// If this variable is being set. Get the type reference it is being set to.
         /// </summary>
-        Result<Maybe<ITypeReference>> GetTypeReferencesSet(VariableName variableName,
+        Result<Maybe<ITypeReference>, IError> GetTypeReferencesSet(VariableName variableName,
             FreezableStepData freezableStepData, TypeResolver typeResolver) =>
             Maybe<ITypeReference>.None;
 
@@ -60,7 +61,7 @@ namespace Reductech.EDR.Core.Internal
         /// <summary>
         /// Try to create the instance of this type and set all arguments.
         /// </summary>
-        Result<IStep> TryFreeze(StepContext stepContext, FreezableStepData freezableStepData,
+        Result<IStep, IError> TryFreeze(StepContext stepContext, FreezableStepData freezableStepData,
             Configuration? configuration);
 
         /// <summary>

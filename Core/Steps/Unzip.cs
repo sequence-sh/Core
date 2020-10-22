@@ -34,7 +34,7 @@ namespace Reductech.EDR.Core.Steps
 #pragma warning disable CA1031 // Do not catch general exception types
             catch (Exception e)
             {
-                error = Maybe<IError>.From(new SingleError(e.Message, Name, null, ErrorCode.ExternalProcessError));
+                error = Maybe<IError>.From(new SingleError(e.Message, ErrorCode.ExternalProcessError, new StepErrorLocation(this)));
             }
 #pragma warning restore CA1031 // Do not catch general exception types
 

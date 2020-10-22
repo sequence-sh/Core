@@ -38,7 +38,7 @@ namespace Reductech.EDR.Core.Steps
             if (str.IsFailure) return str;
 
             if (index.Value < 0 || index.Value >= str.Value.Length)
-                return new SingleError("Index was outside the bounds of the string", Name, null, ErrorCode.IndexOutOfBounds);
+                return new SingleError("Index was outside the bounds of the string", ErrorCode.IndexOutOfBounds, new StepErrorLocation(this));
 
             return str.Value[index.Value].ToString();
         }

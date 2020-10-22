@@ -23,8 +23,8 @@ namespace Reductech.EDR.Core.Steps
             if (pathResult.IsFailure) return pathResult.ConvertFailure<bool>();
 
             if (!File.Exists(pathResult.Value))
-                return new SingleError($"File '{pathResult.Value}' does not exist", Name, null,
-                    ErrorCode.ExternalProcessError);
+                return new SingleError($"File '{pathResult.Value}' does not exist",
+                    ErrorCode.ExternalProcessError, new StepErrorLocation(this));
 
             var textResult = await Text.Run(stateMonad, cancellationToken);
             if (textResult.IsFailure) return textResult.ConvertFailure<bool>();
@@ -41,7 +41,7 @@ namespace Reductech.EDR.Core.Steps
             catch (Exception e)
             {
                 realText = "";
-                error = Maybe<SingleError>.From(new SingleError(e.Message, Name, null, ErrorCode.ExternalProcessError));
+                error = Maybe<SingleError>.From(new SingleError(e.Message, ErrorCode.ExternalProcessError, new StepErrorLocation(this)));
             }
 #pragma warning restore CA1031 // Do not catch general exception types
 

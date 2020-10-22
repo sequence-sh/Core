@@ -33,12 +33,11 @@ namespace Reductech.EDR.Core.Steps
                 arguments = argsResult.Value;
             }
 
-            var r =
+            var r = await
                 stateMonad.ExternalProcessRunner.RunExternalProcess(pathResult.Value,
                     stateMonad.Logger,
-                    Name,
                     IgnoreNoneErrorHandler.Instance,
-                    arguments).Result;
+                    arguments).MapError(x=>x.WithLocation(this));
 
             return r;
         }

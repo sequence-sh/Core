@@ -51,7 +51,7 @@ namespace Reductech.EDR.Core.Serialization
                     var typeNameResult = TryDeserializeNested<string>(nestedObjectDeserializer, parser)
                         .Bind(x => StepMemberParser
                             .StepFactoryStore.Dictionary.TryFindOrFail(x, $"'{x}' is not the name of a Step")
-                            .MapFailure(e => new YamlException(markStart, markEnd, e))
+                            .MapError(e => new YamlException(markStart, markEnd, e))
                         );
 
                     if (typeNameResult.IsFailure)

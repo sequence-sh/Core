@@ -2,6 +2,7 @@
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Serialization;
+using Reductech.EDR.Core.Util;
 using Reductech.Utilities.Testing;
 using Xunit;
 using Xunit.Abstractions;
@@ -47,11 +48,8 @@ namespace Reductech.EDR.Core.Tests
     Array = ['a','b','c'],
     VariableName = <char>,
     Action = Print(Value = <char>)
-  )", @"'ForEach(
-  Array = ['a','b','c'],
-  VariableName = <char>,
-  Action = Print(Value = <char>)
-)' is a 'String' but it should be a 'Unit' to be a member of 'Sequence'");
+  )",
+@"'ForEach( Array = ['a','b','c'], VariableName = <char>, Action = Print(Value = <char>) )' is a 'String' but it should be a 'Unit' to be a member of 'Sequence'");
 
             }
         }
@@ -76,7 +74,8 @@ namespace Reductech.EDR.Core.Tests
                 var sfs = StepFactoryStore.CreateUsingReflection(typeof(IFreezableStep));
 
                 var result = YamlMethods.DeserializeFromYaml(Name, sfs)
-                    .Bind(x=>x.TryFreeze());
+                    .Bind(x=>x.TryFreeze())
+                    .MapError(x=>x.AsString);
 
                 result.ShouldBeFailure(_expectedError);
             }

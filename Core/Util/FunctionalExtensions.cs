@@ -74,7 +74,7 @@ namespace Reductech.EDR.Core.Util
         /// <summary>
         /// If the result is a failure, convert the error to a string.
         /// </summary>
-        public static Result<T> MapFailure<T, TE>(this Result<T, TE> result, Func<TE, string> convertError)
+        public static Result<T> MapError<T, TE>(this Result<T, TE> result, Func<TE, string> convertError)
         {
             if (result.IsSuccess) return result.Value!;
 
@@ -87,17 +87,17 @@ namespace Reductech.EDR.Core.Util
         /// <summary>
         /// If the result is a failure, convert the error to a string.
         /// </summary>
-        public static async Task<Result<T>> MapFailure<T, TE>(this Task<Result<T, TE>> result, Func<TE, string> convertError)
+        public static async Task<Result<T>> MapError<T, TE>(this Task<Result<T, TE>> result, Func<TE, string> convertError)
         {
             var r1 = await result;
-            return r1.MapFailure(convertError);
+            return r1.MapError(convertError);
         }
 
 
         /// <summary>
         /// If the result is a failure, convert the error to another type.
         /// </summary>
-        public static Result<T, TE> MapFailure<T, TE>(this Result<T> result, Func<string, TE> convertError)
+        public static Result<T, TE> MapError<T, TE>(this Result<T> result, Func<string, TE> convertError)
         {
             if (result.IsSuccess) return result.Value!;
 
@@ -110,16 +110,16 @@ namespace Reductech.EDR.Core.Util
         /// <summary>
         /// If the result is a failure, convert the error to another type.
         /// </summary>
-        public static async Task<Result<T, TE>>  MapFailure<T, TE>(this Task<Result<T>>  result, Func<string, TE> convertError)
+        public static async Task<Result<T, TE>>  MapError<T, TE>(this Task<Result<T>>  result, Func<string, TE> convertError)
         {
             var r1 = await result;
-            return r1.MapFailure(convertError);
+            return r1.MapError(convertError);
         }
 
         /// <summary>
         /// If the result is a failure, convert the error to another type.
         /// </summary>
-        public static Result<T,TE2> MapFailure<T, TE1, TE2>(this Result<T, TE1> result, Func<TE1, TE2> convertError)
+        public static Result<T,TE2> MapError<T, TE1, TE2>(this Result<T, TE1> result, Func<TE1, TE2> convertError)
         {
             if (result.IsSuccess) return result.Value!;
             var error2 = convertError(result.Error);
@@ -129,10 +129,10 @@ namespace Reductech.EDR.Core.Util
         /// <summary>
         /// If the result is a failure, convert the error to another type.
         /// </summary>
-        public static async Task<Result<T, TE2>> MapFailure<T, TE1, TE2>(this Task<Result<T, TE1>>  result, Func<TE1, TE2> convertError)
+        public static async Task<Result<T, TE2>> MapError<T, TE1, TE2>(this Task<Result<T, TE1>>  result, Func<TE1, TE2> convertError)
         {
             var r1 = await result;
-            return r1.MapFailure(convertError);
+            return r1.MapError(convertError);
         }
 
 

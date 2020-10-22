@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using CSharpFunctionalExtensions;
+using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Util;
 
 namespace Reductech.EDR.Core.Internal
@@ -24,7 +25,7 @@ namespace Reductech.EDR.Core.Internal
 
 
         /// <inheritdoc />
-        public Result<IStep> TryFreeze(StepContext _)
+        public Result<IStep, IError> TryFreeze(StepContext _)
         {
             Type elementType = Value.GetType();
             Type stepType = typeof(Constant<>).MakeGenericType(elementType);
@@ -32,13 +33,25 @@ namespace Reductech.EDR.Core.Internal
 
             //TODO check for exceptions here?
 
-            var step = (IStep) stepAsObject!;
+            Result<IStep, IError> result;
 
-            return Result.Success(step);
+            try
+            {
+                var step = (IStep)stepAsObject!;
+                result = Result.Success<IStep, IError>(step);
+            }
+#pragma warning disable CA1031 // Do not catch general exception types
+            catch (Exception e)
+            {
+                result = Result.Failure<IStep, IError>(new SingleError(e, ErrorCode.InvalidCast, new FreezableStepErrorLocation(this)));
+            }
+#pragma warning restore CA1031 // Do not catch general exception types
+
+            return result;
         }
 
         /// <inheritdoc />
-        public Result<IReadOnlyCollection<(VariableName VariableName, ITypeReference typeReference)>> TryGetVariablesSet(TypeResolver typeResolver) =>
+        public Result<IReadOnlyCollection<(VariableName VariableName, ITypeReference typeReference)>, IError> TryGetVariablesSet(TypeResolver typeResolver) =>
             ImmutableList<(VariableName VariableName, ITypeReference type)>.Empty;
 
         /// <inheritdoc />
@@ -58,7 +71,7 @@ namespace Reductech.EDR.Core.Internal
 
         /// <param name="typeResolver"></param>
         /// <inheritdoc />
-        public Result<ITypeReference> TryGetOutputTypeReference(TypeResolver typeResolver) => new ActualTypeReference(Value.GetType());
+        public Result<ITypeReference, IError> TryGetOutputTypeReference(TypeResolver typeResolver) => new ActualTypeReference(Value.GetType());
 
         /// <inheritdoc />
         public override string ToString() => StepName;
