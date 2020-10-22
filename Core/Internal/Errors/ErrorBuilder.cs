@@ -4,17 +4,16 @@ using System.Collections.Generic;
 namespace Reductech.EDR.Core.Internal.Errors
 {
     /// <summary>
-    /// An single error.
+    /// An error without a location.
     /// </summary>
-    public class SingleError : IError
+    public class ErrorBuilder : IErrorBuilder
     {
         /// <summary>
         /// Create a new error.
         /// </summary>
-        public SingleError(string message, ErrorCode errorCode, IErrorLocation location, IError? innerError = null)
+        public ErrorBuilder(string message, ErrorCode errorCode, IError? innerError = null)
         {
             Message = message;
-            Location = location;
             InnerError = innerError;
             Exception = null;
             ErrorCode = errorCode;
@@ -23,14 +22,12 @@ namespace Reductech.EDR.Core.Internal.Errors
         /// <summary>
         /// Create a new error with an exception.
         /// </summary>
-        public SingleError(Exception exception, ErrorCode errorCode, IErrorLocation location)
+        public ErrorBuilder(Exception exception,  ErrorCode errorCode)
         {
             Message = exception.Message;
-            Location = location;
             InnerError = null;
             Exception = exception;
             ErrorCode = errorCode;
-            Timestamp = DateTime.Now;
         }
 
 
@@ -38,16 +35,6 @@ namespace Reductech.EDR.Core.Internal.Errors
         /// Error Message Text.
         /// </summary>
         public string Message { get; }
-
-        /// <summary>
-        /// The time the error was created.
-        /// </summary>
-        public DateTime Timestamp { get; }
-
-        /// <summary>
-        /// The location where this error arose. This could be a line number.
-        /// </summary>
-        public IErrorLocation Location { get; }
 
         /// <summary>
         /// The error that caused this error.
@@ -64,8 +51,23 @@ namespace Reductech.EDR.Core.Internal.Errors
         /// </summary>
         public ErrorCode ErrorCode { get; }
 
+
+        /// <summary>
+        /// Returns a SingleError with the given location.
+        /// </summary>
+        public SingleError WithLocationSingle(IErrorLocation location)
+        {
+            if (Exception != null)
+                return new SingleError(Exception, ErrorCode, location);
+
+            return new SingleError(Message, ErrorCode, location, InnerError);
+        }
+
         /// <inheritdoc />
-        public IEnumerable<SingleError> GetAllErrors()
+        public IError WithLocation(IErrorLocation location) => WithLocationSingle(location);
+
+        /// <inheritdoc />
+        public IEnumerable<ErrorBuilder> GetErrorBuilders()
         {
             yield return this;
         }
