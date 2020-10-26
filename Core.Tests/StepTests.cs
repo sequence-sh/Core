@@ -712,7 +712,7 @@ Two,The second number")
                 //Arrange
                 var pfs = StepFactoryStore.CreateUsingReflection(typeof(StepFactory));
                 var logger = new TestLogger();
-                var yamlRunner = new YamlRunner(EmptySettings.Instance, logger, pfs);
+                var yamlRunner = new YamlRunner(EmptySettings.Instance, logger, ExternalProcessRunner.Instance,  pfs);
 
                 //Act
                 IFreezableStep unfrozen = Step.Unfreeze();

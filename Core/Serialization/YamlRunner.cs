@@ -19,15 +19,21 @@ namespace Reductech.EDR.Core.Serialization
         /// <summary>
         /// Creates a new Yaml Runner
         /// </summary>
-        public YamlRunner(ISettings settings, ILogger logger,  StepFactoryStore stepFactoryStore)
+        public YamlRunner(ISettings settings,
+            ILogger logger,
+            IExternalProcessRunner externalProcessRunner,
+            StepFactoryStore stepFactoryStore)
         {
             _settings = settings;
             _logger = logger;
+            _externalProcessRunner = externalProcessRunner;
             _stepFactoryStore = stepFactoryStore;
+
         }
 
         private readonly ISettings _settings;
         private readonly ILogger _logger;
+        private readonly IExternalProcessRunner _externalProcessRunner;
         private readonly StepFactoryStore _stepFactoryStore;
 
         /// <summary>
@@ -41,13 +47,12 @@ namespace Reductech.EDR.Core.Serialization
         {
             var stepResult = YamlMethods.DeserializeFromYaml(yamlString, _stepFactoryStore)
                     .Bind(x => x.TryFreeze())
-                    .Bind(ConvertToUnitStep)
-                ;
+                    .Bind(ConvertToUnitStep);
 
             if (stepResult.IsFailure)
                 return stepResult.ConvertFailure<Unit>();
 
-            var stateMonad = new StateMonad(_logger, _settings, ExternalProcessRunner.Instance, _stepFactoryStore);
+            var stateMonad = new StateMonad(_logger, _settings, _externalProcessRunner, _stepFactoryStore);
 
             var runResult = await stepResult.Value.Run(stateMonad, cancellationToken);
 

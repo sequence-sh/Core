@@ -31,7 +31,7 @@ namespace Reductech.EDR.Core.Serialization
             /// </summary>
             // ReSharper disable once UnusedMember.Local
             None,
-            [Token(Example = "<Path>")]
+            [Token(Example = "<VariableName>")]
             VariableName,
             [Token(Example = "(")]
             OpenBracket,
@@ -52,10 +52,10 @@ namespace Reductech.EDR.Core.Serialization
             [Token(Example = "==")]
             Comparator,
 
-            [Token(Example = "\"Hello World\"")]
+            [Token(Example = "\"Double-Quoted\"")]
             DoubleQuotedStringLiteral,
 
-            [Token(Example = "'Hello World'")]
+            [Token(Example = "'Single-Quoted'")]
             SingleQuotedStringLiteral,
             [Token(Example = "123")]
             Number,
@@ -63,7 +63,7 @@ namespace Reductech.EDR.Core.Serialization
             Boolean,
             [Token(Example = "MathOperator.And")]
             Enum,
-            [Token(Example = "WriteFile")]
+            [Token(Example = "FuncName")]
             FuncOrArgumentName,
             [Token(Example = "Not")]
             NotOperator
@@ -72,12 +72,12 @@ namespace Reductech.EDR.Core.Serialization
 
 
         private static SingleError CreateError(Superpower.Model.Result<TokenList<ProcessToken>> result, Mark start, Mark end) =>
-            new SingleError(result.ErrorMessage.DefaultIfNullOrWhitespace($"Could not tokenize '{result.Remainder.ToStringValue()}'") ,
+            new SingleError(result.ErrorMessage??result.FormatErrorMessageFragment(),
                 ErrorCode.CouldNotTokenize,
                 new YamlRegionErrorLocation(start, end,result.ErrorPosition));
 
         private static SingleError CreateError(TokenListParserResult<ProcessToken, StepMember> result, Mark start, Mark end) =>
-            new SingleError(result.ErrorMessage.DefaultIfNullOrWhitespace($"Could not parse '{result.Remainder}'"),
+            new SingleError(result.ErrorMessage??result.FormatErrorMessageFragment(),
                 ErrorCode.CouldNotParse,
                 new YamlRegionErrorLocation(start, end, result.ErrorPosition));
 
