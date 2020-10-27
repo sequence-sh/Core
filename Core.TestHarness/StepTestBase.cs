@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using Castle.DynamicProxy.Internal;
 using FluentAssertions;
+using Microsoft.VisualBasic;
 using Namotion.Reflection;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal;
@@ -54,7 +55,7 @@ namespace Reductech.EDR.Core.TestHarness
                     if(hasDefaultAttribute)
                         errors.Add($"{propName} has both required and defaultValueExplanation attributes");
 
-                    if(defaultValue != null)
+                    if(defaultValue != null && !(defaultValue is VariableName vn && vn == default))
                         errors.Add($"{propName} is required but it has a default value");
                 }
                 else if(hasDefaultAttribute)

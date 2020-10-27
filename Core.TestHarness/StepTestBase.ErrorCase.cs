@@ -25,7 +25,7 @@ namespace Reductech.EDR.Core.TestHarness
         }
 
 #pragma warning disable CA1034 // Nested types should not be visible
-        public class ErrorCase : ICase
+        public class ErrorCase :  ICaseWithState
 #pragma warning restore CA1034 // Nested types should not be visible
         {
             public ErrorCase(string name, TStep step, IError expectedError)
@@ -59,6 +59,9 @@ namespace Reductech.EDR.Core.TestHarness
                 SetupMockExternalProcessRunner?.Invoke(externalProcessRunnerMock);
                 var stateMonad = new StateMonad(logger, EmptySettings.Instance, externalProcessRunnerMock.Object, sfs);
 
+                foreach (var (key, value) in InitialState)
+                    stateMonad.SetVariable(key, value).ShouldBeSuccessful(x => x.AsString);
+
                 var output = await Step.Run<TOutput>(stateMonad, CancellationToken.None);
 
                 output.ShouldBeFailure(ExpectedError);
@@ -68,6 +71,9 @@ namespace Reductech.EDR.Core.TestHarness
 
             public TStep Step { get; }
             public IError ExpectedError { get; }
+
+            public Dictionary<VariableName, object> InitialState { get; } = new Dictionary<VariableName, object>();
+            public Dictionary<VariableName, object> ExpectedFinalState { get; } = new Dictionary<VariableName, object>();
 
             public Action<Mock<IExternalProcessRunner>>? SetupMockExternalProcessRunner { get; set; }
         }

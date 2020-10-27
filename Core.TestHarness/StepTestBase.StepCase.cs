@@ -35,7 +35,7 @@ namespace Reductech.EDR.Core.TestHarness
         }
 
 #pragma warning disable CA1034 // Nested types should not be visible
-        public class StepCase : ICase
+        public class StepCase : ICase, ICaseWithState
 #pragma warning restore CA1034 // Nested types should not be visible
         {
             public StepCase(string name, TStep step, TOutput expectedOutput, params object[] expectedLoggedValues)
@@ -52,6 +52,10 @@ namespace Reductech.EDR.Core.TestHarness
             public TOutput ExpectedOutput { get; }
 
             public IReadOnlyCollection<object> ExpectedLoggedValues { get; }
+
+            public Dictionary<VariableName, object> InitialState {get; } = new Dictionary<VariableName, object>();
+
+            public Dictionary<VariableName, object> ExpectedFinalState { get; } = new Dictionary<VariableName, object>();
 
             public Action<Mock<IExternalProcessRunner>>? SetupMockExternalProcessRunner { get; set; }
 
@@ -104,6 +108,9 @@ namespace Reductech.EDR.Core.TestHarness
                 SetupMockExternalProcessRunner?.Invoke(externalProcessRunnerMock);
                 var stateMonad = new StateMonad(logger, EmptySettings.Instance, externalProcessRunnerMock.Object, sfs);
 
+                foreach (var (key, value) in InitialState)
+                    stateMonad.SetVariable(key, value).ShouldBeSuccessful(x => x.AsString);
+
                 var step = GetStep(Step, extraArgument, testOutputHelper, sfs);
 
                 var output = await step.Run<TOutput>(stateMonad, CancellationToken.None);
@@ -113,6 +120,8 @@ namespace Reductech.EDR.Core.TestHarness
                 output.Value.Should().Be(ExpectedOutput);
 
                 logger.LoggedValues.Should().BeEquivalentTo(ExpectedLoggedValues);
+
+                stateMonad.GetState().Should().BeEquivalentTo(ExpectedFinalState);
 
 
                 factory.VerifyAll();

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Concurrent;
+using System.Collections.Generic;
 using CSharpFunctionalExtensions;
 using Microsoft.Extensions.Logging;
 using Reductech.EDR.Core.Internal;
@@ -44,6 +45,12 @@ namespace Reductech.EDR.Core
         /// The step factory store. Maps from step names to step factories.
         /// </summary>
         public StepFactoryStore StepFactoryStore { get; }
+
+        /// <summary>
+        /// Gets all VariableNames and associated objects.
+        /// </summary>
+        /// <returns></returns>
+        public IEnumerable<KeyValuePair<VariableName, object>> GetState() => _stateDictionary;
 
         /// <summary>
         /// Get settings of a particular type.

@@ -27,7 +27,7 @@ namespace Reductech.EDR.Core.TestHarness
         }
 
 #pragma warning disable CA1034 // Nested types should not be visible
-        public class DeserializeCase : ICase
+        public class DeserializeCase : ICaseWithState
 #pragma warning restore CA1034 // Nested types should not be visible
         {
             public DeserializeCase(string name, string yaml, TOutput expectedOutput,
@@ -46,6 +46,10 @@ namespace Reductech.EDR.Core.TestHarness
             public TOutput ExpectedOutput { get; }
 
             public IReadOnlyCollection<object> ExpectedLoggedValues { get; }
+
+            public Dictionary<VariableName, object> InitialState { get; } = new Dictionary<VariableName, object>();
+
+            public Dictionary<VariableName, object> ExpectedFinalState { get; } = new Dictionary<VariableName, object>();
 
             public Action<Mock<IExternalProcessRunner>>? SetupMockExternalProcessRunner { get; set; }
 
@@ -77,6 +81,9 @@ namespace Reductech.EDR.Core.TestHarness
 
                 var stateMonad = new StateMonad(logger, EmptySettings.Instance, externalProcessRunnerMock.Object, sfs);
 
+                foreach (var (key, value) in InitialState)
+                    stateMonad.SetVariable(key, value).ShouldBeSuccessful(x => x.AsString);
+
                 var output = await freezeResult.Value.Run<TOutput>(stateMonad, CancellationToken.None);
 
                 if(output.IsFailure)
@@ -88,6 +95,7 @@ namespace Reductech.EDR.Core.TestHarness
 
                 logger.LoggedValues.Should().BeEquivalentTo(ExpectedLoggedValues);
 
+                stateMonad.GetState().Should().BeEquivalentTo(ExpectedFinalState);
 
                 factory.VerifyAll();
             }
