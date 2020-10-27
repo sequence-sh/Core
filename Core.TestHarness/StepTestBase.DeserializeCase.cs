@@ -26,7 +26,9 @@ namespace Reductech.EDR.Core.TestHarness
             await DeserializeCases.FindAndRunAsync(deserializeCaseName, TestOutputHelper);
         }
 
+#pragma warning disable CA1034 // Nested types should not be visible
         public class DeserializeCase : ICase
+#pragma warning restore CA1034 // Nested types should not be visible
         {
             public DeserializeCase(string name, string yaml, TOutput expectedOutput,
                 params object[] expectedLoggedValues)

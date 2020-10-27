@@ -85,7 +85,7 @@ namespace Reductech.EDR.Core.TestHarness
 
             var stepFactoryType = instance.StepFactory.GetType();
 
-            var constructor = stepFactoryType.GetConstructor(new Type[] { });
+            var constructor = stepFactoryType.GetConstructor(Array.Empty<Type>());
             constructor.Should().BeNull($"{StepName} should not have a public parameterless constructor");
 
             var instanceProperty = stepFactoryType.GetProperty("Instance",

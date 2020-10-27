@@ -34,7 +34,9 @@ namespace Reductech.EDR.Core.TestHarness
             await StepCases.FindAndRunAsync(stepCaseName, TestOutputHelper, StepCase.SerializeArgument);
         }
 
+#pragma warning disable CA1034 // Nested types should not be visible
         public class StepCase : ICase
+#pragma warning restore CA1034 // Nested types should not be visible
         {
             public StepCase(string name, TStep step, TOutput expectedOutput, params object[] expectedLoggedValues)
             {

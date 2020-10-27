@@ -8,7 +8,7 @@ using Xunit;
 
 namespace Reductech.EDR.Core.TestHarness
 {
-    public class NonStaticMemberData : MemberDataAttributeBase
+    public sealed class NonStaticMemberData : MemberDataAttributeBase
     {
         /// <inheritdoc />
         public NonStaticMemberData(string memberName, bool addDefaultIfNoValues, params object[] parameters) : base(memberName, parameters)
@@ -82,7 +82,7 @@ namespace Reductech.EDR.Core.TestHarness
         Func<object?>? GetMethodAccessor(Type type)
         {
             MethodInfo? methodInfo = null;
-            var parameterTypes = Parameters == null ? new Type[0] : Parameters.Select(p => p?.GetType()).ToArray();
+            var parameterTypes = (Parameters ?? Array.Empty<object>()).Select(p => p?.GetType()).ToArray();
             for (var reflectionType = type; reflectionType != null; reflectionType = reflectionType.BaseType)
             {
                 methodInfo =
@@ -144,7 +144,7 @@ namespace Reductech.EDR.Core.TestHarness
         private object?[] ConvertDataItem1(object? item, Type type)
         {
             if (item == null)
-                return new object[0];
+                return Array.Empty<object>();
 
             if (!(item is object?[] array))
                 throw new ArgumentException($"Property {MemberName} on {MemberType ?? type} yielded an item that is not an object?[] (it was {item.GetType().GetDisplayName()})");
