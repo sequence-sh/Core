@@ -36,7 +36,7 @@ namespace Reductech.EDR.Core.Tests
 
                 yield return new DeserializationErrorCase("'Print(Value = 123)'", ("Yaml must represent a step with return type Unit", "Print(Value = 123)"));
 
-                yield return new DeserializationErrorCase("Do:Nothing",("Could not tokenize 'Do:Nothing'", "Line: 1, Col: 1, Idx: 0 - Line: 1, Col: 11, Idx: 10"));
+                yield return new DeserializationErrorCase("Do:Nothing",("unexpected `D`", "Line: 1, Col: 1, Idx: 0 - Line: 1, Col: 11, Idx: 10"));
                 yield return new DeserializationErrorCase("Do: Print\nValue:Hello",
                     ("While scanning a simple key, could not find expected ':'.", "Line: 3, Col: 1, Idx: 21 - Line: 3, Col: 1, Idx: 21"));
 

@@ -74,6 +74,6 @@ namespace Reductech.EDR.Core.Internal.Errors
         public string AsString => Message;
 
         /// <inheritdoc />
-        public override string ToString() => AsString;
+        public override string ToString() => AsString + " in " + Location.AsString;
     }
 }

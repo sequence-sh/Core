@@ -19,6 +19,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="StrykerOutput\**" />
+    <EmbeddedResource Remove="StrykerOutput\**" />
+    <None Remove="StrykerOutput\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Compile Remove="AliasDeserializationTest.cs" />
     <Compile Remove="AssemblyInfo.cs" />
     <Compile Remove="CleverInjectionTest.cs" />
@@ -47,10 +53,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Core\Core.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="StrykerOutput\" />
   </ItemGroup>
 
 </Project>

@@ -122,6 +122,11 @@
         /// <summary>
         /// A unexpected parameter was found
         /// </summary>
-        UnexpectedParameter
+        UnexpectedParameter,
+
+        /// <summary>
+        /// The enum value could not be handled.
+        /// </summary>
+        UnexpectedEnumValue
     }
 }

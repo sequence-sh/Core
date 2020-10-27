@@ -1,11 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Reductech.EDR.Core.Internal.Errors
 {
     /// <summary>
     /// One or more errors caused
     /// </summary>
-    public interface IError
+    public interface IError : IEquatable<IError>
     {
         /// <summary>
         /// The errors.

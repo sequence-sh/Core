@@ -6,40 +6,59 @@ using System.Reflection;
 using Namotion.Reflection;
 using Xunit;
 
-namespace Reductech.EDR.Core.Tests.Steps
+namespace Reductech.EDR.Core.Tests.TestHarness
 {
     public class NonStaticMemberData : MemberDataAttributeBase
     {
         /// <inheritdoc />
-        public NonStaticMemberData(string memberName, params object[] parameters) : base(memberName, parameters)
+        public NonStaticMemberData(string memberName, bool addDefaultIfNoValues, params object[] parameters) : base(memberName, parameters)
         {
+            AddDefaultIfNoValues = addDefaultIfNoValues;
         }
 
+        public bool AddDefaultIfNoValues { get; }
+
         /// <inheritdoc />
-        public override IEnumerable<object[]> GetData(MethodInfo testMethod)
+        public override IEnumerable<object?[]> GetData(MethodInfo testMethod)
         {
+            var reflectedType = testMethod.ReflectedType;
+            if (reflectedType == null)
+                throw new ArgumentException($"{testMethod.Name} does not belong to a type");
 
-            var type = testMethod.ReflectedType;
-            if (type == null)
-                return null;
-
-            var accessor = GetPropertyAccessor(type) ?? GetFieldAccessor(type) ?? GetMethodAccessor(type);
+            var accessor = GetPropertyAccessor(reflectedType) ?? GetFieldAccessor(reflectedType) ?? GetMethodAccessor(reflectedType);
             if (accessor == null)
             {
                 var parameterText = Parameters?.Length > 0 ? $" with parameter types: {string.Join(", ", Parameters.Select(p => p?.GetType().FullName ?? "(null)"))}" : "";
-                throw new ArgumentException($"Could not find public static member (property, field, or method) named '{MemberName}' on {type.FullName}{parameterText}");
+                throw new ArgumentException($"Could not find public static member (property, field, or method) named '{MemberName}' on {reflectedType.FullName}{parameterText}");
             }
 
             var obj = accessor();
             if (obj == null)
-                return null;
+                throw new ArgumentException($"{reflectedType.GetDisplayName()}.{MemberName} is null");
 
             if (!(obj is IEnumerable dataItems))
-                throw new ArgumentException($"Property {MemberName} on {type.FullName} did not return IEnumerable");
+                throw new ArgumentException($"Property {reflectedType.GetDisplayName()}.{MemberName} did not return IEnumerable");
 
-            return dataItems.Cast<object?>().Select(item => ConvertDataItem(testMethod, item));
+            var result = new List<object?[]>();
+
+            foreach (var item in dataItems)
+            {
+                var converted = ConvertDataItem1(item, reflectedType);
+                result.Add(converted);
+            }
+
+            if (result.Count == 0)
+            {
+                if(AddDefaultIfNoValues)
+                    result.Add(testMethod.GetParameters().Select(x => x.DefaultValue).ToArray());
+                else
+                {
+                    throw new ArgumentException($"Property {reflectedType.GetDisplayName()}.{MemberName} did not have any members");
+                }
+            }
+
+            return result;
         }
-
 
 
         Func<object?>? GetFieldAccessor(Type type)
@@ -119,18 +138,26 @@ namespace Reductech.EDR.Core.Tests.Steps
             return instance;
         }
 
-        /// <inheritdoc/>
-        protected override object?[] ConvertDataItem(
-            MethodInfo testMethod,
-            object? item)
+
+
+
+        private object?[] ConvertDataItem1(object? item, Type type)
         {
             if (item == null)
                 return new object[0];
 
             if (!(item is object?[] array))
-                throw new ArgumentException($"Property {MemberName} on {MemberType ?? testMethod.DeclaringType} yielded an item that is not an object?[] (it was {item.GetType().GetDisplayName()})");
+                throw new ArgumentException($"Property {MemberName} on {MemberType ?? type} yielded an item that is not an object?[] (it was {item.GetType().GetDisplayName()})");
 
             return array;
+        }
+
+        /// <inheritdoc/>
+        protected override object?[] ConvertDataItem(
+            MethodInfo testMethod,
+            object? item)
+        {
+            return ConvertDataItem1(item, testMethod.DeclaringType!);
         }
 
         static bool ParameterTypesCompatible(

@@ -355,6 +355,18 @@ namespace Reductech.EDR.Core.Serialization
 
             /// <inheritdoc />
             public Result<ITypeReference, IError> TryGetOutputTypeReference(TypeResolver typeResolver) => Result.Failure<ITypeReference, IError>(ErrorBuilder.WithLocation(EntireSequenceLocation.Instance));
+
+            public bool Equals(IFreezableStep? other)
+            {
+                return other is ParseError pe && ErrorBuilder.Equals(pe.ErrorBuilder);
+            }
+
+            /// <inheritdoc />
+            public override bool Equals(object? obj) => ReferenceEquals(this, obj) || obj is IFreezableStep other && Equals(other);
+
+
+            /// <inheritdoc />
+            public override int GetHashCode() => ErrorBuilder.GetHashCode();
         }
 
 
@@ -519,5 +531,24 @@ namespace Reductech.EDR.Core.Serialization
 
         /// <inheritdoc />
         public string AsString => $"{Start} - {End}";
+
+        /// <inheritdoc />
+        public bool Equals(IErrorLocation? other)
+        {
+            if (other is null) return false;
+            if (ReferenceEquals(this, other)) return true;
+            return other is YamlRegionErrorLocation y && Start.Equals(y.Start) && End.Equals(y.End);
+        }
+
+        /// <inheritdoc />
+        public override bool Equals(object? obj)
+        {
+            if (obj is null) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            return obj is IErrorLocation errorLocation && Equals(errorLocation);
+        }
+
+        /// <inheritdoc />
+        public override int GetHashCode() => HashCode.Combine(Start, End);
     }
 }

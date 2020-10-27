@@ -10,7 +10,7 @@ namespace Reductech.EDR.Core.Internal
     /// <summary>
     /// A step that is not a constant or a variable reference.
     /// </summary>
-    public sealed class CompoundFreezableStep : IFreezableStep, IEquatable<CompoundFreezableStep>
+    public sealed class CompoundFreezableStep : IFreezableStep
     {
         /// <summary>
         /// Creates a new CompoundFreezableStep.
@@ -85,29 +85,25 @@ namespace Reductech.EDR.Core.Internal
         public override string ToString() => StepName;
 
         /// <inheritdoc />
-        public bool Equals(CompoundFreezableStep? other)
+        public bool Equals(IFreezableStep? other)
         {
             if (other is null) return false;
             if (ReferenceEquals(this, other)) return true;
-            return StepFactory.Equals(other.StepFactory) &&
-                   FreezableStepData.Equals(other.FreezableStepData) &&
-                   Equals(StepConfiguration, other.StepConfiguration);
+
+            if (other is CompoundFreezableStep fs)
+            {
+                return StepFactory.Equals(fs.StepFactory) &&
+                   FreezableStepData.Equals(fs.FreezableStepData) &&
+                   Equals(StepConfiguration, fs.StepConfiguration);
+            }
+
+            return false;
         }
 
         /// <inheritdoc />
-        public override bool Equals(object? obj) => ReferenceEquals(this, obj) || obj is CompoundFreezableStep other && Equals(other);
+        public override bool Equals(object? obj) => ReferenceEquals(this, obj) || obj is IFreezableStep other && Equals(other);
 
         /// <inheritdoc />
         public override int GetHashCode() => HashCode.Combine(StepFactory, FreezableStepData, StepConfiguration);
-
-        /// <summary>
-        /// Equals Operator.
-        /// </summary>
-        public static bool operator ==(CompoundFreezableStep? left, CompoundFreezableStep? right) => Equals(left, right);
-
-        /// <summary>
-        /// Not Equals Operator.
-        /// </summary>
-        public static bool operator !=(CompoundFreezableStep? left, CompoundFreezableStep? right) => !Equals(left, right);
     }
 }
