@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Reflection;
-using Castle.DynamicProxy.Internal;
-using FluentAssertions;
 using Namotion.Reflection;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal;
@@ -12,7 +10,7 @@ using Xunit;
 using Xunit.Abstractions;
 using Xunit.Sdk;
 
-namespace Reductech.EDR.Core.Tests.TestHarness
+namespace Core.TestHarness
 {
     public abstract partial class StepTestBase<TStep, TOutput> where TStep : ICompoundStep<TOutput>, new()
     {

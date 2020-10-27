@@ -3,14 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Moq;
+using Reductech.EDR.Core;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
-using Reductech.Utilities.Testing;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace Reductech.EDR.Core.Tests.TestHarness
+namespace Core.TestHarness
 {
     public abstract partial class StepTestBase<TStep, TOutput>
     {

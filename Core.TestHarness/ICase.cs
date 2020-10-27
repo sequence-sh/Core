@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Xunit.Abstractions;
 
-namespace Reductech.EDR.Core.Tests.TestHarness
+namespace Core.TestHarness
 {
     public interface ICase
     {

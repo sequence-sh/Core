@@ -3,17 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using FluentAssertions;
-using Moq;
 using Namotion.Reflection;
+using Reductech.EDR.Core;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Serialization;
-using Reductech.Utilities.Testing;
 using Xunit;
 using Xunit.Abstractions;
 using Xunit.Sdk;
 
-namespace Reductech.EDR.Core.Tests.TestHarness
+namespace Core.TestHarness
 {
     public abstract partial class StepTestBase<TStep, TOutput>
     {
