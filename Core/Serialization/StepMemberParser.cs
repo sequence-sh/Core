@@ -93,6 +93,8 @@ namespace Reductech.EDR.Core.Serialization
 
             //VariableName must be before comparator
             .Match(Span.Regex("<[a-z0-9-_]+>", RegexOptions.Compiled | RegexOptions.IgnoreCase), ProcessToken.VariableName)
+            .Match(Span.Regex(@"-?[0-9]+", RegexOptions.Compiled), ProcessToken.Number) //Number must come before MathOperator
+
 
             .Match(GetSpan(MathOperator.None), ProcessToken.MathOperator)
             .Match(GetSpan(BooleanOperator.None), ProcessToken.BooleanOperator, true)
@@ -105,7 +107,7 @@ namespace Reductech.EDR.Core.Serialization
 
             .Match(Span.EqualToIgnoreCase(true.ToString()).Or(Span.EqualToIgnoreCase(false.ToString())), ProcessToken.Boolean, true)
             .Match(Span.EqualToIgnoreCase("not"), ProcessToken.NotOperator, true)
-            .Match(Span.Regex(@"[0-9]+", RegexOptions.Compiled), ProcessToken.Number)
+
             .Match(Span.Regex(@"[a-z0-9-_]+\.[a-z0-9-_]+", RegexOptions.Compiled | RegexOptions.IgnoreCase), ProcessToken.Enum, true)
 
             .Match(Span.Regex("[a-z0-9-_]+", RegexOptions.Compiled | RegexOptions.IgnoreCase), ProcessToken.FuncOrArgumentName, true)
