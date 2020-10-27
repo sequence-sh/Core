@@ -1,11 +1,31 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <AssemblyName>Reductech.EDR.Core.TestHarness</AssemblyName>
     <RootNamespace>Reductech.EDR.Core.TestHarness</RootNamespace>
     <Nullable>enable</Nullable>
+    <Version>0.2.1$(VersionSuffix)</Version>
   </PropertyGroup>
+
+
+  <PropertyGroup>
+    <PackageId>Reductech.EDR.Core.TestHarness</PackageId>
+    <Title>EDR Core SDK TestHarness</Title>
+    <Description>Class library for testing steps which use EDR Core.</Description>
+    <Product>EDR</Product>
+
+    <PackageProjectUrl>https://gitlab.com/reductech/edr/core</PackageProjectUrl>
+    <RepositoryUrl>https://gitlab.com/reductech/edr/core</RepositoryUrl>
+    <PackageReleaseNotes>Please see https://gitlab.com/reductech/edr/core/-/releases</PackageReleaseNotes>
+    <PackageTags>ediscovery;forensics;automation;orchestration;edrm;testing</PackageTags>
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+
+    <Authors>reductech</Authors>
+    <Company>Reductech</Company>
+    <Copyright>Copyright (c) 2020 Reductech Ltd</Copyright>
+  </PropertyGroup>
+
 
   <ItemGroup>
     <PackageReference Include="FluentAssertions" Version="5.10.3" />
