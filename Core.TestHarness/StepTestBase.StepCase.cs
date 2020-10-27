@@ -117,7 +117,7 @@ namespace Reductech.EDR.Core.TestHarness
 
                 output.ShouldBeSuccessful(x => x.AsString);
 
-                output.Value.Should().Be(ExpectedOutput);
+                output.Value.Should().BeEquivalentTo(ExpectedOutput);
 
                 logger.LoggedValues.Should().BeEquivalentTo(ExpectedLoggedValues);
 

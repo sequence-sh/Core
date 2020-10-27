@@ -24,8 +24,14 @@ namespace Reductech.EDR.Core.Tests.Steps
                         Operator = Constant(MathOperator.Divide),
                         Right = Constant(0)
                     },
-                    new ErrorBuilder("Divide by Zero Error", ErrorCode.DivideByZero)
-                    );
+                    new ErrorBuilder("Divide by Zero Error", ErrorCode.DivideByZero));
+
+                yield return new ErrorCase("Math Operator.None", new ApplyMathOperator
+                {
+                    Left = Constant(1),
+                    Operator = Constant(MathOperator.None),
+                    Right = Constant(2)
+                }, new ErrorBuilder($"Could not apply '{MathOperator.None}'", ErrorCode.UnexpectedEnumValue) );
             } }
 
         /// <inheritdoc />

@@ -39,7 +39,7 @@ namespace Reductech.EDR.Core.Steps
                 MathOperator.Divide => left.Value / right.Value,
                 MathOperator.Modulo => left.Value % right.Value,
                 MathOperator.Power => Convert.ToInt32(Math.Pow(left.Value, right.Value)),
-                _ => throw new ArgumentOutOfRangeException()
+                _ => new SingleError($"Could not apply '{@operator.Value}'", ErrorCode.UnexpectedEnumValue, new StepErrorLocation(this))
             };
 
             return result;

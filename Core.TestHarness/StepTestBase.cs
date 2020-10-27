@@ -5,7 +5,6 @@ using System.Linq;
 using System.Reflection;
 using Castle.DynamicProxy.Internal;
 using FluentAssertions;
-using Microsoft.VisualBasic;
 using Namotion.Reflection;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal;
@@ -60,7 +59,7 @@ namespace Reductech.EDR.Core.TestHarness
                 }
                 else if(hasDefaultAttribute)
                 {
-                    if(!propertyInfo.PropertyType.IsNullableType() && defaultValue == null)
+                    if(propertyInfo.CustomAttributes.All(x => x.AttributeType.Name != "NullableAttribute") && defaultValue == null)
                         errors.Add($"{propName} has a default value explanation but is not nullable and it's default value is null");
                 }
                 else
@@ -82,7 +81,7 @@ namespace Reductech.EDR.Core.TestHarness
 
             instance.StepFactory.Should().NotBeNull();
 
-            instance.StepFactory.StepType.Should().Be(typeof(TStep));
+            instance.StepFactory.StepType.Name.Should().Be(typeof(TStep).Name);//Compare type names because of generic types
 
             var stepFactoryType = instance.StepFactory.GetType();
 

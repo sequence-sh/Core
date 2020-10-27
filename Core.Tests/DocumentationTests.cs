@@ -73,40 +73,41 @@ namespace Reductech.EDR.Core.Tests
 
                     );
 
+                //TODO test enums
 
-                yield return new DocumentationTestCase(
-                    new List<IStepFactory>
-                    {
-                        ApplyMathOperatorStepFactory.Instance
-                    },
-                    "# Contents",
-                    "|Step                                   |Summary                                                                              |",
-                    "|:-------------------------------------:|:-----------------------------------------------------------------------------------:|",
-                    "|[ApplyMathOperator](#ApplyMathOperator)|Applies a mathematical operator to two integers. Returns the result of the operation.|",
-                    "# Core",
-                    "<a name=\"ApplyMathOperator\"></a>",
-                    "## ApplyMathOperator",
-                    "**Int32**",
-                    "Applies a mathematical operator to two integers. Returns the result of the operation.",
-                    "|Parameter|Type                         |Required|Summary               |",
-                    "|:-------:|:---------------------------:|:------:|:--------------------:|",
-                    "|Left     |`int`                        |☑️      |The left operand.     |",
-                    "|Operator |[MathOperator](#MathOperator)|☑️      |The operator to apply.|",
-                    "|Right    |`int`                        |☑️      |The right operand.    |",
-                    "# Enums",
-                    "<a name=\"MathOperator\"></a>",
-                    "## MathOperator",
-                    "An operator that can be applied to two numbers.",
-                    "|Name    |Summary                                          |",
-                    "|:------:|:-----------------------------------------------:|",
-                    "|None    |Sentinel value                                   |",
-                    "|Add     |Add the left and right operands.                 |",
-                    "|Subtract|Subtract the right operand from the left.        |",
-                    "|Multiply|Multiply the left and right operands.            |",
-                    "|Divide  |Divide the left operand by the right.            |",
-                    "|Modulo  |Reduce the left operand modulo the right.        |",
-                    "|Power   |Raise the left operand to the power of the right.|"
-                );
+                //yield return new DocumentationTestCase(
+                //    new List<IStepFactory>
+                //    {
+                //        ApplyMathOperatorStepFactory.Instance
+                //    },
+                //    "# Contents",
+                //    "|Step                                   |Summary                                                                              |",
+                //    "|:-------------------------------------:|:-----------------------------------------------------------------------------------:|",
+                //    "|[ApplyMathOperator](#ApplyMathOperator)|Applies a mathematical operator to two integers. Returns the result of the operation.|",
+                //    "# Core",
+                //    "<a name=\"ApplyMathOperator\"></a>",
+                //    "## ApplyMathOperator",
+                //    "**Int32**",
+                //    "Applies a mathematical operator to two integers. Returns the result of the operation.",
+                //    "|Parameter|Type                         |Required|Summary               |",
+                //    "|:-------:|:---------------------------:|:------:|:--------------------:|",
+                //    "|Left     |`int`                        |☑️      |The left operand.     |",
+                //    "|Operator |[MathOperator](#MathOperator)|☑️      |The operator to apply.|",
+                //    "|Right    |`int`                        |☑️      |The right operand.    |",
+                //    "# Enums",
+                //    "<a name=\"MathOperator\"></a>",
+                //    "## MathOperator",
+                //    "An operator that can be applied to two numbers.",
+                //    "|Name    |Summary                                          |",
+                //    "|:------:|:-----------------------------------------------:|",
+                //    "|None    |Sentinel value                                   |",
+                //    "|Add     |Add the left and right operands.                 |",
+                //    "|Subtract|Subtract the right operand from the left.        |",
+                //    "|Multiply|Multiply the left and right operands.            |",
+                //    "|Divide  |Divide the left operand by the right.            |",
+                //    "|Modulo  |Reduce the left operand modulo the right.        |",
+                //    "|Power   |Raise the left operand to the power of the right.|"
+                //);
 
                 yield return new DocumentationTestCase(
                     new List<IStepFactory>
