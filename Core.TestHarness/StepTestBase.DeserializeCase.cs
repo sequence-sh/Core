@@ -3,13 +3,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Reductech.EDR.Core;
+using FluentAssertions;
+using Moq;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Serialization;
+using Reductech.Utilities.Testing;
 using Xunit;
 using Xunit.Abstractions;
+using Xunit.Sdk;
 
-namespace Core.TestHarness
+namespace Reductech.EDR.Core.TestHarness
 {
     public abstract partial class StepTestBase<TStep, TOutput>
     {
@@ -73,6 +76,9 @@ namespace Core.TestHarness
                 var stateMonad = new StateMonad(logger, EmptySettings.Instance, externalProcessRunnerMock.Object, sfs);
 
                 var output = await freezeResult.Value.Run<TOutput>(stateMonad, CancellationToken.None);
+
+                if(output.IsFailure)
+                    throw new XunitException(output.Error.AsString);
 
                 output.ShouldBeSuccessful(x => x.AsString);
 

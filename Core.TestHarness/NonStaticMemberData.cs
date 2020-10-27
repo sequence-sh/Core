@@ -6,7 +6,7 @@ using System.Reflection;
 using Namotion.Reflection;
 using Xunit;
 
-namespace Core.TestHarness
+namespace Reductech.EDR.Core.TestHarness
 {
     public class NonStaticMemberData : MemberDataAttributeBase
     {

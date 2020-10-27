@@ -1,12 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Reductech.EDR.Core;
+using FluentAssertions;
 using Reductech.EDR.Core.Serialization;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace Core.TestHarness
+namespace Reductech.EDR.Core.TestHarness
 {
     public abstract partial class StepTestBase<TStep, TOutput>
     {

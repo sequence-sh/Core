@@ -135,13 +135,23 @@ namespace Reductech.EDR.Core.Internal
         {
             if (other is null) return false;
             if (ReferenceEquals(this, other)) return true;
-            return DictionariesEqual(VariableNameDictionary, other.VariableNameDictionary) &&
-                DictionariesEqual(StepDictionary, other.StepDictionary) &&
-                DictionariesEqual(StepListDictionary, other.StepListDictionary);
+            if (!DictionariesEqual1(VariableNameDictionary, other.VariableNameDictionary)) return false;
+            if (!DictionariesEqual2(StepDictionary, other.StepDictionary)) return false;
+            if (!DictionariesEqual3(StepListDictionary, other.StepListDictionary)) return false;
+            return true;
 
-            static bool DictionariesEqual<T>(IReadOnlyDictionary<string, T> dict1, IReadOnlyDictionary<string, T> dict2) =>
+            static bool DictionariesEqual1(IReadOnlyDictionary<string, VariableName> dict1, IReadOnlyDictionary<string, VariableName> dict2) =>
                 dict1.Count == dict2.Count &&
-                dict1.Keys.All(key => dict2.ContainsKey(key) && dict1[key]!.Equals(dict2[key]));
+                dict1.Keys.All(key => dict2.ContainsKey(key) && dict1[key].Equals(dict2[key]));
+
+            static bool DictionariesEqual2(IReadOnlyDictionary<string, IFreezableStep> dict1, IReadOnlyDictionary<string, IFreezableStep> dict2) =>
+                dict1.Count == dict2.Count &&
+                dict1.Keys.All(key => dict2.ContainsKey(key) && dict1[key].Equals(dict2[key]));
+
+
+            static bool DictionariesEqual3(IReadOnlyDictionary<string, IReadOnlyList<IFreezableStep>> dict1, IReadOnlyDictionary<string, IReadOnlyList<IFreezableStep>> dict2) =>
+                dict1.Count == dict2.Count &&
+                dict1.Keys.All(key => dict2.ContainsKey(key) && dict1[key].SequenceEqual(dict2[key]));
         }
 
         /// <inheritdoc />

@@ -5,7 +5,7 @@ using Namotion.Reflection;
 using Xunit.Abstractions;
 using Xunit.Sdk;
 
-namespace Core.TestHarness
+namespace Reductech.EDR.Core.TestHarness
 {
     public static class CaseHelper
     {

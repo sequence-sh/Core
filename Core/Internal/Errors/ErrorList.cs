@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Reductech.EDR.Core.Internal.Errors
@@ -28,5 +29,19 @@ namespace Reductech.EDR.Core.Internal.Errors
         /// Combine multiple run errors.
         /// </summary>
         public static ErrorList Combine(IEnumerable<IError> source) => new ErrorList(source.SelectMany(x => x.GetAllErrors()).ToList());
+
+        /// <inheritdoc />
+        public bool Equals(IError? other) => other != null && _allErrors.SequenceEqual(other.GetAllErrors());
+
+        /// <inheritdoc />
+        public override bool Equals(object? obj)
+        {
+            if (obj is null) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            return obj is IError e && Equals(e);
+        }
+
+        /// <inheritdoc />
+        public override int GetHashCode() => HashCode.Combine(_allErrors.First().GetHashCode(), _allErrors.Count);
     }
 }

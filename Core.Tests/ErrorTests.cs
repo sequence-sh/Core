@@ -67,6 +67,10 @@ namespace Reductech.EDR.Core.Tests
                         }
                     },
                     new ErrorBuilder("Variable '<Foo>' does not have type 'System.Boolean'.", ErrorCode.WrongVariableType)
+                        .WithLocation(new GetVariable<bool>
+                        {
+                            VariableName = FooString
+                        })
                 );
 
                 yield return new ErrorTestFunction("Assert Error with succeeding step",
@@ -157,6 +161,13 @@ namespace Reductech.EDR.Core.Tests
                 ExpectedErrors = expectedErrors.WithLocation(process);
             }
 
+            public ErrorTestFunction(string name, IStep process, IError expectedErrors)
+            {
+                Name = name;
+                Process = process;
+                ExpectedErrors = expectedErrors;
+            }
+
             /// <inheritdoc />
             public string Name { get; }
 
@@ -177,8 +188,7 @@ namespace Reductech.EDR.Core.Tests
 
                 r.IsFailure.Should().BeTrue("Step should have failed");
 
-                r.Error.GetAllErrors().Should().BeEquivalentTo(ExpectedErrors.GetAllErrors(),
-                    x=>x.Excluding(se=> se.Location));
+                r.Error.GetAllErrors().Should().BeEquivalentTo(ExpectedErrors.GetAllErrors());
 
             }
         }
