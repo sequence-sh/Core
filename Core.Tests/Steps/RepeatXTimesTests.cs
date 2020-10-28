@@ -23,7 +23,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                     {
                         Action = new Print<int>(){Value = Constant(6)},
                         Number = Constant(3)
-                    }, Unit.Default, 6,6,6
+                    }, Unit.Default, "6","6","6"
                     );
 
             }
@@ -35,7 +35,7 @@ namespace Reductech.EDR.Core.Tests.Steps
             get
             {
                 yield return new DeserializeCase("Print something three times",
-                    "RepeatXTimes(Action = Print(Value = 6), Number = 3)", Unit.Default, 6,6,6
+                    "RepeatXTimes(Action = Print(Value = 6), Number = 3)", Unit.Default, "6","6","6"
                     );
 
 

@@ -69,7 +69,10 @@ namespace Reductech.EDR.Core.Steps
             var setResult = stateMonad.SetVariable(VariableName, currentValue);
             if (setResult.IsFailure) return setResult.ConvertFailure<Unit>();
 
-            while (currentValue <= to.Value)
+            if(increment.Value == 0)
+                return new SingleError("Cannot do a For loop with an increment of 0", ErrorCode.DivideByZero, new StepErrorLocation(this));
+
+            while (increment.Value > 0? currentValue <= to.Value : currentValue >= to.Value)
             {
                 var r = await Action.Run(stateMonad, cancellationToken);
                 if (r.IsFailure) return r;

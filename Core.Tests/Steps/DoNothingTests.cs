@@ -27,10 +27,12 @@ namespace Reductech.EDR.Core.Tests.Steps
         {
             get
             {
-                yield return new DeserializeCase("Do nothing", "DoNothing", Unit.Default);
+                yield return new DeserializeCase("Do nothing", "DoNothing()", Unit.Default);
             }
 
         }
 
+        /// <inheritdoc />
+        protected override IEnumerable<ErrorCase> ErrorCases => new List<ErrorCase>();
     }
 }

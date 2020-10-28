@@ -46,6 +46,7 @@ namespace Reductech.EDR.Core.Steps
         /// The Else branch, if it exists.
         /// </summary>
         [StepProperty]
+        [Required]
         public IStep<T> ElseValue { get; set; } = null!;
     }
 

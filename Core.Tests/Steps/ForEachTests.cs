@@ -27,17 +27,8 @@ namespace Reductech.EDR.Core.Tests.Steps
                         VariableName = new VariableName("Foo")
                     },
                     Unit.Default,
-                    3,2,1)
+                    "3", "2", "1")
                     .WithExpectedFinalState("Foo", 1);
-
-                yield return new StepCase("No elements",
-                    new ForEach<int>
-                    {
-                        Action = new Print<int> { Value = GetVariable<int>("Foo") },
-                        Array = new Array<int>{Elements = new List<IStep<int>>()},
-                        VariableName = new VariableName("Foo")
-                    },
-                    Unit.Default);
 
 
             }
@@ -48,7 +39,7 @@ namespace Reductech.EDR.Core.Tests.Steps
         {
             get
             {
-                yield return new DeserializeCase("Simple Foreach", "Foreach(Action = Print(Value = <Foo>), Array = [3,2,1], VariableName = <Foo>)", Unit.Default, 3,2,1)
+                yield return new DeserializeCase("Simple Foreach", "Foreach(Action = Print(Value = <Foo>), Array = [3,2,1], VariableName = <Foo>)", Unit.Default, "3", "2", "1")
                     .WithExpectedFinalState("Foo", 1);
             }
 

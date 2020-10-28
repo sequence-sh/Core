@@ -20,18 +20,18 @@ namespace Reductech.EDR.Core.Tests.Steps
             get
             {
                 yield return new StepCase("Index 0",
-                    new ElementAtIndex<string>()
+                    new ElementAtIndex<string>
                     {
-                        Index = Constant(1),
+                        Index = Constant(0),
                         Array = Array("Hello", "World")
                     }, "Hello");
 
                 yield return new StepCase("Index 1",
-                    new ElementAtIndex<string>()
+                    new ElementAtIndex<string>
                     {
                         Index = Constant(1),
                         Array = Array("Hello", "World")
-                    }, "Hello");
+                    }, "World");
             }
         }
 
@@ -41,10 +41,10 @@ namespace Reductech.EDR.Core.Tests.Steps
             get
             {
                 yield return new DeserializeCase("Index 0",
-                    "ElementAtIndex(Array = ['Hello', 'World'], Index = 0", "Hello");
+                    "ElementAtIndex(Array = ['Hello', 'World'], Index = 0)", "Hello");
 
                 yield return new DeserializeCase("Index 1",
-                    "ElementAtIndex(Array = ['Hello', 'World'], Index = 1", "Hello");
+                    "ElementAtIndex(Array = ['Hello', 'World'], Index = 1)", "World");
 
             }
         }
@@ -56,10 +56,10 @@ namespace Reductech.EDR.Core.Tests.Steps
                 yield return new ErrorCase("Index -1",
                     new ElementAtIndex<string>()
                     {
-                        Index = Constant(1),
+                        Index = Constant(-1),
                         Array = Array("Hello", "World")
                     },
-                    new ErrorBuilder("Index", ErrorCode.IndexOutOfBounds)
+                    new ErrorBuilder("Index was out of the range of the array.", ErrorCode.IndexOutOfBounds)
                     );
 
                 yield return new ErrorCase("Index too big",
@@ -68,7 +68,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                         Index = Constant(2),
                         Array = Array("Hello", "World")
                     },
-                    new ErrorBuilder("Index", ErrorCode.IndexOutOfBounds)
+                    new ErrorBuilder("Index was out of the range of the array.", ErrorCode.IndexOutOfBounds)
                     );
 
 

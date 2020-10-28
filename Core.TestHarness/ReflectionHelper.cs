@@ -45,12 +45,12 @@ namespace Reductech.EDR.Core.TestHarness
                 if (currentValue == null)
                 {
                     var newValue = CreateSimpleStep(property.PropertyType, ref index);
-                    values.Add(property.Name, newValue.Unfreeze().StepName);
+                    values.Add(property.Name, GetString(newValue));
                     property.SetValue(instance, newValue);
                 }
                 else
                 {
-                    values.Add(property.Name, (currentValue as IStep).Name);
+                    values.Add(property.Name, GetString((IStep) currentValue));
                 }
             }
 
@@ -60,7 +60,7 @@ namespace Reductech.EDR.Core.TestHarness
                 if (currentValue == null)
                 {
                     var newValue = CreateStepListOfType(property.PropertyType, 3, ref index);
-                    var newValueString = CreateArrayString(newValue.Select(x => x.Unfreeze().StepName));
+                    var newValueString = CreateArrayString(newValue.Select(GetString));
 
                     values.Add(property.Name, newValueString);
                     property.SetValue(instance, newValue);
@@ -69,7 +69,7 @@ namespace Reductech.EDR.Core.TestHarness
                 {
                     var currentValueString =
                         CreateArrayString(
-                            (currentValue as IReadOnlyList<IStep>).Select(x => x.Unfreeze().StepName));
+                            (currentValue as IReadOnlyList<IStep>).Select(GetString));
 
                     values.Add(property.Name, currentValueString);
                 }
@@ -79,6 +79,16 @@ namespace Reductech.EDR.Core.TestHarness
                     return $"[{string.Join(", ", elements)}]";
                 }
             }
+        }
+
+        private static string GetString(IStep step)
+        {
+            var freezable = step.Unfreeze();
+
+            if (freezable is ConstantFreezableStep cfs)
+                return ConstantFreezableStep.WriteValue(cfs.Value, true);
+
+            return freezable.StepName;
         }
 
         private static void MatchStepPropertyInfo(PropertyInfo stepPropertyInfo,
@@ -148,6 +158,28 @@ namespace Reductech.EDR.Core.TestHarness
 
                 return Constant(list);
             }
+            if (outputType == typeof(List<int>))
+            {
+                var list = new List<int>();
+                for (var i = 0; i < 3; i++)
+                {
+                    list.Add(index);
+                    index++;
+                }
+
+                return Constant(list);
+            }
+
+            if (outputType.IsEnum)
+            {
+                var v = Enum.GetValues(outputType).OfType<object>().First();
+
+                var constantType = typeof(Constant<>).MakeGenericType(outputType);
+                var constant = Activator.CreateInstance(constantType, new[] {v});
+
+                return (IStep) constant!;
+            }
+
 
             throw new XunitException($"Cannot create a constant step with type {outputType.GetDisplayName()}");
         }

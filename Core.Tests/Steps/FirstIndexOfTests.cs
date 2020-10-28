@@ -22,7 +22,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                     {
                         String = Constant("Hello"),
                         SubString = Constant("lo")
-                    }, 4
+                    }, 3
                 );
 
                 yield return new StepCase("Substring is no present",
@@ -41,7 +41,7 @@ namespace Reductech.EDR.Core.Tests.Steps
         {
             get
             {
-                yield return new DeserializeCase("Present", "FirstIndexOf(String = 'Hello', Substring = 'lo')", 4);
+                yield return new DeserializeCase("Present", "FirstIndexOf(String = 'Hello', Substring = 'lo')", 3);
 
             }
 

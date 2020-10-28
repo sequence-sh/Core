@@ -60,7 +60,7 @@ namespace Reductech.EDR.Core.Internal
         {
             get
             {
-                var r = WriteValue(Value);
+                var r = WriteValue(Value, false);
                 return r;
             }
         }
@@ -68,18 +68,23 @@ namespace Reductech.EDR.Core.Internal
         /// <summary>
         /// Serialize a value.
         /// </summary>
-        private static string WriteValue(object value)
+        public static string WriteValue(object value, bool prefixEnumNames)
         {
             if (value is string s)
                 return $"'{s}'";
 
             if (value is Enum e)
-                return e.GetDisplayName();
+            {
+                if(!prefixEnumNames)
+                    return e.GetDisplayName();
+
+                return e.GetType().Name + "." + e;
+            }
 
             if (value is IEnumerable<object> enumerable)
             {
 
-                var r = string.Join(", ", enumerable.Select(WriteValue));
+                var r = string.Join(", ", enumerable.Select(x=> WriteValue(x, prefixEnumNames)));
 
                 return $"[{r}]";
             }

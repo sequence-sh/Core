@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.TestHarness;
@@ -42,5 +43,22 @@ namespace Reductech.EDR.Core.Tests.Steps
 
         }
 
+        /// <inheritdoc />
+        protected override IEnumerable<SerializeCase> SerializeCases
+        {
+            get
+            {
+                yield return new SerializeCase("Short form",
+                    new Sequence
+                    {
+                        Steps = new List<IStep<Unit>>
+                        {
+                            new DoNothing(),
+                            new DoNothing(),
+                            new DoNothing()
+                        }
+                    }, $"- DoNothing(){Environment.NewLine}- DoNothing(){Environment.NewLine}- DoNothing()" );
+            }
+        }
     }
 }

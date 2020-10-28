@@ -21,14 +21,14 @@ namespace Reductech.EDR.Core.TestHarness
         public IEnumerable<object?[]> StepCaseNames => StepCases.Select(x => new[] {x.Name});
 
         [Theory]
-        [NonStaticMemberData(nameof(StepCaseNames), false)]
+        [NonStaticMemberData(nameof(StepCaseNames), true)]
         public async Task Should_behave_as_expected_when_run(string stepCaseName)
         {
             await StepCases.FindAndRunAsync(stepCaseName, TestOutputHelper);
         }
 
         [Theory]
-        [NonStaticMemberData(nameof(StepCaseNames), false)]
+        [NonStaticMemberData(nameof(StepCaseNames), true)]
         public async Task Should_behave_as_expected_when_serialized_deserialized_and_executed(string stepCaseName)
         {
             await StepCases.FindAndRunAsync(stepCaseName, TestOutputHelper, StepCase.SerializeArgument);

@@ -51,5 +51,17 @@ namespace Reductech.EDR.Core.Tests.Steps
 
         }
 
+        /// <inheritdoc />
+        protected override IEnumerable<SerializeCase> SerializeCases {
+            get
+            {
+                yield return new SerializeCase("Short form",
+                    new SetVariable<int>
+                    {
+                        Value = Constant(42),
+                        VariableName = new VariableName("Foo")
+                    }, "<Foo> = 42"
+                    );
+            } }
     }
 }
