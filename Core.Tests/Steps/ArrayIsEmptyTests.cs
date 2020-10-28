@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Collections.Immutable;
 using JetBrains.Annotations;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Steps;
@@ -69,30 +68,6 @@ namespace Reductech.EDR.Core.Tests.Steps
             }
         }
 
-        /// <inheritdoc />
-        protected override IEnumerable<ErrorCase> ErrorCases => ImmutableList<ErrorCase>.Empty;
 
-        /// <inheritdoc />
-        protected override IEnumerable<SerializeCase> SerializeCases
-        {
-            get
-            {
-                yield return new SerializeCase("Is Empty",
-                    new ArrayIsEmpty<string>
-                    {
-                        Array = new Array<string>
-                        {
-                            Elements = new List<IStep<string>>
-                            {
-                                Constant("Hello"),
-                                Constant("World"),
-                            }
-                        }
-                    },
-                    "ArrayIsEmpty(Array = Array(Elements = ['Hello', 'World']))"
-                );
-
-            }
-        }
     }
 }

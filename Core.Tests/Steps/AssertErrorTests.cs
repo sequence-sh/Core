@@ -55,21 +55,5 @@ namespace Reductech.EDR.Core.Tests.Steps
                     );
             } }
 
-        /// <inheritdoc />
-        protected override IEnumerable<SerializeCase> SerializeCases
-        {
-            get
-            {
-                yield return new SerializeCase("Print",
-                    new AssertError
-                    {
-                        Test = new Print<string>
-                        {
-                            Value = Constant("Hello World")
-                        }
-                    },
-                    "AssertError(Test = Print(Value = 'Hello World'))"
-                );
-            } }
     }
 }

@@ -50,8 +50,5 @@ namespace Reductech.EDR.Core.Tests.Steps
                     },2);
             } }
 
-        /// <inheritdoc />
-        protected override IEnumerable<ErrorCase> ErrorCases => ImmutableList<ErrorCase>.Empty;
-
     }
 }

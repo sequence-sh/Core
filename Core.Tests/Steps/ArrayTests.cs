@@ -14,9 +14,6 @@ namespace Reductech.EDR.Core.Tests.Steps
         public ArrayTests([NotNull] ITestOutputHelper testOutputHelper) : base(testOutputHelper) {}
 
         /// <inheritdoc />
-        protected override IEnumerable<ErrorCase> ErrorCases => ImmutableArray<ErrorCase>.Empty;
-
-        /// <inheritdoc />
         protected override IEnumerable<DeserializeCase> DeserializeCases
         {
             get
@@ -41,26 +38,26 @@ namespace Reductech.EDR.Core.Tests.Steps
                     }, new List<int>{1,2,3} );
             } }
 
-        /// <inheritdoc />
-        protected override IEnumerable<SerializeCase> SerializeCases
-        {
-            get
-            {
-                yield return new SerializeCase("Empty", new Array<int>
-                {
-                    Elements = ImmutableList<IStep<int>>.Empty
-                }, "Array(Elements = [])");
+        ///// <inheritdoc /> //TODO create a serialize case
+        //protected override IEnumerable<SerializeCase> SerializeCases
+        //{
+        //    get
+        //    {
+        //        yield return new SerializeCase("Empty", new Array<int>
+        //        {
+        //            Elements = ImmutableList<IStep<int>>.Empty
+        //        }, "Array(Elements = [])");
 
-                yield return new SerializeCase("Three Elements", new Array<int>
-                {
-                    Elements = new List<IStep<int>>
-                    {
-                        Constant(1),
-                        Constant(2),
-                        Constant(3),
-                    }
-                }, "Array(Elements = [1, 2, 3])");
-            }
-        }
+        //        yield return new SerializeCase("Three Elements", new Array<int>
+        //        {
+        //            Elements = new List<IStep<int>>
+        //            {
+        //                Constant(1),
+        //                Constant(2),
+        //                Constant(3),
+        //            }
+        //        }, "Array(Elements = [1, 2, 3])");
+        //    }
+        //}
     }
 }

@@ -127,6 +127,11 @@
         /// <summary>
         /// The enum value could not be handled.
         /// </summary>
-        UnexpectedEnumValue
+        UnexpectedEnumValue,
+
+        /// <summary>
+        /// Intentional error to be used during unit testing
+        /// </summary>
+        Test
     }
 }

@@ -104,8 +104,9 @@ namespace Reductech.EDR.Core.Tests.Steps
 
 
                 yield return new ErrorCase("BooleanOperator.None", noneStep,
-                    new SingleError($"Could not apply '{BooleanOperator.None}'", ErrorCode.UnexpectedEnumValue, new StepErrorLocation(noneStep))
-                );
+                    new SingleError($"Could not apply '{BooleanOperator.None}'", ErrorCode.UnexpectedEnumValue, new StepErrorLocation(noneStep)));
+
+                yield return CreateDefaultErrorCase();
             }
         }
     }

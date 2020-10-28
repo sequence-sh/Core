@@ -25,19 +25,8 @@ namespace Reductech.EDR.Core.Tests.Steps
                         String = Constant("World")
                     }, new ErrorBuilder("Variable '<Foo>' does not exist.", ErrorCode.MissingVariable)
                 );
-            } }
 
-        /// <inheritdoc />
-        protected override IEnumerable<SerializeCase> SerializeCases {
-            get
-            {
-                yield return CreateDefaultSerializeCase();
-
-                //yield return new SerializeCase("Test Serialize", new AppendString()
-                //{
-                //    Variable = new VariableName("Hello"),
-                //    String = Constant("World")
-                //}, "AppendString(String = 'World', Variable = <Hello>)" );
+                yield return CreateDefaultErrorCase(false);
             } }
 
         /// <inheritdoc />

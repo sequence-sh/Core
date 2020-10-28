@@ -50,19 +50,8 @@ namespace Reductech.EDR.Core.Tests.Steps
                     },
                     new ErrorBuilder($"Assertion Failed 'False'", ErrorCode.IndexOutOfBounds)
                 );
-            }
-        }
 
-        /// <inheritdoc />
-        protected override IEnumerable<SerializeCase> SerializeCases
-        {
-            get
-            {
-                yield return new SerializeCase("Basic serialize",
-                    new AssertTrue
-                    {
-                        Test = Constant(false)
-                    }, "AssertTrue(Test = False)" );
+                yield return CreateDefaultErrorCase();
             }
         }
     }

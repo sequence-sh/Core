@@ -32,6 +32,8 @@ namespace Reductech.EDR.Core.Tests.Steps
                     Operator = Constant(MathOperator.None),
                     Right = Constant(2)
                 }, new ErrorBuilder($"Could not apply '{MathOperator.None}'", ErrorCode.UnexpectedEnumValue) );
+
+                yield return CreateDefaultErrorCase();
             } }
 
         /// <inheritdoc />

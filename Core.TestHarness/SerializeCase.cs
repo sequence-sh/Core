@@ -11,7 +11,13 @@ namespace Reductech.EDR.Core.TestHarness
 
     public abstract partial class StepTestBase<TStep, TOutput>
     {
-        protected virtual IEnumerable<SerializeCase> SerializeCases { get; } = new List<SerializeCase>(){CreateDefaultSerializeCase()};
+        protected virtual IEnumerable<SerializeCase> SerializeCases
+        {
+            get
+            {
+                yield return CreateDefaultSerializeCase();
+            }
+        }
 
         public IEnumerable<object?[]> SerializeCaseNames => SerializeCases.Select(x => new[] { x.Name });
 
@@ -65,7 +71,7 @@ namespace Reductech.EDR.Core.TestHarness
 
             var stepName = new TStep().StepFactory.TypeName;
 
-            var expectedYaml = $"{stepName}({string.Join(", ", values.OrderBy(x=>x.Key).Select(x=>$"{x.Key} = {x.Value}"))})";
+            var expectedYaml = $"{stepName}({string.Join(", ", values.OrderBy(x => x.Key).Select(x => $"{x.Key} = {x.Value}"))})";
 
             var c = new SerializeCase("Default", step, expectedYaml);
 

@@ -56,9 +56,6 @@ namespace Reductech.EDR.Core.Tests.Steps
         }
 
         /// <inheritdoc />
-        protected override IEnumerable<ErrorCase> ErrorCases => ImmutableList<ErrorCase>.Empty;
-
-        /// <inheritdoc />
         protected override IEnumerable<SerializeCase> SerializeCases
         {
             get
@@ -79,6 +76,8 @@ namespace Reductech.EDR.Core.Tests.Steps
                         ElseStep = new Print<string> { Value = Constant("Goodbye World") },
                     }, "Conditional(Condition = True, ElseStep = Print(Value = 'Goodbye World'), ThenStep = Print(Value = 'Hello World'))"
                     );
+
+                yield return CreateDefaultSerializeCase();
             }
         }
     }

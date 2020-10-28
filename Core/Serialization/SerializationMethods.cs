@@ -1,7 +1,9 @@
-﻿using CSharpFunctionalExtensions;
+﻿using System;
+using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Internal;
 using System.Collections.Generic;
 using System.Linq;
+using Reductech.EDR.Core.Util;
 
 namespace Reductech.EDR.Core.Serialization
 {
@@ -15,6 +17,9 @@ namespace Reductech.EDR.Core.Serialization
         /// </summary>
         public static Result<string> TrySerializeConstant(ConstantFreezableStep cfp) => TrySerializeValue(cfp.Value);
 
+        /// <summary>
+        /// Serialize a value.
+        /// </summary>
         private static Result<string> TrySerializeValue(object value)
         {
             if (value is string s)
@@ -25,7 +30,7 @@ namespace Reductech.EDR.Core.Serialization
                 return Result.Failure<string>("String constant contains newline");
             }
 
-            if (value.GetType().IsEnum)
+            if (value is Enum)
                 return value.GetType().Name + "." + value;
 
             if (value is IEnumerable<object> enumerable)
@@ -38,7 +43,6 @@ namespace Reductech.EDR.Core.Serialization
 
                 return r;
             }
-
 
             return value.ToString() ?? string.Empty;
         }

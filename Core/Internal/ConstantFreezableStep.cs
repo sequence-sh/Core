@@ -1,11 +1,9 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Internal.Errors;
-using Reductech.EDR.Core.Serialization;
 using Reductech.EDR.Core.Util;
 
 namespace Reductech.EDR.Core.Internal
@@ -62,10 +60,31 @@ namespace Reductech.EDR.Core.Internal
         {
             get
             {
-                var r = SerializationMethods.TrySerializeConstant(this);
-
-                return r.IsSuccess ? r.Value : r.Error;
+                var r = WriteValue(Value);
+                return r;
             }
+        }
+
+        /// <summary>
+        /// Serialize a value.
+        /// </summary>
+        private static string WriteValue(object value)
+        {
+            if (value is string s)
+                return $"'{s}'";
+
+            if (value is Enum e)
+                return e.GetDisplayName();
+
+            if (value is IEnumerable<object> enumerable)
+            {
+
+                var r = string.Join(", ", enumerable.Select(WriteValue));
+
+                return $"[{r}]";
+            }
+
+            return value.ToString() ?? string.Empty;
         }
 
 

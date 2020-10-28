@@ -14,7 +14,14 @@ namespace Reductech.EDR.Core.TestHarness
 {
     public abstract partial class StepTestBase<TStep, TOutput>
     {
-        protected abstract IEnumerable<ErrorCase> ErrorCases { get; }
+        protected virtual IEnumerable<ErrorCase> ErrorCases
+        {
+            get
+            {
+                yield return CreateDefaultErrorCase();
+            }
+        }
+
         public IEnumerable<object?[]> ErrorCaseNames => ErrorCases.Select(x => new[] {x.Name});
 
         [Theory]
@@ -76,6 +83,19 @@ namespace Reductech.EDR.Core.TestHarness
             public Dictionary<VariableName, object> ExpectedFinalState { get; } = new Dictionary<VariableName, object>();
 
             public Action<Mock<IExternalProcessRunner>>? SetupMockExternalProcessRunner { get; set; }
+        }
+
+        /// <summary>
+        /// Creates the default error case. This tests that if every property returns an error, that error will be propagated.
+        /// If the step tries to get a variable before trying to get a property, set firstErrorIsStep to true.
+        /// </summary>
+        protected static ErrorCase CreateDefaultErrorCase(bool firstErrorIsStep = true)
+        {
+            var step = CreateStepWithFailStepsAsValues();
+            var error = firstErrorIsStep ? FailStepError : new SingleError("Variable '<Foo>' does not exist.", ErrorCode.MissingVariable, new StepErrorLocation(step));
+            var errorCase = new ErrorCase("Default", step, error);
+
+            return errorCase;
         }
     }
 }

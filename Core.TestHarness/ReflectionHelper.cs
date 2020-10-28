@@ -6,7 +6,8 @@ using FluentAssertions.Common;
 using Namotion.Reflection;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal;
-using Reductech.EDR.Core.Serialization;
+using Reductech.EDR.Core.Steps;
+using Reductech.EDR.Core.Util;
 using Xunit.Sdk;
 
 namespace Reductech.EDR.Core.TestHarness
@@ -43,7 +44,7 @@ namespace Reductech.EDR.Core.TestHarness
                 var currentValue = property.GetValue(instance);
                 if (currentValue == null)
                 {
-                    var newValue = CreateConstantOfType(property.PropertyType, ref index);
+                    var newValue = CreateSimpleStep(property.PropertyType, ref index);
                     values.Add(property.Name, newValue.Unfreeze().StepName);
                     property.SetValue(instance, newValue);
                 }
@@ -108,10 +109,14 @@ namespace Reductech.EDR.Core.TestHarness
             }
         }
 
-        private static IConstantStep CreateConstantOfType(Type tStep, ref int index)
+        private static IStep CreateSimpleStep(Type tStep, ref int index)
         {
             var outputType = tStep.GenericTypeArguments.First();
 
+            if (outputType == typeof(Unit))
+            {
+                return new DoNothing();
+            }
 
             if (outputType == typeof(string))
             {
@@ -120,18 +125,19 @@ namespace Reductech.EDR.Core.TestHarness
 
                 return Constant(s);
             }
-            else if (outputType == typeof(bool))
+
+            if (outputType == typeof(bool))
             {
                 var b = true;
                 return Constant(b);
             }
-            else if (outputType == typeof(int))
+            if (outputType == typeof(int))
             {
                 var i = index;
                 index++;
                 return Constant(i);
             }
-            else if (outputType == typeof(List<string>))
+            if (outputType == typeof(List<string>))
             {
                 var list = new List<string>();
                 for (var i = 0; i < 3; i++)
@@ -146,52 +152,38 @@ namespace Reductech.EDR.Core.TestHarness
             throw new XunitException($"Cannot create a constant step with type {outputType.GetDisplayName()}");
         }
 
-        private static IReadOnlyList<IStep> CreateStepListOfType(Type tStep, int numberOfElements, ref int index)
+
+        private static IEnumerable<IStep> CreateStepListOfType(Type tList, int numberOfElements, ref int index)
         {
-            var outputType = tStep.GenericTypeArguments.First();
+            var stepType = tList.GenericTypeArguments.First();
+            var outputType = stepType.GenericTypeArguments.First();
+
+            var listType = typeof(List<>).MakeGenericType(stepType);
+            var list = Activator.CreateInstance(listType)!;
+
+            var addMethod = list.GetType().GetMethod(nameof(List<object>.Add))!;
+
+            Func<int, object> getElement;
 
 
-            if (outputType == typeof(string))
+            if (outputType == typeof(Unit)) getElement = _ => new DoNothing();
+
+
+            else if (outputType == typeof(string)) getElement = i => Constant("Bar" + i);
+
+            else if (outputType == typeof(bool)) getElement = i => Constant(i % 2 == 0);
+            else if (outputType == typeof(int)) getElement = Constant;
+            else throw new XunitException($"Cannot create default value for {outputType.GetDisplayName()}");
+
+            for (var i = 0; i < numberOfElements; i++)
             {
-                var l = new List<IStep<string>>();
-
-                for (var i = 0; i < numberOfElements; i++)
-                {
-                    var s = "Bar" + index;
-                    index++;
-
-                    l.Add(Constant(s));
-                }
-
-                return l;
-            }
-            else if (outputType == typeof(bool))
-            {
-                var l = new List<IStep<bool>>();
-
-                for (var i = 0; i < numberOfElements; i++)
-                {
-                    var b = i % 2 == 0;
-
-                    l.Add(Constant(b));
-                }
-
-                return l;
-            }
-            else if (outputType == typeof(int))
-            {
-                var l = new List<IStep<int>>();
-
-                for (var i = 0; i < numberOfElements; i++)
-                {
-                    l.Add(Constant(index));
-                    index++;
-                }
-
-                return l;
+                var e = getElement(index);
+                index++;
+                addMethod.Invoke(list, new[]{e});
             }
 
-            throw new XunitException($"Cannot create default value for {outputType.GetDisplayName()}");
+            return (IEnumerable<IStep>) list;
+
         }
     }
 }
