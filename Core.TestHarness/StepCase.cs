@@ -35,7 +35,7 @@ namespace Reductech.EDR.Core.TestHarness
         }
 
 #pragma warning disable CA1034 // Nested types should not be visible
-        public class StepCase : ICase, ICaseWithState
+        public class StepCase : ICaseWithState
 #pragma warning restore CA1034 // Nested types should not be visible
         {
             public StepCase(string name, TStep step, TOutput expectedOutput, params object[] expectedLoggedValues)

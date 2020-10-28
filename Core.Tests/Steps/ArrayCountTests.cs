@@ -53,25 +53,5 @@ namespace Reductech.EDR.Core.Tests.Steps
         /// <inheritdoc />
         protected override IEnumerable<ErrorCase> ErrorCases => ImmutableList<ErrorCase>.Empty;
 
-        /// <inheritdoc />
-        protected override IEnumerable<SerializeCase> SerializeCases {
-            get
-            {
-                yield return new SerializeCase("Count Array",
-                    new ArrayCount<string>
-                    {
-                        Array = new Array<string>
-                        {
-                            Elements = new List<IStep<string>>
-                            {
-                                Constant("Hello"),
-                                Constant("World"),
-                            }
-                        }
-                    },
-                    "ArrayCount(Array = Array(Elements = ['Hello', 'World']))"
-                    );
-
-            } }
     }
 }

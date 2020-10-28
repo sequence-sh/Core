@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Reflection;
-using Castle.DynamicProxy.Internal;
 using FluentAssertions;
+using FluentAssertions.Common;
+using Moq;
 using Namotion.Reflection;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal;
@@ -21,22 +22,23 @@ namespace Reductech.EDR.Core.TestHarness
         public string StepName => typeof(TStep).GetDisplayName();
 
 
-        public ITestOutputHelper TestOutputHelper {get;}
+        public ITestOutputHelper TestOutputHelper { get; }
 
 
         [Fact]
         public void All_properties_should_be_required_or_have_default_values_and_attributes()
         {
-            var instance = CreateInstance();
+            var instance = new TStep();
             var errors = new List<string>();
 
-            foreach (var propertyInfo in typeof(TStep).GetProperties().Where(x=>x.GetCustomAttribute<StepPropertyBaseAttribute>() != null))
+            foreach (var propertyInfo in typeof(TStep).GetProperties()
+                .Where(x => x.IsDecoratedWith<StepPropertyBaseAttribute>()))
             {
                 var propName = $"{typeof(TStep).GetDisplayName()}.{propertyInfo.Name}";
 
 
-                var required = propertyInfo.GetCustomAttribute<RequiredAttribute>() != null;
-                var hasDefaultAttribute = propertyInfo.GetCustomAttribute<DefaultValueExplanationAttribute>() != null;
+                var required = propertyInfo.IsDecoratedWith<RequiredAttribute>();
+                var hasDefaultAttribute = propertyInfo.IsDecoratedWith<DefaultValueExplanationAttribute>();
 
                 if (propertyInfo.SetMethod == null || !propertyInfo.SetMethod.IsPublic)
                     errors.Add($"{propName} has no public setter");
@@ -51,16 +53,18 @@ namespace Reductech.EDR.Core.TestHarness
 
                 if (required)
                 {
-                    if(hasDefaultAttribute)
+                    if (hasDefaultAttribute)
                         errors.Add($"{propName} has both required and defaultValueExplanation attributes");
 
-                    if(defaultValue != null && !(defaultValue is VariableName vn && vn == default))
+                    if (defaultValue != null && !(defaultValue is VariableName vn && vn == default))
                         errors.Add($"{propName} is required but it has a default value");
                 }
-                else if(hasDefaultAttribute)
+                else if (hasDefaultAttribute)
                 {
-                    if(propertyInfo.CustomAttributes.All(x => x.AttributeType.Name != "NullableAttribute") && defaultValue == null)
-                        errors.Add($"{propName} has a default value explanation but is not nullable and it's default value is null");
+                    if (propertyInfo.CustomAttributes.All(x => x.AttributeType.Name != "NullableAttribute") &&
+                        defaultValue == null)
+                        errors.Add(
+                            $"{propName} has a default value explanation but is not nullable and it's default value is null");
                 }
                 else
                 {
@@ -68,20 +72,20 @@ namespace Reductech.EDR.Core.TestHarness
                 }
             }
 
-            if(errors.Any())
+            if (errors.Any())
                 throw new XunitException(string.Join("\r\n", errors));
-
         }
 
 
         [Fact]
         public void Process_factory_must_be_set_correctly()
         {
-            var instance = CreateInstance();
+            var instance = new TStep();
 
             instance.StepFactory.Should().NotBeNull();
 
-            instance.StepFactory.StepType.Name.Should().Be(typeof(TStep).Name);//Compare type names because of generic types
+            instance.StepFactory.StepType.Name.Should()
+                .Be(typeof(TStep).Name); //Compare type names because of generic types
 
             var stepFactoryType = instance.StepFactory.GetType();
 
@@ -91,14 +95,17 @@ namespace Reductech.EDR.Core.TestHarness
             var instanceProperty = stepFactoryType.GetProperty("Instance",
                 BindingFlags.Static | BindingFlags.Public | BindingFlags.GetProperty);
 
-            instanceProperty.Should().NotBeNull($"{StepName} should have a public static Get property named 'Instance'");
+            instanceProperty.Should()
+                .NotBeNull($"{StepName} should have a public static Get property named 'Instance'");
             instanceProperty.Should().NotBeWritable($"{StepName}.Instance should be readonly");
 
-            instanceProperty!.PropertyType.Should().BeAssignableTo<IStepFactory>($"{StepName}.Instance should return an IStepFactory");
+            instanceProperty!.PropertyType.Should()
+                .BeAssignableTo<IStepFactory>($"{StepName}.Instance should return an IStepFactory");
         }
 
-        private static TStep CreateInstance() => Activator.CreateInstance<TStep>();
 
-        public static IStep<TNew> Constant<TNew>(TNew value) => new Constant<TNew>(value);
+        public static Constant<TNew> Constant<TNew>(TNew value) => new Constant<TNew>(value);
     }
+
+
 }

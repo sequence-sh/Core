@@ -1,8 +1,11 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Linq;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Internal.Errors;
+using Reductech.EDR.Core.Serialization;
 using Reductech.EDR.Core.Util;
 
 namespace Reductech.EDR.Core.Internal
@@ -59,15 +62,13 @@ namespace Reductech.EDR.Core.Internal
         {
             get
             {
-                if (Value is string s)
-                    return $"'{s}'";
+                var r = SerializationMethods.TrySerializeConstant(this);
 
-                if (Value is Enum e)
-                    return e.GetDisplayName();
-
-                return $"{Value}";
+                return r.IsSuccess ? r.Value : r.Error;
             }
         }
+
+
 
         /// <param name="typeResolver"></param>
         /// <inheritdoc />

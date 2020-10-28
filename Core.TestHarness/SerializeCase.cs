@@ -8,9 +8,10 @@ using Xunit.Abstractions;
 
 namespace Reductech.EDR.Core.TestHarness
 {
+
     public abstract partial class StepTestBase<TStep, TOutput>
     {
-        protected abstract IEnumerable<SerializeCase> SerializeCases { get; }
+        protected virtual IEnumerable<SerializeCase> SerializeCases { get; } = new List<SerializeCase>(){CreateDefaultSerializeCase()};
 
         public IEnumerable<object?[]> SerializeCaseNames => SerializeCases.Select(x => new[] { x.Name });
 
@@ -47,10 +48,28 @@ namespace Reductech.EDR.Core.TestHarness
             public async Task RunCaseAsync(ITestOutputHelper testOutputHelper, string? extraArgument)
             {
                 var realYaml = Step.Unfreeze().SerializeToYaml();
+
+                testOutputHelper.WriteLine(realYaml);
+
                 realYaml.Should().Be(ExpectedYaml);
 
                 await Task.CompletedTask;
             }
+        }
+
+
+        public static SerializeCase CreateDefaultSerializeCase()
+        {
+            var (step, values) = CreateStepWithDefaultOrArbitraryValues();
+
+
+            var stepName = new TStep().StepFactory.TypeName;
+
+            var expectedYaml = $"{stepName}({string.Join(", ", values.OrderBy(x=>x.Key).Select(x=>$"{x.Key} = {x.Value}"))})";
+
+            var c = new SerializeCase("Default", step, expectedYaml);
+
+            return c;
         }
     }
 }

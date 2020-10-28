@@ -31,11 +31,13 @@ namespace Reductech.EDR.Core.Tests.Steps
         protected override IEnumerable<SerializeCase> SerializeCases {
             get
             {
-                yield return new SerializeCase("Test Serialize", new AppendString()
-                {
-                    Variable = new VariableName("Hello"),
-                    String = Constant("World")
-                }, "AppendString(String = 'World', Variable = <Hello>)" );
+                yield return CreateDefaultSerializeCase();
+
+                //yield return new SerializeCase("Test Serialize", new AppendString()
+                //{
+                //    Variable = new VariableName("Hello"),
+                //    String = Constant("World")
+                //}, "AppendString(String = 'World', Variable = <Hello>)" );
             } }
 
         /// <inheritdoc />
