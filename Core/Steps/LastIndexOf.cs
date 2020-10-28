@@ -11,6 +11,7 @@ namespace Reductech.EDR.Core.Steps
 {
     /// <summary>
     /// Gets the last instance of substring in a string.
+    /// Returns -1 if the substring is not present
     /// </summary>
     public sealed class LastIndexOf : CompoundStep<int>
     {

@@ -15,13 +15,32 @@ namespace Reductech.EDR.Core.Tests.Steps
         /// <inheritdoc />
         protected override IEnumerable<StepCase> StepCases
         {
-            get { }
+            get
+            {
+                yield return new StepCase("Join some strings",
+                    new JoinStrings
+                    {
+                        Delimiter = Constant(", "),
+                        List = Array("Hello", "World")
+                    }, "Hello, World"
+                    );
+
+            }
         }
 
         /// <inheritdoc />
         protected override IEnumerable<DeserializeCase> DeserializeCases
         {
-            get { }
+            get
+            {
+                yield return new DeserializeCase("Join some strings",
+                    "JoinStrings(Delimiter = ', ', List = ['Hello', 'World'])"
+                    ,"Hello, World"
+                );
+
+
+
+            }
 
         }
 

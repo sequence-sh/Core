@@ -15,13 +15,36 @@ namespace Reductech.EDR.Core.Tests.Steps
         /// <inheritdoc />
         protected override IEnumerable<StepCase> StepCases
         {
-            get { }
+            get
+            {
+                yield return new StepCase("To upper", new ToCase()
+                {
+                    Case = Constant(TextCase.Upper), String = Constant("hello")
+                }, "HELLO");
+
+                yield return new StepCase("To lower", new ToCase()
+                {
+                    Case = Constant(TextCase.Lower),
+                    String = Constant("HELLO")
+                }, "hello");
+
+                yield return new StepCase("To title", new ToCase()
+                {
+                    Case = Constant(TextCase.Title),
+                    String = Constant("hELLo")
+                }, "Hello");
+
+            }
         }
 
         /// <inheritdoc />
         protected override IEnumerable<DeserializeCase> DeserializeCases
         {
-            get { }
+            get
+            {
+                yield return new DeserializeCase("To title", "ToCase(Case = TextCase.Title, String = 'hELLo')", "Hello");
+
+            }
 
         }
 

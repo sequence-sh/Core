@@ -15,13 +15,29 @@ namespace Reductech.EDR.Core.Tests.Steps
         /// <inheritdoc />
         protected override IEnumerable<StepCase> StepCases
         {
-            get { }
+            get
+            {
+                yield return new StepCase("Substring length 3",
+                    new GetSubstring
+                    {
+                        String = Constant("Hello World"),
+                        Index = Constant(1),
+                        Length = Constant(3)
+                    }, "ell"
+                );
+
+
+            }
         }
 
         /// <inheritdoc />
         protected override IEnumerable<DeserializeCase> DeserializeCases
         {
-            get { }
+            get
+            {
+                yield return new DeserializeCase("Length 3",
+                    "GetSubstring(String = 'Hello World', Index = 1, Length = 3", "ell");
+            }
 
         }
 

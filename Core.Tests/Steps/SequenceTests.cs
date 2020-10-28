@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.TestHarness;
 using Reductech.EDR.Core.Util;
@@ -16,13 +17,28 @@ namespace Reductech.EDR.Core.Tests.Steps
         /// <inheritdoc />
         protected override IEnumerable<StepCase> StepCases
         {
-            get { }
+            get
+            {
+                yield return new StepCase("Print then print", new Sequence
+                {
+                    Steps = new List<IStep<Unit>>
+                    {
+                        new Print<string> {Value = Constant("Hello")},
+                        new Print<string> {Value = Constant("World")}
+                    }
+                }, Unit.Default, "Hello", "World" );
+
+
+            }
         }
 
         /// <inheritdoc />
         protected override IEnumerable<DeserializeCase> DeserializeCases
         {
-            get { }
+            get
+            {
+                yield return new DeserializeCase("Print then print", "- Print(Value = 'Hello')\n- Print(Value = 'World')", Unit.Default, "Hello", "World");
+            }
 
         }
 

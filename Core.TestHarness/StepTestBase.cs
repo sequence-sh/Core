@@ -1,18 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Reflection;
-using System.Threading;
-using System.Threading.Tasks;
-using CSharpFunctionalExtensions;
 using FluentAssertions;
 using FluentAssertions.Common;
-using Moq;
 using Namotion.Reflection;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal;
-using Reductech.EDR.Core.Internal.Errors;
+using Reductech.EDR.Core.Steps;
 using Xunit;
 using Xunit.Abstractions;
 using Xunit.Sdk;
@@ -93,7 +90,7 @@ namespace Reductech.EDR.Core.TestHarness
 
             var stepFactoryType = instance.StepFactory.GetType();
 
-            var constructor = stepFactoryType.GetConstructor(Array.Empty<Type>());
+            var constructor = stepFactoryType.GetConstructor( new Type[0]);
             constructor.Should().BeNull($"{StepName} should not have a public parameterless constructor");
 
             var instanceProperty = stepFactoryType.GetProperty("Instance",
@@ -109,5 +106,9 @@ namespace Reductech.EDR.Core.TestHarness
 
 
         public static Constant<TNew> Constant<TNew>(TNew value) => new Constant<TNew>(value);
+
+        public static IStep<List<TNew>> Array<TNew>(params TNew[] elements)=> new Array<TNew>() {Elements = elements.Select(Constant).ToList()};
+
+        public static IStep<TNew> GetVariable<TNew>(string variableName)=> new GetVariable<TNew>() {VariableName = new VariableName(variableName)};
     }
 }

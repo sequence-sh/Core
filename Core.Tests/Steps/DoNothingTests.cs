@@ -16,13 +16,19 @@ namespace Reductech.EDR.Core.Tests.Steps
         /// <inheritdoc />
         protected override IEnumerable<StepCase> StepCases
         {
-            get { }
+            get
+            {
+                yield return new StepCase("Do nothing", new DoNothing(), Unit.Default);
+            }
         }
 
         /// <inheritdoc />
         protected override IEnumerable<DeserializeCase> DeserializeCases
         {
-            get { }
+            get
+            {
+                yield return new DeserializeCase("Do nothing", "DoNothing", Unit.Default);
+            }
 
         }
 

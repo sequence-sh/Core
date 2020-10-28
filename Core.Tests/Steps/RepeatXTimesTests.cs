@@ -16,13 +16,30 @@ namespace Reductech.EDR.Core.Tests.Steps
         /// <inheritdoc />
         protected override IEnumerable<StepCase> StepCases
         {
-            get { }
+            get
+            {
+                yield return new StepCase("Print something three times",
+                    new RepeatXTimes()
+                    {
+                        Action = new Print<int>(){Value = Constant(6)},
+                        Number = Constant(3)
+                    }, Unit.Default, 6,6,6
+                    );
+
+            }
         }
 
         /// <inheritdoc />
         protected override IEnumerable<DeserializeCase> DeserializeCases
         {
-            get { }
+            get
+            {
+                yield return new DeserializeCase("Print something three times",
+                    "RepeatXTimes(Action = Print(Value = 6), Number = 3)", Unit.Default, 6,6,6
+                    );
+
+
+            }
 
         }
 

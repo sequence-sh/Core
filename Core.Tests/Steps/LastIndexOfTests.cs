@@ -15,13 +15,36 @@ namespace Reductech.EDR.Core.Tests.Steps
         /// <inheritdoc />
         protected override IEnumerable<StepCase> StepCases
         {
-            get { }
+            get
+            {
+                yield return new StepCase("Substring present",
+                    new LastIndexOf()
+                    {
+                        String = Constant("Hello elle"),
+                        SubString = Constant("ell")
+                    }, 6
+                );
+
+                yield return new StepCase("Substring not present",
+                    new LastIndexOf()
+                    {
+                        String = Constant("Hello elle"),
+                        SubString = Constant("ELL")
+                    }, -1
+                );
+
+
+            }
         }
 
         /// <inheritdoc />
         protected override IEnumerable<DeserializeCase> DeserializeCases
         {
-            get { }
+            get
+            {
+                yield return new DeserializeCase("Substring present", "LastIndexOf(String = 'Hello ell', Substring = 'ell')", 6);
+
+            }
 
         }
 

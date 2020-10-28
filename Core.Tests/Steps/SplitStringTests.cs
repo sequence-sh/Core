@@ -15,13 +15,28 @@ namespace Reductech.EDR.Core.Tests.Steps
         /// <inheritdoc />
         protected override IEnumerable<StepCase> StepCases
         {
-            get { }
+            get
+            {
+                yield return new StepCase("Split a string",
+                    new SplitString()
+                    {
+                        String = Constant("Hello World"),
+                        Delimiter = Constant(" ")
+                    }, new List<string>(){"Hello", "World"}
+                    );
+
+
+            }
         }
 
         /// <inheritdoc />
         protected override IEnumerable<DeserializeCase> DeserializeCases
         {
-            get { }
+            get
+            {
+                yield return new DeserializeCase("Split a string", "SplitString(String = 'Hello World', Delimiter = ' ')", new List<string>{"Hello", "World"});
+
+            }
 
         }
 

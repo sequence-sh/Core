@@ -6,7 +6,7 @@ using Xunit.Abstractions;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
-    public class PrintTests<T> : StepTestBase<Print<T>, Unit>
+    public class PrintTests : StepTestBase<Print<string>, Unit>
     {
         /// <inheritdoc />
         public PrintTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
@@ -16,13 +16,27 @@ namespace Reductech.EDR.Core.Tests.Steps
         /// <inheritdoc />
         protected override IEnumerable<StepCase> StepCases
         {
-            get { }
+            get
+            {
+                yield return new StepCase("Print something",
+                    new Print<string>()
+                    {
+                        Value = Constant("Hello")
+                    }, Unit.Default, "Hello"
+                    );
+
+
+            }
         }
 
         /// <inheritdoc />
         protected override IEnumerable<DeserializeCase> DeserializeCases
         {
-            get { }
+            get
+            {
+                yield return new DeserializeCase("Print something", "Print(Value = 'Hello')", Unit.Default, "Hello");
+
+            }
 
         }
 

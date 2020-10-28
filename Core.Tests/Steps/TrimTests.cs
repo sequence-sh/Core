@@ -15,13 +15,41 @@ namespace Reductech.EDR.Core.Tests.Steps
         /// <inheritdoc />
         protected override IEnumerable<StepCase> StepCases
         {
-            get { }
+            get
+            {
+                yield return new StepCase("Trim left", new Trim
+                {
+                    Side = Constant(TrimSide.Left),
+                    String = Constant("  word  ")
+
+                }, "word  " );
+
+
+                yield return new StepCase("Trim right", new Trim
+                {
+                    Side = Constant(TrimSide.Right),
+                    String = Constant("  word  ")
+
+                }, "  word");
+
+                yield return new StepCase("Trim both", new Trim
+                {
+                    Side = Constant(TrimSide.Both),
+                    String = Constant("  word  ")
+
+                }, "word");
+
+            }
         }
 
         /// <inheritdoc />
         protected override IEnumerable<DeserializeCase> DeserializeCases
         {
-            get { }
+            get
+            {
+                yield return new DeserializeCase("Trim left", "Trim(Side = TrimSide.Left, String = '  word  ')", "word  ");
+
+            }
 
         }
 

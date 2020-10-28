@@ -13,8 +13,8 @@ namespace Reductech.EDR.Core.Steps
 {
     /// <summary>
     /// Gets the first index of an element in an array.
+    /// Returns -1 if the element is not present.
     /// </summary>
-    /// <typeparam name="T"></typeparam>
     public sealed class FirstIndexOfElement<T> : CompoundStep<int>
     {
         /// <summary>

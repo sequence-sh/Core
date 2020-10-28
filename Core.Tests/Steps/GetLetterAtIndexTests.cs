@@ -15,13 +15,26 @@ namespace Reductech.EDR.Core.Tests.Steps
         /// <inheritdoc />
         protected override IEnumerable<StepCase> StepCases
         {
-            get { }
+            get
+            {
+                yield return new StepCase("Index is present", new GetLetterAtIndex()
+                {
+                    Index = Constant(1),
+                    String = Constant("Hello")
+                }, "e" );
+
+
+            }
         }
 
         /// <inheritdoc />
         protected override IEnumerable<DeserializeCase> DeserializeCases
         {
-            get { }
+            get
+            {
+                yield return new DeserializeCase("Index is present", "GetLetterAtIndex(Index = 1, String = 'Hello')", "e");
+
+            }
 
         }
 

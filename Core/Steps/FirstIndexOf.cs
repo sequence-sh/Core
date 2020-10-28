@@ -10,7 +10,8 @@ using Reductech.EDR.Core.Internal.Errors;
 namespace Reductech.EDR.Core.Steps
 {
     /// <summary>
-    /// Gets the first instance of substring in a string.
+    /// Gets the index of the first instance of substring in a string.
+    /// Returns -1 if the substring is not present.
     /// </summary>
     public sealed class FirstIndexOf : CompoundStep<int>
     {
