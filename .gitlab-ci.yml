@@ -257,7 +257,7 @@ push to nuget dev:
     NUGET_TOKEN: $NUGET_TOKEN_DEV
   before_script: *nuget_add_source
   script:
-    - dotnet nuget push --source reductech *.nupkg
+    - dotnet nuget push --source reductech "*.nupkg"
   rules:
     - if: *is_master
       when: never
