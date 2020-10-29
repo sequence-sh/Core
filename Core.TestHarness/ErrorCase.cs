@@ -32,7 +32,7 @@ namespace Reductech.EDR.Core.TestHarness
         }
 
 #pragma warning disable CA1034 // Nested types should not be visible
-        public class ErrorCase :  ICaseWithState
+        public class ErrorCase :  ICaseThatRuns
 #pragma warning restore CA1034 // Nested types should not be visible
         {
             public ErrorCase(string name, TStep step, IError expectedError)
@@ -63,8 +63,9 @@ namespace Reductech.EDR.Core.TestHarness
 
                 var sfs = StepFactoryStore.CreateUsingReflection(typeof(IStep), typeof(TStep));
 
-                SetupMockExternalProcessRunner?.Invoke(externalProcessRunnerMock);
-                var stateMonad = new StateMonad(logger, EmptySettings.Instance, externalProcessRunnerMock.Object, sfs);
+                foreach (var action in _externalProcessRunnerActions) action(externalProcessRunnerMock);
+
+                var stateMonad = new StateMonad(logger, Settings, externalProcessRunnerMock.Object, sfs);
 
                 foreach (var (key, value) in InitialState)
                     stateMonad.SetVariable(key, value).ShouldBeSuccessful(x => x.AsString);
@@ -82,7 +83,13 @@ namespace Reductech.EDR.Core.TestHarness
             public Dictionary<VariableName, object> InitialState { get; } = new Dictionary<VariableName, object>();
             public Dictionary<VariableName, object> ExpectedFinalState { get; } = new Dictionary<VariableName, object>();
 
-            public Action<Mock<IExternalProcessRunner>>? SetupMockExternalProcessRunner { get; set; }
+            /// <inheritdoc />
+            public void AddExternalProcessRunnerAction(Action<Mock<IExternalProcessRunner>> action) => _externalProcessRunnerActions.Add(action);
+
+            /// <inheritdoc />
+            public ISettings Settings { get; set; } = EmptySettings.Instance;
+
+            private readonly List<Action<Mock<IExternalProcessRunner>>> _externalProcessRunnerActions = new List<Action<Mock<IExternalProcessRunner>>>();
         }
 
         /// <summary>

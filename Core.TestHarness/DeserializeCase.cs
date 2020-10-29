@@ -27,7 +27,7 @@ namespace Reductech.EDR.Core.TestHarness
         }
 
 #pragma warning disable CA1034 // Nested types should not be visible
-        public class DeserializeCase : ICaseWithState
+        public class DeserializeCase : ICaseThatRuns
 #pragma warning restore CA1034 // Nested types should not be visible
         {
             public DeserializeCase(string name, string yaml, TOutput expectedOutput,
@@ -51,7 +51,13 @@ namespace Reductech.EDR.Core.TestHarness
 
             public Dictionary<VariableName, object> ExpectedFinalState { get; } = new Dictionary<VariableName, object>();
 
-            public Action<Mock<IExternalProcessRunner>>? SetupMockExternalProcessRunner { get; set; }
+            /// <inheritdoc />
+            public void AddExternalProcessRunnerAction(Action<Mock<IExternalProcessRunner>> action) => _externalProcessRunnerActions.Add(action);
+
+            /// <inheritdoc />
+            public ISettings Settings { get; set; } = EmptySettings.Instance;
+
+            private readonly List<Action<Mock<IExternalProcessRunner>>> _externalProcessRunnerActions = new List<Action<Mock<IExternalProcessRunner>>>();
 
             /// <inheritdoc />
             public override string ToString() => Name;
@@ -77,9 +83,12 @@ namespace Reductech.EDR.Core.TestHarness
                 var externalProcessRunnerMock = factory.Create<IExternalProcessRunner>();
 
 
-                SetupMockExternalProcessRunner?.Invoke(externalProcessRunnerMock);
+                foreach (var action in _externalProcessRunnerActions)
+                {
+                    action(externalProcessRunnerMock);
+                }
 
-                var stateMonad = new StateMonad(logger, EmptySettings.Instance, externalProcessRunnerMock.Object, sfs);
+                var stateMonad = new StateMonad(logger, Settings, externalProcessRunnerMock.Object, sfs);
 
                 foreach (var (key, value) in InitialState)
                     stateMonad.SetVariable(key, value).ShouldBeSuccessful(x => x.AsString);
