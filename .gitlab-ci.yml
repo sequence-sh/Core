@@ -160,6 +160,7 @@ code_quality:
 mutation testing:
   stage: quality
   needs: []
+  image: registry.gitlab.com/reductech/containers/dotnet/sdk
   tags: 
     - rt-windows
   variables:
