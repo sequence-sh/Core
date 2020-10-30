@@ -38,7 +38,7 @@ namespace Reductech.EDR.Core.TestHarness
         public class SequenceStepCase : StepCase
         {
             // ReSharper disable once UnusedParameter.Local - needed to disambiguate constructor
-            public SequenceStepCase(string name, Sequence sequence, params object[] expectedLoggedValues) : base(name, sequence, Maybe<TOutput>.None,expectedLoggedValues)
+            public SequenceStepCase(string name, Sequence sequence, params string[] expectedLoggedValues) : base(name, sequence, Maybe<TOutput>.None,expectedLoggedValues)
             {
             }
         }
@@ -47,12 +47,12 @@ namespace Reductech.EDR.Core.TestHarness
         public class StepCase : ICaseThatRuns
 #pragma warning restore CA1034 // Nested types should not be visible
         {
-            public StepCase(string name, TStep step, TOutput expectedOutput, params object[] expectedLoggedValues)
+            public StepCase(string name, TStep step, TOutput expectedOutput, params string[] expectedLoggedValues)
             :this(name, step, Maybe<TOutput>.From(expectedOutput), expectedLoggedValues)
             {
             }
 
-            protected StepCase(string name, IStep step, Maybe<TOutput> expectedOutput, object[] expectedLoggedValues)
+            protected StepCase(string name, IStep step, Maybe<TOutput> expectedOutput, string[] expectedLoggedValues)
             {
                 Name = name;
                 Step = step;
