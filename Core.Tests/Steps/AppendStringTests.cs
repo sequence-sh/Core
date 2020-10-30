@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using CSharpFunctionalExtensions;
 using JetBrains.Annotations;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;

@@ -58,7 +58,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                     {
                         foreach (var op in new[] {BooleanOperator.And, BooleanOperator.Or})
                         {
-                            bool expected = op switch
+                            var expected = op switch
                             {
                                 BooleanOperator.And => arg1 && arg2,
                                 BooleanOperator.Or => arg1 || arg2,

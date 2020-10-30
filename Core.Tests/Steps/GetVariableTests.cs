@@ -1,7 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.TestHarness;
+using Reductech.EDR.Core.Util;
 using Xunit.Abstractions;
 
 namespace Reductech.EDR.Core.Tests.Steps
@@ -18,15 +20,28 @@ namespace Reductech.EDR.Core.Tests.Steps
         {
             get
             {
-                //yield return new StepCase("Get Variable", new GetVariable<int>
-                //{
-                //    VariableName = new VariableName("Foo")
-                //}, 42 )
-                //    .WithInitialState("Foo", 42)
-                //    .WithExpectedFinalState("Foo", 42);
+                var sequence = new Sequence
+                {
+                    Steps = new List<IStep<Unit>>
+                    {
+                        new SetVariable<int>
+                        {
+                            VariableName = new VariableName("Foo"),
+                            Value = Constant(42)
+                        },
+                        new Print<int>
+                        {
+                            Value = new GetVariable<int>
+                            {
+                                VariableName = new VariableName("Foo")
+                            }
+                        }
+                    }
+                };
 
-                //Can't test this here - Could not resolve variable <Foo>
-                yield break;
+
+
+                yield return new StepCase("Get Variable", sequence,  "42").WithExpectedFinalState("Foo", 42);
             }
         }
 
@@ -35,23 +50,12 @@ namespace Reductech.EDR.Core.Tests.Steps
         {
             get
             {
-                //Can't do deserialize cases - Could not resolve variable <Foo>
 
-                yield break;
-
-                //yield return new DeserializeCase("Short Form",
-                //    "<Foo>",
-                //    42
-                //    ).WithInitialState("Foo", 42)
-                //    .WithExpectedFinalState("Foo", 42);
-
-
-                //yield return new DeserializeCase("Long Form",
-                //    "Do: GetVariable\nVariableName: <Foo>",
-                //    42
-                //    ).WithInitialState("Foo", 42)
-                //    .WithExpectedFinalState("Foo", 42);
-
+                yield return new DeserializeCase("Short Form",
+                    $"- <Foo> = 42{Environment.NewLine}- Print(Value = <Foo>)",
+                    Unit.Default, "42"
+                    ).WithInitialState("Foo", 42)
+                    .WithExpectedFinalState("Foo", 42);
 
             }
 

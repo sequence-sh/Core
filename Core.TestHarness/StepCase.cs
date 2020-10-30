@@ -3,15 +3,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using CSharpFunctionalExtensions;
 using FluentAssertions;
 using Moq;
-using Namotion.Reflection;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Serialization;
+using Reductech.EDR.Core.Steps;
+using Reductech.EDR.Core.Util;
 using Reductech.Utilities.Testing;
 using Xunit;
 using Xunit.Abstractions;
-using Xunit.Sdk;
 
 namespace Reductech.EDR.Core.TestHarness
 {
@@ -42,14 +43,27 @@ namespace Reductech.EDR.Core.TestHarness
             {
                 Name = name;
                 Step = step;
-                ExpectedOutput = expectedOutput;
+                ExpectedOutput = Maybe<TOutput>.From(expectedOutput);
+                ExpectedLoggedValues = expectedLoggedValues;
+            }
+
+            // ReSharper disable once UnusedParameter.Local - needed to disambiguate constructor
+            public StepCase(string name, Sequence sequence, params object[] expectedLoggedValues)
+            {
+                Name = name;
+                Step = sequence;
+                ExpectedOutput = Maybe<TOutput>.None;
                 ExpectedLoggedValues = expectedLoggedValues;
             }
 
 
             public string Name { get; }
 
-            public TOutput ExpectedOutput { get; }
+            /// <summary>
+            /// The expected output of the step.
+            /// If this is not set. It is expected that a unit will be returned
+            /// </summary>
+            public Maybe<TOutput> ExpectedOutput { get; }
 
             public IReadOnlyCollection<object> ExpectedLoggedValues { get; }
 
@@ -66,11 +80,10 @@ namespace Reductech.EDR.Core.TestHarness
             private readonly List<Action<Mock<IExternalProcessRunner>>> _externalProcessRunnerActions = new List<Action<Mock<IExternalProcessRunner>>>();
 
 
-
             /// <inheritdoc />
             public override string ToString() => Name;
 
-            public TStep Step { get; }
+            public IStep Step { get; }
 
 
             public const string SerializeArgument = "Serialize";
@@ -78,7 +91,7 @@ namespace Reductech.EDR.Core.TestHarness
             /// <summary>
             /// Serialize and Deserialize the step if required.
             /// </summary>
-            private TStep GetStep(TStep step, string? extraArgument, ITestOutputHelper testOutputHelper,
+            private IStep GetStep(IStep step, string? extraArgument, ITestOutputHelper testOutputHelper,
                 StepFactoryStore sfs)
             {
                 if (extraArgument != SerializeArgument)
@@ -95,10 +108,7 @@ namespace Reductech.EDR.Core.TestHarness
                 var freezeResult = deserializeResult.Value.TryFreeze();
                 freezeResult.ShouldBeSuccessful(x => x.AsString);
 
-                if (freezeResult.Value is TStep tStep)
-                    return tStep;
-
-                throw new XunitException($"'{yaml}' did not deserialize to a {typeof(TStep).GetDisplayName()}");
+                return freezeResult.Value;
             }
 
             /// <inheritdoc />
@@ -125,16 +135,22 @@ namespace Reductech.EDR.Core.TestHarness
 
                 var step = GetStep(Step, extraArgument, testOutputHelper, sfs);
 
-                var output = await step.Run<TOutput>(stateMonad, CancellationToken.None);
 
-                output.ShouldBeSuccessful(x => x.AsString);
+                if (ExpectedOutput.HasValue)
+                {
+                    var outputResult = await step.Run<TOutput>(stateMonad, CancellationToken.None);
 
-                output.Value.Should().BeEquivalentTo(ExpectedOutput);
+                    outputResult.ShouldBeSuccessful(x => x.AsString);
+                    outputResult.Value.Should().BeEquivalentTo(ExpectedOutput.Value);
+                }
+                else
+                {
+                    var result = await step.Run<Unit>(stateMonad, CancellationToken.None);
+                    result.ShouldBeSuccessful(x=>x.AsString);
+                }
 
                 logger.LoggedValues.Should().BeEquivalentTo(ExpectedLoggedValues);
-
                 stateMonad.GetState().Should().BeEquivalentTo(ExpectedFinalState);
-
 
                 factory.VerifyAll();
             }

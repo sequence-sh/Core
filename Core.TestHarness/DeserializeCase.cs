@@ -3,14 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using CSharpFunctionalExtensions;
 using FluentAssertions;
 using Moq;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Serialization;
+using Reductech.EDR.Core.Util;
 using Reductech.Utilities.Testing;
 using Xunit;
 using Xunit.Abstractions;
-using Xunit.Sdk;
 
 namespace Reductech.EDR.Core.TestHarness
 {
@@ -35,7 +36,17 @@ namespace Reductech.EDR.Core.TestHarness
             {
                 Name = name;
                 Yaml = yaml;
-                ExpectedOutput = expectedOutput;
+                ExpectedOutput = Maybe<TOutput>.From(expectedOutput);
+                ExpectedLoggedValues = expectedLoggedValues;
+            }
+
+            // ReSharper disable once UnusedParameter.Local - needed to disambiguate constructor
+            public DeserializeCase(string name, string yaml, Unit _,
+                params object[] expectedLoggedValues)
+            {
+                Name = name;
+                Yaml = yaml;
+                ExpectedOutput = Maybe<TOutput>.None;
                 ExpectedLoggedValues = expectedLoggedValues;
             }
 
@@ -43,7 +54,7 @@ namespace Reductech.EDR.Core.TestHarness
 
             public string Name { get; }
 
-            public TOutput ExpectedOutput { get; }
+            public Maybe<TOutput> ExpectedOutput { get; }
 
             public IReadOnlyCollection<object> ExpectedLoggedValues { get; }
 
@@ -93,19 +104,22 @@ namespace Reductech.EDR.Core.TestHarness
                 foreach (var (key, value) in InitialState)
                     stateMonad.SetVariable(key, value).ShouldBeSuccessful(x => x.AsString);
 
-                var output = await freezeResult.Value.Run<TOutput>(stateMonad, CancellationToken.None);
+                if (ExpectedOutput.HasValue)
+                {
+                    var outputResult = await freezeResult.Value.Run<TOutput>(stateMonad, CancellationToken.None);
 
-                if(output.IsFailure)
-                    throw new XunitException(output.Error.AsString);
+                    outputResult.ShouldBeSuccessful(x => x.AsString);
+                    outputResult.Value.Should().BeEquivalentTo(ExpectedOutput.Value);
+                }
+                else
+                {
+                    var result = await freezeResult.Value.Run<Unit>(stateMonad, CancellationToken.None);
 
-                output.ShouldBeSuccessful(x => x.AsString);
-
-                output.Value.Should().BeEquivalentTo(ExpectedOutput);
+                    result.ShouldBeSuccessful(x => x.AsString);
+                }
 
                 logger.LoggedValues.Should().BeEquivalentTo(ExpectedLoggedValues);
-
                 stateMonad.GetState().Should().BeEquivalentTo(ExpectedFinalState);
-
                 factory.VerifyAll();
             }
         }

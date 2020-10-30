@@ -27,7 +27,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                         new Print<string> {Value = Constant("Hello")},
                         new Print<string> {Value = Constant("World")}
                     }
-                }, Unit.Default, "Hello", "World" );
+                },  "Hello", "World" );
 
 
             }
