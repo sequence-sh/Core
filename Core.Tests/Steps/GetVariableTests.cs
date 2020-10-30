@@ -41,7 +41,7 @@ namespace Reductech.EDR.Core.Tests.Steps
 
 
 
-                yield return new StepCase("Get Variable", sequence,  "42").WithExpectedFinalState("Foo", 42);
+                yield return new SequenceStepCase("Get Variable", sequence,  "42").WithExpectedFinalState("Foo", 42);
             }
         }
 

@@ -35,24 +35,28 @@ namespace Reductech.EDR.Core.TestHarness
             await StepCases.FindAndRunAsync(stepCaseName, TestOutputHelper, StepCase.SerializeArgument);
         }
 
+        public class SequenceStepCase : StepCase
+        {
+            // ReSharper disable once UnusedParameter.Local - needed to disambiguate constructor
+            public SequenceStepCase(string name, Sequence sequence, params object[] expectedLoggedValues) : base(name, sequence, Maybe<TOutput>.None,expectedLoggedValues)
+            {
+            }
+        }
+
 #pragma warning disable CA1034 // Nested types should not be visible
         public class StepCase : ICaseThatRuns
 #pragma warning restore CA1034 // Nested types should not be visible
         {
             public StepCase(string name, TStep step, TOutput expectedOutput, params object[] expectedLoggedValues)
+            :this(name, step, Maybe<TOutput>.From(expectedOutput), expectedLoggedValues)
+            {
+            }
+
+            protected StepCase(string name, IStep step, Maybe<TOutput> expectedOutput, object[] expectedLoggedValues)
             {
                 Name = name;
                 Step = step;
-                ExpectedOutput = Maybe<TOutput>.From(expectedOutput);
-                ExpectedLoggedValues = expectedLoggedValues;
-            }
-
-            // ReSharper disable once UnusedParameter.Local - needed to disambiguate constructor
-            public StepCase(string name, Sequence sequence, params object[] expectedLoggedValues)
-            {
-                Name = name;
-                Step = sequence;
-                ExpectedOutput = Maybe<TOutput>.None;
+                ExpectedOutput = expectedOutput;
                 ExpectedLoggedValues = expectedLoggedValues;
             }
 
