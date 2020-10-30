@@ -32,7 +32,7 @@ namespace Reductech.EDR.Core.TestHarness
 #pragma warning restore CA1034 // Nested types should not be visible
         {
             public DeserializeCase(string name, string yaml, TOutput expectedOutput,
-                params object[] expectedLoggedValues)
+                params string[] expectedLoggedValues)
             {
                 Name = name;
                 Yaml = yaml;
@@ -42,7 +42,7 @@ namespace Reductech.EDR.Core.TestHarness
 
             // ReSharper disable once UnusedParameter.Local - needed to disambiguate constructor
             public DeserializeCase(string name, string yaml, Unit _,
-                params object[] expectedLoggedValues)
+                params string[] expectedLoggedValues)
             {
                 Name = name;
                 Yaml = yaml;
