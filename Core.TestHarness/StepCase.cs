@@ -72,6 +72,9 @@ namespace Reductech.EDR.Core.TestHarness
             public Dictionary<VariableName, object> ExpectedFinalState { get; } = new Dictionary<VariableName, object>();
 
             /// <inheritdoc />
+            public Maybe<StepFactoryStore> StepFactoryStoreToUse { get; set; }
+
+            /// <inheritdoc />
             public void AddExternalProcessRunnerAction(Action<Mock<IExternalProcessRunner>> action) => _externalProcessRunnerActions.Add(action);
 
             /// <inheritdoc />
@@ -123,17 +126,15 @@ namespace Reductech.EDR.Core.TestHarness
 
                 var sfs = StepFactoryStore.CreateUsingReflection(typeof(IStep), typeof(TStep));
 
-                foreach (var action in _externalProcessRunnerActions)
-                {
-                    action(externalProcessRunnerMock);
-                }
+                foreach (var action in _externalProcessRunnerActions) action(externalProcessRunnerMock);
 
-                var stateMonad = new StateMonad(logger, Settings, externalProcessRunnerMock.Object, sfs);
+
+                var step = GetStep(Step, extraArgument, testOutputHelper, sfs);
+
+                var stateMonad = new StateMonad(logger, Settings, externalProcessRunnerMock.Object, StepFactoryStoreToUse.Unwrap(sfs));
 
                 foreach (var (key, value) in InitialState)
                     stateMonad.SetVariable(key, value).ShouldBeSuccessful(x => x.AsString);
-
-                var step = GetStep(Step, extraArgument, testOutputHelper, sfs);
 
 
                 if (ExpectedOutput.HasValue)

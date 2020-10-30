@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using CSharpFunctionalExtensions;
 using Moq;
 using Reductech.EDR.Core.Internal;
 using Xunit.Abstractions;
@@ -18,6 +19,8 @@ namespace Reductech.EDR.Core.TestHarness
     {
         Dictionary<VariableName, object> InitialState { get; }
         Dictionary<VariableName, object> ExpectedFinalState { get; }
+
+        Maybe<StepFactoryStore> StepFactoryStoreToUse { get; set; }
 
         void AddExternalProcessRunnerAction(Action<Mock<IExternalProcessRunner>> action);
 

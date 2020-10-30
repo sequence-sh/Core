@@ -19,6 +19,12 @@ namespace Reductech.EDR.Core.TestHarness
             return cws;
         }
 
+        public static T WithStepFactoryStore<T>(this T cws, StepFactoryStore stepFactoryStore) where T : ICaseThatRuns
+        {
+            cws.StepFactoryStoreToUse = stepFactoryStore;
+            return cws;
+        }
+
         public static T WithSettings<T>(this T cws, ISettings settings) where T : ICaseThatRuns
         {
             cws.Settings = settings;

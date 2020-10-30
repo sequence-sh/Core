@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using CSharpFunctionalExtensions;
 using Moq;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
@@ -61,7 +62,7 @@ namespace Reductech.EDR.Core.TestHarness
                 var factory = new MockRepository(MockBehavior.Strict);
                 var externalProcessRunnerMock = factory.Create<IExternalProcessRunner>();
 
-                var sfs = StepFactoryStore.CreateUsingReflection(typeof(IStep), typeof(TStep));
+                var sfs = StepFactoryStoreToUse.Unwrap(StepFactoryStore.CreateUsingReflection(typeof(IStep), typeof(TStep)));
 
                 foreach (var action in _externalProcessRunnerActions) action(externalProcessRunnerMock);
 
@@ -82,6 +83,9 @@ namespace Reductech.EDR.Core.TestHarness
 
             public Dictionary<VariableName, object> InitialState { get; } = new Dictionary<VariableName, object>();
             public Dictionary<VariableName, object> ExpectedFinalState { get; } = new Dictionary<VariableName, object>();
+
+            /// <inheritdoc />
+            public Maybe<StepFactoryStore> StepFactoryStoreToUse { get; set; }
 
             /// <inheritdoc />
             public void AddExternalProcessRunnerAction(Action<Mock<IExternalProcessRunner>> action) => _externalProcessRunnerActions.Add(action);
