@@ -45,7 +45,7 @@ namespace Reductech.EDR.Core.Steps
         {
             var result = await Left.Run(stateMonad, cancellationToken)
                 .Compose(() => Operator.Run(stateMonad, cancellationToken), () => Right.Run(stateMonad, cancellationToken))
-                .Bind(x => CompareItems(x.Item1, x.Item2, x.Item3));
+                .Bind(x => CompareItems(x.Item1, x.Item2, x.Item3).MapError(e=>e.WithLocation(this)));
 
 
             return result;
@@ -54,7 +54,7 @@ namespace Reductech.EDR.Core.Steps
         /// <inheritdoc />
         public override IStepFactory StepFactory => CompareStepFactory.Instance;
 
-        private static Result<bool, IError> CompareItems(T item1, CompareOperator compareOperator, T item2)
+        private static Result<bool, IErrorBuilder> CompareItems(T item1, CompareOperator compareOperator, T item2)
         {
             return compareOperator switch
             {
@@ -64,7 +64,7 @@ namespace Reductech.EDR.Core.Steps
                 CompareOperator.LessThanOrEqual => item1.CompareTo(item2) <= 0,
                 CompareOperator.GreaterThan => item1.CompareTo(item2) > 0,
                 CompareOperator.GreaterThanOrEqual => item1.CompareTo(item2) >= 0,
-                _ => throw new ArgumentOutOfRangeException(nameof(compareOperator), compareOperator, null)
+                _ => new ErrorBuilder($"Could not apply '{compareOperator}'", ErrorCode.UnexpectedEnumValue)
             };
         }
 

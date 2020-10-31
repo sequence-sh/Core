@@ -36,9 +36,9 @@ namespace Reductech.EDR.Core.Tests
 
                 yield return new DeserializationErrorCase("'Print(Value = 123)'", ("Yaml must represent a step with return type Unit", "Print(Value = 123)"));
 
-                yield return new DeserializationErrorCase("Do:Nothing",("Could not tokenize 'Do:Nothing'", "Line: 1, Col: 1, Idx: 0 - Line: 1, Col: 11, Idx: 10"));
+                yield return new DeserializationErrorCase("Do:Nothing",("unexpected `D`", "Line: 1, Col: 1, Idx: 0 - Line: 1, Col: 11, Idx: 10"));
                 yield return new DeserializationErrorCase("Do: Print\nValue:Hello",
-                    ("While scanning a simple key, could not find expected ':'.", "Line: 3, Col: 1, Idx: 21 - Line: 3, Col: 1, Idx: 21"));
+                    ("While parsing a block mapping, did not find expected key.", "Line: 2, Col: 1, Idx: 10 - Line: 2, Col: 12, Idx: 21"));
 
 
                 yield return new DeserializationErrorCase("Do: Print\nWord: Hello\nWord: World\nText: Goodbye",
@@ -48,7 +48,7 @@ namespace Reductech.EDR.Core.Tests
                 yield return new DeserializationErrorCase("Do: Print\nDo: Print\nValue: Hello",
                     ("Duplicate Parameter 'Do'", "Line: 1, Col: 1, Idx: 0 - Line: 3, Col: 6, Idx: 25")
                 );
-                yield return new DeserializationErrorCase("Do: Print\nValue: Hello\nConfig:\n\tDoNotSplit: false\nConfig:\n\tDoNotSplit: true",
+                yield return new DeserializationErrorCase("Do: Print\nValue: Hello\nConfig:\n DoNotSplit: false\nConfig:\n DoNotSplit: true",
                     ("Duplicate Parameter 'Config'", "Line: 1, Col: 1, Idx: 0 - Line: 7, Col: 1, Idx: 75")
                     );
 
@@ -78,21 +78,13 @@ namespace Reductech.EDR.Core.Tests
 ("Unexpected Parameter 'ColumnsToMap' in 'ReadFile'", "Line: 2, Col: 3, Idx: 29 - Line: 2, Col: 121, Idx: 147")
                     );
 
-                yield return new DeserializationErrorCase(@"
-- <ArrayVar1> = Array(Elements = ['abc', '123'])
-- <ArrayVar2> = Array(Elements = ['abc', '123'])
-- Print(Value = (<ArrayVar1> == <ArrayVar2>))",
+                yield return new DeserializationErrorCase("- <ArrayVar1> = Array(Elements = ['abc', '123'])\n- <ArrayVar2> = Array(Elements = ['abc', '123'])\n- Print(Value = (<ArrayVar1> == <ArrayVar2>))",
                     ("Cannot compare objects of type 'ListOfString'", "<ArrayVar1> == <ArrayVar2>"));
 
                 yield return new DeserializationErrorCase("MyMegaFunction(Value = true)", ("The step 'MyMegaFunction' does not exist", "Line: 1, Col: 1, Idx: 0 - Line: 1, Col: 29, Idx: 28"));
 
-                yield return new DeserializationErrorCase(@"- >
-  ForEach(
-    Array = ['a','b','c'],
-    VariableName = <char>,
-    Action = Print(Value = <char>)
-  )",
-                    ("'ForEach( Array = ['a','b','c'], VariableName = <char>, Action = Print(Value = <char>) )' is a 'String' but it should be a 'Unit' to be a member of 'Sequence'", "Sequence")
+                yield return new DeserializationErrorCase("- >\n  ForEach(\n    Array = ['a','b','c'],\n    VariableName = <char>,\n    Action = Print(Value = <char>))",
+                    ("'ForEach( Array = ['a','b','c'], VariableName = <char>, Action = Print(Value = <char>))' is a 'String' but it should be a 'Unit' to be a member of 'Sequence'", "Sequence")
                 );
 
             }

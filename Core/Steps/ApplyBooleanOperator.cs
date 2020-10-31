@@ -66,8 +66,8 @@ namespace Reductech.EDR.Core.Steps
                     var r = await Right.Run(stateMonad, cancellationToken);
                     return r;
                 }
-                default:
-                    throw new ArgumentOutOfRangeException();
+
+                default: return new SingleError($"Could not apply '{op.Value}'", ErrorCode.UnexpectedEnumValue, new StepErrorLocation(this));
             }
         }
 

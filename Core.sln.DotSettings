@@ -1,0 +1,90 @@
+﻿<wpf:ResourceDictionary xml:space="preserve" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:s="clr-namespace:System;assembly=mscorlib" xmlns:ss="urn:shemas-jetbrains-com:settings-storage-xaml" xmlns:wpf="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=05D15528B5BE854BB84D74F408D32500/@KeyIndexDefined">True</s:Boolean>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=05D15528B5BE854BB84D74F408D32500/Applicability/=Live/@EntryIndexedValue">True</s:Boolean>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=05D15528B5BE854BB84D74F408D32500/Categories/=Step_0020Test/@EntryIndexedValue">Step Test</s:String>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=05D15528B5BE854BB84D74F408D32500/Description/@EntryValue">Reductech Step</s:String>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=05D15528B5BE854BB84D74F408D32500/Field/=step/@KeyIndexDefined">True</s:Boolean>
+	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=05D15528B5BE854BB84D74F408D32500/Field/=step/Order/@EntryValue">0</s:Int64>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=05D15528B5BE854BB84D74F408D32500/Reformat/@EntryValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=05D15528B5BE854BB84D74F408D32500/Scope/=C3001E7C0DA78E4487072B7E050D86C5/@KeyIndexDefined">True</s:Boolean>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=05D15528B5BE854BB84D74F408D32500/Scope/=C3001E7C0DA78E4487072B7E050D86C5/CustomProperties/=minimumLanguageVersion/@EntryIndexedValue">2.0</s:String>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=05D15528B5BE854BB84D74F408D32500/Scope/=C3001E7C0DA78E4487072B7E050D86C5/Type/@EntryValue">InCSharpFile</s:String>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=05D15528B5BE854BB84D74F408D32500/Shortcut/@EntryValue">GenericStepTest</s:String>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=05D15528B5BE854BB84D74F408D32500/ShortenQualifiedReferences/@EntryValue">True</s:Boolean>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=05D15528B5BE854BB84D74F408D32500/Text/@EntryValue"> public class $step$Tests&lt;T&gt; : StepTestBase&lt;$step$&lt;T&gt;, T&gt;&#xD;
+    {&#xD;
+        /// &lt;inheritdoc /&gt;&#xD;
+        public $step$Tests(ITestOutputHelper testOutputHelper) : base(testOutputHelper) {}&#xD;
+&#xD;
+        /// &lt;inheritdoc /&gt;&#xD;
+        protected override IEnumerable&lt;StepCase&gt; StepCases&#xD;
+        {&#xD;
+            get&#xD;
+            {&#xD;
+          &#xD;
+            }&#xD;
+        }&#xD;
+&#xD;
+        /// &lt;inheritdoc /&gt;&#xD;
+        protected override IEnumerable&lt;DeserializeCase&gt; DeserializeCases {&#xD;
+            get&#xD;
+            {&#xD;
+            }&#xD;
+&#xD;
+        }&#xD;
+&#xD;
+    }</s:String>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=14062B2D4FD825468FECD3CF658AD8FA/@KeyIndexDefined">True</s:Boolean>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=14062B2D4FD825468FECD3CF658AD8FA/Categories/=Step_0020Test/@EntryIndexedValue">Step Test</s:String>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=14062B2D4FD825468FECD3CF658AD8FA/Shortcut/@EntryValue">StepTest</s:String>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=14062B2D4FD825468FECD3CF658AD8FA/Description/@EntryValue">Reductech Step</s:String>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=14062B2D4FD825468FECD3CF658AD8FA/Text/@EntryValue"> public class $step$Tests : StepTestBase&lt;$step$, $tout$&gt;&#xD;
+    {&#xD;
+        /// &lt;inheritdoc /&gt;&#xD;
+        public $step$Tests(ITestOutputHelper testOutputHelper) : base(testOutputHelper) {}&#xD;
+&#xD;
+        /// &lt;inheritdoc /&gt;&#xD;
+        protected override IEnumerable&lt;StepCase&gt; StepCases&#xD;
+        {&#xD;
+            get&#xD;
+            {&#xD;
+          &#xD;
+            }&#xD;
+        }&#xD;
+&#xD;
+        /// &lt;inheritdoc /&gt;&#xD;
+        protected override IEnumerable&lt;DeserializeCase&gt; DeserializeCases {&#xD;
+            get&#xD;
+            {&#xD;
+            }&#xD;
+&#xD;
+        }&#xD;
+&#xD;
+    }</s:String>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=14062B2D4FD825468FECD3CF658AD8FA/Reformat/@EntryValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=14062B2D4FD825468FECD3CF658AD8FA/ShortenQualifiedReferences/@EntryValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=14062B2D4FD825468FECD3CF658AD8FA/Applicability/=Live/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=14062B2D4FD825468FECD3CF658AD8FA/Scope/=C3001E7C0DA78E4487072B7E050D86C5/@KeyIndexDefined">True</s:Boolean>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=14062B2D4FD825468FECD3CF658AD8FA/Scope/=C3001E7C0DA78E4487072B7E050D86C5/Type/@EntryValue">InCSharpFile</s:String>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=14062B2D4FD825468FECD3CF658AD8FA/Scope/=C3001E7C0DA78E4487072B7E050D86C5/CustomProperties/=minimumLanguageVersion/@EntryIndexedValue">2.0</s:String>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=14062B2D4FD825468FECD3CF658AD8FA/Field/=step/@KeyIndexDefined">True</s:Boolean>
+	
+	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=14062B2D4FD825468FECD3CF658AD8FA/Field/=step/Order/@EntryValue">0</s:Int64>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=14062B2D4FD825468FECD3CF658AD8FA/Field/=tout/@KeyIndexDefined">True</s:Boolean>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=14062B2D4FD825468FECD3CF658AD8FA/Field/=tout/Expression/@EntryValue">guessExpectedType("")</s:String>
+	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=14062B2D4FD825468FECD3CF658AD8FA/Field/=tout/Order/@EntryValue">1</s:Int64>
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	</wpf:ResourceDictionary>

@@ -22,6 +22,11 @@ namespace Reductech.EDR.Core.Internal
         /// <summary>
         /// Creates a new StepFactoryStore.
         /// </summary>
+        public static StepFactoryStore Create(params IStepFactory[] factories) => Create(factories.AsEnumerable());
+
+        /// <summary>
+        /// Creates a new StepFactoryStore.
+        /// </summary>
         public static StepFactoryStore Create(IEnumerable<IStepFactory> factories)
         {
             var dictionary = factories.ToDictionary(x => x.TypeName);

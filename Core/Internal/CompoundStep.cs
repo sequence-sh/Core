@@ -66,10 +66,15 @@ namespace Reductech.EDR.Core.Internal
         {
             get
             {
-                return GetType().GetProperties()
-                    .Where(x => x.GetCustomAttribute<StepPropertyAttribute>() != null)
-                    .Select(x => (x.Name, step: x.GetValue(this) as IStep))
+                var arguments = GetType().GetProperties()
+                    .Select(propertyInfo=> (propertyInfo, attribute: propertyInfo.GetCustomAttribute<StepPropertyAttribute>() ))
+                    .Where(x => x.attribute != null)
+                    .OrderBy(x=>x.attribute!.Order)
+                    .Select(x => (x.propertyInfo.Name, step: x.propertyInfo.GetValue(this) as IStep))
                     .Where(x => x.step != null)!;
+
+
+                return arguments;
             }
         }
 

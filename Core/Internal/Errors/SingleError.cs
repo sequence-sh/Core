@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Reductech.EDR.Core.Internal.Errors
 {
@@ -74,6 +75,40 @@ namespace Reductech.EDR.Core.Internal.Errors
         public string AsString => Message;
 
         /// <inheritdoc />
-        public override string ToString() => AsString;
+        public override string ToString() => AsString + " in " + Location.AsString;
+
+        /// <inheritdoc />
+        public bool Equals(IError? other)
+        {
+            return other switch
+            {
+                ErrorList errorList => errorList.GetAllErrors().Count() == 1 &&
+                                       Equals(errorList.GetAllErrors().Single()),
+                SingleError singleError => Equals(singleError),
+                _ => false
+            };
+        }
+
+        private bool Equals(SingleError other)
+        {
+            return Message == other.Message &&
+                   Location.Equals(other.Location) &&
+                   ErrorCode == other.ErrorCode;
+        }
+
+        /// <inheritdoc />
+        public override bool Equals(object? obj)
+        {
+            if (obj is null) return false;
+            if (ReferenceEquals(this, obj)) return true;
+
+            return obj is IError error && Equals(error);
+        }
+
+        /// <inheritdoc />
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(Message, Location, (int) ErrorCode);
+        }
     }
 }

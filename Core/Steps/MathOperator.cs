@@ -29,6 +29,7 @@ namespace Reductech.EDR.Core.Steps
         Multiply,
         /// <summary>
         /// Divide the left operand by the right.
+        /// Attempting to divide by zero will result in an error.
         /// </summary>
         [Display(Name = "/")]
         Divide,
@@ -39,6 +40,7 @@ namespace Reductech.EDR.Core.Steps
         Modulo,
         /// <summary>
         /// Raise the left operand to the power of the right.
+        /// If the right operand is negative, zero will be returned.
         /// </summary>
         [Display(Name = "^")]
         Power

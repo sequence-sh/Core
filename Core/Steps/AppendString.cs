@@ -30,7 +30,7 @@ namespace Reductech.EDR.Core.Steps
         public IStep<string> String { get; set; } = null!;
 
         /// <inheritdoc />
-        public override async Task<Result<Unit, IError>>  Run(StateMonad stateMonad, CancellationToken cancellationToken)
+        public override async Task<Result<Unit, IError>> Run(StateMonad stateMonad, CancellationToken cancellationToken)
         {
             var currentValue = stateMonad.GetVariable<string>(Variable).MapError(x=>x.WithLocation(this));
             if (currentValue.IsFailure)

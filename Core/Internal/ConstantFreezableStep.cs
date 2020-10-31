@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Linq;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Util;
@@ -10,7 +11,7 @@ namespace Reductech.EDR.Core.Internal
     /// <summary>
     /// A step that returns a fixed value when run.
     /// </summary>
-    public sealed class ConstantFreezableStep : IFreezableStep, IEquatable<ConstantFreezableStep>
+    public sealed class ConstantFreezableStep : IFreezableStep
     {
         /// <summary>
         /// Creates a new ConstantFreezableStep.
@@ -59,15 +60,39 @@ namespace Reductech.EDR.Core.Internal
         {
             get
             {
-                if (Value is string s)
-                    return $"'{s}'";
-
-                if (Value is Enum e)
-                    return e.GetDisplayName();
-
-                return $"{Value}";
+                var r = WriteValue(Value, false);
+                return r;
             }
         }
+
+        /// <summary>
+        /// Serialize a value.
+        /// </summary>
+        public static string WriteValue(object value, bool prefixEnumNames)
+        {
+            if (value is string s)
+                return $"'{s}'";
+
+            if (value is Enum e)
+            {
+                if(!prefixEnumNames)
+                    return e.GetDisplayName();
+
+                return e.GetType().Name + "." + e;
+            }
+
+            if (value is IEnumerable<object> enumerable)
+            {
+
+                var r = string.Join(", ", enumerable.Select(x=> WriteValue(x, prefixEnumNames)));
+
+                return $"[{r}]";
+            }
+
+            return value.ToString() ?? string.Empty;
+        }
+
+
 
         /// <param name="typeResolver"></param>
         /// <inheritdoc />
@@ -77,27 +102,18 @@ namespace Reductech.EDR.Core.Internal
         public override string ToString() => StepName;
 
         /// <inheritdoc />
-        public bool Equals(ConstantFreezableStep? other)
+        public bool Equals(IFreezableStep? other)
         {
             if (other is null) return false;
             if (ReferenceEquals(this, other)) return true;
-            return Value.Equals(other.Value);
+            return other is ConstantFreezableStep cfs && Value.Equals(cfs.Value);
         }
 
+
         /// <inheritdoc />
-        public override bool Equals(object? obj) => ReferenceEquals(this, obj) || obj is ConstantFreezableStep other && Equals(other);
+        public override bool Equals(object? obj) => ReferenceEquals(this, obj) || obj is IFreezableStep other && Equals(other);
 
         /// <inheritdoc />
         public override int GetHashCode() => Value.GetHashCode();
-
-        /// <summary>
-        /// Equals operator.
-        /// </summary>
-        public static bool operator ==(ConstantFreezableStep? left, ConstantFreezableStep? right) => Equals(left, right);
-
-        /// <summary>
-        /// Not Equals operator
-        /// </summary>
-        public static bool operator !=(ConstantFreezableStep? left, ConstantFreezableStep? right) => !Equals(left, right);
     }
 }

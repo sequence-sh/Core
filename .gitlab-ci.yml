@@ -1,4 +1,3 @@
-
 image: mcr.microsoft.com/dotnet/core/sdk:3.1
 
 include:
@@ -81,7 +80,7 @@ test dev:
   variables:
     CONFIG: $CONFIG_DEV
   script:
-    - dotnet test --no-build --configuration $CONFIG --collect:"XPlat Code Coverage" --results-directory ./
+    - dotnet test Core.Tests/Core.Tests.csproj --no-build --configuration $CONFIG --collect:"XPlat Code Coverage" --results-directory ./
     - >-
       pwsh -Command '$report = Get-Content -Path "*/coverage.cobertura.xml" -Raw ;
       $fixPaths = $report -replace "filename=`".+?${env:CI_PROJECT_NAME}(/|\\)", "filename=`"" ;
@@ -161,6 +160,9 @@ code_quality:
 mutation testing:
   stage: quality
   needs: []
+  image: registry.gitlab.com/reductech/containers/dotnet/sdk
+  tags: 
+    - rt-windows
   variables:
     PROJECT_TO_TEST: $CI_PROJECT_TITLE
     NUGET_PROJECT_ID: $NUGET_PROJECT_ID_DEV
@@ -257,7 +259,7 @@ push to nuget dev:
     NUGET_TOKEN: $NUGET_TOKEN_DEV
   before_script: *nuget_add_source
   script:
-    - dotnet nuget push --source reductech *.nupkg
+    - dotnet nuget push --source reductech "*.nupkg"
   rules:
     - if: *is_master
       when: never

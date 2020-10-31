@@ -46,7 +46,9 @@ namespace Reductech.EDR.Core.Serialization
     }
 
 
+#pragma warning disable CA1032 // Implement standard exception constructors
     internal class GeneralSerializerYamlException : YamlException
+#pragma warning restore CA1032 // Implement standard exception constructors
     {
         /// <inheritdoc />
         public GeneralSerializerYamlException([NotNull] Mark start, [NotNull] Mark end, [NotNull] IError error) : base(start, end, error.AsString)

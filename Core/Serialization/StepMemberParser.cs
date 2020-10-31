@@ -31,7 +31,7 @@ namespace Reductech.EDR.Core.Serialization
             /// </summary>
             // ReSharper disable once UnusedMember.Local
             None,
-            [Token(Example = "<Path>")]
+            [Token(Example = "<VariableName>")]
             VariableName,
             [Token(Example = "(")]
             OpenBracket,
@@ -52,10 +52,10 @@ namespace Reductech.EDR.Core.Serialization
             [Token(Example = "==")]
             Comparator,
 
-            [Token(Example = "\"Hello World\"")]
+            [Token(Example = "\"Double-Quoted\"")]
             DoubleQuotedStringLiteral,
 
-            [Token(Example = "'Hello World'")]
+            [Token(Example = "'Single-Quoted'")]
             SingleQuotedStringLiteral,
             [Token(Example = "123")]
             Number,
@@ -63,7 +63,7 @@ namespace Reductech.EDR.Core.Serialization
             Boolean,
             [Token(Example = "MathOperator.And")]
             Enum,
-            [Token(Example = "WriteFile")]
+            [Token(Example = "FuncName")]
             FuncOrArgumentName,
             [Token(Example = "Not")]
             NotOperator
@@ -72,12 +72,12 @@ namespace Reductech.EDR.Core.Serialization
 
 
         private static SingleError CreateError(Superpower.Model.Result<TokenList<ProcessToken>> result, Mark start, Mark end) =>
-            new SingleError(result.ErrorMessage.DefaultIfNullOrWhitespace($"Could not tokenize '{result.Remainder.ToStringValue()}'") ,
+            new SingleError(result.ErrorMessage??result.FormatErrorMessageFragment(),
                 ErrorCode.CouldNotTokenize,
                 new YamlRegionErrorLocation(start, end,result.ErrorPosition));
 
         private static SingleError CreateError(TokenListParserResult<ProcessToken, StepMember> result, Mark start, Mark end) =>
-            new SingleError(result.ErrorMessage.DefaultIfNullOrWhitespace($"Could not parse '{result.Remainder}'"),
+            new SingleError(result.ErrorMessage??result.FormatErrorMessageFragment(),
                 ErrorCode.CouldNotParse,
                 new YamlRegionErrorLocation(start, end, result.ErrorPosition));
 
@@ -93,6 +93,8 @@ namespace Reductech.EDR.Core.Serialization
 
             //VariableName must be before comparator
             .Match(Span.Regex("<[a-z0-9-_]+>", RegexOptions.Compiled | RegexOptions.IgnoreCase), ProcessToken.VariableName)
+            .Match(Span.Regex(@"-?[0-9]+", RegexOptions.Compiled), ProcessToken.Number) //Number must come before MathOperator
+
 
             .Match(GetSpan(MathOperator.None), ProcessToken.MathOperator)
             .Match(GetSpan(BooleanOperator.None), ProcessToken.BooleanOperator, true)
@@ -105,7 +107,7 @@ namespace Reductech.EDR.Core.Serialization
 
             .Match(Span.EqualToIgnoreCase(true.ToString()).Or(Span.EqualToIgnoreCase(false.ToString())), ProcessToken.Boolean, true)
             .Match(Span.EqualToIgnoreCase("not"), ProcessToken.NotOperator, true)
-            .Match(Span.Regex(@"[0-9]+", RegexOptions.Compiled), ProcessToken.Number)
+
             .Match(Span.Regex(@"[a-z0-9-_]+\.[a-z0-9-_]+", RegexOptions.Compiled | RegexOptions.IgnoreCase), ProcessToken.Enum, true)
 
             .Match(Span.Regex("[a-z0-9-_]+", RegexOptions.Compiled | RegexOptions.IgnoreCase), ProcessToken.FuncOrArgumentName, true)
@@ -355,6 +357,18 @@ namespace Reductech.EDR.Core.Serialization
 
             /// <inheritdoc />
             public Result<ITypeReference, IError> TryGetOutputTypeReference(TypeResolver typeResolver) => Result.Failure<ITypeReference, IError>(ErrorBuilder.WithLocation(EntireSequenceLocation.Instance));
+
+            public bool Equals(IFreezableStep? other)
+            {
+                return other is ParseError pe && ErrorBuilder.Equals(pe.ErrorBuilder);
+            }
+
+            /// <inheritdoc />
+            public override bool Equals(object? obj) => ReferenceEquals(this, obj) || obj is IFreezableStep other && Equals(other);
+
+
+            /// <inheritdoc />
+            public override int GetHashCode() => ErrorBuilder.GetHashCode();
         }
 
 
@@ -519,5 +533,24 @@ namespace Reductech.EDR.Core.Serialization
 
         /// <inheritdoc />
         public string AsString => $"{Start} - {End}";
+
+        /// <inheritdoc />
+        public bool Equals(IErrorLocation? other)
+        {
+            if (other is null) return false;
+            if (ReferenceEquals(this, other)) return true;
+            return other is YamlRegionErrorLocation y && Start.Equals(y.Start) && End.Equals(y.End);
+        }
+
+        /// <inheritdoc />
+        public override bool Equals(object? obj)
+        {
+            if (obj is null) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            return obj is IErrorLocation errorLocation && Equals(errorLocation);
+        }
+
+        /// <inheritdoc />
+        public override int GetHashCode() => HashCode.Combine(Start, End);
     }
 }

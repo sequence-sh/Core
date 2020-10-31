@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Internal.Errors;
 
@@ -7,7 +8,7 @@ namespace Reductech.EDR.Core.Internal
     /// <summary>
     /// A step which can be frozen.
     /// </summary>
-    public interface IFreezableStep
+    public interface IFreezableStep : IEquatable<IFreezableStep>
     {
         /// <summary>
         /// Try to freeze this step.

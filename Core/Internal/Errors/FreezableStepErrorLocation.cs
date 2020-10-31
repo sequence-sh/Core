@@ -22,5 +22,24 @@
 
         /// <inheritdoc />
         public string AsString => FreezableStep.StepName;
+
+        /// <inheritdoc />
+        public bool Equals(IErrorLocation? other)
+        {
+            if (other is null) return false;
+            if (ReferenceEquals(this, other)) return true;
+            return other is FreezableStepErrorLocation y && FreezableStep.Equals(y.FreezableStep);
+        }
+
+        /// <inheritdoc />
+        public override bool Equals(object? obj)
+        {
+            if (obj is null) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            return obj is IErrorLocation errorLocation && Equals(errorLocation);
+        }
+
+        /// <inheritdoc />
+        public override int GetHashCode() => FreezableStep.StepName.GetHashCode();
     }
 }

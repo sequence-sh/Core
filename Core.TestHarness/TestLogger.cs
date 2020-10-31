@@ -1,18 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Internal;
 
-namespace Reductech.EDR.Core.Tests
+namespace Reductech.EDR.Core.TestHarness
 {
     public class TestLogger : ILogger
     {
         /// <inheritdoc />
         public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter)
         {
-            if (state is FormattedLogValues flv)
-                foreach (var formattedLogValue in flv)
-                    LoggedValues.Add(formattedLogValue.Value);
+            if (state is IEnumerable<KeyValuePair<string, object>> flv)
+                foreach (var (_, value) in flv)
+                    LoggedValues.Add(value);
             else throw new NotImplementedException();
         }
 

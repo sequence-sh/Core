@@ -8,6 +8,7 @@ using FluentAssertions;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Serialization;
 using Reductech.EDR.Core.Steps;
+using Reductech.EDR.Core.TestHarness;
 using Reductech.EDR.Core.Util;
 using Reductech.Utilities.Testing;
 using Xunit;
@@ -712,7 +713,7 @@ Two,The second number")
                 //Arrange
                 var pfs = StepFactoryStore.CreateUsingReflection(typeof(StepFactory));
                 var logger = new TestLogger();
-                var yamlRunner = new YamlRunner(EmptySettings.Instance, logger, pfs);
+                var yamlRunner = new YamlRunner(EmptySettings.Instance, logger, ExternalProcessRunner.Instance,  pfs);
 
                 //Act
                 IFreezableStep unfrozen = Step.Unfreeze();
