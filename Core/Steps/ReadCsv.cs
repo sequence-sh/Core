@@ -14,18 +14,18 @@ namespace Reductech.EDR.Core.Steps
     /// <summary>
     /// Extracts elements from a CSV file
     /// </summary>
-    public sealed class ReadCsv : CompoundStep<RecordStream>
+    public sealed class ReadCsv : CompoundStep<EntityStream>
     {
         /// <inheritdoc />
-        public override async Task< Result<RecordStream, IError>> Run(StateMonad stateMonad, CancellationToken cancellationToken)
+        public override async Task< Result<EntityStream, IError>> Run(StateMonad stateMonad, CancellationToken cancellationToken)
         {
             var testStreamResult = await TextStream.Run(stateMonad, cancellationToken);
             if (testStreamResult.IsFailure)
-                return testStreamResult.ConvertFailure<RecordStream>();
+                return testStreamResult.ConvertFailure<EntityStream>();
 
             var delimiterResult = await Delimiter.Run(stateMonad, cancellationToken);
             if (delimiterResult.IsFailure)
-                return delimiterResult.ConvertFailure<RecordStream>();
+                return delimiterResult.ConvertFailure<EntityStream>();
 
             string? commentToken;
 
@@ -35,21 +35,21 @@ namespace Reductech.EDR.Core.Steps
             {
                 var commentTokenResult = await CommentToken.Run(stateMonad, cancellationToken);
                 if (commentTokenResult.IsFailure)
-                    return commentTokenResult.ConvertFailure<RecordStream>();
+                    return commentTokenResult.ConvertFailure<EntityStream>();
                 commentToken = commentTokenResult.Value;
             }
 
             var fieldsEnclosedInQuotesResult = await HasFieldsEnclosedInQuotes.Run(stateMonad, cancellationToken);
             if (fieldsEnclosedInQuotesResult.IsFailure)
-                return fieldsEnclosedInQuotesResult.ConvertFailure<RecordStream>();
+                return fieldsEnclosedInQuotesResult.ConvertFailure<EntityStream>();
 
             var columnsToMapResult = await ColumnsToMap.Run(stateMonad, cancellationToken);
             if (columnsToMapResult.IsFailure)
-                return columnsToMapResult.ConvertFailure<RecordStream>();
+                return columnsToMapResult.ConvertFailure<EntityStream>();
 
             var encodingResult = await Encoding.Run(stateMonad, cancellationToken);
             if (encodingResult.IsFailure)
-                return encodingResult.ConvertFailure<RecordStream>();
+                return encodingResult.ConvertFailure<EntityStream>();
 
 
             var block = CSVBlockHelper.ReadCsv(testStreamResult.Value,
@@ -58,7 +58,7 @@ namespace Reductech.EDR.Core.Steps
                 commentToken,
                 fieldsEnclosedInQuotesResult.Value, new StepErrorLocation(this));
 
-            var recordStream = new RecordStream(block);
+            var recordStream = new EntityStream(block);
 
             return recordStream;
         }
@@ -113,13 +113,13 @@ namespace Reductech.EDR.Core.Steps
     /// <summary>
     /// Extracts elements from a CSV file
     /// </summary>
-    public sealed class ReadCsvStepFactory : SimpleStepFactory<ReadCsv, RecordStream>
+    public sealed class ReadCsvStepFactory : SimpleStepFactory<ReadCsv, EntityStream>
     {
         private ReadCsvStepFactory() { }
 
         /// <summary>
         /// The instance.
         /// </summary>
-        public static SimpleStepFactory<ReadCsv, RecordStream> Instance { get; } = new ReadCsvStepFactory();
+        public static SimpleStepFactory<ReadCsv, EntityStream> Instance { get; } = new ReadCsvStepFactory();
     }
 }

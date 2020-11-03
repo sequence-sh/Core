@@ -112,14 +112,14 @@ namespace Reductech.EDR.Core
         /// <summary>
         /// Creates a block that will produce records from the CSV file.
         /// </summary>
-        public static ISourceBlock<Record> ReadCsv(Stream stream,
+        public static ISourceBlock<Entity> ReadCsv(Stream stream,
             Encoding encoding,
             string delimiter, string? commentToken, bool enclosedInQuotes, IErrorLocation errorLocation)
 
         {
             var textFieldParser = new TextFieldParser(stream, encoding);
 
-            var block = new TransformManyBlock<TextFieldParser, Record>(tfp=> TryReadCSV(tfp, delimiter, commentToken, enclosedInQuotes, errorLocation));
+            var block = new TransformManyBlock<TextFieldParser, Entity>(tfp=> TryReadCSV(tfp, delimiter, commentToken, enclosedInQuotes, errorLocation));
 
             block.Post(textFieldParser);
 
@@ -132,7 +132,7 @@ namespace Reductech.EDR.Core
         /// Reads a csv file
         /// <throws>ErrorException</throws>
         /// </summary>
-        private static IEnumerable<Record> TryReadCSV(TextFieldParser csvParser,
+        private static IEnumerable<Entity> TryReadCSV(TextFieldParser csvParser,
             string delimiter, string? commentToken, bool enclosedInQuotes, IErrorLocation errorLocation)
         {
 
@@ -156,7 +156,7 @@ namespace Reductech.EDR.Core
             var rowNumber = 1;
             while (!csvParser.EndOfData)
             {
-                Record row;
+                Entity row;
 
                 // Read current line fields, pointer moves to the next line.
                 try
@@ -170,7 +170,7 @@ namespace Reductech.EDR.Core
 
                     var pairs = headers.Zip(fields).Select(x => new KeyValuePair<string, string>(x.First, x.Second));
 
-                    row = new Record(pairs);
+                    row = new Entity(pairs);
 
                 }
                 catch (MalformedLineException e)

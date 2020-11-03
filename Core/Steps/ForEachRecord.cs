@@ -7,6 +7,7 @@ using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Util;
+using Entity = Reductech.EDR.Core.Entities.Entity;
 
 namespace Reductech.EDR.Core.Steps
 {
@@ -35,7 +36,7 @@ namespace Reductech.EDR.Core.Steps
         /// </summary>
         [StepProperty]
         [Required]
-        public IStep<RecordStream> RecordStream { get; set; } = null!;
+        public IStep<EntityStream> RecordStream { get; set; } = null!;
 
         /// <inheritdoc />
         public override async Task<Result<Unit, IError>> Run(StateMonad stateMonad, CancellationToken cancellationToken)
@@ -43,7 +44,7 @@ namespace Reductech.EDR.Core.Steps
             var records = await RecordStream.Run(stateMonad, cancellationToken);
             if (records.IsFailure) return records.ConvertFailure<Unit>();
 
-            async Task RunAction(Record record)
+            async Task RunAction(Entity record)
             {
                 var setResult = stateMonad.SetVariable(VariableName, record);
 
@@ -81,7 +82,7 @@ namespace Reductech.EDR.Core.Steps
 
         /// <inheritdoc />
         public override Result<Maybe<ITypeReference>, IError> GetTypeReferencesSet(VariableName variableName, FreezableStepData freezableStepData, TypeResolver typeResolver) =>
-            Maybe<ITypeReference>.From(new ActualTypeReference(typeof(Record)));
+            Maybe<ITypeReference>.From(new ActualTypeReference(typeof(Entity)));
     }
 
 }
