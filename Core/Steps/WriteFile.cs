@@ -26,11 +26,14 @@ namespace Reductech.EDR.Core.Steps
 
 
             var path = Path.Combine(data.Value.Item1, data.Value.Item2);
+            var stream = data.Value.Item3;
 
             Maybe<IError> errors;
             try
             {
-                await File.WriteAllTextAsync(path, data.Value.Item3, cancellationToken);
+                var fileStream = File.Create(path);
+                await stream.CopyToAsync(fileStream, cancellationToken);
+                fileStream.Close();
                 errors = Maybe<IError>.None;
             }
 #pragma warning disable CA1031 // Do not catch general exception types
@@ -65,7 +68,7 @@ namespace Reductech.EDR.Core.Steps
         /// </summary>
         [StepProperty]
         [Required]
-        public IStep<string> Text { get; set; } = null!;
+        public IStep<Stream> Text { get; set; } = null!;
 
 
         /// <inheritdoc />

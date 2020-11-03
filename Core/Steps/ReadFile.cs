@@ -14,23 +14,24 @@ namespace Reductech.EDR.Core.Steps
     /// <summary>
     /// Reads text from a file.
     /// </summary>
-    public sealed class ReadFile : CompoundStep<string>
+    public sealed class ReadFile : CompoundStep<Stream>
     {
         /// <inheritdoc />
-        public override async Task<Result<string, IError>>  Run(StateMonad stateMonad, CancellationToken cancellationToken)
+        public override async Task<Result<Stream, IError>>  Run(StateMonad stateMonad, CancellationToken cancellationToken)
         {
             var data = await Folder.Run(stateMonad, cancellationToken).Compose(() => FileName.Run(stateMonad, cancellationToken));
 
             if (data.IsFailure)
-                return data.ConvertFailure<string>();
+                return data.ConvertFailure<Stream>();
 
 
             var path = Path.Combine(data.Value.Item1, data.Value.Item2);
 
-            Result<string, IError> result;
+            Result<Stream, IError> result;
             try
             {
-                result = await File.ReadAllTextAsync(path, cancellationToken);
+                var fs = File.OpenRead(path);
+                result = Result.Success<Stream, IError>(fs);
             }
 #pragma warning disable CA1031 // Do not catch general exception types
             catch (Exception e)

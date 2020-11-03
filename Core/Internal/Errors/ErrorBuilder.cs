@@ -4,6 +4,39 @@ using System.Collections.Generic;
 namespace Reductech.EDR.Core.Internal.Errors
 {
     /// <summary>
+    /// An exception that wraps an error
+    /// </summary>
+    public class ErrorBuilderException : Exception
+    {
+        /// <summary>
+        /// Create a new ErrorException
+        /// </summary>
+        /// <param name="errorBuilder"></param>
+        public ErrorBuilderException(IErrorBuilder errorBuilder) => ErrorBuilder = errorBuilder;
+
+        /// <summary>
+        /// The errorBuilder
+        /// </summary>
+        public IErrorBuilder ErrorBuilder { get; }
+    }
+
+    /// <summary>
+    /// An exception that wraps an error
+    /// </summary>
+    public class ErrorException : Exception
+    {
+        /// <summary>
+        /// Create a new ErrorException
+        /// </summary>
+        public ErrorException(IError error) => Error = error;
+
+        /// <summary>
+        /// The errorBuilder
+        /// </summary>
+        public IError Error { get; }
+    }
+
+    /// <summary>
     /// An error without a location.
     /// </summary>
     public class ErrorBuilder : IErrorBuilder

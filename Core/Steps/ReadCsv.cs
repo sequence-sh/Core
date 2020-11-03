@@ -1,32 +1,31 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Data;
-using System.Linq;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Attributes;
+using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
-using Reductech.EDR.Core.Util;
 
 namespace Reductech.EDR.Core.Steps
 {
     /// <summary>
     /// Extracts elements from a CSV file
     /// </summary>
-    public sealed class ReadCsv : CompoundStep<List<List<string>>>
+    public sealed class ReadCsv : CompoundStep<RecordStream>
     {
         /// <inheritdoc />
-        public override async Task< Result<List<List<string>>, IError>> Run(StateMonad stateMonad, CancellationToken cancellationToken)
+        public override async Task< Result<RecordStream, IError>> Run(StateMonad stateMonad, CancellationToken cancellationToken)
         {
-            var textResult = await Text.Run(stateMonad, cancellationToken);
-            if (textResult.IsFailure)
-                return textResult.ConvertFailure<List<List<string>>>();
+            var testStreamResult = await TextStream.Run(stateMonad, cancellationToken);
+            if (testStreamResult.IsFailure)
+                return testStreamResult.ConvertFailure<RecordStream>();
 
             var delimiterResult = await Delimiter.Run(stateMonad, cancellationToken);
             if (delimiterResult.IsFailure)
-                return delimiterResult.ConvertFailure<List<List<string>>>();
+                return delimiterResult.ConvertFailure<RecordStream>();
 
             string? commentToken;
 
@@ -36,51 +35,32 @@ namespace Reductech.EDR.Core.Steps
             {
                 var commentTokenResult = await CommentToken.Run(stateMonad, cancellationToken);
                 if (commentTokenResult.IsFailure)
-                    return commentTokenResult.ConvertFailure<List<List<string>>>();
+                    return commentTokenResult.ConvertFailure<RecordStream>();
                 commentToken = commentTokenResult.Value;
             }
 
             var fieldsEnclosedInQuotesResult = await HasFieldsEnclosedInQuotes.Run(stateMonad, cancellationToken);
             if (fieldsEnclosedInQuotesResult.IsFailure)
-                return fieldsEnclosedInQuotesResult.ConvertFailure<List<List<string>>>();
+                return fieldsEnclosedInQuotesResult.ConvertFailure<RecordStream>();
 
             var columnsToMapResult = await ColumnsToMap.Run(stateMonad, cancellationToken);
             if (columnsToMapResult.IsFailure)
-                return columnsToMapResult.ConvertFailure<List<List<string>>>();
+                return columnsToMapResult.ConvertFailure<RecordStream>();
+
+            var encodingResult = await Encoding.Run(stateMonad, cancellationToken);
+            if (encodingResult.IsFailure)
+                return encodingResult.ConvertFailure<RecordStream>();
 
 
-            var dataTableResult = CsvReader.TryReadCSVFromString(textResult.Value, delimiterResult.Value, commentToken,
-                fieldsEnclosedInQuotesResult.Value);
+            var block = CSVBlockHelper.ReadCsv(testStreamResult.Value,
+                encodingResult.Value.Convert(),
+                delimiterResult.Value,
+                commentToken,
+                fieldsEnclosedInQuotesResult.Value, new StepErrorLocation(this));
 
-            if (dataTableResult.IsFailure) return dataTableResult
-                .MapError(x=> x.WithLocation(this))
-                .ConvertFailure<List<List<string>>>();
+            var recordStream = new RecordStream(block);
 
-            var missingColumnsErrors = columnsToMapResult.Value
-                .Where(x => !dataTableResult.Value.Columns.Contains(x))
-                .Select(x=> new SingleError($"Missing Column: '{x}'", ErrorCode.CSVError, new StepErrorLocation(this)))
-                .ToList();
-
-            if (missingColumnsErrors.Any())
-                return new ErrorList(missingColumnsErrors);
-
-            var results = new List<List<string>>();
-
-            foreach (DataRow row in dataTableResult.Value.Rows.Cast<DataRow>())
-            {
-                var result = new List<string>();
-
-                foreach (var columnName in columnsToMapResult.Value)
-                {
-                    var current = row[columnName, DataRowVersion.Default];
-
-                    result.Add(current.ToString()!);
-                }
-
-                results.Add(result);
-            }
-
-            return results;
+            return recordStream;
         }
 
 
@@ -89,7 +69,7 @@ namespace Reductech.EDR.Core.Steps
         /// </summary>
         [StepProperty(Order = 1)]
         [Required]
-        public IStep<string> Text { get; set; } = null!;
+        public IStep<Stream> TextStream { get; set; } = null!;
 
         /// <summary>
         /// The delimiter to use to separate rows.
@@ -118,6 +98,13 @@ namespace Reductech.EDR.Core.Steps
         [Required]
         public IStep<List<string>> ColumnsToMap { get; set; } = null!;
 
+        /// <summary>
+        /// How the stream is encoded.
+        /// </summary>
+        [StepProperty(Order = 6)]
+        [DefaultValueExplanation("The default encoding")]
+        public IStep<EncodingEnum> Encoding { get; set; } = new Constant<EncodingEnum>(EncodingEnum.Default);
+
         /// <inheritdoc />
         public override IStepFactory StepFactory => ReadCsvStepFactory.Instance;
     }
@@ -126,13 +113,13 @@ namespace Reductech.EDR.Core.Steps
     /// <summary>
     /// Extracts elements from a CSV file
     /// </summary>
-    public sealed class ReadCsvStepFactory : SimpleStepFactory<ReadCsv, List<List<string>>>
+    public sealed class ReadCsvStepFactory : SimpleStepFactory<ReadCsv, RecordStream>
     {
         private ReadCsvStepFactory() { }
 
         /// <summary>
         /// The instance.
         /// </summary>
-        public static SimpleStepFactory<ReadCsv, List<List<string>>> Instance { get; } = new ReadCsvStepFactory();
+        public static SimpleStepFactory<ReadCsv, RecordStream> Instance { get; } = new ReadCsvStepFactory();
     }
 }
