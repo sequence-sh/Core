@@ -399,7 +399,7 @@ namespace Reductech.EDR.Core.Tests
 
                             new CreateFile {Path = testFilePath, Text = new Constant<string>("Hello World")},
 
-                            new AssertTrue {Test = new FileExists {Path = testFilePath}},
+                            new AssertTrue {Test = new DoesFileExist {Path = testFilePath}},
 
                             new AssertTrue
                             {
@@ -582,7 +582,7 @@ Two,The second number"),
                 //Arrange
                 var pfs = StepFactoryStore.CreateUsingReflection(typeof(StepFactory));
                 var logger = new TestLogger();
-                var yamlRunner = new YamlRunner(EmptySettings.Instance, logger, ExternalProcessRunner.Instance,  pfs);
+                var yamlRunner = new YamlRunner(EmptySettings.Instance, logger, ExternalProcessRunner.Instance, FileSystemHelper.Instance, pfs);
 
                 //Act
                 IFreezableStep unfrozen = Step.Unfreeze();

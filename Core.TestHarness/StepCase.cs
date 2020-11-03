@@ -44,7 +44,7 @@ namespace Reductech.EDR.Core.TestHarness
         }
 
 #pragma warning disable CA1034 // Nested types should not be visible
-        public class StepCase : ICaseThatRuns
+        public class StepCase : ICaseThatExecutes
 #pragma warning restore CA1034 // Nested types should not be visible
         {
             public StepCase(string name, TStep step, TOutput expectedOutput, params string[] expectedLoggedValues)
@@ -82,9 +82,14 @@ namespace Reductech.EDR.Core.TestHarness
             public void AddExternalProcessRunnerAction(Action<Mock<IExternalProcessRunner>> action) => _externalProcessRunnerActions.Add(action);
 
             /// <inheritdoc />
-            public ISettings Settings { get; set; } = EmptySettings.Instance;
+            public void AddFileSystemAction(Action<Mock<IFileSystemHelper>> action) => _fileSystemActions.Add(action);
 
             private readonly List<Action<Mock<IExternalProcessRunner>>> _externalProcessRunnerActions = new List<Action<Mock<IExternalProcessRunner>>>();
+
+            private readonly List<Action<Mock<IFileSystemHelper>>> _fileSystemActions = new List<Action<Mock<IFileSystemHelper>>>();
+
+            /// <inheritdoc />
+            public ISettings Settings { get; set; } = EmptySettings.Instance;
 
 
             /// <inheritdoc />
@@ -127,15 +132,18 @@ namespace Reductech.EDR.Core.TestHarness
 
                 var factory = new MockRepository(MockBehavior.Strict);
                 var externalProcessRunnerMock = factory.Create<IExternalProcessRunner>();
-
-                var sfs = StepFactoryStore.CreateUsingReflection(typeof(IStep), typeof(TStep));
+                var fileSystemMock = factory.Create<IFileSystemHelper>();
 
                 foreach (var action in _externalProcessRunnerActions) action(externalProcessRunnerMock);
+
+                foreach (var fileSystemAction in _fileSystemActions) fileSystemAction(fileSystemMock);
+
+                var sfs = StepFactoryStore.CreateUsingReflection(typeof(IStep), typeof(TStep));
 
 
                 var step = GetStep(Step, extraArgument, testOutputHelper, sfs);
 
-                var stateMonad = new StateMonad(logger, Settings, externalProcessRunnerMock.Object, StepFactoryStoreToUse.Unwrap(sfs));
+                var stateMonad = new StateMonad(logger, Settings, externalProcessRunnerMock.Object, fileSystemMock.Object, StepFactoryStoreToUse.Unwrap(sfs));
 
                 foreach (var (key, value) in InitialState)
                     stateMonad.SetVariable(key, value).ShouldBeSuccessful(x => x.AsString);

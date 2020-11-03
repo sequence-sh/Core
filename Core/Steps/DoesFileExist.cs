@@ -12,7 +12,7 @@ namespace Reductech.EDR.Core.Steps
     /// <summary>
     /// Returns whether a file on the file system exists.
     /// </summary>
-    public class FileExists : CompoundStep<bool>
+    public class DoesFileExist : CompoundStep<bool>
     {
         /// <summary>
         /// The path to the file to check.
@@ -40,13 +40,13 @@ namespace Reductech.EDR.Core.Steps
     /// <summary>
     /// Returns whether a file on the file system exists.
     /// </summary>
-    public class FileExistsStepFactory : SimpleStepFactory<FileExists, bool>
+    public class FileExistsStepFactory : SimpleStepFactory<DoesFileExist, bool>
     {
         private FileExistsStepFactory() { }
 
         /// <summary>
         /// The instance.
         /// </summary>
-        public static SimpleStepFactory<FileExists, bool> Instance { get; } = new FileExistsStepFactory();
+        public static SimpleStepFactory<DoesFileExist, bool> Instance { get; } = new FileExistsStepFactory();
     }
 }
