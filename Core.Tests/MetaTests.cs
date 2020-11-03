@@ -15,10 +15,10 @@ namespace Reductech.EDR.Core.Tests
         [Fact]
         public void All_steps_should_have_a_step_test()
         {
-            var stepTypes = typeof(ICompoundStep).Assembly.GetTypes().Where(x => typeof(ICompoundStep).IsAssignableFrom(x) && !x.IsAbstract).ToHashSet();
+            var stepTypes = typeof(ICompoundStep).Assembly.GetTypes().Where(x => !x.IsAbstract && typeof(ICompoundStep).IsAssignableFrom(x)).ToHashSet();
 
             var testedStepTypes = typeof(MetaTests).Assembly.GetTypes()
-                .Where(x => typeof(IStepTestBase).IsAssignableFrom(x) && !x.IsAbstract).Select(GetStepType).ToHashSet();
+                .Where(x => !x.IsAbstract && typeof(IStepTestBase).IsAssignableFrom(x)).Select(GetStepType).ToHashSet();
 
 
             var untestedSteps = stepTypes.Except(testedStepTypes);
