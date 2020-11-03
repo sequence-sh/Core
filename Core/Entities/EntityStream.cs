@@ -25,7 +25,7 @@ namespace Reductech.EDR.Core.Entities
         public ISourceBlock<Entity> Source { get; }
 
         /// <summary>
-        /// Transforms the records in the this stream
+        /// Transforms the records in this stream
         /// </summary>
         public EntityStream Apply(Func<Entity, Entity> function)
         {
