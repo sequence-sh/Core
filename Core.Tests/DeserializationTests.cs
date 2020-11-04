@@ -303,7 +303,7 @@ Action = Print(Value = <char>))", "a", "b", "c");
                 unitStep.Should().NotBeNull();
 
                 var runResult = await unitStep!
-                    .Run(new StateMonad(logger, EmptySettings.Instance, ExternalProcessRunner.Instance, stepFactoryStore), CancellationToken.None);
+                    .Run(new StateMonad(logger, EmptySettings.Instance, ExternalProcessRunner.Instance, FileSystemHelper.Instance,  stepFactoryStore), CancellationToken.None);
 
                 runResult.ShouldBeSuccessful(x => x.AsString);
 

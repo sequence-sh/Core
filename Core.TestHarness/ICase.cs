@@ -15,7 +15,11 @@ namespace Reductech.EDR.Core.TestHarness
         public Task RunCaseAsync(ITestOutputHelper testOutputHelper, string? extraArgument);
     }
 
-    public interface ICaseThatRuns : ICase
+
+    /// <summary>
+    /// A case that executes a step.
+    /// </summary>
+    public interface ICaseThatExecutes : ICase
     {
         Dictionary<VariableName, object> InitialState { get; }
         Dictionary<VariableName, object> ExpectedFinalState { get; }
@@ -23,6 +27,7 @@ namespace Reductech.EDR.Core.TestHarness
         Maybe<StepFactoryStore> StepFactoryStoreToUse { get; set; }
 
         void AddExternalProcessRunnerAction(Action<Mock<IExternalProcessRunner>> action);
+        void AddFileSystemAction(Action<Mock<IFileSystemHelper>> action);
 
         ISettings Settings {get; set; }
 

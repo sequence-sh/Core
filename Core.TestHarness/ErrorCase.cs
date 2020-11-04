@@ -33,7 +33,7 @@ namespace Reductech.EDR.Core.TestHarness
         }
 
 #pragma warning disable CA1034 // Nested types should not be visible
-        public class ErrorCase :  ICaseThatRuns
+        public class ErrorCase :  ICaseThatExecutes
 #pragma warning restore CA1034 // Nested types should not be visible
         {
             public ErrorCase(string name, TStep step, IError expectedError)
@@ -61,12 +61,15 @@ namespace Reductech.EDR.Core.TestHarness
 
                 var factory = new MockRepository(MockBehavior.Strict);
                 var externalProcessRunnerMock = factory.Create<IExternalProcessRunner>();
-
-                var sfs = StepFactoryStoreToUse.Unwrap(StepFactoryStore.CreateUsingReflection(typeof(IStep), typeof(TStep)));
+                var fileSystemMock = factory.Create<IFileSystemHelper>();
 
                 foreach (var action in _externalProcessRunnerActions) action(externalProcessRunnerMock);
 
-                var stateMonad = new StateMonad(logger, Settings, externalProcessRunnerMock.Object, sfs);
+                foreach (var fileSystemAction in _fileSystemActions) fileSystemAction(fileSystemMock);
+
+                var sfs = StepFactoryStoreToUse.Unwrap(StepFactoryStore.CreateUsingReflection(typeof(IStep), typeof(TStep)));
+
+                var stateMonad = new StateMonad(logger, Settings, externalProcessRunnerMock.Object, fileSystemMock.Object, sfs);
 
                 foreach (var (key, value) in InitialState)
                     stateMonad.SetVariable(key, value).ShouldBeSuccessful(x => x.AsString);
@@ -87,13 +90,19 @@ namespace Reductech.EDR.Core.TestHarness
             /// <inheritdoc />
             public Maybe<StepFactoryStore> StepFactoryStoreToUse { get; set; }
 
-            /// <inheritdoc />
-            public void AddExternalProcessRunnerAction(Action<Mock<IExternalProcessRunner>> action) => _externalProcessRunnerActions.Add(action);
 
             /// <inheritdoc />
             public ISettings Settings { get; set; } = EmptySettings.Instance;
 
+            /// <inheritdoc />
+            public void AddExternalProcessRunnerAction(Action<Mock<IExternalProcessRunner>> action) => _externalProcessRunnerActions.Add(action);
+
+            /// <inheritdoc />
+            public void AddFileSystemAction(Action<Mock<IFileSystemHelper>> action) => _fileSystemActions.Add(action);
+
             private readonly List<Action<Mock<IExternalProcessRunner>>> _externalProcessRunnerActions = new List<Action<Mock<IExternalProcessRunner>>>();
+
+            private readonly List<Action<Mock<IFileSystemHelper>>> _fileSystemActions = new List<Action<Mock<IFileSystemHelper>>>();
         }
 
         /// <summary>

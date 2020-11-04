@@ -17,7 +17,14 @@ namespace Reductech.EDR.Core.TestHarness
 {
     public abstract partial class StepTestBase<TStep, TOutput>
     {
-        protected abstract IEnumerable<DeserializeCase> DeserializeCases { get; }
+        protected virtual IEnumerable<DeserializeCase> DeserializeCases
+        {
+            get
+            {
+                yield break;
+            }
+        }
+
         public IEnumerable<object?[]> DeserializeCaseNames => DeserializeCases.Select(x => new[] {x.Name});
 
         [Theory]
@@ -28,7 +35,7 @@ namespace Reductech.EDR.Core.TestHarness
         }
 
 #pragma warning disable CA1034 // Nested types should not be visible
-        public class DeserializeCase : ICaseThatRuns
+        public class DeserializeCase : ICaseThatExecutes
 #pragma warning restore CA1034 // Nested types should not be visible
         {
             public DeserializeCase(string name, string yaml, TOutput expectedOutput,
@@ -69,9 +76,15 @@ namespace Reductech.EDR.Core.TestHarness
             public void AddExternalProcessRunnerAction(Action<Mock<IExternalProcessRunner>> action) => _externalProcessRunnerActions.Add(action);
 
             /// <inheritdoc />
-            public ISettings Settings { get; set; } = EmptySettings.Instance;
+            public void AddFileSystemAction(Action<Mock<IFileSystemHelper>> action) => _fileSystemActions.Add(action);
 
             private readonly List<Action<Mock<IExternalProcessRunner>>> _externalProcessRunnerActions = new List<Action<Mock<IExternalProcessRunner>>>();
+
+            private readonly List<Action<Mock<IFileSystemHelper>>> _fileSystemActions = new List<Action<Mock<IFileSystemHelper>>>();
+
+
+            /// <inheritdoc />
+            public ISettings Settings { get; set; } = EmptySettings.Instance;
 
             /// <inheritdoc />
             public override string ToString() => Name;
@@ -95,14 +108,13 @@ namespace Reductech.EDR.Core.TestHarness
 
                 var factory = new MockRepository(MockBehavior.Strict);
                 var externalProcessRunnerMock = factory.Create<IExternalProcessRunner>();
+                var fileSystemMock = factory.Create<IFileSystemHelper>();
 
+                foreach (var action in _externalProcessRunnerActions) action(externalProcessRunnerMock);
 
-                foreach (var action in _externalProcessRunnerActions)
-                {
-                    action(externalProcessRunnerMock);
-                }
+                foreach (var fileSystemAction in _fileSystemActions) fileSystemAction(fileSystemMock);
 
-                var stateMonad = new StateMonad(logger, Settings, externalProcessRunnerMock.Object, StepFactoryStoreToUse.Unwrap(sfs));
+                var stateMonad = new StateMonad(logger, Settings, externalProcessRunnerMock.Object,  fileSystemMock.Object, StepFactoryStoreToUse.Unwrap(sfs));
 
                 foreach (var (key, value) in InitialState)
                     stateMonad.SetVariable(key, value).ShouldBeSuccessful(x => x.AsString);
