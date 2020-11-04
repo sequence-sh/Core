@@ -14,7 +14,14 @@ namespace Reductech.EDR.Core.Entities
         /// <summary>
         /// Create a new record.
         /// </summary>
-        /// <param name="fields"></param>
+        public Entity(params KeyValuePair<string, string>[] fields) : this(fields.AsEnumerable())
+        {
+
+        }
+
+        /// <summary>
+        /// Create a new record.
+        /// </summary>
         public Entity(IEnumerable<KeyValuePair<string, string>> fields) =>
             _fields = fields.ToLookup(x => x.Key, x => x.Value);
 

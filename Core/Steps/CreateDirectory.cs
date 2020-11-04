@@ -1,6 +1,4 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations;
-using System.IO;
+﻿using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
@@ -24,19 +22,8 @@ namespace Reductech.EDR.Core.Steps
             if (path.IsFailure)
                 return path.ConvertFailure<Unit>();
 
-
-            Result<Unit, IError> r;
-
-            try
-            {
-                Directory.CreateDirectory(path.Value);
-                r = Result.Success<Unit, IError>(Unit.Default);
-            }
-#pragma warning disable CA1031 // Do not catch general exception types
-            catch (Exception e)
-            {
-                r = new SingleError(e.Message, ErrorCode.ExternalProcessError, new StepErrorLocation(this));
-            }
+            var r = stateMonad.FileSystemHelper.CreateDirectory(path.Value)
+                .MapError(x => x.WithLocation(this));
 
             return r;
         }

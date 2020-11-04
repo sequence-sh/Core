@@ -1,6 +1,4 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations;
-using System.IO;
+﻿using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
@@ -29,29 +27,10 @@ namespace Reductech.EDR.Core.Steps
             if (textResult.IsFailure)
                 return textResult.ConvertFailure<Unit>();
 
-            var result = await CreateFile1(pathResult.Value, textResult.Value, cancellationToken);
+            var result = await stateMonad.FileSystemHelper.CreateFileAsync(pathResult.Value, textResult.Value, cancellationToken)
+                .MapError(x=>x.WithLocation(this));
 
             return result;
-        }
-
-        private async Task<Result<Unit, IError>>  CreateFile1(string path, string text, CancellationToken ca)
-        {
-            Result<Unit, IError> r1;
-
-            try
-            {
-                await using var sw = File.CreateText(path);
-                await sw.WriteAsync(text.AsMemory(), ca);
-                r1 = Unit.Default;
-            }
-#pragma warning disable CA1031 // Do not catch general exception types
-            catch (Exception e)
-            {
-                r1 = new SingleError(e.Message, ErrorCode.ExternalProcessError, new StepErrorLocation(this));
-            }
-#pragma warning restore CA1031 // Do not catch general exception types
-
-            return r1;
         }
 
         /// <summary>

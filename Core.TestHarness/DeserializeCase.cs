@@ -17,7 +17,14 @@ namespace Reductech.EDR.Core.TestHarness
 {
     public abstract partial class StepTestBase<TStep, TOutput>
     {
-        protected abstract IEnumerable<DeserializeCase> DeserializeCases { get; }
+        protected virtual IEnumerable<DeserializeCase> DeserializeCases
+        {
+            get
+            {
+                yield break;
+            }
+        }
+
         public IEnumerable<object?[]> DeserializeCaseNames => DeserializeCases.Select(x => new[] {x.Name});
 
         [Theory]

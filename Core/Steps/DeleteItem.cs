@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
@@ -26,20 +25,25 @@ namespace Reductech.EDR.Core.Steps
             var path = pathResult.Value;
 
 
-            if (Directory.Exists(path))
+            Result<Unit, IErrorBuilder> result;
+
+            if (stateMonad.FileSystemHelper.DoesDirectoryExist(path))
             {
-                Directory.Delete(path, true);
+                result = stateMonad.FileSystemHelper.DeleteDirectory(path, true);
                 stateMonad.Logger.LogInformation($"Directory '{path}' Deleted.");
             }
-            else if (File.Exists(path))
+            else if (stateMonad.FileSystemHelper.DoesFileExist(path))
             {
-                File.Delete(path);
+                result = stateMonad.FileSystemHelper.DeleteFile(path);
                 stateMonad.Logger.LogInformation($"File '{path}' Deleted.");
             }
             else
+            {
+                result = Unit.Default;
                 stateMonad.Logger.LogInformation($"Item '{path}' did not exist.");
+            }
 
-            return Unit.Default;
+            return result.MapError(x=>x.WithLocation(this));
 
         }
 

@@ -1,6 +1,4 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations;
-using System.IO;
+﻿using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
@@ -13,7 +11,7 @@ namespace Reductech.EDR.Core.Steps
     /// <summary>
     /// Returns whether a directory on the file system exists.
     /// </summary>
-    public class DirectoryExists : CompoundStep<bool>
+    public class DoesDirectoryExist : CompoundStep<bool>
     {
         /// <summary>
         /// The path to the folder to check.
@@ -29,19 +27,7 @@ namespace Reductech.EDR.Core.Steps
 
             if (pathResult.IsFailure) return pathResult.ConvertFailure<bool>();
 
-            Result<bool, IError> r;
-            try
-            {
-                r = Directory.Exists(pathResult.Value);
-            }
-#pragma warning disable CA1031 // Do not catch general exception types
-            catch (Exception e)
-            {
-                r = new SingleError(e.Message, ErrorCode.ExternalProcessError, new StepErrorLocation(this));
-            }
-#pragma warning restore CA1031 // Do not catch general exception types
-
-
+            var r = stateMonad.FileSystemHelper.DoesDirectoryExist(pathResult.Value);
             return r;
         }
 
@@ -52,14 +38,14 @@ namespace Reductech.EDR.Core.Steps
     /// <summary>
     /// Returns whether a directory on the file system exists.
     /// </summary>
-    public class DirectoryExistsStepFactory : SimpleStepFactory<DirectoryExists, bool>
+    public class DirectoryExistsStepFactory : SimpleStepFactory<DoesDirectoryExist, bool>
     {
         private DirectoryExistsStepFactory() { }
 
         /// <summary>
         /// The instance.
         /// </summary>
-        public static SimpleStepFactory<DirectoryExists, bool> Instance { get; } = new DirectoryExistsStepFactory();
+        public static SimpleStepFactory<DoesDirectoryExist, bool> Instance { get; } = new DirectoryExistsStepFactory();
     }
 
 }

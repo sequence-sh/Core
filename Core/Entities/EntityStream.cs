@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
 using CSharpFunctionalExtensions;
@@ -18,6 +19,27 @@ namespace Reductech.EDR.Core.Entities
         /// </summary>
         /// <param name="source"></param>
         public EntityStream(ISourceBlock<Entity> source) => Source = source;
+
+        /// <summary>
+        /// Create a new EntityStream from an enumerable
+        /// </summary>
+        public static EntityStream Create(IEnumerable<Entity> entities)
+        {
+            var block = new TransformBlock<Entity, Entity>(x=>x);
+
+            foreach (var entity in entities)
+            {
+                block.Post(entity);
+            }
+            block.Complete();
+
+            return new EntityStream(block);
+        }
+
+        /// <summary>
+        /// Create a new EntityStream from an enumerable
+        /// </summary>
+        public static EntityStream Create(params Entity[] entities) => Create(entities.AsEnumerable());
 
         /// <summary>
         /// The source block

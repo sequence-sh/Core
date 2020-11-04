@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
@@ -28,7 +27,7 @@ namespace Reductech.EDR.Core.Steps
 
             if (pathResult.IsFailure) return pathResult.ConvertFailure<bool>();
 
-            var r = File.Exists(pathResult.Value);
+            var r = stateMonad.FileSystemHelper.DoesFileExist(pathResult.Value);
 
             return r;
         }

@@ -1,5 +1,4 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -27,18 +26,8 @@ namespace Reductech.EDR.Core.Steps
 
             var path = Path.Combine(data.Value.Item1, data.Value.Item2);
 
-            Result<Stream, IError> result;
-            try
-            {
-                var fs = File.OpenRead(path);
-                result = Result.Success<Stream, IError>(fs);
-            }
-#pragma warning disable CA1031 // Do not catch general exception types
-            catch (Exception e)
-            {
-                result = new SingleError(e.Message, ErrorCode.ExternalProcessError, new StepErrorLocation(this));
-            }
-#pragma warning restore CA1031 // Do not catch general exception types
+            var result = stateMonad.FileSystemHelper.ReadFile(path)
+                    .MapError(x=>x.WithLocation(this));
 
             return result;
         }

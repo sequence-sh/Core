@@ -82,6 +82,7 @@ namespace Reductech.EDR.Core.Steps
         /// The token to use to indicate comments.
         /// </summary>
         [StepProperty(Order = 3)]
+        [DefaultValueExplanation("Comments cannot be indicated")]
         public IStep<string>? CommentToken { get; set; }
 
         /// <summary>

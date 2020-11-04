@@ -12,9 +12,9 @@ using Entity = Reductech.EDR.Core.Entities.Entity;
 namespace Reductech.EDR.Core.Steps
 {
     /// <summary>
-    /// Perform an action on each record in the stream.
+    /// Perform an action on each entity in the stream.
     /// </summary>
-    public sealed class ForEachRecord : CompoundStep<Unit>
+    public sealed class ForEachEntity : CompoundStep<Unit>
     {
         /// <summary>
         /// The action to perform repeatedly.
@@ -32,16 +32,16 @@ namespace Reductech.EDR.Core.Steps
         public VariableName VariableName { get; set; }
 
         /// <summary>
-        /// The records to iterate over.
+        /// The entities to iterate over.
         /// </summary>
         [StepProperty]
         [Required]
-        public IStep<EntityStream> RecordStream { get; set; } = null!;
+        public IStep<EntityStream> EntityStream { get; set; } = null!;
 
         /// <inheritdoc />
         public override async Task<Result<Unit, IError>> Run(StateMonad stateMonad, CancellationToken cancellationToken)
         {
-            var records = await RecordStream.Run(stateMonad, cancellationToken);
+            var records = await EntityStream.Run(stateMonad, cancellationToken);
             if (records.IsFailure) return records.ConvertFailure<Unit>();
 
             async Task RunAction(Entity record)
@@ -63,21 +63,21 @@ namespace Reductech.EDR.Core.Steps
         }
 
         /// <inheritdoc />
-        public override IStepFactory StepFactory => ForEachRecordStepFactory.Instance;
+        public override IStepFactory StepFactory => ForEachEntityStepFactory.Instance;
     }
 
 
     /// <summary>
     /// Perform an action on each record in the stream.
     /// </summary>
-    public sealed class ForEachRecordStepFactory : SimpleStepFactory<ForEachRecord, Unit>
+    public sealed class ForEachEntityStepFactory : SimpleStepFactory<ForEachEntity, Unit>
     {
-        private ForEachRecordStepFactory() {}
+        private ForEachEntityStepFactory() {}
 
         /// <summary>
         /// The instance.
         /// </summary>
-        public static SimpleStepFactory<ForEachRecord, Unit> Instance { get; } = new ForEachRecordStepFactory();
+        public static SimpleStepFactory<ForEachEntity, Unit> Instance { get; } = new ForEachEntityStepFactory();
 
 
         /// <inheritdoc />
