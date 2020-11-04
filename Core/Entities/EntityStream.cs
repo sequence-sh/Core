@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
 using CSharpFunctionalExtensions;
@@ -45,6 +46,32 @@ namespace Reductech.EDR.Core.Entities
         /// The source block
         /// </summary>
         public ISourceBlock<Entity> Source { get; }
+
+        /// <summary>
+        /// Gets a list of results
+        /// </summary>
+        public async Task<Result<IReadOnlyCollection<Entity>>> TryGetResultsAsync(CancellationToken cancellationToken)
+        {
+            var list = new List<Entity>();
+            try
+            {
+                while (await Source.OutputAvailableAsync(cancellationToken))
+                {
+                    var r = await Source.ReceiveAsync(cancellationToken);
+                    list.Add(r);
+                }
+
+                await Source.Completion;
+            }
+#pragma warning disable CA1031 // Do not catch general exception types
+            catch (Exception e)
+            {
+                return Result.Failure<IReadOnlyCollection<Entity>>(e.Message);
+            }
+#pragma warning restore CA1031 // Do not catch general exception types
+
+            return list;
+        }
 
         /// <summary>
         /// Transforms the records in this stream

@@ -1,6 +1,10 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.Linq;
+using System.Text;
+using CSharpFunctionalExtensions;
+using Reductech.EDR.Core.Serialization;
 
 namespace Reductech.EDR.Core.Entities
 {
@@ -14,10 +18,7 @@ namespace Reductech.EDR.Core.Entities
         /// <summary>
         /// Create a new record.
         /// </summary>
-        public Entity(params KeyValuePair<string, string>[] fields) : this(fields.AsEnumerable())
-        {
-
-        }
+        public Entity(params KeyValuePair<string, string>[] fields) : this(fields.AsEnumerable()) {}
 
         /// <summary>
         /// Create a new record.
@@ -66,9 +67,51 @@ namespace Reductech.EDR.Core.Entities
 
 
         /// <summary>
-        /// Converts this record into a string.
+        /// Serialize this record.
         /// </summary>
         /// <returns></returns>
+        public Result<string> TrySerializeShortForm()
+        {
+            var sb = new StringBuilder();
+
+            sb.Append("(");
+
+            var pairs = _fields.SelectMany(grouping => grouping.Select(value => (grouping.Key, value)))
+                .Select(x=> SerializationMethods.TrySerializeShortFormString(x.value).Map(k=> $"{x.Key} = {k}"))
+                .Combine();
+
+            if (pairs.IsFailure)
+                return pairs.ConvertFailure<string>();
+
+            sb.AppendJoin(",", pairs.Value);
+
+            sb.Append(")");
+
+            return sb.ToString();
+        }
+
+        /// <summary>
+        /// Convert this entity to an object that can be serialized
+        /// </summary>
+        /// <returns></returns>
+        public object ToSimpleObject()
+        {
+            IDictionary<string, object> expandoObject = new ExpandoObject();
+
+            foreach (var field in _fields)
+            {
+                if (field.Count() == 1)
+                    expandoObject[field.Key] = field.Single();
+                else
+                    expandoObject[field.Key] = field.ToList();
+            }
+
+            return expandoObject;
+        }
+
+        /// <summary>
+        /// Converts this record into a string.
+        /// </summary>
         public string AsString()
         {
             var result = string.Join(", ",

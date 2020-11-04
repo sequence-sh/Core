@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Reductech.EDR.Core.Serialization;
@@ -71,9 +72,20 @@ namespace Reductech.EDR.Core.TestHarness
 
             var stepName = new TStep().StepFactory.TypeName;
 
-            var expectedYaml = $"{stepName}({string.Join(", ", values.OrderBy(x => x.Key).Select(x => $"{x.Key} = {x.Value}"))})";
+            var expectedYamlBuilder = new StringBuilder();
 
-            var c = new SerializeCase("Default", step, expectedYaml);
+            expectedYamlBuilder.Append(stepName);
+            expectedYamlBuilder.Append("(");
+
+            var pairs = values.OrderBy(x => x.Key).Select(x => $"{x.Key} = {x.Value}");
+
+            expectedYamlBuilder.AppendJoin(", ", pairs);
+
+
+            expectedYamlBuilder.Append(")");
+
+
+            var c = new SerializeCase("Default", step, expectedYamlBuilder.ToString());
 
             return c;
         }
