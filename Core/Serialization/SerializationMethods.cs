@@ -67,7 +67,7 @@ namespace Reductech.EDR.Core.Serialization
             return Result.Failure<string>("Strings containing newline characters cannot be serialized in short form");
         }
 
-        private static Result<string> TrySerializeSimple(object value)
+        public static Result<string> TrySerializeSimple(object value)
         {
             if (value is Enum)
                 return value.GetType().Name + "." + value;
@@ -136,8 +136,10 @@ namespace Reductech.EDR.Core.Serialization
         /// </summary>
         public static string Escape(string s) => s.Replace("'", "''");
 
-
-        private static string StreamToString(Stream stream, Encoding encoding)
+        /// <summary>
+        /// Converts a stream to a string with the given encoding.
+        /// </summary>
+        public static string StreamToString(Stream stream, Encoding encoding)
         {
             stream.Position = 0;
             using StreamReader reader = new StreamReader(stream, encoding);
