@@ -8,6 +8,7 @@ using System.Text;
 using FluentAssertions.Common;
 using Namotion.Reflection;
 using Reductech.EDR.Core.Attributes;
+using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.Util;
@@ -219,12 +220,44 @@ namespace Reductech.EDR.Core.TestHarness
 
                 return (step, asString);
             }
+            else if (outputType == typeof(Entity))
+            {
+                var entity = CreateEntity(ref index);
+
+                step = new Constant<Entity>(entity);
+            }
+            else if (outputType == typeof(EntityStream))
+            {
+                var entityList = new List<Entity>
+                {
+                    CreateEntity(ref index), CreateEntity(ref index), CreateEntity(ref index)
+                };
+
+
+                var entityStream = EntityStream.Create(entityList);
+
+                step = new Constant<EntityStream>(entityStream);
+            }
             else
                 throw new XunitException($"Cannot create a constant step with type {outputType.GetDisplayName()}");
 
             return (step, GetString(step));
 
 
+            static Entity CreateEntity(ref int index1)
+            {
+                var pairs = new List<KeyValuePair<string, string>>
+                {
+                    new KeyValuePair<string, string>("Prop1", $"Val{index1}")
+                };
+
+                index1++;
+                pairs.Add(new KeyValuePair<string, string>("Prop2", $"Val{index1}"));
+                index1++;
+
+                var entity = new Entity(pairs);
+                return entity;
+            }
         }
 
 

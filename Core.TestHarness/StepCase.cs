@@ -112,6 +112,8 @@ namespace Reductech.EDR.Core.TestHarness
                 var yaml = Step.Unfreeze().SerializeToYaml();
 
                 testOutputHelper.WriteLine(yaml);
+                testOutputHelper.WriteLine("");
+                testOutputHelper.WriteLine("");
 
                 var deserializeResult = YamlMethods.DeserializeFromYaml(yaml, sfs);
 
