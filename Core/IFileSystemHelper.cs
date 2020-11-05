@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.IO.Compression;
 using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
@@ -121,6 +122,52 @@ namespace Reductech.EDR.Core
 
             return result;
         }
+
+        /// <inheritdoc />
+        public Result<Unit, IErrorBuilder> ExtractToDirectory(string sourceArchivePath, string destinationDirectoryPath, bool overwrite)
+        {
+            Maybe<IErrorBuilder> error;
+            try
+            {
+                ZipFile.ExtractToDirectory(sourceArchivePath, destinationDirectoryPath, overwrite);
+                error = Maybe<IErrorBuilder>.None;
+            }
+#pragma warning disable CA1031 // Do not catch general exception types
+            catch (Exception e)
+            {
+                error = Maybe<IErrorBuilder>.From(new ErrorBuilder(e.Message, ErrorCode.ExternalProcessError));
+            }
+#pragma warning restore CA1031 // Do not catch general exception types
+
+            if (error.HasValue)
+                return Result.Failure<Unit, IErrorBuilder>(error.Value);
+
+            return Unit.Default;
+        }
+
+        /// <inheritdoc />
+        public async Task<Result<Unit, IErrorBuilder>> WriteFileAsync(string path, Stream stream, CancellationToken cancellationToken)
+        {
+            Maybe<IErrorBuilder> error;
+            try
+            {
+                var fileStream = File.Create(path);
+                await stream.CopyToAsync(fileStream, cancellationToken);
+                fileStream.Close();
+                error = Maybe<IErrorBuilder>.None;
+            }
+#pragma warning disable CA1031 // Do not catch general exception types
+            catch (Exception e)
+            {
+                error = Maybe<IErrorBuilder>.From(new ErrorBuilder(e.Message, ErrorCode.ExternalProcessError));
+            }
+#pragma warning restore CA1031 // Do not catch general exception types
+
+            if (error.HasValue)
+                return Result.Failure<Unit, IErrorBuilder>(error.Value);
+
+            return Unit.Default;
+        }
     }
 
 
@@ -165,5 +212,16 @@ namespace Reductech.EDR.Core
         /// Reads the text of a file
         /// </summary>
         Result<Stream, IErrorBuilder> ReadFile(string path);
+
+        /// <summary>
+        /// Extracts all the files in the specified archive to the directory on the file system.
+        /// </summary>
+        Result<Unit, IErrorBuilder> ExtractToDirectory(string sourceArchivePath,
+            string destinationDirectoryPath, bool overwrite);
+
+        /// <summary>
+        /// Creates a file and writes a stream to it.
+        /// </summary>
+        Task<Result<Unit, IErrorBuilder>> WriteFileAsync(string path, Stream text, CancellationToken cancellationToken);
     }
 }

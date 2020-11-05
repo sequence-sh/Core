@@ -57,7 +57,7 @@ namespace Reductech.EDR.Core.TestHarness
                 Name = name;
                 Step = step;
                 ExpectedOutput = expectedOutput;
-                ExpectedLoggedValues = expectedLoggedValues;
+                ExpectedLoggedValues = expectedLoggedValues.Select(CompressNewlines).ToList();
             }
 
 
@@ -69,7 +69,7 @@ namespace Reductech.EDR.Core.TestHarness
             /// </summary>
             public Maybe<TOutput> ExpectedOutput { get; }
 
-            public IReadOnlyCollection<object> ExpectedLoggedValues { get; }
+            public IReadOnlyCollection<string> ExpectedLoggedValues { get; }
 
             public Dictionary<VariableName, object> InitialState {get; } = new Dictionary<VariableName, object>();
 
@@ -162,7 +162,7 @@ namespace Reductech.EDR.Core.TestHarness
                     result.ShouldBeSuccessful(x=>x.AsString);
                 }
 
-                logger.LoggedValues.Should().BeEquivalentTo(ExpectedLoggedValues);
+                logger.LoggedValues.Select(x=> CompressNewlines(x.ToString()!)) .Should().BeEquivalentTo(ExpectedLoggedValues);
                 stateMonad.GetState().Should().BeEquivalentTo(ExpectedFinalState);
 
                 factory.VerifyAll();

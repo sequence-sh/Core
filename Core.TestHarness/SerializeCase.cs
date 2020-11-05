@@ -16,7 +16,7 @@ namespace Reductech.EDR.Core.TestHarness
         {
             get
             {
-                yield return CreateDefaultSerializeCase();
+                yield return CreateDefaultSerializeCase(true);
             }
         }
 
@@ -65,29 +65,47 @@ namespace Reductech.EDR.Core.TestHarness
         }
 
 
-        public static SerializeCase CreateDefaultSerializeCase()
+        public static SerializeCase CreateDefaultSerializeCase(bool shortForm)
         {
             var (step, values) = CreateStepWithDefaultOrArbitraryValues();
 
 
             var stepName = new TStep().StepFactory.TypeName;
-
             var expectedYamlBuilder = new StringBuilder();
 
-            expectedYamlBuilder.Append(stepName);
-            expectedYamlBuilder.Append("(");
+            if (shortForm)
+            {
+                expectedYamlBuilder.Append(stepName);
+                expectedYamlBuilder.Append("(");
 
-            var pairs = values.OrderBy(x => x.Key).Select(x => $"{x.Key} = {x.Value}");
+                var pairs = values.OrderBy(x => x.Key).Select(x => $"{x.Key} = {x.Value}");
 
-            expectedYamlBuilder.AppendJoin(", ", pairs);
+                expectedYamlBuilder.AppendJoin(", ", pairs);
+                expectedYamlBuilder.Append(")");
+                var c = new SerializeCase("Default", step, expectedYamlBuilder.ToString());
 
+                return c;
+            }
+            else
+            {
+                expectedYamlBuilder.AppendLine($"Do: {stepName}");
 
-            expectedYamlBuilder.Append(")");
+                var pairs = values.OrderBy(x => x.Key);
 
+                foreach (var pair in pairs)
+                {
+                    if (pair.Value.Contains("\n"))
+                    {
+                        expectedYamlBuilder.AppendLine($"{pair.Key}: ");
+                        expectedYamlBuilder.AppendLine($"{pair.Value}");
+                    }
+                    else
+                        expectedYamlBuilder.AppendLine($"{pair.Key}: {pair.Value}");
+                }
 
-            var c = new SerializeCase("Default", step, expectedYamlBuilder.ToString());
-
-            return c;
+                var c = new SerializeCase("Long Form", step, expectedYamlBuilder.ToString().Trim());
+                return c;
+            }
         }
     }
 }

@@ -67,6 +67,9 @@ namespace Reductech.EDR.Core.Serialization
             return Result.Failure<string>("Strings containing newline characters cannot be serialized in short form");
         }
 
+        /// <summary>
+        /// Try to serialize a simple object.
+        /// </summary>
         public static Result<string> TrySerializeSimple(object value)
         {
             if (value is Enum)
@@ -83,30 +86,29 @@ namespace Reductech.EDR.Core.Serialization
         }
 
 
-
-        internal static object ConvertToSerializableType(ConstantFreezableStep cfp)
+        private static object ConvertToSerializableType(Entity entity)
         {
-            static object Convert(Entity entity1)
-            {
-                var shortFormEntity = entity1.TrySerializeShortForm();
-                if (shortFormEntity.IsSuccess)
-                    return shortFormEntity.Value;
-                return entity1.ToSimpleObject();
-            }
+            var shortFormEntity = entity.TrySerializeShortForm();
+            if (shortFormEntity.IsSuccess)
+                return shortFormEntity.Value;
 
-            if (cfp.Value is string s)
+            return entity.ToSimpleObject();
+        }
+
+
+        private static object ConvertToSerializableType1(object value)
+        {
+            if (value is string s)
                 return new YamlString(s);
 
-            if (cfp.Value is Entity entity)
-            {
-                return Convert(entity);
-            }
+            if (value is Entity entity)
+                return ConvertToSerializableType(entity);
 
-            if (cfp.Value is EntityStream entityStream)
+            if (value is EntityStream entityStream)
             {
                 var entities = entityStream.TryGetResultsAsync(CancellationToken.None)
                     .Result //This should work, but maybe not in some environments
-                    .Map(x=>x.Select(Convert).ToList());
+                    .Map(x => x.Select(ConvertToSerializableType).ToList());
 
                 if (entities.IsFailure)
                     throw new SerializationException(entities.Error);
@@ -115,21 +117,28 @@ namespace Reductech.EDR.Core.Serialization
             }
 
 
-            if (cfp.Value is Stream stream)
+            if (value is Stream stream)
             {
                 var streamString = StreamToString(stream, Encoding.UTF8);
                 return new YamlString(streamString); //This will be a string - convert it to a stream
             }
 
+            if (value is IEnumerable enumerable)
+            {
+                var list = enumerable.OfType<object>().Select(ConvertToSerializableType1).ToList();
+                return list;
+            }
 
-            var r = TrySerializeSimple(cfp.Value);
+
+            var r = TrySerializeSimple(value);
 
             if (r.IsSuccess)
                 return r.Value;
 
-
             throw new SerializationException(r.Error);//This is unexpected
         }
+
+        internal static object ConvertToSerializableType(ConstantFreezableStep cfp) => ConvertToSerializableType1(cfp.Value);
 
         /// <summary>
         /// Escape single quotes

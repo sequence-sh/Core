@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.Serialization;
+using System.Text;
 using FluentAssertions.Common;
 using Namotion.Reflection;
 using Reductech.EDR.Core.Attributes;
@@ -24,9 +27,7 @@ namespace Reductech.EDR.Core.TestHarness
 
             foreach (var propertyInfo in typeof(TStep).GetProperties()
                 .Where(x => x.IsDecoratedWith<StepPropertyBaseAttribute>()).OrderBy(x=>x.Name))
-            {
                 MatchStepPropertyInfo(propertyInfo, SetVariableName, SetStep, SetStepList);
-            }
 
             return (instance, values);
 
@@ -44,9 +45,18 @@ namespace Reductech.EDR.Core.TestHarness
                 var currentValue = property.GetValue(instance);
                 if (currentValue == null)
                 {
-                    var newValue = CreateSimpleStep(property.PropertyType, ref index);
-                    values.Add(property.Name, GetString(newValue));
-                    property.SetValue(instance, newValue);
+                    var (step, value) = CreateSimpleStep(property.PropertyType, ref index);
+                    values.Add(property.Name, value);
+
+                    try
+                    {
+                        property.SetValue(instance, step);
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine(e);
+                        throw;
+                    }
                 }
                 else
                 {
@@ -86,7 +96,15 @@ namespace Reductech.EDR.Core.TestHarness
             var freezable = step.Unfreeze();
 
             if (freezable is ConstantFreezableStep cfs)
+            {
+                if (cfs.Value is Stream)
+                {
+                    throw new SerializationException("Cannot get string from a stream as that would enumerate the stream");
+                    //return SerializationMethods.StreamToString(stream, Encoding.UTF8);
+                }
+
                 return ConstantFreezableStep.WriteValue(cfs.Value, true);
+            }
 
             return freezable.StepName;
         }
@@ -119,35 +137,43 @@ namespace Reductech.EDR.Core.TestHarness
             }
         }
 
-        private static IStep CreateSimpleStep(Type tStep, ref int index)
+        private static (IStep step, string value) CreateSimpleStep(Type tStep, ref int index)
         {
             var outputType = tStep.GenericTypeArguments.First();
+            IStep step;
 
             if (outputType == typeof(Unit))
             {
-                return new DoNothing();
+                step = new DoNothing();
             }
 
-            if (outputType == typeof(string))
+            else if (outputType == typeof(string))
             {
                 var s = "Bar" + index;
                 index++;
-
-                return Constant(s);
+                step = Constant(s);
             }
 
-            if (outputType == typeof(bool))
+            else if (outputType == typeof(bool))
             {
                 var b = true;
-                return Constant(b);
+                step =  Constant(b);
             }
-            if (outputType == typeof(int))
+            else if (outputType == typeof(int))
             {
                 var i = index;
                 index++;
-                return Constant(i);
+                step =  Constant(i);
             }
-            if (outputType == typeof(List<string>))
+
+            else if (outputType == typeof(double))
+            {
+                double d = index;
+                index++;
+                step =  Constant(d);
+            }
+
+            else if (outputType == typeof(List<string>))
             {
                 var list = new List<string>();
                 for (var i = 0; i < 3; i++)
@@ -156,9 +182,9 @@ namespace Reductech.EDR.Core.TestHarness
                     index++;
                 }
 
-                return Constant(list);
+                step =  Constant(list);
             }
-            if (outputType == typeof(List<int>))
+            else if (outputType == typeof(List<int>))
             {
                 var list = new List<int>();
                 for (var i = 0; i < 3; i++)
@@ -167,21 +193,38 @@ namespace Reductech.EDR.Core.TestHarness
                     index++;
                 }
 
-                return Constant(list);
+                step =  Constant(list);
             }
 
-            if (outputType.IsEnum)
+            else if (outputType.IsEnum)
             {
                 var v = Enum.GetValues(outputType).OfType<object>().First();
 
                 var constantType = typeof(Constant<>).MakeGenericType(outputType);
                 var constant = Activator.CreateInstance(constantType, new[] {v});
 
-                return (IStep) constant!;
+                step =  (IStep) constant!;
             }
 
+            else if (outputType == typeof(Stream))
+            {
+                var s = "Baz" + index;
+                index++;
 
-            throw new XunitException($"Cannot create a constant step with type {outputType.GetDisplayName()}");
+                byte[] byteArray = Encoding.UTF8.GetBytes(s);
+                Stream stream = new MemoryStream(byteArray); //special case so we don't read the stream early
+
+                step = Constant(stream);
+                var asString = GetString(Constant(s));
+
+                return (step, asString);
+            }
+            else
+                throw new XunitException($"Cannot create a constant step with type {outputType.GetDisplayName()}");
+
+            return (step, GetString(step));
+
+
         }
 
 

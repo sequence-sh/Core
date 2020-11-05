@@ -77,7 +77,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                     }, "Conditional(Condition = True, ElseStep = Print(Value = 'Goodbye World'), ThenStep = Print(Value = 'Hello World'))"
                     );
 
-                yield return CreateDefaultSerializeCase();
+                yield return CreateDefaultSerializeCase(true);
             }
         }
     }

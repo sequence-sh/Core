@@ -28,7 +28,7 @@ namespace Reductech.EDR.Core.Serialization
         public void WriteYaml(IEmitter emitter, object? value, Type type)
         {
             if(value is YamlString s)
-                emitter.Emit(new Scalar(null, null, s.Value, ScalarStyle.DoubleQuoted, true, false));
+                emitter.Emit(new Scalar(null, null, s.Value, ScalarStyle.SingleQuoted, true, false));
         }
     }
 }

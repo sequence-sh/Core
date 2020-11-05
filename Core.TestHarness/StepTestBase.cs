@@ -122,5 +122,7 @@ namespace Reductech.EDR.Core.TestHarness
         public static IStep<List<TNew>> Array<TNew>(params TNew[] elements)=> new Array<TNew>() {Elements = elements.Select(Constant).ToList()};
 
         public static IStep<TNew> GetVariable<TNew>(string variableName)=> new GetVariable<TNew>() {VariableName = new VariableName(variableName)};
+
+        protected static string CompressNewlines(string s) => s.Replace("\r\n", "\n");
     }
 }

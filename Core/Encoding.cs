@@ -1,22 +1,47 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Text;
 
 namespace Reductech.EDR.Core
 {
 
+    /// <summary>
+    /// An encoding
+    /// </summary>
     public enum EncodingEnum
     {
+        /// <summary>
+        /// The default encoding.
+        /// </summary>
         Default,
+        /// <summary>
+        /// Ascii
+        /// </summary>
         Ascii,
+        /// <summary>
+        /// Unicode with big-endian byte order
+        /// </summary>
         BigEndianUnicode,
+        /// <summary>
+        /// UTF7
+        /// </summary>
         UTF7,
+        /// <summary>
+        /// UTF8
+        /// </summary>
         UTF8,
+        /// <summary>
+        /// UTF32
+        /// </summary>
         UTF32,
+        /// <summary>
+        /// Unicode with little-endian byte order
+        /// </summary>
         Unicode
     }
 
+    /// <summary>
+    /// Contains methods for converting encodings.
+    /// </summary>
     public static class EncodingHelper
     {
         /// <summary>

@@ -209,7 +209,7 @@ Config:
   - Tag1
   DoNotSplit: false
   Priority: 1
-Value: ""I have config""");
+Value: 'I have config'");
 
                 yield return new SerializationTestMethod(
                     new Print<string>
@@ -242,7 +242,7 @@ Config:
   - Tag1
   DoNotSplit: false
   Priority: 1
-Value: ""I have config too""");
+Value: 'I have config too'");
 
 
 

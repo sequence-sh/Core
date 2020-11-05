@@ -65,46 +65,46 @@ namespace Reductech.EDR.Core.Steps
 
 
         /// <summary>
-        /// The text of the CSV file.
-        /// </summary>
-        [StepProperty(Order = 1)]
-        [Required]
-        public IStep<Stream> TextStream { get; set; } = null!;
-
-        /// <summary>
-        /// The delimiter to use to separate rows.
-        /// </summary>
-        [StepProperty(Order = 2)]
-        [DefaultValueExplanation(",")]
-        public IStep<string> Delimiter { get; set; } = new Constant<string>(",");
-
-        /// <summary>
-        /// The token to use to indicate comments.
-        /// </summary>
-        [StepProperty(Order = 3)]
-        [DefaultValueExplanation("Comments cannot be indicated")]
-        public IStep<string>? CommentToken { get; set; }
-
-        /// <summary>
-        /// Whether CSV fields are enclosed in quotes.
-        /// </summary>
-        [StepProperty(Order = 4)]
-        [DefaultValueExplanation("false")]
-        public IStep<bool> HasFieldsEnclosedInQuotes { get; set; } = new Constant<bool>(false);
-
-        /// <summary>
         /// The csv columns to map to result columns, in order.
         /// </summary>
-        [StepProperty(Order = 5)]
+        [StepProperty(Order = 1)]
         [Required]
         public IStep<List<string>> ColumnsToMap { get; set; } = null!;
 
         /// <summary>
+        /// The token to use to indicate comments.
+        /// </summary>
+        [StepProperty(Order = 2)]
+        [DefaultValueExplanation("Comments cannot be indicated")]
+        public IStep<string>? CommentToken { get; set; }
+
+        /// <summary>
+        /// The delimiter to use to separate rows.
+        /// </summary>
+        [StepProperty(Order = 3)]
+        [DefaultValueExplanation(",")]
+        public IStep<string> Delimiter { get; set; } = new Constant<string>(",");
+
+        /// <summary>
         /// How the stream is encoded.
         /// </summary>
-        [StepProperty(Order = 6)]
+        [StepProperty(Order = 4)]
         [DefaultValueExplanation("The default encoding")]
         public IStep<EncodingEnum> Encoding { get; set; } = new Constant<EncodingEnum>(EncodingEnum.Default);
+
+        /// <summary>
+        /// Whether CSV fields are enclosed in quotes.
+        /// </summary>
+        [StepProperty(Order = 5)]
+        [DefaultValueExplanation("false")]
+        public IStep<bool> HasFieldsEnclosedInQuotes { get; set; } = new Constant<bool>(false);
+
+        /// <summary>
+        /// The text of the CSV file.
+        /// </summary>
+        [StepProperty(Order = 6)]
+        [Required]
+        public IStep<Stream> TextStream { get; set; } = null!;
 
         /// <inheritdoc />
         public override IStepFactory StepFactory => ReadCsvStepFactory.Instance;

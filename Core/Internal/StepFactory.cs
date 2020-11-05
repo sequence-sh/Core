@@ -201,6 +201,8 @@ namespace Reductech.EDR.Core.Internal
             return Unit.Default;
         }
 
+
+
         private static Result<Unit, IError> TrySetStepList(PropertyInfo propertyInfo, ICompoundStep parentStep, IReadOnlyList<IFreezableStep> member, StepContext context)
         {
             var freezeResult =
@@ -222,8 +224,8 @@ namespace Reductech.EDR.Core.Internal
                 }
                 else
                     return new SingleError(
-                        $"'{CompressSpaces(step1.Name)}' is a '{step1.OutputType.GetDisplayName()}' but it should be a '{genericType.GenericTypeArguments.First().GetDisplayName()}' to be a member of '{parentStep.StepFactory.TypeName}'", 
-                        ErrorCode.InvalidCast, 
+                        $"'{CompressSpaces(step1.Name)}' is a '{step1.OutputType.GetDisplayName()}' but it should be a '{genericType.GenericTypeArguments.First().GetDisplayName()}' to be a member of '{parentStep.StepFactory.TypeName}'",
+                        ErrorCode.InvalidCast,
                         new StepErrorLocation(parentStep));
 
 
