@@ -30,12 +30,21 @@ namespace Reductech.EDR.Core.Internal
         /// </summary>
         public object Value { get; }
 
+        private Type ElementType
+        {
+            get
+            {
+                if (Value is Stream) return typeof(Stream); //We always need to return the base type for stream.s
+                var type = Value.GetType();
+                return type;
+            }
+        }
+
 
         /// <inheritdoc />
         public Result<IStep, IError> TryFreeze(StepContext _)
         {
-            Type elementType = Value.GetType();
-            Type stepType = typeof(Constant<>).MakeGenericType(elementType);
+            Type stepType = typeof(Constant<>).MakeGenericType(ElementType);
             var stepAsObject = Activator.CreateInstance(stepType, Value);
 
             //TODO check for exceptions here?

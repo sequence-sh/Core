@@ -105,6 +105,9 @@ namespace Reductech.EDR.Core.Serialization
                 FreezableStepData.TryCreate(factory!, dictionary)
                     .MapError(x=> x.WithLocation(new YamlRegionErrorLocation(markStart, parser.Current.End)));
 
+            if (fsd.IsFailure)
+                return fsd.ConvertFailure<IFreezableStep>();
+
             return new CompoundFreezableStep(factory!, fsd.Value, configuration);
 
         }

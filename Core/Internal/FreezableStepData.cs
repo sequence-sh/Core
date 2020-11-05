@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Text;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Util;
@@ -27,13 +29,13 @@ namespace Reductech.EDR.Core.Internal
 
             foreach (var (key, value) in dictionary)
             {
-                var mt = stepFactory.GetExpectedMemberType(key);
+                var (memberType, type) = stepFactory.GetExpectedMemberType(key);
 
-                if (mt == MemberType.NotAMember)
+                if (memberType == MemberType.NotAMember)
                     errors.Add(ErrorHelper.UnexpectedParameterError(key, stepFactory.TypeName));
                 else
                 {
-                    var convertedMember = value.TryConvert(mt, false);
+                    var convertedMember = value.TryConvert(memberType, false);
 
                     if(convertedMember.IsFailure)
                         errors.Add(convertedMember.Error);
@@ -41,12 +43,15 @@ namespace Reductech.EDR.Core.Internal
                     {
                         remainingRequiredProperties.Remove(key);
 
+                        var addResult =
                         convertedMember.Value
-                            .Match(
-                            x => variableNameDictionary.Add(key, x),
-                            x => stepDictionary.Add(key, x),
-                            x => stepListDictionary.Add(key, x)
+                            .Join(
+                            x => AddVariableName(variableNameDictionary, key, x),
+                            x => TryAddStep(stepDictionary, key, x, type),
+                            x => TryAddStepList(stepListDictionary, key, x, type)
                             );
+                        if(addResult.IsFailure)
+                            errors.Add(addResult.Error);
                     }
                 }
             }
@@ -58,6 +63,60 @@ namespace Reductech.EDR.Core.Internal
                 return Result.Failure<FreezableStepData, IErrorBuilder>( ErrorBuilderList.Combine(errors));
 
             return new FreezableStepData(stepDictionary, variableNameDictionary, stepListDictionary);
+        }
+
+        private static Result<Unit, IErrorBuilder> AddVariableName(IDictionary<string, VariableName> variableNames, string key, VariableName variableName)
+        {
+            variableNames.Add(key, variableName);
+            return Unit.Default;
+        }
+
+        private static Result<Unit, IErrorBuilder> TryAddStep(IDictionary<string, IFreezableStep> freezableSteps, string key, IFreezableStep freezableStep, Type? expectedType)
+        {
+            var convertedResult = TryConvertStep(freezableStep, expectedType);
+            if (convertedResult.IsFailure)
+                return convertedResult.ConvertFailure<Unit>();
+
+            freezableSteps.Add(key, convertedResult.Value);
+
+            return Unit.Default;
+        }
+
+        private static Result<Unit, IErrorBuilder> TryAddStepList(IDictionary<string, IReadOnlyList<IFreezableStep>> stepListDictionary, string key, IReadOnlyList<IFreezableStep> stepList, Type? expectedType)
+        {
+            var convertedSteps = stepList.Select(sl => TryConvertStep(sl, expectedType))
+                .Combine(ErrorBuilderList.Combine).Map(x=>x.ToList());
+
+            if (convertedSteps.IsFailure)
+                return convertedSteps.ConvertFailure<Unit>();
+
+            stepListDictionary.Add(key, convertedSteps.Value);
+
+            return Unit.Default;
+        }
+
+        private static Result<IFreezableStep, IErrorBuilder> TryConvertStep(IFreezableStep step, Type? expectedType)
+        {
+            if(expectedType == null)
+                throw new ArgumentNullException(nameof(expectedType));
+
+            if (step is ConstantFreezableStep cfs)
+            {
+                if (expectedType.IsGenericParameter || expectedType.IsInstanceOfType(cfs.Value))
+                    return cfs;
+
+                if(expectedType == typeof(Stream) && cfs.Value is string s)
+                {
+                    var bytes = Encoding.Default.GetBytes(s);
+                    Stream stream = new MemoryStream(bytes);
+
+                    return new ConstantFreezableStep(stream);
+                }
+
+                return new ErrorBuilder($"Could not convert '{cfs.Value}' from {cfs.Value.GetType().Name} to {expectedType.Name}", ErrorCode.InvalidCast);
+            }
+
+            return Result.Success<IFreezableStep, IErrorBuilder>(step);
         }
 
         /// <summary>

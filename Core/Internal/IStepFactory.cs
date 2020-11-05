@@ -72,7 +72,7 @@ namespace Reductech.EDR.Core.Internal
         /// <summary>
         /// Gets the type of this member.
         /// </summary>
-        MemberType GetExpectedMemberType(string name);
+        (MemberType memberType, Type? type) GetExpectedMemberType(string name);
 
         /// <summary>
         /// Gets all the properties required by this step.
