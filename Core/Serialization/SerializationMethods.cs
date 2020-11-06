@@ -106,7 +106,10 @@ namespace Reductech.EDR.Core.Serialization
 
             if (value is EntityStream entityStream)
             {
-                var entities = entityStream.TryGetResultsAsync(CancellationToken.None)
+                var task = entityStream.TryGetResultsAsync(CancellationToken.None);
+                task.Wait();
+
+                var entities = task
                     .Result //This should work, but maybe not in some environments
                     .Map(x => x.Select(ConvertToSerializableType).ToList());
 
