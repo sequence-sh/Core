@@ -384,8 +384,8 @@ namespace Reductech.EDR.Core.Tests
                 );
 
 
-                var testFolderPath = new Constant<string>(Path.Combine(Directory.GetCurrentDirectory(), "TestFolder"));
-                var testFilePath = new Constant<string>(Path.Combine(testFolderPath.Value, "Poem.txt"));
+                //var testFolderPath = new Constant<string>(Path.Combine(Directory.GetCurrentDirectory(), "TestFolder"));
+                //var testFilePath = new Constant<string>(Path.Combine(testFolderPath.Value, "Poem.txt"));
 
                 //yield return new StepTestCase("Delete Folder etc",
                 //    new Sequence
@@ -590,7 +590,7 @@ Two,The second number"),
                 if (AddConfiguration) unfrozen = AddConfigurationToAllSteps(unfrozen);
 
 
-                var yaml = unfrozen.SerializeToYaml();
+                var yaml = await unfrozen.SerializeToYamlAsync(CancellationToken.None);
                 outputHelper.WriteLine(yaml);
                 var runResult = await yamlRunner.RunSequenceFromYamlStringAsync(yaml, CancellationToken.None);
 
