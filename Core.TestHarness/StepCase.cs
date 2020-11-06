@@ -103,13 +103,13 @@ namespace Reductech.EDR.Core.TestHarness
             /// <summary>
             /// Serialize and Deserialize the step if required.
             /// </summary>
-            private IStep GetStep(IStep step, string? extraArgument, ITestOutputHelper testOutputHelper,
+            private async Task<IStep> GetStepAsync(IStep step, string? extraArgument, ITestOutputHelper testOutputHelper,
                 StepFactoryStore sfs)
             {
                 if (extraArgument != SerializeArgument)
                     return step;
 
-                var yaml = Step.Unfreeze().SerializeToYaml();
+                var yaml = await Step.Unfreeze().SerializeToYamlAsync(CancellationToken.None);
 
                 testOutputHelper.WriteLine(yaml);
                 testOutputHelper.WriteLine("");
@@ -143,7 +143,7 @@ namespace Reductech.EDR.Core.TestHarness
                 var sfs = StepFactoryStore.CreateUsingReflection(typeof(IStep), typeof(TStep));
 
 
-                var step = GetStep(Step, extraArgument, testOutputHelper, sfs);
+                var step = await GetStepAsync(Step, extraArgument, testOutputHelper, sfs);
 
                 var stateMonad = new StateMonad(logger, Settings, externalProcessRunnerMock.Object, fileSystemMock.Object, StepFactoryStoreToUse.Unwrap(sfs));
 

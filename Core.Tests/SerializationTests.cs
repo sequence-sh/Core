@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 using FluentAssertions;
 using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.Internal;
@@ -18,13 +20,13 @@ namespace Reductech.EDR.Core.Tests
         /// <inheritdoc />
         [Theory]
         [ClassData(typeof(SerializationTestCases))]
-        public override void Test(string key) => base.Test(key);
+        public override Task Test(string key) => base.Test(key);
     }
 
-    public class SerializationTestCases : TestBase
+    public class SerializationTestCases : TestBaseParallel
     {
         /// <inheritdoc />
-        protected override IEnumerable<ITestBaseCase> TestCases
+        protected override IEnumerable<ITestBaseCaseParallel> TestCases
         {
             get
             {
@@ -252,7 +254,7 @@ Value: 'I have config too'");
         }
 
 
-        private class SerializationTestMethod : ITestBaseCase
+        private class SerializationTestMethod : ITestBaseCaseParallel
         {
             public IStep Step { get; }
             public string ExpectedYaml { get; }
@@ -277,11 +279,11 @@ Value: 'I have config too'");
             public string Name { get; }
 
             /// <inheritdoc />
-            public void Execute(ITestOutputHelper testOutputHelper)
+            public async Task ExecuteAsync(ITestOutputHelper testOutputHelper)
             {
                 var fp = Step.Unfreeze();
 
-                var yaml = fp.SerializeToYaml();
+                var yaml = await fp.SerializeToYamlAsync(CancellationToken.None);
 
                 yaml.Should().Be(ExpectedYaml);
             }
