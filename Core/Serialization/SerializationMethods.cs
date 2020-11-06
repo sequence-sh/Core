@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Internal;
 using System.Globalization;
@@ -8,6 +9,7 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 using Reductech.EDR.Core.Entities;
 using Entity = Reductech.EDR.Core.Entities.Entity;
 
@@ -96,52 +98,64 @@ namespace Reductech.EDR.Core.Serialization
         }
 
 
-        private static object ConvertToSerializableType1(object value)
+
+
+        internal static async Task<object> ConvertToSerializableTypeAsync(ConstantFreezableStep cfp, CancellationToken cancellationToken)
         {
-            if (value is string s)
-                return new YamlString(s);
+            return await Convert(cfp.Value, cancellationToken);
 
-            if (value is Entity entity)
-                return ConvertToSerializableType(entity);
 
-            if (value is EntityStream entityStream)
+            static async Task<object> Convert(object value, CancellationToken cancellationToken)
             {
-                var task = entityStream.TryGetResultsAsync(CancellationToken.None);
-                task.Wait();
+                if (value is string s)
+                    return new YamlString(s);
 
-                var entities = task
-                    .Result //This should work, but maybe not in some environments
-                    .Map(x => x.Select(ConvertToSerializableType).ToList());
+                if (value is Entity entity)
+                    return ConvertToSerializableType(entity);
 
-                if (entities.IsFailure)
-                    throw new SerializationException(entities.Error);
+                if (value is EntityStream entityStream)
+                {
+                    var task = await entityStream.TryGetResultsAsync(cancellationToken);
 
-                return entities.Value;
+                    var entities = task
+                        //This should work, but maybe not in some environments
+                        .Map(x => x.Select(ConvertToSerializableType).ToList());
+
+                    if (entities.IsFailure)
+                        throw new SerializationException(entities.Error);
+
+                    return entities.Value;
+                }
+
+
+                if (value is Stream stream)
+                {
+                    var streamString = StreamToString(stream, Encoding.UTF8);
+                    return new YamlString(streamString); //This will be a string - convert it to a stream
+                }
+
+                if (value is IEnumerable enumerable)
+                {
+                    var list = new List<object>();
+
+                    foreach (var member in enumerable.OfType<object>())
+                    {
+                        var o = await Convert(member, cancellationToken);
+                        list.Add(o);
+                    }
+
+                    return list;
+                }
+
+
+                var r = TrySerializeSimple(value);
+
+                if (r.IsSuccess)
+                    return r.Value;
+
+                throw new SerializationException(r.Error);//This is unexpected
             }
-
-
-            if (value is Stream stream)
-            {
-                var streamString = StreamToString(stream, Encoding.UTF8);
-                return new YamlString(streamString); //This will be a string - convert it to a stream
-            }
-
-            if (value is IEnumerable enumerable)
-            {
-                var list = enumerable.OfType<object>().Select(ConvertToSerializableType1).ToList();
-                return list;
-            }
-
-
-            var r = TrySerializeSimple(value);
-
-            if (r.IsSuccess)
-                return r.Value;
-
-            throw new SerializationException(r.Error);//This is unexpected
         }
-
-        internal static object ConvertToSerializableType(ConstantFreezableStep cfp) => ConvertToSerializableType1(cfp.Value);
 
         /// <summary>
         /// Escape single quotes

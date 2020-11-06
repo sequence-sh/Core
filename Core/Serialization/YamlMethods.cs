@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Dynamic;
-using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.Internal;
@@ -19,9 +20,9 @@ namespace Reductech.EDR.Core.Serialization
         /// <summary>
         /// Serialize this step to yaml.
         /// </summary>
-        public static string SerializeToYaml(this IFreezableStep step)
+        public static async Task<string> SerializeToYamlAsync(this IFreezableStep step, CancellationToken cancellationToken)
         {
-            var obj = SimplifyProcess(step, true);
+            var obj = await SimplifyProcessAsync(step, true, cancellationToken);
 
             var builder = new SerializerBuilder()
                 .WithTypeConverter(YamlStringTypeConverter.Instance)
@@ -81,17 +82,17 @@ namespace Reductech.EDR.Core.Serialization
         internal const string TypeString = "Do";
         internal const string ConfigString = "Config";
 
-        private static object SimplifyProcess(IFreezableStep step, bool isTopLevel)
+        private static async Task<object> SimplifyProcessAsync(IFreezableStep step, bool isTopLevel, CancellationToken cancellationToken)
         {
             switch (step)
             {
                 case ConstantFreezableStep cfp:
-                    return SerializationMethods.ConvertToSerializableType(cfp);
+                    return await SerializationMethods.ConvertToSerializableTypeAsync(cfp, cancellationToken);
                 case CompoundFreezableStep compoundFreezableProcess:
                 {
                     if (isTopLevel && compoundFreezableProcess.StepFactory == SequenceStepFactory.Instance &&
                         compoundFreezableProcess.FreezableStepData.StepMembersDictionary.TryGetValue(nameof(Sequence.Steps), out var stepMember))
-                        return ToSimpleObject(stepMember);
+                        return await ToSimpleObject(stepMember, cancellationToken);
 
                     if (compoundFreezableProcess.StepConfiguration == null)//Don't use custom serialization if you have configuration
                     {
@@ -109,7 +110,7 @@ namespace Reductech.EDR.Core.Serialization
                         expandoObject[ConfigString] = compoundFreezableProcess.StepConfiguration;
 
                     foreach (var (name, m) in compoundFreezableProcess.FreezableStepData.StepMembersDictionary)
-                        expandoObject[name] = ToSimpleObject(m);
+                        expandoObject[name] = await ToSimpleObject(m, cancellationToken);
 
                     return expandoObject;
 
@@ -120,9 +121,24 @@ namespace Reductech.EDR.Core.Serialization
         }
 
 
-        private static object ToSimpleObject(StepMember member) =>
-            member.Join(x=> VariableNameComponent.Serialize(x).Value,
-                x=> SimplifyProcess(x, false),
-                l=>l.Select(x=>SimplifyProcess(x, false)).ToList());
+        private static Task<object> ToSimpleObject(StepMember member, CancellationToken cancellationToken) =>
+            member.Join(x=> Task.FromResult<object>(VariableNameComponent.Serialize(x).Value),
+                x=> SimplifyProcessAsync(x, false, cancellationToken),
+                l=> SimplifyProcessListAsync(l, cancellationToken));
+
+
+        private static async Task<object> SimplifyProcessListAsync(IEnumerable<IFreezableStep> steps, CancellationToken cancellationToken)
+        {
+            var list = new List<object>();
+
+            foreach (var freezableStep in steps)
+            {
+                var o = await SimplifyProcessAsync(freezableStep, false, cancellationToken);
+                list.Add(o);
+            }
+
+            return list;
+
+        }
     }
 }
