@@ -153,7 +153,7 @@ namespace Reductech.EDR.Core.Serialization
         /// </summary>
         private static Result<StepMember, IErrorBuilder> CheckForErrors(StepMember stepMember)
         {
-            var r = stepMember.Join(x => Unit.Default,
+            var r = stepMember.Match(x => Unit.Default,
                 CheckForErrors2,
                 x=> x
                     .Select(CheckForErrors2)
@@ -390,14 +390,14 @@ namespace Reductech.EDR.Core.Serialization
 
             var errorBuilders = new List<ErrorBuilder>();
 
-            foreach (var entityArgument in entityArguments)
+            foreach (var (argumentName, stepMember) in entityArguments)
             {
-                var argumentResult = entityArgument.stepMember.AsArgument(entityArgument.argumentName);
+                var argumentResult = stepMember.AsArgument(argumentName);
                 if(argumentResult.IsFailure)
                     errorBuilders.Add(new ErrorBuilder(argumentResult.Error, ErrorCode.InvalidCast));
                 else if(argumentResult.Value is ConstantFreezableStep cfs)
                 {
-                    pairs.Add(new KeyValuePair<string, string>(entityArgument.argumentName, cfs.Value.ToString()!));//TODO remove toString here
+                    pairs.Add(new KeyValuePair<string, string>(argumentName, cfs.Value.ToString()!));//TODO remove toString here
                 }
                 else
                 {

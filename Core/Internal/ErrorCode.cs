@@ -132,6 +132,11 @@
         /// <summary>
         /// Intentional error to be used during unit testing
         /// </summary>
-        Test
+        Test,
+
+        /// <summary>
+        /// Error caused by violation of a schema.
+        /// </summary>
+        SchemaViolation
     }
 }

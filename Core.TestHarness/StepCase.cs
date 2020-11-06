@@ -35,7 +35,9 @@ namespace Reductech.EDR.Core.TestHarness
             await StepCases.FindAndRunAsync(stepCaseName, TestOutputHelper, StepCase.SerializeArgument);
         }
 
+#pragma warning disable CA1034 // Nested types should not be visible
         public class SequenceStepCase : StepCase
+#pragma warning restore CA1034 // Nested types should not be visible
         {
             // ReSharper disable once UnusedParameter.Local - needed to disambiguate constructor
             public SequenceStepCase(string name, Sequence sequence, params string[] expectedLoggedValues) : base(name, sequence, Maybe<TOutput>.None,expectedLoggedValues)

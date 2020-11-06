@@ -28,7 +28,7 @@ namespace Reductech.EDR.Core.Steps
 
             var lines = DocumentationCreator.CreateDocumentationLines(documented);
 
-            //var text = string.Join(Environment.NewLine, lines);
+            //var text = string.Match(Environment.NewLine, lines);
             //TODO allow multiple files somehow
 
             return lines;

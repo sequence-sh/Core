@@ -25,7 +25,7 @@ namespace Reductech.EDR.Core.Serialization
         public Result<string> TryGetText(FreezableStepData data) =>
             data.StepMembersDictionary
                 .TryFindOrFail(PropertyName, null)
-                .Bind(x => x.Join(VariableNameComponent.Serialize,
+                .Bind(x => x.Match(VariableNameComponent.Serialize,
                     TrySerialize,
                     _ => Result.Failure<string>("Cannot serialize list")
 

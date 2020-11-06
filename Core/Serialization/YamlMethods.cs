@@ -122,7 +122,7 @@ namespace Reductech.EDR.Core.Serialization
 
 
         private static Task<object> ToSimpleObject(StepMember member, CancellationToken cancellationToken) =>
-            member.Join(x=> Task.FromResult<object>(VariableNameComponent.Serialize(x).Value),
+            member.Match(x=> Task.FromResult<object>(VariableNameComponent.Serialize(x).Value),
                 x=> SimplifyProcessAsync(x, false, cancellationToken),
                 l=> SimplifyProcessListAsync(l, cancellationToken));
 

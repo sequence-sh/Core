@@ -43,7 +43,7 @@ namespace Reductech.EDR.Core.Internal
                 var p = freezableStepData
                     .StepMembersDictionary
                     .TryFindOrFail(variableName, null)
-                    .Map(x=>x.Join(vn=>vn.ToString(),
+                    .Map(x=>x.Match(vn=>vn.ToString(),
                         fp=>fp.StepName,
                         l=> string.Join(ListDelimiter, l.Select(i=>i.StepName))))
                     .OnFailureCompensate(x=>Result.Success(stepFactory.TypeName));

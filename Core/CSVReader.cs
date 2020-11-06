@@ -13,7 +13,7 @@ namespace Reductech.EDR.Core
     /// <summary>
     /// Helps read blocks
     /// </summary>
-    public class CSVBlockHelper
+    public static class CSVBlockHelper
     {
         /// <summary>
         /// Creates a block that will produce records from the CSV file.
