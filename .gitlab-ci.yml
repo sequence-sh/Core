@@ -5,3 +5,8 @@ include:
 variables:
   PACKAGE_NAME_NUGET: Reductech.EDR.Core
   PACKAGE_NAME_DLL: Reductech.EDR.Core
+
+mutation testing:
+  image: registry.gitlab.com/reductech/containers/dotnet/sdk
+  tags: 
+    - rt-windows
