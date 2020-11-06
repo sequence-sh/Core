@@ -1,10 +1,16 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.IO;
 using System.Linq;
+using System.Runtime.Serialization;
 using CSharpFunctionalExtensions;
+using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.Internal.Errors;
+using Reductech.EDR.Core.Serialization;
 using Reductech.EDR.Core.Util;
+using Entity = Reductech.EDR.Core.Entities.Entity;
 
 namespace Reductech.EDR.Core.Internal
 {
@@ -24,12 +30,21 @@ namespace Reductech.EDR.Core.Internal
         /// </summary>
         public object Value { get; }
 
+        private Type ElementType
+        {
+            get
+            {
+                if (Value is Stream) return typeof(Stream); //We always need to return the base type for stream.s
+                var type = Value.GetType();
+                return type;
+            }
+        }
+
 
         /// <inheritdoc />
         public Result<IStep, IError> TryFreeze(StepContext _)
         {
-            Type elementType = Value.GetType();
-            Type stepType = typeof(Constant<>).MakeGenericType(elementType);
+            Type stepType = typeof(Constant<>).MakeGenericType(ElementType);
             var stepAsObject = Activator.CreateInstance(stepType, Value);
 
             //TODO check for exceptions here?
@@ -73,23 +88,42 @@ namespace Reductech.EDR.Core.Internal
             if (value is string s)
                 return $"'{s}'";
 
-            if (value is Enum e)
-            {
-                if(!prefixEnumNames)
-                    return e.GetDisplayName();
-
-                return e.GetType().Name + "." + e;
-            }
-
-            if (value is IEnumerable<object> enumerable)
+            if (value is IEnumerable enumerable)
             {
 
-                var r = string.Join(", ", enumerable.Select(x=> WriteValue(x, prefixEnumNames)));
+                var r = string.Join(", ", enumerable.OfType<object>().Select(x => WriteValue(x, prefixEnumNames)));
 
                 return $"[{r}]";
             }
 
-            return value.ToString() ?? string.Empty;
+            if (!prefixEnumNames && value is Enum e)
+                return e.GetDisplayName();
+
+
+            if (value is Stream)
+            {
+                return "Stream";
+                //return SerializationMethods.StreamToString(stream, Encoding.UTF8);
+            }
+
+            if (value is Entity entity)
+            {
+                var r = entity.TrySerializeShortForm();
+                if (r.IsSuccess) return r.Value;
+                return "Entity";
+            }
+
+            if (value is EntityStream)
+            {
+                return "EntityStream";
+            }
+
+            var simpleResult = SerializationMethods.TrySerializeSimple(value);
+
+            if(simpleResult.IsFailure)
+                throw new SerializationException(simpleResult.Value);
+
+            return simpleResult.Value;
         }
 
 

@@ -73,10 +73,6 @@ namespace Reductech.EDR.Core.Tests
                 );
 
 
-                yield return new DeserializationErrorCase("- <CsvHeader> = ['a', 'b']\n- <SearchTerms> = ReadCsv(Text = ReadFile(Folder = <CurrentDir>, FileName = <SearchTagCSV>, ColumnsToMap = <CsvHeader>))",
-("Missing Parameter 'ColumnsToMap' in 'ReadCsv'", "Line: 2, Col: 3, Idx: 29 - Line: 2, Col: 121, Idx: 147"),
-("Unexpected Parameter 'ColumnsToMap' in 'ReadFile'", "Line: 2, Col: 3, Idx: 29 - Line: 2, Col: 121, Idx: 147")
-                    );
 
                 yield return new DeserializationErrorCase("- <ArrayVar1> = Array(Elements = ['abc', '123'])\n- <ArrayVar2> = Array(Elements = ['abc', '123'])\n- Print(Value = (<ArrayVar1> == <ArrayVar2>))",
                     ("Cannot compare objects of type 'ListOfString'", "<ArrayVar1> == <ArrayVar2>"));

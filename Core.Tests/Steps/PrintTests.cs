@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.TestHarness;
 using Reductech.EDR.Core.Util;
@@ -23,6 +24,14 @@ namespace Reductech.EDR.Core.Tests.Steps
                     {
                         Value = Constant("Hello")
                     }, Unit.Default, "Hello"
+                    );
+
+
+                yield return new StepCase("Print something containing a newline",
+                    new Print<string>()
+                    {
+                        Value = Constant($"Hello{Environment.NewLine}World")
+                    }, Unit.Default, $"Hello{Environment.NewLine}World"
                     );
 
 

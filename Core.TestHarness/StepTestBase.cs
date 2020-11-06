@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Reflection;
@@ -16,11 +15,24 @@ using Xunit.Sdk;
 
 namespace Reductech.EDR.Core.TestHarness
 {
-    public abstract partial class StepTestBase<TStep, TOutput> where TStep : class, ICompoundStep<TOutput>, new()
+    public interface IStepTestBase
+    {
+        string StepName { get; }
+
+        Type StepType { get; }
+    }
+
+
+
+    public abstract partial class StepTestBase<TStep, TOutput> : IStepTestBase
+        where TStep : class, ICompoundStep<TOutput>, new()
     {
         protected StepTestBase(ITestOutputHelper testOutputHelper) => TestOutputHelper = testOutputHelper;
 
         public string StepName => typeof(TStep).GetDisplayName();
+
+        /// <inheritdoc />
+        public Type StepType => typeof(TStep);
 
 
         public ITestOutputHelper TestOutputHelper { get; }
@@ -110,5 +122,7 @@ namespace Reductech.EDR.Core.TestHarness
         public static IStep<List<TNew>> Array<TNew>(params TNew[] elements)=> new Array<TNew>() {Elements = elements.Select(Constant).ToList()};
 
         public static IStep<TNew> GetVariable<TNew>(string variableName)=> new GetVariable<TNew>() {VariableName = new VariableName(variableName)};
+
+        protected static string CompressNewlines(string s) => s.Replace("\r\n", "\n");
     }
 }

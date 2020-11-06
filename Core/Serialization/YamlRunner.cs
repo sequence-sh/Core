@@ -22,18 +22,20 @@ namespace Reductech.EDR.Core.Serialization
         public YamlRunner(ISettings settings,
             ILogger logger,
             IExternalProcessRunner externalProcessRunner,
+            IFileSystemHelper fileSystemHelper,
             StepFactoryStore stepFactoryStore)
         {
             _settings = settings;
             _logger = logger;
             _externalProcessRunner = externalProcessRunner;
             _stepFactoryStore = stepFactoryStore;
-
+            _fileSystemHelper = fileSystemHelper;
         }
 
         private readonly ISettings _settings;
         private readonly ILogger _logger;
         private readonly IExternalProcessRunner _externalProcessRunner;
+        private readonly IFileSystemHelper _fileSystemHelper;
         private readonly StepFactoryStore _stepFactoryStore;
 
         /// <summary>
@@ -52,7 +54,7 @@ namespace Reductech.EDR.Core.Serialization
             if (stepResult.IsFailure)
                 return stepResult.ConvertFailure<Unit>();
 
-            var stateMonad = new StateMonad(_logger, _settings, _externalProcessRunner, _stepFactoryStore);
+            var stateMonad = new StateMonad(_logger, _settings, _externalProcessRunner, _fileSystemHelper, _stepFactoryStore);
 
             var runResult = await stepResult.Value.Run(stateMonad, cancellationToken);
 

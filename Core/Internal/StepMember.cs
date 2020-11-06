@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using CSharpFunctionalExtensions;
+using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.Util;
+using Entity = CSharpFunctionalExtensions.Entity;
 
 namespace Reductech.EDR.Core.Internal
 {
@@ -99,13 +101,32 @@ namespace Reductech.EDR.Core.Internal
         public IFreezableStep ConvertToStep(bool convertStepListToSequence)
         {
 
-            var r = Option.Join(MapVariableName, x => x,
+            var r = Option.Join(
+                MapVariableName,
+                x => x,
 
-                x =>
-                    convertStepListToSequence ? MapStepListToSequence(x) : MapStepListToArray(x));
+                x => MapStepList(x, convertStepListToSequence));
 
             return r;
 
+
+            static IFreezableStep MapStepList(IReadOnlyList<IFreezableStep> stepList, bool convertStepListToSequence)
+            {
+                if (stepList.Any() && stepList.All(x => x is ConstantFreezableStep cfs && cfs.Value is Entities.Entity))
+                {
+                    var entities = stepList
+                        .Select(x => (ConstantFreezableStep) x)
+                        .Select(x => (Entities.Entity) x.Value).ToList();
+
+                    var entityStream = EntityStream.Create(entities);
+
+                    var c = new ConstantFreezableStep(entityStream);
+                    return c;
+                }
+                else if (convertStepListToSequence)
+                    return MapStepListToSequence(stepList);
+                else return MapStepListToArray(stepList);
+            }
 
             static IFreezableStep MapStepListToArray(IReadOnlyList<IFreezableStep> stepList)
             {

@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
-using System.Collections.Immutable;
+﻿using System;
+using System.Collections.Generic;
 using JetBrains.Annotations;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Steps;
@@ -48,6 +48,21 @@ namespace Reductech.EDR.Core.Tests.Steps
                             }
                         }
                     },2);
+
+
+                yield return new StepCase("Hello World multiline",
+                    new ArrayCount<string>
+                    {
+                        Array = new Array<string>
+                        {
+                            Elements = new List<IStep<string>>
+                            {
+                                Constant($"Hello{Environment.NewLine}Hello"),
+                                Constant($"World{Environment.NewLine}World"),
+                            }
+                        }
+                    }, 2);
+
             } }
 
     }

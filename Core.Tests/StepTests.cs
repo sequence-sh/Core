@@ -387,31 +387,31 @@ namespace Reductech.EDR.Core.Tests
                 var testFolderPath = new Constant<string>(Path.Combine(Directory.GetCurrentDirectory(), "TestFolder"));
                 var testFilePath = new Constant<string>(Path.Combine(testFolderPath.Value, "Poem.txt"));
 
-                yield return new StepTestCase("Delete Folder etc",
-                    new Sequence
-                    {
-                        Steps = new List<IStep<Unit>>
-                        {
-                            new DeleteItem {Path = testFolderPath},
-                            new AssertTrue {Test = new Not {Boolean = new DirectoryExists {Path = testFolderPath}}},
-                            new CreateDirectory {Path = testFolderPath},
-                            new AssertTrue {Test = new DirectoryExists {Path = testFolderPath}},
+                //yield return new StepTestCase("Delete Folder etc",
+                //    new Sequence
+                //    {
+                //        Steps = new List<IStep<Unit>>
+                //        {
+                //            new DeleteItem {Path = testFolderPath},
+                //            new AssertTrue {Test = new Not {Boolean = new DoesDirectoryExist {Path = testFolderPath}}},
+                //            new CreateDirectory {Path = testFolderPath},
+                //            new AssertTrue {Test = new DoesDirectoryExist {Path = testFolderPath}},
 
-                            new CreateFile {Path = testFilePath, Text = new Constant<string>("Hello World")},
+                //            new CreateFile {Path = testFilePath, Text = new Constant<string>("Hello World")},
 
-                            new AssertTrue {Test = new FileExists {Path = testFilePath}},
+                //            new AssertTrue {Test = new DoesFileExist {Path = testFilePath}},
 
-                            new AssertTrue
-                            {
-                                Test = new DoesFileContain
-                                    {Path = testFilePath, Text = new Constant<string>("Hello World")}
-                            },
-                            new DeleteItem {Path = testFilePath},
-                            new DeleteItem {Path = testFolderPath},
-                            new AssertTrue {Test = new Not {Boolean = new DirectoryExists {Path = testFolderPath}}}
-                        }
-                    }
-                ) {IgnoreName = true, IgnoreLoggedValues = true};
+                //            new AssertTrue
+                //            {
+                //                Test = new DoesFileContain
+                //                    {Path = testFilePath, Text = new Constant<string>("Hello World")}
+                //            },
+                //            new DeleteItem {Path = testFilePath},
+                //            new DeleteItem {Path = testFolderPath},
+                //            new AssertTrue {Test = new Not {Boolean = new DoesDirectoryExist {Path = testFolderPath}}}
+                //        }
+                //    }
+                //) {IgnoreName = true, IgnoreLoggedValues = true};
 
                 yield return new StepTestCase("Print 'I have more config'", new Print<string>
                 {
@@ -452,162 +452,31 @@ namespace Reductech.EDR.Core.Tests
                 });
 
                 yield return new StepTestCase("Read CSV",
-                    new Print<string>
+                    new ForEachEntity
                     {
-                        Value = new ElementAtIndex<string>
+
+                        EntityStream = new ReadCsv
                         {
-                            Array = new ElementAtIndex<List<string>>
+                            ColumnsToMap = new Array<string>
                             {
-                                Array = new ReadCsv
-                                {
-                                    Text = new Constant<string>(@"Name,Summary
+                                Elements = new[] { new Constant<string>("Name"), new Constant<string>("Summary") }
+                            },
+                            Delimiter = new Constant<string>(","),
+                            TextStream = new ToStream
+                            {
+                                Text = new Constant<string>(@"Name,Summary
 One,The first number
 Two,The second number"),
-                                    ColumnsToMap = new Array<string>
-                                    {
-                                        Elements = new[] { new Constant<string>("Name"), new Constant<string>("Summary") }
-                                    },
-                                    Delimiter = new Constant<string>(",")
-                                },
-                                Index = new Constant<int>(1)
-                            },
-                            Index = new Constant<int>(1)
-                        }
+                            }
+                        },
+                        VariableName = FooVariableName,
+                        Action = new Print<Record>{Value = new GetVariable<Record> {VariableName = FooVariableName}}
                     },
-                    "The second number"){IgnoreName = true};
+                    "Name: One, Summary: The first number",
+                    "Name: Two, Summary: The second number"
+                ){IgnoreName = true};
 
 
-                yield return new StepTestCase("Read CSV ForEach",
-
-                    new Sequence
-                    {
-                        Steps = new IStep<Unit>[]
-                        {
-                            new ForEach<List<string>>
-                            {
-                                Array = new ReadCsv
-                                {
-                                    Text = new Constant<string>(@"Name,Summary
-One,The first number
-Two,The second number"),
-                                    ColumnsToMap = new Array<string>
-                                    {
-                                        Elements = new[] {new Constant<string>("Name"), new Constant<string>("Summary")}
-                                    },
-                                    Delimiter = new Constant<string>(",")
-                                },
-                                VariableName = FooVariableName,
-                                Action = new Print<string>
-                                {
-                                    Value = new ElementAtIndex<string>
-                                    {
-                                        Array = new GetVariable<List<string>> {VariableName = FooVariableName},
-                                        Index = new Constant<int>(1)
-                                    }
-                                }
-                            }
-                        }
-                    }, "The first number", "The second number" )
-                { IgnoreName = true };
-
-
-                yield return new StepTestCase("Read CSV ForEach 2",
-
-                    new Sequence
-                    {
-                        Steps = new IStep<Unit>[]
-                        {
-                            new SetVariable<string>
-                            {
-                                VariableName = new VariableName("TextVar"),
-                                Value = new Constant<string>(@"Name,Summary
-One,The first number
-Two,The second number")
-                            },
-
-                            new SetVariable<List<List<string>>>
-                            {
-                                VariableName = new VariableName("CSVVar"),
-
-                                Value = new ReadCsv
-                                {
-                                    Text = GetVariable<string>(new VariableName("TextVar")),
-
-                                    ColumnsToMap = new Array<string>
-                                    {
-                                        Elements = new[] {new Constant<string>("Name"), new Constant<string>("Summary")}
-                                    },
-                                    Delimiter = new Constant<string>(",")
-                                }
-                            },
-
-                            new ForEach<List<string>>
-                            {
-                                Array = GetVariable<List<List<string>>>(new VariableName("CSVVar")),
-                                VariableName = FooVariableName,
-                                Action = new Print<string>
-                                {
-                                    Value = new ElementAtIndex<string>
-                                    {
-                                        Array = new GetVariable<List<string>> {VariableName = FooVariableName},
-                                        Index = new Constant<int>(0)
-                                    }
-                                }
-                            }
-                        }
-                    }, "One", "Two")
-                { IgnoreName = true };
-
-                yield return new StepTestCase("Read CSV ForEach 3",
-
-                    new Sequence
-                    {
-                        Steps = new IStep<Unit>[]
-                        {
-                            new SetVariable<string>
-                            {
-                                VariableName = new VariableName("TextVar"),
-                                Value = new Constant<string>(@"Name,Summary
-One,The first number
-Two,The second number")
-                            },
-
-                            new SetVariable<List<List<string>>>
-                            {
-                                VariableName = new VariableName("CSVVar"),
-
-                                Value = new ReadCsv
-                                {
-                                    Text = GetVariable<string>(new VariableName("TextVar")),
-
-                                    ColumnsToMap = new Array<string>
-                                    {
-                                        Elements = new[] {new Constant<string>("Name"), new Constant<string>("Summary")}
-                                    },
-                                    Delimiter = new Constant<string>(",")
-                                }
-                            },
-
-                            new ForEach<List<string>>
-                            {
-                                Array = GetVariable<List<List<string>>>(new VariableName("CSVVar")),
-                                VariableName = FooVariableName,
-                                Action = new Print<string>
-                                {
-                                    Value = new ElementAtIndex<string>
-                                    {
-                                        Array = new GetVariable<List<string>> {VariableName = FooVariableName},
-                                        Index = new Constant<int>(0)
-                                    }
-                                },
-                                Configuration = new Configuration
-                                {
-                                    TargetMachineTags = new List<string> {"Tag1"}
-                                }
-                            }
-                        }
-                    }, "One", "Two")
-                { IgnoreName = true };
 
                 yield return new StepTestCase("Foreach nested array",
                     new Sequence
@@ -713,7 +582,7 @@ Two,The second number")
                 //Arrange
                 var pfs = StepFactoryStore.CreateUsingReflection(typeof(StepFactory));
                 var logger = new TestLogger();
-                var yamlRunner = new YamlRunner(EmptySettings.Instance, logger, ExternalProcessRunner.Instance,  pfs);
+                var yamlRunner = new YamlRunner(EmptySettings.Instance, logger, ExternalProcessRunner.Instance, FileSystemHelper.Instance, pfs);
 
                 //Act
                 IFreezableStep unfrozen = Step.Unfreeze();
@@ -752,15 +621,16 @@ Two,The second number")
                     var newFsd = FreezableStepData.TryCreate(compoundFreezableStep.StepFactory, newDict);
                     newFsd.ShouldBeSuccessful(x=>x.AsString);
 
-                    return new CompoundFreezableStep(compoundFreezableStep.StepFactory, newFsd.Value, new Configuration()
+                    return new CompoundFreezableStep(compoundFreezableStep.StepFactory, newFsd.Value, new Configuration
                     {
-                        TargetMachineTags = new List<string>()
+                        TargetMachineTags = new List<string>
                         {
                             "Test Tag"
                         }
                     });
                 }
-                else return step;
+
+                return step;
             }
         }
     }

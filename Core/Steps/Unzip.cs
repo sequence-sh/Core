@@ -1,6 +1,4 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations;
-using System.IO.Compression;
+﻿using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
@@ -25,23 +23,10 @@ namespace Reductech.EDR.Core.Steps
             if (data.IsFailure)
                 return data.ConvertFailure<Unit>();
 
-            Maybe<IError> error;
-            try
-            {
-                ZipFile.ExtractToDirectory(data.Value.Item1, data.Value.Item2, data.Value.Item3);
-                error = Maybe<IError>.None;
-            }
-#pragma warning disable CA1031 // Do not catch general exception types
-            catch (Exception e)
-            {
-                error = Maybe<IError>.From(new SingleError(e.Message, ErrorCode.ExternalProcessError, new StepErrorLocation(this)));
-            }
-#pragma warning restore CA1031 // Do not catch general exception types
+            var result =
+                stateMonad.FileSystemHelper.ExtractToDirectory(data.Value.Item1, data.Value.Item2, data.Value.Item3);
 
-            if (error.HasValue)
-                return Result.Failure<Unit, IError>(error.Value);
-
-            return Unit.Default;
+            return result.MapError(x=>x.WithLocation(this));
 
         }
 

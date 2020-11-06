@@ -1,5 +1,4 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -26,46 +25,35 @@ namespace Reductech.EDR.Core.Steps
 
 
             var path = Path.Combine(data.Value.Item1, data.Value.Item2);
+            var stream = data.Value.Item3;
 
-            Maybe<IError> errors;
-            try
-            {
-                await File.WriteAllTextAsync(path, data.Value.Item3, cancellationToken);
-                errors = Maybe<IError>.None;
-            }
-#pragma warning disable CA1031 // Do not catch general exception types
-            catch (Exception e)
-            {
-                errors = Maybe<IError>.From(new SingleError(e.Message, ErrorCode.ExternalProcessError, new StepErrorLocation(this)));
-            }
-#pragma warning restore CA1031 // Do not catch general exception types
+            var r = await stateMonad.FileSystemHelper.WriteFileAsync(path, stream, cancellationToken)
+                .MapError(x=>x.WithLocation(this));
 
-            if (errors.HasValue)
-                return Result.Failure<Unit, IError>(errors.Value);
-            return Unit.Default;
+            return r;
 
         }
 
         /// <summary>
-        /// The name of the folder.
-        /// </summary>
-        [StepProperty]
-        [Required]
-        public IStep<string> Folder { get; set; } = null!;
-
-        /// <summary>
         /// The name of the file to write to.
         /// </summary>
-        [StepProperty]
+        [StepProperty(Order = 0)]
         [Required]
         public IStep<string> FileName { get; set; } = null!;
 
         /// <summary>
+        /// The name of the folder.
+        /// </summary>
+        [StepProperty(Order = 1)]
+        [Required]
+        public IStep<string> Folder { get; set; } = null!;
+
+        /// <summary>
         /// The text to write.
         /// </summary>
-        [StepProperty]
+        [StepProperty(Order = 2)]
         [Required]
-        public IStep<string> Text { get; set; } = null!;
+        public IStep<Stream> Text { get; set; } = null!;
 
 
         /// <inheritdoc />

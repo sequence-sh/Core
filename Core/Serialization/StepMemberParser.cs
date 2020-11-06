@@ -287,6 +287,16 @@ namespace Reductech.EDR.Core.Serialization
                      select CreateProcess(fName.ToStringValue(), StepFactoryStore, args)).Try()
                     );
 
+
+            Lazy<TokenListParser<ProcessToken, IFreezableStep>> entity =
+                new Lazy<TokenListParser<ProcessToken, IFreezableStep>>(()=>
+                    (from _1 in Token.EqualTo(ProcessToken.OpenBracket)
+                    from args in functionMember
+                        .ManyDelimitedBy(Token.EqualTo(ProcessToken.Delimiter),
+                     Token.EqualTo(ProcessToken.CloseBracket))
+                    select CreateEntity(args)).Try()
+                   );
+
             var operation = mathOperation.Or(booleanOperation).Or(compareOperation);
 
             var bracketedOperation =
@@ -304,6 +314,7 @@ namespace Reductech.EDR.Core.Serialization
                 .Or(GetVariableParser)
                 .Or(notOperation)
                 .Or(function.Value)
+                .Or(entity.Value)
                 .Or(bracketedOperation)
                 .Or(array.Select(x=>x.ConvertToStep(false)))
                 );
@@ -327,6 +338,7 @@ namespace Reductech.EDR.Core.Serialization
                     .Or(setVariable)
                     //note: no getVariable here
                     .Or(Parse.Ref(() => function.Value))
+                    .Or(Parse.Ref(() => entity.Value))
                     .Select(x => new StepMember(x))
                     .Or(VariableNameParser.Select(x => new StepMember(x)))
                     .Or(array)).Try()
@@ -371,6 +383,36 @@ namespace Reductech.EDR.Core.Serialization
             public override int GetHashCode() => ErrorBuilder.GetHashCode();
         }
 
+
+        private static IFreezableStep CreateEntity((string argumentName, StepMember stepMember)[] entityArguments)
+        {
+            var pairs = new List<KeyValuePair<string, string>>();
+
+            var errorBuilders = new List<ErrorBuilder>();
+
+            foreach (var entityArgument in entityArguments)
+            {
+                var argumentResult = entityArgument.stepMember.AsArgument(entityArgument.argumentName);
+                if(argumentResult.IsFailure)
+                    errorBuilders.Add(new ErrorBuilder(argumentResult.Error, ErrorCode.InvalidCast));
+                else if(argumentResult.Value is ConstantFreezableStep cfs)
+                {
+                    pairs.Add(new KeyValuePair<string, string>(entityArgument.argumentName, cfs.Value.ToString()!));//TODO remove toString here
+                }
+                else
+                {
+                    {errorBuilders.Add(new ErrorBuilder($"'{argumentResult.Value.StepName}' is not a constant", ErrorCode.InvalidCast));}
+                }
+            }
+
+            if(errorBuilders.Any())
+                return new ParseError(ErrorBuilderList.Combine(errorBuilders));
+
+            var entity = new Entities.Entity(pairs);
+
+            return new ConstantFreezableStep(entity);
+
+        }
 
         private static IFreezableStep CreateProcess(string funcName, StepFactoryStore factoryStore,
             (string argumentName, StepMember stepMember)[] functionArguments)

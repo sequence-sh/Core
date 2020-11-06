@@ -55,6 +55,7 @@ namespace Reductech.EDR.Core.Steps
         /// Arguments to the step.
         /// </summary>
         [StepProperty(Order = 2)]
+        [DefaultValueExplanation("No arguments")]
         public IStep<List<string>>? Arguments { get; set; }
 
 

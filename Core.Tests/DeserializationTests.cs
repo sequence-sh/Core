@@ -200,54 +200,54 @@ Value: I have config too", "I have config too")
                 };
 
 
-                yield return new DeserializationTestFunction(@"Do: Print
-Value:
-  Do: ElementAtIndex
-  Array:
-    Do: ElementAtIndex
-    Array:
-      Do: ReadCsv
-      Text: >-
-        Name,Summary
+//                yield return new DeserializationTestFunction(@"Do: Print
+//Value:
+//  Do: ElementAtIndex
+//  Array:
+//    Do: ElementAtIndex
+//    Array:
+//      Do: ReadCsv
+//      Text: >-
+//        Name,Summary
 
-        One,The first number
+//        One,The first number
 
-        Two,The second number
-      ColumnsToMap: Array(Elements = ['Name', 'Summary'])
-    Index: 1
-  Index: 1", "The second number");
-
-
-                yield return new DeserializationTestFunction(@"- Do: SetVariable
-  VariableName: <TextVar>
-  Value: >-
-    Name,Summary
-
-    One,The first number
-
-    Two,The second number
-- <CSVVar> = ReadCsv(ColumnsToMap = Array(Elements = ['Name', 'Summary']), Delimiter = ',', HasFieldsEnclosedInQuotes = False, Text = <TextVar>)
-- ForEach(Action = Print(Value = ElementAtIndex(Array = <Foo>, Index = 0)), Array = <CSVVar>, VariableName = <Foo>)",
-                    "One", "Two"
-                    );
+//        Two,The second number
+//      ColumnsToMap: Array(Elements = ['Name', 'Summary'])
+//    Index: 1
+//  Index: 1", "The second number");
 
 
+//                yield return new DeserializationTestFunction(@"- Do: SetVariable
+//  VariableName: <TextVar>
+//  Value: >-
+//    Name,Summary
+
+//    One,The first number
+
+//    Two,The second number
+//- <CSVVar> = ReadCsv(ColumnsToMap = Array(Elements = ['Name', 'Summary']), Delimiter = ',', HasFieldsEnclosedInQuotes = False, Text = <TextVar>)
+//- ForEach(Action = Print(Value = ElementAtIndex(Array = <Foo>, Index = 0)), Array = <CSVVar>, VariableName = <Foo>)",
+//                    "One", "Two"
+//                    );
 
 
-                yield return new DeserializationTestFunction(@"- Do: SetVariable
-  VariableName: <TextVar>
-  Value: >-
-    Name,Summary
 
-    One,The first number
 
-    Two,The second number
-- <SearchTerms> = ReadCsv(ColumnsToMap = Array(Elements = ['Name', 'Summary']), Delimiter = ',', HasFieldsEnclosedInQuotes = False, Text = <TextVar>)
-- Do: ForEach
-  Array: <SearchTerms>
-  VariableName: <Row>
-  Action: Print(Value = ElementAtIndex(Array = <Row>, Index = 0))",
-                    "One", "Two");
+//                yield return new DeserializationTestFunction(@"- Do: SetVariable
+//  VariableName: <TextVar>
+//  Value: >-
+//    Name,Summary
+
+//    One,The first number
+
+//    Two,The second number
+//- <SearchTerms> = ReadCsv(ColumnsToMap = Array(Elements = ['Name', 'Summary']), Delimiter = ',', HasFieldsEnclosedInQuotes = False, Text = <TextVar>)
+//- Do: ForEach
+//  Array: <SearchTerms>
+//  VariableName: <Row>
+//  Action: Print(Value = ElementAtIndex(Array = <Row>, Index = 0))",
+//                    "One", "Two");
 
 
 
@@ -303,7 +303,7 @@ Action = Print(Value = <char>))", "a", "b", "c");
                 unitStep.Should().NotBeNull();
 
                 var runResult = await unitStep!
-                    .Run(new StateMonad(logger, EmptySettings.Instance, ExternalProcessRunner.Instance, stepFactoryStore), CancellationToken.None);
+                    .Run(new StateMonad(logger, EmptySettings.Instance, ExternalProcessRunner.Instance, FileSystemHelper.Instance,  stepFactoryStore), CancellationToken.None);
 
                 runResult.ShouldBeSuccessful(x => x.AsString);
 

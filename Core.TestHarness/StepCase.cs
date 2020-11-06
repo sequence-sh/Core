@@ -44,7 +44,7 @@ namespace Reductech.EDR.Core.TestHarness
         }
 
 #pragma warning disable CA1034 // Nested types should not be visible
-        public class StepCase : ICaseThatRuns
+        public class StepCase : ICaseThatExecutes
 #pragma warning restore CA1034 // Nested types should not be visible
         {
             public StepCase(string name, TStep step, TOutput expectedOutput, params string[] expectedLoggedValues)
@@ -57,7 +57,7 @@ namespace Reductech.EDR.Core.TestHarness
                 Name = name;
                 Step = step;
                 ExpectedOutput = expectedOutput;
-                ExpectedLoggedValues = expectedLoggedValues;
+                ExpectedLoggedValues = expectedLoggedValues.Select(CompressNewlines).ToList();
             }
 
 
@@ -69,7 +69,7 @@ namespace Reductech.EDR.Core.TestHarness
             /// </summary>
             public Maybe<TOutput> ExpectedOutput { get; }
 
-            public IReadOnlyCollection<object> ExpectedLoggedValues { get; }
+            public IReadOnlyCollection<string> ExpectedLoggedValues { get; }
 
             public Dictionary<VariableName, object> InitialState {get; } = new Dictionary<VariableName, object>();
 
@@ -82,9 +82,14 @@ namespace Reductech.EDR.Core.TestHarness
             public void AddExternalProcessRunnerAction(Action<Mock<IExternalProcessRunner>> action) => _externalProcessRunnerActions.Add(action);
 
             /// <inheritdoc />
-            public ISettings Settings { get; set; } = EmptySettings.Instance;
+            public void AddFileSystemAction(Action<Mock<IFileSystemHelper>> action) => _fileSystemActions.Add(action);
 
             private readonly List<Action<Mock<IExternalProcessRunner>>> _externalProcessRunnerActions = new List<Action<Mock<IExternalProcessRunner>>>();
+
+            private readonly List<Action<Mock<IFileSystemHelper>>> _fileSystemActions = new List<Action<Mock<IFileSystemHelper>>>();
+
+            /// <inheritdoc />
+            public ISettings Settings { get; set; } = EmptySettings.Instance;
 
 
             /// <inheritdoc />
@@ -107,6 +112,8 @@ namespace Reductech.EDR.Core.TestHarness
                 var yaml = Step.Unfreeze().SerializeToYaml();
 
                 testOutputHelper.WriteLine(yaml);
+                testOutputHelper.WriteLine("");
+                testOutputHelper.WriteLine("");
 
                 var deserializeResult = YamlMethods.DeserializeFromYaml(yaml, sfs);
 
@@ -127,15 +134,18 @@ namespace Reductech.EDR.Core.TestHarness
 
                 var factory = new MockRepository(MockBehavior.Strict);
                 var externalProcessRunnerMock = factory.Create<IExternalProcessRunner>();
-
-                var sfs = StepFactoryStore.CreateUsingReflection(typeof(IStep), typeof(TStep));
+                var fileSystemMock = factory.Create<IFileSystemHelper>();
 
                 foreach (var action in _externalProcessRunnerActions) action(externalProcessRunnerMock);
+
+                foreach (var fileSystemAction in _fileSystemActions) fileSystemAction(fileSystemMock);
+
+                var sfs = StepFactoryStore.CreateUsingReflection(typeof(IStep), typeof(TStep));
 
 
                 var step = GetStep(Step, extraArgument, testOutputHelper, sfs);
 
-                var stateMonad = new StateMonad(logger, Settings, externalProcessRunnerMock.Object, StepFactoryStoreToUse.Unwrap(sfs));
+                var stateMonad = new StateMonad(logger, Settings, externalProcessRunnerMock.Object, fileSystemMock.Object, StepFactoryStoreToUse.Unwrap(sfs));
 
                 foreach (var (key, value) in InitialState)
                     stateMonad.SetVariable(key, value).ShouldBeSuccessful(x => x.AsString);
@@ -154,7 +164,7 @@ namespace Reductech.EDR.Core.TestHarness
                     result.ShouldBeSuccessful(x=>x.AsString);
                 }
 
-                logger.LoggedValues.Should().BeEquivalentTo(ExpectedLoggedValues);
+                logger.LoggedValues.Select(x=> CompressNewlines(x.ToString()!)) .Should().BeEquivalentTo(ExpectedLoggedValues);
                 stateMonad.GetState().Should().BeEquivalentTo(ExpectedFinalState);
 
                 factory.VerifyAll();

@@ -74,7 +74,7 @@ namespace Reductech.EDR.Core.Internal
                     .Where(x => x.step != null)!;
 
 
-                return arguments;
+                return arguments!;
             }
         }
 

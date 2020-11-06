@@ -66,17 +66,17 @@ namespace Reductech.EDR.Core.Internal
         protected abstract Result<ICompoundStep, IError> TryCreateInstance(StepContext stepContext, FreezableStepData freezableStepData);
 
         /// <inheritdoc />
-        public MemberType GetExpectedMemberType(string name)
+        public (MemberType memberType, Type? type) GetExpectedMemberType(string name)
         {
             var propertyInfo = StepType.GetProperty(name, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
 
-            if (propertyInfo == null) return MemberType.NotAMember;
+            if (propertyInfo == null) return (MemberType.NotAMember, null);
 
-            if (propertyInfo.GetCustomAttribute<VariableNameAttribute>() != null) return MemberType.VariableName;
-            if (propertyInfo.GetCustomAttribute<StepPropertyAttribute>() != null) return MemberType.Step;
-            if (propertyInfo.GetCustomAttribute<StepListPropertyAttribute>() != null) return MemberType.StepList;
+            if (propertyInfo.GetCustomAttribute<VariableNameAttribute>() != null) return (MemberType.VariableName, null);
+            if (propertyInfo.GetCustomAttribute<StepPropertyAttribute>() != null) return (MemberType.Step, propertyInfo.PropertyType.GenericTypeArguments.First());
+            if (propertyInfo.GetCustomAttribute<StepListPropertyAttribute>() != null) return (MemberType.StepList, propertyInfo.PropertyType.GenericTypeArguments.First().GenericTypeArguments.First());
 
-            return MemberType.NotAMember;
+            return (MemberType.NotAMember, null);
         }
 
         /// <inheritdoc />
@@ -194,12 +194,18 @@ namespace Reductech.EDR.Core.Internal
             var argumentFreezeResult = freezableStep.TryFreeze(context);
             if (argumentFreezeResult.IsFailure)
                 return argumentFreezeResult.ConvertFailure<Unit>();
-            if (!propertyInfo.PropertyType.IsInstanceOfType(argumentFreezeResult.Value))
-                return new SingleError($"'{propertyInfo.Name}' cannot take the value '{argumentFreezeResult.Value}'", ErrorCode.InvalidCast, new StepErrorLocation(parentStep));
 
-            propertyInfo.SetValue(parentStep, argumentFreezeResult.Value); //This could throw an exception but we don't expect it.
+            var frozenStep = argumentFreezeResult.Value;
+
+
+            if (!propertyInfo.PropertyType.IsInstanceOfType(frozenStep))
+                return new SingleError($"'{propertyInfo.Name}' cannot take the value '{frozenStep}'", ErrorCode.InvalidCast, new StepErrorLocation(parentStep));
+
+            propertyInfo.SetValue(parentStep, frozenStep); //This could throw an exception but we don't expect it.
             return Unit.Default;
         }
+
+
 
         private static Result<Unit, IError> TrySetStepList(PropertyInfo propertyInfo, ICompoundStep parentStep, IReadOnlyList<IFreezableStep> member, StepContext context)
         {
@@ -222,8 +228,8 @@ namespace Reductech.EDR.Core.Internal
                 }
                 else
                     return new SingleError(
-                        $"'{CompressSpaces(step1.Name)}' is a '{step1.OutputType.GetDisplayName()}' but it should be a '{genericType.GenericTypeArguments.First().GetDisplayName()}' to be a member of '{parentStep.StepFactory.TypeName}'", 
-                        ErrorCode.InvalidCast, 
+                        $"'{CompressSpaces(step1.Name)}' is a '{step1.OutputType.GetDisplayName()}' but it should be a '{genericType.GenericTypeArguments.First().GetDisplayName()}' to be a member of '{parentStep.StepFactory.TypeName}'",
+                        ErrorCode.InvalidCast,
                         new StepErrorLocation(parentStep));
 
 
