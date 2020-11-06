@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Reflection;
 using FluentAssertions;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.TestHarness;
@@ -10,37 +11,12 @@ namespace Reductech.EDR.Core.Tests
     /// <summary>
     /// Makes sure all steps have a test class
     /// </summary>
-    public class MetaTests
+    public class MetaTests : MetaTestsBase
     {
-        [Fact]
-        public void All_steps_should_have_a_step_test()
-        {
-            var stepTypes = typeof(ICompoundStep).Assembly.GetTypes().Where(x => !x.IsAbstract && typeof(ICompoundStep).IsAssignableFrom(x)).ToHashSet();
+        /// <inheritdoc />
+        public override Assembly StepAssembly => typeof(IStep).Assembly;
 
-            var testedStepTypes = typeof(MetaTests).Assembly.GetTypes()
-                .Where(x => !x.IsAbstract && typeof(IStepTestBase).IsAssignableFrom(x)).Select(GetStepType).ToHashSet();
-
-
-            var untestedSteps = stepTypes.Except(testedStepTypes);
-
-            untestedSteps.Should().BeEmpty();
-        }
-
-        private static Type GetStepType(Type testType)
-        {
-            var constructor = testType.GetConstructors().First();
-
-            var parameters = constructor.GetParameters().Select(x => x.DefaultValue ?? null).Select(x=> x == DBNull.Value? null : x).ToArray();
-
-            var instance = constructor.Invoke(parameters);
-
-            var stepTestBase = (IStepTestBase) instance;
-
-            if(stepTestBase.StepType.IsGenericType)
-                return stepTestBase.StepType.GetGenericTypeDefinition();
-
-            return stepTestBase.StepType;
-        }
-
+        /// <inheritdoc />
+        public override Assembly TestAssembly => typeof(MetaTests).Assembly;
     }
 }
