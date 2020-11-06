@@ -1,10 +1,6 @@
-﻿using System;
-using System.Linq;
-using System.Reflection;
-using FluentAssertions;
+﻿using System.Reflection;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.TestHarness;
-using Xunit;
 
 namespace Reductech.EDR.Core.Tests
 {
