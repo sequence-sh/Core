@@ -11,9 +11,7 @@ namespace Reductech.EDR.Core.Tests.Steps
     public class ForEachEntityTests : StepTestBase<ForEachEntity, Unit> //TODO sort out entity stream serialization
     {
         /// <inheritdoc />
-        public ForEachEntityTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
-        {
-        }
+        public ForEachEntityTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper) { }
 
         /// <inheritdoc />
         protected override IEnumerable<StepCase> StepCases
@@ -28,14 +26,14 @@ namespace Reductech.EDR.Core.Tests.Steps
                         {
                             Value = GetVariable<Entity>("Foo")
                         },EntityStream = Constant(EntityStream.Create(
-                            new Entity(new KeyValuePair<string, string>("Foo", "Hello"), new KeyValuePair<string, string>("Bar", "World")),
-                            new Entity(new KeyValuePair<string, string>("Foo", "Hello 2"), new KeyValuePair<string, string>("Bar", "World 2"))
+                            CreateEntity(new KeyValuePair<string, string>("Foo", "Hello"), new KeyValuePair<string, string>("Bar", "World")),
+                            CreateEntity(new KeyValuePair<string, string>("Foo", "Hello 2"), new KeyValuePair<string, string>("Bar", "World 2"))
                         ))
                     },
                     Unit.Default,
                     "Foo: Hello, Bar: World",
                     "Foo: Hello 2, Bar: World 2"
-                ).WithExpectedFinalState("Foo", new Entity(new KeyValuePair<string, string>("Foo", "Hello 2"), new KeyValuePair<string, string>("Bar", "World 2")));
+                ).WithExpectedFinalState("Foo", CreateEntity(new KeyValuePair<string, string>("Foo", "Hello 2"), new KeyValuePair<string, string>("Bar", "World 2")));
 
 
                 //yield return new StepCase("For each record. Line breaks",

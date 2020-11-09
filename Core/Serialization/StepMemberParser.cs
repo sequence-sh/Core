@@ -13,6 +13,7 @@ using Superpower.Parsers;
 using Superpower.Tokenizers;
 using Result = CSharpFunctionalExtensions.Result;
 using CSharpFunctionalExtensions;
+using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.Internal.Errors;
 using YamlDotNet.Core;
 using Unit = Reductech.EDR.Core.Util.Unit;
@@ -386,7 +387,7 @@ namespace Reductech.EDR.Core.Serialization
 
         private static IFreezableStep CreateEntity((string argumentName, StepMember stepMember)[] entityArguments)
         {
-            var pairs = new List<KeyValuePair<string, string>>();
+            var pairs = new List<KeyValuePair<string, EntityValue>>();
 
             var errorBuilders = new List<ErrorBuilder>();
 
@@ -397,7 +398,7 @@ namespace Reductech.EDR.Core.Serialization
                     errorBuilders.Add(new ErrorBuilder(argumentResult.Error, ErrorCode.InvalidCast));
                 else if(argumentResult.Value is ConstantFreezableStep cfs)
                 {
-                    pairs.Add(new KeyValuePair<string, string>(argumentName, cfs.Value.ToString()!));//TODO remove toString here
+                    pairs.Add(new KeyValuePair<string, EntityValue>(argumentName, EntityValue.Create(cfs.Value.ToString())));
                 }
                 else
                 {

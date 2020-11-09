@@ -46,7 +46,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                     },
                     "Foo: Hello, Bar: World",
                     "Foo: Hello 2, Bar: World 2"
-                ).WithExpectedFinalState("Foo", new Entity(new KeyValuePair<string, string>("Foo", "Hello 2"), new KeyValuePair<string, string>("Bar", "World 2")));
+                ).WithExpectedFinalState("Foo", CreateEntity(new KeyValuePair<string, string>("Foo", "Hello 2"), new KeyValuePair<string, string>("Bar", "World 2")));
 
 
             }

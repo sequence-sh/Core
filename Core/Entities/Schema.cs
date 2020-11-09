@@ -1,13 +1,11 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Xml;
-using System.Xml.Schema;
 using CSharpFunctionalExtensions;
+using OneOf;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
-using Reductech.EDR.Core.Util;
+using YamlDotNet.Serialization;
 
 namespace Reductech.EDR.Core.Entities
 {
@@ -17,27 +15,203 @@ namespace Reductech.EDR.Core.Entities
     /// </summary>
     public sealed class Schema
     {
+        /// <summary>
+        /// The schema properties.
+        /// </summary>
+        [YamlMember]
+        public Dictionary<string, SchemaProperty> Properties { get; set; } //public setter for deserialization
+
+        /// <summary>
+        /// Whether properties other than the explicitly defined properties are allowed.
+        /// </summary>
+        [YamlMember]
+        public bool AllowExtraProperties { get; set; }
     }
 
-    //public class EntityValue : Option<DBNull,IReadOnlyCollection<EntitySingleValue>, EntitySingleValue>
-    //{
-    //    //TODO original string value
+    /// <summary>
+    /// The value of an entity property.
+    /// </summary>
+    public class EntityValue
+    {
+        /// <summary>
+        /// Create a new entityValue
+        /// </summary>
+        /// <param name="value"></param>
+        public EntityValue(OneOf<DBNull, EntitySingleValue, IReadOnlyCollection<EntitySingleValue>> value) => Value = value;
+
+        /// <summary>
+        /// Create a new EntityValue from an original string.
+        /// </summary>
+        /// <param name="original"></param>
+        /// <returns></returns>
+        public static EntityValue Create(string? original)
+        {
+            if(string.IsNullOrWhiteSpace(original))
+                return new EntityValue(DBNull.Value);
+
+            return new EntityValue(EntitySingleValue.Create(original));
+        }
+
+        /// <summary>
+        /// The Value
+        /// </summary>
+        public OneOf<DBNull, EntitySingleValue, IReadOnlyCollection<EntitySingleValue>> Value { get; }
+
+        /// <summary>
+        /// Tries to convert the value so it matches the schema.
+        /// </summary>
+        public Result<EntityValue, IErrorBuilder> TryConvert(SchemaProperty schemaProperty)
+        {
+            var r =
+
+            Value.Match(_ =>
+                {
+                    if (schemaProperty.Multiplicity == Multiplicity.Any ||
+                        schemaProperty.Multiplicity == Multiplicity.UpToOne)
+                        return Result.Success<EntityValue, IErrorBuilder>(this);
+                    return new ErrorBuilder("Unexpected null", ErrorCode.SchemaViolation);
 
 
-    //    /// <inheritdoc />
-    //    public EntityValue(DBNull t1) : base(t1) {}
+                },
+                singleValue =>
+                {
+                    if (singleValue.SchemaPropertyType == schemaProperty.SchemaPropertyType)
+                        return this;
+                    return singleValue.TryConvert(schemaProperty).Map(x => new EntityValue(x));
+                },
+                multiValue =>
+                {
+                    if (schemaProperty.Multiplicity == Multiplicity.Any || schemaProperty.Multiplicity == Multiplicity.AtLeastOne)
+                    {
+                        if(multiValue.All(x=>x.SchemaPropertyType == schemaProperty.SchemaPropertyType))
+                            return Result.Success<EntityValue, IErrorBuilder>(this);
 
-    //    /// <inheritdoc />
-    //    public EntityValue(IReadOnlyCollection<EntitySingleValue> t2) : base(t2) {}
+                        var result = multiValue.Select(x=>x.TryConvert(schemaProperty))
+                                .Combine(ErrorBuilderList.Combine)
+                                .Map(x => new EntityValue(x.ToList()));
 
-    //    /// <inheritdoc />
-    //    public EntityValue(EntitySingleValue t3) : base(t3) {}
-    //}
+                        return result;
+                    }
 
-    //public class EntitySingleValue : Option<int, double, bool, string, DateTime>
-    //{
+                    return new ErrorBuilder("Unexpected list", ErrorCode.SchemaViolation);
+                }
+            );
 
-    //}
+            return r;
+        }
+
+        /// <inheritdoc />
+        public override string ToString()
+        {
+            return Value.Match(x => "Empty", x => x.ToString(), x => string.Join(", ", x));
+        }
+    }
+
+    /// <summary>
+    /// The value of a single-value entity, or one of the values of a multi-value entity.
+    /// </summary>
+    public class EntitySingleValue : IEquatable<EntitySingleValue>
+    {
+        /// <summary>
+        /// Create a new EntitySingleValue
+        /// </summary>
+        public EntitySingleValue(OneOf<string, int, double, bool, string, DateTime> value, string original)
+        {
+            Value = value;
+            Original = original;
+        }
+
+        /// <summary>
+        /// Create a new EntitySingleValue with a string property.
+        /// </summary>
+        public static EntitySingleValue Create(string s) => new EntitySingleValue(OneOf<string, int, double, bool, string, DateTime>.FromT0(s), s);
+
+        /// <summary>
+        /// The original string
+        /// </summary>
+        public string Original { get; }
+
+        /// <summary>
+        /// The value
+        /// </summary>
+        public OneOf<string, int, double, bool, string, DateTime> Value { get; }
+
+        /// <summary>
+        /// The type of the value
+        /// </summary>
+        public SchemaPropertyType SchemaPropertyType => Value.Match(
+            _ => SchemaPropertyType.String,
+            _ => SchemaPropertyType.Integer,
+            _ => SchemaPropertyType.Double,
+            _ => SchemaPropertyType.Bool,
+            _ => SchemaPropertyType.Enum,
+            _ => SchemaPropertyType.Date
+            );
+
+        /// <summary>
+        /// Returns whether this value obeys the schema already without conversion.
+        /// </summary>
+        public bool Obeys(SchemaProperty schemaProperty)
+        {
+            if (schemaProperty.SchemaPropertyType == SchemaPropertyType.Enum) //Is the value a valid type for this enum.
+                return SchemaPropertyType == SchemaPropertyType.Enum && schemaProperty.Format.Contains(Original);
+
+            return SchemaPropertyType == schemaProperty.SchemaPropertyType;
+        }
+
+
+        /// <summary>
+        /// Try to convert this EntityValue to they type of the schemaProperty.
+        /// </summary>
+        public Result<EntitySingleValue, IErrorBuilder> TryConvert(SchemaProperty schemaProperty)
+        {
+            if (Obeys(schemaProperty))
+                return this;
+
+            var r = ConvertTo(Original, schemaProperty);
+
+            return r.ToResult(
+                new ErrorBuilder($"Could not convert '{Original}' to {schemaProperty.SchemaPropertyType}", ErrorCode.SchemaViolation) as IErrorBuilder);
+        }
+
+        private static Maybe<EntitySingleValue> ConvertTo(string original, SchemaProperty schemaProperty)
+        {
+            var r = schemaProperty.SchemaPropertyType switch
+            {
+                SchemaPropertyType.String => new EntitySingleValue(OneOf<string, int, double, bool, string, DateTime>.FromT0(original), original),
+                SchemaPropertyType.Integer => int.TryParse(original, out var i) ? new EntitySingleValue(i, original) :Maybe<EntitySingleValue>.None,
+                SchemaPropertyType.Double => double.TryParse(original, out var d) ? new EntitySingleValue(d, original) : Maybe<EntitySingleValue>.None,
+                SchemaPropertyType.Enum => schemaProperty.Format.Contains(original) ? new EntitySingleValue(OneOf<string, int, double, bool, string, DateTime>.FromT4(original),original ) : Maybe<EntitySingleValue>.None,
+                SchemaPropertyType.Bool => bool.TryParse(original, out var b) ? new EntitySingleValue(b, original) : Maybe<EntitySingleValue>.None,
+                SchemaPropertyType.Date => DateTime.TryParse(original, out var dt) ? new EntitySingleValue(dt, original) : Maybe<EntitySingleValue>.None, //TODO format
+                _ => throw new ArgumentOutOfRangeException()
+            };
+            return r;
+        }
+
+        /// <inheritdoc />
+        public override string ToString() => Original;
+
+        /// <inheritdoc />
+        public bool Equals(EntitySingleValue? other)
+        {
+            if (other is null) return false;
+            if (ReferenceEquals(this, other)) return true;
+            return Original == other.Original;
+        }
+
+        /// <inheritdoc />
+        public override bool Equals(object? obj)
+        {
+            if (obj is null) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            if (obj.GetType() != GetType()) return false;
+            return Equals((EntitySingleValue) obj);
+        }
+
+        /// <inheritdoc />
+        public override int GetHashCode() => Original.GetHashCode();
+    }
 
     /// <summary>
     /// A single property in a a schema.
@@ -45,160 +219,25 @@ namespace Reductech.EDR.Core.Entities
     public sealed class SchemaProperty
     {
         /// <summary>
-        /// Ensures that this property meets the constraints of the schema.
-        /// </summary>
-        public Result<object?, IErrorBuilder> Enforce(object? currentValue)
-        {
-            if (currentValue == null)
-            {
-                if (Multiplicity.AllowsNull())
-                    return currentValue;
-                return new ErrorBuilder("Unexpected null", ErrorCode.SchemaViolation);
-            }
-            else if (currentValue is IEnumerable enumerable)
-            {
-                if (Multiplicity.AllowsList())
-                {
-                    var result =
-                    enumerable.OfType<object>().Select(TryConvertSingleValue)
-                        .Combine(ErrorBuilderList.Combine)
-                        .Map(x => x.ToList() as object);
-
-                    return result;
-                }
-                else
-                {
-                    return new ErrorBuilder("Unexpected list", ErrorCode.SchemaViolation);
-                }
-            }
-            else
-            {
-                return TryConvertSingleValue(currentValue);
-            }
-        }
-
-
-        private static Maybe<int> TryConvertToInt(object currentValue)
-        {
-            return currentValue switch
-            {
-                int i => i,
-                double d => Convert.ToInt32(d),
-                bool b => Convert.ToInt32(b),
-                string s when int.TryParse(s, out var castInt) => castInt,
-                _ => Maybe<int>.None
-            };
-        }
-
-        private static Maybe<double> TryConvertToDouble(object currentValue)
-        {
-            return currentValue switch
-            {
-                int i => i,
-                double d => d,
-                bool b => Convert.ToDouble(b),
-                string s when double.TryParse(s, out var castDouble) => castDouble,
-                _ => Maybe<double>.None
-            };
-        }
-
-        private static Maybe<bool> TryConvertToBool(object currentValue)
-        {
-            return currentValue switch
-            {
-                int i when i == 1 => true,
-                int i when i == 0 => false,
-                bool b => b,
-                string s when bool.TryParse(s, out var castBool) => castBool,
-                _ => Maybe<bool>.None
-            };
-        }
-
-        private Maybe<string> TryConvertToEnum(object currentValue)
-        {
-            var s = currentValue.ToString();
-
-            if (Format.Contains(s))
-                return s!;
-            return Maybe<string>.None;
-        }
-
-        private Maybe<DateTime> TryConvertToDateTime(object currentValue)
-        {
-            switch (currentValue)
-            {
-                case DateTime dt:
-                    return dt;
-                case string s:
-                {
-                    //TODO formats
-                    if(DateTime.TryParse(s, out var result))
-                        return result;
-                    return Maybe<DateTime>.None;
-                }
-
-                default:
-                    return Maybe<DateTime>.None;
-            }
-        }
-
-        private Result<object, IErrorBuilder> TryConvertSingleValue(object currentValue)
-        {
-            var r = SchemaPropertyType switch
-            {
-                SchemaPropertyType.String => Maybe<object>.From(currentValue.ToString()!),
-                SchemaPropertyType.Integer => TryConvertToInt(currentValue),
-                SchemaPropertyType.Double => TryConvertToDouble(currentValue),
-                SchemaPropertyType.Enum => TryConvertToEnum(currentValue),
-                SchemaPropertyType.Bool => TryConvertToBool(currentValue),
-                SchemaPropertyType.Date => TryConvertToDateTime(currentValue),
-                _ => throw new ArgumentOutOfRangeException()
-            };
-
-            if (r.HasValue)
-                return r.Value;
-
-            return new ErrorBuilder($"Could not convert '{currentValue}' to {SchemaPropertyType}", ErrorCode.SchemaViolation);
-        }
-
-
-        /// <summary>
-        /// Create a new SchemaProperty
-        /// </summary>
-        public SchemaProperty(SchemaPropertyType schemaPropertyType, Multiplicity multiplicity, IReadOnlyCollection<string> format)
-        {
-            SchemaPropertyType = schemaPropertyType;
-            Multiplicity = multiplicity;
-            Format = format;
-        }
-
-        /// <summary>
         /// The type of the property.
         /// </summary>
+        [YamlMember]
         public SchemaPropertyType SchemaPropertyType { get; }
 
         /// <summary>
         /// The multiplicity of the property.
         /// </summary>
-        public Multiplicity Multiplicity { get; }
+        [YamlMember]
+        public Multiplicity Multiplicity { get; set; }
 
         /// <summary>
         /// The format strings.
         /// For Date, this will contain possible date formats.
         /// For Enum, this will contain possible enum values.
         /// </summary>
-        public IReadOnlyCollection<string> Format { get; }
+        [YamlMember]
+        public List<string> Format { get; set; }
 
-    }
-
-    /// <summary>
-    /// Extension methods to help with schema.
-    /// </summary>
-    public static class SchemaHelper
-    {
-        public static bool AllowsNull(this Multiplicity multiplicity) => multiplicity == Multiplicity.Any || multiplicity == Multiplicity.UpToOne;
-
-        public static bool AllowsList(this Multiplicity multiplicity) => multiplicity == Multiplicity.Any || multiplicity == Multiplicity.AtLeastOne;
     }
 
 

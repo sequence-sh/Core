@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
@@ -39,17 +37,16 @@ namespace Reductech.EDR.Core.Steps
 
             static Entity ChangeHeader(Entity entity, string oldHeader, string newHeader)
             {
-                var pairs = new List<KeyValuePair<string, string>>();
+                var pairs = new List<KeyValuePair<string, EntityValue>>();
 
-                foreach (var grouping in entity)
+                foreach (var (key, value) in entity)
                 {
                     string newKey;
-                    if (grouping.Key == oldHeader)
+                    if (key == oldHeader)
                         newKey = newHeader;
-                    else newKey = grouping.Key;
+                    else newKey = key;
 
-                    foreach (var value in grouping)
-                        pairs.Add(new KeyValuePair<string, string>(newKey, value));
+                    pairs.Add(new KeyValuePair<string, EntityValue>(newKey, value));
                 }
 
                 return new Entity(pairs);

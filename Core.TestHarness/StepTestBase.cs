@@ -7,6 +7,7 @@ using FluentAssertions;
 using FluentAssertions.Common;
 using Namotion.Reflection;
 using Reductech.EDR.Core.Attributes;
+using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Steps;
 using Xunit;
@@ -122,6 +123,13 @@ namespace Reductech.EDR.Core.TestHarness
         public static IStep<List<TNew>> Array<TNew>(params TNew[] elements)=> new Array<TNew>() {Elements = elements.Select(Constant).ToList()};
 
         public static IStep<TNew> GetVariable<TNew>(string variableName)=> new GetVariable<TNew>() {VariableName = new VariableName(variableName)};
+
+        protected static Entity CreateEntity(params KeyValuePair<string, string>[] pairs)
+        {
+            var evs = pairs.Select(x => new KeyValuePair<string, EntityValue>(x.Key, EntityValue.Create(x.Value)));
+
+            return new Entity(evs);
+        }
 
         protected static string CompressNewlines(string s) => s.Replace("\r\n", "\n");
     }
