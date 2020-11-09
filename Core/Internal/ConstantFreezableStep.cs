@@ -88,6 +88,18 @@ namespace Reductech.EDR.Core.Internal
             if (value is string s)
                 return $"'{s}'";
 
+            if (value is Entity entity)
+            {
+                var r = entity.TrySerializeShortForm();
+                if (r.IsSuccess) return r.Value;
+                return "Entity";
+            }
+
+            if (value is EntityStream)
+            {
+                return "EntityStream";
+            }
+
             if (value is IEnumerable enumerable)
             {
 
@@ -106,22 +118,10 @@ namespace Reductech.EDR.Core.Internal
                 //return SerializationMethods.StreamToString(stream, Encoding.UTF8);
             }
 
-            if (value is Entity entity)
-            {
-                var r = entity.TrySerializeShortForm();
-                if (r.IsSuccess) return r.Value;
-                return "Entity";
-            }
-
-            if (value is EntityStream)
-            {
-                return "EntityStream";
-            }
-
             var simpleResult = SerializationMethods.TrySerializeSimple(value);
 
             if(simpleResult.IsFailure)
-                throw new SerializationException(simpleResult.Value);
+                throw new SerializationException(simpleResult.Error);
 
             return simpleResult.Value;
         }
