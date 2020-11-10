@@ -7,9 +7,11 @@ using CSharpFunctionalExtensions;
 using Moq;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
+using Reductech.EDR.Core.Util;
 using Reductech.Utilities.Testing;
 using Xunit;
 using Xunit.Abstractions;
+using Xunit.Sdk;
 
 namespace Reductech.EDR.Core.TestHarness
 {
@@ -36,19 +38,14 @@ namespace Reductech.EDR.Core.TestHarness
         public class ErrorCase :  ICaseThatExecutes
 #pragma warning restore CA1034 // Nested types should not be visible
         {
-            public ErrorCase(string name, TStep step, IError expectedError)
+            public ErrorCase(string name, IStep step, IError expectedError)
             {
                 Name = name;
                 Step = step;
                 ExpectedError = expectedError;
             }
 
-            public ErrorCase(string name, TStep step, IErrorBuilder expectedErrorBuilder)
-            {
-                Name = name;
-                Step = step;
-                ExpectedError = expectedErrorBuilder.WithLocation(step);
-            }
+            public ErrorCase(string name, IStep step, IErrorBuilder expectedErrorBuilder) : this(name, step, expectedErrorBuilder.WithLocation(step)) { }
 
             public string Name { get; }
 
@@ -74,18 +71,34 @@ namespace Reductech.EDR.Core.TestHarness
                 foreach (var (key, value) in InitialState)
                     stateMonad.SetVariable(key, value).ShouldBeSuccessful(x => x.AsString);
 
-                var output = await Step.Run<TOutput>(stateMonad, CancellationToken.None);
+                if (Step is IStep<TOutput> outputStep)
+                {
+                    var result = await outputStep.Run<TOutput>(stateMonad, CancellationToken.None);
 
-                output.ShouldBeFailure(ExpectedError);
+                    result.ShouldBeFailure(ExpectedError);
+                }
+                else if (Step is IStep<Unit> unitStep)
+                {
+                    var result = await unitStep.Run<Unit>(stateMonad, CancellationToken.None);
+
+                    result.ShouldBeFailure(ExpectedError);
+                }
+                else
+                {
+                    throw new XunitException($"Step is does not have output type {nameof(Unit)} or {nameof(TOutput)}");
+                }
 
                 factory.VerifyAll();
             }
 
-            public TStep Step { get; }
+            public IStep Step { get; }
             public IError ExpectedError { get; }
 
             public Dictionary<VariableName, object> InitialState { get; } = new Dictionary<VariableName, object>();
             public Dictionary<VariableName, object> ExpectedFinalState { get; } = new Dictionary<VariableName, object>();
+
+            /// <inheritdoc />
+            public bool IgnoreFinalState { get; set; }
 
             /// <inheritdoc />
             public Maybe<StepFactoryStore> StepFactoryStoreToUse { get; set; }

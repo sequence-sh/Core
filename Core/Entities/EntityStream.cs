@@ -153,7 +153,7 @@ namespace Reductech.EDR.Core.Entities
                     return Maybe<IError>.None;
             }
 
-            return ErrorList.Combine(l);
+            return Maybe<IError>.From(ErrorList.Combine(l));
         }
     }
 }

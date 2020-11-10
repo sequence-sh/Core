@@ -77,9 +77,18 @@ namespace Reductech.EDR.Core.Entities
             foreach (var (key, value) in _fields)
             {
                 value.Value.Switch(_=>{},
-                    singleValue=> results.Add(SerializationMethods.TrySerializeShortFormString(singleValue.Original).Map(v=> $"{key} = {v}")),
-                    multiValue=> results.Add(SerializationMethods.TrySerializeSimple(multiValue.Select(x=>x.Original).ToList()).Map(v=> $"{key} = {v}"))
-                        );
+                    singleValue=>
+                    {
+                        var r = SerializationMethods.TrySerializeShortFormString(singleValue.Original)
+                            .Map(v => $"{key} = {v}");
+                        results.Add(r);
+                    },
+                    multiValue=>
+                    {
+                        var r = SerializationMethods.TrySerializeSimpleList(multiValue.Select(x => x.Original))
+                            .Map(v => $"{key} = {v}");
+                        results.Add(r);
+                    });
             }
 
             var r = results.Combine();

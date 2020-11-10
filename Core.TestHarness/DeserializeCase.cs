@@ -70,6 +70,9 @@ namespace Reductech.EDR.Core.TestHarness
             public Dictionary<VariableName, object> ExpectedFinalState { get; } = new Dictionary<VariableName, object>();
 
             /// <inheritdoc />
+            public bool IgnoreFinalState { get; set; }
+
+            /// <inheritdoc />
             public Maybe<StepFactoryStore> StepFactoryStoreToUse { get; set; }
 
             /// <inheritdoc />
@@ -134,7 +137,9 @@ namespace Reductech.EDR.Core.TestHarness
                 }
 
                 logger.LoggedValues.Should().BeEquivalentTo(ExpectedLoggedValues);
-                stateMonad.GetState().Should().BeEquivalentTo(ExpectedFinalState);
+
+                if(!IgnoreFinalState)
+                    stateMonad.GetState().Should().BeEquivalentTo(ExpectedFinalState);
                 factory.VerifyAll();
             }
         }

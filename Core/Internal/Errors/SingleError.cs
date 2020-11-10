@@ -75,7 +75,7 @@ namespace Reductech.EDR.Core.Internal.Errors
         public string AsString => Message;
 
         /// <inheritdoc />
-        public override string ToString() => AsString + " in " + Location.AsString;
+        public override string ToString() => ErrorCode + ": " + AsString + " in " + Location.AsString;
 
         /// <inheritdoc />
         public bool Equals(IError? other)
@@ -106,9 +106,6 @@ namespace Reductech.EDR.Core.Internal.Errors
         }
 
         /// <inheritdoc />
-        public override int GetHashCode()
-        {
-            return HashCode.Combine(Message, Location, (int) ErrorCode);
-        }
+        public override int GetHashCode() => HashCode.Combine(Message, Location, (int) ErrorCode);
     }
 }

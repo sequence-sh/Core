@@ -46,6 +46,21 @@ namespace Reductech.EDR.Core.Internal
         }
 
         /// <summary>
+        /// This, if it is a variableName
+        /// </summary>
+        public Maybe<VariableName> VariableName => Option.Match(x => x, x => Maybe<VariableName>.None, x => Maybe<VariableName>.None);
+
+        /// <summary>
+        /// This, if it is a FreezableStep
+        /// </summary>
+        public Maybe<IFreezableStep> FreezableStep => Option.Match(x => Maybe<IFreezableStep>.None,Maybe<IFreezableStep>.From,  x => Maybe<IFreezableStep>.None);
+
+        /// <summary>
+        /// This, if it is a StepList
+        /// </summary>
+        public Maybe<IReadOnlyList<IFreezableStep>> StepList => Option.Match(x => Maybe<IReadOnlyList<IFreezableStep>>.None,x => Maybe<IReadOnlyList<IFreezableStep>>.None,Maybe<IReadOnlyList<IFreezableStep>>.From);
+
+        /// <summary>
         /// The chosen option.
         /// </summary>
         private OneOf<VariableName, IFreezableStep, IReadOnlyList<IFreezableStep>> Option { get; }

@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.Internal;
+using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.TestHarness;
 using Reductech.EDR.Core.Util;
@@ -18,47 +19,149 @@ namespace Reductech.EDR.Core.Tests.Steps
         {
             get
             {
-                yield return new SequenceStepCase("No Errors",
+                static StepCase CreateCase(string name, EntityStream stream, Schema schema, params string[] expectedLogValues)
+                {
+                    return new SequenceStepCase(name,
 
-                    new Sequence
-                    {
-                        Steps = new List<IStep<Unit>>()
+                        new Sequence
                         {
-                            new ForEachEntity
+                            Steps = new List<IStep<Unit>>
                             {
-                                VariableName = new VariableName("Foo"),
-                                Action = new Print<Entity>
+                                new ForEachEntity
                                 {
-                                    Value = GetVariable<Entity>("Foo")
-                                },
-                                EntityStream =
-                                    new EnforceSchema
+                                    VariableName = new VariableName("Foo"),
+                                    Action = new Print<Entity>
                                     {
-                                        EntityStream = Constant(EntityStream.Create(
-                                            CreateEntity(new KeyValuePair<string, string>("Foo", "Hello"),
-                                                new KeyValuePair<string, string>("Bar", "1")),
-                                            CreateEntity(new KeyValuePair<string, string>("Foo", "Hello 2"),
-                                                new KeyValuePair<string, string>("Bar", "2")))),
-
-                                        Schema = Constant(new Schema
+                                        Value = GetVariable<Entity>("Foo")
+                                    },
+                                    EntityStream =
+                                        new EnforceSchema
                                         {
-                                            Name = "Test Schema",
-                                            AllowExtraProperties = false,
-                                            Properties = new Dictionary<string, SchemaProperty>
-                                            {
-                                                {"Foo", new SchemaProperty{Multiplicity = Multiplicity.ExactlyOne, Type = SchemaPropertyType.String}},
-                                                {"Bar", new SchemaProperty{Multiplicity = Multiplicity.ExactlyOne, Type = SchemaPropertyType.Integer}}
-                                            }
-                                        })
-                                    }
-                            }
+                                            EntityStream = Constant(stream),
 
-                        }
-                    }, "Foo: Hello, Bar: 1",
-                    "Foo: Hello 2, Bar: 2"
-                ).WithExpectedFinalState("Foo",
-                    CreateEntity(new KeyValuePair<string, string>("Foo", "Hello 2"),
-                        new KeyValuePair<string, string>("Bar", "2")));
+                                            Schema = Constant(schema)
+                                        }
+                                }
+
+                            }
+                        }, expectedLogValues
+                    ){IgnoreFinalState = true};
+                }
+
+
+                yield return CreateCase("Simple case",
+                        EntityStream.Create(CreateEntity(("Foo", "Hello"), ("Bar", "1")), CreateEntity(("Foo", "Hello 2"),("Bar", "2"))),
+                        CreateSchema("Test Schema",false, ("foo", SchemaPropertyType.String, Multiplicity.ExactlyOne), ("Bar", SchemaPropertyType.Integer, Multiplicity.ExactlyOne)),
+                        "Foo: Hello, Bar: 1","Foo: Hello 2, Bar: 2");
+
+
+                yield return CreateCase("Cast int",
+                    EntityStream.Create(CreateEntity(("Foo", "100"))),
+                        CreateSchema("Test Schema", false, ("Foo", SchemaPropertyType.Integer, Multiplicity.ExactlyOne)),
+                        "Foo: 100");
+
+
+                yield return CreateCase("Cast double",
+                    EntityStream.Create(CreateEntity(("Foo", "100.345"))),
+                        CreateSchema("Test Schema", false, ("Foo", SchemaPropertyType.Double, Multiplicity.ExactlyOne)),
+                        "Foo: 100.345");
+
+                yield return CreateCase("Cast bool",
+                    EntityStream.Create(CreateEntity(("Foo", "true"))),
+                        CreateSchema("Test Schema", false, ("Foo", SchemaPropertyType.Bool, Multiplicity.ExactlyOne)),
+                        "Foo: true");
+
+                yield return CreateCase("Cast date time",
+                    EntityStream.Create(CreateEntity(("Foo", "11/10/2020 3:45:44 PM"))),
+                        CreateSchema("Test Schema", false, ("Foo", SchemaPropertyType.Date, Multiplicity.ExactlyOne)),
+                    "Foo: 11/10/2020 3:45:44 PM");
+
+
+                yield return CreateCase("Cast multiple values",
+                   EntityStream.Create(CreateEntity(("Foo", "10"), ("Foo", "15"))),
+                   CreateSchema("Test Schema", false, ("Foo", SchemaPropertyType.Integer, Multiplicity.Any)),
+                   "Foo: 10, 15");
+
+
+                yield return CreateCase("Match regex",
+                    EntityStream.Create(CreateEntity(("Foo", "100"))),
+                    CreateSchema("Test Schema", false, ("Foo", SchemaPropertyType.Integer, Multiplicity.ExactlyOne, @"\d+", null)),
+                        "Foo: 100");
+
+                yield return CreateCase("Match enum",
+                    EntityStream.Create(CreateEntity(("Foo", "hello"))),
+                    CreateSchema("Test Schema", false, ("Foo", SchemaPropertyType.Enum, Multiplicity.ExactlyOne, null, new List<string>(){"Hello", "World"})),
+                        "Foo: hello");
+            }
+        }
+
+        /// <inheritdoc />
+        protected override IEnumerable<ErrorCase> ErrorCases
+        {
+            get
+            {
+                static ErrorCase CreateCase(string name, EntityStream stream, Schema schema, string expectedError, ErrorCode expectedErrorCode)
+                {
+                    var enforceSchema = new EnforceSchema
+                    {
+                        EntityStream = Constant(stream),
+
+                        Schema = Constant(schema),
+                        ErrorBehaviour = Constant(ErrorBehaviour.Fail)
+                    };
+
+                    return new ErrorCase(name,
+                        new Sequence
+                        {
+                            Steps = new List<IStep<Unit>>
+                            {
+                                new ForEachEntity
+                                {
+                                    VariableName = new VariableName("Foo"),
+                                    Action = new Print<Entity>
+                                    {
+                                        Value = GetVariable<Entity>("Foo")
+                                    },
+                                    EntityStream =enforceSchema
+                                }
+
+                            }
+                        },
+                        new ErrorBuilder(expectedError, expectedErrorCode).WithLocation(new StepErrorLocation(enforceSchema))
+
+                    );
+                }
+
+                yield return CreateCase("Could not cast",
+                    EntityStream.Create(CreateEntity(("Foo", "Hello"))),
+                    CreateSchema("Test Schema", false, ("Foo", SchemaPropertyType.Integer, Multiplicity.Any)),
+                    "Could not convert 'Hello' to Integer", ErrorCode.SchemaViolation);
+
+
+                yield return CreateCase("Missing enum",
+                    EntityStream.Create(CreateEntity(("Foo", "Fish"))),
+                    CreateSchema("Test Schema", false, ("Foo", SchemaPropertyType.Enum, Multiplicity.Any, null, new List<string>(){"Meat", "Chips"})),
+                    "Could not convert 'Fish' to Enum", ErrorCode.SchemaViolation);
+
+
+                yield return CreateCase("Regex not matched",
+                    EntityStream.Create(CreateEntity(("Foo", "Fish"))),
+                    CreateSchema("Test Schema", false, ("Foo", SchemaPropertyType.String, Multiplicity.Any, @"\d+", null)),
+                    @"'Fish' does not match regex '\d+'", ErrorCode.SchemaViolation);
+
+
+                yield return CreateCase("Missing property",
+                    EntityStream.Create(CreateEntity(("Foo", "Fish"))),
+                    CreateSchema("Test Schema", false, ("Foo", SchemaPropertyType.String, Multiplicity.Any), ("Bar", SchemaPropertyType.String, Multiplicity.AtLeastOne)),
+                    "Missing property 'Bar'", ErrorCode.SchemaViolation);
+
+                yield return CreateCase("Extra property",
+                    EntityStream.Create(CreateEntity(("Foo", "Fish"),("Bar", "Fly"))),
+                    CreateSchema("Test Schema", false, ("Foo", SchemaPropertyType.String, Multiplicity.Any)),
+                    "Unexpected Property 'Bar'", ErrorCode.SchemaViolation);
+
+
+
             }
         }
 

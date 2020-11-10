@@ -215,7 +215,7 @@ namespace Reductech.EDR.Core.Serialization
             }
 
             if (errors.Any())
-                return ErrorList.Combine(errors);
+                return Result.Failure<IFreezableStep, IError>(ErrorList.Combine(errors));
 
             var buildResult = manifest.Value.manifest.TryBuild(manifest.Value.key, StepMemberParser, specialObjectDictionary, stepMemberDictionary)
                     .MapError(x=>x.WithLocation(markStart, parser.Current.End));

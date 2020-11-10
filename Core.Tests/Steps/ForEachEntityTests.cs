@@ -26,14 +26,14 @@ namespace Reductech.EDR.Core.Tests.Steps
                         {
                             Value = GetVariable<Entity>("Foo")
                         },EntityStream = Constant(EntityStream.Create(
-                            CreateEntity(new KeyValuePair<string, string>("Foo", "Hello"), new KeyValuePair<string, string>("Bar", "World")),
-                            CreateEntity(new KeyValuePair<string, string>("Foo", "Hello 2"), new KeyValuePair<string, string>("Bar", "World 2"))
+                            CreateEntity(("Foo", "Hello"), ("Bar", "World")),
+                            CreateEntity(("Foo", "Hello 2"), ("Bar", "World 2"))
                         ))
                     },
                     Unit.Default,
                     "Foo: Hello, Bar: World",
                     "Foo: Hello 2, Bar: World 2"
-                ).WithExpectedFinalState("Foo", CreateEntity(new KeyValuePair<string, string>("Foo", "Hello 2"), new KeyValuePair<string, string>("Bar", "World 2")));
+                ).WithExpectedFinalState("Foo", CreateEntity(("Foo", "Hello 2"), ("Bar", "World 2")));
 
 
                 //yield return new StepCase("For each record. Line breaks",

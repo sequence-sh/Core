@@ -11,7 +11,7 @@ namespace Reductech.EDR.Core.Internal.Errors
         /// <summary>
         /// Create a new ErrorBuilderList
         /// </summary>
-        public ErrorBuilderList(IEnumerable<ErrorBuilder> errorBuilders) => ErrorBuilders = errorBuilders.ToList();
+        public ErrorBuilderList(IReadOnlyCollection<ErrorBuilder> errorBuilders) => ErrorBuilders = errorBuilders;
 
         /// <summary>
         /// The errorBuilders
@@ -33,6 +33,14 @@ namespace Reductech.EDR.Core.Internal.Errors
         /// <summary>
         /// Combine multiple ErrorBuilders
         /// </summary>
-        public static IErrorBuilder Combine(IEnumerable<IErrorBuilder> errorBuilders) => new ErrorBuilderList(errorBuilders.SelectMany(x=>x.GetErrorBuilders()));
+        public static IErrorBuilder Combine(IEnumerable<IErrorBuilder> errorBuilders)
+        {
+            var errors = errorBuilders.SelectMany(x => x.GetErrorBuilders()).ToList();
+
+            if (errors.Count == 1)
+                return errors.Single();
+
+            return new ErrorBuilderList(errors);
+        }
     }
 }

@@ -46,23 +46,28 @@ namespace Reductech.EDR.Core.Entities
         /// </summary>
         public Result<Entity, IErrorBuilder> ApplyToEntity(Entity entity)
         {
-            var remainingProperties = Properties.ToDictionary(x=>x.Key, x=>x.Value);
+            var remainingProperties = Properties
+                .ToDictionary(x=>x.Key,
+                    x=>x.Value,
+                    StringComparer.OrdinalIgnoreCase);
 
-            var kvps = new List<KeyValuePair<string, EntityValue>>();
+            var keyValuePairs = new List<KeyValuePair<string, EntityValue>>();
             var errors = new List<IErrorBuilder>();
 
             foreach (var kvp in entity)
             {
+#pragma warning disable 8714
                 if (remainingProperties.Remove(kvp.Key, out var schemaProperty))
+#pragma warning restore 8714
                 {
                     var r = kvp.Value.TryConvert(schemaProperty);
                     if(r.IsSuccess)
-                        kvps.Add(new KeyValuePair<string, EntityValue>(kvp.Key, r.Value));
+                        keyValuePairs.Add(new KeyValuePair<string, EntityValue>(kvp.Key, r.Value));
                     else
                         errors.Add(r.Error);
                 }
                 else if (AllowExtraProperties)
-                    kvps.Add(kvp);
+                    keyValuePairs.Add(kvp);
                 else
                     errors.Add(new ErrorBuilder($"Unexpected Property '{kvp.Key}'", ErrorCode.SchemaViolation));
             }
@@ -72,9 +77,13 @@ namespace Reductech.EDR.Core.Entities
                 errors.Add(new ErrorBuilder($"Missing property '{key}'", ErrorCode.SchemaViolation));
 
             if (errors.Any())
-                return Result.Failure<Entity, IErrorBuilder>(ErrorBuilderList.Combine(errors));
+            {
+                var l = ErrorBuilderList.Combine(errors);
+                return Result.Failure<Entity, IErrorBuilder>(l);
+            }
 
-            var resultEntity = new Entity(kvps);
+
+            var resultEntity = new Entity(keyValuePairs);
 
             return resultEntity;
         }
@@ -94,14 +103,27 @@ namespace Reductech.EDR.Core.Entities
         /// <summary>
         /// Create a new EntityValue from an original string.
         /// </summary>
-        /// <param name="original"></param>
-        /// <returns></returns>
         public static EntityValue Create(string? original)
         {
             if(string.IsNullOrWhiteSpace(original))
                 return new EntityValue(DBNull.Value);
 
             return new EntityValue(EntitySingleValue.Create(original));
+        }
+
+        /// <summary>
+        /// Create a new EntityValue from some number of original strings.
+        /// </summary>
+        public static EntityValue Create(IEnumerable<string> originals)
+        {
+            var values = originals.Select(EntitySingleValue.Create).ToList();
+
+            return values.Count switch
+            {
+                0 => new EntityValue(DBNull.Value),
+                1 => new EntityValue(values.Single()),
+                _ => new EntityValue(values)
+            };
         }
 
         /// <summary>
@@ -127,7 +149,7 @@ namespace Reductech.EDR.Core.Entities
                 },
                 singleValue =>
                 {
-                    if (singleValue.Type == schemaProperty.Type)
+                    if (singleValue.Type == schemaProperty.Type && singleValue.Obeys(schemaProperty))
                         return this;
                     return singleValue.TryConvert(schemaProperty).Map(x => new EntityValue(x));
                 },
@@ -135,7 +157,7 @@ namespace Reductech.EDR.Core.Entities
                 {
                     if (schemaProperty.Multiplicity == Multiplicity.Any || schemaProperty.Multiplicity == Multiplicity.AtLeastOne)
                     {
-                        if(multiValue.All(x=>x.Type == schemaProperty.Type))
+                        if(multiValue.All(x=>x.Type == schemaProperty.Type && x.Obeys(schemaProperty)))
                             return Result.Success<EntityValue, IErrorBuilder>(this);
 
                         var result = multiValue.Select(x=>x.TryConvert(schemaProperty))
@@ -215,7 +237,7 @@ namespace Reductech.EDR.Core.Entities
 
             if (schemaProperty.Regex != null)
             {
-                if (!Regex.IsMatch(schemaProperty.Regex, Original))
+                if (!Regex.IsMatch(Original, schemaProperty.Regex))
                     return false;
             }
 
@@ -231,10 +253,18 @@ namespace Reductech.EDR.Core.Entities
             if (Obeys(schemaProperty))
                 return this;
 
+            if (schemaProperty.Regex != null)
+            {
+                if (!Regex.IsMatch(Original, schemaProperty.Regex))
+                    return new ErrorBuilder($"'{Original}' does not match regex '{schemaProperty.Regex}'", ErrorCode.SchemaViolation);
+            }
+
             var r = ConvertTo(Original, schemaProperty);
 
-            return r.ToResult(
-                new ErrorBuilder($"Could not convert '{Original}' to {schemaProperty.Type}", ErrorCode.SchemaViolation) as IErrorBuilder);
+            if (r.HasNoValue)
+                return new ErrorBuilder($"Could not convert '{Original}' to {schemaProperty.Type}", ErrorCode.SchemaViolation);
+
+            return r.Value;
         }
 
         private static Maybe<EntitySingleValue> ConvertTo(string original, SchemaProperty schemaProperty)
@@ -244,7 +274,7 @@ namespace Reductech.EDR.Core.Entities
                 SchemaPropertyType.String => new EntitySingleValue(OneOf<string, int, double, bool, string, DateTime>.FromT0(original), original),
                 SchemaPropertyType.Integer => int.TryParse(original, out var i) ? new EntitySingleValue(i, original) :Maybe<EntitySingleValue>.None,
                 SchemaPropertyType.Double => double.TryParse(original, out var d) ? new EntitySingleValue(d, original) : Maybe<EntitySingleValue>.None,
-                SchemaPropertyType.Enum => schemaProperty.Format != null && schemaProperty.Format.Contains(original) ? new EntitySingleValue(OneOf<string, int, double, bool, string, DateTime>.FromT4(original),original ) : Maybe<EntitySingleValue>.None,
+                SchemaPropertyType.Enum => schemaProperty.Format != null && schemaProperty.Format.Contains(original, StringComparer.OrdinalIgnoreCase) ? new EntitySingleValue(OneOf<string, int, double, bool, string, DateTime>.FromT4(original),original ) : Maybe<EntitySingleValue>.None,
                 SchemaPropertyType.Bool => bool.TryParse(original, out var b) ? new EntitySingleValue(b, original) : Maybe<EntitySingleValue>.None,
                 SchemaPropertyType.Date => DateTime.TryParse(original, out var dt) ? new EntitySingleValue(dt, original) : Maybe<EntitySingleValue>.None, //TODO format
                 _ => throw new ArgumentOutOfRangeException()

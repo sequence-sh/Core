@@ -93,7 +93,7 @@ namespace Reductech.EDR.Core.Internal
             if (stepsForLater.Any())
             {
                 var error = ErrorList.Combine(stepsForLater.Select(x => x.error));
-                return error;
+                return Result.Failure<StepContext, IError>(error);
             }
 
             return new StepContext(typeResolver);

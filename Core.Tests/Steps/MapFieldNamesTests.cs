@@ -37,12 +37,12 @@ namespace Reductech.EDR.Core.Tests.Steps
                                     new MapFieldNames
                                     {
                                         EntityStream = Constant(EntityStream.Create(
-                                            CreateEntity(new KeyValuePair<string, string>("Food", "Hello"),
-                                                new KeyValuePair<string, string>("Bar", "World")),
-                                            CreateEntity(new KeyValuePair<string, string>("Food", "Hello 2"),
-                                                new KeyValuePair<string, string>("Bar", "World 2")))),
+                                            CreateEntity(("Food", "Hello"),
+                                                ("Bar", "World")),
+                                            CreateEntity(("Food", "Hello 2"),
+                                                ("Bar", "World 2")))),
 
-                                        Mappings = new Constant<Entity>(CreateEntity(new KeyValuePair<string, string>("Food", "Foo")))
+                                        Mappings = new Constant<Entity>(CreateEntity(("Food", "Foo")))
                                     }
                             }
 
@@ -50,8 +50,8 @@ namespace Reductech.EDR.Core.Tests.Steps
                     }, "Foo: Hello, Bar: World",
                     "Foo: Hello 2, Bar: World 2"
                 ).WithExpectedFinalState("Foo",
-                    CreateEntity(new KeyValuePair<string, string>("Foo", "Hello 2"),
-                        new KeyValuePair<string, string>("Bar", "World 2")));
+                    CreateEntity(("Foo", "Hello 2"),
+                        ("Bar", "World 2")));
             }
         }
 

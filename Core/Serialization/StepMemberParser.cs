@@ -377,6 +377,9 @@ namespace Reductech.EDR.Core.Serialization
             }
 
             /// <inheritdoc />
+            public override string ToString() => ErrorBuilder.AsString;
+
+            /// <inheritdoc />
             public override bool Equals(object? obj) => ReferenceEquals(this, obj) || obj is IFreezableStep other && Equals(other);
 
 
@@ -389,21 +392,45 @@ namespace Reductech.EDR.Core.Serialization
         {
             var pairs = new List<KeyValuePair<string, EntityValue>>();
 
-            var errorBuilders = new List<ErrorBuilder>();
+            var errorBuilders = new List<IErrorBuilder>();
 
             foreach (var (argumentName, stepMember) in entityArguments)
             {
-                var argumentResult = stepMember.AsArgument(argumentName);
-                if(argumentResult.IsFailure)
-                    errorBuilders.Add(new ErrorBuilder(argumentResult.Error, ErrorCode.InvalidCast));
-                else if(argumentResult.Value is ConstantFreezableStep cfs)
+                static Result<EntityValue, IErrorBuilder> HandleVariableName(VariableName variableName)
                 {
-                    pairs.Add(new KeyValuePair<string, EntityValue>(argumentName, EntityValue.Create(cfs.Value.ToString())));
+                    return new ErrorBuilder($"Cannot include a <{variableName.Name}> inside an entity because it is a variable.", ErrorCode.InvalidCast);
                 }
+
+                static Result<EntityValue, IErrorBuilder> HandleStep(IFreezableStep step) => GetSingleValueFromStep(step).Map(x => new EntityValue(x));
+
+                static Result<EntitySingleValue, IErrorBuilder> GetSingleValueFromStep(IFreezableStep step)
+                {
+                    if (step is ConstantFreezableStep cfs)
+                    {
+                        return EntitySingleValue.Create(cfs.Value.ToString()!);
+                    }
+                    return new ErrorBuilder($"Cannot include '{step.StepName}' inside an entity because it is not a constant.", ErrorCode.InvalidCast);
+                }
+
+                static Result<EntityValue, IErrorBuilder> HandleStepList(IReadOnlyList<IFreezableStep> steps)
+                {
+                    var r = steps.Select(GetSingleValueFromStep)
+                        .Combine(ErrorBuilderList.Combine)
+                        .Map(x=> new EntityValue(x.ToList()));
+
+                    return r;
+                }
+
+
+                var evResult = stepMember.Match(HandleVariableName, HandleStep, HandleStepList);
+                if(evResult.IsFailure)
+                    errorBuilders.Add(evResult.Error);
                 else
                 {
-                    {errorBuilders.Add(new ErrorBuilder($"'{argumentResult.Value.StepName}' is not a constant", ErrorCode.InvalidCast));}
+                    pairs.Add(new KeyValuePair<string, EntityValue>(argumentName, evResult.Value));
                 }
+
+
             }
 
             if(errorBuilders.Any())
