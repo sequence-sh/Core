@@ -11,6 +11,7 @@ using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Serialization;
 using Reductech.EDR.Core.Util;
 using Entity = Reductech.EDR.Core.Entities.Entity;
+using Type = System.Type;
 
 namespace Reductech.EDR.Core.Internal
 {
@@ -116,6 +117,11 @@ namespace Reductech.EDR.Core.Internal
             {
                 return "Stream";
                 //return SerializationMethods.StreamToString(stream, Encoding.UTF8);
+            }
+
+            if (value is Schema schema)
+            {
+                return schema.Name??"Schema";
             }
 
             var simpleResult = SerializationMethods.TrySerializeSimple(value);

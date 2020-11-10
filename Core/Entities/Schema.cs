@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using CSharpFunctionalExtensions;
 using OneOf;
 using Reductech.EDR.Core.Internal;
@@ -15,17 +16,68 @@ namespace Reductech.EDR.Core.Entities
     /// </summary>
     public sealed class Schema
     {
+
+        /// <summary>
+        /// The name of the schema.
+        /// </summary>
+        [YamlMember]
+        public string Name { get; set; } = null!;
+
         /// <summary>
         /// The schema properties.
         /// </summary>
         [YamlMember]
-        public Dictionary<string, SchemaProperty> Properties { get; set; } //public setter for deserialization
+        public Dictionary<string, SchemaProperty> Properties { get; set; } = null!; //public setter for deserialization
 
         /// <summary>
         /// Whether properties other than the explicitly defined properties are allowed.
         /// </summary>
         [YamlMember]
-        public bool AllowExtraProperties { get; set; }
+        public bool AllowExtraProperties { get; set; } = true;
+
+        /// <inheritdoc />
+        public override string ToString()
+        {
+            return Name??"Schema";
+        }
+
+        /// <summary>
+        /// Attempts to apply this schema to an entity.
+        /// </summary>
+        public Result<Entity, IErrorBuilder> ApplyToEntity(Entity entity)
+        {
+            var remainingProperties = Properties.ToDictionary(x=>x.Key, x=>x.Value);
+
+            var kvps = new List<KeyValuePair<string, EntityValue>>();
+            var errors = new List<IErrorBuilder>();
+
+            foreach (var kvp in entity)
+            {
+                if (remainingProperties.Remove(kvp.Key, out var schemaProperty))
+                {
+                    var r = kvp.Value.TryConvert(schemaProperty);
+                    if(r.IsSuccess)
+                        kvps.Add(new KeyValuePair<string, EntityValue>(kvp.Key, r.Value));
+                    else
+                        errors.Add(r.Error);
+                }
+                else if (AllowExtraProperties)
+                    kvps.Add(kvp);
+                else
+                    errors.Add(new ErrorBuilder($"Unexpected Property '{kvp.Key}'", ErrorCode.SchemaViolation));
+            }
+
+            foreach (var (key, _) in remainingProperties
+                .Where(x=>x.Value.Multiplicity == Multiplicity.ExactlyOne || x.Value.Multiplicity == Multiplicity.AtLeastOne))
+                errors.Add(new ErrorBuilder($"Missing property '{key}'", ErrorCode.SchemaViolation));
+
+            if (errors.Any())
+                return Result.Failure<Entity, IErrorBuilder>(ErrorBuilderList.Combine(errors));
+
+            var resultEntity = new Entity(kvps);
+
+            return resultEntity;
+        }
     }
 
     /// <summary>
@@ -75,7 +127,7 @@ namespace Reductech.EDR.Core.Entities
                 },
                 singleValue =>
                 {
-                    if (singleValue.SchemaPropertyType == schemaProperty.SchemaPropertyType)
+                    if (singleValue.Type == schemaProperty.Type)
                         return this;
                     return singleValue.TryConvert(schemaProperty).Map(x => new EntityValue(x));
                 },
@@ -83,7 +135,7 @@ namespace Reductech.EDR.Core.Entities
                 {
                     if (schemaProperty.Multiplicity == Multiplicity.Any || schemaProperty.Multiplicity == Multiplicity.AtLeastOne)
                     {
-                        if(multiValue.All(x=>x.SchemaPropertyType == schemaProperty.SchemaPropertyType))
+                        if(multiValue.All(x=>x.Type == schemaProperty.Type))
                             return Result.Success<EntityValue, IErrorBuilder>(this);
 
                         var result = multiValue.Select(x=>x.TryConvert(schemaProperty))
@@ -139,7 +191,7 @@ namespace Reductech.EDR.Core.Entities
         /// <summary>
         /// The type of the value
         /// </summary>
-        public SchemaPropertyType SchemaPropertyType => Value.Match(
+        public SchemaPropertyType Type => Value.Match(
             _ => SchemaPropertyType.String,
             _ => SchemaPropertyType.Integer,
             _ => SchemaPropertyType.Double,
@@ -153,10 +205,21 @@ namespace Reductech.EDR.Core.Entities
         /// </summary>
         public bool Obeys(SchemaProperty schemaProperty)
         {
-            if (schemaProperty.SchemaPropertyType == SchemaPropertyType.Enum) //Is the value a valid type for this enum.
-                return SchemaPropertyType == SchemaPropertyType.Enum && schemaProperty.Format.Contains(Original);
+            if (Type != schemaProperty.Type)
+                return false;
 
-            return SchemaPropertyType == schemaProperty.SchemaPropertyType;
+
+            if (schemaProperty.Type == SchemaPropertyType.Enum) //Is the value a valid type for this enum.
+                return schemaProperty.Format != null && schemaProperty.Format.Contains(Original);
+
+
+            if (schemaProperty.Regex != null)
+            {
+                if (!Regex.IsMatch(schemaProperty.Regex, Original))
+                    return false;
+            }
+
+            return true;
         }
 
 
@@ -171,17 +234,17 @@ namespace Reductech.EDR.Core.Entities
             var r = ConvertTo(Original, schemaProperty);
 
             return r.ToResult(
-                new ErrorBuilder($"Could not convert '{Original}' to {schemaProperty.SchemaPropertyType}", ErrorCode.SchemaViolation) as IErrorBuilder);
+                new ErrorBuilder($"Could not convert '{Original}' to {schemaProperty.Type}", ErrorCode.SchemaViolation) as IErrorBuilder);
         }
 
         private static Maybe<EntitySingleValue> ConvertTo(string original, SchemaProperty schemaProperty)
         {
-            var r = schemaProperty.SchemaPropertyType switch
+            var r = schemaProperty.Type switch
             {
                 SchemaPropertyType.String => new EntitySingleValue(OneOf<string, int, double, bool, string, DateTime>.FromT0(original), original),
                 SchemaPropertyType.Integer => int.TryParse(original, out var i) ? new EntitySingleValue(i, original) :Maybe<EntitySingleValue>.None,
                 SchemaPropertyType.Double => double.TryParse(original, out var d) ? new EntitySingleValue(d, original) : Maybe<EntitySingleValue>.None,
-                SchemaPropertyType.Enum => schemaProperty.Format.Contains(original) ? new EntitySingleValue(OneOf<string, int, double, bool, string, DateTime>.FromT4(original),original ) : Maybe<EntitySingleValue>.None,
+                SchemaPropertyType.Enum => schemaProperty.Format != null && schemaProperty.Format.Contains(original) ? new EntitySingleValue(OneOf<string, int, double, bool, string, DateTime>.FromT4(original),original ) : Maybe<EntitySingleValue>.None,
                 SchemaPropertyType.Bool => bool.TryParse(original, out var b) ? new EntitySingleValue(b, original) : Maybe<EntitySingleValue>.None,
                 SchemaPropertyType.Date => DateTime.TryParse(original, out var dt) ? new EntitySingleValue(dt, original) : Maybe<EntitySingleValue>.None, //TODO format
                 _ => throw new ArgumentOutOfRangeException()
@@ -222,13 +285,13 @@ namespace Reductech.EDR.Core.Entities
         /// The type of the property.
         /// </summary>
         [YamlMember]
-        public SchemaPropertyType SchemaPropertyType { get; }
+        public SchemaPropertyType Type { get; set; }
 
         /// <summary>
         /// The multiplicity of the property.
         /// </summary>
         [YamlMember]
-        public Multiplicity Multiplicity { get; set; }
+        public Multiplicity Multiplicity { get; set; } = Multiplicity.Any;
 
         /// <summary>
         /// The format strings.
@@ -236,7 +299,12 @@ namespace Reductech.EDR.Core.Entities
         /// For Enum, this will contain possible enum values.
         /// </summary>
         [YamlMember]
-        public List<string> Format { get; set; }
+        public List<string>? Format { get; set; }
+
+        /// <summary>
+        /// A regex to validate the string form of the field value
+        /// </summary>
+        public string? Regex { get; set; }
 
     }
 

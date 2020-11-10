@@ -13,6 +13,7 @@ using Reductech.EDR.Core.Steps;
 using Xunit;
 using Xunit.Abstractions;
 using Xunit.Sdk;
+using Type = System.Type;
 
 namespace Reductech.EDR.Core.TestHarness
 {
@@ -103,7 +104,7 @@ namespace Reductech.EDR.Core.TestHarness
 
             var stepFactoryType = instance.StepFactory.GetType();
 
-            var constructor = stepFactoryType.GetConstructor( new Type[0]);
+            var constructor = stepFactoryType.GetConstructor(System.Array.Empty<Type>());
             constructor.Should().BeNull($"{StepName} should not have a public parameterless constructor");
 
             var instanceProperty = stepFactoryType.GetProperty("Instance",

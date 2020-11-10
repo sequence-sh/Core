@@ -134,6 +134,9 @@ namespace Reductech.EDR.Core.Serialization
                     return new YamlString(streamString); //This will be a string - convert it to a stream
                 }
 
+                if (value is Schema schema)
+                    return schema; //Yaml serializable
+
                 if (value is IEnumerable enumerable)
                 {
                     var list = new List<object>();
