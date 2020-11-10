@@ -35,7 +35,9 @@ namespace Reductech.EDR.Core.TestHarness
             await StepCases.FindAndRunAsync(stepCaseName, TestOutputHelper, StepCase.SerializeArgument);
         }
 
+#pragma warning disable CA1034 // Nested types should not be visible
         public class SequenceStepCase : StepCase
+#pragma warning restore CA1034 // Nested types should not be visible
         {
             // ReSharper disable once UnusedParameter.Local - needed to disambiguate constructor
             public SequenceStepCase(string name, Sequence sequence, params string[] expectedLoggedValues) : base(name, sequence, Maybe<TOutput>.None,expectedLoggedValues)
@@ -76,6 +78,9 @@ namespace Reductech.EDR.Core.TestHarness
             public Dictionary<VariableName, object> ExpectedFinalState { get; } = new Dictionary<VariableName, object>();
 
             /// <inheritdoc />
+            public bool IgnoreFinalState { get; set; }
+
+            /// <inheritdoc />
             public Maybe<StepFactoryStore> StepFactoryStoreToUse { get; set; }
 
             /// <inheritdoc />
@@ -111,9 +116,10 @@ namespace Reductech.EDR.Core.TestHarness
 
                 var yaml = await Step.Unfreeze().SerializeToYamlAsync(CancellationToken.None);
 
+                testOutputHelper.WriteLine("");
+                testOutputHelper.WriteLine("");
                 testOutputHelper.WriteLine(yaml);
-                testOutputHelper.WriteLine("");
-                testOutputHelper.WriteLine("");
+
 
                 var deserializeResult = YamlMethods.DeserializeFromYaml(yaml, sfs);
 
@@ -165,7 +171,9 @@ namespace Reductech.EDR.Core.TestHarness
                 }
 
                 logger.LoggedValues.Select(x=> CompressNewlines(x.ToString()!)) .Should().BeEquivalentTo(ExpectedLoggedValues);
-                stateMonad.GetState().Should().BeEquivalentTo(ExpectedFinalState);
+
+                if(!IgnoreFinalState)
+                    stateMonad.GetState().Should().BeEquivalentTo(ExpectedFinalState);
 
                 factory.VerifyAll();
             }

@@ -24,6 +24,8 @@ namespace Reductech.EDR.Core.TestHarness
         Dictionary<VariableName, object> InitialState { get; }
         Dictionary<VariableName, object> ExpectedFinalState { get; }
 
+        public bool IgnoreFinalState { get; set; }
+
         Maybe<StepFactoryStore> StepFactoryStoreToUse { get; set; }
 
         void AddExternalProcessRunnerAction(Action<Mock<IExternalProcessRunner>> action);

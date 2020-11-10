@@ -88,6 +88,21 @@ namespace Reductech.EDR.Core.Entities
             return new EntityStream(b);
         }
 
+        /// <summary>
+        /// Transforms the records in this stream
+        /// </summary>
+        public EntityStream ApplyMaybe(Func<Entity, Maybe<Entity>> function)
+        {
+            var b = new TransformManyBlock<Entity, Entity>(entity => function(entity).ToList());
+
+            Source.LinkTo(b, new DataflowLinkOptions
+            {
+                PropagateCompletion = true
+            });
+
+            return new EntityStream(b);
+        }
+
 
         /// <summary>
         /// Perform an action on every record.
@@ -101,7 +116,17 @@ namespace Reductech.EDR.Core.Entities
                 PropagateCompletion = true
             });
 
-            await finalBlock.Completion;
+            try
+            {
+                await finalBlock.Completion;
+            }
+            catch (AggregateException exception)
+            {
+                var error = ExtractError(exception, errorLocation);
+                if (error.HasValue)
+                    return Result.Failure<Unit, IError>(error.Value);
+                throw;
+            }
 
             if (finalBlock.Completion.Exception == null)
                 return Unit.Default;
@@ -128,7 +153,7 @@ namespace Reductech.EDR.Core.Entities
                     return Maybe<IError>.None;
             }
 
-            return ErrorList.Combine(l);
+            return Maybe<IError>.From(ErrorList.Combine(l));
         }
     }
 }

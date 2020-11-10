@@ -36,11 +36,7 @@ namespace Reductech.EDR.Core.Serialization
             if (value is IEnumerable enumerable)
             {
 
-                var r = enumerable.OfType<object>().Select(TrySerializeShortForm)
-                    .Combine()
-                    .Map(x=> string.Join(", ", x))
-                    .Map(x=> $"[{x}]");
-
+                var r = TrySerializeSimpleList(enumerable.OfType<object>());
                 return r;
             }
 
@@ -67,6 +63,17 @@ namespace Reductech.EDR.Core.Serialization
             if (!newS.Contains('\n'))
                 return newS;
             return Result.Failure<string>("Strings containing newline characters cannot be serialized in short form");
+        }
+
+        /// <summary>
+        /// Try to deserialize list of simple objects.
+        /// </summary>
+        public static Result<string> TrySerializeSimpleList(IEnumerable<object> values)
+        {
+            return values.Select(TrySerializeShortForm)
+                    .Combine()
+                    .Map(x => string.Join(", ", x))
+                    .Map(x => $"[{x}]");
         }
 
         /// <summary>
@@ -133,6 +140,9 @@ namespace Reductech.EDR.Core.Serialization
                     var streamString = StreamToString(stream, Encoding.UTF8);
                     return new YamlString(streamString); //This will be a string - convert it to a stream
                 }
+
+                if (value is Schema schema)
+                    return schema; //Yaml serializable
 
                 if (value is IEnumerable enumerable)
                 {

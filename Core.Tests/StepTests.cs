@@ -229,7 +229,7 @@ namespace Reductech.EDR.Core.Tests
                     (-1).ToString()
                 );
 
-                yield return new StepTestCase("Print Join Repeat(Element: 'Hello', Number: 3)", Print(new JoinStrings
+                yield return new StepTestCase("Print Match Repeat(Element: 'Hello', Number: 3)", Print(new JoinStrings
                 {
                     Delimiter = Constant(", "),
                     List = new Repeat<string>
@@ -304,7 +304,7 @@ namespace Reductech.EDR.Core.Tests
                         ElseValue = Constant("World")
                     }), "World");
 
-                yield return new StepTestCase("Print Join SortArray(Array: ['B'; 'C'; 'A'], Order: Ascending)",
+                yield return new StepTestCase("Print Match SortArray(Array: ['B'; 'C'; 'A'], Order: Ascending)",
                     Print(new JoinStrings
                     {
                         Delimiter = Constant(", "),
@@ -315,7 +315,7 @@ namespace Reductech.EDR.Core.Tests
                         }
                     }), "A, B, C");
 
-                yield return new StepTestCase("Print Join SortArray(Array: ['B'; 'C'; 'A'], Order: Descending)",
+                yield return new StepTestCase("Print Match SortArray(Array: ['B'; 'C'; 'A'], Order: Descending)",
                     Print(new JoinStrings
                     {
                         Delimiter = Constant(", "),
@@ -610,7 +610,7 @@ Two,The second number"),
                 if (step is CompoundFreezableStep compoundFreezableStep)
                 {
                     var newDict = compoundFreezableStep.FreezableStepData.StepMembersDictionary
-                        .Select(x => (x.Key, stepMember: x.Value.Join(
+                        .Select(x => (x.Key, stepMember: x.Value.Match(
                             vn => new StepMember(vn),
                             s => new StepMember(AddConfigurationToAllSteps(s)),
                             la => new StepMember(la.Select(AddConfigurationToAllSteps).ToList())

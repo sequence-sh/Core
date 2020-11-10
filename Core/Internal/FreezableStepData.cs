@@ -45,7 +45,7 @@ namespace Reductech.EDR.Core.Internal
 
                         var addResult =
                         convertedMember.Value
-                            .Join(
+                            .Match(
                             x => AddVariableName(variableNameDictionary, key, x),
                             x => TryAddStep(stepDictionary, key, x, type),
                             x => TryAddStepList(stepListDictionary, key, x, type)

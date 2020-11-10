@@ -13,6 +13,7 @@ using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.Util;
 using Xunit.Sdk;
+using Type = System.Type;
 
 namespace Reductech.EDR.Core.TestHarness
 {
@@ -238,6 +239,18 @@ namespace Reductech.EDR.Core.TestHarness
 
                 step = new Constant<EntityStream>(entityStream);
             }
+            else if (outputType == typeof(Schema))
+            {
+                var schema = new Schema
+                {
+                    Name = "Schema" + index,
+                    Properties = new Dictionary<string, SchemaProperty>()
+                };
+                index++;
+                schema.Properties.Add("MyProp" + index, new SchemaProperty(){Multiplicity = Multiplicity.Any, Type = SchemaPropertyType.Integer});
+                index++;
+                step = new Constant<Schema>(schema);
+            }
             else
                 throw new XunitException($"Cannot create a constant step with type {outputType.GetDisplayName()}");
 
@@ -246,13 +259,13 @@ namespace Reductech.EDR.Core.TestHarness
 
             static Entity CreateEntity(ref int index1)
             {
-                var pairs = new List<KeyValuePair<string, string>>
+                var pairs = new List<KeyValuePair<string, EntityValue>>
                 {
-                    new KeyValuePair<string, string>("Prop1", $"Val{index1}")
+                    new KeyValuePair<string, EntityValue>("Prop1", EntityValue.Create($"Val{index1}"))
                 };
 
                 index1++;
-                pairs.Add(new KeyValuePair<string, string>("Prop2", $"Val{index1}"));
+                pairs.Add(new KeyValuePair<string, EntityValue>("Prop2", EntityValue.Create($"Val{index1}")));
                 index1++;
 
                 var entity = new Entity(pairs);

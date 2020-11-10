@@ -28,7 +28,14 @@ namespace Reductech.EDR.Core.Internal.Errors
         /// <summary>
         /// Combine multiple run errors.
         /// </summary>
-        public static ErrorList Combine(IEnumerable<IError> source) => new ErrorList(source.SelectMany(x => x.GetAllErrors()).ToList());
+        public static IError Combine(IEnumerable<IError> source)
+        {
+            var errors = source.SelectMany(x => x.GetAllErrors()).ToList();
+            if (errors.Count == 1)
+                return errors.Single();
+
+            return new ErrorList(errors);
+        }
 
         /// <inheritdoc />
         public bool Equals(IError? other) => other != null && _allErrors.SequenceEqual(other.GetAllErrors());

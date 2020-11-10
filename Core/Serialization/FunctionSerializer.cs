@@ -46,7 +46,7 @@ namespace Reductech.EDR.Core.Serialization
 
 
                 var valueSerializeResult =
-                    value.Join(
+                    value.Match(
                         VariableNameComponent.Serialize,
                         SerializeProcess,
                         SerializeList);

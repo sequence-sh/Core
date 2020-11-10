@@ -10,7 +10,7 @@ using Reductech.EDR.Core.Internal.Errors;
 namespace Reductech.EDR.Core.Steps
 {
     /// <summary>
-    /// Join strings with a delimiter.
+    /// Match strings with a delimiter.
     /// </summary>
     public sealed class JoinStrings : CompoundStep<string>
     {
@@ -50,7 +50,7 @@ namespace Reductech.EDR.Core.Steps
 
 
     /// <summary>
-    /// Join strings with a delimiter.
+    /// Match strings with a delimiter.
     /// </summary>
     public sealed class JoinStringsStepFactory : SimpleStepFactory<JoinStrings, string>
     {
@@ -62,6 +62,6 @@ namespace Reductech.EDR.Core.Steps
         public static SimpleStepFactory<JoinStrings, string> Instance { get; } = new JoinStringsStepFactory();
 
         /// <inheritdoc />
-        public override IStepNameBuilder StepNameBuilder => new StepNameBuilderFromTemplate($"Join [{nameof(JoinStrings.List)}]");
+        public override IStepNameBuilder StepNameBuilder => new StepNameBuilderFromTemplate($"Match [{nameof(JoinStrings.List)}]");
     }
 }

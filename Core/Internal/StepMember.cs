@@ -2,11 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using CSharpFunctionalExtensions;
+using OneOf;
 using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Steps;
-using Reductech.EDR.Core.Util;
-using Entity = CSharpFunctionalExtensions.Entity;
 
 namespace Reductech.EDR.Core.Internal
 {
@@ -18,17 +17,17 @@ namespace Reductech.EDR.Core.Internal
         /// <summary>
         /// Create a new VariableName StepMember
         /// </summary>
-        public StepMember(VariableName variableName) => Option = new Option<VariableName, IFreezableStep, IReadOnlyList<IFreezableStep>>(variableName);
+        public StepMember(VariableName variableName) => Option = OneOf<VariableName, IFreezableStep, IReadOnlyList<IFreezableStep>>.FromT0(variableName);
 
         /// <summary>
         /// Create a new IFreezableStep StepMember
         /// </summary>
-        public StepMember(IFreezableStep argument) => Option = new Option<VariableName, IFreezableStep, IReadOnlyList<IFreezableStep>>(argument);
+        public StepMember(IFreezableStep argument) => Option = OneOf<VariableName, IFreezableStep, IReadOnlyList<IFreezableStep>>.FromT1(argument);
 
         /// <summary>
         /// Create a new ListArgument StepMember
         /// </summary>
-        public StepMember(IReadOnlyList<IFreezableStep> listArgument) => Option = new Option<VariableName, IFreezableStep, IReadOnlyList<IFreezableStep>>(listArgument);
+        public StepMember(IReadOnlyList<IFreezableStep> listArgument) => Option = OneOf<VariableName, IFreezableStep, IReadOnlyList<IFreezableStep>>.FromT2(listArgument);
 
 
         /// <summary>
@@ -38,48 +37,72 @@ namespace Reductech.EDR.Core.Internal
         {
             get
             {
-                if (Option.Choice1.HasValue) return MemberType.VariableName;
-                if (Option.Choice2.HasValue) return MemberType.Step;
-                if (Option.Choice3.HasValue) return MemberType.StepList;
+                if (Option.IsT0) return MemberType.VariableName;
+                if (Option.IsT1) return MemberType.Step;
+                if (Option.IsT2) return MemberType.StepList;
 
                 return MemberType.NotAMember;
             }
         }
 
         /// <summary>
+        /// This, if it is a variableName
+        /// </summary>
+        public Maybe<VariableName> VariableName => Option.Match(x => x, x => Maybe<VariableName>.None, x => Maybe<VariableName>.None);
+
+        /// <summary>
+        /// This, if it is a FreezableStep
+        /// </summary>
+        public Maybe<IFreezableStep> FreezableStep => Option.Match(x => Maybe<IFreezableStep>.None,Maybe<IFreezableStep>.From,  x => Maybe<IFreezableStep>.None);
+
+        /// <summary>
+        /// This, if it is a StepList
+        /// </summary>
+        public Maybe<IReadOnlyList<IFreezableStep>> StepList => Option.Match(x => Maybe<IReadOnlyList<IFreezableStep>>.None,x => Maybe<IReadOnlyList<IFreezableStep>>.None,Maybe<IReadOnlyList<IFreezableStep>>.From);
+
+        /// <summary>
         /// The chosen option.
         /// </summary>
-        private Option<VariableName, IFreezableStep, IReadOnlyList<IFreezableStep>> Option { get; }
+        private OneOf<VariableName, IFreezableStep, IReadOnlyList<IFreezableStep>> Option { get; }
 
         /// <summary>
         /// Use this StepMember.
         /// </summary>
-        public T Join<T>(Func<VariableName, T> handleVariableName, Func<IFreezableStep, T> handleArgument,
+        public T Match<T>(Func<VariableName, T> handleVariableName, Func<IFreezableStep, T> handleArgument,
             Func<IReadOnlyList<IFreezableStep>, T> handleListArgument) =>
-            Option.Join(handleVariableName, handleArgument, handleListArgument);
+            Option.Match(handleVariableName, handleArgument, handleListArgument);
 
 
         /// <summary>
         /// Use this StepMember.
         /// </summary>
-        public void Match(Action<VariableName> handleVariableName, Action<IFreezableStep> handleArgument,
+        public void Switch(Action<VariableName> handleVariableName, Action<IFreezableStep> handleArgument,
             Action<IReadOnlyList<IFreezableStep>> handleListArgument) =>
-            Option.Match(handleVariableName, handleArgument, handleListArgument);
+            Option.Switch(handleVariableName, handleArgument, handleListArgument);
 
         /// <summary>
         /// Gets the stepMember if it is a VariableName.
         /// </summary>
-        public Result<VariableName> AsVariableName(string propertyName) => Option.Choice1.ToResult($"{propertyName} was a {MemberType}, not a VariableName");
+        public Result<VariableName> AsVariableName(string propertyName) =>
+            Option.TryPickT0(out var vn, out _)?
+                vn :
+                Result.Failure<VariableName>($"{propertyName} was a {MemberType}, not a VariableName");
 
         /// <summary>
         /// Gets the stepMember if it is an argument.
         /// </summary>
-        public Result<IFreezableStep> AsArgument(string propertyName) => Option.Choice2.ToResult($"{propertyName} was a {MemberType}, not an argument");
+        public Result<IFreezableStep> AsArgument(string propertyName) =>
+            Option.TryPickT1(out var fs, out _)?
+                Result.Success(fs) :
+                Result.Failure<IFreezableStep>($"{propertyName} was a {MemberType}, not an argument");
 
         /// <summary>
         /// Gets the stepMember if it is a listArgument.
         /// </summary>
-        public Result<IReadOnlyList<IFreezableStep>> AsListArgument(string propertyName) => Option.Choice3.ToResult($"{propertyName} was a {MemberType}, not an list argument");
+        public Result<IReadOnlyList<IFreezableStep>> AsListArgument(string propertyName) =>
+            Option.TryPickT2(out var l, out _)?
+                Result.Success(l) :
+                Result.Failure<IReadOnlyList<IFreezableStep>>($"{propertyName} was a {MemberType}, not an list argument");
 
         /// <summary>
         /// Tries to convert a step member of one type to one of another.
@@ -100,8 +123,7 @@ namespace Reductech.EDR.Core.Internal
         /// </summary>
         public IFreezableStep ConvertToStep(bool convertStepListToSequence)
         {
-
-            var r = Option.Join(
+            var r = Option.Match(
                 MapVariableName,
                 x => x,
 
@@ -154,7 +176,7 @@ namespace Reductech.EDR.Core.Internal
         {
             get
             {
-                return Join(x =>
+                return Match(x =>
                         x.ToString()!,
                     x => x.ToString()!,
                     x => x.ToString()!);
@@ -171,12 +193,15 @@ namespace Reductech.EDR.Core.Internal
             if (other is null) return false;
             if (ReferenceEquals(this, other)) return true;
 
-            return Option.Equals(other.Option,
-                (a, b) => a.Equals(b),
-                (a, b) => a.Equals(b),
-                ListsAreEqual);
 
-            static bool ListsAreEqual(IReadOnlyList<IFreezableStep> a1, IReadOnlyList<IFreezableStep> a2)
+            return Option.Match(
+                vn => other.Option.TryPickT0(out var vn2, out _) && vn.Equals(vn2),
+                fs => other.Option.TryPickT1(out var fs2, out _) && fs.Equals(fs2),
+                fsl => other.Option.TryPickT2(out var fsl2, out _) && ListsAreEqual(fsl, fsl2)
+
+            );
+
+            static bool ListsAreEqual(IEnumerable<IFreezableStep> a1, IEnumerable<IFreezableStep> a2)
             {
                 if (a1 is null)
                     return a2 is null;
@@ -194,7 +219,7 @@ namespace Reductech.EDR.Core.Internal
         public override bool Equals(object? obj) => ReferenceEquals(this, obj) || obj is StepMember other && Equals(other);
 
         /// <inheritdoc />
-        public override int GetHashCode() => HashCode.Combine(Option.Choice1, Option.Choice2, Option.Choice3.Select(x=>x.Count));
+        public override int GetHashCode() => Option.Match(x => x.GetHashCode(), x => x.GetHashCode(), x => x.Count);
 
         /// <summary>
         /// Equals operator

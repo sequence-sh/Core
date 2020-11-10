@@ -37,16 +37,17 @@ namespace Reductech.EDR.Core.Tests
                 yield return new DeserializationErrorCase("'Print(Value = 123)'", ("Yaml must represent a step with return type Unit", "Print(Value = 123)"));
 
                 yield return new DeserializationErrorCase("Do:Nothing",("unexpected `D`", "Line: 1, Col: 1, Idx: 0 - Line: 1, Col: 11, Idx: 10"));
+
                 yield return new DeserializationErrorCase("Do: Print\nValue:Hello",
-                    ("While parsing a block mapping, did not find expected key.", "Line: 2, Col: 1, Idx: 10 - Line: 2, Col: 12, Idx: 21"));
+                    ("While scanning a simple key, could not find expected ':'.", "Line: 2, Col: 1, Idx: 10 - Line: 2, Col: 1, Idx: 10"));
 
 
                 yield return new DeserializationErrorCase("Do: Print\nWord: Hello\nWord: World\nText: Goodbye",
-                    ("Duplicate Parameter 'Word'", "Line: 1, Col: 1, Idx: 0 - Line: 4, Col: 5, Idx: 38"), ("Missing Parameter 'Value' in 'Print'", "Line: 1, Col: 1, Idx: 0 - Line: 5, Col: 1, Idx: 47")
+                    ("Duplicate Parameter 'Word'", "Line: 1, Col: 1, Idx: 0 - Line: 4, Col: 5, Idx: 38")//, ("Missing Parameter 'Value' in 'Print'", "Line: 1, Col: 1, Idx: 0 - Line: 5, Col: 1, Idx: 47")
                     );
 
                 yield return new DeserializationErrorCase("Do: Print\nDo: Print\nValue: Hello",
-                    ("Duplicate Parameter 'Do'", "Line: 1, Col: 1, Idx: 0 - Line: 3, Col: 6, Idx: 25")
+                    ("Unexpected Parameter 'Do' in 'Print'", "Line: 1, Col: 1, Idx: 0 - Line: 4, Col: 1, Idx: 32")
                 );
                 yield return new DeserializationErrorCase("Do: Print\nValue: Hello\nConfig:\n DoNotSplit: false\nConfig:\n DoNotSplit: true",
                     ("Duplicate Parameter 'Config'", "Line: 1, Col: 1, Idx: 0 - Line: 7, Col: 1, Idx: 75")
@@ -54,7 +55,7 @@ namespace Reductech.EDR.Core.Tests
 
 
                 yield return new DeserializationErrorCase("Da: Print\nValue: Hello",
-                    ("Missing Parameter 'Do' in 'Step Definition'", "Line: 1, Col: 1, Idx: 0 - Line: 3, Col: 1, Idx: 22")
+                    ("Could not deserialize an object whose first property is 'Da'", "Line: 1, Col: 1, Idx: 0 - Line: 1, Col: 10, Idx: 9")
                 );
 
                 yield return new DeserializationErrorCase("Print(Word = 'hello', Term = 'world')",

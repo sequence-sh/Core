@@ -13,7 +13,7 @@ namespace Reductech.EDR.Core
     /// <summary>
     /// Helps read blocks
     /// </summary>
-    public class CSVBlockHelper
+    public static class CSVBlockHelper
     {
         /// <summary>
         /// Creates a block that will produce records from the CSV file.
@@ -74,7 +74,7 @@ namespace Reductech.EDR.Core
                             new ErrorBuilder($"There were {fields.Length} columns in row {rowNumber} but we expected {headers.Length}.", ErrorCode.CSVError)
                         .WithLocation(errorLocation));
 
-                    var pairs = headers.Zip(fields).Select(x => new KeyValuePair<string, string>(x.First, x.Second));
+                    var pairs = headers.Zip(fields).Select(x => new KeyValuePair<string, EntityValue>(x.First, EntityValue.Create(x.Second)));
 
                     row = new Entity(pairs);
 

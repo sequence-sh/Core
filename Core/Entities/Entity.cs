@@ -11,20 +11,19 @@ namespace Reductech.EDR.Core.Entities
     /// <summary>
     /// A piece of data.
     /// </summary>
-    public sealed class Entity : IEnumerable<IGrouping<string, string>>
+    public sealed class Entity : IEnumerable<KeyValuePair<string, EntityValue>>
     {
-        private readonly ILookup<string, string> _fields;
+        private readonly IReadOnlyDictionary<string, EntityValue> _fields;
 
         /// <summary>
         /// Create a new record.
         /// </summary>
-        public Entity(params KeyValuePair<string, string>[] fields) : this(fields.AsEnumerable()) {}
+        public Entity(params KeyValuePair<string, EntityValue>[] fields) : this(fields.AsEnumerable()) {}
 
         /// <summary>
         /// Create a new record.
         /// </summary>
-        public Entity(IEnumerable<KeyValuePair<string, string>> fields) =>
-            _fields = fields.ToLookup(x => x.Key, x => x.Value);
+        public Entity(IEnumerable<KeyValuePair<string, EntityValue>> fields) => _fields = new Dictionary<string, EntityValue>(fields);
 
         /// <summary>
         /// Gets the names of different fields on this object.
@@ -37,33 +36,30 @@ namespace Reductech.EDR.Core.Entities
         /// </summary>
         /// <param name="newFields"></param>
         /// <returns></returns>
-        public Entity WithFields(IReadOnlyCollection<KeyValuePair<string, string>> newFields)
+        public Entity WithFields(IReadOnlyCollection<KeyValuePair<string, EntityValue>> newFields)
         {
-            var usedKeys = new HashSet<string>(newFields.Select(x => x.Key));
+            if (!newFields.Any())
+                return this;
 
-            var allNewKeyValuePairs = newFields
-                .Concat(_fields.Where(x => !usedKeys.Contains(x.Key))
-                    .SelectMany(group => group.Select(x => new KeyValuePair<string, string>(group.Key, x))));
+            var newDict = newFields.Concat(_fields).GroupBy(x => x.Key, x => x.Value)
+                .ToDictionary(x => x.Key, x => x.First());
 
-            return new Entity(allNewKeyValuePairs);
+            return new Entity(newDict);
         }
 
         /// <summary>
         /// Gets the values of a particular field.
         /// </summary>
-        public IEnumerable<string> this[string key] => _fields[key];
+        public EntityValue this[string key] => _fields[key];
 
-        /// <summary>
-        /// Gets the values of a particular field.
-        /// </summary>
-        public IEnumerable<string> GetField(string key) => this[key];
-
-        IEnumerator<IGrouping<string, string>> IEnumerable<IGrouping<string, string>>.GetEnumerator() => _fields.GetEnumerator();
-
-        IEnumerator IEnumerable.GetEnumerator() => _fields.GetEnumerator();
+        /// <inheritdoc />
+        public IEnumerator<KeyValuePair<string, EntityValue>> GetEnumerator() => _fields.GetEnumerator();
 
         /// <inheritdoc />
         public override string ToString() => AsString();
+
+        /// <inheritdoc />
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
 
         /// <summary>
@@ -76,14 +72,31 @@ namespace Reductech.EDR.Core.Entities
 
             sb.Append("(");
 
-            var pairs = _fields.SelectMany(grouping => grouping.Select(value => (grouping.Key, value)))
-                .Select(x=> SerializationMethods.TrySerializeShortFormString(x.value).Map(k=> $"{x.Key} = {k}"))
-                .Combine();
+            var results = new List<Result<string>>();
 
-            if (pairs.IsFailure)
-                return pairs.ConvertFailure<string>();
+            foreach (var (key, value) in _fields)
+            {
+                value.Value.Switch(_=>{},
+                    singleValue=>
+                    {
+                        var r = SerializationMethods.TrySerializeShortFormString(singleValue.Original)
+                            .Map(v => $"{key} = {v}");
+                        results.Add(r);
+                    },
+                    multiValue=>
+                    {
+                        var r = SerializationMethods.TrySerializeSimpleList(multiValue.Select(x => x.Original))
+                            .Map(v => $"{key} = {v}");
+                        results.Add(r);
+                    });
+            }
 
-            sb.AppendJoin(",", pairs.Value);
+            var r = results.Combine();
+
+            if (r.IsFailure)
+                return r.ConvertFailure<string>();
+
+            sb.AppendJoin(",", r.Value);
 
             sb.Append(")");
 
@@ -98,12 +111,11 @@ namespace Reductech.EDR.Core.Entities
         {
             IDictionary<string, object> expandoObject = new ExpandoObject();
 
-            foreach (var field in _fields)
+            foreach (var (key, value) in _fields)
             {
-                if (field.Count() == 1)
-                    expandoObject[field.Key] = field.Single();
-                else
-                    expandoObject[field.Key] = field.ToList();
+                value.Value.Switch(_=>{},
+                    v=> expandoObject[key] = v,
+                    l => expandoObject[key] = l  );
             }
 
             return expandoObject;
@@ -115,7 +127,7 @@ namespace Reductech.EDR.Core.Entities
         public string AsString()
         {
             var result = string.Join(", ",
-                _fields.Select(field => $"{field.Key}: {string.Join(";", field)}"));
+                _fields.Select(field => $"{field.Key}: {field.Value}"));
 
             return result;
         }
