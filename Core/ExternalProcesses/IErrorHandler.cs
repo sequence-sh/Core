@@ -1,4 +1,4 @@
-﻿namespace Reductech.EDR.Core
+﻿namespace Reductech.EDR.Core.ExternalProcesses
 {
     /// <summary>
     /// Determines how to handle errors coming from an external step.

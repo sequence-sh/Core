@@ -1,4 +1,4 @@
-﻿namespace Reductech.EDR.Core
+﻿namespace Reductech.EDR.Core.ExternalProcesses
 {
     /// <summary>
     /// Does not ignore any errors.

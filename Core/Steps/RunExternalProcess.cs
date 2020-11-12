@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Attributes;
+using Reductech.EDR.Core.ExternalProcesses;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Util;
@@ -33,11 +34,15 @@ namespace Reductech.EDR.Core.Steps
                 arguments = argsResult.Value;
             }
 
+            var encodingResult = await Encoding.Run(stateMonad, cancellationToken);
+            if (encodingResult.IsFailure) return encodingResult.ConvertFailure<Unit>();
+
+
             var r = await
                 stateMonad.ExternalProcessRunner.RunExternalProcess(pathResult.Value,
                     stateMonad.Logger,
                     IgnoreNoneErrorHandler.Instance,
-                    arguments).MapError(x=>x.WithLocation(this));
+                    arguments, encodingResult.Value.Convert()).MapError(x=>x.WithLocation(this));
 
             return r;
         }
@@ -57,6 +62,13 @@ namespace Reductech.EDR.Core.Steps
         [StepProperty(Order = 2)]
         [DefaultValueExplanation("No arguments")]
         public IStep<List<string>>? Arguments { get; set; }
+
+        /// <summary>
+        /// Encoding to use for the process output.
+        /// </summary>
+        [StepProperty(Order = 3)]
+        [DefaultValueExplanation("Default encoding")]
+        public IStep<EncodingEnum> Encoding { get; set; } = new Constant<EncodingEnum>(EncodingEnum.Default);
 
 
         /// <inheritdoc />

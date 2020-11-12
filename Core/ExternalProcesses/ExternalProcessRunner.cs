@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
@@ -10,7 +12,7 @@ using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Util;
 
-namespace Reductech.EDR.Core
+namespace Reductech.EDR.Core.ExternalProcesses
 {
     /// <summary>
     /// Basic external step runner.
@@ -24,21 +26,14 @@ namespace Reductech.EDR.Core
         /// </summary>
         public static IExternalProcessRunner Instance { get; } = new ExternalProcessRunner();
 
-        private enum Source
-        {
-            Output,
-            Error
-        }
-
-
         /// <inheritdoc />
-        public async Task<Result<Unit, IErrorBuilder>> RunExternalProcess(string processPath, ILogger logger, IErrorHandler errorHandler, IEnumerable<string> arguments)
+        public Result<IExternalProcessReference, IErrorBuilder> StartExternalProcess(string processPath, IEnumerable<string> arguments, Encoding encoding)
         {
             if (!File.Exists(processPath))
                 return new ErrorBuilder($"Could not find '{processPath}'", ErrorCode.ExternalProcessNotFound);
 
             var argumentString = string.Join(' ', arguments.Select(EncodeParameterArgument));
-            using var pProcess = new System.Diagnostics.Process
+            var pProcess = new Process
             {
                 StartInfo =
                 {
@@ -47,10 +42,36 @@ namespace Reductech.EDR.Core
                     UseShellExecute = false,
                     RedirectStandardOutput = true,
                     RedirectStandardError = true,
-                    WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden, //don't display a window
+                    WindowStyle = ProcessWindowStyle.Hidden, //don't display a window
                     CreateNoWindow = true,
-                    StandardErrorEncoding = System.Text.Encoding.UTF8,
-                    StandardOutputEncoding = System.Text.Encoding.UTF8
+                    StandardErrorEncoding = encoding,
+                    StandardOutputEncoding = encoding,
+                }
+            };
+
+            return new ExternalProcessReference(pProcess);
+        }
+
+        /// <inheritdoc />
+        public async Task<Result<Unit, IErrorBuilder>> RunExternalProcess(string processPath, ILogger logger, IErrorHandler errorHandler, IEnumerable<string> arguments, Encoding encoding)
+        {
+            if (!File.Exists(processPath))
+                return new ErrorBuilder($"Could not find '{processPath}'", ErrorCode.ExternalProcessNotFound);
+
+            var argumentString = string.Join(' ', arguments.Select(EncodeParameterArgument));
+            using var pProcess = new Process
+            {
+                StartInfo =
+                {
+                    FileName = processPath,
+                    Arguments = argumentString,
+                    UseShellExecute = false,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    WindowStyle = ProcessWindowStyle.Hidden, //don't display a window
+                    CreateNoWindow = true,
+                    StandardErrorEncoding = encoding,
+                    StandardOutputEncoding = encoding,
                 }
             };
 
@@ -60,10 +81,10 @@ namespace Reductech.EDR.Core
             {
                 pProcess.Start();
 
-                var multiStreamReader = new MultiStreamReader<(string line, Source source)>(new IStreamReader<(string, Source)>[]
+                var multiStreamReader = new MultiStreamReader<(string line, StreamSource source)>(new IStreamReader<(string, StreamSource)>[]
                 {
-                new StreamReaderWithSource<Source>(pProcess.StandardOutput, Source.Output),
-                new StreamReaderWithSource<Source>(pProcess.StandardError, Source.Error),
+                new StreamReaderWithSource<StreamSource>(pProcess.StandardOutput, StreamSource.Output),
+                new StreamReaderWithSource<StreamSource>(pProcess.StandardError, StreamSource.Error),
                 });
 
                 //Read the output one line at a time
@@ -72,7 +93,7 @@ namespace Reductech.EDR.Core
                     var line = await multiStreamReader.ReadLineAsync();
                     if (line == null) //We've reached the end of the file
                         break;
-                    if (line.Value.source == Source.Error)
+                    if (line.Value.source == StreamSource.Error)
                     {
                         var errorText = string.IsNullOrWhiteSpace(line.Value.line) ? "Unknown Error" : line.Value.line;
 
