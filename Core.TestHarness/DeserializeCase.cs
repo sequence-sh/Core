@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using FluentAssertions;
 using Moq;
+using Reductech.EDR.Core.ExternalProcesses;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Serialization;
 using Reductech.EDR.Core.Util;

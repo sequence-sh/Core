@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
+using System.Text;
 using Microsoft.Extensions.Logging;
 using Moq;
+using Reductech.EDR.Core.ExternalProcesses;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.TestHarness;
@@ -24,7 +26,8 @@ namespace Reductech.EDR.Core.Tests.Steps
                         new RunExternalProcess
                         {
                             Arguments = new Constant<List<string>>(new List<string>(){"Foo"}),
-                            ProcessPath = new Constant<string>("Process.exe")
+                            ProcessPath = new Constant<string>("Process.exe"),
+                            Encoding = Constant(EncodingEnum.Ascii)
                         },
                         Unit.Default, "My Message"
                     )
@@ -32,8 +35,10 @@ namespace Reductech.EDR.Core.Tests.Steps
                         x.Setup(a => a.RunExternalProcess("Process.exe",
                                 It.IsAny<ILogger>(),
                                 It.IsAny<IErrorHandler>(),
-                                It.IsAny<IEnumerable<string>>()))
-                            .Callback<string, ILogger, IErrorHandler, IEnumerable<string>>((a,b,c,d)=> b.LogInformation("My Message"))
+                                It.IsAny<IEnumerable<string>>(),
+                                Encoding.ASCII
+                                ))
+                            .Callback<string, ILogger, IErrorHandler, IEnumerable<string>, Encoding>((a,b,c,d, e)=> b.LogInformation("My Message"))
                             .ReturnsAsync(Unit.Default)
                     )
 

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using CSharpFunctionalExtensions;
 using Microsoft.Extensions.Logging;
+using Reductech.EDR.Core.ExternalProcesses;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Util;

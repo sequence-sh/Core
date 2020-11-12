@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Moq;
+using Reductech.EDR.Core.ExternalProcesses;
 using Reductech.EDR.Core.Internal;
 using Xunit.Abstractions;
 

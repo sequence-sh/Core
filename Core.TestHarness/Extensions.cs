@@ -1,5 +1,6 @@
 ﻿using System;
 using Moq;
+using Reductech.EDR.Core.ExternalProcesses;
 using Reductech.EDR.Core.Internal;
 
 namespace Reductech.EDR.Core.TestHarness
