@@ -27,14 +27,6 @@ namespace Reductech.EDR.Core.Tests.Steps
                     );
 
 
-                yield return new StepCase("Print something containing a newline",
-                    new Print<string>()
-                    {
-                        Value = Constant($"Hello{Environment.NewLine}World")
-                    }, Unit.Default, $"Hello{Environment.NewLine}World"
-                    );
-
-
             }
         }
 
