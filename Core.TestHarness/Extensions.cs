@@ -32,14 +32,14 @@ namespace Reductech.EDR.Core.TestHarness
             return cws;
         }
 
+
         public static T WithExternalProcessAction<T>(this T cws, Action<Mock<IExternalProcessRunner>> action) where T : ICaseThatExecutes
         {
             cws.AddExternalProcessRunnerAction(action);
             return cws;
         }
 
-        public static T WithFileSystemAction<T>(this T cws, Action<Mock<IFileSystemHelper>> action)
-            where T : ICaseThatExecutes
+        public static T WithFileSystemAction<T>(this T cws, Action<Mock<IFileSystemHelper>> action) where T : ICaseThatExecutes
         {
             cws.AddFileSystemAction(action);
             return cws;
