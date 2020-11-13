@@ -46,10 +46,26 @@ namespace Reductech.EDR.Core.ExternalProcesses
                     CreateNoWindow = true,
                     StandardErrorEncoding = encoding,
                     StandardOutputEncoding = encoding,
+                    RedirectStandardInput = true
                 }
             };
 
-            return new ExternalProcessReference(pProcess);
+            var started = pProcess.Start();
+            if(!started)
+                return new ErrorBuilder($"Could not start '{processPath}'", ErrorCode.ExternalProcessError);
+
+            AppDomain.CurrentDomain.ProcessExit += KillProcess;
+            AppDomain.CurrentDomain.DomainUnload += KillProcess;
+
+            var reference = new ExternalProcessReference(pProcess);
+
+            return reference;
+
+            void KillProcess(object? sender, EventArgs e)
+            {
+                if (!pProcess.HasExited)
+                    pProcess.Kill(true);
+            }
         }
 
         /// <inheritdoc />

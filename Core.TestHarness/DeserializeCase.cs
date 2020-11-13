@@ -118,7 +118,7 @@ namespace Reductech.EDR.Core.TestHarness
 
                 foreach (var fileSystemAction in _fileSystemActions) fileSystemAction(fileSystemMock);
 
-                var stateMonad = new StateMonad(logger, Settings, externalProcessRunnerMock.Object,  fileSystemMock.Object, StepFactoryStoreToUse.Unwrap(sfs));
+                using var stateMonad = new StateMonad(logger, Settings, externalProcessRunnerMock.Object,  fileSystemMock.Object, StepFactoryStoreToUse.Unwrap(sfs));
 
                 foreach (var (key, value) in InitialState)
                     stateMonad.SetVariable(key, value).ShouldBeSuccessful(x => x.AsString);
