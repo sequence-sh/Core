@@ -183,7 +183,7 @@ namespace Reductech.EDR.Core.Tests
             {
                 var spf = StepFactoryStore.CreateUsingReflection(typeof(IStep));
 
-                var state = new StateMonad(NullLogger.Instance, EmptySettings.Instance, ExternalProcessRunner.Instance, FileSystemHelper.Instance, spf);
+                using var state = new StateMonad(NullLogger.Instance, EmptySettings.Instance, ExternalProcessRunner.Instance, FileSystemHelper.Instance, spf);
 
                 var r = await Process.Run<object>(state, CancellationToken.None);
 
