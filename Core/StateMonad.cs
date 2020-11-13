@@ -1,5 +1,7 @@
-﻿using System.Collections.Concurrent;
+﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
 using CSharpFunctionalExtensions;
 using Microsoft.Extensions.Logging;
 using Reductech.EDR.Core.ExternalProcesses;
@@ -12,7 +14,7 @@ namespace Reductech.EDR.Core
     /// <summary>
     /// The state monad that is passed between steps.
     /// </summary>
-    public sealed class StateMonad
+    public sealed class StateMonad : IDisposable
     {
         private readonly ConcurrentDictionary<VariableName, object>  _stateDictionary = new ConcurrentDictionary<VariableName, object>();
 
@@ -75,6 +77,9 @@ namespace Reductech.EDR.Core
         /// </summary>
         public Result<T,IErrorBuilder> GetVariable<T>(VariableName key)
         {
+            if (Disposed)
+                throw new ObjectDisposedException("State Monad was disposed");
+
             if (_stateDictionary.TryGetValue(key, out var value))
             {
                 if (value is T typedValue)
@@ -84,8 +89,6 @@ namespace Reductech.EDR.Core
             }
 
             return new ErrorBuilder($"Variable '{key}' does not exist.", ErrorCode.MissingVariable);
-
-
         }
 
         /// <summary>
@@ -93,10 +96,33 @@ namespace Reductech.EDR.Core
         /// </summary>
         public Result<Unit, IError> SetVariable<T>(VariableName key, T variable)
         {
+            if (Disposed)
+                throw new ObjectDisposedException("State Monad was disposed");
+
             _stateDictionary
                 .AddOrUpdate(key, _ => variable!, (_1, _2) => variable!);
 
             return Unit.Default;
+        }
+
+        /// <summary>
+        /// Has this State Monad been disposed
+        /// </summary>
+        public bool Disposed { get; private set; }
+
+        /// <summary>
+        /// Dispose of this State Monad
+        /// </summary>
+        public void Dispose()
+        {
+            if(!Disposed)
+            {
+                Disposed = true;
+                foreach(var val in _stateDictionary.Values.OfType<IDisposable>())
+                {
+                    val.Dispose();
+                }
+            }
         }
     }
 }

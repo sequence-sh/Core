@@ -22,14 +22,16 @@ namespace Reductech.EDR.Core.ExternalProcesses
                 new StreamReaderWithSource<StreamSource>(process.StandardError, StreamSource.Error),
             });
             InputStream = process.StandardInput;
-
-
         }
 
-        private Process Process { get; }
+        public Process Process { get; }
 
         /// <inheritdoc />
-        public void Dispose() => Process.Dispose();
+        public void Dispose()
+        {
+            Process.Kill(true);
+            Process.Dispose();
+        }
 
         /// <inheritdoc />
         public IStreamReader<(string line, StreamSource source)> OutputStream { get; }
