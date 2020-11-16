@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Text;
+using System.Threading;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Reductech.EDR.Core.ExternalProcesses;
@@ -36,9 +37,10 @@ namespace Reductech.EDR.Core.Tests.Steps
                                 It.IsAny<ILogger>(),
                                 It.IsAny<IErrorHandler>(),
                                 It.IsAny<IEnumerable<string>>(),
-                                Encoding.ASCII
+                                Encoding.ASCII,
+                                It.IsAny<CancellationToken>()
                                 ))
-                            .Callback<string, ILogger, IErrorHandler, IEnumerable<string>, Encoding>((a,b,c,d, e)=> b.LogInformation("My Message"))
+                            .Callback<string, ILogger, IErrorHandler, IEnumerable<string>, Encoding, CancellationToken>((a,b,c,d, e, ct)=> b.LogInformation("My Message"))
                             .ReturnsAsync(Unit.Default)
                     )
 

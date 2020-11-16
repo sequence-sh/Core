@@ -1,6 +1,5 @@
 ﻿using System;
-using System.IO;
-using Reductech.EDR.Core.Internal;
+using System.Threading.Channels;
 
 namespace Reductech.EDR.Core.ExternalProcesses
 {
@@ -12,12 +11,12 @@ namespace Reductech.EDR.Core.ExternalProcesses
         /// <summary>
         /// The output stream of the process
         /// </summary>
-        IStreamReader<(string line, StreamSource source)> OutputStream { get; }
+        ChannelReader<(string line, StreamSource source)> OutputChannel { get; }
 
         /// <summary>
         /// The input stream of the process.
         /// </summary>
-        StreamWriter InputStream { get; }
+        ChannelWriter<string> InputChannel { get; }
 
         /// <summary>
         /// Wait for the process to exit

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Microsoft.Extensions.Logging;
@@ -21,13 +22,15 @@ namespace Reductech.EDR.Core.ExternalProcesses
         /// <param name="errorHandler">The error handler.</param>
         /// <param name="arguments">The arguments to provide to the step. These will all be escaped</param>
         /// <param name="encoding">The encoding to use for process output streams</param>
+        /// <param name="cancellationToken"></param>
         /// <returns>The output of the step</returns>
         Task<Result<Unit, IErrorBuilder>> RunExternalProcess(
             string processPath,
             ILogger logger,
             IErrorHandler errorHandler,
             IEnumerable<string> arguments,
-            Encoding encoding);
+            Encoding encoding,
+            CancellationToken cancellationToken);
 
         /// <summary>
         /// Starts an external process.

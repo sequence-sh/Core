@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
@@ -56,8 +55,8 @@ namespace Reductech.EDR.Core.TestHarness
                     throw new XunitException($"Step is does not have output type {nameof(Unit)} or {nameof(TOutput)}");
                 }
 
-
-                logger.LoggedValues.Should().BeEquivalentTo(ExpectedLoggedValues);
+                if(!IgnoreLoggedValues)
+                    logger.LoggedValues.Should().BeEquivalentTo(ExpectedLoggedValues);
 
                 if (!IgnoreFinalState)
                     stateMonad.GetState().Should().BeEquivalentTo(ExpectedFinalState);
@@ -125,6 +124,8 @@ namespace Reductech.EDR.Core.TestHarness
 
             /// <inheritdoc />
             public bool IgnoreFinalState { get; set; }
+
+            public bool IgnoreLoggedValues { get; set; }
 
             /// <inheritdoc />
             public Maybe<StepFactoryStore> StepFactoryStoreToUse { get; set; }

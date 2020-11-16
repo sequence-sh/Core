@@ -42,7 +42,7 @@ namespace Reductech.EDR.Core.Steps
                 stateMonad.ExternalProcessRunner.RunExternalProcess(pathResult.Value,
                     stateMonad.Logger,
                     IgnoreNoneErrorHandler.Instance,
-                    arguments, encodingResult.Value.Convert()).MapError(x=>x.WithLocation(this));
+                    arguments, encodingResult.Value.Convert(), cancellationToken).MapError(x=>x.WithLocation(this));
 
             return r;
         }
