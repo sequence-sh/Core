@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Microsoft.Extensions.Logging;
@@ -69,7 +70,12 @@ namespace Reductech.EDR.Core.ExternalProcesses
         }
 
         /// <inheritdoc />
-        public async Task<Result<Unit, IErrorBuilder>> RunExternalProcess(string processPath, ILogger logger, IErrorHandler errorHandler, IEnumerable<string> arguments, Encoding encoding)
+        public async Task<Result<Unit, IErrorBuilder>> RunExternalProcess(string processPath,
+            ILogger logger,
+            IErrorHandler errorHandler,
+            IEnumerable<string> arguments,
+            Encoding encoding,
+            CancellationToken cancellationToken)
         {
             if (!File.Exists(processPath))
                 return new ErrorBuilder($"Could not find '{processPath}'", ErrorCode.ExternalProcessNotFound);
@@ -97,31 +103,26 @@ namespace Reductech.EDR.Core.ExternalProcesses
             {
                 pProcess.Start();
 
-                var multiStreamReader = new MultiStreamReader<(string line, StreamSource source)>(new IStreamReader<(string, StreamSource)>[]
-                {
-                new StreamReaderWithSource<StreamSource>(pProcess.StandardOutput, StreamSource.Output),
-                new StreamReaderWithSource<StreamSource>(pProcess.StandardError, StreamSource.Error),
-                });
+                var channelReader =
+                    StreamChannelHelper.ToChannelReader(
+                    (pProcess.StandardOutput, StreamSource.Output), (pProcess.StandardError, StreamSource.Error));
 
-                //Read the output one line at a time
-                while (true)
+
+                await foreach (var (line, streamSource) in  channelReader.ReadAllAsync(cancellationToken))
                 {
-                    var line = await multiStreamReader.ReadLineAsync();
-                    if (line == null) //We've reached the end of the file
-                        break;
-                    if (line.Value.source == StreamSource.Error)
+                    if (streamSource == StreamSource.Error)
                     {
-                        var errorText = string.IsNullOrWhiteSpace(line.Value.line) ? "Unknown Error" : line.Value.line;
+                        var errorText = string.IsNullOrWhiteSpace(line) ? "Unknown Error" : line;
 
                         if (errorHandler.ShouldIgnoreError(errorText))
-                            logger.LogWarning(line.Value.line);
+                            logger.LogWarning(line);
                         else
                             errors.Add(new ErrorBuilder(errorText, ErrorCode.ExternalProcessError));
-
                     }
                     else
-                        logger.LogInformation(line.Value.line);
+                        logger.LogInformation(line);
                 }
+
 
                 pProcess.WaitForExit();
             }

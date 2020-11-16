@@ -1,5 +1,5 @@
 ﻿using System.Diagnostics;
-using System.IO;
+using System.Threading.Channels;
 using Reductech.EDR.Core.Internal;
 
 namespace Reductech.EDR.Core.ExternalProcesses
@@ -16,12 +16,12 @@ namespace Reductech.EDR.Core.ExternalProcesses
         public ExternalProcessReference(Process process)
         {
             Process = process;
-            OutputStream = new MultiStreamReader<(string line, StreamSource source)>(new IStreamReader<(string, StreamSource)>[]
-            {
-                new StreamReaderWithSource<StreamSource>(process.StandardOutput, StreamSource.Output),
-                new StreamReaderWithSource<StreamSource>(process.StandardError, StreamSource.Error),
-            });
-            InputStream = process.StandardInput;
+
+            OutputChannel = StreamChannelHelper.ToChannelReader(
+                (process.StandardOutput, StreamSource.Output),
+                (process.StandardError, StreamSource.Error));
+
+            InputChannel = process.StandardInput.ToChannelWriter();
         }
 
         public Process Process { get; }
@@ -34,10 +34,10 @@ namespace Reductech.EDR.Core.ExternalProcesses
         }
 
         /// <inheritdoc />
-        public IStreamReader<(string line, StreamSource source)> OutputStream { get; }
+        public ChannelReader<(string line, StreamSource source)> OutputChannel { get; }
 
         /// <inheritdoc />
-        public StreamWriter InputStream { get; }
+        public ChannelWriter<string> InputChannel { get; }
 
         /// <inheritdoc />
         public void WaitForExit(int? milliseconds)
