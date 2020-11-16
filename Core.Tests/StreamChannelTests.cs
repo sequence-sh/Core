@@ -95,7 +95,7 @@ namespace Reductech.EDR.Core.Tests
                 tries++;
             }
 
-            stringBuilder.ToString().Should().Be("Hello\r\nWorld\r\n");
+            stringBuilder.ToString().Should().StartWith("Hello").And.Contain("World");
 
         }
     }
