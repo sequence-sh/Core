@@ -22,6 +22,9 @@ namespace Reductech.EDR.Core.Steps
             if (streamResult.IsFailure)
                 return streamResult.ConvertFailure<string>();
 
+            streamResult.Value.Seek(0, SeekOrigin.Begin);
+
+
             var encodingResult = await Encoding.Run(stateMonad, cancellationToken);
 
             if (encodingResult.IsFailure)

@@ -6,7 +6,6 @@ using System.Threading.Tasks.Dataflow;
 using CsvHelper;
 using CsvHelper.Configuration;
 using Reductech.EDR.Core.Entities;
-using Reductech.EDR.Core.Internal.Errors;
 
 namespace Reductech.EDR.Core
 {
@@ -21,7 +20,7 @@ namespace Reductech.EDR.Core
         public static ISourceBlock<Entity> ReadCsv(Stream stream,
             Encoding encoding,
             bool ignoreQuotes,
-            string delimiter, char? commentToken, IErrorLocation errorLocation)
+            string delimiter, char? commentToken)
 
         {
             var configuration = new CsvConfiguration(CultureInfo.InvariantCulture)
@@ -37,7 +36,7 @@ namespace Reductech.EDR.Core
             }
 
             var textReader = new StreamReader(stream, encoding);
-            var block = new TransformManyBlock<TextReader, Entity>(tr=> TryReadCSV(tr, configuration, errorLocation));
+            var block = new TransformManyBlock<TextReader, Entity>(tr=> TryReadCSV(tr, configuration));
 
             block.Post(textReader);
 
@@ -50,7 +49,7 @@ namespace Reductech.EDR.Core
         /// Reads a csv file
         /// <throws>ErrorException</throws>
         /// </summary>
-        private static IEnumerable<Entity> TryReadCSV(TextReader textReader, CsvConfiguration configuration, IErrorLocation errorLocation)
+        private static IEnumerable<Entity> TryReadCSV(TextReader textReader, CsvConfiguration configuration)
         {
             var reader = new CsvReader(textReader, configuration);
 
