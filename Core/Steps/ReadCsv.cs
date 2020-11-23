@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -46,10 +45,6 @@ namespace Reductech.EDR.Core.Steps
             var ignoreQuotesResult = await IgnoreQuotes.Run(stateMonad, cancellationToken);
             if (ignoreQuotesResult.IsFailure) return ignoreQuotesResult.ConvertFailure<EntityStream>();
 
-            var columnsToMapResult = await ColumnsToMap.Run(stateMonad, cancellationToken);
-            if (columnsToMapResult.IsFailure)
-                return columnsToMapResult.ConvertFailure<EntityStream>();
-
             var encodingResult = await Encoding.Run(stateMonad, cancellationToken);
             if (encodingResult.IsFailure)
                 return encodingResult.ConvertFailure<EntityStream>();
@@ -67,13 +62,6 @@ namespace Reductech.EDR.Core.Steps
             return recordStream;
         }
 
-
-        /// <summary>
-        /// The csv columns to map to result columns, in order.
-        /// </summary>
-        [StepProperty(Order = 1)]
-        [Required]
-        public IStep<List<string>> ColumnsToMap { get; set; } = null!;
 
         /// <summary>
         /// The token to use to indicate comments.
