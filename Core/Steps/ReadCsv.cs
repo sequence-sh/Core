@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
@@ -27,7 +27,7 @@ namespace Reductech.EDR.Core.Steps
             if (delimiterResult.IsFailure)
                 return delimiterResult.ConvertFailure<EntityStream>();
 
-            string? commentToken;
+            char? commentToken;
 
             if (CommentToken == null)
                 commentToken = null;
@@ -36,16 +36,14 @@ namespace Reductech.EDR.Core.Steps
                 var commentTokenResult = await CommentToken.Run(stateMonad, cancellationToken);
                 if (commentTokenResult.IsFailure)
                     return commentTokenResult.ConvertFailure<EntityStream>();
-                commentToken = commentTokenResult.Value;
+
+                if(commentTokenResult.Value.Length > 1)
+                    return new SingleError("Comment token must be a single character.", ErrorCode.CSVError, new StepErrorLocation(this));
+                commentToken = commentTokenResult.Value.Single();
             }
 
-            var fieldsEnclosedInQuotesResult = await HasFieldsEnclosedInQuotes.Run(stateMonad, cancellationToken);
-            if (fieldsEnclosedInQuotesResult.IsFailure)
-                return fieldsEnclosedInQuotesResult.ConvertFailure<EntityStream>();
-
-            var columnsToMapResult = await ColumnsToMap.Run(stateMonad, cancellationToken);
-            if (columnsToMapResult.IsFailure)
-                return columnsToMapResult.ConvertFailure<EntityStream>();
+            var ignoreQuotesResult = await IgnoreQuotes.Run(stateMonad, cancellationToken);
+            if (ignoreQuotesResult.IsFailure) return ignoreQuotesResult.ConvertFailure<EntityStream>();
 
             var encodingResult = await Encoding.Run(stateMonad, cancellationToken);
             if (encodingResult.IsFailure)
@@ -54,9 +52,10 @@ namespace Reductech.EDR.Core.Steps
 
             var block = CSVBlockHelper.ReadCsv(testStreamResult.Value,
                 encodingResult.Value.Convert(),
+                ignoreQuotesResult.Value,
                 delimiterResult.Value,
                 commentToken,
-                fieldsEnclosedInQuotesResult.Value, new StepErrorLocation(this));
+                 new StepErrorLocation(this));
 
             var recordStream = new EntityStream(block);
 
@@ -65,18 +64,12 @@ namespace Reductech.EDR.Core.Steps
 
 
         /// <summary>
-        /// The csv columns to map to result columns, in order.
-        /// </summary>
-        [StepProperty(Order = 1)]
-        [Required]
-        public IStep<List<string>> ColumnsToMap { get; set; } = null!;
-
-        /// <summary>
         /// The token to use to indicate comments.
+        /// Must be a single character, or null.
         /// </summary>
         [StepProperty(Order = 2)]
         [DefaultValueExplanation("Comments cannot be indicated")]
-        public IStep<string>? CommentToken { get; set; }
+        public IStep<string>? CommentToken { get; set; } //TODO enable char property type
 
         /// <summary>
         /// The delimiter to use to separate rows.
@@ -93,11 +86,11 @@ namespace Reductech.EDR.Core.Steps
         public IStep<EncodingEnum> Encoding { get; set; } = new Constant<EncodingEnum>(EncodingEnum.Default);
 
         /// <summary>
-        /// Whether CSV fields are enclosed in quotes.
+        /// If true, quotes should be treated like any other character.
         /// </summary>
         [StepProperty(Order = 5)]
         [DefaultValueExplanation("false")]
-        public IStep<bool> HasFieldsEnclosedInQuotes { get; set; } = new Constant<bool>(false);
+        public IStep<bool> IgnoreQuotes { get; set; } = new Constant<bool>(false);
 
         /// <summary>
         /// The text of the CSV file.

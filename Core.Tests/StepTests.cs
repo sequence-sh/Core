@@ -458,10 +458,6 @@ namespace Reductech.EDR.Core.Tests
 
                         EntityStream = new ReadCsv
                         {
-                            ColumnsToMap = new Array<string>
-                            {
-                                Elements = new[] { new Constant<string>("Name"), new Constant<string>("Summary") }
-                            },
                             Delimiter = new Constant<string>(","),
                             TextStream = new ToStream
                             {

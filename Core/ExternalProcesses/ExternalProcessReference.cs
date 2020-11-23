@@ -7,7 +7,7 @@ namespace Reductech.EDR.Core.ExternalProcesses
     /// <summary>
     /// A reference to a running external process.
     /// </summary>
-    public class ExternalProcessReference : IExternalProcessReference
+    public sealed class ExternalProcessReference : IExternalProcessReference
     {
         /// <summary>
         /// Create a new ExternalProcessReference
@@ -24,6 +24,9 @@ namespace Reductech.EDR.Core.ExternalProcesses
             InputChannel = process.StandardInput.ToChannelWriter();
         }
 
+        /// <summary>
+        /// The external process.
+        /// </summary>
         public Process Process { get; }
 
         /// <inheritdoc />
