@@ -14,7 +14,7 @@ namespace Reductech.EDR.Core.Steps
     /// <summary>
     /// Extracts elements from a CSV file
     /// </summary>
-    public sealed class ReadCsv : CompoundStep<EntityStream>
+    public sealed class ReadCSV : CompoundStep<EntityStream>
     {
         /// <inheritdoc />
         public override async Task< Result<EntityStream, IError>> Run(StateMonad stateMonad, CancellationToken cancellationToken)
@@ -106,13 +106,13 @@ namespace Reductech.EDR.Core.Steps
     /// <summary>
     /// Extracts elements from a CSV file
     /// </summary>
-    public sealed class ReadCsvStepFactory : SimpleStepFactory<ReadCsv, EntityStream>
+    public sealed class ReadCsvStepFactory : SimpleStepFactory<ReadCSV, EntityStream>
     {
         private ReadCsvStepFactory() { }
 
         /// <summary>
         /// The instance.
         /// </summary>
-        public static SimpleStepFactory<ReadCsv, EntityStream> Instance { get; } = new ReadCsvStepFactory();
+        public static SimpleStepFactory<ReadCSV, EntityStream> Instance { get; } = new ReadCsvStepFactory();
     }
 }

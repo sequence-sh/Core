@@ -9,7 +9,7 @@ using Xunit.Abstractions;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
-    public class ReadCSVTests : StepTestBase<ReadCsv, EntityStream>
+    public class ReadCSVTests : StepTestBase<ReadCSV, EntityStream>
     {
         /// <inheritdoc />
         public ReadCSVTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper) {}
@@ -27,7 +27,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                             new ForEachEntity
                             {
                                 VariableName = new VariableName("Foo"),
-                                EntityStream = new ReadCsv
+                                EntityStream = new ReadCSV
                                 {
                                     Delimiter = Constant(","),
                                     TextStream = new ToStream
@@ -54,7 +54,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                             new ForEachEntity
                             {
                                 VariableName = new VariableName("Foo"),
-                                EntityStream = new ReadCsv
+                                EntityStream = new ReadCSV
                                 {
                                     Delimiter = Constant(","),
                                     TextStream = new ToStream
@@ -96,7 +96,7 @@ namespace Reductech.EDR.Core.Tests.Steps
             {
                 var (step, _) = CreateStepWithDefaultOrArbitraryValues();
 
-                const string expectedYaml = @"Do: ReadCsv
+                const string expectedYaml = @"Do: ReadCSV
 CommentToken: 'Bar0'
 Delimiter: ','
 Encoding: EncodingEnum.Default

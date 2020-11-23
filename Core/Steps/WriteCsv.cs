@@ -14,7 +14,7 @@ namespace Reductech.EDR.Core.Steps
     /// <summary>
     /// Write entities to a stream in csv format.
     /// </summary>
-    public sealed class WriteCsv : CompoundStep<Stream>
+    public sealed class WriteCSV : CompoundStep<Stream>
     {
         /// <inheritdoc />
         public override async Task<Result<Stream, IError>> Run(StateMonad stateMonad, CancellationToken cancellationToken)
@@ -66,13 +66,13 @@ namespace Reductech.EDR.Core.Steps
     /// <summary>
     /// Write entities to a stream in csv format.
     /// </summary>
-    public sealed class WriteCsvFactory : SimpleStepFactory<WriteCsv, Stream>
+    public sealed class WriteCsvFactory : SimpleStepFactory<WriteCSV, Stream>
     {
         private WriteCsvFactory() { }
 
         /// <summary>
         /// The instance.
         /// </summary>
-        public static SimpleStepFactory<WriteCsv, Stream> Instance { get; } = new WriteCsvFactory();
+        public static SimpleStepFactory<WriteCSV, Stream> Instance { get; } = new WriteCsvFactory();
     }
 }
