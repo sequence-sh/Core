@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.Internal;
-using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.TestHarness;
 using Reductech.EDR.Core.Util;

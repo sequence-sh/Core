@@ -29,8 +29,6 @@ namespace Reductech.EDR.Core
             Encoding encoding,
             CancellationToken cancellationToken)
         {
-
-
             var results = await entityStream.TryGetResultsAsync(cancellationToken);
 
             if (results.IsFailure)
@@ -56,6 +54,8 @@ namespace Reductech.EDR.Core
             var records = results.Value.Select(x => x.ToSimpleObject());
 
             await writer.WriteRecordsAsync(records);
+
+            await textWriter.FlushAsync();
 
             return stream;
 
