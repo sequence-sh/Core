@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
@@ -22,10 +23,7 @@ namespace Reductech.EDR.Core.TestHarness
         public abstract class CaseThatExecutes : ICaseThatExecutes
 #pragma warning restore CA1034 // Nested types should not be visible
         {
-            protected CaseThatExecutes(IReadOnlyCollection<object> expectedLoggedValues)
-            {
-                ExpectedLoggedValues = expectedLoggedValues;
-            }
+            protected CaseThatExecutes(IReadOnlyCollection<object> expectedLoggedValues) => ExpectedLoggedValues = expectedLoggedValues;
 
             /// <inheritdoc />
             public async Task RunCaseAsync(ITestOutputHelper testOutputHelper, string? extraArgument)
@@ -58,7 +56,7 @@ namespace Reductech.EDR.Core.TestHarness
                 }
 
                 if(!IgnoreLoggedValues)
-                    logger.LoggedValues.Should().BeEquivalentTo(ExpectedLoggedValues);
+                    logger.LoggedValues.Select(x=>CompressNewlines(x.ToString()!)) .Should().BeEquivalentTo(ExpectedLoggedValues);
 
                 if (!IgnoreFinalState)
                     stateMonad.GetState().Should().BeEquivalentTo(ExpectedFinalState);

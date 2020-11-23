@@ -54,8 +54,7 @@ namespace Reductech.EDR.Core.Steps
                 encodingResult.Value.Convert(),
                 ignoreQuotesResult.Value,
                 delimiterResult.Value,
-                commentToken,
-                 new StepErrorLocation(this));
+                commentToken);
 
             var recordStream = new EntityStream(block);
 
