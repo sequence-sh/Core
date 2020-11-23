@@ -15,6 +15,9 @@ namespace Reductech.EDR.Core.Entities
     {
         private readonly IReadOnlyDictionary<string, EntityValue> _fields;
 
+
+
+
         /// <summary>
         /// Create a new record.
         /// </summary>
@@ -24,6 +27,17 @@ namespace Reductech.EDR.Core.Entities
         /// Create a new record.
         /// </summary>
         public Entity(IEnumerable<KeyValuePair<string, EntityValue>> fields) => _fields = new Dictionary<string, EntityValue>(fields);
+
+        /// <summary>
+        /// Create a new entity
+        /// </summary>
+        public static Entity Create(IEnumerable<KeyValuePair<string, object>> fields)
+        {
+            var fieldEntities = fields
+                .Select(x => new KeyValuePair<string, EntityValue>(x.Key, EntityValue.Create(x .Value.ToString())));
+
+            return new Entity(fieldEntities);
+        }
 
         /// <summary>
         /// Gets the names of different fields on this object.
@@ -91,12 +105,12 @@ namespace Reductech.EDR.Core.Entities
                     });
             }
 
-            var r = results.Combine();
+            var result = results.Combine();
 
-            if (r.IsFailure)
-                return r.ConvertFailure<string>();
+            if (result.IsFailure)
+                return result.ConvertFailure<string>();
 
-            sb.AppendJoin(",", r.Value);
+            sb.AppendJoin(",", result.Value);
 
             sb.Append(")");
 

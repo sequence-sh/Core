@@ -67,7 +67,7 @@ ColumnsToMap:
 CommentToken: 'Bar3'
 Delimiter: ','
 Encoding: EncodingEnum.Default
-HasFieldsEnclosedInQuotes: False
+IgnoreQuotes: False
 TextStream: 'Baz4'";
 
 

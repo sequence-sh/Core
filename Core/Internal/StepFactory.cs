@@ -170,12 +170,8 @@ namespace Reductech.EDR.Core.Internal
 
             foreach (var (propertyName, stepMember) in dict)
             {
-#pragma warning disable 8714
                 if (remaining.Remove(propertyName, out var propertyInfo))
-#pragma warning restore 8714
-                {
                     results.Add(trySet(propertyInfo, stepMember));
-                }
                 else
                     results.Add(Result.Failure<Unit, IError>(ErrorHelper.UnexpectedParameterError(propertyName, typeName).WithLocation(parentStep)));
             }

@@ -18,7 +18,9 @@ namespace Reductech.EDR.Core.TestHarness
 {
     public abstract partial class StepTestBase<TStep, TOutput>
     {
+#pragma warning disable CA1034 // Nested types should not be visible
         public abstract class CaseThatExecutes : ICaseThatExecutes
+#pragma warning restore CA1034 // Nested types should not be visible
         {
             protected CaseThatExecutes(IReadOnlyCollection<object> expectedLoggedValues)
             {

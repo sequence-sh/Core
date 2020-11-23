@@ -1,11 +1,11 @@
 ﻿using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
-using System.Linq;
 using System.Text;
 using System.Threading.Tasks.Dataflow;
-using Microsoft.VisualBasic.FileIO;
+using CsvHelper;
+using CsvHelper.Configuration;
 using Reductech.EDR.Core.Entities;
-using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
 
 namespace Reductech.EDR.Core
@@ -20,14 +20,26 @@ namespace Reductech.EDR.Core
         /// </summary>
         public static ISourceBlock<Entity> ReadCsv(Stream stream,
             Encoding encoding,
-            string delimiter, string? commentToken, bool enclosedInQuotes, IErrorLocation errorLocation)
+            bool ignoreQuotes,
+            string delimiter, char? commentToken, IErrorLocation errorLocation)
 
         {
-            var textFieldParser = new TextFieldParser(stream, encoding);
+            var configuration = new CsvConfiguration(CultureInfo.InvariantCulture)
+            {
+                Delimiter = delimiter,
+                IgnoreQuotes = ignoreQuotes
+            };
 
-            var block = new TransformManyBlock<TextFieldParser, Entity>(tfp=> TryReadCSV(tfp, delimiter, commentToken, enclosedInQuotes, errorLocation));
+            if (commentToken.HasValue)
+            {
+                configuration.Comment = commentToken.Value;
+                configuration.AllowComments = true;
+            }
 
-            block.Post(textFieldParser);
+            var textReader = new StreamReader(stream, encoding);
+            var block = new TransformManyBlock<TextReader, Entity>(tr=> TryReadCSV(tr, configuration, errorLocation));
+
+            block.Post(textReader);
 
             block.Complete();
 
@@ -38,56 +50,80 @@ namespace Reductech.EDR.Core
         /// Reads a csv file
         /// <throws>ErrorException</throws>
         /// </summary>
-        private static IEnumerable<Entity> TryReadCSV(TextFieldParser csvParser,
-            string delimiter, string? commentToken, bool enclosedInQuotes, IErrorLocation errorLocation)
+        private static IEnumerable<Entity> TryReadCSV(TextReader textReader, CsvConfiguration configuration, IErrorLocation errorLocation)
         {
+            var reader = new CsvReader(textReader, configuration);
 
-            if (commentToken != null)
-                csvParser.CommentTokens = new[] { commentToken };
 
-            csvParser.SetDelimiters(delimiter);
-            csvParser.HasFieldsEnclosedInQuotes = enclosedInQuotes;
-
-            string[] headers;
-
-            try
+            foreach (var row in reader.GetRecords<dynamic>())
             {
-                headers = csvParser.ReadFields();
-            }
-            catch (MalformedLineException e)
-            {
-                throw new ErrorException(new ErrorBuilder(e, ErrorCode.CSVError).WithLocation(errorLocation));
+                var dict = row as IDictionary<string, object>;
+
+                yield return Entity.Create(dict!);
             }
 
-            var rowNumber = 1;
-            while (!csvParser.EndOfData)
-            {
-                Entity row;
+            reader.Dispose();
+            //try
+            //{
+            //    var rows = reader.GetRecords<dynamic>()
+            //    .Select(x =>
+            //    {
 
-                // Read current line fields, pointer moves to the next line.
-                try
-                {
-                    var fields = csvParser.ReadFields();
+            //    });
 
-                    if (fields.Length != headers.Length)
-                        throw new ErrorException(
-                            new ErrorBuilder($"There were {fields.Length} columns in row {rowNumber} but we expected {headers.Length}.", ErrorCode.CSVError)
-                        .WithLocation(errorLocation));
+            //    return rows;
+            //}
+            //catch (Exception e)
+            //{
+            //    throw new ErrorException(new ErrorBuilder(e, ErrorCode.CSVError).WithLocation(errorLocation));
+            //}
 
-                    var pairs = headers.Zip(fields).Select(x => new KeyValuePair<string, EntityValue>(x.First, EntityValue.Create(x.Second)));
+            //if (commentToken != null)
+            //    csvParser.CommentTokens = new[] { commentToken };
 
-                    row = new Entity(pairs);
+            //csvParser.SetDelimiters(delimiter);
+            //csvParser.HasFieldsEnclosedInQuotes = enclosedInQuotes;
 
-                }
-                catch (MalformedLineException e)
-                {
-                    throw new ErrorException(new ErrorBuilder(e, ErrorCode.CSVError).WithLocation(errorLocation));
-                }
+            //string[] headers;
 
-                yield return row;
+            //try
+            //{
+            //    headers = csvParser.ReadFields();
+            //}
+            //catch (MalformedLineException e)
+            //{
+            //    throw new ErrorException(new ErrorBuilder(e, ErrorCode.CSVError).WithLocation(errorLocation));
+            //}
 
-                rowNumber++;
-            }
+            //var rowNumber = 1;
+            //while (!csvParser.EndOfData)
+            //{
+            //    Entity row;
+
+            //    // Read current line fields, pointer moves to the next line.
+            //    try
+            //    {
+            //        var fields = csvParser.ReadFields();
+
+            //        if (fields.Length != headers.Length)
+            //            throw new ErrorException(
+            //                new ErrorBuilder($"There were {fields.Length} columns in row {rowNumber} but we expected {headers.Length}.", ErrorCode.CSVError)
+            //            .WithLocation(errorLocation));
+
+            //        var pairs = headers.Zip(fields).Select(x => new KeyValuePair<string, EntityValue>(x.First, EntityValue.Create(x.Second)));
+
+            //        row = new Entity(pairs);
+
+            //    }
+            //    catch (MalformedLineException e)
+            //    {
+            //        throw new ErrorException(new ErrorBuilder(e, ErrorCode.CSVError).WithLocation(errorLocation));
+            //    }
+
+            //    yield return row;
+
+            //    rowNumber++;
+            //}
         }
     }
 }
