@@ -58,6 +58,6 @@ namespace Reductech.EDR.Core.Internal
         /// <summary>
         /// Run this step and return the result.
         /// </summary>
-        Task<Result<T, IError>> Run(StateMonad stateMonad, CancellationToken cancellationToken);
+        Task<Result<T, IError>> Run(IStateMonad stateMonad, CancellationToken cancellationToken);
     }
 }

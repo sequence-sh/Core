@@ -18,7 +18,7 @@ namespace Reductech.EDR.Core.Steps
     public sealed class ApplyMathOperator : CompoundStep<int>
     {
         /// <inheritdoc />
-        public override async Task<Result<int, IError>> Run(StateMonad stateMonad, CancellationToken cancellationToken)
+        public override async Task<Result<int, IError>> Run(IStateMonad stateMonad, CancellationToken cancellationToken)
         {
             var left = await Left.Run(stateMonad, cancellationToken);
             if (left.IsFailure) return left;

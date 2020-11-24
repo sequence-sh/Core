@@ -34,7 +34,7 @@ namespace Reductech.EDR.Core.Internal
 
         /// <inheritdoc />
 #pragma warning disable 1998
-        public async Task<Result<T, IError>> Run(StateMonad stateMonad, CancellationToken cancellationToken) => Value!;
+        public async Task<Result<T, IError>> Run(IStateMonad stateMonad, CancellationToken cancellationToken) => Value!;
 
         /// <inheritdoc />
         public async Task<Result<T1, IError>>  Run<T1>(StateMonad stateMonad, CancellationToken cancellationToken)

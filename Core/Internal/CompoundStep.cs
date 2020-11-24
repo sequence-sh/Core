@@ -18,7 +18,7 @@ namespace Reductech.EDR.Core.Internal
     public abstract class CompoundStep<T> : ICompoundStep<T>
     {
         /// <inheritdoc />
-        public abstract Task<Result<T, IError>> Run(StateMonad stateMonad, CancellationToken cancellationToken);
+        public abstract Task<Result<T, IError>> Run(IStateMonad stateMonad, CancellationToken cancellationToken);
 
 
         /// <inheritdoc />

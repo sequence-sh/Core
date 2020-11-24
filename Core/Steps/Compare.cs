@@ -41,7 +41,8 @@ namespace Reductech.EDR.Core.Steps
 
 
         /// <inheritdoc />
-        public override async Task<Result<bool, IError>> Run(StateMonad stateMonad, CancellationToken cancellationToken)
+        public override async Task<Result<bool, IError>> Run(IStateMonad stateMonad,
+            CancellationToken cancellationToken)
         {
             var result = await Left.Run(stateMonad, cancellationToken)
                 .Compose(() => Operator.Run(stateMonad, cancellationToken), () => Right.Run(stateMonad, cancellationToken))

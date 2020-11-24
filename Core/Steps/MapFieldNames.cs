@@ -18,7 +18,8 @@ namespace Reductech.EDR.Core.Steps
     public class MapFieldNames : CompoundStep<EntityStream>
     {
         /// <inheritdoc />
-        public override async Task<Result<EntityStream, IError>> Run(StateMonad stateMonad, CancellationToken cancellationToken)
+        public override async Task<Result<EntityStream, IError>> Run(IStateMonad stateMonad,
+            CancellationToken cancellationToken)
         {
             var mappings = await Mappings.Run(stateMonad, cancellationToken)
                 .Map(e=>e

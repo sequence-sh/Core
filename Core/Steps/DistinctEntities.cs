@@ -18,7 +18,8 @@ namespace Reductech.EDR.Core.Steps
     public sealed class DistinctEntities : CompoundStep<EntityStream>
     {
         /// <inheritdoc />
-        public override async Task<Result<EntityStream, IError>> Run(StateMonad stateMonad, CancellationToken cancellationToken)
+        public override async Task<Result<EntityStream, IError>> Run(IStateMonad stateMonad,
+            CancellationToken cancellationToken)
         {
             var entityStreamResult = await EntityStream.Run(stateMonad, cancellationToken);
             if (entityStreamResult.IsFailure) return entityStreamResult.ConvertFailure<EntityStream>();
@@ -31,7 +32,7 @@ namespace Reductech.EDR.Core.Steps
 
             //var entities = await entityStreamResult.Value.TryGetResultsAsync(cancellationToken);
 
-            //thropw
+            //throw
             throw new NotImplementedException();
         }
 

@@ -15,7 +15,8 @@ namespace Reductech.EDR.Core.Steps
     public class Unzip : CompoundStep<Unit>
     {
         /// <inheritdoc />
-        public override async Task<Result<Unit, IError>> Run(StateMonad stateMonad, CancellationToken cancellationToken)
+        public override async Task<Result<Unit, IError>> Run(IStateMonad stateMonad,
+            CancellationToken cancellationToken)
         {
             var data = await ArchiveFilePath.Run(stateMonad, cancellationToken)
                 .Compose(() => DestinationDirectory.Run(stateMonad, cancellationToken), () => OverwriteFiles.Run(stateMonad, cancellationToken));

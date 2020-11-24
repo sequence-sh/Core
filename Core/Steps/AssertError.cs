@@ -15,7 +15,8 @@ namespace Reductech.EDR.Core.Steps
     public sealed class AssertError : CompoundStep<Unit>
     {
         /// <inheritdoc />
-        public override async Task<Result<Unit, IError>> Run(StateMonad stateMonad, CancellationToken cancellationToken)
+        public override async Task<Result<Unit, IError>> Run(IStateMonad stateMonad,
+            CancellationToken cancellationToken)
         {
             var result = await Test.Run(stateMonad, cancellationToken);
 

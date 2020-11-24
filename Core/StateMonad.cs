@@ -14,7 +14,72 @@ namespace Reductech.EDR.Core
     /// <summary>
     /// The state monad that is passed between steps.
     /// </summary>
-    public sealed class StateMonad : IDisposable
+    public interface IStateMonad : IDisposable
+    {
+        /// <summary>
+        /// The logger that steps will use to output messages.
+        /// </summary>
+        ILogger Logger { get; }
+
+        /// <summary>
+        /// The settings for this step.
+        /// </summary>
+        ISettings Settings { get; }
+
+        /// <summary>
+        /// The runner of external processes.
+        /// </summary>
+        IExternalProcessRunner ExternalProcessRunner { get; }
+
+        /// <summary>
+        /// Interacts with the file system.
+        /// </summary>
+        IFileSystemHelper FileSystemHelper { get; }
+
+        /// <summary>
+        /// The step factory store. Maps from step names to step factories.
+        /// </summary>
+        StepFactoryStore StepFactoryStore { get; }
+
+        /// <summary>
+        /// Gets all VariableNames and associated objects.
+        /// </summary>
+        /// <returns></returns>
+        IEnumerable<KeyValuePair<VariableName, object>> GetState();
+
+        /// <summary>
+        /// Get settings of a particular type.
+        /// </summary>
+        public Result<T, IErrorBuilder> GetSettings<T>() where T : ISettings =>
+            Settings.TryCast<T>()
+                .MapError(x => new ErrorBuilder(x, ErrorCode.MissingStepSettings) as IErrorBuilder);
+
+        /// <summary>
+        /// Gets the current value of this variable.
+        /// </summary>
+        Result<T,IErrorBuilder> GetVariable<T>(VariableName key);
+
+        /// <summary>
+        /// Returns whether a particular variable has been set and not removed.
+        /// </summary>
+        bool VariableExists(VariableName variable);
+
+        /// <summary>
+        /// Creates or set the value of this variable.
+        /// </summary>
+        Result<Unit, IError> SetVariable<T>(VariableName key, T variable);
+
+        /// <summary>
+        /// Removes the variable if it exists.
+        /// </summary>
+        void RemoveVariable(VariableName key, bool dispose);
+    }
+
+
+    /// <summary>
+    /// The state monad that is passed between steps.
+    /// </summary>
+    public sealed class StateMonad : IStateMonad
     {
         private readonly ConcurrentDictionary<VariableName, object>  _stateDictionary = new ConcurrentDictionary<VariableName, object>();
 
@@ -65,12 +130,7 @@ namespace Reductech.EDR.Core
         /// <returns></returns>
         public IEnumerable<KeyValuePair<VariableName, object>> GetState() => _stateDictionary;
 
-        /// <summary>
-        /// Get settings of a particular type.
-        /// </summary>
-        public Result<T, IErrorBuilder> GetSettings<T>() where T : ISettings =>
-            Settings.TryCast<T>()
-                .MapError(x => new ErrorBuilder(x, ErrorCode.MissingStepSettings) as IErrorBuilder);
+
 
         /// <summary>
         /// Gets the current value of this variable.

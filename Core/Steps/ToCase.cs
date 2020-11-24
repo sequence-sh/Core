@@ -32,7 +32,8 @@ namespace Reductech.EDR.Core.Steps
         public IStep<TextCase> Case { get; set; } = null!;
 
         /// <inheritdoc />
-        public override async Task<Result<string, IError>>  Run(StateMonad stateMonad, CancellationToken cancellationToken)
+        public override async Task<Result<string, IError>> Run(IStateMonad stateMonad,
+            CancellationToken cancellationToken)
         {
             return await String.Run(stateMonad, cancellationToken).Compose(() => Case.Run(stateMonad, cancellationToken))
                 .Map(x => Convert(x.Item1, x.Item2));

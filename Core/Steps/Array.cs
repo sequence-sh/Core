@@ -18,7 +18,8 @@ namespace Reductech.EDR.Core.Steps
     public sealed class Array<T> : CompoundStep<List<T>>
     {
         /// <inheritdoc />
-        public override async Task<Result<List<T>, IError>> Run(StateMonad stateMonad, CancellationToken cancellationToken)
+        public override async Task<Result<List<T>, IError>> Run(IStateMonad stateMonad,
+            CancellationToken cancellationToken)
         {
             var result = await Elements.Select(x => x.Run(stateMonad, cancellationToken))
                 .Combine(ErrorList.Combine)

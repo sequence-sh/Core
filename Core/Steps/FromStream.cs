@@ -15,7 +15,8 @@ namespace Reductech.EDR.Core.Steps
     public sealed class FromStream : CompoundStep<string>
     {
         /// <inheritdoc />
-        public override async Task<Result<string, IError>> Run(StateMonad stateMonad, CancellationToken cancellationToken)
+        public override async Task<Result<string, IError>> Run(IStateMonad stateMonad,
+            CancellationToken cancellationToken)
         {
             var streamResult = await Stream.Run(stateMonad, cancellationToken);
 

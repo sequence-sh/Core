@@ -32,7 +32,8 @@ namespace Reductech.EDR.Core.Steps
         public IStep<string> Delimiter { get; set; } = null!;
 
         /// <inheritdoc />
-        public override async Task<Result<List<string>, IError>>  Run(StateMonad stateMonad, CancellationToken cancellationToken)
+        public override async Task<Result<List<string>, IError>> Run(IStateMonad stateMonad,
+            CancellationToken cancellationToken)
         {
             return await String.Run(stateMonad, cancellationToken).Compose(() => Delimiter.Run(stateMonad, cancellationToken))
                 .Map(x => x.Item1.Split(new[] {x.Item2}, StringSplitOptions.None).ToList());

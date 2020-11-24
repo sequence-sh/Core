@@ -14,7 +14,8 @@ namespace Reductech.EDR.Core.Steps
     public sealed class StringIsEmpty : CompoundStep<bool>
     {
         /// <inheritdoc />
-        public override async Task<Result<bool, IError>>  Run(StateMonad stateMonad, CancellationToken cancellationToken)
+        public override async Task<Result<bool, IError>> Run(IStateMonad stateMonad,
+            CancellationToken cancellationToken)
         {
             var str = await String.Run(stateMonad, cancellationToken);
             if (str.IsFailure) return str.ConvertFailure<bool>();

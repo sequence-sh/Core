@@ -18,7 +18,8 @@ namespace Reductech.EDR.Core.Steps
     public sealed class SortEntities : CompoundStep<EntityStream>
     {
         /// <inheritdoc />
-        public override async Task<Result<EntityStream, IError>> Run(StateMonad stateMonad, CancellationToken cancellationToken)
+        public override async Task<Result<EntityStream, IError>> Run(IStateMonad stateMonad,
+            CancellationToken cancellationToken)
         {
             var sortAscendingResult = await SortAscending.Run(stateMonad, cancellationToken);
             if (sortAscendingResult.IsFailure) return sortAscendingResult.ConvertFailure<EntityStream>();

@@ -21,7 +21,8 @@ namespace Reductech.EDR.Core.Steps
     {
 
         /// <inheritdoc />
-        public override async Task<Result<Unit, IError>>  Run(StateMonad stateMonad, CancellationToken cancellationToken)
+        public override async Task<Result<Unit, IError>> Run(IStateMonad stateMonad,
+            CancellationToken cancellationToken)
         {
             return await Value.Run(stateMonad, cancellationToken)
                 .Bind(x => stateMonad.SetVariable(VariableName, x));
