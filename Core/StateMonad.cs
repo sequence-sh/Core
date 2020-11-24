@@ -106,6 +106,20 @@ namespace Reductech.EDR.Core
         }
 
         /// <summary>
+        /// Removes the variable if it exists.
+        /// </summary>
+        public void RemoveVariable(VariableName key, bool dispose)
+        {
+            if (Disposed)
+                throw new ObjectDisposedException("State Monad was disposed");
+
+            if (!_stateDictionary.Remove(key, out var variable)) return;
+            if(dispose && variable is IDisposable disposable)
+                disposable.Dispose();
+
+        }
+
+        /// <summary>
         /// Has this State Monad been disposed
         /// </summary>
         public bool Disposed { get; private set; }
