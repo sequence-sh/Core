@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
 using CSharpFunctionalExtensions;
+using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Util;
 
@@ -50,7 +51,8 @@ namespace Reductech.EDR.Core.Entities
         /// <summary>
         /// Gets a list of results
         /// </summary>
-        public async Task<Result<IReadOnlyCollection<Entity>>> TryGetResultsAsync(CancellationToken cancellationToken)
+        public async Task<Result<IReadOnlyCollection<Entity>, IError>> TryGetResultsAsync(
+            CancellationToken cancellationToken)
         {
             var list = new List<Entity>();
             try
@@ -63,10 +65,15 @@ namespace Reductech.EDR.Core.Entities
 
                 await Source.Completion;
             }
+            catch (ErrorException errorException)
+            {
+                return Result.Failure<IReadOnlyCollection<Entity>, IError>(errorException.Error);
+            }
+
 #pragma warning disable CA1031 // Do not catch general exception types
             catch (Exception e)
             {
-                return Result.Failure<IReadOnlyCollection<Entity>>(e.Message);
+                return Result.Failure<IReadOnlyCollection<Entity>, IError>(new SingleError(e, ErrorCode.Unknown, EntireSequenceLocation.Instance));
             }
 #pragma warning restore CA1031 // Do not catch general exception types
 
@@ -122,7 +129,7 @@ namespace Reductech.EDR.Core.Entities
             }
             catch (AggregateException exception)
             {
-                var error = ExtractError(exception, errorLocation);
+                var error = ExtractError(exception);
                 if (error.HasValue)
                     return Result.Failure<Unit, IError>(error.Value);
                 throw;
@@ -131,7 +138,7 @@ namespace Reductech.EDR.Core.Entities
             if (finalBlock.Completion.Exception == null)
                 return Unit.Default;
 
-            var e = ExtractError(finalBlock.Completion.Exception, errorLocation);
+            var e = ExtractError(finalBlock.Completion.Exception);
             if(e.HasValue)
                 return Result.Failure<Unit, IError>(e.Value);
             else
@@ -139,7 +146,7 @@ namespace Reductech.EDR.Core.Entities
         }
 
 
-        private static Maybe<IError> ExtractError(AggregateException aggregateException, IErrorLocation errorLocation)
+        private static Maybe<IError> ExtractError(AggregateException aggregateException)
         {
             var l = new List<IError>();
 
@@ -147,8 +154,8 @@ namespace Reductech.EDR.Core.Entities
             {
                 if (innerException is ErrorException ee)
                     l.Add(ee.Error);
-                else if (innerException is ErrorBuilderException eb)
-                    l.Add(eb.ErrorBuilder.WithLocation(errorLocation));
+                //else if (innerException is ErrorBuilderException eb)
+                //    l.Add(eb.ErrorBuilder.WithLocation(errorLocation));
                 else
                     return Maybe<IError>.None;
             }

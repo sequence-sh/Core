@@ -138,6 +138,13 @@
         /// Error caused by violation of a schema.
         /// </summary>
         SchemaViolation,
-        ReservedVariableName
+        /// <summary>
+        /// Attempt to set a reserved variable.
+        /// </summary>
+        ReservedVariableName,
+        /// <summary>
+        /// An unexpected or unrecognized error
+        /// </summary>
+        Unknown
     }
 }

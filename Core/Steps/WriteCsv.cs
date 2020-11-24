@@ -7,7 +7,6 @@ using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
-using Reductech.EDR.Core.Util;
 
 namespace Reductech.EDR.Core.Steps
 {
@@ -34,7 +33,7 @@ namespace Reductech.EDR.Core.Steps
 
             var result = await CSVWriter.WriteCSV(entitiesResult.Value, delimiterResult.Value, encodingResult.Value.Convert(), cancellationToken);
 
-            return result.MapError(x=>x.WithLocation(this));
+            return result;
         }
 
         /// <summary>

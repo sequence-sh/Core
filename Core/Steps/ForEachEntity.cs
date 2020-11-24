@@ -38,8 +38,8 @@ namespace Reductech.EDR.Core.Steps
         /// <inheritdoc />
         public override async Task<Result<Unit, IError>> Run(StateMonad stateMonad, CancellationToken cancellationToken)
         {
-            var records = await EntityStream.Run(stateMonad, cancellationToken);
-            if (records.IsFailure) return records.ConvertFailure<Unit>();
+            var entities = await EntityStream.Run(stateMonad, cancellationToken);
+            if (entities.IsFailure) return entities.ConvertFailure<Unit>();
 
             if(stateMonad.VariableExists(VariableName.Entity))
                 return new SingleError($"Variable {VariableName.Entity} was already set.", ErrorCode.ReservedVariableName, new StepErrorLocation(this));
@@ -57,7 +57,7 @@ namespace Reductech.EDR.Core.Steps
                     throw new ErrorException(result.Error);
             }
 
-            var r = await records.Value.Act(RunAction, new StepErrorLocation(this));
+            var r = await entities.Value.Act(RunAction, new StepErrorLocation(this));
 
             stateMonad.RemoveVariable(VariableName.Entity, false);
 
