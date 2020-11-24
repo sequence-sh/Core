@@ -29,10 +29,9 @@ namespace Reductech.EDR.Core.Tests.Steps
                             {
                                 new ForEachEntity
                                 {
-                                    VariableName = new VariableName("Foo"),
                                     Action = new Print<Entity>
                                     {
-                                        Value = GetVariable<Entity>("Foo")
+                                        Value = GetVariable<Entity>(VariableName.Entity)
                                     },
                                     EntityStream =
                                         new EnforceSchema
@@ -45,7 +44,7 @@ namespace Reductech.EDR.Core.Tests.Steps
 
                             }
                         }, expectedLogValues
-                    ){IgnoreFinalState = true};
+                    );
                 }
 
 
@@ -117,10 +116,9 @@ namespace Reductech.EDR.Core.Tests.Steps
                             {
                                 new ForEachEntity
                                 {
-                                    VariableName = new VariableName("Foo"),
                                     Action = new Print<Entity>
                                     {
-                                        Value = GetVariable<Entity>("Foo")
+                                        Value = GetVariable<Entity>(VariableName.Entity)
                                     },
                                     EntityStream =enforceSchema
                                 }

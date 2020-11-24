@@ -21,10 +21,9 @@ namespace Reductech.EDR.Core.Tests.Steps
                 yield return new StepCase("For each record. No line breaks",
                     new ForEachEntity
                     {
-                        VariableName = new VariableName("Foo"),
                         Action = new Print<Entity>
                         {
-                            Value = GetVariable<Entity>("Foo")
+                            Value = GetVariable<Entity>(VariableName.Entity)
                         },EntityStream = Constant(EntityStream.Create(
                             CreateEntity(("Foo", "Hello"), ("Bar", "World")),
                             CreateEntity(("Foo", "Hello 2"), ("Bar", "World 2"))
@@ -33,7 +32,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                     Unit.Default,
                     "Foo: Hello, Bar: World",
                     "Foo: Hello 2, Bar: World 2"
-                ).WithExpectedFinalState("Foo", CreateEntity(("Foo", "Hello 2"), ("Bar", "World 2")));
+                );
 
 
                 //yield return new StepCase("For each record. Line breaks",
@@ -66,8 +65,7 @@ Action: DoNothing()
 EntityStream:
 - (Prop1 = 'Val0',Prop2 = 'Val1')
 - (Prop1 = 'Val2',Prop2 = 'Val3')
-- (Prop1 = 'Val4',Prop2 = 'Val5')
-VariableName: <Foo6>";
+- (Prop1 = 'Val4',Prop2 = 'Val5')";
 
                 var (step, _) = CreateStepWithDefaultOrArbitraryValues();
 

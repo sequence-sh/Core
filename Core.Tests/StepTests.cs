@@ -466,8 +466,7 @@ One,The first number
 Two,The second number"),
                             }
                         },
-                        VariableName = FooVariableName,
-                        Action = new Print<Record>{Value = new GetVariable<Record> {VariableName = FooVariableName}}
+                        Action = new Print<Record>{Value = new GetVariable<Record> {VariableName = VariableName.Entity}}
                     },
                     "Name: One, Summary: The first number",
                     "Name: Two, Summary: The second number"

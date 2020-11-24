@@ -80,6 +80,11 @@ namespace Reductech.EDR.Core.Internal
         IEnumerable<string> RequiredProperties { get; }
 
         /// <summary>
+        /// Variables that will always be set by this step.
+        /// </summary>
+        IEnumerable<(VariableName VariableName, ITypeReference typeReference)> FixedVariablesSet { get; }
+
+        /// <summary>
         /// Gets all enum types used by this step.
         /// </summary>
         IEnumerable<Type> EnumTypes { get; }

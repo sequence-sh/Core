@@ -28,10 +28,9 @@ namespace Reductech.EDR.Core.Tests.Steps
                         {
                             new ForEachEntity
                             {
-                                VariableName = new VariableName("Foo"),
                                 Action = new Print<Entity>
                                 {
-                                    Value = GetVariable<Entity>("Foo")
+                                    Value = GetVariable<Entity>(VariableName.Entity)
                                 },
                                 EntityStream =
                                     new MapFieldNames
@@ -49,9 +48,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                         }
                     }, "Foo: Hello, Bar: World",
                     "Foo: Hello 2, Bar: World 2"
-                ).WithExpectedFinalState("Foo",
-                    CreateEntity(("Foo", "Hello 2"),
-                        ("Bar", "World 2")));
+                );
             }
         }
 

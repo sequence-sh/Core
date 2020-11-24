@@ -32,14 +32,12 @@ namespace Reductech.EDR.Core.Tests
             {
 
                 yield return new DeserializationErrorCase("- <Entity> = 123\n- Print(Value = <Entity>)",
-                    ("The VariableName <Entity> is Reserved.", "<Entity>"),
                     ("The VariableName <Entity> is Reserved.", "<Entity> = 123")
                     );
 
 
                 yield return new DeserializationErrorCase("- <ReductechEntity> = 123\n- Print(Value = <ReductechEntity>)",
-                    ("The VariableName Prefix '{Reductech}' is Reserved.", "<ReductechEntity>"),
-                    ("The VariableName Prefix '{Reductech}' is Reserved.", "<ReductechEntity> = 123")
+                    ("The VariableName Prefix 'Reductech' is Reserved.", "<ReductechEntity> = 123")
                     );
 
                 yield return new DeserializationErrorCase("", ("Yaml is empty.", EntireSequenceLocation.Instance.AsString));

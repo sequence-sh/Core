@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
@@ -18,18 +19,14 @@ namespace Reductech.EDR.Core.Steps
     {
         /// <summary>
         /// The action to perform repeatedly.
+        /// Use the Variable &lt;Entity&gt; to access the entity.
         /// </summary>
         [StepProperty]
         [Required]
         public IStep<Unit> Action { get; set; } = null!;
 
 
-        /// <summary>
-        /// The name of the variable to loop over.
-        /// </summary>
-        [VariableName]
-        [Required]
-        public VariableName VariableName { get; set; }
+
 
         /// <summary>
         /// The entities to iterate over.
@@ -44,9 +41,12 @@ namespace Reductech.EDR.Core.Steps
             var records = await EntityStream.Run(stateMonad, cancellationToken);
             if (records.IsFailure) return records.ConvertFailure<Unit>();
 
+            if(stateMonad.VariableExists(VariableName.Entity))
+                return new SingleError($"Variable {VariableName.Entity} was already set.", ErrorCode.ReservedVariableName, new StepErrorLocation(this));
+
             async Task RunAction(Entity record)
             {
-                var setResult = stateMonad.SetVariable(VariableName, record);
+                var setResult = stateMonad.SetVariable(VariableName.Entity, record);
 
                 if (setResult.IsFailure)
                     throw new ErrorException(setResult.Error);
@@ -58,6 +58,8 @@ namespace Reductech.EDR.Core.Steps
             }
 
             var r = await records.Value.Act(RunAction, new StepErrorLocation(this));
+
+            stateMonad.RemoveVariable(VariableName.Entity, false);
 
             return r;
         }
@@ -79,6 +81,14 @@ namespace Reductech.EDR.Core.Steps
         /// </summary>
         public static SimpleStepFactory<ForEachEntity, Unit> Instance { get; } = new ForEachEntityStepFactory();
 
+        /// <inheritdoc />
+        public override IEnumerable<(VariableName VariableName, ITypeReference typeReference)> FixedVariablesSet
+        {
+            get
+            {
+                yield return (VariableName.Entity, new ActualTypeReference(typeof(Entity)));
+            }
+        }
 
         /// <inheritdoc />
         public override Result<Maybe<ITypeReference>, IError> GetTypeReferencesSet(VariableName variableName, FreezableStepData freezableStepData, TypeResolver typeResolver) =>

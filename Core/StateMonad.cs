@@ -92,6 +92,11 @@ namespace Reductech.EDR.Core
         }
 
         /// <summary>
+        /// Returns whether a particular variable has been set and not removed.
+        /// </summary>
+        public bool VariableExists(VariableName variable) => _stateDictionary.ContainsKey(variable);
+
+        /// <summary>
         /// Creates or set the value of this variable.
         /// </summary>
         public Result<Unit, IError> SetVariable<T>(VariableName key, T variable)
