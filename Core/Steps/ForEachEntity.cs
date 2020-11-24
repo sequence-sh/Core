@@ -47,20 +47,16 @@ namespace Reductech.EDR.Core.Steps
 
             async Task RunAction(Entity record)
             {
-                var setResult = stateMonad.SetVariable(VariableName.Entity, record);
+                var scopedMonad = new ScopedStateMonad(stateMonad, new KeyValuePair<VariableName, object>(VariableName.Entity, record));
 
-                if (setResult.IsFailure)
-                    throw new ErrorException(setResult.Error);
 
-                var result = await Action.Run(stateMonad, cancellationToken);
+                var result = await Action.Run(scopedMonad, cancellationToken);
 
                 if (result.IsFailure)
                     throw new ErrorException(result.Error);
             }
 
             var r = await entities.Value.Act(RunAction, new StepErrorLocation(this));
-
-            stateMonad.RemoveVariable(VariableName.Entity, false);
 
             return r;
         }

@@ -20,7 +20,7 @@ namespace Reductech.EDR.Core
         /// <summary>
         /// Create a new ScopedStateMonad
         /// </summary>
-        public ScopedStateMonad(StateMonad baseStateMonad, params KeyValuePair<VariableName, object>[] state)
+        public ScopedStateMonad(IStateMonad baseStateMonad, params KeyValuePair<VariableName, object>[] state)
         {
             BaseStateMonad = baseStateMonad;
 
@@ -32,7 +32,7 @@ namespace Reductech.EDR.Core
 
         private readonly ConcurrentDictionary<VariableName, object> _scopedStateDictionary;
 
-        private StateMonad BaseStateMonad { get; }
+        private IStateMonad BaseStateMonad { get; }
 
         /// <inheritdoc />
         public ILogger Logger => BaseStateMonad.Logger;
