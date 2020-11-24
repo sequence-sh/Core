@@ -22,24 +22,19 @@ namespace Reductech.EDR.Core.Tests.Steps
         {
             get
             {
-                yield return new SequenceStepCase("Print file text",
-                    new Sequence
+                yield return new StepCase("Print file text",
+                    new Print<string>
                     {
-                        Steps = new List<IStep<Unit>>
+                        Value = new FromStream
                         {
-                            new Print<string>
+                            Stream = new ReadFile
                             {
-                                Value = new FromStream
-                                {
-                                    Stream = new ReadFile
-                                    {
-                                        FileName = Constant("File.txt"),
-                                        Folder = Constant("MyFolder")
-                                    }
-                                }
+                                FileName = Constant("File.txt"),
+                                Folder = Constant("MyFolder")
                             }
                         }
                     },
+                    Unit.Default,
                     "Hello World"
 
                 ).WithFileSystemAction(x=>x.Setup(a=>a.ReadFile(

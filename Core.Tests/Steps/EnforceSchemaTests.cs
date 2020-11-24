@@ -21,29 +21,24 @@ namespace Reductech.EDR.Core.Tests.Steps
             {
                 static StepCase CreateCase(string name, EntityStream stream, Schema schema, params string[] expectedLogValues)
                 {
-                    return new SequenceStepCase(name,
+                    return new StepCase(name,
 
-                        new Sequence
+                        new ForEachEntity
                         {
-                            Steps = new List<IStep<Unit>>
+                            Action = new Print<Entity>
                             {
-                                new ForEachEntity
-                                {
-                                    Action = new Print<Entity>
-                                    {
-                                        Value = GetVariable<Entity>(VariableName.Entity)
-                                    },
-                                    EntityStream =
+                                Value = GetVariable<Entity>(VariableName.Entity)
+                            },
+                            EntityStream =
                                         new EnforceSchema
                                         {
                                             EntityStream = Constant(stream),
 
                                             Schema = Constant(schema)
                                         }
-                                }
-
-                            }
-                        }, expectedLogValues
+                        },
+                        Unit.Default
+                        , expectedLogValues
                     );
                 }
 

@@ -20,14 +20,14 @@ namespace Reductech.EDR.Core.Tests.Steps
         {
             get
             {
-                yield return new SequenceStepCase("Print then print", new Sequence
+                yield return new StepCase("Print then print", new Sequence
                 {
                     Steps = new List<IStep<Unit>>
                     {
                         new Print<string> {Value = Constant("Hello")},
                         new Print<string> {Value = Constant("World")}
                     }
-                },  "Hello", "World" );
+                }, Unit.Default,  "Hello", "World" );
 
 
             }
