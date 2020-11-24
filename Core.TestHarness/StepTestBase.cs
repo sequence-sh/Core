@@ -125,6 +125,8 @@ namespace Reductech.EDR.Core.TestHarness
         public static IStep<TNew> GetVariable<TNew>(string variableName)=> new GetVariable<TNew>() {VariableName = new VariableName(variableName)};
         public static IStep<TNew> GetVariable<TNew>(VariableName variableName)=> new GetVariable<TNew>() {VariableName = variableName};
 
+        public static IStep<Entity> GetEntityVariable => GetVariable<Entity>(VariableName.Entity);
+
         protected static Entity CreateEntity(params (string key, string value)[] pairs)
         {
             var evs = pairs
