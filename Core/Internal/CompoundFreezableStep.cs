@@ -4,6 +4,7 @@ using System.Collections.Immutable;
 using System.Linq;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Internal.Errors;
+using Reductech.EDR.Core.Util;
 
 namespace Reductech.EDR.Core.Internal
 {
@@ -46,6 +47,14 @@ namespace Reductech.EDR.Core.Internal
         /// <inheritdoc />
         public Result<IReadOnlyCollection<(VariableName VariableName, ITypeReference typeReference)>, IError> TryGetVariablesSet(TypeResolver typeResolver)
         {
+            var ensureReservedResult = FreezableStepData.VariableNameDictionary.Values.Select(x => x.EnsureNotReserved())
+                .Combine(ErrorBuilderList.Combine)
+                .MapError(x => x.WithLocation(this));
+
+            if (ensureReservedResult.IsFailure)
+                return ensureReservedResult.ConvertFailure<IReadOnlyCollection<(VariableName VariableName, ITypeReference typeReference)>>();
+
+
             var result = FreezableStepData
                 .VariableNameDictionary.Values.Select(TryGetVariableNameVariablesSet)
                 .Concat(FreezableStepData.StepDictionary.Values.Select(TryGetStepVariablesSet))

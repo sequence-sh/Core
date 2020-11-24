@@ -95,6 +95,9 @@ namespace Reductech.EDR.Core.Steps
         .MapError(e=>e.WithLocation(this, freezableStepData));
 
 
+
+
+
         /// <inheritdoc />
         public override IStepSerializer Serializer { get; } = new StepSerializer(
             new VariableNameComponent(nameof(SetVariable<object>.VariableName)),

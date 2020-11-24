@@ -137,6 +137,7 @@
         /// <summary>
         /// Error caused by violation of a schema.
         /// </summary>
-        SchemaViolation
+        SchemaViolation,
+        ReservedVariableName
     }
 }
