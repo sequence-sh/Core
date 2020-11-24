@@ -38,6 +38,7 @@ namespace Reductech.EDR.Core.Entities
         /// <inheritdoc />
         public override string ToString()
         {
+            // ReSharper disable once ConstantNullCoalescingCondition
             return Name??"Schema";
         }
 
@@ -168,8 +169,7 @@ namespace Reductech.EDR.Core.Entities
                     }
 
                     return new ErrorBuilder("Unexpected list", ErrorCode.SchemaViolation);
-                }
-            );
+                });
 
             return r;
         }

@@ -3,6 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Attributes;
+using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
 using Entity = Reductech.EDR.Core.Entities.Entity;
@@ -25,7 +26,13 @@ namespace Reductech.EDR.Core.Steps
 
             if (property.IsFailure) return property.ConvertFailure<string>();
 
-            return property.Value;
+            if (!entity.Value.TryGetValue(property.Value, out var ev) || ev == null)
+                ev = EntityValue.Create(null as string);
+
+
+            var resultString = ev.Value.Match(_ => "", v => v.ToString(), vs => string.Join(",", vs));
+
+            return resultString;
         }
 
         /// <summary>
@@ -33,14 +40,15 @@ namespace Reductech.EDR.Core.Steps
         /// </summary>
         [StepProperty(Order = 1)]
         [Required]
-        public IStep<Entity> Entity { get; } = null!;
+        public IStep<Entity> Entity { get; set; } = null!;
 
         /// <summary>
         /// The name of the property to get.
+        /// Returns an empty string if the property is not present.
         /// </summary>
         [StepProperty(Order = 2)]
         [Required]
-        public IStep<string> PropertyName { get; } = null!;
+        public IStep<string> PropertyName { get; set; } = null!;
 
         /// <inheritdoc />
         public override IStepFactory StepFactory => GetPropertyStepFactory.Instance;

@@ -66,6 +66,11 @@ namespace Reductech.EDR.Core.Entities
         /// </summary>
         public EntityValue this[string key] => _fields[key];
 
+        /// <summary>
+        /// Try to get the value of a particular field
+        /// </summary>
+        public bool TryGetValue(string key, out EntityValue? entityValue) => _fields.TryGetValue(key, out entityValue);
+
         /// <inheritdoc />
         public IEnumerator<KeyValuePair<string, EntityValue>> GetEnumerator() => _fields.GetEnumerator();
 
