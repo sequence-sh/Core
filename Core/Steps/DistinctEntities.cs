@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
@@ -27,13 +26,25 @@ namespace Reductech.EDR.Core.Steps
             var caseSensitiveResult = await CaseSensitive.Run(stateMonad, cancellationToken);
             if (caseSensitiveResult.IsFailure) return caseSensitiveResult.ConvertFailure<EntityStream>();
 
+            HashSet<string> usedKeys = new HashSet<string>();
 
+            async Task<Maybe<Entity>> FilterAction(Entity record)
+            {
+                var scopedMonad = new ScopedStateMonad(stateMonad, new KeyValuePair<VariableName, object>(VariableName.Entity, record));
 
+                var result = await DistinctBy.Run(scopedMonad, cancellationToken);
 
-            //var entities = await entityStreamResult.Value.TryGetResultsAsync(cancellationToken);
+                if (result.IsFailure)
+                    throw new ErrorException(result.Error);
 
-            //throw
-            throw new NotImplementedException();
+                if(usedKeys.Add(result.Value))
+                    return Maybe<Entity>.From(record);
+                return Maybe<Entity>.None;
+            }
+
+            var newStream = entityStreamResult.Value.ApplyMaybe(FilterAction);
+
+            return newStream;
         }
 
         /// <summary>

@@ -110,6 +110,27 @@ namespace Reductech.EDR.Core.Entities
             return new EntityStream(b);
         }
 
+        /// <summary>
+        /// Transforms the records in this stream
+        /// </summary>
+        public EntityStream ApplyMaybe(Func<Entity, Task<Maybe<Entity>>> function)
+        {
+            var b = new TransformManyBlock<Entity, Entity>(x=> MapAsync(function(x)));
+
+            Source.LinkTo(b, new DataflowLinkOptions
+            {
+                PropagateCompletion = true
+            });
+
+            return new EntityStream(b);
+        }
+
+        private static async Task<IEnumerable<T>> MapAsync<T>(Task<Maybe<T>> maybe)
+        {
+            var m = await maybe;
+
+            return m.ToList();
+        }
 
         /// <summary>
         /// Perform an action on every record.
