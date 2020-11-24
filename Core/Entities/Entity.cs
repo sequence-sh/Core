@@ -1,5 +1,7 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Dynamic;
 using System.Linq;
 using System.Text;
@@ -15,9 +17,6 @@ namespace Reductech.EDR.Core.Entities
     {
         private readonly IReadOnlyDictionary<string, EntityValue> _fields;
 
-
-
-
         /// <summary>
         /// Create a new record.
         /// </summary>
@@ -26,7 +25,11 @@ namespace Reductech.EDR.Core.Entities
         /// <summary>
         /// Create a new record.
         /// </summary>
-        public Entity(IEnumerable<KeyValuePair<string, EntityValue>> fields) => _fields = new Dictionary<string, EntityValue>(fields);
+        public Entity(IEnumerable<KeyValuePair<string, EntityValue>> fields)
+        {
+            _fields = new Dictionary<string, EntityValue>(fields);
+        }
+
 
         /// <summary>
         /// Create a new entity
@@ -150,6 +153,5 @@ namespace Reductech.EDR.Core.Entities
 
             return result;
         }
-
     }
 }
