@@ -21,14 +21,7 @@ namespace Reductech.EDR.Core.Steps
             var streamsResult = await Streams.Run(stateMonad, cancellationToken);
             if (streamsResult.IsFailure) return streamsResult.ConvertFailure<EntityStream>();
 
-            var preserveOrderResult = await PreserveOrder.Run(stateMonad, cancellationToken);
-            if (preserveOrderResult.IsFailure) return preserveOrderResult.ConvertFailure<EntityStream>();
-
-
-            if (!preserveOrderResult.Value)
-                return EntityStream.Combine(streamsResult.Value);
-
-            var result = await EntityStream.Concatenate(streamsResult.Value, cancellationToken);
+            var result = EntityStream.Concatenate(streamsResult.Value);
             return result;
 
         }
@@ -39,13 +32,6 @@ namespace Reductech.EDR.Core.Steps
         [StepProperty]
         [Required]
         public IStep<List<EntityStream>> Streams { get; set; } = null!;
-
-        /// <summary>
-        /// Whether to preserve order.
-        /// </summary>
-        [StepProperty]
-        [DefaultValueExplanation("False")]
-        public IStep<bool> PreserveOrder { get; set; } = new Constant<bool>(false);
 
         /// <inheritdoc />
         public override IStepFactory StepFactory => ConcatenateEntitiesStepFactory.Instance;

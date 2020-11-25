@@ -56,9 +56,7 @@ namespace Reductech.EDR.Core.Entities
 
             foreach (var kvp in entity)
             {
-#pragma warning disable 8714
                 if (remainingProperties.Remove(kvp.Key, out var schemaProperty))
-#pragma warning restore 8714
                 {
                     var r = kvp.Value.TryConvert(schemaProperty);
                     if(r.IsSuccess)

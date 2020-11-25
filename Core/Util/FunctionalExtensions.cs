@@ -401,5 +401,24 @@ namespace Reductech.EDR.Core.Util
             return firstTwo.Single()!;
         }
 
+
+        public static IEnumerable<T> ToEnumerable<T>(this Maybe<T> maybe)
+        {
+            if (maybe.HasValue) yield return maybe.Value;
+        }
+
+#pragma warning disable 1998
+        public static async IAsyncEnumerable<T> ToAsyncEnumerable<T>(this Maybe<T> maybe)
+#pragma warning restore 1998
+        {
+            if (maybe.HasValue) yield return maybe.Value;
+        }
+
+        public static async IAsyncEnumerable<T> ToAsyncEnumerable<T>(this Task<Maybe<T>> maybe)
+        {
+            var m = await maybe;
+
+            if (m.HasValue) yield return m.Value;
+        }
     }
 }

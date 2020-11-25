@@ -35,7 +35,7 @@
     <PackageReference Include="Namotion.Reflection" Version="1.0.14" />
     <PackageReference Include="OneOf" Version="2.1.155" />
     <PackageReference Include="Superpower" Version="2.3.0" />
-    <PackageReference Include="System.Threading.Tasks.Dataflow" Version="4.11.1" />
+    <PackageReference Include="System.Linq.Async" Version="5.0.0" />
     <PackageReference Include="YamlDotNet" Version="8.1.2" />
   </ItemGroup>
 

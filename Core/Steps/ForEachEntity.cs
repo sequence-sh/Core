@@ -57,7 +57,7 @@ namespace Reductech.EDR.Core.Steps
                     throw new ErrorException(result.Error);
             }
 
-            var r = await entities.Value.Act(RunAction, new StepErrorLocation(this));
+            var r = await entities.Value.Act(RunAction);
 
             return r;
         }
