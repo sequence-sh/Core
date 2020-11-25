@@ -71,70 +71,6 @@ namespace Reductech.EDR.Core.Util
             collection.Select(tryConvert).Combine().Map(x => x.ToList() as IReadOnlyCollection<T2>);
 
 
-        /// <summary>
-        /// If the result is a failure, convert the error to a string.
-        /// </summary>
-        public static Result<T> MapError<T, TE>(this Result<T, TE> result, Func<TE, string> convertError)
-        {
-            if (result.IsSuccess) return result.Value!;
-
-            var errorString = convertError(result.Error);
-
-            return Result.Failure<T>(errorString);
-        }
-
-
-        /// <summary>
-        /// If the result is a failure, convert the error to a string.
-        /// </summary>
-        public static async Task<Result<T>> MapError<T, TE>(this Task<Result<T, TE>> result, Func<TE, string> convertError)
-        {
-            var r1 = await result;
-            return r1.MapError(convertError);
-        }
-
-
-        /// <summary>
-        /// If the result is a failure, convert the error to another type.
-        /// </summary>
-        public static Result<T, TE> MapError<T, TE>(this Result<T> result, Func<string, TE> convertError)
-        {
-            if (result.IsSuccess) return result.Value!;
-
-            var error2 = convertError(result.Error);
-
-            return error2!;
-        }
-
-
-        /// <summary>
-        /// If the result is a failure, convert the error to another type.
-        /// </summary>
-        public static async Task<Result<T, TE>>  MapError<T, TE>(this Task<Result<T>>  result, Func<string, TE> convertError)
-        {
-            var r1 = await result;
-            return r1.MapError(convertError);
-        }
-
-        /// <summary>
-        /// If the result is a failure, convert the error to another type.
-        /// </summary>
-        public static Result<T,TE2> MapError<T, TE1, TE2>(this Result<T, TE1> result, Func<TE1, TE2> convertError)
-        {
-            if (result.IsSuccess) return result.Value!;
-            var error2 = convertError(result.Error);
-            return error2!;
-        }
-
-        /// <summary>
-        /// If the result is a failure, convert the error to another type.
-        /// </summary>
-        public static async Task<Result<T, TE2>> MapError<T, TE1, TE2>(this Task<Result<T, TE1>>  result, Func<TE1, TE2> convertError)
-        {
-            var r1 = await result;
-            return r1.MapError(convertError);
-        }
-
 
         /// <summary>
         /// Casts the result to type T2.
@@ -401,12 +337,17 @@ namespace Reductech.EDR.Core.Util
             return firstTwo.Single()!;
         }
 
-
+        /// <summary>
+        /// Converts a maybe to an enumerable.
+        /// </summary>
         public static IEnumerable<T> ToEnumerable<T>(this Maybe<T> maybe)
         {
             if (maybe.HasValue) yield return maybe.Value;
         }
 
+        /// <summary>
+        /// Converts a maybe to an async enumerable.
+        /// </summary>
 #pragma warning disable 1998
         public static async IAsyncEnumerable<T> ToAsyncEnumerable<T>(this Maybe<T> maybe)
 #pragma warning restore 1998
@@ -414,6 +355,9 @@ namespace Reductech.EDR.Core.Util
             if (maybe.HasValue) yield return maybe.Value;
         }
 
+        /// <summary>
+        /// Converts a maybe task to an async enumerable.
+        /// </summary>
         public static async IAsyncEnumerable<T> ToAsyncEnumerable<T>(this Task<Maybe<T>> maybe)
         {
             var m = await maybe;
