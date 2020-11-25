@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -286,7 +287,7 @@ namespace Reductech.EDR.Core.TestHarness
                 pairs.Add(new KeyValuePair<string, EntityValue>("Prop2", EntityValue.Create($"Val{index1}")));
                 index1++;
 
-                var entity = new Entity(pairs);
+                var entity = new Entity(pairs.ToImmutableList());
                 return entity;
             }
         }

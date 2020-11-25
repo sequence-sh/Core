@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -390,7 +391,7 @@ namespace Reductech.EDR.Core.Serialization
 
         private static IFreezableStep CreateEntity((string argumentName, StepMember stepMember)[] entityArguments)
         {
-            var pairs = new List<KeyValuePair<string, EntityValue>>();
+            var pairs = ImmutableList<KeyValuePair<string, EntityValue>>.Empty.ToBuilder();
 
             var errorBuilders = new List<IErrorBuilder>();
 
@@ -426,17 +427,13 @@ namespace Reductech.EDR.Core.Serialization
                 if(evResult.IsFailure)
                     errorBuilders.Add(evResult.Error);
                 else
-                {
                     pairs.Add(new KeyValuePair<string, EntityValue>(argumentName, evResult.Value));
-                }
-
-
             }
 
             if(errorBuilders.Any())
                 return new ParseError(ErrorBuilderList.Combine(errorBuilders));
 
-            var entity = new Entities.Entity(pairs);
+            var entity = new Entities.Entity(pairs.ToImmutable());
 
             return new ConstantFreezableStep(entity);
 

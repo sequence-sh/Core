@@ -14,20 +14,17 @@ namespace Reductech.EDR.Core.Entities
     /// </summary>
     public sealed class Entity : IEnumerable<KeyValuePair<string, EntityValue>>
     {
-        private readonly ImmutableDictionary<string, EntityValue> _fields;
+        private readonly ImmutableList<KeyValuePair<string, EntityValue>> _fields;
 
         /// <summary>
         /// Create a new entity
         /// </summary>
-        public Entity(params KeyValuePair<string, EntityValue>[] fields) : this(fields.ToImmutableDictionary()) {}
+        public Entity(params KeyValuePair<string, EntityValue>[] fields) : this(fields.ToImmutableList()) {}
 
         /// <summary>
         /// Create a new entity.
         /// </summary>
-        public Entity(ImmutableDictionary<string, EntityValue> fields)
-        {
-            _fields = fields.ToImmutableDictionary();
-        }
+        public Entity(ImmutableList<KeyValuePair<string, EntityValue>> fields) => _fields = fields;
 
 
         /// <summary>
@@ -37,7 +34,7 @@ namespace Reductech.EDR.Core.Entities
         {
             var fieldEntities = fields
                 .Select(x => new KeyValuePair<string, EntityValue>(x.Key, EntityValue.Create(x .Value.ToString())))
-                .ToImmutableDictionary();
+                .ToImmutableList();
 
             return new Entity(fieldEntities);
         }
@@ -69,20 +66,35 @@ namespace Reductech.EDR.Core.Entities
         /// </summary>
         public Entity WithField(string key, EntityValue value)
         {
-            var newDict = _fields.SetItem(key, value);
-
-            return new Entity(newDict);
+            var index = _fields.FindIndex(x => x.Key == key);
+            if (index == -1)
+            {
+                var newList = _fields.Add(new KeyValuePair<string, EntityValue>(key, value));
+                return new Entity(newList);
+            }
+            else
+            {
+                var newList = _fields.SetItem(index, new KeyValuePair<string, EntityValue>(key, value));
+                return new Entity(newList);
+            }
         }
 
-        /// <summary>
-        /// Gets the values of a particular field.
-        /// </summary>
-        public EntityValue this[string key] => _fields[key];
 
         /// <summary>
         /// Try to get the value of a particular field
         /// </summary>
-        public bool TryGetValue(string key, out EntityValue? entityValue) => _fields.TryGetValue(key, out entityValue);
+        public bool TryGetValue(string key, out EntityValue? entityValue)
+        {
+            var v = _fields.TryFirst(x => x.Key == key);
+            if (v.HasValue)
+            {
+                entityValue = v.Value.Value;
+                return true;
+            }
+
+            entityValue = null;
+            return false;
+        }
 
         /// <inheritdoc />
         public IEnumerator<KeyValuePair<string, EntityValue>> GetEnumerator() => _fields.GetEnumerator();

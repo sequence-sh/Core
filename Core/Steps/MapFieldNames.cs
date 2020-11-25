@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading;
@@ -43,7 +44,7 @@ namespace Reductech.EDR.Core.Steps
 
             static Entity ChangeHeader(Entity entity, IReadOnlyDictionary<string, string> mappings)
             {
-                var pairs = new List<KeyValuePair<string, EntityValue>>();
+                var pairs = ImmutableList<KeyValuePair<string, EntityValue>>.Empty.ToBuilder();
 
                 foreach (var kvp in entity)
                 {
@@ -52,7 +53,7 @@ namespace Reductech.EDR.Core.Steps
                     else pairs.Add(kvp);
                 }
 
-                return new Entity(pairs);
+                return new Entity(pairs.ToImmutable());
             }
 
         }

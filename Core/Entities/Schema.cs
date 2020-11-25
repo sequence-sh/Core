@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Internal;
@@ -50,7 +51,7 @@ namespace Reductech.EDR.Core.Entities
                     x=>x.Value,
                     StringComparer.OrdinalIgnoreCase);
 
-            var keyValuePairs = new List<KeyValuePair<string, EntityValue>>();
+            var keyValuePairs = ImmutableList<KeyValuePair< string,EntityValue>>.Empty.ToBuilder();
             var errors = new List<IErrorBuilder>();
 
             foreach (var kvp in entity)
@@ -82,7 +83,7 @@ namespace Reductech.EDR.Core.Entities
             }
 
 
-            var resultEntity = new Entity(keyValuePairs);
+            var resultEntity = new Entity(keyValuePairs.ToImmutable());
 
             return resultEntity;
         }

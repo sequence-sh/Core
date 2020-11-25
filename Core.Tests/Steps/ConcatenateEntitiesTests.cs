@@ -10,9 +10,7 @@ namespace Reductech.EDR.Core.Tests.Steps
     public class ConcatenateEntitiesTests : StepTestBase<ConcatenateEntities, EntityStream>
     {
         /// <inheritdoc />
-        public ConcatenateEntitiesTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
-        {
-        }
+        public ConcatenateEntitiesTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper) {}
 
         /// <inheritdoc />
         protected override IEnumerable<StepCase> StepCases

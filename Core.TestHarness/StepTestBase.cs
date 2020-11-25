@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Reflection;
@@ -133,7 +134,7 @@ namespace Reductech.EDR.Core.TestHarness
                 .GroupBy(x=>x.key, x=>x.value)
                 .Select(x => new KeyValuePair<string, EntityValue>(x.Key, EntityValue.Create(x)));
 
-            return new Entity(evs);
+            return new Entity(evs.ToImmutableList());
         }
 
         protected static Schema CreateSchema(string name, bool allowExtraProperties, params (string propertyName, SchemaPropertyType type, Multiplicity multiplicity)[] properties)
