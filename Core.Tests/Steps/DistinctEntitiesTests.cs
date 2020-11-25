@@ -72,10 +72,10 @@ namespace Reductech.EDR.Core.Tests.Steps
                     CreateStepWithDefaultOrArbitraryValues().step,
                     @"Do: DistinctEntities
 EntityStream:
-- (Prop1 = 'Val1',Prop2 = 'Val2')
-- (Prop1 = 'Val3',Prop2 = 'Val4')
-- (Prop1 = 'Val5',Prop2 = 'Val6')
-DistinctBy: 'Bar0'
+- (Prop1 = 'Val0',Prop2 = 'Val1')
+- (Prop1 = 'Val2',Prop2 = 'Val3')
+- (Prop1 = 'Val4',Prop2 = 'Val5')
+GetKey: 'Bar6'
 CaseSensitive: True"
 
                     );
