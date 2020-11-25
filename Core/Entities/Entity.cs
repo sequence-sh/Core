@@ -1,7 +1,6 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
+using System.Collections.Immutable;
 using System.Dynamic;
 using System.Linq;
 using System.Text;
@@ -15,19 +14,19 @@ namespace Reductech.EDR.Core.Entities
     /// </summary>
     public sealed class Entity : IEnumerable<KeyValuePair<string, EntityValue>>
     {
-        private readonly IReadOnlyDictionary<string, EntityValue> _fields;
+        private readonly ImmutableDictionary<string, EntityValue> _fields;
 
         /// <summary>
-        /// Create a new record.
+        /// Create a new entity
         /// </summary>
-        public Entity(params KeyValuePair<string, EntityValue>[] fields) : this(fields.AsEnumerable()) {}
+        public Entity(params KeyValuePair<string, EntityValue>[] fields) : this(fields.ToImmutableDictionary()) {}
 
         /// <summary>
-        /// Create a new record.
+        /// Create a new entity.
         /// </summary>
-        public Entity(IEnumerable<KeyValuePair<string, EntityValue>> fields)
+        public Entity(ImmutableDictionary<string, EntityValue> fields)
         {
-            _fields = new Dictionary<string, EntityValue>(fields);
+            _fields = fields.ToImmutableDictionary();
         }
 
 
@@ -37,7 +36,8 @@ namespace Reductech.EDR.Core.Entities
         public static Entity Create(IEnumerable<KeyValuePair<string, object>> fields)
         {
             var fieldEntities = fields
-                .Select(x => new KeyValuePair<string, EntityValue>(x.Key, EntityValue.Create(x .Value.ToString())));
+                .Select(x => new KeyValuePair<string, EntityValue>(x.Key, EntityValue.Create(x .Value.ToString())))
+                .ToImmutableDictionary();
 
             return new Entity(fieldEntities);
         }
@@ -48,18 +48,28 @@ namespace Reductech.EDR.Core.Entities
         /// <returns></returns>
         public IEnumerable<string> GetFieldNames() => _fields.Select(x => x.Key);
 
-        /// <summary>
-        /// Creates a copy of this with the new fields added or updated.
-        /// </summary>
-        /// <param name="newFields"></param>
-        /// <returns></returns>
-        public Entity WithFields(IReadOnlyCollection<KeyValuePair<string, EntityValue>> newFields)
-        {
-            if (!newFields.Any())
-                return this;
+        ///// <summary>
+        ///// Creates a copy of this with the new fields added or updated.
+        ///// </summary>
+        ///// <param name="newFields"></param>
+        ///// <returns></returns>
+        //public Entity WithFields(IReadOnlyCollection<KeyValuePair<string, EntityValue>> newFields)
+        //{
+        //    if (!newFields.Any())
+        //        return this;
 
-            var newDict = newFields.Concat(_fields).GroupBy(x => x.Key, x => x.Value)
-                .ToDictionary(x => x.Key, x => x.First());
+        //    var newDict = newFields.Concat(_fields).GroupBy(x => x.Key, x => x.Value)
+        //        .ToDictionary(x => x.Key, x => x.First());
+
+        //    return new Entity(newDict);
+        //}
+
+        /// <summary>
+        /// Creates a copy of this with the field added or updated
+        /// </summary>
+        public Entity WithField(string key, EntityValue value)
+        {
+            var newDict = _fields.SetItem(key, value);
 
             return new Entity(newDict);
         }
