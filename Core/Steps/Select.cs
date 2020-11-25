@@ -26,7 +26,7 @@ namespace Reductech.EDR.Core.Steps
 
             var currentState = stateMonad.GetState().ToImmutableDictionary();
 
-            async Task<Entity> SelectAction(Entity record)
+            async ValueTask<Entity> SelectAction(Entity record)
             {
                 var scopedMonad = new ScopedStateMonad(stateMonad, currentState,
                     new KeyValuePair<VariableName, object>(VariableName.Entity, record));

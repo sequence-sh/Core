@@ -1,6 +1,5 @@
 ﻿using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Internal;
-using Reductech.EDR.Core.Util;
 
 namespace Reductech.EDR.Core.Serialization
 {
@@ -20,9 +19,16 @@ namespace Reductech.EDR.Core.Serialization
         public string PropertyName { get; }
 
         /// <inheritdoc />
-        public Result<string> TryGetText(FreezableStepData data) =>
-            data.GetVariableName(PropertyName, "Type").MapError(x=>x.AsString)
-                .Bind(Serialize);
+        public Result<string> TryGetText(FreezableStepData data)
+        {
+            var r = data.GetVariableName(PropertyName, "Type");
+
+            if (r.IsFailure)
+                return Result.Failure<string>(r.Error.AsString);
+
+            return Serialize(r.Value);
+        }
+        //.Bind(Serialize);
 
         /// <summary>
         /// Serialize a variable name.
@@ -31,6 +37,6 @@ namespace Reductech.EDR.Core.Serialization
 
 
         /// <inheritdoc />
-        public ISerializerBlock? SerializerBlock => this;
+        public ISerializerBlock SerializerBlock => this;
     }
 }

@@ -51,7 +51,7 @@ namespace Reductech.EDR.Core.Steps
                 return encodingResult.ConvertFailure<EntityStream>();
 
 
-            var block = CSVBlockHelper.ReadCsv(testStreamResult.Value,
+            var block = CSVReader.ReadCsv(testStreamResult.Value,
                 encodingResult.Value.Convert(),
                 ignoreQuotesResult.Value,
                 delimiterResult.Value,
