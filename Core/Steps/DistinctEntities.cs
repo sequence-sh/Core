@@ -69,7 +69,7 @@ namespace Reductech.EDR.Core.Steps
         [DefaultValueExplanation("true")]
         public IStep<bool> CaseSensitive { get; set; } = new Constant<bool>(true);
         /// <inheritdoc />
-        public override IStepFactory StepFactory => DirectoryExistsStepFactory.Instance;
+        public override IStepFactory StepFactory => DistinctEntitiesStepFactory.Instance;
     }
 
     /// <summary>
