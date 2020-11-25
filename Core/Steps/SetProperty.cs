@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
@@ -6,6 +7,7 @@ using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
+using Reductech.EDR.Core.Util;
 using Entity = Reductech.EDR.Core.Entities.Entity;
 
 namespace Reductech.EDR.Core.Steps
@@ -14,7 +16,7 @@ namespace Reductech.EDR.Core.Steps
     /// Returns a copy of the entity with this property set.
     /// Will add a new property if the property is not already present.
     /// </summary>
-    public sealed class SetProperty : CompoundStep<Entity>
+    public sealed class SetProperty<T> : CompoundStep<Entity>
     {
         /// <inheritdoc />
         public override async Task<Result<Entity, IError>> Run(IStateMonad stateMonad, CancellationToken cancellationToken)
@@ -28,7 +30,7 @@ namespace Reductech.EDR.Core.Steps
             var value = await Value.Run(stateMonad, cancellationToken);
             if (value.IsFailure) return value.ConvertFailure<Entity>();
 
-            var entityValue = EntityValue.Create(value.ToString());
+            var entityValue = EntityValue.Create(value.Value?.ToString());
 
             var newEntity = entity.Value.WithField(property.Value, entityValue);
 
@@ -54,7 +56,7 @@ namespace Reductech.EDR.Core.Steps
         /// </summary>
         [StepProperty(Order = 3)]
         [Required]
-        public IStep<object> Value { get; set; } = null!;
+        public IStep<T> Value { get; set; } = null!;
 
 
         /// <inheritdoc />
@@ -65,13 +67,32 @@ namespace Reductech.EDR.Core.Steps
     /// Returns a copy of the entity with this property set.
     /// Will add a new property if the property is not already present.
     /// </summary>
-    public sealed class SetPropertyStepFactory : SimpleStepFactory<SetProperty, Entity>
+    public sealed class SetPropertyStepFactory : GenericStepFactory
     {
         private SetPropertyStepFactory() {}
 
         /// <summary>
-        /// The instance
+        /// The instance.
         /// </summary>
-        public static SimpleStepFactory<SetProperty, Entity> Instance { get; } = new SetPropertyStepFactory();
+        public static GenericStepFactory Instance { get; } = new SetPropertyStepFactory();
+
+        /// <inheritdoc />
+        public override Type StepType => typeof(SetProperty<>);
+
+        /// <inheritdoc />
+        public override string OutputTypeExplanation => nameof(Entity);
+
+        /// <inheritdoc />
+        protected override ITypeReference GetOutputTypeReference(ITypeReference memberTypeReference) => new ActualTypeReference(typeof(Entity));
+
+        /// <inheritdoc />
+        protected override Result<ITypeReference, IError> GetMemberType(FreezableStepData freezableStepData, TypeResolver typeResolver)
+        {
+            var r1 = freezableStepData.GetArgument(nameof(SetProperty<object>.Value), TypeName)
+                .MapError(x => x.WithLocation(this, freezableStepData))
+                .Bind(x => x.TryGetOutputTypeReference(typeResolver));
+
+            return r1;
+        }
     }
 }
