@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
@@ -42,12 +43,12 @@ namespace Reductech.EDR.Core.Steps
             var entities = await EntityStream.Run(stateMonad, cancellationToken);
             if (entities.IsFailure) return entities.ConvertFailure<Unit>();
 
-            if(stateMonad.VariableExists(VariableName.Entity))
-                return new SingleError($"Variable {VariableName.Entity} was already set.", ErrorCode.ReservedVariableName, new StepErrorLocation(this));
+            var currentState = stateMonad.GetState().ToImmutableDictionary();
 
             async Task RunAction(Entity record)
             {
-                var scopedMonad = new ScopedStateMonad(stateMonad, new KeyValuePair<VariableName, object>(VariableName.Entity, record));
+                var scopedMonad = new ScopedStateMonad(stateMonad, currentState,
+                    new KeyValuePair<VariableName, object>(VariableName.Entity, record));
 
 
                 var result = await Action.Run(scopedMonad, cancellationToken);

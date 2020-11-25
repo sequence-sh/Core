@@ -140,17 +140,28 @@ namespace Reductech.EDR.Core
             if (Disposed)
                 throw new ObjectDisposedException("State Monad was disposed");
 
-            if (_stateDictionary.TryGetValue(key, out var value))
-            {
-                if (value is T typedValue)
-                    return typedValue;
+            var r = TryGetVariableFromDictionary<T>(key, _stateDictionary)
+                .Bind(x =>
+                    x.ToResult<T, IErrorBuilder>(new ErrorBuilder($"Variable '{key}' does not exist.", ErrorCode.MissingVariable)));
 
-                return new ErrorBuilder($"Variable '{key}' does not have type '{typeof(T)}'.", ErrorCode.WrongVariableType);
-            }
-
-            return new ErrorBuilder($"Variable '{key}' does not exist.", ErrorCode.MissingVariable);
+            return r;
         }
 
+        /// <summary>
+        /// Tries to get a variable from a dictionary.
+        /// </summary>
+        public static Result<Maybe<T>,IErrorBuilder> TryGetVariableFromDictionary<T>(
+            VariableName key,
+            IReadOnlyDictionary<VariableName, object> dictionary)
+        {
+            if (!dictionary.TryGetValue(key, out var value))
+                return Maybe<T>.None;
+
+            if (value is T typedValue)
+                return Maybe<T>.From(typedValue);
+
+            return new ErrorBuilder($"Variable '{key}' does not have type '{typeof(T)}'.", ErrorCode.WrongVariableType);
+        }
         /// <summary>
         /// Returns whether a particular variable has been set and not removed.
         /// </summary>

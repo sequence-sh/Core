@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
@@ -27,10 +28,12 @@ namespace Reductech.EDR.Core.Steps
             if (caseSensitiveResult.IsFailure) return caseSensitiveResult.ConvertFailure<EntityStream>();
 
             HashSet<string> usedKeys = new HashSet<string>();
+            var currentState = stateMonad.GetState().ToImmutableDictionary();
 
             async Task<Maybe<Entity>> FilterAction(Entity record)
             {
-                var scopedMonad = new ScopedStateMonad(stateMonad, new KeyValuePair<VariableName, object>(VariableName.Entity, record));
+                var scopedMonad = new ScopedStateMonad(stateMonad, currentState,
+                    new KeyValuePair<VariableName, object>(VariableName.Entity, record));
 
                 var result = await DistinctBy.Run(scopedMonad, cancellationToken);
 

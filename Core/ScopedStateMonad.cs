@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using CSharpFunctionalExtensions;
 using Microsoft.Extensions.Logging;
@@ -20,10 +21,12 @@ namespace Reductech.EDR.Core
         /// <summary>
         /// Create a new ScopedStateMonad
         /// </summary>
-        public ScopedStateMonad(IStateMonad baseStateMonad, params KeyValuePair<VariableName, object>[] state)
+        public ScopedStateMonad(IStateMonad baseStateMonad,
+            ImmutableDictionary<VariableName, object> fixedState,
+            params KeyValuePair<VariableName, object>[] state)
         {
+            _fixedState = fixedState;
             BaseStateMonad = baseStateMonad;
-
             _scopedStateDictionary= new ConcurrentDictionary<VariableName, object>(state);
         }
 
@@ -33,6 +36,8 @@ namespace Reductech.EDR.Core
         private readonly ConcurrentDictionary<VariableName, object> _scopedStateDictionary;
 
         private IStateMonad BaseStateMonad { get; }
+
+        private readonly ImmutableDictionary<VariableName, object> _fixedState;
 
         /// <inheritdoc />
         public ILogger Logger => BaseStateMonad.Logger;
@@ -50,30 +55,37 @@ namespace Reductech.EDR.Core
         public StepFactoryStore StepFactoryStore => BaseStateMonad.StepFactoryStore;
 
         /// <inheritdoc />
-        public IEnumerable<KeyValuePair<VariableName, object>> GetState() => _scopedStateDictionary.Concat(BaseStateMonad.GetState());
+        public IEnumerable<KeyValuePair<VariableName, object>> GetState() => _scopedStateDictionary.Concat(_fixedState);
 
 
         /// <inheritdoc />
         public Result<T, IErrorBuilder> GetVariable<T>(VariableName key)
         {
-            if (_scopedStateDictionary.TryGetValue(key, out var value))
-            {
-                if (value is T typedValue)
-                    return typedValue;
+            var r1= StateMonad.TryGetVariableFromDictionary<T>(key, _scopedStateDictionary);
+            if (r1.IsFailure) return r1.ConvertFailure<T>();
 
-                return new ErrorBuilder($"Variable '{key}' does not have type '{typeof(T)}'.", ErrorCode.WrongVariableType);
-            }
+            if (r1.Value.HasValue) return r1.Value.Value;
 
-            return BaseStateMonad.GetVariable<T>(key);
+            var r2 = StateMonad
+                .TryGetVariableFromDictionary<T>(key, _fixedState)
+                .Bind(x=>x.ToResult<T, IErrorBuilder>
+                    (new ErrorBuilder($"Variable '{key}' does not exist.", ErrorCode.MissingVariable)));
+
+            return r2;
         }
 
         /// <inheritdoc />
-        public bool VariableExists(VariableName variable) => _scopedStateDictionary.ContainsKey(variable) || BaseStateMonad.VariableExists(variable);
+        public bool VariableExists(VariableName variable) =>
+            _scopedStateDictionary.ContainsKey(variable) ||
+            _fixedState.ContainsKey(variable);
 
         /// <inheritdoc />
         public Result<Unit, IError> SetVariable<T>(VariableName key, T variable)
         {
             _scopedStateDictionary.AddOrUpdate(key, _ => variable!, (_1, _2) => variable!);
+
+            if (_fixedState.ContainsKey(key))
+                Logger.LogWarning($"Could not set variable {key} as it was out of scope.");
 
             return Unit.Default;
         }
@@ -82,13 +94,11 @@ namespace Reductech.EDR.Core
         public void RemoveVariable(VariableName key, bool dispose)
         {
             if (_scopedStateDictionary.Remove(key, out var v))
-            {
-                if(v is IDisposable d)d.Dispose();
-            }
+                if (v is IDisposable d)
+                    d.Dispose();
 
-            else
-                BaseStateMonad.RemoveVariable(key, dispose);
-
+            if (_fixedState.ContainsKey(key))
+                Logger.LogWarning($"Could not remove variable {key} as it was out of scope.");
         }
     }
 }
