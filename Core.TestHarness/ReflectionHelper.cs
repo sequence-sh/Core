@@ -197,6 +197,18 @@ namespace Reductech.EDR.Core.TestHarness
 
                 step =  Constant(list);
             }
+            else if (outputType == typeof(List<EntityStream>))
+            {
+                var entityStreamList = new List<IStep<EntityStream> >
+                {
+                    new Constant<EntityStream>(CreateSimpleEntityStream(ref index)),
+                    new Constant<EntityStream>(CreateSimpleEntityStream(ref index)),
+                    new Constant<EntityStream>(CreateSimpleEntityStream(ref index))
+                };
+
+
+                step = new Array<EntityStream>(){Elements = entityStreamList};
+            }
 
             else if (outputType.IsEnum)
             {
@@ -223,19 +235,13 @@ namespace Reductech.EDR.Core.TestHarness
             }
             else if (outputType == typeof(Entity))
             {
-                var entity = CreateEntity(ref index);
+                var entity = CreateSimpleEntity(ref index);
 
                 step = new Constant<Entity>(entity);
             }
             else if (outputType == typeof(EntityStream))
             {
-                var entityList = new List<Entity>
-                {
-                    CreateEntity(ref index), CreateEntity(ref index), CreateEntity(ref index)
-                };
-
-
-                var entityStream = EntityStream.Create(entityList);
+                var entityStream = CreateSimpleEntityStream(ref index);
 
                 step = new Constant<EntityStream>(entityStream);
             }
@@ -257,7 +263,19 @@ namespace Reductech.EDR.Core.TestHarness
             return (step, GetString(step));
 
 
-            static Entity CreateEntity(ref int index1)
+            static EntityStream CreateSimpleEntityStream(ref int index1)
+            {
+                var entityList = new List<Entity>
+                {
+                    CreateSimpleEntity(ref index1), CreateSimpleEntity(ref index1), CreateSimpleEntity(ref index1)
+                };
+
+                var entityStream = EntityStream.Create(entityList);
+
+                return entityStream;
+            }
+
+            static Entity CreateSimpleEntity(ref int index1)
             {
                 var pairs = new List<KeyValuePair<string, EntityValue>>
                 {

@@ -44,6 +44,43 @@ namespace Reductech.EDR.Core.Entities
         public static EntityStream Create(params Entity[] entities) => Create(entities.AsEnumerable());
 
         /// <summary>
+        /// Combines streams. Does not preserve order between streams.
+        /// </summary>
+        public static EntityStream Combine(IReadOnlyCollection<EntityStream> streams)
+        {
+            if (streams.Count == 0) return Create();//Empty
+            if (streams.Count == 1) return streams.Single();
+
+            var block = new TransformBlock<Entity, Entity>(x=>x);
+
+            foreach (var entityStream in streams)
+                entityStream.Source.LinkTo(block, new DataflowLinkOptions{PropagateCompletion = true});
+
+            return new EntityStream(block);
+        }
+
+        /// <summary>
+        /// Concatenates streams. Preservers order but evaluates the streams.
+        /// </summary>
+        public static async Task<Result<EntityStream, IError>> Concatenate(IReadOnlyCollection<EntityStream> streams, CancellationToken cancellationToken)
+        {
+            if (streams.Count == 0) return Create();//Empty
+            if (streams.Count == 1) return streams.Single();
+
+            var entities = new List<Entity>();
+
+            foreach (var entityStream in streams)
+            {
+                var partialResult = await entityStream.TryGetResultsAsync(cancellationToken);
+                if (partialResult.IsFailure) return partialResult.ConvertFailure<EntityStream>();
+
+                entities.AddRange(partialResult.Value);
+            }
+
+            return Create(entities);
+        }
+
+        /// <summary>
         /// The source block
         /// </summary>
         public ISourceBlock<Entity> Source { get; }
@@ -87,7 +124,7 @@ namespace Reductech.EDR.Core.Entities
         {
             var b = new TransformBlock<Entity, Entity>(function);
 
-            Source.LinkTo(b, new DataflowLinkOptions()
+            Source.LinkTo(b, new DataflowLinkOptions
             {
                 PropagateCompletion = true
             });
