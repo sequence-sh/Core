@@ -53,8 +53,15 @@ namespace Reductech.EDR.Core.Entities
 
             var block = new TransformBlock<Entity, Entity>(x=>x);
 
+
             foreach (var entityStream in streams)
-                entityStream.Source.LinkTo(block, new DataflowLinkOptions{PropagateCompletion = true});
+                entityStream.Source.LinkTo(block, new DataflowLinkOptions{PropagateCompletion = false});
+
+            Task.WhenAll(streams.Select(x => x.Source.Completion))
+                .ContinueWith(x =>
+            {
+                block.Complete();
+            });
 
             return new EntityStream(block);
         }
