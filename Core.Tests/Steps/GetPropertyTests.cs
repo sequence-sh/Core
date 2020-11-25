@@ -22,7 +22,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                     new GetProperty
                     {
                         Entity =  Constant(CreateEntity(("Foo", "Hello"), ("Bar", "World"))),
-                        PropertyName = Constant("Foo")
+                        Property = Constant("Foo")
                     },
                     "Hello");
 
@@ -31,7 +31,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                     new GetProperty
                     {
                         Entity = Constant(CreateEntity(("Foo", "Hello"), ("Bar", "World"))),
-                        PropertyName = Constant("Foot")
+                        Property = Constant("Foot")
                     },
                     "");
 
@@ -39,7 +39,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                     new GetProperty
                     {
                         Entity = Constant(CreateEntity(("Foo", ""), ("Bar", "World"))),
-                        PropertyName = Constant("Foo")
+                        Property = Constant("Foo")
                     },
                     "");
 
@@ -49,7 +49,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                         Entity = Constant(new Entity(new KeyValuePair<string, EntityValue>("Foo",
                             EntityValue.Create(new []{"Hello", "World"})
                             ))),
-                        PropertyName = Constant("Foo")
+                        Property = Constant("Foo")
                     },
                     "Hello,World");
             }
@@ -69,7 +69,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                     ,
 @"Do: GetProperty
 Entity: (Prop1 = 'Val0',Prop2 = 'Val1')
-PropertyName: 'Bar2'"
+Property: 'Bar2'"
 
                     );
             }

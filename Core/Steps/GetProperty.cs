@@ -23,7 +23,7 @@ namespace Reductech.EDR.Core.Steps
 
             if (entity.IsFailure) return entity.ConvertFailure<string>();
 
-            var property = await PropertyName.Run(stateMonad, cancellationToken);
+            var property = await Property.Run(stateMonad, cancellationToken);
 
             if (property.IsFailure) return property.ConvertFailure<string>();
 
@@ -49,7 +49,7 @@ namespace Reductech.EDR.Core.Steps
         /// </summary>
         [StepProperty(Order = 2)]
         [Required]
-        public IStep<string> PropertyName { get; set; } = null!;
+        public IStep<string> Property { get; set; } = null!;
 
         /// <inheritdoc />
         public override IStepFactory StepFactory => GetPropertyStepFactory.Instance;
