@@ -25,27 +25,6 @@ namespace Reductech.EDR.Core.Steps
 
             while (remainingSteps.TryPop(out var step))
             {
-                if (step.StepCombiners.Any() && remainingSteps.TryPop(out var nextStep))
-                {
-                    var combined = false;
-                    foreach (var stepCombiner in step.StepCombiners)
-                    {
-                        var combineResult = stepCombiner.TryCombine(step, nextStep);
-                        if (combineResult.IsSuccess)
-                        {
-                            remainingSteps.Push(combineResult.Value);
-                            combined = true;
-                            break;
-                        }
-                    }
-
-                    if(!combined)
-                        remainingSteps.Push(nextStep); //put it back
-                    else
-                        continue; //try combining the combined result
-
-                }
-
                 var r = await step.Run(stateMonad, cancellationToken);
                 if (r.IsFailure)
                     return r.ConvertFailure<Unit>();

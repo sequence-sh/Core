@@ -48,17 +48,6 @@ namespace Reductech.EDR.Core.Internal
         public virtual IEnumerable<Requirement> RuntimeRequirements => ImmutableArray<Requirement>.Empty;
 
         /// <inheritdoc />
-        public IEnumerable<IStepCombiner> StepCombiners =>
-            StepFactory.StepCombiner.ToList()
-                .Concat(
-                    RunnableArguments.Select(x => x.step)
-                        .Concat(RunnableListArguments.SelectMany(x => x.list))
-                        .OfType<ICompoundStep>()
-                        .SelectMany(x => x.StepCombiners)
-
-                ).Distinct();
-
-        /// <inheritdoc />
         public Type OutputType => typeof(T);
 
 
