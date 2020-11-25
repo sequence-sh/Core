@@ -17,7 +17,8 @@ namespace Reductech.EDR.Core.Steps
     public sealed class Not : CompoundStep<bool>
     {
         /// <inheritdoc />
-        public override async Task<Result<bool, IError>>  Run(StateMonad stateMonad, CancellationToken cancellationToken)
+        public override async Task<Result<bool, IError>> Run(IStateMonad stateMonad,
+            CancellationToken cancellationToken)
         {
             return await Boolean.Run(stateMonad, cancellationToken).Map(x => !x);
         }

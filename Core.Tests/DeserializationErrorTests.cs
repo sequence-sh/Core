@@ -30,6 +30,16 @@ namespace Reductech.EDR.Core.Tests
         {
             get
             {
+
+                yield return new DeserializationErrorCase("- <Entity> = 123\n- Print(Value = <Entity>)",
+                    ("The VariableName <Entity> is Reserved.", "<Entity> = 123")
+                    );
+
+
+                yield return new DeserializationErrorCase("- <ReductechEntity> = 123\n- Print(Value = <ReductechEntity>)",
+                    ("The VariableName Prefix 'Reductech' is Reserved.", "<ReductechEntity> = 123")
+                    );
+
                 yield return new DeserializationErrorCase("", ("Yaml is empty.", EntireSequenceLocation.Instance.AsString));
 
                 yield return new DeserializationErrorCase("\"Print(Value = 123)\"", ("Yaml must represent a step with return type Unit", "Print(Value = 123)"));

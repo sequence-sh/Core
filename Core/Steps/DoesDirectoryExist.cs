@@ -21,7 +21,8 @@ namespace Reductech.EDR.Core.Steps
         public IStep<string> Path { get; set; } = null!;
 
         /// <inheritdoc />
-        public override async Task<Result<bool, IError>>  Run(StateMonad stateMonad, CancellationToken cancellationToken)
+        public override async Task<Result<bool, IError>> Run(IStateMonad stateMonad,
+            CancellationToken cancellationToken)
         {
             var pathResult = await Path.Run(stateMonad, cancellationToken);
 

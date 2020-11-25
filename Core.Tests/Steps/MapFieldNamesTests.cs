@@ -20,20 +20,15 @@ namespace Reductech.EDR.Core.Tests.Steps
         {
             get
             {
-                yield return new SequenceStepCase("Map some fields",
+                yield return new StepCase("Map some fields",
 
-                    new Sequence
+                    new ForEachEntity
                     {
-                        Steps = new List<IStep<Unit>>()
+                        Action = new Print<Entity>
                         {
-                            new ForEachEntity
-                            {
-                                VariableName = new VariableName("Foo"),
-                                Action = new Print<Entity>
-                                {
-                                    Value = GetVariable<Entity>("Foo")
-                                },
-                                EntityStream =
+                            Value = GetVariable<Entity>(VariableName.Entity)
+                        },
+                        EntityStream =
                                     new MapFieldNames
                                     {
                                         EntityStream = Constant(EntityStream.Create(
@@ -44,14 +39,9 @@ namespace Reductech.EDR.Core.Tests.Steps
 
                                         Mappings = new Constant<Entity>(CreateEntity(("Food", "Foo")))
                                     }
-                            }
-
-                        }
-                    }, "Foo: Hello, Bar: World",
+                    }, Unit.Default , "Foo: Hello, Bar: World",
                     "Foo: Hello 2, Bar: World 2"
-                ).WithExpectedFinalState("Foo",
-                    CreateEntity(("Foo", "Hello 2"),
-                        ("Bar", "World 2")));
+                );
             }
         }
 

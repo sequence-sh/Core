@@ -4,6 +4,8 @@ using System.Collections.Immutable;
 using System.Linq;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Internal.Errors;
+using Reductech.EDR.Core.Steps;
+using Reductech.EDR.Core.Util;
 
 namespace Reductech.EDR.Core.Internal
 {
@@ -43,15 +45,29 @@ namespace Reductech.EDR.Core.Internal
         public Result<IStep, IError> TryFreeze(StepContext stepContext) =>
             StepFactory.TryFreeze(stepContext, FreezableStepData, StepConfiguration);
 
+
         /// <inheritdoc />
         public Result<IReadOnlyCollection<(VariableName VariableName, ITypeReference typeReference)>, IError> TryGetVariablesSet(TypeResolver typeResolver)
         {
+            if (!(StepFactory is GetVariableStepFactory)) //GetVariable is allowed to access reserved variables
+            {
+                var ensureReservedResult = FreezableStepData.VariableNameDictionary.Values.Select(x => x.EnsureNotReserved())
+                .Combine(ErrorBuilderList.Combine)
+                .MapError(x => x.WithLocation(this));
+
+                if (ensureReservedResult.IsFailure)
+                    return ensureReservedResult.ConvertFailure<IReadOnlyCollection<(VariableName VariableName, ITypeReference typeReference)>>();
+            }
+
+
             var result = FreezableStepData
                 .VariableNameDictionary.Values.Select(TryGetVariableNameVariablesSet)
                 .Concat(FreezableStepData.StepDictionary.Values.Select(TryGetStepVariablesSet))
                 .Concat(FreezableStepData.StepListDictionary.Values.Select(TryGetStepListVariablesSet))
-                    .Combine(ErrorList.Combine)
-                    .Map(x => x.SelectMany(y => y).ToList() as IReadOnlyCollection<(VariableName name, ITypeReference type)>);
+                .Combine(ErrorList.Combine)
+                    .Map(x => x.SelectMany(y => y)
+                    .Concat(StepFactory.FixedVariablesSet)
+                    .ToList() as IReadOnlyCollection<(VariableName name, ITypeReference type)>);
 
 
 

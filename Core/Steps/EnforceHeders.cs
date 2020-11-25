@@ -20,7 +20,8 @@ namespace Reductech.EDR.Core.Steps
     public sealed class EnforceSchema : CompoundStep<EntityStream>
     {
         /// <inheritdoc />
-        public override async Task<Result<EntityStream, IError>> Run(StateMonad stateMonad, CancellationToken cancellationToken)
+        public override async Task<Result<EntityStream, IError>> Run(IStateMonad stateMonad,
+            CancellationToken cancellationToken)
         {
             var entityStream = await EntityStream.Run(stateMonad, cancellationToken);
             if (entityStream.IsFailure) return entityStream.ConvertFailure<EntityStream>();

@@ -32,7 +32,8 @@ namespace Reductech.EDR.Core.Steps
         public IStep<TrimSide> Side { get; set; } = null!;
 
         /// <inheritdoc />
-        public override async Task<Result<string, IError>>  Run(StateMonad stateMonad, CancellationToken cancellationToken)
+        public override async Task<Result<string, IError>> Run(IStateMonad stateMonad,
+            CancellationToken cancellationToken)
         {
             return await String.Run(stateMonad, cancellationToken).Compose(() => Side.Run(stateMonad, cancellationToken))
                 .Map(x => TrimString(x.Item1, x.Item2));

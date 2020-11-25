@@ -51,9 +51,7 @@ namespace Reductech.EDR.Core.TestHarness
                     CheckUnitResult(result);
                 }
                 else
-                {
                     throw new XunitException($"Step is does not have output type {nameof(Unit)} or {nameof(TOutput)}");
-                }
 
                 if(!IgnoreLoggedValues)
                     logger.LoggedValues.Select(x=>CompressNewlines(x.ToString()!)) .Should().BeEquivalentTo(ExpectedLoggedValues);

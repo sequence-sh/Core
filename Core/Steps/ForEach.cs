@@ -39,7 +39,8 @@ namespace Reductech.EDR.Core.Steps
         public IStep<List<T>> Array { get; set; } = null!;
 
         /// <inheritdoc />
-        public override async Task<Result<Unit, IError>>  Run(StateMonad stateMonad, CancellationToken cancellationToken)
+        public override async Task<Result<Unit, IError>> Run(IStateMonad stateMonad,
+            CancellationToken cancellationToken)
         {
             var elements = await Array.Run(stateMonad, cancellationToken);
             if (elements.IsFailure) return elements.ConvertFailure<Unit>();

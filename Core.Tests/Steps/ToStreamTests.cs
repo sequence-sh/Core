@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.IO;
-using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.TestHarness;
 using Reductech.EDR.Core.Util;
@@ -18,23 +17,17 @@ namespace Reductech.EDR.Core.Tests.Steps
         /// <inheritdoc />
         protected override IEnumerable<StepCase> StepCases
         {
-            get { yield return new SequenceStepCase("To stream test",
-                new Sequence
+            get { yield return new StepCase("To stream test",
+                new Print<string>
                 {
-                    Steps = new List<IStep<Unit>>
+                    Value = new FromStream
                     {
-                        new Print<string>()
+                        Stream = new ToStream
                         {
-                            Value = new FromStream
-                            {
-                                Stream = new ToStream
-                                {
-                                    Text = Constant("Hello World")
-                                }
-                            }
+                            Text = Constant("Hello World")
                         }
                     }
-                }, "Hello World"
+                }, Unit.Default, "Hello World"
             );}
         }
 

@@ -21,7 +21,8 @@ namespace Reductech.EDR.Core.Steps
     {
 
         /// <inheritdoc />
-        public override async Task<Result<Unit, IError>>  Run(StateMonad stateMonad, CancellationToken cancellationToken)
+        public override async Task<Result<Unit, IError>> Run(IStateMonad stateMonad,
+            CancellationToken cancellationToken)
         {
             return await Value.Run(stateMonad, cancellationToken)
                 .Bind(x => stateMonad.SetVariable(VariableName, x));
@@ -93,6 +94,9 @@ namespace Reductech.EDR.Core.Steps
                 .Bind(x => stepContext.TryGetTypeFromReference(new VariableTypeReference(x)))
                 .Bind(x => TryCreateGeneric(typeof(SetVariable<>), x))
         .MapError(e=>e.WithLocation(this, freezableStepData));
+
+
+
 
 
         /// <inheritdoc />

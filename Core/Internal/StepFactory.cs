@@ -39,6 +39,10 @@ namespace Reductech.EDR.Core.Internal
         public abstract IStepNameBuilder StepNameBuilder { get; }
 
         /// <inheritdoc />
+        public virtual IEnumerable<(VariableName VariableName, ITypeReference typeReference)> FixedVariablesSet =>
+            Enumerable.Empty<(VariableName VariableName, ITypeReference typeReference)>();
+
+        /// <inheritdoc />
         public abstract IEnumerable<Type> EnumTypes { get; }
 
         /// <inheritdoc />

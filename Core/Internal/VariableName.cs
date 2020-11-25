@@ -1,4 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
+using CSharpFunctionalExtensions;
+using Reductech.EDR.Core.Internal.Errors;
+using Reductech.EDR.Core.Util;
 
 namespace Reductech.EDR.Core.Internal
 {
@@ -18,13 +22,24 @@ namespace Reductech.EDR.Core.Internal
         public string Name { get;  }
 
         /// <inheritdoc />
-        public bool Equals(VariableName other) => Name == other.Name;
+        public bool Equals(VariableName other)
+        {
+            // ReSharper disable ConditionIsAlwaysTrueOrFalse
+            if (Name == null)
+                return other.Name == null;
+            if (other.Name == null)
+                return false;
+            // ReSharper restore ConditionIsAlwaysTrueOrFalse
+
+
+            return  Name.Equals(other.Name, StringComparison.OrdinalIgnoreCase);
+        }
 
         /// <inheritdoc />
         public override bool Equals(object? obj) => obj is VariableName other && Equals(other);
 
         /// <inheritdoc />
-        public override int GetHashCode() => Name.GetHashCode();
+        public override int GetHashCode() => Name.ToLowerInvariant().GetHashCode();
 
         /// <summary>
         /// Equals operator
@@ -43,5 +58,36 @@ namespace Reductech.EDR.Core.Internal
 
         /// <inheritdoc />
         public override string ToString() => $"<{Name}>";
+
+        /// <summary>
+        /// Ensures that this variable name is not reserved
+        /// </summary>
+        /// <returns></returns>
+        public Result<Unit, IErrorBuilder> EnsureNotReserved()
+        {
+            if (ReservedVariableNames.Contains(Name))
+                return new ErrorBuilder($"The VariableName <{Name}> is Reserved.", ErrorCode.ReservedVariableName);
+            if (Name.StartsWith(ReservedVariableNamePrefix, StringComparison.OrdinalIgnoreCase))
+                return new ErrorBuilder($"The VariableName Prefix '{ReservedVariableNamePrefix}' is Reserved.", ErrorCode.ReservedVariableName);
+
+            return Unit.Default;
+        }
+
+
+        /// <summary>
+        /// The variable that entities will be set to.
+        /// </summary>
+
+        public static VariableName Entity { get; } = new VariableName("Entity");
+
+        /// <summary>
+        /// Prefix reserved for internal use
+        /// </summary>
+        private const string ReservedVariableNamePrefix = "Reductech";
+
+        private static readonly HashSet<string> ReservedVariableNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+        {
+            Entity.Name,
+        };
     }
 }

@@ -8,9 +8,7 @@ using CSharpFunctionalExtensions;
 using CsvHelper;
 using CsvHelper.Configuration;
 using Reductech.EDR.Core.Entities;
-using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
-using Reductech.EDR.Core.Util;
 
 namespace Reductech.EDR.Core
 {
@@ -23,7 +21,7 @@ namespace Reductech.EDR.Core
         /// Writes entities from an entityStream to a stream in csv format.
         /// </summary>
         /// <returns></returns>
-        public static async Task<Result<Stream, IErrorBuilder>> WriteCSV(
+        public static async Task<Result<Stream, IError>> WriteCSV(
             EntityStream entityStream,
             string delimiter,
             Encoding encoding,
@@ -32,13 +30,13 @@ namespace Reductech.EDR.Core
             var results = await entityStream.TryGetResultsAsync(cancellationToken);
 
             if (results.IsFailure)
-                return results.ConvertFailure<Stream>().MapError(x=> new ErrorBuilder(x, ErrorCode.CSVError) as IErrorBuilder);
-
-
-            if (!results.Value.Any())
-                return new ErrorBuilder("Entity Stream was empty - could not write CSV", ErrorCode.CSVError);
+                return results.ConvertFailure<Stream>();
 
             var stream = new MemoryStream();
+
+            if (!results.Value.Any())
+                return stream;//empty stream
+
             var textWriter = new StreamWriter(stream, encoding);
 
             var configuration = new CsvConfiguration(CultureInfo.InvariantCulture)
@@ -49,7 +47,6 @@ namespace Reductech.EDR.Core
             };
 
             var writer = new CsvWriter(textWriter, configuration);
-
 
             var records = results.Value.Select(x => x.ToSimpleObject());
 

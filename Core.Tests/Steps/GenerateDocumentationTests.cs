@@ -215,7 +215,8 @@ namespace Reductech.EDR.Core.Tests.Steps
         {
             /// <inheritdoc />
 #pragma warning disable 1998
-            public override async Task<Result<string, IError>> Run(StateMonad stateMonad, CancellationToken cancellation)
+            public override async Task<Result<string, IError>> Run(IStateMonad stateMonad,
+                CancellationToken cancellation)
 #pragma warning restore 1998
             {
                 throw new NotImplementedException();

@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
 using CSharpFunctionalExtensions;
+using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Util;
 
@@ -43,6 +44,50 @@ namespace Reductech.EDR.Core.Entities
         public static EntityStream Create(params Entity[] entities) => Create(entities.AsEnumerable());
 
         /// <summary>
+        /// Combines streams. Does not preserve order between streams.
+        /// </summary>
+        public static EntityStream Combine(IReadOnlyCollection<EntityStream> streams)
+        {
+            if (streams.Count == 0) return Create();//Empty
+            if (streams.Count == 1) return streams.Single();
+
+            var block = new TransformBlock<Entity, Entity>(x=>x);
+
+
+            foreach (var entityStream in streams)
+                entityStream.Source.LinkTo(block, new DataflowLinkOptions{PropagateCompletion = false});
+
+            Task.WhenAll(streams.Select(x => x.Source.Completion))
+                .ContinueWith(x =>
+            {
+                block.Complete();
+            });
+
+            return new EntityStream(block);
+        }
+
+        /// <summary>
+        /// Concatenates streams. Preservers order but evaluates the streams.
+        /// </summary>
+        public static async Task<Result<EntityStream, IError>> Concatenate(IReadOnlyCollection<EntityStream> streams, CancellationToken cancellationToken)
+        {
+            if (streams.Count == 0) return Create();//Empty
+            if (streams.Count == 1) return streams.Single();
+
+            var entities = new List<Entity>();
+
+            foreach (var entityStream in streams)
+            {
+                var partialResult = await entityStream.TryGetResultsAsync(cancellationToken);
+                if (partialResult.IsFailure) return partialResult.ConvertFailure<EntityStream>();
+
+                entities.AddRange(partialResult.Value);
+            }
+
+            return Create(entities);
+        }
+
+        /// <summary>
         /// The source block
         /// </summary>
         public ISourceBlock<Entity> Source { get; }
@@ -50,7 +95,8 @@ namespace Reductech.EDR.Core.Entities
         /// <summary>
         /// Gets a list of results
         /// </summary>
-        public async Task<Result<IReadOnlyCollection<Entity>>> TryGetResultsAsync(CancellationToken cancellationToken)
+        public async Task<Result<IReadOnlyCollection<Entity>, IError>> TryGetResultsAsync(
+            CancellationToken cancellationToken)
         {
             var list = new List<Entity>();
             try
@@ -63,10 +109,15 @@ namespace Reductech.EDR.Core.Entities
 
                 await Source.Completion;
             }
+            catch (ErrorException errorException)
+            {
+                return Result.Failure<IReadOnlyCollection<Entity>, IError>(errorException.Error);
+            }
+
 #pragma warning disable CA1031 // Do not catch general exception types
             catch (Exception e)
             {
-                return Result.Failure<IReadOnlyCollection<Entity>>(e.Message);
+                return Result.Failure<IReadOnlyCollection<Entity>, IError>(new SingleError(e, ErrorCode.Unknown, EntireSequenceLocation.Instance));
             }
 #pragma warning restore CA1031 // Do not catch general exception types
 
@@ -80,13 +131,29 @@ namespace Reductech.EDR.Core.Entities
         {
             var b = new TransformBlock<Entity, Entity>(function);
 
-            Source.LinkTo(b, new DataflowLinkOptions()
+            Source.LinkTo(b, new DataflowLinkOptions
             {
                 PropagateCompletion = true
             });
 
             return new EntityStream(b);
         }
+
+        /// <summary>
+        /// Transforms the records in this stream
+        /// </summary>
+        public EntityStream Apply(Func<Entity, Task<Entity>> function)
+        {
+            var b = new TransformBlock<Entity, Entity>(function);
+
+            Source.LinkTo(b, new DataflowLinkOptions
+            {
+                PropagateCompletion = true
+            });
+
+            return new EntityStream(b);
+        }
+
 
         /// <summary>
         /// Transforms the records in this stream
@@ -103,6 +170,27 @@ namespace Reductech.EDR.Core.Entities
             return new EntityStream(b);
         }
 
+        /// <summary>
+        /// Transforms the records in this stream
+        /// </summary>
+        public EntityStream ApplyMaybe(Func<Entity, Task<Maybe<Entity>>> function)
+        {
+            var b = new TransformManyBlock<Entity, Entity>(x=> MapAsync(function(x)));
+
+            Source.LinkTo(b, new DataflowLinkOptions
+            {
+                PropagateCompletion = true
+            });
+
+            return new EntityStream(b);
+        }
+
+        private static async Task<IEnumerable<T>> MapAsync<T>(Task<Maybe<T>> maybe)
+        {
+            var m = await maybe;
+
+            return m.ToList();
+        }
 
         /// <summary>
         /// Perform an action on every record.
@@ -122,7 +210,7 @@ namespace Reductech.EDR.Core.Entities
             }
             catch (AggregateException exception)
             {
-                var error = ExtractError(exception, errorLocation);
+                var error = ExtractError(exception);
                 if (error.HasValue)
                     return Result.Failure<Unit, IError>(error.Value);
                 throw;
@@ -131,7 +219,7 @@ namespace Reductech.EDR.Core.Entities
             if (finalBlock.Completion.Exception == null)
                 return Unit.Default;
 
-            var e = ExtractError(finalBlock.Completion.Exception, errorLocation);
+            var e = ExtractError(finalBlock.Completion.Exception);
             if(e.HasValue)
                 return Result.Failure<Unit, IError>(e.Value);
             else
@@ -139,7 +227,7 @@ namespace Reductech.EDR.Core.Entities
         }
 
 
-        private static Maybe<IError> ExtractError(AggregateException aggregateException, IErrorLocation errorLocation)
+        private static Maybe<IError> ExtractError(AggregateException aggregateException)
         {
             var l = new List<IError>();
 
@@ -147,8 +235,8 @@ namespace Reductech.EDR.Core.Entities
             {
                 if (innerException is ErrorException ee)
                     l.Add(ee.Error);
-                else if (innerException is ErrorBuilderException eb)
-                    l.Add(eb.ErrorBuilder.WithLocation(errorLocation));
+                //else if (innerException is ErrorBuilderException eb)
+                //    l.Add(eb.ErrorBuilder.WithLocation(errorLocation));
                 else
                     return Maybe<IError>.None;
             }

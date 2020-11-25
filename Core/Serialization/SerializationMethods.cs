@@ -129,7 +129,7 @@ namespace Reductech.EDR.Core.Serialization
                         .Map(x => x.Select(ConvertToSerializableType).ToList());
 
                     if (entities.IsFailure)
-                        throw new SerializationException(entities.Error);
+                        throw new SerializationException(entities.Error.AsString);
 
                     return entities.Value;
                 }

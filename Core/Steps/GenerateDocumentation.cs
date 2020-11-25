@@ -16,7 +16,8 @@ namespace Reductech.EDR.Core.Steps
     public sealed class GenerateDocumentation : CompoundStep<List<string>> //TODO maybe output a list of entities
     {
         /// <inheritdoc />
-        public override async Task<Result<List<string>, IError>> Run(StateMonad stateMonad, CancellationToken cancellationToken)
+        public override async Task<Result<List<string>, IError>> Run(IStateMonad stateMonad,
+            CancellationToken cancellationToken)
         {
             await Task.CompletedTask;
 

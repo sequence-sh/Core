@@ -19,58 +19,48 @@ namespace Reductech.EDR.Core.Tests.Steps
         {
             get
             {
-                yield return new SequenceStepCase("Read CSV and print all lines",
-                    new Sequence
+                yield return new StepCase("Read CSV and print all lines",
+                    new ForEachEntity
                     {
-                        Steps = new List<IStep<Unit>>
+                        EntityStream = new ReadCSV
                         {
-                            new ForEachEntity
+                            Delimiter = Constant(","),
+                            TextStream = new ToStream
                             {
-                                VariableName = new VariableName("Foo"),
-                                EntityStream = new ReadCSV
-                                {
-                                    Delimiter = Constant(","),
-                                    TextStream = new ToStream
-                                    {Text = Constant(
-                                        $@"Foo,Bar{Environment.NewLine}Hello,World{Environment.NewLine}Hello 2,World 2")}
-                                },
-                                Action = new Print<Entity>
-                                {
-                                    Value = new GetVariable<Entity> {VariableName = new VariableName("Foo")}
-                                }
+                                Text = Constant(
+                                        $@"Foo,Bar{Environment.NewLine}Hello,World{Environment.NewLine}Hello 2,World 2")
                             }
+                        },
+                        Action = new Print<Entity>
+                        {
+                            Value = new GetVariable<Entity>() { VariableName = VariableName.Entity }
                         }
-                    },
+                    }, Unit.Default,
                     "Foo: Hello, Bar: World",
                     "Foo: Hello 2, Bar: World 2"
-                ).WithExpectedFinalState("Foo", CreateEntity(("Foo", "Hello 2"), ("Bar", "World 2")));
+                );
 
 
-                yield return new SequenceStepCase("Read CSV and print all lines should ignore missing columns",
-                    new Sequence
+                yield return new StepCase("Read CSV and print all lines should ignore missing columns",
+                    new ForEachEntity
                     {
-                        Steps = new List<IStep<Unit>>
+                        EntityStream = new ReadCSV
                         {
-                            new ForEachEntity
+                            Delimiter = Constant(","),
+                            TextStream = new ToStream
                             {
-                                VariableName = new VariableName("Foo"),
-                                EntityStream = new ReadCSV
-                                {
-                                    Delimiter = Constant(","),
-                                    TextStream = new ToStream
-                                    {Text = Constant(
-                                        $@"Foo{Environment.NewLine}Hello,World{Environment.NewLine}Hello 2,World 2")}
-                                },
-                                Action = new Print<Entity>
-                                {
-                                    Value = new GetVariable<Entity> {VariableName = new VariableName("Foo")}
-                                }
+                                Text = Constant(
+                                        $@"Foo{Environment.NewLine}Hello,World{Environment.NewLine}Hello 2,World 2")
                             }
+                        },
+                        Action = new Print<Entity>
+                        {
+                            Value = new GetVariable<Entity> { VariableName = VariableName.Entity }
                         }
-                    },
+                    }, Unit.Default,
                     "Foo: Hello",
                     "Foo: Hello 2"
-                ).WithExpectedFinalState("Foo", CreateEntity(("Foo", "Hello 2")));
+                );
 
 
             }

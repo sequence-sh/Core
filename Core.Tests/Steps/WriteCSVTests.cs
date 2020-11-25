@@ -5,6 +5,7 @@ using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.TestHarness;
+using Reductech.EDR.Core.Util;
 using Xunit.Abstractions;
 
 namespace Reductech.EDR.Core.Tests.Steps
@@ -21,54 +22,42 @@ namespace Reductech.EDR.Core.Tests.Steps
         {
             get
             {
-                yield return  new SequenceStepCase("Write Simple CSV",
+                yield return new StepCase("Write Simple CSV",
 
-                    new Sequence
+                    new Print<string>
                     {
-                        Steps = new[]
+                        Value = new FromStream
                         {
-                            new Print<string>
+                            Stream = new WriteCSV
                             {
-                                Value = new FromStream
-                                {
-                                    Stream = new WriteCSV
-                                    {
-                                        Entities = new Constant<EntityStream>(EntityStream.Create(
+                                Entities = new Constant<EntityStream>(EntityStream.Create(
                                             CreateEntity(("Foo", "Hello"), ("Bar", "World")),
                                             CreateEntity(("Foo", "Hello 2"), ("Bar", "World 2"))
 
                                         ))
-                                    }
-                                }
                             }
                         }
-                    },
+                    }, Unit.Default,
                     $"Foo,Bar{Environment.NewLine}Hello,World{Environment.NewLine}Hello 2,World 2{Environment.NewLine}"
                 );
 
-                yield return new SequenceStepCase("Write Simple CSV with tab delimiter",
+                yield return new StepCase("Write Simple CSV with tab delimiter",
 
-                    new Sequence
+                    new Print<string>
                     {
-                        Steps = new[]
+                        Value = new FromStream
                         {
-                            new Print<string>
+                            Stream = new WriteCSV
                             {
-                                Value = new FromStream
-                                {
-                                    Stream = new WriteCSV
-                                    {
-                                        Entities = new Constant<EntityStream>(EntityStream.Create(
+                                Entities = new Constant<EntityStream>(EntityStream.Create(
                                             CreateEntity(("Foo", "Hello"), ("Bar", "World")),
                                             CreateEntity(("Foo", "Hello 2"), ("Bar", "World 2"))
 
                                         )),
-                                        Delimiter = Constant("\t")
-                                    }
-                                }
+                                Delimiter = Constant("\t")
                             }
                         }
-                    },
+                    }, Unit.Default,
                     $"Foo\tBar{Environment.NewLine}Hello\tWorld{Environment.NewLine}Hello 2\tWorld 2{Environment.NewLine}"
                 );
             }

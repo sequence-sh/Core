@@ -21,31 +21,25 @@ namespace Reductech.EDR.Core.Tests.Steps
             {
                 static StepCase CreateCase(string name, EntityStream stream, Schema schema, params string[] expectedLogValues)
                 {
-                    return new SequenceStepCase(name,
+                    return new StepCase(name,
 
-                        new Sequence
+                        new ForEachEntity
                         {
-                            Steps = new List<IStep<Unit>>
+                            Action = new Print<Entity>
                             {
-                                new ForEachEntity
-                                {
-                                    VariableName = new VariableName("Foo"),
-                                    Action = new Print<Entity>
-                                    {
-                                        Value = GetVariable<Entity>("Foo")
-                                    },
-                                    EntityStream =
+                                Value = GetVariable<Entity>(VariableName.Entity)
+                            },
+                            EntityStream =
                                         new EnforceSchema
                                         {
                                             EntityStream = Constant(stream),
 
                                             Schema = Constant(schema)
                                         }
-                                }
-
-                            }
-                        }, expectedLogValues
-                    ){IgnoreFinalState = true};
+                        },
+                        Unit.Default
+                        , expectedLogValues
+                    );
                 }
 
 
@@ -117,10 +111,9 @@ namespace Reductech.EDR.Core.Tests.Steps
                             {
                                 new ForEachEntity
                                 {
-                                    VariableName = new VariableName("Foo"),
                                     Action = new Print<Entity>
                                     {
-                                        Value = GetVariable<Entity>("Foo")
+                                        Value = GetVariable<Entity>(VariableName.Entity)
                                     },
                                     EntityStream =enforceSchema
                                 }

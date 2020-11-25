@@ -7,7 +7,6 @@ using FluentAssertions;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Serialization;
-using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.Util;
 using Reductech.Utilities.Testing;
 using Xunit;
@@ -34,15 +33,6 @@ namespace Reductech.EDR.Core.TestHarness
             await StepCases.FindAndRunAsync(stepCaseName, TestOutputHelper, StepCase.SerializeArgument);
         }
 
-#pragma warning disable CA1034 // Nested types should not be visible
-        public class SequenceStepCase : StepCase
-#pragma warning restore CA1034 // Nested types should not be visible
-        {
-            // ReSharper disable once UnusedParameter.Local - needed to disambiguate constructor
-            public SequenceStepCase(string name, Sequence sequence, params string[] expectedLoggedValues) : base(name, sequence, Maybe<TOutput>.None,expectedLoggedValues)
-            {
-            }
-        }
 
 #pragma warning disable CA1034 // Nested types should not be visible
         public class StepCase : CaseThatExecutes
@@ -53,6 +43,12 @@ namespace Reductech.EDR.Core.TestHarness
             {
             }
 
+
+            public StepCase(string name, IStep<Unit> step, Unit _, params string[] expectedLoggedValues)
+                : this(name, step, Maybe<TOutput>.None,expectedLoggedValues)
+            {
+
+            }
             protected StepCase(string name, IStep step, Maybe<TOutput> expectedOutput, string[] expectedLoggedValues) : base(expectedLoggedValues.Select(CompressNewlines).ToList())
             {
                 Name = name;

@@ -17,7 +17,8 @@ namespace Reductech.EDR.Core.Steps
     public sealed class ReadCSV : CompoundStep<EntityStream>
     {
         /// <inheritdoc />
-        public override async Task< Result<EntityStream, IError>> Run(StateMonad stateMonad, CancellationToken cancellationToken)
+        public override async Task<Result<EntityStream, IError>> Run(IStateMonad stateMonad,
+            CancellationToken cancellationToken)
         {
             var testStreamResult = await TextStream.Run(stateMonad, cancellationToken);
             if (testStreamResult.IsFailure)

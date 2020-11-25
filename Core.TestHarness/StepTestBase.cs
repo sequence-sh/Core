@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Reflection;
@@ -123,6 +124,9 @@ namespace Reductech.EDR.Core.TestHarness
         public static IStep<List<TNew>> Array<TNew>(params TNew[] elements)=> new Array<TNew>() {Elements = elements.Select(Constant).ToList()};
 
         public static IStep<TNew> GetVariable<TNew>(string variableName)=> new GetVariable<TNew>() {VariableName = new VariableName(variableName)};
+        public static IStep<TNew> GetVariable<TNew>(VariableName variableName)=> new GetVariable<TNew>() {VariableName = variableName};
+
+        public static IStep<Entity> GetEntityVariable => GetVariable<Entity>(VariableName.Entity);
 
         protected static Entity CreateEntity(params (string key, string value)[] pairs)
         {
@@ -130,7 +134,7 @@ namespace Reductech.EDR.Core.TestHarness
                 .GroupBy(x=>x.key, x=>x.value)
                 .Select(x => new KeyValuePair<string, EntityValue>(x.Key, EntityValue.Create(x)));
 
-            return new Entity(evs);
+            return new Entity(evs.ToImmutableList());
         }
 
         protected static Schema CreateSchema(string name, bool allowExtraProperties, params (string propertyName, SchemaPropertyType type, Multiplicity multiplicity)[] properties)
