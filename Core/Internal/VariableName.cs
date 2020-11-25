@@ -81,12 +81,6 @@ namespace Reductech.EDR.Core.Internal
         public static VariableName Entity { get; } = new VariableName("Entity");
 
         /// <summary>
-        /// The variable that entities will be set to.
-        /// </summary>
-
-        public static VariableName Property { get; } = new VariableName("Property");
-
-        /// <summary>
         /// Prefix reserved for internal use
         /// </summary>
         private const string ReservedVariableNamePrefix = "Reductech";
@@ -94,7 +88,6 @@ namespace Reductech.EDR.Core.Internal
         private static readonly HashSet<string> ReservedVariableNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
         {
             Entity.Name,
-            Property.Name
         };
     }
 }
