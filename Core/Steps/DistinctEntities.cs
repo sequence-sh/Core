@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.ComponentModel.DataAnnotations;
 using System.Threading;
@@ -27,7 +28,11 @@ namespace Reductech.EDR.Core.Steps
             var caseSensitiveResult = await CaseSensitive.Run(stateMonad, cancellationToken);
             if (caseSensitiveResult.IsFailure) return caseSensitiveResult.ConvertFailure<EntityStream>();
 
-            HashSet<string> usedKeys = new HashSet<string>();
+            IEqualityComparer<string> comparer = caseSensitiveResult.Value
+                ? StringComparer.Ordinal
+                : StringComparer.OrdinalIgnoreCase;
+
+            HashSet<string> usedKeys = new HashSet<string>(comparer);
             var currentState = stateMonad.GetState().ToImmutableDictionary();
 
             async Task<Maybe<Entity>> FilterAction(Entity record)
@@ -35,7 +40,7 @@ namespace Reductech.EDR.Core.Steps
                 var scopedMonad = new ScopedStateMonad(stateMonad, currentState,
                     new KeyValuePair<VariableName, object>(VariableName.Entity, record));
 
-                var result = await DistinctBy.Run(scopedMonad, cancellationToken);
+                var result = await GetKey.Run(scopedMonad, cancellationToken);
 
                 if (result.IsFailure)
                     throw new ErrorException(result.Error);
@@ -63,7 +68,7 @@ namespace Reductech.EDR.Core.Steps
         /// </summary>
         [StepProperty(Order = 2)]
         [Required]
-        public IStep<string> DistinctBy { get; set; } = null!;
+        public IStep<string> GetKey { get; set; } = null!;
 
         /// <summary>
         /// Whether comparisons should be case sensitive.

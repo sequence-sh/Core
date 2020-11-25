@@ -33,7 +33,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                                 CreateEntity(("Foo", "Beta")),
                                 CreateEntity(("Foo", "Beta"))
                             )),
-                            DistinctBy = new GetProperty() {PropertyName = Constant("Foo"), Entity = GetEntityVariable}
+                            GetKey = new GetProperty() {PropertyName = Constant("Foo"), Entity = GetEntityVariable}
                         }
                     },
                     Unit.Default,
@@ -53,12 +53,12 @@ namespace Reductech.EDR.Core.Tests.Steps
                                 CreateEntity(("Foo", "Beta")),
                                 CreateEntity(("Foo", "Beta"))
                             )),
-                            DistinctBy = new GetProperty { PropertyName = Constant("Foo"), Entity = GetEntityVariable },
+                            GetKey = new GetProperty { PropertyName = Constant("Foo"), Entity = GetEntityVariable },
                             CaseSensitive = Constant(false)
                         }
                     },
                     Unit.Default,
-                    "Foo: Alpha", "Foo: ALPHA", "Foo: Beta"
+                    "Foo: Alpha",  "Foo: Beta"
                 );
             }
         }

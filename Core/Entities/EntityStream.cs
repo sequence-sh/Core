@@ -142,6 +142,22 @@ namespace Reductech.EDR.Core.Entities
         /// <summary>
         /// Transforms the records in this stream
         /// </summary>
+        public EntityStream Apply(Func<Entity, Task<Entity>> function)
+        {
+            var b = new TransformBlock<Entity, Entity>(function);
+
+            Source.LinkTo(b, new DataflowLinkOptions
+            {
+                PropagateCompletion = true
+            });
+
+            return new EntityStream(b);
+        }
+
+
+        /// <summary>
+        /// Transforms the records in this stream
+        /// </summary>
         public EntityStream ApplyMaybe(Func<Entity, Maybe<Entity>> function)
         {
             var b = new TransformManyBlock<Entity, Entity>(entity => function(entity).ToList());
