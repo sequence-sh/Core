@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Reductech.EDR.Core.Steps;
@@ -201,7 +200,6 @@ namespace Reductech.EDR.Core.Serialization
         /// <summary>
         /// Create a new StepMemberParser
         /// </summary>
-        [SuppressMessage("ReSharper", "AccessToModifiedClosure")]
         public StepMemberParser(StepFactoryStore stepFactoryStore)
         {
             StepFactoryStore = stepFactoryStore;
@@ -216,7 +214,9 @@ namespace Reductech.EDR.Core.Serialization
             TokenListParser<ProcessToken, IFreezableStep> setVariable =
                 (from vnToken in Token.EqualTo(ProcessToken.VariableName)
                  from _ in Token.EqualTo(ProcessToken.Assignment)
+                 // ReSharper disable AccessToModifiedClosure
                  from value in Parse.Ref(() => freezableProcess.Value)
+
                  select SetVariableStepFactory.CreateFreezable(
                          new VariableName(vnToken.ToStringValue().TrimStart('<').TrimEnd('>')),
                          value)).Try();
@@ -349,6 +349,7 @@ namespace Reductech.EDR.Core.Serialization
 
 
             Parser = stepMember.Value;
+            // ReSharper restore AccessToModifiedClosure
         }
 
         /// <summary>

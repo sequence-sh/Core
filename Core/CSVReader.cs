@@ -2,7 +2,6 @@
 using System.Globalization;
 using System.IO;
 using System.Text;
-using System.Threading.Tasks.Dataflow;
 using CsvHelper;
 using CsvHelper.Configuration;
 using Reductech.EDR.Core.Entities;
@@ -12,12 +11,12 @@ namespace Reductech.EDR.Core
     /// <summary>
     /// Helps read blocks
     /// </summary>
-    public static class CSVBlockHelper
+    public static class CSVReader
     {
         /// <summary>
         /// Creates a block that will produce records from the CSV file.
         /// </summary>
-        public static ISourceBlock<Entity> ReadCsv(Stream stream,
+        public static async IAsyncEnumerable<Entity> ReadCsv(Stream stream,
             Encoding encoding,
             bool ignoreQuotes,
             string delimiter, char? commentToken)
@@ -36,93 +35,20 @@ namespace Reductech.EDR.Core
             }
 
             var textReader = new StreamReader(stream, encoding);
-            var block = new TransformManyBlock<TextReader, Entity>(tr=> TryReadCSV(tr, configuration));
 
-            block.Post(textReader);
 
-            block.Complete();
-
-            return block;
-        }
-
-        /// <summary>
-        /// Reads a csv file
-        /// <throws>ErrorException</throws>
-        /// </summary>
-        private static IEnumerable<Entity> TryReadCSV(TextReader textReader, CsvConfiguration configuration)
-        {
             var reader = new CsvReader(textReader, configuration);
 
 
-            foreach (var row in reader.GetRecords<dynamic>())
+            await foreach (var row in reader.GetRecordsAsync<dynamic>())
             {
                 var dict = row as IDictionary<string, object>;
 
-                yield return Entity.Create(dict!);
+                var entity = Entity.Create(dict!);
+                yield return entity;
             }
 
             reader.Dispose();
-            //try
-            //{
-            //    var rows = reader.GetRecords<dynamic>()
-            //    .Select(x =>
-            //    {
-
-            //    });
-
-            //    return rows;
-            //}
-            //catch (Exception e)
-            //{
-            //    throw new ErrorException(new ErrorBuilder(e, ErrorCode.CSVError).WithLocation(errorLocation));
-            //}
-
-            //if (commentToken != null)
-            //    csvParser.CommentTokens = new[] { commentToken };
-
-            //csvParser.SetDelimiters(delimiter);
-            //csvParser.HasFieldsEnclosedInQuotes = enclosedInQuotes;
-
-            //string[] headers;
-
-            //try
-            //{
-            //    headers = csvParser.ReadFields();
-            //}
-            //catch (MalformedLineException e)
-            //{
-            //    throw new ErrorException(new ErrorBuilder(e, ErrorCode.CSVError).WithLocation(errorLocation));
-            //}
-
-            //var rowNumber = 1;
-            //while (!csvParser.EndOfData)
-            //{
-            //    Entity row;
-
-            //    // Read current line fields, pointer moves to the next line.
-            //    try
-            //    {
-            //        var fields = csvParser.ReadFields();
-
-            //        if (fields.Length != headers.Length)
-            //            throw new ErrorException(
-            //                new ErrorBuilder($"There were {fields.Length} columns in row {rowNumber} but we expected {headers.Length}.", ErrorCode.CSVError)
-            //            .WithLocation(errorLocation));
-
-            //        var pairs = headers.Zip(fields).Select(x => new KeyValuePair<string, EntityValue>(x.First, EntityValue.Create(x.Second)));
-
-            //        row = new Entity(pairs);
-
-            //    }
-            //    catch (MalformedLineException e)
-            //    {
-            //        throw new ErrorException(new ErrorBuilder(e, ErrorCode.CSVError).WithLocation(errorLocation));
-            //    }
-
-            //    yield return row;
-
-            //    rowNumber++;
-            //}
         }
     }
 }

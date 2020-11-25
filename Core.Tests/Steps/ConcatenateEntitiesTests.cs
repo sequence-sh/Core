@@ -36,7 +36,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                 );
 
 
-                yield return new StepCase("Two streams, unordered",
+                yield return new StepCase("Two streams",
                     new ForEachEntity
                     {
                         Action = new Print<Entity>{Value = GetEntityVariable},
@@ -50,30 +50,6 @@ namespace Reductech.EDR.Core.Tests.Steps
                                 EntityStream.Create(
                                     CreateEntity(("Foo", "Gamma")),
                                     CreateEntity(("Foo", "Delta"))))
-                        }
-
-                    }, Unit.Default,
-
-                    "Foo: Alpha", "Foo: Beta", "Foo: Gamma", "Foo: Delta"
-                );
-
-
-                yield return new StepCase("Two streams, ordered",
-                    new ForEachEntity
-                    {
-                        Action = new Print<Entity> { Value = GetEntityVariable },
-
-                        EntityStream = new ConcatenateEntities
-                        {
-                            Streams = Array(
-                                EntityStream.Create(
-                                    CreateEntity(("Foo", "Alpha")),
-                                    CreateEntity(("Foo", "Beta"))),
-                                EntityStream.Create(
-                                    CreateEntity(("Foo", "Gamma")),
-                                    CreateEntity(("Foo", "Delta")))),
-
-                            PreserveOrder = Constant(true)
                         }
 
                     }, Unit.Default,
@@ -103,8 +79,7 @@ Streams:
     - (Prop1 = 'Val10',Prop2 = 'Val11')
   - - (Prop1 = 'Val12',Prop2 = 'Val13')
     - (Prop1 = 'Val14',Prop2 = 'Val15')
-    - (Prop1 = 'Val16',Prop2 = 'Val17')
-PreserveOrder: False"
+    - (Prop1 = 'Val16',Prop2 = 'Val17')"
 
 
                     );
