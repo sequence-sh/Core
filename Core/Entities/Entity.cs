@@ -30,10 +30,10 @@ namespace Reductech.EDR.Core.Entities
         /// <summary>
         /// Create a new entity
         /// </summary>
-        public static Entity Create(IEnumerable<KeyValuePair<string, object>> fields)
+        public static Entity Create(IEnumerable<KeyValuePair<string, object>> fields, char? multiValueDelimiter)
         {
             var fieldEntities = fields
-                .Select(x => new KeyValuePair<string, EntityValue>(x.Key, EntityValue.Create(x .Value.ToString())))
+                .Select(x => new KeyValuePair<string, EntityValue>(x.Key, EntityValue.Create(x.Value.ToString(), multiValueDelimiter)))
                 .ToImmutableList();
 
             return new Entity(fieldEntities);

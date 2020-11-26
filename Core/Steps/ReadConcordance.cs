@@ -11,13 +11,12 @@ using Reductech.EDR.Core.Internal.Errors;
 namespace Reductech.EDR.Core.Steps
 {
     /// <summary>
-    /// Extracts entities from a CSV file
+    /// Extracts entities from a Concordance stream
     /// </summary>
-    public sealed class ReadCSV : CompoundStep<EntityStream>
+    public sealed class ReadConcordance : CompoundStep<EntityStream>
     {
         /// <inheritdoc />
-        public override async Task<Result<EntityStream, IError>> Run(IStateMonad stateMonad,
-            CancellationToken cancellationToken)
+        public override async Task<Result<EntityStream, IError>> Run(IStateMonad stateMonad, CancellationToken cancellationToken)
         {
             var result = await CSVReader.ReadCSV(
                 stateMonad,
@@ -32,6 +31,7 @@ namespace Reductech.EDR.Core.Steps
 
             return result;
         }
+
 
         /// <summary>
         /// Stream containing the CSV data.
@@ -51,8 +51,8 @@ namespace Reductech.EDR.Core.Steps
         /// The delimiter to use to separate fields.
         /// </summary>
         [StepProperty(Order = 3)]
-        [DefaultValueExplanation(",")]
-        public IStep<string> Delimiter { get; set; } = new Constant<string>(",");
+        [DefaultValueExplanation("\\u0014")]
+        public IStep<string> Delimiter { get; set; } = new Constant<string>("\u0014");
 
         /// <summary>
         /// The token to use to indicate comments.
@@ -69,8 +69,8 @@ namespace Reductech.EDR.Core.Steps
         /// If it is empty then strings cannot be quoted.
         /// </summary>
         [StepProperty(Order = 5)]
-        [DefaultValueExplanation("\"")]
-        public IStep<string> QuoteCharacter { get; set; } = new Constant<string>("\"");
+        [DefaultValueExplanation("\u00FE")]
+        public IStep<string> QuoteCharacter { get; set; } = new Constant<string>("\u00FE");
 
         /// <summary>
         /// The multi value delimiter character to use.
@@ -78,24 +78,23 @@ namespace Reductech.EDR.Core.Steps
         /// If it is empty then fields cannot have multiple fields.
         /// </summary>
         [StepProperty(Order = 6)]
-        [DefaultValueExplanation("")]
-        public IStep<string> MultiValueDelimiter { get; set; } = new Constant<string>("");
+        [DefaultValueExplanation("|")]
+        public IStep<string> MultiValueDelimiter { get; set; } = new Constant<string>("|");
 
         /// <inheritdoc />
-        public override IStepFactory StepFactory => ReadCsvStepFactory.Instance;
+        public override IStepFactory StepFactory => ReadConcordanceStepFactory.Instance;
     }
 
-
     /// <summary>
-    /// Extracts entities from a CSV Stream
+    /// Extracts entities from a Concordance stream.
     /// </summary>
-    public sealed class ReadCsvStepFactory : SimpleStepFactory<ReadCSV, EntityStream>
+    public sealed class ReadConcordanceStepFactory : SimpleStepFactory<ReadConcordance, EntityStream>
     {
-        private ReadCsvStepFactory() { }
+        private ReadConcordanceStepFactory() {}
 
         /// <summary>
         /// The instance.
         /// </summary>
-        public static SimpleStepFactory<ReadCSV, EntityStream> Instance { get; } = new ReadCsvStepFactory();
+        public static SimpleStepFactory<ReadConcordance, EntityStream> Instance { get; } = new ReadConcordanceStepFactory();
     }
 }

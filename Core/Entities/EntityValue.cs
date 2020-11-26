@@ -22,10 +22,20 @@ namespace Reductech.EDR.Core.Entities
         /// <summary>
         /// Create a new EntityValue from an original string.
         /// </summary>
-        public static EntityValue Create(string? original)
+        public static EntityValue Create(string? original, char? multiValueDelimiter)
         {
             if(string.IsNullOrWhiteSpace(original))
                 return new EntityValue(DBNull.Value);
+
+            if (multiValueDelimiter.HasValue)
+            {
+                var splits = original.Split(multiValueDelimiter.Value);
+                if (splits.Length > 1)
+                {
+                    var values = splits.Select(EntitySingleValue.Create).ToList();
+                    return new EntityValue(values);
+                }
+            }
 
             return new EntityValue(EntitySingleValue.Create(original));
         }

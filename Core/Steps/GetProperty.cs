@@ -28,7 +28,7 @@ namespace Reductech.EDR.Core.Steps
             if (property.IsFailure) return property.ConvertFailure<string>();
 
             if (!entity.Value.TryGetValue(property.Value, out var ev) || ev == null)
-                ev = EntityValue.Create(null as string);
+                ev = EntityValue.Create(null, null);
 
 
             var resultString = ev.Value.Match(_ => "", v => v.ToString(), vs => string.Join(",", vs));
