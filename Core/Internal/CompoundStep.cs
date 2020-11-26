@@ -22,7 +22,7 @@ namespace Reductech.EDR.Core.Internal
 
 
         /// <inheritdoc />
-        public Task<Result<T1, IError>> Run<T1>(StateMonad stateMonad, CancellationToken cancellationToken)
+        public Task<Result<T1, IError>> Run<T1>(IStateMonad stateMonad, CancellationToken cancellationToken)
         {
             return Run(stateMonad, cancellationToken).BindCast<T, T1, IError>(
                     new SingleError($"Could not cast {typeof(T)} to {typeof(T1)}", ErrorCode.InvalidCast, new StepErrorLocation(this)));

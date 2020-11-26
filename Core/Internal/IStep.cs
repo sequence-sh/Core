@@ -25,7 +25,7 @@ namespace Reductech.EDR.Core.Internal
         /// <summary>
         /// Run this step and return the result, assuming it is the specified type.
         /// </summary>
-         Task<Result<T, IError>>  Run<T>(StateMonad stateMonad, CancellationToken cancellationToken);
+         Task<Result<T, IError>> Run<T>(IStateMonad stateMonad, CancellationToken cancellationToken);
 
         /// <summary>
         /// Verify that this step can be run with the current settings.
