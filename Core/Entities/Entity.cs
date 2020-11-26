@@ -165,6 +165,7 @@ namespace Reductech.EDR.Core.Entities
             return expandoObject;
         }
 
+
         /// <summary>
         /// Converts this record into a string.
         /// </summary>

@@ -72,6 +72,7 @@ namespace Reductech.EDR.Core.Steps
         [DefaultValueExplanation("\"")]
         public IStep<string> QuoteCharacter { get; set; } = new Constant<string>("\"");
 
+
         /// <summary>
         /// The multi value delimiter character to use.
         /// Should be a single character or an empty string.

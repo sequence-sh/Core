@@ -24,7 +24,7 @@ namespace Reductech.EDR.Core
         /// Reads a CSV stream to an entity stream based on all the input steps.
         /// </summary>
         /// <returns></returns>
-        public static async Task<Result<EntityStream, IError>>  ReadCSV(
+        public static async Task<Result<EntityStream, IError>> ReadCSV(
             IStateMonad stateMonad,
             IStep<Stream> stream,
             IStep<string> delimiter,
@@ -44,13 +44,13 @@ namespace Reductech.EDR.Core
             var encodingResult = await encoding.Run(stateMonad, cancellationToken);
             if (encodingResult.IsFailure) return encodingResult.ConvertFailure<EntityStream>();
 
-            var quoteResult = await TryConvertToChar(quoteCharacter, "Quote Character");
+            var quoteResult = await TryConvertToChar(quoteCharacter, "Quote Character", stateMonad, errorLocation, cancellationToken);
             if (quoteResult.IsFailure) return quoteResult.ConvertFailure<EntityStream>();
 
-            var commentResult = await TryConvertToChar(commentCharacter, "Comment Character");
+            var commentResult = await TryConvertToChar(commentCharacter, "Comment Character", stateMonad, errorLocation, cancellationToken);
             if (commentResult.IsFailure) return commentResult.ConvertFailure<EntityStream>();
 
-            var multiValueResult = await TryConvertToChar(multiValueDelimiter, "MultiValue Delimiter");
+            var multiValueResult = await TryConvertToChar(multiValueDelimiter, "MultiValue Delimiter", stateMonad, errorLocation, cancellationToken);
             if (multiValueResult.IsFailure) return multiValueResult.ConvertFailure<EntityStream>();
 
 
@@ -67,24 +67,31 @@ namespace Reductech.EDR.Core
             return recordStream;
 
 
-            async Task<Result<char?, IError>> TryConvertToChar(IStep<string> step, string propertyName)
-            {
-                var charResult = await step.Run(stateMonad, cancellationToken);
-                if (charResult.IsFailure) return charResult.ConvertFailure<char?>();
 
-                char? resultChar;
-
-                if (charResult.Value.Length == 0)
-                    resultChar = null;
-                else if (charResult.Value.Length == 1)
-                    resultChar = charResult.Value.Single();
-                else return new SingleError($"{propertyName} must be a single character.", ErrorCode.CSVError, errorLocation);
-
-                return resultChar;
-            }
         }
 
+        /// <summary>
+        /// Tries to convert a string step to a single nullable character.
+        /// </summary>
+        public static async Task<Result<char?, IError>> TryConvertToChar(IStep<string> step,
+            string propertyName,
+            IStateMonad stateMonad,
+            IErrorLocation errorLocation,
+            CancellationToken cancellationToken)
+        {
+            var charResult = await step.Run(stateMonad, cancellationToken);
+            if (charResult.IsFailure) return charResult.ConvertFailure<char?>();
 
+            char? resultChar;
+
+            if (charResult.Value.Length == 0)
+                resultChar = null;
+            else if (charResult.Value.Length == 1)
+                resultChar = charResult.Value.Single();
+            else return new SingleError($"{propertyName} must be a single character.", ErrorCode.CSVError, errorLocation);
+
+            return resultChar;
+        }
 
         /// <summary>
         /// Creates a block that will produce records from the CSV file.

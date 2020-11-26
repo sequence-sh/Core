@@ -149,8 +149,16 @@ namespace Reductech.EDR.Core.Entities
             return r;
         }
 
+        /// <summary>
+        /// This value as a string
+        /// </summary>
+        public string GetStringValue(string dateFormat)
+        {
+            return Value.Match(x => x, x => x.ToString(), x => x.ToString("G"), x => x.ToString(), x => x, x => x.ToString(dateFormat));
+        }
+
         /// <inheritdoc />
-        public override string ToString() => Original;
+        public override string ToString() => GetStringValue("yyyy/MM/dd H:mm:ss");
 
         /// <inheritdoc />
         public bool Equals(EntitySingleValue? other)
