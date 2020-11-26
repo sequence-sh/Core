@@ -14,7 +14,6 @@ using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.Util;
 using Xunit.Sdk;
-using Type = System.Type;
 
 namespace Reductech.EDR.Core.TestHarness
 {
@@ -69,22 +68,21 @@ namespace Reductech.EDR.Core.TestHarness
 
             void SetStepList(PropertyInfo property)
             {
-                var currentValue = property.GetValue(instance);
-                if (currentValue == null)
+                if (property.GetValue(instance) is IReadOnlyList<IStep> currentValue)
+                {
+                    var currentValueString =
+                        CreateArrayString(
+                            (currentValue).Select(GetString));
+
+                    values.Add(property.Name, currentValueString);
+                }
+                else
                 {
                     var newValue = CreateStepListOfType(property.PropertyType, 3, ref index);
                     var newValueString = CreateArrayString(newValue.Select(GetString));
 
                     values.Add(property.Name, newValueString);
                     property.SetValue(instance, newValue);
-                }
-                else
-                {
-                    var currentValueString =
-                        CreateArrayString(
-                            (currentValue as IReadOnlyList<IStep>).Select(GetString));
-
-                    values.Add(property.Name, currentValueString);
                 }
 
                 static string CreateArrayString(IEnumerable<string> elements)
@@ -254,7 +252,7 @@ namespace Reductech.EDR.Core.TestHarness
                     Properties = new Dictionary<string, SchemaProperty>()
                 };
                 index++;
-                schema.Properties.Add("MyProp" + index, new SchemaProperty(){Multiplicity = Multiplicity.Any, Type = SchemaPropertyType.Integer});
+                schema.Properties.Add("MyProp" + index, new SchemaProperty{Multiplicity = Multiplicity.Any, Type = SchemaPropertyType.Integer});
                 index++;
                 step = new Constant<Schema>(schema);
             }
@@ -280,11 +278,11 @@ namespace Reductech.EDR.Core.TestHarness
             {
                 var pairs = new List<KeyValuePair<string, EntityValue>>
                 {
-                    new KeyValuePair<string, EntityValue>("Prop1", EntityValue.Create($"Val{index1}"))
+                    new KeyValuePair<string, EntityValue>("Prop1", EntityValue.Create($"Val{index1}", null))
                 };
 
                 index1++;
-                pairs.Add(new KeyValuePair<string, EntityValue>("Prop2", EntityValue.Create($"Val{index1}")));
+                pairs.Add(new KeyValuePair<string, EntityValue>("Prop2", EntityValue.Create($"Val{index1}", null)));
                 index1++;
 
                 var entity = new Entity(pairs.ToImmutableList());

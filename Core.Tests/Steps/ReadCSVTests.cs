@@ -24,8 +24,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                     {
                         EntityStream = new ReadCSV
                         {
-                            Delimiter = Constant(","),
-                            TextStream = new ToStream
+                            Stream = new ToStream
                             {
                                 Text = Constant(
                                         $@"Foo,Bar{Environment.NewLine}Hello,World{Environment.NewLine}Hello 2,World 2")
@@ -33,12 +32,11 @@ namespace Reductech.EDR.Core.Tests.Steps
                         },
                         Action = new Print<Entity>
                         {
-                            Value = new GetVariable<Entity>() { VariableName = VariableName.Entity }
+                            Value = new GetVariable<Entity> { VariableName = VariableName.Entity }
                         }
                     }, Unit.Default,
                     "Foo: Hello, Bar: World",
-                    "Foo: Hello 2, Bar: World 2"
-                );
+                    "Foo: Hello 2, Bar: World 2");
 
 
                 yield return new StepCase("Read CSV and print all lines should ignore missing columns",
@@ -46,8 +44,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                     {
                         EntityStream = new ReadCSV
                         {
-                            Delimiter = Constant(","),
-                            TextStream = new ToStream
+                            Stream = new ToStream
                             {
                                 Text = Constant(
                                         $@"Foo{Environment.NewLine}Hello,World{Environment.NewLine}Hello 2,World 2")
@@ -59,8 +56,27 @@ namespace Reductech.EDR.Core.Tests.Steps
                         }
                     }, Unit.Default,
                     "Foo: Hello",
-                    "Foo: Hello 2"
-                );
+                    "Foo: Hello 2");
+
+
+                yield return new StepCase("Read CSV and print all lines should ignore comments",
+                    new ForEachEntity
+                    {
+                        EntityStream = new ReadCSV
+                        {
+                            Stream = new ToStream
+                            {
+                                Text = Constant(
+                                        $@"#this is a comment{Environment.NewLine}Foo{Environment.NewLine}Hello,World{Environment.NewLine}Hello 2,World 2")
+                            }
+                        },
+                        Action = new Print<Entity>
+                        {
+                            Value = new GetVariable<Entity> { VariableName = VariableName.Entity }
+                        }
+                    }, Unit.Default,
+                    "Foo: Hello",
+                    "Foo: Hello 2");
 
 
             }
@@ -87,11 +103,12 @@ namespace Reductech.EDR.Core.Tests.Steps
                 var (step, _) = CreateStepWithDefaultOrArbitraryValues();
 
                 const string expectedYaml = @"Do: ReadCSV
-CommentToken: 'Bar0'
-Delimiter: ','
+Stream: 'Baz0'
 Encoding: EncodingEnum.Default
-IgnoreQuotes: False
-TextStream: 'Baz1'";
+Delimiter: ','
+CommentCharacter: '#'
+QuoteCharacter: '""'
+MultiValueDelimiter: ''";
 
 
 

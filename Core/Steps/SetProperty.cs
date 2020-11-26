@@ -7,7 +7,6 @@ using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
-using Reductech.EDR.Core.Util;
 using Entity = Reductech.EDR.Core.Entities.Entity;
 
 namespace Reductech.EDR.Core.Steps
@@ -30,7 +29,7 @@ namespace Reductech.EDR.Core.Steps
             var value = await Value.Run(stateMonad, cancellationToken);
             if (value.IsFailure) return value.ConvertFailure<Entity>();
 
-            var entityValue = EntityValue.Create(value.Value?.ToString());
+            var entityValue = EntityValue.Create(value.Value?.ToString(), null);
 
             var newEntity = entity.Value.WithField(property.Value, entityValue);
 

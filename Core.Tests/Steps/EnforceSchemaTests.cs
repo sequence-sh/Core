@@ -63,12 +63,12 @@ namespace Reductech.EDR.Core.Tests.Steps
                 yield return CreateCase("Cast bool",
                     EntityStream.Create(CreateEntity(("Foo", "true"))),
                         CreateSchema("Test Schema", false, ("Foo", SchemaPropertyType.Bool, Multiplicity.ExactlyOne)),
-                        "Foo: true");
+                        "Foo: True");
 
                 yield return CreateCase("Cast date time",
                     EntityStream.Create(CreateEntity(("Foo", "11/10/2020 3:45:44 PM"))),
                         CreateSchema("Test Schema", false, ("Foo", SchemaPropertyType.Date, Multiplicity.ExactlyOne)),
-                    "Foo: 11/10/2020 3:45:44 PM");
+                    "Foo: 2020/11/10 15:45:44");
 
 
                 yield return CreateCase("Cast multiple values",

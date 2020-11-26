@@ -10,10 +10,10 @@ using Xunit.Abstractions;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
-    public class WriteCSVTests : StepTestBase<WriteCSV, Stream>
+    public class WriteConcordanceTests : StepTestBase<WriteConcordance, Stream>
     {
         /// <inheritdoc />
-        public WriteCSVTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
+        public WriteConcordanceTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
         {
         }
 
@@ -22,43 +22,46 @@ namespace Reductech.EDR.Core.Tests.Steps
         {
             get
             {
-                yield return new StepCase("Write Simple CSV",
+                yield return new StepCase("Write Simple Concordance",
 
                     new Print<string>
                     {
                         Value = new FromStream
                         {
-                            Stream = new WriteCSV
+                            Stream = new WriteConcordance()
                             {
                                 Entities = new Constant<EntityStream>(EntityStream.Create(
-                                            CreateEntity(("Foo", "Hello"), ("Bar", "World")),
-                                            CreateEntity(("Foo", "Hello 2"), ("Bar", "World 2"))
+                                    CreateEntity(("Foo", "Hello"), ("Bar", "World")),
+                                    CreateEntity(("Foo", "Hello 2"), ("Bar", "World 2"))
 
-                                        ))
+                                ))
                             }
                         }
                     }, Unit.Default,
-                    $"Foo,Bar{Environment.NewLine}Hello,World{Environment.NewLine}Hello 2,World 2{Environment.NewLine}"
+                    $"þFooþþBarþ{ Environment.NewLine }þHelloþþWorldþ{ Environment.NewLine }þHello 2þþWorld 2þ{Environment.NewLine}"
                 );
 
-                yield return new StepCase("Write Simple CSV with tab delimiter",
+                yield return new StepCase("Write Simple Concordance MultiValue",
 
                     new Print<string>
                     {
                         Value = new FromStream
                         {
-                            Stream = new WriteCSV
+                            Stream = new WriteConcordance
                             {
                                 Entities = new Constant<EntityStream>(EntityStream.Create(
-                                            CreateEntity(("Foo", "Hello"), ("Bar", "World")),
-                                            CreateEntity(("Foo", "Hello 2"), ("Bar", "World 2"))
 
-                                        )),
-                                Delimiter = Constant("\t")
+                                    new Entity(
+                                        new KeyValuePair<string, EntityValue>("Foo", EntityValue.Create("Hello")),
+                                        new KeyValuePair<string, EntityValue>("Bar", EntityValue.Create(new []{"World", "Earth"}))),
+                                    new Entity(
+                                        new KeyValuePair<string, EntityValue>("Foo", EntityValue.Create("Hello 2")),
+                                        new KeyValuePair<string, EntityValue>("Bar", EntityValue.Create(new[] { "World 2", "Earth 2" })))
+                                ))
                             }
                         }
                     }, Unit.Default,
-                    $"Foo\tBar{Environment.NewLine}Hello\tWorld{Environment.NewLine}Hello 2\tWorld 2{Environment.NewLine}"
+                    $"þFooþþBarþ{ Environment.NewLine }þHelloþþWorld|Earthþ{ Environment.NewLine }þHello 2þþWorld 2|Earth 2þ{Environment.NewLine}"
                 );
             }
         }
@@ -68,15 +71,15 @@ namespace Reductech.EDR.Core.Tests.Steps
         {
             get
             {
-                var expectedYaml = @"Do: WriteCSV
+                var expectedYaml = @"Do: WriteConcordance
 Entities:
 - (Prop1 = 'Val0',Prop2 = 'Val1')
 - (Prop1 = 'Val2',Prop2 = 'Val3')
 - (Prop1 = 'Val4',Prop2 = 'Val5')
 Encoding: EncodingEnum.Default
-Delimiter: ','
-QuoteCharacter: '""'
-AlwaysQuote: False
+Delimiter: ""\x14""
+QuoteCharacter: 'þ'
+AlwaysQuote: True
 MultiValueDelimiter: '|'
 DateTimeFormat: 'yyyy/MM/dd H:mm:ss'";
 
@@ -88,5 +91,6 @@ DateTimeFormat: 'yyyy/MM/dd H:mm:ss'";
                 yield return case1;
             }
         }
+
     }
 }
