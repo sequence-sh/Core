@@ -11,7 +11,8 @@ using Reductech.EDR.Core.Internal.Errors;
 namespace Reductech.EDR.Core.Steps
 {
     /// <summary>
-    /// Extracts entities from a CSV file
+    /// Extracts entities from a CSV file.
+    /// The same as ReadConcordance but with different default values.
     /// </summary>
     public sealed class ReadCSV : CompoundStep<EntityStream>
     {
@@ -89,6 +90,7 @@ namespace Reductech.EDR.Core.Steps
 
     /// <summary>
     /// Extracts entities from a CSV Stream
+    /// The same as ReadConcordance but with different default values.
     /// </summary>
     public sealed class ReadCsvStepFactory : SimpleStepFactory<ReadCSV, EntityStream>
     {

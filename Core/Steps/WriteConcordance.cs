@@ -11,35 +11,35 @@ using Reductech.EDR.Core.Internal.Errors;
 namespace Reductech.EDR.Core.Steps
 {
     /// <summary>
-    /// Extracts entities from a Concordance stream.
-    /// The same as ReadCSV but with different default values.
+    /// Write entities to a stream in concordance format.
+    /// The same as WriteCSV but with different default values.
     /// </summary>
-    public sealed class ReadConcordance : CompoundStep<EntityStream>
+    public sealed class WriteConcordance : CompoundStep<Stream>
     {
         /// <inheritdoc />
-        public override async Task<Result<EntityStream, IError>> Run(IStateMonad stateMonad, CancellationToken cancellationToken)
+        public override async Task<Result<Stream, IError>> Run(IStateMonad stateMonad,
+            CancellationToken cancellationToken)
         {
-            var result = await CSVReader.ReadCSV(
-                stateMonad,
-                Stream,
+            var result = await CSVWriter.WriteCSV(stateMonad,
+                Entities,
                 Delimiter,
                 Encoding,
-                CommentCharacter,
                 QuoteCharacter,
-                MultiValueDelimiter,
-                new StepErrorLocation(this),
-                cancellationToken);
+                AlwaysQuote, MultiValueDelimiter,
+                DateTimeFormat, new StepErrorLocation(this), cancellationToken);
 
             return result;
         }
 
+        /// <inheritdoc />
+        public override IStepFactory StepFactory => WriteConcordanceStepFactory.Instance;
 
         /// <summary>
-        /// Stream containing the CSV data.
+        /// The entities to write.
         /// </summary>
         [StepProperty(Order = 1)]
         [Required]
-        public IStep<Stream> Stream { get; set; } = null!;
+        public IStep<EntityStream> Entities { get; set; } = null!;
 
         /// <summary>
         /// How the stream is encoded.
@@ -52,26 +52,24 @@ namespace Reductech.EDR.Core.Steps
         /// The delimiter to use to separate fields.
         /// </summary>
         [StepProperty(Order = 3)]
-        [DefaultValueExplanation("\\u0014")]
+        [DefaultValueExplanation("\u0014")]
         public IStep<string> Delimiter { get; set; } = new Constant<string>("\u0014");
-
-        /// <summary>
-        /// The token to use to indicate comments.
-        /// Must be a single character, or an empty string.
-        /// If it is empty, then comments cannot be indicated
-        /// </summary>
-        [StepProperty(Order = 4)]
-        [DefaultValueExplanation("#")]
-        public IStep<string> CommentCharacter { get; set; } = new Constant<string>("#"); //TODO enable char property type
 
         /// <summary>
         /// The quote character to use.
         /// Should be a single character or an empty string.
         /// If it is empty then strings cannot be quoted.
         /// </summary>
-        [StepProperty(Order = 5)]
+        [StepProperty(Order = 4)]
         [DefaultValueExplanation("\u00FE")]
         public IStep<string> QuoteCharacter { get; set; } = new Constant<string>("\u00FE");
+
+        /// <summary>
+        /// Whether to always quote all fields and headers.
+        /// </summary>
+        [StepProperty(Order = 4)]
+        [DefaultValueExplanation("false")]
+        public IStep<bool> AlwaysQuote { get; set; } = new Constant<bool>(true);
 
         /// <summary>
         /// The multi value delimiter character to use.
@@ -79,24 +77,30 @@ namespace Reductech.EDR.Core.Steps
         /// If it is empty then fields cannot have multiple fields.
         /// </summary>
         [StepProperty(Order = 6)]
-        [DefaultValueExplanation("|")]
+        [DefaultValueExplanation("")]
         public IStep<string> MultiValueDelimiter { get; set; } = new Constant<string>("|");
 
-        /// <inheritdoc />
-        public override IStepFactory StepFactory => ReadConcordanceStepFactory.Instance;
+        /// <summary>
+        /// The format to use for DateTime fields.
+        /// </summary>
+        [StepProperty(Order = 7)]
+        [DefaultValueExplanation("yyyy/MM/dd H:mm:ss")]
+        public IStep<string> DateTimeFormat { get; set; } = new Constant<string>("yyyy/MM/dd H:mm:ss");
     }
 
+
+
     /// <summary>
-    /// Extracts entities from a Concordance stream.
-    /// The same as ReadCSV but with different default values.
+    /// Write entities to a stream in concordance format.
+    /// The same as WriteCSV but with different default values.
     /// </summary>
-    public sealed class ReadConcordanceStepFactory : SimpleStepFactory<ReadConcordance, EntityStream>
+    public sealed class WriteConcordanceStepFactory : SimpleStepFactory<WriteConcordance, Stream>
     {
-        private ReadConcordanceStepFactory() {}
+        private WriteConcordanceStepFactory() { }
 
         /// <summary>
         /// The instance.
         /// </summary>
-        public static SimpleStepFactory<ReadConcordance, EntityStream> Instance { get; } = new ReadConcordanceStepFactory();
+        public static SimpleStepFactory<WriteConcordance, Stream> Instance { get; } = new WriteConcordanceStepFactory();
     }
 }

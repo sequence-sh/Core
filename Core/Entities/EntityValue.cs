@@ -22,7 +22,7 @@ namespace Reductech.EDR.Core.Entities
         /// <summary>
         /// Create a new EntityValue from an original string.
         /// </summary>
-        public static EntityValue Create(string? original, char? multiValueDelimiter)
+        public static EntityValue Create(string? original, char? multiValueDelimiter = null)
         {
             if(string.IsNullOrWhiteSpace(original))
                 return new EntityValue(DBNull.Value);

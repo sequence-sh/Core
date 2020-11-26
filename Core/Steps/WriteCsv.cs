@@ -12,6 +12,7 @@ namespace Reductech.EDR.Core.Steps
 {
     /// <summary>
     /// Write entities to a stream in csv format.
+    /// The same as WriteConcordance but with different default values.
     /// </summary>
     public sealed class WriteCSV : CompoundStep<Stream>
     {
@@ -89,6 +90,7 @@ namespace Reductech.EDR.Core.Steps
 
     /// <summary>
     /// Write entities to a stream in csv format.
+    /// The same as WriteConcordance but with different default values.
     /// </summary>
     public sealed class WriteCsvFactory : SimpleStepFactory<WriteCSV, Stream>
     {
