@@ -13,7 +13,7 @@ namespace Reductech.EDR.Core.Steps
     /// <summary>
     /// Counts the elements in an array.
     /// </summary>
-    public sealed class Length<T> : CompoundStep<int>
+    public sealed class ArrayLength<T> : CompoundStep<int>
     {
         /// <summary>
         /// The array to count.
@@ -29,23 +29,23 @@ namespace Reductech.EDR.Core.Steps
         }
 
         /// <inheritdoc />
-        public override IStepFactory StepFactory => LengthStepFactory.Instance;
+        public override IStepFactory StepFactory => ArrayLengthStepFactory.Instance;
     }
 
     /// <summary>
     /// Counts the elements in an array.
     /// </summary>
-    public sealed class LengthStepFactory : GenericStepFactory
+    public sealed class ArrayLengthStepFactory : GenericStepFactory
     {
-        private LengthStepFactory() { }
+        private ArrayLengthStepFactory() { }
 
         /// <summary>
         /// The instance.
         /// </summary>
-        public static GenericStepFactory Instance { get; } = new LengthStepFactory();
+        public static GenericStepFactory Instance { get; } = new ArrayLengthStepFactory();
 
         /// <inheritdoc />
-        public override Type StepType => typeof(Length<>);
+        public override Type StepType => typeof(ArrayLength<>);
 
         /// <inheritdoc />
         public override string OutputTypeExplanation => nameof(Int32);
@@ -58,7 +58,7 @@ namespace Reductech.EDR.Core.Steps
             TypeResolver typeResolver)
         {
 
-            var r1 = freezableStepData.GetArgument(nameof(Length<object>.Array), TypeName)
+            var r1 = freezableStepData.GetArgument(nameof(ArrayLength<object>.Array), TypeName)
                 .MapError(x=>x.WithLocation(this, freezableStepData))
                 .Bind(x => x.TryGetOutputTypeReference(typeResolver))
                 .Bind(x => x.TryGetGenericTypeReference(typeResolver, 0)

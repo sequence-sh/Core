@@ -7,7 +7,7 @@ using Xunit.Abstractions;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
-    public class IsEmptyTests : StepTestBase<IsEmpty<string>, bool>
+    public class IsEmptyTests : StepTestBase<ArrayIsEmpty<string>, bool>
     {
         /// <inheritdoc />
         public IsEmptyTests([NotNull] ITestOutputHelper testOutputHelper) : base(testOutputHelper) {}
@@ -19,17 +19,17 @@ namespace Reductech.EDR.Core.Tests.Steps
             {
 
                 yield return new DeserializeCase("short form empty",
-                    "IsEmpty(Array = [])",
+                    "ArrayIsEmpty(Array = [])",
                     true
                 );
 
                 yield return new DeserializeCase("short form",
-                    "IsEmpty(Array = ['Hello','World'])",
+                    "ArrayIsEmpty(Array = ['Hello','World'])",
                     false
                 );
 
                 yield return new DeserializeCase("long form",
-                    "Do: IsEmpty\nArray: ['Hello','World']",
+                    "Do: ArrayIsEmpty\nArray: ['Hello','World']",
                     false
                 );
             }
@@ -41,7 +41,7 @@ namespace Reductech.EDR.Core.Tests.Steps
             get
             {
                 yield return new StepCase("Empty",
-                    new IsEmpty<string>()
+                    new ArrayIsEmpty<string>()
                     {
                         Array = new Array<string>
                         {
@@ -54,7 +54,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                     }, false);
 
                 yield return new StepCase("Not Empty",
-                    new IsEmpty<string>()
+                    new ArrayIsEmpty<string>()
                     {
                         Array = new Array<string>
                         {

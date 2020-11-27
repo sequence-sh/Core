@@ -106,7 +106,7 @@ namespace Reductech.EDR.Core.Tests
                                     Properties = new Dictionary<string, SchemaProperty>()
                                     {
                                         {"Name", new SchemaProperty{Type = SchemaPropertyType.String}},
-                                        {"Length", new SchemaProperty{Type = SchemaPropertyType.Double}},
+                                        {"ArrayLength", new SchemaProperty{Type = SchemaPropertyType.Double}},
                                         {"Period", new SchemaProperty{Type = SchemaPropertyType.String}},
                                     }
                                 })

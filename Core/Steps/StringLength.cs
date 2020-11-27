@@ -46,7 +46,7 @@ namespace Reductech.EDR.Core.Steps
         public static SimpleStepFactory<StringLength, int> Instance { get; } = new StringLengthStepFactory();
 
         /// <inheritdoc />
-        public override IStepNameBuilder StepNameBuilder => new StepNameBuilderFromTemplate($"Length of [{nameof(StringLength.String)}]");
+        public override IStepNameBuilder StepNameBuilder => new StepNameBuilderFromTemplate($"ArrayLength of [{nameof(StringLength.String)}]");
 
     }
 }

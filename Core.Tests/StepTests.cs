@@ -171,8 +171,8 @@ namespace Reductech.EDR.Core.Tests
                         Operator = Constant(MathOperator.Multiply)
                     }), "6");
 
-                yield return new StepTestCase("Print Length(Array: ['Hello'; 'World'])",
-                    Print(new Length<string>
+                yield return new StepTestCase("Print ArrayLength(Array: ['Hello'; 'World'])",
+                    Print(new ArrayLength<string>
                     {
                         Array = Array(Constant("Hello"),
                             Constant("World"))
@@ -180,16 +180,16 @@ namespace Reductech.EDR.Core.Tests
                     "2"
                 );
 
-                yield return new StepTestCase("Print IsEmpty(Array: [])",
-                    Print(new IsEmpty<string> {Array = Array<string>()}), true.ToString());
+                yield return new StepTestCase("Print ArrayIsEmpty(Array: [])",
+                    Print(new ArrayIsEmpty<string> {Array = Array<string>()}), true.ToString());
 
-                yield return new StepTestCase("Print IsEmpty(Array: ['Hello World'])",
-                    Print(new IsEmpty<string>
+                yield return new StepTestCase("Print ArrayIsEmpty(Array: ['Hello World'])",
+                    Print(new ArrayIsEmpty<string>
                     {
                         Array = Array(Constant(HelloWorldString))
                     }), false.ToString());
 
-                yield return new StepTestCase("Print Length of 'Hello World'",
+                yield return new StepTestCase("Print ArrayLength of 'Hello World'",
                     Print(new StringLength
                     {
                         String = Constant(HelloWorldString)
@@ -366,7 +366,7 @@ namespace Reductech.EDR.Core.Tests
                         Print(GetVariable<string>(FooVariableName))
                     ), HelloWorldString);
 
-                yield return new StepTestCase("Print GetSubstring(Index: 6, Length: 2, String: 'Hello World')",
+                yield return new StepTestCase("Print GetSubstring(Index: 6, ArrayLength: 2, String: 'Hello World')",
                     Print(new GetSubstring
                     {
                         String = Constant(HelloWorldString),
@@ -408,16 +408,16 @@ namespace Reductech.EDR.Core.Tests
                     }
                 }, "I have more config");
 
-                yield return new StepTestCase("AssertTrue(Bool: True)", new AssertTrue
+                yield return new StepTestCase("AssertTrue(Boolean: True)", new AssertTrue
                 {
-                    Bool = Constant(true)
+                    Boolean = Constant(true)
                 });
 
-                yield return new StepTestCase("AssertError(Step: AssertTrue(Bool: False))", new AssertError
+                yield return new StepTestCase("AssertError(Step: AssertTrue(Boolean: False))", new AssertError
                 {
                     Step = new AssertTrue
                     {
-                        Bool = Constant(false)
+                        Boolean = Constant(false)
                     }
                 });
 

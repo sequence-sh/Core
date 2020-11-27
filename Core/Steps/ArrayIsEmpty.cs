@@ -14,7 +14,7 @@ namespace Reductech.EDR.Core.Steps
     /// <summary>
     /// Checks if an array is empty.
     /// </summary>
-    public sealed class IsEmpty<T> : CompoundStep<bool>
+    public sealed class ArrayIsEmpty<T> : CompoundStep<bool>
     {
         /// <summary>
         /// The array to check for emptiness.
@@ -31,23 +31,23 @@ namespace Reductech.EDR.Core.Steps
         }
 
         /// <inheritdoc />
-        public override IStepFactory StepFactory => IsEmptyStepFactory.Instance;
+        public override IStepFactory StepFactory => ArrayIsEmptyStepFactory.Instance;
     }
 
     /// <summary>
     /// Checks if an array is empty.
     /// </summary>
-    public sealed class IsEmptyStepFactory : GenericStepFactory
+    public sealed class ArrayIsEmptyStepFactory : GenericStepFactory
     {
-        private IsEmptyStepFactory() { }
+        private ArrayIsEmptyStepFactory() { }
 
         /// <summary>
         /// The instance.
         /// </summary>
-        public static GenericStepFactory Instance { get; } = new IsEmptyStepFactory();
+        public static GenericStepFactory Instance { get; } = new ArrayIsEmptyStepFactory();
 
         /// <inheritdoc />
-        public override Type StepType => typeof(IsEmpty<>);
+        public override Type StepType => typeof(ArrayIsEmpty<>);
 
         /// <inheritdoc />
         public override string OutputTypeExplanation => nameof(Boolean);
@@ -58,7 +58,7 @@ namespace Reductech.EDR.Core.Steps
         /// <inheritdoc />
         protected override Result<ITypeReference, IError> GetMemberType(FreezableStepData freezableStepData,
             TypeResolver typeResolver) =>
-            freezableStepData.GetArgument(nameof(IsEmpty<object>.Array), TypeName)
+            freezableStepData.GetArgument(nameof(ArrayIsEmpty<object>.Array), TypeName)
                 .MapError(e=>e.WithLocation(this, freezableStepData))
                 .Bind(x => x.TryGetOutputTypeReference(typeResolver))
                 .Bind(x=>x.TryGetGenericTypeReference(typeResolver, 0)

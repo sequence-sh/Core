@@ -8,7 +8,7 @@ using Xunit.Abstractions;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
-    public class LengthTests : StepTestBase<Length<string>, int>
+    public class LengthTests : StepTestBase<ArrayLength<string>, int>
     {
         /// <inheritdoc />
         public LengthTests([NotNull] ITestOutputHelper testOutputHelper) : base(testOutputHelper)
@@ -21,12 +21,12 @@ namespace Reductech.EDR.Core.Tests.Steps
             get
             {
                 yield return new DeserializeCase("short form",
-                    "Length(Array = ['Hello','World'])",
+                    "ArrayLength(Array = ['Hello','World'])",
                     2
                     );
 
                 yield return new DeserializeCase("long form",
-                    "Do: Length\nArray: ['Hello','World']",
+                    "Do: ArrayLength\nArray: ['Hello','World']",
                     2
                     );
             }
@@ -37,7 +37,7 @@ namespace Reductech.EDR.Core.Tests.Steps
             get
             {
                 yield return new StepCase("Hello World",
-                    new Length<string>
+                    new ArrayLength<string>
                     {
                         Array = new Array<string>
                         {
@@ -51,7 +51,7 @@ namespace Reductech.EDR.Core.Tests.Steps
 
 
                 yield return new StepCase("Hello World multiline",
-                    new Length<string>
+                    new ArrayLength<string>
                     {
                         Array = new Array<string>
                         {

@@ -43,7 +43,7 @@ namespace Reductech.EDR.Core.Tests
                 yield return new ErrorTestFunction("Test assert",
                     new AssertTrue
                     {
-                        Bool = new Constant<bool>(false)
+                        Boolean = new Constant<bool>(false)
                     }, new ErrorBuilder($"Assertion Failed '{false}'", ErrorCode.IndexOutOfBounds));
 
 
@@ -79,7 +79,7 @@ namespace Reductech.EDR.Core.Tests
                     {
                         Step = new AssertTrue
                         {
-                            Bool = new Constant<bool>(true)
+                            Boolean = new Constant<bool>(true)
                         }
                     }, new ErrorBuilder("Expected an error but step was successful.", ErrorCode.AssertionFailed));
 
