@@ -81,8 +81,9 @@ namespace Reductech.EDR.Core.Steps
         /// The format to use for DateTime fields.
         /// </summary>
         [StepProperty(Order = 7)]
-        [DefaultValueExplanation("yyyy/MM/dd H:mm:ss")]
-        public IStep<string> DateTimeFormat { get; set; } = new Constant<string>("yyyy/MM/dd H:mm:ss");
+        [DefaultValueExplanation("O - ISO 8601 compliant - e.g. 2009-06-15T13:45:30.0000000-07:00")]
+        [Example("yyyy/MM/dd HH:mm:ss")]
+        public IStep<string> DateTimeFormat { get; set; } = new Constant<string>("O");
 
         /// <inheritdoc />
         public override IStepFactory StepFactory => ToCSVFactory.Instance;
