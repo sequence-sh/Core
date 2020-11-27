@@ -18,12 +18,12 @@ namespace Reductech.EDR.Core.Tests.Steps
         {
             get
             {
-                var expected1 = Path.Combine("Hello", "World");
+                var expected1 = Path.Combine("C:/", "Hello", "World");
 
 
                 yield return new StepCase("Non Relative", new PathCombine
                 {
-                    Paths = new Constant<List<string>>(new List<string>{"Hello", "World"})
+                    Paths = new Constant<List<string>>(new List<string>{"C:/", "Hello", "World"})
                 }, expected1
                     );
 
@@ -34,18 +34,8 @@ namespace Reductech.EDR.Core.Tests.Steps
                 yield return new StepCase("Relative", new PathCombine
                 {
                     Paths = Constant(new List<string> { "Hello", "World" }),
-                    IsRelative = Constant(true)
                 }, expected2)
                     .WithFileSystemAction(x=>x.Setup(a=>a.GetCurrentDirectory()).Returns(currentDirectory));
-            }
-        }
-
-        public static bool IsLinux
-        {
-            get
-            {
-                int p = (int)Environment.OSVersion.Platform;
-                return (p == 4) || (p == 6) || (p == 128);
             }
         }
 
