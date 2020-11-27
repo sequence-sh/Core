@@ -9,7 +9,7 @@ using Xunit.Abstractions;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
-    public class ReadCSVTests : StepTestBase<ReadCSV, EntityStream>
+    public class ReadCSVTests : StepTestBase<FromCSV, EntityStream>
     {
         /// <inheritdoc />
         public ReadCSVTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper) {}
@@ -22,7 +22,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                 yield return new StepCase("Read CSV and print all lines",
                     new EntityForEach
                     {
-                        EntityStream = new ReadCSV
+                        EntityStream = new FromCSV
                         {
                             Stream = new ToStream
                             {
@@ -42,7 +42,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                 yield return new StepCase("Read CSV and print all lines should ignore missing columns",
                     new EntityForEach
                     {
-                        EntityStream = new ReadCSV
+                        EntityStream = new FromCSV
                         {
                             Stream = new ToStream
                             {
@@ -62,7 +62,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                 yield return new StepCase("Read CSV and print all lines should ignore comments",
                     new EntityForEach
                     {
-                        EntityStream = new ReadCSV
+                        EntityStream = new FromCSV
                         {
                             Stream = new ToStream
                             {
@@ -102,7 +102,7 @@ namespace Reductech.EDR.Core.Tests.Steps
             {
                 var (step, _) = CreateStepWithDefaultOrArbitraryValues();
 
-                const string expectedYaml = @"Do: ReadCSV
+                const string expectedYaml = @"Do: FromCSV
 Stream: 'Baz0'
 Encoding: EncodingEnum.Default
 Delimiter: ','

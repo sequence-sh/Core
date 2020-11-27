@@ -11,20 +11,21 @@ using Reductech.EDR.Core.Internal.Errors;
 namespace Reductech.EDR.Core.Steps
 {
     /// <summary>
-    /// Extracts entities from a Concordance stream.
-    /// The same as FromCSV but with different default values.
+    /// Extracts entities from a CSV file.
+    /// The same as FromConcordance but with different default values.
     /// </summary>
-    public sealed class FromConcordance : CompoundStep<EntityStream>
+    public sealed class FromCSV : CompoundStep<EntityStream>
     {
         /// <inheritdoc />
-        public override async Task<Result<EntityStream, IError>> Run(IStateMonad stateMonad, CancellationToken cancellationToken)
+        public override async Task<Result<EntityStream, IError>> Run(IStateMonad stateMonad,
+            CancellationToken cancellationToken)
         {
             var result = await CSVReader.ReadCSV(
                 stateMonad,
                 Stream,
                 Delimiter,
                 Encoding,
-                new Constant<string>(""),
+                CommentCharacter,
                 QuoteCharacter,
                 MultiValueDelimiter,
                 new StepErrorLocation(this),
@@ -32,7 +33,6 @@ namespace Reductech.EDR.Core.Steps
 
             return result;
         }
-
 
         /// <summary>
         /// Stream containing the CSV data.
@@ -52,9 +52,17 @@ namespace Reductech.EDR.Core.Steps
         /// The delimiter to use to separate fields.
         /// </summary>
         [StepProperty(Order = 3)]
-        [DefaultValueExplanation("\\u0014 - DC4")]
-        public IStep<string> Delimiter { get; set; } = new Constant<string>("\u0014");
+        [DefaultValueExplanation(",")]
+        public IStep<string> Delimiter { get; set; } = new Constant<string>(",");
 
+        /// <summary>
+        /// The token to use to indicate comments.
+        /// Must be a single character, or an empty string.
+        /// If it is empty, then comments cannot be indicated
+        /// </summary>
+        [StepProperty(Order = 4)]
+        [DefaultValueExplanation("#")]
+        public IStep<string> CommentCharacter { get; set; } = new Constant<string>("#");
 
         /// <summary>
         /// The quote character to use.
@@ -62,8 +70,9 @@ namespace Reductech.EDR.Core.Steps
         /// If it is empty then strings cannot be quoted.
         /// </summary>
         [StepProperty(Order = 5)]
-        [DefaultValueExplanation("\u00FE")]
-        public IStep<string> QuoteCharacter { get; set; } = new Constant<string>("\u00FE");
+        [DefaultValueExplanation("\"")]
+        public IStep<string> QuoteCharacter { get; set; } = new Constant<string>("\"");
+
 
         /// <summary>
         /// The multi value delimiter character to use.
@@ -71,24 +80,25 @@ namespace Reductech.EDR.Core.Steps
         /// If it is empty then fields cannot have multiple fields.
         /// </summary>
         [StepProperty(Order = 6)]
-        [DefaultValueExplanation("|")]
-        public IStep<string> MultiValueDelimiter { get; set; } = new Constant<string>("|");
+        [DefaultValueExplanation("")]
+        public IStep<string> MultiValueDelimiter { get; set; } = new Constant<string>("");
 
         /// <inheritdoc />
-        public override IStepFactory StepFactory => FromConcordanceStepFactory.Instance;
+        public override IStepFactory StepFactory => FromCSVStepFactory.Instance;
     }
 
+
     /// <summary>
-    /// Extracts entities from a Concordance stream.
-    /// The same as FromCSV but with different default values.
+    /// Extracts entities from a CSV Stream
+    /// The same as FromConcordance but with different default values.
     /// </summary>
-    public sealed class FromConcordanceStepFactory : SimpleStepFactory<FromConcordance, EntityStream>
+    public sealed class FromCSVStepFactory : SimpleStepFactory<FromCSV, EntityStream>
     {
-        private FromConcordanceStepFactory() {}
+        private FromCSVStepFactory() { }
 
         /// <summary>
         /// The instance.
         /// </summary>
-        public static SimpleStepFactory<FromConcordance, EntityStream> Instance { get; } = new FromConcordanceStepFactory();
+        public static SimpleStepFactory<FromCSV, EntityStream> Instance { get; } = new FromCSVStepFactory();
     }
 }

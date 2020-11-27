@@ -10,7 +10,7 @@ using Xunit.Abstractions;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
-    public class WriteConcordanceTests : StepTestBase<WriteConcordance, Stream>
+    public class WriteConcordanceTests : StepTestBase<ToConcordance, Stream>
     {
         /// <inheritdoc />
         public WriteConcordanceTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
@@ -28,7 +28,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                     {
                         Value = new FromStream
                         {
-                            Stream = new WriteConcordance()
+                            Stream = new ToConcordance()
                             {
                                 Entities = new Constant<EntityStream>(EntityStream.Create(
                                     CreateEntity(("Foo", "Hello"), ("Bar", "World")),
@@ -47,7 +47,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                     {
                         Value = new FromStream
                         {
-                            Stream = new WriteConcordance
+                            Stream = new ToConcordance
                             {
                                 Entities = new Constant<EntityStream>(EntityStream.Create(
 
@@ -71,7 +71,7 @@ namespace Reductech.EDR.Core.Tests.Steps
         {
             get
             {
-                var expectedYaml = @"Do: WriteConcordance
+                var expectedYaml = @"Do: ToConcordance
 Entities:
 - (Prop1 = 'Val0',Prop2 = 'Val1')
 - (Prop1 = 'Val2',Prop2 = 'Val3')

@@ -11,35 +11,32 @@ using Reductech.EDR.Core.Internal.Errors;
 namespace Reductech.EDR.Core.Steps
 {
     /// <summary>
-    /// Extracts entities from a CSV file.
-    /// The same as FromConcordance but with different default values.
+    /// Write entities to a stream in CSV format.
+    /// The same as ToConcordance but with different default values.
     /// </summary>
-    public sealed class ReadCSV : CompoundStep<EntityStream>
+    public sealed class ToCSV : CompoundStep<Stream>
     {
         /// <inheritdoc />
-        public override async Task<Result<EntityStream, IError>> Run(IStateMonad stateMonad,
+        public override async Task<Result<Stream, IError>> Run(IStateMonad stateMonad,
             CancellationToken cancellationToken)
         {
-            var result = await CSVReader.ReadCSV(
-                stateMonad,
-                Stream,
+            var result = await CSVWriter.WriteCSV(stateMonad,
+                Entities,
                 Delimiter,
                 Encoding,
-                CommentCharacter,
                 QuoteCharacter,
-                MultiValueDelimiter,
-                new StepErrorLocation(this),
-                cancellationToken);
+                AlwaysQuote, MultiValueDelimiter,
+                DateTimeFormat, new StepErrorLocation(this), cancellationToken);
 
             return result;
         }
 
         /// <summary>
-        /// Stream containing the CSV data.
+        /// The entities to write.
         /// </summary>
         [StepProperty(Order = 1)]
         [Required]
-        public IStep<Stream> Stream { get; set; } = null!;
+        public IStep<EntityStream> Entities { get; set; } = null!;
 
         /// <summary>
         /// How the stream is encoded.
@@ -56,23 +53,20 @@ namespace Reductech.EDR.Core.Steps
         public IStep<string> Delimiter { get; set; } = new Constant<string>(",");
 
         /// <summary>
-        /// The token to use to indicate comments.
-        /// Must be a single character, or an empty string.
-        /// If it is empty, then comments cannot be indicated
-        /// </summary>
-        [StepProperty(Order = 4)]
-        [DefaultValueExplanation("#")]
-        public IStep<string> CommentCharacter { get; set; } = new Constant<string>("#"); //TODO enable char property type
-
-        /// <summary>
         /// The quote character to use.
         /// Should be a single character or an empty string.
         /// If it is empty then strings cannot be quoted.
         /// </summary>
-        [StepProperty(Order = 5)]
+        [StepProperty(Order = 4)]
         [DefaultValueExplanation("\"")]
         public IStep<string> QuoteCharacter { get; set; } = new Constant<string>("\"");
 
+        /// <summary>
+        /// Whether to always quote all fields and headers.
+        /// </summary>
+        [StepProperty(Order = 4)]
+        [DefaultValueExplanation("false")]
+        public IStep<bool> AlwaysQuote { get; set; } = new Constant<bool>(false);
 
         /// <summary>
         /// The multi value delimiter character to use.
@@ -81,24 +75,30 @@ namespace Reductech.EDR.Core.Steps
         /// </summary>
         [StepProperty(Order = 6)]
         [DefaultValueExplanation("")]
-        public IStep<string> MultiValueDelimiter { get; set; } = new Constant<string>("");
+        public IStep<string> MultiValueDelimiter { get; set; } = new Constant<string>("|");
+
+        /// <summary>
+        /// The format to use for DateTime fields.
+        /// </summary>
+        [StepProperty(Order = 7)]
+        [DefaultValueExplanation("yyyy/MM/dd H:mm:ss")]
+        public IStep<string> DateTimeFormat { get; set; } = new Constant<string>("yyyy/MM/dd H:mm:ss");
 
         /// <inheritdoc />
-        public override IStepFactory StepFactory => ReadCSVStepFactory.Instance;
+        public override IStepFactory StepFactory => ToCSVFactory.Instance;
     }
 
-
     /// <summary>
-    /// Extracts entities from a CSV Stream
-    /// The same as FromConcordance but with different default values.
+    /// Write entities to a stream in CSV format.
+    /// The same as ToConcordance but with different default values.
     /// </summary>
-    public sealed class ReadCSVStepFactory : SimpleStepFactory<ReadCSV, EntityStream>
+    public sealed class ToCSVFactory : SimpleStepFactory<ToCSV, Stream>
     {
-        private ReadCSVStepFactory() { }
+        private ToCSVFactory() { }
 
         /// <summary>
         /// The instance.
         /// </summary>
-        public static SimpleStepFactory<ReadCSV, EntityStream> Instance { get; } = new ReadCSVStepFactory();
+        public static SimpleStepFactory<ToCSV, Stream> Instance { get; } = new ToCSVFactory();
     }
 }

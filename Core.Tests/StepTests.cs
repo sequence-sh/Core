@@ -425,7 +425,7 @@ namespace Reductech.EDR.Core.Tests
                     new EntityForEach
                     {
 
-                        EntityStream = new ReadCSV
+                        EntityStream = new FromCSV
                         {
                             Delimiter = new Constant<string>(","),
                             Stream = new ToStream

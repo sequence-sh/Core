@@ -10,10 +10,10 @@ using Xunit.Abstractions;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
-    public class WriteCSVTests : StepTestBase<WriteCSV, Stream>
+    public class ToCSVTests : StepTestBase<ToCSV, Stream>
     {
         /// <inheritdoc />
-        public WriteCSVTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
+        public ToCSVTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
         {
         }
 
@@ -28,7 +28,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                     {
                         Value = new FromStream
                         {
-                            Stream = new WriteCSV
+                            Stream = new ToCSV
                             {
                                 Entities = new Constant<EntityStream>(EntityStream.Create(
                                             CreateEntity(("Foo", "Hello"), ("Bar", "World")),
@@ -47,7 +47,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                     {
                         Value = new FromStream
                         {
-                            Stream = new WriteCSV
+                            Stream = new ToCSV
                             {
                                 Entities = new Constant<EntityStream>(EntityStream.Create(
                                             CreateEntity(("Foo", "Hello"), ("Bar", "World")),
@@ -68,7 +68,7 @@ namespace Reductech.EDR.Core.Tests.Steps
         {
             get
             {
-                var expectedYaml = @"Do: WriteCSV
+                var expectedYaml = @"Do: ToCSV
 Entities:
 - (Prop1 = 'Val0',Prop2 = 'Val1')
 - (Prop1 = 'Val2',Prop2 = 'Val3')

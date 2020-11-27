@@ -62,9 +62,9 @@ namespace Reductech.EDR.Core.Tests
 - <Folder> = 'C:\Users\wainw\source\repos\Reductech\edr\Examples'
 - <SourceFile> = 'Dinosaurs.csv'
 - <TargetFile> = 'MappedDinosaurs.csv'
-- <EntityStream> = ReadCSV(Stream = ReadFile(Path = PathCombine(Paths = [<Folder>, <SourceFile>])))
+- <EntityStream> = FromCSV(Stream = ReadFile(Path = PathCombine(Paths = [<Folder>, <SourceFile>])))
 - <EntityStream> = EntityMapProperties(EntityStream = <EntityStream>, Mappings = (Name = 'Dinosaur'))
-- <WriteStream> = WriteCSV(Entities = <EntityStream>)
+- <WriteStream> = ToCSV(Entities = <EntityStream>)
 - WriteFile(Path = PathCombine(Paths = [<Folder>, <TargetFile>]), Stream = <WriteStream>)";
 
 
@@ -93,7 +93,7 @@ namespace Reductech.EDR.Core.Tests
                     new SetVariable<EntityStream>
                     {
                         VariableName = new VariableName("EntityStream"),
-                        Value = new ReadCSV{Stream = new ReadFile{Path = new Constant<string>(@"C:\Users\wainw\source\repos\Reductech\edr\Examples\Dinosaurs.csv")}}
+                        Value = new FromCSV{Stream = new ReadFile{Path = new Constant<string>(@"C:\Users\wainw\source\repos\Reductech\edr\Examples\Dinosaurs.csv")}}
                     },
 
                     new SetVariable<Schema>()
@@ -115,7 +115,7 @@ namespace Reductech.EDR.Core.Tests
                     new WriteFile
                     {
                         Path = new PathCombine{Paths = new Constant<List<string>>(new List<string>{"MyFile.txt"})},
-                        Stream = new WriteCSV
+                        Stream = new ToCSV
                         {
                             Entities = new EnforceSchema()
                             {
