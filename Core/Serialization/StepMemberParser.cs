@@ -14,6 +14,7 @@ using Superpower.Tokenizers;
 using Result = CSharpFunctionalExtensions.Result;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Entities;
+using Reductech.EDR.Core.Enums;
 using Reductech.EDR.Core.Internal.Errors;
 using YamlDotNet.Core;
 using Unit = Reductech.EDR.Core.Util.Unit;

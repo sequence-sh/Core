@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Reductech.EDR.Core.Steps
+namespace Reductech.EDR.Core.Enums
 {
     /// <summary>
     /// An operator that can be applied to two numbers.

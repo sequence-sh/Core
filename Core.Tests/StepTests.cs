@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
+using Reductech.EDR.Core.Enums;
 using Reductech.EDR.Core.ExternalProcesses;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Serialization;
@@ -310,7 +311,7 @@ namespace Reductech.EDR.Core.Tests
                         Strings = new ArraySort<string>
                         {
                             Array = Array(Constant("B"), Constant("C"), Constant("A")),
-                            Order = Constant(SortOrder.Ascending)
+                            Descending = Constant(false)
                         }
                     }), "A, B, C");
 
@@ -321,7 +322,7 @@ namespace Reductech.EDR.Core.Tests
                         Strings = new ArraySort<string>
                         {
                             Array = Array(Constant("B"), Constant("C"), Constant("A")),
-                            Order = Constant(SortOrder.Descending)
+                            Descending = Constant(true)
                         }
                     }), "C, B, A");
 

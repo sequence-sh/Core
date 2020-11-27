@@ -1,4 +1,4 @@
-﻿namespace Reductech.EDR.Core.Steps
+﻿namespace Reductech.EDR.Core.Enums
 {
     /// <summary>
     /// The side of the string to trim.

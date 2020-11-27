@@ -20,14 +20,14 @@ namespace Reductech.EDR.Core.Tests.Steps
                 yield return new StepCase("Ascending", new ArraySort<int>()
                 {
                     Array = Array(8,6,7,5,3,0,9),
-                    Order = Constant(SortOrder.Ascending)
+                    Descending = Constant(false)
 
                 }, new List<int>(){0,3,5,6,7,8,9} );
 
                 yield return new StepCase("Descending", new ArraySort<int>()
                 {
                     Array = Array(8, 6, 7, 5, 3, 0, 9),
-                    Order = Constant(SortOrder.Descending)
+                    Descending = Constant(true)
 
                 }, new List<int>() { 9,8,7,6,5,3,0 });
             }

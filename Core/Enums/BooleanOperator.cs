@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Reductech.EDR.Core.Steps
+namespace Reductech.EDR.Core.Enums
 {
     /// <summary>
     /// A boolean operator.
