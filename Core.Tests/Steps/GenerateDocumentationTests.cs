@@ -66,9 +66,9 @@ namespace Reductech.EDR.Core.Tests.Steps
                         "",
                         "|Parameter|Type                         |Required|Summary               |",
                         "|:-------:|:---------------------------:|:------:|:--------------------:|",
-                        "|Start     |`int`                        |☑️      |The left operand.     |",
+                        "|Left     |`int`                        |☑️      |The left operand.     |",
                         "|Operator |[MathOperator](#MathOperator)|☑️      |The operator to apply.|",
-                        "|End    |`int`                        |☑️      |The right operand.    |",
+                        "|Right    |`int`                        |☑️      |The right operand.    |",
                         "",
                         "# Enums",
                         "<a name=\"MathOperator\"></a>",
@@ -131,7 +131,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                         "|:-------:|:---------------------------:|:------:|:-----:|:------------:|:-----------:|:-----:|:---------------:|:---------------:|:----------:|:------:|:----------------:|:-------------:|",
                         "|Alpha    |`int`                        |☑️      |       |Greater than 1|             |1234   |100-300          |201              |Greek 2.1   |Beta    |[Alpha](alpha.com)|               |",
                         "|Beta     |`string`                     |        |       |              |Two hundred  |       |                 |                 |            |Alpha   |                  |               |",
-                        "|Gamma    |[Variable](#Variable)|        |       |              |             |       |                 |                 |            |        |                  |               |",
+                        "|Gamma    |[VariableName](#VariableName)|        |       |              |             |       |                 |                 |            |        |                  |               |",
                         "|Delta    |IStep<`bool`>                |        |       |              |             |       |                 |                 |            |        |                  |,              |",
                         "",
                     }).WithStepFactoryStore(StepFactoryStore.Create(DocumentationExampleStepFactory.Instance));
@@ -169,7 +169,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                         "|:-------:|:---------------------------:|:------:|:-----:|:------------:|:-----------:|:-----:|:---------------:|:---------------:|:----------:|:------:|:----------------:|:-------------:|",
                         "|Alpha    |`int`                        |☑️      |       |Greater than 1|             |1234   |100-300          |201              |Greek 2.1   |Beta    |[Alpha](alpha.com)|               |",
                         "|Beta     |`string`                     |        |       |              |Two hundred  |       |                 |                 |            |Alpha   |                  |               |",
-                        "|Gamma    |[Variable](#Variable)|        |       |              |             |       |                 |                 |            |        |                  |               |",
+                        "|Gamma    |[VariableName](#VariableName)|        |       |              |             |       |                 |                 |            |        |                  |               |",
                         "|Delta    |IStep<`bool`>                |        |       |              |             |       |                 |                 |            |        |                  |,              |",
                         ""
                     }).WithStepFactoryStore(StepFactoryStore.Create(NotStepFactory.Instance, DocumentationExampleStepFactory.Instance));

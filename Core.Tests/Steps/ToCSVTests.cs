@@ -73,12 +73,12 @@ Entities:
 - (Prop1 = 'Val0',Prop2 = 'Val1')
 - (Prop1 = 'Val2',Prop2 = 'Val3')
 - (Prop1 = 'Val4',Prop2 = 'Val5')
-Encoding: EncodingEnum.Default
+Encoding: EncodingEnum.UTF8
 Delimiter: ','
 QuoteCharacter: '""'
 AlwaysQuote: False
 MultiValueDelimiter: '|'
-DateTimeFormat: 'yyyy/MM/dd H:mm:ss'";
+DateTimeFormat: 'O'";
 
 
                 var step = CreateStepWithDefaultOrArbitraryValues();

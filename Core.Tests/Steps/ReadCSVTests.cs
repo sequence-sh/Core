@@ -104,7 +104,7 @@ namespace Reductech.EDR.Core.Tests.Steps
 
                 const string expectedYaml = @"Do: FromCSV
 Stream: 'Baz0'
-Encoding: EncodingEnum.Default
+Encoding: EncodingEnum.UTF8
 Delimiter: ','
 CommentCharacter: '#'
 QuoteCharacter: '""'

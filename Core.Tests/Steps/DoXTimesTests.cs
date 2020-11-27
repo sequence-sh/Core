@@ -6,10 +6,10 @@ using Xunit.Abstractions;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
-    public class RepeatXTimesTests : StepTestBase<DoXTimes, Unit>
+    public class DoXTimesTests : StepTestBase<DoXTimes, Unit>
     {
         /// <inheritdoc />
-        public RepeatXTimesTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
+        public DoXTimesTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
         {
         }
 

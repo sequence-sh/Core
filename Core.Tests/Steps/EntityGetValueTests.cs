@@ -6,10 +6,10 @@ using Xunit.Abstractions;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
-    public class GetPropertyTests : StepTestBase<EntityGetValue, string>
+    public class EntityGetValueTests : StepTestBase<EntityGetValue, string>
     {
         /// <inheritdoc />
-        public GetPropertyTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
+        public EntityGetValueTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
         {
         }
 
@@ -67,7 +67,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                 yield return new SerializeCase("default",
                     step.step
                     ,
-@"Do: GetProperty
+@"Do: EntityGetValue
 Entity: (Prop1 = 'Val0',Prop2 = 'Val1')
 Property: 'Bar2'"
 

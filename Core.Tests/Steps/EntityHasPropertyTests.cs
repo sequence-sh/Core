@@ -5,10 +5,10 @@ using Xunit.Abstractions;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
-    public class HasPropertyTests : StepTestBase<EntityHasProperty, bool>
+    public class EntityHasPropertyTests : StepTestBase<EntityHasProperty, bool>
     {
         /// <inheritdoc />
-        public HasPropertyTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
+        public EntityHasPropertyTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
         {
         }
 
@@ -40,7 +40,7 @@ namespace Reductech.EDR.Core.Tests.Steps
             {
                 yield return new SerializeCase("default",
                     CreateStepWithDefaultOrArbitraryValues().step,
-                    @"Do: HasProperty
+                    @"Do: EntityHasProperty
 Entity: (Prop1 = 'Val0',Prop2 = 'Val1')
 Property: 'Bar2'");
             }

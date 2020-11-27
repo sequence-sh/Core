@@ -49,7 +49,7 @@ namespace Reductech.EDR.Core.Steps
         /// <summary>
         /// How the stream is encoded.
         /// </summary>
-        [StepProperty(Order = 2)]
+        [StepProperty(Order = 1)]
         [DefaultValueExplanation("UTF8 no BOM")]
         public IStep<EncodingEnum> Encoding { get; set; } = new Constant<EncodingEnum>(EncodingEnum.UTF8);
 

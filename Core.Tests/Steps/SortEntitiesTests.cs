@@ -25,7 +25,6 @@ namespace Reductech.EDR.Core.Tests.Steps
                     {
                         EntityStream = new EntityStreamSort
                         {
-                            Descending = Constant(true),
                             EntityStream = new Constant<EntityStream>(EntityStream.Create(
                                 CreateEntity(("Foo", "Gamma")),
                                 CreateEntity(("Foo", "Alpha")),
@@ -45,7 +44,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                     {
                         EntityStream = new EntityStreamSort
                         {
-                            Descending = Constant(false),
+                            Descending = Constant(true),
                             EntityStream = new Constant<EntityStream>(EntityStream.Create(
                                 CreateEntity(("Foo", "Gamma")),
                                 CreateEntity(("Foo", "Alpha")),
@@ -97,7 +96,7 @@ EntityStream:
 - (Prop1 = 'Val2',Prop2 = 'Val3')
 - (Prop1 = 'Val4',Prop2 = 'Val5')
 KeySelector: 'Bar6'
-Descending: True"
+Descending: False"
 
                     );
 

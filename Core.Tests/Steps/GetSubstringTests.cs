@@ -36,7 +36,7 @@ namespace Reductech.EDR.Core.Tests.Steps
             get
             {
                 yield return new DeserializeCase("ArrayLength 3",
-                    "GetSubstring(String = 'Hello World', Index = 1, ArrayLength = 3)", "ell");
+                    "GetSubstring(String = 'Hello World', Index = 1, Length = 3)", "ell");
             }
 
         }

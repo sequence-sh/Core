@@ -46,19 +46,19 @@ namespace Reductech.EDR.Core.Steps
         }
 
         /// <inheritdoc />
-        public override IStepFactory StepFactory => RepeatXTimesStepFactory.Instance;
+        public override IStepFactory StepFactory => DoXTimesStepFactory.Instance;
     }
 
     /// <summary>
     /// Repeat a step a set number of times.
     /// </summary>
-    public sealed class RepeatXTimesStepFactory : SimpleStepFactory<DoXTimes, Unit>
+    public sealed class DoXTimesStepFactory : SimpleStepFactory<DoXTimes, Unit>
     {
-        private RepeatXTimesStepFactory() { }
+        private DoXTimesStepFactory() { }
         /// <summary>
         /// The instance.
         /// </summary>
-        public static SimpleStepFactory<DoXTimes, Unit> Instance { get; } = new RepeatXTimesStepFactory();
+        public static SimpleStepFactory<DoXTimes, Unit> Instance { get; } = new DoXTimesStepFactory();
 
 
         /// <inheritdoc />

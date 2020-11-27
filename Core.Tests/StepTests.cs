@@ -164,7 +164,7 @@ namespace Reductech.EDR.Core.Tests
                         }),
                     HelloWorldString);
 
-                yield return new StepTestCase("Print ApplyMathOperator(Start: 2, Operator: *, End: 3)",
+                yield return new StepTestCase("Print ApplyMathOperator(Left: 2, Operator: *, Right: 3)",
                     Print(new ApplyMathOperator
                     {
                         Left = Constant(2),
@@ -229,7 +229,7 @@ namespace Reductech.EDR.Core.Tests
                     (-1).ToString()
                 );
 
-                yield return new StepTestCase("Print Match Repeat(Element: 'Hello', X: 3)", Print(new StringJoin
+                yield return new StepTestCase("Print Match Repeat(Element: 'Hello', Number: 3)", Print(new StringJoin
                 {
                     Delimiter = Constant(", "),
                     Strings = new Repeat<string>
@@ -304,7 +304,7 @@ namespace Reductech.EDR.Core.Tests
                         Else = Constant("World")
                     }), "World");
 
-                yield return new StepTestCase("Print Match ArraySort(Array: ['B'; 'C'; 'A'], Order: Ascending)",
+                yield return new StepTestCase("Print Match ArraySort(Array: ['B'; 'C'; 'A'], Descending: False)",
                     Print(new StringJoin
                     {
                         Delimiter = Constant(", "),
@@ -315,7 +315,7 @@ namespace Reductech.EDR.Core.Tests
                         }
                     }), "A, B, C");
 
-                yield return new StepTestCase("Print Match ArraySort(Array: ['B'; 'C'; 'A'], Order: Descending)",
+                yield return new StepTestCase("Print Match ArraySort(Array: ['B'; 'C'; 'A'], Descending: True)",
                     Print(new StringJoin
                     {
                         Delimiter = Constant(", "),
@@ -367,7 +367,7 @@ namespace Reductech.EDR.Core.Tests
                         Print(GetVariable<string>(FooVariableName))
                     ), HelloWorldString);
 
-                yield return new StepTestCase("Print GetSubstring(Index: 6, ArrayLength: 2, String: 'Hello World')",
+                yield return new StepTestCase("Print GetSubstring(Index: 6, Length: 2, String: 'Hello World')",
                     Print(new GetSubstring
                     {
                         String = Constant(HelloWorldString),

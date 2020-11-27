@@ -74,7 +74,7 @@ namespace Reductech.EDR.Core.Tests
                 ("Missing Parameter 'Value' in 'Print'", "Line: 1, Col: 1, Idx: 0 - Line: 1, Col: 38, Idx: 37"));
 
 
-                yield return new DeserializationErrorCase("Compare(Start = Print(Foo = 1), End = Print(Foo = 2), Operator = Print(Foo = 2))",
+                yield return new DeserializationErrorCase("Compare(Left = Print(Foo = 1), Right = Print(Foo = 2), Operator = Print(Foo = 2))",
                     ("Unexpected Parameter 'Foo' in 'Print'", "Line: 1, Col: 1, Idx: 0 - Line: 1, Col: 82, Idx: 81"),
                 ("Missing Parameter 'Value' in 'Print'", "Line: 1, Col: 1, Idx: 0 - Line: 1, Col: 82, Idx: 81"),
                 ("Unexpected Parameter 'Foo' in 'Print'", "Line: 1, Col: 1, Idx: 0 - Line: 1, Col: 82, Idx: 81"),

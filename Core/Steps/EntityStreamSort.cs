@@ -89,16 +89,16 @@ namespace Reductech.EDR.Core.Steps
 
 
         /// <inheritdoc />
-        public override IStepFactory StepFactory => SortEntitiesStepFactory.Instance;
+        public override IStepFactory StepFactory => EntityStreamSortStepFactory.Instance;
     }
 
     /// <summary>
     /// Reorder entities according to their property values.
     /// Consumes the stream.
     /// </summary>
-    public sealed class SortEntitiesStepFactory : SimpleStepFactory<EntityStreamSort, EntityStream>
+    public sealed class EntityStreamSortStepFactory : SimpleStepFactory<EntityStreamSort, EntityStream>
     {
-        private SortEntitiesStepFactory() { }
+        private EntityStreamSortStepFactory() { }
 
         /// <inheritdoc />
         public override IEnumerable<(VariableName VariableName, ITypeReference typeReference)> FixedVariablesSet =>
@@ -110,7 +110,7 @@ namespace Reductech.EDR.Core.Steps
         /// <summary>
         /// The instance.
         /// </summary>
-        public static SimpleStepFactory<EntityStreamSort, EntityStream> Instance { get; } = new SortEntitiesStepFactory();
+        public static SimpleStepFactory<EntityStreamSort, EntityStream> Instance { get; } = new EntityStreamSortStepFactory();
     }
 
 }
