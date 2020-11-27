@@ -16,7 +16,7 @@ namespace Reductech.EDR.Core.Steps
     /// <summary>
     /// Removes duplicate entities.
     /// </summary>
-    public sealed class DistinctEntities : CompoundStep<EntityStream>
+    public sealed class EntityStreamDistinct : CompoundStep<EntityStream>
     {
         /// <inheritdoc />
         public override async Task<Result<EntityStream, IError>> Run(IStateMonad stateMonad,
@@ -33,6 +33,7 @@ namespace Reductech.EDR.Core.Steps
                 : StringComparer.OrdinalIgnoreCase;
 
             HashSet<string> usedKeys = new HashSet<string>(comparer);
+
             var currentState = stateMonad.GetState().ToImmutableDictionary();
 
             async Task<Maybe<Entity>> FilterAction(Entity record)
@@ -40,7 +41,7 @@ namespace Reductech.EDR.Core.Steps
                 var scopedMonad = new ScopedStateMonad(stateMonad, currentState,
                     new KeyValuePair<VariableName, object>(VariableName.Entity, record));
 
-                var result = await GetKey.Run(scopedMonad, cancellationToken);
+                var result = await KeySelector.Run(scopedMonad, cancellationToken);
 
                 if (result.IsFailure)
                     throw new ErrorException(result.Error);
@@ -68,7 +69,7 @@ namespace Reductech.EDR.Core.Steps
         /// </summary>
         [StepProperty(Order = 2)]
         [Required]
-        public IStep<string> GetKey { get; set; } = null!;
+        public IStep<string> KeySelector { get; set; } = null!;
 
         /// <summary>
         /// Whether comparisons should be case sensitive.
@@ -77,20 +78,20 @@ namespace Reductech.EDR.Core.Steps
         [DefaultValueExplanation("true")]
         public IStep<bool> CaseSensitive { get; set; } = new Constant<bool>(true);
         /// <inheritdoc />
-        public override IStepFactory StepFactory => DistinctEntitiesStepFactory.Instance;
+        public override IStepFactory StepFactory => EntityStreamDistinctStepFactory.Instance;
     }
 
     /// <summary>
     /// Removes duplicate entities.
     /// </summary>
-    public sealed class DistinctEntitiesStepFactory : SimpleStepFactory<DistinctEntities, EntityStream>
+    public sealed class EntityStreamDistinctStepFactory : SimpleStepFactory<EntityStreamDistinct, EntityStream>
     {
-        private DistinctEntitiesStepFactory() {}
+        private EntityStreamDistinctStepFactory() {}
 
         /// <summary>
         /// The instance.
         /// </summary>
-        public static SimpleStepFactory<DistinctEntities, EntityStream> Instance { get; } = new DistinctEntitiesStepFactory();
+        public static SimpleStepFactory<EntityStreamDistinct, EntityStream> Instance { get; } = new EntityStreamDistinctStepFactory();
 
         /// <inheritdoc />
         public override IEnumerable<(VariableName VariableName, ITypeReference typeReference)> FixedVariablesSet
