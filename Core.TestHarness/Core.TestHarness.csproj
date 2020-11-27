@@ -8,9 +8,8 @@
     <IsPackable>true</IsPackable>
     <IsTestProject>false</IsTestProject>
     <Nullable>enable</Nullable>
-    <Version>0.3.0$(VersionSuffix)</Version>
+    <Version>0.4.0$(VersionSuffix)</Version>
   </PropertyGroup>
-
 
   <PropertyGroup>
     <PackageId>Reductech.EDR.Core.TestHarness</PackageId>
@@ -29,13 +28,11 @@
     <Copyright>Copyright (c) 2020 Reductech Ltd</Copyright>
   </PropertyGroup>
 
-
   <ItemGroup>
     <Compile Remove="TestResults\**" />
     <EmbeddedResource Remove="TestResults\**" />
     <None Remove="TestResults\**" />
   </ItemGroup>
-
 
   <ItemGroup>
     <PackageReference Include="FluentAssertions" Version="5.10.3" />
