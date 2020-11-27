@@ -13,16 +13,17 @@ using Entity = Reductech.EDR.Core.Entities.Entity;
 namespace Reductech.EDR.Core.Steps
 {
     /// <summary>
-    /// Reorder entities according to their property values
+    /// Reorder entities according to their property values.
+    /// Consumes the stream.
     /// </summary>
-    public sealed class SortEntities : CompoundStep<EntityStream>
+    public sealed class EntityStreamSort : CompoundStep<EntityStream>
     {
         /// <inheritdoc />
         public override async Task<Result<EntityStream, IError>> Run(IStateMonad stateMonad,
             CancellationToken cancellationToken)
         {
-            var sortAscendingResult = await Descending.Run(stateMonad, cancellationToken);
-            if (sortAscendingResult.IsFailure) return sortAscendingResult.ConvertFailure<EntityStream>();
+            var sortDescending = await Descending.Run(stateMonad, cancellationToken);
+            if (sortDescending.IsFailure) return sortDescending.ConvertFailure<EntityStream>();
 
             var entityStreamResult = await EntityStream.Run(stateMonad, cancellationToken);
             if (entityStreamResult.IsFailure) return entityStreamResult.ConvertFailure<EntityStream>();
@@ -44,7 +45,7 @@ namespace Reductech.EDR.Core.Steps
             {
                 var setResult = stateMonad.SetVariable(VariableName.Entity, entity);
                 if (setResult.IsFailure) return setResult.ConvertFailure<EntityStream>();
-                var propertyValue = await SortBy.Run(stateMonad, cancellationToken);
+                var propertyValue = await KeySelector.Run(stateMonad, cancellationToken);
                 if (propertyValue.IsFailure) return propertyValue.ConvertFailure<EntityStream>();
 
                 list.Add((propertyValue.Value, entity));
@@ -53,9 +54,9 @@ namespace Reductech.EDR.Core.Steps
             stateMonad.RemoveVariable(VariableName.Entity, false);
 
             var sortedList =
-                sortAscendingResult.Value ?
-                    list.OrderBy(x => x.property) :
-                    list.OrderByDescending(x => x.property);
+                sortDescending.Value ?
+                    list.OrderByDescending(x => x.property) :
+                    list.OrderBy(x => x.property);
 
             var resultsList = sortedList.Select(x => x.entity).ToList();
 
@@ -77,7 +78,7 @@ namespace Reductech.EDR.Core.Steps
         /// </summary>
         [StepProperty(Order = 2)]
         [Required]
-        public IStep<string> SortBy { get; set; } = null!;
+        public IStep<string> KeySelector { get; set; } = null!;
 
         /// <summary>
         /// Whether to sort in descending order.
@@ -92,9 +93,10 @@ namespace Reductech.EDR.Core.Steps
     }
 
     /// <summary>
-    /// Reorder entities according to their property values
+    /// Reorder entities according to their property values.
+    /// Consumes the stream.
     /// </summary>
-    public sealed class SortEntitiesStepFactory : SimpleStepFactory<SortEntities, EntityStream>
+    public sealed class SortEntitiesStepFactory : SimpleStepFactory<EntityStreamSort, EntityStream>
     {
         private SortEntitiesStepFactory() { }
 
@@ -108,7 +110,7 @@ namespace Reductech.EDR.Core.Steps
         /// <summary>
         /// The instance.
         /// </summary>
-        public static SimpleStepFactory<SortEntities, EntityStream> Instance { get; } = new SortEntitiesStepFactory();
+        public static SimpleStepFactory<EntityStreamSort, EntityStream> Instance { get; } = new SortEntitiesStepFactory();
     }
 
 }

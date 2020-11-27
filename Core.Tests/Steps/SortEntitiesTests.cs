@@ -8,7 +8,7 @@ using Xunit.Abstractions;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
-    public class SortEntitiesTests : StepTestBase<SortEntities, EntityStream >
+    public class SortEntitiesTests : StepTestBase<EntityStreamSort, EntityStream >
     {
         /// <inheritdoc />
         public SortEntitiesTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
@@ -23,7 +23,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                 yield return new StepCase("Ascending",
                     new EntityForEach
                     {
-                        EntityStream = new SortEntities
+                        EntityStream = new EntityStreamSort
                         {
                             Descending = Constant(true),
                             EntityStream = new Constant<EntityStream>(EntityStream.Create(
@@ -31,7 +31,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                                 CreateEntity(("Foo", "Alpha")),
                                 CreateEntity(("Foo", "Beta"))
                             )),
-                            SortBy = new EntityGetValue {Entity = GetEntityVariable, Property = Constant("Foo")}
+                            KeySelector = new EntityGetValue {Entity = GetEntityVariable, Property = Constant("Foo")}
                         },
                         Action = new Print<Entity> {Value = GetEntityVariable}
 
@@ -43,7 +43,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                     yield return new StepCase("Descending",
                     new EntityForEach
                     {
-                        EntityStream = new SortEntities
+                        EntityStream = new EntityStreamSort
                         {
                             Descending = Constant(false),
                             EntityStream = new Constant<EntityStream>(EntityStream.Create(
@@ -51,7 +51,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                                 CreateEntity(("Foo", "Alpha")),
                                 CreateEntity(("Foo", "Beta"))
                             )),
-                            SortBy = new EntityGetValue { Entity = GetEntityVariable, Property = Constant("Foo") }
+                            KeySelector = new EntityGetValue { Entity = GetEntityVariable, Property = Constant("Foo") }
                         },
                         Action = new Print<Entity> { Value = GetEntityVariable }
 
@@ -64,7 +64,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                 yield return new StepCase("Missing Property",
                 new EntityForEach
                 {
-                    EntityStream = new SortEntities
+                    EntityStream = new EntityStreamSort
                     {
                         Descending = Constant(true),
                         EntityStream = new Constant<EntityStream>(EntityStream.Create(
@@ -73,7 +73,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                             CreateEntity(("Foo", "Beta")),
                             CreateEntity(("Bar", "Delta"))
                         )),
-                        SortBy = new EntityGetValue { Entity = GetEntityVariable, Property = Constant("Foo") }
+                        KeySelector = new EntityGetValue { Entity = GetEntityVariable, Property = Constant("Foo") }
                     },
                     Action = new Print<Entity> { Value = GetEntityVariable }
 
@@ -91,12 +91,12 @@ namespace Reductech.EDR.Core.Tests.Steps
             {
                 yield return new SerializeCase("Default",
                     CreateStepWithDefaultOrArbitraryValues().step,
-                    @"Do: SortEntities
+                    @"Do: EntityStreamSort
 EntityStream:
 - (Prop1 = 'Val0',Prop2 = 'Val1')
 - (Prop1 = 'Val2',Prop2 = 'Val3')
 - (Prop1 = 'Val4',Prop2 = 'Val5')
-SortBy: 'Bar6'
+KeySelector: 'Bar6'
 Descending: True"
 
                     );
