@@ -65,7 +65,7 @@ namespace Reductech.EDR.Core.Tests
 - <EntityStream> = FromCSV(Stream = ReadFile(Path = PathCombine(Paths = [<Folder>, <SourceFile>])))
 - <EntityStream> = EntityMapProperties(EntityStream = <EntityStream>, Mappings = (Name = 'Dinosaur'))
 - <WriteStream> = ToCSV(Entities = <EntityStream>)
-- WriteFile(Path = PathCombine(Paths = [<Folder>, <TargetFile>]), Stream = <WriteStream>)";
+- FileWrite(Path = PathCombine(Paths = [<Folder>, <TargetFile>]), Stream = <WriteStream>)";
 
 
             var sfs = StepFactoryStore.CreateUsingReflection();
@@ -112,7 +112,7 @@ namespace Reductech.EDR.Core.Tests
                                 })
                     },
 
-                    new WriteFile
+                    new FileWrite
                     {
                         Path = new PathCombine{Paths = new Constant<List<string>>(new List<string>{"MyFile.txt"})},
                         Stream = new ToCSV

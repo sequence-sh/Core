@@ -13,7 +13,7 @@ namespace Reductech.EDR.Core.Steps
     /// <summary>
     /// Writes a file to the local file system.
     /// </summary>
-    public sealed class WriteFile  : CompoundStep<Unit>
+    public sealed class FileWrite  : CompoundStep<Unit>
     {
         /// <inheritdoc />
         public override async Task<Result<Unit, IError>> Run(IStateMonad stateMonad,
@@ -44,7 +44,7 @@ namespace Reductech.EDR.Core.Steps
         public IStep<string> Path { get; set; } = null!;
 
         /// <summary>
-        /// The text to write.
+        /// The data to write.
         /// </summary>
         [StepProperty(Order = 2)]
         [Required]
@@ -52,19 +52,19 @@ namespace Reductech.EDR.Core.Steps
 
 
         /// <inheritdoc />
-        public override IStepFactory StepFactory => WriteFileStepFactory.Instance;
+        public override IStepFactory StepFactory => FileWriteStepFactory.Instance;
     }
 
     /// <summary>
     /// Writes a file to the local file system.
     /// </summary>
-    public sealed class WriteFileStepFactory : SimpleStepFactory<WriteFile, Unit>
+    public sealed class FileWriteStepFactory : SimpleStepFactory<FileWrite, Unit>
     {
-        private WriteFileStepFactory() { }
+        private FileWriteStepFactory() { }
 
         /// <summary>
         /// The instance.
         /// </summary>
-        public static SimpleStepFactory<WriteFile, Unit> Instance { get; } = new WriteFileStepFactory();
+        public static SimpleStepFactory<FileWrite, Unit> Instance { get; } = new FileWriteStepFactory();
     }
 }
