@@ -14,69 +14,69 @@ namespace Reductech.EDR.Core.Entities
     /// </summary>
     public sealed class Entity : IEnumerable<KeyValuePair<string, EntityValue>>
     {
-        private readonly ImmutableList<KeyValuePair<string, EntityValue>> _fields;
+        private readonly ImmutableList<KeyValuePair<string, EntityValue>> _properties;
 
         /// <summary>
-        /// The default field name if the Entity represents a single primitive.
+        /// The default property name if the Entity represents a single primitive.
         /// </summary>
         public const string PrimitiveKey = "value";
 
         /// <summary>
         /// Create a new entity
         /// </summary>
-        public Entity(params KeyValuePair<string, EntityValue>[] fields) : this(fields.ToImmutableList()) {}
+        public Entity(params KeyValuePair<string, EntityValue>[] properties) : this(properties.ToImmutableList()) {}
 
         /// <summary>
         /// Create a new entity.
         /// </summary>
-        public Entity(ImmutableList<KeyValuePair<string, EntityValue>> fields) => _fields = fields;
+        public Entity(ImmutableList<KeyValuePair<string, EntityValue>> properties) => _properties = properties;
 
 
         /// <summary>
         /// Create a new entity
         /// </summary>
-        public static Entity Create(IEnumerable<KeyValuePair<string, object>> fields, char? multiValueDelimiter = null)
+        public static Entity Create(IEnumerable<KeyValuePair<string, object>> properties, char? multiValueDelimiter = null)
         {
-            var fieldEntities = fields
+            var propertyEntities = properties
                 .Select(x => new KeyValuePair<string, EntityValue>(x.Key, EntityValue.Create(x.Value.ToString(), multiValueDelimiter)))
                 .ToImmutableList();
 
-            return new Entity(fieldEntities);
+            return new Entity(propertyEntities);
         }
 
         /// <summary>
-        /// Gets the names of different fields on this object.
+        /// Gets the names of different properties on this object.
         /// </summary>
         /// <returns></returns>
-        public IEnumerable<string> GetFieldNames() => _fields.Select(x => x.Key);
+        public IEnumerable<string> GetPropertyNames() => _properties.Select(x => x.Key);
 
 
 
         /// <summary>
-        /// Creates a copy of this with the field added or updated
+        /// Creates a copy of this with the property added or updated
         /// </summary>
-        public Entity WithField(string key, EntityValue value)
+        public Entity WithProperty(string key, EntityValue value)
         {
-            var index = _fields.FindIndex(x => x.Key == key);
+            var index = _properties.FindIndex(x => x.Key == key);
             if (index == -1)
             {
-                var newList = _fields.Add(new KeyValuePair<string, EntityValue>(key, value));
+                var newList = _properties.Add(new KeyValuePair<string, EntityValue>(key, value));
                 return new Entity(newList);
             }
             else
             {
-                var newList = _fields.SetItem(index, new KeyValuePair<string, EntityValue>(key, value));
+                var newList = _properties.SetItem(index, new KeyValuePair<string, EntityValue>(key, value));
                 return new Entity(newList);
             }
         }
 
 
         /// <summary>
-        /// Try to get the value of a particular field
+        /// Try to get the value of a particular property
         /// </summary>
         public bool TryGetValue(string key, out EntityValue? entityValue)
         {
-            var v = _fields.TryFirst(x => x.Key == key);
+            var v = _properties.TryFirst(x => x.Key == key);
             if (v.HasValue)
             {
                 entityValue = v.Value.Value;
@@ -88,7 +88,7 @@ namespace Reductech.EDR.Core.Entities
         }
 
         /// <inheritdoc />
-        public IEnumerator<KeyValuePair<string, EntityValue>> GetEnumerator() => _fields.GetEnumerator();
+        public IEnumerator<KeyValuePair<string, EntityValue>> GetEnumerator() => _properties.GetEnumerator();
 
         /// <inheritdoc />
         public override string ToString() => AsString();
@@ -109,7 +109,7 @@ namespace Reductech.EDR.Core.Entities
 
             var results = new List<Result<string>>();
 
-            foreach (var (key, value) in _fields)
+            foreach (var (key, value) in _properties)
             {
                 value.Value.Switch(_=>{},
                     singleValue=>
@@ -146,7 +146,7 @@ namespace Reductech.EDR.Core.Entities
         {
             IDictionary<string, object> expandoObject = new ExpandoObject();
 
-            foreach (var (key, value) in _fields)
+            foreach (var (key, value) in _properties)
             {
                 value.Value.Switch(_=>{},
                     v=> expandoObject[key] = v,
@@ -163,7 +163,7 @@ namespace Reductech.EDR.Core.Entities
         public string AsString()
         {
             var result = string.Join(", ",
-                _fields.Select(field => $"{field.Key}: {field.Value}"));
+                _properties.Select(property => $"{property.Key}: {property.Value}"));
 
             return result;
         }

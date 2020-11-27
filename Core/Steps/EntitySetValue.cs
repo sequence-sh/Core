@@ -31,7 +31,7 @@ namespace Reductech.EDR.Core.Steps
 
             var entityValue = EntityValue.Create(value.Value?.ToString());
 
-            var newEntity = entity.Value.WithField(property.Value, entityValue);
+            var newEntity = entity.Value.WithProperty(property.Value, entityValue);
 
             return newEntity;
         }
