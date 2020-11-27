@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reflection.Metadata;
 using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
@@ -31,6 +30,7 @@ namespace Reductech.EDR.Core.Tests
         public ITestOutputHelper TestOutputHelper { get; }
 
         [Theory]
+        [Trait("Category", "Integration")]
         [InlineData(@"C:\Users\wainw\source\repos\Reductech\edr\Examples\Sort.yml")]
         [InlineData(@"C:\Users\wainw\source\repos\Reductech\edr\Examples\MapFieldNames.yml")]
         [InlineData(@"C:\Users\wainw\source\repos\Reductech\edr\Examples\ChangeCase.yml")]
@@ -57,6 +57,7 @@ namespace Reductech.EDR.Core.Tests
 
 
         [Fact]
+        [Trait("Category", "Integration")]
         public async Task RunYamlSequence()
         {
             const string yaml = @"
@@ -84,6 +85,7 @@ namespace Reductech.EDR.Core.Tests
 
 
        [Fact]
+       [Trait("Category", "Integration")]
         public async Task RunObjectSequence()
         {
             var step = new WriteFile
