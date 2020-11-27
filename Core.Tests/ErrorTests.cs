@@ -3,6 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.Extensions.Logging.Abstractions;
+using Reductech.EDR.Core.Enums;
 using Reductech.EDR.Core.ExternalProcesses;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
@@ -36,14 +37,14 @@ namespace Reductech.EDR.Core.Tests
                 yield return new ErrorTestFunction("Get Missing Variable",
                     new GetVariable<string>
                     {
-                        VariableName = FooString
+                        Variable = FooString
                     },
                     new ErrorBuilder("Variable '<Foo>' does not exist.", ErrorCode.MissingVariable));
 
-                yield return new ErrorTestFunction("Test assert",
+                yield return new ErrorTestFunction("ValueIf assert",
                     new AssertTrue
                     {
-                        Test = new Constant<bool>(false)
+                        Boolean = new Constant<bool>(false)
                     }, new ErrorBuilder($"Assertion Failed '{false}'", ErrorCode.IndexOutOfBounds));
 
 
@@ -54,7 +55,7 @@ namespace Reductech.EDR.Core.Tests
                         {
                             new SetVariable<int>
                             {
-                                VariableName = FooString,
+                                Variable = FooString,
                                 Value = new Constant<int>(42)
                             },
 
@@ -62,7 +63,7 @@ namespace Reductech.EDR.Core.Tests
                             {
                                 Value = new GetVariable<bool>
                                 {
-                                    VariableName =FooString
+                                    Variable =FooString
                                 }
                             }
                         }
@@ -70,16 +71,16 @@ namespace Reductech.EDR.Core.Tests
                     new ErrorBuilder("Variable '<Foo>' does not have type 'System.Boolean'.", ErrorCode.WrongVariableType)
                         .WithLocation(new GetVariable<bool>
                         {
-                            VariableName = FooString
+                            Variable = FooString
                         })
                 );
 
                 yield return new ErrorTestFunction("Assert Error with succeeding step",
                     new AssertError
                     {
-                        Test = new AssertTrue
+                        Step = new AssertTrue
                         {
-                            Test = new Constant<bool>(true)
+                            Boolean = new Constant<bool>(true)
                         }
                     }, new ErrorBuilder("Expected an error but step was successful.", ErrorCode.AssertionFailed));
 
@@ -116,14 +117,14 @@ namespace Reductech.EDR.Core.Tests
 
 
                 yield return new ErrorTestFunction("Get letter minus one",
-                    new GetLetterAtIndex
+                    new CharAtIndex
                     {
                         Index = new Constant<int>(-1),
                         String = new Constant<string>("Foo")
                     }, new ErrorBuilder("Index was outside the bounds of the string", ErrorCode.IndexOutOfBounds));
 
                 yield return new ErrorTestFunction("Get letter out of bounds",
-                    new GetLetterAtIndex
+                    new CharAtIndex
                     {
                         Index = new Constant<int>(5),
                         String = new Constant<string>("Foo")

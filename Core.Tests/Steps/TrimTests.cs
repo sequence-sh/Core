@@ -1,11 +1,12 @@
 ﻿using System.Collections.Generic;
+using Reductech.EDR.Core.Enums;
 using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.TestHarness;
 using Xunit.Abstractions;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
-    public class TrimTests : StepTestBase<Trim, string>
+    public class TrimTests : StepTestBase<StringTrim, string>
     {
         /// <inheritdoc />
         public TrimTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
@@ -17,22 +18,22 @@ namespace Reductech.EDR.Core.Tests.Steps
         {
             get
             {
-                yield return new StepCase("Trim left", new Trim
+                yield return new StepCase("StringTrim left", new StringTrim
                 {
-                    Side = Constant(TrimSide.Left),
+                    Side = Constant(TrimSide.Start),
                     String = Constant("  word  ")
 
                 }, "word  " );
 
 
-                yield return new StepCase("Trim right", new Trim
+                yield return new StepCase("StringTrim right", new StringTrim
                 {
-                    Side = Constant(TrimSide.Right),
+                    Side = Constant(TrimSide.End),
                     String = Constant("  word  ")
 
                 }, "  word");
 
-                yield return new StepCase("Trim both", new Trim
+                yield return new StepCase("StringTrim both", new StringTrim
                 {
                     Side = Constant(TrimSide.Both),
                     String = Constant("  word  ")
@@ -47,7 +48,7 @@ namespace Reductech.EDR.Core.Tests.Steps
         {
             get
             {
-                yield return new DeserializeCase("Trim left", "Trim(Side = TrimSide.Left, String = '  word  ')", "word  ");
+                yield return new DeserializeCase("StringTrim left", "StringTrim(Side = TrimSide.Start, String = '  word  ')", "word  ");
 
             }
 

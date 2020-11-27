@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using JetBrains.Annotations;
+using Reductech.EDR.Core.Enums;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Steps;
@@ -19,7 +20,7 @@ namespace Reductech.EDR.Core.Tests.Steps
             get
             {
                 yield return new DeserializeCase("Print Divide by zero",
-                    "AssertError(Test = Print(Value = 1 / 0))",
+                    "AssertError(Step = Print(Value = 1 / 0))",
                     Unit.Default);
             } }
 
@@ -30,7 +31,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                 yield return new StepCase("Print divide by zero",
                     new AssertError
                     {
-                        Test = new Print<int>{Value = new ApplyMathOperator()
+                        Step = new Print<int>{Value = new ApplyMathOperator()
                         {
                             Left = Constant(1),
                             Operator = Constant(MathOperator.Divide),
@@ -46,7 +47,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                 yield return new ErrorCase("Successful Step",
                     new AssertError
                     {
-                        Test = new Print<string>
+                        Step = new Print<string>
                         {
                             Value = Constant("Hello World")
                         }

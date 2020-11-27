@@ -29,7 +29,7 @@ namespace Reductech.EDR.Core.Steps
         /// </summary>
         [VariableName]
         [Required]
-        public VariableName VariableName { get; set; }
+        public VariableName Variable { get; set; } //TODO use x
 
         /// <summary>
         /// The elements to iterate over.
@@ -47,7 +47,7 @@ namespace Reductech.EDR.Core.Steps
 
             foreach (var element in elements.Value)
             {
-                var setResult = stateMonad.SetVariable(VariableName, element);
+                var setResult = stateMonad.SetVariable(Variable, element);
                 if (setResult.IsFailure) return setResult.ConvertFailure<Unit>();
 
                 var r = await Action.Run(stateMonad, cancellationToken);
@@ -58,20 +58,20 @@ namespace Reductech.EDR.Core.Steps
         }
 
         /// <inheritdoc />
-        public override IStepFactory StepFactory => ForeachStepFactory.Instance;
+        public override IStepFactory StepFactory => ForEachStepFactory.Instance;
     }
 
     /// <summary>
     /// Do an action for each member of the list.
     /// </summary>
-    public sealed class ForeachStepFactory : GenericStepFactory
+    public sealed class ForEachStepFactory : GenericStepFactory
     {
-        private ForeachStepFactory() { }
+        private ForEachStepFactory() { }
 
         /// <summary>
         /// The instance.
         /// </summary>
-        public static StepFactory Instance { get; } = new ForeachStepFactory();
+        public static StepFactory Instance { get; } = new ForEachStepFactory();
 
         /// <inheritdoc />
         public override Type StepType => typeof(ForEach<>);
@@ -100,6 +100,6 @@ namespace Reductech.EDR.Core.Steps
                 .Map(Maybe<ITypeReference>.From);
 
         /// <inheritdoc />
-        public override IStepNameBuilder StepNameBuilder => new StepNameBuilderFromTemplate($"Foreach [{nameof(ForEach<object>.VariableName)}] in [{nameof(ForEach<object>.Array)}]; [{nameof(ForEach<object>.Action)}]");
+        public override IStepNameBuilder StepNameBuilder => new StepNameBuilderFromTemplate($"Foreach [{nameof(ForEach<object>.Variable)}] in [{nameof(ForEach<object>.Array)}]; [{nameof(ForEach<object>.Action)}]");
     }
 }

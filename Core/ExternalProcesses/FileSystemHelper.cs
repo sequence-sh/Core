@@ -168,5 +168,8 @@ namespace Reductech.EDR.Core.ExternalProcesses
 
             return Unit.Default;
         }
+
+        /// <inheritdoc />
+        public string GetCurrentDirectory() => Directory.GetCurrentDirectory();
     }
 }

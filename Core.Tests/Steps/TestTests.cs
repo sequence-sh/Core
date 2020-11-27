@@ -5,7 +5,7 @@ using Xunit.Abstractions;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
-    public class TestTests : StepTestBase<Test<int>, int>
+    public class TestTests : StepTestBase<ValueIf<int>, int>
     {
         /// <inheritdoc />
         public TestTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
@@ -17,18 +17,18 @@ namespace Reductech.EDR.Core.Tests.Steps
         {
             get
             {
-                yield return new StepCase("Test true", new Test<int>()
+                yield return new StepCase("ValueIf true", new ValueIf<int>()
                 {
                     Condition = Constant(true),
-                    ThenValue = Constant(1),
-                    ElseValue = Constant(2)
+                    Then = Constant(1),
+                    Else = Constant(2)
                 }, 1 );
 
-                yield return new StepCase("Test false", new Test<int>()
+                yield return new StepCase("ValueIf false", new ValueIf<int>()
                 {
                     Condition = Constant(false),
-                    ThenValue = Constant(1),
-                    ElseValue = Constant(2)
+                    Then = Constant(1),
+                    Else = Constant(2)
                 }, 2);
             }
         }
@@ -38,7 +38,7 @@ namespace Reductech.EDR.Core.Tests.Steps
         {
             get
             {
-                yield return new DeserializeCase("Test true", "Test(Condition = true, ThenValue = 1, ElseValue = 2)", 1);
+                yield return new DeserializeCase("ValueIf true", "ValueIf(Condition = true, Then = 1, Else = 2)", 1);
             }
 
         }

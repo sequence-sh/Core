@@ -6,7 +6,7 @@ using Xunit.Abstractions;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
-    public class UnzipTests : StepTestBase<Unzip, Unit>
+    public class UnzipTests : StepTestBase<FileExtract, Unit>
     {
         /// <inheritdoc />
         public UnzipTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
@@ -18,12 +18,12 @@ namespace Reductech.EDR.Core.Tests.Steps
         {
             get
             {
-                yield return new StepCase("Unzip",
-                    new Unzip
+                yield return new StepCase("FileExtract",
+                    new FileExtract
                     {
                         ArchiveFilePath = Constant("Foo"),
-                        DestinationDirectory = Constant("Bar"),
-                        OverwriteFiles = Constant(true)
+                        Destination = Constant("Bar"),
+                        Overwrite = Constant(true)
                     },
                     Unit.Default
                 ).WithFileSystemAction(x=>x.Setup(a=>a.ExtractToDirectory("Foo", "Bar", true)).Returns(Unit.Default));

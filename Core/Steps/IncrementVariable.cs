@@ -25,8 +25,8 @@ namespace Reductech.EDR.Core.Steps
         /// The amount to increment by.
         /// </summary>
         [StepProperty]
-        [Required]
-        public IStep<int> Amount { get; set; } = null!;
+        [DefaultValueExplanation("1")]
+        public IStep<int> Amount { get; set; } = new Constant<int>(1);
 
         /// <inheritdoc />
         public override async Task<Result<Unit, IError>> Run(IStateMonad stateMonad,

@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
+using Reductech.EDR.Core.Enums;
 using Reductech.EDR.Core.ExternalProcesses;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Serialization;
@@ -114,7 +114,7 @@ namespace Reductech.EDR.Core.Tests
                         Action = Print(GetVariable<string>(FooVariableName)),
                         Array = Array(Constant("Hello"),
                             Constant("World")),
-                        VariableName = FooVariableName
+                        Variable = FooVariableName
                     }, "Hello", "World");
 
 
@@ -131,24 +131,23 @@ namespace Reductech.EDR.Core.Tests
                         },
                         Array = Array(Constant("Hello"),
                             Constant("World")),
-                        VariableName = FooVariableName
+                        Variable = FooVariableName
                     }, "Farewell", "Hello", "Farewell", "World");
 
                 yield return new StepTestCase("If True then Print 'Hello World' else Print 'World Hello'",
-                    new Conditional
+                    new If
                     {
                         Condition = Constant(true),
-                        ThenStep = Print(Constant(HelloWorldString)),
-                        ElseStep = Print(Constant("World Hello"))
+                        Then = Print(Constant(HelloWorldString)),
+                        Else = Print(Constant("World Hello"))
                     },
                     HelloWorldString);
 
 
-                yield return new StepTestCase("For <Foo> = 5; <Foo> <= 10; += 2; Print <Foo>",
+                yield return new StepTestCase("For i = 5; i <= 10; += 2; Print <i>",
                     new For
                     {
-                        VariableName = FooVariableName,
-                        Action = Print(GetVariable<int>(FooVariableName)),
+                        Action = Print(GetVariable<int>(VariableName.Index)),
                         From = Constant(5),
                         To = Constant(10),
                         Increment = Constant(2)
@@ -157,7 +156,7 @@ namespace Reductech.EDR.Core.Tests
 
                 yield return new StepTestCase("<Foo> = True; Repeat 'Print 'Hello World'; <Foo> = False' while '<Foo>'",
                     Sequence(SetVariable(FooVariableName, Constant(true)),
-                        new RepeatWhile
+                        new While
                         {
                             Action = Sequence(Print(Constant(HelloWorldString)),
                                 SetVariable(FooVariableName, Constant(false))),
@@ -173,8 +172,8 @@ namespace Reductech.EDR.Core.Tests
                         Operator = Constant(MathOperator.Multiply)
                     }), "6");
 
-                yield return new StepTestCase("Print ArrayCount(Array: ['Hello'; 'World'])",
-                    Print(new ArrayCount<string>
+                yield return new StepTestCase("Print ArrayLength(Array: ['Hello'; 'World'])",
+                    Print(new ArrayLength<string>
                     {
                         Array = Array(Constant("Hello"),
                             Constant("World"))
@@ -191,8 +190,8 @@ namespace Reductech.EDR.Core.Tests
                         Array = Array(Constant(HelloWorldString))
                     }), false.ToString());
 
-                yield return new StepTestCase("Print Length of 'Hello World'",
-                    Print(new LengthOfString
+                yield return new StepTestCase("Print ArrayLength of 'Hello World'",
+                    Print(new StringLength
                     {
                         String = Constant(HelloWorldString)
                     }), "11");
@@ -211,8 +210,8 @@ namespace Reductech.EDR.Core.Tests
                     }), false.ToString()
                 );
 
-                yield return new StepTestCase("Print FirstIndexOfElement(Array: ['Hello'; 'World'], Element: 'World')",
-                    Print(new FirstIndexOfElement<string>
+                yield return new StepTestCase("Print FindElement(Array: ['Hello'; 'World'], Element: 'World')",
+                    Print(new FindElement<string>
                     {
                         Array = Array(Constant("Hello"), Constant("World")),
                         Element = Constant("World")
@@ -221,8 +220,8 @@ namespace Reductech.EDR.Core.Tests
                 );
 
                 yield return new StepTestCase(
-                    "Print FirstIndexOfElement(Array: ['Hello'; 'World'], Element: 'Goodbye')",
-                    Print(new FirstIndexOfElement<string>
+                    "Print FindElement(Array: ['Hello'; 'World'], Element: 'Goodbye')",
+                    Print(new FindElement<string>
                     {
                         Array = Array(Constant("Hello"), Constant("World")),
                         Element = Constant("Goodbye")
@@ -230,10 +229,10 @@ namespace Reductech.EDR.Core.Tests
                     (-1).ToString()
                 );
 
-                yield return new StepTestCase("Print Match Repeat(Element: 'Hello', Number: 3)", Print(new JoinStrings
+                yield return new StepTestCase("Print Match Repeat(Element: 'Hello', Number: 3)", Print(new StringJoin
                 {
                     Delimiter = Constant(", "),
-                    List = new Repeat<string>
+                    Strings = new Repeat<string>
                     {
                         Number = Constant(3),
                         Element = Constant("Hello")
@@ -241,11 +240,11 @@ namespace Reductech.EDR.Core.Tests
                 }), "Hello, Hello, Hello");
 
                 yield return new StepTestCase(
-                    "Print ElementAtIndex(Array: SplitString(Delimiter: ', ', String: 'Hello, World'), Index: 1)",
+                    "Print ElementAtIndex(Array: StringSplit(Delimiter: ', ', String: 'Hello, World'), Index: 1)",
                     Print(
                         new ElementAtIndex<string>
                         {
-                            Array = new SplitString
+                            Array = new StringSplit
                             {
                                 Delimiter = Constant(", "),
                                 String = Constant("Hello, World")
@@ -266,69 +265,69 @@ namespace Reductech.EDR.Core.Tests
 
                     5.ToString());
 
-                yield return new StepTestCase("Print ToCase(Case: Upper, String: 'Hello World')",
-                    Print(new ToCase {Case = Constant(TextCase.Upper), String = Constant(HelloWorldString)}),
+                yield return new StepTestCase("Print StringToCase(Case: Upper, String: 'Hello World')",
+                    Print(new StringToCase {Case = Constant(TextCase.Upper), String = Constant(HelloWorldString)}),
                     "HELLO WORLD");
-                yield return new StepTestCase("Print ToCase(Case: Lower, String: 'Hello World')",
-                    Print(new ToCase {Case = Constant(TextCase.Lower), String = Constant(HelloWorldString)}),
+                yield return new StepTestCase("Print StringToCase(Case: Lower, String: 'Hello World')",
+                    Print(new StringToCase {Case = Constant(TextCase.Lower), String = Constant(HelloWorldString)}),
                     "hello world");
-                yield return new StepTestCase("Print ToCase(Case: Title, String: 'Hello World')",
-                    Print(new ToCase {Case = Constant(TextCase.Title), String = Constant(HelloWorldString)}),
+                yield return new StepTestCase("Print StringToCase(Case: Title, String: 'Hello World')",
+                    Print(new StringToCase {Case = Constant(TextCase.Title), String = Constant(HelloWorldString)}),
                     "Hello World");
 
 
-                yield return new StepTestCase("Print Trim(Side: Left, String: '  Hello World  ')",
-                    Print(new Trim {Side = Constant(TrimSide.Left), String = Constant("  Hello World  ")}),
+                yield return new StepTestCase("Print StringTrim(Side: Start, String: '  Hello World  ')",
+                    Print(new StringTrim {Side = Constant(TrimSide.Start), String = Constant("  Hello World  ")}),
                     "Hello World  ");
-                yield return new StepTestCase("Print Trim(Side: Right, String: '  Hello World  ')",
-                    Print(new Trim {Side = Constant(TrimSide.Right), String = Constant("  Hello World  ")}),
+                yield return new StepTestCase("Print StringTrim(Side: End, String: '  Hello World  ')",
+                    Print(new StringTrim {Side = Constant(TrimSide.End), String = Constant("  Hello World  ")}),
                     "  Hello World");
-                yield return new StepTestCase("Print Trim(Side: Both, String: '  Hello World  ')",
-                    Print(new Trim {Side = Constant(TrimSide.Both), String = Constant("  Hello World  ")}),
+                yield return new StepTestCase("Print StringTrim(Side: Both, String: '  Hello World  ')",
+                    Print(new StringTrim {Side = Constant(TrimSide.Both), String = Constant("  Hello World  ")}),
                     HelloWorldString);
 
 
-                yield return new StepTestCase("Print Test(Condition: True, ElseValue: 'World', ThenValue: 'Hello')",
-                    Print(new Test<string>
+                yield return new StepTestCase("Print ValueIf(Condition: True, Else: 'World', Then: 'Hello')",
+                    Print(new ValueIf<string>
                     {
                         Condition = Constant(true),
-                        ThenValue = Constant("Hello"),
-                        ElseValue = Constant("World")
+                        Then = Constant("Hello"),
+                        Else = Constant("World")
                     }), "Hello");
 
 
-                yield return new StepTestCase("Print Test(Condition: False, ElseValue: 'World', ThenValue: 'Hello')",
-                    Print(new Test<string>
+                yield return new StepTestCase("Print ValueIf(Condition: False, Else: 'World', Then: 'Hello')",
+                    Print(new ValueIf<string>
                     {
                         Condition = Constant(false),
-                        ThenValue = Constant("Hello"),
-                        ElseValue = Constant("World")
+                        Then = Constant("Hello"),
+                        Else = Constant("World")
                     }), "World");
 
-                yield return new StepTestCase("Print Match SortArray(Array: ['B'; 'C'; 'A'], Order: Ascending)",
-                    Print(new JoinStrings
+                yield return new StepTestCase("Print Match ArraySort(Array: ['B'; 'C'; 'A'], Descending: False)",
+                    Print(new StringJoin
                     {
                         Delimiter = Constant(", "),
-                        List = new SortArray<string>
+                        Strings = new ArraySort<string>
                         {
                             Array = Array(Constant("B"), Constant("C"), Constant("A")),
-                            Order = Constant(SortOrder.Ascending)
+                            Descending = Constant(false)
                         }
                     }), "A, B, C");
 
-                yield return new StepTestCase("Print Match SortArray(Array: ['B'; 'C'; 'A'], Order: Descending)",
-                    Print(new JoinStrings
+                yield return new StepTestCase("Print Match ArraySort(Array: ['B'; 'C'; 'A'], Descending: True)",
+                    Print(new StringJoin
                     {
                         Delimiter = Constant(", "),
-                        List = new SortArray<string>
+                        Strings = new ArraySort<string>
                         {
                             Array = Array(Constant("B"), Constant("C"), Constant("A")),
-                            Order = Constant(SortOrder.Descending)
+                            Descending = Constant(true)
                         }
                     }), "C, B, A");
 
                 yield return new StepTestCase("Print First index of ''World'' in ''Hello World, Goodbye World''",
-                    Print(new FirstIndexOf
+                    Print(new FindSubstring
                     {
                         String = Constant("Hello World, Goodbye World"),
                         SubString = Constant("World")
@@ -337,7 +336,7 @@ namespace Reductech.EDR.Core.Tests
                 );
 
                 yield return new StepTestCase("Print Last index of ''World'' in ''Hello World, Goodbye World''",
-                    Print(new LastIndexOf
+                    Print(new FindLastSubstring
                     {
                         String = Constant("Hello World, Goodbye World"),
                         SubString = Constant("World")
@@ -346,7 +345,7 @@ namespace Reductech.EDR.Core.Tests
                 );
 
                 yield return new StepTestCase("Print Get character at index '1' in ''Hello World''",
-                    Print(new GetLetterAtIndex
+                    Print(new CharAtIndex
                     {
                         Index = Constant(1),
                         String = Constant(HelloWorldString)
@@ -354,9 +353,9 @@ namespace Reductech.EDR.Core.Tests
                     }), "e");
 
                 yield return new StepTestCase("Repeat 'Print 'Hello World'' '3' times.",
-                    new RepeatXTimes
+                    new DoXTimes
                     {
-                        Number = Constant(3),
+                        X = Constant(3),
                         Action = Print(Constant(HelloWorldString))
                     }, HelloWorldString, HelloWorldString, HelloWorldString);
 
@@ -385,35 +384,6 @@ namespace Reductech.EDR.Core.Tests
                 );
 
 
-                //var testFolderPath = new Constant<string>(Path.Combine(Directory.GetCurrentDirectory(), "TestFolder"));
-                //var testFilePath = new Constant<string>(Path.Combine(testFolderPath.Value, "Poem.txt"));
-
-                //yield return new StepTestCase("Delete Folder etc",
-                //    new Sequence
-                //    {
-                //        Steps = new List<IStep<Unit>>
-                //        {
-                //            new DeleteItem {Path = testFolderPath},
-                //            new AssertTrue {Test = new Not {Boolean = new DoesDirectoryExist {Path = testFolderPath}}},
-                //            new CreateDirectory {Path = testFolderPath},
-                //            new AssertTrue {Test = new DoesDirectoryExist {Path = testFolderPath}},
-
-                //            new CreateFile {Path = testFilePath, Text = new Constant<string>("Hello World")},
-
-                //            new AssertTrue {Test = new DoesFileExist {Path = testFilePath}},
-
-                //            new AssertTrue
-                //            {
-                //                Test = new DoesFileContain
-                //                    {Path = testFilePath, Text = new Constant<string>("Hello World")}
-                //            },
-                //            new DeleteItem {Path = testFilePath},
-                //            new DeleteItem {Path = testFolderPath},
-                //            new AssertTrue {Test = new Not {Boolean = new DoesDirectoryExist {Path = testFolderPath}}}
-                //        }
-                //    }
-                //) {IgnoreName = true, IgnoreLoggedValues = true};
-
                 yield return new StepTestCase("Print 'I have more config'", new Print<string>
                 {
                     Value = Constant("I have more config"),
@@ -432,41 +402,41 @@ namespace Reductech.EDR.Core.Tests
                             {
                                 MinVersion = new Version(1, 0),
                                 MaxVersion = new Version(2, 0),
-                                Name = "Test",
+                                Name = "ValueIf",
                                 Notes = "ABC123"
                             }
                         }
                     }
                 }, "I have more config");
 
-                yield return new StepTestCase("AssertTrue(Test: True)", new AssertTrue
+                yield return new StepTestCase("AssertTrue(Boolean: True)", new AssertTrue
                 {
-                    Test = Constant(true)
+                    Boolean = Constant(true)
                 });
 
-                yield return new StepTestCase("AssertError(Test: AssertTrue(Test: False))", new AssertError
+                yield return new StepTestCase("AssertError(Step: AssertTrue(Boolean: False))", new AssertError
                 {
-                    Test = new AssertTrue
+                    Step = new AssertTrue
                     {
-                        Test = Constant(false)
+                        Boolean = Constant(false)
                     }
                 });
 
                 yield return new StepTestCase("Read CSV",
-                    new ForEachEntity
+                    new EntityForEach
                     {
 
-                        EntityStream = new ReadCSV
+                        EntityStream = new FromCSV
                         {
                             Delimiter = new Constant<string>(","),
-                            Stream = new ToStream
+                            Stream = new StringToStream
                             {
-                                Text = new Constant<string>(@"Name,Summary
+                                String = new Constant<string>(@"Name,Summary
 One,The first number
 Two,The second number"),
                             }
                         },
-                        Action = new Print<Record>{Value = new GetVariable<Record> {VariableName = VariableName.Entity}}
+                        Action = new Print<Record>{Value = new GetVariable<Record> {Variable = VariableName.Entity}}
                     },
                     "Name: One, Summary: The first number",
                     "Name: Two, Summary: The second number"
@@ -480,7 +450,7 @@ Two,The second number"),
                         Steps = new IStep<Unit>[]{
                             new SetVariable<List<List<string>>>
                             {
-                                VariableName = new VariableName("DataVar"),
+                                Variable = new VariableName("DataVar"),
 
                                 Value = new Array<List<string>>
                                 {
@@ -502,12 +472,12 @@ Two,The second number"),
                             new ForEach<List<string>>
                             {
                                 Array = GetVariable<List<List<string>>>(new VariableName("DataVar")),
-                                VariableName = FooVariableName,
+                                Variable = FooVariableName,
                                 Action = new Print<string>
                                 {
                                     Value = new ElementAtIndex<string>
                                     {
-                                        Array = new GetVariable<List<string>> {VariableName = FooVariableName},
+                                        Array = new GetVariable<List<string>> {Variable = FooVariableName},
                                         Index = new Constant<int>(0)
                                     }
                                 },
@@ -526,7 +496,7 @@ Two,The second number"),
             }
         }
 
-        private static GetVariable<T> GetVariable<T>(VariableName variableName) => new GetVariable<T>{VariableName = variableName};
+        private static GetVariable<T> GetVariable<T>(VariableName variableName) => new GetVariable<T>{Variable = variableName};
 
         private static Constant<T> Constant<T>(T element) => new Constant<T>(element);
 
@@ -536,7 +506,7 @@ Two,The second number"),
         private static SetVariable<T> SetVariable<T>(VariableName variableName, IStep<T> step) =>
             new SetVariable<T>
             {
-                VariableName = variableName,
+                Variable = variableName,
                 Value = step
             };
 
@@ -621,7 +591,7 @@ Two,The second number"),
                     {
                         TargetMachineTags = new List<string>
                         {
-                            "Test Tag"
+                            "ValueIf Tag"
                         }
                     });
                 }

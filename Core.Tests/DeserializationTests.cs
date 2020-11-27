@@ -105,13 +105,13 @@ Value: notable", "notable");//check 'not' delimiter
 
                 yield return new DeserializationTestFunction(@"
 - <ArrayVar> = Array(Elements = ['abc', '123'])
-- Print(Value = ArrayCount(Array = <ArrayVar>))",2);
+- Print(Value = ArrayLength(Array = <ArrayVar>))",2);
 
-                yield return new DeserializationTestFunction(@"Print(Value = ArrayCount(Array = ['abc', '123']))", 2);
+                yield return new DeserializationTestFunction(@"Print(Value = ArrayLength(Array = ['abc', '123']))", 2);
 
                 yield return new DeserializationTestFunction(@"
 - <ArrayVar> =  ['abc', '123']
-- Print(Value = ArrayCount(Array = <ArrayVar>))", 2);
+- Print(Value = ArrayLength(Array = <ArrayVar>))", 2);
 
 
 
@@ -129,26 +129,26 @@ Value: notable", "notable");//check 'not' delimiter
 
                 yield return new DeserializationTestFunction(@"
 - <ArrayVar> = Array(Elements = ['abc', '123'])
-- Print(Value = FirstIndexOfElement(Array = <ArrayVar>, Element = '123'))", "1");
+- Print(Value = FindElement(Array = <ArrayVar>, Element = '123'))", "1");
 
                 yield return new DeserializationTestFunction(@"
 - <ArrayVar> = Array(Elements = ['abc', '123'])
-- Foreach(Array = <ArrayVar>, VariableName = <Element>, Action = Print(Value = <Element>))", "abc", "123");
+- Foreach(Array = <ArrayVar>, Variable = <Element>, Action = Print(Value = <Element>))", "abc", "123");
 
 
                 yield return new DeserializationTestFunction(@"
 - <ArrayVar1> = Array(Elements = ['abc', '123'])
 - <ArrayVar2> = Repeat(Element = <ArrayVar1>, Number = 2)
-- Foreach(Array = <ArrayVar2>, VariableName = <Element>, Action = Print(Value = ArrayCount(Array = <Element>)))", "2", "2");
+- Foreach(Array = <ArrayVar2>, Variable = <Element>, Action = Print(Value = ArrayLength(Array = <Element>)))", "2", "2");
 
                 yield return new DeserializationTestFunction(@"
 - <ArrayVar> = Array(Elements = ['abc', 'def'])
-- <Sorted> = SortArray(Array = <ArrayVar>)
+- <Sorted> = ArraySort(Array = <ArrayVar>)
 - Print(Value = ElementAtIndex(Array = <Sorted>, Index = 0))", "abc");
 
                 yield return new DeserializationTestFunction(@"
 - <ConditionVar> = true
-- Conditional(Condition = <ConditionVar>, ThenStep = Print(Value = 1), ElseStep = Print(Value = 2))", "1");
+- If(Condition = <ConditionVar>, Then = Print(Value = 1), Else = Print(Value = 2))", "1");
 
                 yield return new DeserializationTestFunction(
                     @"Do: Print
@@ -173,7 +173,7 @@ Value: I have config", "I have config"
 Config:
   AdditionalRequirements:
   - Notes: ABC123
-    Name: Test
+    Name: ValueIf
     MinVersion: 1.2.3.4
     MaxVersion: 5.6.7.8
   TargetMachineTags:
@@ -193,7 +193,7 @@ Value: I have config too", "I have config too")
                             {
                                 MaxVersion = new Version(5,6,7,8),
                                 MinVersion = new Version(1,2,3,4),
-                                Name = "Test",
+                                Name = "ValueIf",
                                 Notes = "ABC123"
                             }
                         }
@@ -201,62 +201,12 @@ Value: I have config too", "I have config too")
                 };
 
 
-//                yield return new DeserializationTestFunction(@"Do: Print
-//Value:
-//  Do: ElementAtIndex
-//  Array:
-//    Do: ElementAtIndex
-//    Array:
-//      Do: ReadCsv
-//      Text: >-
-//        Name,Summary
-
-//        One,The first number
-
-//        Two,The second number
-//      ColumnsToMap: Array(Elements = ['Name', 'Summary'])
-//    Index: 1
-//  Index: 1", "The second number");
 
 
-//                yield return new DeserializationTestFunction(@"- Do: SetVariable
-//  VariableName: <TextVar>
-//  Value: >-
-//    Name,Summary
-
-//    One,The first number
-
-//    Two,The second number
-//- <CSVVar> = ReadCsv(ColumnsToMap = Array(Elements = ['Name', 'Summary']), Delimiter = ',', HasFieldsEnclosedInQuotes = False, Text = <TextVar>)
-//- ForEach(Action = Print(Value = ElementAtIndex(Array = <Foo>, Index = 0)), Array = <CSVVar>, VariableName = <Foo>)",
-//                    "One", "Two"
-//                    );
-
-
-
-
-//                yield return new DeserializationTestFunction(@"- Do: SetVariable
-//  VariableName: <TextVar>
-//  Value: >-
-//    Name,Summary
-
-//    One,The first number
-
-//    Two,The second number
-//- <SearchTerms> = ReadCsv(ColumnsToMap = Array(Elements = ['Name', 'Summary']), Delimiter = ',', HasFieldsEnclosedInQuotes = False, Text = <TextVar>)
-//- Do: ForEach
-//  Array: <SearchTerms>
-//  VariableName: <Row>
-//  Action: Print(Value = ElementAtIndex(Array = <Row>, Index = 0))",
-//                    "One", "Two");
-
-
-
-
-                yield return new DeserializationTestFunction(@"ForEach(Array = ['a','b','c'], VariableName = <char>, Action = Print(Value = <char>))", "a", "b", "c");
+                yield return new DeserializationTestFunction(@"ForEach(Array = ['a','b','c'], Variable = <char>, Action = Print(Value = <char>))", "a", "b", "c");
                 yield return new DeserializationTestFunction(@"ForEach(
 Array = ['a','b','c'],
-VariableName = <char>,
+Variable = <char>,
 Action = Print(Value = <char>))", "a", "b", "c");
 
 

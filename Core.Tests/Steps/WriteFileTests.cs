@@ -9,7 +9,7 @@ using Xunit.Abstractions;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
-    public class WriteFileTests : StepTestBase<WriteFile, Unit>
+    public class WriteFileTests : StepTestBase<FileWrite, Unit>
     {
         /// <inheritdoc />
         public WriteFileTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
@@ -21,16 +21,15 @@ namespace Reductech.EDR.Core.Tests.Steps
         {
             get
             {
-                yield return new StepCase("Write file", new WriteFile()
+                yield return new StepCase("Write file", new FileWrite
                     {
-                        FileName = Constant("Filename.txt"),
-                        Folder = Constant("MyPath"),
-                        Text = new ToStream(){Text = Constant("Hello World")}
+                        Path =  Constant("Filename.txt"),
+                        Stream = new StringToStream{String = Constant("Hello World")}
 
 
                     },Unit.Default)
                     .WithFileSystemAction(x=>x.Setup(a=>
-                        a.WriteFileAsync(Path.Combine("MyPath", "Filename.txt"),
+                        a.WriteFileAsync("Filename.txt",
                             It.IsAny<Stream>(), It.IsAny<CancellationToken>())).ReturnsAsync(Unit.Default));
                 //TODO check that the text being sent is actually written
             }

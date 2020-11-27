@@ -9,7 +9,7 @@ using Xunit.Abstractions;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
-    public class ReadConcordanceTests : StepTestBase<ReadConcordance, EntityStream>
+    public class ReadConcordanceTests : StepTestBase<FromConcordance, EntityStream>
     {
         /// <inheritdoc />
         public ReadConcordanceTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper) {}
@@ -20,38 +20,38 @@ namespace Reductech.EDR.Core.Tests.Steps
             get
             {
                 yield return new StepCase("Read Concordance and print all lines",
-                    new ForEachEntity
+                    new EntityForEach
                     {
-                        EntityStream = new ReadConcordance()
+                        EntityStream = new FromConcordance()
                         {
-                            Stream = new ToStream
+                            Stream = new StringToStream
                             {
-                                Text = Constant(
+                                String = Constant(
                                     $@"þFooþþBarþ{Environment.NewLine}þHelloþþWorldþ{Environment.NewLine}þHello 2þþWorld 2þ")
                             }
                         },
                         Action = new Print<Entity>
                         {
-                            Value = new GetVariable<Entity>() { VariableName = VariableName.Entity }
+                            Value = new GetVariable<Entity>() { Variable = VariableName.Entity }
                         }
                     }, Unit.Default,
                     "Foo: Hello, Bar: World",
                     "Foo: Hello 2, Bar: World 2");
 
                 yield return new StepCase("Read Concordance with multiValue and print all lines",
-                    new ForEachEntity
+                    new EntityForEach
                     {
-                        EntityStream = new ReadConcordance
+                        EntityStream = new FromConcordance
                         {
-                            Stream = new ToStream
+                            Stream = new StringToStream
                             {
-                                Text = Constant(
+                                String = Constant(
                                     $@"þFooþþBarþ{Environment.NewLine}þHelloþþWorld|Earthþ{Environment.NewLine}þHello 2þþWorld 2|Earth 2þ")
                             }
                         },
                         Action = new Print<Entity>
                         {
-                            Value = new GetVariable<Entity> { VariableName = VariableName.Entity }
+                            Value = new GetVariable<Entity> { Variable = VariableName.Entity }
                         }
                     }, Unit.Default,
                     "Foo: Hello, Bar: World, Earth",
@@ -68,11 +68,10 @@ namespace Reductech.EDR.Core.Tests.Steps
             {
                 var (step, _) = CreateStepWithDefaultOrArbitraryValues();
 
-                const string expectedYaml = @"Do: ReadConcordance
+                const string expectedYaml = @"Do: FromConcordance
 Stream: 'Baz0'
-Encoding: EncodingEnum.Default
+Encoding: EncodingEnum.UTF8
 Delimiter: ""\x14""
-CommentCharacter: '#'
 QuoteCharacter: 'þ'
 MultiValueDelimiter: '|'";
 

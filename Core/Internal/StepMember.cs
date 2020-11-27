@@ -15,7 +15,7 @@ namespace Reductech.EDR.Core.Internal
     public sealed class StepMember : IEquatable<StepMember>
     {
         /// <summary>
-        /// Create a new VariableName StepMember
+        /// Create a new Variable StepMember
         /// </summary>
         public StepMember(VariableName variableName) => Option = OneOf<VariableName, IFreezableStep, IReadOnlyList<IFreezableStep>>.FromT0(variableName);
 
@@ -81,12 +81,12 @@ namespace Reductech.EDR.Core.Internal
             Option.Switch(handleVariableName, handleArgument, handleListArgument);
 
         /// <summary>
-        /// Gets the stepMember if it is a VariableName.
+        /// Gets the stepMember if it is a Variable.
         /// </summary>
         public Result<VariableName> AsVariableName(string propertyName) =>
             Option.TryPickT0(out var vn, out _)?
                 vn :
-                Result.Failure<VariableName>($"{propertyName} was a {MemberType}, not a VariableName");
+                Result.Failure<VariableName>($"{propertyName} was a {MemberType}, not a Variable");
 
         /// <summary>
         /// Gets the stepMember if it is an argument.

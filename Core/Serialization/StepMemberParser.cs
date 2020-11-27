@@ -14,6 +14,7 @@ using Superpower.Tokenizers;
 using Result = CSharpFunctionalExtensions.Result;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Entities;
+using Reductech.EDR.Core.Enums;
 using Reductech.EDR.Core.Internal.Errors;
 using YamlDotNet.Core;
 using Unit = Reductech.EDR.Core.Util.Unit;
@@ -32,7 +33,7 @@ namespace Reductech.EDR.Core.Serialization
             /// </summary>
             // ReSharper disable once UnusedMember.Local
             None,
-            [Token(Example = "<VariableName>")]
+            [Token(Example = "<Variable>")]
             VariableName,
             [Token(Example = "(")]
             OpenBracket,
@@ -92,7 +93,7 @@ namespace Reductech.EDR.Core.Serialization
             .Match(Character.EqualTo(']'), ProcessToken.CloseArray)
             .Match(Character.EqualTo(','), ProcessToken.Delimiter)
 
-            //VariableName must be before comparator
+            //Variable must be before comparator
             .Match(Span.Regex("<[a-z0-9-_]+>", RegexOptions.Compiled | RegexOptions.IgnoreCase), ProcessToken.VariableName)
             .Match(Span.Regex(@"-?[0-9]+", RegexOptions.Compiled), ProcessToken.Number) //Number must come before MathOperator
 
@@ -260,7 +261,7 @@ namespace Reductech.EDR.Core.Serialization
                 (from f1 in Parse.Ref(()=> singleTerm.Value)
                  from o in Token.EqualTo(ProcessToken.BooleanOperator)
                  from f2 in Parse.Ref(()=> singleTerm.Value)
-                 select ApplyBooleanStepFactory.CreateFreezable(f1,
+                 select ApplyBooleanOperatorStepFactory.CreateFreezable(f1,
                      new ConstantFreezableStep(Extensions.TryParseValue<BooleanOperator>(o.ToStringValue()).Value),
                   f2)).Try();
 

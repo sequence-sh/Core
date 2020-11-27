@@ -20,7 +20,7 @@ namespace Reductech.EDR.Core.Steps
         public override async Task<Result<Unit, IError>> Run(IStateMonad stateMonad,
             CancellationToken cancellationToken)
         {
-            var pathResult = await ProcessPath.Run(stateMonad, cancellationToken);
+            var pathResult = await Path.Run(stateMonad, cancellationToken);
             if (pathResult.IsFailure) return pathResult.ConvertFailure<Unit>();
 
             List<string> arguments;
@@ -55,7 +55,7 @@ namespace Reductech.EDR.Core.Steps
         /// </summary>
         [StepProperty(Order = 1)]
         [Required]
-        public IStep<string> ProcessPath { get; set; } = null!;
+        public IStep<string> Path { get; set; } = null!;
 
         /// <summary>
         /// Arguments to the step.

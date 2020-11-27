@@ -104,6 +104,8 @@ namespace Reductech.EDR.Core.TestHarness
 
             var stepFactoryType = instance.StepFactory.GetType();
 
+            stepFactoryType.Name.Should().StartWith(typeof(TStep).Name.Trim('`','1'));
+
             var constructor = stepFactoryType.GetConstructor(System.Array.Empty<Type>());
             constructor.Should().BeNull($"{StepName} should not have a public parameterless constructor");
 
@@ -123,8 +125,8 @@ namespace Reductech.EDR.Core.TestHarness
 
         public static IStep<List<TNew>> Array<TNew>(params TNew[] elements)=> new Array<TNew>() {Elements = elements.Select(Constant).ToList()};
 
-        public static IStep<TNew> GetVariable<TNew>(string variableName)=> new GetVariable<TNew>() {VariableName = new VariableName(variableName)};
-        public static IStep<TNew> GetVariable<TNew>(VariableName variableName)=> new GetVariable<TNew>() {VariableName = variableName};
+        public static IStep<TNew> GetVariable<TNew>(string variableName)=> new GetVariable<TNew>() {Variable = new VariableName(variableName)};
+        public static IStep<TNew> GetVariable<TNew>(VariableName variableName)=> new GetVariable<TNew>() {Variable = variableName};
 
         public static IStep<Entity> GetEntityVariable => GetVariable<Entity>(VariableName.Entity);
 

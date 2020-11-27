@@ -5,7 +5,7 @@ using Xunit.Abstractions;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
-    public class DoesDirectoryExistTests : StepTestBase<DoesDirectoryExist, bool>
+    public class DoesDirectoryExistTests : StepTestBase<DirectoryExists, bool>
     {
         /// <inheritdoc />
         public DoesDirectoryExistTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
@@ -18,7 +18,7 @@ namespace Reductech.EDR.Core.Tests.Steps
             get
             {
                 yield return new StepCase("Directory Exists",
-                    new DoesDirectoryExist
+                    new DirectoryExists
                     {
                         Path = Constant("My Path")
                     },

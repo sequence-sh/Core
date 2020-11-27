@@ -19,8 +19,8 @@ namespace Reductech.EDR.Core.Steps
             CancellationToken cancellationToken)
         {
 
-            return await Test.Run(stateMonad, cancellationToken).Ensure(x => x,
-                    new SingleError($"Assertion Failed '{Test.Name}'", ErrorCode.IndexOutOfBounds, new StepErrorLocation(this)))
+            return await Boolean.Run(stateMonad, cancellationToken).Ensure(x => x,
+                    new SingleError($"Assertion Failed '{Boolean.Name}'", ErrorCode.IndexOutOfBounds, new StepErrorLocation(this)))
                 .Map(x => Unit.Default);
         }
 
@@ -28,11 +28,11 @@ namespace Reductech.EDR.Core.Steps
         public override IStepFactory StepFactory => AssertTrueStepFactory.Instance;
 
         /// <summary>
-        /// The step to test.
+        /// The bool to test.
         /// </summary>
         [StepProperty]
         [Required]
-        public IStep<bool> Test { get; set; } = null!;
+        public IStep<bool> Boolean { get; set; } = null!;
     }
 
     /// <summary>

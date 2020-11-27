@@ -25,20 +25,18 @@ namespace Reductech.EDR.Core.Tests.Steps
                 yield return new StepCase("Print file text",
                     new Print<string>
                     {
-                        Value = new FromStream
+                        Value = new StringFromStream
                         {
                             Stream = new ReadFile
                             {
-                                FileName = Constant("File.txt"),
-                                Folder = Constant("MyFolder")
+                                Path = Constant("File.txt"),
                             }
                         }
                     },
                     Unit.Default,
                     "Hello World"
 
-                ).WithFileSystemAction(x=>x.Setup(a=>a.ReadFile(
-                    Path.Combine("MyFolder", "File.txt"))).Returns(new MemoryStream(Encoding.ASCII.GetBytes("Hello World"))));
+                ).WithFileSystemAction(x=>x.Setup(a=>a.ReadFile("File.txt")).Returns(new MemoryStream(Encoding.ASCII.GetBytes("Hello World"))));
             }
         }
 
@@ -47,16 +45,15 @@ namespace Reductech.EDR.Core.Tests.Steps
         {
             get
             {
-                yield return new ErrorCase("Test Error",
+                yield return new ErrorCase("ValueIf Error",
                         new ReadFile
                         {
-                            FileName = Constant("File.txt"),
-                            Folder = Constant("MyFolder")
+                            Path =  Constant("File.txt"),
                         },
-                        new ErrorBuilder("Test Error", ErrorCode.Test)
+                        new ErrorBuilder("ValueIf Error", ErrorCode.Test)
                     )
                     .WithFileSystemAction(x => x.Setup(a => a.ReadFile(
-                        Path.Combine("MyFolder", "File.txt"))).Returns(new ErrorBuilder("Test Error", ErrorCode.Test)));
+                        "File.txt")).Returns(new ErrorBuilder("ValueIf Error", ErrorCode.Test)));
             }
         }
     }

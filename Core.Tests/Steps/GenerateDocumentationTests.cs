@@ -104,9 +104,9 @@ namespace Reductech.EDR.Core.Tests.Steps
                         "",
                         "Represents an ordered collection of objects.",
                         "",
-                        "|Parameter|Type          |Required|Summary                    |",
-                        "|:-------:|:------------:|:------:|:-------------------------:|",
-                        "|Elements |IStep<[T](#T)>|☑️      |The elements of this array.|",
+                        "|Parameter|Type          |Required|Summary                   |",
+                        "|:-------:|:------------:|:------:|:------------------------:|",
+                        "|Elements |IStep<[T](#T)>|☑️      |The elements of the array.|",
                         "",
                     }
                     ).WithStepFactoryStore(StepFactoryStore.Create(ArrayStepFactory.Instance));
@@ -125,7 +125,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                         "",
                         "**String**",
                         "",
-                        "*Requires Test Library Version 1.2*",
+                        "*Requires ValueIf Library Version 1.2*",
                         "",
                         "|Parameter|Type                         |Required|Summary|Allowed Range |Default Value|Example|Recommended Range|Recommended Value|Requirements|See Also|URL               |Value Delimiter|",
                         "|:-------:|:---------------------------:|:------:|:-----:|:------------:|:-----------:|:-----:|:---------------:|:---------------:|:----------:|:------:|:----------------:|:-------------:|",
@@ -163,7 +163,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                         "",
                         "**String**",
                         "",
-                        "*Requires Test Library Version 1.2*",
+                        "*Requires ValueIf Library Version 1.2*",
                         "",
                         "|Parameter|Type                         |Required|Summary|Allowed Range |Default Value|Example|Recommended Range|Recommended Value|Requirements|See Also|URL               |Value Delimiter|",
                         "|:-------:|:---------------------------:|:------:|:-----:|:------------:|:-----------:|:-----:|:---------------:|:---------------:|:----------:|:------:|:----------------:|:-------------:|",
@@ -201,7 +201,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                 {
                     yield return new Requirement
                     {
-                        Name = "Test Library",
+                        Name = "ValueIf Library",
                         MinVersion = new Version(1, 2)
                     };
                 }

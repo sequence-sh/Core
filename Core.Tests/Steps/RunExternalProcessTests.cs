@@ -27,7 +27,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                         new RunExternalProcess
                         {
                             Arguments = new Constant<List<string>>(new List<string>(){"Foo"}),
-                            ProcessPath = new Constant<string>("Process.exe"),
+                            Path = new Constant<string>("Process.exe"),
                             Encoding = Constant(EncodingEnum.Ascii)
                         },
                         Unit.Default, "My Message"

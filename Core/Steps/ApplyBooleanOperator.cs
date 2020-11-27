@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Attributes;
+using Reductech.EDR.Core.Enums;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Serialization;
@@ -73,20 +74,20 @@ namespace Reductech.EDR.Core.Steps
         }
 
         /// <inheritdoc />
-        public override IStepFactory StepFactory => ApplyBooleanStepFactory.Instance;
+        public override IStepFactory StepFactory => ApplyBooleanOperatorStepFactory.Instance;
     }
 
     /// <summary>
     /// Returns true if both operands are true
     /// </summary>
-    public sealed class ApplyBooleanStepFactory : SimpleStepFactory<ApplyBooleanOperator, bool>
+    public sealed class ApplyBooleanOperatorStepFactory : SimpleStepFactory<ApplyBooleanOperator, bool>
     {
-        private ApplyBooleanStepFactory() { }
+        private ApplyBooleanOperatorStepFactory() { }
 
         /// <summary>
         /// The instance.
         /// </summary>
-        public static StepFactory Instance { get; } = new ApplyBooleanStepFactory();
+        public static StepFactory Instance { get; } = new ApplyBooleanOperatorStepFactory();
 
         /// <inheritdoc />
         public override IStepNameBuilder StepNameBuilder => new StepNameBuilderFromTemplate($"[{nameof(ApplyBooleanOperator.Left)}] [{nameof(ApplyBooleanOperator.Operator)}] [{nameof(ApplyBooleanOperator.Right)}]");

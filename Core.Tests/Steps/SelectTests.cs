@@ -7,7 +7,7 @@ using Xunit.Abstractions;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
-    public class SelectTests : StepTestBase<Select, EntityStream>
+    public class SelectTests : StepTestBase<EntityMap, EntityStream>
     {
         /// <inheritdoc />
         public SelectTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper) {}
@@ -18,17 +18,17 @@ namespace Reductech.EDR.Core.Tests.Steps
             get
             {
                 yield return new StepCase("Add property",
-                    new ForEachEntity
+                    new EntityForEach
                     {
                         Action  = new Print<Entity> {Value = GetEntityVariable},
 
-                        EntityStream = new Select
+                        EntityStream = new EntityMap
                         {
                             EntityStream = Constant(EntityStream.Create(
                             CreateEntity(("Foo", "Hello")),
                             CreateEntity(("Foo", "Hello 2")))),
 
-                            Selector = new SetProperty<string>
+                            Function = new EntitySetValue<string>
                             {
                                 Entity = GetEntityVariable,
                                 Property = Constant("Bar"),
@@ -40,17 +40,17 @@ namespace Reductech.EDR.Core.Tests.Steps
                     "Foo: Hello 2, Bar: World");
 
                 yield return new StepCase("Change property",
-                    new ForEachEntity
+                    new EntityForEach
                     {
                         Action = new Print<Entity> { Value = GetEntityVariable },
 
-                        EntityStream = new Select
+                        EntityStream = new EntityMap
                         {
                             EntityStream = Constant(EntityStream.Create(
                             CreateEntity(("Foo", "Hello"), ("Bar", "Earth")),
                             CreateEntity(("Foo", "Hello 2"), ("Bar", "Earth")))),
 
-                            Selector = new SetProperty<string>
+                            Function = new EntitySetValue<string>
                             {
                                 Entity = GetEntityVariable,
                                 Property = Constant("Bar"),
@@ -71,12 +71,12 @@ namespace Reductech.EDR.Core.Tests.Steps
             {
                 yield return new SerializeCase("Default",
                     CreateStepWithDefaultOrArbitraryValues().step,
-                    @"Do: Select
+                    @"Do: EntityMap
 EntityStream:
 - (Prop1 = 'Val0',Prop2 = 'Val1')
 - (Prop1 = 'Val2',Prop2 = 'Val3')
 - (Prop1 = 'Val4',Prop2 = 'Val5')
-Selector: (Prop1 = 'Val6',Prop2 = 'Val7')"
+Function: (Prop1 = 'Val6',Prop2 = 'Val7')"
 
                     );
 

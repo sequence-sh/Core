@@ -8,7 +8,7 @@ using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Serialization;
-using Reductech.EDR.Core.Util;
+
 
 namespace Reductech.EDR.Core.Steps
 {
@@ -21,7 +21,7 @@ namespace Reductech.EDR.Core.Steps
         /// <inheritdoc />
 #pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
         public override async Task<Result<T, IError>> Run(IStateMonad stateMonad, CancellationToken cancellationToken) =>
-            stateMonad.GetVariable<T>(VariableName).MapError(x=>x.WithLocation(this));
+            stateMonad.GetVariable<T>(Variable).MapError(x=>x.WithLocation(this));
 #pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
 
         /// <inheritdoc />
@@ -30,8 +30,9 @@ namespace Reductech.EDR.Core.Steps
         /// <summary>
         /// The name of the variable to get.
         /// </summary>
-        [VariableName] [Required]
-        public VariableName VariableName { get; set; }
+        [VariableName]
+        [Required]
+        public VariableName Variable { get; set; }
     }
 
     /// <summary>
@@ -48,7 +49,7 @@ namespace Reductech.EDR.Core.Steps
 
 
         /// <inheritdoc />
-        public override IStepNameBuilder StepNameBuilder => new StepNameBuilderFromTemplate($"[{nameof(GetVariable<object>.VariableName)}]");
+        public override IStepNameBuilder StepNameBuilder => new StepNameBuilderFromTemplate($"[{nameof(GetVariable<object>.Variable)}]");
 
         /// <inheritdoc />
         public override Type StepType => typeof(GetVariable<>);
@@ -59,7 +60,7 @@ namespace Reductech.EDR.Core.Steps
         /// <inheritdoc />
         protected override Result<ITypeReference, IError> GetMemberType(FreezableStepData freezableStepData,
             TypeResolver typeResolver) =>
-            freezableStepData.GetVariableName(nameof(GetVariable<object>.VariableName), TypeName)
+            freezableStepData.GetVariableName(nameof(GetVariable<object>.Variable), TypeName)
                 .MapError(x=> x.WithLocation(new FreezableStepErrorLocation(this, freezableStepData)))
 
                 .Map(x => new VariableTypeReference(x) as ITypeReference);
@@ -70,7 +71,7 @@ namespace Reductech.EDR.Core.Steps
 
         /// <inheritdoc />
         public override IStepSerializer Serializer { get; } = new StepSerializer(
-            new VariableNameComponent(nameof(GetVariable<object>.VariableName)));
+            new VariableNameComponent(nameof(GetVariable<object>.Variable)));
 
 
 
@@ -81,7 +82,7 @@ namespace Reductech.EDR.Core.Steps
         {
             var dict = new Dictionary<string, VariableName>
             {
-                {nameof(GetVariable<object>.VariableName), variableName}
+                {nameof(GetVariable<object>.Variable), variableName}
             };
 
             var fpd = new FreezableStepData(null, dict, null);

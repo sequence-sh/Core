@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Reductech.EDR.Core.Enums;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.TestHarness;
@@ -7,7 +8,7 @@ using Xunit.Abstractions;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
-    public class RepeatWhileTests : StepTestBase<RepeatWhile, Unit>
+    public class RepeatWhileTests : StepTestBase<While, Unit>
     {
         /// <inheritdoc />
         public RepeatWhileTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
@@ -20,7 +21,7 @@ namespace Reductech.EDR.Core.Tests.Steps
             get
             {
                 yield return new StepCase("Repeat while Foo < 5",
-                    new RepeatWhile()
+                    new While()
                     {
                         Action = new IncrementVariable
                         {
@@ -40,7 +41,7 @@ namespace Reductech.EDR.Core.Tests.Steps
         {
             get
             {
-                yield return new DeserializeCase("Repeat while Foo < 5", "RepeatWhile(Condition = <Foo> < 5, Action = IncrementVariable(Amount = 1, Variable = <Foo>))", Unit.Default)
+                yield return new DeserializeCase("Repeat while Foo < 5", "While(Condition = <Foo> < 5, Action = IncrementVariable(Amount = 1, Variable = <Foo>))", Unit.Default)
                     .WithInitialState("Foo", 1).WithExpectedFinalState("Foo", 5);
 
             }

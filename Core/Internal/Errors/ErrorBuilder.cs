@@ -3,23 +3,6 @@ using System.Collections.Generic;
 
 namespace Reductech.EDR.Core.Internal.Errors
 {
-    ///// <summary>
-    ///// An exception that wraps an error
-    ///// </summary>
-    //public class ErrorBuilderException : Exception
-    //{
-    //    /// <summary>
-    //    /// Create a new ErrorException
-    //    /// </summary>
-    //    /// <param name="errorBuilder"></param>
-    //    public ErrorBuilderException(IErrorBuilder errorBuilder) => ErrorBuilder = errorBuilder;
-
-    //    /// <summary>
-    //    /// The errorBuilder
-    //    /// </summary>
-    //    public IErrorBuilder ErrorBuilder { get; }
-    //}
-
     /// <summary>
     /// An exception that wraps an error
     /// </summary>
@@ -65,7 +48,7 @@ namespace Reductech.EDR.Core.Internal.Errors
 
 
         /// <summary>
-        /// Error Message Text.
+        /// Error Message String.
         /// </summary>
         public string Message { get; }
 

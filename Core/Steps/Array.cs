@@ -32,7 +32,7 @@ namespace Reductech.EDR.Core.Steps
         public override IStepFactory StepFactory => ArrayStepFactory.Instance;
 
         /// <summary>
-        /// The elements of this array.
+        /// The elements of the array.
         /// </summary>
         [StepListProperty]
         [Required]

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
+using Reductech.EDR.Core.Enums;
 using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Serialization;
@@ -35,9 +36,9 @@ namespace Reductech.EDR.Core.Tests
                     {
                         Steps = new List<IStep<Unit>>
                         {
-                            new SetVariable<string>{Value = new Constant<string>("Hello World"), VariableName = new VariableName("Foo")},
-                            new SetVariable<string>{Value = new GetVariable<string> {VariableName = new VariableName("Foo")}, VariableName = new VariableName("Bar")},
-                            new Print<string>{Value = new GetVariable<string> {VariableName = new VariableName("Bar")}}
+                            new SetVariable<string>{Value = new Constant<string>("Hello World"), Variable = new VariableName("Foo")},
+                            new SetVariable<string>{Value = new GetVariable<string> {Variable = new VariableName("Foo")}, Variable = new VariableName("Bar")},
+                            new Print<string>{Value = new GetVariable<string> {Variable = new VariableName("Bar")}}
                         }
                     },
                     @"- <Foo> = 'Hello World'
@@ -162,7 +163,7 @@ namespace Reductech.EDR.Core.Tests
                             new SetVariable<CompareOperator>()
                             {
                                 Value = new Constant<CompareOperator>(CompareOperator.LessThan),
-                                VariableName = new VariableName("Foo")
+                                Variable = new VariableName("Foo")
                             },
 
                             new Print<bool>
@@ -173,7 +174,7 @@ namespace Reductech.EDR.Core.Tests
                                     Right = new Constant<int>(2),
                                     Operator = new GetVariable<CompareOperator>
                                     {
-                                        VariableName = new VariableName("Foo"),
+                                        Variable = new VariableName("Foo"),
                                         Configuration = new Configuration
                                         {
                                             DoNotSplit = true
@@ -191,7 +192,7 @@ namespace Reductech.EDR.Core.Tests
       Do: GetVariable
       Config:
         DoNotSplit: true
-      VariableName: <Foo>
+      Variable: <Foo>
     Right: 2"
                 );
 
@@ -226,7 +227,7 @@ Value: 'I have config'");
                             {
                                 new Requirement
                                 {
-                                    Name = "Test",
+                                    Name = "ValueIf",
                                     MinVersion = new Version(1,2,3,4),
                                     MaxVersion = new Version(5,6,7,8),
                                     Notes = "ABC123"
@@ -237,7 +238,7 @@ Value: 'I have config'");
 Config:
   AdditionalRequirements:
   - Notes: ABC123
-    Name: Test
+    Name: ValueIf
     MinVersion: 1.2.3.4
     MaxVersion: 5.6.7.8
   TargetMachineTags:

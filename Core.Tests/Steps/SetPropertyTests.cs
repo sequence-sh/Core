@@ -6,7 +6,7 @@ using Xunit.Abstractions;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
-    public class SetPropertyTests : StepTestBase<SetProperty<string>, Entity>
+    public class SetPropertyTests : StepTestBase<EntitySetValue<string>, Entity>
     {
         /// <inheritdoc />
         public SetPropertyTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper) {}
@@ -18,7 +18,7 @@ namespace Reductech.EDR.Core.Tests.Steps
             {
                 yield return new StepCase(
                     "Set new property",
-                    new SetProperty<string>
+                    new EntitySetValue<string>
                     {
                         Entity = Constant(CreateEntity(("Foo", "Hello"))),
                         Property = Constant("Bar"),
@@ -29,7 +29,7 @@ namespace Reductech.EDR.Core.Tests.Steps
 
                 yield return new StepCase(
                     "Change existing property",
-                    new SetProperty<string>
+                    new EntitySetValue<string>
                     {
                         Entity = Constant(CreateEntity(("Foo", "Hello"), ("Bar", "Earth"))),
                         Property = Constant("Bar"),
@@ -48,7 +48,7 @@ namespace Reductech.EDR.Core.Tests.Steps
             {
                 yield return new SerializeCase("default",
                     CreateStepWithDefaultOrArbitraryValues().step,
-                    @"Do: SetProperty
+                    @"Do: EntitySetValue
 Entity: (Prop1 = 'Val0',Prop2 = 'Val1')
 Property: 'Bar2'
 Value: 'Bar3'");

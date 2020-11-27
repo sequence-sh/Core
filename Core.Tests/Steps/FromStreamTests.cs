@@ -7,7 +7,7 @@ using Xunit.Abstractions;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
-    public class FromStreamTests : StepTestBase<FromStream, string>
+    public class FromStreamTests : StepTestBase<StringFromStream, string>
     {
         /// <inheritdoc />
         public FromStreamTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
@@ -20,7 +20,7 @@ namespace Reductech.EDR.Core.Tests.Steps
             get
             {
                 yield return new StepCase("From Stream",
-                    new FromStream
+                    new StringFromStream
                     {
                         Stream = Constant<Stream>(new MemoryStream( Encoding.UTF8.GetBytes( "Hello World" )))
                     },"Hello World"

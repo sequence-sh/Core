@@ -10,7 +10,7 @@ using Reductech.EDR.Core.Util;
 namespace Reductech.EDR.Core.Steps
 {
     /// <summary>
-    /// Returns success if the Test step returns an error and a failure otherwise.
+    /// Returns success if the ValueIf step returns an error and a failure otherwise.
     /// </summary>
     public sealed class AssertError : CompoundStep<Unit>
     {
@@ -18,7 +18,7 @@ namespace Reductech.EDR.Core.Steps
         public override async Task<Result<Unit, IError>> Run(IStateMonad stateMonad,
             CancellationToken cancellationToken)
         {
-            var result = await Test.Run(stateMonad, cancellationToken);
+            var result = await Step.Run(stateMonad, cancellationToken);
 
             if (result.IsFailure)
                 return Unit.Default;
@@ -34,11 +34,11 @@ namespace Reductech.EDR.Core.Steps
         /// </summary>
         [StepProperty]
         [Required]
-        public IStep<Unit> Test { get; set; } = null!;
+        public IStep<Unit> Step { get; set; } = null!;
     }
 
     /// <summary>
-    /// Returns success if the Test step returns an error and a failure otherwise.
+    /// Returns success if the ValueIf step returns an error and a failure otherwise.
     /// </summary>
     public sealed class AssertErrorStepFactory : SimpleStepFactory<AssertError, Unit>
     {

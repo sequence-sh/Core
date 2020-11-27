@@ -53,10 +53,10 @@ namespace Reductech.EDR.Core.Tests.Steps
                 yield return new ErrorCase("Error returned", new CreateDirectory
                 {
                     Path = Constant("MyPath")
-                }, new ErrorBuilder("Test Error", ErrorCode.Test))
+                }, new ErrorBuilder("ValueIf Error", ErrorCode.Test))
                     .WithFileSystemAction(x =>
                     x.Setup(h => h.CreateDirectory("MyPath"))
-                        .Returns(new ErrorBuilder("Test Error", ErrorCode.Test)));
+                        .Returns(new ErrorBuilder("ValueIf Error", ErrorCode.Test)));
 
             } }
     }

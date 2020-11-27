@@ -9,7 +9,7 @@ using Xunit.Abstractions;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
-    public class ReadCSVTests : StepTestBase<ReadCSV, EntityStream>
+    public class ReadCSVTests : StepTestBase<FromCSV, EntityStream>
     {
         /// <inheritdoc />
         public ReadCSVTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper) {}
@@ -20,19 +20,19 @@ namespace Reductech.EDR.Core.Tests.Steps
             get
             {
                 yield return new StepCase("Read CSV and print all lines",
-                    new ForEachEntity
+                    new EntityForEach
                     {
-                        EntityStream = new ReadCSV
+                        EntityStream = new FromCSV
                         {
-                            Stream = new ToStream
+                            Stream = new StringToStream
                             {
-                                Text = Constant(
+                                String = Constant(
                                         $@"Foo,Bar{Environment.NewLine}Hello,World{Environment.NewLine}Hello 2,World 2")
                             }
                         },
                         Action = new Print<Entity>
                         {
-                            Value = new GetVariable<Entity> { VariableName = VariableName.Entity }
+                            Value = new GetVariable<Entity> { Variable = VariableName.Entity }
                         }
                     }, Unit.Default,
                     "Foo: Hello, Bar: World",
@@ -40,19 +40,19 @@ namespace Reductech.EDR.Core.Tests.Steps
 
 
                 yield return new StepCase("Read CSV and print all lines should ignore missing columns",
-                    new ForEachEntity
+                    new EntityForEach
                     {
-                        EntityStream = new ReadCSV
+                        EntityStream = new FromCSV
                         {
-                            Stream = new ToStream
+                            Stream = new StringToStream
                             {
-                                Text = Constant(
+                                String = Constant(
                                         $@"Foo{Environment.NewLine}Hello,World{Environment.NewLine}Hello 2,World 2")
                             }
                         },
                         Action = new Print<Entity>
                         {
-                            Value = new GetVariable<Entity> { VariableName = VariableName.Entity }
+                            Value = new GetVariable<Entity> { Variable = VariableName.Entity }
                         }
                     }, Unit.Default,
                     "Foo: Hello",
@@ -60,19 +60,19 @@ namespace Reductech.EDR.Core.Tests.Steps
 
 
                 yield return new StepCase("Read CSV and print all lines should ignore comments",
-                    new ForEachEntity
+                    new EntityForEach
                     {
-                        EntityStream = new ReadCSV
+                        EntityStream = new FromCSV
                         {
-                            Stream = new ToStream
+                            Stream = new StringToStream
                             {
-                                Text = Constant(
+                                String = Constant(
                                         $@"#this is a comment{Environment.NewLine}Foo{Environment.NewLine}Hello,World{Environment.NewLine}Hello 2,World 2")
                             }
                         },
                         Action = new Print<Entity>
                         {
-                            Value = new GetVariable<Entity> { VariableName = VariableName.Entity }
+                            Value = new GetVariable<Entity> { Variable = VariableName.Entity }
                         }
                     }, Unit.Default,
                     "Foo: Hello",
@@ -102,9 +102,9 @@ namespace Reductech.EDR.Core.Tests.Steps
             {
                 var (step, _) = CreateStepWithDefaultOrArbitraryValues();
 
-                const string expectedYaml = @"Do: ReadCSV
+                const string expectedYaml = @"Do: FromCSV
 Stream: 'Baz0'
-Encoding: EncodingEnum.Default
+Encoding: EncodingEnum.UTF8
 Delimiter: ','
 CommentCharacter: '#'
 QuoteCharacter: '""'

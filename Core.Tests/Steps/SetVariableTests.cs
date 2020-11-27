@@ -22,7 +22,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                 yield return new StepCase("Set a new variable",
                     new SetVariable<int>
                     {
-                        Value = Constant(42), VariableName = new VariableName("Foo")
+                        Value = Constant(42), Variable = new VariableName("Foo")
                     }, Unit.Default
                     ).WithExpectedFinalState("Foo", 42);
 
@@ -31,7 +31,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                     new SetVariable<int>
                     {
                         Value = Constant(42),
-                        VariableName = new VariableName("Foo")
+                        Variable = new VariableName("Foo")
                     }, Unit.Default
                     )
                     .WithInitialState("Foo", 21)
@@ -59,7 +59,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                     new SetVariable<int>
                     {
                         Value = Constant(42),
-                        VariableName = new VariableName("Foo")
+                        Variable = new VariableName("Foo")
                     }, "<Foo> = 42"
                     );
             } }
