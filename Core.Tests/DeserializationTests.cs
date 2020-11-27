@@ -143,7 +143,7 @@ Value: notable", "notable");//check 'not' delimiter
 
                 yield return new DeserializationTestFunction(@"
 - <ArrayVar> = Array(Elements = ['abc', 'def'])
-- <Sorted> = SortArray(Array = <ArrayVar>)
+- <Sorted> = ArraySort(Array = <ArrayVar>)
 - Print(Value = ElementAtIndex(Array = <Sorted>, Index = 0))", "abc");
 
                 yield return new DeserializationTestFunction(@"

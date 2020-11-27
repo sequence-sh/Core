@@ -5,7 +5,7 @@ using Xunit.Abstractions;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
-    public class SortArrayTests : StepTestBase<SortArray<int>, List<int>>
+    public class SortArrayTests : StepTestBase<ArraySort<int>, List<int>>
     {
         /// <inheritdoc />
         public SortArrayTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
@@ -17,14 +17,14 @@ namespace Reductech.EDR.Core.Tests.Steps
         {
             get
             {
-                yield return new StepCase("Ascending", new SortArray<int>()
+                yield return new StepCase("Ascending", new ArraySort<int>()
                 {
                     Array = Array(8,6,7,5,3,0,9),
                     Order = Constant(SortOrder.Ascending)
 
                 }, new List<int>(){0,3,5,6,7,8,9} );
 
-                yield return new StepCase("Descending", new SortArray<int>()
+                yield return new StepCase("Descending", new ArraySort<int>()
                 {
                     Array = Array(8, 6, 7, 5, 3, 0, 9),
                     Order = Constant(SortOrder.Descending)
@@ -39,7 +39,7 @@ namespace Reductech.EDR.Core.Tests.Steps
             get
             {
                 yield return new DeserializeCase("Sort Ascending",
-                    "SortArray(Array = [8,6,7,5,3,0,9], Order = SortOrder.Ascending)",
+                    "ArraySort(Array = [8,6,7,5,3,0,9], Order = SortOrder.Ascending)",
                     new List<int>(){0,3,5,6,7,8,9});
 
             }

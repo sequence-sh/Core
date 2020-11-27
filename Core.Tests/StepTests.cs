@@ -303,22 +303,22 @@ namespace Reductech.EDR.Core.Tests
                         ElseValue = Constant("World")
                     }), "World");
 
-                yield return new StepTestCase("Print Match SortArray(Array: ['B'; 'C'; 'A'], Order: Ascending)",
+                yield return new StepTestCase("Print Match ArraySort(Array: ['B'; 'C'; 'A'], Order: Ascending)",
                     Print(new StringJoin
                     {
                         Delimiter = Constant(", "),
-                        Strings = new SortArray<string>
+                        Strings = new ArraySort<string>
                         {
                             Array = Array(Constant("B"), Constant("C"), Constant("A")),
                             Order = Constant(SortOrder.Ascending)
                         }
                     }), "A, B, C");
 
-                yield return new StepTestCase("Print Match SortArray(Array: ['B'; 'C'; 'A'], Order: Descending)",
+                yield return new StepTestCase("Print Match ArraySort(Array: ['B'; 'C'; 'A'], Order: Descending)",
                     Print(new StringJoin
                     {
                         Delimiter = Constant(", "),
-                        Strings = new SortArray<string>
+                        Strings = new ArraySort<string>
                         {
                             Array = Array(Constant("B"), Constant("C"), Constant("A")),
                             Order = Constant(SortOrder.Descending)

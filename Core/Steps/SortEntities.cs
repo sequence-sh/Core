@@ -21,7 +21,7 @@ namespace Reductech.EDR.Core.Steps
         public override async Task<Result<EntityStream, IError>> Run(IStateMonad stateMonad,
             CancellationToken cancellationToken)
         {
-            var sortAscendingResult = await SortAscending.Run(stateMonad, cancellationToken);
+            var sortAscendingResult = await Descending.Run(stateMonad, cancellationToken);
             if (sortAscendingResult.IsFailure) return sortAscendingResult.ConvertFailure<EntityStream>();
 
             var entityStreamResult = await EntityStream.Run(stateMonad, cancellationToken);
@@ -80,11 +80,11 @@ namespace Reductech.EDR.Core.Steps
         public IStep<string> SortBy { get; set; } = null!;
 
         /// <summary>
-        /// Whether to sort in ascending order.
+        /// Whether to sort in descending order.
         /// </summary>
         [StepProperty(Order = 3)]
-        [DefaultValueExplanation("True")]
-        public IStep<bool> SortAscending { get; set; } = new Constant<bool>(true);
+        [DefaultValueExplanation("False")]
+        public IStep<bool> Descending { get; set; } = new Constant<bool>(false);
 
 
         /// <inheritdoc />
