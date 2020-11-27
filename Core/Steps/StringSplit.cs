@@ -15,7 +15,7 @@ namespace Reductech.EDR.Core.Steps
     /// <summary>
     /// Splits a string.
     /// </summary>
-    public sealed class SplitString : CompoundStep<List<string>>
+    public sealed class StringSplit : CompoundStep<List<string>>
     {
         /// <summary>
         /// The string to split.
@@ -40,19 +40,19 @@ namespace Reductech.EDR.Core.Steps
         }
 
         /// <inheritdoc />
-        public override IStepFactory StepFactory => SplitStringStepFactory.Instance;
+        public override IStepFactory StepFactory => StringSplitStepFactory.Instance;
     }
 
     /// <summary>
     /// Splits a string.
     /// </summary>
-    public class SplitStringStepFactory : SimpleStepFactory<SplitString, List<string>>
+    public class StringSplitStepFactory : SimpleStepFactory<StringSplit, List<string>>
     {
-        private SplitStringStepFactory() { }
+        private StringSplitStepFactory() { }
 
         /// <summary>
         /// The instance.
         /// </summary>
-        public static SimpleStepFactory<SplitString, List<string>> Instance { get; } = new SplitStringStepFactory();
+        public static SimpleStepFactory<StringSplit, List<string>> Instance { get; } = new StringSplitStepFactory();
     }
 }

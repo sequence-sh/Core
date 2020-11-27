@@ -239,11 +239,11 @@ namespace Reductech.EDR.Core.Tests
                 }), "Hello, Hello, Hello");
 
                 yield return new StepTestCase(
-                    "Print ElementAtIndex(Array: SplitString(Delimiter: ', ', String: 'Hello, World'), Index: 1)",
+                    "Print ElementAtIndex(Array: StringSplit(Delimiter: ', ', String: 'Hello, World'), Index: 1)",
                     Print(
                         new ElementAtIndex<string>
                         {
-                            Array = new SplitString
+                            Array = new StringSplit
                             {
                                 Delimiter = Constant(", "),
                                 String = Constant("Hello, World")

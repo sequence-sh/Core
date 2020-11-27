@@ -5,7 +5,7 @@ using Xunit.Abstractions;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
-    public class SplitStringTests : StepTestBase<SplitString, List<string>>
+    public class SplitStringTests : StepTestBase<StringSplit, List<string>>
     {
         /// <inheritdoc />
         public SplitStringTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
@@ -18,7 +18,7 @@ namespace Reductech.EDR.Core.Tests.Steps
             get
             {
                 yield return new StepCase("Split a string",
-                    new SplitString()
+                    new StringSplit()
                     {
                         String = Constant("Hello World"),
                         Delimiter = Constant(" ")
@@ -34,7 +34,7 @@ namespace Reductech.EDR.Core.Tests.Steps
         {
             get
             {
-                yield return new DeserializeCase("Split a string", "SplitString(String = 'Hello World', Delimiter = ' ')", new List<string>{"Hello", "World"});
+                yield return new DeserializeCase("Split a string", "StringSplit(String = 'Hello World', Delimiter = ' ')", new List<string>{"Hello", "World"});
 
             }
 
