@@ -173,7 +173,7 @@ Value: I have config", "I have config"
 Config:
   AdditionalRequirements:
   - Notes: ABC123
-    Name: Test
+    Name: ValueIf
     MinVersion: 1.2.3.4
     MaxVersion: 5.6.7.8
   TargetMachineTags:
@@ -193,7 +193,7 @@ Value: I have config too", "I have config too")
                             {
                                 MaxVersion = new Version(5,6,7,8),
                                 MinVersion = new Version(1,2,3,4),
-                                Name = "Test",
+                                Name = "ValueIf",
                                 Notes = "ABC123"
                             }
                         }

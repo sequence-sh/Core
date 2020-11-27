@@ -11,21 +11,21 @@ using Reductech.EDR.Core.Util;
 namespace Reductech.EDR.Core.Steps
 {
     /// <summary>
-    /// Returns one result if a condition is true and another if the condition is false.
+    /// Returns the consequent if a condition is true and the alternative if the condition is false.
     /// </summary>
-    public sealed class Test<T> : CompoundStep<T>
+    public sealed class ValueIf<T> : CompoundStep<T>
     {
         /// <inheritdoc />
         public override async Task<Result<T, IError>> Run(IStateMonad stateMonad, CancellationToken cancellationToken)
         {
             var result = await Condition.Run(stateMonad, cancellationToken)
-                .Bind(r => r ? ThenValue.Run(stateMonad, cancellationToken) : ElseValue.Run(stateMonad, cancellationToken));
+                .Bind(r => r ? Then.Run(stateMonad, cancellationToken) : Else.Run(stateMonad, cancellationToken));
 
             return result;
         }
 
         /// <inheritdoc />
-        public override IStepFactory StepFactory => TestStepFactory.Instance;
+        public override IStepFactory StepFactory => ValueIfStepFactory.Instance;
 
 
         /// <summary>
@@ -36,33 +36,33 @@ namespace Reductech.EDR.Core.Steps
         public IStep<bool> Condition { get; set; } = null!;
 
         /// <summary>
-        /// The Then Branch.
+        /// The Consequent. Returned if the condition is true.
         /// </summary>
         [StepProperty]
         [Required]
-        public IStep<T> ThenValue { get; set; } = null!;
+        public IStep<T> Then { get; set; } = null!;
 
         /// <summary>
-        /// The Else branch, if it exists.
+        /// The Alternative. Returned if the condition is false.
         /// </summary>
         [StepProperty]
         [Required]
-        public IStep<T> ElseValue { get; set; } = null!;
+        public IStep<T> Else { get; set; } = null!;
     }
 
     /// <summary>
     /// Returns one result if a condition is true and another if the condition is false.
     /// </summary>
-    public sealed class TestStepFactory : GenericStepFactory
+    public sealed class ValueIfStepFactory : GenericStepFactory
     {
-        private TestStepFactory() { }
+        private ValueIfStepFactory() { }
         /// <summary>
         /// The instance.
         /// </summary>
-        public static GenericStepFactory Instance { get; } = new TestStepFactory();
+        public static GenericStepFactory Instance { get; } = new ValueIfStepFactory();
 
         /// <inheritdoc />
-        public override Type StepType => typeof(Test<>);
+        public override Type StepType => typeof(ValueIf<>);
 
         /// <inheritdoc />
         public override string OutputTypeExplanation => "T";
@@ -73,8 +73,8 @@ namespace Reductech.EDR.Core.Steps
         /// <inheritdoc />
         protected override Result<ITypeReference, IError> GetMemberType(FreezableStepData freezableStepData,
             TypeResolver typeResolver) =>
-            freezableStepData.GetArgument(nameof(Test<object>.ThenValue), TypeName)
-                .Compose(() => freezableStepData.GetArgument(nameof(Test<object>.ElseValue), TypeName))
+            freezableStepData.GetArgument(nameof(ValueIf<object>.Then), TypeName)
+                .Compose(() => freezableStepData.GetArgument(nameof(ValueIf<object>.Else), TypeName))
                 .MapError(e=>e.WithLocation(this, freezableStepData))
                 .Bind(x => x.Item1.TryGetOutputTypeReference(typeResolver)
                     .Compose(() => x.Item2.TryGetOutputTypeReference(typeResolver)))

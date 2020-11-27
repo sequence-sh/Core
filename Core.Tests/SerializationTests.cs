@@ -226,7 +226,7 @@ Value: 'I have config'");
                             {
                                 new Requirement
                                 {
-                                    Name = "Test",
+                                    Name = "ValueIf",
                                     MinVersion = new Version(1,2,3,4),
                                     MaxVersion = new Version(5,6,7,8),
                                     Notes = "ABC123"
@@ -237,7 +237,7 @@ Value: 'I have config'");
 Config:
   AdditionalRequirements:
   - Notes: ABC123
-    Name: Test
+    Name: ValueIf
     MinVersion: 1.2.3.4
     MaxVersion: 5.6.7.8
   TargetMachineTags:

@@ -81,7 +81,7 @@ namespace Reductech.EDR.Core.Tests.Steps
         {
             get
             {
-                yield return new ErrorCase("Test increment 0",
+                yield return new ErrorCase("ValueIf increment 0",
                     new For
                     {
                         Action = new Print<int> { Value = GetVariable<int>(VariableName.Index.Name) },

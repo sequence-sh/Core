@@ -59,10 +59,10 @@ namespace Reductech.EDR.Core.Tests.Steps
                         {
                             Path = Constant("My Path")
                         },
-                        new ErrorBuilder("Test Error", ErrorCode.Test), "Directory 'My Path' Deleted.")
+                        new ErrorBuilder("ValueIf Error", ErrorCode.Test), "Directory 'My Path' Deleted.")
                     .WithFileSystemAction(x => x.Setup(a => a.DoesDirectoryExist("My Path")).Returns(true))
                     .WithFileSystemAction(x => x.Setup(a => a.DeleteDirectory("My Path", true))
-                        .Returns(new ErrorBuilder("Test Error", ErrorCode.Test)));
+                        .Returns(new ErrorBuilder("ValueIf Error", ErrorCode.Test)));
             }
         }
     }

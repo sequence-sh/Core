@@ -286,21 +286,21 @@ namespace Reductech.EDR.Core.Tests
                     HelloWorldString);
 
 
-                yield return new StepTestCase("Print Test(Condition: True, ElseValue: 'World', ThenValue: 'Hello')",
-                    Print(new Test<string>
+                yield return new StepTestCase("Print ValueIf(Condition: True, Else: 'World', Then: 'Hello')",
+                    Print(new ValueIf<string>
                     {
                         Condition = Constant(true),
-                        ThenValue = Constant("Hello"),
-                        ElseValue = Constant("World")
+                        Then = Constant("Hello"),
+                        Else = Constant("World")
                     }), "Hello");
 
 
-                yield return new StepTestCase("Print Test(Condition: False, ElseValue: 'World', ThenValue: 'Hello')",
-                    Print(new Test<string>
+                yield return new StepTestCase("Print ValueIf(Condition: False, Else: 'World', Then: 'Hello')",
+                    Print(new ValueIf<string>
                     {
                         Condition = Constant(false),
-                        ThenValue = Constant("Hello"),
-                        ElseValue = Constant("World")
+                        Then = Constant("Hello"),
+                        Else = Constant("World")
                     }), "World");
 
                 yield return new StepTestCase("Print Match ArraySort(Array: ['B'; 'C'; 'A'], Order: Ascending)",
@@ -401,7 +401,7 @@ namespace Reductech.EDR.Core.Tests
                             {
                                 MinVersion = new Version(1, 0),
                                 MaxVersion = new Version(2, 0),
-                                Name = "Test",
+                                Name = "ValueIf",
                                 Notes = "ABC123"
                             }
                         }
@@ -590,7 +590,7 @@ Two,The second number"),
                     {
                         TargetMachineTags = new List<string>
                         {
-                            "Test Tag"
+                            "ValueIf Tag"
                         }
                     });
                 }

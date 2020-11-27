@@ -40,7 +40,7 @@ namespace Reductech.EDR.Core.Tests
                     },
                     new ErrorBuilder("Variable '<Foo>' does not exist.", ErrorCode.MissingVariable));
 
-                yield return new ErrorTestFunction("Test assert",
+                yield return new ErrorTestFunction("ValueIf assert",
                     new AssertTrue
                     {
                         Boolean = new Constant<bool>(false)

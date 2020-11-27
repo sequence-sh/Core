@@ -45,15 +45,15 @@ namespace Reductech.EDR.Core.Tests.Steps
         {
             get
             {
-                yield return new ErrorCase("Test Error",
+                yield return new ErrorCase("ValueIf Error",
                         new ReadFile
                         {
                             Path =  Constant("File.txt"),
                         },
-                        new ErrorBuilder("Test Error", ErrorCode.Test)
+                        new ErrorBuilder("ValueIf Error", ErrorCode.Test)
                     )
                     .WithFileSystemAction(x => x.Setup(a => a.ReadFile(
-                        "File.txt")).Returns(new ErrorBuilder("Test Error", ErrorCode.Test)));
+                        "File.txt")).Returns(new ErrorBuilder("ValueIf Error", ErrorCode.Test)));
             }
         }
     }

@@ -10,7 +10,7 @@ using Reductech.EDR.Core.Util;
 namespace Reductech.EDR.Core.Steps
 {
     /// <summary>
-    /// Returns success if the Test step returns an error and a failure otherwise.
+    /// Returns success if the ValueIf step returns an error and a failure otherwise.
     /// </summary>
     public sealed class AssertError : CompoundStep<Unit>
     {
@@ -38,7 +38,7 @@ namespace Reductech.EDR.Core.Steps
     }
 
     /// <summary>
-    /// Returns success if the Test step returns an error and a failure otherwise.
+    /// Returns success if the ValueIf step returns an error and a failure otherwise.
     /// </summary>
     public sealed class AssertErrorStepFactory : SimpleStepFactory<AssertError, Unit>
     {
