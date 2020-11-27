@@ -1,3 +1,46 @@
+## v0.3.0 (2020-11-27)
+
+**Breaking changes** - Step and argument names have changed to make them more
+consistent. Step names now follow the convention of _NamespaceAction_, e.g.
+`ArrayLength`, `ArraySort`, `EntityMap`, `EntityStreamSort`.
+
+- Added Entities and EntityStreams along with Linq style methods to manipulate them.
+- Added Entity Schemas to allow conversion between different
+- Step state is now scoped and disposable
+- Added Steps to convert `EntityStream` to/from concordance and CSV
+
+### New Features
+
+- Rename some arguments for consistency #109
+- Create Steps to read and write concordance so technicians do that easily #108
+- Use AsyncEnumerable instead of TPL for EntityStream #106
+- Create Linq style methods so Technicians can easily manipulate entities #72
+- Create a WriteCSV method so Technicians can write entities to CSV #73
+- Use CSVHelper instead of VisualBasic.io to read and write CSV files #94
+- RunExternalProcess should use channels rather than StreamReaders to make testing easier #102
+- Refactor Unit Test cases so classes inheriting from them have more control over settings #101
+- To release control of resources, Make StateMonad IDisposable #100
+- RunExternalProcess should take inputStream and Encoding arguments to support Nuix script streaming #99
+- Create Schema for Entities so we can enforce and manipulate type and format constraints #95
+- Create Data Interchange Entities, so that a Technicians can have a clean way to handle data #71
+- Add encoding step, so that technicians can specify text encoding when reading or writing files #82
+- To prevent steps going untested, create a unit test to test that all steps are being tested #91
+- Allow Serialization and Deserialization of Entity, Stream, and EntityStream #93
+
+### Bug Fixes
+
+- Unit Tests are flaky #97
+
+### Maintenance
+
+- Remove obsolete Script Composition Code #105
+- Add Release issue template #98
+- Use template ci config, so that it's easier to maintain #96
+
+### Other
+
+- Change references to StateMonad to IStateMonad in Process Run Overloads #107
+
 ## v0.2.1 (2020-11-03)
 
 ### New Features
