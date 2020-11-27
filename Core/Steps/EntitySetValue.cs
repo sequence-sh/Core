@@ -15,7 +15,7 @@ namespace Reductech.EDR.Core.Steps
     /// Returns a copy of the entity with this property set.
     /// Will add a new property if the property is not already present.
     /// </summary>
-    public sealed class SetProperty<T> : CompoundStep<Entity>
+    public sealed class EntitySetValue<T> : CompoundStep<Entity>
     {
         /// <inheritdoc />
         public override async Task<Result<Entity, IError>> Run(IStateMonad stateMonad, CancellationToken cancellationToken)
@@ -29,7 +29,7 @@ namespace Reductech.EDR.Core.Steps
             var value = await Value.Run(stateMonad, cancellationToken);
             if (value.IsFailure) return value.ConvertFailure<Entity>();
 
-            var entityValue = EntityValue.Create(value.Value?.ToString(), null);
+            var entityValue = EntityValue.Create(value.Value?.ToString());
 
             var newEntity = entity.Value.WithField(property.Value, entityValue);
 
@@ -59,24 +59,24 @@ namespace Reductech.EDR.Core.Steps
 
 
         /// <inheritdoc />
-        public override IStepFactory StepFactory => SetPropertyStepFactory.Instance;
+        public override IStepFactory StepFactory => EntitySetValueStepFactory.Instance;
     }
 
     /// <summary>
     /// Returns a copy of the entity with this property set.
     /// Will add a new property if the property is not already present.
     /// </summary>
-    public sealed class SetPropertyStepFactory : GenericStepFactory
+    public sealed class EntitySetValueStepFactory : GenericStepFactory
     {
-        private SetPropertyStepFactory() {}
+        private EntitySetValueStepFactory() {}
 
         /// <summary>
         /// The instance.
         /// </summary>
-        public static GenericStepFactory Instance { get; } = new SetPropertyStepFactory();
+        public static GenericStepFactory Instance { get; } = new EntitySetValueStepFactory();
 
         /// <inheritdoc />
-        public override Type StepType => typeof(SetProperty<>);
+        public override Type StepType => typeof(EntitySetValue<>);
 
         /// <inheritdoc />
         public override string OutputTypeExplanation => nameof(Entity);
@@ -87,7 +87,7 @@ namespace Reductech.EDR.Core.Steps
         /// <inheritdoc />
         protected override Result<ITypeReference, IError> GetMemberType(FreezableStepData freezableStepData, TypeResolver typeResolver)
         {
-            var r1 = freezableStepData.GetArgument(nameof(SetProperty<object>.Value), TypeName)
+            var r1 = freezableStepData.GetArgument(nameof(EntitySetValue<object>.Value), TypeName)
                 .MapError(x => x.WithLocation(this, freezableStepData))
                 .Bind(x => x.TryGetOutputTypeReference(typeResolver));
 

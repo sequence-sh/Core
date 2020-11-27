@@ -28,7 +28,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                             CreateEntity(("Foo", "Hello")),
                             CreateEntity(("Foo", "Hello 2")))),
 
-                            Function = new SetProperty<string>
+                            Function = new EntitySetValue<string>
                             {
                                 Entity = GetEntityVariable,
                                 Property = Constant("Bar"),
@@ -50,7 +50,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                             CreateEntity(("Foo", "Hello"), ("Bar", "Earth")),
                             CreateEntity(("Foo", "Hello 2"), ("Bar", "Earth")))),
 
-                            Function = new SetProperty<string>
+                            Function = new EntitySetValue<string>
                             {
                                 Entity = GetEntityVariable,
                                 Property = Constant("Bar"),
