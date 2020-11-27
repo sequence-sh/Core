@@ -54,7 +54,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                                 CreateEntity(("Foo", "Beta"))
                             )),
                             KeySelector = new GetProperty { Property = Constant("Foo"), Entity = GetEntityVariable },
-                            CaseSensitive = Constant(false)
+                            IgnoreCase = Constant(true)
                         }
                     },
                     Unit.Default,

@@ -24,7 +24,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                     {
                         Action = new Print<int>{Value = GetVariable<int>("Foo")},
                         Array = Array(3,2,1),
-                        VariableName = new VariableName("Foo")
+                        Variable = new VariableName("Foo")
                     },
                     Unit.Default,
                     "3", "2", "1")

@@ -29,7 +29,7 @@ namespace Reductech.EDR.Core.Steps
         /// </summary>
         [VariableName]
         [Required]
-        public VariableName VariableName { get; set; } //TODO use x
+        public VariableName Variable { get; set; } //TODO use x
 
         /// <summary>
         /// The elements to iterate over.
@@ -47,7 +47,7 @@ namespace Reductech.EDR.Core.Steps
 
             foreach (var element in elements.Value)
             {
-                var setResult = stateMonad.SetVariable(VariableName, element);
+                var setResult = stateMonad.SetVariable(Variable, element);
                 if (setResult.IsFailure) return setResult.ConvertFailure<Unit>();
 
                 var r = await Action.Run(stateMonad, cancellationToken);
@@ -100,6 +100,6 @@ namespace Reductech.EDR.Core.Steps
                 .Map(Maybe<ITypeReference>.From);
 
         /// <inheritdoc />
-        public override IStepNameBuilder StepNameBuilder => new StepNameBuilderFromTemplate($"Foreach [{nameof(ForEach<object>.VariableName)}] in [{nameof(ForEach<object>.Array)}]; [{nameof(ForEach<object>.Action)}]");
+        public override IStepNameBuilder StepNameBuilder => new StepNameBuilderFromTemplate($"Foreach [{nameof(ForEach<object>.Variable)}] in [{nameof(ForEach<object>.Array)}]; [{nameof(ForEach<object>.Action)}]");
     }
 }

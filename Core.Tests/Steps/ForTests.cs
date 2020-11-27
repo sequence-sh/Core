@@ -23,45 +23,40 @@ namespace Reductech.EDR.Core.Tests.Steps
                 yield return new StepCase("Increment 1",
                     new For
                     {
-                        Action = new Print<int> {Value = GetVariable<int>("Foo")},
+                        Action = new Print<int> {Value = GetVariable<int>(VariableName.Index.Name)},
                         From = Constant(1),
                         To = Constant(3),
                         Increment = Constant(1),
-                        Variable = new VariableName("Foo")
-                    }, Unit.Default,"1","2","3").WithExpectedFinalState("Foo", 4);
+                    }, Unit.Default,"1","2","3");
 
                 yield return new StepCase("Increment 2",
                     new For
                     {
-                        Action = new Print<int> { Value = GetVariable<int>("Foo") },
+                        Action = new Print<int> { Value = GetVariable<int>(VariableName.Index.Name) },
                         From = Constant(1),
                         To = Constant(6),
                         Increment = Constant(2),
-                        Variable = new VariableName("Foo")
-                    }, Unit.Default, "1","3","5")
-                    .WithExpectedFinalState("Foo", 7);
+                    }, Unit.Default, "1","3","5");
 
                 yield return new StepCase("Increment -1",
                     new For
                     {
-                        Action = new Print<int> { Value = GetVariable<int>("Foo") },
+                        Action = new Print<int> { Value = GetVariable<int>(VariableName.Index.Name) },
                         From = Constant(3),
                         To = Constant(1),
                         Increment = Constant(-1),
-                        Variable = new VariableName("Foo")
                     }, Unit.Default, "3","2","1"
-                    ).WithExpectedFinalState("Foo", 0);
+                    );
 
                 yield return new StepCase("Increment No range",
                     new For
                     {
-                        Action = new Print<int> { Value = GetVariable<int>("Foo") },
+                        Action = new Print<int> { Value = GetVariable<int>(VariableName.Index.Name) },
                         From = Constant(3),
                         To = Constant(1),
                         Increment = Constant(1),
-                        Variable = new VariableName("Foo")
                     }, Unit.Default
-                    ).WithExpectedFinalState("Foo", 3);
+                    );
 
 
             }
@@ -73,10 +68,10 @@ namespace Reductech.EDR.Core.Tests.Steps
             get
             {
                 yield return new DeserializeCase("Increment 1",
-                    "For(Action = Print(Value = <Foo>), From = 1, To = 3, Increment = 1, VariableName = <Foo>)",
+                    "For(Action = Print(Value = <i>), From = 1, To = 3, Increment = 1)",
                     Unit.Default,
                     "1","2","3"
-                    ).WithExpectedFinalState("Foo", 4);
+                    );
             }
 
         }
@@ -89,14 +84,13 @@ namespace Reductech.EDR.Core.Tests.Steps
                 yield return new ErrorCase("Test increment 0",
                     new For
                     {
-                        Action = new Print<int> { Value = GetVariable<int>("Foo") },
+                        Action = new Print<int> { Value = GetVariable<int>(VariableName.Index.Name) },
                         From = Constant(1),
                         To = Constant(3),
-                        Increment = Constant(0),
-                        Variable = new VariableName("Foo")
+                        Increment = Constant(0)
                     },
                     new ErrorBuilder("Cannot do a For loop with an increment of 0", ErrorCode.DivideByZero))
-                        .WithExpectedFinalState("Foo", 1)
+                        .WithExpectedFinalState(VariableName.Index.Name, 1)
                     ;
 
                 yield return CreateDefaultErrorCase();

@@ -86,6 +86,8 @@ namespace Reductech.EDR.Core.Steps
                 if (setResult2.IsFailure) return setResult.ConvertFailure<Unit>();
             }
 
+            stateMonad.RemoveVariable(VariableName.Index, false);
+
             return Unit.Default;
 
         }

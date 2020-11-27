@@ -114,7 +114,7 @@ namespace Reductech.EDR.Core.Tests
                         Action = Print(GetVariable<string>(FooVariableName)),
                         Array = Array(Constant("Hello"),
                             Constant("World")),
-                        VariableName = FooVariableName
+                        Variable = FooVariableName
                     }, "Hello", "World");
 
 
@@ -131,7 +131,7 @@ namespace Reductech.EDR.Core.Tests
                         },
                         Array = Array(Constant("Hello"),
                             Constant("World")),
-                        VariableName = FooVariableName
+                        Variable = FooVariableName
                     }, "Farewell", "Hello", "Farewell", "World");
 
                 yield return new StepTestCase("If True then Print 'Hello World' else Print 'World Hello'",
@@ -147,8 +147,7 @@ namespace Reductech.EDR.Core.Tests
                 yield return new StepTestCase("For <Foo> = 5; <Foo> <= 10; += 2; Print <Foo>",
                     new For
                     {
-                        Variable = FooVariableName,
-                        Action = Print(GetVariable<int>(FooVariableName)),
+                        Action = Print(GetVariable<int>(VariableName.Index)),
                         From = Constant(5),
                         To = Constant(10),
                         Increment = Constant(2)
@@ -502,7 +501,7 @@ Two,The second number"),
                             new ForEach<List<string>>
                             {
                                 Array = GetVariable<List<List<string>>>(new VariableName("DataVar")),
-                                VariableName = FooVariableName,
+                                Variable = FooVariableName,
                                 Action = new Print<string>
                                 {
                                     Value = new ElementAtIndex<string>
