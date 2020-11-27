@@ -131,7 +131,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                         "|:-------:|:---------------------------:|:------:|:-----:|:------------:|:-----------:|:-----:|:---------------:|:---------------:|:----------:|:------:|:----------------:|:-------------:|",
                         "|Alpha    |`int`                        |☑️      |       |Greater than 1|             |1234   |100-300          |201              |Greek 2.1   |Beta    |[Alpha](alpha.com)|               |",
                         "|Beta     |`string`                     |        |       |              |Two hundred  |       |                 |                 |            |Alpha   |                  |               |",
-                        "|Gamma    |[VariableName](#VariableName)|        |       |              |             |       |                 |                 |            |        |                  |               |",
+                        "|Gamma    |[Variable](#Variable)|        |       |              |             |       |                 |                 |            |        |                  |               |",
                         "|Delta    |IStep<`bool`>                |        |       |              |             |       |                 |                 |            |        |                  |,              |",
                         "",
                     }).WithStepFactoryStore(StepFactoryStore.Create(DocumentationExampleStepFactory.Instance));
@@ -169,7 +169,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                         "|:-------:|:---------------------------:|:------:|:-----:|:------------:|:-----------:|:-----:|:---------------:|:---------------:|:----------:|:------:|:----------------:|:-------------:|",
                         "|Alpha    |`int`                        |☑️      |       |Greater than 1|             |1234   |100-300          |201              |Greek 2.1   |Beta    |[Alpha](alpha.com)|               |",
                         "|Beta     |`string`                     |        |       |              |Two hundred  |       |                 |                 |            |Alpha   |                  |               |",
-                        "|Gamma    |[VariableName](#VariableName)|        |       |              |             |       |                 |                 |            |        |                  |               |",
+                        "|Gamma    |[Variable](#Variable)|        |       |              |             |       |                 |                 |            |        |                  |               |",
                         "|Delta    |IStep<`bool`>                |        |       |              |             |       |                 |                 |            |        |                  |,              |",
                         ""
                     }).WithStepFactoryStore(StepFactoryStore.Create(NotStepFactory.Instance, DocumentationExampleStepFactory.Instance));

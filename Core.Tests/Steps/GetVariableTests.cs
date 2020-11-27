@@ -26,7 +26,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                     {
                         new SetVariable<int>
                         {
-                            VariableName = new VariableName("Foo"),
+                            Variable = new VariableName("Foo"),
                             Value = Constant(42)
                         },
                         new Print<int>

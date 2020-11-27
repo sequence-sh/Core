@@ -35,8 +35,8 @@ namespace Reductech.EDR.Core.Tests
                     {
                         Steps = new List<IStep<Unit>>
                         {
-                            new SetVariable<string>{Value = new Constant<string>("Hello World"), VariableName = new VariableName("Foo")},
-                            new SetVariable<string>{Value = new GetVariable<string> {Variable = new VariableName("Foo")}, VariableName = new VariableName("Bar")},
+                            new SetVariable<string>{Value = new Constant<string>("Hello World"), Variable = new VariableName("Foo")},
+                            new SetVariable<string>{Value = new GetVariable<string> {Variable = new VariableName("Foo")}, Variable = new VariableName("Bar")},
                             new Print<string>{Value = new GetVariable<string> {Variable = new VariableName("Bar")}}
                         }
                     },
@@ -162,7 +162,7 @@ namespace Reductech.EDR.Core.Tests
                             new SetVariable<CompareOperator>()
                             {
                                 Value = new Constant<CompareOperator>(CompareOperator.LessThan),
-                                VariableName = new VariableName("Foo")
+                                Variable = new VariableName("Foo")
                             },
 
                             new Print<bool>
@@ -191,7 +191,7 @@ namespace Reductech.EDR.Core.Tests
       Do: GetVariable
       Config:
         DoNotSplit: true
-      VariableName: <Foo>
+      Variable: <Foo>
     Right: 2"
                 );
 

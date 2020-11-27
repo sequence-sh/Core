@@ -12,7 +12,7 @@ namespace Reductech.EDR.Core.Internal
     public readonly struct VariableName : IEquatable<VariableName>
     {
         /// <summary>
-        /// Creates a new VariableName.
+        /// Creates a new Variable.
         /// </summary>
         public VariableName(string name) => Name = name;
 
@@ -66,9 +66,9 @@ namespace Reductech.EDR.Core.Internal
         public Result<Unit, IErrorBuilder> EnsureNotReserved()
         {
             if (ReservedVariableNames.Contains(Name))
-                return new ErrorBuilder($"The VariableName <{Name}> is Reserved.", ErrorCode.ReservedVariableName);
+                return new ErrorBuilder($"The Variable <{Name}> is Reserved.", ErrorCode.ReservedVariableName);
             if (Name.StartsWith(ReservedVariableNamePrefix, StringComparison.OrdinalIgnoreCase))
-                return new ErrorBuilder($"The VariableName Prefix '{ReservedVariableNamePrefix}' is Reserved.", ErrorCode.ReservedVariableName);
+                return new ErrorBuilder($"The Variable Prefix '{ReservedVariableNamePrefix}' is Reserved.", ErrorCode.ReservedVariableName);
 
             return Unit.Default;
         }

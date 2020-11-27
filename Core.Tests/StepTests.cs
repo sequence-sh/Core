@@ -449,7 +449,7 @@ Two,The second number"),
                         Steps = new IStep<Unit>[]{
                             new SetVariable<List<List<string>>>
                             {
-                                VariableName = new VariableName("DataVar"),
+                                Variable = new VariableName("DataVar"),
 
                                 Value = new Array<List<string>>
                                 {
@@ -505,7 +505,7 @@ Two,The second number"),
         private static SetVariable<T> SetVariable<T>(VariableName variableName, IStep<T> step) =>
             new SetVariable<T>
             {
-                VariableName = variableName,
+                Variable = variableName,
                 Value = step
             };
 

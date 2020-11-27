@@ -32,12 +32,12 @@ namespace Reductech.EDR.Core.Tests
             {
 
                 yield return new DeserializationErrorCase("- <Entity> = 123\n- Print(Value = <Entity>)",
-                    ("The VariableName <Entity> is Reserved.", "<Entity> = 123")
+                    ("The Variable <Entity> is Reserved.", "<Entity> = 123")
                     );
 
 
                 yield return new DeserializationErrorCase("- <ReductechEntity> = 123\n- Print(Value = <ReductechEntity>)",
-                    ("The VariableName Prefix 'Reductech' is Reserved.", "<ReductechEntity> = 123")
+                    ("The Variable Prefix 'Reductech' is Reserved.", "<ReductechEntity> = 123")
                     );
 
                 yield return new DeserializationErrorCase("", ("Yaml is empty.", EntireSequenceLocation.Instance.AsString));
@@ -90,8 +90,8 @@ namespace Reductech.EDR.Core.Tests
 
                 yield return new DeserializationErrorCase("MyMegaFunction(Value = true)", ("The step 'MyMegaFunction' does not exist", "Line: 1, Col: 1, Idx: 0 - Line: 1, Col: 29, Idx: 28"));
 
-                yield return new DeserializationErrorCase("- >\n  ForEach(\n    Array = ['a','b','c'],\n    VariableName = <char>,\n    Action = Print(Value = <char>))",
-                    ("'ForEach( Array = ['a','b','c'], VariableName = <char>, Action = Print(Value = <char>))' is a 'String' but it should be a 'Unit' to be a member of 'Sequence'", "Sequence")
+                yield return new DeserializationErrorCase("- >\n  ForEach(\n    Array = ['a','b','c'],\n    Variable = <char>,\n    Action = Print(Value = <char>))",
+                    ("'ForEach( Array = ['a','b','c'], Variable = <char>, Action = Print(Value = <char>))' is a 'String' but it should be a 'Unit' to be a member of 'Sequence'", "Sequence")
                 );
 
             }

@@ -54,7 +54,7 @@ namespace Reductech.EDR.Core.Tests
                         {
                             new SetVariable<int>
                             {
-                                VariableName = FooString,
+                                Variable = FooString,
                                 Value = new Constant<int>(42)
                             },
 

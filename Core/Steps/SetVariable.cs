@@ -25,7 +25,7 @@ namespace Reductech.EDR.Core.Steps
             CancellationToken cancellationToken)
         {
             return await Value.Run(stateMonad, cancellationToken)
-                .Bind(x => stateMonad.SetVariable(VariableName, x));
+                .Bind(x => stateMonad.SetVariable(Variable, x));
         }
 
         /// <inheritdoc />
@@ -36,7 +36,7 @@ namespace Reductech.EDR.Core.Steps
         /// </summary>
         [VariableName]
         [Required]
-        public VariableName VariableName { get; set; }
+        public VariableName Variable { get; set; }
 
         /// <summary>
         /// The value to set the variable to.
@@ -67,7 +67,7 @@ namespace Reductech.EDR.Core.Steps
 
 
         /// <inheritdoc />
-        public override IStepNameBuilder StepNameBuilder => new StepNameBuilderFromTemplate($"[{nameof(SetVariable<object>.VariableName)}] = [{nameof(SetVariable<object>.Value)}]");
+        public override IStepNameBuilder StepNameBuilder => new StepNameBuilderFromTemplate($"[{nameof(SetVariable<object>.Variable)}] = [{nameof(SetVariable<object>.Value)}]");
 
         /// <inheritdoc />
         public override IEnumerable<Type> EnumTypes => ImmutableArray<Type>.Empty;
@@ -90,7 +90,7 @@ namespace Reductech.EDR.Core.Steps
 
         /// <inheritdoc />
         protected override Result<ICompoundStep, IError> TryCreateInstance(StepContext stepContext, FreezableStepData freezableStepData) =>
-            freezableStepData.GetVariableName(nameof(SetVariable<object>.VariableName), TypeName)
+            freezableStepData.GetVariableName(nameof(SetVariable<object>.Variable), TypeName)
                 .Bind(x => stepContext.TryGetTypeFromReference(new VariableTypeReference(x)))
                 .Bind(x => TryCreateGeneric(typeof(SetVariable<>), x))
         .MapError(e=>e.WithLocation(this, freezableStepData));
@@ -101,7 +101,7 @@ namespace Reductech.EDR.Core.Steps
 
         /// <inheritdoc />
         public override IStepSerializer Serializer { get; } = new StepSerializer(
-            new VariableNameComponent(nameof(SetVariable<object>.VariableName)),
+            new VariableNameComponent(nameof(SetVariable<object>.Variable)),
             new SpaceComponent(),
             new FixedStringComponent("="),
             new SpaceComponent(),
@@ -116,7 +116,7 @@ namespace Reductech.EDR.Core.Steps
         {
             var varNameDict = new Dictionary<string, VariableName>
             {
-                {nameof(SetVariable<object>.VariableName), variableName},
+                {nameof(SetVariable<object>.Variable), variableName},
             };
 
             var stepDict = new Dictionary<string, IFreezableStep>

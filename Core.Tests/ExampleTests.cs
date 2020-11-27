@@ -92,13 +92,13 @@ namespace Reductech.EDR.Core.Tests
                 {
                     new SetVariable<EntityStream>
                     {
-                        VariableName = new VariableName("EntityStream"),
+                        Variable = new VariableName("EntityStream"),
                         Value = new FromCSV{Stream = new ReadFile{Path = new Constant<string>(@"C:\Users\wainw\source\repos\Reductech\edr\Examples\Dinosaurs.csv")}}
                     },
 
                     new SetVariable<Schema>()
                     {
-                        VariableName = new VariableName("Schema"),
+                        Variable = new VariableName("Schema"),
                         Value = new Constant<Schema>(new Schema
                                 {
                                     AllowExtraProperties = false,

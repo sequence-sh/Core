@@ -38,7 +38,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                 //yield return new StepCase("For each record. Line breaks",
                 //    new ForEachEntity
                 //    {
-                //        VariableName = new VariableName("Foo"),
+                //        Variable = new Variable("Foo"),
                 //        Action = new Print<Entity>
                 //        {
                 //            Value = GetVariable<Entity>("Foo")

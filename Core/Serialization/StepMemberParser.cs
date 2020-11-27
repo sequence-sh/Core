@@ -32,7 +32,7 @@ namespace Reductech.EDR.Core.Serialization
             /// </summary>
             // ReSharper disable once UnusedMember.Local
             None,
-            [Token(Example = "<VariableName>")]
+            [Token(Example = "<Variable>")]
             VariableName,
             [Token(Example = "(")]
             OpenBracket,
@@ -92,7 +92,7 @@ namespace Reductech.EDR.Core.Serialization
             .Match(Character.EqualTo(']'), ProcessToken.CloseArray)
             .Match(Character.EqualTo(','), ProcessToken.Delimiter)
 
-            //VariableName must be before comparator
+            //Variable must be before comparator
             .Match(Span.Regex("<[a-z0-9-_]+>", RegexOptions.Compiled | RegexOptions.IgnoreCase), ProcessToken.VariableName)
             .Match(Span.Regex(@"-?[0-9]+", RegexOptions.Compiled), ProcessToken.Number) //Number must come before MathOperator
 
