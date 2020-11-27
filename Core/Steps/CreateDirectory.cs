@@ -11,6 +11,7 @@ namespace Reductech.EDR.Core.Steps
 {
     /// <summary>
     /// Creates a new directory in the file system.
+    /// Will create all directories and subdirectories in the specified path unless they already exist.
     /// </summary>
     public class CreateDirectory : CompoundStep<Unit>
     {
@@ -44,6 +45,7 @@ namespace Reductech.EDR.Core.Steps
 
     /// <summary>
     /// Creates a new directory in the file system.
+    /// Will create all directories and subdirectories in the specified path unless they already exist.
     /// </summary>
     public class CreateDirectoryStepFactory : SimpleStepFactory<CreateDirectory, Unit>
     {
