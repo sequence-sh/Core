@@ -6,7 +6,7 @@ using Xunit.Abstractions;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
-    public class RepeatXTimesTests : StepTestBase<RepeatXTimes, Unit>
+    public class RepeatXTimesTests : StepTestBase<DoXTimes, Unit>
     {
         /// <inheritdoc />
         public RepeatXTimesTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
@@ -19,10 +19,10 @@ namespace Reductech.EDR.Core.Tests.Steps
             get
             {
                 yield return new StepCase("Print something three times",
-                    new RepeatXTimes()
+                    new DoXTimes()
                     {
                         Action = new Print<int>(){Value = Constant(6)},
-                        Number = Constant(3)
+                        X = Constant(3)
                     }, Unit.Default, "6","6","6"
                     );
 
@@ -35,7 +35,7 @@ namespace Reductech.EDR.Core.Tests.Steps
             get
             {
                 yield return new DeserializeCase("Print something three times",
-                    "RepeatXTimes(Action = Print(Value = 6), Number = 3)", Unit.Default, "6","6","6"
+                    "DoXTimes(Action = Print(Value = 6), X = 3)", Unit.Default, "6","6","6"
                     );
 
 

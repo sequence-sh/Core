@@ -138,7 +138,7 @@ Value: notable", "notable");//check 'not' delimiter
 
                 yield return new DeserializationTestFunction(@"
 - <ArrayVar1> = Array(Elements = ['abc', '123'])
-- <ArrayVar2> = Repeat(Element = <ArrayVar1>, Number = 2)
+- <ArrayVar2> = Repeat(Element = <ArrayVar1>, X = 2)
 - Foreach(Array = <ArrayVar2>, Variable = <Element>, Action = Print(Value = ArrayLength(Array = <Element>)))", "2", "2");
 
                 yield return new DeserializationTestFunction(@"

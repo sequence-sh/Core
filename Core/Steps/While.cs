@@ -13,7 +13,7 @@ namespace Reductech.EDR.Core.Steps
     /// <summary>
     /// Repeat an action while the condition is met.
     /// </summary>
-    public sealed class RepeatWhile : CompoundStep<Unit>
+    public sealed class While : CompoundStep<Unit>
     {
         /// <inheritdoc />
         public override async Task<Result<Unit, IError>> Run(IStateMonad stateMonad,
@@ -49,26 +49,23 @@ namespace Reductech.EDR.Core.Steps
         [Required]
         public IStep<Unit> Action { get; set; } = null!;
 
-
-
-
         /// <inheritdoc />
-        public override IStepFactory StepFactory => RepeatWhileStepFactory.Instance;
+        public override IStepFactory StepFactory => WhileStepFactory.Instance;
     }
 
     /// <summary>
     /// Repeat an action while the condition is met.
     /// </summary>
-    public sealed class RepeatWhileStepFactory : SimpleStepFactory<RepeatWhile, Unit>
+    public sealed class WhileStepFactory : SimpleStepFactory<While, Unit>
     {
-        private RepeatWhileStepFactory() { }
+        private WhileStepFactory() { }
 
         /// <summary>
         /// The instance.
         /// </summary>
-        public static SimpleStepFactory<RepeatWhile, Unit> Instance { get; } = new RepeatWhileStepFactory();
+        public static SimpleStepFactory<While, Unit> Instance { get; } = new WhileStepFactory();
 
         /// <inheritdoc />
-        public override IStepNameBuilder StepNameBuilder => new StepNameBuilderFromTemplate($"Repeat '[{nameof(RepeatWhile.Action)}]' while '[{nameof(RepeatWhile.Condition)}]'");
+        public override IStepNameBuilder StepNameBuilder => new StepNameBuilderFromTemplate($"Repeat '[{nameof(While.Action)}]' while '[{nameof(While.Condition)}]'");
     }
 }

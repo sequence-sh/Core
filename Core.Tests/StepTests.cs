@@ -155,7 +155,7 @@ namespace Reductech.EDR.Core.Tests
 
                 yield return new StepTestCase("<Foo> = True; Repeat 'Print 'Hello World'; <Foo> = False' while '<Foo>'",
                     Sequence(SetVariable(FooVariableName, Constant(true)),
-                        new RepeatWhile
+                        new While
                         {
                             Action = Sequence(Print(Constant(HelloWorldString)),
                                 SetVariable(FooVariableName, Constant(false))),
@@ -228,7 +228,7 @@ namespace Reductech.EDR.Core.Tests
                     (-1).ToString()
                 );
 
-                yield return new StepTestCase("Print Match Repeat(Element: 'Hello', Number: 3)", Print(new StringJoin
+                yield return new StepTestCase("Print Match Repeat(Element: 'Hello', X: 3)", Print(new StringJoin
                 {
                     Delimiter = Constant(", "),
                     Strings = new Repeat<string>
@@ -352,9 +352,9 @@ namespace Reductech.EDR.Core.Tests
                     }), "e");
 
                 yield return new StepTestCase("Repeat 'Print 'Hello World'' '3' times.",
-                    new RepeatXTimes
+                    new DoXTimes
                     {
-                        Number = Constant(3),
+                        X = Constant(3),
                         Action = Print(Constant(HelloWorldString))
                     }, HelloWorldString, HelloWorldString, HelloWorldString);
 

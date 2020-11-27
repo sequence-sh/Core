@@ -12,7 +12,7 @@ namespace Reductech.EDR.Core.Steps
     /// <summary>
     /// Repeat a step a set number of times.
     /// </summary>
-    public sealed class RepeatXTimes : CompoundStep<Unit>
+    public sealed class DoXTimes : CompoundStep<Unit>
     {
         /// <summary>
         /// The action to perform repeatedly.
@@ -26,13 +26,13 @@ namespace Reductech.EDR.Core.Steps
         /// </summary>
         [StepProperty]
         [Required]
-        public IStep<int> Number { get; set; } = null!;
+        public IStep<int> X { get; set; } = null!;
 
         /// <inheritdoc />
         public override async Task<Result<Unit, IError>> Run(IStateMonad stateMonad,
             CancellationToken cancellationToken)
         {
-            var numberResult = await Number.Run(stateMonad, cancellationToken);
+            var numberResult = await X.Run(stateMonad, cancellationToken);
 
             if (numberResult.IsFailure) return numberResult.ConvertFailure<Unit>();
 
@@ -52,16 +52,16 @@ namespace Reductech.EDR.Core.Steps
     /// <summary>
     /// Repeat a step a set number of times.
     /// </summary>
-    public sealed class RepeatXTimesStepFactory : SimpleStepFactory<RepeatXTimes, Unit>
+    public sealed class RepeatXTimesStepFactory : SimpleStepFactory<DoXTimes, Unit>
     {
         private RepeatXTimesStepFactory() { }
         /// <summary>
         /// The instance.
         /// </summary>
-        public static SimpleStepFactory<RepeatXTimes, Unit> Instance { get; } = new RepeatXTimesStepFactory();
+        public static SimpleStepFactory<DoXTimes, Unit> Instance { get; } = new RepeatXTimesStepFactory();
 
 
         /// <inheritdoc />
-        public override IStepNameBuilder StepNameBuilder => new StepNameBuilderFromTemplate($"Repeat '[{nameof(RepeatXTimes.Action)}]' '[{nameof(RepeatXTimes.Number)}]' times.");
+        public override IStepNameBuilder StepNameBuilder => new StepNameBuilderFromTemplate($"Repeat '[{nameof(DoXTimes.Action)}]' '[{nameof(DoXTimes.X)}]' times.");
     }
 }
