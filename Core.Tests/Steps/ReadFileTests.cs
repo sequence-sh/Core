@@ -29,16 +29,14 @@ namespace Reductech.EDR.Core.Tests.Steps
                         {
                             Stream = new ReadFile
                             {
-                                FileName = Constant("File.txt"),
-                                Folder = Constant("MyFolder")
+                                Path = Constant("File.txt"),
                             }
                         }
                     },
                     Unit.Default,
                     "Hello World"
 
-                ).WithFileSystemAction(x=>x.Setup(a=>a.ReadFile(
-                    Path.Combine("MyFolder", "File.txt"))).Returns(new MemoryStream(Encoding.ASCII.GetBytes("Hello World"))));
+                ).WithFileSystemAction(x=>x.Setup(a=>a.ReadFile("File.txt")).Returns(new MemoryStream(Encoding.ASCII.GetBytes("Hello World"))));
             }
         }
 
@@ -50,13 +48,12 @@ namespace Reductech.EDR.Core.Tests.Steps
                 yield return new ErrorCase("Test Error",
                         new ReadFile
                         {
-                            FileName = Constant("File.txt"),
-                            Folder = Constant("MyFolder")
+                            Path =  Constant("File.txt"),
                         },
                         new ErrorBuilder("Test Error", ErrorCode.Test)
                     )
                     .WithFileSystemAction(x => x.Setup(a => a.ReadFile(
-                        Path.Combine("MyFolder", "File.txt"))).Returns(new ErrorBuilder("Test Error", ErrorCode.Test)));
+                        "File.txt")).Returns(new ErrorBuilder("Test Error", ErrorCode.Test)));
             }
         }
     }

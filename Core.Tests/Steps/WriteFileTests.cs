@@ -21,16 +21,15 @@ namespace Reductech.EDR.Core.Tests.Steps
         {
             get
             {
-                yield return new StepCase("Write file", new WriteFile()
+                yield return new StepCase("Write file", new WriteFile
                     {
-                        FileName = Constant("Filename.txt"),
-                        Folder = Constant("MyPath"),
-                        Text = new ToStream(){Text = Constant("Hello World")}
+                        Path =  Constant("Filename.txt"),
+                        Stream = new ToStream{Text = Constant("Hello World")}
 
 
                     },Unit.Default)
                     .WithFileSystemAction(x=>x.Setup(a=>
-                        a.WriteFileAsync(Path.Combine("MyPath", "Filename.txt"),
+                        a.WriteFileAsync("Filename.txt",
                             It.IsAny<Stream>(), It.IsAny<CancellationToken>())).ReturnsAsync(Unit.Default));
                 //TODO check that the text being sent is actually written
             }

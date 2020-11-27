@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using System.Reflection.Metadata;
 using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
@@ -80,9 +81,8 @@ namespace Reductech.EDR.Core.Tests
         {
             var step = new WriteFile
             {
-                FileName = new Constant<string>("MyFile"),
-                Folder = new Constant<string>(@"C:\Users\wainw\source\repos\Reductech\edr\Examples"),
-                Text = new WriteCSV
+                Path = new PathCombine{Paths = new Constant<List<string>>(new List<string>{"MyFile.txt"})},
+                Stream = new WriteCSV
                 {
                     Entities = new MapFieldNames
                     {
