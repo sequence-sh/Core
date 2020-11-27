@@ -7,7 +7,6 @@ using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
-using Reductech.EDR.Core.Util;
 
 namespace Reductech.EDR.Core.Steps
 {
@@ -30,20 +29,20 @@ namespace Reductech.EDR.Core.Steps
         }
 
         /// <inheritdoc />
-        public override IStepFactory StepFactory => ArrayCountStepFactory.Instance;
+        public override IStepFactory StepFactory => LengthStepFactory.Instance;
     }
 
     /// <summary>
     /// Counts the elements in an array.
     /// </summary>
-    public sealed class ArrayCountStepFactory : GenericStepFactory
+    public sealed class LengthStepFactory : GenericStepFactory
     {
-        private ArrayCountStepFactory() { }
+        private LengthStepFactory() { }
 
         /// <summary>
         /// The instance.
         /// </summary>
-        public static GenericStepFactory Instance { get; } = new ArrayCountStepFactory();
+        public static GenericStepFactory Instance { get; } = new LengthStepFactory();
 
         /// <inheritdoc />
         public override Type StepType => typeof(Length<>);

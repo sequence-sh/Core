@@ -28,7 +28,7 @@ namespace Reductech.EDR.Core.TestHarness
 
         [Theory]
         [NonStaticMemberData(nameof(StepCaseNames), true)]
-        public async Task Should_behave_as_expected_when_serialized_deserialized_and_executed(string stepCaseName)
+        public async Task Should_behave_as_expected_when_serialized_deserialized_and_run(string stepCaseName)
         {
             await StepCases.FindAndRunAsync(stepCaseName, TestOutputHelper, StepCase.SerializeArgument);
         }

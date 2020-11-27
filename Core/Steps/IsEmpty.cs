@@ -32,20 +32,20 @@ namespace Reductech.EDR.Core.Steps
         }
 
         /// <inheritdoc />
-        public override IStepFactory StepFactory => ArrayIsEmptyStepFactory.Instance;
+        public override IStepFactory StepFactory => IsEmptyStepFactory.Instance;
     }
 
     /// <summary>
     /// Checks if an array is empty.
     /// </summary>
-    public sealed class ArrayIsEmptyStepFactory : GenericStepFactory
+    public sealed class IsEmptyStepFactory : GenericStepFactory
     {
-        private ArrayIsEmptyStepFactory() { }
+        private IsEmptyStepFactory() { }
 
         /// <summary>
         /// The instance.
         /// </summary>
-        public static GenericStepFactory Instance { get; } = new ArrayIsEmptyStepFactory();
+        public static GenericStepFactory Instance { get; } = new IsEmptyStepFactory();
 
         /// <inheritdoc />
         public override Type StepType => typeof(IsEmpty<>);

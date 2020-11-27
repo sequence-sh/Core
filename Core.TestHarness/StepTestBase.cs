@@ -104,6 +104,8 @@ namespace Reductech.EDR.Core.TestHarness
 
             var stepFactoryType = instance.StepFactory.GetType();
 
+            stepFactoryType.Name.Should().StartWith(typeof(TStep).Name.Trim('`','1'));
+
             var constructor = stepFactoryType.GetConstructor(System.Array.Empty<Type>());
             constructor.Should().BeNull($"{StepName} should not have a public parameterless constructor");
 

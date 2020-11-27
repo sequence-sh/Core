@@ -58,20 +58,20 @@ namespace Reductech.EDR.Core.Steps
         }
 
         /// <inheritdoc />
-        public override IStepFactory StepFactory => ForeachStepFactory.Instance;
+        public override IStepFactory StepFactory => ForEachStepFactory.Instance;
     }
 
     /// <summary>
     /// Do an action for each member of the list.
     /// </summary>
-    public sealed class ForeachStepFactory : GenericStepFactory
+    public sealed class ForEachStepFactory : GenericStepFactory
     {
-        private ForeachStepFactory() { }
+        private ForEachStepFactory() { }
 
         /// <summary>
         /// The instance.
         /// </summary>
-        public static StepFactory Instance { get; } = new ForeachStepFactory();
+        public static StepFactory Instance { get; } = new ForEachStepFactory();
 
         /// <inheritdoc />
         public override Type StepType => typeof(ForEach<>);

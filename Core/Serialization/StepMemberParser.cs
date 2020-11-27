@@ -260,7 +260,7 @@ namespace Reductech.EDR.Core.Serialization
                 (from f1 in Parse.Ref(()=> singleTerm.Value)
                  from o in Token.EqualTo(ProcessToken.BooleanOperator)
                  from f2 in Parse.Ref(()=> singleTerm.Value)
-                 select ApplyBooleanStepFactory.CreateFreezable(f1,
+                 select ApplyBooleanOperatorStepFactory.CreateFreezable(f1,
                      new ConstantFreezableStep(Extensions.TryParseValue<BooleanOperator>(o.ToStringValue()).Value),
                   f2)).Try();
 

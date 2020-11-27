@@ -85,20 +85,20 @@ namespace Reductech.EDR.Core.Steps
         public IStep<string> DateTimeFormat { get; set; } = new Constant<string>("yyyy/MM/dd H:mm:ss");
 
         /// <inheritdoc />
-        public override IStepFactory StepFactory => WriteCsvFactory.Instance;
+        public override IStepFactory StepFactory => WriteCSVFactory.Instance;
     }
 
     /// <summary>
     /// Write entities to a stream in csv format.
     /// The same as WriteConcordance but with different default values.
     /// </summary>
-    public sealed class WriteCsvFactory : SimpleStepFactory<WriteCSV, Stream>
+    public sealed class WriteCSVFactory : SimpleStepFactory<WriteCSV, Stream>
     {
-        private WriteCsvFactory() { }
+        private WriteCSVFactory() { }
 
         /// <summary>
         /// The instance.
         /// </summary>
-        public static SimpleStepFactory<WriteCSV, Stream> Instance { get; } = new WriteCsvFactory();
+        public static SimpleStepFactory<WriteCSV, Stream> Instance { get; } = new WriteCSVFactory();
     }
 }
