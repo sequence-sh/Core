@@ -27,7 +27,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                         From = Constant(1),
                         To = Constant(3),
                         Increment = Constant(1),
-                        VariableName = new VariableName("Foo")
+                        Variable = new VariableName("Foo")
                     }, Unit.Default,"1","2","3").WithExpectedFinalState("Foo", 4);
 
                 yield return new StepCase("Increment 2",
@@ -37,7 +37,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                         From = Constant(1),
                         To = Constant(6),
                         Increment = Constant(2),
-                        VariableName = new VariableName("Foo")
+                        Variable = new VariableName("Foo")
                     }, Unit.Default, "1","3","5")
                     .WithExpectedFinalState("Foo", 7);
 
@@ -48,7 +48,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                         From = Constant(3),
                         To = Constant(1),
                         Increment = Constant(-1),
-                        VariableName = new VariableName("Foo")
+                        Variable = new VariableName("Foo")
                     }, Unit.Default, "3","2","1"
                     ).WithExpectedFinalState("Foo", 0);
 
@@ -59,7 +59,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                         From = Constant(3),
                         To = Constant(1),
                         Increment = Constant(1),
-                        VariableName = new VariableName("Foo")
+                        Variable = new VariableName("Foo")
                     }, Unit.Default
                     ).WithExpectedFinalState("Foo", 3);
 
@@ -93,7 +93,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                         From = Constant(1),
                         To = Constant(3),
                         Increment = Constant(0),
-                        VariableName = new VariableName("Foo")
+                        Variable = new VariableName("Foo")
                     },
                     new ErrorBuilder("Cannot do a For loop with an increment of 0", ErrorCode.DivideByZero))
                         .WithExpectedFinalState("Foo", 1)

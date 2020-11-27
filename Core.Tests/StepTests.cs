@@ -147,7 +147,7 @@ namespace Reductech.EDR.Core.Tests
                 yield return new StepTestCase("For <Foo> = 5; <Foo> <= 10; += 2; Print <Foo>",
                     new For
                     {
-                        VariableName = FooVariableName,
+                        Variable = FooVariableName,
                         Action = Print(GetVariable<int>(FooVariableName)),
                         From = Constant(5),
                         To = Constant(10),

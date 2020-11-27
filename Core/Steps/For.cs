@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
@@ -10,25 +11,20 @@ using Reductech.EDR.Core.Util;
 namespace Reductech.EDR.Core.Steps
 {
     /// <summary>
-    /// Do an action for each value of a given variable in a range.
+    /// Do an action for each value of &lt;i&gt; in a range.
     /// </summary>
     public sealed class For : CompoundStep<Unit>
     {
 
         /// <summary>
         /// The action to perform repeatedly.
+        /// Use the variable &lt;i&gt;
         /// </summary>
         [StepProperty]
         [Required]
         public IStep<Unit> Action { get; set; } = null!;
 
-
-        /// <summary>
-        /// The name of the variable to loop over.
-        /// </summary>
-        [VariableName]
-        [Required]
-        public VariableName VariableName { get; set; }
+        //TODO let users set a custom variable name
 
         /// <summary>
         /// The first value of the variable to use.
@@ -56,6 +52,8 @@ namespace Reductech.EDR.Core.Steps
         public override async Task<Result<Unit, IError>> Run(IStateMonad stateMonad,
             CancellationToken cancellationToken)
         {
+            var variableName = VariableName.Index;
+
             var from = await From.Run(stateMonad, cancellationToken);
             if (from.IsFailure) return from.ConvertFailure<Unit>();
 
@@ -67,7 +65,7 @@ namespace Reductech.EDR.Core.Steps
 
             var currentValue = from.Value;
 
-            var setResult = stateMonad.SetVariable(VariableName, currentValue);
+            var setResult = stateMonad.SetVariable(variableName, currentValue);
             if (setResult.IsFailure) return setResult.ConvertFailure<Unit>();
 
             if(increment.Value == 0)
@@ -79,12 +77,12 @@ namespace Reductech.EDR.Core.Steps
                 if (r.IsFailure) return r;
 
 
-                var currentValueResult = stateMonad.GetVariable<int>(VariableName).MapError(e=>e.WithLocation(this));
+                var currentValueResult = stateMonad.GetVariable<int>(variableName).MapError(e=>e.WithLocation(this));
                 if (currentValueResult.IsFailure) return currentValueResult.ConvertFailure<Unit>();
                 currentValue = currentValueResult.Value;
                 currentValue += increment.Value;
 
-                var setResult2 = stateMonad.SetVariable(VariableName, currentValue);
+                var setResult2 = stateMonad.SetVariable(variableName, currentValue);
                 if (setResult2.IsFailure) return setResult.ConvertFailure<Unit>();
             }
 
@@ -110,8 +108,16 @@ namespace Reductech.EDR.Core.Steps
         public static SimpleStepFactory<For, Unit> Instance { get; } = new ForStepFactory();
 
         /// <inheritdoc />
-        public override IStepNameBuilder StepNameBuilder => new StepNameBuilderFromTemplate($"For [{nameof(For.VariableName)}] = [{nameof(For.From)}]; [{nameof(For.VariableName)}] <= [{nameof(For.To)}]; += [{nameof(For.Increment)}]; [{nameof(For.Action)}]");
+        public override IStepNameBuilder StepNameBuilder => new StepNameBuilderFromTemplate($"For [i] = [{nameof(For.From)}]; [i] <= [{nameof(For.To)}]; += [{nameof(For.Increment)}]; [{nameof(For.Action)}]");
 
+        /// <inheritdoc />
+        public override IEnumerable<(VariableName VariableName, ITypeReference typeReference)> FixedVariablesSet
+        {
+            get
+            {
+                yield return (VariableName.Index, new ActualTypeReference(typeof(int)));
+            }
+        }
 
         /// <inheritdoc />
         public override Result<Maybe<ITypeReference>, IError> GetTypeReferencesSet(VariableName variableName,

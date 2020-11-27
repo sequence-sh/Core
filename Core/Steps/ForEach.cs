@@ -29,7 +29,7 @@ namespace Reductech.EDR.Core.Steps
         /// </summary>
         [VariableName]
         [Required]
-        public VariableName VariableName { get; set; }
+        public VariableName VariableName { get; set; } //TODO use x
 
         /// <summary>
         /// The elements to iterate over.
