@@ -11,6 +11,7 @@ using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.TestHarness;
 using Reductech.EDR.Core.Util;
 using Reductech.Utilities.Testing;
+// ReSharper disable once RedundantUsingDirective
 using Xunit;
 using Xunit.Abstractions;
 using Entity = Reductech.EDR.Core.Entities.Entity;
@@ -27,8 +28,8 @@ namespace Reductech.EDR.Core.Tests
         public ITestOutputHelper TestOutputHelper { get; }
 
         //[Theory]
-        [InlineData(@"C:\Users\wainw\source\repos\Reductech\edr\Examples\Sort.yml")]
-        [InlineData(@"C:\Users\wainw\source\repos\Reductech\edr\Examples\MapFieldNames.yml")]
+        //[InlineData(@"C:\Users\wainw\source\repos\Reductech\edr\Examples\Sort.yml")]
+        //[InlineData(@"C:\Users\wainw\source\repos\Reductech\edr\Examples\MapFieldNames.yml")]
         public async Task RunYamlSequenceFromFile(string path)
         {
             var yaml = await File.ReadAllTextAsync(path);

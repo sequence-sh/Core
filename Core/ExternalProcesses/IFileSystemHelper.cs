@@ -57,5 +57,10 @@ namespace Reductech.EDR.Core.ExternalProcesses
         /// Creates a file and writes a stream to it.
         /// </summary>
         Task<Result<Unit, IErrorBuilder>> WriteFileAsync(string path, Stream text, CancellationToken cancellationToken);
+
+        /// <summary>
+        /// Gets the current working directory of the application.
+        /// </summary>
+        string GetCurrentDirectory();
     }
 }
