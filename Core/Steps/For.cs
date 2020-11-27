@@ -110,7 +110,7 @@ namespace Reductech.EDR.Core.Steps
         public static SimpleStepFactory<For, Unit> Instance { get; } = new ForStepFactory();
 
         /// <inheritdoc />
-        public override IStepNameBuilder StepNameBuilder => new StepNameBuilderFromTemplate($"For [i] = [{nameof(For.From)}]; [i] <= [{nameof(For.To)}]; += [{nameof(For.Increment)}]; [{nameof(For.Action)}]");
+        public override IStepNameBuilder StepNameBuilder => new StepNameBuilderFromTemplate($"For i = [{nameof(For.From)}]; i <= [{nameof(For.To)}]; += [{nameof(For.Increment)}]; [{nameof(For.Action)}]");
 
         /// <inheritdoc />
         public override IEnumerable<(VariableName VariableName, ITypeReference typeReference)> FixedVariablesSet

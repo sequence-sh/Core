@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -144,7 +143,7 @@ namespace Reductech.EDR.Core.Tests
                     HelloWorldString);
 
 
-                yield return new StepTestCase("For <Foo> = 5; <Foo> <= 10; += 2; Print <Foo>",
+                yield return new StepTestCase("For i = 5; i <= 10; += 2; Print <i>",
                     new For
                     {
                         Action = Print(GetVariable<int>(VariableName.Index)),
@@ -172,7 +171,7 @@ namespace Reductech.EDR.Core.Tests
                         Operator = Constant(MathOperator.Multiply)
                     }), "6");
 
-                yield return new StepTestCase("Print ArrayCount(Array: ['Hello'; 'World'])",
+                yield return new StepTestCase("Print Length(Array: ['Hello'; 'World'])",
                     Print(new Length<string>
                     {
                         Array = Array(Constant("Hello"),
@@ -181,10 +180,10 @@ namespace Reductech.EDR.Core.Tests
                     "2"
                 );
 
-                yield return new StepTestCase("Print ArrayIsEmpty(Array: [])",
+                yield return new StepTestCase("Print IsEmpty(Array: [])",
                     Print(new IsEmpty<string> {Array = Array<string>()}), true.ToString());
 
-                yield return new StepTestCase("Print ArrayIsEmpty(Array: ['Hello World'])",
+                yield return new StepTestCase("Print IsEmpty(Array: ['Hello World'])",
                     Print(new IsEmpty<string>
                     {
                         Array = Array(Constant(HelloWorldString))
@@ -210,7 +209,7 @@ namespace Reductech.EDR.Core.Tests
                     }), false.ToString()
                 );
 
-                yield return new StepTestCase("Print FirstIndexOfElement(Array: ['Hello'; 'World'], Element: 'World')",
+                yield return new StepTestCase("Print FindElement(Array: ['Hello'; 'World'], Element: 'World')",
                     Print(new FindElement<string>
                     {
                         Array = Array(Constant("Hello"), Constant("World")),
@@ -220,7 +219,7 @@ namespace Reductech.EDR.Core.Tests
                 );
 
                 yield return new StepTestCase(
-                    "Print FirstIndexOfElement(Array: ['Hello'; 'World'], Element: 'Goodbye')",
+                    "Print FindElement(Array: ['Hello'; 'World'], Element: 'Goodbye')",
                     Print(new FindElement<string>
                     {
                         Array = Array(Constant("Hello"), Constant("World")),
@@ -384,35 +383,6 @@ namespace Reductech.EDR.Core.Tests
                 );
 
 
-                //var testFolderPath = new Constant<string>(Path.Combine(Directory.GetCurrentDirectory(), "TestFolder"));
-                //var testFilePath = new Constant<string>(Path.Combine(testFolderPath.Value, "Poem.txt"));
-
-                //yield return new StepTestCase("Delete Folder etc",
-                //    new Sequence
-                //    {
-                //        Steps = new List<IStep<Unit>>
-                //        {
-                //            new DeleteItem {Path = testFolderPath},
-                //            new AssertTrue {Test = new Not {Boolean = new DoesDirectoryExist {Path = testFolderPath}}},
-                //            new CreateDirectory {Path = testFolderPath},
-                //            new AssertTrue {Test = new DoesDirectoryExist {Path = testFolderPath}},
-
-                //            new CreateFile {Path = testFilePath, Text = new Constant<string>("Hello World")},
-
-                //            new AssertTrue {Test = new DoesFileExist {Path = testFilePath}},
-
-                //            new AssertTrue
-                //            {
-                //                Test = new DoesFileContain
-                //                    {Path = testFilePath, Text = new Constant<string>("Hello World")}
-                //            },
-                //            new DeleteItem {Path = testFilePath},
-                //            new DeleteItem {Path = testFolderPath},
-                //            new AssertTrue {Test = new Not {Boolean = new DoesDirectoryExist {Path = testFolderPath}}}
-                //        }
-                //    }
-                //) {IgnoreName = true, IgnoreLoggedValues = true};
-
                 yield return new StepTestCase("Print 'I have more config'", new Print<string>
                 {
                     Value = Constant("I have more config"),
@@ -438,12 +408,12 @@ namespace Reductech.EDR.Core.Tests
                     }
                 }, "I have more config");
 
-                yield return new StepTestCase("AssertTrue(Test: True)", new AssertTrue
+                yield return new StepTestCase("AssertTrue(Bool: True)", new AssertTrue
                 {
                     Bool = Constant(true)
                 });
 
-                yield return new StepTestCase("AssertError(Test: AssertTrue(Test: False))", new AssertError
+                yield return new StepTestCase("AssertError(Step: AssertTrue(Bool: False))", new AssertError
                 {
                     Step = new AssertTrue
                     {

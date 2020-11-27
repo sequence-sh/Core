@@ -152,7 +152,7 @@ namespace Reductech.EDR.Core.Tests
                     {
                         Array = new Array<string>{Elements = new List<IStep<string>>()}
                     }
-                }, @"Print(Value = ArrayIsEmpty(Array = Array(Elements = [])))");
+                }, @"Print(Value = IsEmpty(Array = Array(Elements = [])))");
 
                 yield return new SerializationTestMethod(
                     new Sequence
