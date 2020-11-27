@@ -8,7 +8,7 @@ using Xunit.Abstractions;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
-    public class ForEachEntityTests : StepTestBase<ForEachEntity, Unit> //TODO sort out entity stream serialization
+    public class ForEachEntityTests : StepTestBase<EntityForEach, Unit> //TODO sort out entity stream serialization
     {
         /// <inheritdoc />
         public ForEachEntityTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper) { }
@@ -19,7 +19,7 @@ namespace Reductech.EDR.Core.Tests.Steps
             get
             {
                 yield return new StepCase("For each record. No line breaks",
-                    new ForEachEntity
+                    new EntityForEach
                     {
                         Action = new Print<Entity>
                         {

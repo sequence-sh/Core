@@ -22,7 +22,7 @@ namespace Reductech.EDR.Core.Tests.Steps
             {
                 yield return new StepCase("Map some fields",
 
-                    new ForEachEntity
+                    new EntityForEach
                     {
                         Action = new Print<Entity>
                         {

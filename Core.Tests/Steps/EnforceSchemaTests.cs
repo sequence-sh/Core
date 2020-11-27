@@ -23,7 +23,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                 {
                     return new StepCase(name,
 
-                        new ForEachEntity
+                        new EntityForEach
                         {
                             Action = new Print<Entity>
                             {
@@ -109,7 +109,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                         {
                             Steps = new List<IStep<Unit>>
                             {
-                                new ForEachEntity
+                                new EntityForEach
                                 {
                                     Action = new Print<Entity>
                                     {

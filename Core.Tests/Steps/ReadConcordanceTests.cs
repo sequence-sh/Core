@@ -20,7 +20,7 @@ namespace Reductech.EDR.Core.Tests.Steps
             get
             {
                 yield return new StepCase("Read Concordance and print all lines",
-                    new ForEachEntity
+                    new EntityForEach
                     {
                         EntityStream = new ReadConcordance()
                         {
@@ -39,7 +39,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                     "Foo: Hello 2, Bar: World 2");
 
                 yield return new StepCase("Read Concordance with multiValue and print all lines",
-                    new ForEachEntity
+                    new EntityForEach
                     {
                         EntityStream = new ReadConcordance
                         {

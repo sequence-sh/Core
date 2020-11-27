@@ -21,7 +21,7 @@ namespace Reductech.EDR.Core.Tests.Steps
             get
             {
                 yield return new StepCase("Ascending",
-                    new ForEachEntity
+                    new EntityForEach
                     {
                         EntityStream = new SortEntities
                         {
@@ -41,7 +41,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                 );
 
                     yield return new StepCase("Descending",
-                    new ForEachEntity
+                    new EntityForEach
                     {
                         EntityStream = new SortEntities
                         {
@@ -62,7 +62,7 @@ namespace Reductech.EDR.Core.Tests.Steps
 
 
                 yield return new StepCase("Missing Property",
-                new ForEachEntity
+                new EntityForEach
                 {
                     EntityStream = new SortEntities
                     {

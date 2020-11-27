@@ -16,8 +16,15 @@ namespace Reductech.EDR.Core.Steps
     /// <summary>
     /// Perform an action on each entity in the stream.
     /// </summary>
-    public sealed class ForEachEntity : CompoundStep<Unit>
+    public sealed class EntityForEach : CompoundStep<Unit>
     {
+        /// <summary>
+        /// The entities to iterate over.
+        /// </summary>
+        [StepProperty]
+        [Required]
+        public IStep<EntityStream> EntityStream { get; set; } = null!;
+
         /// <summary>
         /// The action to perform repeatedly.
         /// Use the Variable &lt;Entity&gt; to access the entity.
@@ -25,16 +32,6 @@ namespace Reductech.EDR.Core.Steps
         [StepProperty]
         [Required]
         public IStep<Unit> Action { get; set; } = null!;
-
-
-
-
-        /// <summary>
-        /// The entities to iterate over.
-        /// </summary>
-        [StepProperty]
-        [Required]
-        public IStep<EntityStream> EntityStream { get; set; } = null!;
 
         /// <inheritdoc />
         public override async Task<Result<Unit, IError>> Run(IStateMonad stateMonad,
@@ -63,21 +60,21 @@ namespace Reductech.EDR.Core.Steps
         }
 
         /// <inheritdoc />
-        public override IStepFactory StepFactory => ForEachEntityStepFactory.Instance;
+        public override IStepFactory StepFactory => EntityForEachStepFactory.Instance;
     }
 
 
     /// <summary>
     /// Perform an action on each record in the stream.
     /// </summary>
-    public sealed class ForEachEntityStepFactory : SimpleStepFactory<ForEachEntity, Unit>
+    public sealed class EntityForEachStepFactory : SimpleStepFactory<EntityForEach, Unit>
     {
-        private ForEachEntityStepFactory() {}
+        private EntityForEachStepFactory() {}
 
         /// <summary>
         /// The instance.
         /// </summary>
-        public static SimpleStepFactory<ForEachEntity, Unit> Instance { get; } = new ForEachEntityStepFactory();
+        public static SimpleStepFactory<EntityForEach, Unit> Instance { get; } = new EntityForEachStepFactory();
 
         /// <inheritdoc />
         public override IEnumerable<(VariableName VariableName, ITypeReference typeReference)> FixedVariablesSet

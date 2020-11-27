@@ -18,7 +18,7 @@ namespace Reductech.EDR.Core.Tests.Steps
             get
             {
                 yield return new StepCase("Add property",
-                    new ForEachEntity
+                    new EntityForEach
                     {
                         Action  = new Print<Entity> {Value = GetEntityVariable},
 
@@ -40,7 +40,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                     "Foo: Hello 2, Bar: World");
 
                 yield return new StepCase("Change property",
-                    new ForEachEntity
+                    new EntityForEach
                     {
                         Action = new Print<Entity> { Value = GetEntityVariable },
 

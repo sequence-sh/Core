@@ -21,7 +21,7 @@ namespace Reductech.EDR.Core.Tests.Steps
             get
             {
                 yield return new StepCase("Filter stuff",
-                    new ForEachEntity
+                    new EntityForEach
                     {
                         Action = new Print<Entity> { Value = GetEntityVariable },
                         EntityStream = new Where

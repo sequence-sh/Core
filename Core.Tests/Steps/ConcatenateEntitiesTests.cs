@@ -18,7 +18,7 @@ namespace Reductech.EDR.Core.Tests.Steps
             get
             {
                 yield return new StepCase("One stream",
-                    new ForEachEntity
+                    new EntityForEach
                     {
                         Action = new Print<Entity> { Value = GetEntityVariable },
 
@@ -37,7 +37,7 @@ namespace Reductech.EDR.Core.Tests.Steps
 
 
                 yield return new StepCase("Two streams",
-                    new ForEachEntity
+                    new EntityForEach
                     {
                         Action = new Print<Entity>{Value = GetEntityVariable},
 

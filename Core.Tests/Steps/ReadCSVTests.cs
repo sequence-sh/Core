@@ -20,7 +20,7 @@ namespace Reductech.EDR.Core.Tests.Steps
             get
             {
                 yield return new StepCase("Read CSV and print all lines",
-                    new ForEachEntity
+                    new EntityForEach
                     {
                         EntityStream = new ReadCSV
                         {
@@ -40,7 +40,7 @@ namespace Reductech.EDR.Core.Tests.Steps
 
 
                 yield return new StepCase("Read CSV and print all lines should ignore missing columns",
-                    new ForEachEntity
+                    new EntityForEach
                     {
                         EntityStream = new ReadCSV
                         {
@@ -60,7 +60,7 @@ namespace Reductech.EDR.Core.Tests.Steps
 
 
                 yield return new StepCase("Read CSV and print all lines should ignore comments",
-                    new ForEachEntity
+                    new EntityForEach
                     {
                         EntityStream = new ReadCSV
                         {

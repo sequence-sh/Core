@@ -21,7 +21,7 @@ namespace Reductech.EDR.Core.Tests.Steps
             get
             {
                 yield return new StepCase("Distinct case sensitive",
-                    new ForEachEntity
+                    new EntityForEach
                     {
                         Action = new Print<Entity> {Value = GetEntityVariable},
                         EntityStream = new EntityStreamDistinct
@@ -41,7 +41,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                 );
 
                 yield return new StepCase("Distinct case insensitive",
-                    new ForEachEntity
+                    new EntityForEach
                     {
                         Action = new Print<Entity> { Value = GetEntityVariable },
                         EntityStream = new EntityStreamDistinct

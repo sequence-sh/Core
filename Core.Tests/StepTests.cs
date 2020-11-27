@@ -452,7 +452,7 @@ namespace Reductech.EDR.Core.Tests
                 });
 
                 yield return new StepTestCase("Read CSV",
-                    new ForEachEntity
+                    new EntityForEach
                     {
 
                         EntityStream = new ReadCSV
