@@ -119,8 +119,8 @@ namespace Reductech.EDR.Core.Tests
                         {
                             Entities = new EnforceSchema()
                             {
-                                EntityStream = new GetVariable<EntityStream>(){VariableName = new VariableName("EntityStream")},
-                                Schema = new GetVariable<Schema>(){VariableName = new VariableName("Schema")}
+                                EntityStream = new GetVariable<EntityStream>(){Variable = new VariableName("EntityStream")},
+                                Schema = new GetVariable<Schema>(){Variable = new VariableName("Schema")}
                             }
                         }
                     }

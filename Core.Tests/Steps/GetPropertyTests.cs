@@ -6,7 +6,7 @@ using Xunit.Abstractions;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
-    public class GetPropertyTests : StepTestBase<GetProperty, string>
+    public class GetPropertyTests : StepTestBase<EntityGetValue, string>
     {
         /// <inheritdoc />
         public GetPropertyTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
@@ -19,7 +19,7 @@ namespace Reductech.EDR.Core.Tests.Steps
             get
             {
                 yield return new StepCase("Get Simple Property",
-                    new GetProperty
+                    new EntityGetValue
                     {
                         Entity =  Constant(CreateEntity(("Foo", "Hello"), ("Bar", "World"))),
                         Property = Constant("Foo")
@@ -28,7 +28,7 @@ namespace Reductech.EDR.Core.Tests.Steps
 
 
                 yield return new StepCase("Get Missing Property",
-                    new GetProperty
+                    new EntityGetValue
                     {
                         Entity = Constant(CreateEntity(("Foo", "Hello"), ("Bar", "World"))),
                         Property = Constant("Foot")
@@ -36,7 +36,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                     "");
 
                 yield return new StepCase("Get Empty Property",
-                    new GetProperty
+                    new EntityGetValue
                     {
                         Entity = Constant(CreateEntity(("Foo", ""), ("Bar", "World"))),
                         Property = Constant("Foo")
@@ -44,7 +44,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                     "");
 
                 yield return new StepCase("Get List Property",
-                    new GetProperty
+                    new EntityGetValue
                     {
                         Entity = Constant(new Entity(new KeyValuePair<string, EntityValue>("Foo",
                             EntityValue.Create(new []{"Hello", "World"})

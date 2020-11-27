@@ -31,7 +31,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                                 CreateEntity(("Foo", "Alpha")),
                                 CreateEntity(("Foo", "Beta"))
                             )),
-                            SortBy = new GetProperty {Entity = GetEntityVariable, Property = Constant("Foo")}
+                            SortBy = new EntityGetValue {Entity = GetEntityVariable, Property = Constant("Foo")}
                         },
                         Action = new Print<Entity> {Value = GetEntityVariable}
 
@@ -51,7 +51,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                                 CreateEntity(("Foo", "Alpha")),
                                 CreateEntity(("Foo", "Beta"))
                             )),
-                            SortBy = new GetProperty { Entity = GetEntityVariable, Property = Constant("Foo") }
+                            SortBy = new EntityGetValue { Entity = GetEntityVariable, Property = Constant("Foo") }
                         },
                         Action = new Print<Entity> { Value = GetEntityVariable }
 
@@ -73,7 +73,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                             CreateEntity(("Foo", "Beta")),
                             CreateEntity(("Bar", "Delta"))
                         )),
-                        SortBy = new GetProperty { Entity = GetEntityVariable, Property = Constant("Foo") }
+                        SortBy = new EntityGetValue { Entity = GetEntityVariable, Property = Constant("Foo") }
                     },
                     Action = new Print<Entity> { Value = GetEntityVariable }
 

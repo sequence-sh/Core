@@ -36,7 +36,7 @@ namespace Reductech.EDR.Core.Tests
                 yield return new ErrorTestFunction("Get Missing Variable",
                     new GetVariable<string>
                     {
-                        VariableName = FooString
+                        Variable = FooString
                     },
                     new ErrorBuilder("Variable '<Foo>' does not exist.", ErrorCode.MissingVariable));
 
@@ -62,7 +62,7 @@ namespace Reductech.EDR.Core.Tests
                             {
                                 Value = new GetVariable<bool>
                                 {
-                                    VariableName =FooString
+                                    Variable =FooString
                                 }
                             }
                         }
@@ -70,7 +70,7 @@ namespace Reductech.EDR.Core.Tests
                     new ErrorBuilder("Variable '<Foo>' does not have type 'System.Boolean'.", ErrorCode.WrongVariableType)
                         .WithLocation(new GetVariable<bool>
                         {
-                            VariableName = FooString
+                            Variable = FooString
                         })
                 );
 

@@ -33,7 +33,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                         {
                             Value = new GetVariable<int>
                             {
-                                VariableName = new VariableName("Foo")
+                                Variable = new VariableName("Foo")
                             }
                         }
                     }
@@ -65,7 +65,7 @@ namespace Reductech.EDR.Core.Tests.Steps
         protected override IEnumerable<SerializeCase> SerializeCases {
             get
             {
-                yield return new SerializeCase("Short form", new GetVariable<int>(){VariableName = new VariableName("Foo")}, "<Foo>");
+                yield return new SerializeCase("Short form", new GetVariable<int>(){Variable = new VariableName("Foo")}, "<Foo>");
             } }
 
         /// <inheritdoc />

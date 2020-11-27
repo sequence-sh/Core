@@ -33,7 +33,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                                 CreateEntity(("Foo", "Beta")),
                                 CreateEntity(("Foo", "Beta"))
                             )),
-                            KeySelector = new GetProperty() {Property = Constant("Foo"), Entity = GetEntityVariable}
+                            KeySelector = new EntityGetValue() {Property = Constant("Foo"), Entity = GetEntityVariable}
                         }
                     },
                     Unit.Default,
@@ -53,7 +53,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                                 CreateEntity(("Foo", "Beta")),
                                 CreateEntity(("Foo", "Beta"))
                             )),
-                            KeySelector = new GetProperty { Property = Constant("Foo"), Entity = GetEntityVariable },
+                            KeySelector = new EntityGetValue { Property = Constant("Foo"), Entity = GetEntityVariable },
                             IgnoreCase = Constant(true)
                         }
                     },

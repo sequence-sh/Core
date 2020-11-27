@@ -435,7 +435,7 @@ One,The first number
 Two,The second number"),
                             }
                         },
-                        Action = new Print<Record>{Value = new GetVariable<Record> {VariableName = VariableName.Entity}}
+                        Action = new Print<Record>{Value = new GetVariable<Record> {Variable = VariableName.Entity}}
                     },
                     "Name: One, Summary: The first number",
                     "Name: Two, Summary: The second number"
@@ -476,7 +476,7 @@ Two,The second number"),
                                 {
                                     Value = new ElementAtIndex<string>
                                     {
-                                        Array = new GetVariable<List<string>> {VariableName = FooVariableName},
+                                        Array = new GetVariable<List<string>> {Variable = FooVariableName},
                                         Index = new Constant<int>(0)
                                     }
                                 },
@@ -495,7 +495,7 @@ Two,The second number"),
             }
         }
 
-        private static GetVariable<T> GetVariable<T>(VariableName variableName) => new GetVariable<T>{VariableName = variableName};
+        private static GetVariable<T> GetVariable<T>(VariableName variableName) => new GetVariable<T>{Variable = variableName};
 
         private static Constant<T> Constant<T>(T element) => new Constant<T>(element);
 

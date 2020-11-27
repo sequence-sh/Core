@@ -11,9 +11,9 @@ using Entity = Reductech.EDR.Core.Entities.Entity;
 namespace Reductech.EDR.Core.Steps
 {
     /// <summary>
-    /// Get a property from an entity
+    /// Gets the value of a property from an entity
     /// </summary>
-    public sealed class GetProperty : CompoundStep<string>
+    public sealed class EntityGetValue : CompoundStep<string>
     {
         /// <inheritdoc />
         public override async Task<Result<string, IError>> Run(IStateMonad stateMonad,
@@ -52,19 +52,19 @@ namespace Reductech.EDR.Core.Steps
         public IStep<string> Property { get; set; } = null!;
 
         /// <inheritdoc />
-        public override IStepFactory StepFactory => GetPropertyStepFactory.Instance;
+        public override IStepFactory StepFactory => EntityGetValueStepFactory.Instance;
     }
 
     /// <summary>
-    /// Get a property from an entity
+    /// Gets the value of a property from an entity
     /// </summary>
-    public sealed class GetPropertyStepFactory : SimpleStepFactory<GetProperty, string>
+    public sealed class EntityGetValueStepFactory : SimpleStepFactory<EntityGetValue, string>
     {
-        private GetPropertyStepFactory() {}
+        private EntityGetValueStepFactory() {}
 
         /// <summary>
         /// The instance.
         /// </summary>
-        public static SimpleStepFactory<GetProperty, string> Instance { get; } = new GetPropertyStepFactory();
+        public static SimpleStepFactory<EntityGetValue, string> Instance { get; } = new EntityGetValueStepFactory();
     }
 }

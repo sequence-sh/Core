@@ -32,7 +32,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                         },
                         Action = new Print<Entity>
                         {
-                            Value = new GetVariable<Entity> { VariableName = VariableName.Entity }
+                            Value = new GetVariable<Entity> { Variable = VariableName.Entity }
                         }
                     }, Unit.Default,
                     "Foo: Hello, Bar: World",
@@ -52,7 +52,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                         },
                         Action = new Print<Entity>
                         {
-                            Value = new GetVariable<Entity> { VariableName = VariableName.Entity }
+                            Value = new GetVariable<Entity> { Variable = VariableName.Entity }
                         }
                     }, Unit.Default,
                     "Foo: Hello",
@@ -72,7 +72,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                         },
                         Action = new Print<Entity>
                         {
-                            Value = new GetVariable<Entity> { VariableName = VariableName.Entity }
+                            Value = new GetVariable<Entity> { Variable = VariableName.Entity }
                         }
                     }, Unit.Default,
                     "Foo: Hello",
