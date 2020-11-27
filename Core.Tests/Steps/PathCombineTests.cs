@@ -18,28 +18,24 @@ namespace Reductech.EDR.Core.Tests.Steps
         {
             get
             {
-                var root = "C:/";
-                if (!Path.IsPathFullyQualified(root))
-                    root = @"C:\";
+                var currentDirectory = Environment.CurrentDirectory;
 
 
-                var expected1 = Path.Combine(root, "Hello", "World");
+
+                var expected = Path.Combine(currentDirectory, "Hello", "World");
 
 
                 yield return new StepCase("Non Relative", new PathCombine
                 {
-                    Paths = new Constant<List<string>>(new List<string>{root, "Hello", "World"})
-                }, expected1
+                    Paths = new Constant<List<string>>(new List<string>{currentDirectory, "Hello", "World"})
+                }, expected
                     );
 
-                var currentDirectory = Environment.CurrentDirectory;
-
-                var expected2 = Path.Combine(currentDirectory, "Hello", "World");
 
                 yield return new StepCase("Relative", new PathCombine
                 {
                     Paths = Constant(new List<string> { "Hello", "World" }),
-                }, expected2)
+                }, expected)
                     .WithFileSystemAction(x=>x.Setup(a=>a.GetCurrentDirectory()).Returns(currentDirectory));
             }
         }
