@@ -11,7 +11,7 @@ namespace Reductech.EDR.Core.Steps
     /// <summary>
     /// Gets the letters that appears at a specific index
     /// </summary>
-    public sealed class GetLetterAtIndex : CompoundStep<string>
+    public sealed class CharAtIndex : CompoundStep<string>
     {
         /// <summary>
         /// The string to extract a substring from.
@@ -45,22 +45,22 @@ namespace Reductech.EDR.Core.Steps
         }
 
         /// <inheritdoc />
-        public override IStepFactory StepFactory => GetLetterAtIndexStepFactory.Instance;
+        public override IStepFactory StepFactory => CharAtIndexStepFactory.Instance;
     }
 
     /// <summary>
     /// Gets the letters that appears at a specific index
     /// </summary>
-    public sealed class GetLetterAtIndexStepFactory : SimpleStepFactory<GetLetterAtIndex, string>
+    public sealed class CharAtIndexStepFactory : SimpleStepFactory<CharAtIndex, string>
     {
-        private GetLetterAtIndexStepFactory() { }
+        private CharAtIndexStepFactory() { }
 
         /// <summary>
         /// The instance.
         /// </summary>
-        public static SimpleStepFactory<GetLetterAtIndex, string> Instance { get; } = new GetLetterAtIndexStepFactory();
+        public static SimpleStepFactory<CharAtIndex, string> Instance { get; } = new CharAtIndexStepFactory();
 
         /// <inheritdoc />
-        public override IStepNameBuilder StepNameBuilder => new StepNameBuilderFromTemplate($"Get character at index '[{nameof(GetLetterAtIndex.Index)}]' in '[{nameof(GetLetterAtIndex.String)}]'");
+        public override IStepNameBuilder StepNameBuilder => new StepNameBuilderFromTemplate($"Get character at index '[{nameof(CharAtIndex.Index)}]' in '[{nameof(CharAtIndex.String)}]'");
     }
 }

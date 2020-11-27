@@ -345,7 +345,7 @@ namespace Reductech.EDR.Core.Tests
                 );
 
                 yield return new StepTestCase("Print Get character at index '1' in ''Hello World''",
-                    Print(new GetLetterAtIndex
+                    Print(new CharAtIndex
                     {
                         Index = Constant(1),
                         String = Constant(HelloWorldString)

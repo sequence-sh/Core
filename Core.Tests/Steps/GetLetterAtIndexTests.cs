@@ -5,7 +5,7 @@ using Xunit.Abstractions;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
-    public class GetLetterAtIndexTests : StepTestBase<GetLetterAtIndex, string>
+    public class GetLetterAtIndexTests : StepTestBase<CharAtIndex, string>
     {
         /// <inheritdoc />
         public GetLetterAtIndexTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
@@ -17,7 +17,7 @@ namespace Reductech.EDR.Core.Tests.Steps
         {
             get
             {
-                yield return new StepCase("Index is present", new GetLetterAtIndex()
+                yield return new StepCase("Index is present", new CharAtIndex()
                 {
                     Index = Constant(1),
                     String = Constant("Hello")

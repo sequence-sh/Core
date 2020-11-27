@@ -116,14 +116,14 @@ namespace Reductech.EDR.Core.Tests
 
 
                 yield return new ErrorTestFunction("Get letter minus one",
-                    new GetLetterAtIndex
+                    new CharAtIndex
                     {
                         Index = new Constant<int>(-1),
                         String = new Constant<string>("Foo")
                     }, new ErrorBuilder("Index was outside the bounds of the string", ErrorCode.IndexOutOfBounds));
 
                 yield return new ErrorTestFunction("Get letter out of bounds",
-                    new GetLetterAtIndex
+                    new CharAtIndex
                     {
                         Index = new Constant<int>(5),
                         String = new Constant<string>("Foo")
