@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection.Metadata;
 using System.Threading;
 using System.Threading.Tasks;
@@ -15,6 +16,7 @@ using Reductech.Utilities.Testing;
 // ReSharper disable once RedundantUsingDirective
 using Xunit;
 using Xunit.Abstractions;
+using Xunit.Sdk;
 using Entity = Reductech.EDR.Core.Entities.Entity;
 
 namespace Reductech.EDR.Core.Tests
@@ -28,9 +30,10 @@ namespace Reductech.EDR.Core.Tests
 
         public ITestOutputHelper TestOutputHelper { get; }
 
-        //[Theory]
-        //[InlineData(@"C:\Users\wainw\source\repos\Reductech\edr\Examples\Sort.yml")]
-        //[InlineData(@"C:\Users\wainw\source\repos\Reductech\edr\Examples\MapFieldNames.yml")]
+        [Theory]
+        [InlineData(@"C:\Users\wainw\source\repos\Reductech\edr\Examples\Sort.yml")]
+        [InlineData(@"C:\Users\wainw\source\repos\Reductech\edr\Examples\MapFieldNames.yml")]
+        [InlineData(@"C:\Users\wainw\source\repos\Reductech\edr\Examples\ChangeCase.yml")]
         public async Task RunYamlSequenceFromFile(string path)
         {
             var yaml = await File.ReadAllTextAsync(path);
@@ -39,7 +42,11 @@ namespace Reductech.EDR.Core.Tests
 
             var stepResult = YamlMethods.DeserializeFromYaml(yaml, sfs).Bind(x => x.TryFreeze());
 
-            stepResult.ShouldBeSuccessful(x => x.AsString);
+            if(stepResult.IsFailure)
+                throw new XunitException(
+                    string.Join(", ",
+                    stepResult.Error.GetAllErrors().Select(x=> x.Message + " " + x.Location.AsString)));
+
 
             var monad = new StateMonad(new TestLogger(), EmptySettings.Instance, ExternalProcessRunner.Instance, FileSystemHelper.Instance, sfs);
 
@@ -49,17 +56,17 @@ namespace Reductech.EDR.Core.Tests
         }
 
 
-        //[Fact]
+        [Fact]
         public async Task RunYamlSequence()
         {
             const string yaml = @"
 - <Folder> = 'C:\Users\wainw\source\repos\Reductech\edr\Examples'
 - <SourceFile> = 'Dinosaurs.csv'
-- <TargetFile> = 'SortedDinosaurs.csv'
-- <EntityStream> = ReadCSV(Stream = ReadFile(Folder = <Folder>, FileName = <SourceFile>))
-- <EntityStream> = SortEntities(EntityStream = <EntityStream>, SortBy = GetProperty(Entity =<Entity>, Property = 'Name'))
+- <TargetFile> = 'MappedDinosaurs.csv'
+- <EntityStream> = ReadCSV(Stream = ReadFile(Path = PathCombine(Paths = [<Folder>, <SourceFile>])))
+- <EntityStream> = MapFieldNames(EntityStream = <EntityStream>, Mappings = (Name = 'Dinosaur'))
 - <WriteStream> = WriteCSV(Entities = <EntityStream>)
-- WriteFile(Folder = <Folder>, Text = <WriteStream>, FileName =<TargetFile>)";
+- WriteFile(Path = PathCombine(Paths = [<Folder>, <TargetFile>]), Stream = <WriteStream>)";
 
 
             var sfs = StepFactoryStore.CreateUsingReflection();
@@ -76,7 +83,7 @@ namespace Reductech.EDR.Core.Tests
         }
 
 
-       //[Fact]
+       [Fact]
         public async Task RunObjectSequence()
         {
             var step = new WriteFile
