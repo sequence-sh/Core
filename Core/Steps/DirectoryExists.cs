@@ -11,7 +11,7 @@ namespace Reductech.EDR.Core.Steps
     /// <summary>
     /// Returns whether a directory on the file system exists.
     /// </summary>
-    public class DoesDirectoryExist : CompoundStep<bool>
+    public class DirectoryExists : CompoundStep<bool>
     {
         /// <summary>
         /// The path to the folder to check.
@@ -39,14 +39,14 @@ namespace Reductech.EDR.Core.Steps
     /// <summary>
     /// Returns whether a directory on the file system exists.
     /// </summary>
-    public class DirectoryExistsStepFactory : SimpleStepFactory<DoesDirectoryExist, bool>
+    public class DirectoryExistsStepFactory : SimpleStepFactory<DirectoryExists, bool>
     {
         private DirectoryExistsStepFactory() { }
 
         /// <summary>
         /// The instance.
         /// </summary>
-        public static SimpleStepFactory<DoesDirectoryExist, bool> Instance { get; } = new DirectoryExistsStepFactory();
+        public static SimpleStepFactory<DirectoryExists, bool> Instance { get; } = new DirectoryExistsStepFactory();
     }
 
 }

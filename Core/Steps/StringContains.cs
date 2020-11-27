@@ -10,15 +10,15 @@ using Reductech.EDR.Core.Internal.Errors;
 namespace Reductech.EDR.Core.Steps
 {
     /// <summary>
-    /// Returns true if the SuperString contains the substring.
+    /// Returns true if the String contains the substring.
     /// </summary>
-    public sealed class DoesStringContain : CompoundStep<bool>
+    public sealed class StringContains : CompoundStep<bool>
     {
         /// <inheritdoc />
         public override async Task<Result<bool, IError>> Run(IStateMonad stateMonad,
             CancellationToken cancellationToken)
         {
-            var superstringResult = await Superstring.Run(stateMonad, cancellationToken);
+            var superstringResult = await String.Run(stateMonad, cancellationToken);
 
             if (superstringResult.IsFailure) return superstringResult.ConvertFailure<bool>();
 
@@ -41,7 +41,7 @@ namespace Reductech.EDR.Core.Steps
         /// </summary>
         [StepProperty]
         [Required]
-        public IStep<string> Superstring { get; set; } = null!;
+        public IStep<string> String { get; set; } = null!;
 
         /// <summary>
         /// The substring
@@ -60,19 +60,19 @@ namespace Reductech.EDR.Core.Steps
 
 
         /// <inheritdoc />
-        public override IStepFactory StepFactory => DoesStringContainFactory.Instance;
+        public override IStepFactory StepFactory => StringContainsFactory.Instance;
     }
 
     /// <summary>
-    /// Returns true if the SuperString contains the substring.
+    /// Returns true if the String contains the substring.
     /// </summary>
-    public sealed class DoesStringContainFactory : SimpleStepFactory<DoesStringContain, bool>
+    public sealed class StringContainsFactory : SimpleStepFactory<StringContains, bool>
     {
-        private DoesStringContainFactory() {}
+        private StringContainsFactory() {}
 
         /// <summary>
         /// The instance.
         /// </summary>
-        public static SimpleStepFactory<DoesStringContain, bool> Instance { get; } = new DoesStringContainFactory();
+        public static SimpleStepFactory<StringContains, bool> Instance { get; } = new StringContainsFactory();
     }
 }

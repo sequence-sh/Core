@@ -5,7 +5,7 @@ using Xunit.Abstractions;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
-    public class DoesFileExistTests : StepTestBase<DoesFileExist, bool>
+    public class DoesFileExistTests : StepTestBase<FileExists, bool>
     {
         /// <inheritdoc />
         public DoesFileExistTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
@@ -18,14 +18,14 @@ namespace Reductech.EDR.Core.Tests.Steps
             get
             {
                 yield return new StepCase("File exists",
-                        new DoesFileExist
+                        new FileExists
                         {
                             Path = Constant("My Path")
                         }, true)
                     .WithFileSystemAction(x => x.Setup(a => a.DoesFileExist("My Path")).Returns(true));
 
                 yield return new StepCase("File does not exist",
-                        new DoesFileExist
+                        new FileExists
                         {
                             Path = Constant("My Path")
                         }, false)

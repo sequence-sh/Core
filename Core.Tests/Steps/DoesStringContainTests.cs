@@ -5,7 +5,7 @@ using Xunit.Abstractions;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
-    public class DoesStringContainTests : StepTestBase<DoesStringContain, bool>
+    public class DoesStringContainTests : StepTestBase<StringContains, bool>
     {
         /// <inheritdoc />
         public DoesStringContainTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
@@ -18,31 +18,31 @@ namespace Reductech.EDR.Core.Tests.Steps
             get
             {
                 yield return new StepCase("True case sensitive",
-                    new DoesStringContain
+                    new StringContains
                     {
-                        Superstring = Constant("Hello World"),
+                        String = Constant("Hello World"),
                         Substring = Constant("Hello")
                     }, true);
 
                 yield return new StepCase("False case sensitive",
-                    new DoesStringContain
+                    new StringContains
                     {
-                        Superstring = Constant("Hello World"),
+                        String = Constant("Hello World"),
                         Substring = Constant("hello")
                     }, false);
 
                 yield return new StepCase("True case insensitive",
-                    new DoesStringContain
+                    new StringContains
                     {
-                        Superstring = Constant("Hello World"),
+                        String = Constant("Hello World"),
                         Substring = Constant("hello"),
                         IgnoreCase = Constant(true)
                     }, true);
 
                 yield return new StepCase("False case insensitive",
-                    new DoesStringContain
+                    new StringContains
                     {
-                        Superstring = Constant("Hello World"),
+                        String = Constant("Hello World"),
                         Substring = Constant("Goodbye"),
                         IgnoreCase = Constant(true)
                     }, false);
