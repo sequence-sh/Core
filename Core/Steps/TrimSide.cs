@@ -6,13 +6,13 @@
     public enum TrimSide
     {
         /// <summary>
-        /// Removes whitespace from the left side of the string.
+        /// Removes whitespace from the start of the string.
         /// </summary>
-        Left,
+        Start,
         /// <summary>
-        /// Removes whitespace from the right side of the string.
+        /// Removes whitespace from the end of the string.
         /// </summary>
-        Right,
+        End,
         /// <summary>
         /// Removes whitespace from both sides of the string.
         /// </summary>

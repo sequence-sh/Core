@@ -186,13 +186,13 @@ namespace Reductech.EDR.Core.Tests
 - Do: Print
   Value:
     Do: Compare
-    Left: 1
+    Start: 1
     Operator:
       Do: GetVariable
       Config:
         DoNotSplit: true
       Variable: <Foo>
-    Right: 2"
+    End: 2"
                 );
 
                 yield return new SerializationTestMethod(

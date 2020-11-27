@@ -163,7 +163,7 @@ namespace Reductech.EDR.Core.Tests
                         }),
                     HelloWorldString);
 
-                yield return new StepTestCase("Print ApplyMathOperator(Left: 2, Operator: *, Right: 3)",
+                yield return new StepTestCase("Print ApplyMathOperator(Start: 2, Operator: *, End: 3)",
                     Print(new ApplyMathOperator
                     {
                         Left = Constant(2),
@@ -275,14 +275,14 @@ namespace Reductech.EDR.Core.Tests
                     "Hello World");
 
 
-                yield return new StepTestCase("Print Trim(Side: Left, String: '  Hello World  ')",
-                    Print(new Trim {Side = Constant(TrimSide.Left), String = Constant("  Hello World  ")}),
+                yield return new StepTestCase("Print StringTrim(Side: Start, String: '  Hello World  ')",
+                    Print(new StringTrim {Side = Constant(TrimSide.Start), String = Constant("  Hello World  ")}),
                     "Hello World  ");
-                yield return new StepTestCase("Print Trim(Side: Right, String: '  Hello World  ')",
-                    Print(new Trim {Side = Constant(TrimSide.Right), String = Constant("  Hello World  ")}),
+                yield return new StepTestCase("Print StringTrim(Side: End, String: '  Hello World  ')",
+                    Print(new StringTrim {Side = Constant(TrimSide.End), String = Constant("  Hello World  ")}),
                     "  Hello World");
-                yield return new StepTestCase("Print Trim(Side: Both, String: '  Hello World  ')",
-                    Print(new Trim {Side = Constant(TrimSide.Both), String = Constant("  Hello World  ")}),
+                yield return new StepTestCase("Print StringTrim(Side: Both, String: '  Hello World  ')",
+                    Print(new StringTrim {Side = Constant(TrimSide.Both), String = Constant("  Hello World  ")}),
                     HelloWorldString);
 
 

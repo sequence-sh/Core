@@ -14,7 +14,7 @@ namespace Reductech.EDR.Core.Steps
     /// <summary>
     /// Trims a string.
     /// </summary>
-    public sealed class Trim : CompoundStep<string>
+    public sealed class StringTrim : CompoundStep<string>
     {
 
         /// <summary>
@@ -28,8 +28,8 @@ namespace Reductech.EDR.Core.Steps
         /// The side to trim.
         /// </summary>
         [StepProperty]
-        [Required]
-        public IStep<TrimSide> Side { get; set; } = null!;
+        [DefaultValueExplanation("Both")]
+        public IStep<TrimSide> Side { get; set; } = new Constant<TrimSide>(TrimSide.Both);
 
         /// <inheritdoc />
         public override async Task<Result<string, IError>> Run(IStateMonad stateMonad,
@@ -42,28 +42,28 @@ namespace Reductech.EDR.Core.Steps
         private static string TrimString(string s, TrimSide side) =>
             side switch
             {
-                TrimSide.Left => s.TrimStart(),
-                TrimSide.Right => s.TrimEnd(),
+                TrimSide.Start => s.TrimStart(),
+                TrimSide.End => s.TrimEnd(),
                 TrimSide.Both => s.Trim(),
                 _ => throw new ArgumentOutOfRangeException(nameof(side), side, null)
             };
 
         /// <inheritdoc />
-        public override IStepFactory StepFactory => TrimStepFactory.Instance;
+        public override IStepFactory StepFactory => StringTrimStepFactory.Instance;
     }
 
 
     /// <summary>
     /// Trims a string.
     /// </summary>
-    public sealed class TrimStepFactory : SimpleStepFactory<Trim, string>
+    public sealed class StringTrimStepFactory : SimpleStepFactory<StringTrim, string>
     {
-        private TrimStepFactory() { }
+        private StringTrimStepFactory() { }
 
         /// <summary>
         /// The instance.
         /// </summary>
-        public static SimpleStepFactory<Trim, string> Instance { get; } = new TrimStepFactory();
+        public static SimpleStepFactory<StringTrim, string> Instance { get; } = new StringTrimStepFactory();
 
         /// <inheritdoc />
         public override IEnumerable<Type> EnumTypes => new[] { typeof(TrimSide) };
