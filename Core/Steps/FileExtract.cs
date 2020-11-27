@@ -10,16 +10,16 @@ using Reductech.EDR.Core.Util;
 namespace Reductech.EDR.Core.Steps
 {
     /// <summary>
-    /// Unzip a file in the file system.
+    /// Extract a file in the file system.
     /// </summary>
-    public class Unzip : CompoundStep<Unit>
+    public class FileExtract : CompoundStep<Unit>
     {
         /// <inheritdoc />
         public override async Task<Result<Unit, IError>> Run(IStateMonad stateMonad,
             CancellationToken cancellationToken)
         {
             var data = await ArchiveFilePath.Run(stateMonad, cancellationToken)
-                .Compose(() => DestinationDirectory.Run(stateMonad, cancellationToken), () => OverwriteFiles.Run(stateMonad, cancellationToken));
+                .Compose(() => Destination.Run(stateMonad, cancellationToken), () => Overwrite.Run(stateMonad, cancellationToken));
 
             if (data.IsFailure)
                 return data.ConvertFailure<Unit>();
@@ -33,40 +33,40 @@ namespace Reductech.EDR.Core.Steps
 
 
         /// <summary>
-        /// The path to the archive to unzip.
+        /// The path to the archive to extract.
         /// </summary>
         [StepProperty]
         [Required]
         public IStep<string> ArchiveFilePath { get; set; } = null!;
 
         /// <summary>
-        /// The directory to unzip to.
+        /// The directory to extract to.
         /// </summary>
         [StepProperty]
         [Required]
-        public IStep<string> DestinationDirectory { get; set; } = null!;
+        public IStep<string> Destination { get; set; } = null!;
 
         /// <summary>
-        /// Whether to overwrite files when unzipping.
+        /// Whether to overwrite files when extracting.
         /// </summary>
         [StepProperty]
         [DefaultValueExplanation("false")]
-        public IStep<bool> OverwriteFiles { get; set; } = new Constant<bool>(false);
+        public IStep<bool> Overwrite { get; set; } = new Constant<bool>(false);
 
         /// <inheritdoc />
-        public override IStepFactory StepFactory => UnzipStepFactory.Instance;
+        public override IStepFactory StepFactory => FileExtractStepFactory.Instance;
     }
 
     /// <summary>
-    /// Unzip a file in the file system.
+    /// Extract a file in the file system.
     /// </summary>
-    public class UnzipStepFactory : SimpleStepFactory<Unzip, Unit>
+    public class FileExtractStepFactory : SimpleStepFactory<FileExtract, Unit>
     {
-        private UnzipStepFactory() { }
+        private FileExtractStepFactory() { }
 
         /// <summary>
         /// The instance.
         /// </summary>
-        public static SimpleStepFactory<Unzip, Unit> Instance { get; } = new UnzipStepFactory();
+        public static SimpleStepFactory<FileExtract, Unit> Instance { get; } = new FileExtractStepFactory();
     }
 }
