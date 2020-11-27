@@ -17,6 +17,11 @@ namespace Reductech.EDR.Core.Entities
         private readonly ImmutableList<KeyValuePair<string, EntityValue>> _fields;
 
         /// <summary>
+        /// The default field name if the Entity represents a single primitive.
+        /// </summary>
+        public const string PrimitiveKey = "value";
+
+        /// <summary>
         /// Create a new entity
         /// </summary>
         public Entity(params KeyValuePair<string, EntityValue>[] fields) : this(fields.ToImmutableList()) {}
@@ -45,21 +50,7 @@ namespace Reductech.EDR.Core.Entities
         /// <returns></returns>
         public IEnumerable<string> GetFieldNames() => _fields.Select(x => x.Key);
 
-        ///// <summary>
-        ///// Creates a copy of this with the new fields added or updated.
-        ///// </summary>
-        ///// <param name="newFields"></param>
-        ///// <returns></returns>
-        //public Entity WithFields(IReadOnlyCollection<KeyValuePair<string, EntityValue>> newFields)
-        //{
-        //    if (!newFields.Any())
-        //        return this;
 
-        //    var newDict = newFields.Concat(_fields).GroupBy(x => x.Key, x => x.Value)
-        //        .ToDictionary(x => x.Key, x => x.First());
-
-        //    return new Entity(newDict);
-        //}
 
         /// <summary>
         /// Creates a copy of this with the field added or updated
