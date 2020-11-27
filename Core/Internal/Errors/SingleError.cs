@@ -36,7 +36,7 @@ namespace Reductech.EDR.Core.Internal.Errors
 
 
         /// <summary>
-        /// Error Message Text.
+        /// Error Message String.
         /// </summary>
         public string Message { get; }
 

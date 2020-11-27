@@ -428,9 +428,9 @@ namespace Reductech.EDR.Core.Tests
                         EntityStream = new FromCSV
                         {
                             Delimiter = new Constant<string>(","),
-                            Stream = new ToStream
+                            Stream = new StringToStream
                             {
-                                Text = new Constant<string>(@"Name,Summary
+                                String = new Constant<string>(@"Name,Summary
 One,The first number
 Two,The second number"),
                             }

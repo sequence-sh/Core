@@ -24,9 +24,9 @@ namespace Reductech.EDR.Core.Tests.Steps
                     {
                         EntityStream = new FromCSV
                         {
-                            Stream = new ToStream
+                            Stream = new StringToStream
                             {
-                                Text = Constant(
+                                String = Constant(
                                         $@"Foo,Bar{Environment.NewLine}Hello,World{Environment.NewLine}Hello 2,World 2")
                             }
                         },
@@ -44,9 +44,9 @@ namespace Reductech.EDR.Core.Tests.Steps
                     {
                         EntityStream = new FromCSV
                         {
-                            Stream = new ToStream
+                            Stream = new StringToStream
                             {
-                                Text = Constant(
+                                String = Constant(
                                         $@"Foo{Environment.NewLine}Hello,World{Environment.NewLine}Hello 2,World 2")
                             }
                         },
@@ -64,9 +64,9 @@ namespace Reductech.EDR.Core.Tests.Steps
                     {
                         EntityStream = new FromCSV
                         {
-                            Stream = new ToStream
+                            Stream = new StringToStream
                             {
-                                Text = Constant(
+                                String = Constant(
                                         $@"#this is a comment{Environment.NewLine}Foo{Environment.NewLine}Hello,World{Environment.NewLine}Hello 2,World 2")
                             }
                         },

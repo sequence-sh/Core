@@ -26,7 +26,7 @@ namespace Reductech.EDR.Core.Tests.Steps
 
                     new Print<string>
                     {
-                        Value = new FromStream
+                        Value = new StringFromStream
                         {
                             Stream = new ToConcordance()
                             {
@@ -45,7 +45,7 @@ namespace Reductech.EDR.Core.Tests.Steps
 
                     new Print<string>
                     {
-                        Value = new FromStream
+                        Value = new StringFromStream
                         {
                             Stream = new ToConcordance
                             {

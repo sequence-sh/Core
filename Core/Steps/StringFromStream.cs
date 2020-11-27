@@ -12,7 +12,7 @@ namespace Reductech.EDR.Core.Steps
     /// <summary>
     /// Creates a string from a stream.
     /// </summary>
-    public sealed class FromStream : CompoundStep<string>
+    public sealed class StringFromStream : CompoundStep<string>
     {
         /// <inheritdoc />
         public override async Task<Result<string, IError>> Run(IStateMonad stateMonad,
@@ -54,19 +54,19 @@ namespace Reductech.EDR.Core.Steps
         public IStep<EncodingEnum> Encoding { get; set; } = new Constant<EncodingEnum>(EncodingEnum.UTF8);
 
         /// <inheritdoc />
-        public override IStepFactory StepFactory => FromStreamFactory.Instance;
+        public override IStepFactory StepFactory => StringFromStreamFactory.Instance;
     }
 
     /// <summary>
     /// Creates a string from a stream.
     /// </summary>
-    public sealed class FromStreamFactory : SimpleStepFactory<FromStream, string>
+    public sealed class StringFromStreamFactory : SimpleStepFactory<StringFromStream, string>
     {
-        private FromStreamFactory() { }
+        private StringFromStreamFactory() { }
 
         /// <summary>
         /// The instance.
         /// </summary>
-        public static SimpleStepFactory<FromStream, string> Instance { get; } = new FromStreamFactory();
+        public static SimpleStepFactory<StringFromStream, string> Instance { get; } = new StringFromStreamFactory();
     }
 }

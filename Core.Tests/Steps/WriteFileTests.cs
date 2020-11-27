@@ -24,7 +24,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                 yield return new StepCase("Write file", new WriteFile
                     {
                         Path =  Constant("Filename.txt"),
-                        Stream = new ToStream{Text = Constant("Hello World")}
+                        Stream = new StringToStream{String = Constant("Hello World")}
 
 
                     },Unit.Default)

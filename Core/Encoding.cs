@@ -49,7 +49,7 @@ namespace Reductech.EDR.Core
     public static class EncodingHelper
     {
         /// <summary>
-        /// Convert this to a System.Text.Encoding.
+        /// Convert this to a System.String.Encoding.
         /// </summary>
         public static Encoding Convert(this EncodingEnum encodingEnum)
         {

@@ -14,13 +14,13 @@ namespace Reductech.EDR.Core.Steps
     /// <summary>
     /// Converts a string to a stream.
     /// </summary>
-    public sealed class ToStream : CompoundStep<Stream>
+    public sealed class StringToStream : CompoundStep<Stream>
     {
         /// <inheritdoc />
         public override async Task<Result<Stream, IError>> Run(IStateMonad stateMonad,
             CancellationToken cancellationToken)
         {
-            var textResult = await Text.Run(stateMonad, cancellationToken);
+            var textResult = await String.Run(stateMonad, cancellationToken);
 
             if (textResult.IsFailure)
                 return textResult.ConvertFailure<Stream>();
@@ -31,20 +31,18 @@ namespace Reductech.EDR.Core.Steps
             if (encodingResult.IsFailure)
                 return encodingResult.ConvertFailure<Stream>();
 
-            // convert string to stream
             byte[] byteArray = encodingResult.Value.Convert().GetBytes(textResult.Value);
-            //byte[] byteArray = Encoding.ASCII.GetBytes(contents);
             var stream = new MemoryStream(byteArray);
 
             return stream;
         }
 
         /// <summary>
-        /// The text to convert to a stream.
+        /// The string to convert to a stream.
         /// </summary>
         [StepProperty(Order = 1)]
         [Required]
-        public IStep<string> Text { get; set; } = null!;
+        public IStep<string> String { get; set; } = null!;
 
         /// <summary>
         /// How the stream is encoded.
@@ -54,20 +52,20 @@ namespace Reductech.EDR.Core.Steps
         public IStep<EncodingEnum> Encoding { get; set; } = new Constant<EncodingEnum>(EncodingEnum.UTF8);
 
         /// <inheritdoc />
-        public override IStepFactory StepFactory => ToStreamStepFactory.Instance;
+        public override IStepFactory StepFactory => StringToStreamStepFactory.Instance;
     }
 
     /// <summary>
     /// Converts a string to a stream.
     /// </summary>
-    public sealed class ToStreamStepFactory : SimpleStepFactory<ToStream, Stream>
+    public sealed class StringToStreamStepFactory : SimpleStepFactory<StringToStream, Stream>
     {
-        private ToStreamStepFactory() { }
+        private StringToStreamStepFactory() { }
 
         /// <summary>
         /// The instance.
         /// </summary>
-        public static SimpleStepFactory<ToStream, Stream> Instance { get; } = new ToStreamStepFactory();
+        public static SimpleStepFactory<StringToStream, Stream> Instance { get; } = new StringToStreamStepFactory();
 
         /// <inheritdoc />
         public override IEnumerable<Type> EnumTypes

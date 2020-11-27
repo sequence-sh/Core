@@ -25,7 +25,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                 yield return new StepCase("Print file text",
                     new Print<string>
                     {
-                        Value = new FromStream
+                        Value = new StringFromStream
                         {
                             Stream = new ReadFile
                             {

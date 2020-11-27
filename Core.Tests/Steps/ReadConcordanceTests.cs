@@ -24,9 +24,9 @@ namespace Reductech.EDR.Core.Tests.Steps
                     {
                         EntityStream = new FromConcordance()
                         {
-                            Stream = new ToStream
+                            Stream = new StringToStream
                             {
-                                Text = Constant(
+                                String = Constant(
                                     $@"þFooþþBarþ{Environment.NewLine}þHelloþþWorldþ{Environment.NewLine}þHello 2þþWorld 2þ")
                             }
                         },
@@ -43,9 +43,9 @@ namespace Reductech.EDR.Core.Tests.Steps
                     {
                         EntityStream = new FromConcordance
                         {
-                            Stream = new ToStream
+                            Stream = new StringToStream
                             {
-                                Text = Constant(
+                                String = Constant(
                                     $@"þFooþþBarþ{Environment.NewLine}þHelloþþWorld|Earthþ{Environment.NewLine}þHello 2þþWorld 2|Earth 2þ")
                             }
                         },
