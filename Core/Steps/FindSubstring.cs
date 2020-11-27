@@ -10,10 +10,10 @@ using Reductech.EDR.Core.Internal.Errors;
 namespace Reductech.EDR.Core.Steps
 {
     /// <summary>
-    /// Gets the index of the first instance of substring in a string.
+    /// Gets the index of the first instance of a substring in a string.
     /// Returns -1 if the substring is not present.
     /// </summary>
-    public sealed class FirstIndexOf : CompoundStep<int>
+    public sealed class FindSubstring : CompoundStep<int>
     {
         /// <summary>
         /// The string to check.
@@ -43,24 +43,25 @@ namespace Reductech.EDR.Core.Steps
         }
 
         /// <inheritdoc />
-        public override IStepFactory StepFactory => FirstIndexOfStepFactory.Instance;
+        public override IStepFactory StepFactory => FindSubstringStepFactory.Instance;
     }
 
 
     /// <summary>
-    /// Gets the first instance of substring in a string.
+    /// Gets the first instance of a substring in a string.
+    /// Returns -1 if the substring is not present.
     /// </summary>
-    public sealed class FirstIndexOfStepFactory : SimpleStepFactory<FirstIndexOf, int>
+    public sealed class FindSubstringStepFactory : SimpleStepFactory<FindSubstring, int>
     {
-        private FirstIndexOfStepFactory() { }
+        private FindSubstringStepFactory() { }
 
         /// <summary>
         /// The instance
         /// </summary>
-        public static SimpleStepFactory<FirstIndexOf, int> Instance { get; } = new FirstIndexOfStepFactory();
+        public static SimpleStepFactory<FindSubstring, int> Instance { get; } = new FindSubstringStepFactory();
 
         /// <inheritdoc />
-        public override IStepNameBuilder StepNameBuilder => new StepNameBuilderFromTemplate($"First index of '[{nameof(FirstIndexOf.SubString)}]' in '[{nameof(FirstIndexOf.String)}]'");
+        public override IStepNameBuilder StepNameBuilder => new StepNameBuilderFromTemplate($"First index of '[{nameof(FindSubstring.SubString)}]' in '[{nameof(FindSubstring.String)}]'");
     }
 
 

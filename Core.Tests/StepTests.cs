@@ -212,7 +212,7 @@ namespace Reductech.EDR.Core.Tests
                 );
 
                 yield return new StepTestCase("Print FirstIndexOfElement(Array: ['Hello'; 'World'], Element: 'World')",
-                    Print(new FirstIndexOfElement<string>
+                    Print(new FindElement<string>
                     {
                         Array = Array(Constant("Hello"), Constant("World")),
                         Element = Constant("World")
@@ -222,7 +222,7 @@ namespace Reductech.EDR.Core.Tests
 
                 yield return new StepTestCase(
                     "Print FirstIndexOfElement(Array: ['Hello'; 'World'], Element: 'Goodbye')",
-                    Print(new FirstIndexOfElement<string>
+                    Print(new FindElement<string>
                     {
                         Array = Array(Constant("Hello"), Constant("World")),
                         Element = Constant("Goodbye")
@@ -328,7 +328,7 @@ namespace Reductech.EDR.Core.Tests
                     }), "C, B, A");
 
                 yield return new StepTestCase("Print First index of ''World'' in ''Hello World, Goodbye World''",
-                    Print(new FirstIndexOf
+                    Print(new FindSubstring
                     {
                         String = Constant("Hello World, Goodbye World"),
                         SubString = Constant("World")

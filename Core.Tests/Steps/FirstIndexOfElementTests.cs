@@ -5,7 +5,7 @@ using Xunit.Abstractions;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
-    public class FirstIndexOfElementTests : StepTestBase<FirstIndexOfElement<string>, int>
+    public class FirstIndexOfElementTests : StepTestBase<FindElement<string>, int>
     {
         /// <inheritdoc />
         public FirstIndexOfElementTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
@@ -18,7 +18,7 @@ namespace Reductech.EDR.Core.Tests.Steps
             get
             {
                 yield return new StepCase("Simple case",
-                    new FirstIndexOfElement<string>()
+                    new FindElement<string>()
                     {
                         Array = Array("Hello", "World"),
                         Element = Constant("World")
@@ -27,7 +27,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                     1);
 
                 yield return new StepCase("Duplicate Element",
-                    new FirstIndexOfElement<string>
+                    new FindElement<string>
                     {
                         Array = Array("Hello", "World", "World"),
                         Element = Constant("World")
@@ -36,7 +36,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                     1);
 
                 yield return new StepCase("Element not present",
-                    new FirstIndexOfElement<string>
+                    new FindElement<string>
                     {
                         Array = Array("Hello", "World", "World"),
                         Element = Constant("Mark")

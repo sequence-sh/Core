@@ -15,7 +15,7 @@ namespace Reductech.EDR.Core.Steps
     /// Gets the first index of an element in an array.
     /// Returns -1 if the element is not present.
     /// </summary>
-    public sealed class FirstIndexOfElement<T> : CompoundStep<int>
+    public sealed class FindElement<T> : CompoundStep<int>
     {
         /// <summary>
         /// The array to check.
@@ -39,23 +39,23 @@ namespace Reductech.EDR.Core.Steps
         }
 
         /// <inheritdoc />
-        public override IStepFactory StepFactory => FirstIndexOfElementStepFactory.Instance;
+        public override IStepFactory StepFactory => FindElementStepFactory.Instance;
     }
 
     /// <summary>
     /// Gets the first index of an element in an array.
     /// </summary>
-    public sealed class FirstIndexOfElementStepFactory : GenericStepFactory
+    public sealed class FindElementStepFactory : GenericStepFactory
     {
-        private FirstIndexOfElementStepFactory() { }
+        private FindElementStepFactory() { }
 
         /// <summary>
         /// The instance.
         /// </summary>
-        public static GenericStepFactory Instance { get; } = new FirstIndexOfElementStepFactory();
+        public static GenericStepFactory Instance { get; } = new FindElementStepFactory();
 
         /// <inheritdoc />
-        public override Type StepType => typeof(FirstIndexOfElement<>);
+        public override Type StepType => typeof(FindElement<>);
 
         /// <inheritdoc />
         public override string OutputTypeExplanation => nameof(Int32);
@@ -65,7 +65,7 @@ namespace Reductech.EDR.Core.Steps
 
         /// <inheritdoc />
         protected override Result<ITypeReference, IError> GetMemberType(FreezableStepData freezableStepData, TypeResolver typeResolver) =>
-            freezableStepData.GetArgument(nameof(FirstIndexOfElement<object>.Array), TypeName)
+            freezableStepData.GetArgument(nameof(FindElement<object>.Array), TypeName)
                 .MapError(e=>e.WithLocation(this, freezableStepData))
                 .Bind(x => x.TryGetOutputTypeReference(typeResolver))
                 .Bind(x=>x.TryGetGenericTypeReference(typeResolver, 0)
