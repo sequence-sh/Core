@@ -10,7 +10,7 @@ using Reductech.EDR.Core.Internal.Errors;
 namespace Reductech.EDR.Core.Steps
 {
     /// <summary>
-    /// Match strings with a delimiter.
+    /// Join strings with a delimiter.
     /// </summary>
     public sealed class JoinStrings : CompoundStep<string>
     {
@@ -22,17 +22,17 @@ namespace Reductech.EDR.Core.Steps
         public IStep<string> Delimiter { get; set; } = null!;
 
         /// <summary>
-        /// The elements to iterate over.
+        /// The string to join.
         /// </summary>
         [StepProperty]
         [Required]
-        public IStep<List<string>> List { get; set; } = null!;
+        public IStep<List<string>> Strings { get; set; } = null!;
 
         /// <inheritdoc />
         public override async Task<Result<string, IError>> Run(IStateMonad stateMonad,
             CancellationToken cancellationToken)
         {
-            var list = await List.Run(stateMonad, cancellationToken);
+            var list = await Strings.Run(stateMonad, cancellationToken);
             if (list.IsFailure) return list.ConvertFailure<string>();
 
             var delimiter = await Delimiter.Run(stateMonad, cancellationToken);
@@ -51,7 +51,7 @@ namespace Reductech.EDR.Core.Steps
 
 
     /// <summary>
-    /// Match strings with a delimiter.
+    /// Join strings with a delimiter.
     /// </summary>
     public sealed class JoinStringsStepFactory : SimpleStepFactory<JoinStrings, string>
     {
@@ -63,6 +63,6 @@ namespace Reductech.EDR.Core.Steps
         public static SimpleStepFactory<JoinStrings, string> Instance { get; } = new JoinStringsStepFactory();
 
         /// <inheritdoc />
-        public override IStepNameBuilder StepNameBuilder => new StepNameBuilderFromTemplate($"Match [{nameof(JoinStrings.List)}]");
+        public override IStepNameBuilder StepNameBuilder => new StepNameBuilderFromTemplate($"Match [{nameof(JoinStrings.Strings)}]");
     }
 }

@@ -13,17 +13,16 @@ namespace Reductech.EDR.Core.Steps
     /// <summary>
     /// Concatenates streams of entities
     /// </summary>
-    public sealed class ConcatenateEntities : CompoundStep<EntityStream>
+    public sealed class EntityStreamConcat : CompoundStep<EntityStream>
     {
         /// <inheritdoc />
         public override async Task<Result<EntityStream, IError>> Run(IStateMonad stateMonad, CancellationToken cancellationToken)
         {
-            var streamsResult = await Streams.Run(stateMonad, cancellationToken);
+            var streamsResult = await EntityStreams.Run(stateMonad, cancellationToken);
             if (streamsResult.IsFailure) return streamsResult.ConvertFailure<EntityStream>();
 
             var result = EntityStream.Concatenate(streamsResult.Value);
             return result;
-
         }
 
         /// <summary>
@@ -31,23 +30,23 @@ namespace Reductech.EDR.Core.Steps
         /// </summary>
         [StepProperty]
         [Required]
-        public IStep<List<EntityStream>> Streams { get; set; } = null!;
+        public IStep<List<EntityStream>> EntityStreams { get; set; } = null!;
 
         /// <inheritdoc />
-        public override IStepFactory StepFactory => ConcatenateEntitiesStepFactory.Instance;
+        public override IStepFactory StepFactory => EntityStreamConcatStepFactory.Instance;
     }
 
     /// <summary>
     /// Concatenates streams of entities
     /// </summary>
-    public sealed class ConcatenateEntitiesStepFactory : SimpleStepFactory<ConcatenateEntities, EntityStream>
+    public sealed class EntityStreamConcatStepFactory : SimpleStepFactory<EntityStreamConcat, EntityStream>
     {
-        private ConcatenateEntitiesStepFactory() {}
+        private EntityStreamConcatStepFactory() {}
 
         /// <summary>
         /// The instance.
         /// </summary>
-        public static SimpleStepFactory<ConcatenateEntities, EntityStream> Instance { get; } = new ConcatenateEntitiesStepFactory();
+        public static SimpleStepFactory<EntityStreamConcat, EntityStream> Instance { get; } = new EntityStreamConcatStepFactory();
     }
 
 }

@@ -21,7 +21,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                     new JoinStrings
                     {
                         Delimiter = Constant(", "),
-                        List = Array("Hello", "World")
+                        Strings = Array("Hello", "World")
                     }, "Hello, World"
                     );
 

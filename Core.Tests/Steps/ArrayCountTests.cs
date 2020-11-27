@@ -8,7 +8,7 @@ using Xunit.Abstractions;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
-    public class ArrayCountTests : StepTestBase<ArrayCount<string>, int>
+    public class ArrayCountTests : StepTestBase<Length<string>, int>
     {
         /// <inheritdoc />
         public ArrayCountTests([NotNull] ITestOutputHelper testOutputHelper) : base(testOutputHelper)
@@ -37,7 +37,7 @@ namespace Reductech.EDR.Core.Tests.Steps
             get
             {
                 yield return new StepCase("Hello World",
-                    new ArrayCount<string>
+                    new Length<string>
                     {
                         Array = new Array<string>
                         {
@@ -51,7 +51,7 @@ namespace Reductech.EDR.Core.Tests.Steps
 
 
                 yield return new StepCase("Hello World multiline",
-                    new ArrayCount<string>
+                    new Length<string>
                     {
                         Array = new Array<string>
                         {

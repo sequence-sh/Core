@@ -7,7 +7,7 @@ using Xunit.Abstractions;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
-    public class ConcatenateEntitiesTests : StepTestBase<ConcatenateEntities, EntityStream>
+    public class ConcatenateEntitiesTests : StepTestBase<EntityStreamConcat, EntityStream>
     {
         /// <inheritdoc />
         public ConcatenateEntitiesTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper) {}
@@ -22,9 +22,9 @@ namespace Reductech.EDR.Core.Tests.Steps
                     {
                         Action = new Print<Entity> { Value = GetEntityVariable },
 
-                        EntityStream = new ConcatenateEntities
+                        EntityStream = new EntityStreamConcat
                         {
-                            Streams = Array(
+                            EntityStreams = Array(
                                 EntityStream.Create(
                                     CreateEntity(("Foo", "Alpha")),
                                     CreateEntity(("Foo", "Beta"))))
@@ -41,9 +41,9 @@ namespace Reductech.EDR.Core.Tests.Steps
                     {
                         Action = new Print<Entity>{Value = GetEntityVariable},
 
-                        EntityStream = new ConcatenateEntities
+                        EntityStream = new EntityStreamConcat
                         {
-                            Streams = Array(
+                            EntityStreams = Array(
                                 EntityStream.Create(
                                     CreateEntity(("Foo", "Alpha")),
                                     CreateEntity(("Foo", "Beta"))),

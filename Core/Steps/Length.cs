@@ -14,7 +14,7 @@ namespace Reductech.EDR.Core.Steps
     /// <summary>
     /// Counts the elements in an array.
     /// </summary>
-    public sealed class ArrayCount<T> : CompoundStep<int>
+    public sealed class Length<T> : CompoundStep<int>
     {
         /// <summary>
         /// The array to count.
@@ -46,7 +46,7 @@ namespace Reductech.EDR.Core.Steps
         public static GenericStepFactory Instance { get; } = new ArrayCountStepFactory();
 
         /// <inheritdoc />
-        public override Type StepType => typeof(ArrayCount<>);
+        public override Type StepType => typeof(Length<>);
 
         /// <inheritdoc />
         public override string OutputTypeExplanation => nameof(Int32);
@@ -59,7 +59,7 @@ namespace Reductech.EDR.Core.Steps
             TypeResolver typeResolver)
         {
 
-            var r1 = freezableStepData.GetArgument(nameof(ArrayCount<object>.Array), TypeName)
+            var r1 = freezableStepData.GetArgument(nameof(Length<object>.Array), TypeName)
                 .MapError(x=>x.WithLocation(this, freezableStepData))
                 .Bind(x => x.TryGetOutputTypeReference(typeResolver))
                 .Bind(x => x.TryGetGenericTypeReference(typeResolver, 0)

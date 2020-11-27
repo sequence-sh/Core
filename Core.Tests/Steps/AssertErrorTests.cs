@@ -30,7 +30,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                 yield return new StepCase("Print divide by zero",
                     new AssertError
                     {
-                        Test = new Print<int>{Value = new ApplyMathOperator()
+                        Step = new Print<int>{Value = new ApplyMathOperator()
                         {
                             Left = Constant(1),
                             Operator = Constant(MathOperator.Divide),
@@ -46,7 +46,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                 yield return new ErrorCase("Successful Step",
                     new AssertError
                     {
-                        Test = new Print<string>
+                        Step = new Print<string>
                         {
                             Value = Constant("Hello World")
                         }

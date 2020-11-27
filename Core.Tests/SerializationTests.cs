@@ -148,7 +148,7 @@ namespace Reductech.EDR.Core.Tests
 
                 yield return new SerializationTestMethod(new Print<bool>
                 {
-                    Value = new ArrayIsEmpty<string>
+                    Value = new IsEmpty<string>
                     {
                         Array = new Array<string>{Elements = new List<IStep<string>>()}
                     }

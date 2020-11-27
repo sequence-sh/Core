@@ -32,7 +32,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                 yield return new StepCase("Is true true",
                     new AssertTrue
                     {
-                        Test = Constant(true)
+                        Step = Constant(true)
                     }, Unit.Default
                 );
             }
@@ -46,7 +46,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                 yield return new ErrorCase("Failed Assertion",
                     new AssertTrue
                     {
-                        Test = Constant(false)
+                        Step = Constant(false)
                     },
                     new ErrorBuilder($"Assertion Failed 'False'", ErrorCode.IndexOutOfBounds)
                 );

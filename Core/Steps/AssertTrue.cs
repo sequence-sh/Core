@@ -19,8 +19,8 @@ namespace Reductech.EDR.Core.Steps
             CancellationToken cancellationToken)
         {
 
-            return await Test.Run(stateMonad, cancellationToken).Ensure(x => x,
-                    new SingleError($"Assertion Failed '{Test.Name}'", ErrorCode.IndexOutOfBounds, new StepErrorLocation(this)))
+            return await Step.Run(stateMonad, cancellationToken).Ensure(x => x,
+                    new SingleError($"Assertion Failed '{Step.Name}'", ErrorCode.IndexOutOfBounds, new StepErrorLocation(this)))
                 .Map(x => Unit.Default);
         }
 
@@ -32,7 +32,7 @@ namespace Reductech.EDR.Core.Steps
         /// </summary>
         [StepProperty]
         [Required]
-        public IStep<bool> Test { get; set; } = null!;
+        public IStep<bool> Step { get; set; } = null!;
     }
 
     /// <summary>

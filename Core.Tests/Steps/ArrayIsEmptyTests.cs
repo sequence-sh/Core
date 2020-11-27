@@ -7,7 +7,7 @@ using Xunit.Abstractions;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
-    public class ArrayIsEmptyTests : StepTestBase<ArrayIsEmpty<string>, bool>
+    public class ArrayIsEmptyTests : StepTestBase<IsEmpty<string>, bool>
     {
         /// <inheritdoc />
         public ArrayIsEmptyTests([NotNull] ITestOutputHelper testOutputHelper) : base(testOutputHelper) {}
@@ -41,7 +41,7 @@ namespace Reductech.EDR.Core.Tests.Steps
             get
             {
                 yield return new StepCase("Empty",
-                    new ArrayIsEmpty<string>()
+                    new IsEmpty<string>()
                     {
                         Array = new Array<string>
                         {
@@ -54,7 +54,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                     }, false);
 
                 yield return new StepCase("Not Empty",
-                    new ArrayIsEmpty<string>()
+                    new IsEmpty<string>()
                     {
                         Array = new Array<string>
                         {

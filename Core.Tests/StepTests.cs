@@ -174,7 +174,7 @@ namespace Reductech.EDR.Core.Tests
                     }), "6");
 
                 yield return new StepTestCase("Print ArrayCount(Array: ['Hello'; 'World'])",
-                    Print(new ArrayCount<string>
+                    Print(new Length<string>
                     {
                         Array = Array(Constant("Hello"),
                             Constant("World"))
@@ -183,10 +183,10 @@ namespace Reductech.EDR.Core.Tests
                 );
 
                 yield return new StepTestCase("Print ArrayIsEmpty(Array: [])",
-                    Print(new ArrayIsEmpty<string> {Array = Array<string>()}), true.ToString());
+                    Print(new IsEmpty<string> {Array = Array<string>()}), true.ToString());
 
                 yield return new StepTestCase("Print ArrayIsEmpty(Array: ['Hello World'])",
-                    Print(new ArrayIsEmpty<string>
+                    Print(new IsEmpty<string>
                     {
                         Array = Array(Constant(HelloWorldString))
                     }), false.ToString());
@@ -233,7 +233,7 @@ namespace Reductech.EDR.Core.Tests
                 yield return new StepTestCase("Print Match Repeat(Element: 'Hello', Number: 3)", Print(new JoinStrings
                 {
                     Delimiter = Constant(", "),
-                    List = new Repeat<string>
+                    Strings = new Repeat<string>
                     {
                         Number = Constant(3),
                         Element = Constant("Hello")
@@ -309,7 +309,7 @@ namespace Reductech.EDR.Core.Tests
                     Print(new JoinStrings
                     {
                         Delimiter = Constant(", "),
-                        List = new SortArray<string>
+                        Strings = new SortArray<string>
                         {
                             Array = Array(Constant("B"), Constant("C"), Constant("A")),
                             Order = Constant(SortOrder.Ascending)
@@ -320,7 +320,7 @@ namespace Reductech.EDR.Core.Tests
                     Print(new JoinStrings
                     {
                         Delimiter = Constant(", "),
-                        List = new SortArray<string>
+                        Strings = new SortArray<string>
                         {
                             Array = Array(Constant("B"), Constant("C"), Constant("A")),
                             Order = Constant(SortOrder.Descending)
@@ -441,14 +441,14 @@ namespace Reductech.EDR.Core.Tests
 
                 yield return new StepTestCase("AssertTrue(Test: True)", new AssertTrue
                 {
-                    Test = Constant(true)
+                    Step = Constant(true)
                 });
 
                 yield return new StepTestCase("AssertError(Test: AssertTrue(Test: False))", new AssertError
                 {
-                    Test = new AssertTrue
+                    Step = new AssertTrue
                     {
-                        Test = Constant(false)
+                        Step = Constant(false)
                     }
                 });
 

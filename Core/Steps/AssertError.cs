@@ -18,7 +18,7 @@ namespace Reductech.EDR.Core.Steps
         public override async Task<Result<Unit, IError>> Run(IStateMonad stateMonad,
             CancellationToken cancellationToken)
         {
-            var result = await Test.Run(stateMonad, cancellationToken);
+            var result = await Step.Run(stateMonad, cancellationToken);
 
             if (result.IsFailure)
                 return Unit.Default;
@@ -34,7 +34,7 @@ namespace Reductech.EDR.Core.Steps
         /// </summary>
         [StepProperty]
         [Required]
-        public IStep<Unit> Test { get; set; } = null!;
+        public IStep<Unit> Step { get; set; } = null!;
     }
 
     /// <summary>
