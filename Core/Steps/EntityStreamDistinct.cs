@@ -25,12 +25,12 @@ namespace Reductech.EDR.Core.Steps
             var entityStreamResult = await EntityStream.Run(stateMonad, cancellationToken);
             if (entityStreamResult.IsFailure) return entityStreamResult.ConvertFailure<EntityStream>();
 
-            var caseSensitiveResult = await CaseSensitive.Run(stateMonad, cancellationToken);
-            if (caseSensitiveResult.IsFailure) return caseSensitiveResult.ConvertFailure<EntityStream>();
+            var ignoreCaseResult = await IgnoreCase.Run(stateMonad, cancellationToken);
+            if (ignoreCaseResult.IsFailure) return ignoreCaseResult.ConvertFailure<EntityStream>();
 
-            IEqualityComparer<string> comparer = caseSensitiveResult.Value
-                ? StringComparer.Ordinal
-                : StringComparer.OrdinalIgnoreCase;
+            IEqualityComparer<string> comparer = ignoreCaseResult.Value
+                ? StringComparer.OrdinalIgnoreCase
+                : StringComparer.Ordinal;
 
             HashSet<string> usedKeys = new HashSet<string>(comparer);
 
@@ -72,11 +72,11 @@ namespace Reductech.EDR.Core.Steps
         public IStep<string> KeySelector { get; set; } = null!;
 
         /// <summary>
-        /// Whether comparisons should be case sensitive.
+        /// Whether to ignore case when comparing strings.
         /// </summary>
-        [StepProperty(Order = 2)]
-        [DefaultValueExplanation("true")]
-        public IStep<bool> CaseSensitive { get; set; } = new Constant<bool>(true);
+        [StepProperty(Order = 3)]
+        [DefaultValueExplanation("False")]
+        public IStep<bool> IgnoreCase { get; set; } = new Constant<bool>(false);
         /// <inheritdoc />
         public override IStepFactory StepFactory => EntityStreamDistinctStepFactory.Instance;
     }
