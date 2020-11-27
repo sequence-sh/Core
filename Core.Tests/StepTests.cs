@@ -135,11 +135,11 @@ namespace Reductech.EDR.Core.Tests
                     }, "Farewell", "Hello", "Farewell", "World");
 
                 yield return new StepTestCase("If True then Print 'Hello World' else Print 'World Hello'",
-                    new Conditional
+                    new If
                     {
                         Condition = Constant(true),
-                        ThenStep = Print(Constant(HelloWorldString)),
-                        ElseStep = Print(Constant("World Hello"))
+                        Then = Print(Constant(HelloWorldString)),
+                        Else = Print(Constant("World Hello"))
                     },
                     HelloWorldString);
 

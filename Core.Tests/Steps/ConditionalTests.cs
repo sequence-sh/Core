@@ -8,7 +8,7 @@ using Xunit.Abstractions;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
-    public class ConditionalTests : StepTestBase<Conditional, Unit>
+    public class ConditionalTests : StepTestBase<If, Unit>
     {
         /// <inheritdoc />
         public ConditionalTests([NotNull] ITestOutputHelper testOutputHelper) : base(testOutputHelper) {}
@@ -32,25 +32,25 @@ namespace Reductech.EDR.Core.Tests.Steps
             get
             {
                 yield return new StepCase("If true print something",
-                    new Conditional
+                    new If
                     {
                         Condition = Constant(true),
-                        ThenStep = new Print<string>(){Value = Constant("Hello World")}
+                        Then = new Print<string>(){Value = Constant("Hello World")}
                     }, Unit.Default, "Hello World");
 
                 yield return new StepCase("If false print nothing",
-                    new Conditional
+                    new If
                     {
                         Condition = Constant(false),
-                        ThenStep = new Print<string> { Value = Constant("Hello World") }
+                        Then = new Print<string> { Value = Constant("Hello World") }
                     }, Unit.Default);
 
                 yield return new StepCase("If false print something else",
-                    new Conditional
+                    new If
                     {
                         Condition = Constant(false),
-                        ThenStep = new Print<string> { Value = Constant("Hello World") },
-                        ElseStep = new Print<string> { Value = Constant("Goodbye World") },
+                        Then = new Print<string> { Value = Constant("Hello World") },
+                        Else = new Print<string> { Value = Constant("Goodbye World") },
                     }, Unit.Default, "Goodbye World");
             }
         }
@@ -61,19 +61,19 @@ namespace Reductech.EDR.Core.Tests.Steps
             get
             {
                 yield return new SerializeCase("No Else",
-                    new Conditional
+                    new If
                     {
                         Condition = Constant(true),
-                        ThenStep = new Print<string>{Value = Constant("Hello World")}
+                        Then = new Print<string>{Value = Constant("Hello World")}
                     }, "Conditional(Condition = True, ThenStep = Print(Value = 'Hello World'))"
                     );
 
                 yield return new SerializeCase("Else",
-                    new Conditional
+                    new If
                     {
                         Condition = Constant(true),
-                        ThenStep = new Print<string> { Value = Constant("Hello World") },
-                        ElseStep = new Print<string> { Value = Constant("Goodbye World") },
+                        Then = new Print<string> { Value = Constant("Hello World") },
+                        Else = new Print<string> { Value = Constant("Goodbye World") },
                     }, "Conditional(Condition = True, ElseStep = Print(Value = 'Goodbye World'), ThenStep = Print(Value = 'Hello World'))"
                     );
 

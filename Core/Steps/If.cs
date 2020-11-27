@@ -13,7 +13,7 @@ namespace Reductech.EDR.Core.Steps
     /// <summary>
     /// Executes a statement if a condition is true.
     /// </summary>
-    public sealed class Conditional : CompoundStep<Unit>
+    public sealed class If : CompoundStep<Unit>
     {
         /// <inheritdoc />
         public override async Task<Result<Unit, IError>> Run(IStateMonad stateMonad,
@@ -23,10 +23,10 @@ namespace Reductech.EDR.Core.Steps
                 .Bind(r =>
                 {
                     if (r)
-                        return ThenStep.Run(stateMonad, cancellationToken);
+                        return Then.Run(stateMonad, cancellationToken);
 
-                    if (ElseStep != null)
-                        return ElseStep.Run(stateMonad, cancellationToken);
+                    if (Else != null)
+                        return Else.Run(stateMonad, cancellationToken);
                     else return Task.FromResult(Result.Success<Unit, IError>(Unit.Default));
 
                 });
@@ -35,7 +35,7 @@ namespace Reductech.EDR.Core.Steps
         }
 
         /// <inheritdoc />
-        public override IStepFactory StepFactory => ConditionalStepFactory.Instance;
+        public override IStepFactory StepFactory => IfStepFactory.Instance;
 
         /// <summary>
         /// Whether to follow the Then Branch
@@ -49,7 +49,7 @@ namespace Reductech.EDR.Core.Steps
         /// </summary>
         [StepProperty(Order = 2)]
         [Required]
-        public IStep<Unit> ThenStep { get; set; } = null!;
+        public IStep<Unit> Then { get; set; } = null!;
 
         //TODO else if
 
@@ -58,23 +58,23 @@ namespace Reductech.EDR.Core.Steps
         /// </summary>
         [StepProperty(Order = 3)]
         [DefaultValueExplanation("Do Nothing")]
-        public IStep<Unit>? ElseStep { get; set; } = null;
+        public IStep<Unit>? Else { get; set; } = null;
 
     }
 
     /// <summary>
     /// Executes a statement if a condition is true.
     /// </summary>
-    public sealed class ConditionalStepFactory : SimpleStepFactory<Conditional, Unit>
+    public sealed class IfStepFactory : SimpleStepFactory<If, Unit>
     {
-        private ConditionalStepFactory() { }
+        private IfStepFactory() { }
 
         /// <summary>
         /// The instance.
         /// </summary>
-        public static ConditionalStepFactory Instance { get; } = new ConditionalStepFactory();
+        public static IfStepFactory Instance { get; } = new IfStepFactory();
 
         /// <inheritdoc />
-        public override IStepNameBuilder StepNameBuilder => new StepNameBuilderFromTemplate($"If [{nameof(Conditional.Condition)}] then [{nameof(Conditional.ThenStep)}] else [{nameof(Conditional.ElseStep)}]");
+        public override IStepNameBuilder StepNameBuilder => new StepNameBuilderFromTemplate($"If [{nameof(If.Condition)}] then [{nameof(If.Then)}] else [{nameof(If.Else)}]");
     }
 }
