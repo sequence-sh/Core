@@ -84,7 +84,7 @@ namespace Reductech.EDR.Core.Steps
         public IStep<string> MultiValueDelimiter { get; set; } = new Constant<string>("");
 
         /// <inheritdoc />
-        public override IStepFactory StepFactory => ReadCsvStepFactory.Instance;
+        public override IStepFactory StepFactory => ReadCSVStepFactory.Instance;
     }
 
 
@@ -92,13 +92,13 @@ namespace Reductech.EDR.Core.Steps
     /// Extracts entities from a CSV Stream
     /// The same as ReadConcordance but with different default values.
     /// </summary>
-    public sealed class ReadCsvStepFactory : SimpleStepFactory<ReadCSV, EntityStream>
+    public sealed class ReadCSVStepFactory : SimpleStepFactory<ReadCSV, EntityStream>
     {
-        private ReadCsvStepFactory() { }
+        private ReadCSVStepFactory() { }
 
         /// <summary>
         /// The instance.
         /// </summary>
-        public static SimpleStepFactory<ReadCSV, EntityStream> Instance { get; } = new ReadCsvStepFactory();
+        public static SimpleStepFactory<ReadCSV, EntityStream> Instance { get; } = new ReadCSVStepFactory();
     }
 }

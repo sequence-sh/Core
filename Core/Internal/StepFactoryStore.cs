@@ -43,7 +43,9 @@ namespace Reductech.EDR.Core.Internal
         public static StepFactoryStore CreateUsingReflection(params Type[] assemblyMemberTypes)
         {
             var factories =
-                assemblyMemberTypes.Select(Assembly.GetAssembly)
+                assemblyMemberTypes
+                    .Prepend(typeof(IStep))
+                    .Select(Assembly.GetAssembly)
                         .Distinct()
                         .SelectMany(a=>a!.GetTypes())
                         .Distinct()

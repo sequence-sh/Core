@@ -28,6 +28,8 @@ namespace Reductech.EDR.Core.Steps
             var path = Path.Combine(data.Value.Item1, data.Value.Item2);
             var stream = data.Value.Item3;
 
+            stream.Seek(0, SeekOrigin.Begin);
+
             var r = await stateMonad.FileSystemHelper.WriteFileAsync(path, stream, cancellationToken)
                 .MapError(x=>x.WithLocation(this));
 

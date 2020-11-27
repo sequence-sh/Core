@@ -30,7 +30,7 @@ namespace Reductech.EDR.Core.Entities
         /// <summary>
         /// Create a new entity
         /// </summary>
-        public static Entity Create(IEnumerable<KeyValuePair<string, object>> fields, char? multiValueDelimiter)
+        public static Entity Create(IEnumerable<KeyValuePair<string, object>> fields, char? multiValueDelimiter = null)
         {
             var fieldEntities = fields
                 .Select(x => new KeyValuePair<string, EntityValue>(x.Key, EntityValue.Create(x.Value.ToString(), multiValueDelimiter)))
