@@ -17,7 +17,7 @@ namespace Reductech.EDR.Core.Attributes
         }
 
         /// <summary>
-        /// Where to go to see something else.
+        /// EntityStreamFilter to go to see something else.
         /// </summary>
         public string SeeAlso { get; }
     }

@@ -13,68 +13,62 @@ using Entity = Reductech.EDR.Core.Entities.Entity;
 namespace Reductech.EDR.Core.Steps
 {
     /// <summary>
-    /// Filter entities according to a function.
+    /// Apply a function to every entity in an entity stream.
     /// </summary>
-    public sealed class Where : CompoundStep<EntityStream>
+    public sealed class EntityMap : CompoundStep<EntityStream>
     {
         /// <inheritdoc />
-        public override async Task<Result<EntityStream, IError>> Run(IStateMonad stateMonad,
-            CancellationToken cancellationToken)
+        public override async Task<Result<EntityStream, IError>> Run(IStateMonad stateMonad, CancellationToken cancellationToken)
         {
             var entityStreamResult = await EntityStream.Run(stateMonad, cancellationToken);
             if (entityStreamResult.IsFailure) return entityStreamResult.ConvertFailure<EntityStream>();
 
+
             var currentState = stateMonad.GetState().ToImmutableDictionary();
 
-            async Task<Maybe<Entity>> FilterAction(Entity record)
+            async ValueTask<Entity> SelectAction(Entity record)
             {
                 var scopedMonad = new ScopedStateMonad(stateMonad, currentState,
                     new KeyValuePair<VariableName, object>(VariableName.Entity, record));
 
-                var result = await Predicate.Run(scopedMonad, cancellationToken);
+                var result = await Function.Run(scopedMonad, cancellationToken);
 
                 if (result.IsFailure)
                     throw new ErrorException(result.Error);
 
-                if(result.Value)
-                    return Maybe<Entity>.From(record);
-                return Maybe<Entity>.None;
+                return result.Value;
             }
 
-            var newStream = entityStreamResult.Value.ApplyMaybe(FilterAction);
+            var newStream = entityStreamResult.Value.Apply(SelectAction);
 
             return newStream;
         }
 
         /// <summary>
-        /// The entities to filter
+        /// The entities to sort
         /// </summary>
         [StepProperty(Order = 1)]
         [Required]
         public IStep<EntityStream> EntityStream { get; set; } = null!;
 
         /// <summary>
-        /// A function that determines whether an entity should be included from the variable &lt;Entity&gt;
+        /// A function to get the mapped entity, using the variable &lt;Entity&gt;
         /// </summary>
         [StepProperty(Order = 2)]
         [Required]
-        public IStep<bool> Predicate { get; set; } = null!;
+        public IStep<Entity> Function { get; set; } = null!;
+
 
         /// <inheritdoc />
-        public override IStepFactory StepFactory => WhereStepFactory.Instance;
+        public override IStepFactory StepFactory => EntityMapStepFactory.Instance;
     }
 
     /// <summary>
-    /// Filter entities according to a function.
+    /// Apply a function to every entity in an entity stream.
     /// </summary>
-    public sealed class WhereStepFactory : SimpleStepFactory<Where, EntityStream>
+    public sealed class EntityMapStepFactory : SimpleStepFactory<EntityMap, EntityStream>
     {
-        private WhereStepFactory() {}
-
-        /// <summary>
-        /// The instance.
-        /// </summary>
-        public static SimpleStepFactory<Where, EntityStream> Instance { get; } = new WhereStepFactory();
+        private EntityMapStepFactory() {}
 
         /// <inheritdoc />
         public override IEnumerable<(VariableName VariableName, ITypeReference typeReference)> FixedVariablesSet
@@ -84,5 +78,10 @@ namespace Reductech.EDR.Core.Steps
                 yield return (VariableName.Entity, new ActualTypeReference(typeof(Entity)));
             }
         }
+
+        /// <summary>
+        /// The instance.
+        /// </summary>
+        public static SimpleStepFactory<EntityMap, EntityStream> Instance { get; } = new EntityMapStepFactory();
     }
 }

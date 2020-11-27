@@ -8,7 +8,7 @@ using Xunit.Abstractions;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
-    public class WhereTests : StepTestBase<Where, EntityStream>
+    public class WhereTests : StepTestBase<EntityStreamFilter, EntityStream>
     {
         /// <inheritdoc />
         public WhereTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
@@ -24,7 +24,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                     new EntityForEach
                     {
                         Action = new Print<Entity> { Value = GetEntityVariable },
-                        EntityStream = new Where
+                        EntityStream = new EntityStreamFilter
                         {
                             EntityStream = new Constant<EntityStream>(EntityStream.Create(
                                 CreateEntity(("Foo", "Alpha")),
@@ -48,7 +48,7 @@ namespace Reductech.EDR.Core.Tests.Steps
             {
                 yield return new SerializeCase("Default",
                     CreateStepWithDefaultOrArbitraryValues().step,
-                    @"Do: Where
+                    @"Do: EntityStreamFilter
 EntityStream:
 - (Prop1 = 'Val0',Prop2 = 'Val1')
 - (Prop1 = 'Val2',Prop2 = 'Val3')
