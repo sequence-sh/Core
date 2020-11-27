@@ -5,10 +5,10 @@ using Xunit.Abstractions;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
-    public class FirstIndexOfElementTests : StepTestBase<FindElement<string>, int>
+    public class FindElementTests : StepTestBase<FindElement<string>, int>
     {
         /// <inheritdoc />
-        public FirstIndexOfElementTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
+        public FindElementTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
         {
         }
 
@@ -53,7 +53,7 @@ namespace Reductech.EDR.Core.Tests.Steps
         {
             get
             {
-                yield return new DeserializeCase("Simple Case", "FirstIndexOfElement(Array = ['Hello', 'World'], Element = 'World')", 1);
+                yield return new DeserializeCase("Simple Case", "FindElement(Array = ['Hello', 'World'], Element = 'World')", 1);
             }
 
         }

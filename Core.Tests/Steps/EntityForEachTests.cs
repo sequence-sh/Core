@@ -8,10 +8,10 @@ using Xunit.Abstractions;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
-    public class ForEachEntityTests : StepTestBase<EntityForEach, Unit> //TODO sort out entity stream serialization
+    public class EntityForEachTests : StepTestBase<EntityForEach, Unit> //TODO sort out entity stream serialization
     {
         /// <inheritdoc />
-        public ForEachEntityTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper) { }
+        public EntityForEachTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper) { }
 
         /// <inheritdoc />
         protected override IEnumerable<StepCase> StepCases
@@ -60,12 +60,12 @@ namespace Reductech.EDR.Core.Tests.Steps
         protected override IEnumerable<SerializeCase> SerializeCases {
             get
             {
-                var expectedYaml = @"Do: ForEachEntity
-Action: DoNothing()
+                var expectedYaml = @"Do: EntityForEach
 EntityStream:
 - (Prop1 = 'Val0',Prop2 = 'Val1')
 - (Prop1 = 'Val2',Prop2 = 'Val3')
-- (Prop1 = 'Val4',Prop2 = 'Val5')";
+- (Prop1 = 'Val4',Prop2 = 'Val5')
+Action: DoNothing()";
 
                 var (step, _) = CreateStepWithDefaultOrArbitraryValues();
 

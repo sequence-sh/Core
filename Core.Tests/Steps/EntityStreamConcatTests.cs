@@ -7,10 +7,10 @@ using Xunit.Abstractions;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
-    public class ConcatenateEntitiesTests : StepTestBase<EntityStreamConcat, EntityStream>
+    public class EntityStreamConcatTests : StepTestBase<EntityStreamConcat, EntityStream>
     {
         /// <inheritdoc />
-        public ConcatenateEntitiesTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper) {}
+        public EntityStreamConcatTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper) {}
 
         /// <inheritdoc />
         protected override IEnumerable<StepCase> StepCases
@@ -67,8 +67,8 @@ namespace Reductech.EDR.Core.Tests.Steps
             {
                 yield return new SerializeCase("Default",
                     CreateStepWithDefaultOrArbitraryValues().step,
-                    @"Do: ConcatenateEntities
-Streams:
+                    @"Do: EntityStreamConcat
+EntityStreams:
   Do: Array
   Elements:
   - - (Prop1 = 'Val0',Prop2 = 'Val1')

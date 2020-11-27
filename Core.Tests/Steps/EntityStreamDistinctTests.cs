@@ -8,10 +8,10 @@ using Xunit.Abstractions;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
-    public class DistinctEntitiesTests : StepTestBase<EntityStreamDistinct, EntityStream>
+    public class EntityStreamDistinctTests : StepTestBase<EntityStreamDistinct, EntityStream>
     {
         /// <inheritdoc />
-        public DistinctEntitiesTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
+        public EntityStreamDistinctTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
         {
         }
 
@@ -70,13 +70,13 @@ namespace Reductech.EDR.Core.Tests.Steps
             {
                 yield return new SerializeCase("Default",
                     CreateStepWithDefaultOrArbitraryValues().step,
-                    @"Do: DistinctEntities
+                    @"Do: EntityStreamDistinct
 EntityStream:
 - (Prop1 = 'Val0',Prop2 = 'Val1')
 - (Prop1 = 'Val2',Prop2 = 'Val3')
 - (Prop1 = 'Val4',Prop2 = 'Val5')
-GetKey: 'Bar6'
-CaseSensitive: True"
+KeySelector: 'Bar6'
+IgnoreCase: False"
 
                     );
 

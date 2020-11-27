@@ -34,7 +34,7 @@ namespace Reductech.EDR.Core.Tests.Steps
             get
             {
                 yield return new DeserializeCase("Match some strings",
-                    "JoinStrings(Delimiter = ', ', List = ['Hello', 'World'])"
+                    "JoinStrings(Delimiter = ', ', Strings = ['Hello', 'World'])"
                     ,"Hello, World"
                 );
 

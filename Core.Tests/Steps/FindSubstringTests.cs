@@ -5,10 +5,10 @@ using Xunit.Abstractions;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
-    public class FirstIndexOfTests : StepTestBase<FindSubstring, int>
+    public class FindSubstringTests : StepTestBase<FindSubstring, int>
     {
         /// <inheritdoc />
-        public FirstIndexOfTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
+        public FindSubstringTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
         {
         }
 
@@ -41,7 +41,7 @@ namespace Reductech.EDR.Core.Tests.Steps
         {
             get
             {
-                yield return new DeserializeCase("Present", "FirstIndexOf(String = 'Hello', Substring = 'lo')", 3);
+                yield return new DeserializeCase("Present", "FindSubstring(String = 'Hello', Substring = 'lo')", 3);
 
             }
 

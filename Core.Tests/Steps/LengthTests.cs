@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using JetBrains.Annotations;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Steps;
@@ -7,41 +8,36 @@ using Xunit.Abstractions;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
-    public class ArrayIsEmptyTests : StepTestBase<IsEmpty<string>, bool>
+    public class LengthTests : StepTestBase<Length<string>, int>
     {
         /// <inheritdoc />
-        public ArrayIsEmptyTests([NotNull] ITestOutputHelper testOutputHelper) : base(testOutputHelper) {}
+        public LengthTests([NotNull] ITestOutputHelper testOutputHelper) : base(testOutputHelper)
+        {
+        }
 
         /// <inheritdoc />
         protected override IEnumerable<DeserializeCase> DeserializeCases
         {
             get
             {
-
-                yield return new DeserializeCase("short form empty",
-                    "ArrayIsEmpty(Array = [])",
-                    true
-                );
-
                 yield return new DeserializeCase("short form",
-                    "ArrayIsEmpty(Array = ['Hello','World'])",
-                    false
-                );
+                    "Length(Array = ['Hello','World'])",
+                    2
+                    );
 
                 yield return new DeserializeCase("long form",
-                    "Do: ArrayIsEmpty\nArray: ['Hello','World']",
-                    false
-                );
+                    "Do: Length\nArray: ['Hello','World']",
+                    2
+                    );
             }
         }
 
         /// <inheritdoc />
-        protected override IEnumerable<StepCase> StepCases
-        {
+        protected override IEnumerable<StepCase> StepCases {
             get
             {
-                yield return new StepCase("Empty",
-                    new IsEmpty<string>()
+                yield return new StepCase("Hello World",
+                    new Length<string>
                     {
                         Array = new Array<string>
                         {
@@ -51,23 +47,23 @@ namespace Reductech.EDR.Core.Tests.Steps
                                 Constant("World"),
                             }
                         }
-                    }, false);
+                    },2);
 
-                yield return new StepCase("Not Empty",
-                    new IsEmpty<string>()
+
+                yield return new StepCase("Hello World multiline",
+                    new Length<string>
                     {
                         Array = new Array<string>
                         {
                             Elements = new List<IStep<string>>
                             {
-                                Constant("Hello"),
-                                Constant("World"),
+                                Constant($"Hello{Environment.NewLine}Hello"),
+                                Constant($"World{Environment.NewLine}World"),
                             }
                         }
-                    }, false);
-            }
-        }
+                    }, 2);
 
+            } }
 
     }
 }

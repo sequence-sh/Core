@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Collections.Immutable;
 using JetBrains.Annotations;
 using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.TestHarness;
@@ -8,10 +7,10 @@ using Xunit.Abstractions;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
-    public class ConditionalTests : StepTestBase<If, Unit>
+    public class IfTests : StepTestBase<If, Unit>
     {
         /// <inheritdoc />
-        public ConditionalTests([NotNull] ITestOutputHelper testOutputHelper) : base(testOutputHelper) {}
+        public IfTests([NotNull] ITestOutputHelper testOutputHelper) : base(testOutputHelper) {}
 
         /// <inheritdoc />
         protected override IEnumerable<DeserializeCase> DeserializeCases
@@ -20,7 +19,7 @@ namespace Reductech.EDR.Core.Tests.Steps
             {
                 yield return new DeserializeCase(
                     "If true print something",
-                    "Conditional(Condition = true, ThenStep = Print(Value = 'Hello World'))",
+                    "If(Condition = true, Then = Print(Value = 'Hello World'))",
                     Unit.Default,
                     "Hello World");
             }
@@ -65,7 +64,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                     {
                         Condition = Constant(true),
                         Then = new Print<string>{Value = Constant("Hello World")}
-                    }, "Conditional(Condition = True, ThenStep = Print(Value = 'Hello World'))"
+                    }, "If(Condition = True, Then = Print(Value = 'Hello World'))"
                     );
 
                 yield return new SerializeCase("Else",
@@ -74,7 +73,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                         Condition = Constant(true),
                         Then = new Print<string> { Value = Constant("Hello World") },
                         Else = new Print<string> { Value = Constant("Goodbye World") },
-                    }, "Conditional(Condition = True, ElseStep = Print(Value = 'Goodbye World'), ThenStep = Print(Value = 'Hello World'))"
+                    }, "If(Condition = True, Else = Print(Value = 'Goodbye World'), Then = Print(Value = 'Hello World'))"
                     );
 
                 yield return CreateDefaultSerializeCase(true);

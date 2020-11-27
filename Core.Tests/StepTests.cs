@@ -440,14 +440,14 @@ namespace Reductech.EDR.Core.Tests
 
                 yield return new StepTestCase("AssertTrue(Test: True)", new AssertTrue
                 {
-                    Step = Constant(true)
+                    Bool = Constant(true)
                 });
 
                 yield return new StepTestCase("AssertError(Test: AssertTrue(Test: False))", new AssertError
                 {
                     Step = new AssertTrue
                     {
-                        Step = Constant(false)
+                        Bool = Constant(false)
                     }
                 });
 

@@ -104,9 +104,9 @@ namespace Reductech.EDR.Core.Tests.Steps
                         "",
                         "Represents an ordered collection of objects.",
                         "",
-                        "|Parameter|Type          |Required|Summary                    |",
-                        "|:-------:|:------------:|:------:|:-------------------------:|",
-                        "|Elements |IStep<[T](#T)>|☑️      |The elements of this array.|",
+                        "|Parameter|Type          |Required|Summary                   |",
+                        "|:-------:|:------------:|:------:|:------------------------:|",
+                        "|Elements |IStep<[T](#T)>|☑️      |The elements of the array.|",
                         "",
                     }
                     ).WithStepFactoryStore(StepFactoryStore.Create(ArrayStepFactory.Instance));

@@ -5,10 +5,10 @@ using Xunit.Abstractions;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
-    public class GetLetterAtIndexTests : StepTestBase<CharAtIndex, string>
+    public class CharAtIndexTests : StepTestBase<CharAtIndex, string>
     {
         /// <inheritdoc />
-        public GetLetterAtIndexTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
+        public CharAtIndexTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
         {
         }
 
@@ -32,7 +32,7 @@ namespace Reductech.EDR.Core.Tests.Steps
         {
             get
             {
-                yield return new DeserializeCase("Index is present", "GetLetterAtIndex(Index = 1, String = 'Hello')", "e");
+                yield return new DeserializeCase("Index is present", "CharAtIndex(Index = 1, String = 'Hello')", "e");
 
             }
 

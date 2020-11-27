@@ -39,7 +39,7 @@ namespace Reductech.EDR.Core.Tests.Steps
         {
             get
             {
-                yield return new DeserializeCase("Simple Foreach", "Foreach(Action = Print(Value = <Foo>), Array = [3,2,1], VariableName = <Foo>)", Unit.Default, "3", "2", "1")
+                yield return new DeserializeCase("Simple Foreach", "Foreach(Action = Print(Value = <Foo>), Array = [3,2,1], Variable = <Foo>)", Unit.Default, "3", "2", "1")
                     .WithExpectedFinalState("Foo", 1);
             }
 
