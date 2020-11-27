@@ -45,8 +45,8 @@ namespace Reductech.EDR.Core.Steps
         /// How the stream is encoded.
         /// </summary>
         [StepProperty(Order = 2)]
-        [DefaultValueExplanation("The default encoding")]
-        public IStep<EncodingEnum> Encoding { get; set; } = new Constant<EncodingEnum>(EncodingEnum.Default);
+        [DefaultValueExplanation("UTF8 no BOM")]
+        public IStep<EncodingEnum> Encoding { get; set; } = new Constant<EncodingEnum>(EncodingEnum.UTF8);
 
         /// <summary>
         /// The delimiter to use to separate fields.

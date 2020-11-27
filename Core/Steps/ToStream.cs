@@ -47,11 +47,11 @@ namespace Reductech.EDR.Core.Steps
         public IStep<string> Text { get; set; } = null!;
 
         /// <summary>
-        /// How to encode the string.
+        /// How the stream is encoded.
         /// </summary>
         [StepProperty(Order = 2)]
-        [DefaultValueExplanation("The default encoding")]
-        public IStep<EncodingEnum> Encoding { get; set; } = new Constant<EncodingEnum>(EncodingEnum.Default);
+        [DefaultValueExplanation("UTF8 no BOM")]
+        public IStep<EncodingEnum> Encoding { get; set; } = new Constant<EncodingEnum>(EncodingEnum.UTF8);
 
         /// <inheritdoc />
         public override IStepFactory StepFactory => ToStreamStepFactory.Instance;

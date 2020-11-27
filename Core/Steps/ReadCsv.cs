@@ -12,7 +12,7 @@ namespace Reductech.EDR.Core.Steps
 {
     /// <summary>
     /// Extracts entities from a CSV file.
-    /// The same as ReadConcordance but with different default values.
+    /// The same as FromConcordance but with different default values.
     /// </summary>
     public sealed class ReadCSV : CompoundStep<EntityStream>
     {
@@ -45,8 +45,8 @@ namespace Reductech.EDR.Core.Steps
         /// How the stream is encoded.
         /// </summary>
         [StepProperty(Order = 2)]
-        [DefaultValueExplanation("The default encoding")]
-        public IStep<EncodingEnum> Encoding { get; set; } = new Constant<EncodingEnum>(EncodingEnum.Default);
+        [DefaultValueExplanation("UTF8 no BOM")]
+        public IStep<EncodingEnum> Encoding { get; set; } = new Constant<EncodingEnum>(EncodingEnum.UTF8);
 
         /// <summary>
         /// The delimiter to use to separate fields.
@@ -90,7 +90,7 @@ namespace Reductech.EDR.Core.Steps
 
     /// <summary>
     /// Extracts entities from a CSV Stream
-    /// The same as ReadConcordance but with different default values.
+    /// The same as FromConcordance but with different default values.
     /// </summary>
     public sealed class ReadCSVStepFactory : SimpleStepFactory<ReadCSV, EntityStream>
     {

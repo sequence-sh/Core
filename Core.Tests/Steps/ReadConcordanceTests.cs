@@ -9,7 +9,7 @@ using Xunit.Abstractions;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
-    public class ReadConcordanceTests : StepTestBase<ReadConcordance, EntityStream>
+    public class ReadConcordanceTests : StepTestBase<FromConcordance, EntityStream>
     {
         /// <inheritdoc />
         public ReadConcordanceTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper) {}
@@ -22,7 +22,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                 yield return new StepCase("Read Concordance and print all lines",
                     new EntityForEach
                     {
-                        EntityStream = new ReadConcordance()
+                        EntityStream = new FromConcordance()
                         {
                             Stream = new ToStream
                             {
@@ -41,7 +41,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                 yield return new StepCase("Read Concordance with multiValue and print all lines",
                     new EntityForEach
                     {
-                        EntityStream = new ReadConcordance
+                        EntityStream = new FromConcordance
                         {
                             Stream = new ToStream
                             {
@@ -68,7 +68,7 @@ namespace Reductech.EDR.Core.Tests.Steps
             {
                 var (step, _) = CreateStepWithDefaultOrArbitraryValues();
 
-                const string expectedYaml = @"Do: ReadConcordance
+                const string expectedYaml = @"Do: FromConcordance
 Stream: 'Baz0'
 Encoding: EncodingEnum.Default
 Delimiter: ""\x14""

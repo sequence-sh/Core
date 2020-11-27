@@ -26,9 +26,13 @@ namespace Reductech.EDR.Core
         /// </summary>
         UTF7,
         /// <summary>
-        /// UTF8
+        /// UTF8 with no byte order mark.
         /// </summary>
         UTF8,
+        /// <summary>
+        /// UTF8 with byte order mark.
+        /// </summary>
+        UTF8BOM,
         /// <summary>
         /// UTF32
         /// </summary>
@@ -55,7 +59,8 @@ namespace Reductech.EDR.Core
                 EncodingEnum.Ascii => Encoding.ASCII,
                 EncodingEnum.BigEndianUnicode => Encoding.BigEndianUnicode,
                 EncodingEnum.UTF7 => Encoding.UTF7,
-                EncodingEnum.UTF8 => Encoding.UTF8,
+                EncodingEnum.UTF8 => new UTF8Encoding(false),
+                EncodingEnum.UTF8BOM => new UTF8Encoding(true),
                 EncodingEnum.UTF32 => Encoding.UTF32,
                 EncodingEnum.Unicode => Encoding.Unicode,
                 _ => throw new ArgumentOutOfRangeException(nameof(encodingEnum), encodingEnum, null)

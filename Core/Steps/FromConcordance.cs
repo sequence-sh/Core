@@ -14,7 +14,7 @@ namespace Reductech.EDR.Core.Steps
     /// Extracts entities from a Concordance stream.
     /// The same as ReadCSV but with different default values.
     /// </summary>
-    public sealed class ReadConcordance : CompoundStep<EntityStream>
+    public sealed class FromConcordance : CompoundStep<EntityStream>
     {
         /// <inheritdoc />
         public override async Task<Result<EntityStream, IError>> Run(IStateMonad stateMonad, CancellationToken cancellationToken)
@@ -45,8 +45,8 @@ namespace Reductech.EDR.Core.Steps
         /// How the stream is encoded.
         /// </summary>
         [StepProperty(Order = 2)]
-        [DefaultValueExplanation("The default encoding")]
-        public IStep<EncodingEnum> Encoding { get; set; } = new Constant<EncodingEnum>(EncodingEnum.Default);
+        [DefaultValueExplanation("UTF8 no BOM")]
+        public IStep<EncodingEnum> Encoding { get; set; } = new Constant<EncodingEnum>(EncodingEnum.UTF8);
 
         /// <summary>
         /// The delimiter to use to separate fields.
@@ -83,20 +83,20 @@ namespace Reductech.EDR.Core.Steps
         public IStep<string> MultiValueDelimiter { get; set; } = new Constant<string>("|");
 
         /// <inheritdoc />
-        public override IStepFactory StepFactory => ReadConcordanceStepFactory.Instance;
+        public override IStepFactory StepFactory => FromConcordanceStepFactory.Instance;
     }
 
     /// <summary>
     /// Extracts entities from a Concordance stream.
     /// The same as ReadCSV but with different default values.
     /// </summary>
-    public sealed class ReadConcordanceStepFactory : SimpleStepFactory<ReadConcordance, EntityStream>
+    public sealed class FromConcordanceStepFactory : SimpleStepFactory<FromConcordance, EntityStream>
     {
-        private ReadConcordanceStepFactory() {}
+        private FromConcordanceStepFactory() {}
 
         /// <summary>
         /// The instance.
         /// </summary>
-        public static SimpleStepFactory<ReadConcordance, EntityStream> Instance { get; } = new ReadConcordanceStepFactory();
+        public static SimpleStepFactory<FromConcordance, EntityStream> Instance { get; } = new FromConcordanceStepFactory();
     }
 }
