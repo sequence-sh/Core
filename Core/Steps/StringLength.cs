@@ -11,7 +11,7 @@ namespace Reductech.EDR.Core.Steps
     /// <summary>
     /// Calculates the length of the string.
     /// </summary>
-    public sealed class LengthOfString : CompoundStep<int>
+    public sealed class StringLength : CompoundStep<int>
     {
         /// <summary>
         /// The string to measure the length of.
@@ -30,23 +30,23 @@ namespace Reductech.EDR.Core.Steps
         }
 
         /// <inheritdoc />
-        public override IStepFactory StepFactory => LengthOfStringStepFactory.Instance;
+        public override IStepFactory StepFactory => StringLengthStepFactory.Instance;
     }
 
     /// <summary>
     /// Calculates the length of the string.
     /// </summary>
-    public sealed class LengthOfStringStepFactory : SimpleStepFactory<LengthOfString, int>
+    public sealed class StringLengthStepFactory : SimpleStepFactory<StringLength, int>
     {
-        private LengthOfStringStepFactory() { }
+        private StringLengthStepFactory() { }
 
         /// <summary>
         /// The instance
         /// </summary>
-        public static SimpleStepFactory<LengthOfString, int> Instance { get; } = new LengthOfStringStepFactory();
+        public static SimpleStepFactory<StringLength, int> Instance { get; } = new StringLengthStepFactory();
 
         /// <inheritdoc />
-        public override IStepNameBuilder StepNameBuilder => new StepNameBuilderFromTemplate($"Length of [{nameof(LengthOfString.String)}]");
+        public override IStepNameBuilder StepNameBuilder => new StepNameBuilderFromTemplate($"Length of [{nameof(StringLength.String)}]");
 
     }
 }

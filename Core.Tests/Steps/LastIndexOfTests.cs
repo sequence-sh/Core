@@ -5,7 +5,7 @@ using Xunit.Abstractions;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
-    public class LastIndexOfTests : StepTestBase<LastIndexOf, int>
+    public class LastIndexOfTests : StepTestBase<FindLastSubstring, int>
     {
         /// <inheritdoc />
         public LastIndexOfTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
@@ -18,7 +18,7 @@ namespace Reductech.EDR.Core.Tests.Steps
             get
             {
                 yield return new StepCase("Substring present",
-                    new LastIndexOf()
+                    new FindLastSubstring()
                     {
                         String = Constant("Hello elle"),
                         SubString = Constant("ell")
@@ -26,7 +26,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                 );
 
                 yield return new StepCase("Substring not present",
-                    new LastIndexOf()
+                    new FindLastSubstring()
                     {
                         String = Constant("Hello elle"),
                         SubString = Constant("ELL")
@@ -42,7 +42,7 @@ namespace Reductech.EDR.Core.Tests.Steps
         {
             get
             {
-                yield return new DeserializeCase("Substring present", "LastIndexOf(String = 'Hello ell', Substring = 'ell')", 6);
+                yield return new DeserializeCase("Substring present", "FindLastSubstring(String = 'Hello ell', Substring = 'ell')", 6);
 
             }
 

@@ -5,10 +5,10 @@ using Xunit.Abstractions;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
-    public class LengthOfStringTests : StepTestBase<LengthOfString, int>
+    public class StringLengthTests : StepTestBase<StringLength, int>
     {
         /// <inheritdoc />
-        public LengthOfStringTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
+        public StringLengthTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
         {
         }
 
@@ -18,7 +18,7 @@ namespace Reductech.EDR.Core.Tests.Steps
             get
             {
                 yield return new StepCase("simple length of string",
-                    new LengthOfString()
+                    new StringLength()
                     {
                         String = Constant("Hello")
                     }, 5
@@ -33,7 +33,7 @@ namespace Reductech.EDR.Core.Tests.Steps
         {
             get
             {
-                yield return new DeserializeCase("Simple length of string", "LengthOfString(String = 'Hello')", 5);
+                yield return new DeserializeCase("Simple length of string", "StringLength(String = 'Hello')", 5);
 
             }
 

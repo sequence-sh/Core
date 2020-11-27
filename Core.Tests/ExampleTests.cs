@@ -30,7 +30,7 @@ namespace Reductech.EDR.Core.Tests
         //[Theory]
         //[Trait("Category", "Integration")]
         //[InlineData(@"C:\Users\wainw\source\repos\Reductech\edr\Examples\Sort.yml")]
-        //[InlineData(@"C:\Users\wainw\source\repos\Reductech\edr\Examples\MapFieldNames.yml")]
+        //[InlineData(@"C:\Users\wainw\source\repos\Reductech\edr\Examples\EntityMapProperties.yml")]
         //[InlineData(@"C:\Users\wainw\source\repos\Reductech\edr\Examples\ChangeCase.yml")]
         public async Task RunYamlSequenceFromFile(string path)
         {
@@ -63,7 +63,7 @@ namespace Reductech.EDR.Core.Tests
 - <SourceFile> = 'Dinosaurs.csv'
 - <TargetFile> = 'MappedDinosaurs.csv'
 - <EntityStream> = ReadCSV(Stream = ReadFile(Path = PathCombine(Paths = [<Folder>, <SourceFile>])))
-- <EntityStream> = MapFieldNames(EntityStream = <EntityStream>, Mappings = (Name = 'Dinosaur'))
+- <EntityStream> = EntityMapProperties(EntityStream = <EntityStream>, Mappings = (Name = 'Dinosaur'))
 - <WriteStream> = WriteCSV(Entities = <EntityStream>)
 - WriteFile(Path = PathCombine(Paths = [<Folder>, <TargetFile>]), Stream = <WriteStream>)";
 

@@ -5,10 +5,10 @@ using Xunit.Abstractions;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
-    public class JoinStringsTests : StepTestBase<JoinStrings, string>
+    public class StringJoinTests : StepTestBase<StringJoin, string>
     {
         /// <inheritdoc />
-        public JoinStringsTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
+        public StringJoinTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
         {
         }
 
@@ -18,7 +18,7 @@ namespace Reductech.EDR.Core.Tests.Steps
             get
             {
                 yield return new StepCase("Match some strings",
-                    new JoinStrings
+                    new StringJoin
                     {
                         Delimiter = Constant(", "),
                         Strings = Array("Hello", "World")
@@ -34,7 +34,7 @@ namespace Reductech.EDR.Core.Tests.Steps
             get
             {
                 yield return new DeserializeCase("Match some strings",
-                    "JoinStrings(Delimiter = ', ', Strings = ['Hello', 'World'])"
+                    "StringJoin(Delimiter = ', ', Strings = ['Hello', 'World'])"
                     ,"Hello, World"
                 );
 

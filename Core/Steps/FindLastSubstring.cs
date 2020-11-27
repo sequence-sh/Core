@@ -13,7 +13,7 @@ namespace Reductech.EDR.Core.Steps
     /// Gets the last instance of substring in a string.
     /// Returns -1 if the substring is not present
     /// </summary>
-    public sealed class LastIndexOf : CompoundStep<int>
+    public sealed class FindLastSubstring : CompoundStep<int>
     {
         /// <summary>
         /// The string to check.
@@ -43,22 +43,22 @@ namespace Reductech.EDR.Core.Steps
         }
 
         /// <inheritdoc />
-        public override IStepFactory StepFactory => LastIndexOfStepFactory.Instance;
+        public override IStepFactory StepFactory => FindLastSubstringStepFactory.Instance;
     }
 
     /// <summary>
     /// Gets the last instance of substring in a string.
     /// </summary>
-    public sealed class LastIndexOfStepFactory : SimpleStepFactory<LastIndexOf, int>
+    public sealed class FindLastSubstringStepFactory : SimpleStepFactory<FindLastSubstring, int>
     {
-        private LastIndexOfStepFactory() { }
+        private FindLastSubstringStepFactory() { }
 
         /// <summary>
         /// The instance
         /// </summary>
-        public static SimpleStepFactory<LastIndexOf, int> Instance { get; } = new LastIndexOfStepFactory();
+        public static SimpleStepFactory<FindLastSubstring, int> Instance { get; } = new FindLastSubstringStepFactory();
 
         /// <inheritdoc />
-        public override IStepNameBuilder StepNameBuilder => new StepNameBuilderFromTemplate($"Last index of '[{nameof(LastIndexOf.SubString)}]' in '[{nameof(LastIndexOf.String)}]'");
+        public override IStepNameBuilder StepNameBuilder => new StepNameBuilderFromTemplate($"Last index of '[{nameof(FindLastSubstring.SubString)}]' in '[{nameof(FindLastSubstring.String)}]'");
     }
 }

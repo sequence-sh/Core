@@ -12,7 +12,7 @@ namespace Reductech.EDR.Core.Steps
     /// <summary>
     /// Join strings with a delimiter.
     /// </summary>
-    public sealed class JoinStrings : CompoundStep<string>
+    public sealed class StringJoin : CompoundStep<string>
     {
         /// <summary>
         /// The delimiter to use.
@@ -46,23 +46,23 @@ namespace Reductech.EDR.Core.Steps
         }
 
         /// <inheritdoc />
-        public override IStepFactory StepFactory => JoinStringsStepFactory.Instance;
+        public override IStepFactory StepFactory => StringJoinStepFactory.Instance;
     }
 
 
     /// <summary>
     /// Join strings with a delimiter.
     /// </summary>
-    public sealed class JoinStringsStepFactory : SimpleStepFactory<JoinStrings, string>
+    public sealed class StringJoinStepFactory : SimpleStepFactory<StringJoin, string>
     {
-        private JoinStringsStepFactory() { }
+        private StringJoinStepFactory() { }
 
         /// <summary>
         /// The instance
         /// </summary>
-        public static SimpleStepFactory<JoinStrings, string> Instance { get; } = new JoinStringsStepFactory();
+        public static SimpleStepFactory<StringJoin, string> Instance { get; } = new StringJoinStepFactory();
 
         /// <inheritdoc />
-        public override IStepNameBuilder StepNameBuilder => new StepNameBuilderFromTemplate($"Match [{nameof(JoinStrings.Strings)}]");
+        public override IStepNameBuilder StepNameBuilder => new StepNameBuilderFromTemplate($"Match [{nameof(StringJoin.Strings)}]");
     }
 }

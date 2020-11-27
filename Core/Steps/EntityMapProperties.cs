@@ -16,7 +16,7 @@ namespace Reductech.EDR.Core.Steps
     /// <summary>
     /// Change the name of entity fields.
     /// </summary>
-    public class MapFieldNames : CompoundStep<EntityStream>
+    public class EntityMapProperties : CompoundStep<EntityStream>
     {
         /// <inheritdoc />
         public override async Task<Result<EntityStream, IError>> Run(IStateMonad stateMonad,
@@ -73,21 +73,21 @@ namespace Reductech.EDR.Core.Steps
         public IStep<Entity> Mappings { get; set; } = null!;
 
         /// <inheritdoc />
-        public override IStepFactory StepFactory => MapFieldNamesFactory.Instance;
+        public override IStepFactory StepFactory => EntityMapPropertiesStepFactory.Instance;
     }
 
 
     /// <summary>
     /// Change the name of entity fields.
     /// </summary>
-    public class MapFieldNamesFactory : SimpleStepFactory<MapFieldNames, EntityStream>
+    public class EntityMapPropertiesStepFactory : SimpleStepFactory<EntityMapProperties, EntityStream>
     {
-        private MapFieldNamesFactory() {}
+        private EntityMapPropertiesStepFactory() {}
 
         /// <summary>
         /// The instance.
         /// </summary>
-        public static SimpleStepFactory<MapFieldNames, EntityStream> Instance { get; } = new MapFieldNamesFactory();
+        public static SimpleStepFactory<EntityMapProperties, EntityStream> Instance { get; } = new EntityMapPropertiesStepFactory();
     }
 
 

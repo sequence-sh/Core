@@ -190,7 +190,7 @@ namespace Reductech.EDR.Core.Tests
                     }), false.ToString());
 
                 yield return new StepTestCase("Print Length of 'Hello World'",
-                    Print(new LengthOfString
+                    Print(new StringLength
                     {
                         String = Constant(HelloWorldString)
                     }), "11");
@@ -228,7 +228,7 @@ namespace Reductech.EDR.Core.Tests
                     (-1).ToString()
                 );
 
-                yield return new StepTestCase("Print Match Repeat(Element: 'Hello', Number: 3)", Print(new JoinStrings
+                yield return new StepTestCase("Print Match Repeat(Element: 'Hello', Number: 3)", Print(new StringJoin
                 {
                     Delimiter = Constant(", "),
                     Strings = new Repeat<string>
@@ -304,7 +304,7 @@ namespace Reductech.EDR.Core.Tests
                     }), "World");
 
                 yield return new StepTestCase("Print Match SortArray(Array: ['B'; 'C'; 'A'], Order: Ascending)",
-                    Print(new JoinStrings
+                    Print(new StringJoin
                     {
                         Delimiter = Constant(", "),
                         Strings = new SortArray<string>
@@ -315,7 +315,7 @@ namespace Reductech.EDR.Core.Tests
                     }), "A, B, C");
 
                 yield return new StepTestCase("Print Match SortArray(Array: ['B'; 'C'; 'A'], Order: Descending)",
-                    Print(new JoinStrings
+                    Print(new StringJoin
                     {
                         Delimiter = Constant(", "),
                         Strings = new SortArray<string>
@@ -335,7 +335,7 @@ namespace Reductech.EDR.Core.Tests
                 );
 
                 yield return new StepTestCase("Print Last index of ''World'' in ''Hello World, Goodbye World''",
-                    Print(new LastIndexOf
+                    Print(new FindLastSubstring
                     {
                         String = Constant("Hello World, Goodbye World"),
                         SubString = Constant("World")

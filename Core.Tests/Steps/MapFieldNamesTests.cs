@@ -8,7 +8,7 @@ using Xunit.Abstractions;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
-    public class MapFieldNamesTests : StepTestBase<MapFieldNames, EntityStream>
+    public class MapFieldNamesTests : StepTestBase<EntityMapProperties, EntityStream>
     {
         /// <inheritdoc />
         public MapFieldNamesTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
@@ -29,7 +29,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                             Value = GetVariable<Entity>(VariableName.Entity)
                         },
                         EntityStream =
-                                    new MapFieldNames
+                                    new EntityMapProperties
                                     {
                                         EntityStream = Constant(EntityStream.Create(
                                             CreateEntity(("Food", "Hello"),
@@ -54,7 +54,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                 var step = CreateStepWithDefaultOrArbitraryValues();
 
                 yield return new SerializeCase("default", step.step,
-                    @"Do: MapFieldNames
+                    @"Do: EntityMapProperties
 EntityStream:
 - (Prop1 = 'Val0',Prop2 = 'Val1')
 - (Prop1 = 'Val2',Prop2 = 'Val3')
