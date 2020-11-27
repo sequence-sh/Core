@@ -5,7 +5,7 @@ using Xunit.Abstractions;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
-    public class ToCaseTests : StepTestBase<ToCase, string>
+    public class ToCaseTests : StepTestBase<StringToCase, string>
     {
         /// <inheritdoc />
         public ToCaseTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
@@ -17,18 +17,18 @@ namespace Reductech.EDR.Core.Tests.Steps
         {
             get
             {
-                yield return new StepCase("To upper", new ToCase()
+                yield return new StepCase("To upper", new StringToCase()
                 {
                     Case = Constant(TextCase.Upper), String = Constant("hello")
                 }, "HELLO");
 
-                yield return new StepCase("To lower", new ToCase()
+                yield return new StepCase("To lower", new StringToCase()
                 {
                     Case = Constant(TextCase.Lower),
                     String = Constant("HELLO")
                 }, "hello");
 
-                yield return new StepCase("To title", new ToCase()
+                yield return new StepCase("To title", new StringToCase()
                 {
                     Case = Constant(TextCase.Title),
                     String = Constant("hELLo")
@@ -42,7 +42,7 @@ namespace Reductech.EDR.Core.Tests.Steps
         {
             get
             {
-                yield return new DeserializeCase("To title", "ToCase(Case = TextCase.Title, String = 'hELLo')", "Hello");
+                yield return new DeserializeCase("To title", "StringToCase(Case = TextCase.Title, String = 'hELLo')", "Hello");
 
             }
 

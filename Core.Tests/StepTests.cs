@@ -264,14 +264,14 @@ namespace Reductech.EDR.Core.Tests
 
                     5.ToString());
 
-                yield return new StepTestCase("Print ToCase(Case: Upper, String: 'Hello World')",
-                    Print(new ToCase {Case = Constant(TextCase.Upper), String = Constant(HelloWorldString)}),
+                yield return new StepTestCase("Print StringToCase(Case: Upper, String: 'Hello World')",
+                    Print(new StringToCase {Case = Constant(TextCase.Upper), String = Constant(HelloWorldString)}),
                     "HELLO WORLD");
-                yield return new StepTestCase("Print ToCase(Case: Lower, String: 'Hello World')",
-                    Print(new ToCase {Case = Constant(TextCase.Lower), String = Constant(HelloWorldString)}),
+                yield return new StepTestCase("Print StringToCase(Case: Lower, String: 'Hello World')",
+                    Print(new StringToCase {Case = Constant(TextCase.Lower), String = Constant(HelloWorldString)}),
                     "hello world");
-                yield return new StepTestCase("Print ToCase(Case: Title, String: 'Hello World')",
-                    Print(new ToCase {Case = Constant(TextCase.Title), String = Constant(HelloWorldString)}),
+                yield return new StepTestCase("Print StringToCase(Case: Title, String: 'Hello World')",
+                    Print(new StringToCase {Case = Constant(TextCase.Title), String = Constant(HelloWorldString)}),
                     "Hello World");
 
 

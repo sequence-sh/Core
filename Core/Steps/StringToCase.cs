@@ -15,7 +15,7 @@ namespace Reductech.EDR.Core.Steps
     /// <summary>
     /// Converts a string to a particular case.
     /// </summary>
-    public sealed class ToCase : CompoundStep<string>
+    public sealed class StringToCase : CompoundStep<string>
     {
         /// <summary>
         /// The string to change the case of.
@@ -49,19 +49,19 @@ namespace Reductech.EDR.Core.Steps
             };
 
         /// <inheritdoc />
-        public override IStepFactory StepFactory => ToCaseStepFactory.Instance;
+        public override IStepFactory StepFactory => StringToCaseStepFactory.Instance;
     }
 
     /// <summary>
     /// Converts a string to a particular case.
     /// </summary>
-    public sealed class ToCaseStepFactory : SimpleStepFactory<ToCase, string>
+    public sealed class StringToCaseStepFactory : SimpleStepFactory<StringToCase, string>
     {
-        private ToCaseStepFactory() { }
+        private StringToCaseStepFactory() { }
         /// <summary>
         /// The instance.
         /// </summary>
-        public static SimpleStepFactory<ToCase, string> Instance { get; } = new ToCaseStepFactory();
+        public static SimpleStepFactory<StringToCase, string> Instance { get; } = new StringToCaseStepFactory();
 
         /// <inheritdoc />
         public override IEnumerable<Type> EnumTypes => new[] { typeof(TextCase) };
