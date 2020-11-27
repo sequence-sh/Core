@@ -13,10 +13,8 @@ using Reductech.EDR.Core.TestHarness;
 using Reductech.EDR.Core.Util;
 using Reductech.Utilities.Testing;
 // ReSharper disable once RedundantUsingDirective
-using Xunit;
 using Xunit.Abstractions;
 using Xunit.Sdk;
-using Entity = Reductech.EDR.Core.Entities.Entity;
 
 namespace Reductech.EDR.Core.Tests
 {
@@ -29,11 +27,11 @@ namespace Reductech.EDR.Core.Tests
 
         public ITestOutputHelper TestOutputHelper { get; }
 
-        [Theory]
-        [Trait("Category", "Integration")]
-        [InlineData(@"C:\Users\wainw\source\repos\Reductech\edr\Examples\Sort.yml")]
-        [InlineData(@"C:\Users\wainw\source\repos\Reductech\edr\Examples\MapFieldNames.yml")]
-        [InlineData(@"C:\Users\wainw\source\repos\Reductech\edr\Examples\ChangeCase.yml")]
+        //[Theory]
+        //[Trait("Category", "Integration")]
+        //[InlineData(@"C:\Users\wainw\source\repos\Reductech\edr\Examples\Sort.yml")]
+        //[InlineData(@"C:\Users\wainw\source\repos\Reductech\edr\Examples\MapFieldNames.yml")]
+        //[InlineData(@"C:\Users\wainw\source\repos\Reductech\edr\Examples\ChangeCase.yml")]
         public async Task RunYamlSequenceFromFile(string path)
         {
             var yaml = await File.ReadAllTextAsync(path);
@@ -56,8 +54,8 @@ namespace Reductech.EDR.Core.Tests
         }
 
 
-        [Fact]
-        [Trait("Category", "Integration")]
+        //[Fact]
+        //[Trait("Category", "Integration")]
         public async Task RunYamlSequence()
         {
             const string yaml = @"
@@ -84,22 +82,47 @@ namespace Reductech.EDR.Core.Tests
         }
 
 
-       [Fact]
-       [Trait("Category", "Integration")]
+       //[Fact]
+       //[Trait("Category", "Integration")]
         public async Task RunObjectSequence()
         {
-            var step = new WriteFile
+            var step = new Sequence()
             {
-                Path = new PathCombine{Paths = new Constant<List<string>>(new List<string>{"MyFile.txt"})},
-                Stream = new WriteCSV
+                Steps = new List<IStep<Unit>>
                 {
-                    Entities = new MapFieldNames
+                    new SetVariable<EntityStream>
                     {
-                        EntityStream = new Constant<EntityStream>(EntityStream.Create(new Entity(
-                        new KeyValuePair<string, EntityValue>("Foo", EntityValue.Create("Hello")),
-                        new KeyValuePair<string, EntityValue>("Bar", EntityValue.Create("World"))))),
-                        Mappings = new Constant<Entity>(new Entity(new KeyValuePair<string, EntityValue>("Foo", EntityValue.Create("Foot"))))
+                        VariableName = new VariableName("EntityStream"),
+                        Value = new ReadCSV{Stream = new ReadFile{Path = new Constant<string>(@"C:\Users\wainw\source\repos\Reductech\edr\Examples\Dinosaurs.csv")}}
+                    },
 
+                    new SetVariable<Schema>()
+                    {
+                        VariableName = new VariableName("Schema"),
+                        Value = new Constant<Schema>(new Schema
+                                {
+                                    AllowExtraProperties = false,
+                                    Name = "Dinosaur",
+                                    Properties = new Dictionary<string, SchemaProperty>()
+                                    {
+                                        {"Name", new SchemaProperty{Type = SchemaPropertyType.String}},
+                                        {"Length", new SchemaProperty{Type = SchemaPropertyType.Double}},
+                                        {"Period", new SchemaProperty{Type = SchemaPropertyType.String}},
+                                    }
+                                })
+                    },
+
+                    new WriteFile
+                    {
+                        Path = new PathCombine{Paths = new Constant<List<string>>(new List<string>{"MyFile.txt"})},
+                        Stream = new WriteCSV
+                        {
+                            Entities = new EnforceSchema()
+                            {
+                                EntityStream = new GetVariable<EntityStream>(){VariableName = new VariableName("EntityStream")},
+                                Schema = new GetVariable<Schema>(){VariableName = new VariableName("Schema")}
+                            }
+                        }
                     }
                 }
             };
