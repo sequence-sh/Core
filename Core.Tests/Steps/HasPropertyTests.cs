@@ -5,7 +5,7 @@ using Xunit.Abstractions;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
-    public class HasPropertyTests : StepTestBase<HasProperty, bool>
+    public class HasPropertyTests : StepTestBase<EntityHasProperty, bool>
     {
         /// <inheritdoc />
         public HasPropertyTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
@@ -18,14 +18,14 @@ namespace Reductech.EDR.Core.Tests.Steps
             get
             {
                 yield return new StepCase("Property exists",
-                    new HasProperty
+                    new EntityHasProperty
                     {
                         Property = Constant("Foo"),
                         Entity = Constant(CreateEntity(("Foo", "Hello")))
                     }, true);
 
                 yield return new StepCase("Property missing",
-                    new HasProperty
+                    new EntityHasProperty
                     {
                         Property = Constant("Bar"),
                         Entity = Constant(CreateEntity(("Hello", "World")))

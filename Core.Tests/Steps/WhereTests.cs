@@ -33,7 +33,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                                 CreateEntity(("Foo", "Beta")),
                                 CreateEntity(("Bar", "Beta"))
                             )),
-                            Predicate = new HasProperty() { Property = Constant("Foo"), Entity = GetEntityVariable }
+                            Predicate = new EntityHasProperty() { Property = Constant("Foo"), Entity = GetEntityVariable }
                         }
                     },
                     Unit.Default,

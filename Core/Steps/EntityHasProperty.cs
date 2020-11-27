@@ -12,7 +12,7 @@ namespace Reductech.EDR.Core.Steps
     /// <summary>
     /// Checks if an entity has a particular property.
     /// </summary>
-    public sealed class HasProperty : CompoundStep<bool>
+    public sealed class EntityHasProperty : CompoundStep<bool>
     {
         /// <inheritdoc />
         public override async Task<Result<bool, IError>> Run(IStateMonad stateMonad, CancellationToken cancellationToken)
@@ -43,19 +43,19 @@ namespace Reductech.EDR.Core.Steps
         public IStep<string> Property { get; set; } = null!;
 
         /// <inheritdoc />
-        public override IStepFactory StepFactory => HasPropertyStepFactory.Instance;
+        public override IStepFactory StepFactory => EntityHasPropertyStepFactory.Instance;
     }
 
     /// <summary>
     /// Checks if an entity has a particular property.
     /// </summary>
-    public sealed class HasPropertyStepFactory : SimpleStepFactory<HasProperty,bool>
+    public sealed class EntityHasPropertyStepFactory : SimpleStepFactory<EntityHasProperty,bool>
     {
-        private HasPropertyStepFactory() {}
+        private EntityHasPropertyStepFactory() {}
 
         /// <summary>
         /// The instance.
         /// </summary>
-        public static SimpleStepFactory<HasProperty, bool> Instance { get; } = new HasPropertyStepFactory();
+        public static SimpleStepFactory<EntityHasProperty, bool> Instance { get; } = new EntityHasPropertyStepFactory();
     }
 }
