@@ -94,45 +94,6 @@ namespace Reductech.EDR.Core.Entities
             return r.Value;
         }
 
-        ///// <summary>
-        ///// Attempt to convert this value to a particular type
-        ///// </summary>
-        //public Maybe<T> TryConvertTo<T>()
-        //{
-        //    if (Original is T tString) return tString;
-        //    if (DateTime.Now is T)
-        //    {
-        //        if (Value.IsT5 && Value.AsT5 is T tDateTime) return tDateTime;
-        //        if (DateTime.TryParse(Original, out var dt) && dt is T tDateTime2) return tDateTime2;
-
-        //    }
-
-        //    else if (2.0 is T)
-        //    {
-        //        if (Value.IsT2 && Value.AsT2 is T tDouble) return tDouble;
-        //        if (Value.IsT1 && Value.AsT1 is T tDouble2) return tDouble2;
-        //        if (double.TryParse(Original, out var d) && d is T tDouble3) return tDouble3;
-        //    }
-
-        //    else if (2 is T)
-        //    {
-        //        if (Value.IsT1 && Value.AsT1 is T tint) return tint;
-        //        if (int.TryParse(Original, out var i) && i is T tint2) return tint2;
-        //    }
-        //    else if (true is T)
-        //    {
-        //        if (Value.IsT3 && Value.AsT3 is T tBool) return tBool;
-        //        if (bool.TryParse(Original, out var b) && b is T tBool2) return tBool2;
-        //    }
-        //    else if (typeof(T).IsEnum)
-        //    {
-        //        if (Value.IsT4 && Enum.TryParse(typeof(T), Value.AsT4, true, out var e) && e is T tEnum) return tEnum;
-        //        if (Enum.TryParse(typeof(T), Original, true, out var e2) && e2 is T tEnum2) return tEnum2;
-        //    }
-
-        //    return Maybe<T>.None;
-        //}
-
 
         private static Maybe<EntitySingleValue> ConvertTo(string original, SchemaProperty schemaProperty)
         {
