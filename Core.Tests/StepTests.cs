@@ -52,7 +52,7 @@ namespace Reductech.EDR.Core.Tests
                 }
             }
         }
-        private IEnumerable<StepTestCase> TestCasesWithoutConfig
+        private static IEnumerable<StepTestCase> TestCasesWithoutConfig
         {
             get
             {

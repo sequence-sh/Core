@@ -105,7 +105,7 @@ namespace Reductech.EDR.Core.Entities
         {
             var sb = new StringBuilder();
 
-            sb.Append("(");
+            sb.Append('(');
 
             var results = new List<Result<string>>();
 
@@ -133,7 +133,7 @@ namespace Reductech.EDR.Core.Entities
 
             sb.AppendJoin(",", result.Value);
 
-            sb.Append(")");
+            sb.Append(')');
 
             return sb.ToString();
         }
@@ -144,7 +144,7 @@ namespace Reductech.EDR.Core.Entities
         /// <returns></returns>
         public object ToSimpleObject()
         {
-            IDictionary<string, object> expandoObject = new ExpandoObject();
+            IDictionary<string, object> expandoObject = new ExpandoObject()!;
 
             foreach (var (key, value) in _properties)
             {

@@ -12,6 +12,7 @@ using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.TestHarness;
 using Reductech.EDR.Core.Util;
 using Reductech.Utilities.Testing;
+using Xunit;
 // ReSharper disable once RedundantUsingDirective
 using Xunit.Abstractions;
 using Xunit.Sdk;
@@ -27,14 +28,16 @@ namespace Reductech.EDR.Core.Tests
 
         public ITestOutputHelper TestOutputHelper { get; }
 
-        //[Theory]
-        //[Trait("Category", "Integration")]
-        //[InlineData(@"C:\Users\wainw\source\repos\Reductech\edr\Examples\Sort.yml")]
-        //[InlineData(@"C:\Users\wainw\source\repos\Reductech\edr\Examples\EntityMapProperties.yml")]
-        //[InlineData(@"C:\Users\wainw\source\repos\Reductech\edr\Examples\ChangeCase.yml")]
+        [Theory(Skip = "Manual")]
+        [Trait("Category", "Integration")]
+        [InlineData(@"C:\Users\wainw\source\repos\Reductech\edr\Examples\Sort.yml")]
+        [InlineData(@"C:\Users\wainw\source\repos\Reductech\edr\Examples\EntityMapProperties.yml")]
+        [InlineData(@"C:\Users\wainw\source\repos\Reductech\edr\Examples\ChangeCase.yml")]
         public async Task RunYamlSequenceFromFile(string path)
         {
             var yaml = await File.ReadAllTextAsync(path);
+
+            TestOutputHelper.WriteLine(yaml);
 
             var sfs = StepFactoryStore.CreateUsingReflection();
 
@@ -54,8 +57,8 @@ namespace Reductech.EDR.Core.Tests
         }
 
 
-        //[Fact]
-        //[Trait("Category", "Integration")]
+        [Fact(Skip = "manual")]
+        [Trait("Category", "Integration")]
         public async Task RunYamlSequence()
         {
             const string yaml = @"
@@ -82,8 +85,8 @@ namespace Reductech.EDR.Core.Tests
         }
 
 
-       //[Fact]
-       //[Trait("Category", "Integration")]
+        [Fact(Skip = "Manual")]
+        [Trait("Category", "Integration")]
         public async Task RunObjectSequence()
         {
             var step = new Sequence()

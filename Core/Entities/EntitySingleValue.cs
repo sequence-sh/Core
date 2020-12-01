@@ -144,7 +144,7 @@ namespace Reductech.EDR.Core.Entities
                 SchemaPropertyType.Enum => schemaProperty.Format != null && schemaProperty.Format.Contains(original, StringComparer.OrdinalIgnoreCase) ? new EntitySingleValue(OneOf<string, int, double, bool, string, DateTime>.FromT4(original),original ) : Maybe<EntitySingleValue>.None,
                 SchemaPropertyType.Bool => bool.TryParse(original, out var b) ? new EntitySingleValue(b, original) : Maybe<EntitySingleValue>.None,
                 SchemaPropertyType.Date => DateTime.TryParse(original, out var dt) ? new EntitySingleValue(dt, original) : Maybe<EntitySingleValue>.None, //TODO format
-                _ => throw new ArgumentOutOfRangeException()
+                _ => throw new ArgumentOutOfRangeException(nameof(schemaProperty))
             };
             return r;
         }
