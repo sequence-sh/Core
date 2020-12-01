@@ -273,7 +273,7 @@ Value: 'I have config too'");
                 if (expectedYaml.Length <= 40)
                     return expectedYaml;
 
-                return expectedYaml.Substring(0, 25) + "..." + expectedYaml.Substring(expectedYaml.Length - 10) + "(" + expectedYaml.Length + ")";
+                return expectedYaml.Substring(0, 25) + "..." + expectedYaml[^10..] + "(" + expectedYaml.Length + ")";
             }
 
             /// <inheritdoc />

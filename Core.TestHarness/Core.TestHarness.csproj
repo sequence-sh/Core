@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net5.0</TargetFramework>
     <AssemblyName>Reductech.EDR.Core.TestHarness</AssemblyName>
     <RootNamespace>Reductech.EDR.Core.TestHarness</RootNamespace>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
@@ -36,7 +36,7 @@
 
   <ItemGroup>
     <PackageReference Include="FluentAssertions" Version="5.10.3" />
-    <PackageReference Include="Moq" Version="4.15.1" />
+    <PackageReference Include="Moq" Version="4.15.2" />
     <PackageReference Include="Reductech.Utilities.Testing" Version="0.1.1" />
     <PackageReference Include="xunit" Version="2.4.1" />
     <PackageReference Include="xunit.abstractions" Version="2.0.3" />
