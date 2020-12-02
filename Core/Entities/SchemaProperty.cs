@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using YamlDotNet.Serialization;
+using Reductech.EDR.Core.Attributes;
 
 namespace Reductech.EDR.Core.Entities
 {
@@ -11,13 +11,13 @@ namespace Reductech.EDR.Core.Entities
         /// <summary>
         /// The type of the property.
         /// </summary>
-        [YamlMember]
+        [ConfigProperty(Order = 1)]
         public SchemaPropertyType Type { get; set; }
 
         /// <summary>
         /// The multiplicity of the property.
         /// </summary>
-        [YamlMember]
+        [ConfigProperty(Order = 2)]
         public Multiplicity Multiplicity { get; set; } = Multiplicity.Any;
 
         /// <summary>
@@ -25,12 +25,13 @@ namespace Reductech.EDR.Core.Entities
         /// For Date, this will contain possible date formats.
         /// For Enum, this will contain possible enum values.
         /// </summary>
-        [YamlMember]
+        [ConfigProperty(Order = 3)]
         public List<string>? Format { get; set; }
 
         /// <summary>
         /// A regex to validate the string form of the field value
         /// </summary>
+        [ConfigProperty(Order = 4)]
         public string? Regex { get; set; }
 
     }

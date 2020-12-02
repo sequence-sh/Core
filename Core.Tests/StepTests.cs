@@ -532,7 +532,7 @@ Two,The second number"),
             public IStep Step { get; }
 
             /// <summary>
-            /// If true, adds configuration to every step to test long form serialization.
+            /// If true, adds configuration to the top step.
             /// </summary>
             public bool AddConfiguration {get; set; }
 
@@ -548,17 +548,27 @@ Two,The second number"),
                 //Arrange
                 var pfs = StepFactoryStore.CreateUsingReflection(typeof(StepFactory));
                 var logger = new TestLogger();
-                var yamlRunner = new YamlRunner(EmptySettings.Instance, logger, ExternalProcessRunner.Instance, FileSystemHelper.Instance, pfs);
+                var yamlRunner = new SequenceRunner(EmptySettings.Instance, logger, ExternalProcessRunner.Instance, FileSystemHelper.Instance, pfs);
 
                 //Act
-                IFreezableStep unfrozen = Step.Unfreeze();
 
-                if (AddConfiguration) unfrozen = AddConfigurationToAllSteps(unfrozen);
+                if (AddConfiguration)
+                    Step.Configuration = new Configuration
+                    {
+                        TargetMachineTags = new List<string>
+                        {
+                            "ValueIf Tag"
+                        }
+                    };
+
+                var text = Step.Serialize();
+
+                // unfrozen = AddConfigurationToAllSteps(unfrozen);
 
 
-                var yaml = await unfrozen.SerializeToYamlAsync(CancellationToken.None);
-                outputHelper.WriteLine(yaml);
-                var runResult = await yamlRunner.RunSequenceFromYamlStringAsync(yaml, CancellationToken.None);
+                //var yaml = await unfrozen.SerializeToYamlAsync(CancellationToken.None);
+                outputHelper.WriteLine(text);
+                var runResult = await yamlRunner.RunSequenceFromTextAsync(text, CancellationToken.None);
 
                 //Assert
                 runResult.ShouldBeSuccessful(x=>x.AsString);
@@ -570,34 +580,6 @@ Two,The second number"),
 
             }
 
-
-            private static IFreezableStep AddConfigurationToAllSteps(IFreezableStep step)
-            {
-                if (step is CompoundFreezableStep compoundFreezableStep)
-                {
-                    var newDict = compoundFreezableStep.FreezableStepData.StepMembersDictionary
-                        .Select(x => (x.Key, stepMember: x.Value.Match(
-                            vn => new StepMember(vn),
-                            s => new StepMember(AddConfigurationToAllSteps(s)),
-                            la => new StepMember(la.Select(AddConfigurationToAllSteps).ToList())
-
-                        ))).ToDictionary(x => x.Key, x => x.stepMember);
-
-
-                    var newFsd = FreezableStepData.TryCreate(compoundFreezableStep.StepFactory, newDict);
-                    newFsd.ShouldBeSuccessful(x=>x.AsString);
-
-                    return new CompoundFreezableStep(compoundFreezableStep.StepFactory, newFsd.Value, new Configuration
-                    {
-                        TargetMachineTags = new List<string>
-                        {
-                            "ValueIf Tag"
-                        }
-                    });
-                }
-
-                return step;
-            }
         }
     }
 }

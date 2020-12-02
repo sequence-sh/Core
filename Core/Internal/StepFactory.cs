@@ -51,15 +51,11 @@ namespace Reductech.EDR.Core.Internal
 
         /// <inheritdoc />
         public virtual Result<Maybe<ITypeReference>, IError> GetTypeReferencesSet(VariableName variableName,
-            FreezableStepData freezableStepData, TypeResolver typeResolver) =>
+            FreezableStepData freezableStepData, TypeResolver typeResolver, StepFactoryStore stepFactoryStore) =>
             Maybe<ITypeReference>.None;
 
         /// <inheritdoc />
         public virtual IStepSerializer Serializer => new FunctionSerializer(TypeName);
-
-
-        /// <inheritdoc />
-        public virtual Maybe<IStepCombiner> StepCombiner => Maybe<IStepCombiner>.None;
 
         /// <inheritdoc />
         public virtual IEnumerable<Requirement> Requirements => ImmutableArray<Requirement>.Empty;
@@ -67,7 +63,7 @@ namespace Reductech.EDR.Core.Internal
         /// <summary>
         /// Creates an instance of this type.
         /// </summary>
-        protected abstract Result<ICompoundStep, IError> TryCreateInstance(StepContext stepContext, FreezableStepData freezableStepData);
+        protected abstract Result<ICompoundStep, IError> TryCreateInstance(StepContext stepContext, FreezableStepData freezeData);
 
         /// <inheritdoc />
         public (MemberType memberType, Type? type) GetExpectedMemberType(string name)
@@ -89,9 +85,10 @@ namespace Reductech.EDR.Core.Internal
                 .Where(property => property.GetCustomAttribute<RequiredAttribute>() != null).Select(property => property.Name);
 
         /// <inheritdoc />
-        public Result<IStep, IError> TryFreeze(StepContext stepContext, FreezableStepData freezableStepData, Configuration? configuration)
+        public Result<IStep, IError> TryFreeze(StepContext stepContext,
+            FreezableStepData freezeData, Configuration? configuration)
         {
-            var instanceResult = TryCreateInstance(stepContext, freezableStepData);
+            var instanceResult = TryCreateInstance(stepContext, freezeData);
 
             if (instanceResult.IsFailure)
                 return instanceResult.ConvertFailure<IStep>();
@@ -103,53 +100,35 @@ namespace Reductech.EDR.Core.Internal
 
             var instanceType = step.GetType();
 
+            var remaining = instanceType.GetProperties()
+                    .Where(x => x.GetCustomAttribute<StepPropertyBaseAttribute>() != null)
+                    .ToDictionary(x=>x.Name!, StringComparer.OrdinalIgnoreCase);
 
-            var simpleProperties1 = instanceType.GetProperties()
-                .Where(x => x.GetCustomAttribute<StepPropertyAttribute>() != null)
-                .ToDictionary(x=>x.Name!, StringComparer.OrdinalIgnoreCase);
-
-            var variableNameProperties1 = instanceType
-                .GetProperties()
-                .Where(x => x.PropertyType == typeof(VariableName))
-                .Where(x => x.GetCustomAttribute<VariableNameAttribute>() != null)
-                .ToDictionary(x => x.Name!, StringComparer.OrdinalIgnoreCase);
-
-            var listProperties1 = instanceType.GetProperties()
-                .Where(x => x.GetCustomAttribute<StepListPropertyAttribute>() != null)
-                .ToDictionary(x=>x.Name!, StringComparer.OrdinalIgnoreCase);
-
-
-
-            var r1 = SetFromDictionary(freezableStepData.StepDictionary,
-                (pi, f) => TrySetStep(pi, step, f, stepContext),
-                simpleProperties1!,
-                step,
-                TypeName);
-
-            var r2 = SetFromDictionary(freezableStepData.VariableNameDictionary,
-                (pi, f) => TrySetVariableName(pi, step, f),
-                variableNameProperties1!,
-                step,
-                TypeName);
-
-            var r3 = SetFromDictionary(freezableStepData.StepListDictionary,
-                (pi, f) => TrySetStepList(pi, step, f, stepContext),
-                listProperties1!,
-                step,
-                TypeName);
-
-            results.Add(r1);
-            results.Add(r2);
-            results.Add(r3);
-
-            var remainingProperties = simpleProperties1
-                .Concat(variableNameProperties1)
-                .Concat(listProperties1)
-                .Select(x=>x.Value)
-                .Distinct();
+            foreach (var (propertyName, stepMember) in freezeData.Steps)
+            {
+                if (remaining.Remove(propertyName, out var propertyInfo))
+                {
+                    var result =
+                    stepMember.Match(
+                        vn => TrySetVariableName(propertyInfo, step, vn),
+                        s => TrySetStep(propertyInfo, step, s, stepContext),
+                        sList => TrySetStepList(propertyInfo, step, sList, stepContext)
+                    );
 
 
-            foreach (var property in remainingProperties
+                    results.Add(result);
+                }
+                else
+                    results.Add(
+                        Result.Failure<Unit, IError>(
+                            ErrorHelper.UnexpectedParameterError(propertyName, TypeName)
+                                .WithLocation(freezeData.Location)));
+            }
+
+            results.Combine(_ => Unit.Default, ErrorList.Combine);
+
+
+            foreach (var property in remaining.Values
                 .Where(property => property.GetCustomAttribute<RequiredAttribute>() != null))
             {
                 var error = new SingleError($"The property '{property.Name}' was not set on type '{GetType().Name}'.", ErrorCode.MissingParameter, new StepErrorLocation(step));
@@ -163,75 +142,65 @@ namespace Reductech.EDR.Core.Internal
         }
 
 
-        private static Result<Unit, IError> SetFromDictionary<T>(IReadOnlyDictionary<string, T> dict,
-                Func<PropertyInfo, T, Result<Unit, IError>> trySet,
-                IDictionary<string, PropertyInfo> remaining,
-                ICompoundStep parentStep,
-                string typeName)
-        {
-            var results = new List<Result<Unit, IError>>();
-
-
-            foreach (var (propertyName, stepMember) in dict)
-            {
-                if (remaining.Remove(propertyName, out var propertyInfo))
-                    results.Add(trySet(propertyInfo, stepMember));
-                else
-                    results.Add(Result.Failure<Unit, IError>(ErrorHelper.UnexpectedParameterError(propertyName, typeName).WithLocation(parentStep)));
-            }
-
-            return results.Combine(_=> Unit.Default, ErrorList.Combine);
-        }
-
         private static Result<Unit, IError> TrySetVariableName(PropertyInfo propertyInfo, ICompoundStep parentStep, VariableName member)
         {
             propertyInfo.SetValue(parentStep, member);
             return Unit.Default;
         }
 
-        private static Result<Unit, IError> TrySetStep(PropertyInfo propertyInfo, ICompoundStep parentStep, IFreezableStep freezableStep, StepContext context)
+        private static Result<Unit, IError> TrySetStep(PropertyInfo propertyInfo,
+            ICompoundStep parentStep,
+            IFreezableStep freezableStep,
+            StepContext stepContext)
         {
-            var argumentFreezeResult = freezableStep.TryFreeze(context);
-            if (argumentFreezeResult.IsFailure)
-                return argumentFreezeResult.ConvertFailure<Unit>();
+            var freezeResult = freezableStep.TryFreeze(stepContext);
 
-            var frozenStep = argumentFreezeResult.Value;
+            if (freezeResult.IsFailure) return freezeResult.ConvertFailure<Unit>();
 
+            if (!propertyInfo.PropertyType.IsInstanceOfType(freezeResult.Value))
+                return new SingleError($"'{propertyInfo.Name}' cannot take the value '{freezeResult.Value}'", ErrorCode.InvalidCast, new StepErrorLocation(parentStep));
 
-            if (!propertyInfo.PropertyType.IsInstanceOfType(frozenStep))
-                return new SingleError($"'{propertyInfo.Name}' cannot take the value '{frozenStep}'", ErrorCode.InvalidCast, new StepErrorLocation(parentStep));
-
-            propertyInfo.SetValue(parentStep, frozenStep); //This could throw an exception but we don't expect it.
+            propertyInfo.SetValue(parentStep, freezeResult.Value); //This could throw an exception but we don't expect it.
             return Unit.Default;
         }
 
 
 
-        private static Result<Unit, IError> TrySetStepList(PropertyInfo propertyInfo, ICompoundStep parentStep, IReadOnlyList<IFreezableStep> member, StepContext context)
+        private static Result<Unit, IError> TrySetStepList(PropertyInfo propertyInfo,
+            ICompoundStep parentStep,
+            IReadOnlyList<IFreezableStep> freezableStepList,
+            StepContext stepContext)
         {
-            var freezeResult =
-                member.Select(x => x.TryFreeze(context)).Combine(ErrorList.Combine)
-                        .Map(x => x.ToImmutableArray());
-            if (freezeResult.IsFailure)
-                return freezeResult.ConvertFailure<Unit>();
-
             var genericType = propertyInfo.PropertyType.GenericTypeArguments.Single();
             var listType = typeof(List<>).MakeGenericType(genericType);
 
             var list = Activator.CreateInstance(listType);
+            var errors = new List<IError>();
 
-            foreach (var step1 in freezeResult.Value)
-                if (genericType.IsInstanceOfType(step1))
+
+            foreach (var freezableStep in freezableStepList)
+            {
+                var freezeResult = freezableStep.TryFreeze(stepContext);
+
+                if(freezeResult.IsFailure)
+                    errors.Add(freezeResult.Error);
+                else if (genericType.IsInstanceOfType(freezeResult.Value))
                 {
                     var addMethod = listType.GetMethod(nameof(List<object>.Add))!;
-                    addMethod.Invoke(list, new object?[] { step1 });
+                    addMethod.Invoke(list, new object?[] { freezeResult.Value });
                 }
                 else
-                    return new SingleError(
-                        $"'{CompressSpaces(step1.Name)}' is a '{step1.OutputType.GetDisplayName()}' but it should be a '{genericType.GenericTypeArguments.First().GetDisplayName()}' to be a member of '{parentStep.StepFactory.TypeName}'",
+                {
+                    var error = new SingleError(
+                        $"'{CompressSpaces(freezeResult.Value.Name)}' is a '{freezeResult.Value.OutputType.GetDisplayName()}' but it should be a '{genericType.GenericTypeArguments.First().GetDisplayName()}' to be a member of '{parentStep.StepFactory.TypeName}'",
                         ErrorCode.InvalidCast,
                         new StepErrorLocation(parentStep));
+                    errors.Add(error);
+                }
+            }
 
+            if (errors.Any())
+                return Result.Failure<Unit, IError>(ErrorList.Combine(errors));
 
             propertyInfo.SetValue(parentStep, list);
 

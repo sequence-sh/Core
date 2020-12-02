@@ -1,7 +1,7 @@
-﻿using System;
+﻿using Reductech.EDR.Core.Attributes;
+using System;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
-using YamlDotNet.Serialization;
 
 namespace Reductech.EDR.Core
 {
@@ -13,7 +13,7 @@ namespace Reductech.EDR.Core
         /// <summary>
         /// The name of the required software.
         /// </summary>
-        [YamlMember(Order = 1)]
+        [ConfigProperty(Order = 1)]
         [Required]
 #pragma warning disable 8618
         public string Name { get; set; }
@@ -22,13 +22,13 @@ namespace Reductech.EDR.Core
         /// <summary>
         /// The minimum required version. Inclusive.
         /// </summary>
-        [YamlMember(Order = 1)]
+        [ConfigProperty(Order = 1)]
         public Version? MinVersion { get; set; }
 
         /// <summary>
         /// The The version above the highest allowed version.
         /// </summary>
-        [YamlMember(Order = 1)]
+        [ConfigProperty(Order = 1)]
         public Version? MaxVersion { get; set; }
 
         /// <summary>

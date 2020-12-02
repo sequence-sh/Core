@@ -70,6 +70,13 @@ namespace Reductech.EDR.Core.Util
         public static Result<IReadOnlyCollection<T2>> TryConvertElements<T1, T2>(this IReadOnlyCollection<T1> collection, Func<T1, Result<T2>> tryConvert) where T2 : T1 =>
             collection.Select(tryConvert).Combine().Map(x => x.ToList() as IReadOnlyCollection<T2>);
 
+        public static Result<T> MapError1<T, TError>(this Result<T, TError> result, Func<TError, string> getErrorString)
+        {
+            if(result.IsSuccess)
+                return result.Value;
+
+            return Result.Failure<T>(getErrorString(result.Error));
+        }
 
 
         /// <summary>

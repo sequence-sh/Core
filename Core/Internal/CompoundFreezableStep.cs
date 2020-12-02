@@ -17,18 +17,13 @@ namespace Reductech.EDR.Core.Internal
         /// <summary>
         /// Creates a new CompoundFreezableStep.
         /// </summary>
-        public CompoundFreezableStep(IStepFactory stepFactory, FreezableStepData freezableStepData, Configuration? stepConfiguration)
+        public CompoundFreezableStep(string stepName, FreezableStepData freezableStepData, Configuration? stepConfiguration)
         {
-            StepFactory = stepFactory;
+            StepName = stepName;
             FreezableStepData = freezableStepData;
             StepConfiguration = stepConfiguration;
         }
 
-
-        /// <summary>
-        /// The factory for this step.
-        /// </summary>
-        public IStepFactory StepFactory { get; }
 
         /// <summary>
         /// The data for this step.
@@ -40,18 +35,41 @@ namespace Reductech.EDR.Core.Internal
         /// </summary>
         public Configuration? StepConfiguration { get; }
 
-
-        /// <inheritdoc />
-        public Result<IStep, IError> TryFreeze(StepContext stepContext) =>
-            StepFactory.TryFreeze(stepContext, FreezableStepData, StepConfiguration);
-
-
-        /// <inheritdoc />
-        public Result<IReadOnlyCollection<(VariableName VariableName, ITypeReference typeReference)>, IError> TryGetVariablesSet(TypeResolver typeResolver)
+        public Result<IStepFactory, IError> TryGetStepFactory(StepFactoryStore stepFactoryStore)
         {
-            if (!(StepFactory is GetVariableStepFactory)) //GetVariable is allowed to access reserved variables
+            var r=
+            stepFactoryStore.Dictionary.TryFindOrFail(StepName,
+                () => ErrorHelper.MissingStepError(StepName).WithLocation(FreezableStepData.Location)
+            );
+
+            return r;
+        }
+
+
+        /// <inheritdoc />
+        public string StepName { get; }
+
+        /// <inheritdoc />
+        public Result<IStep, IError> TryFreeze(StepContext stepContext)
+        {
+            return TryGetStepFactory(stepContext.TypeResolver.StepFactoryStore).Bind(x =>
+                x.TryFreeze(stepContext, FreezableStepData, StepConfiguration));
+        }
+
+        /// <inheritdoc />
+        public Result<IReadOnlyCollection<(VariableName VariableName, ITypeReference typeReference)>, IError>
+            TryGetVariablesSet(TypeResolver typeResolver)
+        {
+            var stepFactory = TryGetStepFactory(typeResolver.StepFactoryStore);
+
+            if (stepFactory.IsFailure) return stepFactory.ConvertFailure<IReadOnlyCollection<(VariableName VariableName, ITypeReference typeReference)>>();
+
+
+            if (!(stepFactory.Value is GetVariableStepFactory)) //GetVariable is allowed to access reserved variables
             {
-                var ensureReservedResult = FreezableStepData.VariableNameDictionary.Values.Select(x => x.EnsureNotReserved())
+                var ensureReservedResult = FreezableStepData.Steps
+                    .Values.SelectMany(x=>x.VariableName.ToEnumerable())
+                    .Select(x => x.EnsureNotReserved())
                 .Combine(ErrorBuilderList.Combine)
                 .MapError(x => x.WithLocation(this));
 
@@ -61,12 +79,11 @@ namespace Reductech.EDR.Core.Internal
 
 
             var result = FreezableStepData
-                .VariableNameDictionary.Values.Select(TryGetVariableNameVariablesSet)
-                .Concat(FreezableStepData.StepDictionary.Values.Select(TryGetStepVariablesSet))
-                .Concat(FreezableStepData.StepListDictionary.Values.Select(TryGetStepListVariablesSet))
+                .Steps.Values
+                .Select(x=>
+                    x.Match(TryGetVariableNameVariablesSet, TryGetStepVariablesSet, TryGetStepListVariablesSet))
                 .Combine(ErrorList.Combine)
                     .Map(x => x.SelectMany(y => y)
-                    .Concat(StepFactory.FixedVariablesSet)
                     .ToList() as IReadOnlyCollection<(VariableName name, ITypeReference type)>);
 
 
@@ -76,8 +93,8 @@ namespace Reductech.EDR.Core.Internal
 
             Result<IReadOnlyCollection<(VariableName, ITypeReference)>, IError> TryGetVariableNameVariablesSet(VariableName vn) =>
 
-                StepFactory.GetTypeReferencesSet(vn, FreezableStepData, typeResolver)
-                    .Map(y => y.Map(x => new[] {(vn, x)} as IReadOnlyCollection<(VariableName, ITypeReference)>)
+                stepFactory.Value.GetTypeReferencesSet(vn, FreezableStepData, typeResolver, typeResolver.StepFactoryStore)
+                    .Map(y => y.Map(x => new[] { (vn, x) } as IReadOnlyCollection<(VariableName, ITypeReference)>)
                         .Unwrap(ImmutableArray<(VariableName, ITypeReference)>.Empty));
 
             Result<IReadOnlyCollection<(VariableName, ITypeReference)>, IError> TryGetStepVariablesSet(IFreezableStep y) => y.TryGetVariablesSet(typeResolver);
@@ -88,14 +105,11 @@ namespace Reductech.EDR.Core.Internal
                     x.SelectMany(q => q).ToList() as IReadOnlyCollection<(VariableName, ITypeReference)>);
         }
 
-
-
         /// <inheritdoc />
-        public string StepName => StepFactory.StepNameBuilder.GetFromArguments(FreezableStepData, StepFactory);
-
-        /// <param name="typeResolver"></param>
-        /// <inheritdoc />
-        public Result<ITypeReference, IError> TryGetOutputTypeReference(TypeResolver typeResolver) => StepFactory.TryGetOutputTypeReference(FreezableStepData, typeResolver);
+        public Result<ITypeReference, IError> TryGetOutputTypeReference(TypeResolver typeResolver)
+        {
+            return TryGetStepFactory(typeResolver.StepFactoryStore).Bind(x => x.TryGetOutputTypeReference(FreezableStepData, typeResolver));
+        }
 
         /// <inheritdoc />
         public override string ToString() => StepName;
@@ -108,7 +122,7 @@ namespace Reductech.EDR.Core.Internal
 
             if (other is CompoundFreezableStep fs)
             {
-                return StepFactory.Equals(fs.StepFactory) &&
+                return StepName.Equals(fs.StepName, StringComparison.OrdinalIgnoreCase) &&
                    FreezableStepData.Equals(fs.FreezableStepData) &&
                    Equals(StepConfiguration, fs.StepConfiguration);
             }
@@ -120,6 +134,6 @@ namespace Reductech.EDR.Core.Internal
         public override bool Equals(object? obj) => ReferenceEquals(this, obj) || obj is IFreezableStep other && Equals(other);
 
         /// <inheritdoc />
-        public override int GetHashCode() => HashCode.Combine(StepFactory, FreezableStepData, StepConfiguration);
+        public override int GetHashCode() => HashCode.Combine(StepName, FreezableStepData, StepConfiguration);
     }
 }

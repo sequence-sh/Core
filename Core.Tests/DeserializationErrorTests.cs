@@ -4,6 +4,7 @@ using CSharpFunctionalExtensions;
 using FluentAssertions;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
+using Reductech.EDR.Core.Parser;
 using Reductech.EDR.Core.Serialization;
 using Reductech.Utilities.Testing;
 using Xunit;
@@ -116,9 +117,9 @@ namespace Reductech.EDR.Core.Tests
             {
                 var sfs = StepFactoryStore.CreateUsingReflection(typeof(IFreezableStep));
 
-                var result = YamlMethods.DeserializeFromYaml(Name, sfs)
-                    .Bind(x=>x.TryFreeze())
-                    .Bind(YamlRunner.ConvertToUnitStep);
+                var result = SequenceParsing.ParseSequence(Name)
+                    .Bind(x=>x.TryFreeze(sfs))
+                    .Bind(SequenceRunner.ConvertToUnitStep);
 
                 result.ShouldBeFailure();
 

@@ -4,10 +4,10 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
+using OneOf;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
-using Reductech.EDR.Core.Serialization;
 using Reductech.EDR.Core.Util;
 
 namespace Reductech.EDR.Core.Steps
@@ -61,23 +61,23 @@ namespace Reductech.EDR.Core.Steps
         public override IStepNameBuilder StepNameBuilder => new StepNameBuilderFromTemplate($"[{nameof(Sequence.Steps)}]");
 
 
-        /// <inheritdoc />
-        public override IStepSerializer Serializer => NoSpecialSerializer.Instance;
+        ///// <inheritdoc />
+        //public override IStepSerializer Serializer => NoSpecialSerializer.Instance;
 
         /// <summary>
         /// Create a new Freezable Sequence
         /// </summary>
-        public static IFreezableStep CreateFreezable(IEnumerable<IFreezableStep> steps, Configuration? configuration)
+        public static IFreezableStep CreateFreezable(IEnumerable<IFreezableStep> steps, Configuration? configuration, IErrorLocation location)
         {
-            var dict = new Dictionary<string, IReadOnlyList<IFreezableStep>>()
+            var dict = new Dictionary<string, FreezableStepProperty>()
             {
-                {nameof(Sequence.Steps), steps.ToList()}
+                {nameof(Sequence.Steps), new FreezableStepProperty(OneOf<VariableName, IFreezableStep, IReadOnlyList<IFreezableStep>>.FromT2(steps.ToList()), location )}
             };
 
-            var fpd = new FreezableStepData(null, null, dict);
+            var fpd = new FreezableStepData( dict, location);
 
 
-            return new CompoundFreezableStep(Instance, fpd, configuration);
+            return new CompoundFreezableStep(Instance.TypeName, fpd, configuration);
         }
     }
 }

@@ -1,17 +1,16 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.IO;
-using System.Linq;
-using System.Runtime.Serialization;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.Internal.Errors;
-using Reductech.EDR.Core.Serialization;
-using Reductech.EDR.Core.Util;
+using Reductech.EDR.Core.Parser;
+using DateTime = System.DateTime;
 using Entity = Reductech.EDR.Core.Entities.Entity;
-using Type = System.Type;
+using Option = OneOf.OneOf<string, int, double, bool,
+Reductech.EDR.Core.Internal.Enumeration, System.DateTime,
+Reductech.EDR.Core.Entities.Entity,
+Reductech.EDR.Core.Entities.EntityStream, Reductech.EDR.Core.Parser.DataStream>;
 
 namespace Reductech.EDR.Core.Internal
 {
@@ -24,29 +23,37 @@ namespace Reductech.EDR.Core.Internal
         /// Creates a new ConstantFreezableStep.
         /// </summary>
         /// <param name="value"></param>
-        public ConstantFreezableStep(object value) => Value = value;
+        public ConstantFreezableStep(Option value) => Value = value;
 
         /// <summary>
         /// The value that this will return when run.
         /// </summary>
-        public object Value { get; }
+        public Option Value { get; }
 
         private Type ElementType
         {
             get
             {
-                if (Value is Stream) return typeof(Stream); //We always need to return the base type for stream.s
-                var type = Value.GetType();
-                return type;
+                return Value.Match(
+                    _ => typeof(string),
+                    _ => typeof(int),
+                    _ => typeof(double),
+                    _ => typeof(bool),
+                    _ => typeof(Enumeration),
+                    _ => typeof(DateTime),
+                    _ => typeof(Entity),
+                    _ => typeof(EntityStream),
+                    _ => typeof(DataStream)
+                );
             }
         }
 
 
         /// <inheritdoc />
-        public Result<IStep, IError> TryFreeze(StepContext _)
+        public Result<IStep, IError> TryFreeze(StepContext stepContext)
         {
             Type stepType = typeof(Constant<>).MakeGenericType(ElementType);
-            var stepAsObject = Activator.CreateInstance(stepType, Value);
+            var stepAsObject = Activator.CreateInstance(stepType, Value.Value);
 
             //TODO check for exceptions here?
 
@@ -68,7 +75,8 @@ namespace Reductech.EDR.Core.Internal
         }
 
         /// <inheritdoc />
-        public Result<IReadOnlyCollection<(VariableName VariableName, ITypeReference typeReference)>, IError> TryGetVariablesSet(TypeResolver typeResolver) =>
+        public Result<IReadOnlyCollection<(VariableName VariableName, ITypeReference typeReference)>, IError>
+            TryGetVariablesSet(TypeResolver typeResolver) =>
             ImmutableList<(VariableName VariableName, ITypeReference type)>.Empty;
 
         /// <inheritdoc />
@@ -76,7 +84,7 @@ namespace Reductech.EDR.Core.Internal
         {
             get
             {
-                var r = WriteValue(Value, false);
+                var r = WriteValue(Value);
                 return r;
             }
         }
@@ -84,59 +92,54 @@ namespace Reductech.EDR.Core.Internal
         /// <summary>
         /// Serialize a value.
         /// </summary>
-        public static string WriteValue(object value, bool prefixEnumNames)
+        public static string WriteValue(Option value)
         {
-            if (value is string s)
-                return $"'{s}'";
+            return
 
-            if (value is Entity entity)
-            {
-                var r = entity.TrySerializeShortForm();
-                if (r.IsSuccess) return r.Value;
-                return "Entity";
-            }
-
-            if (value is EntityStream)
-            {
-                return "EntityStream";
-            }
-
-            if (value is IEnumerable enumerable)
-            {
-
-                var r = string.Join(", ", enumerable.OfType<object>().Select(x => WriteValue(x, prefixEnumNames)));
-
-                return $"[{r}]";
-            }
-
-            if (!prefixEnumNames && value is Enum e)
-                return e.GetDisplayName();
-
-
-            if (value is Stream)
-            {
-                return "Stream";
-                //return SerializationMethods.StreamToString(stream, Encoding.UTF8);
-            }
-
-            if (value is Schema schema)
-            {
-                return schema.Name??"Schema";
-            }
-
-            var simpleResult = SerializationMethods.TrySerializeSimple(value);
-
-            if(simpleResult.IsFailure)
-                throw new SerializationException(simpleResult.Error);
-
-            return simpleResult.Value;
+                value.Match(
+                    s => $"'{s}'",
+                    i => i.ToString(),
+                    d => d.ToString("G"),
+                    b => b.ToString(),
+                    e => e.ToString(),
+                    dt => dt.ToString("O"),
+                    entity =>
+                    {
+                        var r = entity.Serialize();
+                        return r;
+                    },
+                    _ => "EntityStream", //TODO fix
+                    ds => "DataStream" //TODO fix
+                );
         }
 
 
-
-        /// <param name="typeResolver"></param>
         /// <inheritdoc />
-        public Result<ITypeReference, IError> TryGetOutputTypeReference(TypeResolver typeResolver) => new ActualTypeReference(Value.GetType());
+        public Result<ITypeReference, IError> TryGetOutputTypeReference(TypeResolver typeResolver)
+        {
+            var type = Value.Match(
+                _ => typeof(string),
+                _ => typeof(int),
+                _ => typeof(double),
+                _ => typeof(bool),
+                GetEnumerationType,
+                _ => typeof(DateTime),
+                _ => typeof(Entity),
+                _ => typeof(EntityStream),
+                _ => typeof(DataStream));
+
+            var r= type.Map(x => new ActualTypeReference(x) as ITypeReference);
+
+
+            return r;
+
+            Result<Type,IError> GetEnumerationType(Enumeration enumeration)
+            {
+                if (typeResolver.StepFactoryStore.EnumTypesDictionary.TryGetValue(enumeration.Type, out var t))
+                    return t;
+                return new SingleError($"Enum '{enumeration.Type}' does not exist", ErrorCode.UnexpectedEnumValue, new FreezableStepErrorLocation(this));
+            }
+        }
 
         /// <inheritdoc />
         public override string ToString() => StepName;

@@ -1,6 +1,4 @@
-﻿using Reductech.EDR.Core.Serialization;
-using Superpower.Model;
-using YamlDotNet.Core;
+﻿using Reductech.EDR.Core.Parser;
 
 namespace Reductech.EDR.Core.Internal.Errors
 {
@@ -27,7 +25,6 @@ namespace Reductech.EDR.Core.Internal.Errors
         /// <summary>
         /// Add a YamlRegionErrorLocation
         /// </summary>
-        public static IError WithLocation(this IErrorBuilder errorBuilder, Mark start, Mark end, Position? position = null) =>
-            errorBuilder.WithLocation(new YamlRegionErrorLocation(start, end, position));
+        public static IError WithLocation(this IErrorBuilder errorBuilder, TextPosition token) => errorBuilder.WithLocation(token);
     }
 }

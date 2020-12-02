@@ -78,10 +78,10 @@ namespace Reductech.EDR.Core.Steps
 
         /// <inheritdoc />
         public override Result<Maybe<ITypeReference>, IError> GetTypeReferencesSet(VariableName variableName,
-            FreezableStepData freezableStepData, TypeResolver typeResolver)
+            FreezableStepData freezableStepData, TypeResolver typeResolver, StepFactoryStore stepFactoryStore)
         {
-            var result = freezableStepData.GetArgument(nameof(SetVariable<object>.Value), TypeName)
-                .MapError(e=>e.WithLocation(this, freezableStepData))
+            var result = freezableStepData.GetStep(nameof(SetVariable<object>.Value), TypeName)
+
                 .Bind(x => x.TryGetOutputTypeReference(typeResolver))
                 .Map(Maybe<ITypeReference>.From);
 
@@ -89,45 +89,25 @@ namespace Reductech.EDR.Core.Steps
         }
 
         /// <inheritdoc />
-        protected override Result<ICompoundStep, IError> TryCreateInstance(StepContext stepContext, FreezableStepData freezableStepData) =>
-            freezableStepData.GetVariableName(nameof(SetVariable<object>.Variable), TypeName)
-                .Bind(x => stepContext.TryGetTypeFromReference(new VariableTypeReference(x)))
-                .Bind(x => TryCreateGeneric(typeof(SetVariable<>), x))
-        .MapError(e=>e.WithLocation(this, freezableStepData));
+        protected override Result<ICompoundStep, IError> TryCreateInstance(StepContext stepContext,
+            FreezableStepData freezeData) =>
+            freezeData.GetVariableName(nameof(SetVariable<object>.Variable), TypeName)
+                .Bind(x => stepContext.TryGetTypeFromReference(new VariableTypeReference(x)).MapError(e=> e.WithLocation(this, freezeData)))
+                .Bind(x => TryCreateGeneric(typeof(SetVariable<>), x).MapError(e=> e.WithLocation(this, freezeData)));
 
 
 
 
 
         /// <inheritdoc />
-        public override IStepSerializer Serializer { get; } = new StepSerializer(
-            new VariableNameComponent(nameof(SetVariable<object>.Variable)),
-            new SpaceComponent(),
+        public override IStepSerializer Serializer  =>
+            new StepSerializer(TypeName, new StepComponent(nameof(SetVariable<object>.Variable)),
+            SpaceComponent.Instance,
             new FixedStringComponent("="),
-            new SpaceComponent(),
-            new AnyPrimitiveComponent(nameof(SetVariable<object>.Value))
+            SpaceComponent.Instance,
+            new StepComponent(nameof(SetVariable<object>.Value))
         );
 
 
-        /// <summary>
-        /// Create a freezable SetVariable step.
-        /// </summary>
-        public static IFreezableStep CreateFreezable(VariableName variableName, IFreezableStep value)
-        {
-            var varNameDict = new Dictionary<string, VariableName>
-            {
-                {nameof(SetVariable<object>.Variable), variableName},
-            };
-
-            var stepDict = new Dictionary<string, IFreezableStep>
-            {
-                {nameof(SetVariable<object>.Value), value}
-            };
-
-
-            var fpd = new FreezableStepData(stepDict, varNameDict, null);
-
-            return new CompoundFreezableStep(Instance, fpd, null);
-        }
     }
 }

@@ -1,9 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
+using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.Internal.Errors;
+using Reductech.EDR.Core.Parser;
+using Reductech.EDR.Core.Serialization;
 using Reductech.EDR.Core.Util;
 
 namespace Reductech.EDR.Core.Internal
@@ -30,7 +32,23 @@ namespace Reductech.EDR.Core.Internal
         public string Name => $"{Value}";
 
         /// <inheritdoc />
-        public IFreezableStep Unfreeze() => new ConstantFreezableStep(Value!);
+        public IFreezableStep Unfreeze()
+        {
+            return Value switch
+            {
+                string s => new ConstantFreezableStep(s),
+                int i => new ConstantFreezableStep(i),
+                double d => new ConstantFreezableStep(d),
+                bool b => new ConstantFreezableStep(b),
+                Enum e => new ConstantFreezableStep(new Enumeration(e.GetType().Name, e.ToString())),
+                DateTime dt => new ConstantFreezableStep(dt),
+                Entities.Entity ent => new ConstantFreezableStep(ent),
+                EntityStream es => new ConstantFreezableStep(es),
+                DataStream ds => new ConstantFreezableStep(ds),
+                //TODO list
+                _ => throw new Exception($"Cannot unfreeze {typeof(T)}")
+            };
+        }
 
         /// <inheritdoc />
 #pragma warning disable 1998
@@ -53,9 +71,26 @@ namespace Reductech.EDR.Core.Internal
         public Configuration? Configuration { get; set; } = null;
 
         /// <inheritdoc />
-        public IEnumerable<IStepCombiner> StepCombiners => ArraySegment<IStepCombiner>.Empty;
+        public Type OutputType => typeof(T);
 
         /// <inheritdoc />
-        public Type OutputType => typeof(T);
+        public string Serialize()
+        {
+            return Value switch
+            {
+                string s => "\"" + SerializationMethods.EscapeDoubleQuotes(s) + "\"",
+                int i => i.ToString(),
+                double d => d.ToString("G17"),
+                bool b =>b.ToString(),
+                Enum e => new Enumeration(e.GetType().Name, e.ToString()).ToString(),
+                DateTime dt => dt.ToString("O"),
+                Entities.Entity ent => ent.Serialize(),
+                EntityStream es => "EntityStream",//TODO fix
+                DataStream ds =>ds.Serialize(),
+                //TODO list
+                _ => throw new Exception($"Cannot unfreeze {typeof(T)}")
+            };
+        }
+
     }
 }

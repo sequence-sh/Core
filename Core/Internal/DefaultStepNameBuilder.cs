@@ -7,7 +7,7 @@ namespace Reductech.EDR.Core.Internal
     /// </summary>
     public class DefaultStepNameBuilder : IStepNameBuilder
     {
-        private DefaultStepNameBuilder() {}
+        private DefaultStepNameBuilder() { }
 
         /// <summary>
         /// The instance.
@@ -19,8 +19,8 @@ namespace Reductech.EDR.Core.Internal
         public string GetFromArguments(FreezableStepData freezableStepData, IStepFactory stepFactory)
         {
             var args = string.Join(", ", freezableStepData
-                .StepMembersDictionary
-                .OrderBy(x=>x.Key)
+                .Steps
+                .OrderBy(x => x.Key)
                 .Select(x => $"{x.Key}: {x.Value.MemberString}"));
 
             return $"{stepFactory.TypeName}({args})";

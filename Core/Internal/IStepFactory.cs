@@ -6,6 +6,8 @@ using Reductech.EDR.Core.Serialization;
 
 namespace Reductech.EDR.Core.Internal
 {
+
+
     /// <summary>
     /// A factory for creating steps.
     /// </summary>
@@ -34,24 +36,20 @@ namespace Reductech.EDR.Core.Internal
         /// <summary>
         /// Tries to get a reference to the output type of this step.
         /// </summary>
-        Result<ITypeReference, IError> TryGetOutputTypeReference(FreezableStepData freezableStepData, TypeResolver typeResolver);
+        Result<ITypeReference, IError> TryGetOutputTypeReference(FreezableStepData freezeData, TypeResolver typeResolver);
 
         /// <summary>
         /// If this variable is being set. Get the type reference it is being set to.
         /// </summary>
         Result<Maybe<ITypeReference>, IError> GetTypeReferencesSet(VariableName variableName,
-            FreezableStepData freezableStepData, TypeResolver typeResolver) =>
+            FreezableStepData freezableStepData, TypeResolver typeResolver, StepFactoryStore stepFactoryStore) =>
             Maybe<ITypeReference>.None;
 
         /// <summary>
-        /// Serializer to use for yaml serialization.
+        /// Serializer to use for serialization.
         /// </summary>
         IStepSerializer Serializer { get; }
 
-        /// <summary>
-        /// An object which can combine a step with the next step in the sequence.
-        /// </summary>
-        Maybe<IStepCombiner> StepCombiner { get; }
 
         /// <summary>
         /// Special requirements for this step.
@@ -61,7 +59,8 @@ namespace Reductech.EDR.Core.Internal
         /// <summary>
         /// Try to create the instance of this type and set all arguments.
         /// </summary>
-        Result<IStep, IError> TryFreeze(StepContext stepContext, FreezableStepData freezableStepData,
+        Result<IStep, IError> TryFreeze(StepContext stepContext,
+            FreezableStepData freezeData,
             Configuration? configuration);
 
         /// <summary>

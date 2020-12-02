@@ -58,8 +58,7 @@ namespace Reductech.EDR.Core.Steps
             TypeResolver typeResolver)
         {
 
-            var r1 = freezableStepData.GetArgument(nameof(ArrayLength<object>.Array), TypeName)
-                .MapError(x=>x.WithLocation(this, freezableStepData))
+            var r1 = freezableStepData.GetStep(nameof(ArrayLength<object>.Array), TypeName)
                 .Bind(x => x.TryGetOutputTypeReference(typeResolver))
                 .Bind(x => x.TryGetGenericTypeReference(typeResolver, 0)
                     .MapError(e=>e.WithLocation(this, freezableStepData)))

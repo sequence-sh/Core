@@ -86,7 +86,8 @@ namespace Reductech.EDR.Core.Steps
         }
 
         /// <inheritdoc />
-        public override Result<Maybe<ITypeReference>, IError> GetTypeReferencesSet(VariableName variableName, FreezableStepData freezableStepData, TypeResolver typeResolver) =>
+        public override Result<Maybe<ITypeReference>, IError> GetTypeReferencesSet(VariableName variableName,
+            FreezableStepData freezableStepData, TypeResolver typeResolver, StepFactoryStore stepFactoryStore) =>
             Maybe<ITypeReference>.From(new ActualTypeReference(typeof(Entity)));
     }
 

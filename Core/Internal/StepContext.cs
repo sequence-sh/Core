@@ -18,6 +18,7 @@ namespace Reductech.EDR.Core.Internal
         /// </summary>
         public  TypeResolver TypeResolver { get; }
 
+
         private StepContext(TypeResolver typeResolver) => TypeResolver = typeResolver;
 
         /// <summary>
@@ -28,9 +29,9 @@ namespace Reductech.EDR.Core.Internal
         /// <summary>
         /// Tries to create a new StepContext.
         /// </summary>
-        public static Result<StepContext, IError> TryCreate(params IFreezableStep[] freezableSteps)
+        public static Result<StepContext, IError> TryCreate(StepFactoryStore stepFactoryStore, params IFreezableStep[] freezableSteps)
         {
-            var typeResolver = new TypeResolver();
+            var typeResolver = new TypeResolver(stepFactoryStore);
 
             var remainingFreezableSteps = new Stack<IFreezableStep>(freezableSteps);
             var stepsForLater = new List<(IFreezableStep step, IError error)>();
@@ -41,12 +42,12 @@ namespace Reductech.EDR.Core.Internal
             {
                 var step = remainingFreezableSteps.Pop();
 
-                if (step is CompoundFreezableStep seq && seq.StepFactory == SequenceStepFactory.Instance)
+                if (step is CompoundFreezableStep seq && seq.StepName == SequenceStepFactory.Instance.TypeName)
                 {
-                    var stepsResult = seq.FreezableStepData.GetListArgument(nameof(Sequence.Steps), nameof(Sequence));
+                    var stepsResult = seq.FreezableStepData.GetStepList(nameof(Sequence.Steps), nameof(Sequence));
 
                     if (stepsResult.IsFailure)
-                        return stepsResult.MapError(x => x.WithLocation(seq)).ConvertFailure<StepContext>();
+                        return stepsResult.ConvertFailure<StepContext>();
 
                     foreach (var freezableStep in stepsResult.Value)
                         remainingFreezableSteps.Push(freezableStep);
@@ -73,12 +74,7 @@ namespace Reductech.EDR.Core.Internal
 
             Result<Unit, IError> Resolve(IEnumerable<(VariableName variableName, ITypeReference typeReference)> data)
             {
-                var genericReferences = data.Where(x => x.typeReference is GenericTypeReference)
-                    .SelectMany(x =>
-                        ((GenericTypeReference)x.typeReference).ChildTypes.Select((t, i) =>
-                           (variableName: x.variableName.CreateChild(i), typeReference: t)));
-
-                var references = data.Concat(genericReferences);
+                var references = data.SelectMany(GetAllSetReferences);
 
                 var result = references
                     .Select(x => (x.variableName, actualType: x.typeReference.TryGetActualTypeReference(typeResolver)))
@@ -88,6 +84,19 @@ namespace Reductech.EDR.Core.Internal
                     .MapError(x=>x.WithLocation(EntireSequenceLocation.Instance));
 
                 return result;
+
+                static IEnumerable<(VariableName variableName, ITypeReference typeReference)> GetAllSetReferences((VariableName variableName, ITypeReference typeReference) pair)
+                {
+                    yield return pair;
+
+                    if (pair.typeReference is GenericTypeReference gtr)
+                    {
+                        foreach (var pair2 in gtr.ChildTypes.Select((t, i) => (variableName: pair.variableName.CreateChild(i), typeReference: t)))
+                            yield return pair2;
+                    }
+                }
+
+
             }
 
             if (stepsForLater.Any())

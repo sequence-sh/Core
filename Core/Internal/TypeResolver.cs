@@ -10,6 +10,14 @@ namespace Reductech.EDR.Core.Internal
     /// </summary>
     public sealed class TypeResolver
     {
+        /// <summary>
+        /// Create a new TypeResolver
+        /// </summary>
+        public TypeResolver(StepFactoryStore stepFactoryStore)
+        {
+            StepFactoryStore = stepFactoryStore;
+        }
+
         /// <inheritdoc />
         public override string ToString() => Dictionary.Count + " Types";
 
@@ -20,6 +28,10 @@ namespace Reductech.EDR.Core.Internal
         /// </summary>
         public IReadOnlyDictionary<VariableName, ActualTypeReference> Dictionary => MyDictionary;
 
+        /// <summary>
+        /// The StepFactoryStory
+        /// </summary>
+        public StepFactoryStore StepFactoryStore { get; }
 
         /// <summary>
         /// Tries to add another actual type.

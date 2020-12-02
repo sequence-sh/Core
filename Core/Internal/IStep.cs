@@ -42,6 +42,11 @@ namespace Reductech.EDR.Core.Internal
         /// </summary>
         Type OutputType { get; }
 
+        /// <summary>
+        /// Serialize this step.
+        /// </summary>
+        string Serialize();
+
     }
 
     /// <summary>

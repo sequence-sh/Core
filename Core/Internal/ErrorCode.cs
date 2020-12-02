@@ -145,6 +145,7 @@
         /// <summary>
         /// An unexpected or unrecognized error
         /// </summary>
-        Unknown
+        Unknown,
+        WrongArgumentType
     }
 }

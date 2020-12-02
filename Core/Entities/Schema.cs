@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using CSharpFunctionalExtensions;
+using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
-using YamlDotNet.Serialization;
 
 namespace Reductech.EDR.Core.Entities
 {
@@ -19,19 +19,19 @@ namespace Reductech.EDR.Core.Entities
         /// <summary>
         /// The name of the schema.
         /// </summary>
-        [YamlMember]
+        [ConfigProperty(Order = 1)]
         public string Name { get; set; } = null!;
 
         /// <summary>
         /// The schema properties.
         /// </summary>
-        [YamlMember]
+        [ConfigProperty(Order = 2)]
         public Dictionary<string, SchemaProperty> Properties { get; set; } = null!; //public setter for deserialization
 
         /// <summary>
         /// Whether properties other than the explicitly defined properties are allowed.
         /// </summary>
-        [YamlMember]
+        [ConfigProperty(Order = 3)]
         public bool AllowExtraProperties { get; set; } = true;
 
         /// <inheritdoc />

@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
+using OneOf;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Util;
@@ -34,6 +35,9 @@ namespace Reductech.EDR.Core.Internal
         public abstract IStepFactory StepFactory { get; }
 
         /// <inheritdoc />
+        public string Serialize() => StepFactory.Serializer.Serialize(AllProperties);
+
+        /// <inheritdoc />
         public string Name => StepFactory.StepNameBuilder.GetFromArguments(FreezableStepData, StepFactory);
 
         /// <inheritdoc />
@@ -50,61 +54,68 @@ namespace Reductech.EDR.Core.Internal
         /// <inheritdoc />
         public Type OutputType => typeof(T);
 
-
-        private IEnumerable<(string name, IStep step) > RunnableArguments
+        /// <summary>
+        /// All properties of this step
+        /// </summary>
+        public IEnumerable<StepProperty> AllProperties
         {
             get
             {
-                var arguments = GetType().GetProperties()
-                    .Select(propertyInfo=> (propertyInfo, attribute: propertyInfo.GetCustomAttribute<StepPropertyAttribute>() ))
+                var r = GetType().GetProperties()
+                    .Select(propertyInfo => (propertyInfo,
+                        attribute: propertyInfo.GetCustomAttribute<StepPropertyBaseAttribute>()))
                     .Where(x => x.attribute != null)
-                    .OrderBy(x=>x.attribute!.Order)
-                    .Select(x => (x.propertyInfo.Name, step: x.propertyInfo.GetValue(this) as IStep))
-                    .Where(x => x.step != null)!;
+                    .OrderBy(x => x.attribute!.Order)
+                    .Select(GetMember);
 
 
-                return arguments!;
+                return r;
+
+                StepProperty GetMember((PropertyInfo propertyInfo, StepPropertyBaseAttribute? attribute) arg1, int arg2)
+                {
+                    var (propertyInfo, _) = arg1;
+                    var val = propertyInfo.GetValue(this);
+
+                    return val switch
+                    {
+                        IStep step => new StepProperty(propertyInfo.Name, arg2,
+                            OneOf<VariableName, IStep, IReadOnlyList<IStep>>.FromT1(step)),
+                        IEnumerable<IStep> enumerable => new StepProperty(propertyInfo.Name, arg2,
+                            OneOf<VariableName, IStep, IReadOnlyList<IStep>>.FromT2(enumerable.ToList())),
+                        VariableName vn => new StepProperty(propertyInfo.Name, arg2, vn),
+                        _ => throw new Exception(
+                            $"{Name}.{propertyInfo.Name} was not a step, a step list or a variable name")
+                    };
+                }
             }
         }
 
-        private IEnumerable<(string name, IEnumerable<IStep> list)> RunnableListArguments
-        {
-            get
-            {
-                return GetType()
-                    .GetProperties()
-                    .Where(x => x.GetCustomAttribute<StepListPropertyAttribute>() != null)
-                    .Select(x => (x.Name, list: x.GetValue(this) as IEnumerable<IStep>))
-                    .Where(x => x.list != null)!;
-            }
-        }
+
 
         private FreezableStepData FreezableStepData
         {
             get
             {
-                var variableNames = GetType().GetProperties()
-                .Where(x => x.GetCustomAttribute<VariableNameAttribute>() != null)
-                .Select(x => (x.Name, variableName: (VariableName)x.GetValue(this)!))
-                .Where(x => x.variableName != null)
+                var dict = AllProperties
+                    .OrderBy(x => x.Index)
+                    .ToDictionary(x => x.Name,
+                        x => x.Value.Match(
+                            vn => new FreezableStepProperty(vn, new StepErrorLocation(this)),
+                            s => new FreezableStepProperty(
+                                OneOf<VariableName, IFreezableStep, IReadOnlyList<IFreezableStep>>.FromT1(s.Unfreeze()),
+                                new StepErrorLocation(this)),
+                            sl =>
+                                new FreezableStepProperty(
+                                    OneOf<VariableName, IFreezableStep, IReadOnlyList<IFreezableStep>>.FromT2(
+                                        sl.Select(s => s.Unfreeze()).ToList()), new StepErrorLocation(this))
+                        ));
 
-                .ToDictionary(x => x.Name, x => x.variableName  );
-
-
-                var steps  = RunnableArguments
-                 .ToDictionary(x => x.name, x => x.step.Unfreeze());
-
-                var stepLists = RunnableListArguments
-                .ToDictionary(x => x.name,
-                    x => x.list.Select(y => y.Unfreeze()).ToList() as IReadOnlyList<IFreezableStep>);
-
-
-                return new FreezableStepData(steps, variableNames, stepLists);
+                return new FreezableStepData(dict, new StepErrorLocation(this));
             }
         }
 
         /// <inheritdoc />
-        public IFreezableStep Unfreeze() => new CompoundFreezableStep(StepFactory,FreezableStepData, Configuration);
+        public IFreezableStep Unfreeze() => new CompoundFreezableStep(StepFactory.TypeName,FreezableStepData, Configuration);
 
 
         /// <summary>
@@ -121,13 +132,17 @@ namespace Reductech.EDR.Core.Internal
             var rRequirements = RuntimeRequirements.Concat(StepFactory.Requirements)
                 .Select(req => settings.CheckRequirement(req).MapError(x=>x.WithLocation(this)));
 
+            var r3 = AllProperties
+                .Select(x => x.Value.Match(
+                    vn => Unit.Default,
+                    s => s.Verify(settings),
+                    sl => sl.Select(s => s.Verify(settings)).Combine(ErrorList.Combine).Map(_=>Unit.Default)
 
-            var r1 = RunnableArguments.Select(x => x.step.Verify(settings));
-            var r2 = RunnableListArguments.Select(x => x.list.Select(l => l.Verify(settings))
-                    .Combine(ErrorList.Combine).Map(_=>Unit.Default));
+                ));
 
 
-            var finalResult = r0.Concat(rRequirements) .Concat(r1).Concat(r2).Combine(ErrorList.Combine).Map(_ => Unit.Default);
+
+            var finalResult = r0.Concat(rRequirements).Concat(r3).Combine(ErrorList.Combine).Map(_ => Unit.Default);
 
             return finalResult;
         }

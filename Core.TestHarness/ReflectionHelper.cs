@@ -28,7 +28,12 @@ namespace Reductech.EDR.Core.TestHarness
             var values = new Dictionary<string, string>();
 
             foreach (var propertyInfo in typeof(TStep).GetProperties()
-                .Where(x => x.IsDecoratedWith<StepPropertyBaseAttribute>()).OrderBy(x=>x.Name))
+                .Select(propertyInfo => (propertyInfo,
+                        attribute: propertyInfo.GetCustomAttribute<StepPropertyBaseAttribute>()))
+                    .Where(x => x.attribute != null)
+                    .OrderBy(x => x.attribute!.Order)
+                .Select(x=>x.propertyInfo)
+            )
                 MatchStepPropertyInfo(propertyInfo, SetVariableName, SetStep, SetStepList);
 
             return (instance, values);
@@ -104,7 +109,7 @@ namespace Reductech.EDR.Core.TestHarness
                     //return SerializationMethods.StreamToString(stream, Encoding.UTF8);
                 }
 
-                return ConstantFreezableStep.WriteValue(cfs.Value, true);
+                return ConstantFreezableStep.WriteValue(cfs.Value);
             }
 
             return freezable.StepName;

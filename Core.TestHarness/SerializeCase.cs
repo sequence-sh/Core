@@ -1,10 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
-using Reductech.EDR.Core.Serialization;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -55,7 +53,7 @@ namespace Reductech.EDR.Core.TestHarness
             /// <inheritdoc />
             public async Task RunCaseAsync(ITestOutputHelper testOutputHelper, string? extraArgument)
             {
-                var realYaml = await Step.Unfreeze().SerializeToYamlAsync(CancellationToken.None);
+                var realYaml = Step.Serialize();
 
                 testOutputHelper.WriteLine(realYaml);
 
@@ -79,7 +77,8 @@ namespace Reductech.EDR.Core.TestHarness
                 expectedYamlBuilder.Append(stepName);
                 expectedYamlBuilder.Append("(");
 
-                var pairs = values.OrderBy(x => x.Key).Select(x => $"{x.Key} = {x.Value}");
+                var pairs = values//.OrderBy(x => x.Key)
+                    .Select(x => $"{x.Key} = {x.Value}");
 
                 expectedYamlBuilder.AppendJoin(", ", pairs);
                 expectedYamlBuilder.Append(")");
@@ -91,7 +90,7 @@ namespace Reductech.EDR.Core.TestHarness
             {
                 expectedYamlBuilder.AppendLine($"Do: {stepName}");
 
-                var pairs = values.OrderBy(x => x.Key);
+                var pairs = values;//.OrderBy(x => x.Key);
 
                 foreach (var pair in pairs)
                 {

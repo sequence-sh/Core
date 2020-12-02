@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Reductech.EDR.Core.Enums;
 using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.Internal;
-using Reductech.EDR.Core.Serialization;
 using Reductech.EDR.Core.Util;
 using Reductech.Utilities.Testing;
 using Xunit;
@@ -258,14 +256,14 @@ Value: 'I have config too'");
         private class SerializationTestMethod : ITestBaseCaseParallel
         {
             public IStep Step { get; }
-            public string ExpectedYaml { get; }
+            public string ExpectedText { get; }
 
-            public SerializationTestMethod(IStep step, string expectedYaml)
+            public SerializationTestMethod(IStep step, string expectedText)
             {
                 Step = step;
-                ExpectedYaml = expectedYaml;
+                ExpectedText = expectedText;
 
-                Name = GetName(ExpectedYaml);
+                Name = GetName(ExpectedText);
             }
 
             private static string GetName(string expectedYaml)
@@ -282,11 +280,11 @@ Value: 'I have config too'");
             /// <inheritdoc />
             public async Task ExecuteAsync(ITestOutputHelper testOutputHelper)
             {
-                var fp = Step.Unfreeze();
+                var text = Step.Serialize();
 
-                var yaml = await fp.SerializeToYamlAsync(CancellationToken.None);
+                text.Should().Be(ExpectedText);
 
-                yaml.Should().Be(ExpectedYaml);
+                await Task.CompletedTask;
             }
         }
     }

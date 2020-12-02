@@ -26,7 +26,8 @@ namespace Reductech.EDR.Core.Internal
         public override IEnumerable<Type> EnumTypes => ImmutableArray<Type>.Empty;
 
         /// <inheritdoc />
-        protected override Result<ICompoundStep, IError> TryCreateInstance(StepContext stepContext, FreezableStepData freezableStepData) => new TStep();
+        protected override Result<ICompoundStep, IError> TryCreateInstance(StepContext stepContext,
+            FreezableStepData freezeData) => new TStep();
 
         /// <inheritdoc />
         public override string OutputTypeExplanation => typeof(TOutput).Name;

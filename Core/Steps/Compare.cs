@@ -100,11 +100,10 @@ namespace Reductech.EDR.Core.Steps
         protected override Result<ITypeReference, IError> GetMemberType(FreezableStepData freezableStepData,
             TypeResolver typeResolver)
         {
-            var result = freezableStepData.GetArgument(nameof(Compare<int>.Left), TypeName)
-                .MapError(e=>e.WithLocation(this, freezableStepData))
+            var result = freezableStepData.GetStep(nameof(Compare<int>.Left), TypeName)
+                .MapError(e=>e)
                 .Bind(x => x.TryGetOutputTypeReference(typeResolver))
-                .Compose(() => freezableStepData.GetArgument(nameof(Compare<int>.Right), TypeName)
-                .MapError(e=>e.WithLocation(this, freezableStepData))
+                .Compose(() => freezableStepData.GetStep(nameof(Compare<int>.Right), TypeName)
                     .Bind(x => x.TryGetOutputTypeReference(typeResolver))
                 )
                 .Map(x => new[] { x.Item1, x.Item2 })
@@ -119,32 +118,12 @@ namespace Reductech.EDR.Core.Steps
 
 
         /// <inheritdoc />
-        public override IStepSerializer Serializer { get; } = new StepSerializer(
-            new FixedStringComponent("("),
-            new IntegerComponent(nameof(Compare<int>.Left)),
-            new SpaceComponent(),
+        public override IStepSerializer Serializer => new StepSerializer(TypeName, new FixedStringComponent("("),
+            new StepComponent(nameof(Compare<int>.Left)),
+            SpaceComponent.Instance,
             new EnumDisplayComponent<CompareOperator>(nameof(Compare<int>.Operator)),
-            new SpaceComponent(),
-            new IntegerComponent(nameof(Compare<int>.Right)),
+            SpaceComponent.Instance,
+            new StepComponent(nameof(Compare<int>.Right)),
             new FixedStringComponent(")"));
-
-
-        /// <summary>
-        /// Create a freezable Compare step.
-        /// </summary>
-        public static IFreezableStep CreateFreezable(IFreezableStep left, IFreezableStep compareOperator, IFreezableStep right)
-        {
-            var dict = new Dictionary<string, IFreezableStep>
-            {
-                {nameof(Compare<int>.Left), left},
-                {nameof(Compare<int>.Operator), compareOperator},
-                {nameof(Compare<int>.Right), right},
-            };
-
-            var fpd = new FreezableStepData(dict, null, null);
-            var step = new CompoundFreezableStep(Instance, fpd, null);
-
-            return step;
-        }
     }
 }

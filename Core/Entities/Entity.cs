@@ -1,7 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Dynamic;
 using System.Linq;
 using System.Text;
 using CSharpFunctionalExtensions;
@@ -91,7 +90,7 @@ namespace Reductech.EDR.Core.Entities
         public IEnumerator<KeyValuePair<string, EntityValue>> GetEnumerator() => _properties.GetEnumerator();
 
         /// <inheritdoc />
-        public override string ToString() => AsString();
+        public override string ToString() => Serialize();
 
         /// <inheritdoc />
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
@@ -101,71 +100,39 @@ namespace Reductech.EDR.Core.Entities
         /// Serialize this record.
         /// </summary>
         /// <returns></returns>
-        public Result<string> TrySerializeShortForm()
+        public string Serialize()
         {
             var sb = new StringBuilder();
 
             sb.Append('(');
 
-            var results = new List<Result<string>>();
+            var results = new List<string>();
 
             foreach (var (key, value) in _properties)
             {
                 value.Value.Switch(_=>{},
                     singleValue=>
                     {
-                        var r = SerializationMethods.TrySerializeShortFormString(singleValue.Original)
-                            .Map(v => $"{key} = {v}");
-                        results.Add(r);
+                        var v = SerializationMethods.EscapeDoubleQuotes(singleValue.Original);
+                        results.Add($"{key} = {v}");
+
                     },
                     multiValue=>
                     {
-                        var r = SerializationMethods.TrySerializeSimpleList(multiValue.Select(x => x.Original))
-                            .Map(v => $"{key} = {v}");
+                        var v = multiValue.Select(x => x.Original)
+                            .Select(SerializationMethods.EscapeDoubleQuotes);
+
+                        var r = SerializationMethods.SerializeList(v);
                         results.Add(r);
                     });
             }
 
-            var result = results.Combine();
-
-            if (result.IsFailure)
-                return result.ConvertFailure<string>();
-
-            sb.AppendJoin(",", result.Value);
+            sb.AppendJoin(",", results);
 
             sb.Append(')');
 
             return sb.ToString();
         }
 
-        /// <summary>
-        /// Convert this entity to an object that can be serialized
-        /// </summary>
-        /// <returns></returns>
-        public object ToSimpleObject()
-        {
-            IDictionary<string, object> expandoObject = new ExpandoObject()!;
-
-            foreach (var (key, value) in _properties)
-            {
-                value.Value.Switch(_=>{},
-                    v=> expandoObject[key] = v,
-                    l => expandoObject[key] = l  );
-            }
-
-            return expandoObject;
-        }
-
-
-        /// <summary>
-        /// Converts this record into a string.
-        /// </summary>
-        public string AsString()
-        {
-            var result = string.Join(", ",
-                _properties.Select(property => $"{property.Key}: {property.Value}"));
-
-            return result;
-        }
     }
 }

@@ -7,6 +7,7 @@ using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.ExternalProcesses;
 using Reductech.EDR.Core.Internal;
+using Reductech.EDR.Core.Parser;
 using Reductech.EDR.Core.Serialization;
 using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.TestHarness;
@@ -41,7 +42,7 @@ namespace Reductech.EDR.Core.Tests
 
             var sfs = StepFactoryStore.CreateUsingReflection();
 
-            var stepResult = YamlMethods.DeserializeFromYaml(yaml, sfs).Bind(x => x.TryFreeze());
+            var stepResult = SequenceParsing.ParseSequence(yaml).Bind(x => x.TryFreeze(sfs));
 
             if(stepResult.IsFailure)
                 throw new XunitException(
@@ -73,7 +74,7 @@ namespace Reductech.EDR.Core.Tests
 
             var sfs = StepFactoryStore.CreateUsingReflection();
 
-            var stepResult = YamlMethods.DeserializeFromYaml(yaml, sfs).Bind(x=>x.TryFreeze());
+            var stepResult = SequenceParsing.ParseSequence(yaml).Bind(x=>x.TryFreeze(sfs));
 
             stepResult.ShouldBeSuccessful(x=>x.AsString);
 
@@ -130,7 +131,7 @@ namespace Reductech.EDR.Core.Tests
                 }
             };
 
-            var yaml = await step.Unfreeze().SerializeToYamlAsync(CancellationToken.None);
+            var yaml = step.Serialize();
 
             TestOutputHelper.WriteLine(yaml);
 

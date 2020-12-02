@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using Reductech.EDR.Core.ExternalProcesses;
 using Reductech.EDR.Core.Internal;
-using Reductech.EDR.Core.Serialization;
+using Reductech.EDR.Core.Parser;
 using Reductech.EDR.Core.TestHarness;
 using Reductech.EDR.Core.Util;
 using Reductech.Utilities.Testing;
@@ -240,11 +240,11 @@ Action = Print(Value = <char>))", "a", "b", "c");
                 var stepFactoryStore = StepFactoryStore.CreateUsingReflection(typeof(StepFactory));
                 var logger = new TestLogger();
 
-                var deserializeResult = YamlMethods.DeserializeFromYaml(Yaml, stepFactoryStore);
+                var deserializeResult = SequenceParsing.ParseSequence(Yaml);
 
                 deserializeResult.ShouldBeSuccessful(x=>x.AsString);
 
-                var freezeResult = deserializeResult.Value.TryFreeze();
+                var freezeResult = deserializeResult.Value.TryFreeze(stepFactoryStore);
 
                 freezeResult.ShouldBeSuccessful(x=>x.AsString);
 

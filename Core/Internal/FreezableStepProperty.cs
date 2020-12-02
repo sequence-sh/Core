@@ -2,33 +2,28 @@
 using System.Collections.Generic;
 using System.Linq;
 using CSharpFunctionalExtensions;
-using OneOf;
 using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Steps;
+using Opt = OneOf.OneOf<Reductech.EDR.Core.Internal.VariableName, Reductech.EDR.Core.Internal.IFreezableStep, System.Collections.Generic.IReadOnlyList<Reductech.EDR.Core.Internal.IFreezableStep>>;
+
+
 
 namespace Reductech.EDR.Core.Internal
 {
     /// <summary>
     /// Any member of a step.
     /// </summary>
-    public sealed class StepMember : IEquatable<StepMember>
+    public sealed class FreezableStepProperty : IEquatable<FreezableStepProperty>
     {
         /// <summary>
-        /// Create a new Variable StepMember
+        /// Create a new FreezableStepProperty
         /// </summary>
-        public StepMember(VariableName variableName) => Option = OneOf<VariableName, IFreezableStep, IReadOnlyList<IFreezableStep>>.FromT0(variableName);
-
-        /// <summary>
-        /// Create a new IFreezableStep StepMember
-        /// </summary>
-        public StepMember(IFreezableStep argument) => Option = OneOf<VariableName, IFreezableStep, IReadOnlyList<IFreezableStep>>.FromT1(argument);
-
-        /// <summary>
-        /// Create a new ListArgument StepMember
-        /// </summary>
-        public StepMember(IReadOnlyList<IFreezableStep> listArgument) => Option = OneOf<VariableName, IFreezableStep, IReadOnlyList<IFreezableStep>>.FromT2(listArgument);
-
+        public FreezableStepProperty(Opt option, IErrorLocation location)
+        {
+            Option = option;
+            Location = location;
+        }
 
         /// <summary>
         /// The member type of this Step Member.
@@ -44,6 +39,11 @@ namespace Reductech.EDR.Core.Internal
                 return MemberType.NotAMember;
             }
         }
+
+        /// <summary>
+        /// The location where this stepMember comes from.
+        /// </summary>
+        public IErrorLocation Location { get; }
 
         /// <summary>
         /// This, if it is a variableName
@@ -63,10 +63,10 @@ namespace Reductech.EDR.Core.Internal
         /// <summary>
         /// The chosen option.
         /// </summary>
-        private OneOf<VariableName, IFreezableStep, IReadOnlyList<IFreezableStep>> Option { get; }
+        private Opt Option { get; }
 
         /// <summary>
-        /// Use this StepMember.
+        /// Use this FreezableStepProperty.
         /// </summary>
         public T Match<T>(Func<VariableName, T> handleVariableName, Func<IFreezableStep, T> handleArgument,
             Func<IReadOnlyList<IFreezableStep>, T> handleListArgument) =>
@@ -74,7 +74,7 @@ namespace Reductech.EDR.Core.Internal
 
 
         /// <summary>
-        /// Use this StepMember.
+        /// Use this FreezableStepProperty.
         /// </summary>
         public void Switch(Action<VariableName> handleVariableName, Action<IFreezableStep> handleArgument,
             Action<IReadOnlyList<IFreezableStep>> handleListArgument) =>
@@ -83,40 +83,52 @@ namespace Reductech.EDR.Core.Internal
         /// <summary>
         /// Gets the stepMember if it is a Variable.
         /// </summary>
-        public Result<VariableName> AsVariableName(string propertyName) =>
-            Option.TryPickT0(out var vn, out _)?
-                vn :
-                Result.Failure<VariableName>($"{propertyName} was a {MemberType}, not a Variable");
-
-        /// <summary>
-        /// Gets the stepMember if it is an argument.
-        /// </summary>
-        public Result<IFreezableStep> AsArgument(string propertyName) =>
-            Option.TryPickT1(out var fs, out _)?
-                Result.Success(fs) :
-                Result.Failure<IFreezableStep>($"{propertyName} was a {MemberType}, not an argument");
-
-        /// <summary>
-        /// Gets the stepMember if it is a listArgument.
-        /// </summary>
-        public Result<IReadOnlyList<IFreezableStep>> AsListArgument(string propertyName) =>
-            Option.TryPickT2(out var l, out _)?
-                Result.Success(l) :
-                Result.Failure<IReadOnlyList<IFreezableStep>>($"{propertyName} was a {MemberType}, not an list argument");
-
-        /// <summary>
-        /// Tries to convert a step member of one type to one of another.
-        /// </summary>
-        public Result<StepMember, IErrorBuilder> TryConvert(MemberType newMemberType, bool convertStepListToSequence)
+        public Result<VariableName, IError> AsVariableName(string propertyName)
         {
-            if (newMemberType == MemberType)
-                return this;
-            else if(newMemberType == MemberType.Step)
-                return new StepMember(ConvertToStep(convertStepListToSequence));
+            if (Option.TryPickT0(out var vn, out _))
+                return Result.Success<VariableName, IError>(vn);
 
-            return new ErrorBuilder($"Could not convert {MemberType} to {newMemberType}", ErrorCode.InvalidCast);
-
+            return Result.Failure<VariableName, IError>(
+                ErrorHelper.WrongParameterTypeError(propertyName, MemberType, MemberType.VariableName).WithLocation(Location));
         }
+
+        /// <summary>
+        /// Gets the stepMember if it is a freezable step.
+        /// </summary>
+        public Result<IFreezableStep, IError> AsStep(string propertyName)
+        {
+            if (Option.TryPickT1(out var s, out _))
+                return Result.Success<IFreezableStep, IError>(s);
+
+            return Result.Failure<IFreezableStep, IError>(
+                ErrorHelper.WrongParameterTypeError(propertyName, MemberType, MemberType.Step).WithLocation(Location));
+        }
+
+        /// <summary>
+        /// Gets the stepMember if it is a list of freezable steps.
+        /// </summary>
+        public Result<IReadOnlyList<IFreezableStep>, IError> AsStepList(string propertyName)
+        {
+            if (Option.TryPickT2(out var l, out _))
+                return Result.Success<IReadOnlyList<IFreezableStep>, IError>(l);
+
+            return Result.Failure<IReadOnlyList<IFreezableStep>, IError>(
+                ErrorHelper.WrongParameterTypeError(propertyName, MemberType, MemberType.StepList).WithLocation(Location));
+        }
+
+        ///// <summary>
+        ///// Tries to convert a step member of one type to one of another.
+        ///// </summary>
+        //public Result<FreezableStepProperty, IErrorBuilder> TryConvert(MemberType newMemberType, bool convertStepListToSequence)
+        //{
+        //    if (newMemberType == MemberType)
+        //        return this;
+        //    else if(newMemberType == MemberType.Step)
+        //        return new FreezableStepProperty(Opt.FromT1(ConvertToStep(convertStepListToSequence)), Location);
+
+        //    return new ErrorBuilder($"Could not convert {MemberType} to {newMemberType}", ErrorCode.InvalidCast);
+
+        //}
 
         /// <summary>
         /// Tries to convert this step member to a FreezableStep
@@ -132,39 +144,39 @@ namespace Reductech.EDR.Core.Internal
             return r;
 
 
-            static IFreezableStep MapStepList(IReadOnlyList<IFreezableStep> stepList, bool convertStepListToSequence)
+            IFreezableStep MapStepList(IReadOnlyList<IFreezableStep> stepList, bool convertStepListToSequence1)
             {
-                if (stepList.Any() && stepList.All(x => x is ConstantFreezableStep cfs && cfs.Value is Entities.Entity))
+                if (stepList.Any() && stepList.All(x => x is ConstantFreezableStep cfs && cfs.Value.IsT6))
                 {
                     var entities = stepList
                         .Select(x => (ConstantFreezableStep) x)
-                        .Select(x => (Entities.Entity) x.Value).ToList();
+                        .Select(x => x.Value.AsT6).ToList();
 
                     var entityStream = EntityStream.Create(entities);
 
                     var c = new ConstantFreezableStep(entityStream);
                     return c;
                 }
-                else if (convertStepListToSequence)
+                else if (convertStepListToSequence1)
                     return MapStepListToSequence(stepList);
                 else return MapStepListToArray(stepList);
             }
 
-            static IFreezableStep MapStepListToArray(IReadOnlyList<IFreezableStep> stepList)
+            IFreezableStep MapStepListToArray(IReadOnlyList<IFreezableStep> stepList)
             {
-                var array = ArrayStepFactory.CreateFreezable(stepList, null);
+                var array = ArrayStepFactory.CreateFreezable(stepList, null, Location);
                 return array;
             }
 
-            static IFreezableStep MapStepListToSequence(IReadOnlyList<IFreezableStep> stepList)
+            IFreezableStep MapStepListToSequence(IReadOnlyList<IFreezableStep> stepList)
             {
-                var array = SequenceStepFactory.CreateFreezable(stepList, null);
+                var array = SequenceStepFactory.CreateFreezable(stepList, null, Location);
                 return array;
             }
 
-            static IFreezableStep MapVariableName(VariableName vn)
+            IFreezableStep MapVariableName(VariableName vn)
             {
-                var getVariableStep = GetVariableStepFactory.CreateFreezable(vn);
+                var getVariableStep = GetVariableStepFactory.CreateFreezable(vn, Location);
                 return getVariableStep;
             }
         }
@@ -188,7 +200,7 @@ namespace Reductech.EDR.Core.Internal
         public override string ToString() => new {MemberType, Value=MemberString}.ToString()!;
 
         /// <inheritdoc />
-        public bool Equals(StepMember? other)
+        public bool Equals(FreezableStepProperty? other)
         {
             if (other is null) return false;
             if (ReferenceEquals(this, other)) return true;
@@ -203,11 +215,11 @@ namespace Reductech.EDR.Core.Internal
 
             static bool ListsAreEqual(IEnumerable<IFreezableStep> a1, IEnumerable<IFreezableStep> a2)
             {
-                if (a1 is null)
-                    return a2 is null;
+                //if (a1 is null)
+                //    return a2 is null;
 
-                if (a2 is null)
-                    return false;
+                //if (a2 is null)
+                //    return false;
 
                 return a1.SequenceEqual(a2);
             }
@@ -216,7 +228,7 @@ namespace Reductech.EDR.Core.Internal
 
 
         /// <inheritdoc />
-        public override bool Equals(object? obj) => ReferenceEquals(this, obj) || obj is StepMember other && Equals(other);
+        public override bool Equals(object? obj) => ReferenceEquals(this, obj) || obj is FreezableStepProperty other && Equals(other);
 
         /// <inheritdoc />
         public override int GetHashCode() => Option.Match(x => x.GetHashCode(), x => x.GetHashCode(), x => x.Count);
@@ -224,11 +236,11 @@ namespace Reductech.EDR.Core.Internal
         /// <summary>
         /// Equals operator
         /// </summary>
-        public static bool operator ==(StepMember? left, StepMember? right) => Equals(left, right);
+        public static bool operator ==(FreezableStepProperty? left, FreezableStepProperty? right) => Equals(left, right);
 
         /// <summary>
         /// Not Equals operator
         /// </summary>
-        public static bool operator !=(StepMember? left, StepMember? right) => !Equals(left, right);
+        public static bool operator !=(FreezableStepProperty? left, FreezableStepProperty? right) => !Equals(left, right);
     }
 }

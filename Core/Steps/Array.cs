@@ -67,8 +67,7 @@ namespace Reductech.EDR.Core.Steps
         protected override Result<ITypeReference, IError> GetMemberType(FreezableStepData freezableStepData, TypeResolver typeResolver)
         {
             var result =
-                freezableStepData.GetListArgument(nameof(Array<object>.Elements), TypeName)
-                    .MapError(x=>x.WithLocation(this, freezableStepData))
+                freezableStepData.GetStepList(nameof(Array<object>.Elements), TypeName)
                     .Bind(x => x.Select(r => r.TryGetOutputTypeReference(typeResolver)).Combine(ErrorList.Combine))
                     .Bind(x => MultipleTypeReference.TryCreate(x, TypeName)
                     .MapError(e=>e.WithLocation(this, freezableStepData)));
@@ -80,16 +79,16 @@ namespace Reductech.EDR.Core.Steps
         /// <summary>
         /// Create a new Freezable Array
         /// </summary>
-        public static IFreezableStep CreateFreezable(IEnumerable<IFreezableStep> elements, Configuration? configuration)
+        public static IFreezableStep CreateFreezable(IEnumerable<IFreezableStep> elements, Configuration? configuration, IErrorLocation location)
         {
-            var dict = new Dictionary<string, IReadOnlyList<IFreezableStep>>
+            var dict = new Dictionary<string, FreezableStepProperty>
             {
-                {nameof(Array<object>.Elements), elements.ToList()}
+                {nameof(Array<object>.Elements), new FreezableStepProperty(elements.ToList(), location)}
             };
 
-            var fpd = new FreezableStepData(null, null, dict);
+            var fpd = new FreezableStepData( dict, location);
 
-            return new CompoundFreezableStep(Instance, fpd, configuration);
+            return new CompoundFreezableStep(Instance.TypeName, fpd, configuration);
         }
     }
 }

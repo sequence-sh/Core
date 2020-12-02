@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using YamlDotNet.Serialization;
+using Reductech.EDR.Core.Attributes;
 
 namespace Reductech.EDR.Core
 {
@@ -12,25 +12,25 @@ namespace Reductech.EDR.Core
         /// <summary>
         /// Additional requirements, beyond the default for this step.
         /// </summary>
-        [YamlMember(Order = 1)]
+        [ConfigProperty(Order = 1)]
         public List<Requirement>? AdditionalRequirements { get; set; }
 
         /// <summary>
         /// Tags that the target machine must have (defined in a the config file) for this to be run on that machine.
         /// </summary>
-        [YamlMember(Order = 2)]
+        [ConfigProperty(Order = 2)]
         public List<string>? TargetMachineTags { get; set; }
 
         /// <summary>
         /// Conditional true, this step will not be split into multiple steps.
         /// </summary>
-        [YamlMember(Order = 3)]
+        [ConfigProperty(Order = 3)]
         public bool DoNotSplit { get; set; }
 
         /// <summary>
         /// The priority of this step. Steps with higher priorities will be run first.
         /// </summary>
-        [YamlMember(Order = 5)]
+        [ConfigProperty(Order = 5)]
         public byte? Priority { get; set; }
 
         /// <summary>

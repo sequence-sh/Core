@@ -57,7 +57,13 @@ namespace Reductech.EDR.Core.Internal
         public VariableName CreateChild(int argNumber) => new VariableName(Name + "ARG" + argNumber);
 
         /// <inheritdoc />
-        public override string ToString() => $"<{Name}>";
+        public override string ToString() => Serialize();
+
+        /// <summary>
+        /// Serialize this VariableName
+        /// </summary>
+        /// <returns></returns>
+        public string Serialize()=> $"<{Name}>";
 
         /// <summary>
         /// Ensures that this variable name is not reserved

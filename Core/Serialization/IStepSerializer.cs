@@ -1,4 +1,4 @@
-﻿using CSharpFunctionalExtensions;
+﻿using System.Collections.Generic;
 using Reductech.EDR.Core.Internal;
 
 namespace Reductech.EDR.Core.Serialization
@@ -9,8 +9,9 @@ namespace Reductech.EDR.Core.Serialization
     public interface IStepSerializer
     {
         /// <summary>
-        /// Serialize this data as a step of this type.
+        /// Serialize a step according to it's properties.
         /// </summary>
-        Result<string> TrySerialize(FreezableStepData data);
+        string Serialize(IEnumerable<StepProperty> stepProperties);
+
     }
 }

@@ -5,7 +5,7 @@ using CSharpFunctionalExtensions;
 using FluentAssertions;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
-using Reductech.EDR.Core.Serialization;
+using Reductech.EDR.Core.Parser;
 using Reductech.EDR.Core.Util;
 using Reductech.Utilities.Testing;
 using Xunit;
@@ -68,11 +68,11 @@ namespace Reductech.EDR.Core.TestHarness
 
                 testOutputHelper.WriteLine(Yaml);
 
-                var deserializeResult = YamlMethods.DeserializeFromYaml(Yaml, sfs);
+                var deserializeResult = SequenceParsing.ParseSequence(Yaml);
 
                 deserializeResult.ShouldBeSuccessful(x => x.AsString);
 
-                var freezeResult = deserializeResult.Value.TryFreeze();
+                var freezeResult = deserializeResult.Value.TryFreeze(sfs);
                 freezeResult.ShouldBeSuccessful(x => x.AsString);
 
                 return freezeResult.Value;

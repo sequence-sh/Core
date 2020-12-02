@@ -1,9 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Internal;
-using Reductech.EDR.Core.Util;
 
 namespace Reductech.EDR.Core.Serialization
 {
@@ -15,31 +13,45 @@ namespace Reductech.EDR.Core.Serialization
         /// <summary>
         /// Create a new StepSerializer
         /// </summary>
-        public StepSerializer(params IStepSerializerComponent[] components) => Components = components;
+        public StepSerializer(string typeName, params ISerializerBlock[] components)
+        {
+            TypeName = typeName;
+            Blocks = components;
+        }
+
+        /// <summary>
+        /// The name of the step to serialize
+        /// </summary>
+        public string TypeName { get; }
+
+        /// <inheritdoc />
+        public override string ToString() => TypeName;
 
         /// <summary>
         /// The component to use.
         /// </summary>
-        public IReadOnlyCollection<IStepSerializerComponent> Components { get; }
+        public IReadOnlyCollection<ISerializerBlock> Blocks { get; }
+
 
         /// <inheritdoc />
-        public Result<string> TrySerialize(FreezableStepData data)
+        public string Serialize(IEnumerable<StepProperty> stepProperties)
         {
-            StringBuilder sb = new StringBuilder();
+            var dict = stepProperties.
+                ToDictionary(x => x.Name);
 
-            foreach (var serializerBlock in Components.Select(x => x.SerializerBlock).WhereNotNull())
-            {
-                var r = serializerBlock.TryGetText(data);
 
-                if (r.IsFailure)
-                    return r;
-                sb.Append(r.Value);
-            }
+            var result = Blocks
+                .Select(x => x.TryGetSegmentText(dict))
+                .Combine();
 
-            if (sb.Length == 0)
-                return Result.Failure<string>("Serialized string was empty");
+            if (result.IsSuccess) //The custom serialization worked
+                return string.Join("", result.Value);
 
-            return sb.ToString();
+            var defaultSerializer = new FunctionSerializer(TypeName);
+
+            var r = defaultSerializer.Serialize(dict.Values);
+
+            return r;
         }
     }
 }

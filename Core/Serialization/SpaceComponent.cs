@@ -1,4 +1,5 @@
-﻿using CSharpFunctionalExtensions;
+﻿using System.Collections.Generic;
+using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Internal;
 
 namespace Reductech.EDR.Core.Serialization
@@ -6,21 +7,16 @@ namespace Reductech.EDR.Core.Serialization
     /// <summary>
     /// Include a required space in serialization.
     /// </summary>
-    public class SpaceComponent : IStepSerializerComponent, ISerializerBlock//, IDeserializerBlock
+    public class SpaceComponent :ISerializerBlock
     {
+        private SpaceComponent() { }
+
         /// <summary>
-        /// Create a new Space Component.
+        /// The instance
         /// </summary>
-        public SpaceComponent()
-        {
-
-        }
-
+        public static SpaceComponent Instance { get; } = new SpaceComponent();
 
         /// <inheritdoc />
-        public ISerializerBlock? SerializerBlock => this;
-
-        /// <inheritdoc />
-        public Result<string> TryGetText(FreezableStepData data) => " ";
+        public Result<string> TryGetSegmentText(IReadOnlyDictionary<string, StepProperty> dictionary) => " ";
     }
 }
