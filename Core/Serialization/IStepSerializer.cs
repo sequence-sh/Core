@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 using Reductech.EDR.Core.Internal;
 
 namespace Reductech.EDR.Core.Serialization
@@ -9,9 +11,9 @@ namespace Reductech.EDR.Core.Serialization
     public interface IStepSerializer
     {
         /// <summary>
-        /// Serialize a step according to it's properties.
+        /// SerializeAsync a step according to it's properties.
         /// </summary>
-        string Serialize(IEnumerable<StepProperty> stepProperties);
+        Task<string> SerializeAsync(IEnumerable<StepProperty> stepProperties, CancellationToken cancellationToken);
 
     }
 }

@@ -18,12 +18,12 @@ namespace Reductech.EDR.Core.Serialization
     //    /// The name of the property.
     //    /// </summary>
     //    public string PropertyName { get; }
-    //    //.Bind(Serialize);
+    //    //.Bind(SerializeAsync);
 
     //    /// <summary>
-    //    /// Serialize a variable name.
+    //    /// SerializeAsync a variable name.
     //    /// </summary>
-    //    public static string Serialize(VariableName vn)
+    //    public static string SerializeAsync(VariableName vn)
 
 
     //    /// <inheritdoc />
@@ -35,7 +35,7 @@ namespace Reductech.EDR.Core.Serialization
     //        dictionary[PropertyName].SerializeValue();
 
 
-    //        return Serialize();
+    //        return SerializeAsync();
     //    }
     //}
 }

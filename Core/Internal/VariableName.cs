@@ -60,7 +60,7 @@ namespace Reductech.EDR.Core.Internal
         public override string ToString() => Serialize();
 
         /// <summary>
-        /// Serialize this VariableName
+        /// SerializeAsync this VariableName
         /// </summary>
         /// <returns></returns>
         public string Serialize()=> $"<{Name}>";

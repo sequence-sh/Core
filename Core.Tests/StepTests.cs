@@ -121,11 +121,8 @@ namespace Reductech.EDR.Core.Tests
                 yield return new StepTestCase("Foreach <Foo> in ['Hello'; 'World']; Print 'Farewell'; Print <Foo>",
                     new ForEach<string>
                     {
-                        Action = Sequence(new[]
-                            {
-                                Print(Constant("Farewell")),
-                                Print(GetVariable<string>(FooVariableName)),
-                            }),
+                        Action = Sequence(Print(Constant("Farewell")),
+                                Print(GetVariable<string>(FooVariableName))),
                         Array = Array(Constant("Hello"),
                             Constant("World")),
                         Variable = FooVariableName
@@ -556,12 +553,8 @@ Two,The second number"),
                         }
                     };
 
-                var text = Step.Serialize();
+                var text = await Step.SerializeAsync(CancellationToken.None);
 
-                // unfrozen = AddConfigurationToAllSteps(unfrozen);
-
-
-                //var yaml = await unfrozen.SerializeToYamlAsync(CancellationToken.None);
                 outputHelper.WriteLine(text);
                 var runResult = await yamlRunner.RunSequenceFromTextAsync(text, CancellationToken.None);
 

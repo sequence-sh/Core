@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
@@ -73,8 +74,9 @@ namespace Reductech.EDR.Core.Internal
         /// <inheritdoc />
         public Type OutputType => typeof(T);
 
+        /// <param name="cancellationToken"></param>
         /// <inheritdoc />
-        public string Serialize()
+        public async Task<string> SerializeAsync(CancellationToken cancellationToken)
         {
             return Value switch
             {
@@ -85,11 +87,23 @@ namespace Reductech.EDR.Core.Internal
                 Enum e => new Enumeration(e.GetType().Name, e.ToString()).ToString(),
                 DateTime dt => dt.ToString("O"),
                 Entities.Entity ent => ent.Serialize(),
-                EntityStream es => "EntityStream",//TODO fix
+                EntityStream es => await SerializeEntityStream(es),
                 DataStream ds =>ds.Serialize(),
                 //TODO list
                 _ => throw new Exception($"Cannot unfreeze {typeof(T)}")
             };
+
+
+            static async Task<string> SerializeEntityStream(EntityStream entityStream)
+            {
+                var entities = await entityStream.SourceEnumerable
+                    .Select(x=>x.Serialize())
+                    .ToListAsync();
+
+                var s = SerializationMethods.SerializeList(entities);
+
+                return s;
+            }
         }
 
         /// <inheritdoc />

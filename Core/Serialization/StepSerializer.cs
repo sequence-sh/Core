@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Internal;
 
@@ -34,14 +36,14 @@ namespace Reductech.EDR.Core.Serialization
 
 
         /// <inheritdoc />
-        public string Serialize(IEnumerable<StepProperty> stepProperties)
+        public  async Task<string> SerializeAsync(IEnumerable<StepProperty> stepProperties, CancellationToken cancellationToken)
         {
             var dict = stepProperties.
                 ToDictionary(x => x.Name);
 
 
-            var result = Blocks
-                .Select(x => x.TryGetSegmentText(dict))
+            var result = await Blocks
+                .Select(x => x.TryGetSegmentTextAsync(dict, cancellationToken))
                 .Combine();
 
             if (result.IsSuccess) //The custom serialization worked
@@ -49,7 +51,7 @@ namespace Reductech.EDR.Core.Serialization
 
             var defaultSerializer = new FunctionSerializer(TypeName);
 
-            var r = defaultSerializer.Serialize(dict.Values);
+            var r = await defaultSerializer.SerializeAsync(dict.Values, cancellationToken);
 
             return r;
         }

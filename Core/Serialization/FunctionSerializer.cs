@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using Reductech.EDR.Core.Internal;
 
 namespace Reductech.EDR.Core.Serialization
@@ -24,14 +26,13 @@ namespace Reductech.EDR.Core.Serialization
 
 
         /// <inheritdoc />
-        public string Serialize(IEnumerable<StepProperty> stepProperties)
+        public async Task<string> SerializeAsync(IEnumerable<StepProperty> stepProperties, CancellationToken cancellationToken)
         {
             var sb = new StringBuilder();
             sb.Append(Name);
             sb.Append("(");
 
             var first = true;
-
 
             foreach (var stepProperty in stepProperties.OrderBy(x => x.Index))
             {
@@ -43,7 +44,7 @@ namespace Reductech.EDR.Core.Serialization
                 sb.Append(stepProperty.Name);
                 sb.Append(" = ");
 
-                sb.Append(stepProperty.SerializeValue());
+                sb.Append( await stepProperty.SerializeValueAsync(cancellationToken));
             }
             sb.Append(")");
 

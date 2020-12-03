@@ -97,7 +97,7 @@ namespace Reductech.EDR.Core.Entities
 
 
         /// <summary>
-        /// Serialize this record.
+        /// SerializeAsync this record.
         /// </summary>
         /// <returns></returns>
         public string Serialize()

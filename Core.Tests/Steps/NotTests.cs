@@ -35,7 +35,7 @@ namespace Reductech.EDR.Core.Tests.Steps
         {
             get
             {
-                yield return new SerializeCase("Serialize", new Not {Boolean = Constant(true)},
+                yield return new SerializeCase("SerializeAsync", new Not {Boolean = Constant(true)},
                     "not(True)");
             }
         }

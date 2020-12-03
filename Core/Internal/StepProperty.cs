@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using OneOf;
 using Reductech.EDR.Core.Serialization;
 
@@ -17,27 +18,54 @@ namespace Reductech.EDR.Core.Internal
             Value = value;
         }
 
+        /// <summary>
+        /// The name of the property
+        /// </summary>
         public string Name { get;  }
+        /// <summary>
+        /// The position of this property among the other properties
+        /// </summary>
         public int Index { get;  }
+
+        /// <summary>
+        /// The value of the property
+        /// </summary>
         public OneOf<VariableName, IStep, IReadOnlyList<IStep>> Value { get;  }
 
         /// <inheritdoc />
-        public override string ToString() => Name + " = " + SerializeValue();
+        public override string ToString() => Name + " = " + Value.Match(x=>x.ToString(), x=>x.ToString(), x=>x.ToString());
 
         /// <summary>
         /// Serialize the property value
         /// </summary>
-        public string SerializeValue()
+        public async Task<string> SerializeValueAsync(CancellationToken cancellationToken)
         {
-            return Value.Match(vn=>vn.Serialize(),
-                x => x.Serialize(),
-                SerializeList);
+            var result = await
+            Value.Match<Task<string>> (vn => Task.FromResult(vn.Serialize()),
+                async x =>
+                {
+                    var r = await x.SerializeAsync(cancellationToken);
+                    return r;
+                },
+                async l =>
+                {
+                    var r = await SerializeList(l);
+                    return r;
+                });
 
-            static string SerializeList(IReadOnlyList<IStep> list)
+            return result;
+
+            async Task<string> SerializeList(IReadOnlyList<IStep> list)
             {
-                var elements = list.Select(x=>x.Serialize());
+                var l = new List<string>();
 
-                return SerializationMethods.SerializeList(elements);
+                foreach (var s in list)
+                {
+                    var r = await s.SerializeAsync(cancellationToken);
+                    l.Add(r);
+                }
+
+                return SerializationMethods.SerializeList(l);
             }
         }
 

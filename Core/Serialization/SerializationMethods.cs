@@ -9,14 +9,14 @@ namespace Reductech.EDR.Core.Serialization
     public static class SerializationMethods
     {
         ///// <summary>
-        ///// Serialize a constant freezable step. Used in short form serialization.
+        ///// SerializeAsync a constant freezable step. Used in short form serialization.
         ///// </summary>
-        //public static Result<string> TrySerializeConstant(ConstantFreezableStep cfp) => Serialize(cfp.Value);
+        //public static Result<string> TrySerializeConstant(ConstantFreezableStep cfp) => SerializeAsync(cfp.Value);
 
         ///// <summary>
-        ///// Serialize a value.
+        ///// SerializeAsync a value.
         ///// </summary>
-        //private static Result<string> Serialize(object value)
+        //private static Result<string> SerializeAsync(object value)
         //{
         //    if (value is string s)
         //        return TrySerializeShortFormString(s);
@@ -30,7 +30,7 @@ namespace Reductech.EDR.Core.Serialization
         //    }
 
         //    if (value is Entity entity)
-        //        return entity.Serialize();
+        //        return entity.SerializeAsync();
 
         //    if (value is Stream)
         //        return Result.Failure<string>("Streams cannot be serialized in short form");
@@ -48,7 +48,7 @@ namespace Reductech.EDR.Core.Serialization
         ///// </summary>
         //public static Result<string> TrySerializeSimpleList(IEnumerable<object> values)
         //{
-        //    return values.Select(Serialize)
+        //    return values.Select(SerializeAsync)
         //            .Combine()
         //            .Map(x => string.Join(", ", x))
         //            .Map(x => $"[{x}]");
@@ -75,7 +75,7 @@ namespace Reductech.EDR.Core.Serialization
 
         //private static object ConvertToSerializableType(Entity entity)
         //{
-        //    var shortFormEntity = entity.Serialize();
+        //    var shortFormEntity = entity.SerializeAsync();
         //    if (shortFormEntity.IsSuccess)
         //        return shortFormEntity.Value;
 
@@ -146,7 +146,7 @@ namespace Reductech.EDR.Core.Serialization
         //}
 
         /// <summary>
-        /// Serialize a list
+        /// SerializeAsync a list
         /// </summary>
         public static string SerializeList(IEnumerable<string> serializedMembers)
         {

@@ -104,7 +104,7 @@ namespace Reductech.EDR.Core.Internal
         }
 
         /// <summary>
-        /// Serialize a value.
+        /// SerializeAsync a value.
         /// </summary>
         public static string WriteValue(Option value)
         {

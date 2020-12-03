@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Util;
@@ -24,8 +26,11 @@ namespace Reductech.EDR.Core.Serialization
         public string PropertyName { get; }
 
         /// <inheritdoc />
-        public Result<string> TryGetSegmentText(IReadOnlyDictionary<string, StepProperty> dictionary)
+        public async Task<Result<string>> TryGetSegmentTextAsync(IReadOnlyDictionary<string, StepProperty> dictionary,
+            CancellationToken cancellationToken)
         {
+            await Task.CompletedTask;
+
             return dictionary.TryFindOrFail(PropertyName, $"Missing Property {PropertyName}")
                 .Bind(x => x.Value.Match(
                     _ => Result.Failure<string>("Operator is VariableName"),

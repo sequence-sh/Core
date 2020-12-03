@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Reductech.EDR.Core.Enums;
@@ -279,11 +280,9 @@ Value: 'I have config too'");
             /// <inheritdoc />
             public async Task ExecuteAsync(ITestOutputHelper testOutputHelper)
             {
-                var text = Step.Serialize();
+                var text = await Step.SerializeAsync(CancellationToken.None);
 
                 text.Should().Be(ExpectedText);
-
-                await Task.CompletedTask;
             }
         }
     }

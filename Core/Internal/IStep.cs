@@ -43,9 +43,10 @@ namespace Reductech.EDR.Core.Internal
         Type OutputType { get; }
 
         /// <summary>
-        /// Serialize this step.
+        /// SerializeAsync this step.
         /// </summary>
-        string Serialize();
+        /// <param name="cancellationToken"></param>
+        Task<string> SerializeAsync(CancellationToken cancellationToken);
 
     }
 

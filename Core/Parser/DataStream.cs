@@ -21,7 +21,9 @@ namespace Reductech.EDR.Core.Parser
         //TODO store encoding
 
         //TODO OneOf<Stream, String>
-
+        /// <summary>
+        /// SerializeAsync this DataStream
+        /// </summary>
         public string Serialize()
         {
             Stream.Position = 0;

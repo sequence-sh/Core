@@ -17,7 +17,7 @@
 //    public static class YamlMethods
 //    {
 //        /// <summary>
-//        /// Serialize this step to yaml.
+//        /// SerializeAsync this step to yaml.
 //        /// </summary>
 //        public static async Task<string> SerializeToYamlAsync(this IFreezableStep step, CancellationToken cancellationToken)
 //        {
@@ -33,7 +33,7 @@
 
 //            //var serializer = builder.Build();
 
-//            //var r = serializer.Serialize(obj).Trim();
+//            //var r = serializer.SerializeAsync(obj).Trim();
 
 //            //return r;
 //        }
@@ -127,7 +127,7 @@
 
 
 //        private static Task<object> ToSimpleObject(FreezableStepProperty member, StepFactoryStore stepFactoryStore, CancellationToken cancellationToken) =>
-//            member.Match(x=> Task.FromResult<object>(VariableNameComponent.Serialize(x).Value),
+//            member.Match(x=> Task.FromResult<object>(VariableNameComponent.SerializeAsync(x).Value),
 //                x=> SimplifyProcessAsync(x, false, stepFactoryStore, cancellationToken),
 //                l=> SimplifyProcessListAsync(l, stepFactoryStore, cancellationToken));
 

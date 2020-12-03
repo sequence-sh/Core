@@ -23,7 +23,7 @@
 //        public Result<string> TryGetText(FreezableStepData data, StepFactoryStore stepFactoryStore) =>
 //            data.InitialSteps
 //                .TryFindOrFail(PropertyName, null)
-//                .Bind(x => x.Match(VariableNameComponent.Serialize,
+//                .Bind(x => x.Match(VariableNameComponent.SerializeAsync,
 //                    step=> TrySerialize(step, stepFactoryStore),
 //                    _ => Result.Failure<string>("Cannot serialize list")
 
