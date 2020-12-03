@@ -111,7 +111,7 @@ namespace Reductech.EDR.Core.Internal
             return
 
                 value.Match(
-                    s =>"\"" + SerializationMethods.EscapeDoubleQuotes(s) + "\"",
+                    SerializationMethods.DoubleQuote,
                     i => i.ToString(),
                     d => d.ToString("G17"),
                     b => b.ToString(),
@@ -119,7 +119,7 @@ namespace Reductech.EDR.Core.Internal
                     dt => dt.ToString("O"),
                     entity => entity.Serialize(),
                     _ => "EntityStream", //TODO fix
-                    ds => "DataStream" //TODO fix
+                    ds => ds.Serialize() //TODO fix
                 );
         }
 

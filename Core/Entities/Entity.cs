@@ -113,14 +113,14 @@ namespace Reductech.EDR.Core.Entities
                 value.Value.Switch(_=>{},
                     singleValue=>
                     {
-                        var v = SerializationMethods.EscapeDoubleQuotes(singleValue.Original);
+                        var v = SerializationMethods.DoubleQuote(singleValue.Original);
                         results.Add($"{key} = {v}");
 
                     },
                     multiValue=>
                     {
                         var v = multiValue.Select(x => x.Original)
-                            .Select(SerializationMethods.EscapeDoubleQuotes);
+                            .Select(SerializationMethods.DoubleQuote);
 
                         var r = SerializationMethods.SerializeList(v);
                         results.Add(r);

@@ -78,7 +78,7 @@ namespace Reductech.EDR.Core.Internal
         {
             return Value switch
             {
-                string s => "\"" + SerializationMethods.EscapeDoubleQuotes(s) + "\"",
+                string s => SerializationMethods.DoubleQuote(s),
                 int i => i.ToString(),
                 double d => d.ToString("G17"),
                 bool b =>b.ToString(),
@@ -92,5 +92,7 @@ namespace Reductech.EDR.Core.Internal
             };
         }
 
+        /// <inheritdoc />
+        public object ValueObject => Value;
     }
 }

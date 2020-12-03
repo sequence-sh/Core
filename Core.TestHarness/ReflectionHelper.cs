@@ -10,6 +10,7 @@ using Namotion.Reflection;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.Internal;
+using Reductech.EDR.Core.Serialization;
 using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.Util;
 using Xunit.Sdk;
@@ -100,9 +101,17 @@ namespace Reductech.EDR.Core.TestHarness
 
             if (freezable is ConstantFreezableStep cfs)
                 return ConstantFreezableStep.WriteValue(cfs.Value);
-            else if (freezable.StepName == DoNothingStepFactory.Instance.TypeName)
+            else if (step is DoNothing)
             {
                 return DoNothingStepFactory.Instance.TypeName + "()";
+            }
+            else if (freezable is CompoundFreezableStep cs && freezable.StepName == ArrayStepFactory.Instance.TypeName)
+            {
+                return
+                SerializationMethods.SerializeList(
+                    cs.FreezableStepData
+                        .StepProperties[nameof(Steps.Array<object>.Elements)]
+                        .StepList.Value.Cast<ConstantFreezableStep>().Select(x => x.ToString()));
             }
 
             throw new NotImplementedException("Cannot get string from step");

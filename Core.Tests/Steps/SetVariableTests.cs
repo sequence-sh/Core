@@ -28,13 +28,21 @@ namespace Reductech.EDR.Core.Tests.Steps
 
 
                 yield return new StepCase("Set an existing variable",
-                    new SetVariable<int>
+
+                    new Sequence<Unit>
                     {
-                        Value = Constant(42),
-                        Variable = new VariableName("Foo")
+                        InitialSteps = new List<IStep<Unit>>
+                        {
+                            SetVariable("Foo", 21)
+                        },
+
+                        FinalStep = new SetVariable<int>
+                        {
+                            Value = Constant(42),
+                            Variable = new VariableName("Foo")
+                        }
                     }, Unit.Default
                     )
-                    .WithInitialState("Foo", 21)
                     .WithExpectedFinalState("Foo", 42);
 
             }

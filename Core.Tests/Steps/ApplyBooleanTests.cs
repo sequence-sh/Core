@@ -84,9 +84,7 @@ namespace Reductech.EDR.Core.Tests.Steps
             get
             {
                 yield return new DeserializeCase("Short form with symbols", "true && true", true);
-                //yield return new DeserializeCase("Short form with symbols but not spaces", "true&&true", true); TODO: this fails
-                yield return new DeserializeCase("Short form with and", "true and true", true);
-                yield return new DeserializeCase("Short form with or", "false or true", true);
+                yield return new DeserializeCase("Short form with symbols but not spaces", "true&&true", true);
             }
         }
 

@@ -22,7 +22,6 @@ namespace Reductech.EDR.Core.TestHarness
     /// </summary>
     public interface ICaseThatExecutes : ICase
     {
-        Dictionary<VariableName, object> InitialState { get; }
         Dictionary<VariableName, object> ExpectedFinalState { get; }
 
         public bool IgnoreFinalState { get; set; }

@@ -171,8 +171,8 @@ namespace Reductech.EDR.Core.Internal
             IReadOnlyList<IFreezableStep> freezableStepList,
             StepContext stepContext)
         {
-            var genericType = propertyInfo.PropertyType.GenericTypeArguments.Single();
-            var listType = typeof(List<>).MakeGenericType(genericType);
+            var argument = propertyInfo.PropertyType.GenericTypeArguments.Single();
+            var listType = typeof(List<>).MakeGenericType(argument);
 
             var list = Activator.CreateInstance(listType);
             var errors = new List<IError>();
@@ -184,7 +184,12 @@ namespace Reductech.EDR.Core.Internal
 
                 if(freezeResult.IsFailure)
                     errors.Add(freezeResult.Error);
-                else if (genericType.IsInstanceOfType(freezeResult.Value))
+                else if (freezeResult.Value is IConstantStep constant && argument.IsInstanceOfType(constant.ValueObject))
+                {
+                    var addMethod = listType.GetMethod(nameof(List<object>.Add))!;
+                    addMethod.Invoke(list, new[] { constant.ValueObject });
+                }
+                else if (argument.IsInstanceOfType(freezeResult.Value))
                 {
                     var addMethod = listType.GetMethod(nameof(List<object>.Add))!;
                     addMethod.Invoke(list, new object?[] { freezeResult.Value });
@@ -192,7 +197,7 @@ namespace Reductech.EDR.Core.Internal
                 else
                 {
                     var error = new SingleError(
-                        $"'{CompressSpaces(freezeResult.Value.Name)}' is a '{freezeResult.Value.OutputType.GetDisplayName()}' but it should be a '{genericType.GenericTypeArguments.First().GetDisplayName()}' to be a member of '{parentStep.StepFactory.TypeName}'",
+                        $"'{CompressSpaces(freezeResult.Value.Name)}' is a '{freezeResult.Value.OutputType.GetDisplayName()}' but it should be a '{argument.GenericTypeArguments.First().GetDisplayName()}' to be a member of '{parentStep.StepFactory.TypeName}'",
                         ErrorCode.InvalidCast,
                         new StepErrorLocation(parentStep));
                     errors.Add(error);

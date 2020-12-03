@@ -10,6 +10,7 @@ using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Steps;
+using Reductech.EDR.Core.Util;
 using Xunit;
 using Xunit.Abstractions;
 using Xunit.Sdk;
@@ -120,7 +121,7 @@ namespace Reductech.EDR.Core.TestHarness
                 .BeAssignableTo<IStepFactory>($"{StepName}.Instance should return an IStepFactory");
         }
 
-
+        public static IStep<Unit> SetVariable<TNew>(string name, TNew value)=> new SetVariable<TNew>(){Variable = new VariableName(name), Value = Constant(value)};
         public static Constant<TNew> Constant<TNew>(TNew value) => new Constant<TNew>(value);
 
         public static IStep<List<TNew>> Array<TNew>(params TNew[] elements)=> new Array<TNew>() {Elements = elements.Select(Constant).ToList()};

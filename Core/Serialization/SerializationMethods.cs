@@ -1,11 +1,5 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using CSharpFunctionalExtensions;
-using System.IO;
-using System.Linq;
+﻿using System.Collections.Generic;
 using System.Text;
-using Reductech.EDR.Core.Entities;
-using Entity = Reductech.EDR.Core.Entities.Entity;
 
 namespace Reductech.EDR.Core.Serialization
 {
@@ -166,15 +160,19 @@ namespace Reductech.EDR.Core.Serialization
         }
 
         /// <summary>
-        /// Escape single quotes
+        /// Quote with single quotes
         /// </summary>
-        public static string EscapeSingleQuotes(string s) => s.Replace("'", "''");
+        public static string SingleQuote(string s) => "'" + s.Replace("'", "''") + "'";
 
+        /// <summary>
+        /// Quote with double quotes
+        /// </summary>
+        public static string DoubleQuote(string s) =>
 
-        public static string EscapeDoubleQuotes(string s) => s
+            "\"" + (s
             .Replace("\\", @"\\")
             .Replace("\r", @"\r")
-            .Replace("\n", @"\n");
+            .Replace("\n", @"\n")) + "\"";
 
 
 
