@@ -59,28 +59,53 @@ namespace Reductech.EDR.Core.Parser
             /// <inheritdoc />
             public override Result<FreezableStepProperty, IError> VisitSequence(SequenceParser.SequenceContext context)
             {
-                var members = context.step().Select(VisitStep).ToList();
+                var results = new List<Result<IFreezableStep, IError>>();
+                var lastWasError = false;
 
-                var steps =
-                    members.SkipLast(1)
-                        .Select(x => x.Map(y => y.ConvertToStep()))
-                        .Combine(ErrorList.Combine);
+                foreach (var child in context.children)
+                {
+                    if (child is SequenceParser.StepContext step)
+                    {
+                        results.Add(VisitStep(step).Map(x=>x.ConvertToStep()));
+                        lastWasError = false;
+                    }
+                    else if (child is null)
+                    {
+                        if(!lastWasError)
+                            results.Add(new SingleError("Step was null", ErrorCode.CouldNotParse, new TextPosition(context)));
+                        lastWasError = true;
+                    }
+                    else if (child is ErrorNodeImpl errorNodeImpl)
+                    {
+                        if(!lastWasError)
+                            results.Add(VisitErrorNode(errorNodeImpl).Map(x=>x.ConvertToStep()));
+                        lastWasError = true;
+                    }
+                    else if (child is TerminalNodeImpl)
+                    {
+                        //Skip eof
+                    }
+                    else
+                    {
+                        if(!lastWasError)
+                            results.Add(new SingleError($"Could not parse '{child.GetText()}'", ErrorCode.CouldNotParse, new TextPosition(context)));
+                        lastWasError = true;
+                    }
+                }
 
-                var finalStep = members.Last().Map(x => x.ConvertToStep());
 
-                var errors = new List<IError>();
+                var result = results.Combine(ErrorList.Combine).Map(x=>x.ToList());
 
-                if(steps.IsFailure)
-                    errors.Add(steps.Error);
-                if(finalStep.IsFailure)
-                    errors.Add(finalStep.Error);
-
-                if (errors.Any())
-                    return Result.Failure<FreezableStepProperty, IError>(ErrorList.Combine(errors));
+                if (result.IsFailure) return result.ConvertFailure<FreezableStepProperty>();
 
 
+                if (result.Value.Count == 0)
+                    return new SingleError("Sequence contained no members", ErrorCode.CouldNotParse, new TextPosition(context));
 
-                var sequence = SequenceStepFactory.CreateFreezable(steps.Value, finalStep.Value, null, new TextPosition(context));
+                var sequence = SequenceStepFactory.CreateFreezable(
+                    result.Value.SkipLast(1).ToList(),
+                    result.Value.Last(),
+                    null, new TextPosition(context));
 
                 return new FreezableStepProperty(
                     OneOf<VariableName, IFreezableStep, IReadOnlyList<IFreezableStep>>.FromT1(sequence),
@@ -128,7 +153,7 @@ namespace Reductech.EDR.Core.Parser
 
             /// <inheritdoc />
             public override Result<FreezableStepProperty, IError> VisitErrorNode(IErrorNode node) =>
-                new SingleError(node.GetText(), ErrorCode.CouldNotParse,new TextPosition(node.Symbol));
+                new SingleError($"Could not parse '{node.GetText()}'", ErrorCode.CouldNotParse,new TextPosition(node.Symbol));
 
             /// <inheritdoc />
             public override Result<FreezableStepProperty, IError> VisitSetvariable(SequenceParser.SetvariableContext context)

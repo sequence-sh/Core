@@ -1,6 +1,8 @@
-﻿namespace Reductech.EDR.Core.Internal
+﻿using System;
+
+namespace Reductech.EDR.Core.Internal
 {
-    public sealed class Enumeration
+    public sealed class Enumeration : IEquatable<Enumeration>
     {
         //TODO make a record
         public Enumeration(string type, string value)
@@ -9,13 +11,42 @@
             Value = value;
         }
 
-        public string Type { get; set; }
-        public string Value { get; set; }
+        /// <summary>
+        /// The enum type
+        /// </summary>
+        public string Type { get;  }
+
+        /// <summary>
+        /// The enum value
+        /// </summary>
+        public string Value { get;}
 
         /// <inheritdoc />
-        public override string ToString()
+        public override string ToString() => Type + "." + Value;
+
+
+        /// <inheritdoc />
+        public bool Equals(Enumeration? other)
         {
-            return Type + "." + Value;
+            if (other is null) return false;
+            if (ReferenceEquals(this, other)) return true;
+            return Type == other.Type && Value == other.Value;
         }
+
+        /// <inheritdoc />
+        public override bool Equals(object? obj) => ReferenceEquals(this, obj) || obj is Enumeration other && Equals(other);
+
+        /// <inheritdoc />
+        public override int GetHashCode() => HashCode.Combine(Type, Value);
+
+        /// <summary>
+        /// Equals operator
+        /// </summary>
+        public static bool operator ==(Enumeration? left, Enumeration? right) => Equals(left, right);
+
+        /// <summary>
+        /// Not equals operator
+        /// </summary>
+        public static bool operator !=(Enumeration? left, Enumeration? right) => !Equals(left, right);
     }
 }

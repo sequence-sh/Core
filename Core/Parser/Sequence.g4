@@ -41,7 +41,7 @@ simpleterm			: number
                     | getvariable
                     | entity
                     | array ;
-sequence			:(step | (NEWCOMMAND | DASH) step (NEWCOMMAND step)*)  EOF ;
+sequence			:(step | ((NEWCOMMAND | DASH) step (NEWCOMMAND step)*))  EOF ;
 
 
 /*

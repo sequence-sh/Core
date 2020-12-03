@@ -2,12 +2,14 @@
 using System.Linq;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
+using FluentAssertions;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Util;
 using Reductech.Utilities.Testing;
 using Xunit;
 using Xunit.Abstractions;
+using Xunit.Sdk;
 
 namespace Reductech.EDR.Core.TestHarness
 {
@@ -59,13 +61,19 @@ namespace Reductech.EDR.Core.TestHarness
             /// <inheritdoc />
             public override void CheckUnitResult(Result<Unit, IError> result)
             {
-                result.ShouldBeFailure(ExpectedError);
+                if(result.IsSuccess)
+                    throw new XunitException($"Expected {ExpectedError.AsString} but was successful");
+
+                result.Error.Should().Be(ExpectedError);
             }
 
             /// <inheritdoc />
             public override void CheckOutputResult(Result<TOutput, IError> result)
             {
-                result.ShouldBeFailure(ExpectedError);
+                if (result.IsSuccess)
+                    throw new XunitException($"Expected {ExpectedError.AsString} but was successful");
+
+                result.Error.Should().Be(ExpectedError);
             }
         }
 
