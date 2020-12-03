@@ -67,7 +67,7 @@ namespace Reductech.EDR.Core.Internal
 
             if (!(stepFactory.Value is GetVariableStepFactory)) //GetVariable is allowed to access reserved variables
             {
-                var ensureReservedResult = FreezableStepData.Steps
+                var ensureReservedResult = FreezableStepData.StepProperties
                     .Values.SelectMany(x=>x.VariableName.ToEnumerable())
                     .Select(x => x.EnsureNotReserved())
                 .Combine(ErrorBuilderList.Combine)
@@ -79,7 +79,7 @@ namespace Reductech.EDR.Core.Internal
 
 
             var result = FreezableStepData
-                .Steps.Values
+                .StepProperties.Values
                 .Select(x=>
                     x.Match(TryGetVariableNameVariablesSet, TryGetStepVariablesSet, TryGetStepListVariablesSet))
                 .Combine(ErrorList.Combine)

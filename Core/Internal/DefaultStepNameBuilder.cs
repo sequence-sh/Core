@@ -19,7 +19,7 @@ namespace Reductech.EDR.Core.Internal
         public string GetFromArguments(FreezableStepData freezableStepData, IStepFactory stepFactory)
         {
             var args = string.Join(", ", freezableStepData
-                .Steps
+                .StepProperties
                 .OrderBy(x => x.Key)
                 .Select(x => $"{x.Key}: {x.Value.MemberString}"));
 

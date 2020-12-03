@@ -92,7 +92,7 @@ namespace Reductech.EDR.Core.Tests
         {
             var step = new Sequence<Unit>()
             {
-                Steps = new List<IStep<Unit>>
+                InitialSteps = new List<IStep<Unit>>
                 {
                     new SetVariable<EntityStream>
                     {

@@ -38,10 +38,10 @@ namespace Reductech.EDR.Core.Internal
         public string Serialize() => StepFactory.Serializer.Serialize(AllProperties);
 
         /// <inheritdoc />
-        public string Name => StepFactory.StepNameBuilder.GetFromArguments(FreezableStepData, StepFactory);
+        public string Name => StepFactory.TypeName;
 
         /// <inheritdoc />
-        public override string ToString() => StepFactory.TypeName;
+        public override string ToString() => Name;
 
         /// <summary>
         /// Configuration for this step.

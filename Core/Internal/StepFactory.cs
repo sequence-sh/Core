@@ -104,7 +104,7 @@ namespace Reductech.EDR.Core.Internal
                     .Where(x => x.GetCustomAttribute<StepPropertyBaseAttribute>() != null)
                     .ToDictionary(x=>x.Name!, StringComparer.OrdinalIgnoreCase);
 
-            foreach (var (propertyName, stepMember) in freezeData.Steps)
+            foreach (var (propertyName, stepMember) in freezeData.StepProperties)
             {
                 if (remaining.Remove(propertyName, out var propertyInfo))
                 {

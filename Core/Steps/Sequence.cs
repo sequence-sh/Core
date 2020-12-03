@@ -24,7 +24,7 @@ namespace Reductech.EDR.Core.Steps
             CancellationToken cancellationToken)
         {
 
-            foreach (var step in Steps)
+            foreach (var step in InitialSteps)
             {
                 var r = await step.Run(stateMonad, cancellationToken);
                 if (r.IsFailure)
@@ -40,11 +40,11 @@ namespace Reductech.EDR.Core.Steps
         public override IStepFactory StepFactory => SequenceStepFactory.Instance;
 
         /// <summary>
-        /// The steps of this sequence.
+        /// The steps of this sequence apart from the final step.
         /// </summary>
         [StepListProperty]
         [Required]
-        public IReadOnlyList<IStep<Unit>> Steps { get; set; } = null!;
+        public IReadOnlyList<IStep<Unit>> InitialSteps { get; set; } = null!;
 
         /// <summary>
         /// The final step of the sequence.
@@ -74,7 +74,7 @@ namespace Reductech.EDR.Core.Steps
         protected override ITypeReference GetOutputTypeReference(ITypeReference memberTypeReference) => memberTypeReference;
 
         /// <inheritdoc />
-        public override IStepNameBuilder StepNameBuilder => new StepNameBuilderFromTemplate($"[{nameof(Sequence<object>.Steps)}, {nameof(Sequence<object>.FinalStep)}]");
+        public override IStepNameBuilder StepNameBuilder => new StepNameBuilderFromTemplate($"[{nameof(Sequence<object>.InitialSteps)}, {nameof(Sequence<object>.FinalStep)}]");
 
         /// <inheritdoc />
         protected override Result<ITypeReference, IError> GetMemberType(FreezableStepData freezableStepData, TypeResolver typeResolver) =>
@@ -94,7 +94,7 @@ namespace Reductech.EDR.Core.Steps
         {
             var dict = new Dictionary<string, FreezableStepProperty>()
             {
-                {nameof(Sequence<object>.Steps), new FreezableStepProperty(OneOf<VariableName, IFreezableStep, IReadOnlyList<IFreezableStep>>.FromT2(steps.ToList()), location )},
+                {nameof(Sequence<object>.InitialSteps), new FreezableStepProperty(OneOf<VariableName, IFreezableStep, IReadOnlyList<IFreezableStep>>.FromT2(steps.ToList()), location )},
                 {nameof(Sequence<object>.FinalStep), new FreezableStepProperty(OneOf<VariableName, IFreezableStep, IReadOnlyList<IFreezableStep>>.FromT1(finalStep), location )},
             };
 

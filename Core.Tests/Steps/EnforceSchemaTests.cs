@@ -107,7 +107,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                     return new ErrorCase(name,
                         new Sequence<Unit>
                         {
-                            Steps = new List<IStep<Unit>>
+                            InitialSteps = new List<IStep<Unit>>
                             {
                                 new EntityForEach
                                 {

@@ -59,7 +59,7 @@ namespace Reductech.EDR.Core.Parser
             /// <inheritdoc />
             public override Result<FreezableStepProperty, IError> VisitSequence(SequenceParser.SequenceContext context)
             {
-                var members = context.member().Select(VisitMember).ToList();
+                var members = context.step().Select(VisitStep).ToList();
 
                 var steps =
                     members.SkipLast(1)
@@ -89,16 +89,10 @@ namespace Reductech.EDR.Core.Parser
 
 
             /// <inheritdoc />
-            public override Result<FreezableStepProperty, IError> VisitMember(SequenceParser.MemberContext context)
-            {
-                return VisitChildren(context);
-            }
-
-            /// <inheritdoc />
             public override Result<FreezableStepProperty, IError> VisitArray(SequenceParser.ArrayContext context)
             {
                 var members =
-                    context.member().Select(VisitMember);
+                    context.term().Select(VisitTerm);
 
                 var r = Aggregate(new TextPosition(context),members);
                 return r;
@@ -115,20 +109,22 @@ namespace Reductech.EDR.Core.Parser
             }
 
             /// <inheritdoc />
-            public override Result<FreezableStepProperty, IError> VisitBracketedoperation(SequenceParser.BracketedoperationContext context) => Visit(context.infixoperation());
+            public override Result<FreezableStepProperty, IError> VisitBracketedstep(SequenceParser.BracketedstepContext context) => VisitStep(context.step());
 
             /// <inheritdoc />
             public override Result<FreezableStepProperty, IError> VisitInfixoperation(SequenceParser.InfixoperationContext context)
             {
 
-                var left = VisitMember(context.member(0));
-                var right = VisitMember(context.member(1));
+                var left = VisitTerm(context.term(0));
+                var right = VisitTerm(context.term(1));
                 var operatorSymbol = context.infixoperator().GetText();
 
                 var result = InfixHelper.TryCreateStep(new TextPosition(context), left, right, operatorSymbol);
 
                 return result;
             }
+
+
 
             /// <inheritdoc />
             public override Result<FreezableStepProperty, IError> VisitErrorNode(IErrorNode node) =>
@@ -137,7 +133,7 @@ namespace Reductech.EDR.Core.Parser
             /// <inheritdoc />
             public override Result<FreezableStepProperty, IError> VisitSetvariable(SequenceParser.SetvariableContext context)
             {
-                var member = VisitMember(context.member());
+                var member = VisitTerm(context.term());
 
                 if (member.IsFailure) return member;
 
@@ -202,10 +198,9 @@ namespace Reductech.EDR.Core.Parser
             /// <inheritdoc />
             public override Result<FreezableStepProperty, IError> VisitString(SequenceParser.StringContext context)
             {
-                string s;
-                if (context.DOUBLEQUOTEDSTRING() != null)
-                    s = UnescapeDoubleQuoted(context.DOUBLEQUOTEDSTRING().GetText());
-                else s = UnescapeSingleQuoted(context.SINGLEQUOTEDSTRING().GetText());
+                string s = context.DOUBLEQUOTEDSTRING() != null ?
+                    UnescapeDoubleQuoted(context.DOUBLEQUOTEDSTRING().GetText()):
+                    UnescapeSingleQuoted(context.SINGLEQUOTEDSTRING().GetText());
 
                 var member = new FreezableStepProperty(new ConstantFreezableStep(s), new TextPosition(context) );
 
@@ -297,7 +292,7 @@ namespace Reductech.EDR.Core.Parser
             {
                 var key = context.TOKEN().Symbol.Text;
 
-                var value = VisitMember(context.member());
+                var value = VisitTerm(context.term());
                 if (value.IsFailure) return value.ConvertFailure<(string name, FreezableStepProperty value)>();
 
                 return (key, value.Value);

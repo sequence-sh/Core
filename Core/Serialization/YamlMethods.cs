@@ -4,7 +4,7 @@
 //using System.Threading;
 //using System.Threading.Tasks;
 //using CSharpFunctionalExtensions;
-//using Reductech.EDR.Core.Steps;
+//using Reductech.EDR.Core.InitialSteps;
 //using Reductech.EDR.Core.Internal;
 //using Reductech.EDR.Core.Internal.Errors;
 //using Reductech.EDR.Core.Util;
@@ -94,7 +94,7 @@
 //                case CompoundFreezableStep compound:
 //                {
 //                    if (isTopLevel && compound.StepName == SequenceStepFactory.Instance.TypeName &&
-//                        compound.FreezableStepData.Steps.TryGetValue(nameof(Sequence.Steps), out var stepMember))
+//                        compound.FreezableStepData.InitialSteps.TryGetValue(nameof(Sequence.InitialSteps), out var stepMember))
 //                        return await ToSimpleObject(stepMember, stepFactoryStore, cancellationToken);
 
 //                    if (compound.StepConfiguration == null)//Don't use custom serialization if you have configuration
@@ -114,7 +114,7 @@
 //                    if (compound.StepConfiguration != null)
 //                        expandoObject[ConfigString] = compound.StepConfiguration;
 
-//                    foreach (var (name, m) in compound.FreezableStepData.Steps)
+//                    foreach (var (name, m) in compound.FreezableStepData.InitialSteps)
 //                        expandoObject[name] = await ToSimpleObject(m, stepFactoryStore, cancellationToken);
 
 //                    return expandoObject;

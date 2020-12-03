@@ -22,7 +22,7 @@
 
 //        /// <inheritdoc />
 //        public Result<string> TryGetText(FreezableStepData data, StepFactoryStore stepFactoryStore) =>
-//            data.Steps
+//            data.InitialSteps
 //                .TryFindOrFail(PropertyName, null)
 //                .Bind(x => x.Match(VariableNameComponent.Serialize,
 //                    step=> TrySerialize(step, stepFactoryStore),

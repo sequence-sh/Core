@@ -28,7 +28,7 @@ namespace Reductech.EDR.Core
         public bool DoNotSplit { get; set; }
 
         /// <summary>
-        /// The priority of this step. Steps with higher priorities will be run first.
+        /// The priority of this step. InitialSteps with higher priorities will be run first.
         /// </summary>
         [ConfigProperty(Order = 5)]
         public byte? Priority { get; set; }

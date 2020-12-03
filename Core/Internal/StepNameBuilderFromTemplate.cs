@@ -40,7 +40,7 @@ namespace Reductech.EDR.Core.Internal
             {
                 var variableName = m.Groups["ArgumentName"].Value;
 
-                var p = freezableStepData.Steps
+                var p = freezableStepData.StepProperties
                     .TryFindOrFail(variableName, null)
                     .Map(x => x.Match(vn => vn.ToString(),
                         fp => fp.StepName,

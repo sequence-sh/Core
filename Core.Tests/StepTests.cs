@@ -505,7 +505,7 @@ Two,The second number"),
                 Value = step
             };
 
-        private static Sequence<Unit> Sequence(params IStep<Unit>[] steps)=> new Sequence<Unit>{Steps = steps.SkipLast(1).ToList(), FinalStep = steps.Last()};
+        private static Sequence<Unit> Sequence(params IStep<Unit>[] steps)=> new Sequence<Unit>{InitialSteps = steps.SkipLast(1).ToList(), FinalStep = steps.Last()};
 
 
         private class StepTestCase : ITestBaseCaseParallel

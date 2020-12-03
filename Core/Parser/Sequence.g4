@@ -2,9 +2,9 @@
 /*
  * Parser Rules
  */
-setvariable			: VARIABLENAME EQUALS member;
+setvariable			: VARIABLENAME EQUALS term;
 getvariable         : VARIABLENAME ;
-array				: OPENSQUAREBRACKET ( member ( COMMA member)* )? CLOSESQUAREBRACKET ;
+array				: OPENSQUAREBRACKET ( term ( COMMA term)* )? CLOSESQUAREBRACKET ;
 infixoperator		: DASH
 					| PLUS
 					| ASTERIX
@@ -19,25 +19,29 @@ infixoperator		: DASH
 					| GREATERTHENEQUALS
 					| LESSTHAN
 					| GREATERTHAN ;
-infixoperation		: member infixoperator member ;
-functionmember		: TOKEN EQUALS member ;
+infixoperation		: term infixoperator term ;
+functionmember		: TOKEN EQUALS term ;
 function			: TOKEN OPENBRACKET ( functionmember ( COMMA functionmember)* )? CLOSEBRACKET ;
 entity				: OPENSQUAREBRACKET ( functionmember ( COMMA functionmember)* )? CLOSESQUAREBRACKET ;
-bracketedoperation	: OPENBRACKET infixoperation CLOSEBRACKET ;
+bracketedstep		: OPENBRACKET step CLOSEBRACKET ;
 bool				: TRUE | FALSE ;
 string              : DOUBLEQUOTEDSTRING | SINGLEQUOTEDSTRING ;
 number              : NUMBER ;
 enum                : TOKEN DOT TOKEN ;
-member				: number
+term				: simpleterm
+					| bracketedstep ;
+step				: function
+					| infixoperation
+					| setvariable
+					| term;
+simpleterm			: number
                     | bool
                     | enum
                     | string
                     | getvariable
-                    | function
                     | entity
-                    | bracketedoperation
-                    | array  ;
-sequence			:(member | (NEWCOMMAND | DASH) member (NEWCOMMAND member)*)  EOF ;
+                    | array ;
+sequence			:(step | (NEWCOMMAND | DASH) step (NEWCOMMAND step)*)  EOF ;
 
 
 /*
@@ -64,7 +68,7 @@ CLOSEBRACKET		: ')' ;
 OPENSQUAREBRACKET	: '[' ;
 CLOSESQUAREBRACKET	: ']' ;
 COMMA			    : ',' ;
-NEWCOMMAND			: ('\r'? '\n' | '\r')+ DASH ;
+NEWCOMMAND			: ('\r'? '\n' | '\r')+ DASH (' ' | '\t') ;
 DOT                 : '.' ;
 VARIABLENAME		: LESSTHAN [a-zA-Z0-9_]+ GREATERTHAN ;
 NUMBER				: DASH? [0-9]+ ;

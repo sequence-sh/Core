@@ -32,7 +32,7 @@ namespace Reductech.EDR.Core.Tests
                 yield return new SerializationTestMethod(
                     new Sequence<Unit>
                     {
-                        Steps = new List<IStep<Unit>>
+                        InitialSteps = new List<IStep<Unit>>
                         {
                             new SetVariable<string>{Value = new Constant<string>("Hello World"), Variable = new VariableName("Foo")},
                             new SetVariable<string>{Value = new GetVariable<string> {Variable = new VariableName("Foo")}, Variable = new VariableName("Bar")},
@@ -156,7 +156,7 @@ namespace Reductech.EDR.Core.Tests
                 yield return new SerializationTestMethod(
                     new Sequence<Unit>
                     {
-                        Steps = new List<IStep<Unit>>
+                        InitialSteps = new List<IStep<Unit>>
                         {
                             new SetVariable<CompareOperator>()
                             {

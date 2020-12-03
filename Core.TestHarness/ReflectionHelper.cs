@@ -102,15 +102,7 @@ namespace Reductech.EDR.Core.TestHarness
             var freezable = step.Unfreeze();
 
             if (freezable is ConstantFreezableStep cfs)
-            {
-                if (cfs.Value is Stream)
-                {
-                    throw new SerializationException("Cannot get string from a stream as that would enumerate the stream");
-                    //return SerializationMethods.StreamToString(stream, Encoding.UTF8);
-                }
-
                 return ConstantFreezableStep.WriteValue(cfs.Value);
-            }
 
             return freezable.StepName;
         }

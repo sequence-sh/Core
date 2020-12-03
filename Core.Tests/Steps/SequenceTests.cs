@@ -23,7 +23,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                 yield return new StepCase("Print then print",
                     new Sequence<string>
                 {
-                    Steps = new List<IStep<Unit>>
+                    InitialSteps = new List<IStep<Unit>>
                     {
                         new Print<string> {Value = Constant("Hello")},
                         new Print<string> {Value = Constant("World")}
@@ -55,7 +55,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                 yield return new SerializeCase("Short form",
                     new Sequence<string>
                     {
-                        Steps = new List<IStep<Unit>>
+                        InitialSteps = new List<IStep<Unit>>
                         {
                             new DoNothing(),
                             new DoNothing()
