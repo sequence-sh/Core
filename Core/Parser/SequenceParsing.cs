@@ -60,36 +60,27 @@ namespace Reductech.EDR.Core.Parser
             public override Result<FreezableStepProperty, IError> VisitSequence(SequenceParser.SequenceContext context)
             {
                 var results = new List<Result<IFreezableStep, IError>>();
-                var lastWasError = false;
 
                 foreach (var child in context.children)
                 {
                     if (child is SequenceParser.StepContext step)
+                        results.Add(VisitStep(step).Map(x => x.ConvertToStep()));
+                    else switch (child)
                     {
-                        results.Add(VisitStep(step).Map(x=>x.ConvertToStep()));
-                        lastWasError = false;
-                    }
-                    else if (child is null)
-                    {
-                        if(!lastWasError)
+                        case null:
                             results.Add(new SingleError("Step was null", ErrorCode.CouldNotParse, new TextPosition(context)));
-                        lastWasError = true;
-                    }
-                    else if (child is ErrorNodeImpl errorNodeImpl)
-                    {
-                        if(!lastWasError)
+                            break;
+                        case ErrorNodeImpl errorNodeImpl:
                             results.Add(VisitErrorNode(errorNodeImpl).Map(x=>x.ConvertToStep()));
-                        lastWasError = true;
-                    }
-                    else if (child is TerminalNodeImpl)
-                    {
-                        //Skip eof
-                    }
-                    else
-                    {
-                        if(!lastWasError)
-                            results.Add(new SingleError($"Could not parse '{child.GetText()}'", ErrorCode.CouldNotParse, new TextPosition(context)));
-                        lastWasError = true;
+                            break;
+                        case TerminalNodeImpl _:
+                            //Skip eof
+                            break;
+                        case ParserRuleContext prc:
+                            results.Add(ParseError(prc));
+                            break;
+                        default:
+                            throw new Exception($"Could not handle '{child}'");
                     }
                 }
 
@@ -155,6 +146,12 @@ namespace Reductech.EDR.Core.Parser
             public override Result<FreezableStepProperty, IError> VisitErrorNode(IErrorNode node) =>
                 new SingleError($"Could not parse '{node.GetText()}'", ErrorCode.CouldNotParse,new TextPosition(node.Symbol));
 
+            private static SingleError ParseError(ParserRuleContext pt)
+            {
+
+                return new SingleError($"Could not parse '{pt.GetText()}'", ErrorCode.CouldNotParse, new TextPosition(pt));
+            }
+
             /// <inheritdoc />
             public override Result<FreezableStepProperty, IError> VisitSetvariable(SequenceParser.SetvariableContext context)
             {
@@ -199,6 +196,9 @@ namespace Reductech.EDR.Core.Parser
             /// <inheritdoc />
             public override Result<FreezableStepProperty, IError> VisitEnum(SequenceParser.EnumContext context)
             {
+                if (context.children.Count != 2 || context.TOKEN().Length != 2)
+                    return ParseError(context);
+
                 var prefix = context.TOKEN(0).GetText();
                 var suffix = context.TOKEN(1).GetText();
 
@@ -317,7 +317,7 @@ namespace Reductech.EDR.Core.Parser
             {
                 var key = context.TOKEN().Symbol.Text;
 
-                var value = VisitTerm(context.term());
+                var value = VisitStep(context.step());
                 if (value.IsFailure) return value.ConvertFailure<(string name, FreezableStepProperty value)>();
 
                 return (key, value.Value);

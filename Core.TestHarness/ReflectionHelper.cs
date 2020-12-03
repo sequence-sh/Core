@@ -4,7 +4,6 @@ using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.Serialization;
 using System.Text;
 using FluentAssertions.Common;
 using Namotion.Reflection;
@@ -66,9 +65,7 @@ namespace Reductech.EDR.Core.TestHarness
                     }
                 }
                 else
-                {
                     values.Add(property.Name, GetString((IStep) currentValue));
-                }
             }
 
             void SetStepList(PropertyInfo property)
@@ -103,8 +100,12 @@ namespace Reductech.EDR.Core.TestHarness
 
             if (freezable is ConstantFreezableStep cfs)
                 return ConstantFreezableStep.WriteValue(cfs.Value);
+            else if (freezable.StepName == DoNothingStepFactory.Instance.TypeName)
+            {
+                return DoNothingStepFactory.Instance.TypeName + "()";
+            }
 
-            return freezable.StepName;
+            throw new NotImplementedException("Cannot get string from step");
         }
 
         private static void MatchStepPropertyInfo(PropertyInfo stepPropertyInfo,
