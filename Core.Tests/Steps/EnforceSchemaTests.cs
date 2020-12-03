@@ -105,7 +105,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                     };
 
                     return new ErrorCase(name,
-                        new Sequence
+                        new Sequence<Unit>
                         {
                             Steps = new List<IStep<Unit>>
                             {
@@ -118,7 +118,8 @@ namespace Reductech.EDR.Core.Tests.Steps
                                     EntityStream =enforceSchema
                                 }
 
-                            }
+                            },
+                            FinalStep = new DoNothing()
                         },
                         new ErrorBuilder(expectedError, expectedErrorCode).WithLocation(new StepErrorLocation(enforceSchema))
 

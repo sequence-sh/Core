@@ -44,13 +44,20 @@ namespace Reductech.EDR.Core.Internal
 
                 if (step is CompoundFreezableStep seq && seq.StepName == SequenceStepFactory.Instance.TypeName)
                 {
-                    var stepsResult = seq.FreezableStepData.GetStepList(nameof(Sequence.Steps), nameof(Sequence));
+                    var stepsResult = seq.FreezableStepData.GetStepList(nameof(Sequence<object>.Steps), nameof(Sequence<object>));
 
                     if (stepsResult.IsFailure)
                         return stepsResult.ConvertFailure<StepContext>();
 
                     foreach (var freezableStep in stepsResult.Value)
                         remainingFreezableSteps.Push(freezableStep);
+
+                    var finalStepResult = seq.FreezableStepData.GetStep(nameof(Sequence<object>.FinalStep), nameof(Sequence<object>));
+
+                    if (finalStepResult.IsFailure)
+                        return finalStepResult.ConvertFailure<StepContext>();
+
+                    remainingFreezableSteps.Push(finalStepResult.Value);
 
                     continue;
                 }

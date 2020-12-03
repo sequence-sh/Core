@@ -133,18 +133,17 @@ namespace Reductech.EDR.Core.Internal
         /// <summary>
         /// Tries to convert this step member to a FreezableStep
         /// </summary>
-        public IFreezableStep ConvertToStep(bool convertStepListToSequence)
+        public IFreezableStep ConvertToStep()
         {
             var r = Option.Match(
                 MapVariableName,
                 x => x,
-
-                x => MapStepList(x, convertStepListToSequence));
+                MapStepList);
 
             return r;
 
 
-            IFreezableStep MapStepList(IReadOnlyList<IFreezableStep> stepList, bool convertStepListToSequence1)
+            IFreezableStep MapStepList(IReadOnlyList<IFreezableStep> stepList)
             {
                 if (stepList.Any() && stepList.All(x => x is ConstantFreezableStep cfs && cfs.Value.IsT6))
                 {
@@ -157,8 +156,8 @@ namespace Reductech.EDR.Core.Internal
                     var c = new ConstantFreezableStep(entityStream);
                     return c;
                 }
-                else if (convertStepListToSequence1)
-                    return MapStepListToSequence(stepList);
+                //else if (convertStepListToSequence1)
+                //    return MapStepListToSequence(stepList);
                 else return MapStepListToArray(stepList);
             }
 
@@ -168,11 +167,11 @@ namespace Reductech.EDR.Core.Internal
                 return array;
             }
 
-            IFreezableStep MapStepListToSequence(IReadOnlyList<IFreezableStep> stepList)
-            {
-                var array = SequenceStepFactory.CreateFreezable(stepList, null, Location);
-                return array;
-            }
+            //IFreezableStep MapStepListToSequence(IReadOnlyList<IFreezableStep> stepList)
+            //{
+            //    var array = SequenceStepFactory.CreateFreezable(stepList, null, Location);
+            //    return array;
+            //}
 
             IFreezableStep MapVariableName(VariableName vn)
             {

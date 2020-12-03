@@ -145,7 +145,7 @@ namespace Reductech.EDR.Core.Internal
         public Result<IFreezableStep, IError> GetStep(string name, string typeName) =>
             Steps.TryFindOrFail(name,
             () => ErrorHelper.MissingParameterError(name, typeName).WithLocation(Location))
-                .Map(x => x.ConvertToStep(false));
+                .Map(x => x.ConvertToStep());
 
 
         /// <summary>

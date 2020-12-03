@@ -26,7 +26,7 @@ namespace Reductech.EDR.Core.Parser
             if (string.IsNullOrWhiteSpace(text))
                 return new SingleError("Sequence is empty.", ErrorCode.EmptySequence, EntireSequenceLocation.Instance);
 
-            var r = TryParse(text).Map(x=> x.ConvertToStep(true));
+            var r = TryParse(text).Map(x=> x.ConvertToStep());
 
 
             return r;
@@ -46,7 +46,6 @@ namespace Reductech.EDR.Core.Parser
             var commonTokenStream = new CommonTokenStream(lexer);
             var parser = new SequenceParser(commonTokenStream);
 
-
             var visitor = new Visitor();
 
             var result = visitor.Visit(parser.sequence());
@@ -60,15 +59,40 @@ namespace Reductech.EDR.Core.Parser
             /// <inheritdoc />
             public override Result<FreezableStepProperty, IError> VisitSequence(SequenceParser.SequenceContext context)
             {
-                var members =
-                    context.member().Select(VisitMember);
+                var members = context.member().Select(VisitMember).ToList();
 
-                var r = Aggregate(new TextPosition(context), members);
-                return r;
+                var steps =
+                    members.SkipLast(1)
+                        .Select(x => x.Map(y => y.ConvertToStep()))
+                        .Combine(ErrorList.Combine);
+
+                var finalStep = members.Last().Map(x => x.ConvertToStep());
+
+                var errors = new List<IError>();
+
+                if(steps.IsFailure)
+                    errors.Add(steps.Error);
+                if(finalStep.IsFailure)
+                    errors.Add(finalStep.Error);
+
+                if (errors.Any())
+                    return Result.Failure<FreezableStepProperty, IError>(ErrorList.Combine(errors));
+
+
+
+                var sequence = SequenceStepFactory.CreateFreezable(steps.Value, finalStep.Value, null, new TextPosition(context));
+
+                return new FreezableStepProperty(
+                    OneOf<VariableName, IFreezableStep, IReadOnlyList<IFreezableStep>>.FromT1(sequence),
+                    new TextPosition(context));
             }
 
+
             /// <inheritdoc />
-            public override Result<FreezableStepProperty, IError> VisitMember(SequenceParser.MemberContext context) => VisitChildren(context);
+            public override Result<FreezableStepProperty, IError> VisitMember(SequenceParser.MemberContext context)
+            {
+                return VisitChildren(context);
+            }
 
             /// <inheritdoc />
             public override Result<FreezableStepProperty, IError> VisitArray(SequenceParser.ArrayContext context)
@@ -99,9 +123,9 @@ namespace Reductech.EDR.Core.Parser
 
                 var left = VisitMember(context.member(0));
                 var right = VisitMember(context.member(1));
-                var operatorSymbol = context.INFIXOPERATOR().Symbol;
+                var operatorSymbol = context.infixoperator().GetText();
 
-                var result = InfixHelper.TryCreateStep(new TextPosition(context), left, right, operatorSymbol.Text);
+                var result = InfixHelper.TryCreateStep(new TextPosition(context), left, right, operatorSymbol);
 
                 return result;
             }
@@ -297,7 +321,7 @@ namespace Reductech.EDR.Core.Parser
 
                 foreach (var node in nodes)
                 {
-                    var result = node.Map(x => x.ConvertToStep(false));
+                    var result = node.Map(x => x.ConvertToStep());
 
                     if (result.IsSuccess) l.Add(result.Value);
                     else errors.Add(result.Error);
@@ -315,13 +339,14 @@ namespace Reductech.EDR.Core.Parser
         {
             private class OperatorData
             {
-                public OperatorData(string stepName, string leftName, string rightName, string operatorStepName, IFreezableStep operatorStep)
+                public OperatorData(string stepName, string leftName, string rightName, string operatorStepName,
+                    IFreezableStep operatorStep)
                 {
-                    StepName = stepName;
                     LeftName = leftName;
                     RightName = rightName;
                     OperatorStepName = operatorStepName;
                     OperatorStep = operatorStep;
+                    StepName = stepName;
                 }
 
                 public string StepName { get; }
@@ -362,7 +387,7 @@ namespace Reductech.EDR.Core.Parser
 
             }, errorLocation);
 
-                var step = new CompoundFreezableStep(opData.OperatorStepName, data, null);
+                var step = new CompoundFreezableStep(opData.StepName, data, null);
 
                 return new FreezableStepProperty(OneOf<VariableName, IFreezableStep, IReadOnlyList<IFreezableStep>>.FromT1(step), errorLocation);
 
@@ -372,6 +397,7 @@ namespace Reductech.EDR.Core.Parser
 
             private static readonly IReadOnlyDictionary<string, OperatorData> OperatorDataDictionary =
                 Enum.GetValues<MathOperator>()
+
                     .ToDictionary(mo => mo.GetDisplayName(), mo => new OperatorData(
                         nameof(ApplyMathOperator),
                         nameof(ApplyMathOperator.Left),
@@ -392,13 +418,14 @@ namespace Reductech.EDR.Core.Parser
                     .Concat(
                         Enum.GetValues<CompareOperator>()
                     .ToDictionary(mo => mo.GetDisplayName(), mo => new OperatorData(
-                        "Compare",//TODO is there a better way to write this
+                        CompareStepFactory.Instance.TypeName,
                         nameof(Compare<int>.Left),
                         nameof(Compare<int>.Right),
                         nameof(Compare<int>.Operator),
                         new ConstantFreezableStep(new Enumeration(nameof(CompareOperator), mo.ToString()))
                     ))
                         )
+                    .Where(x=>x.Key != MathOperator.None.ToString())
 
                     .ToDictionary(x => x.Key, x => x.Value, StringComparer.OrdinalIgnoreCase);
 

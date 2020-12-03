@@ -20,7 +20,7 @@ namespace Reductech.EDR.Core.Tests.Steps
         {
             get
             {
-                var sequence = new Sequence
+                var sequence = new Sequence<Unit>
                 {
                     Steps = new List<IStep<Unit>>
                     {
@@ -36,7 +36,8 @@ namespace Reductech.EDR.Core.Tests.Steps
                                 Variable = new VariableName("Foo")
                             }
                         }
-                    }
+                    },
+                    FinalStep = new DoNothing()
                 };
 
 

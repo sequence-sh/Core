@@ -90,7 +90,7 @@ namespace Reductech.EDR.Core.Tests
         [Trait("Category", "Integration")]
         public async Task RunObjectSequence()
         {
-            var step = new Sequence()
+            var step = new Sequence<Unit>()
             {
                 Steps = new List<IStep<Unit>>
                 {
@@ -128,7 +128,8 @@ namespace Reductech.EDR.Core.Tests
                             }
                         }
                     }
-                }
+                },
+                FinalStep = new DoNothing()
             };
 
             var yaml = step.Serialize();

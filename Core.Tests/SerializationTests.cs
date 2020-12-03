@@ -30,14 +30,14 @@ namespace Reductech.EDR.Core.Tests
             get
             {
                 yield return new SerializationTestMethod(
-                    new Sequence
+                    new Sequence<Unit>
                     {
                         Steps = new List<IStep<Unit>>
                         {
                             new SetVariable<string>{Value = new Constant<string>("Hello World"), Variable = new VariableName("Foo")},
                             new SetVariable<string>{Value = new GetVariable<string> {Variable = new VariableName("Foo")}, Variable = new VariableName("Bar")},
-                            new Print<string>{Value = new GetVariable<string> {Variable = new VariableName("Bar")}}
-                        }
+                        },
+                        FinalStep = new Print<string>{Value = new GetVariable<string> {Variable = new VariableName("Bar")}}
                     },
                     @"- <Foo> = 'Hello World'
 - <Bar> = <Foo>
@@ -154,7 +154,7 @@ namespace Reductech.EDR.Core.Tests
                 }, @"Print(Value = ArrayIsEmpty(Array = Array(Elements = [])))");
 
                 yield return new SerializationTestMethod(
-                    new Sequence
+                    new Sequence<Unit>
                     {
                         Steps = new List<IStep<Unit>>
                         {
@@ -162,21 +162,20 @@ namespace Reductech.EDR.Core.Tests
                             {
                                 Value = new Constant<CompareOperator>(CompareOperator.LessThan),
                                 Variable = new VariableName("Foo")
-                            },
-
-                            new Print<bool>
+                            }
+                        },
+                        FinalStep = new Print<bool>
+                        {
+                            Value = new Compare<int>
                             {
-                                Value = new Compare<int>
+                                Left = new Constant<int>(1),
+                                Right = new Constant<int>(2),
+                                Operator = new GetVariable<CompareOperator>
                                 {
-                                    Left = new Constant<int>(1),
-                                    Right = new Constant<int>(2),
-                                    Operator = new GetVariable<CompareOperator>
+                                    Variable = new VariableName("Foo"),
+                                    Configuration = new Configuration
                                     {
-                                        Variable = new VariableName("Foo"),
-                                        Configuration = new Configuration
-                                        {
-                                            DoNotSplit = true
-                                        }
+                                        DoNotSplit = true
                                     }
                                 }
                             }

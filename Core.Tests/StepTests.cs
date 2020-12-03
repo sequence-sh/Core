@@ -121,14 +121,11 @@ namespace Reductech.EDR.Core.Tests
                 yield return new StepTestCase("Foreach <Foo> in ['Hello'; 'World']; Print 'Farewell'; Print <Foo>",
                     new ForEach<string>
                     {
-                        Action = new Sequence
-                        {
-                            Steps = new []
+                        Action = Sequence(new[]
                             {
                                 Print(Constant("Farewell")),
                                 Print(GetVariable<string>(FooVariableName)),
-                            }
-                        },
+                            }),
                         Array = Array(Constant("Hello"),
                             Constant("World")),
                         Variable = FooVariableName
@@ -445,9 +442,7 @@ Two,The second number"),
 
 
                 yield return new StepTestCase("Foreach nested array",
-                    new Sequence
-                    {
-                        Steps = new IStep<Unit>[]{
+                    Sequence(new IStep<Unit>[]{
                             new SetVariable<List<List<string>>>
                             {
                                 Variable = new VariableName("DataVar"),
@@ -487,10 +482,10 @@ Two,The second number"),
                                 }
                             }
 
-                    }
-                    },"One", "Two"
+                    }), "One", "Two"
 
-                    ){IgnoreName = true};
+                    )
+                {IgnoreName = true};
 
 
             }
@@ -510,7 +505,7 @@ Two,The second number"),
                 Value = step
             };
 
-        private static Sequence Sequence(params IStep<Unit>[] steps)=> new Sequence{Steps = steps};
+        private static Sequence<Unit> Sequence(params IStep<Unit>[] steps)=> new Sequence<Unit>{Steps = steps.SkipLast(1).ToList(), FinalStep = steps.Last()};
 
 
         private class StepTestCase : ITestBaseCaseParallel

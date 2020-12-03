@@ -8,7 +8,7 @@ using Xunit.Abstractions;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
-    public class SequenceTests : StepTestBase<Sequence, Unit>
+    public class SequenceTests : StepTestBase<Sequence<string>, string>
     {
         /// <inheritdoc />
         public SequenceTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
@@ -20,14 +20,18 @@ namespace Reductech.EDR.Core.Tests.Steps
         {
             get
             {
-                yield return new StepCase("Print then print", new Sequence
+                yield return new StepCase("Print then print",
+                    new Sequence<string>
                 {
                     Steps = new List<IStep<Unit>>
                     {
                         new Print<string> {Value = Constant("Hello")},
                         new Print<string> {Value = Constant("World")}
-                    }
-                }, Unit.Default,  "Hello", "World" );
+                    },
+                    FinalStep = Constant("Goodbye")
+                },
+                    "Goodbye",
+                    "Hello", "World" );
 
 
             }
@@ -49,15 +53,16 @@ namespace Reductech.EDR.Core.Tests.Steps
             get
             {
                 yield return new SerializeCase("Short form",
-                    new Sequence
+                    new Sequence<string>
                     {
                         Steps = new List<IStep<Unit>>
                         {
                             new DoNothing(),
-                            new DoNothing(),
                             new DoNothing()
-                        }
-                    }, $"- DoNothing(){Environment.NewLine}- DoNothing(){Environment.NewLine}- DoNothing()" );
+                        },
+                        FinalStep = Constant("Hello World")
+                    },
+                    $"- DoNothing(){Environment.NewLine}- DoNothing(){Environment.NewLine}- DoNothing(){Environment.NewLine}- \"Hello World\"" );
             }
         }
     }
