@@ -98,5 +98,6 @@ namespace Reductech.EDR.Core.Internal
         /// Not Equals Operator
         /// </summary>
         public static bool operator !=(FreezableStepData? left, FreezableStepData? right) => !Equals(left, right);
+
     }
 }

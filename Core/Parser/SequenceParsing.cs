@@ -274,9 +274,9 @@ namespace Reductech.EDR.Core.Parser
 
                 if (members.IsFailure) return members.ConvertFailure<FreezableStepProperty>();
 
-                throw new NotImplementedException("Cannot deserialize entity");//TODO support this
+                var step = new CreateEntityFreezableStep(new FreezableStepData(members.Value, new TextPosition(context)));
 
-                //return new EntityNode(new TextPosition(context), members.Value);
+                return new FreezableStepProperty(OneOf<VariableName, IFreezableStep, IReadOnlyList<IFreezableStep>>.FromT1(step), new TextPosition(context));
             }
 
             private Result<IReadOnlyDictionary<string, FreezableStepProperty>, IError>

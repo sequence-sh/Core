@@ -35,6 +35,9 @@ namespace Reductech.EDR.Core.Internal
         /// </summary>
         public Configuration? StepConfiguration { get; }
 
+        /// <summary>
+        /// Try to get this step factory from the store.
+        /// </summary>
         public Result<IStepFactory, IError> TryGetStepFactory(StepFactoryStore stepFactoryStore)
         {
             var r=
