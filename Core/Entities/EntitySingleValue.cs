@@ -2,10 +2,11 @@
 using System.Linq;
 using System.Text.RegularExpressions;
 using CSharpFunctionalExtensions;
-using OneOf;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Serialization;
+
+using Option = OneOf.OneOf<string, int, double, bool, Reductech.EDR.Core.Internal.Enumeration, System.DateTime, Reductech.EDR.Core.Entity>;
 
 namespace Reductech.EDR.Core.Entities
 {
@@ -17,7 +18,7 @@ namespace Reductech.EDR.Core.Entities
         /// <summary>
         /// Create a new EntitySingleValue
         /// </summary>
-        public EntitySingleValue(OneOf<string, int, double, bool, Enumeration, DateTime> value, string original)
+        public EntitySingleValue(Option value, string original)
         {
             Value = value;
             Original = original;
@@ -26,7 +27,7 @@ namespace Reductech.EDR.Core.Entities
         /// <summary>
         /// Create a new EntitySingleValue with a string property.
         /// </summary>
-        public static EntitySingleValue Create(string s) => new EntitySingleValue(OneOf<string, int, double, bool, Enumeration, DateTime>.FromT0(s), s);
+        public static EntitySingleValue Create(string s) => new EntitySingleValue(Option.FromT0(s), s);
 
         /// <summary>
         /// The original string
@@ -36,7 +37,7 @@ namespace Reductech.EDR.Core.Entities
         /// <summary>
         /// The value
         /// </summary>
-        public OneOf<string, int, double, bool, Enumeration, DateTime> Value { get; }
+        public Option Value { get; }
 
         /// <summary>
         /// The type of the value
@@ -47,7 +48,8 @@ namespace Reductech.EDR.Core.Entities
             _ => SchemaPropertyType.Double,
             _ => SchemaPropertyType.Bool,
             _ => SchemaPropertyType.Enum,
-            _ => SchemaPropertyType.Date
+            _ => SchemaPropertyType.Date,
+            _ => SchemaPropertyType.Entity
         );
 
         /// <summary>
@@ -106,6 +108,7 @@ namespace Reductech.EDR.Core.Entities
                 SchemaPropertyType.Enum => schemaProperty.Format != null && schemaProperty.Format.Contains(original, StringComparer.OrdinalIgnoreCase) ? new EntitySingleValue(new Enumeration("Enum", original),original ) : Maybe<EntitySingleValue>.None, //TODO fix enum type
                 SchemaPropertyType.Bool => bool.TryParse(original, out var b) ? new EntitySingleValue(b, original) : Maybe<EntitySingleValue>.None,
                 SchemaPropertyType.Date => DateTime.TryParse(original, out var dt) ? new EntitySingleValue(dt, original) : Maybe<EntitySingleValue>.None, //TODO format
+                SchemaPropertyType.Entity => Maybe<EntitySingleValue>.None, //TODO allow this
                 _ => throw new ArgumentOutOfRangeException(nameof(schemaProperty))
             };
             return r;
@@ -121,7 +124,8 @@ namespace Reductech.EDR.Core.Entities
                 x => x.ToString("G17"),
                 x => x.ToString(),
                 x => x.ToString(),
-                x => x.ToString(dateFormat));
+                x => x.ToString(dateFormat),
+                x=>x.ToString());
         }
 
         /// <inheritdoc />
@@ -157,7 +161,8 @@ namespace Reductech.EDR.Core.Entities
                 x => x.ToString("G17"),
                 x => x.ToString(),
                 x => x.ToString(),
-                x => x.ToString("O"));
+                x => x.ToString("O"),
+                x => x.Serialize());
         }
     }
 }

@@ -45,16 +45,18 @@ namespace Reductech.EDR.Core.Entities
         /// <summary>
         /// Create an entity from an object
         /// </summary>
-        public static EntityValue CreateFromObject(object argValue, char? multiValueDelimiter)
+        public static EntityValue CreateFromObject(object? argValue, char? multiValueDelimiter = null)
         {
             switch (argValue)
             {
+                case null: return new EntityValue(DBNull.Value);
                 case string s: return Create(s, multiValueDelimiter);
                 case int i: return new EntityValue(new EntitySingleValue(i, argValue.ToString()!));
                 case bool b: return new EntityValue(new EntitySingleValue(b, argValue.ToString()!));
                 case double d: return new EntityValue(new EntitySingleValue(d, argValue.ToString()!));
                 case Enumeration e: return new EntityValue(new EntitySingleValue(e, argValue.ToString()!));
                 case DateTime dt: return new EntityValue(new EntitySingleValue(dt, argValue.ToString()!));
+                case Entity entity: return new EntityValue(new EntitySingleValue(entity, entity.ToString()));
                 case IEnumerable e:
                 {
                     var newEnumerable  = e.Cast<object>().Select(x=>x.ToString()!);

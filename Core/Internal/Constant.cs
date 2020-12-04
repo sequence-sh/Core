@@ -9,7 +9,6 @@ using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Parser;
 using Reductech.EDR.Core.Serialization;
-using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.Util;
 
 namespace Reductech.EDR.Core.Internal
@@ -53,6 +52,7 @@ namespace Reductech.EDR.Core.Internal
                     Entity ent => new ConstantFreezableStep(ent),
                     EntityStream es => new ConstantFreezableStep(es),
                     DataStream ds => new ConstantFreezableStep(ds),
+                    Schema schema => new ConstantFreezableStep(schema.ConvertToEntity()),
                     IEnumerable enumerable => UnfreezeList(enumerable),
                     _ => throw new Exception($"Cannot unfreeze {typeof(T)}")
                 };
@@ -112,6 +112,7 @@ namespace Reductech.EDR.Core.Internal
                     Entity ent => ent.Serialize(),
                     EntityStream es => await SerializeEntityStream(es, cancellationToken),
                     DataStream ds => await ds.SerializeAsync(cancellationToken),
+                    Schema schema => schema.ConvertToEntity().Serialize(),
                     IEnumerable enumerable => await SerializeEnumerable(enumerable, cancellationToken),
                 _ => throw new Exception($"Cannot serialize {typeof(T)}")
                 };

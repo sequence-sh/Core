@@ -85,5 +85,29 @@ namespace Reductech.EDR.Core.Entities
 
             return resultEntity;
         }
+
+        /// <summary>
+        /// Converts a schema to an entity for deserialization
+        /// </summary>
+        public Entity ConvertToEntity()
+        {
+            var propertiesEntity = new Entity(
+                Properties.Select(x=>
+                    new KeyValuePair<string,EntityValue>(x.Key, EntityValue.CreateFromObject(x.Value.ConvertToEntity()))).ToImmutableList()
+            );
+
+
+            var topProperties = new []
+            {
+                new KeyValuePair<string, EntityValue>(nameof(Name), EntityValue.CreateFromObject(Name)),
+                new KeyValuePair<string, EntityValue>(nameof(AllowExtraProperties), EntityValue.CreateFromObject(AllowExtraProperties)),
+                new KeyValuePair<string, EntityValue>(nameof(Properties), EntityValue.CreateFromObject(propertiesEntity)),
+            };
+
+
+            var entity = new Entity(topProperties);
+
+            return entity;
+        }
     }
 }

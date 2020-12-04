@@ -34,5 +34,24 @@ namespace Reductech.EDR.Core.Entities
         [ConfigProperty(Order = 4)]
         public string? Regex { get; set; }
 
+        /// <summary>
+        /// Convert this SchemaProperty to an entity
+        /// </summary>
+        /// <returns></returns>
+        public object ConvertToEntity()
+        {
+            var topProperties = new[]
+            {
+                new KeyValuePair<string, EntityValue>(nameof(Type), EntityValue.CreateFromObject(Type)),
+                new KeyValuePair<string, EntityValue>(nameof(Multiplicity), EntityValue.CreateFromObject(Multiplicity)),
+                new KeyValuePair<string, EntityValue>(nameof(Format), EntityValue.CreateFromObject(Format)),
+                new KeyValuePair<string, EntityValue>(nameof(Regex), EntityValue.CreateFromObject(Regex)),
+            };
+
+
+            var entity = new Entity(topProperties);
+
+            return entity;
+        }
     }
 }
