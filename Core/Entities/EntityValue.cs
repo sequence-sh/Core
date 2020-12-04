@@ -6,6 +6,7 @@ using CSharpFunctionalExtensions;
 using OneOf;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
+using Reductech.EDR.Core.Serialization;
 
 namespace Reductech.EDR.Core.Entities
 {
@@ -46,15 +47,22 @@ namespace Reductech.EDR.Core.Entities
         /// </summary>
         public static EntityValue CreateFromObject(object argValue, char? multiValueDelimiter)
         {
-            if (argValue is string s)
-                return Create(s, multiValueDelimiter);
-            else if (argValue is IEnumerable e)
+            switch (argValue)
             {
-                var newEnumerable  = e.Cast<object>().Select(x=>x.ToString()!);
-                return Create(newEnumerable);
+                case string s: return Create(s, multiValueDelimiter);
+                case int i: return new EntityValue(new EntitySingleValue(i, argValue.ToString()!));
+                case bool b: return new EntityValue(new EntitySingleValue(b, argValue.ToString()!));
+                case double d: return new EntityValue(new EntitySingleValue(d, argValue.ToString()!));
+                case Enumeration e: return new EntityValue(new EntitySingleValue(e, argValue.ToString()!));
+                case DateTime dt: return new EntityValue(new EntitySingleValue(dt, argValue.ToString()!));
+                case IEnumerable e:
+                {
+                    var newEnumerable  = e.Cast<object>().Select(x=>x.ToString()!);
+                    return Create(newEnumerable);
+                }
+                default:
+                    return Create(argValue.ToString(), multiValueDelimiter);
             }
-
-            return Create(argValue.ToString(), multiValueDelimiter);
         }
 
 
@@ -127,6 +135,17 @@ namespace Reductech.EDR.Core.Entities
             return Value.Match(x => "Empty", x => x.ToString(), x => string.Join(", ", x));
         }
 
-
+        /// <summary>
+        /// Serialize this EntityValue
+        /// </summary>
+        /// <returns></returns>
+        public string Serialize()
+        {
+            return
+            Value.Match(_=> "", x=>
+                x.Serialize(),
+                x=>
+                    SerializationMethods.SerializeList(x.Select(y=>y.Serialize())));
+        }
     }
 }

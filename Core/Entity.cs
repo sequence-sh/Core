@@ -5,8 +5,6 @@ using System.Linq;
 using System.Text;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Entities;
-using Reductech.EDR.Core.Serialization;
-
 namespace Reductech.EDR.Core
 {
     /// <summary>
@@ -98,7 +96,7 @@ namespace Reductech.EDR.Core
 
 
         /// <summary>
-        /// SerializeAsync this record.
+        /// Serialize this entity.
         /// </summary>
         /// <returns></returns>
         public string Serialize()
@@ -111,21 +109,8 @@ namespace Reductech.EDR.Core
 
             foreach (var (key, value) in _properties)
             {
-                value.Value.Switch(_=>{},
-                    singleValue=>
-                    {
-                        var v = SerializationMethods.DoubleQuote(singleValue.Original);
-                        results.Add($"{key}: {v}");
-
-                    },
-                    multiValue=>
-                    {
-                        var v = multiValue.Select(x => x.Original)
-                            .Select(SerializationMethods.DoubleQuote);
-
-                        var r = SerializationMethods.SerializeList(v);
-                        results.Add($"{key}: {r}");
-                    });
+                if(!value.Value.IsT0)
+                    results.Add($"{key}: {value.Serialize()}");
             }
 
             sb.AppendJoin(",", results);

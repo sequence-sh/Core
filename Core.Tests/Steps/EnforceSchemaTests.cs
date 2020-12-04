@@ -46,7 +46,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                 yield return CreateCase("Simple case",
                         EntityStream.Create(CreateEntity(("Foo", "Hello"), ("Bar", "1")), CreateEntity(("Foo", "Hello 2"),("Bar", "2"))),
                         CreateSchema("ValueIf Schema",false, ("foo", SchemaPropertyType.String, Multiplicity.ExactlyOne), ("Bar", SchemaPropertyType.Integer, Multiplicity.ExactlyOne)),
-                        "(Foo: \"Hello\", Bar: 1)","(Foo: \"Hello 2\", Bar: 2)");
+                        "(Foo: \"Hello\",Bar: 1)","(Foo: \"Hello 2\",Bar: 2)");
 
 
                 yield return CreateCase("Cast int",
@@ -68,13 +68,13 @@ namespace Reductech.EDR.Core.Tests.Steps
                 yield return CreateCase("Cast date time",
                     EntityStream.Create(CreateEntity(("Foo", "11/10/2020 3:45:44 PM"))),
                         CreateSchema("ValueIf Schema", false, ("Foo", SchemaPropertyType.Date, Multiplicity.ExactlyOne)),
-                    "(Foo: 2020/11/10 15:45:44)");
+                    "(Foo: 2020-11-10T15:45:44.0000000)");
 
 
                 yield return CreateCase("Cast multiple values",
                    EntityStream.Create(CreateEntity(("Foo", "10"), ("Foo", "15"))),
                    CreateSchema("ValueIf Schema", false, ("Foo", SchemaPropertyType.Integer, Multiplicity.Any)),
-                   "(Foo: 10, 15)");
+                   "(Foo: [10, 15])");
 
 
                 yield return CreateCase("Match regex",
@@ -85,7 +85,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                 yield return CreateCase("Match enum",
                     EntityStream.Create(CreateEntity(("Foo", "hello"))),
                     CreateSchema("ValueIf Schema", false, ("Foo", SchemaPropertyType.Enum, Multiplicity.ExactlyOne, null, new List<string>(){"Hello", "World"})),
-                        "(Foo: \"hello\")");
+                        "(Foo: Enum.hello)");
             }
         }
 
