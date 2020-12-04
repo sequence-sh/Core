@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using CSharpFunctionalExtensions;
+using Namotion.Reflection;
 using Reductech.EDR.Core.Internal.Errors;
 
 namespace Reductech.EDR.Core.Internal
@@ -40,6 +41,9 @@ namespace Reductech.EDR.Core.Internal
         }
 
         /// <inheritdoc />
+        public override string ToString() => Type.GetDisplayName();
+
+        /// <inheritdoc />
         public override bool Equals(object? obj) => ReferenceEquals(this, obj) || obj is ITypeReference other && Equals(other);
 
         /// <inheritdoc />
@@ -54,7 +58,7 @@ namespace Reductech.EDR.Core.Internal
         /// <inheritdoc />
         public Result<ActualTypeReference, IErrorBuilder> TryGetGenericTypeReference(TypeResolver typeResolver, int argumentNumber)
         {
-            if(!Type.IsGenericType)
+            if (!Type.IsGenericType)
                 return new ErrorBuilder($"'{Type.Name}' is not a generic type.", ErrorCode.InvalidCast);
 
             if (argumentNumber < 0 || Type.GenericTypeArguments.Length <= argumentNumber)
@@ -63,6 +67,10 @@ namespace Reductech.EDR.Core.Internal
             var t = Type.GenericTypeArguments[argumentNumber];
             return new ActualTypeReference(t);
         }
+
+        /// <inheritdoc />
+        public Result<Maybe<ActualTypeReference>, IErrorBuilder> GetActualTypeReferenceIfResolvable(TypeResolver typeResolver) => TryGetActualTypeReference(typeResolver).Map(Maybe<ActualTypeReference>.From);
+
 
         /// <summary>
         /// Creates a fixed type reference from a type

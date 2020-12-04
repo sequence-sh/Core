@@ -99,5 +99,37 @@ namespace Reductech.EDR.Core.Internal
         /// </summary>
         public static bool operator !=(FreezableStepData? left, FreezableStepData? right) => !Equals(left, right);
 
+        /// <summary>
+        /// Gets the variables set by steps in this FreezableStepData.
+        /// </summary>
+        public Result<IReadOnlyCollection<(VariableName variableName, Maybe<ITypeReference>)>, IError> GetVariablesSet(TypeResolver typeResolver)
+        {
+            var variables = new List<(VariableName variableName, Maybe<ITypeReference>)>();
+            var errors = new List<IError>();
+
+            foreach (var stepProperty in StepProperties)
+            {
+                stepProperty.Value.Switch(_ => { },
+                    LocalGetVariablesSet,
+                    l =>
+                    {
+                        foreach (var step in l) LocalGetVariablesSet(step);
+                    }
+                    );
+            }
+
+            if (errors.Any())
+                return Result.Failure<IReadOnlyCollection<(VariableName variableName, Maybe<ITypeReference>)>, IError>(ErrorList.Combine(errors));
+
+            return variables;
+
+
+            void LocalGetVariablesSet(IFreezableStep freezableStep)
+            {
+                var variablesSet = freezableStep.GetVariablesSet(typeResolver);
+                if (variablesSet.IsFailure) errors.Add(variablesSet.Error);
+                variables.AddRange(variablesSet.Value);
+            }
+        }
     }
 }

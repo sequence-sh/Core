@@ -63,18 +63,21 @@ namespace Reductech.EDR.Core.Parser
 
                 foreach (var child in context.children)
                 {
-                    if (child is SequenceParser.StepContext step)
-                        results.Add(VisitStep(step).Map(x => x.ConvertToStep()));
-                    else switch (child)
+                   switch (child)
                     {
-                        case null:
-                            results.Add(new SingleError("Step was null", ErrorCode.CouldNotParse, new TextPosition(context)));
-                            break;
                         case ErrorNodeImpl errorNodeImpl:
-                            results.Add(VisitErrorNode(errorNodeImpl).Map(x=>x.ConvertToStep()));
+                            results.Add(VisitErrorNode(errorNodeImpl).Map(x => x.ConvertToStep()));
+                            break;
+
+                        case SequenceParser.StepContext step:
+                            results.Add(VisitStep(step).Map(x => x.ConvertToStep()));
                             break;
                         case TerminalNodeImpl _:
-                            //Skip eof
+                            //Skip newCommand or EOF
+                            break;
+
+                        case null:
+                            results.Add(new SingleError("Step was null", ErrorCode.CouldNotParse, new TextPosition(context)));
                             break;
                         case ParserRuleContext prc:
                             results.Add(ParseError(prc));
@@ -115,7 +118,7 @@ namespace Reductech.EDR.Core.Parser
             }
 
             /// <inheritdoc />
-            public override Result<FreezableStepProperty, IError> VisitBool(SequenceParser.BoolContext context)
+            public override Result<FreezableStepProperty, IError> VisitBoolean(SequenceParser.BooleanContext context)
             {
                 var b = context.TRUE() != null;
 
@@ -125,15 +128,15 @@ namespace Reductech.EDR.Core.Parser
             }
 
             /// <inheritdoc />
-            public override Result<FreezableStepProperty, IError> VisitBracketedstep(SequenceParser.BracketedstepContext context) => VisitStep(context.step());
+            public override Result<FreezableStepProperty, IError> VisitBracketedStep(SequenceParser.BracketedStepContext context) => VisitStep(context.step());
 
             /// <inheritdoc />
-            public override Result<FreezableStepProperty, IError> VisitInfixoperation(SequenceParser.InfixoperationContext context)
+            public override Result<FreezableStepProperty, IError> VisitInfixOperation(SequenceParser.InfixOperationContext context)
             {
 
                 var left = VisitTerm(context.term(0));
                 var right = VisitTerm(context.term(1));
-                var operatorSymbol = context.infixoperator().GetText();
+                var operatorSymbol = context.infixOperator().GetText();
 
                 var result = InfixHelper.TryCreateStep(new TextPosition(context), left, right, operatorSymbol);
 
@@ -153,7 +156,7 @@ namespace Reductech.EDR.Core.Parser
             }
 
             /// <inheritdoc />
-            public override Result<FreezableStepProperty, IError> VisitSetvariable(SequenceParser.SetvariableContext context)
+            public override Result<FreezableStepProperty, IError> VisitSetVariable(SequenceParser.SetVariableContext context)
             {
                 var member = VisitTerm(context.term());
 
@@ -176,25 +179,14 @@ namespace Reductech.EDR.Core.Parser
             }
 
             /// <inheritdoc />
-            public override Result<FreezableStepProperty, IError> VisitGetvariable(SequenceParser.GetvariableContext context)
+            public override Result<FreezableStepProperty, IError> VisitGetVariable(SequenceParser.GetVariableContext context)
             {
                 var vn = GetVariableName(context.VARIABLENAME());
-
-                var stepData = new FreezableStepData(new Dictionary<string, FreezableStepProperty>()
-                {
-                    {nameof(GetVariable<object>.Variable), vn }
-
-                }, new TextPosition(context) );
-
-
-                var step = new CompoundFreezableStep(GetVariableStepFactory.Instance.TypeName, stepData, null);
-
-
-                return new FreezableStepProperty(OneOf<VariableName, IFreezableStep, IReadOnlyList<IFreezableStep>>.FromT1(step), new TextPosition(context) );
+                return vn;
             }
 
             /// <inheritdoc />
-            public override Result<FreezableStepProperty, IError> VisitEnum(SequenceParser.EnumContext context)
+            public override Result<FreezableStepProperty, IError> VisitEnumeration(SequenceParser.EnumerationContext context)
             {
                 if (context.children.Count != 2 || context.TOKEN().Length != 2)
                     return ParseError(context);
@@ -221,7 +213,7 @@ namespace Reductech.EDR.Core.Parser
             }
 
             /// <inheritdoc />
-            public override Result<FreezableStepProperty, IError> VisitString(SequenceParser.StringContext context)
+            public override Result<FreezableStepProperty, IError> VisitQuotedString(SequenceParser.QuotedStringContext context)
             {
                 string s = context.DOUBLEQUOTEDSTRING() != null ?
                     UnescapeDoubleQuoted(context.DOUBLEQUOTEDSTRING().GetText()):
@@ -255,7 +247,7 @@ namespace Reductech.EDR.Core.Parser
             public override Result<FreezableStepProperty, IError> VisitFunction(SequenceParser.FunctionContext context)
             {
                 var name = context.TOKEN().Symbol.Text;
-                var members = AggregateFunctionMembers(context.functionmember());
+                var members = AggregateFunctionMembers(context.functionMember());
 
                 if (members.IsFailure) return members.ConvertFailure<FreezableStepProperty>();
 
@@ -270,7 +262,7 @@ namespace Reductech.EDR.Core.Parser
             /// <inheritdoc />
             public override Result<FreezableStepProperty, IError> VisitEntity(SequenceParser.EntityContext context)
             {
-                var members = AggregateFunctionMembers(context.functionmember());
+                var members = AggregateFunctionMembers(context.functionMember());
 
                 if (members.IsFailure) return members.ConvertFailure<FreezableStepProperty>();
 
@@ -281,7 +273,7 @@ namespace Reductech.EDR.Core.Parser
 
             private Result<IReadOnlyDictionary<string, FreezableStepProperty>, IError>
                 AggregateFunctionMembers(
-                    IEnumerable<SequenceParser.FunctionmemberContext> functionMembers)
+                    IEnumerable<SequenceParser.FunctionMemberContext> functionMembers)
             {
                 var l = new List<(string key, FreezableStepProperty member)>();
                 var errors = new List<IError>();
@@ -313,7 +305,7 @@ namespace Reductech.EDR.Core.Parser
             }
 
             private Result<(string name, FreezableStepProperty value), IError> GetFunctionMember(
-                SequenceParser.FunctionmemberContext context)
+                SequenceParser.FunctionMemberContext context)
             {
                 var key = context.TOKEN().Symbol.Text;
 

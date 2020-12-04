@@ -48,9 +48,6 @@ namespace Reductech.EDR.Core.Steps
         public static StepFactory Instance { get; } = new NotStepFactory();
 
         /// <inheritdoc />
-        public override IStepNameBuilder StepNameBuilder => new StepNameBuilderFromTemplate($"Not [{nameof(Not.Boolean)}]");
-
-        /// <inheritdoc />
         public override IStepSerializer Serializer =>
             new StepSerializer(TypeName, new FixedStringComponent("not"),
             new FixedStringComponent("("),

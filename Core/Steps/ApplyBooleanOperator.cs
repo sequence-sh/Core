@@ -90,9 +90,6 @@ namespace Reductech.EDR.Core.Steps
         public static StepFactory Instance { get; } = new ApplyBooleanOperatorStepFactory();
 
         /// <inheritdoc />
-        public override IStepNameBuilder StepNameBuilder => new StepNameBuilderFromTemplate($"[{nameof(ApplyBooleanOperator.Left)}] [{nameof(ApplyBooleanOperator.Operator)}] [{nameof(ApplyBooleanOperator.Right)}]");
-
-        /// <inheritdoc />
         public override IEnumerable<Type> EnumTypes => new[] { typeof(BooleanOperator) };
 
         /// <inheritdoc />

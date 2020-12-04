@@ -94,11 +94,11 @@ namespace Reductech.EDR.Core.Internal
             };
 
 
-            static async Task<string> SerializeEntityStream(EntityStream entityStream)
+            async Task<string> SerializeEntityStream(EntityStream entityStream)
             {
                 var entities = await entityStream.SourceEnumerable
                     .Select(x=>x.Serialize())
-                    .ToListAsync();
+                    .ToListAsync(cancellationToken);
 
                 var s = SerializationMethods.SerializeList(entities);
 
@@ -107,6 +107,6 @@ namespace Reductech.EDR.Core.Internal
         }
 
         /// <inheritdoc />
-        public object ValueObject => Value;
+        public object ValueObject => Value!;
     }
 }

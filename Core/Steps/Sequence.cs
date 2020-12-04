@@ -74,9 +74,6 @@ namespace Reductech.EDR.Core.Steps
         protected override ITypeReference GetOutputTypeReference(ITypeReference memberTypeReference) => memberTypeReference;
 
         /// <inheritdoc />
-        public override IStepNameBuilder StepNameBuilder => new StepNameBuilderFromTemplate($"[{nameof(Sequence<object>.InitialSteps)}, {nameof(Sequence<object>.FinalStep)}]");
-
-        /// <inheritdoc />
         protected override Result<ITypeReference, IError> GetMemberType(FreezableStepData freezableStepData, TypeResolver typeResolver) =>
             freezableStepData.GetStep(nameof(Sequence<object>.FinalStep), TypeName)
                 .Bind(x => x.TryGetOutputTypeReference(typeResolver));

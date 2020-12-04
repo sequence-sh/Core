@@ -58,9 +58,6 @@ namespace Reductech.EDR.Core.Steps
         protected override ITypeReference GetOutputTypeReference(ITypeReference memberTypeReference) => new ActualTypeReference(typeof(Unit));
 
         /// <inheritdoc />
-        public override IStepNameBuilder StepNameBuilder { get; } = new StepNameBuilderFromTemplate($"Print [{nameof(Print<object>.Value)}]");
-
-        /// <inheritdoc />
         public override string OutputTypeExplanation => nameof(Unit);
 
         /// <inheritdoc />

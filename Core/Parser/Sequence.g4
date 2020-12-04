@@ -2,10 +2,10 @@
 /*
  * Parser Rules
  */
-setvariable			: VARIABLENAME EQUALS term;
-getvariable         : VARIABLENAME ;
+setVariable			: VARIABLENAME EQUALS term;
+getVariable         : VARIABLENAME ;
 array				: OPENSQUAREBRACKET ( term ( COMMA term)* )? CLOSESQUAREBRACKET ;
-infixoperator		: DASH
+infixOperator		: DASH
 					| PLUS
 					| ASTERIX
 					| DIVIDE
@@ -19,26 +19,26 @@ infixoperator		: DASH
 					| GREATERTHENEQUALS
 					| LESSTHAN
 					| GREATERTHAN ;
-infixoperation		: term infixoperator term ;
-functionmember		: TOKEN EQUALS step ;
-function			: TOKEN OPENBRACKET ( functionmember ( COMMA functionmember)* )? CLOSEBRACKET ;
-entity				: OPENBRACKET ( functionmember ( COMMA functionmember)* )? CLOSEBRACKET ;
-bracketedstep		: OPENBRACKET step CLOSEBRACKET ;
-bool				: TRUE | FALSE ;
-string              : DOUBLEQUOTEDSTRING | SINGLEQUOTEDSTRING ;
+infixOperation		: term infixOperator term ;
+functionMember		: TOKEN (EQUALS | COLON) step ;
+function			: TOKEN OPENBRACKET ( functionMember ( COMMA functionMember)* )? CLOSEBRACKET ;
+entity				: OPENBRACKET ( functionMember ( COMMA functionMember)* )? CLOSEBRACKET ;
+bracketedStep		: OPENBRACKET step CLOSEBRACKET ;
+boolean				: TRUE | FALSE ;
+quotedString		: DOUBLEQUOTEDSTRING | SINGLEQUOTEDSTRING ;
 number              : NUMBER ;
-enum                : TOKEN DOT TOKEN ;
-term				: simpleterm
-					| bracketedstep ;
+enumeration			: TOKEN DOT TOKEN ;
+term				: simpleTerm
+					| bracketedStep ;
 step				: function
-					| infixoperation
-					| setvariable
+					| infixOperation
+					| setVariable
 					| term;
-simpleterm			: number
-                    | bool
-                    | enum
-                    | string
-                    | getvariable
+simpleTerm			: number
+                    | boolean
+                    | enumeration
+                    | quotedString
+                    | getVariable
                     | entity
                     | array ;
 sequence			:(step | ((NEWCOMMAND | DASH) step (NEWCOMMAND step)*))  EOF ;
@@ -63,6 +63,7 @@ GREATERTHENEQUALS   : '>=' ;
 LESSTHAN            : '<' ;
 GREATERTHAN         : '>' ;
 EQUALS				: '=' ;
+COLON				: ':' ;
 OPENBRACKET			: '(' ;
 CLOSEBRACKET		: ')' ;
 OPENSQUAREBRACKET	: '[' ;

@@ -9,14 +9,22 @@ namespace Reductech.EDR.Core.Parser
     /// </summary>
     public sealed class TextPosition : IErrorLocation
     {
+        /// <summary>
+        /// Create a TextPosition from a token
+        /// </summary>
         public TextPosition(IToken token) : this(token.Text, token.StartIndex, token.StopIndex) { }
 
+        /// <summary>
+        /// Create a TextPosition from a parserRuleContext
+        /// </summary>
         public TextPosition(ParserRuleContext parserRuleContext) : this(
             parserRuleContext.GetText(),
             parserRuleContext.Start.StartIndex,
             parserRuleContext.Stop.StopIndex)
         { }
-
+        /// <summary>
+        /// Create a TextPosition from a string and a position
+        /// </summary>
         public TextPosition(string text, int startIndex, int stopIndex)
         {
             Text = text;

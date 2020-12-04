@@ -20,11 +20,13 @@ namespace Reductech.EDR.Core.Internal
         /// </summary>
         Result<IStep, IError> TryFreeze(StepContext stepContext);
 
+
         /// <summary>
-        /// Gets the variables which may be set by this step and their types.
+        /// Gets the variables set by this step and its children and the types of those variables if they can be resolved at this time.
+        /// Does not include reserved variables e.g. Entity
+        /// Returns an error if the type name cannot be resolved
         /// </summary>
-        Result<IReadOnlyCollection<(VariableName VariableName, ITypeReference typeReference)>, IError>
-            TryGetVariablesSet(TypeResolver typeResolver);
+        Result<IReadOnlyCollection<(VariableName variableName, Maybe<ITypeReference>)>, IError> GetVariablesSet(TypeResolver typeResolver);
 
 
         /// <summary>

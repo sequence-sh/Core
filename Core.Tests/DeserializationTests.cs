@@ -99,12 +99,12 @@ Value: notable", "notable");//check 'not' delimiter
 
                 yield return new DeserializationTestFunction(@"Print(Value = true and false)", false);
 
-                yield return new DeserializationTestFunction("Print(Value = ArrayIsEmpty(Array = Array(Elements = [])))", true);
+                yield return new DeserializationTestFunction("Print(Value = ArrayIsEmpty(Array = []))", true);
 
-                yield return new DeserializationTestFunction(@"<ArrayVar> = Array(Elements = ['abc', '123'])");
+                yield return new DeserializationTestFunction(@"<ArrayVar> = ['abc', '123']");
 
                 yield return new DeserializationTestFunction(@"
-- <ArrayVar> = Array(Elements = ['abc', '123'])
+- <ArrayVar> = ['abc', '123']
 - Print(Value = ArrayLength(Array = <ArrayVar>))",2);
 
                 yield return new DeserializationTestFunction(@"Print(Value = ArrayLength(Array = ['abc', '123']))", 2);
@@ -118,31 +118,31 @@ Value: notable", "notable");//check 'not' delimiter
 
 
                 yield return new DeserializationTestFunction(@"
-- <ArrayVar> = Array(Elements = ['abc', '123'])
+- <ArrayVar> = ['abc', '123']
 - Print(Value = ArrayIsEmpty(Array = <ArrayVar>))",false);
 
 
 
                 yield return new DeserializationTestFunction(@"
-- <ArrayVar> = Array(Elements = ['abc', '123'])
+- <ArrayVar> =  ['abc', '123']
 - Print(Value = ElementAtIndex(Array = <ArrayVar>, Index = 1))", "123");
 
                 yield return new DeserializationTestFunction(@"
-- <ArrayVar> = Array(Elements = ['abc', '123'])
+- <ArrayVar> = ['abc', '123']
 - Print(Value = FindElement(Array = <ArrayVar>, Element = '123'))", "1");
 
                 yield return new DeserializationTestFunction(@"
-- <ArrayVar> = Array(Elements = ['abc', '123'])
+- <ArrayVar> = ['abc', '123']
 - Foreach(Array = <ArrayVar>, Variable = <Element>, Action = Print(Value = <Element>))", "abc", "123");
 
 
                 yield return new DeserializationTestFunction(@"
-- <ArrayVar1> = Array(Elements = ['abc', '123'])
+- <ArrayVar1> = ['abc', '123']
 - <ArrayVar2> = Repeat(Element = <ArrayVar1>, Number = 2)
 - Foreach(Array = <ArrayVar2>, Variable = <Element>, Action = Print(Value = ArrayLength(Array = <Element>)))", "2", "2");
 
                 yield return new DeserializationTestFunction(@"
-- <ArrayVar> = Array(Elements = ['abc', 'def'])
+- <ArrayVar> = ['abc', 'def']
 - <Sorted> = ArraySort(Array = <ArrayVar>)
 - Print(Value = ElementAtIndex(Array = <Sorted>, Index = 0))", "abc");
 

@@ -21,10 +21,9 @@ namespace Reductech.EDR.Core
         /// Unicode with big-endian byte order
         /// </summary>
         BigEndianUnicode,
-        /// <summary>
-        /// UTF7
-        /// </summary>
-        UTF7,
+
+        //NOTE: UTF7 is obsolete and insecure and shouldn't be supported
+
         /// <summary>
         /// UTF8 with no byte order mark.
         /// </summary>
@@ -58,7 +57,6 @@ namespace Reductech.EDR.Core
                 EncodingEnum.Default => Encoding.Default,
                 EncodingEnum.Ascii => Encoding.ASCII,
                 EncodingEnum.BigEndianUnicode => Encoding.BigEndianUnicode,
-                EncodingEnum.UTF7 => Encoding.UTF7,
                 EncodingEnum.UTF8 => new UTF8Encoding(false),
                 EncodingEnum.UTF8BOM => new UTF8Encoding(true),
                 EncodingEnum.UTF32 => Encoding.UTF32,

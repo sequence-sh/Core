@@ -71,7 +71,7 @@ namespace Reductech.EDR.Core.Internal
         /// <returns></returns>
         public Result<Unit, IErrorBuilder> EnsureNotReserved()
         {
-            if (ReservedVariableNames.Contains(Name))
+            if (ReservedVariableNames.ContainsKey(this))
                 return new ErrorBuilder($"The Variable <{Name}> is Reserved.", ErrorCode.ReservedVariableName);
             if (Name.StartsWith(ReservedVariableNamePrefix, StringComparison.OrdinalIgnoreCase))
                 return new ErrorBuilder($"The Variable Prefix '{ReservedVariableNamePrefix}' is Reserved.", ErrorCode.ReservedVariableName);
@@ -91,21 +91,23 @@ namespace Reductech.EDR.Core.Internal
         /// </summary>
         public static VariableName Index { get; } = new VariableName("i");
 
-        /// <summary>
-        /// The variable name that elements in foreach loops will be set to
-        /// </summary>
-        public static VariableName Element { get; } = new VariableName("x");
+        ///// <summary>
+        ///// The variable name that elements in foreach loops will be set to
+        ///// </summary>
+        //public static VariableName Element { get; } = new VariableName("x");
 
         /// <summary>
         /// Prefix reserved for internal use
         /// </summary>
         private const string ReservedVariableNamePrefix = "Reductech";
 
-        private static readonly HashSet<string> ReservedVariableNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+        /// <summary>
+        /// Variable names that are reserved
+        /// </summary>
+        public static readonly Dictionary<VariableName, ActualTypeReference> ReservedVariableNames = new Dictionary<VariableName, ActualTypeReference>()
         {
-            Entity.Name,
-            Index.Name,
-            Element.Name,
+            {Entity, new ActualTypeReference(typeof(Entities.Entity))},
+            {Index, new ActualTypeReference(typeof(int))},
         };
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
@@ -68,14 +69,12 @@ namespace Reductech.EDR.Core.Steps
         public static SimpleStepFactory<AppendString, Unit> Instance { get; } = new AppendStringStepFactory();
 
         /// <inheritdoc />
-        public override Result<Maybe<ITypeReference>, IError> GetTypeReferencesSet(VariableName variableName,
-            FreezableStepData freezableStepData, TypeResolver typeResolver, StepFactoryStore stepFactoryStore) => Maybe<ITypeReference>.From(new ActualTypeReference(typeof(string)));
+        public override IEnumerable<(VariableName variableName, Maybe<ITypeReference>)> GetTypeReferencesSet(FreezableStepData freezableStepData, TypeResolver typeResolver)
+        {
+            var vn = freezableStepData.GetVariableName(nameof(AppendString.Variable), TypeName);
+            if(vn.IsFailure) yield break;
 
-
-        /// <inheritdoc />
-        public override IStepNameBuilder StepNameBuilder => new StepNameBuilderFromTemplate($"Append [{nameof(AppendString.String)}] to [{nameof(AppendString.Variable)}]");
-
-
-
+            yield return (vn.Value, Maybe<ITypeReference>.From(new ActualTypeReference(typeof(string))));
+        }
     }
 }

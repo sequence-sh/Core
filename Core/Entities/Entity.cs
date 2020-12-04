@@ -114,7 +114,7 @@ namespace Reductech.EDR.Core.Entities
                     singleValue=>
                     {
                         var v = SerializationMethods.DoubleQuote(singleValue.Original);
-                        results.Add($"{key} = {v}");
+                        results.Add($"{key}: {v}");
 
                     },
                     multiValue=>
@@ -123,7 +123,7 @@ namespace Reductech.EDR.Core.Entities
                             .Select(SerializationMethods.DoubleQuote);
 
                         var r = SerializationMethods.SerializeList(v);
-                        results.Add(r);
+                        results.Add($"{key}: {r}");
                     });
             }
 

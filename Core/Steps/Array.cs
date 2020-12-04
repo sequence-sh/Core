@@ -8,7 +8,6 @@ using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
-using Reductech.EDR.Core.Util;
 
 namespace Reductech.EDR.Core.Steps
 {
@@ -61,9 +60,6 @@ namespace Reductech.EDR.Core.Steps
         protected override ITypeReference GetOutputTypeReference(ITypeReference memberTypeReference) => new GenericTypeReference(typeof(List<>), new[] { memberTypeReference });
 
         /// <inheritdoc />
-        public override IStepNameBuilder StepNameBuilder => new StepNameBuilderFromTemplate($"[[{nameof(Array<object>.Elements)}]]");
-
-        /// <inheritdoc />
         protected override Result<ITypeReference, IError> GetMemberType(FreezableStepData freezableStepData, TypeResolver typeResolver)
         {
             var result =
@@ -89,6 +85,17 @@ namespace Reductech.EDR.Core.Steps
             var fpd = new FreezableStepData( dict, location);
 
             return new CompoundFreezableStep(Instance.TypeName, fpd, configuration);
+        }
+
+        /// <summary>
+        /// Creates an array.
+        /// </summary>
+        public static Array<T> CreateArray<T>(List<IStep<T>> stepList)
+        {
+            return new Array<T>()
+            {
+                Elements = stepList
+            };
         }
     }
 }

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
@@ -49,65 +48,55 @@ namespace Reductech.EDR.Core.Steps
     /// <summary>
     /// Sets the value of a named variable.
     /// </summary>
-    public class SetVariableStepFactory : StepFactory
+    public class SetVariableStepFactory : GenericStepFactory
     {
-        private SetVariableStepFactory() { }
+        private SetVariableStepFactory() {}
 
         /// <summary>
         /// The instance.
         /// </summary>
-        public static StepFactory Instance { get; } = new SetVariableStepFactory();
-
-        /// <inheritdoc />
-        public override Result<ITypeReference, IError> TryGetOutputTypeReference(FreezableStepData freezableStepData,
-            TypeResolver typeResolver) => new ActualTypeReference(typeof(Unit));
+        public static GenericStepFactory Instance { get; } = new SetVariableStepFactory();
 
         /// <inheritdoc />
         public override Type StepType => typeof(SetVariable<>);
 
-
-        /// <inheritdoc />
-        public override IStepNameBuilder StepNameBuilder => new StepNameBuilderFromTemplate($"[{nameof(SetVariable<object>.Variable)}] = [{nameof(SetVariable<object>.Value)}]");
-
-        /// <inheritdoc />
-        public override IEnumerable<Type> EnumTypes => ImmutableArray<Type>.Empty;
-
         /// <inheritdoc />
         public override string OutputTypeExplanation => nameof(Unit);
 
+        /// <inheritdoc />
+        protected override ITypeReference GetOutputTypeReference(ITypeReference memberTypeReference)=> new ActualTypeReference(typeof(Unit));
 
         /// <inheritdoc />
-        public override Result<Maybe<ITypeReference>, IError> GetTypeReferencesSet(VariableName variableName,
-            FreezableStepData freezableStepData, TypeResolver typeResolver, StepFactoryStore stepFactoryStore)
+        protected override Result<ITypeReference, IError> GetMemberType(FreezableStepData freezableStepData, TypeResolver typeResolver)
         {
-            var result = freezableStepData.GetStep(nameof(SetVariable<object>.Value), TypeName)
+            var r =
+            freezableStepData
+                .GetStep(nameof(SetVariable<object>.Value), TypeName)
+                .Bind(x => x.TryGetOutputTypeReference(typeResolver));
 
-                .Bind(x => x.TryGetOutputTypeReference(typeResolver))
-                .Map(Maybe<ITypeReference>.From);
-
-            return result;
+            return r;
         }
 
         /// <inheritdoc />
-        protected override Result<ICompoundStep, IError> TryCreateInstance(StepContext stepContext,
-            FreezableStepData freezeData) =>
-            freezeData.GetVariableName(nameof(SetVariable<object>.Variable), TypeName)
-                .Bind(x => stepContext.TryGetTypeFromReference(new VariableTypeReference(x)).MapError(e=> e.WithLocation(this, freezeData)))
-                .Bind(x => TryCreateGeneric(typeof(SetVariable<>), x).MapError(e=> e.WithLocation(this, freezeData)));
+        public override IEnumerable<(VariableName variableName, Maybe<ITypeReference>)> GetTypeReferencesSet(FreezableStepData freezableStepData, TypeResolver typeResolver)
+        {
+            var vn = freezableStepData.GetVariableName(nameof(SetVariable<object>.Variable), TypeName);
+            if (vn.IsFailure) yield break;
 
+            var memberType =  GetMemberType(freezableStepData, typeResolver);
 
-
+            if (memberType.IsFailure) yield return (vn.Value, Maybe<ITypeReference>.None);
+            yield return (vn.Value, Maybe<ITypeReference>.From(memberType.Value));
+        }
 
 
         /// <inheritdoc />
-        public override IStepSerializer Serializer  =>
+        public override IStepSerializer Serializer =>
             new StepSerializer(TypeName, new StepComponent(nameof(SetVariable<object>.Variable)),
             SpaceComponent.Instance,
             new FixedStringComponent("="),
             SpaceComponent.Instance,
             new StepComponent(nameof(SetVariable<object>.Value))
         );
-
-
     }
 }

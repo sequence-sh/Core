@@ -73,8 +73,5 @@ namespace Reductech.EDR.Core.Steps
         /// The instance.
         /// </summary>
         public static IfStepFactory Instance { get; } = new IfStepFactory();
-
-        /// <inheritdoc />
-        public override IStepNameBuilder StepNameBuilder => new StepNameBuilderFromTemplate($"If [{nameof(If.Condition)}] then [{nameof(If.Then)}] else [{nameof(If.Else)}]");
     }
 }

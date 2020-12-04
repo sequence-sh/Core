@@ -30,7 +30,7 @@ namespace Reductech.EDR.Core.Serialization
         {
             var sb = new StringBuilder();
             sb.Append(Name);
-            sb.Append("(");
+            sb.Append('(');
 
             var first = true;
 
@@ -46,7 +46,7 @@ namespace Reductech.EDR.Core.Serialization
 
                 sb.Append( await stepProperty.SerializeValueAsync(cancellationToken));
             }
-            sb.Append(")");
+            sb.Append(')');
 
             return sb.ToString();
         }

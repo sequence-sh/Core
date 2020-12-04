@@ -70,15 +70,6 @@ namespace Reductech.EDR.Core.Steps
     {
         private EntityMapStepFactory() {}
 
-        /// <inheritdoc />
-        public override IEnumerable<(VariableName VariableName, ITypeReference typeReference)> FixedVariablesSet
-        {
-            get
-            {
-                yield return (VariableName.Entity, new ActualTypeReference(typeof(Entity)));
-            }
-        }
-
         /// <summary>
         /// The instance.
         /// </summary>

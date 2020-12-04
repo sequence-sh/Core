@@ -59,8 +59,5 @@ namespace Reductech.EDR.Core.Steps
         /// The instance.
         /// </summary>
         public static SimpleStepFactory<CharAtIndex, string> Instance { get; } = new CharAtIndexStepFactory();
-
-        /// <inheritdoc />
-        public override IStepNameBuilder StepNameBuilder => new StepNameBuilderFromTemplate($"Get character at index '[{nameof(CharAtIndex.Index)}]' in '[{nameof(CharAtIndex.String)}]'");
     }
 }

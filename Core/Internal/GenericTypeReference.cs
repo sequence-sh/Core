@@ -24,6 +24,7 @@ namespace Reductech.EDR.Core.Internal
         /// <inheritdoc />
         public IEnumerable<VariableTypeReference> VariableTypeReferences => ImmutableList<VariableTypeReference>.Empty;
 
+
         /// <inheritdoc />
         public Result<ActualTypeReference, IErrorBuilder> TryGetActualTypeReference(TypeResolver typeResolver)
         {
@@ -62,6 +63,41 @@ namespace Reductech.EDR.Core.Internal
             var r = TypeArgumentReferences[argumentNumber].TryGetActualTypeReference(typeResolver);
 
             return r;
+        }
+
+        /// <inheritdoc />
+        public Result<Maybe<ActualTypeReference>, IErrorBuilder> GetActualTypeReferenceIfResolvable(TypeResolver typeResolver)
+        {
+            var result = ChildTypes
+                .Select(ct => ct.GetActualTypeReferenceIfResolvable(typeResolver))
+                .Combine(ErrorBuilderList.Combine)
+                .Bind(x => Create(GenericType, x));
+
+            return result;
+
+            static Result<Maybe<ActualTypeReference>, IErrorBuilder> Create(Type genericType, IEnumerable<Maybe<ActualTypeReference>> actualTypeReferences)
+            {
+                var arguments = new List<Type>();
+                foreach (var actualTypeReference in actualTypeReferences)
+                {
+                    if (actualTypeReference.HasValue)
+                        arguments.Add(actualTypeReference.Value.Type);
+                    else return Maybe<ActualTypeReference>.None;
+                }
+
+                try
+                {
+                    var t = genericType.MakeGenericType(arguments.ToArray());
+
+                    return Maybe<ActualTypeReference>.From(new ActualTypeReference(t));
+                }
+#pragma warning disable CA1031 // Do not catch general exception types
+                catch (Exception e)
+                {
+                    return new ErrorBuilder(e, ErrorCode.InvalidCast);
+                }
+#pragma warning restore CA1031 // Do not catch general exception types
+            }
         }
 
 

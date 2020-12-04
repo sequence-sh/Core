@@ -14,7 +14,6 @@ namespace Reductech.EDR.Core.Internal
         /// </summary>
         IEnumerable<VariableTypeReference> VariableTypeReferences { get; }
 
-
         /// <summary>
         /// Tries to get actual type references
         /// </summary>
@@ -24,6 +23,12 @@ namespace Reductech.EDR.Core.Internal
         /// Tries to get the generic member type
         /// </summary>
         Result<ActualTypeReference, IErrorBuilder> TryGetGenericTypeReference(TypeResolver typeResolver, int argumentNumber);
+
+
+        /// <summary>
+        /// Tries to get actual type references
+        /// </summary>
+        Result<Maybe<ActualTypeReference>, IErrorBuilder> GetActualTypeReferenceIfResolvable(TypeResolver typeResolver);
     }
 
 

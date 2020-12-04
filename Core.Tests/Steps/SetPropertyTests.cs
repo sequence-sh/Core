@@ -47,7 +47,7 @@ namespace Reductech.EDR.Core.Tests.Steps
 //            get
 //            {
 //                yield return new SerializeCase("default",
-//                    CreateStepWithDefaultOrArbitraryValues().step,
+//                    CreateStepWithDefaultOrArbitraryValuesAsync().step,
 //                    @"Do: EntitySetValue
 //Entity: (Prop1 = 'Val0',Prop2 = 'Val1')
 //Property: 'Bar2'

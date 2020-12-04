@@ -75,20 +75,6 @@ namespace Reductech.EDR.Core.Steps
         /// The instance.
         /// </summary>
         public static SimpleStepFactory<EntityForEach, Unit> Instance { get; } = new EntityForEachStepFactory();
-
-        /// <inheritdoc />
-        public override IEnumerable<(VariableName VariableName, ITypeReference typeReference)> FixedVariablesSet
-        {
-            get
-            {
-                yield return (VariableName.Entity, new ActualTypeReference(typeof(Entity)));
-            }
-        }
-
-        /// <inheritdoc />
-        public override Result<Maybe<ITypeReference>, IError> GetTypeReferencesSet(VariableName variableName,
-            FreezableStepData freezableStepData, TypeResolver typeResolver, StepFactoryStore stepFactoryStore) =>
-            Maybe<ITypeReference>.From(new ActualTypeReference(typeof(Entity)));
     }
 
 }

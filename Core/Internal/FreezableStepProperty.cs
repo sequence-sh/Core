@@ -8,7 +8,6 @@ using Reductech.EDR.Core.Steps;
 using Opt = OneOf.OneOf<Reductech.EDR.Core.Internal.VariableName, Reductech.EDR.Core.Internal.IFreezableStep, System.Collections.Generic.IReadOnlyList<Reductech.EDR.Core.Internal.IFreezableStep>>;
 
 
-
 namespace Reductech.EDR.Core.Internal
 {
     /// <summary>
@@ -72,13 +71,13 @@ namespace Reductech.EDR.Core.Internal
             Func<IReadOnlyList<IFreezableStep>, T> handleListArgument) =>
             Option.Match(handleVariableName, handleArgument, handleListArgument);
 
-
         /// <summary>
         /// Use this FreezableStepProperty.
         /// </summary>
         public void Switch(Action<VariableName> handleVariableName, Action<IFreezableStep> handleArgument,
             Action<IReadOnlyList<IFreezableStep>> handleListArgument) =>
             Option.Switch(handleVariableName, handleArgument, handleListArgument);
+
 
         /// <summary>
         /// Gets the stepMember if it is a Variable.
@@ -92,17 +91,6 @@ namespace Reductech.EDR.Core.Internal
                 ErrorHelper.WrongParameterTypeError(propertyName, MemberType, MemberType.VariableName).WithLocation(Location));
         }
 
-        /// <summary>
-        /// Gets the stepMember if it is a freezable step.
-        /// </summary>
-        public Result<IFreezableStep, IError> AsStep(string propertyName)
-        {
-            if (Option.TryPickT1(out var s, out _))
-                return Result.Success<IFreezableStep, IError>(s);
-
-            return Result.Failure<IFreezableStep, IError>(
-                ErrorHelper.WrongParameterTypeError(propertyName, MemberType, MemberType.Step).WithLocation(Location));
-        }
 
         /// <summary>
         /// Gets the stepMember if it is a list of freezable steps.
@@ -116,19 +104,6 @@ namespace Reductech.EDR.Core.Internal
                 ErrorHelper.WrongParameterTypeError(propertyName, MemberType, MemberType.StepList).WithLocation(Location));
         }
 
-        ///// <summary>
-        ///// Tries to convert a step member of one type to one of another.
-        ///// </summary>
-        //public Result<FreezableStepProperty, IErrorBuilder> TryConvert(MemberType newMemberType, bool convertStepListToSequence)
-        //{
-        //    if (newMemberType == MemberType)
-        //        return this;
-        //    else if(newMemberType == MemberType.Step)
-        //        return new FreezableStepProperty(Opt.FromT1(ConvertToStep(convertStepListToSequence)), Location);
-
-        //    return new ErrorBuilder($"Could not convert {MemberType} to {newMemberType}", ErrorCode.InvalidCast);
-
-        //}
 
         /// <summary>
         /// Tries to convert this step member to a FreezableStep
@@ -145,20 +120,17 @@ namespace Reductech.EDR.Core.Internal
 
             IFreezableStep MapStepList(IReadOnlyList<IFreezableStep> stepList)
             {
-                if (stepList.Any() && stepList.All(x => x is ConstantFreezableStep cfs && cfs.Value.IsT6))
-                {
-                    var entities = stepList
-                        .Select(x => (ConstantFreezableStep) x)
-                        .Select(x => x.Value.AsT6).ToList();
+                if (!stepList.Any() || !stepList.All(x => x is ConstantFreezableStep cfs && cfs.Value.IsT6))
+                    return MapStepListToArray(stepList);
 
-                    var entityStream = EntityStream.Create(entities);
+                var entities = stepList
+                    .Select(x => (ConstantFreezableStep) x)
+                    .Select(x => x.Value.AsT6).ToList();
 
-                    var c = new ConstantFreezableStep(entityStream);
-                    return c;
-                }
-                //else if (convertStepListToSequence1)
-                //    return MapStepListToSequence(stepList);
-                else return MapStepListToArray(stepList);
+                var entityStream = EntityStream.Create(entities);
+
+                var c = new ConstantFreezableStep(entityStream);
+                return c;
             }
 
             IFreezableStep MapStepListToArray(IReadOnlyList<IFreezableStep> stepList)
@@ -166,12 +138,6 @@ namespace Reductech.EDR.Core.Internal
                 var array = ArrayStepFactory.CreateFreezable(stepList, null, Location);
                 return array;
             }
-
-            //IFreezableStep MapStepListToSequence(IReadOnlyList<IFreezableStep> stepList)
-            //{
-            //    var array = SequenceStepFactory.CreateFreezable(stepList, null, Location);
-            //    return array;
-            //}
 
             IFreezableStep MapVariableName(VariableName vn)
             {
@@ -214,12 +180,6 @@ namespace Reductech.EDR.Core.Internal
 
             static bool ListsAreEqual(IEnumerable<IFreezableStep> a1, IEnumerable<IFreezableStep> a2)
             {
-                //if (a1 is null)
-                //    return a2 is null;
-
-                //if (a2 is null)
-                //    return false;
-
                 return a1.SequenceEqual(a2);
             }
         }

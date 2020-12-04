@@ -6,8 +6,6 @@ using Reductech.EDR.Core.Serialization;
 
 namespace Reductech.EDR.Core.Internal
 {
-
-
     /// <summary>
     /// A factory for creating steps.
     /// </summary>
@@ -29,21 +27,22 @@ namespace Reductech.EDR.Core.Internal
         public string Category { get; }
 
         /// <summary>
-        /// Builds the name for a particular instance of a step.
-        /// </summary>
-        IStepNameBuilder StepNameBuilder { get; }
-
-        /// <summary>
         /// Tries to get a reference to the output type of this step.
         /// </summary>
         Result<ITypeReference, IError> TryGetOutputTypeReference(FreezableStepData freezeData, TypeResolver typeResolver);
 
+        ///// <summary>
+        ///// If this variable is being set. Get the type reference it is being set to.
+        ///// </summary>
+        //Result<Maybe<ITypeReference>, IError> GetTypeReferencesSet(VariableName variableName,
+        //    FreezableStepData freezableStepData, TypeResolver typeResolver, StepFactoryStore stepFactoryStore) =>
+        //    Maybe<ITypeReference>.None;
+
+
         /// <summary>
-        /// If this variable is being set. Get the type reference it is being set to.
+        /// Gets all type references set by this method and their values if they can be calculated.
         /// </summary>
-        Result<Maybe<ITypeReference>, IError> GetTypeReferencesSet(VariableName variableName,
-            FreezableStepData freezableStepData, TypeResolver typeResolver, StepFactoryStore stepFactoryStore) =>
-            Maybe<ITypeReference>.None;
+        IEnumerable<(VariableName variableName, Maybe<ITypeReference>)> GetTypeReferencesSet(FreezableStepData freezableStepData, TypeResolver typeResolver);
 
         /// <summary>
         /// Serializer to use for serialization.
@@ -77,11 +76,6 @@ namespace Reductech.EDR.Core.Internal
         /// Gets all the properties required by this step.
         /// </summary>
         IEnumerable<string> RequiredProperties { get; }
-
-        /// <summary>
-        /// Variables that will always be set by this step.
-        /// </summary>
-        IEnumerable<(VariableName VariableName, ITypeReference typeReference)> FixedVariablesSet { get; }
 
         /// <summary>
         /// Gets all enum types used by this step.

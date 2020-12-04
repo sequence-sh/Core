@@ -64,9 +64,10 @@ namespace Reductech.EDR.Core.Internal
         }
 
         /// <inheritdoc />
-        public Result<IReadOnlyCollection<(VariableName VariableName, ITypeReference typeReference)>, IError>
-            TryGetVariablesSet(TypeResolver typeResolver) =>
-            ImmutableList<(VariableName VariableName, ITypeReference type)>.Empty;
+        public Result<IReadOnlyCollection<(VariableName variableName, Maybe<ITypeReference>)>, IError> GetVariablesSet(TypeResolver typeResolver)
+        {
+            return Result.Success<IReadOnlyCollection<(VariableName variableName, Maybe<ITypeReference>)>, IError>(new List<(VariableName variableName, Maybe<ITypeReference>)>());
+        }
 
         /// <inheritdoc />
         public string StepName
@@ -118,8 +119,8 @@ namespace Reductech.EDR.Core.Internal
                     e => e.ToString(),
                     dt => dt.ToString("O"),
                     entity => entity.Serialize(),
-                    _ => "EntityStream", //TODO fix
-                    ds => ds.Serialize() //TODO fix
+                    es => "EntityStream",
+                    ds => ds.Serialize()//TODO change to DataStream
                 );
         }
 

@@ -104,7 +104,6 @@ namespace Reductech.EDR.Core.Util
         /// <summary>
         /// Tries to get the element. Returns a failure if it is not present.
         /// </summary>
-#pragma warning disable 8714
         public static Result<TValue> TryFindOrFail<TKey, TValue>(this IReadOnlyDictionary<TKey, TValue> dictionary,
             TKey key, string? error)
         {
@@ -117,7 +116,6 @@ namespace Reductech.EDR.Core.Util
         /// <summary>
         /// Tries to get the element. Returns a failure if it is not present.
         /// </summary>
-#pragma warning disable 8714
         public static Result<TValue, TError> TryFindOrFail<TKey, TValue, TError>(this IReadOnlyDictionary<TKey, TValue> dictionary,
             TKey key, Func<TError> error)
         {
@@ -160,6 +158,5 @@ namespace Reductech.EDR.Core.Util
 
             return Result.Failure<object>($"{enumType.Name} does not have a value '{value}'");
         }
-#pragma warning restore 8714
     }
 }

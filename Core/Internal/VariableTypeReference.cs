@@ -11,6 +11,7 @@ namespace Reductech.EDR.Core.Internal
     /// </summary>
     public sealed class VariableTypeReference : ITypeReference, IEquatable<ITypeReference>
     {
+
         /// <summary>
         /// Creates a new VariableTypeReference.
         /// </summary>
@@ -62,5 +63,15 @@ namespace Reductech.EDR.Core.Internal
             return TryGetActualTypeReference(typeResolver)
                 .Bind(x=> x.TryGetGenericTypeReference(typeResolver, argumentNumber) );
         }
+
+        /// <inheritdoc />
+        public Result<Maybe<ActualTypeReference>, IErrorBuilder> GetActualTypeReferenceIfResolvable(TypeResolver typeResolver)
+        {
+            if (typeResolver.Dictionary.TryGetValue(VariableName, out var act))
+                return Maybe<ActualTypeReference>.From(act);
+
+            return Maybe<ActualTypeReference>.None;
+        }
+
     }
 }

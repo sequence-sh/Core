@@ -28,14 +28,14 @@ namespace Reductech.EDR.Core.Tests.Steps
             }
         }
 
-        /// <inheritdoc />
-        protected override IEnumerable<SerializeCase> SerializeCases
-        {
-            get
-            {
-                yield return CreateDefaultSerializeCase(false);
-            }
+        ///// <inheritdoc />
+        //protected override IEnumerable<SerializeCase> SerializeCases
+        //{
+        //    get
+        //    {
+        //        yield return CreateDefaultSerializeCase(false);
+        //    }
 
-        }
+        //}
     }
 }

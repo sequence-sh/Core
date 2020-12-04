@@ -16,7 +16,7 @@ namespace Reductech.EDR.Core.TestHarness
         {
             get
             {
-                yield return CreateDefaultSerializeCase(true);
+                yield return CreateDefaultSerializeCase(true).Result; //TODO fix th
             }
         }
 
@@ -65,9 +65,9 @@ namespace Reductech.EDR.Core.TestHarness
         }
 
 
-        public static SerializeCase CreateDefaultSerializeCase(bool shortForm)
+        public static async Task<SerializeCase> CreateDefaultSerializeCase(bool shortForm)
         {
-            var (step, values) = CreateStepWithDefaultOrArbitraryValues();
+            var (step, values) = await CreateStepWithDefaultOrArbitraryValuesAsync();
 
 
             var stepName = new TStep().StepFactory.TypeName;
@@ -76,13 +76,13 @@ namespace Reductech.EDR.Core.TestHarness
             if (shortForm)
             {
                 expectedYamlBuilder.Append(stepName);
-                expectedYamlBuilder.Append("(");
+                expectedYamlBuilder.Append('(');
 
                 var pairs = values//.OrderBy(x => x.Key)
                     .Select(x => $"{x.Key} = {x.Value}");
 
                 expectedYamlBuilder.AppendJoin(", ", pairs);
-                expectedYamlBuilder.Append(")");
+                expectedYamlBuilder.Append(')');
                 var c = new SerializeCase("Default", step, expectedYamlBuilder.ToString());
 
                 return c;

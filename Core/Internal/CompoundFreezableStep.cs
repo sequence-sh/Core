@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Linq;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Internal.Errors;
-using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.Util;
 
 namespace Reductech.EDR.Core.Internal
@@ -60,52 +58,17 @@ namespace Reductech.EDR.Core.Internal
         }
 
         /// <inheritdoc />
-        public Result<IReadOnlyCollection<(VariableName VariableName, ITypeReference typeReference)>, IError>
-            TryGetVariablesSet(TypeResolver typeResolver)
+        public Result<IReadOnlyCollection<(VariableName variableName, Maybe<ITypeReference>)>, IError> GetVariablesSet(TypeResolver typeResolver)
         {
             var stepFactory = TryGetStepFactory(typeResolver.StepFactoryStore);
 
-            if (stepFactory.IsFailure) return stepFactory.ConvertFailure<IReadOnlyCollection<(VariableName VariableName, ITypeReference typeReference)>>();
+            if (stepFactory.IsFailure) return stepFactory.ConvertFailure<IReadOnlyCollection<(VariableName variableName, Maybe<ITypeReference>)>>();
 
+            var dataResult = FreezableStepData.GetVariablesSet(typeResolver);
+            if (dataResult.IsFailure) return dataResult;
 
-            if (!(stepFactory.Value is GetVariableStepFactory)) //GetVariable is allowed to access reserved variables
-            {
-                var ensureReservedResult = FreezableStepData.StepProperties
-                    .Values.SelectMany(x=>x.VariableName.ToEnumerable())
-                    .Select(x => x.EnsureNotReserved())
-                .Combine(ErrorBuilderList.Combine)
-                .MapError(x => x.WithLocation(this));
-
-                if (ensureReservedResult.IsFailure)
-                    return ensureReservedResult.ConvertFailure<IReadOnlyCollection<(VariableName VariableName, ITypeReference typeReference)>>();
-            }
-
-
-            var result = FreezableStepData
-                .StepProperties.Values
-                .Select(x=>
-                    x.Match(TryGetVariableNameVariablesSet, TryGetStepVariablesSet, TryGetStepListVariablesSet))
-                .Combine(ErrorList.Combine)
-                    .Map(x => x.SelectMany(y => y)
-                    .ToList() as IReadOnlyCollection<(VariableName name, ITypeReference type)>);
-
-
-
-            return result;
-
-
-            Result<IReadOnlyCollection<(VariableName, ITypeReference)>, IError> TryGetVariableNameVariablesSet(VariableName vn) =>
-
-                stepFactory.Value.GetTypeReferencesSet(vn, FreezableStepData, typeResolver, typeResolver.StepFactoryStore)
-                    .Map(y => y.Map(x => new[] { (vn, x) } as IReadOnlyCollection<(VariableName, ITypeReference)>)
-                        .Unwrap(ImmutableArray<(VariableName, ITypeReference)>.Empty));
-
-            Result<IReadOnlyCollection<(VariableName, ITypeReference)>, IError> TryGetStepVariablesSet(IFreezableStep y) => y.TryGetVariablesSet(typeResolver);
-
-            Result<IReadOnlyCollection<(VariableName, ITypeReference)>, IError> TryGetStepListVariablesSet(IReadOnlyList<IFreezableStep> y) =>
-
-                y.Select(z => z.TryGetVariablesSet(typeResolver)).Combine(ErrorList.Combine).Map(x =>
-                    x.SelectMany(q => q).ToList() as IReadOnlyCollection<(VariableName, ITypeReference)>);
+            return dataResult.Value.Concat(stepFactory.Value.GetTypeReferencesSet(FreezableStepData, typeResolver))
+                .ToList();
         }
 
         /// <inheritdoc />

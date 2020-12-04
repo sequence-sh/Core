@@ -96,7 +96,7 @@ namespace Reductech.EDR.Core.Internal
             {
                 var valueString = await value.SerializeAsync(cancellationToken);
 
-                results.Add($"{key} = {valueString}");
+                results.Add($"{key}: {valueString}");
             }
 
             sb.AppendJoin(",", results);

@@ -92,14 +92,5 @@ namespace Reductech.EDR.Core.Steps
         /// The instance.
         /// </summary>
         public static SimpleStepFactory<EntityStreamDistinct, EntityStream> Instance { get; } = new EntityStreamDistinctStepFactory();
-
-        /// <inheritdoc />
-        public override IEnumerable<(VariableName VariableName, ITypeReference typeReference)> FixedVariablesSet
-        {
-            get
-            {
-                yield return (VariableName.Entity, new ActualTypeReference(typeof(Entity)));
-            }
-        }
     }
 }

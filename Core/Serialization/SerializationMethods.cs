@@ -1,5 +1,9 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+using Reductech.EDR.Core.Entities;
 
 namespace Reductech.EDR.Core.Serialization
 {
@@ -174,7 +178,14 @@ namespace Reductech.EDR.Core.Serialization
             .Replace("\r", @"\r")
             .Replace("\n", @"\n")) + "\"";
 
+        /// <summary>
+        /// Serialize an entityStream
+        /// </summary>
+        public static async Task<string> SerializeEntityStreamAsync(EntityStream entityStream, CancellationToken cancellationToken)
+        {
+            var enumerable = await entityStream.SourceEnumerable.Select(x=>x.Serialize()) .ToListAsync(cancellationToken);
 
-
+            return SerializeList(enumerable);
+        }
     }
 }

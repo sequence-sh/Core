@@ -32,7 +32,7 @@ namespace Reductech.EDR.Core.Tests.Steps
 
                     }, Unit.Default,
 
-                    "Foo: Alpha", "Foo: Beta"
+                    "(Foo: \"Alpha\")", "(Foo: \"Beta\")"
                 );
 
 
@@ -54,37 +54,37 @@ namespace Reductech.EDR.Core.Tests.Steps
 
                     }, Unit.Default,
 
-                    "Foo: Alpha", "Foo: Beta", "Foo: Gamma", "Foo: Delta"
+                    "(Foo: \"Alpha\")", "(Foo: \"Beta\")", "(Foo: \"Gamma\")", "(Foo: \"Delta\")"
                 );
 
             }
         }
 
-        /// <inheritdoc />
-        protected override IEnumerable<SerializeCase> SerializeCases
-        {
-            get
-            {
-                yield return new SerializeCase("Default",
-                    CreateStepWithDefaultOrArbitraryValues().step,
-                    @"Do: EntityStreamConcat
-EntityStreams:
-  Do: Array
-  Elements:
-  - - (Prop1 = 'Val0',Prop2 = 'Val1')
-    - (Prop1 = 'Val2',Prop2 = 'Val3')
-    - (Prop1 = 'Val4',Prop2 = 'Val5')
-  - - (Prop1 = 'Val6',Prop2 = 'Val7')
-    - (Prop1 = 'Val8',Prop2 = 'Val9')
-    - (Prop1 = 'Val10',Prop2 = 'Val11')
-  - - (Prop1 = 'Val12',Prop2 = 'Val13')
-    - (Prop1 = 'Val14',Prop2 = 'Val15')
-    - (Prop1 = 'Val16',Prop2 = 'Val17')"
+//        /// <inheritdoc />
+//        protected override IEnumerable<SerializeCase> SerializeCases
+//        {
+//            get
+//            {
+//                yield return new SerializeCase("Default",
+//                    CreateStepWithDefaultOrArbitraryValuesAsync().step,
+//                    @"Do: EntityStreamConcat
+//EntityStreams:
+//  Do: Array
+//  Elements:
+//  - - (Prop1 = 'Val0',Prop2 = 'Val1')
+//    - (Prop1 = 'Val2',Prop2 = 'Val3')
+//    - (Prop1 = 'Val4',Prop2 = 'Val5')
+//  - - (Prop1 = 'Val6',Prop2 = 'Val7')
+//    - (Prop1 = 'Val8',Prop2 = 'Val9')
+//    - (Prop1 = 'Val10',Prop2 = 'Val11')
+//  - - (Prop1 = 'Val12',Prop2 = 'Val13')
+//    - (Prop1 = 'Val14',Prop2 = 'Val15')
+//    - (Prop1 = 'Val16',Prop2 = 'Val17')"
 
 
-                    );
+//                    );
 
-            }
-        }
+//            }
+//        }
     }
 }

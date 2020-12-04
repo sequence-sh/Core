@@ -79,7 +79,7 @@ namespace Reductech.EDR.Core.TestHarness
         /// <summary>
         /// The error returned by a FailStep
         /// </summary>
-        protected static IError FailStepError { get; } = new SingleError("Intentional ValueIf Error", ErrorCode.Test, EntireSequenceLocation.Instance);
+        protected static IError FailStepError { get; } = new SingleError("Intentional Error", ErrorCode.Test, EntireSequenceLocation.Instance);
 
         private class FailStep<T> : CompoundStep<T>
         {

@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
-using System.Collections.Immutable;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Internal.Errors;
@@ -15,15 +15,15 @@ namespace Reductech.EDR.Core.Internal
         /// Create a new CreateEntityFreezableStep
         /// </summary>
         /// <param name="data"></param>
-        public CreateEntityFreezableStep(FreezableStepData data) => Data = data;
+        public CreateEntityFreezableStep(FreezableStepData data) => FreezableStepData = data;
 
         /// <summary>
         /// The data
         /// </summary>
-        public FreezableStepData Data { get; }
+        public FreezableStepData FreezableStepData { get; }
 
         /// <inheritdoc />
-        public bool Equals(IFreezableStep? other) => other is CreateEntityFreezableStep oStep && Data.Equals(oStep.Data);
+        public bool Equals(IFreezableStep? other) => other is CreateEntityFreezableStep oStep && FreezableStepData.Equals(oStep.FreezableStepData);
 
         /// <inheritdoc />
         public string StepName => "Create Entity";
@@ -36,7 +36,7 @@ namespace Reductech.EDR.Core.Internal
 
 
 
-            foreach (var (propertyName, stepMember) in Data.StepProperties)
+            foreach (var (propertyName, stepMember) in FreezableStepData.StepProperties)
             {
                 var frozen = stepMember.ConvertToStep()
                     .TryFreeze(stepContext)
@@ -59,34 +59,12 @@ namespace Reductech.EDR.Core.Internal
         }
 
         /// <inheritdoc />
-        public Result<IReadOnlyCollection<(VariableName VariableName, ITypeReference typeReference)>, IError> TryGetVariablesSet(TypeResolver typeResolver)
+        public Result<IReadOnlyCollection<(VariableName variableName, Maybe<ITypeReference>)>, IError> GetVariablesSet(TypeResolver typeResolver)
         {
-            var result = Data
-                .StepProperties.Values
-                .Select(x =>
-                    x.Match(TryGetVariableNameVariablesSet, TryGetStepVariablesSet, TryGetStepListVariablesSet))
-                .Combine(ErrorList.Combine)
-                .Map(x => x.SelectMany(y => y)
-                    .ToList() as IReadOnlyCollection<(VariableName name, ITypeReference type)>);
-
-
-
-            return result;
-
-
-            Result<IReadOnlyCollection<(VariableName, ITypeReference)>, IError> TryGetVariableNameVariablesSet(
-                VariableName vn) =>
-                ImmutableArray<(VariableName, ITypeReference)>.Empty;
-
-            Result<IReadOnlyCollection<(VariableName, ITypeReference)>, IError> TryGetStepVariablesSet(IFreezableStep y) => y.TryGetVariablesSet(typeResolver);
-
-            Result<IReadOnlyCollection<(VariableName, ITypeReference)>, IError> TryGetStepListVariablesSet(IReadOnlyList<IFreezableStep> y) =>
-
-                y.Select(z => z.TryGetVariablesSet(typeResolver)).Combine(ErrorList.Combine).Map(x =>
-                    x.SelectMany(q => q).ToList() as IReadOnlyCollection<(VariableName, ITypeReference)>);
+            return FreezableStepData.GetVariablesSet(typeResolver);
         }
 
         /// <inheritdoc />
-        public Result<ITypeReference, IError> TryGetOutputTypeReference(TypeResolver typeResolver) => new ActualTypeReference(typeof(Entity));
+        public Result<ITypeReference, IError> TryGetOutputTypeReference(TypeResolver typeResolver) => new ActualTypeReference(typeof(Entities.Entity));
     }
 }

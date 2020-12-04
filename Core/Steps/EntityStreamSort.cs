@@ -100,13 +100,6 @@ namespace Reductech.EDR.Core.Steps
     {
         private EntityStreamSortStepFactory() { }
 
-        /// <inheritdoc />
-        public override IEnumerable<(VariableName VariableName, ITypeReference typeReference)> FixedVariablesSet =>
-            new (VariableName VariableName, ITypeReference typeReference)[]
-            {
-                (VariableName.Entity, new ActualTypeReference(typeof(Entity)))
-            };
-
         /// <summary>
         /// The instance.
         /// </summary>

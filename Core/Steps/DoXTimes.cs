@@ -59,9 +59,5 @@ namespace Reductech.EDR.Core.Steps
         /// The instance.
         /// </summary>
         public static SimpleStepFactory<DoXTimes, Unit> Instance { get; } = new DoXTimesStepFactory();
-
-
-        /// <inheritdoc />
-        public override IStepNameBuilder StepNameBuilder => new StepNameBuilderFromTemplate($"Repeat '[{nameof(DoXTimes.Action)}]' '[{nameof(DoXTimes.X)}]' times.");
     }
 }

@@ -113,9 +113,6 @@ namespace Reductech.EDR.Core.Steps
             return result;
         }
 
-        /// <inheritdoc />
-        public override IStepNameBuilder StepNameBuilder => new StepNameBuilderFromTemplate($"[{nameof(Compare<int>.Left)}] [{nameof(Compare<int>.Operator)}] [{nameof(Compare<int>.Right)}]");
-
 
         /// <inheritdoc />
         public override IStepSerializer Serializer => new StepSerializer(TypeName, new FixedStringComponent("("),

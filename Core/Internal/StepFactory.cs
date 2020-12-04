@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.ComponentModel.DataAnnotations;
@@ -8,6 +9,7 @@ using System.Text.RegularExpressions;
 using CSharpFunctionalExtensions;
 using Namotion.Reflection;
 using Reductech.EDR.Core.Attributes;
+using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Serialization;
 using Reductech.EDR.Core.Steps;
@@ -36,13 +38,6 @@ namespace Reductech.EDR.Core.Internal
         public override string ToString() => TypeName;
 
         /// <inheritdoc />
-        public abstract IStepNameBuilder StepNameBuilder { get; }
-
-        /// <inheritdoc />
-        public virtual IEnumerable<(VariableName VariableName, ITypeReference typeReference)> FixedVariablesSet =>
-            Enumerable.Empty<(VariableName VariableName, ITypeReference typeReference)>();
-
-        /// <inheritdoc />
         public abstract IEnumerable<Type> EnumTypes { get; }
 
         /// <inheritdoc />
@@ -50,9 +45,11 @@ namespace Reductech.EDR.Core.Internal
 
 
         /// <inheritdoc />
-        public virtual Result<Maybe<ITypeReference>, IError> GetTypeReferencesSet(VariableName variableName,
-            FreezableStepData freezableStepData, TypeResolver typeResolver, StepFactoryStore stepFactoryStore) =>
-            Maybe<ITypeReference>.None;
+        public virtual IEnumerable<(VariableName variableName, Maybe<ITypeReference>)> GetTypeReferencesSet(FreezableStepData freezableStepData, TypeResolver typeResolver)
+        {
+            yield break;
+        }
+
 
         /// <inheritdoc />
         public virtual IStepSerializer Serializer => new FunctionSerializer(TypeName);
@@ -110,7 +107,7 @@ namespace Reductech.EDR.Core.Internal
                 {
                     var result =
                     stepMember.Match(
-                        vn => TrySetVariableName(propertyInfo, step, vn),
+                        vn => TrySetVariableName(propertyInfo, step, vn, stepMember.Location, stepContext),
                         s => TrySetStep(propertyInfo, step, s, stepContext),
                         sList => TrySetStepList(propertyInfo, step, sList, stepContext)
                     );
@@ -142,10 +139,23 @@ namespace Reductech.EDR.Core.Internal
         }
 
 
-        private static Result<Unit, IError> TrySetVariableName(PropertyInfo propertyInfo, ICompoundStep parentStep, VariableName member)
+        private static Result<Unit, IError> TrySetVariableName(PropertyInfo propertyInfo,
+            ICompoundStep parentStep,
+            VariableName variableName,
+            IErrorLocation stepMemberLocation,
+            StepContext stepContext)
         {
-            propertyInfo.SetValue(parentStep, member);
-            return Unit.Default;
+            if (propertyInfo.PropertyType.IsInstanceOfType(variableName))
+            {
+                propertyInfo.SetValue(parentStep, variableName);
+                return Unit.Default;
+            }
+
+            var step = GetVariableStepFactory.CreateFreezable(variableName, stepMemberLocation);
+
+            return TrySetStep(propertyInfo, parentStep, step, stepContext);
+
+
         }
 
         private static Result<Unit, IError> TrySetStep(PropertyInfo propertyInfo,
@@ -165,51 +175,168 @@ namespace Reductech.EDR.Core.Internal
         }
 
 
-
         private static Result<Unit, IError> TrySetStepList(PropertyInfo propertyInfo,
             ICompoundStep parentStep,
             IReadOnlyList<IFreezableStep> freezableStepList,
             StepContext stepContext)
         {
-            var argument = propertyInfo.PropertyType.GenericTypeArguments.Single();
-            var listType = typeof(List<>).MakeGenericType(argument);
-
-            var list = Activator.CreateInstance(listType);
-            var errors = new List<IError>();
-
-
-            foreach (var freezableStep in freezableStepList)
+            if (propertyInfo.GetCustomAttribute<StepListPropertyAttribute>() != null)
             {
-                var freezeResult = freezableStep.TryFreeze(stepContext);
+                return SetStepList();
+            }
+            else if (propertyInfo.GetCustomAttribute<StepPropertyAttribute>() != null)
+            {
+                var argument = propertyInfo.PropertyType.GenericTypeArguments.Single();
 
-                if(freezeResult.IsFailure)
-                    errors.Add(freezeResult.Error);
-                else if (freezeResult.Value is IConstantStep constant && argument.IsInstanceOfType(constant.ValueObject))
+                if (argument == typeof(EntityStream))
                 {
-                    var addMethod = listType.GetMethod(nameof(List<object>.Add))!;
-                    addMethod.Invoke(list, new[] { constant.ValueObject });
+                    return SetEntityStream();
                 }
-                else if (argument.IsInstanceOfType(freezeResult.Value))
+                else if (argument.GenericTypeArguments.Length == 1 && typeof(IEnumerable).IsAssignableFrom(argument) && argument != typeof(string))
                 {
-                    var addMethod = listType.GetMethod(nameof(List<object>.Add))!;
-                    addMethod.Invoke(list, new object?[] { freezeResult.Value });
+                    return SetArray(argument);
                 }
-                else
-                {
-                    var error = new SingleError(
-                        $"'{CompressSpaces(freezeResult.Value.Name)}' is a '{freezeResult.Value.OutputType.GetDisplayName()}' but it should be a '{argument.GenericTypeArguments.First().GetDisplayName()}' to be a member of '{parentStep.StepFactory.TypeName}'",
-                        ErrorCode.InvalidCast,
-                        new StepErrorLocation(parentStep));
-                    errors.Add(error);
-                }
+
+                return Result.Failure<Unit, IError>(ErrorHelper.WrongParameterTypeError(propertyInfo.Name, MemberType.StepList, MemberType.Step)
+                    .WithLocation(parentStep));
             }
 
-            if (errors.Any())
-                return Result.Failure<Unit, IError>(ErrorList.Combine(errors));
+            return Result.Failure<Unit, IError>(ErrorHelper.WrongParameterTypeError(propertyInfo.Name, MemberType.StepList, MemberType.VariableName)
+                    .WithLocation(parentStep));
 
-            propertyInfo.SetValue(parentStep, list);
+            Result<Unit, IError> SetStepList()
+            {
+                var argument = propertyInfo.PropertyType.GenericTypeArguments.Single();
+                var listType = typeof(List<>).MakeGenericType(argument);
 
-            return Unit.Default;
+                var list = Activator.CreateInstance(listType);
+                var addMethod = listType.GetMethod(nameof(List<object>.Add))!;
+                var errors = new List<IError>();
+
+
+                foreach (var freezableStep in freezableStepList)
+                {
+                    var freezeResult = freezableStep.TryFreeze(stepContext);
+
+                    if (freezeResult.IsFailure)
+                        errors.Add(freezeResult.Error);
+                    else if (freezeResult.Value is IConstantStep constant && argument.IsInstanceOfType(constant.ValueObject))
+                    {
+
+                        addMethod.Invoke(list, new[] { constant.ValueObject });
+                    }
+                    else if (argument.IsInstanceOfType(freezeResult.Value))
+                    {
+                        addMethod.Invoke(list, new object?[] { freezeResult.Value });
+                    }
+                    else
+                    {
+                        var error = new SingleError(
+                            $"'{CompressSpaces(freezeResult.Value.Name)}' is a '{freezeResult.Value.OutputType.GetDisplayName()}' but it should be a '{argument.GenericTypeArguments.First().GetDisplayName()}' to be a variableName of '{parentStep.StepFactory.TypeName}'",
+                            ErrorCode.InvalidCast,
+                            new StepErrorLocation(parentStep));
+                        errors.Add(error);
+                    }
+                }
+
+                if (errors.Any())
+                    return Result.Failure<Unit, IError>(ErrorList.Combine(errors));
+
+                propertyInfo.SetValue(parentStep, list);
+
+                return Unit.Default;
+            }
+
+
+            Result<Unit, IError> SetEntityStream()
+            {
+                var list = new List<IStep<Entities.Entity>>();
+                var errors = new List<IError>();
+
+                foreach (var freezableStep in freezableStepList)
+                {
+                    var freezeResult = freezableStep.TryFreeze(stepContext);
+
+                    if (freezeResult.IsFailure)
+                        errors.Add(freezeResult.Error);
+                    else if (freezeResult.Value is IStep<Entities.Entity> entityStep)
+                    {
+                        list.Add(entityStep);
+                    }
+                    else
+                    {
+                        var error = new SingleError(
+                            $"'{CompressSpaces(freezeResult.Value.Name)}' is a '{freezeResult.Value.OutputType.GetDisplayName()}' but it should be an Entity to be a variableName of '{parentStep.StepFactory.TypeName}'",
+                            ErrorCode.InvalidCast,
+                            new StepErrorLocation(parentStep));
+                        errors.Add(error);
+                    }
+                }
+
+                if (errors.Any())
+                    return Result.Failure<Unit, IError>(ErrorList.Combine(errors));
+
+                var step = new EntityStreamCreate()
+                {
+                    Elements = list
+                };
+
+                propertyInfo.SetValue(parentStep, step);
+
+                return Unit.Default;
+            }
+
+            Result<Unit, IError> SetArray(Type argument)
+            {
+                var nestedArgument = argument.GenericTypeArguments.Single();
+
+                var stepType = typeof(IStep<>).MakeGenericType(nestedArgument);
+
+                var listType = typeof(List<>).MakeGenericType(stepType);
+                var addMethod = listType.GetMethod(nameof(List<object>.Add))!;
+
+                var list = Activator.CreateInstance(listType);
+                var errors = new List<IError>();
+
+                foreach (var freezableStep in freezableStepList)
+                {
+                    var freezeResult = freezableStep.TryFreeze(stepContext);
+
+                    if (freezeResult.IsFailure)
+                        errors.Add(freezeResult.Error);
+                    else if (stepType.IsInstanceOfType(freezeResult.Value))
+                    {
+                        addMethod.Invoke(list, new object?[] { freezeResult.Value });
+                    }
+                    else
+                    {
+                        var error = new SingleError(
+                            $"'{CompressSpaces(freezeResult.Value.Name)}' is a '{freezeResult.Value.OutputType.GetDisplayName()}' but it should be a '{argument.GenericTypeArguments.First().GetDisplayName()}' to be a variableName of '{parentStep.StepFactory.TypeName}'",
+                            ErrorCode.InvalidCast,
+                            new StepErrorLocation(parentStep));
+                        errors.Add(error);
+                    }
+                }
+
+
+                if (errors.Any())
+                    return Result.Failure<Unit, IError>(ErrorList.Combine(errors));
+
+                object array = ArrayStepFactory.CreateArray(list as dynamic);
+
+                //var arrayType = typeof(Array<>).MakeGenericType(nestedArgument);
+                //var array = Activator.CreateInstance(arrayType);
+
+                //(list as IList<string>).
+
+
+                //var arrayElementsProperty = typeof(Array<>).GetProperty(nameof(Array<object>.Elements))!;
+                //arrayElementsProperty.SetValue(array, list);
+
+                propertyInfo.SetValue(parentStep, array);
+
+                return Unit.Default;
+            }
         }
 
 

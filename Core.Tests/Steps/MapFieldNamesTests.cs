@@ -46,23 +46,23 @@ namespace Reductech.EDR.Core.Tests.Steps
         }
 
 
-        /// <inheritdoc />
-        protected override IEnumerable<SerializeCase> SerializeCases
-        {
-            get
-            {
-                var step = CreateStepWithDefaultOrArbitraryValues();
+//        /// <inheritdoc />
+//        protected override IEnumerable<SerializeCase> SerializeCases
+//        {
+//            get
+//            {
+//                var step = CreateStepWithDefaultOrArbitraryValuesAsync();
 
-                yield return new SerializeCase("default", step.step,
-                    @"Do: EntityMapProperties
-EntityStream:
-- (Prop1 = 'Val0',Prop2 = 'Val1')
-- (Prop1 = 'Val2',Prop2 = 'Val3')
-- (Prop1 = 'Val4',Prop2 = 'Val5')
-Mappings: (Prop1 = 'Val6',Prop2 = 'Val7')");
+//                yield return new SerializeCase("default", step.step,
+//                    @"Do: EntityMapProperties
+//EntityStream:
+//- (Prop1 = 'Val0',Prop2 = 'Val1')
+//- (Prop1 = 'Val2',Prop2 = 'Val3')
+//- (Prop1 = 'Val4',Prop2 = 'Val5')
+//Mappings: (Prop1 = 'Val6',Prop2 = 'Val7')");
 
 
-            }
-        }
+//            }
+//        }
     }
 }

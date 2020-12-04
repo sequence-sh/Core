@@ -33,18 +33,18 @@ namespace Reductech.EDR.Core.Tests.Steps
             }
         }
 
-        /// <inheritdoc />
-        protected override IEnumerable<SerializeCase> SerializeCases
-        {
-            get
-            {
-                yield return new SerializeCase("default",
-                    CreateStepWithDefaultOrArbitraryValues().step,
-                    @"Do: EntityHasProperty
-Entity: (Prop1 = 'Val0',Prop2 = 'Val1')
-Property: 'Bar2'");
-            }
-        }
+//        /// <inheritdoc />
+//        protected override IEnumerable<SerializeCase> SerializeCases
+//        {
+//            get
+//            {
+//                yield return new SerializeCase("default",
+//                    CreateStepWithDefaultOrArbitraryValuesAsync().step,
+//                    @"Do: EntityHasProperty
+//Entity: (Prop1 = 'Val0',Prop2 = 'Val1')
+//Property: 'Bar2'");
+//            }
+//        }
 
     }
 }

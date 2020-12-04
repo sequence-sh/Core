@@ -54,30 +54,30 @@ namespace Reductech.EDR.Core.Tests.Steps
             }
         }
 
-        /// <inheritdoc />
-        protected override IEnumerable<SerializeCase> SerializeCases
-        {
-            get
-            {
-                yield return new SerializeCase("No Else",
-                    new If
-                    {
-                        Condition = Constant(true),
-                        Then = new Print<string>{Value = Constant("Hello World")}
-                    }, "If(Condition = True, Then = Print(Value = 'Hello World'))"
-                    );
+        ///// <inheritdoc />
+        //protected override IEnumerable<SerializeCase> SerializeCases
+        //{
+        //    get
+        //    {
+        //        yield return new SerializeCase("No Else",
+        //            new If
+        //            {
+        //                Condition = Constant(true),
+        //                Then = new Print<string>{Value = Constant("Hello World")}
+        //            }, "If(Condition = True, Then = Print(Value = 'Hello World'))"
+        //            );
 
-                yield return new SerializeCase("Else",
-                    new If
-                    {
-                        Condition = Constant(true),
-                        Then = new Print<string> { Value = Constant("Hello World") },
-                        Else = new Print<string> { Value = Constant("Goodbye World") },
-                    }, "If(Condition = True, Else = Print(Value = 'Goodbye World'), Then = Print(Value = 'Hello World'))"
-                    );
+        //        yield return new SerializeCase("Else",
+        //            new If
+        //            {
+        //                Condition = Constant(true),
+        //                Then = new Print<string> { Value = Constant("Hello World") },
+        //                Else = new Print<string> { Value = Constant("Goodbye World") },
+        //            }, "If(Condition = True, Else = Print(Value = 'Goodbye World'), Then = Print(Value = 'Hello World'))"
+        //            );
 
-                yield return CreateDefaultSerializeCase(true);
-            }
-        }
+        //        yield return CreateDefaultSerializeCase(true);
+        //    }
+        //}
     }
 }

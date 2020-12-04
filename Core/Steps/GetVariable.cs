@@ -47,10 +47,6 @@ namespace Reductech.EDR.Core.Steps
         /// </summary>
         public static GenericStepFactory Instance { get; } = new GetVariableStepFactory();
 
-
-        /// <inheritdoc />
-        public override IStepNameBuilder StepNameBuilder => new StepNameBuilderFromTemplate($"[{nameof(GetVariable<object>.Variable)}]");
-
         /// <inheritdoc />
         public override Type StepType => typeof(GetVariable<>);
 
