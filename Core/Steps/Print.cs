@@ -23,7 +23,15 @@ namespace Reductech.EDR.Core.Steps
             var r = await Value.Run(stateMonad, cancellationToken);
             if (r.IsFailure) return r.ConvertFailure<Unit>();
 
-            stateMonad.Logger.LogInformation(r.Value?.ToString());
+
+            string stringToPrint;
+
+            if (r.Value is Entity entity)
+                stringToPrint = entity.Serialize();
+            else
+                stringToPrint = r.Value?.ToString()!;
+
+            stateMonad.Logger.LogInformation(stringToPrint);
 
             return Unit.Default;
         }

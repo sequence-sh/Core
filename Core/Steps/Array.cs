@@ -8,6 +8,7 @@ using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
+using Reductech.EDR.Core.Serialization;
 
 namespace Reductech.EDR.Core.Steps
 {
@@ -71,6 +72,9 @@ namespace Reductech.EDR.Core.Steps
 
             return result;
         }
+
+        /// <inheritdoc />
+        public override IStepSerializer Serializer => ArraySerializer.Instance;
 
         /// <summary>
         /// Create a new Freezable Array

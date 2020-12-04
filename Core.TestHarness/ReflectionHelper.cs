@@ -381,7 +381,8 @@ namespace Reductech.EDR.Core.TestHarness
 
             else if (outputType == typeof(bool)) getElement = i => Constant(i % 2 == 0);
             else if (outputType == typeof(int)) getElement = Constant;
-            else throw new XunitException($"Cannot create default value for {outputType.GetDisplayName()}");
+            else if (outputType == typeof(Entity)) getElement = i => Constant(CreateEntity(("Foo", $"Val + {i}")));
+            else throw new XunitException($"Cannot create default value for {outputType.GetDisplayName()} List");
 
             for (var i = 0; i < numberOfElements; i++)
             {

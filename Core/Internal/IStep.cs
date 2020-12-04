@@ -19,6 +19,7 @@ namespace Reductech.EDR.Core.Internal
 
         /// <summary>
         /// Convert this Step into a FreezableStep.
+        /// Useful for equality comparison.
         /// </summary>
         IFreezableStep Unfreeze();
 

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using CSharpFunctionalExtensions;
@@ -39,6 +40,21 @@ namespace Reductech.EDR.Core.Entities
 
             return new EntityValue(EntitySingleValue.Create(original));
         }
+
+        public static EntityValue CreateFromObject(object argValue, char? multiValueDelimiter)
+        {
+            if (argValue is string s)
+                return Create(s, multiValueDelimiter);
+            else if (argValue is IEnumerable e)
+            {
+                var newEnumerable  = e.Cast<object>().Select(x=>x.ToString()!);
+                return Create(newEnumerable);
+            }
+
+            return Create(argValue.ToString(), multiValueDelimiter);
+        }
+
+
 
         /// <summary>
         /// Create a new EntityValue from some number of original strings.
@@ -107,5 +123,7 @@ namespace Reductech.EDR.Core.Entities
         {
             return Value.Match(x => "Empty", x => x.ToString(), x => string.Join(", ", x));
         }
+
+
     }
 }

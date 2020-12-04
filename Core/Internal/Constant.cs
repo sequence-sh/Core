@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -7,6 +9,7 @@ using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Parser;
 using Reductech.EDR.Core.Serialization;
+using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.Util;
 
 namespace Reductech.EDR.Core.Internal
@@ -35,20 +38,34 @@ namespace Reductech.EDR.Core.Internal
         /// <inheritdoc />
         public IFreezableStep Unfreeze()
         {
-            return Value switch
+            return UnfreezeObject(Value!);
+
+            IFreezableStep UnfreezeObject(object o)
             {
-                string s => new ConstantFreezableStep(s),
-                int i => new ConstantFreezableStep(i),
-                double d => new ConstantFreezableStep(d),
-                bool b => new ConstantFreezableStep(b),
-                Enum e => new ConstantFreezableStep(new Enumeration(e.GetType().Name, e.ToString())),
-                DateTime dt => new ConstantFreezableStep(dt),
-                Entity ent => new ConstantFreezableStep(ent),
-                EntityStream es => new ConstantFreezableStep(es),
-                DataStream ds => new ConstantFreezableStep(ds),
-                //TODO list
-                _ => throw new Exception($"Cannot unfreeze {typeof(T)}")
-            };
+                return o switch
+                {
+                    string s => new ConstantFreezableStep(s),
+                    int i => new ConstantFreezableStep(i),
+                    double d => new ConstantFreezableStep(d),
+                    bool b => new ConstantFreezableStep(b),
+                    Enum e => new ConstantFreezableStep(new Enumeration(e.GetType().Name, e.ToString())),
+                    DateTime dt => new ConstantFreezableStep(dt),
+                    Entity ent => new ConstantFreezableStep(ent),
+                    EntityStream es => new ConstantFreezableStep(es),
+                    DataStream ds => new ConstantFreezableStep(ds),
+                    IEnumerable enumerable => UnfreezeList(enumerable),
+                    _ => throw new Exception($"Cannot unfreeze {typeof(T)}")
+                };
+            }
+
+            IFreezableStep UnfreezeList(IEnumerable enumerable)
+            {
+                var l = enumerable.Cast<object>().Select(UnfreezeObject).ToList();
+
+                var a = ArrayStepFactory.CreateFreezable(l, null, new StepErrorLocation(this));
+
+                return a;
+            }
         }
 
         /// <inheritdoc />
@@ -78,23 +95,43 @@ namespace Reductech.EDR.Core.Internal
         /// <inheritdoc />
         public async Task<string> SerializeAsync(CancellationToken cancellationToken)
         {
-            return Value switch
+            return await SerializeObject(Value!, cancellationToken);
+
+            static async ValueTask<string> SerializeObject(object o, CancellationToken cancellationToken)
             {
-                string s => SerializationMethods.DoubleQuote(s),
-                int i => i.ToString(),
-                double d => d.ToString("G17"),
-                bool b =>b.ToString(),
-                Enum e => new Enumeration(e.GetType().Name, e.ToString()).ToString(),
-                DateTime dt => dt.ToString("O"),
-                Entity ent => ent.Serialize(),
-                EntityStream es => await SerializeEntityStream(es),
-                DataStream ds =>ds.Serialize(),
-                //TODO list
-                _ => throw new Exception($"Cannot unfreeze {typeof(T)}")
-            };
+                return o switch
+                {
+                    string s => SerializationMethods.DoubleQuote(s),
+                    int i => i.ToString(),
+                    double d => d.ToString("G17"),
+                    bool b => b.ToString(),
+                    Enum e => new Enumeration(e.GetType().Name, e.ToString()).ToString(),
+                    DateTime dt => dt.ToString("O"),
+                    Entity ent => ent.Serialize(),
+                    EntityStream es => await SerializeEntityStream(es, cancellationToken),
+                    DataStream ds => ds.Serialize(),
+                    IEnumerable enumerable => await SerializeEnumerable(enumerable, cancellationToken),
+                _ => throw new Exception($"Cannot serialize {typeof(T)}")
+                };
+            }
 
 
-            async Task<string> SerializeEntityStream(EntityStream entityStream)
+            static async ValueTask<string> SerializeEnumerable(IEnumerable enumerable, CancellationToken cancellationToken)
+            {
+                var strings = new List<string>();
+
+                foreach (var o in enumerable.Cast<object>())
+                {
+                    var v = await SerializeObject(o, cancellationToken);
+                    strings.Add(v);
+                }
+
+                var s = SerializationMethods.SerializeList(strings);
+                return s;
+            }
+
+
+            static async ValueTask<string> SerializeEntityStream(EntityStream entityStream, CancellationToken cancellationToken)
             {
                 var entities = await entityStream.SourceEnumerable
                     .Select(x=>x.Serialize())

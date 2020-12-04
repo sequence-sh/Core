@@ -38,7 +38,7 @@ namespace Reductech.EDR.Core
         public static Entity Create(IEnumerable<KeyValuePair<string, object>> properties, char? multiValueDelimiter = null)
         {
             var propertyEntities = properties
-                .Select(x => new KeyValuePair<string, EntityValue>(x.Key, EntityValue.Create(x.Value.ToString(), multiValueDelimiter)))
+                .Select(x => new KeyValuePair<string, EntityValue>(x.Key, EntityValue.CreateFromObject(x.Value, multiValueDelimiter)))
                 .ToImmutableList();
 
             return new Entity(propertyEntities);
