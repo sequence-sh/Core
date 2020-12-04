@@ -75,7 +75,7 @@ namespace Reductech.EDR.Core
                 multiValueResult.Value.Value,
                 alwaysQuoteResult.Value,
                 dateTimeResult.Value, cancellationToken)
-                    .Map(x=> new DataStream(x))
+                    .Map(x=> new DataStream(x, encodingResult.Value))
                 ;
 
             return result;

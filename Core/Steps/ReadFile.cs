@@ -25,7 +25,7 @@ namespace Reductech.EDR.Core.Steps
 
             var result = stateMonad.FileSystemHelper.ReadFile(path.Value)
                     .MapError(x=>x.WithLocation(this))
-                    .Map(x=> new DataStream(x));
+                    .Map(x=> new DataStream(x, EncodingEnum.UTF8)); //TODO fix
 
             return result;
         }

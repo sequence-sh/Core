@@ -188,7 +188,7 @@ namespace Reductech.EDR.Core.Parser
             /// <inheritdoc />
             public override Result<FreezableStepProperty, IError> VisitEnumeration(SequenceParser.EnumerationContext context)
             {
-                if (context.children.Count != 2 || context.TOKEN().Length != 2)
+                if (context.children.Count != 3 || context.TOKEN().Length != 2)
                     return ParseError(context);
 
                 var prefix = context.TOKEN(0).GetText();

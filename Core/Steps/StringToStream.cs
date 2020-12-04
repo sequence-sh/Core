@@ -35,7 +35,7 @@ namespace Reductech.EDR.Core.Steps
             byte[] byteArray = encodingResult.Value.Convert().GetBytes(textResult.Value);
             var stream = new MemoryStream(byteArray);
 
-            return new DataStream(stream);
+            return new DataStream(stream, encodingResult.Value);
         }
 
         /// <summary>

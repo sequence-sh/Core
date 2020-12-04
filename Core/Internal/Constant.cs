@@ -109,7 +109,7 @@ namespace Reductech.EDR.Core.Internal
                     DateTime dt => dt.ToString("O"),
                     Entity ent => ent.Serialize(),
                     EntityStream es => await SerializeEntityStream(es, cancellationToken),
-                    DataStream ds => ds.Serialize(),
+                    DataStream ds => await ds.SerializeAsync(cancellationToken),
                     IEnumerable enumerable => await SerializeEnumerable(enumerable, cancellationToken),
                 _ => throw new Exception($"Cannot serialize {typeof(T)}")
                 };

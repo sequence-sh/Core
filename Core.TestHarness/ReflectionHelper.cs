@@ -12,6 +12,7 @@ using Namotion.Reflection;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.Internal;
+using Reductech.EDR.Core.Parser;
 using Reductech.EDR.Core.Serialization;
 using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.Util;
@@ -320,6 +321,13 @@ namespace Reductech.EDR.Core.TestHarness
                 var entityStream = CreateSimpleEntityStream(ref index);
 
                 step = new Constant<EntityStream>(entityStream);
+            }
+            else if (outputType == typeof(DataStream))
+            {
+                var s = "DataStream" + index;
+                index++;
+
+                step = new Constant<DataStream>(new DataStream(s));
             }
             else if (outputType == typeof(Schema))
             {

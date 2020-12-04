@@ -23,7 +23,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                 yield return new StepCase("From Stream",
                     new StringFromStream
                     {
-                        Stream = Constant<DataStream>(new DataStream(new MemoryStream( Encoding.UTF8.GetBytes( "Hello World" ))) )
+                        Stream = Constant(new DataStream(new MemoryStream( Encoding.UTF8.GetBytes( "Hello World" )), EncodingEnum.UTF8) )
                     },"Hello World"
                 );
             }

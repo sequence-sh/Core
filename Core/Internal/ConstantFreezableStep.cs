@@ -120,10 +120,11 @@ namespace Reductech.EDR.Core.Internal
         {
 
             if (Value.IsT7)
-            {
                 return await SerializationMethods.SerializeEntityStreamAsync(Value.AsT7, cancellation);
-            }
 
+
+            if (Value.IsT8)
+                return await Value.AsT8.SerializeAsync(cancellation);
 
             return
                 Value.Match(
@@ -135,9 +136,7 @@ namespace Reductech.EDR.Core.Internal
                     dt => dt.ToString("O"),
                     entity => entity.Serialize(),
                     es => throw new Exception("Should not encounter entity stream here"),
-                    ds => ds.Serialize()
-
-                        );
+                    ds =>  throw new Exception("Should not encounter data stream here"));
         }
 
 
