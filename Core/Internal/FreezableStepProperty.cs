@@ -135,7 +135,7 @@ namespace Reductech.EDR.Core.Internal
 
             IFreezableStep MapStepListToArray(IReadOnlyList<IFreezableStep> stepList)
             {
-                var array = ArrayStepFactory.CreateFreezable(stepList, null, Location);
+                var array = FreezableFactory.CreateFreezableList(stepList, null, Location);
                 return array;
             }
 

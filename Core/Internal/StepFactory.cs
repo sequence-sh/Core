@@ -324,15 +324,6 @@ namespace Reductech.EDR.Core.Internal
 
                 object array = ArrayStepFactory.CreateArray(list as dynamic);
 
-                //var arrayType = typeof(Array<>).MakeGenericType(nestedArgument);
-                //var array = Activator.CreateInstance(arrayType);
-
-                //(list as IList<string>).
-
-
-                //var arrayElementsProperty = typeof(Array<>).GetProperty(nameof(Array<object>.Elements))!;
-                //arrayElementsProperty.SetValue(array, list);
-
                 propertyInfo.SetValue(parentStep, array);
 
                 return Unit.Default;

@@ -17,14 +17,16 @@ namespace Reductech.EDR.Core.Internal
         /// </summary>
         public static IErrorBuilder MissingParameterError(string parameterName, string stepType) => new ErrorBuilder($"Missing Parameter '{parameterName}' in '{stepType}'", ErrorCode.MissingParameter);
 
-
+        /// <summary>
+        /// The error that should be returned when a parameter has the wrong type.
+        /// </summary>
         public static IErrorBuilder WrongParameterTypeError(string propertyName, MemberType realType, MemberType expectedType) =>
             new ErrorBuilder($"{propertyName} was a {realType}, not a {expectedType}", ErrorCode.WrongArgumentType);
 
         /// <summary>
         /// The error that should be returned when a parameter is missing.
         /// </summary>
-        public static IErrorBuilder UnexpectedParameterError(string parameterName, string stepType) => 
+        public static IErrorBuilder UnexpectedParameterError(string parameterName, string stepType) =>
             new ErrorBuilder($"Unexpected Parameter '{parameterName}' in '{stepType}'", ErrorCode.UnexpectedParameter);
 
         /// <summary>

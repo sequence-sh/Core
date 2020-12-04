@@ -41,6 +41,9 @@ namespace Reductech.EDR.Core.Entities
             return new EntityValue(EntitySingleValue.Create(original));
         }
 
+        /// <summary>
+        /// Create an entity from an object
+        /// </summary>
         public static EntityValue CreateFromObject(object argValue, char? multiValueDelimiter)
         {
             if (argValue is string s)

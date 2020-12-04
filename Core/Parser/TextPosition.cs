@@ -47,7 +47,7 @@ namespace Reductech.EDR.Core.Parser
         public int StopIndex { get; }
 
         /// <inheritdoc />
-        public override string ToString() => (Text, StartIndex, StopIndex).ToString();
+        public override string ToString() => AsString;
 
 
         /// <inheritdoc />
@@ -64,6 +64,6 @@ namespace Reductech.EDR.Core.Parser
         public override int GetHashCode() => HashCode.Combine(Text, StartIndex, StopIndex);
 
         /// <inheritdoc />
-        public string AsString { get; }
+        public string AsString => (Text, StartIndex, StopIndex).ToString();
     }
 }

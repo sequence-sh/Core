@@ -62,7 +62,7 @@ namespace Reductech.EDR.Core.Internal
             {
                 var l = enumerable.Cast<object>().Select(UnfreezeObject).ToList();
 
-                var a = ArrayStepFactory.CreateFreezable(l, null, new StepErrorLocation(this));
+                var a = FreezableFactory.CreateFreezableList(l, null, new StepErrorLocation(this));
 
                 return a;
             }

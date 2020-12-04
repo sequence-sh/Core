@@ -139,7 +139,7 @@ namespace Reductech.EDR.Core
 
             static object ConvertToObject(Entity entity, char delimiter, string dateTimeFormat)
             {
-                IDictionary<string, object> expandoObject = new ExpandoObject();
+                IDictionary<string, object> expandoObject = new ExpandoObject()!;
 
                 foreach (var (key, value) in entity)
                 {

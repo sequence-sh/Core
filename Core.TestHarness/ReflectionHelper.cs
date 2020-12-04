@@ -132,7 +132,7 @@ namespace Reductech.EDR.Core.TestHarness
                 }
 
 
-                return ConstantFreezableStep.WriteValue(cfs.Value);
+                return await cfs.Serialize(CancellationToken.None);
             }
 
             else if (step is DoNothing)
@@ -141,11 +141,20 @@ namespace Reductech.EDR.Core.TestHarness
             }
             else if (freezable is CompoundFreezableStep cs && freezable.StepName == ArrayStepFactory.Instance.TypeName)
             {
-                return
-                SerializationMethods.SerializeList(
-                    cs.FreezableStepData
-                        .StepProperties[nameof(Steps.Array<object>.Elements)]
-                        .StepList.Value.Cast<ConstantFreezableStep>().Select(x => x.ToString()));
+
+                var constants = cs.FreezableStepData
+                    .StepProperties[nameof(Steps.Array<object>.Elements)]
+                    .StepList.Value.Cast<ConstantFreezableStep>();
+
+                var list = new List<string>();
+
+                foreach (var constantFreezableStep in constants)
+                {
+                    var s = await constantFreezableStep.Serialize(CancellationToken.None);
+                    list.Add(s);
+                }
+
+                return SerializationMethods.SerializeList(list);
             }
 
             throw new NotImplementedException("Cannot get string from step");

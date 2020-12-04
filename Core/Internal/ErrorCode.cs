@@ -146,6 +146,9 @@
         /// An unexpected or unrecognized error
         /// </summary>
         Unknown,
+        /// <summary>
+        /// The argument has the wrong type
+        /// </summary>
         WrongArgumentType
     }
 }

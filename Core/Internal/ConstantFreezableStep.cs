@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.Internal.Errors;
@@ -72,8 +74,17 @@ namespace Reductech.EDR.Core.Internal
         {
             get
             {
-                var r = WriteValue(Value);
-                return r;
+                return Value.Match(
+                            SerializationMethods.DoubleQuote,
+                            i => i.ToString(),
+                            d => d.ToString("G17"),
+                            b => b.ToString(),
+                            e => e.ToString(),
+                            dt => dt.ToString("O"),
+                            entity => entity.Serialize(),
+                            es => "EntityStream",
+                            ds => "DataStream"
+                        );
             }
         }
 
@@ -103,23 +114,30 @@ namespace Reductech.EDR.Core.Internal
         }
 
         /// <summary>
-        /// SerializeAsync a value.
+        /// Serialize this constant.
         /// </summary>
-        public static string WriteValue(Option value)
+        public async Task<string> Serialize(CancellationToken cancellation)
         {
-            return
 
-                value.Match(
-                    SerializationMethods.DoubleQuote,
+            if (Value.IsT7)
+            {
+                return await SerializationMethods.SerializeEntityStreamAsync(Value.AsT7, cancellation);
+            }
+
+
+            return
+                Value.Match(
+                        SerializationMethods.DoubleQuote,
                     i => i.ToString(),
                     d => d.ToString("G17"),
                     b => b.ToString(),
                     e => e.ToString(),
                     dt => dt.ToString("O"),
                     entity => entity.Serialize(),
-                    es => "EntityStream",
-                    ds => ds.Serialize()//TODO change to DataStream
-                );
+                    es => throw new Exception("Should not encounter entity stream here"),
+                    ds => ds.Serialize()
+
+                        );
         }
 
 

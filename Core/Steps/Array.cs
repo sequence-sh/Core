@@ -77,21 +77,6 @@ namespace Reductech.EDR.Core.Steps
         public override IStepSerializer Serializer => ArraySerializer.Instance;
 
         /// <summary>
-        /// Create a new Freezable Array
-        /// </summary>
-        public static IFreezableStep CreateFreezable(IEnumerable<IFreezableStep> elements, Configuration? configuration, IErrorLocation location)
-        {
-            var dict = new Dictionary<string, FreezableStepProperty>
-            {
-                {nameof(Array<object>.Elements), new FreezableStepProperty(elements.ToList(), location)}
-            };
-
-            var fpd = new FreezableStepData( dict, location);
-
-            return new CompoundFreezableStep(Instance.TypeName, fpd, configuration);
-        }
-
-        /// <summary>
         /// Creates an array.
         /// </summary>
         public static Array<T> CreateArray<T>(List<IStep<T>> stepList)
