@@ -11,7 +11,7 @@ using CsvHelper.Configuration;
 using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
-using Entity = Reductech.EDR.Core.Entity;
+using Reductech.EDR.Core.Parser;
 
 namespace Reductech.EDR.Core
 {
@@ -26,7 +26,7 @@ namespace Reductech.EDR.Core
         /// <returns></returns>
         public static async Task<Result<EntityStream, IError>> ReadCSV(
             IStateMonad stateMonad,
-            IStep<Stream> stream,
+            IStep<DataStream> stream,
             IStep<string> delimiter,
             IStep<EncodingEnum> encoding,
             IStep<string> commentCharacter,
@@ -54,7 +54,7 @@ namespace Reductech.EDR.Core
             if (multiValueResult.IsFailure) return multiValueResult.ConvertFailure<EntityStream>();
 
 
-            var block = ReadCSV(testStreamResult.Value,
+            var block = ReadCSV(testStreamResult.Value.Stream,
                 encodingResult.Value.Convert(),
                 delimiterResult.Value,
                 quoteResult.Value,

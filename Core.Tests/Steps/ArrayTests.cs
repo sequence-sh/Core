@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Collections.Immutable;
 using JetBrains.Annotations;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Steps;

@@ -6,6 +6,7 @@ using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
+using Reductech.EDR.Core.Parser;
 using Reductech.EDR.Core.Util;
 
 namespace Reductech.EDR.Core.Steps
@@ -27,9 +28,9 @@ namespace Reductech.EDR.Core.Steps
 
             if (stream.IsFailure) return stream.ConvertFailure<Unit>();
 
-            stream.Value.Seek(0, SeekOrigin.Begin);
+            stream.Value.Stream.Seek(0, SeekOrigin.Begin);
 
-            var r = await stateMonad.FileSystemHelper.WriteFileAsync(path.Value, stream.Value, cancellationToken)
+            var r = await stateMonad.FileSystemHelper.WriteFileAsync(path.Value, stream.Value.Stream, cancellationToken)
                 .MapError(x=>x.WithLocation(this));
 
             return r;
@@ -48,7 +49,7 @@ namespace Reductech.EDR.Core.Steps
         /// </summary>
         [StepProperty(Order = 2)]
         [Required]
-        public IStep<Stream> Stream { get; set; } = null!;
+        public IStep<DataStream> Stream { get; set; } = null!;
 
 
         /// <inheritdoc />

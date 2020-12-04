@@ -3,6 +3,7 @@ using System.IO;
 using System.Text;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
+using Reductech.EDR.Core.Parser;
 using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.TestHarness;
 using Reductech.EDR.Core.Util;
@@ -10,7 +11,7 @@ using Xunit.Abstractions;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
-    public class ReadFileTests : StepTestBase<ReadFile, Stream>
+    public class ReadFileTests : StepTestBase<ReadFile, DataStream>
     {
         /// <inheritdoc />
         public ReadFileTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)

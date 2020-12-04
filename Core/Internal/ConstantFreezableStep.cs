@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Parser;
 using Reductech.EDR.Core.Serialization;
 using DateTime = System.DateTime;
-using Entity = Reductech.EDR.Core.Entity;
 using Option = OneOf.OneOf<string, int, double, bool,
 Reductech.EDR.Core.Internal.Enumeration, System.DateTime,
 Reductech.EDR.Core.Entity,

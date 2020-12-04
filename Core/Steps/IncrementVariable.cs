@@ -50,14 +50,14 @@ namespace Reductech.EDR.Core.Steps
     /// <summary>
     /// Increment an integer variable by a particular amount
     /// </summary>
-    public sealed class IncrementVariableStepFactory : SimpleStepFactory<IncrementVariable, int>
+    public sealed class IncrementVariableStepFactory : SimpleStepFactory<IncrementVariable, Unit>
     {
         private IncrementVariableStepFactory() { }
 
         /// <summary>
         /// The instance.
         /// </summary>
-        public static SimpleStepFactory<IncrementVariable, int> Instance { get; } = new IncrementVariableStepFactory();
+        public static SimpleStepFactory<IncrementVariable, Unit> Instance { get; } = new IncrementVariableStepFactory();
 
         /// <inheritdoc />
         public override IEnumerable<(VariableName variableName, Maybe<ITypeReference>)> GetTypeReferencesSet(FreezableStepData freezableStepData, TypeResolver typeResolver)

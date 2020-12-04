@@ -11,7 +11,6 @@ using Reductech.EDR.Core.ExternalProcesses;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Util;
-using Reductech.Utilities.Testing;
 using Xunit.Abstractions;
 using Xunit.Sdk;
 

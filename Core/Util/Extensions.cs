@@ -5,7 +5,6 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Reflection;
 using CSharpFunctionalExtensions;
-using OneOf;
 
 namespace Reductech.EDR.Core.Util
 {
