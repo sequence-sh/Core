@@ -238,6 +238,7 @@ namespace Reductech.EDR.Core.Parser
                         if (jx >= txt.Length) break;
                         switch (txt[jx + 1])
                         {
+                            case '"': sb.Append('"'); break;   //double quote
                             case 'n': sb.Append('\n'); break;  // Line feed
                             case 'r': sb.Append('\r'); break;  // Carriage return
                             case 't': sb.Append('\t'); break;  // Tab

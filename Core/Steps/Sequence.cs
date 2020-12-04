@@ -50,7 +50,7 @@ namespace Reductech.EDR.Core.Steps
         /// The final step of the sequence.
         /// Will be the return value.
         /// </summary>
-        [StepListProperty]
+        [StepProperty]
         [Required]
         public IStep<T> FinalStep { get; set; } = null!;
     }

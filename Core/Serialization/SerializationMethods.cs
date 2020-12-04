@@ -34,12 +34,22 @@ namespace Reductech.EDR.Core.Serialization
         /// <summary>
         /// Quote with double quotes
         /// </summary>
-        public static string DoubleQuote(string s) =>
+        public static string DoubleQuote(string s)
+        {
+            var result = s
+                .Replace("\\", @"\\") //Needs to come first
+                .Replace("\r", @"\r")
+                .Replace("\n", @"\n")
+                .Replace("\t", @"\t")
+                .Replace("\"", @"\""")
 
-            "\"" + (s
-            .Replace("\\", @"\\")
-            .Replace("\r", @"\r")
-            .Replace("\n", @"\n")) + "\"";
+                ;
+
+
+            result = "\"" + result + "\"";
+
+            return result;
+        }
 
         /// <summary>
         /// Serialize an entityStream

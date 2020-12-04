@@ -46,46 +46,46 @@ namespace Reductech.EDR.Core.Tests.Steps
                 yield return CreateCase("Simple case",
                         EntityStream.Create(CreateEntity(("Foo", "Hello"), ("Bar", "1")), CreateEntity(("Foo", "Hello 2"),("Bar", "2"))),
                         CreateSchema("ValueIf Schema",false, ("foo", SchemaPropertyType.String, Multiplicity.ExactlyOne), ("Bar", SchemaPropertyType.Integer, Multiplicity.ExactlyOne)),
-                        "Foo: Hello, Bar: 1","Foo: Hello 2, Bar: 2");
+                        "(Foo: \"Hello\", Bar: 1)","(Foo: \"Hello 2\", Bar: 2)");
 
 
                 yield return CreateCase("Cast int",
                     EntityStream.Create(CreateEntity(("Foo", "100"))),
                         CreateSchema("ValueIf Schema", false, ("Foo", SchemaPropertyType.Integer, Multiplicity.ExactlyOne)),
-                        "Foo: 100");
+                        "(Foo: 100)");
 
 
                 yield return CreateCase("Cast double",
                     EntityStream.Create(CreateEntity(("Foo", "100.345"))),
                         CreateSchema("ValueIf Schema", false, ("Foo", SchemaPropertyType.Double, Multiplicity.ExactlyOne)),
-                        "Foo: 100.345");
+                        "(Foo: 100.345)");
 
                 yield return CreateCase("Cast bool",
                     EntityStream.Create(CreateEntity(("Foo", "true"))),
                         CreateSchema("ValueIf Schema", false, ("Foo", SchemaPropertyType.Bool, Multiplicity.ExactlyOne)),
-                        "Foo: True");
+                        "(Foo: True)");
 
                 yield return CreateCase("Cast date time",
                     EntityStream.Create(CreateEntity(("Foo", "11/10/2020 3:45:44 PM"))),
                         CreateSchema("ValueIf Schema", false, ("Foo", SchemaPropertyType.Date, Multiplicity.ExactlyOne)),
-                    "Foo: 2020/11/10 15:45:44");
+                    "(Foo: 2020/11/10 15:45:44)");
 
 
                 yield return CreateCase("Cast multiple values",
                    EntityStream.Create(CreateEntity(("Foo", "10"), ("Foo", "15"))),
                    CreateSchema("ValueIf Schema", false, ("Foo", SchemaPropertyType.Integer, Multiplicity.Any)),
-                   "Foo: 10, 15");
+                   "(Foo: 10, 15)");
 
 
                 yield return CreateCase("Match regex",
                     EntityStream.Create(CreateEntity(("Foo", "100"))),
                     CreateSchema("ValueIf Schema", false, ("Foo", SchemaPropertyType.Integer, Multiplicity.ExactlyOne, @"\d+", null)),
-                        "Foo: 100");
+                        "(Foo: 100)");
 
                 yield return CreateCase("Match enum",
                     EntityStream.Create(CreateEntity(("Foo", "hello"))),
                     CreateSchema("ValueIf Schema", false, ("Foo", SchemaPropertyType.Enum, Multiplicity.ExactlyOne, null, new List<string>(){"Hello", "World"})),
-                        "Foo: hello");
+                        "(Foo: \"hello\")");
             }
         }
 

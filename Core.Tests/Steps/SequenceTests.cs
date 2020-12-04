@@ -58,11 +58,12 @@ namespace Reductech.EDR.Core.Tests.Steps
                         InitialSteps = new List<IStep<Unit>>
                         {
                             new DoNothing(),
+                            new DoNothing(),
                             new DoNothing()
                         },
                         FinalStep = Constant("Hello World")
                     },
-                    $"- DoNothing(){Environment.NewLine}- DoNothing(){Environment.NewLine}- DoNothing(){Environment.NewLine}- \"Hello World\"" );
+                    $"- DoNothing(){Environment.NewLine}- DoNothing(){Environment.NewLine}- DoNothing(){Environment.NewLine}- \"Hello World\"\r\n" );
             }
         }
     }
