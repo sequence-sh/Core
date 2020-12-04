@@ -4,9 +4,10 @@ using System.Collections.Immutable;
 using System.Linq;
 using System.Text;
 using CSharpFunctionalExtensions;
+using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.Serialization;
 
-namespace Reductech.EDR.Core.Entities
+namespace Reductech.EDR.Core
 {
     /// <summary>
     /// A piece of data.

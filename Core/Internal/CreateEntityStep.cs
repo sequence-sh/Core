@@ -14,7 +14,7 @@ namespace Reductech.EDR.Core.Internal
     /// <summary>
     /// A step that creates and returns an entity.
     /// </summary>
-    public class CreateEntityStep : IStep<Entities.Entity>
+    public class CreateEntityStep : IStep<Entity>
     {
         /// <summary>
         /// Create a new CreateEntityStep
@@ -31,7 +31,7 @@ namespace Reductech.EDR.Core.Internal
         public IReadOnlyDictionary<string, IStep> Properties { get; }
 
         /// <inheritdoc />
-        public async Task<Result<Entities.Entity, IError>> Run(IStateMonad stateMonad, CancellationToken cancellationToken)
+        public async Task<Result<Entity, IError>> Run(IStateMonad stateMonad, CancellationToken cancellationToken)
         {
             var pairs = new List<KeyValuePair<string, object>>();
 
@@ -39,12 +39,12 @@ namespace Reductech.EDR.Core.Internal
             {
                 var r = await step.Run<object>(stateMonad, cancellationToken);
 
-                if (r.IsFailure) return r.ConvertFailure<Entities.Entity>();
+                if (r.IsFailure) return r.ConvertFailure<Entity>();
 
                 pairs.Add(new KeyValuePair<string, object>(key, r.Value));
             }
 
-            return Entities.Entity.Create(pairs);
+            return Entity.Create(pairs);
         }
 
         /// <inheritdoc />
@@ -64,8 +64,8 @@ namespace Reductech.EDR.Core.Internal
         /// <inheritdoc />
         public async Task<Result<T, IError>> Run<T>(IStateMonad stateMonad, CancellationToken cancellationToken)
         {
-            return await Run(stateMonad, cancellationToken).BindCast<Entities.Entity, T, IError>(
-                    new SingleError($"Could not cast {typeof(Entities.Entity)} to {typeof(T)}", ErrorCode.InvalidCast, new StepErrorLocation(this)));
+            return await Run(stateMonad, cancellationToken).BindCast<Entity, T, IError>(
+                    new SingleError($"Could not cast {typeof(Entity)} to {typeof(T)}", ErrorCode.InvalidCast, new StepErrorLocation(this)));
         }
 
         /// <inheritdoc />
@@ -81,7 +81,7 @@ namespace Reductech.EDR.Core.Internal
         public Configuration? Configuration { get; set; } = null;
 
         /// <inheritdoc />
-        public Type OutputType => typeof(Entities.Entity);
+        public Type OutputType => typeof(Entity);
 
         /// <inheritdoc />
         public async Task<string> SerializeAsync(CancellationToken cancellationToken)

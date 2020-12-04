@@ -5,7 +5,7 @@ using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
-using Entity = Reductech.EDR.Core.Entities.Entity;
+using Entity = Reductech.EDR.Core.Entity;
 
 namespace Reductech.EDR.Core.Steps
 {

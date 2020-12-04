@@ -250,7 +250,7 @@ namespace Reductech.EDR.Core.Internal
 
             Result<Unit, IError> SetEntityStream()
             {
-                var list = new List<IStep<Entities.Entity>>();
+                var list = new List<IStep<Entity>>();
                 var errors = new List<IError>();
 
                 foreach (var freezableStep in freezableStepList)
@@ -259,7 +259,7 @@ namespace Reductech.EDR.Core.Internal
 
                     if (freezeResult.IsFailure)
                         errors.Add(freezeResult.Error);
-                    else if (freezeResult.Value is IStep<Entities.Entity> entityStep)
+                    else if (freezeResult.Value is IStep<Entity> entityStep)
                     {
                         list.Add(entityStep);
                     }

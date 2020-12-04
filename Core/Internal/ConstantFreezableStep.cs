@@ -7,10 +7,10 @@ using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Parser;
 using Reductech.EDR.Core.Serialization;
 using DateTime = System.DateTime;
-using Entity = Reductech.EDR.Core.Entities.Entity;
+using Entity = Reductech.EDR.Core.Entity;
 using Option = OneOf.OneOf<string, int, double, bool,
 Reductech.EDR.Core.Internal.Enumeration, System.DateTime,
-Reductech.EDR.Core.Entities.Entity,
+Reductech.EDR.Core.Entity,
 Reductech.EDR.Core.Entities.EntityStream, Reductech.EDR.Core.Parser.DataStream>;
 
 namespace Reductech.EDR.Core.Internal

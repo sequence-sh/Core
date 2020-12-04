@@ -65,6 +65,6 @@ namespace Reductech.EDR.Core.Internal
         }
 
         /// <inheritdoc />
-        public Result<ITypeReference, IError> TryGetOutputTypeReference(TypeResolver typeResolver) => new ActualTypeReference(typeof(Entities.Entity));
+        public Result<ITypeReference, IError> TryGetOutputTypeReference(TypeResolver typeResolver) => new ActualTypeReference(typeof(Entity));
     }
 }

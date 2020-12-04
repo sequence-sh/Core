@@ -106,7 +106,7 @@ namespace Reductech.EDR.Core.Internal
         /// </summary>
         public static readonly Dictionary<VariableName, ActualTypeReference> ReservedVariableNames = new Dictionary<VariableName, ActualTypeReference>()
         {
-            {Entity, new ActualTypeReference(typeof(Entities.Entity))},
+            {Entity, new ActualTypeReference(typeof(Entity))},
             {Index, new ActualTypeReference(typeof(int))},
         };
     }

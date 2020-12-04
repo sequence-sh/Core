@@ -43,7 +43,7 @@ namespace Reductech.EDR.Core.Internal
                 bool b => new ConstantFreezableStep(b),
                 Enum e => new ConstantFreezableStep(new Enumeration(e.GetType().Name, e.ToString())),
                 DateTime dt => new ConstantFreezableStep(dt),
-                Entities.Entity ent => new ConstantFreezableStep(ent),
+                Entity ent => new ConstantFreezableStep(ent),
                 EntityStream es => new ConstantFreezableStep(es),
                 DataStream ds => new ConstantFreezableStep(ds),
                 //TODO list
@@ -86,7 +86,7 @@ namespace Reductech.EDR.Core.Internal
                 bool b =>b.ToString(),
                 Enum e => new Enumeration(e.GetType().Name, e.ToString()).ToString(),
                 DateTime dt => dt.ToString("O"),
-                Entities.Entity ent => ent.Serialize(),
+                Entity ent => ent.Serialize(),
                 EntityStream es => await SerializeEntityStream(es),
                 DataStream ds =>ds.Serialize(),
                 //TODO list

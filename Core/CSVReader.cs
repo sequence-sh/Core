@@ -11,7 +11,7 @@ using CsvHelper.Configuration;
 using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
-using Entity = Reductech.EDR.Core.Entities.Entity;
+using Entity = Reductech.EDR.Core.Entity;
 
 namespace Reductech.EDR.Core
 {
