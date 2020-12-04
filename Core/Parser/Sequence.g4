@@ -78,4 +78,4 @@ SINGLEQUOTEDSTRING	: '\'' (~('\'') | '\'\'')* '\'' ;
 TRUE				: [Tt] [Rr] [Uu] [Ee];
 FALSE				: [Ff] [Aa] [Ll] [Ss] [Ee];
 TOKEN				: [a-zA-Z0-9_]+;
-WHITESPACE			: (' ' | '\t' | '\r' | '\n')+ -> skip ;
+WHITESPACE			: (' ' | '\t' | '\r' | '\n') -> skip ;
