@@ -175,7 +175,9 @@ namespace Reductech.EDR.Core.Internal
         {
             if (other is null) return false;
             if (ReferenceEquals(this, other)) return true;
-            return other is ConstantFreezableStep cfs && Value.Equals(cfs.Value);
+            var r= other is ConstantFreezableStep cfs && Value.Equals(cfs.Value);
+
+            return r;
         }
 
 

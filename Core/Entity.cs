@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
@@ -10,7 +11,7 @@ namespace Reductech.EDR.Core
     /// <summary>
     /// A piece of data.
     /// </summary>
-    public sealed class Entity : IEnumerable<KeyValuePair<string, EntityValue>>
+    public sealed class Entity : IEnumerable<KeyValuePair<string, EntityValue>> , IEquatable<Entity>
     {
         private readonly ImmutableList<KeyValuePair<string, EntityValue>> _properties;
 
@@ -87,6 +88,32 @@ namespace Reductech.EDR.Core
 
         /// <inheritdoc />
         public IEnumerator<KeyValuePair<string, EntityValue>> GetEnumerator() => _properties.GetEnumerator();
+
+        /// <inheritdoc />
+        public bool Equals(Entity? other)
+        {
+            return other is not null && _properties.SequenceEqual(other._properties);
+        }
+
+        /// <inheritdoc />
+        public override bool Equals(object? obj)
+        {
+            if (obj is null) return false;
+            if (ReferenceEquals(this, obj)) return true;
+
+            return obj is Entity e && Equals(e);
+        }
+
+        /// <inheritdoc />
+        public override int GetHashCode()
+        {
+            return _properties.Count switch
+            {
+                0 => 0,
+                1 => HashCode.Combine(_properties[0].Key, _properties[0].Value),
+                _ => HashCode.Combine(_properties.Count, _properties[0].Key, _properties[0].Value)
+            };
+        }
 
         /// <inheritdoc />
         public override string ToString() => Serialize();

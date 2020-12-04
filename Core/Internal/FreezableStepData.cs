@@ -76,11 +76,21 @@ namespace Reductech.EDR.Core.Internal
         {
             if (other is null) return false;
             if (ReferenceEquals(this, other)) return true;
-            return DictionariesEqual1(StepProperties, other.StepProperties);
+            var result = DictionariesEqual1(StepProperties, other.StepProperties);
 
-            static bool DictionariesEqual1(IReadOnlyDictionary<string, FreezableStepProperty> dict1, IReadOnlyDictionary<string, FreezableStepProperty> dict2) =>
-                dict1.Count == dict2.Count &&
-                dict1.Keys.All(key => dict2.ContainsKey(key) && dict1[key].Equals(dict2[key]));
+            return result;
+
+            static bool DictionariesEqual1(IReadOnlyDictionary<string, FreezableStepProperty> dict1, IReadOnlyDictionary<string, FreezableStepProperty> dict2)
+            {
+                if (dict1.Count != dict2.Count) return false;
+                foreach (var key in dict1.Keys)
+                {
+                    if (!dict2.ContainsKey(key)) return false;
+                    if (!dict1[key].Equals(dict2[key])) return false;
+                }
+
+                return true;
+            }
         }
 
         /// <inheritdoc />
