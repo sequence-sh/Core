@@ -47,29 +47,15 @@ namespace Reductech.EDR.Core.Steps
         /// </summary>
         public static StepFactory Instance { get; } = new NotStepFactory();
 
-        /// <inheritdoc />
-        public override IStepSerializer Serializer =>
-            new StepSerializer(TypeName, new FixedStringComponent("not"),
-            new FixedStringComponent("("),
-            new StepComponent(nameof(Not.Boolean)),
-            new FixedStringComponent(")")
-        );
+        ///// <inheritdoc /> //TODO uncomment
+        //public override IStepSerializer Serializer =>
+        //    new StepSerializer(TypeName, new FixedStringComponent("not"),
+        //    new FixedStringComponent("("),
+        //    new StepComponent(nameof(Not.Boolean)),
+        //    new FixedStringComponent(")")
+        //);
 
 
-        /// <summary>
-        /// Create a freezable Not step.
-        /// </summary>
-        public static IFreezableStep CreateFreezable(IFreezableStep boolean, IErrorLocation location)
-        {
-            var dict = new Dictionary<string, FreezableStepProperty>
-            {
-                {nameof(Not.Boolean), new FreezableStepProperty(OneOf<VariableName, IFreezableStep, IReadOnlyList<IFreezableStep>>.FromT1(boolean), location)},
-            };
 
-            var fpd = new FreezableStepData(dict, location);
-            var step = new CompoundFreezableStep(Instance.TypeName, fpd, null);
-
-            return step;
-        }
     }
 }

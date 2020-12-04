@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using Antlr4.Runtime;
 using Antlr4.Runtime.Tree;
 using CSharpFunctionalExtensions;
@@ -223,15 +224,30 @@ namespace Reductech.EDR.Core.Parser
 
                 return member;
 
-                static string UnescapeDoubleQuoted(string s)
+                static string UnescapeDoubleQuoted(string txt)
                 {
-                    s = s[1..^1]; //Remove quotes
-                    s = s
-                        .Replace(@"\\", "\\")
-                        .Replace(@"\""", "\"")
-                        .Replace(@"\r", "\r")
-                        .Replace(@"\n", "\n");
-                    return s;
+                    txt = txt[1..^1]; //Remove quotes
+
+                    if (string.IsNullOrEmpty(txt)) { return txt; }
+                    var sb = new StringBuilder(txt.Length);
+                    for (var ix = 0; ix < txt.Length;)
+                    {
+                        var jx = txt.IndexOf('\\', ix);
+                        if (jx < 0 || jx == txt.Length - 1) jx = txt.Length;
+                        sb.Append(txt, ix, jx - ix);
+                        if (jx >= txt.Length) break;
+                        switch (txt[jx + 1])
+                        {
+                            case 'n': sb.Append('\n'); break;  // Line feed
+                            case 'r': sb.Append('\r'); break;  // Carriage return
+                            case 't': sb.Append('\t'); break;  // Tab
+                            case '\\': sb.Append('\\'); break; // Don't escape
+                            default:                                 // Unrecognized, copy as-is
+                                sb.Append('\\').Append(txt[jx + 1]); break;
+                        }
+                        ix = jx + 2;
+                    }
+                    return sb.ToString();
                 }
 
                 static string UnescapeSingleQuoted(string s)

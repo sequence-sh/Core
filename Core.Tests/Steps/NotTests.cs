@@ -24,21 +24,20 @@ namespace Reductech.EDR.Core.Tests.Steps
         protected override IEnumerable<DeserializeCase> DeserializeCases {
             get
             {
-                yield return new DeserializeCase("Short Form", "not (true)", false);
-                yield return new DeserializeCase("Long Form", "do: not\nboolean: true", false);
+                yield return new DeserializeCase("Short Form", "not (boolean: true)", false);
             }
 
         }
 
-        /// <inheritdoc />
-        protected override IEnumerable<SerializeCase> SerializeCases
-        {
-            get
-            {
-                yield return new SerializeCase("SerializeAsync", new Not {Boolean = Constant(true)},
-                    "not(True)");
-            }
-        }
+        ///// <inheritdoc />
+        //protected override IEnumerable<SerializeCase> SerializeCases
+        //{
+        //    get
+        //    {
+        //        yield return new SerializeCase("SerializeAsync", new Not {Boolean = Constant(true)},
+        //            "not(True)");
+        //    }
+        //}
 
     }
 }

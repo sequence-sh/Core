@@ -67,12 +67,12 @@ namespace Reductech.EDR.Core.Internal
                         attribute: propertyInfo.GetCustomAttribute<StepPropertyBaseAttribute>()))
                     .Where(x => x.attribute != null)
                     .OrderBy(x => x.attribute!.Order)
-                    .Select(GetMember);
+                    .SelectMany((x,i)=> GetMember(x, i).ToEnumerable());
 
 
                 return r;
 
-                StepProperty GetMember((PropertyInfo propertyInfo, StepPropertyBaseAttribute? attribute) arg1, int arg2)
+                Maybe<StepProperty> GetMember((PropertyInfo propertyInfo, StepPropertyBaseAttribute? attribute) arg1, int arg2)
                 {
                     var (propertyInfo, _) = arg1;
                     var val = propertyInfo.GetValue(this);
@@ -84,8 +84,7 @@ namespace Reductech.EDR.Core.Internal
                         IEnumerable<IStep> enumerable => new StepProperty(propertyInfo.Name, arg2,
                             OneOf<VariableName, IStep, IReadOnlyList<IStep>>.FromT2(enumerable.ToList())),
                         VariableName vn => new StepProperty(propertyInfo.Name, arg2, vn),
-                        _ => throw new Exception(
-                            $"{Name}.{propertyInfo.Name} was not a step, a step list or a variable name")
+                        _ => Maybe<StepProperty>.None
                     };
                 }
             }

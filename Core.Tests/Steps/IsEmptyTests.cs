@@ -29,7 +29,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                 );
 
                 yield return new DeserializeCase("long form",
-                    "Do: ArrayIsEmpty\nArray: ['Hello','World']",
+                    "ArrayIsEmpty(Array: ['Hello','World'])",
                     false
                 );
             }

@@ -95,7 +95,9 @@ namespace Reductech.EDR.Core.Internal
         /// <inheritdoc />
         public async Task<string> SerializeAsync(CancellationToken cancellationToken)
         {
-            return await SerializeObject(Value!, cancellationToken);
+            var result =  await SerializeObject(Value!, cancellationToken);
+
+            return result;
 
             static async ValueTask<string> SerializeObject(object o, CancellationToken cancellationToken)
             {
