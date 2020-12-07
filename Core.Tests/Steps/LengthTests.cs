@@ -21,7 +21,7 @@ namespace Reductech.EDR.Core.Tests.Steps
             get
             {
                 yield return new DeserializeCase("short form",
-                    "ArrayLength(Array = ['Hello','World'])",
+                    "ArrayLength(Array: ['Hello','World'])",
                     2
                     );
             }

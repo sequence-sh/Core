@@ -20,7 +20,7 @@ namespace Reductech.EDR.Core.Tests.Steps
             get
             {
                 yield return new DeserializeCase("Print Divide by zero",
-                    "AssertError(Step = Print(Value = 1 / 0))",
+                    "AssertError(Step: Print(Value: 1 / 0))",
                     Unit.Default);
             } }
 

@@ -82,7 +82,7 @@ namespace Reductech.EDR.Core.Tests.Steps
         {
             get
             {
-                yield return new DeserializeCase("increment 1", "- <Foo> = 41\r\n- IncrementVariable(Amount = 1, Variable = <Foo>)", Unit.Default)
+                yield return new DeserializeCase("increment 1", "- <Foo> = 41\r\n- IncrementVariable(Amount: 1, Variable: <Foo>)", Unit.Default)
                     .WithExpectedFinalState("Foo", 42);
 
             }

@@ -43,7 +43,7 @@ namespace Reductech.EDR.Core.Tests.Steps
         {
             get
             {
-                yield return new DeserializeCase("To title", "StringToCase(Case = TextCase.Title, String = 'hELLo')", "Hello");
+                yield return new DeserializeCase("To title", "StringToCase(Case: TextCase.Title, String: 'hELLo')", "Hello");
 
             }
 

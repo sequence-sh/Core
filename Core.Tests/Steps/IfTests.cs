@@ -19,7 +19,7 @@ namespace Reductech.EDR.Core.Tests.Steps
             {
                 yield return new DeserializeCase(
                     "If true print something",
-                    "If(Condition = true, Then = Print(Value = 'Hello World'))",
+                    "If(Condition: true, Then: Print(Value: 'Hello World'))",
                     Unit.Default,
                     "Hello World");
             }

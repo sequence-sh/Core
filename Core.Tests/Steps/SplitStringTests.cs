@@ -34,7 +34,7 @@ namespace Reductech.EDR.Core.Tests.Steps
         {
             get
             {
-                yield return new DeserializeCase("Split a string", "StringSplit(String = 'Hello World', Delimiter = ' ')", new List<string>{"Hello", "World"});
+                yield return new DeserializeCase("Split a string", "StringSplit(String: 'Hello World', Delimiter: ' ')", new List<string>{"Hello", "World"});
 
             }
 
