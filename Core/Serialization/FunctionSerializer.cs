@@ -42,7 +42,7 @@ namespace Reductech.EDR.Core.Serialization
                     sb.Append(", ");
 
                 sb.Append(stepProperty.Name);
-                sb.Append(" = ");
+                sb.Append(": ");
 
                 sb.Append( await stepProperty.SerializeValueAsync(cancellationToken));
             }

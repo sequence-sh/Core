@@ -20,7 +20,7 @@ infixOperator		: DASH
 					| LESSTHAN
 					| GREATERTHAN ;
 infixOperation		: term infixOperator term ;
-functionMember		: TOKEN (EQUALS | COLON) step ;
+functionMember		: TOKEN COLON step ;
 function			: TOKEN OPENBRACKET ( functionMember ( COMMA functionMember)* )? CLOSEBRACKET ;
 entity				: OPENBRACKET ( functionMember ( COMMA functionMember)* )? CLOSEBRACKET ;
 bracketedStep		: OPENBRACKET step CLOSEBRACKET ;
