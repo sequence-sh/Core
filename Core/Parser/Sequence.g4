@@ -22,7 +22,7 @@ infixOperator		: DASH
 infixOperation		: term infixOperator term ;
 functionMember		: TOKEN COLON step ;
 function			: TOKEN ( functionMember ( COMMA? functionMember)* )? ;
-entity				: OPENBRACKET ( functionMember ( COMMA? functionMember)* )? CLOSEBRACKET ;
+entity				: OPENBRACKET ( functionMember )*  CLOSEBRACKET ;
 bracketedStep		: OPENBRACKET step CLOSEBRACKET ;
 boolean				: TRUE | FALSE ;
 quotedString		: DOUBLEQUOTEDSTRING | SINGLEQUOTEDSTRING ;

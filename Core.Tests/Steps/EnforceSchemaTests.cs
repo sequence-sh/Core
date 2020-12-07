@@ -46,7 +46,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                 yield return CreateCase("Simple case",
                         EntityStream.Create(CreateEntity(("Foo", "Hello"), ("Bar", "1")), CreateEntity(("Foo", "Hello 2"),("Bar", "2"))),
                         CreateSchema("ValueIf Schema",false, ("foo", SchemaPropertyType.String, Multiplicity.ExactlyOne), ("Bar", SchemaPropertyType.Integer, Multiplicity.ExactlyOne)),
-                        "(Foo: \"Hello\",Bar: 1)","(Foo: \"Hello 2\",Bar: 2)");
+                        "(Foo: \"Hello\" Bar: 1)","(Foo: \"Hello 2\" Bar: 2)");
 
 
                 yield return CreateCase("Cast int",

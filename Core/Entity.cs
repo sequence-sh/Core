@@ -140,7 +140,7 @@ namespace Reductech.EDR.Core
                     results.Add($"{key}: {value.Serialize()}");
             }
 
-            sb.AppendJoin(",", results);
+            sb.AppendJoin(" ", results);
 
             sb.Append(')');
 

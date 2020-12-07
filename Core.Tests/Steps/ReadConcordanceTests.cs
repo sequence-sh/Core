@@ -35,8 +35,8 @@ namespace Reductech.EDR.Core.Tests.Steps
                             Value = new GetVariable<Entity>() { Variable = VariableName.Entity }
                         }
                     }, Unit.Default,
-                    "(Foo: \"Hello\",Bar: \"World\")",
-                    "(Foo: \"Hello 2\",Bar: \"World 2\")");
+                    "(Foo: \"Hello\" Bar: \"World\")",
+                    "(Foo: \"Hello 2\" Bar: \"World 2\")");
 
                 yield return new StepCase("Read Concordance with multiValue and print all lines",
                     new EntityForEach
@@ -54,8 +54,8 @@ namespace Reductech.EDR.Core.Tests.Steps
                             Value = new GetVariable<Entity> { Variable = VariableName.Entity }
                         }
                     }, Unit.Default,
-                    "(Foo: \"Hello\",Bar: [\"World\", \"Earth\"])",
-                    "(Foo: \"Hello 2\",Bar: [\"World 2\", \"Earth 2\"])");
+                    "(Foo: \"Hello\" Bar: [\"World\", \"Earth\"])",
+                    "(Foo: \"Hello 2\" Bar: [\"World 2\", \"Earth 2\"])");
 
 
             }
