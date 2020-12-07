@@ -36,6 +36,6 @@ compile grammar:
     expire_in: 2 hours
 
 mutation testing:
-  image: registry.gitlab.com/reductech/containers/dotnet/sdk
+  image: mcr.microsoft.com/dotnet/sdk:5.0-windowsservercore-ltsc2019
   tags: 
     - rt-windows
