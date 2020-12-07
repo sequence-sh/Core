@@ -19,7 +19,7 @@ namespace Reductech.EDR.Core.Tests.Steps
             get
             {
                 yield return new DeserializeCase("Is true true",
-                    "AssertTrue(Boolean: true)",
+                    "AssertTrue Boolean: true",
                     Unit.Default
                 );
             } }

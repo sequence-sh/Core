@@ -35,8 +35,8 @@ namespace Reductech.EDR.Core.Tests.Steps
         {
             get
             {
-                yield return new DeserializeCase("String is empty", "StringIsEmpty(String: '')", true);
-                yield return new DeserializeCase("String is not empty", "StringIsEmpty(String: 'Hello')", false);
+                yield return new DeserializeCase("String is empty", "StringIsEmpty String: ''", true);
+                yield return new DeserializeCase("String is not empty", "StringIsEmpty String: 'Hello'", false);
 
             }
 

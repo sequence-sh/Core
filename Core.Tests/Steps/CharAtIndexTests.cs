@@ -32,7 +32,7 @@ namespace Reductech.EDR.Core.Tests.Steps
         {
             get
             {
-                yield return new DeserializeCase("Index is present", "CharAtIndex(Index: 1, String: 'Hello')", "e");
+                yield return new DeserializeCase("Index is present", "CharAtIndex Index: 1 String: 'Hello'", "e");
 
             }
 

@@ -53,7 +53,7 @@ namespace Reductech.EDR.Core.Tests.Steps
         {
             get
             {
-                yield return new DeserializeCase("Simple Case", "FindElement(Array: ['Hello', 'World'], Element: 'World')", 1);
+                yield return new DeserializeCase("Simple Case", "FindElement Array: ['Hello', 'World'] Element: 'World'", 1);
             }
 
         }

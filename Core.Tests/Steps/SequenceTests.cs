@@ -42,7 +42,7 @@ namespace Reductech.EDR.Core.Tests.Steps
         {
             get
             {
-                yield return new DeserializeCase("Print then print", "- Print(Value: 'Hello')\n- Print(Value: 'World')", Unit.Default, "Hello", "World");
+                yield return new DeserializeCase("Print then print", "- Print Value: 'Hello'\n- Print Value: 'World'", Unit.Default, "Hello", "World");
             }
 
         }

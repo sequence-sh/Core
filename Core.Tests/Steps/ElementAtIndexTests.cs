@@ -41,10 +41,10 @@ namespace Reductech.EDR.Core.Tests.Steps
             get
             {
                 yield return new DeserializeCase("Index 0",
-                    "ElementAtIndex(Array: ['Hello', 'World'], Index: 0)", "Hello");
+                    "ElementAtIndex Array: ['Hello', 'World'] Index: 0", "Hello");
 
                 yield return new DeserializeCase("Index 1",
-                    "ElementAtIndex(Array: ['Hello', 'World'], Index: 1)", "World");
+                    "ElementAtIndex Array: ['Hello', 'World'] Index: 1", "World");
 
             }
         }
