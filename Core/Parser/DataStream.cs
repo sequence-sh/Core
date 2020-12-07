@@ -59,7 +59,7 @@ namespace Reductech.EDR.Core.Parser
             };
             var r = await toStream.SerializeAsync(cancellationToken);
 
-            return r;
+            return "(" + r + ")";
         }
     }
 }
