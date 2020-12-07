@@ -47,10 +47,6 @@ namespace Reductech.EDR.Core.Steps
         /// </summary>
         public static GenericStepFactory Instance { get; } = new GetVariableStepFactory();
 
-
-        /// <inheritdoc />
-        public override IStepNameBuilder StepNameBuilder => new StepNameBuilderFromTemplate($"[{nameof(GetVariable<object>.Variable)}]");
-
         /// <inheritdoc />
         public override Type StepType => typeof(GetVariable<>);
 
@@ -61,7 +57,6 @@ namespace Reductech.EDR.Core.Steps
         protected override Result<ITypeReference, IError> GetMemberType(FreezableStepData freezableStepData,
             TypeResolver typeResolver) =>
             freezableStepData.GetVariableName(nameof(GetVariable<object>.Variable), TypeName)
-                .MapError(x=> x.WithLocation(new FreezableStepErrorLocation(this, freezableStepData)))
 
                 .Map(x => new VariableTypeReference(x) as ITypeReference);
 
@@ -70,23 +65,24 @@ namespace Reductech.EDR.Core.Steps
         public override string OutputTypeExplanation => "T";
 
         /// <inheritdoc />
-        public override IStepSerializer Serializer { get; } = new StepSerializer(
-            new VariableNameComponent(nameof(GetVariable<object>.Variable)));
+        public override IStepSerializer Serializer =>
+            new StepSerializer(TypeName,
+                new StepComponent(nameof(GetVariable<object>.Variable)));
 
 
 
         /// <summary>
         /// Create a freezable GetVariable step.
         /// </summary>
-        public static IFreezableStep CreateFreezable(VariableName variableName)
+        public static IFreezableStep CreateFreezable(VariableName variableName, IErrorLocation location)
         {
-            var dict = new Dictionary<string, VariableName>
+            var dict = new Dictionary<string, FreezableStepProperty>
             {
-                {nameof(GetVariable<object>.Variable), variableName}
+                {nameof(GetVariable<object>.Variable), new FreezableStepProperty(variableName, location)}
             };
 
-            var fpd = new FreezableStepData(null, dict, null);
-            var step = new CompoundFreezableStep(Instance, fpd, null);
+            var fpd = new FreezableStepData( dict, location);
+            var step = new CompoundFreezableStep(Instance.TypeName, fpd, null);
 
             return step;
         }

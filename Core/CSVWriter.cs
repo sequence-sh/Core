@@ -14,7 +14,7 @@ using CsvHelper.TypeConversion;
 using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
-using Entity = Reductech.EDR.Core.Entities.Entity;
+using Reductech.EDR.Core.Parser;
 
 namespace Reductech.EDR.Core
 {
@@ -26,7 +26,7 @@ namespace Reductech.EDR.Core
         /// <summary>
         /// Writes entities from an entityStream to a stream in csv format.
         /// </summary>
-        public static async Task<Result<Stream, IError>> WriteCSV(
+        public static async Task<Result<DataStream, IError>> WriteCSV(
             IStateMonad stateMonad,
             IStep<EntityStream> entityStream,
             IStep<string> delimiter,
@@ -41,31 +41,31 @@ namespace Reductech.EDR.Core
         {
             var entityStreamResult = await entityStream.Run(stateMonad, cancellationToken);
 
-            if (entityStreamResult.IsFailure) return entityStreamResult.ConvertFailure<Stream>();
+            if (entityStreamResult.IsFailure) return entityStreamResult.ConvertFailure<DataStream>();
 
             var delimiterResult = await delimiter.Run(stateMonad, cancellationToken);
 
-            if (delimiterResult.IsFailure) return delimiterResult.ConvertFailure<Stream>();
+            if (delimiterResult.IsFailure) return delimiterResult.ConvertFailure<DataStream>();
 
             var encodingResult = await encoding.Run(stateMonad, cancellationToken);
 
-            if (encodingResult.IsFailure) return encodingResult.ConvertFailure<Stream>();
+            if (encodingResult.IsFailure) return encodingResult.ConvertFailure<DataStream>();
 
             var quoteResult = await CSVReader.TryConvertToChar(quoteCharacter, "Quote Character", stateMonad, errorLocation, cancellationToken);
-            if (quoteResult.IsFailure) return quoteResult.ConvertFailure<Stream>();
+            if (quoteResult.IsFailure) return quoteResult.ConvertFailure<DataStream>();
 
             var multiValueResult = await CSVReader.TryConvertToChar(multiValueDelimiter, "MultiValue Delimiter", stateMonad, errorLocation, cancellationToken);
-            if (multiValueResult.IsFailure) return multiValueResult.ConvertFailure<Stream>();
+            if (multiValueResult.IsFailure) return multiValueResult.ConvertFailure<DataStream>();
 
             if(multiValueResult.Value is null)
                 return new SingleError("MultiValue Delimiter is empty", ErrorCode.CSVError, errorLocation);
 
 
             var alwaysQuoteResult = await alwaysQuote.Run(stateMonad, cancellationToken);
-            if (alwaysQuoteResult.IsFailure) return alwaysQuoteResult.ConvertFailure<Stream>();
+            if (alwaysQuoteResult.IsFailure) return alwaysQuoteResult.ConvertFailure<DataStream>();
 
             var dateTimeResult = await dateTimeFormat.Run(stateMonad, cancellationToken);
-            if (dateTimeResult.IsFailure) return dateTimeResult.ConvertFailure<Stream>();
+            if (dateTimeResult.IsFailure) return dateTimeResult.ConvertFailure<DataStream>();
 
 
             var result = await WriteCSV(entityStreamResult.Value,
@@ -74,7 +74,9 @@ namespace Reductech.EDR.Core
                 quoteResult.Value,
                 multiValueResult.Value.Value,
                 alwaysQuoteResult.Value,
-                dateTimeResult.Value, cancellationToken);
+                dateTimeResult.Value, cancellationToken)
+                    .Map(x=> new DataStream(x, encodingResult.Value))
+                ;
 
             return result;
         }
@@ -137,7 +139,7 @@ namespace Reductech.EDR.Core
 
             static object ConvertToObject(Entity entity, char delimiter, string dateTimeFormat)
             {
-                IDictionary<string, object> expandoObject = new ExpandoObject();
+                IDictionary<string, object> expandoObject = new ExpandoObject()!;
 
                 foreach (var (key, value) in entity)
                 {

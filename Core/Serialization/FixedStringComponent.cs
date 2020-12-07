@@ -1,4 +1,7 @@
-﻿using CSharpFunctionalExtensions;
+﻿using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
+using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Internal;
 
 namespace Reductech.EDR.Core.Serialization
@@ -6,7 +9,7 @@ namespace Reductech.EDR.Core.Serialization
     /// <summary>
     /// Include a fixed string in serialization.
     /// </summary>
-    public class FixedStringComponent : IStepSerializerComponent, ISerializerBlock//, IDeserializerBlock
+    public class FixedStringComponent : ISerializerBlock//, IDeserializerBlock
     {
         /// <summary>
         /// Creates a new FixedStringComponent
@@ -19,9 +22,11 @@ namespace Reductech.EDR.Core.Serialization
         public string Value { get; }
 
         /// <inheritdoc />
-        public ISerializerBlock? SerializerBlock => this;
-
-        /// <inheritdoc />
-        public Result<string> TryGetText(FreezableStepData data) => Value;
+        public async Task<Result<string>> TryGetSegmentTextAsync(IReadOnlyDictionary<string, StepProperty> dictionary,
+            CancellationToken cancellationToken)
+        {
+            await Task.CompletedTask;
+            return Value;
+        }
     }
 }

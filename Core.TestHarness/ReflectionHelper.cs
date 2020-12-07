@@ -4,22 +4,26 @@ using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.Serialization;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using FluentAssertions.Common;
 using Namotion.Reflection;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.Internal;
+using Reductech.EDR.Core.Parser;
+using Reductech.EDR.Core.Serialization;
 using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.Util;
 using Xunit.Sdk;
+using Task = System.Threading.Tasks.Task;
 
 namespace Reductech.EDR.Core.TestHarness
 {
     public abstract partial class StepTestBase<TStep, TOutput>
     {
-        protected static (TStep step, Dictionary<string, string> values) CreateStepWithDefaultOrArbitraryValues()
+        protected static async Task<(TStep step, Dictionary<string, string> values)>  CreateStepWithDefaultOrArbitraryValuesAsync()
         {
             var instance = new TStep();
 
@@ -28,26 +32,33 @@ namespace Reductech.EDR.Core.TestHarness
             var values = new Dictionary<string, string>();
 
             foreach (var propertyInfo in typeof(TStep).GetProperties()
-                .Where(x => x.IsDecoratedWith<StepPropertyBaseAttribute>()).OrderBy(x=>x.Name))
-                MatchStepPropertyInfo(propertyInfo, SetVariableName, SetStep, SetStepList);
+                .Select(propertyInfo => (propertyInfo,
+                        attribute: propertyInfo.GetCustomAttribute<StepPropertyBaseAttribute>()))
+                    .Where(x => x.attribute != null)
+                    .OrderBy(x => x.attribute!.Order)
+                .Select(x=>x.propertyInfo)
+            )
+                await MatchStepPropertyInfoAsync(propertyInfo, SetVariableName, SetStep, SetStepList);
 
             return (instance, values);
 
 
-            void SetVariableName(PropertyInfo property)
+            Task SetVariableName(PropertyInfo property)
             {
                 var vn = new VariableName("Foo" + index);
                 index++;
                 property.SetValue(instance, vn);
                 values.Add(property.Name, $"<{vn.Name}>");
+                return Task.CompletedTask;
             }
 
-            void SetStep(PropertyInfo property)
+            async Task SetStep(PropertyInfo property)
             {
                 var currentValue = property.GetValue(instance);
                 if (currentValue == null)
                 {
-                    var (step, value) = CreateSimpleStep(property.PropertyType, ref index);
+                    var (step, value, newIndex) = await CreateSimpleStep(property.PropertyType, index);
+                    index = newIndex;
                     values.Add(property.Name, value);
 
                     try
@@ -62,24 +73,42 @@ namespace Reductech.EDR.Core.TestHarness
                 }
                 else
                 {
-                    values.Add(property.Name, GetString((IStep) currentValue));
+                    var s = await GetStringAsync((IStep) currentValue);
+                    values.Add(property.Name, s);
                 }
+
             }
 
-            void SetStepList(PropertyInfo property)
+            async Task SetStepList(PropertyInfo property)
             {
                 if (property.GetValue(instance) is IReadOnlyList<IStep> currentValue)
                 {
-                    var currentValueString =
-                        CreateArrayString(
-                            (currentValue).Select(GetString));
+                    var elements = new List<string>();
+
+                    foreach (var step in currentValue)
+                    {
+                        var s = await GetStringAsync(step);
+                        elements.Add(s);
+                    }
+
+
+                    var currentValueString = CreateArrayString(elements
+                            );
 
                     values.Add(property.Name, currentValueString);
                 }
                 else
                 {
                     var newValue = CreateStepListOfType(property.PropertyType, 3, ref index);
-                    var newValueString = CreateArrayString(newValue.Select(GetString));
+                    var elements = new List<string>();
+
+                    foreach (var step in newValue)
+                    {
+                        var e = await GetStringAsync(step);
+                        elements.Add(e);
+                    }
+
+                    var newValueString = CreateArrayString(elements);
 
                     values.Add(property.Name, newValueString);
                     property.SetValue(instance, newValue);
@@ -92,22 +121,71 @@ namespace Reductech.EDR.Core.TestHarness
             }
         }
 
-        private static string GetString(IStep step)
+        private static async Task<string> GetStringAsync(IStep step)
         {
             var freezable = step.Unfreeze();
 
             if (freezable is ConstantFreezableStep cfs)
             {
-                if (cfs.Value is Stream)
+                if (cfs.Value.IsT7)
                 {
-                    throw new SerializationException("Cannot get string from a stream as that would enumerate the stream");
-                    //return SerializationMethods.StreamToString(stream, Encoding.UTF8);
+                    return await SerializationMethods.SerializeEntityStreamAsync(cfs.Value.AsT7, CancellationToken.None);
                 }
 
-                return ConstantFreezableStep.WriteValue(cfs.Value, true);
+
+                return await cfs.Serialize(CancellationToken.None);
             }
 
-            return freezable.StepName;
+            else if (step is DoNothing)
+            {
+                return DoNothingStepFactory.Instance.TypeName + "()";
+            }
+            else if (freezable is CompoundFreezableStep cs && freezable.StepName == ArrayStepFactory.Instance.TypeName)
+            {
+
+                var constants = cs.FreezableStepData
+                    .StepProperties[nameof(Steps.Array<object>.Elements)]
+                    .StepList.Value.Cast<ConstantFreezableStep>();
+
+                var list = new List<string>();
+
+                foreach (var constantFreezableStep in constants)
+                {
+                    var s = await constantFreezableStep.Serialize(CancellationToken.None);
+                    list.Add(s);
+                }
+
+                return SerializationMethods.SerializeList(list);
+            }
+
+            throw new NotImplementedException("Cannot get string from step");
+        }
+
+        private static async Task MatchStepPropertyInfoAsync(PropertyInfo stepPropertyInfo,
+            Func<PropertyInfo, Task> variableNameAction,
+            Func<PropertyInfo, Task> stepPropertyAction,
+            Func<PropertyInfo, Task> stepListAction)
+        {
+            var actionsToDo = new List<Func<PropertyInfo, Task>>();
+
+            if (stepPropertyInfo.IsDecoratedWith<VariableNameAttribute>())
+                actionsToDo.Add(variableNameAction);
+
+            if (stepPropertyInfo.IsDecoratedWith<StepPropertyAttribute>())
+                actionsToDo.Add(stepPropertyAction);
+
+            if (stepPropertyInfo.IsDecoratedWith<StepListPropertyAttribute>())
+                actionsToDo.Add(stepListAction);
+
+            switch (actionsToDo.Count)
+            {
+                case 0: throw new XunitException($"{stepPropertyInfo.Name} does not have a valid attribute");
+                case 1: await actionsToDo.Single()(stepPropertyInfo);
+                    return;
+                default:
+                    throw new XunitException(
+                        $"{stepPropertyInfo.Name} has more than one step property base attribute");
+            }
         }
 
         private static void MatchStepPropertyInfo(PropertyInfo stepPropertyInfo,
@@ -130,7 +208,7 @@ namespace Reductech.EDR.Core.TestHarness
             {
                 case 0: throw new XunitException($"{stepPropertyInfo.Name} does not have a valid attribute");
                 case 1:
-                    actionsToDo.Single()(stepPropertyInfo);
+                     actionsToDo.Single()(stepPropertyInfo);
                     return;
                 default:
                     throw new XunitException(
@@ -138,7 +216,7 @@ namespace Reductech.EDR.Core.TestHarness
             }
         }
 
-        private static (IStep step, string value) CreateSimpleStep(Type tStep, ref int index)
+        private static async Task<(IStep step, string value, int newIndex)>  CreateSimpleStep(Type tStep, int index)
         {
             var outputType = tStep.GenericTypeArguments.First();
             IStep step;
@@ -228,9 +306,9 @@ namespace Reductech.EDR.Core.TestHarness
                 Stream stream = new MemoryStream(byteArray); //special case so we don't read the stream early
 
                 step = Constant(stream);
-                var asString = GetString(Constant(s));
+                var asString = await GetStringAsync(Constant(s));
 
-                return (step, asString);
+                return (step, asString, index);
             }
             else if (outputType == typeof(Entity))
             {
@@ -243,6 +321,13 @@ namespace Reductech.EDR.Core.TestHarness
                 var entityStream = CreateSimpleEntityStream(ref index);
 
                 step = new Constant<EntityStream>(entityStream);
+            }
+            else if (outputType == typeof(DataStream))
+            {
+                var s = "DataStream" + index;
+                index++;
+
+                step = new Constant<DataStream>(new DataStream(s));
             }
             else if (outputType == typeof(Schema))
             {
@@ -259,7 +344,9 @@ namespace Reductech.EDR.Core.TestHarness
             else
                 throw new XunitException($"Cannot create a constant step with type {outputType.GetDisplayName()}");
 
-            return (step, GetString(step));
+            var newString = await GetStringAsync(step);
+
+            return (step, newString, index);
 
 
             static EntityStream CreateSimpleEntityStream(ref int index1)
@@ -278,11 +365,11 @@ namespace Reductech.EDR.Core.TestHarness
             {
                 var pairs = new List<KeyValuePair<string, EntityValue>>
                 {
-                    new KeyValuePair<string, EntityValue>("Prop1", EntityValue.Create($"Val{index1}", null))
+                    new KeyValuePair<string, EntityValue>("Prop1", EntityValue.Create($"Val{index1}"))
                 };
 
                 index1++;
-                pairs.Add(new KeyValuePair<string, EntityValue>("Prop2", EntityValue.Create($"Val{index1}", null)));
+                pairs.Add(new KeyValuePair<string, EntityValue>("Prop2", EntityValue.Create($"Val{index1}")));
                 index1++;
 
                 var entity = new Entity(pairs.ToImmutableList());
@@ -311,7 +398,8 @@ namespace Reductech.EDR.Core.TestHarness
 
             else if (outputType == typeof(bool)) getElement = i => Constant(i % 2 == 0);
             else if (outputType == typeof(int)) getElement = Constant;
-            else throw new XunitException($"Cannot create default value for {outputType.GetDisplayName()}");
+            else if (outputType == typeof(Entity)) getElement = i => Constant(CreateEntity(("Foo", $"Val + {i}")));
+            else throw new XunitException($"Cannot create default value for {outputType.GetDisplayName()} List");
 
             for (var i = 0; i < numberOfElements; i++)
             {

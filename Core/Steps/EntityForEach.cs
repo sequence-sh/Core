@@ -9,7 +9,6 @@ using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Util;
-using Entity = Reductech.EDR.Core.Entities.Entity;
 
 namespace Reductech.EDR.Core.Steps
 {
@@ -75,19 +74,6 @@ namespace Reductech.EDR.Core.Steps
         /// The instance.
         /// </summary>
         public static SimpleStepFactory<EntityForEach, Unit> Instance { get; } = new EntityForEachStepFactory();
-
-        /// <inheritdoc />
-        public override IEnumerable<(VariableName VariableName, ITypeReference typeReference)> FixedVariablesSet
-        {
-            get
-            {
-                yield return (VariableName.Entity, new ActualTypeReference(typeof(Entity)));
-            }
-        }
-
-        /// <inheritdoc />
-        public override Result<Maybe<ITypeReference>, IError> GetTypeReferencesSet(VariableName variableName, FreezableStepData freezableStepData, TypeResolver typeResolver) =>
-            Maybe<ITypeReference>.From(new ActualTypeReference(typeof(Entity)));
     }
 
 }

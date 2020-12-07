@@ -49,9 +49,9 @@ namespace Reductech.EDR.Core.Tests
 
 
                 yield return new ErrorTestFunction("Get variable with wrong type",
-                    new Sequence
+                    new Sequence<Unit>
                     {
-                        Steps = new IStep<Unit>[]
+                        InitialSteps = new IStep<Unit>[]
                         {
                             new SetVariable<int>
                             {
@@ -66,7 +66,8 @@ namespace Reductech.EDR.Core.Tests
                                     Variable =FooString
                                 }
                             }
-                        }
+                        },
+                        FinalStep = new DoNothing()
                     },
                     new ErrorBuilder("Variable '<Foo>' does not have type 'System.Boolean'.", ErrorCode.WrongVariableType)
                         .WithLocation(new GetVariable<bool>

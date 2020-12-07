@@ -24,11 +24,6 @@ namespace Reductech.EDR.Core.Tests.Steps
                     "ArrayLength(Array = ['Hello','World'])",
                     2
                     );
-
-                yield return new DeserializeCase("long form",
-                    "Do: ArrayLength\nArray: ['Hello','World']",
-                    2
-                    );
             }
         }
 

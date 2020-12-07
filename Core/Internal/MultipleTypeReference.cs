@@ -42,7 +42,7 @@ namespace Reductech.EDR.Core.Internal
         /// Creates a new MultipleTypeReference.
         /// </summary>
         /// <param name="allReferences"></param>
-        private MultipleTypeReference(ImmutableHashSet<ITypeReference> allReferences) => AllReferences = allReferences.ToImmutableHashSet();
+        private MultipleTypeReference(ImmutableHashSet<ITypeReference> allReferences) => AllReferences = allReferences;
 
         /// <summary>
         /// The type references.
@@ -70,7 +70,7 @@ namespace Reductech.EDR.Core.Internal
         public override bool Equals(object? obj) => ReferenceEquals(this, obj) || obj is ITypeReference other && Equals(other);
 
         /// <inheritdoc />
-        public override int GetHashCode() => AllReferences.FirstOrDefault().GetHashCode();
+        public override int GetHashCode() => AllReferences.Select(x=>x.GetHashCode()).FirstOrDefault()!;
 
         /// <inheritdoc />
         public IEnumerable<VariableTypeReference> VariableTypeReferences => AllReferences.SelectMany(x=>x.VariableTypeReferences);
@@ -82,8 +82,7 @@ namespace Reductech.EDR.Core.Internal
                 .Select(x => x.TryGetActualTypeReference(typeResolver))
                 .Combine(ErrorBuilderList.Combine)
                 .Bind(x => x.Distinct().EnsureSingle("Type multiply defined")
-                    .MapError(y => new ErrorBuilder(y, ErrorCode.AmbiguousType) as IErrorBuilder))
-                ; //TODO improve this error
+                    .MapError(y => new ErrorBuilder(y, ErrorCode.AmbiguousType) as IErrorBuilder));
 
             return results;
         }
@@ -91,14 +90,25 @@ namespace Reductech.EDR.Core.Internal
         /// <inheritdoc />
         public Result<ActualTypeReference, IErrorBuilder> TryGetGenericTypeReference(TypeResolver typeResolver, int argumentNumber)
         {
-            var result = AllReferences
-                .Select(x => x.TryGetGenericTypeReference(typeResolver, argumentNumber))
-                .Combine(ErrorBuilderList.Combine)
-                .Map(x => x.ToHashSet())
-                .Ensure(x=>x.Count == 1,new ErrorBuilder("Type multiply defined", ErrorCode.AmbiguousType))
-                .Map(x=>x.Single());
-
-            return result;
+            return TryGetActualTypeReference(typeResolver)
+                .Bind(x => x.TryGetGenericTypeReference(typeResolver, argumentNumber));
         }
+
+        /// <inheritdoc />
+        public Result<Maybe<ActualTypeReference>, IErrorBuilder> GetActualTypeReferenceIfResolvable(TypeResolver typeResolver)
+        {
+            var results = AllReferences
+                .Select(x => x.GetActualTypeReferenceIfResolvable(typeResolver))
+                .Combine(ErrorBuilderList.Combine)
+                .Map(x=>x.SelectMany(m=>m.ToEnumerable()).Distinct().ToList());
+
+            if (results.IsFailure)
+                return results.ConvertFailure<Maybe<ActualTypeReference>>();
+            if(!results.Value.Any()) return Maybe<ActualTypeReference>.None;
+            if(results.Value.Count == 1) return Maybe<ActualTypeReference>.From(results.Value.Single());
+
+            return new ErrorBuilder("Type multiply defined", ErrorCode.AmbiguousType);
+        }
+
     }
 }

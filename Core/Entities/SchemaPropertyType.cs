@@ -29,7 +29,10 @@
         /// <summary>
         /// A date.
         /// </summary>
-        Date
-
+        Date,
+        /// <summary>
+        /// Another entity
+        /// </summary>
+        Entity
     }
 }

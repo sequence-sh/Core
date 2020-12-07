@@ -35,8 +35,8 @@ namespace Reductech.EDR.Core.Tests.Steps
                             Value = new GetVariable<Entity> { Variable = VariableName.Entity }
                         }
                     }, Unit.Default,
-                    "Foo: Hello, Bar: World",
-                    "Foo: Hello 2, Bar: World 2");
+                    "(Foo: \"Hello\",Bar: \"World\")",
+                    "(Foo: \"Hello 2\",Bar: \"World 2\")");
 
 
                 yield return new StepCase("Read CSV and print all lines should ignore missing columns",
@@ -55,8 +55,8 @@ namespace Reductech.EDR.Core.Tests.Steps
                             Value = new GetVariable<Entity> { Variable = VariableName.Entity }
                         }
                     }, Unit.Default,
-                    "Foo: Hello",
-                    "Foo: Hello 2");
+                    "(Foo: \"Hello\")",
+                    "(Foo: \"Hello 2\")");
 
 
                 yield return new StepCase("Read CSV and print all lines should ignore comments",
@@ -75,8 +75,8 @@ namespace Reductech.EDR.Core.Tests.Steps
                             Value = new GetVariable<Entity> { Variable = VariableName.Entity }
                         }
                     }, Unit.Default,
-                    "Foo: Hello",
-                    "Foo: Hello 2");
+                    "(Foo: \"Hello\")",
+                    "(Foo: \"Hello 2\")");
 
 
             }
@@ -95,25 +95,25 @@ namespace Reductech.EDR.Core.Tests.Steps
             }
         }
 
-        /// <inheritdoc />
-        protected override IEnumerable<SerializeCase> SerializeCases
-        {
-            get
-            {
-                var (step, _) = CreateStepWithDefaultOrArbitraryValues();
+//        /// <inheritdoc />
+//        protected override IEnumerable<SerializeCase> SerializeCases
+//        {
+//            get
+//            {
+//                var (step, _) = CreateStepWithDefaultOrArbitraryValuesAsync();
 
-                const string expectedYaml = @"Do: FromCSV
-Stream: 'Baz0'
-Encoding: EncodingEnum.UTF8
-Delimiter: ','
-CommentCharacter: '#'
-QuoteCharacter: '""'
-MultiValueDelimiter: ''";
+//                const string expectedYaml = @"Do: FromCSV
+//Stream: 'Baz0'
+//Encoding: EncodingEnum.UTF8
+//Delimiter: ','
+//CommentCharacter: '#'
+//QuoteCharacter: '""'
+//MultiValueDelimiter: ''";
 
 
 
-                yield return new SerializeCase("Default", step, expectedYaml);
-            }
-        }
+//                yield return new SerializeCase("Default", step, expectedYaml);
+//            }
+//        }
     }
 }

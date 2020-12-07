@@ -28,15 +28,26 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Parser\Sequence.g4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Antlr4 Include="Parser\Sequence.g4">
+      <Listener>false</Listener>
+      <Error>true</Error>
+    </Antlr4>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Antlr4.Runtime.Standard" Version="4.9.0" />
+    <PackageReference Include="Antlr4BuildTasks" Version="8.8.0" />
     <PackageReference Include="CSharpFunctionalExtensions" Version="2.13.1" />
     <PackageReference Include="CsvHelper" Version="17.0.0" />
     <PackageReference Include="JetBrains.Annotations" Version="2020.3.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="5.0.0" />
     <PackageReference Include="Namotion.Reflection" Version="1.0.14" />
     <PackageReference Include="OneOf" Version="2.1.155" />
-    <PackageReference Include="Superpower" Version="2.3.0" />
     <PackageReference Include="System.Linq.Async" Version="5.0.0" />
-    <PackageReference Include="YamlDotNet" Version="9.1.0" />
   </ItemGroup>
 
 </Project>

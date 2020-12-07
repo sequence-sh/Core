@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
@@ -49,17 +50,22 @@ namespace Reductech.EDR.Core.Steps
     /// <summary>
     /// Increment an integer variable by a particular amount
     /// </summary>
-    public sealed class IncrementVariableStepFactory : SimpleStepFactory<IncrementVariable, int>
+    public sealed class IncrementVariableStepFactory : SimpleStepFactory<IncrementVariable, Unit>
     {
         private IncrementVariableStepFactory() { }
 
         /// <summary>
         /// The instance.
         /// </summary>
-        public static SimpleStepFactory<IncrementVariable, int> Instance { get; } = new IncrementVariableStepFactory();
+        public static SimpleStepFactory<IncrementVariable, Unit> Instance { get; } = new IncrementVariableStepFactory();
 
         /// <inheritdoc />
-        public override Result<Maybe<ITypeReference>, IError> GetTypeReferencesSet(VariableName variableName,
-            FreezableStepData freezableStepData, TypeResolver typeResolver) => Maybe<ITypeReference>.From(new ActualTypeReference(typeof(int)));
+        public override IEnumerable<(VariableName variableName, Maybe<ITypeReference>)> GetTypeReferencesSet(FreezableStepData freezableStepData, TypeResolver typeResolver)
+        {
+            var vn = freezableStepData.GetVariableName(nameof(IncrementVariable.Variable), TypeName);
+            if(vn.IsFailure) yield break;
+
+            yield return (vn.Value, Maybe<ITypeReference>.From(new ActualTypeReference(typeof(int))));
+        }
     }
 }

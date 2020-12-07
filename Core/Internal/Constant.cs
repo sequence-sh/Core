@@ -1,9 +1,14 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
+using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.Internal.Errors;
+using Reductech.EDR.Core.Parser;
+using Reductech.EDR.Core.Serialization;
 using Reductech.EDR.Core.Util;
 
 namespace Reductech.EDR.Core.Internal
@@ -30,7 +35,38 @@ namespace Reductech.EDR.Core.Internal
         public string Name => $"{Value}";
 
         /// <inheritdoc />
-        public IFreezableStep Unfreeze() => new ConstantFreezableStep(Value!);
+        public IFreezableStep Unfreeze()
+        {
+            return UnfreezeObject(Value!);
+
+            IFreezableStep UnfreezeObject(object o)
+            {
+                return o switch
+                {
+                    string s => new ConstantFreezableStep(s),
+                    int i => new ConstantFreezableStep(i),
+                    double d => new ConstantFreezableStep(d),
+                    bool b => new ConstantFreezableStep(b),
+                    Enum e => new ConstantFreezableStep(new Enumeration(e.GetType().Name, e.ToString())),
+                    DateTime dt => new ConstantFreezableStep(dt),
+                    Entity ent => new ConstantFreezableStep(ent),
+                    EntityStream es => new ConstantFreezableStep(es),
+                    DataStream ds => new ConstantFreezableStep(ds),
+                    Schema schema => new ConstantFreezableStep(schema.ConvertToEntity()),
+                    IEnumerable enumerable => UnfreezeList(enumerable),
+                    _ => throw new Exception($"Cannot unfreeze {typeof(T)}")
+                };
+            }
+
+            IFreezableStep UnfreezeList(IEnumerable enumerable)
+            {
+                var l = enumerable.Cast<object>().Select(UnfreezeObject).ToList();
+
+                var a = FreezableFactory.CreateFreezableList(l, null, new StepErrorLocation(this));
+
+                return a;
+            }
+        }
 
         /// <inheritdoc />
 #pragma warning disable 1998
@@ -53,9 +89,64 @@ namespace Reductech.EDR.Core.Internal
         public Configuration? Configuration { get; set; } = null;
 
         /// <inheritdoc />
-        public IEnumerable<IStepCombiner> StepCombiners => ArraySegment<IStepCombiner>.Empty;
+        public Type OutputType => typeof(T);
+
+        /// <param name="cancellationToken"></param>
+        /// <inheritdoc />
+        public async Task<string> SerializeAsync(CancellationToken cancellationToken)
+        {
+            var result =  await SerializeObject(Value!, cancellationToken);
+
+            return result;
+
+            static async ValueTask<string> SerializeObject(object o, CancellationToken cancellationToken)
+            {
+                return o switch
+                {
+                    string s => SerializationMethods.DoubleQuote(s),
+                    int i => i.ToString(),
+                    double d => d.ToString("G17"),
+                    bool b => b.ToString(),
+                    Enum e => new Enumeration(e.GetType().Name, e.ToString()).ToString(),
+                    DateTime dt => dt.ToString("O"),
+                    Entity ent => ent.Serialize(),
+                    EntityStream es => await SerializeEntityStream(es, cancellationToken),
+                    DataStream ds => await ds.SerializeAsync(cancellationToken),
+                    Schema schema => schema.ConvertToEntity().Serialize(),
+                    IEnumerable enumerable => await SerializeEnumerable(enumerable, cancellationToken),
+                _ => throw new Exception($"Cannot serialize {typeof(T)}")
+                };
+            }
+
+
+            static async ValueTask<string> SerializeEnumerable(IEnumerable enumerable, CancellationToken cancellationToken)
+            {
+                var strings = new List<string>();
+
+                foreach (var o in enumerable.Cast<object>())
+                {
+                    var v = await SerializeObject(o, cancellationToken);
+                    strings.Add(v);
+                }
+
+                var s = SerializationMethods.SerializeList(strings);
+                return s;
+            }
+
+
+            static async ValueTask<string> SerializeEntityStream(EntityStream entityStream, CancellationToken cancellationToken)
+            {
+                var entities = await entityStream.SourceEnumerable
+                    .Select(x=>x.Serialize())
+                    .ToListAsync(cancellationToken);
+
+                var s = SerializationMethods.SerializeList(entities);
+
+                return s;
+            }
+        }
 
         /// <inheritdoc />
-        public Type OutputType => typeof(T);
+        public object ValueObject => Value!;
     }
 }

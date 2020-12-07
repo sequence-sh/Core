@@ -136,7 +136,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                         "",
                     }).WithStepFactoryStore(StepFactoryStore.Create(DocumentationExampleStepFactory.Instance));
 
-                yield return new StepCase("Two Steps",
+                yield return new StepCase("Two InitialSteps",
                     new GenerateDocumentation(),
                     new List<string>()
                     {

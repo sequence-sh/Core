@@ -90,40 +90,17 @@ namespace Reductech.EDR.Core.Steps
         public static StepFactory Instance { get; } = new ApplyBooleanOperatorStepFactory();
 
         /// <inheritdoc />
-        public override IStepNameBuilder StepNameBuilder => new StepNameBuilderFromTemplate($"[{nameof(ApplyBooleanOperator.Left)}] [{nameof(ApplyBooleanOperator.Operator)}] [{nameof(ApplyBooleanOperator.Right)}]");
-
-        /// <inheritdoc />
         public override IEnumerable<Type> EnumTypes => new[] { typeof(BooleanOperator) };
 
         /// <inheritdoc />
-        public override IStepSerializer Serializer { get; } = new StepSerializer(
-            new FixedStringComponent("("),
-            new BooleanComponent(nameof(ApplyBooleanOperator.Left)),
-            new SpaceComponent(),
+        public override IStepSerializer Serializer => new StepSerializer(TypeName, new FixedStringComponent("("),
+            new StepComponent(nameof(ApplyBooleanOperator.Left)),
+            SpaceComponent.Instance,
             new EnumDisplayComponent<BooleanOperator>(nameof(ApplyBooleanOperator.Operator)),
-            new SpaceComponent(),
-            new BooleanComponent(nameof(ApplyBooleanOperator.Right)),
+            SpaceComponent.Instance,
+            new StepComponent(nameof(ApplyBooleanOperator.Right)),
             new FixedStringComponent(")")
         );
-
-        /// <summary>
-        /// Create a freezable ApplyBooleanOperator step.
-        /// </summary>
-        public static IFreezableStep CreateFreezable(IFreezableStep left, IFreezableStep compareOperator, IFreezableStep right)
-        {
-            var dict = new Dictionary<string, IFreezableStep>
-            {
-                {nameof(ApplyBooleanOperator.Left), left},
-                {nameof(ApplyBooleanOperator.Operator), compareOperator},
-                {nameof(ApplyBooleanOperator.Right), right},
-            };
-
-            var fpd = new FreezableStepData(dict, null, null);
-            var step = new CompoundFreezableStep(Instance, fpd, null);
-
-            return step;
-        }
-
 
     }
 }

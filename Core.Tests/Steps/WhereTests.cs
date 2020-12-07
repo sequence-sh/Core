@@ -37,26 +37,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                         }
                     },
                     Unit.Default,
-                    "Foo: Alpha", "Foo: ALPHA", "Foo: Beta");
-            }
-        }
-
-        /// <inheritdoc />
-        protected override IEnumerable<SerializeCase> SerializeCases
-        {
-            get
-            {
-                yield return new SerializeCase("Default",
-                    CreateStepWithDefaultOrArbitraryValues().step,
-                    @"Do: EntityStreamFilter
-EntityStream:
-- (Prop1 = 'Val0',Prop2 = 'Val1')
-- (Prop1 = 'Val2',Prop2 = 'Val3')
-- (Prop1 = 'Val4',Prop2 = 'Val5')
-Predicate: True"
-
-                );
-
+                    "(Foo: \"Alpha\")", "(Foo: \"ALPHA\")", "(Foo: \"Beta\")");
             }
         }
 

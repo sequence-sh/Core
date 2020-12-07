@@ -9,7 +9,6 @@ using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
-using Entity = Reductech.EDR.Core.Entities.Entity;
 using Type = System.Type;
 
 namespace Reductech.EDR.Core.Steps
@@ -26,8 +25,13 @@ namespace Reductech.EDR.Core.Steps
             var entityStream = await EntityStream.Run(stateMonad, cancellationToken);
             if (entityStream.IsFailure) return entityStream.ConvertFailure<EntityStream>();
 
-            var schema = await Schema.Run(stateMonad, cancellationToken);
+            var schemaEntity = await Schema.Run(stateMonad, cancellationToken);
+            if (schemaEntity.IsFailure) return schemaEntity.ConvertFailure<EntityStream>();
+
+            var schema = Entities.Schema.TryCreateFromEntity(schemaEntity.Value).MapError(e=>e.WithLocation(this));
+
             if (schema.IsFailure) return schema.ConvertFailure<EntityStream>();
+
 
             var errorBehaviour = await ErrorBehaviour.Run(stateMonad, cancellationToken);
             if (errorBehaviour.IsFailure) return errorBehaviour.ConvertFailure<EntityStream>();
@@ -72,11 +76,13 @@ namespace Reductech.EDR.Core.Steps
         public IStep<EntityStream> EntityStream { get; set; } = null!;
 
         /// <summary>
-        /// The schema to enforce
+        /// The schema to enforce.
+        /// This must be an entity with the properties of a schema.
+        /// All other properties will be ignored.
         /// </summary>
         [StepProperty]
         [Required]
-        public IStep<Schema> Schema { get; set; } = null!;
+        public IStep<Entity> Schema { get; set; } = null!;
 
         /// <summary>
         /// How to behave if an error occurs.

@@ -64,8 +64,5 @@ namespace Reductech.EDR.Core.Steps
         /// The instance.
         /// </summary>
         public static SimpleStepFactory<While, Unit> Instance { get; } = new WhileStepFactory();
-
-        /// <inheritdoc />
-        public override IStepNameBuilder StepNameBuilder => new StepNameBuilderFromTemplate($"Repeat '[{nameof(While.Action)}]' while '[{nameof(While.Condition)}]'");
     }
 }

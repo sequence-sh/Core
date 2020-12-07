@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.Internal;
+using Reductech.EDR.Core.Parser;
 using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.TestHarness;
 using Reductech.EDR.Core.Util;
@@ -10,7 +10,7 @@ using Xunit.Abstractions;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
-    public class ToCSVTests : StepTestBase<ToCSV, Stream>
+    public class ToCSVTests : StepTestBase<ToCSV, DataStream>
     {
         /// <inheritdoc />
         public ToCSVTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
@@ -60,32 +60,6 @@ namespace Reductech.EDR.Core.Tests.Steps
                     }, Unit.Default,
                     $"Foo\tBar{Environment.NewLine}Hello\tWorld{Environment.NewLine}Hello 2\tWorld 2{Environment.NewLine}"
                 );
-            }
-        }
-
-        /// <inheritdoc />
-        protected override IEnumerable<SerializeCase> SerializeCases
-        {
-            get
-            {
-                var expectedYaml = @"Do: ToCSV
-Entities:
-- (Prop1 = 'Val0',Prop2 = 'Val1')
-- (Prop1 = 'Val2',Prop2 = 'Val3')
-- (Prop1 = 'Val4',Prop2 = 'Val5')
-Encoding: EncodingEnum.UTF8
-Delimiter: ','
-QuoteCharacter: '""'
-AlwaysQuote: False
-MultiValueDelimiter: '|'
-DateTimeFormat: 'O'";
-
-
-                var step = CreateStepWithDefaultOrArbitraryValues();
-
-                var case1 = new SerializeCase("Default", step.step, expectedYaml);
-
-                yield return case1;
             }
         }
     }

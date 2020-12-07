@@ -11,7 +11,6 @@ using Reductech.EDR.Core.ExternalProcesses;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Util;
-using Reductech.Utilities.Testing;
 using Xunit.Abstractions;
 using Xunit.Sdk;
 
@@ -82,9 +81,6 @@ namespace Reductech.EDR.Core.TestHarness
 
                 var stateMonad = new StateMonad(logger, Settings, externalProcessRunner, fileSystemHelper, sfs);
 
-                foreach (var (key, value) in InitialState)
-                    stateMonad.SetVariable(key, value).ShouldBeSuccessful(x => x.AsString);
-
 
                 return stateMonad;
             }
@@ -132,8 +128,6 @@ namespace Reductech.EDR.Core.TestHarness
             /// <inheritdoc />
             public ISettings Settings { get; set; } = EmptySettings.Instance;
 
-
-            public Dictionary<VariableName, object> InitialState { get; } = new Dictionary<VariableName, object>();
             public Dictionary<VariableName, object> ExpectedFinalState { get; } = new Dictionary<VariableName, object>();
 
             public IReadOnlyCollection<object> ExpectedLoggedValues { get; }

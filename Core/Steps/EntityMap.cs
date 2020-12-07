@@ -8,7 +8,6 @@ using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
-using Entity = Reductech.EDR.Core.Entities.Entity;
 
 namespace Reductech.EDR.Core.Steps
 {
@@ -69,15 +68,6 @@ namespace Reductech.EDR.Core.Steps
     public sealed class EntityMapStepFactory : SimpleStepFactory<EntityMap, EntityStream>
     {
         private EntityMapStepFactory() {}
-
-        /// <inheritdoc />
-        public override IEnumerable<(VariableName VariableName, ITypeReference typeReference)> FixedVariablesSet
-        {
-            get
-            {
-                yield return (VariableName.Entity, new ActualTypeReference(typeof(Entity)));
-            }
-        }
 
         /// <summary>
         /// The instance.

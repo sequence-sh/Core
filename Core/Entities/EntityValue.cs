@@ -1,17 +1,19 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using CSharpFunctionalExtensions;
 using OneOf;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
+using Reductech.EDR.Core.Serialization;
 
 namespace Reductech.EDR.Core.Entities
 {
     /// <summary>
     /// The value of an entity property.
     /// </summary>
-    public class EntityValue
+    public sealed class EntityValue : IEquatable<EntityValue>
     {
         /// <summary>
         /// Create a new entityValue
@@ -39,6 +41,33 @@ namespace Reductech.EDR.Core.Entities
 
             return new EntityValue(EntitySingleValue.Create(original));
         }
+
+        /// <summary>
+        /// Create an entity from an object
+        /// </summary>
+        public static EntityValue CreateFromObject(object? argValue, char? multiValueDelimiter = null)
+        {
+            switch (argValue)
+            {
+                case null: return new EntityValue(DBNull.Value);
+                case string s: return Create(s, multiValueDelimiter);
+                case int i: return new EntityValue(new EntitySingleValue(i, argValue.ToString()!));
+                case bool b: return new EntityValue(new EntitySingleValue(b, argValue.ToString()!));
+                case double d: return new EntityValue(new EntitySingleValue(d, argValue.ToString()!));
+                case Enumeration e: return new EntityValue(new EntitySingleValue(e, argValue.ToString()!));
+                case DateTime dt: return new EntityValue(new EntitySingleValue(dt, argValue.ToString()!));
+                case Entity entity: return new EntityValue(new EntitySingleValue(entity, entity.ToString()));
+                case IEnumerable e:
+                {
+                    var newEnumerable  = e.Cast<object>().Select(x=>x.ToString()!);
+                    return Create(newEnumerable);
+                }
+                default:
+                    return Create(argValue.ToString(), multiValueDelimiter);
+            }
+        }
+
+
 
         /// <summary>
         /// Create a new EntityValue from some number of original strings.
@@ -103,9 +132,51 @@ namespace Reductech.EDR.Core.Entities
         }
 
         /// <inheritdoc />
+        public bool Equals(EntityValue? other)
+        {
+            return other is not null && Value.Equals(other.Value);
+        }
+
+        /// <inheritdoc />
+        public override bool Equals(object? obj)
+        {
+            if (obj is null) return false;
+            if (ReferenceEquals(this, obj)) return true;
+
+            return obj is EntityValue ev && Equals(ev);
+        }
+
+        /// <inheritdoc />
+        public override int GetHashCode()
+        {
+            return Value.Match(_ => 0,
+                v => v.Value.GetHashCode(),
+                l => l.Count switch
+                {
+                    0 => 0,
+                    1 => l.Single().GetHashCode(),
+                    _ => HashCode.Combine(l.Count, l.First())
+                }
+            );
+        }
+
+        /// <inheritdoc />
         public override string ToString()
         {
             return Value.Match(x => "Empty", x => x.ToString(), x => string.Join(", ", x));
+        }
+
+        /// <summary>
+        /// Serialize this EntityValue
+        /// </summary>
+        /// <returns></returns>
+        public string Serialize()
+        {
+            return
+            Value.Match(_=> "", x=>
+                x.Serialize(),
+                x=>
+                    SerializationMethods.SerializeList(x.Select(y=>y.Serialize())));
         }
     }
 }

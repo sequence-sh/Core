@@ -8,7 +8,7 @@ using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
-using Reductech.EDR.Core.Util;
+using Reductech.EDR.Core.Serialization;
 
 namespace Reductech.EDR.Core.Steps
 {
@@ -61,14 +61,10 @@ namespace Reductech.EDR.Core.Steps
         protected override ITypeReference GetOutputTypeReference(ITypeReference memberTypeReference) => new GenericTypeReference(typeof(List<>), new[] { memberTypeReference });
 
         /// <inheritdoc />
-        public override IStepNameBuilder StepNameBuilder => new StepNameBuilderFromTemplate($"[[{nameof(Array<object>.Elements)}]]");
-
-        /// <inheritdoc />
         protected override Result<ITypeReference, IError> GetMemberType(FreezableStepData freezableStepData, TypeResolver typeResolver)
         {
             var result =
-                freezableStepData.GetListArgument(nameof(Array<object>.Elements), TypeName)
-                    .MapError(x=>x.WithLocation(this, freezableStepData))
+                freezableStepData.GetStepList(nameof(Array<object>.Elements), TypeName)
                     .Bind(x => x.Select(r => r.TryGetOutputTypeReference(typeResolver)).Combine(ErrorList.Combine))
                     .Bind(x => MultipleTypeReference.TryCreate(x, TypeName)
                     .MapError(e=>e.WithLocation(this, freezableStepData)));
@@ -77,19 +73,18 @@ namespace Reductech.EDR.Core.Steps
             return result;
         }
 
+        /// <inheritdoc />
+        public override IStepSerializer Serializer => ArraySerializer.Instance;
+
         /// <summary>
-        /// Create a new Freezable Array
+        /// Creates an array.
         /// </summary>
-        public static IFreezableStep CreateFreezable(IEnumerable<IFreezableStep> elements, Configuration? configuration)
+        public static Array<T> CreateArray<T>(List<IStep<T>> stepList)
         {
-            var dict = new Dictionary<string, IReadOnlyList<IFreezableStep>>
+            return new Array<T>()
             {
-                {nameof(Array<object>.Elements), elements.ToList()}
+                Elements = stepList
             };
-
-            var fpd = new FreezableStepData(null, null, dict);
-
-            return new CompoundFreezableStep(Instance, fpd, configuration);
         }
     }
 }

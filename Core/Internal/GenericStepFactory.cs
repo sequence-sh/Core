@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Internal.Errors;
-using Reductech.EDR.Core.Util;
 
 namespace Reductech.EDR.Core.Internal
 {
@@ -23,17 +22,16 @@ namespace Reductech.EDR.Core.Internal
         /// </summary>
         protected abstract ITypeReference GetOutputTypeReference(ITypeReference memberTypeReference);
 
-        /// <inheritdoc />
-        public override IStepNameBuilder StepNameBuilder => DefaultStepNameBuilder.Instance;
 
         /// <inheritdoc />
         public override IEnumerable<Type> EnumTypes => ImmutableList<Type>.Empty;
 
         /// <inheritdoc />
-        protected override Result<ICompoundStep, IError> TryCreateInstance(StepContext stepContext, FreezableStepData freezableStepData) =>
-            GetMemberType(freezableStepData, stepContext.TypeResolver)
-                .Bind(x=> stepContext.TryGetTypeFromReference(x).MapError(e=>e.WithLocation(this, freezableStepData)))
-                .Bind(x => TryCreateGeneric(StepType, x).MapError(e=> e.WithLocation(this, freezableStepData)));
+        protected override Result<ICompoundStep, IError> TryCreateInstance(StepContext stepContext,
+            FreezableStepData freezeData) =>
+            GetMemberType(freezeData, stepContext.TypeResolver)
+                .Bind(x=> stepContext.TryGetTypeFromReference(x).MapError(e=>e.WithLocation(this, freezeData)))
+                .Bind(x => TryCreateGeneric(StepType, x).MapError(e=> e.WithLocation(this, freezeData)));
 
         /// <summary>
         /// Gets the type

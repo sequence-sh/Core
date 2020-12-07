@@ -1,18 +1,17 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Dynamic;
 using System.Linq;
 using System.Text;
 using CSharpFunctionalExtensions;
-using Reductech.EDR.Core.Serialization;
-
-namespace Reductech.EDR.Core.Entities
+using Reductech.EDR.Core.Entities;
+namespace Reductech.EDR.Core
 {
     /// <summary>
     /// A piece of data.
     /// </summary>
-    public sealed class Entity : IEnumerable<KeyValuePair<string, EntityValue>>
+    public sealed class Entity : IEnumerable<KeyValuePair<string, EntityValue>> , IEquatable<Entity>
     {
         private readonly ImmutableList<KeyValuePair<string, EntityValue>> _properties;
 
@@ -38,7 +37,7 @@ namespace Reductech.EDR.Core.Entities
         public static Entity Create(IEnumerable<KeyValuePair<string, object>> properties, char? multiValueDelimiter = null)
         {
             var propertyEntities = properties
-                .Select(x => new KeyValuePair<string, EntityValue>(x.Key, EntityValue.Create(x.Value.ToString(), multiValueDelimiter)))
+                .Select(x => new KeyValuePair<string, EntityValue>(x.Key, EntityValue.CreateFromObject(x.Value, multiValueDelimiter)))
                 .ToImmutableList();
 
             return new Entity(propertyEntities);
@@ -91,81 +90,62 @@ namespace Reductech.EDR.Core.Entities
         public IEnumerator<KeyValuePair<string, EntityValue>> GetEnumerator() => _properties.GetEnumerator();
 
         /// <inheritdoc />
-        public override string ToString() => AsString();
+        public bool Equals(Entity? other)
+        {
+            return other is not null && _properties.SequenceEqual(other._properties);
+        }
+
+        /// <inheritdoc />
+        public override bool Equals(object? obj)
+        {
+            if (obj is null) return false;
+            if (ReferenceEquals(this, obj)) return true;
+
+            return obj is Entity e && Equals(e);
+        }
+
+        /// <inheritdoc />
+        public override int GetHashCode()
+        {
+            return _properties.Count switch
+            {
+                0 => 0,
+                1 => HashCode.Combine(_properties[0].Key, _properties[0].Value),
+                _ => HashCode.Combine(_properties.Count, _properties[0].Key, _properties[0].Value)
+            };
+        }
+
+        /// <inheritdoc />
+        public override string ToString() => Serialize();
 
         /// <inheritdoc />
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
 
         /// <summary>
-        /// Serialize this record.
+        /// Serialize this entity.
         /// </summary>
         /// <returns></returns>
-        public Result<string> TrySerializeShortForm()
+        public string Serialize()
         {
             var sb = new StringBuilder();
 
             sb.Append('(');
 
-            var results = new List<Result<string>>();
+            var results = new List<string>();
 
             foreach (var (key, value) in _properties)
             {
-                value.Value.Switch(_=>{},
-                    singleValue=>
-                    {
-                        var r = SerializationMethods.TrySerializeShortFormString(singleValue.Original)
-                            .Map(v => $"{key} = {v}");
-                        results.Add(r);
-                    },
-                    multiValue=>
-                    {
-                        var r = SerializationMethods.TrySerializeSimpleList(multiValue.Select(x => x.Original))
-                            .Map(v => $"{key} = {v}");
-                        results.Add(r);
-                    });
+                if(!value.Value.IsT0)
+                    results.Add($"{key}: {value.Serialize()}");
             }
 
-            var result = results.Combine();
-
-            if (result.IsFailure)
-                return result.ConvertFailure<string>();
-
-            sb.AppendJoin(",", result.Value);
+            sb.AppendJoin(",", results);
 
             sb.Append(')');
 
             return sb.ToString();
         }
 
-        /// <summary>
-        /// Convert this entity to an object that can be serialized
-        /// </summary>
-        /// <returns></returns>
-        public object ToSimpleObject()
-        {
-            IDictionary<string, object> expandoObject = new ExpandoObject()!;
-
-            foreach (var (key, value) in _properties)
-            {
-                value.Value.Switch(_=>{},
-                    v=> expandoObject[key] = v,
-                    l => expandoObject[key] = l  );
-            }
-
-            return expandoObject;
-        }
-
-
-        /// <summary>
-        /// Converts this record into a string.
-        /// </summary>
-        public string AsString()
-        {
-            var result = string.Join(", ",
-                _properties.Select(property => $"{property.Key}: {property.Value}"));
-
-            return result;
-        }
     }
 }

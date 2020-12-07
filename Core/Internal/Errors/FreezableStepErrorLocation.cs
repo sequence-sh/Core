@@ -13,7 +13,7 @@
         /// <summary>
         /// Creates a new FreezableStepErrorLocation
         /// </summary>
-        public FreezableStepErrorLocation(IStepFactory stepFactory, FreezableStepData data) => FreezableStep = new CompoundFreezableStep(stepFactory, data, null);
+        public FreezableStepErrorLocation(IStepFactory stepFactory, FreezableStepData data) => FreezableStep = new CompoundFreezableStep(stepFactory.TypeName, data, null);
 
         /// <summary>
         /// The freezable step

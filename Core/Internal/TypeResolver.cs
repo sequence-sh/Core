@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Internal.Errors;
-using Reductech.EDR.Core.Util;
 
 namespace Reductech.EDR.Core.Internal
 {
@@ -10,6 +9,14 @@ namespace Reductech.EDR.Core.Internal
     /// </summary>
     public sealed class TypeResolver
     {
+        /// <summary>
+        /// Create a new TypeResolver
+        /// </summary>
+        public TypeResolver(StepFactoryStore stepFactoryStore)
+        {
+            StepFactoryStore = stepFactoryStore;
+        }
+
         /// <inheritdoc />
         public override string ToString() => Dictionary.Count + " Types";
 
@@ -20,22 +27,35 @@ namespace Reductech.EDR.Core.Internal
         /// </summary>
         public IReadOnlyDictionary<VariableName, ActualTypeReference> Dictionary => MyDictionary;
 
+        /// <summary>
+        /// The StepFactoryStory
+        /// </summary>
+        public StepFactoryStore StepFactoryStore { get; }
+
+
 
         /// <summary>
-        /// Tries to add another actual type.
+        /// Tries to add a variableName with this type to the type resolver.
         /// </summary>
-        public Result<Unit, IErrorBuilder> TryAddType(VariableName variable, ActualTypeReference actualTypeReference)
+        public Result<bool, IErrorBuilder> TryAddType(VariableName variable, ITypeReference typeReference)
         {
+            var actualType = typeReference. GetActualTypeReferenceIfResolvable(this);
+            if (actualType.IsFailure) return actualType.ConvertFailure<bool>();
+
+            if (actualType.Value.HasNoValue) return false;
+
+            var actualTypeReference = actualType.Value.Value;
+
             if (MyDictionary.TryGetValue(variable, out var previous))
             {
-                if(previous.Equals(actualTypeReference))
-                    return Unit.Default;
+                if (previous.Equals(actualTypeReference))
+                    return true;
 
-                return new ErrorBuilder($"The type of {variable} is ambiguous.", ErrorCode.AmbiguousType);
+                return new ErrorBuilder($"The type of {variable} is ambiguous between {actualTypeReference} and {previous}.", ErrorCode.AmbiguousType);
             }
 
             MyDictionary.Add(variable, actualTypeReference);
-            return Unit.Default;
+            return true;
         }
     }
 }

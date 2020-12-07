@@ -21,16 +21,25 @@ namespace Reductech.EDR.Core.Tests.Steps
             get
             {
                 yield return new StepCase("Repeat while Foo < 5",
-                    new While()
+                    new Sequence<Unit>
                     {
-                        Action = new IncrementVariable
+                        InitialSteps = new List<IStep<Unit>>
                         {
-                            Amount = Constant(1),
-                            Variable = new VariableName("Foo")
+                            SetVariable("Foo", 1)
                         },
-                        Condition = new Compare<int>{Left = GetVariable<int>("Foo"), Right = Constant(5), Operator = Constant(CompareOperator.LessThan)}
-                    }, Unit.Default
-                ).WithInitialState("Foo", 1).WithExpectedFinalState("Foo", 5);
+
+                        FinalStep = new While()
+                        {
+                            Action = new IncrementVariable
+                            {
+                                Amount = Constant(1),
+                                Variable = new VariableName("Foo")
+                            },
+                            Condition = new Compare<int> { Left = GetVariable<int>("Foo"), Right = Constant(5), Operator = Constant(CompareOperator.LessThan) }
+                        }
+                    }
+
+                    , Unit.Default).WithExpectedFinalState("Foo", 5);
 
 
             }
@@ -41,8 +50,8 @@ namespace Reductech.EDR.Core.Tests.Steps
         {
             get
             {
-                yield return new DeserializeCase("Repeat while Foo < 5", "While(Condition = <Foo> < 5, Action = IncrementVariable(Amount = 1, Variable = <Foo>))", Unit.Default)
-                    .WithInitialState("Foo", 1).WithExpectedFinalState("Foo", 5);
+                yield return new DeserializeCase("Repeat while Foo < 5", "- <Foo> = 1 \r\n- While(Condition = (<Foo> < 5), Action = IncrementVariable(Variable = <Foo>, Amount = 1))", Unit.Default)
+                    .WithExpectedFinalState("Foo", 5);
 
             }
 

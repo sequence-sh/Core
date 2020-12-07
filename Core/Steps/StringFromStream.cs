@@ -6,6 +6,7 @@ using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
+using Reductech.EDR.Core.Parser;
 
 namespace Reductech.EDR.Core.Steps
 {
@@ -23,7 +24,7 @@ namespace Reductech.EDR.Core.Steps
             if (streamResult.IsFailure)
                 return streamResult.ConvertFailure<string>();
 
-            streamResult.Value.Seek(0, SeekOrigin.Begin);
+            streamResult.Value.Stream.Seek(0, SeekOrigin.Begin);
 
 
             var encodingResult = await Encoding.Run(stateMonad, cancellationToken);
@@ -32,7 +33,7 @@ namespace Reductech.EDR.Core.Steps
                 return encodingResult.ConvertFailure<string>();
 
 
-            using StreamReader reader = new StreamReader(streamResult.Value, encodingResult.Value.Convert());
+            using StreamReader reader = new StreamReader(streamResult.Value.Stream, encodingResult.Value.Convert());
             var text = await reader.ReadToEndAsync();
 
             return text;
@@ -44,14 +45,14 @@ namespace Reductech.EDR.Core.Steps
         /// </summary>
         [StepProperty(Order = 2)]
         [Required]
-        public IStep<Stream> Stream { get; set; } = null!;
+        public IStep<DataStream> Stream { get; set; } = null!;
 
         /// <summary>
         /// How the stream is encoded.
         /// </summary>
         [StepProperty(Order = 1)]
         [DefaultValueExplanation("UTF8 no BOM")]
-        public IStep<EncodingEnum> Encoding { get; set; } = new Constant<EncodingEnum>(EncodingEnum.UTF8);
+        public IStep<EncodingEnum> Encoding { get; set; } = new Constant<EncodingEnum>(EncodingEnum.UTF8); //TODO move away
 
         /// <inheritdoc />
         public override IStepFactory StepFactory => StringFromStreamFactory.Instance;

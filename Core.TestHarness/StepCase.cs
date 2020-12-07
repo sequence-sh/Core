@@ -6,7 +6,7 @@ using CSharpFunctionalExtensions;
 using FluentAssertions;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
-using Reductech.EDR.Core.Serialization;
+using Reductech.EDR.Core.Parser;
 using Reductech.EDR.Core.Util;
 using Reductech.Utilities.Testing;
 using Xunit;
@@ -72,7 +72,7 @@ namespace Reductech.EDR.Core.TestHarness
             public IStep Step { get; }
 
 
-            public const string SerializeArgument = "Serialize";
+            public const string SerializeArgument = "SerializeAsync";
 
             /// <inheritdoc />
             public override async Task<IStep> GetStepAsync(ITestOutputHelper testOutputHelper, string? extraArgument)
@@ -80,18 +80,19 @@ namespace Reductech.EDR.Core.TestHarness
                 if (extraArgument != SerializeArgument)
                     return Step;
 
-                var yaml = await Step.Unfreeze().SerializeToYamlAsync(CancellationToken.None);
+                var yaml = await Step.SerializeAsync(CancellationToken.None);
 
                 testOutputHelper.WriteLine("");
                 testOutputHelper.WriteLine("");
                 testOutputHelper.WriteLine(yaml);
 
+                var sfs = StepFactoryStore.CreateUsingReflection(typeof(IStep), typeof(TStep));
 
-                var deserializeResult = YamlMethods.DeserializeFromYaml(yaml, StepFactoryStore.CreateUsingReflection(typeof(IStep), typeof(TStep)));
+                var deserializeResult = SequenceParsing.ParseSequence(yaml);
 
                 deserializeResult.ShouldBeSuccessful(x => x.AsString);
 
-                var freezeResult = deserializeResult.Value.TryFreeze();
+                var freezeResult = deserializeResult.Value.TryFreeze(sfs);
                 freezeResult.ShouldBeSuccessful(x => x.AsString);
 
                 return freezeResult.Value;

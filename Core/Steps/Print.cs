@@ -23,7 +23,15 @@ namespace Reductech.EDR.Core.Steps
             var r = await Value.Run(stateMonad, cancellationToken);
             if (r.IsFailure) return r.ConvertFailure<Unit>();
 
-            stateMonad.Logger.LogInformation(r.Value?.ToString());
+
+            string stringToPrint;
+
+            if (r.Value is Entity entity)
+                stringToPrint = entity.Serialize();
+            else
+                stringToPrint = r.Value?.ToString()!;
+
+            stateMonad.Logger.LogInformation(stringToPrint);
 
             return Unit.Default;
         }
@@ -58,16 +66,12 @@ namespace Reductech.EDR.Core.Steps
         protected override ITypeReference GetOutputTypeReference(ITypeReference memberTypeReference) => new ActualTypeReference(typeof(Unit));
 
         /// <inheritdoc />
-        public override IStepNameBuilder StepNameBuilder { get; } = new StepNameBuilderFromTemplate($"Print [{nameof(Print<object>.Value)}]");
-
-        /// <inheritdoc />
         public override string OutputTypeExplanation => nameof(Unit);
 
         /// <inheritdoc />
         protected override Result<ITypeReference, IError> GetMemberType(FreezableStepData freezableStepData,
             TypeResolver typeResolver) =>
-            freezableStepData.GetArgument(nameof(Print<object>.Value), TypeName)
-                .MapError(e=>e.WithLocation(this, freezableStepData))
+            freezableStepData.GetStep(nameof(Print<object>.Value), TypeName)
                 .Bind(x => x.TryGetOutputTypeReference(typeResolver));
     }
 }

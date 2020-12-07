@@ -19,6 +19,7 @@ namespace Reductech.EDR.Core.Internal
 
         /// <summary>
         /// Convert this Step into a FreezableStep.
+        /// Useful for equality comparison.
         /// </summary>
         IFreezableStep Unfreeze();
 
@@ -41,6 +42,12 @@ namespace Reductech.EDR.Core.Internal
         /// The output type. Will be the generic type in IStep&lt;T&gt;
         /// </summary>
         Type OutputType { get; }
+
+        /// <summary>
+        /// SerializeAsync this step.
+        /// </summary>
+        /// <param name="cancellationToken"></param>
+        Task<string> SerializeAsync(CancellationToken cancellationToken);
 
     }
 

@@ -61,8 +61,5 @@ namespace Reductech.EDR.Core.Steps
         /// The instance
         /// </summary>
         public static SimpleStepFactory<StringJoin, string> Instance { get; } = new StringJoinStepFactory();
-
-        /// <inheritdoc />
-        public override IStepNameBuilder StepNameBuilder => new StepNameBuilderFromTemplate($"Match [{nameof(StringJoin.Strings)}]");
     }
 }

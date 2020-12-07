@@ -34,12 +34,26 @@ namespace Reductech.EDR.Core.Tests.Steps
             get
             {
                 yield return new StepCase("Append string to existing variable",
-                    new AppendString
+                    new Sequence<Unit>()
                     {
-                        Variable = new VariableName("Foo"),
-                        String = Constant("World")
-                    }, Unit.Default)
-                    .WithInitialState("Foo", "Hello")
+                        InitialSteps = new List<IStep<Unit>>()
+                        {
+                            new SetVariable<string>()
+                            {
+                                Value = Constant( "Hello"),
+                                Variable = new VariableName("Foo")
+                            }
+                        },
+
+                        FinalStep = new AppendString
+                        {
+                            Variable = new VariableName("Foo"),
+                            String = Constant("World")
+                        }
+                    }
+
+
+                    , Unit.Default)
                     .WithExpectedFinalState("Foo", "HelloWorld");
             } }
 
@@ -49,8 +63,7 @@ namespace Reductech.EDR.Core.Tests.Steps
             get
             {
                 yield return new DeserializeCase("Short Form",
-                    "AppendString(String = 'World', Variable = <Foo>)", Unit.Default)
-                    .WithInitialState("Foo", "Hello")
+                    "- <Foo> = 'Hello'\r\n- AppendString(String = 'World', Variable = <Foo>)", Unit.Default)
                     .WithExpectedFinalState("Foo", "HelloWorld");
 
             }

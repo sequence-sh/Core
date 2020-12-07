@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
@@ -7,6 +6,7 @@ using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
+using Reductech.EDR.Core.Parser;
 
 namespace Reductech.EDR.Core.Steps
 {
@@ -14,10 +14,10 @@ namespace Reductech.EDR.Core.Steps
     /// Write entities to a stream in CSV format.
     /// The same as ToConcordance but with different default values.
     /// </summary>
-    public sealed class ToCSV : CompoundStep<Stream>
+    public sealed class ToCSV : CompoundStep<DataStream>
     {
         /// <inheritdoc />
-        public override async Task<Result<Stream, IError>> Run(IStateMonad stateMonad,
+        public override async Task<Result<DataStream, IError>> Run(IStateMonad stateMonad,
             CancellationToken cancellationToken)
         {
             var result = await CSVWriter.WriteCSV(stateMonad,
@@ -93,13 +93,13 @@ namespace Reductech.EDR.Core.Steps
     /// Write entities to a stream in CSV format.
     /// The same as ToConcordance but with different default values.
     /// </summary>
-    public sealed class ToCSVFactory : SimpleStepFactory<ToCSV, Stream>
+    public sealed class ToCSVFactory : SimpleStepFactory<ToCSV, DataStream>
     {
         private ToCSVFactory() { }
 
         /// <summary>
         /// The instance.
         /// </summary>
-        public static SimpleStepFactory<ToCSV, Stream> Instance { get; } = new ToCSVFactory();
+        public static SimpleStepFactory<ToCSV, DataStream> Instance { get; } = new ToCSVFactory();
     }
 }

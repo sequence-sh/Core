@@ -7,7 +7,6 @@ using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
-using Entity = Reductech.EDR.Core.Entities.Entity;
 
 namespace Reductech.EDR.Core.Steps
 {
@@ -87,8 +86,7 @@ namespace Reductech.EDR.Core.Steps
         /// <inheritdoc />
         protected override Result<ITypeReference, IError> GetMemberType(FreezableStepData freezableStepData, TypeResolver typeResolver)
         {
-            var r1 = freezableStepData.GetArgument(nameof(EntitySetValue<object>.Value), TypeName)
-                .MapError(x => x.WithLocation(this, freezableStepData))
+            var r1 = freezableStepData.GetStep(nameof(EntitySetValue<object>.Value), TypeName)
                 .Bind(x => x.TryGetOutputTypeReference(typeResolver));
 
             return r1;

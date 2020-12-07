@@ -1,7 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using CSharpFunctionalExtensions;
+using System.Threading;
+using System.Threading.Tasks;
 using Reductech.EDR.Core.Internal;
 
 namespace Reductech.EDR.Core.Serialization
@@ -23,69 +24,31 @@ namespace Reductech.EDR.Core.Serialization
         /// </summary>
         public string Name { get; }
 
+
         /// <inheritdoc />
-        public Result<string> TrySerialize(FreezableStepData data)
+        public async Task<string> SerializeAsync(IEnumerable<StepProperty> stepProperties, CancellationToken cancellationToken)
         {
             var sb = new StringBuilder();
             sb.Append(Name);
-            sb.Append("(");
+            sb.Append('(');
 
             var first = true;
 
-
-            foreach (var (propertyName, value) in
-                data.StepMembersDictionary.OrderBy(x=>x.Key))
+            foreach (var stepProperty in stepProperties.OrderBy(x => x.Index))
             {
                 if (first)
                     first = false;
                 else
                     sb.Append(", ");
 
-                sb.Append(propertyName);
+                sb.Append(stepProperty.Name);
                 sb.Append(" = ");
 
-
-                var valueSerializeResult =
-                    value.Match(
-                        VariableNameComponent.Serialize,
-                        SerializeProcess,
-                        SerializeList);
-
-                if (valueSerializeResult.IsFailure)
-                    return valueSerializeResult;
-
-                sb.Append(valueSerializeResult.Value);
+                sb.Append( await stepProperty.SerializeValueAsync(cancellationToken));
             }
-            sb.Append(")");
+            sb.Append(')');
 
             return sb.ToString();
-
-
-            static Result<string> SerializeProcess(IFreezableStep freezableProcess)
-            {
-                return freezableProcess switch
-                {
-                    ConstantFreezableStep constant => SerializationMethods.TrySerializeConstant(constant),
-                    CompoundFreezableStep compoundFreezableProcess => compoundFreezableProcess.StepFactory
-                        .Serializer.TrySerialize(compoundFreezableProcess.FreezableStepData),
-                    _ => Result.Failure<string>("Cannot serialize")
-                };
-            }
-
-            static Result<string> SerializeList(IReadOnlyList<IFreezableStep> list)
-            {
-                var elementResult = list.Select(SerializeProcess).Combine();
-                if (elementResult.IsFailure)
-                    return elementResult.ConvertFailure<string>();
-
-                var sb2 = new StringBuilder();
-
-                sb2.Append("[");
-                sb2.AppendJoin(", ", elementResult.Value);
-                sb2.Append("]");
-
-                return sb2.ToString();
-            }
         }
     }
 }

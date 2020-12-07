@@ -59,9 +59,6 @@ namespace Reductech.EDR.Core.Steps
         /// The instance
         /// </summary>
         public static SimpleStepFactory<FindSubstring, int> Instance { get; } = new FindSubstringStepFactory();
-
-        /// <inheritdoc />
-        public override IStepNameBuilder StepNameBuilder => new StepNameBuilderFromTemplate($"First index of '[{nameof(FindSubstring.SubString)}]' in '[{nameof(FindSubstring.String)}]'");
     }
 
 

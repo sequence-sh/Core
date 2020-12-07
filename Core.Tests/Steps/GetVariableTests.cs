@@ -20,9 +20,9 @@ namespace Reductech.EDR.Core.Tests.Steps
         {
             get
             {
-                var sequence = new Sequence
+                var sequence = new Sequence<Unit>
                 {
-                    Steps = new List<IStep<Unit>>
+                    InitialSteps = new List<IStep<Unit>>
                     {
                         new SetVariable<int>
                         {
@@ -36,7 +36,8 @@ namespace Reductech.EDR.Core.Tests.Steps
                                 Variable = new VariableName("Foo")
                             }
                         }
-                    }
+                    },
+                    FinalStep = new DoNothing()
                 };
 
 
@@ -54,7 +55,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                 yield return new DeserializeCase("Short Form",
                     $"- <Foo> = 42{Environment.NewLine}- Print(Value = <Foo>)",
                     Unit.Default, "42"
-                    ).WithInitialState("Foo", 42)
+                    )
                     .WithExpectedFinalState("Foo", 42);
 
             }

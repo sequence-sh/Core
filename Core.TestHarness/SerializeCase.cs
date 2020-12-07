@@ -4,7 +4,6 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
-using Reductech.EDR.Core.Serialization;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -17,7 +16,7 @@ namespace Reductech.EDR.Core.TestHarness
         {
             get
             {
-                yield return CreateDefaultSerializeCase(true);
+                yield return CreateDefaultSerializeCase().Result; //TODO fix the synchronicity
             }
         }
 
@@ -55,7 +54,7 @@ namespace Reductech.EDR.Core.TestHarness
             /// <inheritdoc />
             public async Task RunCaseAsync(ITestOutputHelper testOutputHelper, string? extraArgument)
             {
-                var realYaml = await Step.Unfreeze().SerializeToYamlAsync(CancellationToken.None);
+                var realYaml = await Step.SerializeAsync(CancellationToken.None);
 
                 testOutputHelper.WriteLine(realYaml);
 
@@ -66,47 +65,25 @@ namespace Reductech.EDR.Core.TestHarness
         }
 
 
-        public static SerializeCase CreateDefaultSerializeCase(bool shortForm)
+        public static async Task<SerializeCase> CreateDefaultSerializeCase()
         {
-            var (step, values) = CreateStepWithDefaultOrArbitraryValues();
+            var (step, values) = await CreateStepWithDefaultOrArbitraryValuesAsync();
 
 
             var stepName = new TStep().StepFactory.TypeName;
             var expectedYamlBuilder = new StringBuilder();
 
-            if (shortForm)
-            {
-                expectedYamlBuilder.Append(stepName);
-                expectedYamlBuilder.Append("(");
+            expectedYamlBuilder.Append(stepName);
+            expectedYamlBuilder.Append('(');
 
-                var pairs = values.OrderBy(x => x.Key).Select(x => $"{x.Key} = {x.Value}");
+            var pairs = values//.OrderBy(x => x.Key)
+                .Select(x => $"{x.Key} = {x.Value}");
 
-                expectedYamlBuilder.AppendJoin(", ", pairs);
-                expectedYamlBuilder.Append(")");
-                var c = new SerializeCase("Default", step, expectedYamlBuilder.ToString());
+            expectedYamlBuilder.AppendJoin(", ", pairs);
+            expectedYamlBuilder.Append(')');
+            var c = new SerializeCase("Default", step, expectedYamlBuilder.ToString());
 
-                return c;
-            }
-            else
-            {
-                expectedYamlBuilder.AppendLine($"Do: {stepName}");
-
-                var pairs = values.OrderBy(x => x.Key);
-
-                foreach (var pair in pairs)
-                {
-                    if (pair.Value.Contains("\n"))
-                    {
-                        expectedYamlBuilder.AppendLine($"{pair.Key}: ");
-                        expectedYamlBuilder.AppendLine($"{pair.Value}");
-                    }
-                    else
-                        expectedYamlBuilder.AppendLine($"{pair.Key}: {pair.Value}");
-                }
-
-                var c = new SerializeCase("Long Form", step, expectedYamlBuilder.ToString().Trim());
-                return c;
-            }
+            return c;
         }
     }
 }

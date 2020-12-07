@@ -82,8 +82,7 @@ namespace Reductech.EDR.Core.Steps
         /// <inheritdoc />
         protected override Result<ITypeReference, IError> GetMemberType(FreezableStepData freezableStepData,
             TypeResolver typeResolver) =>
-            freezableStepData.GetArgument(nameof(ForEach<object>.Array), TypeName)
-                .MapError(e=>e.WithLocation(this, freezableStepData))
+            freezableStepData.GetStep(nameof(ForEach<object>.Array), TypeName)
                 .Bind(x => x.TryGetOutputTypeReference(typeResolver))
                 .Bind(x=>x.TryGetGenericTypeReference(typeResolver, 0)
                 .MapError(e=>e.WithLocation(this, freezableStepData))
@@ -94,12 +93,18 @@ namespace Reductech.EDR.Core.Steps
         public override string OutputTypeExplanation => nameof(Unit);
 
         /// <inheritdoc />
-        public override Result<Maybe<ITypeReference>, IError> GetTypeReferencesSet(VariableName variableName,
-            FreezableStepData freezableStepData, TypeResolver typeResolver) =>
-            GetMemberType(freezableStepData, typeResolver)
-                .Map(Maybe<ITypeReference>.From);
+        public override IEnumerable<(VariableName variableName, Maybe<ITypeReference>)> GetTypeReferencesSet(FreezableStepData freezableStepData, TypeResolver typeResolver)
+        {
+            var vn = freezableStepData.GetVariableName(nameof(ForEach<object>.Variable), TypeName);
+            if(vn.IsFailure) yield break;
 
-        /// <inheritdoc />
-        public override IStepNameBuilder StepNameBuilder => new StepNameBuilderFromTemplate($"Foreach [{nameof(ForEach<object>.Variable)}] in [{nameof(ForEach<object>.Array)}]; [{nameof(ForEach<object>.Action)}]");
+
+            var memberType = GetMemberType(freezableStepData, typeResolver);
+            if (memberType.IsSuccess)
+                yield return (vn.Value, Maybe<ITypeReference>.From(memberType.Value));
+            else
+                yield return (vn.Value, Maybe<ITypeReference>.None);
+        }
+
     }
 }

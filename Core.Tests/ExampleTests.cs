@@ -7,7 +7,7 @@ using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.ExternalProcesses;
 using Reductech.EDR.Core.Internal;
-using Reductech.EDR.Core.Serialization;
+using Reductech.EDR.Core.Parser;
 using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.TestHarness;
 using Reductech.EDR.Core.Util;
@@ -41,7 +41,7 @@ namespace Reductech.EDR.Core.Tests
 
             var sfs = StepFactoryStore.CreateUsingReflection();
 
-            var stepResult = YamlMethods.DeserializeFromYaml(yaml, sfs).Bind(x => x.TryFreeze());
+            var stepResult = SequenceParsing.ParseSequence(yaml).Bind(x => x.TryFreeze(sfs));
 
             if(stepResult.IsFailure)
                 throw new XunitException(
@@ -73,7 +73,7 @@ namespace Reductech.EDR.Core.Tests
 
             var sfs = StepFactoryStore.CreateUsingReflection();
 
-            var stepResult = YamlMethods.DeserializeFromYaml(yaml, sfs).Bind(x=>x.TryFreeze());
+            var stepResult = SequenceParsing.ParseSequence(yaml).Bind(x=>x.TryFreeze(sfs));
 
             stepResult.ShouldBeSuccessful(x=>x.AsString);
 
@@ -89,9 +89,9 @@ namespace Reductech.EDR.Core.Tests
         [Trait("Category", "Integration")]
         public async Task RunObjectSequence()
         {
-            var step = new Sequence()
+            var step = new Sequence<Unit>()
             {
-                Steps = new List<IStep<Unit>>
+                InitialSteps = new List<IStep<Unit>>
                 {
                     new SetVariable<EntityStream>
                     {
@@ -99,10 +99,10 @@ namespace Reductech.EDR.Core.Tests
                         Value = new FromCSV{Stream = new ReadFile{Path = new Constant<string>(@"C:\Users\wainw\source\repos\Reductech\edr\Examples\Dinosaurs.csv")}}
                     },
 
-                    new SetVariable<Schema>()
+                    new SetVariable<Entity>()
                     {
                         Variable = new VariableName("Schema"),
-                        Value = new Constant<Schema>(new Schema
+                        Value = new Constant<Entity>(new Schema
                                 {
                                     AllowExtraProperties = false,
                                     Name = "Dinosaur",
@@ -112,7 +112,7 @@ namespace Reductech.EDR.Core.Tests
                                         {"ArrayLength", new SchemaProperty{Type = SchemaPropertyType.Double}},
                                         {"Period", new SchemaProperty{Type = SchemaPropertyType.String}},
                                     }
-                                })
+                                }.ConvertToEntity())
                     },
 
                     new FileWrite
@@ -123,14 +123,15 @@ namespace Reductech.EDR.Core.Tests
                             Entities = new EnforceSchema()
                             {
                                 EntityStream = new GetVariable<EntityStream>(){Variable = new VariableName("EntityStream")},
-                                Schema = new GetVariable<Schema>(){Variable = new VariableName("Schema")}
+                                Schema = new GetVariable<Entity>(){Variable = new VariableName("Schema")}
                             }
                         }
                     }
-                }
+                },
+                FinalStep = new DoNothing()
             };
 
-            var yaml = await step.Unfreeze().SerializeToYamlAsync(CancellationToken.None);
+            var yaml = await step.SerializeAsync(CancellationToken.None);
 
             TestOutputHelper.WriteLine(yaml);
 

@@ -38,26 +38,26 @@ namespace Reductech.EDR.Core.Tests.Steps
                     }, new List<int>{1,2,3} );
             } }
 
-        ///// <inheritdoc /> //TODO create a serialize case
-        //protected override IEnumerable<SerializeCase> SerializeCases
-        //{
-        //    get
-        //    {
-        //        yield return new SerializeCase("Empty", new Array<int>
-        //        {
-        //            Elements = ImmutableList<IStep<int>>.Empty
-        //        }, "Array(Elements = [])");
+        /// <inheritdoc /> //TODO create a serialize case
+        protected override IEnumerable<SerializeCase> SerializeCases
+        {
+            get
+            {
+                yield return new SerializeCase("Empty", new Array<int>
+                {
+                    Elements = ImmutableList<IStep<int>>.Empty
+                }, "[]");
 
-        //        yield return new SerializeCase("Three Elements", new Array<int>
-        //        {
-        //            Elements = new List<IStep<int>>
-        //            {
-        //                Constant(1),
-        //                Constant(2),
-        //                Constant(3),
-        //            }
-        //        }, "Array(Elements = [1, 2, 3])");
-        //    }
-        //}
+                yield return new SerializeCase("Three Elements", new Array<int>
+                {
+                    Elements = new List<IStep<int>>
+                    {
+                        Constant(1),
+                        Constant(2),
+                        Constant(3),
+                    }
+                }, "[1, 2, 3]");
+            }
+        }
     }
 }

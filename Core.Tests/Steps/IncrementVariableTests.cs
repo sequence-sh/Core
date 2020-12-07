@@ -20,29 +20,58 @@ namespace Reductech.EDR.Core.Tests.Steps
             get
             {
                 yield return new StepCase("Increment 1",
-                    new IncrementVariable()
+                    new Sequence<Unit>()
                     {
-                        Amount = Constant(1),
-                        Variable = new VariableName("Foo")
-                    },Unit.Default
-                    ).WithInitialState("Foo", 41).WithExpectedFinalState("Foo", 42);
+                        InitialSteps = new List<IStep<Unit>>()
+                        {
+
+                            SetVariable("Foo", 41)
+                        },
+
+                        FinalStep = new IncrementVariable()
+                        {
+                            Amount = Constant(1),
+                            Variable = new VariableName("Foo")
+                        }
+                    },
+
+                    Unit.Default
+                    ).WithExpectedFinalState("Foo", 42);
 
                 yield return new StepCase("Increment 2",
-                    new IncrementVariable()
+                    new Sequence<Unit>()
                     {
-                        Amount = Constant(2),
-                        Variable = new VariableName("Foo")
-                    }, Unit.Default
-                    ).WithInitialState("Foo", 40).WithExpectedFinalState("Foo", 42);
+                        InitialSteps = new List<IStep<Unit>>()
+                        {
+
+                            SetVariable("Foo", 40)
+                        },
+
+                        FinalStep = new IncrementVariable()
+                        {
+                            Amount = Constant(2),
+                            Variable = new VariableName("Foo")
+                        }
+                    } , Unit.Default
+                    ).WithExpectedFinalState("Foo", 42);
 
 
                 yield return new StepCase("Increment -1",
-                    new IncrementVariable()
+                    new Sequence<Unit>
                     {
-                        Amount = Constant(-1),
-                        Variable = new VariableName("Foo")
+                        InitialSteps = new List<IStep<Unit>>
+                        {
+
+                            SetVariable("Foo", 43)
+                        },
+
+                        FinalStep = new IncrementVariable
+                        {
+                            Amount = Constant(-1),
+                            Variable = new VariableName("Foo")
+                        }
                     }, Unit.Default
-                    ).WithInitialState("Foo", 43).WithExpectedFinalState("Foo", 42);
+                    ).WithExpectedFinalState("Foo", 42);
 
 
             }
@@ -53,8 +82,8 @@ namespace Reductech.EDR.Core.Tests.Steps
         {
             get
             {
-                yield return new DeserializeCase("increment 1", "IncrementVariable(Amount = 1, Variable = <Foo>)", Unit.Default)
-                    .WithInitialState("Foo", 41).WithExpectedFinalState("Foo", 42);
+                yield return new DeserializeCase("increment 1", "- <Foo> = 41\r\n- IncrementVariable(Amount = 1, Variable = <Foo>)", Unit.Default)
+                    .WithExpectedFinalState("Foo", 42);
 
             }
 

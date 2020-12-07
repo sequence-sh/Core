@@ -27,31 +27,28 @@ namespace Reductech.EDR.Core.Internal
         public string Category { get; }
 
         /// <summary>
-        /// Builds the name for a particular instance of a step.
-        /// </summary>
-        IStepNameBuilder StepNameBuilder { get; }
-
-        /// <summary>
         /// Tries to get a reference to the output type of this step.
         /// </summary>
-        Result<ITypeReference, IError> TryGetOutputTypeReference(FreezableStepData freezableStepData, TypeResolver typeResolver);
+        Result<ITypeReference, IError> TryGetOutputTypeReference(FreezableStepData freezeData, TypeResolver typeResolver);
+
+        ///// <summary>
+        ///// If this variable is being set. Get the type reference it is being set to.
+        ///// </summary>
+        //Result<Maybe<ITypeReference>, IError> GetTypeReferencesSet(VariableName variableName,
+        //    FreezableStepData freezableStepData, TypeResolver typeResolver, StepFactoryStore stepFactoryStore) =>
+        //    Maybe<ITypeReference>.None;
+
 
         /// <summary>
-        /// If this variable is being set. Get the type reference it is being set to.
+        /// Gets all type references set by this method and their values if they can be calculated.
         /// </summary>
-        Result<Maybe<ITypeReference>, IError> GetTypeReferencesSet(VariableName variableName,
-            FreezableStepData freezableStepData, TypeResolver typeResolver) =>
-            Maybe<ITypeReference>.None;
+        IEnumerable<(VariableName variableName, Maybe<ITypeReference>)> GetTypeReferencesSet(FreezableStepData freezableStepData, TypeResolver typeResolver);
 
         /// <summary>
-        /// Serializer to use for yaml serialization.
+        /// Serializer to use for serialization.
         /// </summary>
         IStepSerializer Serializer { get; }
 
-        /// <summary>
-        /// An object which can combine a step with the next step in the sequence.
-        /// </summary>
-        Maybe<IStepCombiner> StepCombiner { get; }
 
         /// <summary>
         /// Special requirements for this step.
@@ -61,7 +58,8 @@ namespace Reductech.EDR.Core.Internal
         /// <summary>
         /// Try to create the instance of this type and set all arguments.
         /// </summary>
-        Result<IStep, IError> TryFreeze(StepContext stepContext, FreezableStepData freezableStepData,
+        Result<IStep, IError> TryFreeze(StepContext stepContext,
+            FreezableStepData freezeData,
             Configuration? configuration);
 
         /// <summary>
@@ -78,11 +76,6 @@ namespace Reductech.EDR.Core.Internal
         /// Gets all the properties required by this step.
         /// </summary>
         IEnumerable<string> RequiredProperties { get; }
-
-        /// <summary>
-        /// Variables that will always be set by this step.
-        /// </summary>
-        IEnumerable<(VariableName VariableName, ITypeReference typeReference)> FixedVariablesSet { get; }
 
         /// <summary>
         /// Gets all enum types used by this step.

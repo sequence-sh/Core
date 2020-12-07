@@ -34,7 +34,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                                         {
                                             EntityStream = Constant(stream),
 
-                                            Schema = Constant(schema)
+                                            Schema = Constant(schema.ConvertToEntity())
                                         }
                         },
                         Unit.Default
@@ -46,46 +46,46 @@ namespace Reductech.EDR.Core.Tests.Steps
                 yield return CreateCase("Simple case",
                         EntityStream.Create(CreateEntity(("Foo", "Hello"), ("Bar", "1")), CreateEntity(("Foo", "Hello 2"),("Bar", "2"))),
                         CreateSchema("ValueIf Schema",false, ("foo", SchemaPropertyType.String, Multiplicity.ExactlyOne), ("Bar", SchemaPropertyType.Integer, Multiplicity.ExactlyOne)),
-                        "Foo: Hello, Bar: 1","Foo: Hello 2, Bar: 2");
+                        "(Foo: \"Hello\",Bar: 1)","(Foo: \"Hello 2\",Bar: 2)");
 
 
                 yield return CreateCase("Cast int",
                     EntityStream.Create(CreateEntity(("Foo", "100"))),
                         CreateSchema("ValueIf Schema", false, ("Foo", SchemaPropertyType.Integer, Multiplicity.ExactlyOne)),
-                        "Foo: 100");
+                        "(Foo: 100)");
 
 
                 yield return CreateCase("Cast double",
                     EntityStream.Create(CreateEntity(("Foo", "100.345"))),
                         CreateSchema("ValueIf Schema", false, ("Foo", SchemaPropertyType.Double, Multiplicity.ExactlyOne)),
-                        "Foo: 100.345");
+                        "(Foo: 100.345)");
 
                 yield return CreateCase("Cast bool",
                     EntityStream.Create(CreateEntity(("Foo", "true"))),
                         CreateSchema("ValueIf Schema", false, ("Foo", SchemaPropertyType.Bool, Multiplicity.ExactlyOne)),
-                        "Foo: True");
+                        "(Foo: True)");
 
                 yield return CreateCase("Cast date time",
                     EntityStream.Create(CreateEntity(("Foo", "11/10/2020 3:45:44 PM"))),
                         CreateSchema("ValueIf Schema", false, ("Foo", SchemaPropertyType.Date, Multiplicity.ExactlyOne)),
-                    "Foo: 2020/11/10 15:45:44");
+                    "(Foo: 2020-11-10T15:45:44.0000000)");
 
 
                 yield return CreateCase("Cast multiple values",
                    EntityStream.Create(CreateEntity(("Foo", "10"), ("Foo", "15"))),
                    CreateSchema("ValueIf Schema", false, ("Foo", SchemaPropertyType.Integer, Multiplicity.Any)),
-                   "Foo: 10, 15");
+                   "(Foo: [10, 15])");
 
 
                 yield return CreateCase("Match regex",
                     EntityStream.Create(CreateEntity(("Foo", "100"))),
                     CreateSchema("ValueIf Schema", false, ("Foo", SchemaPropertyType.Integer, Multiplicity.ExactlyOne, @"\d+", null)),
-                        "Foo: 100");
+                        "(Foo: 100)");
 
                 yield return CreateCase("Match enum",
                     EntityStream.Create(CreateEntity(("Foo", "hello"))),
                     CreateSchema("ValueIf Schema", false, ("Foo", SchemaPropertyType.Enum, Multiplicity.ExactlyOne, null, new List<string>(){"Hello", "World"})),
-                        "Foo: hello");
+                        "(Foo: Enum.hello)");
             }
         }
 
@@ -100,14 +100,14 @@ namespace Reductech.EDR.Core.Tests.Steps
                     {
                         EntityStream = Constant(stream),
 
-                        Schema = Constant(schema),
+                        Schema = Constant(schema.ConvertToEntity()),
                         ErrorBehaviour = Constant(ErrorBehaviour.Fail)
                     };
 
                     return new ErrorCase(name,
-                        new Sequence
+                        new Sequence<Unit>
                         {
-                            Steps = new List<IStep<Unit>>
+                            InitialSteps = new List<IStep<Unit>>
                             {
                                 new EntityForEach
                                 {
@@ -118,7 +118,8 @@ namespace Reductech.EDR.Core.Tests.Steps
                                     EntityStream =enforceSchema
                                 }
 
-                            }
+                            },
+                            FinalStep = new DoNothing()
                         },
                         new ErrorBuilder(expectedError, expectedErrorCode).WithLocation(new StepErrorLocation(enforceSchema))
 
@@ -158,31 +159,31 @@ namespace Reductech.EDR.Core.Tests.Steps
             }
         }
 
-        /// <inheritdoc />
-        protected override IEnumerable<SerializeCase> SerializeCases
-        {
-            get
-            {
-                var c = CreateStepWithDefaultOrArbitraryValues();
+//        /// <inheritdoc />
+//        protected override IEnumerable<SerializeCase> SerializeCases
+//        {
+//            get
+//            {
+//                var c = CreateStepWithDefaultOrArbitraryValuesAsync();
 
-                yield return new SerializeCase("default",
-                    c.step,
-                    @"Do: EnforceSchema
-EntityStream:
-- (Prop1 = 'Val0',Prop2 = 'Val1')
-- (Prop1 = 'Val2',Prop2 = 'Val3')
-- (Prop1 = 'Val4',Prop2 = 'Val5')
-Schema:
-  Name: Schema6
-  Properties:
-    MyProp7:
-      Type: Integer
-      Multiplicity: Any
-  AllowExtraProperties: true
-ErrorBehaviour: ErrorBehaviour.Fail"
-                    );
+//                yield return new SerializeCase("default",
+//                    c.step,
+//                    @"Do: EnforceSchema
+//EntityStream:
+//- (Prop1 = 'Val0',Prop2 = 'Val1')
+//- (Prop1 = 'Val2',Prop2 = 'Val3')
+//- (Prop1 = 'Val4',Prop2 = 'Val5')
+//Schema:
+//  Name: Schema6
+//  Properties:
+//    MyProp7:
+//      Type: Integer
+//      Multiplicity: Any
+//  AllowExtraProperties: true
+//ErrorBehaviour: ErrorBehaviour.Fail"
+//                    );
 
-            }
-        }
+//            }
+//        }
     }
 }

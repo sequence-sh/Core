@@ -2,9 +2,11 @@
 using System.Linq;
 using System.Text.RegularExpressions;
 using CSharpFunctionalExtensions;
-using OneOf;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
+using Reductech.EDR.Core.Serialization;
+
+using Option = OneOf.OneOf<string, int, double, bool, Reductech.EDR.Core.Internal.Enumeration, System.DateTime, Reductech.EDR.Core.Entity>;
 
 namespace Reductech.EDR.Core.Entities
 {
@@ -16,7 +18,7 @@ namespace Reductech.EDR.Core.Entities
         /// <summary>
         /// Create a new EntitySingleValue
         /// </summary>
-        public EntitySingleValue(OneOf<string, int, double, bool, string, DateTime> value, string original)
+        public EntitySingleValue(Option value, string original)
         {
             Value = value;
             Original = original;
@@ -25,7 +27,7 @@ namespace Reductech.EDR.Core.Entities
         /// <summary>
         /// Create a new EntitySingleValue with a string property.
         /// </summary>
-        public static EntitySingleValue Create(string s) => new EntitySingleValue(OneOf<string, int, double, bool, string, DateTime>.FromT0(s), s);
+        public static EntitySingleValue Create(string s) => new EntitySingleValue(Option.FromT0(s), s);
 
         /// <summary>
         /// The original string
@@ -35,7 +37,7 @@ namespace Reductech.EDR.Core.Entities
         /// <summary>
         /// The value
         /// </summary>
-        public OneOf<string, int, double, bool, string, DateTime> Value { get; }
+        public Option Value { get; }
 
         /// <summary>
         /// The type of the value
@@ -46,7 +48,8 @@ namespace Reductech.EDR.Core.Entities
             _ => SchemaPropertyType.Double,
             _ => SchemaPropertyType.Bool,
             _ => SchemaPropertyType.Enum,
-            _ => SchemaPropertyType.Date
+            _ => SchemaPropertyType.Date,
+            _ => SchemaPropertyType.Entity
         );
 
         /// <summary>
@@ -99,12 +102,13 @@ namespace Reductech.EDR.Core.Entities
         {
             var r = schemaProperty.Type switch
             {
-                SchemaPropertyType.String => new EntitySingleValue(OneOf<string, int, double, bool, string, DateTime>.FromT0(original), original),
+                SchemaPropertyType.String => new EntitySingleValue(original, original),
                 SchemaPropertyType.Integer => int.TryParse(original, out var i) ? new EntitySingleValue(i, original) :Maybe<EntitySingleValue>.None,
                 SchemaPropertyType.Double => double.TryParse(original, out var d) ? new EntitySingleValue(d, original) : Maybe<EntitySingleValue>.None,
-                SchemaPropertyType.Enum => schemaProperty.Format != null && schemaProperty.Format.Contains(original, StringComparer.OrdinalIgnoreCase) ? new EntitySingleValue(OneOf<string, int, double, bool, string, DateTime>.FromT4(original),original ) : Maybe<EntitySingleValue>.None,
+                SchemaPropertyType.Enum => schemaProperty.Format != null && schemaProperty.Format.Contains(original, StringComparer.OrdinalIgnoreCase) ? new EntitySingleValue(new Enumeration("Enum", original),original ) : Maybe<EntitySingleValue>.None, //TODO fix enum type
                 SchemaPropertyType.Bool => bool.TryParse(original, out var b) ? new EntitySingleValue(b, original) : Maybe<EntitySingleValue>.None,
                 SchemaPropertyType.Date => DateTime.TryParse(original, out var dt) ? new EntitySingleValue(dt, original) : Maybe<EntitySingleValue>.None, //TODO format
+                SchemaPropertyType.Entity => Maybe<EntitySingleValue>.None, //TODO allow this
                 _ => throw new ArgumentOutOfRangeException(nameof(schemaProperty))
             };
             return r;
@@ -115,7 +119,13 @@ namespace Reductech.EDR.Core.Entities
         /// </summary>
         public string GetStringValue(string dateFormat)
         {
-            return Value.Match(x => x, x => x.ToString(), x => x.ToString("G"), x => x.ToString(), x => x, x => x.ToString(dateFormat));
+            return Value.Match(x => x,
+                x => x.ToString(),
+                x => x.ToString("G17"),
+                x => x.ToString(),
+                x => x.ToString(),
+                x => x.ToString(dateFormat),
+                x=>x.ToString());
         }
 
         /// <inheritdoc />
@@ -140,5 +150,19 @@ namespace Reductech.EDR.Core.Entities
 
         /// <inheritdoc />
         public override int GetHashCode() => Original.GetHashCode();
+
+        /// <summary>
+        /// Serialize this entity
+        /// </summary>
+        public string Serialize()
+        {
+            return Value.Match(SerializationMethods.DoubleQuote,
+                x => x.ToString(),
+                x => x.ToString("G17"),
+                x => x.ToString(),
+                x => x.ToString(),
+                x => x.ToString("O"),
+                x => x.Serialize());
+        }
     }
 }

@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Util;
@@ -7,11 +10,9 @@ namespace Reductech.EDR.Core.Serialization
 {
 
     /// <summary>
-    /// Deserializes a regex group into an enum.
+    /// Deserializes a regex group into an enum using the display value of the enum.
     /// </summary>
-    public class EnumDisplayComponent<T>
-        : ISerializerBlock,  IStepSerializerComponent
-        where T : Enum
+    public class EnumDisplayComponent<T> : ISerializerBlock where T : Enum
     {
         /// <summary>
         /// Creates a new EnumDisplayComponent
@@ -25,30 +26,19 @@ namespace Reductech.EDR.Core.Serialization
         public string PropertyName { get; }
 
         /// <inheritdoc />
-        public Result<string> TryGetText(FreezableStepData data) =>
-            data.StepMembersDictionary
-                .TryFindOrFail(PropertyName, null)
-                .Bind(x => x.Match(VariableNameComponent.Serialize,
-                    TrySerialize,
-                    _ => Result.Failure<string>("Cannot serialize list")));
-
-        private static Result<string> TrySerialize(IFreezableStep step)
+        public async Task<Result<string>> TryGetSegmentTextAsync(IReadOnlyDictionary<string, StepProperty> dictionary,
+            CancellationToken cancellationToken)
         {
+            await Task.CompletedTask;
 
-            if (step is ConstantFreezableStep constant && constant.Value is T t)
-                return t.GetDisplayName();
+            return dictionary.TryFindOrFail(PropertyName, $"Missing Property {PropertyName}")
+                .Bind(x => x.Value.Match(
+                    _ => Result.Failure<string>("Operator is VariableName"),
+                    s=> s is Constant<T> cs? cs.Value.GetDisplayName() : Result.Failure<string>("Operator is non constant step"),
+                    sl => Result.Failure<string>("Operator is Step List")
 
-            if (step is CompoundFreezableStep compound && compound.StepConfiguration == null)
-            {
-                var cSerializeResult = compound.StepFactory.Serializer.TrySerialize(compound.FreezableStepData);
 
-                return cSerializeResult;
-            }
-
-            return Result.Failure<string>("Cannot serialize a step with a Configuration");
+                ));
         }
-
-        /// <inheritdoc />
-        public ISerializerBlock? SerializerBlock => this;
     }
 }

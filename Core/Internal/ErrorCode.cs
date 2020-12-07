@@ -145,6 +145,10 @@
         /// <summary>
         /// An unexpected or unrecognized error
         /// </summary>
-        Unknown
+        Unknown,
+        /// <summary>
+        /// The argument has the wrong type
+        /// </summary>
+        WrongArgumentType
     }
 }
