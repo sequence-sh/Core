@@ -17,6 +17,11 @@ namespace Reductech.EDR.Core.Internal
         /// </summary>
         IEnumerable<Requirement> RuntimeRequirements { get; }
 
+        /// <summary>
+        /// Whether this term should be bracketed when serialized
+        /// </summary>
+        bool ShouldBracketWhenSerialized { get; }
+
 
     }
 

@@ -63,7 +63,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                         },
                         FinalStep = Constant("Hello World")
                     },
-                    $"- DoNothing(){Environment.NewLine}- DoNothing(){Environment.NewLine}- DoNothing(){Environment.NewLine}- \"Hello World\"\r\n" );
+                    $"- DoNothing{Environment.NewLine}- DoNothing{Environment.NewLine}- DoNothing{Environment.NewLine}- \"Hello World\"\r\n" );
             }
         }
     }

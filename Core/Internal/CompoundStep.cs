@@ -53,6 +53,9 @@ namespace Reductech.EDR.Core.Internal
         public virtual IEnumerable<Requirement> RuntimeRequirements => ImmutableArray<Requirement>.Empty;
 
         /// <inheritdoc />
+        public virtual bool ShouldBracketWhenSerialized => true;
+
+        /// <inheritdoc />
         public Type OutputType => typeof(T);
 
         /// <summary>

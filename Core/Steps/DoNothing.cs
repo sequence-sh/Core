@@ -21,6 +21,9 @@ namespace Reductech.EDR.Core.Steps
         }
 
         /// <inheritdoc />
+        public override bool ShouldBracketWhenSerialized => false;
+
+        /// <inheritdoc />
         public override IStepFactory StepFactory => DoNothingStepFactory.Instance;
     }
 

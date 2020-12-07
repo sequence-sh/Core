@@ -138,7 +138,7 @@ namespace Reductech.EDR.Core.TestHarness
 
             else if (step is DoNothing)
             {
-                return DoNothingStepFactory.Instance.TypeName + "()";
+                return DoNothingStepFactory.Instance.TypeName;
             }
             else if (freezable is CompoundFreezableStep cs && freezable.StepName == ArrayStepFactory.Instance.TypeName)
             {
