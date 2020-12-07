@@ -18,7 +18,7 @@ namespace Reductech.EDR.Core.Tests
         public SerializationTests(ITestOutputHelper testOutputHelper) => TestOutputHelper = testOutputHelper;
 
         /// <inheritdoc />
-        [Theory]
+        [Theory(Skip = "true")]
         [ClassData(typeof(SerializationTestCases))]
         public override Task Test(string key) => base.Test(key);
     }

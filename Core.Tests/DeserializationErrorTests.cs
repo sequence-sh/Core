@@ -19,7 +19,7 @@ namespace Reductech.EDR.Core.Tests
 
 
         /// <inheritdoc />
-        [Theory]
+        [Theory(Skip = "true")]
         [ClassData(typeof(DeserializationErrorTestCases))]
         public override void Test(string key) => base.Test(key);
     }
