@@ -6,6 +6,7 @@ using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
+using Reductech.EDR.Core.Util;
 
 namespace Reductech.EDR.Core.Entities
 {
@@ -84,6 +85,34 @@ namespace Reductech.EDR.Core.Entities
             var resultEntity = new Entity(keyValuePairs.ToImmutable());
 
             return resultEntity;
+        }
+
+        /// <summary>
+        /// Tries to create a schema from an entity.
+        /// Ignores unexpected properties.
+        /// </summary>
+        public static Result<Schema, IErrorBuilder> TryCreateFromEntity(Entity entity)
+        {
+            var results = new List<Result<Unit, IErrorBuilder>>();
+            var schema = new Schema();
+
+            results.Add(entity.TrySetString(nameof(Name), nameof(Schema), s => schema.Name = s));
+            results.Add(entity.TrySetBoolean(nameof(AllowExtraProperties), nameof(Schema), s => schema.AllowExtraProperties = s));
+
+            results.Add(entity.TrySetDictionary(nameof(Properties), nameof(Schema), ev =>
+            {
+                if(ev.Value.IsT1 && ev.Value.AsT1.Value.IsT6)
+                    return SchemaProperty.TryCreateFromEntity(ev.Value.AsT1.Value.AsT6);
+                else
+                    return new ErrorBuilder($"Could not convert {ev} to SchemaProperty", ErrorCode.InvalidCast);
+            }, d=> schema.Properties = d));
+
+            var r = results.Combine(ErrorBuilderList.Combine)
+                .Map(_ => schema);
+
+
+            return r;
+
         }
 
         /// <summary>

@@ -1,5 +1,8 @@
 ﻿using System.Collections.Generic;
+using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Attributes;
+using Reductech.EDR.Core.Internal.Errors;
+using Reductech.EDR.Core.Util;
 
 namespace Reductech.EDR.Core.Entities
 {
@@ -26,13 +29,39 @@ namespace Reductech.EDR.Core.Entities
         /// For Enum, this will contain possible enum values.
         /// </summary>
         [ConfigProperty(Order = 3)]
-        public List<string>? Format { get; set; }
+        public IReadOnlyList<string>? Format { get; set; }
 
         /// <summary>
         /// A regex to validate the string form of the field value
         /// </summary>
         [ConfigProperty(Order = 4)]
         public string? Regex { get; set; }
+
+
+        /// <summary>
+        /// Tries to create a schema from an entity.
+        /// Ignores unexpected properties.
+        /// </summary>
+        public static Result<SchemaProperty, IErrorBuilder> TryCreateFromEntity(Entity entity)
+        {
+            var results = new List<Result<Unit, IErrorBuilder>>();
+            var schemaProperty = new SchemaProperty();
+
+            results.Add(entity.TrySetEnum<SchemaPropertyType>(nameof(Type), nameof(SchemaProperty), s => schemaProperty.Type = s));
+            results.Add(entity.TrySetEnum<Multiplicity>(nameof(Multiplicity), nameof(SchemaProperty), s => schemaProperty.Multiplicity = s));
+            entity.TrySetStringList(nameof(Format), nameof(SchemaProperty), s => schemaProperty.Format = s);
+
+
+            entity.TrySetString(nameof(Regex), nameof(SchemaProperty), s => schemaProperty.Regex = s); //Ignore the result of this
+
+            var r = results.Combine(ErrorBuilderList.Combine)
+                .Map(_ => schemaProperty);
+
+
+            return r;
+
+        }
+
 
         /// <summary>
         /// Convert this SchemaProperty to an entity

@@ -34,7 +34,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                                         {
                                             EntityStream = Constant(stream),
 
-                                            Schema = Constant(schema)
+                                            Schema = Constant(schema.ConvertToEntity())
                                         }
                         },
                         Unit.Default
@@ -100,7 +100,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                     {
                         EntityStream = Constant(stream),
 
-                        Schema = Constant(schema),
+                        Schema = Constant(schema.ConvertToEntity()),
                         ErrorBehaviour = Constant(ErrorBehaviour.Fail)
                     };
 

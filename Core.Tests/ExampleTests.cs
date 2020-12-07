@@ -99,10 +99,10 @@ namespace Reductech.EDR.Core.Tests
                         Value = new FromCSV{Stream = new ReadFile{Path = new Constant<string>(@"C:\Users\wainw\source\repos\Reductech\edr\Examples\Dinosaurs.csv")}}
                     },
 
-                    new SetVariable<Schema>()
+                    new SetVariable<Entity>()
                     {
                         Variable = new VariableName("Schema"),
-                        Value = new Constant<Schema>(new Schema
+                        Value = new Constant<Entity>(new Schema
                                 {
                                     AllowExtraProperties = false,
                                     Name = "Dinosaur",
@@ -112,7 +112,7 @@ namespace Reductech.EDR.Core.Tests
                                         {"ArrayLength", new SchemaProperty{Type = SchemaPropertyType.Double}},
                                         {"Period", new SchemaProperty{Type = SchemaPropertyType.String}},
                                     }
-                                })
+                                }.ConvertToEntity())
                     },
 
                     new FileWrite
@@ -123,7 +123,7 @@ namespace Reductech.EDR.Core.Tests
                             Entities = new EnforceSchema()
                             {
                                 EntityStream = new GetVariable<EntityStream>(){Variable = new VariableName("EntityStream")},
-                                Schema = new GetVariable<Schema>(){Variable = new VariableName("Schema")}
+                                Schema = new GetVariable<Entity>(){Variable = new VariableName("Schema")}
                             }
                         }
                     }
