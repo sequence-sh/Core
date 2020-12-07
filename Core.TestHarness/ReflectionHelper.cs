@@ -216,7 +216,7 @@ namespace Reductech.EDR.Core.TestHarness
             }
         }
 
-        private static async Task<(IStep step, string value, int newIndex)>  CreateSimpleStep(Type tStep, int index)
+        private static async Task<(IStep step, string value, int newIndex)> CreateSimpleStep(Type tStep, int index)
         {
             var outputType = tStep.GenericTypeArguments.First();
             IStep step;
