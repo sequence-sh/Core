@@ -21,7 +21,7 @@ infixOperator		: DASH
 					| GREATERTHAN ;
 infixOperation		: term infixOperator term ;
 functionMember		: TOKEN COLON step ;
-function			: TOKEN ( functionMember ( COMMA? functionMember)* )? ;
+function			: TOKEN ( functionMember )* ;
 entity				: OPENBRACKET ( functionMember )*  CLOSEBRACKET ;
 bracketedStep		: OPENBRACKET step CLOSEBRACKET ;
 boolean				: TRUE | FALSE ;
