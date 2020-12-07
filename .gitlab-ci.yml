@@ -1,6 +1,6 @@
 include:
   - project: reductech/templates/cicd/dotnet
-    file: .gitlab-ci.linux.yml
+    file: .gitlab-ci.windows.yml
 
 variables:
   PACKAGE_NAME_NUGET: Reductech.EDR.Core
