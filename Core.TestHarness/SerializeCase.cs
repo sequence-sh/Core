@@ -77,7 +77,7 @@ namespace Reductech.EDR.Core.TestHarness
             expectedYamlBuilder.Append('(');
 
             var pairs = values//.OrderBy(x => x.Key)
-                .Select(x => $"{x.Key} = {x.Value}");
+                .Select(x => $"{x.Key}: {x.Value}");
 
             expectedYamlBuilder.AppendJoin(", ", pairs);
             expectedYamlBuilder.Append(')');

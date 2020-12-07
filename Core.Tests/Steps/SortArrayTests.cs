@@ -39,7 +39,7 @@ namespace Reductech.EDR.Core.Tests.Steps
             get
             {
                 yield return new DeserializeCase("Sort Ascending",
-                    "ArraySort(Array = [8,6,7,5,3,0,9])",
+                    "ArraySort(Array: [8,6,7,5,3,0,9])",
                     new List<int>(){0,3,5,6,7,8,9});
 
             }

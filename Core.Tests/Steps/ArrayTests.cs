@@ -18,7 +18,7 @@ namespace Reductech.EDR.Core.Tests.Steps
         {
             get
             {
-                yield return new DeserializeCase("Three elements", "Array(Elements = [1, 2, 3])", new List<int>{1,2,3});
+                yield return new DeserializeCase("Three elements", "Array(Elements: [1, 2, 3])", new List<int>{1,2,3});
             }
         }
 

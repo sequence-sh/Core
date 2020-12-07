@@ -48,7 +48,7 @@ namespace Reductech.EDR.Core.Tests.Steps
         {
             get
             {
-                yield return new DeserializeCase("StringTrim left", "StringTrim(Side = TrimSide.Start, String = '  word  ')", "word  ");
+                yield return new DeserializeCase("StringTrim left", "StringTrim(Side: TrimSide.Start, String: '  word  ')", "word  ");
 
             }
 

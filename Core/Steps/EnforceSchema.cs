@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
@@ -61,7 +62,7 @@ namespace Reductech.EDR.Core.Steps
                     }
                     case Steps.ErrorBehaviour.Ignore: return Maybe<Entity>.None;
                     default:
-                        throw new ArgumentOutOfRangeException(nameof(errorBehaviour), errorBehaviour, null);
+                        throw new InvalidEnumArgumentException(nameof(errorBehaviour), (int) errorBehaviour.Value, typeof(ErrorBehaviour));
                 }
             }
 

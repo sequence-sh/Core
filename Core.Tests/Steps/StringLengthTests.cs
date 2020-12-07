@@ -33,7 +33,7 @@ namespace Reductech.EDR.Core.Tests.Steps
         {
             get
             {
-                yield return new DeserializeCase("Simple length of string", "StringLength(String = 'Hello')", 5);
+                yield return new DeserializeCase("Simple length of string", "StringLength(String: 'Hello')", 5);
 
             }
 

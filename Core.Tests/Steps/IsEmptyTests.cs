@@ -19,12 +19,12 @@ namespace Reductech.EDR.Core.Tests.Steps
             {
 
                 yield return new DeserializeCase("short form empty",
-                    "ArrayIsEmpty(Array = [])",
+                    "ArrayIsEmpty(Array: [])",
                     true
                 );
 
                 yield return new DeserializeCase("short form",
-                    "ArrayIsEmpty(Array = ['Hello','World'])",
+                    "ArrayIsEmpty(Array: ['Hello','World'])",
                     false
                 );
 

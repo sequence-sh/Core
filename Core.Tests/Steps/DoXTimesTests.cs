@@ -19,9 +19,9 @@ namespace Reductech.EDR.Core.Tests.Steps
             get
             {
                 yield return new StepCase("Print something three times",
-                    new DoXTimes()
+                    new DoXTimes
                     {
-                        Action = new Print<int>(){Value = Constant(6)},
+                        Action = new Print<int>{Value = Constant(6)},
                         X = Constant(3)
                     }, Unit.Default, "6","6","6"
                     );
@@ -35,7 +35,7 @@ namespace Reductech.EDR.Core.Tests.Steps
             get
             {
                 yield return new DeserializeCase("Print something three times",
-                    "DoXTimes(Action = Print(Value = 6), X = 3)", Unit.Default, "6","6","6"
+                    "DoXTimes(Action: Print(Value: 6), X: 3)", Unit.Default, "6","6","6"
                     );
 
 

@@ -68,7 +68,7 @@ namespace Reductech.EDR.Core.Tests.Steps
             get
             {
                 yield return new DeserializeCase("Increment 1",
-                    "For(Action = Print(Value = <i>), From = 1, To = 3, Increment = 1)",
+                    "For(Action: Print(Value: <i>), From: 1, To: 3, Increment: 1)",
                     Unit.Default,
                     "1","2","3"
                     );
