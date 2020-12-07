@@ -53,7 +53,7 @@ namespace Reductech.EDR.Core.Tests.Steps
             {
 
                 yield return new DeserializeCase("Short Form",
-                    $"- <Foo> = 42{Environment.NewLine}- Print(Value: <Foo>)",
+                    $"- <Foo> = 42\r\n- Print Value: <Foo>",
                     Unit.Default, "42"
                     )
                     .WithExpectedFinalState("Foo", 42);

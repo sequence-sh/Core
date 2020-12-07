@@ -36,8 +36,8 @@ namespace Reductech.EDR.Core.Tests.Steps
                             }
                         }
                     }, Unit.Default,
-                    "(Foo: \"Hello\",Bar: \"World\")",
-                    "(Foo: \"Hello 2\",Bar: \"World\")");
+                    "(Foo: \"Hello\" Bar: \"World\")",
+                    "(Foo: \"Hello 2\" Bar: \"World\")");
 
                 yield return new StepCase("Change property",
                     new EntityForEach
@@ -58,8 +58,8 @@ namespace Reductech.EDR.Core.Tests.Steps
                             }
                         }
                     }, Unit.Default,
-                    "(Foo: \"Hello\",Bar: \"World\")",
-                    "(Foo: \"Hello 2\",Bar: \"World\")");
+                    "(Foo: \"Hello\" Bar: \"World\")",
+                    "(Foo: \"Hello 2\" Bar: \"World\")");
 
             }
         }

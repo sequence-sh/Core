@@ -50,7 +50,7 @@ namespace Reductech.EDR.Core.Tests.Steps
         {
             get
             {
-                yield return new DeserializeCase("Repeat while Foo < 5", "- <Foo> = 1 \r\n- While(Condition: (<Foo> < 5), Action: IncrementVariable(Variable: <Foo>, Amount: 1))", Unit.Default)
+                yield return new DeserializeCase("Repeat while Foo < 5", "- <Foo> = 1 \r\n- While Condition: (<Foo> < 5) Action: (IncrementVariable Variable: <Foo> Amount: 1)", Unit.Default)
                     .WithExpectedFinalState("Foo", 5);
 
             }

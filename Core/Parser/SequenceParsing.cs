@@ -326,7 +326,7 @@ namespace Reductech.EDR.Core.Parser
             {
                 var key = context.TOKEN().Symbol.Text;
 
-                var value = VisitStep(context.step());
+                var value = VisitTerm(context.term());
                 if (value.IsFailure) return value.ConvertFailure<(string name, FreezableStepProperty value)>();
 
                 return (key, value.Value);

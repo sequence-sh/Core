@@ -74,14 +74,14 @@ namespace Reductech.EDR.Core.TestHarness
             var expectedYamlBuilder = new StringBuilder();
 
             expectedYamlBuilder.Append(stepName);
-            expectedYamlBuilder.Append('(');
+            expectedYamlBuilder.Append(' ');
 
             var pairs = values//.OrderBy(x => x.Key)
                 .Select(x => $"{x.Key}: {x.Value}");
 
-            expectedYamlBuilder.AppendJoin(", ", pairs);
-            expectedYamlBuilder.Append(')');
-            var c = new SerializeCase("Default", step, expectedYamlBuilder.ToString());
+            expectedYamlBuilder.AppendJoin(" ", pairs);
+            //expectedYamlBuilder.Append(')');
+            var c = new SerializeCase("Default", step, expectedYamlBuilder.ToString().Trim());
 
             return c;
         }

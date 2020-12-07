@@ -41,7 +41,7 @@ namespace Reductech.EDR.Core.Tests.Steps
         {
             get
             {
-                yield return new DeserializeCase("Present", "FindSubstring(String: 'Hello', Substring: 'lo')", 3);
+                yield return new DeserializeCase("Present", "FindSubstring String: 'Hello' Substring: 'lo'", 3);
 
             }
 

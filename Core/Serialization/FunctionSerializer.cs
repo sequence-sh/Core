@@ -4,6 +4,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Reductech.EDR.Core.Internal;
+using Reductech.EDR.Core.Steps;
 
 namespace Reductech.EDR.Core.Serialization
 {
@@ -30,23 +31,30 @@ namespace Reductech.EDR.Core.Serialization
         {
             var sb = new StringBuilder();
             sb.Append(Name);
-            sb.Append('(');
+            //sb.Append('(');
 
-            var first = true;
+            //var first = true;
 
             foreach (var stepProperty in stepProperties.OrderBy(x => x.Index))
             {
-                if (first)
-                    first = false;
-                else
-                    sb.Append(", ");
+                //if (first)
+                //    first = false;
+                //else
+                //    sb.Append(", ");
+                sb.Append(' ');
+
+
 
                 sb.Append(stepProperty.Name);
                 sb.Append(": ");
 
-                sb.Append( await stepProperty.SerializeValueAsync(cancellationToken));
+                var value = await stepProperty.SerializeValueAsync(cancellationToken);
+
+                 if (stepProperty.Value.IsT1 && stepProperty.Value.AsT1 is ICompoundStep cs && cs.ShouldBracketWhenSerialized)
+                    value = '(' + value + ')';
+                sb.Append(value );
             }
-            sb.Append(')');
+            //sb.Append(')');
 
             return sb.ToString();
         }

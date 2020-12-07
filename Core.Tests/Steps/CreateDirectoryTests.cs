@@ -38,7 +38,7 @@ namespace Reductech.EDR.Core.Tests.Steps
         {
             get
             {
-                yield return new DeserializeCase("Create Directory", "CreateDirectory(Path: 'MyPath')", Unit.Default)
+                yield return new DeserializeCase("Create Directory", "CreateDirectory Path: 'MyPath'", Unit.Default)
                     .WithFileSystemAction(x =>
                     x.Setup(h => h.CreateDirectory("MyPath"))
                         .Returns(Unit.Default));

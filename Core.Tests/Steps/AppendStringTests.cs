@@ -63,7 +63,7 @@ namespace Reductech.EDR.Core.Tests.Steps
             get
             {
                 yield return new DeserializeCase("Short Form",
-                    "- <Foo> = 'Hello'\r\n- AppendString(String: 'World', Variable: <Foo>)", Unit.Default)
+                    "- <Foo> = 'Hello'\r\n- AppendString String: 'World' Variable: <Foo>", Unit.Default)
                     .WithExpectedFinalState("Foo", "HelloWorld");
 
             }

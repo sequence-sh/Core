@@ -38,7 +38,7 @@ namespace Reductech.EDR.Core.Tests.Steps
         {
             get
             {
-                yield return new DeserializeCase("ValueIf true", "ValueIf(Condition: true, Then: 1, Else: 2)", 1);
+                yield return new DeserializeCase("ValueIf true", "ValueIf Condition: true Then: 1 Else: 2", 1);
             }
 
         }

@@ -31,6 +31,9 @@ namespace Reductech.EDR.Core.Steps
         /// <inheritdoc />
         public override IStepFactory StepFactory => ArrayStepFactory.Instance;
 
+        /// <inheritdoc />
+        public override bool ShouldBracketWhenSerialized => false;
+
         /// <summary>
         /// The elements of the array.
         /// </summary>
