@@ -379,3 +379,4 @@ FodyWeavers.xsd
 
 ####
 **/StrykerOutput/
+/Core/Antlr
