@@ -380,3 +380,4 @@ FodyWeavers.xsd
 ####
 **/StrykerOutput/
 /Core/Grammar
+/Core/Antlr
