@@ -174,11 +174,11 @@ namespace Reductech.EDR.Core.Parser
             /// <inheritdoc />
             public override Result<FreezableStepProperty, IError> VisitEnumeration(SequenceParser.EnumerationContext context)
             {
-                if (context.children.Count != 3 || context.TOKEN().Length != 2)
+                if (context.children.Count != 3 || context.NAME().Length != 2)
                     return ParseError(context);
 
-                var prefix = context.TOKEN(0).GetText();
-                var suffix = context.TOKEN(1).GetText();
+                var prefix = context.NAME(0).GetText();
+                var suffix = context.NAME(1).GetText();
 
                 var member = new FreezableStepProperty(new ConstantFreezableStep(new Enumeration(prefix, suffix)), new TextPosition(context));
 
@@ -248,7 +248,7 @@ namespace Reductech.EDR.Core.Parser
             /// <inheritdoc />
             public override Result<FreezableStepProperty, IError> VisitFunction(SequenceParser.FunctionContext context)
             {
-                var name = context.TOKEN().Symbol.Text;
+                var name = context.NAME().Symbol.Text;
                 var members = AggregateFunctionMembers(context.functionMember());
 
                 if (members.IsFailure) return members.ConvertFailure<FreezableStepProperty>();
@@ -340,7 +340,7 @@ namespace Reductech.EDR.Core.Parser
 
             private Result<(string name, FreezableStepProperty value), IError> GetEntityMember(SequenceParser.EntityMemberContext context)
             {
-                var key = context.TOKEN().Symbol.Text;
+                var key = context.NAME().Symbol.Text;
 
                 var value = VisitTerm(context.term());
                 if (value.IsFailure) return value.ConvertFailure<(string name, FreezableStepProperty value)>();
@@ -350,7 +350,7 @@ namespace Reductech.EDR.Core.Parser
 
             private Result<(string name, FreezableStepProperty value), IError> GetFunctionMember(SequenceParser.FunctionMemberContext context)
             {
-                var key = context.TOKEN().Symbol.Text;
+                var key = context.NAME().Symbol.Text;
 
                 var value = VisitTerm(context.term());
                 if (value.IsFailure) return value.ConvertFailure<(string name, FreezableStepProperty value)>();
