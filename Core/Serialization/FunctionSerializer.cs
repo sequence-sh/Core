@@ -4,7 +4,6 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Reductech.EDR.Core.Internal;
-using Reductech.EDR.Core.Steps;
 
 namespace Reductech.EDR.Core.Serialization
 {

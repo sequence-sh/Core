@@ -1,8 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Collections.Immutable;
-using System.Linq;
-
-namespace Reductech.EDR.Core.Internal.Errors
+﻿namespace Reductech.EDR.Core.Internal.Errors
 {
     /// <summary>
     /// A location with no information
