@@ -27,7 +27,7 @@ namespace Reductech.EDR.Core.Steps
         /// <summary>
         /// The delimiter to use.
         /// </summary>
-        [StepProperty(1)]
+        [StepProperty(2)]
         [Required]
         public IStep<string> Delimiter { get; set; } = null!;
 

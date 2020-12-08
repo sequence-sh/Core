@@ -28,7 +28,7 @@ namespace Reductech.EDR.Core.Steps
         /// The action to perform repeatedly.
         /// Use the Variable &lt;Entity&gt; to access the entity.
         /// </summary>
-        [StepProperty(1)]
+        [StepProperty(2)]
         [Required]
         public IStep<Unit> Action { get; set; } = null!;
 

@@ -40,7 +40,7 @@ namespace Reductech.EDR.Core.Steps
         /// <summary>
         /// The value to set the variable to.
         /// </summary>
-        [StepProperty(1)]
+        [StepProperty(2)]
         [Required]
         public IStep<T> Value { get; set; } = null!;
     }

@@ -27,7 +27,7 @@ namespace Reductech.EDR.Core.Steps
         /// <summary>
         /// The element to look for.
         /// </summary>
-        [StepProperty(1)]
+        [StepProperty(2)]
         [Required]
         public IStep<T> Element { get; set; } = null!;
 

@@ -25,7 +25,7 @@ namespace Reductech.EDR.Core.Steps
         /// <summary>
         /// The amount to increment by.
         /// </summary>
-        [StepProperty(1)]
+        [StepProperty(2)]
         [DefaultValueExplanation("1")]
         public IStep<int> Amount { get; set; } = new Constant<int>(1);
 

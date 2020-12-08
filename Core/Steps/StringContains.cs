@@ -46,14 +46,14 @@ namespace Reductech.EDR.Core.Steps
         /// <summary>
         /// The substring
         /// </summary>
-        [StepProperty(1)]
+        [StepProperty(2)]
         [Required]
         public IStep<string> Substring { get; set; } = null!;
 
         /// <summary>
         /// Whether to ignore case when comparing strings.
         /// </summary>
-        [StepProperty(1)]
+        [StepProperty(3)]
         [DefaultValueExplanation("False")]
         public IStep<bool> IgnoreCase { get; set; } = new Constant<bool>(false);
 

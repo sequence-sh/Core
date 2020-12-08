@@ -80,14 +80,14 @@ namespace Reductech.EDR.Core.Steps
         /// This must be an entity with the properties of a schema.
         /// All other properties will be ignored.
         /// </summary>
-        [StepProperty(1)]
+        [StepProperty(2)]
         [Required]
         public IStep<Entity> Schema { get; set; } = null!;
 
         /// <summary>
         /// How to behave if an error occurs.
         /// </summary>
-        [StepProperty(1)]
+        [StepProperty(3)]
         [DefaultValueExplanation("Fail")]
         public IStep<ErrorBehaviour> ErrorBehaviour { get; set; } = new Constant<ErrorBehaviour>(Steps.ErrorBehaviour.Fail);
 

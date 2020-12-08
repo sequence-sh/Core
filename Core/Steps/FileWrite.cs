@@ -40,7 +40,7 @@ namespace Reductech.EDR.Core.Steps
         /// <summary>
         /// The path of the file to write to.
         /// </summary>
-        [StepProperty(0)]
+        [StepProperty(1)]
         [Required]
         public IStep<string> Path { get; set; } = null!;
 

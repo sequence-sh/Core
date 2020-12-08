@@ -42,14 +42,14 @@ namespace Reductech.EDR.Core.Steps
         /// <summary>
         /// The directory to extract to.
         /// </summary>
-        [StepProperty(1)]
+        [StepProperty(2)]
         [Required]
         public IStep<string> Destination { get; set; } = null!;
 
         /// <summary>
         /// Whether to overwrite files when extracting.
         /// </summary>
-        [StepProperty(1)]
+        [StepProperty(3)]
         [DefaultValueExplanation("false")]
         public IStep<bool> Overwrite { get; set; } = new Constant<bool>(false);
 

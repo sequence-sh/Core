@@ -38,14 +38,14 @@ namespace Reductech.EDR.Core.Steps
         /// <summary>
         /// The Consequent. Returned if the condition is true.
         /// </summary>
-        [StepProperty(1)]
+        [StepProperty(2)]
         [Required]
         public IStep<T> Then { get; set; } = null!;
 
         /// <summary>
         /// The Alternative. Returned if the condition is false.
         /// </summary>
-        [StepProperty(1)]
+        [StepProperty(3)]
         [Required]
         public IStep<T> Else { get; set; } = null!;
     }

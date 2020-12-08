@@ -25,7 +25,7 @@ namespace Reductech.EDR.Core.Steps
         /// <summary>
         /// The substring to find.
         /// </summary>
-        [StepProperty(1)]
+        [StepProperty(2)]
         [Required]
         public IStep<string> SubString { get; set; } = null!;
 

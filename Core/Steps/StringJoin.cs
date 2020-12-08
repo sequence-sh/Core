@@ -24,7 +24,7 @@ namespace Reductech.EDR.Core.Steps
         /// <summary>
         /// The string to join.
         /// </summary>
-        [StepProperty(1)]
+        [StepProperty(2)]
         [Required]
         public IStep<List<string>> Strings { get; set; } = null!;
 

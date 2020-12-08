@@ -27,7 +27,7 @@ namespace Reductech.EDR.Core.Steps
         /// <summary>
         /// The number of times to repeat the element
         /// </summary>
-        [StepProperty(1)]
+        [StepProperty(2)]
         [Required]
         public IStep<int> Number { get; set; } = null!;
 

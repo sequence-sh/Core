@@ -43,14 +43,14 @@ namespace Reductech.EDR.Core.Steps
         /// <summary>
         /// The stream to read.
         /// </summary>
-        [StepProperty(2)]
+        [StepProperty(1)]
         [Required]
         public IStep<DataStream> Stream { get; set; } = null!;
 
         /// <summary>
         /// How the stream is encoded.
         /// </summary>
-        [StepProperty(1)]
+        [StepProperty(2)]
         [DefaultValueExplanation("UTF8 no BOM")]
         public IStep<EncodingEnum> Encoding { get; set; } = new Constant<EncodingEnum>(EncodingEnum.UTF8); //TODO move away
 

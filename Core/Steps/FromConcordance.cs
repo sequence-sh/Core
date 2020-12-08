@@ -61,7 +61,7 @@ namespace Reductech.EDR.Core.Steps
         /// Should be a single character or an empty string.
         /// If it is empty then strings cannot be quoted.
         /// </summary>
-        [StepProperty(5)]
+        [StepProperty(4)]
         [DefaultValueExplanation("\u00FE")]
         public IStep<string> QuoteCharacter { get; set; } = new Constant<string>("\u00FE");
 
@@ -70,7 +70,7 @@ namespace Reductech.EDR.Core.Steps
         /// Should be a single character or an empty string.
         /// If it is empty then fields cannot have multiple fields.
         /// </summary>
-        [StepProperty(6)]
+        [StepProperty(5)]
         [DefaultValueExplanation("|")]
         public IStep<string> MultiValueDelimiter { get; set; } = new Constant<string>("|");
 

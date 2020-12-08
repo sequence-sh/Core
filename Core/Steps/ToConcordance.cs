@@ -67,7 +67,7 @@ namespace Reductech.EDR.Core.Steps
         /// <summary>
         /// Whether to always quote all fields and headers.
         /// </summary>
-        [StepProperty(4)]
+        [StepProperty(5)]
         [DefaultValueExplanation("false")]
         public IStep<bool> AlwaysQuote { get; set; } = new Constant<bool>(true);
 

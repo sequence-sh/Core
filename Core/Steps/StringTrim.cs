@@ -28,7 +28,7 @@ namespace Reductech.EDR.Core.Steps
         /// <summary>
         /// The side to trim.
         /// </summary>
-        [StepProperty(1)]
+        [StepProperty(2)]
         [DefaultValueExplanation("Both")]
         public IStep<TrimSide> Side { get; set; } = new Constant<TrimSide>(TrimSide.Both);
 

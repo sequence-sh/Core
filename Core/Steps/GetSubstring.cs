@@ -23,14 +23,14 @@ namespace Reductech.EDR.Core.Steps
         /// <summary>
         /// The index.
         /// </summary>
-        [StepProperty(1)]
+        [StepProperty(3)]
         [DefaultValueExplanation("0")]
         public IStep<int> Index { get; set; } = new Constant<int>(0);
 
         /// <summary>
         /// The length of the substring to extract.
         /// </summary>
-        [StepProperty(1)]
+        [StepProperty(2)]
         [Required]
         public IStep<int> Length { get; set; } = null!;
 

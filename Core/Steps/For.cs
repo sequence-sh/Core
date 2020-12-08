@@ -16,16 +16,6 @@ namespace Reductech.EDR.Core.Steps
     {
 
         /// <summary>
-        /// The action to perform repeatedly.
-        /// Use the variable &lt;i&gt;
-        /// </summary>
-        [StepProperty(1)]
-        [Required]
-        public IStep<Unit> Action { get; set; } = null!;
-
-        //TODO let users set a custom variable name
-
-        /// <summary>
         /// The first value of the variable to use.
         /// </summary>
         [StepProperty(1)]
@@ -35,7 +25,7 @@ namespace Reductech.EDR.Core.Steps
         /// <summary>
         /// The highest value of the variable to use
         /// </summary>
-        [StepProperty(1)]
+        [StepProperty(2)]
         [Required]
         public IStep<int> To { get; set; } = null!;
 
@@ -43,9 +33,19 @@ namespace Reductech.EDR.Core.Steps
         /// <summary>
         /// The amount to increment by each iteration.
         /// </summary>
-        [StepProperty(1)]
+        [StepProperty(3)]
         [Required]
         public IStep<int> Increment { get; set; } = null!;
+
+        /// <summary>
+        /// The action to perform repeatedly.
+        /// Use the variable &lt;i&gt;
+        /// </summary>
+        [StepProperty(4)]
+        [Required]
+        public IStep<Unit> Action { get; set; } = null!;
+
+        //TODO let users set a custom variable name
 
         /// <inheritdoc />
         public override async Task<Result<Unit, IError>> Run(IStateMonad stateMonad,

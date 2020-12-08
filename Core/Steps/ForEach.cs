@@ -17,26 +17,25 @@ namespace Reductech.EDR.Core.Steps
     public sealed class ForEach<T> : CompoundStep<Unit>
     {
         /// <summary>
-        /// The action to perform repeatedly.
-        /// </summary>
-        [StepProperty(1)]
-        [Required]
-        public IStep<Unit> Action { get; set; } = null!;
-
-
-        /// <summary>
-        /// The name of the variable to loop over.
-        /// </summary>
-        [VariableName(1)]
-        [Required]
-        public VariableName Variable { get; set; } //TODO use x
-
-        /// <summary>
         /// The elements to iterate over.
         /// </summary>
         [StepProperty(1)]
         [Required]
         public IStep<List<T>> Array { get; set; } = null!;
+
+        /// <summary>
+        /// The name of the variable to loop over.
+        /// </summary>
+        [VariableName(2)]
+        [Required]
+        public VariableName Variable { get; set; } //TODO use x
+
+        /// <summary>
+        /// The action to perform repeatedly.
+        /// </summary>
+        [StepProperty(3)]
+        [Required]
+        public IStep<Unit> Action { get; set; } = null!;
 
         /// <inheritdoc />
         public override async Task<Result<Unit, IError>> Run(IStateMonad stateMonad,

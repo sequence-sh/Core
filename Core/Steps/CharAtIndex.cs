@@ -24,7 +24,7 @@ namespace Reductech.EDR.Core.Steps
         /// <summary>
         /// The index.
         /// </summary>
-        [StepProperty(1)]
+        [StepProperty(2)]
         [Required]
         public IStep<int> Index { get; set; } = null!;
 
