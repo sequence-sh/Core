@@ -32,8 +32,8 @@
     <Antlr4 Include="Parser/Sequence.g4">
       <Listener>false</Listener>
       <Error>true</Error>
-      <Package>Reductech.EDR.Core.Parser</Package>
       <AntOutDir>Antlr</AntOutDir>
+      <Package>Reductech.EDR.Core.Parser</Package>
     </Antlr4>
   </ItemGroup>
 
