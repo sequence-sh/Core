@@ -249,7 +249,7 @@ namespace Reductech.EDR.Core.Parser
             public override Result<FreezableStepProperty, IError> VisitFunction(SequenceParser.FunctionContext context)
             {
                 var name = context.NAME().Symbol.Text;
-                var members = AggregateFunctionMembers(context.functionMember());
+                var members = AggregateNamedArguments(context.namedArgument());
 
                 if (members.IsFailure) return members.ConvertFailure<FreezableStepProperty>();
 
@@ -264,7 +264,7 @@ namespace Reductech.EDR.Core.Parser
             /// <inheritdoc />
             public override Result<FreezableStepProperty, IError> VisitEntity(SequenceParser.EntityContext context)
             {
-                var members = AggregateEntityMembers(context.entityMember());
+                var members = AggregateNamedArguments(context.namedArgument());
 
                 if (members.IsFailure) return members.ConvertFailure<FreezableStepProperty>();
 
@@ -274,12 +274,12 @@ namespace Reductech.EDR.Core.Parser
             }
 
             private Result<IReadOnlyDictionary<string, FreezableStepProperty>, IError>
-                AggregateEntityMembers(IEnumerable<SequenceParser.EntityMemberContext> entityMembers)
+                AggregateNamedArguments(IEnumerable<SequenceParser.NamedArgumentContext> namedArguments)
             {
                 var l = new List<(string key, FreezableStepProperty member)>();
                 var errors = new List<IError>();
 
-                foreach (var r in entityMembers.Select(GetEntityMember))
+                foreach (var r in namedArguments.Select(GetNamedArgument))
                 {
                     if (r.IsFailure) errors.Add(r.Error);
                     else
@@ -306,39 +306,7 @@ namespace Reductech.EDR.Core.Parser
             }
 
 
-            private Result<IReadOnlyDictionary<string, FreezableStepProperty>, IError>
-                AggregateFunctionMembers(IEnumerable<SequenceParser.FunctionMemberContext> functionMembers)
-            {
-                var l = new List<(string key, FreezableStepProperty member)>();
-                var errors = new List<IError>();
-
-                foreach (var r in functionMembers.Select(GetFunctionMember))
-                {
-                    if(r.IsFailure)errors.Add(r.Error);
-                    else
-                        l.Add(r.Value);
-                }
-
-                foreach (var duplicateKeys in l.GroupBy(x=>x.key).Where(x=>x.Count() > 1))
-                {
-                    errors.Add(new SingleError(
-                        $"Duplicate Parameter '{duplicateKeys.Key}'",
-                        ErrorCode.DuplicateParameter,
-                            new TextPosition(duplicateKeys.Key,
-                                (duplicateKeys.First().member.Location as TextPosition)!.StartIndex,
-                                (duplicateKeys.Last().member.Location  as TextPosition)!.StopIndex
-                            )));
-                }
-
-                if (errors.Any())
-                    return Result.Failure<IReadOnlyDictionary<string, FreezableStepProperty>, IError>(ErrorList.Combine(errors));
-
-                var dict = l.ToDictionary(x => x.key, x => x.member);
-
-                return dict;
-            }
-
-            private Result<(string name, FreezableStepProperty value), IError> GetEntityMember(SequenceParser.EntityMemberContext context)
+            private Result<(string name, FreezableStepProperty value), IError> GetNamedArgument(SequenceParser.NamedArgumentContext context)
             {
                 var key = context.NAME().Symbol.Text;
 
@@ -348,15 +316,6 @@ namespace Reductech.EDR.Core.Parser
                 return (key, value.Value);
             }
 
-            private Result<(string name, FreezableStepProperty value), IError> GetFunctionMember(SequenceParser.FunctionMemberContext context)
-            {
-                var key = context.NAME().Symbol.Text;
-
-                var value = VisitTerm(context.term());
-                if (value.IsFailure) return value.ConvertFailure<(string name, FreezableStepProperty value)>();
-
-                return (key, value.Value);
-            }
 
             private static FreezableStepProperty GetVariableName(ITerminalNode node)
             {

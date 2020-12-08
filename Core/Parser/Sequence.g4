@@ -20,10 +20,9 @@ infixOperator		: DASH
 					| LESSTHAN
 					| GREATERTHAN ;
 infixOperation		: term infixOperator term ;
-functionMember		: NAME COLON term ;
-entityMember		: NAME COLON term ;
-function			: NAME ( functionMember )* ;
-entity				: OPENBRACKET ( entityMember )*  CLOSEBRACKET ;
+namedArgument		: NAME COLON term ;
+function			: NAME ( namedArgument )* ;
+entity				: OPENBRACKET ( namedArgument )*  CLOSEBRACKET ;
 bracketedStep		: OPENBRACKET step CLOSEBRACKET ;
 boolean				: TRUE | FALSE ;
 quotedString		: DOUBLEQUOTEDSTRING | SINGLEQUOTEDSTRING ;
