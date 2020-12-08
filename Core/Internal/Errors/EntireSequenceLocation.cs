@@ -23,52 +23,52 @@ namespace Reductech.EDR.Core.Internal.Errors
         public string AsString => "No Location";
     }
 
-    /// <summary>
-    /// An error location composed of multiple locations.
-    /// </summary>
-    public class ErrorLocationList : IErrorLocation
-    {
-        public ErrorLocationList(ImmutableList<IErrorLocation> locations) => Locations = locations;
+    ///// <summary>
+    ///// An error location composed of multiple locations.
+    ///// </summary>
+    //public class ErrorLocationList : IErrorLocation
+    //{
+    //    public ErrorLocationList(ImmutableList<IErrorLocation> locations) => Locations = locations;
 
-        /// <summary>
-        /// The ErrorLocations
-        /// </summary>
-        public ImmutableList<IErrorLocation> Locations { get; }
+    //    /// <summary>
+    //    /// The ErrorLocations
+    //    /// </summary>
+    //    public ImmutableList<IErrorLocation> Locations { get; }
 
 
-        /// <inheritdoc />
-        public bool Equals(IErrorLocation? other)
-        {
-            if (other is ErrorLocationList cel && Locations.SequenceEqual(cel.Locations))
-                return true;
+    //    /// <inheritdoc />
+    //    public bool Equals(IErrorLocation? other)
+    //    {
+    //        if (other is ErrorLocationList cel && Locations.SequenceEqual(cel.Locations))
+    //            return true;
 
-            if (Locations.Count == 1)
-                return Locations.Single().Equals(other);
+    //        if (Locations.Count == 1)
+    //            return Locations.Single().Equals(other);
 
-            return false;
-        }
+    //        return false;
+    //    }
 
-        /// <inheritdoc />
-        public string AsString => string.Join("; ", Locations.Select(x => x.AsString));
+    //    /// <inheritdoc />
+    //    public string AsString => string.Join("; ", Locations.Select(x => x.AsString));
 
-        /// <summary>
-        /// Combine several ErrorLocations into a single ErrorLocation.
-        /// </summary>
-        public static IErrorLocation Combine(IEnumerable<IErrorLocation> locations)
-        {
-            var list = locations
-                .SelectMany(x => x is ErrorLocationList ell ? ell.Locations : ImmutableList.Create(x))
-                .Where(x=> x != EmptyLocation.Instance)
-                .ToImmutableList();
+    //    /// <summary>
+    //    /// Combine several ErrorLocations into a single ErrorLocation.
+    //    /// </summary>
+    //    public static IErrorLocation Combine(IEnumerable<IErrorLocation> locations)
+    //    {
+    //        var list = locations
+    //            .SelectMany(x => x is ErrorLocationList ell ? ell.Locations : ImmutableList.Create(x))
+    //            .Where(x=> x != EmptyLocation.Instance)
+    //            .ToImmutableList();
 
-            return list.Count switch
-            {
-                0 => EmptyLocation.Instance,
-                1 => list.Single(),
-                _ => new ErrorLocationList(list)
-            };
-        }
-    }
+    //        return list.Count switch
+    //        {
+    //            0 => EmptyLocation.Instance,
+    //            1 => list.Single(),
+    //            _ => new ErrorLocationList(list)
+    //        };
+    //    }
+    //}
 
 
     /// <summary>

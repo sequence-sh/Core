@@ -57,38 +57,26 @@ namespace Reductech.EDR.Core.Parser
         private class Visitor : SequenceBaseVisitor<Result<FreezableStepProperty, IError>>
         {
             /// <inheritdoc />
+            public override Result<FreezableStepProperty, IError> VisitFullSequence(SequenceParser.FullSequenceContext context)
+            {
+                if (context.step() != null)
+                    return VisitStep(context.step());
+
+                return VisitStepSequence(context.stepSequence());
+            }
+
+
+            /// <inheritdoc />
             public override Result<FreezableStepProperty, IError> VisitStepSequence(SequenceParser.StepSequenceContext context)
             {
                 var results = new List<Result<IFreezableStep, IError>>();
 
-                foreach (var child in context.children)
+                foreach (var stepContext in context.step())
                 {
-                    switch (child)
-                    {
-                        case ErrorNodeImpl errorNodeImpl:
-                            results.Add(VisitErrorNode(errorNodeImpl).Map(x => x.ConvertToStep()));
-                            break;
-
-                        case SequenceParser.StepContext step:
-                            results.Add(VisitStep(step).Map(x => x.ConvertToStep()));
-                            break;
-                        case TerminalNodeImpl _:
-                            //Skip newCommand or EOF
-                            break;
-
-                        case null:
-                            results.Add(new SingleError("Step was null", ErrorCode.CouldNotParse, new TextPosition(context)));
-                            break;
-                        case ParserRuleContext prc:
-                            results.Add(ParseError(prc));
-                            break;
-                        default:
-                            throw new Exception($"Could not handle '{child}'");
-                    }
+                    results.Add(VisitStep(stepContext).Map(x => x.ConvertToStep()));
                 }
 
-
-                var result = results.Combine(ErrorList.Combine).Map(x => x.ToList());
+                var result = results.Combine(ErrorList.Combine).Map(x=>x.ToList());
 
                 if (result.IsFailure) return result.ConvertFailure<FreezableStepProperty>();
 
@@ -103,35 +91,6 @@ namespace Reductech.EDR.Core.Parser
 
                 return new FreezableStepProperty(sequence, new TextPosition(context));
             }
-
-            /// <inheritdoc />
-            protected override Result<FreezableStepProperty, IError> AggregateResult(Result<FreezableStepProperty, IError> aggregate, Result<FreezableStepProperty, IError> nextResult)
-            {
-                if(aggregate.IsFailure && nextResult.IsFailure)
-                    return Result.Failure<FreezableStepProperty, IError>(ErrorList.Combine(new []{aggregate.Error, nextResult.Error}));
-                if (aggregate.IsFailure)
-                    return aggregate;
-                if (nextResult.IsFailure)
-                    return nextResult;
-
-
-                if (aggregate.Value.StepList.HasValue && aggregate.Value.StepList.Value.IsEmpty)
-                    return nextResult; //Aggregate is default - ignore it
-
-                var location = aggregate.Value.Location.Combine(nextResult.Value.Location);
-
-                ImmutableList<IFreezableStep> list;
-                if (aggregate.Value.StepList.HasValue)
-                    list = aggregate.Value.StepList.Value.Add(nextResult.Value.ConvertToStep());
-                else
-                    list = ImmutableList<IFreezableStep>.Empty.Add(aggregate.Value.ConvertToStep())
-                        .Add(nextResult.Value.ConvertToStep());
-
-                return new FreezableStepProperty(list, location);
-            }
-
-            /// <inheritdoc />
-            protected override Result<FreezableStepProperty, IError> DefaultResult { get; } = new FreezableStepProperty(ImmutableList<IFreezableStep>.Empty, EmptyLocation.Instance);
 
 
             /// <inheritdoc />
