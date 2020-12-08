@@ -1,12 +1,43 @@
 include:
   - project: reductech/templates/cicd/dotnet
-    file: .gitlab-ci.windows.yml
+    file: .gitlab-ci.linux.yml
 
 variables:
   PACKAGE_NAME_NUGET: Reductech.EDR.Core
   PACKAGE_NAME_DLL: Reductech.EDR.Core
 
+stages:
+  - antlr
+  - build
+  - test
+  - quality
+  - package
+  - sign
+  - push
+
+compile grammar:
+  stage: antlr
+  image: openjdk:8-jre-buster
+  variables:
+    ANTLR_JAR_URI: https://www.antlr.org/download/antlr-4.9-complete.jar
+    ANTLR_JAR: antlr-4.9-complete.jar
+    ANTLR_ENCODING: UTF-8
+    ANTLR_NAMESPACE: Reductech.EDR.Core.Parser
+    ANTLR_OUTPUT: ./Core/Antlr
+    ANTLR_GRAMMAR: ./Core/Parser/Sequence.g4
+  script:
+    - wget -O $ANTLR_JAR $ANTLR_JAR_URI
+    - java -jar $ANTLR_JAR -Dlanguage=CSharp -visitor -no-listener -Werror
+      -encoding $ANTLR_ENCODING -package $ANTLR_NAMESPACE -o $ANTLR_OUTPUT
+      -Xexact-output-dir $ANTLR_GRAMMAR
+  artifacts:
+    paths:
+      - $ANTLR_OUTPUT
+    expire_in: 2 hours
+
 mutation testing:
-  image: registry.gitlab.com/reductech/containers/dotnet/sdk
+  image: mcr.microsoft.com/dotnet/sdk:5.0-windowsservercore-ltsc2019
   tags: 
     - rt-windows
+  needs:
+   - compile grammar
