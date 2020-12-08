@@ -264,7 +264,7 @@ namespace Reductech.EDR.Core.Parser
             /// <inheritdoc />
             public override Result<FreezableStepProperty, IError> VisitEntity(SequenceParser.EntityContext context)
             {
-                var members = AggregateFunctionMembers(context.functionMember());
+                var members = AggregateEntityMembers(context.entityMember());
 
                 if (members.IsFailure) return members.ConvertFailure<FreezableStepProperty>();
 
@@ -274,8 +274,40 @@ namespace Reductech.EDR.Core.Parser
             }
 
             private Result<IReadOnlyDictionary<string, FreezableStepProperty>, IError>
-                AggregateFunctionMembers(
-                    IEnumerable<SequenceParser.FunctionMemberContext> functionMembers)
+                AggregateEntityMembers(IEnumerable<SequenceParser.EntityMemberContext> entityMembers)
+            {
+                var l = new List<(string key, FreezableStepProperty member)>();
+                var errors = new List<IError>();
+
+                foreach (var r in entityMembers.Select(GetEntityMember))
+                {
+                    if (r.IsFailure) errors.Add(r.Error);
+                    else
+                        l.Add(r.Value);
+                }
+
+                foreach (var duplicateKeys in l.GroupBy(x => x.key).Where(x => x.Count() > 1))
+                {
+                    errors.Add(new SingleError(
+                        $"Duplicate Parameter '{duplicateKeys.Key}'",
+                        ErrorCode.DuplicateParameter,
+                            new TextPosition(duplicateKeys.Key,
+                                (duplicateKeys.First().member.Location as TextPosition)!.StartIndex,
+                                (duplicateKeys.Last().member.Location as TextPosition)!.StopIndex
+                            )));
+                }
+
+                if (errors.Any())
+                    return Result.Failure<IReadOnlyDictionary<string, FreezableStepProperty>, IError>(ErrorList.Combine(errors));
+
+                var dict = l.ToDictionary(x => x.key, x => x.member);
+
+                return dict;
+            }
+
+
+            private Result<IReadOnlyDictionary<string, FreezableStepProperty>, IError>
+                AggregateFunctionMembers(IEnumerable<SequenceParser.FunctionMemberContext> functionMembers)
             {
                 var l = new List<(string key, FreezableStepProperty member)>();
                 var errors = new List<IError>();
@@ -306,8 +338,17 @@ namespace Reductech.EDR.Core.Parser
                 return dict;
             }
 
-            private Result<(string name, FreezableStepProperty value), IError> GetFunctionMember(
-                SequenceParser.FunctionMemberContext context)
+            private Result<(string name, FreezableStepProperty value), IError> GetEntityMember(SequenceParser.EntityMemberContext context)
+            {
+                var key = context.TOKEN().Symbol.Text;
+
+                var value = VisitTerm(context.term());
+                if (value.IsFailure) return value.ConvertFailure<(string name, FreezableStepProperty value)>();
+
+                return (key, value.Value);
+            }
+
+            private Result<(string name, FreezableStepProperty value), IError> GetFunctionMember(SequenceParser.FunctionMemberContext context)
             {
                 var key = context.TOKEN().Symbol.Text;
 
