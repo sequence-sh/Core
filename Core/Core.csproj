@@ -27,17 +27,18 @@
     <Copyright>Copyright (c) 2020 Reductech Ltd</Copyright>
   </PropertyGroup>
 
-  <ItemGroup>
-    <None Remove="Parser\Sequence.g4" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Antlr4 Include="Parser\Sequence.g4">
+  <ItemGroup Condition="'$(CI)' == ''">
+    <None Remove="Parser/Sequence.g4" />
+    <Antlr4 Include="Parser/Sequence.g4">
       <Listener>false</Listener>
       <Error>true</Error>
       <Package>Reductech.EDR.Core.Grammar</Package>
       <AntOutDir>Grammar</AntOutDir>
     </Antlr4>
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(CI)' != ''">
+    <None Include="Antlr/*" />
   </ItemGroup>
 
   <ItemGroup>

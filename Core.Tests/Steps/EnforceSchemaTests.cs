@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Globalization;
 using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
@@ -12,7 +13,10 @@ namespace Reductech.EDR.Core.Tests.Steps
     public class EnforceSchemaTests : StepTestBase<EnforceSchema, EntityStream>
     {
         /// <inheritdoc />
-        public EnforceSchemaTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper) { }
+        public EnforceSchemaTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper) {
+            CultureInfo.DefaultThreadCurrentCulture = new CultureInfo("en-GB");
+            CultureInfo.DefaultThreadCurrentUICulture = new CultureInfo("en-GB");
+        }
 
         /// <inheritdoc />
         protected override IEnumerable<StepCase> StepCases
@@ -68,8 +72,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                 yield return CreateCase("Cast date time",
                     EntityStream.Create(CreateEntity(("Foo", "11/10/2020 3:45:44 PM"))),
                         CreateSchema("ValueIf Schema", false, ("Foo", SchemaPropertyType.Date, Multiplicity.ExactlyOne)),
-                    "(Foo: 2020-11-10T15:45:44.0000000)");
-
+                    "(Foo: 2020-10-11T15:45:44.0000000)");
 
                 yield return CreateCase("Cast multiple values",
                    EntityStream.Create(CreateEntity(("Foo", "10"), ("Foo", "15"))),
