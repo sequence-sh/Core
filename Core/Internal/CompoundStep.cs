@@ -104,13 +104,11 @@ namespace Reductech.EDR.Core.Internal
                     .ToDictionary(x => x.Name,
                         x => x.Value.Match(
                             vn => new FreezableStepProperty(vn, new StepErrorLocation(this)),
-                            s => new FreezableStepProperty(
-                                OneOf<VariableName, IFreezableStep, IReadOnlyList<IFreezableStep>>.FromT1(s.Unfreeze()),
+                            s => new FreezableStepProperty(s.Unfreeze(),
                                 new StepErrorLocation(this)),
                             sl =>
                                 new FreezableStepProperty(
-                                    OneOf<VariableName, IFreezableStep, IReadOnlyList<IFreezableStep>>.FromT2(
-                                        sl.Select(s => s.Unfreeze()).ToList()), new StepErrorLocation(this))
+                                        sl.Select(s => s.Unfreeze()).ToImmutableList(), new StepErrorLocation(this))
                         ));
 
                 return new FreezableStepData(dict, new StepErrorLocation(this));

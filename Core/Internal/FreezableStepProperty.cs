@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Steps;
-using Opt = OneOf.OneOf<Reductech.EDR.Core.Internal.VariableName, Reductech.EDR.Core.Internal.IFreezableStep, System.Collections.Generic.IReadOnlyList<Reductech.EDR.Core.Internal.IFreezableStep>>;
+using Opt = OneOf.OneOf<Reductech.EDR.Core.Internal.VariableName, Reductech.EDR.Core.Internal.IFreezableStep, System.Collections.Immutable.ImmutableList<Reductech.EDR.Core.Internal.IFreezableStep>>;
 
 
 namespace Reductech.EDR.Core.Internal
@@ -18,11 +19,39 @@ namespace Reductech.EDR.Core.Internal
         /// <summary>
         /// Create a new FreezableStepProperty
         /// </summary>
-        public FreezableStepProperty(Opt option, IErrorLocation location)
+        public FreezableStepProperty(VariableName variableName, IErrorLocation location)
         {
-            Option = option;
+            Option = variableName;
             Location = location;
         }
+
+        /// <summary>
+        /// Create a new FreezableStepProperty
+        /// </summary>
+        public FreezableStepProperty(IFreezableStep step, IErrorLocation location)
+        {
+            Option = Opt.FromT1(step);
+            Location = location;
+        }
+
+        /// <summary>
+        /// Create a new FreezableStepProperty
+        /// </summary>
+        public FreezableStepProperty(ImmutableList<IFreezableStep> stepList, IErrorLocation location)
+        {
+            Option = stepList;
+            Location = location;
+        }
+
+        /// <summary>
+        /// The chosen option.
+        /// </summary>
+        private Opt Option { get; }
+
+        /// <summary>
+        /// The location where this stepMember comes from.
+        /// </summary>
+        public IErrorLocation Location { get; }
 
         /// <summary>
         /// The member type of this Step Member.
@@ -39,10 +68,7 @@ namespace Reductech.EDR.Core.Internal
             }
         }
 
-        /// <summary>
-        /// The location where this stepMember comes from.
-        /// </summary>
-        public IErrorLocation Location { get; }
+
 
         /// <summary>
         /// This, if it is a variableName
@@ -57,12 +83,12 @@ namespace Reductech.EDR.Core.Internal
         /// <summary>
         /// This, if it is a StepList
         /// </summary>
-        public Maybe<IReadOnlyList<IFreezableStep>> StepList => Option.Match(x => Maybe<IReadOnlyList<IFreezableStep>>.None,x => Maybe<IReadOnlyList<IFreezableStep>>.None,Maybe<IReadOnlyList<IFreezableStep>>.From);
+        public Maybe<ImmutableList<IFreezableStep>> StepList => Option.Match(
+            x => Maybe<ImmutableList<IFreezableStep>>.None,
+            x => Maybe<ImmutableList<IFreezableStep>>.None,
+            Maybe<ImmutableList<IFreezableStep>>.From);
 
-        /// <summary>
-        /// The chosen option.
-        /// </summary>
-        private Opt Option { get; }
+
 
         /// <summary>
         /// Use this FreezableStepProperty.
@@ -118,7 +144,7 @@ namespace Reductech.EDR.Core.Internal
             return r;
 
 
-            IFreezableStep MapStepList(IReadOnlyList<IFreezableStep> stepList)
+            IFreezableStep MapStepList(ImmutableList<IFreezableStep> stepList)
             {
                 if (!stepList.Any() || !stepList.All(x => x is ConstantFreezableStep cfs && cfs.Value.IsT6))
                     return MapStepListToArray(stepList);
@@ -133,7 +159,7 @@ namespace Reductech.EDR.Core.Internal
                 return c;
             }
 
-            IFreezableStep MapStepListToArray(IReadOnlyList<IFreezableStep> stepList)
+            IFreezableStep MapStepListToArray(ImmutableList<IFreezableStep> stepList)
             {
                 var array = FreezableFactory.CreateFreezableList(stepList, null, Location);
                 return array;

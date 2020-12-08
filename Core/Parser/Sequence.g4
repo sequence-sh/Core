@@ -33,6 +33,7 @@ term				: simpleTerm
 step				: function
 					| infixOperation
 					| setVariable
+					| stepSequence
 					| term;
 simpleTerm			: number
                     | boolean
@@ -41,7 +42,8 @@ simpleTerm			: number
                     | getVariable
                     | entity
                     | array ;
-sequence			:(step | ((NEWCOMMAND | DASH) step (NEWCOMMAND step)*))  EOF ;
+stepSequence		: (NEWCOMMAND | DASH) step (NEWCOMMAND step)* ;
+fullSequence		: (step | stepSequence)  EOF ;
 
 
 /*

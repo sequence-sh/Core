@@ -55,7 +55,7 @@ namespace Reductech.EDR.Core.Internal
         {
             var dictionary =
             Properties.ToDictionary(x => x.Key, x =>
-                new FreezableStepProperty(OneOf<VariableName, IFreezableStep, IReadOnlyList<IFreezableStep>>.FromT1(x.Value.Unfreeze()),
+                new FreezableStepProperty(x.Value.Unfreeze(),
                     new StepErrorLocation(x.Value) ));
 
             return new CreateEntityFreezableStep(new FreezableStepData(dictionary, new StepErrorLocation(this)));
