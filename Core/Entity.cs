@@ -92,7 +92,7 @@ namespace Reductech.EDR.Core
         /// <inheritdoc />
         public bool Equals(Entity? other)
         {
-            return other is not null && _properties.SequenceEqual(other._properties);
+            return !(other is null) && _properties.SequenceEqual(other._properties);
         }
 
         /// <inheritdoc />
