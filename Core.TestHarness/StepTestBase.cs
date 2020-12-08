@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -14,7 +15,6 @@ using Reductech.EDR.Core.Util;
 using Xunit;
 using Xunit.Abstractions;
 using Xunit.Sdk;
-using Type = System.Type;
 
 namespace Reductech.EDR.Core.TestHarness
 {
@@ -39,6 +39,42 @@ namespace Reductech.EDR.Core.TestHarness
 
 
         public ITestOutputHelper TestOutputHelper { get; }
+
+        [Fact]
+        public void All_Properties_should_have_distinct_consecutive_positive_orders()
+        {
+            var instance = new TStep();
+            var errors = new List<string>();
+
+            var properties = typeof(TStep).GetProperties().Select(propertyInfo =>
+                    (propertyInfo, attribute: propertyInfo.GetCustomAttribute<StepPropertyBaseAttribute>()))
+                .Where(x => x.attribute != null)
+                .OrderBy(x => x.attribute!.Order).ToList();
+
+            var expectedI = 1;
+            var canBeRequired = true;
+
+            foreach (var (propertyInfo, attribute) in properties)
+            {
+                var propName = $"{typeof(TStep).GetDisplayName()}.{propertyInfo.Name}";
+                var required = propertyInfo.IsDecoratedWith<RequiredAttribute>();
+
+                if (required)
+                {
+                    if(!canBeRequired)
+                        errors.Add($"{propName} should not be required as it comes after non-required attributes");
+                }
+                else canBeRequired = false; //Required attributes cannot follow non-required attributes
+
+                if(attribute!.Order != expectedI)
+                    errors.Add($"{propName} has order {attribute.Order} but should have {expectedI}");
+
+                expectedI++;
+            }
+
+            if (errors.Any())
+                throw new XunitException(string.Join("\r\n", errors));
+        }
 
 
         [Fact]
@@ -121,13 +157,13 @@ namespace Reductech.EDR.Core.TestHarness
                 .BeAssignableTo<IStepFactory>($"{StepName}.Instance should return an IStepFactory");
         }
 
-        public static IStep<Unit> SetVariable<TNew>(string name, TNew value)=> new SetVariable<TNew>(){Variable = new VariableName(name), Value = Constant(value)};
+        public static IStep<Unit> SetVariable<TNew>(string name, TNew value)=> new SetVariable<TNew> {Variable = new VariableName(name), Value = Constant(value)};
         public static Constant<TNew> Constant<TNew>(TNew value) => new Constant<TNew>(value);
 
-        public static IStep<List<TNew>> Array<TNew>(params TNew[] elements)=> new Array<TNew>() {Elements = elements.Select(Constant).ToList()};
+        public static IStep<List<TNew>> Array<TNew>(params TNew[] elements)=> new Array<TNew> {Elements = elements.Select(Constant).ToList()};
 
-        public static IStep<TNew> GetVariable<TNew>(string variableName)=> new GetVariable<TNew>() {Variable = new VariableName(variableName)};
-        public static IStep<TNew> GetVariable<TNew>(VariableName variableName)=> new GetVariable<TNew>() {Variable = variableName};
+        public static IStep<TNew> GetVariable<TNew>(string variableName)=> new GetVariable<TNew> {Variable = new VariableName(variableName)};
+        public static IStep<TNew> GetVariable<TNew>(VariableName variableName)=> new GetVariable<TNew> {Variable = variableName};
 
         public static IStep<Entity> GetEntityVariable => GetVariable<Entity>(VariableName.Entity);
 
@@ -142,11 +178,11 @@ namespace Reductech.EDR.Core.TestHarness
 
         protected static Schema CreateSchema(string name, bool allowExtraProperties, params (string propertyName, SchemaPropertyType type, Multiplicity multiplicity)[] properties)
         {
-            return new Schema()
+            return new Schema
             {
                 Name = name,
                 AllowExtraProperties = allowExtraProperties,
-                Properties = properties.ToDictionary(x=>x.propertyName, x=> new SchemaProperty()
+                Properties = properties.ToDictionary(x=>x.propertyName, x=> new SchemaProperty
                 {
                     Multiplicity = x.multiplicity,
                     Type = x.type
@@ -156,11 +192,11 @@ namespace Reductech.EDR.Core.TestHarness
 
         protected static Schema CreateSchema(string name, bool allowExtraProperties, params (string propertyName, SchemaPropertyType type, Multiplicity multiplicity, string? regex, List<string>? format)[] properties)
         {
-            return new Schema()
+            return new Schema
             {
                 Name = name,
                 AllowExtraProperties = allowExtraProperties,
-                Properties = properties.ToDictionary(x => x.propertyName, x => new SchemaProperty()
+                Properties = properties.ToDictionary(x => x.propertyName, x => new SchemaProperty
                 {
                     Multiplicity = x.multiplicity,
                     Type = x.type,
