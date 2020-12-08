@@ -134,7 +134,7 @@ namespace Reductech.EDR.Core.Entities
         /// <inheritdoc />
         public bool Equals(EntityValue? other)
         {
-            return other is not null && Value.Equals(other.Value);
+            return !(other is null)  && Value.Equals(other.Value);
         }
 
         /// <inheritdoc />
