@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -60,7 +61,7 @@ namespace Reductech.EDR.Core.Internal
 
             IFreezableStep UnfreezeList(IEnumerable enumerable)
             {
-                var l = enumerable.Cast<object>().Select(UnfreezeObject).ToList();
+                var l = enumerable.Cast<object>().Select(UnfreezeObject).ToImmutableList();
 
                 var a = FreezableFactory.CreateFreezableList(l, null, new StepErrorLocation(this));
 

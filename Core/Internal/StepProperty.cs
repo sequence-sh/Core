@@ -11,6 +11,9 @@ namespace Reductech.EDR.Core.Internal
     /// </summary>
     public class StepProperty
     {
+        /// <summary>
+        /// Create a new StepProperty
+        /// </summary>
         public StepProperty(string name, int index, OneOf<VariableName, IStep, IReadOnlyList<IStep>> value)
         {
             Name = name;

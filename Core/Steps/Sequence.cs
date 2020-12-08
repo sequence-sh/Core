@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
-using OneOf;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
@@ -91,8 +90,8 @@ namespace Reductech.EDR.Core.Steps
         {
             var dict = new Dictionary<string, FreezableStepProperty>()
             {
-                {nameof(Sequence<object>.InitialSteps), new FreezableStepProperty(OneOf<VariableName, IFreezableStep, IReadOnlyList<IFreezableStep>>.FromT2(steps.ToList()), location )},
-                {nameof(Sequence<object>.FinalStep), new FreezableStepProperty(OneOf<VariableName, IFreezableStep, IReadOnlyList<IFreezableStep>>.FromT1(finalStep), location )},
+                {nameof(Sequence<object>.InitialSteps), new FreezableStepProperty(steps.ToImmutableList(), location )},
+                {nameof(Sequence<object>.FinalStep), new FreezableStepProperty(finalStep, location )},
             };
 
             var fpd = new FreezableStepData( dict, location);
