@@ -31,21 +31,21 @@ namespace Reductech.EDR.Core.Steps
         /// <summary>
         /// Whether to follow the Then Branch
         /// </summary>
-        [StepProperty]
+        [StepProperty(1)]
         [Required]
         public IStep<bool> Condition { get; set; } = null!;
 
         /// <summary>
         /// The Consequent. Returned if the condition is true.
         /// </summary>
-        [StepProperty]
+        [StepProperty(1)]
         [Required]
         public IStep<T> Then { get; set; } = null!;
 
         /// <summary>
         /// The Alternative. Returned if the condition is false.
         /// </summary>
-        [StepProperty]
+        [StepProperty(1)]
         [Required]
         public IStep<T> Else { get; set; } = null!;
     }

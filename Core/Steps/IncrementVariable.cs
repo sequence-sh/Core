@@ -18,14 +18,14 @@ namespace Reductech.EDR.Core.Steps
         /// <summary>
         /// The variable to increment.
         /// </summary>
-        [VariableName]
+        [VariableName(1)]
         [Required]
         public VariableName Variable { get; set; }
 
         /// <summary>
         /// The amount to increment by.
         /// </summary>
-        [StepProperty]
+        [StepProperty(1)]
         [DefaultValueExplanation("1")]
         public IStep<int> Amount { get; set; } = new Constant<int>(1);
 

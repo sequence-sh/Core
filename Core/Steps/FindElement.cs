@@ -20,14 +20,14 @@ namespace Reductech.EDR.Core.Steps
         /// <summary>
         /// The array to check.
         /// </summary>
-        [StepProperty]
+        [StepProperty(1)]
         [Required]
         public IStep<List<T>> Array { get; set; } = null!;
 
         /// <summary>
         /// The element to look for.
         /// </summary>
-        [StepProperty]
+        [StepProperty(1)]
         [Required]
         public IStep<T> Element { get; set; } = null!;
 

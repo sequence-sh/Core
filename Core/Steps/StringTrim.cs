@@ -21,14 +21,14 @@ namespace Reductech.EDR.Core.Steps
         /// <summary>
         /// The string to change the case of.
         /// </summary>
-        [StepProperty]
+        [StepProperty(1)]
         [Required]
         public IStep<string> String { get; set; } = null!;
 
         /// <summary>
         /// The side to trim.
         /// </summary>
-        [StepProperty]
+        [StepProperty(1)]
         [DefaultValueExplanation("Both")]
         public IStep<TrimSide> Side { get; set; } = new Constant<TrimSide>(TrimSide.Both);
 

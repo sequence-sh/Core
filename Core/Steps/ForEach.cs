@@ -19,7 +19,7 @@ namespace Reductech.EDR.Core.Steps
         /// <summary>
         /// The action to perform repeatedly.
         /// </summary>
-        [StepProperty]
+        [StepProperty(1)]
         [Required]
         public IStep<Unit> Action { get; set; } = null!;
 
@@ -27,14 +27,14 @@ namespace Reductech.EDR.Core.Steps
         /// <summary>
         /// The name of the variable to loop over.
         /// </summary>
-        [VariableName]
+        [VariableName(1)]
         [Required]
         public VariableName Variable { get; set; } //TODO use x
 
         /// <summary>
         /// The elements to iterate over.
         /// </summary>
-        [StepProperty]
+        [StepProperty(1)]
         [Required]
         public IStep<List<T>> Array { get; set; } = null!;
 

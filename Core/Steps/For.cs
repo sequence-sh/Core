@@ -19,7 +19,7 @@ namespace Reductech.EDR.Core.Steps
         /// The action to perform repeatedly.
         /// Use the variable &lt;i&gt;
         /// </summary>
-        [StepProperty]
+        [StepProperty(1)]
         [Required]
         public IStep<Unit> Action { get; set; } = null!;
 
@@ -28,14 +28,14 @@ namespace Reductech.EDR.Core.Steps
         /// <summary>
         /// The first value of the variable to use.
         /// </summary>
-        [StepProperty]
+        [StepProperty(1)]
         [Required]
         public IStep<int> From { get; set; } = null!;
 
         /// <summary>
         /// The highest value of the variable to use
         /// </summary>
-        [StepProperty]
+        [StepProperty(1)]
         [Required]
         public IStep<int> To { get; set; } = null!;
 
@@ -43,7 +43,7 @@ namespace Reductech.EDR.Core.Steps
         /// <summary>
         /// The amount to increment by each iteration.
         /// </summary>
-        [StepProperty]
+        [StepProperty(1)]
         [Required]
         public IStep<int> Increment { get; set; } = null!;
 

@@ -38,7 +38,7 @@ namespace Reductech.EDR.Core.Steps
         /// <summary>
         /// The entity to get the property from.
         /// </summary>
-        [StepProperty(Order = 1)]
+        [StepProperty(1)]
         [Required]
         public IStep<Entity> Entity { get; set; } = null!;
 
@@ -46,7 +46,7 @@ namespace Reductech.EDR.Core.Steps
         /// The name of the property to get.
         /// Returns an empty string if the property is not present.
         /// </summary>
-        [StepProperty(Order = 2)]
+        [StepProperty(2)]
         [Required]
         public IStep<string> Property { get; set; } = null!;
 

@@ -53,21 +53,21 @@ namespace Reductech.EDR.Core.Steps
         /// <summary>
         /// The path to the external process
         /// </summary>
-        [StepProperty(Order = 1)]
+        [StepProperty(1)]
         [Required]
         public IStep<string> Path { get; set; } = null!;
 
         /// <summary>
         /// Arguments to the step.
         /// </summary>
-        [StepProperty(Order = 2)]
+        [StepProperty(2)]
         [DefaultValueExplanation("No arguments")]
         public IStep<List<string>>? Arguments { get; set; }
 
         /// <summary>
         /// Encoding to use for the process output.
         /// </summary>
-        [StepProperty(Order = 3)]
+        [StepProperty(3)]
         [DefaultValueExplanation("Default encoding")]
         public IStep<EncodingEnum> Encoding { get; set; } = new Constant<EncodingEnum>(EncodingEnum.Default);
 

@@ -39,7 +39,7 @@ namespace Reductech.EDR.Core.Steps
         /// <summary>
         /// The Value to Print.
         /// </summary>
-        [StepProperty]
+        [StepProperty(1)]
         [Required]
         public IStep<T> Value { get; set; } = null!;
 

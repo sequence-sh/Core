@@ -12,25 +12,25 @@ namespace Reductech.EDR.Core
         /// <summary>
         /// Additional requirements, beyond the default for this step.
         /// </summary>
-        [ConfigProperty(Order = 1)]
+        [ConfigProperty(1)]
         public List<Requirement>? AdditionalRequirements { get; set; }
 
         /// <summary>
         /// Tags that the target machine must have (defined in a the config file) for this to be run on that machine.
         /// </summary>
-        [ConfigProperty(Order = 2)]
+        [ConfigProperty(2)]
         public List<string>? TargetMachineTags { get; set; }
 
         /// <summary>
         /// Conditional true, this step will not be split into multiple steps.
         /// </summary>
-        [ConfigProperty(Order = 3)]
+        [ConfigProperty(3)]
         public bool DoNotSplit { get; set; }
 
         /// <summary>
         /// The priority of this step. InitialSteps with higher priorities will be run first.
         /// </summary>
-        [ConfigProperty(Order = 5)]
+        [ConfigProperty(5)]
         public byte? Priority { get; set; }
 
         /// <summary>

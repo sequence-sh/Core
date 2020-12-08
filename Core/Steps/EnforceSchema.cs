@@ -71,7 +71,7 @@ namespace Reductech.EDR.Core.Steps
         /// <summary>
         /// Entities to enforce the schema on
         /// </summary>
-        [StepProperty]
+        [StepProperty(1)]
         [Required]
         public IStep<EntityStream> EntityStream { get; set; } = null!;
 
@@ -80,14 +80,14 @@ namespace Reductech.EDR.Core.Steps
         /// This must be an entity with the properties of a schema.
         /// All other properties will be ignored.
         /// </summary>
-        [StepProperty]
+        [StepProperty(1)]
         [Required]
         public IStep<Entity> Schema { get; set; } = null!;
 
         /// <summary>
         /// How to behave if an error occurs.
         /// </summary>
-        [StepProperty]
+        [StepProperty(1)]
         [DefaultValueExplanation("Fail")]
         public IStep<ErrorBehaviour> ErrorBehaviour { get; set; } = new Constant<ErrorBehaviour>(Steps.ErrorBehaviour.Fail);
 

@@ -30,7 +30,7 @@ namespace Reductech.EDR.Core.Steps
         /// <summary>
         /// The name of the variable to get.
         /// </summary>
-        [VariableName]
+        [VariableName(1)]
         [Required]
         public VariableName Variable { get; set; }
     }

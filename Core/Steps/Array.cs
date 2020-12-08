@@ -37,7 +37,7 @@ namespace Reductech.EDR.Core.Steps
         /// <summary>
         /// The elements of the array.
         /// </summary>
-        [StepListProperty]
+        [StepListProperty(1)]
         [Required]
         public IReadOnlyList<IStep<T>> Elements { get; set; } = null!;
     }

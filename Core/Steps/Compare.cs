@@ -21,14 +21,14 @@ namespace Reductech.EDR.Core.Steps
         /// <summary>
         /// The item to the left of the operator.
         /// </summary>
-        [StepProperty]
+        [StepProperty(1)]
         [Required]
         public IStep<T> Left { get; set; } = null!;
 
         /// <summary>
         /// The operator to use for comparison.
         /// </summary>
-        [StepProperty]
+        [StepProperty(1)]
         [Required]
 
         public IStep<CompareOperator> Operator { get; set; } = null!;
@@ -36,7 +36,7 @@ namespace Reductech.EDR.Core.Steps
         /// <summary>
         /// The item to the right of the operator.
         /// </summary>
-        [StepProperty]
+        [StepProperty(1)]
         [Required]
         public IStep<T> Right { get; set; } = null!;
 

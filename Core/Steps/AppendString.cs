@@ -18,7 +18,7 @@ namespace Reductech.EDR.Core.Steps
         /// <summary>
         /// The variable to append to.
         /// </summary>
-        [VariableName(Order = 1)]
+        [VariableName(1)]
         [Required]
         public VariableName Variable { get; set; }
 
@@ -26,7 +26,7 @@ namespace Reductech.EDR.Core.Steps
         /// <summary>
         /// The string to append.
         /// </summary>
-        [StepProperty(Order = 2)]
+        [StepProperty(2)]
         [Required]
         public IStep<string> String { get; set; } = null!;
 

@@ -28,7 +28,7 @@ namespace Reductech.EDR.Core.Steps
         /// <summary>
         /// The streams to concatenate
         /// </summary>
-        [StepProperty]
+        [StepProperty(1)]
         [Required]
         public IStep<List<EntityStream>> EntityStreams { get; set; } = null!;
 

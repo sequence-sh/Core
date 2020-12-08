@@ -20,14 +20,14 @@ namespace Reductech.EDR.Core.Steps
         /// <summary>
         /// The array to modify.
         /// </summary>
-        [StepProperty]
+        [StepProperty(1)]
         [Required]
         public IStep<List<T>> Array { get; set; } = null!;
 
         /// <summary>
         /// Whether to sort in descending order.
         /// </summary>
-        [StepProperty(Order = 3)]
+        [StepProperty(2)]
         [DefaultValueExplanation("False")]
         public IStep<bool> Descending { get; set; } = new Constant<bool>(false);
 

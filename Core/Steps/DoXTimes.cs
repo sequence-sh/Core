@@ -17,14 +17,14 @@ namespace Reductech.EDR.Core.Steps
         /// <summary>
         /// The action to perform repeatedly.
         /// </summary>
-        [StepProperty]
+        [StepProperty(1)]
         [Required]
         public IStep<Unit> Action { get; set; } = null!;
 
         /// <summary>
         /// The number of times to perform the action.
         /// </summary>
-        [StepProperty]
+        [StepProperty(1)]
         [Required]
         public IStep<int> X { get; set; } = null!;
 

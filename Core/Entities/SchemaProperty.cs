@@ -14,13 +14,13 @@ namespace Reductech.EDR.Core.Entities
         /// <summary>
         /// The type of the property.
         /// </summary>
-        [ConfigProperty(Order = 1)]
+        [ConfigProperty(1)]
         public SchemaPropertyType Type { get; set; }
 
         /// <summary>
         /// The multiplicity of the property.
         /// </summary>
-        [ConfigProperty(Order = 2)]
+        [ConfigProperty(2)]
         public Multiplicity Multiplicity { get; set; } = Multiplicity.Any;
 
         /// <summary>
@@ -28,13 +28,13 @@ namespace Reductech.EDR.Core.Entities
         /// For Date, this will contain possible date formats.
         /// For Enum, this will contain possible enum values.
         /// </summary>
-        [ConfigProperty(Order = 3)]
+        [ConfigProperty(3)]
         public IReadOnlyList<string>? Format { get; set; }
 
         /// <summary>
         /// A regex to validate the string form of the field value
         /// </summary>
-        [ConfigProperty(Order = 4)]
+        [ConfigProperty(4)]
         public string? Regex { get; set; }
 
 

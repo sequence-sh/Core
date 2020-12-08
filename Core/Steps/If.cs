@@ -40,14 +40,14 @@ namespace Reductech.EDR.Core.Steps
         /// <summary>
         /// Whether to follow the Then Branch
         /// </summary>
-        [StepProperty(Order = 1)]
+        [StepProperty(1)]
         [Required]
         public IStep<bool> Condition { get; set; } = null!;
 
         /// <summary>
         /// The Then Branch.
         /// </summary>
-        [StepProperty(Order = 2)]
+        [StepProperty(2)]
         [Required]
         public IStep<Unit> Then { get; set; } = null!;
 
@@ -56,7 +56,7 @@ namespace Reductech.EDR.Core.Steps
         /// <summary>
         /// The Else branch, if it exists.
         /// </summary>
-        [StepProperty(Order = 3)]
+        [StepProperty(3)]
         [DefaultValueExplanation("Do Nothing")]
         public IStep<Unit>? Else { get; set; } = null;
 

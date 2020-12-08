@@ -21,14 +21,14 @@ namespace Reductech.EDR.Core.Steps
         /// <summary>
         /// The string to change the case of.
         /// </summary>
-        [StepProperty]
+        [StepProperty(1)]
         [Required]
         public IStep<string> String { get; set; } = null!;
 
         /// <summary>
         /// The case to change to.
         /// </summary>
-        [StepProperty]
+        [StepProperty(1)]
         [Required]
         public IStep<TextCase> Case { get; set; } = null!;
 

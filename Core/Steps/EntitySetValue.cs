@@ -38,21 +38,21 @@ namespace Reductech.EDR.Core.Steps
         /// <summary>
         /// The entity to set the property on.
         /// </summary>
-        [StepProperty(Order = 1)]
+        [StepProperty(1)]
         [Required]
         public IStep<Entity> Entity { get; set; } = null!;
 
         /// <summary>
         /// The name of the property to set.
         /// </summary>
-        [StepProperty(Order = 2)]
+        [StepProperty(2)]
         [Required]
         public IStep<string> Property { get; set; } = null!;
 
         /// <summary>
         /// The new value of the property to set.
         /// </summary>
-        [StepProperty(Order = 3)]
+        [StepProperty(3)]
         [Required]
         public IStep<T> Value { get; set; } = null!;
 

@@ -16,21 +16,21 @@ namespace Reductech.EDR.Core.Steps
         /// <summary>
         /// The string to extract a substring from.
         /// </summary>
-        [StepProperty]
+        [StepProperty(1)]
         [Required]
         public IStep<string> String { get; set; } = null!;
 
         /// <summary>
         /// The index.
         /// </summary>
-        [StepProperty]
+        [StepProperty(1)]
         [DefaultValueExplanation("0")]
         public IStep<int> Index { get; set; } = new Constant<int>(0);
 
         /// <summary>
         /// The length of the substring to extract.
         /// </summary>
-        [StepProperty]
+        [StepProperty(1)]
         [Required]
         public IStep<int> Length { get; set; } = null!;
 

@@ -37,21 +37,21 @@ namespace Reductech.EDR.Core.Steps
         /// <summary>
         /// The entities to write.
         /// </summary>
-        [StepProperty(Order = 1)]
+        [StepProperty(1)]
         [Required]
         public IStep<EntityStream> Entities { get; set; } = null!;
 
         /// <summary>
         /// How the stream is encoded.
         /// </summary>
-        [StepProperty(Order = 2)]
+        [StepProperty(2)]
         [DefaultValueExplanation("UTF8 no BOM")]
         public IStep<EncodingEnum> Encoding { get; set; } = new Constant<EncodingEnum>(EncodingEnum.UTF8);
 
         /// <summary>
         /// The delimiter to use to separate fields.
         /// </summary>
-        [StepProperty(Order = 3)]
+        [StepProperty(3)]
         [DefaultValueExplanation("\u0014")]
         public IStep<string> Delimiter { get; set; } = new Constant<string>("\u0014");
 
@@ -60,14 +60,14 @@ namespace Reductech.EDR.Core.Steps
         /// Should be a single character or an empty string.
         /// If it is empty then strings cannot be quoted.
         /// </summary>
-        [StepProperty(Order = 4)]
+        [StepProperty(4)]
         [DefaultValueExplanation("\u00FE")]
         public IStep<string> QuoteCharacter { get; set; } = new Constant<string>("\u00FE");
 
         /// <summary>
         /// Whether to always quote all fields and headers.
         /// </summary>
-        [StepProperty(Order = 4)]
+        [StepProperty(4)]
         [DefaultValueExplanation("false")]
         public IStep<bool> AlwaysQuote { get; set; } = new Constant<bool>(true);
 
@@ -76,14 +76,14 @@ namespace Reductech.EDR.Core.Steps
         /// Should be a single character or an empty string.
         /// If it is empty then fields cannot have multiple fields.
         /// </summary>
-        [StepProperty(Order = 6)]
+        [StepProperty(6)]
         [DefaultValueExplanation("")]
         public IStep<string> MultiValueDelimiter { get; set; } = new Constant<string>("|");
 
         /// <summary>
         /// The format to use for DateTime fields.
         /// </summary>
-        [StepProperty(Order = 7)]
+        [StepProperty(7)]
         [DefaultValueExplanation("O - ISO 8601 compliant - e.g. 2009-06-15T13:45:30.0000000-07:00")]
         [Example("yyyy/MM/dd HH:mm:ss")]
         public IStep<string> DateTimeFormat { get; set; } = new Constant<string>("O");

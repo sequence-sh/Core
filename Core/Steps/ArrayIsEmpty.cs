@@ -19,7 +19,7 @@ namespace Reductech.EDR.Core.Steps
         /// <summary>
         /// The array to check for emptiness.
         /// </summary>
-        [StepProperty]
+        [StepProperty(1)]
         [Required]
         public IStep<List<T>> Array { get; set; } = null!;
 

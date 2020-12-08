@@ -34,7 +34,7 @@ namespace Reductech.EDR.Core.Steps
         /// <summary>
         /// The path to the directory to create.
         /// </summary>
-        [StepProperty]
+        [StepProperty(1)]
         [Required]
         public IStep<string> Path { get; set; } = null!;
 

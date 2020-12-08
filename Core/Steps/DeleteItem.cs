@@ -51,7 +51,7 @@ namespace Reductech.EDR.Core.Steps
         /// <summary>
         /// The path to the file or folder to delete.
         /// </summary>
-        [StepProperty]
+        [StepProperty(1)]
         [Required]
         public IStep<string> Path { get; set; } = null!;
 

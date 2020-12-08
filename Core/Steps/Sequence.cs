@@ -41,7 +41,7 @@ namespace Reductech.EDR.Core.Steps
         /// <summary>
         /// The steps of this sequence apart from the final step.
         /// </summary>
-        [StepListProperty]
+        [StepListProperty(1)]
         [Required]
         public IReadOnlyList<IStep<Unit>> InitialSteps { get; set; } = null!;
 
@@ -49,7 +49,7 @@ namespace Reductech.EDR.Core.Steps
         /// The final step of the sequence.
         /// Will be the return value.
         /// </summary>
-        [StepProperty]
+        [StepProperty(1)]
         [Required]
         public IStep<T> FinalStep { get; set; } = null!;
     }

@@ -40,14 +40,14 @@ namespace Reductech.EDR.Core.Steps
         /// <summary>
         /// The path of the file to write to.
         /// </summary>
-        [StepProperty(Order = 0)]
+        [StepProperty(0)]
         [Required]
         public IStep<string> Path { get; set; } = null!;
 
         /// <summary>
         /// The data to write.
         /// </summary>
-        [StepProperty(Order = 2)]
+        [StepProperty(2)]
         [Required]
         public IStep<DataStream> Stream { get; set; } = null!;
 

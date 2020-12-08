@@ -33,14 +33,14 @@ namespace Reductech.EDR.Core.Steps
         /// <summary>
         /// The name of the variable to set.
         /// </summary>
-        [VariableName]
+        [VariableName(1)]
         [Required]
         public VariableName Variable { get; set; }
 
         /// <summary>
         /// The value to set the variable to.
         /// </summary>
-        [StepProperty]
+        [StepProperty(1)]
         [Required]
         public IStep<T> Value { get; set; } = null!;
     }

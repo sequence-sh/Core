@@ -37,21 +37,21 @@ namespace Reductech.EDR.Core.Steps
         /// <summary>
         /// Stream containing the CSV data.
         /// </summary>
-        [StepProperty(Order = 1)]
+        [StepProperty(1)]
         [Required]
         public IStep<DataStream> Stream { get; set; } = null!;
 
         /// <summary>
         /// How the stream is encoded.
         /// </summary>
-        [StepProperty(Order = 2)]
+        [StepProperty(2)]
         [DefaultValueExplanation("UTF8 no BOM")]
         public IStep<EncodingEnum> Encoding { get; set; } = new Constant<EncodingEnum>(EncodingEnum.UTF8);
 
         /// <summary>
         /// The delimiter to use to separate fields.
         /// </summary>
-        [StepProperty(Order = 3)]
+        [StepProperty(3)]
         [DefaultValueExplanation("\\u0014 - DC4")]
         public IStep<string> Delimiter { get; set; } = new Constant<string>("\u0014");
 
@@ -61,7 +61,7 @@ namespace Reductech.EDR.Core.Steps
         /// Should be a single character or an empty string.
         /// If it is empty then strings cannot be quoted.
         /// </summary>
-        [StepProperty(Order = 5)]
+        [StepProperty(5)]
         [DefaultValueExplanation("\u00FE")]
         public IStep<string> QuoteCharacter { get; set; } = new Constant<string>("\u00FE");
 
@@ -70,7 +70,7 @@ namespace Reductech.EDR.Core.Steps
         /// Should be a single character or an empty string.
         /// If it is empty then fields cannot have multiple fields.
         /// </summary>
-        [StepProperty(Order = 6)]
+        [StepProperty(6)]
         [DefaultValueExplanation("|")]
         public IStep<string> MultiValueDelimiter { get; set; } = new Constant<string>("|");
 

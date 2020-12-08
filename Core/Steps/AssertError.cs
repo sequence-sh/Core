@@ -32,7 +32,7 @@ namespace Reductech.EDR.Core.Steps
         /// <summary>
         /// The step to test.
         /// </summary>
-        [StepProperty]
+        [StepProperty(1)]
         [Required]
         public IStep<Unit> Step { get; set; } = null!;
     }

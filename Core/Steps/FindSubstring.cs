@@ -18,14 +18,14 @@ namespace Reductech.EDR.Core.Steps
         /// <summary>
         /// The string to check.
         /// </summary>
-        [StepProperty]
+        [StepProperty(1)]
         [Required]
         public IStep<string> String { get; set; } = null!;
 
         /// <summary>
         /// The substring to find.
         /// </summary>
-        [StepProperty]
+        [StepProperty(1)]
         [Required]
         public IStep<string> SubString { get; set; } = null!;
 

@@ -20,7 +20,7 @@ namespace Reductech.EDR.Core.Steps
         /// <summary>
         /// The entities to iterate over.
         /// </summary>
-        [StepProperty]
+        [StepProperty(1)]
         [Required]
         public IStep<EntityStream> EntityStream { get; set; } = null!;
 
@@ -28,7 +28,7 @@ namespace Reductech.EDR.Core.Steps
         /// The action to perform repeatedly.
         /// Use the Variable &lt;Entity&gt; to access the entity.
         /// </summary>
-        [StepProperty]
+        [StepProperty(1)]
         [Required]
         public IStep<Unit> Action { get; set; } = null!;
 

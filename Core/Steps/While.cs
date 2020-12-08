@@ -38,14 +38,14 @@ namespace Reductech.EDR.Core.Steps
         /// <summary>
         /// The condition to check before performing the action.
         /// </summary>
-        [StepProperty]
+        [StepProperty(1)]
         [Required]
         public IStep<bool> Condition { get; set; } = null!;
 
         /// <summary>
         /// The action to perform repeatedly.
         /// </summary>
-        [StepProperty]
+        [StepProperty(1)]
         [Required]
         public IStep<Unit> Action { get; set; } = null!;
 

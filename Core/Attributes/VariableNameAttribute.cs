@@ -6,5 +6,11 @@ namespace Reductech.EDR.Core.Attributes
     /// Indicates that this property is the name of a variable.
     /// </summary>
     [AttributeUsage(AttributeTargets.Property)]
-    public sealed class VariableNameAttribute : StepPropertyBaseAttribute { }
+    public sealed class VariableNameAttribute : StepPropertyBaseAttribute
+    {
+        /// <inheritdoc />
+        public VariableNameAttribute(int order) : base(order)
+        {
+        }
+    }
 }

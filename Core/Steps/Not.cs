@@ -27,7 +27,7 @@ namespace Reductech.EDR.Core.Steps
         /// <summary>
         /// The value to negate.
         /// </summary>
-        [StepProperty]
+        [StepProperty(1)]
         [Required]
         public IStep<bool> Boolean { get; set; } = null!;
     }

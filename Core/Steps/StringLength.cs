@@ -16,7 +16,7 @@ namespace Reductech.EDR.Core.Steps
         /// <summary>
         /// The string to measure the length of.
         /// </summary>
-        [StepProperty]
+        [StepProperty(1)]
         [Required]
         public IStep<string> String { get; set; } = null!;
 
