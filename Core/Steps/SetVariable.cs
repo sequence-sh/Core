@@ -85,8 +85,10 @@ namespace Reductech.EDR.Core.Steps
 
             var memberType =  GetMemberType(freezableStepData, typeResolver);
 
-            if (memberType.IsFailure) yield return (vn.Value, Maybe<ITypeReference>.None);
-            yield return (vn.Value, Maybe<ITypeReference>.From(memberType.Value));
+            if (memberType.IsFailure)
+                yield return (vn.Value, Maybe<ITypeReference>.None);
+            else
+                yield return (vn.Value, Maybe<ITypeReference>.From(memberType.Value));
         }
 
 
