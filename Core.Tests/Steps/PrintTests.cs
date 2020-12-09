@@ -9,9 +9,7 @@ namespace Reductech.EDR.Core.Tests.Steps
     public class PrintTests : StepTestBase<Print<string>, Unit>
     {
         /// <inheritdoc />
-        public PrintTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
-        {
-        }
+        public PrintTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper) {}
 
         /// <inheritdoc />
         protected override IEnumerable<StepCase> StepCases
@@ -35,6 +33,7 @@ namespace Reductech.EDR.Core.Tests.Steps
             get
             {
                 yield return new DeserializeCase("Named argument", "Print Value: 'Hello'", Unit.Default, "Hello");
+                yield return new DeserializeCase("Log Alias", "Log Value: 'Hello'", Unit.Default, "Hello");
                 yield return new DeserializeCase("Ordered Argument", "Print 'Hello'", Unit.Default, "Hello");
 
             }
