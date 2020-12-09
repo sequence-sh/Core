@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Collections.Immutable;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Internal.Errors;
 
@@ -17,10 +15,6 @@ namespace Reductech.EDR.Core.Internal
 
         /// <inheritdoc />
         public override Type StepType => typeof(TStep);
-
-
-        /// <inheritdoc />
-        public override IEnumerable<Type> EnumTypes => ImmutableArray<Type>.Empty;
 
         /// <inheritdoc />
         protected override Result<ICompoundStep, IError> TryCreateInstance(StepContext stepContext,

@@ -67,14 +67,5 @@ namespace Reductech.EDR.Core.Steps
         /// The instance.
         /// </summary>
         public static SimpleStepFactory<StringToStream, DataStream> Instance { get; } = new StringToStreamStepFactory();
-
-        /// <inheritdoc />
-        public override IEnumerable<Type> EnumTypes
-        {
-            get
-            {
-                yield return typeof(EncodingEnum);
-            }
-        }
     }
 }

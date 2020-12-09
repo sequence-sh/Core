@@ -38,7 +38,28 @@ namespace Reductech.EDR.Core.Internal
         public override string ToString() => TypeName;
 
         /// <inheritdoc />
-        public abstract IEnumerable<Type> EnumTypes { get; }
+        public IEnumerable<Type> EnumTypes
+        {
+            get
+            {
+                return
+                StepType.GetProperties()
+                    .Where(property => property.GetCustomAttribute<StepPropertyBaseAttribute>() != null)
+                    .Select(x => x.PropertyType)
+                    .Select(GetUnderlyingType)
+                    .Where(x => x.IsEnum);
+
+
+                static Type GetUnderlyingType(Type t)
+                {
+                    while (true)
+                    {
+                        if (!t.GenericTypeArguments.Any()) return t;
+                        t = t.GenericTypeArguments.First();
+                    }
+                }
+            }
+        }
 
         /// <inheritdoc />
         public abstract string OutputTypeExplanation { get; }
@@ -146,9 +167,6 @@ namespace Reductech.EDR.Core.Internal
             return Result.Success<IStep, IError>(step);
         }
 
-
-
-
         private static Result<Unit, IError> TrySetVariableName(PropertyInfo propertyInfo,
             ICompoundStep parentStep,
             VariableName variableName,
@@ -175,12 +193,39 @@ namespace Reductech.EDR.Core.Internal
 
             if (freezeResult.IsFailure) return freezeResult.ConvertFailure<Unit>();
 
-            if (!propertyInfo.PropertyType.IsInstanceOfType(freezeResult.Value))
-                return new SingleError($"'{propertyInfo.Name}' cannot take the value '{freezeResult.Value}'", ErrorCode.InvalidCast, new StepErrorLocation(parentStep));
+            var stepToSet = TryCoerceStep(propertyInfo, freezeResult.Value);
 
-            propertyInfo.SetValue(parentStep, freezeResult.Value); //This could throw an exception but we don't expect it.
+            if (stepToSet.IsFailure) return stepToSet.MapError(x => x.WithLocation(parentStep)).ConvertFailure<Unit>();
+
+            propertyInfo.SetValue(parentStep, stepToSet.Value); //This could throw an exception but we don't expect it.
             return Unit.Default;
         }
+
+        private static Result<IStep, IErrorBuilder> TryCoerceStep(PropertyInfo propertyInfo, IStep stepToSet)
+        {
+            if (propertyInfo.PropertyType.IsInstanceOfType(stepToSet))
+                return Result.Success<IStep, IErrorBuilder>(stepToSet); //No coercion required
+
+            if (propertyInfo.PropertyType.IsGenericType &&
+                propertyInfo.PropertyType.GenericTypeArguments.First().IsEnum && stepToSet is Constant<string> constant)
+            {
+                var enumType = propertyInfo.PropertyType.GenericTypeArguments.First();
+
+                if (Enum.TryParse(enumType, constant.Value, true, out var enumValue))
+                {
+                    Type stepType = typeof(Constant<>).MakeGenericType(enumType);
+                    var ecs = Activator.CreateInstance(stepType, enumValue);
+
+                    if (ecs is IStep enumConstantStep && propertyInfo.PropertyType.IsInstanceOfType(enumConstantStep))
+                        return Result.Success<IStep, IErrorBuilder>(enumConstantStep);
+                }
+
+            }
+
+
+            return new ErrorBuilder($"'{propertyInfo.Name}' cannot take the value '{stepToSet.Name}'", ErrorCode.InvalidCast);
+        }
+
 
 
         private static Result<Unit, IError> TrySetStepList(PropertyInfo propertyInfo,

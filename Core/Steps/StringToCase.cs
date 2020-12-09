@@ -63,8 +63,5 @@ namespace Reductech.EDR.Core.Steps
         /// The instance.
         /// </summary>
         public static SimpleStepFactory<StringToCase, string> Instance { get; } = new StringToCaseStepFactory();
-
-        /// <inheritdoc />
-        public override IEnumerable<Type> EnumTypes => new[] { typeof(TextCase) };
     }
 }

@@ -65,8 +65,5 @@ namespace Reductech.EDR.Core.Steps
         /// The instance.
         /// </summary>
         public static SimpleStepFactory<StringTrim, string> Instance { get; } = new StringTrimStepFactory();
-
-        /// <inheritdoc />
-        public override IEnumerable<Type> EnumTypes => new[] { typeof(TrimSide) };
     }
 }

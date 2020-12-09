@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.Immutable;
-using CSharpFunctionalExtensions;
+﻿using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Internal.Errors;
 
 namespace Reductech.EDR.Core.Internal
@@ -21,10 +18,6 @@ namespace Reductech.EDR.Core.Internal
         /// Gets the output type from the member type.
         /// </summary>
         protected abstract ITypeReference GetOutputTypeReference(ITypeReference memberTypeReference);
-
-
-        /// <inheritdoc />
-        public override IEnumerable<Type> EnumTypes => ImmutableList<Type>.Empty;
 
         /// <inheritdoc />
         protected override Result<ICompoundStep, IError> TryCreateInstance(StepContext stepContext,

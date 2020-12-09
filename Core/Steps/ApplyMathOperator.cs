@@ -88,9 +88,6 @@ namespace Reductech.EDR.Core.Steps
         public static SimpleStepFactory<ApplyMathOperator, int> Instance { get; } = new ApplyMathOperatorStepFactory();
 
         /// <inheritdoc />
-        public override IEnumerable<Type> EnumTypes => new[] { typeof(MathOperator) };
-
-        /// <inheritdoc />
         public override IStepSerializer Serializer => new StepSerializer(TypeName, new FixedStringComponent("("),
             new StepComponent(nameof(ApplyMathOperator.Left)),
             SpaceComponent.Instance,
