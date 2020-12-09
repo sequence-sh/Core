@@ -3,9 +3,9 @@
 namespace Reductech.EDR.Core.Attributes
 {
     /// <summary>
-    /// Allows you to define an alternative name for a property
+    /// Allows you to define an alternative name for a property or step
     /// </summary>
-    [AttributeUsage(AttributeTargets.Property, AllowMultiple = true)]
+    [AttributeUsage(AttributeTargets.Property | AttributeTargets.Class, AllowMultiple = true)]
     public sealed class AliasAttribute : Attribute
     {
         /// <summary>
@@ -14,7 +14,7 @@ namespace Reductech.EDR.Core.Attributes
         public AliasAttribute(string name) => Name = name;
 
         /// <summary>
-        /// The alternative name for the property
+        /// The alternative name for the property or step
         /// </summary>
         public string Name { get; }
     }

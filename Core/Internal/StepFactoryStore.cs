@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Reductech.EDR.Core.Attributes;
 
 namespace Reductech.EDR.Core.Internal
 {
@@ -10,10 +11,7 @@ namespace Reductech.EDR.Core.Internal
     /// </summary>
     public class StepFactoryStore
     {
-        /// <summary>
-        /// Creates a new StepFactoryStore.
-        /// </summary>
-        public StepFactoryStore(IReadOnlyDictionary<string, IStepFactory> dictionary, IReadOnlyDictionary<string, Type> enumTypesDictionary)
+        private StepFactoryStore(IReadOnlyDictionary<string, IStepFactory> dictionary, IReadOnlyDictionary<string, Type> enumTypesDictionary)
         {
             Dictionary = dictionary.ToDictionary(x=>x.Key!, x=>x.Value!, StringComparer.OrdinalIgnoreCase)!;
             EnumTypesDictionary = enumTypesDictionary.ToDictionary(x=>x.Key!, x=>x.Value!, StringComparer.OrdinalIgnoreCase)!;
@@ -29,11 +27,23 @@ namespace Reductech.EDR.Core.Internal
         /// </summary>
         public static StepFactoryStore Create(IEnumerable<IStepFactory> factories)
         {
-            var dictionary = factories.ToDictionary(x => x.TypeName);
-            var enumTypesDictionary = factories.SelectMany(x => x.EnumTypes).Distinct()
-                .ToDictionary(x => x.Name ?? "", StringComparer.OrdinalIgnoreCase);
+            var dictionary = factories
+                .SelectMany(factory=> GetStepNames(factory).Select(name=> (factory, name)))
+                .ToDictionary(x => x.name, x=>x.factory);
+
+
+            var enumTypesDictionary = dictionary.Values.SelectMany(x => x.EnumTypes).Distinct()
+                .ToDictionary(x => x.Name, StringComparer.OrdinalIgnoreCase);
 
             return new StepFactoryStore(dictionary, enumTypesDictionary!);
+        }
+
+        private static IEnumerable<string> GetStepNames(IStepFactory stepFactory)
+        {
+            yield return stepFactory.TypeName;
+
+            foreach (var alias in stepFactory.StepType.GetCustomAttributes<AliasAttribute>())
+                yield return alias.Name;
         }
 
         /// <summary>
