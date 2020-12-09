@@ -7,5 +7,11 @@ namespace Reductech.EDR.Core.Attributes
     /// </summary>
 
     [AttributeUsage(AttributeTargets.Property, AllowMultiple = false, Inherited = true)]
-    public sealed class StepListPropertyAttribute : StepPropertyBaseAttribute { }
+    public sealed class StepListPropertyAttribute : StepPropertyBaseAttribute
+    {
+        /// <inheritdoc />
+        public StepListPropertyAttribute(int order) : base(order)
+        {
+        }
+    }
 }

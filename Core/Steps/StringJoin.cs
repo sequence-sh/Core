@@ -17,14 +17,14 @@ namespace Reductech.EDR.Core.Steps
         /// <summary>
         /// The delimiter to use.
         /// </summary>
-        [StepProperty]
+        [StepProperty(1)]
         [Required]
         public IStep<string> Delimiter { get; set; } = null!;
 
         /// <summary>
         /// The string to join.
         /// </summary>
-        [StepProperty]
+        [StepProperty(2)]
         [Required]
         public IStep<List<string>> Strings { get; set; } = null!;
 

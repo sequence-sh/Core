@@ -7,6 +7,7 @@ using Reductech.EDR.Core.Enums;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.Util;
+using StepParameterDict = System.Collections.Generic.Dictionary<Reductech.EDR.Core.Internal.StepParameterReference, Reductech.EDR.Core.Internal.FreezableStepProperty>;
 
 namespace Reductech.EDR.Core.Internal
 {
@@ -18,13 +19,70 @@ namespace Reductech.EDR.Core.Internal
         //TODO move other CreateFreezable methods here
 
         /// <summary>
+        /// Create a new Freezable Sequence
+        /// </summary>
+        public static IFreezableStep CreateFreezableSequence(IEnumerable<IFreezableStep> steps, IFreezableStep finalStep, Configuration? configuration, IErrorLocation location)
+        {
+            var dict = new StepParameterDict
+            {
+                {new StepParameterReference(nameof(Sequence<object>.InitialSteps)), new FreezableStepProperty(steps.ToImmutableList(), location )},
+                {new StepParameterReference(nameof(Sequence<object>.FinalStep)), new FreezableStepProperty(finalStep, location )},
+            };
+
+            var fpd = new FreezableStepData(dict, location);
+
+
+            return new CompoundFreezableStep(SequenceStepFactory. Instance.TypeName, fpd, configuration);
+        }
+
+        /// <summary>
+        /// Create a freezable GetVariable step.
+        /// </summary>
+        public static IFreezableStep CreateFreezableGetVariable(VariableName variableName, IErrorLocation location)
+        {
+            var dict = new StepParameterDict
+            {
+                {
+                    new StepParameterReference(nameof(GetVariable<object>.Variable)), new FreezableStepProperty(variableName, location)
+                }
+            };
+
+            var fpd = new FreezableStepData(dict, location);
+            var step = new CompoundFreezableStep(GetVariableStepFactory.Instance.TypeName, fpd, null);
+
+            return step;
+        }
+
+        /// <summary>
+        /// Create a freezable GetVariable step.
+        /// </summary>
+        public static IFreezableStep CreateFreezableSetVariable(FreezableStepProperty variableName, FreezableStepProperty value, IErrorLocation location)
+        {
+            var dict = new StepParameterDict
+            {
+                {
+                    new StepParameterReference(nameof(SetVariable<object>.Variable)), variableName
+                },
+                {
+                    new StepParameterReference(nameof(SetVariable<object>.Value)), value
+                },
+            };
+
+            var fpd = new FreezableStepData(dict, location);
+            var step = new CompoundFreezableStep(SetVariableStepFactory.Instance.TypeName, fpd, null);
+
+            return step;
+        }
+
+
+        /// <summary>
         /// Create a freezable Not step.
         /// </summary>
         public static IFreezableStep CreateFreezableNot(IFreezableStep boolean, IErrorLocation location)
         {
-            var dict = new Dictionary<string, FreezableStepProperty>
+            var dict = new StepParameterDict
             {
-                {nameof(Not.Boolean), new FreezableStepProperty(boolean, location)},
+                {new StepParameterReference(nameof(Not.Boolean)), new FreezableStepProperty(boolean, location)},
             };
 
             var fpd = new FreezableStepData(dict, location);
@@ -42,9 +100,11 @@ namespace Reductech.EDR.Core.Internal
             if (elements.Any() && elements
                 .All(x => x is CreateEntityFreezableStep || x is ConstantFreezableStep cfs && cfs.Value.IsT6))
             {
-                var dict = new Dictionary<string, FreezableStepProperty>
+                var dict = new StepParameterDict
                 {
-                    {nameof(EntityStreamCreate.Elements), new FreezableStepProperty(elements, location)}
+                    {
+                        new StepParameterReference(nameof(EntityStreamCreate.Elements)), new FreezableStepProperty(elements, location)
+                    }
                 };
 
                 var fpd = new FreezableStepData(dict, location);
@@ -53,9 +113,11 @@ namespace Reductech.EDR.Core.Internal
             }
             else
             {
-                var dict = new Dictionary<string, FreezableStepProperty>
+                var dict = new StepParameterDict
                 {
-                    {nameof(Array<object>.Elements), new FreezableStepProperty(elements, location)}
+                    {
+                        new StepParameterReference(nameof(Array<object>.Elements)), new FreezableStepProperty(elements, location)
+                    }
                 };
 
                 var fpd = new FreezableStepData(dict, location);
@@ -66,6 +128,9 @@ namespace Reductech.EDR.Core.Internal
 
     }
 
+    /// <summary>
+    /// Contains helper methods for creating infix steps
+    /// </summary>
     public static class InfixHelper
     {
         private class OperatorData
@@ -112,11 +177,17 @@ namespace Reductech.EDR.Core.Internal
             if (errors.Any())
                 return Result.Failure<FreezableStepProperty, IError>(ErrorList.Combine(errors));
 
-            var data = new FreezableStepData(new Dictionary<string, FreezableStepProperty>
+            var data = new FreezableStepData(new StepParameterDict
             {
-                {opData!.OperatorStepName, new FreezableStepProperty(opData.OperatorStep, errorLocation )},
-                {opData.LeftName, left.Value},
-                {opData.RightName, right.Value},
+                {
+                    new StepParameterReference(opData!.OperatorStepName), new FreezableStepProperty(opData.OperatorStep, errorLocation )
+                },
+                {
+                    new StepParameterReference(opData.LeftName), left.Value
+                },
+                {
+                    new StepParameterReference(opData.RightName), right.Value
+                },
 
             }, errorLocation);
 

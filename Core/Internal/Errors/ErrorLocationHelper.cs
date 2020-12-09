@@ -1,6 +1,4 @@
-﻿using System.Collections.Immutable;
-using System.Linq;
-using Reductech.EDR.Core.Parser;
+﻿using Reductech.EDR.Core.Parser;
 
 namespace Reductech.EDR.Core.Internal.Errors
 {

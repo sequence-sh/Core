@@ -21,7 +21,7 @@ namespace Reductech.EDR.Core.Steps
         /// <summary>
         /// The left operand. Will always be evaluated.
         /// </summary>
-        [StepProperty]
+        [StepProperty(1)]
         [Required]
         public IStep<bool> Left { get; set; } = null!;
 
@@ -29,7 +29,7 @@ namespace Reductech.EDR.Core.Steps
         /// <summary>
         /// The operator to apply.
         /// </summary>
-        [StepProperty]
+        [StepProperty(2)]
         [Required]
         public IStep<BooleanOperator> Operator { get; set; } = null!;
 
@@ -37,7 +37,7 @@ namespace Reductech.EDR.Core.Steps
         /// <summary>
         /// The right operand. Will not be evaluated unless necessary.
         /// </summary>
-        [StepProperty]
+        [StepProperty(3)]
         [Required]
         public IStep<bool> Right { get; set; } = null!;
 

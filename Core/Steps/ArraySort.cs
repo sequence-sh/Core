@@ -20,14 +20,14 @@ namespace Reductech.EDR.Core.Steps
         /// <summary>
         /// The array to modify.
         /// </summary>
-        [StepProperty]
+        [StepProperty(1)]
         [Required]
         public IStep<List<T>> Array { get; set; } = null!;
 
         /// <summary>
         /// Whether to sort in descending order.
         /// </summary>
-        [StepProperty(Order = 3)]
+        [StepProperty(2)]
         [DefaultValueExplanation("False")]
         public IStep<bool> Descending { get; set; } = new Constant<bool>(false);
 
@@ -74,7 +74,7 @@ namespace Reductech.EDR.Core.Steps
         /// <inheritdoc />
         protected override Result<ITypeReference, IError> GetMemberType(FreezableStepData freezableStepData,
             TypeResolver typeResolver) =>
-            freezableStepData.GetStep(nameof(ArraySort<object>.Array), TypeName)
+            freezableStepData.TryGetStep(nameof(ArraySort<object>.Array), StepType)
                 .Bind(x => x.TryGetOutputTypeReference(typeResolver))
                 .Bind(x => x.TryGetGenericTypeReference(typeResolver, 0)
                     .MapError(e=>e.WithLocation(this, freezableStepData)))

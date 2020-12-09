@@ -34,7 +34,7 @@ namespace Reductech.EDR.Core.Steps
         /// <summary>
         /// The name of the file to read.
         /// </summary>
-        [StepProperty]
+        [StepProperty(1)]
         [Required]
         public IStep<string> Path { get; set; } = null!;
 

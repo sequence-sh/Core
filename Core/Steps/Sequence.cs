@@ -5,6 +5,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
+using OneOf;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
@@ -41,7 +42,7 @@ namespace Reductech.EDR.Core.Steps
         /// <summary>
         /// The steps of this sequence apart from the final step.
         /// </summary>
-        [StepListProperty]
+        [StepListProperty(1)]
         [Required]
         public IReadOnlyList<IStep<Unit>> InitialSteps { get; set; } = null!;
 
@@ -49,7 +50,7 @@ namespace Reductech.EDR.Core.Steps
         /// The final step of the sequence.
         /// Will be the return value.
         /// </summary>
-        [StepProperty]
+        [StepProperty(2)]
         [Required]
         public IStep<T> FinalStep { get; set; } = null!;
     }
@@ -74,7 +75,7 @@ namespace Reductech.EDR.Core.Steps
 
         /// <inheritdoc />
         protected override Result<ITypeReference, IError> GetMemberType(FreezableStepData freezableStepData, TypeResolver typeResolver) =>
-            freezableStepData.GetStep(nameof(Sequence<object>.FinalStep), TypeName)
+            freezableStepData.TryGetStep(nameof(Sequence<object>.FinalStep), StepType)
                 .Bind(x => x.TryGetOutputTypeReference(typeResolver));
 
         /// <inheritdoc />
@@ -83,21 +84,6 @@ namespace Reductech.EDR.Core.Steps
         /// <inheritdoc />
         public override IStepSerializer Serializer { get; } = SequenceSerializer.Instance;
 
-        /// <summary>
-        /// Create a new Freezable Sequence
-        /// </summary>
-        public static IFreezableStep CreateFreezable(IEnumerable<IFreezableStep> steps, IFreezableStep finalStep, Configuration? configuration, IErrorLocation location)
-        {
-            var dict = new Dictionary<string, FreezableStepProperty>()
-            {
-                {nameof(Sequence<object>.InitialSteps), new FreezableStepProperty(steps.ToImmutableList(), location )},
-                {nameof(Sequence<object>.FinalStep), new FreezableStepProperty(finalStep, location )},
-            };
 
-            var fpd = new FreezableStepData( dict, location);
-
-
-            return new CompoundFreezableStep(Instance.TypeName, fpd, configuration);
-        }
     }
 }

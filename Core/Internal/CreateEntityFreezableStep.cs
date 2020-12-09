@@ -14,15 +14,15 @@ namespace Reductech.EDR.Core.Internal
         /// Create a new CreateEntityFreezableStep
         /// </summary>
         /// <param name="data"></param>
-        public CreateEntityFreezableStep(FreezableStepData data) => FreezableStepData = data;
+        public CreateEntityFreezableStep(FreezableEntityData data) => FreezableEntityData = data;
 
         /// <summary>
         /// The data
         /// </summary>
-        public FreezableStepData FreezableStepData { get; }
+        public FreezableEntityData FreezableEntityData { get; }
 
         /// <inheritdoc />
-        public bool Equals(IFreezableStep? other) => other is CreateEntityFreezableStep oStep && FreezableStepData.Equals(oStep.FreezableStepData);
+        public bool Equals(IFreezableStep? other) => other is CreateEntityFreezableStep oStep && FreezableEntityData.Equals(oStep.FreezableEntityData);
 
         /// <inheritdoc />
         public string StepName => "Create Entity";
@@ -35,7 +35,7 @@ namespace Reductech.EDR.Core.Internal
 
 
 
-            foreach (var (propertyName, stepMember) in FreezableStepData.StepProperties)
+            foreach (var (propertyName, stepMember) in FreezableEntityData.EntityProperties)
             {
                 var frozen = stepMember.ConvertToStep()
                     .TryFreeze(stepContext)
@@ -60,7 +60,7 @@ namespace Reductech.EDR.Core.Internal
         /// <inheritdoc />
         public Result<IReadOnlyCollection<(VariableName variableName, Maybe<ITypeReference>)>, IError> GetVariablesSet(TypeResolver typeResolver)
         {
-            return FreezableStepData.GetVariablesSet(typeResolver);
+            return FreezableEntityData.GetVariablesSet(typeResolver);
         }
 
         /// <inheritdoc />

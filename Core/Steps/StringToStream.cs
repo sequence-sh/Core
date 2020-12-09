@@ -41,14 +41,14 @@ namespace Reductech.EDR.Core.Steps
         /// <summary>
         /// The string to convert to a stream.
         /// </summary>
-        [StepProperty(Order = 1)]
+        [StepProperty(1)]
         [Required]
         public IStep<string> String { get; set; } = null!;
 
         /// <summary>
         /// How the stream is encoded.
         /// </summary>
-        [StepProperty(Order = 2)]
+        [StepProperty(2)]
         [DefaultValueExplanation("UTF8 no BOM")]
         public IStep<EncodingEnum> Encoding { get; set; } = new Constant<EncodingEnum>(EncodingEnum.UTF8);
 

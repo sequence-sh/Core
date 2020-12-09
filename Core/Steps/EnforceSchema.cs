@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Threading;
@@ -72,7 +71,7 @@ namespace Reductech.EDR.Core.Steps
         /// <summary>
         /// Entities to enforce the schema on
         /// </summary>
-        [StepProperty]
+        [StepProperty(1)]
         [Required]
         public IStep<EntityStream> EntityStream { get; set; } = null!;
 
@@ -81,14 +80,14 @@ namespace Reductech.EDR.Core.Steps
         /// This must be an entity with the properties of a schema.
         /// All other properties will be ignored.
         /// </summary>
-        [StepProperty]
+        [StepProperty(2)]
         [Required]
         public IStep<Entity> Schema { get; set; } = null!;
 
         /// <summary>
         /// How to behave if an error occurs.
         /// </summary>
-        [StepProperty]
+        [StepProperty(3)]
         [DefaultValueExplanation("Fail")]
         public IStep<ErrorBehaviour> ErrorBehaviour { get; set; } = new Constant<ErrorBehaviour>(Steps.ErrorBehaviour.Fail);
 

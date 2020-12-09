@@ -20,19 +20,19 @@ namespace Reductech.EDR.Core.Entities
         /// <summary>
         /// The name of the schema.
         /// </summary>
-        [ConfigProperty(Order = 1)]
+        [ConfigProperty(1)]
         public string Name { get; set; } = null!;
 
         /// <summary>
         /// The schema properties.
         /// </summary>
-        [ConfigProperty(Order = 2)]
+        [ConfigProperty(2)]
         public Dictionary<string, SchemaProperty> Properties { get; set; } = null!; //public setter for deserialization
 
         /// <summary>
         /// Whether properties other than the explicitly defined properties are allowed.
         /// </summary>
-        [ConfigProperty(Order = 3)]
+        [ConfigProperty(3)]
         public bool AllowExtraProperties { get; set; } = true;
 
         /// <inheritdoc />

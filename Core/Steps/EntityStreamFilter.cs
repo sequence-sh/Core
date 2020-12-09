@@ -48,14 +48,14 @@ namespace Reductech.EDR.Core.Steps
         /// <summary>
         /// The entities to filter
         /// </summary>
-        [StepProperty(Order = 1)]
+        [StepProperty(1)]
         [Required]
         public IStep<EntityStream> EntityStream { get; set; } = null!;
 
         /// <summary>
         /// A function that determines whether an entity should be included from the variable &lt;Entity&gt;
         /// </summary>
-        [StepProperty(Order = 2)]
+        [StepProperty(2)]
         [Required]
         public IStep<bool> Predicate { get; set; } = null!;
 

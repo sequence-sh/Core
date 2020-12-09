@@ -21,14 +21,14 @@ namespace Reductech.EDR.Core.Steps
         /// <summary>
         /// The item to the left of the operator.
         /// </summary>
-        [StepProperty]
+        [StepProperty(1)]
         [Required]
         public IStep<T> Left { get; set; } = null!;
 
         /// <summary>
         /// The operator to use for comparison.
         /// </summary>
-        [StepProperty]
+        [StepProperty(2)]
         [Required]
 
         public IStep<CompareOperator> Operator { get; set; } = null!;
@@ -36,7 +36,7 @@ namespace Reductech.EDR.Core.Steps
         /// <summary>
         /// The item to the right of the operator.
         /// </summary>
-        [StepProperty]
+        [StepProperty(3)]
         [Required]
         public IStep<T> Right { get; set; } = null!;
 
@@ -100,10 +100,10 @@ namespace Reductech.EDR.Core.Steps
         protected override Result<ITypeReference, IError> GetMemberType(FreezableStepData freezableStepData,
             TypeResolver typeResolver)
         {
-            var result = freezableStepData.GetStep(nameof(Compare<int>.Left), TypeName)
+            var result = freezableStepData.TryGetStep(nameof(Compare<int>.Left), StepType)
                 .MapError(e=>e)
                 .Bind(x => x.TryGetOutputTypeReference(typeResolver))
-                .Compose(() => freezableStepData.GetStep(nameof(Compare<int>.Right), TypeName)
+                .Compose(() => freezableStepData.TryGetStep(nameof(Compare<int>.Right), StepType)
                     .Bind(x => x.TryGetOutputTypeReference(typeResolver))
                 )
                 .Map(x => new[] { x.Item1, x.Item2 })

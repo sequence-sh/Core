@@ -17,26 +17,25 @@ namespace Reductech.EDR.Core.Steps
     public sealed class ForEach<T> : CompoundStep<Unit>
     {
         /// <summary>
-        /// The action to perform repeatedly.
+        /// The elements to iterate over.
         /// </summary>
-        [StepProperty]
+        [StepProperty(1)]
         [Required]
-        public IStep<Unit> Action { get; set; } = null!;
-
+        public IStep<List<T>> Array { get; set; } = null!;
 
         /// <summary>
         /// The name of the variable to loop over.
         /// </summary>
-        [VariableName]
+        [VariableName(2)]
         [Required]
         public VariableName Variable { get; set; } //TODO use x
 
         /// <summary>
-        /// The elements to iterate over.
+        /// The action to perform repeatedly.
         /// </summary>
-        [StepProperty]
+        [StepProperty(3)]
         [Required]
-        public IStep<List<T>> Array { get; set; } = null!;
+        public IStep<Unit> Action { get; set; } = null!;
 
         /// <inheritdoc />
         public override async Task<Result<Unit, IError>> Run(IStateMonad stateMonad,
@@ -82,7 +81,7 @@ namespace Reductech.EDR.Core.Steps
         /// <inheritdoc />
         protected override Result<ITypeReference, IError> GetMemberType(FreezableStepData freezableStepData,
             TypeResolver typeResolver) =>
-            freezableStepData.GetStep(nameof(ForEach<object>.Array), TypeName)
+            freezableStepData.TryGetStep(nameof(ForEach<object>.Array), StepType)
                 .Bind(x => x.TryGetOutputTypeReference(typeResolver))
                 .Bind(x=>x.TryGetGenericTypeReference(typeResolver, 0)
                 .MapError(e=>e.WithLocation(this, freezableStepData))
@@ -95,7 +94,7 @@ namespace Reductech.EDR.Core.Steps
         /// <inheritdoc />
         public override IEnumerable<(VariableName variableName, Maybe<ITypeReference>)> GetTypeReferencesSet(FreezableStepData freezableStepData, TypeResolver typeResolver)
         {
-            var vn = freezableStepData.GetVariableName(nameof(ForEach<object>.Variable), TypeName);
+            var vn = freezableStepData.TryGetVariableName(nameof(ForEach<object>.Variable), StepType);
             if(vn.IsFailure) yield break;
 
 

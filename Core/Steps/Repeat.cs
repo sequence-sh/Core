@@ -20,14 +20,14 @@ namespace Reductech.EDR.Core.Steps
         /// <summary>
         /// The element to repeat.
         /// </summary>
-        [StepProperty]
+        [StepProperty(1)]
         [Required]
         public IStep<T> Element { get; set; } = null!;
 
         /// <summary>
         /// The number of times to repeat the element
         /// </summary>
-        [StepProperty]
+        [StepProperty(2)]
         [Required]
         public IStep<int> Number { get; set; } = null!;
 
@@ -67,7 +67,7 @@ namespace Reductech.EDR.Core.Steps
         /// <inheritdoc />
         protected override Result<ITypeReference, IError> GetMemberType(FreezableStepData freezableStepData,
             TypeResolver typeResolver) =>
-            freezableStepData.GetStep(nameof(Repeat<object>.Element), TypeName)
+            freezableStepData.TryGetStep(nameof(Repeat<object>.Element), StepType)
                 .Bind(x => x.TryGetOutputTypeReference(typeResolver));
     }
 }

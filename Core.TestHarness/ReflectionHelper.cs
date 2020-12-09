@@ -144,7 +144,7 @@ namespace Reductech.EDR.Core.TestHarness
             {
 
                 var constants = cs.FreezableStepData
-                    .StepProperties[nameof(Steps.Array<object>.Elements)]
+                    .StepProperties[new StepParameterReference(nameof(Steps.Array<object>.Elements))]
                     .StepList.Value.Cast<ConstantFreezableStep>();
 
                 var list = new List<string>();

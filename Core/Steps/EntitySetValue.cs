@@ -38,21 +38,21 @@ namespace Reductech.EDR.Core.Steps
         /// <summary>
         /// The entity to set the property on.
         /// </summary>
-        [StepProperty(Order = 1)]
+        [StepProperty(1)]
         [Required]
         public IStep<Entity> Entity { get; set; } = null!;
 
         /// <summary>
         /// The name of the property to set.
         /// </summary>
-        [StepProperty(Order = 2)]
+        [StepProperty(2)]
         [Required]
         public IStep<string> Property { get; set; } = null!;
 
         /// <summary>
         /// The new value of the property to set.
         /// </summary>
-        [StepProperty(Order = 3)]
+        [StepProperty(3)]
         [Required]
         public IStep<T> Value { get; set; } = null!;
 
@@ -86,7 +86,7 @@ namespace Reductech.EDR.Core.Steps
         /// <inheritdoc />
         protected override Result<ITypeReference, IError> GetMemberType(FreezableStepData freezableStepData, TypeResolver typeResolver)
         {
-            var r1 = freezableStepData.GetStep(nameof(EntitySetValue<object>.Value), TypeName)
+            var r1 = freezableStepData.TryGetStep(nameof(EntitySetValue<object>.Value), StepType)
                 .Bind(x => x.TryGetOutputTypeReference(typeResolver));
 
             return r1;

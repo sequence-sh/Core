@@ -20,14 +20,14 @@ namespace Reductech.EDR.Core.Steps
         /// <summary>
         /// The array to check.
         /// </summary>
-        [StepProperty]
+        [StepProperty(1)]
         [Required]
         public IStep<List<T>> Array { get; set; } = null!;
 
         /// <summary>
         /// The element to look for.
         /// </summary>
-        [StepProperty]
+        [StepProperty(2)]
         [Required]
         public IStep<T> Element { get; set; } = null!;
 
@@ -65,7 +65,7 @@ namespace Reductech.EDR.Core.Steps
 
         /// <inheritdoc />
         protected override Result<ITypeReference, IError> GetMemberType(FreezableStepData freezableStepData, TypeResolver typeResolver) =>
-            freezableStepData.GetStep(nameof(FindElement<object>.Array), TypeName)
+            freezableStepData.TryGetStep(nameof(FindElement<object>.Array), StepType)
                 .Bind(x => x.TryGetOutputTypeReference(typeResolver))
                 .Bind(x=>x.TryGetGenericTypeReference(typeResolver, 0)
                 .MapError(e=>e.WithLocation(this, freezableStepData))

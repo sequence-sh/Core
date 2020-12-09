@@ -225,7 +225,7 @@ namespace Reductech.EDR.Core.Tests.Steps
             /// <summary>
             /// The alpha property. Required
             /// </summary>
-            [StepProperty(Order = 1)]
+            [StepProperty(1)]
             [Required]
             [AllowedRange("Greater than 1")]
 
@@ -242,7 +242,7 @@ namespace Reductech.EDR.Core.Tests.Steps
             /// <summary>
             /// The beta property. Not Required.
             /// </summary>
-            [StepProperty(Order = 2)]
+            [StepProperty(2)]
             [SeeAlso("Alpha")]
             [DefaultValueExplanation("Two hundred")]
             public IStep<string> Beta { get; set; } = new Constant<string>("Two hundred");
@@ -251,14 +251,14 @@ namespace Reductech.EDR.Core.Tests.Steps
             /// <summary>
             /// The delta property.
             /// </summary>
-            [StepListProperty(Order = 4)]
+            [StepListProperty(4)]
             [ValueDelimiter(",")]
             public IReadOnlyList<IStep<bool>> Delta { get; set; } = null!;
 
             /// <summary>
             /// The Gamma property.
             /// </summary>
-            [VariableName(Order = 3)]
+            [VariableName(3)]
             public VariableName Gamma { get; set; }
             // ReSharper restore UnusedMember.Local
 

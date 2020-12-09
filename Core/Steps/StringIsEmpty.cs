@@ -26,7 +26,7 @@ namespace Reductech.EDR.Core.Steps
         /// <summary>
         /// The string to check for being empty.
         /// </summary>
-        [StepProperty]
+        [StepProperty(1)]
         [Required]
         public IStep<string> String { get; set; } = null!;
 

@@ -38,7 +38,7 @@ namespace Reductech.EDR.Core.Steps
         /// <summary>
         /// The paths to combine.
         /// </summary>
-        [StepProperty(Order = 1)]
+        [StepProperty(1)]
         [Required]
         public IStep<List<string>> Paths { get; set; } = null!;
 

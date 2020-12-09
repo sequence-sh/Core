@@ -67,7 +67,7 @@ namespace Reductech.EDR.Core.Steps
         /// <summary>
         /// The entities to sort
         /// </summary>
-        [StepProperty(Order = 1)]
+        [StepProperty(1)]
         [Required]
         public IStep<EntityStream> EntityStream { get; set; } = null!;
 
@@ -75,14 +75,14 @@ namespace Reductech.EDR.Core.Steps
         /// A function that gets the key to sort by from the variable &lt;Entity&gt;
         /// To sort by multiple properties, concatenate several keys
         /// </summary>
-        [StepProperty(Order = 2)]
+        [StepProperty(2)]
         [Required]
         public IStep<string> KeySelector { get; set; } = null!;
 
         /// <summary>
         /// Whether to sort in descending order.
         /// </summary>
-        [StepProperty(Order = 3)]
+        [StepProperty(3)]
         [DefaultValueExplanation("False")]
         public IStep<bool> Descending { get; set; } = new Constant<bool>(false);
 

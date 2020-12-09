@@ -20,14 +20,14 @@ infixOperator		: DASH
 					| LESSTHAN
 					| GREATERTHAN ;
 infixOperation		: term infixOperator term ;
-functionMember		: TOKEN COLON term ;
-function			: TOKEN ( functionMember )* ;
-entity				: OPENBRACKET ( functionMember )*  CLOSEBRACKET ;
+namedArgument		: NAME COLON term ;
+function			: NAME (term)* (namedArgument)* ;
+entity				: OPENBRACKET (namedArgument)*  CLOSEBRACKET ;
 bracketedStep		: OPENBRACKET step CLOSEBRACKET ;
 boolean				: TRUE | FALSE ;
 quotedString		: DOUBLEQUOTEDSTRING | SINGLEQUOTEDSTRING ;
 number              : NUMBER ;
-enumeration			: TOKEN DOT TOKEN ;
+enumeration			: NAME DOT NAME ;
 term				: simpleTerm
 					| bracketedStep ;
 step				: function
@@ -79,5 +79,5 @@ DOUBLEQUOTEDSTRING	: '"' (~('"' | '\\' | '\r' | '\n' | '\t') | '\\' ('"' | '\\' 
 SINGLEQUOTEDSTRING	: '\'' (~('\'') | '\'\'')* '\'' ;
 TRUE				: [Tt] [Rr] [Uu] [Ee];
 FALSE				: [Ff] [Aa] [Ll] [Ss] [Ee];
-TOKEN				: [a-zA-Z0-9_]+;
+NAME				: [a-zA-Z0-9_]+;
 WHITESPACE			: (' ' | '\t' | '\r' | '\n') -> skip ;

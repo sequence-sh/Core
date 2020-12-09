@@ -19,7 +19,7 @@ namespace Reductech.EDR.Core.Steps
         /// <summary>
         /// The array to check for emptiness.
         /// </summary>
-        [StepProperty]
+        [StepProperty(1)]
         [Required]
         public IStep<List<T>> Array { get; set; } = null!;
 
@@ -58,7 +58,7 @@ namespace Reductech.EDR.Core.Steps
         /// <inheritdoc />
         protected override Result<ITypeReference, IError> GetMemberType(FreezableStepData freezableStepData,
             TypeResolver typeResolver) =>
-            freezableStepData.GetStep(nameof(ArrayIsEmpty<object>.Array), TypeName)
+            freezableStepData.TryGetStep(nameof(ArrayIsEmpty<object>.Array), StepType)
                 .Bind(x => x.TryGetOutputTypeReference(typeResolver))
                 .Bind(x=>x.TryGetGenericTypeReference(typeResolver, 0)
                 .MapError(e=>e.WithLocation(this, freezableStepData)))

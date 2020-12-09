@@ -31,21 +31,21 @@ namespace Reductech.EDR.Core.Steps
         /// <summary>
         /// Whether to follow the Then Branch
         /// </summary>
-        [StepProperty]
+        [StepProperty(1)]
         [Required]
         public IStep<bool> Condition { get; set; } = null!;
 
         /// <summary>
         /// The Consequent. Returned if the condition is true.
         /// </summary>
-        [StepProperty]
+        [StepProperty(2)]
         [Required]
         public IStep<T> Then { get; set; } = null!;
 
         /// <summary>
         /// The Alternative. Returned if the condition is false.
         /// </summary>
-        [StepProperty]
+        [StepProperty(3)]
         [Required]
         public IStep<T> Else { get; set; } = null!;
     }
@@ -73,8 +73,8 @@ namespace Reductech.EDR.Core.Steps
         /// <inheritdoc />
         protected override Result<ITypeReference, IError> GetMemberType(FreezableStepData freezableStepData,
             TypeResolver typeResolver) =>
-            freezableStepData.GetStep(nameof(ValueIf<object>.Then), TypeName)
-                .Compose(() => freezableStepData.GetStep(nameof(ValueIf<object>.Else), TypeName))
+            freezableStepData.TryGetStep(nameof(ValueIf<object>.Then), StepType)
+                .Compose(() => freezableStepData.TryGetStep(nameof(ValueIf<object>.Else), StepType))
                 .Bind(x => x.Item1.TryGetOutputTypeReference(typeResolver)
                     .Compose(() => x.Item2.TryGetOutputTypeReference(typeResolver)))
                 .Bind(x => MultipleTypeReference.TryCreate(new[] { x.Item1, x.Item2 }, TypeName)

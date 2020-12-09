@@ -5,7 +5,6 @@ using System.Linq;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.Internal.Errors;
-using Reductech.EDR.Core.Steps;
 using Opt = OneOf.OneOf<Reductech.EDR.Core.Internal.VariableName, Reductech.EDR.Core.Internal.IFreezableStep, System.Collections.Immutable.ImmutableList<Reductech.EDR.Core.Internal.IFreezableStep>>;
 
 
@@ -167,7 +166,7 @@ namespace Reductech.EDR.Core.Internal
 
             IFreezableStep MapVariableName(VariableName vn)
             {
-                var getVariableStep = GetVariableStepFactory.CreateFreezable(vn, Location);
+                var getVariableStep = FreezableFactory.CreateFreezableGetVariable(vn, Location);
                 return getVariableStep;
             }
         }

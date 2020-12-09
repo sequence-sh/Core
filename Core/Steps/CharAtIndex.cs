@@ -16,7 +16,7 @@ namespace Reductech.EDR.Core.Steps
         /// <summary>
         /// The string to extract a substring from.
         /// </summary>
-        [StepProperty]
+        [StepProperty(1)]
         [Required]
         public IStep<string> String { get; set; } = null!;
 
@@ -24,7 +24,7 @@ namespace Reductech.EDR.Core.Steps
         /// <summary>
         /// The index.
         /// </summary>
-        [StepProperty]
+        [StepProperty(2)]
         [Required]
         public IStep<int> Index { get; set; } = null!;
 

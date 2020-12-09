@@ -53,14 +53,14 @@ namespace Reductech.EDR.Core.Steps
         /// <summary>
         /// The left operand.
         /// </summary>
-        [StepProperty]
+        [StepProperty(1)]
         [Required]
         public IStep<int> Left { get; set; } = null!;
 
         /// <summary>
         /// The operator to apply.
         /// </summary>
-        [StepProperty]
+        [StepProperty(2)]
         [Required]
 
         public IStep<MathOperator> Operator { get; set; } = null!;
@@ -68,7 +68,7 @@ namespace Reductech.EDR.Core.Steps
         /// <summary>
         /// The right operand.
         /// </summary>
-        [StepProperty]
+        [StepProperty(3)]
         [Required]
         public IStep<int> Right { get; set; } = null!;
 

@@ -24,7 +24,8 @@ namespace Reductech.EDR.Core.Tests.Steps
         protected override IEnumerable<DeserializeCase> DeserializeCases {
             get
             {
-                yield return new DeserializeCase("Short Form", "not boolean: true", false);
+                yield return new DeserializeCase("Ordered argument", "not true", false);
+                yield return new DeserializeCase("Named argument", "not boolean: true", false);
             }
 
         }

@@ -35,21 +35,21 @@ namespace Reductech.EDR.Core.Steps
         /// <summary>
         /// The path to the archive to extract.
         /// </summary>
-        [StepProperty]
+        [StepProperty(1)]
         [Required]
         public IStep<string> ArchiveFilePath { get; set; } = null!;
 
         /// <summary>
         /// The directory to extract to.
         /// </summary>
-        [StepProperty]
+        [StepProperty(2)]
         [Required]
         public IStep<string> Destination { get; set; } = null!;
 
         /// <summary>
         /// Whether to overwrite files when extracting.
         /// </summary>
-        [StepProperty]
+        [StepProperty(3)]
         [DefaultValueExplanation("false")]
         public IStep<bool> Overwrite { get; set; } = new Constant<bool>(false);
 
