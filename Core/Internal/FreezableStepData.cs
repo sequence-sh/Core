@@ -3,8 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Internal.Errors;
-using Reductech.EDR.Core.Util;
-using StepPropertyDict = System.Collections.Generic.IReadOnlyDictionary<OneOf.OneOf<string, int>, Reductech.EDR.Core.Internal.FreezableStepProperty>;
+using StepParameterDict = System.Collections.Generic.IReadOnlyDictionary<Reductech.EDR.Core.Internal.StepParameterReference, Reductech.EDR.Core.Internal.FreezableStepProperty>;
 
 namespace Reductech.EDR.Core.Internal
 {
@@ -16,7 +15,7 @@ namespace Reductech.EDR.Core.Internal
         /// <summary>
         /// Creates a new FreezableStepData
         /// </summary>
-        public FreezableStepData(StepPropertyDict stepProperties, IErrorLocation location)
+        public FreezableStepData(StepParameterDict stepProperties, IErrorLocation location)
         {
             StepProperties = stepProperties;
             Location = location;
@@ -25,40 +24,49 @@ namespace Reductech.EDR.Core.Internal
         /// <summary>
         /// The step properties.
         /// </summary>
-        public StepPropertyDict StepProperties { get; }
+        public StepParameterDict StepProperties { get; }
 
         /// <summary>
         /// The location where this data comes from.
         /// </summary>
         public IErrorLocation Location {get;}
 
+
+
+        private Result<T, IError> TryGetValue<T>(string propertyName, Type stepType,
+            Func<FreezableStepProperty, Result<T, IError>> extractValue)
+        {
+            var property = stepType.GetProperty(propertyName);
+
+            if (property == null) throw new Exception($"{stepType.Name} does not have property {propertyName}");
+
+            foreach (var reference in StepParameterReference.GetPossibleReferences(property))
+                if (StepProperties.TryGetValue(reference, out var value))
+                    return extractValue(value);
+
+            return Result.Failure<T, IError>(ErrorHelper.MissingParameterError(propertyName, stepType.Name).WithLocation(Location));
+        }
+
+
         /// <summary>
         /// Gets a variable name.
         /// </summary>
-        public Result<VariableName, IError> GetVariableName(string name, string typeName) =>
-            StepProperties.TryFindOrFail(name,
-            ()=> ErrorHelper.MissingParameterError(name, typeName).WithLocation(Location))
-                .Bind(x=>x.AsVariableName(name)
-                    );
-
-        /// <summary>
-        /// Gets an argument.
-        /// </summary>
-        public Result<IFreezableStep, IError> GetStep(string name, string typeName) =>
-            StepProperties.TryFindOrFail(name,
-            () => ErrorHelper.MissingParameterError(name, typeName).WithLocation(Location))
-                .Map(x => x.ConvertToStep());
+        public Result<VariableName, IError> TryGetVariableName(string propertyName, Type stepType) => TryGetValue(propertyName, stepType, x =>
+            x.AsVariableName(propertyName));
 
 
         /// <summary>
-        /// Gets a list argument.
+        /// Gets a step argument
         /// </summary>
-        public Result<IReadOnlyList<IFreezableStep>, IError> GetStepList(string name, string typeName) =>
+        public Result<IFreezableStep, IError> TryGetStep(string propertyName, Type stepType) => TryGetValue(propertyName, stepType, x =>
+            Result.Success<IFreezableStep, IError>(x.ConvertToStep()));
 
-            StepProperties.TryFindOrFail(name,
-            () => ErrorHelper.MissingParameterError(name, typeName).WithLocation(Location))
-                .Bind(x => x.AsStepList(name)
-                    );
+        /// <summary>
+        /// Gets a variable name.
+        /// </summary>
+        public Result<IReadOnlyList<IFreezableStep>, IError> TryGetStepList(string propertyName, Type stepType) =>
+            TryGetValue(propertyName, stepType, x => x.AsStepList(propertyName));
+
 
         /// <inheritdoc />
         public override string ToString()
@@ -81,7 +89,7 @@ namespace Reductech.EDR.Core.Internal
 
             return result;
 
-            static bool DictionariesEqual1(StepPropertyDict dict1, StepPropertyDict dict2)
+            static bool DictionariesEqual1(StepParameterDict dict1, StepParameterDict dict2)
             {
                 if (dict1.Count != dict2.Count) return false;
                 foreach (var key in dict1.Keys)

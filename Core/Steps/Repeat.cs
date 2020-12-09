@@ -67,7 +67,7 @@ namespace Reductech.EDR.Core.Steps
         /// <inheritdoc />
         protected override Result<ITypeReference, IError> GetMemberType(FreezableStepData freezableStepData,
             TypeResolver typeResolver) =>
-            freezableStepData.GetStep(nameof(Repeat<object>.Element), TypeName)
+            freezableStepData.TryGetStep(nameof(Repeat<object>.Element), StepType)
                 .Bind(x => x.TryGetOutputTypeReference(typeResolver));
     }
 }

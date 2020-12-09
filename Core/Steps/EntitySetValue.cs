@@ -86,7 +86,7 @@ namespace Reductech.EDR.Core.Steps
         /// <inheritdoc />
         protected override Result<ITypeReference, IError> GetMemberType(FreezableStepData freezableStepData, TypeResolver typeResolver)
         {
-            var r1 = freezableStepData.GetStep(nameof(EntitySetValue<object>.Value), TypeName)
+            var r1 = freezableStepData.TryGetStep(nameof(EntitySetValue<object>.Value), StepType)
                 .Bind(x => x.TryGetOutputTypeReference(typeResolver));
 
             return r1;

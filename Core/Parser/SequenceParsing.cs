@@ -10,7 +10,7 @@ using OneOf;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
 using static Reductech.EDR.Core.Internal.FreezableFactory;
-using StepPropertyDict = System.Collections.Generic.Dictionary<OneOf.OneOf<string, int>, Reductech.EDR.Core.Internal.FreezableStepProperty>;
+using StepParameterDict = System.Collections.Generic.Dictionary<Reductech.EDR.Core.Internal.StepParameterReference, Reductech.EDR.Core.Internal.FreezableStepProperty>;
 
 namespace Reductech.EDR.Core.Parser
 {
@@ -244,7 +244,7 @@ namespace Reductech.EDR.Core.Parser
                 var name = context.NAME().Symbol.Text;
 
                 var errors = new List<IError>();
-                var dict = new StepPropertyDict();
+                var dict = new StepParameterDict();
 
                 var numberedArguments = context.term().Select((term, i) =>
                     (term: VisitTerm(term), number: OneOf<string, int>.FromT1(i + 1)));
@@ -254,7 +254,7 @@ namespace Reductech.EDR.Core.Parser
                 foreach (var numberedArgument in numberedArguments)
                 {
                     if(numberedArgument.term.IsFailure) errors.Add(numberedArgument.term.Error);
-                    else dict.Add(numberedArgument.number, numberedArgument.term.Value);
+                    else dict.Add(new StepParameterReference(numberedArgument.number),  numberedArgument.term.Value);
                 }
 
                 var members = AggregateNamedArguments(context.namedArgument());
@@ -262,7 +262,7 @@ namespace Reductech.EDR.Core.Parser
                 if (members.IsFailure) errors.Add(members.Error);
                 else
                     foreach (var (key, value) in members.Value)
-                        dict.Add(key, value);
+                        dict.Add(new StepParameterReference(key), value);
 
                 if(errors.Any())
                     return Result.Failure<FreezableStepProperty, IError>(ErrorList.Combine(errors));

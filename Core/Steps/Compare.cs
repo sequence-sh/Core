@@ -100,10 +100,10 @@ namespace Reductech.EDR.Core.Steps
         protected override Result<ITypeReference, IError> GetMemberType(FreezableStepData freezableStepData,
             TypeResolver typeResolver)
         {
-            var result = freezableStepData.GetStep(nameof(Compare<int>.Left), TypeName)
+            var result = freezableStepData.TryGetStep(nameof(Compare<int>.Left), StepType)
                 .MapError(e=>e)
                 .Bind(x => x.TryGetOutputTypeReference(typeResolver))
-                .Compose(() => freezableStepData.GetStep(nameof(Compare<int>.Right), TypeName)
+                .Compose(() => freezableStepData.TryGetStep(nameof(Compare<int>.Right), StepType)
                     .Bind(x => x.TryGetOutputTypeReference(typeResolver))
                 )
                 .Map(x => new[] { x.Item1, x.Item2 })

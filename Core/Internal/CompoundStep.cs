@@ -101,7 +101,7 @@ namespace Reductech.EDR.Core.Internal
             {
                 var dict = AllProperties
                     .OrderBy(x => x.Index)
-                    .ToDictionary(x => OneOf<string, int>.FromT0(x.Name),
+                    .ToDictionary(x => new StepParameterReference(x.Name),
                         x => x.Value.Match(
                             vn => new FreezableStepProperty(vn, new StepErrorLocation(this)),
                             s => new FreezableStepProperty(s.Unfreeze(),

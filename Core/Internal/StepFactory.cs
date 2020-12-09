@@ -8,7 +8,6 @@ using System.Reflection;
 using System.Text.RegularExpressions;
 using CSharpFunctionalExtensions;
 using Namotion.Reflection;
-using OneOf;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.Internal.Errors;
@@ -99,19 +98,16 @@ namespace Reductech.EDR.Core.Internal
             var pairs = new List<(FreezableStepProperty freezableStepProperty, PropertyInfo propertyInfo)>();
 
             var propertyDictionary = instanceResult.Value.GetType().GetProperties()
-                .SelectMany(propertyInfo =>
-                    GetPossibleKeys(propertyInfo).Select(key => (propertyInfo, key)))
-                        .ToDictionary(x => x.key, x => x.propertyInfo, PropertyKeyComparer.Instance);
+                .SelectMany(propertyInfo => StepParameterReference.GetPossibleReferences(propertyInfo)
+                    .Select(key => (propertyInfo, key)))
+                        .ToDictionary(x => x.key, x => x.propertyInfo);
 
             foreach (var (key, stepMember) in freezeData.StepProperties)
             {
                 if (propertyDictionary.TryGetValue(key, out var propertyInfo))
                     pairs.Add((stepMember, propertyInfo));
-                else if (key.IsT0)
-                    errors.Add(ErrorHelper.UnexpectedParameterError(key.AsT0, TypeName).WithLocation(freezeData.Location));
                 else
-                    errors.Add(new SingleError($"{TypeName} does not have a parameter number {key.AsT1}",
-                        ErrorCode.UnexpectedParameter, freezeData.Location));
+                    errors.Add(ErrorHelper.UnexpectedParameterError(key.Name, TypeName).WithLocation(freezeData.Location));
             }
 
             var duplicates = pairs
@@ -150,15 +146,7 @@ namespace Reductech.EDR.Core.Internal
             return Result.Success<IStep, IError>(step);
         }
 
-        private static IEnumerable<OneOf<string, int>> GetPossibleKeys(MemberInfo propertyInfo)
-        {
-            var attribute = propertyInfo.GetCustomAttribute<StepPropertyBaseAttribute>();
 
-            if (attribute == null) yield break;
-
-            yield return propertyInfo.Name;
-            yield return attribute.Order;
-        }
 
 
         private static Result<Unit, IError> TrySetVariableName(PropertyInfo propertyInfo,

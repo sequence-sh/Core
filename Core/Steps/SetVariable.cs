@@ -71,7 +71,7 @@ namespace Reductech.EDR.Core.Steps
         {
             var r =
             freezableStepData
-                .GetStep(nameof(SetVariable<object>.Value), TypeName)
+                .TryGetStep(nameof(SetVariable<object>.Value), StepType)
                 .Bind(x => x.TryGetOutputTypeReference(typeResolver));
 
             return r;
@@ -80,7 +80,7 @@ namespace Reductech.EDR.Core.Steps
         /// <inheritdoc />
         public override IEnumerable<(VariableName variableName, Maybe<ITypeReference>)> GetTypeReferencesSet(FreezableStepData freezableStepData, TypeResolver typeResolver)
         {
-            var vn = freezableStepData.GetVariableName(nameof(SetVariable<object>.Variable), TypeName);
+            var vn = freezableStepData.TryGetVariableName(nameof(SetVariable<object>.Variable), StepType);
             if (vn.IsFailure) yield break;
 
             var memberType =  GetMemberType(freezableStepData, typeResolver);

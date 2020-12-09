@@ -62,7 +62,7 @@ namespace Reductech.EDR.Core.Steps
         /// <inheritdoc />
         public override IEnumerable<(VariableName variableName, Maybe<ITypeReference>)> GetTypeReferencesSet(FreezableStepData freezableStepData, TypeResolver typeResolver)
         {
-            var vn = freezableStepData.GetVariableName(nameof(IncrementVariable.Variable), TypeName);
+            var vn = freezableStepData.TryGetVariableName(nameof(IncrementVariable.Variable), StepType);
             if(vn.IsFailure) yield break;
 
             yield return (vn.Value, Maybe<ITypeReference>.From(new ActualTypeReference(typeof(int))));
