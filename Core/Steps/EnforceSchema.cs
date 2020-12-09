@@ -106,9 +106,6 @@ namespace Reductech.EDR.Core.Steps
         /// The instance
         /// </summary>
         public static SimpleStepFactory<EnforceSchema, EntityStream> Instance { get; } = new EnforceSchemaStepFactory();
-
-        /// <inheritdoc />
-        public override IEnumerable<Type> EnumTypes => new[] {typeof(ErrorBehaviour)};
     }
 
     /// <summary>

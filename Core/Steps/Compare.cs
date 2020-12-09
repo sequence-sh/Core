@@ -88,9 +88,6 @@ namespace Reductech.EDR.Core.Steps
         public override Type StepType => typeof(Compare<>);
 
         /// <inheritdoc />
-        public override IEnumerable<Type> EnumTypes => new[] { typeof(CompareOperator) };
-
-        /// <inheritdoc />
         public override string OutputTypeExplanation => nameof(Boolean);
 
         /// <inheritdoc />

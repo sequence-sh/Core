@@ -38,7 +38,28 @@ namespace Reductech.EDR.Core.Internal
         public override string ToString() => TypeName;
 
         /// <inheritdoc />
-        public abstract IEnumerable<Type> EnumTypes { get; }
+        public IEnumerable<Type> EnumTypes
+        {
+            get
+            {
+                return
+                StepType.GetProperties()
+                    .Where(property => property.GetCustomAttribute<StepPropertyBaseAttribute>() != null)
+                    .Select(x => x.PropertyType)
+                    .Select(GetUnderlyingType)
+                    .Where(x => x.IsEnum);
+
+
+                static Type GetUnderlyingType(Type t)
+                {
+                    while (true)
+                    {
+                        if (!t.GenericTypeArguments.Any()) return t;
+                        t = t.GenericTypeArguments.First();
+                    }
+                }
+            }
+        }
 
         /// <inheritdoc />
         public abstract string OutputTypeExplanation { get; }
