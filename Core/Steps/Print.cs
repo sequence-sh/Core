@@ -14,6 +14,7 @@ namespace Reductech.EDR.Core.Steps
     /// <summary>
     /// Prints a value to the log.
     /// </summary>
+    [Alias("Log")]
     public sealed class Print<T> : CompoundStep<Unit>
     {
         /// <inheritdoc />

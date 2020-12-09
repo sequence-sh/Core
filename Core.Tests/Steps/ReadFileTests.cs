@@ -14,9 +14,7 @@ namespace Reductech.EDR.Core.Tests.Steps
     public class ReadFileTests : StepTestBase<ReadFile, DataStream>
     {
         /// <inheritdoc />
-        public ReadFileTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
-        {
-        }
+        public ReadFileTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper) { }
 
         /// <inheritdoc />
         protected override IEnumerable<StepCase> StepCases
@@ -38,6 +36,35 @@ namespace Reductech.EDR.Core.Tests.Steps
                     "Hello World"
 
                 ).WithFileSystemAction(x=>x.Setup(a=>a.ReadFile("File.txt")).Returns(new MemoryStream(Encoding.ASCII.GetBytes("Hello World"))));
+            }
+        }
+
+        /// <inheritdoc />
+        protected override IEnumerable<DeserializeCase> DeserializeCases
+        {
+            get
+            {
+                yield return new DeserializeCase("Default", "Print Value: (StringFromStream Stream: (ReadFile Path: 'File.txt') Encoding: EncodingEnum.UTF8)",
+                    Unit.Default,
+                    "Hello World"
+                ).WithFileSystemAction(x=>
+                    x.Setup(a=>a.ReadFile("File.txt"))
+                        .Returns(new MemoryStream(Encoding.ASCII.GetBytes("Hello World"))));
+
+                yield return new DeserializeCase("Ordered Args", "Print (StringFromStream  (ReadFile  'File.txt') EncodingEnum.UTF8)",
+                    Unit.Default,
+                    "Hello World"
+                ).WithFileSystemAction(x =>
+                    x.Setup(a => a.ReadFile("File.txt"))
+                        .Returns(new MemoryStream(Encoding.ASCII.GetBytes("Hello World"))));
+
+                yield return new DeserializeCase("Alias args", "Print Value: (StringFromStream Stream: (ReadFile FromPath: 'File.txt') Encoding: EncodingEnum.UTF8)",
+                    Unit.Default,
+                    "Hello World"
+                ).WithFileSystemAction(x =>
+                    x.Setup(a => a.ReadFile("File.txt"))
+                        .Returns(new MemoryStream(Encoding.ASCII.GetBytes("Hello World"))));
+
             }
         }
 

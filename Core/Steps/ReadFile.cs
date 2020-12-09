@@ -36,6 +36,7 @@ namespace Reductech.EDR.Core.Steps
         /// </summary>
         [StepProperty(1)]
         [Required]
+        [Alias("FromPath")]
         public IStep<string> Path { get; set; } = null!;
 
         /// <inheritdoc />

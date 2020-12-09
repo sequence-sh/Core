@@ -72,6 +72,10 @@ namespace Reductech.EDR.Core.Internal
 
             yield return new StepParameterReference(propertyInfo.Name);
             yield return new StepParameterReference(attribute.Order);
+
+            foreach (var alias in propertyInfo.GetCustomAttributes<AliasAttribute>())
+                yield return new StepParameterReference(alias.Name);
+
         }
     }
 }
