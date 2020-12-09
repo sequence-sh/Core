@@ -5,6 +5,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
+using OneOf;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
@@ -83,21 +84,6 @@ namespace Reductech.EDR.Core.Steps
         /// <inheritdoc />
         public override IStepSerializer Serializer { get; } = SequenceSerializer.Instance;
 
-        /// <summary>
-        /// Create a new Freezable Sequence
-        /// </summary>
-        public static IFreezableStep CreateFreezable(IEnumerable<IFreezableStep> steps, IFreezableStep finalStep, Configuration? configuration, IErrorLocation location)
-        {
-            var dict = new Dictionary<string, FreezableStepProperty>()
-            {
-                {nameof(Sequence<object>.InitialSteps), new FreezableStepProperty(steps.ToImmutableList(), location )},
-                {nameof(Sequence<object>.FinalStep), new FreezableStepProperty(finalStep, location )},
-            };
 
-            var fpd = new FreezableStepData( dict, location);
-
-
-            return new CompoundFreezableStep(Instance.TypeName, fpd, configuration);
-        }
     }
 }

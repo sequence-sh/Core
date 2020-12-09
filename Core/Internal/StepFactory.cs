@@ -8,6 +8,7 @@ using System.Reflection;
 using System.Text.RegularExpressions;
 using CSharpFunctionalExtensions;
 using Namotion.Reflection;
+using OneOf;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.Internal.Errors;
@@ -81,6 +82,7 @@ namespace Reductech.EDR.Core.Internal
             StepType.GetProperties()
                 .Where(property => property.GetCustomAttribute<RequiredAttribute>() != null).Select(property => property.Name);
 
+
         /// <inheritdoc />
         public Result<IStep, IError> TryFreeze(StepContext stepContext,
             FreezableStepData freezeData, Configuration? configuration)
@@ -93,49 +95,69 @@ namespace Reductech.EDR.Core.Internal
             var step = instanceResult.Value;
             step.Configuration = configuration;
 
-            var results = new List<Result<Unit, IError>>();
+            var errors = new List<IError>();
+            var pairs = new List<(FreezableStepProperty freezableStepProperty, PropertyInfo propertyInfo)>();
 
-            var instanceType = step.GetType();
+            var propertyDictionary = instanceResult.Value.GetType().GetProperties()
+                .SelectMany(propertyInfo =>
+                    GetPossibleKeys(propertyInfo).Select(key => (propertyInfo, key)))
+                        .ToDictionary(x => x.key, x => x.propertyInfo, PropertyKeyComparer.Instance);
 
-            var remaining = instanceType.GetProperties()
-                    .Where(x => x.GetCustomAttribute<StepPropertyBaseAttribute>() != null)
-                    .ToDictionary(x=>x.Name!, StringComparer.OrdinalIgnoreCase);
-
-            foreach (var (propertyName, stepMember) in freezeData.StepProperties)
+            foreach (var (key, stepMember) in freezeData.StepProperties)
             {
-                if (remaining.Remove(propertyName, out var propertyInfo))
-                {
-                    var result =
+                if (propertyDictionary.TryGetValue(key, out var propertyInfo))
+                    pairs.Add((stepMember, propertyInfo));
+                else if (key.IsT0)
+                    errors.Add(ErrorHelper.UnexpectedParameterError(key.AsT0, TypeName).WithLocation(freezeData.Location));
+                else
+                    errors.Add(new SingleError($"{TypeName} does not have a parameter number {key.AsT1}",
+                        ErrorCode.UnexpectedParameter, freezeData.Location));
+            }
+
+            var duplicates = pairs
+                .GroupBy(x => x.propertyInfo)
+                .Where(x => x.Count() > 1)
+                .Select(x=>x.Key);
+
+            foreach (var propertyInfo in duplicates)
+                errors.Add(new SingleError($"{TypeName}.{propertyInfo.Name} defined more than once",
+                    ErrorCode.DuplicateParameter, freezeData.Location));
+
+            if (errors.Any()) return Result.Failure<IStep, IError>(ErrorList.Combine(errors));
+
+            var remainingRequired = RequiredProperties.ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+            foreach (var (stepMember, propertyInfo) in pairs)
+            {
+                remainingRequired.Remove(propertyInfo.Name);
+                var result =
                     stepMember.Match(
                         vn => TrySetVariableName(propertyInfo, step, vn, stepMember.Location, stepContext),
                         s => TrySetStep(propertyInfo, step, s, stepContext),
                         sList => TrySetStepList(propertyInfo, step, sList, stepContext)
                     );
 
-
-                    results.Add(result);
-                }
-                else
-                    results.Add(
-                        Result.Failure<Unit, IError>(
-                            ErrorHelper.UnexpectedParameterError(propertyName, TypeName)
-                                .WithLocation(freezeData.Location)));
+                if(result.IsFailure) errors.Add(result.Error);
             }
 
-            results.Combine(_ => Unit.Default, ErrorList.Combine);
+            foreach (var property in remainingRequired)
+                errors.Add(new SingleError($"The property '{property}' was not set on type '{GetType().Name}'.",
+                    ErrorCode.MissingParameter, new StepErrorLocation(step)));
+
+            if (errors.Any()) return Result.Failure<IStep, IError>(ErrorList.Combine(errors));
 
 
-            foreach (var property in remaining.Values
-                .Where(property => property.GetCustomAttribute<RequiredAttribute>() != null))
-            {
-                var error = new SingleError($"The property '{property.Name}' was not set on type '{GetType().Name}'.", ErrorCode.MissingParameter, new StepErrorLocation(step));
+            return Result.Success<IStep, IError>(step);
+        }
 
-                results.Add(error);
-            }
+        private static IEnumerable<OneOf<string, int>> GetPossibleKeys(MemberInfo propertyInfo)
+        {
+            var attribute = propertyInfo.GetCustomAttribute<StepPropertyBaseAttribute>();
 
+            if (attribute == null) yield break;
 
-            return results.Combine(ErrorList.Combine).Map(_ => step as IStep);
-
+            yield return propertyInfo.Name;
+            yield return attribute.Order;
         }
 
 
@@ -151,11 +173,9 @@ namespace Reductech.EDR.Core.Internal
                 return Unit.Default;
             }
 
-            var step = GetVariableStepFactory.CreateFreezable(variableName, stepMemberLocation);
+            var step = FreezableFactory.CreateFreezableGetVariable(variableName, stepMemberLocation);
 
             return TrySetStep(propertyInfo, parentStep, step, stepContext);
-
-
         }
 
         private static Result<Unit, IError> TrySetStep(PropertyInfo propertyInfo,

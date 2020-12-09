@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
@@ -71,21 +70,7 @@ namespace Reductech.EDR.Core.Steps
 
 
 
-        /// <summary>
-        /// Create a freezable GetVariable step.
-        /// </summary>
-        public static IFreezableStep CreateFreezable(VariableName variableName, IErrorLocation location)
-        {
-            var dict = new Dictionary<string, FreezableStepProperty>
-            {
-                {nameof(GetVariable<object>.Variable), new FreezableStepProperty(variableName, location)}
-            };
 
-            var fpd = new FreezableStepData( dict, location);
-            var step = new CompoundFreezableStep(Instance.TypeName, fpd, null);
-
-            return step;
-        }
 
     }
 }

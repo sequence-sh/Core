@@ -57,7 +57,7 @@ namespace Reductech.EDR.Core.Internal
                 new FreezableStepProperty(x.Value.Unfreeze(),
                     new StepErrorLocation(x.Value) ));
 
-            return new CreateEntityFreezableStep(new FreezableStepData(dictionary, new StepErrorLocation(this)));
+            return new CreateEntityFreezableStep(new FreezableEntityData(dictionary, new StepErrorLocation(this)));
         }
 
         /// <inheritdoc />

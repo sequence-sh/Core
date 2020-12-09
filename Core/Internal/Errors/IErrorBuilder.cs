@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using JetBrains.Annotations;
 
 namespace Reductech.EDR.Core.Internal.Errors
 {
@@ -10,6 +11,7 @@ namespace Reductech.EDR.Core.Internal.Errors
         /// <summary>
         /// Converts this errorBuilder to an error
         /// </summary>
+        [Pure]
         public IError WithLocation(IErrorLocation location);
 
         /// <summary>

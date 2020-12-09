@@ -7,6 +7,7 @@ using Reductech.EDR.Core.Enums;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.Util;
+using StepPropertyDict = System.Collections.Generic.Dictionary<OneOf.OneOf<string, int>, Reductech.EDR.Core.Internal.FreezableStepProperty>;
 
 namespace Reductech.EDR.Core.Internal
 {
@@ -18,11 +19,62 @@ namespace Reductech.EDR.Core.Internal
         //TODO move other CreateFreezable methods here
 
         /// <summary>
+        /// Create a new Freezable Sequence
+        /// </summary>
+        public static IFreezableStep CreateFreezableSequence(IEnumerable<IFreezableStep> steps, IFreezableStep finalStep, Configuration? configuration, IErrorLocation location)
+        {
+            var dict = new StepPropertyDict
+            {
+                {nameof(Sequence<object>.InitialSteps), new FreezableStepProperty(steps.ToImmutableList(), location )},
+                {nameof(Sequence<object>.FinalStep), new FreezableStepProperty(finalStep, location )},
+            };
+
+            var fpd = new FreezableStepData(dict, location);
+
+
+            return new CompoundFreezableStep(SequenceStepFactory. Instance.TypeName, fpd, configuration);
+        }
+
+        /// <summary>
+        /// Create a freezable GetVariable step.
+        /// </summary>
+        public static IFreezableStep CreateFreezableGetVariable(VariableName variableName, IErrorLocation location)
+        {
+            var dict = new StepPropertyDict
+            {
+                {nameof(GetVariable<object>.Variable), new FreezableStepProperty(variableName, location)}
+            };
+
+            var fpd = new FreezableStepData(dict, location);
+            var step = new CompoundFreezableStep(GetVariableStepFactory.Instance.TypeName, fpd, null);
+
+            return step;
+        }
+
+        /// <summary>
+        /// Create a freezable GetVariable step.
+        /// </summary>
+        public static IFreezableStep CreateFreezableSetVariable(FreezableStepProperty variableName, FreezableStepProperty value, IErrorLocation location)
+        {
+            var dict = new StepPropertyDict
+            {
+                {nameof(SetVariable<object>.Variable), variableName},
+                {nameof(SetVariable<object>.Value), value},
+            };
+
+            var fpd = new FreezableStepData(dict, location);
+            var step = new CompoundFreezableStep(SetVariableStepFactory.Instance.TypeName, fpd, null);
+
+            return step;
+        }
+
+
+        /// <summary>
         /// Create a freezable Not step.
         /// </summary>
         public static IFreezableStep CreateFreezableNot(IFreezableStep boolean, IErrorLocation location)
         {
-            var dict = new Dictionary<string, FreezableStepProperty>
+            var dict = new StepPropertyDict
             {
                 {nameof(Not.Boolean), new FreezableStepProperty(boolean, location)},
             };
@@ -42,7 +94,7 @@ namespace Reductech.EDR.Core.Internal
             if (elements.Any() && elements
                 .All(x => x is CreateEntityFreezableStep || x is ConstantFreezableStep cfs && cfs.Value.IsT6))
             {
-                var dict = new Dictionary<string, FreezableStepProperty>
+                var dict = new StepPropertyDict
                 {
                     {nameof(EntityStreamCreate.Elements), new FreezableStepProperty(elements, location)}
                 };
@@ -53,7 +105,7 @@ namespace Reductech.EDR.Core.Internal
             }
             else
             {
-                var dict = new Dictionary<string, FreezableStepProperty>
+                var dict = new StepPropertyDict
                 {
                     {nameof(Array<object>.Elements), new FreezableStepProperty(elements, location)}
                 };
@@ -66,6 +118,9 @@ namespace Reductech.EDR.Core.Internal
 
     }
 
+    /// <summary>
+    /// Contains helper methods for creating infix steps
+    /// </summary>
     public static class InfixHelper
     {
         private class OperatorData
@@ -112,7 +167,7 @@ namespace Reductech.EDR.Core.Internal
             if (errors.Any())
                 return Result.Failure<FreezableStepProperty, IError>(ErrorList.Combine(errors));
 
-            var data = new FreezableStepData(new Dictionary<string, FreezableStepProperty>
+            var data = new FreezableStepData(new StepPropertyDict
             {
                 {opData!.OperatorStepName, new FreezableStepProperty(opData.OperatorStep, errorLocation )},
                 {opData.LeftName, left.Value},

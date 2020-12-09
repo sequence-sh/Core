@@ -6,9 +6,11 @@ using System.Text;
 using Antlr4.Runtime;
 using Antlr4.Runtime.Tree;
 using CSharpFunctionalExtensions;
+using OneOf;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
-using Reductech.EDR.Core.Steps;
+using static Reductech.EDR.Core.Internal.FreezableFactory;
+using StepPropertyDict = System.Collections.Generic.Dictionary<OneOf.OneOf<string, int>, Reductech.EDR.Core.Internal.FreezableStepProperty>;
 
 namespace Reductech.EDR.Core.Parser
 {
@@ -84,7 +86,7 @@ namespace Reductech.EDR.Core.Parser
                 if (result.Value.Count == 0)
                     return new SingleError("Sequence contained no members", ErrorCode.CouldNotParse, new TextPosition(context));
 
-                var sequence = SequenceStepFactory.CreateFreezable(
+                var sequence = CreateFreezableSequence(
                     result.Value.SkipLast(1).ToList(),
                     result.Value.Last(),
                     null, new TextPosition(context));
@@ -150,16 +152,7 @@ namespace Reductech.EDR.Core.Parser
 
                 var vn = GetVariableName(context.VARIABLENAME());
 
-
-                var stepData = new FreezableStepData(new Dictionary<string, FreezableStepProperty>()
-                {
-                    {nameof(SetVariable<object>.Variable), vn },
-                    {nameof(SetVariable<object>.Value), member.Value },
-
-                }, new TextPosition(context));
-
-
-                var step = new CompoundFreezableStep(SetVariableStepFactory.Instance.TypeName, stepData, null);
+                var step = CreateFreezableSetVariable(vn, member.Value, new TextPosition(context));
 
                 return new FreezableStepProperty(step, new TextPosition(context) );
             }
@@ -249,12 +242,34 @@ namespace Reductech.EDR.Core.Parser
             public override Result<FreezableStepProperty, IError> VisitFunction(SequenceParser.FunctionContext context)
             {
                 var name = context.NAME().Symbol.Text;
+
+                var errors = new List<IError>();
+                var dict = new StepPropertyDict();
+
+                var numberedArguments = context.term().Select((term, i) =>
+                    (term: VisitTerm(term), number: OneOf<string, int>.FromT1(i + 1)));
+
+
+
+                foreach (var numberedArgument in numberedArguments)
+                {
+                    if(numberedArgument.term.IsFailure) errors.Add(numberedArgument.term.Error);
+                    else dict.Add(numberedArgument.number, numberedArgument.term.Value);
+                }
+
                 var members = AggregateNamedArguments(context.namedArgument());
 
-                if (members.IsFailure) return members.ConvertFailure<FreezableStepProperty>();
+                if (members.IsFailure) errors.Add(members.Error);
+                else
+                    foreach (var (key, value) in members.Value)
+                        dict.Add(key, value);
+
+                if(errors.Any())
+                    return Result.Failure<FreezableStepProperty, IError>(ErrorList.Combine(errors));
 
 
-                var fsd = new FreezableStepData(members.Value, new TextPosition(context) );
+
+                var fsd = new FreezableStepData(dict, new TextPosition(context) );
 
                 var cfs = new CompoundFreezableStep(name, fsd, null);
 
@@ -268,7 +283,7 @@ namespace Reductech.EDR.Core.Parser
 
                 if (members.IsFailure) return members.ConvertFailure<FreezableStepProperty>();
 
-                var step = new CreateEntityFreezableStep(new FreezableStepData(members.Value, new TextPosition(context)));
+                var step = new CreateEntityFreezableStep(new FreezableEntityData(members.Value, new TextPosition(context)));
 
                 return new FreezableStepProperty(step, new TextPosition(context));
             }

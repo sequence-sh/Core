@@ -21,8 +21,8 @@ infixOperator		: DASH
 					| GREATERTHAN ;
 infixOperation		: term infixOperator term ;
 namedArgument		: NAME COLON term ;
-function			: NAME ( namedArgument )* ;
-entity				: OPENBRACKET ( namedArgument )*  CLOSEBRACKET ;
+function			: NAME (term)* (namedArgument)* ;
+entity				: OPENBRACKET (namedArgument)*  CLOSEBRACKET ;
 bracketedStep		: OPENBRACKET step CLOSEBRACKET ;
 boolean				: TRUE | FALSE ;
 quotedString		: DOUBLEQUOTEDSTRING | SINGLEQUOTEDSTRING ;

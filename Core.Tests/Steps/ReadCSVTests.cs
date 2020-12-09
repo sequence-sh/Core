@@ -82,6 +82,27 @@ namespace Reductech.EDR.Core.Tests.Steps
             }
         }
 
+        ///// <inheritdoc />
+        //protected override IEnumerable<DeserializeCase> DeserializeCases {
+        //    get
+        //    {
+
+        //        var csvString = "Foo\r\nHello,World\r\nHello 2,World 2";
+
+
+        //        yield return new DeserializeCase(
+        //            "Ordered Arguments",
+
+        //            $"EntityForEach (FromCSV (StringToStream \"{csvString}\" EncodingEnum.UTF8) EncodingEnum.UTF8 \",\"  \"#\"  ''''  \"\") (Print (<Entity>))",
+        //            Unit.Default,
+        //            "(Foo: \"Hello\")",
+        //            "(Foo: \"Hello 2\")"
+
+
+        //            );
+
+        //    } }
+
 
         /// <inheritdoc />
         protected override IEnumerable<ErrorCase> ErrorCases

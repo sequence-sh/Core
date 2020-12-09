@@ -34,7 +34,8 @@ namespace Reductech.EDR.Core.Tests.Steps
         {
             get
             {
-                yield return new DeserializeCase("Print something", "Print Value: 'Hello'", Unit.Default, "Hello");
+                yield return new DeserializeCase("Named argument", "Print Value: 'Hello'", Unit.Default, "Hello");
+                yield return new DeserializeCase("Ordered Argument", "Print 'Hello'", Unit.Default, "Hello");
 
             }
 
