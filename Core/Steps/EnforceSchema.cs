@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
@@ -9,7 +8,6 @@ using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
-using Type = System.Type;
 
 namespace Reductech.EDR.Core.Steps
 {
@@ -106,24 +104,5 @@ namespace Reductech.EDR.Core.Steps
         /// The instance
         /// </summary>
         public static SimpleStepFactory<EnforceSchema, EntityStream> Instance { get; } = new EnforceSchemaStepFactory();
-    }
-
-    /// <summary>
-    /// How to respond to a data error
-    /// </summary>
-    public enum ErrorBehaviour
-    {
-        /// <summary>
-        /// Stop the process on error
-        /// </summary>
-        Fail,
-        /// <summary>
-        /// Log a warning message on error
-        /// </summary>
-        Warning,
-        /// <summary>
-        /// Ignore errors
-        /// </summary>
-        Ignore
     }
 }
