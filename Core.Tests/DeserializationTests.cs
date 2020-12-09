@@ -74,6 +74,9 @@ Print 'Comments!'", "Comments!");
 
                 yield return new DeserializationTestFunction(@"Print(not True)", false);
 
+                yield return new DeserializationTestFunction(@"Print(stringToCase 'hello' textCase.Upper)", "HELLO");
+                yield return new DeserializationTestFunction(@"Print(stringToCase 'hello' 'Upper')", "HELLO");
+
 
                 yield return new DeserializationTestFunction(@"Print(2 >= 3)", false);
                 yield return new DeserializationTestFunction(@"Print(4 >= 3)", true);
