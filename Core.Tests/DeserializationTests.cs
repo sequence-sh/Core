@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -22,7 +21,7 @@ namespace Reductech.EDR.Core.Tests
 
 
         /// <inheritdoc />
-        [Theory(Skip = "true")]
+        [Theory()]
         [ClassData(typeof(DeserializationTestCases))]
         public override Task Test(string key) => base.Test(key);
     }
@@ -37,177 +36,181 @@ namespace Reductech.EDR.Core.Tests
                 yield return new DeserializationTestFunction(
                     @"- <Foo> = 'Hello World'
 - <Bar> = <Foo>
-- Print(Value = <Bar>)", "Hello World");
+- Print <Bar>", "Hello World");
 
-                yield return new DeserializationTestFunction(@"Print(Value = 'Mark''s string')", "Mark's string" );
-                yield return new DeserializationTestFunction(@"Print(Value = ""Mark's string"")", "Mark's string" );
-
-
-                yield return new DeserializationTestFunction(@"Print(Value = 2 * 3)", 6);
-
-                yield return new DeserializationTestFunction(@"Print(Value = 3 - 2)", 1);
-
-                yield return new DeserializationTestFunction(@"print(value = 2 * 3)", 6);
-
-                yield return new DeserializationTestFunction(@"print(value = 6 / 3)", 2);
-
-                yield return new DeserializationTestFunction(@"print(value = 6 ^ 2)", 36);
-
-                yield return new DeserializationTestFunction(@"print(value = 7 % 2)", 1);
-
-                yield return new DeserializationTestFunction(@"print(value = 7 modulo 2)", 1);
-
-                yield return new DeserializationTestFunction(@"do: Print
-Value: falsetto", "falsetto"); //check 'false' delimiter
-
-                yield return new DeserializationTestFunction(@"do: Print
-Value: notable", "notable");//check 'not' delimiter
-
-                yield return new DeserializationTestFunction(@"print(value=2*3)", 6);
-
-                yield return new DeserializationTestFunction(@"Print(Value = 2 ^ 3)", 8);
-
-                yield return new DeserializationTestFunction(@"Print(Value = not (True))", false);
+                yield return new DeserializationTestFunction(@"Print 'Mark''s string'", "Mark's string" );
+                yield return new DeserializationTestFunction(@"Print ""Mark's string""", "Mark's string" );
 
 
-                yield return new DeserializationTestFunction(@"Print(Value = 2 >= 3)", false);
-                yield return new DeserializationTestFunction(@"Print(Value = 4 >= 3)", true);
-                yield return new DeserializationTestFunction(@"Print(Value = 3 >= 3)", true);
+                yield return new DeserializationTestFunction(@"Print 'Comments!' //This is a comment", "Comments!");
+                yield return new DeserializationTestFunction(@"//This is a comment
+Print 'Comments!'", "Comments!");
 
-                yield return new DeserializationTestFunction(@"Print(Value = 3 > 3)", false);
-                yield return new DeserializationTestFunction(@"Print(Value = 4 > 3)", true);
-                yield return new DeserializationTestFunction(@"Print(Value = 3 < 3)", false);
+                yield return new DeserializationTestFunction(@"/*This is a comment
+block*/
+Print 'Comments!'", "Comments!");
 
-                yield return new DeserializationTestFunction(@"Print(Value = 3 <= 3)", true);
+                yield return new DeserializationTestFunction(@"Print /*Comment Block */ 'Comments!' ", "Comments!");
 
-                yield return new DeserializationTestFunction(@"Print(Value = 2 * (3 + 4))",14);
-                yield return new DeserializationTestFunction(@"Print(Value = (2 * 3) + 4)",10);
+                yield return new DeserializationTestFunction(@"Print (2 * 3)", 6);
 
-                yield return new DeserializationTestFunction(@"Print(Value = (2 >= 3))", false);
+                yield return new DeserializationTestFunction(@"Print(3 - 2)", 1);
 
-                yield return new DeserializationTestFunction(@"Print(Value = (2 * (3 + 4)))", 14);
-                yield return new DeserializationTestFunction(@"Print(Value = (2*(3+4)))", 14);
-                yield return new DeserializationTestFunction(@"Print(Value = ((2 * 3) + 4))", 10);
+                yield return new DeserializationTestFunction(@"print(2 * 3)", 6);
 
-                yield return new DeserializationTestFunction(@"Print(Value = True && False)", false);
+                yield return new DeserializationTestFunction(@"print(6 / 3)", 2);
 
-                yield return new DeserializationTestFunction(@"Print(Value = StringIsEmpty(String = 'Hello') && StringIsEmpty(String = 'World'))", false);
+                yield return new DeserializationTestFunction(@"print(6 ^ 2)", 36);
 
-                yield return new DeserializationTestFunction(@"Print(Value = not (True) && not(False))", false);
+                yield return new DeserializationTestFunction(@"print(7 % 2)", 1);
 
-                yield return new DeserializationTestFunction(@"Print(Value = true && false)", false);
+                yield return new DeserializationTestFunction(@"Print 'falsetto'", "falsetto"); //check 'false' delimiter
 
-                yield return new DeserializationTestFunction(@"Print(Value = true and false)", false);
+                yield return new DeserializationTestFunction(@"Print 'notable'", "notable");//check 'not' delimiter
 
-                yield return new DeserializationTestFunction("Print(Value = ArrayIsEmpty(Array = []))", true);
+                yield return new DeserializationTestFunction(@"print(2*3)", 6);
+
+                yield return new DeserializationTestFunction(@"Print(2 ^ 3)", 8);
+
+                yield return new DeserializationTestFunction(@"Print(not True)", false);
+
+
+                yield return new DeserializationTestFunction(@"Print(2 >= 3)", false);
+                yield return new DeserializationTestFunction(@"Print(4 >= 3)", true);
+                yield return new DeserializationTestFunction(@"Print(3 >= 3)", true);
+
+                yield return new DeserializationTestFunction(@"Print(3 > 3)", false);
+                yield return new DeserializationTestFunction(@"Print(4 > 3)", true);
+                yield return new DeserializationTestFunction(@"Print(3 < 3)", false);
+
+                yield return new DeserializationTestFunction(@"Print(3 <= 3)", true);
+
+                yield return new DeserializationTestFunction(@"Print(2 * (3 + 4))",14);
+                yield return new DeserializationTestFunction(@"Print((2 * 3) + 4)",10);
+
+                yield return new DeserializationTestFunction(@"Print((2 >= 3))", false);
+
+                yield return new DeserializationTestFunction(@"Print((2 * (3 + 4)))", 14);
+                yield return new DeserializationTestFunction(@"Print((2*(3+4)))", 14);
+                yield return new DeserializationTestFunction(@"Print(((2 * 3) + 4))", 10);
+
+                yield return new DeserializationTestFunction(@"Print(True && False)", false);
+
+                yield return new DeserializationTestFunction(@"Print(StringIsEmpty 'Hello' && StringIsEmpty 'World')", false);
+
+                yield return new DeserializationTestFunction(@"Print((not True) && (not False))", false);
+
+                yield return new DeserializationTestFunction(@"Print(true && false)", false);
+
+                yield return new DeserializationTestFunction("Print(ArrayIsEmpty([]))", true);
 
                 yield return new DeserializationTestFunction(@"<ArrayVar> = ['abc', '123']");
 
                 yield return new DeserializationTestFunction(@"
 - <ArrayVar> = ['abc', '123']
-- Print(Value = ArrayLength(Array = <ArrayVar>))",2);
+- Print(ArrayLength <ArrayVar>)",2);
 
-                yield return new DeserializationTestFunction(@"Print(Value = ArrayLength(Array = ['abc', '123']))", 2);
-
-                yield return new DeserializationTestFunction(@"
-- <ArrayVar> =  ['abc', '123']
-- Print(Value = ArrayLength(Array = <ArrayVar>))", 2);
-
-
-
-
-
-                yield return new DeserializationTestFunction(@"
-- <ArrayVar> = ['abc', '123']
-- Print(Value = ArrayIsEmpty(Array = <ArrayVar>))",false);
-
-
+                yield return new DeserializationTestFunction(@"Print(ArrayLength ['abc', '123'])", 2);
 
                 yield return new DeserializationTestFunction(@"
 - <ArrayVar> =  ['abc', '123']
-- Print(Value = ElementAtIndex(Array = <ArrayVar>, Index = 1))", "123");
+- Print(ArrayLength <ArrayVar>)", 2);
+
+
+
+
 
                 yield return new DeserializationTestFunction(@"
 - <ArrayVar> = ['abc', '123']
-- Print(Value = FindElement(Array = <ArrayVar>, Element = '123'))", "1");
+- Print(ArrayIsEmpty <ArrayVar>)",false);
+
+
+
+                yield return new DeserializationTestFunction(@"
+- <ArrayVar> =  ['abc', '123']
+- Print(ElementAtIndex <ArrayVar> 1)", "123");
 
                 yield return new DeserializationTestFunction(@"
 - <ArrayVar> = ['abc', '123']
-- Foreach(Array = <ArrayVar>, Variable = <Element>, Action = Print(Value = <Element>))", "abc", "123");
+- Print(FindElement <ArrayVar> '123')", "1");
+
+                yield return new DeserializationTestFunction(@"
+- <ArrayVar> = ['abc', '123']
+- Foreach <ArrayVar> <Element> (Print <Element>)", "abc", "123");
 
 
                 yield return new DeserializationTestFunction(@"
 - <ArrayVar1> = ['abc', '123']
-- <ArrayVar2> = Repeat(Element = <ArrayVar1>, Number = 2)
-- Foreach(Array = <ArrayVar2>, Variable = <Element>, Action = Print(Value = ArrayLength(Array = <Element>)))", "2", "2");
+- <ArrayVar2> = (Repeat <ArrayVar1> 2)
+- Foreach <ArrayVar2> <Element> (Print (ArrayLength <Element>))", "2", "2");
 
                 yield return new DeserializationTestFunction(@"
 - <ArrayVar> = ['abc', 'def']
-- <Sorted> = ArraySort(Array = <ArrayVar>)
-- Print(Value = ElementAtIndex(Array = <Sorted>, Index = 0))", "abc");
+- <Sorted> = (ArraySort <ArrayVar>)
+- Print (ElementAtIndex <Sorted> 0)", "abc");
 
                 yield return new DeserializationTestFunction(@"
 - <ConditionVar> = true
-- If(Condition = <ConditionVar>, Then = Print(Value = 1), Else = Print(Value = 2))", "1");
+- If <ConditionVar> (Print 1) (Print 2)", "1");
 
-                yield return new DeserializationTestFunction(
-                    @"Do: Print
-Config:
-  AdditionalRequirements: 
-  TargetMachineTags:
-  - Tag1
-  DoNotSplit: false
-  Priority: 1
-Value: I have config", "I have config"
-                )
-                {
-                    ExpectedConfiguration = new Configuration
-                    {
-                        TargetMachineTags = new List<string> {"Tag1"},
-                        DoNotSplit = false,
-                        Priority = 1
-                    }
-                };
+//                yield return new DeserializationTestFunction(
+//                    @"Do: Print
+//Config:
+//  AdditionalRequirements: 
+//  TargetMachineTags:
+//  - Tag1
+//  DoNotSplit: false
+//  Priority: 1
+//Value: I have config", "I have config"
+//                )
+//                {
+//                    ExpectedConfiguration = new Configuration
+//                    {
+//                        TargetMachineTags = new List<string> {"Tag1"},
+//                        DoNotSplit = false,
+//                        Priority = 1
+//                    }
+//                };
 
-                yield return new DeserializationTestFunction(@"Do: Print
-Config:
-  AdditionalRequirements:
-  - Notes: ABC123
-    Name: ValueIf
-    MinVersion: 1.2.3.4
-    MaxVersion: 5.6.7.8
-  TargetMachineTags:
-  - Tag1
-  DoNotSplit: false
-  Priority: 1
-Value: I have config too", "I have config too")
-                {
-                    ExpectedConfiguration = new Configuration
-                    {
-                        TargetMachineTags = new List<string> { "Tag1" },
-                        DoNotSplit = false,
-                        Priority = 1,
-                        AdditionalRequirements = new List<Requirement>
-                        {
-                            new Requirement
-                            {
-                                MaxVersion = new Version(5,6,7,8),
-                                MinVersion = new Version(1,2,3,4),
-                                Name = "ValueIf",
-                                Notes = "ABC123"
-                            }
-                        }
-                    }
-                };
-
-
+//                yield return new DeserializationTestFunction(@"Do: Print
+//Config:
+//  AdditionalRequirements:
+//  - Notes: ABC123
+//    Name: ValueIf
+//    MinVersion: 1.2.3.4
+//    MaxVersion: 5.6.7.8
+//  TargetMachineTags:
+//  - Tag1
+//  DoNotSplit: false
+//  Priority: 1
+//Value: I have config too", "I have config too")
+//                {
+//                    ExpectedConfiguration = new Configuration
+//                    {
+//                        TargetMachineTags = new List<string> { "Tag1" },
+//                        DoNotSplit = false,
+//                        Priority = 1,
+//                        AdditionalRequirements = new List<Requirement>
+//                        {
+//                            new Requirement
+//                            {
+//                                MaxVersion = new Version(5,6,7,8),
+//                                MinVersion = new Version(1,2,3,4),
+//                                Name = "ValueIf",
+//                                Notes = "ABC123"
+//                            }
+//                        }
+//                    }
+//                };
 
 
-                yield return new DeserializationTestFunction(@"ForEach(Array = ['a','b','c'], Variable = <char>, Action = Print(Value = <char>))", "a", "b", "c");
-                yield return new DeserializationTestFunction(@"ForEach(
-Array = ['a','b','c'],
-Variable = <char>,
-Action = Print(Value = <char>))", "a", "b", "c");
+
+
+                yield return new DeserializationTestFunction(@"ForEach ['a','b','c'] <char> (Print <char>)", "a", "b", "c");
+                yield return new DeserializationTestFunction(@"ForEach
+['a','b','c']
+<char>
+(Print <char>)", "a", "b", "c");
 
 
             }

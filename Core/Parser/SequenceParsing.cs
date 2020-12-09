@@ -64,7 +64,10 @@ namespace Reductech.EDR.Core.Parser
                 if (context.step() != null)
                     return VisitStep(context.step());
 
-                return VisitStepSequence(context.stepSequence());
+                if(context.stepSequence() != null)
+                    return VisitStepSequence(context.stepSequence());
+
+                return ParseError(context);
             }
 
 

@@ -49,7 +49,9 @@ fullSequence		: (step | stepSequence)  EOF ;
 /*
  * Lexer Rules
  */
-
+ 
+SINGLELINECOMMENT	: '//'  ~[\r\n\u0085\u2028\u2029]* -> skip;
+DELIMITEDCOMMENT	: '/*'  .*? '*/' -> skip;
 DASH                : '-' ;
 PLUS                : '+' ;
 ASTERIX             : '*' ;
