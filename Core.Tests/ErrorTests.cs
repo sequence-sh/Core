@@ -7,11 +7,13 @@ using Reductech.EDR.Core.Enums;
 using Reductech.EDR.Core.ExternalProcesses;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
+using Reductech.EDR.Core.Parser;
 using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.Util;
 using Reductech.Utilities.Testing;
 using Xunit;
 using Xunit.Abstractions;
+using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 
 namespace Reductech.EDR.Core.Tests
 {
@@ -35,7 +37,7 @@ namespace Reductech.EDR.Core.Tests
             get
             {
                 yield return new ErrorTestFunction("Get Missing Variable",
-                    new GetVariable<string>
+                    new GetVariable<StringStream>
                     {
                         Variable = FooString
                     },
@@ -121,21 +123,21 @@ namespace Reductech.EDR.Core.Tests
                     new CharAtIndex
                     {
                         Index = new Constant<int>(-1),
-                        String = new Constant<string>("Foo")
+                        String = Constant("Foo")
                     }, new ErrorBuilder("Index was outside the bounds of the string", ErrorCode.IndexOutOfBounds));
 
                 yield return new ErrorTestFunction("Get letter out of bounds",
                     new CharAtIndex
                     {
                         Index = new Constant<int>(5),
-                        String = new Constant<string>("Foo")
+                        String = Constant("Foo")
                     }, new ErrorBuilder("Index was outside the bounds of the string", ErrorCode.IndexOutOfBounds));
 
                 yield return new ErrorTestFunction("Get substring minus one",
                     new GetSubstring
                     {
                         Index = new Constant<int>(-1),
-                        String = new Constant<string>("Foo"),
+                        String = Constant("Foo"),
                         Length = new Constant<int>(10)
                     }, new ErrorBuilder("Index was outside the bounds of the string", ErrorCode.IndexOutOfBounds));
 
@@ -143,7 +145,7 @@ namespace Reductech.EDR.Core.Tests
                     new GetSubstring
                     {
                         Index = new Constant<int>(5),
-                        String = new Constant<string>("Foo"),
+                        String = Constant("Foo"),
                         Length = new Constant<int>(10)
                     }, new ErrorBuilder("Index was outside the bounds of the string", ErrorCode.IndexOutOfBounds));
 

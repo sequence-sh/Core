@@ -26,46 +26,48 @@ namespace Reductech.EDR.Core
         /// <summary>
         /// Writes entities from an entityStream to a stream in csv format.
         /// </summary>
-        public static async Task<Result<DataStream, IError>> WriteCSV(
+        public static async Task<Result<StringStream, IError>> WriteCSV(
             IStateMonad stateMonad,
             IStep<EntityStream> entityStream,
-            IStep<string> delimiter,
+            IStep<StringStream> delimiter,
             IStep<EncodingEnum> encoding,
-            IStep<string> quoteCharacter,
+            IStep<StringStream> quoteCharacter,
             IStep<bool> alwaysQuote,
-            IStep<string> multiValueDelimiter,
-            IStep<string> dateTimeFormat,
+            IStep<StringStream> multiValueDelimiter,
+            IStep<StringStream> dateTimeFormat,
             IErrorLocation errorLocation,
 
             CancellationToken cancellationToken)
         {
             var entityStreamResult = await entityStream.Run(stateMonad, cancellationToken);
 
-            if (entityStreamResult.IsFailure) return entityStreamResult.ConvertFailure<DataStream>();
+            if (entityStreamResult.IsFailure) return entityStreamResult.ConvertFailure<StringStream>();
 
-            var delimiterResult = await delimiter.Run(stateMonad, cancellationToken);
+            var delimiterResult = await delimiter.Run(stateMonad, cancellationToken)
+                .Map(async x=> await x.GetStringAsync());
 
-            if (delimiterResult.IsFailure) return delimiterResult.ConvertFailure<DataStream>();
+            if (delimiterResult.IsFailure) return delimiterResult.ConvertFailure<StringStream>();
 
             var encodingResult = await encoding.Run(stateMonad, cancellationToken);
 
-            if (encodingResult.IsFailure) return encodingResult.ConvertFailure<DataStream>();
+            if (encodingResult.IsFailure) return encodingResult.ConvertFailure<StringStream>();
 
             var quoteResult = await CSVReader.TryConvertToChar(quoteCharacter, "Quote Character", stateMonad, errorLocation, cancellationToken);
-            if (quoteResult.IsFailure) return quoteResult.ConvertFailure<DataStream>();
+            if (quoteResult.IsFailure) return quoteResult.ConvertFailure<StringStream>();
 
             var multiValueResult = await CSVReader.TryConvertToChar(multiValueDelimiter, "MultiValue Delimiter", stateMonad, errorLocation, cancellationToken);
-            if (multiValueResult.IsFailure) return multiValueResult.ConvertFailure<DataStream>();
+            if (multiValueResult.IsFailure) return multiValueResult.ConvertFailure<StringStream>();
 
             if(multiValueResult.Value is null)
                 return new SingleError("MultiValue Delimiter is empty", ErrorCode.CSVError, errorLocation);
 
 
             var alwaysQuoteResult = await alwaysQuote.Run(stateMonad, cancellationToken);
-            if (alwaysQuoteResult.IsFailure) return alwaysQuoteResult.ConvertFailure<DataStream>();
+            if (alwaysQuoteResult.IsFailure) return alwaysQuoteResult.ConvertFailure<StringStream>();
 
-            var dateTimeResult = await dateTimeFormat.Run(stateMonad, cancellationToken);
-            if (dateTimeResult.IsFailure) return dateTimeResult.ConvertFailure<DataStream>();
+            var dateTimeResult = await dateTimeFormat.Run(stateMonad, cancellationToken)
+                .Map(async x=> await x.GetStringAsync());
+            if (dateTimeResult.IsFailure) return dateTimeResult.ConvertFailure<StringStream>();
 
 
             var result = await WriteCSV(entityStreamResult.Value,
@@ -75,8 +77,7 @@ namespace Reductech.EDR.Core
                 multiValueResult.Value.Value,
                 alwaysQuoteResult.Value,
                 dateTimeResult.Value, cancellationToken)
-                    .Map(x=> new DataStream(x, encodingResult.Value))
-                ;
+                    .Map(x=> new StringStream(x, encodingResult.Value));
 
             return result;
         }

@@ -6,33 +6,40 @@ using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
+using Reductech.EDR.Core.Parser;
 
 namespace Reductech.EDR.Core.Steps
 {
     /// <summary>
     /// Gets the value of a property from an entity
     /// </summary>
-    public sealed class EntityGetValue : CompoundStep<string>
+    public sealed class EntityGetValue : CompoundStep<StringStream>
     {
         /// <inheritdoc />
-        public override async Task<Result<string, IError>> Run(IStateMonad stateMonad,
+        public override async Task<Result<StringStream, IError>> Run(IStateMonad stateMonad,
             CancellationToken cancellationToken)
         {
             var entity = await Entity.Run(stateMonad, cancellationToken);
 
-            if (entity.IsFailure) return entity.ConvertFailure<string>();
+            if (entity.IsFailure) return entity.ConvertFailure<StringStream>();
 
-            var property = await Property.Run(stateMonad, cancellationToken);
+            var propertyResult = await Property.Run(stateMonad, cancellationToken);
 
-            if (property.IsFailure) return property.ConvertFailure<string>();
+            if (propertyResult.IsFailure) return propertyResult.ConvertFailure<StringStream>();
 
-            if (!entity.Value.TryGetValue(property.Value, out var ev) || ev == null)
+            var propertyName = await propertyResult.Value.GetStringAsync();
+
+
+
+            if (!entity.Value.TryGetValue(propertyName, out var ev) || ev == null)
                 ev = EntityValue.Create(null, null);
 
 
             var resultString = ev.Value.Match(_ => "", v => v.ToString(), vs => string.Join(",", vs));
 
-            return resultString;
+            var resultStream = new StringStream(resultString);
+
+            return resultStream;
         }
 
         /// <summary>
@@ -48,7 +55,7 @@ namespace Reductech.EDR.Core.Steps
         /// </summary>
         [StepProperty(2)]
         [Required]
-        public IStep<string> Property { get; set; } = null!;
+        public IStep<StringStream> Property { get; set; } = null!;
 
         /// <inheritdoc />
         public override IStepFactory StepFactory => EntityGetValueStepFactory.Instance;
@@ -57,13 +64,13 @@ namespace Reductech.EDR.Core.Steps
     /// <summary>
     /// Gets the value of a property from an entity
     /// </summary>
-    public sealed class EntityGetValueStepFactory : SimpleStepFactory<EntityGetValue, string>
+    public sealed class EntityGetValueStepFactory : SimpleStepFactory<EntityGetValue, StringStream>
     {
         private EntityGetValueStepFactory() {}
 
         /// <summary>
         /// The instance.
         /// </summary>
-        public static SimpleStepFactory<EntityGetValue, string> Instance { get; } = new EntityGetValueStepFactory();
+        public static SimpleStepFactory<EntityGetValue, StringStream> Instance { get; } = new EntityGetValueStepFactory();
     }
 }

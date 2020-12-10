@@ -6,6 +6,7 @@ using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.TestHarness;
 using Reductech.EDR.Core.Util;
 using Xunit.Abstractions;
+using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
@@ -24,11 +25,8 @@ namespace Reductech.EDR.Core.Tests.Steps
                     {
                         EntityStream = new FromConcordance()
                         {
-                            Stream = new StringToStream
-                            {
-                                String = Constant(
+                            Stream = Constant(
                                     $@"þFooþþBarþ{Environment.NewLine}þHelloþþWorldþ{Environment.NewLine}þHello 2þþWorld 2þ")
-                            }
                         },
                         Action = new Print<Entity>
                         {
@@ -43,11 +41,8 @@ namespace Reductech.EDR.Core.Tests.Steps
                     {
                         EntityStream = new FromConcordance
                         {
-                            Stream = new StringToStream
-                            {
-                                String = Constant(
+                            Stream = Constant(
                                     $@"þFooþþBarþ{Environment.NewLine}þHelloþþWorld|Earthþ{Environment.NewLine}þHello 2þþWorld 2|Earth 2þ")
-                            }
                         },
                         Action = new Print<Entity>
                         {

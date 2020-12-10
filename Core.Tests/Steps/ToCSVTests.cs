@@ -7,10 +7,11 @@ using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.TestHarness;
 using Reductech.EDR.Core.Util;
 using Xunit.Abstractions;
+using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
-    public class ToCSVTests : StepTestBase<ToCSV, DataStream>
+    public class ToCSVTests : StepTestBase<ToCSV, StringStream>
     {
         /// <inheritdoc />
         public ToCSVTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
@@ -24,18 +25,15 @@ namespace Reductech.EDR.Core.Tests.Steps
             {
                 yield return new StepCase("Write Simple CSV",
 
-                    new Print<string>
+                    new Print<StringStream>
                     {
-                        Value = new StringFromStream
+                        Value = new ToCSV
                         {
-                            Stream = new ToCSV
-                            {
-                                Entities = new Constant<EntityStream>(EntityStream.Create(
+                            Entities = new Constant<EntityStream>(EntityStream.Create(
                                             CreateEntity(("Foo", "Hello"), ("Bar", "World")),
                                             CreateEntity(("Foo", "Hello 2"), ("Bar", "World 2"))
 
                                         ))
-                            }
                         }
                     }, Unit.Default,
                     $"Foo,Bar{Environment.NewLine}Hello,World{Environment.NewLine}Hello 2,World 2{Environment.NewLine}"
@@ -43,19 +41,16 @@ namespace Reductech.EDR.Core.Tests.Steps
 
                 yield return new StepCase("Write Simple CSV with tab delimiter",
 
-                    new Print<string>
+                    new Print<StringStream>
                     {
-                        Value = new StringFromStream
+                        Value = new ToCSV
                         {
-                            Stream = new ToCSV
-                            {
-                                Entities = new Constant<EntityStream>(EntityStream.Create(
+                            Entities = new Constant<EntityStream>(EntityStream.Create(
                                             CreateEntity(("Foo", "Hello"), ("Bar", "World")),
                                             CreateEntity(("Foo", "Hello 2"), ("Bar", "World 2"))
 
                                         )),
-                                Delimiter = Constant("\t")
-                            }
+                            Delimiter = Constant("\t")
                         }
                     }, Unit.Default,
                     $"Foo\tBar{Environment.NewLine}Hello\tWorld{Environment.NewLine}Hello 2\tWorld 2{Environment.NewLine}"

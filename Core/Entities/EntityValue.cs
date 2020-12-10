@@ -6,6 +6,7 @@ using CSharpFunctionalExtensions;
 using OneOf;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
+using Reductech.EDR.Core.Parser;
 using Reductech.EDR.Core.Serialization;
 
 namespace Reductech.EDR.Core.Entities
@@ -50,6 +51,7 @@ namespace Reductech.EDR.Core.Entities
             switch (argValue)
             {
                 case null: return new EntityValue(DBNull.Value);
+                case StringStream ss: return Create(ss.GetString());
                 case string s: return Create(s, multiValueDelimiter);
                 case int i: return new EntityValue(new EntitySingleValue(i, argValue.ToString()!));
                 case bool b: return new EntityValue(new EntitySingleValue(b, argValue.ToString()!));
@@ -59,9 +61,14 @@ namespace Reductech.EDR.Core.Entities
                 case Entity entity: return new EntityValue(new EntitySingleValue(entity, entity.ToString()));
                 case IEnumerable e:
                 {
-                    var newEnumerable  = e.Cast<object>().Select(x=>x.ToString()!);
+                    var newEnumerable  = e.Cast<object>().Select(x=>
+                        x is StringStream ss? ss.GetString() :
+                            x.ToString()!);
                     return Create(newEnumerable);
                 }
+                case IResult: throw new ArgumentException("Attempt to set EntityValue to a Result - you should check the result for failure and then set it to the value of the result", nameof(argValue));
+
+
                 default:
                     return Create(argValue.ToString(), multiValueDelimiter);
             }

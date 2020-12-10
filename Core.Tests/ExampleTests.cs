@@ -96,7 +96,7 @@ namespace Reductech.EDR.Core.Tests
                     new SetVariable<EntityStream>
                     {
                         Variable = new VariableName("EntityStream"),
-                        Value = new FromCSV{Stream = new ReadFile{Path = new Constant<string>(@"C:\Users\wainw\source\repos\Reductech\edr\Examples\Dinosaurs.csv")}}
+                        Value = new FromCSV{Stream = new ReadFile{Path = new Constant<StringStream>(@"C:\Users\wainw\source\repos\Reductech\edr\Examples\Dinosaurs.csv")}}
                     },
 
                     new SetVariable<Entity>()
@@ -117,7 +117,7 @@ namespace Reductech.EDR.Core.Tests
 
                     new FileWrite
                     {
-                        Path = new PathCombine{Paths = new Constant<List<string>>(new List<string>{"MyFile.txt"})},
+                        Path = new PathCombine{Paths = new Constant<List<StringStream>>(new List<StringStream>{"MyFile.txt"})},
                         Stream = new ToCSV
                         {
                             Entities = new EnforceSchema()

@@ -5,6 +5,7 @@ using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
+using Reductech.EDR.Core.Parser;
 
 namespace Reductech.EDR.Core.Steps
 {
@@ -18,18 +19,19 @@ namespace Reductech.EDR.Core.Steps
         /// </summary>
         [StepProperty(1)]
         [Required]
-        public IStep<string> Path { get; set; } = null!;
+        public IStep<StringStream> Path { get; set; } = null!;
 
         /// <inheritdoc />
         public override async Task<Result<bool, IError>> Run(IStateMonad stateMonad,
             CancellationToken cancellationToken)
         {
-            var pathResult = await Path.Run(stateMonad, cancellationToken);
+            var pathResult = await Path.Run(stateMonad, cancellationToken)
+                .Map(async x=> await x.GetStringAsync());
 
             if (pathResult.IsFailure) return pathResult.ConvertFailure<bool>();
 
-            var r = stateMonad.FileSystemHelper.DoesFileExist(pathResult.Value);
 
+            var r = stateMonad.FileSystemHelper.DoesFileExist(pathResult.Value);
             return r;
         }
 

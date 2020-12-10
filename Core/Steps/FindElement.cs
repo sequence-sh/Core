@@ -34,8 +34,17 @@ namespace Reductech.EDR.Core.Steps
         /// <inheritdoc />
         public override async Task<Result<int, IError>> Run(IStateMonad stateMonad, CancellationToken cancellationToken)
         {
-            return await Array.Run(stateMonad, cancellationToken).Compose(() => Element.Run(stateMonad, cancellationToken))
-                .Map(x => x.Item1.IndexOf(x.Item2));
+            var arrayResult = await Array.Run(stateMonad, cancellationToken);
+
+            if (arrayResult.IsFailure) return arrayResult.ConvertFailure<int>();
+
+            var elementResult = await Element.Run(stateMonad, cancellationToken);
+
+            if (elementResult.IsFailure) return elementResult.ConvertFailure<int>();
+
+            var r = arrayResult.Value.IndexOf(elementResult.Value);
+
+            return r;
         }
 
         /// <inheritdoc />

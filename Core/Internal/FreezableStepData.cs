@@ -146,8 +146,10 @@ namespace Reductech.EDR.Core.Internal
             void LocalGetVariablesSet(IFreezableStep freezableStep)
             {
                 var variablesSet = freezableStep.GetVariablesSet(typeResolver);
-                if (variablesSet.IsFailure) errors.Add(variablesSet.Error);
-                variables.AddRange(variablesSet.Value);
+                if (variablesSet.IsFailure)
+                    errors.Add(variablesSet.Error);
+                else
+                    variables.AddRange(variablesSet.Value);
             }
         }
     }

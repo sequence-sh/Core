@@ -1,14 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using Reductech.EDR.Core.Internal;
+using Reductech.EDR.Core.Parser;
 using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.TestHarness;
 using Reductech.EDR.Core.Util;
 using Xunit.Abstractions;
+using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
-    public class SequenceTests : StepTestBase<Sequence<string>, string>
+    public class SequenceTests : StepTestBase<Sequence<StringStream>, StringStream>
     {
         /// <inheritdoc />
         public SequenceTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
@@ -21,12 +23,12 @@ namespace Reductech.EDR.Core.Tests.Steps
             get
             {
                 yield return new StepCase("Print then print",
-                    new Sequence<string>
+                    new Sequence<StringStream>
                 {
                     InitialSteps = new List<IStep<Unit>>
                     {
-                        new Print<string> {Value = Constant("Hello")},
-                        new Print<string> {Value = Constant("World")}
+                        new Print<StringStream> {Value = Constant("Hello")},
+                        new Print<StringStream> {Value = Constant("World")}
                     },
                     FinalStep = Constant("Goodbye")
                 },
@@ -53,7 +55,7 @@ namespace Reductech.EDR.Core.Tests.Steps
             get
             {
                 yield return new SerializeCase("Short form",
-                    new Sequence<string>
+                    new Sequence<StringStream>
                     {
                         InitialSteps = new List<IStep<Unit>>
                         {

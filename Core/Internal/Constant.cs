@@ -44,7 +44,7 @@ namespace Reductech.EDR.Core.Internal
             {
                 return o switch
                 {
-                    string s => new ConstantFreezableStep(s),
+                    StringStream s => new ConstantFreezableStep(s),
                     int i => new ConstantFreezableStep(i),
                     double d => new ConstantFreezableStep(d),
                     bool b => new ConstantFreezableStep(b),
@@ -52,7 +52,6 @@ namespace Reductech.EDR.Core.Internal
                     DateTime dt => new ConstantFreezableStep(dt),
                     Entity ent => new ConstantFreezableStep(ent),
                     EntityStream es => new ConstantFreezableStep(es),
-                    DataStream ds => new ConstantFreezableStep(ds),
                     Schema schema => new ConstantFreezableStep(schema.ConvertToEntity()),
                     IEnumerable enumerable => UnfreezeList(enumerable),
                     _ => throw new Exception($"Cannot unfreeze {typeof(T)}")
@@ -112,7 +111,7 @@ namespace Reductech.EDR.Core.Internal
                     DateTime dt => dt.ToString("O"),
                     Entity ent => ent.Serialize(),
                     EntityStream es => await SerializeEntityStream(es, cancellationToken),
-                    DataStream ds => await ds.SerializeAsync(cancellationToken),
+                    StringStream ds => await ds.SerializeAsync(cancellationToken),
                     Schema schema => schema.ConvertToEntity().Serialize(),
                     IEnumerable enumerable => await SerializeEnumerable(enumerable, cancellationToken),
                 _ => throw new Exception($"Cannot serialize {typeof(T)}")

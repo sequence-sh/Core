@@ -6,6 +6,7 @@ using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
+using Reductech.EDR.Core.Parser;
 
 namespace Reductech.EDR.Core.Steps
 {
@@ -18,12 +19,14 @@ namespace Reductech.EDR.Core.Steps
         public override async Task<Result<bool, IError>> Run(IStateMonad stateMonad,
             CancellationToken cancellationToken)
         {
-            var superstringResult = await String.Run(stateMonad, cancellationToken);
+            var superstringResult = await String.Run(stateMonad, cancellationToken)
+                .Map(async x => await x.GetStringAsync());
 
             if (superstringResult.IsFailure) return superstringResult.ConvertFailure<bool>();
 
 
-            var substringResult = await Substring.Run(stateMonad, cancellationToken);
+            var substringResult = await Substring.Run(stateMonad, cancellationToken)
+                .Map(async x => await x.GetStringAsync());
 
             if (substringResult.IsFailure) return substringResult.ConvertFailure<bool>();
 
@@ -41,14 +44,14 @@ namespace Reductech.EDR.Core.Steps
         /// </summary>
         [StepProperty(1)]
         [Required]
-        public IStep<string> String { get; set; } = null!;
+        public IStep<StringStream> String { get; set; } = null!;
 
         /// <summary>
         /// The substring
         /// </summary>
         [StepProperty(2)]
         [Required]
-        public IStep<string> Substring { get; set; } = null!;
+        public IStep<StringStream> Substring { get; set; } = null!;
 
         /// <summary>
         /// Whether to ignore case when comparing strings.

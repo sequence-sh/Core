@@ -8,10 +8,10 @@ using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Parser;
 using Reductech.EDR.Core.Serialization;
 using DateTime = System.DateTime;
-using Option = OneOf.OneOf<string, int, double, bool,
+using Option = OneOf.OneOf<Reductech.EDR.Core.Parser.StringStream, int, double, bool,
 Reductech.EDR.Core.Internal.Enumeration, System.DateTime,
 Reductech.EDR.Core.Entity,
-Reductech.EDR.Core.Entities.EntityStream, Reductech.EDR.Core.Parser.DataStream>;
+Reductech.EDR.Core.Entities.EntityStream>;
 
 namespace Reductech.EDR.Core.Internal
 {
@@ -75,15 +75,14 @@ namespace Reductech.EDR.Core.Internal
             get
             {
                 return Value.Match(
-                            SerializationMethods.DoubleQuote,
+                            s=>s.Name,
                             i => i.ToString(),
                             d => d.ToString("G17"),
                             b => b.ToString(),
                             e => e.ToString(),
                             dt => dt.ToString("O"),
                             entity => entity.Serialize(),
-                            es => "EntityStream",
-                            ds => "DataStream"
+                            es => "EntityStream"
                         );
             }
         }
@@ -97,7 +96,6 @@ namespace Reductech.EDR.Core.Internal
                 x=>Result.Success<object, IError>(x),
                 TryGetEnumerationValue,
                 x=>Result.Success<object, IError>(x),
-                Result.Success<object, IError>,
                 Result.Success<object, IError>,
                 Result.Success<object, IError>);
 
@@ -123,20 +121,19 @@ namespace Reductech.EDR.Core.Internal
                 return await SerializationMethods.SerializeEntityStreamAsync(Value.AsT7, cancellation);
 
 
-            if (Value.IsT8)
-                return await Value.AsT8.SerializeAsync(cancellation);
+            if (Value.IsT0)
+                return await Value.AsT0.SerializeAsync(cancellation);
 
             return
                 Value.Match(
-                        SerializationMethods.DoubleQuote,
+                    x=> throw new Exception("Should not encounter string stream here"),
                     i => i.ToString(),
                     d => d.ToString("G17"),
                     b => b.ToString(),
                     e => e.ToString(),
                     dt => dt.ToString("O"),
                     entity => entity.Serialize(),
-                    es => throw new Exception("Should not encounter entity stream here"),
-                    ds =>  throw new Exception("Should not encounter data stream here"));
+                    es => throw new Exception("Should not encounter entity stream here"));
         }
 
 
@@ -147,15 +144,14 @@ namespace Reductech.EDR.Core.Internal
         private Result<Type, IError> TryGetType(StepFactoryStore stepFactoryStore)
         {
             var type = Value.Match(
-               _ => typeof(string),
+               _ => typeof(StringStream),
                _ => typeof(int),
                _ => typeof(double),
                _ => typeof(bool),
                GetEnumerationType,
                _ => typeof(DateTime),
                _ => typeof(Entity),
-               _ => typeof(EntityStream),
-               _ => typeof(DataStream));
+               _ => typeof(EntityStream));
 
             return type;
 

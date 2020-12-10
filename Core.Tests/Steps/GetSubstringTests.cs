@@ -1,11 +1,13 @@
 ﻿using System.Collections.Generic;
+using Reductech.EDR.Core.Parser;
 using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.TestHarness;
 using Xunit.Abstractions;
+using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
-    public class GetSubstringTests : StepTestBase<GetSubstring, string>
+    public class GetSubstringTests : StepTestBase<GetSubstring, StringStream>
     {
         /// <inheritdoc />
         public GetSubstringTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)

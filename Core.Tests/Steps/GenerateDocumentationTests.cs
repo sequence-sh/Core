@@ -7,13 +7,15 @@ using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
+using Reductech.EDR.Core.Parser;
 using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.TestHarness;
 using Xunit.Abstractions;
 
+
 namespace Reductech.EDR.Core.Tests.Steps
 {
-    public class GenerateDocumentationTests : StepTestBase<GenerateDocumentation, List<string>>
+    public class GenerateDocumentationTests : StepTestBase<GenerateDocumentation, List<StringStream>>
     {
         /// <inheritdoc />
         public GenerateDocumentationTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
@@ -27,7 +29,7 @@ namespace Reductech.EDR.Core.Tests.Steps
             {
                 yield return new StepCase("Generate Not Documentation",
                     new GenerateDocumentation(),
-                    new List<string>
+                    new List<StringStream>
                     {
                         "# Contents",
                         "|Step       |Summary                     |",
@@ -50,7 +52,7 @@ namespace Reductech.EDR.Core.Tests.Steps
 
                 yield return new StepCase("Generate Math Documentation",
                     new GenerateDocumentation(),
-                    new List<string>()
+                    new List<StringStream>()
                     {
                         "# Contents",
                         "|Step                                   |Summary                                                                              |",
@@ -90,7 +92,7 @@ namespace Reductech.EDR.Core.Tests.Steps
 
                 yield return new StepCase("Generate Array Documentation",
                     new GenerateDocumentation(),
-                    new List<string>
+                    new List<StringStream>
                     {
                         "# Contents",
                         "|Step                 |Summary                                     |",
@@ -113,7 +115,7 @@ namespace Reductech.EDR.Core.Tests.Steps
 
                 yield return new StepCase("Example step",
                     new GenerateDocumentation(),
-                    new List<string>()
+                    new List<StringStream>()
                     {
                         "# Contents",
                         "|Step                                                 |Summary|",
@@ -138,7 +140,7 @@ namespace Reductech.EDR.Core.Tests.Steps
 
                 yield return new StepCase("Two InitialSteps",
                     new GenerateDocumentation(),
-                    new List<string>()
+                    new List<StringStream>()
                     {
                         "# Contents",
                         "|Step                                                 |Summary                     |",
@@ -188,11 +190,11 @@ namespace Reductech.EDR.Core.Tests.Steps
         protected override IEnumerable<ErrorCase> ErrorCases { get{ yield break;} }
 
 
-        private class DocumentationExampleStepFactory : SimpleStepFactory<DocumentationExampleStep, string>
+        private class DocumentationExampleStepFactory : SimpleStepFactory<DocumentationExampleStep, StringStream>
         {
             private DocumentationExampleStepFactory() { }
 
-            public static SimpleStepFactory<DocumentationExampleStep, string> Instance { get; } = new DocumentationExampleStepFactory();
+            public static SimpleStepFactory<DocumentationExampleStep, StringStream> Instance { get; } = new DocumentationExampleStepFactory();
 
             /// <inheritdoc />
             public override IEnumerable<Requirement> Requirements
@@ -211,11 +213,11 @@ namespace Reductech.EDR.Core.Tests.Steps
             public override string Category => "Examples";
         }
 
-        private class DocumentationExampleStep : CompoundStep<string>
+        private class DocumentationExampleStep : CompoundStep<StringStream>
         {
             /// <inheritdoc />
 #pragma warning disable 1998
-            public override async Task<Result<string, IError>> Run(IStateMonad stateMonad,
+            public override async Task<Result<StringStream, IError>> Run(IStateMonad stateMonad,
                 CancellationToken cancellation)
 #pragma warning restore 1998
             {
@@ -245,7 +247,7 @@ namespace Reductech.EDR.Core.Tests.Steps
             [StepProperty(2)]
             [SeeAlso("Alpha")]
             [DefaultValueExplanation("Two hundred")]
-            public IStep<string> Beta { get; set; } = new Constant<string>("Two hundred");
+            public IStep<StringStream> Beta { get; set; } = new Constant<StringStream>("Two hundred");
 
 
             /// <summary>

@@ -12,20 +12,25 @@ namespace Reductech.EDR.Core.Steps
     /// <summary>
     /// Reads text from a file.
     /// </summary>
-    public sealed class ReadFile : CompoundStep<DataStream>
+    public sealed class ReadFile : CompoundStep<StringStream>
     {
         /// <inheritdoc />
-        public override async Task<Result<DataStream, IError>> Run(IStateMonad stateMonad,
+        public override async Task<Result<StringStream, IError>> Run(IStateMonad stateMonad,
             CancellationToken cancellationToken)
         {
-            var path = await Path.Run(stateMonad, cancellationToken);
+            var path = await Path.Run(stateMonad, cancellationToken)
+                .Map(async x => await x.GetStringAsync());
 
-            if (path.IsFailure) return path.ConvertFailure<DataStream>();
+            if (path.IsFailure) return path.ConvertFailure<StringStream>();
+
+            var encoding = await Encoding.Run(stateMonad, cancellationToken);
+
+            if (encoding.IsFailure) return encoding.ConvertFailure<StringStream>();
 
 
             var result = stateMonad.FileSystemHelper.ReadFile(path.Value)
                     .MapError(x=>x.WithLocation(this))
-                    .Map(x=> new DataStream(x, EncodingEnum.UTF8)); //TODO fix
+                    .Map(x=> new StringStream(x, encoding.Value)); //TODO fix
 
             return result;
         }
@@ -37,7 +42,15 @@ namespace Reductech.EDR.Core.Steps
         [StepProperty(1)]
         [Required]
         [Alias("FromPath")]
-        public IStep<string> Path { get; set; } = null!;
+        public IStep<StringStream> Path { get; set; } = null!;
+
+        /// <summary>
+        /// How the file is encoded.
+        /// </summary>
+        [StepProperty(2)]
+        [DefaultValueExplanation("UTF8 no BOM")]
+        public IStep<EncodingEnum> Encoding { get; set; } = new Constant<EncodingEnum>(EncodingEnum.UTF8);
+
 
         /// <inheritdoc />
         public override IStepFactory StepFactory => ReadFileStepFactory.Instance;
@@ -46,13 +59,13 @@ namespace Reductech.EDR.Core.Steps
     /// <summary>
     /// Reads text from a file.
     /// </summary>
-    public sealed class ReadFileStepFactory : SimpleStepFactory<ReadFile, DataStream>
+    public sealed class ReadFileStepFactory : SimpleStepFactory<ReadFile, StringStream>
     {
         private ReadFileStepFactory() { }
 
         /// <summary>
         /// The instance.
         /// </summary>
-        public static SimpleStepFactory<ReadFile, DataStream> Instance { get; } = new ReadFileStepFactory();
+        public static SimpleStepFactory<ReadFile, StringStream> Instance { get; } = new ReadFileStepFactory();
     }
 }

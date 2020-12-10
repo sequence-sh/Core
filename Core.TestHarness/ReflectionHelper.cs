@@ -18,12 +18,13 @@ using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.Util;
 using Xunit.Sdk;
 using Task = System.Threading.Tasks.Task;
+using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 
 namespace Reductech.EDR.Core.TestHarness
 {
     public abstract partial class StepTestBase<TStep, TOutput>
     {
-        protected static async Task<(TStep step, Dictionary<string, string> values)>  CreateStepWithDefaultOrArbitraryValuesAsync()
+        protected static async Task<(TStep step, Dictionary<string, string> values)> CreateStepWithDefaultOrArbitraryValuesAsync()
         {
             var instance = new TStep();
 
@@ -226,11 +227,15 @@ namespace Reductech.EDR.Core.TestHarness
                 step = new DoNothing();
             }
 
-            else if (outputType == typeof(string))
+            else if (outputType == typeof(StringStream))
             {
                 var s = "Bar" + index;
                 index++;
                 step = Constant(s);
+            }
+            else if (outputType == typeof(string))
+            {
+                throw new Exception($"{tStep.Name} should not have output type 'String' - it should be 'StringStream'");
             }
 
             else if (outputType == typeof(bool))
@@ -252,9 +257,9 @@ namespace Reductech.EDR.Core.TestHarness
                 step =  Constant(d);
             }
 
-            else if (outputType == typeof(List<string>))
+            else if (outputType == typeof(List<StringStream>))
             {
-                var list = new List<string>();
+                var list = new List<StringStream>();
                 for (var i = 0; i < 3; i++)
                 {
                     list.Add("Foo" + index);
@@ -322,12 +327,12 @@ namespace Reductech.EDR.Core.TestHarness
 
                 step = new Constant<EntityStream>(entityStream);
             }
-            else if (outputType == typeof(DataStream))
+            else if (outputType == typeof(StringStream))
             {
                 var s = "DataStream" + index;
                 index++;
 
-                step = new Constant<DataStream>(new DataStream(s));
+                step = new Constant<StringStream>(new StringStream(s));
             }
             else if (outputType == typeof(Schema))
             {

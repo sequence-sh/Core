@@ -1,9 +1,11 @@
 ﻿using System.Collections.Generic;
 using Reductech.EDR.Core.Entities;
+using Reductech.EDR.Core.Parser;
 using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.TestHarness;
 using Reductech.EDR.Core.Util;
 using Xunit.Abstractions;
+using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
@@ -28,7 +30,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                             CreateEntity(("Foo", "Hello")),
                             CreateEntity(("Foo", "Hello 2")))),
 
-                            Function = new EntitySetValue<string>
+                            Function = new EntitySetValue<StringStream>
                             {
                                 Entity = GetEntityVariable,
                                 Property = Constant("Bar"),
@@ -50,7 +52,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                             CreateEntity(("Foo", "Hello"), ("Bar", "Earth")),
                             CreateEntity(("Foo", "Hello 2"), ("Bar", "Earth")))),
 
-                            Function = new EntitySetValue<string>
+                            Function = new EntitySetValue<StringStream>
                             {
                                 Entity = GetEntityVariable,
                                 Property = Constant("Bar"),

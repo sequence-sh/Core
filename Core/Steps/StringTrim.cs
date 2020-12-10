@@ -8,6 +8,7 @@ using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Enums;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
+using Reductech.EDR.Core.Parser;
 using Reductech.EDR.Core.Util;
 
 namespace Reductech.EDR.Core.Steps
@@ -15,7 +16,7 @@ namespace Reductech.EDR.Core.Steps
     /// <summary>
     /// Trims a string.
     /// </summary>
-    public sealed class StringTrim : CompoundStep<string>
+    public sealed class StringTrim : CompoundStep<StringStream>
     {
 
         /// <summary>
@@ -23,7 +24,7 @@ namespace Reductech.EDR.Core.Steps
         /// </summary>
         [StepProperty(1)]
         [Required]
-        public IStep<string> String { get; set; } = null!;
+        public IStep<StringStream> String { get; set; } = null!;
 
         /// <summary>
         /// The side to trim.
@@ -33,11 +34,23 @@ namespace Reductech.EDR.Core.Steps
         public IStep<TrimSide> Side { get; set; } = new Constant<TrimSide>(TrimSide.Both);
 
         /// <inheritdoc />
-        public override async Task<Result<string, IError>> Run(IStateMonad stateMonad,
+        public override async Task<Result<StringStream, IError>> Run(IStateMonad stateMonad,
             CancellationToken cancellationToken)
         {
-            return await String.Run(stateMonad, cancellationToken).Compose(() => Side.Run(stateMonad, cancellationToken))
-                .Map(x => TrimString(x.Item1, x.Item2));
+            var stringResult = await String.Run(stateMonad, cancellationToken)
+                .Map(async x => await x.GetStringAsync());
+
+            if (stringResult.IsFailure) return stringResult.ConvertFailure<StringStream>();
+
+
+            var sideResult = await Side.Run(stateMonad, cancellationToken);
+
+            if (sideResult.IsFailure) return sideResult.ConvertFailure<StringStream>();
+
+            var r = TrimString(stringResult.Value, sideResult.Value);
+
+
+            return new StringStream(r);
         }
 
         private static string TrimString(string s, TrimSide side) =>
@@ -57,13 +70,13 @@ namespace Reductech.EDR.Core.Steps
     /// <summary>
     /// Trims a string.
     /// </summary>
-    public sealed class StringTrimStepFactory : SimpleStepFactory<StringTrim, string>
+    public sealed class StringTrimStepFactory : SimpleStepFactory<StringTrim, StringStream>
     {
         private StringTrimStepFactory() { }
 
         /// <summary>
         /// The instance.
         /// </summary>
-        public static SimpleStepFactory<StringTrim, string> Instance { get; } = new StringTrimStepFactory();
+        public static SimpleStepFactory<StringTrim, StringStream> Instance { get; } = new StringTrimStepFactory();
     }
 }

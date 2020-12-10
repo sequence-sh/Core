@@ -11,6 +11,7 @@ using Namotion.Reflection;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.Internal.Errors;
+using Reductech.EDR.Core.Parser;
 using Reductech.EDR.Core.Serialization;
 using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.Util;
@@ -207,11 +208,11 @@ namespace Reductech.EDR.Core.Internal
                 return Result.Success<IStep, IErrorBuilder>(stepToSet); //No coercion required
 
             if (propertyInfo.PropertyType.IsGenericType &&
-                propertyInfo.PropertyType.GenericTypeArguments.First().IsEnum && stepToSet is Constant<string> constant)
+                propertyInfo.PropertyType.GenericTypeArguments.First().IsEnum && stepToSet is Constant<StringStream> constant && constant.Value.Value.IsT0)
             {
                 var enumType = propertyInfo.PropertyType.GenericTypeArguments.First();
 
-                if (Enum.TryParse(enumType, constant.Value, true, out var enumValue))
+                if (Enum.TryParse(enumType, constant.Value.Value.AsT0, true, out var enumValue))
                 {
                     Type stepType = typeof(Constant<>).MakeGenericType(enumType);
                     var ecs = Activator.CreateInstance(stepType, enumValue);

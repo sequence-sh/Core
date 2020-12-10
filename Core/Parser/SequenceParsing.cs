@@ -201,7 +201,9 @@ namespace Reductech.EDR.Core.Parser
                     UnescapeDoubleQuoted(context.DOUBLEQUOTEDSTRING().GetText()):
                     UnescapeSingleQuoted(context.SINGLEQUOTEDSTRING().GetText());
 
-                var member = new FreezableStepProperty(new ConstantFreezableStep(s), new TextPosition(context) );
+                var stringStream = new StringStream(s);
+
+                var member = new FreezableStepProperty(new ConstantFreezableStep(stringStream), new TextPosition(context) );
 
                 return member;
 

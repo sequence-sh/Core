@@ -6,6 +6,7 @@ using CSharpFunctionalExtensions;
 using Microsoft.Extensions.Logging;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Entities;
+using Reductech.EDR.Core.Enums;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
 
@@ -48,16 +49,16 @@ namespace Reductech.EDR.Core.Steps
 
                 switch (errorBehaviour.Value)
                 {
-                    case Steps.ErrorBehaviour.Fail:
+                    case Enums.ErrorBehaviour.Fail:
                         {
                             throw new ErrorException(r.Error.WithLocation(this));
                         }
-                    case Steps.ErrorBehaviour.Warning:
+                    case Enums.ErrorBehaviour.Warning:
                     {
                         stateMonad.Logger.LogWarning(r.Error.AsString);
                         return Maybe<Entity>.None;
                     }
-                    case Steps.ErrorBehaviour.Ignore: return Maybe<Entity>.None;
+                    case Enums.ErrorBehaviour.Ignore: return Maybe<Entity>.None;
                     default:
                         throw new InvalidEnumArgumentException(nameof(errorBehaviour), (int) errorBehaviour.Value, typeof(ErrorBehaviour));
                 }
@@ -87,7 +88,7 @@ namespace Reductech.EDR.Core.Steps
         /// </summary>
         [StepProperty(3)]
         [DefaultValueExplanation("Fail")]
-        public IStep<ErrorBehaviour> ErrorBehaviour { get; set; } = new Constant<ErrorBehaviour>(Steps.ErrorBehaviour.Fail);
+        public IStep<ErrorBehaviour> ErrorBehaviour { get; set; } = new Constant<ErrorBehaviour>(Enums.ErrorBehaviour.Fail);
 
         /// <inheritdoc />
         public override IStepFactory StepFactory => EnforceSchemaStepFactory.Instance;

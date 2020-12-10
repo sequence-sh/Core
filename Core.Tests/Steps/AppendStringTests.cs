@@ -2,10 +2,13 @@
 using JetBrains.Annotations;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
+using Reductech.EDR.Core.Parser;
 using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.TestHarness;
 using Reductech.EDR.Core.Util;
 using Xunit.Abstractions;
+using static Reductech.EDR.Core.TestHarness.StaticHelpers;
+
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
@@ -38,7 +41,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                     {
                         InitialSteps = new List<IStep<Unit>>()
                         {
-                            new SetVariable<string>()
+                            new SetVariable<StringStream>()
                             {
                                 Value = Constant( "Hello"),
                                 Variable = new VariableName("Foo")

@@ -1,12 +1,14 @@
 ﻿using System.Collections.Generic;
+using Reductech.EDR.Core.Parser;
 using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.TestHarness;
 using Reductech.EDR.Core.Util;
 using Xunit.Abstractions;
+using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
-    public class PrintTests : StepTestBase<Print<string>, Unit>
+    public class PrintTests : StepTestBase<Print<StringStream>, Unit>
     {
         /// <inheritdoc />
         public PrintTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper) {}
@@ -17,7 +19,7 @@ namespace Reductech.EDR.Core.Tests.Steps
             get
             {
                 yield return new StepCase("Print something",
-                    new Print<string>()
+                    new Print<StringStream>()
                     {
                         Value = Constant("Hello")
                     }, Unit.Default, "Hello"

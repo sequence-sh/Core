@@ -2,7 +2,6 @@
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
@@ -26,23 +25,19 @@ namespace Reductech.EDR.Core
         /// <returns></returns>
         public static async Task<Result<EntityStream, IError>> ReadCSV(
             IStateMonad stateMonad,
-            IStep<DataStream> stream,
-            IStep<string> delimiter,
-            IStep<EncodingEnum> encoding,
-            IStep<string> commentCharacter,
-            IStep<string> quoteCharacter,
-            IStep<string> multiValueDelimiter,
+            IStep<StringStream> stream,
+            IStep<StringStream> delimiter,
+            IStep<StringStream> commentCharacter,
+            IStep<StringStream> quoteCharacter,
+            IStep<StringStream> multiValueDelimiter,
             IErrorLocation errorLocation,
             CancellationToken cancellationToken)
         {
             var testStreamResult = await stream.Run(stateMonad, cancellationToken);
             if (testStreamResult.IsFailure) return testStreamResult.ConvertFailure<EntityStream>();
 
-            var delimiterResult = await delimiter.Run(stateMonad, cancellationToken);
+            var delimiterResult = await delimiter.Run(stateMonad, cancellationToken).Map(async x=> await x.GetStringAsync());
             if (delimiterResult.IsFailure) return delimiterResult.ConvertFailure<EntityStream>();
-
-            var encodingResult = await encoding.Run(stateMonad, cancellationToken);
-            if (encodingResult.IsFailure) return encodingResult.ConvertFailure<EntityStream>();
 
             var quoteResult = await TryConvertToChar(quoteCharacter, "Quote Character", stateMonad, errorLocation, cancellationToken);
             if (quoteResult.IsFailure) return quoteResult.ConvertFailure<EntityStream>();
@@ -54,8 +49,7 @@ namespace Reductech.EDR.Core
             if (multiValueResult.IsFailure) return multiValueResult.ConvertFailure<EntityStream>();
 
 
-            var block = ReadCSV(testStreamResult.Value.Stream,
-                encodingResult.Value.Convert(),
+            var block = ReadCSV(testStreamResult.Value,
                 delimiterResult.Value,
                 quoteResult.Value,
                 commentResult.Value,
@@ -65,21 +59,20 @@ namespace Reductech.EDR.Core
             var recordStream = new EntityStream(block);
 
             return recordStream;
-
-
-
         }
 
         /// <summary>
         /// Tries to convert a string step to a single nullable character.
         /// </summary>
-        public static async Task<Result<char?, IError>> TryConvertToChar(IStep<string> step,
+        public static async Task<Result<char?, IError>> TryConvertToChar(IStep<StringStream> step,
             string propertyName,
             IStateMonad stateMonad,
             IErrorLocation errorLocation,
             CancellationToken cancellationToken)
         {
-            var charResult = await step.Run(stateMonad, cancellationToken);
+            var charResult = await step.Run(stateMonad, cancellationToken)
+                .Map(async x=> await x.GetStringAsync());
+
             if (charResult.IsFailure) return charResult.ConvertFailure<char?>();
 
             char? resultChar;
@@ -96,19 +89,19 @@ namespace Reductech.EDR.Core
         /// <summary>
         /// Creates a block that will produce records from the CSV file.
         /// </summary>
-        public static async IAsyncEnumerable<Entity> ReadCSV(Stream stream,
-            Encoding encoding,
+        public static async IAsyncEnumerable<Entity> ReadCSV(StringStream stringStream,
             string delimiter,
             char? quoteCharacter,
             char? commentCharacter,
             char? multiValueDelimiter,
             IErrorLocation location)
-
         {
+            var (stream, encodingEnum) = stringStream.GetStream();
+
             var configuration = new CsvConfiguration(CultureInfo.InvariantCulture)
             {
                 Delimiter = delimiter,
-                Encoding = encoding,
+                Encoding = encodingEnum.Convert(),
                 SanitizeForInjection = false,
                 DetectColumnCountChanges = false,
                 ReadingExceptionOccurred = HandleException,
@@ -128,8 +121,8 @@ namespace Reductech.EDR.Core
             }
             else configuration.AllowComments = false;
 
-            var textReader = new StreamReader(stream, encoding);
 
+            var textReader = new StreamReader(stream, encodingEnum.Convert());
 
             var reader = new CsvReader(textReader, configuration);
 

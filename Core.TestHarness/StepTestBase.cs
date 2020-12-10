@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Reflection;
@@ -8,10 +7,7 @@ using FluentAssertions;
 using FluentAssertions.Common;
 using Namotion.Reflection;
 using Reductech.EDR.Core.Attributes;
-using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.Internal;
-using Reductech.EDR.Core.Steps;
-using Reductech.EDR.Core.Util;
 using Xunit;
 using Xunit.Abstractions;
 using Xunit.Sdk;
@@ -157,55 +153,6 @@ namespace Reductech.EDR.Core.TestHarness
                 .BeAssignableTo<IStepFactory>($"{StepName}.Instance should return an IStepFactory");
         }
 
-        public static IStep<Unit> SetVariable<TNew>(string name, TNew value)=> new SetVariable<TNew> {Variable = new VariableName(name), Value = Constant(value)};
-        public static Constant<TNew> Constant<TNew>(TNew value) => new Constant<TNew>(value);
 
-        public static IStep<List<TNew>> Array<TNew>(params TNew[] elements)=> new Array<TNew> {Elements = elements.Select(Constant).ToList()};
-
-        public static IStep<TNew> GetVariable<TNew>(string variableName)=> new GetVariable<TNew> {Variable = new VariableName(variableName)};
-        public static IStep<TNew> GetVariable<TNew>(VariableName variableName)=> new GetVariable<TNew> {Variable = variableName};
-
-        public static IStep<Entity> GetEntityVariable => GetVariable<Entity>(VariableName.Entity);
-
-        protected static Entity CreateEntity(params (string key, string value)[] pairs)
-        {
-            var evs = pairs
-                .GroupBy(x=>x.key, x=>x.value)
-                .Select(x => new KeyValuePair<string, EntityValue>(x.Key, EntityValue.Create(x)));
-
-            return new Entity(evs.ToImmutableList());
-        }
-
-        protected static Schema CreateSchema(string name, bool allowExtraProperties, params (string propertyName, SchemaPropertyType type, Multiplicity multiplicity)[] properties)
-        {
-            return new Schema
-            {
-                Name = name,
-                AllowExtraProperties = allowExtraProperties,
-                Properties = properties.ToDictionary(x=>x.propertyName, x=> new SchemaProperty
-                {
-                    Multiplicity = x.multiplicity,
-                    Type = x.type
-                })
-            };
-        }
-
-        protected static Schema CreateSchema(string name, bool allowExtraProperties, params (string propertyName, SchemaPropertyType type, Multiplicity multiplicity, string? regex, List<string>? format)[] properties)
-        {
-            return new Schema
-            {
-                Name = name,
-                AllowExtraProperties = allowExtraProperties,
-                Properties = properties.ToDictionary(x => x.propertyName, x => new SchemaProperty
-                {
-                    Multiplicity = x.multiplicity,
-                    Type = x.type,
-                    Regex = x.regex,
-                    Format = x.format
-                })
-            };
-        }
-
-        protected static string CompressNewlines(string s) => s.Replace("\r\n", "\n");
     }
 }

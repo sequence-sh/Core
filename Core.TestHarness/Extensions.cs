@@ -2,6 +2,7 @@
 using Moq;
 using Reductech.EDR.Core.ExternalProcesses;
 using Reductech.EDR.Core.Internal;
+using Reductech.EDR.Core.Parser;
 
 namespace Reductech.EDR.Core.TestHarness
 {
@@ -9,6 +10,10 @@ namespace Reductech.EDR.Core.TestHarness
     {
         public static T WithExpectedFinalState<T>(this T cws, string variableName, object value) where T : ICaseThatExecutes
         {
+            if(value is string s)
+                value = new StringStream(s);
+
+
             cws.ExpectedFinalState.Add(new VariableName(variableName), value);
             return cws;
         }

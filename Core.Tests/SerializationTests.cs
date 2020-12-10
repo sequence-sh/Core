@@ -6,10 +6,12 @@ using FluentAssertions;
 using Reductech.EDR.Core.Enums;
 using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.Internal;
+using Reductech.EDR.Core.Parser;
 using Reductech.EDR.Core.Util;
 using Reductech.Utilities.Testing;
 using Xunit;
 using Xunit.Abstractions;
+using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 
 namespace Reductech.EDR.Core.Tests
 {
@@ -35,10 +37,10 @@ namespace Reductech.EDR.Core.Tests
                     {
                         InitialSteps = new List<IStep<Unit>>
                         {
-                            new SetVariable<string>{Value = new Constant<string>("Hello World"), Variable = new VariableName("Foo")},
-                            new SetVariable<string>{Value = new GetVariable<string> {Variable = new VariableName("Foo")}, Variable = new VariableName("Bar")},
+                            SetVariable("Foo", new StringStream("Hello World")),
+                            new SetVariable<StringStream>{Value = new GetVariable<StringStream> {Variable = new VariableName("Foo")}, Variable = new VariableName("Bar")},
                         },
-                        FinalStep = new Print<string>{Value = new GetVariable<string> {Variable = new VariableName("Bar")}}
+                        FinalStep = new Print<StringStream>{Value = new GetVariable<StringStream> {Variable = new VariableName("Bar")}}
                     },
                     @"- <Foo> = 'Hello World'
 - <Bar> = <Foo>
@@ -130,9 +132,9 @@ namespace Reductech.EDR.Core.Tests
                 {
                     Value = new ApplyBooleanOperator
                     {
-                        Left = new StringIsEmpty{String = new Constant<string>("Hello") },
+                        Left = new StringIsEmpty{String = new Constant<StringStream>("Hello") },
                         Operator = new Constant<BooleanOperator>(BooleanOperator.And),
-                        Right = new StringIsEmpty{String = new Constant<string>("World") }
+                        Right = new StringIsEmpty{String = new Constant<StringStream>("World") }
                     }
                 }, @"Print(Value = (StringIsEmpty(String = 'Hello') && StringIsEmpty(String = 'World')))");
 
@@ -148,9 +150,9 @@ namespace Reductech.EDR.Core.Tests
 
                 yield return new SerializationTestMethod(new Print<bool>
                 {
-                    Value = new ArrayIsEmpty<string>
+                    Value = new ArrayIsEmpty<StringStream>
                     {
-                        Array = new Array<string>{Elements = new List<IStep<string>>()}
+                        Array = new Array<StringStream>{Elements = new List<IStep<StringStream>>()}
                     }
                 }, @"Print(Value = ArrayIsEmpty(Array = Array(Elements = [])))");
 
@@ -195,9 +197,9 @@ namespace Reductech.EDR.Core.Tests
                 );
 
                 yield return new SerializationTestMethod(
-                    new Print<string>
+                    new Print<StringStream>
                     {
-                        Value = new Constant<string>("I have config"),
+                        Value = new Constant<StringStream>("I have config"),
                         Configuration = new Configuration
                         {
                             TargetMachineTags = new List<string> {"Tag1"},
@@ -213,9 +215,9 @@ Config:
 Value: 'I have config'");
 
                 yield return new SerializationTestMethod(
-                    new Print<string>
+                    new Print<StringStream>
                     {
-                        Value = new Constant<string>("I have config too"),
+                        Value = new Constant<StringStream>("I have config too"),
                         Configuration = new Configuration
                         {
                             TargetMachineTags = new List<string> { "Tag1" },

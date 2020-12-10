@@ -5,10 +5,12 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using Reductech.EDR.Core.ExternalProcesses;
 using Reductech.EDR.Core.Internal;
+using Reductech.EDR.Core.Parser;
 using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.TestHarness;
 using Reductech.EDR.Core.Util;
 using Xunit.Abstractions;
+using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
@@ -26,8 +28,8 @@ namespace Reductech.EDR.Core.Tests.Steps
 
                         new RunExternalProcess
                         {
-                            Arguments = new Constant<List<string>>(new List<string>(){"Foo"}),
-                            Path = new Constant<string>("Process.exe"),
+                            Arguments = new Constant<List<StringStream>>(new List<StringStream>(){"Foo"}),
+                            Path = new Constant<StringStream>("Process.exe"),
                             Encoding = Constant(EncodingEnum.Ascii)
                         },
                         Unit.Default, "My Message"
