@@ -104,5 +104,8 @@ namespace Reductech.EDR.Core.Internal
 
             return sb.ToString();
         }
+
+        /// <inheritdoc />
+        public bool ShouldBracketWhenSerialized => false;
     }
 }

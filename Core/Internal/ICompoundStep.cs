@@ -16,13 +16,6 @@ namespace Reductech.EDR.Core.Internal
         /// Requirements for this step that can only be determined at runtime.
         /// </summary>
         IEnumerable<Requirement> RuntimeRequirements { get; }
-
-        /// <summary>
-        /// Whether this term should be bracketed when serialized
-        /// </summary>
-        bool ShouldBracketWhenSerialized { get; }
-
-
     }
 
     /// <summary>

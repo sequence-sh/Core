@@ -56,6 +56,10 @@ namespace Reductech.EDR.Core.Internal
                     return r;
                 });
 
+
+            if (Value.IsT1 && Value.AsT1.ShouldBracketWhenSerialized)
+                result = "(" + result + ")";
+
             return result;
 
             async Task<string> SerializeList(IReadOnlyList<IStep> list)

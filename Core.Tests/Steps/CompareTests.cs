@@ -84,6 +84,39 @@ namespace Reductech.EDR.Core.Tests.Steps
                        Operator = Constant(op)
                    }, expectedOutput );
                }
+
+
+               yield return new StepCase("Left is a func",
+                   new Compare<int>()
+                   {
+                       Left = new StringLength(){String = Constant("Four")},
+                       Operator = Constant(CompareOperator.LessThan),
+                       Right = Constant(5)
+                   },
+                   true
+               );
+
+
+                yield return new StepCase("Right is a func",
+                    new Compare<int>()
+                    {
+                        Left = Constant(3),
+                        Operator = Constant(CompareOperator.LessThan),
+                        Right = new StringLength() { String = Constant("Four") },
+                    },
+                    true
+                );
+
+                yield return new StepCase("Both sides are functions",
+                    new Compare<int>()
+                    {
+                        Left = new StringLength() { String = Constant("Four") },
+                        Operator = Constant(CompareOperator.LessThan),
+                        Right = new StringLength() { String = Constant("Five") },
+                    },
+                    false
+                );
+
             }
         }
 
@@ -114,7 +147,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                         Left = Constant(1),
                         Right = Constant(2),
                         Operator = Constant(CompareOperator.LessThan)
-                    }, "(1 < 2)"
+                    }, "1 < 2"
                 );
             } }
     }

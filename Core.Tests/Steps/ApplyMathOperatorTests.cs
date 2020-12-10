@@ -97,6 +97,53 @@ namespace Reductech.EDR.Core.Tests.Steps
                             Operator = Constant(op)
                         }, expectedOutput );
                 }
+
+                yield return new StepCase("Left is a math operation",
+                  new ApplyMathOperator()
+                  {
+                      Left = new ApplyMathOperator
+                      {
+                          Left = Constant(2),
+                          Operator = Constant(MathOperator.Multiply),
+                          Right = Constant(3)
+                      },
+                      Operator = Constant(MathOperator.Add),
+                      Right = Constant(5)
+                  },
+                  11
+              );
+
+
+                yield return new StepCase("Left is a func",
+                  new ApplyMathOperator()
+                  {
+                      Left = new StringLength() { String = Constant("Four") },
+                      Operator = Constant(MathOperator.Add),
+                      Right = Constant(5)
+                  },
+                  9
+              );
+
+
+                yield return new StepCase("Right is a func",
+                    new ApplyMathOperator()
+                    {
+                        Left = Constant(3),
+                        Operator = Constant(MathOperator.Add),
+                        Right = new StringLength() { String = Constant("Four") },
+                    },
+                    7
+                );
+
+                yield return new StepCase("Both sides are functions",
+                    new ApplyMathOperator()
+                    {
+                        Left = new StringLength() { String = Constant("Four") },
+                        Operator = Constant(MathOperator.Add),
+                        Right = new StringLength() { String = Constant("Five") },
+                    },
+                    8
+                );
             }
 
         }
@@ -111,21 +158,21 @@ namespace Reductech.EDR.Core.Tests.Steps
                     Left = Constant(1),
                     Operator = Constant(MathOperator.Add),
                     Right = Constant(2)
-                }, "(1 + 2)");
+                }, "1 + 2");
 
                 yield return new SerializeCase("Add negative number", new ApplyMathOperator()
                 {
                     Left = Constant(1),
                     Operator = Constant(MathOperator.Add),
                     Right = Constant(-2)
-                }, "(1 + -2)");
+                }, "1 + -2");
 
                 yield return new SerializeCase("Subtract negative number", new ApplyMathOperator()
                 {
                     Left = Constant(1),
                     Operator = Constant(MathOperator.Subtract),
                     Right = Constant(-2)
-                }, "(1 - -2)");
+                }, "1 - -2");
 
             }
         }

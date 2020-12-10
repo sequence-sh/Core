@@ -2,7 +2,7 @@
 /*
  * Parser Rules
  */
-setVariable			: VARIABLENAME EQUALS term;
+setVariable			: VARIABLENAME EQUALS step;
 getVariable         : VARIABLENAME ;
 array				: OPENSQUAREBRACKET ( term ( COMMA term)* )? CLOSESQUAREBRACKET ;
 infixOperator		: DASH
@@ -49,7 +49,7 @@ fullSequence		: (step | stepSequence)  EOF ;
 /*
  * Lexer Rules
  */
- 
+
 SINGLELINECOMMENT	: '//'  ~[\r\n\u0085\u2028\u2029]* -> skip;
 DELIMITEDCOMMENT	: '/*'  .*? '*/' -> skip;
 DASH                : '-' ;

@@ -111,12 +111,11 @@ namespace Reductech.EDR.Core.Steps
 
 
         /// <inheritdoc />
-        public override IStepSerializer Serializer => new StepSerializer(TypeName, new FixedStringComponent("("),
+        public override IStepSerializer Serializer => new StepSerializer(TypeName,
             new StepComponent(nameof(Compare<int>.Left)),
             SpaceComponent.Instance,
             new EnumDisplayComponent<CompareOperator>(nameof(Compare<int>.Operator)),
             SpaceComponent.Instance,
-            new StepComponent(nameof(Compare<int>.Right)),
-            new FixedStringComponent(")"));
+            new StepComponent(nameof(Compare<int>.Right)));
     }
 }

@@ -62,6 +62,9 @@ namespace Reductech.EDR.Core.Internal
 
         /// <inheritdoc />
         public abstract Task<string> SerializeAsync(CancellationToken cancellationToken);
+
+        /// <inheritdoc />
+        public bool ShouldBracketWhenSerialized => false;
     }
 
     /// <summary>
@@ -194,6 +197,6 @@ namespace Reductech.EDR.Core.Internal
         public override IFreezableStep Unfreeze() => new EntityStreamConstantFreezable(Value);
 
         /// <inheritdoc />
-        public override async Task<string> SerializeAsync(CancellationToken cancellationToken) => await SerializationMethods.SerializeEntityStreamAsync(Value, cancellationToken);
+        public override async Task<string> SerializeAsync(CancellationToken cancellationToken) => await Value.SerializeEntityStreamAsync(cancellationToken);
     }
 }

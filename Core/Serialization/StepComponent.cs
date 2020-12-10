@@ -27,7 +27,16 @@ namespace Reductech.EDR.Core.Serialization
         public async Task<Result<string>> TryGetSegmentTextAsync(IReadOnlyDictionary<string, StepProperty> dictionary,
             CancellationToken cancellationToken)
         {
-            return await dictionary[PropertyName].SerializeValueAsync(cancellationToken);
+            var property = dictionary[PropertyName];
+
+
+
+            var r = await property.SerializeValueAsync(cancellationToken);
+
+
+
+
+            return r;
         }
     }
 }

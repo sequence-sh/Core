@@ -34,6 +34,11 @@ namespace Reductech.EDR.Core.Internal
         public Result<Unit, IError> Verify(ISettings settings);
 
         /// <summary>
+        /// Whether this term should be bracketed when serialized
+        /// </summary>
+        bool ShouldBracketWhenSerialized { get; }
+
+        /// <summary>
         /// Configuration for this step.
         /// </summary>
         Configuration? Configuration { get; set; }

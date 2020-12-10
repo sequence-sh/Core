@@ -117,6 +117,7 @@ namespace Reductech.EDR.Core.Internal.Documentation
                     var parameterRows = new List<string?[]> { new[] { "Name", "Summary" } };
                     parameterRows.AddRange(
                         type.GetFields(BindingFlags.Public | BindingFlags.Static)
+                            .OrderBy(GetEnumFieldValue)
                             .Select(fieldInfo => new[] { fieldInfo.Name, fieldInfo.GetXmlDocsSummary() }));
 
                     var table = Prettifier.CreateMarkdownTable(parameterRows).ToList();
@@ -135,6 +136,16 @@ namespace Reductech.EDR.Core.Internal.Documentation
                     .Replace("|", @"\|")
                     .Replace("\r\n", " ")
                     .Replace("\n", " ");
+            }
+
+
+            static object GetEnumFieldValue(MemberInfo memberInfo)
+            {
+                var type = memberInfo.DeclaringType;
+
+                var v =Enum.Parse(type!, memberInfo.Name);
+
+                return v;
             }
         }
 
