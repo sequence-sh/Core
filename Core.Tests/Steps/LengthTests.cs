@@ -2,13 +2,15 @@
 using System.Collections.Generic;
 using JetBrains.Annotations;
 using Reductech.EDR.Core.Internal;
+using Reductech.EDR.Core.Parser;
 using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.TestHarness;
 using Xunit.Abstractions;
+using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
-    public class LengthTests : StepTestBase<ArrayLength<string>, int>
+    public class LengthTests : StepTestBase<ArrayLength<StringStream>, int>
     {
         /// <inheritdoc />
         public LengthTests([NotNull] ITestOutputHelper testOutputHelper) : base(testOutputHelper)
@@ -32,11 +34,11 @@ namespace Reductech.EDR.Core.Tests.Steps
             get
             {
                 yield return new StepCase("Hello World",
-                    new ArrayLength<string>
+                    new ArrayLength<StringStream>
                     {
-                        Array = new Array<string>
+                        Array = new Array<StringStream>
                         {
-                            Elements = new List<IStep<string>>
+                            Elements = new List<IStep<StringStream>>
                             {
                                 Constant("Hello"),
                                 Constant("World"),
@@ -46,11 +48,11 @@ namespace Reductech.EDR.Core.Tests.Steps
 
 
                 yield return new StepCase("Hello World multiline",
-                    new ArrayLength<string>
+                    new ArrayLength<StringStream>
                     {
-                        Array = new Array<string>
+                        Array = new Array<StringStream>
                         {
-                            Elements = new List<IStep<string>>
+                            Elements = new List<IStep<StringStream>>
                             {
                                 Constant($"Hello{Environment.NewLine}Hello"),
                                 Constant($"World{Environment.NewLine}World"),

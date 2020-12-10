@@ -5,6 +5,7 @@ using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
+using Reductech.EDR.Core.Parser;
 
 namespace Reductech.EDR.Core.Steps
 {
@@ -19,10 +20,12 @@ namespace Reductech.EDR.Core.Steps
             var entity = await Entity.Run(stateMonad, cancellationToken);
             if (entity.IsFailure) return entity.ConvertFailure<bool>();
 
-            var property = await Property.Run(stateMonad, cancellationToken);
-            if (property.IsFailure) return property.ConvertFailure<bool>();
+            var propertyResult = await Property.Run(stateMonad, cancellationToken);
+            if (propertyResult.IsFailure) return propertyResult.ConvertFailure<bool>();
 
-            var r = entity.Value.TryGetValue(property.Value, out _);
+            var propertyName = await propertyResult.Value.GetStringAsync();
+
+            var r = entity.Value.TryGetValue(propertyName, out _);
 
             return r;
         }
@@ -39,7 +42,7 @@ namespace Reductech.EDR.Core.Steps
         /// </summary>
         [StepProperty(2)]
         [Required]
-        public IStep<string> Property { get; set; } = null!;
+        public IStep<StringStream> Property { get; set; } = null!;
 
         /// <inheritdoc />
         public override IStepFactory StepFactory => EntityHasPropertyStepFactory.Instance;

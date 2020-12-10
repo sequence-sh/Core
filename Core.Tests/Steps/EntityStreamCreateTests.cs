@@ -5,6 +5,7 @@ using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.TestHarness;
 using Xunit.Abstractions;
+using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
@@ -25,8 +26,8 @@ namespace Reductech.EDR.Core.Tests.Steps
                     {
                         Elements = new List<IStep<Entity>>()
                         {
-                            new Constant<Entity>(CreateEntity(("Foo", "Hello"), ("Bar", "World"))),
-                            new Constant<Entity>(CreateEntity(("Foo", "Hello 2"), ("Bar", "World 2"))),
+                             Constant(CreateEntity(("Foo", "Hello"), ("Bar", "World"))),
+                            Constant(CreateEntity(("Foo", "Hello 2"), ("Bar", "World 2"))),
                         }
                     },
                     new EntityStream(new List<Entity>()

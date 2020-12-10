@@ -4,7 +4,6 @@ using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions.Common;
@@ -18,12 +17,13 @@ using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.Util;
 using Xunit.Sdk;
 using Task = System.Threading.Tasks.Task;
+using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 
 namespace Reductech.EDR.Core.TestHarness
 {
     public abstract partial class StepTestBase<TStep, TOutput>
     {
-        protected static async Task<(TStep step, Dictionary<string, string> values)>  CreateStepWithDefaultOrArbitraryValuesAsync()
+        protected static async Task<(TStep step, Dictionary<string, string> values)> CreateStepWithDefaultOrArbitraryValuesAsync()
         {
             var instance = new TStep();
 
@@ -125,15 +125,10 @@ namespace Reductech.EDR.Core.TestHarness
         {
             var freezable = step.Unfreeze();
 
-            if (freezable is ConstantFreezableStep cfs)
+            if (freezable is IConstantFreezableStep cfs)
             {
-                if (cfs.Value.IsT7)
-                {
-                    return await SerializationMethods.SerializeEntityStreamAsync(cfs.Value.AsT7, CancellationToken.None);
-                }
 
-
-                return await cfs.Serialize(CancellationToken.None);
+                return await cfs.SerializeAsync(CancellationToken.None);
             }
 
             else if (step is DoNothing)
@@ -145,13 +140,13 @@ namespace Reductech.EDR.Core.TestHarness
 
                 var constants = cs.FreezableStepData
                     .StepProperties[new StepParameterReference(nameof(Steps.Array<object>.Elements))]
-                    .StepList.Value.Cast<ConstantFreezableStep>();
+                    .StepList.Value.Cast<IConstantFreezableStep>();
 
                 var list = new List<string>();
 
                 foreach (var constantFreezableStep in constants)
                 {
-                    var s = await constantFreezableStep.Serialize(CancellationToken.None);
+                    var s = await constantFreezableStep.SerializeAsync(CancellationToken.None);
                     list.Add(s);
                 }
 
@@ -226,11 +221,15 @@ namespace Reductech.EDR.Core.TestHarness
                 step = new DoNothing();
             }
 
-            else if (outputType == typeof(string))
+            else if (outputType == typeof(StringStream))
             {
                 var s = "Bar" + index;
                 index++;
                 step = Constant(s);
+            }
+            else if (outputType == typeof(string))
+            {
+                throw new Exception($"{tStep.Name} should not have output type 'String' - it should be 'StringStream'");
             }
 
             else if (outputType == typeof(bool))
@@ -252,7 +251,7 @@ namespace Reductech.EDR.Core.TestHarness
                 step =  Constant(d);
             }
 
-            else if (outputType == typeof(List<string>))
+            else if (outputType == typeof(List<StringStream>))
             {
                 var list = new List<string>();
                 for (var i = 0; i < 3; i++)
@@ -261,7 +260,7 @@ namespace Reductech.EDR.Core.TestHarness
                     index++;
                 }
 
-                step =  Constant(list);
+                step = Array(list.ToArray());
             }
             else if (outputType == typeof(List<int>))
             {
@@ -272,15 +271,15 @@ namespace Reductech.EDR.Core.TestHarness
                     index++;
                 }
 
-                step =  Constant(list);
+                step =  Array(list.ToArray());
             }
             else if (outputType == typeof(List<EntityStream>))
             {
                 var entityStreamList = new List<IStep<EntityStream> >
                 {
-                    new Constant<EntityStream>(CreateSimpleEntityStream(ref index)),
-                    new Constant<EntityStream>(CreateSimpleEntityStream(ref index)),
-                    new Constant<EntityStream>(CreateSimpleEntityStream(ref index))
+                    Constant(CreateSimpleEntityStream(ref index)),
+                    Constant(CreateSimpleEntityStream(ref index)),
+                    Constant(CreateSimpleEntityStream(ref index))
                 };
 
 
@@ -291,55 +290,54 @@ namespace Reductech.EDR.Core.TestHarness
             {
                 var v = Enum.GetValues(outputType).OfType<object>().First();
 
-                var constantType = typeof(Constant<>).MakeGenericType(outputType);
-                var constant = Activator.CreateInstance(constantType, new[] {v});
-
-                step =  (IStep) constant!;
+                step = EnumConstantFreezable.TryCreateEnumConstant(v).Value;
             }
 
             else if (outputType == typeof(Stream))
             {
-                var s = "Baz" + index;
-                index++;
+                throw new Exception($"{tStep.Name} should not have output type 'Stream' - it should be 'StringStream'");
+                //var s = "Baz" + index;
+                //index++;
 
-                byte[] byteArray = Encoding.UTF8.GetBytes(s);
-                Stream stream = new MemoryStream(byteArray); //special case so we don't read the stream early
+                //byte[] byteArray = Encoding.UTF8.GetBytes(s);
+                //Stream stream = new MemoryStream(byteArray); //special case so we don't read the stream early
 
-                step = Constant(stream);
-                var asString = await GetStringAsync(Constant(s));
+                //step = Constant(stream);
+                //var asString = await GetStringAsync(Constant(s));
 
-                return (step, asString, index);
+                //return (step, asString, index);
             }
             else if (outputType == typeof(Entity))
             {
                 var entity = CreateSimpleEntity(ref index);
 
-                step = new Constant<Entity>(entity);
+                step = Constant(entity);
             }
             else if (outputType == typeof(EntityStream))
             {
                 var entityStream = CreateSimpleEntityStream(ref index);
 
-                step = new Constant<EntityStream>(entityStream);
+                step = Constant(entityStream);
             }
-            else if (outputType == typeof(DataStream))
+            else if (outputType == typeof(StringStream))
             {
                 var s = "DataStream" + index;
                 index++;
 
-                step = new Constant<DataStream>(new DataStream(s));
+                step = new StringConstant(new StringStream(s));
             }
             else if (outputType == typeof(Schema))
             {
-                var schema = new Schema
-                {
-                    Name = "Schema" + index,
-                    Properties = new Dictionary<string, SchemaProperty>()
-                };
-                index++;
-                schema.Properties.Add("MyProp" + index, new SchemaProperty{Multiplicity = Multiplicity.Any, Type = SchemaPropertyType.Integer});
-                index++;
-                step = new Constant<Schema>(schema);
+                throw new Exception($"{tStep.Name} should not have output type 'Schema' - it should be 'Entity'");
+                //var schema = new Schema
+                //{
+                //    Name = "Schema" + index,
+                //    Properties = new Dictionary<string, SchemaProperty>()
+                //};
+                //index++;
+                //schema.Properties.Add("MyProp" + index, new SchemaProperty{Multiplicity = Multiplicity.Any, Type = SchemaPropertyType.Integer});
+                //index++;
+                //step = new Constant<Schema>(schema);
             }
             else
                 throw new XunitException($"Cannot create a constant step with type {outputType.GetDisplayName()}");

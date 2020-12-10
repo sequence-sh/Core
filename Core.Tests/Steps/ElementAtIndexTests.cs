@@ -1,18 +1,18 @@
 ﻿using System.Collections.Generic;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
+using Reductech.EDR.Core.Parser;
 using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.TestHarness;
 using Xunit.Abstractions;
+using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
-    public class ElementAtIndexTests : StepTestBase<ElementAtIndex<string>, string>
+    public class ElementAtIndexTests : StepTestBase<ElementAtIndex<StringStream>, StringStream>
     {
         /// <inheritdoc />
-        public ElementAtIndexTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
-        {
-        }
+        public ElementAtIndexTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper) {}
 
         /// <inheritdoc />
         protected override IEnumerable<StepCase> StepCases
@@ -20,17 +20,17 @@ namespace Reductech.EDR.Core.Tests.Steps
             get
             {
                 yield return new StepCase("Index 0",
-                    new ElementAtIndex<string>
+                    new ElementAtIndex<StringStream>
                     {
                         Index = Constant(0),
-                        Array = Array("Hello", "World")
+                        Array = Array(("Hello"), ("World") )
                     }, "Hello");
 
                 yield return new StepCase("Index 1",
-                    new ElementAtIndex<string>
+                    new ElementAtIndex<StringStream>
                     {
                         Index = Constant(1),
-                        Array = Array("Hello", "World")
+                        Array = Array( ("Hello"),  ("World"))
                     }, "World");
             }
         }
@@ -54,19 +54,19 @@ namespace Reductech.EDR.Core.Tests.Steps
             get
             {
                 yield return new ErrorCase("Index -1",
-                    new ElementAtIndex<string>()
+                    new ElementAtIndex<StringStream>
                     {
                         Index = Constant(-1),
-                        Array = Array("Hello", "World")
+                        Array = Array( ("Hello"),  ("World"))
                     },
                     new ErrorBuilder("Index was out of the range of the array.", ErrorCode.IndexOutOfBounds)
                     );
 
                 yield return new ErrorCase("Index too big",
-                    new ElementAtIndex<string>()
+                    new ElementAtIndex<StringStream>
                     {
                         Index = Constant(2),
-                        Array = Array("Hello", "World")
+                        Array = Array( ("Hello"),  ("World"))
                     },
                     new ErrorBuilder("Index was out of the range of the array.", ErrorCode.IndexOutOfBounds)
                     );

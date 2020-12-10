@@ -6,6 +6,7 @@ using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.TestHarness;
 using Reductech.EDR.Core.Util;
 using Xunit.Abstractions;
+using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
@@ -24,11 +25,8 @@ namespace Reductech.EDR.Core.Tests.Steps
                     {
                         EntityStream = new FromCSV
                         {
-                            Stream = new StringToStream
-                            {
-                                String = Constant(
+                            Stream = Constant(
                                         $@"Foo,Bar{Environment.NewLine}Hello,World{Environment.NewLine}Hello 2,World 2")
-                            }
                         },
                         Action = new Print<Entity>
                         {
@@ -44,11 +42,8 @@ namespace Reductech.EDR.Core.Tests.Steps
                     {
                         EntityStream = new FromCSV
                         {
-                            Stream = new StringToStream
-                            {
-                                String = Constant(
+                            Stream = Constant(
                                         $@"Foo{Environment.NewLine}Hello,World{Environment.NewLine}Hello 2,World 2")
-                            }
                         },
                         Action = new Print<Entity>
                         {
@@ -64,11 +59,8 @@ namespace Reductech.EDR.Core.Tests.Steps
                     {
                         EntityStream = new FromCSV
                         {
-                            Stream = new StringToStream
-                            {
-                                String = Constant(
+                            Stream = Constant(
                                         $@"#this is a comment{Environment.NewLine}Foo{Environment.NewLine}Hello,World{Environment.NewLine}Hello 2,World 2")
-                            }
                         },
                         Action = new Print<Entity>
                         {

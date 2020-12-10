@@ -1,47 +1,61 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
+using Reductech.EDR.Core.Parser;
 
 namespace Reductech.EDR.Core.Steps
 {
     /// <summary>
     /// Join strings with a delimiter.
     /// </summary>
-    public sealed class StringJoin : CompoundStep<string>
+    public sealed class StringJoin : CompoundStep<StringStream>
     {
         /// <summary>
         /// The delimiter to use.
         /// </summary>
         [StepProperty(1)]
         [Required]
-        public IStep<string> Delimiter { get; set; } = null!;
+        public IStep<StringStream> Delimiter { get; set; } = null!;
 
         /// <summary>
         /// The string to join.
         /// </summary>
         [StepProperty(2)]
         [Required]
-        public IStep<List<string>> Strings { get; set; } = null!;
+        public IStep<List<StringStream>> Strings { get; set; } = null!;
 
         /// <inheritdoc />
-        public override async Task<Result<string, IError>> Run(IStateMonad stateMonad,
+        public override async Task<Result<StringStream, IError>> Run(IStateMonad stateMonad,
             CancellationToken cancellationToken)
         {
-            var list = await Strings.Run(stateMonad, cancellationToken);
-            if (list.IsFailure) return list.ConvertFailure<string>();
+            var listResult = await Strings.Run(stateMonad, cancellationToken);
+            if (listResult.IsFailure) return listResult.ConvertFailure<StringStream>();
 
-            var delimiter = await Delimiter.Run(stateMonad, cancellationToken);
-            if (delimiter.IsFailure) return delimiter;
+            var delimiter = await Delimiter.Run(stateMonad, cancellationToken)
+                .Map(async x=> await x.GetStringAsync());
+            if (delimiter.IsFailure) return delimiter.ConvertFailure<StringStream>();
+
+            if (listResult.Value.Count == 0)
+                return new StringStream(string.Empty);
+
+            if (listResult.Value.Count == 1)
+                return listResult.Value.Single();
+
+            var strings = new List<string>();
+
+            foreach (var stringStream in listResult.Value)
+                strings.Add(await stringStream.GetStringAsync());
 
 
-            var result = string.Join(delimiter.Value, list.Value);
+            var resultString = string.Join(delimiter.Value, strings);
 
-            return result;
+            return new StringStream(resultString);
 
         }
 
@@ -53,13 +67,13 @@ namespace Reductech.EDR.Core.Steps
     /// <summary>
     /// Join strings with a delimiter.
     /// </summary>
-    public sealed class StringJoinStepFactory : SimpleStepFactory<StringJoin, string>
+    public sealed class StringJoinStepFactory : SimpleStepFactory<StringJoin, StringStream>
     {
         private StringJoinStepFactory() { }
 
         /// <summary>
         /// The instance
         /// </summary>
-        public static SimpleStepFactory<StringJoin, string> Instance { get; } = new StringJoinStepFactory();
+        public static SimpleStepFactory<StringJoin, StringStream> Instance { get; } = new StringJoinStepFactory();
     }
 }

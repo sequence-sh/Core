@@ -7,12 +7,14 @@ using CSharpFunctionalExtensions;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Moq;
+using Namotion.Reflection;
 using Reductech.EDR.Core.ExternalProcesses;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Util;
 using Xunit.Abstractions;
 using Xunit.Sdk;
+using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 
 namespace Reductech.EDR.Core.TestHarness
 {
@@ -50,10 +52,15 @@ namespace Reductech.EDR.Core.TestHarness
                     CheckUnitResult(result);
                 }
                 else
-                    throw new XunitException($"Step is does not have output type {nameof(Unit)} or {nameof(TOutput)}");
+                {
+                    var stepType = step.GetType().GetDisplayName();
+
+                    throw new XunitException($"{stepType} does not have output type {nameof(Unit)} or {typeof(TOutput).Name}");
+                }
 
                 if(!IgnoreLoggedValues)
-                    logger.LoggedValues.Select(x=>CompressNewlines(x.ToString()!)) .Should().BeEquivalentTo(ExpectedLoggedValues);
+                    logger.LoggedValues.Select(x=>CompressNewlines(x.ToString()!)) .Should()
+                        .BeEquivalentTo(ExpectedLoggedValues);
 
                 if (!IgnoreFinalState)
                     stateMonad.GetState().Should().BeEquivalentTo(ExpectedFinalState);

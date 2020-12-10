@@ -8,174 +8,267 @@ using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Parser;
 using Reductech.EDR.Core.Serialization;
 using DateTime = System.DateTime;
-using Option = OneOf.OneOf<string, int, double, bool,
+using Option = OneOf.OneOf<Reductech.EDR.Core.Parser.StringStream, int, double, bool,
 Reductech.EDR.Core.Internal.Enumeration, System.DateTime,
 Reductech.EDR.Core.Entity,
-Reductech.EDR.Core.Entities.EntityStream, Reductech.EDR.Core.Parser.DataStream>;
+Reductech.EDR.Core.Entities.EntityStream>;
 
 namespace Reductech.EDR.Core.Internal
 {
     /// <summary>
-    /// A step that returns a fixed value when run.
+    /// A constant string
     /// </summary>
-    public sealed class ConstantFreezableStep : IFreezableStep
+    public class StringConstantFreezable : ConstantFreezableBase<StringStream>
     {
-        /// <summary>
-        /// Creates a new ConstantFreezableStep.
-        /// </summary>
-        /// <param name="value"></param>
-        public ConstantFreezableStep(Option value) => Value = value;
+        /// <inheritdoc />
+        public StringConstantFreezable(StringStream value) : base(value) { }
 
-        /// <summary>
-        /// The value that this will return when run.
-        /// </summary>
-        public Option Value { get; }
+        /// <inheritdoc />
+        public override string StepName => Value.Name;
+
+        /// <inheritdoc />
+        public override Result<IStep, IError> TryFreeze(StepContext stepContext) => new StringConstant(Value);
+
+        /// <inheritdoc />
+        public override Task<string> SerializeAsync(CancellationToken cancellation) => Value.SerializeAsync(cancellation);
+    }
+
+    /// <summary>
+    /// A constant int
+    /// </summary>
+    public class IntConstantFreezable : ConstantFreezableBase<int>
+    {
+        /// <inheritdoc />
+        public IntConstantFreezable(int value) : base(value) {}
+
+        /// <inheritdoc />
+        public override string StepName => Value.ToString();
+
+        /// <inheritdoc />
+        public override Result<IStep, IError> TryFreeze(StepContext stepContext) => new IntConstant(Value);
+
+        /// <inheritdoc />
+        public override Task<string> SerializeAsync(CancellationToken cancellation) => Task.FromResult(Value.ToString());
+    }
+
+    /// <summary>
+    /// A constant double
+    /// </summary>
+    public class DoubleConstantFreezable : ConstantFreezableBase<double>
+    {
+        /// <inheritdoc />
+        public DoubleConstantFreezable(double value) : base(value) { }
+
+        /// <inheritdoc />
+        public override string StepName => Value.ToString("G17");
+
+        /// <inheritdoc />
+        public override Result<IStep, IError> TryFreeze(StepContext stepContext) => new DoubleConstant(Value);
+
+        /// <inheritdoc />
+        public override Task<string> SerializeAsync(CancellationToken cancellation) => Task.FromResult(Value.ToString("G17"));
+    }
+
+    /// <summary>
+    /// A constant bool
+    /// </summary>
+    public class BoolConstantFreezable : ConstantFreezableBase<bool>
+    {
+        /// <inheritdoc />
+        public BoolConstantFreezable(bool value) : base(value) {}
+
+        /// <inheritdoc />
+        public override string StepName => Value.ToString();
+
+        /// <inheritdoc />
+        public override Result<IStep, IError> TryFreeze(StepContext stepContext) => new BoolConstant(Value);
+
+        /// <inheritdoc />
+        public override Task<string> SerializeAsync(CancellationToken cancellation) => Task.FromResult(Value.ToString());
+    }
+
+
+    /// <summary>
+    /// A constant DateTime
+    /// </summary>
+    public class DateTimeConstantFreezable : ConstantFreezableBase<DateTime>
+    {
+        /// <inheritdoc />
+        public DateTimeConstantFreezable(DateTime value) : base(value) {}
+
+        /// <inheritdoc />
+        public override string StepName => Value.ToString("O");
+
+        /// <inheritdoc />
+        public override Result<IStep, IError> TryFreeze(StepContext stepContext) => new DateTimeConstant(Value);
+
+        /// <inheritdoc />
+        public override Task<string> SerializeAsync(CancellationToken cancellation) => Task.FromResult(Value.ToString("O"));
+    }
+
+    /// <summary>
+    /// An entity Constant
+    /// </summary>
+    public class EntityConstantFreezable : ConstantFreezableBase<Entity>
+    {
+        /// <inheritdoc />
+        public EntityConstantFreezable(Entity value) : base(value) {}
+
+        /// <inheritdoc />
+        public override string StepName => Value.Serialize();
+
+        /// <inheritdoc />
+        public override Result<IStep, IError> TryFreeze(StepContext stepContext) => new EntityConstant(Value);
+
+        /// <inheritdoc />
+        public override Task<string> SerializeAsync(CancellationToken cancellation) => Task.FromResult(Value.ToString());
+    }
+
+    /// <summary>
+    /// An entityStream Constant
+    /// </summary>
+    public class EntityStreamConstantFreezable : ConstantFreezableBase<EntityStream>
+    {
+        /// <inheritdoc />
+        public EntityStreamConstantFreezable(EntityStream value) : base(value) {}
+
+        /// <inheritdoc />
+        public override string StepName => "EntityStream";
+
+        /// <inheritdoc />
+        public override Result<IStep, IError> TryFreeze(StepContext stepContext) => new EntityStreamConstant(Value);
+
+        /// <param name="cancellation"></param>
+        /// <inheritdoc />
+        public override Task<string> SerializeAsync(CancellationToken cancellation) => Value.SerializeEntityStreamAsync(cancellation);
+    }
+
+    /// <summary>
+    /// An Enum Constant
+    /// </summary>
+    public class EnumConstantFreezable : ConstantFreezableBase<Enumeration>
+    {
+        /// <inheritdoc />
+        public EnumConstantFreezable(Enumeration value) : base(value) {}
+
+        /// <inheritdoc />
+        public override string StepName => Value.ToString();
+
+        /// <inheritdoc />
+        public override Result<IStep, IError> TryFreeze(StepContext stepContext)
+        {
+            var type = TryGetType(stepContext.TypeResolver);
+            if (type.IsFailure) return type.ConvertFailure<IStep>();
+
+            if (Enum.TryParse(type.Value, Value.Value, false, out var o))
+                return TryCreateEnumConstant(o!).MapError(x => x.WithLocation(this));
+
+            return new SingleError($"Enum '{Value.Type}' does not exist", ErrorCode.UnexpectedEnumValue, new FreezableStepErrorLocation(this));
+        }
 
 
         /// <inheritdoc />
-        public Result<IStep, IError> TryFreeze(StepContext stepContext)
+        public override Result<ITypeReference, IError> TryGetOutputTypeReference(TypeResolver typeResolver) =>
+            TryGetType(typeResolver).Map(x => new ActualTypeReference(x) as ITypeReference);
+
+        /// <param name="cancellation"></param>
+        /// <inheritdoc />
+        public override Task<string> SerializeAsync(CancellationToken cancellation) => Task.FromResult(Value.ToString());
+
+        private Result<Type, IError> TryGetType(TypeResolver typeResolver)
         {
-            var elementType = TryGetType(stepContext.TypeResolver.StepFactoryStore);
-            if (elementType.IsFailure) return elementType.ConvertFailure<IStep>();
+            if (typeResolver.StepFactoryStore.EnumTypesDictionary.TryGetValue(Value.Type, out var t))
+                return t;
+            return new SingleError($"Enum '{Value.Type}' does not exist", ErrorCode.UnexpectedEnumValue, new FreezableStepErrorLocation(this));
+        }
 
-            Type stepType = typeof(Constant<>).MakeGenericType(elementType.Value);
-            var value = GetValue(stepContext.TypeResolver.StepFactoryStore);
-            if (value.IsFailure) return value.ConvertFailure<IStep>();
 
-            var stepAsObject = Activator.CreateInstance(stepType, value.Value);
+        /// <summary>
+        /// Tries to create an enum constant from a value.
+        /// Will fail if the value is not an enum.
+        /// </summary>
+        public static Result<IStep, IErrorBuilder> TryCreateEnumConstant(object value)
+        {
+            var type = value.GetType();
 
-            //TODO check for exceptions here?
+            if (!type.IsEnum)
+                return new ErrorBuilder($"{type.Name} is not an enum type", ErrorCode.InvalidCast);
 
-            Result<IStep, IError> result;
+            Type stepType = typeof(EnumConstant<>).MakeGenericType(type);
+
+            var stepAsObject = Activator.CreateInstance(stepType, value);
 
             try
             {
                 var step = (IStep)stepAsObject!;
-                result = Result.Success<IStep, IError>(step);
+                return Result.Success<IStep, IErrorBuilder>(step);
             }
 #pragma warning disable CA1031 // Do not catch general exception types
             catch (Exception e)
             {
-                result = Result.Failure<IStep, IError>(new SingleError(e, ErrorCode.InvalidCast, new FreezableStepErrorLocation(this)));
+                return new ErrorBuilder(e, ErrorCode.InvalidCast);
             }
 #pragma warning restore CA1031 // Do not catch general exception types
-
-            return result;
         }
+    }
+
+    /// <summary>
+    /// A freezable step which represents a constant value.
+    /// </summary>
+    public interface IConstantFreezableStep : IFreezableStep
+    {
+        /// <summary>
+        /// The Constant Value
+        /// </summary>
+        object ValueObject { get; }
+
+        /// <summary>
+        /// Serialize this constant
+        /// </summary>
+        /// <param name="cancellation"></param>
+        Task<string> SerializeAsync(CancellationToken cancellation);
+
+    }
+
+    /// <summary>
+    /// The base class for freezable constants
+    /// </summary>
+    public abstract class ConstantFreezableBase<T> : IConstantFreezableStep
+    {
+        /// <summary>
+        /// Create a new ConstantFreezable
+        /// </summary>
+        protected ConstantFreezableBase(T value) => Value = value;
+
+        /// <summary>
+        /// The constant value
+        /// </summary>
+        public T Value { get; }
+
+        /// <inheritdoc />
+        public abstract string StepName { get; }
+
+        /// <inheritdoc />
+        public abstract Result<IStep, IError> TryFreeze(StepContext stepContext);
 
         /// <inheritdoc />
         public Result<IReadOnlyCollection<(VariableName variableName, Maybe<ITypeReference>)>, IError> GetVariablesSet(TypeResolver typeResolver)
         {
-            return Result.Success<IReadOnlyCollection<(VariableName variableName, Maybe<ITypeReference>)>, IError>(new List<(VariableName variableName, Maybe<ITypeReference>)>());
+            return new List<(VariableName variableName, Maybe<ITypeReference>)>();
         }
 
         /// <inheritdoc />
-        public string StepName
+        public virtual Result<ITypeReference, IError> TryGetOutputTypeReference(TypeResolver typeResolver)
         {
-            get
-            {
-                return Value.Match(
-                            SerializationMethods.DoubleQuote,
-                            i => i.ToString(),
-                            d => d.ToString("G17"),
-                            b => b.ToString(),
-                            e => e.ToString(),
-                            dt => dt.ToString("O"),
-                            entity => entity.Serialize(),
-                            es => "EntityStream",
-                            ds => "DataStream"
-                        );
-            }
+            return new ActualTypeReference(typeof(T));
         }
-
-        private Result<object, IError> GetValue(StepFactoryStore stepFactoryStore)
-        {
-            return Value.Match(
-                Result.Success<object, IError>,
-                x=>Result.Success<object, IError>(x),
-                x=>Result.Success<object, IError>(x),
-                x=>Result.Success<object, IError>(x),
-                TryGetEnumerationValue,
-                x=>Result.Success<object, IError>(x),
-                Result.Success<object, IError>,
-                Result.Success<object, IError>,
-                Result.Success<object, IError>);
-
-            Result<object, IError> TryGetEnumerationValue(Enumeration enumeration)
-            {
-                var type = TryGetType(stepFactoryStore);
-                if (type.IsFailure) return type.ConvertFailure<object>();
-
-                if (Enum.TryParse(type.Value, enumeration.Value, false, out var o))
-                    return o!;
-
-                return new SingleError($"Enum '{enumeration}' does not exist", ErrorCode.UnexpectedEnumValue, new FreezableStepErrorLocation(this));
-            }
-        }
-
-        /// <summary>
-        /// Serialize this constant.
-        /// </summary>
-        public async Task<string> Serialize(CancellationToken cancellation)
-        {
-
-            if (Value.IsT7)
-                return await SerializationMethods.SerializeEntityStreamAsync(Value.AsT7, cancellation);
-
-
-            if (Value.IsT8)
-                return await Value.AsT8.SerializeAsync(cancellation);
-
-            return
-                Value.Match(
-                        SerializationMethods.DoubleQuote,
-                    i => i.ToString(),
-                    d => d.ToString("G17"),
-                    b => b.ToString(),
-                    e => e.ToString(),
-                    dt => dt.ToString("O"),
-                    entity => entity.Serialize(),
-                    es => throw new Exception("Should not encounter entity stream here"),
-                    ds =>  throw new Exception("Should not encounter data stream here"));
-        }
-
-
-        /// <inheritdoc />
-        public Result<ITypeReference, IError> TryGetOutputTypeReference(TypeResolver typeResolver) => TryGetType(typeResolver.StepFactoryStore)
-            .Map(x => new ActualTypeReference(x) as ITypeReference);
-
-        private Result<Type, IError> TryGetType(StepFactoryStore stepFactoryStore)
-        {
-            var type = Value.Match(
-               _ => typeof(string),
-               _ => typeof(int),
-               _ => typeof(double),
-               _ => typeof(bool),
-               GetEnumerationType,
-               _ => typeof(DateTime),
-               _ => typeof(Entity),
-               _ => typeof(EntityStream),
-               _ => typeof(DataStream));
-
-            return type;
-
-            Result<Type, IError> GetEnumerationType(Enumeration enumeration)
-            {
-                if (stepFactoryStore.EnumTypesDictionary.TryGetValue(enumeration.Type, out var t))
-                    return t;
-                return new SingleError($"Enum '{enumeration.Type}' does not exist", ErrorCode.UnexpectedEnumValue, new FreezableStepErrorLocation(this));
-            }
-        }
-
-        /// <inheritdoc />
-        public override string ToString() => StepName;
 
         /// <inheritdoc />
         public bool Equals(IFreezableStep? other)
         {
             if (other is null) return false;
             if (ReferenceEquals(this, other)) return true;
-            var r= other is ConstantFreezableStep cfs && Value.Equals(cfs.Value);
+            var r = other is ConstantFreezableBase<T> cfs && Value!.Equals(cfs.Value);
 
             return r;
         }
@@ -185,6 +278,16 @@ namespace Reductech.EDR.Core.Internal
         public override bool Equals(object? obj) => ReferenceEquals(this, obj) || obj is IFreezableStep other && Equals(other);
 
         /// <inheritdoc />
-        public override int GetHashCode() => Value.GetHashCode();
+        public override int GetHashCode() => Value!.GetHashCode();
+
+        /// <inheritdoc />
+        public override string ToString() => StepName;
+
+        /// <inheritdoc />
+        public object ValueObject => Value!;
+
+        /// <param name="cancellation"></param>
+        /// <inheritdoc />
+        public abstract Task<string> SerializeAsync(CancellationToken cancellation);
     }
 }

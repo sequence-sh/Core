@@ -7,6 +7,7 @@ using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.ExternalProcesses;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
+using Reductech.EDR.Core.Parser;
 using Reductech.EDR.Core.Util;
 
 namespace Reductech.EDR.Core.Steps
@@ -20,7 +21,9 @@ namespace Reductech.EDR.Core.Steps
         public override async Task<Result<Unit, IError>> Run(IStateMonad stateMonad,
             CancellationToken cancellationToken)
         {
-            var pathResult = await Path.Run(stateMonad, cancellationToken);
+            var pathResult = await Path.Run(stateMonad, cancellationToken)
+                .Map(async x=> await x.GetStringAsync());
+
             if (pathResult.IsFailure) return pathResult.ConvertFailure<Unit>();
 
             List<string> arguments;
@@ -32,7 +35,12 @@ namespace Reductech.EDR.Core.Steps
                 var argsResult = await Arguments.Run(stateMonad, cancellationToken);
 
                 if (argsResult.IsFailure) return argsResult.ConvertFailure<Unit>();
-                arguments = argsResult.Value;
+
+
+                arguments = new List<string>();
+
+                foreach (var stringStream in argsResult.Value)
+                    arguments.Add(await stringStream.GetStringAsync());
             }
 
             var encodingResult = await Encoding.Run(stateMonad, cancellationToken);
@@ -55,21 +63,21 @@ namespace Reductech.EDR.Core.Steps
         /// </summary>
         [StepProperty(1)]
         [Required]
-        public IStep<string> Path { get; set; } = null!;
+        public IStep<StringStream> Path { get; set; } = null!;
 
         /// <summary>
         /// Arguments to the step.
         /// </summary>
         [StepProperty(2)]
         [DefaultValueExplanation("No arguments")]
-        public IStep<List<string>>? Arguments { get; set; }
+        public IStep<List<StringStream>>? Arguments { get; set; }
 
         /// <summary>
         /// Encoding to use for the process output.
         /// </summary>
         [StepProperty(3)]
         [DefaultValueExplanation("Default encoding")]
-        public IStep<EncodingEnum> Encoding { get; set; } = new Constant<EncodingEnum>(EncodingEnum.Default);
+        public IStep<EncodingEnum> Encoding { get; set; } = new EnumConstant<EncodingEnum>(EncodingEnum.Default);
 
 
         /// <inheritdoc />

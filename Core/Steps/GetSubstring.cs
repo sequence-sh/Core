@@ -5,27 +5,28 @@ using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
+using Reductech.EDR.Core.Parser;
 
 namespace Reductech.EDR.Core.Steps
 {
     /// <summary>
     /// Gets a substring from a string.
     /// </summary>
-    public sealed class GetSubstring : CompoundStep<string>
+    public sealed class GetSubstring : CompoundStep<StringStream>
     {
         /// <summary>
         /// The string to extract a substring from.
         /// </summary>
         [StepProperty(1)]
         [Required]
-        public IStep<string> String { get; set; } = null!;
+        public IStep<StringStream> String { get; set; } = null!;
 
         /// <summary>
         /// The index.
         /// </summary>
         [StepProperty(3)]
         [DefaultValueExplanation("0")]
-        public IStep<int> Index { get; set; } = new Constant<int>(0);
+        public IStep<int> Index { get; set; } = new IntConstant(0);
 
         /// <summary>
         /// The length of the substring to extract.
@@ -36,21 +37,24 @@ namespace Reductech.EDR.Core.Steps
 
 
         /// <inheritdoc />
-        public override async Task<Result<string, IError>> Run(IStateMonad stateMonad,
+        public override async Task<Result<StringStream, IError>> Run(IStateMonad stateMonad,
             CancellationToken cancellationToken)
         {
-            var str = await String.Run(stateMonad, cancellationToken);
-            if (str.IsFailure) return str;
+            var stringResult = await String.Run(stateMonad, cancellationToken);
+            if (stringResult.IsFailure) return stringResult;
             var index = await Index.Run(stateMonad, cancellationToken);
-            if (index.IsFailure) return index.ConvertFailure<string>();
+            if (index.IsFailure) return index.ConvertFailure<StringStream>();
             var length = await Length.Run(stateMonad, cancellationToken);
-            if (length.IsFailure) return length.ConvertFailure<string>();
+            if (length.IsFailure) return length.ConvertFailure<StringStream>();
 
+            var str = await stringResult.Value.GetStringAsync();
 
-            if (index.Value < 0 || index.Value >= str.Value.Length)
+            if (index.Value < 0 || index.Value >= str.Length)
                 return new SingleError("Index was outside the bounds of the string", ErrorCode.IndexOutOfBounds, new StepErrorLocation(this));
 
-            return str.Value.Substring(index.Value, length.Value);
+            var resultString = str.Substring(index.Value, length.Value);
+
+            return new StringStream(resultString);
         }
 
         /// <inheritdoc />
@@ -60,13 +64,13 @@ namespace Reductech.EDR.Core.Steps
     /// <summary>
     /// Gets a substring from a string.
     /// </summary>
-    public sealed class GetSubstringStepFactory : SimpleStepFactory<GetSubstring, string>
+    public sealed class GetSubstringStepFactory : SimpleStepFactory<GetSubstring, StringStream>
     {
         private GetSubstringStepFactory() { }
 
         /// <summary>
         /// The instance.
         /// </summary>
-        public static SimpleStepFactory<GetSubstring, string> Instance { get; } = new GetSubstringStepFactory();
+        public static SimpleStepFactory<GetSubstring, StringStream> Instance { get; } = new GetSubstringStepFactory();
     }
 }

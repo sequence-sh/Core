@@ -144,7 +144,9 @@ namespace Reductech.EDR.Core
 
             sb.Append(')');
 
-            return sb.ToString();
+            var result = sb.ToString();
+
+            return result;
         }
 
     }

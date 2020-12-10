@@ -9,6 +9,7 @@ using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
+using Reductech.EDR.Core.Parser;
 
 namespace Reductech.EDR.Core.Steps
 {
@@ -40,10 +41,13 @@ namespace Reductech.EDR.Core.Steps
                 var scopedMonad = new ScopedStateMonad(stateMonad, currentState,
                     new KeyValuePair<VariableName, object>(VariableName.Entity, record));
 
-                var result = await KeySelector.Run(scopedMonad, cancellationToken);
+                var result = await KeySelector.Run(scopedMonad, cancellationToken)
+                    .Map(async x=> await x.GetStringAsync());
 
                 if (result.IsFailure)
                     throw new ErrorException(result.Error);
+
+
 
                 if(usedKeys.Add(result.Value))
                     return Maybe<Entity>.From(record);
@@ -68,14 +72,14 @@ namespace Reductech.EDR.Core.Steps
         /// </summary>
         [StepProperty(2)]
         [Required]
-        public IStep<string> KeySelector { get; set; } = null!;
+        public IStep<StringStream> KeySelector { get; set; } = null!;
 
         /// <summary>
         /// Whether to ignore case when comparing strings.
         /// </summary>
         [StepProperty(3)]
         [DefaultValueExplanation("False")]
-        public IStep<bool> IgnoreCase { get; set; } = new Constant<bool>(false);
+        public IStep<bool> IgnoreCase { get; set; } = new BoolConstant(false);
         /// <inheritdoc />
         public override IStepFactory StepFactory => EntityStreamDistinctStepFactory.Instance;
     }

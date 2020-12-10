@@ -8,6 +8,7 @@ using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
+using Reductech.EDR.Core.Parser;
 
 namespace Reductech.EDR.Core.Steps
 {
@@ -44,10 +45,12 @@ namespace Reductech.EDR.Core.Steps
             {
                 var setResult = stateMonad.SetVariable(VariableName.Entity, entity);
                 if (setResult.IsFailure) return setResult.ConvertFailure<EntityStream>();
-                var propertyValue = await KeySelector.Run(stateMonad, cancellationToken);
-                if (propertyValue.IsFailure) return propertyValue.ConvertFailure<EntityStream>();
+                var propertyResult = await KeySelector.Run(stateMonad, cancellationToken);
+                if (propertyResult.IsFailure) return propertyResult.ConvertFailure<EntityStream>();
 
-                list.Add((propertyValue.Value, entity));
+                var propertyName = await propertyResult.Value.GetStringAsync();
+
+                list.Add((propertyName, entity));
 
             }
             stateMonad.RemoveVariable(VariableName.Entity, false);
@@ -77,14 +80,14 @@ namespace Reductech.EDR.Core.Steps
         /// </summary>
         [StepProperty(2)]
         [Required]
-        public IStep<string> KeySelector { get; set; } = null!;
+        public IStep<StringStream> KeySelector { get; set; } = null!;
 
         /// <summary>
         /// Whether to sort in descending order.
         /// </summary>
         [StepProperty(3)]
         [DefaultValueExplanation("False")]
-        public IStep<bool> Descending { get; set; } = new Constant<bool>(false);
+        public IStep<bool> Descending { get; set; } = new BoolConstant(false);
 
 
         /// <inheritdoc />

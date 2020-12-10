@@ -6,6 +6,7 @@ using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
+using Reductech.EDR.Core.Parser;
 using Reductech.EDR.Core.Util;
 
 namespace Reductech.EDR.Core.Steps
@@ -28,13 +29,13 @@ namespace Reductech.EDR.Core.Steps
         /// </summary>
         [StepProperty(2)]
         [Required]
-        public IStep<string> String { get; set; } = null!;
+        public IStep<StringStream> String { get; set; } = null!;
 
         /// <inheritdoc />
         public override async Task<Result<Unit, IError>> Run(IStateMonad stateMonad,
             CancellationToken cancellationToken)
         {
-            var currentValue = stateMonad.GetVariable<string>(Variable).MapError(x=>x.WithLocation(this));
+            var currentValue = stateMonad.GetVariable<StringStream>(Variable).MapError(x=>x.WithLocation(this));
             if (currentValue.IsFailure)
                 return currentValue.ConvertFailure<Unit>();
 
@@ -43,9 +44,9 @@ namespace Reductech.EDR.Core.Steps
             if (str.IsFailure)
                 return str.ConvertFailure<Unit>();
 
-            var value = currentValue.Value + str.Value;
+            var newValue = await currentValue.Value.GetStringAsync() + await str.Value.GetStringAsync();
 
-            var r = stateMonad.SetVariable(Variable, value);
+            var r = stateMonad.SetVariable(Variable, new StringStream(newValue));
             if (r.IsFailure)
                 return r.ConvertFailure<Unit>();
 
@@ -74,7 +75,7 @@ namespace Reductech.EDR.Core.Steps
             var vn = freezableStepData.TryGetVariableName(nameof(AppendString.Variable), StepType);
             if(vn.IsFailure) yield break;
 
-            yield return (vn.Value, Maybe<ITypeReference>.From(new ActualTypeReference(typeof(string))));
+            yield return (vn.Value, Maybe<ITypeReference>.From(new ActualTypeReference(typeof(StringStream))));
         }
     }
 }

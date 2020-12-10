@@ -14,10 +14,10 @@ namespace Reductech.EDR.Core.Steps
     /// Write entities to a stream in concordance format.
     /// The same as ToCSV but with different default values.
     /// </summary>
-    public sealed class ToConcordance : CompoundStep<DataStream>
+    public sealed class ToConcordance : CompoundStep<StringStream>
     {
         /// <inheritdoc />
-        public override async Task<Result<DataStream, IError>> Run(IStateMonad stateMonad,
+        public override async Task<Result<StringStream, IError>> Run(IStateMonad stateMonad,
             CancellationToken cancellationToken)
         {
             var result = await CSVWriter.WriteCSV(stateMonad,
@@ -46,14 +46,14 @@ namespace Reductech.EDR.Core.Steps
         /// </summary>
         [StepProperty(2)]
         [DefaultValueExplanation("UTF8 no BOM")]
-        public IStep<EncodingEnum> Encoding { get; set; } = new Constant<EncodingEnum>(EncodingEnum.UTF8);
+        public IStep<EncodingEnum> Encoding { get; set; } = new EnumConstant<EncodingEnum>(EncodingEnum.UTF8);
 
         /// <summary>
         /// The delimiter to use to separate fields.
         /// </summary>
         [StepProperty(3)]
         [DefaultValueExplanation("\u0014")]
-        public IStep<string> Delimiter { get; set; } = new Constant<string>("\u0014");
+        public IStep<StringStream> Delimiter { get; set; } = new StringConstant(new StringStream( "\u0014"));
 
         /// <summary>
         /// The quote character to use.
@@ -62,14 +62,14 @@ namespace Reductech.EDR.Core.Steps
         /// </summary>
         [StepProperty(4)]
         [DefaultValueExplanation("\u00FE")]
-        public IStep<string> QuoteCharacter { get; set; } = new Constant<string>("\u00FE");
+        public IStep<StringStream> QuoteCharacter { get; set; } = new StringConstant(new StringStream("\u00FE"));
 
         /// <summary>
         /// Whether to always quote all fields and headers.
         /// </summary>
         [StepProperty(5)]
         [DefaultValueExplanation("false")]
-        public IStep<bool> AlwaysQuote { get; set; } = new Constant<bool>(true);
+        public IStep<bool> AlwaysQuote { get; set; } = new BoolConstant(true);
 
         /// <summary>
         /// The multi value delimiter character to use.
@@ -78,7 +78,7 @@ namespace Reductech.EDR.Core.Steps
         /// </summary>
         [StepProperty(6)]
         [DefaultValueExplanation("")]
-        public IStep<string> MultiValueDelimiter { get; set; } = new Constant<string>("|");
+        public IStep<StringStream> MultiValueDelimiter { get; set; } = new StringConstant(new StringStream("|"));
 
         /// <summary>
         /// The format to use for DateTime fields.
@@ -86,7 +86,7 @@ namespace Reductech.EDR.Core.Steps
         [StepProperty(7)]
         [DefaultValueExplanation("O - ISO 8601 compliant - e.g. 2009-06-15T13:45:30.0000000-07:00")]
         [Example("yyyy/MM/dd HH:mm:ss")]
-        public IStep<string> DateTimeFormat { get; set; } = new Constant<string>("O");
+        public IStep<StringStream> DateTimeFormat { get; set; } = new StringConstant(new StringStream("O"));
     }
 
 
@@ -95,13 +95,13 @@ namespace Reductech.EDR.Core.Steps
     /// Write entities to a stream in concordance format.
     /// The same as ToCSV but with different default values.
     /// </summary>
-    public sealed class ToConcordanceStepFactory : SimpleStepFactory<ToConcordance, DataStream>
+    public sealed class ToConcordanceStepFactory : SimpleStepFactory<ToConcordance, StringStream>
     {
         private ToConcordanceStepFactory() { }
 
         /// <summary>
         /// The instance.
         /// </summary>
-        public static SimpleStepFactory<ToConcordance, DataStream> Instance { get; } = new ToConcordanceStepFactory();
+        public static SimpleStepFactory<ToConcordance, StringStream> Instance { get; } = new ToConcordanceStepFactory();
     }
 }

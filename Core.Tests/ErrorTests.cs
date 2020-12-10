@@ -7,11 +7,13 @@ using Reductech.EDR.Core.Enums;
 using Reductech.EDR.Core.ExternalProcesses;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
+using Reductech.EDR.Core.Parser;
 using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.Util;
 using Reductech.Utilities.Testing;
 using Xunit;
 using Xunit.Abstractions;
+using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 
 namespace Reductech.EDR.Core.Tests
 {
@@ -35,7 +37,7 @@ namespace Reductech.EDR.Core.Tests
             get
             {
                 yield return new ErrorTestFunction("Get Missing Variable",
-                    new GetVariable<string>
+                    new GetVariable<StringStream>
                     {
                         Variable = FooString
                     },
@@ -44,7 +46,7 @@ namespace Reductech.EDR.Core.Tests
                 yield return new ErrorTestFunction("ValueIf assert",
                     new AssertTrue
                     {
-                        Boolean = new Constant<bool>(false)
+                        Boolean = new BoolConstant(false)
                     }, new ErrorBuilder($"Assertion Failed '{false}'", ErrorCode.IndexOutOfBounds));
 
 
@@ -56,7 +58,7 @@ namespace Reductech.EDR.Core.Tests
                             new SetVariable<int>
                             {
                                 Variable = FooString,
-                                Value = new Constant<int>(42)
+                                Value = new IntConstant(42)
                             },
 
                             new Print<bool>
@@ -81,7 +83,7 @@ namespace Reductech.EDR.Core.Tests
                     {
                         Step = new AssertTrue
                         {
-                            Boolean = new Constant<bool>(true)
+                            Boolean = new BoolConstant(true)
                         }
                     }, new ErrorBuilder("Expected an error but step was successful.", ErrorCode.AssertionFailed));
 
@@ -89,17 +91,17 @@ namespace Reductech.EDR.Core.Tests
                 yield return new ErrorTestFunction("Divide by zero",
                     new ApplyMathOperator
                     {
-                        Left = new Constant<int>(1),
-                        Right = new Constant<int>(0),
-                        Operator = new Constant<MathOperator>(MathOperator.Divide)
+                        Left = new IntConstant(1),
+                        Right = new IntConstant(0),
+                        Operator = Constant(MathOperator.Divide)
                     },
                     new ErrorBuilder("Divide by Zero Error", ErrorCode.DivideByZero));
 
                 yield return new ErrorTestFunction("Array Index minus one",
                     new ElementAtIndex<bool>
                     {
-                        Array = new Array<bool>(){Elements = new []{new Constant<bool>(true)}},
-                        Index = new Constant<int>(-1)
+                        Array = new Array<bool>(){Elements = new []{new BoolConstant(true)}},
+                        Index = new IntConstant(-1)
                     },
                     new ErrorBuilder("Index was out of the range of the array.", ErrorCode.IndexOutOfBounds)
                     );
@@ -109,9 +111,9 @@ namespace Reductech.EDR.Core.Tests
                     {
                         Array = new Array<bool>
                         {
-                            Elements = new []{new Constant<bool>(true), new Constant<bool>(false)}
+                            Elements = new []{new BoolConstant(true), new BoolConstant(false)}
                         },
-                        Index = new Constant<int>(5)
+                        Index = new IntConstant(5)
                     },
                     new ErrorBuilder("Index was out of the range of the array.", ErrorCode.IndexOutOfBounds)
                     );
@@ -120,31 +122,31 @@ namespace Reductech.EDR.Core.Tests
                 yield return new ErrorTestFunction("Get letter minus one",
                     new CharAtIndex
                     {
-                        Index = new Constant<int>(-1),
-                        String = new Constant<string>("Foo")
+                        Index = new IntConstant(-1),
+                        String = Constant("Foo")
                     }, new ErrorBuilder("Index was outside the bounds of the string", ErrorCode.IndexOutOfBounds));
 
                 yield return new ErrorTestFunction("Get letter out of bounds",
                     new CharAtIndex
                     {
-                        Index = new Constant<int>(5),
-                        String = new Constant<string>("Foo")
+                        Index = new IntConstant(5),
+                        String = Constant("Foo")
                     }, new ErrorBuilder("Index was outside the bounds of the string", ErrorCode.IndexOutOfBounds));
 
                 yield return new ErrorTestFunction("Get substring minus one",
                     new GetSubstring
                     {
-                        Index = new Constant<int>(-1),
-                        String = new Constant<string>("Foo"),
-                        Length = new Constant<int>(10)
+                        Index = new IntConstant(-1),
+                        String = Constant("Foo"),
+                        Length = new IntConstant(10)
                     }, new ErrorBuilder("Index was outside the bounds of the string", ErrorCode.IndexOutOfBounds));
 
                 yield return new ErrorTestFunction("Get substring out of bounds",
                     new GetSubstring
                     {
-                        Index = new Constant<int>(5),
-                        String = new Constant<string>("Foo"),
-                        Length = new Constant<int>(10)
+                        Index = new IntConstant(5),
+                        String = Constant("Foo"),
+                        Length = new IntConstant(10)
                     }, new ErrorBuilder("Index was outside the bounds of the string", ErrorCode.IndexOutOfBounds));
 
 

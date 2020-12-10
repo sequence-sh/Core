@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
 using Reductech.EDR.Core.Entities;
-using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.TestHarness;
 using Reductech.EDR.Core.Util;
 using Xunit.Abstractions;
+using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
@@ -26,7 +26,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                         Action = new Print<Entity> {Value = GetEntityVariable},
                         EntityStream = new EntityStreamDistinct
                         {
-                            EntityStream = new Constant<EntityStream>(EntityStream.Create(
+                            EntityStream = Constant(EntityStream.Create(
                                 CreateEntity(("Foo", "Alpha")),
                                 CreateEntity(("Foo", "Alpha")),
                                 CreateEntity(("Foo", "ALPHA")),
@@ -46,7 +46,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                         Action = new Print<Entity> { Value = GetEntityVariable },
                         EntityStream = new EntityStreamDistinct
                         {
-                            EntityStream = new Constant<EntityStream>(EntityStream.Create(
+                            EntityStream = Constant(EntityStream.Create(
                                 CreateEntity(("Foo", "Alpha")),
                                 CreateEntity(("Foo", "Alpha")),
                                 CreateEntity(("Foo", "ALPHA")),

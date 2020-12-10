@@ -8,35 +8,50 @@ using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
-using Reductech.EDR.Core.Util;
+using Reductech.EDR.Core.Parser;
 
 namespace Reductech.EDR.Core.Steps
 {
     /// <summary>
     /// Splits a string.
     /// </summary>
-    public sealed class StringSplit : CompoundStep<List<string>>
+    public sealed class StringSplit : CompoundStep<List<StringStream>>
     {
         /// <summary>
         /// The string to split.
         /// </summary>
         [StepProperty(1)]
         [Required]
-        public IStep<string> String { get; set; } = null!;
+        public IStep<StringStream> String { get; set; } = null!;
 
         /// <summary>
         /// The delimiter to use.
         /// </summary>
         [StepProperty(2)]
         [Required]
-        public IStep<string> Delimiter { get; set; } = null!;
+        public IStep<StringStream> Delimiter { get; set; } = null!;
 
         /// <inheritdoc />
-        public override async Task<Result<List<string>, IError>> Run(IStateMonad stateMonad,
-            CancellationToken cancellationToken)
+        public override async Task<Result<List<StringStream>, IError>> Run(IStateMonad stateMonad, CancellationToken cancellationToken)
         {
-            return await String.Run(stateMonad, cancellationToken).Compose(() => Delimiter.Run(stateMonad, cancellationToken))
-                .Map(x => x.Item1.Split(new[] {x.Item2}, StringSplitOptions.None).ToList());
+            var stringResult = await String.Run(stateMonad, cancellationToken)
+                .Map(async x=> await x.GetStringAsync());
+
+            if (stringResult.IsFailure) return stringResult.ConvertFailure<List<StringStream>>();
+
+            var delimiterResult = await  Delimiter.Run(stateMonad, cancellationToken)
+                .Map(async x=> await x.GetStringAsync());
+
+            if (delimiterResult.IsFailure) return delimiterResult.ConvertFailure<List<StringStream>>();
+
+
+            var results = stringResult.Value
+                .Split(new[] {delimiterResult.Value}, StringSplitOptions.None)
+                .Select(x => new StringStream(x))
+                .ToList();
+
+
+            return results;
         }
 
         /// <inheritdoc />
@@ -46,13 +61,13 @@ namespace Reductech.EDR.Core.Steps
     /// <summary>
     /// Splits a string.
     /// </summary>
-    public class StringSplitStepFactory : SimpleStepFactory<StringSplit, List<string>>
+    public class StringSplitStepFactory : SimpleStepFactory<StringSplit, List<StringStream>>
     {
         private StringSplitStepFactory() { }
 
         /// <summary>
         /// The instance.
         /// </summary>
-        public static SimpleStepFactory<StringSplit, List<string>> Instance { get; } = new StringSplitStepFactory();
+        public static SimpleStepFactory<StringSplit, List<StringStream>> Instance { get; } = new StringSplitStepFactory();
     }
 }

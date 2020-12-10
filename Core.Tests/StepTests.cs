@@ -7,6 +7,7 @@ using FluentAssertions;
 using Reductech.EDR.Core.Enums;
 using Reductech.EDR.Core.ExternalProcesses;
 using Reductech.EDR.Core.Internal;
+using Reductech.EDR.Core.Parser;
 using Reductech.EDR.Core.Serialization;
 using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.TestHarness;
@@ -14,6 +15,8 @@ using Reductech.EDR.Core.Util;
 using Reductech.Utilities.Testing;
 using Xunit;
 using Xunit.Abstractions;
+
+using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 
 namespace Reductech.EDR.Core.Tests
 {
@@ -66,12 +69,12 @@ namespace Reductech.EDR.Core.Tests
                 yield return new StepTestCase("<Foo> = 'Hello World'; Print <Foo>", Sequence
                 (
                     SetVariable(FooVariableName, Constant(HelloWorldString)),
-                    Print(GetVariable<string>(FooVariableName))), HelloWorldString);
+                    Print(GetVariable<StringStream>(FooVariableName))), HelloWorldString);
 
                 yield return new StepTestCase("<Foo> = 'Hello World'; <Bar> = <Foo>; Print <Bar>", Sequence(
                     SetVariable(FooVariableName, Constant(HelloWorldString)),
-                    SetVariable(BarString, GetVariable<string>(FooVariableName)),
-                    Print(GetVariable<string>(BarString))), HelloWorldString);
+                    SetVariable(BarString, GetVariable<StringStream>(FooVariableName)),
+                    Print(GetVariable<StringStream>(BarString))), HelloWorldString);
 
 
                 yield return new StepTestCase("<Foo> = 1 < 2; Print <Foo>", Sequence(
@@ -88,7 +91,7 @@ namespace Reductech.EDR.Core.Tests
                 yield return new StepTestCase("Print +",
                     new Print<MathOperator>
                     {
-                        Value = new Constant<MathOperator>(MathOperator.Add)
+                        Value = Constant(MathOperator.Add)
                     }, MathOperator.Add.ToString());
 
 
@@ -109,22 +112,20 @@ namespace Reductech.EDR.Core.Tests
                     }), true.ToString());
 
                 yield return new StepTestCase("Foreach <Foo> in ['Hello'; 'World']; Print <Foo>",
-                    new ForEach<string>
+                    new ForEach<StringStream>
                     {
-                        Action = Print(GetVariable<string>(FooVariableName)),
-                        Array = Array(Constant("Hello"),
-                            Constant("World")),
+                        Action = Print(GetVariable<StringStream>(FooVariableName)),
+                        Array = Array("Hello", "World"),
                         Variable = FooVariableName
                     }, "Hello", "World");
 
 
                 yield return new StepTestCase("Foreach <Foo> in ['Hello'; 'World']; Print 'Farewell'; Print <Foo>",
-                    new ForEach<string>
+                    new ForEach<StringStream>
                     {
                         Action = Sequence(Print(Constant("Farewell")),
-                                Print(GetVariable<string>(FooVariableName))),
-                        Array = Array(Constant("Hello"),
-                            Constant("World")),
+                                Print(GetVariable<StringStream>(FooVariableName))),
+                        Array = Array("Hello", "World"),
                         Variable = FooVariableName
                     }, "Farewell", "Hello", "Farewell", "World");
 
@@ -167,21 +168,20 @@ namespace Reductech.EDR.Core.Tests
                     }), "6");
 
                 yield return new StepTestCase("Print ArrayLength(Array: ['Hello'; 'World'])",
-                    Print(new ArrayLength<string>
+                    Print(new ArrayLength<StringStream>
                     {
-                        Array = Array(Constant("Hello"),
-                            Constant("World"))
+                        Array = Array("Hello", "World")
                     }),
                     "2"
                 );
 
                 yield return new StepTestCase("Print ArrayIsEmpty(Array: [])",
-                    Print(new ArrayIsEmpty<string> {Array = Array<string>()}), true.ToString());
+                    Print(new ArrayIsEmpty<StringStream> {Array = Array(System.Array.Empty<string>()) }), true.ToString());
 
                 yield return new StepTestCase("Print ArrayIsEmpty(Array: ['Hello World'])",
-                    Print(new ArrayIsEmpty<string>
+                    Print(new ArrayIsEmpty<StringStream>
                     {
-                        Array = Array(Constant(HelloWorldString))
+                        Array = Array(HelloWorldString)
                     }), false.ToString());
 
                 yield return new StepTestCase("Print ArrayLength of 'Hello World'",
@@ -205,9 +205,9 @@ namespace Reductech.EDR.Core.Tests
                 );
 
                 yield return new StepTestCase("Print FindElement(Array: ['Hello'; 'World'], Element: 'World')",
-                    Print(new FindElement<string>
+                    Print(new FindElement<StringStream>
                     {
-                        Array = Array(Constant("Hello"), Constant("World")),
+                        Array = Array("Hello", "World"),
                         Element = Constant("World")
                     }),
                     1.ToString()
@@ -215,9 +215,9 @@ namespace Reductech.EDR.Core.Tests
 
                 yield return new StepTestCase(
                     "Print FindElement(Array: ['Hello'; 'World'], Element: 'Goodbye')",
-                    Print(new FindElement<string>
+                    Print(new FindElement<StringStream>
                     {
-                        Array = Array(Constant("Hello"), Constant("World")),
+                        Array = Array(("Hello"), ("World")),
                         Element = Constant("Goodbye")
                     }),
                     (-1).ToString()
@@ -226,7 +226,7 @@ namespace Reductech.EDR.Core.Tests
                 yield return new StepTestCase("Print Match Repeat(Element: 'Hello', Number: 3)", Print(new StringJoin
                 {
                     Delimiter = Constant(", "),
-                    Strings = new Repeat<string>
+                    Strings = new Repeat<StringStream>
                     {
                         Number = Constant(3),
                         Element = Constant("Hello")
@@ -236,7 +236,7 @@ namespace Reductech.EDR.Core.Tests
                 yield return new StepTestCase(
                     "Print ElementAtIndex(Array: StringSplit(Delimiter: ', ', String: 'Hello, World'), Index: 1)",
                     Print(
-                        new ElementAtIndex<string>
+                        new ElementAtIndex<StringStream>
                         {
                             Array = new StringSplit
                             {
@@ -282,7 +282,7 @@ namespace Reductech.EDR.Core.Tests
 
 
                 yield return new StepTestCase("Print ValueIf(Condition: True, Else: 'World', Then: 'Hello')",
-                    Print(new ValueIf<string>
+                    Print(new ValueIf<StringStream>
                     {
                         Condition = Constant(true),
                         Then = Constant("Hello"),
@@ -291,7 +291,7 @@ namespace Reductech.EDR.Core.Tests
 
 
                 yield return new StepTestCase("Print ValueIf(Condition: False, Else: 'World', Then: 'Hello')",
-                    Print(new ValueIf<string>
+                    Print(new ValueIf<StringStream>
                     {
                         Condition = Constant(false),
                         Then = Constant("Hello"),
@@ -302,9 +302,9 @@ namespace Reductech.EDR.Core.Tests
                     Print(new StringJoin
                     {
                         Delimiter = Constant(", "),
-                        Strings = new ArraySort<string>
+                        Strings = new ArraySort<StringStream>
                         {
-                            Array = Array(Constant("B"), Constant("C"), Constant("A")),
+                            Array = Array(("B"), ("C"), ("A")),
                             Descending = Constant(false)
                         }
                     }), "A, B, C");
@@ -313,9 +313,9 @@ namespace Reductech.EDR.Core.Tests
                     Print(new StringJoin
                     {
                         Delimiter = Constant(", "),
-                        Strings = new ArraySort<string>
+                        Strings = new ArraySort<StringStream>
                         {
-                            Array = Array(Constant("B"), Constant("C"), Constant("A")),
+                            Array = Array(("B"), ("C"), ("A")),
                             Descending = Constant(true)
                         }
                     }), "C, B, A");
@@ -358,7 +358,7 @@ namespace Reductech.EDR.Core.Tests
                     Sequence(
                         SetVariable(FooVariableName, Constant("Hello")),
                         new AppendString {Variable = FooVariableName, String = Constant(" World")},
-                        Print(GetVariable<string>(FooVariableName))
+                        Print(GetVariable<StringStream>(FooVariableName))
                     ), HelloWorldString);
 
                 yield return new StepTestCase("Print GetSubstring(Index: 6, Length: 2, String: 'Hello World')",
@@ -370,15 +370,15 @@ namespace Reductech.EDR.Core.Tests
                     }), "Wo");
 
                 yield return new StepTestCase("Print ElementAtIndex(Array: ['Hello'; 'World'], Index: 1)",
-                    Print(new ElementAtIndex<string>
+                    Print(new ElementAtIndex<StringStream>
                     {
-                        Array = Array(Constant("Hello"), Constant("World")),
+                        Array = Array(("Hello"), ("World")),
                         Index = Constant(1)
                     }), "World"
                 );
 
 
-                yield return new StepTestCase("Print 'I have more config'", new Print<string>
+                yield return new StepTestCase("Print 'I have more config'", new Print<StringStream>
                 {
                     Value = Constant("I have more config"),
                     Configuration = new Configuration
@@ -422,13 +422,10 @@ namespace Reductech.EDR.Core.Tests
 
                         EntityStream = new FromCSV
                         {
-                            Delimiter = new Constant<string>(","),
-                            Stream = new StringToStream
-                            {
-                                String = new Constant<string>(@"Name,Summary
+                            Delimiter = Constant(","),
+                            Stream = Constant(@"Name,Summary
 One,The first number
 Two,The second number"),
-                            }
                         },
                         Action = new Print<Record>{Value = new GetVariable<Record> {Variable = VariableName.Entity}}
                     },
@@ -441,19 +438,19 @@ Two,The second number"),
                 yield return new StepTestCase("Foreach nested array",
                     Sequence(new IStep<Unit>[]
                     {
-                        new SetVariable<List<List<string>>>
+                        new SetVariable<List<List<StringStream>>>
                         {
                             Variable = new VariableName("DataVar"),
 
-                            Value = new Array<List<string>>
+                            Value = new Array<List<StringStream>>
                             {
                                 Elements = new[]
                                 {
-                                    new Array<string>
+                                    new Array<StringStream>
                                     {
                                         Elements = new[] {Constant("One"), Constant("The first number")}
                                     },
-                                    new Array<string>
+                                    new Array<StringStream>
                                     {
                                         Elements = new[] {Constant("Two"), Constant("The second number")}
                                     },
@@ -466,12 +463,12 @@ Two,The second number"),
                         {
                             Array = GetVariable<List<List<string>>>(new VariableName("DataVar")),
                             Variable = FooVariableName,
-                            Action = new Print<string>
+                            Action = new Print<StringStream>
                             {
-                                Value = new ElementAtIndex<string>
+                                Value = new ElementAtIndex<StringStream>
                                 {
-                                    Array = new GetVariable<List<string>> {Variable = FooVariableName},
-                                    Index = new Constant<int>(0)
+                                    Array = new GetVariable<List<StringStream>> {Variable = FooVariableName},
+                                    Index = new IntConstant(0)
                                 }
                             },
                             Configuration = new Configuration
@@ -491,11 +488,14 @@ Two,The second number"),
 
         private static GetVariable<T> GetVariable<T>(VariableName variableName) => new GetVariable<T>{Variable = variableName};
 
-        private static Constant<T> Constant<T>(T element) => new Constant<T>(element);
+
+        //private static Constant<StringStream> Constant(string s) => new StringConstant(new StringStream(s));
+
+        //private static Constant<T> Constant<T>(T element) => new Constant<T>(element);
 
         private static Print<T> Print<T>(IStep<T> element) => new Print<T>{Value = element};
 
-        private static Array<T> Array<T>(params IStep<T>[] elements)=> new Array<T>{Elements = elements};
+        //private static Array<T> Array<T>(params IStep<T>[] elements)=> new Array<T>{Elements = elements};
         private static SetVariable<T> SetVariable<T>(VariableName variableName, IStep<T> step) =>
             new SetVariable<T>
             {

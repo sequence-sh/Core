@@ -23,8 +23,7 @@ namespace Reductech.EDR.Core.Steps
                 stateMonad,
                 Stream,
                 Delimiter,
-                Encoding,
-                new Constant<string>(""),
+                new StringConstant(new StringStream("")),
                 QuoteCharacter,
                 MultiValueDelimiter,
                 new StepErrorLocation(this),
@@ -39,21 +38,15 @@ namespace Reductech.EDR.Core.Steps
         /// </summary>
         [StepProperty(1)]
         [Required]
-        public IStep<DataStream> Stream { get; set; } = null!;
+        public IStep<StringStream> Stream { get; set; } = null!;
 
-        /// <summary>
-        /// How the stream is encoded.
-        /// </summary>
-        [StepProperty(2)]
-        [DefaultValueExplanation("UTF8 no BOM")]
-        public IStep<EncodingEnum> Encoding { get; set; } = new Constant<EncodingEnum>(EncodingEnum.UTF8);
 
         /// <summary>
         /// The delimiter to use to separate fields.
         /// </summary>
-        [StepProperty(3)]
+        [StepProperty(2)]
         [DefaultValueExplanation("\\u0014 - DC4")]
-        public IStep<string> Delimiter { get; set; } = new Constant<string>("\u0014");
+        public IStep<StringStream> Delimiter { get; set; } = new StringConstant(new StringStream("\u0014"));
 
 
         /// <summary>
@@ -61,18 +54,18 @@ namespace Reductech.EDR.Core.Steps
         /// Should be a single character or an empty string.
         /// If it is empty then strings cannot be quoted.
         /// </summary>
-        [StepProperty(4)]
+        [StepProperty(3)]
         [DefaultValueExplanation("\u00FE")]
-        public IStep<string> QuoteCharacter { get; set; } = new Constant<string>("\u00FE");
+        public IStep<StringStream> QuoteCharacter { get; set; } = new StringConstant(new StringStream("\u00FE"));
 
         /// <summary>
         /// The multi value delimiter character to use.
         /// Should be a single character or an empty string.
         /// If it is empty then fields cannot have multiple fields.
         /// </summary>
-        [StepProperty(5)]
+        [StepProperty(4)]
         [DefaultValueExplanation("|")]
-        public IStep<string> MultiValueDelimiter { get; set; } = new Constant<string>("|");
+        public IStep<StringStream> MultiValueDelimiter { get; set; } = new StringConstant(new StringStream("|"));
 
         /// <inheritdoc />
         public override IStepFactory StepFactory => FromConcordanceStepFactory.Instance;

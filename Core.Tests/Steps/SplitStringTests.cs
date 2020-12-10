@@ -1,11 +1,13 @@
 ﻿using System.Collections.Generic;
+using Reductech.EDR.Core.Parser;
 using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.TestHarness;
 using Xunit.Abstractions;
+using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
-    public class SplitStringTests : StepTestBase<StringSplit, List<string>>
+    public class SplitStringTests : StepTestBase<StringSplit, List<StringStream>>
     {
         /// <inheritdoc />
         public SplitStringTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
@@ -22,7 +24,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                     {
                         String = Constant("Hello World"),
                         Delimiter = Constant(" ")
-                    }, new List<string>(){"Hello", "World"}
+                    }, new List<StringStream>(){"Hello", "World"}
                     );
 
 
@@ -34,7 +36,8 @@ namespace Reductech.EDR.Core.Tests.Steps
         {
             get
             {
-                yield return new DeserializeCase("Split a string", "StringSplit String: 'Hello World' Delimiter: ' '", new List<string>{"Hello", "World"});
+                yield return new DeserializeCase("Split a string", "StringSplit String: 'Hello World' Delimiter: ' '",
+                    new List<StringStream>{"Hello", "World"});
 
             }
 

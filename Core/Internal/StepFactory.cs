@@ -207,17 +207,15 @@ namespace Reductech.EDR.Core.Internal
                 return Result.Success<IStep, IErrorBuilder>(stepToSet); //No coercion required
 
             if (propertyInfo.PropertyType.IsGenericType &&
-                propertyInfo.PropertyType.GenericTypeArguments.First().IsEnum && stepToSet is Constant<string> constant)
+                propertyInfo.PropertyType.GenericTypeArguments.First().IsEnum && stepToSet is StringConstant constant && constant.Value.Value.IsT0)
             {
                 var enumType = propertyInfo.PropertyType.GenericTypeArguments.First();
 
-                if (Enum.TryParse(enumType, constant.Value, true, out var enumValue))
+                if (Enum.TryParse(enumType, constant.Value.Value.AsT0, true, out var enumValue))
                 {
-                    Type stepType = typeof(Constant<>).MakeGenericType(enumType);
-                    var ecs = Activator.CreateInstance(stepType, enumValue);
+                    var step = EnumConstantFreezable.TryCreateEnumConstant(enumValue!);
 
-                    if (ecs is IStep enumConstantStep && propertyInfo.PropertyType.IsInstanceOfType(enumConstantStep))
-                        return Result.Success<IStep, IErrorBuilder>(enumConstantStep);
+                    return step;
                 }
 
             }

@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
+using Reductech.EDR.Core.Parser;
 using Reductech.EDR.Core.Util;
 
 namespace Reductech.EDR.Core.Steps
@@ -23,7 +24,7 @@ namespace Reductech.EDR.Core.Steps
             if (pathResult.IsFailure)
                 return pathResult.ConvertFailure<Unit>();
 
-            var path = pathResult.Value;
+            var path = await pathResult.Value.GetStringAsync();
 
 
             Result<Unit, IErrorBuilder> result;
@@ -53,7 +54,7 @@ namespace Reductech.EDR.Core.Steps
         /// </summary>
         [StepProperty(1)]
         [Required]
-        public IStep<string> Path { get; set; } = null!;
+        public IStep<StringStream> Path { get; set; } = null!;
 
 
         /// <inheritdoc />

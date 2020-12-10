@@ -24,7 +24,6 @@ namespace Reductech.EDR.Core.Steps
                 stateMonad,
                 Stream,
                 Delimiter,
-                Encoding,
                 CommentCharacter,
                 QuoteCharacter,
                 MultiValueDelimiter,
@@ -39,39 +38,32 @@ namespace Reductech.EDR.Core.Steps
         /// </summary>
         [StepProperty(1)]
         [Required]
-        public IStep<DataStream> Stream { get; set; } = null!;
-
-        /// <summary>
-        /// How the stream is encoded.
-        /// </summary>
-        [StepProperty(2)]
-        [DefaultValueExplanation("UTF8 no BOM")]
-        public IStep<EncodingEnum> Encoding { get; set; } = new Constant<EncodingEnum>(EncodingEnum.UTF8);
+        public IStep<StringStream> Stream { get; set; } = null!;
 
         /// <summary>
         /// The delimiter to use to separate fields.
         /// </summary>
-        [StepProperty(3)]
+        [StepProperty(2)]
         [DefaultValueExplanation(",")]
-        public IStep<string> Delimiter { get; set; } = new Constant<string>(",");
+        public IStep<StringStream> Delimiter { get; set; } = new StringConstant(new StringStream(","));
 
         /// <summary>
         /// The token to use to indicate comments.
         /// Must be a single character, or an empty string.
         /// If it is empty, then comments cannot be indicated
         /// </summary>
-        [StepProperty(4)]
+        [StepProperty(3)]
         [DefaultValueExplanation("#")]
-        public IStep<string> CommentCharacter { get; set; } = new Constant<string>("#");
+        public IStep<StringStream> CommentCharacter { get; set; } = new StringConstant(new StringStream("#"));
 
         /// <summary>
         /// The quote character to use.
         /// Should be a single character or an empty string.
         /// If it is empty then strings cannot be quoted.
         /// </summary>
-        [StepProperty(5)]
+        [StepProperty(4)]
         [DefaultValueExplanation("\"")]
-        public IStep<string> QuoteCharacter { get; set; } = new Constant<string>("\"");
+        public IStep<StringStream> QuoteCharacter { get; set; } = new StringConstant(new StringStream( "\""));
 
 
         /// <summary>
@@ -79,9 +71,9 @@ namespace Reductech.EDR.Core.Steps
         /// Should be a single character or an empty string.
         /// If it is empty then fields cannot have multiple fields.
         /// </summary>
-        [StepProperty(6)]
+        [StepProperty(5)]
         [DefaultValueExplanation("")]
-        public IStep<string> MultiValueDelimiter { get; set; } = new Constant<string>("");
+        public IStep<StringStream> MultiValueDelimiter { get; set; } = new StringConstant(new StringStream(""));
 
         /// <inheritdoc />
         public override IStepFactory StepFactory => FromCSVStepFactory.Instance;

@@ -1,11 +1,13 @@
 ﻿using System.Collections.Generic;
+using Reductech.EDR.Core.Parser;
 using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.TestHarness;
 using Xunit.Abstractions;
+using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
-    public class SetPropertyTests : StepTestBase<EntitySetValue<string>, Entity>
+    public class SetPropertyTests : StepTestBase<EntitySetValue<StringStream>, Entity>
     {
         /// <inheritdoc />
         public SetPropertyTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper) {}
@@ -17,7 +19,7 @@ namespace Reductech.EDR.Core.Tests.Steps
             {
                 yield return new StepCase(
                     "Set new property",
-                    new EntitySetValue<string>
+                    new EntitySetValue<StringStream>
                     {
                         Entity = Constant(CreateEntity(("Foo", "Hello"))),
                         Property = Constant("Bar"),
@@ -28,7 +30,7 @@ namespace Reductech.EDR.Core.Tests.Steps
 
                 yield return new StepCase(
                     "Change existing property",
-                    new EntitySetValue<string>
+                    new EntitySetValue<StringStream>
                     {
                         Entity = Constant(CreateEntity(("Foo", "Hello"), ("Bar", "Earth"))),
                         Property = Constant("Bar"),

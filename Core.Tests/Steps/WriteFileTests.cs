@@ -6,6 +6,7 @@ using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.TestHarness;
 using Reductech.EDR.Core.Util;
 using Xunit.Abstractions;
+using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
@@ -24,7 +25,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                 yield return new StepCase("Write file", new FileWrite
                     {
                         Path =  Constant("Filename.txt"),
-                        Stream = new StringToStream{String = Constant("Hello World")}
+                        Stream = Constant("Hello World")
 
 
                     },Unit.Default)

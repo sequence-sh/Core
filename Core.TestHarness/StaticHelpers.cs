@@ -1,0 +1,89 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.Linq;
+using Reductech.EDR.Core.Entities;
+using Reductech.EDR.Core.Internal;
+using Reductech.EDR.Core.Parser;
+using Reductech.EDR.Core.Steps;
+using Reductech.EDR.Core.Util;
+
+namespace Reductech.EDR.Core.TestHarness
+{
+    public static class StaticHelpers
+    {
+        public static IStep<Unit> SetVariable(string name, string value) => new SetVariable<StringStream> { Variable = new VariableName(name), Value = Constant(value) };
+        public static IStep<Unit> SetVariable(string name, int value) => new SetVariable<int> { Variable = new VariableName(name), Value = Constant(value) };
+        public static IStep<Unit> SetVariable(string name, double value) => new SetVariable<double> { Variable = new VariableName(name), Value = Constant(value) };
+        public static IStep<Unit> SetVariable(string name, bool value) => new SetVariable<bool> { Variable = new VariableName(name), Value = Constant(value) };
+        public static IStep<Unit> SetVariable(string name, DateTime value) => new SetVariable<DateTime> { Variable = new VariableName(name), Value = Constant(value) };
+        public static IStep<Unit> SetVariable(string name, Entity value) => new SetVariable<Entity> { Variable = new VariableName(name), Value = Constant(value) };
+        public static IStep<Unit> SetVariable(string name, EntityStream value) => new SetVariable<EntityStream> { Variable = new VariableName(name), Value = Constant(value) };
+        public static IStep<Unit> SetVariable<T>(string name, T value) where T : Enum => new SetVariable<T> { Variable = new VariableName(name), Value = Constant(value) };
+
+
+        public static StringConstant Constant(string value) => new StringConstant(new StringStream(value));
+        public static IntConstant Constant(int value) => new IntConstant(value);
+        public static DoubleConstant Constant(double value) => new DoubleConstant(value);
+        public static BoolConstant Constant(bool value) => new BoolConstant((value));
+        public static DateTimeConstant Constant(DateTime value) => new DateTimeConstant((value));
+        public static EntityConstant Constant(Entity value) => new EntityConstant((value));
+        public static EntityStreamConstant Constant(EntityStream value) => new EntityStreamConstant((value));
+        public static EnumConstant<T> Constant<T>(T value) where T: Enum => new EnumConstant<T>((value));
+
+        public static IStep<List<int>> Array(params int[] elements) => new Array<int> { Elements = elements.Select(Constant).ToList() };
+        public static IStep<List<double>> Array(params double[] elements) => new Array<double> { Elements = elements.Select(Constant).ToList() };
+        public static IStep<List<bool>> Array(params bool[] elements) => new Array<bool> { Elements = elements.Select(Constant).ToList() };
+        public static IStep<List<DateTime>> Array(params DateTime[] elements) => new Array<DateTime> { Elements = elements.Select(Constant).ToList() };
+        public static IStep<List<Entity>> Array(params Entity[] elements) => new Array<Entity> { Elements = elements.Select(Constant).ToList() };
+        public static IStep<List<EntityStream>> Array(params EntityStream[] elements) => new Array<EntityStream> { Elements = elements.Select(Constant).ToList() };
+        public static IStep<List<StringStream>> Array(params string[] elements) => new Array<StringStream> { Elements = elements.Select(Constant).ToList() };
+        public static IStep<List<T>> Array<T>(params T[] elements) where T : Enum => new Array<T> { Elements = elements.Select(Constant).ToList() };
+
+        public static IStep<TNew> GetVariable<TNew>(string variableName) => new GetVariable<TNew> { Variable = new VariableName(variableName) };
+        public static IStep<TNew> GetVariable<TNew>(VariableName variableName) => new GetVariable<TNew> { Variable = variableName };
+
+        public static IStep<Entity> GetEntityVariable => GetVariable<Entity>(VariableName.Entity);
+
+        public static Entity CreateEntity(params (string key, string value)[] pairs)
+        {
+            var evs = pairs
+                .GroupBy(x => x.key, x => x.value)
+                .Select(x => new KeyValuePair<string, EntityValue>(x.Key, EntityValue.Create(x)));
+
+            return new Entity(evs.ToImmutableList());
+        }
+
+        public static Schema CreateSchema(string name, bool allowExtraProperties, params (string propertyName, SchemaPropertyType type, Multiplicity multiplicity)[] properties)
+        {
+            return new Schema
+            {
+                Name = name,
+                AllowExtraProperties = allowExtraProperties,
+                Properties = properties.ToDictionary(x => x.propertyName, x => new SchemaProperty
+                {
+                    Multiplicity = x.multiplicity,
+                    Type = x.type
+                })
+            };
+        }
+
+        public static Schema CreateSchema(string name, bool allowExtraProperties, params (string propertyName, SchemaPropertyType type, Multiplicity multiplicity, string? regex, List<string>? format)[] properties)
+        {
+            return new Schema
+            {
+                Name = name,
+                AllowExtraProperties = allowExtraProperties,
+                Properties = properties.ToDictionary(x => x.propertyName, x => new SchemaProperty
+                {
+                    Multiplicity = x.multiplicity,
+                    Type = x.type,
+                    Regex = x.regex,
+                    Format = x.format
+                })
+            };
+        }
+
+        public static string CompressNewlines(string s) => s.Replace("\r\n", "\n");
+    }
+}

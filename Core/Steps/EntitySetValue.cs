@@ -7,6 +7,7 @@ using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
+using Reductech.EDR.Core.Parser;
 
 namespace Reductech.EDR.Core.Steps
 {
@@ -19,18 +20,20 @@ namespace Reductech.EDR.Core.Steps
         /// <inheritdoc />
         public override async Task<Result<Entity, IError>> Run(IStateMonad stateMonad, CancellationToken cancellationToken)
         {
-            var entity = await Entity.Run(stateMonad, cancellationToken);
-            if (entity.IsFailure) return entity;
+            var entityResult = await Entity.Run(stateMonad, cancellationToken);
+            if (entityResult.IsFailure) return entityResult;
 
-            var property = await Property.Run(stateMonad, cancellationToken);
-            if (property.IsFailure) return property.ConvertFailure<Entity>();
+            var propertyResult = await Property.Run(stateMonad, cancellationToken);
+            if (propertyResult.IsFailure) return propertyResult.ConvertFailure<Entity>();
 
-            var value = await Value.Run(stateMonad, cancellationToken);
-            if (value.IsFailure) return value.ConvertFailure<Entity>();
+            var valueResult = await Value.Run(stateMonad, cancellationToken);
+            if (valueResult.IsFailure) return valueResult.ConvertFailure<Entity>();
 
-            var entityValue = EntityValue.Create(value.Value?.ToString());
+            var propertyName = await propertyResult.Value.GetStringAsync();
 
-            var newEntity = entity.Value.WithProperty(property.Value, entityValue);
+            var entityValue = EntityValue.CreateFromObject(valueResult.Value);
+
+            var newEntity = entityResult.Value.WithProperty(propertyName, entityValue);
 
             return newEntity;
         }
@@ -47,7 +50,7 @@ namespace Reductech.EDR.Core.Steps
         /// </summary>
         [StepProperty(2)]
         [Required]
-        public IStep<string> Property { get; set; } = null!;
+        public IStep<StringStream> Property { get; set; } = null!;
 
         /// <summary>
         /// The new value of the property to set.

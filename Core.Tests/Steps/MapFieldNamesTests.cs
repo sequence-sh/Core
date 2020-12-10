@@ -5,6 +5,7 @@ using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.TestHarness;
 using Reductech.EDR.Core.Util;
 using Xunit.Abstractions;
+using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
@@ -37,7 +38,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                                             CreateEntity(("Food", "Hello 2"),
                                                 ("Bar", "World 2")))),
 
-                                        Mappings = new Constant<Entity>(CreateEntity(("Food", "Foo")))
+                                        Mappings =  Constant(CreateEntity(("Food", "Foo")))
                                     }
                     }, Unit.Default , "(Foo: \"Hello\" Bar: \"World\")",
                     "(Foo: \"Hello 2\" Bar: \"World 2\")"

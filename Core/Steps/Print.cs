@@ -7,6 +7,7 @@ using Microsoft.Extensions.Logging;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
+using Reductech.EDR.Core.Parser;
 using Reductech.EDR.Core.Util;
 
 namespace Reductech.EDR.Core.Steps
@@ -29,6 +30,8 @@ namespace Reductech.EDR.Core.Steps
 
             if (r.Value is Entity entity)
                 stringToPrint = entity.Serialize();
+            else if (r.Value is StringStream ss)
+                stringToPrint = await ss.GetStringAsync();
             else
                 stringToPrint = r.Value?.ToString()!;
 

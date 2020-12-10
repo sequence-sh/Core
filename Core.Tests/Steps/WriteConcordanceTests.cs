@@ -1,16 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using Reductech.EDR.Core.Entities;
-using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Parser;
 using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.TestHarness;
 using Reductech.EDR.Core.Util;
 using Xunit.Abstractions;
+using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
-    public class WriteConcordanceTests : StepTestBase<ToConcordance, DataStream>
+    public class WriteConcordanceTests : StepTestBase<ToConcordance, StringStream>
     {
         /// <inheritdoc />
         public WriteConcordanceTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
@@ -24,18 +24,15 @@ namespace Reductech.EDR.Core.Tests.Steps
             {
                 yield return new StepCase("Write Simple Concordance",
 
-                    new Print<string>
+                    new Print<StringStream>
                     {
-                        Value = new StringFromStream
+                        Value = new ToConcordance()
                         {
-                            Stream = new ToConcordance()
-                            {
-                                Entities = new Constant<EntityStream>(EntityStream.Create(
+                            Entities =  Constant(EntityStream.Create(
                                     CreateEntity(("Foo", "Hello"), ("Bar", "World")),
                                     CreateEntity(("Foo", "Hello 2"), ("Bar", "World 2"))
 
                                 ))
-                            }
                         }
                     }, Unit.Default,
                     $"þFooþþBarþ{ Environment.NewLine }þHelloþþWorldþ{ Environment.NewLine }þHello 2þþWorld 2þ{Environment.NewLine}"
@@ -43,22 +40,19 @@ namespace Reductech.EDR.Core.Tests.Steps
 
                 yield return new StepCase("Write Simple Concordance MultiValue",
 
-                    new Print<string>
+                    new Print<StringStream>
                     {
-                        Value = new StringFromStream
+                        Value = new ToConcordance
                         {
-                            Stream = new ToConcordance
-                            {
-                                Entities = new Constant<EntityStream>(EntityStream.Create(
+                            Entities =  Constant(EntityStream.Create(
 
                                     new Entity(
                                         new KeyValuePair<string, EntityValue>("Foo", EntityValue.Create("Hello")),
-                                        new KeyValuePair<string, EntityValue>("Bar", EntityValue.Create(new []{"World", "Earth"}))),
+                                        new KeyValuePair<string, EntityValue>("Bar", EntityValue.Create(new[] { "World", "Earth" }))),
                                     new Entity(
                                         new KeyValuePair<string, EntityValue>("Foo", EntityValue.Create("Hello 2")),
                                         new KeyValuePair<string, EntityValue>("Bar", EntityValue.Create(new[] { "World 2", "Earth 2" })))
                                 ))
-                            }
                         }
                     }, Unit.Default,
                     $"þFooþþBarþ{ Environment.NewLine }þHelloþþWorld|Earthþ{ Environment.NewLine }þHello 2þþWorld 2|Earth 2þ{Environment.NewLine}"

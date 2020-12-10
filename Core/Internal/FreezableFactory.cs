@@ -98,8 +98,8 @@ namespace Reductech.EDR.Core.Internal
         public static IFreezableStep CreateFreezableList(ImmutableList<IFreezableStep> elements, Configuration? configuration, IErrorLocation location)
         {
             if (elements.Any() && elements
-                .All(x => x is CreateEntityFreezableStep || x is ConstantFreezableStep cfs && cfs.Value.IsT6))
-            {
+                .All(x => x is CreateEntityFreezableStep || x is EntityConstantFreezable))
+            { //Special case for entity streams
                 var dict = new StepParameterDict
                 {
                     {
@@ -207,7 +207,7 @@ namespace Reductech.EDR.Core.Internal
                     nameof(ApplyMathOperator.Left),
                     nameof(ApplyMathOperator.Right),
                     nameof(ApplyMathOperator.Operator),
-                    new ConstantFreezableStep(new Enumeration(nameof(MathOperator), mo.ToString()))
+                    new EnumConstantFreezable(new Enumeration(nameof(MathOperator), mo.ToString()))
                 ))
                 .Concat(
                     Enum.GetValues<BooleanOperator>()
@@ -216,7 +216,7 @@ namespace Reductech.EDR.Core.Internal
                     nameof(ApplyBooleanOperator.Left),
                     nameof(ApplyBooleanOperator.Right),
                     nameof(ApplyBooleanOperator.Operator),
-                    new ConstantFreezableStep(new Enumeration(nameof(BooleanOperator), mo.ToString()))
+                    new EnumConstantFreezable(new Enumeration(nameof(BooleanOperator), mo.ToString()))
                 ))
                     )
                 .Concat(
@@ -226,7 +226,7 @@ namespace Reductech.EDR.Core.Internal
                     nameof(Compare<int>.Left),
                     nameof(Compare<int>.Right),
                     nameof(Compare<int>.Operator),
-                    new ConstantFreezableStep(new Enumeration(nameof(CompareOperator), mo.ToString()))
+                    new EnumConstantFreezable(new Enumeration(nameof(CompareOperator), mo.ToString()))
                 ))
                     )
                 .Where(x => x.Key != MathOperator.None.ToString())

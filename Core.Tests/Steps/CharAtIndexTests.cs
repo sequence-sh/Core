@@ -1,11 +1,14 @@
 ﻿using System.Collections.Generic;
+using Reductech.EDR.Core.Parser;
 using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.TestHarness;
 using Xunit.Abstractions;
 
+using static Reductech.EDR.Core.TestHarness.StaticHelpers;
+
 namespace Reductech.EDR.Core.Tests.Steps
 {
-    public class CharAtIndexTests : StepTestBase<CharAtIndex, string>
+    public class CharAtIndexTests : StepTestBase<CharAtIndex, StringStream>
     {
         /// <inheritdoc />
         public CharAtIndexTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)

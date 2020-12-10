@@ -6,6 +6,7 @@ using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
+using Reductech.EDR.Core.Parser;
 
 namespace Reductech.EDR.Core.Steps
 {
@@ -20,22 +21,24 @@ namespace Reductech.EDR.Core.Steps
         /// </summary>
         [StepProperty(1)]
         [Required]
-        public IStep<string> String { get; set; } = null!;
+        public IStep<StringStream> String { get; set; } = null!;
 
         /// <summary>
         /// The substring to find.
         /// </summary>
         [StepProperty(2)]
         [Required]
-        public IStep<string> SubString { get; set; } = null!;
+        public IStep<StringStream> SubString { get; set; } = null!;
 
         /// <inheritdoc />
         public override async Task<Result<int, IError>> Run(IStateMonad stateMonad, CancellationToken cancellationToken)
         {
-            var str = await String.Run(stateMonad, cancellationToken);
+            var str = await String.Run(stateMonad, cancellationToken)
+                .Map(async x=> await x.GetStringAsync());
             if (str.IsFailure) return str.ConvertFailure<int>();
 
-            var subString = await SubString.Run(stateMonad, cancellationToken);
+            var subString = await SubString.Run(stateMonad, cancellationToken)
+                .Map(async x=> await x.GetStringAsync());
             if (subString.IsFailure) return subString.ConvertFailure<int>();
 
 

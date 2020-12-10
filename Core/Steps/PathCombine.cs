@@ -8,31 +8,39 @@ using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
+using Reductech.EDR.Core.Parser;
 
 namespace Reductech.EDR.Core.Steps
 {
     /// <summary>
     /// Combine Paths
     /// </summary>
-    public sealed class PathCombine : CompoundStep<string>
+    public sealed class PathCombine : CompoundStep<StringStream>
     {
         /// <inheritdoc />
-        public override async Task<Result<string, IError>> Run(IStateMonad stateMonad, CancellationToken cancellationToken)
+        public override async Task<Result<StringStream, IError>> Run(IStateMonad stateMonad, CancellationToken cancellationToken)
         {
             var pathsResult = await Paths.Run(stateMonad, cancellationToken);
-            if (pathsResult.IsFailure) return pathsResult.ConvertFailure<string>();
+            if (pathsResult.IsFailure) return pathsResult.ConvertFailure<StringStream>();
 
 
             if (pathsResult.Value.Count <= 0)
-                return stateMonad.FileSystemHelper.GetCurrentDirectory();
-            var paths = pathsResult.Value.AsEnumerable();
+                return new StringStream(stateMonad.FileSystemHelper.GetCurrentDirectory());
 
-            if (!Path.IsPathFullyQualified(pathsResult.Value[0]))
-                paths = paths.Prepend(stateMonad.FileSystemHelper.GetCurrentDirectory());
+            var paths = new List<string>();
+
+
+            foreach (var stringStream in pathsResult.Value)
+            {
+                paths.Add(await stringStream.GetStringAsync());
+            }
+
+            if (!Path.IsPathFullyQualified(paths[0]))
+                paths = paths.Prepend(stateMonad.FileSystemHelper.GetCurrentDirectory()).ToList();
 
             var result = Path.Combine(paths.ToArray());
 
-            return result;
+            return new StringStream(result);
         }
 
         /// <summary>
@@ -40,7 +48,7 @@ namespace Reductech.EDR.Core.Steps
         /// </summary>
         [StepProperty(1)]
         [Required]
-        public IStep<List<string>> Paths { get; set; } = null!;
+        public IStep<List<StringStream>> Paths { get; set; } = null!;
 
 
         /// <inheritdoc />
@@ -50,13 +58,13 @@ namespace Reductech.EDR.Core.Steps
     /// <summary>
     /// Combine Paths
     /// </summary>
-    public class PathCombineStepFactory : SimpleStepFactory<PathCombine, string>
+    public class PathCombineStepFactory : SimpleStepFactory<PathCombine, StringStream>
     {
         private PathCombineStepFactory() { }
 
         /// <summary>
         /// The instance.
         /// </summary>
-        public static SimpleStepFactory<PathCombine, string> Instance { get; } = new PathCombineStepFactory();
+        public static SimpleStepFactory<PathCombine, StringStream> Instance { get; } = new PathCombineStepFactory();
     }
 }

@@ -1,11 +1,13 @@
 ﻿using System.Collections.Generic;
+using Reductech.EDR.Core.Parser;
 using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.TestHarness;
 using Xunit.Abstractions;
+using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
-    public class FindElementTests : StepTestBase<FindElement<string>, int>
+    public class FindElementTests : StepTestBase<FindElement<StringStream>, int>
     {
         /// <inheritdoc />
         public FindElementTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
@@ -18,27 +20,27 @@ namespace Reductech.EDR.Core.Tests.Steps
             get
             {
                 yield return new StepCase("Simple case",
-                    new FindElement<string>()
+                    new FindElement<StringStream>()
                     {
-                        Array = Array("Hello", "World"),
+                        Array = Array( ("Hello") , ("World") ),
                         Element = Constant("World")
 
                     },
                     1);
 
                 yield return new StepCase("Duplicate Element",
-                    new FindElement<string>
+                    new FindElement<StringStream>
                     {
-                        Array = Array("Hello", "World", "World"),
+                        Array = Array( ("Hello") ,  ("World") ,  ("World")),
                         Element = Constant("World")
 
                     },
                     1);
 
                 yield return new StepCase("Element not present",
-                    new FindElement<string>
+                    new FindElement<StringStream>
                     {
-                        Array = Array("Hello", "World", "World"),
+                        Array = Array(("Hello") , ("World") , ("World")),
                         Element = Constant("Mark")
 
                     },

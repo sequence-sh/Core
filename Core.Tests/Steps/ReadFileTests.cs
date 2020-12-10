@@ -8,10 +8,11 @@ using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.TestHarness;
 using Reductech.EDR.Core.Util;
 using Xunit.Abstractions;
+using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
-    public class ReadFileTests : StepTestBase<ReadFile, DataStream>
+    public class ReadFileTests : StepTestBase<ReadFile, StringStream>
     {
         /// <inheritdoc />
         public ReadFileTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper) { }
@@ -22,14 +23,11 @@ namespace Reductech.EDR.Core.Tests.Steps
             get
             {
                 yield return new StepCase("Print file text",
-                    new Print<string>
+                    new Print<StringStream>
                     {
-                        Value = new StringFromStream
+                        Value = new ReadFile
                         {
-                            Stream = new ReadFile
-                            {
-                                Path = Constant("File.txt"),
-                            }
+                            Path = Constant("File.txt"),
                         }
                     },
                     Unit.Default,
@@ -44,21 +42,21 @@ namespace Reductech.EDR.Core.Tests.Steps
         {
             get
             {
-                yield return new DeserializeCase("Default", "Print Value: (StringFromStream Stream: (ReadFile Path: 'File.txt') Encoding: EncodingEnum.UTF8)",
+                yield return new DeserializeCase("Default", "Print Value: (ReadFile Path: 'File.txt')",
                     Unit.Default,
                     "Hello World"
                 ).WithFileSystemAction(x=>
                     x.Setup(a=>a.ReadFile("File.txt"))
                         .Returns(new MemoryStream(Encoding.ASCII.GetBytes("Hello World"))));
 
-                yield return new DeserializeCase("Ordered Args", "Print (StringFromStream  (ReadFile  'File.txt') EncodingEnum.UTF8)",
+                yield return new DeserializeCase("Ordered Args", "Print (ReadFile  'File.txt')",
                     Unit.Default,
                     "Hello World"
                 ).WithFileSystemAction(x =>
                     x.Setup(a => a.ReadFile("File.txt"))
                         .Returns(new MemoryStream(Encoding.ASCII.GetBytes("Hello World"))));
 
-                yield return new DeserializeCase("Alias args", "Print Value: (StringFromStream Stream: (ReadFile FromPath: 'File.txt') Encoding: EncodingEnum.UTF8)",
+                yield return new DeserializeCase("Alias args", "Print Value: (ReadFile FromPath: 'File.txt')",
                     Unit.Default,
                     "Hello World"
                 ).WithFileSystemAction(x =>

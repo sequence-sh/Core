@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Collections.Immutable;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
@@ -15,73 +11,45 @@ using Reductech.EDR.Core.Util;
 namespace Reductech.EDR.Core.Internal
 {
     /// <summary>
-    /// A step that returns a fixed value when run.
+    /// A step that returns a constant value.
     /// </summary>
-    public class Constant<T> : IStep<T>, IConstantStep
+    public abstract class ConstantBase<T> : IStep<T>, IConstantStep
     {
         /// <summary>
-        /// Creates a new Constant.
+        /// Create a new Constant
         /// </summary>
-        /// <param name="value"></param>
-        public Constant(T value) => Value = value;
+        protected ConstantBase(T value) => Value = value;
+
+        /// <inheritdoc />
+        public async Task<Result<T, IError>> Run(IStateMonad stateMonad, CancellationToken cancellationToken)
+        {
+            await Task.CompletedTask;
+            return Value;
+        }
 
         /// <summary>
-        /// The value that this will return when run.
+        /// The value of this constant.
         /// </summary>
         public T Value { get; }
 
-
+        /// <inheritdoc />
+        public string Name => Value!.ToString()!;
 
         /// <inheritdoc />
-        public string Name => $"{Value}";
+        public object ValueObject => Value!;
 
         /// <inheritdoc />
-        public IFreezableStep Unfreeze()
-        {
-            return UnfreezeObject(Value!);
-
-            IFreezableStep UnfreezeObject(object o)
-            {
-                return o switch
-                {
-                    string s => new ConstantFreezableStep(s),
-                    int i => new ConstantFreezableStep(i),
-                    double d => new ConstantFreezableStep(d),
-                    bool b => new ConstantFreezableStep(b),
-                    Enum e => new ConstantFreezableStep(new Enumeration(e.GetType().Name, e.ToString())),
-                    DateTime dt => new ConstantFreezableStep(dt),
-                    Entity ent => new ConstantFreezableStep(ent),
-                    EntityStream es => new ConstantFreezableStep(es),
-                    DataStream ds => new ConstantFreezableStep(ds),
-                    Schema schema => new ConstantFreezableStep(schema.ConvertToEntity()),
-                    IEnumerable enumerable => UnfreezeList(enumerable),
-                    _ => throw new Exception($"Cannot unfreeze {typeof(T)}")
-                };
-            }
-
-            IFreezableStep UnfreezeList(IEnumerable enumerable)
-            {
-                var l = enumerable.Cast<object>().Select(UnfreezeObject).ToImmutableList();
-
-                var a = FreezableFactory.CreateFreezableList(l, null, new StepErrorLocation(this));
-
-                return a;
-            }
-        }
-
-        /// <inheritdoc />
-#pragma warning disable 1998
-        public async Task<Result<T, IError>> Run(IStateMonad stateMonad, CancellationToken cancellationToken) => Value!;
+        public abstract IFreezableStep Unfreeze();
 
         /// <inheritdoc />
         public async Task<Result<T1, IError>> Run<T1>(IStateMonad stateMonad, CancellationToken cancellationToken)
         {
+            await Task.CompletedTask;
             var r = Value!.TryConvert<T1>()
                 .MapError(x => new SingleError(x, ErrorCode.InvalidCast, new StepErrorLocation(this)) as IError);
 
             return r;
         }
-        #pragma warning restore 1998
 
         /// <inheritdoc />
         public Result<Unit, IError> Verify(ISettings settings) => Unit.Default;
@@ -92,62 +60,140 @@ namespace Reductech.EDR.Core.Internal
         /// <inheritdoc />
         public Type OutputType => typeof(T);
 
-        /// <param name="cancellationToken"></param>
         /// <inheritdoc />
-        public async Task<string> SerializeAsync(CancellationToken cancellationToken)
+        public abstract Task<string> SerializeAsync(CancellationToken cancellationToken);
+    }
+
+    /// <summary>
+    /// A Constant String
+    /// </summary>
+    public class StringConstant : ConstantBase<StringStream>
+    {
+        /// <inheritdoc />
+        public StringConstant(StringStream value) : base(value) { }
+
+        /// <inheritdoc />
+        public override IFreezableStep Unfreeze() => new StringConstantFreezable(Value);
+
+        /// <inheritdoc />
+        public override async Task<string> SerializeAsync(CancellationToken cancellationToken) => await Value.SerializeAsync(cancellationToken);
+    }
+
+
+    /// <summary>
+    /// A Constant int
+    /// </summary>
+    public class IntConstant : ConstantBase<int>
+    {
+        /// <inheritdoc />
+        public IntConstant(int value) : base(value) { }
+
+        /// <inheritdoc />
+        public override IFreezableStep Unfreeze() => new IntConstantFreezable(Value);
+
+        /// <inheritdoc />
+        public override async Task<string> SerializeAsync(CancellationToken cancellationToken) => await ValueTask.FromResult(Value.ToString());
+    }
+
+    /// <summary>
+    /// A constant double
+    /// </summary>
+    public class DoubleConstant : ConstantBase<double>
+    {
+        /// <inheritdoc />
+        public DoubleConstant(double value) : base(value) {}
+
+        /// <inheritdoc />
+        public override IFreezableStep Unfreeze() => new DoubleConstantFreezable(Value);
+
+        /// <inheritdoc />
+        public override async Task<string> SerializeAsync(CancellationToken cancellationToken) => await ValueTask.FromResult(Value.ToString("G17"));
+    }
+
+    /// <summary>
+    /// A constant bool
+    /// </summary>
+    public class BoolConstant : ConstantBase<bool>
+    {
+        /// <inheritdoc />
+        public BoolConstant(bool value) : base(value) {}
+
+        /// <inheritdoc />
+        public override IFreezableStep Unfreeze() => new BoolConstantFreezable(Value);
+
+        /// <inheritdoc />
+        public override async Task<string> SerializeAsync(CancellationToken cancellationToken) => await ValueTask.FromResult(Value.ToString());
+    }
+
+    /// <summary>
+    /// A constant enum value
+    /// </summary>
+    public class EnumConstant<T> : ConstantBase<T> where T : Enum
+    {
+        /// <inheritdoc />
+        public EnumConstant(T value) : base(value){}
+
+        /// <inheritdoc />
+        public override IFreezableStep Unfreeze()
         {
-            var result =  await SerializeObject(Value!, cancellationToken);
-
-            return result;
-
-            static async ValueTask<string> SerializeObject(object o, CancellationToken cancellationToken)
-            {
-                return o switch
-                {
-                    string s => SerializationMethods.DoubleQuote(s),
-                    int i => i.ToString(),
-                    double d => d.ToString("G17"),
-                    bool b => b.ToString(),
-                    Enum e => new Enumeration(e.GetType().Name, e.ToString()).ToString(),
-                    DateTime dt => dt.ToString("O"),
-                    Entity ent => ent.Serialize(),
-                    EntityStream es => await SerializeEntityStream(es, cancellationToken),
-                    DataStream ds => await ds.SerializeAsync(cancellationToken),
-                    Schema schema => schema.ConvertToEntity().Serialize(),
-                    IEnumerable enumerable => await SerializeEnumerable(enumerable, cancellationToken),
-                _ => throw new Exception($"Cannot serialize {typeof(T)}")
-                };
-            }
-
-
-            static async ValueTask<string> SerializeEnumerable(IEnumerable enumerable, CancellationToken cancellationToken)
-            {
-                var strings = new List<string>();
-
-                foreach (var o in enumerable.Cast<object>())
-                {
-                    var v = await SerializeObject(o, cancellationToken);
-                    strings.Add(v);
-                }
-
-                var s = SerializationMethods.SerializeList(strings);
-                return s;
-            }
-
-
-            static async ValueTask<string> SerializeEntityStream(EntityStream entityStream, CancellationToken cancellationToken)
-            {
-                var entities = await entityStream.SourceEnumerable
-                    .Select(x=>x.Serialize())
-                    .ToListAsync(cancellationToken);
-
-                var s = SerializationMethods.SerializeList(entities);
-
-                return s;
-            }
+            return new EnumConstantFreezable(new Enumeration(typeof(T).Name, Value.ToString()));
         }
 
         /// <inheritdoc />
-        public object ValueObject => Value!;
+        public override async Task<string> SerializeAsync(CancellationToken cancellationToken)
+        {
+            var enumeration = new Enumeration(typeof(T).Name, Value.ToString());
+            return await ValueTask.FromResult(enumeration.ToString());
+        }
+    }
+
+
+
+
+    /// <summary>
+    /// A constant date time value
+    /// </summary>
+    public class DateTimeConstant : ConstantBase<DateTime>
+    {
+        /// <inheritdoc />
+        public DateTimeConstant(DateTime value) : base(value) {}
+
+        /// <inheritdoc />
+        public override IFreezableStep Unfreeze() => new DateTimeConstantFreezable(Value);
+
+        /// <inheritdoc />
+        public override async Task<string> SerializeAsync(CancellationToken cancellationToken) => await ValueTask.FromResult(Value.ToString("O"));
+    }
+
+    /// <summary>
+    /// A constant entity value
+    /// </summary>
+    public class EntityConstant : ConstantBase<Entity>
+    {
+        /// <inheritdoc />
+        public EntityConstant(Entity value) : base(value) {}
+
+        /// <inheritdoc />
+        public override IFreezableStep Unfreeze() => new EntityConstantFreezable(Value);
+
+        /// <inheritdoc />
+        public override async Task<string> SerializeAsync(CancellationToken cancellationToken) => await ValueTask.FromResult(Value.Serialize());
+    }
+
+    /// <summary>
+    /// A constant entityStream value
+    /// </summary>
+    public class EntityStreamConstant : ConstantBase<EntityStream>
+    {
+        /// <inheritdoc />
+        public EntityStreamConstant(EntityStream value) : base(value)
+        {
+        }
+
+        /// <inheritdoc />
+        public override IFreezableStep Unfreeze() => new EntityStreamConstantFreezable(Value);
+
+        /// <inheritdoc />
+        public override async Task<string> SerializeAsync(CancellationToken cancellationToken) => await SerializationMethods.SerializeEntityStreamAsync(Value, cancellationToken);
     }
 }

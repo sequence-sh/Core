@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
@@ -7,9 +6,9 @@ using CSharpFunctionalExtensions;
 using Microsoft.Extensions.Logging;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Entities;
+using Reductech.EDR.Core.Enums;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
-using Type = System.Type;
 
 namespace Reductech.EDR.Core.Steps
 {
@@ -50,16 +49,16 @@ namespace Reductech.EDR.Core.Steps
 
                 switch (errorBehaviour.Value)
                 {
-                    case Steps.ErrorBehaviour.Fail:
+                    case Enums.ErrorBehaviour.Fail:
                         {
                             throw new ErrorException(r.Error.WithLocation(this));
                         }
-                    case Steps.ErrorBehaviour.Warning:
+                    case Enums.ErrorBehaviour.Warning:
                     {
                         stateMonad.Logger.LogWarning(r.Error.AsString);
                         return Maybe<Entity>.None;
                     }
-                    case Steps.ErrorBehaviour.Ignore: return Maybe<Entity>.None;
+                    case Enums.ErrorBehaviour.Ignore: return Maybe<Entity>.None;
                     default:
                         throw new InvalidEnumArgumentException(nameof(errorBehaviour), (int) errorBehaviour.Value, typeof(ErrorBehaviour));
                 }
@@ -89,7 +88,7 @@ namespace Reductech.EDR.Core.Steps
         /// </summary>
         [StepProperty(3)]
         [DefaultValueExplanation("Fail")]
-        public IStep<ErrorBehaviour> ErrorBehaviour { get; set; } = new Constant<ErrorBehaviour>(Steps.ErrorBehaviour.Fail);
+        public IStep<ErrorBehaviour> ErrorBehaviour { get; set; } = new EnumConstant<ErrorBehaviour>(Enums.ErrorBehaviour.Fail);
 
         /// <inheritdoc />
         public override IStepFactory StepFactory => EnforceSchemaStepFactory.Instance;
@@ -106,24 +105,5 @@ namespace Reductech.EDR.Core.Steps
         /// The instance
         /// </summary>
         public static SimpleStepFactory<EnforceSchema, EntityStream> Instance { get; } = new EnforceSchemaStepFactory();
-    }
-
-    /// <summary>
-    /// How to respond to a data error
-    /// </summary>
-    public enum ErrorBehaviour
-    {
-        /// <summary>
-        /// Stop the process on error
-        /// </summary>
-        Fail,
-        /// <summary>
-        /// Log a warning message on error
-        /// </summary>
-        Warning,
-        /// <summary>
-        /// Ignore errors
-        /// </summary>
-        Ignore
     }
 }
