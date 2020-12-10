@@ -88,13 +88,12 @@ namespace Reductech.EDR.Core.Steps
         public static StepFactory Instance { get; } = new ApplyBooleanOperatorStepFactory();
 
         /// <inheritdoc />
-        public override IStepSerializer Serializer => new StepSerializer(TypeName, new FixedStringComponent("("),
+        public override IStepSerializer Serializer => new StepSerializer(TypeName,
             new StepComponent(nameof(ApplyBooleanOperator.Left)),
             SpaceComponent.Instance,
             new EnumDisplayComponent<BooleanOperator>(nameof(ApplyBooleanOperator.Operator)),
             SpaceComponent.Instance,
-            new StepComponent(nameof(ApplyBooleanOperator.Right)),
-            new FixedStringComponent(")")
+            new StepComponent(nameof(ApplyBooleanOperator.Right))
         );
 
     }

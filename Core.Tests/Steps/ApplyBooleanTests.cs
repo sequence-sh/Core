@@ -32,8 +32,8 @@ namespace Reductech.EDR.Core.Tests.Steps
                         {
                             string expected = op switch
                             {
-                                BooleanOperator.And => $"({arg1} && {arg2})",
-                                BooleanOperator.Or => $"({arg1} || {arg2})",
+                                BooleanOperator.And => $"{arg1} && {arg2}",
+                                BooleanOperator.Or => $"{arg1} || {arg2}",
                                 _ => throw new ArgumentException($"Could not recognize {op}")
                             };
 

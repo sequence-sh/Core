@@ -148,7 +148,7 @@ namespace Reductech.EDR.Core.Parser
             /// <inheritdoc />
             public override Result<FreezableStepProperty, IError> VisitSetVariable(SequenceParser.SetVariableContext context)
             {
-                var member = VisitTerm(context.term());
+                var member = VisitStep(context.step());
 
                 if (member.IsFailure) return member;
 

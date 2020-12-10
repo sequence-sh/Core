@@ -109,6 +109,9 @@ Print 'Comments!'", "Comments!");
 
                 yield return new DeserializationTestFunction(@"<ArrayVar> = ['abc', '123']");
 
+                yield return new DeserializationTestFunction("-<Seven> = 3 + 4\r\n- Print <Seven>", 7);
+
+
                 yield return new DeserializationTestFunction(@"
 - <ArrayVar> = ['abc', '123']
 - Print(ArrayLength <ArrayVar>)",2);

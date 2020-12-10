@@ -158,21 +158,21 @@ namespace Reductech.EDR.Core.Tests.Steps
                     Left = Constant(1),
                     Operator = Constant(MathOperator.Add),
                     Right = Constant(2)
-                }, "(1 + 2)");
+                }, "1 + 2");
 
                 yield return new SerializeCase("Add negative number", new ApplyMathOperator()
                 {
                     Left = Constant(1),
                     Operator = Constant(MathOperator.Add),
                     Right = Constant(-2)
-                }, "(1 + -2)");
+                }, "1 + -2");
 
                 yield return new SerializeCase("Subtract negative number", new ApplyMathOperator()
                 {
                     Left = Constant(1),
                     Operator = Constant(MathOperator.Subtract),
                     Right = Constant(-2)
-                }, "(1 - -2)");
+                }, "1 - -2");
 
             }
         }

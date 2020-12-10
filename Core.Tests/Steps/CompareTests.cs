@@ -147,7 +147,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                         Left = Constant(1),
                         Right = Constant(2),
                         Operator = Constant(CompareOperator.LessThan)
-                    }, "(1 < 2)"
+                    }, "1 < 2"
                 );
             } }
     }
