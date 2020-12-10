@@ -76,6 +76,37 @@ namespace Reductech.EDR.Core.Tests.Steps
                         }
                     }
                 }
+
+                yield return new StepCase("Left is a func",
+                   new ApplyBooleanOperator()
+                   {
+                       Left = new StringIsEmpty() { String = Constant("") },
+                       Operator = Constant(BooleanOperator.And),
+                       Right = Constant(true)
+                   },
+                   true
+               );
+
+
+                yield return new StepCase("Right is a func",
+                    new ApplyBooleanOperator()
+                    {
+                        Left = Constant(true),
+                        Operator = Constant(BooleanOperator.And),
+                        Right  = new StringIsEmpty() { String = Constant("") },
+                    },
+                    true
+                );
+
+                yield return new StepCase("Both sides are functions",
+                    new ApplyBooleanOperator()
+                    {
+                        Left = new StringIsEmpty() { String = Constant("") },
+                        Operator = Constant(BooleanOperator.And),
+                        Right  = new StringIsEmpty() { String = Constant("") },
+                    },
+                    true
+                );
             }
         }
 
