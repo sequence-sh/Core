@@ -48,29 +48,57 @@ namespace Reductech.EDR.Core.Entities
         /// </summary>
         public static EntityValue CreateFromObject(object? argValue, char? multiValueDelimiter = null)
         {
-            switch (argValue)
+            if (argValue == null) //TODO convert to switch statement (this is not supported by stryker at the moment)
             {
-                case null: return new EntityValue(DBNull.Value);
-                case StringStream ss: return Create(ss.GetString());
-                case string s: return Create(s, multiValueDelimiter);
-                case int i: return new EntityValue(new EntitySingleValue(i, argValue.ToString()!));
-                case bool b: return new EntityValue(new EntitySingleValue(b, argValue.ToString()!));
-                case double d: return new EntityValue(new EntitySingleValue(d, argValue.ToString()!));
-                case Enumeration e: return new EntityValue(new EntitySingleValue(e, argValue.ToString()!));
-                case DateTime dt: return new EntityValue(new EntitySingleValue(dt, argValue.ToString()!));
-                case Entity entity: return new EntityValue(new EntitySingleValue(entity, entity.ToString()));
-                case IEnumerable e:
-                {
-                    var newEnumerable  = e.Cast<object>().Select(x=>
-                        x is StringStream ss? ss.GetString() :
-                            x.ToString()!);
-                    return Create(newEnumerable);
-                }
-                case IResult: throw new ArgumentException("Attempt to set EntityValue to a Result - you should check the result for failure and then set it to the value of the result", nameof(argValue));
-
-
-                default:
-                    return Create(argValue.ToString(), multiValueDelimiter);
+                return new EntityValue(DBNull.Value);
+            }
+            else if (argValue is StringStream ss1)
+            {
+                return Create(ss1.GetString());
+            }
+            else if (argValue is string s)
+            {
+                return Create(s, multiValueDelimiter);
+            }
+            else if (argValue is int i)
+            {
+                return new EntityValue(new EntitySingleValue(i, argValue.ToString()!));
+            }
+            else if (argValue is bool b)
+            {
+                return new EntityValue(new EntitySingleValue(b, argValue.ToString()!));
+            }
+            else if (argValue is double d)
+            {
+                return new EntityValue(new EntitySingleValue(d, argValue.ToString()!));
+            }
+            else if (argValue is Enumeration e1)
+            {
+                return new EntityValue(new EntitySingleValue(e1, argValue.ToString()!));
+            }
+            else if (argValue is DateTime dt)
+            {
+                return new EntityValue(new EntitySingleValue(dt, argValue.ToString()!));
+            }
+            else if (argValue is Entity entity)
+            {
+                return new EntityValue(new EntitySingleValue(entity, entity.ToString()));
+            }
+            else if (argValue is IEnumerable e2)
+            {
+                var newEnumerable = e2.Cast<object>().Select(x =>
+                    x is StringStream ss ? ss.GetString() : x.ToString()!);
+                return Create(newEnumerable);
+            }
+            else if (argValue is IResult)
+            {
+                throw new ArgumentException(
+                    "Attempt to set EntityValue to a Result - you should check the result for failure and then set it to the value of the result",
+                    nameof(argValue));
+            }
+            else
+            {
+                return Create(argValue.ToString(), multiValueDelimiter);
             }
         }
 
