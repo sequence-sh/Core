@@ -98,6 +98,21 @@ namespace Reductech.EDR.Core.Tests.Steps
                         }, expectedOutput );
                 }
 
+                yield return new StepCase("Left is a math operation",
+                  new ApplyMathOperator()
+                  {
+                      Left = new ApplyMathOperator
+                      {
+                          Left = Constant(2),
+                          Operator = Constant(MathOperator.Multiply),
+                          Right = Constant(3)
+                      },
+                      Operator = Constant(MathOperator.Add),
+                      Right = Constant(5)
+                  },
+                  11
+              );
+
 
                 yield return new StepCase("Left is a func",
                   new ApplyMathOperator()
