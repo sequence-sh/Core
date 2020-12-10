@@ -28,8 +28,8 @@ namespace Reductech.EDR.Core.Tests.Steps
 
                         new RunExternalProcess
                         {
-                            Arguments = new Constant<List<StringStream>>(new List<StringStream>(){"Foo"}),
-                            Path = new Constant<StringStream>("Process.exe"),
+                            Arguments = new Array<StringStream>(){Elements = new IStep<StringStream>[]{Constant("Foo") }},
+                            Path = new StringConstant("Process.exe"),
                             Encoding = Constant(EncodingEnum.Ascii)
                         },
                         Unit.Default, "My Message"

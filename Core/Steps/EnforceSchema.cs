@@ -88,7 +88,7 @@ namespace Reductech.EDR.Core.Steps
         /// </summary>
         [StepProperty(3)]
         [DefaultValueExplanation("Fail")]
-        public IStep<ErrorBehaviour> ErrorBehaviour { get; set; } = new Constant<ErrorBehaviour>(Enums.ErrorBehaviour.Fail);
+        public IStep<ErrorBehaviour> ErrorBehaviour { get; set; } = new EnumConstant<ErrorBehaviour>(Enums.ErrorBehaviour.Fail);
 
         /// <inheritdoc />
         public override IStepFactory StepFactory => EnforceSchemaStepFactory.Instance;

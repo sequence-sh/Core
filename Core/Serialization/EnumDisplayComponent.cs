@@ -34,7 +34,7 @@ namespace Reductech.EDR.Core.Serialization
             return dictionary.TryFindOrFail(PropertyName, $"Missing Property {PropertyName}")
                 .Bind(x => x.Value.Match(
                     _ => Result.Failure<string>("Operator is VariableName"),
-                    s=> s is Constant<T> cs? cs.Value.GetDisplayName() : Result.Failure<string>("Operator is non constant step"),
+                    s=> s is EnumConstant<T> cs? cs.Value.GetDisplayName() : Result.Failure<string>("Operator is non constant step"),
                     sl => Result.Failure<string>("Operator is Step List")
 
 

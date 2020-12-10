@@ -23,7 +23,7 @@ namespace Reductech.EDR.Core.Steps
                 stateMonad,
                 Stream,
                 Delimiter,
-                new Constant<StringStream>(new StringStream("")),
+                new StringConstant(new StringStream("")),
                 QuoteCharacter,
                 MultiValueDelimiter,
                 new StepErrorLocation(this),
@@ -46,7 +46,7 @@ namespace Reductech.EDR.Core.Steps
         /// </summary>
         [StepProperty(2)]
         [DefaultValueExplanation("\\u0014 - DC4")]
-        public IStep<StringStream> Delimiter { get; set; } = new Constant<StringStream>(new StringStream("\u0014"));
+        public IStep<StringStream> Delimiter { get; set; } = new StringConstant(new StringStream("\u0014"));
 
 
         /// <summary>
@@ -56,7 +56,7 @@ namespace Reductech.EDR.Core.Steps
         /// </summary>
         [StepProperty(3)]
         [DefaultValueExplanation("\u00FE")]
-        public IStep<StringStream> QuoteCharacter { get; set; } = new Constant<StringStream>(new StringStream("\u00FE"));
+        public IStep<StringStream> QuoteCharacter { get; set; } = new StringConstant(new StringStream("\u00FE"));
 
         /// <summary>
         /// The multi value delimiter character to use.
@@ -65,7 +65,7 @@ namespace Reductech.EDR.Core.Steps
         /// </summary>
         [StepProperty(4)]
         [DefaultValueExplanation("|")]
-        public IStep<StringStream> MultiValueDelimiter { get; set; } = new Constant<StringStream>(new StringStream("|"));
+        public IStep<StringStream> MultiValueDelimiter { get; set; } = new StringConstant(new StringStream("|"));
 
         /// <inheritdoc />
         public override IStepFactory StepFactory => FromConcordanceStepFactory.Instance;

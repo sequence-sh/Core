@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using Reductech.EDR.Core.Entities;
-using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Parser;
 using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.TestHarness;
@@ -29,7 +28,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                     {
                         Value = new ToCSV
                         {
-                            Entities = new Constant<EntityStream>(EntityStream.Create(
+                            Entities =  Constant(EntityStream.Create(
                                             CreateEntity(("Foo", "Hello"), ("Bar", "World")),
                                             CreateEntity(("Foo", "Hello 2"), ("Bar", "World 2"))
 
@@ -45,7 +44,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                     {
                         Value = new ToCSV
                         {
-                            Entities = new Constant<EntityStream>(EntityStream.Create(
+                            Entities =  Constant(EntityStream.Create(
                                             CreateEntity(("Foo", "Hello"), ("Bar", "World")),
                                             CreateEntity(("Foo", "Hello 2"), ("Bar", "World 2"))
 

@@ -38,7 +38,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                                             CreateEntity(("Food", "Hello 2"),
                                                 ("Bar", "World 2")))),
 
-                                        Mappings = new Constant<Entity>(CreateEntity(("Food", "Foo")))
+                                        Mappings =  Constant(CreateEntity(("Food", "Foo")))
                                     }
                     }, Unit.Default , "(Foo: \"Hello\" Bar: \"World\")",
                     "(Foo: \"Hello 2\" Bar: \"World 2\")"

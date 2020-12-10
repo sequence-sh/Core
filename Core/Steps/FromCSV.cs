@@ -45,7 +45,7 @@ namespace Reductech.EDR.Core.Steps
         /// </summary>
         [StepProperty(2)]
         [DefaultValueExplanation(",")]
-        public IStep<StringStream> Delimiter { get; set; } = new Constant<StringStream>(new StringStream(","));
+        public IStep<StringStream> Delimiter { get; set; } = new StringConstant(new StringStream(","));
 
         /// <summary>
         /// The token to use to indicate comments.
@@ -54,7 +54,7 @@ namespace Reductech.EDR.Core.Steps
         /// </summary>
         [StepProperty(3)]
         [DefaultValueExplanation("#")]
-        public IStep<StringStream> CommentCharacter { get; set; } = new Constant<StringStream>(new StringStream("#"));
+        public IStep<StringStream> CommentCharacter { get; set; } = new StringConstant(new StringStream("#"));
 
         /// <summary>
         /// The quote character to use.
@@ -63,7 +63,7 @@ namespace Reductech.EDR.Core.Steps
         /// </summary>
         [StepProperty(4)]
         [DefaultValueExplanation("\"")]
-        public IStep<StringStream> QuoteCharacter { get; set; } = new Constant<StringStream>(new StringStream( "\""));
+        public IStep<StringStream> QuoteCharacter { get; set; } = new StringConstant(new StringStream( "\""));
 
 
         /// <summary>
@@ -73,7 +73,7 @@ namespace Reductech.EDR.Core.Steps
         /// </summary>
         [StepProperty(5)]
         [DefaultValueExplanation("")]
-        public IStep<StringStream> MultiValueDelimiter { get; set; } = new Constant<StringStream>(new StringStream(""));
+        public IStep<StringStream> MultiValueDelimiter { get; set; } = new StringConstant(new StringStream(""));
 
         /// <inheritdoc />
         public override IStepFactory StepFactory => FromCSVStepFactory.Instance;

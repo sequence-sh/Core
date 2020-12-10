@@ -60,7 +60,7 @@ namespace Reductech.EDR.Core.Steps
         /// </summary>
         [StepProperty(3)]
         [DefaultValueExplanation("false")]
-        public IStep<bool> Overwrite { get; set; } = new Constant<bool>(false);
+        public IStep<bool> Overwrite { get; set; } = new BoolConstant(false);
 
         /// <inheritdoc />
         public override IStepFactory StepFactory => FileExtractStepFactory.Instance;

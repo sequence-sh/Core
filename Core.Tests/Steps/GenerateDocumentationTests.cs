@@ -243,7 +243,7 @@ Negation of a boolean value.
             [StepProperty(2)]
             [SeeAlso("Alpha")]
             [DefaultValueExplanation("Two hundred")]
-            public IStep<StringStream> Beta { get; set; } = new Constant<StringStream>("Two hundred");
+            public IStep<StringStream> Beta { get; set; } = new StringConstant("Two hundred");
 
 
             /// <summary>

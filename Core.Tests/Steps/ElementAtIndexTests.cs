@@ -23,14 +23,14 @@ namespace Reductech.EDR.Core.Tests.Steps
                     new ElementAtIndex<StringStream>
                     {
                         Index = Constant(0),
-                        Array = Array(new StringStream("Hello"), new StringStream("World") )
+                        Array = Array(("Hello"), ("World") )
                     }, "Hello");
 
                 yield return new StepCase("Index 1",
                     new ElementAtIndex<StringStream>
                     {
                         Index = Constant(1),
-                        Array = Array(new StringStream("Hello"), new StringStream("World"))
+                        Array = Array( ("Hello"),  ("World"))
                     }, "World");
             }
         }
@@ -57,7 +57,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                     new ElementAtIndex<StringStream>
                     {
                         Index = Constant(-1),
-                        Array = Array(new StringStream("Hello"), new StringStream("World"))
+                        Array = Array( ("Hello"),  ("World"))
                     },
                     new ErrorBuilder("Index was out of the range of the array.", ErrorCode.IndexOutOfBounds)
                     );
@@ -66,7 +66,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                     new ElementAtIndex<StringStream>
                     {
                         Index = Constant(2),
-                        Array = Array(new StringStream("Hello"), new StringStream("World"))
+                        Array = Array( ("Hello"),  ("World"))
                     },
                     new ErrorBuilder("Index was out of the range of the array.", ErrorCode.IndexOutOfBounds)
                     );

@@ -35,32 +35,30 @@ namespace Reductech.EDR.Core.Internal
         /// <inheritdoc />
         public Result<IStep, IError> TryFreeze(StepContext stepContext)
         {
-            var elementType = TryGetType(stepContext.TypeResolver.StepFactoryStore);
-            if (elementType.IsFailure) return elementType.ConvertFailure<IStep>();
+            var r = Value.Match(
+                x => new StringConstant(x),
+                x => new IntConstant(x),
+                x => new DoubleConstant(x),
+                x => new BoolConstant(x),
+                x => GetEnumStep(),
+                x => new DateTimeConstant(x),
+                x => new EntityConstant(x),
+                x => new EntityStreamConstant(x));
 
-            Type stepType = typeof(Constant<>).MakeGenericType(elementType.Value);
-            var value = GetValue(stepContext.TypeResolver.StepFactoryStore);
-            if (value.IsFailure) return value.ConvertFailure<IStep>();
+            return r;
 
-            var stepAsObject = Activator.CreateInstance(stepType, value.Value);
 
-            //TODO check for exceptions here?
-
-            Result<IStep, IError> result;
-
-            try
+            Result<IStep, IError> GetEnumStep()
             {
-                var step = (IStep)stepAsObject!;
-                result = Result.Success<IStep, IError>(step);
-            }
-#pragma warning disable CA1031 // Do not catch general exception types
-            catch (Exception e)
-            {
-                result = Result.Failure<IStep, IError>(new SingleError(e, ErrorCode.InvalidCast, new FreezableStepErrorLocation(this)));
-            }
-#pragma warning restore CA1031 // Do not catch general exception types
+                var valueResult = GetValue(stepContext.TypeResolver.StepFactoryStore);
 
-            return result;
+                if (valueResult.IsFailure) return valueResult.ConvertFailure<IStep>();
+
+                return EnumConstantHelper.TryCreateEnumConstant(valueResult.Value)
+                    .MapError(x => x.WithLocation(this));
+            }
+
+
         }
 
         /// <inheritdoc />

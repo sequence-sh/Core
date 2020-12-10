@@ -4,7 +4,6 @@ using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions.Common;
@@ -259,14 +258,14 @@ namespace Reductech.EDR.Core.TestHarness
 
             else if (outputType == typeof(List<StringStream>))
             {
-                var list = new List<StringStream>();
+                var list = new List<string>();
                 for (var i = 0; i < 3; i++)
                 {
                     list.Add("Foo" + index);
                     index++;
                 }
 
-                step =  Constant(list);
+                step = Array(list.ToArray());
             }
             else if (outputType == typeof(List<int>))
             {
@@ -277,15 +276,15 @@ namespace Reductech.EDR.Core.TestHarness
                     index++;
                 }
 
-                step =  Constant(list);
+                step =  Array(list.ToArray());
             }
             else if (outputType == typeof(List<EntityStream>))
             {
                 var entityStreamList = new List<IStep<EntityStream> >
                 {
-                    new Constant<EntityStream>(CreateSimpleEntityStream(ref index)),
-                    new Constant<EntityStream>(CreateSimpleEntityStream(ref index)),
-                    new Constant<EntityStream>(CreateSimpleEntityStream(ref index))
+                    Constant(CreateSimpleEntityStream(ref index)),
+                    Constant(CreateSimpleEntityStream(ref index)),
+                    Constant(CreateSimpleEntityStream(ref index))
                 };
 
 
@@ -296,55 +295,54 @@ namespace Reductech.EDR.Core.TestHarness
             {
                 var v = Enum.GetValues(outputType).OfType<object>().First();
 
-                var constantType = typeof(Constant<>).MakeGenericType(outputType);
-                var constant = Activator.CreateInstance(constantType, new[] {v});
-
-                step =  (IStep) constant!;
+                step = EnumConstantHelper.TryCreateEnumConstant(v).Value;
             }
 
             else if (outputType == typeof(Stream))
             {
-                var s = "Baz" + index;
-                index++;
+                throw new Exception($"{tStep.Name} should not have output type 'Stream' - it should be 'StringStream'");
+                //var s = "Baz" + index;
+                //index++;
 
-                byte[] byteArray = Encoding.UTF8.GetBytes(s);
-                Stream stream = new MemoryStream(byteArray); //special case so we don't read the stream early
+                //byte[] byteArray = Encoding.UTF8.GetBytes(s);
+                //Stream stream = new MemoryStream(byteArray); //special case so we don't read the stream early
 
-                step = Constant(stream);
-                var asString = await GetStringAsync(Constant(s));
+                //step = Constant(stream);
+                //var asString = await GetStringAsync(Constant(s));
 
-                return (step, asString, index);
+                //return (step, asString, index);
             }
             else if (outputType == typeof(Entity))
             {
                 var entity = CreateSimpleEntity(ref index);
 
-                step = new Constant<Entity>(entity);
+                step = Constant(entity);
             }
             else if (outputType == typeof(EntityStream))
             {
                 var entityStream = CreateSimpleEntityStream(ref index);
 
-                step = new Constant<EntityStream>(entityStream);
+                step = Constant(entityStream);
             }
             else if (outputType == typeof(StringStream))
             {
                 var s = "DataStream" + index;
                 index++;
 
-                step = new Constant<StringStream>(new StringStream(s));
+                step = new StringConstant(new StringStream(s));
             }
             else if (outputType == typeof(Schema))
             {
-                var schema = new Schema
-                {
-                    Name = "Schema" + index,
-                    Properties = new Dictionary<string, SchemaProperty>()
-                };
-                index++;
-                schema.Properties.Add("MyProp" + index, new SchemaProperty{Multiplicity = Multiplicity.Any, Type = SchemaPropertyType.Integer});
-                index++;
-                step = new Constant<Schema>(schema);
+                throw new Exception($"{tStep.Name} should not have output type 'Schema' - it should be 'Entity'");
+                //var schema = new Schema
+                //{
+                //    Name = "Schema" + index,
+                //    Properties = new Dictionary<string, SchemaProperty>()
+                //};
+                //index++;
+                //schema.Properties.Add("MyProp" + index, new SchemaProperty{Multiplicity = Multiplicity.Any, Type = SchemaPropertyType.Integer});
+                //index++;
+                //step = new Constant<Schema>(schema);
             }
             else
                 throw new XunitException($"Cannot create a constant step with type {outputType.GetDisplayName()}");

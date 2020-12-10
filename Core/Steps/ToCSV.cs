@@ -43,14 +43,14 @@ namespace Reductech.EDR.Core.Steps
         /// </summary>
         [StepProperty(2)]
         [DefaultValueExplanation("UTF8 no BOM")]
-        public IStep<EncodingEnum> Encoding { get; set; } = new Constant<EncodingEnum>(EncodingEnum.UTF8);
+        public IStep<EncodingEnum> Encoding { get; set; } = new EnumConstant<EncodingEnum>(EncodingEnum.UTF8);
 
         /// <summary>
         /// The delimiter to use to separate fields.
         /// </summary>
         [StepProperty(3)]
         [DefaultValueExplanation(",")]
-        public IStep<StringStream> Delimiter { get; set; } = new Constant<StringStream>(new StringStream(","));
+        public IStep<StringStream> Delimiter { get; set; } = new StringConstant(new StringStream(","));
 
         /// <summary>
         /// The quote character to use.
@@ -59,14 +59,14 @@ namespace Reductech.EDR.Core.Steps
         /// </summary>
         [StepProperty(4)]
         [DefaultValueExplanation("\"")]
-        public IStep<StringStream> QuoteCharacter { get; set; } = new Constant<StringStream>(new StringStream("\""));
+        public IStep<StringStream> QuoteCharacter { get; set; } = new StringConstant(new StringStream("\""));
 
         /// <summary>
         /// Whether to always quote all fields and headers.
         /// </summary>
         [StepProperty(5)]
         [DefaultValueExplanation("false")]
-        public IStep<bool> AlwaysQuote { get; set; } = new Constant<bool>(false);
+        public IStep<bool> AlwaysQuote { get; set; } = new BoolConstant(false);
 
         /// <summary>
         /// The multi value delimiter character to use.
@@ -75,7 +75,7 @@ namespace Reductech.EDR.Core.Steps
         /// </summary>
         [StepProperty(6)]
         [DefaultValueExplanation("")]
-        public IStep<StringStream> MultiValueDelimiter { get; set; } = new Constant<StringStream>(new StringStream("|"));
+        public IStep<StringStream> MultiValueDelimiter { get; set; } = new StringConstant(new StringStream("|"));
 
         /// <summary>
         /// The format to use for DateTime fields.
@@ -83,7 +83,7 @@ namespace Reductech.EDR.Core.Steps
         [StepProperty(7)]
         [DefaultValueExplanation("O - ISO 8601 compliant - e.g. 2009-06-15T13:45:30.0000000-07:00")]
         [Example("yyyy/MM/dd HH:mm:ss")]
-        public IStep<StringStream> DateTimeFormat { get; set; } = new Constant<StringStream>(new StringStream("O"));
+        public IStep<StringStream> DateTimeFormat { get; set; } = new StringConstant(new StringStream("O"));
 
         /// <inheritdoc />
         public override IStepFactory StepFactory => ToCSVFactory.Instance;

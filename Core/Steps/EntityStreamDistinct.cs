@@ -79,7 +79,7 @@ namespace Reductech.EDR.Core.Steps
         /// </summary>
         [StepProperty(3)]
         [DefaultValueExplanation("False")]
-        public IStep<bool> IgnoreCase { get; set; } = new Constant<bool>(false);
+        public IStep<bool> IgnoreCase { get; set; } = new BoolConstant(false);
         /// <inheritdoc />
         public override IStepFactory StepFactory => EntityStreamDistinctStepFactory.Instance;
     }

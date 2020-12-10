@@ -23,7 +23,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                     new StringJoin
                     {
                         Delimiter = Constant(", "),
-                        Strings = Array(new StringStream("Hello"), new StringStream("World") )
+                        Strings = Array( ("Hello"),  ("World") )
                     }, "Hello, World"
                     );
 

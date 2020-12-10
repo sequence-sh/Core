@@ -29,7 +29,7 @@ namespace Reductech.EDR.Core.Steps
         /// </summary>
         [StepProperty(2)]
         [DefaultValueExplanation("False")]
-        public IStep<bool> Descending { get; set; } = new Constant<bool>(false);
+        public IStep<bool> Descending { get; set; } = new BoolConstant(false);
 
         /// <inheritdoc />
         public override async Task<Result<List<T>, IError>> Run(IStateMonad stateMonad,

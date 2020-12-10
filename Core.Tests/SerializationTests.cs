@@ -37,7 +37,7 @@ namespace Reductech.EDR.Core.Tests
                     {
                         InitialSteps = new List<IStep<Unit>>
                         {
-                            SetVariable("Foo", new StringStream("Hello World")),
+                            SetVariable("Foo", ("Hello World")),
                             new SetVariable<StringStream>{Value = new GetVariable<StringStream> {Variable = new VariableName("Foo")}, Variable = new VariableName("Bar")},
                         },
                         FinalStep = new Print<StringStream>{Value = new GetVariable<StringStream> {Variable = new VariableName("Bar")}}
@@ -53,9 +53,9 @@ namespace Reductech.EDR.Core.Tests
                 {
                     Value = new ApplyMathOperator
                     {
-                        Left = new Constant<int>(2),
-                        Operator = new Constant<MathOperator>(MathOperator.Multiply),
-                        Right = new Constant<int>(3)
+                        Left = new IntConstant(2),
+                        Operator = Constant(MathOperator.Multiply),
+                        Right = new IntConstant(3)
                     }
                 }, @"Print(Value = (2 * 3))");
 
@@ -63,13 +63,13 @@ namespace Reductech.EDR.Core.Tests
                 {
                     Value = new ApplyMathOperator
                     {
-                        Left = new Constant<int>(2),
-                        Operator = new Constant<MathOperator>(MathOperator.Multiply),
+                        Left = new IntConstant(2),
+                        Operator =  Constant(MathOperator.Multiply),
                         Right = new ApplyMathOperator
                         {
-                            Left = new Constant<int>(3),
-                            Operator = new Constant<MathOperator>(MathOperator.Add),
-                            Right = new Constant<int>(4)
+                            Left = new IntConstant(3),
+                            Operator = Constant(MathOperator.Add),
+                            Right = new IntConstant(4)
                         }
                     }
                 }, @"Print(Value = (2 * (3 + 4)))");
@@ -80,12 +80,12 @@ namespace Reductech.EDR.Core.Tests
                     {
                         Left = new ApplyMathOperator
                         {
-                            Left = new Constant<int>(2),
-                            Operator = new Constant<MathOperator>(MathOperator.Multiply),
-                            Right = new Constant<int>(3)
+                            Left = new IntConstant(2),
+                            Operator = Constant(MathOperator.Multiply),
+                            Right = new IntConstant(3)
                         },
-                        Operator = new Constant<MathOperator>(MathOperator.Add),
-                        Right  = new Constant<int>(4)
+                        Operator = Constant(MathOperator.Add),
+                        Right  = new IntConstant(4)
                     }
                 }, @"Print(Value = ((2 * 3) + 4))");
 
@@ -93,9 +93,9 @@ namespace Reductech.EDR.Core.Tests
                 {
                     Value = new ApplyMathOperator
                     {
-                        Left = new Constant<int>(2),
-                        Operator = new Constant<MathOperator>(MathOperator.Power),
-                        Right = new Constant<int>(3)
+                        Left = new IntConstant(2),
+                        Operator = Constant(MathOperator.Power),
+                        Right = new IntConstant(3)
                     }
                 }, @"Print(Value = (2 ^ 3))");
 
@@ -103,7 +103,7 @@ namespace Reductech.EDR.Core.Tests
                 {
                     Value = new Not
                     {
-                        Boolean = new Constant<bool>(true)
+                        Boolean = new BoolConstant(true)
                     }
                 }, @"Print(Value = not(True))");
 
@@ -111,9 +111,9 @@ namespace Reductech.EDR.Core.Tests
                 {
                     Value = new Compare<int>
                     {
-                        Left = new Constant<int>(2),
-                        Operator = new Constant<CompareOperator>(CompareOperator.GreaterThanOrEqual),
-                        Right = new Constant<int>(3)
+                        Left = new IntConstant(2),
+                        Operator =  Constant(CompareOperator.GreaterThanOrEqual),
+                        Right = new IntConstant(3)
                     }
                 }, @"Print(Value = (2 >= 3))");
 
@@ -121,9 +121,9 @@ namespace Reductech.EDR.Core.Tests
                 {
                     Value = new ApplyBooleanOperator
                     {
-                        Left = new Constant<bool>(true),
-                        Operator = new Constant<BooleanOperator>(BooleanOperator.And),
-                        Right = new Constant<bool>(false)
+                        Left = new BoolConstant(true),
+                        Operator = Constant(BooleanOperator.And),
+                        Right = new BoolConstant(false)
                     }
                 }, @"Print(Value = (True && False))");
 
@@ -132,9 +132,9 @@ namespace Reductech.EDR.Core.Tests
                 {
                     Value = new ApplyBooleanOperator
                     {
-                        Left = new StringIsEmpty{String = new Constant<StringStream>("Hello") },
-                        Operator = new Constant<BooleanOperator>(BooleanOperator.And),
-                        Right = new StringIsEmpty{String = new Constant<StringStream>("World") }
+                        Left = new StringIsEmpty{String = new StringConstant("Hello") },
+                        Operator = Constant(BooleanOperator.And),
+                        Right = new StringIsEmpty{String = new StringConstant("World") }
                     }
                 }, @"Print(Value = (StringIsEmpty(String = 'Hello') && StringIsEmpty(String = 'World')))");
 
@@ -142,9 +142,9 @@ namespace Reductech.EDR.Core.Tests
                 {
                     Value = new ApplyBooleanOperator
                     {
-                        Left = new Not{Boolean = new Constant<bool>(true)},
-                        Operator = new Constant<BooleanOperator>(BooleanOperator.And),
-                        Right = new Not{Boolean = new Constant<bool>(false)}
+                        Left = new Not{Boolean = new BoolConstant(true)},
+                        Operator = Constant(BooleanOperator.And),
+                        Right = new Not{Boolean = new BoolConstant(false)}
                     }
                 }, @"Print(Value = (not(True) && not(False)))");
 
@@ -163,7 +163,7 @@ namespace Reductech.EDR.Core.Tests
                         {
                             new SetVariable<CompareOperator>()
                             {
-                                Value = new Constant<CompareOperator>(CompareOperator.LessThan),
+                                Value = Constant(CompareOperator.LessThan),
                                 Variable = new VariableName("Foo")
                             }
                         },
@@ -171,8 +171,8 @@ namespace Reductech.EDR.Core.Tests
                         {
                             Value = new Compare<int>
                             {
-                                Left = new Constant<int>(1),
-                                Right = new Constant<int>(2),
+                                Left = new IntConstant(1),
+                                Right = new IntConstant(2),
                                 Operator = new GetVariable<CompareOperator>
                                 {
                                     Variable = new VariableName("Foo"),
@@ -199,7 +199,7 @@ namespace Reductech.EDR.Core.Tests
                 yield return new SerializationTestMethod(
                     new Print<StringStream>
                     {
-                        Value = new Constant<StringStream>("I have config"),
+                        Value = new StringConstant("I have config"),
                         Configuration = new Configuration
                         {
                             TargetMachineTags = new List<string> {"Tag1"},
@@ -217,7 +217,7 @@ Value: 'I have config'");
                 yield return new SerializationTestMethod(
                     new Print<StringStream>
                     {
-                        Value = new Constant<StringStream>("I have config too"),
+                        Value = new StringConstant("I have config too"),
                         Configuration = new Configuration
                         {
                             TargetMachineTags = new List<string> { "Tag1" },

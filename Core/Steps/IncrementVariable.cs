@@ -27,7 +27,7 @@ namespace Reductech.EDR.Core.Steps
         /// </summary>
         [StepProperty(2)]
         [DefaultValueExplanation("1")]
-        public IStep<int> Amount { get; set; } = new Constant<int>(1);
+        public IStep<int> Amount { get; set; } = new IntConstant(1);
 
         /// <inheritdoc />
         public override async Task<Result<Unit, IError>> Run(IStateMonad stateMonad,

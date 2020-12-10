@@ -22,7 +22,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                 yield return new StepCase("Simple case",
                     new FindElement<StringStream>()
                     {
-                        Array = Array(new StringStream("Hello") , new StringStream("World") ),
+                        Array = Array( ("Hello") , ("World") ),
                         Element = Constant("World")
 
                     },
@@ -31,7 +31,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                 yield return new StepCase("Duplicate Element",
                     new FindElement<StringStream>
                     {
-                        Array = Array(new StringStream("Hello") , new StringStream("World") , new StringStream("World")),
+                        Array = Array( ("Hello") ,  ("World") ,  ("World")),
                         Element = Constant("World")
 
                     },
@@ -40,7 +40,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                 yield return new StepCase("Element not present",
                     new FindElement<StringStream>
                     {
-                        Array = Array(new StringStream("Hello") , new StringStream("World") , new StringStream("World")),
+                        Array = Array(("Hello") , ("World") , ("World")),
                         Element = Constant("Mark")
 
                     },
