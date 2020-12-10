@@ -54,7 +54,7 @@ namespace Reductech.EDR.Core.Serialization
         /// <summary>
         /// Serialize an entityStream
         /// </summary>
-        public static async Task<string> SerializeEntityStreamAsync(EntityStream entityStream, CancellationToken cancellationToken)
+        public static async Task<string> SerializeEntityStreamAsync(this EntityStream entityStream, CancellationToken cancellationToken)
         {
             var enumerable = await entityStream.SourceEnumerable.Select(x=>x.Serialize()) .ToListAsync(cancellationToken);
 

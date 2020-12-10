@@ -113,9 +113,8 @@ namespace Reductech.EDR.Core.Parser
             {
                 var b = context.TRUE() != null;
 
-                var member = new FreezableStepProperty(new ConstantFreezableStep(b), new TextPosition(context));
+                var member = new FreezableStepProperty(new BoolConstantFreezable(b), new TextPosition(context));
                 return member;
-
             }
 
             /// <inheritdoc />
@@ -176,7 +175,7 @@ namespace Reductech.EDR.Core.Parser
                 var prefix = context.NAME(0).GetText();
                 var suffix = context.NAME(1).GetText();
 
-                var member = new FreezableStepProperty(new ConstantFreezableStep(new Enumeration(prefix, suffix)), new TextPosition(context));
+                var member = new FreezableStepProperty(new EnumConstantFreezable(new Enumeration(prefix, suffix)), new TextPosition(context));
 
                 return member;
             }
@@ -186,7 +185,7 @@ namespace Reductech.EDR.Core.Parser
             {
                 if (int.TryParse(context.NUMBER().GetText(), out var num))
                 {
-                    var member = new FreezableStepProperty(new ConstantFreezableStep(num), new TextPosition(context));
+                    var member = new FreezableStepProperty(new IntConstantFreezable(num), new TextPosition(context));
 
                     return member;
                 }
@@ -203,7 +202,7 @@ namespace Reductech.EDR.Core.Parser
 
                 var stringStream = new StringStream(s);
 
-                var member = new FreezableStepProperty(new ConstantFreezableStep(stringStream), new TextPosition(context) );
+                var member = new FreezableStepProperty(new StringConstantFreezable(stringStream), new TextPosition(context) );
 
                 return member;
 

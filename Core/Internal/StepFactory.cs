@@ -213,7 +213,7 @@ namespace Reductech.EDR.Core.Internal
 
                 if (Enum.TryParse(enumType, constant.Value.Value.AsT0, true, out var enumValue))
                 {
-                    var step = EnumConstantHelper.TryCreateEnumConstant(enumValue!);
+                    var step = EnumConstantFreezable.TryCreateEnumConstant(enumValue!);
 
                     return step;
                 }

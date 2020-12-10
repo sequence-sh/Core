@@ -125,15 +125,10 @@ namespace Reductech.EDR.Core.TestHarness
         {
             var freezable = step.Unfreeze();
 
-            if (freezable is ConstantFreezableStep cfs)
+            if (freezable is IConstantFreezableStep cfs)
             {
-                if (cfs.Value.IsT7)
-                {
-                    return await SerializationMethods.SerializeEntityStreamAsync(cfs.Value.AsT7, CancellationToken.None);
-                }
 
-
-                return await cfs.Serialize(CancellationToken.None);
+                return await cfs.SerializeAsync(CancellationToken.None);
             }
 
             else if (step is DoNothing)
@@ -145,13 +140,13 @@ namespace Reductech.EDR.Core.TestHarness
 
                 var constants = cs.FreezableStepData
                     .StepProperties[new StepParameterReference(nameof(Steps.Array<object>.Elements))]
-                    .StepList.Value.Cast<ConstantFreezableStep>();
+                    .StepList.Value.Cast<IConstantFreezableStep>();
 
                 var list = new List<string>();
 
                 foreach (var constantFreezableStep in constants)
                 {
-                    var s = await constantFreezableStep.Serialize(CancellationToken.None);
+                    var s = await constantFreezableStep.SerializeAsync(CancellationToken.None);
                     list.Add(s);
                 }
 
@@ -295,7 +290,7 @@ namespace Reductech.EDR.Core.TestHarness
             {
                 var v = Enum.GetValues(outputType).OfType<object>().First();
 
-                step = EnumConstantHelper.TryCreateEnumConstant(v).Value;
+                step = EnumConstantFreezable.TryCreateEnumConstant(v).Value;
             }
 
             else if (outputType == typeof(Stream))

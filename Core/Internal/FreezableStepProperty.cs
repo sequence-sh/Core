@@ -145,17 +145,19 @@ namespace Reductech.EDR.Core.Internal
 
             IFreezableStep MapStepList(ImmutableList<IFreezableStep> stepList)
             {
-                if (!stepList.Any() || !stepList.All(x => x is ConstantFreezableStep cfs && cfs.Value.IsT6))
-                    return MapStepListToArray(stepList);
+                if (stepList.Any() && stepList.All(x => x is EntityConstantFreezable))
+                { //Special case for entity stream
+                    var entities = stepList
+                        .Select(x => (EntityConstantFreezable) x)
+                        .Select(x => x.Value).ToList();
 
-                var entities = stepList
-                    .Select(x => (ConstantFreezableStep) x)
-                    .Select(x => x.Value.AsT6).ToList();
+                    var entityStream = EntityStream.Create(entities);
 
-                var entityStream = EntityStream.Create(entities);
+                    var c = new EntityStreamConstantFreezable(entityStream);
+                    return c;
+                }
 
-                var c = new ConstantFreezableStep(entityStream);
-                return c;
+                return MapStepListToArray(stepList);
             }
 
             IFreezableStep MapStepListToArray(ImmutableList<IFreezableStep> stepList)
