@@ -42,25 +42,20 @@ namespace Reductech.EDR.Core.TestHarness
                 if (step is IStep<TOutput> outputStep)
                 {
                     var result = await outputStep.Run<TOutput>(stateMonad, CancellationToken.None);
-
                     CheckOutputResult(result);
                 }
                 else if (step is IStep<Unit> unitStep)
                 {
                     var result = await unitStep.Run<Unit>(stateMonad, CancellationToken.None);
-
                     CheckUnitResult(result);
                 }
                 else
                 {
                     var stepType = step.GetType().GetDisplayName();
-
                     throw new XunitException($"{stepType} does not have output type {nameof(Unit)} or {typeof(TOutput).Name}");
                 }
 
-                if(!IgnoreLoggedValues)
-                    logger.LoggedValues.Select(x=>CompressNewlines(x.ToString()!)) .Should()
-                        .BeEquivalentTo(ExpectedLoggedValues);
+                CheckLoggedValues(logger);
 
                 if (!IgnoreFinalState)
                     stateMonad.GetState().Should().BeEquivalentTo(ExpectedFinalState);
@@ -78,16 +73,20 @@ namespace Reductech.EDR.Core.TestHarness
             public abstract void CheckUnitResult(Result<Unit, IError> result);
             public abstract void CheckOutputResult(Result<TOutput, IError> result);
 
+            public virtual void CheckLoggedValues(TestLogger logger)
+            {
+                if (!IgnoreLoggedValues)
+                    logger.LoggedValues.Select(x => CompressNewlines(x.ToString()!)).Should()
+                        .BeEquivalentTo(ExpectedLoggedValues, x => x.WithStrictOrdering());
+            }
+
             public virtual StateMonad GetStateMonad(MockRepository mockRepository, ILogger logger)
             {
-
                 var externalProcessRunner = GetExternalProcessRunner(mockRepository);
                 var fileSystemHelper = GetFileSystemHelper(mockRepository);
-
                 var sfs = StepFactoryStoreToUse.Unwrap(StepFactoryStore.CreateUsingReflection(typeof(IStep), typeof(TStep)));
 
                 var stateMonad = new StateMonad(logger, Settings, externalProcessRunner, fileSystemHelper, sfs);
-
 
                 return stateMonad;
             }

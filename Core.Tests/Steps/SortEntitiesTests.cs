@@ -78,7 +78,7 @@ namespace Reductech.EDR.Core.Tests.Steps
 
                 }, Unit.Default,
 
-                "(Bar: \"Delta\")", "(Foo: \"Gamma\")", "(Foo: \"Beta\")", "(Foo: \"Alpha\")"
+                 "(Foo: \"Gamma\")", "(Foo: \"Beta\")", "(Foo: \"Alpha\")", "(Bar: \"Delta\")"
             );
             }
         }
