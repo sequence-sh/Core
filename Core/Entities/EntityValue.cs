@@ -1,13 +1,16 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using CSharpFunctionalExtensions;
-using OneOf;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Parser;
 using Reductech.EDR.Core.Serialization;
+
+using Option = OneOf.OneOf<System.DBNull, string, int, double, bool, Reductech.EDR.Core.Internal.Enumeration, System.DateTime, Reductech.EDR.Core.Entity, System.Collections.Immutable.ImmutableList<Reductech.EDR.Core.Entities.EntityValue>>;
+
 
 namespace Reductech.EDR.Core.Entities
 {
@@ -20,33 +23,39 @@ namespace Reductech.EDR.Core.Entities
         /// Create a new entityValue
         /// </summary>
         /// <param name="value"></param>
-        public EntityValue(OneOf<DBNull, EntitySingleValue, IReadOnlyCollection<EntitySingleValue>> value) => Value = value;
+        public EntityValue(Option value) => Value = value;
 
         /// <summary>
-        /// Create a new EntityValue from an original string.
+        /// The Value
         /// </summary>
-        public static EntityValue Create(string? original, char? multiValueDelimiter = null)
-        {
-            if(string.IsNullOrWhiteSpace(original))
-                return new EntityValue(DBNull.Value);
+        public Option Value { get; }
 
-            if (multiValueDelimiter.HasValue)
-            {
-                var splits = original.Split(multiValueDelimiter.Value);
-                if (splits.Length > 1)
-                {
-                    var values = splits.Select(EntitySingleValue.Create).ToList();
-                    return new EntityValue(values);
-                }
-            }
 
-            return new EntityValue(EntitySingleValue.Create(original));
-        }
+        ///// <summary>
+        ///// Create a new EntityValue from an original string.
+        ///// </summary>
+        //public static EntityValue Create(string? original, char? multiValueDelimiter = null)
+        //{
+        //    if(string.IsNullOrWhiteSpace(original))
+        //        return new EntityValue(DBNull.Value);
+
+        //    if (multiValueDelimiter.HasValue)
+        //    {
+        //        var splits = original.Split(multiValueDelimiter.Value);
+        //        if (splits.Length > 1)
+        //        {
+        //            var values = splits.Select(EntitySingleValue.Create).ToList();
+        //            return new EntityValue(values);
+        //        }
+        //    }
+
+        //    return new EntityValue(EntitySingleValue.Create(original));
+        //}
 
         /// <summary>
         /// Create an entity from an object
         /// </summary>
-        public static EntityValue CreateFromObject(object? argValue, char? multiValueDelimiter = null)
+        public static EntityValue CreateFromObject(object? argValue)
         {
             if (argValue == null) //TODO convert to switch statement (this is not supported by stryker at the moment)
             {
@@ -54,41 +63,42 @@ namespace Reductech.EDR.Core.Entities
             }
             else if (argValue is StringStream ss1)
             {
-                return Create(ss1.GetString());
+                return new EntityValue(ss1.GetString());
             }
             else if (argValue is string s)
             {
-                return Create(s, multiValueDelimiter);
+                return new EntityValue(s);
             }
             else if (argValue is int i)
             {
-                return new EntityValue(new EntitySingleValue(i, argValue.ToString()!));
+                return new EntityValue(i);
             }
             else if (argValue is bool b)
             {
-                return new EntityValue(new EntitySingleValue(b, argValue.ToString()!));
+                return new EntityValue(b);
             }
             else if (argValue is double d)
             {
-                return new EntityValue(new EntitySingleValue(d, argValue.ToString()!));
+                return new EntityValue(d);
             }
             else if (argValue is Enumeration e1)
             {
-                return new EntityValue(new EntitySingleValue(e1, argValue.ToString()!));
+                return new EntityValue(e1);
             }
             else if (argValue is DateTime dt)
             {
-                return new EntityValue(new EntitySingleValue(dt, argValue.ToString()!));
+                return new EntityValue(dt);
             }
             else if (argValue is Entity entity)
             {
-                return new EntityValue(new EntitySingleValue(entity, entity.ToString()));
+                return new EntityValue(entity);
             }
             else if (argValue is IEnumerable e2)
             {
-                var newEnumerable = e2.Cast<object>().Select(x =>
-                    x is StringStream ss ? ss.GetString() : x.ToString()!);
-                return Create(newEnumerable);
+                var newEnumerable = e2.Cast<object>().Select(CreateFromObject).ToImmutableList();
+                if(!newEnumerable.Any())
+                    return new EntityValue(DBNull.Value);
+                return new EntityValue(newEnumerable);
             }
             else if (argValue is IResult)
             {
@@ -98,72 +108,149 @@ namespace Reductech.EDR.Core.Entities
             }
             else
             {
-                return Create(argValue.ToString(), multiValueDelimiter);
+                return new EntityValue(argValue.ToString()!);
             }
         }
 
 
 
-        /// <summary>
-        /// Create a new EntityValue from some number of original strings.
-        /// </summary>
-        public static EntityValue Create(IEnumerable<string> originals)
-        {
-            var values = originals.Select(EntitySingleValue.Create).ToList();
 
-            return values.Count switch
-            {
-                0 => new EntityValue(DBNull.Value),
-                1 => new EntityValue(values.Single()),
-                _ => new EntityValue(values)
-            };
-        }
-
-        /// <summary>
-        /// The Value
-        /// </summary>
-        public OneOf<DBNull, EntitySingleValue, IReadOnlyCollection<EntitySingleValue>> Value { get; }
 
         /// <summary>
         /// Tries to convert the value so it matches the schema.
         /// </summary>
         public Result<EntityValue, IErrorBuilder> TryConvert(SchemaProperty schemaProperty)
         {
-            var r =
 
-                Value.Match(_ =>
-                    {
-                        if (schemaProperty.Multiplicity == Multiplicity.Any ||
-                            schemaProperty.Multiplicity == Multiplicity.UpToOne)
-                            return Result.Success<EntityValue, IErrorBuilder>(this);
-                        return new ErrorBuilder("Unexpected null", ErrorCode.SchemaViolation);
+            var r = Value.Match(MatchDbNull,
+                MatchString, MatchInt, MatchDouble, MatchBool, MatchEnum,
+                MatchDateTime, MatchEntity, MatchList
 
 
-                    },
-                    singleValue =>
-                    {
-                        if (singleValue.Type == schemaProperty.Type && singleValue.Obeys(schemaProperty))
-                            return this;
-                        return singleValue.TryConvert(schemaProperty).Map(x => new EntityValue(x));
-                    },
-                    multiValue =>
-                    {
-                        if (schemaProperty.Multiplicity == Multiplicity.Any || schemaProperty.Multiplicity == Multiplicity.AtLeastOne)
-                        {
-                            if(multiValue.All(x=>x.Type == schemaProperty.Type && x.Obeys(schemaProperty)))
-                                return Result.Success<EntityValue, IErrorBuilder>(this);
 
-                            var result = multiValue.Select(x=>x.TryConvert(schemaProperty))
-                                .Combine(ErrorBuilderList.Combine)
-                                .Map(x => new EntityValue(x.ToList()));
+            );
 
-                            return result;
-                        }
-
-                        return new ErrorBuilder("Unexpected list", ErrorCode.SchemaViolation);
-                    });
 
             return r;
+
+            static ErrorBuilder CreateErrorBuilder(object o, SchemaPropertyType schemaPropertyType)
+            {
+                return new ErrorBuilder($"Could not convert '{o}' to '{schemaPropertyType}'.", ErrorCode.SchemaViolation);
+            }
+
+            Result<EntityValue, IErrorBuilder> MatchDbNull(DBNull dbNull)
+            {
+                if (schemaProperty.Multiplicity == Multiplicity.Any ||
+                            schemaProperty.Multiplicity == Multiplicity.UpToOne)
+                    return Result.Success<EntityValue, IErrorBuilder>(this);
+                return new ErrorBuilder("Unexpected null", ErrorCode.SchemaViolation);
+            }
+
+            Result<EntityValue, IErrorBuilder> MatchString(string s)
+            {
+                switch (schemaProperty.Type)
+                {
+                    case SchemaPropertyType.String: return this;
+                    case SchemaPropertyType.Integer:
+                    {
+                        if (int.TryParse(s, out var i))
+                            return new EntityValue(i);
+                        break;
+                    }
+                    case SchemaPropertyType.Double:
+                        {
+                            if (double.TryParse(s, out var d))
+                                return new EntityValue(d);
+                            break;
+                        }
+                    case SchemaPropertyType.Enum:
+                        {
+                            throw new NotImplementedException();
+                            if (int.TryParse(s, out var i))
+                                return new EntityValue(i);
+                            break;
+                        }
+                    case SchemaPropertyType.Bool:
+                        {
+                            if (bool.TryParse(s, out var b))
+                                return new EntityValue(b);
+                            break;
+                        }
+                    case SchemaPropertyType.Date:
+                        {
+                            if (DateTime.TryParse(s, out var dt)) //TODO format
+                                return new EntityValue(dt);
+                            break;
+                        }
+                    case SchemaPropertyType.Entity:
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+
+                return CreateErrorBuilder(s, schemaProperty.Type);
+            }
+
+            Result<EntityValue, IErrorBuilder> MatchInt(int i)
+            {
+            }
+
+            Result<EntityValue, IErrorBuilder> MatchDouble(double d)
+            {
+            }
+
+            Result<EntityValue, IErrorBuilder> MatchBool(bool b)
+            {
+            }
+
+            Result<EntityValue, IErrorBuilder> MatchEnum(Enumeration e)
+            {
+            }
+
+            Result<EntityValue, IErrorBuilder> MatchDateTime(DateTime dt)
+            {
+            }
+            Result<EntityValue, IErrorBuilder> MatchEntity(Entity e)
+            {
+            }
+
+            Result<EntityValue, IErrorBuilder> MatchList(ImmutableList<EntityValue> list)
+            {
+            }
+
+
+            //var r =
+
+            //    Value.Match(_ =>
+            //        {
+
+
+
+            //        },
+            //        singleValue =>
+            //        {
+            //            if (singleValue.Type == schemaProperty.Type && singleValue.Obeys(schemaProperty))
+            //                return this;
+            //            return singleValue.TryConvert(schemaProperty).Map(x => new EntityValue(x));
+            //        },
+            //        multiValue =>
+            //        {
+            //            if (schemaProperty.Multiplicity == Multiplicity.Any || schemaProperty.Multiplicity == Multiplicity.AtLeastOne)
+            //            {
+            //                if(multiValue.All(x=>x.Type == schemaProperty.Type && x.Obeys(schemaProperty)))
+            //                    return Result.Success<EntityValue, IErrorBuilder>(this);
+
+            //                var result = multiValue.Select(x=>x.TryConvert(schemaProperty))
+            //                    .Combine(ErrorBuilderList.Combine)
+            //                    .Map(x => new EntityValue(x.ToList()));
+
+            //                return result;
+            //            }
+
+            //            return new ErrorBuilder("Unexpected list", ErrorCode.SchemaViolation);
+            //        });
+
+            //return r;
         }
 
         /// <inheritdoc />
