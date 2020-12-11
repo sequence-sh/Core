@@ -57,18 +57,21 @@ namespace Reductech.EDR.Core.Tests
         }
 
 
-        [Fact(Skip = "manual")]
+        [Fact(Skip = "Manual")]
         [Trait("Category", "Integration")]
         public async Task RunYamlSequence()
         {
             const string yaml = @"
 - <Folder> = 'C:\Users\wainw\source\repos\Reductech\edr\Examples'
-- <SourceFile> = 'Dinosaurs.csv'
-- <TargetFile> = 'MappedDinosaurs.csv'
-- <EntityStream> = FromCSV(Stream = ReadFile(Path = PathCombine(Paths = [<Folder>, <SourceFile>])))
-- <EntityStream> = EntityMapProperties(EntityStream = <EntityStream>, Mappings = (Name = 'Dinosaur'))
-- <WriteStream> = ToCSV(Entities = <EntityStream>)
-- FileWrite(Path = PathCombine(Paths = [<Folder>, <TargetFile>]), Stream = <WriteStream>)";
+- <SourceFile> = 'Hello.txt'
+- <FilePath> = PathCombine [<Folder>, <SourceFile>]
+- <SourceFileTwo> = 'Hello2.txt'
+- <FilePathTwo> = PathCombine [<Folder>, <SourceFileTwo>]
+- DeleteItem <SourceFile>
+- FileWrite <SourceFile> 'Hello'
+- <Text> = ReadFile <SourceFile>
+- FileWrite <SourceFileTwo> <Text>
+- DeleteItem <SourceFile>";
 
 
             var sfs = StepFactoryStore.CreateUsingReflection();

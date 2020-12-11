@@ -73,7 +73,7 @@ namespace Reductech.EDR.Core.Tests
         }
 
         [Fact]
-        public void GetString_should_dispose_of_original_Stream()
+        public void GetString_should_close_original_Stream()
         {
             var inputStream = new MemoryStream(Encoding.UTF8.GetBytes(StringToTest));
 
@@ -86,7 +86,7 @@ namespace Reductech.EDR.Core.Tests
 
             try
             {
-                inputStream.Dispose();
+                var _ = inputStream.Read(Span<byte>.Empty);
             }
             catch (ObjectDisposedException)
             {
