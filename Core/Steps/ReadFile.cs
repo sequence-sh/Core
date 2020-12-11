@@ -45,6 +45,7 @@ namespace Reductech.EDR.Core.Steps
         public IStep<StringStream> Path { get; set; } = null!;
 
         /// <summary>
+        /// 
         /// How the file is encoded.
         /// </summary>
         [StepProperty(2)]

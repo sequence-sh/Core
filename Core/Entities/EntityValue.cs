@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using CSharpFunctionalExtensions;
+using JetBrains.Annotations;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Parser;
@@ -119,7 +120,7 @@ namespace Reductech.EDR.Core.Entities
         /// <summary>
         /// Tries to convert the value so it matches the schema.
         /// </summary>
-        public Result<EntityValue, IErrorBuilder> TryConvert(SchemaProperty schemaProperty)
+        public Result<(EntityValue value, bool changed), IErrorBuilder> TryConvert(SchemaProperty schemaProperty)
         {
 
             var r = Value.Match(MatchDbNull,
@@ -138,19 +139,19 @@ namespace Reductech.EDR.Core.Entities
                 return new ErrorBuilder($"Could not convert '{o}' to '{schemaPropertyType}'.", ErrorCode.SchemaViolation);
             }
 
-            Result<EntityValue, IErrorBuilder> MatchDbNull(DBNull dbNull)
+            Result<(EntityValue value, bool changed), IErrorBuilder> MatchDbNull(DBNull dbNull)
             {
                 if (schemaProperty.Multiplicity == Multiplicity.Any ||
                             schemaProperty.Multiplicity == Multiplicity.UpToOne)
-                    return Result.Success<EntityValue, IErrorBuilder>(this);
+                    return (this, false);
                 return new ErrorBuilder("Unexpected null", ErrorCode.SchemaViolation);
             }
 
-            Result<EntityValue, IErrorBuilder> MatchString(string s)
+            Result<(EntityValue value, bool changed) , IErrorBuilder> MatchString(string s)
             {
                 switch (schemaProperty.Type)
                 {
-                    case SchemaPropertyType.String: return this;
+                    case SchemaPropertyType.String: return (this, false);
                     case SchemaPropertyType.Integer:
                     {
                         if (int.TryParse(s, out var i))
@@ -165,9 +166,13 @@ namespace Reductech.EDR.Core.Entities
                         }
                     case SchemaPropertyType.Enum:
                         {
-                            throw new NotImplementedException();
-                            if (int.TryParse(s, out var i))
-                                return new EntityValue(i);
+                            if(schemaProperty.EnumType == null)
+                                return new ErrorBuilder("Schema does not define the name of the enum", ErrorCode.SchemaViolation);
+                            if(schemaProperty.Format == null || !schemaProperty.Format.Any())
+                                return new ErrorBuilder("Schema does not define any possible values for the enum", ErrorCode.SchemaViolation);
+
+                            if(schemaProperty.Format.Contains(s, StringComparer.OrdinalIgnoreCase))
+                                return new EntityValue(new Enumeration(schemaProperty.EnumType, s));
                             break;
                         }
                     case SchemaPropertyType.Bool:
@@ -182,75 +187,117 @@ namespace Reductech.EDR.Core.Entities
                                 return new EntityValue(dt);
                             break;
                         }
-                    case SchemaPropertyType.Entity:
-                        break;
                     default:
-                        throw new ArgumentOutOfRangeException();
+                        return CreateErrorBuilder(s, schemaProperty.Type);
                 }
-
                 return CreateErrorBuilder(s, schemaProperty.Type);
             }
 
-            Result<EntityValue, IErrorBuilder> MatchInt(int i)
+            Result<(EntityValue value, bool changed), IErrorBuilder> MatchInt(int i)
             {
+                return schemaProperty.Type switch
+                {
+                    SchemaPropertyType.String => new EntityValue(i.ToString()),
+                    SchemaPropertyType.Integer => (this, false),
+                    SchemaPropertyType.Double => new EntityValue(Convert.ToDouble(i)),
+                    _ => CreateErrorBuilder(i, schemaProperty.Type)
+                };
             }
 
-            Result<EntityValue, IErrorBuilder> MatchDouble(double d)
+            Result<(EntityValue value, bool changed), IErrorBuilder> MatchDouble(double d)
             {
+                return schemaProperty.Type switch
+                {
+                    SchemaPropertyType.String => new EntityValue(d.ToString("G17")),
+                    SchemaPropertyType.Double => (this, false),
+                    _ => CreateErrorBuilder(d, schemaProperty.Type)
+                };
             }
 
-            Result<EntityValue, IErrorBuilder> MatchBool(bool b)
+            Result<(EntityValue value, bool changed), IErrorBuilder> MatchBool(bool b)
             {
+                return schemaProperty.Type switch
+                {
+                    SchemaPropertyType.String => new EntityValue(b.ToString()),
+                    SchemaPropertyType.Bool => (this, false),
+                    _ => CreateErrorBuilder(b, schemaProperty.Type)
+                };
             }
 
-            Result<EntityValue, IErrorBuilder> MatchEnum(Enumeration e)
+            Result<(EntityValue value, bool changed), IErrorBuilder> MatchEnum(Enumeration e)
             {
+                switch (schemaProperty.Type)
+                {
+                    case SchemaPropertyType.String: return (this, false);
+                    case SchemaPropertyType.Enum:
+                        {
+                            if (schemaProperty.EnumType == null)
+                                return new ErrorBuilder("Schema does not define the name of the enum", ErrorCode.SchemaViolation);
+                            if (schemaProperty.Format == null || !schemaProperty.Format.Any())
+                                return new ErrorBuilder("Schema does not define any possible values for the enum", ErrorCode.SchemaViolation);
+
+                            if (schemaProperty.Format.Contains(e.Value, StringComparer.OrdinalIgnoreCase))
+                            {
+                                if (schemaProperty.EnumType == e.Type)
+                                    return (this, false);
+                                return new EntityValue(new Enumeration(schemaProperty.EnumType, e.Value));
+                            }
+
+                            return CreateErrorBuilder(e, schemaProperty.Type);
+                        }
+                    default:
+                        return CreateErrorBuilder(e, schemaProperty.Type);
+                }
             }
 
-            Result<EntityValue, IErrorBuilder> MatchDateTime(DateTime dt)
+            Result<(EntityValue value, bool changed), IErrorBuilder> MatchDateTime(DateTime dt)
             {
+                return schemaProperty.Type switch
+                {
+                    SchemaPropertyType.String => new EntityValue(dt.ToString("O")),
+                    SchemaPropertyType.Date => (this, false),
+                    _ => CreateErrorBuilder(dt, schemaProperty.Type)
+                };
             }
-            Result<EntityValue, IErrorBuilder> MatchEntity(Entity e)
+            Result<(EntityValue value, bool changed), IErrorBuilder> MatchEntity(Entity e)
             {
+                return schemaProperty.Type switch
+                {
+                    SchemaPropertyType.String => new EntityValue(e.ToString()),
+                    SchemaPropertyType.Enum => (this, false),
+                    _ => CreateErrorBuilder(e, schemaProperty.Type)
+                };
             }
 
-            Result<EntityValue, IErrorBuilder> MatchList(ImmutableList<EntityValue> list)
+            Result<(EntityValue value, bool changed), IErrorBuilder> MatchList(ImmutableList<EntityValue> list)
             {
+                if (schemaProperty.Multiplicity == Multiplicity.UpToOne ||
+                    schemaProperty.Multiplicity == Multiplicity.ExactlyOne)
+                {
+                    if (list.Count == 1)
+                        return list.Single().TryConvert(schemaProperty);
+                    else if (list.Count == 0 && schemaProperty.Multiplicity == Multiplicity.UpToOne)
+                        return (new EntityValue(DBNull.Value), true);
+
+                    return new ErrorBuilder($"Unexpected list with {list.Count} elements", ErrorCode.SchemaViolation);
+                }
+
+
+                var sp = new SchemaProperty()
+                {
+                    EnumType = schemaProperty.EnumType,
+                    Format = schemaProperty.Format,
+                    Multiplicity = Multiplicity.ExactlyOne,
+                    Regex = schemaProperty.Regex,
+                    Type = schemaProperty.Type
+                };
+
+                var newList = list.Select(x => x.TryConvert(sp))
+                    .Combine(ErrorBuilderList.Combine)
+                    .Map(x => new EntityValue(x.ToImmutableList()));
+
+                return newList; //TODO resuse this entityValue if no conversion was required
             }
-
-
-            //var r =
-
-            //    Value.Match(_ =>
-            //        {
-
-
-
-            //        },
-            //        singleValue =>
-            //        {
-            //            if (singleValue.Type == schemaProperty.Type && singleValue.Obeys(schemaProperty))
-            //                return this;
-            //            return singleValue.TryConvert(schemaProperty).Map(x => new EntityValue(x));
-            //        },
-            //        multiValue =>
-            //        {
-            //            if (schemaProperty.Multiplicity == Multiplicity.Any || schemaProperty.Multiplicity == Multiplicity.AtLeastOne)
-            //            {
-            //                if(multiValue.All(x=>x.Type == schemaProperty.Type && x.Obeys(schemaProperty)))
-            //                    return Result.Success<EntityValue, IErrorBuilder>(this);
-
-            //                var result = multiValue.Select(x=>x.TryConvert(schemaProperty))
-            //                    .Combine(ErrorBuilderList.Combine)
-            //                    .Map(x => new EntityValue(x.ToList()));
-
-            //                return result;
-            //            }
-
-            //            return new ErrorBuilder("Unexpected list", ErrorCode.SchemaViolation);
-            //        });
-
-            //return r;
         }
 
         /// <inheritdoc />

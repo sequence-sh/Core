@@ -18,9 +18,15 @@ namespace Reductech.EDR.Core.Entities
         public SchemaPropertyType Type { get; set; }
 
         /// <summary>
-        /// The multiplicity of the property.
+        /// If this is an enum, the name of the enum
         /// </summary>
         [ConfigProperty(2)]
+        public string? EnumType { get; set; }
+
+        /// <summary>
+        /// The multiplicity of the property.
+        /// </summary>
+        [ConfigProperty(3)]
         public Multiplicity Multiplicity { get; set; } = Multiplicity.Any;
 
         /// <summary>
@@ -28,13 +34,13 @@ namespace Reductech.EDR.Core.Entities
         /// For Date, this will contain possible date formats.
         /// For Enum, this will contain possible enum values.
         /// </summary>
-        [ConfigProperty(3)]
+        [ConfigProperty(4)]
         public IReadOnlyList<string>? Format { get; set; }
 
         /// <summary>
         /// A regex to validate the string form of the field value
         /// </summary>
-        [ConfigProperty(4)]
+        [ConfigProperty(5)]
         public string? Regex { get; set; }
 
 
@@ -48,11 +54,15 @@ namespace Reductech.EDR.Core.Entities
             var schemaProperty = new SchemaProperty();
 
             results.Add(entity.TrySetEnum<SchemaPropertyType>(nameof(Type), nameof(SchemaProperty), s => schemaProperty.Type = s));
+            entity.TrySetString(nameof(EnumType), nameof(SchemaProperty), s => schemaProperty.EnumType = s); //Ignore the result of this
+
+
             results.Add(entity.TrySetEnum<Multiplicity>(nameof(Multiplicity), nameof(SchemaProperty), s => schemaProperty.Multiplicity = s));
             entity.TrySetStringList(nameof(Format), nameof(SchemaProperty), s => schemaProperty.Format = s);
 
 
             entity.TrySetString(nameof(Regex), nameof(SchemaProperty), s => schemaProperty.Regex = s); //Ignore the result of this
+
 
             var r = results.Combine(ErrorBuilderList.Combine)
                 .Map(_ => schemaProperty);
@@ -72,6 +82,7 @@ namespace Reductech.EDR.Core.Entities
             var topProperties = new[]
             {
                 new KeyValuePair<string, EntityValue>(nameof(Type), EntityValue.CreateFromObject(Type)),
+                new KeyValuePair<string, EntityValue>(nameof(Type), EntityValue.CreateFromObject(EnumType)),
                 new KeyValuePair<string, EntityValue>(nameof(Multiplicity), EntityValue.CreateFromObject(Multiplicity)),
                 new KeyValuePair<string, EntityValue>(nameof(Format), EntityValue.CreateFromObject(Format)),
                 new KeyValuePair<string, EntityValue>(nameof(Regex), EntityValue.CreateFromObject(Regex)),
