@@ -1,8 +1,10 @@
-﻿using Reductech.EDR.Core.Parser;
+﻿using System;
+using Reductech.EDR.Core.Parser;
 using System.IO;
 using System.Text;
 using FluentAssertions;
 using Xunit;
+using Xunit.Sdk;
 
 namespace Reductech.EDR.Core.Tests
 {
@@ -27,6 +29,19 @@ namespace Reductech.EDR.Core.Tests
 
             var ss = new StringStream(inputStream, EncodingEnum.UTF8);
 
+            ss.GetString().Should().Be(StringToTest);
+        }
+
+        [Fact]
+        public void GetString_should_work_with_Stream_Multiple_times()
+        {
+            var inputStream = new MemoryStream(Encoding.UTF8.GetBytes(StringToTest));
+
+
+            var ss = new StringStream(inputStream, EncodingEnum.UTF8);
+
+            ss.GetString().Should().Be(StringToTest);
+            ss.GetString().Should().Be(StringToTest);
             ss.GetString().Should().Be(StringToTest);
         }
 
@@ -57,6 +72,30 @@ namespace Reductech.EDR.Core.Tests
             sr.ReadToEnd().Should().Be(StringToTest);
         }
 
+        [Fact]
+        public void GetString_should_dispose_of_original_Stream()
+        {
+            var inputStream = new MemoryStream(Encoding.UTF8.GetBytes(StringToTest));
+
+
+            var ss = new StringStream(inputStream, EncodingEnum.UTF8);
+
+            ss.GetString().Should().Be(StringToTest);
+
+            var alreadyDisposed = false;
+
+            try
+            {
+                inputStream.Dispose();
+            }
+            catch (ObjectDisposedException)
+            {
+                alreadyDisposed = true;
+            }
+
+            if(!alreadyDisposed)
+                throw new XunitException("Stream had not yet been disposed");
+        }
 
     }
 }
