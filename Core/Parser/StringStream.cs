@@ -28,13 +28,7 @@ namespace Reductech.EDR.Core.Parser
         /// If this is a string, the string.
         /// If this is a stream, "StringStream"
         /// </summary>
-        public string Name
-        {
-            get
-            {
-                return Value.Match(x => x, x => "StringStream");
-            }
-        }
+        public string Name => Value.Match(x => x, x => "StringStream");
 
 
         /// <summary>
