@@ -12,7 +12,7 @@ namespace Reductech.EDR.Core.Parser
     /// A stream of data representing a string.
     /// This can either be a raw string or a stream and an encoding.
     /// </summary>
-    public class StringStream : IEquatable<StringStream>, IComparable<StringStream>
+    public class StringStream : IEquatable<StringStream>, IComparable<StringStream>, IDisposable
     {
         /// <summary>
         /// Create a new DataStream
@@ -25,16 +25,21 @@ namespace Reductech.EDR.Core.Parser
         public StringStream(string s) => Value = s;
 
         /// <summary>
+        /// The Value of this
+        /// </summary>
+        public Option Value { get; private set; }
+
+        /// <inheritdoc />
+        public override string ToString() => Name;
+
+        private readonly SemaphoreSlim _semaphore = new SemaphoreSlim(1);
+
+
+        /// <summary>
         /// If this is a string, the string.
         /// If this is a stream, "StringStream"
         /// </summary>
-        public string Name
-        {
-            get
-            {
-                return Value.Match(x => x, x => "StringStream");
-            }
-        }
+        public string Name => Value.Match(x => x, x => "StringStream");
 
 
         /// <summary>
@@ -42,21 +47,26 @@ namespace Reductech.EDR.Core.Parser
         /// </summary>
         public async Task<string> GetStringAsync()
         {
-            var result = Value.Match(Task.FromResult, SerializeStreamAsync);
+            await _semaphore.WaitAsync();
 
-            return await result;
-
-
-            static async Task<string> SerializeStreamAsync((Stream stream, EncodingEnum encodingEnum) streamPair)
+            try
             {
-                var stream = streamPair.stream;
-                var encodingEnum = streamPair.encodingEnum;
+                if (Value.IsT0)
+                    return Value.AsT0;
+
+                var (stream, encodingEnum) = Value.AsT1;
 
                 stream.Position = 0;
-                using StreamReader reader = new StreamReader(stream, encodingEnum.Convert(), leaveOpen: true);
+                using StreamReader reader = new StreamReader(stream, encodingEnum.Convert(), leaveOpen: false);
                 var s = await reader.ReadToEndAsync();
 
+                Value = s;
+
                 return s;
+            }
+            finally
+            {
+                _semaphore.Release();
             }
         }
 
@@ -65,22 +75,26 @@ namespace Reductech.EDR.Core.Parser
         /// </summary>
         public string GetString()
         {
-            var result = Value.Match(x=>x, SerializeStream);
+            _semaphore.Wait();
 
-            return result;
-
-
-            static string SerializeStream((Stream stream, EncodingEnum encodingEnum) streamPair)
+            try
             {
-                var stream = streamPair.stream;
-                var encodingEnum = streamPair.encodingEnum;
+                if (Value.IsT0)
+                    return Value.AsT0;
+
+                var (stream, encodingEnum) = Value.AsT1;
 
                 stream.Position = 0;
-                using StreamReader reader = new StreamReader(stream, encodingEnum.Convert(), leaveOpen: true);
-
+                using StreamReader reader = new StreamReader(stream, encodingEnum.Convert(), leaveOpen: false);
                 var s = reader.ReadToEnd();
 
+                Value = s;
+
                 return s;
+            }
+            finally
+            {
+                _semaphore.Release();
             }
         }
 
@@ -95,12 +109,18 @@ namespace Reductech.EDR.Core.Parser
         }
 
         /// <summary>
-        /// If this is a stream, return it. Otherwise, return the string as a stream.
+        /// If this is a stream, return it.
+        /// Otherwise, return the string as a stream.
+        /// You should dispose of this stream after using it.
         /// </summary>
         /// <returns></returns>
         public (Stream stream, EncodingEnum encodingEnum) GetStream()
         {
-            return Value.Match(x =>
+            _semaphore.Wait();
+
+            try
+            {
+                return Value.Match(x =>
             {
                 // convert string to stream
                 byte[] byteArray = Encoding.UTF8.GetBytes(x);
@@ -109,35 +129,25 @@ namespace Reductech.EDR.Core.Parser
                 return (stream, EncodingEnum.UTF8);
 
             }, x => x);
+            }
+            finally
+            {
+                _semaphore.Release();
+            }
         }
 
-        /// <summary>
-        /// The Value of this
-        /// </summary>
-        public Option Value { get; }
 
-        /// <inheritdoc />
-        public override string ToString() => Name;
 
         /// <summary>
         /// SerializeAsync this DataStream
         /// </summary>
         public async Task<string> SerializeAsync(CancellationToken cancellationToken)
         {
-
             var s = await GetStringAsync();
 
             var text = SerializationMethods.DoubleQuote(s);
 
             return text;
-        }
-
-        /// <inheritdoc />
-        public bool Equals(StringStream? other)
-        {
-            if (other is null) return false;
-            if (ReferenceEquals(this, other)) return true;
-            return GetString().Equals(other.GetString());
         }
 
         /// <inheritdoc />
@@ -152,6 +162,14 @@ namespace Reductech.EDR.Core.Parser
         }
 
         /// <inheritdoc />
+        public bool Equals(StringStream? other)
+        {
+            if (other is null) return false;
+            if (ReferenceEquals(this, other)) return true;
+            return GetString().Equals(other.GetString());
+        }
+
+        /// <inheritdoc />
         public override bool Equals(object? obj)
         {
             if (obj is null) return false;
@@ -161,7 +179,7 @@ namespace Reductech.EDR.Core.Parser
         }
 
         /// <inheritdoc />
-        public override int GetHashCode() => Value.Match(x => x.GetHashCode(), x => x.GetHashCode());
+        public override int GetHashCode() => GetString().GetHashCode();
 
         /// <summary>
         /// Equals operator.
@@ -172,5 +190,13 @@ namespace Reductech.EDR.Core.Parser
         /// Not Equals operator
         /// </summary>
         public static bool operator !=(StringStream? left, StringStream? right) => !Equals(left, right);
+
+        /// <inheritdoc />
+        public void Dispose()
+        {
+            _semaphore.Dispose();
+            if(Value.IsT1)
+                Value.AsT1.Item1.Dispose();
+        }
     }
 }

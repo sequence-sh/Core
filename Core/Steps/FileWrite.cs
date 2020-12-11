@@ -33,6 +33,8 @@ namespace Reductech.EDR.Core.Steps
             var r = await stateMonad.FileSystemHelper.WriteFileAsync(path.Value, stream, cancellationToken)
                 .MapError(x=>x.WithLocation(this));
 
+            await stream.DisposeAsync();
+
             return r;
 
         }
