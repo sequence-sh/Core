@@ -9,7 +9,7 @@ namespace Reductech.EDR.Core.Serialization
 {
     /// <summary>
     /// The default step serializer for functions.
-    /// Produces results like: Print(Value: 'Hello World')
+    /// Produces results like: Print Value: 'Hello World'
     /// </summary>
     public sealed class FunctionSerializer : IStepSerializer
     {

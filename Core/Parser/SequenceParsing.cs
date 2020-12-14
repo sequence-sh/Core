@@ -62,7 +62,7 @@ namespace Reductech.EDR.Core.Parser
             public override Result<FreezableStepProperty, IError> VisitFullSequence(SequenceParser.FullSequenceContext context)
             {
                 if (context.step() != null)
-                    return VisitStep(context.step());
+                    return Visit(context.step());
 
                 if(context.stepSequence() != null)
                     return VisitStepSequence(context.stepSequence());
@@ -78,7 +78,7 @@ namespace Reductech.EDR.Core.Parser
 
                 foreach (var stepContext in context.step())
                 {
-                    results.Add(VisitStep(stepContext).Map(x => x.ConvertToStep()));
+                    results.Add(Visit(stepContext).Map(x => x.ConvertToStep()));
                 }
 
                 var result = results.Combine(ErrorList.Combine).Map(x=>x.ToList());
@@ -118,7 +118,7 @@ namespace Reductech.EDR.Core.Parser
             }
 
             /// <inheritdoc />
-            public override Result<FreezableStepProperty, IError> VisitBracketedStep(SequenceParser.BracketedStepContext context) => VisitStep(context.step());
+            public override Result<FreezableStepProperty, IError> VisitBracketedStep(SequenceParser.BracketedStepContext context) => Visit(context.step());
 
             /// <inheritdoc />
             public override Result<FreezableStepProperty, IError> VisitInfixOperation(SequenceParser.InfixOperationContext context)
@@ -148,7 +148,7 @@ namespace Reductech.EDR.Core.Parser
             /// <inheritdoc />
             public override Result<FreezableStepProperty, IError> VisitSetVariable(SequenceParser.SetVariableContext context)
             {
-                var member = VisitStep(context.step());
+                var member = Visit(context.step());
 
                 if (member.IsFailure) return member;
 
@@ -243,6 +243,47 @@ namespace Reductech.EDR.Core.Parser
             }
 
             /// <inheritdoc />
+            public override Result<FreezableStepProperty, IError> VisitPipeFunction(SequenceParser.PipeFunctionContext context)
+            {
+                var name = context.NAME().Symbol.Text;
+
+                var errors = new List<IError>();
+                var dict = new StepParameterDict();
+
+                var firstStep = Visit(context.step());
+                if(firstStep.IsFailure) errors.Add(firstStep.Error);
+                else dict.Add(new StepParameterReference(1), firstStep.Value);
+
+                var numberedArguments = context.term().Select((term, i) =>
+                    (term: VisitTerm(term), number: OneOf<string, int>.FromT1(i + 2)));
+
+
+                foreach (var numberedArgument in numberedArguments)
+                {
+                    if (numberedArgument.term.IsFailure) errors.Add(numberedArgument.term.Error);
+                    else dict.Add(new StepParameterReference(numberedArgument.number), numberedArgument.term.Value);
+                }
+
+                var members = AggregateNamedArguments(context.namedArgument());
+
+                if (members.IsFailure) errors.Add(members.Error);
+                else
+                    foreach (var (key, value) in members.Value)
+                        dict.Add(new StepParameterReference(key), value);
+
+                if (errors.Any())
+                    return Result.Failure<FreezableStepProperty, IError>(ErrorList.Combine(errors));
+
+
+
+                var fsd = new FreezableStepData(dict, new TextPosition(context));
+
+                var cfs = new CompoundFreezableStep(name, fsd, null);
+
+                return new FreezableStepProperty(cfs, new TextPosition(context));
+            }
+
+            /// <inheritdoc />
             public override Result<FreezableStepProperty, IError> VisitFunction(SequenceParser.FunctionContext context)
             {
                 var name = context.NAME().Symbol.Text;
@@ -252,7 +293,6 @@ namespace Reductech.EDR.Core.Parser
 
                 var numberedArguments = context.term().Select((term, i) =>
                     (term: VisitTerm(term), number: OneOf<string, int>.FromT1(i + 1)));
-
 
 
                 foreach (var numberedArgument in numberedArguments)
