@@ -118,6 +118,8 @@ Print 'Comments!'", "Comments!");
 
                 yield return new DeserializationTestFunction("3 | ApplyMathOperator 'Add' 4 | ApplyMathOperator 'Multiply' 5 | Print", 35);
 
+                yield return new DeserializationTestFunction("Print (3 | ApplyMathOperator 'Add' 4 | ApplyMathOperator 'Multiply' 5)", 35);
+
 
                 yield return new DeserializationTestFunction(@"
 - <ArrayVar> = ['abc', '123']
