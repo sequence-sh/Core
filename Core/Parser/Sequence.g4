@@ -30,11 +30,13 @@ number              : NUMBER ;
 enumeration			: NAME DOT NAME ;
 term				: simpleTerm
 					| bracketedStep ;
-step				: function
-					| infixOperation
-					| setVariable
-					| stepSequence
-					| term;
+step				: <assoc=right> step PIPE NAME (term)* (namedArgument)* #PipeFunction
+					| function #Function1
+					| infixOperation #InfixOperation1
+					| setVariable #SetVariable1
+					| stepSequence #StepSequence1
+					| term #Term1
+					;
 simpleTerm			: number
                     | boolean
                     | enumeration
@@ -73,6 +75,7 @@ CLOSEBRACKET		: ')' ;
 OPENSQUAREBRACKET	: '[' ;
 CLOSESQUAREBRACKET	: ']' ;
 COMMA			    : ',' ;
+PIPE				: '|' ;
 NEWCOMMAND			: ('\r'? '\n' | '\r')+ (' ' | '\t')* DASH (' ' | '\t')+ ;
 DOT                 : '.' ;
 VARIABLENAME		: LESSTHAN [a-zA-Z0-9_]+ GREATERTHAN ;

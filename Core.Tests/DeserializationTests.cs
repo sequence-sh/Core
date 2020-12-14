@@ -112,6 +112,13 @@ Print 'Comments!'", "Comments!");
                 yield return new DeserializationTestFunction("-<Seven> = 3 + 4\r\n- Print <Seven>", 7);
 
 
+                yield return new DeserializationTestFunction("2 + 2 | Print", 4);
+
+                yield return new DeserializationTestFunction("StringIsEmpty 'World' | Print", false);
+
+                yield return new DeserializationTestFunction("3 | ApplyMathOperator 'Add' 4 | ApplyMathOperator 'Multiply' 5 | Print", 35);
+
+
                 yield return new DeserializationTestFunction(@"
 - <ArrayVar> = ['abc', '123']
 - Print(ArrayLength <ArrayVar>)",2);
