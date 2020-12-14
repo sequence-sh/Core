@@ -124,7 +124,7 @@ namespace Reductech.EDR.Core
             {
                 configuration.Quote = quoteCharacter.Value;
                 if (alwaysQuote)
-                    configuration.ShouldQuote = (s, context) => true;
+                    configuration.ShouldQuote = (_,_) => true;
             }
 
             var writer = new CsvWriter(textWriter, configuration);
@@ -142,14 +142,32 @@ namespace Reductech.EDR.Core
             {
                 IDictionary<string, object> expandoObject = new ExpandoObject()!;
 
-                foreach (var (key, value) in entity)
+                foreach (var entityProperty in entity)
                 {
-                    value.Value.Switch(_ => { },
-                        v => expandoObject[key] = v,
-                        l => expandoObject[key] = string.Join(delimiter, l.Select(x => x.GetStringValue(dateTimeFormat))));
+                    var s = GetString(entityProperty.BestValue, delimiter, dateTimeFormat);
+
+                    expandoObject[entityProperty.Name] = s;
                 }
 
                 return expandoObject;
+
+                static string GetString(EntityValue ev, char delimiter, string dateTimeFormat)
+                {
+                    var valueString = ev.Value.Match(
+                   _ => "",
+                   x => x,
+                   x => x.ToString(),
+                   x => x.ToString("G17"),
+                   x => x.ToString(),
+                   x => x.ToString(),
+                   x => x.ToString(dateTimeFormat),
+                   x => x.ToString(),
+                   x =>
+                       string.Join(delimiter, x.Select(ev1 => GetString(ev1, delimiter, dateTimeFormat)))
+                       );
+
+                    return valueString;
+                }
             }
         }
     }

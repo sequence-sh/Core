@@ -45,46 +45,15 @@ namespace Reductech.EDR.Core.Tests.Steps
                         Value = new ToConcordance
                         {
                             Entities =  Constant(EntityStream.Create(
-
-                                    new Entity(
-                                        new KeyValuePair<string, EntityValue>("Foo", EntityValue.Create("Hello")),
-                                        new KeyValuePair<string, EntityValue>("Bar", EntityValue.Create(new[] { "World", "Earth" }))),
-                                    new Entity(
-                                        new KeyValuePair<string, EntityValue>("Foo", EntityValue.Create("Hello 2")),
-                                        new KeyValuePair<string, EntityValue>("Bar", EntityValue.Create(new[] { "World 2", "Earth 2" })))
-                                ))
+                                Entity.Create(("Foo", "Hello"), ("Bar", new[] { "World", "Earth" })),
+                                Entity.Create(("Foo", "Hello 2"), ("Bar", new[] { "World 2", "Earth 2" }))
+                            ))
                         }
                     }, Unit.Default,
                     $"þFooþþBarþ{ Environment.NewLine }þHelloþþWorld|Earthþ{ Environment.NewLine }þHello 2þþWorld 2|Earth 2þ{Environment.NewLine}"
                 );
             }
         }
-
-//        /// <inheritdoc />
-//        protected override IEnumerable<SerializeCase> SerializeCases
-//        {
-//            get
-//            {
-//                var expectedYaml = @"Do: ToConcordance
-//Entities:
-//- (Prop1 = 'Val0',Prop2 = 'Val1')
-//- (Prop1 = 'Val2',Prop2 = 'Val3')
-//- (Prop1 = 'Val4',Prop2 = 'Val5')
-//Encoding: EncodingEnum.UTF8
-//Delimiter: ""\x14""
-//QuoteCharacter: 'þ'
-//AlwaysQuote: True
-//MultiValueDelimiter: '|'
-//DateTimeFormat: 'O'";
-
-
-//                var step = CreateStepWithDefaultOrArbitraryValuesAsync();
-
-//                var case1 = new SerializeCase("Default", step.step, expectedYaml);
-
-//                yield return case1;
-//            }
-//        }
 
     }
 }

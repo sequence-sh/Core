@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.Parser;
 using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.TestHarness;
@@ -48,33 +47,11 @@ namespace Reductech.EDR.Core.Tests.Steps
                 yield return new StepCase("Get List Property",
                     new EntityGetValue
                     {
-                        Entity = Constant(new Entity(new KeyValuePair<string, EntityValue>("Foo",
-                            EntityValue.Create(new []{"Hello", "World"})
-                            ))),
+                        Entity = Constant(CreateEntity(("Foo", new []{"Hello", "World"}))),
                         Property = Constant("Foo")
                     },
                     "Hello,World");
             }
         }
-
-
-//        /// <inheritdoc />
-//        protected override IEnumerable<SerializeCase> SerializeCases
-//        {
-//            get
-//            {
-
-//                var step = CreateStepWithDefaultOrArbitraryValuesAsync();
-
-//                yield return new SerializeCase("default",
-//                    step.step
-//                    ,
-//@"Do: EntityGetValue
-//Entity: (Prop1 = 'Val0',Prop2 = 'Val1')
-//Property: 'Bar2'"
-
-//                    );
-//            }
-//        }
     }
 }

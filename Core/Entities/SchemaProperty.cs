@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal.Errors;
@@ -77,20 +78,19 @@ namespace Reductech.EDR.Core.Entities
         /// Convert this SchemaProperty to an entity
         /// </summary>
         /// <returns></returns>
-        public object ConvertToEntity()
+        public Entity ConvertToEntity()
         {
-            var topProperties = new[]
+            var schemaProperties = new[]
             {
-                new KeyValuePair<string, EntityValue>(nameof(Type), EntityValue.CreateFromObject(Type)),
-                new KeyValuePair<string, EntityValue>(nameof(Type), EntityValue.CreateFromObject(EnumType)),
-                new KeyValuePair<string, EntityValue>(nameof(Multiplicity), EntityValue.CreateFromObject(Multiplicity)),
-                new KeyValuePair<string, EntityValue>(nameof(Format), EntityValue.CreateFromObject(Format)),
-                new KeyValuePair<string, EntityValue>(nameof(Regex), EntityValue.CreateFromObject(Regex)),
-            };
+                (nameof(Type), EntityValue.CreateFromObject(Type)),
+                (nameof(EnumType), EntityValue.CreateFromObject(EnumType)),
+                (nameof(Multiplicity), EntityValue.CreateFromObject(Multiplicity)),
+                (nameof(Format), EntityValue.CreateFromObject(Format)),
+                (nameof(Regex), EntityValue.CreateFromObject(Regex))
+            }.Select((x,i)=> new EntityProperty(x.Item1, x.Item2, null, i));
 
 
-            var entity = new Entity(topProperties);
-
+            var entity = new Entity(schemaProperties);
             return entity;
         }
     }

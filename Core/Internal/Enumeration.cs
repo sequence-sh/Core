@@ -1,10 +1,16 @@
 ﻿using System;
+using CSharpFunctionalExtensions;
 
 namespace Reductech.EDR.Core.Internal
 {
-    public sealed class Enumeration : IEquatable<Enumeration>
+    /// <summary>
+    /// A member of a set of predefined values
+    /// </summary>
+    public sealed class Enumeration : IEquatable<Enumeration>//TODO make this a record
     {
-        //TODO make a record
+        /// <summary>
+        /// Create a new Enumeration
+        /// </summary>
         public Enumeration(string type, string value)
         {
             Type = type;
@@ -23,6 +29,17 @@ namespace Reductech.EDR.Core.Internal
 
         /// <inheritdoc />
         public override string ToString() => Type + "." + Value;
+
+        /// <summary>
+        /// Try to convert this to a C# enum
+        /// </summary>
+        public Maybe<T> TryConvert<T>() where T : struct, Enum
+        {
+            if (Enum.TryParse(Value, true, out T t))
+                return t;
+
+            return Maybe<T>.None;
+        }
 
 
         /// <inheritdoc />

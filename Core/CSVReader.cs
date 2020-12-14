@@ -131,7 +131,7 @@ namespace Reductech.EDR.Core
             {
                 var dict = row as IDictionary<string, object>;
 
-                var entity = Entity.Create(dict!, multiValueDelimiter);
+                var entity = Entity.Create(dict!.Select(x=>(x.Key, x.Value)), multiValueDelimiter);
                 yield return entity;
             }
 

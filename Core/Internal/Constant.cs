@@ -197,6 +197,6 @@ namespace Reductech.EDR.Core.Internal
         public override IFreezableStep Unfreeze() => new EntityStreamConstantFreezable(Value);
 
         /// <inheritdoc />
-        public override async Task<string> SerializeAsync(CancellationToken cancellationToken) => await Value.SerializeEntityStreamAsync(cancellationToken);
+        public override async Task<string> SerializeAsync(CancellationToken cancellationToken) => await Value.SerializeAsync(cancellationToken);
     }
 }

@@ -52,23 +52,36 @@ namespace Reductech.EDR.Core.Entities
                     x=>x.Value,
                     StringComparer.OrdinalIgnoreCase);
 
-            var keyValuePairs = ImmutableList<KeyValuePair< string,EntityValue>>.Empty.ToBuilder();
+            var newProperties = new List<EntityProperty>();
             var errors = new List<IErrorBuilder>();
+            var changed = false;
 
-            foreach (var kvp in entity)
+            foreach (var entityProperty in entity)
             {
-                if (remainingProperties.Remove(kvp.Key, out var schemaProperty))
+                if (remainingProperties.Remove(entityProperty.Name, out var schemaProperty))
                 {
-                    var r = kvp.Value.TryConvert(schemaProperty);
-                    if(r.IsSuccess)
-                        keyValuePairs.Add(new KeyValuePair<string, EntityValue>(kvp.Key, r.Value));
+                    var convertResult = entityProperty.BestValue.TryConvert(schemaProperty);
+                    if (convertResult.IsSuccess)
+                    {
+                        if (convertResult.Value.changed)
+                        {
+                            changed = true;
+                            var newProperty = new EntityProperty(entityProperty.Name, entityProperty.BaseValue, convertResult.Value.value, entityProperty.Order);
+                            newProperties.Add(newProperty);
+                        }
+                        else
+                        {
+                            newProperties.Add(entityProperty);
+                        }
+                    }
+
                     else
-                        errors.Add(r.Error);
+                        errors.Add(convertResult.Error);
                 }
-                else if (AllowExtraProperties)
-                    keyValuePairs.Add(kvp);
+                else if (AllowExtraProperties)//This entity has a property that is not in the schema
+                    newProperties.Add(entityProperty);
                 else
-                    errors.Add(new ErrorBuilder($"Unexpected Property '{kvp.Key}'", ErrorCode.SchemaViolation));
+                    errors.Add(new ErrorBuilder($"Unexpected Property '{entityProperty.Name}'", ErrorCode.SchemaViolation));
             }
 
             foreach (var (key, _) in remainingProperties
@@ -81,8 +94,11 @@ namespace Reductech.EDR.Core.Entities
                 return Result.Failure<Entity, IErrorBuilder>(l);
             }
 
+            if (!changed)
+                return entity;
 
-            var resultEntity = new Entity(keyValuePairs.ToImmutable());
+
+            var resultEntity = new Entity(newProperties);
 
             return resultEntity;
         }
@@ -101,10 +117,11 @@ namespace Reductech.EDR.Core.Entities
 
             results.Add(entity.TrySetDictionary(nameof(Properties), nameof(Schema), ev =>
             {
-                if(ev.Value.IsT1 && ev.Value.AsT1.Value.IsT6)
-                    return SchemaProperty.TryCreateFromEntity(ev.Value.AsT1.Value.AsT6);
-                else
-                    return new ErrorBuilder($"Could not convert {ev} to SchemaProperty", ErrorCode.InvalidCast);
+                var childEntity = ev.TryGetEntity();
+
+                if(childEntity.HasValue)
+                    return SchemaProperty.TryCreateFromEntity(childEntity.Value);
+                return new ErrorBuilder($"Could not convert {ev} to SchemaProperty", ErrorCode.InvalidCast);
             }, d=> schema.Properties = d));
 
             var r = results.Combine(ErrorBuilderList.Combine)
@@ -120,18 +137,20 @@ namespace Reductech.EDR.Core.Entities
         /// </summary>
         public Entity ConvertToEntity()
         {
-            var propertiesEntity = new Entity(
-                Properties.Select(x=>
-                    new KeyValuePair<string,EntityValue>(x.Key, EntityValue.CreateFromObject(x.Value.ConvertToEntity()))).ToImmutableList()
-            );
+            var propertiesEntity =
+                new Entity(
+                    Properties.Select((x, i) =>
+                        new EntityProperty(x.Key, new EntityValue(x.Value.ConvertToEntity()), null, i))
+                );
+
 
 
             var topProperties = new []
             {
-                new KeyValuePair<string, EntityValue>(nameof(Name), EntityValue.CreateFromObject(Name)),
-                new KeyValuePair<string, EntityValue>(nameof(AllowExtraProperties), EntityValue.CreateFromObject(AllowExtraProperties)),
-                new KeyValuePair<string, EntityValue>(nameof(Properties), EntityValue.CreateFromObject(propertiesEntity)),
-            };
+                (nameof(Name), EntityValue.CreateFromObject(Name)),
+                (nameof(AllowExtraProperties), EntityValue.CreateFromObject(AllowExtraProperties)),
+                (nameof(Properties), EntityValue.CreateFromObject(propertiesEntity)),
+            }.Select((x,i)=> new EntityProperty(x.Item1, x.Item2, null, i));
 
 
             var entity = new Entity(topProperties);

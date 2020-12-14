@@ -1,14 +1,12 @@
 ﻿using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
+using System.Text.RegularExpressions;
 using CSharpFunctionalExtensions;
-using JetBrains.Annotations;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Parser;
-using Reductech.EDR.Core.Serialization;
 
 using Option = OneOf.OneOf<System.DBNull, string, int, double, bool, Reductech.EDR.Core.Internal.Enumeration, System.DateTime, Reductech.EDR.Core.Entity, System.Collections.Immutable.ImmutableList<Reductech.EDR.Core.Entities.EntityValue>>;
 
@@ -31,32 +29,10 @@ namespace Reductech.EDR.Core.Entities
         /// </summary>
         public Option Value { get; }
 
-
-        ///// <summary>
-        ///// Create a new EntityValue from an original string.
-        ///// </summary>
-        //public static EntityValue Create(string? original, char? multiValueDelimiter = null)
-        //{
-        //    if(string.IsNullOrWhiteSpace(original))
-        //        return new EntityValue(DBNull.Value);
-
-        //    if (multiValueDelimiter.HasValue)
-        //    {
-        //        var splits = original.Split(multiValueDelimiter.Value);
-        //        if (splits.Length > 1)
-        //        {
-        //            var values = splits.Select(EntitySingleValue.Create).ToList();
-        //            return new EntityValue(values);
-        //        }
-        //    }
-
-        //    return new EntityValue(EntitySingleValue.Create(original));
-        //}
-
         /// <summary>
         /// Create an entity from an object
         /// </summary>
-        public static EntityValue CreateFromObject(object? argValue)
+        public static EntityValue CreateFromObject(object? argValue, char? multiValueDelimiter = null)
         {
             if (argValue == null) //TODO convert to switch statement (this is not supported by stryker at the moment)
             {
@@ -64,11 +40,11 @@ namespace Reductech.EDR.Core.Entities
             }
             else if (argValue is StringStream ss1)
             {
-                return new EntityValue(ss1.GetString());
+                return Create(ss1.GetString(), multiValueDelimiter);
             }
             else if (argValue is string s)
             {
-                return new EntityValue(s);
+                return Create(s, multiValueDelimiter);
             }
             else if (argValue is int i)
             {
@@ -96,7 +72,7 @@ namespace Reductech.EDR.Core.Entities
             }
             else if (argValue is IEnumerable e2)
             {
-                var newEnumerable = e2.Cast<object>().Select(CreateFromObject).ToImmutableList();
+                var newEnumerable = e2.Cast<object>().Select(v=>CreateFromObject(v, multiValueDelimiter)).ToImmutableList();
                 if(!newEnumerable.Any())
                     return new EntityValue(DBNull.Value);
                 return new EntityValue(newEnumerable);
@@ -111,33 +87,50 @@ namespace Reductech.EDR.Core.Entities
             {
                 return new EntityValue(argValue.ToString()!);
             }
+
+            static EntityValue Create(string s, char? multiValueDelimiter)
+            {
+                if (multiValueDelimiter == null)
+                    return new EntityValue(s);
+
+                var stringArray = s.Split(multiValueDelimiter.Value);
+                if (stringArray.Length > 1)
+                    return new EntityValue(stringArray.Select(s => new EntityValue(s)).ToImmutableList());
+
+                return new EntityValue(s);
+            }
         }
-
-
-
-
 
         /// <summary>
         /// Tries to convert the value so it matches the schema.
         /// </summary>
         public Result<(EntityValue value, bool changed), IErrorBuilder> TryConvert(SchemaProperty schemaProperty)
         {
+            if(schemaProperty.Regex!= null)
+            {
+                var s = this.GetString();
 
-            var r = Value.Match(MatchDbNull,
-                MatchString, MatchInt, MatchDouble, MatchBool, MatchEnum,
-                MatchDateTime, MatchEntity, MatchList
+                if (!Regex.IsMatch(s, schemaProperty.Regex))
+                    return new ErrorBuilder(@$"'{s}' does not match regex '{schemaProperty.Regex}'", ErrorCode.SchemaViolation);
+            }
+
+            ErrorBuilder CouldNotConvert(object o) =>
+                new ErrorBuilder($"Could not convert '{o}' to {schemaProperty.Type}", ErrorCode.SchemaViolation);
 
 
-
-            );
-
+            var r = Value.Match(
+                MatchDbNull,
+                MatchString,
+                MatchInt,
+                MatchDouble,
+                MatchBool,
+                MatchEnum,
+                MatchDateTime,
+                MatchEntity,
+                MatchList);
 
             return r;
 
-            static ErrorBuilder CreateErrorBuilder(object o, SchemaPropertyType schemaPropertyType)
-            {
-                return new ErrorBuilder($"Could not convert '{o}' to '{schemaPropertyType}'.", ErrorCode.SchemaViolation);
-            }
 
             Result<(EntityValue value, bool changed), IErrorBuilder> MatchDbNull(DBNull dbNull)
             {
@@ -155,52 +148,52 @@ namespace Reductech.EDR.Core.Entities
                     case SchemaPropertyType.Integer:
                     {
                         if (int.TryParse(s, out var i))
-                            return new EntityValue(i);
+                            return (new EntityValue(i), true);
                         break;
                     }
                     case SchemaPropertyType.Double:
                         {
                             if (double.TryParse(s, out var d))
-                                return new EntityValue(d);
+                                return (new EntityValue(d), true);
                             break;
                         }
                     case SchemaPropertyType.Enum:
                         {
-                            if(schemaProperty.EnumType == null)
+                            if(string.IsNullOrWhiteSpace(schemaProperty.EnumType))
                                 return new ErrorBuilder("Schema does not define the name of the enum", ErrorCode.SchemaViolation);
                             if(schemaProperty.Format == null || !schemaProperty.Format.Any())
                                 return new ErrorBuilder("Schema does not define any possible values for the enum", ErrorCode.SchemaViolation);
 
                             if(schemaProperty.Format.Contains(s, StringComparer.OrdinalIgnoreCase))
-                                return new EntityValue(new Enumeration(schemaProperty.EnumType, s));
+                                return (new EntityValue(new Enumeration(schemaProperty.EnumType, s)), true);
                             break;
                         }
                     case SchemaPropertyType.Bool:
                         {
                             if (bool.TryParse(s, out var b))
-                                return new EntityValue(b);
+                                return (new EntityValue(b), true);
                             break;
                         }
                     case SchemaPropertyType.Date:
                         {
                             if (DateTime.TryParse(s, out var dt)) //TODO format
-                                return new EntityValue(dt);
+                                return (new EntityValue(dt), true);
                             break;
                         }
                     default:
-                        return CreateErrorBuilder(s, schemaProperty.Type);
+                        return CouldNotConvert(s);
                 }
-                return CreateErrorBuilder(s, schemaProperty.Type);
+                return CouldNotConvert(s);
             }
 
             Result<(EntityValue value, bool changed), IErrorBuilder> MatchInt(int i)
             {
                 return schemaProperty.Type switch
                 {
-                    SchemaPropertyType.String => new EntityValue(i.ToString()),
+                    SchemaPropertyType.String => (new EntityValue(i.ToString()), true),
                     SchemaPropertyType.Integer => (this, false),
-                    SchemaPropertyType.Double => new EntityValue(Convert.ToDouble(i)),
-                    _ => CreateErrorBuilder(i, schemaProperty.Type)
+                    SchemaPropertyType.Double => (new EntityValue(Convert.ToDouble(i)), true),
+                    _ => CouldNotConvert(i)
                 };
             }
 
@@ -208,9 +201,9 @@ namespace Reductech.EDR.Core.Entities
             {
                 return schemaProperty.Type switch
                 {
-                    SchemaPropertyType.String => new EntityValue(d.ToString("G17")),
-                    SchemaPropertyType.Double => (this, false),
-                    _ => CreateErrorBuilder(d, schemaProperty.Type)
+                    SchemaPropertyType.String => (new EntityValue(d.ToString("G17")), false),
+                    SchemaPropertyType.Double => (this, true),
+                    _ => CouldNotConvert(d)
                 };
             }
 
@@ -218,9 +211,9 @@ namespace Reductech.EDR.Core.Entities
             {
                 return schemaProperty.Type switch
                 {
-                    SchemaPropertyType.String => new EntityValue(b.ToString()),
+                    SchemaPropertyType.String => (new EntityValue(b.ToString()), true),
                     SchemaPropertyType.Bool => (this, false),
-                    _ => CreateErrorBuilder(b, schemaProperty.Type)
+                    _ => CouldNotConvert(b)
                 };
             }
 
@@ -240,13 +233,13 @@ namespace Reductech.EDR.Core.Entities
                             {
                                 if (schemaProperty.EnumType == e.Type)
                                     return (this, false);
-                                return new EntityValue(new Enumeration(schemaProperty.EnumType, e.Value));
+                                return (new EntityValue(new Enumeration(schemaProperty.EnumType, e.Value)), true);
                             }
 
-                            return CreateErrorBuilder(e, schemaProperty.Type);
+                            return CouldNotConvert(e);
                         }
                     default:
-                        return CreateErrorBuilder(e, schemaProperty.Type);
+                        return CouldNotConvert(e);
                 }
             }
 
@@ -254,18 +247,18 @@ namespace Reductech.EDR.Core.Entities
             {
                 return schemaProperty.Type switch
                 {
-                    SchemaPropertyType.String => new EntityValue(dt.ToString("O")),
+                    SchemaPropertyType.String => (new EntityValue(dt.ToString("O")), true),
                     SchemaPropertyType.Date => (this, false),
-                    _ => CreateErrorBuilder(dt, schemaProperty.Type)
+                    _ => CouldNotConvert(dt)
                 };
             }
             Result<(EntityValue value, bool changed), IErrorBuilder> MatchEntity(Entity e)
             {
                 return schemaProperty.Type switch
                 {
-                    SchemaPropertyType.String => new EntityValue(e.ToString()),
+                    SchemaPropertyType.String => (new EntityValue(e.ToString()), true),
                     SchemaPropertyType.Enum => (this, false),
-                    _ => CreateErrorBuilder(e, schemaProperty.Type)
+                    _ => CouldNotConvert(e)
                 };
             }
 
@@ -294,9 +287,12 @@ namespace Reductech.EDR.Core.Entities
 
                 var newList = list.Select(x => x.TryConvert(sp))
                     .Combine(ErrorBuilderList.Combine)
-                    .Map(x => new EntityValue(x.ToImmutableList()));
-
-                return newList; //TODO resuse this entityValue if no conversion was required
+                    .Map(x=>x.Aggregate(
+                        (list: ImmutableList<EntityValue>.Empty, changed: false),
+                        (a, b) => (a.list.Add(b.value), a.changed || b.changed)))
+                    .Map(x=>
+                        x.changed?(new EntityValue(x.list), true) : (this, false));
+                return newList;
             }
         }
 
@@ -316,36 +312,21 @@ namespace Reductech.EDR.Core.Entities
         }
 
         /// <inheritdoc />
-        public override int GetHashCode()
-        {
-            return Value.Match(_ => 0,
-                v => v.Value.GetHashCode(),
-                l => l.Count switch
-                {
-                    0 => 0,
-                    1 => l.Single().GetHashCode(),
-                    _ => HashCode.Combine(l.Count, l.First())
-                }
-            );
-        }
+        public override int GetHashCode() => Value.GetHashCode(); //TODO get hash code from immutable list
 
         /// <inheritdoc />
         public override string ToString()
         {
-            return Value.Match(x => "Empty", x => x.ToString(), x => string.Join(", ", x));
+            return Value.Match(_ => "Empty",
+                x => x,
+                x => x.ToString(),
+                x => x.ToString("G17"),
+                x => x.ToString(),
+                x => x.ToString(),
+                x => x.ToString("O"),
+                x => x.ToString(),
+                x => x.Count + " elements");
         }
 
-        /// <summary>
-        /// Serialize this EntityValue
-        /// </summary>
-        /// <returns></returns>
-        public string Serialize()
-        {
-            return
-            Value.Match(_=> "", x=>
-                x.Serialize(),
-                x=>
-                    SerializationMethods.SerializeList(x.Select(y=>y.Serialize())));
-        }
     }
 }

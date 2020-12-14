@@ -140,7 +140,7 @@ namespace Reductech.EDR.Core.Internal
 
         /// <param name="cancellation"></param>
         /// <inheritdoc />
-        public override Task<string> SerializeAsync(CancellationToken cancellation) => Value.SerializeEntityStreamAsync(cancellation);
+        public override Task<string> SerializeAsync(CancellationToken cancellation) => Value.SerializeAsync(cancellation);
     }
 
     /// <summary>

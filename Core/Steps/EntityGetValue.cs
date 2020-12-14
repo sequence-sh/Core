@@ -23,19 +23,16 @@ namespace Reductech.EDR.Core.Steps
 
             if (entity.IsFailure) return entity.ConvertFailure<StringStream>();
 
-            var propertyResult = await Property.Run(stateMonad, cancellationToken);
+            var propertyResult = await Property.Run(stateMonad, cancellationToken)
+                    .Map(x=>x.GetStringAsync());
 
             if (propertyResult.IsFailure) return propertyResult.ConvertFailure<StringStream>();
 
-            var propertyName = await propertyResult.Value.GetStringAsync();
 
+            var entityValue = entity.Value.TryGetValue(propertyResult.Value)
+                .Map(x=>x.GetString());
 
-
-            if (!entity.Value.TryGetValue(propertyName, out var ev) || ev == null)
-                ev = EntityValue.Create(null, null);
-
-
-            var resultString = ev.Value.Match(_ => "", v => v.ToString(), vs => string.Join(",", vs));
+            string resultString = entityValue.HasValue ? entityValue.Value : "";
 
             var resultStream = new StringStream(resultString);
 

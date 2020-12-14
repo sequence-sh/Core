@@ -54,11 +54,53 @@ namespace Reductech.EDR.Core.Serialization
         /// <summary>
         /// Serialize an entityStream
         /// </summary>
-        public static async Task<string> SerializeEntityStreamAsync(this EntityStream entityStream, CancellationToken cancellationToken)
+        public static async Task<string> SerializeAsync(this EntityStream entityStream, CancellationToken cancellationToken)
         {
             var enumerable = await entityStream.SourceEnumerable.Select(x=>x.Serialize()) .ToListAsync(cancellationToken);
 
             return SerializeList(enumerable);
+        }
+
+
+        /// <summary>
+        /// Serialize this entity.
+        /// </summary>
+        /// <returns></returns>
+        public static string Serialize(this Entity entity)
+        {
+            var sb = new StringBuilder();
+
+            sb.Append('(');
+
+            var results = new List<string>();
+
+            foreach (var property in entity)
+                results.Add($"{property.Name}: {property.BestValue.Serialize()}");
+
+            sb.AppendJoin(" ", results);
+
+            sb.Append(')');
+
+            var result = sb.ToString();
+
+            return result;
+        }
+
+        /// <summary>
+        /// Serialize an EntityValue
+        /// </summary>
+        public static string Serialize(this EntityValue entityValue)
+        {
+            return entityValue.Value.Match(_ => DoubleQuote(""),
+                DoubleQuote,
+                x => x.ToString(),
+                x => x.ToString("G17"),
+                x => x.ToString(),
+                x => x.ToString(),
+                x => x.ToString("O"),
+                x => x.Serialize(),
+                x => SerializeList(x.Select(y => y.Serialize()))
+            );
         }
     }
 }

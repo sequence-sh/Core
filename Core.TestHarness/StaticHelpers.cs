@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Linq;
 using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.Internal;
@@ -45,30 +44,17 @@ namespace Reductech.EDR.Core.TestHarness
 
         public static IStep<Entity> GetEntityVariable => GetVariable<Entity>(VariableName.Entity);
 
-        public static Entity CreateEntity(params (string key, string value)[] pairs)
-        {
-            var evs = pairs
-                .GroupBy(x => x.key, x => x.value)
-                .Select(x => new KeyValuePair<string, EntityValue>(x.Key, EntityValue.Create(x)));
-
-            return new Entity(evs.ToImmutableList());
-        }
+        public static Entity CreateEntity(params (string key, object value)[] pairs) => Entity.Create(pairs);
 
         public static Schema CreateSchema(string name, bool allowExtraProperties, params (string propertyName, SchemaPropertyType type, Multiplicity multiplicity)[] properties)
         {
-            return new Schema
-            {
-                Name = name,
-                AllowExtraProperties = allowExtraProperties,
-                Properties = properties.ToDictionary(x => x.propertyName, x => new SchemaProperty
-                {
-                    Multiplicity = x.multiplicity,
-                    Type = x.type
-                })
-            };
+            return CreateSchema(name, allowExtraProperties,
+                properties.Select(p => (p.propertyName, p.type, null as string, p.multiplicity, null as string, null as List<string>))
+                    .ToArray()
+            );
         }
 
-        public static Schema CreateSchema(string name, bool allowExtraProperties, params (string propertyName, SchemaPropertyType type, Multiplicity multiplicity, string? regex, List<string>? format)[] properties)
+        public static Schema CreateSchema(string name, bool allowExtraProperties, params (string propertyName, SchemaPropertyType type, string? enumType, Multiplicity multiplicity, string? regex, List<string>? format)[] properties)
         {
             return new Schema
             {
@@ -76,6 +62,7 @@ namespace Reductech.EDR.Core.TestHarness
                 AllowExtraProperties = allowExtraProperties,
                 Properties = properties.ToDictionary(x => x.propertyName, x => new SchemaProperty
                 {
+                    EnumType = x.enumType,
                     Multiplicity = x.multiplicity,
                     Type = x.type,
                     Regex = x.regex,

@@ -361,16 +361,16 @@ namespace Reductech.EDR.Core.TestHarness
 
             static Entity CreateSimpleEntity(ref int index1)
             {
-                var pairs = new List<KeyValuePair<string, EntityValue>>
+                var pairs = new List<(string, object)>
                 {
-                    new KeyValuePair<string, EntityValue>("Prop1", EntityValue.Create($"Val{index1}"))
+                    ("Prop1", $"Val{index1}")
                 };
 
                 index1++;
-                pairs.Add(new KeyValuePair<string, EntityValue>("Prop2", EntityValue.Create($"Val{index1}")));
+                pairs.Add(("Prop2", $"Val{index1}"));
                 index1++;
 
-                var entity = new Entity(pairs.ToImmutableList());
+                var entity = Entity.Create(pairs);
                 return entity;
             }
         }
