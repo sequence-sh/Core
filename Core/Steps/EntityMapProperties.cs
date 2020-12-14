@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading;
@@ -23,8 +22,7 @@ namespace Reductech.EDR.Core.Steps
         {
             var mappings = await Mappings.Run(stateMonad, cancellationToken)
                 .Map(e=>e
-                    .Where(x=>x.Value.Value.IsT1)
-                    .ToDictionary(x=>x.Key,x=>x.Value.Value.AsT1.ToString()));
+                    .ToDictionary(x=>x.Name,x=>x.BestValue.ToString()));
 
 
 
@@ -43,16 +41,22 @@ namespace Reductech.EDR.Core.Steps
 
             static Entity ChangeHeader(Entity entity, IReadOnlyDictionary<string, string> mappings)
             {
-                var pairs = ImmutableList<KeyValuePair<string, EntityValue>>.Empty.ToBuilder();
+                var builder = entity.Dictionary.ToBuilder();
+                var changed = false;
 
-                foreach (var kvp in entity)
+                foreach (var property in entity)
                 {
-                    if (mappings.TryGetValue(kvp.Key, out var newKey))
-                        pairs.Add(new KeyValuePair<string, EntityValue>(newKey, kvp.Value));
-                    else pairs.Add(kvp);
+                    if (mappings.TryGetValue(property.Name, out var newKey))
+                    {
+                        builder.Remove(property.Name);
+                        var newProperty = new EntityProperty(newKey, property.BaseValue, property.NewValue, property.Order);
+                        builder.Add(newKey, newProperty);
+                        changed = true;
+                    }
                 }
 
-                return new Entity(pairs.ToImmutable());
+                if (!changed) return entity;
+                return new Entity(builder.ToImmutable());
             }
 
         }

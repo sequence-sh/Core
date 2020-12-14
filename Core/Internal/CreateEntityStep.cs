@@ -32,7 +32,7 @@ namespace Reductech.EDR.Core.Internal
         /// <inheritdoc />
         public async Task<Result<Entity, IError>> Run(IStateMonad stateMonad, CancellationToken cancellationToken)
         {
-            var pairs = new List<KeyValuePair<string, object>>();
+            var pairs = new List<(string, object)>();
 
             foreach (var (key, step) in Properties)
             {
@@ -40,7 +40,7 @@ namespace Reductech.EDR.Core.Internal
 
                 if (r.IsFailure) return r.ConvertFailure<Entity>();
 
-                pairs.Add(new KeyValuePair<string, object>(key, r.Value));
+                pairs.Add((key, r.Value));
             }
 
             return Entity.Create(pairs);

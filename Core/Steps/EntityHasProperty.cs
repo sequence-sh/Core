@@ -25,7 +25,7 @@ namespace Reductech.EDR.Core.Steps
 
             var propertyName = await propertyResult.Value.GetStringAsync();
 
-            var r = entity.Value.TryGetValue(propertyName, out _);
+            var r = entity.Value.TryGetValue(propertyName).HasValue;
 
             return r;
         }

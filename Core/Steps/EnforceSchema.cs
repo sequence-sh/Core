@@ -27,7 +27,9 @@ namespace Reductech.EDR.Core.Steps
             var schemaEntity = await Schema.Run(stateMonad, cancellationToken);
             if (schemaEntity.IsFailure) return schemaEntity.ConvertFailure<EntityStream>();
 
-            var schema = Entities.Schema.TryCreateFromEntity(schemaEntity.Value).MapError(e=>e.WithLocation(this));
+            var schema = Entities.Schema
+                .TryCreateFromEntity(schemaEntity.Value)
+                .MapError(e=>e.WithLocation(this));
 
             if (schema.IsFailure) return schema.ConvertFailure<EntityStream>();
 

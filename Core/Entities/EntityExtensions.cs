@@ -21,10 +21,11 @@ namespace Reductech.EDR.Core.Entities
             string className,
             Action<string> setString)
         {
-            if (entity.TryGetValue(propertyName, out var ev) && ev!.Value.IsT1)
+            var value = entity.TryGetValue(propertyName).Map(x=>x.GetString());
+
+            if (value.HasValue)
             {
-                var s = ev.Value.AsT1.Original;
-                setString(s);
+                setString(value.Value);
                 return Unit.Default;
             }
 
@@ -41,10 +42,13 @@ namespace Reductech.EDR.Core.Entities
             string className,
             Action<List<string>> setStringList)
         {
-            if (entity.TryGetValue(propertyName, out var ev) && ev!.Value.IsT2)
+            var value = entity.TryGetValue(propertyName)
+                .Bind(x=>x.TryGetEntityValueList())
+                .Map(x=>x.Select(z=>z.GetString()).ToList());
+
+            if (value.HasValue)
             {
-                var l = ev.Value.AsT2.Select(x=>x.Original).ToList();
-                setStringList(l);
+                setStringList(value.Value);
                 return Unit.Default;
             }
 
@@ -60,27 +64,29 @@ namespace Reductech.EDR.Core.Entities
             string propertyName,
             string className,
             Func<EntityValue, Result<T, IErrorBuilder>> getElement,
-            Action<Dictionary<string, T>> setStringDictionary)
+            Action<Dictionary<string, T>> setDictionary)
         {
-            if (entity.TryGetValue(propertyName, out var ev) && ev!.Value.IsT1 && ev!.Value.AsT1.Value.IsT6)
-            {
-                var topEntity = ev!.Value.AsT1.Value.AsT6;
+            var value = entity.TryGetValue(propertyName)
+                .Bind(x => x.TryGetEntity());
 
+            if (value.HasValue)
+            {
                 var errors = new List<IErrorBuilder>();
                 var dict = new Dictionary<string, T>();
 
-                foreach (var (key, value) in topEntity)
+                foreach (var property in value.Value)
                 {
-                    var element = getElement(value);
+                    var element = getElement(property.BestValue);
+
                     if(element.IsFailure) errors.Add(element.Error);
-                    else dict.Add(key, element.Value);
+                    else dict.Add(property.Name, element.Value);
                 }
 
                 if (errors.Any())
                     return Result.Failure<Unit, IErrorBuilder>(ErrorBuilderList.Combine(errors));
 
 
-                setStringDictionary(dict);
+                setDictionary(dict);
                 return Unit.Default;
             }
 
@@ -98,12 +104,11 @@ namespace Reductech.EDR.Core.Entities
             string className,
             Action<bool> setBool)
         {
-            if (entity.TryGetValue(propertyName, out var ev) && ev!.Value.IsT1)
-            {
-                var convertResult = ev.Value.AsT1.TryConvert(new SchemaProperty() {Type = SchemaPropertyType.Bool});
-                if (convertResult.IsFailure) return convertResult.ConvertFailure<Unit>();
+            var v = entity.TryGetValue(propertyName).Bind(x => x.TryGetBool());
 
-                setBool(convertResult.Value.Value.AsT3);
+            if (v.HasValue)
+            {
+                setBool(v.Value);
                 return Unit.Default;
             }
 
@@ -121,17 +126,14 @@ namespace Reductech.EDR.Core.Entities
             string className,
             Action<T> setEnum) where T : struct, Enum
         {
-            if (entity.TryGetValue(propertyName, out var ev) && ev!.Value.IsT1)
+            var v = entity.TryGetValue(propertyName)
+                .Bind(x => x.TryGetEnumeration(typeof(T).Name, Enum.GetNames<T>()))
+                .Bind(x=>x.TryConvert<T>());
+
+            if (v.HasValue)
             {
-                if (Enum.TryParse(ev.Value.AsT1.Original, true, out T t))
-                {
-                    setEnum(t);
-                    return Unit.Default;
-                }
-                else
-                {
-                    return new ErrorBuilder($" '{typeof(T).Name}.{ev.Value.AsT1.Original}' does not exist", ErrorCode.UnexpectedEnumValue);
-                }
+                setEnum(v.Value);
+                return Unit.Default;
             }
 
             var errorBuilder = ErrorHelper.MissingParameterError(propertyName, className);
