@@ -35,16 +35,16 @@ namespace Reductech.EDR.Core.Steps
         public override async Task<Result<Unit, IError>> Run(IStateMonad stateMonad,
             CancellationToken cancellationToken)
         {
+            var str = await String.Run(stateMonad, cancellationToken)
+                .Map(x => x.GetStringAsync());
+            if (str.IsFailure)
+                return str.ConvertFailure<Unit>();
+
             var currentValue = stateMonad.GetVariable<StringStream>(Variable).MapError(x=>x.WithLocation(this));
             if (currentValue.IsFailure)
                 return currentValue.ConvertFailure<Unit>();
 
-
-            var str = await String.Run(stateMonad, cancellationToken);
-            if (str.IsFailure)
-                return str.ConvertFailure<Unit>();
-
-            var newValue = await currentValue.Value.GetStringAsync() + await str.Value.GetStringAsync();
+            var newValue = await currentValue.Value.GetStringAsync() + str.Value;
 
             var r = stateMonad.SetVariable(Variable, new StringStream(newValue));
             if (r.IsFailure)

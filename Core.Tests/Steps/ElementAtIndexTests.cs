@@ -72,7 +72,8 @@ namespace Reductech.EDR.Core.Tests.Steps
                     );
 
 
-                yield return CreateDefaultErrorCase();
+                foreach (var errorCase in base.ErrorCases)
+                    yield return errorCase;
             } }
     }
 }

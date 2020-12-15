@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
 using JetBrains.Annotations;
+using Reductech.EDR.Core.Internal;
+using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Parser;
 using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.TestHarness;
@@ -56,30 +58,38 @@ namespace Reductech.EDR.Core.Tests.Steps
             }
         }
 
-        ///// <inheritdoc />
-        //protected override IEnumerable<SerializeCase> SerializeCases
-        //{
-        //    get
-        //    {
-        //        yield return new SerializeCase("No Else",
-        //            new If
-        //            {
-        //                Condition = Constant(true),
-        //                Then = new Print<StringStream>{Value = Constant("Hello World")}
-        //            }, "If(Condition = True, Then = Print(Value = 'Hello World'))"
-        //            );
+        /// <inheritdoc />
+        protected override IEnumerable<ErrorCase> ErrorCases
+        {
+            get
+            {
+                yield return new ErrorCase("Condition is error",
+                    new If()
+                    {
+                        Condition = new FailStep<bool>{ErrorMessage = "Condition Fail"},
+                        Then = new FailStep<Unit> { ErrorMessage = "Then Fail" },
+                        Else = new FailStep<Unit> { ErrorMessage = "Else Fail" },
+                    },
+                    new SingleError("Condition Fail", ErrorCode.Test, EntireSequenceLocation.Instance));
 
-        //        yield return new SerializeCase("Else",
-        //            new If
-        //            {
-        //                Condition = Constant(true),
-        //                Then = new Print<StringStream> { Value = Constant("Hello World") },
-        //                Else = new Print<StringStream> { Value = Constant("Goodbye World") },
-        //            }, "If(Condition = True, Else = Print(Value = 'Goodbye World'), Then = Print(Value = 'Hello World'))"
-        //            );
+                yield return new ErrorCase("Then is error",
+                    new If()
+                    {
+                        Condition = Constant(true),
+                        Then = new FailStep<Unit> { ErrorMessage = "Then Fail" },
+                        Else = new FailStep<Unit> { ErrorMessage = "Else Fail" },
+                    },
+                    new SingleError("Then Fail", ErrorCode.Test, EntireSequenceLocation.Instance));
 
-        //        yield return CreateDefaultSerializeCase(true);
-        //    }
-        //}
+                yield return new ErrorCase("Else is error",
+                    new If()
+                    {
+                        Condition = Constant(false),
+                        Then = new FailStep<Unit> { ErrorMessage = "Then Fail" },
+                        Else = new FailStep<Unit> { ErrorMessage = "Else Fail" },
+                    },
+                    new SingleError("Else Fail", ErrorCode.Test, EntireSequenceLocation.Instance));
+            }
+        }
     }
 }

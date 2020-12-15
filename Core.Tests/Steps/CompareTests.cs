@@ -134,7 +134,8 @@ namespace Reductech.EDR.Core.Tests.Steps
                     new ErrorBuilder($"Could not apply '{CompareOperator.None}'", ErrorCode.UnexpectedEnumValue)
                 );
 
-                yield return CreateDefaultErrorCase();
+                foreach (var errorCase in base.ErrorCases)
+                    yield return errorCase;
             } }
 
         /// <inheritdoc />
