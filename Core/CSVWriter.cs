@@ -135,6 +135,8 @@ namespace Reductech.EDR.Core
 
             await textWriter.FlushAsync();
 
+            stream.Seek(0, SeekOrigin.Begin);
+
             return stream;
 
 
