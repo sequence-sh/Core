@@ -91,12 +91,6 @@ namespace Reductech.EDR.Core.Tests.Steps
         }
 
         /// <inheritdoc />
-        protected override IEnumerable<ErrorCase> ErrorCases
-        {
-            get
-            {
-                yield return CreateDefaultErrorCase(false);
-            }
-        }
+        protected override IEnumerable<ErrorCase> ErrorCases => CreateDefaultErrorCases(1);
     }
 }

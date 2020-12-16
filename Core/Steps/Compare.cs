@@ -104,7 +104,7 @@ namespace Reductech.EDR.Core.Steps
                 )
                 .Map(x => new[] { x.Item1, x.Item2 })
                 .Bind((x) => MultipleTypeReference.TryCreate(x, TypeName)
-                .MapError(e=>e.WithLocation(this, freezableStepData)));
+                .MapError(e=>e.WithLocation(freezableStepData)));
 
             return result;
         }

@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
 using Reductech.EDR.Core.Entities;
+using Reductech.EDR.Core.Internal;
+using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.TestHarness;
 using Reductech.EDR.Core.Util;
@@ -60,6 +62,25 @@ namespace Reductech.EDR.Core.Tests.Steps
                     Unit.Default,
                     "(Foo: \"Alpha\")",  "(Foo: \"Beta\")"
                 );
+            }
+        }
+
+
+        /// <inheritdoc />
+        protected override IEnumerable<ErrorCase> ErrorCases
+        {
+            get
+            {
+
+                //Do not do default cases as some errors are not propagated due to lazy evaluation
+
+                yield return new ErrorCase("Stream is error",
+                    new EntityStreamDistinct()
+                    {
+                        EntityStream = new FailStep<EntityStream>() { ErrorMessage = "Stream Fail" },
+                        KeySelector =  Constant("A")
+                    },
+                    new SingleError("Stream Fail", ErrorCode.Test, EntireSequenceLocation.Instance));
             }
         }
     }

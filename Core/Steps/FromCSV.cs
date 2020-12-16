@@ -54,6 +54,7 @@ namespace Reductech.EDR.Core.Steps
         /// </summary>
         [StepProperty(3)]
         [DefaultValueExplanation("#")]
+        [SingleCharacter]
         public IStep<StringStream> CommentCharacter { get; set; } = new StringConstant(new StringStream("#"));
 
         /// <summary>
@@ -63,6 +64,7 @@ namespace Reductech.EDR.Core.Steps
         /// </summary>
         [StepProperty(4)]
         [DefaultValueExplanation("\"")]
+        [SingleCharacter]
         public IStep<StringStream> QuoteCharacter { get; set; } = new StringConstant(new StringStream( "\""));
 
 
@@ -73,6 +75,7 @@ namespace Reductech.EDR.Core.Steps
         /// </summary>
         [StepProperty(5)]
         [DefaultValueExplanation("")]
+        [SingleCharacter]
         public IStep<StringStream> MultiValueDelimiter { get; set; } = new StringConstant(new StringStream(""));
 
         /// <inheritdoc />

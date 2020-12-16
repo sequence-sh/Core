@@ -32,6 +32,8 @@ namespace Reductech.EDR.Core.Steps
 
             var ignoreCaseResult = await IgnoreCase.Run(stateMonad, cancellationToken);
 
+            if (ignoreCaseResult.IsFailure) return ignoreCaseResult.ConvertFailure<bool>();
+
             var comparison = ignoreCaseResult.Value ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
 
             var r = superstringResult.Value.Contains(substringResult.Value, comparison);

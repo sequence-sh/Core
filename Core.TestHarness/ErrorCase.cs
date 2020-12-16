@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
@@ -14,13 +15,7 @@ namespace Reductech.EDR.Core.TestHarness
 {
     public abstract partial class StepTestBase<TStep, TOutput>
     {
-        protected virtual IEnumerable<ErrorCase> ErrorCases
-        {
-            get
-            {
-                yield return CreateDefaultErrorCase();
-            }
-        }
+        protected virtual IEnumerable<ErrorCase> ErrorCases => CreateDefaultErrorCases();
 
         public IEnumerable<object?[]> ErrorCaseNames => ErrorCases.Select(x => new[] {x.Name});
 
@@ -42,7 +37,8 @@ namespace Reductech.EDR.Core.TestHarness
                 ExpectedError = expectedError;
             }
 
-            public ErrorCase(string name, IStep step, IErrorBuilder expectedErrorBuilder, params string[] expectedLoggedValues) : this(name, step, expectedErrorBuilder.WithLocation(step), expectedLoggedValues) { }
+            public ErrorCase(string name, IStep step, IErrorBuilder expectedErrorBuilder, params string[] expectedLoggedValues)
+                : this(name, step, expectedErrorBuilder.WithLocation(step), expectedLoggedValues) { }
 
             public override string Name { get; }
 
@@ -77,16 +73,22 @@ namespace Reductech.EDR.Core.TestHarness
         }
 
         /// <summary>
-        /// Creates the default error case. This tests that if every property returns an error, that error will be propagated.
-        /// If the step tries to get a variable before trying to get a property, set firstErrorIsStep to true.
+        /// Creates the default error cases.
+        /// These tests that for a particular property, if that property returns an error then the step itself will return an error.
         /// </summary>
-        protected static ErrorCase CreateDefaultErrorCase(bool firstErrorIsStep = true)
+        protected static IEnumerable<ErrorCase> CreateDefaultErrorCases(object? defaultVariableValue = null)
         {
-            var step = CreateStepWithFailStepsAsValues();
-            var error = firstErrorIsStep ? FailStepError : new SingleError("Variable '<Foo>' does not exist.", ErrorCode.MissingVariable, new StepErrorLocation(step));
-            var errorCase = new ErrorCase("Default", step, error);
+            var enumerable = CreateStepsWithFailStepsAsValues(defaultVariableValue);
 
-            return errorCase;
+            foreach (var (step, expectedError, actions) in enumerable)
+            {
+                var errorCase = new ErrorCase(expectedError.AsString, step, expectedError)
+                {
+                    IgnoreFinalState = true
+                };
+                errorCase.InitialStateActions.AddRange(actions);
+                yield return errorCase;
+            }
         }
     }
 }
