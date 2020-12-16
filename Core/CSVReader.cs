@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using CsvHelper;
 using CsvHelper.Configuration;
-using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Parser;
@@ -23,7 +22,7 @@ namespace Reductech.EDR.Core
         /// Reads a CSV stream to an entity stream based on all the input steps.
         /// </summary>
         /// <returns></returns>
-        public static async Task<Result<EntityStream, IError>> ReadCSV(
+        public static async Task<Result<IAsyncEnumerable<Entity>, IError>> ReadCSV(
             IStateMonad stateMonad,
             IStep<StringStream> stream,
             IStep<StringStream> delimiter,
@@ -34,31 +33,30 @@ namespace Reductech.EDR.Core
             CancellationToken cancellationToken)
         {
             var testStreamResult = await stream.Run(stateMonad, cancellationToken);
-            if (testStreamResult.IsFailure) return testStreamResult.ConvertFailure<EntityStream>();
+            if (testStreamResult.IsFailure) return testStreamResult.ConvertFailure<IAsyncEnumerable<Entity>>();
 
             var delimiterResult = await delimiter.Run(stateMonad, cancellationToken).Map(async x=> await x.GetStringAsync());
-            if (delimiterResult.IsFailure) return delimiterResult.ConvertFailure<EntityStream>();
+            if (delimiterResult.IsFailure) return delimiterResult.ConvertFailure<IAsyncEnumerable<Entity>>();
 
             var quoteResult = await TryConvertToChar(quoteCharacter, "Quote Character", stateMonad, errorLocation, cancellationToken);
-            if (quoteResult.IsFailure) return quoteResult.ConvertFailure<EntityStream>();
+            if (quoteResult.IsFailure) return quoteResult.ConvertFailure<IAsyncEnumerable<Entity>>();
 
             var commentResult = await TryConvertToChar(commentCharacter, "Comment Character", stateMonad, errorLocation, cancellationToken);
-            if (commentResult.IsFailure) return commentResult.ConvertFailure<EntityStream>();
+            if (commentResult.IsFailure) return commentResult.ConvertFailure<IAsyncEnumerable<Entity>>();
 
             var multiValueResult = await TryConvertToChar(multiValueDelimiter, "MultiValue Delimiter", stateMonad, errorLocation, cancellationToken);
-            if (multiValueResult.IsFailure) return multiValueResult.ConvertFailure<EntityStream>();
+            if (multiValueResult.IsFailure) return multiValueResult.ConvertFailure<IAsyncEnumerable<Entity>>();
 
 
-            var block = ReadCSV(testStreamResult.Value,
+            var asyncEnumerable = ReadCSV(testStreamResult.Value,
                 delimiterResult.Value,
                 quoteResult.Value,
                 commentResult.Value,
                 multiValueResult.Value,
                 errorLocation);
 
-            var recordStream = new EntityStream(block);
 
-            return recordStream;
+            return Result.Success<IAsyncEnumerable<Entity>, IError>(asyncEnumerable);
         }
 
         /// <summary>

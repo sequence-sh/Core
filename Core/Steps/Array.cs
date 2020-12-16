@@ -15,15 +15,15 @@ namespace Reductech.EDR.Core.Steps
     /// <summary>
     /// Represents an ordered collection of objects.
     /// </summary>
-    public sealed class Array<T> : CompoundStep<List<T>>
+    public sealed class Array<T> : CompoundStep<IAsyncEnumerable<T>>
     {
         /// <inheritdoc />
-        public override async Task<Result<List<T>, IError>> Run(IStateMonad stateMonad,
+        public override async Task<Result<IAsyncEnumerable<T>, IError>> Run(IStateMonad stateMonad,
             CancellationToken cancellationToken)
         {
             var result = await Elements.Select(x => x.Run(stateMonad, cancellationToken))
                 .Combine(ErrorList.Combine)
-                .Map(x => x.ToList());
+                .Map(x => x.ToList().ToAsyncEnumerable());
 
             return result;
         }

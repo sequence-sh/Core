@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.TestHarness;
@@ -25,10 +24,9 @@ namespace Reductech.EDR.Core.Tests.Steps
                         Action = new Print<Entity>
                         {
                             Value = GetVariable<Entity>(VariableName.Entity)
-                        },EntityStream = Constant(EntityStream.Create(
+                        },EntityStream = Array(
                             CreateEntity(("Foo", "Hello"), ("Bar", "World")),
-                            CreateEntity(("Foo", "Hello 2"), ("Bar", "World 2"))
-                        ))
+                            CreateEntity(("Foo", "Hello 2"), ("Bar", "World 2")))
                     },
                     Unit.Default,
                     "(Foo: \"Hello\" Bar: \"World\")",

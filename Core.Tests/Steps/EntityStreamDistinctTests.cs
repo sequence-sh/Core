@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.TestHarness;
 using Reductech.EDR.Core.Util;
@@ -8,7 +7,7 @@ using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
-    public class EntityStreamDistinctTests : StepTestBase<EntityStreamDistinct, EntityStream>
+    public class EntityStreamDistinctTests : StepTestBase<EntityStreamDistinct, IAsyncEnumerable<Entity>>
     {
         /// <inheritdoc />
         public EntityStreamDistinctTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
@@ -26,13 +25,13 @@ namespace Reductech.EDR.Core.Tests.Steps
                         Action = new Print<Entity> {Value = GetEntityVariable},
                         EntityStream = new EntityStreamDistinct
                         {
-                            EntityStream = Constant(EntityStream.Create(
+                            EntityStream = Array(
                                 CreateEntity(("Foo", "Alpha")),
                                 CreateEntity(("Foo", "Alpha")),
                                 CreateEntity(("Foo", "ALPHA")),
                                 CreateEntity(("Foo", "Beta")),
                                 CreateEntity(("Foo", "Beta"))
-                            )),
+                            ),
                             KeySelector = new EntityGetValue() {Property = Constant("Foo"), Entity = GetEntityVariable}
                         }
                     },
@@ -46,13 +45,13 @@ namespace Reductech.EDR.Core.Tests.Steps
                         Action = new Print<Entity> { Value = GetEntityVariable },
                         EntityStream = new EntityStreamDistinct
                         {
-                            EntityStream = Constant(EntityStream.Create(
+                            EntityStream = Array(
                                 CreateEntity(("Foo", "Alpha")),
                                 CreateEntity(("Foo", "Alpha")),
                                 CreateEntity(("Foo", "ALPHA")),
                                 CreateEntity(("Foo", "Beta")),
                                 CreateEntity(("Foo", "Beta"))
-                            )),
+                            ),
                             KeySelector = new EntityGetValue { Property = Constant("Foo"), Entity = GetEntityVariable },
                             IgnoreCase = Constant(true)
                         }

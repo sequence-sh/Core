@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using CSharpFunctionalExtensions;
-using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.Internal.Errors;
 using Opt = OneOf.OneOf<Reductech.EDR.Core.Internal.VariableName, Reductech.EDR.Core.Internal.IFreezableStep, System.Collections.Immutable.ImmutableList<Reductech.EDR.Core.Internal.IFreezableStep>>;
 
@@ -72,7 +71,7 @@ namespace Reductech.EDR.Core.Internal
         /// <summary>
         /// This, if it is a variableName
         /// </summary>
-        public Maybe<VariableName> VariableName => Option.Match(x => x, x => Maybe<VariableName>.None, x => Maybe<VariableName>.None);
+        public Maybe<VariableName> VariableName => Option.Match(x => x, _ => Maybe<VariableName>.None, _ => Maybe<VariableName>.None);
 
         /// <summary>
         /// This, if it is a FreezableStep
@@ -145,18 +144,6 @@ namespace Reductech.EDR.Core.Internal
 
             IFreezableStep MapStepList(ImmutableList<IFreezableStep> stepList)
             {
-                if (stepList.Any() && stepList.All(x => x is EntityConstantFreezable))
-                { //Special case for entity stream
-                    var entities = stepList
-                        .Select(x => (EntityConstantFreezable) x)
-                        .Select(x => x.Value).ToList();
-
-                    var entityStream = EntityStream.Create(entities);
-
-                    var c = new EntityStreamConstantFreezable(entityStream);
-                    return c;
-                }
-
                 return MapStepListToArray(stepList);
             }
 

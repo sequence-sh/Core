@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
-using Reductech.EDR.Core.Util;
 
 namespace Reductech.EDR.Core.Steps
 {
@@ -21,7 +21,7 @@ namespace Reductech.EDR.Core.Steps
         /// </summary>
         [StepProperty(1)]
         [Required]
-        public IStep<List<T>> Array { get; set; } = null!;
+        public IStep<IAsyncEnumerable<T>> Array { get; set; } = null!;
 
         /// <summary>
         /// The index to get the element at.
@@ -33,11 +33,22 @@ namespace Reductech.EDR.Core.Steps
         /// <inheritdoc />
         public override async Task<Result<T, IError>> Run(IStateMonad stateMonad, CancellationToken cancellationToken)
         {
-            return await Array.Run(stateMonad, cancellationToken)
-                .Compose(() => Index.Run(stateMonad, cancellationToken))
-                .Ensure(x => x.Item2 >= 0 && x.Item2 < x.Item1.Count,
-                    new SingleError("Index was out of the range of the array.", ErrorCode.IndexOutOfBounds, new StepErrorLocation(this)))
-                .Map(x => x.Item1[x.Item2]);
+            var arrayResult = await Array.Run(stateMonad, cancellationToken);
+
+            if (arrayResult.IsFailure) return arrayResult.ConvertFailure<T>();
+
+            var indexResult = await Index.Run(stateMonad, cancellationToken);
+
+            if (indexResult.IsFailure) return indexResult.ConvertFailure<T>();
+
+            var r = await arrayResult.Value.ElementAtOrDefaultAsync(indexResult.Value, cancellationToken);
+
+            if (r == null)
+                return new SingleError("Index was out of the range of the array.", ErrorCode.IndexOutOfBounds,
+                    new StepErrorLocation(this));
+
+            return r;
+            //))
         }
 
         /// <inheritdoc />

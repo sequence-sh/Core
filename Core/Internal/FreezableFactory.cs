@@ -97,33 +97,18 @@ namespace Reductech.EDR.Core.Internal
         /// </summary>
         public static IFreezableStep CreateFreezableList(ImmutableList<IFreezableStep> elements, Configuration? configuration, IErrorLocation location)
         {
-            if (elements.Any() && elements
-                .All(x => x is CreateEntityFreezableStep || x is EntityConstantFreezable))
-            { //Special case for entity streams
-                var dict = new StepParameterDict
-                {
-                    {
-                        new StepParameterReference(nameof(EntityStreamCreate.Elements)), new FreezableStepProperty(elements, location)
-                    }
-                };
 
-                var fpd = new FreezableStepData(dict, location);
-
-                return new CompoundFreezableStep(EntityStreamCreateStepFactory.Instance.TypeName, fpd, configuration);
-            }
-            else
+            var dict = new StepParameterDict
             {
-                var dict = new StepParameterDict
                 {
-                    {
-                        new StepParameterReference(nameof(Array<object>.Elements)), new FreezableStepProperty(elements, location)
-                    }
-                };
+                    new StepParameterReference(nameof(Array<object>.Elements)),
+                    new FreezableStepProperty(elements, location)
+                }
+            };
 
-                var fpd = new FreezableStepData(dict, location);
+            var fpd = new FreezableStepData(dict, location);
 
-                return new CompoundFreezableStep(ArrayStepFactory.Instance.TypeName, fpd, configuration);
-            }
+            return new CompoundFreezableStep(ArrayStepFactory.Instance.TypeName, fpd, configuration);
         }
 
     }

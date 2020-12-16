@@ -15,14 +15,14 @@ namespace Reductech.EDR.Core.Steps
     /// <summary>
     /// Reorder an array.
     /// </summary>
-    public sealed class ArraySort<T> : CompoundStep<List<T>>
+    public sealed class ArraySort<T> : CompoundStep<IAsyncEnumerable<T>>
     {
         /// <summary>
         /// The array to modify.
         /// </summary>
         [StepProperty(1)]
         [Required]
-        public IStep<List<T>> Array { get; set; } = null!;
+        public IStep<IAsyncEnumerable<T>> Array { get; set; } = null!;
 
         /// <summary>
         /// Whether to sort in descending order.
@@ -32,7 +32,7 @@ namespace Reductech.EDR.Core.Steps
         public IStep<bool> Descending { get; set; } = new BoolConstant(false);
 
         /// <inheritdoc />
-        public override async Task<Result<List<T>, IError>> Run(IStateMonad stateMonad,
+        public override async Task<Result<IAsyncEnumerable<T>, IError>> Run(IStateMonad stateMonad,
             CancellationToken cancellationToken)
         {
             return await Array.Run(stateMonad, cancellationToken)
@@ -40,10 +40,10 @@ namespace Reductech.EDR.Core.Steps
                 .Map(x => Sort(x.Item1, x.Item2));
         }
 
-        private static List<T> Sort(IEnumerable<T> list, bool descending) =>
+        private static IAsyncEnumerable<T> Sort(IAsyncEnumerable<T> list, bool descending) =>
 
-            descending?list.OrderByDescending(x => x).ToList():
-                list.OrderBy(x => x).ToList();
+            descending?list.OrderByDescending(x => x):
+                list.OrderBy(x => x);
 
         /// <inheritdoc />
         public override IStepFactory StepFactory => ArraySortStepFactory.Instance;

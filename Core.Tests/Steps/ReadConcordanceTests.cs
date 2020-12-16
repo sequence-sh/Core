@@ -10,7 +10,7 @@ using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
-    public class ReadConcordanceTests : StepTestBase<FromConcordance, EntityStream>
+    public class ReadConcordanceTests : StepTestBase<FromConcordance, IAsyncEnumerable<Entity>>
     {
         /// <inheritdoc />
         public ReadConcordanceTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper) {}

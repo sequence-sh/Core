@@ -10,7 +10,7 @@ using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
-    public class ReadCSVTests : StepTestBase<FromCSV, EntityStream>
+    public class ReadCSVTests : StepTestBase<FromCSV, IAsyncEnumerable<Entity>>
     {
         /// <inheritdoc />
         public ReadCSVTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper) {}

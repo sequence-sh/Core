@@ -183,20 +183,20 @@ namespace Reductech.EDR.Core.Internal
         public override async Task<string> SerializeAsync(CancellationToken cancellationToken) => await ValueTask.FromResult(Value.Serialize());
     }
 
-    /// <summary>
-    /// A constant entityStream value
-    /// </summary>
-    public class EntityStreamConstant : ConstantBase<EntityStream>
-    {
-        /// <inheritdoc />
-        public EntityStreamConstant(EntityStream value) : base(value)
-        {
-        }
+    ///// <summary>
+    ///// A constant entityStream value
+    ///// </summary>
+    //public class EntityStreamConstant : ConstantBase<EntityStream>
+    //{
+    //    /// <inheritdoc />
+    //    public EntityStreamConstant(EntityStream value) : base(value)
+    //    {
+    //    }
 
-        /// <inheritdoc />
-        public override IFreezableStep Unfreeze() => new EntityStreamConstantFreezable(Value);
+    //    /// <inheritdoc />
+    //    public override IFreezableStep Unfreeze() => new EntityStreamConstantFreezable(Value);
 
-        /// <inheritdoc />
-        public override async Task<string> SerializeAsync(CancellationToken cancellationToken) => await Value.SerializeAsync(cancellationToken);
-    }
+    //    /// <inheritdoc />
+    //    public override async Task<string> SerializeAsync(CancellationToken cancellationToken) => await Value.SerializeAsync(cancellationToken);
+    //}
 }

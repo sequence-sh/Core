@@ -21,7 +21,7 @@ namespace Reductech.EDR.Core.Steps
         /// </summary>
         [StepProperty(1)]
         [Required]
-        public IStep<List<T>> Array { get; set; } = null!;
+        public IStep<IAsyncEnumerable<T>> Array { get; set; } = null!;
 
         /// <summary>
         /// The name of the variable to loop over.
@@ -44,7 +44,7 @@ namespace Reductech.EDR.Core.Steps
             var elements = await Array.Run(stateMonad, cancellationToken);
             if (elements.IsFailure) return elements.ConvertFailure<Unit>();
 
-            foreach (var element in elements.Value)
+            await foreach (var element in elements.Value.WithCancellation(cancellationToken))
             {
                 var setResult = stateMonad.SetVariable(Variable, element);
                 if (setResult.IsFailure) return setResult.ConvertFailure<Unit>();

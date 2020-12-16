@@ -1,11 +1,11 @@
 ﻿using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Attributes;
-using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Parser;
@@ -16,55 +16,41 @@ namespace Reductech.EDR.Core.Steps
     /// Reorder entities according to their property values.
     /// Consumes the stream.
     /// </summary>
-    public sealed class EntityStreamSort : CompoundStep<EntityStream>
+    public sealed class EntityStreamSort : CompoundStep<IAsyncEnumerable<Entity>>
     {
         /// <inheritdoc />
-        public override async Task<Result<EntityStream, IError>> Run(IStateMonad stateMonad,
+        public override async Task<Result<IAsyncEnumerable<Entity>, IError>> Run(IStateMonad stateMonad,
             CancellationToken cancellationToken)
         {
             var sortDescending = await Descending.Run(stateMonad, cancellationToken);
-            if (sortDescending.IsFailure) return sortDescending.ConvertFailure<EntityStream>();
+            if (sortDescending.IsFailure) return sortDescending.ConvertFailure<IAsyncEnumerable<Entity>>();
 
             var entityStreamResult = await EntityStream.Run(stateMonad, cancellationToken);
-            if (entityStreamResult.IsFailure) return entityStreamResult.ConvertFailure<EntityStream>();
+            if (entityStreamResult.IsFailure) return entityStreamResult.ConvertFailure<IAsyncEnumerable<Entity>>();
 
-            if (stateMonad.VariableExists(VariableName.Entity))
-                return new SingleError($"Variable {VariableName.Entity} was already set.", ErrorCode.ReservedVariableName, new StepErrorLocation(this));
+            var currentState = stateMonad.GetState().ToImmutableDictionary();
 
-            //evaluate the entity stream
-
-            var entitiesResult = await entityStreamResult.Value.TryGetResultsAsync(cancellationToken);
-
-            if (entitiesResult.IsFailure)
-                return entitiesResult.ConvertFailure<EntityStream>();
-
-
-            var list = new List<(string property, Entity entity)>();
-
-            foreach (var entity in entitiesResult.Value)
+            async ValueTask<string> GetKey(Entity entity)
             {
-                var setResult = stateMonad.SetVariable(VariableName.Entity, entity);
-                if (setResult.IsFailure) return setResult.ConvertFailure<EntityStream>();
-                var propertyResult = await KeySelector.Run(stateMonad, cancellationToken);
-                if (propertyResult.IsFailure) return propertyResult.ConvertFailure<EntityStream>();
+                var scopedMonad = new ScopedStateMonad(stateMonad, currentState,
+                    new KeyValuePair<VariableName, object>(VariableName.Entity, entity));
 
-                var propertyName = await propertyResult.Value.GetStringAsync();
+                var result = await KeySelector.Run(scopedMonad, cancellationToken)
+                    .Map(x=>x.GetStringAsync());
 
-                list.Add((propertyName, entity));
+                if (result.IsFailure)
+                    throw new ErrorException(result.Error);
 
+                return result.Value;
             }
-            stateMonad.RemoveVariable(VariableName.Entity, false);
 
-            var sortedList =
-                sortDescending.Value ?
-                    list.OrderByDescending(x => x.property) :
-                    list.OrderBy(x => x.property);
+            IOrderedAsyncEnumerable<Entity> resultStream;
 
-            var resultsList = sortedList.Select(x => x.entity).ToList();
+            if(sortDescending.Value)
+                resultStream = entityStreamResult.Value.OrderByDescendingAwait(GetKey);
+            else resultStream = entityStreamResult.Value.OrderByAwait(GetKey);
 
-            var newStream = Entities.EntityStream.Create(resultsList);
-
-            return newStream;
+            return Result.Success<IAsyncEnumerable<Entity>, IError>(resultStream);
         }
 
         /// <summary>
@@ -72,7 +58,7 @@ namespace Reductech.EDR.Core.Steps
         /// </summary>
         [StepProperty(1)]
         [Required]
-        public IStep<EntityStream> EntityStream { get; set; } = null!;
+        public IStep<IAsyncEnumerable<Entity>> EntityStream { get; set; } = null!;
 
         /// <summary>
         /// A function that gets the key to sort by from the variable &lt;Entity&gt;
@@ -98,14 +84,14 @@ namespace Reductech.EDR.Core.Steps
     /// Reorder entities according to their property values.
     /// Consumes the stream.
     /// </summary>
-    public sealed class EntityStreamSortStepFactory : SimpleStepFactory<EntityStreamSort, EntityStream>
+    public sealed class EntityStreamSortStepFactory : SimpleStepFactory<EntityStreamSort, IAsyncEnumerable<Entity>>
     {
         private EntityStreamSortStepFactory() { }
 
         /// <summary>
         /// The instance.
         /// </summary>
-        public static SimpleStepFactory<EntityStreamSort, EntityStream> Instance { get; } = new EntityStreamSortStepFactory();
+        public static SimpleStepFactory<EntityStreamSort, IAsyncEnumerable<Entity>> Instance { get; } = new EntityStreamSortStepFactory();
     }
 
 }

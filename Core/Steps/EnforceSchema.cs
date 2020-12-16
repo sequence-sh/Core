@@ -1,46 +1,49 @@
-﻿using System.ComponentModel;
+﻿using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Microsoft.Extensions.Logging;
 using Reductech.EDR.Core.Attributes;
-using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.Enums;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
+using Reductech.EDR.Core.Util;
 
 namespace Reductech.EDR.Core.Steps
 {
     /// <summary>
     /// Enforce that the schema is valid for all entities
     /// </summary>
-    public sealed class EnforceSchema : CompoundStep<EntityStream>
+    public sealed class EnforceSchema : CompoundStep<IAsyncEnumerable<Entity>>
     {
         /// <inheritdoc />
-        public override async Task<Result<EntityStream, IError>> Run(IStateMonad stateMonad,
+        public override async Task<Result<IAsyncEnumerable<Entity>, IError>> Run(IStateMonad stateMonad,
             CancellationToken cancellationToken)
         {
             var entityStream = await EntityStream.Run(stateMonad, cancellationToken);
-            if (entityStream.IsFailure) return entityStream.ConvertFailure<EntityStream>();
+            if (entityStream.IsFailure) return entityStream.ConvertFailure<IAsyncEnumerable<Entity>>();
 
             var schemaEntity = await Schema.Run(stateMonad, cancellationToken);
-            if (schemaEntity.IsFailure) return schemaEntity.ConvertFailure<EntityStream>();
+            if (schemaEntity.IsFailure) return schemaEntity.ConvertFailure<IAsyncEnumerable<Entity>>();
 
             var schema = Entities.Schema
                 .TryCreateFromEntity(schemaEntity.Value)
                 .MapError(e=>e.WithLocation(this));
 
-            if (schema.IsFailure) return schema.ConvertFailure<EntityStream>();
+            if (schema.IsFailure) return schema.ConvertFailure<IAsyncEnumerable<Entity>>();
 
 
             var errorBehaviour = await ErrorBehaviour.Run(stateMonad, cancellationToken);
-            if (errorBehaviour.IsFailure) return errorBehaviour.ConvertFailure<EntityStream>();
+            if (errorBehaviour.IsFailure) return errorBehaviour.ConvertFailure<IAsyncEnumerable<Entity>>();
 
 
-            var newStream = entityStream.Value.ApplyMaybe(ApplySchema);
+            var newStream = entityStream.Value
+                .SelectMany(x => ApplySchema(x).ToAsyncEnumerable());
 
-            return newStream;
+            return Result.Success<IAsyncEnumerable<Entity>, IError>(newStream);
 
 
             Maybe<Entity> ApplySchema(Entity entity)
@@ -74,7 +77,7 @@ namespace Reductech.EDR.Core.Steps
         /// </summary>
         [StepProperty(1)]
         [Required]
-        public IStep<EntityStream> EntityStream { get; set; } = null!;
+        public IStep<IAsyncEnumerable<Entity>> EntityStream { get; set; } = null!;
 
         /// <summary>
         /// The schema to enforce.
@@ -99,13 +102,13 @@ namespace Reductech.EDR.Core.Steps
     /// <summary>
     /// Enforce that the schema is valid for all entities
     /// </summary>
-    public sealed class EnforceSchemaStepFactory : SimpleStepFactory<EnforceSchema, EntityStream>
+    public sealed class EnforceSchemaStepFactory : SimpleStepFactory<EnforceSchema, IAsyncEnumerable<Entity>>
     {
         private EnforceSchemaStepFactory() {}
 
         /// <summary>
         /// The instance
         /// </summary>
-        public static SimpleStepFactory<EnforceSchema, EntityStream> Instance { get; } = new EnforceSchemaStepFactory();
+        public static SimpleStepFactory<EnforceSchema, IAsyncEnumerable<Entity>> Instance { get; } = new EnforceSchemaStepFactory();
     }
 }

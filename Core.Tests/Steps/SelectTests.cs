@@ -9,7 +9,7 @@ using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
-    public class SelectTests : StepTestBase<EntityMap, EntityStream>
+    public class SelectTests : StepTestBase<EntityMap, IAsyncEnumerable<Entity>>
     {
         /// <inheritdoc />
         public SelectTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper) {}

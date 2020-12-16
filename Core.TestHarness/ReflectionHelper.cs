@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -16,7 +15,6 @@ using Reductech.EDR.Core.Serialization;
 using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.Util;
 using Xunit.Sdk;
-using Task = System.Threading.Tasks.Task;
 using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 
 namespace Reductech.EDR.Core.TestHarness
@@ -131,11 +129,12 @@ namespace Reductech.EDR.Core.TestHarness
                 return await cfs.SerializeAsync(CancellationToken.None);
             }
 
-            else if (step is DoNothing)
+            if (step is DoNothing)
             {
                 return DoNothingStepFactory.Instance.TypeName;
             }
-            else if (freezable is CompoundFreezableStep cs && freezable.StepName == ArrayStepFactory.Instance.TypeName)
+
+            if (freezable is CompoundFreezableStep cs && freezable.StepName == ArrayStepFactory.Instance.TypeName)
             {
 
                 var constants = cs.FreezableStepData
@@ -251,7 +250,7 @@ namespace Reductech.EDR.Core.TestHarness
                 step =  Constant(d);
             }
 
-            else if (outputType == typeof(List<StringStream>))
+            else if (outputType == typeof(IAsyncEnumerable<StringStream>))
             {
                 var list = new List<string>();
                 for (var i = 0; i < 3; i++)
@@ -262,7 +261,7 @@ namespace Reductech.EDR.Core.TestHarness
 
                 step = Array(list.ToArray());
             }
-            else if (outputType == typeof(List<int>))
+            else if (outputType == typeof(IAsyncEnumerable<int>))
             {
                 var list = new List<int>();
                 for (var i = 0; i < 3; i++)
@@ -273,17 +272,22 @@ namespace Reductech.EDR.Core.TestHarness
 
                 step =  Array(list.ToArray());
             }
-            else if (outputType == typeof(List<EntityStream>))
+            else if (outputType == typeof(IAsyncEnumerable<Entity>))
             {
-                var entityStreamList = new List<IStep<EntityStream> >
+                var entityStream = CreateSimpleEntityStream(ref index);
+
+                step = entityStream;
+            }
+            else if (outputType == typeof(IAsyncEnumerable<IAsyncEnumerable<Entity>>))
+            {
+                var entityStreamList = new List<IStep<IAsyncEnumerable<Entity>> >
                 {
-                    Constant(CreateSimpleEntityStream(ref index)),
-                    Constant(CreateSimpleEntityStream(ref index)),
-                    Constant(CreateSimpleEntityStream(ref index))
+                    CreateSimpleEntityStream(ref index),
+                    CreateSimpleEntityStream(ref index),
+                    CreateSimpleEntityStream(ref index)
                 };
 
-
-                step = new Array<EntityStream>(){Elements = entityStreamList};
+                step = new Array<IAsyncEnumerable<Entity>> {Elements = entityStreamList};
             }
 
             else if (outputType.IsEnum)
@@ -313,12 +317,6 @@ namespace Reductech.EDR.Core.TestHarness
 
                 step = Constant(entity);
             }
-            else if (outputType == typeof(EntityStream))
-            {
-                var entityStream = CreateSimpleEntityStream(ref index);
-
-                step = Constant(entityStream);
-            }
             else if (outputType == typeof(StringStream))
             {
                 var s = "DataStream" + index;
@@ -347,14 +345,16 @@ namespace Reductech.EDR.Core.TestHarness
             return (step, newString, index);
 
 
-            static EntityStream CreateSimpleEntityStream(ref int index1)
+            static IStep<IAsyncEnumerable<Entity>>  CreateSimpleEntityStream(ref int index1)
             {
-                var entityList = new List<Entity>
+                var entityList = new List<IStep<Entity>>
                 {
-                    CreateSimpleEntity(ref index1), CreateSimpleEntity(ref index1), CreateSimpleEntity(ref index1)
+                    Constant(CreateSimpleEntity(ref index1)),
+                    Constant(CreateSimpleEntity(ref index1)),
+                    Constant(CreateSimpleEntity(ref index1))
                 };
 
-                var entityStream = EntityStream.Create(entityList);
+                var entityStream = new Array<Entity> {Elements = entityList};
 
                 return entityStream;
             }

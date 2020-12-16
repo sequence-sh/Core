@@ -15,7 +15,7 @@ namespace Reductech.EDR.Core.Steps
     /// <summary>
     /// Splits a string.
     /// </summary>
-    public sealed class StringSplit : CompoundStep<List<StringStream>>
+    public sealed class StringSplit : CompoundStep<IAsyncEnumerable<StringStream>>
     {
         /// <summary>
         /// The string to split.
@@ -32,26 +32,26 @@ namespace Reductech.EDR.Core.Steps
         public IStep<StringStream> Delimiter { get; set; } = null!;
 
         /// <inheritdoc />
-        public override async Task<Result<List<StringStream>, IError>> Run(IStateMonad stateMonad, CancellationToken cancellationToken)
+        public override async Task<Result<IAsyncEnumerable<StringStream>, IError>> Run(IStateMonad stateMonad, CancellationToken cancellationToken)
         {
             var stringResult = await String.Run(stateMonad, cancellationToken)
                 .Map(async x=> await x.GetStringAsync());
 
-            if (stringResult.IsFailure) return stringResult.ConvertFailure<List<StringStream>>();
+            if (stringResult.IsFailure) return stringResult.ConvertFailure<IAsyncEnumerable<StringStream>>();
 
             var delimiterResult = await  Delimiter.Run(stateMonad, cancellationToken)
                 .Map(async x=> await x.GetStringAsync());
 
-            if (delimiterResult.IsFailure) return delimiterResult.ConvertFailure<List<StringStream>>();
+            if (delimiterResult.IsFailure) return delimiterResult.ConvertFailure<IAsyncEnumerable<StringStream>>();
 
 
             var results = stringResult.Value
                 .Split(new[] {delimiterResult.Value}, StringSplitOptions.None)
                 .Select(x => new StringStream(x))
-                .ToList();
+                .ToList().ToAsyncEnumerable();
 
 
-            return results;
+            return Result.Success<IAsyncEnumerable<StringStream>, IError>(results);
         }
 
         /// <inheritdoc />
@@ -61,13 +61,13 @@ namespace Reductech.EDR.Core.Steps
     /// <summary>
     /// Splits a string.
     /// </summary>
-    public class StringSplitStepFactory : SimpleStepFactory<StringSplit, List<StringStream>>
+    public class StringSplitStepFactory : SimpleStepFactory<StringSplit, IAsyncEnumerable<StringStream>>
     {
         private StringSplitStepFactory() { }
 
         /// <summary>
         /// The instance.
         /// </summary>
-        public static SimpleStepFactory<StringSplit, List<StringStream>> Instance { get; } = new StringSplitStepFactory();
+        public static SimpleStepFactory<StringSplit, IAsyncEnumerable<StringStream>> Instance { get; } = new StringSplitStepFactory();
     }
 }

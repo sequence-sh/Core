@@ -9,7 +9,6 @@ using System.Text.RegularExpressions;
 using CSharpFunctionalExtensions;
 using Namotion.Reflection;
 using Reductech.EDR.Core.Attributes;
-using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Serialization;
 using Reductech.EDR.Core.Steps;
@@ -232,21 +231,14 @@ namespace Reductech.EDR.Core.Internal
             StepContext stepContext)
         {
             if (propertyInfo.GetCustomAttribute<StepListPropertyAttribute>() != null)
-            {
                 return SetStepList();
-            }
-            else if (propertyInfo.GetCustomAttribute<StepPropertyAttribute>() != null)
+
+            if (propertyInfo.GetCustomAttribute<StepPropertyAttribute>() != null)
             {
                 var argument = propertyInfo.PropertyType.GenericTypeArguments.Single();
 
-                if (argument == typeof(EntityStream))
-                {
-                    return SetEntityStream();
-                }
-                else if (argument.GenericTypeArguments.Length == 1 && typeof(IEnumerable).IsAssignableFrom(argument) && argument != typeof(string))
-                {
+                if (argument.GenericTypeArguments.Length == 1 && typeof(IEnumerable).IsAssignableFrom(argument) && argument != typeof(string))
                     return SetArray(argument);
-                }
 
                 return Result.Failure<Unit, IError>(ErrorHelper.WrongParameterTypeError(propertyInfo.Name, MemberType.StepList, MemberType.Step)
                     .WithLocation(parentStep));
@@ -294,45 +286,6 @@ namespace Reductech.EDR.Core.Internal
                     return Result.Failure<Unit, IError>(ErrorList.Combine(errors));
 
                 propertyInfo.SetValue(parentStep, list);
-
-                return Unit.Default;
-            }
-
-
-            Result<Unit, IError> SetEntityStream()
-            {
-                var list = new List<IStep<Entity>>();
-                var errors = new List<IError>();
-
-                foreach (var freezableStep in freezableStepList)
-                {
-                    var freezeResult = freezableStep.TryFreeze(stepContext);
-
-                    if (freezeResult.IsFailure)
-                        errors.Add(freezeResult.Error);
-                    else if (freezeResult.Value is IStep<Entity> entityStep)
-                    {
-                        list.Add(entityStep);
-                    }
-                    else
-                    {
-                        var error = new SingleError(
-                            $"'{CompressSpaces(freezeResult.Value.Name)}' is a '{freezeResult.Value.OutputType.GetDisplayName()}' but it should be an Entity to be a variableName of '{parentStep.StepFactory.TypeName}'",
-                            ErrorCode.InvalidCast,
-                            new StepErrorLocation(parentStep));
-                        errors.Add(error);
-                    }
-                }
-
-                if (errors.Any())
-                    return Result.Failure<Unit, IError>(ErrorList.Combine(errors));
-
-                var step = new EntityStreamCreate()
-                {
-                    Elements = list
-                };
-
-                propertyInfo.SetValue(parentStep, step);
 
                 return Unit.Default;
             }

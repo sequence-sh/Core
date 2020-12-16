@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.TestHarness;
@@ -9,7 +8,7 @@ using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
-    public class MapFieldNamesTests : StepTestBase<EntityMapProperties, EntityStream>
+    public class MapFieldNamesTests : StepTestBase<EntityMapProperties, IAsyncEnumerable<Entity>>
     {
         /// <inheritdoc />
         public MapFieldNamesTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
@@ -32,11 +31,11 @@ namespace Reductech.EDR.Core.Tests.Steps
                         EntityStream =
                                     new EntityMapProperties
                                     {
-                                        EntityStream = Constant(EntityStream.Create(
+                                        EntityStream = Array(
                                             CreateEntity(("Food", "Hello"),
                                                 ("Bar", "World")),
                                             CreateEntity(("Food", "Hello 2"),
-                                                ("Bar", "World 2")))),
+                                                ("Bar", "World 2"))),
 
                                         Mappings =  Constant(CreateEntity(("Food", "Foo")))
                                     }

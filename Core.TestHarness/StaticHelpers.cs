@@ -17,7 +17,6 @@ namespace Reductech.EDR.Core.TestHarness
         public static IStep<Unit> SetVariable(string name, bool value) => new SetVariable<bool> { Variable = new VariableName(name), Value = Constant(value) };
         public static IStep<Unit> SetVariable(string name, DateTime value) => new SetVariable<DateTime> { Variable = new VariableName(name), Value = Constant(value) };
         public static IStep<Unit> SetVariable(string name, Entity value) => new SetVariable<Entity> { Variable = new VariableName(name), Value = Constant(value) };
-        public static IStep<Unit> SetVariable(string name, EntityStream value) => new SetVariable<EntityStream> { Variable = new VariableName(name), Value = Constant(value) };
         public static IStep<Unit> SetVariable<T>(string name, T value) where T : Enum => new SetVariable<T> { Variable = new VariableName(name), Value = Constant(value) };
 
 
@@ -27,17 +26,16 @@ namespace Reductech.EDR.Core.TestHarness
         public static BoolConstant Constant(bool value) => new BoolConstant((value));
         public static DateTimeConstant Constant(DateTime value) => new DateTimeConstant((value));
         public static EntityConstant Constant(Entity value) => new EntityConstant((value));
-        public static EntityStreamConstant Constant(EntityStream value) => new EntityStreamConstant((value));
         public static EnumConstant<T> Constant<T>(T value) where T: Enum => new EnumConstant<T>((value));
 
-        public static IStep<List<int>> Array(params int[] elements) => new Array<int> { Elements = elements.Select(Constant).ToList() };
-        public static IStep<List<double>> Array(params double[] elements) => new Array<double> { Elements = elements.Select(Constant).ToList() };
-        public static IStep<List<bool>> Array(params bool[] elements) => new Array<bool> { Elements = elements.Select(Constant).ToList() };
-        public static IStep<List<DateTime>> Array(params DateTime[] elements) => new Array<DateTime> { Elements = elements.Select(Constant).ToList() };
-        public static IStep<List<Entity>> Array(params Entity[] elements) => new Array<Entity> { Elements = elements.Select(Constant).ToList() };
-        public static IStep<List<EntityStream>> Array(params EntityStream[] elements) => new Array<EntityStream> { Elements = elements.Select(Constant).ToList() };
-        public static IStep<List<StringStream>> Array(params string[] elements) => new Array<StringStream> { Elements = elements.Select(Constant).ToList() };
-        public static IStep<List<T>> Array<T>(params T[] elements) where T : Enum => new Array<T> { Elements = elements.Select(Constant).ToList() };
+        public static IStep<IAsyncEnumerable<int>> Array(params int[] elements) => new Array<int> { Elements = elements.Select(Constant).ToList() };
+        public static IStep<IAsyncEnumerable<double>> Array(params double[] elements) => new Array<double> { Elements = elements.Select(Constant).ToList() };
+        public static IStep<IAsyncEnumerable<bool>> Array(params bool[] elements) => new Array<bool> { Elements = elements.Select(Constant).ToList() };
+        public static IStep<IAsyncEnumerable<DateTime>> Array(params DateTime[] elements) => new Array<DateTime> { Elements = elements.Select(Constant).ToList() };
+        public static IStep<IAsyncEnumerable<Entity>> Array(params Entity[] elements) => new Array<Entity> { Elements = elements.Select(Constant).ToList() };
+        //public static IStep<IAsyncEnumerable<EntityStream>> Array(params EntityStream[] elements) => new Array<EntityStream> { Elements = elements.Select(Constant).ToList() };
+        public static IStep<IAsyncEnumerable<StringStream>> Array(params string[] elements) => new Array<StringStream> { Elements = elements.Select(Constant).ToList() };
+        public static IStep<IAsyncEnumerable<T>> Array<T>(params T[] elements) where T : Enum => new Array<T> { Elements = elements.Select(Constant).ToList() };
 
         public static IStep<TNew> GetVariable<TNew>(string variableName) => new GetVariable<TNew> { Variable = new VariableName(variableName) };
         public static IStep<TNew> GetVariable<TNew>(VariableName variableName) => new GetVariable<TNew> { Variable = variableName };

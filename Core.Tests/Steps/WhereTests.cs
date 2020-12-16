@@ -8,7 +8,7 @@ using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
-    public class WhereTests : StepTestBase<EntityStreamFilter, EntityStream>
+    public class WhereTests : StepTestBase<EntityStreamFilter, IAsyncEnumerable<Entity>>
     {
         /// <inheritdoc />
         public WhereTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)

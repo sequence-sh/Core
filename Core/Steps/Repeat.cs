@@ -8,14 +8,13 @@ using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
-using Reductech.EDR.Core.Util;
 
 namespace Reductech.EDR.Core.Steps
 {
     /// <summary>
     /// Creates an array by repeating an element.
     /// </summary>
-    public sealed class Repeat<T> : CompoundStep<List<T>>
+    public sealed class Repeat<T> : CompoundStep<IAsyncEnumerable<T>>
     {
         /// <summary>
         /// The element to repeat.
@@ -32,11 +31,20 @@ namespace Reductech.EDR.Core.Steps
         public IStep<int> Number { get; set; } = null!;
 
         /// <inheritdoc />
-        public override async Task<Result<List<T>, IError>> Run(IStateMonad stateMonad,
+        public override async Task<Result<IAsyncEnumerable<T>, IError>> Run(IStateMonad stateMonad,
             CancellationToken cancellationToken)
         {
-            return await Element.Run(stateMonad, cancellationToken).Compose(() => Number.Run(stateMonad, cancellationToken))
-                .Map(x => Enumerable.Repeat(x.Item1, x.Item2).ToList());
+            var element = await Element.Run(stateMonad, cancellationToken);
+
+            if (element.IsFailure) return element.ConvertFailure<IAsyncEnumerable<T>>();
+
+            var number = await Number.Run(stateMonad, cancellationToken);
+
+            if (number.IsFailure) return number.ConvertFailure<IAsyncEnumerable<T>>();
+
+            var result = Enumerable.Repeat(element.Value, number.Value).ToAsyncEnumerable();
+
+            return Result.Success<IAsyncEnumerable<T>, IError>(result);
         }
 
         /// <inheritdoc />

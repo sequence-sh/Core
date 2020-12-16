@@ -1,11 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Attributes;
-using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Util;
@@ -22,7 +22,7 @@ namespace Reductech.EDR.Core.Steps
         /// </summary>
         [StepProperty(1)]
         [Required]
-        public IStep<EntityStream> EntityStream { get; set; } = null!;
+        public IStep<IAsyncEnumerable<Entity>> EntityStream { get; set; } = null!;
 
         /// <summary>
         /// The action to perform repeatedly.
@@ -40,22 +40,24 @@ namespace Reductech.EDR.Core.Steps
             if (entities.IsFailure) return entities.ConvertFailure<Unit>();
 
             var currentState = stateMonad.GetState().ToImmutableDictionary();
+            var errors = new List<IError>();
 
-            async Task RunAction(Entity record)
+            await foreach (var entity in entities.Value.WithCancellation(cancellationToken))
             {
                 var scopedMonad = new ScopedStateMonad(stateMonad, currentState,
-                    new KeyValuePair<VariableName, object>(VariableName.Entity, record));
+                    new KeyValuePair<VariableName, object>(VariableName.Entity, entity));
 
 
                 var result = await Action.Run(scopedMonad, cancellationToken);
 
                 if (result.IsFailure)
-                    throw new ErrorException(result.Error);
+                    errors.Add(result.Error);
             }
 
-            var r = await entities.Value.Act(RunAction);
+            if(errors.Any())
+                return Result.Failure<Unit, IError>( ErrorList.Combine(errors));
 
-            return r;
+            return Unit.Default;
         }
 
         /// <inheritdoc />

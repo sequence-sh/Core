@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Linq;
 using JetBrains.Annotations;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Steps;
@@ -9,7 +10,7 @@ using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
-    public class ArrayTests : StepTestBase<Array<int>, List<int>>
+    public class ArrayTests : StepTestBase<Array<int>, IAsyncEnumerable<int>>
     {
         /// <inheritdoc />
         public ArrayTests([NotNull] ITestOutputHelper testOutputHelper) : base(testOutputHelper) {}
@@ -19,8 +20,8 @@ namespace Reductech.EDR.Core.Tests.Steps
         {
             get
             {
-                yield return new DeserializeCase("Three elements explicit form", "Array Elements: [1, 2, 3]", new List<int>{1,2,3});
-                yield return new DeserializeCase("Three elements simple form", "Array Elements: [1, 2, 3]", new List<int>{1,2,3});
+                yield return new DeserializeCase("Three elements explicit form", "Array Elements: [1, 2, 3]", new List<int>{1,2,3}.ToAsyncEnumerable());
+                yield return new DeserializeCase("Three elements simple form", "Array Elements: [1, 2, 3]", new List<int>{1,2,3}.ToAsyncEnumerable());
             }
         }
 
@@ -37,7 +38,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                             Constant(2),
                             Constant(3),
                         }
-                    }, new List<int>{1,2,3} );
+                    }, new List<int>{1,2,3}.ToAsyncEnumerable() );
             } }
 
         /// <inheritdoc /> //TODO create a serialize case

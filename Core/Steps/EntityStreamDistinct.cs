@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Attributes;
-using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Parser;
@@ -16,27 +16,27 @@ namespace Reductech.EDR.Core.Steps
     /// <summary>
     /// Removes duplicate entities.
     /// </summary>
-    public sealed class EntityStreamDistinct : CompoundStep<EntityStream>
+    public sealed class EntityStreamDistinct : CompoundStep<IAsyncEnumerable<Entity>>
     {
         /// <inheritdoc />
-        public override async Task<Result<EntityStream, IError>> Run(IStateMonad stateMonad,
+        public override async Task<Result<IAsyncEnumerable<Entity>, IError>> Run(IStateMonad stateMonad,
             CancellationToken cancellationToken)
         {
             var entityStreamResult = await EntityStream.Run(stateMonad, cancellationToken);
-            if (entityStreamResult.IsFailure) return entityStreamResult.ConvertFailure<EntityStream>();
+            if (entityStreamResult.IsFailure) return entityStreamResult.ConvertFailure<IAsyncEnumerable<Entity>>();
 
             var ignoreCaseResult = await IgnoreCase.Run(stateMonad, cancellationToken);
-            if (ignoreCaseResult.IsFailure) return ignoreCaseResult.ConvertFailure<EntityStream>();
+            if (ignoreCaseResult.IsFailure) return ignoreCaseResult.ConvertFailure<IAsyncEnumerable<Entity>>();
 
             IEqualityComparer<string> comparer = ignoreCaseResult.Value
                 ? StringComparer.OrdinalIgnoreCase
                 : StringComparer.Ordinal;
 
-            HashSet<string> usedKeys = new HashSet<string>(comparer);
+            HashSet<string> usedKeys = new(comparer);
 
             var currentState = stateMonad.GetState().ToImmutableDictionary();
 
-            async Task<Maybe<Entity>> FilterAction(Entity record)
+            async IAsyncEnumerable<Entity> Filter(Entity record)
             {
                 var scopedMonad = new ScopedStateMonad(stateMonad, currentState,
                     new KeyValuePair<VariableName, object>(VariableName.Entity, record));
@@ -47,16 +47,13 @@ namespace Reductech.EDR.Core.Steps
                 if (result.IsFailure)
                     throw new ErrorException(result.Error);
 
-
-
-                if(usedKeys.Add(result.Value))
-                    return Maybe<Entity>.From(record);
-                return Maybe<Entity>.None;
+                if (usedKeys.Add(result.Value))
+                    yield return record;
             }
 
-            var newStream = entityStreamResult.Value.ApplyMaybe(FilterAction);
+            var newStream = entityStreamResult.Value.SelectMany(Filter);
 
-            return newStream;
+            return Result.Success<IAsyncEnumerable<Entity>, IError>(newStream);
         }
 
         /// <summary>
@@ -64,7 +61,7 @@ namespace Reductech.EDR.Core.Steps
         /// </summary>
         [StepProperty(1)]
         [Required]
-        public IStep<EntityStream> EntityStream { get; set; } = null!;
+        public IStep<IAsyncEnumerable<Entity>> EntityStream { get; set; } = null!;
 
         /// <summary>
         /// A function that gets the key to distinct by from the variable &lt;Entity&gt;
@@ -87,13 +84,13 @@ namespace Reductech.EDR.Core.Steps
     /// <summary>
     /// Removes duplicate entities.
     /// </summary>
-    public sealed class EntityStreamDistinctStepFactory : SimpleStepFactory<EntityStreamDistinct, EntityStream>
+    public sealed class EntityStreamDistinctStepFactory : SimpleStepFactory<EntityStreamDistinct, IAsyncEnumerable<Entity>>
     {
         private EntityStreamDistinctStepFactory() {}
 
         /// <summary>
         /// The instance.
         /// </summary>
-        public static SimpleStepFactory<EntityStreamDistinct, EntityStream> Instance { get; } = new EntityStreamDistinctStepFactory();
+        public static SimpleStepFactory<EntityStreamDistinct, IAsyncEnumerable<Entity>> Instance { get; } = new EntityStreamDistinctStepFactory();
     }
 }

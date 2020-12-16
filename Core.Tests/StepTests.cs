@@ -438,11 +438,11 @@ Two,The second number"),
                 yield return new StepTestCase("Foreach nested array",
                     Sequence(new IStep<Unit>[]
                     {
-                        new SetVariable<List<List<StringStream>>>
+                        new SetVariable<IAsyncEnumerable<IAsyncEnumerable<StringStream>>>
                         {
                             Variable = new VariableName("DataVar"),
 
-                            Value = new Array<List<StringStream>>
+                            Value = new Array<IAsyncEnumerable<StringStream>>
                             {
                                 Elements = new[]
                                 {
@@ -459,15 +459,15 @@ Two,The second number"),
                             }
                         },
 
-                        new ForEach<List<string>>
+                        new ForEach<IAsyncEnumerable<string>>
                         {
-                            Array = GetVariable<List<List<string>>>(new VariableName("DataVar")),
+                            Array = GetVariable<IAsyncEnumerable<IAsyncEnumerable<string>>>(new VariableName("DataVar")),
                             Variable = FooVariableName,
                             Action = new Print<StringStream>
                             {
                                 Value = new ElementAtIndex<StringStream>
                                 {
-                                    Array = new GetVariable<List<StringStream>> {Variable = FooVariableName},
+                                    Array = new GetVariable<IAsyncEnumerable<StringStream>> {Variable = FooVariableName},
                                     Index = new IntConstant(0)
                                 }
                             },

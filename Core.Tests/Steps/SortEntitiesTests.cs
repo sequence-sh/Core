@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.TestHarness;
 using Reductech.EDR.Core.Util;
@@ -8,7 +7,7 @@ using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
-    public class SortEntitiesTests : StepTestBase<EntityStreamSort, EntityStream >
+    public class SortEntitiesTests : StepTestBase<EntityStreamSort, IAsyncEnumerable<Entity>>
     {
         /// <inheritdoc />
         public SortEntitiesTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
@@ -25,11 +24,10 @@ namespace Reductech.EDR.Core.Tests.Steps
                     {
                         EntityStream = new EntityStreamSort
                         {
-                            EntityStream =  Constant(EntityStream.Create(
+                            EntityStream = Array(
                                 CreateEntity(("Foo", "Gamma")),
                                 CreateEntity(("Foo", "Alpha")),
-                                CreateEntity(("Foo", "Beta"))
-                            )),
+                                CreateEntity(("Foo", "Beta"))),
                             KeySelector = new EntityGetValue {Entity = GetEntityVariable, Property = Constant("Foo")}
                         },
                         Action = new Print<Entity> {Value = GetEntityVariable}
@@ -45,11 +43,10 @@ namespace Reductech.EDR.Core.Tests.Steps
                         EntityStream = new EntityStreamSort
                         {
                             Descending = Constant(true),
-                            EntityStream =  Constant(EntityStream.Create(
+                            EntityStream = Array(
                                 CreateEntity(("Foo", "Gamma")),
                                 CreateEntity(("Foo", "Alpha")),
-                                CreateEntity(("Foo", "Beta"))
-                            )),
+                                CreateEntity(("Foo", "Beta"))),
                             KeySelector = new EntityGetValue { Entity = GetEntityVariable, Property = Constant("Foo") }
                         },
                         Action = new Print<Entity> { Value = GetEntityVariable }
@@ -66,12 +63,12 @@ namespace Reductech.EDR.Core.Tests.Steps
                     EntityStream = new EntityStreamSort
                     {
                         Descending = Constant(true),
-                        EntityStream =  Constant(EntityStream.Create(
+                        EntityStream = Array(
                             CreateEntity(("Foo", "Gamma")),
                             CreateEntity(("Foo", "Alpha")),
                             CreateEntity(("Foo", "Beta")),
                             CreateEntity(("Bar", "Delta"))
-                        )),
+                        ),
                         KeySelector = new EntityGetValue { Entity = GetEntityVariable, Property = Constant("Foo") }
                     },
                     Action = new Print<Entity> { Value = GetEntityVariable }

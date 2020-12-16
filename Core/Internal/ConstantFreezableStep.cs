@@ -3,15 +3,10 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
-using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Parser;
 using Reductech.EDR.Core.Serialization;
 using DateTime = System.DateTime;
-using Option = OneOf.OneOf<Reductech.EDR.Core.Parser.StringStream, int, double, bool,
-Reductech.EDR.Core.Internal.Enumeration, System.DateTime,
-Reductech.EDR.Core.Entity,
-Reductech.EDR.Core.Entities.EntityStream>;
 
 namespace Reductech.EDR.Core.Internal
 {
@@ -122,25 +117,6 @@ namespace Reductech.EDR.Core.Internal
 
         /// <inheritdoc />
         public override Task<string> SerializeAsync(CancellationToken cancellation) => Task.FromResult(Value.ToString());
-    }
-
-    /// <summary>
-    /// An entityStream Constant
-    /// </summary>
-    public class EntityStreamConstantFreezable : ConstantFreezableBase<EntityStream>
-    {
-        /// <inheritdoc />
-        public EntityStreamConstantFreezable(EntityStream value) : base(value) {}
-
-        /// <inheritdoc />
-        public override string StepName => "EntityStream";
-
-        /// <inheritdoc />
-        public override Result<IStep, IError> TryFreeze(StepContext stepContext) => new EntityStreamConstant(Value);
-
-        /// <param name="cancellation"></param>
-        /// <inheritdoc />
-        public override Task<string> SerializeAsync(CancellationToken cancellation) => Value.SerializeAsync(cancellation);
     }
 
     /// <summary>
