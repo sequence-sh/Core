@@ -13,6 +13,7 @@ namespace Reductech.EDR.Core.Steps
     /// <summary>
     /// Writes a file to the local file system.
     /// </summary>
+    [Alias("WriteToFile")]
     public sealed class FileWrite : CompoundStep<Unit>
     {
         /// <inheritdoc />
@@ -20,7 +21,7 @@ namespace Reductech.EDR.Core.Steps
             CancellationToken cancellationToken)
         {
             var path = await Path.Run(stateMonad, cancellationToken)
-                .Map(async x=> await x.GetStringAsync());
+                .Map(async x => await x.GetStringAsync());
 
             if (path.IsFailure) return path.ConvertFailure<Unit>();
 
@@ -31,7 +32,7 @@ namespace Reductech.EDR.Core.Steps
             var stream = stringStreamResult.Value.GetStream().stream;
 
             var r = await stateMonad.FileSystemHelper.WriteFileAsync(path.Value, stream, cancellationToken)
-                .MapError(x=>x.WithLocation(this));
+                .MapError(x => x.WithLocation(this));
 
             await stream.DisposeAsync();
 
@@ -40,19 +41,20 @@ namespace Reductech.EDR.Core.Steps
         }
 
         /// <summary>
-        /// The path of the file to write to.
+        /// The data to write to file.
         /// </summary>
         [StepProperty(1)]
         [Required]
-        public IStep<StringStream> Path { get; set; } = null!;
-
+        [Alias("Data")]
+        public IStep<StringStream> Stream { get; set; } = null!;
+        
         /// <summary>
-        /// The data to write.
+        /// The path of the file to write to.
         /// </summary>
         [StepProperty(2)]
         [Required]
-        public IStep<StringStream> Stream { get; set; } = null!;
-
+        [Alias("ToFile")]
+        public IStep<StringStream> Path { get; set; } = null!;
 
         /// <inheritdoc />
         public override IStepFactory StepFactory => FileWriteStepFactory.Instance;
