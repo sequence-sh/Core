@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.IO;
 using System.Linq;
 using System.Text;
 using Antlr4.Runtime;
@@ -29,11 +30,8 @@ namespace Reductech.EDR.Core.Parser
 
             var r = TryParse(text).Map(x=> x.ConvertToStep());
 
-
             return r;
         }
-
-
 
         /// <summary>
         /// Try to parse this text
@@ -41,20 +39,44 @@ namespace Reductech.EDR.Core.Parser
         public static Result<FreezableStepProperty, IError> TryParse(string text)
         {
             var inputStream = new AntlrInputStream(text);
-
-
             var lexer = new SequenceLexer(inputStream);
             var commonTokenStream = new CommonTokenStream(lexer);
             var parser = new SequenceParser(commonTokenStream);
+
+            var syntaxErrorListener = new SyntaxErrorListener();
+            parser.AddErrorListener(syntaxErrorListener);
 
             var visitor = new Visitor();
 
             var result = visitor.Visit(parser.fullSequence());
 
+            if (syntaxErrorListener.Errors.Any())
+            {
+
+                return Result.Failure<FreezableStepProperty, IError>(ErrorList.Combine(syntaxErrorListener.Errors));
+            }
+
             return result;
         }
 
+        /// <summary>
+        /// Error listener that looks for syntax errors
+        /// </summary>
+        public class SyntaxErrorListener : BaseErrorListener
+        {
+            /// <summary>
+            /// Errors found by this error listener.
+            /// </summary>
+            public readonly List<IError> Errors = new List<IError>();
 
+            /// <inheritdoc />
+            public override void SyntaxError(TextWriter output, IRecognizer recognizer, IToken offendingSymbol, int line, int charPositionInLine,
+                string msg, RecognitionException e)
+            {
+                var error = new SingleError(msg, ErrorCode.CouldNotParse, new TextLocation(offendingSymbol));
+                Errors.Add(error);
+            }
+        }
 
         private class Visitor : SequenceBaseVisitor<Result<FreezableStepProperty, IError>>
         {
@@ -87,14 +109,14 @@ namespace Reductech.EDR.Core.Parser
 
 
                 if (result.Value.Count == 0)
-                    return new SingleError("Sequence contained no members", ErrorCode.CouldNotParse, new TextPosition(context));
+                    return new SingleError("Sequence contained no members", ErrorCode.CouldNotParse, new TextLocation(context));
 
                 var sequence = CreateFreezableSequence(
                     result.Value.SkipLast(1).ToList(),
                     result.Value.Last(),
-                    null, new TextPosition(context));
+                    null, new TextLocation(context));
 
-                return new FreezableStepProperty(sequence, new TextPosition(context));
+                return new FreezableStepProperty(sequence, new TextLocation(context));
             }
 
 
@@ -104,7 +126,7 @@ namespace Reductech.EDR.Core.Parser
                 var members =
                     context.term().Select(VisitTerm);
 
-                var r = Aggregate(new TextPosition(context),members);
+                var r = Aggregate(new TextLocation(context),members);
                 return r;
             }
 
@@ -113,7 +135,7 @@ namespace Reductech.EDR.Core.Parser
             {
                 var b = context.TRUE() != null;
 
-                var member = new FreezableStepProperty(new BoolConstantFreezable(b), new TextPosition(context));
+                var member = new FreezableStepProperty(new BoolConstantFreezable(b), new TextLocation(context));
                 return member;
             }
 
@@ -128,21 +150,19 @@ namespace Reductech.EDR.Core.Parser
                 var right = VisitTerm(context.term(1));
                 var operatorSymbol = context.infixOperator().GetText();
 
-                var result = InfixHelper.TryCreateStep(new TextPosition(context), left, right, operatorSymbol);
+                var result = InfixHelper.TryCreateStep(new TextLocation(context), left, right, operatorSymbol);
 
                 return result;
             }
 
-
-
             /// <inheritdoc />
             public override Result<FreezableStepProperty, IError> VisitErrorNode(IErrorNode node) =>
-                new SingleError($"Could not parse '{node.GetText()}'", ErrorCode.CouldNotParse,new TextPosition(node.Symbol));
+                new SingleError($"Could not parse '{node.GetText()}'", ErrorCode.CouldNotParse,new TextLocation(node.Symbol));
 
             private static SingleError ParseError(ParserRuleContext pt)
             {
 
-                return new SingleError($"Could not parse '{pt.GetText()}'", ErrorCode.CouldNotParse, new TextPosition(pt));
+                return new SingleError($"Could not parse '{pt.GetText()}'", ErrorCode.CouldNotParse, new TextLocation(pt));
             }
 
             /// <inheritdoc />
@@ -154,9 +174,9 @@ namespace Reductech.EDR.Core.Parser
 
                 var vn = GetVariableName(context.VARIABLENAME());
 
-                var step = CreateFreezableSetVariable(vn, member.Value, new TextPosition(context));
+                var step = CreateFreezableSetVariable(vn, member.Value, new TextLocation(context));
 
-                return new FreezableStepProperty(step, new TextPosition(context) );
+                return new FreezableStepProperty(step, new TextLocation(context) );
             }
 
             /// <inheritdoc />
@@ -175,7 +195,7 @@ namespace Reductech.EDR.Core.Parser
                 var prefix = context.NAME(0).GetText();
                 var suffix = context.NAME(1).GetText();
 
-                var member = new FreezableStepProperty(new EnumConstantFreezable(new Enumeration(prefix, suffix)), new TextPosition(context));
+                var member = new FreezableStepProperty(new EnumConstantFreezable(new Enumeration(prefix, suffix)), new TextLocation(context));
 
                 return member;
             }
@@ -185,12 +205,12 @@ namespace Reductech.EDR.Core.Parser
             {
                 if (int.TryParse(context.NUMBER().GetText(), out var num))
                 {
-                    var member = new FreezableStepProperty(new IntConstantFreezable(num), new TextPosition(context));
+                    var member = new FreezableStepProperty(new IntConstantFreezable(num), new TextLocation(context));
 
                     return member;
                 }
                 return new SingleError($"Could not parse '{context.GetText()}' as a number",
-                    ErrorCode.CouldNotParse,new TextPosition(context));
+                    ErrorCode.CouldNotParse,new TextLocation(context));
             }
 
             /// <inheritdoc />
@@ -202,7 +222,7 @@ namespace Reductech.EDR.Core.Parser
 
                 var stringStream = new StringStream(s);
 
-                var member = new FreezableStepProperty(new StringConstantFreezable(stringStream), new TextPosition(context) );
+                var member = new FreezableStepProperty(new StringConstantFreezable(stringStream), new TextLocation(context) );
 
                 return member;
 
@@ -264,7 +284,7 @@ namespace Reductech.EDR.Core.Parser
                     else dict.Add(new StepParameterReference(numberedArgument.number), numberedArgument.term.Value);
                 }
 
-                var members = AggregateNamedArguments(context.namedArgument());
+                var members = AggregateNamedArguments(context.namedArgument(), new TextLocation(context));
 
                 if (members.IsFailure) errors.Add(members.Error);
                 else
@@ -276,11 +296,11 @@ namespace Reductech.EDR.Core.Parser
 
 
 
-                var fsd = new FreezableStepData(dict, new TextPosition(context));
+                var fsd = new FreezableStepData(dict, new TextLocation(context));
 
                 var cfs = new CompoundFreezableStep(name, fsd, null);
 
-                return new FreezableStepProperty(cfs, new TextPosition(context));
+                return new FreezableStepProperty(cfs, new TextLocation(context));
             }
 
             /// <inheritdoc />
@@ -301,7 +321,7 @@ namespace Reductech.EDR.Core.Parser
                     else dict.Add(new StepParameterReference(numberedArgument.number),  numberedArgument.term.Value);
                 }
 
-                var members = AggregateNamedArguments(context.namedArgument());
+                var members = AggregateNamedArguments(context.namedArgument(), new TextLocation(context));
 
                 if (members.IsFailure) errors.Add(members.Error);
                 else
@@ -313,27 +333,27 @@ namespace Reductech.EDR.Core.Parser
 
 
 
-                var fsd = new FreezableStepData(dict, new TextPosition(context) );
+                var fsd = new FreezableStepData(dict, new TextLocation(context) );
 
                 var cfs = new CompoundFreezableStep(name, fsd, null);
 
-                return new FreezableStepProperty(cfs,new TextPosition(context) );
+                return new FreezableStepProperty(cfs,new TextLocation(context) );
             }
 
             /// <inheritdoc />
             public override Result<FreezableStepProperty, IError> VisitEntity(SequenceParser.EntityContext context)
             {
-                var members = AggregateNamedArguments(context.namedArgument());
+                var members = AggregateNamedArguments(context.namedArgument(), new TextLocation(context));
 
                 if (members.IsFailure) return members.ConvertFailure<FreezableStepProperty>();
 
-                var step = new CreateEntityFreezableStep(new FreezableEntityData(members.Value, new TextPosition(context)));
+                var step = new CreateEntityFreezableStep(new FreezableEntityData(members.Value, new TextLocation(context)));
 
-                return new FreezableStepProperty(step, new TextPosition(context));
+                return new FreezableStepProperty(step, new TextLocation(context));
             }
 
             private Result<IReadOnlyDictionary<string, FreezableStepProperty>, IError>
-                AggregateNamedArguments(IEnumerable<SequenceParser.NamedArgumentContext> namedArguments)
+                AggregateNamedArguments(IEnumerable<SequenceParser.NamedArgumentContext> namedArguments, IErrorLocation location)
             {
                 var l = new List<(string key, FreezableStepProperty member)>();
                 var errors = new List<IError>();
@@ -350,10 +370,7 @@ namespace Reductech.EDR.Core.Parser
                     errors.Add(new SingleError(
                         $"Duplicate Parameter '{duplicateKeys.Key}'",
                         ErrorCode.DuplicateParameter,
-                            new TextPosition(duplicateKeys.Key,
-                                (duplicateKeys.First().member.Location as TextPosition)!.StartIndex,
-                                (duplicateKeys.Last().member.Location as TextPosition)!.StopIndex
-                            )));
+                        location));
                 }
 
                 if (errors.Any())
@@ -378,16 +395,17 @@ namespace Reductech.EDR.Core.Parser
 
             private static FreezableStepProperty GetVariableName(ITerminalNode node)
             {
+
                 var text = node.Symbol.Text;
 
                 if (text == null || !text.StartsWith('<') || !text.EndsWith('>'))
                     throw new Exception($"Expected variable name to be in angle brackets but was '{text}'");
                 var vn = new VariableName(text.TrimStart('<').TrimEnd('>'));
 
-                return new FreezableStepProperty(vn, new TextPosition(node.Symbol));
+                return new FreezableStepProperty(vn, new TextLocation(node.Symbol));
             }
 
-            private static Result<FreezableStepProperty, IError> Aggregate(TextPosition textPosition, IEnumerable<Result<FreezableStepProperty, IError>> nodes)
+            private static Result<FreezableStepProperty, IError> Aggregate(TextLocation textLocation, IEnumerable<Result<FreezableStepProperty, IError>> nodes)
             {
                 var l = ImmutableList<IFreezableStep>.Empty.ToBuilder();
                 var errors = new List<IError>();
@@ -403,13 +421,8 @@ namespace Reductech.EDR.Core.Parser
                 if (errors.Any())
                     return Result.Failure<FreezableStepProperty, IError>(ErrorList.Combine(errors));
 
-                return new FreezableStepProperty(l.ToImmutable(), textPosition);
+                return new FreezableStepProperty(l.ToImmutable(), textLocation);
             }
-
         }
-
-
-
     }
-
 }

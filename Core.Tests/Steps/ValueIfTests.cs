@@ -1,6 +1,9 @@
 ﻿using System.Collections.Generic;
+using Reductech.EDR.Core.Internal;
+using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.TestHarness;
+using Reductech.EDR.Core.Util;
 using Xunit.Abstractions;
 using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 
@@ -44,5 +47,38 @@ namespace Reductech.EDR.Core.Tests.Steps
 
         }
 
+        /// <inheritdoc />
+        protected override IEnumerable<ErrorCase> ErrorCases
+        {
+            get
+            {
+                yield return new ErrorCase("Condition is error",
+                    new ValueIf<Unit>()
+                    {
+                        Condition = new FailStep<bool> { ErrorMessage = "Condition Fail" },
+                        Then = new FailStep<Unit> { ErrorMessage = "Then Fail" },
+                        Else = new FailStep<Unit> { ErrorMessage = "Else Fail" },
+                    },
+                    new SingleError("Condition Fail", ErrorCode.Test, EntireSequenceLocation.Instance));
+
+                yield return new ErrorCase("Then is error",
+                    new ValueIf<Unit>()
+                    {
+                        Condition = Constant(true),
+                        Then = new FailStep<Unit> { ErrorMessage = "Then Fail" },
+                        Else = new FailStep<Unit> { ErrorMessage = "Else Fail" },
+                    },
+                    new SingleError("Then Fail", ErrorCode.Test, EntireSequenceLocation.Instance));
+
+                yield return new ErrorCase("Else is error",
+                    new ValueIf<Unit>()
+                    {
+                        Condition = Constant(false),
+                        Then = new FailStep<Unit> { ErrorMessage = "Then Fail" },
+                        Else = new FailStep<Unit> { ErrorMessage = "Else Fail" },
+                    },
+                    new SingleError("Else Fail", ErrorCode.Test, EntireSequenceLocation.Instance));
+            }
+        }
     }
 }

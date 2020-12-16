@@ -52,7 +52,8 @@ namespace Reductech.EDR.Core.Tests.Steps
                     new ErrorBuilder($"Assertion Failed 'False'", ErrorCode.IndexOutOfBounds)
                 );
 
-                yield return CreateDefaultErrorCase();
+                foreach (var errorCase in base.ErrorCases)
+                    yield return errorCase;
             }
         }
     }

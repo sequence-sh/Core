@@ -69,10 +69,10 @@ namespace Reductech.EDR.Core.Tests.Steps
                 yield return new SerializeCase("Short form", new GetVariable<int>(){Variable = new VariableName("Foo")}, "<Foo>");
             } }
 
-        /// <inheritdoc />
-        protected override IEnumerable<ErrorCase> ErrorCases
-        {
-            get { yield return CreateDefaultErrorCase(false); }
-        }
+        ///// <inheritdoc />
+        //protected override IEnumerable<ErrorCase> ErrorCases
+        //{
+        //    get { yield return CreateDefaultErrorCase(false); }
+        //}
     }
 }

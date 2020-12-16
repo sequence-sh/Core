@@ -52,8 +52,8 @@ fullSequence		: (step | stepSequence)  EOF ;
  * Lexer Rules
  */
 
-SINGLELINECOMMENT	: '//'  ~[\r\n\u0085\u2028\u2029]* -> skip;
-DELIMITEDCOMMENT	: '/*'  .*? '*/' -> skip;
+SINGLELINECOMMENT	: '//'  ~[\r\n\u0085\u2028\u2029]* -> channel(HIDDEN);
+DELIMITEDCOMMENT	: '/*'  .*? '*/' -> channel(HIDDEN);
 DASH                : '-' ;
 PLUS                : '+' ;
 ASTERIX             : '*' ;
@@ -85,4 +85,4 @@ SINGLEQUOTEDSTRING	: '\'' (~('\'') | '\'\'')* '\'' ;
 TRUE				: [Tt] [Rr] [Uu] [Ee];
 FALSE				: [Ff] [Aa] [Ll] [Ss] [Ee];
 NAME				: [a-zA-Z0-9_]+;
-WHITESPACE			: (' ' | '\t' | '\r' | '\n') -> skip ;
+WHITESPACE			: (' ' | '\t' | '\r' | '\n') -> channel(HIDDEN) ;

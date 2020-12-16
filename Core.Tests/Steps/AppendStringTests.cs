@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using JetBrains.Annotations;
 using Reductech.EDR.Core.Internal;
-using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Parser;
 using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.TestHarness;
@@ -18,19 +17,7 @@ namespace Reductech.EDR.Core.Tests.Steps
         public AppendStringTests([NotNull] ITestOutputHelper testOutputHelper) : base(testOutputHelper) {}
 
         /// <inheritdoc />
-        protected override IEnumerable<ErrorCase> ErrorCases {
-            get
-            {
-                yield return new ErrorCase("Variable does not exist",
-                    new AppendString
-                    {
-                        Variable = new VariableName("Foo"),
-                        String = Constant("World")
-                    }, new ErrorBuilder("Variable '<Foo>' does not exist.", ErrorCode.MissingVariable)
-                );
-
-                yield return CreateDefaultErrorCase(false);
-            } }
+        protected override IEnumerable<ErrorCase> ErrorCases => CreateDefaultErrorCases();
 
         /// <inheritdoc />
         protected override IEnumerable<StepCase> StepCases {

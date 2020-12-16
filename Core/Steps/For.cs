@@ -57,10 +57,10 @@ namespace Reductech.EDR.Core.Steps
             if (from.IsFailure) return from.ConvertFailure<Unit>();
 
             var to = await To.Run(stateMonad, cancellationToken);
-            if (to.IsFailure) return from.ConvertFailure<Unit>();
+            if (to.IsFailure) return to.ConvertFailure<Unit>();
 
             var increment = await Increment.Run(stateMonad, cancellationToken);
-            if (increment.IsFailure) return from.ConvertFailure<Unit>();
+            if (increment.IsFailure) return increment.ConvertFailure<Unit>();
 
             var currentValue = from.Value;
 

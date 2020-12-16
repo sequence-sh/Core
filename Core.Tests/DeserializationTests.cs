@@ -99,7 +99,7 @@ Print 'Comments!'", "Comments!");
 
                 yield return new DeserializationTestFunction(@"Print(True && False)", false);
 
-                yield return new DeserializationTestFunction(@"Print(StringIsEmpty 'Hello' && StringIsEmpty 'World')", false);
+                yield return new DeserializationTestFunction(@"Print ((StringIsEmpty 'Hello') && (StringIsEmpty 'World'))", false);
 
                 yield return new DeserializationTestFunction(@"Print((not True) && (not False))", false);
 

@@ -55,7 +55,7 @@ namespace Reductech.EDR.Core.TestHarness
                 var currentValue = property.GetValue(instance);
                 if (currentValue == null)
                 {
-                    var (step, value, newIndex) = await CreateSimpleStep(property.PropertyType, index);
+                    var (step, value, newIndex) = await CreateSimpleStep(property, index);
                     index = newIndex;
                     values.Add(property.Name, value);
 
@@ -182,12 +182,12 @@ namespace Reductech.EDR.Core.TestHarness
             }
         }
 
-        private static void MatchStepPropertyInfo(PropertyInfo stepPropertyInfo,
-            Action<PropertyInfo> variableNameAction,
-            Action<PropertyInfo> stepPropertyAction,
-            Action<PropertyInfo> stepListAction)
+        private static T MatchStepPropertyInfo<T>(PropertyInfo stepPropertyInfo,
+            Func<PropertyInfo, T> variableNameAction,
+            Func<PropertyInfo, T> stepPropertyAction,
+            Func<PropertyInfo, T> stepListAction)
         {
-            var actionsToDo = new List<Action<PropertyInfo>>();
+            var actionsToDo = new List<Func<PropertyInfo, T>>();
 
             if (stepPropertyInfo.IsDecoratedWith<VariableNameAttribute>())
                 actionsToDo.Add(variableNameAction);
@@ -198,20 +198,18 @@ namespace Reductech.EDR.Core.TestHarness
             if (stepPropertyInfo.IsDecoratedWith<StepListPropertyAttribute>())
                 actionsToDo.Add(stepListAction);
 
-            switch (actionsToDo.Count)
+            return actionsToDo.Count switch
             {
-                case 0: throw new XunitException($"{stepPropertyInfo.Name} does not have a valid attribute");
-                case 1:
-                     actionsToDo.Single()(stepPropertyInfo);
-                    return;
-                default:
-                    throw new XunitException(
-                        $"{stepPropertyInfo.Name} has more than one step property base attribute");
-            }
+                0 => throw new XunitException($"{stepPropertyInfo.Name} does not have a valid attribute"),
+                1 => actionsToDo.Single()(stepPropertyInfo),
+                _ => throw new XunitException($"{stepPropertyInfo.Name} has more than one step property base attribute")
+            };
         }
 
-        private static async Task<(IStep step, string value, int newIndex)> CreateSimpleStep(Type tStep, int index)
+        private static async Task<(IStep step, string value, int newIndex)> CreateSimpleStep(PropertyInfo propertyInfo, int index)
         {
+            var tStep = propertyInfo.PropertyType;
+
             var outputType = tStep.GenericTypeArguments.First();
             IStep step;
 
@@ -222,7 +220,12 @@ namespace Reductech.EDR.Core.TestHarness
 
             else if (outputType == typeof(StringStream))
             {
-                var s = "Bar" + index;
+                string s;
+                if (propertyInfo != null && propertyInfo.GetCustomAttribute<SingleCharacterAttribute>() != null)
+                    s = "" + index;
+                else
+                    s = "Bar" + index;
+
                 index++;
                 step = Constant(s);
             }

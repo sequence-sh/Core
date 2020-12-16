@@ -120,6 +120,7 @@ namespace Reductech.EDR.Core.Tests.Steps
             }
         }
 
+
         /// <inheritdoc />
         protected override IEnumerable<ErrorCase> ErrorCases
         {
@@ -130,14 +131,40 @@ namespace Reductech.EDR.Core.Tests.Steps
                     Left = Constant(true),
                     Right = Constant(true),
                     Operator = Constant(BooleanOperator.None)
-
                 };
 
 
                 yield return new ErrorCase("BooleanOperator.None", noneStep,
                     new SingleError($"Could not apply '{BooleanOperator.None}'", ErrorCode.UnexpectedEnumValue, new StepErrorLocation(noneStep)));
 
-                yield return CreateDefaultErrorCase();
+                //Do not do default cases as some errors are not propagated due to lazy evaluation
+
+                yield return new ErrorCase("Left is error",
+                    new ApplyBooleanOperator
+                    {
+                        Left = new FailStep<bool>{ErrorMessage = "Left Fail"},
+                        Right = Constant(true),
+                        Operator = Constant(BooleanOperator.And)
+                    },
+                    new SingleError("Left Fail", ErrorCode.Test, EntireSequenceLocation.Instance));
+
+                yield return new ErrorCase("Operator is error",
+                    new ApplyBooleanOperator
+                    {
+                        Left = Constant(true),
+                        Right = Constant(true),
+                        Operator = new FailStep<BooleanOperator> { ErrorMessage = "Operator Fail" },
+                    },
+                    new SingleError("Operator Fail", ErrorCode.Test, EntireSequenceLocation.Instance));
+
+                yield return new ErrorCase("Right is error",
+                    new ApplyBooleanOperator
+                    {
+                        Left = Constant(true),
+                        Right = new FailStep<bool>{ErrorMessage = "Right Fail"},
+                        Operator = Constant(BooleanOperator.And)
+                    },
+                    new SingleError("Right Fail", ErrorCode.Test, EntireSequenceLocation.Instance));
             }
         }
     }

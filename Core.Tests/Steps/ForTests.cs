@@ -94,7 +94,8 @@ namespace Reductech.EDR.Core.Tests.Steps
                         .WithExpectedFinalState(VariableName.Index.Name, 1)
                     ;
 
-                yield return CreateDefaultErrorCase();
+                foreach (var errorCase in base.ErrorCases)
+                    yield return errorCase;
             }
         }
     }

@@ -88,6 +88,9 @@ namespace Reductech.EDR.Core.TestHarness
 
                 var stateMonad = new StateMonad(logger, Settings, externalProcessRunner, fileSystemHelper, sfs);
 
+                foreach (var action in InitialStateActions)
+                    action(stateMonad);
+
                 return stateMonad;
             }
 
@@ -130,6 +133,7 @@ namespace Reductech.EDR.Core.TestHarness
             /// <inheritdoc />
             public Maybe<StepFactoryStore> StepFactoryStoreToUse { get; set; }
 
+            public List<Action<IStateMonad>> InitialStateActions { get; } = new List<Action<IStateMonad>>();
 
             /// <inheritdoc />
             public ISettings Settings { get; set; } = EmptySettings.Instance;

@@ -70,7 +70,7 @@ namespace Reductech.EDR.Core.Steps
                 freezableStepData.TryGetStepList(nameof(Array<object>.Elements), StepType)
                     .Bind(x => x.Select(r => r.TryGetOutputTypeReference(typeResolver)).Combine(ErrorList.Combine))
                     .Bind(x => MultipleTypeReference.TryCreate(x, TypeName)
-                    .MapError(e=>e.WithLocation(this, freezableStepData)));
+                    .MapError(e=>e.WithLocation( freezableStepData)));
 
 
             return result;
