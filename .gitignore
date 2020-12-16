@@ -380,3 +380,5 @@ FodyWeavers.xsd
 ####
 **/StrykerOutput/
 /Core/Antlr
+/TestCSV2.csv
+/TestCSV.csv

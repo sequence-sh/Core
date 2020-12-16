@@ -62,16 +62,16 @@ namespace Reductech.EDR.Core.Tests
         public async Task RunYamlSequence()
         {
             const string yaml = @"
-- <Folder> = 'C:\Users\wainw\source\repos\Reductech\edr\Examples'
-- <SourceFile> = 'Hello.txt'
-- <FilePath> = PathCombine [<Folder>, <SourceFile>]
-- <SourceFileTwo> = 'Hello2.txt'
-- <FilePathTwo> = PathCombine [<Folder>, <SourceFileTwo>]
-- DeleteItem <SourceFile>
-- FileWrite <SourceFile> 'Hello'
-- <Text> = ReadFile <SourceFile>
-- FileWrite <SourceFileTwo> <Text>
-- DeleteItem <SourceFile>";
+- <Converted> = ReadFile Path: 'C:\Users\wainw\source\repos\Reductech\core\TestCSV.csv'
+  | FromCSV
+  | EntityMap Function: (
+      EntitySetValue
+        Entity: <Entity>
+        Property: 'Name'
+        Value: (StringToCase String: (EntityGetValue <Entity> 'Name') Case: TextCase.Upper)
+    )
+  | ToCSV
+- FileWrite Path: 'C:\Users\wainw\source\repos\Reductech\core\TestCSV2.csv' Stream: <Converted>";
 
 
             var sfs = StepFactoryStore.CreateUsingReflection();
