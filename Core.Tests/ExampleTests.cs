@@ -57,8 +57,7 @@ namespace Reductech.EDR.Core.Tests
         }
 
 
-        //[Fact(Skip = "Manual")]
-        [Fact]
+        [Fact(Skip = "Manual")]
         [Trait("Category", "Integration")]
         public async Task RunYamlSequence()
         {
