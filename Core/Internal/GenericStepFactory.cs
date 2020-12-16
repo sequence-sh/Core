@@ -23,8 +23,8 @@ namespace Reductech.EDR.Core.Internal
         protected override Result<ICompoundStep, IError> TryCreateInstance(StepContext stepContext,
             FreezableStepData freezeData) =>
             GetMemberType(freezeData, stepContext.TypeResolver)
-                .Bind(x=> stepContext.TryGetTypeFromReference(x).MapError(e=>e.WithLocation(this, freezeData)))
-                .Bind(x => TryCreateGeneric(StepType, x).MapError(e=> e.WithLocation(this, freezeData)));
+                .Bind(x=> stepContext.TryGetTypeFromReference(x).MapError(e=>e.WithLocation(freezeData)))
+                .Bind(x => TryCreateGeneric(StepType, x).MapError(e=> e.WithLocation(freezeData)));
 
         /// <summary>
         /// Gets the type

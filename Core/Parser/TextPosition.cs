@@ -1,69 +1,61 @@
-﻿using System;
-using Antlr4.Runtime;
+﻿using Antlr4.Runtime;
+using Antlr4.Runtime.Misc;
 using Reductech.EDR.Core.Internal.Errors;
 
 namespace Reductech.EDR.Core.Parser
 {
+
     /// <summary>
-    /// The position in a sequence text.
+    /// A position within a piece of text.
     /// </summary>
-    public sealed class TextPosition : IErrorLocation
+    public sealed record TextPosition(int Line, int Column, int Index)
     {
         /// <summary>
         /// Create a TextPosition from a token
         /// </summary>
-        public TextPosition(IToken token) : this(token.Text, token.StartIndex, token.StopIndex) { }
+        public TextPosition(IToken token) : this(token.Line, token.Column, token.StartIndex){}
+        /// <inheritdoc />
+        public override string ToString() => $"Line: {Line}, Col: {Column}, Idx: {Index}";
 
         /// <summary>
-        /// Create a TextPosition from a parserRuleContext
+        /// Create a TextPosition Stop
         /// </summary>
-        public TextPosition(ParserRuleContext parserRuleContext) : this(
-            parserRuleContext.GetText(),
-            parserRuleContext.Start.StartIndex,
-            parserRuleContext.Stop.StopIndex)
-        { }
+        public static TextPosition CreateStop(IToken token) => new(token.Line,
+            token.Column + (token.StopIndex - token.StartIndex), token.StopIndex);
+    }
+
+    /// <summary>
+    /// A location within a piece of text
+    /// </summary>
+    public sealed record TextLocation(string Text, TextPosition Start, TextPosition Stop) : IErrorLocation
+    {
         /// <summary>
-        /// Create a TextPosition from a string and a position
+        /// Create a textLocation from a token
         /// </summary>
-        public TextPosition(string text, int startIndex, int stopIndex)
-        {
-            Text = text;
-            StartIndex = startIndex;
-            StopIndex = stopIndex;
-        }
+        public TextLocation(IToken token) : this(
+            token.Text,
+            new TextPosition(token),
+            TextPosition.CreateStop(token)) {}
 
         /// <summary>
-        /// The text
+        /// Create a textLocation from a context
         /// </summary>
-        public string Text { get; }
+        public TextLocation(ParserRuleContext context) :
+            this(GetSourceText(context), new TextPosition(context.Start), TextPosition.CreateStop(context.Stop)) {}
 
-        /// <summary>
-        /// The start index
-        /// </summary>
-        public int StartIndex { get; }
-        /// <summary>
-        /// The stop index
-        /// </summary>
-        public int StopIndex { get; }
+        /// <inheritdoc />
+        public bool Equals(IErrorLocation? other) => other is TextLocation tl && Equals(tl);
+
+        /// <inheritdoc />
+        public string AsString => $"{Start} - {Stop} Text: {Text}";
 
         /// <inheritdoc />
         public override string ToString() => AsString;
 
-
-        /// <inheritdoc />
-        public bool Equals(IErrorLocation? other)
+        static string GetSourceText(ParserRuleContext context)
         {
-            return other is TextPosition tp &&
-                   Text == tp.Text && StartIndex == tp.StartIndex && StopIndex == tp.StopIndex;
+            var text = context.Start.TokenSource.InputStream.GetText(new Interval(context.Start.StartIndex, context.Stop.StopIndex));
+            return text;
         }
-
-        /// <inheritdoc />
-        public override bool Equals(object? obj) => obj is TextPosition other && Equals(other);
-
-        /// <inheritdoc />
-        public override int GetHashCode() => HashCode.Combine(Text, StartIndex, StopIndex);
-
-        /// <inheritdoc />
-        public string AsString => (Text, StartIndex, StopIndex).ToString();
     }
 }

@@ -34,30 +34,27 @@ namespace Reductech.EDR.Core.Tests
                 yield return new DeserializationErrorCase("", ("Sequence is empty.", EntireSequenceLocation.Instance.AsString));
 
                 yield return new DeserializationErrorCase("- <Entity> = 123\n- Print <Entity>",
-                    ("The Variable <Entity> is Reserved.", "<Entity> = 123"));
+                    ("The type of <Entity> is ambiguous between Integer and Entity.", "Entire Sequence"));
 
-                yield return new DeserializationErrorCase("\"Print 123\"", ("Yaml must represent a step with return type Unit", "\"Print 123\""));
+                yield return new DeserializationErrorCase("\"Print 123\"", ("Yaml must represent a step with return type Unit", "Print 123"));
 
-                yield return new DeserializationErrorCase("'Print 123'", ("Yaml must represent a step with return type Unit", "'Print 123'"));
+                yield return new DeserializationErrorCase("'Print 123'", ("Yaml must represent a step with return type Unit", "Print 123"));
 
 
-                yield return new DeserializationErrorCase("Print Value: Hello Value: World",
-                    ("Duplicate Parameter 'Word'", "Line: 1, Col: 1, Idx: 0 - Line: 4, Col: 5, Idx: 38")
+                yield return new DeserializationErrorCase("Print Value: 'Hello' Value: 'World'",
+                    ("Duplicate Parameter 'Value'", "Line: 1, Col: 0, Idx: 0 - Line: 1, Col: 34, Idx: 34 Text: Print Value: 'Hello' Value: 'World'")
                     );
 
-                yield return new DeserializationErrorCase("Print Value: 'hello' Term: 'world')",
-                ("Unexpected Parameter 'Term' in 'Print'", "Line: 1, Col: 1, Idx: 0 - Line: 1, Col: 38, Idx: 37"));
+                yield return new DeserializationErrorCase("Print Value: 'hello' Term: 'world'",
+                ("Unexpected Parameter 'Term' in 'Print'", "Line: 1, Col: 0, Idx: 0 - Line: 1, Col: 33, Idx: 33 Text: Print Value: 'hello' Term: 'world'"));
 
                 yield return new DeserializationErrorCase("Print(['abc', '123'] == ['abc', '123'])",
-                    ("Cannot compare objects of type 'ListOfString'", "['abc', '123'] == ['abc', '123']"));
+                    ("Cannot compare objects of type 'ListOfStringStream'", "Line: 1, Col: 6, Idx: 6 - Line: 1, Col: 37, Idx: 37 Text: ['abc', '123'] == ['abc', '123']"));
 
-                yield return new DeserializationErrorCase("MyMegaFunction true", ("The step 'MyMegaFunction' does not exist", "MyMegaFunction true"));
+                yield return new DeserializationErrorCase("MyMegaFunction true", ("The step 'MyMegaFunction' does not exist", "Line: 1, Col: 0, Idx: 0 - Line: 1, Col: 18, Idx: 18 Text: MyMegaFunction true"));
 
-                yield return new DeserializationErrorCase("ForEach ['a','b','c'] <char> (Print <char>)",
-                    ("'ForEach( Array = ['a','b','c'], Variable = <char>, Action = Print(Value = <char>))' is a 'String' but it should be a 'Unit' to be a member of 'Sequence'",
-                        "ForEach ['a','b','c'] <char> (Print <char>)")
-                );
 
+                yield return new DeserializationErrorCase("Print (2 + 2", ("missing ')' at '<EOF>'", "Line: 1, Col: 12, Idx: 12 - Line: 1, Col: 11, Idx: 11 Text: <EOF>"));
             }
         }
 
@@ -84,7 +81,7 @@ namespace Reductech.EDR.Core.Tests
                     .Bind(x=>x.TryFreeze(sfs))
                     .Bind(SequenceRunner.ConvertToUnitStep);
 
-                result.ShouldBeFailure();
+                result.IsFailure.Should().BeTrue("Case should fail");
 
                 var realErrorPairs =
                     result.Error.GetAllErrors().Select(x => (x.Message, x.Location.AsString)).ToArray();

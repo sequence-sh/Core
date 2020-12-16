@@ -46,11 +46,11 @@ namespace Reductech.EDR.Core.Internal.Errors
         /// <summary>
         /// Add a FreezableStepErrorLocation
         /// </summary>
-        public static IError WithLocation(this IErrorBuilder errorBuilder, IStepFactory factory, FreezableStepData data)=> errorBuilder.WithLocation(new FreezableStepErrorLocation(factory, data));
+        public static IError WithLocation(this IErrorBuilder errorBuilder,FreezableStepData data)=> errorBuilder.WithLocation(data.Location);
 
         /// <summary>
         /// Add a YamlRegionErrorLocation
         /// </summary>
-        public static IError WithLocation(this IErrorBuilder errorBuilder, TextPosition token) => errorBuilder.WithLocation(token);
+        public static IError WithLocation(this IErrorBuilder errorBuilder, TextLocation token) => errorBuilder.WithLocation(token);
     }
 }
