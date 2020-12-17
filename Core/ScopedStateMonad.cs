@@ -31,7 +31,13 @@ namespace Reductech.EDR.Core
         }
 
         /// <inheritdoc />
-        public void Dispose() {}
+        public void Dispose()
+        {
+            foreach (var disposable in _scopedStateDictionary.Values.OfType<IDisposable>())
+            {
+                disposable.Dispose();
+            }
+        }
 
         private readonly ConcurrentDictionary<VariableName, object> _scopedStateDictionary;
 
