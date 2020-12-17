@@ -13,6 +13,7 @@ namespace Reductech.EDR.Core.Steps
     /// <summary>
     /// Gets the value of a property from an entity
     /// </summary>
+    [Alias("From")]
     public sealed class EntityGetValue : CompoundStep<StringStream>
     {
         /// <inheritdoc />
@@ -52,6 +53,7 @@ namespace Reductech.EDR.Core.Steps
         /// </summary>
         [StepProperty(2)]
         [Required]
+        [Alias("Get")]
         public IStep<StringStream> Property { get; set; } = null!;
 
         /// <inheritdoc />

@@ -15,6 +15,7 @@ namespace Reductech.EDR.Core.Steps
     /// Returns a copy of the entity with this property set.
     /// Will add a new property if the property is not already present.
     /// </summary>
+    [Alias("In")]
     public sealed class EntitySetValue<T> : CompoundStep<Entity>
     {
         /// <inheritdoc />
@@ -54,6 +55,7 @@ namespace Reductech.EDR.Core.Steps
         /// </summary>
         [StepProperty(2)]
         [Required]
+        [Alias("Set")]
         public IStep<StringStream> Property { get; set; } = null!;
 
         /// <summary>
@@ -61,8 +63,8 @@ namespace Reductech.EDR.Core.Steps
         /// </summary>
         [StepProperty(3)]
         [Required]
+        [Alias("To")]
         public IStep<T> Value { get; set; } = null!;
-
 
         /// <inheritdoc />
         public override IStepFactory StepFactory => EntitySetValueStepFactory.Instance;
@@ -74,7 +76,7 @@ namespace Reductech.EDR.Core.Steps
     /// </summary>
     public sealed class EntitySetValueStepFactory : GenericStepFactory
     {
-        private EntitySetValueStepFactory() {}
+        private EntitySetValueStepFactory() { }
 
         /// <summary>
         /// The instance.
