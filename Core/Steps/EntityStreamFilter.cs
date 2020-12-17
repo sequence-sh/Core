@@ -27,7 +27,7 @@ namespace Reductech.EDR.Core.Steps
 
             async Task<Maybe<Entity>> FilterAction(Entity record)
             {
-                var scopedMonad = new ScopedStateMonad(stateMonad, currentState,
+                using var scopedMonad = new ScopedStateMonad(stateMonad, currentState,
                     new KeyValuePair<VariableName, object>(VariableName.Entity, record));
 
                 var result = await Predicate.Run(scopedMonad, cancellationToken);

@@ -43,10 +43,8 @@ namespace Reductech.EDR.Core.Steps
 
             async Task RunAction(Entity record)
             {
-                var scopedMonad = new ScopedStateMonad(stateMonad, currentState,
+                using var scopedMonad = new ScopedStateMonad(stateMonad, currentState,
                     new KeyValuePair<VariableName, object>(VariableName.Entity, record));
-
-
                 var result = await Action.Run(scopedMonad, cancellationToken);
 
                 if (result.IsFailure)
