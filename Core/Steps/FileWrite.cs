@@ -13,7 +13,7 @@ namespace Reductech.EDR.Core.Steps
     /// <summary>
     /// Writes a file to the local file system.
     /// </summary>
-    [Alias("WriteToFile")]
+    [Alias("WriteTo")]
     public sealed class FileWrite : CompoundStep<Unit>
     {
         /// <inheritdoc />
@@ -53,7 +53,7 @@ namespace Reductech.EDR.Core.Steps
         /// </summary>
         [StepProperty(2)]
         [Required]
-        [Alias("ToFile")]
+        [Alias("File")]
         public IStep<StringStream> Path { get; set; } = null!;
 
         /// <inheritdoc />
