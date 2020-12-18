@@ -33,6 +33,10 @@ namespace Reductech.EDR.Core.Steps
                 stringToPrint = entity.Serialize();
             else if (r.Value is StringStream ss)
                 stringToPrint = await ss.GetStringAsync();
+            else if (r.Value is DateTime dt)
+                stringToPrint = dt.ToString("O");
+            else if (r.Value is double d)
+                stringToPrint = d.ToString("G17");
             else
                 stringToPrint = r.Value?.ToString()!;
 
