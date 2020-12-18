@@ -21,7 +21,6 @@ namespace Reductech.EDR.Core.Steps
             var entityStreamResult = await EntityStream.Run(stateMonad, cancellationToken);
             if (entityStreamResult.IsFailure) return entityStreamResult.ConvertFailure<AsyncList<Entity>>();
 
-
             var currentState = stateMonad.GetState().ToImmutableDictionary();
 
             async ValueTask<Entity> Action(Entity record)
@@ -55,7 +54,6 @@ namespace Reductech.EDR.Core.Steps
         [StepProperty(2)]
         [Required]
         public IStep<Entity> Function { get; set; } = null!;
-
 
         /// <inheritdoc />
         public override IStepFactory StepFactory => EntityMapStepFactory.Instance;

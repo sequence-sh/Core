@@ -13,6 +13,7 @@ namespace Reductech.EDR.Core.Steps
     /// <summary>
     /// Filter entities according to a function.
     /// </summary>
+    [Alias("FilterEntityStream")]
     public sealed class EntityStreamFilter : CompoundStep<AsyncList<Entity>>
     {
         /// <inheritdoc />

@@ -12,6 +12,7 @@ namespace Reductech.EDR.Core.Steps
     /// <summary>
     /// Checks if an entity has a particular property.
     /// </summary>
+    [Alias("DoesEntityHave")]
     public sealed class EntityHasProperty : CompoundStep<bool>
     {
         /// <inheritdoc />

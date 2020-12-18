@@ -15,6 +15,8 @@ namespace Reductech.EDR.Core.Steps
     /// <summary>
     /// Combine Paths
     /// </summary>
+    [Alias("JoinPath")]
+    [Alias("ResolvePath")]
     public sealed class PathCombine : CompoundStep<StringStream>
     {
         /// <inheritdoc />

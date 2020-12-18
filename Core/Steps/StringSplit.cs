@@ -15,6 +15,7 @@ namespace Reductech.EDR.Core.Steps
     /// <summary>
     /// Splits a string.
     /// </summary>
+    [Alias("SplitString")]
     public sealed class StringSplit : CompoundStep<AsyncList<StringStream>>
     {
         /// <summary>
@@ -49,7 +50,6 @@ namespace Reductech.EDR.Core.Steps
                 .Split(new[] {delimiterResult.Value}, StringSplitOptions.None)
                 .Select(x => new StringStream(x))
                 .ToList().ToAsyncList();
-
 
             return results;
         }

@@ -13,6 +13,7 @@ namespace Reductech.EDR.Core.Steps
     /// <summary>
     /// Extract a file in the file system.
     /// </summary>
+    [Alias("ExtractFile")]
     public class FileExtract : CompoundStep<Unit>
     {
         /// <inheritdoc />
@@ -46,6 +47,7 @@ namespace Reductech.EDR.Core.Steps
         /// </summary>
         [StepProperty(1)]
         [Required]
+        [Alias("Container")]
         public IStep<StringStream> ArchiveFilePath { get; set; } = null!;
 
         /// <summary>
@@ -53,6 +55,7 @@ namespace Reductech.EDR.Core.Steps
         /// </summary>
         [StepProperty(2)]
         [Required]
+        [Alias("ToDirectory")]
         public IStep<StringStream> Destination { get; set; } = null!;
 
         /// <summary>

@@ -12,6 +12,7 @@ namespace Reductech.EDR.Core.Steps
     /// <summary>
     /// Returns whether a directory on the file system exists.
     /// </summary>
+    [Alias("DoesDirectoryExist")]
     public class DirectoryExists : CompoundStep<bool>
     {
         /// <summary>
@@ -19,6 +20,7 @@ namespace Reductech.EDR.Core.Steps
         /// </summary>
         [StepProperty(1)]
         [Required]
+        [Alias("Directory")]
         public IStep<StringStream> Path { get; set; } = null!;
 
         /// <inheritdoc />
