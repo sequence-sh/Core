@@ -14,6 +14,7 @@ namespace Reductech.EDR.Core.Steps
     /// Creates a new directory in the file system.
     /// Will create all directories and subdirectories in the specified path unless they already exist.
     /// </summary>
+    [Alias("mkdir")]
     public class CreateDirectory : CompoundStep<Unit>
     {
         /// <inheritdoc />
@@ -32,16 +33,14 @@ namespace Reductech.EDR.Core.Steps
 
             return r;
         }
-
-
+        
         /// <summary>
         /// The path to the directory to create.
         /// </summary>
         [StepProperty(1)]
         [Required]
         public IStep<StringStream> Path { get; set; } = null!;
-
-
+        
         /// <inheritdoc />
         public override IStepFactory StepFactory => CreateDirectoryStepFactory.Instance;
     }
