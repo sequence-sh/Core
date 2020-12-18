@@ -10,10 +10,10 @@ using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
-    public class WriteFileTests : StepTestBase<FileWrite, Unit>
+    public class FileWriteTests : StepTestBase<FileWrite, Unit>
     {
         /// <inheritdoc />
-        public WriteFileTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
+        public FileWriteTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
         {
         }
 
@@ -26,8 +26,6 @@ namespace Reductech.EDR.Core.Tests.Steps
                     {
                         Path =  Constant("Filename.txt"),
                         Stream = Constant("Hello World")
-
-
                     },Unit.Default)
                     .WithFileSystemAction(x=>x.Setup(a=>
                         a.WriteFileAsync("Filename.txt",

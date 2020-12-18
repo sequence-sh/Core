@@ -12,10 +12,10 @@ using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
-    public class ReadFileTests : StepTestBase<FileRead, StringStream>
+    public class FileReadTests : StepTestBase<FileRead, StringStream>
     {
         /// <inheritdoc />
-        public ReadFileTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper) { }
+        public FileReadTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper) { }
 
         /// <inheritdoc />
         protected override IEnumerable<StepCase> StepCases
@@ -49,14 +49,14 @@ namespace Reductech.EDR.Core.Tests.Steps
                     x.Setup(a=>a.ReadFile("File.txt"))
                         .Returns(new MemoryStream(Encoding.ASCII.GetBytes("Hello World"))));
 
-                yield return new DeserializeCase("Ordered Args", "Print (FileRead  'File.txt')",
+                yield return new DeserializeCase("Ordered Args", "Print (FileRead 'File.txt')",
                     Unit.Default,
                     "Hello World"
                 ).WithFileSystemAction(x =>
                     x.Setup(a => a.ReadFile("File.txt"))
                         .Returns(new MemoryStream(Encoding.ASCII.GetBytes("Hello World"))));
 
-                yield return new DeserializeCase("Alias args", "Print Value: (FileRead FromPath: 'File.txt')",
+                yield return new DeserializeCase("Alias", "Print Value: (ReadFromFile Path: 'File.txt')",
                     Unit.Default,
                     "Hello World"
                 ).WithFileSystemAction(x =>

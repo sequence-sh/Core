@@ -53,7 +53,6 @@ namespace Reductech.EDR.Core.Steps
         /// </summary>
         [StepProperty(2)]
         [Required]
-        [Alias("File")]
         public IStep<StringStream> Path { get; set; } = null!;
 
         /// <inheritdoc />
