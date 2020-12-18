@@ -51,8 +51,7 @@ namespace Reductech.EDR.Core.Internal
         /// <summary>
         /// SerializeAsync this step.
         /// </summary>
-        /// <param name="cancellationToken"></param>
-        Task<string> SerializeAsync(CancellationToken cancellationToken);
+        string Serialize();
 
     }
 

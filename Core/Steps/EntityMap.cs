@@ -5,7 +5,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Attributes;
-using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
 
@@ -14,18 +13,18 @@ namespace Reductech.EDR.Core.Steps
     /// <summary>
     /// Apply a function to every entity in an entity stream.
     /// </summary>
-    public sealed class EntityMap : CompoundStep<EntityStream>
+    public sealed class EntityMap : CompoundStep<AsyncList<Entity>>
     {
         /// <inheritdoc />
-        public override async Task<Result<EntityStream, IError>> Run(IStateMonad stateMonad, CancellationToken cancellationToken)
+        public override async Task<Result<AsyncList<Entity>, IError>> Run(IStateMonad stateMonad, CancellationToken cancellationToken)
         {
             var entityStreamResult = await EntityStream.Run(stateMonad, cancellationToken);
-            if (entityStreamResult.IsFailure) return entityStreamResult.ConvertFailure<EntityStream>();
+            if (entityStreamResult.IsFailure) return entityStreamResult.ConvertFailure<AsyncList<Entity>>();
 
 
             var currentState = stateMonad.GetState().ToImmutableDictionary();
 
-            async ValueTask<Entity> SelectAction(Entity record)
+            async ValueTask<Entity> Action(Entity record)
             {
                 using var scopedMonad = new ScopedStateMonad(stateMonad, currentState,
                     new KeyValuePair<VariableName, object>(VariableName.Entity, record));
@@ -38,7 +37,7 @@ namespace Reductech.EDR.Core.Steps
                 return result.Value;
             }
 
-            var newStream = entityStreamResult.Value.Apply(SelectAction);
+            var newStream = entityStreamResult.Value.SelectAwait(Action);
 
             return newStream;
         }
@@ -48,7 +47,7 @@ namespace Reductech.EDR.Core.Steps
         /// </summary>
         [StepProperty(1)]
         [Required]
-        public IStep<EntityStream> EntityStream { get; set; } = null!;
+        public IStep<AsyncList<Entity>> EntityStream { get; set; } = null!;
 
         /// <summary>
         /// A function to get the mapped entity, using the variable &lt;Entity&gt;
@@ -65,13 +64,13 @@ namespace Reductech.EDR.Core.Steps
     /// <summary>
     /// Apply a function to every entity in an entity stream.
     /// </summary>
-    public sealed class EntityMapStepFactory : SimpleStepFactory<EntityMap, EntityStream>
+    public sealed class EntityMapStepFactory : SimpleStepFactory<EntityMap, AsyncList<Entity>>
     {
         private EntityMapStepFactory() {}
 
         /// <summary>
         /// The instance.
         /// </summary>
-        public static SimpleStepFactory<EntityMap, EntityStream> Instance { get; } = new EntityMapStepFactory();
+        public static SimpleStepFactory<EntityMap, AsyncList<Entity>> Instance { get; } = new EntityMapStepFactory();
     }
 }

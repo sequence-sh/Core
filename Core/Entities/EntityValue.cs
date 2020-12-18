@@ -34,58 +34,59 @@ namespace Reductech.EDR.Core.Entities
         /// </summary>
         public static EntityValue CreateFromObject(object? argValue, char? multiValueDelimiter = null)
         {
-            if (argValue == null) //TODO convert to switch statement (this is not supported by stryker at the moment)
+            switch (argValue)
             {
-                return new EntityValue(DBNull.Value);
-            }
-            else if (argValue is StringStream ss1)
-            {
-                return Create(ss1.GetString(), multiValueDelimiter);
-            }
-            else if (argValue is string s)
-            {
-                return Create(s, multiValueDelimiter);
-            }
-            else if (argValue is int i)
-            {
-                return new EntityValue(i);
-            }
-            else if (argValue is bool b)
-            {
-                return new EntityValue(b);
-            }
-            else if (argValue is double d)
-            {
-                return new EntityValue(d);
-            }
-            else if (argValue is Enumeration e1)
-            {
-                return new EntityValue(e1);
-            }
-            else if (argValue is DateTime dt)
-            {
-                return new EntityValue(dt);
-            }
-            else if (argValue is Entity entity)
-            {
-                return new EntityValue(entity);
-            }
-            else if (argValue is IEnumerable e2)
-            {
-                var newEnumerable = e2.Cast<object>().Select(v=>CreateFromObject(v, multiValueDelimiter)).ToImmutableList();
-                if(!newEnumerable.Any())
+                //TODO convert to switch statement (this is not supported by stryker at the moment)
+                case null:
                     return new EntityValue(DBNull.Value);
-                return new EntityValue(newEnumerable);
-            }
-            else if (argValue is IResult)
-            {
-                throw new ArgumentException(
-                    "Attempt to set EntityValue to a Result - you should check the result for failure and then set it to the value of the result",
-                    nameof(argValue));
-            }
-            else
-            {
-                return new EntityValue(argValue.ToString()!);
+                case StringStream ss1:
+                    return Create(ss1.GetString(), multiValueDelimiter);
+                case string s:
+                    return Create(s, multiValueDelimiter);
+                case int i:
+                    return new EntityValue(i);
+                case bool b:
+                    return new EntityValue(b);
+                case double d:
+                    return new EntityValue(d);
+                case Enumeration e1:
+                    return new EntityValue(e1);
+                case DateTime dt:
+                    return new EntityValue(dt);
+                case Enum e:
+                    return new EntityValue(new Enumeration(e.GetType().Name, e.ToString()));
+                //case IAsyncList asyncList:
+                //{
+                //    var objectsResult = asyncList.GetObjects();
+                //    if (objectsResult.IsFailure) throw new ArgumentException(objectsResult.Error.AsString);
+
+                //    var newEnumerable = objectsResult.Value.Select(v => CreateFromObject(v, multiValueDelimiter)).ToImmutableList();
+                //    if (!newEnumerable.Any())
+                //        return new EntityValue(DBNull.Value);
+                //    return new EntityValue(newEnumerable);
+                //    }
+                //else if (argValue is IAsyncList asyncList)
+                //{
+                //    var newEnumerable = asyncList.AsEnumerable().Select(v => CreateFromObject(v, multiValueDelimiter)).ToImmutableList();
+                //    if (!newEnumerable.Any())
+                //        return new EntityValue(DBNull.Value);
+                //    return new EntityValue(newEnumerable);
+                //}
+                case Entity entity:
+                    return new EntityValue(entity);
+                case IEnumerable e2:
+                {
+                    var newEnumerable = e2.Cast<object>().Select(v=>CreateFromObject(v, multiValueDelimiter)).ToImmutableList();
+                    if(!newEnumerable.Any())
+                        return new EntityValue(DBNull.Value);
+                    return new EntityValue(newEnumerable);
+                }
+                case IResult:
+                    throw new ArgumentException(
+                        "Attempt to set EntityValue to a Result - you should check the result for failure and then set it to the value of the result",
+                        nameof(argValue));
+                default:
+                    throw new ArgumentException($"Attempt to set EntityValue to {argValue.GetType().Name}");
             }
 
             static EntityValue Create(string s, char? multiValueDelimiter)

@@ -3,7 +3,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Attributes;
-using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Parser;
@@ -14,10 +13,10 @@ namespace Reductech.EDR.Core.Steps
     /// Extracts entities from a CSV file.
     /// The same as FromConcordance but with different default values.
     /// </summary>
-    public sealed class FromCSV : CompoundStep<EntityStream>
+    public sealed class FromCSV : CompoundStep<AsyncList<Entity>>
     {
         /// <inheritdoc />
-        public override async Task<Result<EntityStream, IError>> Run(IStateMonad stateMonad,
+        public override async Task<Result<AsyncList<Entity>, IError>> Run(IStateMonad stateMonad,
             CancellationToken cancellationToken)
         {
             var result = await CSVReader.ReadCSV(
@@ -87,13 +86,13 @@ namespace Reductech.EDR.Core.Steps
     /// Extracts entities from a CSV Stream
     /// The same as FromConcordance but with different default values.
     /// </summary>
-    public sealed class FromCSVStepFactory : SimpleStepFactory<FromCSV, EntityStream>
+    public sealed class FromCSVStepFactory : SimpleStepFactory<FromCSV, AsyncList<Entity>>
     {
         private FromCSVStepFactory() { }
 
         /// <summary>
         /// The instance.
         /// </summary>
-        public static SimpleStepFactory<FromCSV, EntityStream> Instance { get; } = new FromCSVStepFactory();
+        public static SimpleStepFactory<FromCSV, AsyncList<Entity>> Instance { get; } = new FromCSVStepFactory();
     }
 }

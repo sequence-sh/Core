@@ -28,11 +28,11 @@ namespace Reductech.EDR.Core.Tests.Steps
                     {
                         Value = new ToConcordance()
                         {
-                            Entities =  Constant(EntityStream.Create(
+                            Entities =  Array(
                                     CreateEntity(("Foo", "Hello"), ("Bar", "World")),
                                     CreateEntity(("Foo", "Hello 2"), ("Bar", "World 2"))
 
-                                ))
+                                )
                         }
                     }, Unit.Default,
                     $"þFooþþBarþ{ Environment.NewLine }þHelloþþWorldþ{ Environment.NewLine }þHello 2þþWorld 2þ{Environment.NewLine}"
@@ -44,10 +44,10 @@ namespace Reductech.EDR.Core.Tests.Steps
                     {
                         Value = new ToConcordance
                         {
-                            Entities =  Constant(EntityStream.Create(
+                            Entities =  Array(
                                 Entity.Create(("Foo", "Hello"), ("Bar", new[] { "World", "Earth" })),
                                 Entity.Create(("Foo", "Hello 2"), ("Bar", new[] { "World 2", "Earth 2" }))
-                            ))
+                            )
                         }
                     }, Unit.Default,
                     $"þFooþþBarþ{ Environment.NewLine }þHelloþþWorld|Earthþ{ Environment.NewLine }þHello 2þþWorld 2|Earth 2þ{Environment.NewLine}"

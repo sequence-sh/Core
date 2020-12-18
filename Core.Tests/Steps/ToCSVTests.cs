@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.Parser;
 using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.TestHarness;
@@ -28,11 +27,11 @@ namespace Reductech.EDR.Core.Tests.Steps
                     {
                         Value = new ToCSV
                         {
-                            Entities =  Constant(EntityStream.Create(
+                            Entities =  Array(
                                             CreateEntity(("Foo", "Hello"), ("Bar", "World")),
                                             CreateEntity(("Foo", "Hello 2"), ("Bar", "World 2"))
 
-                                        ))
+                                        )
                         }
                     }, Unit.Default,
                     $"Foo,Bar{Environment.NewLine}Hello,World{Environment.NewLine}Hello 2,World 2{Environment.NewLine}"
@@ -44,11 +43,11 @@ namespace Reductech.EDR.Core.Tests.Steps
                     {
                         Value = new ToCSV
                         {
-                            Entities =  Constant(EntityStream.Create(
+                            Entities =  Array(
                                             CreateEntity(("Foo", "Hello"), ("Bar", "World")),
                                             CreateEntity(("Foo", "Hello 2"), ("Bar", "World 2"))
 
-                                        )),
+                                        ),
                             Delimiter = Constant("\t")
                         }
                     }, Unit.Default,

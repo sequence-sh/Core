@@ -32,14 +32,14 @@ namespace Reductech.EDR.Core.Parser
         /// <inheritdoc />
         public override string ToString() => Name;
 
-        private readonly SemaphoreSlim _semaphore = new SemaphoreSlim(1);
+        private readonly SemaphoreSlim _semaphore = new(1);
 
 
         /// <summary>
         /// If this is a string, the string.
         /// If this is a stream, "StringStream"
         /// </summary>
-        public string Name => Value.Match(x => x, x => "StringStream");
+        public string Name => Value.Match(x => x, _ => "StringStream");
 
 
         /// <summary>
@@ -141,10 +141,9 @@ namespace Reductech.EDR.Core.Parser
         /// <summary>
         /// SerializeAsync this DataStream
         /// </summary>
-        public async Task<string> SerializeAsync(CancellationToken cancellationToken)
+        public string Serialize()
         {
-            var s = await GetStringAsync();
-
+            var s = GetString();
             var text = SerializationMethods.DoubleQuote(s);
 
             return text;

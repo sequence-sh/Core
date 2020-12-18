@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
@@ -21,7 +20,7 @@ namespace Reductech.EDR.Core.Steps
         /// </summary>
         [StepProperty(1)]
         [Required]
-        public IStep<List<T>> Array { get; set; } = null!;
+        public IStep<AsyncList<T>> Array { get; set; } = null!;
 
         /// <summary>
         /// The element to look for.
@@ -41,9 +40,9 @@ namespace Reductech.EDR.Core.Steps
 
             if (elementResult.IsFailure) return elementResult.ConvertFailure<int>();
 
-            var r = arrayResult.Value.IndexOf(elementResult.Value);
+            var indexResult = await arrayResult.Value.IndexOfAsync(elementResult.Value, cancellationToken);
 
-            return r;
+            return indexResult;
         }
 
         /// <inheritdoc />

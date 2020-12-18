@@ -28,7 +28,7 @@ namespace Reductech.EDR.Core
         /// </summary>
         public static async Task<Result<StringStream, IError>> WriteCSV(
             IStateMonad stateMonad,
-            IStep<EntityStream> entityStream,
+            IStep<AsyncList<Entity>> entityStream,
             IStep<StringStream> delimiter,
             IStep<EncodingEnum> encoding,
             IStep<StringStream> quoteCharacter,
@@ -88,7 +88,7 @@ namespace Reductech.EDR.Core
         /// Writes entities from an entityStream to a stream in csv format.
         /// </summary>
         public static async Task<Result<Stream, IError>> WriteCSV(
-            EntityStream entityStream,
+            AsyncList<Entity> entityStream,
             Encoding encoding,
             string delimiter,
             char? quoteCharacter,
@@ -97,10 +97,9 @@ namespace Reductech.EDR.Core
             string dateTimeFormat,
             CancellationToken cancellationToken)
         {
-            var results = await entityStream.TryGetResultsAsync(cancellationToken);
+            var results = await entityStream.GetElementsAsync(cancellationToken);
 
-            if (results.IsFailure)
-                return results.ConvertFailure<Stream>();
+            if (results.IsFailure) return results.ConvertFailure<Stream>();
 
             var stream = new MemoryStream();
 
@@ -131,7 +130,7 @@ namespace Reductech.EDR.Core
 
             var records = results.Value.Select(x => ConvertToObject(x, multiValueDelimiter, dateTimeFormat));
 
-            await writer.WriteRecordsAsync(records);
+            await writer.WriteRecordsAsync(records); //TODO pass an async enumerable
 
             await textWriter.FlushAsync();
 

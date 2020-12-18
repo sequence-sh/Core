@@ -59,7 +59,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                         Index = Constant(-1),
                         Array = Array( ("Hello"),  ("World"))
                     },
-                    new ErrorBuilder("Index was out of the range of the array.", ErrorCode.IndexOutOfBounds)
+                    new ErrorBuilder("Index was less than zero.", ErrorCode.IndexOutOfBounds)
                     );
 
                 yield return new ErrorCase("Index too big",

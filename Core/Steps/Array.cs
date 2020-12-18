@@ -15,15 +15,15 @@ namespace Reductech.EDR.Core.Steps
     /// <summary>
     /// Represents an ordered collection of objects.
     /// </summary>
-    public sealed class Array<T> : CompoundStep<List<T>>
+    public sealed class Array<T> : CompoundStep<AsyncList<T>>
     {
         /// <inheritdoc />
-        public override async Task<Result<List<T>, IError>> Run(IStateMonad stateMonad,
+        public override async Task<Result<AsyncList<T>, IError>> Run(IStateMonad stateMonad,
             CancellationToken cancellationToken)
         {
             var result = await Elements.Select(x => x.Run(stateMonad, cancellationToken))
                 .Combine(ErrorList.Combine)
-                .Map(x => x.ToList());
+                .Map(x => x.ToList().ToAsyncList());
 
             return result;
         }
@@ -58,10 +58,10 @@ namespace Reductech.EDR.Core.Steps
         public override Type StepType => typeof(Array<>);
 
         /// <inheritdoc />
-        public override string OutputTypeExplanation => "List<T>";
+        public override string OutputTypeExplanation => "ArrayList<T>";
 
         /// <inheritdoc />
-        protected override ITypeReference GetOutputTypeReference(ITypeReference memberTypeReference) => new GenericTypeReference(typeof(List<>), new[] { memberTypeReference });
+        protected override ITypeReference GetOutputTypeReference(ITypeReference memberTypeReference) => new GenericTypeReference(typeof(AsyncList<>), new[] { memberTypeReference });
 
         /// <inheritdoc />
         protected override Result<ITypeReference, IError> GetMemberType(FreezableStepData freezableStepData, TypeResolver typeResolver)
@@ -84,7 +84,7 @@ namespace Reductech.EDR.Core.Steps
         /// </summary>
         public static Array<T> CreateArray<T>(List<IStep<T>> stepList)
         {
-            return new Array<T>()
+            return new()
             {
                 Elements = stepList
             };

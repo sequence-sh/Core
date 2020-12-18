@@ -40,8 +40,7 @@ namespace Reductech.EDR.Core.Internal
         {
             var r=
             stepFactoryStore.Dictionary.TryFindOrFail(StepName,
-                () => ErrorHelper.MissingStepError(StepName).WithLocation(FreezableStepData.Location)
-            );
+                () => ErrorHelper.MissingStepError(StepName).WithLocation(FreezableStepData.Location));
 
             return r;
         }

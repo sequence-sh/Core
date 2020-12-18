@@ -26,7 +26,7 @@ namespace Reductech.EDR.Core.Serialization
 
 
         /// <inheritdoc />
-        public async Task<string> SerializeAsync(IEnumerable<StepProperty> stepProperties, CancellationToken cancellationToken)
+        public string Serialize(IEnumerable<StepProperty> stepProperties)
         {
             var sb = new StringBuilder();
             sb.Append(Name);
@@ -38,7 +38,7 @@ namespace Reductech.EDR.Core.Serialization
                 sb.Append(stepProperty.Name);
                 sb.Append(": ");
 
-                var value = await stepProperty.SerializeValueAsync(cancellationToken);
+                var value = stepProperty.Serialize();
 
                 sb.Append(value );
             }

@@ -13,7 +13,7 @@ namespace Reductech.EDR.Core.Serialization
         /// <summary>
         /// SerializeAsync a step according to it's properties.
         /// </summary>
-        Task<string> SerializeAsync(IEnumerable<StepProperty> stepProperties, CancellationToken cancellationToken);
+        string Serialize(IEnumerable<StepProperty> stepProperties);
 
     }
 }

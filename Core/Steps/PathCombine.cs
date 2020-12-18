@@ -20,20 +20,18 @@ namespace Reductech.EDR.Core.Steps
         /// <inheritdoc />
         public override async Task<Result<StringStream, IError>> Run(IStateMonad stateMonad, CancellationToken cancellationToken)
         {
-            var pathsResult = await Paths.Run(stateMonad, cancellationToken);
+            var pathsResult = await Paths.Run(stateMonad, cancellationToken)
+                    .Bind(x=>x.GetElementsAsync(cancellationToken));
+
             if (pathsResult.IsFailure) return pathsResult.ConvertFailure<StringStream>();
-
-
-            if (pathsResult.Value.Count <= 0)
-                return new StringStream(stateMonad.FileSystemHelper.GetCurrentDirectory());
 
             var paths = new List<string>();
 
-
             foreach (var stringStream in pathsResult.Value)
-            {
                 paths.Add(await stringStream.GetStringAsync());
-            }
+
+            if(!paths.Any())
+                return new StringStream(stateMonad.FileSystemHelper.GetCurrentDirectory());
 
             if (!Path.IsPathFullyQualified(paths[0]))
                 paths = paths.Prepend(stateMonad.FileSystemHelper.GetCurrentDirectory()).ToList();
@@ -48,7 +46,7 @@ namespace Reductech.EDR.Core.Steps
         /// </summary>
         [StepProperty(1)]
         [Required]
-        public IStep<List<StringStream>> Paths { get; set; } = null!;
+        public IStep<AsyncList<StringStream>> Paths { get; set; } = null!;
 
 
         /// <inheritdoc />

@@ -96,7 +96,7 @@ An operator that can be applied to two numbers.
 <a name=""Array<T>""></a>
 ## Array<T>
 
-**List<T>**
+**ArrayList<T>**
 
 Represents an ordered collection of objects.
 

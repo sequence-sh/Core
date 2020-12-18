@@ -1,8 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using Reductech.EDR.Core.Entities;
 
 namespace Reductech.EDR.Core.Serialization
@@ -49,16 +47,6 @@ namespace Reductech.EDR.Core.Serialization
             result = "\"" + result + "\"";
 
             return result;
-        }
-
-        /// <summary>
-        /// Serialize an entityStream
-        /// </summary>
-        public static async Task<string> SerializeAsync(this EntityStream entityStream, CancellationToken cancellationToken)
-        {
-            var enumerable = await entityStream.SourceEnumerable.Select(x=>x.Serialize()) .ToListAsync(cancellationToken);
-
-            return SerializeList(enumerable);
         }
 
 

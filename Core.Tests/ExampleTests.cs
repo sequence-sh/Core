@@ -96,7 +96,7 @@ namespace Reductech.EDR.Core.Tests
             {
                 InitialSteps = new List<IStep<Unit>>
                 {
-                    new SetVariable<EntityStream>
+                    new SetVariable<AsyncList<Entity>>
                     {
                         Variable = new VariableName("EntityStream"),
                         Value = new FromCSV{Stream = new ReadFile{Path = new StringConstant(@"C:\Users\wainw\source\repos\Reductech\edr\Examples\Dinosaurs.csv")}}
@@ -125,7 +125,7 @@ namespace Reductech.EDR.Core.Tests
                         {
                             Entities = new EnforceSchema()
                             {
-                                EntityStream = new GetVariable<EntityStream>(){Variable = new VariableName("EntityStream")},
+                                EntityStream = new GetVariable<AsyncList<Entity>>(){Variable = new VariableName("EntityStream")},
                                 Schema = new GetVariable<Entity>(){Variable = new VariableName("Schema")}
                             }
                         }
@@ -134,7 +134,7 @@ namespace Reductech.EDR.Core.Tests
                 FinalStep = new DoNothing()
             };
 
-            var yaml = await step.SerializeAsync(CancellationToken.None);
+            var yaml = step.Serialize();
 
             TestOutputHelper.WriteLine(yaml);
 

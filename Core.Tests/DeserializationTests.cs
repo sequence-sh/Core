@@ -132,13 +132,7 @@ Print 'Comments!'", "Comments!");
 
                 yield return new DeserializationTestFunction(@"Print(ArrayLength ['abc', '123'])", 2);
 
-                yield return new DeserializationTestFunction(@"
-- <ArrayVar> =  ['abc', '123']
-- Print(ArrayLength <ArrayVar>)", 2);
-
-
-
-
+                yield return new DeserializationTestFunction("- <ArrayVar> =  ['abc', '123']\r\n- Print(ArrayLength <ArrayVar>)", 2);
 
                 yield return new DeserializationTestFunction(@"
 - <ArrayVar> = ['abc', '123']
@@ -156,13 +150,21 @@ Print 'Comments!'", "Comments!");
 
                 yield return new DeserializationTestFunction(@"
 - <ArrayVar> = ['abc', '123']
-- Foreach <ArrayVar> <Element> (Print <Element>)", "abc", "123");
+- Foreach <ArrayVar> (Print <Element>) <Element>", "abc", "123");
+
+                yield return new DeserializationTestFunction(@"
+- <ArrayVar> = [(str: 'abc' num: '123')]
+- Foreach <ArrayVar> (Print <Entity>)", "(str: \"abc\" num: \"123\")");
+
+                yield return new DeserializationTestFunction(@"
+- <ArrayVar> = [(str: 'abc' num: '123')]
+- EntityForeach <ArrayVar> (Print <Entity>)", "(str: \"abc\" num: \"123\")");
 
 
                 yield return new DeserializationTestFunction(@"
 - <ArrayVar1> = ['abc', '123']
 - <ArrayVar2> = (Repeat <ArrayVar1> 2)
-- Foreach <ArrayVar2> <Element> (Print (ArrayLength <Element>))", "2", "2");
+- Foreach <ArrayVar2> (Print (ArrayLength <Element>)) <Element>", "2", "2");
 
                 yield return new DeserializationTestFunction(@"
 - <ArrayVar> = ['abc', 'def']
@@ -226,11 +228,11 @@ Print 'Comments!'", "Comments!");
 
 
 
-                yield return new DeserializationTestFunction(@"ForEach ['a','b','c'] <char> (Print <char>)", "a", "b", "c");
+                yield return new DeserializationTestFunction(@"ForEach ['a','b','c'] (Print <char>) <char>", "a", "b", "c");
                 yield return new DeserializationTestFunction(@"ForEach
 ['a','b','c']
-<char>
-(Print <char>)", "a", "b", "c");
+(Print <char>)
+<char>", "a", "b", "c");
 
 
             }

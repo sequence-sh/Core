@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
@@ -14,6 +15,7 @@ namespace Reductech.EDR.Core.Steps
     /// <summary>
     /// Do an action for each member of the list.
     /// </summary>
+    [Alias("EntityForEach")]
     public sealed class ForEach<T> : CompoundStep<Unit>
     {
         /// <summary>
@@ -21,21 +23,21 @@ namespace Reductech.EDR.Core.Steps
         /// </summary>
         [StepProperty(1)]
         [Required]
-        public IStep<List<T>> Array { get; set; } = null!;
-
-        /// <summary>
-        /// The name of the variable to loop over.
-        /// </summary>
-        [VariableName(2)]
-        [Required]
-        public VariableName Variable { get; set; } //TODO use x
+        public IStep<AsyncList<T>> Array { get; set; } = null!;
 
         /// <summary>
         /// The action to perform repeatedly.
         /// </summary>
-        [StepProperty(3)]
+        [StepProperty(2)]
         [Required]
         public IStep<Unit> Action { get; set; } = null!;
+
+        /// <summary>
+        /// The name of the variable to loop over.
+        /// </summary>
+        [VariableName(3)]
+        [DefaultValueExplanation("<Entity>")]
+        public VariableName Variable { get; set; } = VariableName.Entity;
 
         /// <inheritdoc />
         public override async Task<Result<Unit, IError>> Run(IStateMonad stateMonad,
@@ -44,16 +46,22 @@ namespace Reductech.EDR.Core.Steps
             var elements = await Array.Run(stateMonad, cancellationToken);
             if (elements.IsFailure) return elements.ConvertFailure<Unit>();
 
-            foreach (var element in elements.Value)
-            {
-                var setResult = stateMonad.SetVariable(Variable, element);
-                if (setResult.IsFailure) return setResult.ConvertFailure<Unit>();
+            var currentState = stateMonad.GetState().ToImmutableDictionary();
 
-                var r = await Action.Run(stateMonad, cancellationToken);
-                if (r.IsFailure) return r;
+            async ValueTask<Result<Unit, IError>> Apply(T element, CancellationToken cancellation)
+            {
+                var scopedMonad = new ScopedStateMonad(stateMonad, currentState,
+                    new KeyValuePair<VariableName, object>(Variable, element));
+
+
+                var result = await Action.Run(scopedMonad, cancellation);
+                return result;
             }
 
-            return Unit.Default;
+
+            var finalResult = await elements.Value.ForEach(Apply, cancellationToken);
+
+            return finalResult;
         }
 
         /// <inheritdoc />

@@ -32,11 +32,12 @@ namespace Reductech.EDR.Core.Internal
         /// <inheritdoc />
         public async Task<Result<Entity, IError>> Run(IStateMonad stateMonad, CancellationToken cancellationToken)
         {
-            var pairs = new List<(string, object)>();
+            var pairs = new List<(string, object?)>();
 
             foreach (var (key, step) in Properties)
             {
-                var r = await step.Run<object>(stateMonad, cancellationToken);
+                var r = await step.Run<object>(stateMonad, cancellationToken)
+                    .Bind(x=> EntityHelper.TryUnpackObjectAsync(x, cancellationToken));
 
                 if (r.IsFailure) return r.ConvertFailure<Entity>();
 
@@ -83,7 +84,7 @@ namespace Reductech.EDR.Core.Internal
         public Type OutputType => typeof(Entity);
 
         /// <inheritdoc />
-        public async Task<string> SerializeAsync(CancellationToken cancellationToken)
+        public string Serialize()
         {
             var sb = new StringBuilder();
 
@@ -93,7 +94,7 @@ namespace Reductech.EDR.Core.Internal
 
             foreach (var (key, value) in Properties)
             {
-                var valueString = await value.SerializeAsync(cancellationToken);
+                var valueString = value.Serialize();
 
                 results.Add($"{key}: {valueString}");
             }

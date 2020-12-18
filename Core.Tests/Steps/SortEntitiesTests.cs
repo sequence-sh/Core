@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using Reductech.EDR.Core.Entities;
+using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.TestHarness;
 using Reductech.EDR.Core.Util;
@@ -8,7 +8,7 @@ using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
-    public class SortEntitiesTests : StepTestBase<EntityStreamSort, EntityStream >
+    public class SortEntitiesTests : StepTestBase<EntityStreamSort, AsyncList<Entity>>
     {
         /// <inheritdoc />
         public SortEntitiesTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
@@ -21,18 +21,18 @@ namespace Reductech.EDR.Core.Tests.Steps
             get
             {
                 yield return new StepCase("Ascending",
-                    new EntityForEach
+                    new ForEach<Entity>
                     {
-                        EntityStream = new EntityStreamSort
+                        Array = new EntityStreamSort
                         {
-                            EntityStream =  Constant(EntityStream.Create(
+                            EntityStream = Array(
                                 CreateEntity(("Foo", "Gamma")),
                                 CreateEntity(("Foo", "Alpha")),
-                                CreateEntity(("Foo", "Beta"))
-                            )),
+                                CreateEntity(("Foo", "Beta"))),
                             KeySelector = new EntityGetValue {Entity = GetEntityVariable, Property = Constant("Foo")}
                         },
-                        Action = new Print<Entity> {Value = GetEntityVariable}
+                        Action = new Print<Entity> {Value = GetEntityVariable},
+                        Variable = VariableName.Entity
 
                     }, Unit.Default,
 
@@ -40,20 +40,19 @@ namespace Reductech.EDR.Core.Tests.Steps
                 );
 
                     yield return new StepCase("Descending",
-                    new EntityForEach
+                    new ForEach<Entity>
                     {
-                        EntityStream = new EntityStreamSort
+                        Array = new EntityStreamSort
                         {
                             Descending = Constant(true),
-                            EntityStream =  Constant(EntityStream.Create(
+                            EntityStream = Array(
                                 CreateEntity(("Foo", "Gamma")),
                                 CreateEntity(("Foo", "Alpha")),
-                                CreateEntity(("Foo", "Beta"))
-                            )),
+                                CreateEntity(("Foo", "Beta"))),
                             KeySelector = new EntityGetValue { Entity = GetEntityVariable, Property = Constant("Foo") }
                         },
-                        Action = new Print<Entity> { Value = GetEntityVariable }
-
+                        Action = new Print<Entity> { Value = GetEntityVariable },
+                        Variable = VariableName.Entity
                     }, Unit.Default,
 
                     "(Foo: \"Gamma\")", "(Foo: \"Beta\")", "(Foo: \"Alpha\")"
@@ -61,20 +60,21 @@ namespace Reductech.EDR.Core.Tests.Steps
 
 
                 yield return new StepCase("Missing Property",
-                new EntityForEach
+                new ForEach<Entity>
                 {
-                    EntityStream = new EntityStreamSort
+                    Array = new EntityStreamSort
                     {
                         Descending = Constant(true),
-                        EntityStream =  Constant(EntityStream.Create(
+                        EntityStream = Array(
                             CreateEntity(("Foo", "Gamma")),
                             CreateEntity(("Foo", "Alpha")),
                             CreateEntity(("Foo", "Beta")),
                             CreateEntity(("Bar", "Delta"))
-                        )),
+                        ),
                         KeySelector = new EntityGetValue { Entity = GetEntityVariable, Property = Constant("Foo") }
                     },
-                    Action = new Print<Entity> { Value = GetEntityVariable }
+                    Action = new Print<Entity> { Value = GetEntityVariable },
+                    Variable = VariableName.Entity
 
                 }, Unit.Default,
 

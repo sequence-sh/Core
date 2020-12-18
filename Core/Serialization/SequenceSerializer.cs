@@ -1,8 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Steps;
 
@@ -21,7 +19,7 @@ namespace Reductech.EDR.Core.Serialization
         public static IStepSerializer Instance { get; } = new SequenceSerializer();
 
         /// <inheritdoc />
-        public async Task<string> SerializeAsync(IEnumerable<StepProperty> stepProperties, CancellationToken cancellationToken)
+        public string Serialize(IEnumerable<StepProperty> stepProperties)
         {
             var dict = stepProperties.ToDictionary(x=>x.Name);
 
@@ -30,10 +28,10 @@ namespace Reductech.EDR.Core.Serialization
 
             if (dict.TryGetValue(nameof(Sequence<object>.InitialSteps), out var stepList) && stepList.Value.IsT2)
                 foreach (var step in stepList.Value.AsT2)
-                    sb.AppendLine("- " + await step.SerializeAsync(cancellationToken));
+                    sb.AppendLine("- " + step.Serialize());
 
             if(dict.TryGetValue(nameof(Sequence<object>.FinalStep), out var finalStep) && finalStep.Value.IsT1)
-                sb.AppendLine("- " + await finalStep.Value.AsT1.SerializeAsync(cancellationToken));
+                sb.AppendLine("- " + finalStep.Value.AsT1.Serialize());
 
             var s = sb.ToString();
 

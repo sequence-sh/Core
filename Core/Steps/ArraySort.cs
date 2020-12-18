@@ -1,28 +1,25 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
-using Reductech.EDR.Core.Util;
 
 namespace Reductech.EDR.Core.Steps
 {
     /// <summary>
     /// Reorder an array.
     /// </summary>
-    public sealed class ArraySort<T> : CompoundStep<List<T>>
+    public sealed class ArraySort<T> : CompoundStep<AsyncList<T>>
     {
         /// <summary>
         /// The array to modify.
         /// </summary>
         [StepProperty(1)]
         [Required]
-        public IStep<List<T>> Array { get; set; } = null!;
+        public IStep<AsyncList<T>> Array { get; set; } = null!;
 
         /// <summary>
         /// Whether to sort in descending order.
@@ -32,18 +29,21 @@ namespace Reductech.EDR.Core.Steps
         public IStep<bool> Descending { get; set; } = new BoolConstant(false);
 
         /// <inheritdoc />
-        public override async Task<Result<List<T>, IError>> Run(IStateMonad stateMonad,
+        public override async Task<Result<AsyncList<T>, IError>> Run(IStateMonad stateMonad,
             CancellationToken cancellationToken)
         {
-            return await Array.Run(stateMonad, cancellationToken)
-                .Compose(() => Descending.Run(stateMonad, cancellationToken))
-                .Map(x => Sort(x.Item1, x.Item2));
+            var array = await Array.Run(stateMonad, cancellationToken);
+
+            if (array.IsFailure) return array.ConvertFailure<AsyncList<T>>();
+
+            var descending = await Descending.Run(stateMonad, cancellationToken);
+
+            if (descending.IsFailure) return descending.ConvertFailure<AsyncList<T>>();
+
+            var r = array.Value.Sort(descending.Value);
+
+            return r;
         }
-
-        private static List<T> Sort(IEnumerable<T> list, bool descending) =>
-
-            descending?list.OrderByDescending(x => x).ToList():
-                list.OrderBy(x => x).ToList();
 
         /// <inheritdoc />
         public override IStepFactory StepFactory => ArraySortStepFactory.Instance;
@@ -65,10 +65,10 @@ namespace Reductech.EDR.Core.Steps
         public override Type StepType => typeof(ArraySort<>);
 
         /// <inheritdoc />
-        protected override ITypeReference GetOutputTypeReference(ITypeReference memberTypeReference) => new GenericTypeReference(typeof(List<>), new[] { memberTypeReference });
+        protected override ITypeReference GetOutputTypeReference(ITypeReference memberTypeReference) => new GenericTypeReference(typeof(AsyncList<>), new[] { memberTypeReference });
 
         /// <inheritdoc />
-        public override string OutputTypeExplanation => "List<T>";
+        public override string OutputTypeExplanation => "ArrayList<T>";
 
 
         /// <inheritdoc />

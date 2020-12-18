@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Xunit;
@@ -16,7 +15,9 @@ namespace Reductech.EDR.Core.TestHarness
         {
             get
             {
-                yield return CreateDefaultSerializeCase().Result; //TODO fix the synchronicity
+                var case1 =  CreateDefaultSerializeCase().Result; //TODO fix the synchronicity
+
+                yield return case1;
             }
         }
 
@@ -54,7 +55,7 @@ namespace Reductech.EDR.Core.TestHarness
             /// <inheritdoc />
             public async Task RunCaseAsync(ITestOutputHelper testOutputHelper, string? extraArgument)
             {
-                var realYaml = await Step.SerializeAsync(CancellationToken.None);
+                var realYaml = Step.Serialize();
 
                 testOutputHelper.WriteLine(realYaml);
 

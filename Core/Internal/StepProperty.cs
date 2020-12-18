@@ -1,6 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 using OneOf;
 using Reductech.EDR.Core.Serialization;
 
@@ -41,18 +39,18 @@ namespace Reductech.EDR.Core.Internal
         /// <summary>
         /// Serialize the property value
         /// </summary>
-        public async Task<string> SerializeValueAsync(CancellationToken cancellationToken)
+        public string Serialize()
         {
-            var result = await
-            Value.Match<Task<string>> (vn => Task.FromResult(vn.Serialize()),
-                async x =>
+            var result =
+            Value.Match (vn => vn.Serialize(),
+                 x =>
                 {
-                    var r = await x.SerializeAsync(cancellationToken);
+                    var r = x.Serialize();
                     return r;
                 },
-                async l =>
+                 l =>
                 {
-                    var r = await SerializeList(l);
+                    var r = SerializeList(l);
                     return r;
                 });
 
@@ -62,13 +60,13 @@ namespace Reductech.EDR.Core.Internal
 
             return result;
 
-            async Task<string> SerializeList(IReadOnlyList<IStep> list)
+            string SerializeList(IReadOnlyList<IStep> list)
             {
                 var l = new List<string>();
 
                 foreach (var s in list)
                 {
-                    var r = await s.SerializeAsync(cancellationToken);
+                    var r = s.Serialize();
                     l.Add(r);
                 }
 

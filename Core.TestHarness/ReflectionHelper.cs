@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions.Common;
 using Namotion.Reflection;
@@ -11,11 +10,9 @@ using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Parser;
-using Reductech.EDR.Core.Serialization;
 using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.Util;
 using Xunit.Sdk;
-using Task = System.Threading.Tasks.Task;
 using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 
 namespace Reductech.EDR.Core.TestHarness
@@ -72,7 +69,7 @@ namespace Reductech.EDR.Core.TestHarness
                 }
                 else
                 {
-                    var s = await GetStringAsync((IStep) currentValue);
+                    var s = ((IStep) currentValue).Serialize();
                     values.Add(property.Name, s);
                 }
 
@@ -86,7 +83,7 @@ namespace Reductech.EDR.Core.TestHarness
 
                     foreach (var step in currentValue)
                     {
-                        var s = await GetStringAsync(step);
+                        var s = step.Serialize();// await GetStringAsync(step);
                         elements.Add(s);
                     }
 
@@ -103,7 +100,7 @@ namespace Reductech.EDR.Core.TestHarness
 
                     foreach (var step in newValue)
                     {
-                        var e = await GetStringAsync(step);
+                        var e = step.Serialize();// await GetStringAsync(step);
                         elements.Add(e);
                     }
 
@@ -120,40 +117,51 @@ namespace Reductech.EDR.Core.TestHarness
             }
         }
 
-        private static async Task<string> GetStringAsync(IStep step)
-        {
-            var freezable = step.Unfreeze();
+        //private static async Task<string> GetStringAsync(IStep step)
+        //{
+        //    var freezable = step.Unfreeze();
 
-            if (freezable is IConstantFreezableStep cfs)
-            {
+        //    if (freezable is IConstantFreezableStep cfs)
+        //    {
 
-                return await cfs.SerializeAsync(CancellationToken.None);
-            }
+        //        return cfs.Serialize();
+        //    }
 
-            else if (step is DoNothing)
-            {
-                return DoNothingStepFactory.Instance.TypeName;
-            }
-            else if (freezable is CompoundFreezableStep cs && freezable.StepName == ArrayStepFactory.Instance.TypeName)
-            {
+        //    if (step is DoNothing)
+        //    {
+        //        return DoNothingStepFactory.Instance.TypeName;
+        //    }
 
-                var constants = cs.FreezableStepData
-                    .StepProperties[new StepParameterReference(nameof(Steps.Array<object>.Elements))]
-                    .StepList.Value.Cast<IConstantFreezableStep>();
+        //    if (freezable is CompoundFreezableStep cs && freezable.StepName == ArrayStepFactory.Instance.TypeName)
+        //    {
+        //        var list = new List<string>();
 
-                var list = new List<string>();
+        //        try
+        //        {
+        //            var steps = cs.FreezableStepData
+        //            .StepProperties[new StepParameterReference(nameof(Steps.Array<object>.Elements))]
+        //            .StepList.Value.Cast<IFreezableStep>();
 
-                foreach (var constantFreezableStep in constants)
-                {
-                    var s = await constantFreezableStep.SerializeAsync(CancellationToken.None);
-                    list.Add(s);
-                }
 
-                return SerializationMethods.SerializeList(list);
-            }
 
-            throw new NotImplementedException("Cannot get string from step");
-        }
+        //            foreach (var step1 in steps)
+        //            {
+        //                var s = await step1.Serialize();
+        //                list.Add(s);
+        //            }
+        //        }
+        //        catch (Exception e)
+        //        {
+        //            throw new Exception($"Case Failure 123 {e.Message}");
+        //        }
+
+
+
+        //        return SerializationMethods.SerializeList(list);
+        //    }
+
+        //    throw new NotImplementedException("Cannot get string from step");
+        //}
 
         private static async Task MatchStepPropertyInfoAsync(PropertyInfo stepPropertyInfo,
             Func<PropertyInfo, Task> variableNameAction,
@@ -259,7 +267,7 @@ namespace Reductech.EDR.Core.TestHarness
                 step = Constant(dt);
             }
 
-            else if (outputType == typeof(List<StringStream>))
+            else if (outputType == typeof(AsyncList<StringStream>))
             {
                 var list = new List<string>();
                 for (var i = 0; i < 3; i++)
@@ -270,7 +278,7 @@ namespace Reductech.EDR.Core.TestHarness
 
                 step = Array(list.ToArray());
             }
-            else if (outputType == typeof(List<int>))
+            else if (outputType == typeof(AsyncList<int>))
             {
                 var list = new List<int>();
                 for (var i = 0; i < 3; i++)
@@ -281,17 +289,22 @@ namespace Reductech.EDR.Core.TestHarness
 
                 step =  Array(list.ToArray());
             }
-            else if (outputType == typeof(List<EntityStream>))
+            else if (outputType == typeof(AsyncList<Entity>))
             {
-                var entityStreamList = new List<IStep<EntityStream> >
+                var entityStream = CreateSimpleEntityStream(ref index);
+
+                step = entityStream;
+            }
+            else if (outputType == typeof(AsyncList<AsyncList<Entity>>))
+            {
+                var entityStreamList = new List<IStep<AsyncList<Entity>> >
                 {
-                    Constant(CreateSimpleEntityStream(ref index)),
-                    Constant(CreateSimpleEntityStream(ref index)),
-                    Constant(CreateSimpleEntityStream(ref index))
+                    CreateSimpleEntityStream(ref index),
+                    CreateSimpleEntityStream(ref index),
+                    CreateSimpleEntityStream(ref index)
                 };
 
-
-                step = new Array<EntityStream>(){Elements = entityStreamList};
+                step = new Array<AsyncList<Entity>> {Elements = entityStreamList};
             }
 
             else if (outputType.IsEnum)
@@ -321,12 +334,6 @@ namespace Reductech.EDR.Core.TestHarness
 
                 step = Constant(entity);
             }
-            else if (outputType == typeof(EntityStream))
-            {
-                var entityStream = CreateSimpleEntityStream(ref index);
-
-                step = Constant(entityStream);
-            }
             else if (outputType == typeof(StringStream))
             {
                 var s = "DataStream" + index;
@@ -350,19 +357,21 @@ namespace Reductech.EDR.Core.TestHarness
             else
                 throw new XunitException($"Cannot create a constant step with type {outputType.GetDisplayName()}");
 
-            var newString = await GetStringAsync(step);
+            var newString = step.Serialize();// await GetStringAsync(step);
 
             return (step, newString, index);
 
 
-            static EntityStream CreateSimpleEntityStream(ref int index1)
+            static IStep<AsyncList<Entity>>  CreateSimpleEntityStream(ref int index1)
             {
-                var entityList = new List<Entity>
+                var entityList = new List<IStep<Entity>>
                 {
-                    CreateSimpleEntity(ref index1), CreateSimpleEntity(ref index1), CreateSimpleEntity(ref index1)
+                    Constant(CreateSimpleEntity(ref index1)),
+                    Constant(CreateSimpleEntity(ref index1)),
+                    Constant(CreateSimpleEntity(ref index1))
                 };
 
-                var entityStream = EntityStream.Create(entityList);
+                var entityStream = new Array<Entity> {Elements = entityList};
 
                 return entityStream;
             }

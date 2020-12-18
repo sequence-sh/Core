@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using Reductech.EDR.Core.Entities;
+using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.TestHarness;
 using Reductech.EDR.Core.Util;
@@ -8,7 +8,7 @@ using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
-    public class EntityStreamConcatTests : StepTestBase<EntityStreamConcat, EntityStream>
+    public class EntityStreamConcatTests : StepTestBase<EntityStreamConcat, AsyncList<Entity>>
     {
         /// <inheritdoc />
         public EntityStreamConcatTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper) {}
@@ -19,17 +19,21 @@ namespace Reductech.EDR.Core.Tests.Steps
             get
             {
                 yield return new StepCase("One stream",
-                    new EntityForEach
+                    new ForEach<Entity>
                     {
                         Action = new Print<Entity> { Value = GetEntityVariable },
 
-                        EntityStream = new EntityStreamConcat
+                        Array = new EntityStreamConcat
                         {
-                            EntityStreams = Array(
-                                EntityStream.Create(
-                                    CreateEntity(("Foo", "Alpha")),
-                                    CreateEntity(("Foo", "Beta"))))
-                        }
+                            EntityStreams = new Array<AsyncList<Entity>>
+                            {
+                                Elements = new List<IStep<AsyncList<Entity>>>
+                                {
+                                    Array(CreateEntity(("Foo", "Alpha")), CreateEntity(("Foo", "Beta")))
+                                }
+                            }
+                        },
+                        Variable = VariableName.Entity
 
                     }, Unit.Default,
 
@@ -38,20 +42,22 @@ namespace Reductech.EDR.Core.Tests.Steps
 
 
                 yield return new StepCase("Two streams",
-                    new EntityForEach
+                    new ForEach<Entity>
                     {
                         Action = new Print<Entity>{Value = GetEntityVariable},
 
-                        EntityStream = new EntityStreamConcat
+                        Array = new EntityStreamConcat
                         {
-                            EntityStreams = Array(
-                                EntityStream.Create(
-                                    CreateEntity(("Foo", "Alpha")),
-                                    CreateEntity(("Foo", "Beta"))),
-                                EntityStream.Create(
-                                    CreateEntity(("Foo", "Gamma")),
-                                    CreateEntity(("Foo", "Delta"))))
-                        }
+                            EntityStreams = new Array<AsyncList<Entity>>()
+                            {
+                                Elements = new List<IStep<AsyncList<Entity>>>()
+                                {
+                                    Array(CreateEntity(("Foo", "Alpha")), CreateEntity(("Foo", "Beta"))),
+                                    Array(CreateEntity(("Foo", "Gamma")), CreateEntity(("Foo", "Delta")))
+                                }
+                            }
+                        },
+                        Variable = VariableName.Entity
 
                     }, Unit.Default,
 
@@ -60,32 +66,5 @@ namespace Reductech.EDR.Core.Tests.Steps
 
             }
         }
-
-//        /// <inheritdoc />
-//        protected override IEnumerable<SerializeCase> SerializeCases
-//        {
-//            get
-//            {
-//                yield return new SerializeCase("Default",
-//                    CreateStepWithDefaultOrArbitraryValuesAsync().step,
-//                    @"Do: EntityStreamConcat
-//EntityStreams:
-//  Do: Array
-//  Elements:
-//  - - (Prop1 = 'Val0',Prop2 = 'Val1')
-//    - (Prop1 = 'Val2',Prop2 = 'Val3')
-//    - (Prop1 = 'Val4',Prop2 = 'Val5')
-//  - - (Prop1 = 'Val6',Prop2 = 'Val7')
-//    - (Prop1 = 'Val8',Prop2 = 'Val9')
-//    - (Prop1 = 'Val10',Prop2 = 'Val11')
-//  - - (Prop1 = 'Val12',Prop2 = 'Val13')
-//    - (Prop1 = 'Val14',Prop2 = 'Val15')
-//    - (Prop1 = 'Val16',Prop2 = 'Val17')"
-
-
-//                    );
-
-//            }
-//        }
     }
 }

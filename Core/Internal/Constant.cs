@@ -2,7 +2,6 @@
 using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
-using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Parser;
 using Reductech.EDR.Core.Serialization;
@@ -61,7 +60,7 @@ namespace Reductech.EDR.Core.Internal
         public Type OutputType => typeof(T);
 
         /// <inheritdoc />
-        public abstract Task<string> SerializeAsync(CancellationToken cancellationToken);
+        public abstract string Serialize();
 
         /// <inheritdoc />
         public bool ShouldBracketWhenSerialized => false;
@@ -79,7 +78,7 @@ namespace Reductech.EDR.Core.Internal
         public override IFreezableStep Unfreeze() => new StringConstantFreezable(Value);
 
         /// <inheritdoc />
-        public override async Task<string> SerializeAsync(CancellationToken cancellationToken) => await Value.SerializeAsync(cancellationToken);
+        public override string Serialize() => Value.Serialize();
     }
 
 
@@ -95,7 +94,7 @@ namespace Reductech.EDR.Core.Internal
         public override IFreezableStep Unfreeze() => new IntConstantFreezable(Value);
 
         /// <inheritdoc />
-        public override async Task<string> SerializeAsync(CancellationToken cancellationToken) => await ValueTask.FromResult(Value.ToString());
+        public override string Serialize() => Value.ToString();
     }
 
     /// <summary>
@@ -110,7 +109,7 @@ namespace Reductech.EDR.Core.Internal
         public override IFreezableStep Unfreeze() => new DoubleConstantFreezable(Value);
 
         /// <inheritdoc />
-        public override async Task<string> SerializeAsync(CancellationToken cancellationToken) => await ValueTask.FromResult(Value.ToString("G17"));
+        public override string Serialize() => Value.ToString("G17");
     }
 
     /// <summary>
@@ -125,7 +124,7 @@ namespace Reductech.EDR.Core.Internal
         public override IFreezableStep Unfreeze() => new BoolConstantFreezable(Value);
 
         /// <inheritdoc />
-        public override async Task<string> SerializeAsync(CancellationToken cancellationToken) => await ValueTask.FromResult(Value.ToString());
+        public override string Serialize() => Value.ToString();
     }
 
     /// <summary>
@@ -143,10 +142,10 @@ namespace Reductech.EDR.Core.Internal
         }
 
         /// <inheritdoc />
-        public override async Task<string> SerializeAsync(CancellationToken cancellationToken)
+        public override string Serialize()
         {
             var enumeration = new Enumeration(typeof(T).Name, Value.ToString());
-            return await ValueTask.FromResult(enumeration.ToString());
+            return enumeration.ToString();
         }
     }
 
@@ -165,7 +164,7 @@ namespace Reductech.EDR.Core.Internal
         public override IFreezableStep Unfreeze() => new DateTimeConstantFreezable(Value);
 
         /// <inheritdoc />
-        public override async Task<string> SerializeAsync(CancellationToken cancellationToken) => await ValueTask.FromResult(Value.ToString("O"));
+        public override  string Serialize() => Value.ToString("O");
     }
 
     /// <summary>
@@ -180,23 +179,6 @@ namespace Reductech.EDR.Core.Internal
         public override IFreezableStep Unfreeze() => new EntityConstantFreezable(Value);
 
         /// <inheritdoc />
-        public override async Task<string> SerializeAsync(CancellationToken cancellationToken) => await ValueTask.FromResult(Value.Serialize());
-    }
-
-    /// <summary>
-    /// A constant entityStream value
-    /// </summary>
-    public class EntityStreamConstant : ConstantBase<EntityStream>
-    {
-        /// <inheritdoc />
-        public EntityStreamConstant(EntityStream value) : base(value)
-        {
-        }
-
-        /// <inheritdoc />
-        public override IFreezableStep Unfreeze() => new EntityStreamConstantFreezable(Value);
-
-        /// <inheritdoc />
-        public override async Task<string> SerializeAsync(CancellationToken cancellationToken) => await Value.SerializeAsync(cancellationToken);
+        public override string Serialize() => Value.Serialize();
     }
 }

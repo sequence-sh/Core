@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.TestHarness;
@@ -10,7 +9,7 @@ using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
-    public class ReadConcordanceTests : StepTestBase<FromConcordance, EntityStream>
+    public class ReadConcordanceTests : StepTestBase<FromConcordance, AsyncList<Entity>>
     {
         /// <inheritdoc />
         public ReadConcordanceTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper) {}
@@ -21,9 +20,9 @@ namespace Reductech.EDR.Core.Tests.Steps
             get
             {
                 yield return new StepCase("Read Concordance and print all lines",
-                    new EntityForEach
+                    new ForEach<Entity>
                     {
-                        EntityStream = new FromConcordance()
+                        Array = new FromConcordance()
                         {
                             Stream = Constant(
                                     $@"þFooþþBarþ{Environment.NewLine}þHelloþþWorldþ{Environment.NewLine}þHello 2þþWorld 2þ")
@@ -31,15 +30,17 @@ namespace Reductech.EDR.Core.Tests.Steps
                         Action = new Print<Entity>
                         {
                             Value = new GetVariable<Entity>() { Variable = VariableName.Entity }
-                        }
+                        },
+                        Variable = VariableName.Entity
+
                     }, Unit.Default,
                     "(Foo: \"Hello\" Bar: \"World\")",
                     "(Foo: \"Hello 2\" Bar: \"World 2\")");
 
                 yield return new StepCase("Read Concordance with multiValue and print all lines",
-                    new EntityForEach
+                    new ForEach<Entity>
                     {
-                        EntityStream = new FromConcordance
+                        Array = new FromConcordance
                         {
                             Stream = Constant(
                                     $@"þFooþþBarþ{Environment.NewLine}þHelloþþWorld|Earthþ{Environment.NewLine}þHello 2þþWorld 2|Earth 2þ")
@@ -47,7 +48,9 @@ namespace Reductech.EDR.Core.Tests.Steps
                         Action = new Print<Entity>
                         {
                             Value = new GetVariable<Entity> { Variable = VariableName.Entity }
-                        }
+                        },
+                        Variable = VariableName.Entity
+
                     }, Unit.Default,
                     "(Foo: \"Hello\" Bar: [\"World\", \"Earth\"])",
                     "(Foo: \"Hello 2\" Bar: [\"World 2\", \"Earth 2\"])");
