@@ -12,7 +12,7 @@ namespace Reductech.EDR.Core.Steps
     /// <summary>
     /// Reads text from a file.
     /// </summary>
-    [Alias("ReadFrom")]
+    [Alias("ReadFromFile")]
     public sealed class FileRead : CompoundStep<StringStream>
     {
         /// <inheritdoc />
