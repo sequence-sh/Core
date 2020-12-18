@@ -151,6 +151,10 @@ Print 'Comments!'", "Comments!");
 - <ArrayVar> = [(str: 'abc' num: '123')]
 - Foreach <ArrayVar> (Print <Entity>)", "(str: \"abc\" num: \"123\")");
 
+                yield return new DeserializationTestFunction(@"
+- <ArrayVar> = [(str: 'abc' num: '123')]
+- EntityForeach <ArrayVar> (Print <Entity>)", "(str: \"abc\" num: \"123\")");
+
 
                 yield return new DeserializationTestFunction(@"
 - <ArrayVar1> = ['abc', '123']

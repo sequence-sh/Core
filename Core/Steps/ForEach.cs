@@ -15,6 +15,7 @@ namespace Reductech.EDR.Core.Steps
     /// <summary>
     /// Do an action for each member of the list.
     /// </summary>
+    [Alias("EntityForEach")]
     public sealed class ForEach<T> : CompoundStep<Unit>
     {
         /// <summary>
