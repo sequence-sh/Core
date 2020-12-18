@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using FluentAssertions;
@@ -78,10 +77,12 @@ namespace Reductech.EDR.Core.TestHarness
             /// <inheritdoc />
             public override async Task<IStep> GetStepAsync(ITestOutputHelper testOutputHelper, string? extraArgument)
             {
+                await ValueTask.CompletedTask;
+
                 if (extraArgument != SerializeArgument)
                     return Step;
 
-                var yaml = await Step.SerializeAsync(CancellationToken.None);
+                var yaml = Step.Serialize();
 
                 testOutputHelper.WriteLine("");
                 testOutputHelper.WriteLine("");

@@ -1,6 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Internal;
 
@@ -15,8 +13,7 @@ namespace Reductech.EDR.Core.Serialization
         /// <summary>
         /// Gets the segment of serialized text if possible
         /// </summary>
-        public Task<Result<string>> TryGetSegmentTextAsync(IReadOnlyDictionary<string, StepProperty> dictionary,
-            CancellationToken cancellationToken);
+        public Result<string> TryGetSegmentText(IReadOnlyDictionary<string, StepProperty> dictionary);
 
     }
 }

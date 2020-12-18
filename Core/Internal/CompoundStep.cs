@@ -34,9 +34,8 @@ namespace Reductech.EDR.Core.Internal
         /// </summary>
         public abstract IStepFactory StepFactory { get; }
 
-        /// <param name="cancellationToken"></param>
         /// <inheritdoc />
-        public Task<string> SerializeAsync(CancellationToken cancellationToken) => StepFactory.Serializer.SerializeAsync(AllProperties, cancellationToken);
+        public string Serialize() => StepFactory.Serializer.Serialize(AllProperties);
 
         /// <inheritdoc />
         public string Name => StepFactory.TypeName;

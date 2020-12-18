@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions.Common;
 using Namotion.Reflection;
@@ -11,7 +10,6 @@ using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Parser;
-using Reductech.EDR.Core.Serialization;
 using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.Util;
 using Xunit.Sdk;
@@ -71,7 +69,7 @@ namespace Reductech.EDR.Core.TestHarness
                 }
                 else
                 {
-                    var s = await GetStringAsync((IStep) currentValue);
+                    var s = ((IStep) currentValue).Serialize();
                     values.Add(property.Name, s);
                 }
 
@@ -85,7 +83,7 @@ namespace Reductech.EDR.Core.TestHarness
 
                     foreach (var step in currentValue)
                     {
-                        var s = await GetStringAsync(step);
+                        var s = step.Serialize();// await GetStringAsync(step);
                         elements.Add(s);
                     }
 
@@ -102,7 +100,7 @@ namespace Reductech.EDR.Core.TestHarness
 
                     foreach (var step in newValue)
                     {
-                        var e = await GetStringAsync(step);
+                        var e = step.Serialize();// await GetStringAsync(step);
                         elements.Add(e);
                     }
 
@@ -119,51 +117,51 @@ namespace Reductech.EDR.Core.TestHarness
             }
         }
 
-        private static async Task<string> GetStringAsync(IStep step)
-        {
-            var freezable = step.Unfreeze();
+        //private static async Task<string> GetStringAsync(IStep step)
+        //{
+        //    var freezable = step.Unfreeze();
 
-            if (freezable is IConstantFreezableStep cfs)
-            {
+        //    if (freezable is IConstantFreezableStep cfs)
+        //    {
 
-                return await cfs.SerializeAsync(CancellationToken.None);
-            }
+        //        return cfs.Serialize();
+        //    }
 
-            if (step is DoNothing)
-            {
-                return DoNothingStepFactory.Instance.TypeName;
-            }
+        //    if (step is DoNothing)
+        //    {
+        //        return DoNothingStepFactory.Instance.TypeName;
+        //    }
 
-            if (freezable is CompoundFreezableStep cs && freezable.StepName == ArrayStepFactory.Instance.TypeName)
-            {
-                var list = new List<string>();
+        //    if (freezable is CompoundFreezableStep cs && freezable.StepName == ArrayStepFactory.Instance.TypeName)
+        //    {
+        //        var list = new List<string>();
 
-                try
-                {
-                    var steps = cs.FreezableStepData
-                    .StepProperties[new StepParameterReference(nameof(Steps.Array<object>.Elements))]
-                    .StepList.Value.Cast<IFreezableStep>();
-
-
-
-                    foreach (var step1 in steps)
-                    {
-                        var s = await step1.SerializeAsync(CancellationToken.None);
-                        list.Add(s);
-                    }
-                }
-                catch (Exception e)
-                {
-                    throw new Exception($"Case Failure 123 {e.Message}");
-                }
+        //        try
+        //        {
+        //            var steps = cs.FreezableStepData
+        //            .StepProperties[new StepParameterReference(nameof(Steps.Array<object>.Elements))]
+        //            .StepList.Value.Cast<IFreezableStep>();
 
 
 
-                return SerializationMethods.SerializeList(list);
-            }
+        //            foreach (var step1 in steps)
+        //            {
+        //                var s = await step1.Serialize();
+        //                list.Add(s);
+        //            }
+        //        }
+        //        catch (Exception e)
+        //        {
+        //            throw new Exception($"Case Failure 123 {e.Message}");
+        //        }
 
-            throw new NotImplementedException("Cannot get string from step");
-        }
+
+
+        //        return SerializationMethods.SerializeList(list);
+        //    }
+
+        //    throw new NotImplementedException("Cannot get string from step");
+        //}
 
         private static async Task MatchStepPropertyInfoAsync(PropertyInfo stepPropertyInfo,
             Func<PropertyInfo, Task> variableNameAction,
@@ -353,7 +351,7 @@ namespace Reductech.EDR.Core.TestHarness
             else
                 throw new XunitException($"Cannot create a constant step with type {outputType.GetDisplayName()}");
 
-            var newString = await GetStringAsync(step);
+            var newString = step.Serialize();// await GetStringAsync(step);
 
             return (step, newString, index);
 

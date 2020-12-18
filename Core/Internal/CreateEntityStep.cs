@@ -84,7 +84,7 @@ namespace Reductech.EDR.Core.Internal
         public Type OutputType => typeof(Entity);
 
         /// <inheritdoc />
-        public async Task<string> SerializeAsync(CancellationToken cancellationToken)
+        public string Serialize()
         {
             var sb = new StringBuilder();
 
@@ -94,7 +94,7 @@ namespace Reductech.EDR.Core.Internal
 
             foreach (var (key, value) in Properties)
             {
-                var valueString = await value.SerializeAsync(cancellationToken);
+                var valueString = value.Serialize();
 
                 results.Add($"{key}: {valueString}");
             }

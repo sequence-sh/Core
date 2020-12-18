@@ -1,6 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Internal;
 
@@ -24,18 +22,11 @@ namespace Reductech.EDR.Core.Serialization
         public string PropertyName { get; }
 
         /// <inheritdoc />
-        public async Task<Result<string>> TryGetSegmentTextAsync(IReadOnlyDictionary<string, StepProperty> dictionary,
-            CancellationToken cancellationToken)
+        public Result<string> TryGetSegmentText(IReadOnlyDictionary<string, StepProperty> dictionary)
         {
             var property = dictionary[PropertyName];
 
-
-
-            var r = await property.SerializeValueAsync(cancellationToken);
-
-
-
-
+            var r = property.Serialize();
             return r;
         }
     }

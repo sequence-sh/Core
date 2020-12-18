@@ -134,7 +134,7 @@ namespace Reductech.EDR.Core.Tests
                 FinalStep = new DoNothing()
             };
 
-            var yaml = await step.SerializeAsync(CancellationToken.None);
+            var yaml = await step.Serialize();
 
             TestOutputHelper.WriteLine(yaml);
 

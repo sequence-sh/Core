@@ -141,10 +141,9 @@ namespace Reductech.EDR.Core.Parser
         /// <summary>
         /// SerializeAsync this DataStream
         /// </summary>
-        public async Task<string> SerializeAsync(CancellationToken cancellationToken)
+        public string Serialize()
         {
-            var s = await GetStringAsync();
-
+            var s = GetString();
             var text = SerializationMethods.DoubleQuote(s);
 
             return text;

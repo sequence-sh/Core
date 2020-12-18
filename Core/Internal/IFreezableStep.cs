@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Internal.Errors;
 
@@ -22,10 +20,10 @@ namespace Reductech.EDR.Core.Internal
         /// </summary>
         Result<IStep, IError> TryFreeze(StepContext stepContext);
 
-        /// <summary>
-        /// Serialize this step.
-        /// </summary>
-        Task<string> SerializeAsync(CancellationToken cancellation);
+        ///// <summary>
+        ///// Serialize this step.
+        ///// </summary>
+        //string Serialize();
 
         /// <summary>
         /// Gets the variables set by this step and its children and the types of those variables if they can be resolved at this time.

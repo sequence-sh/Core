@@ -25,7 +25,7 @@ namespace Reductech.EDR.Core.Internal
         public override Result<IStep, IError> TryFreeze(StepContext stepContext) => new StringConstant(Value);
 
         /// <inheritdoc />
-        public override Task<string> SerializeAsync(CancellationToken cancellation) => Value.SerializeAsync(cancellation);
+        public override string Serialize() => Value.Serialize();
     }
 
     /// <summary>
@@ -43,7 +43,7 @@ namespace Reductech.EDR.Core.Internal
         public override Result<IStep, IError> TryFreeze(StepContext stepContext) => new IntConstant(Value);
 
         /// <inheritdoc />
-        public override Task<string> SerializeAsync(CancellationToken cancellation) => Task.FromResult(Value.ToString());
+        public override string Serialize() => Value.ToString();
     }
 
     /// <summary>
@@ -61,7 +61,7 @@ namespace Reductech.EDR.Core.Internal
         public override Result<IStep, IError> TryFreeze(StepContext stepContext) => new DoubleConstant(Value);
 
         /// <inheritdoc />
-        public override Task<string> SerializeAsync(CancellationToken cancellation) => Task.FromResult(Value.ToString("G17"));
+        public override string Serialize() => Value.ToString("G17");
     }
 
     /// <summary>
@@ -79,7 +79,7 @@ namespace Reductech.EDR.Core.Internal
         public override Result<IStep, IError> TryFreeze(StepContext stepContext) => new BoolConstant(Value);
 
         /// <inheritdoc />
-        public override Task<string> SerializeAsync(CancellationToken cancellation) => Task.FromResult(Value.ToString());
+        public override string Serialize() => Value.ToString();
     }
 
 
@@ -98,7 +98,7 @@ namespace Reductech.EDR.Core.Internal
         public override Result<IStep, IError> TryFreeze(StepContext stepContext) => new DateTimeConstant(Value);
 
         /// <inheritdoc />
-        public override Task<string> SerializeAsync(CancellationToken cancellation) => Task.FromResult(Value.ToString("O"));
+        public override string Serialize() => Value.ToString("O");
     }
 
     /// <summary>
@@ -116,7 +116,7 @@ namespace Reductech.EDR.Core.Internal
         public override Result<IStep, IError> TryFreeze(StepContext stepContext) => new EntityConstant(Value);
 
         /// <inheritdoc />
-        public override Task<string> SerializeAsync(CancellationToken cancellation) => Task.FromResult(Value.ToString());
+        public override string Serialize() => Value.ToString();
     }
 
     /// <summary>
@@ -147,9 +147,8 @@ namespace Reductech.EDR.Core.Internal
         public override Result<ITypeReference, IError> TryGetOutputTypeReference(TypeResolver typeResolver) =>
             TryGetType(typeResolver).Map(x => new ActualTypeReference(x) as ITypeReference);
 
-        /// <param name="cancellation"></param>
         /// <inheritdoc />
-        public override Task<string> SerializeAsync(CancellationToken cancellation) => Task.FromResult(Value.ToString());
+        public override string Serialize() => Value.ToString();
 
         private Result<Type, IError> TryGetType(TypeResolver typeResolver)
         {
@@ -201,8 +200,7 @@ namespace Reductech.EDR.Core.Internal
         /// <summary>
         /// Serialize this constant
         /// </summary>
-        /// <param name="cancellation"></param>
-        Task<string> SerializeAsync(CancellationToken cancellation);
+        string Serialize();
 
     }
 
@@ -262,8 +260,7 @@ namespace Reductech.EDR.Core.Internal
         /// <inheritdoc />
         public object ValueObject => Value!;
 
-        /// <param name="cancellation"></param>
         /// <inheritdoc />
-        public abstract Task<string> SerializeAsync(CancellationToken cancellation);
+        public abstract string Serialize();
     }
 }
