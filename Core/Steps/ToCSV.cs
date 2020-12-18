@@ -14,6 +14,7 @@ namespace Reductech.EDR.Core.Steps
     /// Write entities to a stream in CSV format.
     /// The same as ToConcordance but with different default values.
     /// </summary>
+    [Alias("ConvertEntityToCSV")]
     public sealed class ToCSV : CompoundStep<StringStream>
     {
         /// <inheritdoc />
