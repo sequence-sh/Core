@@ -140,6 +140,19 @@ namespace Reductech.EDR.Core.Parser
             }
 
             /// <inheritdoc />
+            public override Result<FreezableStepProperty, IError> VisitDateTime(SequenceParser.DateTimeContext context)
+            {
+                if (!DateTime.TryParse(context.GetText(), out var dateTime))
+                    return new SingleError($"Could not parse '{context.GetText()}'", ErrorCode.CouldNotParse,
+                        new TextLocation(context));
+
+                var constant = new DateTimeConstantFreezable(dateTime);
+
+                var member = new FreezableStepProperty(constant, new TextLocation(context));
+                return member;
+            }
+
+            /// <inheritdoc />
             public override Result<FreezableStepProperty, IError> VisitBracketedStep(SequenceParser.BracketedStepContext context) => Visit(context.step());
 
             /// <inheritdoc />

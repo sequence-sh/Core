@@ -25,6 +25,7 @@ function			: NAME (term)* (namedArgument)* ;
 entity				: OPENBRACKET (namedArgument)*  CLOSEBRACKET ;
 bracketedStep		: OPENBRACKET step CLOSEBRACKET ;
 boolean				: TRUE | FALSE ;
+dateTime			: DATETIME ;
 quotedString		: DOUBLEQUOTEDSTRING | SINGLEQUOTEDSTRING ;
 number              : NUMBER ;
 enumeration			: NAME DOT NAME ;
@@ -39,6 +40,7 @@ step				: <assoc=right> step PIPE NAME (term)* (namedArgument)* #PipeFunction
 					;
 simpleTerm			: number
                     | boolean
+					| dateTime
                     | enumeration
                     | quotedString
                     | getVariable
@@ -85,4 +87,5 @@ SINGLEQUOTEDSTRING	: '\'' (~('\'') | '\'\'')* '\'' ;
 TRUE				: [Tt] [Rr] [Uu] [Ee];
 FALSE				: [Ff] [Aa] [Ll] [Ss] [Ee];
 NAME				: [a-zA-Z0-9_]+;
+DATETIME			: '[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(.[0-9]+)?' ;
 WHITESPACE			: (' ' | '\t' | '\r' | '\n') -> channel(HIDDEN) ;
