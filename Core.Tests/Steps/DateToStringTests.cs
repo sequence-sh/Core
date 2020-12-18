@@ -29,9 +29,9 @@ namespace Reductech.EDR.Core.Tests.Steps
                     new DateToString
                     {
                         Date = Constant(new DateTime(2020, 11, 22, 20, 30, 40)),
-                        Format = Constant("MM/dd/yy hh:mm:ss tt")
+                        Format = Constant("MM/dd/yy hh.mm.ss")
                     },
-                    "11/22/20 08:30:40 PM"
+                    "11/22/20 08.30.40"
                 );
             }
         }
