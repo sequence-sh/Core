@@ -74,6 +74,11 @@ Print 'Comments!'", "Comments!");
 
                 yield return new DeserializationTestFunction(@"Print(not True)", false);
 
+                yield return new DeserializationTestFunction(@"Print 2020-11-22T20:30:40.0000000", "2020-11-22T20:30:40.0000000");
+                yield return new DeserializationTestFunction(@"Print 2020-11-22", "2020-11-22T00:00:00.0000000");
+
+                yield return new DeserializationTestFunction(@"Print 2020-11-22T20:30:40", "2020-11-22T20:30:40.0000000");
+
                 yield return new DeserializationTestFunction(@"Print(stringToCase 'hello' textCase.Upper)", "HELLO");
                 yield return new DeserializationTestFunction(@"Print(stringToCase 'hello' 'Upper')", "HELLO");
 

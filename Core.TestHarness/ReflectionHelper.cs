@@ -260,6 +260,12 @@ namespace Reductech.EDR.Core.TestHarness
                 index++;
                 step =  Constant(d);
             }
+            else if (outputType == typeof(DateTime))
+            {
+                var dt = new DateTime(1990,index, 1);
+                index++;
+                step = Constant(dt);
+            }
 
             else if (outputType == typeof(AsyncList<StringStream>))
             {

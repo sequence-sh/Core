@@ -210,19 +210,33 @@ namespace Reductech.EDR.Core.Internal
             if (propertyInfo.PropertyType.IsInstanceOfType(stepToSet))
                 return Result.Success<IStep, IErrorBuilder>(stepToSet); //No coercion required
 
-            if (propertyInfo.PropertyType.IsGenericType &&
-                propertyInfo.PropertyType.GenericTypeArguments.First().IsEnum && stepToSet is StringConstant constant && constant.Value.Value.IsT0)
+
+            if(propertyInfo.PropertyType.IsGenericType && stepToSet is StringConstant constant && constant.Value.Value.IsT0)
             {
-                var enumType = propertyInfo.PropertyType.GenericTypeArguments.First();
-
-                if (Enum.TryParse(enumType, constant.Value.Value.AsT0, true, out var enumValue))
+                if (propertyInfo.PropertyType.GenericTypeArguments.First().IsEnum)
                 {
-                    var step = EnumConstantFreezable.TryCreateEnumConstant(enumValue!);
+                    var enumType = propertyInfo.PropertyType.GenericTypeArguments.First();
 
-                    return step;
+                    if (Enum.TryParse(enumType, constant.Value.Value.AsT0, true, out var enumValue))
+                    {
+                        var step = EnumConstantFreezable.TryCreateEnumConstant(enumValue!);
+
+                        return step;
+                    }
+
                 }
+                else if(propertyInfo.PropertyType.GenericTypeArguments.First() == typeof(DateTime))
+                {
+                    if (DateTime.TryParse(constant.Value.Value.AsT0, out var dt))
+                    {
+                        var step = new DateTimeConstant(dt);
 
+                        return Result.Success<IStep, IErrorBuilder>(step);
+                    }
+                }
             }
+
+
 
 
             return new ErrorBuilder($"'{propertyInfo.Name}' cannot take the value '{stepToSet.Name}'", ErrorCode.InvalidCast);
