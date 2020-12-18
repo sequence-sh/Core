@@ -103,7 +103,7 @@ namespace Reductech.EDR.Core.Tests
                         Array = Array(true) ,
                         Index = new IntConstant(-1)
                     },
-                    new ErrorBuilder("Index was out of the range of the array.", ErrorCode.IndexOutOfBounds)
+                    new ErrorBuilder("Index was less than zero.", ErrorCode.IndexOutOfBounds)
                     );
 
                 yield return new ErrorTestFunction("Array Index out of bounds",

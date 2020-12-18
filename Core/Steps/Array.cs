@@ -58,10 +58,10 @@ namespace Reductech.EDR.Core.Steps
         public override Type StepType => typeof(Array<>);
 
         /// <inheritdoc />
-        public override string OutputTypeExplanation => "List<T>";
+        public override string OutputTypeExplanation => "ArrayList<T>";
 
         /// <inheritdoc />
-        protected override ITypeReference GetOutputTypeReference(ITypeReference memberTypeReference) => new GenericTypeReference(typeof(List<>), new[] { memberTypeReference });
+        protected override ITypeReference GetOutputTypeReference(ITypeReference memberTypeReference) => new GenericTypeReference(typeof(AsyncList<>), new[] { memberTypeReference });
 
         /// <inheritdoc />
         protected override Result<ITypeReference, IError> GetMemberType(FreezableStepData freezableStepData, TypeResolver typeResolver)
@@ -84,7 +84,7 @@ namespace Reductech.EDR.Core.Steps
         /// </summary>
         public static Array<T> CreateArray<T>(List<IStep<T>> stepList)
         {
-            return new Array<T>()
+            return new()
             {
                 Elements = stepList
             };

@@ -127,13 +127,7 @@ Print 'Comments!'", "Comments!");
 
                 yield return new DeserializationTestFunction(@"Print(ArrayLength ['abc', '123'])", 2);
 
-                yield return new DeserializationTestFunction(@"
-- <ArrayVar> =  ['abc', '123']
-- Print(ArrayLength <ArrayVar>)", 2);
-
-
-
-
+                yield return new DeserializationTestFunction("- <ArrayVar> =  ['abc', '123']\r\n- Print(ArrayLength <ArrayVar>)", 2);
 
                 yield return new DeserializationTestFunction(@"
 - <ArrayVar> = ['abc', '123']

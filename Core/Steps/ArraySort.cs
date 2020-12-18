@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
@@ -66,10 +65,10 @@ namespace Reductech.EDR.Core.Steps
         public override Type StepType => typeof(ArraySort<>);
 
         /// <inheritdoc />
-        protected override ITypeReference GetOutputTypeReference(ITypeReference memberTypeReference) => new GenericTypeReference(typeof(List<>), new[] { memberTypeReference });
+        protected override ITypeReference GetOutputTypeReference(ITypeReference memberTypeReference) => new GenericTypeReference(typeof(AsyncList<>), new[] { memberTypeReference });
 
         /// <inheritdoc />
-        public override string OutputTypeExplanation => "List<T>";
+        public override string OutputTypeExplanation => "ArrayList<T>";
 
 
         /// <inheritdoc />
