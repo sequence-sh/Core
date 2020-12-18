@@ -53,7 +53,6 @@ fullSequence		: (step | stepSequence)  EOF ;
 /*
  * Lexer Rules
  */
-
 SINGLELINECOMMENT	: '//'  ~[\r\n\u0085\u2028\u2029]* -> channel(HIDDEN);
 DELIMITEDCOMMENT	: '/*'  .*? '*/' -> channel(HIDDEN);
 DASH                : '-' ;
@@ -80,12 +79,13 @@ COMMA			    : ',' ;
 PIPE				: '|' ;
 NEWCOMMAND			: ('\r'? '\n' | '\r')+ (' ' | '\t')* DASH (' ' | '\t')+ ;
 DOT                 : '.' ;
+fragment DIGIT		: [0-9];
 VARIABLENAME		: LESSTHAN [a-zA-Z0-9_]+ GREATERTHAN ;
-NUMBER				: DASH? [0-9]+ ;
+DATETIME			: DIGIT DIGIT DIGIT DIGIT DASH DIGIT DIGIT DASH DIGIT DIGIT ([Tt] DIGIT DIGIT COLON DIGIT DIGIT COLON DIGIT DIGIT ('.' DIGIT+)?)? ;
+NUMBER				: DASH? DIGIT+ ;
 DOUBLEQUOTEDSTRING	: '"' (~('"' | '\\' | '\r' | '\n' | '\t') | '\\' ('"' | '\\' | 'r' | 'n' | 't'))* '"' ;
 SINGLEQUOTEDSTRING	: '\'' (~('\'') | '\'\'')* '\'' ;
 TRUE				: [Tt] [Rr] [Uu] [Ee];
 FALSE				: [Ff] [Aa] [Ll] [Ss] [Ee];
 NAME				: [a-zA-Z0-9_]+;
-DATETIME			: '[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(.[0-9]+)?' ;
 WHITESPACE			: (' ' | '\t' | '\r' | '\n') -> channel(HIDDEN) ;
