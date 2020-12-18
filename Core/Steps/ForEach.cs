@@ -25,18 +25,18 @@ namespace Reductech.EDR.Core.Steps
         public IStep<AsyncList<T>> Array { get; set; } = null!;
 
         /// <summary>
-        /// The name of the variable to loop over.
-        /// </summary>
-        [VariableName(2)]
-        [Required]
-        public VariableName Variable { get; set; } //TODO default value
-
-        /// <summary>
         /// The action to perform repeatedly.
         /// </summary>
-        [StepProperty(3)]
+        [StepProperty(2)]
         [Required]
         public IStep<Unit> Action { get; set; } = null!;
+
+        /// <summary>
+        /// The name of the variable to loop over.
+        /// </summary>
+        [VariableName(3)]
+        [DefaultValueExplanation("<Entity>")]
+        public VariableName Variable { get; set; } = VariableName.Entity;
 
         /// <inheritdoc />
         public override async Task<Result<Unit, IError>> Run(IStateMonad stateMonad,
@@ -47,10 +47,10 @@ namespace Reductech.EDR.Core.Steps
 
             var currentState = stateMonad.GetState().ToImmutableDictionary();
 
-            async ValueTask<Result<Unit, IError>> Apply(T entity, CancellationToken cancellation)
+            async ValueTask<Result<Unit, IError>> Apply(T element, CancellationToken cancellation)
             {
                 var scopedMonad = new ScopedStateMonad(stateMonad, currentState,
-                    new KeyValuePair<VariableName, object>(Variable, entity));
+                    new KeyValuePair<VariableName, object>(Variable, element));
 
 
                 var result = await Action.Run(scopedMonad, cancellation);
