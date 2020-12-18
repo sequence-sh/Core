@@ -53,7 +53,7 @@ fullSequence		: (step | stepSequence)  EOF ;
 /*
  * Lexer Rules
  */
-SINGLELINECOMMENT	: '//'  ~[\r\n\u0085\u2028\u2029]* -> channel(HIDDEN);
+SINGLELINECOMMENT	: '#'  ~[\r\n\u0085\u2028\u2029]* -> channel(HIDDEN);
 DELIMITEDCOMMENT	: '/*'  .*? '*/' -> channel(HIDDEN);
 DASH                : '-' ;
 PLUS                : '+' ;
