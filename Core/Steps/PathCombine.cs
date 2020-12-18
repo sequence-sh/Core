@@ -20,12 +20,14 @@ namespace Reductech.EDR.Core.Steps
         /// <inheritdoc />
         public override async Task<Result<StringStream, IError>> Run(IStateMonad stateMonad, CancellationToken cancellationToken)
         {
-            var pathsResult = await Paths.Run(stateMonad, cancellationToken);
+            var pathsResult = await Paths.Run(stateMonad, cancellationToken)
+                    .Bind(x=>x.GetElementsAsync(cancellationToken));
+
             if (pathsResult.IsFailure) return pathsResult.ConvertFailure<StringStream>();
 
             var paths = new List<string>();
 
-            await foreach (var stringStream in pathsResult.Value.WithCancellation(cancellationToken))
+            foreach (var stringStream in pathsResult.Value)
                 paths.Add(await stringStream.GetStringAsync());
 
             if(!paths.Any())
@@ -44,7 +46,7 @@ namespace Reductech.EDR.Core.Steps
         /// </summary>
         [StepProperty(1)]
         [Required]
-        public IStep<IAsyncEnumerable<StringStream>> Paths { get; set; } = null!;
+        public IStep<AsyncList<StringStream>> Paths { get; set; } = null!;
 
 
         /// <inheritdoc />

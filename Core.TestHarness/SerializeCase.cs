@@ -16,7 +16,9 @@ namespace Reductech.EDR.Core.TestHarness
         {
             get
             {
-                yield return CreateDefaultSerializeCase().Result; //TODO fix the synchronicity
+                var case1 =  CreateDefaultSerializeCase().Result; //TODO fix the synchronicity
+
+                yield return case1;
             }
         }
 

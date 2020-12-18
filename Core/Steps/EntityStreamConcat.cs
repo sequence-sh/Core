@@ -1,6 +1,5 @@
-﻿using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Runtime.CompilerServices;
+﻿using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
@@ -13,32 +12,31 @@ namespace Reductech.EDR.Core.Steps
     /// <summary>
     /// Concatenates streams of entities
     /// </summary>
-    public sealed class EntityStreamConcat : CompoundStep<IAsyncEnumerable<Entity>>
+    public sealed class EntityStreamConcat : CompoundStep<AsyncList<Entity>>
     {
         /// <inheritdoc />
-        public override async Task<Result<IAsyncEnumerable<Entity>, IError>> Run(IStateMonad stateMonad, CancellationToken cancellationToken)
+        public override async Task<Result<AsyncList<Entity>, IError>> Run(IStateMonad stateMonad, CancellationToken cancellationToken)
         {
             var streamsResult = await EntityStreams.Run(stateMonad, cancellationToken);
-            if (streamsResult.IsFailure) return streamsResult.ConvertFailure<IAsyncEnumerable<Entity>>();
+            if (streamsResult.IsFailure) return streamsResult.ConvertFailure<AsyncList<Entity>>();
 
-            var result = Concatenate(streamsResult.Value, cancellationToken);
-            return Result.Success<IAsyncEnumerable<Entity>, IError>(result);
+            var result =
+                streamsResult.Value.SelectMany(al =>
+            {
+                var asyncEnumerable = al.
+                Option.IsT0 ? al.Option.AsT0.ToAsyncEnumerable() : al.Option.AsT1;
+                return asyncEnumerable;
+            });
+
+            return result;
         }
-
-        static async IAsyncEnumerable<T> Concatenate<T>(IAsyncEnumerable<IAsyncEnumerable<T>> enumerables, [EnumeratorCancellation] CancellationToken cancellationToken)
-        {
-            await foreach (var enumerable in enumerables.WithCancellation(cancellationToken))
-            await foreach (var e in enumerable.WithCancellation(cancellationToken))
-                yield return e;
-        }
-
 
         /// <summary>
         /// The streams to concatenate
         /// </summary>
         [StepProperty(1)]
         [Required]
-        public IStep<IAsyncEnumerable<IAsyncEnumerable<Entity>>> EntityStreams { get; set; } = null!;
+        public IStep<AsyncList<AsyncList<Entity>>> EntityStreams { get; set; } = null!;
 
         /// <inheritdoc />
         public override IStepFactory StepFactory => EntityStreamConcatStepFactory.Instance;
@@ -47,14 +45,14 @@ namespace Reductech.EDR.Core.Steps
     /// <summary>
     /// Concatenates streams of entities
     /// </summary>
-    public sealed class EntityStreamConcatStepFactory : SimpleStepFactory<EntityStreamConcat, IAsyncEnumerable<Entity>>
+    public sealed class EntityStreamConcatStepFactory : SimpleStepFactory<EntityStreamConcat, AsyncList<Entity>>
     {
         private EntityStreamConcatStepFactory() {}
 
         /// <summary>
         /// The instance.
         /// </summary>
-        public static SimpleStepFactory<EntityStreamConcat, IAsyncEnumerable<Entity>> Instance { get; } = new EntityStreamConcatStepFactory();
+        public static SimpleStepFactory<EntityStreamConcat, AsyncList<Entity>> Instance { get; } = new EntityStreamConcatStepFactory();
     }
 
 }

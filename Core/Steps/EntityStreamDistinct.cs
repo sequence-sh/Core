@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
@@ -16,17 +15,17 @@ namespace Reductech.EDR.Core.Steps
     /// <summary>
     /// Removes duplicate entities.
     /// </summary>
-    public sealed class EntityStreamDistinct : CompoundStep<IAsyncEnumerable<Entity>>
+    public sealed class EntityStreamDistinct : CompoundStep<AsyncList<Entity>>
     {
         /// <inheritdoc />
-        public override async Task<Result<IAsyncEnumerable<Entity>, IError>> Run(IStateMonad stateMonad,
+        public override async Task<Result<AsyncList<Entity>, IError>> Run(IStateMonad stateMonad,
             CancellationToken cancellationToken)
         {
             var entityStreamResult = await EntityStream.Run(stateMonad, cancellationToken);
-            if (entityStreamResult.IsFailure) return entityStreamResult.ConvertFailure<IAsyncEnumerable<Entity>>();
+            if (entityStreamResult.IsFailure) return entityStreamResult.ConvertFailure<AsyncList<Entity>>();
 
             var ignoreCaseResult = await IgnoreCase.Run(stateMonad, cancellationToken);
-            if (ignoreCaseResult.IsFailure) return ignoreCaseResult.ConvertFailure<IAsyncEnumerable<Entity>>();
+            if (ignoreCaseResult.IsFailure) return ignoreCaseResult.ConvertFailure<AsyncList<Entity>>();
 
             IEqualityComparer<string> comparer = ignoreCaseResult.Value
                 ? StringComparer.OrdinalIgnoreCase
@@ -53,7 +52,7 @@ namespace Reductech.EDR.Core.Steps
 
             var newStream = entityStreamResult.Value.SelectMany(Filter);
 
-            return Result.Success<IAsyncEnumerable<Entity>, IError>(newStream);
+            return newStream;
         }
 
         /// <summary>
@@ -61,7 +60,7 @@ namespace Reductech.EDR.Core.Steps
         /// </summary>
         [StepProperty(1)]
         [Required]
-        public IStep<IAsyncEnumerable<Entity>> EntityStream { get; set; } = null!;
+        public IStep<AsyncList<Entity>> EntityStream { get; set; } = null!;
 
         /// <summary>
         /// A function that gets the key to distinct by from the variable &lt;Entity&gt;
@@ -84,13 +83,13 @@ namespace Reductech.EDR.Core.Steps
     /// <summary>
     /// Removes duplicate entities.
     /// </summary>
-    public sealed class EntityStreamDistinctStepFactory : SimpleStepFactory<EntityStreamDistinct, IAsyncEnumerable<Entity>>
+    public sealed class EntityStreamDistinctStepFactory : SimpleStepFactory<EntityStreamDistinct, AsyncList<Entity>>
     {
         private EntityStreamDistinctStepFactory() {}
 
         /// <summary>
         /// The instance.
         /// </summary>
-        public static SimpleStepFactory<EntityStreamDistinct, IAsyncEnumerable<Entity>> Instance { get; } = new EntityStreamDistinctStepFactory();
+        public static SimpleStepFactory<EntityStreamDistinct, AsyncList<Entity>> Instance { get; } = new EntityStreamDistinctStepFactory();
     }
 }

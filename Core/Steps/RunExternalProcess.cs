@@ -32,7 +32,8 @@ namespace Reductech.EDR.Core.Steps
                 arguments = new List<string>();
             else
             {
-                var argsResult = await Arguments.Run(stateMonad, cancellationToken);
+                var argsResult = await Arguments.Run(stateMonad, cancellationToken)
+                    .Bind(x=>x.GetElementsAsync(cancellationToken));
 
                 if (argsResult.IsFailure) return argsResult.ConvertFailure<Unit>();
 
@@ -70,7 +71,7 @@ namespace Reductech.EDR.Core.Steps
         /// </summary>
         [StepProperty(2)]
         [DefaultValueExplanation("No arguments")]
-        public IStep<IAsyncEnumerable<StringStream>>? Arguments { get; set; }
+        public IStep<AsyncList<StringStream>>? Arguments { get; set; }
 
         /// <summary>
         /// Encoding to use for the process output.

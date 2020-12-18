@@ -28,15 +28,15 @@ namespace Reductech.EDR.Core.Steps
         /// </summary>
         [StepProperty(2)]
         [Required]
-        public IStep<IAsyncEnumerable<StringStream>> Strings { get; set; } = null!;
+        public IStep<AsyncList<StringStream>> Strings { get; set; } = null!;
 
         /// <inheritdoc />
         public override async Task<Result<StringStream, IError>> Run(IStateMonad stateMonad,
             CancellationToken cancellationToken)
         {
             var listResult = await Strings.Run(stateMonad, cancellationToken)
-                    .Map(async x=>await x.ToListAsync(cancellationToken))
-                ;
+                    .Bind(x=>x.GetElementsAsync(cancellationToken));
+
             if (listResult.IsFailure) return listResult.ConvertFailure<StringStream>();
 
             var delimiter = await Delimiter.Run(stateMonad, cancellationToken)

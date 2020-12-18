@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Steps;
@@ -10,10 +9,10 @@ using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
-    public class WhereTests : StepTestBase<EntityStreamFilter, EntityStream>
+    public class WhereTests : StepTestBase<EntityStreamFilter, AsyncList<Entity>>
     {
         /// <inheritdoc />
-        public EntityStreamFilterTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
+        public WhereTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
         {
         }
 
@@ -23,20 +22,21 @@ namespace Reductech.EDR.Core.Tests.Steps
             get
             {
                 yield return new StepCase("Filter stuff",
-                    new EntityForEach
+                    new ForEach<Entity>
                     {
                         Action = new Print<Entity> { Value = GetEntityVariable },
-                        EntityStream = new EntityStreamFilter
+                        Array = new EntityStreamFilter
                         {
-                            EntityStream =  Constant(EntityStream.Create(
+                            EntityStream =  Array(
                                 CreateEntity(("Foo", "Alpha")),
                                 CreateEntity(("Bar", "Alpha")),
                                 CreateEntity(("Foo", "ALPHA")),
                                 CreateEntity(("Foo", "Beta")),
                                 CreateEntity(("Bar", "Beta"))
-                            )),
+                            ),
                             Predicate = new EntityHasProperty() { Property = Constant("Foo"), Entity = GetEntityVariable }
-                        }
+                        },
+                        Variable = VariableName.Entity
                     },
                     Unit.Default,
                     "(Foo: \"Alpha\")", "(Foo: \"ALPHA\")", "(Foo: \"Beta\")");
@@ -54,7 +54,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                 yield return new ErrorCase("EntityStream is error",
                     new EntityStreamFilter()
                     {
-                        EntityStream = new FailStep<EntityStream>(){ErrorMessage = "Stream Fail"},
+                        EntityStream = new FailStep<AsyncList<Entity>>(){ErrorMessage = "Stream Fail"},
                         Predicate = Constant(true)
                     },
                     new SingleError("Stream Fail", ErrorCode.Test, EntireSequenceLocation.Instance));

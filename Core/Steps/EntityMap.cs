@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
@@ -14,13 +13,13 @@ namespace Reductech.EDR.Core.Steps
     /// <summary>
     /// Apply a function to every entity in an entity stream.
     /// </summary>
-    public sealed class EntityMap : CompoundStep<IAsyncEnumerable<Entity>>
+    public sealed class EntityMap : CompoundStep<AsyncList<Entity>>
     {
         /// <inheritdoc />
-        public override async Task<Result<IAsyncEnumerable<Entity>, IError>> Run(IStateMonad stateMonad, CancellationToken cancellationToken)
+        public override async Task<Result<AsyncList<Entity>, IError>> Run(IStateMonad stateMonad, CancellationToken cancellationToken)
         {
             var entityStreamResult = await EntityStream.Run(stateMonad, cancellationToken);
-            if (entityStreamResult.IsFailure) return entityStreamResult.ConvertFailure<IAsyncEnumerable<Entity>>();
+            if (entityStreamResult.IsFailure) return entityStreamResult.ConvertFailure<AsyncList<Entity>>();
 
 
             var currentState = stateMonad.GetState().ToImmutableDictionary();
@@ -40,7 +39,7 @@ namespace Reductech.EDR.Core.Steps
 
             var newStream = entityStreamResult.Value.SelectAwait(Action);
 
-            return Result.Success<IAsyncEnumerable<Entity>, IError>(newStream);
+            return newStream;
         }
 
         /// <summary>
@@ -48,7 +47,7 @@ namespace Reductech.EDR.Core.Steps
         /// </summary>
         [StepProperty(1)]
         [Required]
-        public IStep<IAsyncEnumerable<Entity>> EntityStream { get; set; } = null!;
+        public IStep<AsyncList<Entity>> EntityStream { get; set; } = null!;
 
         /// <summary>
         /// A function to get the mapped entity, using the variable &lt;Entity&gt;
@@ -65,13 +64,13 @@ namespace Reductech.EDR.Core.Steps
     /// <summary>
     /// Apply a function to every entity in an entity stream.
     /// </summary>
-    public sealed class EntityMapStepFactory : SimpleStepFactory<EntityMap, IAsyncEnumerable<Entity>>
+    public sealed class EntityMapStepFactory : SimpleStepFactory<EntityMap, AsyncList<Entity>>
     {
         private EntityMapStepFactory() {}
 
         /// <summary>
         /// The instance.
         /// </summary>
-        public static SimpleStepFactory<EntityMap, IAsyncEnumerable<Entity>> Instance { get; } = new EntityMapStepFactory();
+        public static SimpleStepFactory<EntityMap, AsyncList<Entity>> Instance { get; } = new EntityMapStepFactory();
     }
 }

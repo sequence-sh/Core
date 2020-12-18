@@ -7,7 +7,7 @@ using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
-    public class RepeatTests : StepTestBase<Repeat<int>, IAsyncEnumerable<int>>
+    public class RepeatTests : StepTestBase<Repeat<int>, AsyncList<int>>
     {
         /// <inheritdoc />
         public RepeatTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
@@ -23,14 +23,14 @@ namespace Reductech.EDR.Core.Tests.Steps
                 {
                     Element = Constant(6),
                     Number = Constant(3)
-                }, new List<int>(){6,6,6}.ToAsyncEnumerable() );
+                }, new List<int>(){6,6,6}.ToAsyncList() );
 
 
                 yield return new StepCase("Repeat zero times", new Repeat<int>()
                 {
                     Element = Constant(6),
                     Number = Constant(0)
-                }, new List<int>().ToAsyncEnumerable());
+                }, new List<int>().ToAsyncList());
             }
         }
 
@@ -39,7 +39,7 @@ namespace Reductech.EDR.Core.Tests.Steps
         {
             get
             {
-                yield return new DeserializeCase("Repeat number", "Repeat Element: 6 Number: 3", new List<int>(){6,6,6}.ToAsyncEnumerable());
+                yield return new DeserializeCase("Repeat number", "Repeat Element: 6 Number: 3", new List<int>(){6,6,6}.ToAsyncList());
             }
 
         }

@@ -8,7 +8,7 @@ using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
-    public class EntityStreamConcatTests : StepTestBase<EntityStreamConcat, IAsyncEnumerable<Entity>>
+    public class EntityStreamConcatTests : StepTestBase<EntityStreamConcat, AsyncList<Entity>>
     {
         /// <inheritdoc />
         public EntityStreamConcatTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper) {}
@@ -19,20 +19,21 @@ namespace Reductech.EDR.Core.Tests.Steps
             get
             {
                 yield return new StepCase("One stream",
-                    new EntityForEach
+                    new ForEach<Entity>
                     {
                         Action = new Print<Entity> { Value = GetEntityVariable },
 
-                        EntityStream = new EntityStreamConcat
+                        Array = new EntityStreamConcat
                         {
-                            EntityStreams = new Array<IAsyncEnumerable<Entity>>
+                            EntityStreams = new Array<AsyncList<Entity>>
                             {
-                                Elements = new List<IStep<IAsyncEnumerable<Entity>>>
+                                Elements = new List<IStep<AsyncList<Entity>>>
                                 {
                                     Array(CreateEntity(("Foo", "Alpha")), CreateEntity(("Foo", "Beta")))
                                 }
                             }
-                        }
+                        },
+                        Variable = VariableName.Entity
 
                     }, Unit.Default,
 
@@ -41,21 +42,22 @@ namespace Reductech.EDR.Core.Tests.Steps
 
 
                 yield return new StepCase("Two streams",
-                    new EntityForEach
+                    new ForEach<Entity>
                     {
                         Action = new Print<Entity>{Value = GetEntityVariable},
 
-                        EntityStream = new EntityStreamConcat
+                        Array = new EntityStreamConcat
                         {
-                            EntityStreams = new Array<IAsyncEnumerable<Entity>>()
+                            EntityStreams = new Array<AsyncList<Entity>>()
                             {
-                                Elements = new List<IStep<IAsyncEnumerable<Entity>>>()
+                                Elements = new List<IStep<AsyncList<Entity>>>()
                                 {
                                     Array(CreateEntity(("Foo", "Alpha")), CreateEntity(("Foo", "Beta"))),
                                     Array(CreateEntity(("Foo", "Gamma")), CreateEntity(("Foo", "Delta")))
                                 }
                             }
-                        }
+                        },
+                        Variable = VariableName.Entity
 
                     }, Unit.Default,
 

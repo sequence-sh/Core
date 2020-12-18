@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
@@ -14,14 +13,14 @@ namespace Reductech.EDR.Core.Steps
     /// <summary>
     /// Filter entities according to a function.
     /// </summary>
-    public sealed class EntityStreamFilter : CompoundStep<IAsyncEnumerable<Entity>>
+    public sealed class EntityStreamFilter : CompoundStep<AsyncList<Entity>>
     {
         /// <inheritdoc />
-        public override async Task<Result<IAsyncEnumerable<Entity>, IError>> Run(IStateMonad stateMonad,
+        public override async Task<Result<AsyncList<Entity>, IError>> Run(IStateMonad stateMonad,
             CancellationToken cancellationToken)
         {
             var entityStreamResult = await EntityStream.Run(stateMonad, cancellationToken);
-            if (entityStreamResult.IsFailure) return entityStreamResult.ConvertFailure<IAsyncEnumerable<Entity>>();
+            if (entityStreamResult.IsFailure) return entityStreamResult.ConvertFailure<AsyncList<Entity>>();
 
             var currentState = stateMonad.GetState().ToImmutableDictionary();
 
@@ -41,7 +40,7 @@ namespace Reductech.EDR.Core.Steps
 
             var newStream = entityStreamResult.Value.SelectMany(Filter);
 
-            return Result.Success<IAsyncEnumerable<Entity>, IError>(newStream);
+            return newStream;
         }
 
         /// <summary>
@@ -49,7 +48,7 @@ namespace Reductech.EDR.Core.Steps
         /// </summary>
         [StepProperty(1)]
         [Required]
-        public IStep<IAsyncEnumerable<Entity>> EntityStream { get; set; } = null!;
+        public IStep<AsyncList<Entity>> EntityStream { get; set; } = null!;
 
         /// <summary>
         /// A function that determines whether an entity should be included from the variable &lt;Entity&gt;
@@ -65,13 +64,13 @@ namespace Reductech.EDR.Core.Steps
     /// <summary>
     /// Filter entities according to a function.
     /// </summary>
-    public sealed class EntityStreamFilterStepFactory : SimpleStepFactory<EntityStreamFilter, IAsyncEnumerable<Entity>>
+    public sealed class EntityStreamFilterStepFactory : SimpleStepFactory<EntityStreamFilter, AsyncList<Entity>>
     {
         private EntityStreamFilterStepFactory() {}
 
         /// <summary>
         /// The instance.
         /// </summary>
-        public static SimpleStepFactory<EntityStreamFilter, IAsyncEnumerable<Entity>> Instance { get; } = new EntityStreamFilterStepFactory();
+        public static SimpleStepFactory<EntityStreamFilter, AsyncList<Entity>> Instance { get; } = new EntityStreamFilterStepFactory();
     }
 }

@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Parser;
@@ -11,10 +10,10 @@ using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
-    public class SelectTests : StepTestBase<EntityMap, EntityStream>
+    public class SelectTests : StepTestBase<EntityMap, AsyncList<Entity>>
     {
         /// <inheritdoc />
-        public EntityMapTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper) {}
+        public SelectTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper) {}
 
         /// <inheritdoc />
         protected override IEnumerable<StepCase> StepCases
@@ -22,15 +21,15 @@ namespace Reductech.EDR.Core.Tests.Steps
             get
             {
                 yield return new StepCase("Add property",
-                    new EntityForEach
+                    new ForEach<Entity>
                     {
                         Action  = new Print<Entity> {Value = GetEntityVariable},
 
-                        EntityStream = new EntityMap
+                        Array = new EntityMap
                         {
-                            EntityStream = Constant(EntityStream.Create(
+                            EntityStream = Array(
                             CreateEntity(("Foo", "Hello")),
-                            CreateEntity(("Foo", "Hello 2")))),
+                            CreateEntity(("Foo", "Hello 2"))),
 
                             Function = new EntitySetValue<StringStream>
                             {
@@ -38,21 +37,22 @@ namespace Reductech.EDR.Core.Tests.Steps
                                 Property = Constant("Bar"),
                                 Value = Constant("World")
                             }
-                        }
+                        },
+                        Variable = VariableName.Entity
                     }, Unit.Default,
                     "(Foo: \"Hello\" Bar: \"World\")",
                     "(Foo: \"Hello 2\" Bar: \"World\")");
 
                 yield return new StepCase("Change property",
-                    new EntityForEach
+                    new ForEach<Entity>
                     {
                         Action = new Print<Entity> { Value = GetEntityVariable },
 
-                        EntityStream = new EntityMap
+                        Array = new EntityMap
                         {
-                            EntityStream = Constant(EntityStream.Create(
+                            EntityStream = Array(
                             CreateEntity(("Foo", "Hello"), ("Bar", "Earth")),
-                            CreateEntity(("Foo", "Hello 2"), ("Bar", "Earth")))),
+                            CreateEntity(("Foo", "Hello 2"), ("Bar", "Earth"))),
 
                             Function = new EntitySetValue<StringStream>
                             {
@@ -60,7 +60,8 @@ namespace Reductech.EDR.Core.Tests.Steps
                                 Property = Constant("Bar"),
                                 Value = Constant("World")
                             }
-                        }
+                        },
+                        Variable = VariableName.Entity
                     }, Unit.Default,
                     "(Foo: \"Hello\" Bar: \"World\")",
                     "(Foo: \"Hello 2\" Bar: \"World\")");
@@ -79,7 +80,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                 yield return new ErrorCase("Stream error",
                     new EntityMap
                     {
-                        EntityStream = new FailStep<EntityStream>{ ErrorMessage = "Stream Fail" },
+                        EntityStream = new FailStep<AsyncList<Entity>>{ ErrorMessage = "Stream Fail" },
                         Function = Constant(Entity.Create(("Key", "Value")))
                     },
                     new SingleError("Stream Fail", ErrorCode.Test, EntireSequenceLocation.Instance));

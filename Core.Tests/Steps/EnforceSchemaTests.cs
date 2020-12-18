@@ -16,7 +16,7 @@ using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
-    public class EnforceSchemaTests : StepTestBase<EnforceSchema, IAsyncEnumerable<Entity>>
+    public class EnforceSchemaTests : StepTestBase<EnforceSchema, AsyncList<Entity>>
     {
         /// <inheritdoc />
         public EnforceSchemaTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper) {
@@ -35,19 +35,20 @@ namespace Reductech.EDR.Core.Tests.Steps
 
                     return new StepCase(name,
 
-                        new EntityForEach
+                        new ForEach<Entity>
                         {
                             Action = new Print<Entity>
                             {
                                 Value = GetVariable<Entity>(VariableName.Entity)
                             },
-                            EntityStream =
+                            Array =
                             new EnforceSchema
                             {
                                 EntityStream = Array(entities.ToArray()) ,
 
                                 Schema = Constant(schemaEntity)
-                            }
+                            },
+                            Variable = VariableName.Entity
                         },
                         Unit.Default
                         , expectedLogValues
@@ -124,13 +125,14 @@ namespace Reductech.EDR.Core.Tests.Steps
                         {
                             InitialSteps = new List<IStep<Unit>>
                             {
-                                new EntityForEach
+                                new ForEach<Entity>
                                 {
                                     Action = new Print<Entity>
                                     {
                                         Value = GetVariable<Entity>(VariableName.Entity)
                                     },
-                                    EntityStream =enforceSchema
+                                    Array =enforceSchema,
+                                    Variable = VariableName.Entity
                                 }
 
                             },

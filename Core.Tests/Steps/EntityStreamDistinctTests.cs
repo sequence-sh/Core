@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
-using Reductech.EDR.Core.Entities;
+using Reductech.EDR.Core.Internal;
+using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.TestHarness;
 using Reductech.EDR.Core.Util;
@@ -21,10 +22,10 @@ namespace Reductech.EDR.Core.Tests.Steps
             get
             {
                 yield return new StepCase("Distinct case sensitive",
-                    new EntityForEach
+                    new ForEach<Entity>
                     {
                         Action = new Print<Entity> {Value = GetEntityVariable},
-                        EntityStream = new EntityStreamDistinct
+                        Array = new EntityStreamDistinct
                         {
                             EntityStream = Array(
                                 CreateEntity(("Foo", "Alpha")),
@@ -34,17 +35,18 @@ namespace Reductech.EDR.Core.Tests.Steps
                                 CreateEntity(("Foo", "Beta"))
                             ),
                             KeySelector = new EntityGetValue() {Property = Constant("Foo"), Entity = GetEntityVariable}
-                        }
+                        },
+                        Variable = VariableName.Entity
                     },
                     Unit.Default,
                     "(Foo: \"Alpha\")", "(Foo: \"ALPHA\")", "(Foo: \"Beta\")"
                 );
 
                 yield return new StepCase("Distinct case insensitive",
-                    new EntityForEach
+                    new ForEach<Entity>
                     {
                         Action = new Print<Entity> { Value = GetEntityVariable },
-                        EntityStream = new EntityStreamDistinct
+                        Array = new EntityStreamDistinct
                         {
                             EntityStream = Array(
                                 CreateEntity(("Foo", "Alpha")),
@@ -55,7 +57,8 @@ namespace Reductech.EDR.Core.Tests.Steps
                             ),
                             KeySelector = new EntityGetValue { Property = Constant("Foo"), Entity = GetEntityVariable },
                             IgnoreCase = Constant(true)
-                        }
+                        },
+                        Variable = VariableName.Entity
                     },
                     Unit.Default,
                     "(Foo: \"Alpha\")",  "(Foo: \"Beta\")"
@@ -75,7 +78,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                 yield return new ErrorCase("Stream is error",
                     new EntityStreamDistinct()
                     {
-                        EntityStream = new FailStep<EntityStream>() { ErrorMessage = "Stream Fail" },
+                        EntityStream = new FailStep<AsyncList<Entity>>() { ErrorMessage = "Stream Fail" },
                         KeySelector =  Constant("A")
                     },
                     new SingleError("Stream Fail", ErrorCode.Test, EntireSequenceLocation.Instance));

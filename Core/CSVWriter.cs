@@ -28,7 +28,7 @@ namespace Reductech.EDR.Core
         /// </summary>
         public static async Task<Result<StringStream, IError>> WriteCSV(
             IStateMonad stateMonad,
-            IStep<IAsyncEnumerable<Entity>> entityStream,
+            IStep<AsyncList<Entity>> entityStream,
             IStep<StringStream> delimiter,
             IStep<EncodingEnum> encoding,
             IStep<StringStream> quoteCharacter,
@@ -88,7 +88,7 @@ namespace Reductech.EDR.Core
         /// Writes entities from an entityStream to a stream in csv format.
         /// </summary>
         public static async Task<Result<Stream, IError>> WriteCSV(
-            IAsyncEnumerable<Entity> entityStream,
+            AsyncList<Entity> entityStream,
             Encoding encoding,
             string delimiter,
             char? quoteCharacter,
@@ -97,15 +97,13 @@ namespace Reductech.EDR.Core
             string dateTimeFormat,
             CancellationToken cancellationToken)
         {
-            //var results = await entityStream.TryGetResultsAsync(cancellationToken);
+            var results = await entityStream.GetElementsAsync(cancellationToken);
 
-            //if (results.IsFailure)
-            //    return results.ConvertFailure<Stream>();
-            var results = await entityStream.ToListAsync(cancellationToken);
+            if (results.IsFailure) return results.ConvertFailure<Stream>();
 
             var stream = new MemoryStream();
 
-            if (!results.Any())
+            if (!results.Value.Any())
                 return stream;//empty stream
 
             var textWriter = new StreamWriter(stream, encoding);
@@ -130,9 +128,9 @@ namespace Reductech.EDR.Core
 
             var writer = new CsvWriter(textWriter, configuration);
 
-            var records = results.Select(x => ConvertToObject(x, multiValueDelimiter, dateTimeFormat));
+            var records = results.Value.Select(x => ConvertToObject(x, multiValueDelimiter, dateTimeFormat));
 
-            await writer.WriteRecordsAsync(records);
+            await writer.WriteRecordsAsync(records); //TODO pass an async enumerable
 
             await textWriter.FlushAsync();
 

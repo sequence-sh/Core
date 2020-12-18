@@ -14,7 +14,7 @@ namespace Reductech.EDR.Core.Steps
     /// <summary>
     /// Creates an array by repeating an element.
     /// </summary>
-    public sealed class Repeat<T> : CompoundStep<IAsyncEnumerable<T>>
+    public sealed class Repeat<T> : CompoundStep<AsyncList<T>>
     {
         /// <summary>
         /// The element to repeat.
@@ -31,20 +31,20 @@ namespace Reductech.EDR.Core.Steps
         public IStep<int> Number { get; set; } = null!;
 
         /// <inheritdoc />
-        public override async Task<Result<IAsyncEnumerable<T>, IError>> Run(IStateMonad stateMonad,
+        public override async Task<Result<AsyncList<T>, IError>> Run(IStateMonad stateMonad,
             CancellationToken cancellationToken)
         {
             var element = await Element.Run(stateMonad, cancellationToken);
 
-            if (element.IsFailure) return element.ConvertFailure<IAsyncEnumerable<T>>();
+            if (element.IsFailure) return element.ConvertFailure<AsyncList<T>>();
 
             var number = await Number.Run(stateMonad, cancellationToken);
 
-            if (number.IsFailure) return number.ConvertFailure<IAsyncEnumerable<T>>();
+            if (number.IsFailure) return number.ConvertFailure<AsyncList<T>>();
 
-            var result = Enumerable.Repeat(element.Value, number.Value).ToAsyncEnumerable();
+            var result = Enumerable.Repeat(element.Value, number.Value).ToAsyncList();
 
-            return Result.Success<IAsyncEnumerable<T>, IError>(result);
+            return result;
         }
 
         /// <inheritdoc />

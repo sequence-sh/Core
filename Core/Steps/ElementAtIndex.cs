@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
@@ -21,7 +19,7 @@ namespace Reductech.EDR.Core.Steps
         /// </summary>
         [StepProperty(1)]
         [Required]
-        public IStep<IAsyncEnumerable<T>> Array { get; set; } = null!;
+        public IStep<AsyncList<T>> Array { get; set; } = null!;
 
         /// <summary>
         /// The index to get the element at.
@@ -41,14 +39,9 @@ namespace Reductech.EDR.Core.Steps
 
             if (indexResult.IsFailure) return indexResult.ConvertFailure<T>();
 
-            var r = await arrayResult.Value.ElementAtOrDefaultAsync(indexResult.Value, cancellationToken);
-
-            if (r == null)
-                return new SingleError("Index was out of the range of the array.", ErrorCode.IndexOutOfBounds,
-                    new StepErrorLocation(this));
+            var r = await arrayResult.Value.ElementAtAsync(indexResult.Value, new StepErrorLocation(this), cancellationToken);
 
             return r;
-            //))
         }
 
         /// <inheritdoc />

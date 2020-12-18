@@ -32,11 +32,12 @@ namespace Reductech.EDR.Core.Internal
         /// <inheritdoc />
         public async Task<Result<Entity, IError>> Run(IStateMonad stateMonad, CancellationToken cancellationToken)
         {
-            var pairs = new List<(string, object)>();
+            var pairs = new List<(string, object?)>();
 
             foreach (var (key, step) in Properties)
             {
-                var r = await step.Run<object>(stateMonad, cancellationToken);
+                var r = await step.Run<object>(stateMonad, cancellationToken)
+                    .Bind(x=> EntityHelper.TryUnpackObjectAsync(x, cancellationToken));
 
                 if (r.IsFailure) return r.ConvertFailure<Entity>();
 

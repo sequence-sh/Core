@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
@@ -22,7 +20,7 @@ namespace Reductech.EDR.Core.Steps
         /// </summary>
         [StepProperty(1)]
         [Required]
-        public IStep<IAsyncEnumerable<T>> Array { get; set; } = null!;
+        public IStep<AsyncList<T>> Array { get; set; } = null!;
 
         /// <summary>
         /// The element to look for.
@@ -42,10 +40,9 @@ namespace Reductech.EDR.Core.Steps
 
             if (elementResult.IsFailure) return elementResult.ConvertFailure<int>();
 
-            var list = await arrayResult.Value.ToListAsync(cancellationToken);
-            var index = list.IndexOf(elementResult.Value);
+            var indexResult = await arrayResult.Value.IndexOfAsync(elementResult.Value, cancellationToken);
 
-            return index;
+            return indexResult;
         }
 
         /// <inheritdoc />

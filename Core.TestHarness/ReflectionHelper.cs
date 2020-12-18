@@ -136,18 +136,28 @@ namespace Reductech.EDR.Core.TestHarness
 
             if (freezable is CompoundFreezableStep cs && freezable.StepName == ArrayStepFactory.Instance.TypeName)
             {
-
-                var constants = cs.FreezableStepData
-                    .StepProperties[new StepParameterReference(nameof(Steps.Array<object>.Elements))]
-                    .StepList.Value.Cast<IConstantFreezableStep>();
-
                 var list = new List<string>();
 
-                foreach (var constantFreezableStep in constants)
+                try
                 {
-                    var s = await constantFreezableStep.SerializeAsync(CancellationToken.None);
-                    list.Add(s);
+                    var steps = cs.FreezableStepData
+                    .StepProperties[new StepParameterReference(nameof(Steps.Array<object>.Elements))]
+                    .StepList.Value.Cast<IFreezableStep>();
+
+
+
+                    foreach (var step1 in steps)
+                    {
+                        var s = await step1.SerializeAsync(CancellationToken.None);
+                        list.Add(s);
+                    }
                 }
+                catch (Exception e)
+                {
+                    throw new Exception($"Case Failure 123 {e.Message}");
+                }
+
+
 
                 return SerializationMethods.SerializeList(list);
             }
@@ -253,7 +263,7 @@ namespace Reductech.EDR.Core.TestHarness
                 step =  Constant(d);
             }
 
-            else if (outputType == typeof(IAsyncEnumerable<StringStream>))
+            else if (outputType == typeof(AsyncList<StringStream>))
             {
                 var list = new List<string>();
                 for (var i = 0; i < 3; i++)
@@ -264,7 +274,7 @@ namespace Reductech.EDR.Core.TestHarness
 
                 step = Array(list.ToArray());
             }
-            else if (outputType == typeof(IAsyncEnumerable<int>))
+            else if (outputType == typeof(AsyncList<int>))
             {
                 var list = new List<int>();
                 for (var i = 0; i < 3; i++)
@@ -275,22 +285,22 @@ namespace Reductech.EDR.Core.TestHarness
 
                 step =  Array(list.ToArray());
             }
-            else if (outputType == typeof(IAsyncEnumerable<Entity>))
+            else if (outputType == typeof(AsyncList<Entity>))
             {
                 var entityStream = CreateSimpleEntityStream(ref index);
 
                 step = entityStream;
             }
-            else if (outputType == typeof(IAsyncEnumerable<IAsyncEnumerable<Entity>>))
+            else if (outputType == typeof(AsyncList<AsyncList<Entity>>))
             {
-                var entityStreamList = new List<IStep<IAsyncEnumerable<Entity>> >
+                var entityStreamList = new List<IStep<AsyncList<Entity>> >
                 {
                     CreateSimpleEntityStream(ref index),
                     CreateSimpleEntityStream(ref index),
                     CreateSimpleEntityStream(ref index)
                 };
 
-                step = new Array<IAsyncEnumerable<Entity>> {Elements = entityStreamList};
+                step = new Array<AsyncList<Entity>> {Elements = entityStreamList};
             }
 
             else if (outputType.IsEnum)
@@ -348,7 +358,7 @@ namespace Reductech.EDR.Core.TestHarness
             return (step, newString, index);
 
 
-            static IStep<IAsyncEnumerable<Entity>>  CreateSimpleEntityStream(ref int index1)
+            static IStep<AsyncList<Entity>>  CreateSimpleEntityStream(ref int index1)
             {
                 var entityList = new List<IStep<Entity>>
                 {

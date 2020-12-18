@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
@@ -21,14 +22,14 @@ namespace Reductech.EDR.Core.Steps
         /// </summary>
         [StepProperty(1)]
         [Required]
-        public IStep<IAsyncEnumerable<T>> Array { get; set; } = null!;
+        public IStep<AsyncList<T>> Array { get; set; } = null!;
 
         /// <summary>
         /// The name of the variable to loop over.
         /// </summary>
         [VariableName(2)]
         [Required]
-        public VariableName Variable { get; set; } //TODO use x
+        public VariableName Variable { get; set; } //TODO default value
 
         /// <summary>
         /// The action to perform repeatedly.
@@ -44,16 +45,22 @@ namespace Reductech.EDR.Core.Steps
             var elements = await Array.Run(stateMonad, cancellationToken);
             if (elements.IsFailure) return elements.ConvertFailure<Unit>();
 
-            await foreach (var element in elements.Value.WithCancellation(cancellationToken))
-            {
-                var setResult = stateMonad.SetVariable(Variable, element);
-                if (setResult.IsFailure) return setResult.ConvertFailure<Unit>();
+            var currentState = stateMonad.GetState().ToImmutableDictionary();
 
-                var r = await Action.Run(stateMonad, cancellationToken);
-                if (r.IsFailure) return r;
+            async ValueTask<Result<Unit, IError>> Apply(T entity, CancellationToken cancellation)
+            {
+                var scopedMonad = new ScopedStateMonad(stateMonad, currentState,
+                    new KeyValuePair<VariableName, object>(Variable, entity));
+
+
+                var result = await Action.Run(scopedMonad, cancellation);
+                return result;
             }
 
-            return Unit.Default;
+
+            var finalResult = await elements.Value.ForEach(Apply, cancellationToken);
+
+            return finalResult;
         }
 
         /// <inheritdoc />

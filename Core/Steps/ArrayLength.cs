@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
@@ -21,12 +19,12 @@ namespace Reductech.EDR.Core.Steps
         /// </summary>
         [StepProperty(1)]
         [Required]
-        public IStep<IAsyncEnumerable<T>> Array { get; set; } = null!;
+        public IStep<AsyncList<T>> Array { get; set; } = null!;
 
         /// <inheritdoc />
         public override async Task<Result<int, IError>> Run(IStateMonad stateMonad, CancellationToken cancellationToken)
         {
-            return await Array.Run(stateMonad, cancellationToken).Map(async x=> await x.CountAsync(cancellationToken));
+            return await Array.Run(stateMonad, cancellationToken).Bind(x=> x.CountAsync(cancellationToken));
         }
 
         /// <inheritdoc />

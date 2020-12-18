@@ -14,10 +14,10 @@ namespace Reductech.EDR.Core.Steps
     /// <summary>
     /// Change the name of entity fields.
     /// </summary>
-    public class EntityMapProperties : CompoundStep<IAsyncEnumerable<Entity>>, IStep<IAsyncEnumerable<Entity>>
+    public class EntityMapProperties : CompoundStep<AsyncList<Entity>>
     {
         /// <inheritdoc />
-        public override async Task<Result<IAsyncEnumerable<Entity>, IError>> Run(IStateMonad stateMonad,
+        public override async Task<Result<AsyncList<Entity>, IError>> Run(IStateMonad stateMonad,
             CancellationToken cancellationToken)
         {
             var mappings = await Mappings.Run(stateMonad, cancellationToken)
@@ -26,18 +26,18 @@ namespace Reductech.EDR.Core.Steps
 
 
 
-            if (mappings.IsFailure) return mappings.ConvertFailure<IAsyncEnumerable<Entity>>();
+            if (mappings.IsFailure) return mappings.ConvertFailure<AsyncList<Entity>>();
 
             var entityStream = await EntityStream.Run(stateMonad, cancellationToken);
 
-            if (entityStream.IsFailure) return entityStream.ConvertFailure<IAsyncEnumerable<Entity>>();
+            if (entityStream.IsFailure) return entityStream.ConvertFailure<AsyncList<Entity>>();
 
 
             var newEntityStream = entityStream.Value
                 .Select(e=> ChangeHeader(e, mappings.Value));
 
 
-            return Result.Success<IAsyncEnumerable<Entity>, IError>(newEntityStream);
+            return newEntityStream;
 
             static Entity ChangeHeader(Entity entity, IReadOnlyDictionary<string, string> mappings)
             {
@@ -66,7 +66,7 @@ namespace Reductech.EDR.Core.Steps
         /// </summary>
         [StepProperty(1)]
         [Required]
-        public IStep<IAsyncEnumerable<Entity>> EntityStream { get; set; } = null!;
+        public IStep<AsyncList<Entity>> EntityStream { get; set; } = null!;
 
         /// <summary>
         /// An entity containing mappings
@@ -83,14 +83,14 @@ namespace Reductech.EDR.Core.Steps
     /// <summary>
     /// Change the name of entity fields.
     /// </summary>
-    public class EntityMapPropertiesStepFactory : SimpleStepFactory<EntityMapProperties, IAsyncEnumerable<Entity>>
+    public class EntityMapPropertiesStepFactory : SimpleStepFactory<EntityMapProperties, AsyncList<Entity>>
     {
         private EntityMapPropertiesStepFactory() {}
 
         /// <summary>
         /// The instance.
         /// </summary>
-        public static SimpleStepFactory<EntityMapProperties, IAsyncEnumerable<Entity>> Instance { get; } = new EntityMapPropertiesStepFactory();
+        public static SimpleStepFactory<EntityMapProperties, AsyncList<Entity>> Instance { get; } = new EntityMapPropertiesStepFactory();
     }
 
 

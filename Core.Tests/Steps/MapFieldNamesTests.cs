@@ -8,7 +8,7 @@ using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
-    public class MapFieldNamesTests : StepTestBase<EntityMapProperties, IAsyncEnumerable<Entity>>
+    public class MapFieldNamesTests : StepTestBase<EntityMapProperties, AsyncList<Entity>>
     {
         /// <inheritdoc />
         public MapFieldNamesTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
@@ -22,13 +22,13 @@ namespace Reductech.EDR.Core.Tests.Steps
             {
                 yield return new StepCase("Map some fields",
 
-                    new EntityForEach
+                    new ForEach<Entity>
                     {
                         Action = new Print<Entity>
                         {
                             Value = GetVariable<Entity>(VariableName.Entity)
                         },
-                        EntityStream =
+                        Array =
                                     new EntityMapProperties
                                     {
                                         EntityStream = Array(
@@ -38,7 +38,8 @@ namespace Reductech.EDR.Core.Tests.Steps
                                                 ("Bar", "World 2"))),
 
                                         Mappings =  Constant(CreateEntity(("Food", "Foo")))
-                                    }
+                                    },
+                        Variable = VariableName.Entity
                     }, Unit.Default , "(Foo: \"Hello\" Bar: \"World\")",
                     "(Foo: \"Hello 2\" Bar: \"World 2\")"
                 );

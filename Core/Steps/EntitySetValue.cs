@@ -26,10 +26,12 @@ namespace Reductech.EDR.Core.Steps
             var propertyResult = await Property.Run(stateMonad, cancellationToken);
             if (propertyResult.IsFailure) return propertyResult.ConvertFailure<Entity>();
 
-            var valueResult = await Value.Run(stateMonad, cancellationToken);
+            var valueResult = await Value.Run(stateMonad, cancellationToken)
+                    .Bind(x=> EntityHelper.TryUnpackObjectAsync(x, cancellationToken));
             if (valueResult.IsFailure) return valueResult.ConvertFailure<Entity>();
 
             var propertyName = await propertyResult.Value.GetStringAsync();
+
 
             var entityValue = EntityValue.CreateFromObject(valueResult.Value);
 
@@ -37,6 +39,8 @@ namespace Reductech.EDR.Core.Steps
 
             return newEntity;
         }
+
+
 
         /// <summary>
         /// The entity to set the property on.

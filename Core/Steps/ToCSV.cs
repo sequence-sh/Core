@@ -36,7 +36,7 @@ namespace Reductech.EDR.Core.Steps
         /// </summary>
         [StepProperty(1)]
         [Required]
-        public IStep<IAsyncEnumerable<Entity>> Entities { get; set; } = null!;
+        public IStep<AsyncList<Entity>> Entities { get; set; } = null!;
 
         /// <summary>
         /// How the stream is encoded.

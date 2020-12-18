@@ -3,8 +3,11 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Entities;
+using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Serialization;
 
 // ReSharper disable once CheckNamespace - we want this namespace to prevent clash with FunctionalExtensions
@@ -41,12 +44,12 @@ namespace Reductech.EDR.Core
         /// <summary>
         /// Creates a new Entity
         /// </summary>
-        public static Entity Create(params (string key, object property)[] properties) => Create(properties.AsEnumerable(), null);
+        public static Entity Create(params (string key, object? property)[] properties) => Create(properties.AsEnumerable());
 
         /// <summary>
         /// Creates a new Entity
         /// </summary>
-        public static Entity Create(IEnumerable<(string key, object property)> properties, char? multiValueDelimiter = null)
+        public static Entity Create(IEnumerable<(string key, object? property)> properties, char? multiValueDelimiter = null)
         {
             var dict = properties.Select((x, i) =>
                     new EntityProperty(x.key, EntityValue.CreateFromObject(x.property, multiValueDelimiter), null, i))
@@ -123,5 +126,31 @@ namespace Reductech.EDR.Core
 
         /// <inheritdoc />
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+    }
+
+    /// <summary>
+    /// Contains methods for helping with entities.
+    /// </summary>
+    public static class EntityHelper
+    {
+        /// <summary>
+        /// Tries to convert an object into one suitable as an entity property.
+        /// </summary>
+        public static async Task<Result<object?, IError>> TryUnpackObjectAsync(object? o, CancellationToken cancellation)
+        {
+            if (o is IAsyncList list)
+            {
+                var r = await list.GetObjectsAsync(cancellation);
+
+                if (r.IsFailure) return r.ConvertFailure<object?>();
+
+                var q = await r.Value.Select(x => TryUnpackObjectAsync(x, cancellation))
+                    .Combine(ErrorList.Combine).Map(x => x.ToList());
+
+                return q;
+            }
+
+            return Result.Success<object?, IError>(o);
+        }
     }
 }

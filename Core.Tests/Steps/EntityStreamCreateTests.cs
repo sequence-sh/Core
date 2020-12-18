@@ -9,7 +9,7 @@
 
 //namespace Reductech.EDR.Core.Tests.Steps
 //{
-//    public class EntityStreamCreateTests : StepTestBase<Entitystr, IAsyncEnumerable<Entity>>
+//    public class EntityStreamCreateTests : StepTestBase<Entitystr, AsyncList<Entity>>
 //    {
 //        /// <inheritdoc />
 //        public EntityStreamCreateTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)

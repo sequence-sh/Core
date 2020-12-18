@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.ComponentModel.DataAnnotations;
@@ -46,7 +45,8 @@ namespace Reductech.EDR.Core.Internal
                     .Where(property => property.GetCustomAttribute<StepPropertyBaseAttribute>() != null)
                     .Select(x => x.PropertyType)
                     .Select(GetUnderlyingType)
-                    .Where(x => x.IsEnum);
+                    .Where(x => x.IsEnum)
+                    .Concat(ExtraEnumTypes);
 
 
                 static Type GetUnderlyingType(Type t)
@@ -59,6 +59,11 @@ namespace Reductech.EDR.Core.Internal
                 }
             }
         }
+
+        /// <summary>
+        /// Additional enum types needed by this step.
+        /// </summary>
+        public virtual IEnumerable<Type> ExtraEnumTypes => Enumerable.Empty<Type>();
 
         /// <inheritdoc />
         public abstract string OutputTypeExplanation { get; }
@@ -237,8 +242,9 @@ namespace Reductech.EDR.Core.Internal
             {
                 var argument = propertyInfo.PropertyType.GenericTypeArguments.Single();
 
-                if (argument.GenericTypeArguments.Length == 1 && typeof(IEnumerable).IsAssignableFrom(argument) && argument != typeof(string))
+                if (argument.GenericTypeArguments.Length == 1 && typeof(IAsyncList).IsAssignableFrom(argument))
                     return SetArray(argument);
+
 
                 return Result.Failure<Unit, IError>(ErrorHelper.WrongParameterTypeError(propertyInfo.Name, MemberType.StepList, MemberType.Step)
                     .WithLocation(parentStep));

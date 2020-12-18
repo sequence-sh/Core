@@ -1,6 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using FluentAssertions;
@@ -65,11 +65,22 @@ namespace Reductech.EDR.Core.TestHarness
             /// <inheritdoc />
             public override void CheckOutputResult(Result<TOutput, IError> result)
             {
-                if (result.IsSuccess)
-                    throw new XunitException($"Expected {ExpectedError.AsString} but was successful");
+                var result2 = result.Bind(GetValue);
 
-                result.Error.Should().Be(ExpectedError);
+                result2.Error.Should().Be(ExpectedError);
             }
+        }
+
+        private static Result<Unit, IError> GetValue(TOutput result)
+        {
+            if (result is IAsyncList list)
+            {
+                var r = list.GetObjectsAsync(CancellationToken.None).Result;
+
+                if (r.IsFailure) return r.ConvertFailure<Unit>();
+            }
+
+            return Unit.Default;
         }
 
         /// <summary>

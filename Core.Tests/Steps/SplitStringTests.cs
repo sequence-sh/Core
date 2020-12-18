@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using Reductech.EDR.Core.Parser;
 using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.TestHarness;
@@ -8,7 +7,7 @@ using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
-    public class SplitStringTests : StepTestBase<StringSplit, IAsyncEnumerable<StringStream>>
+    public class SplitStringTests : StepTestBase<StringSplit, AsyncList<StringStream>>
     {
         /// <inheritdoc />
         public SplitStringTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
@@ -25,7 +24,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                     {
                         String = Constant("Hello World"),
                         Delimiter = Constant(" ")
-                    }, new List<StringStream>(){"Hello", "World"}.ToAsyncEnumerable()
+                    }, new List<StringStream>(){"Hello", "World"}.ToAsyncList()
                     );
 
 
@@ -38,7 +37,7 @@ namespace Reductech.EDR.Core.Tests.Steps
             get
             {
                 yield return new DeserializeCase("Split a string", "StringSplit String: 'Hello World' Delimiter: ' '",
-                    new List<StringStream>{"Hello", "World"}.ToAsyncEnumerable());
+                    new List<StringStream>{"Hello", "World"}.ToAsyncList());
 
             }
 
