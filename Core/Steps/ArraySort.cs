@@ -12,6 +12,7 @@ namespace Reductech.EDR.Core.Steps
     /// <summary>
     /// Reorder an array.
     /// </summary>
+    [Alias("SortArray")]
     public sealed class ArraySort<T> : CompoundStep<AsyncList<T>>
     {
         /// <summary>
@@ -77,7 +78,7 @@ namespace Reductech.EDR.Core.Steps
             freezableStepData.TryGetStep(nameof(ArraySort<object>.Array), StepType)
                 .Bind(x => x.TryGetOutputTypeReference(typeResolver))
                 .Bind(x => x.TryGetGenericTypeReference(typeResolver, 0)
-                    .MapError(e=>e.WithLocation(freezableStepData)))
+                    .MapError(e => e.WithLocation(freezableStepData)))
                 .Map(x => x as ITypeReference)
         ;
     }

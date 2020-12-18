@@ -13,6 +13,7 @@ namespace Reductech.EDR.Core.Steps
     /// Extracts entities from a CSV file.
     /// The same as FromConcordance but with different default values.
     /// </summary>
+    [Alias("ConvertCSVToEntity")]
     public sealed class FromCSV : CompoundStep<AsyncList<Entity>>
     {
         /// <inheritdoc />

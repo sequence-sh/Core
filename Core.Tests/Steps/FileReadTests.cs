@@ -12,10 +12,10 @@ using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
-    public class ReadFileTests : StepTestBase<ReadFile, StringStream>
+    public class FileReadTests : StepTestBase<FileRead, StringStream>
     {
         /// <inheritdoc />
-        public ReadFileTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper) { }
+        public FileReadTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper) { }
 
         /// <inheritdoc />
         protected override IEnumerable<StepCase> StepCases
@@ -25,7 +25,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                 yield return new StepCase("Print file text",
                     new Print<StringStream>
                     {
-                        Value = new ReadFile
+                        Value = new FileRead
                         {
                             Path = Constant("File.txt"),
                         }
@@ -42,21 +42,21 @@ namespace Reductech.EDR.Core.Tests.Steps
         {
             get
             {
-                yield return new DeserializeCase("Default", "Print Value: (ReadFile Path: 'File.txt')",
+                yield return new DeserializeCase("Default", "Print Value: (FileRead Path: 'File.txt')",
                     Unit.Default,
                     "Hello World"
                 ).WithFileSystemAction(x=>
                     x.Setup(a=>a.ReadFile("File.txt"))
                         .Returns(new MemoryStream(Encoding.ASCII.GetBytes("Hello World"))));
 
-                yield return new DeserializeCase("Ordered Args", "Print (ReadFile  'File.txt')",
+                yield return new DeserializeCase("Ordered Args", "Print (FileRead 'File.txt')",
                     Unit.Default,
                     "Hello World"
                 ).WithFileSystemAction(x =>
                     x.Setup(a => a.ReadFile("File.txt"))
                         .Returns(new MemoryStream(Encoding.ASCII.GetBytes("Hello World"))));
 
-                yield return new DeserializeCase("Alias args", "Print Value: (ReadFile FromPath: 'File.txt')",
+                yield return new DeserializeCase("Alias", "Print Value: (ReadFromFile Path: 'File.txt')",
                     Unit.Default,
                     "Hello World"
                 ).WithFileSystemAction(x =>
@@ -72,7 +72,7 @@ namespace Reductech.EDR.Core.Tests.Steps
             get
             {
                 yield return new ErrorCase("ValueIf Error",
-                        new ReadFile
+                        new FileRead
                         {
                             Path =  Constant("File.txt"),
                         },

@@ -12,6 +12,7 @@ namespace Reductech.EDR.Core.Steps
     /// <summary>
     /// Returns whether a string is empty.
     /// </summary>
+    [Alias("IsStringEmpty")]
     public sealed class StringIsEmpty : CompoundStep<bool>
     {
         /// <inheritdoc />

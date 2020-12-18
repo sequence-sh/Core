@@ -12,6 +12,7 @@ namespace Reductech.EDR.Core.Steps
     /// <summary>
     /// Returns whether a file on the file system exists.
     /// </summary>
+    [Alias("DoesFileExist")]
     public class FileExists : CompoundStep<bool>
     {
         /// <summary>
@@ -19,6 +20,7 @@ namespace Reductech.EDR.Core.Steps
         /// </summary>
         [StepProperty(1)]
         [Required]
+        [Alias("File")]
         public IStep<StringStream> Path { get; set; } = null!;
 
         /// <inheritdoc />

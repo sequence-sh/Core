@@ -15,6 +15,7 @@ namespace Reductech.EDR.Core.Steps
     /// Reorder entities according to their property values.
     /// Consumes the stream.
     /// </summary>
+    [Alias("SortEntityStream")]
     public sealed class EntityStreamSort : CompoundStep<AsyncList<Entity>>
     {
         /// <inheritdoc />
@@ -45,7 +46,6 @@ namespace Reductech.EDR.Core.Steps
 
             var r = entityStreamResult.Value.Sort(sortDescending.Value, GetKey);
 
-
             return r;
         }
 
@@ -70,7 +70,6 @@ namespace Reductech.EDR.Core.Steps
         [StepProperty(3)]
         [DefaultValueExplanation("False")]
         public IStep<bool> Descending { get; set; } = new BoolConstant(false);
-
 
         /// <inheritdoc />
         public override IStepFactory StepFactory => EntityStreamSortStepFactory.Instance;

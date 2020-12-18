@@ -14,6 +14,7 @@ namespace Reductech.EDR.Core.Steps
     /// <summary>
     /// Change the name of entity fields.
     /// </summary>
+    [Alias("RenameEntityFields")]
     public class EntityMapProperties : CompoundStep<AsyncList<Entity>>
     {
         /// <inheritdoc />
@@ -21,10 +22,8 @@ namespace Reductech.EDR.Core.Steps
             CancellationToken cancellationToken)
         {
             var mappings = await Mappings.Run(stateMonad, cancellationToken)
-                .Map(e=>e
-                    .ToDictionary(x=>x.Name,x=>x.BestValue.ToString()));
-
-
+                .Map(e => e
+                    .ToDictionary(x => x.Name, x => x.BestValue.ToString()));
 
             if (mappings.IsFailure) return mappings.ConvertFailure<AsyncList<Entity>>();
 
@@ -32,10 +31,8 @@ namespace Reductech.EDR.Core.Steps
 
             if (entityStream.IsFailure) return entityStream.ConvertFailure<AsyncList<Entity>>();
 
-
             var newEntityStream = entityStream.Value
                 .Select(e=> ChangeHeader(e, mappings.Value));
-
 
             return newEntityStream;
 
@@ -55,7 +52,8 @@ namespace Reductech.EDR.Core.Steps
                     }
                 }
 
-                if (!changed) return entity;
+                if (!changed)
+                    return entity;
                 return new Entity(builder.ToImmutable());
             }
 
@@ -85,13 +83,12 @@ namespace Reductech.EDR.Core.Steps
     /// </summary>
     public class EntityMapPropertiesStepFactory : SimpleStepFactory<EntityMapProperties, AsyncList<Entity>>
     {
-        private EntityMapPropertiesStepFactory() {}
+        private EntityMapPropertiesStepFactory() { }
 
         /// <summary>
         /// The instance.
         /// </summary>
         public static SimpleStepFactory<EntityMapProperties, AsyncList<Entity>> Instance { get; } = new EntityMapPropertiesStepFactory();
     }
-
-
+    
 }

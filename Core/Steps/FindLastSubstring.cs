@@ -14,6 +14,7 @@ namespace Reductech.EDR.Core.Steps
     /// Gets the last instance of substring in a string.
     /// Returns -1 if the substring is not present
     /// </summary>
+    [Alias("LastIndexOfSubstring")]
     public sealed class FindLastSubstring : CompoundStep<int>
     {
         /// <summary>

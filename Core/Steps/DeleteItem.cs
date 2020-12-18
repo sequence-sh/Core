@@ -14,6 +14,7 @@ namespace Reductech.EDR.Core.Steps
     /// <summary>
     /// Deletes a file or folder from the file system.
     /// </summary>
+    [Alias("Delete")]
     public class DeleteItem : CompoundStep<Unit>
     {
         /// <inheritdoc />
@@ -25,7 +26,6 @@ namespace Reductech.EDR.Core.Steps
                 return pathResult.ConvertFailure<Unit>();
 
             var path = await pathResult.Value.GetStringAsync();
-
 
             Result<Unit, IErrorBuilder> result;
 
@@ -45,8 +45,7 @@ namespace Reductech.EDR.Core.Steps
                 stateMonad.Logger.LogInformation($"Item '{path}' did not exist.");
             }
 
-            return result.MapError(x=>x.WithLocation(this));
-
+            return result.MapError(x => x.WithLocation(this));
         }
 
         /// <summary>
@@ -54,8 +53,9 @@ namespace Reductech.EDR.Core.Steps
         /// </summary>
         [StepProperty(1)]
         [Required]
+        [Alias("File")]
+        [Alias("Folder")]
         public IStep<StringStream> Path { get; set; } = null!;
-
 
         /// <inheritdoc />
         public override IStepFactory StepFactory => DeleteItemStepFactory.Instance;

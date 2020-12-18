@@ -14,6 +14,7 @@ namespace Reductech.EDR.Core.Steps
     /// <summary>
     /// Join strings with a delimiter.
     /// </summary>
+    [Alias("JoinStrings")]
     public sealed class StringJoin : CompoundStep<StringStream>
     {
         /// <summary>

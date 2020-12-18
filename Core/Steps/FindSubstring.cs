@@ -14,6 +14,7 @@ namespace Reductech.EDR.Core.Steps
     /// Gets the index of the first instance of a substring in a string.
     /// Returns -1 if the substring is not present.
     /// </summary>
+    [Alias("IndexOfSubstring")]
     public sealed class FindSubstring : CompoundStep<int>
     {
         /// <summary>

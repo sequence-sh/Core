@@ -12,6 +12,7 @@ namespace Reductech.EDR.Core.Steps
     /// <summary>
     /// Checks if an array is empty.
     /// </summary>
+    [Alias("IsArrayEmpty")]
     public sealed class ArrayIsEmpty<T> : CompoundStep<bool>
     {
         /// <summary>

@@ -99,7 +99,7 @@ namespace Reductech.EDR.Core.Tests
                     new SetVariable<AsyncList<Entity>>
                     {
                         Variable = new VariableName("EntityStream"),
-                        Value = new FromCSV{Stream = new ReadFile{Path = new StringConstant(@"C:\Users\wainw\source\repos\Reductech\edr\Examples\Dinosaurs.csv")}}
+                        Value = new FromCSV{Stream = new FileRead{Path = new StringConstant(@"C:\Users\wainw\source\repos\Reductech\edr\Examples\Dinosaurs.csv")}}
                     },
 
                     new SetVariable<Entity>()

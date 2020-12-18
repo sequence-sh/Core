@@ -13,6 +13,7 @@ namespace Reductech.EDR.Core.Steps
     /// Extracts entities from a Concordance stream.
     /// The same as FromCSV but with different default values.
     /// </summary>
+    [Alias("ConvertConcordanceToEntity")]
     public sealed class FromConcordance : CompoundStep<AsyncList<Entity>>
     {
         /// <inheritdoc />
@@ -31,7 +32,6 @@ namespace Reductech.EDR.Core.Steps
             return result;
         }
 
-
         /// <summary>
         /// Stream containing the CSV data.
         /// </summary>
@@ -39,14 +39,12 @@ namespace Reductech.EDR.Core.Steps
         [Required]
         public IStep<StringStream> Stream { get; set; } = null!;
 
-
         /// <summary>
         /// The delimiter to use to separate fields.
         /// </summary>
         [StepProperty(2)]
         [DefaultValueExplanation("\\u0014 - DC4")]
         public IStep<StringStream> Delimiter { get; set; } = new StringConstant(new StringStream("\u0014"));
-
 
         /// <summary>
         /// The quote character to use.
