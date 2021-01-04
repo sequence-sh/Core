@@ -42,7 +42,7 @@ namespace Reductech.EDR.Core.TestHarness
 
         public static IStep<Entity> GetEntityVariable => GetVariable<Entity>(VariableName.Entity);
 
-        public static Entity CreateEntity(params (string key, object value)[] pairs) => Entity.Create(pairs);
+        public static Entity CreateEntity(params (string key, object? value)[] pairs) => Entity.Create(pairs);
 
         public static Schema CreateSchema(string name, bool allowExtraProperties, params (string propertyName, SchemaPropertyType type, Multiplicity multiplicity)[] properties)
         {

@@ -53,7 +53,7 @@ namespace Reductech.EDR.Core
                 quoteResult.Value,
                 commentResult.Value,
                 multiValueResult.Value,
-                errorLocation).ToAsyncList();
+                errorLocation).ToSequence();
 
 
             return asyncEnumerable;
@@ -129,7 +129,9 @@ namespace Reductech.EDR.Core
             {
                 var dict = row as IDictionary<string, object>;
 
-                var entity = Entity.Create(dict!.Select(x=>(x.Key, x.Value)), multiValueDelimiter);
+                var values = dict!.Select(x => (x.Key, x.Value));
+
+                var entity = Entity.Create(values!, multiValueDelimiter);
                 yield return entity;
             }
 

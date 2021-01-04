@@ -291,10 +291,10 @@ namespace Reductech.EDR.Core.Parser
                     (term: VisitTerm(term), number: OneOf<string, int>.FromT1(i + 2)));
 
 
-                foreach (var numberedArgument in numberedArguments)
+                foreach (var (term, number) in numberedArguments)
                 {
-                    if (numberedArgument.term.IsFailure) errors.Add(numberedArgument.term.Error);
-                    else dict.Add(new StepParameterReference(numberedArgument.number), numberedArgument.term.Value);
+                    if (term.IsFailure) errors.Add(term.Error);
+                    else dict.Add(new StepParameterReference(number), term.Value);
                 }
 
                 var members = AggregateNamedArguments(context.namedArgument(), new TextLocation(context));
@@ -328,10 +328,10 @@ namespace Reductech.EDR.Core.Parser
                     (term: VisitTerm(term), number: OneOf<string, int>.FromT1(i + 1)));
 
 
-                foreach (var numberedArgument in numberedArguments)
+                foreach (var (term, number) in numberedArguments)
                 {
-                    if(numberedArgument.term.IsFailure) errors.Add(numberedArgument.term.Error);
-                    else dict.Add(new StepParameterReference(numberedArgument.number),  numberedArgument.term.Value);
+                    if(term.IsFailure) errors.Add(term.Error);
+                    else dict.Add(new StepParameterReference(number),  term.Value);
                 }
 
                 var members = AggregateNamedArguments(context.namedArgument(), new TextLocation(context));

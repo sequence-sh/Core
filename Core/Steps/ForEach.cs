@@ -51,7 +51,7 @@ namespace Reductech.EDR.Core.Steps
             async ValueTask<Result<Unit, IError>> Apply(T element, CancellationToken cancellation)
             {
                 var scopedMonad = new ScopedStateMonad(stateMonad, currentState,
-                    new KeyValuePair<VariableName, object>(Variable, element));
+                    new KeyValuePair<VariableName, object>(Variable, element!));
 
 
                 var result = await Action.Run(scopedMonad, cancellation);

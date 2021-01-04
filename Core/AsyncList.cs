@@ -14,7 +14,7 @@ namespace Reductech.EDR.Core
     /// <summary>
     /// Either a list of an asynchronous list
     /// </summary>
-    public sealed class Sequence<T> : IAsyncList, IEquatable<Sequence<T>>
+    public sealed class Sequence<T> : ISequence, IEquatable<Sequence<T>>
     {
         /// <summary>
         /// Create a new AsyncList
@@ -130,7 +130,7 @@ namespace Reductech.EDR.Core
             IAsyncEnumerable<T> asyncEnumerable = Option.IsT0 ? Option.AsT0.ToAsyncEnumerable() : Option.AsT1;
 
 
-            var r = asyncEnumerable.SelectMany(selector).ToAsyncList();
+            var r = asyncEnumerable.SelectMany(selector).ToSequence();
 
             return r;
         }
@@ -143,7 +143,7 @@ namespace Reductech.EDR.Core
             IAsyncEnumerable<T> asyncEnumerable =
                 Option.IsT0 ? Option.AsT0.ToAsyncEnumerable() : Option.AsT1;
 
-            var r = asyncEnumerable.SelectAwait(selector).ToAsyncList();
+            var r = asyncEnumerable.SelectAwait(selector).ToSequence();
 
             return r;
         }
@@ -156,7 +156,7 @@ namespace Reductech.EDR.Core
             IAsyncEnumerable<T> asyncEnumerable =
                 Option.IsT0 ? Option.AsT0.ToAsyncEnumerable() : Option.AsT1;
 
-            var r = asyncEnumerable.Select(selector).ToAsyncList();
+            var r = asyncEnumerable.Select(selector).ToSequence();
 
             return r;
         }
@@ -292,7 +292,7 @@ namespace Reductech.EDR.Core
             if (e.IsFailure) return e.Error.GetHashCode();
             if (e.Value.Count == 0) return 0;
 
-            return HashCode.Combine(e.Value.First(), e.Value.Count);
+            return HashCode.Combine(e.Value[0], e.Value.Count);
         }
 
         /// <inheritdoc />
@@ -306,7 +306,10 @@ namespace Reductech.EDR.Core
         }
     }
 
-    public interface IAsyncList
+    /// <summary>
+    /// Either a list of an asynchronous list
+    /// </summary>
+    public interface ISequence
     {
         /// <summary>
         /// Try to get the elements of this list, as objects.
@@ -319,11 +322,21 @@ namespace Reductech.EDR.Core
         Task<Result<List<object>, IError>> GetObjectsAsync(CancellationToken cancellation);
     }
 
-    public static class AsyncListHelper
+    /// <summary>
+    /// Provides extension methods for converting Enumerables to Sequences
+    /// </summary>
+    public static class SequenceHelper
     {
-        public static Sequence<T> ToAsyncList<T>(this IAsyncEnumerable<T> enumerable) =>
+        /// <summary>
+        /// Converts an enumerable to a Sequence
+        /// </summary>
+        public static Sequence<T> ToSequence<T>(this IAsyncEnumerable<T> enumerable) =>
             new(OneOf<IReadOnlyList<T>, IAsyncEnumerable<T>>.FromT1(enumerable));
-        public static Sequence<T> ToAsyncList<T>(this IEnumerable<T> enumerable) =>
+
+        /// <summary>
+        /// Converts an asyncEnumerable to a Sequence
+        /// </summary>
+        public static Sequence<T> ToSequence<T>(this IEnumerable<T> enumerable) =>
             new(OneOf<IReadOnlyList<T>, IAsyncEnumerable<T>>.FromT0(enumerable.ToList()));
     }
 }

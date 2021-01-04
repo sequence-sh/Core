@@ -256,7 +256,7 @@ namespace Reductech.EDR.Core.Internal
             {
                 var argument = propertyInfo.PropertyType.GenericTypeArguments.Single();
 
-                if (argument.GenericTypeArguments.Length == 1 && typeof(IAsyncList).IsAssignableFrom(argument))
+                if (argument.GenericTypeArguments.Length == 1 && typeof(ISequence).IsAssignableFrom(argument))
                     return SetArray(argument);
 
 

@@ -41,7 +41,7 @@ namespace Reductech.EDR.Core.Steps
 
             if (number.IsFailure) return number.ConvertFailure<Core.Sequence<T>>();
 
-            var result = Enumerable.Repeat(element.Value, number.Value).ToAsyncList();
+            var result = Enumerable.Repeat(element.Value, number.Value).ToSequence();
 
             return result;
         }

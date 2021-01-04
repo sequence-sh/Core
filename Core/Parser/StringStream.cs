@@ -12,7 +12,7 @@ namespace Reductech.EDR.Core.Parser
     /// A stream of data representing a string.
     /// This can either be a raw string or a stream and an encoding.
     /// </summary>
-    public class StringStream : IEquatable<StringStream>, IComparable<StringStream>, IDisposable
+    public sealed class StringStream : IEquatable<StringStream>, IComparable<StringStream>, IDisposable
     {
         /// <summary>
         /// Create a new DataStream

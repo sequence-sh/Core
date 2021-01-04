@@ -23,7 +23,7 @@ namespace Reductech.EDR.Core.Steps
         {
             var result = await Elements.Select(x => x.Run(stateMonad, cancellationToken))
                 .Combine(ErrorList.Combine)
-                .Map(x => x.ToList().ToAsyncList());
+                .Map(x => x.ToList().ToSequence());
 
             return result;
         }

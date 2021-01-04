@@ -24,7 +24,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                     {
                         String = Constant("Hello World"),
                         Delimiter = Constant(" ")
-                    }, new List<StringStream>(){"Hello", "World"}.ToAsyncList()
+                    }, new List<StringStream>(){"Hello", "World"}.ToSequence()
                     );
 
 
@@ -37,7 +37,7 @@ namespace Reductech.EDR.Core.Tests.Steps
             get
             {
                 yield return new DeserializeCase("Split a string", "StringSplit String: 'Hello World' Delimiter: ' '",
-                    new List<StringStream>{"Hello", "World"}.ToAsyncList());
+                    new List<StringStream>{"Hello", "World"}.ToSequence());
 
             }
 

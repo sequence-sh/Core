@@ -138,7 +138,7 @@ namespace Reductech.EDR.Core
         /// </summary>
         public static async Task<Result<object?, IError>> TryUnpackObjectAsync(object? o, CancellationToken cancellation)
         {
-            if (o is IAsyncList list)
+            if (o is ISequence list)
             {
                 var r = await list.GetObjectsAsync(cancellation);
 

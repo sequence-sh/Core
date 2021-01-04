@@ -49,7 +49,7 @@ namespace Reductech.EDR.Core.Steps
             var results = stringResult.Value
                 .Split(new[] {delimiterResult.Value}, StringSplitOptions.None)
                 .Select(x => new StringStream(x))
-                .ToList().ToAsyncList();
+                .ToList().ToSequence();
 
             return results;
         }
