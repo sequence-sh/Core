@@ -20,6 +20,18 @@ namespace Reductech.EDR.Core.Internal
     /// </summary>
     public abstract class StepFactory : IStepFactory
     {
+        /// <summary>
+        /// Create a new StepFactory
+        /// </summary>
+        protected StepFactory()
+        {
+            ScopedFunctionParameterReferences = new Lazy<IReadOnlySet<StepParameterReference>>(
+                ()=>  StepType.GetProperties()
+                    .Where(x=>x.GetCustomAttribute<ScopedFunctionAttribute>() != null)
+                    .SelectMany(StepParameterReference.GetPossibleReferences).ToHashSet());
+        }
+
+
         /// <inheritdoc />
         public abstract Result<ITypeReference, IError> TryGetOutputTypeReference(FreezableStepData freezableStepData, TypeResolver typeResolver);
 
@@ -30,7 +42,6 @@ namespace Reductech.EDR.Core.Internal
         /// The type of this step.
         /// </summary>
         public abstract Type StepType { get; }
-
 
         /// <inheritdoc />
         public override string ToString() => TypeName;
@@ -148,13 +159,13 @@ namespace Reductech.EDR.Core.Internal
 
             var remainingRequired = RequiredProperties.ToHashSet(StringComparer.OrdinalIgnoreCase);
 
-            List<(FreezableStepProperty, PropertyInfo)> scopedFunctions = new();
+            List<(IFreezableStep, PropertyInfo)> scopedFunctions = new();
 
             foreach (var (stepMember, propertyInfo) in pairs)
             {
                 if(propertyInfo.GetCustomAttribute<ScopedFunctionAttribute>() != null)
                 {
-                    scopedFunctions.Add((stepMember, propertyInfo));
+                    scopedFunctions.Add((stepMember.ConvertToStep(), propertyInfo));
                     continue;
                 }
 
@@ -171,24 +182,19 @@ namespace Reductech.EDR.Core.Internal
 
             if(scopedFunctions.Any())
             {
-                var scopedContext = step.TryGetScopedContext(stepContext);
-                if (scopedContext.IsSuccess)
-                    foreach (var (stepMember, propertyInfo) in scopedFunctions)
+
+                    foreach (var (freezableStep, propertyInfo) in scopedFunctions)
                     {
+                        var scopedContext = step.TryGetScopedContext(stepContext, freezableStep);
+                        if (scopedContext.IsFailure)
+                            errors.Add(scopedContext.Error);
+
                         remainingRequired.Remove(propertyInfo.Name);
-                        var result =
-                            stepMember.Match(
-                                vn => TrySetVariableName(propertyInfo, step, vn, stepMember.Location,
-                                    scopedContext.Value),
-                                s => TrySetStep(propertyInfo, step, s, scopedContext.Value),
-                                sList => TrySetStepList(propertyInfo, step, sList, scopedContext.Value)
-                            );
+                        var result = TrySetStep(propertyInfo, step, freezableStep, scopedContext.Value);
 
-                        if (result.IsFailure) errors.Add(result.Error);
+                        if (result.IsFailure)
+                            errors.Add(result.Error);
                     }
-                else
-                    errors.Add(scopedContext.Error);
-
             }
 
             foreach (var property in remainingRequired)
@@ -250,7 +256,6 @@ namespace Reductech.EDR.Core.Internal
                     if (Enum.TryParse(enumType, constant.Value.Value.AsT0, true, out var enumValue))
                     {
                         var step = EnumConstantFreezable.TryCreateEnumConstant(enumValue!);
-
                         return step;
                     }
 
@@ -260,7 +265,6 @@ namespace Reductech.EDR.Core.Internal
                     if (DateTime.TryParse(constant.Value.Value.AsT0, out var dt))
                     {
                         var step = new DateTimeConstant(dt);
-
                         return Result.Success<IStep, IErrorBuilder>(step);
                     }
                 }
@@ -453,5 +457,10 @@ namespace Reductech.EDR.Core.Internal
         }
 
         private static string GetLastTerm(string s) => s.Split('.', StringSplitOptions.RemoveEmptyEntries).Last();
+
+        private Lazy<IReadOnlySet<StepParameterReference>> ScopedFunctionParameterReferences { get; }
+
+        /// <inheritdoc />
+        public bool IsScopedFunction(StepParameterReference stepParameterReference) => ScopedFunctionParameterReferences.Value.Contains(stepParameterReference);
     }
 }

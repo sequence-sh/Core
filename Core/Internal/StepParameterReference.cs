@@ -42,10 +42,7 @@ namespace Reductech.EDR.Core.Internal
         }
 
         /// <inheritdoc />
-        public override bool Equals(object? obj)
-        {
-            return obj is StepParameterReference other && Equals(other);
-        }
+        public override bool Equals(object? obj) => obj is StepParameterReference other && Equals(other);
 
         /// <inheritdoc />
         public override int GetHashCode() => Value.Match(x => StringComparer.OrdinalIgnoreCase.GetHashCode(x), x => x);

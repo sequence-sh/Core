@@ -98,10 +98,10 @@ namespace Reductech.EDR.Core.Steps
         }
 
         /// <inheritdoc />
-        public override Result<StepContext, IError> TryGetScopedContext(StepContext baseContext)
+        public override Result<StepContext, IError> TryGetScopedContext(StepContext baseContext, IFreezableStep scopedStep)
         {
-            return baseContext.TryClone((Variable, new ActualTypeReference(typeof(int))))
-                .MapError(eb => eb.WithLocation(this));
+            return baseContext.TryCloneWithScopedStep(Variable, new ActualTypeReference(typeof(int)), scopedStep,
+                new StepErrorLocation(this));
         }
 
         /// <inheritdoc />

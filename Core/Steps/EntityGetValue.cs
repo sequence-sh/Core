@@ -56,6 +56,7 @@ namespace Reductech.EDR.Core.Steps
         [Alias("Get")]
         public IStep<StringStream> Property { get; set; } = null!;
 
+
         /// <inheritdoc />
         public override IStepFactory StepFactory => EntityGetValueStepFactory.Instance;
     }

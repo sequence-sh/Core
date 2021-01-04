@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Reflection;
 using Reductech.EDR.Core.Attributes;
@@ -44,6 +45,18 @@ namespace Reductech.EDR.Core.Internal
 
             foreach (var alias in stepFactory.StepType.GetCustomAttributes<AliasAttribute>())
                 yield return alias.Name;
+        }
+
+        /// <summary>
+        /// Is this property a scoped function
+        /// </summary>
+        [Pure]
+        public bool IsScopedFunction(string stepName, StepParameterReference stepParameterReference)
+        {
+            if (!Dictionary.TryGetValue(stepName, out var factory))
+                return false;
+
+            return factory.IsScopedFunction(stepParameterReference);
         }
 
         /// <summary>

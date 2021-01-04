@@ -2,6 +2,7 @@
 using System.Linq;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Internal.Errors;
+using Reductech.EDR.Core.Util;
 
 namespace Reductech.EDR.Core.Internal
 {
@@ -44,7 +45,56 @@ namespace Reductech.EDR.Core.Internal
         /// </summary>
         public StepFactoryStore StepFactoryStore { get; }
 
+        /// <summary>
+        /// Try to add this step and all its children to this TypeResolver.
+        /// </summary>
+        public Result<Unit, IError> TryAddTypeHierarchy(IFreezableStep topLevelStep)
+        {
+            int? numberUnresolved = null;
 
+            while (true)
+            {
+                var unresolvableVariableNames = new List<VariableName>();
+                var errors = new List<IError>();
+
+                var result = topLevelStep.GetVariablesSet(this);
+                if (result.IsFailure) return result.ConvertFailure<Unit>();
+
+                foreach (var (variableName, maybe) in result.Value)
+                {
+                    if (maybe.HasNoValue)
+                        unresolvableVariableNames.Add(variableName);
+                    else
+                    {
+                        var addResult = TryAddType(variableName, maybe.Value);
+                        if (addResult.IsFailure) errors.Add(addResult.Error.WithLocation(EntireSequenceLocation.Instance));
+                        else if (!addResult.Value) unresolvableVariableNames.Add(variableName);
+                    }
+                }
+
+                if (errors.Any())
+                    return Result.Failure<Unit, IError>(ErrorList.Combine(errors));
+
+                if (!unresolvableVariableNames.Any())
+                    break; //We've resolved everything. Yey!
+
+                if (numberUnresolved == null || numberUnresolved > unresolvableVariableNames.Count)
+                    numberUnresolved = unresolvableVariableNames.Count; //We have improved this number and can try again
+                else
+                {
+                    var error =
+                        ErrorList.Combine(
+                            unresolvableVariableNames.Distinct().Select(x =>
+                                new SingleError($"Could not resolve variable {x}",
+                                    ErrorCode.CouldNotResolveVariable, EntireSequenceLocation.Instance))
+                        );
+
+                    return Result.Failure<Unit, IError>(error);
+                }
+            }
+
+            return Unit.Default;
+        }
 
         /// <summary>
         /// Tries to add a variableName with this type to the type resolver.

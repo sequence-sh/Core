@@ -124,7 +124,8 @@ namespace Reductech.EDR.Core.Internal
         public virtual Result<Unit, IError> VerifyThis(ISettings settings) => Unit.Default;
 
         /// <inheritdoc />
-        public virtual Result<StepContext, IError> TryGetScopedContext(StepContext baseContext) => new SingleError($"{Name} cannot create a scoped context", ErrorCode.UnexpectedParameter, new StepErrorLocation(this));
+        public virtual Result<StepContext, IError> TryGetScopedContext(StepContext baseContext, IFreezableStep scopedStep) =>
+            new SingleError($"{Name} cannot create a scoped context", ErrorCode.UnexpectedParameter, new StepErrorLocation(this));
 
         /// <inheritdoc />
         public Result<Unit, IError> Verify(ISettings settings)

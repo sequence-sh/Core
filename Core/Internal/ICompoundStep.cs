@@ -23,7 +23,7 @@ namespace Reductech.EDR.Core.Internal
         /// Tries to get the scoped context for this step.
         /// Returns an error if this step does not have any scoped functions.
         /// </summary>
-        Result<StepContext, IError> TryGetScopedContext(StepContext baseContext);
+        Result<StepContext, IError> TryGetScopedContext(StepContext baseContext, IFreezableStep scopedStep);
     }
 
     /// <summary>
