@@ -12,10 +12,7 @@ namespace Reductech.EDR.Core.Internal
         /// <summary>
         /// Create a new TypeResolver
         /// </summary>
-        public TypeResolver(StepFactoryStore stepFactoryStore)
-        {
-            StepFactoryStore = stepFactoryStore;
-        }
+        public TypeResolver(StepFactoryStore stepFactoryStore) => StepFactoryStore = stepFactoryStore;
 
         /// <inheritdoc />
         public override string ToString() => Dictionary.Count + " Types";

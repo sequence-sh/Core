@@ -99,19 +99,21 @@ namespace Reductech.EDR.Core.Steps
         /// <inheritdoc />
         public override string OutputTypeExplanation => nameof(Unit);
 
-        /// <inheritdoc />
-        public override IEnumerable<(VariableName variableName, Maybe<ITypeReference>)> GetTypeReferencesSet(FreezableStepData freezableStepData, TypeResolver typeResolver)
-        {
-            var vn = freezableStepData.TryGetVariableName(nameof(ForEach<object>.Variable), StepType);
-            if(vn.IsFailure) yield break;
+        ///// <inheritdoc />
+        //public override IEnumerable<(VariableName variableName, Maybe<ITypeReference>)> GetVariablesSet(FreezableStepData freezableStepData, TypeResolver typeResolver)
+        //{
+        //    var vn = freezableStepData.TryGetVariableName(nameof(ForEach<object>.Variable), StepType)
+        //        .OnFailureCompensate(() => VariableName.Entity);
 
 
-            var memberType = GetMemberType(freezableStepData, typeResolver);
-            if (memberType.IsSuccess)
-                yield return (vn.Value, Maybe<ITypeReference>.From(memberType.Value));
-            else
-                yield return (vn.Value, Maybe<ITypeReference>.None);
-        }
+        //    var memberType = GetMemberType(freezableStepData, typeResolver);
+        //    if (memberType.IsSuccess)
+        //        yield return (vn.Value, Maybe<ITypeReference>.From(memberType.Value));
+        //    else
+        //        yield return (vn.Value, Maybe<ITypeReference>.None);
+
+
+        //}
 
     }
 }

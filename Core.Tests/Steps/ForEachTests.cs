@@ -50,10 +50,24 @@ namespace Reductech.EDR.Core.Tests.Steps
             get
             {
                 yield return new DeserializeCase(
-                        "Simple Foreach",
-                        "Foreach Action: (Print Value: <Foo>) Array: [3,2,1] Variable: <Foo>",
+                        "Default Variable Name",
+                        "Foreach [3,2,1]  (Print Value: <Entity>)",
                         Unit.Default,
                         "3", "2", "1");
+
+                yield return new DeserializeCase(
+                       "Named Variable",
+                       "Foreach [3,2,1] (Print Value: <Foo>) <Foo>",
+                       Unit.Default,
+                       "3", "2", "1");
+
+                yield return new DeserializeCase(
+                    "Scoped Variable Overloading",
+@"- Foreach [1,2,3] (Print <Entity>) #Here <Entity> is an int
+- Foreach ['one', 'two','three'] (Print <Entity>) #Here <Entity> is a string
+", Unit.Default, "1","2","3", "one", "two", "three"
+
+                );
             }
 
         }
@@ -64,17 +78,17 @@ namespace Reductech.EDR.Core.Tests.Steps
             get
             {
                 yield return new ErrorCase("Array Failure",
-                    new ForEach<int>()
+                    new ForEach<int>
                     {
-                        Array = new FailStep<Array<int>>() {ErrorMessage = "Array Failure"}
+                        Array = new FailStep<Array<int>> {ErrorMessage = "Array Failure"}
                     },
                     new SingleError("Array Failure", ErrorCode.Test, EntireSequenceLocation.Instance));
 
                 yield return new ErrorCase("Action Failure",
-                    new ForEach<int>()
+                    new ForEach<int>
                     {
                         Array = Array(1),
-                        Action = new FailStep<Unit>() { ErrorMessage = "Action Failure" },
+                        Action = new FailStep<Unit> { ErrorMessage = "Action Failure" },
                         Variable = VariableName.Index
                     },
                     new SingleError("Action Failure", ErrorCode.Test, EntireSequenceLocation.Instance));

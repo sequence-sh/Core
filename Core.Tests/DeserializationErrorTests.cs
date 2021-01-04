@@ -33,9 +33,6 @@ namespace Reductech.EDR.Core.Tests
             {
                 yield return new DeserializationErrorCase("", ("Sequence is empty.", EntireSequenceLocation.Instance.AsString));
 
-                yield return new DeserializationErrorCase("- <Entity> = 123\n- Print <Entity>",
-                    ("The type of <Entity> is ambiguous between Integer and Entity.", "Entire Sequence"));
-
                 yield return new DeserializationErrorCase("\"Print 123\"", ("SCL must represent a step with return type Unit", "Print 123"));
 
                 yield return new DeserializationErrorCase("'Print 123'", ("SCL must represent a step with return type Unit", "Print 123"));
@@ -55,6 +52,12 @@ namespace Reductech.EDR.Core.Tests
 
 
                 yield return new DeserializationErrorCase("Print (2 + 2", ("missing ')' at '<EOF>'", "Line: 1, Col: 12, Idx: 12 - Line: 1, Col: 11, Idx: 11 Text: <EOF>"));
+
+                yield return new DeserializationErrorCase("Foreach ['one', 'two'] (Print (<Entity> + 1))",
+                ("Could not resolve variable <Entity>","Line: 1, Col: 31, Idx: 31 - Line: 1, Col: 38, Idx: 38 Text: <Entity>"));
+
+                yield return new DeserializationErrorCase("Foreach ['one', 'two'] (Print (<Num> + 1)) <Num>",
+                ("Could not resolve variable <Num>", "Line: 1, Col: 31, Idx: 31 - Line: 1, Col: 38, Idx: 38 Text: <Num>"));
             }
         }
 

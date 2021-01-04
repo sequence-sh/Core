@@ -38,7 +38,7 @@ namespace Reductech.EDR.Core.Internal
         public string Serialize() => StepFactory.Serializer.Serialize(AllProperties);
 
         /// <inheritdoc />
-        public string Name => StepFactory.TypeName;
+        public virtual string Name => StepFactory.TypeName;
 
         /// <inheritdoc />
         public override string ToString() => Name;

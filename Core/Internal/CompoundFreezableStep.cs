@@ -66,7 +66,7 @@ namespace Reductech.EDR.Core.Internal
             var dataResult = FreezableStepData.GetVariablesSet(typeResolver);
             if (dataResult.IsFailure) return dataResult;
 
-            return dataResult.Value.Concat(stepFactory.Value.GetTypeReferencesSet(FreezableStepData, typeResolver))
+            return dataResult.Value.Concat(stepFactory.Value.GetVariablesSet(FreezableStepData, typeResolver))
                 .ToList();
         }
 

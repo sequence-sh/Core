@@ -70,7 +70,7 @@ namespace Reductech.EDR.Core.Internal
 
 
         /// <inheritdoc />
-        public virtual IEnumerable<(VariableName variableName, Maybe<ITypeReference>)> GetTypeReferencesSet(FreezableStepData freezableStepData, TypeResolver typeResolver)
+        public virtual IEnumerable<(VariableName variableName, Maybe<ITypeReference>)> GetVariablesSet(FreezableStepData freezableStepData, TypeResolver typeResolver)
         {
             yield break;
         }
@@ -235,9 +235,6 @@ namespace Reductech.EDR.Core.Internal
                     }
                 }
             }
-
-
-
 
             return new ErrorBuilder($"'{propertyInfo.Name}' cannot take the value '{stepToSet.Name}'", ErrorCode.InvalidCast);
         }

@@ -103,9 +103,10 @@ namespace Reductech.EDR.Core.Steps
         public override string OutputTypeExplanation => "Array<T>";
 
         /// <inheritdoc />
-        public override IEnumerable<(VariableName variableName, Maybe<ITypeReference>)> GetTypeReferencesSet(FreezableStepData freezableStepData, TypeResolver typeResolver)
+        public override IEnumerable<(VariableName variableName, Maybe<ITypeReference>)> GetVariablesSet(FreezableStepData freezableStepData, TypeResolver typeResolver)
         {
-            var vn = freezableStepData.TryGetVariableName(nameof(ArrayFilter<object>.Variable), StepType);
+            var vn = freezableStepData.TryGetVariableName(nameof(ArrayFilter<object>.Variable), StepType)
+                .OnFailureCompensate(() => VariableName.Entity);
             if (vn.IsFailure) yield break;
 
 
