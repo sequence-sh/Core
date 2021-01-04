@@ -188,12 +188,14 @@ namespace Reductech.EDR.Core.Internal
                         var scopedContext = step.TryGetScopedContext(stepContext, freezableStep);
                         if (scopedContext.IsFailure)
                             errors.Add(scopedContext.Error);
+                        else
+                        {
+                            remainingRequired.Remove(propertyInfo.Name);
+                            var result = TrySetStep(propertyInfo, step, freezableStep, scopedContext.Value);
 
-                        remainingRequired.Remove(propertyInfo.Name);
-                        var result = TrySetStep(propertyInfo, step, freezableStep, scopedContext.Value);
-
-                        if (result.IsFailure)
-                            errors.Add(result.Error);
+                            if (result.IsFailure)
+                                errors.Add(result.Error);
+                        }
                     }
             }
 
