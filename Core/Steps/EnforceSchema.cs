@@ -17,27 +17,27 @@ namespace Reductech.EDR.Core.Steps
     /// <summary>
     /// Enforce that the schema is valid for all entities
     /// </summary>
-    public sealed class EnforceSchema : CompoundStep<AsyncList<Entity>>
+    public sealed class EnforceSchema : CompoundStep<Core.Sequence<Entity>>
     {
         /// <inheritdoc />
-        public override async Task<Result<AsyncList<Entity>, IError>> Run(IStateMonad stateMonad,
+        public override async Task<Result<Core.Sequence<Entity>, IError>> Run(IStateMonad stateMonad,
             CancellationToken cancellationToken)
         {
             var entityStream = await EntityStream.Run(stateMonad, cancellationToken);
-            if (entityStream.IsFailure) return entityStream.ConvertFailure<AsyncList<Entity>>();
+            if (entityStream.IsFailure) return entityStream.ConvertFailure<Core.Sequence<Entity>>();
 
             var schemaEntity = await Schema.Run(stateMonad, cancellationToken);
-            if (schemaEntity.IsFailure) return schemaEntity.ConvertFailure<AsyncList<Entity>>();
+            if (schemaEntity.IsFailure) return schemaEntity.ConvertFailure<Core.Sequence<Entity>>();
 
             var schema = Entities.Schema
                 .TryCreateFromEntity(schemaEntity.Value)
                 .MapError(e=>e.WithLocation(this));
 
-            if (schema.IsFailure) return schema.ConvertFailure<AsyncList<Entity>>();
+            if (schema.IsFailure) return schema.ConvertFailure<Core.Sequence<Entity>>();
 
 
             var errorBehaviour = await ErrorBehaviour.Run(stateMonad, cancellationToken);
-            if (errorBehaviour.IsFailure) return errorBehaviour.ConvertFailure<AsyncList<Entity>>();
+            if (errorBehaviour.IsFailure) return errorBehaviour.ConvertFailure<Core.Sequence<Entity>>();
 
 
             var newStream = entityStream.Value.SelectMany(ApplySchema);
@@ -84,7 +84,7 @@ namespace Reductech.EDR.Core.Steps
         /// </summary>
         [StepProperty(1)]
         [Required]
-        public IStep<AsyncList<Entity>> EntityStream { get; set; } = null!;
+        public IStep<Core.Sequence<Entity>> EntityStream { get; set; } = null!;
 
         /// <summary>
         /// The schema to enforce.
@@ -109,14 +109,14 @@ namespace Reductech.EDR.Core.Steps
     /// <summary>
     /// Enforce that the schema is valid for all entities
     /// </summary>
-    public sealed class EnforceSchemaStepFactory : SimpleStepFactory<EnforceSchema, AsyncList<Entity>>
+    public sealed class EnforceSchemaStepFactory : SimpleStepFactory<EnforceSchema, Core.Sequence<Entity>>
     {
         private EnforceSchemaStepFactory() {}
 
         /// <summary>
         /// The instance
         /// </summary>
-        public static SimpleStepFactory<EnforceSchema, AsyncList<Entity>> Instance { get; } = new EnforceSchemaStepFactory();
+        public static SimpleStepFactory<EnforceSchema, Core.Sequence<Entity>> Instance { get; } = new EnforceSchemaStepFactory();
 
         /// <inheritdoc />
         public override IEnumerable<Type> ExtraEnumTypes

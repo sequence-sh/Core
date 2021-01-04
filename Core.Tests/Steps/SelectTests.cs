@@ -10,7 +10,7 @@ using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
-    public class SelectTests : StepTestBase<EntityMap, AsyncList<Entity>>
+    public class SelectTests : StepTestBase<EntityMap, Sequence<Entity>>
     {
         /// <inheritdoc />
         public SelectTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper) {}
@@ -80,7 +80,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                 yield return new ErrorCase("Stream error",
                     new EntityMap
                     {
-                        EntityStream = new FailStep<AsyncList<Entity>>{ ErrorMessage = "Stream Fail" },
+                        EntityStream = new FailStep<Sequence<Entity>>{ ErrorMessage = "Stream Fail" },
                         Function = Constant(Entity.Create(("Key", "Value")))
                     },
                     new SingleError("Stream Fail", ErrorCode.Test, EntireSequenceLocation.Instance));

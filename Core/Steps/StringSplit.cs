@@ -16,7 +16,7 @@ namespace Reductech.EDR.Core.Steps
     /// Splits a string.
     /// </summary>
     [Alias("SplitString")]
-    public sealed class StringSplit : CompoundStep<AsyncList<StringStream>>
+    public sealed class StringSplit : CompoundStep<Core.Sequence<StringStream>>
     {
         /// <summary>
         /// The string to split.
@@ -33,17 +33,17 @@ namespace Reductech.EDR.Core.Steps
         public IStep<StringStream> Delimiter { get; set; } = null!;
 
         /// <inheritdoc />
-        public override async Task<Result<AsyncList<StringStream>, IError>> Run(IStateMonad stateMonad, CancellationToken cancellationToken)
+        public override async Task<Result<Core.Sequence<StringStream>, IError>> Run(IStateMonad stateMonad, CancellationToken cancellationToken)
         {
             var stringResult = await String.Run(stateMonad, cancellationToken)
                 .Map(async x=> await x.GetStringAsync());
 
-            if (stringResult.IsFailure) return stringResult.ConvertFailure<AsyncList<StringStream>>();
+            if (stringResult.IsFailure) return stringResult.ConvertFailure<Core.Sequence<StringStream>>();
 
             var delimiterResult = await  Delimiter.Run(stateMonad, cancellationToken)
                 .Map(async x=> await x.GetStringAsync());
 
-            if (delimiterResult.IsFailure) return delimiterResult.ConvertFailure<AsyncList<StringStream>>();
+            if (delimiterResult.IsFailure) return delimiterResult.ConvertFailure<Core.Sequence<StringStream>>();
 
 
             var results = stringResult.Value
@@ -61,13 +61,13 @@ namespace Reductech.EDR.Core.Steps
     /// <summary>
     /// Splits a string.
     /// </summary>
-    public class StringSplitStepFactory : SimpleStepFactory<StringSplit, AsyncList<StringStream>>
+    public class StringSplitStepFactory : SimpleStepFactory<StringSplit, Core.Sequence<StringStream>>
     {
         private StringSplitStepFactory() { }
 
         /// <summary>
         /// The instance.
         /// </summary>
-        public static SimpleStepFactory<StringSplit, AsyncList<StringStream>> Instance { get; } = new StringSplitStepFactory();
+        public static SimpleStepFactory<StringSplit, Core.Sequence<StringStream>> Instance { get; } = new StringSplitStepFactory();
     }
 }

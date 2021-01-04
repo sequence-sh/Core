@@ -28,7 +28,7 @@ namespace Reductech.EDR.Core
         /// </summary>
         public static async Task<Result<StringStream, IError>> WriteCSV(
             IStateMonad stateMonad,
-            IStep<AsyncList<Entity>> entityStream,
+            IStep<Sequence<Entity>> entityStream,
             IStep<StringStream> delimiter,
             IStep<EncodingEnum> encoding,
             IStep<StringStream> quoteCharacter,
@@ -88,7 +88,7 @@ namespace Reductech.EDR.Core
         /// Writes entities from an entityStream to a stream in csv format.
         /// </summary>
         public static async Task<Result<Stream, IError>> WriteCSV(
-            AsyncList<Entity> entityStream,
+            Sequence<Entity> entityStream,
             Encoding encoding,
             string delimiter,
             char? quoteCharacter,

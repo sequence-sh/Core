@@ -14,14 +14,14 @@ namespace Reductech.EDR.Core.Steps
     /// Filter entities according to a function.
     /// </summary>
     [Alias("FilterEntityStream")]
-    public sealed class EntityStreamFilter : CompoundStep<AsyncList<Entity>>
+    public sealed class EntityStreamFilter : CompoundStep<Core.Sequence<Entity>>
     {
         /// <inheritdoc />
-        public override async Task<Result<AsyncList<Entity>, IError>> Run(IStateMonad stateMonad,
+        public override async Task<Result<Core.Sequence<Entity>, IError>> Run(IStateMonad stateMonad,
             CancellationToken cancellationToken)
         {
             var entityStreamResult = await EntityStream.Run(stateMonad, cancellationToken);
-            if (entityStreamResult.IsFailure) return entityStreamResult.ConvertFailure<AsyncList<Entity>>();
+            if (entityStreamResult.IsFailure) return entityStreamResult.ConvertFailure<Core.Sequence<Entity>>();
 
             var currentState = stateMonad.GetState().ToImmutableDictionary();
 
@@ -49,7 +49,7 @@ namespace Reductech.EDR.Core.Steps
         /// </summary>
         [StepProperty(1)]
         [Required]
-        public IStep<AsyncList<Entity>> EntityStream { get; set; } = null!;
+        public IStep<Core.Sequence<Entity>> EntityStream { get; set; } = null!;
 
         /// <summary>
         /// A function that determines whether an entity should be included from the variable &lt;Entity&gt;
@@ -65,13 +65,13 @@ namespace Reductech.EDR.Core.Steps
     /// <summary>
     /// Filter entities according to a function.
     /// </summary>
-    public sealed class EntityStreamFilterStepFactory : SimpleStepFactory<EntityStreamFilter, AsyncList<Entity>>
+    public sealed class EntityStreamFilterStepFactory : SimpleStepFactory<EntityStreamFilter, Core.Sequence<Entity>>
     {
         private EntityStreamFilterStepFactory() {}
 
         /// <summary>
         /// The instance.
         /// </summary>
-        public static SimpleStepFactory<EntityStreamFilter, AsyncList<Entity>> Instance { get; } = new EntityStreamFilterStepFactory();
+        public static SimpleStepFactory<EntityStreamFilter, Core.Sequence<Entity>> Instance { get; } = new EntityStreamFilterStepFactory();
     }
 }

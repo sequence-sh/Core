@@ -21,7 +21,7 @@ namespace Reductech.EDR.Core.Tests.Steps
             get
             {
                 yield return new StepCase("Increment 1",
-                    new Sequence<Unit>()
+                    new Core.Steps.Sequence<Unit>()
                     {
                         InitialSteps = new List<IStep<Unit>>()
                         {
@@ -40,7 +40,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                     ).WithExpectedFinalState("Foo", 42);
 
                 yield return new StepCase("Increment 2",
-                    new Sequence<Unit>()
+                    new Core.Steps.Sequence<Unit>()
                     {
                         InitialSteps = new List<IStep<Unit>>()
                         {
@@ -58,7 +58,7 @@ namespace Reductech.EDR.Core.Tests.Steps
 
 
                 yield return new StepCase("Increment -1",
-                    new Sequence<Unit>
+                    new Core.Steps.Sequence<Unit>
                     {
                         InitialSteps = new List<IStep<Unit>>
                         {

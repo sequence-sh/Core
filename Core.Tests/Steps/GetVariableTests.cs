@@ -20,7 +20,7 @@ namespace Reductech.EDR.Core.Tests.Steps
         {
             get
             {
-                var sequence = new Sequence<Unit>
+                var sequence = new Core.Steps.Sequence<Unit>
                 {
                     InitialSteps = new List<IStep<Unit>>
                     {

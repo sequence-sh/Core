@@ -24,7 +24,7 @@ namespace Reductech.EDR.Core.Tests.Steps
             get
             {
                 yield return new StepCase("Append string to existing variable",
-                    new Sequence<Unit>()
+                    new Core.Steps.Sequence<Unit>()
                     {
                         InitialSteps = new List<IStep<Unit>>()
                         {

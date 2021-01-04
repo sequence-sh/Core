@@ -7,7 +7,7 @@ using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
-    public class SplitStringTests : StepTestBase<StringSplit, AsyncList<StringStream>>
+    public class SplitStringTests : StepTestBase<StringSplit, Sequence<StringStream>>
     {
         /// <inheritdoc />
         public SplitStringTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)

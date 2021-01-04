@@ -7,7 +7,7 @@ using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
-    public class RepeatTests : StepTestBase<Repeat<int>, AsyncList<int>>
+    public class RepeatTests : StepTestBase<Repeat<int>, Sequence<int>>
     {
         /// <inheritdoc />
         public RepeatTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)

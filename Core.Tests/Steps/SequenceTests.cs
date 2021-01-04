@@ -11,7 +11,7 @@ using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
-    public class SequenceTests : StepTestBase<Sequence<StringStream>, StringStream>
+    public class SequenceTests : StepTestBase<Core.Steps.Sequence<StringStream>, StringStream>
     {
         /// <inheritdoc />
         public SequenceTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
@@ -24,7 +24,7 @@ namespace Reductech.EDR.Core.Tests.Steps
             get
             {
                 yield return new StepCase("Print then print",
-                    new Sequence<StringStream>
+                    new Core.Steps.Sequence<StringStream>
                 {
                     InitialSteps = new List<IStep<Unit>>
                     {
@@ -56,7 +56,7 @@ namespace Reductech.EDR.Core.Tests.Steps
             get
             {
                 yield return new SerializeCase("Short form",
-                    new Sequence<StringStream>
+                    new Core.Steps.Sequence<StringStream>
                     {
                         InitialSteps = new List<IStep<Unit>>
                         {
@@ -76,7 +76,7 @@ namespace Reductech.EDR.Core.Tests.Steps
             get
             {
                 yield return new ErrorCase("Initial steps error",
-                    new Sequence<StringStream>
+                    new Core.Steps.Sequence<StringStream>
                     {
                         InitialSteps = new List<IStep<Unit>> {new FailStep<Unit> {ErrorMessage = "Initial step Fail"}},
                         FinalStep = Constant("Final")
@@ -84,7 +84,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                     new SingleError("Initial step Fail", ErrorCode.Test, EntireSequenceLocation.Instance));
 
                 yield return new ErrorCase("Final steps error",
-                    new Sequence<StringStream>
+                    new Core.Steps.Sequence<StringStream>
                     {
                         InitialSteps = new List<IStep<Unit>> {new DoNothing() },
                         FinalStep =  new FailStep<StringStream> { ErrorMessage = "Final step Fail" }

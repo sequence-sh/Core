@@ -13,14 +13,14 @@ namespace Reductech.EDR.Core.Steps
     /// Reorder an array.
     /// </summary>
     [Alias("SortArray")]
-    public sealed class ArraySort<T> : CompoundStep<AsyncList<T>>
+    public sealed class ArraySort<T> : CompoundStep<Core.Sequence<T>>
     {
         /// <summary>
         /// The array to modify.
         /// </summary>
         [StepProperty(1)]
         [Required]
-        public IStep<AsyncList<T>> Array { get; set; } = null!;
+        public IStep<Core.Sequence<T>> Array { get; set; } = null!;
 
         /// <summary>
         /// Whether to sort in descending order.
@@ -30,16 +30,16 @@ namespace Reductech.EDR.Core.Steps
         public IStep<bool> Descending { get; set; } = new BoolConstant(false);
 
         /// <inheritdoc />
-        public override async Task<Result<AsyncList<T>, IError>> Run(IStateMonad stateMonad,
+        public override async Task<Result<Core.Sequence<T>, IError>> Run(IStateMonad stateMonad,
             CancellationToken cancellationToken)
         {
             var array = await Array.Run(stateMonad, cancellationToken);
 
-            if (array.IsFailure) return array.ConvertFailure<AsyncList<T>>();
+            if (array.IsFailure) return array.ConvertFailure<Core.Sequence<T>>();
 
             var descending = await Descending.Run(stateMonad, cancellationToken);
 
-            if (descending.IsFailure) return descending.ConvertFailure<AsyncList<T>>();
+            if (descending.IsFailure) return descending.ConvertFailure<Core.Sequence<T>>();
 
             var r = array.Value.Sort(descending.Value);
 
@@ -66,7 +66,7 @@ namespace Reductech.EDR.Core.Steps
         public override Type StepType => typeof(ArraySort<>);
 
         /// <inheritdoc />
-        protected override ITypeReference GetOutputTypeReference(ITypeReference memberTypeReference) => new GenericTypeReference(typeof(AsyncList<>), new[] { memberTypeReference });
+        protected override ITypeReference GetOutputTypeReference(ITypeReference memberTypeReference) => new GenericTypeReference(typeof(Core.Sequence<>), new[] { memberTypeReference });
 
         /// <inheritdoc />
         public override string OutputTypeExplanation => "ArrayList<T>";

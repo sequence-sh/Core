@@ -7,7 +7,7 @@ using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
-    public class SortArrayTests : StepTestBase<ArraySort<int>, AsyncList<int>>
+    public class SortArrayTests : StepTestBase<ArraySort<int>, Sequence<int>>
     {
         /// <inheritdoc />
         public SortArrayTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)

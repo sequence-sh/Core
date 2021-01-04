@@ -14,12 +14,12 @@ namespace Reductech.EDR.Core
     /// <summary>
     /// Either a list of an asynchronous list
     /// </summary>
-    public sealed class AsyncList<T> : IAsyncList, IEquatable<AsyncList<T>>
+    public sealed class Sequence<T> : IAsyncList, IEquatable<Sequence<T>>
     {
         /// <summary>
         /// Create a new AsyncList
         /// </summary>
-        public AsyncList(OneOf<IReadOnlyList<T>, IAsyncEnumerable<T>> option) => Option = option;
+        public Sequence(OneOf<IReadOnlyList<T>, IAsyncEnumerable<T>> option) => Option = option;
 
         /// <summary>
         /// The option.
@@ -53,7 +53,7 @@ namespace Reductech.EDR.Core
         /// <summary>
         /// Change the ordering of the AsyncList
         /// </summary>
-        public AsyncList<T> Sort(bool descending)
+        public Sequence<T> Sort(bool descending)
         {
             if (Option.IsT0)
             {
@@ -62,7 +62,7 @@ namespace Reductech.EDR.Core
                     enumerable = Option.AsT0.OrderByDescending(x=>x);
                 else enumerable = Option.AsT0.OrderBy(x=>x);
 
-                return new AsyncList<T>(enumerable.ToList());
+                return new Sequence<T>(enumerable.ToList());
             }
 
             IAsyncEnumerable<T> asyncEnumerable;
@@ -70,13 +70,13 @@ namespace Reductech.EDR.Core
                 asyncEnumerable = Option.AsT1.OrderByDescending(x => x);
             else asyncEnumerable = Option.AsT1.OrderBy(x => x);
 
-            return new AsyncList<T>(OneOf<IReadOnlyList<T>, IAsyncEnumerable<T>>.FromT1(asyncEnumerable));
+            return new Sequence<T>(OneOf<IReadOnlyList<T>, IAsyncEnumerable<T>>.FromT1(asyncEnumerable));
         }
 
         /// <summary>
         /// Change the ordering of the AsyncList
         /// </summary>
-        public AsyncList<T> Sort<TKey>(bool descending, Func<T, CancellationToken, ValueTask<TKey>> func)
+        public Sequence<T> Sort<TKey>(bool descending, Func<T, CancellationToken, ValueTask<TKey>> func)
         {
             IAsyncEnumerable<T> asyncEnumerable1 = Option.IsT0 ? Option.AsT0.ToAsyncEnumerable() : Option.AsT1;
 
@@ -85,7 +85,7 @@ namespace Reductech.EDR.Core
                 asyncEnumerable2 = asyncEnumerable1.OrderByDescendingAwaitWithCancellation(func);
             else asyncEnumerable2 = asyncEnumerable1.OrderByAwaitWithCancellation(func);
 
-            return new AsyncList<T>(OneOf<IReadOnlyList<T>, IAsyncEnumerable<T>>.FromT1(asyncEnumerable2));
+            return new Sequence<T>(OneOf<IReadOnlyList<T>, IAsyncEnumerable<T>>.FromT1(asyncEnumerable2));
         }
 
         /// <summary>
@@ -125,7 +125,7 @@ namespace Reductech.EDR.Core
         /// <summary>
         /// Returns some number of elements
         /// </summary>
-        public AsyncList<TResult> SelectMany<TResult>(Func<T, IAsyncEnumerable<TResult>> selector)
+        public Sequence<TResult> SelectMany<TResult>(Func<T, IAsyncEnumerable<TResult>> selector)
         {
             IAsyncEnumerable<T> asyncEnumerable = Option.IsT0 ? Option.AsT0.ToAsyncEnumerable() : Option.AsT1;
 
@@ -138,7 +138,7 @@ namespace Reductech.EDR.Core
         /// <summary>
         /// Perform an action on every member of the sequence
         /// </summary>
-        public AsyncList<TResult> SelectAwait<TResult>(Func<T, ValueTask<TResult>> selector)
+        public Sequence<TResult> SelectAwait<TResult>(Func<T, ValueTask<TResult>> selector)
         {
             IAsyncEnumerable<T> asyncEnumerable =
                 Option.IsT0 ? Option.AsT0.ToAsyncEnumerable() : Option.AsT1;
@@ -151,7 +151,7 @@ namespace Reductech.EDR.Core
         /// <summary>
         /// Perform an action on every member of the sequence
         /// </summary>
-        public AsyncList<TResult> Select<TResult>(Func<T, TResult> selector)
+        public Sequence<TResult> Select<TResult>(Func<T, TResult> selector)
         {
             IAsyncEnumerable<T> asyncEnumerable =
                 Option.IsT0 ? Option.AsT0.ToAsyncEnumerable() : Option.AsT1;
@@ -266,7 +266,7 @@ namespace Reductech.EDR.Core
         }
 
         /// <inheritdoc />
-        public bool Equals(AsyncList<T>? other)
+        public bool Equals(Sequence<T>? other)
         {
             if (other is null)
                 return false;
@@ -301,7 +301,7 @@ namespace Reductech.EDR.Core
             if (obj is null) return false;
             if (ReferenceEquals(this, obj)) return true;
 
-            if (obj is AsyncList<T> al) return Equals(al);
+            if (obj is Sequence<T> al) return Equals(al);
             return false;
         }
     }
@@ -321,9 +321,9 @@ namespace Reductech.EDR.Core
 
     public static class AsyncListHelper
     {
-        public static AsyncList<T> ToAsyncList<T>(this IAsyncEnumerable<T> enumerable) =>
+        public static Sequence<T> ToAsyncList<T>(this IAsyncEnumerable<T> enumerable) =>
             new(OneOf<IReadOnlyList<T>, IAsyncEnumerable<T>>.FromT1(enumerable));
-        public static AsyncList<T> ToAsyncList<T>(this IEnumerable<T> enumerable) =>
+        public static Sequence<T> ToAsyncList<T>(this IEnumerable<T> enumerable) =>
             new(OneOf<IReadOnlyList<T>, IAsyncEnumerable<T>>.FromT0(enumerable.ToList()));
     }
 }

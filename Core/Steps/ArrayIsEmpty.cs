@@ -20,7 +20,7 @@ namespace Reductech.EDR.Core.Steps
         /// </summary>
         [StepProperty(1)]
         [Required]
-        public IStep<AsyncList<T>> Array { get; set; } = null!;
+        public IStep<Core.Sequence<T>> Array { get; set; } = null!;
 
         /// <inheritdoc />
         public override async Task<Result<bool, IError>> Run(IStateMonad stateMonad,

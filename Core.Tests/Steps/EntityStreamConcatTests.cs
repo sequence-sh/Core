@@ -8,7 +8,7 @@ using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
-    public class EntityStreamConcatTests : StepTestBase<EntityStreamConcat, AsyncList<Entity>>
+    public class EntityStreamConcatTests : StepTestBase<EntityStreamConcat, Sequence<Entity>>
     {
         /// <inheritdoc />
         public EntityStreamConcatTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper) {}
@@ -25,9 +25,9 @@ namespace Reductech.EDR.Core.Tests.Steps
 
                         Array = new EntityStreamConcat
                         {
-                            EntityStreams = new Array<AsyncList<Entity>>
+                            EntityStreams = new Array<Sequence<Entity>>
                             {
-                                Elements = new List<IStep<AsyncList<Entity>>>
+                                Elements = new List<IStep<Sequence<Entity>>>
                                 {
                                     Array(CreateEntity(("Foo", "Alpha")), CreateEntity(("Foo", "Beta")))
                                 }
@@ -48,9 +48,9 @@ namespace Reductech.EDR.Core.Tests.Steps
 
                         Array = new EntityStreamConcat
                         {
-                            EntityStreams = new Array<AsyncList<Entity>>()
+                            EntityStreams = new Array<Sequence<Entity>>()
                             {
-                                Elements = new List<IStep<AsyncList<Entity>>>()
+                                Elements = new List<IStep<Sequence<Entity>>>()
                                 {
                                     Array(CreateEntity(("Foo", "Alpha")), CreateEntity(("Foo", "Beta"))),
                                     Array(CreateEntity(("Foo", "Gamma")), CreateEntity(("Foo", "Delta")))

@@ -30,7 +30,7 @@ namespace Reductech.EDR.Core.Tests.Steps
 
                 yield return new StepCase("Set an existing variable",
 
-                    new Sequence<Unit>
+                    new Core.Steps.Sequence<Unit>
                     {
                         InitialSteps = new List<IStep<Unit>>
                         {

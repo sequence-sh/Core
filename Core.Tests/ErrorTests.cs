@@ -51,7 +51,7 @@ namespace Reductech.EDR.Core.Tests
 
 
                 yield return new ErrorTestFunction("Get variable with wrong type",
-                    new Sequence<Unit>
+                    new Core.Steps.Sequence<Unit>
                     {
                         InitialSteps = new IStep<Unit>[]
                         {
