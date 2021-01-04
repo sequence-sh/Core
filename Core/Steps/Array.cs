@@ -15,15 +15,15 @@ namespace Reductech.EDR.Core.Steps
     /// <summary>
     /// Represents an ordered collection of objects.
     /// </summary>
-    public sealed class Array<T> : CompoundStep<AsyncList<T>>
+    public sealed class Array<T> : CompoundStep<Core.Sequence<T>>
     {
         /// <inheritdoc />
-        public override async Task<Result<AsyncList<T>, IError>> Run(IStateMonad stateMonad,
+        public override async Task<Result<Core.Sequence<T>, IError>> Run(IStateMonad stateMonad,
             CancellationToken cancellationToken)
         {
             var result = await Elements.Select(x => x.Run(stateMonad, cancellationToken))
                 .Combine(ErrorList.Combine)
-                .Map(x => x.ToList().ToAsyncList());
+                .Map(x => x.ToList().ToSequence());
 
             return result;
         }
@@ -61,7 +61,7 @@ namespace Reductech.EDR.Core.Steps
         public override string OutputTypeExplanation => "ArrayList<T>";
 
         /// <inheritdoc />
-        protected override ITypeReference GetOutputTypeReference(ITypeReference memberTypeReference) => new GenericTypeReference(typeof(AsyncList<>), new[] { memberTypeReference });
+        protected override ITypeReference GetOutputTypeReference(ITypeReference memberTypeReference) => new GenericTypeReference(typeof(Core.Sequence<>), new[] { memberTypeReference });
 
         /// <inheritdoc />
         protected override Result<ITypeReference, IError> GetMemberType(FreezableStepData freezableStepData, TypeResolver typeResolver)

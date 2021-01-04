@@ -25,8 +25,8 @@ namespace Reductech.EDR.Core.Internal
         {
             var dict = new StepParameterDict
             {
-                {new StepParameterReference(nameof(Sequence<object>.InitialSteps)), new FreezableStepProperty(steps.ToImmutableList(), location )},
-                {new StepParameterReference(nameof(Sequence<object>.FinalStep)), new FreezableStepProperty(finalStep, location )},
+                {new StepParameterReference(nameof(Steps.Sequence<object>.InitialSteps)), new FreezableStepProperty(steps.ToImmutableList(), location )},
+                {new StepParameterReference(nameof(Steps.Sequence<object>.FinalStep)), new FreezableStepProperty(finalStep, location )},
             };
 
             var fpd = new FreezableStepData(dict, location);

@@ -9,7 +9,7 @@ using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
-    public class ArrayTests : StepTestBase<Array<int>, AsyncList<int>>
+    public class ArrayTests : StepTestBase<Array<int>, Sequence<int>>
     {
         /// <inheritdoc />
         public ArrayTests([NotNull] ITestOutputHelper testOutputHelper) : base(testOutputHelper) {}
@@ -19,8 +19,8 @@ namespace Reductech.EDR.Core.Tests.Steps
         {
             get
             {
-                yield return new DeserializeCase("Three elements explicit form", "Array Elements: [1, 2, 3]", new List<int>{1,2,3}.ToAsyncList());
-                yield return new DeserializeCase("Three elements simple form", "Array Elements: [1, 2, 3]", new List<int>{1,2,3}.ToAsyncList());
+                yield return new DeserializeCase("Three elements explicit form", "Array Elements: [1, 2, 3]", new List<int>{1,2,3}.ToSequence());
+                yield return new DeserializeCase("Three elements simple form", "Array Elements: [1, 2, 3]", new List<int>{1,2,3}.ToSequence());
             }
         }
 
@@ -37,7 +37,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                             Constant(2),
                             Constant(3),
                         }
-                    }, new List<int>{1,2,3}.ToAsyncList() );
+                    }, new List<int>{1,2,3}.ToSequence() );
             } }
 
         /// <inheritdoc /> //TODO create a serialize case

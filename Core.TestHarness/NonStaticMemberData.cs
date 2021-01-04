@@ -36,7 +36,7 @@ namespace Reductech.EDR.Core.TestHarness
             if (obj == null)
                 throw new ArgumentException($"{reflectedType.GetDisplayName()}.{MemberName} is null");
 
-            if (!(obj is IEnumerable dataItems))
+            if (obj is not IEnumerable dataItems)
                 throw new ArgumentException($"Property {reflectedType.GetDisplayName()}.{MemberName} did not return IEnumerable");
 
             var result = new List<object?[]>();
@@ -79,10 +79,10 @@ namespace Reductech.EDR.Core.TestHarness
             return () => fieldInfo.GetValue(instance);
         }
 
-        Func<object?>? GetMethodAccessor(Type type)
+        private Func<object?>? GetMethodAccessor(Type type)
         {
             MethodInfo? methodInfo = null;
-            var parameterTypes = (Parameters ?? Array.Empty<object>()).Select(p => p?.GetType()).ToArray();
+            var parameterTypes = (Parameters ?? Array.Empty<object>()).Select(p => p.GetType()).ToArray();
             for (var reflectionType = type; reflectionType != null; reflectionType = reflectionType.BaseType)
             {
                 methodInfo =
@@ -121,7 +121,7 @@ namespace Reductech.EDR.Core.TestHarness
             return () => propInfo.GetValue(instance, null);
         }
 
-        object GetInstance(Type type)
+        static object GetInstance(Type type)
         {
             var constructors = type.GetConstructors();
 
@@ -146,7 +146,7 @@ namespace Reductech.EDR.Core.TestHarness
             if (item == null)
                 return Array.Empty<object>();
 
-            if (!(item is object?[] array))
+            if (item is not object?[] array)
                 throw new ArgumentException($"Property {MemberName} on {MemberType ?? type} yielded an item that is not an object?[] (it was {item.GetType().GetDisplayName()})");
 
             return array;
@@ -164,7 +164,7 @@ namespace Reductech.EDR.Core.TestHarness
             IReadOnlyList<ParameterInfo> parameters,
             IReadOnlyList<Type?> parameterTypes)
         {
-            if (parameters?.Count != parameterTypes.Count)
+            if (parameters.Count != parameterTypes.Count)
                 return false;
 
             for (var idx = 0; idx < parameters.Count; ++idx)

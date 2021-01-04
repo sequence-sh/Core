@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using OneOf;
 using Reductech.EDR.Core.Serialization;
 
@@ -50,7 +51,7 @@ namespace Reductech.EDR.Core.Internal
                 },
                  l =>
                 {
-                    var r = SerializeList(l);
+                    var r = SerializeEnumerable(l);
                     return r;
                 });
 
@@ -60,15 +61,9 @@ namespace Reductech.EDR.Core.Internal
 
             return result;
 
-            string SerializeList(IReadOnlyList<IStep> list)
+            static string SerializeEnumerable(IEnumerable<IStep> enumerable)
             {
-                var l = new List<string>();
-
-                foreach (var s in list)
-                {
-                    var r = s.Serialize();
-                    l.Add(r);
-                }
+                var l = enumerable.Select(s => s.Serialize()).ToList();
 
                 return SerializationMethods.SerializeList(l);
             }

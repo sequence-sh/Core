@@ -34,12 +34,12 @@ namespace Reductech.EDR.Core.TestHarness
         public class SerializeCase : ICase
 #pragma warning restore CA1034 // Nested types should not be visible
         {
-            public SerializeCase(string name, TStep step, string expectedYaml,
+            public SerializeCase(string name, TStep step, string expectedSCL,
                 Configuration? expectedConfiguration = null)
             {
                 Name = name;
                 Step = step;
-                ExpectedYaml = expectedYaml;
+                ExpectedSCL = expectedSCL;
                 ExpectedConfiguration = expectedConfiguration;
             }
 
@@ -49,17 +49,17 @@ namespace Reductech.EDR.Core.TestHarness
             public override string ToString() => Name;
 
             public TStep Step { get; }
-            public string ExpectedYaml { get; }
+            public string ExpectedSCL { get; }
             public Configuration? ExpectedConfiguration { get; }
 
             /// <inheritdoc />
             public async Task RunCaseAsync(ITestOutputHelper testOutputHelper, string? extraArgument)
             {
-                var realYaml = Step.Serialize();
+                var realSCL = Step.Serialize();
 
-                testOutputHelper.WriteLine(realYaml);
+                testOutputHelper.WriteLine(realSCL);
 
-                realYaml.Should().Be(ExpectedYaml);
+                realSCL.Should().Be(ExpectedSCL);
 
                 await Task.CompletedTask;
             }
@@ -72,17 +72,16 @@ namespace Reductech.EDR.Core.TestHarness
 
 
             var stepName = new TStep().StepFactory.TypeName;
-            var expectedYamlBuilder = new StringBuilder();
+            var expectedSCLBuilder = new StringBuilder();
 
-            expectedYamlBuilder.Append(stepName);
-            expectedYamlBuilder.Append(' ');
+            expectedSCLBuilder.Append(stepName);
+            expectedSCLBuilder.Append(' ');
 
-            var pairs = values//.OrderBy(x => x.Key)
+            var pairs = values
                 .Select(x => $"{x.Key}: {x.Value}");
 
-            expectedYamlBuilder.AppendJoin(" ", pairs);
-            //expectedYamlBuilder.Append(')');
-            var c = new SerializeCase("Default", step, expectedYamlBuilder.ToString().Trim());
+            expectedSCLBuilder.AppendJoin(" ", pairs);
+            var c = new SerializeCase("Default", step, expectedSCLBuilder.ToString().Trim());
 
             return c;
         }

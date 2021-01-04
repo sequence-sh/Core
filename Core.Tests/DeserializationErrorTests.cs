@@ -36,9 +36,9 @@ namespace Reductech.EDR.Core.Tests
                 yield return new DeserializationErrorCase("- <Entity> = 123\n- Print <Entity>",
                     ("The type of <Entity> is ambiguous between Integer and Entity.", "Entire Sequence"));
 
-                yield return new DeserializationErrorCase("\"Print 123\"", ("Yaml must represent a step with return type Unit", "Print 123"));
+                yield return new DeserializationErrorCase("\"Print 123\"", ("SCL must represent a step with return type Unit", "Print 123"));
 
-                yield return new DeserializationErrorCase("'Print 123'", ("Yaml must represent a step with return type Unit", "Print 123"));
+                yield return new DeserializationErrorCase("'Print 123'", ("SCL must represent a step with return type Unit", "Print 123"));
 
 
                 yield return new DeserializationErrorCase("Print Value: 'Hello' Value: 'World'",
@@ -49,7 +49,7 @@ namespace Reductech.EDR.Core.Tests
                 ("Unexpected Parameter 'Term' in 'Print'", "Line: 1, Col: 0, Idx: 0 - Line: 1, Col: 33, Idx: 33 Text: Print Value: 'hello' Term: 'world'"));
 
                 yield return new DeserializationErrorCase("Print(['abc', '123'] == ['abc', '123'])",
-                    ("Cannot compare objects of type 'AsyncListOfStringStream'", "Line: 1, Col: 6, Idx: 6 - Line: 1, Col: 37, Idx: 37 Text: ['abc', '123'] == ['abc', '123']"));
+                    ("Cannot compare objects of type 'SequenceOfStringStream'", "Line: 1, Col: 6, Idx: 6 - Line: 1, Col: 37, Idx: 37 Text: ['abc', '123'] == ['abc', '123']"));
 
                 yield return new DeserializationErrorCase("MyMegaFunction true", ("The step 'MyMegaFunction' does not exist", "Line: 1, Col: 0, Idx: 0 - Line: 1, Col: 18, Idx: 18 Text: MyMegaFunction true"));
 
@@ -63,9 +63,9 @@ namespace Reductech.EDR.Core.Tests
         {
             private readonly (string error, string location)[] _expectedErrors;
 
-            public DeserializationErrorCase(string yaml, params (string error, string location)[] expectedErrors)
+            public DeserializationErrorCase(string scl, params (string error, string location)[] expectedErrors)
             {
-                Name = yaml;
+                Name = scl;
                 _expectedErrors = expectedErrors;
             }
 
@@ -77,9 +77,9 @@ namespace Reductech.EDR.Core.Tests
             {
                 var sfs = StepFactoryStore.CreateUsingReflection(typeof(IFreezableStep));
 
-                var result = SequenceParsing.ParseSequence(Name)
+                var result = SCLParsing.ParseSequence(Name)
                     .Bind(x=>x.TryFreeze(sfs))
-                    .Bind(SequenceRunner.ConvertToUnitStep);
+                    .Bind(SCLRunner.ConvertToUnitStep);
 
                 result.IsFailure.Should().BeTrue("Case should fail");
 

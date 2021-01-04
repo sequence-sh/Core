@@ -22,7 +22,7 @@ namespace Reductech.EDR.Core.Tests.Steps
             get
             {
                 yield return new StepCase("Repeat while Foo < 5",
-                    new Sequence<Unit>
+                    new Core.Steps.Sequence<Unit>
                     {
                         InitialSteps = new List<IStep<Unit>>
                         {

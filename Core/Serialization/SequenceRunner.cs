@@ -16,12 +16,12 @@ namespace Reductech.EDR.Core.Serialization
     /// <summary>
     /// Runs processes from Text
     /// </summary>
-    public class SequenceRunner
+    public class SCLRunner
     {
         /// <summary>
-        /// Creates a new Yaml Runner
+        /// Creates a new SCL Runner
         /// </summary>
-        public SequenceRunner(ISettings settings,
+        public SCLRunner(ISettings settings,
             ILogger logger,
             IExternalProcessRunner externalProcessRunner,
             IFileSystemHelper fileSystemHelper,
@@ -41,15 +41,15 @@ namespace Reductech.EDR.Core.Serialization
         private readonly StepFactoryStore _stepFactoryStore;
 
         /// <summary>
-        /// Run step defined in a yaml string.
+        /// Run step defined in an SCL string.
         /// </summary>
-        /// <param name="text">Yaml representing the step.</param>
+        /// <param name="text">SCL representing the step.</param>
         /// <param name="cancellationToken">Cancellation ErrorLocation</param>
         /// <returns></returns>
         [UsedImplicitly]
         public async Task<Result<Unit, IError>> RunSequenceFromTextAsync(string text, CancellationToken cancellationToken)
         {
-            var stepResult = SequenceParsing.ParseSequence(text)
+            var stepResult = SCLParsing.ParseSequence(text)
                     .Bind(x => x.TryFreeze(_stepFactoryStore))
                     .Bind(ConvertToUnitStep);
 
@@ -73,13 +73,13 @@ namespace Reductech.EDR.Core.Serialization
                 return Result.Success<IStep<Unit>, IError>(unitStep);
             }
 
-            return new SingleError("Yaml must represent a step with return type Unit", ErrorCode.InvalidCast, new StepErrorLocation(step));
+            return new SingleError("SCL must represent a step with return type Unit", ErrorCode.InvalidCast, new StepErrorLocation(step));
         }
 
         /// <summary>
-        /// Run step defined in a yaml file.
+        /// Run step defined in an SCL file.
         /// </summary>
-        /// <param name="path">Path to the yaml file.</param>
+        /// <param name="path">Path to the SCL file.</param>
         /// <param name="cancellationToken">The cancellation token</param>
         /// <returns></returns>
         [UsedImplicitly]

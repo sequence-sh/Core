@@ -32,7 +32,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                 yield return new StepCase("Run a sequence three times",
                     new DoXTimes
                     {
-                        Action = new Sequence<Unit>()
+                        Action = new Core.Steps.Sequence<Unit>()
                         {
                             InitialSteps = new List<IStep<Unit>>()
                             {

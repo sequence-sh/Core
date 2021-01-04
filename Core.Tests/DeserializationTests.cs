@@ -242,16 +242,16 @@ Print 'Comments!'", "Comments!");
         private class DeserializationTestFunction : ITestBaseCaseParallel
         {
 
-            public DeserializationTestFunction(string yaml, params object[] expectedLoggedValues)
+            public DeserializationTestFunction(string scl, params object[] expectedLoggedValues)
             {
-                Yaml = yaml;
+                SCL = scl;
                 ExpectedLoggedValues = expectedLoggedValues.Select(x => x.ToString()!).ToList();
             }
 
             /// <inheritdoc />
-            public string Name => Yaml;
+            public string Name => SCL;
 
-            private string Yaml { get; }
+            private string SCL { get; }
 
             public Configuration? ExpectedConfiguration { get; set; } = null!;
 
@@ -260,12 +260,12 @@ Print 'Comments!'", "Comments!");
             /// <inheritdoc />
             public async Task ExecuteAsync(ITestOutputHelper testOutputHelper)
             {
-                testOutputHelper.WriteLine(Yaml);
+                testOutputHelper.WriteLine(SCL);
 
                 var stepFactoryStore = StepFactoryStore.CreateUsingReflection(typeof(StepFactory));
                 var logger = new TestLogger();
 
-                var deserializeResult = SequenceParsing.ParseSequence(Yaml);
+                var deserializeResult = SCLParsing.ParseSequence(SCL);
 
                 deserializeResult.ShouldBeSuccessful(x=>x.AsString);
 

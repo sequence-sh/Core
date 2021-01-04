@@ -8,7 +8,7 @@ using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
-    public class MapFieldNamesTests : StepTestBase<EntityMapProperties, AsyncList<Entity>>
+    public class MapFieldNamesTests : StepTestBase<EntityMapProperties, Sequence<Entity>>
     {
         /// <inheritdoc />
         public MapFieldNamesTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)

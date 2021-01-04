@@ -162,7 +162,7 @@ namespace Reductech.EDR.Core.TestHarness
             /// <summary>
             /// The error message that will be returned
             /// </summary>
-            public string ErrorMessage {get; set; }
+            public string ErrorMessage { get; set; } = null!;
 
             /// <inheritdoc />
             public override IStepFactory StepFactory => FailStepFactory.Instance;

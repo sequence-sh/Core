@@ -71,7 +71,7 @@ namespace Reductech.EDR.Core.Steps
         /// </summary>
         [StepProperty(2)]
         [DefaultValueExplanation("No arguments")]
-        public IStep<AsyncList<StringStream>>? Arguments { get; set; }
+        public IStep<Core.Sequence<StringStream>>? Arguments { get; set; }
 
         /// <summary>
         /// Encoding to use for the process output.

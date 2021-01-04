@@ -30,18 +30,18 @@ namespace Reductech.EDR.Core.Tests
 
         [Theory(Skip = "Manual")]
         [Trait("Category", "Integration")]
-        [InlineData(@"C:\Users\wainw\source\repos\Reductech\edr\Examples\Sort.yml")]
-        [InlineData(@"C:\Users\wainw\source\repos\Reductech\edr\Examples\EntityMapProperties.yml")]
-        [InlineData(@"C:\Users\wainw\source\repos\Reductech\edr\Examples\ChangeCase.yml")]
-        public async Task RunYamlSequenceFromFile(string path)
+        [InlineData(@"C:\Users\wainw\source\repos\Reductech\edr\Examples\Sort.scl")]
+        [InlineData(@"C:\Users\wainw\source\repos\Reductech\edr\Examples\EntityMapProperties.scl")]
+        [InlineData(@"C:\Users\wainw\source\repos\Reductech\edr\Examples\ChangeCase.scl")]
+        public async Task RunSCLFromFile(string path)
         {
-            var yaml = await File.ReadAllTextAsync(path);
+            var scl = await File.ReadAllTextAsync(path);
 
-            TestOutputHelper.WriteLine(yaml);
+            TestOutputHelper.WriteLine(scl);
 
             var sfs = StepFactoryStore.CreateUsingReflection();
 
-            var stepResult = SequenceParsing.ParseSequence(yaml).Bind(x => x.TryFreeze(sfs));
+            var stepResult = SCLParsing.ParseSequence(scl).Bind(x => x.TryFreeze(sfs));
 
             if(stepResult.IsFailure)
                 throw new XunitException(
@@ -59,9 +59,9 @@ namespace Reductech.EDR.Core.Tests
 
         [Fact(Skip = "Manual")]
         [Trait("Category", "Integration")]
-        public async Task RunYamlSequence()
+        public async Task RunSCLSequence()
         {
-            const string yaml = @"
+            const string scl = @"
 - <Converted> = ReadFile Path: 'C:\Users\wainw\source\repos\Reductech\core\TestCSV.csv'
   | FromCSV
   | EntityMap Function: (
@@ -76,7 +76,7 @@ namespace Reductech.EDR.Core.Tests
 
             var sfs = StepFactoryStore.CreateUsingReflection();
 
-            var stepResult = SequenceParsing.ParseSequence(yaml).Bind(x=>x.TryFreeze(sfs));
+            var stepResult = SCLParsing.ParseSequence(scl).Bind(x=>x.TryFreeze(sfs));
 
             stepResult.ShouldBeSuccessful(x=>x.AsString);
 
@@ -92,11 +92,11 @@ namespace Reductech.EDR.Core.Tests
         [Trait("Category", "Integration")]
         public async Task RunObjectSequence()
         {
-            var step = new Sequence<Unit>()
+            var step = new Core.Steps.Sequence<Unit>()
             {
                 InitialSteps = new List<IStep<Unit>>
                 {
-                    new SetVariable<AsyncList<Entity>>
+                    new SetVariable<Sequence<Entity>>
                     {
                         Variable = new VariableName("EntityStream"),
                         Value = new FromCSV{Stream = new FileRead{Path = new StringConstant(@"C:\Users\wainw\source\repos\Reductech\edr\Examples\Dinosaurs.csv")}}
@@ -125,7 +125,7 @@ namespace Reductech.EDR.Core.Tests
                         {
                             Entities = new EnforceSchema()
                             {
-                                EntityStream = new GetVariable<AsyncList<Entity>>(){Variable = new VariableName("EntityStream")},
+                                EntityStream = new GetVariable<Sequence<Entity>>(){Variable = new VariableName("EntityStream")},
                                 Schema = new GetVariable<Entity>(){Variable = new VariableName("Schema")}
                             }
                         }
@@ -134,9 +134,9 @@ namespace Reductech.EDR.Core.Tests
                 FinalStep = new DoNothing()
             };
 
-            var yaml = step.Serialize();
+            var scl = step.Serialize();
 
-            TestOutputHelper.WriteLine(yaml);
+            TestOutputHelper.WriteLine(scl);
 
             var monad = new StateMonad(new TestLogger(), EmptySettings.Instance, ExternalProcessRunner.Instance, FileSystemHelper.Instance, StepFactoryStore.CreateUsingReflection() );
 

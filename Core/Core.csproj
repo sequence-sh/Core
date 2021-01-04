@@ -28,8 +28,7 @@
   </PropertyGroup>
 
   <ItemGroup Condition="'$(CI)' == ''">
-    <None Remove="Parser/Sequence.g4" />
-    <Antlr4 Include="Parser/Sequence.g4">
+    <Antlr4 Include="Parser\SCL.g4">
       <Listener>false</Listener>
       <Error>true</Error>
       <AntOutDir>Antlr</AntOutDir>
@@ -45,6 +44,10 @@
     <Compile Remove="StrykerOutput\**" />
     <EmbeddedResource Remove="StrykerOutput\**" />
     <None Remove="StrykerOutput\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="Parser\SCL.g4" />
   </ItemGroup>
 
   <ItemGroup>

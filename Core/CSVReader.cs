@@ -22,7 +22,7 @@ namespace Reductech.EDR.Core
         /// Reads a CSV stream to an entity stream based on all the input steps.
         /// </summary>
         /// <returns></returns>
-        public static async Task<Result<AsyncList<Entity>, IError>> ReadCSV(
+        public static async Task<Result<Sequence<Entity>, IError>> ReadCSV(
             IStateMonad stateMonad,
             IStep<StringStream> stream,
             IStep<StringStream> delimiter,
@@ -33,19 +33,19 @@ namespace Reductech.EDR.Core
             CancellationToken cancellationToken)
         {
             var testStreamResult = await stream.Run(stateMonad, cancellationToken);
-            if (testStreamResult.IsFailure) return testStreamResult.ConvertFailure<AsyncList<Entity>>();
+            if (testStreamResult.IsFailure) return testStreamResult.ConvertFailure<Sequence<Entity>>();
 
             var delimiterResult = await delimiter.Run(stateMonad, cancellationToken).Map(async x=> await x.GetStringAsync());
-            if (delimiterResult.IsFailure) return delimiterResult.ConvertFailure<AsyncList<Entity>>();
+            if (delimiterResult.IsFailure) return delimiterResult.ConvertFailure<Sequence<Entity>>();
 
             var quoteResult = await TryConvertToChar(quoteCharacter, "Quote Character", stateMonad, errorLocation, cancellationToken);
-            if (quoteResult.IsFailure) return quoteResult.ConvertFailure<AsyncList<Entity>>();
+            if (quoteResult.IsFailure) return quoteResult.ConvertFailure<Sequence<Entity>>();
 
             var commentResult = await TryConvertToChar(commentCharacter, "Comment Character", stateMonad, errorLocation, cancellationToken);
-            if (commentResult.IsFailure) return commentResult.ConvertFailure<AsyncList<Entity>>();
+            if (commentResult.IsFailure) return commentResult.ConvertFailure<Sequence<Entity>>();
 
             var multiValueResult = await TryConvertToChar(multiValueDelimiter, "MultiValue Delimiter", stateMonad, errorLocation, cancellationToken);
-            if (multiValueResult.IsFailure) return multiValueResult.ConvertFailure<AsyncList<Entity>>();
+            if (multiValueResult.IsFailure) return multiValueResult.ConvertFailure<Sequence<Entity>>();
 
 
             var asyncEnumerable = ReadCSV(testStreamResult.Value,
@@ -53,7 +53,7 @@ namespace Reductech.EDR.Core
                 quoteResult.Value,
                 commentResult.Value,
                 multiValueResult.Value,
-                errorLocation).ToAsyncList();
+                errorLocation).ToSequence();
 
 
             return asyncEnumerable;
@@ -129,7 +129,9 @@ namespace Reductech.EDR.Core
             {
                 var dict = row as IDictionary<string, object>;
 
-                var entity = Entity.Create(dict!.Select(x=>(x.Key, x.Value)), multiValueDelimiter);
+                var values = dict!.Select(x => (x.Key, x.Value));
+
+                var entity = Entity.Create(values!, multiValueDelimiter);
                 yield return entity;
             }
 

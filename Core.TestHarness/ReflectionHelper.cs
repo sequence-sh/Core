@@ -77,6 +77,7 @@ namespace Reductech.EDR.Core.TestHarness
 
             async Task SetStepList(PropertyInfo property)
             {
+                await Task.CompletedTask;
                 if (property.GetValue(instance) is IReadOnlyList<IStep> currentValue)
                 {
                     var elements = new List<string>();
@@ -117,51 +118,6 @@ namespace Reductech.EDR.Core.TestHarness
             }
         }
 
-        //private static async Task<string> GetStringAsync(IStep step)
-        //{
-        //    var freezable = step.Unfreeze();
-
-        //    if (freezable is IConstantFreezableStep cfs)
-        //    {
-
-        //        return cfs.Serialize();
-        //    }
-
-        //    if (step is DoNothing)
-        //    {
-        //        return DoNothingStepFactory.Instance.TypeName;
-        //    }
-
-        //    if (freezable is CompoundFreezableStep cs && freezable.StepName == ArrayStepFactory.Instance.TypeName)
-        //    {
-        //        var list = new List<string>();
-
-        //        try
-        //        {
-        //            var steps = cs.FreezableStepData
-        //            .StepProperties[new StepParameterReference(nameof(Steps.Array<object>.Elements))]
-        //            .StepList.Value.Cast<IFreezableStep>();
-
-
-
-        //            foreach (var step1 in steps)
-        //            {
-        //                var s = await step1.Serialize();
-        //                list.Add(s);
-        //            }
-        //        }
-        //        catch (Exception e)
-        //        {
-        //            throw new Exception($"Case Failure 123 {e.Message}");
-        //        }
-
-
-
-        //        return SerializationMethods.SerializeList(list);
-        //    }
-
-        //    throw new NotImplementedException("Cannot get string from step");
-        //}
 
         private static async Task MatchStepPropertyInfoAsync(PropertyInfo stepPropertyInfo,
             Func<PropertyInfo, Task> variableNameAction,
@@ -216,6 +172,7 @@ namespace Reductech.EDR.Core.TestHarness
 
         private static async Task<(IStep step, string value, int newIndex)> CreateSimpleStep(PropertyInfo propertyInfo, int index)
         {
+            await Task.CompletedTask;
             var tStep = propertyInfo.PropertyType;
 
             var outputType = tStep.GenericTypeArguments.First();
@@ -267,7 +224,7 @@ namespace Reductech.EDR.Core.TestHarness
                 step = Constant(dt);
             }
 
-            else if (outputType == typeof(AsyncList<StringStream>))
+            else if (outputType == typeof(Sequence<StringStream>))
             {
                 var list = new List<string>();
                 for (var i = 0; i < 3; i++)
@@ -278,7 +235,7 @@ namespace Reductech.EDR.Core.TestHarness
 
                 step = Array(list.ToArray());
             }
-            else if (outputType == typeof(AsyncList<int>))
+            else if (outputType == typeof(Sequence<int>))
             {
                 var list = new List<int>();
                 for (var i = 0; i < 3; i++)
@@ -289,22 +246,22 @@ namespace Reductech.EDR.Core.TestHarness
 
                 step =  Array(list.ToArray());
             }
-            else if (outputType == typeof(AsyncList<Entity>))
+            else if (outputType == typeof(Sequence<Entity>))
             {
                 var entityStream = CreateSimpleEntityStream(ref index);
 
                 step = entityStream;
             }
-            else if (outputType == typeof(AsyncList<AsyncList<Entity>>))
+            else if (outputType == typeof(Sequence<Sequence<Entity>>))
             {
-                var entityStreamList = new List<IStep<AsyncList<Entity>> >
+                var entityStreamList = new List<IStep<Sequence<Entity>> >
                 {
                     CreateSimpleEntityStream(ref index),
                     CreateSimpleEntityStream(ref index),
                     CreateSimpleEntityStream(ref index)
                 };
 
-                step = new Array<AsyncList<Entity>> {Elements = entityStreamList};
+                step = new Array<Sequence<Entity>> {Elements = entityStreamList};
             }
 
             else if (outputType.IsEnum)
@@ -362,7 +319,7 @@ namespace Reductech.EDR.Core.TestHarness
             return (step, newString, index);
 
 
-            static IStep<AsyncList<Entity>>  CreateSimpleEntityStream(ref int index1)
+            static IStep<Sequence<Entity>>  CreateSimpleEntityStream(ref int index1)
             {
                 var entityList = new List<IStep<Entity>>
                 {
@@ -378,7 +335,7 @@ namespace Reductech.EDR.Core.TestHarness
 
             static Entity CreateSimpleEntity(ref int index1)
             {
-                var pairs = new List<(string, object)>
+                var pairs = new List<(string, object?)>
                 {
                     ("Prop1", $"Val{index1}")
                 };

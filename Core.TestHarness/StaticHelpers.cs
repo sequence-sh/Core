@@ -28,21 +28,21 @@ namespace Reductech.EDR.Core.TestHarness
         public static EntityConstant Constant(Entity value) => new EntityConstant((value));
         public static EnumConstant<T> Constant<T>(T value) where T: Enum => new EnumConstant<T>((value));
 
-        public static IStep<AsyncList<int>> Array(params int[] elements) => new Array<int> { Elements = elements.Select(Constant).ToList() };
-        public static IStep<AsyncList<double>> Array(params double[] elements) => new Array<double> { Elements = elements.Select(Constant).ToList() };
-        public static IStep<AsyncList<bool>> Array(params bool[] elements) => new Array<bool> { Elements = elements.Select(Constant).ToList() };
-        public static IStep<AsyncList<DateTime>> Array(params DateTime[] elements) => new Array<DateTime> { Elements = elements.Select(Constant).ToList() };
-        public static IStep<AsyncList<Entity>> Array(params Entity[] elements) => new Array<Entity> { Elements = elements.Select(Constant).ToList() };
+        public static IStep<Sequence<int>> Array(params int[] elements) => new Array<int> { Elements = elements.Select(Constant).ToList() };
+        public static IStep<Sequence<double>> Array(params double[] elements) => new Array<double> { Elements = elements.Select(Constant).ToList() };
+        public static IStep<Sequence<bool>> Array(params bool[] elements) => new Array<bool> { Elements = elements.Select(Constant).ToList() };
+        public static IStep<Sequence<DateTime>> Array(params DateTime[] elements) => new Array<DateTime> { Elements = elements.Select(Constant).ToList() };
+        public static IStep<Sequence<Entity>> Array(params Entity[] elements) => new Array<Entity> { Elements = elements.Select(Constant).ToList() };
         //public static IStep<AsyncList<EntityStream>> Array(params EntityStream[] elements) => new Array<EntityStream> { Elements = elements.Select(Constant).ToList() };
-        public static IStep<AsyncList<StringStream>> Array(params string[] elements) => new Array<StringStream> { Elements = elements.Select(Constant).ToList() };
-        public static IStep<AsyncList<T>> Array<T>(params T[] elements) where T : Enum => new Array<T> { Elements = elements.Select(Constant).ToList() };
+        public static IStep<Sequence<StringStream>> Array(params string[] elements) => new Array<StringStream> { Elements = elements.Select(Constant).ToList() };
+        public static IStep<Sequence<T>> Array<T>(params T[] elements) where T : Enum => new Array<T> { Elements = elements.Select(Constant).ToList() };
 
         public static IStep<TNew> GetVariable<TNew>(string variableName) => new GetVariable<TNew> { Variable = new VariableName(variableName) };
         public static IStep<TNew> GetVariable<TNew>(VariableName variableName) => new GetVariable<TNew> { Variable = variableName };
 
         public static IStep<Entity> GetEntityVariable => GetVariable<Entity>(VariableName.Entity);
 
-        public static Entity CreateEntity(params (string key, object value)[] pairs) => Entity.Create(pairs);
+        public static Entity CreateEntity(params (string key, object? value)[] pairs) => Entity.Create(pairs);
 
         public static Schema CreateSchema(string name, bool allowExtraProperties, params (string propertyName, SchemaPropertyType type, Multiplicity multiplicity)[] properties)
         {

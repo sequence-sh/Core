@@ -1,4 +1,4 @@
-﻿grammar Sequence;
+﻿grammar SCL;
 /*
  * Parser Rules
  */
