@@ -36,24 +36,24 @@ namespace Reductech.EDR.Core.TestHarness
         public class DeserializeCase : CaseThatExecutes
 #pragma warning restore CA1034 // Nested types should not be visible
         {
-            public DeserializeCase(string name, string yaml, TOutput expectedOutput,
+            public DeserializeCase(string name, string scl, TOutput expectedOutput,
                 params string[] expectedLoggedValues) : base(expectedLoggedValues)
             {
                 Name = name;
-                Yaml = yaml;
+                SCL = scl;
                 ExpectedOutput = Maybe<TOutput>.From(expectedOutput);
             }
 
             // ReSharper disable once UnusedParameter.Local - needed to disambiguate constructor
-            public DeserializeCase(string name, string yaml, Unit _,
+            public DeserializeCase(string name, string scl, Unit _,
                 params string[] expectedLoggedValues) : base(expectedLoggedValues)
             {
                 Name = name;
-                Yaml = yaml;
+                SCL = scl;
                 ExpectedOutput = Maybe<TOutput>.None;
             }
 
-            public string Yaml { get; }
+            public string SCL { get; }
 
             public override string Name { get; }
 
@@ -66,9 +66,9 @@ namespace Reductech.EDR.Core.TestHarness
 
                 var sfs = StepFactoryStore.CreateUsingReflection(typeof(IStep), typeof(TStep));
 
-                testOutputHelper.WriteLine(Yaml);
+                testOutputHelper.WriteLine(SCL);
 
-                var deserializeResult = SequenceParsing.ParseSequence(Yaml);
+                var deserializeResult = SCLParsing.ParseSequence(SCL);
 
                 deserializeResult.ShouldBeSuccessful(x => x.AsString);
 

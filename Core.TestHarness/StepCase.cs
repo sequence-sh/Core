@@ -82,15 +82,15 @@ namespace Reductech.EDR.Core.TestHarness
                 if (extraArgument != SerializeArgument)
                     return Step;
 
-                var yaml = Step.Serialize();
+                var scl = Step.Serialize();
 
                 testOutputHelper.WriteLine("");
                 testOutputHelper.WriteLine("");
-                testOutputHelper.WriteLine(yaml);
+                testOutputHelper.WriteLine(scl);
 
                 var sfs = StepFactoryStore.CreateUsingReflection(typeof(IStep), typeof(TStep));
 
-                var deserializeResult = SequenceParsing.ParseSequence(yaml);
+                var deserializeResult = SCLParsing.ParseSequence(scl);
 
                 deserializeResult.ShouldBeSuccessful(x => x.AsString);
 

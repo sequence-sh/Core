@@ -24,7 +24,7 @@ compile grammar:
     ANTLR_ENCODING: UTF-8
     ANTLR_NAMESPACE: Reductech.EDR.Core.Parser
     ANTLR_OUTPUT: ./Core/Antlr
-    ANTLR_GRAMMAR: ./Core/Parser/Sequence.g4
+    ANTLR_GRAMMAR: ./Core/Parser/SCL.g4
   script:
     - wget -O $ANTLR_JAR $ANTLR_JAR_URI
     - java -jar $ANTLR_JAR -Dlanguage=CSharp -visitor -no-listener -Werror

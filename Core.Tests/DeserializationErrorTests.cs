@@ -36,9 +36,9 @@ namespace Reductech.EDR.Core.Tests
                 yield return new DeserializationErrorCase("- <Entity> = 123\n- Print <Entity>",
                     ("The type of <Entity> is ambiguous between Integer and Entity.", "Entire Sequence"));
 
-                yield return new DeserializationErrorCase("\"Print 123\"", ("Yaml must represent a step with return type Unit", "Print 123"));
+                yield return new DeserializationErrorCase("\"Print 123\"", ("SCL must represent a step with return type Unit", "Print 123"));
 
-                yield return new DeserializationErrorCase("'Print 123'", ("Yaml must represent a step with return type Unit", "Print 123"));
+                yield return new DeserializationErrorCase("'Print 123'", ("SCL must represent a step with return type Unit", "Print 123"));
 
 
                 yield return new DeserializationErrorCase("Print Value: 'Hello' Value: 'World'",
@@ -63,9 +63,9 @@ namespace Reductech.EDR.Core.Tests
         {
             private readonly (string error, string location)[] _expectedErrors;
 
-            public DeserializationErrorCase(string yaml, params (string error, string location)[] expectedErrors)
+            public DeserializationErrorCase(string scl, params (string error, string location)[] expectedErrors)
             {
-                Name = yaml;
+                Name = scl;
                 _expectedErrors = expectedErrors;
             }
 
@@ -77,9 +77,9 @@ namespace Reductech.EDR.Core.Tests
             {
                 var sfs = StepFactoryStore.CreateUsingReflection(typeof(IFreezableStep));
 
-                var result = SequenceParsing.ParseSequence(Name)
+                var result = SCLParsing.ParseSequence(Name)
                     .Bind(x=>x.TryFreeze(sfs))
-                    .Bind(SequenceRunner.ConvertToUnitStep);
+                    .Bind(SCLRunner.ConvertToUnitStep);
 
                 result.IsFailure.Should().BeTrue("Case should fail");
 

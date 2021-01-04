@@ -18,10 +18,10 @@ namespace Reductech.EDR.Core.Parser
     /// <summary>
     /// Contains methods for parsing sequences
     /// </summary>
-    public static class SequenceParsing
+    public static class SCLParsing
     {
         /// <summary>
-        /// Deserialize this yaml into a step.
+        /// Deserialize this SCL into a step.
         /// </summary>
         public static Result<IFreezableStep, IError> ParseSequence(string text)
         {
@@ -34,7 +34,7 @@ namespace Reductech.EDR.Core.Parser
         }
 
         /// <summary>
-        /// Try to parse this text
+        /// Try to parse this SCL text
         /// </summary>
         public static Result<FreezableStepProperty, IError> TryParse(string text)
         {
