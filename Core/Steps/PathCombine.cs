@@ -48,7 +48,7 @@ namespace Reductech.EDR.Core.Steps
         /// </summary>
         [StepProperty(1)]
         [Required]
-        public IStep<Core.Sequence<StringStream>> Paths { get; set; } = null!;
+        public IStep<Core.Array<StringStream>> Paths { get; set; } = null!;
 
 
         /// <inheritdoc />

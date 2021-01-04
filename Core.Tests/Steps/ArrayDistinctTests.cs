@@ -9,34 +9,36 @@ using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
-    public class EntityStreamDistinctTests : StepTestBase<EntityStreamDistinct, Sequence<Entity>>
+    public class ArrayDistinctTests : StepTestBase<ArrayDistinct<Entity>, Array<Entity>>
     {
         /// <inheritdoc />
-        public EntityStreamDistinctTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
-        {
-        }
+        public ArrayDistinctTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper) {}
 
         /// <inheritdoc />
         protected override IEnumerable<StepCase> StepCases
         {
             get
             {
+                var distinctVar = new VariableName("DistinctVar");
+                var foreachVar = new VariableName("ForeachVar");
+
                 yield return new StepCase("Distinct case sensitive",
                     new ForEach<Entity>
                     {
-                        Action = new Print<Entity> {Value = GetEntityVariable},
-                        Array = new EntityStreamDistinct
+                        Action = new Print<Entity> {Value = GetVariable<Entity>(foreachVar)},
+                        Array = new ArrayDistinct<Entity>
                         {
-                            EntityStream = Array(
+                            Array = Array(
                                 CreateEntity(("Foo", "Alpha")),
                                 CreateEntity(("Foo", "Alpha")),
                                 CreateEntity(("Foo", "ALPHA")),
                                 CreateEntity(("Foo", "Beta")),
                                 CreateEntity(("Foo", "Beta"))
                             ),
-                            KeySelector = new EntityGetValue() {Property = Constant("Foo"), Entity = GetEntityVariable}
+                            KeySelector = new EntityGetValue {Property = Constant("Foo"), Entity = GetVariable<Entity>(distinctVar)},
+                            Variable = distinctVar
                         },
-                        Variable = VariableName.Entity
+                        Variable = foreachVar
                     },
                     Unit.Default,
                     "(Foo: \"Alpha\")", "(Foo: \"ALPHA\")", "(Foo: \"Beta\")"
@@ -46,9 +48,9 @@ namespace Reductech.EDR.Core.Tests.Steps
                     new ForEach<Entity>
                     {
                         Action = new Print<Entity> { Value = GetEntityVariable },
-                        Array = new EntityStreamDistinct
+                        Array = new ArrayDistinct<Entity>
                         {
-                            EntityStream = Array(
+                            Array = Array(
                                 CreateEntity(("Foo", "Alpha")),
                                 CreateEntity(("Foo", "Alpha")),
                                 CreateEntity(("Foo", "ALPHA")),
@@ -72,13 +74,12 @@ namespace Reductech.EDR.Core.Tests.Steps
         {
             get
             {
-
                 //Do not do default cases as some errors are not propagated due to lazy evaluation
 
                 yield return new ErrorCase("Stream is error",
-                    new EntityStreamDistinct()
+                    new ArrayDistinct<Entity>
                     {
-                        EntityStream = new FailStep<Sequence<Entity>>() { ErrorMessage = "Stream Fail" },
+                        Array = new FailStep<Array<Entity>> { ErrorMessage = "Stream Fail" },
                         KeySelector =  Constant("A")
                     },
                     new SingleError("Stream Fail", ErrorCode.Test, EntireSequenceLocation.Instance));

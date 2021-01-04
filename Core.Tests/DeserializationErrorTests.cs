@@ -33,9 +33,6 @@ namespace Reductech.EDR.Core.Tests
             {
                 yield return new DeserializationErrorCase("", ("Sequence is empty.", EntireSequenceLocation.Instance.AsString));
 
-                yield return new DeserializationErrorCase("- <Entity> = 123\n- Print <Entity>",
-                    ("The type of <Entity> is ambiguous between Integer and Entity.", "Entire Sequence"));
-
                 yield return new DeserializationErrorCase("\"Print 123\"", ("SCL must represent a step with return type Unit", "Print 123"));
 
                 yield return new DeserializationErrorCase("'Print 123'", ("SCL must represent a step with return type Unit", "Print 123"));
@@ -49,12 +46,18 @@ namespace Reductech.EDR.Core.Tests
                 ("Unexpected Parameter 'Term' in 'Print'", "Line: 1, Col: 0, Idx: 0 - Line: 1, Col: 33, Idx: 33 Text: Print Value: 'hello' Term: 'world'"));
 
                 yield return new DeserializationErrorCase("Print(['abc', '123'] == ['abc', '123'])",
-                    ("Cannot compare objects of type 'SequenceOfStringStream'", "Line: 1, Col: 6, Idx: 6 - Line: 1, Col: 37, Idx: 37 Text: ['abc', '123'] == ['abc', '123']"));
+                    ("Cannot compare objects of type 'ArrayOfStringStream'", "Line: 1, Col: 6, Idx: 6 - Line: 1, Col: 37, Idx: 37 Text: ['abc', '123'] == ['abc', '123']"));
 
                 yield return new DeserializationErrorCase("MyMegaFunction true", ("The step 'MyMegaFunction' does not exist", "Line: 1, Col: 0, Idx: 0 - Line: 1, Col: 18, Idx: 18 Text: MyMegaFunction true"));
 
 
                 yield return new DeserializationErrorCase("Print (2 + 2", ("missing ')' at '<EOF>'", "Line: 1, Col: 12, Idx: 12 - Line: 1, Col: 11, Idx: 11 Text: <EOF>"));
+
+                yield return new DeserializationErrorCase("Foreach ['one', 'two'] (Print (<Entity> + 1))",
+                ("'Left' cannot take the value '<Entity>'","ApplyMathOperator"));
+
+                yield return new DeserializationErrorCase("Foreach ['one', 'two'] (Print (<Num> + 1)) <Num>",
+                ("'Left' cannot take the value '<Num>'", "ApplyMathOperator"));
             }
         }
 

@@ -73,7 +73,7 @@ namespace Reductech.EDR.Core.TestHarness
 
         private static Result<Unit, IError> GetValue(TOutput result)
         {
-            if (result is ISequence list)
+            if (result is IArray list)
             {
                 var r = list.GetObjectsAsync(CancellationToken.None).Result;
 

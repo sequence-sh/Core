@@ -88,13 +88,11 @@ namespace Reductech.EDR.Core.Steps
 
         /// <inheritdoc />
         public override IStepSerializer Serializer => new StepSerializer(TypeName,
-            //new FixedStringComponent("("),
             new StepComponent(nameof(ApplyMathOperator.Left)),
             SpaceComponent.Instance,
             new EnumDisplayComponent<MathOperator>(nameof(ApplyMathOperator.Operator)),
             SpaceComponent.Instance,
             new StepComponent(nameof(ApplyMathOperator.Right))
-            //new FixedStringComponent(")")
         );
     }
 

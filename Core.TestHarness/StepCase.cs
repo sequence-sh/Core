@@ -84,7 +84,7 @@ namespace Reductech.EDR.Core.TestHarness
 
                 var scl = Step.Serialize();
 
-                testOutputHelper.WriteLine("");
+                testOutputHelper.WriteLine("SCL:");
                 testOutputHelper.WriteLine("");
                 testOutputHelper.WriteLine(scl);
 

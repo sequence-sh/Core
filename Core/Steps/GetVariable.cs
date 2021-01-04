@@ -32,6 +32,9 @@ namespace Reductech.EDR.Core.Steps
         [VariableName(1)]
         [Required]
         public VariableName Variable { get; set; }
+
+        /// <inheritdoc />
+        public override string Name => Variable == default? base.Name : Variable.Serialize();
     }
 
     /// <summary>
@@ -56,9 +59,7 @@ namespace Reductech.EDR.Core.Steps
         protected override Result<ITypeReference, IError> GetMemberType(FreezableStepData freezableStepData,
             TypeResolver typeResolver) =>
             freezableStepData.TryGetVariableName(nameof(GetVariable<object>.Variable), StepType)
-
                 .Map(x => new VariableTypeReference(x) as ITypeReference);
-
 
         /// <inheritdoc />
         public override string OutputTypeExplanation => "T";
@@ -67,10 +68,5 @@ namespace Reductech.EDR.Core.Steps
         public override IStepSerializer Serializer =>
             new StepSerializer(TypeName,
                 new StepComponent(nameof(GetVariable<object>.Variable)));
-
-
-
-
-
     }
 }

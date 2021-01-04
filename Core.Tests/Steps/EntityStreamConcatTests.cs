@@ -8,10 +8,10 @@ using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
-    public class EntityStreamConcatTests : StepTestBase<EntityStreamConcat, Sequence<Entity>>
+    public class ArrayConcatTests : StepTestBase<ArrayConcat<Entity>, Array<Entity>>
     {
         /// <inheritdoc />
-        public EntityStreamConcatTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper) {}
+        public ArrayConcatTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper) {}
 
         /// <inheritdoc />
         protected override IEnumerable<StepCase> StepCases
@@ -23,11 +23,11 @@ namespace Reductech.EDR.Core.Tests.Steps
                     {
                         Action = new Print<Entity> { Value = GetEntityVariable },
 
-                        Array = new EntityStreamConcat
+                        Array = new ArrayConcat<Entity>
                         {
-                            EntityStreams = new Array<Sequence<Entity>>
+                            Arrays = new ArrayNew<Array<Entity>>
                             {
-                                Elements = new List<IStep<Sequence<Entity>>>
+                                Elements = new List<IStep<Array<Entity>>>
                                 {
                                     Array(CreateEntity(("Foo", "Alpha")), CreateEntity(("Foo", "Beta")))
                                 }
@@ -46,11 +46,11 @@ namespace Reductech.EDR.Core.Tests.Steps
                     {
                         Action = new Print<Entity>{Value = GetEntityVariable},
 
-                        Array = new EntityStreamConcat
+                        Array = new ArrayConcat<Entity>
                         {
-                            EntityStreams = new Array<Sequence<Entity>>()
+                            Arrays = new ArrayNew<Array<Entity>>
                             {
-                                Elements = new List<IStep<Sequence<Entity>>>()
+                                Elements = new List<IStep<Array<Entity>>>
                                 {
                                     Array(CreateEntity(("Foo", "Alpha")), CreateEntity(("Foo", "Beta"))),
                                     Array(CreateEntity(("Foo", "Gamma")), CreateEntity(("Foo", "Delta")))

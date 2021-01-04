@@ -38,7 +38,7 @@ namespace Reductech.EDR.Core.Internal
         public string Serialize() => StepFactory.Serializer.Serialize(AllProperties);
 
         /// <inheritdoc />
-        public string Name => StepFactory.TypeName;
+        public virtual string Name => StepFactory.TypeName;
 
         /// <inheritdoc />
         public override string ToString() => Name;
@@ -123,6 +123,9 @@ namespace Reductech.EDR.Core.Internal
         /// </summary>
         public virtual Result<Unit, IError> VerifyThis(ISettings settings) => Unit.Default;
 
+        /// <inheritdoc />
+        public virtual Result<StepContext, IError> TryGetScopedContext(StepContext baseContext, IFreezableStep scopedStep) =>
+            new SingleError($"{Name} cannot create a scoped context", ErrorCode.UnexpectedParameter, new StepErrorLocation(this));
 
         /// <inheritdoc />
         public Result<Unit, IError> Verify(ISettings settings)
@@ -134,7 +137,7 @@ namespace Reductech.EDR.Core.Internal
 
             var r3 = AllProperties
                 .Select(x => x.Value.Match(
-                    vn => Unit.Default,
+                    _ => Unit.Default,
                     s => s.Verify(settings),
                     sl => sl.Select(s => s.Verify(settings)).Combine(ErrorList.Combine).Map(_=>Unit.Default)
 

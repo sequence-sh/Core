@@ -96,7 +96,7 @@ namespace Reductech.EDR.Core.Tests
             {
                 InitialSteps = new List<IStep<Unit>>
                 {
-                    new SetVariable<Sequence<Entity>>
+                    new SetVariable<Array<Entity>>
                     {
                         Variable = new VariableName("EntityStream"),
                         Value = new FromCSV{Stream = new FileRead{Path = new StringConstant(@"C:\Users\wainw\source\repos\Reductech\edr\Examples\Dinosaurs.csv")}}
@@ -125,7 +125,7 @@ namespace Reductech.EDR.Core.Tests
                         {
                             Entities = new EnforceSchema()
                             {
-                                EntityStream = new GetVariable<Sequence<Entity>>(){Variable = new VariableName("EntityStream")},
+                                EntityStream = new GetVariable<Array<Entity>>(){Variable = new VariableName("EntityStream")},
                                 Schema = new GetVariable<Entity>(){Variable = new VariableName("Schema")}
                             }
                         }

@@ -20,11 +20,6 @@ namespace Reductech.EDR.Core.Internal
         /// </summary>
         Result<IStep, IError> TryFreeze(StepContext stepContext);
 
-        ///// <summary>
-        ///// Serialize this step.
-        ///// </summary>
-        //string Serialize();
-
         /// <summary>
         /// Gets the variables set by this step and its children and the types of those variables if they can be resolved at this time.
         /// Does not include reserved variables e.g. Entity

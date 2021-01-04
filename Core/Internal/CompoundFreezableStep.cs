@@ -22,6 +22,8 @@ namespace Reductech.EDR.Core.Internal
             StepConfiguration = stepConfiguration;
         }
 
+        /// <inheritdoc />
+        public string StepName { get; }
 
         /// <summary>
         /// The data for this step.
@@ -47,9 +49,6 @@ namespace Reductech.EDR.Core.Internal
 
 
         /// <inheritdoc />
-        public string StepName { get; }
-
-        /// <inheritdoc />
         public Result<IStep, IError> TryFreeze(StepContext stepContext)
         {
             return TryGetStepFactory(stepContext.TypeResolver.StepFactoryStore).Bind(x =>
@@ -63,10 +62,10 @@ namespace Reductech.EDR.Core.Internal
 
             if (stepFactory.IsFailure) return stepFactory.ConvertFailure<IReadOnlyCollection<(VariableName variableName, Maybe<ITypeReference>)>>();
 
-            var dataResult = FreezableStepData.GetVariablesSet(typeResolver);
+            var dataResult = FreezableStepData.GetVariablesSet(StepName, typeResolver);
             if (dataResult.IsFailure) return dataResult;
 
-            return dataResult.Value.Concat(stepFactory.Value.GetTypeReferencesSet(FreezableStepData, typeResolver))
+            return dataResult.Value.Concat(stepFactory.Value.GetVariablesSet(FreezableStepData, typeResolver))
                 .ToList();
         }
 

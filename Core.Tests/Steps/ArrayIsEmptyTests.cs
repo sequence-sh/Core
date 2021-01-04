@@ -10,10 +10,10 @@ using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
-    public class IsEmptyTests : StepTestBase<ArrayIsEmpty<StringStream>, bool>
+    public class ArrayIsEmptyTests : StepTestBase<ArrayIsEmpty<StringStream>, bool>
     {
         /// <inheritdoc />
-        public IsEmptyTests([NotNull] ITestOutputHelper testOutputHelper) : base(testOutputHelper) {}
+        public ArrayIsEmptyTests([NotNull] ITestOutputHelper testOutputHelper) : base(testOutputHelper) {}
 
         /// <inheritdoc />
         protected override IEnumerable<DeserializeCase> DeserializeCases
@@ -41,7 +41,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                 yield return new StepCase("Empty",
                     new ArrayIsEmpty<StringStream>()
                     {
-                        Array = new Array<StringStream>
+                        Array = new ArrayNew<StringStream>
                         {
                             Elements = new List<IStep<StringStream>>
                             {
@@ -54,7 +54,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                 yield return new StepCase("Not Empty",
                     new ArrayIsEmpty<StringStream>()
                     {
-                        Array = new Array<StringStream>
+                        Array = new ArrayNew<StringStream>
                         {
                             Elements = new List<IStep<StringStream>>
                             {

@@ -12,6 +12,7 @@ namespace Reductech.EDR.Core.Steps
     /// <summary>
     /// Counts the elements in an array.
     /// </summary>
+    [Alias("Length")]
     public sealed class ArrayLength<T> : CompoundStep<int>
     {
         /// <summary>
@@ -19,7 +20,7 @@ namespace Reductech.EDR.Core.Steps
         /// </summary>
         [StepProperty(1)]
         [Required]
-        public IStep<Core.Sequence<T>> Array { get; set; } = null!;
+        public IStep<Array<T>> Array { get; set; } = null!;
 
         /// <inheritdoc />
         public override async Task<Result<int, IError>> Run(IStateMonad stateMonad, CancellationToken cancellationToken)

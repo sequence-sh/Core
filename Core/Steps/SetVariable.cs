@@ -78,7 +78,7 @@ namespace Reductech.EDR.Core.Steps
         }
 
         /// <inheritdoc />
-        public override IEnumerable<(VariableName variableName, Maybe<ITypeReference>)> GetTypeReferencesSet(FreezableStepData freezableStepData, TypeResolver typeResolver)
+        public override IEnumerable<(VariableName variableName, Maybe<ITypeReference>)> GetVariablesSet(FreezableStepData freezableStepData, TypeResolver typeResolver)
         {
             var vn = freezableStepData.TryGetVariableName(nameof(SetVariable<object>.Variable), StepType);
             if (vn.IsFailure) yield break;

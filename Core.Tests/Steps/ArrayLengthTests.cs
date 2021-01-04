@@ -10,12 +10,10 @@ using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
-    public class LengthTests : StepTestBase<ArrayLength<StringStream>, int>
+    public class ArrayLengthTests : StepTestBase<ArrayLength<StringStream>, int>
     {
         /// <inheritdoc />
-        public LengthTests([NotNull] ITestOutputHelper testOutputHelper) : base(testOutputHelper)
-        {
-        }
+        public ArrayLengthTests([NotNull] ITestOutputHelper testOutputHelper) : base(testOutputHelper) {}
 
         /// <inheritdoc />
         protected override IEnumerable<DeserializeCase> DeserializeCases
@@ -36,7 +34,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                 yield return new StepCase("Hello World",
                     new ArrayLength<StringStream>
                     {
-                        Array = new Array<StringStream>
+                        Array = new ArrayNew<StringStream>
                         {
                             Elements = new List<IStep<StringStream>>
                             {
@@ -50,7 +48,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                 yield return new StepCase("Hello World multiline",
                     new ArrayLength<StringStream>
                     {
-                        Array = new Array<StringStream>
+                        Array = new ArrayNew<StringStream>
                         {
                             Elements = new List<IStep<StringStream>>
                             {

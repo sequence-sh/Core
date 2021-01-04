@@ -20,6 +20,18 @@ namespace Reductech.EDR.Core.Internal
     /// </summary>
     public abstract class StepFactory : IStepFactory
     {
+        /// <summary>
+        /// Create a new StepFactory
+        /// </summary>
+        protected StepFactory()
+        {
+            ScopedFunctionParameterReferences = new Lazy<IReadOnlySet<StepParameterReference>>(
+                ()=>  StepType.GetProperties()
+                    .Where(x=>x.GetCustomAttribute<ScopedFunctionAttribute>() != null)
+                    .SelectMany(StepParameterReference.GetPossibleReferences).ToHashSet());
+        }
+
+
         /// <inheritdoc />
         public abstract Result<ITypeReference, IError> TryGetOutputTypeReference(FreezableStepData freezableStepData, TypeResolver typeResolver);
 
@@ -30,7 +42,6 @@ namespace Reductech.EDR.Core.Internal
         /// The type of this step.
         /// </summary>
         public abstract Type StepType { get; }
-
 
         /// <inheritdoc />
         public override string ToString() => TypeName;
@@ -70,7 +81,7 @@ namespace Reductech.EDR.Core.Internal
 
 
         /// <inheritdoc />
-        public virtual IEnumerable<(VariableName variableName, Maybe<ITypeReference>)> GetTypeReferencesSet(FreezableStepData freezableStepData, TypeResolver typeResolver)
+        public virtual IEnumerable<(VariableName variableName, Maybe<ITypeReference>)> GetVariablesSet(FreezableStepData freezableStepData, TypeResolver typeResolver)
         {
             yield break;
         }
@@ -148,8 +159,16 @@ namespace Reductech.EDR.Core.Internal
 
             var remainingRequired = RequiredProperties.ToHashSet(StringComparer.OrdinalIgnoreCase);
 
+            List<(IFreezableStep, PropertyInfo)> scopedFunctions = new();
+
             foreach (var (stepMember, propertyInfo) in pairs)
             {
+                if(propertyInfo.GetCustomAttribute<ScopedFunctionAttribute>() != null)
+                {
+                    scopedFunctions.Add((stepMember.ConvertToStep(), propertyInfo));
+                    continue;
+                }
+
                 remainingRequired.Remove(propertyInfo.Name);
                 var result =
                     stepMember.Match(
@@ -159,6 +178,25 @@ namespace Reductech.EDR.Core.Internal
                     );
 
                 if(result.IsFailure) errors.Add(result.Error);
+            }
+
+            if(scopedFunctions.Any())
+            {
+
+                    foreach (var (freezableStep, propertyInfo) in scopedFunctions)
+                    {
+                        var scopedContext = step.TryGetScopedContext(stepContext, freezableStep);
+                        if (scopedContext.IsFailure)
+                            errors.Add(scopedContext.Error);
+                        else
+                        {
+                            remainingRequired.Remove(propertyInfo.Name);
+                            var result = TrySetStep(propertyInfo, step, freezableStep, scopedContext.Value);
+
+                            if (result.IsFailure)
+                                errors.Add(result.Error);
+                        }
+                    }
             }
 
             foreach (var property in remainingRequired)
@@ -220,7 +258,6 @@ namespace Reductech.EDR.Core.Internal
                     if (Enum.TryParse(enumType, constant.Value.Value.AsT0, true, out var enumValue))
                     {
                         var step = EnumConstantFreezable.TryCreateEnumConstant(enumValue!);
-
                         return step;
                     }
 
@@ -230,14 +267,10 @@ namespace Reductech.EDR.Core.Internal
                     if (DateTime.TryParse(constant.Value.Value.AsT0, out var dt))
                     {
                         var step = new DateTimeConstant(dt);
-
                         return Result.Success<IStep, IErrorBuilder>(step);
                     }
                 }
             }
-
-
-
 
             return new ErrorBuilder($"'{propertyInfo.Name}' cannot take the value '{stepToSet.Name}'", ErrorCode.InvalidCast);
         }
@@ -256,7 +289,7 @@ namespace Reductech.EDR.Core.Internal
             {
                 var argument = propertyInfo.PropertyType.GenericTypeArguments.Single();
 
-                if (argument.GenericTypeArguments.Length == 1 && typeof(ISequence).IsAssignableFrom(argument))
+                if (argument.GenericTypeArguments.Length == 1 && typeof(IArray).IsAssignableFrom(argument))
                     return SetArray(argument);
 
 
@@ -346,7 +379,7 @@ namespace Reductech.EDR.Core.Internal
                 if (errors.Any())
                     return Result.Failure<Unit, IError>(ErrorList.Combine(errors));
 
-                object array = ArrayStepFactory.CreateArray(list as dynamic);
+                object array = ArrayNewStepFactory.CreateArray(list as dynamic);
 
                 propertyInfo.SetValue(parentStep, array);
 
@@ -426,5 +459,10 @@ namespace Reductech.EDR.Core.Internal
         }
 
         private static string GetLastTerm(string s) => s.Split('.', StringSplitOptions.RemoveEmptyEntries).Last();
+
+        private Lazy<IReadOnlySet<StepParameterReference>> ScopedFunctionParameterReferences { get; }
+
+        /// <inheritdoc />
+        public bool IsScopedFunction(StepParameterReference stepParameterReference) => ScopedFunctionParameterReferences.Value.Contains(stepParameterReference);
     }
 }

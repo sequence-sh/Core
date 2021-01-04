@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Serialization;
@@ -30,11 +31,11 @@ namespace Reductech.EDR.Core.Internal
         /// Tries to get a reference to the output type of this step.
         /// </summary>
         Result<ITypeReference, IError> TryGetOutputTypeReference(FreezableStepData freezeData, TypeResolver typeResolver);
-        
+
         /// <summary>
         /// Gets all type references set by this method and their values if they can be calculated.
         /// </summary>
-        IEnumerable<(VariableName variableName, Maybe<ITypeReference>)> GetTypeReferencesSet(FreezableStepData freezableStepData, TypeResolver typeResolver);
+        IEnumerable<(VariableName variableName, Maybe<ITypeReference>)> GetVariablesSet(FreezableStepData freezableStepData, TypeResolver typeResolver);
 
         /// <summary>
         /// Serializer to use for serialization.
@@ -73,5 +74,11 @@ namespace Reductech.EDR.Core.Internal
         /// Gets all enum types used by this step.
         /// </summary>
         IEnumerable<Type> EnumTypes { get; }
+
+        /// <summary>
+        /// Does this reference a scoped property.
+        /// </summary>
+        [Pure]
+        bool IsScopedFunction(StepParameterReference stepParameterReference);
     }
 }

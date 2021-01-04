@@ -16,7 +16,7 @@ using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
-    public class EnforceSchemaTests : StepTestBase<EnforceSchema, Sequence<Entity>>
+    public class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Entity>>
     {
         /// <inheritdoc />
         public EnforceSchemaTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper) {

@@ -121,20 +121,21 @@ namespace Reductech.EDR.Core.Internal
         /// <summary>
         /// Gets the variables set by steps in this FreezableStepData.
         /// </summary>
-        public Result<IReadOnlyCollection<(VariableName variableName, Maybe<ITypeReference>)>, IError> GetVariablesSet(TypeResolver typeResolver)
+        public Result<IReadOnlyCollection<(VariableName variableName, Maybe<ITypeReference>)>, IError> GetVariablesSet(string stepName, TypeResolver typeResolver)
         {
             var variables = new List<(VariableName variableName, Maybe<ITypeReference>)>();
             var errors = new List<IError>();
 
-            foreach (var stepProperty in StepProperties)
+            foreach (var (key, freezableStepProperty) in StepProperties)
             {
-                stepProperty.Value.Switch(_ => { },
-                    LocalGetVariablesSet,
-                    l =>
-                    {
-                        foreach (var step in l) LocalGetVariablesSet(step);
-                    }
-                    );
+                if (!typeResolver.StepFactoryStore.IsScopedFunction(stepName, key))
+                    freezableStepProperty.Switch(_ => { },
+                        LocalGetVariablesSet,
+                        l =>
+                        {
+                            foreach (var step in l)
+                                LocalGetVariablesSet(step);
+                        });
             }
 
             if (errors.Any())

@@ -101,14 +101,14 @@ namespace Reductech.EDR.Core.Internal
             var dict = new StepParameterDict
             {
                 {
-                    new StepParameterReference(nameof(Array<object>.Elements)),
+                    new StepParameterReference(nameof(ArrayNew<object>.Elements)),
                     new FreezableStepProperty(elements, location)
                 }
             };
 
             var fpd = new FreezableStepData(dict, location);
 
-            return new CompoundFreezableStep(ArrayStepFactory.Instance.TypeName, fpd, configuration);
+            return new CompoundFreezableStep(ArrayNewStepFactory.Instance.TypeName, fpd, configuration);
         }
 
     }

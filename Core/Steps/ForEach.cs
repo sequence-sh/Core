@@ -23,12 +23,13 @@ namespace Reductech.EDR.Core.Steps
         /// </summary>
         [StepProperty(1)]
         [Required]
-        public IStep<Core.Sequence<T>> Array { get; set; } = null!;
+        public IStep<Array<T>> Array { get; set; } = null!;
 
         /// <summary>
         /// The action to perform repeatedly.
         /// </summary>
         [StepProperty(2)]
+        [ScopedFunction]
         [Required]
         public IStep<Unit> Action { get; set; } = null!;
 
@@ -65,6 +66,13 @@ namespace Reductech.EDR.Core.Steps
         }
 
         /// <inheritdoc />
+        public override Result<StepContext, IError> TryGetScopedContext(StepContext baseContext, IFreezableStep scopedStep)
+        {
+            return baseContext.TryCloneWithScopedStep(Variable, new ActualTypeReference(typeof(T)), scopedStep,
+                new StepErrorLocation(this));
+        }
+
+        /// <inheritdoc />
         public override IStepFactory StepFactory => ForEachStepFactory.Instance;
     }
 
@@ -98,20 +106,5 @@ namespace Reductech.EDR.Core.Steps
 
         /// <inheritdoc />
         public override string OutputTypeExplanation => nameof(Unit);
-
-        /// <inheritdoc />
-        public override IEnumerable<(VariableName variableName, Maybe<ITypeReference>)> GetTypeReferencesSet(FreezableStepData freezableStepData, TypeResolver typeResolver)
-        {
-            var vn = freezableStepData.TryGetVariableName(nameof(ForEach<object>.Variable), StepType);
-            if(vn.IsFailure) yield break;
-
-
-            var memberType = GetMemberType(freezableStepData, typeResolver);
-            if (memberType.IsSuccess)
-                yield return (vn.Value, Maybe<ITypeReference>.From(memberType.Value));
-            else
-                yield return (vn.Value, Maybe<ITypeReference>.None);
-        }
-
     }
 }
