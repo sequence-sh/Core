@@ -42,8 +42,8 @@ namespace Reductech.EDR.Core.Tests
                 yield return new DeserializationTestFunction(@"Print ""Mark's string""", "Mark's string" );
 
 
-                yield return new DeserializationTestFunction(@"Print 'Comments!' //This is a comment", "Comments!");
-                yield return new DeserializationTestFunction(@"//This is a comment
+                yield return new DeserializationTestFunction(@"Print 'Comments!' #This is a comment", "Comments!");
+                yield return new DeserializationTestFunction(@"#This is a comment
 Print 'Comments!'", "Comments!");
 
                 yield return new DeserializationTestFunction(@"/*This is a comment
