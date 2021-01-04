@@ -8,7 +8,7 @@ using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
-    public class SortEntitiesTests : StepTestBase<EntityStreamSort, Sequence<Entity>>
+    public class SortEntitiesTests : StepTestBase<EntityStreamSort, Array<Entity>>
     {
         /// <inheritdoc />
         public SortEntitiesTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)

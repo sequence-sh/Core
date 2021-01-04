@@ -224,7 +224,7 @@ namespace Reductech.EDR.Core.TestHarness
                 step = Constant(dt);
             }
 
-            else if (outputType == typeof(Sequence<StringStream>))
+            else if (outputType == typeof(Array<StringStream>))
             {
                 var list = new List<string>();
                 for (var i = 0; i < 3; i++)
@@ -235,7 +235,7 @@ namespace Reductech.EDR.Core.TestHarness
 
                 step = Array(list.ToArray());
             }
-            else if (outputType == typeof(Sequence<int>))
+            else if (outputType == typeof(Array<int>))
             {
                 var list = new List<int>();
                 for (var i = 0; i < 3; i++)
@@ -246,22 +246,22 @@ namespace Reductech.EDR.Core.TestHarness
 
                 step =  Array(list.ToArray());
             }
-            else if (outputType == typeof(Sequence<Entity>))
+            else if (outputType == typeof(Array<Entity>))
             {
                 var entityStream = CreateSimpleEntityStream(ref index);
 
                 step = entityStream;
             }
-            else if (outputType == typeof(Sequence<Sequence<Entity>>))
+            else if (outputType == typeof(Array<Array<Entity>>))
             {
-                var entityStreamList = new List<IStep<Sequence<Entity>> >
+                var entityStreamList = new List<IStep<Array<Entity>> >
                 {
                     CreateSimpleEntityStream(ref index),
                     CreateSimpleEntityStream(ref index),
                     CreateSimpleEntityStream(ref index)
                 };
 
-                step = new Array<Sequence<Entity>> {Elements = entityStreamList};
+                step = new ArrayNew<Array<Entity>> {Elements = entityStreamList};
             }
 
             else if (outputType.IsEnum)
@@ -319,7 +319,7 @@ namespace Reductech.EDR.Core.TestHarness
             return (step, newString, index);
 
 
-            static IStep<Sequence<Entity>>  CreateSimpleEntityStream(ref int index1)
+            static IStep<Array<Entity>>  CreateSimpleEntityStream(ref int index1)
             {
                 var entityList = new List<IStep<Entity>>
                 {
@@ -328,7 +328,7 @@ namespace Reductech.EDR.Core.TestHarness
                     Constant(CreateSimpleEntity(ref index1))
                 };
 
-                var entityStream = new Array<Entity> {Elements = entityList};
+                var entityStream = new ArrayNew<Entity> {Elements = entityList};
 
                 return entityStream;
             }

@@ -58,7 +58,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                 yield return new ErrorCase("Array Failure",
                     new ForEach<int>()
                     {
-                        Array = new FailStep<Sequence<int>>() {ErrorMessage = "Array Failure"}
+                        Array = new FailStep<Array<int>>() {ErrorMessage = "Array Failure"}
                     },
                     new SingleError("Array Failure", ErrorCode.Test, EntireSequenceLocation.Instance));
 

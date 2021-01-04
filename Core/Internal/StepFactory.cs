@@ -256,7 +256,7 @@ namespace Reductech.EDR.Core.Internal
             {
                 var argument = propertyInfo.PropertyType.GenericTypeArguments.Single();
 
-                if (argument.GenericTypeArguments.Length == 1 && typeof(ISequence).IsAssignableFrom(argument))
+                if (argument.GenericTypeArguments.Length == 1 && typeof(IArray).IsAssignableFrom(argument))
                     return SetArray(argument);
 
 
@@ -346,7 +346,7 @@ namespace Reductech.EDR.Core.Internal
                 if (errors.Any())
                     return Result.Failure<Unit, IError>(ErrorList.Combine(errors));
 
-                object array = ArrayStepFactory.CreateArray(list as dynamic);
+                object array = ArrayNewStepFactory.CreateArray(list as dynamic);
 
                 propertyInfo.SetValue(parentStep, array);
 

@@ -9,7 +9,7 @@ using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
-    public class WhereTests : StepTestBase<EntityStreamFilter, Sequence<Entity>>
+    public class WhereTests : StepTestBase<EntityStreamFilter, Array<Entity>>
     {
         /// <inheritdoc />
         public WhereTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
@@ -54,7 +54,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                 yield return new ErrorCase("EntityStream is error",
                     new EntityStreamFilter()
                     {
-                        EntityStream = new FailStep<Sequence<Entity>>(){ErrorMessage = "Stream Fail"},
+                        EntityStream = new FailStep<Array<Entity>>(){ErrorMessage = "Stream Fail"},
                         Predicate = Constant(true)
                     },
                     new SingleError("Stream Fail", ErrorCode.Test, EntireSequenceLocation.Instance));

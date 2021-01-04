@@ -13,7 +13,7 @@ using Reductech.EDR.Core.Util;
 namespace Reductech.EDR.Core.Steps
 {
     /// <summary>
-    /// A sequence of steps to be run one after the other.
+    /// A chain of steps to be run one after the other.
     /// </summary>
     public sealed class Sequence<T> : CompoundStep<T>
     {

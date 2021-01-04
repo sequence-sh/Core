@@ -29,7 +29,7 @@ namespace Reductech.EDR.Core.Steps
         /// </summary>
         [StepProperty(2)]
         [Required]
-        public IStep<Core.Sequence<StringStream>> Strings { get; set; } = null!;
+        public IStep<Core.Array<StringStream>> Strings { get; set; } = null!;
 
         /// <inheritdoc />
         public override async Task<Result<StringStream, IError>> Run(IStateMonad stateMonad,

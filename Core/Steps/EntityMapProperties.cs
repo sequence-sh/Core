@@ -15,21 +15,21 @@ namespace Reductech.EDR.Core.Steps
     /// Change the name of entity fields.
     /// </summary>
     [Alias("RenameEntityFields")]
-    public class EntityMapProperties : CompoundStep<Core.Sequence<Entity>>
+    public class EntityMapProperties : CompoundStep<Core.Array<Entity>>
     {
         /// <inheritdoc />
-        public override async Task<Result<Core.Sequence<Entity>, IError>> Run(IStateMonad stateMonad,
+        public override async Task<Result<Core.Array<Entity>, IError>> Run(IStateMonad stateMonad,
             CancellationToken cancellationToken)
         {
             var mappings = await Mappings.Run(stateMonad, cancellationToken)
                 .Map(e => e
                     .ToDictionary(x => x.Name, x => x.BestValue.ToString()));
 
-            if (mappings.IsFailure) return mappings.ConvertFailure<Core.Sequence<Entity>>();
+            if (mappings.IsFailure) return mappings.ConvertFailure<Core.Array<Entity>>();
 
             var entityStream = await EntityStream.Run(stateMonad, cancellationToken);
 
-            if (entityStream.IsFailure) return entityStream.ConvertFailure<Core.Sequence<Entity>>();
+            if (entityStream.IsFailure) return entityStream.ConvertFailure<Core.Array<Entity>>();
 
             var newEntityStream = entityStream.Value
                 .Select(e=> ChangeHeader(e, mappings.Value));
@@ -64,7 +64,7 @@ namespace Reductech.EDR.Core.Steps
         /// </summary>
         [StepProperty(1)]
         [Required]
-        public IStep<Core.Sequence<Entity>> EntityStream { get; set; } = null!;
+        public IStep<Core.Array<Entity>> EntityStream { get; set; } = null!;
 
         /// <summary>
         /// An entity containing mappings
@@ -81,14 +81,14 @@ namespace Reductech.EDR.Core.Steps
     /// <summary>
     /// Change the name of entity fields.
     /// </summary>
-    public class EntityMapPropertiesStepFactory : SimpleStepFactory<EntityMapProperties, Core.Sequence<Entity>>
+    public class EntityMapPropertiesStepFactory : SimpleStepFactory<EntityMapProperties, Core.Array<Entity>>
     {
         private EntityMapPropertiesStepFactory() { }
 
         /// <summary>
         /// The instance.
         /// </summary>
-        public static SimpleStepFactory<EntityMapProperties, Core.Sequence<Entity>> Instance { get; } = new EntityMapPropertiesStepFactory();
+        public static SimpleStepFactory<EntityMapProperties, Core.Array<Entity>> Instance { get; } = new EntityMapPropertiesStepFactory();
     }
     
 }

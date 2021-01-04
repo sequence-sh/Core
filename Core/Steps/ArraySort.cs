@@ -10,17 +10,18 @@ using Reductech.EDR.Core.Internal.Errors;
 namespace Reductech.EDR.Core.Steps
 {
     /// <summary>
-    /// Reorder an array.
+    /// Reorder an array
     /// </summary>
     [Alias("SortArray")]
-    public sealed class ArraySort<T> : CompoundStep<Core.Sequence<T>>
+    [Alias("Sort")]
+    public sealed class ArraySort<T> : CompoundStep<Core.Array<T>>
     {
         /// <summary>
-        /// The array to modify.
+        /// The array to sort.
         /// </summary>
         [StepProperty(1)]
         [Required]
-        public IStep<Core.Sequence<T>> Array { get; set; } = null!;
+        public IStep<Array<T>> Array { get; set; } = null!;
 
         /// <summary>
         /// Whether to sort in descending order.
@@ -30,16 +31,16 @@ namespace Reductech.EDR.Core.Steps
         public IStep<bool> Descending { get; set; } = new BoolConstant(false);
 
         /// <inheritdoc />
-        public override async Task<Result<Core.Sequence<T>, IError>> Run(IStateMonad stateMonad,
+        public override async Task<Result<Core.Array<T>, IError>> Run(IStateMonad stateMonad,
             CancellationToken cancellationToken)
         {
             var array = await Array.Run(stateMonad, cancellationToken);
 
-            if (array.IsFailure) return array.ConvertFailure<Core.Sequence<T>>();
+            if (array.IsFailure) return array.ConvertFailure<Core.Array<T>>();
 
             var descending = await Descending.Run(stateMonad, cancellationToken);
 
-            if (descending.IsFailure) return descending.ConvertFailure<Core.Sequence<T>>();
+            if (descending.IsFailure) return descending.ConvertFailure<Core.Array<T>>();
 
             var r = array.Value.Sort(descending.Value);
 
@@ -66,10 +67,10 @@ namespace Reductech.EDR.Core.Steps
         public override Type StepType => typeof(ArraySort<>);
 
         /// <inheritdoc />
-        protected override ITypeReference GetOutputTypeReference(ITypeReference memberTypeReference) => new GenericTypeReference(typeof(Core.Sequence<>), new[] { memberTypeReference });
+        protected override ITypeReference GetOutputTypeReference(ITypeReference memberTypeReference) => new GenericTypeReference(typeof(Array<>), new[] { memberTypeReference });
 
         /// <inheritdoc />
-        public override string OutputTypeExplanation => "ArrayList<T>";
+        public override string OutputTypeExplanation => "Array<T>";
 
 
         /// <inheritdoc />
@@ -79,7 +80,6 @@ namespace Reductech.EDR.Core.Steps
                 .Bind(x => x.TryGetOutputTypeReference(typeResolver))
                 .Bind(x => x.TryGetGenericTypeReference(typeResolver, 0)
                     .MapError(e => e.WithLocation(freezableStepData)))
-                .Map(x => x as ITypeReference)
-        ;
+                .Map(x => x as ITypeReference);
     }
 }

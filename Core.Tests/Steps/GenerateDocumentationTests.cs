@@ -86,26 +86,26 @@ An operator that can be applied to two numbers.
                 ).WithStepFactoryStore(StepFactoryStore.Create(ApplyMathOperatorStepFactory.Instance));
 
 
-                yield return new StepCase("Generate Array Documentation",
-                    new GenerateDocumentation(),
-                    @"# Contents
-|Step                 |Summary                                     |
-|:-------------------:|:------------------------------------------:|
-|[Array<T>](#Array<T>)|Represents an ordered collection of objects.|
-# Core
-<a name=""Array<T>""></a>
-## Array<T>
+//                yield return new StepCase("Generate Array Documentation",
+//                    new GenerateDocumentation(),
+//                    @"# Contents
+//|Step                 |Summary                                     |
+//|:-------------------:|:------------------------------------------:|
+//|[Array<T>](#Array<T>)|Represents an ordered collection of objects.|
+//# Core
+//<a name=""Array<T>""></a>
+//## Array<T>
 
-**ArrayList<T>**
+//**ArrayList<T>**
 
-Represents an ordered collection of objects.
+//Represents an ordered collection of objects.
 
-|Parameter|Type          |Required|Summary                   |
-|:-------:|:------------:|:------:|:------------------------:|
-|Elements |IStep<[T](#T)>|☑️      |The elements of the array.|
-"
+//|Parameter|Type          |Required|Summary                   |
+//|:-------:|:------------:|:------:|:------------------------:|
+//|Elements |IStep<[T](#T)>|☑️      |The elements of the array.|
+//"
 
-                ).WithStepFactoryStore(StepFactoryStore.Create(ArrayStepFactory.Instance));
+//                ).WithStepFactoryStore(StepFactoryStore.Create(ArrayNewStepFactory.Instance));
 
                 yield return new StepCase("Example step",
                     new GenerateDocumentation(),

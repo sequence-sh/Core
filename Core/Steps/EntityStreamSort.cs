@@ -16,17 +16,17 @@ namespace Reductech.EDR.Core.Steps
     /// Consumes the stream.
     /// </summary>
     [Alias("SortEntityStream")]
-    public sealed class EntityStreamSort : CompoundStep<Core.Sequence<Entity>>
+    public sealed class EntityStreamSort : CompoundStep<Core.Array<Entity>>
     {
         /// <inheritdoc />
-        public override async Task<Result<Core.Sequence<Entity>, IError>> Run(IStateMonad stateMonad,
+        public override async Task<Result<Array<Entity>, IError>> Run(IStateMonad stateMonad,
             CancellationToken cancellationToken)
         {
             var sortDescending = await Descending.Run(stateMonad, cancellationToken);
-            if (sortDescending.IsFailure) return sortDescending.ConvertFailure<Core.Sequence<Entity>>();
+            if (sortDescending.IsFailure) return sortDescending.ConvertFailure<Core.Array<Entity>>();
 
             var entityStreamResult = await EntityStream.Run(stateMonad, cancellationToken);
-            if (entityStreamResult.IsFailure) return entityStreamResult.ConvertFailure<Core.Sequence<Entity>>();
+            if (entityStreamResult.IsFailure) return entityStreamResult.ConvertFailure<Core.Array<Entity>>();
 
             var currentState = stateMonad.GetState().ToImmutableDictionary();
 
@@ -54,7 +54,7 @@ namespace Reductech.EDR.Core.Steps
         /// </summary>
         [StepProperty(1)]
         [Required]
-        public IStep<Core.Sequence<Entity>> EntityStream { get; set; } = null!;
+        public IStep<Core.Array<Entity>> EntityStream { get; set; } = null!;
 
         /// <summary>
         /// A function that gets the key to sort by from the variable &lt;Entity&gt;
@@ -79,14 +79,14 @@ namespace Reductech.EDR.Core.Steps
     /// Reorder entities according to their property values.
     /// Consumes the stream.
     /// </summary>
-    public sealed class EntityStreamSortStepFactory : SimpleStepFactory<EntityStreamSort, Core.Sequence<Entity>>
+    public sealed class EntityStreamSortStepFactory : SimpleStepFactory<EntityStreamSort, Core.Array<Entity>>
     {
         private EntityStreamSortStepFactory() { }
 
         /// <summary>
         /// The instance.
         /// </summary>
-        public static SimpleStepFactory<EntityStreamSort, Core.Sequence<Entity>> Instance { get; } = new EntityStreamSortStepFactory();
+        public static SimpleStepFactory<EntityStreamSort, Core.Array<Entity>> Instance { get; } = new EntityStreamSortStepFactory();
     }
 
 }

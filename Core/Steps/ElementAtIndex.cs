@@ -20,7 +20,7 @@ namespace Reductech.EDR.Core.Steps
         /// </summary>
         [StepProperty(1)]
         [Required]
-        public IStep<Core.Sequence<T>> Array { get; set; } = null!;
+        public IStep<Core.Array<T>> Array { get; set; } = null!;
 
         /// <summary>
         /// The index to get the element at.

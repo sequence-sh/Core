@@ -109,7 +109,7 @@ namespace Reductech.EDR.Core.Tests
                 yield return new ErrorTestFunction("Array Index out of bounds",
                     new ElementAtIndex<bool>
                     {
-                        Array = new Array<bool>
+                        Array = new ArrayNew<bool>
                         {
                             Elements = new []{new BoolConstant(true), new BoolConstant(false)}
                         },

@@ -15,17 +15,17 @@ namespace Reductech.EDR.Core.Steps
     /// <summary>
     /// Removes duplicate entities.
     /// </summary>
-    public sealed class EntityStreamDistinct : CompoundStep<Core.Sequence<Entity>>
+    public sealed class EntityStreamDistinct : CompoundStep<Core.Array<Entity>>
     {
         /// <inheritdoc />
-        public override async Task<Result<Core.Sequence<Entity>, IError>> Run(IStateMonad stateMonad,
+        public override async Task<Result<Core.Array<Entity>, IError>> Run(IStateMonad stateMonad,
             CancellationToken cancellationToken)
         {
             var entityStreamResult = await EntityStream.Run(stateMonad, cancellationToken);
-            if (entityStreamResult.IsFailure) return entityStreamResult.ConvertFailure<Core.Sequence<Entity>>();
+            if (entityStreamResult.IsFailure) return entityStreamResult.ConvertFailure<Core.Array<Entity>>();
 
             var ignoreCaseResult = await IgnoreCase.Run(stateMonad, cancellationToken);
-            if (ignoreCaseResult.IsFailure) return ignoreCaseResult.ConvertFailure<Core.Sequence<Entity>>();
+            if (ignoreCaseResult.IsFailure) return ignoreCaseResult.ConvertFailure<Core.Array<Entity>>();
 
             IEqualityComparer<string> comparer = ignoreCaseResult.Value
                 ? StringComparer.OrdinalIgnoreCase
@@ -60,7 +60,7 @@ namespace Reductech.EDR.Core.Steps
         /// </summary>
         [StepProperty(1)]
         [Required]
-        public IStep<Core.Sequence<Entity>> EntityStream { get; set; } = null!;
+        public IStep<Core.Array<Entity>> EntityStream { get; set; } = null!;
 
         /// <summary>
         /// A function that gets the key to distinct by from the variable &lt;Entity&gt;
@@ -83,13 +83,13 @@ namespace Reductech.EDR.Core.Steps
     /// <summary>
     /// Removes duplicate entities.
     /// </summary>
-    public sealed class EntityStreamDistinctStepFactory : SimpleStepFactory<EntityStreamDistinct, Core.Sequence<Entity>>
+    public sealed class EntityStreamDistinctStepFactory : SimpleStepFactory<EntityStreamDistinct, Core.Array<Entity>>
     {
         private EntityStreamDistinctStepFactory() {}
 
         /// <summary>
         /// The instance.
         /// </summary>
-        public static SimpleStepFactory<EntityStreamDistinct, Core.Sequence<Entity>> Instance { get; } = new EntityStreamDistinctStepFactory();
+        public static SimpleStepFactory<EntityStreamDistinct, Core.Array<Entity>> Instance { get; } = new EntityStreamDistinctStepFactory();
     }
 }

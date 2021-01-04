@@ -40,7 +40,7 @@ namespace Reductech.EDR.Core.Steps
         /// </summary>
         [StepProperty(1)]
         [Required]
-        public IStep<Core.Sequence<Entity>> Entities { get; set; } = null!;
+        public IStep<Core.Array<Entity>> Entities { get; set; } = null!;
 
         /// <summary>
         /// How the stream is encoded.

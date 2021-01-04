@@ -9,7 +9,7 @@ using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
-    public class ArrayTests : StepTestBase<Array<int>, Sequence<int>>
+    public class ArrayTests : StepTestBase<ArrayNew<int>, Array<int>>
     {
         /// <inheritdoc />
         public ArrayTests([NotNull] ITestOutputHelper testOutputHelper) : base(testOutputHelper) {}
@@ -29,7 +29,7 @@ namespace Reductech.EDR.Core.Tests.Steps
             get
             {
                 yield return new StepCase("Empty",
-                    new Array<int>
+                    new ArrayNew<int>
                     {
                         Elements = new List<IStep<int>>
                         {
@@ -45,12 +45,12 @@ namespace Reductech.EDR.Core.Tests.Steps
         {
             get
             {
-                yield return new SerializeCase("Empty", new Array<int>
+                yield return new SerializeCase("Empty", new ArrayNew<int>
                 {
                     Elements = ImmutableList<IStep<int>>.Empty
                 }, "[]");
 
-                yield return new SerializeCase("Three Elements", new Array<int>
+                yield return new SerializeCase("Three Elements", new ArrayNew<int>
                 {
                     Elements = new List<IStep<int>>
                     {

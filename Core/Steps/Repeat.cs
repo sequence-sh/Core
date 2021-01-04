@@ -13,7 +13,7 @@ namespace Reductech.EDR.Core.Steps
     /// <summary>
     /// Creates an array by repeating an element.
     /// </summary>
-    public sealed class Repeat<T> : CompoundStep<Core.Sequence<T>>
+    public sealed class Repeat<T> : CompoundStep<Core.Array<T>>
     {
         /// <summary>
         /// The element to repeat.
@@ -30,16 +30,16 @@ namespace Reductech.EDR.Core.Steps
         public IStep<int> Number { get; set; } = null!;
 
         /// <inheritdoc />
-        public override async Task<Result<Core.Sequence<T>, IError>> Run(IStateMonad stateMonad,
+        public override async Task<Result<Core.Array<T>, IError>> Run(IStateMonad stateMonad,
             CancellationToken cancellationToken)
         {
             var element = await Element.Run(stateMonad, cancellationToken);
 
-            if (element.IsFailure) return element.ConvertFailure<Core.Sequence<T>>();
+            if (element.IsFailure) return element.ConvertFailure<Core.Array<T>>();
 
             var number = await Number.Run(stateMonad, cancellationToken);
 
-            if (number.IsFailure) return number.ConvertFailure<Core.Sequence<T>>();
+            if (number.IsFailure) return number.ConvertFailure<Core.Array<T>>();
 
             var result = Enumerable.Repeat(element.Value, number.Value).ToSequence();
 
@@ -69,7 +69,7 @@ namespace Reductech.EDR.Core.Steps
         public override string OutputTypeExplanation => "ArrayList<T>";
 
         /// <inheritdoc />
-        protected override ITypeReference GetOutputTypeReference(ITypeReference memberTypeReference) => new GenericTypeReference(typeof(Core.Sequence<>), new[] { memberTypeReference });
+        protected override ITypeReference GetOutputTypeReference(ITypeReference memberTypeReference) => new GenericTypeReference(typeof(Core.Array<>), new[] { memberTypeReference });
 
         /// <inheritdoc />
         protected override Result<ITypeReference, IError> GetMemberType(FreezableStepData freezableStepData,

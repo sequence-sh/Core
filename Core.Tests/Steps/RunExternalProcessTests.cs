@@ -28,7 +28,7 @@ namespace Reductech.EDR.Core.Tests.Steps
 
                         new RunExternalProcess
                         {
-                            Arguments = new Array<StringStream>(){Elements = new IStep<StringStream>[]{Constant("Foo") }},
+                            Arguments = new ArrayNew<StringStream>(){Elements = new IStep<StringStream>[]{Constant("Foo") }},
                             Path = new StringConstant("Process.exe"),
                             Encoding = Constant(EncodingEnum.Ascii)
                         },

@@ -13,6 +13,7 @@ namespace Reductech.EDR.Core.Steps
     /// Checks if an array is empty.
     /// </summary>
     [Alias("IsArrayEmpty")]
+    [Alias("IsEmpty")]
     public sealed class ArrayIsEmpty<T> : CompoundStep<bool>
     {
         /// <summary>
@@ -20,7 +21,7 @@ namespace Reductech.EDR.Core.Steps
         /// </summary>
         [StepProperty(1)]
         [Required]
-        public IStep<Core.Sequence<T>> Array { get; set; } = null!;
+        public IStep<Array<T>> Array { get; set; } = null!;
 
         /// <inheritdoc />
         public override async Task<Result<bool, IError>> Run(IStateMonad stateMonad,

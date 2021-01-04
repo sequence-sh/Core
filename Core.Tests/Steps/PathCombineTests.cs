@@ -28,14 +28,14 @@ namespace Reductech.EDR.Core.Tests.Steps
 
                 yield return new StepCase("Non Relative", new PathCombine
                 {
-                    Paths = new Array<StringStream>{Elements = new List<IStep<StringStream>>(){Constant(currentDirectory), Constant("Hello"), Constant("World")}}
+                    Paths = new ArrayNew<StringStream>{Elements = new List<IStep<StringStream>>(){Constant(currentDirectory), Constant("Hello"), Constant("World")}}
                 }, expected
                     );
 
 
                 yield return new StepCase("Relative", new PathCombine
                 {
-                    Paths = new Array<StringStream>{Elements = new List<IStep<StringStream>>(){ Constant("Hello"), Constant("World")}}
+                    Paths = new ArrayNew<StringStream>{Elements = new List<IStep<StringStream>>(){ Constant("Hello"), Constant("World")}}
                 }, expected)
                     .WithFileSystemAction(x=>x.Setup(a=>a.GetCurrentDirectory()).Returns(currentDirectory));
             }
