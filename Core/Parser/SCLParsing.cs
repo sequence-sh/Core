@@ -39,9 +39,9 @@ namespace Reductech.EDR.Core.Parser
         public static Result<FreezableStepProperty, IError> TryParse(string text)
         {
             var inputStream = new AntlrInputStream(text);
-            var lexer = new SequenceLexer(inputStream);
+            var lexer = new SCLLexer(inputStream);
             var commonTokenStream = new CommonTokenStream(lexer);
-            var parser = new SequenceParser(commonTokenStream);
+            var parser = new SCLParser(commonTokenStream);
 
             var syntaxErrorListener = new SyntaxErrorListener();
             parser.AddErrorListener(syntaxErrorListener);
@@ -78,10 +78,10 @@ namespace Reductech.EDR.Core.Parser
             }
         }
 
-        private class Visitor : SequenceBaseVisitor<Result<FreezableStepProperty, IError>>
+        private class Visitor : SCLBaseVisitor<Result<FreezableStepProperty, IError>>
         {
             /// <inheritdoc />
-            public override Result<FreezableStepProperty, IError> VisitFullSequence(SequenceParser.FullSequenceContext context)
+            public override Result<FreezableStepProperty, IError> VisitFullSequence(SCLParser.FullSequenceContext context)
             {
                 if (context.step() != null)
                     return Visit(context.step());
@@ -94,7 +94,7 @@ namespace Reductech.EDR.Core.Parser
 
 
             /// <inheritdoc />
-            public override Result<FreezableStepProperty, IError> VisitStepSequence(SequenceParser.StepSequenceContext context)
+            public override Result<FreezableStepProperty, IError> VisitStepSequence(SCLParser.StepSequenceContext context)
             {
                 var results = new List<Result<IFreezableStep, IError>>();
 
@@ -121,7 +121,7 @@ namespace Reductech.EDR.Core.Parser
 
 
             /// <inheritdoc />
-            public override Result<FreezableStepProperty, IError> VisitArray(SequenceParser.ArrayContext context)
+            public override Result<FreezableStepProperty, IError> VisitArray(SCLParser.ArrayContext context)
             {
                 var members =
                     context.term().Select(VisitTerm);
@@ -131,7 +131,7 @@ namespace Reductech.EDR.Core.Parser
             }
 
             /// <inheritdoc />
-            public override Result<FreezableStepProperty, IError> VisitBoolean(SequenceParser.BooleanContext context)
+            public override Result<FreezableStepProperty, IError> VisitBoolean(SCLParser.BooleanContext context)
             {
                 var b = context.TRUE() != null;
 
@@ -140,7 +140,7 @@ namespace Reductech.EDR.Core.Parser
             }
 
             /// <inheritdoc />
-            public override Result<FreezableStepProperty, IError> VisitDateTime(SequenceParser.DateTimeContext context)
+            public override Result<FreezableStepProperty, IError> VisitDateTime(SCLParser.DateTimeContext context)
             {
                 if (!DateTime.TryParse(context.GetText(), out var dateTime))
                     return new SingleError($"Could not parse '{context.GetText()}'", ErrorCode.CouldNotParse,
@@ -153,10 +153,10 @@ namespace Reductech.EDR.Core.Parser
             }
 
             /// <inheritdoc />
-            public override Result<FreezableStepProperty, IError> VisitBracketedStep(SequenceParser.BracketedStepContext context) => Visit(context.step());
+            public override Result<FreezableStepProperty, IError> VisitBracketedStep(SCLParser.BracketedStepContext context) => Visit(context.step());
 
             /// <inheritdoc />
-            public override Result<FreezableStepProperty, IError> VisitInfixOperation(SequenceParser.InfixOperationContext context)
+            public override Result<FreezableStepProperty, IError> VisitInfixOperation(SCLParser.InfixOperationContext context)
             {
 
                 var left = VisitTerm(context.term(0));
@@ -179,7 +179,7 @@ namespace Reductech.EDR.Core.Parser
             }
 
             /// <inheritdoc />
-            public override Result<FreezableStepProperty, IError> VisitSetVariable(SequenceParser.SetVariableContext context)
+            public override Result<FreezableStepProperty, IError> VisitSetVariable(SCLParser.SetVariableContext context)
             {
                 var member = Visit(context.step());
 
@@ -193,14 +193,14 @@ namespace Reductech.EDR.Core.Parser
             }
 
             /// <inheritdoc />
-            public override Result<FreezableStepProperty, IError> VisitGetVariable(SequenceParser.GetVariableContext context)
+            public override Result<FreezableStepProperty, IError> VisitGetVariable(SCLParser.GetVariableContext context)
             {
                 var vn = GetVariableName(context.VARIABLENAME());
                 return vn;
             }
 
             /// <inheritdoc />
-            public override Result<FreezableStepProperty, IError> VisitEnumeration(SequenceParser.EnumerationContext context)
+            public override Result<FreezableStepProperty, IError> VisitEnumeration(SCLParser.EnumerationContext context)
             {
                 if (context.children.Count != 3 || context.NAME().Length != 2)
                     return ParseError(context);
@@ -214,7 +214,7 @@ namespace Reductech.EDR.Core.Parser
             }
 
             /// <inheritdoc />
-            public override Result<FreezableStepProperty, IError> VisitNumber(SequenceParser.NumberContext context)
+            public override Result<FreezableStepProperty, IError> VisitNumber(SCLParser.NumberContext context)
             {
                 if (int.TryParse(context.NUMBER().GetText(), out var num))
                 {
@@ -227,7 +227,7 @@ namespace Reductech.EDR.Core.Parser
             }
 
             /// <inheritdoc />
-            public override Result<FreezableStepProperty, IError> VisitQuotedString(SequenceParser.QuotedStringContext context)
+            public override Result<FreezableStepProperty, IError> VisitQuotedString(SCLParser.QuotedStringContext context)
             {
                 string s = context.DOUBLEQUOTEDSTRING() != null ?
                     UnescapeDoubleQuoted(context.DOUBLEQUOTEDSTRING().GetText()):
@@ -276,7 +276,7 @@ namespace Reductech.EDR.Core.Parser
             }
 
             /// <inheritdoc />
-            public override Result<FreezableStepProperty, IError> VisitPipeFunction(SequenceParser.PipeFunctionContext context)
+            public override Result<FreezableStepProperty, IError> VisitPipeFunction(SCLParser.PipeFunctionContext context)
             {
                 var name = context.NAME().Symbol.Text;
 
@@ -317,7 +317,7 @@ namespace Reductech.EDR.Core.Parser
             }
 
             /// <inheritdoc />
-            public override Result<FreezableStepProperty, IError> VisitFunction(SequenceParser.FunctionContext context)
+            public override Result<FreezableStepProperty, IError> VisitFunction(SCLParser.FunctionContext context)
             {
                 var name = context.NAME().Symbol.Text;
 
@@ -354,7 +354,7 @@ namespace Reductech.EDR.Core.Parser
             }
 
             /// <inheritdoc />
-            public override Result<FreezableStepProperty, IError> VisitEntity(SequenceParser.EntityContext context)
+            public override Result<FreezableStepProperty, IError> VisitEntity(SCLParser.EntityContext context)
             {
                 var members = AggregateNamedArguments(context.namedArgument(), new TextLocation(context));
 
@@ -366,7 +366,7 @@ namespace Reductech.EDR.Core.Parser
             }
 
             private Result<IReadOnlyDictionary<string, FreezableStepProperty>, IError>
-                AggregateNamedArguments(IEnumerable<SequenceParser.NamedArgumentContext> namedArguments, IErrorLocation location)
+                AggregateNamedArguments(IEnumerable<SCLParser.NamedArgumentContext> namedArguments, IErrorLocation location)
             {
                 var l = new List<(string key, FreezableStepProperty member)>();
                 var errors = new List<IError>();
@@ -395,7 +395,7 @@ namespace Reductech.EDR.Core.Parser
             }
 
 
-            private Result<(string name, FreezableStepProperty value), IError> GetNamedArgument(SequenceParser.NamedArgumentContext context)
+            private Result<(string name, FreezableStepProperty value), IError> GetNamedArgument(SCLParser.NamedArgumentContext context)
             {
                 var key = context.NAME().Symbol.Text;
 
