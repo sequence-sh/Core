@@ -148,8 +148,16 @@ namespace Reductech.EDR.Core.Internal
 
             var remainingRequired = RequiredProperties.ToHashSet(StringComparer.OrdinalIgnoreCase);
 
+            List<(FreezableStepProperty, PropertyInfo)> scopedFunctions = new();
+
             foreach (var (stepMember, propertyInfo) in pairs)
             {
+                if(propertyInfo.GetCustomAttribute<ScopedFunctionAttribute>() != null)
+                {
+                    scopedFunctions.Add((stepMember, propertyInfo));
+                    continue;
+                }
+
                 remainingRequired.Remove(propertyInfo.Name);
                 var result =
                     stepMember.Match(
@@ -159,6 +167,28 @@ namespace Reductech.EDR.Core.Internal
                     );
 
                 if(result.IsFailure) errors.Add(result.Error);
+            }
+
+            if(scopedFunctions.Any())
+            {
+                var scopedContext = step.TryGetScopedContext(stepContext);
+                if (scopedContext.IsSuccess)
+                    foreach (var (stepMember, propertyInfo) in scopedFunctions)
+                    {
+                        remainingRequired.Remove(propertyInfo.Name);
+                        var result =
+                            stepMember.Match(
+                                vn => TrySetVariableName(propertyInfo, step, vn, stepMember.Location,
+                                    scopedContext.Value),
+                                s => TrySetStep(propertyInfo, step, s, scopedContext.Value),
+                                sList => TrySetStepList(propertyInfo, step, sList, scopedContext.Value)
+                            );
+
+                        if (result.IsFailure) errors.Add(result.Error);
+                    }
+                else
+                    errors.Add(scopedContext.Error);
+
             }
 
             foreach (var property in remainingRequired)

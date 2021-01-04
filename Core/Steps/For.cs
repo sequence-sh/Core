@@ -39,13 +39,19 @@ namespace Reductech.EDR.Core.Steps
 
         /// <summary>
         /// The action to perform repeatedly.
-        /// Use the variable &lt;i&gt;
         /// </summary>
         [StepProperty(4)]
+        [ScopedFunction]
         [Required]
         public IStep<Unit> Action { get; set; } = null!;
 
-        //TODO let users set a custom variable name
+        /// <summary>
+        /// The name of the variable to use within the action.
+        /// </summary>
+        [VariableName(5)]
+        [DefaultValueExplanation("<i>")]
+
+        public VariableName Variable { get; set; } = VariableName.Index;
 
         /// <inheritdoc />
         public override async Task<Result<Unit, IError>> Run(IStateMonad stateMonad,
@@ -89,6 +95,13 @@ namespace Reductech.EDR.Core.Steps
 
             return Unit.Default;
 
+        }
+
+        /// <inheritdoc />
+        public override Result<StepContext, IError> TryGetScopedContext(StepContext baseContext)
+        {
+            return baseContext.TryClone((Variable, new ActualTypeReference(typeof(int))))
+                .MapError(eb => eb.WithLocation(this));
         }
 
         /// <inheritdoc />

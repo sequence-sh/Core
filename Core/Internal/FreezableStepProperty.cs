@@ -5,7 +5,6 @@ using System.Linq;
 using CSharpFunctionalExtensions;
 using OneOf;
 using Reductech.EDR.Core.Internal.Errors;
-//using Opt = OneOf.OneOf<Reductech.EDR.Core.Internal.VariableName, Reductech.EDR.Core.Internal.IFreezableStep, System.Collections.Immutable.ImmutableList<Reductech.EDR.Core.Internal.IFreezableStep>>;
 
 
 namespace Reductech.EDR.Core.Internal
@@ -49,19 +48,6 @@ namespace Reductech.EDR.Core.Internal
         /// This, if it is a variableName
         /// </summary>
         public Maybe<VariableName> VariableName => Match(x => x, _ => Maybe<VariableName>.None, _ => Maybe<VariableName>.None);
-
-        /// <summary>
-        /// This, if it is a FreezableStep
-        /// </summary>
-        public Maybe<IFreezableStep> FreezableStep => Match(x => Maybe<IFreezableStep>.None,Maybe<IFreezableStep>.From,  x => Maybe<IFreezableStep>.None);
-
-        /// <summary>
-        /// This, if it is a StepList
-        /// </summary>
-        public Maybe<ImmutableList<IFreezableStep>> StepList => Match(
-            x => Maybe<ImmutableList<IFreezableStep>>.None,
-            x => Maybe<ImmutableList<IFreezableStep>>.None,
-            Maybe<ImmutableList<IFreezableStep>>.From);
 
         /// <summary>
         /// Gets the stepMember if it is a Variable.

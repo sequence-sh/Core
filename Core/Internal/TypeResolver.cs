@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Internal.Errors;
 
@@ -12,12 +13,26 @@ namespace Reductech.EDR.Core.Internal
         /// <summary>
         /// Create a new TypeResolver
         /// </summary>
-        public TypeResolver(StepFactoryStore stepFactoryStore) => StepFactoryStore = stepFactoryStore;
+        public TypeResolver(StepFactoryStore stepFactoryStore, Dictionary<VariableName, ActualTypeReference>? myDictionary = null)
+        {
+            StepFactoryStore = stepFactoryStore;
+            MyDictionary = myDictionary?? new Dictionary<VariableName, ActualTypeReference>();
+        }
+
+
+        /// <summary>
+        /// Copy this type resolver.
+        /// </summary>
+        public TypeResolver Copy()
+        {
+            var dictClone = MyDictionary.ToDictionary(x => x.Key, x => x.Value);
+            return new TypeResolver(StepFactoryStore, dictClone);
+        }
 
         /// <inheritdoc />
         public override string ToString() => Dictionary.Count + " Types";
 
-        private Dictionary<VariableName, ActualTypeReference> MyDictionary { get; } = new Dictionary<VariableName, ActualTypeReference>();
+        private Dictionary<VariableName, ActualTypeReference> MyDictionary { get; }
 
         /// <summary>
         /// The dictionary mapping VariableNames to ActualTypeReferences

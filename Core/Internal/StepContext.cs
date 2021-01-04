@@ -20,6 +20,22 @@ namespace Reductech.EDR.Core.Internal
         private StepContext(TypeResolver typeResolver) => TypeResolver = typeResolver;
 
         /// <summary>
+        /// Try to Clone this context with additional set variables.
+        /// </summary>
+        public  Result<StepContext, IErrorBuilder> TryClone(params (VariableName vn, ITypeReference typeReference)[] extraVariables)
+        {
+            var newTypeResolver = TypeResolver.Copy();
+
+            foreach (var (vn, typeReference) in extraVariables)
+            {
+                var r = newTypeResolver.TryAddType(vn, typeReference);
+                if (r.IsFailure) return r.ConvertFailure<StepContext>();
+            }
+
+            return new StepContext(newTypeResolver);
+        }
+
+        /// <summary>
         /// Gets the type referred to by a reference.
         /// </summary>
         public Result<Type, IErrorBuilder> TryGetTypeFromReference(ITypeReference typeReference) => typeReference.TryGetActualTypeReference(TypeResolver).Map(x => x.Type);
@@ -75,86 +91,6 @@ namespace Reductech.EDR.Core.Internal
             }
 
             return new StepContext(typeResolver);
-
-            //var remainingFreezableSteps = new Stack<IFreezableStep>(freezableSteps);
-            //var stepsForLater = new List<(IFreezableStep step, IError error)>();
-
-            //var changed = false;
-
-            //while (remainingFreezableSteps.Any())
-            //{
-            //    var step = remainingFreezableSteps.Pop();
-
-            //    if (step is CompoundFreezableStep seq && seq.StepName == SequenceStepFactory.Instance.TypeName)
-            //    {
-            //        var stepsResult = seq.FreezableStepData.GetStepList(nameof(Sequence<object>.InitialSteps), nameof(Sequence<object>));
-
-            //        if (stepsResult.IsFailure)
-            //            return stepsResult.ConvertFailure<StepContext>();
-
-            //        foreach (var freezableStep in stepsResult.Value)
-            //            remainingFreezableSteps.Push(freezableStep);
-
-            //        var finalStepResult = seq.FreezableStepData.GetStep(nameof(Sequence<object>.FinalStep), nameof(Sequence<object>));
-
-            //        if (finalStepResult.IsFailure)
-            //            return finalStepResult.ConvertFailure<StepContext>();
-
-            //        remainingFreezableSteps.Push(finalStepResult.Value);
-
-            //        continue;
-            //    }
-
-            //    var variablesSetResult = step.GetVariablesSet(typeResolver);
-            //    if (variablesSetResult.IsFailure) return variablesSetResult.ConvertFailure<StepContext>();
-
-            //    var resolveResult = variablesSetResult.Bind(Resolve);
-
-            //    if (resolveResult.IsSuccess)
-            //        changed = true;
-            //    else
-            //        stepsForLater.Add((step, resolveResult.Error));
-
-            //    if (!remainingFreezableSteps.Any() && changed && stepsForLater.Any())
-            //    {
-            //        remainingFreezableSteps = new Stack<IFreezableStep>(stepsForLater.Select(x=>x.step));
-            //        stepsForLater.Clear();
-            //        changed = false;
-            //    }
-            //}
-
-            //static Result<Unit, IError> Resolve(IEnumerable<(VariableName variableName, ITypeReference typeReference)> data, TypeResolver typeResolver)
-            //{
-            //    var references = data.SelectMany(GetAllSetReferences);
-
-            //    var result = references
-            //        .Select(x => (x.variableName, actualType: x.typeReference.TryGetActualTypeReference(typeResolver)))
-            //        .Select(x => x.actualType.Bind(y => typeResolver.TryAddType(x.variableName, y)))
-            //        .Combine(ErrorBuilderList.Combine)
-            //        .Map(_=> Unit.Default)
-            //        .MapError(x=>x.WithLocation(EntireSequenceLocation.Instance));
-
-            //    return result;
-
-            //    static IEnumerable<(VariableName variableName, ITypeReference typeReference)> GetAllSetReferences((VariableName variableName, ITypeReference typeReference) pair)
-            //    {
-            //        yield return pair;
-
-            //        if (pair.typeReference is GenericTypeReference gtr)
-            //        {
-            //            foreach (var pair2 in gtr.ChildTypes.Select((t, i) => (variableName: pair.variableName.CreateChild(i), typeReference: t)))
-            //                yield return pair2;
-            //        }
-            //    }
-            //}
-
-            //if (stepsForLater.Any())
-            //{
-            //    var error = ErrorList.Combine(stepsForLater.Select(x => x.error));
-            //    return Result.Failure<StepContext, IError>(error);
-            //}
-
-            //return new StepContext(typeResolver);
         }
     }
 }

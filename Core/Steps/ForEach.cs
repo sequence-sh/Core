@@ -29,6 +29,7 @@ namespace Reductech.EDR.Core.Steps
         /// The action to perform repeatedly.
         /// </summary>
         [StepProperty(2)]
+        [ScopedFunction]
         [Required]
         public IStep<Unit> Action { get; set; } = null!;
 
@@ -65,6 +66,13 @@ namespace Reductech.EDR.Core.Steps
         }
 
         /// <inheritdoc />
+        public override Result<StepContext, IError> TryGetScopedContext(StepContext baseContext)
+        {
+            return baseContext.TryClone((Variable, new ActualTypeReference(typeof(T))))
+                .MapError(eb => eb.WithLocation(this));
+        }
+
+        /// <inheritdoc />
         public override IStepFactory StepFactory => ForEachStepFactory.Instance;
     }
 
@@ -98,22 +106,5 @@ namespace Reductech.EDR.Core.Steps
 
         /// <inheritdoc />
         public override string OutputTypeExplanation => nameof(Unit);
-
-        ///// <inheritdoc />
-        //public override IEnumerable<(VariableName variableName, Maybe<ITypeReference>)> GetVariablesSet(FreezableStepData freezableStepData, TypeResolver typeResolver)
-        //{
-        //    var vn = freezableStepData.TryGetVariableName(nameof(ForEach<object>.Variable), StepType)
-        //        .OnFailureCompensate(() => VariableName.Entity);
-
-
-        //    var memberType = GetMemberType(freezableStepData, typeResolver);
-        //    if (memberType.IsSuccess)
-        //        yield return (vn.Value, Maybe<ITypeReference>.From(memberType.Value));
-        //    else
-        //        yield return (vn.Value, Maybe<ITypeReference>.None);
-
-
-        //}
-
     }
 }

@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using CSharpFunctionalExtensions;
+using Reductech.EDR.Core.Internal.Errors;
 
 namespace Reductech.EDR.Core.Internal
 {
@@ -16,6 +18,12 @@ namespace Reductech.EDR.Core.Internal
         /// Requirements for this step that can only be determined at runtime.
         /// </summary>
         IEnumerable<Requirement> RuntimeRequirements { get; }
+
+        /// <summary>
+        /// Tries to get the scoped context for this step.
+        /// Returns an error if this step does not have any scoped functions.
+        /// </summary>
+        Result<StepContext, IError> TryGetScopedContext(StepContext baseContext);
     }
 
     /// <summary>
