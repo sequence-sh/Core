@@ -5,7 +5,6 @@ using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.TestHarness;
 using Reductech.EDR.Core.Util;
 using Xunit.Abstractions;
-using Xunit.Sdk;
 using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 
 namespace Reductech.EDR.Core.Tests.Steps
@@ -22,7 +21,16 @@ namespace Reductech.EDR.Core.Tests.Steps
         {
             get
             {
-                yield return new StepCase("Simple Foreach",
+                yield return new StepCase("Default Variable Name",
+                    new ForEach<int>
+                    {
+                        Action = new Print<int> { Value = GetVariable<int>(VariableName.Entity) },
+                        Array = Array(3, 2, 1)
+                    },
+                    Unit.Default,
+                    "3", "2", "1");
+
+                yield return new StepCase("Custom Variable Name",
                     new ForEach<int>
                     {
                         Action = new Print<int> {Value = GetVariable<int>("Foo")},

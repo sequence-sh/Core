@@ -31,14 +31,6 @@ namespace Reductech.EDR.Core.Internal
         {
             var typeResolver = new TypeResolver(stepFactoryStore);
 
-            foreach (var reservedVariableName in VariableName.ReservedVariableNames)
-            {
-                var r = typeResolver.TryAddType(reservedVariableName.Key, reservedVariableName.Value);
-
-                if (r.IsFailure)
-                    return Result.Failure<StepContext, IError>(r.Error.WithLocation(EntireSequenceLocation.Instance));
-            }
-
             int? numberUnresolved = null;
 
             while (true)

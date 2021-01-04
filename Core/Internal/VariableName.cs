@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using CSharpFunctionalExtensions;
-using Reductech.EDR.Core.Internal.Errors;
-using Reductech.EDR.Core.Util;
 
 namespace Reductech.EDR.Core.Internal
 {
@@ -54,7 +50,7 @@ namespace Reductech.EDR.Core.Internal
         /// <summary>
         /// Creates the name of a generic type argument.
         /// </summary>
-        public VariableName CreateChild(int argNumber) => new VariableName(Name + "ARG" + argNumber);
+        public VariableName CreateChild(int argNumber) => new (Name + "ARG" + argNumber);
 
         /// <inheritdoc />
         public override string ToString() => Serialize();
@@ -65,49 +61,16 @@ namespace Reductech.EDR.Core.Internal
         /// <returns></returns>
         public string Serialize()=> $"<{Name}>";
 
-        /// <summary>
-        /// Ensures that this variable name is not reserved
-        /// </summary>
-        /// <returns></returns>
-        public Result<Unit, IErrorBuilder> EnsureNotReserved()
-        {
-            if (ReservedVariableNames.ContainsKey(this))
-                return new ErrorBuilder($"The Variable <{Name}> is Reserved.", ErrorCode.ReservedVariableName);
-            if (Name.StartsWith(ReservedVariableNamePrefix, StringComparison.OrdinalIgnoreCase))
-                return new ErrorBuilder($"The Variable Prefix '{ReservedVariableNamePrefix}' is Reserved.", ErrorCode.ReservedVariableName);
-
-            return Unit.Default;
-        }
-
 
         /// <summary>
         /// The variable that entities will be set to.
         /// </summary>
 
-        public static VariableName Entity { get; } = new VariableName("Entity");
+        public static VariableName Entity { get; } = new ("Entity");
 
         /// <summary>
         /// The variable name that indexes in for loops will be set to
         /// </summary>
-        public static VariableName Index { get; } = new VariableName("i");
-
-        ///// <summary>
-        ///// The variable name that elements in foreach loops will be set to
-        ///// </summary>
-        //public static VariableName Element { get; } = new VariableName("x");
-
-        /// <summary>
-        /// Prefix reserved for internal use
-        /// </summary>
-        private const string ReservedVariableNamePrefix = "Reductech";
-
-        /// <summary>
-        /// Variable names that are reserved
-        /// </summary>
-        public static readonly Dictionary<VariableName, ActualTypeReference> ReservedVariableNames = new Dictionary<VariableName, ActualTypeReference>()
-        {
-            {Entity, new ActualTypeReference(typeof(Entity))},
-            {Index, new ActualTypeReference(typeof(int))},
-        };
+        public static VariableName Index { get; } = new ("i");
     }
 }

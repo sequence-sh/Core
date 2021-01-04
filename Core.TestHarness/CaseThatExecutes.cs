@@ -33,7 +33,7 @@ namespace Reductech.EDR.Core.TestHarness
 
                 var step = await GetStepAsync(testOutputHelper, extraArgument);
 
-                testOutputHelper.WriteLine(step.Name);
+                //testOutputHelper.WriteLine(step.Name);
 
                 var mockRepository = new MockRepository(MockBehavior.Strict);
 

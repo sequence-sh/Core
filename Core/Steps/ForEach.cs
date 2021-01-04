@@ -23,7 +23,7 @@ namespace Reductech.EDR.Core.Steps
         /// </summary>
         [StepProperty(1)]
         [Required]
-        public IStep<Core.Array<T>> Array { get; set; } = null!;
+        public IStep<Array<T>> Array { get; set; } = null!;
 
         /// <summary>
         /// The action to perform repeatedly.
