@@ -263,7 +263,7 @@ Print 'Comments!'", "Comments!");
                 testOutputHelper.WriteLine(SCL);
 
                 var stepFactoryStore = StepFactoryStore.CreateUsingReflection(typeof(StepFactory));
-                var logger = new TestLogger();
+                var logger = new TestInformationLogger();
 
                 var deserializeResult = SCLParsing.ParseSequence(SCL);
 

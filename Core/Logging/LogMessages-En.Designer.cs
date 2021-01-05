@@ -61,20 +61,29 @@ namespace Reductech.EDR.Core.Logging {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Step Finished.
+        ///   Looks up a localized string similar to {StepName} Started.
         /// </summary>
-        internal static string StepFinished {
+        internal static string EnterStep {
             get {
-                return ResourceManager.GetString("StepFinished", resourceCulture);
+                return ResourceManager.GetString("EnterStep", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Step Started.
+        ///   Looks up a localized string similar to {StepName} Failed.
         /// </summary>
-        internal static string StepStarted {
+        internal static string ExitStepFailure {
             get {
-                return ResourceManager.GetString("StepStarted", resourceCulture);
+                return ResourceManager.GetString("ExitStepFailure", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {StepName} Completed Successfully.
+        /// </summary>
+        internal static string ExitStepSuccess {
+            get {
+                return ResourceManager.GetString("ExitStepSuccess", resourceCulture);
             }
         }
     }

@@ -9,6 +9,7 @@ using CSharpFunctionalExtensions;
 using OneOf;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal.Errors;
+using Reductech.EDR.Core.Logging;
 using Reductech.EDR.Core.Util;
 
 namespace Reductech.EDR.Core.Internal
@@ -18,9 +19,24 @@ namespace Reductech.EDR.Core.Internal
     /// </summary>
     public abstract class CompoundStep<T> : ICompoundStep<T>
     {
-        /// <inheritdoc />
+        /// <summary>
+        /// Run this step.
+        /// Does not activate logging.
+        /// </summary>
         public abstract Task<Result<T, IError>> Run(IStateMonad stateMonad, CancellationToken cancellationToken);
 
+
+        /// <inheritdoc />
+        async Task<Result<T, IError>> IStep<T>.Run(IStateMonad stateMonad, CancellationToken cancellationToken)
+        {
+            using (stateMonad.Logger.BeginScope(Guid.NewGuid()))
+            {
+                stateMonad.Logger.LogSituation(LogSituation.EnterStep, Name);
+                var result = await Run(stateMonad, cancellationToken);
+                stateMonad.Logger.LogSituation(result.IsFailure ? LogSituation.ExitStepFailure : LogSituation.ExitStepSuccess, Name);
+                return result;
+            }
+        }
 
         /// <inheritdoc />
         public Task<Result<T1, IError>> Run<T1>(IStateMonad stateMonad, CancellationToken cancellationToken)
@@ -91,8 +107,6 @@ namespace Reductech.EDR.Core.Internal
                 }
             }
         }
-
-
 
         private FreezableStepData FreezableStepData
         {

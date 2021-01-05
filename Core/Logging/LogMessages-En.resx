@@ -117,12 +117,13 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="StepFinished" xml:space="preserve">
-    <value>Step Finished</value>
-    <comment>Trace. Whenever a step finishes.</comment>
+  <data name="EnterStep" xml:space="preserve">
+    <value>{StepName} Started</value>
   </data>
-  <data name="StepStarted" xml:space="preserve">
-    <value>Step Started</value>
-    <comment>Trace. Whenever a step starts.</comment>
+  <data name="ExitStepFailure" xml:space="preserve">
+    <value>{StepName} Failed</value>
+  </data>
+  <data name="ExitStepSuccess" xml:space="preserve">
+    <value>{StepName} Completed Successfully</value>
   </data>
 </root>

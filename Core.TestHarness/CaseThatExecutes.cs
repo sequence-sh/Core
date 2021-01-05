@@ -29,7 +29,7 @@ namespace Reductech.EDR.Core.TestHarness
             /// <inheritdoc />
             public async Task RunCaseAsync(ITestOutputHelper testOutputHelper, string? extraArgument)
             {
-                var logger = new TestLogger();
+                var logger = new TestInformationLogger();
 
                 var step = await GetStepAsync(testOutputHelper, extraArgument);
 
@@ -73,10 +73,10 @@ namespace Reductech.EDR.Core.TestHarness
             public abstract void CheckUnitResult(Result<Unit, IError> result);
             public abstract void CheckOutputResult(Result<TOutput, IError> result);
 
-            public virtual void CheckLoggedValues(TestLogger logger)
+            public virtual void CheckLoggedValues(TestInformationLogger informationLogger)
             {
                 if (!IgnoreLoggedValues)
-                    logger.LoggedValues.Select(x => CompressNewlines(x.ToString()!)).Should()
+                    informationLogger.LoggedValues.Select(x => CompressNewlines(x.ToString()!)).Should()
                         .BeEquivalentTo(ExpectedLoggedValues, x => x.WithStrictOrdering());
             }
 

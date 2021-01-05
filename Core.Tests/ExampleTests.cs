@@ -49,7 +49,7 @@ namespace Reductech.EDR.Core.Tests
                     stepResult.Error.GetAllErrors().Select(x=> x.Message + " " + x.Location.AsString)));
 
 
-            var monad = new StateMonad(new TestLogger(), EmptySettings.Instance, ExternalProcessRunner.Instance, FileSystemHelper.Instance, sfs);
+            var monad = new StateMonad(new TestInformationLogger(), EmptySettings.Instance, ExternalProcessRunner.Instance, FileSystemHelper.Instance, sfs);
 
             var r = await stepResult.Value.Run<Unit>(monad, CancellationToken.None);
 
@@ -80,7 +80,7 @@ namespace Reductech.EDR.Core.Tests
 
             stepResult.ShouldBeSuccessful(x=>x.AsString);
 
-            var monad = new StateMonad(new TestLogger(), EmptySettings.Instance, ExternalProcessRunner.Instance, FileSystemHelper.Instance, sfs);
+            var monad = new StateMonad(new TestInformationLogger(), EmptySettings.Instance, ExternalProcessRunner.Instance, FileSystemHelper.Instance, sfs);
 
             var r = await stepResult.Value.Run<Unit>(monad, CancellationToken.None);
 
@@ -138,7 +138,7 @@ namespace Reductech.EDR.Core.Tests
 
             TestOutputHelper.WriteLine(scl);
 
-            var monad = new StateMonad(new TestLogger(), EmptySettings.Instance, ExternalProcessRunner.Instance, FileSystemHelper.Instance, StepFactoryStore.CreateUsingReflection() );
+            var monad = new StateMonad(new TestInformationLogger(), EmptySettings.Instance, ExternalProcessRunner.Instance, FileSystemHelper.Instance, StepFactoryStore.CreateUsingReflection() );
 
             var r = await step.Run(monad, CancellationToken.None);
 
