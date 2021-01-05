@@ -18,7 +18,7 @@ namespace Reductech.EDR.Core.Steps
     public class CreateDirectory : CompoundStep<Unit>
     {
         /// <inheritdoc />
-        public override async Task<Result<Unit, IError>> Run(IStateMonad stateMonad,
+        protected override async Task<Result<Unit, IError>> Run(IStateMonad stateMonad,
             CancellationToken cancellationToken)
         {
             var pathResult = await Path.Run(stateMonad, cancellationToken);

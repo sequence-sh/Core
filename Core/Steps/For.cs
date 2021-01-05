@@ -54,7 +54,7 @@ namespace Reductech.EDR.Core.Steps
         public VariableName Variable { get; set; } = VariableName.Index;
 
         /// <inheritdoc />
-        public override async Task<Result<Unit, IError>> Run(IStateMonad stateMonad,
+        protected override async Task<Result<Unit, IError>> Run(IStateMonad stateMonad,
             CancellationToken cancellationToken)
         {
             var variableName = VariableName.Index;

@@ -16,7 +16,7 @@ namespace Reductech.EDR.Core.Steps
     public sealed class EntityHasProperty : CompoundStep<bool>
     {
         /// <inheritdoc />
-        public override async Task<Result<bool, IError>> Run(IStateMonad stateMonad, CancellationToken cancellationToken)
+        protected override async Task<Result<bool, IError>> Run(IStateMonad stateMonad, CancellationToken cancellationToken)
         {
             var entity = await Entity.Run(stateMonad, cancellationToken);
             if (entity.IsFailure) return entity.ConvertFailure<bool>();

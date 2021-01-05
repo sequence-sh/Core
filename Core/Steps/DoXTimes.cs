@@ -29,7 +29,7 @@ namespace Reductech.EDR.Core.Steps
         public IStep<int> X { get; set; } = null!;
 
         /// <inheritdoc />
-        public override async Task<Result<Unit, IError>> Run(IStateMonad stateMonad,
+        protected override async Task<Result<Unit, IError>> Run(IStateMonad stateMonad,
             CancellationToken cancellationToken)
         {
             var numberResult = await X.Run(stateMonad, cancellationToken);

@@ -20,7 +20,7 @@ namespace Reductech.EDR.Core.Steps
     {
 
         /// <inheritdoc />
-        public override async Task<Result<Unit, IError>> Run(IStateMonad stateMonad,
+        protected override async Task<Result<Unit, IError>> Run(IStateMonad stateMonad,
             CancellationToken cancellationToken)
         {
             return await Value.Run(stateMonad, cancellationToken)

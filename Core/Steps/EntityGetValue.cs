@@ -17,7 +17,7 @@ namespace Reductech.EDR.Core.Steps
     public sealed class EntityGetValue : CompoundStep<StringStream>
     {
         /// <inheritdoc />
-        public override async Task<Result<StringStream, IError>> Run(IStateMonad stateMonad,
+        protected override async Task<Result<StringStream, IError>> Run(IStateMonad stateMonad,
             CancellationToken cancellationToken)
         {
             var entity = await Entity.Run(stateMonad, cancellationToken);

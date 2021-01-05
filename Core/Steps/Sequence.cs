@@ -18,7 +18,7 @@ namespace Reductech.EDR.Core.Steps
     public sealed class Sequence<T> : CompoundStep<T>
     {
         /// <inheritdoc />
-        public override async Task<Result<T, IError>> Run(IStateMonad stateMonad,
+        protected override async Task<Result<T, IError>> Run(IStateMonad stateMonad,
             CancellationToken cancellationToken)
         {
 

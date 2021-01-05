@@ -13,7 +13,7 @@ namespace Reductech.EDR.Core.Steps
     public class DoNothing : CompoundStep<Unit>
     {
         /// <inheritdoc />
-        public override async Task<Result<Unit, IError>> Run(IStateMonad stateMonad,
+        protected override async Task<Result<Unit, IError>> Run(IStateMonad stateMonad,
             CancellationToken cancellationToken)
         {
             await Task.CompletedTask;

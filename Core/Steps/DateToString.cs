@@ -33,7 +33,7 @@ namespace Reductech.EDR.Core.Steps
         public IStep<StringStream> Format { get; set; } = new StringConstant(new StringStream("yyyy/MM/dd HH:mm:ss"));
         
         /// <inheritdoc />
-        public override async Task<Result<StringStream, IError>> Run(IStateMonad stateMonad,
+        protected override async Task<Result<StringStream, IError>> Run(IStateMonad stateMonad,
             CancellationToken cancellationToken)
         {
 

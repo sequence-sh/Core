@@ -17,7 +17,7 @@ namespace Reductech.EDR.Core.Steps
     public sealed class FromCSV : CompoundStep<Core.Array<Entity>>
     {
         /// <inheritdoc />
-        public override async Task<Result<Core.Array<Entity>, IError>> Run(IStateMonad stateMonad,
+        protected override async Task<Result<Core.Array<Entity>, IError>> Run(IStateMonad stateMonad,
             CancellationToken cancellationToken)
         {
             var result = await CSVReader.ReadCSV(

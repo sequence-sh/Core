@@ -150,7 +150,7 @@ namespace Reductech.EDR.Core.TestHarness
         public class FailStep<T> : CompoundStep<T>
         {
             /// <inheritdoc />
-            public override async Task<Result<T, IError>> Run(IStateMonad stateMonad,
+            protected override async Task<Result<T, IError>> Run(IStateMonad stateMonad,
                 CancellationToken cancellationToken)
             {
                 await Task.CompletedTask;

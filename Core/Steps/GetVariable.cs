@@ -19,7 +19,7 @@ namespace Reductech.EDR.Core.Steps
     {
         /// <inheritdoc />
 #pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
-        public override async Task<Result<T, IError>> Run(IStateMonad stateMonad, CancellationToken cancellationToken) =>
+        protected override async Task<Result<T, IError>> Run(IStateMonad stateMonad, CancellationToken cancellationToken) =>
             stateMonad.GetVariable<T>(Variable).MapError(x=>x.WithLocation(this));
 #pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
 

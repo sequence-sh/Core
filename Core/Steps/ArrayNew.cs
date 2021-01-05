@@ -20,7 +20,7 @@ namespace Reductech.EDR.Core.Steps
     public sealed class ArrayNew<T> : CompoundStep<Array<T>>
     {
         /// <inheritdoc />
-        public override async Task<Result<Array<T>, IError>> Run(IStateMonad stateMonad,
+        protected override async Task<Result<Array<T>, IError>> Run(IStateMonad stateMonad,
             CancellationToken cancellationToken)
         {
             var result = await Elements.Select(x => x.Run(stateMonad, cancellationToken))

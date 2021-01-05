@@ -23,7 +23,7 @@ namespace Reductech.EDR.Core.Internal
         /// Run this step.
         /// Does not activate logging.
         /// </summary>
-        public abstract Task<Result<T, IError>> Run(IStateMonad stateMonad, CancellationToken cancellationToken);
+        protected abstract Task<Result<T, IError>> Run(IStateMonad stateMonad, CancellationToken cancellationToken);
 
 
         /// <inheritdoc />

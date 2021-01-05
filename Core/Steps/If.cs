@@ -16,7 +16,7 @@ namespace Reductech.EDR.Core.Steps
     public sealed class If : CompoundStep<Unit>
     {
         /// <inheritdoc />
-        public override async Task<Result<Unit, IError>> Run(IStateMonad stateMonad,
+        protected override async Task<Result<Unit, IError>> Run(IStateMonad stateMonad,
             CancellationToken cancellationToken)
         {
             var result = await Condition.Run(stateMonad, cancellationToken)

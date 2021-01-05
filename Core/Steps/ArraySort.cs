@@ -50,7 +50,7 @@ namespace Reductech.EDR.Core.Steps
         public VariableName Variable { get; set; } = VariableName.Entity;
 
         /// <inheritdoc />
-        public override async Task<Result<Array<T>, IError>> Run(IStateMonad stateMonad, CancellationToken cancellationToken)
+        protected override async Task<Result<Array<T>, IError>> Run(IStateMonad stateMonad, CancellationToken cancellationToken)
         {
             var array = await Array.Run(stateMonad, cancellationToken);
             if (array.IsFailure) return array.ConvertFailure<Array<T>>();

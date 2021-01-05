@@ -20,7 +20,7 @@ namespace Reductech.EDR.Core.Steps
     public sealed class PathCombine : CompoundStep<StringStream>
     {
         /// <inheritdoc />
-        public override async Task<Result<StringStream, IError>> Run(IStateMonad stateMonad, CancellationToken cancellationToken)
+        protected override async Task<Result<StringStream, IError>> Run(IStateMonad stateMonad, CancellationToken cancellationToken)
         {
             var pathsResult = await Paths.Run(stateMonad, cancellationToken)
                     .Bind(x=>x.GetElementsAsync(cancellationToken));

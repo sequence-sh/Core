@@ -19,7 +19,7 @@ namespace Reductech.EDR.Core.Steps
     public sealed class EntitySetValue<T> : CompoundStep<Entity>
     {
         /// <inheritdoc />
-        public override async Task<Result<Entity, IError>> Run(IStateMonad stateMonad, CancellationToken cancellationToken)
+        protected override async Task<Result<Entity, IError>> Run(IStateMonad stateMonad, CancellationToken cancellationToken)
         {
             var entityResult = await Entity.Run(stateMonad, cancellationToken);
             if (entityResult.IsFailure) return entityResult;

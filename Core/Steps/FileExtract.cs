@@ -17,7 +17,7 @@ namespace Reductech.EDR.Core.Steps
     public class FileExtract : CompoundStep<Unit>
     {
         /// <inheritdoc />
-        public override async Task<Result<Unit, IError>> Run(IStateMonad stateMonad,
+        protected override async Task<Result<Unit, IError>> Run(IStateMonad stateMonad,
             CancellationToken cancellationToken)
         {
             var archivePathResult = await ArchiveFilePath.Run(stateMonad, cancellationToken)

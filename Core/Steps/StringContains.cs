@@ -16,7 +16,7 @@ namespace Reductech.EDR.Core.Steps
     public sealed class StringContains : CompoundStep<bool>
     {
         /// <inheritdoc />
-        public override async Task<Result<bool, IError>> Run(IStateMonad stateMonad,
+        protected override async Task<Result<bool, IError>> Run(IStateMonad stateMonad,
             CancellationToken cancellationToken)
         {
             var superstringResult = await String.Run(stateMonad, cancellationToken)

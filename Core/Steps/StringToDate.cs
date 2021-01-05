@@ -46,7 +46,7 @@ namespace Reductech.EDR.Core.Steps
             new StringStream(CultureInfo.CurrentCulture.Name));
 
         /// <inheritdoc />
-        public override async Task<Result<DateTime, IError>> Run(IStateMonad stateMonad,
+        protected override async Task<Result<DateTime, IError>> Run(IStateMonad stateMonad,
             CancellationToken cancellationToken)
         {
 

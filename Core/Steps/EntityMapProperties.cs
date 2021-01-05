@@ -18,7 +18,7 @@ namespace Reductech.EDR.Core.Steps
     public class EntityMapProperties : CompoundStep<Array<Entity>>
     {
         /// <inheritdoc />
-        public override async Task<Result<Array<Entity>, IError>> Run(IStateMonad stateMonad,
+        protected override async Task<Result<Array<Entity>, IError>> Run(IStateMonad stateMonad,
             CancellationToken cancellationToken)
         {
             var mappings = await Mappings.Run(stateMonad, cancellationToken)

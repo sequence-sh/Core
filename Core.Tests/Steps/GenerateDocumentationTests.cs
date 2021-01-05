@@ -214,7 +214,7 @@ Negation of a boolean value.
         {
             /// <inheritdoc />
 #pragma warning disable 1998
-            public override async Task<Result<StringStream, IError>> Run(IStateMonad stateMonad,
+            protected override async Task<Result<StringStream, IError>> Run(IStateMonad stateMonad,
                 CancellationToken cancellation)
 #pragma warning restore 1998
             {

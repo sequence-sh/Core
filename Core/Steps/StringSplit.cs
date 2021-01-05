@@ -33,7 +33,7 @@ namespace Reductech.EDR.Core.Steps
         public IStep<StringStream> Delimiter { get; set; } = null!;
 
         /// <inheritdoc />
-        public override async Task<Result<Core.Array<StringStream>, IError>> Run(IStateMonad stateMonad, CancellationToken cancellationToken)
+        protected override async Task<Result<Core.Array<StringStream>, IError>> Run(IStateMonad stateMonad, CancellationToken cancellationToken)
         {
             var stringResult = await String.Run(stateMonad, cancellationToken)
                 .Map(async x=> await x.GetStringAsync());

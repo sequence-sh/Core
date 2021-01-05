@@ -20,7 +20,7 @@ namespace Reductech.EDR.Core.Steps
     public sealed class Print<T> : CompoundStep<Unit>
     {
         /// <inheritdoc />
-        public override async Task<Result<Unit, IError>> Run(IStateMonad stateMonad,
+        protected override async Task<Result<Unit, IError>> Run(IStateMonad stateMonad,
             CancellationToken cancellationToken)
         {
             var r = await Value.Run(stateMonad, cancellationToken);

@@ -30,7 +30,7 @@ namespace Reductech.EDR.Core.Steps
         public IStep<int> Index { get; set; } = null!;
 
         /// <inheritdoc />
-        public override async Task<Result<StringStream, IError>> Run(IStateMonad stateMonad,
+        protected override async Task<Result<StringStream, IError>> Run(IStateMonad stateMonad,
             CancellationToken cancellationToken)
         {
             var index = await Index.Run(stateMonad, cancellationToken);

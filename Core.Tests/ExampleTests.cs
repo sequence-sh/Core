@@ -92,7 +92,7 @@ namespace Reductech.EDR.Core.Tests
         [Trait("Category", "Integration")]
         public async Task RunObjectSequence()
         {
-            var step = new Core.Steps.Sequence<Unit>()
+            var step = new Sequence<Unit>()
             {
                 InitialSteps = new List<IStep<Unit>>
                 {
@@ -140,7 +140,7 @@ namespace Reductech.EDR.Core.Tests
 
             var monad = new StateMonad(new TestInformationLogger(), EmptySettings.Instance, ExternalProcessRunner.Instance, FileSystemHelper.Instance, StepFactoryStore.CreateUsingReflection() );
 
-            var r = await step.Run(monad, CancellationToken.None);
+            var r = await (step as IStep<Unit>).Run(monad, CancellationToken.None);
 
             r.ShouldBeSuccessful(x=>x.AsString);
         }

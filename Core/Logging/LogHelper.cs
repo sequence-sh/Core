@@ -14,12 +14,16 @@ namespace Reductech.EDR.Core.Logging
         /// </summary>
         public static void LogSituation(this ILogger logger, LogSituation situation, params object[] args)
         {
-            using (logger.BeginScope(situation))
+            var logLevel = GetLogLevel(situation);
+            if (logger.IsEnabled(logLevel))
             {
-                var logLevel = GetLogLevel(situation);
-                var messageString = GetMessageString(situation);
-                logger.Log(logLevel, messageString, args);
+                using (logger.BeginScope(situation))
+                {
+                    var messageString = GetMessageString(situation);
+                    logger.Log(logLevel, messageString, args);
+                }
             }
+
         }
 
         private static string GetMessageString(LogSituation situation)

@@ -12,13 +12,10 @@ namespace Reductech.EDR.Core.TestHarness
         /// <inheritdoc />
         public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter)
         {
-            if (IsEnabled(logLevel))
-            {
-                if (state is IEnumerable<KeyValuePair<string, object>> flv)
-                    foreach (var (_, value) in flv)
-                        LoggedValues.Add(value);
-                else throw new NotImplementedException();
-            }
+            if (state is IEnumerable<KeyValuePair<string, object>> flv)
+                foreach (var (_, value) in flv)
+                    LoggedValues.Add(value);
+            else throw new NotImplementedException();
 
         }
 

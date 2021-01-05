@@ -16,7 +16,7 @@ namespace Reductech.EDR.Core.Steps
     public sealed class FileRead : CompoundStep<StringStream>
     {
         /// <inheritdoc />
-        public override async Task<Result<StringStream, IError>> Run(IStateMonad stateMonad,
+        protected override async Task<Result<StringStream, IError>> Run(IStateMonad stateMonad,
             CancellationToken cancellationToken)
         {
             var path = await Path.Run(stateMonad, cancellationToken)

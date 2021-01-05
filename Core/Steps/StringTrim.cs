@@ -32,7 +32,7 @@ namespace Reductech.EDR.Core.Steps
         public IStep<TrimSide> Side { get; set; } = new EnumConstant<TrimSide>(TrimSide.Both);
 
         /// <inheritdoc />
-        public override async Task<Result<StringStream, IError>> Run(IStateMonad stateMonad,
+        protected override async Task<Result<StringStream, IError>> Run(IStateMonad stateMonad,
             CancellationToken cancellationToken)
         {
             var stringResult = await String.Run(stateMonad, cancellationToken)

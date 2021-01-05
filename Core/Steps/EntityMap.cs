@@ -16,7 +16,7 @@ namespace Reductech.EDR.Core.Steps
     public sealed class EntityMap : CompoundStep<Array<Entity>>
     {
         /// <inheritdoc />
-        public override async Task<Result<Array<Entity>, IError>> Run(IStateMonad stateMonad, CancellationToken cancellationToken)
+        protected override async Task<Result<Array<Entity>, IError>> Run(IStateMonad stateMonad, CancellationToken cancellationToken)
         {
             var entityStreamResult = await EntityStream.Run(stateMonad, cancellationToken);
             if (entityStreamResult.IsFailure) return entityStreamResult.ConvertFailure<Array<Entity>>();
