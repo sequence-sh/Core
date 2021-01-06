@@ -118,12 +118,12 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="EnterStep" xml:space="preserve">
-    <value>{StepName} Started</value>
+    <value>{StepName} Started with Parameters: {Parameters}</value>
   </data>
   <data name="ExitStepFailure" xml:space="preserve">
-    <value>{StepName} Failed</value>
+    <value>{StepName} Failed with message: {Message}</value>
   </data>
   <data name="ExitStepSuccess" xml:space="preserve">
-    <value>{StepName} Completed Successfully</value>
+    <value>{StepName} Completed Successfully with Result: {Result}</value>
   </data>
 </root>

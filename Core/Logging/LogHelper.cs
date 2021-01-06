@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using Microsoft.Extensions.Logging;
 
 namespace Reductech.EDR.Core.Logging
@@ -12,49 +14,85 @@ namespace Reductech.EDR.Core.Logging
         /// Logs a message for the particular situation.
         /// Will use the resource to
         /// </summary>
-        public static void LogSituation(this ILogger logger, LogSituation situation, params object[] args)
+        public static void LogSituation(this ILogger logger, LogSituationCore situationCore, IEnumerable<object> args)
+            => LogSituation(logger, situationCore, LogSituationHelperCoreEN.Instance, args);
+
+        /// <summary>
+        /// Logs a message for the particular situation.
+        /// Will use the resource to
+        /// </summary>
+        public static void LogSituation<T>(this ILogger logger, T situationCore, ILogSituationHelper<T> helper, IEnumerable<object> args) where T: Enum
         {
-            var logLevel = GetLogLevel(situation);
+            var logLevel = helper.GetLogLevel(situationCore);
             if (logger.IsEnabled(logLevel))
             {
-                using (logger.BeginScope(situation))
-                {
-                    var messageString = GetMessageString(situation);
-                    logger.Log(logLevel, messageString, args);
-                }
+                var messageString = helper.GetMessageString(situationCore);
+                logger.Log(logLevel, messageString, args.ToArray());
             }
-
-        }
-
-        private static string GetMessageString(LogSituation situation)
-        {
-            return situation switch
-            {
-                Logging.LogSituation.EnterStep => LogMessages_EN.EnterStep,
-                Logging.LogSituation.ExitStepSuccess => LogMessages_EN.ExitStepSuccess,
-                Logging.LogSituation.ExitStepFailure => LogMessages_EN.ExitStepFailure,
-                _ => throw new ArgumentOutOfRangeException(nameof(situation), situation, null)
-            };
-        }
-
-        private static LogLevel GetLogLevel(LogSituation situation)
-        {
-            return situation switch
-            {
-                Logging.LogSituation.EnterStep => LogLevel.Trace,
-                Logging.LogSituation.ExitStepFailure => LogLevel.Trace,
-                Logging.LogSituation.ExitStepSuccess => LogLevel.Trace,
-                _ => throw new ArgumentOutOfRangeException(nameof(situation), situation, null)
-            };
         }
 
 
     }
 
+
+    /// <summary>
+    /// Contains methods for handling Log Severity and Localization for Core in English.
+    /// </summary>
+    public sealed class LogSituationHelperCoreEN : ILogSituationHelper<LogSituationCore>
+    {
+        private LogSituationHelperCoreEN() { }
+
+        /// <summary>
+        /// The Instance
+        /// </summary>
+        public static ILogSituationHelper<LogSituationCore> Instance { get; } = new LogSituationHelperCoreEN();
+
+        /// <inheritdoc />
+        public LogLevel GetLogLevel(LogSituationCore logSituation)
+        {
+            return logSituation switch
+            {
+                LogSituationCore.EnterStep => LogLevel.Trace,
+                LogSituationCore.ExitStepFailure => LogLevel.Trace,
+                LogSituationCore.ExitStepSuccess => LogLevel.Trace,
+                _ => throw new ArgumentOutOfRangeException(nameof(logSituation), logSituation, null)
+            };
+        }
+
+        /// <inheritdoc />
+        public string GetMessageString(LogSituationCore logSituation)
+        {
+            return logSituation switch
+            {
+                LogSituationCore.EnterStep => LogMessages_EN.EnterStep,
+                LogSituationCore.ExitStepSuccess => LogMessages_EN.ExitStepSuccess,
+                LogSituationCore.ExitStepFailure => LogMessages_EN.ExitStepFailure,
+                _ => throw new ArgumentOutOfRangeException(nameof(logSituation), logSituation, null)
+            };
+        }
+    }
+
+    /// <summary>
+    /// Contains methods for handling Log Severity and Localization.
+    /// Each connector should have an implementation of this.
+    /// </summary>
+    public interface ILogSituationHelper<in T> where T : Enum
+    {
+        /// <summary>
+        /// Gets the severity of the situation.
+        /// </summary>
+        LogLevel GetLogLevel(T logSituation);
+
+        /// <summary>
+        /// Gets a localized log message
+        /// </summary>
+        string GetMessageString(T logSituation);
+    }
+
     /// <summary>
     /// Different LoggingSituations
     /// </summary>
-    public enum LogSituation
+    public enum LogSituationCore
     {
         /// <summary>
         /// Whenever a step is entered.

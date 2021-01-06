@@ -266,6 +266,9 @@ namespace Reductech.EDR.Core
         }
 
         /// <inheritdoc />
+        public string NameInLogs => Option.Match(x=> x.Count + " Elements", _=> "Stream");
+
+        /// <inheritdoc />
         public bool Equals(Array<T>? other)
         {
             if (other is null)
@@ -320,6 +323,11 @@ namespace Reductech.EDR.Core
         /// Try to get the elements of this list, as objects asynchronously.
         /// </summary>
         Task<Result<List<object>, IError>> GetObjectsAsync(CancellationToken cancellation);
+
+        /// <summary>
+        /// How this Array will appear in the logs.
+        /// </summary>
+        public string NameInLogs { get; }
     }
 
     /// <summary>

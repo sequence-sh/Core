@@ -4,6 +4,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Reductech.EDR.Core.Serialization;
+using Reductech.EDR.Core.Util;
 using Option = OneOf.OneOf<string, (System.IO.Stream, Reductech.EDR.Core.EncodingEnum)>;
 
 namespace Reductech.EDR.Core.Parser
@@ -41,6 +42,13 @@ namespace Reductech.EDR.Core.Parser
         /// </summary>
         public string Name => Value.Match(x => x, _ => "StringStream");
 
+        /// <summary>
+        /// How this stringStream will appear in the logs.
+        /// </summary>
+        public string NameInLogs =>
+            Value.TryPickT0(out var text, out var remainder)
+                ? $"string Length: {text.Length}"
+                : remainder.Item2.GetDisplayName() + "-Stream";
 
         /// <summary>
         /// If this is a string, return the string, otherwise read the stream as a string.

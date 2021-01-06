@@ -61,7 +61,7 @@ namespace Reductech.EDR.Core.Logging {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to {StepName} Started.
+        ///   Looks up a localized string similar to {StepName} Started with Parameters: {Parameters}.
         /// </summary>
         internal static string EnterStep {
             get {
@@ -70,7 +70,7 @@ namespace Reductech.EDR.Core.Logging {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to {StepName} Failed.
+        ///   Looks up a localized string similar to {StepName} Failed with message: {Message}.
         /// </summary>
         internal static string ExitStepFailure {
             get {
@@ -79,7 +79,7 @@ namespace Reductech.EDR.Core.Logging {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to {StepName} Completed Successfully.
+        ///   Looks up a localized string similar to {StepName} Completed Successfully with Result: {Result}.
         /// </summary>
         internal static string ExitStepSuccess {
             get {

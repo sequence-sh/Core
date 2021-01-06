@@ -34,7 +34,7 @@ namespace Reductech.EDR.Core.Steps
         public VariableName Variable { get; set; }
 
         /// <inheritdoc />
-        public override string Name => Variable == default? base.Name : Variable.Serialize();
+        public override string Name => Variable == default ? base.Name : $"Get {Variable.Serialize()}";
     }
 
     /// <summary>

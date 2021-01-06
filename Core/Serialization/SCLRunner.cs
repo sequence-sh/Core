@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
@@ -16,7 +18,7 @@ namespace Reductech.EDR.Core.Serialization
     /// <summary>
     /// Runs processes from Text
     /// </summary>
-    public class SCLRunner
+    public sealed class SCLRunner
     {
         /// <summary>
         /// Creates a new SCL Runner
@@ -25,13 +27,16 @@ namespace Reductech.EDR.Core.Serialization
             ILogger logger,
             IExternalProcessRunner externalProcessRunner,
             IFileSystemHelper fileSystemHelper,
-            StepFactoryStore stepFactoryStore)
+            StepFactoryStore stepFactoryStore, params KeyValuePair<string, object>[] loggingData)
         {
             _settings = settings;
             _logger = logger;
             _externalProcessRunner = externalProcessRunner;
             _stepFactoryStore = stepFactoryStore;
             _fileSystemHelper = fileSystemHelper;
+
+            _loggingData = loggingData.ToDictionary(x => x.Key, x => x.Value);
+
         }
 
         private readonly ISettings _settings;
@@ -39,6 +44,8 @@ namespace Reductech.EDR.Core.Serialization
         private readonly IExternalProcessRunner _externalProcessRunner;
         private readonly IFileSystemHelper _fileSystemHelper;
         private readonly StepFactoryStore _stepFactoryStore;
+
+        private readonly IReadOnlyDictionary<string, object> _loggingData;
 
         /// <summary>
         /// Run step defined in an SCL string.
@@ -56,6 +63,7 @@ namespace Reductech.EDR.Core.Serialization
             if (stepResult.IsFailure)
                 return stepResult.ConvertFailure<Unit>();
 
+            using var loggingScope = _logger.BeginScope(_loggingData);
             using var stateMonad = new StateMonad(_logger, _settings, _externalProcessRunner, _fileSystemHelper, _stepFactoryStore);
 
             var runResult = await stepResult.Value.Run(stateMonad, cancellationToken);

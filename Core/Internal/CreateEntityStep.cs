@@ -19,10 +19,7 @@ namespace Reductech.EDR.Core.Internal
         /// Create a new CreateEntityStep
         /// </summary>
         /// <param name="properties"></param>
-        public CreateEntityStep(IReadOnlyDictionary<string, IStep> properties)
-        {
-            Properties = properties;
-        }
+        public CreateEntityStep(IReadOnlyDictionary<string, IStep> properties) => Properties = properties;
 
         /// <summary>
         /// The entity properties

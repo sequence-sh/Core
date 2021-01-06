@@ -10,6 +10,7 @@ using OneOf;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Logging;
+using Reductech.EDR.Core.Parser;
 using Reductech.EDR.Core.Util;
 
 namespace Reductech.EDR.Core.Internal
@@ -29,12 +30,69 @@ namespace Reductech.EDR.Core.Internal
         /// <inheritdoc />
         async Task<Result<T, IError>> IStep<T>.Run(IStateMonad stateMonad, CancellationToken cancellationToken)
         {
-            using (stateMonad.Logger.BeginScope(Guid.NewGuid()))
+            using (stateMonad.Logger.BeginScope(Name))
             {
-                stateMonad.Logger.LogSituation(LogSituation.EnterStep, Name);
+                IEnumerable<object> GetEnterStepArgs()
+                {
+                    yield return Name;
+
+                    var properties = AllProperties
+                        .ToDictionary(x => x.Name, GetPropertyValue);
+
+                    yield return properties;
+                }
+
+                stateMonad.Logger.LogSituation(LogSituationCore.EnterStep, GetEnterStepArgs());
+
                 var result = await Run(stateMonad, cancellationToken);
-                stateMonad.Logger.LogSituation(result.IsFailure ? LogSituation.ExitStepFailure : LogSituation.ExitStepSuccess, Name);
+
+                if (result.IsFailure)
+                {
+                    stateMonad.Logger.LogSituation(LogSituationCore.ExitStepFailure, new[]{Name, result.Error.AsString});
+                }
+                else
+                {
+                    var resultValue = SerializeOutput(result.Value);
+                    stateMonad.Logger.LogSituation(LogSituationCore.ExitStepSuccess, new[]{Name, resultValue});
+                }
                 return result;
+
+                static string SerializeOutput(object? o)
+                {
+                    return o switch
+                    {
+                        null => "Null",
+                        StringStream ss => ss.NameInLogs,
+                        IArray array => array.NameInLogs,
+                        Unit => "Unit",
+                        _ => o.ToString()!
+                    };
+                }
+
+                static string GetPropertyValue(StepProperty stepProperty)
+                {
+                    return stepProperty.Value.Match(
+                        vn => vn.ToString(),
+                        GetStepValue,
+                        GetListValue);
+
+                    static string GetStepValue(IStep step)
+                    {
+                        return step switch
+                        {
+                            StringConstant str => str.Value.NameInLogs,
+                            IConstantStep constant => constant.Name,
+                            CreateEntityStep createEntityStep => createEntityStep.Name,
+                            ICompoundStep => step.Name,
+                            _ => step.Name
+                        };
+                    }
+
+                    static string GetListValue(IReadOnlyList<IStep> list)
+                    {
+                        return list.Count + " Elements";
+                    }
+                }
             }
         }
 
