@@ -64,7 +64,7 @@ namespace Reductech.EDR.Core.TestHarness
                 yield return (instance, error, stateActions);
             }
 
-            static VariableName FooVariableName() => new VariableName("Foo");
+            static VariableName FooVariableName() => new("Foo");
 
 
             static bool SetVariableName(PropertyInfo property, object instance)

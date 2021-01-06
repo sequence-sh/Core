@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using FluentAssertions;
+using MELT;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Namotion.Reflection;
@@ -14,7 +14,6 @@ using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Util;
 using Xunit.Abstractions;
 using Xunit.Sdk;
-using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 
 namespace Reductech.EDR.Core.TestHarness
 {
@@ -29,15 +28,14 @@ namespace Reductech.EDR.Core.TestHarness
             /// <inheritdoc />
             public async Task RunCaseAsync(ITestOutputHelper testOutputHelper, string? extraArgument)
             {
-                var logger = new TestInformationLogger();
+                var loggerFactory = TestLoggerFactory.Create();
+                loggerFactory.AddXunit(testOutputHelper);
 
                 var step = await GetStepAsync(testOutputHelper, extraArgument);
 
-                //testOutputHelper.WriteLine(step.Name);
-
                 var mockRepository = new MockRepository(MockBehavior.Strict);
 
-                using var stateMonad = GetStateMonad(mockRepository, logger);
+                using var stateMonad = GetStateMonad(mockRepository, loggerFactory.CreateLogger("Test"));
 
                 if (step is IStep<TOutput> outputStep)
                 {
@@ -55,7 +53,7 @@ namespace Reductech.EDR.Core.TestHarness
                     throw new XunitException($"{stepType} does not have output type {nameof(Unit)} or {typeof(TOutput).Name}");
                 }
 
-                CheckLoggedValues(logger);
+                CheckLoggedValues(loggerFactory);
 
                 if (!IgnoreFinalState)
                     stateMonad.GetState().Should().BeEquivalentTo(ExpectedFinalState);
@@ -73,11 +71,12 @@ namespace Reductech.EDR.Core.TestHarness
             public abstract void CheckUnitResult(Result<Unit, IError> result);
             public abstract void CheckOutputResult(Result<TOutput, IError> result);
 
-            public virtual void CheckLoggedValues(TestInformationLogger informationLogger)
+            public virtual void CheckLoggedValues(ITestLoggerFactory loggerFactory)
             {
                 if (!IgnoreLoggedValues)
-                    informationLogger.LoggedValues.Select(x => CompressNewlines(x.ToString()!)).Should()
-                        .BeEquivalentTo(ExpectedLoggedValues, x => x.WithStrictOrdering());
+                {
+                    StaticHelpers.CheckLoggedValues(loggerFactory, LogLevel.Information, ExpectedLoggedValues);
+                }
             }
 
             public virtual StateMonad GetStateMonad(MockRepository mockRepository, ILogger logger)
@@ -120,9 +119,9 @@ namespace Reductech.EDR.Core.TestHarness
             /// <inheritdoc />
             public void AddFileSystemAction(Action<Mock<IFileSystemHelper>> action) => _fileSystemActions.Add(action);
 
-            private readonly List<Action<Mock<IExternalProcessRunner>>> _externalProcessRunnerActions = new List<Action<Mock<IExternalProcessRunner>>>();
+            private readonly List<Action<Mock<IExternalProcessRunner>>> _externalProcessRunnerActions = new();
 
-            private readonly List<Action<Mock<IFileSystemHelper>>> _fileSystemActions = new List<Action<Mock<IFileSystemHelper>>>();
+            private readonly List<Action<Mock<IFileSystemHelper>>> _fileSystemActions = new();
 
 
             /// <inheritdoc />
@@ -133,12 +132,12 @@ namespace Reductech.EDR.Core.TestHarness
             /// <inheritdoc />
             public Maybe<StepFactoryStore> StepFactoryStoreToUse { get; set; }
 
-            public List<Action<IStateMonad>> InitialStateActions { get; } = new List<Action<IStateMonad>>();
+            public List<Action<IStateMonad>> InitialStateActions { get; } = new();
 
             /// <inheritdoc />
             public ISettings Settings { get; set; } = EmptySettings.Instance;
 
-            public Dictionary<VariableName, object> ExpectedFinalState { get; } = new Dictionary<VariableName, object>();
+            public Dictionary<VariableName, object> ExpectedFinalState { get; } = new();
 
             public IReadOnlyCollection<object> ExpectedLoggedValues { get; }
 

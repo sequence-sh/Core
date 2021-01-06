@@ -126,8 +126,8 @@ namespace Reductech.EDR.Core.Tests
                 };
 
                 yield return new LoggingTestCase("File Read", "FileRead 'MyFile' | Print",
-                    CheckMessageAndScope(LogLevel.Trace, "Print Started with Parameters: [Value, \"MyFile\"]", null),
-                    CheckMessageAndScope(LogLevel.Trace, "FileRead Started with Parameters: [Path, string Length: 6], [Encoding, UTF8]", null),
+                    CheckMessageAndScope(LogLevel.Trace, "Print Started with Parameters: [Value, FileRead]", null),
+                    CheckMessageAndScope(LogLevel.Trace, "FileRead Started with Parameters: [Path, \"MyFile\"], [Encoding, UTF8]", null),
                     CheckMessageAndScope(LogLevel.Trace, "FileRead Completed Successfully with Result: UTF8-Stream", null),
                     CheckMessageAndScope(LogLevel.Information, "MyData", null),
                     CheckMessageAndScope(LogLevel.Trace, "Print Completed Successfully with Result: Unit", null)

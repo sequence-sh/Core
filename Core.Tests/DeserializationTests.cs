@@ -3,6 +3,8 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
+using MELT;
+using Microsoft.Extensions.Logging;
 using Reductech.EDR.Core.ExternalProcesses;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Parser;
@@ -263,7 +265,8 @@ Print 'Comments!'", "Comments!");
                 testOutputHelper.WriteLine(SCL);
 
                 var stepFactoryStore = StepFactoryStore.CreateUsingReflection(typeof(StepFactory));
-                var logger = new TestInformationLogger();
+                var loggerFactory = TestLoggerFactory.Create();
+                loggerFactory.AddXunit(testOutputHelper);
 
                 var deserializeResult = SCLParsing.ParseSequence(SCL);
 
@@ -278,7 +281,7 @@ Print 'Comments!'", "Comments!");
 
                 unitStep.Should().NotBeNull();
 
-                using var stateMonad = new StateMonad(logger, EmptySettings.Instance, ExternalProcessRunner.Instance,
+                using var stateMonad = new StateMonad(loggerFactory.CreateLogger("Test"), EmptySettings.Instance, ExternalProcessRunner.Instance,
                     FileSystemHelper.Instance, stepFactoryStore);
 
                 var runResult = await unitStep!
@@ -286,7 +289,7 @@ Print 'Comments!'", "Comments!");
 
                 runResult.ShouldBeSuccessful(x => x.AsString);
 
-                logger.LoggedValues.Should().BeEquivalentTo(ExpectedLoggedValues);
+                StaticHelpers.CheckLoggedValues(loggerFactory, LogLevel.Information, ExpectedLoggedValues);
 
 
                 if (ExpectedConfiguration != null || freezeResult.Value.Configuration != null)

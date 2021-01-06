@@ -1,6 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Castle.Core.Internal;
+using FluentAssertions;
+using MELT;
+using Microsoft.Extensions.Logging;
 using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Parser;
@@ -20,13 +24,13 @@ namespace Reductech.EDR.Core.TestHarness
         public static IStep<Unit> SetVariable<T>(string name, T value) where T : Enum => new SetVariable<T> { Variable = new VariableName(name), Value = Constant(value) };
 
 
-        public static StringConstant Constant(string value) => new StringConstant(new StringStream(value));
-        public static IntConstant Constant(int value) => new IntConstant(value);
-        public static DoubleConstant Constant(double value) => new DoubleConstant(value);
-        public static BoolConstant Constant(bool value) => new BoolConstant((value));
-        public static DateTimeConstant Constant(DateTime value) => new DateTimeConstant((value));
-        public static EntityConstant Constant(Entity value) => new EntityConstant((value));
-        public static EnumConstant<T> Constant<T>(T value) where T: Enum => new EnumConstant<T>((value));
+        public static StringConstant Constant(string value) => new(new StringStream(value));
+        public static IntConstant Constant(int value) => new(value);
+        public static DoubleConstant Constant(double value) => new(value);
+        public static BoolConstant Constant(bool value) => new((value));
+        public static DateTimeConstant Constant(DateTime value) => new((value));
+        public static EntityConstant Constant(Entity value) => new((value));
+        public static EnumConstant<T> Constant<T>(T value) where T: Enum => new((value));
 
         public static IStep<Array<int>> Array(params int[] elements) => new ArrayNew<int> { Elements = elements.Select(Constant).ToList() };
         public static IStep<Array<double>> Array(params double[] elements) => new ArrayNew<double> { Elements = elements.Select(Constant).ToList() };
@@ -54,7 +58,7 @@ namespace Reductech.EDR.Core.TestHarness
 
         public static Schema CreateSchema(string name, bool allowExtraProperties, params (string propertyName, SchemaPropertyType type, string? enumType, Multiplicity multiplicity, string? regex, List<string>? format)[] properties)
         {
-            return new Schema
+            return new()
             {
                 Name = name,
                 AllowExtraProperties = allowExtraProperties,
@@ -69,6 +73,24 @@ namespace Reductech.EDR.Core.TestHarness
             };
         }
 
-        public static string CompressNewlines(string s) => s.Replace("\r\n", "\n");
+        public static string? CompressNewlines(string? s) => s?.Replace("\r\n", "\n");
+
+        public static void CheckLoggedValues(ITestLoggerFactory loggerFactory, LogLevel minLogLevel, IReadOnlyCollection<object> expectedLoggedValues)
+        {
+            var infoOrHigherEntries = loggerFactory.Sink.LogEntries.Where(x => x.LogLevel >= minLogLevel);
+
+            var assertions = expectedLoggedValues.Select(expected =>
+            {
+                return new Action<LogEntry>(entry => CompressNewlines(entry.Message!).Should().Be(expected.ToString()));
+            });
+
+            if (expectedLoggedValues.IsNullOrEmpty())
+                infoOrHigherEntries.Should().BeEmpty();
+            else
+                infoOrHigherEntries.Should().SatisfyRespectively(assertions);
+
+
+
+        }
     }
 }
