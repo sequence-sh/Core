@@ -35,6 +35,7 @@ namespace Reductech.EDR.Core.TestHarness
                 Name = name;
                 Step = step;
                 ExpectedError = expectedError;
+                IgnoreLoggedValues = true;
             }
 
             public ErrorCase(string name, IStep step, IErrorBuilder expectedErrorBuilder, params string[] expectedLoggedValues)

@@ -69,7 +69,7 @@ namespace Reductech.EDR.Core.Internal
                     };
                 }
 
-                
+
             }
         }
 
@@ -130,7 +130,7 @@ namespace Reductech.EDR.Core.Internal
                     var (propertyInfo, _) = arg1;
                     var val = propertyInfo.GetValue(this);
 
-                    OneOf<VariableName, IStep, IReadOnlyList<IStep>>? oneOf =
+                    var oneOf =
                         val switch
                     {
                         IStep step =>
@@ -138,7 +138,7 @@ namespace Reductech.EDR.Core.Internal
                         IEnumerable<IStep> enumerable =>
                             OneOf<VariableName, IStep, IReadOnlyList<IStep>>.FromT2(enumerable.ToList()),
                         VariableName vn =>  vn,
-                        _ => default
+                        _ => null as OneOf<VariableName, IStep, IReadOnlyList<IStep>>?
                     };
 
                     if(!oneOf.HasValue)

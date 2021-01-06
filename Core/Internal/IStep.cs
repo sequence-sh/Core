@@ -49,7 +49,7 @@ namespace Reductech.EDR.Core.Internal
         Type OutputType { get; }
 
         /// <summary>
-        /// SerializeAsync this step.
+        /// Serialize this step.
         /// </summary>
         string Serialize();
 

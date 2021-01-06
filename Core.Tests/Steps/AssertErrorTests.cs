@@ -23,7 +23,10 @@ namespace Reductech.EDR.Core.Tests.Steps
             {
                 yield return new DeserializeCase("Print Divide by zero",
                     "AssertError Step: (Print Value: (1 / 0))",
-                    Unit.Default);
+                    Unit.Default,
+                    "ApplyMathOperator Failed with message: Divide by Zero Error",
+                    "Print Failed with message: Divide by Zero Error"
+                    );
             } }
 
         /// <inheritdoc />
@@ -39,7 +42,11 @@ namespace Reductech.EDR.Core.Tests.Steps
                             Operator = Constant(MathOperator.Divide),
                             Right = Constant(0),
                         }}
-                    }, Unit.Default);
+                    }, Unit.Default,
+                    "ApplyMathOperator Failed with message: Divide by Zero Error",
+                    "Print Failed with message: Divide by Zero Error"
+
+                    );
             } }
 
         /// <inheritdoc />
