@@ -61,8 +61,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                             Value = Constant("Hello World")
                         }
                     },
-                    new ErrorBuilder("Expected an error but step was successful.", ErrorCode.AssertionFailed),
-                    "Hello World"
+                    new ErrorBuilder("Expected an error but step was successful.", ErrorCode.AssertionFailed)
                     );
             } }
 

@@ -61,6 +61,15 @@ namespace Reductech.EDR.Core.Logging {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Directory Deleted: {Path}.
+        /// </summary>
+        internal static string DirectoryDeleted {
+            get {
+                return ResourceManager.GetString("DirectoryDeleted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to {StepName} Started with Parameters: {Parameters}.
         /// </summary>
         internal static string EnterStep {
@@ -84,6 +93,24 @@ namespace Reductech.EDR.Core.Logging {
         internal static string ExitStepSuccess {
             get {
                 return ResourceManager.GetString("ExitStepSuccess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to File Deleted: {Path}.
+        /// </summary>
+        internal static string FileDeleted {
+            get {
+                return ResourceManager.GetString("FileDeleted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Item to Delete did not Exist: {Path}.
+        /// </summary>
+        internal static string ItemToDeleteDidNotExist {
+            get {
+                return ResourceManager.GetString("ItemToDeleteDidNotExist", resourceCulture);
             }
         }
         

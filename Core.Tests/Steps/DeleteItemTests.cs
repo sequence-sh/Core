@@ -24,7 +24,9 @@ namespace Reductech.EDR.Core.Tests.Steps
                         {
                             Path = Constant("My Path")
                         },
-                        Unit.Default, "Directory 'My Path' Deleted.")
+                        Unit.Default
+                        //, "Directory 'My Path' Deleted."
+                        )
                     .WithFileSystemAction(x=>x.Setup(a=>a.DoesDirectoryExist("My Path")).Returns(true))
                     .WithFileSystemAction(x=>x.Setup(a=>a.DeleteDirectory("My Path", true)).Returns(Unit.Default));
 
@@ -33,7 +35,9 @@ namespace Reductech.EDR.Core.Tests.Steps
                         {
                             Path = Constant("My Path")
                         },
-                        Unit.Default, "File 'My Path' Deleted.")
+                        Unit.Default
+                       // , "File 'My Path' Deleted."
+                        )
                     .WithFileSystemAction(x => x.Setup(a => a.DoesDirectoryExist("My Path")).Returns(false))
                     .WithFileSystemAction(x => x.Setup(a => a.DoesFileExist("My Path")).Returns(true))
                     .WithFileSystemAction(x => x.Setup(a => a.DeleteFile("My Path")).Returns(Unit.Default));
@@ -42,8 +46,9 @@ namespace Reductech.EDR.Core.Tests.Steps
                         new DeleteItem
                         {
                             Path = Constant("My Path")
-                        },
-                        Unit.Default, "Item 'My Path' did not exist.")
+                        } , Unit.Default
+                        //, "Item 'My Path' did not exist."
+                        )
                     .WithFileSystemAction(x => x.Setup(a => a.DoesDirectoryExist("My Path")).Returns(false))
                     .WithFileSystemAction(x => x.Setup(a => a.DoesFileExist("My Path")).Returns(false));
 
@@ -60,7 +65,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                         {
                             Path = Constant("My Path")
                         },
-                        new ErrorBuilder("ValueIf Error", ErrorCode.Test), "Directory 'My Path' Deleted.")
+                        new ErrorBuilder("ValueIf Error", ErrorCode.Test))
                     .WithFileSystemAction(x => x.Setup(a => a.DoesDirectoryExist("My Path")).Returns(true))
                     .WithFileSystemAction(x => x.Setup(a => a.DeleteDirectory("My Path", true))
                         .Returns(new ErrorBuilder("ValueIf Error", ErrorCode.Test)));

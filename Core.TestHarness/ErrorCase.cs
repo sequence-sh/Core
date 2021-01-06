@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -30,7 +31,7 @@ namespace Reductech.EDR.Core.TestHarness
         public class ErrorCase :  CaseThatExecutes
 #pragma warning restore CA1034 // Nested types should not be visible
         {
-            public ErrorCase(string name, IStep step, IError expectedError, params string[] expectedLoggedValues) : base(expectedLoggedValues)
+            public ErrorCase(string name, IStep step, IError expectedError) : base(ArraySegment<object>.Empty)
             {
                 Name = name;
                 Step = step;
@@ -38,8 +39,8 @@ namespace Reductech.EDR.Core.TestHarness
                 IgnoreLoggedValues = true;
             }
 
-            public ErrorCase(string name, IStep step, IErrorBuilder expectedErrorBuilder, params string[] expectedLoggedValues)
-                : this(name, step, expectedErrorBuilder.WithLocation(step), expectedLoggedValues) { }
+            public ErrorCase(string name, IStep step, IErrorBuilder expectedErrorBuilder)
+                : this(name, step, expectedErrorBuilder.WithLocation(step)) { }
 
             public override string Name { get; }
 

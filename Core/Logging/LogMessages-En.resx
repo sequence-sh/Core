@@ -117,6 +117,9 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="DirectoryDeleted" xml:space="preserve">
+    <value>Directory Deleted: {Path}</value>
+  </data>
   <data name="EnterStep" xml:space="preserve">
     <value>{StepName} Started with Parameters: {Parameters}</value>
   </data>
@@ -125,6 +128,12 @@
   </data>
   <data name="ExitStepSuccess" xml:space="preserve">
     <value>{StepName} Completed Successfully with Result: {Result}</value>
+  </data>
+  <data name="FileDeleted" xml:space="preserve">
+    <value>File Deleted: {Path}</value>
+  </data>
+  <data name="ItemToDeleteDidNotExist" xml:space="preserve">
+    <value>Item to Delete did not Exist: {Path}</value>
   </data>
   <data name="NoPathProvided" xml:space="preserve">
     <value>No path was provided. Returning the Current Directory: {CurrentDirectory}</value>

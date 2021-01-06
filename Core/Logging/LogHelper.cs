@@ -57,6 +57,9 @@ namespace Reductech.EDR.Core.Logging
                 LogSituationCore.ExitStepSuccess => LogLevel.Trace,
                 LogSituationCore.QualifyingPath => LogLevel.Debug,
                 LogSituationCore.NoPathProvided => LogLevel.Warning,
+                LogSituationCore.DirectoryDeleted => LogLevel.Debug,
+                LogSituationCore.FileDeleted => LogLevel.Debug,
+                LogSituationCore.ItemToDeleteDidNotExist => LogLevel.Debug,
                 _ => throw new ArgumentOutOfRangeException(nameof(logSituation), logSituation, null)
             };
         }
@@ -71,6 +74,9 @@ namespace Reductech.EDR.Core.Logging
                 LogSituationCore.ExitStepFailure => LogMessages_EN.ExitStepFailure,
                 LogSituationCore.QualifyingPath => LogMessages_EN.QualifyingPath,
                 LogSituationCore.NoPathProvided => LogMessages_EN.NoPathProvided,
+                LogSituationCore.DirectoryDeleted => LogMessages_EN.DirectoryDeleted,
+                LogSituationCore.FileDeleted => LogMessages_EN.FileDeleted,
+                LogSituationCore.ItemToDeleteDidNotExist => LogMessages_EN.ItemToDeleteDidNotExist,
                 _ => throw new ArgumentOutOfRangeException(nameof(logSituation), logSituation, null)
             };
         }
@@ -118,6 +124,18 @@ namespace Reductech.EDR.Core.Logging
         /// <summary>
         /// When Path.Combine is given an empty list of paths.
         /// </summary>
-        NoPathProvided
+        NoPathProvided,
+        /// <summary>
+        /// Directory Deleted
+        /// </summary>
+        DirectoryDeleted,
+        /// <summary>
+        /// File Deleted
+        /// </summary>
+        FileDeleted,
+        /// <summary>
+        /// Item to delete did not exist
+        /// </summary>
+        ItemToDeleteDidNotExist
     }
 }
