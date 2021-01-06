@@ -44,6 +44,7 @@ namespace Reductech.EDR.Core.Steps
         /// </summary>
         [StepProperty(2)]
         [DefaultValueExplanation("\\u0014 - DC4")]
+        [Log(LogOutputLevel.Trace)]
         public IStep<StringStream> Delimiter { get; set; } = new StringConstant(new StringStream("\u0014"));
 
         /// <summary>
@@ -54,6 +55,7 @@ namespace Reductech.EDR.Core.Steps
         [StepProperty(3)]
         [DefaultValueExplanation("\u00FE")]
         [SingleCharacter]
+        [Log(LogOutputLevel.Trace)]
         public IStep<StringStream> QuoteCharacter { get; set; } = new StringConstant(new StringStream("\u00FE"));
 
         /// <summary>
@@ -64,6 +66,7 @@ namespace Reductech.EDR.Core.Steps
         [StepProperty(4)]
         [DefaultValueExplanation("|")]
         [SingleCharacter]
+        [Log(LogOutputLevel.Trace)]
         public IStep<StringStream> MultiValueDelimiter { get; set; } = new StringConstant(new StringStream("|"));
 
         /// <inheritdoc />

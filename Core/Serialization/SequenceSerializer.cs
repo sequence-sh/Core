@@ -26,12 +26,12 @@ namespace Reductech.EDR.Core.Serialization
             var sb = new StringBuilder();
 
 
-            if (dict.TryGetValue(nameof(Steps.Sequence<object>.InitialSteps), out var stepList) && stepList.Value.IsT2)
-                foreach (var step in stepList.Value.AsT2)
+            if (dict.TryGetValue(nameof(Sequence<object>.InitialSteps), out var stepList) && stepList.IsT2)
+                foreach (var step in stepList.AsT2)
                     sb.AppendLine("- " + step.Serialize());
 
-            if(dict.TryGetValue(nameof(Steps.Sequence<object>.FinalStep), out var finalStep) && finalStep.Value.IsT1)
-                sb.AppendLine("- " + finalStep.Value.AsT1.Serialize());
+            if(dict.TryGetValue(nameof(Sequence<object>.FinalStep), out var finalStep) && finalStep.IsT1)
+                sb.AppendLine("- " + finalStep.AsT1.Serialize());
 
             var s = sb.ToString();
 

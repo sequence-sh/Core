@@ -48,6 +48,7 @@ namespace Reductech.EDR.Core.Steps
         [StepProperty(1)]
         [Required]
         [Alias("Container")]
+        [Log(LogOutputLevel.Trace)]
         public IStep<StringStream> ArchiveFilePath { get; set; } = null!;
 
         /// <summary>
@@ -56,6 +57,7 @@ namespace Reductech.EDR.Core.Steps
         [StepProperty(2)]
         [Required]
         [Alias("ToDirectory")]
+        [Log(LogOutputLevel.Trace)]
         public IStep<StringStream> Destination { get; set; } = null!;
 
         /// <summary>

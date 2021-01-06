@@ -41,6 +41,7 @@ namespace Reductech.EDR.Core.Steps
         /// </summary>
         [StepProperty(1)]
         [Required]
+        [Log(LogOutputLevel.Trace)]
         public IStep<StringStream> Path { get; set; } = null!;
 
         /// <summary>

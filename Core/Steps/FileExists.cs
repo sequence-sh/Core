@@ -21,6 +21,7 @@ namespace Reductech.EDR.Core.Steps
         [StepProperty(1)]
         [Required]
         [Alias("File")]
+        [Log(LogOutputLevel.Trace)]
         public IStep<StringStream> Path { get; set; } = null!;
 
         /// <inheritdoc />

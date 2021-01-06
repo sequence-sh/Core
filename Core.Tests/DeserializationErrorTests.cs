@@ -54,10 +54,10 @@ namespace Reductech.EDR.Core.Tests
                 yield return new DeserializationErrorCase("Print (2 + 2", ("missing ')' at '<EOF>'", "Line: 1, Col: 12, Idx: 12 - Line: 1, Col: 11, Idx: 11 Text: <EOF>"));
 
                 yield return new DeserializationErrorCase("Foreach ['one', 'two'] (Print (<Entity> + 1))",
-                ("'Left' cannot take the value '<Entity>'","ApplyMathOperator"));
+                ("'Left' cannot take the value 'Get <Entity>'","ApplyMathOperator"));
 
                 yield return new DeserializationErrorCase("Foreach ['one', 'two'] (Print (<Num> + 1)) <Num>",
-                ("'Left' cannot take the value '<Num>'", "ApplyMathOperator"));
+                ("'Left' cannot take the value 'Get <Num>'", "ApplyMathOperator"));
             }
         }
 

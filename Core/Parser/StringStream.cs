@@ -45,9 +45,10 @@ namespace Reductech.EDR.Core.Parser
         /// <summary>
         /// How this stringStream will appear in the logs.
         /// </summary>
-        public string NameInLogs =>
+        public string NameInLogs(bool reveal) =>
             Value.TryPickT0(out var text, out var remainder)
-                ? $"string Length: {text.Length}"
+                ? reveal? Serialize() //TODO truncate
+                : $"string Length: {text.Length}"
                 : remainder.Item2.GetDisplayName() + "-Stream";
 
         /// <summary>
@@ -65,7 +66,7 @@ namespace Reductech.EDR.Core.Parser
                 var (stream, encodingEnum) = Value.AsT1;
 
                 stream.Position = 0;
-                using StreamReader reader = new StreamReader(stream, encodingEnum.Convert(), leaveOpen: false);
+                using StreamReader reader = new(stream, encodingEnum.Convert(), leaveOpen: false);
                 var s = await reader.ReadToEndAsync();
 
                 Value = s;
@@ -93,7 +94,7 @@ namespace Reductech.EDR.Core.Parser
                 var (stream, encodingEnum) = Value.AsT1;
 
                 stream.Position = 0;
-                using StreamReader reader = new StreamReader(stream, encodingEnum.Convert(), leaveOpen: false);
+                using StreamReader reader = new(stream, encodingEnum.Convert(), leaveOpen: false);
                 var s = reader.ReadToEnd();
 
                 Value = s;
@@ -112,7 +113,7 @@ namespace Reductech.EDR.Core.Parser
         /// </summary>
         public static implicit operator StringStream(string str)
         {
-            StringStream stringStream = new StringStream(str);
+            StringStream stringStream = new(str);
             return stringStream;
         }
 
@@ -132,7 +133,7 @@ namespace Reductech.EDR.Core.Parser
             {
                 // convert string to stream
                 byte[] byteArray = Encoding.UTF8.GetBytes(x);
-                MemoryStream stream = new MemoryStream(byteArray);
+                MemoryStream stream = new(byteArray);
 
                 return (stream, EncodingEnum.UTF8);
 

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
@@ -122,7 +123,33 @@ namespace Reductech.EDR.Core.Tests
                    )
                 {
                     FileSystemActions = new List<Action<Mock<IFileSystemHelper>>> { x => x.Setup(f => f.GetCurrentDirectory()).Returns("MyDir") }
-                }; ;
+                };
+
+                yield return new LoggingTestCase("File Read", "FileRead 'MyFile' | Print",
+                    CheckMessageAndScope(LogLevel.Trace, "Print Started with Parameters: [Value, \"MyFile\"]", null),
+                    CheckMessageAndScope(LogLevel.Trace, "FileRead Started with Parameters: [Path, string Length: 6], [Encoding, UTF8]", null),
+                    CheckMessageAndScope(LogLevel.Trace, "FileRead Completed Successfully with Result: UTF8-Stream", null),
+                    CheckMessageAndScope(LogLevel.Information, "MyData", null),
+                    CheckMessageAndScope(LogLevel.Trace, "Print Completed Successfully with Result: Unit", null)
+                )
+                    {
+                        FileSystemActions = new List<Action<Mock<IFileSystemHelper>>>
+                        {
+                            x=>x.Setup(a=>a.ReadFile("MyFile"))
+                                .Returns(
+                                    () =>
+                                    {
+                                        var s = new MemoryStream();
+                                        var sw = new StreamWriter(s);
+                                        sw.Write("MyData");
+                                        s.Seek(0, SeekOrigin.Begin);
+                                        sw.Flush();
+                                        return s;
+                                    } )
+
+                        }
+
+                    };
 
 
             }
@@ -141,8 +168,6 @@ namespace Reductech.EDR.Core.Tests
             };
         }
 
-
-        public static readonly VariableName FooString = new("Foo");
 
         private class LoggingTestCase : ITestBaseCaseParallel
         {

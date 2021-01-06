@@ -47,12 +47,13 @@ namespace Reductech.EDR.Core.Steps
         [Required]
         [Alias("Data")]
         public IStep<StringStream> Stream { get; set; } = null!;
-        
+
         /// <summary>
         /// The path of the file to write to.
         /// </summary>
         [StepProperty(2)]
         [Required]
+        [Log(LogOutputLevel.Trace)]
         public IStep<StringStream> Path { get; set; } = null!;
 
         /// <inheritdoc />

@@ -51,6 +51,7 @@ namespace Reductech.EDR.Core.Steps
         /// </summary>
         [StepProperty(3)]
         [DefaultValueExplanation(",")]
+        [Log(LogOutputLevel.Trace)]
         public IStep<StringStream> Delimiter { get; set; } = new StringConstant(new StringStream(","));
 
         /// <summary>
@@ -61,6 +62,7 @@ namespace Reductech.EDR.Core.Steps
         [StepProperty(4)]
         [DefaultValueExplanation("\"")]
         [SingleCharacter]
+        [Log(LogOutputLevel.Trace)]
         public IStep<StringStream> QuoteCharacter { get; set; } = new StringConstant(new StringStream("\""));
 
         /// <summary>
@@ -78,6 +80,7 @@ namespace Reductech.EDR.Core.Steps
         [StepProperty(6)]
         [DefaultValueExplanation("")]
         [SingleCharacter]
+        [Log(LogOutputLevel.Trace)]
         public IStep<StringStream> MultiValueDelimiter { get; set; } = new StringConstant(new StringStream("|"));
 
         /// <summary>
@@ -86,6 +89,7 @@ namespace Reductech.EDR.Core.Steps
         [StepProperty(7)]
         [DefaultValueExplanation("O - ISO 8601 compliant - e.g. 2009-06-15T13:45:30.0000000-07:00")]
         [Example("yyyy/MM/dd HH:mm:ss")]
+        [Log(LogOutputLevel.Trace)]
         public IStep<StringStream> DateTimeFormat { get; set; } = new StringConstant(new StringStream("O"));
 
         /// <inheritdoc />

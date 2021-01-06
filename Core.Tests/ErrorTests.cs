@@ -190,8 +190,8 @@ namespace Reductech.EDR.Core.Tests
                 var repo = new MockRepository(MockBehavior.Strict);
 
                 using var state = new StateMonad(NullLogger.Instance, EmptySettings.Instance,
-                    repo.Create<ExternalProcessRunner>().Object,
-                    repo.Create<FileSystemHelper>().Object, spf);
+                    repo.Create<IExternalProcessRunner>().Object,
+                    repo.Create<IFileSystemHelper>().Object, spf);
 
                 var r = await Process.Run<object>(state, CancellationToken.None);
 

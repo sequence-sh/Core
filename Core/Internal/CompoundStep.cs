@@ -37,7 +37,7 @@ namespace Reductech.EDR.Core.Internal
                     yield return Name;
 
                     var properties = AllProperties
-                        .ToDictionary(x => x.Name, GetPropertyValue);
+                        .ToDictionary(x => x.Name, x=>x.GetLogName());
 
                     yield return properties;
                 }
@@ -62,37 +62,14 @@ namespace Reductech.EDR.Core.Internal
                     return o switch
                     {
                         null => "Null",
-                        StringStream ss => ss.NameInLogs,
+                        StringStream ss => ss.NameInLogs(false),
                         IArray array => array.NameInLogs,
                         Unit => "Unit",
                         _ => o.ToString()!
                     };
                 }
 
-                static string GetPropertyValue(StepProperty stepProperty)
-                {
-                    return stepProperty.Value.Match(
-                        vn => vn.ToString(),
-                        GetStepValue,
-                        GetListValue);
-
-                    static string GetStepValue(IStep step)
-                    {
-                        return step switch
-                        {
-                            StringConstant str => str.Value.NameInLogs,
-                            IConstantStep constant => constant.Name,
-                            CreateEntityStep createEntityStep => createEntityStep.Name,
-                            ICompoundStep => step.Name,
-                            _ => step.Name
-                        };
-                    }
-
-                    static string GetListValue(IReadOnlyList<IStep> list)
-                    {
-                        return list.Count + " Elements";
-                    }
-                }
+                
             }
         }
 
@@ -153,15 +130,24 @@ namespace Reductech.EDR.Core.Internal
                     var (propertyInfo, _) = arg1;
                     var val = propertyInfo.GetValue(this);
 
-                    return val switch
+                    OneOf<VariableName, IStep, IReadOnlyList<IStep>>? oneOf =
+                        val switch
                     {
-                        IStep step => new StepProperty(propertyInfo.Name, arg2,
-                            OneOf<VariableName, IStep, IReadOnlyList<IStep>>.FromT1(step)),
-                        IEnumerable<IStep> enumerable => new StepProperty(propertyInfo.Name, arg2,
-                            OneOf<VariableName, IStep, IReadOnlyList<IStep>>.FromT2(enumerable.ToList())),
-                        VariableName vn => new StepProperty(propertyInfo.Name, arg2, vn),
-                        _ => Maybe<StepProperty>.None
+                        IStep step =>
+                            OneOf<VariableName, IStep, IReadOnlyList<IStep>>.FromT1(step),
+                        IEnumerable<IStep> enumerable =>
+                            OneOf<VariableName, IStep, IReadOnlyList<IStep>>.FromT2(enumerable.ToList()),
+                        VariableName vn =>  vn,
+                        _ => default
                     };
+
+                    if(!oneOf.HasValue)
+                        return Maybe<StepProperty>.None;
+
+                    var logAttribute = propertyInfo.GetCustomAttribute<LogAttribute>();
+                    var scopedFunctionAttribute = propertyInfo.GetCustomAttribute<ScopedFunctionAttribute>();
+
+                    return new StepProperty(propertyInfo.Name, arg2, oneOf.Value, logAttribute, scopedFunctionAttribute);
                 }
             }
         }
@@ -173,7 +159,7 @@ namespace Reductech.EDR.Core.Internal
                 var dict = AllProperties
                     .OrderBy(x => x.Index)
                     .ToDictionary(x => new StepParameterReference(x.Name),
-                        x => x.Value.Match(
+                        x => x.Match(
                             vn => new FreezableStepProperty(vn, new StepErrorLocation(this)),
                             s => new FreezableStepProperty(s.Unfreeze(),
                                 new StepErrorLocation(this)),
@@ -208,7 +194,7 @@ namespace Reductech.EDR.Core.Internal
                 .Select(req => settings.CheckRequirement(req).MapError(x=>x.WithLocation(this)));
 
             var r3 = AllProperties
-                .Select(x => x.Value.Match(
+                .Select(x => x.Match(
                     _ => Unit.Default,
                     s => s.Verify(settings),
                     sl => sl.Select(s => s.Verify(settings)).Combine(ErrorList.Combine).Map(_=>Unit.Default)
