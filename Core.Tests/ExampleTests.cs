@@ -58,7 +58,7 @@ namespace Reductech.EDR.Core.Tests
         }
 
 
-        [Fact()]
+        [Fact(Skip = "skip")]
         [Trait("Category", "Integration")]
         public async Task RunSCLSequence()
         {

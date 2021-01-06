@@ -118,7 +118,11 @@ namespace Reductech.EDR.Core.Tests
                    CheckMessageAndScope(LogLevel.Trace, "ArrayNew Completed Successfully with Result: 1 Elements", null),
                    CheckMessageAndScope(LogLevel.Debug, "Path MyDir was not fully qualified. Prepending the Current Directory: MyDir", null),
                    CheckMessageAndScope(LogLevel.Trace, "PathCombine Completed Successfully with Result: string Length: 10", null),
-                   CheckMessageAndScope(LogLevel.Information, @"MyDir\File", null),
+                   x =>
+                   {
+                       x.LogLevel.Should().Be(LogLevel.Information);
+                       x.Message.Should().BeOneOf(@"MyDir\File", @"MyDir/File");
+                   },
                    CheckMessageAndScope(LogLevel.Trace, "Print Completed Successfully with Result: Unit", null)
                    )
                 {
