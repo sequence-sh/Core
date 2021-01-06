@@ -126,4 +126,10 @@
   <data name="ExitStepSuccess" xml:space="preserve">
     <value>{StepName} Completed Successfully with Result: {Result}</value>
   </data>
+  <data name="NoPathProvided" xml:space="preserve">
+    <value>No path was provided. Returning the Current Directory: {CurrentDirectory}</value>
+  </data>
+  <data name="QualifyingPath" xml:space="preserve">
+    <value>Path {Path} was not fully qualified. Prepending the Current Directory: {CurrentDirectory}</value>
+  </data>
 </root>

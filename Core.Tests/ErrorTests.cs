@@ -3,6 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.Extensions.Logging.Abstractions;
+using Moq;
 using Reductech.EDR.Core.Enums;
 using Reductech.EDR.Core.ExternalProcesses;
 using Reductech.EDR.Core.Internal;
@@ -155,7 +156,7 @@ namespace Reductech.EDR.Core.Tests
         }
 
 
-        public static readonly VariableName FooString = new VariableName("Foo");
+        public static readonly VariableName FooString = new("Foo");
 
         private class ErrorTestFunction : ITestBaseCaseParallel
         {
@@ -186,8 +187,11 @@ namespace Reductech.EDR.Core.Tests
             public async Task ExecuteAsync(ITestOutputHelper testOutputHelper)
             {
                 var spf = StepFactoryStore.CreateUsingReflection(typeof(IStep));
+                var repo = new MockRepository(MockBehavior.Strict);
 
-                using var state = new StateMonad(NullLogger.Instance, EmptySettings.Instance, ExternalProcessRunner.Instance, FileSystemHelper.Instance, spf);
+                using var state = new StateMonad(NullLogger.Instance, EmptySettings.Instance,
+                    repo.Create<ExternalProcessRunner>().Object,
+                    repo.Create<FileSystemHelper>().Object, spf);
 
                 var r = await Process.Run<object>(state, CancellationToken.None);
 

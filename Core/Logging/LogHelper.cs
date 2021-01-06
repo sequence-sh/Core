@@ -53,8 +53,10 @@ namespace Reductech.EDR.Core.Logging
             return logSituation switch
             {
                 LogSituationCore.EnterStep => LogLevel.Trace,
-                LogSituationCore.ExitStepFailure => LogLevel.Trace,
+                LogSituationCore.ExitStepFailure => LogLevel.Warning,
                 LogSituationCore.ExitStepSuccess => LogLevel.Trace,
+                LogSituationCore.QualifyingPath => LogLevel.Debug,
+                LogSituationCore.NoPathProvided => LogLevel.Warning,
                 _ => throw new ArgumentOutOfRangeException(nameof(logSituation), logSituation, null)
             };
         }
@@ -67,6 +69,8 @@ namespace Reductech.EDR.Core.Logging
                 LogSituationCore.EnterStep => LogMessages_EN.EnterStep,
                 LogSituationCore.ExitStepSuccess => LogMessages_EN.ExitStepSuccess,
                 LogSituationCore.ExitStepFailure => LogMessages_EN.ExitStepFailure,
+                LogSituationCore.QualifyingPath => LogMessages_EN.QualifyingPath,
+                LogSituationCore.NoPathProvided => LogMessages_EN.NoPathProvided,
                 _ => throw new ArgumentOutOfRangeException(nameof(logSituation), logSituation, null)
             };
         }
@@ -106,5 +110,14 @@ namespace Reductech.EDR.Core.Logging
         /// Whenever a step is existed after failure.
         /// </summary>
         ExitStepFailure,
+
+        /// <summary>
+        /// When a path is not fully qualified.
+        /// </summary>
+        QualifyingPath,
+        /// <summary>
+        /// When Path.Combine is given an empty list of paths.
+        /// </summary>
+        NoPathProvided
     }
 }

@@ -8,6 +8,7 @@ using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
+using Reductech.EDR.Core.Logging;
 using Reductech.EDR.Core.Parser;
 
 namespace Reductech.EDR.Core.Steps
@@ -32,11 +33,20 @@ namespace Reductech.EDR.Core.Steps
             foreach (var stringStream in pathsResult.Value)
                 paths.Add(await stringStream.GetStringAsync());
 
-            if(!paths.Any())
-                return new StringStream(stateMonad.FileSystemHelper.GetCurrentDirectory());
+            if (!paths.Any())
+            {
+                var currentDirectory = stateMonad.FileSystemHelper.GetCurrentDirectory();
+                stateMonad.Logger.LogSituation(LogSituationCore.NoPathProvided, new [] {currentDirectory});
+                return new StringStream(currentDirectory);
+            }
 
             if (!Path.IsPathFullyQualified(paths[0]))
-                paths = paths.Prepend(stateMonad.FileSystemHelper.GetCurrentDirectory()).ToList();
+            {
+                var currentDirectory = stateMonad.FileSystemHelper.GetCurrentDirectory();
+                paths = paths.Prepend(currentDirectory).ToList();
+                stateMonad.Logger.LogSituation(LogSituationCore.QualifyingPath, new []{paths[0], currentDirectory} );
+            }
+
 
             var result = Path.Combine(paths.ToArray());
 
@@ -48,7 +58,7 @@ namespace Reductech.EDR.Core.Steps
         /// </summary>
         [StepProperty(1)]
         [Required]
-        public IStep<Core.Array<StringStream>> Paths { get; set; } = null!;
+        public IStep<Array<StringStream>> Paths { get; set; } = null!;
 
 
         /// <inheritdoc />

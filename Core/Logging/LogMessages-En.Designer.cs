@@ -86,5 +86,23 @@ namespace Reductech.EDR.Core.Logging {
                 return ResourceManager.GetString("ExitStepSuccess", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No path was provided. Returning the Current Directory: {CurrentDirectory}.
+        /// </summary>
+        internal static string NoPathProvided {
+            get {
+                return ResourceManager.GetString("NoPathProvided", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Path {Path} was not fully qualified. Prepending the Current Directory: {CurrentDirectory}.
+        /// </summary>
+        internal static string QualifyingPath {
+            get {
+                return ResourceManager.GetString("QualifyingPath", resourceCulture);
+            }
+        }
     }
 }
