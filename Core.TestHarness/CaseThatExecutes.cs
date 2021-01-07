@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using FluentAssertions;
+using MELT;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Namotion.Reflection;
@@ -14,7 +14,6 @@ using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Util;
 using Xunit.Abstractions;
 using Xunit.Sdk;
-using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 
 namespace Reductech.EDR.Core.TestHarness
 {
@@ -24,20 +23,20 @@ namespace Reductech.EDR.Core.TestHarness
         public abstract class CaseThatExecutes : ICaseThatExecutes
 #pragma warning restore CA1034 // Nested types should not be visible
         {
-            protected CaseThatExecutes(IReadOnlyCollection<object> expectedLoggedValues) => ExpectedLoggedValues = expectedLoggedValues;
+            protected CaseThatExecutes(IReadOnlyCollection<object> expectedLoggedValues) =>
+                ExpectedLoggedValues = expectedLoggedValues;
 
             /// <inheritdoc />
             public async Task RunCaseAsync(ITestOutputHelper testOutputHelper, string? extraArgument)
             {
-                var logger = new TestLogger();
+                var loggerFactory = TestLoggerFactory.Create();
+                loggerFactory.AddXunit(testOutputHelper);
 
                 var step = await GetStepAsync(testOutputHelper, extraArgument);
 
-                //testOutputHelper.WriteLine(step.Name);
-
                 var mockRepository = new MockRepository(MockBehavior.Strict);
 
-                using var stateMonad = GetStateMonad(mockRepository, logger);
+                using var stateMonad = GetStateMonad(mockRepository, loggerFactory.CreateLogger("Test"));
 
                 if (step is IStep<TOutput> outputStep)
                 {
@@ -52,10 +51,11 @@ namespace Reductech.EDR.Core.TestHarness
                 else
                 {
                     var stepType = step.GetType().GetDisplayName();
-                    throw new XunitException($"{stepType} does not have output type {nameof(Unit)} or {typeof(TOutput).Name}");
+                    throw new XunitException(
+                        $"{stepType} does not have output type {nameof(Unit)} or {typeof(TOutput).Name}");
                 }
 
-                CheckLoggedValues(logger);
+                CheckLoggedValues(loggerFactory);
 
                 if (!IgnoreFinalState)
                     stateMonad.GetState().Should().BeEquivalentTo(ExpectedFinalState);
@@ -73,18 +73,20 @@ namespace Reductech.EDR.Core.TestHarness
             public abstract void CheckUnitResult(Result<Unit, IError> result);
             public abstract void CheckOutputResult(Result<TOutput, IError> result);
 
-            public virtual void CheckLoggedValues(TestLogger logger)
+            public virtual void CheckLoggedValues(ITestLoggerFactory loggerFactory)
             {
                 if (!IgnoreLoggedValues)
-                    logger.LoggedValues.Select(x => CompressNewlines(x.ToString()!)).Should()
-                        .BeEquivalentTo(ExpectedLoggedValues, x => x.WithStrictOrdering());
+                {
+                    StaticHelpers.CheckLoggedValues(loggerFactory, LogLevel.Information, ExpectedLoggedValues);
+                }
             }
 
             public virtual StateMonad GetStateMonad(MockRepository mockRepository, ILogger logger)
             {
                 var externalProcessRunner = GetExternalProcessRunner(mockRepository);
                 var fileSystemHelper = GetFileSystemHelper(mockRepository);
-                var sfs = StepFactoryStoreToUse.Unwrap(StepFactoryStore.CreateUsingReflection(typeof(IStep), typeof(TStep)));
+                var sfs = StepFactoryStoreToUse.Unwrap(
+                    StepFactoryStore.CreateUsingReflection(typeof(IStep), typeof(TStep)));
 
                 var stateMonad = new StateMonad(logger, Settings, externalProcessRunner, fileSystemHelper, sfs);
 
@@ -93,7 +95,6 @@ namespace Reductech.EDR.Core.TestHarness
 
                 return stateMonad;
             }
-
 
 
             public virtual IExternalProcessRunner GetExternalProcessRunner(MockRepository mockRepository)
@@ -115,14 +116,15 @@ namespace Reductech.EDR.Core.TestHarness
             }
 
             /// <inheritdoc />
-            public void AddExternalProcessRunnerAction(Action<Mock<IExternalProcessRunner>> action) => _externalProcessRunnerActions.Add(action);
+            public void AddExternalProcessRunnerAction(Action<Mock<IExternalProcessRunner>> action) =>
+                _externalProcessRunnerActions.Add(action);
 
             /// <inheritdoc />
             public void AddFileSystemAction(Action<Mock<IFileSystemHelper>> action) => _fileSystemActions.Add(action);
 
-            private readonly List<Action<Mock<IExternalProcessRunner>>> _externalProcessRunnerActions = new List<Action<Mock<IExternalProcessRunner>>>();
+            private readonly List<Action<Mock<IExternalProcessRunner>>> _externalProcessRunnerActions = new();
 
-            private readonly List<Action<Mock<IFileSystemHelper>>> _fileSystemActions = new List<Action<Mock<IFileSystemHelper>>>();
+            private readonly List<Action<Mock<IFileSystemHelper>>> _fileSystemActions = new();
 
 
             /// <inheritdoc />
@@ -133,16 +135,14 @@ namespace Reductech.EDR.Core.TestHarness
             /// <inheritdoc />
             public Maybe<StepFactoryStore> StepFactoryStoreToUse { get; set; }
 
-            public List<Action<IStateMonad>> InitialStateActions { get; } = new List<Action<IStateMonad>>();
+            public List<Action<IStateMonad>> InitialStateActions { get; } = new();
 
             /// <inheritdoc />
             public ISettings Settings { get; set; } = EmptySettings.Instance;
 
-            public Dictionary<VariableName, object> ExpectedFinalState { get; } = new Dictionary<VariableName, object>();
+            public Dictionary<VariableName, object> ExpectedFinalState { get; } = new();
 
             public IReadOnlyCollection<object> ExpectedLoggedValues { get; }
-
         }
-
     }
 }

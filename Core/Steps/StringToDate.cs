@@ -7,7 +7,6 @@ using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
-using Reductech.EDR.Core.Parser;
 
 namespace Reductech.EDR.Core.Steps
 {
@@ -46,7 +45,7 @@ namespace Reductech.EDR.Core.Steps
             new StringStream(CultureInfo.CurrentCulture.Name));
 
         /// <inheritdoc />
-        public override async Task<Result<DateTime, IError>> Run(IStateMonad stateMonad,
+        protected override async Task<Result<DateTime, IError>> Run(IStateMonad stateMonad,
             CancellationToken cancellationToken)
         {
 
@@ -55,7 +54,7 @@ namespace Reductech.EDR.Core.Steps
                 return dateResult.ConvertFailure<DateTime>();
 
             string? inputFormat = null;
-            
+
             if (InputFormat != null)
             {
                 var inputFormatResult = await InputFormat.Run(stateMonad, cancellationToken)
@@ -78,14 +77,14 @@ namespace Reductech.EDR.Core.Steps
             catch (CultureNotFoundException)
             {
                 return new SingleError(
-                    $"Culture is not supported. {cultureResult.Value} is an invalid culture identifier.",
-                    ErrorCode.CouldNotParse,
-                    new StepErrorLocation(this)
+                    new StepErrorLocation(this),
+                    ErrorCode.CouldNotParse, cultureResult.Value,
+                    nameof(Culture)
                 );
             }
 
             DateTime date;
-            
+
             if (inputFormat == null)
             {
                 try
@@ -94,7 +93,7 @@ namespace Reductech.EDR.Core.Steps
                 }
                 catch (FormatException fe)
                 {
-                    return new SingleError(fe, ErrorCode.CouldNotParse, new StepErrorLocation(this));
+                    return new SingleError(new StepErrorLocation(this), fe, ErrorCode.CouldNotParse);
                 }
             }
             else
@@ -105,7 +104,7 @@ namespace Reductech.EDR.Core.Steps
                 }
                 catch (FormatException fe)
                 {
-                    return new SingleError(fe, ErrorCode.CouldNotParse, new StepErrorLocation(this));
+                    return new SingleError(new StepErrorLocation(this), fe, ErrorCode.CouldNotParse);
                 }
             }
 

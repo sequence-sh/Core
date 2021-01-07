@@ -15,7 +15,7 @@ namespace Reductech.EDR.Core.Steps
     public sealed class AssertError : CompoundStep<Unit>
     {
         /// <inheritdoc />
-        public override async Task<Result<Unit, IError>> Run(IStateMonad stateMonad,
+        protected override async Task<Result<Unit, IError>> Run(IStateMonad stateMonad,
             CancellationToken cancellationToken)
         {
             var result = await Step.Run(stateMonad, cancellationToken);
@@ -23,7 +23,7 @@ namespace Reductech.EDR.Core.Steps
             if (result.IsFailure)
                 return Unit.Default;
 
-            return new SingleError("Expected an error but step was successful.", ErrorCode.AssertionFailed, new StepErrorLocation(this));
+            return new SingleError(new StepErrorLocation(this), ErrorCode.AssertionFailed, Step.Name);
         }
 
         /// <inheritdoc />

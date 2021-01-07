@@ -187,27 +187,29 @@ namespace Reductech.EDR.Core
             CancellationToken cancellation)
         {
             if(index < 0)
-                return new SingleError("Index was less than zero.", ErrorCode.IndexOutOfBounds,
-                    location);
+                return new SingleError(location, ErrorCode.IndexOutOfBounds);
 
-            if (Option.IsT0)
+            if (Option.TryPickT0(out var list, out var asyncList))
             {
-                if(index >= Option.AsT0.Count)
-                    return new SingleError("Index was out of the range of the array.", ErrorCode.IndexOutOfBounds,
-                    location);
+                if (index >= list.Count)
+                    return new SingleError(location, ErrorCode.IndexOutOfBounds);
 
                 return Option.AsT0[index];
             }
 
             try
             {
-                var r = await TryRun(Option.AsT1, (x, c) => x.ElementAtAsync(index, c), cancellation);
+                var r = await TryRun(
+                    asyncList,
+                    (x, c) => x.ElementAtAsync(index, c),
+                    cancellation
+                );
 
                 return r;
             }
             catch (IndexOutOfRangeException)
             {
-                return new SingleError("Index was out of the range of the array.", ErrorCode.IndexOutOfBounds, location);
+                return new SingleError(location, ErrorCode.IndexOutOfBounds);
             }
         }
 
@@ -266,6 +268,9 @@ namespace Reductech.EDR.Core
         }
 
         /// <inheritdoc />
+        public string NameInLogs => Option.Match(x=> x.Count + " Elements", _=> "Stream");
+
+        /// <inheritdoc />
         public bool Equals(Array<T>? other)
         {
             if (other is null)
@@ -320,6 +325,11 @@ namespace Reductech.EDR.Core
         /// Try to get the elements of this list, as objects asynchronously.
         /// </summary>
         Task<Result<List<object>, IError>> GetObjectsAsync(CancellationToken cancellation);
+
+        /// <summary>
+        /// How this Array will appear in the logs.
+        /// </summary>
+        public string NameInLogs { get; }
     }
 
     /// <summary>

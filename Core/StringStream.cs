@@ -3,10 +3,12 @@ using System.IO;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Reductech.EDR.Core.Serialization;
-using Option = OneOf.OneOf<string, (System.IO.Stream, Reductech.EDR.Core.EncodingEnum)>;
+using Reductech.EDR.Core.Enums;
+using Reductech.EDR.Core.Internal.Serialization;
+using Reductech.EDR.Core.Util;
+using Option = OneOf.OneOf<string, (System.IO.Stream, Reductech.EDR.Core.Enums.EncodingEnum)>;
 
-namespace Reductech.EDR.Core.Parser
+namespace Reductech.EDR.Core
 {
     /// <summary>
     /// A stream of data representing a string.
@@ -41,6 +43,14 @@ namespace Reductech.EDR.Core.Parser
         /// </summary>
         public string Name => Value.Match(x => x, _ => "StringStream");
 
+        /// <summary>
+        /// How this stringStream will appear in the logs.
+        /// </summary>
+        public string NameInLogs(bool reveal) =>
+            Value.TryPickT0(out var text, out var remainder)
+                ? reveal? Serialize() //TODO truncate
+                : $"string Length: {text.Length}"
+                : remainder.Item2.GetDisplayName() + "-Stream";
 
         /// <summary>
         /// If this is a string, return the string, otherwise read the stream as a string.
@@ -57,7 +67,7 @@ namespace Reductech.EDR.Core.Parser
                 var (stream, encodingEnum) = Value.AsT1;
 
                 stream.Position = 0;
-                using StreamReader reader = new StreamReader(stream, encodingEnum.Convert(), leaveOpen: false);
+                using StreamReader reader = new(stream, encodingEnum.Convert(), leaveOpen: false);
                 var s = await reader.ReadToEndAsync();
 
                 Value = s;
@@ -85,7 +95,7 @@ namespace Reductech.EDR.Core.Parser
                 var (stream, encodingEnum) = Value.AsT1;
 
                 stream.Position = 0;
-                using StreamReader reader = new StreamReader(stream, encodingEnum.Convert(), leaveOpen: false);
+                using StreamReader reader = new(stream, encodingEnum.Convert(), leaveOpen: false);
                 var s = reader.ReadToEnd();
 
                 Value = s;
@@ -104,7 +114,7 @@ namespace Reductech.EDR.Core.Parser
         /// </summary>
         public static implicit operator StringStream(string str)
         {
-            StringStream stringStream = new StringStream(str);
+            StringStream stringStream = new(str);
             return stringStream;
         }
 
@@ -124,7 +134,7 @@ namespace Reductech.EDR.Core.Parser
             {
                 // convert string to stream
                 byte[] byteArray = Encoding.UTF8.GetBytes(x);
-                MemoryStream stream = new MemoryStream(byteArray);
+                MemoryStream stream = new(byteArray);
 
                 return (stream, EncodingEnum.UTF8);
 

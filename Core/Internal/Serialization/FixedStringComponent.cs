@@ -1,8 +1,7 @@
 ﻿using System.Collections.Generic;
 using CSharpFunctionalExtensions;
-using Reductech.EDR.Core.Internal;
 
-namespace Reductech.EDR.Core.Serialization
+namespace Reductech.EDR.Core.Internal.Serialization
 {
     /// <summary>
     /// Include a fixed string in serialization.

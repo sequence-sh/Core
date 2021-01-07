@@ -16,7 +16,7 @@ namespace Reductech.EDR.Core.Steps
     public sealed class ArrayConcat<T> : CompoundStep<Array<T>>
     {
         /// <inheritdoc />
-        public override async Task<Result<Array<T>, IError>> Run(IStateMonad stateMonad, CancellationToken cancellationToken)
+        protected override async Task<Result<Array<T>, IError>> Run(IStateMonad stateMonad, CancellationToken cancellationToken)
         {
             var streamsResult = await Arrays.Run(stateMonad, cancellationToken);
             if (streamsResult.IsFailure) return streamsResult.ConvertFailure<Array<T>>();

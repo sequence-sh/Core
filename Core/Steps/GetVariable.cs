@@ -6,8 +6,7 @@ using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
-using Reductech.EDR.Core.Serialization;
-
+using Reductech.EDR.Core.Internal.Serialization;
 
 namespace Reductech.EDR.Core.Steps
 {
@@ -19,7 +18,7 @@ namespace Reductech.EDR.Core.Steps
     {
         /// <inheritdoc />
 #pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
-        public override async Task<Result<T, IError>> Run(IStateMonad stateMonad, CancellationToken cancellationToken) =>
+        protected override async Task<Result<T, IError>> Run(IStateMonad stateMonad, CancellationToken cancellationToken) =>
             stateMonad.GetVariable<T>(Variable).MapError(x=>x.WithLocation(this));
 #pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
 
@@ -34,7 +33,7 @@ namespace Reductech.EDR.Core.Steps
         public VariableName Variable { get; set; }
 
         /// <inheritdoc />
-        public override string Name => Variable == default? base.Name : Variable.Serialize();
+        public override string Name => Variable == default ? base.Name : $"Get {Variable.Serialize()}";
     }
 
     /// <summary>

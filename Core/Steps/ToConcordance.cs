@@ -1,12 +1,12 @@
-﻿using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Attributes;
+using Reductech.EDR.Core.Enums;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
-using Reductech.EDR.Core.Parser;
+using Reductech.EDR.Core.Util;
 
 namespace Reductech.EDR.Core.Steps
 {
@@ -18,7 +18,7 @@ namespace Reductech.EDR.Core.Steps
     public sealed class ToConcordance : CompoundStep<StringStream>
     {
         /// <inheritdoc />
-        public override async Task<Result<StringStream, IError>> Run(IStateMonad stateMonad,
+        protected override async Task<Result<StringStream, IError>> Run(IStateMonad stateMonad,
             CancellationToken cancellationToken)
         {
             var result = await CSVWriter.WriteCSV(stateMonad,
@@ -54,6 +54,7 @@ namespace Reductech.EDR.Core.Steps
         /// </summary>
         [StepProperty(3)]
         [DefaultValueExplanation("\u0014")]
+        [Log(LogOutputLevel.Trace)]
         public IStep<StringStream> Delimiter { get; set; } = new StringConstant(new StringStream( "\u0014"));
 
         /// <summary>
@@ -64,6 +65,7 @@ namespace Reductech.EDR.Core.Steps
         [StepProperty(4)]
         [DefaultValueExplanation("\u00FE")]
         [SingleCharacter]
+        [Log(LogOutputLevel.Trace)]
         public IStep<StringStream> QuoteCharacter { get; set; } = new StringConstant(new StringStream("\u00FE"));
 
         /// <summary>
@@ -81,6 +83,7 @@ namespace Reductech.EDR.Core.Steps
         [StepProperty(6)]
         [DefaultValueExplanation("")]
         [SingleCharacter]
+        [Log(LogOutputLevel.Trace)]
         public IStep<StringStream> MultiValueDelimiter { get; set; } = new StringConstant(new StringStream("|"));
 
         /// <summary>
@@ -89,6 +92,7 @@ namespace Reductech.EDR.Core.Steps
         [StepProperty(7)]
         [DefaultValueExplanation("O - ISO 8601 compliant - e.g. 2009-06-15T13:45:30.0000000-07:00")]
         [Example("yyyy/MM/dd HH:mm:ss")]
+        [Log(LogOutputLevel.Trace)]
         public IStep<StringStream> DateTimeFormat { get; set; } = new StringConstant(new StringStream("O"));
     }
 

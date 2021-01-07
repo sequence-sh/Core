@@ -5,7 +5,6 @@ using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
-using Reductech.EDR.Core.Parser;
 
 namespace Reductech.EDR.Core.Steps
 {
@@ -30,7 +29,7 @@ namespace Reductech.EDR.Core.Steps
         public IStep<int> Index { get; set; } = null!;
 
         /// <inheritdoc />
-        public override async Task<Result<StringStream, IError>> Run(IStateMonad stateMonad,
+        protected override async Task<Result<StringStream, IError>> Run(IStateMonad stateMonad,
             CancellationToken cancellationToken)
         {
             var index = await Index.Run(stateMonad, cancellationToken);
@@ -43,7 +42,7 @@ namespace Reductech.EDR.Core.Steps
             var str = await stringStreamResult.Value.GetStringAsync();
 
             if (index.Value < 0 || index.Value >= str.Length)
-                return new SingleError("Index was outside the bounds of the string", ErrorCode.IndexOutOfBounds, new StepErrorLocation(this));
+                return new SingleError(new StepErrorLocation(this), ErrorCode.IndexOutOfBounds);
 
             var character = str[index.Value].ToString();
 

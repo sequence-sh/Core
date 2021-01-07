@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
-using Reductech.EDR.Core.Parser;
 using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.TestHarness;
 using Xunit.Abstractions;
@@ -59,7 +58,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                         Index = Constant(-1),
                         Array = Array( ("Hello"),  ("World"))
                     },
-                    new ErrorBuilder("Index was less than zero.", ErrorCode.IndexOutOfBounds)
+                    new ErrorBuilder( ErrorCode.IndexOutOfBounds)
                     );
 
                 yield return new ErrorCase("Index too big",
@@ -68,7 +67,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                         Index = Constant(2),
                         Array = Array( ("Hello"),  ("World"))
                     },
-                    new ErrorBuilder("Index was out of the range of the array.", ErrorCode.IndexOutOfBounds)
+                    new ErrorBuilder( ErrorCode.IndexOutOfBounds)
                     );
 
 

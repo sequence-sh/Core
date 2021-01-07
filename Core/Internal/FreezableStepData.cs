@@ -44,7 +44,7 @@ namespace Reductech.EDR.Core.Internal
                 if (StepProperties.TryGetValue(reference, out var value))
                     return extractValue(value);
 
-            return Result.Failure<T, IError>(ErrorHelper.MissingParameterError(propertyName, stepType.Name).WithLocation(Location));
+            return Result.Failure<T, IError>(ErrorHelper.MissingParameterError(propertyName).WithLocation(Location));
         }
 
 

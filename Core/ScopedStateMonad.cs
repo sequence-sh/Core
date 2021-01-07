@@ -8,6 +8,7 @@ using Microsoft.Extensions.Logging;
 using Reductech.EDR.Core.ExternalProcesses;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
+using Reductech.EDR.Core.Internal.Logging;
 using Reductech.EDR.Core.Util;
 
 namespace Reductech.EDR.Core
@@ -75,7 +76,7 @@ namespace Reductech.EDR.Core
             var r2 = StateMonad
                 .TryGetVariableFromDictionary<T>(key, _fixedState)
                 .Bind(x=>x.ToResult<T, IErrorBuilder>
-                    (new ErrorBuilder($"Variable '{key}' does not exist.", ErrorCode.MissingVariable)));
+                    (new ErrorBuilder( ErrorCode.MissingVariable, key)));
 
             return r2;
         }
@@ -91,7 +92,7 @@ namespace Reductech.EDR.Core
             _scopedStateDictionary.AddOrUpdate(key, _ => variable!, (_1, _2) => variable!);
 
             if (_fixedState.ContainsKey(key))
-                Logger.LogWarning($"Could not set variable {key} as it was out of scope.");
+                Logger.LogSituation(LogSituationCore.SetVariableOutOfScope, new object[]{key});
 
             return Unit.Default;
         }
@@ -104,7 +105,7 @@ namespace Reductech.EDR.Core
                     d.Dispose();
 
             if (_fixedState.ContainsKey(key))
-                Logger.LogWarning($"Could not remove variable {key} as it was out of scope.");
+                Logger.LogSituation(LogSituationCore.RemoveVariableOutOfScope, new object[]{key});
         }
     }
 }

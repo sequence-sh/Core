@@ -2,7 +2,6 @@
 using JetBrains.Annotations;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
-using Reductech.EDR.Core.Parser;
 using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.TestHarness;
 using Reductech.EDR.Core.Util;
@@ -70,7 +69,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                         Then = new FailStep<Unit> { ErrorMessage = "Then Fail" },
                         Else = new FailStep<Unit> { ErrorMessage = "Else Fail" },
                     },
-                    new SingleError("Condition Fail", ErrorCode.Test, EntireSequenceLocation.Instance));
+                    new SingleError(EntireSequenceLocation.Instance, ErrorCode.Test,"Condition Fail" ));
 
                 yield return new ErrorCase("Then is error",
                     new If()
@@ -79,7 +78,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                         Then = new FailStep<Unit> { ErrorMessage = "Then Fail" },
                         Else = new FailStep<Unit> { ErrorMessage = "Else Fail" },
                     },
-                    new SingleError("Then Fail", ErrorCode.Test, EntireSequenceLocation.Instance));
+                    new SingleError(EntireSequenceLocation.Instance, ErrorCode.Test,"Then Fail" ));
 
                 yield return new ErrorCase("Else is error",
                     new If()
@@ -88,7 +87,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                         Then = new FailStep<Unit> { ErrorMessage = "Then Fail" },
                         Else = new FailStep<Unit> { ErrorMessage = "Else Fail" },
                     },
-                    new SingleError("Else Fail", ErrorCode.Test, EntireSequenceLocation.Instance));
+                    new SingleError(EntireSequenceLocation.Instance, ErrorCode.Test,"Else Fail" ));
             }
         }
     }

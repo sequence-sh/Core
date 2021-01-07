@@ -54,7 +54,7 @@ namespace Reductech.EDR.Core.Steps
         public VariableName Variable { get; set; } = VariableName.Index;
 
         /// <inheritdoc />
-        public override async Task<Result<Unit, IError>> Run(IStateMonad stateMonad,
+        protected override async Task<Result<Unit, IError>> Run(IStateMonad stateMonad,
             CancellationToken cancellationToken)
         {
             var variableName = VariableName.Index;
@@ -74,7 +74,7 @@ namespace Reductech.EDR.Core.Steps
             if (setResult.IsFailure) return setResult.ConvertFailure<Unit>();
 
             if(increment.Value == 0)
-                return new SingleError("Cannot do a For loop with an increment of 0", ErrorCode.DivideByZero, new StepErrorLocation(this));
+                return new SingleError(new StepErrorLocation(this), ErrorCode.DivideByZero);
 
             while (increment.Value > 0? currentValue <= to.Value : currentValue >= to.Value)
             {

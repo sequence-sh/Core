@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using Reductech.EDR.Core.Parser;
 using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.TestHarness;
 using Reductech.EDR.Core.Util;

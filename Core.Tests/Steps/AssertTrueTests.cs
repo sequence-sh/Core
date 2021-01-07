@@ -49,7 +49,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                     {
                         Boolean = Constant(false)
                     },
-                    new ErrorBuilder($"Assertion Failed 'False'", ErrorCode.IndexOutOfBounds)
+                    new ErrorBuilder(ErrorCode.AssertionFailed, Constant(false).Name)
                 );
 
                 foreach (var errorCase in base.ErrorCases)

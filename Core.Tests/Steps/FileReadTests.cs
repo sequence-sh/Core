@@ -3,7 +3,6 @@ using System.IO;
 using System.Text;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
-using Reductech.EDR.Core.Parser;
 using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.TestHarness;
 using Reductech.EDR.Core.Util;
@@ -76,10 +75,10 @@ namespace Reductech.EDR.Core.Tests.Steps
                         {
                             Path =  Constant("File.txt"),
                         },
-                        new ErrorBuilder("ValueIf Error", ErrorCode.Test)
+                        new ErrorBuilder(ErrorCode.Test,"ValueIf Error")
                     )
                     .WithFileSystemAction(x => x.Setup(a => a.ReadFile(
-                        "File.txt")).Returns(new ErrorBuilder("ValueIf Error", ErrorCode.Test)));
+                        "File.txt")).Returns(new ErrorBuilder( ErrorCode.Test, "ValueIf Error")));
             }
         }
     }

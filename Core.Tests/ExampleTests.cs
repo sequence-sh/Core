@@ -7,9 +7,9 @@ using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.ExternalProcesses;
 using Reductech.EDR.Core.Internal;
-using Reductech.EDR.Core.Parser;
+using Reductech.EDR.Core.Internal.Parser;
+using Reductech.EDR.Core.Internal.Serialization;
 using Reductech.EDR.Core.Steps;
-using Reductech.EDR.Core.TestHarness;
 using Reductech.EDR.Core.Util;
 using Reductech.Utilities.Testing;
 using Xunit;
@@ -49,7 +49,7 @@ namespace Reductech.EDR.Core.Tests
                     stepResult.Error.GetAllErrors().Select(x=> x.Message + " " + x.Location.AsString)));
 
 
-            var monad = new StateMonad(new TestLogger(), EmptySettings.Instance, ExternalProcessRunner.Instance, FileSystemHelper.Instance, sfs);
+            var monad = new StateMonad(TestOutputHelper.BuildLogger(), EmptySettings.Instance, ExternalProcessRunner.Instance, FileSystemHelper.Instance, sfs);
 
             var r = await stepResult.Value.Run<Unit>(monad, CancellationToken.None);
 
@@ -57,32 +57,18 @@ namespace Reductech.EDR.Core.Tests
         }
 
 
-        [Fact(Skip = "Manual")]
+        [Fact(Skip = "skip")]
         [Trait("Category", "Integration")]
         public async Task RunSCLSequence()
         {
-            const string scl = @"
-- <Converted> = ReadFile Path: 'C:\Users\wainw\source\repos\Reductech\core\TestCSV.csv'
-  | FromCSV
-  | EntityMap Function: (
-      EntitySetValue
-        Entity: <Entity>
-        Property: 'Name'
-        Value: (StringToCase String: (EntityGetValue <Entity> 'Name') Case: TextCase.Upper)
-    )
-  | ToCSV
-- FileWrite Path: 'C:\Users\wainw\source\repos\Reductech\core\TestCSV2.csv' Stream: <Converted>";
+            const string scl = @"- [1,2,3] | Foreach (Print <Entity>)";
 
-
+            var logger = TestOutputHelper.BuildLogger();
             var sfs = StepFactoryStore.CreateUsingReflection();
+            var runner = new SCLRunner(EmptySettings.Instance, logger, ExternalProcessRunner.Instance,
+                FileSystemHelper.Instance, sfs, new KeyValuePair<string, object>("Runner", "Text"), new KeyValuePair<string, object>("Anything", "You want"));
 
-            var stepResult = SCLParsing.ParseSequence(scl).Bind(x=>x.TryFreeze(sfs));
-
-            stepResult.ShouldBeSuccessful(x=>x.AsString);
-
-            var monad = new StateMonad(new TestLogger(), EmptySettings.Instance, ExternalProcessRunner.Instance, FileSystemHelper.Instance, sfs);
-
-            var r = await stepResult.Value.Run<Unit>(monad, CancellationToken.None);
+            var r = await runner.RunSequenceFromTextAsync(scl, CancellationToken.None);
 
             r.ShouldBeSuccessful(x => x.AsString);
         }
@@ -92,7 +78,7 @@ namespace Reductech.EDR.Core.Tests
         [Trait("Category", "Integration")]
         public async Task RunObjectSequence()
         {
-            var step = new Core.Steps.Sequence<Unit>()
+            var step = new Sequence<Unit>()
             {
                 InitialSteps = new List<IStep<Unit>>
                 {
@@ -138,9 +124,9 @@ namespace Reductech.EDR.Core.Tests
 
             TestOutputHelper.WriteLine(scl);
 
-            var monad = new StateMonad(new TestLogger(), EmptySettings.Instance, ExternalProcessRunner.Instance, FileSystemHelper.Instance, StepFactoryStore.CreateUsingReflection() );
+            var monad = new StateMonad(TestOutputHelper.BuildLogger(), EmptySettings.Instance, ExternalProcessRunner.Instance, FileSystemHelper.Instance, StepFactoryStore.CreateUsingReflection() );
 
-            var r = await step.Run(monad, CancellationToken.None);
+            var r = await (step as IStep<Unit>).Run(monad, CancellationToken.None);
 
             r.ShouldBeSuccessful(x=>x.AsString);
         }

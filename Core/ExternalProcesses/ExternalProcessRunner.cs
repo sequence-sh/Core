@@ -31,7 +31,7 @@ namespace Reductech.EDR.Core.ExternalProcesses
         public Result<IExternalProcessReference, IErrorBuilder> StartExternalProcess(string processPath, IEnumerable<string> arguments, Encoding encoding)
         {
             if (!File.Exists(processPath))
-                return new ErrorBuilder($"Could not find '{processPath}'", ErrorCode.ExternalProcessNotFound);
+                return new ErrorBuilder(ErrorCode.ExternalProcessNotFound, processPath);
 
             var argumentString = string.Join(' ', arguments.Select(EncodeParameterArgument));
             var pProcess = new Process
@@ -53,7 +53,7 @@ namespace Reductech.EDR.Core.ExternalProcesses
 
             var started = pProcess.Start();
             if(!started)
-                return new ErrorBuilder($"Could not start '{processPath}'", ErrorCode.ExternalProcessError);
+                return new ErrorBuilder(ErrorCode.ExternalProcessError,"Could not start");
 
             AppDomain.CurrentDomain.ProcessExit += KillProcess;
             AppDomain.CurrentDomain.DomainUnload += KillProcess;
@@ -78,7 +78,7 @@ namespace Reductech.EDR.Core.ExternalProcesses
             CancellationToken cancellationToken)
         {
             if (!File.Exists(processPath))
-                return new ErrorBuilder($"Could not find '{processPath}'", ErrorCode.ExternalProcessNotFound);
+                return new ErrorBuilder(ErrorCode.ExternalProcessNotFound,processPath);
 
             var argumentString = string.Join(' ', arguments.Select(EncodeParameterArgument));
             using var pProcess = new Process
@@ -117,13 +117,14 @@ namespace Reductech.EDR.Core.ExternalProcesses
                         if (errorHandler.ShouldIgnoreError(errorText))
                             logger.LogWarning(line);
                         else
-                            errors.Add(new ErrorBuilder(errorText, ErrorCode.ExternalProcessError));
+                            errors.Add(new ErrorBuilder( ErrorCode.ExternalProcessError,errorText));
                     }
                     else
                         logger.LogInformation(line);
                 }
 
 
+                // ReSharper disable once MethodHasAsyncOverloadWithCancellation - run on a separate thread
                 pProcess.WaitForExit();
             }
 #pragma warning disable CA1031 // Do not catch general exception types

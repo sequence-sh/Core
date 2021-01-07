@@ -8,7 +8,6 @@ using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
-using Reductech.EDR.Core.Parser;
 
 namespace Reductech.EDR.Core.Steps
 {
@@ -19,7 +18,7 @@ namespace Reductech.EDR.Core.Steps
     public sealed class ArrayDistinct<T> : CompoundStep<Array<T>>
     {
         /// <inheritdoc />
-        public override async Task<Result<Array<T>, IError>> Run(IStateMonad stateMonad,
+        protected override async Task<Result<Array<T>, IError>> Run(IStateMonad stateMonad,
             CancellationToken cancellationToken)
         {
             var entityStreamResult = await Array.Run(stateMonad, cancellationToken);

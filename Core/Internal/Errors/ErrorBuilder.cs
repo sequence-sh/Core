@@ -3,21 +3,6 @@ using System.Collections.Generic;
 
 namespace Reductech.EDR.Core.Internal.Errors
 {
-    /// <summary>
-    /// An exception that wraps an error
-    /// </summary>
-    public class ErrorException : Exception
-    {
-        /// <summary>
-        /// Create a new ErrorException
-        /// </summary>
-        public ErrorException(IError error) => Error = error;
-
-        /// <summary>
-        /// The errorBuilder
-        /// </summary>
-        public IError Error { get; }
-    }
 
     /// <summary>
     /// An error without a location.
@@ -27,35 +12,23 @@ namespace Reductech.EDR.Core.Internal.Errors
         /// <summary>
         /// Create a new error.
         /// </summary>
-        public ErrorBuilder(string message, ErrorCode errorCode, IError? innerError = null)
+        public ErrorBuilder(ErrorCode errorCode, params object?[] args)
         {
-            Message = message;
-            InnerError = innerError;
             Exception = null;
             ErrorCode = errorCode;
+            Args      = args;
         }
 
         /// <summary>
-        /// Create a new error with an exception.
+        /// Create a new error from an exception.
         /// </summary>
         public ErrorBuilder(Exception exception,  ErrorCode errorCode)
         {
-            Message = exception.Message;
-            InnerError = null;
             Exception = exception;
             ErrorCode = errorCode;
+            Args      = Array.Empty<object?>();
         }
 
-
-        /// <summary>
-        /// Error Message String.
-        /// </summary>
-        public string Message { get; }
-
-        /// <summary>
-        /// The error that caused this error.
-        /// </summary>
-        public IError? InnerError { get; }
 
         /// <summary>
         /// Associated Exception if there is one
@@ -67,6 +40,10 @@ namespace Reductech.EDR.Core.Internal.Errors
         /// </summary>
         public ErrorCode ErrorCode { get; }
 
+        /// <summary>
+        /// Error Arguments.
+        /// </summary>
+        public object?[] Args { get; }
 
         /// <summary>
         /// Returns a SingleError with the given location.
@@ -74,9 +51,9 @@ namespace Reductech.EDR.Core.Internal.Errors
         public SingleError WithLocationSingle(IErrorLocation location)
         {
             if (Exception != null)
-                return new SingleError(Exception, ErrorCode, location);
+                return new SingleError(location, Exception, ErrorCode);
 
-            return new SingleError(Message, ErrorCode, location, InnerError);
+            return new SingleError(location, ErrorCode, Args);
         }
 
         /// <inheritdoc />
@@ -89,7 +66,7 @@ namespace Reductech.EDR.Core.Internal.Errors
         }
 
         /// <inheritdoc />
-        public string AsString => Message;
+        public string AsString => ErrorCode.GetFormattedMessage(Args);
 
         /// <inheritdoc />
         public override string ToString() => AsString;

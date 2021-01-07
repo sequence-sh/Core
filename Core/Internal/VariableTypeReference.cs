@@ -53,7 +53,7 @@ namespace Reductech.EDR.Core.Internal
         public Result<ActualTypeReference, IErrorBuilder> TryGetActualTypeReference(TypeResolver tr)
         {
             var r = tr.Dictionary.TryFindOrFail(VariableName,
-                ()=> new ErrorBuilder($"Could not resolve variable <{VariableName.Name}>", ErrorCode.CouldNotResolveVariable) as IErrorBuilder);
+                ()=> new ErrorBuilder( ErrorCode.CouldNotResolveVariable, VariableName.Name) as IErrorBuilder);
             return r;
         }
 

@@ -3,7 +3,7 @@ using System.Linq;
 using System.Text;
 using Reductech.EDR.Core.Entities;
 
-namespace Reductech.EDR.Core.Serialization
+namespace Reductech.EDR.Core.Internal.Serialization
 {
     /// <summary>
     /// Serializes primitive types
@@ -79,7 +79,7 @@ namespace Reductech.EDR.Core.Serialization
         /// </summary>
         public static string Serialize(this EntityValue entityValue)
         {
-            return entityValue.Value.Match(_ => DoubleQuote(""),
+            return entityValue.Match(_ => DoubleQuote(""),
                 DoubleQuote,
                 x => x.ToString(),
                 x => x.ToString("G17"),

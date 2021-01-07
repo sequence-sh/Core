@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
-using Reductech.EDR.Core.Parser;
 using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.TestHarness;
 using Reductech.EDR.Core.Util;
@@ -83,7 +82,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                         EntityStream = new FailStep<Array<Entity>>{ ErrorMessage = "Stream Fail" },
                         Function = Constant(Entity.Create(("Key", "Value")))
                     },
-                    new SingleError("Stream Fail", ErrorCode.Test, EntireSequenceLocation.Instance));
+                    new SingleError(EntireSequenceLocation.Instance, ErrorCode.Test, "Stream Fail" ));
             }
         }
 

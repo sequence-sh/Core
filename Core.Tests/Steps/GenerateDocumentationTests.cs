@@ -7,7 +7,6 @@ using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
-using Reductech.EDR.Core.Parser;
 using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.TestHarness;
 using Xunit.Abstractions;
@@ -214,7 +213,7 @@ Negation of a boolean value.
         {
             /// <inheritdoc />
 #pragma warning disable 1998
-            public override async Task<Result<StringStream, IError>> Run(IStateMonad stateMonad,
+            protected override async Task<Result<StringStream, IError>> Run(IStateMonad stateMonad,
                 CancellationToken cancellation)
 #pragma warning restore 1998
             {

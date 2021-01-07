@@ -9,6 +9,7 @@ using CSharpFunctionalExtensions;
 using OneOf;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal.Errors;
+using Reductech.EDR.Core.Internal.Logging;
 using Reductech.EDR.Core.Util;
 
 namespace Reductech.EDR.Core.Internal
@@ -18,15 +19,64 @@ namespace Reductech.EDR.Core.Internal
     /// </summary>
     public abstract class CompoundStep<T> : ICompoundStep<T>
     {
-        /// <inheritdoc />
-        public abstract Task<Result<T, IError>> Run(IStateMonad stateMonad, CancellationToken cancellationToken);
+        /// <summary>
+        /// Run this step.
+        /// Does not activate logging.
+        /// </summary>
+        protected abstract Task<Result<T, IError>> Run(IStateMonad stateMonad, CancellationToken cancellationToken);
 
+
+        /// <inheritdoc />
+        async Task<Result<T, IError>> IStep<T>.Run(IStateMonad stateMonad, CancellationToken cancellationToken)
+        {
+            using (stateMonad.Logger.BeginScope(Name))
+            {
+                IEnumerable<object> GetEnterStepArgs()
+                {
+                    yield return Name;
+
+                    var properties = AllProperties
+                        .ToDictionary(x => x.Name, x=>x.GetLogName());
+
+                    yield return properties;
+                }
+
+                stateMonad.Logger.LogSituation(LogSituationCore.EnterStep, GetEnterStepArgs());
+
+                var result = await Run(stateMonad, cancellationToken);
+
+                if (result.IsFailure)
+                {
+                    stateMonad.Logger.LogSituation(LogSituationCore.ExitStepFailure, new[]{Name, result.Error.AsString});
+                }
+                else
+                {
+                    var resultValue = SerializeOutput(result.Value);
+                    stateMonad.Logger.LogSituation(LogSituationCore.ExitStepSuccess, new[]{Name, resultValue});
+                }
+                return result;
+
+                static string SerializeOutput(object? o)
+                {
+                    return o switch
+                    {
+                        null => "Null",
+                        StringStream ss => ss.NameInLogs(false),
+                        IArray array => array.NameInLogs,
+                        Unit => "Unit",
+                        _ => o.ToString()!
+                    };
+                }
+
+
+            }
+        }
 
         /// <inheritdoc />
         public Task<Result<T1, IError>> Run<T1>(IStateMonad stateMonad, CancellationToken cancellationToken)
         {
             return Run(stateMonad, cancellationToken).BindCast<T, T1, IError>(
-                    new SingleError($"Could not cast {typeof(T)} to {typeof(T1)}", ErrorCode.InvalidCast, new StepErrorLocation(this)));
+                    new SingleError(new StepErrorLocation(this), ErrorCode.InvalidCast,typeof(T),typeof(T1) ));
         }
 
         /// <summary>
@@ -79,20 +129,27 @@ namespace Reductech.EDR.Core.Internal
                     var (propertyInfo, _) = arg1;
                     var val = propertyInfo.GetValue(this);
 
-                    return val switch
+                    var oneOf =
+                        val switch
                     {
-                        IStep step => new StepProperty(propertyInfo.Name, arg2,
-                            OneOf<VariableName, IStep, IReadOnlyList<IStep>>.FromT1(step)),
-                        IEnumerable<IStep> enumerable => new StepProperty(propertyInfo.Name, arg2,
-                            OneOf<VariableName, IStep, IReadOnlyList<IStep>>.FromT2(enumerable.ToList())),
-                        VariableName vn => new StepProperty(propertyInfo.Name, arg2, vn),
-                        _ => Maybe<StepProperty>.None
+                        IStep step =>
+                            OneOf<VariableName, IStep, IReadOnlyList<IStep>>.FromT1(step),
+                        IEnumerable<IStep> enumerable =>
+                            OneOf<VariableName, IStep, IReadOnlyList<IStep>>.FromT2(enumerable.ToList()),
+                        VariableName vn =>  vn,
+                        _ => null as OneOf<VariableName, IStep, IReadOnlyList<IStep>>?
                     };
+
+                    if(!oneOf.HasValue)
+                        return Maybe<StepProperty>.None;
+
+                    var logAttribute = propertyInfo.GetCustomAttribute<LogAttribute>();
+                    var scopedFunctionAttribute = propertyInfo.GetCustomAttribute<ScopedFunctionAttribute>();
+
+                    return new StepProperty(propertyInfo.Name, arg2, oneOf.Value, logAttribute, scopedFunctionAttribute);
                 }
             }
         }
-
-
 
         private FreezableStepData FreezableStepData
         {
@@ -101,7 +158,7 @@ namespace Reductech.EDR.Core.Internal
                 var dict = AllProperties
                     .OrderBy(x => x.Index)
                     .ToDictionary(x => new StepParameterReference(x.Name),
-                        x => x.Value.Match(
+                        x => x.Match(
                             vn => new FreezableStepProperty(vn, new StepErrorLocation(this)),
                             s => new FreezableStepProperty(s.Unfreeze(),
                                 new StepErrorLocation(this)),
@@ -125,7 +182,7 @@ namespace Reductech.EDR.Core.Internal
 
         /// <inheritdoc />
         public virtual Result<StepContext, IError> TryGetScopedContext(StepContext baseContext, IFreezableStep scopedStep) =>
-            new SingleError($"{Name} cannot create a scoped context", ErrorCode.UnexpectedParameter, new StepErrorLocation(this));
+            new SingleError(new StepErrorLocation(this), ErrorCode.CannotCreateScopedContext, Name);
 
         /// <inheritdoc />
         public Result<Unit, IError> Verify(ISettings settings)
@@ -136,7 +193,7 @@ namespace Reductech.EDR.Core.Internal
                 .Select(req => settings.CheckRequirement(req).MapError(x=>x.WithLocation(this)));
 
             var r3 = AllProperties
-                .Select(x => x.Value.Match(
+                .Select(x => x.Match(
                     _ => Unit.Default,
                     s => s.Verify(settings),
                     sl => sl.Select(s => s.Verify(settings)).Combine(ErrorList.Combine).Map(_=>Unit.Default)

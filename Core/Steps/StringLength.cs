@@ -5,7 +5,6 @@ using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
-using Reductech.EDR.Core.Parser;
 
 namespace Reductech.EDR.Core.Steps
 {
@@ -22,7 +21,7 @@ namespace Reductech.EDR.Core.Steps
         public IStep<StringStream> String { get; set; } = null!;
 
         /// <inheritdoc />
-        public override async Task<Result<int, IError>> Run(IStateMonad stateMonad, CancellationToken cancellationToken)
+        protected override async Task<Result<int, IError>> Run(IStateMonad stateMonad, CancellationToken cancellationToken)
         {
             var str = await String.Run(stateMonad, cancellationToken)
                 .Map(async x=> await x.GetStringAsync());;

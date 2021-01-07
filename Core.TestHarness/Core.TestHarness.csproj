@@ -35,7 +35,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Divergic.Logging.Xunit" Version="3.6.0" />
     <PackageReference Include="FluentAssertions" Version="5.10.3" />
+    <PackageReference Include="MELT.Xunit" Version="0.6.0" />
     <PackageReference Include="Moq" Version="4.15.2" />
     <PackageReference Include="Reductech.Utilities.Testing" Version="0.1.1" />
     <PackageReference Include="xunit" Version="2.4.1" />

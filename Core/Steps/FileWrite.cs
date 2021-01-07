@@ -5,7 +5,6 @@ using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
-using Reductech.EDR.Core.Parser;
 using Reductech.EDR.Core.Util;
 
 namespace Reductech.EDR.Core.Steps
@@ -17,7 +16,7 @@ namespace Reductech.EDR.Core.Steps
     public sealed class FileWrite : CompoundStep<Unit>
     {
         /// <inheritdoc />
-        public override async Task<Result<Unit, IError>> Run(IStateMonad stateMonad,
+        protected override async Task<Result<Unit, IError>> Run(IStateMonad stateMonad,
             CancellationToken cancellationToken)
         {
             var path = await Path.Run(stateMonad, cancellationToken)
@@ -47,12 +46,13 @@ namespace Reductech.EDR.Core.Steps
         [Required]
         [Alias("Data")]
         public IStep<StringStream> Stream { get; set; } = null!;
-        
+
         /// <summary>
         /// The path of the file to write to.
         /// </summary>
         [StepProperty(2)]
         [Required]
+        [Log(LogOutputLevel.Trace)]
         public IStep<StringStream> Path { get; set; } = null!;
 
         /// <inheritdoc />

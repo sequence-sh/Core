@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using CSharpFunctionalExtensions;
-using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Util;
 
-namespace Reductech.EDR.Core.Serialization
+namespace Reductech.EDR.Core.Internal.Serialization
 {
 
     /// <summary>
@@ -28,7 +27,7 @@ namespace Reductech.EDR.Core.Serialization
         {
 
             return dictionary.TryFindOrFail(PropertyName, $"Missing Property {PropertyName}")
-                .Bind(x => x.Value.Match(
+                .Bind(x => x.Match(
                     _ => Result.Failure<string>("Operator is VariableName"),
                     s=> s is EnumConstant<T> cs? cs.Value.GetDisplayName() : Result.Failure<string>("Operator is non constant step"),
                     sl => Result.Failure<string>("Operator is Step List")

@@ -29,7 +29,7 @@ namespace Reductech.EDR.Core.Entities
                 return Unit.Default;
             }
 
-            var errorBuilder = ErrorHelper.MissingParameterError(propertyName, className);
+            var errorBuilder = ErrorHelper.MissingParameterError(propertyName);
 
             return Result.Failure<Unit, IErrorBuilder>(errorBuilder);
         }
@@ -52,7 +52,7 @@ namespace Reductech.EDR.Core.Entities
                 return Unit.Default;
             }
 
-            var errorBuilder = ErrorHelper.MissingParameterError(propertyName, className);
+            var errorBuilder = ErrorHelper.MissingParameterError(propertyName);
 
             return Result.Failure<Unit, IErrorBuilder>(errorBuilder);
         }
@@ -90,7 +90,7 @@ namespace Reductech.EDR.Core.Entities
                 return Unit.Default;
             }
 
-            var errorBuilder = ErrorHelper.MissingParameterError(propertyName, className);
+            var errorBuilder = ErrorHelper.MissingParameterError(propertyName);
 
             return Result.Failure<Unit, IErrorBuilder>(errorBuilder);
         }
@@ -112,7 +112,7 @@ namespace Reductech.EDR.Core.Entities
                 return Unit.Default;
             }
 
-            var errorBuilder = ErrorHelper.MissingParameterError(propertyName, className);
+            var errorBuilder = ErrorHelper.MissingParameterError(propertyName);
 
             return Result.Failure<Unit, IErrorBuilder>(errorBuilder);
         }
@@ -136,7 +136,7 @@ namespace Reductech.EDR.Core.Entities
                 return Unit.Default;
             }
 
-            var errorBuilder = ErrorHelper.MissingParameterError(propertyName, className);
+            var errorBuilder = ErrorHelper.MissingParameterError(propertyName);
 
             return Result.Failure<Unit, IErrorBuilder>(errorBuilder);
         }

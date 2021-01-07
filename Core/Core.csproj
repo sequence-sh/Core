@@ -28,11 +28,11 @@
   </PropertyGroup>
 
   <ItemGroup Condition="'$(CI)' == ''">
-    <Antlr4 Include="Parser\SCL.g4">
+    <Antlr4 Include="Internal\Parser\SCL.g4">
       <Listener>false</Listener>
       <Error>true</Error>
       <AntOutDir>Antlr</AntOutDir>
-      <Package>Reductech.EDR.Core.Parser</Package>
+      <Package>Reductech.EDR.Core.Internal.Parser</Package>
     </Antlr4>
   </ItemGroup>
 
@@ -47,7 +47,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Remove="Parser\SCL.g4" />
+    <None Remove="Internal\Parser\SCL.g4" />
   </ItemGroup>
 
   <ItemGroup>
@@ -56,6 +56,7 @@
     <PackageReference Include="CSharpFunctionalExtensions" Version="2.13.2" />
     <PackageReference Include="CsvHelper" Version="18.0.0" />
     <PackageReference Include="JetBrains.Annotations" Version="2020.3.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="5.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="5.0.0" />
     <PackageReference Include="Namotion.Reflection" Version="1.0.14" />
     <PackageReference Include="OneOf" Version="3.0.162" />
@@ -64,6 +65,30 @@
 
   <ItemGroup>
     <Folder Include="Antlr\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Internal\Errors\ErrorMessages-EN.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>ErrorMessages-EN.resx</DependentUpon>
+    </Compile>
+    <Compile Update="Internal\Logging\LogMessages-En.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>LogMessages-EN.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Internal\Errors\ErrorMessages-EN.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>ErrorMessages-EN.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Internal\Logging\LogMessages-EN.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>LogMessages-En.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
   </ItemGroup>
 
 </Project>

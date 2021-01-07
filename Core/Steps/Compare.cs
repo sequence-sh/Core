@@ -7,7 +7,7 @@ using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Enums;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
-using Reductech.EDR.Core.Serialization;
+using Reductech.EDR.Core.Internal.Serialization;
 using Reductech.EDR.Core.Util;
 
 namespace Reductech.EDR.Core.Steps
@@ -41,7 +41,7 @@ namespace Reductech.EDR.Core.Steps
 
 
         /// <inheritdoc />
-        public override async Task<Result<bool, IError>> Run(IStateMonad stateMonad,
+        protected override async Task<Result<bool, IError>> Run(IStateMonad stateMonad,
             CancellationToken cancellationToken)
         {
             var result = await Left.Run(stateMonad, cancellationToken)
@@ -65,7 +65,7 @@ namespace Reductech.EDR.Core.Steps
                 CompareOperator.LessThanOrEqual => item1.CompareTo(item2) <= 0,
                 CompareOperator.GreaterThan => item1.CompareTo(item2) > 0,
                 CompareOperator.GreaterThanOrEqual => item1.CompareTo(item2) >= 0,
-                _ => new ErrorBuilder($"Could not apply '{compareOperator}'", ErrorCode.UnexpectedEnumValue)
+                _ => new ErrorBuilder(ErrorCode.UnexpectedEnumValue, nameof(Compare<int>.Operator), compareOperator)
             };
         }
 

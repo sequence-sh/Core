@@ -5,7 +5,6 @@ using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
-using Reductech.EDR.Core.Parser;
 using Reductech.EDR.Core.Util;
 
 namespace Reductech.EDR.Core.Steps
@@ -17,7 +16,7 @@ namespace Reductech.EDR.Core.Steps
     public class FileExtract : CompoundStep<Unit>
     {
         /// <inheritdoc />
-        public override async Task<Result<Unit, IError>> Run(IStateMonad stateMonad,
+        protected override async Task<Result<Unit, IError>> Run(IStateMonad stateMonad,
             CancellationToken cancellationToken)
         {
             var archivePathResult = await ArchiveFilePath.Run(stateMonad, cancellationToken)
@@ -48,6 +47,7 @@ namespace Reductech.EDR.Core.Steps
         [StepProperty(1)]
         [Required]
         [Alias("Container")]
+        [Log(LogOutputLevel.Trace)]
         public IStep<StringStream> ArchiveFilePath { get; set; } = null!;
 
         /// <summary>
@@ -56,6 +56,7 @@ namespace Reductech.EDR.Core.Steps
         [StepProperty(2)]
         [Required]
         [Alias("ToDirectory")]
+        [Log(LogOutputLevel.Trace)]
         public IStep<StringStream> Destination { get; set; } = null!;
 
         /// <summary>

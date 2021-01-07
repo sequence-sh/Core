@@ -2,11 +2,10 @@
 using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
-using Microsoft.Extensions.Logging;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
-using Reductech.EDR.Core.Parser;
+using Reductech.EDR.Core.Internal.Logging;
 using Reductech.EDR.Core.Util;
 
 namespace Reductech.EDR.Core.Steps
@@ -18,7 +17,7 @@ namespace Reductech.EDR.Core.Steps
     public class DeleteItem : CompoundStep<Unit>
     {
         /// <inheritdoc />
-        public override async Task<Result<Unit, IError>> Run(IStateMonad stateMonad,
+        protected override async Task<Result<Unit, IError>> Run(IStateMonad stateMonad,
             CancellationToken cancellationToken)
         {
             var pathResult = await Path.Run(stateMonad, cancellationToken);
@@ -32,17 +31,17 @@ namespace Reductech.EDR.Core.Steps
             if (stateMonad.FileSystemHelper.DoesDirectoryExist(path))
             {
                 result = stateMonad.FileSystemHelper.DeleteDirectory(path, true);
-                stateMonad.Logger.LogInformation($"Directory '{path}' Deleted.");
+                stateMonad.Logger.LogSituation(LogSituationCore.DirectoryDeleted, new []{path});
             }
             else if (stateMonad.FileSystemHelper.DoesFileExist(path))
             {
                 result = stateMonad.FileSystemHelper.DeleteFile(path);
-                stateMonad.Logger.LogInformation($"File '{path}' Deleted.");
+                stateMonad.Logger.LogSituation(LogSituationCore.FileDeleted, new []{path});
             }
             else
             {
                 result = Unit.Default;
-                stateMonad.Logger.LogInformation($"Item '{path}' did not exist.");
+                stateMonad.Logger.LogSituation(LogSituationCore.ItemToDeleteDidNotExist, new []{path});
             }
 
             return result.MapError(x => x.WithLocation(this));

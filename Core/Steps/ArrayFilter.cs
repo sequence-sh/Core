@@ -19,7 +19,7 @@ namespace Reductech.EDR.Core.Steps
     public sealed class ArrayFilter<T> : CompoundStep<Array<T>>
     {
         /// <inheritdoc />
-        public override async Task<Result<Array<T>, IError>> Run(IStateMonad stateMonad,
+        protected override async Task<Result<Array<T>, IError>> Run(IStateMonad stateMonad,
             CancellationToken cancellationToken)
         {
             var entityStreamResult = await Array.Run(stateMonad, cancellationToken);

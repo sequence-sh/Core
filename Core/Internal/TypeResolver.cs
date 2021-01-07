@@ -85,8 +85,9 @@ namespace Reductech.EDR.Core.Internal
                     var error =
                         ErrorList.Combine(
                             unresolvableVariableNames.Distinct().Select(x =>
-                                new SingleError($"Could not resolve variable {x}",
-                                    ErrorCode.CouldNotResolveVariable, EntireSequenceLocation.Instance))
+                                new SingleError(
+                                    EntireSequenceLocation.Instance,
+                                    ErrorCode.CouldNotResolveVariable,x.Name ))
                         );
 
                     return Result.Failure<Unit, IError>(error);
@@ -101,7 +102,7 @@ namespace Reductech.EDR.Core.Internal
         /// </summary>
         public Result<bool, IErrorBuilder> TryAddType(VariableName variable, ITypeReference typeReference)
         {
-            var actualType = typeReference. GetActualTypeReferenceIfResolvable(this);
+            var actualType = typeReference.GetActualTypeReferenceIfResolvable(this);
             if (actualType.IsFailure) return actualType.ConvertFailure<bool>();
 
             if (actualType.Value.HasNoValue) return false;
@@ -113,7 +114,7 @@ namespace Reductech.EDR.Core.Internal
                 if (previous.Equals(actualTypeReference))
                     return true;
 
-                return new ErrorBuilder($"The type of {variable} is ambiguous between {actualTypeReference} and {previous}.", ErrorCode.AmbiguousType);
+                return new ErrorBuilder( ErrorCode.CannotInferType);
             }
 
             MyDictionary.Add(variable, actualTypeReference);
