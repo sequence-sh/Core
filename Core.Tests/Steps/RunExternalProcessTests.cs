@@ -3,6 +3,7 @@ using System.Text;
 using System.Threading;
 using Microsoft.Extensions.Logging;
 using Moq;
+using Reductech.EDR.Core.Enums;
 using Reductech.EDR.Core.ExternalProcesses;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Parser;

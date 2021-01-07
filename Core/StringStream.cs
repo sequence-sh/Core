@@ -3,11 +3,12 @@ using System.IO;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Reductech.EDR.Core.Enums;
 using Reductech.EDR.Core.Internal.Serialization;
 using Reductech.EDR.Core.Util;
-using Option = OneOf.OneOf<string, (System.IO.Stream, Reductech.EDR.Core.EncodingEnum)>;
+using Option = OneOf.OneOf<string, (System.IO.Stream, Reductech.EDR.Core.Enums.EncodingEnum)>;
 
-namespace Reductech.EDR.Core.Internal.Parser
+namespace Reductech.EDR.Core
 {
     /// <summary>
     /// A stream of data representing a string.

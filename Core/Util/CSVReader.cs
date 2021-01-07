@@ -7,12 +7,12 @@ using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using CsvHelper;
 using CsvHelper.Configuration;
+using Reductech.EDR.Core.Enums;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Internal.Parser;
-using Reductech.EDR.Core.Parser;
 
-namespace Reductech.EDR.Core
+namespace Reductech.EDR.Core.Util
 {
     /// <summary>
     /// Helps read blocks

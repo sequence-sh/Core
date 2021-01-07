@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Text;
 
-namespace Reductech.EDR.Core
+namespace Reductech.EDR.Core.Enums
 {
 
     /// <summary>
