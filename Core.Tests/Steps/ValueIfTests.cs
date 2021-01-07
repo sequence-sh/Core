@@ -9,77 +9,89 @@ using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
-    public class ValueIfTests : StepTestBase<ValueIf<int>, int>
+
+public class ValueIfTests : StepTestBase<ValueIf<int>, int>
+{
+    /// <inheritdoc />
+    public ValueIfTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper) { }
+
+    /// <inheritdoc />
+    protected override IEnumerable<StepCase> StepCases
     {
-        /// <inheritdoc />
-        public ValueIfTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
+        get
         {
-        }
-
-        /// <inheritdoc />
-        protected override IEnumerable<StepCase> StepCases
-        {
-            get
-            {
-                yield return new StepCase("ValueIf true", new ValueIf<int>()
+            yield return new StepCase(
+                "ValueIf true",
+                new ValueIf<int>()
                 {
-                    Condition = Constant(true),
-                    Then = Constant(1),
-                    Else = Constant(2)
-                }, 1 );
+                    Condition = Constant(true), Then = Constant(1), Else = Constant(2)
+                },
+                1
+            );
 
-                yield return new StepCase("ValueIf false", new ValueIf<int>()
+            yield return new StepCase(
+                "ValueIf false",
+                new ValueIf<int>()
                 {
-                    Condition = Constant(false),
-                    Then = Constant(1),
-                    Else = Constant(2)
-                }, 2);
-            }
-        }
-
-        /// <inheritdoc />
-        protected override IEnumerable<DeserializeCase> DeserializeCases
-        {
-            get
-            {
-                yield return new DeserializeCase("ValueIf true", "ValueIf Condition: true Then: 1 Else: 2", 1);
-            }
-
-        }
-
-        /// <inheritdoc />
-        protected override IEnumerable<ErrorCase> ErrorCases
-        {
-            get
-            {
-                yield return new ErrorCase("Condition is error",
-                    new ValueIf<Unit>()
-                    {
-                        Condition = new FailStep<bool> { ErrorMessage = "Condition Fail" },
-                        Then = new FailStep<Unit> { ErrorMessage = "Then Fail" },
-                        Else = new FailStep<Unit> { ErrorMessage = "Else Fail" },
-                    },
-
-                    new SingleError(EntireSequenceLocation.Instance, ErrorCode.Test,"Condition Fail"));
-
-                yield return new ErrorCase("Then is error",
-                    new ValueIf<Unit>()
-                    {
-                        Condition = Constant(true),
-                        Then = new FailStep<Unit> { ErrorMessage = "Then Fail" },
-                        Else = new FailStep<Unit> { ErrorMessage = "Else Fail" },
-                    },
-                    new SingleError(EntireSequenceLocation.Instance, ErrorCode.Test,"Then Fail"));
-
-                yield return new ErrorCase("Else is error",
-                    new ValueIf<Unit>()
-                    {
-                        Condition = Constant(false),
-                        Then = new FailStep<Unit> { ErrorMessage = "Then Fail" },
-                        Else = new FailStep<Unit> { ErrorMessage = "Else Fail" },
-                    },
-                    new SingleError(EntireSequenceLocation.Instance, ErrorCode.Test,"Else Fail"));
-            }
+                    Condition = Constant(false), Then = Constant(1), Else = Constant(2)
+                },
+                2
+            );
         }
     }
+
+    /// <inheritdoc />
+    protected override IEnumerable<DeserializeCase> DeserializeCases
+    {
+        get
+        {
+            yield return new DeserializeCase(
+                "ValueIf true",
+                "ValueIf Condition: true Then: 1 Else: 2",
+                1
+            );
+        }
+    }
+
+    /// <inheritdoc />
+    protected override IEnumerable<ErrorCase> ErrorCases
+    {
+        get
+        {
+            yield return new ErrorCase(
+                "Condition is error",
+                new ValueIf<Unit>()
+                {
+                    Condition = new FailStep<bool> { ErrorMessage = "Condition Fail" },
+                    Then      = new FailStep<Unit> { ErrorMessage = "Then Fail" },
+                    Else      = new FailStep<Unit> { ErrorMessage = "Else Fail" },
+                },
+                new SingleError(EntireSequenceLocation.Instance, ErrorCode.Test, "Condition Fail")
+            );
+
+            yield return new ErrorCase(
+                "Then is error",
+                new ValueIf<Unit>()
+                {
+                    Condition = Constant(true),
+                    Then      = new FailStep<Unit> { ErrorMessage = "Then Fail" },
+                    Else      = new FailStep<Unit> { ErrorMessage = "Else Fail" },
+                },
+                new SingleError(EntireSequenceLocation.Instance, ErrorCode.Test, "Then Fail")
+            );
+
+            yield return new ErrorCase(
+                "Else is error",
+                new ValueIf<Unit>()
+                {
+                    Condition = Constant(false),
+                    Then      = new FailStep<Unit> { ErrorMessage = "Then Fail" },
+                    Else      = new FailStep<Unit> { ErrorMessage = "Else Fail" },
+                },
+                new SingleError(EntireSequenceLocation.Instance, ErrorCode.Test, "Else Fail")
+            );
+        }
+    }
+}
+
 }

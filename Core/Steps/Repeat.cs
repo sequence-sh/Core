@@ -10,71 +10,78 @@ using Reductech.EDR.Core.Internal.Errors;
 
 namespace Reductech.EDR.Core.Steps
 {
+
+/// <summary>
+/// Creates an array by repeating an element.
+/// </summary>
+public sealed class Repeat<T> : CompoundStep<Core.Array<T>>
+{
     /// <summary>
-    /// Creates an array by repeating an element.
+    /// The element to repeat.
     /// </summary>
-    public sealed class Repeat<T> : CompoundStep<Core.Array<T>>
-    {
-        /// <summary>
-        /// The element to repeat.
-        /// </summary>
-        [StepProperty(1)]
-        [Required]
-        public IStep<T> Element { get; set; } = null!;
-
-        /// <summary>
-        /// The number of times to repeat the element
-        /// </summary>
-        [StepProperty(2)]
-        [Required]
-        public IStep<int> Number { get; set; } = null!;
-
-        /// <inheritdoc />
-        protected override async Task<Result<Core.Array<T>, IError>> Run(IStateMonad stateMonad,
-            CancellationToken cancellationToken)
-        {
-            var element = await Element.Run(stateMonad, cancellationToken);
-
-            if (element.IsFailure) return element.ConvertFailure<Core.Array<T>>();
-
-            var number = await Number.Run(stateMonad, cancellationToken);
-
-            if (number.IsFailure) return number.ConvertFailure<Core.Array<T>>();
-
-            var result = Enumerable.Repeat(element.Value, number.Value).ToSequence();
-
-            return result;
-        }
-
-        /// <inheritdoc />
-        public override IStepFactory StepFactory => RepeatStepFactory.Instance;
-    }
+    [StepProperty(1)]
+    [Required]
+    public IStep<T> Element { get; set; } = null!;
 
     /// <summary>
-    /// Creates an array by repeating an element.
+    /// The number of times to repeat the element
     /// </summary>
-    public sealed class RepeatStepFactory : GenericStepFactory
+    [StepProperty(2)]
+    [Required]
+    public IStep<int> Number { get; set; } = null!;
+
+    /// <inheritdoc />
+    protected override async Task<Result<Core.Array<T>, IError>> Run(
+        IStateMonad stateMonad,
+        CancellationToken cancellationToken)
     {
-        private RepeatStepFactory() { }
+        var element = await Element.Run(stateMonad, cancellationToken);
 
-        /// <summary>
-        /// The instance.
-        /// </summary>
-        public static GenericStepFactory Instance { get; } = new RepeatStepFactory();
+        if (element.IsFailure)
+            return element.ConvertFailure<Core.Array<T>>();
 
-        /// <inheritdoc />
-        public override Type StepType => typeof(Repeat<>);
+        var number = await Number.Run(stateMonad, cancellationToken);
 
-        /// <inheritdoc />
-        public override string OutputTypeExplanation => "ArrayList<T>";
+        if (number.IsFailure)
+            return number.ConvertFailure<Core.Array<T>>();
 
-        /// <inheritdoc />
-        protected override ITypeReference GetOutputTypeReference(ITypeReference memberTypeReference) => new GenericTypeReference(typeof(Core.Array<>), new[] { memberTypeReference });
+        var result = Enumerable.Repeat(element.Value, number.Value).ToSequence();
 
-        /// <inheritdoc />
-        protected override Result<ITypeReference, IError> GetMemberType(FreezableStepData freezableStepData,
-            TypeResolver typeResolver) =>
-            freezableStepData.TryGetStep(nameof(Repeat<object>.Element), StepType)
-                .Bind(x => x.TryGetOutputTypeReference(typeResolver));
+        return result;
     }
+
+    /// <inheritdoc />
+    public override IStepFactory StepFactory => RepeatStepFactory.Instance;
+}
+
+/// <summary>
+/// Creates an array by repeating an element.
+/// </summary>
+public sealed class RepeatStepFactory : GenericStepFactory
+{
+    private RepeatStepFactory() { }
+
+    /// <summary>
+    /// The instance.
+    /// </summary>
+    public static GenericStepFactory Instance { get; } = new RepeatStepFactory();
+
+    /// <inheritdoc />
+    public override Type StepType => typeof(Repeat<>);
+
+    /// <inheritdoc />
+    public override string OutputTypeExplanation => "ArrayList<T>";
+
+    /// <inheritdoc />
+    protected override ITypeReference GetOutputTypeReference(ITypeReference memberTypeReference) =>
+        new GenericTypeReference(typeof(Core.Array<>), new[] { memberTypeReference });
+
+    /// <inheritdoc />
+    protected override Result<ITypeReference, IError> GetMemberType(
+        FreezableStepData freezableStepData,
+        TypeResolver typeResolver) => freezableStepData
+        .TryGetStep(nameof(Repeat<object>.Element), StepType)
+        .Bind(x => x.TryGetOutputTypeReference(typeResolver));
+}
+
 }

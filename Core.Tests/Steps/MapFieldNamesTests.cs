@@ -8,42 +8,45 @@ using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
-    public class MapFieldNamesTests : StepTestBase<EntityMapProperties, Array<Entity>>
+
+public class MapFieldNamesTests : StepTestBase<EntityMapProperties, Array<Entity>>
+{
+    /// <inheritdoc />
+    public MapFieldNamesTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper) { }
+
+    /// <inheritdoc />
+    protected override IEnumerable<StepCase> StepCases
     {
-        /// <inheritdoc />
-        public MapFieldNamesTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
+        get
         {
-        }
-
-        /// <inheritdoc />
-        protected override IEnumerable<StepCase> StepCases
-        {
-            get
-            {
-                yield return new StepCase("Map some fields",
-
-                    new ForEach<Entity>
-                    {
-                        Action = new Print<Entity>
+            yield return new StepCase(
+                "Map some fields",
+                new ForEach<Entity>
+                {
+                    Action = new Print<Entity> { Value = GetVariable<Entity>(VariableName.Entity) },
+                    Array =
+                        new EntityMapProperties
                         {
-                            Value = GetVariable<Entity>(VariableName.Entity)
+                            EntityStream = Array(
+                                CreateEntity(
+                                    ("Food", "Hello"),
+                                    ("Bar", "World")
+                                ),
+                                CreateEntity(
+                                    ("Food", "Hello 2"),
+                                    ("Bar", "World 2")
+                                )
+                            ),
+                            Mappings = Constant(CreateEntity(("Food", "Foo")))
                         },
-                        Array =
-                                    new EntityMapProperties
-                                    {
-                                        EntityStream = Array(
-                                            CreateEntity(("Food", "Hello"),
-                                                ("Bar", "World")),
-                                            CreateEntity(("Food", "Hello 2"),
-                                                ("Bar", "World 2"))),
-
-                                        Mappings =  Constant(CreateEntity(("Food", "Foo")))
-                                    },
-                        Variable = VariableName.Entity
-                    }, Unit.Default , "(Foo: \"Hello\" Bar: \"World\")",
-                    "(Foo: \"Hello 2\" Bar: \"World 2\")"
-                );
-            }
+                    Variable = VariableName.Entity
+                },
+                Unit.Default,
+                "(Foo: \"Hello\" Bar: \"World\")",
+                "(Foo: \"Hello 2\" Bar: \"World 2\")"
+            );
         }
     }
+}
+
 }

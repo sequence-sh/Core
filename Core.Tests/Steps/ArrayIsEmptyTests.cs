@@ -6,65 +6,70 @@ using Reductech.EDR.Core.TestHarness;
 using Xunit.Abstractions;
 using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 
-
 namespace Reductech.EDR.Core.Tests.Steps
 {
-    public class ArrayIsEmptyTests : StepTestBase<ArrayIsEmpty<StringStream>, bool>
+
+public class ArrayIsEmptyTests : StepTestBase<ArrayIsEmpty<StringStream>, bool>
+{
+    /// <inheritdoc />
+    public ArrayIsEmptyTests([NotNull] ITestOutputHelper testOutputHelper) :
+        base(testOutputHelper) { }
+
+    /// <inheritdoc />
+    protected override IEnumerable<DeserializeCase> DeserializeCases
     {
-        /// <inheritdoc />
-        public ArrayIsEmptyTests([NotNull] ITestOutputHelper testOutputHelper) : base(testOutputHelper) {}
-
-        /// <inheritdoc />
-        protected override IEnumerable<DeserializeCase> DeserializeCases
+        get
         {
-            get
-            {
+            yield return new DeserializeCase(
+                "empty array",
+                "ArrayIsEmpty Array: []",
+                true
+            );
 
-                yield return new DeserializeCase("empty array",
-                    "ArrayIsEmpty Array: []",
-                    true
-                );
-
-                yield return new DeserializeCase("two element",
-                    "ArrayIsEmpty Array: ['Hello','World']",
-                    false
-                );
-            }
+            yield return new DeserializeCase(
+                "two element",
+                "ArrayIsEmpty Array: ['Hello','World']",
+                false
+            );
         }
-
-        /// <inheritdoc />
-        protected override IEnumerable<StepCase> StepCases
-        {
-            get
-            {
-                yield return new StepCase("Empty",
-                    new ArrayIsEmpty<StringStream>()
-                    {
-                        Array = new ArrayNew<StringStream>
-                        {
-                            Elements = new List<IStep<StringStream>>
-                            {
-                                Constant("Hello"),
-                                Constant("World"),
-                            }
-                        }
-                    }, false);
-
-                yield return new StepCase("Not Empty",
-                    new ArrayIsEmpty<StringStream>()
-                    {
-                        Array = new ArrayNew<StringStream>
-                        {
-                            Elements = new List<IStep<StringStream>>
-                            {
-                                Constant("Hello"),
-                                Constant("World"),
-                            }
-                        }
-                    }, false);
-            }
-        }
-
-
     }
+
+    /// <inheritdoc />
+    protected override IEnumerable<StepCase> StepCases
+    {
+        get
+        {
+            yield return new StepCase(
+                "Empty",
+                new ArrayIsEmpty<StringStream>()
+                {
+                    Array = new ArrayNew<StringStream>
+                    {
+                        Elements = new List<IStep<StringStream>>
+                        {
+                            Constant("Hello"), Constant("World"),
+                        }
+                    }
+                },
+                false
+            );
+
+            yield return new StepCase(
+                "Not Empty",
+                new ArrayIsEmpty<StringStream>()
+                {
+                    Array = new ArrayNew<StringStream>
+                    {
+                        Elements = new List<IStep<StringStream>>
+                        {
+                            Constant("Hello"), Constant("World"),
+                        }
+                    }
+                },
+                false
+            );
+        }
+    }
+}
+
 }

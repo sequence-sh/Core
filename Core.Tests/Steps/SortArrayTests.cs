@@ -6,46 +6,76 @@ using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
-    public class ArraySort : StepTestBase<ArraySort<int>, Array<int>>
+
+public class ArraySort : StepTestBase<ArraySort<int>, Array<int>>
+{
+    /// <inheritdoc />
+    public ArraySort(ITestOutputHelper testOutputHelper) : base(testOutputHelper) { }
+
+    /// <inheritdoc />
+    protected override IEnumerable<StepCase> StepCases
     {
-        /// <inheritdoc />
-        public ArraySort(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
+        get
         {
-        }
-
-        /// <inheritdoc />
-        protected override IEnumerable<StepCase> StepCases
-        {
-            get
-            {
-                yield return new StepCase("Ascending", new ArraySort<int>()
+            yield return new StepCase(
+                "Ascending",
+                new ArraySort<int>()
                 {
-                    Array = Array(8,6,7,5,3,0,9),
-                    Descending = Constant(false)
-
-                }, new List<int>(){0,3,5,6,7,8,9}.ToSequence() );
-
-                yield return new StepCase("Descending", new ArraySort<int>()
+                    Array = Array(8, 6, 7, 5, 3, 0, 9), Descending = Constant(false)
+                },
+                new List<int>()
                 {
-                    Array = Array(8, 6, 7, 5, 3, 0, 9),
-                    Descending = Constant(true)
+                    0,
+                    3,
+                    5,
+                    6,
+                    7,
+                    8,
+                    9
+                }.ToSequence()
+            );
 
-                }, new List<int>() { 9,8,7,6,5,3,0 }.ToSequence());
-            }
+            yield return new StepCase(
+                "Descending",
+                new ArraySort<int>()
+                {
+                    Array = Array(8, 6, 7, 5, 3, 0, 9), Descending = Constant(true)
+                },
+                new List<int>()
+                {
+                    9,
+                    8,
+                    7,
+                    6,
+                    5,
+                    3,
+                    0
+                }.ToSequence()
+            );
         }
-
-        /// <inheritdoc />
-        protected override IEnumerable<DeserializeCase> DeserializeCases
-        {
-            get
-            {
-                yield return new DeserializeCase("Sort Ascending",
-                    "ArraySort Array: [8,6,7,5,3,0,9]",
-                    new List<int>(){0,3,5,6,7,8,9}.ToSequence());
-
-            }
-
-        }
-
     }
+
+    /// <inheritdoc />
+    protected override IEnumerable<DeserializeCase> DeserializeCases
+    {
+        get
+        {
+            yield return new DeserializeCase(
+                "Sort Ascending",
+                "ArraySort Array: [8,6,7,5,3,0,9]",
+                new List<int>()
+                {
+                    0,
+                    3,
+                    5,
+                    6,
+                    7,
+                    8,
+                    9
+                }.ToSequence()
+            );
+        }
+    }
+}
+
 }

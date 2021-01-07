@@ -9,34 +9,37 @@ using Reductech.EDR.Core.Util;
 
 namespace Reductech.EDR.Core.ExternalProcesses
 {
+
+/// <summary>
+/// Runs external processes.
+/// </summary>
+public interface IExternalProcessRunner
+{
     /// <summary>
-    /// Runs external processes.
+    /// Runs an external step and returns the output and errors
     /// </summary>
-    public interface IExternalProcessRunner
-    {
-        /// <summary>
-        /// Runs an external step and returns the output and errors
-        /// </summary>
-        /// <param name="processPath">The path to the step</param>
-        /// <param name="logger"></param>
-        /// <param name="errorHandler">The error handler.</param>
-        /// <param name="arguments">The arguments to provide to the step. These will all be escaped</param>
-        /// <param name="encoding">The encoding to use for process output streams</param>
-        /// <param name="cancellationToken"></param>
-        /// <returns>The output of the step</returns>
-        Task<Result<Unit, IErrorBuilder>> RunExternalProcess(
-            string processPath,
-            ILogger logger,
-            IErrorHandler errorHandler,
-            IEnumerable<string> arguments,
-            Encoding encoding,
-            CancellationToken cancellationToken);
+    /// <param name="processPath">The path to the step</param>
+    /// <param name="logger"></param>
+    /// <param name="errorHandler">The error handler.</param>
+    /// <param name="arguments">The arguments to provide to the step. These will all be escaped</param>
+    /// <param name="encoding">The encoding to use for process output streams</param>
+    /// <param name="cancellationToken"></param>
+    /// <returns>The output of the step</returns>
+    Task<Result<Unit, IErrorBuilder>> RunExternalProcess(
+        string processPath,
+        ILogger logger,
+        IErrorHandler errorHandler,
+        IEnumerable<string> arguments,
+        Encoding encoding,
+        CancellationToken cancellationToken);
 
-        /// <summary>
-        /// Starts an external process.
-        /// </summary>
-        Result<IExternalProcessReference, IErrorBuilder> StartExternalProcess(string processPath, IEnumerable<string> arguments, Encoding encoding);
-    }
-
+    /// <summary>
+    /// Starts an external process.
+    /// </summary>
+    Result<IExternalProcessReference, IErrorBuilder> StartExternalProcess(
+        string processPath,
+        IEnumerable<string> arguments,
+        Encoding encoding);
+}
 
 }

@@ -4,43 +4,44 @@ using System.Text;
 
 namespace Reductech.EDR.Core.Internal.Serialization
 {
+
+/// <summary>
+/// The default step serializer for functions.
+/// Produces results like: Print Value: 'Hello World'
+/// </summary>
+public sealed class FunctionSerializer : IStepSerializer
+{
     /// <summary>
-    /// The default step serializer for functions.
-    /// Produces results like: Print Value: 'Hello World'
+    /// Creates a new FunctionSerializer
     /// </summary>
-    public sealed class FunctionSerializer : IStepSerializer
+    /// <param name="name"></param>
+    public FunctionSerializer(string name) { Name = name; }
+
+    /// <summary>
+    /// The name of the function.
+    /// </summary>
+    public string Name { get; }
+
+    /// <inheritdoc />
+    public string Serialize(IEnumerable<StepProperty> stepProperties)
     {
-        /// <summary>
-        /// Creates a new FunctionSerializer
-        /// </summary>
-        /// <param name="name"></param>
-        public FunctionSerializer(string name) { Name = name; }
+        var sb = new StringBuilder();
+        sb.Append(Name);
 
-        /// <summary>
-        /// The name of the function.
-        /// </summary>
-        public string Name { get; }
-
-
-        /// <inheritdoc />
-        public string Serialize(IEnumerable<StepProperty> stepProperties)
+        foreach (var stepProperty in stepProperties.OrderBy(x => x.Index))
         {
-            var sb = new StringBuilder();
-            sb.Append(Name);
+            sb.Append(' ');
 
-            foreach (var stepProperty in stepProperties.OrderBy(x => x.Index))
-            {
-                sb.Append(' ');
+            sb.Append(stepProperty.Name);
+            sb.Append(": ");
 
-                sb.Append(stepProperty.Name);
-                sb.Append(": ");
+            var value = stepProperty.Serialize();
 
-                var value = stepProperty.Serialize();
-
-                sb.Append(value );
-            }
-
-            return sb.ToString();
+            sb.Append(value);
         }
+
+        return sb.ToString();
     }
+}
+
 }

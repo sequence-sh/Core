@@ -7,30 +7,31 @@ using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
-    public class UnzipTests : StepTestBase<FileExtract, Unit>
+
+public class UnzipTests : StepTestBase<FileExtract, Unit>
+{
+    /// <inheritdoc />
+    public UnzipTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper) { }
+
+    /// <inheritdoc />
+    protected override IEnumerable<StepCase> StepCases
     {
-        /// <inheritdoc />
-        public UnzipTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
+        get
         {
+            yield return new StepCase(
+                "FileExtract",
+                new FileExtract
+                {
+                    ArchiveFilePath = Constant("Foo"),
+                    Destination     = Constant("Bar"),
+                    Overwrite       = Constant(true)
+                },
+                Unit.Default
+            ).WithFileSystemAction(
+                x => x.Setup(a => a.ExtractToDirectory("Foo", "Bar", true)).Returns(Unit.Default)
+            );
         }
-
-        /// <inheritdoc />
-        protected override IEnumerable<StepCase> StepCases
-        {
-            get
-            {
-                yield return new StepCase("FileExtract",
-                    new FileExtract
-                    {
-                        ArchiveFilePath = Constant("Foo"),
-                        Destination = Constant("Bar"),
-                        Overwrite = Constant(true)
-                    },
-                    Unit.Default
-                ).WithFileSystemAction(x=>x.Setup(a=>a.ExtractToDirectory("Foo", "Bar", true)).Returns(Unit.Default));
-            }
-        }
-
-
     }
+}
+
 }

@@ -8,43 +8,51 @@ using Reductech.EDR.Core.Internal.Errors;
 
 namespace Reductech.EDR.Core.Steps
 {
+
+/// <summary>
+/// Calculates the length of the string.
+/// </summary>
+public sealed class StringLength : CompoundStep<int>
+{
     /// <summary>
-    /// Calculates the length of the string.
+    /// The string to measure the length of.
     /// </summary>
-    public sealed class StringLength : CompoundStep<int>
+    [StepProperty(1)]
+    [Required]
+    public IStep<StringStream> String { get; set; } = null!;
+
+    /// <inheritdoc />
+    protected override async Task<Result<int, IError>> Run(
+        IStateMonad stateMonad,
+        CancellationToken cancellationToken)
     {
-        /// <summary>
-        /// The string to measure the length of.
-        /// </summary>
-        [StepProperty(1)]
-        [Required]
-        public IStep<StringStream> String { get; set; } = null!;
+        var str = await String.Run(stateMonad, cancellationToken)
+            .Map(async x => await x.GetStringAsync());
 
-        /// <inheritdoc />
-        protected override async Task<Result<int, IError>> Run(IStateMonad stateMonad, CancellationToken cancellationToken)
-        {
-            var str = await String.Run(stateMonad, cancellationToken)
-                .Map(async x=> await x.GetStringAsync());;
-            if (str.IsFailure) return str.ConvertFailure<int>();
+        ;
 
-            return str.Value.Length;
-        }
+        if (str.IsFailure)
+            return str.ConvertFailure<int>();
 
-        /// <inheritdoc />
-        public override IStepFactory StepFactory => StringLengthStepFactory.Instance;
+        return str.Value.Length;
     }
 
+    /// <inheritdoc />
+    public override IStepFactory StepFactory => StringLengthStepFactory.Instance;
+}
+
+/// <summary>
+/// Calculates the length of the string.
+/// </summary>
+public sealed class StringLengthStepFactory : SimpleStepFactory<StringLength, int>
+{
+    private StringLengthStepFactory() { }
+
     /// <summary>
-    /// Calculates the length of the string.
+    /// The instance
     /// </summary>
-    public sealed class StringLengthStepFactory : SimpleStepFactory<StringLength, int>
-    {
-        private StringLengthStepFactory() { }
+    public static SimpleStepFactory<StringLength, int> Instance { get; } =
+        new StringLengthStepFactory();
+}
 
-        /// <summary>
-        /// The instance
-        /// </summary>
-        public static SimpleStepFactory<StringLength, int> Instance { get; } = new StringLengthStepFactory();
-
-    }
 }

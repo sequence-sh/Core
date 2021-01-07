@@ -26,12 +26,10 @@
 
 //            streamResult.Value.Stream.Seek(0, SeekOrigin.Begin);
 
-
 //            var encodingResult = await Encoding.Run(stateMonad, cancellationToken);
 
 //            if (encodingResult.IsFailure)
 //                return encodingResult.ConvertFailure<string>();
-
 
 //            using StreamReader reader = new StreamReader(streamResult.Value.Stream, encodingResult.Value.Convert());
 //            var text = await reader.ReadToEndAsync();
@@ -71,3 +69,5 @@
 //        public static SimpleStepFactory<StringFromStream, string> Instance { get; } = new StringFromStreamFactory();
 //    }
 //}
+
+

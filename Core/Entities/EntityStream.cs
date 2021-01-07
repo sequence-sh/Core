@@ -95,7 +95,6 @@
 //            return new EntityStream(newEnumerable);
 //        }
 
-
 //        /// <summary>
 //        /// Transforms the records in this stream
 //        /// </summary>
@@ -144,7 +143,6 @@
 //            return Unit.Default;
 //        }
 
-
 //        private static Maybe<IError> ExtractError(AggregateException aggregateException)
 //        {
 //            var l = new List<IError>();
@@ -174,3 +172,5 @@
 //        }
 //    }
 //}
+
+

@@ -10,10 +10,12 @@ public enum LogSituationCore
     /// Whenever a step is entered.
     /// </summary>
     EnterStep,
+
     /// <summary>
     /// Whenever a step is exited after success.
     /// </summary>
     ExitStepSuccess,
+
     /// <summary>
     /// Whenever a step is existed after failure.
     /// </summary>
@@ -23,18 +25,22 @@ public enum LogSituationCore
     /// When a path is not fully qualified.
     /// </summary>
     QualifyingPath,
+
     /// <summary>
     /// When Path.Combine is given an empty list of paths.
     /// </summary>
     NoPathProvided,
+
     /// <summary>
     /// Directory Deleted
     /// </summary>
     DirectoryDeleted,
+
     /// <summary>
     /// File Deleted
     /// </summary>
     FileDeleted,
+
     /// <summary>
     /// Item to delete did not exist
     /// </summary>
@@ -44,10 +50,11 @@ public enum LogSituationCore
     /// Tried to set a variable that was out of scope
     /// </summary>
     SetVariableOutOfScope,
+
     /// <summary>
     /// Tried to remove a variable that was out of scope
     /// </summary>
     RemoveVariableOutOfScope
-    }
+}
 
 }

@@ -9,44 +9,48 @@ using Reductech.EDR.Core.Util;
 
 namespace Reductech.EDR.Core.Steps
 {
-    /// <summary>
-    /// Returns success if the ValueIf step returns an error and a failure otherwise.
-    /// </summary>
-    public sealed class AssertError : CompoundStep<Unit>
+
+/// <summary>
+/// Returns success if the ValueIf step returns an error and a failure otherwise.
+/// </summary>
+public sealed class AssertError : CompoundStep<Unit>
+{
+    /// <inheritdoc />
+    protected override async Task<Result<Unit, IError>> Run(
+        IStateMonad stateMonad,
+        CancellationToken cancellationToken)
     {
-        /// <inheritdoc />
-        protected override async Task<Result<Unit, IError>> Run(IStateMonad stateMonad,
-            CancellationToken cancellationToken)
-        {
-            var result = await Step.Run(stateMonad, cancellationToken);
+        var result = await Step.Run(stateMonad, cancellationToken);
 
-            if (result.IsFailure)
-                return Unit.Default;
+        if (result.IsFailure)
+            return Unit.Default;
 
-            return new SingleError(new StepErrorLocation(this), ErrorCode.AssertionFailed, Step.Name);
-        }
-
-        /// <inheritdoc />
-        public override IStepFactory StepFactory => AssertErrorStepFactory.Instance;
-
-        /// <summary>
-        /// The step to test.
-        /// </summary>
-        [StepProperty(1)]
-        [Required]
-        public IStep<Unit> Step { get; set; } = null!;
+        return new SingleError(new StepErrorLocation(this), ErrorCode.AssertionFailed, Step.Name);
     }
 
-    /// <summary>
-    /// Returns success if the ValueIf step returns an error and a failure otherwise.
-    /// </summary>
-    public sealed class AssertErrorStepFactory : SimpleStepFactory<AssertError, Unit>
-    {
-        private AssertErrorStepFactory() { }
+    /// <inheritdoc />
+    public override IStepFactory StepFactory => AssertErrorStepFactory.Instance;
 
-        /// <summary>
-        /// The instance.
-        /// </summary>
-        public static SimpleStepFactory<AssertError, Unit> Instance { get; } = new AssertErrorStepFactory();
-    }
+    /// <summary>
+    /// The step to test.
+    /// </summary>
+    [StepProperty(1)]
+    [Required]
+    public IStep<Unit> Step { get; set; } = null!;
+}
+
+/// <summary>
+/// Returns success if the ValueIf step returns an error and a failure otherwise.
+/// </summary>
+public sealed class AssertErrorStepFactory : SimpleStepFactory<AssertError, Unit>
+{
+    private AssertErrorStepFactory() { }
+
+    /// <summary>
+    /// The instance.
+    /// </summary>
+    public static SimpleStepFactory<AssertError, Unit> Instance { get; } =
+        new AssertErrorStepFactory();
+}
+
 }

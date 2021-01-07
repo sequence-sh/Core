@@ -11,342 +11,382 @@ using Reductech.EDR.Core.Util;
 
 namespace Reductech.EDR.Core
 {
+
+/// <summary>
+/// Either a list of an asynchronous list
+/// </summary>
+public sealed class Array<T> : IArray, IEquatable<Array<T>>
+{
     /// <summary>
-    /// Either a list of an asynchronous list
+    /// Create a new Array
     /// </summary>
-    public sealed class Array<T> : IArray, IEquatable<Array<T>>
+    public Array(OneOf<IReadOnlyList<T>, IAsyncEnumerable<T>> option) => Option = option;
+
+    /// <summary>
+    /// The option.
+    /// </summary>
+    public OneOf<IReadOnlyList<T>, IAsyncEnumerable<T>> Option { get; }
+
+    /// <summary>
+    /// Does this list contain any elements
+    /// </summary>
+    public async Task<Result<bool, IError>> AnyAsync(CancellationToken cancellation)
     {
-        /// <summary>
-        /// Create a new Array
-        /// </summary>
-        public Array(OneOf<IReadOnlyList<T>, IAsyncEnumerable<T>> option) => Option = option;
+        if (Option.IsT0)
+            return Option.AsT0.Any();
 
-        /// <summary>
-        /// The option.
-        /// </summary>
-        public OneOf<IReadOnlyList<T>, IAsyncEnumerable<T>> Option { get; }
+        var r = await TryRun(Option.AsT1, (x, c) => x.AnyAsync(c), cancellation);
 
-        /// <summary>
-        /// Does this list contain any elements
-        /// </summary>
-        public async Task<Result<bool, IError>> AnyAsync(CancellationToken cancellation)
+        return r;
+    }
+
+    /// <summary>
+    /// Returns the number of elements in the list
+    /// </summary>
+    public async Task<Result<int, IError>> CountAsync(CancellationToken cancellation)
+    {
+        if (Option.IsT0)
+            return Option.AsT0.Count;
+
+        var r = await TryRun(Option.AsT1, (x, c) => x.CountAsync(c), cancellation);
+
+        return r;
+    }
+
+    /// <summary>
+    /// Change the ordering of the Array
+    /// </summary>
+    public Array<T> Sort(bool descending)
+    {
+        if (Option.IsT0)
         {
-            if (Option.IsT0) return Option.AsT0.Any();
+            IEnumerable<T> enumerable;
 
-            var r = await TryRun(Option.AsT1, (x, c) => x.AnyAsync(c), cancellation);
+            if (descending)
+                enumerable = Option.AsT0.OrderByDescending(x => x);
+            else
+                enumerable = Option.AsT0.OrderBy(x => x);
 
-            return r;
+            return new Array<T>(enumerable.ToList());
         }
 
-        /// <summary>
-        /// Returns the number of elements in the list
-        /// </summary>
-        public async Task<Result<int, IError>> CountAsync(CancellationToken cancellation)
+        IAsyncEnumerable<T> asyncEnumerable;
+
+        if (descending)
+            asyncEnumerable = Option.AsT1.OrderByDescending(x => x);
+        else
+            asyncEnumerable = Option.AsT1.OrderBy(x => x);
+
+        return new Array<T>(OneOf<IReadOnlyList<T>, IAsyncEnumerable<T>>.FromT1(asyncEnumerable));
+    }
+
+    /// <summary>
+    /// Change the ordering of the Array
+    /// </summary>
+    public Array<T> Sort<TKey>(bool descending, Func<T, CancellationToken, ValueTask<TKey>> func)
+    {
+        IAsyncEnumerable<T> asyncEnumerable1 =
+            Option.IsT0 ? Option.AsT0.ToAsyncEnumerable() : Option.AsT1;
+
+        IAsyncEnumerable<T> asyncEnumerable2;
+
+        if (descending)
+            asyncEnumerable2 = asyncEnumerable1.OrderByDescendingAwaitWithCancellation(func);
+        else
+            asyncEnumerable2 = asyncEnumerable1.OrderByAwaitWithCancellation(func);
+
+        return new Array<T>(OneOf<IReadOnlyList<T>, IAsyncEnumerable<T>>.FromT1(asyncEnumerable2));
+    }
+
+    /// <summary>
+    /// Apply a function for each element of the sequence
+    /// </summary>
+    public async Task<Result<Unit, IError>> ForEach(
+        Func<T, CancellationToken, ValueTask<Result<Unit, IError>>> func,
+        CancellationToken cancellation)
+    {
+        var errors = new List<IError>();
+
+        if (Option.IsT0)
         {
-            if (Option.IsT0) return Option.AsT0.Count;
-
-            var r = await TryRun(Option.AsT1, (x, c) => x.CountAsync(c), cancellation);
-
-            return r;
-        }
-
-        /// <summary>
-        /// Change the ordering of the Array
-        /// </summary>
-        public Array<T> Sort(bool descending)
-        {
-            if (Option.IsT0)
+            foreach (var t in Option.AsT0)
             {
-                IEnumerable<T> enumerable;
-                if (descending)
-                    enumerable = Option.AsT0.OrderByDescending(x=>x);
-                else enumerable = Option.AsT0.OrderBy(x=>x);
+                var r = await func(t, cancellation);
 
-                return new Array<T>(enumerable.ToList());
+                if (r.IsFailure)
+                    errors.Add(r.Error);
             }
-
-            IAsyncEnumerable<T> asyncEnumerable;
-            if (descending)
-                asyncEnumerable = Option.AsT1.OrderByDescending(x => x);
-            else asyncEnumerable = Option.AsT1.OrderBy(x => x);
-
-            return new Array<T>(OneOf<IReadOnlyList<T>, IAsyncEnumerable<T>>.FromT1(asyncEnumerable));
         }
-
-        /// <summary>
-        /// Change the ordering of the Array
-        /// </summary>
-        public Array<T> Sort<TKey>(bool descending, Func<T, CancellationToken, ValueTask<TKey>> func)
+        else
         {
-            IAsyncEnumerable<T> asyncEnumerable1 = Option.IsT0 ? Option.AsT0.ToAsyncEnumerable() : Option.AsT1;
-
-            IAsyncEnumerable<T> asyncEnumerable2;
-            if (descending)
-                asyncEnumerable2 = asyncEnumerable1.OrderByDescendingAwaitWithCancellation(func);
-            else asyncEnumerable2 = asyncEnumerable1.OrderByAwaitWithCancellation(func);
-
-            return new Array<T>(OneOf<IReadOnlyList<T>, IAsyncEnumerable<T>>.FromT1(asyncEnumerable2));
-        }
-
-        /// <summary>
-        /// Apply a function for each element of the sequence
-        /// </summary>
-        public async Task<Result<Unit, IError>> ForEach(Func<T, CancellationToken, ValueTask<Result<Unit, IError>>> func, CancellationToken cancellation)
-        {
-            var errors = new List<IError>();
-            if(Option.IsT0)
+            try
             {
-                foreach (var t in Option.AsT0)
+                await foreach (var t in Option.AsT1.WithCancellation(cancellation))
                 {
                     var r = await func(t, cancellation);
-                    if (r.IsFailure) errors.Add(r.Error);
+
+                    if (r.IsFailure)
+                        errors.Add(r.Error);
                 }
-            }
-            else
-            {
-                try
-                {
-                    await foreach (var t in Option.AsT1.WithCancellation(cancellation))
-                    {
-                        var r = await func(t, cancellation);
-                        if(r.IsFailure)errors.Add(r.Error);
-                    }
-                }
-                catch (ErrorException e)
-                {
-                    errors.Add(e.Error);
-                }
-            }
-            if(errors.Any())
-                return Result.Failure<Unit, IError>(ErrorList.Combine(errors));
-
-            return Unit.Default;
-        }
-        /// <summary>
-        /// Returns some number of elements
-        /// </summary>
-        public Array<TResult> SelectMany<TResult>(Func<T, IAsyncEnumerable<TResult>> selector)
-        {
-            IAsyncEnumerable<T> asyncEnumerable = Option.IsT0 ? Option.AsT0.ToAsyncEnumerable() : Option.AsT1;
-
-
-            var r = asyncEnumerable.SelectMany(selector).ToSequence();
-
-            return r;
-        }
-
-        /// <summary>
-        /// Perform an action on every member of the sequence
-        /// </summary>
-        public Array<TResult> SelectAwait<TResult>(Func<T, ValueTask<TResult>> selector)
-        {
-            IAsyncEnumerable<T> asyncEnumerable =
-                Option.IsT0 ? Option.AsT0.ToAsyncEnumerable() : Option.AsT1;
-
-            var r = asyncEnumerable.SelectAwait(selector).ToSequence();
-
-            return r;
-        }
-
-        /// <summary>
-        /// Perform an action on every member of the sequence
-        /// </summary>
-        public Array<TResult> Select<TResult>(Func<T, TResult> selector)
-        {
-            IAsyncEnumerable<T> asyncEnumerable =
-                Option.IsT0 ? Option.AsT0.ToAsyncEnumerable() : Option.AsT1;
-
-            var r = asyncEnumerable.Select(selector).ToSequence();
-
-            return r;
-        }
-
-        /// <summary>
-        /// Get the first index of an element
-        /// </summary>
-        public async Task<Result<int, IError>> IndexOfAsync(T element, CancellationToken cancellation)
-        {
-            if (Option.IsT0)
-            {
-                var index = Option.AsT0.ToList().IndexOf(element);
-
-                return index;
-            }
-
-            var list = await TryRun(Option.AsT1, (x, c) => x.ToListAsync(c), cancellation)
-                .Map(x=>x.IndexOf(element));
-
-            return list;
-        }
-
-        /// <summary>
-        /// Try to get the element at a particular index
-        /// </summary>
-        public async Task<Result<T, IError>> ElementAtAsync(int index,
-            IErrorLocation location,
-            CancellationToken cancellation)
-        {
-            if(index < 0)
-                return new SingleError(location, ErrorCode.IndexOutOfBounds);
-
-            if (Option.TryPickT0(out var list, out var asyncList))
-            {
-                if (index >= list.Count)
-                    return new SingleError(location, ErrorCode.IndexOutOfBounds);
-
-                return Option.AsT0[index];
-            }
-
-            try
-            {
-                var r = await TryRun(
-                    asyncList,
-                    (x, c) => x.ElementAtAsync(index, c),
-                    cancellation
-                );
-
-                return r;
-            }
-            catch (IndexOutOfRangeException)
-            {
-                return new SingleError(location, ErrorCode.IndexOutOfBounds);
-            }
-        }
-
-        /// <summary>
-        /// Gets the elements from the list asynchronously
-        /// </summary>
-        public async Task<Result<IReadOnlyList<T>, IError>> GetElementsAsync(CancellationToken cancellation)
-        {
-            if (Option.IsT0)
-                return Result.Success<IReadOnlyList<T>, IError>(Option.AsT0);
-
-            var r = await TryRun<List<T>>(Option.AsT1, (x, c) => x.ToListAsync(c), cancellation);
-
-            if (r.IsFailure) return r.ConvertFailure<IReadOnlyList<T>>();
-
-            return r.Value;
-        }
-
-        /// <summary>
-        /// Gets the elements from the list
-        /// </summary>
-        public Result<IReadOnlyList<T>, IError> GetElements()
-        {
-            if (Option.IsT0)
-                return Result.Success<IReadOnlyList<T>, IError>(Option.AsT0);
-
-            var r = TryRun<List<T>>(Option.AsT1, (x, c) => x.ToListAsync(c), CancellationToken.None).Result;
-
-            if (r.IsFailure) return r.ConvertFailure<IReadOnlyList<T>>();
-
-            return r.Value;
-        }
-
-        private static async Task<Result<TResult, IError>> TryRun<TResult>(
-            IAsyncEnumerable<T> asyncEnumerable, Func<IAsyncEnumerable<T>, CancellationToken, ValueTask<TResult>> func, CancellationToken cancellation)
-        {
-            try
-            {
-                var r = await func(asyncEnumerable, cancellation);
-
-                return r;
             }
             catch (ErrorException e)
             {
-                return Result.Failure<TResult, IError>(e.Error);
+                errors.Add(e.Error);
             }
         }
 
-        /// <inheritdoc />
-        public Result<List<object>, IError> GetObjects() => GetElements().Map(x => x.Cast<object>().ToList());
+        if (errors.Any())
+            return Result.Failure<Unit, IError>(ErrorList.Combine(errors));
 
-        /// <inheritdoc />
-        public Task<Result<List<object>, IError>> GetObjectsAsync(CancellationToken cancellation)
+        return Unit.Default;
+    }
+
+    /// <summary>
+    /// Returns some number of elements
+    /// </summary>
+    public Array<TResult> SelectMany<TResult>(Func<T, IAsyncEnumerable<TResult>> selector)
+    {
+        IAsyncEnumerable<T> asyncEnumerable =
+            Option.IsT0 ? Option.AsT0.ToAsyncEnumerable() : Option.AsT1;
+
+        var r = asyncEnumerable.SelectMany(selector).ToSequence();
+
+        return r;
+    }
+
+    /// <summary>
+    /// Perform an action on every member of the sequence
+    /// </summary>
+    public Array<TResult> SelectAwait<TResult>(Func<T, ValueTask<TResult>> selector)
+    {
+        IAsyncEnumerable<T> asyncEnumerable =
+            Option.IsT0 ? Option.AsT0.ToAsyncEnumerable() : Option.AsT1;
+
+        var r = asyncEnumerable.SelectAwait(selector).ToSequence();
+
+        return r;
+    }
+
+    /// <summary>
+    /// Perform an action on every member of the sequence
+    /// </summary>
+    public Array<TResult> Select<TResult>(Func<T, TResult> selector)
+    {
+        IAsyncEnumerable<T> asyncEnumerable =
+            Option.IsT0 ? Option.AsT0.ToAsyncEnumerable() : Option.AsT1;
+
+        var r = asyncEnumerable.Select(selector).ToSequence();
+
+        return r;
+    }
+
+    /// <summary>
+    /// Get the first index of an element
+    /// </summary>
+    public async Task<Result<int, IError>> IndexOfAsync(T element, CancellationToken cancellation)
+    {
+        if (Option.IsT0)
         {
-            return GetElementsAsync(cancellation).Map(x => x.Cast<object>().ToList());
+            var index = Option.AsT0.ToList().IndexOf(element);
+
+            return index;
         }
 
-        /// <inheritdoc />
-        public string NameInLogs => Option.Match(x=> x.Count + " Elements", _=> "Stream");
+        var list = await TryRun(Option.AsT1, (x, c) => x.ToListAsync(c), cancellation)
+            .Map(x => x.IndexOf(element));
 
-        /// <inheritdoc />
-        public bool Equals(Array<T>? other)
+        return list;
+    }
+
+    /// <summary>
+    /// Try to get the element at a particular index
+    /// </summary>
+    public async Task<Result<T, IError>> ElementAtAsync(
+        int index,
+        IErrorLocation location,
+        CancellationToken cancellation)
+    {
+        if (index < 0)
+            return new SingleError(location, ErrorCode.IndexOutOfBounds);
+
+        if (Option.TryPickT0(out var list, out var asyncList))
         {
-            if (other is null)
-                return false;
-            if (ReferenceEquals(this, other)) return true;
+            if (index >= list.Count)
+                return new SingleError(location, ErrorCode.IndexOutOfBounds);
 
-            var l1 = GetElements();
-            var l2 = other.GetElements();
-
-            if (l1.IsFailure && l2.IsFailure)
-                return l1.Error.Equals(l2.Error);
-            if (l1.IsFailure || l2.IsFailure)
-                return false;
-
-            return l1.Value.SequenceEqual(l2.Value);
-
+            return Option.AsT0[index];
         }
 
-        /// <inheritdoc />
-        public override int GetHashCode()
+        try
         {
-            var e = GetElements();
+            var r = await TryRun(
+                asyncList,
+                (x, c) => x.ElementAtAsync(index, c),
+                cancellation
+            );
 
-            if (e.IsFailure) return e.Error.GetHashCode();
-            if (e.Value.Count == 0) return 0;
-
-            return HashCode.Combine(e.Value[0], e.Value.Count);
+            return r;
         }
-
-        /// <inheritdoc />
-        public override bool Equals(object? obj)
+        catch (IndexOutOfRangeException)
         {
-            if (obj is null) return false;
-            if (ReferenceEquals(this, obj)) return true;
+            return new SingleError(location, ErrorCode.IndexOutOfBounds);
+        }
+    }
 
-            if (obj is Array<T> al) return Equals(al);
+    /// <summary>
+    /// Gets the elements from the list asynchronously
+    /// </summary>
+    public async Task<Result<IReadOnlyList<T>, IError>> GetElementsAsync(
+        CancellationToken cancellation)
+    {
+        if (Option.IsT0)
+            return Result.Success<IReadOnlyList<T>, IError>(Option.AsT0);
+
+        var r = await TryRun<List<T>>(Option.AsT1, (x, c) => x.ToListAsync(c), cancellation);
+
+        if (r.IsFailure)
+            return r.ConvertFailure<IReadOnlyList<T>>();
+
+        return r.Value;
+    }
+
+    /// <summary>
+    /// Gets the elements from the list
+    /// </summary>
+    public Result<IReadOnlyList<T>, IError> GetElements()
+    {
+        if (Option.IsT0)
+            return Result.Success<IReadOnlyList<T>, IError>(Option.AsT0);
+
+        var r = TryRun<List<T>>(Option.AsT1, (x, c) => x.ToListAsync(c), CancellationToken.None)
+            .Result;
+
+        if (r.IsFailure)
+            return r.ConvertFailure<IReadOnlyList<T>>();
+
+        return r.Value;
+    }
+
+    private static async Task<Result<TResult, IError>> TryRun<TResult>(
+        IAsyncEnumerable<T> asyncEnumerable,
+        Func<IAsyncEnumerable<T>, CancellationToken, ValueTask<TResult>> func,
+        CancellationToken cancellation)
+    {
+        try
+        {
+            var r = await func(asyncEnumerable, cancellation);
+
+            return r;
+        }
+        catch (ErrorException e)
+        {
+            return Result.Failure<TResult, IError>(e.Error);
+        }
+    }
+
+    /// <inheritdoc />
+    public Result<List<object>, IError> GetObjects() =>
+        GetElements().Map(x => x.Cast<object>().ToList());
+
+    /// <inheritdoc />
+    public Task<Result<List<object>, IError>> GetObjectsAsync(CancellationToken cancellation)
+    {
+        return GetElementsAsync(cancellation).Map(x => x.Cast<object>().ToList());
+    }
+
+    /// <inheritdoc />
+    public string NameInLogs => Option.Match(x => x.Count + " Elements", _ => "Stream");
+
+    /// <inheritdoc />
+    public bool Equals(Array<T>? other)
+    {
+        if (other is null)
             return false;
-        }
+
+        if (ReferenceEquals(this, other))
+            return true;
+
+        var l1 = GetElements();
+        var l2 = other.GetElements();
+
+        if (l1.IsFailure && l2.IsFailure)
+            return l1.Error.Equals(l2.Error);
+
+        if (l1.IsFailure || l2.IsFailure)
+            return false;
+
+        return l1.Value.SequenceEqual(l2.Value);
     }
+
+    /// <inheritdoc />
+    public override int GetHashCode()
+    {
+        var e = GetElements();
+
+        if (e.IsFailure)
+            return e.Error.GetHashCode();
+
+        if (e.Value.Count == 0)
+            return 0;
+
+        return HashCode.Combine(e.Value[0], e.Value.Count);
+    }
+
+    /// <inheritdoc />
+    public override bool Equals(object? obj)
+    {
+        if (obj is null)
+            return false;
+
+        if (ReferenceEquals(this, obj))
+            return true;
+
+        if (obj is Array<T> al)
+            return Equals(al);
+
+        return false;
+    }
+}
+
+/// <summary>
+/// Either a list of an asynchronous list
+/// </summary>
+public interface IArray
+{
+    /// <summary>
+    /// Try to get the elements of this list, as objects.
+    /// </summary>
+    Result<List<object>, IError> GetObjects();
 
     /// <summary>
-    /// Either a list of an asynchronous list
+    /// Try to get the elements of this list, as objects asynchronously.
     /// </summary>
-    public interface IArray
-    {
-        /// <summary>
-        /// Try to get the elements of this list, as objects.
-        /// </summary>
-        Result<List<object>, IError> GetObjects();
-
-        /// <summary>
-        /// Try to get the elements of this list, as objects asynchronously.
-        /// </summary>
-        Task<Result<List<object>, IError>> GetObjectsAsync(CancellationToken cancellation);
-
-        /// <summary>
-        /// How this Array will appear in the logs.
-        /// </summary>
-        public string NameInLogs { get; }
-    }
+    Task<Result<List<object>, IError>> GetObjectsAsync(CancellationToken cancellation);
 
     /// <summary>
-    /// Provides extension methods for converting Enumerables to Sequences
+    /// How this Array will appear in the logs.
     /// </summary>
-    public static class ArrayHelper
-    {
-        /// <summary>
-        /// Converts an enumerable to a Sequence
-        /// </summary>
-        public static Array<T> ToSequence<T>(this IAsyncEnumerable<T> enumerable) =>
-            new(OneOf<IReadOnlyList<T>, IAsyncEnumerable<T>>.FromT1(enumerable));
+    public string NameInLogs { get; }
+}
 
-        /// <summary>
-        /// Converts an asyncEnumerable to a Sequence
-        /// </summary>
-        public static Array<T> ToSequence<T>(this IEnumerable<T> enumerable) =>
-            new(OneOf<IReadOnlyList<T>, IAsyncEnumerable<T>>.FromT0(enumerable.ToList()));
-    }
+/// <summary>
+/// Provides extension methods for converting Enumerables to Sequences
+/// </summary>
+public static class ArrayHelper
+{
+    /// <summary>
+    /// Converts an enumerable to a Sequence
+    /// </summary>
+    public static Array<T> ToSequence<T>(this IAsyncEnumerable<T> enumerable) => new(
+        OneOf<IReadOnlyList<T>, IAsyncEnumerable<T>>.FromT1(enumerable)
+    );
+
+    /// <summary>
+    /// Converts an asyncEnumerable to a Sequence
+    /// </summary>
+    public static Array<T> ToSequence<T>(this IEnumerable<T> enumerable) => new(
+        OneOf<IReadOnlyList<T>, IAsyncEnumerable<T>>.FromT0(enumerable.ToList())
+    );
+}
+
 }

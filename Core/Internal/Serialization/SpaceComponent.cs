@@ -3,19 +3,22 @@ using CSharpFunctionalExtensions;
 
 namespace Reductech.EDR.Core.Internal.Serialization
 {
+
+/// <summary>
+/// Include a required space in serialization.
+/// </summary>
+public class SpaceComponent : ISerializerBlock
+{
+    private SpaceComponent() { }
+
     /// <summary>
-    /// Include a required space in serialization.
+    /// The instance
     /// </summary>
-    public class SpaceComponent :ISerializerBlock
-    {
-        private SpaceComponent() { }
+    public static SpaceComponent Instance { get; } = new SpaceComponent();
 
-        /// <summary>
-        /// The instance
-        /// </summary>
-        public static SpaceComponent Instance { get; } = new SpaceComponent();
+    /// <inheritdoc />
+    public Result<string> TryGetSegmentText(IReadOnlyDictionary<string, StepProperty> dictionary) =>
+        " ";
+}
 
-        /// <inheritdoc />
-        public Result<string> TryGetSegmentText(IReadOnlyDictionary<string, StepProperty> dictionary) => " ";
-    }
 }

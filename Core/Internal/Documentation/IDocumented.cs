@@ -2,40 +2,41 @@
 
 namespace Reductech.EDR.Core.Internal.Documentation
 {
+
+/// <summary>
+/// Something that will be shown in the documentation
+/// </summary>
+public interface IDocumented
+{
     /// <summary>
-    /// Something that will be shown in the documentation
+    /// What category this item will belong in.
     /// </summary>
-    public interface IDocumented
-    {
-        /// <summary>
-        /// What category this item will belong in.
-        /// </summary>
-        string DocumentationCategory { get; }
+    string DocumentationCategory { get; }
 
+    /// <summary>
+    /// The name of the method.
+    /// </summary>
+    string Name { get; }
 
-        /// <summary>
-        /// The name of the method.
-        /// </summary>
-        string Name { get; }
+    /// <summary>
+    /// A summary of what the method does.
+    /// </summary>
+    string Summary { get; }
 
-        /// <summary>
-        /// A summary of what the method does.
-        /// </summary>
-        string Summary { get; }
+    /// <summary>
+    /// Information about the return type
+    /// </summary>
+    string? TypeDetails { get; }
 
-        /// <summary>
-        /// Information about the return type
-        /// </summary>
-        string? TypeDetails { get; }
+    /// <summary>
+    /// Requirements for using this method.
+    /// </summary>
+    IEnumerable<string> Requirements { get; }
 
-        /// <summary>
-        /// Requirements for using this method.
-        /// </summary>
-        IEnumerable<string> Requirements { get; }
+    /// <summary>
+    /// The parameters to the method.
+    /// </summary>
+    IEnumerable<IParameter> Parameters { get; }
+}
 
-        /// <summary>
-        /// The parameters to the method.
-        /// </summary>
-        IEnumerable<IParameter> Parameters { get; }
-    }
 }

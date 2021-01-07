@@ -26,7 +26,6 @@
 //            if (textResult.IsFailure)
 //                return textResult.ConvertFailure<StringStream>();
 
-
 //            var encodingResult = await Encoding.Run(stateMonad, cancellationToken);
 
 //            if (encodingResult.IsFailure)
@@ -69,3 +68,5 @@
 //        public static SimpleStepFactory<StringToStream, StringStream> Instance { get; } = new StringToStreamStepFactory();
 //    }
 //}
+
+

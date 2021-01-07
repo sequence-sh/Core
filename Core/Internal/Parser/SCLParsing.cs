@@ -10,430 +10,551 @@ using CSharpFunctionalExtensions;
 using OneOf;
 using Reductech.EDR.Core.Internal.Errors;
 using static Reductech.EDR.Core.Internal.FreezableFactory;
-using StepParameterDict = System.Collections.Generic.Dictionary<Reductech.EDR.Core.Internal.StepParameterReference, Reductech.EDR.Core.Internal.FreezableStepProperty>;
+using StepParameterDict =
+    System.Collections.Generic.Dictionary<Reductech.EDR.Core.Internal.StepParameterReference,
+        Reductech.EDR.Core.Internal.FreezableStepProperty>;
 
 namespace Reductech.EDR.Core.Internal.Parser
 {
+
+/// <summary>
+/// Contains methods for parsing sequences
+/// </summary>
+public static class SCLParsing
+{
     /// <summary>
-    /// Contains methods for parsing sequences
+    /// Deserialize this SCL into a step.
     /// </summary>
-    public static class SCLParsing
+    public static Result<IFreezableStep, IError> ParseSequence(string text)
+    {
+        if (string.IsNullOrWhiteSpace(text))
+            return new SingleError(EntireSequenceLocation.Instance, ErrorCode.EmptySequence);
+
+        var r = TryParse(text).Map(x => x.ConvertToStep());
+
+        return r;
+    }
+
+    /// <summary>
+    /// Try to parse this SCL text
+    /// </summary>
+    public static Result<FreezableStepProperty, IError> TryParse(string text)
+    {
+        var inputStream       = new AntlrInputStream(text);
+        var lexer             = new SCLLexer(inputStream);
+        var commonTokenStream = new CommonTokenStream(lexer);
+        var parser            = new SCLParser(commonTokenStream);
+
+        var syntaxErrorListener = new SyntaxErrorListener();
+        parser.AddErrorListener(syntaxErrorListener);
+
+        var visitor = new Visitor();
+
+        var result = visitor.Visit(parser.fullSequence());
+
+        if (syntaxErrorListener.Errors.Any())
+        {
+            return Result.Failure<FreezableStepProperty, IError>(
+                ErrorList.Combine(syntaxErrorListener.Errors)
+            );
+        }
+
+        return result;
+    }
+
+    /// <summary>
+    /// Error listener that looks for syntax errors
+    /// </summary>
+    public class SyntaxErrorListener : BaseErrorListener
     {
         /// <summary>
-        /// Deserialize this SCL into a step.
+        /// Errors found by this error listener.
         /// </summary>
-        public static Result<IFreezableStep, IError> ParseSequence(string text)
+        public readonly List<IError> Errors = new List<IError>();
+
+        /// <inheritdoc />
+        public override void SyntaxError(
+            TextWriter output,
+            IRecognizer recognizer,
+            IToken offendingSymbol,
+            int line,
+            int charPositionInLine,
+            string msg,
+            RecognitionException e)
         {
-            if (string.IsNullOrWhiteSpace(text))
-                return new SingleError(EntireSequenceLocation.Instance, ErrorCode.EmptySequence);
+            var error = new SingleError(
+                new TextLocation(offendingSymbol),
+                ErrorCode.SCLSyntaxError,
+                msg
+            );
 
-            var r = TryParse(text).Map(x=> x.ConvertToStep());
+            Errors.Add(error);
+        }
+    }
 
+    private class Visitor : SCLBaseVisitor<Result<FreezableStepProperty, IError>>
+    {
+        /// <inheritdoc />
+        public override Result<FreezableStepProperty, IError> VisitFullSequence(
+            SCLParser.FullSequenceContext context)
+        {
+            if (context.step() != null)
+                return Visit(context.step());
+
+            if (context.stepSequence() != null)
+                return VisitStepSequence(context.stepSequence());
+
+            return ParseError(context);
+        }
+
+        /// <inheritdoc />
+        public override Result<FreezableStepProperty, IError> VisitStepSequence(
+            SCLParser.StepSequenceContext context)
+        {
+            var results = new List<Result<IFreezableStep, IError>>();
+
+            foreach (var stepContext in context.step())
+            {
+                results.Add(Visit(stepContext).Map(x => x.ConvertToStep()));
+            }
+
+            var result = results.Combine(ErrorList.Combine).Map(x => x.ToList());
+
+            if (result.IsFailure)
+                return result.ConvertFailure<FreezableStepProperty>();
+
+            if (result.Value.Count == 0)
+                return new SingleError(new TextLocation(context), ErrorCode.EmptySequence);
+
+            var sequence = CreateFreezableSequence(
+                result.Value.SkipLast(1).ToList(),
+                result.Value.Last(),
+                null,
+                new TextLocation(context)
+            );
+
+            return new FreezableStepProperty(sequence, new TextLocation(context));
+        }
+
+        /// <inheritdoc />
+        public override Result<FreezableStepProperty, IError> VisitArray(
+            SCLParser.ArrayContext context)
+        {
+            var members =
+                context.term().Select(VisitTerm);
+
+            var r = Aggregate(new TextLocation(context), members);
             return r;
         }
 
-        /// <summary>
-        /// Try to parse this SCL text
-        /// </summary>
-        public static Result<FreezableStepProperty, IError> TryParse(string text)
+        /// <inheritdoc />
+        public override Result<FreezableStepProperty, IError> VisitBoolean(
+            SCLParser.BooleanContext context)
         {
-            var inputStream = new AntlrInputStream(text);
-            var lexer = new SCLLexer(inputStream);
-            var commonTokenStream = new CommonTokenStream(lexer);
-            var parser = new SCLParser(commonTokenStream);
+            var b = context.TRUE() != null;
 
-            var syntaxErrorListener = new SyntaxErrorListener();
-            parser.AddErrorListener(syntaxErrorListener);
+            var member = new FreezableStepProperty(
+                new BoolConstantFreezable(b),
+                new TextLocation(context)
+            );
 
-            var visitor = new Visitor();
+            return member;
+        }
 
-            var result = visitor.Visit(parser.fullSequence());
-
-            if (syntaxErrorListener.Errors.Any())
+        /// <inheritdoc />
+        public override Result<FreezableStepProperty, IError> VisitDateTime(
+            SCLParser.DateTimeContext context)
+        {
+            if (!DateTime.TryParse(context.GetText(), out var dateTime))
             {
+                var message = context.GetText();
 
-                return Result.Failure<FreezableStepProperty, IError>(ErrorList.Combine(syntaxErrorListener.Errors));
+                return new SingleError(
+                    new TextLocation(context),
+                    ErrorCode.CouldNotParse,
+                    message,
+                    nameof(DateTime)
+                );
             }
+
+            var constant = new DateTimeConstantFreezable(dateTime);
+
+            var member = new FreezableStepProperty(constant, new TextLocation(context));
+            return member;
+        }
+
+        /// <inheritdoc />
+        public override Result<FreezableStepProperty, IError> VisitBracketedStep(
+            SCLParser.BracketedStepContext context) => Visit(context.step());
+
+        /// <inheritdoc />
+        public override Result<FreezableStepProperty, IError> VisitInfixOperation(
+            SCLParser.InfixOperationContext context)
+        {
+            var left           = VisitTerm(context.term(0));
+            var right          = VisitTerm(context.term(1));
+            var operatorSymbol = context.infixOperator().GetText();
+
+            var result = InfixHelper.TryCreateStep(
+                new TextLocation(context),
+                left,
+                right,
+                operatorSymbol
+            );
 
             return result;
         }
 
-        /// <summary>
-        /// Error listener that looks for syntax errors
-        /// </summary>
-        public class SyntaxErrorListener : BaseErrorListener
-        {
-            /// <summary>
-            /// Errors found by this error listener.
-            /// </summary>
-            public readonly List<IError> Errors = new List<IError>();
+        /// <inheritdoc />
+        public override Result<FreezableStepProperty, IError> VisitErrorNode(IErrorNode node) =>
+            new SingleError(
+                new TextLocation(node.Symbol),
+                ErrorCode.SCLSyntaxError,
+                node.GetText()
+            );
 
-            /// <inheritdoc />
-            public override void SyntaxError(TextWriter output, IRecognizer recognizer, IToken offendingSymbol, int line, int charPositionInLine,
-                string msg, RecognitionException e)
+        private static SingleError ParseError(ParserRuleContext pt)
+        {
+            return new SingleError(new TextLocation(pt), ErrorCode.SCLSyntaxError, pt.GetText());
+        }
+
+        /// <inheritdoc />
+        public override Result<FreezableStepProperty, IError> VisitSetVariable(
+            SCLParser.SetVariableContext context)
+        {
+            var member = Visit(context.step());
+
+            if (member.IsFailure)
+                return member;
+
+            var vn = GetVariableName(context.VARIABLENAME());
+
+            var step = CreateFreezableSetVariable(vn, member.Value, new TextLocation(context));
+
+            return new FreezableStepProperty(step, new TextLocation(context));
+        }
+
+        /// <inheritdoc />
+        public override Result<FreezableStepProperty, IError> VisitGetVariable(
+            SCLParser.GetVariableContext context)
+        {
+            var vn = GetVariableName(context.VARIABLENAME());
+            return vn;
+        }
+
+        /// <inheritdoc />
+        public override Result<FreezableStepProperty, IError> VisitEnumeration(
+            SCLParser.EnumerationContext context)
+        {
+            if (context.children.Count != 3 || context.NAME().Length != 2)
+                return ParseError(context);
+
+            var prefix = context.NAME(0).GetText();
+            var suffix = context.NAME(1).GetText();
+
+            var member = new FreezableStepProperty(
+                new EnumConstantFreezable(new Enumeration(prefix, suffix)),
+                new TextLocation(context)
+            );
+
+            return member;
+        }
+
+        /// <inheritdoc />
+        public override Result<FreezableStepProperty, IError> VisitNumber(
+            SCLParser.NumberContext context)
+        {
+            if (int.TryParse(context.NUMBER().GetText(), out var num))
             {
-                var error = new SingleError(new TextLocation(offendingSymbol), ErrorCode.SCLSyntaxError, msg);
-                Errors.Add(error);
+                var member = new FreezableStepProperty(
+                    new IntConstantFreezable(num),
+                    new TextLocation(context)
+                );
+
+                return member;
+            }
+
+            return new SingleError(
+                new TextLocation(context),
+                ErrorCode.CouldNotParse,
+                context.GetText(),
+                "Number"
+            );
+        }
+
+        /// <inheritdoc />
+        public override Result<FreezableStepProperty, IError> VisitQuotedString(
+            SCLParser.QuotedStringContext context)
+        {
+            string s = context.DOUBLEQUOTEDSTRING() != null
+                ? UnescapeDoubleQuoted(context.DOUBLEQUOTEDSTRING().GetText())
+                : UnescapeSingleQuoted(context.SINGLEQUOTEDSTRING().GetText());
+
+            var stringStream = new StringStream(s);
+
+            var member = new FreezableStepProperty(
+                new StringConstantFreezable(stringStream),
+                new TextLocation(context)
+            );
+
+            return member;
+
+            static string UnescapeDoubleQuoted(string txt)
+            {
+                txt = txt[1..^1]; //Remove quotes
+
+                if (string.IsNullOrEmpty(txt)) { return txt; }
+
+                var sb = new StringBuilder(txt.Length);
+
+                for (var ix = 0; ix < txt.Length;)
+                {
+                    var jx = txt.IndexOf('\\', ix);
+
+                    if (jx < 0 || jx == txt.Length - 1)
+                        jx = txt.Length;
+
+                    sb.Append(txt, ix, jx - ix);
+
+                    if (jx >= txt.Length)
+                        break;
+
+                    switch (txt[jx + 1])
+                    {
+                        case '"':
+                            sb.Append('"');
+                            break; //double quote
+                        case 'n':
+                            sb.Append('\n');
+                            break; // Line feed
+                        case 'r':
+                            sb.Append('\r');
+                            break; // Carriage return
+                        case 't':
+                            sb.Append('\t');
+                            break; // Tab
+                        case '\\':
+                            sb.Append('\\');
+                            break; // Don't escape
+                        default:   // Unrecognized, copy as-is
+                            sb.Append('\\').Append(txt[jx + 1]);
+                            break;
+                    }
+
+                    ix = jx + 2;
+                }
+
+                return sb.ToString();
+            }
+
+            static string UnescapeSingleQuoted(string s)
+            {
+                s = s[1..^1]; //Remove quotes
+
+                s = s
+                    .Replace("''", "'");
+
+                return s;
             }
         }
 
-        private class Visitor : SCLBaseVisitor<Result<FreezableStepProperty, IError>>
+        /// <inheritdoc />
+        public override Result<FreezableStepProperty, IError> VisitPipeFunction(
+            SCLParser.PipeFunctionContext context)
         {
-            /// <inheritdoc />
-            public override Result<FreezableStepProperty, IError> VisitFullSequence(SCLParser.FullSequenceContext context)
+            var name = context.NAME().Symbol.Text;
+
+            var errors = new List<IError>();
+            var dict   = new StepParameterDict();
+
+            var firstStep = Visit(context.step());
+
+            if (firstStep.IsFailure)
+                errors.Add(firstStep.Error);
+            else
+                dict.Add(new StepParameterReference(1), firstStep.Value);
+
+            var numberedArguments = context.term()
+                .Select(
+                    (term, i) =>
+                        (term: VisitTerm(term), number: OneOf<string, int>.FromT1(i + 2))
+                );
+
+            foreach (var (term, number) in numberedArguments)
             {
-                if (context.step() != null)
-                    return Visit(context.step());
-
-                if(context.stepSequence() != null)
-                    return VisitStepSequence(context.stepSequence());
-
-                return ParseError(context);
-            }
-
-
-            /// <inheritdoc />
-            public override Result<FreezableStepProperty, IError> VisitStepSequence(SCLParser.StepSequenceContext context)
-            {
-                var results = new List<Result<IFreezableStep, IError>>();
-
-                foreach (var stepContext in context.step())
-                {
-                    results.Add(Visit(stepContext).Map(x => x.ConvertToStep()));
-                }
-
-                var result = results.Combine(ErrorList.Combine).Map(x=>x.ToList());
-
-                if (result.IsFailure) return result.ConvertFailure<FreezableStepProperty>();
-
-
-                if (result.Value.Count == 0)
-                    return new SingleError(new TextLocation(context), ErrorCode.EmptySequence);
-
-                var sequence = CreateFreezableSequence(
-                    result.Value.SkipLast(1).ToList(),
-                    result.Value.Last(),
-                    null, new TextLocation(context));
-
-                return new FreezableStepProperty(sequence, new TextLocation(context));
-            }
-
-
-            /// <inheritdoc />
-            public override Result<FreezableStepProperty, IError> VisitArray(SCLParser.ArrayContext context)
-            {
-                var members =
-                    context.term().Select(VisitTerm);
-
-                var r = Aggregate(new TextLocation(context),members);
-                return r;
-            }
-
-            /// <inheritdoc />
-            public override Result<FreezableStepProperty, IError> VisitBoolean(SCLParser.BooleanContext context)
-            {
-                var b = context.TRUE() != null;
-
-                var member = new FreezableStepProperty(new BoolConstantFreezable(b), new TextLocation(context));
-                return member;
-            }
-
-            /// <inheritdoc />
-            public override Result<FreezableStepProperty, IError> VisitDateTime(SCLParser.DateTimeContext context)
-            {
-                if (!DateTime.TryParse(context.GetText(), out var dateTime))
-                {
-                    var message = context.GetText();
-                    return new SingleError(new TextLocation(context), ErrorCode.CouldNotParse, message, nameof(DateTime));
-                }
-
-
-                var constant = new DateTimeConstantFreezable(dateTime);
-
-                var member = new FreezableStepProperty(constant, new TextLocation(context));
-                return member;
-            }
-
-            /// <inheritdoc />
-            public override Result<FreezableStepProperty, IError> VisitBracketedStep(SCLParser.BracketedStepContext context) => Visit(context.step());
-
-            /// <inheritdoc />
-            public override Result<FreezableStepProperty, IError> VisitInfixOperation(SCLParser.InfixOperationContext context)
-            {
-
-                var left = VisitTerm(context.term(0));
-                var right = VisitTerm(context.term(1));
-                var operatorSymbol = context.infixOperator().GetText();
-
-                var result = InfixHelper.TryCreateStep(new TextLocation(context), left, right, operatorSymbol);
-
-                return result;
-            }
-
-            /// <inheritdoc />
-            public override Result<FreezableStepProperty, IError> VisitErrorNode(IErrorNode node) =>
-                new SingleError(new TextLocation(node.Symbol), ErrorCode.SCLSyntaxError, node.GetText());
-
-            private static SingleError ParseError(ParserRuleContext pt)
-            {
-
-                return new SingleError(new TextLocation(pt), ErrorCode.SCLSyntaxError, pt.GetText());
-            }
-
-            /// <inheritdoc />
-            public override Result<FreezableStepProperty, IError> VisitSetVariable(SCLParser.SetVariableContext context)
-            {
-                var member = Visit(context.step());
-
-                if (member.IsFailure) return member;
-
-                var vn = GetVariableName(context.VARIABLENAME());
-
-                var step = CreateFreezableSetVariable(vn, member.Value, new TextLocation(context));
-
-                return new FreezableStepProperty(step, new TextLocation(context) );
-            }
-
-            /// <inheritdoc />
-            public override Result<FreezableStepProperty, IError> VisitGetVariable(SCLParser.GetVariableContext context)
-            {
-                var vn = GetVariableName(context.VARIABLENAME());
-                return vn;
-            }
-
-            /// <inheritdoc />
-            public override Result<FreezableStepProperty, IError> VisitEnumeration(SCLParser.EnumerationContext context)
-            {
-                if (context.children.Count != 3 || context.NAME().Length != 2)
-                    return ParseError(context);
-
-                var prefix = context.NAME(0).GetText();
-                var suffix = context.NAME(1).GetText();
-
-                var member = new FreezableStepProperty(new EnumConstantFreezable(new Enumeration(prefix, suffix)), new TextLocation(context));
-
-                return member;
-            }
-
-            /// <inheritdoc />
-            public override Result<FreezableStepProperty, IError> VisitNumber(SCLParser.NumberContext context)
-            {
-                if (int.TryParse(context.NUMBER().GetText(), out var num))
-                {
-                    var member = new FreezableStepProperty(new IntConstantFreezable(num), new TextLocation(context));
-
-                    return member;
-                }
-                return new SingleError(new TextLocation(context), ErrorCode.CouldNotParse, context.GetText(), "Number");
-            }
-
-            /// <inheritdoc />
-            public override Result<FreezableStepProperty, IError> VisitQuotedString(SCLParser.QuotedStringContext context)
-            {
-                string s = context.DOUBLEQUOTEDSTRING() != null ?
-                    UnescapeDoubleQuoted(context.DOUBLEQUOTEDSTRING().GetText()):
-                    UnescapeSingleQuoted(context.SINGLEQUOTEDSTRING().GetText());
-
-                var stringStream = new StringStream(s);
-
-                var member = new FreezableStepProperty(new StringConstantFreezable(stringStream), new TextLocation(context) );
-
-                return member;
-
-                static string UnescapeDoubleQuoted(string txt)
-                {
-                    txt = txt[1..^1]; //Remove quotes
-
-                    if (string.IsNullOrEmpty(txt)) { return txt; }
-                    var sb = new StringBuilder(txt.Length);
-                    for (var ix = 0; ix < txt.Length;)
-                    {
-                        var jx = txt.IndexOf('\\', ix);
-                        if (jx < 0 || jx == txt.Length - 1) jx = txt.Length;
-                        sb.Append(txt, ix, jx - ix);
-                        if (jx >= txt.Length) break;
-                        switch (txt[jx + 1])
-                        {
-                            case '"': sb.Append('"'); break;   //double quote
-                            case 'n': sb.Append('\n'); break;  // Line feed
-                            case 'r': sb.Append('\r'); break;  // Carriage return
-                            case 't': sb.Append('\t'); break;  // Tab
-                            case '\\': sb.Append('\\'); break; // Don't escape
-                            default:                                 // Unrecognized, copy as-is
-                                sb.Append('\\').Append(txt[jx + 1]); break;
-                        }
-                        ix = jx + 2;
-                    }
-                    return sb.ToString();
-                }
-
-                static string UnescapeSingleQuoted(string s)
-                {
-                    s = s[1..^1]; //Remove quotes
-                    s = s
-                        .Replace("''", "'");
-                    return s;
-                }
-            }
-
-            /// <inheritdoc />
-            public override Result<FreezableStepProperty, IError> VisitPipeFunction(SCLParser.PipeFunctionContext context)
-            {
-                var name = context.NAME().Symbol.Text;
-
-                var errors = new List<IError>();
-                var dict = new StepParameterDict();
-
-                var firstStep = Visit(context.step());
-                if(firstStep.IsFailure) errors.Add(firstStep.Error);
-                else dict.Add(new StepParameterReference(1), firstStep.Value);
-
-                var numberedArguments = context.term().Select((term, i) =>
-                    (term: VisitTerm(term), number: OneOf<string, int>.FromT1(i + 2)));
-
-
-                foreach (var (term, number) in numberedArguments)
-                {
-                    if (term.IsFailure) errors.Add(term.Error);
-                    else dict.Add(new StepParameterReference(number), term.Value);
-                }
-
-                var members = AggregateNamedArguments(context.namedArgument(), new TextLocation(context));
-
-                if (members.IsFailure) errors.Add(members.Error);
+                if (term.IsFailure)
+                    errors.Add(term.Error);
                 else
-                    foreach (var (key, value) in members.Value)
-                        dict.Add(new StepParameterReference(key), value);
-
-                if (errors.Any())
-                    return Result.Failure<FreezableStepProperty, IError>(ErrorList.Combine(errors));
-
-
-
-                var fsd = new FreezableStepData(dict, new TextLocation(context));
-
-                var cfs = new CompoundFreezableStep(name, fsd, null);
-
-                return new FreezableStepProperty(cfs, new TextLocation(context));
+                    dict.Add(new StepParameterReference(number), term.Value);
             }
 
-            /// <inheritdoc />
-            public override Result<FreezableStepProperty, IError> VisitFunction(SCLParser.FunctionContext context)
+            var members = AggregateNamedArguments(
+                context.namedArgument(),
+                new TextLocation(context)
+            );
+
+            if (members.IsFailure)
+                errors.Add(members.Error);
+            else
+                foreach (var (key, value) in members.Value)
+                    dict.Add(new StepParameterReference(key), value);
+
+            if (errors.Any())
+                return Result.Failure<FreezableStepProperty, IError>(ErrorList.Combine(errors));
+
+            var fsd = new FreezableStepData(dict, new TextLocation(context));
+
+            var cfs = new CompoundFreezableStep(name, fsd, null);
+
+            return new FreezableStepProperty(cfs, new TextLocation(context));
+        }
+
+        /// <inheritdoc />
+        public override Result<FreezableStepProperty, IError> VisitFunction(
+            SCLParser.FunctionContext context)
+        {
+            var name = context.NAME().Symbol.Text;
+
+            var errors = new List<IError>();
+            var dict   = new StepParameterDict();
+
+            var numberedArguments = context.term()
+                .Select(
+                    (term, i) =>
+                        (term: VisitTerm(term), number: OneOf<string, int>.FromT1(i + 1))
+                );
+
+            foreach (var (term, number) in numberedArguments)
             {
-                var name = context.NAME().Symbol.Text;
-
-                var errors = new List<IError>();
-                var dict = new StepParameterDict();
-
-                var numberedArguments = context.term().Select((term, i) =>
-                    (term: VisitTerm(term), number: OneOf<string, int>.FromT1(i + 1)));
-
-
-                foreach (var (term, number) in numberedArguments)
-                {
-                    if(term.IsFailure) errors.Add(term.Error);
-                    else dict.Add(new StepParameterReference(number),  term.Value);
-                }
-
-                var members = AggregateNamedArguments(context.namedArgument(), new TextLocation(context));
-
-                if (members.IsFailure) errors.Add(members.Error);
+                if (term.IsFailure)
+                    errors.Add(term.Error);
                 else
-                    foreach (var (key, value) in members.Value)
-                        dict.Add(new StepParameterReference(key), value);
-
-                if(errors.Any())
-                    return Result.Failure<FreezableStepProperty, IError>(ErrorList.Combine(errors));
-
-
-
-                var fsd = new FreezableStepData(dict, new TextLocation(context) );
-
-                var cfs = new CompoundFreezableStep(name, fsd, null);
-
-                return new FreezableStepProperty(cfs,new TextLocation(context) );
+                    dict.Add(new StepParameterReference(number), term.Value);
             }
 
-            /// <inheritdoc />
-            public override Result<FreezableStepProperty, IError> VisitEntity(SCLParser.EntityContext context)
+            var members = AggregateNamedArguments(
+                context.namedArgument(),
+                new TextLocation(context)
+            );
+
+            if (members.IsFailure)
+                errors.Add(members.Error);
+            else
+                foreach (var (key, value) in members.Value)
+                    dict.Add(new StepParameterReference(key), value);
+
+            if (errors.Any())
+                return Result.Failure<FreezableStepProperty, IError>(ErrorList.Combine(errors));
+
+            var fsd = new FreezableStepData(dict, new TextLocation(context));
+
+            var cfs = new CompoundFreezableStep(name, fsd, null);
+
+            return new FreezableStepProperty(cfs, new TextLocation(context));
+        }
+
+        /// <inheritdoc />
+        public override Result<FreezableStepProperty, IError> VisitEntity(
+            SCLParser.EntityContext context)
+        {
+            var members = AggregateNamedArguments(
+                context.namedArgument(),
+                new TextLocation(context)
+            );
+
+            if (members.IsFailure)
+                return members.ConvertFailure<FreezableStepProperty>();
+
+            var step = new CreateEntityFreezableStep(
+                new FreezableEntityData(members.Value, new TextLocation(context))
+            );
+
+            return new FreezableStepProperty(step, new TextLocation(context));
+        }
+
+        private Result<IReadOnlyDictionary<string, FreezableStepProperty>, IError>
+            AggregateNamedArguments(
+                IEnumerable<SCLParser.NamedArgumentContext> namedArguments,
+                IErrorLocation location)
+        {
+            var l      = new List<(string key, FreezableStepProperty member)>();
+            var errors = new List<IError>();
+
+            foreach (var r in namedArguments.Select(GetNamedArgument))
             {
-                var members = AggregateNamedArguments(context.namedArgument(), new TextLocation(context));
-
-                if (members.IsFailure) return members.ConvertFailure<FreezableStepProperty>();
-
-                var step = new CreateEntityFreezableStep(new FreezableEntityData(members.Value, new TextLocation(context)));
-
-                return new FreezableStepProperty(step, new TextLocation(context));
+                if (r.IsFailure)
+                    errors.Add(r.Error);
+                else
+                    l.Add(r.Value);
             }
 
-            private Result<IReadOnlyDictionary<string, FreezableStepProperty>, IError>
-                AggregateNamedArguments(IEnumerable<SCLParser.NamedArgumentContext> namedArguments, IErrorLocation location)
+            foreach (var duplicateKeys in l.GroupBy(x => x.key).Where(x => x.Count() > 1))
             {
-                var l = new List<(string key, FreezableStepProperty member)>();
-                var errors = new List<IError>();
-
-                foreach (var r in namedArguments.Select(GetNamedArgument))
-                {
-                    if (r.IsFailure) errors.Add(r.Error);
-                    else
-                        l.Add(r.Value);
-                }
-
-                foreach (var duplicateKeys in l.GroupBy(x => x.key).Where(x => x.Count() > 1))
-                {
-                    errors.Add(new SingleError(location, ErrorCode.DuplicateParameter, duplicateKeys.Key));
-                }
-
-                if (errors.Any())
-                    return Result.Failure<IReadOnlyDictionary<string, FreezableStepProperty>, IError>(ErrorList.Combine(errors));
-
-                var dict = l.ToDictionary(x => x.key, x => x.member);
-
-                return dict;
+                errors.Add(
+                    new SingleError(location, ErrorCode.DuplicateParameter, duplicateKeys.Key)
+                );
             }
 
+            if (errors.Any())
+                return Result.Failure<IReadOnlyDictionary<string, FreezableStepProperty>, IError>(
+                    ErrorList.Combine(errors)
+                );
 
-            private Result<(string name, FreezableStepProperty value), IError> GetNamedArgument(SCLParser.NamedArgumentContext context)
+            var dict = l.ToDictionary(x => x.key, x => x.member);
+
+            return dict;
+        }
+
+        private Result<(string name, FreezableStepProperty value), IError> GetNamedArgument(
+            SCLParser.NamedArgumentContext context)
+        {
+            var key = context.NAME().Symbol.Text;
+
+            var value = VisitTerm(context.term());
+
+            if (value.IsFailure)
+                return value.ConvertFailure<(string name, FreezableStepProperty value)>();
+
+            return (key, value.Value);
+        }
+
+        private static FreezableStepProperty GetVariableName(ITerminalNode node)
+        {
+            var text = node.Symbol.Text;
+
+            if (text == null || !text.StartsWith('<') || !text.EndsWith('>'))
+                throw new Exception(
+                    $"Expected variable name to be in angle brackets but was '{text}'"
+                );
+
+            var vn = new VariableName(text.TrimStart('<').TrimEnd('>'));
+
+            return new FreezableStepProperty(vn, new TextLocation(node.Symbol));
+        }
+
+        private static Result<FreezableStepProperty, IError> Aggregate(
+            TextLocation textLocation,
+            IEnumerable<Result<FreezableStepProperty, IError>> nodes)
+        {
+            var l      = ImmutableList<IFreezableStep>.Empty.ToBuilder();
+            var errors = new List<IError>();
+
+            foreach (var node in nodes)
             {
-                var key = context.NAME().Symbol.Text;
+                var result = node.Map(x => x.ConvertToStep());
 
-                var value = VisitTerm(context.term());
-                if (value.IsFailure) return value.ConvertFailure<(string name, FreezableStepProperty value)>();
-
-                return (key, value.Value);
+                if (result.IsSuccess)
+                    l.Add(result.Value);
+                else
+                    errors.Add(result.Error);
             }
 
+            if (errors.Any())
+                return Result.Failure<FreezableStepProperty, IError>(ErrorList.Combine(errors));
 
-            private static FreezableStepProperty GetVariableName(ITerminalNode node)
-            {
-
-                var text = node.Symbol.Text;
-
-                if (text == null || !text.StartsWith('<') || !text.EndsWith('>'))
-                    throw new Exception($"Expected variable name to be in angle brackets but was '{text}'");
-                var vn = new VariableName(text.TrimStart('<').TrimEnd('>'));
-
-                return new FreezableStepProperty(vn, new TextLocation(node.Symbol));
-            }
-
-            private static Result<FreezableStepProperty, IError> Aggregate(TextLocation textLocation, IEnumerable<Result<FreezableStepProperty, IError>> nodes)
-            {
-                var l = ImmutableList<IFreezableStep>.Empty.ToBuilder();
-                var errors = new List<IError>();
-
-                foreach (var node in nodes)
-                {
-                    var result = node.Map(x => x.ConvertToStep());
-
-                    if (result.IsSuccess) l.Add(result.Value);
-                    else errors.Add(result.Error);
-                }
-
-                if (errors.Any())
-                    return Result.Failure<FreezableStepProperty, IError>(ErrorList.Combine(errors));
-
-                return new FreezableStepProperty(l.ToImmutable(), textLocation);
-            }
+            return new FreezableStepProperty(l.ToImmutable(), textLocation);
         }
     }
+}
+
 }

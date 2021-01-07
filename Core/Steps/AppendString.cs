@@ -10,71 +10,83 @@ using Reductech.EDR.Core.Util;
 
 namespace Reductech.EDR.Core.Steps
 {
+
+/// <summary>
+/// Appends a string to an existing string variable.
+/// </summary>
+public sealed class AppendString : CompoundStep<Unit>
+{
     /// <summary>
-    /// Appends a string to an existing string variable.
+    /// The variable to append to.
     /// </summary>
-    public sealed class AppendString : CompoundStep<Unit>
-    {
-        /// <summary>
-        /// The variable to append to.
-        /// </summary>
-        [VariableName(1)]
-        [Required]
-        public VariableName Variable { get; set; }
-
-
-        /// <summary>
-        /// The string to append.
-        /// </summary>
-        [StepProperty(2)]
-        [Required]
-        public IStep<StringStream> String { get; set; } = null!;
-
-        /// <inheritdoc />
-        protected override async Task<Result<Unit, IError>> Run(IStateMonad stateMonad,
-            CancellationToken cancellationToken)
-        {
-            var str = await String.Run(stateMonad, cancellationToken)
-                .Map(x => x.GetStringAsync());
-            if (str.IsFailure)
-                return str.ConvertFailure<Unit>();
-
-            var currentValue = stateMonad.GetVariable<StringStream>(Variable).MapError(x=>x.WithLocation(this));
-            if (currentValue.IsFailure)
-                return currentValue.ConvertFailure<Unit>();
-
-            var newValue = await currentValue.Value.GetStringAsync() + str.Value;
-
-            var r = stateMonad.SetVariable(Variable, new StringStream(newValue));
-            if (r.IsFailure)
-                return r.ConvertFailure<Unit>();
-
-            return Unit.Default;
-        }
-
-        /// <inheritdoc />
-        public override IStepFactory StepFactory => AppendStringStepFactory.Instance;
-    }
+    [VariableName(1)]
+    [Required]
+    public VariableName Variable { get; set; }
 
     /// <summary>
-    /// Appends a string to an existing string variable.
+    /// The string to append.
     /// </summary>
-    public sealed class AppendStringStepFactory : SimpleStepFactory<AppendString, Unit>
+    [StepProperty(2)]
+    [Required]
+    public IStep<StringStream> String { get; set; } = null!;
+
+    /// <inheritdoc />
+    protected override async Task<Result<Unit, IError>> Run(
+        IStateMonad stateMonad,
+        CancellationToken cancellationToken)
     {
-        private AppendStringStepFactory() { }
+        var str = await String.Run(stateMonad, cancellationToken)
+            .Map(x => x.GetStringAsync());
 
-        /// <summary>
-        /// The instance.
-        /// </summary>
-        public static SimpleStepFactory<AppendString, Unit> Instance { get; } = new AppendStringStepFactory();
+        if (str.IsFailure)
+            return str.ConvertFailure<Unit>();
 
-        /// <inheritdoc />
-        public override IEnumerable<(VariableName variableName, Maybe<ITypeReference>)> GetVariablesSet(FreezableStepData freezableStepData, TypeResolver typeResolver)
-        {
-            var vn = freezableStepData.TryGetVariableName(nameof(AppendString.Variable), StepType);
-            if(vn.IsFailure) yield break;
+        var currentValue = stateMonad.GetVariable<StringStream>(Variable)
+            .MapError(x => x.WithLocation(this));
 
-            yield return (vn.Value, Maybe<ITypeReference>.From(new ActualTypeReference(typeof(StringStream))));
-        }
+        if (currentValue.IsFailure)
+            return currentValue.ConvertFailure<Unit>();
+
+        var newValue = await currentValue.Value.GetStringAsync() + str.Value;
+
+        var r = stateMonad.SetVariable(Variable, new StringStream(newValue));
+
+        if (r.IsFailure)
+            return r.ConvertFailure<Unit>();
+
+        return Unit.Default;
     }
+
+    /// <inheritdoc />
+    public override IStepFactory StepFactory => AppendStringStepFactory.Instance;
+}
+
+/// <summary>
+/// Appends a string to an existing string variable.
+/// </summary>
+public sealed class AppendStringStepFactory : SimpleStepFactory<AppendString, Unit>
+{
+    private AppendStringStepFactory() { }
+
+    /// <summary>
+    /// The instance.
+    /// </summary>
+    public static SimpleStepFactory<AppendString, Unit> Instance { get; } =
+        new AppendStringStepFactory();
+
+    /// <inheritdoc />
+    public override IEnumerable<(VariableName variableName, Maybe<ITypeReference>)> GetVariablesSet(
+        FreezableStepData freezableStepData,
+        TypeResolver typeResolver)
+    {
+        var vn = freezableStepData.TryGetVariableName(nameof(AppendString.Variable), StepType);
+
+        if (vn.IsFailure)
+            yield break;
+
+        yield return (
+            vn.Value, Maybe<ITypeReference>.From(new ActualTypeReference(typeof(StringStream))));
+    }
+}
+
 }

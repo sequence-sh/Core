@@ -6,47 +6,43 @@ using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
-    public class FindSubstringTests : StepTestBase<FindSubstring, int>
+
+public class FindSubstringTests : StepTestBase<FindSubstring, int>
+{
+    /// <inheritdoc />
+    public FindSubstringTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper) { }
+
+    /// <inheritdoc />
+    protected override IEnumerable<StepCase> StepCases
     {
-        /// <inheritdoc />
-        public FindSubstringTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
+        get
         {
+            yield return new StepCase(
+                "Substring is present",
+                new FindSubstring() { String = Constant("Hello"), SubString = Constant("lo") },
+                3
+            );
+
+            yield return new StepCase(
+                "Substring is no present",
+                new FindSubstring() { String = Constant("Hello"), SubString = Constant("ol") },
+                -1
+            );
         }
-
-        /// <inheritdoc />
-        protected override IEnumerable<StepCase> StepCases
-        {
-            get
-            {
-                yield return new StepCase("Substring is present",
-                    new FindSubstring()
-                    {
-                        String = Constant("Hello"),
-                        SubString = Constant("lo")
-                    }, 3
-                );
-
-                yield return new StepCase("Substring is no present",
-                    new FindSubstring()
-                    {
-                        String = Constant("Hello"),
-                        SubString = Constant("ol")
-                    }, -1
-                );
-
-            }
-        }
-
-        /// <inheritdoc />
-        protected override IEnumerable<DeserializeCase> DeserializeCases
-        {
-            get
-            {
-                yield return new DeserializeCase("Present", "FindSubstring String: 'Hello' Substring: 'lo'", 3);
-
-            }
-
-        }
-
     }
+
+    /// <inheritdoc />
+    protected override IEnumerable<DeserializeCase> DeserializeCases
+    {
+        get
+        {
+            yield return new DeserializeCase(
+                "Present",
+                "FindSubstring String: 'Hello' Substring: 'lo'",
+                3
+            );
+        }
+    }
+}
+
 }

@@ -10,62 +10,75 @@ using Reductech.EDR.Core.Util;
 
 namespace Reductech.EDR.Core.Steps
 {
+
+/// <summary>
+/// Increment an integer variable by a particular amount
+/// </summary>
+public sealed class IncrementVariable : CompoundStep<Unit>
+{
     /// <summary>
-    /// Increment an integer variable by a particular amount
+    /// The variable to increment.
     /// </summary>
-    public sealed class IncrementVariable : CompoundStep<Unit>
-    {
-        /// <summary>
-        /// The variable to increment.
-        /// </summary>
-        [VariableName(1)]
-        [Required]
-        public VariableName Variable { get; set; }
-
-        /// <summary>
-        /// The amount to increment by.
-        /// </summary>
-        [StepProperty(2)]
-        [DefaultValueExplanation("1")]
-        public IStep<int> Amount { get; set; } = new IntConstant(1);
-
-        /// <inheritdoc />
-        protected override async Task<Result<Unit, IError>> Run(IStateMonad stateMonad,
-            CancellationToken cancellationToken)
-        {
-            var variable = stateMonad.GetVariable<int>(Variable).MapError(x=>x.WithLocation(this));
-            if (variable.IsFailure) return variable.ConvertFailure<Unit>();
-            var amount = await Amount.Run(stateMonad, cancellationToken);
-            if (amount.IsFailure) return amount.ConvertFailure<Unit>();
-
-            var r = stateMonad.SetVariable(Variable, variable.Value + amount.Value);
-
-            return r;
-        }
-
-        /// <inheritdoc />
-        public override IStepFactory StepFactory => IncrementVariableStepFactory.Instance;
-    }
+    [VariableName(1)]
+    [Required]
+    public VariableName Variable { get; set; }
 
     /// <summary>
-    /// Increment an integer variable by a particular amount
+    /// The amount to increment by.
     /// </summary>
-    public sealed class IncrementVariableStepFactory : SimpleStepFactory<IncrementVariable, Unit>
+    [StepProperty(2)]
+    [DefaultValueExplanation("1")]
+    public IStep<int> Amount { get; set; } = new IntConstant(1);
+
+    /// <inheritdoc />
+    protected override async Task<Result<Unit, IError>> Run(
+        IStateMonad stateMonad,
+        CancellationToken cancellationToken)
     {
-        private IncrementVariableStepFactory() { }
+        var variable = stateMonad.GetVariable<int>(Variable).MapError(x => x.WithLocation(this));
 
-        /// <summary>
-        /// The instance.
-        /// </summary>
-        public static SimpleStepFactory<IncrementVariable, Unit> Instance { get; } = new IncrementVariableStepFactory();
+        if (variable.IsFailure)
+            return variable.ConvertFailure<Unit>();
 
-        /// <inheritdoc />
-        public override IEnumerable<(VariableName variableName, Maybe<ITypeReference>)> GetVariablesSet(FreezableStepData freezableStepData, TypeResolver typeResolver)
-        {
-            var vn = freezableStepData.TryGetVariableName(nameof(IncrementVariable.Variable), StepType);
-            if(vn.IsFailure) yield break;
+        var amount = await Amount.Run(stateMonad, cancellationToken);
 
-            yield return (vn.Value, Maybe<ITypeReference>.From(new ActualTypeReference(typeof(int))));
-        }
+        if (amount.IsFailure)
+            return amount.ConvertFailure<Unit>();
+
+        var r = stateMonad.SetVariable(Variable, variable.Value + amount.Value);
+
+        return r;
     }
+
+    /// <inheritdoc />
+    public override IStepFactory StepFactory => IncrementVariableStepFactory.Instance;
+}
+
+/// <summary>
+/// Increment an integer variable by a particular amount
+/// </summary>
+public sealed class IncrementVariableStepFactory : SimpleStepFactory<IncrementVariable, Unit>
+{
+    private IncrementVariableStepFactory() { }
+
+    /// <summary>
+    /// The instance.
+    /// </summary>
+    public static SimpleStepFactory<IncrementVariable, Unit> Instance { get; } =
+        new IncrementVariableStepFactory();
+
+    /// <inheritdoc />
+    public override IEnumerable<(VariableName variableName, Maybe<ITypeReference>)> GetVariablesSet(
+        FreezableStepData freezableStepData,
+        TypeResolver typeResolver)
+    {
+        var vn = freezableStepData.TryGetVariableName(nameof(IncrementVariable.Variable), StepType);
+
+        if (vn.IsFailure)
+            yield break;
+
+        yield return (vn.Value, Maybe<ITypeReference>.From(new ActualTypeReference(typeof(int))));
+    }
+}
+
 }

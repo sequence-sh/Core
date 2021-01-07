@@ -5,33 +5,44 @@ using Microsoft.Extensions.Logging;
 
 namespace Reductech.EDR.Core.Internal.Logging
 {
+
+/// <summary>
+/// Contains methods for interacting with logging.
+/// </summary>
+public static class LogHelper
+{
     /// <summary>
-    /// Contains methods for interacting with logging.
+    /// Logs a message for the particular situation.
+    /// Will use the resource to
     /// </summary>
-    public static class LogHelper
+    public static void LogSituation(
+        this ILogger logger,
+        LogSituationCore situationCore,
+        IEnumerable<object> args) => LogSituation(
+        logger,
+        situationCore,
+        LogSituationHelperCoreEN.Instance,
+        args
+    );
+
+    /// <summary>
+    /// Logs a message for the particular situation.
+    /// Will use the resource to
+    /// </summary>
+    public static void LogSituation<T>(
+        this ILogger logger,
+        T situationCore,
+        ILogSituationHelper<T> helper,
+        IEnumerable<object> args) where T : Enum
     {
-        /// <summary>
-        /// Logs a message for the particular situation.
-        /// Will use the resource to
-        /// </summary>
-        public static void LogSituation(this ILogger logger, LogSituationCore situationCore, IEnumerable<object> args)
-            => LogSituation(logger, situationCore, LogSituationHelperCoreEN.Instance, args);
+        var logLevel = helper.GetLogLevel(situationCore);
 
-        /// <summary>
-        /// Logs a message for the particular situation.
-        /// Will use the resource to
-        /// </summary>
-        public static void LogSituation<T>(this ILogger logger, T situationCore, ILogSituationHelper<T> helper, IEnumerable<object> args) where T: Enum
+        if (logger.IsEnabled(logLevel))
         {
-            var logLevel = helper.GetLogLevel(situationCore);
-            if (logger.IsEnabled(logLevel))
-            {
-                var messageString = helper.GetMessageString(situationCore);
-                logger.Log(logLevel, messageString, args.ToArray());
-            }
+            var messageString = helper.GetMessageString(situationCore);
+            logger.Log(logLevel, messageString, args.ToArray());
         }
-
-
     }
+}
 
 }

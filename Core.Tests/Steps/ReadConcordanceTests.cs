@@ -9,55 +9,60 @@ using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
-    public class ReadConcordanceTests : StepTestBase<FromConcordance, Array<Entity>>
+
+public class ReadConcordanceTests : StepTestBase<FromConcordance, Array<Entity>>
+{
+    /// <inheritdoc />
+    public ReadConcordanceTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper) { }
+
+    /// <inheritdoc />
+    protected override IEnumerable<StepCase> StepCases
     {
-        /// <inheritdoc />
-        public ReadConcordanceTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper) {}
-
-        /// <inheritdoc />
-        protected override IEnumerable<StepCase> StepCases
+        get
         {
-            get
-            {
-                yield return new StepCase("Read Concordance and print all lines",
-                    new ForEach<Entity>
+            yield return new StepCase(
+                "Read Concordance and print all lines",
+                new ForEach<Entity>
+                {
+                    Array = new FromConcordance()
                     {
-                        Array = new FromConcordance()
-                        {
-                            Stream = Constant(
-                                    $@"þFooþþBarþ{Environment.NewLine}þHelloþþWorldþ{Environment.NewLine}þHello 2þþWorld 2þ")
-                        },
-                        Action = new Print<Entity>
-                        {
-                            Value = new GetVariable<Entity>() { Variable = VariableName.Entity }
-                        },
-                        Variable = VariableName.Entity
-
-                    }, Unit.Default,
-                    "(Foo: \"Hello\" Bar: \"World\")",
-                    "(Foo: \"Hello 2\" Bar: \"World 2\")");
-
-                yield return new StepCase("Read Concordance with multiValue and print all lines",
-                    new ForEach<Entity>
+                        Stream = Constant(
+                            $@"þFooþþBarþ{Environment.NewLine}þHelloþþWorldþ{Environment.NewLine}þHello 2þþWorld 2þ"
+                        )
+                    },
+                    Action = new Print<Entity>
                     {
-                        Array = new FromConcordance
-                        {
-                            Stream = Constant(
-                                    $@"þFooþþBarþ{Environment.NewLine}þHelloþþWorld|Earthþ{Environment.NewLine}þHello 2þþWorld 2|Earth 2þ")
-                        },
-                        Action = new Print<Entity>
-                        {
-                            Value = new GetVariable<Entity> { Variable = VariableName.Entity }
-                        },
-                        Variable = VariableName.Entity
+                        Value = new GetVariable<Entity>() { Variable = VariableName.Entity }
+                    },
+                    Variable = VariableName.Entity
+                },
+                Unit.Default,
+                "(Foo: \"Hello\" Bar: \"World\")",
+                "(Foo: \"Hello 2\" Bar: \"World 2\")"
+            );
 
-                    }, Unit.Default,
-                    "(Foo: \"Hello\" Bar: [\"World\", \"Earth\"])",
-                    "(Foo: \"Hello 2\" Bar: [\"World 2\", \"Earth 2\"])");
-
-
-            }
+            yield return new StepCase(
+                "Read Concordance with multiValue and print all lines",
+                new ForEach<Entity>
+                {
+                    Array = new FromConcordance
+                    {
+                        Stream = Constant(
+                            $@"þFooþþBarþ{Environment.NewLine}þHelloþþWorld|Earthþ{Environment.NewLine}þHello 2þþWorld 2|Earth 2þ"
+                        )
+                    },
+                    Action = new Print<Entity>
+                    {
+                        Value = new GetVariable<Entity> { Variable = VariableName.Entity }
+                    },
+                    Variable = VariableName.Entity
+                },
+                Unit.Default,
+                "(Foo: \"Hello\" Bar: [\"World\", \"Earth\"])",
+                "(Foo: \"Hello 2\" Bar: [\"World 2\", \"Earth 2\"])"
+            );
         }
-
     }
+}
+
 }

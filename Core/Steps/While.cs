@@ -10,59 +10,66 @@ using Reductech.EDR.Core.Util;
 namespace Reductech.EDR.Core.Steps
 {
 
-    /// <summary>
-    /// Repeat an action while the condition is met.
-    /// </summary>
-    public sealed class While : CompoundStep<Unit>
+/// <summary>
+/// Repeat an action while the condition is met.
+/// </summary>
+public sealed class While : CompoundStep<Unit>
+{
+    /// <inheritdoc />
+    protected override async Task<Result<Unit, IError>> Run(
+        IStateMonad stateMonad,
+        CancellationToken cancellationToken)
     {
-        /// <inheritdoc />
-        protected override async Task<Result<Unit, IError>> Run(IStateMonad stateMonad,
-            CancellationToken cancellationToken)
+        while (true)
         {
-            while (true)
+            var conditionResult = await Condition.Run(stateMonad, cancellationToken);
+
+            if (conditionResult.IsFailure)
+                return conditionResult.ConvertFailure<Unit>();
+
+            if (conditionResult.Value)
             {
-                var conditionResult = await Condition.Run(stateMonad, cancellationToken);
-                if (conditionResult.IsFailure) return conditionResult.ConvertFailure<Unit>();
+                var actionResult = await Action.Run(stateMonad, cancellationToken);
 
-                if (conditionResult.Value)
-                {
-                    var actionResult = await Action.Run(stateMonad, cancellationToken);
-                    if (actionResult.IsFailure) return actionResult.ConvertFailure<Unit>();
-                }
-                else break;
+                if (actionResult.IsFailure)
+                    return actionResult.ConvertFailure<Unit>();
             }
-
-            return Unit.Default;
+            else
+                break;
         }
 
-        /// <summary>
-        /// The condition to check before performing the action.
-        /// </summary>
-        [StepProperty(1)]
-        [Required]
-        public IStep<bool> Condition { get; set; } = null!;
-
-        /// <summary>
-        /// The action to perform repeatedly.
-        /// </summary>
-        [StepProperty(2)]
-        [Required]
-        public IStep<Unit> Action { get; set; } = null!;
-
-        /// <inheritdoc />
-        public override IStepFactory StepFactory => WhileStepFactory.Instance;
+        return Unit.Default;
     }
 
     /// <summary>
-    /// Repeat an action while the condition is met.
+    /// The condition to check before performing the action.
     /// </summary>
-    public sealed class WhileStepFactory : SimpleStepFactory<While, Unit>
-    {
-        private WhileStepFactory() { }
+    [StepProperty(1)]
+    [Required]
+    public IStep<bool> Condition { get; set; } = null!;
 
-        /// <summary>
-        /// The instance.
-        /// </summary>
-        public static SimpleStepFactory<While, Unit> Instance { get; } = new WhileStepFactory();
-    }
+    /// <summary>
+    /// The action to perform repeatedly.
+    /// </summary>
+    [StepProperty(2)]
+    [Required]
+    public IStep<Unit> Action { get; set; } = null!;
+
+    /// <inheritdoc />
+    public override IStepFactory StepFactory => WhileStepFactory.Instance;
+}
+
+/// <summary>
+/// Repeat an action while the condition is met.
+/// </summary>
+public sealed class WhileStepFactory : SimpleStepFactory<While, Unit>
+{
+    private WhileStepFactory() { }
+
+    /// <summary>
+    /// The instance.
+    /// </summary>
+    public static SimpleStepFactory<While, Unit> Instance { get; } = new WhileStepFactory();
+}
+
 }

@@ -9,50 +9,49 @@ using Reductech.EDR.Core.Internal.Errors;
 namespace Reductech.EDR.Core.Steps
 {
 
-    /// <summary>
-    /// Negation of a boolean value.
-    /// </summary>
-    public sealed class Not : CompoundStep<bool>
+/// <summary>
+/// Negation of a boolean value.
+/// </summary>
+public sealed class Not : CompoundStep<bool>
+{
+    /// <inheritdoc />
+    protected override async Task<Result<bool, IError>> Run(
+        IStateMonad stateMonad,
+        CancellationToken cancellationToken)
     {
-        /// <inheritdoc />
-        protected override async Task<Result<bool, IError>> Run(IStateMonad stateMonad,
-            CancellationToken cancellationToken)
-        {
-            return await Boolean.Run(stateMonad, cancellationToken).Map(x => !x);
-        }
-
-        /// <inheritdoc />
-        public override IStepFactory StepFactory => NotStepFactory.Instance;
-
-        /// <summary>
-        /// The value to negate.
-        /// </summary>
-        [StepProperty(1)]
-        [Required]
-        public IStep<bool> Boolean { get; set; } = null!;
+        return await Boolean.Run(stateMonad, cancellationToken).Map(x => !x);
     }
 
+    /// <inheritdoc />
+    public override IStepFactory StepFactory => NotStepFactory.Instance;
+
     /// <summary>
-    /// Negation of a boolean value.
+    /// The value to negate.
     /// </summary>
-    public class NotStepFactory : SimpleStepFactory<Not, bool>
-    {
-        private NotStepFactory() { }
+    [StepProperty(1)]
+    [Required]
+    public IStep<bool> Boolean { get; set; } = null!;
+}
 
-        /// <summary>
-        /// The instance.
-        /// </summary>
-        public static StepFactory Instance { get; } = new NotStepFactory();
+/// <summary>
+/// Negation of a boolean value.
+/// </summary>
+public class NotStepFactory : SimpleStepFactory<Not, bool>
+{
+    private NotStepFactory() { }
 
-        ///// <inheritdoc /> //TODO uncomment
-        //public override IStepSerializer Serializer =>
-        //    new StepSerializer(TypeName, new FixedStringComponent("not"),
-        //    new FixedStringComponent("("),
-        //    new StepComponent(nameof(Not.Boolean)),
-        //    new FixedStringComponent(")")
-        //);
+    /// <summary>
+    /// The instance.
+    /// </summary>
+    public static StepFactory Instance { get; } = new NotStepFactory();
 
+    ///// <inheritdoc /> //TODO uncomment
+    //public override IStepSerializer Serializer =>
+    //    new StepSerializer(TypeName, new FixedStringComponent("not"),
+    //    new FixedStringComponent("("),
+    //    new StepComponent(nameof(Not.Boolean)),
+    //    new FixedStringComponent(")")
+    //);
+}
 
-
-    }
 }
