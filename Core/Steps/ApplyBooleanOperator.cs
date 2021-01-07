@@ -67,7 +67,7 @@ namespace Reductech.EDR.Core.Steps
                     return r;
                 }
 
-                default: return new SingleError($"Could not apply '{op.Value}'", ErrorCode.UnexpectedEnumValue, new StepErrorLocation(this));
+                default: return new SingleError(new StepErrorLocation(this), ErrorCode.UnexpectedEnumValue, nameof(Operator), op.Value);
             }
         }
 

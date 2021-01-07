@@ -39,8 +39,7 @@ namespace Reductech.EDR.Core.TestHarness
                                 {
                                     SetVariableName(x, instance);
                                     return
-                                        new SingleError("Variable '<Foo>' does not exist.", ErrorCode.MissingVariable,
-                                            new StepErrorLocation(instance));
+                                        new SingleError(new StepErrorLocation(instance), ErrorCode.MissingVariable,"<Foo>");
                                 },
                                 x=>SetFailStep(x, instance),
                                 x=> SetFailStepList(x,instance));
@@ -101,7 +100,7 @@ namespace Reductech.EDR.Core.TestHarness
 
                 var newValue = CreateFailStepOfType(property.PropertyType.GenericTypeArguments.First(), errorMessage);
                 property.SetValue(instance, newValue);
-                return new SingleError(errorMessage, ErrorCode.Test, EntireSequenceLocation.Instance);
+                return new SingleError(EntireSequenceLocation.Instance,ErrorCode.Test, errorMessage);
             }
 
             static IError SetFailStepList(PropertyInfo property, object instance)
@@ -110,7 +109,7 @@ namespace Reductech.EDR.Core.TestHarness
 
                 var newValue = CreateFailStepListOfElementType(property.PropertyType.GenericTypeArguments.First(), errorMessage);
                 property.SetValue(instance, newValue);
-                return new SingleError(errorMessage, ErrorCode.Test, EntireSequenceLocation.Instance);
+                return new SingleError(EntireSequenceLocation.Instance, ErrorCode.Test, errorMessage );
             }
         }
 
@@ -144,9 +143,6 @@ namespace Reductech.EDR.Core.TestHarness
             return step;
         }
 
-
-        public const string IntentionalErrorString = "Intentional Error";
-
         public class FailStep<T> : CompoundStep<T>
         {
             /// <inheritdoc />
@@ -154,7 +150,7 @@ namespace Reductech.EDR.Core.TestHarness
                 CancellationToken cancellationToken)
             {
                 await Task.CompletedTask;
-                var error = new SingleError(ErrorMessage, ErrorCode.Test, EntireSequenceLocation.Instance);
+                var error = new SingleError(EntireSequenceLocation.Instance, ErrorCode.Test, ErrorMessage );
 
                 return error;
             }

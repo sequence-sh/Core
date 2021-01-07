@@ -35,7 +35,7 @@ namespace Reductech.EDR.Core.ExternalProcesses
 #pragma warning disable CA1031 // Do not catch general exception types
             catch (Exception e)
             {
-                r = new ErrorBuilder(e.Message, ErrorCode.ExternalProcessError);
+                r = new ErrorBuilder(ErrorCode.ExternalProcessError, e.Message);
             }
 
             return r;
@@ -57,7 +57,7 @@ namespace Reductech.EDR.Core.ExternalProcesses
 #pragma warning disable CA1031 // Do not catch general exception types
             catch (Exception e)
             {
-                r1 = new ErrorBuilder(e.Message, ErrorCode.ExternalProcessError);
+                r1 = new ErrorBuilder(ErrorCode.ExternalProcessError, e.Message);
             }
 #pragma warning restore CA1031 // Do not catch general exception types
 
@@ -116,7 +116,7 @@ namespace Reductech.EDR.Core.ExternalProcesses
 #pragma warning disable CA1031 // Do not catch general exception types
             catch (Exception e)
             {
-                result = new ErrorBuilder(e.Message, ErrorCode.ExternalProcessError);
+                result = new ErrorBuilder(ErrorCode.ExternalProcessError, e.Message);
             }
 #pragma warning restore CA1031 // Do not catch general exception types
 
@@ -135,7 +135,7 @@ namespace Reductech.EDR.Core.ExternalProcesses
 #pragma warning disable CA1031 // Do not catch general exception types
             catch (Exception e)
             {
-                error = Maybe<IErrorBuilder>.From(new ErrorBuilder(e.Message, ErrorCode.ExternalProcessError));
+                error = Maybe<IErrorBuilder>.From(new ErrorBuilder(ErrorCode.ExternalProcessError, e.Message));
             }
 #pragma warning restore CA1031 // Do not catch general exception types
 
@@ -159,7 +159,7 @@ namespace Reductech.EDR.Core.ExternalProcesses
 #pragma warning disable CA1031 // Do not catch general exception types
             catch (Exception e)
             {
-                error = Maybe<IErrorBuilder>.From(new ErrorBuilder(e.Message, ErrorCode.ExternalProcessError));
+                error = Maybe<IErrorBuilder>.From(new ErrorBuilder(ErrorCode.ExternalProcessError, e.Message));
             }
 #pragma warning restore CA1031 // Do not catch general exception types
 

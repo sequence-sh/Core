@@ -80,7 +80,7 @@ namespace Reductech.EDR.Core.Internal.Serialization
                 return Result.Success<IStep<Unit>, IError>(unitStep);
             }
 
-            return new SingleError("SCL must represent a step with return type Unit", ErrorCode.InvalidCast, new StepErrorLocation(step));
+            return new SingleError(new StepErrorLocation(step), ErrorCode.UnitExpected);
         }
 
         /// <summary>
@@ -100,7 +100,7 @@ namespace Reductech.EDR.Core.Internal.Serialization
 #pragma warning disable CA1031 // Do not catch general exception types
             catch (Exception e)
             {
-                result = new SingleError(e, ErrorCode.ExternalProcessError, EntireSequenceLocation.Instance);
+                result = new SingleError(EntireSequenceLocation.Instance, e, ErrorCode.ExternalProcessError);
             }
 #pragma warning restore CA1031 // Do not catch general exception types
 

@@ -84,7 +84,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                         EntityStream = new FailStep<Array<Entity>>{ ErrorMessage = "Stream Fail" },
                         Function = Constant(Entity.Create(("Key", "Value")))
                     },
-                    new SingleError("Stream Fail", ErrorCode.Test, EntireSequenceLocation.Instance));
+                    new SingleError(EntireSequenceLocation.Instance, ErrorCode.Test, "Stream Fail" ));
             }
         }
 

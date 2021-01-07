@@ -131,5 +131,23 @@ namespace Reductech.EDR.Core.Internal.Logging {
                 return ResourceManager.GetString("QualifyingPath", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Could not remove variable {variable} as it was out of scope..
+        /// </summary>
+        internal static string RemoveVariableOutOfScope {
+            get {
+                return ResourceManager.GetString("RemoveVariableOutOfScope", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Could not set variable {variable} as it was out of scope..
+        /// </summary>
+        internal static string SetVariableOutOfScope {
+            get {
+                return ResourceManager.GetString("SetVariableOutOfScope", resourceCulture);
+            }
+        }
     }
 }

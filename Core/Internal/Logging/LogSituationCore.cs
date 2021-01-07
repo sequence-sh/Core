@@ -38,7 +38,16 @@ public enum LogSituationCore
     /// <summary>
     /// Item to delete did not exist
     /// </summary>
-    ItemToDeleteDidNotExist
-}
+    ItemToDeleteDidNotExist,
+
+    /// <summary>
+    /// Tried to set a variable that was out of scope
+    /// </summary>
+    SetVariableOutOfScope,
+    /// <summary>
+    /// Tried to remove a variable that was out of scope
+    /// </summary>
+    RemoveVariableOutOfScope
+    }
 
 }

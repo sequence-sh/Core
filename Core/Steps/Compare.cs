@@ -65,7 +65,7 @@ namespace Reductech.EDR.Core.Steps
                 CompareOperator.LessThanOrEqual => item1.CompareTo(item2) <= 0,
                 CompareOperator.GreaterThan => item1.CompareTo(item2) > 0,
                 CompareOperator.GreaterThanOrEqual => item1.CompareTo(item2) >= 0,
-                _ => new ErrorBuilder($"Could not apply '{compareOperator}'", ErrorCode.UnexpectedEnumValue)
+                _ => new ErrorBuilder(ErrorCode.UnexpectedEnumValue, nameof(Compare<int>.Operator), compareOperator)
             };
         }
 

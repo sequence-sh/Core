@@ -51,7 +51,7 @@ namespace Reductech.EDR.Core.Steps
             var str = await stringResult.Value.GetStringAsync();
 
             if (index.Value < 0 || index.Value >= str.Length)
-                return new SingleError("Index was outside the bounds of the string", ErrorCode.IndexOutOfBounds, new StepErrorLocation(this));
+                return new SingleError(new StepErrorLocation(this), ErrorCode.IndexOutOfBounds);
 
             var resultString = str.Substring(index.Value, length.Value);
 

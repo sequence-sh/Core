@@ -13,14 +13,13 @@ namespace Reductech.EDR.Core
         /// <summary>
         /// Gets the instance of EmptySettings.
         /// </summary>
-        public static ISettings Instance = new EmptySettings();
+        public static readonly ISettings Instance = new EmptySettings();
 
 
         private EmptySettings() {}
 
         /// <inheritdoc />
         public Result<Unit, IErrorBuilder> CheckRequirement(Requirement requirement) =>
-            new ErrorBuilder($"Requirement '{requirement}' not met.",
-                ErrorCode.RequirementsNotMet);
+            new ErrorBuilder(ErrorCode.RequirementNotMet, requirement);
     }
 }

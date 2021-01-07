@@ -52,7 +52,7 @@ namespace Reductech.EDR.Core
         /// </summary>
         public Result<T, IErrorBuilder> GetSettings<T>() where T : ISettings =>
             Settings.TryCast<T>()
-                .MapError(x => new ErrorBuilder(x, ErrorCode.MissingStepSettings) as IErrorBuilder);
+                .MapError(_ => new ErrorBuilder( ErrorCode.MissingStepSettings, typeof(T).Name) as IErrorBuilder);
 
         /// <summary>
         /// Gets the current value of this variable.
@@ -142,7 +142,7 @@ namespace Reductech.EDR.Core
 
             var r = TryGetVariableFromDictionary<T>(key, _stateDictionary)
                 .Bind(x =>
-                    x.ToResult<T, IErrorBuilder>(new ErrorBuilder($"Variable '{key}' does not exist.", ErrorCode.MissingVariable)));
+                    x.ToResult<T, IErrorBuilder>(new ErrorBuilder( ErrorCode.MissingVariable, key)));
 
             return r;
         }
@@ -160,7 +160,7 @@ namespace Reductech.EDR.Core
             if (value is T typedValue)
                 return Maybe<T>.From(typedValue);
 
-            return new ErrorBuilder($"Variable '{key}' does not have type '{typeof(T)}'.", ErrorCode.WrongVariableType);
+            return new ErrorBuilder(ErrorCode.WrongVariableType, key, typeof(T).Name);
         }
         /// <summary>
         /// Returns whether a particular variable has been set and not removed.
@@ -176,7 +176,7 @@ namespace Reductech.EDR.Core
                 throw new ObjectDisposedException("State Monad was disposed");
 
             _stateDictionary
-                .AddOrUpdate(key, _ => variable!, (_1, _2) => variable!);
+                .AddOrUpdate(key, _ => variable!, (_, _) => variable!);
 
             return Unit.Default;
         }

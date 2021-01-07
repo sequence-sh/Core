@@ -36,7 +36,7 @@ namespace Reductech.EDR.Core.Internal
         /// </summary>
         public Result<VariableName, IError> GetVariableName(string name, string typeName) =>
             EntityProperties.TryFindOrFail(name,
-                    () => ErrorHelper.MissingParameterError(name, typeName).WithLocation(Location))
+                    () => ErrorHelper.MissingParameterError(name).WithLocation(Location))
                 .Bind(x => x.AsVariableName(name)
                 );
 
@@ -45,7 +45,7 @@ namespace Reductech.EDR.Core.Internal
         /// </summary>
         public Result<IFreezableStep, IError> GetStep(string name, string typeName) =>
             EntityProperties.TryFindOrFail(name,
-                    () => ErrorHelper.MissingParameterError(name, typeName).WithLocation(Location))
+                    () => ErrorHelper.MissingParameterError(name).WithLocation(Location))
                 .Map(x => x.ConvertToStep());
 
 
@@ -55,7 +55,7 @@ namespace Reductech.EDR.Core.Internal
         public Result<IReadOnlyList<IFreezableStep>, IError> GetStepList(string name, string typeName) =>
 
             EntityProperties.TryFindOrFail(name,
-                    () => ErrorHelper.MissingParameterError(name, typeName).WithLocation(Location))
+                    () => ErrorHelper.MissingParameterError(name).WithLocation(Location))
                 .Bind(x => x.AsStepList(name)
                 );
 

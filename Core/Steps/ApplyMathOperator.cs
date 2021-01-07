@@ -35,11 +35,11 @@ namespace Reductech.EDR.Core.Steps
                 MathOperator.Subtract => left.Value - right.Value,
                 MathOperator.Multiply => left.Value * right.Value,
                 MathOperator.Divide when right.Value == 0 => Result.Failure<int, IError>(
-                    new SingleError("Divide by Zero Error", ErrorCode.DivideByZero, new StepErrorLocation(this))),
+                    new SingleError(new StepErrorLocation(this), ErrorCode.DivideByZero)),
                 MathOperator.Divide => left.Value / right.Value,
                 MathOperator.Modulo => left.Value % right.Value,
-                MathOperator.Power => Convert.ToInt32(Math.Pow(left.Value, right.Value)),
-                _ => new SingleError($"Could not apply '{@operator.Value}'", ErrorCode.UnexpectedEnumValue, new StepErrorLocation(this))
+                MathOperator.Power  => Convert.ToInt32(Math.Pow(left.Value, right.Value)),
+                _                   => new SingleError(new StepErrorLocation(this), ErrorCode.UnexpectedEnumValue, nameof(Operator), @operator.Value)
             };
 
             return result;

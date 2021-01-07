@@ -68,6 +68,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Update="Internal\Errors\ErrorMessages-EN.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>ErrorMessages-EN.resx</DependentUpon>
+    </Compile>
     <Compile Update="Internal\Logging\LogMessages-En.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
@@ -76,6 +81,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Update="Internal\Errors\ErrorMessages-EN.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>ErrorMessages-EN.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
     <EmbeddedResource Update="Internal\Logging\LogMessages-EN.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>LogMessages-En.Designer.cs</LastGenOutput>

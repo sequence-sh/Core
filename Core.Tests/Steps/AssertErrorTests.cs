@@ -3,8 +3,6 @@ using JetBrains.Annotations;
 using Reductech.EDR.Core.Enums;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
-using Reductech.EDR.Core.Internal.Parser;
-using Reductech.EDR.Core.Parser;
 using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.TestHarness;
 using Reductech.EDR.Core.Util;
@@ -25,8 +23,8 @@ namespace Reductech.EDR.Core.Tests.Steps
                 yield return new DeserializeCase("Print Divide by zero",
                     "AssertError Step: (Print Value: (1 / 0))",
                     Unit.Default,
-                    "ApplyMathOperator Failed with message: Divide by Zero Error",
-                    "Print Failed with message: Divide by Zero Error"
+                    "ApplyMathOperator Failed with message: Attempt to Divide by Zero.",
+                    "Print Failed with message: Attempt to Divide by Zero."
                     );
             } }
 
@@ -44,8 +42,8 @@ namespace Reductech.EDR.Core.Tests.Steps
                             Right = Constant(0),
                         }}
                     }, Unit.Default,
-                    "ApplyMathOperator Failed with message: Divide by Zero Error",
-                    "Print Failed with message: Divide by Zero Error"
+                    "ApplyMathOperator Failed with message: Attempt to Divide by Zero.",
+                    "Print Failed with message: Attempt to Divide by Zero."
 
                     );
             } }
@@ -62,7 +60,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                             Value = Constant("Hello World")
                         }
                     },
-                    new ErrorBuilder("Expected an error but step was successful.", ErrorCode.AssertionFailed)
+                    new ErrorBuilder( ErrorCode.AssertionFailed, Constant("Print").Name)
                     );
             } }
 

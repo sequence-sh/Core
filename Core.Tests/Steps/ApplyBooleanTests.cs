@@ -135,7 +135,7 @@ namespace Reductech.EDR.Core.Tests.Steps
 
 
                 yield return new ErrorCase("BooleanOperator.None", noneStep,
-                    new SingleError($"Could not apply '{BooleanOperator.None}'", ErrorCode.UnexpectedEnumValue, new StepErrorLocation(noneStep)));
+                    new SingleError(new StepErrorLocation(noneStep), ErrorCode.UnexpectedEnumValue, nameof(ApplyBooleanOperator.Operator), BooleanOperator.None ));
 
                 //Do not do default cases as some errors are not propagated due to lazy evaluation
 
@@ -146,7 +146,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                         Right = Constant(true),
                         Operator = Constant(BooleanOperator.And)
                     },
-                    new SingleError("Left Fail", ErrorCode.Test, EntireSequenceLocation.Instance));
+                    new SingleError(EntireSequenceLocation.Instance, ErrorCode.Test, "Left Fail" ));
 
                 yield return new ErrorCase("Operator is error",
                     new ApplyBooleanOperator
@@ -155,7 +155,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                         Right = Constant(true),
                         Operator = new FailStep<BooleanOperator> { ErrorMessage = "Operator Fail" },
                     },
-                    new SingleError("Operator Fail", ErrorCode.Test, EntireSequenceLocation.Instance));
+                    new SingleError(EntireSequenceLocation.Instance, ErrorCode.Test,"Operator Fail" ));
 
                 yield return new ErrorCase("Right is error",
                     new ApplyBooleanOperator
@@ -164,7 +164,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                         Right = new FailStep<bool>{ErrorMessage = "Right Fail"},
                         Operator = Constant(BooleanOperator.And)
                     },
-                    new SingleError("Right Fail", ErrorCode.Test, EntireSequenceLocation.Instance));
+                    new SingleError(EntireSequenceLocation.Instance, ErrorCode.Test,"Right Fail" ));
             }
         }
     }

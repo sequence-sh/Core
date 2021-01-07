@@ -17,7 +17,7 @@ namespace Reductech.EDR.Core.Entities
         /// <returns></returns>
         public static string GetString(this EntityValue entityValue)
         {
-            return entityValue.Value.Match(_ => "",
+            return entityValue.Match(_ => "",
                 x => x,
                 x => x.ToString(),
                 x => x.ToString("G17"),
@@ -33,7 +33,7 @@ namespace Reductech.EDR.Core.Entities
         /// </summary>
         public static Maybe<int> TryGetInt(this EntityValue entityValue)
         {
-            return entityValue.Value.Match(
+            return entityValue.Match(
                 _ => Maybe<int>.None,
                 x => int.TryParse(x, out var i) ? i : Maybe<int>.None,
                 i => i,
@@ -51,7 +51,7 @@ namespace Reductech.EDR.Core.Entities
         /// </summary>
         public static Maybe<double> TryGetDouble(this EntityValue entityValue)
         {
-            return entityValue.Value.Match(
+            return entityValue.Match(
                 _ => Maybe<double>.None,
                 x => double.TryParse(x, out var d) ? d : Maybe<double>.None,
                 i => i,
@@ -70,7 +70,7 @@ namespace Reductech.EDR.Core.Entities
         /// </summary>
         public static Maybe<bool> TryGetBool(this EntityValue entityValue)
         {
-            return entityValue. Value.Match(
+            return entityValue.Match(
                 _ => Maybe<bool>.None,
                 x => bool.TryParse(x, out var b) ? b : Maybe<bool>.None,
                 _ => Maybe<bool>.None,
@@ -88,7 +88,7 @@ namespace Reductech.EDR.Core.Entities
         /// </summary>
         public static Maybe<Enumeration> TryGetEnumeration(this EntityValue entityValue, string enumName, IEnumerable<string> possibleValues)
         {
-            return entityValue.Value.Match(
+            return entityValue.Match(
                 _ => Maybe<Enumeration>.None,
                 s => possibleValues.Contains(s, StringComparer.OrdinalIgnoreCase)?
                 new Enumeration(enumName, s):
@@ -108,7 +108,7 @@ namespace Reductech.EDR.Core.Entities
         /// </summary>
         public static Maybe<DateTime> TryGetDateTime(this EntityValue entityValue)
         {
-            return entityValue.Value.Match(
+            return entityValue.Match(
                 _ => Maybe<DateTime>.None,
                 x => DateTime.TryParse(x, out var dt) ? dt : Maybe<DateTime>.None,
                 _ => Maybe<DateTime>.None,
@@ -126,7 +126,7 @@ namespace Reductech.EDR.Core.Entities
         /// </summary>
         public static Maybe<Entity> TryGetEntity(this EntityValue entityValue)
         {
-            return entityValue.Value.Match(
+            return entityValue.Match(
                 _ => Maybe<Entity>.None,
                 _ => Maybe<Entity>.None,
                 _ => Maybe<Entity>.None,
@@ -144,7 +144,7 @@ namespace Reductech.EDR.Core.Entities
         /// </summary>
         public static Maybe<IReadOnlyList<EntityValue>> TryGetEntityValueList(this EntityValue entityValue)
         {
-            return entityValue.Value.Match(
+            return entityValue.Match(
                 _ => Maybe<IReadOnlyList<EntityValue>>.None,
                 _ => Maybe<IReadOnlyList<EntityValue>>.None,
                 _ => Maybe<IReadOnlyList<EntityValue>>.None,

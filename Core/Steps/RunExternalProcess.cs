@@ -8,8 +8,6 @@ using Reductech.EDR.Core.Enums;
 using Reductech.EDR.Core.ExternalProcesses;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
-using Reductech.EDR.Core.Internal.Parser;
-using Reductech.EDR.Core.Parser;
 using Reductech.EDR.Core.Util;
 
 namespace Reductech.EDR.Core.Steps
@@ -66,6 +64,7 @@ namespace Reductech.EDR.Core.Steps
         /// </summary>
         [StepProperty(1)]
         [Required]
+        [Log(LogOutputLevel.Trace)]
         public IStep<StringStream> Path { get; set; } = null!;
 
         /// <summary>
@@ -73,7 +72,7 @@ namespace Reductech.EDR.Core.Steps
         /// </summary>
         [StepProperty(2)]
         [DefaultValueExplanation("No arguments")]
-        public IStep<Core.Array<StringStream>>? Arguments { get; set; }
+        public IStep<Array<StringStream>>? Arguments { get; set; }
 
         /// <summary>
         /// Encoding to use for the process output.

@@ -90,7 +90,7 @@ namespace Reductech.EDR.Core.Tests.Steps
                         To = Constant(3),
                         Increment = Constant(0)
                     },
-                    new ErrorBuilder("Cannot do a For loop with an increment of 0", ErrorCode.DivideByZero))
+                    new ErrorBuilder(ErrorCode.DivideByZero))
                         .WithExpectedFinalState(VariableName.Index.Name, 1)
                     ;
 

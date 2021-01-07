@@ -117,34 +117,121 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="DirectoryDeleted" xml:space="preserve">
-    <value>Directory Deleted: {Path}</value>
+  <data name="AssertionFailed" xml:space="preserve">
+    <value>Assertion Failed '{0}'</value>
   </data>
-  <data name="EnterStep" xml:space="preserve">
-    <value>{StepName} Started with Parameters: {Parameters}</value>
+  <data name="CannotCreateGeneric" xml:space="preserve">
+    <value>Could not create an instance of {1}&lt;{0}&gt;</value>
   </data>
-  <data name="ExitStepFailure" xml:space="preserve">
-    <value>{StepName} Failed with message: {Message}</value>
+  <data name="CannotCreateScopedContext" xml:space="preserve">
+    <value>{0} cannot create a scoped context</value>
   </data>
-  <data name="ExitStepSuccess" xml:space="preserve">
-    <value>{StepName} Completed Successfully with Result: {Result}</value>
+  <data name="CannotInferType" xml:space="preserve">
+    <value>Could not infer type</value>
   </data>
-  <data name="FileDeleted" xml:space="preserve">
-    <value>File Deleted: {Path}</value>
+  <data name="ConflictingParameters" xml:space="preserve">
+    <value>Parameters {0} and {1} are in conflict.</value>
   </data>
-  <data name="ItemToDeleteDidNotExist" xml:space="preserve">
-    <value>Item to Delete did not Exist: {Path}</value>
+  <data name="CouldNotParse" xml:space="preserve">
+    <value>Could not parse '{0}' as {1}</value>
   </data>
-  <data name="NoPathProvided" xml:space="preserve">
-    <value>No path was provided. Returning the Current Directory: {CurrentDirectory}</value>
+  <data name="CouldNotResolveVariable" xml:space="preserve">
+    <value>Could not resolve variable '{0}'</value>
   </data>
-  <data name="QualifyingPath" xml:space="preserve">
-    <value>Path {Path} was not fully qualified. Prepending the Current Directory: {CurrentDirectory}</value>
+  <data name="DivideByZero" xml:space="preserve">
+    <value>Attempt to Divide by Zero.</value>
   </data>
-  <data name="RemoveVariableOutOfScope" xml:space="preserve">
-    <value>Could not remove variable {variable} as it was out of scope.</value>
+  <data name="DuplicateParameter" xml:space="preserve">
+    <value>Duplicate Parameter: {0}.</value>
   </data>
-  <data name="SetVariableOutOfScope" xml:space="preserve">
-    <value>Could not set variable {variable} as it was out of scope.</value>
+  <data name="EmptySequence" xml:space="preserve">
+    <value>SCL is empty.</value>
+  </data>
+  <data name="ErrorCode.ExternalProcessError" xml:space="preserve">
+    <value>External Process Failed: '{0}'</value>
+  </data>
+  <data name="ExternalProcessMissingOutput" xml:space="preserve">
+    <value>External process {0} did not return an output of the expected form</value>
+  </data>
+  <data name="ExternalProcessNotFound" xml:space="preserve">
+    <value>Could not find process '{0}'</value>
+  </data>
+  <data name="IndexOutOfBounds" xml:space="preserve">
+    <value>Index was outside the bounds of the array.</value>
+  </data>
+  <data name="InvalidCast" xml:space="preserve">
+    <value>'{0}' cannot take the value '{1}'</value>
+  </data>
+  <data name="MissingParameter" xml:space="preserve">
+    <value>{0} was missing or empty.</value>
+  </data>
+  <data name="MissingStepSettings" xml:space="preserve">
+    <value>Could not get settings: {0}</value>
+  </data>
+  <data name="MissingVariable" xml:space="preserve">
+    <value>Variable '{0}' does not exist.</value>
+  </data>
+  <data name="RequirementNotMet" xml:space="preserve">
+    <value>Requirement '{0}' not met.</value>
+  </data>
+  <data name="SchemaInvalidMissingEnum" xml:space="preserve">
+    <value>Schema Invalid: No Enum name defined</value>
+  </data>
+  <data name="SchemaInvalidNoEnumValues" xml:space="preserve">
+    <value>SchemaInvalid: No Enum values defined</value>
+  </data>
+  <data name="SchemaViolationMissingProperty" xml:space="preserve">
+    <value>Schema Violated: Missing Property: '{0}'</value>
+  </data>
+  <data name="SchemaViolationUnexpectedList" xml:space="preserve">
+    <value>Schema Violated: Did not expect a list</value>
+  </data>
+  <data name="SchemaViolationUnexpectedNull" xml:space="preserve">
+    <value>Schema Violated: Expected not null</value>
+  </data>
+  <data name="SchemaViolationUnexpectedProperty" xml:space="preserve">
+    <value>Schema Violated: Unexpected Property: '{0}'</value>
+  </data>
+  <data name="SchemaViolationUnmatchedRegex" xml:space="preserve">
+    <value>Schema Violated: '{0}' does not match regex '{1}'</value>
+  </data>
+  <data name="SchemaViolationWrongType" xml:space="preserve">
+    <value>Schema Violated: '{0}' is not a {1}</value>
+  </data>
+  <data name="SCLSyntaxError" xml:space="preserve">
+    <value>Syntax Error: {0}</value>
+  </data>
+  <data name="SingleCharacterExpected" xml:space="preserve">
+    <value>{0} should be a single character, but was '{1}'.</value>
+  </data>
+  <data name="StepDoesNotExist" xml:space="preserve">
+    <value>The step '{0}' does not exist</value>
+  </data>
+  <data name="Test" xml:space="preserve">
+    <value>Test Error Message: '{0}'</value>
+  </data>
+  <data name="TypeNotComparable" xml:space="preserve">
+    <value>Type {0} is not comparable and so cannot be used for sorting.</value>
+  </data>
+  <data name="UnexpectedEnumType" xml:space="preserve">
+    <value>Enum '{0}' does not exist</value>
+  </data>
+  <data name="UnexpectedEnumValue" xml:space="preserve">
+    <value>Unexpected {0}: {1}</value>
+  </data>
+  <data name="UnexpectedParameter" xml:space="preserve">
+    <value>Unexpected Parameter '{0}' in '{1}'</value>
+  </data>
+  <data name="UnitExpected" xml:space="preserve">
+    <value>An SCL Sequence should have a final return type of Unit. Try wrapping your sequence with 'Print'.</value>
+  </data>
+  <data name="Unknown" xml:space="preserve">
+    <value>Unknown Error: '{0}'</value>
+  </data>
+  <data name="WrongParameterType" xml:space="preserve">
+    <value>{0} was a {1}, not a {2}</value>
+  </data>
+  <data name="WrongVariableType" xml:space="preserve">
+    <value>Variable '{0}' does not have type '{1}'.</value>
   </data>
 </root>

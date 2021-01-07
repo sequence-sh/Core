@@ -10,7 +10,6 @@ using CsvHelper.Configuration;
 using Reductech.EDR.Core.Enums;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
-using Reductech.EDR.Core.Internal.Parser;
 
 namespace Reductech.EDR.Core.Util
 {
@@ -80,7 +79,7 @@ namespace Reductech.EDR.Core.Util
                 resultChar = null;
             else if (charResult.Value.Length == 1)
                 resultChar = charResult.Value.Single();
-            else return new SingleError($"{propertyName} must be a single character.", ErrorCode.CSVError, errorLocation);
+            else return new SingleError(errorLocation, ErrorCode.SingleCharacterExpected, propertyName, charResult.Value);
 
             return resultChar;
         }
@@ -140,7 +139,7 @@ namespace Reductech.EDR.Core.Util
 
             bool HandleException(CsvHelperException exception)
             {
-                throw new ErrorException(new SingleError(exception, ErrorCode.CSVError, location));
+                throw new ErrorException(new SingleError(location, exception, ErrorCode.CSVError));
             }
         }
     }

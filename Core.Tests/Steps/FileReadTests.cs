@@ -77,10 +77,10 @@ namespace Reductech.EDR.Core.Tests.Steps
                         {
                             Path =  Constant("File.txt"),
                         },
-                        new ErrorBuilder("ValueIf Error", ErrorCode.Test)
+                        new ErrorBuilder(ErrorCode.Test,"ValueIf Error")
                     )
                     .WithFileSystemAction(x => x.Setup(a => a.ReadFile(
-                        "File.txt")).Returns(new ErrorBuilder("ValueIf Error", ErrorCode.Test)));
+                        "File.txt")).Returns(new ErrorBuilder( ErrorCode.Test, "ValueIf Error")));
             }
         }
     }

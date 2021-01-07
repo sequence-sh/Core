@@ -26,7 +26,7 @@
         ExternalProcessError,
 
         /// <summary>
-        /// The external step did not return an output of the expected form.
+        /// The external process did not return an output of the expected form.
         /// </summary>
         ExternalProcessMissingOutput,
 
@@ -38,7 +38,7 @@
         /// <summary>
         /// The requirements for a step were not met.
         /// </summary>
-        RequirementsNotMet,
+        RequirementNotMet,
 
         /// <summary>
         /// Cast failed.
@@ -76,16 +76,6 @@
         CSVError,
 
         /// <summary>
-        /// Property did not exist
-        /// </summary>
-        InvalidProperty,
-
-        /// <summary>
-        /// The variable was defined with multiple conflicting types.
-        /// </summary>
-        AmbiguousType,
-
-        /// <summary>
         /// The type of the variable could not be resolved.
         /// </summary>
         CouldNotResolveVariable,
@@ -94,11 +84,6 @@
         /// The sequence was empty.
         /// </summary>
         EmptySequence,
-
-        /// <summary>
-        /// The step could not be deserialized.
-        /// </summary>
-        CouldNotDeserialize,
 
         /// <summary>
         /// The step with the given name does not exist.
@@ -129,19 +114,12 @@
         /// </summary>
         UnexpectedEnumValue,
 
+        UnexpectedEnumType,
+
         /// <summary>
         /// Intentional error to be used during unit testing
         /// </summary>
         Test,
-
-        /// <summary>
-        /// Error caused by violation of a schema.
-        /// </summary>
-        SchemaViolation,
-        /// <summary>
-        /// Attempt to set a reserved variable.
-        /// </summary>
-        ReservedVariableName,
         /// <summary>
         /// An unexpected or unrecognized error
         /// </summary>
@@ -149,6 +127,30 @@
         /// <summary>
         /// The argument has the wrong type
         /// </summary>
-        WrongArgumentType
+        WrongParameterType,
+        TypeNotComparable,
+
+        CannotCreateScopedContext,
+        CannotCreateGeneric,
+
+        CannotInferType,
+
+        UnitExpected,
+        SCLSyntaxError,
+        SingleCharacterExpected,
+
+
+        SchemaViolationUnexpectedList,
+        SchemaViolationUnexpectedNull,
+        SchemaViolationUnmatchedRegex,
+        SchemaViolationWrongType,
+        SchemaViolationUnexpectedProperty,
+        SchemaViolationMissingProperty,
+
+
+
+        SchemaInvalidMissingEnum,
+        SchemaInvalidNoEnumValues
+
     }
 }

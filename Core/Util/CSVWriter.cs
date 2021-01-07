@@ -15,162 +15,193 @@ using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.Enums;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
-using Reductech.EDR.Core.Internal.Parser;
 
 namespace Reductech.EDR.Core.Util
 {
+
+/// <summary>
+/// Helper methods for writing CSV files
+/// </summary>
+public static class CSVWriter
+{
     /// <summary>
-    /// Helper methods for writing CSV files
+    /// Writes entities from an entityStream to a stream in csv format.
     /// </summary>
-    public static class CSVWriter
+    public static async Task<Result<StringStream, IError>> WriteCSV(
+        IStateMonad stateMonad,
+        IStep<Array<Entity>> entityStream,
+        IStep<StringStream> delimiter,
+        IStep<EncodingEnum> encoding,
+        IStep<StringStream> quoteCharacter,
+        IStep<bool> alwaysQuote,
+        IStep<StringStream> multiValueDelimiter,
+        IStep<StringStream> dateTimeFormat,
+        IErrorLocation errorLocation,
+        CancellationToken cancellationToken)
     {
-        /// <summary>
-        /// Writes entities from an entityStream to a stream in csv format.
-        /// </summary>
-        public static async Task<Result<StringStream, IError>> WriteCSV(
-            IStateMonad stateMonad,
-            IStep<Array<Entity>> entityStream,
-            IStep<StringStream> delimiter,
-            IStep<EncodingEnum> encoding,
-            IStep<StringStream> quoteCharacter,
-            IStep<bool> alwaysQuote,
-            IStep<StringStream> multiValueDelimiter,
-            IStep<StringStream> dateTimeFormat,
-            IErrorLocation errorLocation,
+        var entityStreamResult = await entityStream.Run(stateMonad, cancellationToken);
 
-            CancellationToken cancellationToken)
-        {
-            var entityStreamResult = await entityStream.Run(stateMonad, cancellationToken);
+        if (entityStreamResult.IsFailure)
+            return entityStreamResult.ConvertFailure<StringStream>();
 
-            if (entityStreamResult.IsFailure) return entityStreamResult.ConvertFailure<StringStream>();
+        var delimiterResult = await delimiter.Run(stateMonad, cancellationToken)
+            .Map(async x => await x.GetStringAsync());
 
-            var delimiterResult = await delimiter.Run(stateMonad, cancellationToken)
-                .Map(async x=> await x.GetStringAsync());
+        if (delimiterResult.IsFailure)
+            return delimiterResult.ConvertFailure<StringStream>();
 
-            if (delimiterResult.IsFailure) return delimiterResult.ConvertFailure<StringStream>();
+        var encodingResult = await encoding.Run(stateMonad, cancellationToken);
 
-            var encodingResult = await encoding.Run(stateMonad, cancellationToken);
+        if (encodingResult.IsFailure)
+            return encodingResult.ConvertFailure<StringStream>();
 
-            if (encodingResult.IsFailure) return encodingResult.ConvertFailure<StringStream>();
+        var quoteResult = await CSVReader.TryConvertToChar(
+            quoteCharacter,
+            "Quote Character",
+            stateMonad,
+            errorLocation,
+            cancellationToken
+        );
 
-            var quoteResult = await CSVReader.TryConvertToChar(quoteCharacter, "Quote Character", stateMonad, errorLocation, cancellationToken);
-            if (quoteResult.IsFailure) return quoteResult.ConvertFailure<StringStream>();
+        if (quoteResult.IsFailure)
+            return quoteResult.ConvertFailure<StringStream>();
 
-            var multiValueResult = await CSVReader.TryConvertToChar(multiValueDelimiter, "MultiValue Delimiter", stateMonad, errorLocation, cancellationToken);
-            if (multiValueResult.IsFailure) return multiValueResult.ConvertFailure<StringStream>();
+        var multiValueResult = await CSVReader.TryConvertToChar(
+            multiValueDelimiter,
+            "MultiValue Delimiter",
+            stateMonad,
+            errorLocation,
+            cancellationToken
+        );
 
-            if(multiValueResult.Value is null)
-                return new SingleError("MultiValue Delimiter is empty", ErrorCode.CSVError, errorLocation);
+        if (multiValueResult.IsFailure)
+            return multiValueResult.ConvertFailure<StringStream>();
 
+        if (multiValueResult.Value is null)
+            return new SingleError(
+                errorLocation,
+                ErrorCode.MissingParameter,
+                nameof(Steps.FromCSV.MultiValueDelimiter)
+            );
 
-            var alwaysQuoteResult = await alwaysQuote.Run(stateMonad, cancellationToken);
-            if (alwaysQuoteResult.IsFailure) return alwaysQuoteResult.ConvertFailure<StringStream>();
+        var alwaysQuoteResult = await alwaysQuote.Run(stateMonad, cancellationToken);
 
-            var dateTimeResult = await dateTimeFormat.Run(stateMonad, cancellationToken)
-                .Map(async x=> await x.GetStringAsync());
-            if (dateTimeResult.IsFailure) return dateTimeResult.ConvertFailure<StringStream>();
+        if (alwaysQuoteResult.IsFailure)
+            return alwaysQuoteResult.ConvertFailure<StringStream>();
 
+        var dateTimeResult = await dateTimeFormat.Run(stateMonad, cancellationToken)
+            .Map(async x => await x.GetStringAsync());
 
-            var result = await WriteCSV(entityStreamResult.Value,
+        if (dateTimeResult.IsFailure)
+            return dateTimeResult.ConvertFailure<StringStream>();
+
+        var result = await WriteCSV(
+                entityStreamResult.Value,
                 encodingResult.Value.Convert(),
                 delimiterResult.Value,
                 quoteResult.Value,
                 multiValueResult.Value.Value,
                 alwaysQuoteResult.Value,
-                dateTimeResult.Value, cancellationToken)
-                    .Map(x=> new StringStream(x, encodingResult.Value));
+                dateTimeResult.Value,
+                cancellationToken
+            )
+            .Map(x => new StringStream(x, encodingResult.Value));
 
-            return result;
+        return result;
+    }
+
+    /// <summary>
+    /// Writes entities from an entityStream to a stream in csv format.
+    /// </summary>
+    public static async Task<Result<Stream, IError>> WriteCSV(
+        Array<Entity> entityStream,
+        Encoding encoding,
+        string delimiter,
+        char? quoteCharacter,
+        char multiValueDelimiter,
+        bool alwaysQuote,
+        string dateTimeFormat,
+        CancellationToken cancellationToken)
+    {
+        var results = await entityStream.GetElementsAsync(cancellationToken);
+
+        if (results.IsFailure)
+            return results.ConvertFailure<Stream>();
+
+        var stream = new MemoryStream();
+
+        if (!results.Value.Any())
+            return stream; //empty stream
+
+        var textWriter = new StreamWriter(stream, encoding);
+
+        var configuration = new CsvConfiguration(CultureInfo.InvariantCulture)
+        {
+            Delimiter                = delimiter,
+            Encoding                 = encoding,
+            SanitizeForInjection     = false,
+            DetectColumnCountChanges = false
+        };
+
+        var options = new TypeConverterOptions { Formats = new[] { dateTimeFormat } };
+        configuration.TypeConverterOptionsCache.AddOptions<DateTime>(options);
+
+        if (quoteCharacter.HasValue)
+        {
+            configuration.Quote = quoteCharacter.Value;
+
+            if (alwaysQuote)
+                configuration.ShouldQuote = (_, _) => true;
         }
 
+        var writer = new CsvWriter(textWriter, configuration);
 
+        var records =
+            results.Value.Select(x => ConvertToObject(x, multiValueDelimiter, dateTimeFormat));
 
-        /// <summary>
-        /// Writes entities from an entityStream to a stream in csv format.
-        /// </summary>
-        public static async Task<Result<Stream, IError>> WriteCSV(
-            Array<Entity> entityStream,
-            Encoding encoding,
-            string delimiter,
-            char? quoteCharacter,
-            char multiValueDelimiter,
-            bool alwaysQuote,
-            string dateTimeFormat,
-            CancellationToken cancellationToken)
+        await writer.WriteRecordsAsync(records); //TODO pass an async enumerable
+
+        await textWriter.FlushAsync();
+
+        stream.Seek(0, SeekOrigin.Begin);
+
+        return stream;
+
+        static object ConvertToObject(Entity entity, char delimiter, string dateTimeFormat)
         {
-            var results = await entityStream.GetElementsAsync(cancellationToken);
+            IDictionary<string, object> expandoObject = new ExpandoObject()!;
 
-            if (results.IsFailure) return results.ConvertFailure<Stream>();
-
-            var stream = new MemoryStream();
-
-            if (!results.Value.Any())
-                return stream;//empty stream
-
-            var textWriter = new StreamWriter(stream, encoding);
-
-            var configuration = new CsvConfiguration(CultureInfo.InvariantCulture)
+            foreach (var entityProperty in entity)
             {
-                Delimiter = delimiter,
-                Encoding = encoding,
-                SanitizeForInjection = false,
-                DetectColumnCountChanges = false
-            };
+                var s = GetString(entityProperty.BestValue, delimiter, dateTimeFormat);
 
-            var options = new TypeConverterOptions { Formats = new[] { dateTimeFormat } };
-            configuration.TypeConverterOptionsCache.AddOptions<DateTime>(options);
-
-            if (quoteCharacter.HasValue)
-            {
-                configuration.Quote = quoteCharacter.Value;
-                if (alwaysQuote)
-                    configuration.ShouldQuote = (_,_) => true;
+                expandoObject[entityProperty.Name] = s;
             }
 
-            var writer = new CsvWriter(textWriter, configuration);
+            return expandoObject;
 
-            var records = results.Value.Select(x => ConvertToObject(x, multiValueDelimiter, dateTimeFormat));
-
-            await writer.WriteRecordsAsync(records); //TODO pass an async enumerable
-
-            await textWriter.FlushAsync();
-
-            stream.Seek(0, SeekOrigin.Begin);
-
-            return stream;
-
-
-            static object ConvertToObject(Entity entity, char delimiter, string dateTimeFormat)
+            static string GetString(EntityValue ev, char delimiter, string dateTimeFormat)
             {
-                IDictionary<string, object> expandoObject = new ExpandoObject()!;
+                var valueString = ev.Match(
+                    _ => "",
+                    x => x,
+                    x => x.ToString(),
+                    x => x.ToString("G17"),
+                    x => x.ToString(),
+                    x => x.ToString(),
+                    x => x.ToString(dateTimeFormat),
+                    x => x.ToString(),
+                    x =>
+                        string.Join(
+                            delimiter,
+                            x.Select(ev1 => GetString(ev1, delimiter, dateTimeFormat))
+                        )
+                );
 
-                foreach (var entityProperty in entity)
-                {
-                    var s = GetString(entityProperty.BestValue, delimiter, dateTimeFormat);
-
-                    expandoObject[entityProperty.Name] = s;
-                }
-
-                return expandoObject;
-
-                static string GetString(EntityValue ev, char delimiter, string dateTimeFormat)
-                {
-                    var valueString = ev.Value.Match(
-                   _ => "",
-                   x => x,
-                   x => x.ToString(),
-                   x => x.ToString("G17"),
-                   x => x.ToString(),
-                   x => x.ToString(),
-                   x => x.ToString(dateTimeFormat),
-                   x => x.ToString(),
-                   x =>
-                       string.Join(delimiter, x.Select(ev1 => GetString(ev1, delimiter, dateTimeFormat)))
-                       );
-
-                    return valueString;
-                }
+                return valueString;
             }
         }
     }
+}
+
 }

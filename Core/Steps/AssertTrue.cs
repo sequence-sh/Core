@@ -20,8 +20,8 @@ namespace Reductech.EDR.Core.Steps
         {
 
             return await Boolean.Run(stateMonad, cancellationToken).Ensure(x => x,
-                    new SingleError($"Assertion Failed '{Boolean.Name}'", ErrorCode.IndexOutOfBounds, new StepErrorLocation(this)))
-                .Map(x => Unit.Default);
+                    new SingleError(new StepErrorLocation(this), ErrorCode.AssertionFailed, Boolean.Name))
+                .Map(_ => Unit.Default);
         }
 
         /// <inheritdoc />

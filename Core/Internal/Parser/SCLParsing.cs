@@ -26,7 +26,7 @@ namespace Reductech.EDR.Core.Internal.Parser
         public static Result<IFreezableStep, IError> ParseSequence(string text)
         {
             if (string.IsNullOrWhiteSpace(text))
-                return new SingleError("Sequence is empty.", ErrorCode.EmptySequence, EntireSequenceLocation.Instance);
+                return new SingleError(EntireSequenceLocation.Instance, ErrorCode.EmptySequence);
 
             var r = TryParse(text).Map(x=> x.ConvertToStep());
 
@@ -73,7 +73,7 @@ namespace Reductech.EDR.Core.Internal.Parser
             public override void SyntaxError(TextWriter output, IRecognizer recognizer, IToken offendingSymbol, int line, int charPositionInLine,
                 string msg, RecognitionException e)
             {
-                var error = new SingleError(msg, ErrorCode.CouldNotParse, new TextLocation(offendingSymbol));
+                var error = new SingleError(new TextLocation(offendingSymbol), ErrorCode.SCLSyntaxError, msg);
                 Errors.Add(error);
             }
         }
@@ -109,7 +109,7 @@ namespace Reductech.EDR.Core.Internal.Parser
 
 
                 if (result.Value.Count == 0)
-                    return new SingleError("Sequence contained no members", ErrorCode.CouldNotParse, new TextLocation(context));
+                    return new SingleError(new TextLocation(context), ErrorCode.EmptySequence);
 
                 var sequence = CreateFreezableSequence(
                     result.Value.SkipLast(1).ToList(),
@@ -143,8 +143,11 @@ namespace Reductech.EDR.Core.Internal.Parser
             public override Result<FreezableStepProperty, IError> VisitDateTime(SCLParser.DateTimeContext context)
             {
                 if (!DateTime.TryParse(context.GetText(), out var dateTime))
-                    return new SingleError($"Could not parse '{context.GetText()}'", ErrorCode.CouldNotParse,
-                        new TextLocation(context));
+                {
+                    var message = context.GetText();
+                    return new SingleError(new TextLocation(context), ErrorCode.CouldNotParse, message, nameof(DateTime));
+                }
+
 
                 var constant = new DateTimeConstantFreezable(dateTime);
 
@@ -170,12 +173,12 @@ namespace Reductech.EDR.Core.Internal.Parser
 
             /// <inheritdoc />
             public override Result<FreezableStepProperty, IError> VisitErrorNode(IErrorNode node) =>
-                new SingleError($"Could not parse '{node.GetText()}'", ErrorCode.CouldNotParse,new TextLocation(node.Symbol));
+                new SingleError(new TextLocation(node.Symbol), ErrorCode.SCLSyntaxError, node.GetText());
 
             private static SingleError ParseError(ParserRuleContext pt)
             {
 
-                return new SingleError($"Could not parse '{pt.GetText()}'", ErrorCode.CouldNotParse, new TextLocation(pt));
+                return new SingleError(new TextLocation(pt), ErrorCode.SCLSyntaxError, pt.GetText());
             }
 
             /// <inheritdoc />
@@ -222,8 +225,7 @@ namespace Reductech.EDR.Core.Internal.Parser
 
                     return member;
                 }
-                return new SingleError($"Could not parse '{context.GetText()}' as a number",
-                    ErrorCode.CouldNotParse,new TextLocation(context));
+                return new SingleError(new TextLocation(context), ErrorCode.CouldNotParse, context.GetText(), "Number");
             }
 
             /// <inheritdoc />
@@ -380,10 +382,7 @@ namespace Reductech.EDR.Core.Internal.Parser
 
                 foreach (var duplicateKeys in l.GroupBy(x => x.key).Where(x => x.Count() > 1))
                 {
-                    errors.Add(new SingleError(
-                        $"Duplicate Parameter '{duplicateKeys.Key}'",
-                        ErrorCode.DuplicateParameter,
-                        location));
+                    errors.Add(new SingleError(location, ErrorCode.DuplicateParameter, duplicateKeys.Key));
                 }
 
                 if (errors.Any())

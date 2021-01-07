@@ -79,7 +79,7 @@ namespace Reductech.EDR.Core.Internal.Serialization
         /// </summary>
         public static string Serialize(this EntityValue entityValue)
         {
-            return entityValue.Value.Match(_ => DoubleQuote(""),
+            return entityValue.Match(_ => DoubleQuote(""),
                 DoubleQuote,
                 x => x.ToString(),
                 x => x.ToString("G17"),

@@ -187,27 +187,29 @@ namespace Reductech.EDR.Core
             CancellationToken cancellation)
         {
             if(index < 0)
-                return new SingleError("Index was less than zero.", ErrorCode.IndexOutOfBounds,
-                    location);
+                return new SingleError(location, ErrorCode.IndexOutOfBounds);
 
-            if (Option.IsT0)
+            if (Option.TryPickT0(out var list, out var asyncList))
             {
-                if(index >= Option.AsT0.Count)
-                    return new SingleError("Index was out of the range of the array.", ErrorCode.IndexOutOfBounds,
-                    location);
+                if (index >= list.Count)
+                    return new SingleError(location, ErrorCode.IndexOutOfBounds);
 
                 return Option.AsT0[index];
             }
 
             try
             {
-                var r = await TryRun(Option.AsT1, (x, c) => x.ElementAtAsync(index, c), cancellation);
+                var r = await TryRun(
+                    asyncList,
+                    (x, c) => x.ElementAtAsync(index, c),
+                    cancellation
+                );
 
                 return r;
             }
             catch (IndexOutOfRangeException)
             {
-                return new SingleError("Index was out of the range of the array.", ErrorCode.IndexOutOfBounds, location);
+                return new SingleError(location, ErrorCode.IndexOutOfBounds);
             }
         }
 

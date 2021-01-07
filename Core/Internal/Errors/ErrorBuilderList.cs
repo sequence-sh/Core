@@ -25,7 +25,7 @@ namespace Reductech.EDR.Core.Internal.Errors
         public IEnumerable<ErrorBuilder> GetErrorBuilders() => ErrorBuilders;
 
         /// <inheritdoc />
-        public string AsString => string.Join("; ", ErrorBuilders.Select(x => x.Message));
+        public string AsString => string.Join("; ", ErrorBuilders.Select(x => x.AsString));
 
         /// <inheritdoc />
         public override string ToString() => AsString;

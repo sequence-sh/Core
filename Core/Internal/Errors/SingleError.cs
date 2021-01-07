@@ -9,28 +9,29 @@ namespace Reductech.EDR.Core.Internal.Errors
     /// </summary>
     public class SingleError : IError
     {
-        /// <summary>
-        /// Create a new error.
-        /// </summary>
-        public SingleError(string message, ErrorCode errorCode, IErrorLocation location, IError? innerError = null)
-        {
-            Message = message;
-            Location = location;
-            InnerError = innerError;
-            Exception = null;
-            ErrorCode = errorCode;
-        }
+
 
         /// <summary>
         /// Create a new error with an exception.
         /// </summary>
-        public SingleError(Exception exception, ErrorCode errorCode, IErrorLocation location)
+        public SingleError(IErrorLocation location, Exception exception, ErrorCode errorCode)
         {
             Message = exception.Message;
             Location = location;
-            InnerError = null;
             Exception = exception;
-            ErrorCode = errorCode;
+            ErrorCode = errorCode.ToString();
+            Timestamp = DateTime.Now;
+        }
+
+        /// <summary>
+        /// Create a new error by providing the error code and arguments
+        /// </summary>
+        public SingleError(IErrorLocation location, ErrorCode errorCode, params object?[] args)
+        {
+            Message =  errorCode.GetFormattedMessage(args);
+            Location = location;
+            Exception = null;
+            ErrorCode = errorCode.ToString();
             Timestamp = DateTime.Now;
         }
 
@@ -51,19 +52,14 @@ namespace Reductech.EDR.Core.Internal.Errors
         public IErrorLocation Location { get; }
 
         /// <summary>
-        /// The error that caused this error.
-        /// </summary>
-        public IError? InnerError { get; }
-
-        /// <summary>
         /// Associated Exception if there is one
         /// </summary>
         public Exception? Exception { get; }
 
         /// <summary>
-        /// The error code.
+        /// The error code as a string.
         /// </summary>
-        public ErrorCode ErrorCode { get; }
+        public string ErrorCode { get; }
 
         /// <inheritdoc />
         public IEnumerable<SingleError> GetAllErrors()
@@ -106,6 +102,6 @@ namespace Reductech.EDR.Core.Internal.Errors
         }
 
         /// <inheritdoc />
-        public override int GetHashCode() => HashCode.Combine(Message, Location, (int) ErrorCode);
+        public override int GetHashCode() => HashCode.Combine(Message, Location, ErrorCode);
     }
 }

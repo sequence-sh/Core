@@ -10,8 +10,6 @@ using OneOf;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Internal.Logging;
-using Reductech.EDR.Core.Internal.Parser;
-using Reductech.EDR.Core.Parser;
 using Reductech.EDR.Core.Util;
 
 namespace Reductech.EDR.Core.Internal
@@ -78,7 +76,7 @@ namespace Reductech.EDR.Core.Internal
         public Task<Result<T1, IError>> Run<T1>(IStateMonad stateMonad, CancellationToken cancellationToken)
         {
             return Run(stateMonad, cancellationToken).BindCast<T, T1, IError>(
-                    new SingleError($"Could not cast {typeof(T)} to {typeof(T1)}", ErrorCode.InvalidCast, new StepErrorLocation(this)));
+                    new SingleError(new StepErrorLocation(this), ErrorCode.InvalidCast,typeof(T),typeof(T1) ));
         }
 
         /// <summary>
@@ -184,7 +182,7 @@ namespace Reductech.EDR.Core.Internal
 
         /// <inheritdoc />
         public virtual Result<StepContext, IError> TryGetScopedContext(StepContext baseContext, IFreezableStep scopedStep) =>
-            new SingleError($"{Name} cannot create a scoped context", ErrorCode.UnexpectedParameter, new StepErrorLocation(this));
+            new SingleError(new StepErrorLocation(this), ErrorCode.CannotCreateScopedContext, Name);
 
         /// <inheritdoc />
         public Result<Unit, IError> Verify(ISettings settings)

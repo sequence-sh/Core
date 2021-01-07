@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Linq;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Attributes;
@@ -81,12 +80,12 @@ namespace Reductech.EDR.Core.Entities
                 else if (AllowExtraProperties)//This entity has a property that is not in the schema
                     newProperties.Add(entityProperty);
                 else
-                    errors.Add(new ErrorBuilder($"Unexpected Property '{entityProperty.Name}'", ErrorCode.SchemaViolation));
+                    errors.Add(new ErrorBuilder(ErrorCode.SchemaViolationUnexpectedProperty, entityProperty.Name));
             }
 
             foreach (var (key, _) in remainingProperties
                 .Where(x=>x.Value.Multiplicity == Multiplicity.ExactlyOne || x.Value.Multiplicity == Multiplicity.AtLeastOne))
-                errors.Add(new ErrorBuilder($"Missing property '{key}'", ErrorCode.SchemaViolation));
+                errors.Add(new ErrorBuilder(ErrorCode.SchemaViolationMissingProperty, key));
 
             if (errors.Any())
             {
@@ -121,7 +120,7 @@ namespace Reductech.EDR.Core.Entities
 
                 if(childEntity.HasValue)
                     return SchemaProperty.TryCreateFromEntity(childEntity.Value);
-                return new ErrorBuilder($"Could not convert {ev} to SchemaProperty", ErrorCode.InvalidCast);
+                return new ErrorBuilder( ErrorCode.InvalidCast, ev, typeof(SchemaProperty).Name);
             }, d=> schema.Properties = d));
 
             var r = results.Combine(ErrorBuilderList.Combine)
