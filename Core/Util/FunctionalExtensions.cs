@@ -74,8 +74,7 @@ public static class FunctionalExtensions
     /// Casts the result to type T2.
     /// Returns failure if this cast is not possible.
     /// </summary>
-    public static Result<T2> BindCast<T1, T2>(
-        this Result<T1> result) where T2 : T1
+    public static Result<T2> BindCast<T1, T2>(this Result<T1> result) where T2 : T1
     {
         if (result.IsFailure)
             return result.ConvertFailure<T2>();
@@ -106,8 +105,8 @@ public static class FunctionalExtensions
     /// Casts the result to type T2.
     /// Returns failure if this cast is not possible.
     /// </summary>
-    public static async Task<Result<T2>> BindCast<T1, T2>(
-        this Task<Result<T1>> result) where T2 : T1
+    public static async Task<Result<T2>> BindCast<T1, T2>(this Task<Result<T1>> result)
+        where T2 : T1
     {
         var result1 = await result;
         return result1.BindCast<T1, T2>();
@@ -143,8 +142,7 @@ public static class FunctionalExtensions
     /// <summary>
     /// Returns a single value from the sequence or a failure.
     /// </summary>
-    public static Result<T> BindSingle<T>(
-        this Result<IReadOnlyList<T>> result)
+    public static Result<T> BindSingle<T>(this Result<IReadOnlyList<T>> result)
     {
         if (result.IsFailure)
             return result.ConvertFailure<T>();

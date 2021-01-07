@@ -10,45 +10,49 @@ using Reductech.EDR.Core.Internal.Errors;
 namespace Reductech.EDR.Core.Steps
 {
 
-    /// <summary>
-    /// Generates documentation for all available steps.
-    /// </summary>
-    public sealed class GenerateDocumentation : CompoundStep<StringStream> //TODO maybe output a list of entities
+/// <summary>
+/// Generates documentation for all available steps.
+/// </summary>
+public sealed class
+    GenerateDocumentation : CompoundStep<StringStream> //TODO maybe output a list of entities
+{
+    /// <inheritdoc />
+    protected override async Task<Result<StringStream, IError>> Run(
+        IStateMonad stateMonad,
+        CancellationToken cancellationToken)
     {
-        /// <inheritdoc />
-        protected override async Task<Result<StringStream, IError>> Run(IStateMonad stateMonad,
-            CancellationToken cancellationToken)
-        {
-            await Task.CompletedTask;
+        await Task.CompletedTask;
 
-            var documented = stateMonad.StepFactoryStore
-                .Dictionary
-                .Values
-                .Select(x => new StepWrapper(x))
-                .ToList();
+        var documented = stateMonad.StepFactoryStore
+            .Dictionary
+            .Values
+            .Select(x => new StepWrapper(x))
+            .ToList();
 
-            var lines = DocumentationCreator.CreateDocumentationLines(documented);
+        var lines = DocumentationCreator.CreateDocumentationLines(documented);
 
-            var document = string.Join(Environment.NewLine, lines);
+        var document = string.Join(Environment.NewLine, lines);
 
-            return new StringStream(document);
-        }
-
-
-        /// <inheritdoc />
-        public override IStepFactory StepFactory => GenerateDocumentationStepFactory.Instance;
+        return new StringStream(document);
     }
 
-    /// <summary>
-    /// Generates documentation for all available steps.
-    /// </summary>
-    public sealed class GenerateDocumentationStepFactory : SimpleStepFactory<GenerateDocumentation, StringStream>
-    {
-        private GenerateDocumentationStepFactory() { }
+    /// <inheritdoc />
+    public override IStepFactory StepFactory => GenerateDocumentationStepFactory.Instance;
+}
 
-        /// <summary>
-        /// The instance.
-        /// </summary>
-        public static SimpleStepFactory<GenerateDocumentation, StringStream> Instance { get; } = new GenerateDocumentationStepFactory();
-    }
+/// <summary>
+/// Generates documentation for all available steps.
+/// </summary>
+public sealed class
+    GenerateDocumentationStepFactory : SimpleStepFactory<GenerateDocumentation, StringStream>
+{
+    private GenerateDocumentationStepFactory() { }
+
+    /// <summary>
+    /// The instance.
+    /// </summary>
+    public static SimpleStepFactory<GenerateDocumentation, StringStream> Instance { get; } =
+        new GenerateDocumentationStepFactory();
+}
+
 }

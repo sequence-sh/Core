@@ -14,24 +14,25 @@ public sealed class LogSituationHelperCoreEN : ILogSituationHelper<LogSituationC
     /// <summary>
     /// The Instance
     /// </summary>
-    public static ILogSituationHelper<LogSituationCore> Instance { get; } = new LogSituationHelperCoreEN();
+    public static ILogSituationHelper<LogSituationCore> Instance { get; } =
+        new LogSituationHelperCoreEN();
 
     /// <inheritdoc />
     public LogLevel GetLogLevel(LogSituationCore logSituation)
     {
         return logSituation switch
         {
-            LogSituationCore.EnterStep                => LogLevel.Trace,
-            LogSituationCore.ExitStepFailure          => LogLevel.Warning,
-            LogSituationCore.ExitStepSuccess          => LogLevel.Trace,
-            LogSituationCore.QualifyingPath           => LogLevel.Debug,
-            LogSituationCore.NoPathProvided           => LogLevel.Warning,
-            LogSituationCore.DirectoryDeleted         => LogLevel.Debug,
-            LogSituationCore.FileDeleted              => LogLevel.Debug,
-            LogSituationCore.ItemToDeleteDidNotExist  => LogLevel.Debug,
-            LogSituationCore.SetVariableOutOfScope    => LogLevel.Warning,
+            LogSituationCore.EnterStep => LogLevel.Trace,
+            LogSituationCore.ExitStepFailure => LogLevel.Warning,
+            LogSituationCore.ExitStepSuccess => LogLevel.Trace,
+            LogSituationCore.QualifyingPath => LogLevel.Debug,
+            LogSituationCore.NoPathProvided => LogLevel.Warning,
+            LogSituationCore.DirectoryDeleted => LogLevel.Debug,
+            LogSituationCore.FileDeleted => LogLevel.Debug,
+            LogSituationCore.ItemToDeleteDidNotExist => LogLevel.Debug,
+            LogSituationCore.SetVariableOutOfScope => LogLevel.Warning,
             LogSituationCore.RemoveVariableOutOfScope => LogLevel.Warning,
-            _                                         => throw new ArgumentOutOfRangeException(nameof(logSituation), logSituation, null)
+            _ => throw new ArgumentOutOfRangeException(nameof(logSituation), logSituation, null)
         };
     }
 
@@ -40,17 +41,17 @@ public sealed class LogSituationHelperCoreEN : ILogSituationHelper<LogSituationC
     {
         return logSituation switch
         {
-            LogSituationCore.EnterStep                => LogMessages_EN.EnterStep,
-            LogSituationCore.ExitStepSuccess          => LogMessages_EN.ExitStepSuccess,
-            LogSituationCore.ExitStepFailure          => LogMessages_EN.ExitStepFailure,
-            LogSituationCore.QualifyingPath           => LogMessages_EN.QualifyingPath,
-            LogSituationCore.NoPathProvided           => LogMessages_EN.NoPathProvided,
-            LogSituationCore.DirectoryDeleted         => LogMessages_EN.DirectoryDeleted,
-            LogSituationCore.FileDeleted              => LogMessages_EN.FileDeleted,
-            LogSituationCore.ItemToDeleteDidNotExist  => LogMessages_EN.ItemToDeleteDidNotExist,
-            LogSituationCore.SetVariableOutOfScope    => LogMessages_EN.SetVariableOutOfScope,
+            LogSituationCore.EnterStep => LogMessages_EN.EnterStep,
+            LogSituationCore.ExitStepSuccess => LogMessages_EN.ExitStepSuccess,
+            LogSituationCore.ExitStepFailure => LogMessages_EN.ExitStepFailure,
+            LogSituationCore.QualifyingPath => LogMessages_EN.QualifyingPath,
+            LogSituationCore.NoPathProvided => LogMessages_EN.NoPathProvided,
+            LogSituationCore.DirectoryDeleted => LogMessages_EN.DirectoryDeleted,
+            LogSituationCore.FileDeleted => LogMessages_EN.FileDeleted,
+            LogSituationCore.ItemToDeleteDidNotExist => LogMessages_EN.ItemToDeleteDidNotExist,
+            LogSituationCore.SetVariableOutOfScope => LogMessages_EN.SetVariableOutOfScope,
             LogSituationCore.RemoveVariableOutOfScope => LogMessages_EN.RemoveVariableOutOfScope,
-            _                                         => throw new ArgumentOutOfRangeException(nameof(logSituation), logSituation, null)
+            _ => throw new ArgumentOutOfRangeException(nameof(logSituation), logSituation, null)
         };
     }
 }

@@ -9,36 +9,57 @@ using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
-    public class PathCombineTests : StepTestBase<PathCombine, StringStream>
+
+public class PathCombineTests : StepTestBase<PathCombine, StringStream>
+{
+    /// <inheritdoc />
+    public PathCombineTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper) { }
+
+    /// <inheritdoc />
+    protected override IEnumerable<StepCase> StepCases
     {
-        /// <inheritdoc />
-        public PathCombineTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper) {}
-
-        /// <inheritdoc />
-        protected override IEnumerable<StepCase> StepCases
+        get
         {
-            get
-            {
-                var currentDirectory = Environment.CurrentDirectory;
+            var currentDirectory = Environment.CurrentDirectory;
 
+            var expected = Path.Combine(currentDirectory, "Hello", "World");
 
-                var expected = Path.Combine(currentDirectory, "Hello", "World");
-
-
-                yield return new StepCase("Non Relative", new PathCombine
+            yield return new StepCase(
+                "Non Relative",
+                new PathCombine
                 {
-                    Paths = new ArrayNew<StringStream>{Elements = new List<IStep<StringStream>>(){Constant(currentDirectory), Constant("Hello"), Constant("World")}}
-                }, expected
-                    );
+                    Paths = new ArrayNew<StringStream>
+                    {
+                        Elements = new List<IStep<StringStream>>()
+                        {
+                            Constant(currentDirectory),
+                            Constant("Hello"),
+                            Constant("World")
+                        }
+                    }
+                },
+                expected
+            );
 
-
-                yield return new StepCase("Relative", new PathCombine
-                {
-                    Paths = new ArrayNew<StringStream>{Elements = new List<IStep<StringStream>>(){ Constant("Hello"), Constant("World")}}
-                }, expected)
-                    .WithFileSystemAction(x=>x.Setup(a=>a.GetCurrentDirectory()).Returns(currentDirectory));
-            }
+            yield return new StepCase(
+                    "Relative",
+                    new PathCombine
+                    {
+                        Paths = new ArrayNew<StringStream>
+                        {
+                            Elements = new List<IStep<StringStream>>()
+                            {
+                                Constant("Hello"), Constant("World")
+                            }
+                        }
+                    },
+                    expected
+                )
+                .WithFileSystemAction(
+                    x => x.Setup(a => a.GetCurrentDirectory()).Returns(currentDirectory)
+                );
         }
-
     }
+}
+
 }

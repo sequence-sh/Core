@@ -4,104 +4,118 @@ using System.Linq;
 
 namespace Reductech.EDR.Core.Internal.Documentation
 {
-    internal static class Prettifier
+
+internal static class Prettifier
+{
+    internal static IEnumerable<string> CreateMarkdownTable(
+        IEnumerable<IReadOnlyCollection<string?>> rows)
     {
-        internal static IEnumerable<string> CreateMarkdownTable(IEnumerable<IReadOnlyCollection<string?>> rows)
+        var data = rows.SelectMany(
+                (row, rowNumber) =>
+                    row.Select(
+                        (text, columnNumber) =>
+                            (rowNumber, columnNumber, text: Escape(text))
+                    )
+            )
+            .ToList();
+
+        var columnWidthDictionary = data.GroupBy(x => x.columnNumber)
+            .ToDictionary(
+                x => x.Key,
+                x => x.Max(c => c.text.EnumerateRunes().Count())
+            );
+
+        foreach (var grouping in
+            data.GroupBy(d => d.rowNumber).OrderBy(x => x.Key))
         {
-            var data = rows.SelectMany((row, rowNumber) =>
-                row.Select((text, columnNumber) =>
-                    (rowNumber, columnNumber, text: Escape(text)))
-                ).ToList();
+            var terms = new List<string>();
+            var i     = 0;
 
-            var columnWidthDictionary = data.GroupBy(x => x.columnNumber)
-                .ToDictionary(x => x.Key,
-                    x => x.Max(c => c.text.EnumerateRunes().Count()));
-
-
-            foreach (var grouping in
-                data.GroupBy(d => d.rowNumber).OrderBy(x => x.Key))
+            foreach (var (_, columnNumber, text) in grouping.OrderBy(r => r.columnNumber))
             {
-                var terms = new List<string>();
-                var i = 0;
-                foreach (var (_, columnNumber, text) in grouping.OrderBy(r => r.columnNumber))
-                {
-                    while (i < columnNumber)
-                    {
-                        terms.Add(new string(' ', columnWidthDictionary[i]));
-                        i++;
-                    }
-
-                    terms.Add(text.PadRight(columnWidthDictionary[columnNumber]));
-                    i++;
-                }
-
-                while (i < columnWidthDictionary.Count)
+                while (i < columnNumber)
                 {
                     terms.Add(new string(' ', columnWidthDictionary[i]));
                     i++;
                 }
 
-                var s = $"|{string.Join('|', terms)}|";
-                yield return s;
-
-                if (grouping.Key == 0) //create dashes row
-                {
-                    yield return @$"|{
-                            string.Join('|', columnWidthDictionary
-                                .OrderBy(x => x.Key)
-                                .Select(x => ":" + new string('-', Math.Max(x.Value - 2, 1)) + ":"))
-                        }|";
-                }
+                terms.Add(text.PadRight(columnWidthDictionary[columnNumber]));
+                i++;
             }
 
-            static string Escape(string? s)
+            while (i < columnWidthDictionary.Count)
             {
-                return (s ?? string.Empty)
-                    .Replace(@"\", @"\\")
-                    .Replace(@"*", @"\*")
-                    .Replace("|", @"\|")
-                    .Replace("\r\n", "<br>")
-                    .Replace("\n", " ");
+                terms.Add(new string(' ', columnWidthDictionary[i]));
+                i++;
+            }
+
+            var s = $"|{string.Join('|', terms)}|";
+            yield return s;
+
+            if (grouping.Key == 0) //create dashes row
+            {
+                yield return @$"|{
+                        string.Join('|', columnWidthDictionary
+                                        .OrderBy(x => x.Key)
+                                        .Select(x => ":" + new string('-', Math.Max(x.Value - 2, 1)) + ":"))
+                    }|";
             }
         }
 
-        internal static IEnumerable<string> ArrangeIntoColumns(IEnumerable<IReadOnlyCollection<string?>> rows)
+        static string Escape(string? s)
         {
-            var data = rows.SelectMany((row, rowNumber) =>
-                row.SelectMany((text, columnNumber) =>
-                    (text ?? string.Empty).Split("\n")
-                    .Select((line, lineNumber) => (rowNumber, lineNumber, columnNumber, line))
-                )).ToList();
+            return (s ?? string.Empty)
+                .Replace(@"\",   @"\\")
+                .Replace(@"*",   @"\*")
+                .Replace("|",    @"\|")
+                .Replace("\r\n", "<br>")
+                .Replace("\n",   " ");
+        }
+    }
 
-            var columnWidthDictionary = data.GroupBy(x => x.columnNumber)
-                .ToDictionary(x => x.Key, x => x.Max(y => y.line.EnumerateRunes().Count()));
+    internal static IEnumerable<string> ArrangeIntoColumns(
+        IEnumerable<IReadOnlyCollection<string?>> rows)
+    {
+        var data = rows.SelectMany(
+                (row, rowNumber) =>
+                    row.SelectMany(
+                        (text, columnNumber) =>
+                            (text ?? string.Empty).Split("\n")
+                            .Select(
+                                (line, lineNumber) => (rowNumber, lineNumber, columnNumber, line)
+                            )
+                    )
+            )
+            .ToList();
 
+        var columnWidthDictionary = data.GroupBy(x => x.columnNumber)
+            .ToDictionary(x => x.Key, x => x.Max(y => y.line.EnumerateRunes().Count()));
 
-            foreach (var grouping in
-                data.GroupBy(d => (d.rowNumber, d.lineNumber))
+        foreach (var grouping in
+            data.GroupBy(d => (d.rowNumber, d.lineNumber))
+                .OrderBy(x => x.Key.rowNumber)
+                .ThenBy(x => x.Key.lineNumber)
+        )
+        {
+            var terms = new List<string>();
+            var i     = 0;
 
-                    .OrderBy(x => x.Key.rowNumber)
-                    .ThenBy(x => x.Key.lineNumber)
-                )
+            foreach (var (_, _, columnNumber, line) in grouping.OrderBy(r => r.columnNumber))
             {
-
-                var terms = new List<string>();
-                var i = 0;
-                foreach (var (_, _, columnNumber, line) in grouping.OrderBy(r => r.columnNumber))
+                while (i < columnNumber)
                 {
-                    while (i < columnNumber)
-                    {
-                        terms.Add(new string(' ', columnWidthDictionary[i]));
-                        i++;
-                    }
-
-                    terms.Add(line.PadRight(columnWidthDictionary[columnNumber]));
+                    terms.Add(new string(' ', columnWidthDictionary[i]));
                     i++;
                 }
 
-                var s = string.Join(' ', terms).TrimEnd();
-                yield return s;
+                terms.Add(line.PadRight(columnWidthDictionary[columnNumber]));
+                i++;
             }
+
+            var s = string.Join(' ', terms).TrimEnd();
+            yield return s;
         }
     }
+}
+
 }

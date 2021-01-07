@@ -9,57 +9,68 @@ using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
-    public class ArrayTests : StepTestBase<ArrayNew<int>, Array<int>>
+
+public class ArrayTests : StepTestBase<ArrayNew<int>, Array<int>>
+{
+    /// <inheritdoc />
+    public ArrayTests([NotNull] ITestOutputHelper testOutputHelper) : base(testOutputHelper) { }
+
+    /// <inheritdoc />
+    protected override IEnumerable<DeserializeCase> DeserializeCases
     {
-        /// <inheritdoc />
-        public ArrayTests([NotNull] ITestOutputHelper testOutputHelper) : base(testOutputHelper) {}
-
-        /// <inheritdoc />
-        protected override IEnumerable<DeserializeCase> DeserializeCases
+        get
         {
-            get
-            {
-                yield return new DeserializeCase("Three elements explicit form", "Array Elements: [1, 2, 3]", new List<int>{1,2,3}.ToSequence());
-                yield return new DeserializeCase("Three elements simple form", "Array Elements: [1, 2, 3]", new List<int>{1,2,3}.ToSequence());
-            }
-        }
+            yield return new DeserializeCase(
+                "Three elements explicit form",
+                "Array Elements: [1, 2, 3]",
+                new List<int> { 1, 2, 3 }.ToSequence()
+            );
 
-        /// <inheritdoc />
-        protected override IEnumerable<StepCase> StepCases {
-            get
-            {
-                yield return new StepCase("Empty",
-                    new ArrayNew<int>
-                    {
-                        Elements = new List<IStep<int>>
-                        {
-                            Constant(1),
-                            Constant(2),
-                            Constant(3),
-                        }
-                    }, new List<int>{1,2,3}.ToSequence() );
-            } }
-
-        /// <inheritdoc /> //TODO create a serialize case
-        protected override IEnumerable<SerializeCase> SerializeCases
-        {
-            get
-            {
-                yield return new SerializeCase("Empty", new ArrayNew<int>
-                {
-                    Elements = ImmutableList<IStep<int>>.Empty
-                }, "[]");
-
-                yield return new SerializeCase("Three Elements", new ArrayNew<int>
-                {
-                    Elements = new List<IStep<int>>
-                    {
-                        Constant(1),
-                        Constant(2),
-                        Constant(3),
-                    }
-                }, "[1, 2, 3]");
-            }
+            yield return new DeserializeCase(
+                "Three elements simple form",
+                "Array Elements: [1, 2, 3]",
+                new List<int> { 1, 2, 3 }.ToSequence()
+            );
         }
     }
+
+    /// <inheritdoc />
+    protected override IEnumerable<StepCase> StepCases
+    {
+        get
+        {
+            yield return new StepCase(
+                "Empty",
+                new ArrayNew<int>
+                {
+                    Elements = new List<IStep<int>> { Constant(1), Constant(2), Constant(3), }
+                },
+                new List<int> { 1, 2, 3 }.ToSequence()
+            );
+        }
+    }
+
+    /// <inheritdoc /> //TODO create a serialize case
+    protected override IEnumerable<SerializeCase> SerializeCases
+    {
+        get
+        {
+            yield return new SerializeCase(
+                "Empty",
+                new ArrayNew<int> { Elements = ImmutableList<IStep<int>>.Empty },
+                "[]"
+            );
+
+            yield return new SerializeCase(
+                "Three Elements",
+                new ArrayNew<int>
+                {
+                    Elements = new List<IStep<int>> { Constant(1), Constant(2), Constant(3), }
+                },
+                "[1, 2, 3]"
+            );
+        }
+    }
+}
+
 }

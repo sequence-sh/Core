@@ -8,38 +8,44 @@ using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
-    public class ArraySortEntitiesTests : StepTestBase<ArraySort<Entity>, Array<Entity>>
+
+public class ArraySortEntitiesTests : StepTestBase<ArraySort<Entity>, Array<Entity>>
+{
+    /// <inheritdoc />
+    public ArraySortEntitiesTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper) { }
+
+    /// <inheritdoc />
+    protected override IEnumerable<StepCase> StepCases
     {
-        /// <inheritdoc />
-        public ArraySortEntitiesTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
+        get
         {
-        }
-
-        /// <inheritdoc />
-        protected override IEnumerable<StepCase> StepCases
-        {
-            get
-            {
-                yield return new StepCase("Ascending",
-                    new ForEach<Entity>
+            yield return new StepCase(
+                "Ascending",
+                new ForEach<Entity>
+                {
+                    Array = new ArraySort<Entity>
                     {
-                        Array = new ArraySort<Entity>
+                        Array = Array(
+                            CreateEntity(("Foo", "Gamma")),
+                            CreateEntity(("Foo", "Alpha")),
+                            CreateEntity(("Foo", "Beta"))
+                        ),
+                        KeySelector = new EntityGetValue
                         {
-                            Array = Array(
-                                CreateEntity(("Foo", "Gamma")),
-                                CreateEntity(("Foo", "Alpha")),
-                                CreateEntity(("Foo", "Beta"))),
-                            KeySelector = new EntityGetValue { Entity = GetEntityVariable, Property = Constant("Foo") }
-                        },
-                        Action = new Print<Entity> { Value = GetEntityVariable },
-                        Variable = VariableName.Entity
+                            Entity = GetEntityVariable, Property = Constant("Foo")
+                        }
+                    },
+                    Action   = new Print<Entity> { Value = GetEntityVariable },
+                    Variable = VariableName.Entity
+                },
+                Unit.Default,
+                "(Foo: \"Alpha\")",
+                "(Foo: \"Beta\")",
+                "(Foo: \"Gamma\")"
+            );
 
-                    }, Unit.Default,
-
-                    "(Foo: \"Alpha\")", "(Foo: \"Beta\")", "(Foo: \"Gamma\")"
-                );
-
-                yield return new StepCase("Descending",
+            yield return new StepCase(
+                "Descending",
                 new ForEach<Entity>
                 {
                     Array = new ArraySort<Entity>
@@ -48,18 +54,24 @@ namespace Reductech.EDR.Core.Tests.Steps
                         Array = Array(
                             CreateEntity(("Foo", "Gamma")),
                             CreateEntity(("Foo", "Alpha")),
-                            CreateEntity(("Foo", "Beta"))),
-                        KeySelector = new EntityGetValue { Entity = GetEntityVariable, Property = Constant("Foo") }
+                            CreateEntity(("Foo", "Beta"))
+                        ),
+                        KeySelector = new EntityGetValue
+                        {
+                            Entity = GetEntityVariable, Property = Constant("Foo")
+                        }
                     },
-                    Action = new Print<Entity> { Value = GetEntityVariable },
+                    Action   = new Print<Entity> { Value = GetEntityVariable },
                     Variable = VariableName.Entity
-                }, Unit.Default,
-
-                "(Foo: \"Gamma\")", "(Foo: \"Beta\")", "(Foo: \"Alpha\")"
+                },
+                Unit.Default,
+                "(Foo: \"Gamma\")",
+                "(Foo: \"Beta\")",
+                "(Foo: \"Alpha\")"
             );
 
-
-                yield return new StepCase("Missing Property",
+            yield return new StepCase(
+                "Missing Property",
                 new ForEach<Entity>
                 {
                     Array = new ArraySort<Entity>
@@ -71,16 +83,22 @@ namespace Reductech.EDR.Core.Tests.Steps
                             CreateEntity(("Foo", "Beta")),
                             CreateEntity(("Bar", "Delta"))
                         ),
-                        KeySelector = new EntityGetValue { Entity = GetEntityVariable, Property = Constant("Foo") }
+                        KeySelector = new EntityGetValue
+                        {
+                            Entity = GetEntityVariable, Property = Constant("Foo")
+                        }
                     },
-                    Action = new Print<Entity> { Value = GetEntityVariable },
+                    Action   = new Print<Entity> { Value = GetEntityVariable },
                     Variable = VariableName.Entity
-
-                }, Unit.Default,
-
-                 "(Foo: \"Gamma\")", "(Foo: \"Beta\")", "(Foo: \"Alpha\")", "(Bar: \"Delta\")"
+                },
+                Unit.Default,
+                "(Foo: \"Gamma\")",
+                "(Foo: \"Beta\")",
+                "(Foo: \"Alpha\")",
+                "(Bar: \"Delta\")"
             );
-            }
         }
     }
+}
+
 }

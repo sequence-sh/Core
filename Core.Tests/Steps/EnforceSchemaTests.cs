@@ -200,7 +200,8 @@ public class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Entity>>
                     ("Foo", SchemaPropertyType.Integer, Multiplicity.Any)
                 ),
                 ErrorCode.SchemaViolationWrongType,
-                "Hello","Integer"
+                "Hello",
+                "Integer"
             );
 
             yield return CreateCase(
@@ -212,7 +213,9 @@ public class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Entity>>
                     ("Foo", SchemaPropertyType.Enum, "Food", Multiplicity.Any, null,
                      new List<string>() { "Meat", "Chips" })
                 ),
-                ErrorCode.SchemaViolationWrongType,"Fish", "Enum"
+                ErrorCode.SchemaViolationWrongType,
+                "Fish",
+                "Enum"
             );
 
             yield return CreateCase(
@@ -235,7 +238,9 @@ public class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Entity>>
                     false,
                     ("Foo", SchemaPropertyType.String, null, Multiplicity.Any, @"\d+", null)
                 ),
-                ErrorCode.SchemaViolationUnmatchedRegex,"Fish", @"\d+"
+                ErrorCode.SchemaViolationUnmatchedRegex,
+                "Fish",
+                @"\d+"
             );
 
             yield return CreateCase(
@@ -247,7 +252,8 @@ public class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Entity>>
                     ("Foo", SchemaPropertyType.String, Multiplicity.Any),
                     ("Bar", SchemaPropertyType.String, Multiplicity.AtLeastOne)
                 ),
-                ErrorCode.SchemaViolationMissingProperty, "Bar"
+                ErrorCode.SchemaViolationMissingProperty,
+                "Bar"
             );
 
             yield return CreateCase(
@@ -258,7 +264,8 @@ public class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Entity>>
                     false,
                     ("Foo", SchemaPropertyType.String, Multiplicity.Any)
                 ),
-                ErrorCode.SchemaViolationUnexpectedProperty, "Bar"
+                ErrorCode.SchemaViolationUnexpectedProperty,
+                "Bar"
             );
         }
     }

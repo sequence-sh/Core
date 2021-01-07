@@ -8,63 +8,74 @@ using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
-    public class ArrayConcatTests : StepTestBase<ArrayConcat<Entity>, Array<Entity>>
+
+public class ArrayConcatTests : StepTestBase<ArrayConcat<Entity>, Array<Entity>>
+{
+    /// <inheritdoc />
+    public ArrayConcatTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper) { }
+
+    /// <inheritdoc />
+    protected override IEnumerable<StepCase> StepCases
     {
-        /// <inheritdoc />
-        public ArrayConcatTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper) {}
-
-        /// <inheritdoc />
-        protected override IEnumerable<StepCase> StepCases
+        get
         {
-            get
-            {
-                yield return new StepCase("One stream",
-                    new ForEach<Entity>
+            yield return new StepCase(
+                "One stream",
+                new ForEach<Entity>
+                {
+                    Action = new Print<Entity> { Value = GetEntityVariable },
+                    Array = new ArrayConcat<Entity>
                     {
-                        Action = new Print<Entity> { Value = GetEntityVariable },
-
-                        Array = new ArrayConcat<Entity>
+                        Arrays = new ArrayNew<Array<Entity>>
                         {
-                            Arrays = new ArrayNew<Array<Entity>>
+                            Elements = new List<IStep<Array<Entity>>>
                             {
-                                Elements = new List<IStep<Array<Entity>>>
-                                {
-                                    Array(CreateEntity(("Foo", "Alpha")), CreateEntity(("Foo", "Beta")))
-                                }
+                                Array(
+                                    CreateEntity(("Foo", "Alpha")),
+                                    CreateEntity(("Foo", "Beta"))
+                                )
                             }
-                        },
-                        Variable = VariableName.Entity
+                        }
+                    },
+                    Variable = VariableName.Entity
+                },
+                Unit.Default,
+                "(Foo: \"Alpha\")",
+                "(Foo: \"Beta\")"
+            );
 
-                    }, Unit.Default,
-
-                    "(Foo: \"Alpha\")", "(Foo: \"Beta\")"
-                );
-
-
-                yield return new StepCase("Two streams",
-                    new ForEach<Entity>
+            yield return new StepCase(
+                "Two streams",
+                new ForEach<Entity>
+                {
+                    Action = new Print<Entity> { Value = GetEntityVariable },
+                    Array = new ArrayConcat<Entity>
                     {
-                        Action = new Print<Entity>{Value = GetEntityVariable},
-
-                        Array = new ArrayConcat<Entity>
+                        Arrays = new ArrayNew<Array<Entity>>
                         {
-                            Arrays = new ArrayNew<Array<Entity>>
+                            Elements = new List<IStep<Array<Entity>>>
                             {
-                                Elements = new List<IStep<Array<Entity>>>
-                                {
-                                    Array(CreateEntity(("Foo", "Alpha")), CreateEntity(("Foo", "Beta"))),
-                                    Array(CreateEntity(("Foo", "Gamma")), CreateEntity(("Foo", "Delta")))
-                                }
+                                Array(
+                                    CreateEntity(("Foo", "Alpha")),
+                                    CreateEntity(("Foo", "Beta"))
+                                ),
+                                Array(
+                                    CreateEntity(("Foo", "Gamma")),
+                                    CreateEntity(("Foo", "Delta"))
+                                )
                             }
-                        },
-                        Variable = VariableName.Entity
-
-                    }, Unit.Default,
-
-                    "(Foo: \"Alpha\")", "(Foo: \"Beta\")", "(Foo: \"Gamma\")", "(Foo: \"Delta\")"
-                );
-
-            }
+                        }
+                    },
+                    Variable = VariableName.Entity
+                },
+                Unit.Default,
+                "(Foo: \"Alpha\")",
+                "(Foo: \"Beta\")",
+                "(Foo: \"Gamma\")",
+                "(Foo: \"Delta\")"
+            );
         }
     }
+}
+
 }

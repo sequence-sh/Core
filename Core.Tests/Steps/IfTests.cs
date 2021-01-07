@@ -10,85 +10,105 @@ using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
-    public class IfTests : StepTestBase<If, Unit>
+
+public class IfTests : StepTestBase<If, Unit>
+{
+    /// <inheritdoc />
+    public IfTests([NotNull] ITestOutputHelper testOutputHelper) : base(testOutputHelper) { }
+
+    /// <inheritdoc />
+    protected override IEnumerable<DeserializeCase> DeserializeCases
     {
-        /// <inheritdoc />
-        public IfTests([NotNull] ITestOutputHelper testOutputHelper) : base(testOutputHelper) {}
-
-        /// <inheritdoc />
-        protected override IEnumerable<DeserializeCase> DeserializeCases
+        get
         {
-            get
-            {
-                yield return new DeserializeCase(
-                    "If true print something",
-                    "If Condition: true Then: (Print Value: 'Hello World')",
-                    Unit.Default,
-                    "Hello World");
-            }
-        }
-
-        /// <inheritdoc />
-        protected override IEnumerable<StepCase> StepCases
-        {
-            get
-            {
-                yield return new StepCase("If true print something",
-                    new If
-                    {
-                        Condition = Constant(true),
-                        Then = new Print<StringStream>(){Value = Constant("Hello World")}
-                    }, Unit.Default, "Hello World");
-
-                yield return new StepCase("If false print nothing",
-                    new If
-                    {
-                        Condition = Constant(false),
-                        Then = new Print<StringStream> { Value = Constant("Hello World") }
-                    }, Unit.Default);
-
-                yield return new StepCase("If false print something else",
-                    new If
-                    {
-                        Condition = Constant(false),
-                        Then = new Print<StringStream> { Value = Constant("Hello World") },
-                        Else = new Print<StringStream> { Value = Constant("Goodbye World") },
-                    }, Unit.Default, "Goodbye World");
-            }
-        }
-
-        /// <inheritdoc />
-        protected override IEnumerable<ErrorCase> ErrorCases
-        {
-            get
-            {
-                yield return new ErrorCase("Condition is error",
-                    new If()
-                    {
-                        Condition = new FailStep<bool>{ErrorMessage = "Condition Fail"},
-                        Then = new FailStep<Unit> { ErrorMessage = "Then Fail" },
-                        Else = new FailStep<Unit> { ErrorMessage = "Else Fail" },
-                    },
-                    new SingleError(EntireSequenceLocation.Instance, ErrorCode.Test,"Condition Fail" ));
-
-                yield return new ErrorCase("Then is error",
-                    new If()
-                    {
-                        Condition = Constant(true),
-                        Then = new FailStep<Unit> { ErrorMessage = "Then Fail" },
-                        Else = new FailStep<Unit> { ErrorMessage = "Else Fail" },
-                    },
-                    new SingleError(EntireSequenceLocation.Instance, ErrorCode.Test,"Then Fail" ));
-
-                yield return new ErrorCase("Else is error",
-                    new If()
-                    {
-                        Condition = Constant(false),
-                        Then = new FailStep<Unit> { ErrorMessage = "Then Fail" },
-                        Else = new FailStep<Unit> { ErrorMessage = "Else Fail" },
-                    },
-                    new SingleError(EntireSequenceLocation.Instance, ErrorCode.Test,"Else Fail" ));
-            }
+            yield return new DeserializeCase(
+                "If true print something",
+                "If Condition: true Then: (Print Value: 'Hello World')",
+                Unit.Default,
+                "Hello World"
+            );
         }
     }
+
+    /// <inheritdoc />
+    protected override IEnumerable<StepCase> StepCases
+    {
+        get
+        {
+            yield return new StepCase(
+                "If true print something",
+                new If
+                {
+                    Condition = Constant(true),
+                    Then      = new Print<StringStream>() { Value = Constant("Hello World") }
+                },
+                Unit.Default,
+                "Hello World"
+            );
+
+            yield return new StepCase(
+                "If false print nothing",
+                new If
+                {
+                    Condition = Constant(false),
+                    Then      = new Print<StringStream> { Value = Constant("Hello World") }
+                },
+                Unit.Default
+            );
+
+            yield return new StepCase(
+                "If false print something else",
+                new If
+                {
+                    Condition = Constant(false),
+                    Then      = new Print<StringStream> { Value = Constant("Hello World") },
+                    Else      = new Print<StringStream> { Value = Constant("Goodbye World") },
+                },
+                Unit.Default,
+                "Goodbye World"
+            );
+        }
+    }
+
+    /// <inheritdoc />
+    protected override IEnumerable<ErrorCase> ErrorCases
+    {
+        get
+        {
+            yield return new ErrorCase(
+                "Condition is error",
+                new If()
+                {
+                    Condition = new FailStep<bool> { ErrorMessage = "Condition Fail" },
+                    Then      = new FailStep<Unit> { ErrorMessage = "Then Fail" },
+                    Else      = new FailStep<Unit> { ErrorMessage = "Else Fail" },
+                },
+                new SingleError(EntireSequenceLocation.Instance, ErrorCode.Test, "Condition Fail")
+            );
+
+            yield return new ErrorCase(
+                "Then is error",
+                new If()
+                {
+                    Condition = Constant(true),
+                    Then      = new FailStep<Unit> { ErrorMessage = "Then Fail" },
+                    Else      = new FailStep<Unit> { ErrorMessage = "Else Fail" },
+                },
+                new SingleError(EntireSequenceLocation.Instance, ErrorCode.Test, "Then Fail")
+            );
+
+            yield return new ErrorCase(
+                "Else is error",
+                new If()
+                {
+                    Condition = Constant(false),
+                    Then      = new FailStep<Unit> { ErrorMessage = "Then Fail" },
+                    Else      = new FailStep<Unit> { ErrorMessage = "Else Fail" },
+                },
+                new SingleError(EntireSequenceLocation.Instance, ErrorCode.Test, "Else Fail")
+            );
+        }
+    }
+}
+
 }

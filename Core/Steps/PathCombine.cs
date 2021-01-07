@@ -12,68 +12,81 @@ using Reductech.EDR.Core.Internal.Logging;
 
 namespace Reductech.EDR.Core.Steps
 {
-    /// <summary>
-    /// Combine Paths
-    /// </summary>
-    [Alias("JoinPath")]
-    [Alias("ResolvePath")]
-    public sealed class PathCombine : CompoundStep<StringStream>
+
+/// <summary>
+/// Combine Paths
+/// </summary>
+[Alias("JoinPath")]
+[Alias("ResolvePath")]
+public sealed class PathCombine : CompoundStep<StringStream>
+{
+    /// <inheritdoc />
+    protected override async Task<Result<StringStream, IError>> Run(
+        IStateMonad stateMonad,
+        CancellationToken cancellationToken)
     {
-        /// <inheritdoc />
-        protected override async Task<Result<StringStream, IError>> Run(IStateMonad stateMonad, CancellationToken cancellationToken)
+        var pathsResult = await Paths.Run(stateMonad, cancellationToken)
+            .Bind(x => x.GetElementsAsync(cancellationToken));
+
+        if (pathsResult.IsFailure)
+            return pathsResult.ConvertFailure<StringStream>();
+
+        var paths = new List<string>();
+
+        foreach (var stringStream in pathsResult.Value)
+            paths.Add(await stringStream.GetStringAsync());
+
+        if (!paths.Any())
         {
-            var pathsResult = await Paths.Run(stateMonad, cancellationToken)
-                    .Bind(x=>x.GetElementsAsync(cancellationToken));
+            var currentDirectory = stateMonad.FileSystemHelper.GetCurrentDirectory();
 
-            if (pathsResult.IsFailure) return pathsResult.ConvertFailure<StringStream>();
+            stateMonad.Logger.LogSituation(
+                LogSituationCore.NoPathProvided,
+                new[] { currentDirectory }
+            );
 
-            var paths = new List<string>();
-
-            foreach (var stringStream in pathsResult.Value)
-                paths.Add(await stringStream.GetStringAsync());
-
-            if (!paths.Any())
-            {
-                var currentDirectory = stateMonad.FileSystemHelper.GetCurrentDirectory();
-                stateMonad.Logger.LogSituation(LogSituationCore.NoPathProvided, new [] {currentDirectory});
-                return new StringStream(currentDirectory);
-            }
-
-            if (!Path.IsPathFullyQualified(paths[0]))
-            {
-                var currentDirectory = stateMonad.FileSystemHelper.GetCurrentDirectory();
-                paths = paths.Prepend(currentDirectory).ToList();
-                stateMonad.Logger.LogSituation(LogSituationCore.QualifyingPath, new []{paths[0], currentDirectory} );
-            }
-
-
-            var result = Path.Combine(paths.ToArray());
-
-            return new StringStream(result);
+            return new StringStream(currentDirectory);
         }
 
-        /// <summary>
-        /// The paths to combine.
-        /// </summary>
-        [StepProperty(1)]
-        [Required]
-        public IStep<Array<StringStream>> Paths { get; set; } = null!;
+        if (!Path.IsPathFullyQualified(paths[0]))
+        {
+            var currentDirectory = stateMonad.FileSystemHelper.GetCurrentDirectory();
+            paths = paths.Prepend(currentDirectory).ToList();
 
+            stateMonad.Logger.LogSituation(
+                LogSituationCore.QualifyingPath,
+                new[] { paths[0], currentDirectory }
+            );
+        }
 
-        /// <inheritdoc />
-        public override IStepFactory StepFactory => PathCombineStepFactory.Instance;
+        var result = Path.Combine(paths.ToArray());
+
+        return new StringStream(result);
     }
 
     /// <summary>
-    /// Combine Paths
+    /// The paths to combine.
     /// </summary>
-    public class PathCombineStepFactory : SimpleStepFactory<PathCombine, StringStream>
-    {
-        private PathCombineStepFactory() { }
+    [StepProperty(1)]
+    [Required]
+    public IStep<Array<StringStream>> Paths { get; set; } = null!;
 
-        /// <summary>
-        /// The instance.
-        /// </summary>
-        public static SimpleStepFactory<PathCombine, StringStream> Instance { get; } = new PathCombineStepFactory();
-    }
+    /// <inheritdoc />
+    public override IStepFactory StepFactory => PathCombineStepFactory.Instance;
+}
+
+/// <summary>
+/// Combine Paths
+/// </summary>
+public class PathCombineStepFactory : SimpleStepFactory<PathCombine, StringStream>
+{
+    private PathCombineStepFactory() { }
+
+    /// <summary>
+    /// The instance.
+    /// </summary>
+    public static SimpleStepFactory<PathCombine, StringStream> Instance { get; } =
+        new PathCombineStepFactory();
+}
+
 }

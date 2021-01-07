@@ -9,81 +9,97 @@ using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
-    public class ArrayDistinctTests : StepTestBase<ArrayDistinct<Entity>, Array<Entity>>
+
+public class ArrayDistinctTests : StepTestBase<ArrayDistinct<Entity>, Array<Entity>>
+{
+    /// <inheritdoc />
+    public ArrayDistinctTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper) { }
+
+    /// <inheritdoc />
+    protected override IEnumerable<StepCase> StepCases
     {
-        /// <inheritdoc />
-        public ArrayDistinctTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper) {}
-
-        /// <inheritdoc />
-        protected override IEnumerable<StepCase> StepCases
+        get
         {
-            get
-            {
-                var distinctVar = new VariableName("DistinctVar");
-                var foreachVar = new VariableName("ForeachVar");
+            var distinctVar = new VariableName("DistinctVar");
+            var foreachVar  = new VariableName("ForeachVar");
 
-                yield return new StepCase("Distinct case sensitive",
-                    new ForEach<Entity>
+            yield return new StepCase(
+                "Distinct case sensitive",
+                new ForEach<Entity>
+                {
+                    Action = new Print<Entity> { Value = GetVariable<Entity>(foreachVar) },
+                    Array = new ArrayDistinct<Entity>
                     {
-                        Action = new Print<Entity> {Value = GetVariable<Entity>(foreachVar)},
-                        Array = new ArrayDistinct<Entity>
+                        Array = Array(
+                            CreateEntity(("Foo", "Alpha")),
+                            CreateEntity(("Foo", "Alpha")),
+                            CreateEntity(("Foo", "ALPHA")),
+                            CreateEntity(("Foo", "Beta")),
+                            CreateEntity(("Foo", "Beta"))
+                        ),
+                        KeySelector = new EntityGetValue
                         {
-                            Array = Array(
-                                CreateEntity(("Foo", "Alpha")),
-                                CreateEntity(("Foo", "Alpha")),
-                                CreateEntity(("Foo", "ALPHA")),
-                                CreateEntity(("Foo", "Beta")),
-                                CreateEntity(("Foo", "Beta"))
-                            ),
-                            KeySelector = new EntityGetValue {Property = Constant("Foo"), Entity = GetVariable<Entity>(distinctVar)},
-                            Variable = distinctVar
+                            Property = Constant("Foo"),
+                            Entity   = GetVariable<Entity>(distinctVar)
                         },
-                        Variable = foreachVar
+                        Variable = distinctVar
                     },
-                    Unit.Default,
-                    "(Foo: \"Alpha\")", "(Foo: \"ALPHA\")", "(Foo: \"Beta\")"
-                );
+                    Variable = foreachVar
+                },
+                Unit.Default,
+                "(Foo: \"Alpha\")",
+                "(Foo: \"ALPHA\")",
+                "(Foo: \"Beta\")"
+            );
 
-                yield return new StepCase("Distinct case insensitive",
-                    new ForEach<Entity>
+            yield return new StepCase(
+                "Distinct case insensitive",
+                new ForEach<Entity>
+                {
+                    Action = new Print<Entity> { Value = GetEntityVariable },
+                    Array = new ArrayDistinct<Entity>
                     {
-                        Action = new Print<Entity> { Value = GetEntityVariable },
-                        Array = new ArrayDistinct<Entity>
-                        {
-                            Array = Array(
-                                CreateEntity(("Foo", "Alpha")),
-                                CreateEntity(("Foo", "Alpha")),
-                                CreateEntity(("Foo", "ALPHA")),
-                                CreateEntity(("Foo", "Beta")),
-                                CreateEntity(("Foo", "Beta"))
-                            ),
-                            KeySelector = new EntityGetValue { Property = Constant("Foo"), Entity = GetEntityVariable },
-                            IgnoreCase = Constant(true)
-                        },
-                        Variable = VariableName.Entity
+                        Array = Array(
+                            CreateEntity(("Foo", "Alpha")),
+                            CreateEntity(("Foo", "Alpha")),
+                            CreateEntity(("Foo", "ALPHA")),
+                            CreateEntity(("Foo", "Beta")),
+                            CreateEntity(("Foo", "Beta"))
+                        ),
+                        KeySelector =
+                            new EntityGetValue
+                            {
+                                Property = Constant("Foo"), Entity = GetEntityVariable
+                            },
+                        IgnoreCase = Constant(true)
                     },
-                    Unit.Default,
-                    "(Foo: \"Alpha\")",  "(Foo: \"Beta\")"
-                );
-            }
-        }
-
-
-        /// <inheritdoc />
-        protected override IEnumerable<ErrorCase> ErrorCases
-        {
-            get
-            {
-                //Do not do default cases as some errors are not propagated due to lazy evaluation
-
-                yield return new ErrorCase("Stream is error",
-                    new ArrayDistinct<Entity>
-                    {
-                        Array = new FailStep<Array<Entity>> { ErrorMessage = "Stream Fail" },
-                        KeySelector =  Constant("A")
-                    },
-                    new SingleError( EntireSequenceLocation.Instance, ErrorCode.Test, "Stream Fail"));
-            }
+                    Variable = VariableName.Entity
+                },
+                Unit.Default,
+                "(Foo: \"Alpha\")",
+                "(Foo: \"Beta\")"
+            );
         }
     }
+
+    /// <inheritdoc />
+    protected override IEnumerable<ErrorCase> ErrorCases
+    {
+        get
+        {
+            //Do not do default cases as some errors are not propagated due to lazy evaluation
+
+            yield return new ErrorCase(
+                "Stream is error",
+                new ArrayDistinct<Entity>
+                {
+                    Array       = new FailStep<Array<Entity>> { ErrorMessage = "Stream Fail" },
+                    KeySelector = Constant("A")
+                },
+                new SingleError(EntireSequenceLocation.Instance, ErrorCode.Test, "Stream Fail")
+            );
+        }
+    }
+}
+
 }

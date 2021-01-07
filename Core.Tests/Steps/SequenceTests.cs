@@ -90,7 +90,11 @@ public class SequenceTests : StepTestBase<Sequence<StringStream>, StringStream>
                         },
                     FinalStep = Constant("Final")
                 },
-                new SingleError(EntireSequenceLocation.Instance, ErrorCode.Test, "Initial step Fail")
+                new SingleError(
+                    EntireSequenceLocation.Instance,
+                    ErrorCode.Test,
+                    "Initial step Fail"
+                )
             );
 
             yield return new ErrorCase(

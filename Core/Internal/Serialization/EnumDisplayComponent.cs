@@ -6,34 +6,36 @@ using Reductech.EDR.Core.Util;
 namespace Reductech.EDR.Core.Internal.Serialization
 {
 
+/// <summary>
+/// Deserializes a regex group into an enum using the display value of the enum.
+/// </summary>
+public class EnumDisplayComponent<T> : ISerializerBlock where T : Enum
+{
     /// <summary>
-    /// Deserializes a regex group into an enum using the display value of the enum.
+    /// Creates a new EnumDisplayComponent
     /// </summary>
-    public class EnumDisplayComponent<T> : ISerializerBlock where T : Enum
+    /// <param name="propertyName"></param>
+    public EnumDisplayComponent(string propertyName) => PropertyName = propertyName;
+
+    /// <summary>
+    /// The name of the property
+    /// </summary>
+    public string PropertyName { get; }
+
+    /// <inheritdoc />
+    public Result<string> TryGetSegmentText(IReadOnlyDictionary<string, StepProperty> dictionary)
     {
-        /// <summary>
-        /// Creates a new EnumDisplayComponent
-        /// </summary>
-        /// <param name="propertyName"></param>
-        public EnumDisplayComponent(string propertyName) => PropertyName = propertyName;
-
-        /// <summary>
-        /// The name of the property
-        /// </summary>
-        public string PropertyName { get; }
-
-        /// <inheritdoc />
-        public Result<string> TryGetSegmentText(IReadOnlyDictionary<string, StepProperty> dictionary)
-        {
-
-            return dictionary.TryFindOrFail(PropertyName, $"Missing Property {PropertyName}")
-                .Bind(x => x.Match(
+        return dictionary.TryFindOrFail(PropertyName, $"Missing Property {PropertyName}")
+            .Bind(
+                x => x.Match(
                     _ => Result.Failure<string>("Operator is VariableName"),
-                    s=> s is EnumConstant<T> cs? cs.Value.GetDisplayName() : Result.Failure<string>("Operator is non constant step"),
+                    s => s is EnumConstant<T> cs
+                        ? cs.Value.GetDisplayName()
+                        : Result.Failure<string>("Operator is non constant step"),
                     sl => Result.Failure<string>("Operator is Step List")
-
-
-                ));
-        }
+                )
+            );
     }
+}
+
 }

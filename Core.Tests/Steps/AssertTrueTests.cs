@@ -10,51 +10,54 @@ using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
-    public class AssertTrueTests : StepTestBase<AssertTrue, Unit>
+
+public class AssertTrueTests : StepTestBase<AssertTrue, Unit>
+{
+    /// <inheritdoc />
+    public AssertTrueTests([NotNull] ITestOutputHelper testOutputHelper) :
+        base(testOutputHelper) { }
+
+    /// <inheritdoc />
+    protected override IEnumerable<DeserializeCase> DeserializeCases
     {
-        /// <inheritdoc />
-        public AssertTrueTests([NotNull] ITestOutputHelper testOutputHelper) : base(testOutputHelper) { }
-
-        /// <inheritdoc />
-        protected override IEnumerable<DeserializeCase> DeserializeCases {
-            get
-            {
-                yield return new DeserializeCase("Is true true",
-                    "AssertTrue Boolean: true",
-                    Unit.Default
-                );
-            } }
-
-        /// <inheritdoc />
-        protected override IEnumerable<StepCase> StepCases
+        get
         {
-            get
-            {
-                yield return new StepCase("Is true true",
-                    new AssertTrue
-                    {
-                        Boolean = Constant(true)
-                    }, Unit.Default
-                );
-            }
-        }
-
-        /// <inheritdoc />
-        protected override IEnumerable<ErrorCase> ErrorCases
-        {
-            get
-            {
-                yield return new ErrorCase("Failed Assertion",
-                    new AssertTrue
-                    {
-                        Boolean = Constant(false)
-                    },
-                    new ErrorBuilder(ErrorCode.AssertionFailed, Constant(false).Name)
-                );
-
-                foreach (var errorCase in base.ErrorCases)
-                    yield return errorCase;
-            }
+            yield return new DeserializeCase(
+                "Is true true",
+                "AssertTrue Boolean: true",
+                Unit.Default
+            );
         }
     }
+
+    /// <inheritdoc />
+    protected override IEnumerable<StepCase> StepCases
+    {
+        get
+        {
+            yield return new StepCase(
+                "Is true true",
+                new AssertTrue { Boolean = Constant(true) },
+                Unit.Default
+            );
+        }
+    }
+
+    /// <inheritdoc />
+    protected override IEnumerable<ErrorCase> ErrorCases
+    {
+        get
+        {
+            yield return new ErrorCase(
+                "Failed Assertion",
+                new AssertTrue { Boolean = Constant(false) },
+                new ErrorBuilder(ErrorCode.AssertionFailed, Constant(false).Name)
+            );
+
+            foreach (var errorCase in base.ErrorCases)
+                yield return errorCase;
+        }
+    }
+}
+
 }

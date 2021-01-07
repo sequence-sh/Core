@@ -6,30 +6,31 @@ using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
-    public class NotTests : StepTestBase<Not, bool>
+
+public class NotTests : StepTestBase<Not, bool>
+{
+    /// <inheritdoc />
+    public NotTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper) { }
+
+    /// <inheritdoc />
+    protected override IEnumerable<StepCase> StepCases
     {
-        /// <inheritdoc />
-        public NotTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper) {}
-
-        /// <inheritdoc />
-        protected override IEnumerable<StepCase> StepCases
+        get
         {
-            get
-            {
-                yield return new StepCase("Not True", new Not { Boolean = Constant(true) }, false);
-                yield return new StepCase("Not False", new Not { Boolean = Constant(false) }, true);
-            }
+            yield return new StepCase("Not True",  new Not { Boolean = Constant(true) },  false);
+            yield return new StepCase("Not False", new Not { Boolean = Constant(false) }, true);
         }
-
-        /// <inheritdoc />
-        protected override IEnumerable<DeserializeCase> DeserializeCases {
-            get
-            {
-                yield return new DeserializeCase("Ordered argument", "not true", false);
-                yield return new DeserializeCase("Named argument", "not boolean: true", false);
-            }
-
-        }
-
     }
+
+    /// <inheritdoc />
+    protected override IEnumerable<DeserializeCase> DeserializeCases
+    {
+        get
+        {
+            yield return new DeserializeCase("Ordered argument", "not true",          false);
+            yield return new DeserializeCase("Named argument",   "not boolean: true", false);
+        }
+    }
+}
+
 }

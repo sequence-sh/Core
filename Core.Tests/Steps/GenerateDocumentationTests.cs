@@ -11,24 +11,24 @@ using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.TestHarness;
 using Xunit.Abstractions;
 
-
 namespace Reductech.EDR.Core.Tests.Steps
 {
-    public class GenerateDocumentationTests : StepTestBase<GenerateDocumentation, StringStream>
-    {
-        /// <inheritdoc />
-        public GenerateDocumentationTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
-        {
-        }
 
-        /// <inheritdoc />
-        protected override IEnumerable<StepCase> StepCases
+public class GenerateDocumentationTests : StepTestBase<GenerateDocumentation, StringStream>
+{
+    /// <inheritdoc />
+    public GenerateDocumentationTests(ITestOutputHelper testOutputHelper) :
+        base(testOutputHelper) { }
+
+    /// <inheritdoc />
+    protected override IEnumerable<StepCase> StepCases
+    {
+        get
         {
-            get
-            {
-                yield return new StepCase("Generate Not Documentation",
-                    new GenerateDocumentation(),
-                    @"# Contents
+            yield return new StepCase(
+                "Generate Not Documentation",
+                new GenerateDocumentation(),
+                @"# Contents
 |Step       |Summary                     |
 |:---------:|:--------------------------:|
 |[Not](#Not)|Negation of a boolean value.|
@@ -44,12 +44,12 @@ Negation of a boolean value.
 |:-------:|:----:|:------:|:------------------:|
 |Boolean  |`bool`|☑️      |The value to negate.|
 "
+            ).WithStepFactoryStore(StepFactoryStore.Create(NotStepFactory.Instance));
 
-                ).WithStepFactoryStore(StepFactoryStore.Create(NotStepFactory.Instance));
-
-                yield return new StepCase("Generate Math Documentation",
-                    new GenerateDocumentation(),
-                    @"# Contents
+            yield return new StepCase(
+                "Generate Math Documentation",
+                new GenerateDocumentation(),
+                @"# Contents
 |Step                                   |Summary                                                                              |
 |:-------------------------------------:|:-----------------------------------------------------------------------------------:|
 |[ApplyMathOperator](#ApplyMathOperator)|Applies a mathematical operator to two integers. Returns the result of the operation.|
@@ -82,33 +82,33 @@ An operator that can be applied to two numbers.
 |Modulo  |Reduce the left operand modulo the right.                                                                 |
 |Power   |Raise the left operand to the power of the right. If the right operand is negative, zero will be returned.|
 "
-                ).WithStepFactoryStore(StepFactoryStore.Create(ApplyMathOperatorStepFactory.Instance));
+            ).WithStepFactoryStore(StepFactoryStore.Create(ApplyMathOperatorStepFactory.Instance));
 
+            //                yield return new StepCase("Generate Array Documentation",
+            //                    new GenerateDocumentation(),
+            //                    @"# Contents
+            //|Step                 |Summary                                     |
+            //|:-------------------:|:------------------------------------------:|
+            //|[Array<T>](#Array<T>)|Represents an ordered collection of objects.|
+            //# Core
+            //<a name=""Array<T>""></a>
+            //## Array<T>
 
-//                yield return new StepCase("Generate Array Documentation",
-//                    new GenerateDocumentation(),
-//                    @"# Contents
-//|Step                 |Summary                                     |
-//|:-------------------:|:------------------------------------------:|
-//|[Array<T>](#Array<T>)|Represents an ordered collection of objects.|
-//# Core
-//<a name=""Array<T>""></a>
-//## Array<T>
+            //**ArrayList<T>**
 
-//**ArrayList<T>**
+            //Represents an ordered collection of objects.
 
-//Represents an ordered collection of objects.
+            //|Parameter|Type          |Required|Summary                   |
+            //|:-------:|:------------:|:------:|:------------------------:|
+            //|Elements |IStep<[T](#T)>|☑️      |The elements of the array.|
+            //"
 
-//|Parameter|Type          |Required|Summary                   |
-//|:-------:|:------------:|:------:|:------------------------:|
-//|Elements |IStep<[T](#T)>|☑️      |The elements of the array.|
-//"
+            //                ).WithStepFactoryStore(StepFactoryStore.Create(ArrayNewStepFactory.Instance));
 
-//                ).WithStepFactoryStore(StepFactoryStore.Create(ArrayNewStepFactory.Instance));
-
-                yield return new StepCase("Example step",
-                    new GenerateDocumentation(),
-                    @"# Contents
+            yield return new StepCase(
+                "Example step",
+                new GenerateDocumentation(),
+                @"# Contents
 |Step                                                 |Summary|
 |:---------------------------------------------------:|:-----:|
 |[DocumentationExampleStep](#DocumentationExampleStep)|       |
@@ -127,11 +127,14 @@ An operator that can be applied to two numbers.
 |Gamma    |[VariableName](#VariableName)|        |       |              |             |       |                 |                 |            |        |                  |               |
 |Delta    |IStep<`bool`>                |        |       |              |             |       |                 |                 |            |        |                  |,              |
 "
-                ).WithStepFactoryStore(StepFactoryStore.Create(DocumentationExampleStepFactory.Instance));
+            ).WithStepFactoryStore(
+                StepFactoryStore.Create(DocumentationExampleStepFactory.Instance)
+            );
 
-                yield return new StepCase("Two InitialSteps",
-                    new GenerateDocumentation(),
-@"# Contents
+            yield return new StepCase(
+                "Two InitialSteps",
+                new GenerateDocumentation(),
+                @"# Contents
 |Step                                                 |Summary                     |
 |:---------------------------------------------------:|:--------------------------:|
 |[Not](#Not)                                          |Negation of a boolean value.|
@@ -163,104 +166,103 @@ Negation of a boolean value.
 |Gamma    |[VariableName](#VariableName)|        |       |              |             |       |                 |                 |            |        |                  |               |
 |Delta    |IStep<`bool`>                |        |       |              |             |       |                 |                 |            |        |                  |,              |
 "
-                ).WithStepFactoryStore(StepFactoryStore.Create(NotStepFactory.Instance,
-                    DocumentationExampleStepFactory.Instance));
-
-            }
-        }
-
-        /// <inheritdoc />
-        protected override IEnumerable<DeserializeCase> DeserializeCases
-        {
-            get { yield break; }
-
-        }
-
-        /// <inheritdoc />
-        protected override IEnumerable<ErrorCase> ErrorCases
-        {
-            get { yield break; }
-        }
-
-
-        private class DocumentationExampleStepFactory : SimpleStepFactory<DocumentationExampleStep, StringStream>
-        {
-            private DocumentationExampleStepFactory()
-            {
-            }
-
-            public static SimpleStepFactory<DocumentationExampleStep, StringStream> Instance { get; } =
-                new DocumentationExampleStepFactory();
-
-            /// <inheritdoc />
-            public override IEnumerable<Requirement> Requirements
-            {
-                get
-                {
-                    yield return new Requirement
-                    {
-                        Name = "ValueIf Library",
-                        MinVersion = new Version(1, 2)
-                    };
-                }
-            }
-
-            /// <inheritdoc />
-            public override string Category => "Examples";
-        }
-
-        private class DocumentationExampleStep : CompoundStep<StringStream>
-        {
-            /// <inheritdoc />
-#pragma warning disable 1998
-            protected override async Task<Result<StringStream, IError>> Run(IStateMonad stateMonad,
-                CancellationToken cancellation)
-#pragma warning restore 1998
-            {
-                throw new NotImplementedException();
-            }
-
-            /// <summary>
-            /// The alpha property. Required
-            /// </summary>
-            [StepProperty(1)]
-            [Required]
-            [AllowedRange("Greater than 1")]
-            [DocumentationURL("alpha.com")]
-            [Example("1234")]
-            [RecommendedRange("100-300")]
-            [RecommendedValue("201")]
-            [RequiredVersion("Greek", "2.1")]
-            [SeeAlso("Beta")]
-            // ReSharper disable UnusedMember.Local
-            public IStep<int> Alpha { get; set; } = null!;
-
-
-            /// <summary>
-            /// The beta property. Not Required.
-            /// </summary>
-            [StepProperty(2)]
-            [SeeAlso("Alpha")]
-            [DefaultValueExplanation("Two hundred")]
-            public IStep<StringStream> Beta { get; set; } = new StringConstant("Two hundred");
-
-
-            /// <summary>
-            /// The delta property.
-            /// </summary>
-            [StepListProperty(4)]
-            [ValueDelimiter(",")]
-            public IReadOnlyList<IStep<bool>> Delta { get; set; } = null!;
-
-            /// <summary>
-            /// The Gamma property.
-            /// </summary>
-            [VariableName(3)]
-            public VariableName Gamma { get; set; }
-            // ReSharper restore UnusedMember.Local
-
-            /// <inheritdoc />
-            public override IStepFactory StepFactory => DocumentationExampleStepFactory.Instance;
+            ).WithStepFactoryStore(
+                StepFactoryStore.Create(
+                    NotStepFactory.Instance,
+                    DocumentationExampleStepFactory.Instance
+                )
+            );
         }
     }
+
+    /// <inheritdoc />
+    protected override IEnumerable<DeserializeCase> DeserializeCases
+    {
+        get { yield break; }
+    }
+
+    /// <inheritdoc />
+    protected override IEnumerable<ErrorCase> ErrorCases
+    {
+        get { yield break; }
+    }
+
+    private class
+        DocumentationExampleStepFactory : SimpleStepFactory<DocumentationExampleStep, StringStream>
+    {
+        private DocumentationExampleStepFactory() { }
+
+        public static SimpleStepFactory<DocumentationExampleStep, StringStream> Instance { get; } =
+            new DocumentationExampleStepFactory();
+
+        /// <inheritdoc />
+        public override IEnumerable<Requirement> Requirements
+        {
+            get
+            {
+                yield return new Requirement
+                {
+                    Name = "ValueIf Library", MinVersion = new Version(1, 2)
+                };
+            }
+        }
+
+        /// <inheritdoc />
+        public override string Category => "Examples";
+    }
+
+    private class DocumentationExampleStep : CompoundStep<StringStream>
+    {
+        /// <inheritdoc />
+        #pragma warning disable 1998
+        protected override async Task<Result<StringStream, IError>> Run(
+                IStateMonad stateMonad,
+                CancellationToken cancellation)
+            #pragma warning restore 1998
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// The alpha property. Required
+        /// </summary>
+        [StepProperty(1)]
+        [Required]
+        [AllowedRange("Greater than 1")]
+        [DocumentationURL("alpha.com")]
+        [Example("1234")]
+        [RecommendedRange("100-300")]
+        [RecommendedValue("201")]
+        [RequiredVersion("Greek", "2.1")]
+        [SeeAlso("Beta")]
+        // ReSharper disable UnusedMember.Local
+        public IStep<int> Alpha { get; set; } = null!;
+
+        /// <summary>
+        /// The beta property. Not Required.
+        /// </summary>
+        [StepProperty(2)]
+        [SeeAlso("Alpha")]
+        [DefaultValueExplanation("Two hundred")]
+        public IStep<StringStream> Beta { get; set; } = new StringConstant("Two hundred");
+
+        /// <summary>
+        /// The delta property.
+        /// </summary>
+        [StepListProperty(4)]
+        [ValueDelimiter(",")]
+        public IReadOnlyList<IStep<bool>> Delta { get; set; } = null!;
+
+        /// <summary>
+        /// The Gamma property.
+        /// </summary>
+        [VariableName(3)]
+        public VariableName Gamma { get; set; }
+        // ReSharper restore UnusedMember.Local
+
+        /// <inheritdoc />
+        public override IStepFactory StepFactory => DocumentationExampleStepFactory.Instance;
+    }
+}
+
 }

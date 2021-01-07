@@ -12,74 +12,80 @@ using Reductech.EDR.Core.Util;
 
 namespace Reductech.EDR.Core.Steps
 {
-    /// <summary>
-    /// Prints a value to the log.
-    /// </summary>
-    [Alias("Log")]
-    public sealed class Print<T> : CompoundStep<Unit>
+
+/// <summary>
+/// Prints a value to the log.
+/// </summary>
+[Alias("Log")]
+public sealed class Print<T> : CompoundStep<Unit>
+{
+    /// <inheritdoc />
+    protected override async Task<Result<Unit, IError>> Run(
+        IStateMonad stateMonad,
+        CancellationToken cancellationToken)
     {
-        /// <inheritdoc />
-        protected override async Task<Result<Unit, IError>> Run(IStateMonad stateMonad,
-            CancellationToken cancellationToken)
-        {
-            var r = await Value.Run(stateMonad, cancellationToken);
-            if (r.IsFailure) return r.ConvertFailure<Unit>();
+        var r = await Value.Run(stateMonad, cancellationToken);
 
+        if (r.IsFailure)
+            return r.ConvertFailure<Unit>();
 
-            string stringToPrint;
+        string stringToPrint;
 
-            if (r.Value is Entity entity)
-                stringToPrint = entity.Serialize();
-            else if (r.Value is StringStream ss)
-                stringToPrint = await ss.GetStringAsync();
-            else if (r.Value is DateTime dt)
-                stringToPrint = dt.ToString("O");
-            else if (r.Value is double d)
-                stringToPrint = d.ToString("G17");
-            else
-                stringToPrint = r.Value?.ToString()!;
+        if (r.Value is Entity entity)
+            stringToPrint = entity.Serialize();
+        else if (r.Value is StringStream ss)
+            stringToPrint = await ss.GetStringAsync();
+        else if (r.Value is DateTime dt)
+            stringToPrint = dt.ToString("O");
+        else if (r.Value is double d)
+            stringToPrint = d.ToString("G17");
+        else
+            stringToPrint = r.Value?.ToString()!;
 
-            stateMonad.Logger.LogInformation(stringToPrint);
+        stateMonad.Logger.LogInformation(stringToPrint);
 
-            return Unit.Default;
-        }
-
-        /// <summary>
-        /// The Value to Print.
-        /// </summary>
-        [StepProperty(1)]
-        [Required]
-        public IStep<T> Value { get; set; } = null!;
-
-        /// <inheritdoc />
-        public override IStepFactory StepFactory => PrintStepFactory.Instance;
+        return Unit.Default;
     }
 
     /// <summary>
-    /// Prints a value to the log.
+    /// The Value to Print.
     /// </summary>
-    public sealed class PrintStepFactory : GenericStepFactory
-    {
-        private PrintStepFactory() { }
+    [StepProperty(1)]
+    [Required]
+    public IStep<T> Value { get; set; } = null!;
 
-        /// <summary>
-        /// The instance.
-        /// </summary>
-        public static GenericStepFactory Instance { get; } = new PrintStepFactory();
+    /// <inheritdoc />
+    public override IStepFactory StepFactory => PrintStepFactory.Instance;
+}
 
-        /// <inheritdoc />
-        public override Type StepType => typeof(Print<>);
+/// <summary>
+/// Prints a value to the log.
+/// </summary>
+public sealed class PrintStepFactory : GenericStepFactory
+{
+    private PrintStepFactory() { }
 
-        /// <inheritdoc />
-        protected override ITypeReference GetOutputTypeReference(ITypeReference memberTypeReference) => new ActualTypeReference(typeof(Unit));
+    /// <summary>
+    /// The instance.
+    /// </summary>
+    public static GenericStepFactory Instance { get; } = new PrintStepFactory();
 
-        /// <inheritdoc />
-        public override string OutputTypeExplanation => nameof(Unit);
+    /// <inheritdoc />
+    public override Type StepType => typeof(Print<>);
 
-        /// <inheritdoc />
-        protected override Result<ITypeReference, IError> GetMemberType(FreezableStepData freezableStepData,
-            TypeResolver typeResolver) =>
-            freezableStepData.TryGetStep(nameof(Print<object>.Value), StepType)
-                .Bind(x => x.TryGetOutputTypeReference(typeResolver));
-    }
+    /// <inheritdoc />
+    protected override ITypeReference GetOutputTypeReference(ITypeReference memberTypeReference) =>
+        new ActualTypeReference(typeof(Unit));
+
+    /// <inheritdoc />
+    public override string OutputTypeExplanation => nameof(Unit);
+
+    /// <inheritdoc />
+    protected override Result<ITypeReference, IError> GetMemberType(
+        FreezableStepData freezableStepData,
+        TypeResolver typeResolver) => freezableStepData
+        .TryGetStep(nameof(Print<object>.Value), StepType)
+        .Bind(x => x.TryGetOutputTypeReference(typeResolver));
+}
+
 }

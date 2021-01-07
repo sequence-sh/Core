@@ -8,71 +8,74 @@ using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
-    public class GetVariableTests : StepTestBase<GetVariable<int>, int>
+
+public class GetVariableTests : StepTestBase<GetVariable<int>, int>
+{
+    /// <inheritdoc />
+    public GetVariableTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper) { }
+
+    /// <inheritdoc />
+    protected override IEnumerable<StepCase> StepCases
     {
-        /// <inheritdoc />
-        public GetVariableTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
+        get
         {
-        }
-
-        /// <inheritdoc />
-        protected override IEnumerable<StepCase> StepCases
-        {
-            get
+            var sequence = new Core.Steps.Sequence<Unit>
             {
-                var sequence = new Core.Steps.Sequence<Unit>
+                InitialSteps = new List<IStep<Unit>>
                 {
-                    InitialSteps = new List<IStep<Unit>>
+                    new SetVariable<int>
                     {
-                        new SetVariable<int>
-                        {
-                            Variable = new VariableName("Foo"),
-                            Value = Constant(42)
-                        },
-                        new Print<int>
-                        {
-                            Value = new GetVariable<int>
-                            {
-                                Variable = new VariableName("Foo")
-                            }
-                        }
+                        Variable = new VariableName("Foo"), Value = Constant(42)
                     },
-                    FinalStep = new DoNothing()
-                };
+                    new Print<int>
+                    {
+                        Value = new GetVariable<int>
+                        {
+                            Variable = new VariableName("Foo")
+                        }
+                    }
+                },
+                FinalStep = new DoNothing()
+            };
 
-
-
-                yield return new StepCase("Get Variable", sequence, Unit.Default,  "42").WithExpectedFinalState("Foo", 42);
-            }
+            yield return new StepCase("Get Variable", sequence, Unit.Default, "42")
+                .WithExpectedFinalState("Foo", 42);
         }
-
-        /// <inheritdoc />
-        protected override IEnumerable<DeserializeCase> DeserializeCases
-        {
-            get
-            {
-
-                yield return new DeserializeCase("Short Form",
-                    $"- <Foo> = 42\r\n- Print Value: <Foo>",
-                    Unit.Default, "42"
-                    )
-                    .WithExpectedFinalState("Foo", 42);
-
-            }
-
-        }
-
-        /// <inheritdoc />
-        protected override IEnumerable<SerializeCase> SerializeCases {
-            get
-            {
-                yield return new SerializeCase("Short form", new GetVariable<int>(){Variable = new VariableName("Foo")}, "<Foo>");
-            } }
-
-        ///// <inheritdoc />
-        //protected override IEnumerable<ErrorCase> ErrorCases
-        //{
-        //    get { yield return CreateDefaultErrorCase(false); }
-        //}
     }
+
+    /// <inheritdoc />
+    protected override IEnumerable<DeserializeCase> DeserializeCases
+    {
+        get
+        {
+            yield return new DeserializeCase(
+                    "Short Form",
+                    $"- <Foo> = 42\r\n- Print Value: <Foo>",
+                    Unit.Default,
+                    "42"
+                )
+                .WithExpectedFinalState("Foo", 42);
+        }
+    }
+
+    /// <inheritdoc />
+    protected override IEnumerable<SerializeCase> SerializeCases
+    {
+        get
+        {
+            yield return new SerializeCase(
+                "Short form",
+                new GetVariable<int>() { Variable = new VariableName("Foo") },
+                "<Foo>"
+            );
+        }
+    }
+
+    ///// <inheritdoc />
+    //protected override IEnumerable<ErrorCase> ErrorCases
+    //{
+    //    get { yield return CreateDefaultErrorCase(false); }
+    //}
+}
+
 }

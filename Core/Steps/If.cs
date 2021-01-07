@@ -10,68 +10,71 @@ using Reductech.EDR.Core.Util;
 namespace Reductech.EDR.Core.Steps
 {
 
-    /// <summary>
-    /// Executes a statement if a condition is true.
-    /// </summary>
-    public sealed class If : CompoundStep<Unit>
+/// <summary>
+/// Executes a statement if a condition is true.
+/// </summary>
+public sealed class If : CompoundStep<Unit>
+{
+    /// <inheritdoc />
+    protected override async Task<Result<Unit, IError>> Run(
+        IStateMonad stateMonad,
+        CancellationToken cancellationToken)
     {
-        /// <inheritdoc />
-        protected override async Task<Result<Unit, IError>> Run(IStateMonad stateMonad,
-            CancellationToken cancellationToken)
-        {
-            var result = await Condition.Run(stateMonad, cancellationToken)
-                .Bind(r =>
+        var result = await Condition.Run(stateMonad, cancellationToken)
+            .Bind(
+                r =>
                 {
                     if (r)
                         return Then.Run(stateMonad, cancellationToken);
 
                     if (Else != null)
                         return Else.Run(stateMonad, cancellationToken);
-                    else return Task.FromResult(Result.Success<Unit, IError>(Unit.Default));
+                    else
+                        return Task.FromResult(Result.Success<Unit, IError>(Unit.Default));
+                }
+            );
 
-                });
-
-            return result;
-        }
-
-        /// <inheritdoc />
-        public override IStepFactory StepFactory => IfStepFactory.Instance;
-
-        /// <summary>
-        /// Whether to follow the Then Branch
-        /// </summary>
-        [StepProperty(1)]
-        [Required]
-        public IStep<bool> Condition { get; set; } = null!;
-
-        /// <summary>
-        /// The Then Branch.
-        /// </summary>
-        [StepProperty(2)]
-        [Required]
-        public IStep<Unit> Then { get; set; } = null!;
-
-        //TODO else if
-
-        /// <summary>
-        /// The Else branch, if it exists.
-        /// </summary>
-        [StepProperty(3)]
-        [DefaultValueExplanation("Do Nothing")]
-        public IStep<Unit>? Else { get; set; } = null;
-
+        return result;
     }
+
+    /// <inheritdoc />
+    public override IStepFactory StepFactory => IfStepFactory.Instance;
 
     /// <summary>
-    /// Executes a statement if a condition is true.
+    /// Whether to follow the Then Branch
     /// </summary>
-    public sealed class IfStepFactory : SimpleStepFactory<If, Unit>
-    {
-        private IfStepFactory() { }
+    [StepProperty(1)]
+    [Required]
+    public IStep<bool> Condition { get; set; } = null!;
 
-        /// <summary>
-        /// The instance.
-        /// </summary>
-        public static IfStepFactory Instance { get; } = new IfStepFactory();
-    }
+    /// <summary>
+    /// The Then Branch.
+    /// </summary>
+    [StepProperty(2)]
+    [Required]
+    public IStep<Unit> Then { get; set; } = null!;
+
+    //TODO else if
+
+    /// <summary>
+    /// The Else branch, if it exists.
+    /// </summary>
+    [StepProperty(3)]
+    [DefaultValueExplanation("Do Nothing")]
+    public IStep<Unit>? Else { get; set; } = null;
+}
+
+/// <summary>
+/// Executes a statement if a condition is true.
+/// </summary>
+public sealed class IfStepFactory : SimpleStepFactory<If, Unit>
+{
+    private IfStepFactory() { }
+
+    /// <summary>
+    /// The instance.
+    /// </summary>
+    public static IfStepFactory Instance { get; } = new IfStepFactory();
+}
+
 }

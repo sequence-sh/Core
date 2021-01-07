@@ -8,89 +8,74 @@ using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
-    public class IncrementVariableTests : StepTestBase<IncrementVariable, Unit>
+
+public class IncrementVariableTests : StepTestBase<IncrementVariable, Unit>
+{
+    /// <inheritdoc />
+    public IncrementVariableTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper) { }
+
+    /// <inheritdoc />
+    protected override IEnumerable<StepCase> StepCases
     {
-        /// <inheritdoc />
-        public IncrementVariableTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
+        get
         {
-        }
-
-        /// <inheritdoc />
-        protected override IEnumerable<StepCase> StepCases
-        {
-            get
-            {
-                yield return new StepCase("Increment 1",
-                    new Core.Steps.Sequence<Unit>()
+            yield return new StepCase(
+                "Increment 1",
+                new Core.Steps.Sequence<Unit>()
+                {
+                    InitialSteps = new List<IStep<Unit>>() { SetVariable("Foo", 41) },
+                    FinalStep = new IncrementVariable()
                     {
-                        InitialSteps = new List<IStep<Unit>>()
-                        {
+                        Amount = Constant(1), Variable = new VariableName("Foo")
+                    }
+                },
+                Unit.Default
+            ).WithExpectedFinalState("Foo", 42);
 
-                            SetVariable("Foo", 41)
-                        },
-
-                        FinalStep = new IncrementVariable()
-                        {
-                            Amount = Constant(1),
-                            Variable = new VariableName("Foo")
-                        }
-                    },
-
-                    Unit.Default
-                    ).WithExpectedFinalState("Foo", 42);
-
-                yield return new StepCase("Increment 2",
-                    new Core.Steps.Sequence<Unit>()
+            yield return new StepCase(
+                "Increment 2",
+                new Core.Steps.Sequence<Unit>()
+                {
+                    InitialSteps = new List<IStep<Unit>>() { SetVariable("Foo", 40) },
+                    FinalStep = new IncrementVariable()
                     {
-                        InitialSteps = new List<IStep<Unit>>()
-                        {
+                        Amount = Constant(2), Variable = new VariableName("Foo")
+                    }
+                },
+                Unit.Default
+            ).WithExpectedFinalState("Foo", 42);
 
-                            SetVariable("Foo", 40)
-                        },
-
-                        FinalStep = new IncrementVariable()
-                        {
-                            Amount = Constant(2),
-                            Variable = new VariableName("Foo")
-                        }
-                    } , Unit.Default
-                    ).WithExpectedFinalState("Foo", 42);
-
-
-                yield return new StepCase("Increment -1",
-                    new Core.Steps.Sequence<Unit>
+            yield return new StepCase(
+                "Increment -1",
+                new Core.Steps.Sequence<Unit>
+                {
+                    InitialSteps = new List<IStep<Unit>> { SetVariable("Foo", 43) },
+                    FinalStep = new IncrementVariable
                     {
-                        InitialSteps = new List<IStep<Unit>>
-                        {
-
-                            SetVariable("Foo", 43)
-                        },
-
-                        FinalStep = new IncrementVariable
-                        {
-                            Amount = Constant(-1),
-                            Variable = new VariableName("Foo")
-                        }
-                    }, Unit.Default
-                    ).WithExpectedFinalState("Foo", 42);
-
-
-            }
+                        Amount = Constant(-1), Variable = new VariableName("Foo")
+                    }
+                },
+                Unit.Default
+            ).WithExpectedFinalState("Foo", 42);
         }
-
-        /// <inheritdoc />
-        protected override IEnumerable<DeserializeCase> DeserializeCases
-        {
-            get
-            {
-                yield return new DeserializeCase("increment 1", "- <Foo> = 41\r\n- IncrementVariable Amount: 1 Variable: <Foo>", Unit.Default)
-                    .WithExpectedFinalState("Foo", 42);
-
-            }
-
-        }
-
-        /// <inheritdoc />
-        protected override IEnumerable<ErrorCase> ErrorCases => CreateDefaultErrorCases(1);
     }
+
+    /// <inheritdoc />
+    protected override IEnumerable<DeserializeCase> DeserializeCases
+    {
+        get
+        {
+            yield return new DeserializeCase(
+                    "increment 1",
+                    "- <Foo> = 41\r\n- IncrementVariable Amount: 1 Variable: <Foo>",
+                    Unit.Default
+                )
+                .WithExpectedFinalState("Foo", 42);
+        }
+    }
+
+    /// <inheritdoc />
+    protected override IEnumerable<ErrorCase> ErrorCases => CreateDefaultErrorCases(1);
+}
+
 }

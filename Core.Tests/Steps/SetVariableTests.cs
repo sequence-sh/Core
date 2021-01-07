@@ -8,69 +8,61 @@ using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
-    public class SetVariableTests : StepTestBase<SetVariable<int>, Unit>
+
+public class SetVariableTests : StepTestBase<SetVariable<int>, Unit>
+{
+    /// <inheritdoc />
+    public SetVariableTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper) { }
+
+    /// <inheritdoc />
+    protected override IEnumerable<StepCase> StepCases
     {
-        /// <inheritdoc />
-        public SetVariableTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
+        get
         {
-        }
+            yield return new StepCase(
+                "Set a new variable",
+                new SetVariable<int> { Value = Constant(42), Variable = new VariableName("Foo") },
+                Unit.Default
+            ).WithExpectedFinalState("Foo", 42);
 
-        /// <inheritdoc />
-        protected override IEnumerable<StepCase> StepCases
-        {
-            get
-            {
-                yield return new StepCase("Set a new variable",
-                    new SetVariable<int>
-                    {
-                        Value = Constant(42), Variable = new VariableName("Foo")
-                    }, Unit.Default
-                    ).WithExpectedFinalState("Foo", 42);
-
-
-                yield return new StepCase("Set an existing variable",
-
+            yield return new StepCase(
+                    "Set an existing variable",
                     new Core.Steps.Sequence<Unit>
                     {
-                        InitialSteps = new List<IStep<Unit>>
-                        {
-                            SetVariable("Foo", 21)
-                        },
-
+                        InitialSteps = new List<IStep<Unit>> { SetVariable("Foo", 21) },
                         FinalStep = new SetVariable<int>
                         {
-                            Value = Constant(42),
-                            Variable = new VariableName("Foo")
+                            Value = Constant(42), Variable = new VariableName("Foo")
                         }
-                    }, Unit.Default
-                    )
-                    .WithExpectedFinalState("Foo", 42);
-
-            }
+                    },
+                    Unit.Default
+                )
+                .WithExpectedFinalState("Foo", 42);
         }
-
-        /// <inheritdoc />
-        protected override IEnumerable<DeserializeCase> DeserializeCases
-        {
-            get
-            {
-                yield return new DeserializeCase("Set a new variable", "<Foo> = 42", Unit.Default)
-                    .WithExpectedFinalState("Foo", 42);
-            }
-
-        }
-
-        /// <inheritdoc />
-        protected override IEnumerable<SerializeCase> SerializeCases {
-            get
-            {
-                yield return new SerializeCase("Short form",
-                    new SetVariable<int>
-                    {
-                        Value = Constant(42),
-                        Variable = new VariableName("Foo")
-                    }, "<Foo> = 42"
-                    );
-            } }
     }
+
+    /// <inheritdoc />
+    protected override IEnumerable<DeserializeCase> DeserializeCases
+    {
+        get
+        {
+            yield return new DeserializeCase("Set a new variable", "<Foo> = 42", Unit.Default)
+                .WithExpectedFinalState("Foo", 42);
+        }
+    }
+
+    /// <inheritdoc />
+    protected override IEnumerable<SerializeCase> SerializeCases
+    {
+        get
+        {
+            yield return new SerializeCase(
+                "Short form",
+                new SetVariable<int> { Value = Constant(42), Variable = new VariableName("Foo") },
+                "<Foo> = 42"
+            );
+        }
+    }
+}
+
 }

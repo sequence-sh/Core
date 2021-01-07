@@ -6,119 +6,139 @@ using Reductech.EDR.Core.Util;
 
 namespace Reductech.EDR.Core.Internal
 {
+
+/// <summary>
+/// Gets the actual type from a type reference.
+/// </summary>
+public sealed class TypeResolver
+{
     /// <summary>
-    /// Gets the actual type from a type reference.
+    /// Create a new TypeResolver
     /// </summary>
-    public sealed class TypeResolver
+    public TypeResolver(
+        StepFactoryStore stepFactoryStore,
+        Dictionary<VariableName, ActualTypeReference>? myDictionary = null)
     {
-        /// <summary>
-        /// Create a new TypeResolver
-        /// </summary>
-        public TypeResolver(StepFactoryStore stepFactoryStore, Dictionary<VariableName, ActualTypeReference>? myDictionary = null)
+        StepFactoryStore = stepFactoryStore;
+        MyDictionary     = myDictionary ?? new Dictionary<VariableName, ActualTypeReference>();
+    }
+
+    /// <summary>
+    /// Copy this type resolver.
+    /// </summary>
+    public TypeResolver Copy()
+    {
+        var dictClone = MyDictionary.ToDictionary(x => x.Key, x => x.Value);
+        return new TypeResolver(StepFactoryStore, dictClone);
+    }
+
+    /// <inheritdoc />
+    public override string ToString() => Dictionary.Count + " Types";
+
+    private Dictionary<VariableName, ActualTypeReference> MyDictionary { get; }
+
+    /// <summary>
+    /// The dictionary mapping VariableNames to ActualTypeReferences
+    /// </summary>
+    public IReadOnlyDictionary<VariableName, ActualTypeReference> Dictionary => MyDictionary;
+
+    /// <summary>
+    /// The StepFactoryStory
+    /// </summary>
+    public StepFactoryStore StepFactoryStore { get; }
+
+    /// <summary>
+    /// Try to add this step and all its children to this TypeResolver.
+    /// </summary>
+    public Result<Unit, IError> TryAddTypeHierarchy(IFreezableStep topLevelStep)
+    {
+        int? numberUnresolved = null;
+
+        while (true)
         {
-            StepFactoryStore = stepFactoryStore;
-            MyDictionary = myDictionary?? new Dictionary<VariableName, ActualTypeReference>();
-        }
+            var unresolvableVariableNames = new List<VariableName>();
+            var errors                    = new List<IError>();
 
+            var result = topLevelStep.GetVariablesSet(this);
 
-        /// <summary>
-        /// Copy this type resolver.
-        /// </summary>
-        public TypeResolver Copy()
-        {
-            var dictClone = MyDictionary.ToDictionary(x => x.Key, x => x.Value);
-            return new TypeResolver(StepFactoryStore, dictClone);
-        }
+            if (result.IsFailure)
+                return result.ConvertFailure<Unit>();
 
-        /// <inheritdoc />
-        public override string ToString() => Dictionary.Count + " Types";
-
-        private Dictionary<VariableName, ActualTypeReference> MyDictionary { get; }
-
-        /// <summary>
-        /// The dictionary mapping VariableNames to ActualTypeReferences
-        /// </summary>
-        public IReadOnlyDictionary<VariableName, ActualTypeReference> Dictionary => MyDictionary;
-
-        /// <summary>
-        /// The StepFactoryStory
-        /// </summary>
-        public StepFactoryStore StepFactoryStore { get; }
-
-        /// <summary>
-        /// Try to add this step and all its children to this TypeResolver.
-        /// </summary>
-        public Result<Unit, IError> TryAddTypeHierarchy(IFreezableStep topLevelStep)
-        {
-            int? numberUnresolved = null;
-
-            while (true)
+            foreach (var (variableName, maybe) in result.Value)
             {
-                var unresolvableVariableNames = new List<VariableName>();
-                var errors = new List<IError>();
-
-                var result = topLevelStep.GetVariablesSet(this);
-                if (result.IsFailure) return result.ConvertFailure<Unit>();
-
-                foreach (var (variableName, maybe) in result.Value)
-                {
-                    if (maybe.HasNoValue)
-                        unresolvableVariableNames.Add(variableName);
-                    else
-                    {
-                        var addResult = TryAddType(variableName, maybe.Value);
-                        if (addResult.IsFailure) errors.Add(addResult.Error.WithLocation(EntireSequenceLocation.Instance));
-                        else if (!addResult.Value) unresolvableVariableNames.Add(variableName);
-                    }
-                }
-
-                if (errors.Any())
-                    return Result.Failure<Unit, IError>(ErrorList.Combine(errors));
-
-                if (!unresolvableVariableNames.Any())
-                    break; //We've resolved everything. Yey!
-
-                if (numberUnresolved == null || numberUnresolved > unresolvableVariableNames.Count)
-                    numberUnresolved = unresolvableVariableNames.Count; //We have improved this number and can try again
+                if (maybe.HasNoValue)
+                    unresolvableVariableNames.Add(variableName);
                 else
                 {
-                    var error =
-                        ErrorList.Combine(
-                            unresolvableVariableNames.Distinct().Select(x =>
-                                new SingleError(
-                                    EntireSequenceLocation.Instance,
-                                    ErrorCode.CouldNotResolveVariable,x.Name ))
-                        );
+                    var addResult = TryAddType(variableName, maybe.Value);
 
-                    return Result.Failure<Unit, IError>(error);
+                    if (addResult.IsFailure)
+                        errors.Add(addResult.Error.WithLocation(EntireSequenceLocation.Instance));
+                    else if (!addResult.Value)
+                        unresolvableVariableNames.Add(variableName);
                 }
             }
 
-            return Unit.Default;
-        }
+            if (errors.Any())
+                return Result.Failure<Unit, IError>(ErrorList.Combine(errors));
 
-        /// <summary>
-        /// Tries to add a variableName with this type to the type resolver.
-        /// </summary>
-        public Result<bool, IErrorBuilder> TryAddType(VariableName variable, ITypeReference typeReference)
-        {
-            var actualType = typeReference.GetActualTypeReferenceIfResolvable(this);
-            if (actualType.IsFailure) return actualType.ConvertFailure<bool>();
+            if (!unresolvableVariableNames.Any())
+                break; //We've resolved everything. Yey!
 
-            if (actualType.Value.HasNoValue) return false;
-
-            var actualTypeReference = actualType.Value.Value;
-
-            if (MyDictionary.TryGetValue(variable, out var previous))
+            if (numberUnresolved == null || numberUnresolved > unresolvableVariableNames.Count)
+                numberUnresolved =
+                    unresolvableVariableNames
+                        .Count; //We have improved this number and can try again
+            else
             {
-                if (previous.Equals(actualTypeReference))
-                    return true;
+                var error =
+                    ErrorList.Combine(
+                        unresolvableVariableNames.Distinct()
+                            .Select(
+                                x =>
+                                    new SingleError(
+                                        EntireSequenceLocation.Instance,
+                                        ErrorCode.CouldNotResolveVariable,
+                                        x.Name
+                                    )
+                            )
+                    );
 
-                return new ErrorBuilder( ErrorCode.CannotInferType);
+                return Result.Failure<Unit, IError>(error);
             }
-
-            MyDictionary.Add(variable, actualTypeReference);
-            return true;
         }
+
+        return Unit.Default;
     }
+
+    /// <summary>
+    /// Tries to add a variableName with this type to the type resolver.
+    /// </summary>
+    public Result<bool, IErrorBuilder> TryAddType(
+        VariableName variable,
+        ITypeReference typeReference)
+    {
+        var actualType = typeReference.GetActualTypeReferenceIfResolvable(this);
+
+        if (actualType.IsFailure)
+            return actualType.ConvertFailure<bool>();
+
+        if (actualType.Value.HasNoValue)
+            return false;
+
+        var actualTypeReference = actualType.Value.Value;
+
+        if (MyDictionary.TryGetValue(variable, out var previous))
+        {
+            if (previous.Equals(actualTypeReference))
+                return true;
+
+            return new ErrorBuilder(ErrorCode.CannotInferType);
+        }
+
+        MyDictionary.Add(variable, actualTypeReference);
+        return true;
+    }
+}
+
 }

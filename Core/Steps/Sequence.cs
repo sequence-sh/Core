@@ -12,76 +12,80 @@ using Reductech.EDR.Core.Util;
 
 namespace Reductech.EDR.Core.Steps
 {
-    /// <summary>
-    /// A chain of steps to be run one after the other.
-    /// </summary>
-    public sealed class Sequence<T> : CompoundStep<T>
+
+/// <summary>
+/// A chain of steps to be run one after the other.
+/// </summary>
+public sealed class Sequence<T> : CompoundStep<T>
+{
+    /// <inheritdoc />
+    protected override async Task<Result<T, IError>> Run(
+        IStateMonad stateMonad,
+        CancellationToken cancellationToken)
     {
-        /// <inheritdoc />
-        protected override async Task<Result<T, IError>> Run(IStateMonad stateMonad,
-            CancellationToken cancellationToken)
+        foreach (var step in InitialSteps)
         {
+            var r = await step.Run(stateMonad, cancellationToken);
 
-            foreach (var step in InitialSteps)
-            {
-                var r = await step.Run(stateMonad, cancellationToken);
-                if (r.IsFailure)
-                    return r.ConvertFailure<T>();
-            }
-
-            var finalResult = await FinalStep.Run(stateMonad, cancellationToken);
-
-            return finalResult;
+            if (r.IsFailure)
+                return r.ConvertFailure<T>();
         }
 
-        /// <inheritdoc />
-        public override IStepFactory StepFactory => SequenceStepFactory.Instance;
+        var finalResult = await FinalStep.Run(stateMonad, cancellationToken);
 
-        /// <summary>
-        /// The steps of this sequence apart from the final step.
-        /// </summary>
-        [StepListProperty(1)]
-        [Required]
-        public IReadOnlyList<IStep<Unit>> InitialSteps { get; set; } = null!;
-
-        /// <summary>
-        /// The final step of the sequence.
-        /// Will be the return value.
-        /// </summary>
-        [StepProperty(2)]
-        [Required]
-        public IStep<T> FinalStep { get; set; } = null!;
+        return finalResult;
     }
+
+    /// <inheritdoc />
+    public override IStepFactory StepFactory => SequenceStepFactory.Instance;
 
     /// <summary>
-    /// A sequence of steps to be run one after the other.
+    /// The steps of this sequence apart from the final step.
     /// </summary>
-    public sealed class SequenceStepFactory : GenericStepFactory
-    {
-        private SequenceStepFactory() { }
+    [StepListProperty(1)]
+    [Required]
+    public IReadOnlyList<IStep<Unit>> InitialSteps { get; set; } = null!;
 
-        /// <summary>
-        /// The instance.
-        /// </summary>
-        public static StepFactory Instance { get; } = new SequenceStepFactory();
+    /// <summary>
+    /// The final step of the sequence.
+    /// Will be the return value.
+    /// </summary>
+    [StepProperty(2)]
+    [Required]
+    public IStep<T> FinalStep { get; set; } = null!;
+}
 
-        /// <inheritdoc />
-        public override Type StepType => typeof(Sequence<>);
+/// <summary>
+/// A sequence of steps to be run one after the other.
+/// </summary>
+public sealed class SequenceStepFactory : GenericStepFactory
+{
+    private SequenceStepFactory() { }
 
-        /// <inheritdoc />
-        protected override ITypeReference GetOutputTypeReference(ITypeReference memberTypeReference) => memberTypeReference;
+    /// <summary>
+    /// The instance.
+    /// </summary>
+    public static StepFactory Instance { get; } = new SequenceStepFactory();
 
-        /// <inheritdoc />
-        protected override Result<ITypeReference, IError> GetMemberType(FreezableStepData freezableStepData, TypeResolver typeResolver) =>
-            freezableStepData.TryGetStep(nameof(Sequence<object>.FinalStep), StepType)
-                .Bind(x => x.TryGetOutputTypeReference(typeResolver));
+    /// <inheritdoc />
+    public override Type StepType => typeof(Sequence<>);
 
-        /// <inheritdoc />
-        public override string OutputTypeExplanation => "The same type as the final step";
+    /// <inheritdoc />
+    protected override ITypeReference GetOutputTypeReference(ITypeReference memberTypeReference) =>
+        memberTypeReference;
 
-        /// <inheritdoc />
-        public override IStepSerializer Serializer { get; } = SequenceSerializer.Instance;
+    /// <inheritdoc />
+    protected override Result<ITypeReference, IError> GetMemberType(
+        FreezableStepData freezableStepData,
+        TypeResolver typeResolver) => freezableStepData
+        .TryGetStep(nameof(Sequence<object>.FinalStep), StepType)
+        .Bind(x => x.TryGetOutputTypeReference(typeResolver));
 
+    /// <inheritdoc />
+    public override string OutputTypeExplanation => "The same type as the final step";
 
-    }
+    /// <inheritdoc />
+    public override IStepSerializer Serializer { get; } = SequenceSerializer.Instance;
+}
+
 }

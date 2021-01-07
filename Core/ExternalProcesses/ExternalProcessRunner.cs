@@ -15,146 +15,163 @@ using Reductech.EDR.Core.Util;
 
 namespace Reductech.EDR.Core.ExternalProcesses
 {
+
+/// <summary>
+/// Basic external step runner.
+/// </summary>
+public class ExternalProcessRunner : IExternalProcessRunner
+{
+    private ExternalProcessRunner() { }
+
     /// <summary>
-    /// Basic external step runner.
+    /// The instance.
     /// </summary>
-    public class ExternalProcessRunner : IExternalProcessRunner
+    public static IExternalProcessRunner Instance { get; } = new ExternalProcessRunner();
+
+    /// <inheritdoc />
+    public Result<IExternalProcessReference, IErrorBuilder> StartExternalProcess(
+        string processPath,
+        IEnumerable<string> arguments,
+        Encoding encoding)
     {
-        private ExternalProcessRunner() { }
+        if (!File.Exists(processPath))
+            return new ErrorBuilder(ErrorCode.ExternalProcessNotFound, processPath);
 
-        /// <summary>
-        /// The instance.
-        /// </summary>
-        public static IExternalProcessRunner Instance { get; } = new ExternalProcessRunner();
+        var argumentString = string.Join(' ', arguments.Select(EncodeParameterArgument));
 
-        /// <inheritdoc />
-        public Result<IExternalProcessReference, IErrorBuilder> StartExternalProcess(string processPath, IEnumerable<string> arguments, Encoding encoding)
+        var pProcess = new Process
         {
-            if (!File.Exists(processPath))
-                return new ErrorBuilder(ErrorCode.ExternalProcessNotFound, processPath);
-
-            var argumentString = string.Join(' ', arguments.Select(EncodeParameterArgument));
-            var pProcess = new Process
+            StartInfo =
             {
-                StartInfo =
-                {
-                    FileName = processPath,
-                    Arguments = argumentString,
-                    UseShellExecute = false,
-                    RedirectStandardOutput = true,
-                    RedirectStandardError = true,
-                    WindowStyle = ProcessWindowStyle.Hidden, //don't display a window
-                    CreateNoWindow = true,
-                    StandardErrorEncoding = encoding,
-                    StandardOutputEncoding = encoding,
-                    RedirectStandardInput = true
-                }
-            };
-
-            var started = pProcess.Start();
-            if(!started)
-                return new ErrorBuilder(ErrorCode.ExternalProcessError,"Could not start");
-
-            AppDomain.CurrentDomain.ProcessExit += KillProcess;
-            AppDomain.CurrentDomain.DomainUnload += KillProcess;
-
-            var reference = new ExternalProcessReference(pProcess);
-
-            return reference;
-
-            void KillProcess(object? sender, EventArgs e)
-            {
-                if (!pProcess.HasExited)
-                    pProcess.Kill(true);
+                FileName               = processPath,
+                Arguments              = argumentString,
+                UseShellExecute        = false,
+                RedirectStandardOutput = true,
+                RedirectStandardError  = true,
+                WindowStyle            = ProcessWindowStyle.Hidden, //don't display a window
+                CreateNoWindow         = true,
+                StandardErrorEncoding  = encoding,
+                StandardOutputEncoding = encoding,
+                RedirectStandardInput  = true
             }
-        }
+        };
 
-        /// <inheritdoc />
-        public async Task<Result<Unit, IErrorBuilder>> RunExternalProcess(string processPath,
-            ILogger logger,
-            IErrorHandler errorHandler,
-            IEnumerable<string> arguments,
-            Encoding encoding,
-            CancellationToken cancellationToken)
+        var started = pProcess.Start();
+
+        if (!started)
+            return new ErrorBuilder(ErrorCode.ExternalProcessError, "Could not start");
+
+        AppDomain.CurrentDomain.ProcessExit  += KillProcess;
+        AppDomain.CurrentDomain.DomainUnload += KillProcess;
+
+        var reference = new ExternalProcessReference(pProcess);
+
+        return reference;
+
+        void KillProcess(object? sender, EventArgs e)
         {
-            if (!File.Exists(processPath))
-                return new ErrorBuilder(ErrorCode.ExternalProcessNotFound,processPath);
-
-            var argumentString = string.Join(' ', arguments.Select(EncodeParameterArgument));
-            using var pProcess = new Process
-            {
-                StartInfo =
-                {
-                    FileName = processPath,
-                    Arguments = argumentString,
-                    UseShellExecute = false,
-                    RedirectStandardOutput = true,
-                    RedirectStandardError = true,
-                    WindowStyle = ProcessWindowStyle.Hidden, //don't display a window
-                    CreateNoWindow = true,
-                    StandardErrorEncoding = encoding,
-                    StandardOutputEncoding = encoding,
-                }
-            };
-
-            var errors = new List<IErrorBuilder>();
-
-            try
-            {
-                pProcess.Start();
-
-                var channelReader =
-                    StreamChannelHelper.ToChannelReader(
-                    (pProcess.StandardOutput, StreamSource.Output), (pProcess.StandardError, StreamSource.Error));
-
-
-                await foreach (var (line, streamSource) in  channelReader.ReadAllAsync(cancellationToken))
-                {
-                    if (streamSource == StreamSource.Error)
-                    {
-                        var errorText = string.IsNullOrWhiteSpace(line) ? "Unknown Error" : line;
-
-                        if (errorHandler.ShouldIgnoreError(errorText))
-                            logger.LogWarning(line);
-                        else
-                            errors.Add(new ErrorBuilder( ErrorCode.ExternalProcessError,errorText));
-                    }
-                    else
-                        logger.LogInformation(line);
-                }
-
-
-                // ReSharper disable once MethodHasAsyncOverloadWithCancellation - run on a separate thread
-                pProcess.WaitForExit();
-            }
-#pragma warning disable CA1031 // Do not catch general exception types
-            catch (Exception e)
-            {
-                errors.Add(new ErrorBuilder(e, ErrorCode.ExternalProcessError));
-            }
-#pragma warning restore CA1031 // Do not catch general exception types
-
-
-            if (errors.Any())
-            {
-                var e = ErrorBuilderList.Combine(errors);
-                return Result.Failure<Unit, IErrorBuilder>(e);
-            }
-
-            return Unit.Default;
-        }
-
-        private static readonly Regex BackslashRegex = new Regex(@"(\\*)" + "\"", RegexOptions.Compiled);
-        private static readonly Regex TermWithSpaceRegex = new Regex(@"^(.*\s.*?)(\\*)$", RegexOptions.Compiled | RegexOptions.Singleline);
-
-        private static string EncodeParameterArgument(string original)
-        {
-            if (string.IsNullOrEmpty(original))
-                return $"\"{original}\"";
-            var value = BackslashRegex.Replace(original, @"$1\$0");
-
-            value = TermWithSpaceRegex.Replace(value, "\"$1$2$2\"");
-            return value;
+            if (!pProcess.HasExited)
+                pProcess.Kill(true);
         }
     }
+
+    /// <inheritdoc />
+    public async Task<Result<Unit, IErrorBuilder>> RunExternalProcess(
+        string processPath,
+        ILogger logger,
+        IErrorHandler errorHandler,
+        IEnumerable<string> arguments,
+        Encoding encoding,
+        CancellationToken cancellationToken)
+    {
+        if (!File.Exists(processPath))
+            return new ErrorBuilder(ErrorCode.ExternalProcessNotFound, processPath);
+
+        var argumentString = string.Join(' ', arguments.Select(EncodeParameterArgument));
+
+        using var pProcess = new Process
+        {
+            StartInfo =
+            {
+                FileName               = processPath,
+                Arguments              = argumentString,
+                UseShellExecute        = false,
+                RedirectStandardOutput = true,
+                RedirectStandardError  = true,
+                WindowStyle            = ProcessWindowStyle.Hidden, //don't display a window
+                CreateNoWindow         = true,
+                StandardErrorEncoding  = encoding,
+                StandardOutputEncoding = encoding,
+            }
+        };
+
+        var errors = new List<IErrorBuilder>();
+
+        try
+        {
+            pProcess.Start();
+
+            var channelReader =
+                StreamChannelHelper.ToChannelReader(
+                    (pProcess.StandardOutput, StreamSource.Output),
+                    (pProcess.StandardError, StreamSource.Error)
+                );
+
+            await foreach (var (line, streamSource) in channelReader.ReadAllAsync(cancellationToken)
+            )
+            {
+                if (streamSource == StreamSource.Error)
+                {
+                    var errorText = string.IsNullOrWhiteSpace(line) ? "Unknown Error" : line;
+
+                    if (errorHandler.ShouldIgnoreError(errorText))
+                        logger.LogWarning(line);
+                    else
+                        errors.Add(new ErrorBuilder(ErrorCode.ExternalProcessError, errorText));
+                }
+                else
+                    logger.LogInformation(line);
+            }
+
+            // ReSharper disable once MethodHasAsyncOverloadWithCancellation - run on a separate thread
+            pProcess.WaitForExit();
+        }
+        #pragma warning disable CA1031 // Do not catch general exception types
+        catch (Exception e)
+        {
+            errors.Add(new ErrorBuilder(e, ErrorCode.ExternalProcessError));
+        }
+        #pragma warning restore CA1031 // Do not catch general exception types
+
+        if (errors.Any())
+        {
+            var e = ErrorBuilderList.Combine(errors);
+            return Result.Failure<Unit, IErrorBuilder>(e);
+        }
+
+        return Unit.Default;
+    }
+
+    private static readonly Regex BackslashRegex = new Regex(
+        @"(\\*)" + "\"",
+        RegexOptions.Compiled
+    );
+
+    private static readonly Regex TermWithSpaceRegex = new Regex(
+        @"^(.*\s.*?)(\\*)$",
+        RegexOptions.Compiled | RegexOptions.Singleline
+    );
+
+    private static string EncodeParameterArgument(string original)
+    {
+        if (string.IsNullOrEmpty(original))
+            return $"\"{original}\"";
+
+        var value = BackslashRegex.Replace(original, @"$1\$0");
+
+        value = TermWithSpaceRegex.Replace(value, "\"$1$2$2\"");
+        return value;
+    }
+}
+
 }

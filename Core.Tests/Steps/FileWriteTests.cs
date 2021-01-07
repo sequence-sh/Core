@@ -10,37 +10,49 @@ using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
-    public class FileWriteTests : StepTestBase<FileWrite, Unit>
+
+public class FileWriteTests : StepTestBase<FileWrite, Unit>
+{
+    /// <inheritdoc />
+    public FileWriteTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper) { }
+
+    /// <inheritdoc />
+    protected override IEnumerable<StepCase> StepCases
     {
-        /// <inheritdoc />
-        public FileWriteTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
+        get
         {
-        }
-
-        /// <inheritdoc />
-        protected override IEnumerable<StepCase> StepCases
-        {
-            get
-            {
-                yield return new StepCase("Write file", new FileWrite
+            yield return new StepCase(
+                    "Write file",
+                    new FileWrite
                     {
-                        Path =  Constant("Filename.txt"),
-                        Stream = Constant("Hello World")
-                    },Unit.Default)
-                    .WithFileSystemAction(x=>x.Setup(a=>
-                        a.WriteFileAsync("Filename.txt",
-                            It.IsAny<Stream>(), It.IsAny<CancellationToken>())).ReturnsAsync(Unit.Default));
-                //TODO check that the text being sent is actually written
-            }
-        }
+                        Path = Constant("Filename.txt"), Stream = Constant("Hello World")
+                    },
+                    Unit.Default
+                )
+                .WithFileSystemAction(
+                    x => x.Setup(
+                            a =>
+                                a.WriteFileAsync(
+                                    "Filename.txt",
+                                    It.IsAny<Stream>(),
+                                    It.IsAny<CancellationToken>()
+                                )
+                        )
+                        .ReturnsAsync(Unit.Default)
+                );
 
-        ///// <inheritdoc />
-        //protected override IEnumerable<SerializeCase> SerializeCases
-        //{
-        //    get
-        //    {
-        //        yield return CreateDefaultSerializeCase(false);
-        //    }
-        //}
+            //TODO check that the text being sent is actually written
+        }
     }
+
+    ///// <inheritdoc />
+    //protected override IEnumerable<SerializeCase> SerializeCases
+    //{
+    //    get
+    //    {
+    //        yield return CreateDefaultSerializeCase(false);
+    //    }
+    //}
+}
+
 }

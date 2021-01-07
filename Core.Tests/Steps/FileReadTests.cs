@@ -11,75 +11,85 @@ using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
-    public class FileReadTests : StepTestBase<FileRead, StringStream>
+
+public class FileReadTests : StepTestBase<FileRead, StringStream>
+{
+    /// <inheritdoc />
+    public FileReadTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper) { }
+
+    /// <inheritdoc />
+    protected override IEnumerable<StepCase> StepCases
     {
-        /// <inheritdoc />
-        public FileReadTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper) { }
-
-        /// <inheritdoc />
-        protected override IEnumerable<StepCase> StepCases
+        get
         {
-            get
-            {
-                yield return new StepCase("Print file text",
-                    new Print<StringStream>
-                    {
-                        Value = new FileRead
-                        {
-                            Path = Constant("File.txt"),
-                        }
-                    },
-                    Unit.Default,
-                    "Hello World"
-
-                ).WithFileSystemAction(x=>x.Setup(a=>a.ReadFile("File.txt")).Returns(new MemoryStream(Encoding.ASCII.GetBytes("Hello World"))));
-            }
-        }
-
-        /// <inheritdoc />
-        protected override IEnumerable<DeserializeCase> DeserializeCases
-        {
-            get
-            {
-                yield return new DeserializeCase("Default", "Print Value: (FileRead Path: 'File.txt')",
-                    Unit.Default,
-                    "Hello World"
-                ).WithFileSystemAction(x=>
-                    x.Setup(a=>a.ReadFile("File.txt"))
-                        .Returns(new MemoryStream(Encoding.ASCII.GetBytes("Hello World"))));
-
-                yield return new DeserializeCase("Ordered Args", "Print (FileRead 'File.txt')",
-                    Unit.Default,
-                    "Hello World"
-                ).WithFileSystemAction(x =>
-                    x.Setup(a => a.ReadFile("File.txt"))
-                        .Returns(new MemoryStream(Encoding.ASCII.GetBytes("Hello World"))));
-
-                yield return new DeserializeCase("Alias", "Print Value: (ReadFromFile Path: 'File.txt')",
-                    Unit.Default,
-                    "Hello World"
-                ).WithFileSystemAction(x =>
-                    x.Setup(a => a.ReadFile("File.txt"))
-                        .Returns(new MemoryStream(Encoding.ASCII.GetBytes("Hello World"))));
-
-            }
-        }
-
-        /// <inheritdoc />
-        protected override IEnumerable<ErrorCase> ErrorCases
-        {
-            get
-            {
-                yield return new ErrorCase("ValueIf Error",
-                        new FileRead
-                        {
-                            Path =  Constant("File.txt"),
-                        },
-                        new ErrorBuilder(ErrorCode.Test,"ValueIf Error")
-                    )
-                    .WithFileSystemAction(x => x.Setup(a => a.ReadFile(
-                        "File.txt")).Returns(new ErrorBuilder( ErrorCode.Test, "ValueIf Error")));
-            }
+            yield return new StepCase(
+                "Print file text",
+                new Print<StringStream> { Value = new FileRead { Path = Constant("File.txt"), } },
+                Unit.Default,
+                "Hello World"
+            ).WithFileSystemAction(
+                x => x.Setup(a => a.ReadFile("File.txt"))
+                    .Returns(new MemoryStream(Encoding.ASCII.GetBytes("Hello World")))
+            );
         }
     }
+
+    /// <inheritdoc />
+    protected override IEnumerable<DeserializeCase> DeserializeCases
+    {
+        get
+        {
+            yield return new DeserializeCase(
+                "Default",
+                "Print Value: (FileRead Path: 'File.txt')",
+                Unit.Default,
+                "Hello World"
+            ).WithFileSystemAction(
+                x =>
+                    x.Setup(a => a.ReadFile("File.txt"))
+                        .Returns(new MemoryStream(Encoding.ASCII.GetBytes("Hello World")))
+            );
+
+            yield return new DeserializeCase(
+                "Ordered Args",
+                "Print (FileRead 'File.txt')",
+                Unit.Default,
+                "Hello World"
+            ).WithFileSystemAction(
+                x =>
+                    x.Setup(a => a.ReadFile("File.txt"))
+                        .Returns(new MemoryStream(Encoding.ASCII.GetBytes("Hello World")))
+            );
+
+            yield return new DeserializeCase(
+                "Alias",
+                "Print Value: (ReadFromFile Path: 'File.txt')",
+                Unit.Default,
+                "Hello World"
+            ).WithFileSystemAction(
+                x =>
+                    x.Setup(a => a.ReadFile("File.txt"))
+                        .Returns(new MemoryStream(Encoding.ASCII.GetBytes("Hello World")))
+            );
+        }
+    }
+
+    /// <inheritdoc />
+    protected override IEnumerable<ErrorCase> ErrorCases
+    {
+        get
+        {
+            yield return new ErrorCase(
+                    "ValueIf Error",
+                    new FileRead { Path = Constant("File.txt"), },
+                    new ErrorBuilder(ErrorCode.Test, "ValueIf Error")
+                )
+                .WithFileSystemAction(
+                    x => x.Setup(a => a.ReadFile("File.txt"))
+                        .Returns(new ErrorBuilder(ErrorCode.Test, "ValueIf Error"))
+                );
+        }
+    }
+}
+
 }

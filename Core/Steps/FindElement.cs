@@ -9,74 +9,85 @@ using Reductech.EDR.Core.Internal.Errors;
 
 namespace Reductech.EDR.Core.Steps
 {
+
+/// <summary>
+/// Gets the first index of an element in an array.
+/// Returns -1 if the element is not present.
+/// </summary>
+public sealed class FindElement<T> : CompoundStep<int>
+{
     /// <summary>
-    /// Gets the first index of an element in an array.
-    /// Returns -1 if the element is not present.
+    /// The array to check.
     /// </summary>
-    public sealed class FindElement<T> : CompoundStep<int>
-    {
-        /// <summary>
-        /// The array to check.
-        /// </summary>
-        [StepProperty(1)]
-        [Required]
-        public IStep<Core.Array<T>> Array { get; set; } = null!;
-
-        /// <summary>
-        /// The element to look for.
-        /// </summary>
-        [StepProperty(2)]
-        [Required]
-        public IStep<T> Element { get; set; } = null!;
-
-        /// <inheritdoc />
-        protected override async Task<Result<int, IError>> Run(IStateMonad stateMonad, CancellationToken cancellationToken)
-        {
-            var arrayResult = await Array.Run(stateMonad, cancellationToken);
-
-            if (arrayResult.IsFailure) return arrayResult.ConvertFailure<int>();
-
-            var elementResult = await Element.Run(stateMonad, cancellationToken);
-
-            if (elementResult.IsFailure) return elementResult.ConvertFailure<int>();
-
-            var indexResult = await arrayResult.Value.IndexOfAsync(elementResult.Value, cancellationToken);
-
-            return indexResult;
-        }
-
-        /// <inheritdoc />
-        public override IStepFactory StepFactory => FindElementStepFactory.Instance;
-    }
+    [StepProperty(1)]
+    [Required]
+    public IStep<Core.Array<T>> Array { get; set; } = null!;
 
     /// <summary>
-    /// Gets the first index of an element in an array.
+    /// The element to look for.
     /// </summary>
-    public sealed class FindElementStepFactory : GenericStepFactory
+    [StepProperty(2)]
+    [Required]
+    public IStep<T> Element { get; set; } = null!;
+
+    /// <inheritdoc />
+    protected override async Task<Result<int, IError>> Run(
+        IStateMonad stateMonad,
+        CancellationToken cancellationToken)
     {
-        private FindElementStepFactory() { }
+        var arrayResult = await Array.Run(stateMonad, cancellationToken);
 
-        /// <summary>
-        /// The instance.
-        /// </summary>
-        public static GenericStepFactory Instance { get; } = new FindElementStepFactory();
+        if (arrayResult.IsFailure)
+            return arrayResult.ConvertFailure<int>();
 
-        /// <inheritdoc />
-        public override Type StepType => typeof(FindElement<>);
+        var elementResult = await Element.Run(stateMonad, cancellationToken);
 
-        /// <inheritdoc />
-        public override string OutputTypeExplanation => nameof(Int32);
+        if (elementResult.IsFailure)
+            return elementResult.ConvertFailure<int>();
 
-        /// <inheritdoc />
-        protected override ITypeReference GetOutputTypeReference(ITypeReference memberTypeReference) => new ActualTypeReference(typeof(int));
+        var indexResult =
+            await arrayResult.Value.IndexOfAsync(elementResult.Value, cancellationToken);
 
-        /// <inheritdoc />
-        protected override Result<ITypeReference, IError> GetMemberType(FreezableStepData freezableStepData, TypeResolver typeResolver) =>
-            freezableStepData.TryGetStep(nameof(FindElement<object>.Array), StepType)
-                .Bind(x => x.TryGetOutputTypeReference(typeResolver))
-                .Bind(x=>x.TryGetGenericTypeReference(typeResolver, 0)
-                .MapError(e=>e.WithLocation(freezableStepData))
-                )
-                .Map(x=> x as ITypeReference);
+        return indexResult;
     }
+
+    /// <inheritdoc />
+    public override IStepFactory StepFactory => FindElementStepFactory.Instance;
+}
+
+/// <summary>
+/// Gets the first index of an element in an array.
+/// </summary>
+public sealed class FindElementStepFactory : GenericStepFactory
+{
+    private FindElementStepFactory() { }
+
+    /// <summary>
+    /// The instance.
+    /// </summary>
+    public static GenericStepFactory Instance { get; } = new FindElementStepFactory();
+
+    /// <inheritdoc />
+    public override Type StepType => typeof(FindElement<>);
+
+    /// <inheritdoc />
+    public override string OutputTypeExplanation => nameof(Int32);
+
+    /// <inheritdoc />
+    protected override ITypeReference GetOutputTypeReference(ITypeReference memberTypeReference) =>
+        new ActualTypeReference(typeof(int));
+
+    /// <inheritdoc />
+    protected override Result<ITypeReference, IError> GetMemberType(
+        FreezableStepData freezableStepData,
+        TypeResolver typeResolver) => freezableStepData
+        .TryGetStep(nameof(FindElement<object>.Array), StepType)
+        .Bind(x => x.TryGetOutputTypeReference(typeResolver))
+        .Bind(
+            x => x.TryGetGenericTypeReference(typeResolver, 0)
+                .MapError(e => e.WithLocation(freezableStepData))
+        )
+        .Map(x => x as ITypeReference);
+}
+
 }

@@ -7,36 +7,39 @@ using Reductech.EDR.Core.Util;
 
 namespace Reductech.EDR.Core.Steps
 {
-    /// <summary>
-    /// Does nothing.
-    /// </summary>
-    public class DoNothing : CompoundStep<Unit>
+
+/// <summary>
+/// Does nothing.
+/// </summary>
+public class DoNothing : CompoundStep<Unit>
+{
+    /// <inheritdoc />
+    protected override async Task<Result<Unit, IError>> Run(
+        IStateMonad stateMonad,
+        CancellationToken cancellationToken)
     {
-        /// <inheritdoc />
-        protected override async Task<Result<Unit, IError>> Run(IStateMonad stateMonad,
-            CancellationToken cancellationToken)
-        {
-            await Task.CompletedTask;
-            return Unit.Default;
-        }
-
-        /// <inheritdoc />
-        public override bool ShouldBracketWhenSerialized => false;
-
-        /// <inheritdoc />
-        public override IStepFactory StepFactory => DoNothingStepFactory.Instance;
+        await Task.CompletedTask;
+        return Unit.Default;
     }
 
-    /// <summary>
-    /// Does nothing.
-    /// </summary>
-    public class DoNothingStepFactory : SimpleStepFactory<DoNothing, Unit>
-    {
-        private DoNothingStepFactory() { }
+    /// <inheritdoc />
+    public override bool ShouldBracketWhenSerialized => false;
 
-        /// <summary>
-        /// This instance.
-        /// </summary>
-        public static SimpleStepFactory<DoNothing, Unit> Instance { get; } = new DoNothingStepFactory();
-    }
+    /// <inheritdoc />
+    public override IStepFactory StepFactory => DoNothingStepFactory.Instance;
+}
+
+/// <summary>
+/// Does nothing.
+/// </summary>
+public class DoNothingStepFactory : SimpleStepFactory<DoNothing, Unit>
+{
+    private DoNothingStepFactory() { }
+
+    /// <summary>
+    /// This instance.
+    /// </summary>
+    public static SimpleStepFactory<DoNothing, Unit> Instance { get; } = new DoNothingStepFactory();
+}
+
 }

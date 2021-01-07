@@ -3,33 +3,36 @@ using Reductech.EDR.Core.Internal.Errors;
 
 namespace Reductech.EDR.Core.Internal
 {
+
+/// <summary>
+/// Step factory for generic types.
+/// </summary>
+public abstract class GenericStepFactory : StepFactory
+{
+    /// <inheritdoc />
+    public override Result<ITypeReference, IError> TryGetOutputTypeReference(
+        FreezableStepData freezableStepData,
+        TypeResolver typeResolver) => GetMemberType(freezableStepData, typeResolver)
+        .Map(GetOutputTypeReference);
+
     /// <summary>
-    /// Step factory for generic types.
+    /// Gets the output type from the member type.
     /// </summary>
-    public abstract class GenericStepFactory : StepFactory
-    {
-        /// <inheritdoc />
-        public override Result<ITypeReference, IError> TryGetOutputTypeReference(FreezableStepData freezableStepData,
-            TypeResolver typeResolver) =>
-            GetMemberType(freezableStepData, typeResolver)
-                .Map(GetOutputTypeReference);
+    protected abstract ITypeReference GetOutputTypeReference(ITypeReference memberTypeReference);
 
-        /// <summary>
-        /// Gets the output type from the member type.
-        /// </summary>
-        protected abstract ITypeReference GetOutputTypeReference(ITypeReference memberTypeReference);
+    /// <inheritdoc />
+    protected override Result<ICompoundStep, IError> TryCreateInstance(
+        StepContext stepContext,
+        FreezableStepData freezeData) => GetMemberType(freezeData, stepContext.TypeResolver)
+        .Bind(x => stepContext.TryGetTypeFromReference(x).MapError(e => e.WithLocation(freezeData)))
+        .Bind(x => TryCreateGeneric(StepType, x).MapError(e => e.WithLocation(freezeData)));
 
-        /// <inheritdoc />
-        protected override Result<ICompoundStep, IError> TryCreateInstance(StepContext stepContext,
-            FreezableStepData freezeData) =>
-            GetMemberType(freezeData, stepContext.TypeResolver)
-                .Bind(x=> stepContext.TryGetTypeFromReference(x).MapError(e=>e.WithLocation(freezeData)))
-                .Bind(x => TryCreateGeneric(StepType, x).MapError(e=> e.WithLocation(freezeData)));
+    /// <summary>
+    /// Gets the type
+    /// </summary>
+    protected abstract Result<ITypeReference, IError> GetMemberType(
+        FreezableStepData freezableStepData,
+        TypeResolver typeResolver);
+}
 
-        /// <summary>
-        /// Gets the type
-        /// </summary>
-        protected abstract Result<ITypeReference, IError> GetMemberType(FreezableStepData freezableStepData,
-            TypeResolver typeResolver);
-    }
 }

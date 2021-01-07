@@ -8,56 +8,65 @@ using Reductech.EDR.Core.Internal.Errors;
 
 namespace Reductech.EDR.Core.Steps
 {
-    /// <summary>
-    /// Checks if an entity has a particular property.
-    /// </summary>
-    [Alias("DoesEntityHave")]
-    public sealed class EntityHasProperty : CompoundStep<bool>
+
+/// <summary>
+/// Checks if an entity has a particular property.
+/// </summary>
+[Alias("DoesEntityHave")]
+public sealed class EntityHasProperty : CompoundStep<bool>
+{
+    /// <inheritdoc />
+    protected override async Task<Result<bool, IError>> Run(
+        IStateMonad stateMonad,
+        CancellationToken cancellationToken)
     {
-        /// <inheritdoc />
-        protected override async Task<Result<bool, IError>> Run(IStateMonad stateMonad, CancellationToken cancellationToken)
-        {
-            var entity = await Entity.Run(stateMonad, cancellationToken);
-            if (entity.IsFailure) return entity.ConvertFailure<bool>();
+        var entity = await Entity.Run(stateMonad, cancellationToken);
 
-            var propertyResult = await Property.Run(stateMonad, cancellationToken);
-            if (propertyResult.IsFailure) return propertyResult.ConvertFailure<bool>();
+        if (entity.IsFailure)
+            return entity.ConvertFailure<bool>();
 
-            var propertyName = await propertyResult.Value.GetStringAsync();
+        var propertyResult = await Property.Run(stateMonad, cancellationToken);
 
-            var r = entity.Value.TryGetValue(propertyName).HasValue;
+        if (propertyResult.IsFailure)
+            return propertyResult.ConvertFailure<bool>();
 
-            return r;
-        }
+        var propertyName = await propertyResult.Value.GetStringAsync();
 
-        /// <summary>
-        /// The entity to check the property on.
-        /// </summary>
-        [StepProperty(1)]
-        [Required]
-        public IStep<Entity> Entity { get; set; } = null!;
+        var r = entity.Value.TryGetValue(propertyName).HasValue;
 
-        /// <summary>
-        /// The name of the property to check.
-        /// </summary>
-        [StepProperty(2)]
-        [Required]
-        public IStep<StringStream> Property { get; set; } = null!;
-
-        /// <inheritdoc />
-        public override IStepFactory StepFactory => EntityHasPropertyStepFactory.Instance;
+        return r;
     }
 
     /// <summary>
-    /// Checks if an entity has a particular property.
+    /// The entity to check the property on.
     /// </summary>
-    public sealed class EntityHasPropertyStepFactory : SimpleStepFactory<EntityHasProperty,bool>
-    {
-        private EntityHasPropertyStepFactory() {}
+    [StepProperty(1)]
+    [Required]
+    public IStep<Entity> Entity { get; set; } = null!;
 
-        /// <summary>
-        /// The instance.
-        /// </summary>
-        public static SimpleStepFactory<EntityHasProperty, bool> Instance { get; } = new EntityHasPropertyStepFactory();
-    }
+    /// <summary>
+    /// The name of the property to check.
+    /// </summary>
+    [StepProperty(2)]
+    [Required]
+    public IStep<StringStream> Property { get; set; } = null!;
+
+    /// <inheritdoc />
+    public override IStepFactory StepFactory => EntityHasPropertyStepFactory.Instance;
+}
+
+/// <summary>
+/// Checks if an entity has a particular property.
+/// </summary>
+public sealed class EntityHasPropertyStepFactory : SimpleStepFactory<EntityHasProperty, bool>
+{
+    private EntityHasPropertyStepFactory() { }
+
+    /// <summary>
+    /// The instance.
+    /// </summary>
+    public static SimpleStepFactory<EntityHasProperty, bool> Instance { get; } =
+        new EntityHasPropertyStepFactory();
+}
+
 }

@@ -14,8 +14,8 @@ public static class ErrorHelper
     /// </summary>
     [Pure]
     public static IErrorBuilder MissingStepError(string stepName) => new ErrorBuilder(
-        ErrorCode.StepDoesNotExist,stepName
-        
+        ErrorCode.StepDoesNotExist,
+        stepName
     );
 
     /// <summary>
@@ -23,9 +23,7 @@ public static class ErrorHelper
     /// </summary>
     [Pure]
     public static IErrorBuilder MissingParameterError(string parameterName) =>
-        new ErrorBuilder(
-            ErrorCode.MissingParameter,parameterName
-        );
+        new ErrorBuilder(ErrorCode.MissingParameter, parameterName);
 
     /// <summary>
     /// The error that should be returned when a parameter has the wrong type.
@@ -35,7 +33,10 @@ public static class ErrorHelper
         string propertyName,
         MemberType realType,
         MemberType expectedType) => new ErrorBuilder(
-        ErrorCode.WrongParameterType, propertyName, realType, expectedType
+        ErrorCode.WrongParameterType,
+        propertyName,
+        realType,
+        expectedType
     );
 
     /// <summary>
@@ -44,7 +45,6 @@ public static class ErrorHelper
     [Pure]
     public static IErrorBuilder UnexpectedParameterError(string parameterName, string stepType) =>
         new ErrorBuilder(ErrorCode.UnexpectedParameter, parameterName, stepType);
-        
 }
 
 }

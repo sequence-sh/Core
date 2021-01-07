@@ -6,58 +6,58 @@ using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
-    public class FindElementTests : StepTestBase<FindElement<StringStream>, int>
+
+public class FindElementTests : StepTestBase<FindElement<StringStream>, int>
+{
+    /// <inheritdoc />
+    public FindElementTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper) { }
+
+    /// <inheritdoc />
+    protected override IEnumerable<StepCase> StepCases
     {
-        /// <inheritdoc />
-        public FindElementTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
+        get
         {
+            yield return new StepCase(
+                "Simple case",
+                new FindElement<StringStream>()
+                {
+                    Array = Array(("Hello"), ("World")), Element = Constant("World")
+                },
+                1
+            );
+
+            yield return new StepCase(
+                "Duplicate Element",
+                new FindElement<StringStream>
+                {
+                    Array = Array(("Hello"), ("World"), ("World")), Element = Constant("World")
+                },
+                1
+            );
+
+            yield return new StepCase(
+                "Element not present",
+                new FindElement<StringStream>
+                {
+                    Array = Array(("Hello"), ("World"), ("World")), Element = Constant("Mark")
+                },
+                -1
+            );
         }
-
-        /// <inheritdoc />
-        protected override IEnumerable<StepCase> StepCases
-        {
-            get
-            {
-                yield return new StepCase("Simple case",
-                    new FindElement<StringStream>()
-                    {
-                        Array = Array( ("Hello") , ("World") ),
-                        Element = Constant("World")
-
-                    },
-                    1);
-
-                yield return new StepCase("Duplicate Element",
-                    new FindElement<StringStream>
-                    {
-                        Array = Array( ("Hello") ,  ("World") ,  ("World")),
-                        Element = Constant("World")
-
-                    },
-                    1);
-
-                yield return new StepCase("Element not present",
-                    new FindElement<StringStream>
-                    {
-                        Array = Array(("Hello") , ("World") , ("World")),
-                        Element = Constant("Mark")
-
-                    },
-                    -1);
-
-
-            }
-        }
-
-        /// <inheritdoc />
-        protected override IEnumerable<DeserializeCase> DeserializeCases
-        {
-            get
-            {
-                yield return new DeserializeCase("Simple Case", "FindElement Array: ['Hello', 'World'] Element: 'World'", 1);
-            }
-
-        }
-
     }
+
+    /// <inheritdoc />
+    protected override IEnumerable<DeserializeCase> DeserializeCases
+    {
+        get
+        {
+            yield return new DeserializeCase(
+                "Simple Case",
+                "FindElement Array: ['Hello', 'World'] Element: 'World'",
+                1
+            );
+        }
+    }
+}
+
 }

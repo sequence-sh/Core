@@ -12,91 +12,99 @@ using Reductech.EDR.Core.Util;
 
 namespace Reductech.EDR.Core.Steps
 {
-    /// <summary>
-    /// Runs an external executable program.
-    /// </summary>
-    public sealed class RunExternalProcess : CompoundStep<Unit>
+
+/// <summary>
+/// Runs an external executable program.
+/// </summary>
+public sealed class RunExternalProcess : CompoundStep<Unit>
+{
+    /// <inheritdoc />
+    protected override async Task<Result<Unit, IError>> Run(
+        IStateMonad stateMonad,
+        CancellationToken cancellationToken)
     {
-        /// <inheritdoc />
-        protected override async Task<Result<Unit, IError>> Run(IStateMonad stateMonad,
-            CancellationToken cancellationToken)
+        var pathResult = await Path.Run(stateMonad, cancellationToken)
+            .Map(async x => await x.GetStringAsync());
+
+        if (pathResult.IsFailure)
+            return pathResult.ConvertFailure<Unit>();
+
+        List<string> arguments;
+
+        if (Arguments == null)
+            arguments = new List<string>();
+        else
         {
-            var pathResult = await Path.Run(stateMonad, cancellationToken)
-                .Map(async x=> await x.GetStringAsync());
+            var argsResult = await Arguments.Run(stateMonad, cancellationToken)
+                .Bind(x => x.GetElementsAsync(cancellationToken));
 
-            if (pathResult.IsFailure) return pathResult.ConvertFailure<Unit>();
+            if (argsResult.IsFailure)
+                return argsResult.ConvertFailure<Unit>();
 
-            List<string> arguments;
+            arguments = new List<string>();
 
-            if(Arguments == null)
-                arguments = new List<string>();
-            else
-            {
-                var argsResult = await Arguments.Run(stateMonad, cancellationToken)
-                    .Bind(x=>x.GetElementsAsync(cancellationToken));
-
-                if (argsResult.IsFailure) return argsResult.ConvertFailure<Unit>();
-
-
-                arguments = new List<string>();
-
-                foreach (var stringStream in argsResult.Value)
-                    arguments.Add(await stringStream.GetStringAsync());
-            }
-
-            var encodingResult = await Encoding.Run(stateMonad, cancellationToken);
-            if (encodingResult.IsFailure) return encodingResult.ConvertFailure<Unit>();
-
-
-            var r = await
-                stateMonad.ExternalProcessRunner.RunExternalProcess(pathResult.Value,
-                    stateMonad.Logger,
-                    IgnoreNoneErrorHandler.Instance,
-                    arguments, encodingResult.Value.Convert(), cancellationToken).MapError(x=>x.WithLocation(this));
-
-            return r;
+            foreach (var stringStream in argsResult.Value)
+                arguments.Add(await stringStream.GetStringAsync());
         }
 
+        var encodingResult = await Encoding.Run(stateMonad, cancellationToken);
 
+        if (encodingResult.IsFailure)
+            return encodingResult.ConvertFailure<Unit>();
 
-        /// <summary>
-        /// The path to the external process
-        /// </summary>
-        [StepProperty(1)]
-        [Required]
-        [Log(LogOutputLevel.Trace)]
-        public IStep<StringStream> Path { get; set; } = null!;
+        var r = await
+            stateMonad.ExternalProcessRunner.RunExternalProcess(
+                    pathResult.Value,
+                    stateMonad.Logger,
+                    IgnoreNoneErrorHandler.Instance,
+                    arguments,
+                    encodingResult.Value.Convert(),
+                    cancellationToken
+                )
+                .MapError(x => x.WithLocation(this));
 
-        /// <summary>
-        /// Arguments to the step.
-        /// </summary>
-        [StepProperty(2)]
-        [DefaultValueExplanation("No arguments")]
-        public IStep<Array<StringStream>>? Arguments { get; set; }
-
-        /// <summary>
-        /// Encoding to use for the process output.
-        /// </summary>
-        [StepProperty(3)]
-        [DefaultValueExplanation("Default encoding")]
-        public IStep<EncodingEnum> Encoding { get; set; } = new EnumConstant<EncodingEnum>(EncodingEnum.Default);
-
-
-        /// <inheritdoc />
-        public override IStepFactory StepFactory => RunExternalProcessStepFactory.Instance;
+        return r;
     }
-
 
     /// <summary>
-    /// Runs an external executable program.
+    /// The path to the external process
     /// </summary>
-    public sealed class RunExternalProcessStepFactory : SimpleStepFactory<RunExternalProcess, Unit>
-    {
-        private RunExternalProcessStepFactory() { }
+    [StepProperty(1)]
+    [Required]
+    [Log(LogOutputLevel.Trace)]
+    public IStep<StringStream> Path { get; set; } = null!;
 
-        /// <summary>
-        /// The instance.
-        /// </summary>
-        public static SimpleStepFactory<RunExternalProcess, Unit> Instance { get; } = new RunExternalProcessStepFactory();
-    }
+    /// <summary>
+    /// Arguments to the step.
+    /// </summary>
+    [StepProperty(2)]
+    [DefaultValueExplanation("No arguments")]
+    public IStep<Array<StringStream>>? Arguments { get; set; }
+
+    /// <summary>
+    /// Encoding to use for the process output.
+    /// </summary>
+    [StepProperty(3)]
+    [DefaultValueExplanation("Default encoding")]
+    public IStep<EncodingEnum> Encoding { get; set; } =
+        new EnumConstant<EncodingEnum>(EncodingEnum.Default);
+
+    /// <inheritdoc />
+    public override IStepFactory StepFactory => RunExternalProcessStepFactory.Instance;
+}
+
+/// <summary>
+/// Runs an external executable program.
+/// </summary>
+public sealed class RunExternalProcessStepFactory : SimpleStepFactory<RunExternalProcess, Unit>
+{
+    private RunExternalProcessStepFactory() { }
+
+    /// <summary>
+    /// The instance.
+    /// </summary>
+    public static SimpleStepFactory<RunExternalProcess, Unit> Instance { get; } =
+        new RunExternalProcessStepFactory();
+}
+
 }

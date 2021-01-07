@@ -10,75 +10,88 @@ using Reductech.EDR.Core.Util;
 
 namespace Reductech.EDR.Core.Steps
 {
-    /// <summary>
-    /// Returns the consequent if a condition is true and the alternative if the condition is false.
-    /// </summary>
-    public sealed class ValueIf<T> : CompoundStep<T>
+
+/// <summary>
+/// Returns the consequent if a condition is true and the alternative if the condition is false.
+/// </summary>
+public sealed class ValueIf<T> : CompoundStep<T>
+{
+    /// <inheritdoc />
+    protected override async Task<Result<T, IError>> Run(
+        IStateMonad stateMonad,
+        CancellationToken cancellationToken)
     {
-        /// <inheritdoc />
-        protected override async Task<Result<T, IError>> Run(IStateMonad stateMonad, CancellationToken cancellationToken)
-        {
-            var result = await Condition.Run(stateMonad, cancellationToken)
-                .Bind(r => r ? Then.Run(stateMonad, cancellationToken) : Else.Run(stateMonad, cancellationToken));
+        var result = await Condition.Run(stateMonad, cancellationToken)
+            .Bind(
+                r => r
+                    ? Then.Run(stateMonad, cancellationToken)
+                    : Else.Run(stateMonad, cancellationToken)
+            );
 
-            return result;
-        }
-
-        /// <inheritdoc />
-        public override IStepFactory StepFactory => ValueIfStepFactory.Instance;
-
-
-        /// <summary>
-        /// Whether to follow the Then Branch
-        /// </summary>
-        [StepProperty(1)]
-        [Required]
-        public IStep<bool> Condition { get; set; } = null!;
-
-        /// <summary>
-        /// The Consequent. Returned if the condition is true.
-        /// </summary>
-        [StepProperty(2)]
-        [Required]
-        public IStep<T> Then { get; set; } = null!;
-
-        /// <summary>
-        /// The Alternative. Returned if the condition is false.
-        /// </summary>
-        [StepProperty(3)]
-        [Required]
-        public IStep<T> Else { get; set; } = null!;
+        return result;
     }
 
+    /// <inheritdoc />
+    public override IStepFactory StepFactory => ValueIfStepFactory.Instance;
+
     /// <summary>
-    /// Returns one result if a condition is true and another if the condition is false.
+    /// Whether to follow the Then Branch
     /// </summary>
-    public sealed class ValueIfStepFactory : GenericStepFactory
-    {
-        private ValueIfStepFactory() { }
-        /// <summary>
-        /// The instance.
-        /// </summary>
-        public static GenericStepFactory Instance { get; } = new ValueIfStepFactory();
+    [StepProperty(1)]
+    [Required]
+    public IStep<bool> Condition { get; set; } = null!;
 
-        /// <inheritdoc />
-        public override Type StepType => typeof(ValueIf<>);
+    /// <summary>
+    /// The Consequent. Returned if the condition is true.
+    /// </summary>
+    [StepProperty(2)]
+    [Required]
+    public IStep<T> Then { get; set; } = null!;
 
-        /// <inheritdoc />
-        public override string OutputTypeExplanation => "T";
+    /// <summary>
+    /// The Alternative. Returned if the condition is false.
+    /// </summary>
+    [StepProperty(3)]
+    [Required]
+    public IStep<T> Else { get; set; } = null!;
+}
 
-        /// <inheritdoc />
-        protected override ITypeReference GetOutputTypeReference(ITypeReference memberTypeReference) => memberTypeReference;
+/// <summary>
+/// Returns one result if a condition is true and another if the condition is false.
+/// </summary>
+public sealed class ValueIfStepFactory : GenericStepFactory
+{
+    private ValueIfStepFactory() { }
 
-        /// <inheritdoc />
-        protected override Result<ITypeReference, IError> GetMemberType(FreezableStepData freezableStepData,
-            TypeResolver typeResolver) =>
-            freezableStepData.TryGetStep(nameof(ValueIf<object>.Then), StepType)
-                .Compose(() => freezableStepData.TryGetStep(nameof(ValueIf<object>.Else), StepType))
-                .Bind(x => x.Item1.TryGetOutputTypeReference(typeResolver)
-                    .Compose(() => x.Item2.TryGetOutputTypeReference(typeResolver)))
-                .Bind(x => MultipleTypeReference.TryCreate(new[] { x.Item1, x.Item2 }, TypeName)
-                    .MapError(e=>e.WithLocation(freezableStepData)))
-        ;
-    }
+    /// <summary>
+    /// The instance.
+    /// </summary>
+    public static GenericStepFactory Instance { get; } = new ValueIfStepFactory();
+
+    /// <inheritdoc />
+    public override Type StepType => typeof(ValueIf<>);
+
+    /// <inheritdoc />
+    public override string OutputTypeExplanation => "T";
+
+    /// <inheritdoc />
+    protected override ITypeReference GetOutputTypeReference(ITypeReference memberTypeReference) =>
+        memberTypeReference;
+
+    /// <inheritdoc />
+    protected override Result<ITypeReference, IError> GetMemberType(
+        FreezableStepData freezableStepData,
+        TypeResolver typeResolver) => freezableStepData
+        .TryGetStep(nameof(ValueIf<object>.Then), StepType)
+        .Compose(() => freezableStepData.TryGetStep(nameof(ValueIf<object>.Else), StepType))
+        .Bind(
+            x => x.Item1.TryGetOutputTypeReference(typeResolver)
+                .Compose(() => x.Item2.TryGetOutputTypeReference(typeResolver))
+        )
+        .Bind(
+            x => MultipleTypeReference.TryCreate(new[] { x.Item1, x.Item2 }, TypeName)
+                .MapError(e => e.WithLocation(freezableStepData))
+        );
+}
+
 }

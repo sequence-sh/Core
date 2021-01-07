@@ -493,7 +493,8 @@ public abstract class StepFactory : IStepFactory
 
         return new ErrorBuilder(
             ErrorCode.CannotCreateGeneric,
-            openGenericType.Name.Split("`")[0],parameterType.GetDisplayName()
+            openGenericType.Name.Split("`")[0],
+            parameterType.GetDisplayName()
         );
     }
 

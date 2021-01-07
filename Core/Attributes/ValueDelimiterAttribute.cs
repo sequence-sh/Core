@@ -2,24 +2,25 @@
 
 namespace Reductech.EDR.Core.Attributes
 {
+
+/// <summary>
+/// Indicates the value to be used as a delimiter
+/// </summary>
+public sealed class ValueDelimiterAttribute : Attribute
+{
     /// <summary>
-    /// Indicates the value to be used as a delimiter
+    /// Create a new ValueDelimiterAttribute
     /// </summary>
-    public sealed class ValueDelimiterAttribute : Attribute {
-
-
-        /// <summary>
-        /// Create a new ValueDelimiterAttribute
-        /// </summary>
-        /// <param name="delimiter"></param>
-        public ValueDelimiterAttribute(string delimiter)
-        {
-            Delimiter = delimiter;
-        }
-
-        /// <summary>
-        /// The delimiter.
-        /// </summary>
-        public string Delimiter { get;  }
+    /// <param name="delimiter"></param>
+    public ValueDelimiterAttribute(string delimiter)
+    {
+        Delimiter = delimiter;
     }
+
+    /// <summary>
+    /// The delimiter.
+    /// </summary>
+    public string Delimiter { get; }
+}
+
 }
