@@ -6,6 +6,7 @@ using System.Text.RegularExpressions;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
+using Reductech.EDR.Core.Internal.Parser;
 using Reductech.EDR.Core.Parser;
 
 using Option = OneOf.OneOf<System.DBNull, string, int, double, bool, Reductech.EDR.Core.Internal.Enumeration, System.DateTime, Reductech.EDR.Core.Entity, System.Collections.Immutable.ImmutableList<Reductech.EDR.Core.Entities.EntityValue>>;

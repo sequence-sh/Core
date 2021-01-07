@@ -9,6 +9,7 @@ using Namotion.Reflection;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.Internal;
+using Reductech.EDR.Core.Internal.Parser;
 using Reductech.EDR.Core.Parser;
 using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.Util;

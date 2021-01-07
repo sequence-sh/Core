@@ -6,8 +6,7 @@ using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
-using Reductech.EDR.Core.Serialization;
-
+using Reductech.EDR.Core.Internal.Serialization;
 
 namespace Reductech.EDR.Core.Steps
 {

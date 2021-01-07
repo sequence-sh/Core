@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
 
-namespace Reductech.EDR.Core.Logging
+namespace Reductech.EDR.Core.Internal.Logging
 {
     /// <summary>
     /// Contains methods for interacting with logging.

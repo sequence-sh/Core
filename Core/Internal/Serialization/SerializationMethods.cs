@@ -3,7 +3,7 @@ using System.Linq;
 using System.Text;
 using Reductech.EDR.Core.Entities;
 
-namespace Reductech.EDR.Core.Serialization
+namespace Reductech.EDR.Core.Internal.Serialization
 {
     /// <summary>
     /// Serializes primitive types

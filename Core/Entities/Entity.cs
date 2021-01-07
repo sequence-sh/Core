@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.Internal.Errors;
-using Reductech.EDR.Core.Serialization;
+using Reductech.EDR.Core.Internal.Serialization;
 
 // ReSharper disable once CheckNamespace - we want this namespace to prevent clash with FunctionalExtensions
 namespace Reductech.EDR.Core

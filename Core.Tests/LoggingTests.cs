@@ -9,7 +9,7 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using Reductech.EDR.Core.ExternalProcesses;
 using Reductech.EDR.Core.Internal;
-using Reductech.EDR.Core.Serialization;
+using Reductech.EDR.Core.Internal.Serialization;
 using Reductech.Utilities.Testing;
 using Xunit;
 using Xunit.Abstractions;

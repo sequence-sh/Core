@@ -1,9 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using CSharpFunctionalExtensions;
-using Reductech.EDR.Core.Internal;
 
-namespace Reductech.EDR.Core.Serialization
+namespace Reductech.EDR.Core.Internal.Serialization
 {
     /// <summary>
     /// A custom step serializer.

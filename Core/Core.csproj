@@ -28,7 +28,7 @@
   </PropertyGroup>
 
   <ItemGroup Condition="'$(CI)' == ''">
-    <Antlr4 Include="Parser\SCL.g4">
+    <Antlr4 Include="Internal\Parser\SCL.g4">
       <Listener>false</Listener>
       <Error>true</Error>
       <AntOutDir>Antlr</AntOutDir>
@@ -47,7 +47,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Remove="Parser\SCL.g4" />
+    <None Remove="Internal\Parser\SCL.g4" />
   </ItemGroup>
 
   <ItemGroup>
@@ -68,7 +68,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Update="Logging\LogMessages-En.Designer.cs">
+    <Compile Update="Internal\Logging\LogMessages-En.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
       <DependentUpon>LogMessages-EN.resx</DependentUpon>
@@ -76,7 +76,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Update="Logging\LogMessages-EN.resx">
+    <EmbeddedResource Update="Internal\Logging\LogMessages-EN.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>LogMessages-En.Designer.cs</LastGenOutput>
     </EmbeddedResource>

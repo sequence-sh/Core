@@ -23,7 +23,8 @@ namespace Reductech.EDR.Core.TestHarness
         public abstract class CaseThatExecutes : ICaseThatExecutes
 #pragma warning restore CA1034 // Nested types should not be visible
         {
-            protected CaseThatExecutes(IReadOnlyCollection<object> expectedLoggedValues) => ExpectedLoggedValues = expectedLoggedValues;
+            protected CaseThatExecutes(IReadOnlyCollection<object> expectedLoggedValues) =>
+                ExpectedLoggedValues = expectedLoggedValues;
 
             /// <inheritdoc />
             public async Task RunCaseAsync(ITestOutputHelper testOutputHelper, string? extraArgument)
@@ -50,7 +51,8 @@ namespace Reductech.EDR.Core.TestHarness
                 else
                 {
                     var stepType = step.GetType().GetDisplayName();
-                    throw new XunitException($"{stepType} does not have output type {nameof(Unit)} or {typeof(TOutput).Name}");
+                    throw new XunitException(
+                        $"{stepType} does not have output type {nameof(Unit)} or {typeof(TOutput).Name}");
                 }
 
                 CheckLoggedValues(loggerFactory);
@@ -83,7 +85,8 @@ namespace Reductech.EDR.Core.TestHarness
             {
                 var externalProcessRunner = GetExternalProcessRunner(mockRepository);
                 var fileSystemHelper = GetFileSystemHelper(mockRepository);
-                var sfs = StepFactoryStoreToUse.Unwrap(StepFactoryStore.CreateUsingReflection(typeof(IStep), typeof(TStep)));
+                var sfs = StepFactoryStoreToUse.Unwrap(
+                    StepFactoryStore.CreateUsingReflection(typeof(IStep), typeof(TStep)));
 
                 var stateMonad = new StateMonad(logger, Settings, externalProcessRunner, fileSystemHelper, sfs);
 
@@ -92,7 +95,6 @@ namespace Reductech.EDR.Core.TestHarness
 
                 return stateMonad;
             }
-
 
 
             public virtual IExternalProcessRunner GetExternalProcessRunner(MockRepository mockRepository)
@@ -114,7 +116,8 @@ namespace Reductech.EDR.Core.TestHarness
             }
 
             /// <inheritdoc />
-            public void AddExternalProcessRunnerAction(Action<Mock<IExternalProcessRunner>> action) => _externalProcessRunnerActions.Add(action);
+            public void AddExternalProcessRunnerAction(Action<Mock<IExternalProcessRunner>> action) =>
+                _externalProcessRunnerActions.Add(action);
 
             /// <inheritdoc />
             public void AddFileSystemAction(Action<Mock<IFileSystemHelper>> action) => _fileSystemActions.Add(action);
@@ -140,8 +143,6 @@ namespace Reductech.EDR.Core.TestHarness
             public Dictionary<VariableName, object> ExpectedFinalState { get; } = new();
 
             public IReadOnlyCollection<object> ExpectedLoggedValues { get; }
-
         }
-
     }
 }

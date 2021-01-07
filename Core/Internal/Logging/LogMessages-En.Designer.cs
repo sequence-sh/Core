@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Reductech.EDR.Core.Logging {
+namespace Reductech.EDR.Core.Internal.Logging {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace Reductech.EDR.Core.Logging {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Reductech.EDR.Core.Logging.LogMessages-EN", typeof(LogMessages_EN).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Reductech.EDR.Core.Internal.Logging.LogMessages-EN", typeof(LogMessages_EN).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;

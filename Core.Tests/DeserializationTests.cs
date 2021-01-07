@@ -7,6 +7,7 @@ using MELT;
 using Microsoft.Extensions.Logging;
 using Reductech.EDR.Core.ExternalProcesses;
 using Reductech.EDR.Core.Internal;
+using Reductech.EDR.Core.Internal.Parser;
 using Reductech.EDR.Core.Parser;
 using Reductech.EDR.Core.TestHarness;
 using Reductech.EDR.Core.Util;

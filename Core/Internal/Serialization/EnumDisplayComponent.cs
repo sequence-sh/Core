@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using CSharpFunctionalExtensions;
-using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Util;
 
-namespace Reductech.EDR.Core.Serialization
+namespace Reductech.EDR.Core.Internal.Serialization
 {
 
     /// <summary>

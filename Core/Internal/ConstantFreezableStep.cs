@@ -4,8 +4,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Internal.Errors;
+using Reductech.EDR.Core.Internal.Parser;
+using Reductech.EDR.Core.Internal.Serialization;
 using Reductech.EDR.Core.Parser;
-using Reductech.EDR.Core.Serialization;
 using DateTime = System.DateTime;
 
 namespace Reductech.EDR.Core.Internal

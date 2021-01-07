@@ -2,7 +2,7 @@
 using Antlr4.Runtime.Misc;
 using Reductech.EDR.Core.Internal.Errors;
 
-namespace Reductech.EDR.Core.Parser
+namespace Reductech.EDR.Core.Internal.Parser
 {
 
     /// <summary>
