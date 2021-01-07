@@ -6,7 +6,6 @@ using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Internal.Parser;
 using Reductech.EDR.Core.Internal.Serialization;
-using Reductech.EDR.Core.Parser;
 using Reductech.Utilities.Testing;
 using Xunit;
 using Xunit.Abstractions;

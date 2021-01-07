@@ -32,7 +32,7 @@
       <Listener>false</Listener>
       <Error>true</Error>
       <AntOutDir>Antlr</AntOutDir>
-      <Package>Reductech.EDR.Core.Parser</Package>
+      <Package>Reductech.EDR.Core.Internal.Parser</Package>
     </Antlr4>
   </ItemGroup>
 

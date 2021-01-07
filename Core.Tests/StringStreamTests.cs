@@ -1,10 +1,8 @@
 ﻿using System;
-using Reductech.EDR.Core.Parser;
 using System.IO;
 using System.Text;
 using FluentAssertions;
 using Reductech.EDR.Core.Enums;
-using Reductech.EDR.Core.Internal.Parser;
 using Xunit;
 using Xunit.Sdk;
 

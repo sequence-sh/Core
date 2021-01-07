@@ -9,7 +9,6 @@ using Antlr4.Runtime.Tree;
 using CSharpFunctionalExtensions;
 using OneOf;
 using Reductech.EDR.Core.Internal.Errors;
-using Reductech.EDR.Core.Parser;
 using static Reductech.EDR.Core.Internal.FreezableFactory;
 using StepParameterDict = System.Collections.Generic.Dictionary<Reductech.EDR.Core.Internal.StepParameterReference, Reductech.EDR.Core.Internal.FreezableStepProperty>;
 
