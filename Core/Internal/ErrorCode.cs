@@ -6,152 +6,206 @@
 /// </summary>
 public enum ErrorCode
 {
-    /// <summary>
-    /// Variable does not exist.
-    /// </summary>
-    MissingVariable,
+    /*
+     * To Generate:
+     * Replace ([^\t]+)\t([^\t]+)\t
+     * With /// <summary>\r\n/// $2\r\n/// </summary>\r\n$1,\r\n
+     */
 
     /// <summary>
-    /// Variable has the wrong type.
-    /// </summary>
-    WrongVariableType,
-
-    /// <summary>
-    /// Index was out of the range of an array or string.
-    /// </summary>
-    IndexOutOfBounds,
-
-    /// <summary>
-    /// An error in an external step.
-    /// </summary>
-    ExternalProcessError,
-
-    /// <summary>
-    /// The external process did not return an output of the expected form.
-    /// </summary>
-    ExternalProcessMissingOutput,
-
-    /// <summary>
-    /// The external step was not found.
-    /// </summary>
-    ExternalProcessNotFound,
-
-    /// <summary>
-    /// The requirements for a step were not met.
-    /// </summary>
-    RequirementNotMet,
-
-    /// <summary>
-    /// Cast failed.
-    /// </summary>
-    InvalidCast,
-
-    /// <summary>
-    /// Step settings are missing
-    /// </summary>
-    MissingStepSettings,
-
-    /// <summary>
-    /// Attempt to divide by zero
-    /// </summary>
-    DivideByZero,
-
-    /// <summary>
-    /// A required parameter was not set.
-    /// </summary>
-    MissingParameter,
-
-    /// <summary>
-    /// Parameters conflict.
-    /// </summary>
-    ConflictingParameters,
-
-    /// <summary>
-    /// An assertion failed
+    /// Assertion Failed '{0}'
     /// </summary>
     AssertionFailed,
 
     /// <summary>
-    /// An error reading a CSV file
+    /// Could not create an instance of {1}&lt;{0}&gt;
     /// </summary>
-    CSVError,
+    CannotCreateGeneric,
 
     /// <summary>
-    /// The type of the variable could not be resolved.
+    /// {0} cannot create a scoped context
     /// </summary>
-    CouldNotResolveVariable,
+    CannotCreateScopedContext,
 
     /// <summary>
-    /// The sequence was empty.
+    /// Could not infer type
     /// </summary>
-    EmptySequence,
+    CannotInferType,
 
     /// <summary>
-    /// The step with the given name does not exist.
+    /// Parameters {0} and {1} are in conflict.
     /// </summary>
-    StepDoesNotExist,
+    ConflictingParameters,
 
     /// <summary>
-    /// The same argument was given more than once
-    /// </summary>
-    DuplicateParameter,
-
-    /// <summary>
-    /// The term could not be tokenized
-    /// </summary>
-    CouldNotTokenize,
-
-    /// <summary>
-    /// The term could not be parsed
+    /// Could not parse '{0}' as {1}
     /// </summary>
     CouldNotParse,
 
     /// <summary>
-    /// A unexpected parameter was found
+    /// Could not resolve variable '{0}'
     /// </summary>
-    UnexpectedParameter,
+    CouldNotResolveVariable,
 
     /// <summary>
-    /// The enum value could not be handled.
+    /// Attempt to Divide by Zero.
     /// </summary>
-    UnexpectedEnumValue,
-
-    UnexpectedEnumType,
+    DivideByZero,
 
     /// <summary>
-    /// Intentional error to be used during unit testing
+    /// Duplicate Parameter: {0}.
+    /// </summary>
+    DuplicateParameter,
+
+    /// <summary>
+    /// SCL is empty.
+    /// </summary>
+    EmptySequence,
+
+    /// <summary>
+    /// External Process Failed: '{0}'
+    /// </summary>
+    ExternalProcessError,
+
+    /// <summary>
+    /// External process {0} did not return an output of the expected form
+    /// </summary>
+    ExternalProcessMissingOutput,
+
+    /// <summary>
+    /// Could not find process '{0}'
+    /// </summary>
+    ExternalProcessNotFound,
+
+    /// <summary>
+    /// Index was outside the bounds of the array.
+    /// </summary>
+    IndexOutOfBounds,
+
+    /// <summary>
+    /// '{0}' cannot take the value '{1}'
+    /// </summary>
+    InvalidCast,
+
+    /// <summary>
+    /// {0} was missing or empty.
+    /// </summary>
+    MissingParameter,
+
+    /// <summary>
+    /// Could not get settings: {0}
+    /// </summary>
+    MissingStepSettings,
+
+    /// <summary>
+    /// Variable '{0}' does not exist.
+    /// </summary>
+    MissingVariable,
+
+    /// <summary>
+    /// Requirement '{0}' not met.
+    /// </summary>
+    RequirementNotMet,
+
+    /// <summary>
+    /// Schema Invalid: No Enum name defined
+    /// </summary>
+    SchemaInvalidMissingEnum,
+
+    /// <summary>
+    /// SchemaInvalid: No Enum values defined
+    /// </summary>
+    SchemaInvalidNoEnumValues,
+
+    /// <summary>
+    /// Schema Violated: Missing Property: '{0}'
+    /// </summary>
+    SchemaViolationMissingProperty,
+
+    /// <summary>
+    /// Schema Violated: Did not expect a list
+    /// </summary>
+    SchemaViolationUnexpectedList,
+
+    /// <summary>
+    /// Schema Violated: Expected not null
+    /// </summary>
+    SchemaViolationUnexpectedNull,
+
+    /// <summary>
+    /// Schema Violated: Unexpected Property: '{0}'
+    /// </summary>
+    SchemaViolationUnexpectedProperty,
+
+    /// <summary>
+    /// Schema Violated: '{0}' does not match regex '{1}'
+    /// </summary>
+    SchemaViolationUnmatchedRegex,
+
+    /// <summary>
+    /// Schema Violated: '{0}' is not a {1}
+    /// </summary>
+    SchemaViolationWrongType,
+
+    /// <summary>
+    /// Syntax Error: {0}
+    /// </summary>
+    SCLSyntaxError,
+
+    /// <summary>
+    /// {0} should be a single character, but was '{1}'.
+    /// </summary>
+    SingleCharacterExpected,
+
+    /// <summary>
+    /// The step '{0}' does not exist
+    /// </summary>
+    StepDoesNotExist,
+
+    /// <summary>
+    /// Test Error Message: '{0}'
     /// </summary>
     Test,
 
     /// <summary>
-    /// An unexpected or unrecognized error
+    /// Type {0} is not comparable and so cannot be used for sorting.
+    /// </summary>
+    TypeNotComparable,
+
+    /// <summary>
+    /// Enum '{0}' does not exist
+    /// </summary>
+    UnexpectedEnumType,
+
+    /// <summary>
+    /// Unexpected {0}: {1}
+    /// </summary>
+    UnexpectedEnumValue,
+
+    /// <summary>
+    /// Unexpected Parameter '{0}' in '{1}'
+    /// </summary>
+    UnexpectedParameter,
+
+    /// <summary>
+    /// An SCL Sequence should have a final return type of Unit. Try wrapping your sequence with 'Print'.
+    /// </summary>
+    UnitExpected,
+
+    /// <summary>
+    /// Unknown Error: '{0}'
     /// </summary>
     Unknown,
 
     /// <summary>
-    /// The argument has the wrong type
+    /// {0} was a {1}, not a {2}
     /// </summary>
     WrongParameterType,
-    TypeNotComparable,
 
-    CannotCreateScopedContext,
-    CannotCreateGeneric,
-
-    CannotInferType,
-
-    UnitExpected,
-    SCLSyntaxError,
-    SingleCharacterExpected,
-
-    SchemaViolationUnexpectedList,
-    SchemaViolationUnexpectedNull,
-    SchemaViolationUnmatchedRegex,
-    SchemaViolationWrongType,
-    SchemaViolationUnexpectedProperty,
-    SchemaViolationMissingProperty,
-
-    SchemaInvalidMissingEnum,
-    SchemaInvalidNoEnumValues
+    /// <summary>
+    /// Variable '{0}' does not have type '{1}'.
+    /// </summary>
+    WrongVariableType,
 }
 
 }

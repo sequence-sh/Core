@@ -153,9 +153,9 @@ namespace Reductech.EDR.Core.Internal.Errors {
         /// <summary>
         ///   Looks up a localized string similar to External Process Failed: &apos;{0}&apos;.
         /// </summary>
-        internal static string ErrorCode_ExternalProcessError {
+        internal static string ExternalProcessError {
             get {
-                return ResourceManager.GetString("ErrorCode.ExternalProcessError", resourceCulture);
+                return ResourceManager.GetString("ExternalProcessError", resourceCulture);
             }
         }
         
