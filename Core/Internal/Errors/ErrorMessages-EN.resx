@@ -138,6 +138,9 @@
   <data name="CouldNotResolveVariable" xml:space="preserve">
     <value>Could not resolve variable '{0}'</value>
   </data>
+  <data name="CSVError" xml:space="preserve">
+    <value>Error Reading CSV</value>
+  </data>
   <data name="DivideByZero" xml:space="preserve">
     <value>Attempt to Divide by Zero.</value>
   </data>
@@ -147,7 +150,7 @@
   <data name="EmptySequence" xml:space="preserve">
     <value>SCL is empty.</value>
   </data>
-  <data name="ErrorCode.ExternalProcessError" xml:space="preserve">
+  <data name="ExternalProcessError" xml:space="preserve">
     <value>External Process Failed: '{0}'</value>
   </data>
   <data name="ExternalProcessMissingOutput" xml:space="preserve">

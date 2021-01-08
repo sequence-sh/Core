@@ -96,9 +96,9 @@ public sealed class TypeResolver
                         unresolvableVariableNames.Distinct()
                             .Select(
                                 x =>
-                                    new SingleError(
+                                    new SingleError_Core(
                                         EntireSequenceLocation.Instance,
-                                        ErrorCode.CouldNotResolveVariable,
+                                        ErrorCode_Core.CouldNotResolveVariable,
                                         x.Name
                                     )
                             )
@@ -133,7 +133,7 @@ public sealed class TypeResolver
             if (previous.Equals(actualTypeReference))
                 return true;
 
-            return new ErrorBuilder(ErrorCode.CannotInferType);
+            return new ErrorBuilder_Core(ErrorCode_Core.CannotInferType);
         }
 
         MyDictionary.Add(variable, actualTypeReference);

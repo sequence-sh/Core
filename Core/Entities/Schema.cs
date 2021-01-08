@@ -92,8 +92,8 @@ public sealed class Schema
                 newProperties.Add(entityProperty);
             else
                 errors.Add(
-                    new ErrorBuilder(
-                        ErrorCode.SchemaViolationUnexpectedProperty,
+                    new ErrorBuilder_Core(
+                        ErrorCode_Core.SchemaViolationUnexpectedProperty,
                         entityProperty.Name
                     )
                 );
@@ -104,7 +104,7 @@ public sealed class Schema
                 x => x.Value.Multiplicity == Multiplicity.ExactlyOne
                   || x.Value.Multiplicity == Multiplicity.AtLeastOne
             ))
-            errors.Add(new ErrorBuilder(ErrorCode.SchemaViolationMissingProperty, key));
+            errors.Add(new ErrorBuilder_Core(ErrorCode_Core.SchemaViolationMissingProperty, key));
 
         if (errors.Any())
         {
@@ -150,7 +150,11 @@ public sealed class Schema
                     if (childEntity.HasValue)
                         return SchemaProperty.TryCreateFromEntity(childEntity.Value);
 
-                    return new ErrorBuilder(ErrorCode.InvalidCast, ev, typeof(SchemaProperty).Name);
+                    return new ErrorBuilder_Core(
+                        ErrorCode_Core.InvalidCast,
+                        ev,
+                        typeof(SchemaProperty).Name
+                    );
                 },
                 d => schema.Properties = d
             )

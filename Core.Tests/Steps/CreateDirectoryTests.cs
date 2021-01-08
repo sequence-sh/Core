@@ -58,12 +58,12 @@ public class CreateDirectoryTests : StepTestBase<CreateDirectory, Unit>
             yield return new ErrorCase(
                     "Error returned",
                     new CreateDirectory { Path = Constant("MyPath") },
-                    new ErrorBuilder(ErrorCode.Test, "ValueIf Error")
+                    new ErrorBuilder_Core(ErrorCode_Core.Test, "ValueIf Error")
                 )
                 .WithFileSystemAction(
                     x =>
                         x.Setup(h => h.CreateDirectory("MyPath"))
-                            .Returns(new ErrorBuilder(ErrorCode.Test, "ValueIf Error"))
+                            .Returns(new ErrorBuilder_Core(ErrorCode_Core.Test, "ValueIf Error"))
                 );
         }
     }

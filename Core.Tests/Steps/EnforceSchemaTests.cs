@@ -155,7 +155,7 @@ public class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Entity>>
                 string name,
                 List<Entity> entities,
                 Schema schema,
-                ErrorCode expectedErrorCode,
+                ErrorCode_Core expectedErrorCode,
                 params object[] expectedErrorArgs)
             {
                 var schemaEntity = schema.ConvertToEntity();
@@ -185,7 +185,7 @@ public class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Entity>>
                         },
                         FinalStep = new DoNothing()
                     },
-                    new ErrorBuilder(expectedErrorCode, expectedErrorArgs).WithLocation(
+                    new ErrorBuilder_Core(expectedErrorCode, expectedErrorArgs).WithLocation(
                         new StepErrorLocation(enforceSchema)
                     )
                 );
@@ -199,7 +199,7 @@ public class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Entity>>
                     false,
                     ("Foo", SchemaPropertyType.Integer, Multiplicity.Any)
                 ),
-                ErrorCode.SchemaViolationWrongType,
+                ErrorCode_Core.SchemaViolationWrongType,
                 "Hello",
                 "Integer"
             );
@@ -213,7 +213,7 @@ public class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Entity>>
                     ("Foo", SchemaPropertyType.Enum, "Food", Multiplicity.Any, null,
                      new List<string>() { "Meat", "Chips" })
                 ),
-                ErrorCode.SchemaViolationWrongType,
+                ErrorCode_Core.SchemaViolationWrongType,
                 "Fish",
                 "Enum"
             );
@@ -227,7 +227,7 @@ public class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Entity>>
                     ("Foo", SchemaPropertyType.Enum, null, Multiplicity.Any, null,
                      new List<string>() { "Meat", "Chips" })
                 ),
-                ErrorCode.SchemaInvalidMissingEnum
+                ErrorCode_Core.SchemaInvalidMissingEnum
             );
 
             yield return CreateCase(
@@ -238,7 +238,7 @@ public class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Entity>>
                     false,
                     ("Foo", SchemaPropertyType.String, null, Multiplicity.Any, @"\d+", null)
                 ),
-                ErrorCode.SchemaViolationUnmatchedRegex,
+                ErrorCode_Core.SchemaViolationUnmatchedRegex,
                 "Fish",
                 @"\d+"
             );
@@ -252,7 +252,7 @@ public class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Entity>>
                     ("Foo", SchemaPropertyType.String, Multiplicity.Any),
                     ("Bar", SchemaPropertyType.String, Multiplicity.AtLeastOne)
                 ),
-                ErrorCode.SchemaViolationMissingProperty,
+                ErrorCode_Core.SchemaViolationMissingProperty,
                 "Bar"
             );
 
@@ -264,7 +264,7 @@ public class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Entity>>
                     false,
                     ("Foo", SchemaPropertyType.String, Multiplicity.Any)
                 ),
-                ErrorCode.SchemaViolationUnexpectedProperty,
+                ErrorCode_Core.SchemaViolationUnexpectedProperty,
                 "Bar"
             );
         }

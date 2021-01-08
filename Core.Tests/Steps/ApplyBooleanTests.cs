@@ -150,9 +150,9 @@ public class ApplyBooleanTests : StepTestBase<ApplyBooleanOperator, bool>
             yield return new ErrorCase(
                 "BooleanOperator.None",
                 noneStep,
-                new SingleError(
+                new SingleError_Core(
                     new StepErrorLocation(noneStep),
-                    ErrorCode.UnexpectedEnumValue,
+                    ErrorCode_Core.UnexpectedEnumValue,
                     nameof(ApplyBooleanOperator.Operator),
                     BooleanOperator.None
                 )
@@ -168,7 +168,7 @@ public class ApplyBooleanTests : StepTestBase<ApplyBooleanOperator, bool>
                     Right    = Constant(true),
                     Operator = Constant(BooleanOperator.And)
                 },
-                new SingleError(EntireSequenceLocation.Instance, ErrorCode.Test, "Left Fail")
+                new SingleError_Core(EntireSequenceLocation.Instance, ErrorCode_Core.Test, "Left Fail")
             );
 
             yield return new ErrorCase(
@@ -179,7 +179,11 @@ public class ApplyBooleanTests : StepTestBase<ApplyBooleanOperator, bool>
                     Right    = Constant(true),
                     Operator = new FailStep<BooleanOperator> { ErrorMessage = "Operator Fail" },
                 },
-                new SingleError(EntireSequenceLocation.Instance, ErrorCode.Test, "Operator Fail")
+                new SingleError_Core(
+                    EntireSequenceLocation.Instance,
+                    ErrorCode_Core.Test,
+                    "Operator Fail"
+                )
             );
 
             yield return new ErrorCase(
@@ -190,7 +194,7 @@ public class ApplyBooleanTests : StepTestBase<ApplyBooleanOperator, bool>
                     Right    = new FailStep<bool> { ErrorMessage = "Right Fail" },
                     Operator = Constant(BooleanOperator.And)
                 },
-                new SingleError(EntireSequenceLocation.Instance, ErrorCode.Test, "Right Fail")
+                new SingleError_Core(EntireSequenceLocation.Instance, ErrorCode_Core.Test, "Right Fail")
             );
         }
     }

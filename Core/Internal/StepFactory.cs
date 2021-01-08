@@ -182,9 +182,9 @@ public abstract class StepFactory : IStepFactory
 
         foreach (var propertyInfo in duplicates)
             errors.Add(
-                new SingleError(
+                new SingleError_Core(
                     freezeData.Location,
-                    ErrorCode.DuplicateParameter,
+                    ErrorCode_Core.DuplicateParameter,
                     propertyInfo.Name
                 )
             );
@@ -323,7 +323,7 @@ public abstract class StepFactory : IStepFactory
             }
         }
 
-        return new ErrorBuilder(ErrorCode.InvalidCast, propertyInfo.Name, stepToSet.Name);
+        return new ErrorBuilder_Core(ErrorCode_Core.InvalidCast, propertyInfo.Name, stepToSet.Name);
     }
 
     private static Result<Unit, IError> TrySetStepList(
@@ -388,8 +388,8 @@ public abstract class StepFactory : IStepFactory
                 }
                 else
                 {
-                    var error = new ErrorBuilder(
-                            ErrorCode.InvalidCast,
+                    var error = new ErrorBuilder_Core(
+                            ErrorCode_Core.InvalidCast,
                             parentStep.StepFactory.TypeName,
                             CompressSpaces(freezeResult.Value.Name)
                         )
@@ -431,8 +431,8 @@ public abstract class StepFactory : IStepFactory
                 }
                 else
                 {
-                    var error = new ErrorBuilder(
-                            ErrorCode.InvalidCast,
+                    var error = new ErrorBuilder_Core(
+                            ErrorCode_Core.InvalidCast,
                             parentStep.StepFactory.TypeName,
                             CompressSpaces(freezeResult.Value.Name)
                         )
@@ -476,23 +476,23 @@ public abstract class StepFactory : IStepFactory
              && openGenericType == typeof(Compare<>))
             {
                 var parameterTypeName = parameterType.GetDisplayName();
-                return new ErrorBuilder(ErrorCode.TypeNotComparable, parameterTypeName);
+                return new ErrorBuilder_Core(ErrorCode_Core.TypeNotComparable, parameterTypeName);
             }
 
-            return new ErrorBuilder(e, ErrorCode.InvalidCast);
+            return new ErrorBuilder_Core(e, ErrorCode_Core.InvalidCast);
         }
         #pragma warning disable CA1031 // Do not catch general exception types
         catch (Exception e)
         {
-            return new ErrorBuilder(e, ErrorCode.InvalidCast);
+            return new ErrorBuilder_Core(e, ErrorCode_Core.InvalidCast);
         }
         #pragma warning restore CA1031 // Do not catch general exception types
 
         if (r is ICompoundStep rp)
             return Result.Success<ICompoundStep, IErrorBuilder>(rp);
 
-        return new ErrorBuilder(
-            ErrorCode.CannotCreateGeneric,
+        return new ErrorBuilder_Core(
+            ErrorCode_Core.CannotCreateGeneric,
             openGenericType.Name.Split("`")[0],
             parameterType.GetDisplayName()
         );

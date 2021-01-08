@@ -44,14 +44,14 @@ public sealed class ApplyMathOperator : CompoundStep<int>
             MathOperator.Subtract => left.Value - right.Value,
             MathOperator.Multiply => left.Value * right.Value,
             MathOperator.Divide when right.Value == 0 => Result.Failure<int, IError>(
-                new SingleError(new StepErrorLocation(this), ErrorCode.DivideByZero)
+                new SingleError_Core(new StepErrorLocation(this), ErrorCode_Core.DivideByZero)
             ),
             MathOperator.Divide => left.Value / right.Value,
             MathOperator.Modulo => left.Value % right.Value,
             MathOperator.Power  => Convert.ToInt32(Math.Pow(left.Value, right.Value)),
-            _ => new SingleError(
+            _ => new SingleError_Core(
                 new StepErrorLocation(this),
-                ErrorCode.UnexpectedEnumValue,
+                ErrorCode_Core.UnexpectedEnumValue,
                 nameof(Operator),
                 @operator.Value
             )

@@ -45,14 +45,14 @@ public abstract class CompoundStep<T> : ICompoundStep<T>
                 yield return properties;
             }
 
-            stateMonad.Logger.LogSituation(LogSituationCore.EnterStep, GetEnterStepArgs());
+            stateMonad.Logger.LogSituation(LogSituation_Core.EnterStep, GetEnterStepArgs());
 
             var result = await Run(stateMonad, cancellationToken);
 
             if (result.IsFailure)
             {
                 stateMonad.Logger.LogSituation(
-                    LogSituationCore.ExitStepFailure,
+                    LogSituation_Core.ExitStepFailure,
                     new[] { Name, result.Error.AsString }
                 );
             }
@@ -61,7 +61,7 @@ public abstract class CompoundStep<T> : ICompoundStep<T>
                 var resultValue = SerializeOutput(result.Value);
 
                 stateMonad.Logger.LogSituation(
-                    LogSituationCore.ExitStepSuccess,
+                    LogSituation_Core.ExitStepSuccess,
                     new[] { Name, resultValue }
                 );
             }
@@ -89,9 +89,9 @@ public abstract class CompoundStep<T> : ICompoundStep<T>
     {
         return Run(stateMonad, cancellationToken)
             .BindCast<T, T1, IError>(
-                new SingleError(
+                new SingleError_Core(
                     new StepErrorLocation(this),
-                    ErrorCode.InvalidCast,
+                    ErrorCode_Core.InvalidCast,
                     typeof(T),
                     typeof(T1)
                 )
@@ -227,9 +227,9 @@ public abstract class CompoundStep<T> : ICompoundStep<T>
     /// <inheritdoc />
     public virtual Result<StepContext, IError> TryGetScopedContext(
         StepContext baseContext,
-        IFreezableStep scopedStep) => new SingleError(
+        IFreezableStep scopedStep) => new SingleError_Core(
         new StepErrorLocation(this),
-        ErrorCode.CannotCreateScopedContext,
+        ErrorCode_Core.CannotCreateScopedContext,
         Name
     );
 

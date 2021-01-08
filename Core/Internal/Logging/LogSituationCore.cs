@@ -4,7 +4,7 @@
 /// <summary>
 /// Different LoggingSituations
 /// </summary>
-public enum LogSituationCore
+public enum LogSituation_Core
 {
     /// <summary>
     /// Whenever a step is entered.

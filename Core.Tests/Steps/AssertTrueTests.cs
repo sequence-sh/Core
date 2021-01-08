@@ -51,7 +51,7 @@ public class AssertTrueTests : StepTestBase<AssertTrue, Unit>
             yield return new ErrorCase(
                 "Failed Assertion",
                 new AssertTrue { Boolean = Constant(false) },
-                new ErrorBuilder(ErrorCode.AssertionFailed, Constant(false).Name)
+                new ErrorBuilder_Core(ErrorCode_Core.AssertionFailed, Constant(false).Name)
             );
 
             foreach (var errorCase in base.ErrorCases)

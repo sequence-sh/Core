@@ -77,9 +77,9 @@ public class CreateEntityStep : IStep<Entity>
     {
         return await Run(stateMonad, cancellationToken)
             .BindCast<Entity, T, IError>(
-                new SingleError(
+                new SingleError_Core(
                     new StepErrorLocation(this),
-                    ErrorCode.InvalidCast,
+                    ErrorCode_Core.InvalidCast,
                     Name,
                     typeof(T).Name
                 )

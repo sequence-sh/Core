@@ -12,13 +12,13 @@ public class ErrorBuilderList : IErrorBuilder
     /// <summary>
     /// Create a new ErrorBuilderList
     /// </summary>
-    public ErrorBuilderList(IReadOnlyCollection<ErrorBuilder> errorBuilders) =>
+    public ErrorBuilderList(IReadOnlyCollection<SingleErrorBuilder> errorBuilders) =>
         ErrorBuilders = errorBuilders;
 
     /// <summary>
     /// The errorBuilders
     /// </summary>
-    public IReadOnlyCollection<ErrorBuilder> ErrorBuilders { get; }
+    public IReadOnlyCollection<SingleErrorBuilder> ErrorBuilders { get; }
 
     /// <inheritdoc />
     public IError WithLocation(IErrorLocation location) => new ErrorList(
@@ -26,7 +26,7 @@ public class ErrorBuilderList : IErrorBuilder
     );
 
     /// <inheritdoc />
-    public IEnumerable<ErrorBuilder> GetErrorBuilders() => ErrorBuilders;
+    public IEnumerable<SingleErrorBuilder> GetErrorBuilders() => ErrorBuilders;
 
     /// <inheritdoc />
     public string AsString => string.Join("; ", ErrorBuilders.Select(x => x.AsString));

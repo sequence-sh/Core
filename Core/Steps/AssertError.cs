@@ -25,7 +25,11 @@ public sealed class AssertError : CompoundStep<Unit>
         if (result.IsFailure)
             return Unit.Default;
 
-        return new SingleError(new StepErrorLocation(this), ErrorCode.AssertionFailed, Step.Name);
+        return new SingleError_Core(
+            new StepErrorLocation(this),
+            ErrorCode_Core.AssertionFailed,
+            Step.Name
+        );
     }
 
     /// <inheritdoc />
