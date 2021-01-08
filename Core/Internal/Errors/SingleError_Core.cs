@@ -18,13 +18,16 @@ public class SingleError_Core : SingleError<ErrorCode_Core>
     public SingleError_Core(
         [NotNull] IErrorLocation location,
         [NotNull] Exception exception,
-        ErrorCode_Core errorCode) : base(location, exception, errorCode) { }
+        ErrorCode_Core errorCode) : base(location, new ErrorBuilder_Core(exception, errorCode)) { }
 
     /// <inheritdoc />
     public SingleError_Core(
         [NotNull] IErrorLocation location,
         ErrorCode_Core errorCode,
-        [NotNull][ItemCanBeNull] params object?[] args) : base(location, errorCode, args) { }
+        [NotNull][ItemCanBeNull] params object?[] args) : base(
+        location,
+        new ErrorBuilder_Core(errorCode, args)
+    ) { }
 }
 
 }

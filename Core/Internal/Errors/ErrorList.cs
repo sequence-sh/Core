@@ -24,6 +24,18 @@ public class ErrorList : IError
     /// <inheritdoc />
     public string AsString => string.Join("; ", _allErrors.Select(x => x.AsString));
 
+    /// <inheritdoc />
+    public IErrorBuilder ToErrorBuilder
+    {
+        get
+        {
+            return ErrorBuilderList.Combine(
+                _allErrors.SelectMany(x => x.GetAllErrors())
+                    .Select(x => x.ErrorBuilder)
+            );
+        }
+    }
+
     /// <summary>
     /// Combine multiple run errors.
     /// </summary>
