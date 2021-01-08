@@ -18,6 +18,11 @@ public interface IError : IEquatable<IError>
     /// The error as a string.
     /// </summary>
     string AsString { get; }
+
+    /// <summary>
+    /// Converts this Error to an ErrorBuilder
+    /// </summary>
+    IErrorBuilder ToErrorBuilder { get; }
 }
 
 }
