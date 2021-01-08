@@ -45,9 +45,9 @@ public abstract partial class StepTestBase<TStep, TOutput>
                                 SetVariableName(x, instance);
 
                                 return
-                                    new SingleError(
+                                    new SingleError_Core(
                                         new StepErrorLocation(instance),
-                                        ErrorCode.MissingVariable,
+                                        ErrorCode_Core.MissingVariable,
                                         "<Foo>"
                                     );
                             },
@@ -125,7 +125,12 @@ public abstract partial class StepTestBase<TStep, TOutput>
             );
 
             property.SetValue(instance, newValue);
-            return new SingleError(EntireSequenceLocation.Instance, ErrorCode.Test, errorMessage);
+
+            return new SingleError_Core(
+                EntireSequenceLocation.Instance,
+                ErrorCode_Core.Test,
+                errorMessage
+            );
         }
 
         static IError SetFailStepList(PropertyInfo property, object instance)
@@ -138,7 +143,12 @@ public abstract partial class StepTestBase<TStep, TOutput>
             );
 
             property.SetValue(instance, newValue);
-            return new SingleError(EntireSequenceLocation.Instance, ErrorCode.Test, errorMessage);
+
+            return new SingleError_Core(
+                EntireSequenceLocation.Instance,
+                ErrorCode_Core.Test,
+                errorMessage
+            );
         }
     }
 
@@ -184,9 +194,9 @@ public abstract partial class StepTestBase<TStep, TOutput>
         {
             await Task.CompletedTask;
 
-            var error = new SingleError(
+            var error = new SingleError_Core(
                 EntireSequenceLocation.Instance,
-                ErrorCode.Test,
+                ErrorCode_Core.Test,
                 ErrorMessage
             );
 

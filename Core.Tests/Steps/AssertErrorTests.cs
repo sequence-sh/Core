@@ -70,7 +70,7 @@ public class AssertErrorTests : StepTestBase<AssertError, Unit>
                 {
                     Step = new Print<StringStream> { Value = Constant("Hello World") }
                 },
-                new ErrorBuilder(ErrorCode.AssertionFailed, Constant("Print").Name)
+                new ErrorBuilder_Core(ErrorCode_Core.AssertionFailed, Constant("Print").Name)
             );
         }
     }

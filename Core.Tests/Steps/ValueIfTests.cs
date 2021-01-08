@@ -66,7 +66,11 @@ public class ValueIfTests : StepTestBase<ValueIf<int>, int>
                     Then      = new FailStep<Unit> { ErrorMessage = "Then Fail" },
                     Else      = new FailStep<Unit> { ErrorMessage = "Else Fail" },
                 },
-                new SingleError(EntireSequenceLocation.Instance, ErrorCode.Test, "Condition Fail")
+                new SingleError_Core(
+                    EntireSequenceLocation.Instance,
+                    ErrorCode_Core.Test,
+                    "Condition Fail"
+                )
             );
 
             yield return new ErrorCase(
@@ -77,7 +81,7 @@ public class ValueIfTests : StepTestBase<ValueIf<int>, int>
                     Then      = new FailStep<Unit> { ErrorMessage = "Then Fail" },
                     Else      = new FailStep<Unit> { ErrorMessage = "Else Fail" },
                 },
-                new SingleError(EntireSequenceLocation.Instance, ErrorCode.Test, "Then Fail")
+                new SingleError_Core(EntireSequenceLocation.Instance, ErrorCode_Core.Test, "Then Fail")
             );
 
             yield return new ErrorCase(
@@ -88,7 +92,7 @@ public class ValueIfTests : StepTestBase<ValueIf<int>, int>
                     Then      = new FailStep<Unit> { ErrorMessage = "Then Fail" },
                     Else      = new FailStep<Unit> { ErrorMessage = "Else Fail" },
                 },
-                new SingleError(EntireSequenceLocation.Instance, ErrorCode.Test, "Else Fail")
+                new SingleError_Core(EntireSequenceLocation.Instance, ErrorCode_Core.Test, "Else Fail")
             );
         }
     }

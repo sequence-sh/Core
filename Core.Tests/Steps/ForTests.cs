@@ -112,7 +112,7 @@ public class ForTests : StepTestBase<For, Unit>
                             To        = Constant(3),
                             Increment = Constant(0)
                         },
-                        new ErrorBuilder(ErrorCode.DivideByZero)
+                        new ErrorBuilder_Core(ErrorCode_Core.DivideByZero)
                     )
                     .WithExpectedFinalState(VariableName.Index.Name, 1)
                 ;

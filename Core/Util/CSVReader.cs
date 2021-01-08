@@ -113,9 +113,9 @@ public static class CSVReader
         else if (charResult.Value.Length == 1)
             resultChar = charResult.Value.Single();
         else
-            return new SingleError(
+            return new SingleError_Core(
                 errorLocation,
-                ErrorCode.SingleCharacterExpected,
+                ErrorCode_Core.SingleCharacterExpected,
                 propertyName,
                 charResult.Value
             );
@@ -179,7 +179,9 @@ public static class CSVReader
 
         bool HandleException(CsvHelperException exception)
         {
-            throw new ErrorException(new SingleError(location, exception, ErrorCode.CSVError));
+            throw new ErrorException(
+                new SingleError_Core(location, exception, ErrorCode_Core.CSVError)
+            );
         }
     }
 }

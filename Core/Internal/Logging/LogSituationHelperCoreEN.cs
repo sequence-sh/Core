@@ -7,50 +7,50 @@ namespace Reductech.EDR.Core.Internal.Logging
 /// <summary>
 /// Contains methods for handling Log Severity and Localization for Core in English.
 /// </summary>
-public sealed class LogSituationHelperCoreEN : ILogSituationHelper<LogSituationCore>
+public sealed class LogSituationHelper_Core_EN : ILogSituationHelper<LogSituation_Core>
 {
-    private LogSituationHelperCoreEN() { }
+    private LogSituationHelper_Core_EN() { }
 
     /// <summary>
     /// The Instance
     /// </summary>
-    public static ILogSituationHelper<LogSituationCore> Instance { get; } =
-        new LogSituationHelperCoreEN();
+    public static ILogSituationHelper<LogSituation_Core> Instance { get; } =
+        new LogSituationHelper_Core_EN();
 
     /// <inheritdoc />
-    public LogLevel GetLogLevel(LogSituationCore logSituation)
+    public LogLevel GetLogLevel(LogSituation_Core logSituation)
     {
         return logSituation switch
         {
-            LogSituationCore.EnterStep => LogLevel.Trace,
-            LogSituationCore.ExitStepFailure => LogLevel.Warning,
-            LogSituationCore.ExitStepSuccess => LogLevel.Trace,
-            LogSituationCore.QualifyingPath => LogLevel.Debug,
-            LogSituationCore.NoPathProvided => LogLevel.Warning,
-            LogSituationCore.DirectoryDeleted => LogLevel.Debug,
-            LogSituationCore.FileDeleted => LogLevel.Debug,
-            LogSituationCore.ItemToDeleteDidNotExist => LogLevel.Debug,
-            LogSituationCore.SetVariableOutOfScope => LogLevel.Warning,
-            LogSituationCore.RemoveVariableOutOfScope => LogLevel.Warning,
+            LogSituation_Core.EnterStep => LogLevel.Trace,
+            LogSituation_Core.ExitStepFailure => LogLevel.Warning,
+            LogSituation_Core.ExitStepSuccess => LogLevel.Trace,
+            LogSituation_Core.QualifyingPath => LogLevel.Debug,
+            LogSituation_Core.NoPathProvided => LogLevel.Warning,
+            LogSituation_Core.DirectoryDeleted => LogLevel.Debug,
+            LogSituation_Core.FileDeleted => LogLevel.Debug,
+            LogSituation_Core.ItemToDeleteDidNotExist => LogLevel.Debug,
+            LogSituation_Core.SetVariableOutOfScope => LogLevel.Warning,
+            LogSituation_Core.RemoveVariableOutOfScope => LogLevel.Warning,
             _ => throw new ArgumentOutOfRangeException(nameof(logSituation), logSituation, null)
         };
     }
 
     /// <inheritdoc />
-    public string GetMessageString(LogSituationCore logSituation)
+    public string GetMessageString(LogSituation_Core logSituation)
     {
         return logSituation switch
         {
-            LogSituationCore.EnterStep => LogMessages_EN.EnterStep,
-            LogSituationCore.ExitStepSuccess => LogMessages_EN.ExitStepSuccess,
-            LogSituationCore.ExitStepFailure => LogMessages_EN.ExitStepFailure,
-            LogSituationCore.QualifyingPath => LogMessages_EN.QualifyingPath,
-            LogSituationCore.NoPathProvided => LogMessages_EN.NoPathProvided,
-            LogSituationCore.DirectoryDeleted => LogMessages_EN.DirectoryDeleted,
-            LogSituationCore.FileDeleted => LogMessages_EN.FileDeleted,
-            LogSituationCore.ItemToDeleteDidNotExist => LogMessages_EN.ItemToDeleteDidNotExist,
-            LogSituationCore.SetVariableOutOfScope => LogMessages_EN.SetVariableOutOfScope,
-            LogSituationCore.RemoveVariableOutOfScope => LogMessages_EN.RemoveVariableOutOfScope,
+            LogSituation_Core.EnterStep => LogMessages_EN.EnterStep,
+            LogSituation_Core.ExitStepSuccess => LogMessages_EN.ExitStepSuccess,
+            LogSituation_Core.ExitStepFailure => LogMessages_EN.ExitStepFailure,
+            LogSituation_Core.QualifyingPath => LogMessages_EN.QualifyingPath,
+            LogSituation_Core.NoPathProvided => LogMessages_EN.NoPathProvided,
+            LogSituation_Core.DirectoryDeleted => LogMessages_EN.DirectoryDeleted,
+            LogSituation_Core.FileDeleted => LogMessages_EN.FileDeleted,
+            LogSituation_Core.ItemToDeleteDidNotExist => LogMessages_EN.ItemToDeleteDidNotExist,
+            LogSituation_Core.SetVariableOutOfScope => LogMessages_EN.SetVariableOutOfScope,
+            LogSituation_Core.RemoveVariableOutOfScope => LogMessages_EN.RemoveVariableOutOfScope,
             _ => throw new ArgumentOutOfRangeException(nameof(logSituation), logSituation, null)
         };
     }

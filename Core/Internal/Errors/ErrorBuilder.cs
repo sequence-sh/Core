@@ -1,74 +1,76 @@
 ﻿using System;
-using System.Collections.Generic;
+using OneOf;
 
 namespace Reductech.EDR.Core.Internal.Errors
 {
 
 /// <summary>
-/// An error without a location.
+/// A generic single error builder
 /// </summary>
-public class ErrorBuilder : IErrorBuilder
+public abstract class SingleErrorBuilder<TCode> : SingleErrorBuilder where TCode : Enum
 {
-    /// <summary>
-    /// Create a new error.
-    /// </summary>
-    public ErrorBuilder(ErrorCode errorCode, params object?[] args)
+    /// <inheritdoc />
+    protected SingleErrorBuilder(TCode errorCode, OneOf<Exception, object?[]> data)
     {
-        Exception = null;
         ErrorCode = errorCode;
-        Args      = args;
+        Data      = data;
     }
 
     /// <summary>
-    /// Create a new error from an exception.
+    /// The error code
     /// </summary>
-    public ErrorBuilder(Exception exception, ErrorCode errorCode)
-    {
-        Exception = exception;
-        ErrorCode = errorCode;
-        Args      = Array.Empty<object?>();
-    }
+    public TCode ErrorCode { get; }
 
     /// <summary>
-    /// Associated Exception if there is one
+    /// The data
     /// </summary>
-    public Exception? Exception { get; }
-
-    /// <summary>
-    /// The error code.
-    /// </summary>
-    public ErrorCode ErrorCode { get; }
-
-    /// <summary>
-    /// Error Arguments.
-    /// </summary>
-    public object?[] Args { get; }
-
-    /// <summary>
-    /// Returns a SingleError with the given location.
-    /// </summary>
-    public SingleError WithLocationSingle(IErrorLocation location)
-    {
-        if (Exception != null)
-            return new SingleError(location, Exception, ErrorCode);
-
-        return new SingleError(location, ErrorCode, Args);
-    }
-
-    /// <inheritdoc />
-    public IError WithLocation(IErrorLocation location) => WithLocationSingle(location);
-
-    /// <inheritdoc />
-    public IEnumerable<ErrorBuilder> GetErrorBuilders()
-    {
-        yield return this;
-    }
-
-    /// <inheritdoc />
-    public string AsString => ErrorCode.GetFormattedMessage(Args);
+    protected OneOf<Exception, object?[]> Data { get; }
 
     /// <inheritdoc />
     public override string ToString() => AsString;
+
+    /// <inheritdoc />
+    public override string AsString => Data.Match(
+        x => x.Message,
+        x => ErrorCodeHelper.GetFormattedMessage(ErrorCode, x)
+    );
+
+    /// <summary>
+    /// The Error Code helper
+    /// </summary>
+    public abstract IErrorCodeHelper<TCode> ErrorCodeHelper { get; }
+}
+
+/// <summary>
+/// An error without a location.
+/// </summary>
+// ReSharper disable once InconsistentNaming
+public class ErrorBuilder_Core : SingleErrorBuilder<ErrorCode_Core>
+{
+    /// <inheritdoc />
+    public ErrorBuilder_Core(Exception exception, ErrorCode_Core errorCode) : base(
+        errorCode,
+        exception
+    ) { }
+
+    /// <inheritdoc />
+    public ErrorBuilder_Core(ErrorCode_Core errorCode, params object?[] data) : base(
+        errorCode,
+        data
+    ) { }
+
+    /// <inheritdoc />
+    public override SingleError WithLocationSingle(IErrorLocation location)
+    {
+        return Data.Match(
+            x => new SingleError_Core(location, x,         ErrorCode),
+            x => new SingleError_Core(location, ErrorCode, x)
+        );
+    }
+
+    /// <inheritdoc />
+    public override IErrorCodeHelper<ErrorCode_Core> ErrorCodeHelper =>
+        ErrorCodeHelper_Core_EN.Instance;
 }
 
 }

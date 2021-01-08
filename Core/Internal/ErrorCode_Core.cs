@@ -4,7 +4,8 @@
 /// <summary>
 /// Identifying code for an error message.
 /// </summary>
-public enum ErrorCode
+// ReSharper disable once InconsistentNaming
+public enum ErrorCode_Core
 {
     /*
      * To Generate:
@@ -46,6 +47,11 @@ public enum ErrorCode
     /// Could not resolve variable '{0}'
     /// </summary>
     CouldNotResolveVariable,
+
+    /// <summary>
+    /// Error Reading CSV
+    /// </summary>
+    CSVError,
 
     /// <summary>
     /// Attempt to Divide by Zero.

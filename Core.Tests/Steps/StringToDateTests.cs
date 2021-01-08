@@ -86,11 +86,11 @@ public class StringToDateTests : StepTestBase<StringToDate, DateTime>
             yield return new ErrorCase(
                 "Can't parse Date",
                 new StringToDate { Date = Constant("not a date") },
-                new ErrorBuilder(
+                new ErrorBuilder_Core(
                     new FormatException(
                         "The string 'not a date' was not recognized as a valid DateTime. There is an unknown word starting at index '0'."
                     ),
-                    ErrorCode.CouldNotParse
+                    ErrorCode_Core.CouldNotParse
                 )
             );
 
@@ -100,11 +100,11 @@ public class StringToDateTests : StepTestBase<StringToDate, DateTime>
                 {
                     Date = Constant("not a date"), InputFormat = Constant("yyyy/MM/dd")
                 },
-                new ErrorBuilder(
+                new ErrorBuilder_Core(
                     new FormatException(
                         "String 'not a date' was not recognized as a valid DateTime."
                     ),
-                    ErrorCode.CouldNotParse
+                    ErrorCode_Core.CouldNotParse
                 )
             );
         }

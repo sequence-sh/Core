@@ -41,7 +41,7 @@ public sealed class PathCombine : CompoundStep<StringStream>
             var currentDirectory = stateMonad.FileSystemHelper.GetCurrentDirectory();
 
             stateMonad.Logger.LogSituation(
-                LogSituationCore.NoPathProvided,
+                LogSituation_Core.NoPathProvided,
                 new[] { currentDirectory }
             );
 
@@ -54,7 +54,7 @@ public sealed class PathCombine : CompoundStep<StringStream>
             paths = paths.Prepend(currentDirectory).ToList();
 
             stateMonad.Logger.LogSituation(
-                LogSituationCore.QualifyingPath,
+                LogSituation_Core.QualifyingPath,
                 new[] { paths[0], currentDirectory }
             );
         }

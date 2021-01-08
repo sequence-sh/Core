@@ -39,13 +39,13 @@ public class RunErrorTestCases : TestBaseParallel
             yield return new ErrorTestFunction(
                 "Get Missing Variable",
                 new GetVariable<StringStream> { Variable = FooString },
-                new ErrorBuilder(ErrorCode.MissingVariable, "<Foo>")
+                new ErrorBuilder_Core(ErrorCode_Core.MissingVariable, "<Foo>")
             );
 
             yield return new ErrorTestFunction(
                 "ValueIf assert",
                 new AssertTrue { Boolean = Constant(false) },
-                new ErrorBuilder(ErrorCode.AssertionFailed, "False")
+                new ErrorBuilder_Core(ErrorCode_Core.AssertionFailed, "False")
             );
 
             yield return new ErrorTestFunction(
@@ -62,14 +62,14 @@ public class RunErrorTestCases : TestBaseParallel
                     },
                     FinalStep = new DoNothing()
                 },
-                new ErrorBuilder(ErrorCode.WrongVariableType, "<Foo>", nameof(Boolean))
+                new ErrorBuilder_Core(ErrorCode_Core.WrongVariableType, "<Foo>", nameof(Boolean))
                     .WithLocation(new GetVariable<bool> { Variable = FooString })
             );
 
             yield return new ErrorTestFunction(
                 "Assert Error with succeeding step",
                 new AssertError { Step = new AssertTrue { Boolean = Constant(true) } },
-                new ErrorBuilder(ErrorCode.AssertionFailed, nameof(AssertTrue))
+                new ErrorBuilder_Core(ErrorCode_Core.AssertionFailed, nameof(AssertTrue))
             );
 
             yield return new ErrorTestFunction(
@@ -80,13 +80,13 @@ public class RunErrorTestCases : TestBaseParallel
                     Right    = Constant(0),
                     Operator = Constant(MathOperator.Divide)
                 },
-                new ErrorBuilder(ErrorCode.DivideByZero)
+                new ErrorBuilder_Core(ErrorCode_Core.DivideByZero)
             );
 
             yield return new ErrorTestFunction(
                 "Array Index minus one",
                 new ElementAtIndex<bool> { Array = Array(true), Index = Constant(-1) },
-                new ErrorBuilder(ErrorCode.IndexOutOfBounds)
+                new ErrorBuilder_Core(ErrorCode_Core.IndexOutOfBounds)
             );
 
             yield return new ErrorTestFunction(
@@ -99,19 +99,19 @@ public class RunErrorTestCases : TestBaseParallel
                     },
                     Index = Constant(5)
                 },
-                new ErrorBuilder(ErrorCode.IndexOutOfBounds)
+                new ErrorBuilder_Core(ErrorCode_Core.IndexOutOfBounds)
             );
 
             yield return new ErrorTestFunction(
                 "Get letter minus one",
                 new CharAtIndex { Index = Constant(-1), String = Constant("Foo") },
-                new ErrorBuilder(ErrorCode.IndexOutOfBounds)
+                new ErrorBuilder_Core(ErrorCode_Core.IndexOutOfBounds)
             );
 
             yield return new ErrorTestFunction(
                 "Get letter out of bounds",
                 new CharAtIndex { Index = Constant(5), String = Constant("Foo") },
-                new ErrorBuilder(ErrorCode.IndexOutOfBounds)
+                new ErrorBuilder_Core(ErrorCode_Core.IndexOutOfBounds)
             );
 
             yield return new ErrorTestFunction(
@@ -120,7 +120,7 @@ public class RunErrorTestCases : TestBaseParallel
                 {
                     Index = Constant(-1), String = Constant("Foo"), Length = Constant(10)
                 },
-                new ErrorBuilder(ErrorCode.IndexOutOfBounds)
+                new ErrorBuilder_Core(ErrorCode_Core.IndexOutOfBounds)
             );
 
             yield return new ErrorTestFunction(
@@ -129,7 +129,7 @@ public class RunErrorTestCases : TestBaseParallel
                 {
                     Index = Constant(5), String = Constant("Foo"), Length = Constant(10)
                 },
-                new ErrorBuilder(ErrorCode.IndexOutOfBounds)
+                new ErrorBuilder_Core(ErrorCode_Core.IndexOutOfBounds)
             );
         }
     }

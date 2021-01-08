@@ -30,7 +30,7 @@ public sealed class MultipleTypeReference : ITypeReference, IEquatable<ITypeRefe
             default:
             {
                 if (set.OfType<ActualTypeReference>().Count() > 1)
-                    return new ErrorBuilder(ErrorCode.CannotInferType);
+                    return new ErrorBuilder_Core(ErrorCode_Core.CannotInferType);
 
                 return new MultipleTypeReference(set);
             }
@@ -99,7 +99,9 @@ public sealed class MultipleTypeReference : ITypeReference, IEquatable<ITypeRefe
             .Combine(ErrorBuilderList.Combine)
             .Bind(
                 x => x.Distinct()
-                    .EnsureSingle(new ErrorBuilder(ErrorCode.CannotInferType) as IErrorBuilder)
+                    .EnsureSingle(
+                        new ErrorBuilder_Core(ErrorCode_Core.CannotInferType) as IErrorBuilder
+                    )
             );
 
         return results;
@@ -132,7 +134,7 @@ public sealed class MultipleTypeReference : ITypeReference, IEquatable<ITypeRefe
         if (results.Value.Count == 1)
             return Maybe<ActualTypeReference>.From(results.Value.Single());
 
-        return new ErrorBuilder(ErrorCode.CannotInferType);
+        return new ErrorBuilder_Core(ErrorCode_Core.CannotInferType);
     }
 }
 

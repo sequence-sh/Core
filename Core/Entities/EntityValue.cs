@@ -110,15 +110,15 @@ public sealed class EntityValue : OneOfBase<DBNull, string, int, double, bool, E
             var s = this.GetString();
 
             if (!Regex.IsMatch(s, schemaProperty.Regex))
-                return new ErrorBuilder(
-                    ErrorCode.SchemaViolationUnmatchedRegex,
+                return new ErrorBuilder_Core(
+                    ErrorCode_Core.SchemaViolationUnmatchedRegex,
                     s,
                     schemaProperty.Regex
                 );
         }
 
-        ErrorBuilder CouldNotConvert(object o) => new(
-            ErrorCode.SchemaViolationWrongType,
+        ErrorBuilder_Core CouldNotConvert(object o) => new(
+            ErrorCode_Core.SchemaViolationWrongType,
             o,
             schemaProperty.Type
         );
@@ -143,7 +143,7 @@ public sealed class EntityValue : OneOfBase<DBNull, string, int, double, bool, E
                 schemaProperty.Multiplicity == Multiplicity.UpToOne)
                 return (this, false);
 
-            return new ErrorBuilder(ErrorCode.SchemaViolationUnexpectedNull);
+            return new ErrorBuilder_Core(ErrorCode_Core.SchemaViolationUnexpectedNull);
         }
 
         Result<(EntityValue value, bool changed), IErrorBuilder> MatchString(string s)
@@ -168,10 +168,10 @@ public sealed class EntityValue : OneOfBase<DBNull, string, int, double, bool, E
                 case SchemaPropertyType.Enum:
                 {
                     if (string.IsNullOrWhiteSpace(schemaProperty.EnumType))
-                        return new ErrorBuilder(ErrorCode.SchemaInvalidMissingEnum);
+                        return new ErrorBuilder_Core(ErrorCode_Core.SchemaInvalidMissingEnum);
 
                     if (schemaProperty.Format == null || !schemaProperty.Format.Any())
-                        return new ErrorBuilder(ErrorCode.SchemaInvalidNoEnumValues);
+                        return new ErrorBuilder_Core(ErrorCode_Core.SchemaInvalidNoEnumValues);
 
                     if (schemaProperty.Format.Contains(s, StringComparer.OrdinalIgnoreCase))
                         return (new EntityValue(new Enumeration(schemaProperty.EnumType, s)), true);
@@ -237,10 +237,10 @@ public sealed class EntityValue : OneOfBase<DBNull, string, int, double, bool, E
                 case SchemaPropertyType.Enum:
                 {
                     if (schemaProperty.EnumType == null)
-                        return new ErrorBuilder(ErrorCode.SchemaInvalidMissingEnum);
+                        return new ErrorBuilder_Core(ErrorCode_Core.SchemaInvalidMissingEnum);
 
                     if (schemaProperty.Format == null || !schemaProperty.Format.Any())
-                        return new ErrorBuilder(ErrorCode.SchemaInvalidNoEnumValues);
+                        return new ErrorBuilder_Core(ErrorCode_Core.SchemaInvalidNoEnumValues);
 
                     if (schemaProperty.Format.Contains(e.Value, StringComparer.OrdinalIgnoreCase))
                     {
@@ -289,7 +289,7 @@ public sealed class EntityValue : OneOfBase<DBNull, string, int, double, bool, E
                 if (list.Count == 0 && schemaProperty.Multiplicity == Multiplicity.UpToOne)
                     return (new EntityValue(DBNull.Value), true);
 
-                return new ErrorBuilder(ErrorCode.SchemaViolationUnexpectedList);
+                return new ErrorBuilder_Core(ErrorCode_Core.SchemaViolationUnexpectedList);
             }
 
             var sp = new SchemaProperty

@@ -78,9 +78,9 @@ public static class CSVWriter
             return multiValueResult.ConvertFailure<StringStream>();
 
         if (multiValueResult.Value is null)
-            return new SingleError(
+            return new SingleError_Core(
                 errorLocation,
-                ErrorCode.MissingParameter,
+                ErrorCode_Core.MissingParameter,
                 nameof(Steps.FromCSV.MultiValueDelimiter)
             );
 

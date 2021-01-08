@@ -99,7 +99,11 @@ public class ForEachTests : StepTestBase<ForEach<int>, Unit>
                 {
                     Array = new FailStep<Array<int>> { ErrorMessage = "Array Failure" }
                 },
-                new SingleError(EntireSequenceLocation.Instance, ErrorCode.Test, "Array Failure")
+                new SingleError_Core(
+                    EntireSequenceLocation.Instance,
+                    ErrorCode_Core.Test,
+                    "Array Failure"
+                )
             );
 
             yield return new ErrorCase(
@@ -110,7 +114,11 @@ public class ForEachTests : StepTestBase<ForEach<int>, Unit>
                     Action   = new FailStep<Unit> { ErrorMessage = "Action Failure" },
                     Variable = VariableName.Index
                 },
-                new SingleError(EntireSequenceLocation.Instance, ErrorCode.Test, "Action Failure")
+                new SingleError_Core(
+                    EntireSequenceLocation.Instance,
+                    ErrorCode_Core.Test,
+                    "Action Failure"
+                )
             );
         }
     }

@@ -124,6 +124,15 @@ namespace Reductech.EDR.Core.Internal.Errors {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Error Reading CSV.
+        /// </summary>
+        internal static string CSVError {
+            get {
+                return ResourceManager.GetString("CSVError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Attempt to Divide by Zero..
         /// </summary>
         internal static string DivideByZero {

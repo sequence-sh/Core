@@ -17,11 +17,11 @@ public static class LogHelper
     /// </summary>
     public static void LogSituation(
         this ILogger logger,
-        LogSituationCore situationCore,
+        LogSituation_Core situationCore,
         IEnumerable<object> args) => LogSituation(
         logger,
         situationCore,
-        LogSituationHelperCoreEN.Instance,
+        LogSituationHelper_Core_EN.Instance,
         args
     );
 

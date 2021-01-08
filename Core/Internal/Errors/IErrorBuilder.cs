@@ -18,7 +18,7 @@ public interface IErrorBuilder
     /// <summary>
     /// The error builders.
     /// </summary>
-    public IEnumerable<ErrorBuilder> GetErrorBuilders();
+    public IEnumerable<SingleErrorBuilder> GetErrorBuilders();
 
     /// <summary>
     /// String representation of this ErrorBuilder.

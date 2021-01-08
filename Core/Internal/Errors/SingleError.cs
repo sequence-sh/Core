@@ -1,43 +1,100 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using JetBrains.Annotations;
+using OneOf;
 
 namespace Reductech.EDR.Core.Internal.Errors
 {
 
 /// <summary>
-/// An single error.
+/// A single error caused by something in Core
 /// </summary>
-public class SingleError : IError
+// ReSharper disable once InconsistentNaming
+public class SingleError_Core : SingleError<ErrorCode_Core>
+{
+    /// <inheritdoc />
+    public override IErrorCodeHelper<ErrorCode_Core> ErrorCodeHelper =>
+        ErrorCodeHelper_Core_EN.Instance;
+
+    /// <inheritdoc />
+    public SingleError_Core(
+        [NotNull] IErrorLocation location,
+        [NotNull] Exception exception,
+        ErrorCode_Core errorCode) : base(location, exception, errorCode) { }
+
+    /// <inheritdoc />
+    public SingleError_Core(
+        [NotNull] IErrorLocation location,
+        ErrorCode_Core errorCode,
+        [NotNull][ItemCanBeNull] params object?[] args) : base(location, errorCode, args) { }
+}
+
+/// <summary>
+/// A single error
+/// </summary>
+public abstract class SingleError<TCode> : SingleError where TCode : Enum
 {
     /// <summary>
     /// Create a new error with an exception.
     /// </summary>
-    public SingleError(IErrorLocation location, Exception exception, ErrorCode errorCode)
-    {
-        Message   = exception.Message;
-        Location  = location;
-        Exception = exception;
-        ErrorCode = errorCode.ToString();
-        Timestamp = DateTime.Now;
-    }
+    protected SingleError(IErrorLocation location, Exception exception, TCode errorCode) : base(
+        location,
+        exception
+    ) => ErrorCode = errorCode;
 
     /// <summary>
     /// Create a new error by providing the error code and arguments
     /// </summary>
-    public SingleError(IErrorLocation location, ErrorCode errorCode, params object?[] args)
+    protected SingleError(IErrorLocation location, TCode errorCode, params object?[] args) : base(
+        location,
+        args
+    ) => ErrorCode = errorCode;
+
+    /// <summary>
+    /// The error code.
+    /// </summary>
+    public TCode ErrorCode { get; }
+
+    /// <inheritdoc />
+    public override string Message => Data.Match(
+        e => e.Message,
+        args => ErrorCodeHelper.GetFormattedMessage(ErrorCode, args)
+    );
+
+    /// <inheritdoc />
+    public override string ErrorCodeString => ErrorCode.ToString();
+
+    /// <summary>
+    /// Supports localization of the Error Messages
+    /// </summary>
+    public abstract IErrorCodeHelper<TCode> ErrorCodeHelper { get; }
+}
+
+/// <summary>
+/// An single error.
+/// </summary>
+public abstract class SingleError : IError
+{
+    /// <summary>
+    /// Create a new SingleError. Sets the timestamp to now.
+    /// </summary>
+    protected SingleError(IErrorLocation location, OneOf<Exception, object?[]> data)
     {
-        Message   = errorCode.GetFormattedMessage(args);
-        Location  = location;
-        Exception = null;
-        ErrorCode = errorCode.ToString();
         Timestamp = DateTime.Now;
+        Location  = location;
+        Data      = data;
     }
+
+    /// <summary>
+    /// Error Data
+    /// </summary>
+    protected OneOf<Exception, object?[]> Data;
 
     /// <summary>
     /// Error Message String.
     /// </summary>
-    public string Message { get; }
+    public abstract string Message { get; }
 
     /// <summary>
     /// The time the error was created.
@@ -52,12 +109,12 @@ public class SingleError : IError
     /// <summary>
     /// Associated Exception if there is one
     /// </summary>
-    public Exception? Exception { get; }
+    public Exception? Exception => Data.TryPickT0(out var e, out _) ? e : null;
 
     /// <summary>
     /// The error code as a string.
     /// </summary>
-    public string ErrorCode { get; }
+    public abstract string ErrorCodeString { get; }
 
     /// <inheritdoc />
     public IEnumerable<SingleError> GetAllErrors()
@@ -69,7 +126,8 @@ public class SingleError : IError
     public string AsString => Message;
 
     /// <inheritdoc />
-    public override string ToString() => ErrorCode + ": " + AsString + " in " + Location.AsString;
+    public override string ToString() =>
+        ErrorCodeString + ": " + AsString + " in " + Location.AsString;
 
     /// <inheritdoc />
     public bool Equals(IError? other)
@@ -87,7 +145,7 @@ public class SingleError : IError
     {
         return Message == other.Message &&
                Location.Equals(other.Location) &&
-               ErrorCode == other.ErrorCode;
+               ErrorCodeString == other.ErrorCodeString;
     }
 
     /// <inheritdoc />
@@ -103,7 +161,7 @@ public class SingleError : IError
     }
 
     /// <inheritdoc />
-    public override int GetHashCode() => HashCode.Combine(Message, Location, ErrorCode);
+    public override int GetHashCode() => HashCode.Combine(Message, Location, ErrorCodeString);
 }
 
 }

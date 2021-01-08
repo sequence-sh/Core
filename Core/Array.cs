@@ -207,12 +207,12 @@ public sealed class Array<T> : IArray, IEquatable<Array<T>>
         CancellationToken cancellation)
     {
         if (index < 0)
-            return new SingleError(location, ErrorCode.IndexOutOfBounds);
+            return new SingleError_Core(location, ErrorCode_Core.IndexOutOfBounds);
 
         if (Option.TryPickT0(out var list, out var asyncList))
         {
             if (index >= list.Count)
-                return new SingleError(location, ErrorCode.IndexOutOfBounds);
+                return new SingleError_Core(location, ErrorCode_Core.IndexOutOfBounds);
 
             return Option.AsT0[index];
         }
@@ -229,7 +229,7 @@ public sealed class Array<T> : IArray, IEquatable<Array<T>>
         }
         catch (IndexOutOfRangeException)
         {
-            return new SingleError(location, ErrorCode.IndexOutOfBounds);
+            return new SingleError_Core(location, ErrorCode_Core.IndexOutOfBounds);
         }
     }
 

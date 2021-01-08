@@ -82,11 +82,11 @@ public class FileReadTests : StepTestBase<FileRead, StringStream>
             yield return new ErrorCase(
                     "ValueIf Error",
                     new FileRead { Path = Constant("File.txt"), },
-                    new ErrorBuilder(ErrorCode.Test, "ValueIf Error")
+                    new ErrorBuilder_Core(ErrorCode_Core.Test, "ValueIf Error")
                 )
                 .WithFileSystemAction(
                     x => x.Setup(a => a.ReadFile("File.txt"))
-                        .Returns(new ErrorBuilder(ErrorCode.Test, "ValueIf Error"))
+                        .Returns(new ErrorBuilder_Core(ErrorCode_Core.Test, "ValueIf Error"))
                 );
         }
     }

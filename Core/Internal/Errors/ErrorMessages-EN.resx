@@ -138,6 +138,9 @@
   <data name="CouldNotResolveVariable" xml:space="preserve">
     <value>Could not resolve variable '{0}'</value>
   </data>
+  <data name="CSVError" xml:space="preserve">
+    <value>Error Reading CSV</value>
+  </data>
   <data name="DivideByZero" xml:space="preserve">
     <value>Attempt to Divide by Zero.</value>
   </data>
