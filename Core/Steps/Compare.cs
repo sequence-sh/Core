@@ -71,7 +71,7 @@ public sealed class Compare<T> : CompoundStep<bool> where T : IComparable
             CompareOperator.GreaterThan        => item1.CompareTo(item2) > 0,
             CompareOperator.GreaterThanOrEqual => item1.CompareTo(item2) >= 0,
             _ => new ErrorBuilder(
-                ErrorCode_Core.UnexpectedEnumValue,
+                ErrorCode.UnexpectedEnumValue,
                 nameof(Compare<int>.Operator),
                 compareOperator
             )

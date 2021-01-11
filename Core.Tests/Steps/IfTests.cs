@@ -85,7 +85,7 @@ public class IfTests : StepTestBase<If, Unit>
                 },
                 new SingleError(
                     EntireSequenceLocation.Instance,
-                    ErrorCode_Core.Test,
+                    ErrorCode.Test,
                     "Condition Fail"
                 )
             );
@@ -98,7 +98,11 @@ public class IfTests : StepTestBase<If, Unit>
                     Then      = new FailStep<Unit> { ErrorMessage = "Then Fail" },
                     Else      = new FailStep<Unit> { ErrorMessage = "Else Fail" },
                 },
-                new SingleError(EntireSequenceLocation.Instance, ErrorCode_Core.Test, "Then Fail")
+                new SingleError(
+                    EntireSequenceLocation.Instance,
+                    ErrorCode.Test,
+                    "Then Fail"
+                )
             );
 
             yield return new ErrorCase(
@@ -109,7 +113,11 @@ public class IfTests : StepTestBase<If, Unit>
                     Then      = new FailStep<Unit> { ErrorMessage = "Then Fail" },
                     Else      = new FailStep<Unit> { ErrorMessage = "Else Fail" },
                 },
-                new SingleError(EntireSequenceLocation.Instance, ErrorCode_Core.Test, "Else Fail")
+                new SingleError(
+                    EntireSequenceLocation.Instance,
+                    ErrorCode.Test,
+                    "Else Fail"
+                )
             );
         }
     }

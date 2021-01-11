@@ -179,9 +179,7 @@ public static class InfixHelper
             errors.Add(right.Error);
 
         if (!OperatorDataDictionary.TryGetValue(op, out var opData))
-            errors.Add(
-                new SingleError(errorLocation, ErrorCode_Core.CouldNotParse, op, "Operator")
-            );
+            errors.Add(new SingleError(errorLocation, ErrorCode.CouldNotParse, op, "Operator"));
 
         if (errors.Any())
             return Result.Failure<FreezableStepProperty, IError>(ErrorList.Combine(errors));

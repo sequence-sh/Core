@@ -80,9 +80,7 @@ public sealed class ScopedStateMonad : IStateMonad
         var r2 = StateMonad
             .TryGetVariableFromDictionary<T>(key, _fixedState)
             .Bind(
-                x => x.ToResult<T, IErrorBuilder>(
-                    new ErrorBuilder(ErrorCode_Core.MissingVariable, key)
-                )
+                x => x.ToResult<T, IErrorBuilder>(new ErrorBuilder(ErrorCode.MissingVariable, key))
             );
 
         return r2;
@@ -99,7 +97,7 @@ public sealed class ScopedStateMonad : IStateMonad
         _scopedStateDictionary.AddOrUpdate(key, _ => variable!, (_1, _2) => variable!);
 
         if (_fixedState.ContainsKey(key))
-            Logger.LogSituation(LogSituation_Core.SetVariableOutOfScope, new object[] { key });
+            Logger.LogSituation(LogSituation.SetVariableOutOfScope, new object[] { key });
 
         return Unit.Default;
     }
@@ -112,7 +110,7 @@ public sealed class ScopedStateMonad : IStateMonad
                 d.Dispose();
 
         if (_fixedState.ContainsKey(key))
-            Logger.LogSituation(LogSituation_Core.RemoveVariableOutOfScope, new object[] { key });
+            Logger.LogSituation(LogSituation.RemoveVariableOutOfScope, new object[] { key });
     }
 }
 

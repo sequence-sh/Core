@@ -80,7 +80,7 @@ public static class CSVWriter
         if (multiValueResult.Value is null)
             return new SingleError(
                 errorLocation,
-                ErrorCode_Core.MissingParameter,
+                ErrorCode.MissingParameter,
                 nameof(Steps.FromCSV.MultiValueDelimiter)
             );
 

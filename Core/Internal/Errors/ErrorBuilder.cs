@@ -14,21 +14,21 @@ public class ErrorBuilder : IErrorBuilder, IEquatable<IErrorBuilder>
     /// <summary>
     /// Create a new SingleErrorBuilder
     /// </summary>
-    public ErrorBuilder(ErrorCode errorCode, params object?[] data)
+    public ErrorBuilder(ErrorCodeBase errorCodeBase, params object?[] data)
     {
-        ErrorCode = errorCode;
-        Data      = data;
-        Timestamp = DateTime.Now;
+        ErrorCodeBase = errorCodeBase;
+        Data          = data;
+        Timestamp     = DateTime.Now;
     }
 
     /// <summary>
     /// Create a new SingleErrorBuilder
     /// </summary>
-    public ErrorBuilder(Exception exception, ErrorCode errorCode)
+    public ErrorBuilder(Exception exception, ErrorCodeBase errorCodeBase)
     {
-        ErrorCode = errorCode;
-        Data      = exception;
-        Timestamp = DateTime.Now;
+        ErrorCodeBase = errorCodeBase;
+        Data          = exception;
+        Timestamp     = DateTime.Now;
     }
 
     /// <inheritdoc />
@@ -48,7 +48,7 @@ public class ErrorBuilder : IErrorBuilder, IEquatable<IErrorBuilder>
     /// <summary>
     /// The Error Code
     /// </summary>
-    public ErrorCode ErrorCode { get; }
+    public ErrorCodeBase ErrorCodeBase { get; }
 
     /// <summary>
     /// The data
@@ -64,7 +64,7 @@ public class ErrorBuilder : IErrorBuilder, IEquatable<IErrorBuilder>
     /// <inheritdoc />
     public string AsString => Data.Match(
         x => x.Message,
-        args => ErrorCode.GetFormattedMessage(args)
+        args => ErrorCodeBase.GetFormattedMessage(args)
     );
 
     /// <summary>

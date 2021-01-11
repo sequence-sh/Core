@@ -146,7 +146,7 @@ public class EnumConstantFreezable : ConstantFreezableBase<Enumeration>
 
         return new SingleError(
             new FreezableStepErrorLocation(this),
-            ErrorCode_Core.UnexpectedEnumValue,
+            ErrorCode.UnexpectedEnumValue,
             Value.Type
         );
     }
@@ -166,7 +166,7 @@ public class EnumConstantFreezable : ConstantFreezableBase<Enumeration>
 
         return new SingleError(
             new FreezableStepErrorLocation(this),
-            ErrorCode_Core.UnexpectedEnumType,
+            ErrorCode.UnexpectedEnumType,
             Value.Type
         );
     }
@@ -180,7 +180,7 @@ public class EnumConstantFreezable : ConstantFreezableBase<Enumeration>
         var type = value.GetType();
 
         if (!type.IsEnum)
-            return new ErrorBuilder(ErrorCode_Core.UnexpectedEnumType, type.Name);
+            return new ErrorBuilder(ErrorCode.UnexpectedEnumType, type.Name);
 
         Type stepType = typeof(EnumConstant<>).MakeGenericType(type);
 
@@ -194,7 +194,7 @@ public class EnumConstantFreezable : ConstantFreezableBase<Enumeration>
         #pragma warning disable CA1031 // Do not catch general exception types
         catch (Exception e)
         {
-            return new ErrorBuilder(e, ErrorCode_Core.InvalidCast);
+            return new ErrorBuilder(e, ErrorCode.InvalidCast);
         }
         #pragma warning restore CA1031 // Do not catch general exception types
     }

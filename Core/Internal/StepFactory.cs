@@ -184,7 +184,7 @@ public abstract class StepFactory : IStepFactory
             errors.Add(
                 new SingleError(
                     freezeData.Location,
-                    ErrorCode_Core.DuplicateParameter,
+                    ErrorCode.DuplicateParameter,
                     propertyInfo.Name
                 )
             );
@@ -323,7 +323,7 @@ public abstract class StepFactory : IStepFactory
             }
         }
 
-        return new ErrorBuilder(ErrorCode_Core.InvalidCast, propertyInfo.Name, stepToSet.Name);
+        return new ErrorBuilder(ErrorCode.InvalidCast, propertyInfo.Name, stepToSet.Name);
     }
 
     private static Result<Unit, IError> TrySetStepList(
@@ -389,7 +389,7 @@ public abstract class StepFactory : IStepFactory
                 else
                 {
                     var error = new ErrorBuilder(
-                            ErrorCode_Core.InvalidCast,
+                            ErrorCode.InvalidCast,
                             parentStep.StepFactory.TypeName,
                             CompressSpaces(freezeResult.Value.Name)
                         )
@@ -432,7 +432,7 @@ public abstract class StepFactory : IStepFactory
                 else
                 {
                     var error = new ErrorBuilder(
-                            ErrorCode_Core.InvalidCast,
+                            ErrorCode.InvalidCast,
                             parentStep.StepFactory.TypeName,
                             CompressSpaces(freezeResult.Value.Name)
                         )
@@ -476,15 +476,15 @@ public abstract class StepFactory : IStepFactory
              && openGenericType == typeof(Compare<>))
             {
                 var parameterTypeName = parameterType.GetDisplayName();
-                return new ErrorBuilder(ErrorCode_Core.TypeNotComparable, parameterTypeName);
+                return new ErrorBuilder(ErrorCode.TypeNotComparable, parameterTypeName);
             }
 
-            return new ErrorBuilder(e, ErrorCode_Core.InvalidCast);
+            return new ErrorBuilder(e, ErrorCode.InvalidCast);
         }
         #pragma warning disable CA1031 // Do not catch general exception types
         catch (Exception e)
         {
-            return new ErrorBuilder(e, ErrorCode_Core.InvalidCast);
+            return new ErrorBuilder(e, ErrorCode.InvalidCast);
         }
         #pragma warning restore CA1031 // Do not catch general exception types
 
@@ -492,7 +492,7 @@ public abstract class StepFactory : IStepFactory
             return Result.Success<ICompoundStep, IErrorBuilder>(rp);
 
         return new ErrorBuilder(
-            ErrorCode_Core.CannotCreateGeneric,
+            ErrorCode.CannotCreateGeneric,
             openGenericType.Name.Split("`")[0],
             parameterType.GetDisplayName()
         );

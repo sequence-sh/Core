@@ -98,7 +98,7 @@ public sealed class TypeResolver
                                 x =>
                                     new SingleError(
                                         EntireSequenceLocation.Instance,
-                                        ErrorCode_Core.CouldNotResolveVariable,
+                                        ErrorCode.CouldNotResolveVariable,
                                         x.Name
                                     )
                             )
@@ -133,7 +133,7 @@ public sealed class TypeResolver
             if (previous.Equals(actualTypeReference))
                 return true;
 
-            return new ErrorBuilder(ErrorCode_Core.CannotInferType);
+            return new ErrorBuilder(ErrorCode.CannotInferType);
         }
 
         MyDictionary.Add(variable, actualTypeReference);
