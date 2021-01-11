@@ -121,7 +121,7 @@
     <value>Assertion Failed '{0}'</value>
   </data>
   <data name="CannotCreateGeneric" xml:space="preserve">
-    <value>Could not create an instance of {1}&lt;{0}&gt;</value>
+    <value>Could not create an instance of {0}&lt;{1}&gt;</value>
   </data>
   <data name="CannotCreateScopedContext" xml:space="preserve">
     <value>{0} cannot create a scoped context</value>

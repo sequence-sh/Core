@@ -70,10 +70,10 @@ public sealed class ActualTypeReference : ITypeReference, IEquatable<ITypeRefere
         int argumentNumber)
     {
         if (!Type.IsGenericType)
-            return new ErrorBuilder_Core(ErrorCode_Core.InvalidCast, Type.Name, "Generic Type");
+            return new ErrorBuilder(ErrorCode_Core.InvalidCast, Type.Name, "Generic Type");
 
         if (argumentNumber < 0 || Type.GenericTypeArguments.Length <= argumentNumber)
-            return new ErrorBuilder_Core(ErrorCode_Core.IndexOutOfBounds);
+            return new ErrorBuilder(ErrorCode_Core.IndexOutOfBounds);
 
         var t = Type.GenericTypeArguments[argumentNumber];
         return new ActualTypeReference(t);

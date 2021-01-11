@@ -68,14 +68,14 @@ public class DeleteItemTests : StepTestBase<DeleteItem, Unit>
             yield return new ErrorCase(
                     "Could not delete file",
                     new DeleteItem { Path = Constant("My Path") },
-                    new ErrorBuilder_Core(ErrorCode_Core.Test, "ValueIf Error")
+                    new ErrorBuilder(ErrorCode_Core.Test, "ValueIf Error")
                 )
                 .WithFileSystemAction(
                     x => x.Setup(a => a.DoesDirectoryExist("My Path")).Returns(true)
                 )
                 .WithFileSystemAction(
                     x => x.Setup(a => a.DeleteDirectory("My Path", true))
-                        .Returns(new ErrorBuilder_Core(ErrorCode_Core.Test, "ValueIf Error"))
+                        .Returns(new ErrorBuilder(ErrorCode_Core.Test, "ValueIf Error"))
                 );
         }
     }

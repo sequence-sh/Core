@@ -23,7 +23,7 @@ public sealed class AssertTrue : CompoundStep<Unit>
         return await Boolean.Run(stateMonad, cancellationToken)
             .Ensure(
                 x => x,
-                new SingleError_Core(
+                new SingleError(
                     new StepErrorLocation(this),
                     ErrorCode_Core.AssertionFailed,
                     Boolean.Name

@@ -150,7 +150,7 @@ public class ApplyBooleanTests : StepTestBase<ApplyBooleanOperator, bool>
             yield return new ErrorCase(
                 "BooleanOperator.None",
                 noneStep,
-                new SingleError_Core(
+                new SingleError(
                     new StepErrorLocation(noneStep),
                     ErrorCode_Core.UnexpectedEnumValue,
                     nameof(ApplyBooleanOperator.Operator),
@@ -168,7 +168,7 @@ public class ApplyBooleanTests : StepTestBase<ApplyBooleanOperator, bool>
                     Right    = Constant(true),
                     Operator = Constant(BooleanOperator.And)
                 },
-                new SingleError_Core(EntireSequenceLocation.Instance, ErrorCode_Core.Test, "Left Fail")
+                new SingleError(EntireSequenceLocation.Instance, ErrorCode_Core.Test, "Left Fail")
             );
 
             yield return new ErrorCase(
@@ -179,7 +179,7 @@ public class ApplyBooleanTests : StepTestBase<ApplyBooleanOperator, bool>
                     Right    = Constant(true),
                     Operator = new FailStep<BooleanOperator> { ErrorMessage = "Operator Fail" },
                 },
-                new SingleError_Core(
+                new SingleError(
                     EntireSequenceLocation.Instance,
                     ErrorCode_Core.Test,
                     "Operator Fail"
@@ -194,7 +194,7 @@ public class ApplyBooleanTests : StepTestBase<ApplyBooleanOperator, bool>
                     Right    = new FailStep<bool> { ErrorMessage = "Right Fail" },
                     Operator = Constant(BooleanOperator.And)
                 },
-                new SingleError_Core(EntireSequenceLocation.Instance, ErrorCode_Core.Test, "Right Fail")
+                new SingleError(EntireSequenceLocation.Instance, ErrorCode_Core.Test, "Right Fail")
             );
         }
     }

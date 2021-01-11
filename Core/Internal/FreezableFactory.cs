@@ -180,7 +180,7 @@ public static class InfixHelper
 
         if (!OperatorDataDictionary.TryGetValue(op, out var opData))
             errors.Add(
-                new SingleError_Core(errorLocation, ErrorCode_Core.CouldNotParse, op, "Operator")
+                new SingleError(errorLocation, ErrorCode_Core.CouldNotParse, op, "Operator")
             );
 
         if (errors.Any())

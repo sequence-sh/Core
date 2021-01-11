@@ -32,7 +32,7 @@ public static class FunctionalExtensions
         if (obj is T type)
             return type;
 
-        return new ErrorBuilder_Core(ErrorCode_Core.InvalidCast, obj, typeof(T).Name);
+        return new ErrorBuilder(ErrorCode_Core.InvalidCast, obj, typeof(T).Name);
     }
 
     /// <summary>
@@ -48,7 +48,7 @@ public static class FunctionalExtensions
         if (converted is T objConverted)
             return objConverted;
 
-        return new ErrorBuilder_Core(ErrorCode_Core.InvalidCast, obj, typeof(T).Name);
+        return new ErrorBuilder(ErrorCode_Core.InvalidCast, obj, typeof(T).Name);
     }
 
     ///// <summary>

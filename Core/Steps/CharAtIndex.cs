@@ -46,7 +46,7 @@ public sealed class CharAtIndex : CompoundStep<StringStream>
         var str = await stringStreamResult.Value.GetStringAsync();
 
         if (index.Value < 0 || index.Value >= str.Length)
-            return new SingleError_Core(new StepErrorLocation(this), ErrorCode_Core.IndexOutOfBounds);
+            return new SingleError(new StepErrorLocation(this), ErrorCode_Core.IndexOutOfBounds);
 
         var character = str[index.Value].ToString();
 

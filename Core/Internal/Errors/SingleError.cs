@@ -6,43 +6,32 @@ namespace Reductech.EDR.Core.Internal.Errors
 {
 
 /// <summary>
-/// A single error
-/// </summary>
-public abstract class SingleError<TCode> : SingleError where TCode : Enum
-{
-    /// <summary>
-    /// Create a new error with an exception.
-    /// </summary>
-    protected SingleError(
-        IErrorLocation location,
-        SingleErrorBuilder<TCode> singleErrorBuilder) : base(
-        location,
-        singleErrorBuilder
-    ) => ErrorCode = singleErrorBuilder.ErrorCode;
-
-    /// <summary>
-    /// The error code.
-    /// </summary>
-    public TCode ErrorCode { get; }
-
-    /// <inheritdoc />
-    public override string ErrorCodeString => ErrorCode.ToString();
-
-    /// <summary>
-    /// Supports localization of the Error Messages
-    /// </summary>
-    public abstract IErrorCodeHelper<TCode> ErrorCodeHelper { get; }
-}
-
-/// <summary>
 /// An single error.
 /// </summary>
-public abstract class SingleError : IError
+public class SingleError : IError
 {
     /// <summary>
-    /// Create a new SingleError. Sets the timestamp to now.
+    /// Create a new SingleError.
     /// </summary>
-    protected SingleError(IErrorLocation location, SingleErrorBuilder errorBuilder)
+    public SingleError(IErrorLocation location, Exception exception, ErrorCode errorCode)
+    {
+        Location     = location;
+        ErrorBuilder = new ErrorBuilder(exception, errorCode);
+    }
+
+    /// <summary>
+    /// Create a new SingleError.
+    /// </summary>
+    public SingleError(IErrorLocation location, ErrorCode errorCode, params object?[] args)
+    {
+        Location     = location;
+        ErrorBuilder = new ErrorBuilder(errorCode, args);
+    }
+
+    /// <summary>
+    /// Create a new SingleError.
+    /// </summary>
+    public SingleError(IErrorLocation location, ErrorBuilder errorBuilder)
     {
         Location     = location;
         ErrorBuilder = errorBuilder;
@@ -61,17 +50,12 @@ public abstract class SingleError : IError
     /// <summary>
     /// The ErrorBuilder
     /// </summary>
-    public SingleErrorBuilder ErrorBuilder { get; }
+    public ErrorBuilder ErrorBuilder { get; }
 
     /// <summary>
     /// Associated Exception if there is one
     /// </summary>
     public Exception? Exception => ErrorBuilder.Data.TryPickT0(out var e, out _) ? e : null;
-
-    /// <summary>
-    /// The error code as a string.
-    /// </summary>
-    public abstract string ErrorCodeString { get; }
 
     /// <inheritdoc />
     public IEnumerable<SingleError> GetAllErrors()
@@ -87,7 +71,7 @@ public abstract class SingleError : IError
 
     /// <inheritdoc />
     public override string ToString() =>
-        ErrorCodeString + ": " + AsString + " in " + Location.AsString;
+        ErrorBuilder.ErrorCode + ": " + AsString + " in " + Location.AsString;
 
     /// <inheritdoc />
     public bool Equals(IError? other)

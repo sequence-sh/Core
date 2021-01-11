@@ -90,7 +90,7 @@ public class SequenceTests : StepTestBase<Sequence<StringStream>, StringStream>
                         },
                     FinalStep = Constant("Final")
                 },
-                new SingleError_Core(
+                new SingleError(
                     EntireSequenceLocation.Instance,
                     ErrorCode_Core.Test,
                     "Initial step Fail"
@@ -104,7 +104,7 @@ public class SequenceTests : StepTestBase<Sequence<StringStream>, StringStream>
                     InitialSteps = new List<IStep<Unit>> { new DoNothing() },
                     FinalStep    = new FailStep<StringStream> { ErrorMessage = "Final step Fail" }
                 },
-                new SingleError_Core(
+                new SingleError(
                     EntireSequenceLocation.Instance,
                     ErrorCode_Core.Test,
                     "Final step Fail"

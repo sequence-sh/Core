@@ -72,7 +72,7 @@ public sealed class ApplyBooleanOperator : CompoundStep<bool>
             }
 
             default:
-                return new SingleError_Core(
+                return new SingleError(
                     new StepErrorLocation(this),
                     ErrorCode_Core.UnexpectedEnumValue,
                     nameof(Operator),

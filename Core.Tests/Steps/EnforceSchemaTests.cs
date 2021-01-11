@@ -185,7 +185,7 @@ public class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Entity>>
                         },
                         FinalStep = new DoNothing()
                     },
-                    new ErrorBuilder_Core(expectedErrorCode, expectedErrorArgs).WithLocation(
+                    new ErrorBuilder(expectedErrorCode, expectedErrorArgs).WithLocation(
                         new StepErrorLocation(enforceSchema)
                     )
                 );

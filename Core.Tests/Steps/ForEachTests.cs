@@ -99,7 +99,7 @@ public class ForEachTests : StepTestBase<ForEach<int>, Unit>
                 {
                     Array = new FailStep<Array<int>> { ErrorMessage = "Array Failure" }
                 },
-                new SingleError_Core(
+                new SingleError(
                     EntireSequenceLocation.Instance,
                     ErrorCode_Core.Test,
                     "Array Failure"
@@ -114,7 +114,7 @@ public class ForEachTests : StepTestBase<ForEach<int>, Unit>
                     Action   = new FailStep<Unit> { ErrorMessage = "Action Failure" },
                     Variable = VariableName.Index
                 },
-                new SingleError_Core(
+                new SingleError(
                     EntireSequenceLocation.Instance,
                     ErrorCode_Core.Test,
                     "Action Failure"
