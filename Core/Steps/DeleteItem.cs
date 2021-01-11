@@ -34,19 +34,19 @@ public class DeleteItem : CompoundStep<Unit>
         if (stateMonad.FileSystemHelper.DoesDirectoryExist(path))
         {
             result = stateMonad.FileSystemHelper.DeleteDirectory(path, true);
-            stateMonad.Logger.LogSituation(LogSituation_Core.DirectoryDeleted, new[] { path });
+            stateMonad.Logger.LogSituation(LogSituation.DirectoryDeleted, new[] { path });
         }
         else if (stateMonad.FileSystemHelper.DoesFileExist(path))
         {
             result = stateMonad.FileSystemHelper.DeleteFile(path);
-            stateMonad.Logger.LogSituation(LogSituation_Core.FileDeleted, new[] { path });
+            stateMonad.Logger.LogSituation(LogSituation.FileDeleted, new[] { path });
         }
         else
         {
             result = Unit.Default;
 
             stateMonad.Logger.LogSituation(
-                LogSituation_Core.ItemToDeleteDidNotExist,
+                LogSituation.ItemToDeleteDidNotExist,
                 new[] { path }
             );
         }

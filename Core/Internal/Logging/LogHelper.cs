@@ -18,7 +18,7 @@ public static class LogHelper
     public static void LogSituation<T>(
         this ILogger logger,
         T situation,
-        IEnumerable<object?> args) where T : LogSituation
+        IEnumerable<object?> args) where T : LogSituationBase
     {
         var logLevel = situation.LogLevel;
 

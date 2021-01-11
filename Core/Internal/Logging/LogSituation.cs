@@ -6,7 +6,7 @@ namespace Reductech.EDR.Core.Internal.Logging
 /// <summary>
 /// Identifying code for the log situation.
 /// </summary>
-public abstract record LogSituation(string Code, LogLevel LogLevel)
+public abstract record LogSituationBase(string Code, LogLevel LogLevel)
 {
     /// <summary>
     /// Get the format string for this log situation
