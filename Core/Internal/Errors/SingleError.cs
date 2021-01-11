@@ -70,8 +70,7 @@ public class SingleError : IError
     public IErrorBuilder ToErrorBuilder => ErrorBuilder;
 
     /// <inheritdoc />
-    public override string ToString() =>
-        ErrorBuilder.ErrorCode + ": " + AsString + " in " + Location.AsString;
+    public override string ToString() => Message + " in " + Location.AsString;
 
     /// <inheritdoc />
     public bool Equals(IError? other)
