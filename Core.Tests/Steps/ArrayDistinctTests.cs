@@ -96,7 +96,7 @@ public class ArrayDistinctTests : StepTestBase<ArrayDistinct<Entity>, Array<Enti
                     Array       = new FailStep<Array<Entity>> { ErrorMessage = "Stream Fail" },
                     KeySelector = Constant("A")
                 },
-                new SingleError_Core(EntireSequenceLocation.Instance, ErrorCode_Core.Test, "Stream Fail")
+                new SingleError(EntireSequenceLocation.Instance, ErrorCode_Core.Test, "Stream Fail")
             );
         }
     }

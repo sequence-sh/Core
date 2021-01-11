@@ -53,7 +53,7 @@ public interface IStateMonad : IDisposable
     /// </summary>
     public Result<T, IErrorBuilder> GetSettings<T>() where T : ISettings => Settings.TryCast<T>()
         .MapError(
-            _ => new ErrorBuilder_Core(ErrorCode_Core.MissingStepSettings, typeof(T).Name) as
+            _ => new ErrorBuilder(ErrorCode_Core.MissingStepSettings, typeof(T).Name) as
                 IErrorBuilder
         );
 
@@ -146,7 +146,7 @@ public sealed class StateMonad : IStateMonad
             .Bind(
                 x =>
                     x.ToResult<T, IErrorBuilder>(
-                        new ErrorBuilder_Core(ErrorCode_Core.MissingVariable, key)
+                        new ErrorBuilder(ErrorCode_Core.MissingVariable, key)
                     )
             );
 
@@ -166,7 +166,7 @@ public sealed class StateMonad : IStateMonad
         if (value is T typedValue)
             return Maybe<T>.From(typedValue);
 
-        return new ErrorBuilder_Core(ErrorCode_Core.WrongVariableType, key, typeof(T).Name);
+        return new ErrorBuilder(ErrorCode_Core.WrongVariableType, key, typeof(T).Name);
     }
 
     /// <summary>

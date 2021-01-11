@@ -36,7 +36,7 @@ public class FileSystemHelper : IFileSystemHelper
         #pragma warning disable CA1031 // Do not catch general exception types
         catch (Exception e)
         {
-            r = new ErrorBuilder_Core(ErrorCode_Core.ExternalProcessError, e.Message);
+            r = new ErrorBuilder(ErrorCode_Core.ExternalProcessError, e.Message);
         }
 
         return r;
@@ -61,7 +61,7 @@ public class FileSystemHelper : IFileSystemHelper
         #pragma warning disable CA1031 // Do not catch general exception types
         catch (Exception e)
         {
-            r1 = new ErrorBuilder_Core(ErrorCode_Core.ExternalProcessError, e.Message);
+            r1 = new ErrorBuilder(ErrorCode_Core.ExternalProcessError, e.Message);
         }
         #pragma warning restore CA1031 // Do not catch general exception types
 
@@ -84,7 +84,7 @@ public class FileSystemHelper : IFileSystemHelper
         #pragma warning disable CA1031 // Do not catch general exception types
         catch (Exception e)
         {
-            return new ErrorBuilder_Core(e, ErrorCode_Core.ExternalProcessError);
+            return new ErrorBuilder(e, ErrorCode_Core.ExternalProcessError);
         }
         #pragma warning restore CA1031 // Do not catch general exception types
 
@@ -101,7 +101,7 @@ public class FileSystemHelper : IFileSystemHelper
         #pragma warning disable CA1031 // Do not catch general exception types
         catch (Exception e)
         {
-            return new ErrorBuilder_Core(e, ErrorCode_Core.ExternalProcessError);
+            return new ErrorBuilder(e, ErrorCode_Core.ExternalProcessError);
         }
         #pragma warning restore CA1031 // Do not catch general exception types
 
@@ -121,7 +121,7 @@ public class FileSystemHelper : IFileSystemHelper
         #pragma warning disable CA1031 // Do not catch general exception types
         catch (Exception e)
         {
-            result = new ErrorBuilder_Core(ErrorCode_Core.ExternalProcessError, e.Message);
+            result = new ErrorBuilder(ErrorCode_Core.ExternalProcessError, e.Message);
         }
         #pragma warning restore CA1031 // Do not catch general exception types
 
@@ -145,7 +145,7 @@ public class FileSystemHelper : IFileSystemHelper
         catch (Exception e)
         {
             error = Maybe<IErrorBuilder>.From(
-                new ErrorBuilder_Core(ErrorCode_Core.ExternalProcessError, e.Message)
+                new ErrorBuilder(ErrorCode_Core.ExternalProcessError, e.Message)
             );
         }
         #pragma warning restore CA1031 // Do not catch general exception types
@@ -175,7 +175,7 @@ public class FileSystemHelper : IFileSystemHelper
         catch (Exception e)
         {
             error = Maybe<IErrorBuilder>.From(
-                new ErrorBuilder_Core(ErrorCode_Core.ExternalProcessError, e.Message)
+                new ErrorBuilder(ErrorCode_Core.ExternalProcessError, e.Message)
             );
         }
         #pragma warning restore CA1031 // Do not catch general exception types

@@ -89,7 +89,7 @@ public abstract class CompoundStep<T> : ICompoundStep<T>
     {
         return Run(stateMonad, cancellationToken)
             .BindCast<T, T1, IError>(
-                new SingleError_Core(
+                new SingleError(
                     new StepErrorLocation(this),
                     ErrorCode_Core.InvalidCast,
                     typeof(T),
@@ -227,7 +227,7 @@ public abstract class CompoundStep<T> : ICompoundStep<T>
     /// <inheritdoc />
     public virtual Result<StepContext, IError> TryGetScopedContext(
         StepContext baseContext,
-        IFreezableStep scopedStep) => new SingleError_Core(
+        IFreezableStep scopedStep) => new SingleError(
         new StepErrorLocation(this),
         ErrorCode_Core.CannotCreateScopedContext,
         Name

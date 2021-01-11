@@ -45,7 +45,7 @@ public abstract partial class StepTestBase<TStep, TOutput>
                                 SetVariableName(x, instance);
 
                                 return
-                                    new SingleError_Core(
+                                    new SingleError(
                                         new StepErrorLocation(instance),
                                         ErrorCode_Core.MissingVariable,
                                         "<Foo>"
@@ -126,7 +126,7 @@ public abstract partial class StepTestBase<TStep, TOutput>
 
             property.SetValue(instance, newValue);
 
-            return new SingleError_Core(
+            return new SingleError(
                 EntireSequenceLocation.Instance,
                 ErrorCode_Core.Test,
                 errorMessage
@@ -144,7 +144,7 @@ public abstract partial class StepTestBase<TStep, TOutput>
 
             property.SetValue(instance, newValue);
 
-            return new SingleError_Core(
+            return new SingleError(
                 EntireSequenceLocation.Instance,
                 ErrorCode_Core.Test,
                 errorMessage
@@ -194,7 +194,7 @@ public abstract partial class StepTestBase<TStep, TOutput>
         {
             await Task.CompletedTask;
 
-            var error = new SingleError_Core(
+            var error = new SingleError(
                 EntireSequenceLocation.Instance,
                 ErrorCode_Core.Test,
                 ErrorMessage

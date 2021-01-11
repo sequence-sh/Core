@@ -13,33 +13,18 @@ public static class LogHelper
 {
     /// <summary>
     /// Logs a message for the particular situation.
-    /// Will use the resource to
-    /// </summary>
-    public static void LogSituation(
-        this ILogger logger,
-        LogSituation_Core situationCore,
-        IEnumerable<object> args) => LogSituation(
-        logger,
-        situationCore,
-        LogSituationHelper_Core_EN.Instance,
-        args
-    );
-
-    /// <summary>
-    /// Logs a message for the particular situation.
-    /// Will use the resource to
+    /// Will use the resource to localize the message
     /// </summary>
     public static void LogSituation<T>(
         this ILogger logger,
-        T situationCore,
-        ILogSituationHelper<T> helper,
-        IEnumerable<object> args) where T : Enum
+        T situation,
+        IEnumerable<object?> args) where T : LogSituation
     {
-        var logLevel = helper.GetLogLevel(situationCore);
+        var logLevel = situation.LogLevel;
 
         if (logger.IsEnabled(logLevel))
         {
-            var messageString = helper.GetMessageString(situationCore);
+            var messageString = situation.GetLocalizedString();
             logger.Log(logLevel, messageString, args.ToArray());
         }
     }

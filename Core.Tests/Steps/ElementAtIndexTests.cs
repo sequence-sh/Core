@@ -69,7 +69,7 @@ public class ElementAtIndexTests : StepTestBase<ElementAtIndex<StringStream>, St
                 {
                     Index = Constant(-1), Array = Array(("Hello"), ("World"))
                 },
-                new ErrorBuilder_Core(ErrorCode_Core.IndexOutOfBounds)
+                new ErrorBuilder(ErrorCode_Core.IndexOutOfBounds)
             );
 
             yield return new ErrorCase(
@@ -78,7 +78,7 @@ public class ElementAtIndexTests : StepTestBase<ElementAtIndex<StringStream>, St
                 {
                     Index = Constant(2), Array = Array(("Hello"), ("World"))
                 },
-                new ErrorBuilder_Core(ErrorCode_Core.IndexOutOfBounds)
+                new ErrorBuilder(ErrorCode_Core.IndexOutOfBounds)
             );
 
             foreach (var errorCase in base.ErrorCases)

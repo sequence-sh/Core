@@ -35,7 +35,7 @@ public class ExternalProcessRunner : IExternalProcessRunner
         Encoding encoding)
     {
         if (!File.Exists(processPath))
-            return new ErrorBuilder_Core(ErrorCode_Core.ExternalProcessNotFound, processPath);
+            return new ErrorBuilder(ErrorCode_Core.ExternalProcessNotFound, processPath);
 
         var argumentString = string.Join(' ', arguments.Select(EncodeParameterArgument));
 
@@ -59,7 +59,7 @@ public class ExternalProcessRunner : IExternalProcessRunner
         var started = pProcess.Start();
 
         if (!started)
-            return new ErrorBuilder_Core(ErrorCode_Core.ExternalProcessError, "Could not start");
+            return new ErrorBuilder(ErrorCode_Core.ExternalProcessError, "Could not start");
 
         AppDomain.CurrentDomain.ProcessExit  += KillProcess;
         AppDomain.CurrentDomain.DomainUnload += KillProcess;
@@ -85,7 +85,7 @@ public class ExternalProcessRunner : IExternalProcessRunner
         CancellationToken cancellationToken)
     {
         if (!File.Exists(processPath))
-            return new ErrorBuilder_Core(ErrorCode_Core.ExternalProcessNotFound, processPath);
+            return new ErrorBuilder(ErrorCode_Core.ExternalProcessNotFound, processPath);
 
         var argumentString = string.Join(' ', arguments.Select(EncodeParameterArgument));
 
@@ -128,7 +128,7 @@ public class ExternalProcessRunner : IExternalProcessRunner
                         logger.LogWarning(line);
                     else
                         errors.Add(
-                            new ErrorBuilder_Core(ErrorCode_Core.ExternalProcessError, errorText)
+                            new ErrorBuilder(ErrorCode_Core.ExternalProcessError, errorText)
                         );
                 }
                 else
@@ -141,7 +141,7 @@ public class ExternalProcessRunner : IExternalProcessRunner
         #pragma warning disable CA1031 // Do not catch general exception types
         catch (Exception e)
         {
-            errors.Add(new ErrorBuilder_Core(e, ErrorCode_Core.ExternalProcessError));
+            errors.Add(new ErrorBuilder(e, ErrorCode_Core.ExternalProcessError));
         }
         #pragma warning restore CA1031 // Do not catch general exception types
 

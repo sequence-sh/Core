@@ -70,7 +70,7 @@ namespace Reductech.EDR.Core.Internal.Errors {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Could not create an instance of {1}&lt;{0}&gt;.
+        ///   Looks up a localized string similar to Could not create an instance of {0}&lt;{1}&gt;.
         /// </summary>
         internal static string CannotCreateGeneric {
             get {

@@ -86,7 +86,7 @@ public class EntityMapTests : StepTestBase<EntityMap, Array<Entity>>
                     EntityStream = new FailStep<Array<Entity>> { ErrorMessage = "Stream Fail" },
                     Function     = Constant(Entity.Create(("Key", "Value")))
                 },
-                new SingleError_Core(EntireSequenceLocation.Instance, ErrorCode_Core.Test, "Stream Fail")
+                new SingleError(EntireSequenceLocation.Instance, ErrorCode_Core.Test, "Stream Fail")
             );
         }
     }

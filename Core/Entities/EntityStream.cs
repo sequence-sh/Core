@@ -70,7 +70,7 @@
 //#pragma warning disable CA1031 // Do not catch general exception types
 //            catch (Exception e)
 //            {
-//                return Result.Failure<IReadOnlyCollection<Entity>, IError>(new SingleError_Core(e, ErrorCode.Unknown, EntireSequenceLocation.Instance));
+//                return Result.Failure<IReadOnlyCollection<Entity>, IError>(new SingleError(e, ErrorCode.Unknown, EntireSequenceLocation.Instance));
 //            }
 //#pragma warning restore CA1031 // Do not catch general exception types
 //        }

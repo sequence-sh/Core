@@ -130,7 +130,7 @@ public class CompareTests : StepTestBase<Compare<int>, bool>
                     Right    = Constant(1),
                     Operator = Constant(CompareOperator.None)
                 },
-                new ErrorBuilder_Core(
+                new ErrorBuilder(
                     ErrorCode_Core.UnexpectedEnumValue,
                     nameof(Compare<int>.Operator),
                     CompareOperator.None
