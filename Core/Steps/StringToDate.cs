@@ -86,7 +86,7 @@ public sealed class StringToDate : CompoundStep<DateTime>
         {
             return new SingleError(
                 new StepErrorLocation(this),
-                ErrorCode_Core.CouldNotParse,
+                ErrorCode.CouldNotParse,
                 cultureResult.Value,
                 nameof(Culture)
             );
@@ -105,7 +105,7 @@ public sealed class StringToDate : CompoundStep<DateTime>
                 return new SingleError(
                     new StepErrorLocation(this),
                     fe,
-                    ErrorCode_Core.CouldNotParse
+                    ErrorCode.CouldNotParse
                 );
             }
         }
@@ -120,7 +120,7 @@ public sealed class StringToDate : CompoundStep<DateTime>
                 return new SingleError(
                     new StepErrorLocation(this),
                     fe,
-                    ErrorCode_Core.CouldNotParse
+                    ErrorCode.CouldNotParse
                 );
             }
         }

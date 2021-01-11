@@ -91,7 +91,7 @@ public abstract class CompoundStep<T> : ICompoundStep<T>
             .BindCast<T, T1, IError>(
                 new SingleError(
                     new StepErrorLocation(this),
-                    ErrorCode_Core.InvalidCast,
+                    ErrorCode.InvalidCast,
                     typeof(T),
                     typeof(T1)
                 )
@@ -229,7 +229,7 @@ public abstract class CompoundStep<T> : ICompoundStep<T>
         StepContext baseContext,
         IFreezableStep scopedStep) => new SingleError(
         new StepErrorLocation(this),
-        ErrorCode_Core.CannotCreateScopedContext,
+        ErrorCode.CannotCreateScopedContext,
         Name
     );
 

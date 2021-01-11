@@ -92,7 +92,7 @@ public class SequenceTests : StepTestBase<Sequence<StringStream>, StringStream>
                 },
                 new SingleError(
                     EntireSequenceLocation.Instance,
-                    ErrorCode_Core.Test,
+                    ErrorCode.Test,
                     "Initial step Fail"
                 )
             );
@@ -106,7 +106,7 @@ public class SequenceTests : StepTestBase<Sequence<StringStream>, StringStream>
                 },
                 new SingleError(
                     EntireSequenceLocation.Instance,
-                    ErrorCode_Core.Test,
+                    ErrorCode.Test,
                     "Final step Fail"
                 )
             );

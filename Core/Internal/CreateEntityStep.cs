@@ -79,7 +79,7 @@ public class CreateEntityStep : IStep<Entity>
             .BindCast<Entity, T, IError>(
                 new SingleError(
                     new StepErrorLocation(this),
-                    ErrorCode_Core.InvalidCast,
+                    ErrorCode.InvalidCast,
                     Name,
                     typeof(T).Name
                 )

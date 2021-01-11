@@ -101,7 +101,7 @@ public class ForEachTests : StepTestBase<ForEach<int>, Unit>
                 },
                 new SingleError(
                     EntireSequenceLocation.Instance,
-                    ErrorCode_Core.Test,
+                    ErrorCode.Test,
                     "Array Failure"
                 )
             );
@@ -116,7 +116,7 @@ public class ForEachTests : StepTestBase<ForEach<int>, Unit>
                 },
                 new SingleError(
                     EntireSequenceLocation.Instance,
-                    ErrorCode_Core.Test,
+                    ErrorCode.Test,
                     "Action Failure"
                 )
             );

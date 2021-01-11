@@ -13,19 +13,19 @@ public class SingleError : IError
     /// <summary>
     /// Create a new SingleError.
     /// </summary>
-    public SingleError(IErrorLocation location, Exception exception, ErrorCode errorCode)
+    public SingleError(IErrorLocation location, Exception exception, ErrorCodeBase errorCodeBase)
     {
         Location     = location;
-        ErrorBuilder = new ErrorBuilder(exception, errorCode);
+        ErrorBuilder = new ErrorBuilder(exception, errorCodeBase);
     }
 
     /// <summary>
     /// Create a new SingleError.
     /// </summary>
-    public SingleError(IErrorLocation location, ErrorCode errorCode, params object?[] args)
+    public SingleError(IErrorLocation location, ErrorCodeBase errorCodeBase, params object?[] args)
     {
         Location     = location;
-        ErrorBuilder = new ErrorBuilder(errorCode, args);
+        ErrorBuilder = new ErrorBuilder(errorCodeBase, args);
     }
 
     /// <summary>

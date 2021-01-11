@@ -93,7 +93,7 @@ public sealed class Schema
             else
                 errors.Add(
                     new ErrorBuilder(
-                        ErrorCode_Core.SchemaViolationUnexpectedProperty,
+                        ErrorCode.SchemaViolationUnexpectedProperty,
                         entityProperty.Name
                     )
                 );
@@ -104,7 +104,7 @@ public sealed class Schema
                 x => x.Value.Multiplicity == Multiplicity.ExactlyOne
                   || x.Value.Multiplicity == Multiplicity.AtLeastOne
             ))
-            errors.Add(new ErrorBuilder(ErrorCode_Core.SchemaViolationMissingProperty, key));
+            errors.Add(new ErrorBuilder(ErrorCode.SchemaViolationMissingProperty, key));
 
         if (errors.Any())
         {
@@ -151,7 +151,7 @@ public sealed class Schema
                         return SchemaProperty.TryCreateFromEntity(childEntity.Value);
 
                     return new ErrorBuilder(
-                        ErrorCode_Core.InvalidCast,
+                        ErrorCode.InvalidCast,
                         ev,
                         typeof(SchemaProperty).Name
                     );

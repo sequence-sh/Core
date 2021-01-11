@@ -52,7 +52,7 @@ public sealed class GenericTypeReference : ITypeReference, IEquatable<ITypeRefer
             #pragma warning disable CA1031 // Do not catch general exception types
             catch (Exception e)
             {
-                return new ErrorBuilder(e, ErrorCode_Core.InvalidCast);
+                return new ErrorBuilder(e, ErrorCode.InvalidCast);
             }
             #pragma warning restore CA1031 // Do not catch general exception types
         }
@@ -64,7 +64,7 @@ public sealed class GenericTypeReference : ITypeReference, IEquatable<ITypeRefer
         int argumentNumber)
     {
         if (argumentNumber < 0 || TypeArgumentReferences.Count <= argumentNumber)
-            return new ErrorBuilder(ErrorCode_Core.CannotInferType);
+            return new ErrorBuilder(ErrorCode.CannotInferType);
 
         var r = TypeArgumentReferences[argumentNumber].TryGetActualTypeReference(typeResolver);
 
@@ -105,7 +105,7 @@ public sealed class GenericTypeReference : ITypeReference, IEquatable<ITypeRefer
             #pragma warning disable CA1031 // Do not catch general exception types
             catch (Exception e)
             {
-                return new ErrorBuilder(e, ErrorCode_Core.InvalidCast);
+                return new ErrorBuilder(e, ErrorCode.InvalidCast);
             }
             #pragma warning restore CA1031 // Do not catch general exception types
         }

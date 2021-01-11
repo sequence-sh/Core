@@ -115,7 +115,7 @@ public static class CSVReader
         else
             return new SingleError(
                 errorLocation,
-                ErrorCode_Core.SingleCharacterExpected,
+                ErrorCode.SingleCharacterExpected,
                 propertyName,
                 charResult.Value
             );
@@ -179,7 +179,7 @@ public static class CSVReader
 
         bool HandleException(CsvHelperException exception)
         {
-            throw new ErrorException(new SingleError(location, exception, ErrorCode_Core.CSVError));
+            throw new ErrorException(new SingleError(location, exception, ErrorCode.CSVError));
         }
     }
 }

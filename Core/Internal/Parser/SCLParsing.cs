@@ -28,7 +28,10 @@ public static class SCLParsing
     public static Result<IFreezableStep, IError> ParseSequence(string text)
     {
         if (string.IsNullOrWhiteSpace(text))
-            return new SingleError(EntireSequenceLocation.Instance, ErrorCode_Core.EmptySequence);
+            return new SingleError(
+                EntireSequenceLocation.Instance,
+                ErrorCode.EmptySequence
+            );
 
         var r = TryParse(text).Map(x => x.ConvertToStep());
 
@@ -84,7 +87,7 @@ public static class SCLParsing
         {
             var error = new SingleError(
                 new TextLocation(offendingSymbol),
-                ErrorCode_Core.SCLSyntaxError,
+                ErrorCode.SCLSyntaxError,
                 msg
             );
 
@@ -124,7 +127,7 @@ public static class SCLParsing
                 return result.ConvertFailure<FreezableStepProperty>();
 
             if (result.Value.Count == 0)
-                return new SingleError(new TextLocation(context), ErrorCode_Core.EmptySequence);
+                return new SingleError(new TextLocation(context), ErrorCode.EmptySequence);
 
             var sequence = CreateFreezableSequence(
                 result.Value.SkipLast(1).ToList(),
@@ -171,7 +174,7 @@ public static class SCLParsing
 
                 return new SingleError(
                     new TextLocation(context),
-                    ErrorCode_Core.CouldNotParse,
+                    ErrorCode.CouldNotParse,
                     message,
                     nameof(DateTime)
                 );
@@ -209,7 +212,7 @@ public static class SCLParsing
         public override Result<FreezableStepProperty, IError> VisitErrorNode(IErrorNode node) =>
             new SingleError(
                 new TextLocation(node.Symbol),
-                ErrorCode_Core.SCLSyntaxError,
+                ErrorCode.SCLSyntaxError,
                 node.GetText()
             );
 
@@ -217,7 +220,7 @@ public static class SCLParsing
         {
             return new SingleError(
                 new TextLocation(pt),
-                ErrorCode_Core.SCLSyntaxError,
+                ErrorCode.SCLSyntaxError,
                 pt.GetText()
             );
         }
@@ -280,7 +283,7 @@ public static class SCLParsing
 
             return new SingleError(
                 new TextLocation(context),
-                ErrorCode_Core.CouldNotParse,
+                ErrorCode.CouldNotParse,
                 context.GetText(),
                 "Number"
             );
@@ -495,7 +498,11 @@ public static class SCLParsing
             foreach (var duplicateKeys in l.GroupBy(x => x.key).Where(x => x.Count() > 1))
             {
                 errors.Add(
-                    new SingleError(location, ErrorCode_Core.DuplicateParameter, duplicateKeys.Key)
+                    new SingleError(
+                        location,
+                        ErrorCode.DuplicateParameter,
+                        duplicateKeys.Key
+                    )
                 );
             }
 

@@ -25,7 +25,7 @@ public sealed class AssertTrue : CompoundStep<Unit>
                 x => x,
                 new SingleError(
                     new StepErrorLocation(this),
-                    ErrorCode_Core.AssertionFailed,
+                    ErrorCode.AssertionFailed,
                     Boolean.Name
                 )
             )

@@ -80,9 +80,7 @@ public sealed class ScopedStateMonad : IStateMonad
         var r2 = StateMonad
             .TryGetVariableFromDictionary<T>(key, _fixedState)
             .Bind(
-                x => x.ToResult<T, IErrorBuilder>(
-                    new ErrorBuilder(ErrorCode_Core.MissingVariable, key)
-                )
+                x => x.ToResult<T, IErrorBuilder>(new ErrorBuilder(ErrorCode.MissingVariable, key))
             );
 
         return r2;

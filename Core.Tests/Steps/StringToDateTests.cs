@@ -90,7 +90,7 @@ public class StringToDateTests : StepTestBase<StringToDate, DateTime>
                     new FormatException(
                         "The string 'not a date' was not recognized as a valid DateTime. There is an unknown word starting at index '0'."
                     ),
-                    ErrorCode_Core.CouldNotParse
+                    ErrorCode.CouldNotParse
                 )
             );
 
@@ -104,7 +104,7 @@ public class StringToDateTests : StepTestBase<StringToDate, DateTime>
                     new FormatException(
                         "String 'not a date' was not recognized as a valid DateTime."
                     ),
-                    ErrorCode_Core.CouldNotParse
+                    ErrorCode.CouldNotParse
                 )
             );
         }

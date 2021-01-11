@@ -93,7 +93,11 @@ public class ArrayFilterTests : StepTestBase<ArrayFilter<Entity>, Array<Entity>>
                     Array     = new FailStep<Array<Entity>>() { ErrorMessage = "Stream Fail" },
                     Predicate = Constant(true)
                 },
-                new SingleError(EntireSequenceLocation.Instance, ErrorCode_Core.Test, "Stream Fail")
+                new SingleError(
+                    EntireSequenceLocation.Instance,
+                    ErrorCode.Test,
+                    "Stream Fail"
+                )
             );
         }
     }

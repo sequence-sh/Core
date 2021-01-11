@@ -20,7 +20,7 @@ public class EmptySettings : ISettings
 
     /// <inheritdoc />
     public Result<Unit, IErrorBuilder> CheckRequirement(Requirement requirement) =>
-        new ErrorBuilder(ErrorCode_Core.RequirementNotMet, requirement);
+        new ErrorBuilder(ErrorCode.RequirementNotMet, requirement);
 }
 
 }

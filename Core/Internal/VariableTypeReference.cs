@@ -61,7 +61,7 @@ public sealed class VariableTypeReference : ITypeReference, IEquatable<ITypeRefe
         var r = tr.Dictionary.TryFindOrFail(
             VariableName,
             () => new ErrorBuilder(
-                ErrorCode_Core.CouldNotResolveVariable,
+                ErrorCode.CouldNotResolveVariable,
                 VariableName.Name
             ) as IErrorBuilder
         );

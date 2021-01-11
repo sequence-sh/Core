@@ -31,7 +31,7 @@ public class ApplyMathOperatorTests : StepTestBase<ApplyMathOperator, int>
                     Operator = Constant(MathOperator.Divide),
                     Right    = Constant(0)
                 },
-                new ErrorBuilder(ErrorCode_Core.DivideByZero)
+                new ErrorBuilder(ErrorCode.DivideByZero)
             );
 
             yield return new ErrorCase(
@@ -43,7 +43,7 @@ public class ApplyMathOperatorTests : StepTestBase<ApplyMathOperator, int>
                     Right    = Constant(2)
                 },
                 new ErrorBuilder(
-                    ErrorCode_Core.UnexpectedEnumValue,
+                    ErrorCode.UnexpectedEnumValue,
                     nameof(ApplyMathOperator.Operator),
                     MathOperator.None
                 )

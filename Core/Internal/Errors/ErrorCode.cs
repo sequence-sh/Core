@@ -4,7 +4,7 @@
 /// <summary>
 /// Identifying code for an error message.
 /// </summary>
-public abstract record ErrorCode(string Code)
+public abstract record ErrorCodeBase(string Code)
 {
     /// <summary>
     /// Get the format string for this Error Code

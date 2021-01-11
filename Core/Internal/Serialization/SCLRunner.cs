@@ -91,7 +91,7 @@ public sealed class SCLRunner
             return Result.Success<IStep<Unit>, IError>(unitStep);
         }
 
-        return new SingleError(new StepErrorLocation(step), ErrorCode_Core.UnitExpected);
+        return new SingleError(new StepErrorLocation(step), ErrorCode.UnitExpected);
     }
 
     /// <summary>
@@ -117,7 +117,7 @@ public sealed class SCLRunner
             result = new SingleError(
                 EntireSequenceLocation.Instance,
                 e,
-                ErrorCode_Core.ExternalProcessError
+                ErrorCode.ExternalProcessError
             );
         }
         #pragma warning restore CA1031 // Do not catch general exception types

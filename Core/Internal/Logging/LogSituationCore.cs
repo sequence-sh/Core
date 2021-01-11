@@ -7,7 +7,7 @@ namespace Reductech.EDR.Core.Internal.Logging
 /// <summary>
 /// Identifying code for a Core log situation.
 /// </summary>
-public record LogSituation : LogSituationBase
+public sealed record LogSituation : LogSituationBase
 {
     private LogSituation(string code, LogLevel logLevel) : base(code, logLevel) { }
 

@@ -74,7 +74,7 @@ public sealed class ApplyBooleanOperator : CompoundStep<bool>
             default:
                 return new SingleError(
                     new StepErrorLocation(this),
-                    ErrorCode_Core.UnexpectedEnumValue,
+                    ErrorCode.UnexpectedEnumValue,
                     nameof(Operator),
                     op.Value
                 );
