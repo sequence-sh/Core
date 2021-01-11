@@ -1,35 +1,7 @@
 ﻿using System.Diagnostics;
-using Reductech.EDR.Core.Internal.Errors;
 
-namespace Reductech.EDR.Core.Internal
+namespace Reductech.EDR.Core.Internal.Errors
 {
-
-/// <summary>
-/// Identifying code for an error message.
-/// </summary>
-public abstract record ErrorCode(string Code)
-{
-    /// <summary>
-    /// Get the format string for this Error Code
-    /// </summary>
-    public abstract string GetFormatString();
-
-    /// <summary>
-    /// Gets a formatted localized message for an error code
-    /// </summary>
-    public string GetFormattedMessage(params object?[] args)
-    {
-        var message          = GetFormatString();
-        var formattedMessage = string.Format(message, args);
-
-        return formattedMessage;
-    }
-
-    /// <summary>
-    /// The Error Code
-    /// </summary>
-    public string Code { get; init; } = Code;
-}
 
 /// <summary>
 /// Identifying code for an error message in Core
@@ -51,7 +23,7 @@ public record ErrorCode_Core : ErrorCode
     /*
      * To Generate:
      * Replace ([^\t]+)\t([^\t]+)\t
-     * With /// <summary>\r\n/// $2\r\n/// </summary>\r\n$1,\r\n
+     * With /// <summary>\r\n/// $2\r\n/// </summary>\r\npublic ErrorCode_Core $1 = new(nameof($1));\r\n
      */
 
     /// <summary>

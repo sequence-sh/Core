@@ -1,60 +1,99 @@
-﻿namespace Reductech.EDR.Core.Internal.Logging
+﻿using System.Diagnostics;
+using Microsoft.Extensions.Logging;
+
+namespace Reductech.EDR.Core.Internal.Logging
 {
 
 /// <summary>
-/// Different LoggingSituations
+/// Identifying code for a Core log situation.
 /// </summary>
-public enum LogSituation_Core
+public record LogSituation_Core : LogSituation
 {
-    /// <summary>
-    /// Whenever a step is entered.
-    /// </summary>
-    EnterStep,
+    private LogSituation_Core(string code, LogLevel logLevel) : base(code, logLevel) { }
+
+    /// <inheritdoc />
+    public override string GetLocalizedString()
+    {
+        var localizedMessage = LogMessages_EN
+            .ResourceManager.GetString(Code); //TODO static method to get this
+
+        Debug.Assert(localizedMessage != null, nameof(localizedMessage) + " != null");
+        return localizedMessage;
+    }
 
     /// <summary>
-    /// Whenever a step is exited after success.
+    /// Directory Deleted: {Path}
     /// </summary>
-    ExitStepSuccess,
+    public static readonly LogSituation_Core DirectoryDeleted = new(
+        nameof(DirectoryDeleted),
+        LogLevel.Debug
+    );
 
     /// <summary>
-    /// Whenever a step is existed after failure.
+    /// {StepName} Started with Parameters: {Parameters}
     /// </summary>
-    ExitStepFailure,
+    public static readonly LogSituation_Core EnterStep = new(nameof(EnterStep), LogLevel.Trace);
 
     /// <summary>
-    /// When a path is not fully qualified.
+    /// {StepName} Failed with message: {Message}
     /// </summary>
-    QualifyingPath,
+    public static readonly LogSituation_Core ExitStepFailure = new(
+        nameof(ExitStepFailure),
+        LogLevel.Warning
+    );
 
     /// <summary>
-    /// When Path.Combine is given an empty list of paths.
+    /// {StepName} Completed Successfully with Result: {Result}
     /// </summary>
-    NoPathProvided,
+    public static readonly LogSituation_Core ExitStepSuccess = new(
+        nameof(ExitStepSuccess),
+        LogLevel.Trace
+    );
 
     /// <summary>
-    /// Directory Deleted
+    /// File Deleted: {Path}
     /// </summary>
-    DirectoryDeleted,
+    public static readonly LogSituation_Core FileDeleted = new(nameof(FileDeleted), LogLevel.Debug);
 
     /// <summary>
-    /// File Deleted
+    /// Item to Delete did not Exist: {Path}
     /// </summary>
-    FileDeleted,
+    public static readonly LogSituation_Core ItemToDeleteDidNotExist = new(
+        nameof(ItemToDeleteDidNotExist),
+        LogLevel.Debug
+    );
 
     /// <summary>
-    /// Item to delete did not exist
+    /// No path was provided. Returning the Current Directory: {CurrentDirectory}
     /// </summary>
-    ItemToDeleteDidNotExist,
+    public static readonly LogSituation_Core NoPathProvided = new(
+        nameof(NoPathProvided),
+        LogLevel.Warning
+    );
 
     /// <summary>
-    /// Tried to set a variable that was out of scope
+    /// Path {Path} was not fully qualified. Prepending the Current Directory: {CurrentDirectory}
     /// </summary>
-    SetVariableOutOfScope,
+    public static readonly LogSituation_Core QualifyingPath = new(
+        nameof(QualifyingPath),
+        LogLevel.Debug
+    );
 
     /// <summary>
-    /// Tried to remove a variable that was out of scope
+    /// Could not remove variable {variable} as it was out of scope.
     /// </summary>
-    RemoveVariableOutOfScope
+    public static readonly LogSituation_Core RemoveVariableOutOfScope = new(
+        nameof(RemoveVariableOutOfScope),
+        LogLevel.Warning
+    );
+
+    /// <summary>
+    /// Could not set variable {variable} as it was out of scope.
+    /// </summary>
+    public static readonly LogSituation_Core SetVariableOutOfScope = new(
+        nameof(SetVariableOutOfScope),
+        LogLevel.Warning
+    );
 }
 
 }
