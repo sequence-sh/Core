@@ -11,6 +11,9 @@ public sealed class StepListPropertyAttribute : StepPropertyBaseAttribute
 {
     /// <inheritdoc />
     public StepListPropertyAttribute(int order) : base(order) { }
+
+    /// <inheritdoc />
+    public StepListPropertyAttribute() { }
 }
 
 }

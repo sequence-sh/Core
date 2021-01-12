@@ -11,6 +11,9 @@ public sealed class VariableNameAttribute : StepPropertyBaseAttribute
 {
     /// <inheritdoc />
     public VariableNameAttribute(int order) : base(order) { }
+
+    /// <inheritdoc />
+    public VariableNameAttribute() { }
 }
 
 }
