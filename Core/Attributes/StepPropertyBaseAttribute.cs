@@ -10,14 +10,19 @@ namespace Reductech.EDR.Core.Attributes
 public abstract class StepPropertyBaseAttribute : Attribute
 {
     /// <summary>
-    /// Create a new StepPropertyBaseAttribute
+    /// Create a new StepPropertyBaseAttribute with a defined order
     /// </summary>
-    protected StepPropertyBaseAttribute(int order) => Order = order;
+    protected StepPropertyBaseAttribute(int? order) => Order = order;
+
+    /// <summary>
+    /// Create a new StepPropertyBaseAttribute with no defined order (this property will not be usable as a positional parameter)
+    /// </summary>
+    protected StepPropertyBaseAttribute() => Order = null;
 
     /// <summary>
     /// The order where this property should appear.
     /// </summary>
-    public int Order { get; }
+    public int? Order { get; }
 }
 
 }

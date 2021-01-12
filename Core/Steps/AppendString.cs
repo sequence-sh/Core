@@ -26,7 +26,7 @@ public sealed class AppendString : CompoundStep<Unit>
     /// <summary>
     /// The string to append.
     /// </summary>
-    [StepProperty(2)]
+    [StepProperty()]
     [Required]
     public IStep<StringStream> String { get; set; } = null!;
 

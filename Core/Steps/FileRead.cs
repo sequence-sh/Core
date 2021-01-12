@@ -48,7 +48,7 @@ public sealed class FileRead : CompoundStep<StringStream>
     public IStep<StringStream> Path { get; set; } = null!;
 
     /// <summary>
-    /// 
+    ///
     /// How the file is encoded.
     /// </summary>
     [StepProperty(2)]

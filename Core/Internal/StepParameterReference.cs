@@ -76,7 +76,9 @@ public readonly struct StepParameterReference : IEquatable<StepParameterReferenc
             yield break;
 
         yield return new StepParameterReference(propertyInfo.Name);
-        yield return new StepParameterReference(attribute.Order);
+
+        if (attribute.Order.HasValue)
+            yield return new StepParameterReference(attribute.Order.Value);
 
         foreach (var alias in propertyInfo.GetCustomAttributes<AliasAttribute>())
             yield return new StepParameterReference(alias.Name);

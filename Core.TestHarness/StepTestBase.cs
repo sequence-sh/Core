@@ -48,6 +48,7 @@ public abstract partial class StepTestBase<TStep, TOutput> : IStepTestBase
                      attribute: propertyInfo.GetCustomAttribute<StepPropertyBaseAttribute>())
             )
             .Where(x => x.attribute != null)
+            .Where(x => x.attribute.Order.HasValue)
             .OrderBy(x => x.attribute!.Order)
             .ToList();
 
@@ -118,10 +119,8 @@ public abstract partial class StepTestBase<TStep, TOutput> : IStepTestBase
             }
             else if (hasDefaultAttribute)
             {
-                if (propertyInfo.CustomAttributes.All(
-                        x => x.AttributeType.Name != "NullableAttribute"
-                    ) &&
-                    defaultValue == null)
+                if (defaultValue == null
+                 && propertyInfo.ToContextualProperty().Nullability != Nullability.Nullable)
                     errors.Add(
                         $"{propName} has a default value explanation but is not nullable and it's default value is null"
                     );
