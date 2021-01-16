@@ -1,12 +1,4 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using Namotion.Reflection;
-using Xunit;
-
-namespace Reductech.EDR.Core.TestHarness
+﻿namespace Reductech.EDR.Core.TestHarness
 {
 
 //public sealed class NonStaticMemberData : MemberDataAttributeBase

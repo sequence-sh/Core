@@ -4,7 +4,6 @@ using System.Text;
 using System.Threading.Tasks;
 using AutoTheory;
 using FluentAssertions;
-using Xunit;
 using Xunit.Abstractions;
 
 namespace Reductech.EDR.Core.TestHarness

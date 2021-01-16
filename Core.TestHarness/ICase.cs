@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using AutoTheory;
 using CSharpFunctionalExtensions;
 using Moq;
 using Reductech.EDR.Core.ExternalProcesses;
 using Reductech.EDR.Core.Internal;
-using Xunit.Abstractions;
 
 namespace Reductech.EDR.Core.TestHarness
 {

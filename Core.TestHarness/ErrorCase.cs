@@ -6,7 +6,6 @@ using CSharpFunctionalExtensions;
 using FluentAssertions;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
-using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.Util;
 using Xunit.Abstractions;
 using Xunit.Sdk;
@@ -16,7 +15,7 @@ namespace Reductech.EDR.Core.TestHarness
 
 public abstract partial class StepTestBase<TStep, TOutput>
 {
-    //[AutoTheory.GenerateAsyncTheory("ExpectError")]
+    [AutoTheory.GenerateAsyncTheory("ExpectError")]
     protected virtual IEnumerable<ErrorCase> ErrorCases => CreateDefaultErrorCases();
 
     #pragma warning disable CA1034 // Nested types should not be visible
