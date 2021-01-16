@@ -23,8 +23,7 @@ public abstract partial class StepTestBase<TStep, TOutput>
     #pragma warning disable CA1034 // Nested types should not be visible
     public abstract record CaseThatExecutes(
             string Name,
-            IReadOnlyCollection<string> ExpectedLoggedValues) : ICaseThatExecutes,
-                                                                IXunitSerializable
+            IReadOnlyCollection<string> ExpectedLoggedValues) : ICaseThatExecutes
         #pragma warning restore CA1034 // Nested types should not be visible
     {
         /// <inheritdoc />
@@ -160,12 +159,14 @@ public abstract partial class StepTestBase<TStep, TOutput>
         public ISettings Settings { get; set; } = EmptySettings.Instance;
 
         public Dictionary<VariableName, object> ExpectedFinalState { get; } = new();
+        public string Name { get; set; } = Name;
+
+        public IReadOnlyCollection<string> ExpectedLoggedValues { get; set; } =
+            ExpectedLoggedValues;
 
         /// <inheritdoc />
-        public void Deserialize(IXunitSerializationInfo info)
-        {
-            throw new NotImplementedException();
-        }
+        public void Deserialize(IXunitSerializationInfo info) =>
+            Name = info.GetValue<string>(nameof(Name));
 
         /// <inheritdoc />
         public void Serialize(IXunitSerializationInfo info)

@@ -215,7 +215,7 @@ Negation of a boolean value.
                 CancellationToken cancellation)
             #pragma warning restore 1998
         {
-            throw new NotImplementedException();
+            throw new Exception("Cannot run Documentation Example Step");
         }
 
         /// <summary>

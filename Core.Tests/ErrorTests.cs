@@ -141,11 +141,11 @@ public partial class RunErrorTests
             ExpectedErrors = expectedErrors;
         }
 
-        public string Name { get; }
+        public string Name { get; set; }
 
-        public IStep Process { get; }
+        public IStep Process { get; set; }
 
-        public IError ExpectedErrors { get; }
+        public IError ExpectedErrors { get; set; }
 
         /// <inheritdoc />
         public async Task RunAsync(ITestOutputHelper testOutputHelper)
@@ -170,7 +170,7 @@ public partial class RunErrorTests
 
         /// <inheritdoc />
         public void Deserialize(IXunitSerializationInfo info) =>
-            throw new System.NotImplementedException();
+            Name = info.GetValue<string>(nameof(Name));
 
         /// <inheritdoc />
         public void Serialize(IXunitSerializationInfo info) => info.AddValue(nameof(Name), Name);

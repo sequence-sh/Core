@@ -269,10 +269,10 @@ public partial class LoggingTestCases
             ExpectedLogs = expectedLogs;
         }
 
-        public string Name { get; }
+        public string Name { get; set; }
 
-        public string SCL { get; }
-        public IReadOnlyList<Action<LogEntry>> ExpectedLogs { get; }
+        public string SCL { get; set; }
+        public IReadOnlyList<Action<LogEntry>> ExpectedLogs { get; set; }
 
         public List<Action<Mock<IFileSystemHelper>>>? FileSystemActions { get; set; }
 
@@ -309,7 +309,7 @@ public partial class LoggingTestCases
 
         /// <inheritdoc />
         public void Deserialize(IXunitSerializationInfo info) =>
-            throw new NotImplementedException();
+            Name = info.GetValue<string>(nameof(Name));
 
         /// <inheritdoc />
         public void Serialize(IXunitSerializationInfo info) => info.AddValue(nameof(Name), Name);
