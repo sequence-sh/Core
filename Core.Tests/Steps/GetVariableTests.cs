@@ -9,11 +9,8 @@ using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 namespace Reductech.EDR.Core.Tests.Steps
 {
 
-public class GetVariableTests : StepTestBase<GetVariable<int>, int>
+public partial class GetVariableTests : StepTestBase<GetVariable<int>, int>
 {
-    /// <inheritdoc />
-    public GetVariableTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper) { }
-
     /// <inheritdoc />
     protected override IEnumerable<StepCase> StepCases
     {
@@ -51,7 +48,7 @@ public class GetVariableTests : StepTestBase<GetVariable<int>, int>
             yield return new DeserializeCase(
                     "Short Form",
                     $"- <Foo> = 42\r\n- Print Value: <Foo>",
-                    Unit.Default,
+                    (Unit.Default),
                     "42"
                 )
                 .WithExpectedFinalState("Foo", 42);

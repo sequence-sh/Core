@@ -17,10 +17,9 @@ using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 namespace Reductech.EDR.Core.Tests.Steps
 {
 
-public class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Entity>>
+public partial class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Entity>>
 {
-    /// <inheritdoc />
-    public EnforceSchemaTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
+    partial void OnInitialized()
     {
         CultureInfo.DefaultThreadCurrentCulture   = new CultureInfo("en-GB");
         CultureInfo.DefaultThreadCurrentUICulture = new CultureInfo("en-GB");

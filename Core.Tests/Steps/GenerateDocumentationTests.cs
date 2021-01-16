@@ -14,12 +14,8 @@ using Xunit.Abstractions;
 namespace Reductech.EDR.Core.Tests.Steps
 {
 
-public class GenerateDocumentationTests : StepTestBase<GenerateDocumentation, StringStream>
+public partial class GenerateDocumentationTests : StepTestBase<GenerateDocumentation, StringStream>
 {
-    /// <inheritdoc />
-    public GenerateDocumentationTests(ITestOutputHelper testOutputHelper) :
-        base(testOutputHelper) { }
-
     /// <inheritdoc />
     protected override IEnumerable<StepCase> StepCases
     {

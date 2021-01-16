@@ -10,11 +10,8 @@ using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 namespace Reductech.EDR.Core.Tests.Steps
 {
 
-public class ArrayDistinctTests : StepTestBase<ArrayDistinct<Entity>, Array<Entity>>
+public partial class ArrayDistinctTests : StepTestBase<ArrayDistinct<Entity>, Array<Entity>>
 {
-    /// <inheritdoc />
-    public ArrayDistinctTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper) { }
-
     /// <inheritdoc />
     protected override IEnumerable<StepCase> StepCases
     {

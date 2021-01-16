@@ -1,20 +1,15 @@
 ﻿using System.Collections.Generic;
 using System.Collections.Immutable;
-using JetBrains.Annotations;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.TestHarness;
-using Xunit.Abstractions;
 using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
 
-public class ArrayTests : StepTestBase<ArrayNew<int>, Array<int>>
+public partial class ArrayTests : StepTestBase<ArrayNew<int>, Array<int>>
 {
-    /// <inheritdoc />
-    public ArrayTests([NotNull] ITestOutputHelper testOutputHelper) : base(testOutputHelper) { }
-
     /// <inheritdoc />
     protected override IEnumerable<DeserializeCase> DeserializeCases
     {

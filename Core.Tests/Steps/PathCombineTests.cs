@@ -10,11 +10,8 @@ using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 namespace Reductech.EDR.Core.Tests.Steps
 {
 
-public class PathCombineTests : StepTestBase<PathCombine, StringStream>
+public partial class PathCombineTests : StepTestBase<PathCombine, StringStream>
 {
-    /// <inheritdoc />
-    public PathCombineTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper) { }
-
     /// <inheritdoc />
     protected override IEnumerable<StepCase> StepCases
     {

@@ -8,7 +8,7 @@
 
 //namespace Reductech.EDR.Core.Tests.Steps
 //{
-//    public class EntityForEachTests : StepTestBase<EntityForEach, Unit>
+//    public partial class EntityForEachTests : StepTestBase<EntityForEach, Unit>
 //    {
 //        /// <inheritdoc />
 //        public EntityForEachTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper) { }

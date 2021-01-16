@@ -7,11 +7,8 @@ using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 namespace Reductech.EDR.Core.Tests.Steps
 {
 
-public class DoesDirectoryExistTests : StepTestBase<DirectoryExists, bool>
+public partial class DoesDirectoryExistTests : StepTestBase<DirectoryExists, bool>
 {
-    /// <inheritdoc />
-    public DoesDirectoryExistTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper) { }
-
     /// <inheritdoc />
     protected override IEnumerable<StepCase> StepCases
     {

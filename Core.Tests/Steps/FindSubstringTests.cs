@@ -7,11 +7,8 @@ using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 namespace Reductech.EDR.Core.Tests.Steps
 {
 
-public class FindSubstringTests : StepTestBase<FindSubstring, int>
+public partial class FindSubstringTests : StepTestBase<FindSubstring, int>
 {
-    /// <inheritdoc />
-    public FindSubstringTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper) { }
-
     /// <inheritdoc />
     protected override IEnumerable<StepCase> StepCases
     {

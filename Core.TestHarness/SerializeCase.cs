@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using AutoTheory;
 using FluentAssertions;
 using Xunit;
 using Xunit.Abstractions;
@@ -11,6 +12,7 @@ namespace Reductech.EDR.Core.TestHarness
 
 public abstract partial class StepTestBase<TStep, TOutput>
 {
+    [AutoTheory.GenerateAsyncTheory("Serialize")]
     protected virtual IEnumerable<SerializeCase> SerializeCases
     {
         get
@@ -21,43 +23,19 @@ public abstract partial class StepTestBase<TStep, TOutput>
         }
     }
 
-    public IEnumerable<object?[]> SerializeCaseNames =>
-        SerializeCases.Select(x => new[] { x.Name });
-
-    [Theory]
-    [NonStaticMemberData(nameof(SerializeCaseNames), true)]
-    public async Task Should_serialize_as_expected(string serializeCaseName)
-    {
-        await SerializeCases.FindAndRunAsync(serializeCaseName, TestOutputHelper);
-    }
-
     #pragma warning disable CA1034 // Nested types should not be visible
-    public class SerializeCase : ICase
+    public record SerializeCase(
+            string Name,
+            TStep Step,
+            string ExpectedSCL,
+            Configuration? ExpectedConfiguration = null) : IAsyncTestInstance, IXunitSerializable
         #pragma warning restore CA1034 // Nested types should not be visible
     {
-        public SerializeCase(
-            string name,
-            TStep step,
-            string expectedSCL,
-            Configuration? expectedConfiguration = null)
-        {
-            Name                  = name;
-            Step                  = step;
-            ExpectedSCL           = expectedSCL;
-            ExpectedConfiguration = expectedConfiguration;
-        }
-
-        public string Name { get; }
-
         /// <inheritdoc />
         public override string ToString() => Name;
 
-        public TStep Step { get; }
-        public string ExpectedSCL { get; }
-        public Configuration? ExpectedConfiguration { get; }
-
         /// <inheritdoc />
-        public async Task RunCaseAsync(ITestOutputHelper testOutputHelper, string? extraArgument)
+        public async Task RunAsync(ITestOutputHelper testOutputHelper)
         {
             var realSCL = Step.Serialize();
 
@@ -67,6 +45,13 @@ public abstract partial class StepTestBase<TStep, TOutput>
 
             await Task.CompletedTask;
         }
+
+        /// <inheritdoc />
+        public void Deserialize(IXunitSerializationInfo info) =>
+            throw new System.NotImplementedException();
+
+        /// <inheritdoc />
+        public void Serialize(IXunitSerializationInfo info) => info.AddValue(Name, Name);
     }
 
     public static async Task<SerializeCase> CreateDefaultSerializeCase()

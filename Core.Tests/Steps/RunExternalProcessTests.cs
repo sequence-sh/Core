@@ -15,11 +15,8 @@ using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 namespace Reductech.EDR.Core.Tests.Steps
 {
 
-public class RunExternalProcessTests : StepTestBase<RunExternalProcess, Unit>
+public partial class RunExternalProcessTests : StepTestBase<RunExternalProcess, Unit>
 {
-    /// <inheritdoc />
-    public RunExternalProcessTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper) { }
-
     /// <inheritdoc />
     protected override IEnumerable<StepCase> StepCases
     {

@@ -9,11 +9,8 @@ using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 namespace Reductech.EDR.Core.Tests.Steps
 {
 
-public class ArraySortEntitiesTests : StepTestBase<ArraySort<Entity>, Array<Entity>>
+public partial class ArraySortEntitiesTests : StepTestBase<ArraySort<Entity>, Array<Entity>>
 {
-    /// <inheritdoc />
-    public ArraySortEntitiesTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper) { }
-
     /// <inheritdoc />
     protected override IEnumerable<StepCase> StepCases
     {

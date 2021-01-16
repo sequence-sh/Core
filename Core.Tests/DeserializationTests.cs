@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using AutoTheory;
 using FluentAssertions;
 using MELT;
 using Microsoft.Extensions.Logging;
@@ -10,215 +11,203 @@ using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Parser;
 using Reductech.EDR.Core.TestHarness;
 using Reductech.EDR.Core.Util;
-using Reductech.Utilities.Testing;
 using Xunit;
 using Xunit.Abstractions;
 
 namespace Reductech.EDR.Core.Tests
 {
 
-public class DeserializationTests : DeserializationTestCases
+public partial class DeserializationTests
 {
-    public DeserializationTests(ITestOutputHelper testOutputHelper) =>
-        TestOutputHelper = testOutputHelper;
-
-    /// <inheritdoc />
-    [Theory()]
-    [ClassData(typeof(DeserializationTestCases))]
-    public override Task Test(string key) => base.Test(key);
-}
-
-public class DeserializationTestCases : TestBaseParallel
-{
-    /// <inheritdoc />
-    protected override IEnumerable<ITestBaseCaseParallel> TestCases
+    [GenerateAsyncTheory("Deserialize")]
+    public IEnumerable<DeserializationTestInstance> TestCases
     {
         get
         {
-            yield return new DeserializationTestFunction(
+            yield return new DeserializationTestInstance(
                 @"- <Foo> = 'Hello World'
 - <Bar> = <Foo>
 - Print <Bar>",
                 "Hello World"
             );
 
-            yield return new DeserializationTestFunction(
+            yield return new DeserializationTestInstance(
                 @"Print 'Mark''s string'",
                 "Mark's string"
             );
 
-            yield return new DeserializationTestFunction(
+            yield return new DeserializationTestInstance(
                 @"Print ""Mark's string""",
                 "Mark's string"
             );
 
-            yield return new DeserializationTestFunction(
+            yield return new DeserializationTestInstance(
                 @"Print 'Comments!' #This is a comment",
                 "Comments!"
             );
 
-            yield return new DeserializationTestFunction(
+            yield return new DeserializationTestInstance(
                 @"#This is a comment
 Print 'Comments!'",
                 "Comments!"
             );
 
-            yield return new DeserializationTestFunction(
+            yield return new DeserializationTestInstance(
                 @"/*This is a comment
 block*/
 Print 'Comments!'",
                 "Comments!"
             );
 
-            yield return new DeserializationTestFunction(
+            yield return new DeserializationTestInstance(
                 @"Print /*Comment Block */ 'Comments!' ",
                 "Comments!"
             );
 
-            yield return new DeserializationTestFunction(@"Print (2 * 3)", 6);
+            yield return new DeserializationTestInstance(@"Print (2 * 3)", 6);
 
-            yield return new DeserializationTestFunction(@"Print(3 - 2)", 1);
+            yield return new DeserializationTestInstance(@"Print(3 - 2)", 1);
 
-            yield return new DeserializationTestFunction(@"print(2 * 3)", 6);
+            yield return new DeserializationTestInstance(@"print(2 * 3)", 6);
 
-            yield return new DeserializationTestFunction(@"print(6 / 3)", 2);
+            yield return new DeserializationTestInstance(@"print(6 / 3)", 2);
 
-            yield return new DeserializationTestFunction(@"print(6 ^ 2)", 36);
+            yield return new DeserializationTestInstance(@"print(6 ^ 2)", 36);
 
-            yield return new DeserializationTestFunction(@"print(7 % 2)", 1);
+            yield return new DeserializationTestInstance(@"print(7 % 2)", 1);
 
             yield return
-                new DeserializationTestFunction(
+                new DeserializationTestInstance(
                     @"Print 'falsetto'",
                     "falsetto"
                 ); //check 'false' delimiter
 
             yield return
-                new DeserializationTestFunction(
+                new DeserializationTestInstance(
                     @"Print 'notable'",
                     "notable"
                 ); //check 'not' delimiter
 
-            yield return new DeserializationTestFunction(@"print(2*3)", 6);
+            yield return new DeserializationTestInstance(@"print(2*3)", 6);
 
-            yield return new DeserializationTestFunction(@"Print(2 ^ 3)", 8);
+            yield return new DeserializationTestInstance(@"Print(2 ^ 3)", 8);
 
-            yield return new DeserializationTestFunction(@"Print(not True)", false);
+            yield return new DeserializationTestInstance(@"Print(not True)", false);
 
-            yield return new DeserializationTestFunction(
+            yield return new DeserializationTestInstance(
                 @"Print 2020-11-22T20:30:40.0000000",
                 "2020-11-22T20:30:40.0000000"
             );
 
-            yield return new DeserializationTestFunction(
+            yield return new DeserializationTestInstance(
                 @"Print 2020-11-22",
                 "2020-11-22T00:00:00.0000000"
             );
 
-            yield return new DeserializationTestFunction(
+            yield return new DeserializationTestInstance(
                 @"Print 2020-11-22T20:30:40",
                 "2020-11-22T20:30:40.0000000"
             );
 
-            yield return new DeserializationTestFunction(
+            yield return new DeserializationTestInstance(
                 @"Print(stringToCase 'hello' textCase.Upper)",
                 "HELLO"
             );
 
-            yield return new DeserializationTestFunction(
+            yield return new DeserializationTestInstance(
                 @"Print(stringToCase 'hello' 'Upper')",
                 "HELLO"
             );
 
-            yield return new DeserializationTestFunction(@"Print(2 >= 3)", false);
-            yield return new DeserializationTestFunction(@"Print(4 >= 3)", true);
-            yield return new DeserializationTestFunction(@"Print(3 >= 3)", true);
+            yield return new DeserializationTestInstance(@"Print(2 >= 3)", false);
+            yield return new DeserializationTestInstance(@"Print(4 >= 3)", true);
+            yield return new DeserializationTestInstance(@"Print(3 >= 3)", true);
 
-            yield return new DeserializationTestFunction(@"Print(3 > 3)", false);
-            yield return new DeserializationTestFunction(@"Print(4 > 3)", true);
-            yield return new DeserializationTestFunction(@"Print(3 < 3)", false);
+            yield return new DeserializationTestInstance(@"Print(3 > 3)", false);
+            yield return new DeserializationTestInstance(@"Print(4 > 3)", true);
+            yield return new DeserializationTestInstance(@"Print(3 < 3)", false);
 
-            yield return new DeserializationTestFunction(@"Print(3 <= 3)", true);
+            yield return new DeserializationTestInstance(@"Print(3 <= 3)", true);
 
-            yield return new DeserializationTestFunction(@"Print(2 * (3 + 4))", 14);
-            yield return new DeserializationTestFunction(@"Print((2 * 3) + 4)", 10);
+            yield return new DeserializationTestInstance(@"Print(2 * (3 + 4))", 14);
+            yield return new DeserializationTestInstance(@"Print((2 * 3) + 4)", 10);
 
-            yield return new DeserializationTestFunction(@"Print((2 >= 3))", false);
+            yield return new DeserializationTestInstance(@"Print((2 >= 3))", false);
 
-            yield return new DeserializationTestFunction(@"Print((2 * (3 + 4)))", 14);
-            yield return new DeserializationTestFunction(@"Print((2*(3+4)))",     14);
-            yield return new DeserializationTestFunction(@"Print(((2 * 3) + 4))", 10);
+            yield return new DeserializationTestInstance(@"Print((2 * (3 + 4)))", 14);
+            yield return new DeserializationTestInstance(@"Print((2*(3+4)))",     14);
+            yield return new DeserializationTestInstance(@"Print(((2 * 3) + 4))", 10);
 
-            yield return new DeserializationTestFunction(@"Print(True && False)", false);
+            yield return new DeserializationTestInstance(@"Print(True && False)", false);
 
-            yield return new DeserializationTestFunction(
+            yield return new DeserializationTestInstance(
                 @"Print ((StringIsEmpty 'Hello') && (StringIsEmpty 'World'))",
                 false
             );
 
-            yield return new DeserializationTestFunction(
+            yield return new DeserializationTestInstance(
                 @"Print((not True) && (not False))",
                 false
             );
 
-            yield return new DeserializationTestFunction(@"Print(true && false)", false);
+            yield return new DeserializationTestInstance(@"Print(true && false)", false);
 
-            yield return new DeserializationTestFunction("Print(ArrayIsEmpty([]))", true);
+            yield return new DeserializationTestInstance("Print(ArrayIsEmpty([]))", true);
 
-            yield return new DeserializationTestFunction(@"<ArrayVar> = ['abc', '123']");
+            yield return new DeserializationTestInstance(@"<ArrayVar> = ['abc', '123']");
 
-            yield return new DeserializationTestFunction("-<Seven> = 3 + 4\r\n- Print <Seven>", 7);
+            yield return new DeserializationTestInstance("-<Seven> = 3 + 4\r\n- Print <Seven>", 7);
 
-            yield return new DeserializationTestFunction("2 + 2 | Print", 4);
+            yield return new DeserializationTestInstance("2 + 2 | Print", 4);
 
-            yield return new DeserializationTestFunction("StringIsEmpty 'World' | Print", false);
+            yield return new DeserializationTestInstance("StringIsEmpty 'World' | Print", false);
 
-            yield return new DeserializationTestFunction(
+            yield return new DeserializationTestInstance(
                 "3 | ApplyMathOperator 'Add' 4 | ApplyMathOperator 'Multiply' 5 | Print",
                 35
             );
 
-            yield return new DeserializationTestFunction(
+            yield return new DeserializationTestInstance(
                 "Print (3 | ApplyMathOperator 'Add' 4 | ApplyMathOperator 'Multiply' 5)",
                 35
             );
 
-            yield return new DeserializationTestFunction(
+            yield return new DeserializationTestInstance(
                 @"
 - <ArrayVar> = ['abc', '123']
 - Print(ArrayLength <ArrayVar>)",
                 2
             );
 
-            yield return new DeserializationTestFunction(@"Print(ArrayLength ['abc', '123'])", 2);
+            yield return new DeserializationTestInstance(@"Print(ArrayLength ['abc', '123'])", 2);
 
-            yield return new DeserializationTestFunction(
+            yield return new DeserializationTestInstance(
                 "- <ArrayVar> =  ['abc', '123']\r\n- Print(ArrayLength <ArrayVar>)",
                 2
             );
 
-            yield return new DeserializationTestFunction(
+            yield return new DeserializationTestInstance(
                 @"
 - <ArrayVar> = ['abc', '123']
 - Print(ArrayIsEmpty <ArrayVar>)",
                 false
             );
 
-            yield return new DeserializationTestFunction(
+            yield return new DeserializationTestInstance(
                 @"
 - <ArrayVar> =  ['abc', '123']
 - Print(ElementAtIndex <ArrayVar> 1)",
                 "123"
             );
 
-            yield return new DeserializationTestFunction(
+            yield return new DeserializationTestInstance(
                 @"
 - <ArrayVar> = ['abc', '123']
 - Print(FindElement <ArrayVar> '123')",
                 "1"
             );
 
-            yield return new DeserializationTestFunction(
+            yield return new DeserializationTestInstance(
                 @"
 - <ArrayVar> = ['abc', '123']
 - Foreach <ArrayVar> (Print <Element>) <Element>",
@@ -226,21 +215,21 @@ Print 'Comments!'",
                 "123"
             );
 
-            yield return new DeserializationTestFunction(
+            yield return new DeserializationTestInstance(
                 @"
 - <ArrayVar> = [(str: 'abc' num: '123')]
 - Foreach <ArrayVar> (Print <Entity>)",
                 "(str: \"abc\" num: \"123\")"
             );
 
-            yield return new DeserializationTestFunction(
+            yield return new DeserializationTestInstance(
                 @"
 - <ArrayVar> = [(str: 'abc' num: '123')]
 - EntityForeach <ArrayVar> (Print <Entity>)",
                 "(str: \"abc\" num: \"123\")"
             );
 
-            yield return new DeserializationTestFunction(
+            yield return new DeserializationTestInstance(
                 @"
 - <ArrayVar1> = ['abc', '123']
 - <ArrayVar2> = (Repeat <ArrayVar1> 2)
@@ -249,7 +238,7 @@ Print 'Comments!'",
                 "2"
             );
 
-            yield return new DeserializationTestFunction(
+            yield return new DeserializationTestInstance(
                 @"
 - <ArrayVar> = ['abc', 'def']
 - <Sorted> = (ArraySort <ArrayVar>)
@@ -257,7 +246,7 @@ Print 'Comments!'",
                 "abc"
             );
 
-            yield return new DeserializationTestFunction(
+            yield return new DeserializationTestInstance(
                 @"
 - <ConditionVar> = true
 - If <ConditionVar> (Print 1) (Print 2)",
@@ -314,14 +303,14 @@ Print 'Comments!'",
             //                    }
             //                };
 
-            yield return new DeserializationTestFunction(
+            yield return new DeserializationTestInstance(
                 @"ForEach ['a','b','c'] (Print <char>) <char>",
                 "a",
                 "b",
                 "c"
             );
 
-            yield return new DeserializationTestFunction(
+            yield return new DeserializationTestInstance(
                 @"ForEach
 ['a','b','c']
 (Print <char>)
@@ -333,16 +322,13 @@ Print 'Comments!'",
         }
     }
 
-    private class DeserializationTestFunction : ITestBaseCaseParallel
+    public record DeserializationTestInstance : IAsyncTestInstance
     {
-        public DeserializationTestFunction(string scl, params object[] expectedLoggedValues)
+        public DeserializationTestInstance(string scl, params object[] expectedLoggedValues)
         {
             SCL                  = scl;
             ExpectedLoggedValues = expectedLoggedValues.Select(x => x.ToString()!).ToList();
         }
-
-        /// <inheritdoc />
-        public string Name => SCL;
 
         private string SCL { get; }
 
@@ -351,7 +337,7 @@ Print 'Comments!'",
         private IReadOnlyCollection<string> ExpectedLoggedValues { get; }
 
         /// <inheritdoc />
-        public async Task ExecuteAsync(ITestOutputHelper testOutputHelper)
+        public async Task RunAsync(ITestOutputHelper testOutputHelper)
         {
             testOutputHelper.WriteLine(SCL);
 
@@ -394,6 +380,18 @@ Print 'Comments!'",
             {
                 freezeResult.Value.Configuration.Should().BeEquivalentTo(ExpectedConfiguration);
             }
+        }
+
+        /// <inheritdoc />
+        public void Deserialize(IXunitSerializationInfo info)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        /// <inheritdoc />
+        public void Serialize(IXunitSerializationInfo info)
+        {
+            throw new System.NotImplementedException();
         }
     }
 }

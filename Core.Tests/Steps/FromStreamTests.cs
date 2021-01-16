@@ -7,7 +7,7 @@
 
 //namespace Reductech.EDR.Core.Tests.Steps
 //{
-//    public class FromStreamTests : StepTestBase<StringFromStream, string>
+//    public partial class FromStreamTests : StepTestBase<StringFromStream, string>
 //    {
 //        /// <inheritdoc />
 //        public FromStreamTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)

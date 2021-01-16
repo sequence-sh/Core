@@ -10,12 +10,8 @@ using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 namespace Reductech.EDR.Core.Tests.Steps
 {
 
-public class AppendStringTests : StepTestBase<AppendString, Unit>
+public partial class AppendStringTests : StepTestBase<AppendString, Unit>
 {
-    /// <inheritdoc />
-    public AppendStringTests([NotNull] ITestOutputHelper testOutputHelper) :
-        base(testOutputHelper) { }
-
     /// <inheritdoc />
     protected override IEnumerable<ErrorCase> ErrorCases => CreateDefaultErrorCases();
 

@@ -9,11 +9,8 @@ using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 namespace Reductech.EDR.Core.Tests.Steps
 {
 
-public class SetVariableTests : StepTestBase<SetVariable<int>, Unit>
+public partial class SetVariableTests : StepTestBase<SetVariable<int>, Unit>
 {
-    /// <inheritdoc />
-    public SetVariableTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper) { }
-
     /// <inheritdoc />
     protected override IEnumerable<StepCase> StepCases
     {

@@ -9,7 +9,6 @@ using Namotion.Reflection;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal;
 using Xunit;
-using Xunit.Abstractions;
 using Xunit.Sdk;
 
 namespace Reductech.EDR.Core.TestHarness
@@ -25,15 +24,10 @@ public interface IStepTestBase
 public abstract partial class StepTestBase<TStep, TOutput> : IStepTestBase
     where TStep : class, ICompoundStep<TOutput>, new()
 {
-    protected StepTestBase(ITestOutputHelper testOutputHelper) =>
-        TestOutputHelper = testOutputHelper;
-
     public string StepName => typeof(TStep).GetDisplayName();
 
     /// <inheritdoc />
     public Type StepType => typeof(TStep);
-
-    public ITestOutputHelper TestOutputHelper { get; }
 
     [Fact]
     public void All_Properties_should_have_distinct_consecutive_positive_orders()

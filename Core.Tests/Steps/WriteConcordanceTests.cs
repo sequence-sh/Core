@@ -9,11 +9,8 @@ using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 namespace Reductech.EDR.Core.Tests.Steps
 {
 
-public class WriteConcordanceTests : StepTestBase<ToConcordance, StringStream>
+public partial class WriteConcordanceTests : StepTestBase<ToConcordance, StringStream>
 {
-    /// <inheritdoc />
-    public WriteConcordanceTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper) { }
-
     /// <inheritdoc />
     protected override IEnumerable<StepCase> StepCases
     {

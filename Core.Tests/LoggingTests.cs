@@ -10,65 +10,17 @@ using Moq;
 using Reductech.EDR.Core.ExternalProcesses;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Serialization;
-using Reductech.Utilities.Testing;
-using Xunit;
+using Reductech.EDR.Core.TestHarness;
 using Xunit.Abstractions;
+using AutoTheory;
 
 namespace Reductech.EDR.Core.Tests
 {
 
-public class LoggingTests : LoggingTestCases
+public partial class LoggingTestCases
 {
-    [Fact(Skip = "Example test for a MELT issue")]
-    public void LogEntryScopeShouldBeMostInnerOpenScope()
-    {
-        var loggerFactory = TestLoggerFactory.Create();
-        loggerFactory.AddXunit(TestOutputHelper);
-
-        var logger = loggerFactory.CreateLogger("Test");
-
-        using (logger.BeginScope("Outer Scope"))
-        {
-            logger.LogInformation("Message 1");
-
-            using (logger.BeginScope("Inner Scope"))
-            {
-                logger.LogInformation("Message 2");
-            }
-
-            logger.LogInformation("Message 3");
-        }
-
-        loggerFactory.Sink.LogEntries
-            .Should()
-            .SatisfyRespectively(
-                CheckMessageAndScope("Message 1", "Outer Scope"),
-                CheckMessageAndScope("Message 2", "Inner Scope"),
-                CheckMessageAndScope("Message 3", "Outer Scope")
-            );
-
-        static Action<LogEntry> CheckMessageAndScope(string expectedMessage, string expectedScope)
-        {
-            return entry =>
-            {
-                entry.Message.Should().Be(expectedMessage);
-                entry.Scope.Message.Should().Be(expectedScope);
-            };
-        }
-    }
-
-    public LoggingTests(ITestOutputHelper testOutputHelper) => TestOutputHelper = testOutputHelper;
-
-    /// <inheritdoc />
-    [Theory]
-    [ClassData(typeof(LoggingTestCases))]
-    public override Task Test(string key) => base.Test(key);
-}
-
-public class LoggingTestCases : TestBaseParallel
-{
-    /// <inheritdoc />
-    protected override IEnumerable<ITestBaseCaseParallel> TestCases
+    [GenerateAsyncTheory("CheckLogging")]
+    public IEnumerable<LoggingTestCase> TestCases
     {
         get
         {
@@ -308,7 +260,7 @@ public class LoggingTestCases : TestBaseParallel
         };
     }
 
-    private class LoggingTestCase : ITestBaseCaseParallel
+    public record LoggingTestCase : IAsyncTestInstance
     {
         public LoggingTestCase(string name, string scl, params Action<LogEntry>[] expectedLogs)
         {
@@ -317,7 +269,6 @@ public class LoggingTestCases : TestBaseParallel
             ExpectedLogs = expectedLogs;
         }
 
-        /// <inheritdoc />
         public string Name { get; }
 
         public string SCL { get; }
@@ -326,7 +277,7 @@ public class LoggingTestCases : TestBaseParallel
         public List<Action<Mock<IFileSystemHelper>>>? FileSystemActions { get; set; }
 
         /// <inheritdoc />
-        public async Task ExecuteAsync(ITestOutputHelper testOutputHelper)
+        public async Task RunAsync(ITestOutputHelper testOutputHelper)
         {
             var spf = StepFactoryStore.CreateUsingReflection(typeof(IStep));
 
@@ -355,6 +306,13 @@ public class LoggingTestCases : TestBaseParallel
 
             loggerFactory.Sink.LogEntries.Should().SatisfyRespectively(ExpectedLogs);
         }
+
+        /// <inheritdoc />
+        public void Deserialize(IXunitSerializationInfo info) =>
+            throw new NotImplementedException();
+
+        /// <inheritdoc />
+        public void Serialize(IXunitSerializationInfo info) => info.AddValue(nameof(Name), Name);
     }
 }
 

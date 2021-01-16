@@ -7,11 +7,8 @@ using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 namespace Reductech.EDR.Core.Tests.Steps
 {
 
-public class EntityHasPropertyTests : StepTestBase<EntityHasProperty, bool>
+public partial class EntityHasPropertyTests : StepTestBase<EntityHasProperty, bool>
 {
-    /// <inheritdoc />
-    public EntityHasPropertyTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper) { }
-
     /// <inheritdoc />
     protected override IEnumerable<StepCase> StepCases
     {

@@ -11,13 +11,8 @@ using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 namespace Reductech.EDR.Core.Tests.Steps
 {
 
-public class ApplyMathOperatorTests : StepTestBase<ApplyMathOperator, int>
+public partial class ApplyMathOperatorTests : StepTestBase<ApplyMathOperator, int>
 {
-    /// <inheritdoc />
-    public ApplyMathOperatorTests([NotNull] ITestOutputHelper testOutputHelper) : base(
-        testOutputHelper
-    ) { }
-
     /// <inheritdoc />
     protected override IEnumerable<ErrorCase> ErrorCases
     {

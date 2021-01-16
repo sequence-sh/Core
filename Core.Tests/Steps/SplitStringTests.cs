@@ -7,11 +7,8 @@ using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 namespace Reductech.EDR.Core.Tests.Steps
 {
 
-public class SplitStringTests : StepTestBase<StringSplit, Array<StringStream>>
+public partial class SplitStringTests : StepTestBase<StringSplit, Array<StringStream>>
 {
-    /// <inheritdoc />
-    public SplitStringTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper) { }
-
     /// <inheritdoc />
     protected override IEnumerable<StepCase> StepCases
     {

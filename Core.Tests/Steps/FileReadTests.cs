@@ -12,11 +12,8 @@ using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 namespace Reductech.EDR.Core.Tests.Steps
 {
 
-public class FileReadTests : StepTestBase<FileRead, StringStream>
+public partial class FileReadTests : StepTestBase<FileRead, StringStream>
 {
-    /// <inheritdoc />
-    public FileReadTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper) { }
-
     /// <inheritdoc />
     protected override IEnumerable<StepCase> StepCases
     {

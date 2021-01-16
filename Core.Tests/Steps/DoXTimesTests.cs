@@ -9,11 +9,8 @@ using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 namespace Reductech.EDR.Core.Tests.Steps
 {
 
-public class DoXTimesTests : StepTestBase<DoXTimes, Unit>
+public partial class DoXTimesTests : StepTestBase<DoXTimes, Unit>
 {
-    /// <inheritdoc />
-    public DoXTimesTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper) { }
-
     /// <inheritdoc />
     protected override IEnumerable<StepCase> StepCases
     {

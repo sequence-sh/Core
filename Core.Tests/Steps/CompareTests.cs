@@ -12,11 +12,8 @@ using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 namespace Reductech.EDR.Core.Tests.Steps
 {
 
-public class CompareTests : StepTestBase<Compare<int>, bool>
+public partial class CompareTests : StepTestBase<Compare<int>, bool>
 {
-    /// <inheritdoc />
-    public CompareTests([NotNull] ITestOutputHelper testOutputHelper) : base(testOutputHelper) { }
-
     /// <inheritdoc />
     protected override IEnumerable<DeserializeCase> DeserializeCases
     {

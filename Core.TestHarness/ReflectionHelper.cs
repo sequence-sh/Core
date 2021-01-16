@@ -186,7 +186,6 @@ public abstract partial class StepTestBase<TStep, TOutput>
         PropertyInfo propertyInfo,
         int index)
     {
-        await Task.CompletedTask;
         var tStep = propertyInfo.PropertyType;
 
         var   outputType = tStep.GenericTypeArguments.First();
@@ -296,16 +295,6 @@ public abstract partial class StepTestBase<TStep, TOutput>
             throw new Exception(
                 $"{tStep.Name} should not have output type 'Stream' - it should be 'StringStream'"
             );
-            //var s = "Baz" + index;
-            //index++;
-
-            //byte[] byteArray = Encoding.UTF8.GetBytes(s);
-            //Stream stream = new MemoryStream(byteArray); //special case so we don't read the stream early
-
-            //step = Constant(stream);
-            //var asString = await GetStringAsync(Constant(s));
-
-            //return (step, asString, index);
         }
         else if (outputType == typeof(Entity))
         {
@@ -325,16 +314,6 @@ public abstract partial class StepTestBase<TStep, TOutput>
             throw new Exception(
                 $"{tStep.Name} should not have output type 'Schema' - it should be 'Entity'"
             );
-
-            //var schema = new Schema
-            //{
-            //    Name = "Schema" + index,
-            //    Properties = new Dictionary<string, SchemaProperty>()
-            //};
-            //index++;
-            //schema.Properties.Add("MyProp" + index, new SchemaProperty{Multiplicity = Multiplicity.Any, Type = SchemaPropertyType.Integer});
-            //index++;
-            //step = new Constant<Schema>(schema);
         }
         else
             throw new XunitException(

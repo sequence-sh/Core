@@ -12,12 +12,8 @@ using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 namespace Reductech.EDR.Core.Tests.Steps
 {
 
-public class AssertErrorTests : StepTestBase<AssertError, Unit>
+public partial class AssertErrorTests : StepTestBase<AssertError, Unit>
 {
-    /// <inheritdoc />
-    public AssertErrorTests([NotNull] ITestOutputHelper testOutputHelper) :
-        base(testOutputHelper) { }
-
     /// <inheritdoc />
     protected override IEnumerable<DeserializeCase> DeserializeCases
     {

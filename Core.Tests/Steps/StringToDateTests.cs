@@ -10,11 +10,8 @@ using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 namespace Reductech.EDR.Core.Tests.Steps
 {
 
-public class StringToDateTests : StepTestBase<StringToDate, DateTime>
+public partial class StringToDateTests : StepTestBase<StringToDate, DateTime>
 {
-    /// <inheritdoc />
-    public StringToDateTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper) { }
-
     /// <inheritdoc />
     protected override IEnumerable<StepCase> StepCases
     {

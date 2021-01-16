@@ -7,11 +7,8 @@ using Xunit.Abstractions;
 namespace Reductech.EDR.Core.Tests.Steps
 {
 
-public class DoNothingTests : StepTestBase<DoNothing, Unit>
+public partial class DoNothingTests : StepTestBase<DoNothing, Unit>
 {
-    /// <inheritdoc />
-    public DoNothingTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper) { }
-
     /// <inheritdoc />
     protected override IEnumerable<StepCase> StepCases
     {

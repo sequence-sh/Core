@@ -10,8 +10,8 @@ using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Parser;
 using Reductech.EDR.Core.Internal.Serialization;
 using Reductech.EDR.Core.Steps;
+using Reductech.EDR.Core.TestHarness;
 using Reductech.EDR.Core.Util;
-using Reductech.Utilities.Testing;
 using Xunit;
 using Xunit.Abstractions;
 using Xunit.Sdk;
@@ -23,7 +23,7 @@ namespace Reductech.EDR.Core.Tests
 /// <summary>
 /// These are not really tests but ways to quickly and easily run steps
 /// </summary>
-public class ExampleTests
+public partial class ExampleTests
 {
     public ExampleTests(ITestOutputHelper testOutputHelper) => TestOutputHelper = testOutputHelper;
 

@@ -10,11 +10,8 @@ using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 namespace Reductech.EDR.Core.Tests.Steps
 {
 
-public class CreateDirectoryTests : StepTestBase<CreateDirectory, Unit>
+public partial class CreateDirectoryTests : StepTestBase<CreateDirectory, Unit>
 {
-    /// <inheritdoc />
-    public CreateDirectoryTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper) { }
-
     /// <inheritdoc />
     protected override IEnumerable<StepCase> StepCases
     {

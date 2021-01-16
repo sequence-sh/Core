@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.TestHarness;
@@ -9,11 +8,8 @@ using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 namespace Reductech.EDR.Core.Tests.Steps
 {
 
-public class ElementAtIndexTests : StepTestBase<ElementAtIndex<StringStream>, StringStream>
+public partial class ElementAtIndexTests : StepTestBase<ElementAtIndex<StringStream>, StringStream>
 {
-    /// <inheritdoc />
-    public ElementAtIndexTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper) { }
-
     /// <inheritdoc />
     protected override IEnumerable<StepCase> StepCases
     {
@@ -47,13 +43,13 @@ public class ElementAtIndexTests : StepTestBase<ElementAtIndex<StringStream>, St
             yield return new DeserializeCase(
                 "Index 0",
                 "ElementAtIndex Array: ['Hello', 'World'] Index: 0",
-                "Hello"
+                new StringStream("Hello")
             );
 
             yield return new DeserializeCase(
                 "Index 1",
                 "ElementAtIndex Array: ['Hello', 'World'] Index: 1",
-                "World"
+                new StringStream("World")
             );
         }
     }

@@ -11,28 +11,18 @@ using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.Util;
-using Reductech.Utilities.Testing;
 using Xunit;
+using AutoTheory;
 using Xunit.Abstractions;
 using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 
 namespace Reductech.EDR.Core.Tests
 {
 
-public class RunErrorTests : RunErrorTestCases
+public partial class RunErrorTests
 {
-    public RunErrorTests(ITestOutputHelper testOutputHelper) => TestOutputHelper = testOutputHelper;
-
-    /// <inheritdoc />
-    [Theory]
-    [ClassData(typeof(RunErrorTestCases))]
-    public override Task Test(string key) => base.Test(key);
-}
-
-public class RunErrorTestCases : TestBaseParallel
-{
-    /// <inheritdoc />
-    protected override IEnumerable<ITestBaseCaseParallel> TestCases
+    [GenerateAsyncTheory("ExpectError")]
+    public IEnumerable<ErrorTestFunction> TestCases
     {
         get
         {
@@ -136,7 +126,7 @@ public class RunErrorTestCases : TestBaseParallel
 
     public static readonly VariableName FooString = new("Foo");
 
-    private class ErrorTestFunction : ITestBaseCaseParallel
+    public record ErrorTestFunction : IAsyncTestInstance
     {
         public ErrorTestFunction(string name, IStep process, IErrorBuilder expectedErrors)
         {
@@ -152,7 +142,6 @@ public class RunErrorTestCases : TestBaseParallel
             ExpectedErrors = expectedErrors;
         }
 
-        /// <inheritdoc />
         public string Name { get; }
 
         public IStep Process { get; }
@@ -160,7 +149,7 @@ public class RunErrorTestCases : TestBaseParallel
         public IError ExpectedErrors { get; }
 
         /// <inheritdoc />
-        public async Task ExecuteAsync(ITestOutputHelper testOutputHelper)
+        public async Task RunAsync(ITestOutputHelper testOutputHelper)
         {
             var spf  = StepFactoryStore.CreateUsingReflection(typeof(IStep));
             var repo = new MockRepository(MockBehavior.Strict);
@@ -179,6 +168,13 @@ public class RunErrorTestCases : TestBaseParallel
 
             r.Error.GetAllErrors().Should().BeEquivalentTo(ExpectedErrors.GetAllErrors());
         }
+
+        /// <inheritdoc />
+        public void Deserialize(IXunitSerializationInfo info) =>
+            throw new System.NotImplementedException();
+
+        /// <inheritdoc />
+        public void Serialize(IXunitSerializationInfo info) => info.AddValue(nameof(Name), Name);
     }
 }
 

@@ -8,11 +8,8 @@ using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 namespace Reductech.EDR.Core.Tests.Steps
 {
 
-public class UnzipTests : StepTestBase<FileExtract, Unit>
+public partial class UnzipTests : StepTestBase<FileExtract, Unit>
 {
-    /// <inheritdoc />
-    public UnzipTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper) { }
-
     /// <inheritdoc />
     protected override IEnumerable<StepCase> StepCases
     {

@@ -1,33 +1,21 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using AutoTheory;
 using CSharpFunctionalExtensions;
 using FluentAssertions;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Internal.Parser;
 using Reductech.EDR.Core.Internal.Serialization;
-using Reductech.Utilities.Testing;
-using Xunit;
 using Xunit.Abstractions;
 
 namespace Reductech.EDR.Core.Tests
 {
 
-public class DeserializationErrorTests : DeserializationErrorTestCases
+public partial class DeserializationErrorTests
 {
-    public DeserializationErrorTests(ITestOutputHelper testOutputHelper) =>
-        TestOutputHelper = testOutputHelper;
-
-    /// <inheritdoc />
-    [Theory()]
-    [ClassData(typeof(DeserializationErrorTestCases))]
-    public override void Test(string key) => base.Test(key);
-}
-
-public class DeserializationErrorTestCases : TestBase
-{
-    /// <inheritdoc />
-    protected override IEnumerable<ITestBaseCase> TestCases
+    [GenerateTheory("DeserializationError")]
+    protected IEnumerable<ITestInstance> TestCases
     {
         get
         {
@@ -90,27 +78,25 @@ public class DeserializationErrorTestCases : TestBase
         }
     }
 
-    private class DeserializationErrorCase : ITestBaseCase
+    private record DeserializationErrorCase : ITestInstance
     {
-        private readonly (string error, string location)[] _expectedErrors;
-
         public DeserializationErrorCase(
             string scl,
             params (string error, string location)[] expectedErrors)
         {
-            Name            = scl;
-            _expectedErrors = expectedErrors;
+            SCL            = scl;
+            ExpectedErrors = expectedErrors;
         }
 
-        /// <inheritdoc />
-        public string Name { get; }
+        public string SCL { get; init; }
+        public (string error, string location)[] ExpectedErrors { get; init; }
 
         /// <inheritdoc />
-        public void Execute(ITestOutputHelper testOutputHelper)
+        public void Run(ITestOutputHelper testOutputHelper)
         {
             var sfs = StepFactoryStore.CreateUsingReflection(typeof(IFreezableStep));
 
-            var result = SCLParsing.ParseSequence(Name)
+            var result = SCLParsing.ParseSequence(SCL)
                 .Bind(x => x.TryFreeze(sfs))
                 .Bind(SCLRunner.ConvertToUnitStep);
 
@@ -119,8 +105,15 @@ public class DeserializationErrorTestCases : TestBase
             var realErrorPairs =
                 result.Error.GetAllErrors().Select(x => (x.Message, x.Location.AsString)).ToArray();
 
-            realErrorPairs.Should().BeEquivalentTo(_expectedErrors);
+            realErrorPairs.Should().BeEquivalentTo(ExpectedErrors);
         }
+
+        /// <inheritdoc />
+        public void Deserialize(IXunitSerializationInfo info) =>
+            throw new System.NotImplementedException();
+
+        /// <inheritdoc />
+        public void Serialize(IXunitSerializationInfo info) => info.AddValue(nameof(SCL), SCL);
     }
 }
 
