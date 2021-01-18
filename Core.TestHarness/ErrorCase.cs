@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
@@ -8,7 +7,6 @@ using FluentAssertions;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Util;
-using Xunit;
 using Xunit.Abstractions;
 using Xunit.Sdk;
 
@@ -17,43 +15,34 @@ namespace Reductech.EDR.Core.TestHarness
 
 public abstract partial class StepTestBase<TStep, TOutput>
 {
+    [AutoTheory.GenerateAsyncTheory("ExpectError")]
     protected virtual IEnumerable<ErrorCase> ErrorCases => CreateDefaultErrorCases();
 
-    public IEnumerable<object?[]> ErrorCaseNames => ErrorCases.Select(x => new[] { x.Name });
-
-    [Theory]
-    [NonStaticMemberData(nameof(ErrorCaseNames), true)]
-    public virtual async Task Should_return_expected_errors(string errorCaseName)
-    {
-        await ErrorCases.FindAndRunAsync(errorCaseName, TestOutputHelper);
-    }
-
     #pragma warning disable CA1034 // Nested types should not be visible
-    public class ErrorCase : CaseThatExecutes
+    public record ErrorCase : CaseThatExecutes
         #pragma warning restore CA1034 // Nested types should not be visible
     {
         public ErrorCase(string name, IStep step, IError expectedError) : base(
-            ArraySegment<object>.Empty
+            name,
+            ArraySegment<string>.Empty
         )
         {
-            Name               = name;
             Step               = step;
             ExpectedError      = expectedError;
             IgnoreLoggedValues = true;
         }
 
-        public ErrorCase(string name, IStep step, IErrorBuilder expectedErrorBuilder)
-            : this(name, step, expectedErrorBuilder.WithLocation(step)) { }
-
-        public override string Name { get; }
+        public ErrorCase(string name, IStep step, IErrorBuilder expectedErrorBuilder) : this(
+            name,
+            step,
+            expectedErrorBuilder.WithLocation(step)
+        ) { }
 
         public IStep Step { get; }
         public IError ExpectedError { get; }
 
         /// <inheritdoc />
-        public override async Task<IStep> GetStepAsync(
-            ITestOutputHelper testOutputHelper,
-            string? extraArgument)
+        public override async Task<IStep> GetStepAsync(ITestOutputHelper testOutputHelper)
         {
             await Task.CompletedTask;
             return Step;

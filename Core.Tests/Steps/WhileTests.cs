@@ -4,17 +4,13 @@ using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.TestHarness;
 using Reductech.EDR.Core.Util;
-using Xunit.Abstractions;
 using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
 
-public class RepeatWhileTests : StepTestBase<While, Unit>
+public partial class WhileTests : StepTestBase<While, Unit>
 {
-    /// <inheritdoc />
-    public RepeatWhileTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper) { }
-
     /// <inheritdoc />
     protected override IEnumerable<StepCase> StepCases
     {

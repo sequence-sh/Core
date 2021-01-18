@@ -2,17 +2,13 @@
 using System.Collections.Generic;
 using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.TestHarness;
-using Xunit.Abstractions;
 using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
 
-public class DateToStringTests : StepTestBase<DateToString, StringStream>
+public partial class DateToStringTests : StepTestBase<DateToString, StringStream>
 {
-    /// <inheritdoc />
-    public DateToStringTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper) { }
-
     /// <inheritdoc />
     protected override IEnumerable<StepCase> StepCases
     {
@@ -44,7 +40,7 @@ public class DateToStringTests : StepTestBase<DateToString, StringStream>
             yield return new DeserializeCase(
                 "ArrayLength 3",
                 "DateToString Date: 2020-11-22T20:30:40",
-                "2020/11/22 20:30:40"
+                new StringStream("2020/11/22 20:30:40")
             );
         }
     }

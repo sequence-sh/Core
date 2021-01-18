@@ -2,8 +2,8 @@
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using AutoTheory;
 using FluentAssertions;
-using Xunit;
 using Xunit.Abstractions;
 
 namespace Reductech.EDR.Core.TestHarness
@@ -11,53 +11,30 @@ namespace Reductech.EDR.Core.TestHarness
 
 public abstract partial class StepTestBase<TStep, TOutput>
 {
+    [AutoTheory.GenerateAsyncTheory("Serialize")]
     protected virtual IEnumerable<SerializeCase> SerializeCases
     {
         get
         {
-            var case1 = CreateDefaultSerializeCase().Result; //TODO fix the synchronicity
+            var case1 = CreateDefaultSerializeCase();
 
             yield return case1;
         }
     }
 
-    public IEnumerable<object?[]> SerializeCaseNames =>
-        SerializeCases.Select(x => new[] { x.Name });
-
-    [Theory]
-    [NonStaticMemberData(nameof(SerializeCaseNames), true)]
-    public async Task Should_serialize_as_expected(string serializeCaseName)
-    {
-        await SerializeCases.FindAndRunAsync(serializeCaseName, TestOutputHelper);
-    }
-
     #pragma warning disable CA1034 // Nested types should not be visible
-    public class SerializeCase : ICase
+    public record SerializeCase(
+            string Name,
+            TStep Step,
+            string ExpectedSCL,
+            Configuration? ExpectedConfiguration = null) : IAsyncTestInstance
         #pragma warning restore CA1034 // Nested types should not be visible
     {
-        public SerializeCase(
-            string name,
-            TStep step,
-            string expectedSCL,
-            Configuration? expectedConfiguration = null)
-        {
-            Name                  = name;
-            Step                  = step;
-            ExpectedSCL           = expectedSCL;
-            ExpectedConfiguration = expectedConfiguration;
-        }
-
-        public string Name { get; }
-
         /// <inheritdoc />
         public override string ToString() => Name;
 
-        public TStep Step { get; }
-        public string ExpectedSCL { get; }
-        public Configuration? ExpectedConfiguration { get; }
-
         /// <inheritdoc />
-        public async Task RunCaseAsync(ITestOutputHelper testOutputHelper, string? extraArgument)
+        public async Task RunAsync(ITestOutputHelper testOutputHelper)
         {
             var realSCL = Step.Serialize();
 
@@ -69,9 +46,9 @@ public abstract partial class StepTestBase<TStep, TOutput>
         }
     }
 
-    public static async Task<SerializeCase> CreateDefaultSerializeCase()
+    public static SerializeCase CreateDefaultSerializeCase()
     {
-        var (step, values) = await CreateStepWithDefaultOrArbitraryValuesAsync();
+        var (step, values) = CreateStepWithDefaultOrArbitraryValuesAsync();
 
         var stepName           = new TStep().StepFactory.TypeName;
         var expectedSCLBuilder = new StringBuilder();

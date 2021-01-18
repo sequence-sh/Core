@@ -9,7 +9,7 @@ using Xunit.Sdk;
 namespace Reductech.EDR.Core.Tests
 {
 
-public class StringStreamTests
+public partial class StringStreamTests
 {
     public const string StringToTest = "Hello World";
 

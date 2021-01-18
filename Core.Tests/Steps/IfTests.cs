@@ -1,21 +1,15 @@
 ﻿using System.Collections.Generic;
-using JetBrains.Annotations;
-using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.TestHarness;
 using Reductech.EDR.Core.Util;
-using Xunit.Abstractions;
 using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
 
-public class IfTests : StepTestBase<If, Unit>
+public partial class IfTests : StepTestBase<If, Unit>
 {
-    /// <inheritdoc />
-    public IfTests([NotNull] ITestOutputHelper testOutputHelper) : base(testOutputHelper) { }
-
     /// <inheritdoc />
     protected override IEnumerable<DeserializeCase> DeserializeCases
     {

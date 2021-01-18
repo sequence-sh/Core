@@ -12,7 +12,7 @@ using Xunit;
 namespace Reductech.EDR.Core.Tests
 {
 
-public class StreamChannelTests
+public partial class StreamChannelTests
 {
     public enum StreamReaderSource
     {

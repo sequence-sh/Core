@@ -9,17 +9,12 @@ using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.TestHarness;
-using Xunit.Abstractions;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
 
-public class GenerateDocumentationTests : StepTestBase<GenerateDocumentation, StringStream>
+public partial class GenerateDocumentationTests : StepTestBase<GenerateDocumentation, StringStream>
 {
-    /// <inheritdoc />
-    public GenerateDocumentationTests(ITestOutputHelper testOutputHelper) :
-        base(testOutputHelper) { }
-
     /// <inheritdoc />
     protected override IEnumerable<StepCase> StepCases
     {
@@ -220,7 +215,7 @@ Negation of a boolean value.
                 CancellationToken cancellation)
             #pragma warning restore 1998
         {
-            throw new NotImplementedException();
+            throw new Exception("Cannot run Documentation Example Step");
         }
 
         /// <summary>

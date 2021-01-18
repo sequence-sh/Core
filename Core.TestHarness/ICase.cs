@@ -1,26 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
+using AutoTheory;
 using CSharpFunctionalExtensions;
 using Moq;
 using Reductech.EDR.Core.ExternalProcesses;
 using Reductech.EDR.Core.Internal;
-using Xunit.Abstractions;
 
 namespace Reductech.EDR.Core.TestHarness
 {
 
-public interface ICase
-{
-    string Name { get; }
-
-    public Task RunCaseAsync(ITestOutputHelper testOutputHelper, string? extraArgument);
-}
-
 /// <summary>
 /// A case that executes a step.
 /// </summary>
-public interface ICaseThatExecutes : ICase
+public interface ICaseThatExecutes : IAsyncTestInstance
 {
     Dictionary<VariableName, object> ExpectedFinalState { get; }
 

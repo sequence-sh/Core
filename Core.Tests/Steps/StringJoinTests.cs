@@ -1,17 +1,13 @@
 ﻿using System.Collections.Generic;
 using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.TestHarness;
-using Xunit.Abstractions;
 using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
 
-public class StringJoinTests : StepTestBase<StringJoin, StringStream>
+public partial class StringJoinTests : StepTestBase<StringJoin, StringStream>
 {
-    /// <inheritdoc />
-    public StringJoinTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper) { }
-
     /// <inheritdoc />
     protected override IEnumerable<StepCase> StepCases
     {

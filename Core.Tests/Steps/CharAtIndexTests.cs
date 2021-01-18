@@ -1,17 +1,13 @@
 ﻿using System.Collections.Generic;
 using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.TestHarness;
-using Xunit.Abstractions;
 using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
 
-public class CharAtIndexTests : StepTestBase<CharAtIndex, StringStream>
+public partial class CharAtIndexTests : StepTestBase<CharAtIndex, StringStream>
 {
-    /// <inheritdoc />
-    public CharAtIndexTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper) { }
-
     /// <inheritdoc />
     protected override IEnumerable<StepCase> StepCases
     {
@@ -33,7 +29,7 @@ public class CharAtIndexTests : StepTestBase<CharAtIndex, StringStream>
             yield return new DeserializeCase(
                 "Index is present",
                 "CharAtIndex Index: 1 String: 'Hello'",
-                "e"
+                new StringStream("e")
             );
         }
     }

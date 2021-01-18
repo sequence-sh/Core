@@ -5,17 +5,13 @@ using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.TestHarness;
 using Reductech.EDR.Core.Util;
-using Xunit.Abstractions;
 using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
 
-public class SequenceTests : StepTestBase<Sequence<StringStream>, StringStream>
+public partial class SequenceTests : StepTestBase<Sequence<StringStream>, StringStream>
 {
-    /// <inheritdoc />
-    public SequenceTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper) { }
-
     /// <inheritdoc />
     protected override IEnumerable<StepCase> StepCases
     {
@@ -47,7 +43,7 @@ public class SequenceTests : StepTestBase<Sequence<StringStream>, StringStream>
             yield return new DeserializeCase(
                 "Print then print",
                 "- Print Value: 'Hello'\n- Print Value: 'World'",
-                Unit.Default,
+                (Unit.Default),
                 "Hello",
                 "World"
             );

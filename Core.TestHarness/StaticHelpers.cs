@@ -126,7 +126,7 @@ public static class StaticHelpers
     public static void CheckLoggedValues(
         ITestLoggerFactory loggerFactory,
         LogLevel minLogLevel,
-        IReadOnlyCollection<object> expectedLoggedValues)
+        IReadOnlyCollection<string> expectedLoggedValues)
     {
         var infoOrHigherEntries =
             loggerFactory.Sink.LogEntries.Where(x => x.LogLevel >= minLogLevel);
@@ -135,7 +135,9 @@ public static class StaticHelpers
             expected =>
             {
                 return new Action<LogEntry>(
-                    entry => CompressNewlines(entry.Message!).Should().Be(expected.ToString())
+                    entry => CompressNewlines(entry.Message!)
+                        .Should()
+                        .Be(CompressNewlines(expected))
                 );
             }
         );

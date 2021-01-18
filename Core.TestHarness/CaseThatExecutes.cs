@@ -21,19 +21,18 @@ namespace Reductech.EDR.Core.TestHarness
 public abstract partial class StepTestBase<TStep, TOutput>
 {
     #pragma warning disable CA1034 // Nested types should not be visible
-    public abstract class CaseThatExecutes : ICaseThatExecutes
+    public abstract record CaseThatExecutes(
+            string Name,
+            IReadOnlyCollection<string> ExpectedLoggedValues) : ICaseThatExecutes
         #pragma warning restore CA1034 // Nested types should not be visible
     {
-        protected CaseThatExecutes(IReadOnlyCollection<object> expectedLoggedValues) =>
-            ExpectedLoggedValues = expectedLoggedValues;
-
         /// <inheritdoc />
-        public async Task RunCaseAsync(ITestOutputHelper testOutputHelper, string? extraArgument)
+        public async Task RunAsync(ITestOutputHelper testOutputHelper)
         {
             var loggerFactory = TestLoggerFactory.Create();
             loggerFactory.AddXunit(testOutputHelper);
 
-            var step = await GetStepAsync(testOutputHelper, extraArgument);
+            var step = await GetStepAsync(testOutputHelper);
 
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
@@ -69,14 +68,10 @@ public abstract partial class StepTestBase<TStep, TOutput>
             mockRepository.VerifyAll();
         }
 
-        public abstract string Name { get; }
-
         /// <inheritdoc />
         public override string ToString() => Name;
 
-        public abstract Task<IStep> GetStepAsync(
-            ITestOutputHelper testOutputHelper,
-            string? extraArgument);
+        public abstract Task<IStep> GetStepAsync(ITestOutputHelper testOutputHelper);
 
         public abstract void CheckUnitResult(Result<Unit, IError> result);
         public abstract void CheckOutputResult(Result<TOutput, IError> result);
@@ -164,8 +159,20 @@ public abstract partial class StepTestBase<TStep, TOutput>
         public ISettings Settings { get; set; } = EmptySettings.Instance;
 
         public Dictionary<VariableName, object> ExpectedFinalState { get; } = new();
+        public string Name { get; set; } = Name;
 
-        public IReadOnlyCollection<object> ExpectedLoggedValues { get; }
+        public IReadOnlyCollection<string> ExpectedLoggedValues { get; set; } =
+            ExpectedLoggedValues;
+
+        /// <inheritdoc />
+        public void Deserialize(IXunitSerializationInfo info) =>
+            Name = info.GetValue<string>(nameof(Name));
+
+        /// <inheritdoc />
+        public void Serialize(IXunitSerializationInfo info)
+        {
+            info.AddValue(nameof(Name), Name);
+        }
     }
 }
 

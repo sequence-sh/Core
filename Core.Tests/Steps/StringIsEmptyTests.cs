@@ -1,17 +1,13 @@
 ﻿using System.Collections.Generic;
 using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.TestHarness;
-using Xunit.Abstractions;
 using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
 
-public class StringIsEmptyTests : StepTestBase<StringIsEmpty, bool>
+public partial class StringIsEmptyTests : StepTestBase<StringIsEmpty, bool>
 {
-    /// <inheritdoc />
-    public StringIsEmptyTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper) { }
-
     /// <inheritdoc />
     protected override IEnumerable<StepCase> StepCases
     {

@@ -3,17 +3,13 @@ using System.Collections.Generic;
 using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.TestHarness;
 using Reductech.EDR.Core.Util;
-using Xunit.Abstractions;
 using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
 
-public class ToCSVTests : StepTestBase<ToCSV, StringStream>
+public partial class ToCSVTests : StepTestBase<ToCSV, StringStream>
 {
-    /// <inheritdoc />
-    public ToCSVTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper) { }
-
     /// <inheritdoc />
     protected override IEnumerable<StepCase> StepCases
     {

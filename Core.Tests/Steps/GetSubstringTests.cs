@@ -1,17 +1,13 @@
 ﻿using System.Collections.Generic;
 using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.TestHarness;
-using Xunit.Abstractions;
 using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
 
-public class GetSubstringTests : StepTestBase<GetSubstring, StringStream>
+public partial class GetSubstringTests : StepTestBase<GetSubstring, StringStream>
 {
-    /// <inheritdoc />
-    public GetSubstringTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper) { }
-
     /// <inheritdoc />
     protected override IEnumerable<StepCase> StepCases
     {
@@ -36,7 +32,7 @@ public class GetSubstringTests : StepTestBase<GetSubstring, StringStream>
             yield return new DeserializeCase(
                 "ArrayLength 3",
                 "GetSubstring String: 'Hello World' Index: 1 Length: 3",
-                "ell"
+                new StringStream("ell")
             );
         }
     }

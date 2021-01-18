@@ -8,7 +8,7 @@ using Xunit;
 namespace Reductech.EDR.Core.Tests
 {
 
-public class EntityTests
+public partial class EntityTests
 {
     [Theory]
     [InlineData("Hello", "Hello")]

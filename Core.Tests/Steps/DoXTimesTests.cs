@@ -3,17 +3,13 @@ using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.TestHarness;
 using Reductech.EDR.Core.Util;
-using Xunit.Abstractions;
 using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
 
-public class DoXTimesTests : StepTestBase<DoXTimes, Unit>
+public partial class DoXTimesTests : StepTestBase<DoXTimes, Unit>
 {
-    /// <inheritdoc />
-    public DoXTimesTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper) { }
-
     /// <inheritdoc />
     protected override IEnumerable<StepCase> StepCases
     {
