@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Internal;
@@ -18,7 +19,8 @@ public abstract partial class StepTestBase<TStep, TOutput>
     public IEnumerable<StepCase> RunCases => StepCases;
 
     [AutoTheory.GenerateAsyncTheory("DeserializeAndRun")]
-    public IEnumerable<StepCase> DeserializeAndRunCases => StepCases;
+    public IEnumerable<StepCase> DeserializeAndRunCases =>
+        StepCases.Select(x => x with { SerializeFirst = true });
 
     #pragma warning disable CA1034 // Nested types should not be visible
     public record StepCase : CaseThatExecutes
