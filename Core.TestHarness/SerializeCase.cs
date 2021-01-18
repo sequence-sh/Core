@@ -27,7 +27,7 @@ public abstract partial class StepTestBase<TStep, TOutput>
             string Name,
             TStep Step,
             string ExpectedSCL,
-            Configuration? ExpectedConfiguration = null) : IAsyncTestInstance, IXunitSerializable
+            Configuration? ExpectedConfiguration = null) : IAsyncTestInstance
         #pragma warning restore CA1034 // Nested types should not be visible
     {
         /// <inheritdoc />
@@ -44,13 +44,6 @@ public abstract partial class StepTestBase<TStep, TOutput>
 
             await Task.CompletedTask;
         }
-
-        /// <inheritdoc />
-        public void Deserialize(IXunitSerializationInfo info) =>
-            throw new System.NotImplementedException();
-
-        /// <inheritdoc />
-        public void Serialize(IXunitSerializationInfo info) => info.AddValue(Name, Name);
     }
 
     public static async Task<SerializeCase> CreateDefaultSerializeCase()

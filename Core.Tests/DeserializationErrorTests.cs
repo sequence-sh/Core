@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using AutoTheory;
 using CSharpFunctionalExtensions;
@@ -78,7 +79,7 @@ public partial class DeserializationErrorTests
         }
     }
 
-    private record DeserializationErrorCase : ITestInstance
+    private class DeserializationErrorCase : ITestInstance
     {
         public DeserializationErrorCase(
             string scl,
@@ -88,8 +89,8 @@ public partial class DeserializationErrorTests
             ExpectedErrors = expectedErrors;
         }
 
-        public string SCL { get; init; }
-        public (string error, string location)[] ExpectedErrors { get; init; }
+        public string SCL { get; set; }
+        public (string error, string location)[] ExpectedErrors { get; set; }
 
         /// <inheritdoc />
         public void Run(ITestOutputHelper testOutputHelper)
@@ -108,12 +109,7 @@ public partial class DeserializationErrorTests
             realErrorPairs.Should().BeEquivalentTo(ExpectedErrors);
         }
 
-        /// <inheritdoc />
-        public void Deserialize(IXunitSerializationInfo info) =>
-            throw new System.NotImplementedException();
-
-        /// <inheritdoc />
-        public void Serialize(IXunitSerializationInfo info) => info.AddValue(nameof(SCL), SCL);
+        public string Name => SCL;
     }
 }
 

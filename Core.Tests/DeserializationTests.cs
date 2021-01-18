@@ -331,6 +331,8 @@ Print 'Comments!'",
 
         private string SCL { get; }
 
+        public string Name => SCL;
+
         public Configuration? ExpectedConfiguration { get; set; } = null!;
 
         private IReadOnlyCollection<string> ExpectedLoggedValues { get; }
@@ -379,18 +381,6 @@ Print 'Comments!'",
             {
                 freezeResult.Value.Configuration.Should().BeEquivalentTo(ExpectedConfiguration);
             }
-        }
-
-        /// <inheritdoc />
-        public void Deserialize(IXunitSerializationInfo info)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        /// <inheritdoc />
-        public void Serialize(IXunitSerializationInfo info)
-        {
-            throw new System.NotImplementedException();
         }
     }
 }

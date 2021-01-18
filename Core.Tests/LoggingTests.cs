@@ -19,7 +19,7 @@ namespace Reductech.EDR.Core.Tests
 
 public partial class LoggingTestCases
 {
-    [GenerateAsyncTheory("CheckLogging")]
+    //[GenerateAsyncTheory("CheckLogging")]
     public IEnumerable<LoggingTestCase> TestCases
     {
         get

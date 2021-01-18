@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Reflection;
+using AutoTheory;
 using FluentAssertions;
 using FluentAssertions.Common;
 using Namotion.Reflection;
@@ -21,6 +22,7 @@ public interface IStepTestBase
     Type StepType { get; }
 }
 
+[UseTestOutputHelper]
 public abstract partial class StepTestBase<TStep, TOutput> : IStepTestBase
     where TStep : class, ICompoundStep<TOutput>, new()
 {

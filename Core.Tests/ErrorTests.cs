@@ -167,13 +167,6 @@ public partial class RunErrorTests
 
             r.Error.GetAllErrors().Should().BeEquivalentTo(ExpectedErrors.GetAllErrors());
         }
-
-        /// <inheritdoc />
-        public void Deserialize(IXunitSerializationInfo info) =>
-            Name = info.GetValue<string>(nameof(Name));
-
-        /// <inheritdoc />
-        public void Serialize(IXunitSerializationInfo info) => info.AddValue(nameof(Name), Name);
     }
 }
 
