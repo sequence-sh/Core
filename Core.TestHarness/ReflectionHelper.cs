@@ -19,7 +19,7 @@ namespace Reductech.EDR.Core.TestHarness
 
 public abstract partial class StepTestBase<TStep, TOutput>
 {
-    protected static async Task<(TStep step, Dictionary<string, string> values)>
+    protected static (TStep step, Dictionary<string, string> values)
         CreateStepWithDefaultOrArbitraryValuesAsync()
     {
         var instance = new TStep();
@@ -38,26 +38,27 @@ public abstract partial class StepTestBase<TStep, TOutput>
             .OrderBy(x => x.attribute!.Order)
             .Select(x => x.propertyInfo)
         )
-            await MatchStepPropertyInfoAsync(propertyInfo, SetVariableName, SetStep, SetStepList);
+            MatchStepPropertyInfo(propertyInfo, SetVariableName, SetStep, SetStepList);
 
         return (instance, values);
 
-        Task SetVariableName(PropertyInfo property)
+        Unit SetVariableName(PropertyInfo property)
         {
             var vn = new VariableName("Foo" + index);
             index++;
             property.SetValue(instance, vn);
             values.Add(property.Name, $"<{vn.Name}>");
-            return Task.CompletedTask;
+
+            return Unit.Default;
         }
 
-        async Task SetStep(PropertyInfo property)
+        Unit SetStep(PropertyInfo property)
         {
             var currentValue = property.GetValue(instance);
 
             if (currentValue == null)
             {
-                var (step, value, newIndex) = await CreateSimpleStep(property, index);
+                var (step, value, newIndex) = CreateSimpleStep(property, index);
                 index                       = newIndex;
                 values.Add(property.Name, value);
 
@@ -76,12 +77,12 @@ public abstract partial class StepTestBase<TStep, TOutput>
                 var s = ((IStep)currentValue).Serialize();
                 values.Add(property.Name, s);
             }
+
+            return Unit.Default;
         }
 
-        async Task SetStepList(PropertyInfo property)
+        Unit SetStepList(PropertyInfo property)
         {
-            await Task.CompletedTask;
-
             if (property.GetValue(instance) is IReadOnlyList<IStep> currentValue)
             {
                 var elements = new List<string>();
@@ -117,6 +118,8 @@ public abstract partial class StepTestBase<TStep, TOutput>
             {
                 return $"[{string.Join(", ", elements)}]";
             }
+
+            return Unit.Default;
         }
     }
 
@@ -182,7 +185,7 @@ public abstract partial class StepTestBase<TStep, TOutput>
         };
     }
 
-    private static async Task<(IStep step, string value, int newIndex)> CreateSimpleStep(
+    private static (IStep step, string value, int newIndex) CreateSimpleStep(
         PropertyInfo propertyInfo,
         int index)
     {

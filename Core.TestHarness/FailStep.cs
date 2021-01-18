@@ -94,9 +94,8 @@ public abstract partial class StepTestBase<TStep, TOutput>
             if (!property.PropertyType.GenericTypeArguments.Any())
                 throw new Exception($"Property {property} has no generic arguments");
 
-            var ssTask   = CreateSimpleStep(property, 1);
-            var newValue = ssTask.Result.step;
-            property.SetValue(instance, newValue);
+            var (step, _, _) = CreateSimpleStep(property, 1);
+            property.SetValue(instance, step);
 
             return false;
         }

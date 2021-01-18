@@ -16,7 +16,7 @@ public abstract partial class StepTestBase<TStep, TOutput>
     {
         get
         {
-            var case1 = CreateDefaultSerializeCase().Result; //TODO fix the synchronicity
+            var case1 = CreateDefaultSerializeCase();
 
             yield return case1;
         }
@@ -46,9 +46,9 @@ public abstract partial class StepTestBase<TStep, TOutput>
         }
     }
 
-    public static async Task<SerializeCase> CreateDefaultSerializeCase()
+    public static SerializeCase CreateDefaultSerializeCase()
     {
-        var (step, values) = await CreateStepWithDefaultOrArbitraryValuesAsync();
+        var (step, values) = CreateStepWithDefaultOrArbitraryValuesAsync();
 
         var stepName           = new TStep().StepFactory.TypeName;
         var expectedSCLBuilder = new StringBuilder();
