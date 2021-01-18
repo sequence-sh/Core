@@ -9,7 +9,7 @@ using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 namespace Reductech.EDR.Core.Tests.Steps
 {
 
-public partial class RepeatWhileTests : StepTestBase<While, Unit>
+public partial class WhileTests : StepTestBase<While, Unit>
 {
     /// <inheritdoc />
     protected override IEnumerable<StepCase> StepCases

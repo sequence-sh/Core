@@ -9,7 +9,7 @@ using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 namespace Reductech.EDR.Core.Tests.Steps
 {
 
-public partial class ReadCSVTests : StepTestBase<FromCSV, Array<Entity>>
+public partial class FromCSVTests : StepTestBase<FromCSV, Array<Entity>>
 {
     /// <inheritdoc />
     protected override IEnumerable<StepCase> StepCases

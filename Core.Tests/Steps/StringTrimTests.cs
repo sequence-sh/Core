@@ -7,7 +7,7 @@ using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 namespace Reductech.EDR.Core.Tests.Steps
 {
 
-public partial class TrimTests : StepTestBase<StringTrim, StringStream>
+public partial class StringTrimTests : StepTestBase<StringTrim, StringStream>
 {
     /// <inheritdoc />
     protected override IEnumerable<StepCase> StepCases

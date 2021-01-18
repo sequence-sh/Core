@@ -10,7 +10,7 @@ using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 namespace Reductech.EDR.Core.Tests.Steps
 {
 
-public partial class ApplyBooleanTests : StepTestBase<ApplyBooleanOperator, bool>
+public partial class ApplyBooleanOperatorTests : StepTestBase<ApplyBooleanOperator, bool>
 {
     /// <inheritdoc />
     protected override IEnumerable<SerializeCase> SerializeCases

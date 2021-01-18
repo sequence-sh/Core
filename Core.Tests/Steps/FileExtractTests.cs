@@ -7,7 +7,7 @@ using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 namespace Reductech.EDR.Core.Tests.Steps
 {
 
-public partial class UnzipTests : StepTestBase<FileExtract, Unit>
+public partial class FileExtractTests : StepTestBase<FileExtract, Unit>
 {
     /// <inheritdoc />
     protected override IEnumerable<StepCase> StepCases

@@ -6,7 +6,7 @@ using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 namespace Reductech.EDR.Core.Tests.Steps
 {
 
-public partial class SetPropertyTests : StepTestBase<EntitySetValue<StringStream>, Entity>
+public partial class EntitySetValueTests : StepTestBase<EntitySetValue<StringStream>, Entity>
 {
     /// <inheritdoc />
     protected override IEnumerable<StepCase> StepCases

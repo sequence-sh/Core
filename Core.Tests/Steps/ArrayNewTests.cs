@@ -8,7 +8,7 @@ using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 namespace Reductech.EDR.Core.Tests.Steps
 {
 
-public partial class ArrayTests : StepTestBase<ArrayNew<int>, Array<int>>
+public partial class ArrayNewTests : StepTestBase<ArrayNew<int>, Array<int>>
 {
     /// <inheritdoc />
     protected override IEnumerable<DeserializeCase> DeserializeCases

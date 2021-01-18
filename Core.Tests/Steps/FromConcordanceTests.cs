@@ -9,7 +9,7 @@ using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 namespace Reductech.EDR.Core.Tests.Steps
 {
 
-public partial class ReadConcordanceTests : StepTestBase<FromConcordance, Array<Entity>>
+public partial class FromConcordanceTests : StepTestBase<FromConcordance, Array<Entity>>
 {
     /// <inheritdoc />
     protected override IEnumerable<StepCase> StepCases

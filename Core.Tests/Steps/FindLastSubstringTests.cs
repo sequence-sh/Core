@@ -6,7 +6,7 @@ using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 namespace Reductech.EDR.Core.Tests.Steps
 {
 
-public partial class LastIndexOfTests : StepTestBase<FindLastSubstring, int>
+public partial class FindLastSubstringTests : StepTestBase<FindLastSubstring, int>
 {
     /// <inheritdoc />
     protected override IEnumerable<StepCase> StepCases

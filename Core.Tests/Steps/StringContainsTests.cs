@@ -6,7 +6,7 @@ using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 namespace Reductech.EDR.Core.Tests.Steps
 {
 
-public partial class DoesStringContainTests : StepTestBase<StringContains, bool>
+public partial class StringContainsTests : StepTestBase<StringContains, bool>
 {
     /// <inheritdoc />
     protected override IEnumerable<StepCase> StepCases
