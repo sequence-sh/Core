@@ -39,7 +39,7 @@
     <PackageReference Include="FluentAssertions" Version="5.10.3" />
     <PackageReference Include="MELT.Xunit" Version="0.6.0" />
     <PackageReference Include="Moq" Version="4.15.2" />
-    <PackageReference Include="Reductech.Utilities.TheoryGenerator" Version="0.4.0-a.dev.2101181209" />
+    <PackageReference Include="Reductech.Utilities.TheoryGenerator" Version="0.4.0-a.master.2101181302" />
     <PackageReference Include="xunit" Version="2.4.1" />
     <PackageReference Include="xunit.abstractions" Version="2.0.3" />
   </ItemGroup>
