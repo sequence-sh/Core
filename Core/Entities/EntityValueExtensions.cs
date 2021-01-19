@@ -26,7 +26,7 @@ public static class EntityValueExtensions
             x => x.ToString(Constants.DoubleFormat),
             x => x.ToString(),
             x => x.ToString(),
-            x => x.ToString("O"),
+            x => x.ToString(Constants.DateTimeFormat),
             x => x.ToString(),
             x => string.Join(",", x.Select(v => v.GetString()))
         );

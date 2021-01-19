@@ -10,6 +10,11 @@ public static class Constants
     /// The format to use for doubles
     /// </summary>
     public const string DoubleFormat = "G";
+
+    /// <summary>
+    /// The format to use for DateTimes
+    /// </summary>
+    public const string DateTimeFormat = "O";
 }
 
 }

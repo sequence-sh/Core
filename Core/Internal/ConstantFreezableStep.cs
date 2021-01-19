@@ -94,14 +94,14 @@ public class DateTimeConstantFreezable : ConstantFreezableBase<DateTime>
     public DateTimeConstantFreezable(DateTime value) : base(value) { }
 
     /// <inheritdoc />
-    public override string StepName => Value.ToString("O");
+    public override string StepName => Value.ToString(Constants.DateTimeFormat);
 
     /// <inheritdoc />
     public override Result<IStep, IError> TryFreeze(StepContext stepContext) =>
         new DateTimeConstant(Value);
 
     /// <inheritdoc />
-    public override string Serialize() => Value.ToString("O");
+    public override string Serialize() => Value.ToString(Constants.DateTimeFormat);
 }
 
 /// <summary>

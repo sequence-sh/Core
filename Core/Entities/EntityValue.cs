@@ -251,9 +251,10 @@ public sealed class EntityValue : OneOfBase<DBNull, string, int, double, bool, E
         {
             return schemaProperty.Type switch
             {
-                SchemaPropertyType.String => (new EntityValue(dt.ToString("O")), true),
-                SchemaPropertyType.Date   => (this, false),
-                _                         => CouldNotConvert(dt)
+                SchemaPropertyType.String => (
+                    new EntityValue(dt.ToString(Constants.DateTimeFormat)), true),
+                SchemaPropertyType.Date => (this, false),
+                _                       => CouldNotConvert(dt)
             };
         }
 
@@ -358,7 +359,7 @@ public sealed class EntityValue : OneOfBase<DBNull, string, int, double, bool, E
             x => x.ToString(Constants.DoubleFormat),
             x => x.ToString(),
             x => x.ToString(),
-            x => x.ToString("O"),
+            x => x.ToString(Constants.DateTimeFormat),
             x => x.ToString(),
             x => x.Count + " elements"
         );

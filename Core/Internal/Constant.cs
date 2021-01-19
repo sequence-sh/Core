@@ -165,7 +165,7 @@ public class DateTimeConstant : ConstantBase<DateTime>
     public override IFreezableStep Unfreeze() => new DateTimeConstantFreezable(Value);
 
     /// <inheritdoc />
-    public override string Serialize() => Value.ToString("O");
+    public override string Serialize() => Value.ToString(Constants.DateTimeFormat);
 }
 
 /// <summary>

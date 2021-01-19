@@ -36,7 +36,7 @@ public sealed class Print<T> : CompoundStep<Unit>
         else if (r.Value is StringStream ss)
             stringToPrint = await ss.GetStringAsync();
         else if (r.Value is DateTime dt)
-            stringToPrint = dt.ToString("O");
+            stringToPrint = dt.ToString(Constants.DateTimeFormat);
         else if (r.Value is double d)
             stringToPrint = d.ToString(Constants.DoubleFormat);
         else
