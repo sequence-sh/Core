@@ -302,17 +302,10 @@ public partial class LoggingTestCases
 
             var r = await sclRunner.RunSequenceFromTextAsync(SCL, CancellationToken.None);
 
-            r.ShouldBeSuccessful(x => x.AsString);
+            r.ShouldBeSuccessful(x => x.ToString()!);
 
             loggerFactory.Sink.LogEntries.Should().SatisfyRespectively(ExpectedLogs);
         }
-
-        /// <inheritdoc />
-        public void Deserialize(IXunitSerializationInfo info) =>
-            Name = info.GetValue<string>(nameof(Name));
-
-        /// <inheritdoc />
-        public void Serialize(IXunitSerializationInfo info) => info.AddValue(nameof(Name), Name);
     }
 }
 

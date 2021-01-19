@@ -16,7 +16,7 @@ public abstract partial class StepTestBase<TStep, TOutput>
 
         public void CheckOutputResult(Result<TOutput, IError> outputResult)
         {
-            outputResult.ShouldBeSuccessful(x => x.AsString);
+            outputResult.ShouldBeSuccessful(x => x.ToString()!);
 
             if (outputResult.Value is Unit)
                 return;
@@ -29,7 +29,7 @@ public abstract partial class StepTestBase<TStep, TOutput>
 
         public void CheckUnitResult(Result<Unit, IError> result)
         {
-            result.ShouldBeSuccessful(x => x.AsString);
+            result.ShouldBeSuccessful(x => x.ToString()!);
 
             if (IsT1)
                 AsT1.Should().Be(Unit.Default);

@@ -55,6 +55,9 @@ public static class SCLParsing
 
         var result = visitor.Visit(parser.fullSequence());
 
+        if (result.IsFailure)
+            return result;
+
         if (syntaxErrorListener.Errors.Any())
         {
             return Result.Failure<FreezableStepProperty, IError>(
@@ -218,11 +221,25 @@ public static class SCLParsing
 
         private static SingleError ParseError(ParserRuleContext pt)
         {
-            return new SingleError(
-                new TextLocation(pt),
+            return new(
+                new TextLocation(pt.exception.OffendingToken),
                 ErrorCode.SCLSyntaxError,
-                pt.GetText()
+                GetMessage(pt.exception)
             );
+        }
+
+        private static string GetMessage(RecognitionException re)
+        {
+            return re switch
+            {
+                FailedPredicateException fpe => fpe.Message,
+                InputMismatchException ime   => ime.Message,
+                LexerNoViableAltException nve1 =>
+                    $"No Viable Alternative - '{nve1.OffendingToken.Text}' not recognized.",
+                NoViableAltException nve2 =>
+                    $"No Viable Alternative - '{nve2.OffendingToken.Text}' was unexpected.",
+                _ => throw new ArgumentOutOfRangeException(nameof(re))
+            };
         }
 
         /// <inheritdoc />

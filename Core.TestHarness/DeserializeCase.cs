@@ -59,10 +59,10 @@ public abstract partial class StepTestBase<TStep, TOutput>
 
             var deserializeResult = SCLParsing.ParseSequence(SCL);
 
-            deserializeResult.ShouldBeSuccessful(x => x.AsString);
+            deserializeResult.ShouldBeSuccessful(x => x.ToString()!);
 
             var freezeResult = deserializeResult.Value.TryFreeze(sfs);
-            freezeResult.ShouldBeSuccessful(x => x.AsString);
+            freezeResult.ShouldBeSuccessful(x => x.ToString()!);
 
             return freezeResult.Value;
         }
