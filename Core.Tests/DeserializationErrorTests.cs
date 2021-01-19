@@ -63,6 +63,21 @@ public partial class DeserializationErrorTests
                 "Foreach ['one', 'two'] (Print (<Num> + 1)) <Num>",
                 ("'Left' cannot take the value 'Get <Num>'", "ApplyMathOperator")
             );
+
+            yield return new DeserializationErrorCase(
+                "Foreach ['one', 'two') (Print <Num>) <Num>", //The ) should be a ]
+                ("Syntax Error: extraneous input ')' expecting {']', ','}",
+                 "Line: 1, Col: 21, Idx: 21 - Line: 1, Col: 21, Idx: 21 Text: )")
+            );
+
+            yield return new DeserializationErrorCase(
+                @"- <Input> = [
+    (prop1: """"value1"""" prop2: 2),
+    (prop1: """"value3"""" prop2: 4),
+  ]",
+                (@"Syntax Error: No Viable Alternative - '""""' was unexpected.",
+                 @"Line: 2, Col: 20, Idx: 34 - Line: 2, Col: 21, Idx: 35 Text: """"")
+            );
         }
     }
 

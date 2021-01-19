@@ -23,12 +23,9 @@ namespace Reductech.EDR.Core.Tests
 /// <summary>
 /// These are not really tests but ways to quickly and easily run steps
 /// </summary>
+[AutoTheory.UseTestOutputHelper]
 public partial class ExampleTests
 {
-    public ExampleTests(ITestOutputHelper testOutputHelper) => TestOutputHelper = testOutputHelper;
-
-    public ITestOutputHelper TestOutputHelper { get; }
-
     [Theory(Skip = "Manual")]
     [Trait("Category", "Integration")]
     [InlineData(@"C:\Users\wainw\source\repos\Reductech\edr\Examples\Sort.scl")]
@@ -63,7 +60,7 @@ public partial class ExampleTests
 
         var r = await stepResult.Value.Run<Unit>(monad, CancellationToken.None);
 
-        r.ShouldBeSuccessful(x => x.AsString);
+        r.ShouldBeSuccessful(x => x.ToString()!);
     }
 
     [Fact(Skip = "skip")]
@@ -87,7 +84,7 @@ public partial class ExampleTests
 
         var r = await runner.RunSequenceFromTextAsync(scl, CancellationToken.None);
 
-        r.ShouldBeSuccessful(x => x.AsString);
+        r.ShouldBeSuccessful(x => x.ToString()!);
     }
 
     [Fact(Skip = "Manual")]
@@ -175,7 +172,7 @@ public partial class ExampleTests
 
         var r = await (step as IStep<Unit>).Run(monad, CancellationToken.None);
 
-        r.ShouldBeSuccessful(x => x.AsString);
+        r.ShouldBeSuccessful(x => x.ToString()!);
     }
 }
 

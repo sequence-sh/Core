@@ -181,6 +181,13 @@ Print 'Comments!'",
                 2
             );
 
+            yield return new DeserializationTestInstance( //Note the extra comma
+                @"
+- <ArrayVar> = ['abc', '123',]
+- Print(ArrayLength <ArrayVar>)",
+                2
+            );
+
             yield return new DeserializationTestInstance(@"Print(ArrayLength ['abc', '123'])", 2);
 
             yield return new DeserializationTestInstance(
@@ -358,7 +365,7 @@ Print 'Comments!'",
 
             var result = await runner.RunSequenceFromTextAsync(SCL, CancellationToken.None);
 
-            result.ShouldBeSuccessful(x => x.AsString);
+            result.ShouldBeSuccessful(x => x.ToString()!);
 
             StaticHelpers.CheckLoggedValues(
                 loggerFactory,
