@@ -288,10 +288,22 @@ public static class SCLParsing
         public override Result<FreezableStepProperty, IError> VisitNumber(
             SCLParser.NumberContext context)
         {
-            if (int.TryParse(context.NUMBER().GetText(), out var num))
+            var text = context.GetText();
+
+            if (int.TryParse(text, out var num))
             {
                 var member = new FreezableStepProperty(
                     new IntConstantFreezable(num),
+                    new TextLocation(context)
+                );
+
+                return member;
+            }
+
+            if (double.TryParse(text, out var d))
+            {
+                var member = new FreezableStepProperty(
+                    new DoubleConstantFreezable(d),
                     new TextLocation(context)
                 );
 
@@ -343,27 +355,12 @@ public static class SCLParsing
                     if (jx >= txt.Length)
                         break;
 
-                    switch (txt[jx + 1])
-                    {
-                        case '"':
-                            sb.Append('"');
-                            break; //double quote
-                        case 'n':
-                            sb.Append('\n');
-                            break; // Line feed
-                        case 'r':
-                            sb.Append('\r');
-                            break; // Carriage return
-                        case 't':
-                            sb.Append('\t');
-                            break; // Tab
-                        case '\\':
-                            sb.Append('\\');
-                            break; // Don't escape
-                        default:   // Unrecognized, copy as-is
-                            sb.Append('\\').Append(txt[jx + 1]);
-                            break;
-                    }
+                    var escapedChar = GetEscapedChar(txt, jx);
+
+                    if (escapedChar.HasValue)
+                        sb.Append(escapedChar.Value);
+                    else
+                        sb.Append('\\').Append(txt[jx + 1]);
 
                     ix = jx + 2;
                 }
@@ -379,6 +376,19 @@ public static class SCLParsing
                     .Replace("''", "'");
 
                 return s;
+            }
+
+            static char? GetEscapedChar(string txt, int jx)
+            {
+                return txt[jx + 1] switch
+                {
+                    '"'  => '"',
+                    'n'  => '\n',
+                    'r'  => '\r',
+                    't'  => '\t',
+                    '\\' => '\\',
+                    _    => null
+                };
             }
         }
 

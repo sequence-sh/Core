@@ -8,6 +8,7 @@ using Newtonsoft.Json.Linq;
 using OneOf;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
+using Reductech.EDR.Core.Util;
 
 namespace Reductech.EDR.Core.Entities
 {
@@ -201,7 +202,8 @@ public sealed class EntityValue : OneOfBase<DBNull, string, int, double, bool, E
         {
             return schemaProperty.Type switch
             {
-                SchemaPropertyType.String => (new EntityValue(d.ToString("G17")), false),
+                SchemaPropertyType.String => (
+                    new EntityValue(d.ToString(Constants.DoubleFormat)), false),
                 SchemaPropertyType.Double => (this, true),
                 _                         => CouldNotConvert(d)
             };
@@ -249,9 +251,10 @@ public sealed class EntityValue : OneOfBase<DBNull, string, int, double, bool, E
         {
             return schemaProperty.Type switch
             {
-                SchemaPropertyType.String => (new EntityValue(dt.ToString("O")), true),
-                SchemaPropertyType.Date   => (this, false),
-                _                         => CouldNotConvert(dt)
+                SchemaPropertyType.String => (
+                    new EntityValue(dt.ToString(Constants.DateTimeFormat)), true),
+                SchemaPropertyType.Date => (this, false),
+                _                       => CouldNotConvert(dt)
             };
         }
 
@@ -353,10 +356,10 @@ public sealed class EntityValue : OneOfBase<DBNull, string, int, double, bool, E
             _ => "Empty",
             x => x,
             x => x.ToString(),
-            x => x.ToString("G17"),
+            x => x.ToString(Constants.DoubleFormat),
             x => x.ToString(),
             x => x.ToString(),
-            x => x.ToString("O"),
+            x => x.ToString(Constants.DateTimeFormat),
             x => x.ToString(),
             x => x.Count + " elements"
         );

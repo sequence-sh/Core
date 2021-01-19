@@ -186,7 +186,7 @@ public static class CSVWriter
                     _ => "",
                     x => x,
                     x => x.ToString(),
-                    x => x.ToString("G17"),
+                    x => x.ToString(Constants.DoubleFormat),
                     x => x.ToString(),
                     x => x.ToString(),
                     x => x.ToString(dateTimeFormat),

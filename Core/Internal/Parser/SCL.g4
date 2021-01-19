@@ -27,7 +27,7 @@ bracketedStep		: OPENBRACKET step CLOSEBRACKET ;
 boolean				: TRUE | FALSE ;
 dateTime			: DATETIME ;
 quotedString		: DOUBLEQUOTEDSTRING | SINGLEQUOTEDSTRING ;
-number              : NUMBER ;
+number              : NUMBER (DOT NUMBER)? ;
 enumeration			: NAME DOT NAME ;
 term				: simpleTerm
 					| bracketedStep ;

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Internal.Serialization;
+using Reductech.EDR.Core.Util;
 using DateTime = System.DateTime;
 
 namespace Reductech.EDR.Core.Internal
@@ -55,14 +56,14 @@ public class DoubleConstantFreezable : ConstantFreezableBase<double>
     public DoubleConstantFreezable(double value) : base(value) { }
 
     /// <inheritdoc />
-    public override string StepName => Value.ToString("G17");
+    public override string StepName => Value.ToString(Constants.DoubleFormat);
 
     /// <inheritdoc />
     public override Result<IStep, IError> TryFreeze(StepContext stepContext) =>
         new DoubleConstant(Value);
 
     /// <inheritdoc />
-    public override string Serialize() => Value.ToString("G17");
+    public override string Serialize() => Value.ToString(Constants.DoubleFormat);
 }
 
 /// <summary>
@@ -93,14 +94,14 @@ public class DateTimeConstantFreezable : ConstantFreezableBase<DateTime>
     public DateTimeConstantFreezable(DateTime value) : base(value) { }
 
     /// <inheritdoc />
-    public override string StepName => Value.ToString("O");
+    public override string StepName => Value.ToString(Constants.DateTimeFormat);
 
     /// <inheritdoc />
     public override Result<IStep, IError> TryFreeze(StepContext stepContext) =>
         new DateTimeConstant(Value);
 
     /// <inheritdoc />
-    public override string Serialize() => Value.ToString("O");
+    public override string Serialize() => Value.ToString(Constants.DateTimeFormat);
 }
 
 /// <summary>
