@@ -4,6 +4,7 @@ using System.Collections.Immutable;
 using System.Linq;
 using System.Text.RegularExpressions;
 using CSharpFunctionalExtensions;
+using Newtonsoft.Json.Linq;
 using OneOf;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
@@ -34,32 +35,19 @@ public sealed class EntityValue : OneOfBase<DBNull, string, int, double, bool, E
         switch (argValue)
         {
             //TODO convert to switch statement (this is not supported by stryker at the moment)
-            case null: return new EntityValue(DBNull.Value);
+            case null:             return new EntityValue(DBNull.Value);
             case StringStream ss1: return Create(ss1.GetString(), multiValueDelimiter);
-            case string s: return Create(s, multiValueDelimiter);
-            case int i: return new EntityValue(i);
-            case bool b: return new EntityValue(b);
-            case double d: return new EntityValue(d);
+            case string s:         return Create(s,               multiValueDelimiter);
+            case int i:            return new EntityValue(i);
+            case bool b:           return new EntityValue(b);
+            case double d:         return new EntityValue(d);
+            case long ln when ln < int.MaxValue && ln > int.MinValue:
+                return new EntityValue(Convert.ToInt32(ln));
             case Enumeration e1: return new EntityValue(e1);
             case DateTime dt: return new EntityValue(dt);
             case Enum e: return new EntityValue(new Enumeration(e.GetType().Name, e.ToString()));
-            //case IAsyncList asyncList:
-            //{
-            //    var objectsResult = asyncList.GetObjects();
-            //    if (objectsResult.IsFailure) throw new ArgumentException(objectsResult.Error.AsString);
-
-            //    var newEnumerable = objectsResult.Value.Select(v => CreateFromObject(v, multiValueDelimiter)).ToImmutableList();
-            //    if (!newEnumerable.Any())
-            //        return new EntityValue(DBNull.Value);
-            //    return new EntityValue(newEnumerable);
-            //    }
-            //else if (argValue is IAsyncList asyncList)
-            //{
-            //    var newEnumerable = asyncList.AsEnumerable().Select(v => CreateFromObject(v, multiValueDelimiter)).ToImmutableList();
-            //    if (!newEnumerable.Any())
-            //        return new EntityValue(DBNull.Value);
-            //    return new EntityValue(newEnumerable);
-            //}
+            case JValue jv: return CreateFromObject(jv.Value, multiValueDelimiter);
+            case JObject jo: return new EntityValue(Entity.Create(jo));
             case Entity entity: return new EntityValue(entity);
             case IEnumerable e2:
             {
@@ -321,7 +309,25 @@ public sealed class EntityValue : OneOfBase<DBNull, string, int, double, bool, E
     /// <inheritdoc />
     public bool Equals(EntityValue? other)
     {
-        return !(other is null) && Value.Equals(other.Value);
+        if (other is null)
+            return false;
+
+        if (Index != other.Index)
+            return false;
+
+        var r = Match(
+            _ => other.IsT0,
+            a => a.Equals(other.AsT1),
+            a => a.Equals(other.AsT2),
+            a => a.Equals(other.AsT3),
+            a => a.Equals(other.AsT4),
+            a => a.Equals(other.AsT5),
+            a => a.Equals(other.AsT6),
+            a => a.Equals(other.AsT7),
+            a => a.SequenceEqual(other.AsT8)
+        );
+
+        return r;
     }
 
     /// <inheritdoc />

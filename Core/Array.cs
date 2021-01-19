@@ -345,6 +345,9 @@ public sealed class Array<T> : IArray, IEquatable<Array<T>>
 
         return false;
     }
+
+    /// <inheritdoc />
+    public override string ToString() => NameInLogs;
 }
 
 /// <summary>
