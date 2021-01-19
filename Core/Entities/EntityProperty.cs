@@ -63,6 +63,16 @@ public readonly struct EntityProperty : IEquatable<EntityProperty>
 
     /// <inheritdoc />
     public override string ToString() => $"{Name}: {BestValue}";
+
+    /// <summary>
+    /// Equals operator.
+    /// </summary>
+    public static bool operator ==(EntityProperty left, EntityProperty right) => left.Equals(right);
+
+    /// <summary>
+    /// Not Equals operator.
+    /// </summary>
+    public static bool operator !=(EntityProperty left, EntityProperty right) => !(left == right);
 }
 
 }
