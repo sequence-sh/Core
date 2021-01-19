@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Internal;
+using Reductech.EDR.Core.Util;
 
 namespace Reductech.EDR.Core.Entities
 {
@@ -22,7 +23,7 @@ public static class EntityValueExtensions
             _ => "",
             x => x,
             x => x.ToString(),
-            x => x.ToString("G17"),
+            x => x.ToString(Constants.DoubleFormat),
             x => x.ToString(),
             x => x.ToString(),
             x => x.ToString("O"),

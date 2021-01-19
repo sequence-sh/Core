@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Text;
 using Reductech.EDR.Core.Entities;
+using Reductech.EDR.Core.Util;
 
 namespace Reductech.EDR.Core.Internal.Serialization
 {
@@ -81,7 +82,7 @@ public static class SerializationMethods
             _ => DoubleQuote(""),
             DoubleQuote,
             x => x.ToString(),
-            x => x.ToString("G17"),
+            x => x.ToString(Constants.DoubleFormat),
             x => x.ToString(),
             x => x.ToString(),
             x => x.ToString("O"),

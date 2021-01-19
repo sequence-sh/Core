@@ -26,7 +26,7 @@ public partial class DeserializationTests
             yield return new DeserializationTestInstance("123",           "123");
             yield return new DeserializationTestInstance("1 + 2",         "3");
             yield return new DeserializationTestInstance("3.3",           "3.3");
-            yield return new DeserializationTestInstance("(double: 3.3)", "(double:3.3)");
+            yield return new DeserializationTestInstance("(double: 3.3)", "(double: 3.3)");
 
             yield return new DeserializationTestInstance(
                 @"- <Foo> = 'Hello World'

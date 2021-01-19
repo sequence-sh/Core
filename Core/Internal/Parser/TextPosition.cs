@@ -8,7 +8,9 @@ namespace Reductech.EDR.Core.Internal.Parser
 /// <summary>
 /// A position within a piece of text.
 /// </summary>
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 public sealed record TextPosition(int Line, int Column, int Index)
+    #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
 {
     /// <summary>
     /// Create a TextPosition from a token
@@ -32,7 +34,9 @@ public sealed record TextPosition(int Line, int Column, int Index)
 /// A location within a piece of text
 /// </summary>
 public sealed record TextLocation
+    #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
     (string Text, TextPosition Start, TextPosition Stop) : IErrorLocation
+    #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
 {
     /// <summary>
     /// Create a textLocation from a token

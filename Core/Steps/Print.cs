@@ -38,7 +38,7 @@ public sealed class Print<T> : CompoundStep<Unit>
         else if (r.Value is DateTime dt)
             stringToPrint = dt.ToString("O");
         else if (r.Value is double d)
-            stringToPrint = d.ToString("G17");
+            stringToPrint = d.ToString(Constants.DoubleFormat);
         else
             stringToPrint = r.Value?.ToString()!;
 
