@@ -44,10 +44,10 @@ public sealed class ToCSV : CompoundStep<StringStream>
     /// </summary>
     [StepProperty(1)]
     [Required]
-    public IStep<Core.Array<Entity>> Entities { get; set; } = null!;
+    public IStep<Array<Entity>> Entities { get; set; } = null!;
 
     /// <summary>
-    /// How the stream is encoded.
+    /// How the stream should be encoded.
     /// </summary>
     [StepProperty(2)]
     [DefaultValueExplanation("UTF8 no BOM")]

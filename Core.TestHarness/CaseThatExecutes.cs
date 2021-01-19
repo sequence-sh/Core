@@ -63,7 +63,12 @@ public abstract partial class StepTestBase<TStep, TOutput>
             CheckLoggedValues(loggerFactory);
 
             if (!IgnoreFinalState)
-                stateMonad.GetState().Should().BeEquivalentTo(ExpectedFinalState);
+                stateMonad.GetState()
+                    .Should()
+                    .BeEquivalentTo(
+                        ExpectedFinalState,
+                        "Final State should match Expected Final State"
+                    );
 
             mockRepository.VerifyAll();
         }
@@ -163,16 +168,6 @@ public abstract partial class StepTestBase<TStep, TOutput>
 
         public IReadOnlyCollection<string> ExpectedLoggedValues { get; set; } =
             ExpectedLoggedValues;
-
-        /// <inheritdoc />
-        public void Deserialize(IXunitSerializationInfo info) =>
-            Name = info.GetValue<string>(nameof(Name));
-
-        /// <inheritdoc />
-        public void Serialize(IXunitSerializationInfo info)
-        {
-            info.AddValue(nameof(Name), Name);
-        }
     }
 }
 

@@ -3,14 +3,13 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using AutoTheory;
-using FluentAssertions;
 using MELT;
 using Microsoft.Extensions.Logging;
+using Moq;
 using Reductech.EDR.Core.ExternalProcesses;
 using Reductech.EDR.Core.Internal;
-using Reductech.EDR.Core.Internal.Parser;
+using Reductech.EDR.Core.Internal.Serialization;
 using Reductech.EDR.Core.TestHarness;
-using Reductech.EDR.Core.Util;
 using Xunit.Abstractions;
 
 namespace Reductech.EDR.Core.Tests
@@ -23,6 +22,10 @@ public partial class DeserializationTests
     {
         get
         {
+            yield return new DeserializationTestInstance("'Hello World'", "Hello World");
+            yield return new DeserializationTestInstance("123",           "123");
+            yield return new DeserializationTestInstance("1 + 2",         "3");
+
             yield return new DeserializationTestInstance(
                 @"- <Foo> = 'Hello World'
 - <Bar> = <Foo>
@@ -333,8 +336,6 @@ Print 'Comments!'",
 
         public string Name => SCL;
 
-        public Configuration? ExpectedConfiguration { get; set; } = null!;
-
         private IReadOnlyCollection<string> ExpectedLoggedValues { get; }
 
         /// <inheritdoc />
@@ -345,42 +346,25 @@ Print 'Comments!'",
             var stepFactoryStore = StepFactoryStore.CreateUsingReflection(typeof(StepFactory));
             var loggerFactory    = TestLoggerFactory.Create();
             loggerFactory.AddXunit(testOutputHelper);
+            var mockFactory = new MockRepository(MockBehavior.Strict);
 
-            var deserializeResult = SCLParsing.ParseSequence(SCL);
-
-            deserializeResult.ShouldBeSuccessful(x => x.AsString);
-
-            var freezeResult = deserializeResult.Value.TryFreeze(stepFactoryStore);
-
-            freezeResult.ShouldBeSuccessful(x => x.AsString);
-
-            var unitStep = freezeResult.Value as IStep<Unit>;
-
-            unitStep.Should().NotBeNull();
-
-            using var stateMonad = new StateMonad(
-                loggerFactory.CreateLogger("Test"),
+            var runner = new SCLRunner(
                 EmptySettings.Instance,
-                ExternalProcessRunner.Instance,
-                FileSystemHelper.Instance,
+                loggerFactory.CreateLogger("Test"),
+                mockFactory.Create<IExternalProcessRunner>().Object,
+                mockFactory.Create<IFileSystemHelper>().Object,
                 stepFactoryStore
             );
 
-            var runResult = await unitStep!
-                .Run(stateMonad, CancellationToken.None);
+            var result = await runner.RunSequenceFromTextAsync(SCL, CancellationToken.None);
 
-            runResult.ShouldBeSuccessful(x => x.AsString);
+            result.ShouldBeSuccessful(x => x.AsString);
 
             StaticHelpers.CheckLoggedValues(
                 loggerFactory,
                 LogLevel.Information,
                 ExpectedLoggedValues
             );
-
-            if (ExpectedConfiguration != null || freezeResult.Value.Configuration != null)
-            {
-                freezeResult.Value.Configuration.Should().BeEquivalentTo(ExpectedConfiguration);
-            }
         }
     }
 }

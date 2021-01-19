@@ -48,9 +48,11 @@ public readonly struct EntityProperty : IEquatable<EntityProperty>
     /// <inheritdoc />
     public bool Equals(EntityProperty other)
     {
-        return Name == other.Name
-            && BestValue.Equals(other.BestValue)
-            && Order == other.Order;
+        var r = Name == other.Name
+             && BestValue.Equals(other.BestValue)
+             && Order == other.Order;
+
+        return r;
     }
 
     /// <inheritdoc />
@@ -60,10 +62,7 @@ public readonly struct EntityProperty : IEquatable<EntityProperty>
     public override int GetHashCode() => HashCode.Combine(Name, BestValue, Order);
 
     /// <inheritdoc />
-    public override string ToString()
-    {
-        return $"{Name}: {BestValue}";
-    }
+    public override string ToString() => $"{Name}: {BestValue}";
 }
 
 }

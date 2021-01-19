@@ -143,9 +143,10 @@ public static class StaticHelpers
         );
 
         if (expectedLoggedValues.IsNullOrEmpty())
-            infoOrHigherEntries.Should().BeEmpty();
+            infoOrHigherEntries.Should().BeEmpty("Log values should be empty");
         else
-            infoOrHigherEntries.Should().SatisfyRespectively(assertions);
+            infoOrHigherEntries.Should()
+                .SatisfyRespectively(assertions, "Log value should match expected");
     }
 }
 

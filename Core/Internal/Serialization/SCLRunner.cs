@@ -10,6 +10,7 @@ using Microsoft.Extensions.Logging;
 using Reductech.EDR.Core.ExternalProcesses;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Internal.Parser;
+using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.Util;
 
 namespace Reductech.EDR.Core.Internal.Serialization
@@ -61,7 +62,7 @@ public sealed class SCLRunner
     {
         var stepResult = SCLParsing.ParseSequence(text)
             .Bind(x => x.TryFreeze(_stepFactoryStore))
-            .Bind(ConvertToUnitStep);
+            .Map(ConvertToUnitStep);
 
         if (stepResult.IsFailure)
             return stepResult.ConvertFailure<Unit>();
@@ -84,14 +85,20 @@ public sealed class SCLRunner
     /// <summary>
     /// Converts the step to a unit step for running.
     /// </summary>
-    public static Result<IStep<Unit>, IError> ConvertToUnitStep(IStep step)
+    public static IStep<Unit> ConvertToUnitStep(IStep step)
     {
         if (step is IStep<Unit> unitStep)
-        {
-            return Result.Success<IStep<Unit>, IError>(unitStep);
-        }
+            return unitStep;
 
-        return new SingleError(new StepErrorLocation(step), ErrorCode.UnitExpected);
+        IStep<Unit> print = SurroundWithPrint(step as dynamic);
+        return print;
+    }
+
+    private static IStep<Unit> SurroundWithPrint<T>(IStep<T> step)
+    {
+        var p = new Print<T>() { Value = step };
+
+        return p;
     }
 
     /// <summary>

@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
+using Newtonsoft.Json.Linq;
 using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Internal.Serialization;
@@ -51,6 +52,14 @@ public sealed class Entity : IEnumerable<EntityProperty>, IEquatable<Entity>
     /// </summary>
     public static Entity Create(params (string key, object? property)[] properties) =>
         Create(properties.AsEnumerable());
+
+    /// <summary>
+    /// Create and entity from a JObject
+    /// </summary>
+    public static Entity Create(JObject jObject)
+    {
+        return Create(jObject.Properties().Select(x => (x.Name, x.Value as object))!);
+    }
 
     /// <summary>
     /// Creates a new Entity
@@ -112,7 +121,15 @@ public sealed class Entity : IEnumerable<EntityProperty>, IEquatable<Entity>
     /// <inheritdoc />
     public bool Equals(Entity? other)
     {
-        return !(other is null) && Dictionary.Values.SequenceEqual(other.Dictionary.Values);
+        if (other is null)
+            return false;
+
+        if (!Dictionary.Keys.SequenceEqual(other.Dictionary.Keys))
+            return false;
+
+        var r = Dictionary.Values.SequenceEqual(other.Dictionary.Values);
+
+        return r;
     }
 
     /// <inheritdoc />

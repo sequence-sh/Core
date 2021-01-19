@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using AutoTheory;
 using CSharpFunctionalExtensions;
@@ -23,18 +22,6 @@ public partial class DeserializationErrorTests
             yield return new DeserializationErrorCase(
                 "",
                 ("SCL is empty.", EntireSequenceLocation.Instance.AsString)
-            );
-
-            yield return new DeserializationErrorCase(
-                "\"Print 123\"",
-                ("An SCL Sequence should have a final return type of Unit. Try wrapping your sequence with 'Print'.",
-                 "Print 123")
-            );
-
-            yield return new DeserializationErrorCase(
-                "'Print 123'",
-                ("An SCL Sequence should have a final return type of Unit. Try wrapping your sequence with 'Print'.",
-                 "Print 123")
             );
 
             yield return new DeserializationErrorCase(
@@ -99,7 +86,7 @@ public partial class DeserializationErrorTests
 
             var result = SCLParsing.ParseSequence(SCL)
                 .Bind(x => x.TryFreeze(sfs))
-                .Bind(SCLRunner.ConvertToUnitStep);
+                .Map(SCLRunner.ConvertToUnitStep);
 
             result.IsFailure.Should().BeTrue("Case should fail");
 

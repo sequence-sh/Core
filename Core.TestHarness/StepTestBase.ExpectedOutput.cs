@@ -23,7 +23,8 @@ public abstract partial class StepTestBase<TStep, TOutput>
 
             TryPickT1(out var tOutput, out _).Should().BeTrue();
 
-            outputResult.Value.Should().BeEquivalentTo(tOutput);
+            outputResult.Value.Should()
+                .BeEquivalentTo(tOutput);
         }
 
         public void CheckUnitResult(Result<Unit, IError> result)
