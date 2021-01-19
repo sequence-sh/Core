@@ -120,6 +120,12 @@
   <data name="AssertionFailed" xml:space="preserve">
     <value>Assertion Failed '{0}'</value>
   </data>
+  <data name="CannotConvertNestedEntity" xml:space="preserve">
+    <value>Cannot convert a nested entity to {0}.</value>
+  </data>
+  <data name="CannotConvertNestedList" xml:space="preserve">
+    <value>Cannot convert nested list to {0}.</value>
+  </data>
   <data name="CannotCreateGeneric" xml:space="preserve">
     <value>Could not create an instance of {0}&lt;{1}&gt;</value>
   </data>
