@@ -239,6 +239,18 @@ public sealed record ErrorCode : ErrorCodeBase
     /// Variable '{0}' does not have type '{1}'.
     /// </summary>
     public static readonly ErrorCode WrongVariableType = new(nameof(WrongVariableType));
+
+    /// <summary>
+    /// Cannot convert a nested entity to {0}.
+    /// </summary>
+    public static readonly ErrorCode CannotConvertNestedEntity =
+        new(nameof(CannotConvertNestedEntity));
+
+    /// <summary>
+    /// Cannot convert nested list to {0}.
+    /// </summary>
+    public static readonly ErrorCode CannotConvertNestedList =
+        new(nameof(CannotConvertNestedList));
 }
 
 }

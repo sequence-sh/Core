@@ -89,6 +89,31 @@ public sealed class EntityValue : OneOfBase<DBNull, string, int, double, bool, E
     }
 
     /// <summary>
+    /// Combine this with another EntityValue
+    /// </summary>
+    public EntityValue Combine(EntityValue other)
+    {
+        ImmutableList<EntityValue> newList;
+
+        if (TryPickT8(out var thisList, out _))
+        {
+            if (other.TryPickT8(out var otherList, out _))
+                newList = thisList.AddRange(otherList);
+            else
+                newList = thisList.Add(other);
+        }
+        else
+        {
+            if (other.TryPickT8(out var otherList, out _))
+                newList = otherList.Insert(0, this);
+            else
+                newList = ImmutableList.Create(this, other);
+        }
+
+        return new EntityValue(newList);
+    }
+
+    /// <summary>
     /// Tries to convert the value so it matches the schema.
     /// </summary>
     public Result<(EntityValue value, bool changed), IErrorBuilder> TryConvert(

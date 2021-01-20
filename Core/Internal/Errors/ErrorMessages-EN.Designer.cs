@@ -70,6 +70,24 @@ namespace Reductech.EDR.Core.Internal.Errors {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Cannot convert a nested entity to {0}..
+        /// </summary>
+        internal static string CannotConvertNestedEntity {
+            get {
+                return ResourceManager.GetString("CannotConvertNestedEntity", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot convert nested list to {0}..
+        /// </summary>
+        internal static string CannotConvertNestedList {
+            get {
+                return ResourceManager.GetString("CannotConvertNestedList", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Could not create an instance of {0}&lt;{1}&gt;.
         /// </summary>
         internal static string CannotCreateGeneric {
