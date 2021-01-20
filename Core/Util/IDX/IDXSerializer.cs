@@ -78,9 +78,10 @@ public static class IDXSerializer
             if (!DREFieldsSet.Contains(entityProperty.Name))
             {
                 var fieldValue = new SpecialField(
-                    $"{DREField} {entityProperty.Name}=",
+                    $"{DREField} {entityProperty.Name}",
                     StringHandling.Quote,
                     false,
+                    true,
                     true
                 );
 
@@ -118,9 +119,15 @@ public static class IDXSerializer
                 var maybeQuotedString =
                     field.StringHandling == StringHandling.Quote ? $"\"{s1}\"" : s1;
 
-                var line = $"#{field.Name} {maybeQuotedString}";
-                sb.AppendLine(line);
+                AppendField(maybeQuotedString);
             }
+        }
+
+        void AppendField(string s2)
+        {
+            var equalsMaybe = field.UseEquals ? "=" : "";
+            var line        = $"#{field.Name}{equalsMaybe} {s2}";
+            sb.AppendLine(line);
         }
 
         if (r0.TryPickT0(out var s, out var r1))
@@ -131,35 +138,31 @@ public static class IDXSerializer
 
         if (r1.TryPickT0(out var i, out var r2))
         {
-            var line = $"#{field.Name} {i}";
-            sb.AppendLine(line);
+            AppendField(i.ToString());
             return Unit.Default;
         }
 
         if (r2.TryPickT0(out var d, out var r3))
         {
-            var line = $"#{field.Name} {d}";
-            sb.AppendLine(line);
+            AppendField(d.ToString(Constants.DoubleFormat));
             return Unit.Default;
         }
 
         if (r3.TryPickT0(out var b, out var r4))
         {
-            var line = $"#{field.Name} {b}";
-            sb.AppendLine(line);
+            AppendField(b.ToString());
             return Unit.Default;
         }
 
         if (r4.TryPickT0(out var e, out var r5))
         {
-            AppendString(e.ToString());
+            AppendField(e.ToString());
             return Unit.Default;
         }
 
         if (r5.TryPickT0(out var dt, out var r6))
         {
-            var line = $"#{field.Name} {dt:yyyy/MM/dd}";
-            sb.AppendLine(line);
+            AppendField(dt.ToString("yyyy/MM/dd"));
             return Unit.Default;
         }
 
@@ -190,7 +193,8 @@ public static class IDXSerializer
         string Name,
         StringHandling StringHandling,
         bool Mandatory,
-        bool AllowList);
+        bool AllowList,
+        bool UseEquals);
 
     private const string DREEndData = "DREENDDATA";
 
@@ -201,11 +205,11 @@ public static class IDXSerializer
     private static readonly IReadOnlyList<SpecialField> OrderedDREFields = new List<SpecialField>()
     {
         // ReSharper disable StringLiteralTypo
-        new("DREREFERENCE", StringHandling.InlineUnquoted, true, false),
-        new("DREDATE", StringHandling.InlineUnquoted, false, false),
-        new("DRETITLE", StringHandling.Paragraph, false, false),
-        new("DRECONTENT", StringHandling.Paragraph, false, false),
-        new("DREDBNAME", StringHandling.InlineUnquoted, false, false)
+        new("DREREFERENCE", StringHandling.InlineUnquoted, true, false, false),
+        new("DREDATE", StringHandling.InlineUnquoted, false, false, false),
+        new("DRETITLE", StringHandling.Paragraph, false, false, false),
+        new("DRECONTENT", StringHandling.Paragraph, false, false, false),
+        new("DREDBNAME", StringHandling.InlineUnquoted, false, false, false)
         // ReSharper restore StringLiteralTypo
     };
 

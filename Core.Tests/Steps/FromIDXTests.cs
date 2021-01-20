@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.TestHarness;
 
@@ -24,6 +25,37 @@ public partial class FromIDXTests : StepTestBase<FromIDX, Entity>
                     )
                 },
                 Entity.Create(("DREREFERENCE", "abcd"), ("Foo", "1"))
+            );
+
+            yield return new StepCase(
+                "Edgar Brown",
+                new FromIDX
+                {
+                    Stream = StaticHelpers.Constant(
+                        @"#DREREFERENCE 392348A0
+#DREDATE 1990/01/06
+#DRETITLE
+Jurassic Molecules
+#DRECONTENT
+abcde
+fghij
+#DREDBNAME Science
+#DREFIELD authorname1= ""Brown""
+#DREFIELD authorname2= ""Edgar""
+#DREFIELD title= ""Dr.""
+#DREENDDOC
+#DREENDDATAREFERENCE"
+                    )
+                },
+                Entity.Create(
+                    ("DREREFERENCE", "392348A0"),
+                    ("authorname", new List<string>() { "Brown", "Edgar" }),
+                    ("title", "Dr."),
+                    ("DREDATE", new DateTime(1990, 01, 06)),
+                    ("DRETITLE", "Jurassic Molecules"),
+                    ("DRECONTENT", "abcde\r\nfghij"),
+                    ("DREDBNAME", "Science")
+                )
             );
         }
     }

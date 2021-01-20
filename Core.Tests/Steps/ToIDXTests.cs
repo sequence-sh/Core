@@ -51,8 +51,8 @@ Jurassic Molecules
 abcde
 fghij
 #DREDBNAME Science
-#DREFIELD authorname=1 ""Brown""
-#DREFIELD authorname=2 ""Edgar""
+#DREFIELD authorname1= ""Brown""
+#DREFIELD authorname2= ""Edgar""
 #DREFIELD title= ""Dr.""
 #DREENDDOC
 #DREENDDATAREFERENCE"
