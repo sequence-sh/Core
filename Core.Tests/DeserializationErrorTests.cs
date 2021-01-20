@@ -76,7 +76,7 @@ public partial class DeserializationErrorTests
     (prop1: """"value3"""" prop2: 4),
   ]",
                 (@"Syntax Error: No Viable Alternative - '""""' was unexpected.",
-                 @"Line: 2, Col: 20, Idx: 34 - Line: 2, Col: 21, Idx: 35 Text: """"")
+                 @"Line: 2, Col: 20, Idx: 35 - Line: 2, Col: 21, Idx: 36 Text: """"")
             );
         }
     }
