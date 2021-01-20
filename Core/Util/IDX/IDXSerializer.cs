@@ -56,6 +56,22 @@ public static class IDXSerializer
         Entity entity,
         StringBuilder stringBuilder)
     {
+        var reference = entity.TryGetValue(DREReference);
+
+        if (reference.HasNoValue)
+            return ErrorCode.SchemaViolationMissingProperty.ToErrorBuilder(DREReference);
+
+        var referenceResult = TryAppendValue(
+            stringBuilder,
+            DREReference,
+            reference.Value,
+            false,
+            false
+        );
+
+        if (referenceResult.IsFailure)
+            return referenceResult;
+
         foreach (var dreField in OrderedDREFields)
         {
             var value = entity.TryGetValue(dreField);
@@ -67,7 +83,7 @@ public static class IDXSerializer
                     dreField,
                     value.Value,
                     false,
-                    dreField != DREReference
+                    true
                 );
 
                 if (v.IsFailure)
@@ -77,7 +93,7 @@ public static class IDXSerializer
 
         foreach (var entityProperty in entity)
         {
-            if (!DREFieldsSet.Contains(entityProperty.Name))
+            if (!DREFieldsSet.Contains(entityProperty.Name) && entityProperty.Name != DREReference)
             {
                 var v = TryAppendValue(
                     stringBuilder,
@@ -107,8 +123,9 @@ public static class IDXSerializer
 
         if (r0.TryPickT0(out var s, out var r1))
         {
+            var maybeQuotedString = quoteString ? $"\"{s}\"" : s;
             //TODO escape value
-            var line = $"{fieldName} \"{s}\"";
+            var line = $"{fieldName} {maybeQuotedString}";
             sb.AppendLine(line);
             return Unit.Default;
         }
@@ -136,8 +153,9 @@ public static class IDXSerializer
 
         if (r4.TryPickT0(out var e, out var r5))
         {
+            var maybeQuotedString = quoteString ? $"\"{e}\"" : s;
             //TODO escape value
-            var line = $"{fieldName} \"{e}\"";
+            var line = $"{fieldName} {maybeQuotedString}";
             sb.AppendLine(line);
             return Unit.Default;
         }
@@ -176,11 +194,7 @@ public static class IDXSerializer
     private static readonly IReadOnlyList<string> OrderedDREFields = new List<string>()
     {
         // ReSharper disable StringLiteralTypo
-        DREReference,
-        "DREDATE",
-        "DRETITLE",
-        "DRECONTENT",
-        "DREDBNAME"
+        "DREDATE", "DRETITLE", "DRECONTENT", "DREDBNAME"
         // ReSharper restore StringLiteralTypo
     };
 
