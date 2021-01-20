@@ -21,10 +21,7 @@ public partial class ToIDXTests : StepTestBase<ToIDX, StringStream>
                 {
                     Entity = Constant(Entity.Create(("DREREFERENCE", "abcd"), ("Foo", 1)))
                 },
-                @"#DREREFERENCE abcd
-#DREFIELD Foo= 1
-#DREENDDOC
-#DREENDDATAREFERENCE"
+                "#DREREFERENCE abcd\r\n#DREFIELD Foo= 1\r\n#DREENDDOC\r\n#DREENDDATAREFERENCE"
             );
 
             yield return new StepCase(
@@ -43,19 +40,7 @@ public partial class ToIDXTests : StepTestBase<ToIDX, StringStream>
                         )
                     )
                 },
-                @"#DREREFERENCE 392348A0
-#DREDATE 1990/01/06
-#DRETITLE
-Jurassic Molecules
-#DRECONTENT
-abcde
-fghij
-#DREDBNAME Science
-#DREFIELD authorname1= ""Brown""
-#DREFIELD authorname2= ""Edgar""
-#DREFIELD title= ""Dr.""
-#DREENDDOC
-#DREENDDATAREFERENCE"
+                "#DREREFERENCE 392348A0\r\n#DREDATE 1990/01/06\r\n#DRETITLE\r\nJurassic Molecules\r\n#DRECONTENT\r\nabcde\r\nfghij\r\n#DREDBNAME Science\r\n#DREFIELD authorname1= \"Brown\"\r\n#DREFIELD authorname2= \"Edgar\"\r\n#DREFIELD title= \"Dr.\"\r\n#DREENDDOC\r\n#DREENDDATAREFERENCE"
             );
         }
     }

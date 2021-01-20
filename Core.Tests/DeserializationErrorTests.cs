@@ -71,10 +71,7 @@ public partial class DeserializationErrorTests
             );
 
             yield return new DeserializationErrorCase(
-                @"- <Input> = [
-    (prop1: """"value1"""" prop2: 2),
-    (prop1: """"value3"""" prop2: 4),
-  ]",
+                "- <Input> = [\r\n    (prop1: \"\"value1\"\" prop2: 2),\r\n    (prop1: \"\"value3\"\" prop2: 4),\r\n  ]",
                 (@"Syntax Error: No Viable Alternative - '""""' was unexpected.",
                  @"Line: 2, Col: 20, Idx: 35 - Line: 2, Col: 21, Idx: 36 Text: """"")
             );

@@ -32,19 +32,7 @@ public partial class FromIDXTests : StepTestBase<FromIDX, Entity>
                 new FromIDX
                 {
                     Stream = StaticHelpers.Constant(
-                        @"#DREREFERENCE 392348A0
-#DREDATE 1990/01/06
-#DRETITLE
-Jurassic Molecules
-#DRECONTENT
-abcde
-fghij
-#DREDBNAME Science
-#DREFIELD authorname1= ""Brown""
-#DREFIELD authorname2= ""Edgar""
-#DREFIELD title= ""Dr.""
-#DREENDDOC
-#DREENDDATAREFERENCE"
+                        "#DREREFERENCE 392348A0\r\n#DREDATE 1990/01/06\r\n#DRETITLE\r\nJurassic Molecules\r\n#DRECONTENT\r\nabcde\r\nfghij\r\n#DREDBNAME Science\r\n#DREFIELD authorname1= \"Brown\"\r\n#DREFIELD authorname2= \"Edgar\"\r\n#DREFIELD title= \"Dr.\"\r\n#DREENDDOC\r\n#DREENDDATAREFERENCE"
                     )
                 },
                 Entity.Create(
