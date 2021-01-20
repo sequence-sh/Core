@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text.RegularExpressions;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.Internal.Errors;
@@ -27,6 +29,11 @@ public record IdxParserConfiguration(
 public record IdxParser(IdxParserConfiguration Config)
     #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
 {
+    private static readonly Regex FieldRegex = new(
+        @"(?<name>\w+)(?<number>\d+)",
+        RegexOptions.Compiled | RegexOptions.IgnoreCase
+    );
+
     /// <summary>
     /// Parse an IDX string as an entity.
     /// </summary>
@@ -35,20 +42,42 @@ public record IdxParser(IdxParserConfiguration Config)
         if (string.IsNullOrWhiteSpace(input))
             return ErrorCode.CouldNotParse.ToErrorBuilder("", "IDX");
 
-        var propertyList = new List<EntityProperty>();
+        var propertyList = new Dictionary<string, EntityProperty>();
 
         var currentOrder = 0;
 
         void AddField(string fieldName, string fieldValue)
         {
-            propertyList.Add(
-                new EntityProperty(
+            var fieldMatch = FieldRegex.Match(fieldName);
+            var newValue   = EntityValue.CreateFromObject(fieldValue);
+
+            if (fieldMatch.Success)
+                fieldName = fieldMatch.Groups["name"].Value;
+
+            if (propertyList.TryGetValue(fieldName, out var ep))
+            {
+                var combinedValue = ep.BestValue.Combine(newValue);
+
+                propertyList[fieldName] =
+                    new EntityProperty(
+                        fieldName,
+                        combinedValue,
+                        null,
+                        currentOrder
+                    );
+            }
+            else
+            {
+                propertyList.Add(
                     fieldName,
-                    EntityValue.CreateFromObject(fieldValue),
-                    null,
-                    currentOrder
-                )
-            );
+                    new EntityProperty(
+                        fieldName,
+                        newValue,
+                        null,
+                        currentOrder
+                    )
+                );
+            }
 
             currentOrder++;
         }
@@ -68,12 +97,6 @@ public record IdxParser(IdxParserConfiguration Config)
             var fieldValue = fieldBlock.Substring(fieldNameEnd + 1);
 
             fieldValue = fieldValue.Trim();
-
-            //if (fieldValue.EndsWith('\n'))
-            //    fieldValue = fieldValue.Remove(fieldValue.Length - 1);
-
-            //if (fieldValue.EndsWith('\r'))
-            //    fieldValue = fieldValue.Remove(fieldValue.Length - 1);
 
             switch (fieldName)
             {
@@ -127,7 +150,11 @@ public record IdxParser(IdxParserConfiguration Config)
             }
         }
 
-        return new Entity(propertyList);
+        var newPropertyValues = propertyList.Values.OrderBy(x => x.Order)
+            .Select((x, i) => new EntityProperty(x.Name, x.BaseValue, null, i));
+
+        var entity = new Entity(newPropertyValues);
+        return entity;
     }
 }
 

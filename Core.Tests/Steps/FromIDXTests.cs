@@ -49,12 +49,12 @@ fghij
                 },
                 Entity.Create(
                     ("DREREFERENCE", "392348A0"),
-                    ("authorname", new List<string>() { "Brown", "Edgar" }),
-                    ("title", "Dr."),
-                    ("DREDATE", new DateTime(1990, 01, 06)),
+                    ("DREDATE", "1990/01/06"),
                     ("DRETITLE", "Jurassic Molecules"),
                     ("DRECONTENT", "abcde\r\nfghij"),
-                    ("DREDBNAME", "Science")
+                    ("DREDBNAME", "Science"),
+                    ("authorname", new List<string>() { "Brown", "Edgar" }),
+                    ("title", "Dr.")
                 )
             );
         }
