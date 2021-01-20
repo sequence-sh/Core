@@ -28,9 +28,8 @@ public static class IDXSerializer
 
         stringBuilder.AppendLine($"#{DREEndDoc}");
         stringBuilder.AppendLine($"#{DREEndDataReference}");
-        stringBuilder.AppendLine();
 
-        return stringBuilder.ToString();
+        return stringBuilder.ToString().Trim();
     }
 
     /// <summary>
@@ -47,60 +46,64 @@ public static class IDXSerializer
             return r.ConvertFailure<string>();
 
         stringBuilder.AppendLine($"#{DREEndData}");
-        stringBuilder.AppendLine();
 
-        return stringBuilder.ToString();
+        return stringBuilder.ToString().Trim();
     }
 
     private static Result<Unit, IErrorBuilder> TryAppendValues(
         Entity entity,
         StringBuilder stringBuilder)
     {
-        var reference = entity.TryGetValue(DREReference);
+        //var reference = entity.TryGetValue(DREReference);
 
-        if (reference.HasNoValue)
-            return ErrorCode.SchemaViolationMissingProperty.ToErrorBuilder(DREReference);
+        //if (reference.HasNoValue)
+        //    return ErrorCode.SchemaViolationMissingProperty.ToErrorBuilder(DREReference);
 
-        var referenceResult = TryAppendValue(
-            stringBuilder,
-            DREReference,
-            reference.Value,
-            false,
-            false
-        );
+        //var referenceResult = TryAppendValue(
+        //    stringBuilder,
+        //    DREReference,
+        //    reference.Value,
+        //    false,
+        //    false
+        //);
 
-        if (referenceResult.IsFailure)
-            return referenceResult;
+        //if (referenceResult.IsFailure)
+        //    return referenceResult;
 
         foreach (var dreField in OrderedDREFields)
         {
-            var value = entity.TryGetValue(dreField);
+            var value = entity.TryGetValue(dreField.Name);
 
             if (value.HasValue)
             {
                 var v = TryAppendValue(
                     stringBuilder,
-                    dreField,
                     value.Value,
-                    false,
-                    true
+                    dreField
                 );
 
                 if (v.IsFailure)
                     return v;
             }
+            else if (dreField.Mandatory)
+                return ErrorCode.SchemaViolationMissingProperty.ToErrorBuilder(dreField.Name);
         }
 
         foreach (var entityProperty in entity)
         {
-            if (!DREFieldsSet.Contains(entityProperty.Name) && entityProperty.Name != DREReference)
+            if (!DREFieldsSet.Contains(entityProperty.Name))
             {
+                var fieldValue = new SpecialField(
+                    $"DREFIELD {entityProperty.Name}=",
+                    StringHandling.Quote,
+                    false,
+                    true
+                );
+
                 var v = TryAppendValue(
                     stringBuilder,
-                    $"{DREField} {entityProperty.Name}=",
                     entityProperty.BestValue,
-                    true,
-                    true
+                    fieldValue
                 );
 
                 if (v.IsFailure)
@@ -113,56 +116,65 @@ public static class IDXSerializer
 
     private static Result<Unit, IErrorBuilder> TryAppendValue(
         StringBuilder sb,
-        string fieldName,
         EntityValue entityValue,
-        bool allowList,
-        bool quoteString)
+        SpecialField field)
     {
         if (entityValue.TryPickT0(out _, out var r0))
             return Unit.Default;
 
+        void AppendString(string s1) //TODO escape value
+        {
+            if (s1.Contains('\n') || field.StringHandling == StringHandling.Paragraph)
+            {
+                sb.AppendLine(field.Name);
+                sb.AppendLine(s1);
+            }
+            else
+            {
+                var maybeQuotedString =
+                    field.StringHandling == StringHandling.Quote ? $"\"{s1}\"" : s1;
+
+                var line = $"{field.Name} {maybeQuotedString}";
+                sb.AppendLine(line);
+            }
+        }
+
         if (r0.TryPickT0(out var s, out var r1))
         {
-            var maybeQuotedString = quoteString ? $"\"{s}\"" : s;
-            //TODO escape value
-            var line = $"{fieldName} {maybeQuotedString}";
-            sb.AppendLine(line);
+            AppendString(s);
             return Unit.Default;
         }
 
         if (r1.TryPickT0(out var i, out var r2))
         {
-            var line = $"{fieldName} {i}";
+            var line = $"{field.Name} {i}";
             sb.AppendLine(line);
             return Unit.Default;
         }
 
         if (r2.TryPickT0(out var d, out var r3))
         {
-            var line = $"{fieldName} {d}";
+            var line = $"{field.Name} {d}";
             sb.AppendLine(line);
             return Unit.Default;
         }
 
         if (r3.TryPickT0(out var b, out var r4))
         {
-            var line = $"{fieldName} {b}";
+            var line = $"{field.Name} {b}";
             sb.AppendLine(line);
             return Unit.Default;
         }
 
         if (r4.TryPickT0(out var e, out var r5))
         {
-            var maybeQuotedString = quoteString ? $"\"{e}\"" : s;
-            //TODO escape value
-            var line = $"{fieldName} {maybeQuotedString}";
-            sb.AppendLine(line);
+            AppendString(e.ToString());
             return Unit.Default;
         }
 
         if (r5.TryPickT0(out var dt, out var r6))
         {
-            var line = $"{fieldName} {dt:yyyy/MM/dd}";
+            var line = $"{field.Name} {dt:yyyy/MM/dd}";
             sb.AppendLine(line);
             return Unit.Default;
         }
@@ -170,18 +182,31 @@ public static class IDXSerializer
         if (r6.TryPickT0(out _, out var list))
             return ErrorCode.CannotConvertNestedEntity.ToErrorBuilder("IDX");
 
-        if (allowList)
+        if (!field.AllowList)
+            return ErrorCode.CannotConvertNestedList.ToErrorBuilder("IDX");
+
+        for (var j = 0; j < list.Count; j++)
         {
-            for (var j = 0; j < list.Count; j++)
-            {
-                var member       = list[j];
-                var newFieldName = $"{fieldName}{j + 1}";
-                TryAppendValue(sb, newFieldName, member, false, true);
-            }
+            var member       = list[j];
+            var newFieldName = $"{field.Name}{j + 1}";
+            TryAppendValue(sb, member, field with { AllowList = false, Name = newFieldName });
         }
 
-        return ErrorCode.CannotConvertNestedList.ToErrorBuilder("IDX");
+        return Unit.Default;
     }
+
+    private enum StringHandling
+    {
+        Quote,
+        Paragraph,
+        InlineUnquoted
+    }
+
+    private record SpecialField(
+        string Name,
+        StringHandling StringHandling,
+        bool Mandatory,
+        bool AllowList);
 
     private const string DREEndData = "DREENDDATA";
 
@@ -189,16 +214,19 @@ public static class IDXSerializer
     private const string DREEndDoc = "DREENDDOC";
     private const string DREEndDataReference = "DREENDDATAREFERENCE";
 
-    private const string DREReference = "DREREFERENCE";
-
-    private static readonly IReadOnlyList<string> OrderedDREFields = new List<string>()
+    private static readonly IReadOnlyList<SpecialField> OrderedDREFields = new List<SpecialField>()
     {
         // ReSharper disable StringLiteralTypo
-        "DREDATE", "DRETITLE", "DRECONTENT", "DREDBNAME"
+        new("DREREFERENCE", StringHandling.InlineUnquoted, true, false),
+        new("DREDATE", StringHandling.InlineUnquoted, false, false),
+        new("DRETITLE", StringHandling.Paragraph, false, false),
+        new("DRECONTENT", StringHandling.Paragraph, false, false),
+        new("DREDBNAME", StringHandling.InlineUnquoted, false, false)
         // ReSharper restore StringLiteralTypo
     };
 
-    private static readonly IReadOnlyCollection<string> DREFieldsSet = OrderedDREFields.ToHashSet();
+    private static readonly IReadOnlyCollection<string> DREFieldsSet =
+        OrderedDREFields.Select(x => x.Name).ToHashSet();
 }
 
 }

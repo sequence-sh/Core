@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.TestHarness;
@@ -23,9 +24,38 @@ public partial class ToIDXTests : StepTestBase<ToIDX, StringStream>
                 @"DREREFERENCE abcd
 DREFIELD Foo= 1
 #DREENDDOC
-#DREENDDATAREFERENCE
+#DREENDDATAREFERENCE"
+            );
 
-"
+            yield return new StepCase(
+                "Edgar Brown",
+                new ToIDX()
+                {
+                    Entity = Constant(
+                        Entity.Create(
+                            ("DREREFERENCE", "392348A0"),
+                            ("authorname", new List<string>() { "Brown", "Edgar" }),
+                            ("title", "Dr."),
+                            ("DREDATE", new DateTime(1990, 01, 06)),
+                            ("DRETITLE", "Jurassic Molecules"),
+                            ("DRECONTENT", "abcde\r\nfghij"),
+                            ("DREDBNAME", "Science")
+                        )
+                    )
+                },
+                @"DREREFERENCE 392348A0
+DREDATE 1990/01/06
+DRETITLE
+Jurassic Molecules
+DRECONTENT
+abcde
+fghij
+DREDBNAME Science
+DREFIELD authorname=1 ""Brown""
+DREFIELD authorname=2 ""Edgar""
+DREFIELD title= ""Dr.""
+#DREENDDOC
+#DREENDDATAREFERENCE"
             );
         }
     }
