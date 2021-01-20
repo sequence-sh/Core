@@ -17,19 +17,19 @@ public partial class ToIDXTests : StepTestBase<ToIDX, StringStream>
         {
             yield return new StepCase(
                 "Single Property",
-                new ToIDX()
+                new ToIDX
                 {
                     Entity = Constant(Entity.Create(("DREREFERENCE", "abcd"), ("Foo", 1)))
                 },
-                @"DREREFERENCE abcd
-DREFIELD Foo= 1
+                @"#DREREFERENCE abcd
+#DREFIELD Foo= 1
 #DREENDDOC
 #DREENDDATAREFERENCE"
             );
 
             yield return new StepCase(
                 "Edgar Brown",
-                new ToIDX()
+                new ToIDX
                 {
                     Entity = Constant(
                         Entity.Create(
@@ -43,17 +43,17 @@ DREFIELD Foo= 1
                         )
                     )
                 },
-                @"DREREFERENCE 392348A0
-DREDATE 1990/01/06
-DRETITLE
+                @"#DREREFERENCE 392348A0
+#DREDATE 1990/01/06
+#DRETITLE
 Jurassic Molecules
-DRECONTENT
+#DRECONTENT
 abcde
 fghij
-DREDBNAME Science
-DREFIELD authorname=1 ""Brown""
-DREFIELD authorname=2 ""Edgar""
-DREFIELD title= ""Dr.""
+#DREDBNAME Science
+#DREFIELD authorname=1 ""Brown""
+#DREFIELD authorname=2 ""Edgar""
+#DREFIELD title= ""Dr.""
 #DREENDDOC
 #DREENDDATAREFERENCE"
             );

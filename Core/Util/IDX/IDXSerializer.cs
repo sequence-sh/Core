@@ -54,22 +54,6 @@ public static class IDXSerializer
         Entity entity,
         StringBuilder stringBuilder)
     {
-        //var reference = entity.TryGetValue(DREReference);
-
-        //if (reference.HasNoValue)
-        //    return ErrorCode.SchemaViolationMissingProperty.ToErrorBuilder(DREReference);
-
-        //var referenceResult = TryAppendValue(
-        //    stringBuilder,
-        //    DREReference,
-        //    reference.Value,
-        //    false,
-        //    false
-        //);
-
-        //if (referenceResult.IsFailure)
-        //    return referenceResult;
-
         foreach (var dreField in OrderedDREFields)
         {
             var value = entity.TryGetValue(dreField.Name);
@@ -94,7 +78,7 @@ public static class IDXSerializer
             if (!DREFieldsSet.Contains(entityProperty.Name))
             {
                 var fieldValue = new SpecialField(
-                    $"DREFIELD {entityProperty.Name}=",
+                    $"{DREField} {entityProperty.Name}=",
                     StringHandling.Quote,
                     false,
                     true
@@ -126,7 +110,7 @@ public static class IDXSerializer
         {
             if (s1.Contains('\n') || field.StringHandling == StringHandling.Paragraph)
             {
-                sb.AppendLine(field.Name);
+                sb.AppendLine("#" + field.Name);
                 sb.AppendLine(s1);
             }
             else
@@ -134,7 +118,7 @@ public static class IDXSerializer
                 var maybeQuotedString =
                     field.StringHandling == StringHandling.Quote ? $"\"{s1}\"" : s1;
 
-                var line = $"{field.Name} {maybeQuotedString}";
+                var line = $"#{field.Name} {maybeQuotedString}";
                 sb.AppendLine(line);
             }
         }
@@ -147,21 +131,21 @@ public static class IDXSerializer
 
         if (r1.TryPickT0(out var i, out var r2))
         {
-            var line = $"{field.Name} {i}";
+            var line = $"#{field.Name} {i}";
             sb.AppendLine(line);
             return Unit.Default;
         }
 
         if (r2.TryPickT0(out var d, out var r3))
         {
-            var line = $"{field.Name} {d}";
+            var line = $"#{field.Name} {d}";
             sb.AppendLine(line);
             return Unit.Default;
         }
 
         if (r3.TryPickT0(out var b, out var r4))
         {
-            var line = $"{field.Name} {b}";
+            var line = $"#{field.Name} {b}";
             sb.AppendLine(line);
             return Unit.Default;
         }
@@ -174,7 +158,7 @@ public static class IDXSerializer
 
         if (r5.TryPickT0(out var dt, out var r6))
         {
-            var line = $"{field.Name} {dt:yyyy/MM/dd}";
+            var line = $"#{field.Name} {dt:yyyy/MM/dd}";
             sb.AppendLine(line);
             return Unit.Default;
         }
