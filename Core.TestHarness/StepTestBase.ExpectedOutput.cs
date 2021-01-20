@@ -1,4 +1,5 @@
-﻿using CSharpFunctionalExtensions;
+﻿using System.Text.RegularExpressions;
+using CSharpFunctionalExtensions;
 using FluentAssertions;
 using OneOf;
 using Reductech.EDR.Core.Internal.Errors;
@@ -23,14 +24,18 @@ public abstract partial class StepTestBase<TStep, TOutput>
 
             TryPickT1(out var tOutput, out _).Should().BeTrue();
 
-            //if (outputResult.Value is string sActual && tOutput is string sExpected)
-            //    CompressSpaces(sActual).Should().Be(CompressSpaces(sExpected));
-            //else
-            outputResult.Value.Should().BeEquivalentTo(tOutput);
+            if (outputResult.Value is string sActual && tOutput is string sExpected)
+                CompressSpaces(sActual).Should().Be(CompressSpaces(sExpected));
+            else
+                outputResult.Value.Should().BeEquivalentTo(tOutput);
         }
 
-        //private static readonly Regex SpaceRegex = new(@"\s+", RegexOptions.Compiled);
-        //private static string CompressSpaces(string stepName) => SpaceRegex.Replace(stepName, " ");
+        /// <summary>
+        /// Regex for blank spaces
+        /// </summary>
+        private static readonly Regex SpaceRegex = new(@"\s+", RegexOptions.Compiled);
+
+        private static string CompressSpaces(string stepName) => SpaceRegex.Replace(stepName, " ");
 
         public void CheckUnitResult(Result<Unit, IError> result)
         {
