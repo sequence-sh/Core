@@ -17,7 +17,7 @@ using AutoTheory;
 namespace Reductech.EDR.Core.Tests
 {
 
-public partial class LoggingTestCases
+public partial class LoggingTests
 {
     [GenerateAsyncTheory("CheckLogging")]
     public IEnumerable<LoggingTestCase> TestCases
@@ -209,7 +209,7 @@ public partial class LoggingTestCases
                 ),
                 CheckMessageAndScope(
                     LogLevel.Trace,
-                    "FileRead Started with Parameters: [Path, \"MyFile\"], [Encoding, UTF8]",
+                    "FileRead Started with Parameters: [Path, \"MyFile\"], [Encoding, UTF8], [Decompress, False]",
                     null
                 ),
                 CheckMessageAndScope(
@@ -227,7 +227,7 @@ public partial class LoggingTestCases
             {
                 FileSystemActions = new List<Action<Mock<IFileSystemHelper>>>
                 {
-                    x => x.Setup(a => a.ReadFile("MyFile"))
+                    x => x.Setup(a => a.ReadFile("MyFile", false))
                         .Returns(
                             () =>
                             {

@@ -32,10 +32,15 @@ public sealed class FileWrite : CompoundStep<Unit>
         if (stringStreamResult.IsFailure)
             return stringStreamResult.ConvertFailure<Unit>();
 
+        var compressResult = await Compress.Run(stateMonad, cancellationToken);
+
+        if (compressResult.IsFailure)
+            return compressResult.ConvertFailure<Unit>();
+
         var stream = stringStreamResult.Value.GetStream().stream;
 
         var r = await stateMonad.FileSystemHelper
-            .WriteFileAsync(path.Value, stream, cancellationToken)
+            .WriteFileAsync(path.Value, stream, compressResult.Value, cancellationToken)
             .MapError(x => x.WithLocation(this));
 
         await stream.DisposeAsync();
@@ -58,6 +63,13 @@ public sealed class FileWrite : CompoundStep<Unit>
     [Required]
     [Log(LogOutputLevel.Trace)]
     public IStep<StringStream> Path { get; set; } = null!;
+
+    /// <summary>
+    /// Whether to compress the data when writing the file.
+    /// </summary>
+    [StepProperty(3)]
+    [DefaultValueExplanation("false")]
+    public IStep<bool> Compress { get; set; } = new BoolConstant(false);
 
     /// <inheritdoc />
     public override IStepFactory StepFactory => FileWriteStepFactory.Instance;

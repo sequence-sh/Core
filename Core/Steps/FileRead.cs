@@ -32,7 +32,12 @@ public sealed class FileRead : CompoundStep<StringStream>
         if (encoding.IsFailure)
             return encoding.ConvertFailure<StringStream>();
 
-        var result = stateMonad.FileSystemHelper.ReadFile(path.Value)
+        var decompress = await Decompress.Run(stateMonad, cancellationToken);
+
+        if (decompress.IsFailure)
+            return decompress.ConvertFailure<StringStream>();
+
+        var result = stateMonad.FileSystemHelper.ReadFile(path.Value, decompress.Value)
             .MapError(x => x.WithLocation(this))
             .Map(x => new StringStream(x, encoding.Value)); //TODO fix
 
@@ -48,13 +53,19 @@ public sealed class FileRead : CompoundStep<StringStream>
     public IStep<StringStream> Path { get; set; } = null!;
 
     /// <summary>
-    ///
     /// How the file is encoded.
     /// </summary>
     [StepProperty(2)]
     [DefaultValueExplanation("UTF8 no BOM")]
     public IStep<EncodingEnum> Encoding { get; set; } =
         new EnumConstant<EncodingEnum>(EncodingEnum.UTF8);
+
+    /// <summary>
+    /// Whether to decompress this string
+    /// </summary>
+    [StepProperty(3)]
+    [DefaultValueExplanation("false")]
+    public IStep<bool> Decompress { get; set; } = new BoolConstant(false);
 
     /// <inheritdoc />
     public override IStepFactory StepFactory => FileReadStepFactory.Instance;
