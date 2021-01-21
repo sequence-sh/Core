@@ -49,7 +49,7 @@ public interface IFileSystemHelper
     /// <summary>
     /// Reads the text of a file
     /// </summary>
-    Result<Stream, IErrorBuilder> ReadFile(string path);
+    Result<Stream, IErrorBuilder> ReadFile(string path, bool decompress);
 
     /// <summary>
     /// Extracts all the files in the specified archive to the directory on the file system.

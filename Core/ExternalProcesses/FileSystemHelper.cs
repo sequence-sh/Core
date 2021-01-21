@@ -108,13 +108,20 @@ public class FileSystemHelper : IFileSystemHelper
     }
 
     /// <inheritdoc />
-    public Result<Stream, IErrorBuilder> ReadFile(string path)
+    public Result<Stream, IErrorBuilder> ReadFile(string path, bool decompress)
     {
         Result<Stream, IErrorBuilder> result;
 
         try
+
         {
             Stream fs = File.OpenRead(path);
+
+            if (decompress)
+            {
+                fs = new GZipStream(fs, CompressionMode.Decompress);
+            }
+
             result = fs;
         }
         #pragma warning disable CA1031 // Do not catch general exception types

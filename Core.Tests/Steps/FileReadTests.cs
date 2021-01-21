@@ -23,7 +23,23 @@ public partial class FileReadTests : StepTestBase<FileRead, StringStream>
                 Unit.Default,
                 "Hello World"
             ).WithFileSystemAction(
-                x => x.Setup(a => a.ReadFile("File.txt"))
+                x => x.Setup(a => a.ReadFile("File.txt", false))
+                    .Returns(new MemoryStream(Encoding.ASCII.GetBytes("Hello World")))
+            );
+
+            yield return new StepCase(
+                "Print file text compressed",
+                new Print<StringStream>
+                {
+                    Value = new FileRead
+                    {
+                        Path = Constant("File.txt"), Decompress = Constant(true)
+                    }
+                },
+                Unit.Default,
+                "Hello World"
+            ).WithFileSystemAction(
+                x => x.Setup(a => a.ReadFile("File.txt", true))
                     .Returns(new MemoryStream(Encoding.ASCII.GetBytes("Hello World")))
             );
         }
@@ -41,7 +57,7 @@ public partial class FileReadTests : StepTestBase<FileRead, StringStream>
                 "Hello World"
             ).WithFileSystemAction(
                 x =>
-                    x.Setup(a => a.ReadFile("File.txt"))
+                    x.Setup(a => a.ReadFile("File.txt", false))
                         .Returns(new MemoryStream(Encoding.ASCII.GetBytes("Hello World")))
             );
 
@@ -52,7 +68,7 @@ public partial class FileReadTests : StepTestBase<FileRead, StringStream>
                 "Hello World"
             ).WithFileSystemAction(
                 x =>
-                    x.Setup(a => a.ReadFile("File.txt"))
+                    x.Setup(a => a.ReadFile("File.txt", false))
                         .Returns(new MemoryStream(Encoding.ASCII.GetBytes("Hello World")))
             );
 
@@ -63,7 +79,7 @@ public partial class FileReadTests : StepTestBase<FileRead, StringStream>
                 "Hello World"
             ).WithFileSystemAction(
                 x =>
-                    x.Setup(a => a.ReadFile("File.txt"))
+                    x.Setup(a => a.ReadFile("File.txt", false))
                         .Returns(new MemoryStream(Encoding.ASCII.GetBytes("Hello World")))
             );
         }
@@ -80,7 +96,7 @@ public partial class FileReadTests : StepTestBase<FileRead, StringStream>
                     new ErrorBuilder(ErrorCode.Test, "ValueIf Error")
                 )
                 .WithFileSystemAction(
-                    x => x.Setup(a => a.ReadFile("File.txt"))
+                    x => x.Setup(a => a.ReadFile("File.txt", false))
                         .Returns(new ErrorBuilder(ErrorCode.Test, "ValueIf Error"))
                 );
         }
