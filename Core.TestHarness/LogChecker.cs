@@ -23,9 +23,13 @@ public static class LogChecker
             expected =>
             {
                 return new Action<LogEntry>(
-                    entry => SpaceCompressor.CompressSpaces(entry.Message!)
-                        .Should()
-                        .Be(SpaceCompressor.CompressSpaces(expected))
+                    entry =>
+                    {
+                        var actual    = SpaceCompressor.CompressSpaces(entry.Message!);
+                        var expected2 = SpaceCompressor.CompressSpaces(expected);
+
+                        actual.Should().Be(expected2);
+                    }
                 );
             }
         );
