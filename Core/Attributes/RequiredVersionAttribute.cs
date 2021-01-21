@@ -80,7 +80,7 @@ public sealed class RequiredVersionAttribute : Attribute
         {
             MaxVersion = MaxRequiredVersion,
             MinVersion = MinRequiredVersion,
-            Name       = Text,
+            Name       = SoftwareName,
             Notes      = Notes
         };
     }
