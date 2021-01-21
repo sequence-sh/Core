@@ -9,8 +9,11 @@ using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
+using Reductech.EDR.Core.Internal.Serialization;
 using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.TestHarness;
+using Reductech.EDR.Core.Util;
+using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
@@ -83,37 +86,52 @@ public partial class GenerateDocumentationTests : StepTestBase<GenerateDocumenta
                 "<a name=\"DocumentationExampleStep\"></a>\r\n## DocumentationExampleStep\r\n\r\n**StringStream**\r\n\r\n*Requires ValueIf Library Version 1.2*\r\n\r\n|Parameter|Type                         |Required|Summary|Allowed Range |Default Value|Example|Recommended Range|Recommended Value|Requirements|See Also|URL               |Value Delimiter|\r\n|:-------:|:---------------------------:|:------:|:-----:|:------------:|:-----------:|:-----:|:---------------:|:---------------:|:----------:|:------:|:----------------:|:-------------:|\r\n|Alpha    |`int`                        |☑️      |       |Greater than 1|             |1234   |100-300          |201              |Greek 2.1   |Beta    |[Alpha](alpha.com)|               |\r\n|Beta     |[StringStream](#StringStream)|        |       |              |Two hundred  |       |                 |                 |            |Alpha   |                  |               |\r\n|Gamma    |[VariableName](#VariableName)|        |       |              |             |       |                 |                 |            |        |                  |               |\r\n|Delta    |IStep<`bool`>                |        |       |              |             |       |                 |                 |            |        |                  |,              |"
             );
 
+            static string[] ToLogs(Array<Entity> array) =>
+                array.GetElements().Value.Select(x => x.Serialize()).ToArray();
+
+            var printDocumentation = new ForEach<Entity>()
+            {
+                Array  = new GenerateDocumentation(),
+                Action = new Print<Entity>() { Value = GetEntityVariable }
+            };
+
             yield return new StepCase(
                 "Generate Not Documentation",
-                new GenerateDocumentation(),
-                Entities(Contents(notHeader), not)
+                printDocumentation,
+                Unit.Default,
+                ToLogs(Entities(Contents(notHeader), not))
             ).WithStepFactoryStore(StepFactoryStore.Create(NotStepFactory.Instance));
 
             yield return new StepCase(
                 "Generate Math Documentation",
-                new GenerateDocumentation(),
-                Entities(
-                    Contents(mathHeader),
-                    applyMathOperator,
-                    File(
-                        "MathOperator",
-                        "<a name=\"MathOperator\"></a>\r\n## MathOperator\r\nAn operator that can be applied to two numbers.\r\n\r\n|Name    |Summary                                                                                                   |\r\n|:------:|:--------------------------------------------------------------------------------------------------------:|\r\n|None    |Sentinel value                                                                                            |\r\n|Add     |Add the left and right operands.                                                                          |\r\n|Subtract|Subtract the right operand from the left.                                                                 |\r\n|Multiply|Multiply the left and right operands.                                                                     |\r\n|Divide  |Divide the left operand by the right. Attempting to divide by zero will result in an error.               |\r\n|Modulo  |Reduce the left operand modulo the right.                                                                 |\r\n|Power   |Raise the left operand to the power of the right. If the right operand is negative, zero will be returned.|"
+                printDocumentation,
+                Unit.Default,
+                ToLogs(
+                    Entities(
+                        Contents(mathHeader),
+                        applyMathOperator,
+                        File(
+                            "MathOperator",
+                            "<a name=\"MathOperator\"></a>\r\n## MathOperator\r\nAn operator that can be applied to two numbers.\r\n\r\n|Name    |Summary                                                                                                   |\r\n|:------:|:--------------------------------------------------------------------------------------------------------:|\r\n|None    |Sentinel value                                                                                            |\r\n|Add     |Add the left and right operands.                                                                          |\r\n|Subtract|Subtract the right operand from the left.                                                                 |\r\n|Multiply|Multiply the left and right operands.                                                                     |\r\n|Divide  |Divide the left operand by the right. Attempting to divide by zero will result in an error.               |\r\n|Modulo  |Reduce the left operand modulo the right.                                                                 |\r\n|Power   |Raise the left operand to the power of the right. If the right operand is negative, zero will be returned.|"
+                        )
                     )
                 )
             ).WithStepFactoryStore(StepFactoryStore.Create(ApplyMathOperatorStepFactory.Instance));
 
             yield return new StepCase(
                 "Example step",
-                new GenerateDocumentation(),
-                Entities(Contents(exampleStepHeader), documentationExample)
+                printDocumentation,
+                Unit.Default,
+                ToLogs(Entities(Contents(exampleStepHeader), documentationExample))
             ).WithStepFactoryStore(
                 StepFactoryStore.Create(DocumentationExampleStepFactory.Instance)
             );
 
             yield return new StepCase(
                 "Two InitialSteps",
-                new GenerateDocumentation(),
-                Entities(Contents(notHeader, exampleStepHeader), not, documentationExample)
+                printDocumentation,
+                Unit.Default,
+                ToLogs(Entities(Contents(notHeader, exampleStepHeader), not, documentationExample))
             ).WithStepFactoryStore(
                 StepFactoryStore.Create(
                     NotStepFactory.Instance,
