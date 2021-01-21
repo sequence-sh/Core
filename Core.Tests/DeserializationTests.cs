@@ -369,7 +369,7 @@ Print 'Comments!'",
 
             result.ShouldBeSuccessful(x => x.ToString()!);
 
-            StaticHelpers.CheckLoggedValues(
+            LogChecker.CheckLoggedValues(
                 loggerFactory,
                 LogLevel.Information,
                 ExpectedLoggedValues

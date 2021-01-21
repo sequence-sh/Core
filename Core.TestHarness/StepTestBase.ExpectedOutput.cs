@@ -1,9 +1,9 @@
-﻿using System.Text.RegularExpressions;
-using CSharpFunctionalExtensions;
+﻿using CSharpFunctionalExtensions;
 using FluentAssertions;
 using OneOf;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Util;
+using static Reductech.EDR.Core.TestHarness.SpaceCompressor;
 
 namespace Reductech.EDR.Core.TestHarness
 {
@@ -34,13 +34,6 @@ public abstract partial class StepTestBase<TStep, TOutput>
             else
                 outputResult.Value.Should().BeEquivalentTo(expectedTOutput);
         }
-
-        /// <summary>
-        /// Regex for blank spaces
-        /// </summary>
-        private static readonly Regex SpaceRegex = new(@"\s+", RegexOptions.Compiled);
-
-        private static string CompressSpaces(string stepName) => SpaceRegex.Replace(stepName, " ");
 
         public void CheckUnitResult(Result<Unit, IError> result)
         {
