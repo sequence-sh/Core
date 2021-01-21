@@ -85,7 +85,7 @@ public abstract partial class StepTestBase<TStep, TOutput>
         {
             if (!IgnoreLoggedValues)
             {
-                StaticHelpers.CheckLoggedValues(
+                LogChecker.CheckLoggedValues(
                     loggerFactory,
                     LogLevel.Information,
                     ExpectedLoggedValues

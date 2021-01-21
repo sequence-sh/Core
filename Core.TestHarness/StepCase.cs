@@ -50,7 +50,7 @@ public abstract partial class StepTestBase<TStep, TOutput>
             ExpectedOutput = expectedOutput;
         }
 
-        public bool SerializeFirst { get; set; } = false;
+        public bool SerializeFirst { get; set; }
 
         /// <summary>
         /// The expected output of the step.
@@ -62,8 +62,6 @@ public abstract partial class StepTestBase<TStep, TOutput>
         public override string ToString() => Name;
 
         public IStep Step { get; }
-
-        public const string SerializeArgument = "SerializeAsync";
 
         /// <inheritdoc />
         public override async Task<IStep> GetStepAsync(ITestOutputHelper testOutputHelper)

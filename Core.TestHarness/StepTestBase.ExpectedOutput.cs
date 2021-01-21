@@ -1,9 +1,9 @@
-﻿using System.Text.RegularExpressions;
-using CSharpFunctionalExtensions;
+﻿using CSharpFunctionalExtensions;
 using FluentAssertions;
 using OneOf;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Util;
+using static Reductech.EDR.Core.TestHarness.SpaceCompressor;
 
 namespace Reductech.EDR.Core.TestHarness
 {
@@ -22,25 +22,18 @@ public abstract partial class StepTestBase<TStep, TOutput>
             if (outputResult.Value is Unit)
                 return;
 
-            TryPickT1(out var tOutput, out _).Should().BeTrue();
+            TryPickT1(out var expectedTOutput, out _).Should().BeTrue();
 
-            if (outputResult.Value is string sActual && tOutput is string sExpected)
+            if (outputResult.Value is string sActual && expectedTOutput is string sExpected)
                 CompressSpaces(sActual).Should().Be(CompressSpaces(sExpected));
             else if (outputResult.Value is StringStream sActualStream
-                  && tOutput is StringStream sExpectedStream)
+                  && expectedTOutput is StringStream sExpectedStream)
                 CompressSpaces(sActualStream.GetString())
                     .Should()
                     .Be(CompressSpaces(sExpectedStream.GetString()));
             else
-                outputResult.Value.Should().BeEquivalentTo(tOutput);
+                outputResult.Value.Should().BeEquivalentTo(expectedTOutput);
         }
-
-        /// <summary>
-        /// Regex for blank spaces
-        /// </summary>
-        private static readonly Regex SpaceRegex = new(@"\s+", RegexOptions.Compiled);
-
-        private static string CompressSpaces(string stepName) => SpaceRegex.Replace(stepName, " ");
 
         public void CheckUnitResult(Result<Unit, IError> result)
         {

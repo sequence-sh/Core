@@ -1,10 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Castle.Core.Internal;
-using FluentAssertions;
-using MELT;
-using Microsoft.Extensions.Logging;
 using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Steps;
@@ -119,34 +115,6 @@ public static class StaticHelpers
                 }
             )
         };
-    }
-
-    public static string? CompressNewlines(string? s) => s?.Replace("\r\n", "\n");
-
-    public static void CheckLoggedValues(
-        ITestLoggerFactory loggerFactory,
-        LogLevel minLogLevel,
-        IReadOnlyCollection<string> expectedLoggedValues)
-    {
-        var infoOrHigherEntries =
-            loggerFactory.Sink.LogEntries.Where(x => x.LogLevel >= minLogLevel);
-
-        var assertions = expectedLoggedValues.Select(
-            expected =>
-            {
-                return new Action<LogEntry>(
-                    entry => CompressNewlines(entry.Message!)
-                        .Should()
-                        .Be(CompressNewlines(expected))
-                );
-            }
-        );
-
-        if (expectedLoggedValues.IsNullOrEmpty())
-            infoOrHigherEntries.Should().BeEmpty("Log values should be empty");
-        else
-            infoOrHigherEntries.Should()
-                .SatisfyRespectively(assertions, "Log value should match expected");
     }
 }
 
