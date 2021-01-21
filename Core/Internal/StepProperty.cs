@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using OneOf;
 using Reductech.EDR.Core.Attributes;
@@ -20,12 +21,14 @@ public class StepProperty : OneOfBase<VariableName, IStep, IReadOnlyList<IStep>>
         int index,
         OneOf<VariableName, IStep, IReadOnlyList<IStep>> value,
         LogAttribute? logAttribute,
-        ScopedFunctionAttribute? scopedFunctionAttribute) : base(value)
+        ScopedFunctionAttribute? scopedFunctionAttribute,
+        ImmutableList<RequiredVersionAttribute> requiredVersions) : base(value)
     {
         Name                    = name;
         Index                   = index;
         LogAttribute            = logAttribute;
         ScopedFunctionAttribute = scopedFunctionAttribute;
+        RequiredVersions        = requiredVersions;
     }
 
     /// <summary>
@@ -47,6 +50,11 @@ public class StepProperty : OneOfBase<VariableName, IStep, IReadOnlyList<IStep>>
     /// An attribute that indicates this is a scoped function property
     /// </summary>
     public ScopedFunctionAttribute? ScopedFunctionAttribute { get; }
+
+    /// <summary>
+    /// The required version of this property.
+    /// </summary>
+    public ImmutableList<RequiredVersionAttribute> RequiredVersions { get; }
 
     /// <inheritdoc />
     public override string ToString() => Name + " = " + Match(

@@ -13,11 +13,19 @@ public sealed class RequiredVersionAttribute : Attribute
     /// Create a new RequiredVersion attribute
     /// </summary>
     /// <param name="softwareName">e.g. "Nuix"</param>
-    /// <param name="requiredVersion">e.g. "6.2"</param>
-    public RequiredVersionAttribute(string softwareName, string requiredVersion)
+    /// <param name="minRequiredVersion">e.g. "6.2"</param>
+    /// <param name="maxRequiredVersion">e.g. "8.4"</param>
+    /// <param name="notes">Special notes</param>
+    public RequiredVersionAttribute(
+        string softwareName,
+        string? minRequiredVersion,
+        string? maxRequiredVersion = null,
+        string? notes = null)
     {
-        SoftwareName    = softwareName;
-        RequiredVersion = new Version(requiredVersion);
+        SoftwareName       = softwareName;
+        Notes              = notes;
+        MinRequiredVersion = minRequiredVersion == null ? null : new Version(minRequiredVersion);
+        MaxRequiredVersion = maxRequiredVersion == null ? null : new Version(maxRequiredVersion);
     }
 
     /// <summary>
@@ -26,19 +34,55 @@ public sealed class RequiredVersionAttribute : Attribute
     public string SoftwareName { get; }
 
     /// <summary>
-    /// The required version of the software.
+    /// The minimum required version. Inclusive.
     /// </summary>
-    public Version RequiredVersion { get; }
+    public Version? MinRequiredVersion { get; }
+
+    /// <summary>
+    /// The version above the highest allowed version.
+    /// </summary>
+    public Version? MaxRequiredVersion { get; }
+
+    /// <summary>
+    /// The notes.
+    /// </summary>
+    public string? Notes { get; }
 
     /// <summary>
     /// The required version in human readable form.
     /// </summary>
-    public string Text => $"{SoftwareName} {RequiredVersion}";
+    public string Text
+    {
+        get
+        {
+            if (MinRequiredVersion != null && MaxRequiredVersion != null)
+                return $"{SoftwareName} {MinRequiredVersion}-{MaxRequiredVersion}";
+
+            if (MinRequiredVersion != null)
+                return $"{SoftwareName} {MinRequiredVersion}";
+
+            if (MaxRequiredVersion != null)
+                return $"{SoftwareName} Up To {MaxRequiredVersion}";
+
+            return SoftwareName;
+        }
+    }
 
     /// <inheritdoc />
-    public override string ToString()
+    public override string ToString() => Text;
+
+    /// <summary>
+    /// Convert this to a requirement.
+    /// </summary>
+    public Requirement ToRequirement()
     {
-        return Text;
+        return new()
+        {
+            MaxVersion = MaxRequiredVersion,
+            MinVersion = MinRequiredVersion,
+            Name       = SoftwareName,
+            Notes      = Notes
+        };
     }
 }
 

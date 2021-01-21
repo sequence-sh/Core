@@ -118,8 +118,18 @@ public abstract class CompoundStep<T> : ICompoundStep<T>
     public Configuration? Configuration { get; set; }
 
     /// <inheritdoc />
-    public virtual IEnumerable<Requirement> RuntimeRequirements =>
-        ImmutableArray<Requirement>.Empty;
+    public virtual IEnumerable<Requirement> RuntimeRequirements
+    {
+        get
+        {
+            var allRequirements = AllProperties
+                .SelectMany(x => x.RequiredVersions)
+                .Select(x => x.ToRequirement());
+
+            var groupedRequirements = Requirement.CompressRequirements(allRequirements);
+            return groupedRequirements;
+        }
+    }
 
     /// <inheritdoc />
     public virtual bool ShouldBracketWhenSerialized => true;
@@ -180,7 +190,8 @@ public abstract class CompoundStep<T> : ICompoundStep<T>
                     arg2,
                     oneOf.Value,
                     logAttribute,
-                    scopedFunctionAttribute
+                    scopedFunctionAttribute,
+                    propertyInfo.GetCustomAttributes<RequiredVersionAttribute>().ToImmutableList()
                 );
             }
         }
@@ -238,7 +249,7 @@ public abstract class CompoundStep<T> : ICompoundStep<T>
     {
         var r0 = new[] { VerifyThis(settings) };
 
-        var rRequirements = RuntimeRequirements.Concat(StepFactory.Requirements)
+        var rRequirements = StepFactory.Requirements.Concat(RuntimeRequirements)
             .Select(req => settings.CheckRequirement(req).MapError(x => x.WithLocation(this)));
 
         var r3 = AllProperties
