@@ -1,5 +1,4 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
@@ -14,10 +13,10 @@ namespace Reductech.EDR.Core.Steps
 /// Generates documentation for all available steps.
 /// </summary>
 public sealed class
-    GenerateDocumentation : CompoundStep<StringStream> //TODO maybe output a list of entities
+    GenerateDocumentation : CompoundStep<Array<Entity>>
 {
     /// <inheritdoc />
-    protected override async Task<Result<StringStream, IError>> Run(
+    protected override async Task<Result<Array<Entity>, IError>> Run(
         IStateMonad stateMonad,
         CancellationToken cancellationToken)
     {
@@ -29,11 +28,13 @@ public sealed class
             .Select(x => new StepWrapper(x))
             .ToList();
 
-        var lines = DocumentationCreator.CreateDocumentationLines(documented);
+        var files = DocumentationCreator.CreateDocumentation(documented);
 
-        var document = string.Join(Environment.NewLine, lines);
+        var entities =
+            files.Select(x => Entity.Create(("FileName", x.fileName), ("Text", x.fileText)))
+                .ToList();
 
-        return new StringStream(document);
+        return new Array<Entity>(entities);
     }
 
     /// <inheritdoc />
@@ -44,14 +45,14 @@ public sealed class
 /// Generates documentation for all available steps.
 /// </summary>
 public sealed class
-    GenerateDocumentationStepFactory : SimpleStepFactory<GenerateDocumentation, StringStream>
+    GenerateDocumentationStepFactory : SimpleStepFactory<GenerateDocumentation, Array<Entity>>
 {
     private GenerateDocumentationStepFactory() { }
 
     /// <summary>
     /// The instance.
     /// </summary>
-    public static SimpleStepFactory<GenerateDocumentation, StringStream> Instance { get; } =
+    public static SimpleStepFactory<GenerateDocumentation, Array<Entity>> Instance { get; } =
         new GenerateDocumentationStepFactory();
 }
 

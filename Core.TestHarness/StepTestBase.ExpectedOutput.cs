@@ -22,17 +22,17 @@ public abstract partial class StepTestBase<TStep, TOutput>
             if (outputResult.Value is Unit)
                 return;
 
-            TryPickT1(out var tOutput, out _).Should().BeTrue();
+            TryPickT1(out var expectedTOutput, out _).Should().BeTrue();
 
-            if (outputResult.Value is string sActual && tOutput is string sExpected)
+            if (outputResult.Value is string sActual && expectedTOutput is string sExpected)
                 CompressSpaces(sActual).Should().Be(CompressSpaces(sExpected));
             else if (outputResult.Value is StringStream sActualStream
-                  && tOutput is StringStream sExpectedStream)
+                  && expectedTOutput is StringStream sExpectedStream)
                 CompressSpaces(sActualStream.GetString())
                     .Should()
                     .Be(CompressSpaces(sExpectedStream.GetString()));
             else
-                outputResult.Value.Should().BeEquivalentTo(tOutput);
+                outputResult.Value.Should().BeEquivalentTo(expectedTOutput);
         }
 
         /// <summary>
