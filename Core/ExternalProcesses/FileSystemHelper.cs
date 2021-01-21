@@ -166,15 +166,20 @@ public class FileSystemHelper : IFileSystemHelper
     public async Task<Result<Unit, IErrorBuilder>> WriteFileAsync(
         string path,
         Stream stream,
+        bool compress,
         CancellationToken cancellationToken)
     {
         Maybe<IErrorBuilder> error;
 
         try
         {
-            var fileStream = File.Create(path);
-            await stream.CopyToAsync(fileStream, cancellationToken);
-            fileStream.Close();
+            Stream writeStream = File.Create(path);
+
+            if (compress)
+                writeStream = new GZipStream(writeStream, CompressionMode.Compress);
+
+            await stream.CopyToAsync(writeStream, cancellationToken);
+            writeStream.Close();
             error = Maybe<IErrorBuilder>.None;
         }
         #pragma warning disable CA1031 // Do not catch general exception types

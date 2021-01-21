@@ -65,6 +65,7 @@ public interface IFileSystemHelper
     Task<Result<Unit, IErrorBuilder>> WriteFileAsync(
         string path,
         Stream text,
+        bool decompress,
         CancellationToken cancellationToken);
 
     /// <summary>
