@@ -64,15 +64,6 @@ public partial class FileWriteTests : StepTestBase<FileWrite, Unit>
             //TODO check that the text being sent is actually written
         }
     }
-
-    ///// <inheritdoc />
-    //protected override IEnumerable<SerializeCase> SerializeCases
-    //{
-    //    get
-    //    {
-    //        yield return CreateDefaultSerializeCase(false);
-    //    }
-    //}
 }
 
 }

@@ -65,7 +65,9 @@ public sealed class StringStream : IEquatable<StringStream>, IComparable<StringS
 
             var (stream, encodingEnum) = Value.AsT1;
 
-            stream.Position = 0;
+            if (stream.CanSeek)
+                stream.Position = 0;
+
             using StreamReader reader = new(stream, encodingEnum.Convert(), leaveOpen: false);
             var                s      = await reader.ReadToEndAsync();
 

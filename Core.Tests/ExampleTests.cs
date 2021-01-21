@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Security.Principal;
 using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
@@ -67,7 +68,9 @@ public partial class ExampleTests
     [Trait("Category", "Integration")]
     public async Task RunSCLSequence()
     {
-        const string scl = @"- [1,2,3] | Foreach (Print <Entity>)";
+        const string scl
+            = //@"FileWrite 'Dinosaur Dinosaur Dinosaur' 'C:\Users\wainw\source\repos\Reductech\core\TestFile.txt' true";
+            @"Print (FileRead 'C:\Users\wainw\source\repos\Reductech\core\TestFile.txt' decompress:false)";
 
         var logger = TestOutputHelper.BuildLogger();
         var sfs    = StepFactoryStore.CreateUsingReflection();
@@ -77,9 +80,7 @@ public partial class ExampleTests
             logger,
             ExternalProcessRunner.Instance,
             FileSystemHelper.Instance,
-            sfs,
-            new KeyValuePair<string, object>("Runner",   "Text"),
-            new KeyValuePair<string, object>("Anything", "You want")
+            sfs
         );
 
         var r = await runner.RunSequenceFromTextAsync(scl, CancellationToken.None);
