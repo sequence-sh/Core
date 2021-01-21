@@ -8,7 +8,7 @@ public static class SpaceCompressor
     /// <summary>
     /// Regex for blank spaces
     /// </summary>
-    private static readonly Regex SpaceRegex = new(@"\s+", RegexOptions.Compiled);
+    private static readonly Regex SpaceRegex = new(@"(?:\s+|\\r|\\n)", RegexOptions.Compiled);
 
     public static string CompressSpaces(string stepName) => SpaceRegex.Replace(stepName, " ");
 }
