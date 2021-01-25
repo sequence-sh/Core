@@ -17,12 +17,12 @@ public class StepWrapper : IDocumented
     /// <summary>
     /// Creates a new StepWrapper.
     /// </summary>
-    public StepWrapper(IStepFactory factory)
+    public StepWrapper(IGrouping<IStepFactory, string> grouping)
     {
-        Factory               = factory;
-        DocumentationCategory = factory.Category;
+        Factory               = grouping.Key;
+        DocumentationCategory = grouping.Key.Category;
 
-        RelevantProperties = factory.StepType.GetProperties()
+        RelevantProperties = grouping.Key.StepType.GetProperties()
             .Select(
                 property => (
                     property, attribute: property.GetCustomAttribute<StepPropertyBaseAttribute>())
@@ -37,15 +37,15 @@ public class StepWrapper : IDocumented
         Parameters =
             RelevantProperties.Select(GetPropertyWrapper).ToList(); //TODO get default values
 
-        Requirements = factory.Requirements.Select(x => $"Requires {x}").ToList();
+        Requirements = grouping.Key.Requirements.Select(x => $"Requires {x}").ToList();
 
-        TypeDetails = factory.OutputTypeExplanation;
+        TypeDetails = grouping.Key.OutputTypeExplanation;
+
+        AllNames = grouping.ToList();
     }
 
-    private static PropertyWrapper GetPropertyWrapper(PropertyInfo propertyInfo)
-    {
-        return new PropertyWrapper(propertyInfo, null);
-    }
+    private static PropertyWrapper GetPropertyWrapper(PropertyInfo propertyInfo) =>
+        new(propertyInfo, null);
 
     private IStepFactory Factory { get; }
 
@@ -54,6 +54,9 @@ public class StepWrapper : IDocumented
 
     /// <inheritdoc />
     public string Name => TypeNameHelper.GetHumanReadableTypeName(Factory.StepType);
+
+    /// <inheritdoc />
+    public string FileName => Factory.TypeName + ".md";
 
     /// <inheritdoc />
     public string Summary => Factory.StepType.GetXmlDocsSummary();
@@ -71,6 +74,9 @@ public class StepWrapper : IDocumented
 
     /// <inheritdoc />
     public IEnumerable<IParameter> Parameters { get; }
+
+    /// <inheritdoc />
+    public IReadOnlyList<string> AllNames { get; }
 
     /// <summary>
     /// The wrapper for a property.

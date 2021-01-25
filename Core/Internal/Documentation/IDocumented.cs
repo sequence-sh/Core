@@ -14,9 +14,14 @@ public interface IDocumented
     string DocumentationCategory { get; }
 
     /// <summary>
-    /// The name of the method.
+    /// The main name of the step.
     /// </summary>
     string Name { get; }
+
+    /// <summary>
+    /// The name of the file
+    /// </summary>
+    string FileName { get; }
 
     /// <summary>
     /// A summary of what the method does.
@@ -37,6 +42,11 @@ public interface IDocumented
     /// The parameters to the method.
     /// </summary>
     IEnumerable<IParameter> Parameters { get; }
+
+    /// <summary>
+    /// All Names including aliases
+    /// </summary>
+    IReadOnlyList<string> AllNames { get; }
 }
 
 }

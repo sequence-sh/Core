@@ -13,10 +13,10 @@ internal static class TypeNameHelper
             return $"`{name}`";
 
         if (t.IsEnum)
-            return $"[{t.Name}](#{t.Name})";
+            return $"[{t.Name}](../Enums/{t.Name}.md)";
 
         if (!t.IsGenericType)
-            return $"[{t.Name}](#{t.Name})";
+            return $"`{t.Name}`";
 
         if (t.GetGenericTypeDefinition() == typeof(Nullable<>))
         {
@@ -37,6 +37,9 @@ internal static class TypeNameHelper
 
     public static string GetHumanReadableTypeName(Type t)
     {
+        if (t.IsEnum)
+            return t.Name;
+
         if (TypeAliases.TryGetValue(t, out var name))
             return name;
 
@@ -62,7 +65,7 @@ internal static class TypeNameHelper
     }
 
     private static readonly Dictionary<Type, string> TypeAliases =
-        new Dictionary<Type, string>()
+        new()
         {
             { typeof(byte), "byte" },
             { typeof(sbyte), "sbyte" },
@@ -79,6 +82,9 @@ internal static class TypeNameHelper
             { typeof(bool), "bool" },
             { typeof(char), "char" },
             { typeof(string), "string" },
+            { typeof(StringStream), "string" },
+            { typeof(Entity), "entity" },
+            { typeof(DateTime), "dateTime" },
             { typeof(void), "void" }
         };
 }

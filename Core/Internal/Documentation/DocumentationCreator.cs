@@ -9,29 +9,92 @@ namespace Reductech.EDR.Core.Internal.Documentation
 
 internal static class DocumentationCreator
 {
+    /// <summary>
+    /// Creates documentation for a list of entities
+    /// </summary>
+    public static
+        IEnumerable<(string fileName, string title, string fileText, string directory, string
+            category)> CreateDocumentation(IEnumerable<IDocumented> entities)
+    {
+        var enumTypes = new HashSet<Type>();
+
+        var categories = entities.GroupBy(x => x.DocumentationCategory).ToList();
+
+        var contentsLines = new List<string> { $"# Contents" };
+
+        var contentsRows = categories.SelectMany(x => x)
+            .Select(x => new[] { $"[{x.Name}]({x.DocumentationCategory}/{x.FileName})", x.Summary })
+            .Prepend(new[] { "Step", "Summary" }) //Header row
+            .ToList();
+
+        var contentsTableLines = Prettifier.CreateMarkdownTable(contentsRows);
+        contentsLines.AddRange(contentsTableLines);
+
+        yield return ("Contents.md", "Contents", JoinLines(contentsLines), "", "");
+
+        foreach (var category in categories)
+        {
+            foreach (var doc in category)
+            {
+                enumTypes.UnionWith(
+                    doc.Parameters.Select(x => x.Type)
+                        .Select(x => Nullable.GetUnderlyingType(x) ?? x)
+                        .Where(t => t.IsEnum)
+                );
+
+                var pageLines = GetPageLines(doc);
+
+                yield return (doc.FileName, doc.Name, JoinLines(pageLines), category.Key,
+                              category.Key);
+            }
+        }
+
+        if (enumTypes.Any())
+        {
+            foreach (var type in enumTypes.OrderBy(x => x.Name))
+            {
+                var enumLines = GetEnumLines(type);
+
+                yield return (type.Name + ".md", type.Name, JoinLines(enumLines), "Enums", "Enums");
+            }
+        }
+
+        static string JoinLines(IEnumerable<string> lines) => string.Join("\r\n", lines).Trim();
+    }
+
+    private static string Escape(string? s)
+    {
+        return (s ?? string.Empty)
+            .Replace("|",    @"\|")
+            .Replace("<",    @"\<")
+            .Replace("\r\n", " ")
+            .Replace("\n",   " ");
+    }
+
     private static IEnumerable<string> GetPageLines(IDocumented doc)
     {
-        var pageLines = new List<string>
-        {
-            $"<a name=\"{doc.Name}\"></a>", $"## {doc.Name}", string.Empty
-        };
+        yield return $"## {doc.Name}";
+
+        var names = string.Join(@" \| ", doc.AllNames.Select(x => $"*{x}*"));
+
+        yield return $"{names}";
 
         if (!string.IsNullOrWhiteSpace(doc.TypeDetails))
         {
-            pageLines.Add($"**{doc.TypeDetails}**");
-            pageLines.Add(string.Empty);
+            yield return $"**{doc.TypeDetails}**";
+            yield return "";
         }
 
         foreach (var docRequirement in doc.Requirements)
         {
-            pageLines.Add($"*{docRequirement}*");
-            pageLines.Add(string.Empty);
+            yield return $"*{docRequirement}*";
+            yield return "";
         }
 
         if (!string.IsNullOrWhiteSpace(doc.Summary))
         {
-            pageLines.Add(Escape(doc.Summary));
-            pageLines.Add(string.Empty);
+            yield return Escape(doc.Summary);
+            yield return "";
         }
 
         if (doc.Parameters.Any())
@@ -77,87 +140,42 @@ internal static class DocumentationCreator
             );
 
             var table = Prettifier.CreateMarkdownTable(parameterRows).ToList();
-            pageLines.AddRange(table);
-            pageLines.Add(string.Empty);
-        }
 
-        return pageLines;
+            foreach (var line in table)
+            {
+                yield return line;
+            }
+
+            yield return "";
+        }
     }
 
-    /// <summary>
-    /// Creates documentation for a list of entities
-    /// </summary>
-    public static
-        IEnumerable<(string fileName, string title, string fileText, string directory, string
-            category)> CreateDocumentation(IEnumerable<IDocumented> entities)
+    private static IEnumerable<string> GetEnumLines(Type type)
     {
-        var enumTypes = new HashSet<Type>();
+        yield return $"## {Escape(type.Name)}";
 
-        var categories = entities.GroupBy(x => x.DocumentationCategory).ToList();
+        var summary = type.GetXmlDocsSummary();
 
-        var contentsLines = new List<string> { $"# Contents" };
-
-        var contentsRows = categories.SelectMany(x => x)
-            .Select(x => new[] { $"[{x.Name}](#{x.Name})", x.Summary })
-            .Prepend(new[] { "Step", "Summary" }) //Header row
-            .ToList();
-
-        var contentsTableLines = Prettifier.CreateMarkdownTable(contentsRows);
-        contentsLines.AddRange(contentsTableLines);
-
-        yield return ("Contents.md", "Contents", JoinLines(contentsLines), "", "");
-
-        foreach (var category in categories)
+        if (!string.IsNullOrWhiteSpace(summary))
         {
-            foreach (var doc in category)
-            {
-                enumTypes.UnionWith(
-                    doc.Parameters.Select(x => x.Type)
-                        .Select(x => Nullable.GetUnderlyingType(x) ?? x)
-                        .Where(t => t.IsEnum)
-                );
-
-                var pageLines = GetPageLines(doc);
-
-                yield return (doc.Name + ".md", doc.Name, JoinLines(pageLines), category.Key,
-                              category.Key);
-            }
+            yield return Escape(summary);
+            yield return string.Empty;
         }
 
-        if (enumTypes.Any())
-        {
-            foreach (var type in enumTypes.OrderBy(x => x.Name))
-            {
-                var enumLines = new List<string>();
-                enumLines.Add($"<a name=\"{type.Name}\"></a>");
-                enumLines.Add($"## {type.Name}");
-                var summary = type.GetXmlDocsSummary();
+        var parameterRows = new List<string?[]> { new[] { "Name", "Summary" } };
 
-                if (!string.IsNullOrWhiteSpace(summary))
-                {
-                    enumLines.Add(Escape(summary));
-                    enumLines.Add(string.Empty);
-                }
+        parameterRows.AddRange(
+            type.GetFields(BindingFlags.Public | BindingFlags.Static)
+                .OrderBy(GetEnumFieldValue)
+                .Select(fieldInfo => new[] { fieldInfo.Name, fieldInfo.GetXmlDocsSummary() })
+        );
 
-                var parameterRows = new List<string?[]> { new[] { "Name", "Summary" } };
+        var table = Prettifier.CreateMarkdownTable(parameterRows).ToList();
 
-                parameterRows.AddRange(
-                    type.GetFields(BindingFlags.Public | BindingFlags.Static)
-                        .OrderBy(GetEnumFieldValue)
-                        .Select(
-                            fieldInfo => new[] { fieldInfo.Name, fieldInfo.GetXmlDocsSummary() }
-                        )
-                );
+        foreach (var l in table)
+            yield return l;
 
-                var table = Prettifier.CreateMarkdownTable(parameterRows).ToList();
-                enumLines.AddRange(table);
-                enumLines.Add(string.Empty);
-
-                yield return (type.Name + ".md", type.Name, JoinLines(enumLines), "Enums", "Enums");
-            }
-        }
-
-        static string JoinLines(IEnumerable<string> lines) => string.Join("\r\n", lines).Trim();
+        yield return string.Empty;
 
         static object GetEnumFieldValue(MemberInfo memberInfo)
         {
@@ -167,14 +185,6 @@ internal static class DocumentationCreator
 
             return v;
         }
-    }
-
-    private static string Escape(string? s)
-    {
-        return (s ?? string.Empty)
-            .Replace("|",    @"\|")
-            .Replace("\r\n", " ")
-            .Replace("\n",   " ");
     }
 }
 

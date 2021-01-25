@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Security.Principal;
 using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
+using Microsoft.Extensions.Logging;
 using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.ExternalProcesses;
 using Reductech.EDR.Core.Internal;
@@ -70,9 +70,17 @@ public partial class ExampleTests
     {
         const string scl
             = //@"FileWrite 'Dinosaur Dinosaur Dinosaur' 'C:\Users\wainw\source\repos\Reductech\core\TestFile.txt' true";
-            @"GenerateDocumentation | ForEach (Print (From <entity> 'text'))";
+            //            @"GenerateDocumentation | Foreach (
+            //- Print (From <Entity> ""FileName"")
+            //- Print(From <Entity> ""Title"")
+            //- Print(From <Entity> ""Directory"")
+            //- Print(From <Entity> ""Category"")
+            //)";
+            @"- <docs> = GenerateDocumentation
+- <docs> | ArrayDistinct (From <entity> 'Directory') | ForEach (CreateDirectory (PathCombine ['Documentation', (From <Entity> 'Directory')]))
+- <docs> | Foreach (FileWrite (From <Entity> 'FileText') (PathCombine ['Documentation', (From <Entity> 'Directory'), (From <Entity> 'FileName')]))";
 
-        var logger = TestOutputHelper.BuildLogger();
+        var logger = TestOutputHelper.BuildLogger(LogLevel.Trace);
         var sfs    = StepFactoryStore.CreateUsingReflection();
 
         var runner = new SCLRunner(
