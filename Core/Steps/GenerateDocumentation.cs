@@ -31,7 +31,15 @@ public sealed class
         var files = DocumentationCreator.CreateDocumentation(documented);
 
         var entities =
-            files.Select(x => Entity.Create(("FileName", x.fileName), ("Text", x.fileText)))
+            files.Select(
+                    x => Entity.Create(
+                        ("FileName", x.fileName),
+                        ("Title", x.title),
+                        ("FileText", x.fileText),
+                        ("Directory", x.directory),
+                        ("Category", x.category)
+                    )
+                )
                 .ToList();
 
         return new Array<Entity>(entities);

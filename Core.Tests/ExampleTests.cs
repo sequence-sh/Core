@@ -64,13 +64,13 @@ public partial class ExampleTests
         r.ShouldBeSuccessful(x => x.ToString()!);
     }
 
-    [Fact(Skip = "skip")]
+    [Fact]
     [Trait("Category", "Integration")]
     public async Task RunSCLSequence()
     {
         const string scl
             = //@"FileWrite 'Dinosaur Dinosaur Dinosaur' 'C:\Users\wainw\source\repos\Reductech\core\TestFile.txt' true";
-            @"Print (FileRead 'C:\Users\wainw\source\repos\Reductech\core\TestFile.txt' decompress:false)";
+            @"GenerateDocumentation | ForEach (Print (From <entity> 'text'))";
 
         var logger = TestOutputHelper.BuildLogger();
         var sfs    = StepFactoryStore.CreateUsingReflection();
