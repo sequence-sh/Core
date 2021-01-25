@@ -53,7 +53,7 @@ internal static class DocumentationCreator
         {
             foreach (var type in enumTypes.OrderBy(x => x.Name))
             {
-                var enumLines = WriteEnumLines(type);
+                var enumLines = GetEnumLines(type);
 
                 yield return (type.Name + ".md", type.Name, JoinLines(enumLines), "Enums", "Enums");
             }
@@ -66,13 +66,14 @@ internal static class DocumentationCreator
     {
         return (s ?? string.Empty)
             .Replace("|",    @"\|")
+            .Replace("<",    @"\<")
             .Replace("\r\n", " ")
             .Replace("\n",   " ");
     }
 
-    private static IEnumerable<string> WriteEnumLines(Type type)
+    private static IEnumerable<string> GetEnumLines(Type type)
     {
-        yield return $"## {type.Name}";
+        yield return $"## {Escape(type.Name)}";
 
         var summary = type.GetXmlDocsSummary();
 
@@ -109,27 +110,22 @@ internal static class DocumentationCreator
 
     private static IEnumerable<string> GetPageLines(IDocumented doc)
     {
-        var pageLines = new List<string>
-        {
-            $"<a name=\"{doc.Name}\"></a>", $"## {doc.Name}", string.Empty
-        };
-
         if (!string.IsNullOrWhiteSpace(doc.TypeDetails))
         {
-            pageLines.Add($"**{doc.TypeDetails}**");
-            pageLines.Add(string.Empty);
+            yield return $"**{doc.TypeDetails}**";
+            yield return "";
         }
 
         foreach (var docRequirement in doc.Requirements)
         {
-            pageLines.Add($"*{docRequirement}*");
-            pageLines.Add(string.Empty);
+            yield return $"*{docRequirement}*";
+            yield return "";
         }
 
         if (!string.IsNullOrWhiteSpace(doc.Summary))
         {
-            pageLines.Add(Escape(doc.Summary));
-            pageLines.Add(string.Empty);
+            yield return Escape(doc.Summary);
+            yield return "";
         }
 
         if (doc.Parameters.Any())
@@ -175,11 +171,14 @@ internal static class DocumentationCreator
             );
 
             var table = Prettifier.CreateMarkdownTable(parameterRows).ToList();
-            pageLines.AddRange(table);
-            pageLines.Add(string.Empty);
-        }
 
-        return pageLines;
+            foreach (var line in table)
+            {
+                yield return line;
+            }
+
+            yield return "";
+        }
     }
 }
 
