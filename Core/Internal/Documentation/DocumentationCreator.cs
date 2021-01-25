@@ -87,8 +87,9 @@ internal static class DocumentationCreator
     /// <summary>
     /// Creates documentation for a list of entities
     /// </summary>
-    public static IEnumerable<(string fileName, string fileText)> CreateDocumentation(
-        IEnumerable<IDocumented> entities)
+    public static
+        IEnumerable<(string fileName, string title, string fileText, string directory, string
+            category)> CreateDocumentation(IEnumerable<IDocumented> entities)
     {
         var enumTypes = new HashSet<Type>();
 
@@ -104,7 +105,7 @@ internal static class DocumentationCreator
         var contentsTableLines = Prettifier.CreateMarkdownTable(contentsRows);
         contentsLines.AddRange(contentsTableLines);
 
-        yield return ("Contents", JoinLines(contentsLines));
+        yield return ("Contents.md", "Contents", JoinLines(contentsLines), "", "");
 
         foreach (var category in categories)
         {
@@ -118,14 +119,13 @@ internal static class DocumentationCreator
 
                 var pageLines = GetPageLines(doc);
 
-                yield return (doc.Name, JoinLines(pageLines));
+                yield return (doc.Name + ".md", doc.Name, JoinLines(pageLines), category.Key,
+                              category.Key);
             }
         }
 
         if (enumTypes.Any())
         {
-            //lines.Add($"# Enums");
-
             foreach (var type in enumTypes.OrderBy(x => x.Name))
             {
                 var enumLines = new List<string>();
@@ -153,7 +153,7 @@ internal static class DocumentationCreator
                 enumLines.AddRange(table);
                 enumLines.Add(string.Empty);
 
-                yield return (type.Name, JoinLines(enumLines));
+                yield return (type.Name + ".md", type.Name, JoinLines(enumLines), "Enums", "Enums");
             }
         }
 
