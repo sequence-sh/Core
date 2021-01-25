@@ -43,10 +43,15 @@ public partial class GenerateDocumentationTests : StepTestBase<GenerateDocumenta
                 );
             }
 
-            static Entity Contents(params (string name, string comment)[] steps)
+            static Entity Contents(params (string name, string category, string comment)[] steps)
             {
-                static string GetNameTerm(string n) => $"[{n}](#{n})";
-                var maxNameLength    = Math.Max(4, steps.Max(x => GetNameTerm(x.name).Length));
+                static string GetNameTerm(string n, string category) => $"[{n}]({category}/{n}.md)";
+
+                var maxNameLength = Math.Max(
+                    4,
+                    steps.Max(x => GetNameTerm(x.name, x.category).Length)
+                );
+
                 var maxCommentLength = Math.Max(7, steps.Max(x => x.comment.Length));
 
                 var nameSpaces    = string.Join("", Enumerable.Repeat(' ', maxNameLength - 4));
@@ -60,10 +65,10 @@ public partial class GenerateDocumentationTests : StepTestBase<GenerateDocumenta
                 sb.AppendLine($"|Step{nameSpaces}|Summary{commentSpaces}|");
                 sb.AppendLine($"|:{nameDashes}:|:{commentDashes}:|");
 
-                foreach (var (name, comment) in steps)
+                foreach (var (name, category, comment) in steps)
                 {
                     sb.AppendLine(
-                        $"|{GetNameTerm(name).PadRight(maxNameLength)}|{comment.PadRight(maxCommentLength)}|"
+                        $"|{GetNameTerm(name, category).PadRight(maxNameLength)}|{comment.PadRight(maxCommentLength)}|"
                     );
                 }
 
@@ -75,33 +80,36 @@ public partial class GenerateDocumentationTests : StepTestBase<GenerateDocumenta
             var not = File(
                 "Not.md",
                 "Not",
-                "<a name=\"Not\"></a>\r\n## Not\r\n\r\n**Boolean**\r\n\r\nNegation of a boolean value.\r\n\r\n|Parameter|Type  |Required|Summary             |\r\n|:-------:|:----:|:------:|:------------------:|\r\n|Boolean  |`bool`|☑️      |The value to negate.|",
+                "## Not *Not* **Boolean**\r\n\r\nNegation of a boolean value.\r\n\r\n|Parameter|Type |Required|Summary |\r\n|:-------:|:----:|:------:|:------------------:|\r\n|Boolean |`bool`|☑️ |The value to negate.|",
                 "Core",
                 "Core"
             );
 
-            (string nameof, string comment) notHeader = ("Not", "Negation of a boolean value.");
+            (string nameof, string category, string comment) notHeader = (
+                "Not", "Core", "Negation of a boolean value.");
 
             var applyMathOperator = File(
                 "ApplyMathOperator.md",
                 "ApplyMathOperator",
-                "<a name=\"ApplyMathOperator\"></a>\r\n## ApplyMathOperator\r\n\r\n**Int32**\r\n\r\nApplies a mathematical operator to two integers. Returns the result of the operation.\r\n\r\n|Parameter|Type                         |Required|Summary               |\r\n|:-------:|:---------------------------:|:------:|:--------------------:|\r\n|Left     |`int`                        |☑️      |The left operand.     |\r\n|Operator |[MathOperator](#MathOperator)|☑️      |The operator to apply.|\r\n|Right    |`int`                        |☑️      |The right operand.    |",
+                "## ApplyMathOperator *ApplyMathOperator* **Int32**\r\n\r\nApplies a mathematical operator to two integers. Returns the result of the operation.\r\n\r\n|Parameter|Type |Required|Summary |\r\n|:-------:|:--------------------------------------:|:------:|:--------------------:|\r\n|Left |`int` |☑️ |The left operand. |\r\n|Operator |[MathOperator](../Enums/MathOperator.md)|☑️ |The operator to apply.|\r\n|Right |`int` |☑️ |The right operand. |",
                 "Core",
                 "Core"
             );
 
-            (string nameof, string comment) mathHeader = (
+            (string nameof, string category, string comment) mathHeader = (
                 "ApplyMathOperator",
+                "Core",
                 "Applies a mathematical operator to two integers. Returns the result of the operation.");
 
-            (string nameof, string comment) exampleStepHeader = (
+            (string nameof, string category, string comment) exampleStepHeader = (
                 "DocumentationExampleStep",
+                "Examples",
                 "");
 
             var documentationExample = File(
                 "DocumentationExampleStep.md",
                 "DocumentationExampleStep",
-                "<a name=\"DocumentationExampleStep\"></a>\r\n## DocumentationExampleStep\r\n\r\n**StringStream**\r\n\r\n*Requires ValueIf Library Version 1.2*\r\n\r\n|Parameter|Type                         |Required|Summary|Allowed Range |Default Value|Example|Recommended Range|Recommended Value|Requirements|See Also|URL               |Value Delimiter|\r\n|:-------:|:---------------------------:|:------:|:-----:|:------------:|:-----------:|:-----:|:---------------:|:---------------:|:----------:|:------:|:----------------:|:-------------:|\r\n|Alpha    |`int`                        |☑️      |       |Greater than 1|             |1234   |100-300          |201              |Greek 2.1   |Beta    |[Alpha](alpha.com)|               |\r\n|Beta     |[StringStream](#StringStream)|        |       |              |Two hundred  |       |                 |                 |            |Alpha   |                  |               |\r\n|Gamma    |[VariableName](#VariableName)|        |       |              |             |       |                 |                 |            |        |                  |               |\r\n|Delta    |IStep<`bool`>                |        |       |              |             |       |                 |                 |            |        |                  |,              |",
+                "## DocumentationExampleStep *DocumentationExampleStep* **StringStream**\r\n\r\n*Requires ValueIf Library Version 1.2*\r\n\r\n|Parameter|Type |Required|Summary|Allowed Range |Default Value|Example|Recommended Range|Recommended Value|Requirements|See Also|URL |Value Delimiter|\r\n|:-------:|:------------:|:------:|:-----:|:------------:|:-----------:|:-----:|:---------------:|:---------------:|:----------:|:------:|:----------------:|:-------------:|\r\n|Alpha |`int` |☑️ | |Greater than 1| |1234 |100-300 |201 |Greek 2.1 |Beta |[Alpha](alpha.com)| |\r\n|Beta |`string` | | | |Two hundred | | | | |Alpha | | |\r\n|Gamma |`VariableName`| | | | | | | | | | | |\r\n|Delta |IStep<`bool`> | | | | | | | | | | |, |",
                 "Examples",
                 "Examples"
             );
@@ -133,7 +141,7 @@ public partial class GenerateDocumentationTests : StepTestBase<GenerateDocumenta
                         File(
                             "MathOperator.md",
                             "MathOperator",
-                            "<a name=\"MathOperator\"></a>\r\n## MathOperator\r\nAn operator that can be applied to two numbers.\r\n\r\n|Name    |Summary                                                                                                   |\r\n|:------:|:--------------------------------------------------------------------------------------------------------:|\r\n|None    |Sentinel value                                                                                            |\r\n|Add     |Add the left and right operands.                                                                          |\r\n|Subtract|Subtract the right operand from the left.                                                                 |\r\n|Multiply|Multiply the left and right operands.                                                                     |\r\n|Divide  |Divide the left operand by the right. Attempting to divide by zero will result in an error.               |\r\n|Modulo  |Reduce the left operand modulo the right.                                                                 |\r\n|Power   |Raise the left operand to the power of the right. If the right operand is negative, zero will be returned.|",
+                            "## MathOperator\r\nAn operator that can be applied to two numbers.\r\n\r\n|Name |Summary | |:------:|:--------------------------------------------------------------------------------------------------------:|\r\n|None |Sentinel value |\r\n|Add |Add the left and right operands. |\r\n|Subtract|Subtract the right operand from the left. |\r\n|Multiply|Multiply the left and right operands. |\r\n|Divide |Divide the left operand by the right. Attempting to divide by zero will result in an error. |\r\n|Modulo |Reduce the left operand modulo the right. |\r\n|Power |Raise the left operand to the power of the right. If the right operand is negative, zero will be returned.|",
                             "Enums",
                             "Enums"
                         )

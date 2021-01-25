@@ -136,6 +136,7 @@ public partial class PropertyRequirementTests
             IStateMonad stateMonad,
             CancellationToken cancellationToken)
         {
+            await Task.CompletedTask;
             return true;
         }
 
