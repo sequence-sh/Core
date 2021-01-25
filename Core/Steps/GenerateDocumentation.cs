@@ -24,7 +24,7 @@ public sealed class
 
         var documented = stateMonad.StepFactoryStore
             .Dictionary
-            .Values
+            .GroupBy(x => x.Value, x => x.Key)
             .Select(x => new StepWrapper(x))
             .ToList();
 

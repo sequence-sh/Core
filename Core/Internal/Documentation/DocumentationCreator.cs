@@ -23,7 +23,7 @@ internal static class DocumentationCreator
         var contentsLines = new List<string> { $"# Contents" };
 
         var contentsRows = categories.SelectMany(x => x)
-            .Select(x => new[] { $"[{x.Name}](#{x.Name})", x.Summary })
+            .Select(x => new[] { $"[{x.Name}]({x.DocumentationCategory}/{x.FileName})", x.Summary })
             .Prepend(new[] { "Step", "Summary" }) //Header row
             .ToList();
 
@@ -71,45 +71,14 @@ internal static class DocumentationCreator
             .Replace("\n",   " ");
     }
 
-    private static IEnumerable<string> GetEnumLines(Type type)
-    {
-        yield return $"## {Escape(type.Name)}";
-
-        var summary = type.GetXmlDocsSummary();
-
-        if (!string.IsNullOrWhiteSpace(summary))
-        {
-            yield return Escape(summary);
-            yield return string.Empty;
-        }
-
-        var parameterRows = new List<string?[]> { new[] { "Name", "Summary" } };
-
-        parameterRows.AddRange(
-            type.GetFields(BindingFlags.Public | BindingFlags.Static)
-                .OrderBy(GetEnumFieldValue)
-                .Select(fieldInfo => new[] { fieldInfo.Name, fieldInfo.GetXmlDocsSummary() })
-        );
-
-        var table = Prettifier.CreateMarkdownTable(parameterRows).ToList();
-
-        foreach (var l in table)
-            yield return l;
-
-        yield return string.Empty;
-
-        static object GetEnumFieldValue(MemberInfo memberInfo)
-        {
-            var type = memberInfo.DeclaringType;
-
-            var v = Enum.Parse(type!, memberInfo.Name);
-
-            return v;
-        }
-    }
-
     private static IEnumerable<string> GetPageLines(IDocumented doc)
     {
+        yield return $"## {doc.Name}";
+
+        var names = string.Join(@" \| ", doc.AllNames.Select(x => $"*{x}*"));
+
+        yield return $"{names}";
+
         if (!string.IsNullOrWhiteSpace(doc.TypeDetails))
         {
             yield return $"**{doc.TypeDetails}**";
@@ -178,6 +147,43 @@ internal static class DocumentationCreator
             }
 
             yield return "";
+        }
+    }
+
+    private static IEnumerable<string> GetEnumLines(Type type)
+    {
+        yield return $"## {Escape(type.Name)}";
+
+        var summary = type.GetXmlDocsSummary();
+
+        if (!string.IsNullOrWhiteSpace(summary))
+        {
+            yield return Escape(summary);
+            yield return string.Empty;
+        }
+
+        var parameterRows = new List<string?[]> { new[] { "Name", "Summary" } };
+
+        parameterRows.AddRange(
+            type.GetFields(BindingFlags.Public | BindingFlags.Static)
+                .OrderBy(GetEnumFieldValue)
+                .Select(fieldInfo => new[] { fieldInfo.Name, fieldInfo.GetXmlDocsSummary() })
+        );
+
+        var table = Prettifier.CreateMarkdownTable(parameterRows).ToList();
+
+        foreach (var l in table)
+            yield return l;
+
+        yield return string.Empty;
+
+        static object GetEnumFieldValue(MemberInfo memberInfo)
+        {
+            var type = memberInfo.DeclaringType;
+
+            var v = Enum.Parse(type!, memberInfo.Name);
+
+            return v;
         }
     }
 }

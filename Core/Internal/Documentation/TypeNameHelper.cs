@@ -37,6 +37,9 @@ internal static class TypeNameHelper
 
     public static string GetHumanReadableTypeName(Type t)
     {
+        if (t.IsEnum)
+            return t.Name;
+
         if (TypeAliases.TryGetValue(t, out var name))
             return name;
 
