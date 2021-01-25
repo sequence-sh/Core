@@ -50,6 +50,9 @@ public class ErrorList : IError
     }
 
     /// <inheritdoc />
+    public override string ToString() => AsString;
+
+    /// <inheritdoc />
     public bool Equals(IError? other) =>
         other != null && _allErrors.SequenceEqual(other.GetAllErrors());
 

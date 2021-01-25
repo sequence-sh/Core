@@ -19,6 +19,11 @@ public interface IDocumented
     string Name { get; }
 
     /// <summary>
+    /// The name of the file
+    /// </summary>
+    string FileName { get; }
+
+    /// <summary>
     /// A summary of what the method does.
     /// </summary>
     string Summary { get; }

@@ -4,7 +4,7 @@ namespace Reductech.EDR.Core.Enums
 {
 
 /// <summary>
-/// An operator to use for comparison.
+/// Determines what relationship between two operands causes the compare operator to return true.
 /// </summary>
 public enum CompareOperator
 {
@@ -12,15 +12,42 @@ public enum CompareOperator
     /// Sentinel value.
     /// </summary>
     None,
-    #pragma warning disable 1591
-    [Display(Name = "==")] Equals,
 
-    [Display(Name = "!=")] NotEquals,
-    [Display(Name = "<")] LessThan,
-    [Display(Name = "<=")] LessThanOrEqual,
-    [Display(Name = ">")] GreaterThan,
-    [Display(Name = ">=")] GreaterThanOrEqual
-    #pragma warning restore 1591
+    /// <summary>
+    /// The operands are equal
+    /// </summary>
+    [Display(Name = "==")]
+    Equals,
+
+    /// <summary>
+    /// The operands are not equal
+    /// </summary>
+    [Display(Name = "!=")]
+    NotEquals,
+
+    /// <summary>
+    /// The left operand is less than the right operand
+    /// </summary>
+    [Display(Name = "<")]
+    LessThan,
+
+    /// <summary>
+    /// The left operand is less than or equal to the right operand
+    /// </summary>
+    [Display(Name = "<=")]
+    LessThanOrEqual,
+
+    /// <summary>
+    /// The left operand is greater than the right operand
+    /// </summary>
+    [Display(Name = ">")]
+    GreaterThan,
+
+    /// <summary>
+    /// The left operand is greater than or equal to the right operand
+    /// </summary>
+    [Display(Name = ">=")]
+    GreaterThanOrEqual
 }
 
 }

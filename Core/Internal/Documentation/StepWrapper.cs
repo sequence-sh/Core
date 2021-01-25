@@ -56,6 +56,9 @@ public class StepWrapper : IDocumented
     public string Name => TypeNameHelper.GetHumanReadableTypeName(Factory.StepType);
 
     /// <inheritdoc />
+    public string FileName => Factory.TypeName + ".md";
+
+    /// <inheritdoc />
     public string Summary => Factory.StepType.GetXmlDocsSummary();
 
     /// <inheritdoc />
