@@ -23,7 +23,7 @@ public interface ICaseThatExecutes : IAsyncTestInstance
     void AddExternalProcessRunnerAction(Action<Mock<IExternalProcessRunner>> action);
     void AddFileSystemAction(Action<Mock<IFileSystemHelper>> action);
 
-    ISettings Settings { get; set; }
+    SCLSettings Settings { get; set; }
 }
 
 }

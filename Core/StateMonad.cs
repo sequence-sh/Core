@@ -25,7 +25,7 @@ public interface IStateMonad : IDisposable
     /// <summary>
     /// The settings for this step.
     /// </summary>
-    ISettings Settings { get; }
+    SCLSettings Settings { get; }
 
     /// <summary>
     /// The runner of external processes.
@@ -47,15 +47,6 @@ public interface IStateMonad : IDisposable
     /// </summary>
     /// <returns></returns>
     IEnumerable<KeyValuePair<VariableName, object>> GetState();
-
-    /// <summary>
-    /// Get settings of a particular type.
-    /// </summary>
-    public Result<T, IErrorBuilder> GetSettings<T>() where T : ISettings => Settings.TryCast<T>()
-        .MapError(
-            _ => new ErrorBuilder(ErrorCode.MissingStepSettings, typeof(T).Name) as
-                IErrorBuilder
-        );
 
     /// <summary>
     /// Gets the current value of this variable.
@@ -91,7 +82,7 @@ public sealed class StateMonad : IStateMonad
     /// </summary>
     public StateMonad(
         ILogger logger,
-        ISettings settings,
+        SCLSettings settings,
         IExternalProcessRunner externalProcessRunner,
         IFileSystemHelper fileSystemHelper,
         StepFactoryStore stepFactoryStore)
@@ -111,7 +102,7 @@ public sealed class StateMonad : IStateMonad
     /// <summary>
     /// The settings for this step.
     /// </summary>
-    public ISettings Settings { get; }
+    public SCLSettings Settings { get; }
 
     /// <summary>
     /// The runner of external processes.

@@ -122,6 +122,12 @@ public sealed record ErrorCode : ErrorCodeBase
     public static readonly ErrorCode MissingStepSettings = new(nameof(MissingStepSettings));
 
     /// <summary>
+    /// Could not get settings value: {0}.{1}
+    /// </summary>
+    public static readonly ErrorCode MissingStepSettingsValue =
+        new(nameof(MissingStepSettingsValue));
+
+    /// <summary>
     /// Variable '{0}' does not exist.
     /// </summary>
     public static readonly ErrorCode MissingVariable = new(nameof(MissingVariable));

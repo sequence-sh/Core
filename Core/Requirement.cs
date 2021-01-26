@@ -1,9 +1,11 @@
-﻿using Reductech.EDR.Core.Attributes;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
+using CSharpFunctionalExtensions;
+using Reductech.EDR.Core.Attributes;
+using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Util;
 
 namespace Reductech.EDR.Core
@@ -39,6 +41,50 @@ public sealed class Requirement
     /// Notes on the requirement.
     /// </summary>
     public string? Notes { get; set; }
+
+    /// <summary>
+    /// Check that the requirement is met by these settings.
+    /// </summary>
+    public Result<Unit, IErrorBuilder> Check(SCLSettings settings)
+    {
+        if (settings.Entity.Dictionary.TryGetValue(SCLSettings.ConnectorsKey, out var connectors)
+         && connectors.BestValue.TryPickT7(out var connectorsEntity, out _))
+        {
+            var connector = connectorsEntity.TryGetValue(Name);
+
+            if (connector.HasValue && connector.Value.TryPickT7(out var connectorEntity, out _))
+            {
+                var connectorVersion = connectorEntity.TryGetValue(SCLSettings.VersionKey);
+
+                if (connectorVersion.HasValue)
+                {
+                    if (Version.TryParse(connectorVersion.Value.ToString(), out var version))
+                    {
+                        if (MaxVersion != null && MaxVersion < version)
+                            return ErrorCode.RequirementNotMet.ToErrorBuilder(this);
+
+                        if (MinVersion != null && MinVersion > version)
+                            return ErrorCode.RequirementNotMet.ToErrorBuilder(this);
+
+                        return Unit.Default;
+                    }
+
+                    return ErrorCode.CouldNotParse.ToErrorBuilder(
+                        connectorVersion.Value.ToString()!,
+                        "Version"
+                    );
+                }
+
+                return ErrorCode.MissingStepSettingsValue.ToErrorBuilder(
+                    Name,
+                    SCLSettings.VersionKey
+                );
+            }
+        }
+        else { }
+
+        return ErrorCode.MissingStepSettings.ToErrorBuilder(Name);
+    }
 
     /// <inheritdoc />
     public override string ToString()

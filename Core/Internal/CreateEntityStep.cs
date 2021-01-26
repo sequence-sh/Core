@@ -87,7 +87,7 @@ public class CreateEntityStep : IStep<Entity>
     }
 
     /// <inheritdoc />
-    public Result<Unit, IError> Verify(ISettings settings)
+    public Result<Unit, IError> Verify(SCLSettings settings)
     {
         var r = Properties.Select(x => x.Value.Verify(settings))
             .Combine(_ => Unit.Default, ErrorList.Combine);

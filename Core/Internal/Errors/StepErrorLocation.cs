@@ -21,10 +21,8 @@ public class StepErrorLocation : IErrorLocation
     public string AsString => Step.Name;
 
     /// <inheritdoc />
-    public bool Equals(IErrorLocation? other)
-    {
-        return other is StepErrorLocation sel && Step.Unfreeze().Equals(sel.Step.Unfreeze());
-    }
+    public bool Equals(IErrorLocation? other) => other is StepErrorLocation sel
+                                              && Step.Unfreeze().Equals(sel.Step.Unfreeze());
 
     /// <inheritdoc />
     public override bool Equals(object? obj)
@@ -42,10 +40,7 @@ public class StepErrorLocation : IErrorLocation
     }
 
     /// <inheritdoc />
-    public override int GetHashCode()
-    {
-        return Step.Unfreeze().GetHashCode();
-    }
+    public override int GetHashCode() => Step.Unfreeze().GetHashCode();
 }
 
 }

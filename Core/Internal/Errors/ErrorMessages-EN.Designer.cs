@@ -241,6 +241,15 @@ namespace Reductech.EDR.Core.Internal.Errors {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Could not get settings value: {0}.{1}.
+        /// </summary>
+        internal static string MissingStepSettingsValue {
+            get {
+                return ResourceManager.GetString("MissingStepSettingsValue", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Variable &apos;{0}&apos; does not exist..
         /// </summary>
         internal static string MissingVariable {

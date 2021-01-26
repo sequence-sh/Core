@@ -61,6 +61,7 @@
     <PackageReference Include="Namotion.Reflection" Version="1.0.15" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
     <PackageReference Include="OneOf" Version="3.0.163" />
+    <PackageReference Include="System.Configuration.ConfigurationManager" Version="5.0.0" />
     <PackageReference Include="System.Linq.Async" Version="5.0.0" />
   </ItemGroup>
 

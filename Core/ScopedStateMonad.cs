@@ -51,7 +51,7 @@ public sealed class ScopedStateMonad : IStateMonad
     public ILogger Logger => BaseStateMonad.Logger;
 
     /// <inheritdoc />
-    public ISettings Settings => BaseStateMonad.Settings;
+    public SCLSettings Settings => BaseStateMonad.Settings;
 
     /// <inheritdoc />
     public IExternalProcessRunner ExternalProcessRunner => BaseStateMonad.ExternalProcessRunner;

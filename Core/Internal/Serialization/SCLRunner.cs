@@ -25,7 +25,7 @@ public sealed class SCLRunner
     /// Creates a new SCL Runner
     /// </summary>
     public SCLRunner(
-        ISettings settings,
+        SCLSettings settings,
         ILogger logger,
         IExternalProcessRunner externalProcessRunner,
         IFileSystemHelper fileSystemHelper,
@@ -41,7 +41,7 @@ public sealed class SCLRunner
         _loggingData = loggingData.ToDictionary(x => x.Key, x => x.Value);
     }
 
-    private readonly ISettings _settings;
+    private readonly SCLSettings _settings;
     private readonly ILogger _logger;
     private readonly IExternalProcessRunner _externalProcessRunner;
     private readonly IFileSystemHelper _fileSystemHelper;

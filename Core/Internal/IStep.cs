@@ -32,7 +32,7 @@ public interface IStep
     /// <summary>
     /// Verify that this step can be run with the current settings.
     /// </summary>
-    public Result<Unit, IError> Verify(ISettings settings);
+    public Result<Unit, IError> Verify(SCLSettings settings);
 
     /// <summary>
     /// Whether this term should be bracketed when serialized
