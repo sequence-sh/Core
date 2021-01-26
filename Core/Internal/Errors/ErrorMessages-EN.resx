@@ -177,6 +177,9 @@
   <data name="MissingStepSettings" xml:space="preserve">
     <value>Could not get settings: {0}</value>
   </data>
+  <data name="MissingStepSettingsValue" xml:space="preserve">
+    <value>Could not get settings value: {0}.{1}</value>
+  </data>
   <data name="MissingVariable" xml:space="preserve">
     <value>Variable '{0}' does not exist.</value>
   </data>

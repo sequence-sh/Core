@@ -1,9 +1,11 @@
-﻿using Reductech.EDR.Core.Attributes;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
+using CSharpFunctionalExtensions;
+using Reductech.EDR.Core.Attributes;
+using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Util;
 
 namespace Reductech.EDR.Core
@@ -39,6 +41,40 @@ public sealed class Requirement
     /// Notes on the requirement.
     /// </summary>
     public string? Notes { get; set; }
+
+    /// <summary>
+    /// Check that the requirement is met by these settings.
+    /// </summary>
+    public Result<Unit, IErrorBuilder> Check(SCLSettings settings)
+    {
+        if (settings.Map.Dictionary.TryGetValue(Name, out var value)
+         && value is SCLSettingsValue.Map map)
+        {
+            if (map.Dictionary.TryGetValue(SCLSettings.VersionKey, out var versionSetting)
+             && versionSetting is SCLSettingsValue.Primitive primitive)
+            {
+                if (Version.TryParse(primitive.Value, out var version))
+                {
+                    if (MaxVersion != null && MaxVersion < version)
+                        return ErrorCode.RequirementNotMet.ToErrorBuilder(this);
+
+                    if (MinVersion != null && MinVersion > version)
+                        return ErrorCode.RequirementNotMet.ToErrorBuilder(this);
+
+                    return Unit.Default;
+                }
+
+                return ErrorCode.CouldNotParse.ToErrorBuilder(primitive.Value, "Version");
+            }
+
+            return ErrorCode.MissingStepSettingsValue.ToErrorBuilder(
+                Name,
+                SCLSettings.VersionKey
+            );
+        }
+
+        return ErrorCode.MissingStepSettings.ToErrorBuilder(Name);
+    }
 
     /// <inheritdoc />
     public override string ToString()

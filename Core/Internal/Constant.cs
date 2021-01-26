@@ -56,7 +56,7 @@ public abstract class ConstantBase<T> : IStep<T>, IConstantStep
     }
 
     /// <inheritdoc />
-    public Result<Unit, IError> Verify(ISettings settings) => Unit.Default;
+    public Result<Unit, IError> Verify(SCLSettings settings) => Unit.Default;
 
     /// <inheritdoc />
     public Configuration? Configuration { get; set; } = null;

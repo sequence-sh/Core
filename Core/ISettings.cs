@@ -1,19 +1,26 @@
-﻿using CSharpFunctionalExtensions;
-using Reductech.EDR.Core.Internal.Errors;
-using Reductech.EDR.Core.Util;
+﻿using System.Collections.Generic;
 
 namespace Reductech.EDR.Core
 {
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 /// <summary>
 /// External settings for running the step.
 /// </summary>
-public interface ISettings
+public record SCLSettings(SCLSettingsValue.Map Map)
 {
-    /// <summary>
-    /// Check that the requirement is met by these settings.
-    /// </summary>
-    Result<Unit, IErrorBuilder> CheckRequirement(Requirement requirement);
+    public const string VersionKey = "Version";
+
+    public static readonly SCLSettings EmptySettings =
+        new(new SCLSettingsValue.Map(new Dictionary<string, SCLSettingsValue>()));
 }
+
+public abstract record SCLSettingsValue
+{
+    public record Primitive(string Value) : SCLSettingsValue;
+
+    public record Map(IReadOnlyDictionary<string, SCLSettingsValue> Dictionary) : SCLSettingsValue;
+}
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
 
 }

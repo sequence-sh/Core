@@ -30,7 +30,7 @@ public static class Extensions
         return cws;
     }
 
-    public static T WithSettings<T>(this T cws, ISettings settings) where T : ICaseThatExecutes
+    public static T WithSettings<T>(this T cws, SCLSettings settings) where T : ICaseThatExecutes
     {
         cws.Settings = settings;
         return cws;

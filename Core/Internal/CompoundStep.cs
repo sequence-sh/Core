@@ -233,7 +233,7 @@ public abstract class CompoundStep<T> : ICompoundStep<T>
     /// <summary>
     /// Check that this step meets requirements
     /// </summary>
-    public virtual Result<Unit, IError> VerifyThis(ISettings settings) => Unit.Default;
+    public virtual Result<Unit, IError> VerifyThis(SCLSettings settings) => Unit.Default;
 
     /// <inheritdoc />
     public virtual Result<StepContext, IError> TryGetScopedContext(
@@ -245,12 +245,12 @@ public abstract class CompoundStep<T> : ICompoundStep<T>
     );
 
     /// <inheritdoc />
-    public Result<Unit, IError> Verify(ISettings settings)
+    public Result<Unit, IError> Verify(SCLSettings settings)
     {
         var r0 = new[] { VerifyThis(settings) };
 
         var rRequirements = StepFactory.Requirements.Concat(RuntimeRequirements)
-            .Select(req => settings.CheckRequirement(req).MapError(x => x.WithLocation(this)));
+            .Select(req => req.Check(settings).MapError(x => x.WithLocation(this)));
 
         var r3 = AllProperties
             .Select(
