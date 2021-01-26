@@ -47,31 +47,41 @@ public sealed class Requirement
     /// </summary>
     public Result<Unit, IErrorBuilder> Check(SCLSettings settings)
     {
-        if (settings.Map.Dictionary.TryGetValue(Name, out var value)
-         && value is SCLSettingsValue.Map map)
+        if (settings.Entity.Dictionary.TryGetValue(SCLSettings.ConnectorsKey, out var connectors)
+         && connectors.BestValue.TryPickT7(out var connectorsEntity, out _))
         {
-            if (map.Dictionary.TryGetValue(SCLSettings.VersionKey, out var versionSetting)
-             && versionSetting is SCLSettingsValue.Primitive primitive)
+            var connector = connectorsEntity.TryGetValue(Name);
+
+            if (connector.HasValue && connector.Value.TryPickT7(out var connectorEntity, out _))
             {
-                if (Version.TryParse(primitive.Value, out var version))
+                var connectorVersion = connectorEntity.TryGetValue(SCLSettings.VersionKey);
+
+                if (connectorVersion.HasValue)
                 {
-                    if (MaxVersion != null && MaxVersion < version)
-                        return ErrorCode.RequirementNotMet.ToErrorBuilder(this);
+                    if (Version.TryParse(connectorVersion.Value.ToString(), out var version))
+                    {
+                        if (MaxVersion != null && MaxVersion < version)
+                            return ErrorCode.RequirementNotMet.ToErrorBuilder(this);
 
-                    if (MinVersion != null && MinVersion > version)
-                        return ErrorCode.RequirementNotMet.ToErrorBuilder(this);
+                        if (MinVersion != null && MinVersion > version)
+                            return ErrorCode.RequirementNotMet.ToErrorBuilder(this);
 
-                    return Unit.Default;
+                        return Unit.Default;
+                    }
+
+                    return ErrorCode.CouldNotParse.ToErrorBuilder(
+                        connectorVersion.Value.ToString()!,
+                        "Version"
+                    );
                 }
 
-                return ErrorCode.CouldNotParse.ToErrorBuilder(primitive.Value, "Version");
+                return ErrorCode.MissingStepSettingsValue.ToErrorBuilder(
+                    Name,
+                    SCLSettings.VersionKey
+                );
             }
-
-            return ErrorCode.MissingStepSettingsValue.ToErrorBuilder(
-                Name,
-                SCLSettings.VersionKey
-            );
         }
+        else { }
 
         return ErrorCode.MissingStepSettings.ToErrorBuilder(Name);
     }

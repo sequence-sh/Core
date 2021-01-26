@@ -25,14 +25,14 @@ public partial class PropertyRequirementTests
             yield return new TestCase(
                 "No Requirement",
                 new RequirementTestStep(),
-                EmptySettings.Instance,
+                SCLSettings.EmptySettings,
                 true
             );
 
             yield return new TestCase(
                 "Requirement not met",
                 new RequirementTestStep { RequirementStep = placeholder },
-                EmptySettings.Instance,
+                SCLSettings.EmptySettings,
                 false
             );
 
@@ -105,51 +105,17 @@ public partial class PropertyRequirementTests
 
     private static SCLSettings CreateWidgetSettings(Version version)
     {
-        var map = new SCLSettings(
-            new SCLSettingsValue.Map(
-                new Dictionary<string, SCLSettingsValue>(StringComparer.OrdinalIgnoreCase)
-                {
-                    {
-                        "widget",
-                        new SCLSettingsValue.Map(
-                            new Dictionary<string, SCLSettingsValue>(
-                                StringComparer.OrdinalIgnoreCase
-                            )
-                            {
-                                {
-                                    SCLSettings.VersionKey,
-                                    new SCLSettingsValue.Primitive(version.ToString())
-                                }
-                            }
-                        )
-                    }
-                }
-            )
-        );
+        var connectorsString =
+            $@"{{
+  ""connectors"": {{
+    ""widget"": {{
+      ""version"": ""{version}""
+    }}
+  }}
+}}";
 
-        return map;
+        return SCLSettings.CreateFromString(connectorsString);
     }
-
-    //private record WidgetSettings(Version Version) : ISettings
-    //{
-    //    /// <inheritdoc />
-    //    public Result<Unit, IErrorBuilder> CheckRequirement(Requirement requirement)
-    //    {
-    //        if (!requirement.Name.Equals("widget", StringComparison.OrdinalIgnoreCase))
-    //            return ErrorCode.RequirementNotMet.ToErrorBuilder(requirement);
-
-    //        if (requirement.MinVersion != null && Version < requirement.MinVersion)
-    //            return ErrorCode.RequirementNotMet.ToErrorBuilder(requirement);
-
-    //        if (requirement.MaxVersion != null && Version > requirement.MaxVersion)
-    //            return ErrorCode.RequirementNotMet.ToErrorBuilder(requirement);
-
-    //        return Unit.Default;
-    //    }
-
-    //    /// <inheritdoc />
-    //    public override string ToString() => $"Widget {Version}";
-    //}
 
     private class RequirementTestStep : CompoundStep<bool>
     {

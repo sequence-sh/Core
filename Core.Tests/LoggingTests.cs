@@ -293,7 +293,7 @@ public partial class LoggingTests
                     fileSystemAction(fileSystemMock);
 
             var sclRunner = new SCLRunner(
-                EmptySettings.Instance,
+                SCLSettings.EmptySettings,
                 logger,
                 repo.Create<IExternalProcessRunner>().Object,
                 fileSystemMock.Object,

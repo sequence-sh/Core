@@ -53,7 +53,7 @@ public partial class ExampleTests
 
         var monad = new StateMonad(
             TestOutputHelper.BuildLogger(),
-            EmptySettings.Instance,
+            SCLSettings.EmptySettings,
             ExternalProcessRunner.Instance,
             FileSystemHelper.Instance,
             sfs
@@ -84,7 +84,7 @@ public partial class ExampleTests
         var sfs    = StepFactoryStore.CreateUsingReflection();
 
         var runner = new SCLRunner(
-            EmptySettings.Instance,
+            SCLSettings.EmptySettings,
             logger,
             ExternalProcessRunner.Instance,
             FileSystemHelper.Instance,
@@ -173,7 +173,7 @@ public partial class ExampleTests
 
         var monad = new StateMonad(
             TestOutputHelper.BuildLogger(),
-            EmptySettings.Instance,
+            SCLSettings.EmptySettings,
             ExternalProcessRunner.Instance,
             FileSystemHelper.Instance,
             StepFactoryStore.CreateUsingReflection()

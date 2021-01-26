@@ -358,7 +358,7 @@ Print 'Comments!'",
             var mockFactory = new MockRepository(MockBehavior.Strict);
 
             var runner = new SCLRunner(
-                EmptySettings.Instance,
+                SCLSettings.EmptySettings,
                 loggerFactory.CreateLogger("Test"),
                 mockFactory.Create<IExternalProcessRunner>().Object,
                 mockFactory.Create<IFileSystemHelper>().Object,

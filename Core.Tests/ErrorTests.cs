@@ -155,7 +155,7 @@ public partial class RunErrorTests
 
             using var state = new StateMonad(
                 NullLogger.Instance,
-                EmptySettings.Instance,
+                SCLSettings.EmptySettings,
                 repo.Create<IExternalProcessRunner>().Object,
                 repo.Create<IFileSystemHelper>().Object,
                 spf

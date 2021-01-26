@@ -161,7 +161,7 @@ public abstract partial class StepTestBase<TStep, TOutput>
         public List<Action<IStateMonad>> InitialStateActions { get; } = new();
 
         /// <inheritdoc />
-        public SCLSettings Settings { get; set; } = EmptySettings.Instance;
+        public SCLSettings Settings { get; set; } = SCLSettings.EmptySettings;
 
         public Dictionary<VariableName, object> ExpectedFinalState { get; } = new();
         public string Name { get; set; } = Name;
