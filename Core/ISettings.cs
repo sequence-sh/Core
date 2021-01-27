@@ -15,6 +15,7 @@ public record SCLSettings(Entity Entity)
 {
     public const string VersionKey = "Version";
     public const string ConnectorsKey = "Connectors";
+    public const string FeaturesKey = "Features";
 
     public static readonly SCLSettings EmptySettings =
         new(new Entity(ImmutableDictionary<string, EntityProperty>.Empty));

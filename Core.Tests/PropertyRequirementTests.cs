@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using AutoTheory;
@@ -82,6 +83,27 @@ public partial class PropertyRequirementTests
                 CreateWidgetSettings(new Version(5, 0)),
                 true
             );
+
+            yield return new TestCase(
+                "No Features",
+                new RequirementTestStep { RequiredFeatureStep = placeholder },
+                CreateWidgetSettings(new Version(1, 0)),
+                false
+            );
+
+            yield return new TestCase(
+                "Wrong Feature",
+                new RequirementTestStep { RequiredFeatureStep = placeholder },
+                CreateWidgetSettings(new Version(1, 0), "Kludge"),
+                false
+            );
+
+            yield return new TestCase(
+                "Right Features",
+                new RequirementTestStep { RequiredFeatureStep = placeholder },
+                CreateWidgetSettings(new Version(1, 0), "sprocket"),
+                true
+            );
         }
     }
 
@@ -103,13 +125,22 @@ public partial class PropertyRequirementTests
         }
     }
 
-    private static SCLSettings CreateWidgetSettings(Version version)
+    private static SCLSettings CreateWidgetSettings(Version version, params string[] features)
     {
+        string featuresString;
+
+        if (features.Any())
+            featuresString = ", \"features\": ["
+                           + string.Join(", ", features.Select(f => $"\"{f}\"")) + "]";
+        else
+            featuresString = "";
+
         var connectorsString =
             $@"{{
   ""connectors"": {{
     ""widget"": {{
       ""version"": ""{version}""
+      {featuresString}
     }}
   }}
 }}";
@@ -142,6 +173,11 @@ public partial class PropertyRequirementTests
         [DefaultValueExplanation("Nothing")]
         [RequiredVersion("Widget", null, "5.0")]
         public IStep<bool>? MaxVersionStep { get; init; }
+
+        [StepProperty(4)]
+        [DefaultValueExplanation("Nothing")]
+        [RequiredVersion("Widget", null, null, null, "sprocket")]
+        public IStep<bool>? RequiredFeatureStep { get; init; }
 
         /// <inheritdoc />
         public override IStepFactory StepFactory => RequirementTestStepFactory.Instance;
