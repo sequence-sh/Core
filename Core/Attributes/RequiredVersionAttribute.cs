@@ -16,14 +16,17 @@ public sealed class RequiredVersionAttribute : Attribute
     /// <param name="minRequiredVersion">e.g. "6.2"</param>
     /// <param name="maxRequiredVersion">e.g. "8.4"</param>
     /// <param name="notes">Special notes</param>
+    /// <param name="features">Features</param>
     public RequiredVersionAttribute(
         string softwareName,
         string? minRequiredVersion,
         string? maxRequiredVersion = null,
-        string? notes = null)
+        string? notes = null,
+        params string[] features)
     {
         SoftwareName       = softwareName;
         Notes              = notes;
+        Features           = features;
         MinRequiredVersion = minRequiredVersion == null ? null : new Version(minRequiredVersion);
         MaxRequiredVersion = maxRequiredVersion == null ? null : new Version(maxRequiredVersion);
     }
@@ -47,6 +50,11 @@ public sealed class RequiredVersionAttribute : Attribute
     /// The notes.
     /// </summary>
     public string? Notes { get; }
+
+    /// <summary>
+    /// The required features
+    /// </summary>
+    public string[] Features { get; }
 
     /// <summary>
     /// The required version in human readable form.
@@ -81,7 +89,8 @@ public sealed class RequiredVersionAttribute : Attribute
             MaxVersion = MaxRequiredVersion,
             MinVersion = MinRequiredVersion,
             Name       = SoftwareName,
-            Notes      = Notes
+            Notes      = Notes,
+            Features   = Features
         };
     }
 }

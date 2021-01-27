@@ -43,6 +43,11 @@ public sealed class Requirement
     public string? Notes { get; set; }
 
     /// <summary>
+    /// Required Features
+    /// </summary>
+    public IReadOnlyList<string>? Features { get; set; }
+
+    /// <summary>
     /// Check that the requirement is met by these settings.
     /// </summary>
     public Result<Unit, IErrorBuilder> Check(SCLSettings settings)
@@ -65,6 +70,31 @@ public sealed class Requirement
 
                         if (MinVersion != null && MinVersion > version)
                             return ErrorCode.RequirementNotMet.ToErrorBuilder(this);
+
+                        if (Features != null && Features.Any())
+                        {
+                            var connectorFeatures =
+                                connectorEntity.TryGetValue(SCLSettings.FeaturesKey);
+
+                            if (connectorFeatures.HasValue
+                             && connectorFeatures.Value.TryPickT8(out var featuresList, out _))
+                            {
+                                var missingFeatures = Features.Except(
+                                    featuresList.Select(x => x.ToString()),
+                                    StringComparer.OrdinalIgnoreCase
+                                );
+
+                                if (missingFeatures.Any())
+                                {
+                                    return ErrorCode.RequirementNotMet.ToErrorBuilder(this);
+                                }
+                            }
+                            else
+                                return ErrorCode.MissingStepSettingsValue.ToErrorBuilder(
+                                    Name,
+                                    SCLSettings.FeaturesKey
+                                );
+                        }
 
                         return Unit.Default;
                     }
@@ -102,6 +132,12 @@ public sealed class Requirement
         if (Notes != null)
             sb.Append($" ({Notes})");
 
+        if (Features != null && Features.Any())
+        {
+            var features = string.Join(", ", Features);
+            sb.Append($"Features: {features}");
+        }
+
         return sb.ToString();
     }
 
@@ -111,7 +147,8 @@ public sealed class Requirement
     /// <inheritdoc />
     public override int GetHashCode() => ToTuple.GetHashCode();
 
-    private object ToTuple => (Name, MinVersion, MaxVersion, Notes);
+    private object ToTuple => (Name, MinVersion, MaxVersion, Notes,
+                               string.Join(", ", Features ?? new List<string>()));
 
     /// <summary>
     /// Group requirements and remove redundant ones.
@@ -129,12 +166,17 @@ public sealed class Requirement
             var notes             = group.Select(x => x.Notes).WhereNotNull().Distinct().ToList();
             var text              = notes.Any() ? string.Join("; ", notes) : null;
 
+            var features = group.SelectMany(x => x.Features ?? new List<string>())
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .ToList();
+
             yield return new Requirement
             {
                 MaxVersion = highestMaxVersion,
                 MinVersion = lowestMinVersion,
                 Name       = group.Key,
-                Notes      = text
+                Notes      = text,
+                Features   = features
             };
         }
     }
