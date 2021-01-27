@@ -20,7 +20,6 @@ public static class EntityExtensions
     public static Result<Unit, IErrorBuilder> TrySetString(
         this Entity entity,
         string propertyName,
-        string className,
         Action<string> setString)
     {
         var value = entity.TryGetValue(propertyName).Map(x => x.GetString());

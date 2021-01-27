@@ -64,7 +64,6 @@ public sealed class SchemaProperty
 
         entity.TrySetString(
             nameof(EnumType),
-            nameof(SchemaProperty),
             s => schemaProperty.EnumType = s
         ); //Ignore the result of this
 
@@ -84,7 +83,6 @@ public sealed class SchemaProperty
 
         entity.TrySetString(
             nameof(Regex),
-            nameof(SchemaProperty),
             s => schemaProperty.Regex = s
         ); //Ignore the result of this
 
