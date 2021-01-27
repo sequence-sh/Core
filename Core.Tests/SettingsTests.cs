@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using FluentAssertions;
 using Xunit;
 
 namespace Reductech.EDR.Core.Tests
@@ -12,11 +9,40 @@ namespace Reductech.EDR.Core.Tests
 public partial class SettingsTests
 {
     [Fact]
-    public void Test()
+    public void TestCreatingSettingsFromString()
     {
-        var data = SCLSettings.CreateFromString(ConnectorJson);
+        var settings = SCLSettings.CreateFromString(ConnectorJson);
 
-        TestOutputHelper.WriteLine(data.ToString());
+        TestOutputHelper.WriteLine(settings.ToString());
+
+        settings.Entity.TryGetValue("Connectors")
+            .Value.AsT7.TryGetValue("Nuix")
+            .Value.AsT7.TryGetValue("UseDongle")
+            .Value.ToString()
+            .Should()
+            .Be(true.ToString());
+    }
+
+    [Fact]
+    public void TestCreatingSettingsFromDictionary()
+    {
+        var dict = new Dictionary<string, object>()
+        {
+            { "nuix", new Dictionary<string, object>() { { "UseDongle", true } } }
+        };
+
+        var entity = Entity.Create(("Connectors", dict));
+
+        var settings = new SCLSettings(entity);
+
+        TestOutputHelper.WriteLine(settings.ToString());
+
+        settings.Entity.TryGetValue("Connectors")
+            .Value.AsT7.TryGetValue("Nuix")
+            .Value.AsT7.TryGetValue("UseDongle")
+            .Value.ToString()
+            .Should()
+            .Be(true.ToString());
     }
 
     private const string ConnectorJson =
