@@ -152,7 +152,7 @@ public sealed class Schema
                     return new ErrorBuilder(
                         ErrorCode.InvalidCast,
                         ev,
-                        typeof(SchemaProperty).Name
+                        nameof(SchemaProperty)
                     );
                 },
                 d => schema.Properties = d
