@@ -21,6 +21,12 @@ public partial class SettingsTests
             .Value.ToString()
             .Should()
             .Be(true.ToString());
+
+        var ud = settings.Entity.TryGetNestedString("Connectors", "Nuix", "UseDongle");
+
+        ud.HasValue.Should().BeTrue();
+
+        ud.Value.Should().Be(true.ToString());
     }
 
     [Fact]
@@ -28,7 +34,13 @@ public partial class SettingsTests
     {
         var dict = new Dictionary<string, object>()
         {
-            { "nuix", new Dictionary<string, object>() { { "UseDongle", true } } }
+            {
+                "nuix",
+                new Dictionary<string, object>()
+                {
+                    { "UseDongle", true }, { "Features", new List<string>() { "a", "b", "c" } }
+                }
+            }
         };
 
         var entity = Entity.Create(("Connectors", dict));
@@ -43,6 +55,18 @@ public partial class SettingsTests
             .Value.ToString()
             .Should()
             .Be(true.ToString());
+
+        var useDongleString = settings.Entity.TryGetNestedString("Connectors", "Nuix", "UseDongle");
+
+        useDongleString.HasValue.Should().BeTrue();
+
+        useDongleString.Value.Should().Be(true.ToString());
+
+        var featuresList = settings.Entity.TryGetNestedList("Connectors", "Nuix", "Features");
+
+        featuresList.HasValue.Should().BeTrue();
+
+        featuresList.Value.Should().BeEquivalentTo("a", "b", "c");
     }
 
     private const string ConnectorJson =

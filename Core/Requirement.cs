@@ -135,7 +135,7 @@ public sealed class Requirement
         if (Features != null && Features.Any())
         {
             var features = string.Join(", ", Features);
-            sb.Append($"Features: {features}");
+            sb.Append($" Features: {features}");
         }
 
         return sb.ToString();
