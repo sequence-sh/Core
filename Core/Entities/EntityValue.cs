@@ -50,6 +50,23 @@ public sealed class EntityValue : OneOfBase<DBNull, string, int, double, bool, E
             case JValue jv: return CreateFromObject(jv.Value, multiValueDelimiter);
             case JObject jo: return new EntityValue(Entity.Create(jo));
             case Entity entity: return new EntityValue(entity);
+            case IDictionary dict:
+            {
+                var builder = ImmutableDictionary<string, EntityProperty>.Empty.ToBuilder();
+                var i       = 0;
+
+                foreach (DictionaryEntry dictionaryEntry in dict)
+                {
+                    var val = dictionaryEntry.Value;
+                    var ev  = CreateFromObject(val);
+                    var ep  = new EntityProperty(dictionaryEntry.Key.ToString()!, ev, null, i);
+                    builder.Add(dictionaryEntry.Key.ToString()!, ep);
+                    i++;
+                }
+
+                var entity = new Entity(builder.ToImmutable());
+                return new EntityValue(entity);
+            }
             case IEnumerable e2:
             {
                 var newEnumerable = e2.Cast<object>()
