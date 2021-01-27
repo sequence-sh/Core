@@ -18,34 +18,34 @@ namespace Reductech.EDR.Core.Steps
 /// <summary>
 /// Enforce that the schema is valid for all entities
 /// </summary>
-public sealed class EnforceSchema : CompoundStep<Core.Array<Entity>>
+public sealed class EnforceSchema : CompoundStep<Array<Entity>>
 {
     /// <inheritdoc />
-    protected override async Task<Result<Core.Array<Entity>, IError>> Run(
+    protected override async Task<Result<Array<Entity>, IError>> Run(
         IStateMonad stateMonad,
         CancellationToken cancellationToken)
     {
         var entityStream = await EntityStream.Run(stateMonad, cancellationToken);
 
         if (entityStream.IsFailure)
-            return entityStream.ConvertFailure<Core.Array<Entity>>();
+            return entityStream.ConvertFailure<Array<Entity>>();
 
         var schemaEntity = await Schema.Run(stateMonad, cancellationToken);
 
         if (schemaEntity.IsFailure)
-            return schemaEntity.ConvertFailure<Core.Array<Entity>>();
+            return schemaEntity.ConvertFailure<Array<Entity>>();
 
         var schema = Entities.Schema
             .TryCreateFromEntity(schemaEntity.Value)
             .MapError(e => e.WithLocation(this));
 
         if (schema.IsFailure)
-            return schema.ConvertFailure<Core.Array<Entity>>();
+            return schema.ConvertFailure<Array<Entity>>();
 
         var errorBehaviour = await ErrorBehaviour.Run(stateMonad, cancellationToken);
 
         if (errorBehaviour.IsFailure)
-            return errorBehaviour.ConvertFailure<Core.Array<Entity>>();
+            return errorBehaviour.ConvertFailure<Array<Entity>>();
 
         var newStream = entityStream.Value.SelectMany(ApplySchema);
 
@@ -93,7 +93,7 @@ public sealed class EnforceSchema : CompoundStep<Core.Array<Entity>>
     /// </summary>
     [StepProperty(1)]
     [Required]
-    public IStep<Core.Array<Entity>> EntityStream { get; set; } = null!;
+    public IStep<Array<Entity>> EntityStream { get; set; } = null!;
 
     /// <summary>
     /// The schema to enforce.
@@ -119,14 +119,14 @@ public sealed class EnforceSchema : CompoundStep<Core.Array<Entity>>
 /// <summary>
 /// Enforce that the schema is valid for all entities
 /// </summary>
-public sealed class EnforceSchemaStepFactory : SimpleStepFactory<EnforceSchema, Core.Array<Entity>>
+public sealed class EnforceSchemaStepFactory : SimpleStepFactory<EnforceSchema, Array<Entity>>
 {
     private EnforceSchemaStepFactory() { }
 
     /// <summary>
     /// The instance
     /// </summary>
-    public static SimpleStepFactory<EnforceSchema, Core.Array<Entity>> Instance { get; } =
+    public static SimpleStepFactory<EnforceSchema, Array<Entity>> Instance { get; } =
         new EnforceSchemaStepFactory();
 
     /// <inheritdoc />
