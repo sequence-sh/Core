@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Configuration;
+using System.Linq;
+using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using Reductech.EDR.Core.Entities;
 
@@ -20,21 +21,37 @@ public record SCLSettings(Entity Entity)
     public static readonly SCLSettings EmptySettings =
         new(new Entity(ImmutableDictionary<string, EntityProperty>.Empty));
 
-    public static SCLSettings CreateFromConfigurationManager()
+    public static SCLSettings CreateFromIConfiguration(IConfiguration configuration)
     {
-        var dict = new List<(string key, object? e)>();
+        var properties = new List<EntityProperty>();
 
-        foreach (var key in ConfigurationManager.AppSettings.AllKeys)
+        foreach (var section in configuration.GetChildren())
         {
-            var value = ConfigurationManager.AppSettings[key]!;
+            var property = CreateObject(section);
 
-            var entity = CreateEntityFromString(value);
-            dict.Add((value, entity));
+            properties.Add(property);
         }
 
-        var newEntity = Entity.Create(dict);
+        var entity = new Entity(properties);
 
-        return new SCLSettings(newEntity);
+        return new SCLSettings(entity);
+
+        static EntityProperty CreateObject(IConfigurationSection section)
+        {
+            if (section.GetChildren().Any())
+            {
+                var properties = section.GetChildren().Select(CreateObject).ToList();
+
+                var entity = new Entity(properties);
+
+                return new EntityProperty(section.Key, new EntityValue(entity), null, 0);
+            }
+            else
+            {
+                var ev = new EntityValue(section.Value);
+                return new EntityProperty(section.Key, ev, null, 0);
+            }
+        }
     }
 
     public static SCLSettings CreateFromString(string jsonString)
