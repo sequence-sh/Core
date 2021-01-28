@@ -19,6 +19,9 @@ public record IdxParserConfiguration(
         string StringDelimiter)
     #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
 {
+    /// <summary>
+    /// Default Configuration for IDX parsers
+    /// </summary>
     public static readonly IdxParserConfiguration Default = new("#DRE", "=", "\"");
 }
 
@@ -94,7 +97,7 @@ public record IdxParser(IdxParserConfiguration Config)
                 continue;
 
             var fieldName  = fieldBlock.Substring(0, fieldNameEnd).TrimEnd('\r');
-            var fieldValue = fieldBlock.Substring(fieldNameEnd + 1);
+            var fieldValue = fieldBlock[(fieldNameEnd + 1)..];
 
             fieldValue = fieldValue.Trim();
 
@@ -133,7 +136,7 @@ public record IdxParser(IdxParserConfiguration Config)
                         value = value.Trim();
 
                         if (value.StartsWith(Config.StringDelimiter))
-                            value = value.Substring(1);
+                            value = value[1..];
 
                         if (value.EndsWith(Config.StringDelimiter))
                             value = value.Remove(value.Length - 1);

@@ -57,7 +57,6 @@ public sealed class SchemaProperty
         results.Add(
             entity.TrySetEnum<SchemaPropertyType>(
                 nameof(Type),
-                nameof(SchemaProperty),
                 s => schemaProperty.Type = s
             )
         );
@@ -70,14 +69,12 @@ public sealed class SchemaProperty
         results.Add(
             entity.TrySetEnum<Multiplicity>(
                 nameof(Multiplicity),
-                nameof(SchemaProperty),
                 s => schemaProperty.Multiplicity = s
             )
         );
 
         entity.TrySetStringList(
             nameof(Format),
-            nameof(SchemaProperty),
             s => schemaProperty.Format = s
         );
 

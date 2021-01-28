@@ -18,7 +18,9 @@ namespace Reductech.EDR.Core.Tests.Steps
 
 public partial class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Entity>>
 {
+    #pragma warning disable CA1822 // Mark members as static
     partial void OnInitialized()
+        #pragma warning restore CA1822 // Mark members as static
     {
         CultureInfo.DefaultThreadCurrentCulture   = new CultureInfo("en-GB");
         CultureInfo.DefaultThreadCurrentUICulture = new CultureInfo("en-GB");
