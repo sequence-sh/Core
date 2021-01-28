@@ -44,7 +44,7 @@ public abstract partial class StepTestBase<TStep, TOutput> : IStepTestBase
                      attribute: propertyInfo.GetCustomAttribute<StepPropertyBaseAttribute>())
             )
             .Where(x => x.attribute != null)
-            .Where(x => x.attribute.Order.HasValue)
+            .Where(x => x.attribute!.Order.HasValue)
             .OrderBy(x => x.attribute!.Order)
             .ToList();
 

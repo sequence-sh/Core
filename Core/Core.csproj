@@ -41,8 +41,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Remove="packages\**" />
     <Compile Remove="StrykerOutput\**" />
+    <EmbeddedResource Remove="packages\**" />
     <EmbeddedResource Remove="StrykerOutput\**" />
+    <None Remove="packages\**" />
     <None Remove="StrykerOutput\**" />
   </ItemGroup>
 
@@ -96,6 +99,8 @@
   <PropertyGroup>
     <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
     <CompilerGeneratedFilesOutputPath>$(BaseIntermediateOutputPath)\GeneratedFiles</CompilerGeneratedFilesOutputPath>
+    <SignAssembly>false</SignAssembly>
+    <DelaySign>false</DelaySign>
   </PropertyGroup>
 
 </Project>

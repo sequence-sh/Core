@@ -128,7 +128,7 @@ public sealed class Schema
         var results = new List<Result<Unit, IErrorBuilder>>();
         var schema  = new Schema();
 
-        results.Add(entity.TrySetString(nameof(Name), nameof(Schema), s => schema.Name = s));
+        results.Add(entity.TrySetString(nameof(Name), s => schema.Name = s));
 
         results.Add(
             entity.TrySetBoolean(
@@ -152,7 +152,7 @@ public sealed class Schema
                     return new ErrorBuilder(
                         ErrorCode.InvalidCast,
                         ev,
-                        typeof(SchemaProperty).Name
+                        nameof(SchemaProperty)
                     );
                 },
                 d => schema.Properties = d
