@@ -27,7 +27,7 @@ namespace Reductech.EDR.Core.Tests
 [AutoTheory.UseTestOutputHelper]
 public partial class ExampleTests
 {
-    [Theory]
+    [Theory(Skip = "skip")]
     [Trait("Category", "Integration")]
     [InlineData(@"C:\Users\wainw\source\repos\Reductech\edr\Examples\Sort.scl")]
     [InlineData(@"C:\Users\wainw\source\repos\Reductech\edr\Examples\EntityMapProperties.scl")]
@@ -64,7 +64,7 @@ public partial class ExampleTests
         r.ShouldBeSuccessful(x => x.ToString()!);
     }
 
-    [Fact]
+    [Fact(Skip = "skip")]
     [Trait("Category", "Integration")]
     public async Task RunSCLSequence()
     {
@@ -106,7 +106,7 @@ public partial class ExampleTests
         r.ShouldBeSuccessful(x => x.ToString()!);
     }
 
-    [Fact]
+    [Fact(Skip = "skip")]
     [Trait("Category", "Integration")]
     public async Task RunObjectSequence()
     {
