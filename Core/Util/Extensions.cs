@@ -35,9 +35,7 @@ public static class Extensions
     {
         return enumValue.GetType()
             .GetMember(enumValue.ToString())
-            ?
             .First(x => x.MemberType == MemberTypes.Field)
-            ?
             .GetCustomAttribute<DisplayAttribute>()
             ?
             .GetName() ?? enumValue.ToString();
