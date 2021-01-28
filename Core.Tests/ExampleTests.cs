@@ -27,7 +27,7 @@ namespace Reductech.EDR.Core.Tests
 [AutoTheory.UseTestOutputHelper]
 public partial class ExampleTests
 {
-    [Theory(Skip = "Manual")]
+    [Theory]
     [Trait("Category", "Integration")]
     [InlineData(@"C:\Users\wainw\source\repos\Reductech\edr\Examples\Sort.scl")]
     [InlineData(@"C:\Users\wainw\source\repos\Reductech\edr\Examples\EntityMapProperties.scl")]
@@ -68,17 +68,27 @@ public partial class ExampleTests
     [Trait("Category", "Integration")]
     public async Task RunSCLSequence()
     {
-        const string scl
-            = //@"FileWrite 'Dinosaur Dinosaur Dinosaur' 'C:\Users\wainw\source\repos\Reductech\core\TestFile.txt' true";
-            //            @"GenerateDocumentation | Foreach (
-            //- Print (From <Entity> ""FileName"")
-            //- Print(From <Entity> ""Title"")
-            //- Print(From <Entity> ""Directory"")
-            //- Print(From <Entity> ""Category"")
-            //)";
-            @"- <docs> = GenerateDocumentation
-- <docs> | ArrayDistinct (From <entity> 'Directory') | ForEach (CreateDirectory (PathCombine ['Documentation', (From <Entity> 'Directory')]))
-- <docs> | Foreach (FileWrite (From <Entity> 'FileText') (PathCombine ['Documentation', (From <Entity> 'Directory'), (From <Entity> 'FileName')]))";
+        const string scl =
+            @"FileRead 'C:\Users\wainw\source\repos\Reductech\ExamplesAndTests\artwork_data.csv'  #Read a file
+| FromCSV				#Convert to Array<Entity>
+| ArrayFilter ((from <entity> 'artist') == 'Blake, Robert')  # Filter to just entities whose 'artist' property has value 'Blake, Robert'
+| EntityMap (in <entity> 'artist' 'Robert Blake') #Set the 'artist' property to 'Robert Blake'
+| EntityMapProperties (artist: 'Artist Name' artistId: 'ArtistId') #Rename the 'artist' and 'artistId' properties
+| ArraySort (from <entity> 'year') #Sort by the 'year' property
+| ArrayDistinct (from <entity> 'id') # Distinct by the 'id' property
+| ToJson #Convert to JSON
+| FileWrite 'Artwork_Data.json' #Write to a file
+";
+        //@"FileWrite 'Dinosaur Dinosaur Dinosaur' 'C:\Users\wainw\source\repos\Reductech\core\TestFile.txt' true";
+        //            @"GenerateDocumentation | Foreach (
+        //- Print (From <Entity> ""FileName"")
+        //- Print(From <Entity> ""Title"")
+        //- Print(From <Entity> ""Directory"")
+        //- Print(From <Entity> ""Category"")
+        //)";
+        //            @"- <docs> = GenerateDocumentation
+        //- <docs> | ArrayDistinct (From <entity> 'Directory') | ForEach (CreateDirectory (PathCombine ['Documentation', (From <Entity> 'Directory')]))
+        //- <docs> | Foreach (FileWrite (From <Entity> 'FileText') (PathCombine ['Documentation', (From <Entity> 'Directory'), (From <Entity> 'FileName')]))";
 
         var logger = TestOutputHelper.BuildLogger(LogLevel.Trace);
         var sfs    = StepFactoryStore.CreateUsingReflection();
@@ -96,7 +106,7 @@ public partial class ExampleTests
         r.ShouldBeSuccessful(x => x.ToString()!);
     }
 
-    [Fact(Skip = "Manual")]
+    [Fact]
     [Trait("Category", "Integration")]
     public async Task RunObjectSequence()
     {

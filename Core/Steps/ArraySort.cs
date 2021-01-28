@@ -27,20 +27,20 @@ public sealed class ArraySort<T> : CompoundStep<Array<T>>
     public IStep<Array<T>> Array { get; set; } = null!;
 
     /// <summary>
-    /// Whether to sort in descending order.
-    /// </summary>
-    [StepProperty(2)]
-    [DefaultValueExplanation("False")]
-    public IStep<bool> Descending { get; set; } = new BoolConstant(false);
-
-    /// <summary>
     /// A function that gets the key to sort by from the variable &lt;Entity&gt;
     /// To sort by multiple properties, concatenate several keys
     /// </summary>
-    [StepProperty(3)]
+    [StepProperty(2)]
     [ScopedFunction]
     [DefaultValueExplanation("Default Ordering")]
     public IStep<StringStream>? KeySelector { get; set; } = null!;
+
+    /// <summary>
+    /// Whether to sort in descending order.
+    /// </summary>
+    [StepProperty(3)]
+    [DefaultValueExplanation("False")]
+    public IStep<bool> Descending { get; set; } = new BoolConstant(false);
 
     /// <summary>
     /// The variable name to use in the keySelector if there is one.
