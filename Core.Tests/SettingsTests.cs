@@ -23,11 +23,13 @@ public partial class SettingsTests
             .Should()
             .Be(true.ToString());
 
-        var ud = settings.Entity.TryGetNestedString("Connectors", "Nuix", "UseDongle");
+        var udString = settings.Entity.TryGetNestedString("Connectors", "Nuix", "UseDongle");
 
-        ud.HasValue.Should().BeTrue();
+        udString.HasValue.Should().BeTrue();
+        udString.Value.Should().Be(true.ToString());
 
-        ud.Value.Should().Be(true.ToString());
+        var udBool = settings.Entity.TryGetNestedBool("Connectors", "Nuix", "UseDongle");
+        udBool.Should().BeTrue();
     }
 
     [Fact]
@@ -62,6 +64,9 @@ public partial class SettingsTests
         useDongleString.HasValue.Should().BeTrue();
 
         useDongleString.Value.Should().Be(true.ToString());
+
+        var useDongleBool = settings.Entity.TryGetNestedBool("Connectors", "Nuix", "UseDongle");
+        useDongleBool.Should().BeTrue();
 
         var featuresList = settings.Entity.TryGetNestedList("Connectors", "Nuix", "Features");
 
