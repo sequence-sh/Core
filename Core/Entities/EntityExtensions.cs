@@ -41,7 +41,6 @@ public static class EntityExtensions
     public static Result<Unit, IErrorBuilder> TrySetStringList(
         this Entity entity,
         string propertyName,
-        string className,
         Action<List<string>> setStringList)
     {
         var value = entity.TryGetValue(propertyName)
@@ -65,7 +64,6 @@ public static class EntityExtensions
     public static Result<Unit, IErrorBuilder> TrySetDictionary<T>(
         this Entity entity,
         string propertyName,
-        string className,
         Func<EntityValue, Result<T, IErrorBuilder>> getElement,
         Action<Dictionary<string, T>> setDictionary)
     {
@@ -105,7 +103,6 @@ public static class EntityExtensions
     public static Result<Unit, IErrorBuilder> TrySetBoolean(
         this Entity entity,
         string propertyName,
-        string className,
         Action<bool> setBool)
     {
         var v = entity.TryGetValue(propertyName).Bind(x => x.TryGetBool());
@@ -127,7 +124,6 @@ public static class EntityExtensions
     public static Result<Unit, IErrorBuilder> TrySetEnum<T>(
         this Entity entity,
         string propertyName,
-        string className,
         Action<T> setEnum) where T : struct, Enum
     {
         var v = entity.TryGetValue(propertyName)

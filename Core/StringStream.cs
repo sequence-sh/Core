@@ -15,7 +15,8 @@ namespace Reductech.EDR.Core
 /// A stream of data representing a string.
 /// This can either be a raw string or a stream and an encoding.
 /// </summary>
-public sealed class StringStream : IEquatable<StringStream>, IComparable<StringStream>, IDisposable
+public sealed class StringStream : IEquatable<StringStream>, IComparable<StringStream>, IDisposable,
+                                   IComparable
 {
     /// <summary>
     /// Create a new DataStream
@@ -157,6 +158,15 @@ public sealed class StringStream : IEquatable<StringStream>, IComparable<StringS
         var text = SerializationMethods.DoubleQuote(s);
 
         return text;
+    }
+
+    /// <inheritdoc />
+    public int CompareTo(object? obj)
+    {
+        if (obj is StringStream ss)
+            return CompareTo(ss);
+
+        return 0;
     }
 
     /// <inheritdoc />

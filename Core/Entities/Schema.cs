@@ -133,7 +133,6 @@ public sealed class Schema
         results.Add(
             entity.TrySetBoolean(
                 nameof(AllowExtraProperties),
-                nameof(Schema),
                 s => schema.AllowExtraProperties = s
             )
         );
@@ -141,7 +140,6 @@ public sealed class Schema
         results.Add(
             entity.TrySetDictionary(
                 nameof(Properties),
-                nameof(Schema),
                 ev =>
                 {
                     var childEntity = ev.TryGetEntity();
