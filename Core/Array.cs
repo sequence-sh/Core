@@ -53,7 +53,7 @@ public sealed class Array<T> : IArray, IEquatable<Array<T>>
     }
 
     /// <summary>
-    /// Change the ordering of the Array
+    /// Change the order of elements of the array
     /// </summary>
     public Array<T> Sort(bool descending)
     {

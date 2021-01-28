@@ -90,7 +90,7 @@ public partial class ExampleTests
         //- <docs> | ArrayDistinct (From <entity> 'Directory') | ForEach (CreateDirectory (PathCombine ['Documentation', (From <Entity> 'Directory')]))
         //- <docs> | Foreach (FileWrite (From <Entity> 'FileText') (PathCombine ['Documentation', (From <Entity> 'Directory'), (From <Entity> 'FileName')]))";
 
-        var logger = TestOutputHelper.BuildLogger(LogLevel.Trace);
+        var logger = TestOutputHelper.BuildLogger(LogLevel.Information);
         var sfs    = StepFactoryStore.CreateUsingReflection();
 
         var runner = new SCLRunner(
