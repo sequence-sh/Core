@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using FluentAssertions;
+using Reductech.EDR.Core.Entities;
 using Xunit;
 
 namespace Reductech.EDR.Core.Tests
