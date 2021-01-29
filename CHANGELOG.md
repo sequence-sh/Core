@@ -1,3 +1,82 @@
+## v0.4.0 (2021-01-29)
+
+Major rework of the language and data streaming features so lots of **breaking changes** including:
+
+- Moved from YAML-based configuration to a custom configuration
+  language called SCL (Sequence Configuration Language)
+  - Using a custom [ANTLR](https://www.antlr.org/) grammar to parse the configuration language
+  - The new language is similar to YAML
+- Consolidated entity streams, lists and array into a single datatype - `Array<T>`
+  - There are no longer separate Steps for arrays and entity streams (e.g. `ForEach`, `IsEmpty`, `Length`)
+- Consolidated strings and data streams into a single datatype - `StringStream`
+- Update to .NET 5.0
+- Reworked logging and exceptions
+  - More frequent and more consistent logging
+  - Added step scopes
+  - Added localization features
+  - Added support for appending custom metadata
+- Added steps for JSON and IDX
+- Documentation has now been moved to https://docs.reductech.io
+
+### New Features
+
+- Allow creation of SCLSettings from IConfiguration object #167
+- Create shortcut methods to access nested entity properties #166
+- Add 'Features' property to requirements so we can support nuix features #165
+- Allow creation of entities from dictionaries #164
+- Make settings more dynamic to make it easier to control multiple connectors #163
+- GenerateDocumentation links should work #162
+- Include more metadata in the results of GenerateDocumentation #161
+- Check connector requirements, identifying errors during startup #131
+- Make the Documentation generator output entities so we can have documentation spread across multiple files. #129
+- Allow GZip decompression during file read and write to make life easier for technicians #159
+- Create Steps to convert Entities to and from IDX #155
+- Change double formatting when serializing #156
+- Allow dangling commas in arrays and entity lists #157
+- Create Steps to convert Entities to and from JSON #154
+- Use Source Generators to generate unit test code #146
+- Allow steps to have arguments without positional parameters #152
+- Rename LogSituation_Core to LogSituation and ErrorCode_Core to ErrorCode #151
+- Allow Connectors to access Error Exceptions #150
+- Allow Connectors to access Error Exceptions #150
+- Allow Connectors to Define Custom Error Codes #149
+- Systematize log and error output messages so Managers can get detailed information #17
+- Rename and merge Array and EntityStream methods #142
+- Use the names Sequence Configuration Language and SCL where appropriate #137
+- Change Single Line Comments to a single Hash #143
+- Add Steps to convert dates to and from strings, so that technicians can format dates #144 #138
+- Combine EntityStreams and Arrays #134
+- Should Be able to Deserialize DateTimes #141
+- Reinstate Serializaion, Deserialization, and DeserializationError tests #120
+- Allow Pipelining to make language more concise #119
+- Refactor Entities to allow infinite nesting of sequences #135
+- Merge String and DataStream to make Datastream usage implicit #127
+- Allow Coercion of strings to enums to make using enums easier for technicians #126
+- Allow Comments in Sequence files so technicians can comment their code #122
+- Allow argument aliases in language to make it easier to write readable code #118
+- Allow ordered arguments to make language more concise #117
+- Allow nesting of sequences to make complex steps easier to write #121
+- Generated Antlr files should be in a namespace and be written to the Core/Antlr folder #124
+- Allow antlr build to run on linux #123
+- Allow brackets and commas to be omitted in function calls to make the language easier to read and write #115
+- Use colons instead of equals in function calls to make language more intuitive #116
+
+### Bug Fixes
+
+- ScopedStateMonad should dispose of scoped state variables when disposed #140
+- Streams returned by ToCSV should be moved to the beginning of the stream #139
+- StringStreams should dispose of the stream after it is read #136
+- Compare functions should be wrapped in brackets when serialized #133
+- TestHarness should check ordering or log values #132
+- Use of the 'Not' construct prevents mutation testing #125
+- Error when creating entities with 'add' in a property name #113 #112
+
+### Maintenance
+
+- Update Antlr nuget packages to 4.9.1 #160
+- Add .editorconfig file and standardize formatting #148
+- Update to .NET 5.0 #43
+
 ## v0.3.0 (2020-11-27)
 
 **Breaking changes** - Step and argument names have changed to make them more
