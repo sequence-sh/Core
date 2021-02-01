@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Immutable;
+using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
 using CSharpFunctionalExtensions;
@@ -201,10 +202,10 @@ public sealed class EntityValue : OneOfBase<DBNull, string, int, double, bool, E
                     if (string.IsNullOrWhiteSpace(schemaProperty.EnumType))
                         return new ErrorBuilder(ErrorCode.SchemaInvalidMissingEnum);
 
-                    if (schemaProperty.Format == null || !schemaProperty.Format.Any())
+                    if (schemaProperty.Values == null || !schemaProperty.Values.Any())
                         return new ErrorBuilder(ErrorCode.SchemaInvalidNoEnumValues);
 
-                    if (schemaProperty.Format.Contains(s, StringComparer.OrdinalIgnoreCase))
+                    if (schemaProperty.Values.Contains(s, StringComparer.OrdinalIgnoreCase))
                         return (new EntityValue(new Enumeration(schemaProperty.EnumType, s)), true);
 
                     break;
@@ -218,7 +219,20 @@ public sealed class EntityValue : OneOfBase<DBNull, string, int, double, bool, E
                 }
                 case SchemaPropertyType.Date:
                 {
-                    if (DateTime.TryParse(s, out var dt)) //TODO format
+                    if (schemaProperty.DateInputFormats != null &&
+                        DateTime.TryParseExact(
+                            s,
+                            schemaProperty.DateInputFormats.ToArray(),
+                            null,
+                            DateTimeStyles.None,
+                            out var dt1
+                        ))
+
+                    {
+                        return (new EntityValue(dt1), true);
+                    }
+
+                    if (DateTime.TryParse(s, out var dt))
                         return (new EntityValue(dt), true);
 
                     break;
@@ -271,10 +285,10 @@ public sealed class EntityValue : OneOfBase<DBNull, string, int, double, bool, E
                     if (schemaProperty.EnumType == null)
                         return new ErrorBuilder(ErrorCode.SchemaInvalidMissingEnum);
 
-                    if (schemaProperty.Format == null || !schemaProperty.Format.Any())
+                    if (schemaProperty.Values == null || !schemaProperty.Values.Any())
                         return new ErrorBuilder(ErrorCode.SchemaInvalidNoEnumValues);
 
-                    if (schemaProperty.Format.Contains(e.Value, StringComparer.OrdinalIgnoreCase))
+                    if (schemaProperty.Values.Contains(e.Value, StringComparer.OrdinalIgnoreCase))
                     {
                         if (schemaProperty.EnumType == e.Type)
                             return (this, false);
@@ -294,7 +308,9 @@ public sealed class EntityValue : OneOfBase<DBNull, string, int, double, bool, E
             return schemaProperty.Type switch
             {
                 SchemaPropertyType.String => (
-                    new EntityValue(dt.ToString(Constants.DateTimeFormat)), true),
+                    new EntityValue(
+                        dt.ToString(schemaProperty.DateOutputFormat ?? Constants.DateTimeFormat)
+                    ), true),
                 SchemaPropertyType.Date => (this, false),
                 _                       => CouldNotConvert(dt)
             };
@@ -327,11 +343,14 @@ public sealed class EntityValue : OneOfBase<DBNull, string, int, double, bool, E
 
             var sp = new SchemaProperty
             {
-                EnumType     = schemaProperty.EnumType,
-                Format       = schemaProperty.Format,
-                Multiplicity = Multiplicity.ExactlyOne,
-                Regex        = schemaProperty.Regex,
-                Type         = schemaProperty.Type
+                EnumType         = schemaProperty.EnumType,
+                Values           = schemaProperty.Values,
+                ErrorBehaviour   = schemaProperty.ErrorBehaviour,
+                DateInputFormats = schemaProperty.DateInputFormats,
+                DateOutputFormat = schemaProperty.DateOutputFormat,
+                Multiplicity     = Multiplicity.ExactlyOne,
+                Regex            = schemaProperty.Regex,
+                Type             = schemaProperty.Type
             };
 
             var newList = list.Select(x => x.TryConvert(sp))

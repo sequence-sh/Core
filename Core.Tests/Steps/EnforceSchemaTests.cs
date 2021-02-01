@@ -351,7 +351,7 @@ public partial class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Enti
         var sc1 = schema.Properties.Values.First();
 
         sc1.EnumType.Should().BeNull();
-        sc1.Format.Should().BeNull();
+        sc1.Values.Should().BeNull();
         sc1.Multiplicity.Should().Be(Multiplicity.ExactlyOne);
         sc1.Regex.Should().BeNull();
         sc1.Type.Should().Be(SchemaPropertyType.String);

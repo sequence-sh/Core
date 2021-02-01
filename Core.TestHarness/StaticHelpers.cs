@@ -97,7 +97,7 @@ public static class StaticHelpers
         string name,
         bool allowExtraProperties,
         params (string propertyName, SchemaPropertyType type, string? enumType, Multiplicity
-            multiplicity, string? regex, List<string>? format)[] properties)
+            multiplicity, string? regex, List<string>? values)[] properties)
     {
         return new()
         {
@@ -111,7 +111,7 @@ public static class StaticHelpers
                     Multiplicity = x.multiplicity,
                     Type         = x.type,
                     Regex        = x.regex,
-                    Format       = x.format
+                    Values       = x.values
                 }
             )
         };
