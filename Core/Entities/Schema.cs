@@ -264,6 +264,8 @@ public sealed class Schema
         {
             (nameof(Name), EntityValue.CreateFromObject(Name)),
             (nameof(AllowExtraProperties), EntityValue.CreateFromObject(AllowExtraProperties)),
+            (nameof(DefaultErrorBehaviour),
+             EntityValue.CreateFromObject(DefaultErrorBehaviour)),
             (nameof(Properties), EntityValue.CreateFromObject(propertiesEntity)),
         }.Select((x, i) => new EntityProperty(x.Item1, x.Item2, null, i));
 
