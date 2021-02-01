@@ -64,21 +64,18 @@ public partial class ExampleTests
         r.ShouldBeSuccessful(x => x.ToString()!);
     }
 
-    [Fact(Skip = "skip")]
+    [Fact]
     [Trait("Category", "Integration")]
     public async Task RunSCLSequence()
     {
-        const string scl =
-            @"FileRead 'C:\Users\wainw\source\repos\Reductech\ExamplesAndTests\artwork_data.csv'  #Read a file
-| FromCSV				#Convert to Array<Entity>
-| ArrayFilter ((from <entity> 'artist') == 'Blake, Robert')  # Filter to just entities whose 'artist' property has value 'Blake, Robert'
-| EntityMap (in <entity> 'artist' 'Robert Blake') #Set the 'artist' property to 'Robert Blake'
-| EntityMapProperties (artist: 'Artist Name' artistId: 'ArtistId') #Rename the 'artist' and 'artistId' properties
-| ArraySort (from <entity> 'year') #Sort by the 'year' property
-| ArrayDistinct (from <entity> 'id') # Distinct by the 'id' property
-| ToJson #Convert to JSON
-| FileWrite 'Artwork_Data.json' #Write to a file
-";
+        const string scl = @"- <schema> = (
+Name: 'My Schema' 
+AllowExtraProperties: false
+Properties:(
+Foo: (Type: 'String' Multiplicity: 'ExactlyOne')
+Bar: (Type: 'String' Multiplicity: 'ExactlyOne')
+))
+- FileWrite (ToJson [<schema>]) 'Schema.json'";
         //@"FileWrite 'Dinosaur Dinosaur Dinosaur' 'C:\Users\wainw\source\repos\Reductech\core\TestFile.txt' true";
         //            @"GenerateDocumentation | Foreach (
         //- Print (From <Entity> ""FileName"")

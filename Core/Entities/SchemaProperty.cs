@@ -2,6 +2,7 @@
 using System.Linq;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Attributes;
+using Reductech.EDR.Core.Enums;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Util;
 
@@ -46,6 +47,12 @@ public sealed class SchemaProperty
     public string? Regex { get; set; }
 
     /// <summary>
+    /// The error behaviour, overriding the default value of the schema.
+    /// </summary>
+    [ConfigProperty(6)]
+    public ErrorBehaviour? ErrorBehaviour { get; set; }
+
+    /// <summary>
     /// Tries to create a schema from an entity.
     /// Ignores unexpected properties.
     /// </summary>
@@ -56,31 +63,50 @@ public sealed class SchemaProperty
 
         results.Add(
             entity.TrySetEnum<SchemaPropertyType>(
+                false,
                 nameof(Type),
                 s => schemaProperty.Type = s
             )
         );
 
-        entity.TrySetString(
-            nameof(EnumType),
-            s => schemaProperty.EnumType = s
-        ); //Ignore the result of this
+        results.Add(
+            entity.TrySetString(
+                true,
+                nameof(EnumType),
+                s => schemaProperty.EnumType = s
+            )
+        );
 
         results.Add(
             entity.TrySetEnum<Multiplicity>(
+                false,
                 nameof(Multiplicity),
                 s => schemaProperty.Multiplicity = s
             )
         );
 
-        entity.TrySetStringList(
-            nameof(Format),
-            s => schemaProperty.Format = s
+        results.Add(
+            entity.TrySetEnum<ErrorBehaviour>(
+                true,
+                nameof(ErrorBehaviour),
+                e => schemaProperty.ErrorBehaviour = e
+            )
         );
 
-        entity.TrySetString(
-            nameof(Regex),
-            s => schemaProperty.Regex = s
+        results.Add(
+            entity.TrySetStringList(
+                true,
+                nameof(Format),
+                s => schemaProperty.Format = s
+            )
+        );
+
+        results.Add(
+            entity.TrySetString(
+                true,
+                nameof(Regex),
+                s => schemaProperty.Regex = s
+            )
         ); //Ignore the result of this
 
         var r = results.Combine(ErrorBuilderList.Combine)
@@ -101,7 +127,8 @@ public sealed class SchemaProperty
             (nameof(EnumType), EntityValue.CreateFromObject(EnumType)),
             (nameof(Multiplicity), EntityValue.CreateFromObject(Multiplicity)),
             (nameof(Format), EntityValue.CreateFromObject(Format)),
-            (nameof(Regex), EntityValue.CreateFromObject(Regex))
+            (nameof(Regex), EntityValue.CreateFromObject(Regex)),
+            (nameof(ErrorBehaviour), EntityValue.CreateFromObject(ErrorBehaviour)),
         }.Select((x, i) => new EntityProperty(x.Item1, x.Item2, null, i));
 
         var entity = new Entity(schemaProperties);

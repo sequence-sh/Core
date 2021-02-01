@@ -142,6 +142,15 @@ namespace Reductech.EDR.Core.Internal.Logging {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Schema violation: {message}.
+        /// </summary>
+        internal static string SchemaViolation {
+            get {
+                return ResourceManager.GetString("SchemaViolation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Could not set variable {variable} as it was out of scope..
         /// </summary>
         internal static string SetVariableOutOfScope {

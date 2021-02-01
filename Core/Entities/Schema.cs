@@ -2,8 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using CSharpFunctionalExtensions;
+using Microsoft.Extensions.Logging;
 using Reductech.EDR.Core.Attributes;
+using Reductech.EDR.Core.Enums;
 using Reductech.EDR.Core.Internal.Errors;
+using Reductech.EDR.Core.Internal.Logging;
 using Reductech.EDR.Core.Util;
 
 namespace Reductech.EDR.Core.Entities
@@ -34,6 +37,12 @@ public sealed class Schema
     [ConfigProperty(3)]
     public bool AllowExtraProperties { get; set; } = true;
 
+    /// <summary>
+    /// The default error behaviour. This can be overriden by the individual properties or by the value passed to the EnforceSchema method.
+    /// </summary>
+    [ConfigProperty(4)]
+    public ErrorBehaviour DefaultErrorBehaviour { get; set; } = ErrorBehaviour.Fail;
+
     /// <inheritdoc />
     public override string ToString()
     {
@@ -44,7 +53,10 @@ public sealed class Schema
     /// <summary>
     /// Attempts to apply this schema to an entity.
     /// </summary>
-    public Result<Entity, IErrorBuilder> ApplyToEntity(Entity entity)
+    public Result<Maybe<Entity>, IErrorBuilder> ApplyToEntity(
+        Entity entity,
+        ILogger logger,
+        Maybe<ErrorBehaviour> errorBehaviourOverride)
     {
         var remainingProperties = Properties
             .ToDictionary(
@@ -55,7 +67,38 @@ public sealed class Schema
 
         var newProperties = new List<EntityProperty>();
         var errors        = new List<IErrorBuilder>();
+        var warnings      = new List<IErrorBuilder>();
         var changed       = false;
+        var returnEntity  = true;
+
+        void HandleError(IErrorBuilder error, ErrorBehaviour eb)
+        {
+            switch (eb)
+            {
+                case ErrorBehaviour.Fail:
+                    errors.Add(error);
+                    break;
+                case ErrorBehaviour.Error:
+                    warnings.Add(error);
+                    returnEntity = false;
+                    break;
+                case ErrorBehaviour.Warning:
+                    warnings.Add(error);
+                    break;
+                case ErrorBehaviour.Skip:
+                    returnEntity = false;
+                    break;
+                case ErrorBehaviour.Ignore: break;
+                default: throw new ArgumentOutOfRangeException(nameof(eb), eb, null);
+            }
+        }
+
+        ErrorBehaviour generalErrorBehaviour;
+
+        if (errorBehaviourOverride.HasValue)
+            generalErrorBehaviour = errorBehaviourOverride.Value;
+        else
+            generalErrorBehaviour = this.DefaultErrorBehaviour;
 
         foreach (var entityProperty in entity)
         {
@@ -85,17 +128,30 @@ public sealed class Schema
                 }
 
                 else
-                    errors.Add(convertResult.Error);
+                {
+                    ErrorBehaviour errorBehaviour;
+
+                    if (errorBehaviourOverride.HasValue)
+                        errorBehaviour = errorBehaviourOverride.Value;
+                    else if (schemaProperty.ErrorBehaviour != null)
+                        errorBehaviour = schemaProperty.ErrorBehaviour.Value;
+                    else
+                        errorBehaviour = DefaultErrorBehaviour;
+
+                    HandleError(convertResult.Error, errorBehaviour);
+                }
             }
             else if (AllowExtraProperties) //This entity has a property that is not in the schema
                 newProperties.Add(entityProperty);
             else
-                errors.Add(
-                    new ErrorBuilder(
-                        ErrorCode.SchemaViolationUnexpectedProperty,
-                        entityProperty.Name
-                    )
+            {
+                var errorBuilder = new ErrorBuilder(
+                    ErrorCode.SchemaViolationUnexpectedProperty,
+                    entityProperty.Name
                 );
+
+                HandleError(errorBuilder, generalErrorBehaviour);
+            }
         }
 
         foreach (var (key, _) in remainingProperties
@@ -103,20 +159,33 @@ public sealed class Schema
                 x => x.Value.Multiplicity == Multiplicity.ExactlyOne
                   || x.Value.Multiplicity == Multiplicity.AtLeastOne
             ))
-            errors.Add(new ErrorBuilder(ErrorCode.SchemaViolationMissingProperty, key));
+        {
+            var error = new ErrorBuilder(ErrorCode.SchemaViolationMissingProperty, key);
+            HandleError(error, generalErrorBehaviour);
+        }
 
         if (errors.Any())
         {
-            var l = ErrorBuilderList.Combine(errors);
-            return Result.Failure<Entity, IErrorBuilder>(l);
+            var errorList = ErrorBuilderList.Combine(errors);
+            return Result.Failure<Maybe<Entity>, IErrorBuilder>(errorList);
         }
 
+        if (warnings.Any())
+        {
+            var warningList = ErrorBuilderList.Combine(warnings);
+
+            logger.LogSituation(LogSituation.SchemaViolation, new[] { warningList.AsString });
+        }
+
+        if (!returnEntity)
+            return Maybe<Entity>.None;
+
         if (!changed)
-            return entity;
+            return Maybe<Entity>.From(entity);
 
         var resultEntity = new Entity(newProperties);
 
-        return resultEntity;
+        return Maybe<Entity>.From(resultEntity);
     }
 
     /// <summary>
@@ -128,17 +197,27 @@ public sealed class Schema
         var results = new List<Result<Unit, IErrorBuilder>>();
         var schema  = new Schema();
 
-        results.Add(entity.TrySetString(nameof(Name), s => schema.Name = s));
+        results.Add(entity.TrySetString(false, nameof(Name), s => schema.Name = s));
 
         results.Add(
             entity.TrySetBoolean(
+                true,
                 nameof(AllowExtraProperties),
                 s => schema.AllowExtraProperties = s
             )
         );
 
         results.Add(
+            entity.TrySetEnum<ErrorBehaviour>(
+                true,
+                nameof(DefaultErrorBehaviour),
+                eb => schema.DefaultErrorBehaviour = eb
+            )
+        );
+
+        results.Add(
             entity.TrySetDictionary(
+                true,
                 nameof(Properties),
                 ev =>
                 {
@@ -185,6 +264,8 @@ public sealed class Schema
         {
             (nameof(Name), EntityValue.CreateFromObject(Name)),
             (nameof(AllowExtraProperties), EntityValue.CreateFromObject(AllowExtraProperties)),
+            (nameof(DefaultErrorBehaviour),
+             EntityValue.CreateFromObject(DefaultErrorBehaviour)),
             (nameof(Properties), EntityValue.CreateFromObject(propertiesEntity)),
         }.Select((x, i) => new EntityProperty(x.Item1, x.Item2, null, i));
 

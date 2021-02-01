@@ -94,6 +94,14 @@ public sealed record LogSituation : LogSituationBase
         nameof(SetVariableOutOfScope),
         LogLevel.Warning
     );
+
+    /// <summary>
+    /// Schema violation: {message}
+    /// </summary>
+    public static readonly LogSituation SchemaViolation = new(
+        nameof(SchemaViolation),
+        LogLevel.Warning
+    );
 }
 
 }

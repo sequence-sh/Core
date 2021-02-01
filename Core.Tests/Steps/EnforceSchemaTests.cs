@@ -143,7 +143,69 @@ public partial class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Enti
                 ),
                 "(Foo: Word.hello)"
             );
+
+            yield return CreateCase(
+                "Could not cast: Behaviour: Error",
+                new List<Entity>() { CreateEntity(("Foo", "Hello")) },
+                WithErrorBehaviour(
+                    CreateSchema(
+                        "ValueIf Schema",
+                        false,
+                        ("Foo", SchemaPropertyType.Integer, Multiplicity.Any)
+                    ),
+                    ErrorBehaviour.Error
+                ),
+                "Schema violation: Schema Violated: 'Hello' is not a Integer"
+            );
+
+            yield return CreateCase(
+                "Could not cast: Behaviour: Warning",
+                new List<Entity>() { CreateEntity(("Foo", "Hello")) },
+                WithErrorBehaviour(
+                    CreateSchema(
+                        "ValueIf Schema",
+                        false,
+                        ("Foo", SchemaPropertyType.Integer, Multiplicity.Any)
+                    ),
+                    ErrorBehaviour.Warning
+                ),
+                "Schema violation: Schema Violated: 'Hello' is not a Integer",
+                "(Foo: \"Hello\")"
+            );
+
+            yield return CreateCase(
+                "Could not cast: Behaviour: Skip",
+                new List<Entity>() { CreateEntity(("Foo", "Hello")) },
+                WithErrorBehaviour(
+                    CreateSchema(
+                        "ValueIf Schema",
+                        false,
+                        ("Foo", SchemaPropertyType.Integer, Multiplicity.Any)
+                    ),
+                    ErrorBehaviour.Skip
+                )
+            );
+
+            yield return CreateCase(
+                "Could not cast: Behaviour: Ignore",
+                new List<Entity>() { CreateEntity(("Foo", "Hello")) },
+                WithErrorBehaviour(
+                    CreateSchema(
+                        "ValueIf Schema",
+                        false,
+                        ("Foo", SchemaPropertyType.Integer, Multiplicity.Any)
+                    ),
+                    ErrorBehaviour.Ignore
+                ),
+                "(Foo: \"Hello\")"
+            );
         }
+    }
+
+    private static Schema WithErrorBehaviour(Schema schema, ErrorBehaviour eb)
+    {
+        schema.DefaultErrorBehaviour = eb;
+        return schema;
     }
 
     /// <inheritdoc />
