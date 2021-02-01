@@ -20,7 +20,7 @@ public partial class AppendStringTests : StepTestBase<AppendString, Unit>
         {
             yield return new StepCase(
                     "Append string to existing variable",
-                    new Core.Steps.Sequence<Unit>()
+                    new Sequence<Unit>()
                     {
                         InitialSteps = new List<IStep<Unit>>()
                         {

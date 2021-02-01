@@ -24,10 +24,18 @@ public sealed class EntityValue : OneOfBase<DBNull, string, int, double, bool, E
     /// <summary>
     /// Create a new entityValue
     /// </summary>
-    /// <param name="value"></param>
     public EntityValue(
         OneOf<DBNull, string, int, double, bool, Enumeration, DateTime, Entity,
-            ImmutableList<EntityValue>> value) : base(value) { }
+            ImmutableList<EntityValue>> value,
+        string? outputFormat = null) : base(value)
+    {
+        OutputFormat = outputFormat;
+    }
+
+    /// <summary>
+    /// The output format if this is a DateTime and this has been set by a schema
+    /// </summary>
+    public readonly string? OutputFormat;
 
     /// <summary>
     /// Create an entity from an object
@@ -36,7 +44,6 @@ public sealed class EntityValue : OneOfBase<DBNull, string, int, double, bool, E
     {
         switch (argValue)
         {
-            //TODO convert to switch statement (this is not supported by stryker at the moment)
             case null:             return new EntityValue(DBNull.Value);
             case StringStream ss1: return Create(ss1.GetString(), multiValueDelimiter);
             case string s:         return Create(s,               multiValueDelimiter);
@@ -229,11 +236,11 @@ public sealed class EntityValue : OneOfBase<DBNull, string, int, double, bool, E
                         ))
 
                     {
-                        return (new EntityValue(dt1), true);
+                        return (new EntityValue(dt1, schemaProperty.DateOutputFormat), true);
                     }
 
                     if (DateTime.TryParse(s, out var dt))
-                        return (new EntityValue(dt), true);
+                        return (new EntityValue(dt, schemaProperty.DateOutputFormat), true);
 
                     break;
                 }
@@ -308,9 +315,7 @@ public sealed class EntityValue : OneOfBase<DBNull, string, int, double, bool, E
             return schemaProperty.Type switch
             {
                 SchemaPropertyType.String => (
-                    new EntityValue(
-                        dt.ToString(schemaProperty.DateOutputFormat ?? Constants.DateTimeFormat)
-                    ), true),
+                    new EntityValue(dt.ToString(OutputFormat ?? Constants.DateTimeFormat)), true),
                 SchemaPropertyType.Date => (this, false),
                 _                       => CouldNotConvert(dt)
             };
@@ -363,7 +368,9 @@ public sealed class EntityValue : OneOfBase<DBNull, string, int, double, bool, E
                 )
                 .Map(
                     x =>
-                        x.changed ? (new EntityValue(x.list), true) : (this, false)
+                        x.changed
+                            ? (new EntityValue(x.list, schemaProperty.DateOutputFormat), true)
+                            : (this, false)
                 );
 
             return newList;
@@ -377,6 +384,9 @@ public sealed class EntityValue : OneOfBase<DBNull, string, int, double, bool, E
             return false;
 
         if (Index != other.Index)
+            return false;
+
+        if (OutputFormat != other.OutputFormat)
             return false;
 
         var r = Match(
@@ -420,7 +430,7 @@ public sealed class EntityValue : OneOfBase<DBNull, string, int, double, bool, E
             x => x.ToString(Constants.DoubleFormat),
             x => x.ToString(),
             x => x.ToString(),
-            x => x.ToString(Constants.DateTimeFormat),
+            x => x.ToString(OutputFormat ?? Constants.DateTimeFormat),
             x => x.ToString(),
             x => x.Count + " elements"
         );

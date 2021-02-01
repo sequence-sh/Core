@@ -62,7 +62,7 @@ public partial class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Enti
 
             yield return CreateCase(
                 "Simple case",
-                new List<Entity>()
+                new List<Entity>
                 {
                     CreateEntity(("Foo", "Hello"),   ("Bar", "1")),
                     CreateEntity(("Foo", "Hello 2"), ("Bar", "2"))
@@ -79,7 +79,7 @@ public partial class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Enti
 
             yield return CreateCase(
                 "Cast int",
-                new List<Entity>() { CreateEntity(("Foo", "100")) },
+                new List<Entity> { CreateEntity(("Foo", "100")) },
                 CreateSchema(
                     "ValueIf Schema",
                     false,
@@ -90,7 +90,7 @@ public partial class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Enti
 
             yield return CreateCase(
                 "Cast double",
-                new List<Entity>() { CreateEntity(("Foo", "100.345")) },
+                new List<Entity> { CreateEntity(("Foo", "100.345")) },
                 CreateSchema(
                     "ValueIf Schema",
                     false,
@@ -101,7 +101,7 @@ public partial class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Enti
 
             yield return CreateCase(
                 "Cast bool",
-                new List<Entity>() { CreateEntity(("Foo", "true")) },
+                new List<Entity> { CreateEntity(("Foo", "true")) },
                 CreateSchema(
                     "ValueIf Schema",
                     false,
@@ -112,7 +112,7 @@ public partial class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Enti
 
             yield return CreateCase(
                 "Cast date time",
-                new List<Entity>() { CreateEntity(("Foo", "11/10/2020 3:45:44 PM")) },
+                new List<Entity> { CreateEntity(("Foo", "11/10/2020 3:45:44 PM")) },
                 CreateSchema(
                     "ValueIf Schema",
                     false,
@@ -122,31 +122,56 @@ public partial class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Enti
             );
 
             yield return CreateCase(
-                "Match regex",
-                new List<Entity>() { CreateEntity(("Foo", "100")) },
+                "Cast date time with input format",
+                new List<Entity> { CreateEntity(("Foo", "2020")) },
                 CreateSchema(
                     "ValueIf Schema",
                     false,
-                    ("Foo", SchemaPropertyType.Integer, null, Multiplicity.ExactlyOne, @"\d+", null)
+                    ("Foo", SchemaPropertyType.Date, null, Multiplicity.ExactlyOne, null, null,
+                     new List<string> { "yyyy" }, null)
+                ),
+                "(Foo: 2020-01-01T00:00:00.0000000)"
+            );
+
+            yield return CreateCase(
+                "Cast date time with input format and output format",
+                new List<Entity> { CreateEntity(("Foo", "2020")) },
+                CreateSchema(
+                    "ValueIf Schema",
+                    false,
+                    ("Foo", SchemaPropertyType.Date, null, Multiplicity.ExactlyOne, null, null,
+                     new List<string> { "yyyy" }, "yyyy-mm-dd")
+                ),
+                "(Foo: 2020-00-01)"
+            );
+
+            yield return CreateCase(
+                "Match regex",
+                new List<Entity> { CreateEntity(("Foo", "100")) },
+                CreateSchema(
+                    "ValueIf Schema",
+                    false,
+                    ("Foo", SchemaPropertyType.Integer, null, Multiplicity.ExactlyOne, @"\d+", null,
+                     null, null)
                 ),
                 "(Foo: 100)"
             );
 
             yield return CreateCase(
                 "Match enum",
-                new List<Entity>() { CreateEntity(("Foo", "hello")) },
+                new List<Entity> { CreateEntity(("Foo", "hello")) },
                 CreateSchema(
                     "ValueIf Schema",
                     false,
                     ("Foo", SchemaPropertyType.Enum, "Word", Multiplicity.ExactlyOne, null,
-                     new List<string>() { "Hello", "World" })
+                     new List<string> { "Hello", "World" }, null, null)
                 ),
                 "(Foo: Word.hello)"
             );
 
             yield return CreateCase(
                 "Could not cast: Behaviour: Error",
-                new List<Entity>() { CreateEntity(("Foo", "Hello")) },
+                new List<Entity> { CreateEntity(("Foo", "Hello")) },
                 WithErrorBehaviour(
                     CreateSchema(
                         "ValueIf Schema",
@@ -160,7 +185,7 @@ public partial class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Enti
 
             yield return CreateCase(
                 "Could not cast: Behaviour: Warning",
-                new List<Entity>() { CreateEntity(("Foo", "Hello")) },
+                new List<Entity> { CreateEntity(("Foo", "Hello")) },
                 WithErrorBehaviour(
                     CreateSchema(
                         "ValueIf Schema",
@@ -175,7 +200,7 @@ public partial class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Enti
 
             yield return CreateCase(
                 "Could not cast: Behaviour: Skip",
-                new List<Entity>() { CreateEntity(("Foo", "Hello")) },
+                new List<Entity> { CreateEntity(("Foo", "Hello")) },
                 WithErrorBehaviour(
                     CreateSchema(
                         "ValueIf Schema",
@@ -188,7 +213,7 @@ public partial class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Enti
 
             yield return CreateCase(
                 "Could not cast: Behaviour: Ignore",
-                new List<Entity>() { CreateEntity(("Foo", "Hello")) },
+                new List<Entity> { CreateEntity(("Foo", "Hello")) },
                 WithErrorBehaviour(
                     CreateSchema(
                         "ValueIf Schema",
@@ -255,7 +280,7 @@ public partial class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Enti
 
             yield return CreateCase(
                 "Could not cast",
-                new List<Entity>() { CreateEntity(("Foo", "Hello")) },
+                new List<Entity> { CreateEntity(("Foo", "Hello")) },
                 CreateSchema(
                     "ValueIf Schema",
                     false,
@@ -268,12 +293,12 @@ public partial class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Enti
 
             yield return CreateCase(
                 "Missing enum value",
-                new List<Entity>() { CreateEntity(("Foo", "Fish")) },
+                new List<Entity> { CreateEntity(("Foo", "Fish")) },
                 CreateSchema(
                     "ValueIf Schema",
                     false,
                     ("Foo", SchemaPropertyType.Enum, "Food", Multiplicity.Any, null,
-                     new List<string>() { "Meat", "Chips" })
+                     new List<string> { "Meat", "Chips" }, null, null)
                 ),
                 ErrorCode.SchemaViolationWrongType,
                 "Fish",
@@ -282,23 +307,24 @@ public partial class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Enti
 
             yield return CreateCase(
                 "Missing enum name",
-                new List<Entity>() { CreateEntity(("Foo", "Meat")) },
+                new List<Entity> { CreateEntity(("Foo", "Meat")) },
                 CreateSchema(
                     "ValueIf Schema",
                     false,
                     ("Foo", SchemaPropertyType.Enum, null, Multiplicity.Any, null,
-                     new List<string>() { "Meat", "Chips" })
+                     new List<string> { "Meat", "Chips" }, null, null)
                 ),
                 ErrorCode.SchemaInvalidMissingEnum
             );
 
             yield return CreateCase(
                 "Regex not matched",
-                new List<Entity>() { CreateEntity(("Foo", "Fish")) },
+                new List<Entity> { CreateEntity(("Foo", "Fish")) },
                 CreateSchema(
                     "ValueIf Schema",
                     false,
-                    ("Foo", SchemaPropertyType.String, null, Multiplicity.Any, @"\d+", null)
+                    ("Foo", SchemaPropertyType.String, null, Multiplicity.Any, @"\d+", null, null,
+                     null)
                 ),
                 ErrorCode.SchemaViolationUnmatchedRegex,
                 "Fish",
@@ -307,7 +333,7 @@ public partial class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Enti
 
             yield return CreateCase(
                 "Missing property",
-                new List<Entity>() { CreateEntity(("Foo", "Fish")) },
+                new List<Entity> { CreateEntity(("Foo", "Fish")) },
                 CreateSchema(
                     "ValueIf Schema",
                     false,
@@ -320,7 +346,7 @@ public partial class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Enti
 
             yield return CreateCase(
                 "Extra property",
-                new List<Entity>() { CreateEntity(("Foo", "Fish"), ("Bar", "Fly")) },
+                new List<Entity> { CreateEntity(("Foo", "Fish"), ("Bar", "Fly")) },
                 CreateSchema(
                     "ValueIf Schema",
                     false,
