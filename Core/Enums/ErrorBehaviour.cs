@@ -7,17 +7,27 @@
 public enum ErrorBehaviour
 {
     /// <summary>
-    /// Stop the process on error
+    /// On Error: Stop the process
     /// </summary>
     Fail,
 
     /// <summary>
-    /// Log a warning message on error
+    ///  On Error: Emit a warning and skip the entity
+    /// </summary>
+    Error,
+
+    /// <summary>
+    /// On Error: Emit a warning but do allow the entity
     /// </summary>
     Warning,
 
     /// <summary>
-    /// Ignore errors
+    ///  On Error: Skip the entity but do not emit a warning
+    /// </summary>
+    Skip,
+
+    /// <summary>
+    /// On Error: Allow the entity and do not emit a warning
     /// </summary>
     Ignore
 }

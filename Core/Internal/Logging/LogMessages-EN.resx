@@ -144,6 +144,9 @@
   <data name="RemoveVariableOutOfScope" xml:space="preserve">
     <value>Could not remove variable {variable} as it was out of scope.</value>
   </data>
+  <data name="SchemaViolation" xml:space="preserve">
+    <value>Schema violation: {message}</value>
+  </data>
   <data name="SetVariableOutOfScope" xml:space="preserve">
     <value>Could not set variable {variable} as it was out of scope.</value>
   </data>

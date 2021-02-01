@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
-using Microsoft.Extensions.Logging;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.Enums;
@@ -42,10 +40,19 @@ public sealed class EnforceSchema : CompoundStep<Array<Entity>>
         if (schema.IsFailure)
             return schema.ConvertFailure<Array<Entity>>();
 
-        var errorBehaviour = await ErrorBehaviour.Run(stateMonad, cancellationToken);
+        Maybe<ErrorBehaviour> errorBehaviour;
 
-        if (errorBehaviour.IsFailure)
-            return errorBehaviour.ConvertFailure<Array<Entity>>();
+        if (ErrorBehaviour == null)
+            errorBehaviour = Maybe<ErrorBehaviour>.None;
+        else
+        {
+            var errorBehaviourResult = await ErrorBehaviour.Run(stateMonad, cancellationToken);
+
+            if (errorBehaviourResult.IsFailure)
+                return errorBehaviourResult.ConvertFailure<Array<Entity>>();
+
+            errorBehaviour = Maybe<ErrorBehaviour>.From(errorBehaviourResult.Value);
+        }
 
         var newStream = entityStream.Value.SelectMany(ApplySchema);
 
@@ -54,37 +61,13 @@ public sealed class EnforceSchema : CompoundStep<Array<Entity>>
         async IAsyncEnumerable<Entity> ApplySchema(Entity entity)
         {
             await ValueTask.CompletedTask;
-            var result = schema.Value.ApplyToEntity(entity);
+            var result = schema.Value.ApplyToEntity(entity, stateMonad.Logger, errorBehaviour);
 
-            if (result.IsSuccess)
-            {
-                yield return result.Value;
+            if (result.IsFailure)
+                throw new ErrorException(result.Error.WithLocation(this));
 
-                yield break;
-            }
-
-            switch (errorBehaviour.Value)
-            {
-                case Enums.ErrorBehaviour.Fail:
-                {
-                    throw new ErrorException(result.Error.WithLocation(this));
-                }
-                case Enums.ErrorBehaviour.Warning:
-                {
-                    stateMonad.Logger.LogWarning(result.Error.AsString);
-                    break;
-                }
-                case Enums.ErrorBehaviour.Ignore:
-                {
-                    break;
-                }
-                default:
-                    throw new InvalidEnumArgumentException(
-                        nameof(errorBehaviour),
-                        (int)errorBehaviour.Value,
-                        typeof(ErrorBehaviour)
-                    );
-            }
+            if (result.Value.HasValue)
+                yield return result.Value.Value;
         }
     }
 
@@ -108,9 +91,8 @@ public sealed class EnforceSchema : CompoundStep<Array<Entity>>
     /// How to behave if an error occurs.
     /// </summary>
     [StepProperty(3)]
-    [DefaultValueExplanation("Fail")]
-    public IStep<ErrorBehaviour> ErrorBehaviour { get; set; } =
-        new EnumConstant<ErrorBehaviour>(Enums.ErrorBehaviour.Fail);
+    [DefaultValueExplanation("Use the ErrorBehaviour defined in the schema")]
+    public IStep<ErrorBehaviour>? ErrorBehaviour { get; set; } = null;
 
     /// <inheritdoc />
     public override IStepFactory StepFactory => EnforceSchemaStepFactory.Instance;

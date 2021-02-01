@@ -19,6 +19,7 @@ public static class EntityExtensions
     /// </summary>
     public static Result<Unit, IErrorBuilder> TrySetString(
         this Entity entity,
+        bool optional,
         string propertyName,
         Action<string> setString)
     {
@@ -30,6 +31,9 @@ public static class EntityExtensions
             return Unit.Default;
         }
 
+        if (optional)
+            return Unit.Default;
+
         var errorBuilder = ErrorHelper.MissingParameterError(propertyName);
 
         return Result.Failure<Unit, IErrorBuilder>(errorBuilder);
@@ -40,6 +44,7 @@ public static class EntityExtensions
     /// </summary>
     public static Result<Unit, IErrorBuilder> TrySetStringList(
         this Entity entity,
+        bool optional,
         string propertyName,
         Action<List<string>> setStringList)
     {
@@ -53,6 +58,9 @@ public static class EntityExtensions
             return Unit.Default;
         }
 
+        if (optional)
+            return Unit.Default;
+
         var errorBuilder = ErrorHelper.MissingParameterError(propertyName);
 
         return Result.Failure<Unit, IErrorBuilder>(errorBuilder);
@@ -63,6 +71,7 @@ public static class EntityExtensions
     /// </summary>
     public static Result<Unit, IErrorBuilder> TrySetDictionary<T>(
         this Entity entity,
+        bool optional,
         string propertyName,
         Func<EntityValue, Result<T, IErrorBuilder>> getElement,
         Action<Dictionary<string, T>> setDictionary)
@@ -92,6 +101,9 @@ public static class EntityExtensions
             return Unit.Default;
         }
 
+        if (optional)
+            return Unit.Default;
+
         var errorBuilder = ErrorHelper.MissingParameterError(propertyName);
 
         return Result.Failure<Unit, IErrorBuilder>(errorBuilder);
@@ -102,6 +114,7 @@ public static class EntityExtensions
     /// </summary>
     public static Result<Unit, IErrorBuilder> TrySetBoolean(
         this Entity entity,
+        bool optional,
         string propertyName,
         Action<bool> setBool)
     {
@@ -113,6 +126,9 @@ public static class EntityExtensions
             return Unit.Default;
         }
 
+        if (optional)
+            return Unit.Default;
+
         var errorBuilder = ErrorHelper.MissingParameterError(propertyName);
 
         return Result.Failure<Unit, IErrorBuilder>(errorBuilder);
@@ -123,6 +139,7 @@ public static class EntityExtensions
     /// </summary>
     public static Result<Unit, IErrorBuilder> TrySetEnum<T>(
         this Entity entity,
+        bool optional,
         string propertyName,
         Action<T> setEnum) where T : struct, Enum
     {
@@ -136,6 +153,9 @@ public static class EntityExtensions
             return Unit.Default;
         }
 
+        if (optional)
+            return Unit.Default;
+
         var errorBuilder = ErrorHelper.MissingParameterError(propertyName);
 
         return Result.Failure<Unit, IErrorBuilder>(errorBuilder);
@@ -147,7 +167,7 @@ public static class EntityExtensions
     public static Maybe<string>
         TryGetNestedString(
             this Entity current,
-            params string[] properties) //TODO remove when we can update core
+            params string[] properties)
     {
         if (!properties.Any())
             return Maybe<string>.None;
@@ -194,7 +214,7 @@ public static class EntityExtensions
     public static Maybe<string[]>
         TryGetNestedList(
             this Entity current,
-            params string[] properties) //TODO remove when we can update core
+            params string[] properties)
     {
         if (!properties.Any())
             return Maybe<string[]>.None;
