@@ -354,7 +354,7 @@ public sealed class EntityValue : OneOfBase<DBNull, string, int, double, bool, E
             {
                 EnumType         = schemaProperty.EnumType,
                 Values           = schemaProperty.Values,
-                ErrorBehaviour   = schemaProperty.ErrorBehaviour,
+                ErrorBehavior    = schemaProperty.ErrorBehavior,
                 DateInputFormats = schemaProperty.DateInputFormats,
                 DateOutputFormat = schemaProperty.DateOutputFormat,
                 Multiplicity     = Multiplicity.ExactlyOne,

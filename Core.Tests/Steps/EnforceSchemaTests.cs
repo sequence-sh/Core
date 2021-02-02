@@ -170,66 +170,66 @@ public partial class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Enti
             );
 
             yield return CreateCase(
-                "Could not cast: Behaviour: Error",
+                "Could not cast: Behavior: Error",
                 new List<Entity> { CreateEntity(("Foo", "Hello")) },
-                WithErrorBehaviour(
+                WithErrorBehavior(
                     CreateSchema(
                         "ValueIf Schema",
                         false,
                         ("Foo", SchemaPropertyType.Integer, Multiplicity.Any)
                     ),
-                    ErrorBehaviour.Error
+                    ErrorBehavior.Error
                 ),
                 "Schema violation: Schema Violated: 'Hello' is not a Integer"
             );
 
             yield return CreateCase(
-                "Could not cast: Behaviour: Warning",
+                "Could not cast: Behavior: Warning",
                 new List<Entity> { CreateEntity(("Foo", "Hello")) },
-                WithErrorBehaviour(
+                WithErrorBehavior(
                     CreateSchema(
                         "ValueIf Schema",
                         false,
                         ("Foo", SchemaPropertyType.Integer, Multiplicity.Any)
                     ),
-                    ErrorBehaviour.Warning
+                    ErrorBehavior.Warning
                 ),
                 "Schema violation: Schema Violated: 'Hello' is not a Integer",
                 "(Foo: \"Hello\")"
             );
 
             yield return CreateCase(
-                "Could not cast: Behaviour: Skip",
+                "Could not cast: Behavior: Skip",
                 new List<Entity> { CreateEntity(("Foo", "Hello")) },
-                WithErrorBehaviour(
+                WithErrorBehavior(
                     CreateSchema(
                         "ValueIf Schema",
                         false,
                         ("Foo", SchemaPropertyType.Integer, Multiplicity.Any)
                     ),
-                    ErrorBehaviour.Skip
+                    ErrorBehavior.Skip
                 )
             );
 
             yield return CreateCase(
-                "Could not cast: Behaviour: Ignore",
+                "Could not cast: Behavior: Ignore",
                 new List<Entity> { CreateEntity(("Foo", "Hello")) },
-                WithErrorBehaviour(
+                WithErrorBehavior(
                     CreateSchema(
                         "ValueIf Schema",
                         false,
                         ("Foo", SchemaPropertyType.Integer, Multiplicity.Any)
                     ),
-                    ErrorBehaviour.Ignore
+                    ErrorBehavior.Ignore
                 ),
                 "(Foo: \"Hello\")"
             );
         }
     }
 
-    private static Schema WithErrorBehaviour(Schema schema, ErrorBehaviour eb)
+    private static Schema WithErrorBehavior(Schema schema, ErrorBehavior eb)
     {
-        schema.DefaultErrorBehaviour = eb;
+        schema.DefaultErrorBehavior = eb;
         return schema;
     }
 
@@ -249,9 +249,9 @@ public partial class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Enti
 
                 var enforceSchema = new EnforceSchema
                 {
-                    EntityStream   = Array(entities.ToArray()),
-                    Schema         = Constant(schemaEntity),
-                    ErrorBehaviour = Constant(ErrorBehaviour.Fail)
+                    EntityStream  = Array(entities.ToArray()),
+                    Schema        = Constant(schemaEntity),
+                    ErrorBehavior = Constant(ErrorBehavior.Fail)
                 };
 
                 return new ErrorCase(

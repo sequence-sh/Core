@@ -38,10 +38,10 @@ public sealed class Schema
     public bool AllowExtraProperties { get; set; } = true;
 
     /// <summary>
-    /// The default error behaviour. This can be overriden by the individual properties or by the value passed to the EnforceSchema method.
+    /// The default error behavior. This can be overriden by the individual properties or by the value passed to the EnforceSchema method.
     /// </summary>
     [ConfigProperty(4)]
-    public ErrorBehaviour DefaultErrorBehaviour { get; set; } = ErrorBehaviour.Fail;
+    public ErrorBehavior DefaultErrorBehavior { get; set; } = ErrorBehavior.Fail;
 
     /// <inheritdoc />
     public override string ToString()
@@ -56,7 +56,7 @@ public sealed class Schema
     public Result<Maybe<Entity>, IErrorBuilder> ApplyToEntity(
         Entity entity,
         ILogger logger,
-        Maybe<ErrorBehaviour> errorBehaviourOverride)
+        Maybe<ErrorBehavior> errorBehaviorOverride)
     {
         var remainingProperties = Properties
             .ToDictionary(
@@ -71,34 +71,34 @@ public sealed class Schema
         var changed       = false;
         var returnEntity  = true;
 
-        void HandleError(IErrorBuilder error, ErrorBehaviour eb)
+        void HandleError(IErrorBuilder error, ErrorBehavior eb)
         {
             switch (eb)
             {
-                case ErrorBehaviour.Fail:
+                case ErrorBehavior.Fail:
                     errors.Add(error);
                     break;
-                case ErrorBehaviour.Error:
+                case ErrorBehavior.Error:
                     warnings.Add(error);
                     returnEntity = false;
                     break;
-                case ErrorBehaviour.Warning:
+                case ErrorBehavior.Warning:
                     warnings.Add(error);
                     break;
-                case ErrorBehaviour.Skip:
+                case ErrorBehavior.Skip:
                     returnEntity = false;
                     break;
-                case ErrorBehaviour.Ignore: break;
+                case ErrorBehavior.Ignore: break;
                 default: throw new ArgumentOutOfRangeException(nameof(eb), eb, null);
             }
         }
 
-        ErrorBehaviour generalErrorBehaviour;
+        ErrorBehavior generalErrorBehavior;
 
-        if (errorBehaviourOverride.HasValue)
-            generalErrorBehaviour = errorBehaviourOverride.Value;
+        if (errorBehaviorOverride.HasValue)
+            generalErrorBehavior = errorBehaviorOverride.Value;
         else
-            generalErrorBehaviour = this.DefaultErrorBehaviour;
+            generalErrorBehavior = this.DefaultErrorBehavior;
 
         foreach (var entityProperty in entity)
         {
@@ -129,16 +129,16 @@ public sealed class Schema
 
                 else
                 {
-                    ErrorBehaviour errorBehaviour;
+                    ErrorBehavior errorBehavior;
 
-                    if (errorBehaviourOverride.HasValue)
-                        errorBehaviour = errorBehaviourOverride.Value;
-                    else if (schemaProperty.ErrorBehaviour != null)
-                        errorBehaviour = schemaProperty.ErrorBehaviour.Value;
+                    if (errorBehaviorOverride.HasValue)
+                        errorBehavior = errorBehaviorOverride.Value;
+                    else if (schemaProperty.ErrorBehavior != null)
+                        errorBehavior = schemaProperty.ErrorBehavior.Value;
                     else
-                        errorBehaviour = DefaultErrorBehaviour;
+                        errorBehavior = DefaultErrorBehavior;
 
-                    HandleError(convertResult.Error, errorBehaviour);
+                    HandleError(convertResult.Error, errorBehavior);
                 }
             }
             else if (AllowExtraProperties) //This entity has a property that is not in the schema
@@ -150,7 +150,7 @@ public sealed class Schema
                     entityProperty.Name
                 );
 
-                HandleError(errorBuilder, generalErrorBehaviour);
+                HandleError(errorBuilder, generalErrorBehavior);
             }
         }
 
@@ -161,7 +161,7 @@ public sealed class Schema
             ))
         {
             var error = new ErrorBuilder(ErrorCode.SchemaViolationMissingProperty, key);
-            HandleError(error, generalErrorBehaviour);
+            HandleError(error, generalErrorBehavior);
         }
 
         if (errors.Any())
@@ -208,10 +208,10 @@ public sealed class Schema
         );
 
         results.Add(
-            entity.TrySetEnum<ErrorBehaviour>(
+            entity.TrySetEnum<ErrorBehavior>(
                 true,
-                nameof(DefaultErrorBehaviour),
-                eb => schema.DefaultErrorBehaviour = eb
+                nameof(DefaultErrorBehavior),
+                eb => schema.DefaultErrorBehavior = eb
             )
         );
 
@@ -263,9 +263,9 @@ public sealed class Schema
         var topProperties = new[]
         {
             (nameof(Name), EntityValue.CreateFromObject(Name)),
-            (nameof(AllowExtraProperties), EntityValue.CreateFromObject(AllowExtraProperties)),
-            (nameof(DefaultErrorBehaviour),
-             EntityValue.CreateFromObject(DefaultErrorBehaviour)),
+            (nameof(AllowExtraProperties), EntityValue.CreateFromObject(AllowExtraProperties)), (
+                nameof(DefaultErrorBehavior),
+                EntityValue.CreateFromObject(DefaultErrorBehavior)),
             (nameof(Properties), EntityValue.CreateFromObject(propertiesEntity)),
         }.Select((x, i) => new EntityProperty(x.Item1, x.Item2, null, i));
 
