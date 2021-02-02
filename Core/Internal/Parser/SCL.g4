@@ -18,7 +18,8 @@ infixOperator		: DASH
 					| LESSTHANEQUALS
 					| GREATERTHENEQUALS
 					| LESSTHAN
-					| GREATERTHAN ;
+					| GREATERTHAN
+                    | WITH;
 infixOperation		: term infixOperator term ;
 entityPropertyName  : NAME | quotedString;
 entityProperty		: entityPropertyName (DOT entityPropertyName)* COLON term ;
@@ -89,6 +90,7 @@ DATETIME			: DIGIT DIGIT DIGIT DIGIT DASH DIGIT DIGIT DASH DIGIT DIGIT ([Tt] DIG
 NUMBER				: DASH? DIGIT+ ;
 DOUBLEQUOTEDSTRING	: '"' (~('"' | '\\' | '\r' | '\n' | '\t') | '\\' ('"' | '\\' | 'r' | 'n' | 't'))* '"' ;
 SINGLEQUOTEDSTRING	: '\'' (~('\'') | '\'\'')* '\'' ;
+WITH                : [Ww] [Ii] [Tt] [Hh];
 TRUE				: [Tt] [Rr] [Uu] [Ee];
 FALSE				: [Ff] [Aa] [Ll] [Ss] [Ee];
 NAME				: [a-zA-Z0-9_]+;

@@ -45,6 +45,21 @@ public partial class EntityCombineTests : StepTestBase<EntityCombine, Entity>
             );
         }
     }
+
+    /// <inheritdoc />
+    protected override IEnumerable<SerializeCase> SerializeCases
+    {
+        get
+        {
+            var (step, _) = CreateStepWithDefaultOrArbitraryValues();
+
+            yield return new SerializeCase(
+                "Default",
+                step,
+                @"(Prop1: ""Val0"" Prop2: ""Val1"") with (Prop1: ""Val2"" Prop2: ""Val3"")"
+            );
+        }
+    }
 }
 
 }

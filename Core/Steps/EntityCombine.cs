@@ -5,6 +5,7 @@ using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
+using Reductech.EDR.Core.Internal.Serialization;
 
 namespace Reductech.EDR.Core.Steps
 {
@@ -66,6 +67,9 @@ public sealed class EntityCombineStepFactory : SimpleStepFactory<EntityCombine, 
     /// </summary>
     public static SimpleStepFactory<EntityCombine, Entity> Instance { get; } =
         new EntityCombineStepFactory();
+
+    /// <inheritdoc />
+    public override IStepSerializer Serializer => EntityCombineSerializer.Instance;
 }
 
 }
