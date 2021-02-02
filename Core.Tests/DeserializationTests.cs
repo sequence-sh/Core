@@ -270,6 +270,8 @@ Print 'Comments!'",
             yield return new DeserializationTestInstance(@"(Foo:'a')['Foo'] | Print", 'a');
             yield return new DeserializationTestInstance(@"(Foo:'a')['FOO'] | Print", 'a');
 
+            yield return new DeserializationTestInstance(@"(Foo:'a', Bar:'b')['Bar'] | Print", 'b');
+
             yield return new DeserializationTestInstance(
                 @"(Foo:'a')[(StringToCase 'foo' 'Upper')] | Print",
                 'a'

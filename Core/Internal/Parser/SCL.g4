@@ -22,7 +22,7 @@ infixOperator		: DASH
 infixOperation		: term infixOperator term ;
 namedArgument		: NAME COLON term ;
 function			: NAME (term)* (namedArgument)* ;
-entity				: OPENBRACKET (namedArgument)*  CLOSEBRACKET ;
+entity				: OPENBRACKET (namedArgument COMMA?)*  CLOSEBRACKET ;
 bracketedStep		: OPENBRACKET step CLOSEBRACKET ;
 boolean				: TRUE | FALSE ;
 dateTime			: DATETIME ;
