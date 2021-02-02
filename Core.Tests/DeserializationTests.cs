@@ -264,55 +264,16 @@ Print 'Comments!'",
                 "1"
             );
 
-            //                yield return new DeserializationTestFunction(
-            //                    @"Do: Print
-            //Config:
-            //  AdditionalRequirements: 
-            //  TargetMachineTags:
-            //  - Tag1
-            //  DoNotSplit: false
-            //  Priority: 1
-            //Value: I have config", "I have config"
-            //                )
-            //                {
-            //                    ExpectedConfiguration = new Configuration
-            //                    {
-            //                        TargetMachineTags = new List<string> {"Tag1"},
-            //                        DoNotSplit = false,
-            //                        Priority = 1
-            //                    }
-            //                };
+            yield return new DeserializationTestInstance(@"['a','b','c'][0] | Print",     'a');
+            yield return new DeserializationTestInstance(@"['a','b','c'][(1+1)] | Print", 'c');
 
-            //                yield return new DeserializationTestFunction(@"Do: Print
-            //Config:
-            //  AdditionalRequirements:
-            //  - Notes: ABC123
-            //    Name: ValueIf
-            //    MinVersion: 1.2.3.4
-            //    MaxVersion: 5.6.7.8
-            //  TargetMachineTags:
-            //  - Tag1
-            //  DoNotSplit: false
-            //  Priority: 1
-            //Value: I have config too", "I have config too")
-            //                {
-            //                    ExpectedConfiguration = new Configuration
-            //                    {
-            //                        TargetMachineTags = new List<string> { "Tag1" },
-            //                        DoNotSplit = false,
-            //                        Priority = 1,
-            //                        AdditionalRequirements = new List<Requirement>
-            //                        {
-            //                            new Requirement
-            //                            {
-            //                                MaxVersion = new Version(5,6,7,8),
-            //                                MinVersion = new Version(1,2,3,4),
-            //                                Name = "ValueIf",
-            //                                Notes = "ABC123"
-            //                            }
-            //                        }
-            //                    }
-            //                };
+            yield return new DeserializationTestInstance(@"(Foo:'a')['Foo'] | Print", 'a');
+            yield return new DeserializationTestInstance(@"(Foo:'a')['FOO'] | Print", 'a');
+
+            yield return new DeserializationTestInstance(
+                @"(Foo:'a')[(StringToCase 'foo' 'Upper')] | Print",
+                'a'
+            );
 
             yield return new DeserializationTestInstance(
                 @"ForEach ['a','b','c'] (Print <char>) <char>",

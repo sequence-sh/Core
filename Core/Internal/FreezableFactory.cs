@@ -22,6 +22,59 @@ public static class FreezableFactory
     //TODO move other CreateFreezable methods here
 
     /// <summary>
+    /// Create a new Freezable EntityGetValue
+    /// </summary>
+    public static IFreezableStep CreateFreezableArrayAccess(
+        IFreezableStep entityOrArray,
+        IFreezableStep indexer,
+        Configuration? configuration,
+        IErrorLocation location)
+    {
+        var entityGetValueDict = new StepParameterDict
+        {
+            {
+                new StepParameterReference(nameof(EntityGetValue.Entity)),
+                new FreezableStepProperty(entityOrArray, location)
+            },
+            {
+                new StepParameterReference(nameof(EntityGetValue.Property)),
+                new FreezableStepProperty(indexer, location)
+            },
+        };
+
+        var entityGetValueData = new FreezableStepData(entityGetValueDict, location);
+
+        var entityGetValueStep = new CompoundFreezableStep(
+            EntityGetValueStepFactory.Instance.TypeName,
+            entityGetValueData,
+            configuration
+        );
+
+        var elementAtIndexDict = new StepParameterDict
+        {
+            {
+                new StepParameterReference(nameof(ElementAtIndex<object>.Array)),
+                new FreezableStepProperty(entityOrArray, location)
+            },
+            {
+                new StepParameterReference(nameof(ElementAtIndex<object>.Index)),
+                new FreezableStepProperty(indexer, location)
+            },
+        };
+
+        var elementAtData = new FreezableStepData(elementAtIndexDict, location);
+
+        var elementAtStep = new CompoundFreezableStep(
+            ElementAtIndexStepFactory.Instance.TypeName,
+            elementAtData,
+            configuration
+        );
+
+        var result = new OptionFreezableStep(new[] { entityGetValueStep, elementAtStep });
+        return result;
+    }
+
+    /// <summary>
     /// Create a new Freezable Sequence
     /// </summary>
     public static IFreezableStep CreateFreezableSequence(

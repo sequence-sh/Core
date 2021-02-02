@@ -29,8 +29,10 @@ dateTime			: DATETIME ;
 quotedString		: DOUBLEQUOTEDSTRING | SINGLEQUOTEDSTRING ;
 number              : NUMBER (DOT NUMBER)? ;
 enumeration			: NAME DOT NAME ;
-term				: simpleTerm
-					| bracketedStep ;
+term				: simpleTerm #SimpleTerm1
+					| bracketedStep  #BracketedStep1
+                    | arrayOrEntity=term OPENSQUAREBRACKET indexer=term CLOSESQUAREBRACKET #ArrayAccess
+                    ;
 step				: <assoc=right> step PIPE NAME (term)* (namedArgument)* #PipeFunction
 					| function #Function1
 					| infixOperation #InfixOperation1
@@ -45,7 +47,7 @@ simpleTerm			: number
                     | quotedString
                     | getVariable
                     | entity
-                    | array ;
+                    | array;
 stepSequence		: (NEWCOMMAND | DASH) step (NEWCOMMAND step)* ;
 fullSequence		: (step | stepSequence)  EOF ;
 

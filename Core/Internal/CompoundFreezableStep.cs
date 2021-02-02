@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Internal.Errors;
@@ -7,6 +8,96 @@ using Reductech.EDR.Core.Util;
 
 namespace Reductech.EDR.Core.Internal
 {
+
+/// <summary>
+/// A step that could be one of several options
+/// </summary>
+public sealed class OptionFreezableStep : IFreezableStep
+{
+    /// <summary>
+    /// Create a new OptionFreezableStep
+    /// </summary>
+    /// <param name="options"></param>
+    public OptionFreezableStep(IReadOnlyList<IFreezableStep> options)
+    {
+        Options = options;
+    }
+
+    /// <summary>
+    /// The options
+    /// </summary>
+    public IReadOnlyList<IFreezableStep> Options { get; }
+
+    /// <inheritdoc />
+    public string StepName => string.Join(" or ", Options);
+
+    /// <inheritdoc />
+    public bool Equals(IFreezableStep? other) =>
+        other is OptionFreezableStep ofs && Options.SequenceEqual(ofs.Options);
+
+    /// <inheritdoc />
+    public Result<IStep, IError> TryFreeze(StepContext stepContext)
+    {
+        IError? error = null;
+
+        foreach (var freezableStep in Options)
+        {
+            var r = freezableStep.TryFreeze(stepContext);
+
+            if (r.IsSuccess)
+                return r;
+            else
+                error = r.Error;
+        }
+
+        Debug.Assert(error != null, "OptionFreezableStep should have at least one option");
+
+        return Result.Failure<IStep, IError>(error);
+    }
+
+    /// <inheritdoc />
+    public Result<IReadOnlyCollection<(VariableName variableName, Maybe<ITypeReference>)>, IError>
+        GetVariablesSet(TypeResolver typeResolver)
+    {
+        IError? error = null;
+
+        foreach (var freezableStep in Options)
+        {
+            var r = freezableStep.GetVariablesSet(typeResolver);
+
+            if (r.IsSuccess)
+                return r;
+            else
+                error = r.Error;
+        }
+
+        Debug.Assert(error != null, "OptionFreezableStep should have at least one option");
+
+        return Result
+            .Failure<IReadOnlyCollection<(VariableName variableName, Maybe<ITypeReference>)>, IError
+            >(error);
+    }
+
+    /// <inheritdoc />
+    public Result<ITypeReference, IError> TryGetOutputTypeReference(TypeResolver typeResolver)
+    {
+        IError? error = null;
+
+        foreach (var freezableStep in Options)
+        {
+            var r = freezableStep.TryGetOutputTypeReference(typeResolver);
+
+            if (r.IsSuccess)
+                return r;
+            else
+                error = r.Error;
+        }
+
+        Debug.Assert(error != null, "OptionFreezableStep should have at least one option");
+
+        return Result.Failure<ITypeReference, IError>(error);
+    }
+}
 
 /// <summary>
 /// A step that is not a constant or a variable reference.

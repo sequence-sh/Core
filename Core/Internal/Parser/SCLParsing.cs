@@ -147,7 +147,7 @@ public static class SCLParsing
             SCLParser.ArrayContext context)
         {
             var members =
-                context.term().Select(VisitTerm);
+                context.term().Select(Visit);
 
             var r = Aggregate(new TextLocation(context), members);
             return r;
@@ -190,6 +190,30 @@ public static class SCLParsing
         }
 
         /// <inheritdoc />
+        public override Result<FreezableStepProperty, IError> VisitArrayAccess(
+            SCLParser.ArrayAccessContext context)
+        {
+            var arrayResult = Visit(context.arrayOrEntity).Map(x => x.ConvertToStep());
+
+            if (arrayResult.IsFailure)
+                return arrayResult.ConvertFailure<FreezableStepProperty>();
+
+            var indexerResult = Visit(context.indexer).Map(x => x.ConvertToStep());
+
+            if (indexerResult.IsFailure)
+                return indexerResult.ConvertFailure<FreezableStepProperty>();
+
+            var step = CreateFreezableArrayAccess(
+                arrayResult.Value,
+                indexerResult.Value,
+                null,
+                new TextLocation(context)
+            );
+
+            return new FreezableStepProperty(step, new TextLocation(context));
+        }
+
+        /// <inheritdoc />
         public override Result<FreezableStepProperty, IError> VisitBracketedStep(
             SCLParser.BracketedStepContext context) => Visit(context.step());
 
@@ -197,8 +221,8 @@ public static class SCLParsing
         public override Result<FreezableStepProperty, IError> VisitInfixOperation(
             SCLParser.InfixOperationContext context)
         {
-            var left           = VisitTerm(context.term(0));
-            var right          = VisitTerm(context.term(1));
+            var left           = Visit(context.term(0));
+            var right          = Visit(context.term(1));
             var operatorSymbol = context.infixOperator().GetText();
 
             var result = InfixHelper.TryCreateStep(
@@ -411,7 +435,7 @@ public static class SCLParsing
             var numberedArguments = context.term()
                 .Select(
                     (term, i) =>
-                        (term: VisitTerm(term), number: OneOf<string, int>.FromT1(i + 2))
+                        (term: Visit(term), number: OneOf<string, int>.FromT1(i + 2))
                 );
 
             foreach (var (term, number) in numberedArguments)
@@ -455,7 +479,7 @@ public static class SCLParsing
             var numberedArguments = context.term()
                 .Select(
                     (term, i) =>
-                        (term: VisitTerm(term), number: OneOf<string, int>.FromT1(i + 1))
+                        (term: Visit(term), number: OneOf<string, int>.FromT1(i + 1))
                 );
 
             foreach (var (term, number) in numberedArguments)
@@ -548,7 +572,7 @@ public static class SCLParsing
         {
             var key = context.NAME().Symbol.Text;
 
-            var value = VisitTerm(context.term());
+            var value = Visit(context.term());
 
             if (value.IsFailure)
                 return value.ConvertFailure<(string name, FreezableStepProperty value)>();
