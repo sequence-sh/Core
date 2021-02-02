@@ -4,7 +4,7 @@
  */
 setVariable			: VARIABLENAME EQUALS step;
 getVariable         : VARIABLENAME ;
-array				: OPENSQUAREBRACKET ( term ( COMMA term)* COMMA? )? CLOSESQUAREBRACKET ;
+array				: OPENSQUAREBRACKET ( term COMMA? )* CLOSESQUAREBRACKET ;
 infixOperator		: DASH
 					| PLUS
 					| ASTERIX

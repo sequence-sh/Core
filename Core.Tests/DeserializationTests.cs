@@ -284,6 +284,13 @@ Print 'Comments!'",
                 "c"
             );
 
+            yield return new DeserializationTestInstance(
+                @"ForEach ['a' 'b' 'c'] (Print <char>) <char>",
+                "a",
+                "b",
+                "c"
+            );
+
             yield return new DeserializationTestInstance("(Foo.Bar:'b')", "(Foo: (Bar: \"b\"))");
 
             yield return new DeserializationTestInstance(
