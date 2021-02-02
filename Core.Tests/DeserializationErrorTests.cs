@@ -66,8 +66,12 @@ public partial class DeserializationErrorTests
 
             yield return new DeserializationErrorCase(
                 "Foreach ['one', 'two') (Print <Num>) <Num>", //The ) should be a ]
-                ("Syntax Error: extraneous input ')' expecting {']', ','}",
-                 "Line: 1, Col: 21, Idx: 21 - Line: 1, Col: 21, Idx: 21 Text: )")
+                (
+                    @"Syntax Error: extraneous input ')' expecting {'(', '[', ']', ',', VARIABLENAME, DATETIME, NUMBER, DOUBLEQUOTEDSTRING, SINGLEQUOTEDSTRING, TRUE, FALSE, NAME}",
+                    @"Line: 1, Col: 21, Idx: 21 - Line: 1, Col: 21, Idx: 21 Text: )"),
+                (@"Syntax Error: mismatched input '<EOF>' expecting {'(', '[', ']', ',', VARIABLENAME, DATETIME, NUMBER, DOUBLEQUOTEDSTRING, SINGLEQUOTEDSTRING, TRUE, FALSE, NAME}",
+                 @"Line: 1, Col: 42, Idx: 42 - Line: 1, Col: 41, Idx: 41 Text: <EOF>"
+                )
             );
 
             yield return new DeserializationErrorCase(
