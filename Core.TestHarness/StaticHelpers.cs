@@ -87,7 +87,7 @@ public static class StaticHelpers
             allowExtraProperties,
             properties.Select(
                     p => (p.propertyName, p.type, null as string, p.multiplicity, null as string,
-                          null as List<string>)
+                          null as List<string>, null as List<string>, null as string)
                 )
                 .ToArray()
         );
@@ -97,7 +97,8 @@ public static class StaticHelpers
         string name,
         bool allowExtraProperties,
         params (string propertyName, SchemaPropertyType type, string? enumType, Multiplicity
-            multiplicity, string? regex, List<string>? format)[] properties)
+            multiplicity, string? regex, List<string>? values, List<string>? inputFormats, string?
+            outputFormat)[] properties)
     {
         return new()
         {
@@ -107,11 +108,13 @@ public static class StaticHelpers
                 x => x.propertyName,
                 x => new SchemaProperty
                 {
-                    EnumType     = x.enumType,
-                    Multiplicity = x.multiplicity,
-                    Type         = x.type,
-                    Regex        = x.regex,
-                    Format       = x.format
+                    EnumType         = x.enumType,
+                    Multiplicity     = x.multiplicity,
+                    Type             = x.type,
+                    Regex            = x.regex,
+                    Values           = x.values,
+                    DateInputFormats = x.inputFormats,
+                    DateOutputFormat = x.outputFormat
                 }
             )
         };

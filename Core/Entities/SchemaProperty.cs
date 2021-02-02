@@ -33,12 +33,22 @@ public sealed class SchemaProperty
     public Multiplicity Multiplicity { get; set; } = Multiplicity.Any;
 
     /// <summary>
-    /// The format strings.
-    /// For Date, this will contain possible date formats.
-    /// For Enum, this will contain possible enum values.
+    /// If this is an enum, the allowed values.
     /// </summary>
     [ConfigProperty(4)]
-    public IReadOnlyList<string>? Format { get; set; }
+    public IReadOnlyList<string>? Values { get; set; }
+
+    /// <summary>
+    /// The allowed formats for the date
+    /// </summary>
+    [ConfigProperty(5)]
+    public IReadOnlyList<string>? DateInputFormats { get; set; }
+
+    /// <summary>
+    /// The output format for the date
+    /// </summary>
+    [ConfigProperty(6)]
+    public string? DateOutputFormat { get; set; }
 
     /// <summary>
     /// A regex to validate the string form of the field value
@@ -96,8 +106,24 @@ public sealed class SchemaProperty
         results.Add(
             entity.TrySetStringList(
                 true,
-                nameof(Format),
-                s => schemaProperty.Format = s
+                nameof(Values),
+                s => schemaProperty.Values = s
+            )
+        );
+
+        results.Add(
+            entity.TrySetStringList(
+                true,
+                nameof(DateInputFormats),
+                s => schemaProperty.DateInputFormats = s
+            )
+        );
+
+        results.Add(
+            entity.TrySetString(
+                true,
+                nameof(DateOutputFormat),
+                s => schemaProperty.DateOutputFormat = s
             )
         );
 
@@ -107,7 +133,7 @@ public sealed class SchemaProperty
                 nameof(Regex),
                 s => schemaProperty.Regex = s
             )
-        ); //Ignore the result of this
+        );
 
         var r = results.Combine(ErrorBuilderList.Combine)
             .Map(_ => schemaProperty);
@@ -126,7 +152,9 @@ public sealed class SchemaProperty
             (nameof(Type), EntityValue.CreateFromObject(Type)),
             (nameof(EnumType), EntityValue.CreateFromObject(EnumType)),
             (nameof(Multiplicity), EntityValue.CreateFromObject(Multiplicity)),
-            (nameof(Format), EntityValue.CreateFromObject(Format)),
+            (nameof(Values), EntityValue.CreateFromObject(Values)),
+            (nameof(DateInputFormats), EntityValue.CreateFromObject(DateInputFormats)),
+            (nameof(DateOutputFormat), EntityValue.CreateFromObject(DateOutputFormat)),
             (nameof(Regex), EntityValue.CreateFromObject(Regex)),
             (nameof(ErrorBehaviour), EntityValue.CreateFromObject(ErrorBehaviour)),
         }.Select((x, i) => new EntityProperty(x.Item1, x.Item2, null, i));

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Immutable;
+using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
 using CSharpFunctionalExtensions;
@@ -23,10 +24,22 @@ public sealed class EntityValue : OneOfBase<DBNull, string, int, double, bool, E
     /// <summary>
     /// Create a new entityValue
     /// </summary>
-    /// <param name="value"></param>
     public EntityValue(
         OneOf<DBNull, string, int, double, bool, Enumeration, DateTime, Entity,
-            ImmutableList<EntityValue>> value) : base(value) { }
+            ImmutableList<EntityValue>> value,
+        string? outputFormat = null) : base(value) => OutputFormat = outputFormat;
+
+    /// <summary>
+    /// The output format if this is a DateTime and this has been set by a schema
+    /// </summary>
+    public readonly string? OutputFormat;
+
+    /// <summary>
+    /// The DateOutputFormat to use
+    /// </summary>
+    public string DateOutputFormat => string.IsNullOrWhiteSpace(OutputFormat)
+        ? Constants.DateTimeFormat
+        : OutputFormat;
 
     /// <summary>
     /// Create an entity from an object
@@ -35,7 +48,6 @@ public sealed class EntityValue : OneOfBase<DBNull, string, int, double, bool, E
     {
         switch (argValue)
         {
-            //TODO convert to switch statement (this is not supported by stryker at the moment)
             case null:             return new EntityValue(DBNull.Value);
             case StringStream ss1: return Create(ss1.GetString(), multiValueDelimiter);
             case string s:         return Create(s,               multiValueDelimiter);
@@ -201,10 +213,10 @@ public sealed class EntityValue : OneOfBase<DBNull, string, int, double, bool, E
                     if (string.IsNullOrWhiteSpace(schemaProperty.EnumType))
                         return new ErrorBuilder(ErrorCode.SchemaInvalidMissingEnum);
 
-                    if (schemaProperty.Format == null || !schemaProperty.Format.Any())
+                    if (schemaProperty.Values == null || !schemaProperty.Values.Any())
                         return new ErrorBuilder(ErrorCode.SchemaInvalidNoEnumValues);
 
-                    if (schemaProperty.Format.Contains(s, StringComparer.OrdinalIgnoreCase))
+                    if (schemaProperty.Values.Contains(s, StringComparer.OrdinalIgnoreCase))
                         return (new EntityValue(new Enumeration(schemaProperty.EnumType, s)), true);
 
                     break;
@@ -218,8 +230,21 @@ public sealed class EntityValue : OneOfBase<DBNull, string, int, double, bool, E
                 }
                 case SchemaPropertyType.Date:
                 {
-                    if (DateTime.TryParse(s, out var dt)) //TODO format
-                        return (new EntityValue(dt), true);
+                    if (schemaProperty.DateInputFormats != null &&
+                        DateTime.TryParseExact(
+                            s,
+                            schemaProperty.DateInputFormats.ToArray(),
+                            null,
+                            DateTimeStyles.None,
+                            out var dt1
+                        ))
+
+                    {
+                        return (new EntityValue(dt1, schemaProperty.DateOutputFormat), true);
+                    }
+
+                    if (DateTime.TryParse(s, out var dt))
+                        return (new EntityValue(dt, schemaProperty.DateOutputFormat), true);
 
                     break;
                 }
@@ -271,10 +296,10 @@ public sealed class EntityValue : OneOfBase<DBNull, string, int, double, bool, E
                     if (schemaProperty.EnumType == null)
                         return new ErrorBuilder(ErrorCode.SchemaInvalidMissingEnum);
 
-                    if (schemaProperty.Format == null || !schemaProperty.Format.Any())
+                    if (schemaProperty.Values == null || !schemaProperty.Values.Any())
                         return new ErrorBuilder(ErrorCode.SchemaInvalidNoEnumValues);
 
-                    if (schemaProperty.Format.Contains(e.Value, StringComparer.OrdinalIgnoreCase))
+                    if (schemaProperty.Values.Contains(e.Value, StringComparer.OrdinalIgnoreCase))
                     {
                         if (schemaProperty.EnumType == e.Type)
                             return (this, false);
@@ -294,7 +319,7 @@ public sealed class EntityValue : OneOfBase<DBNull, string, int, double, bool, E
             return schemaProperty.Type switch
             {
                 SchemaPropertyType.String => (
-                    new EntityValue(dt.ToString(Constants.DateTimeFormat)), true),
+                    new EntityValue(dt.ToString(DateOutputFormat)), true),
                 SchemaPropertyType.Date => (this, false),
                 _                       => CouldNotConvert(dt)
             };
@@ -327,11 +352,14 @@ public sealed class EntityValue : OneOfBase<DBNull, string, int, double, bool, E
 
             var sp = new SchemaProperty
             {
-                EnumType     = schemaProperty.EnumType,
-                Format       = schemaProperty.Format,
-                Multiplicity = Multiplicity.ExactlyOne,
-                Regex        = schemaProperty.Regex,
-                Type         = schemaProperty.Type
+                EnumType         = schemaProperty.EnumType,
+                Values           = schemaProperty.Values,
+                ErrorBehaviour   = schemaProperty.ErrorBehaviour,
+                DateInputFormats = schemaProperty.DateInputFormats,
+                DateOutputFormat = schemaProperty.DateOutputFormat,
+                Multiplicity     = Multiplicity.ExactlyOne,
+                Regex            = schemaProperty.Regex,
+                Type             = schemaProperty.Type
             };
 
             var newList = list.Select(x => x.TryConvert(sp))
@@ -344,7 +372,9 @@ public sealed class EntityValue : OneOfBase<DBNull, string, int, double, bool, E
                 )
                 .Map(
                     x =>
-                        x.changed ? (new EntityValue(x.list), true) : (this, false)
+                        x.changed
+                            ? (new EntityValue(x.list, schemaProperty.DateOutputFormat), true)
+                            : (this, false)
                 );
 
             return newList;
@@ -358,6 +388,9 @@ public sealed class EntityValue : OneOfBase<DBNull, string, int, double, bool, E
             return false;
 
         if (Index != other.Index)
+            return false;
+
+        if (OutputFormat != other.OutputFormat)
             return false;
 
         var r = Match(
@@ -401,7 +434,7 @@ public sealed class EntityValue : OneOfBase<DBNull, string, int, double, bool, E
             x => x.ToString(Constants.DoubleFormat),
             x => x.ToString(),
             x => x.ToString(),
-            x => x.ToString(Constants.DateTimeFormat),
+            x => x.ToString(DateOutputFormat),
             x => x.ToString(),
             x => x.Count + " elements"
         );
