@@ -135,12 +135,26 @@ public sealed class Entity : IEnumerable<EntityProperty>, IEquatable<Entity>
     /// <summary>
     /// Try to get the value of a particular property
     /// </summary>
-    public Maybe<EntityValue> TryGetValue(string key)
-    {
-        if (Dictionary.TryGetValue(key, out var ep))
-            return ep.NewValue ?? ep.BaseValue;
+    public Maybe<EntityValue> TryGetValue(string key) => TryGetValue(new EntityPropertyKey(key));
 
-        return Maybe<EntityValue>.None;
+    /// <summary>
+    /// Try to get the value of a particular property
+    /// </summary>
+    public Maybe<EntityValue> TryGetValue(EntityPropertyKey key)
+    {
+        var (firstKey, remainder) = key.Split();
+
+        if (!Dictionary.TryGetValue(firstKey, out var ep))
+            return Maybe<EntityValue>.None;
+
+        if (remainder.HasNoValue)
+            return ep.BestValue;
+
+        if (!ep.BestValue.TryPickT7(out var nested, out _))
+            return
+                Maybe<EntityValue>.None; //We can't get the nested property as this is not an entity
+
+        return nested.TryGetValue(remainder.Value);
     }
 
     /// <inheritdoc />

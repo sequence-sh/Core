@@ -32,7 +32,9 @@ public sealed class EntityGetValue : CompoundStep<StringStream>
         if (propertyResult.IsFailure)
             return propertyResult.ConvertFailure<StringStream>();
 
-        var entityValue = entity.Value.TryGetValue(propertyResult.Value)
+        var epk = new EntityPropertyKey(propertyResult.Value);
+
+        var entityValue = entity.Value.TryGetValue(epk)
             .Map(x => x.GetString());
 
         string resultString = entityValue.HasValue ? entityValue.Value : "";
@@ -74,6 +76,8 @@ public sealed class EntityGetValueStepFactory : SimpleStepFactory<EntityGetValue
     /// </summary>
     public static SimpleStepFactory<EntityGetValue, StringStream> Instance { get; } =
         new EntityGetValueStepFactory();
+
+    //TODO step serializer
 }
 
 }

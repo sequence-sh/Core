@@ -291,6 +291,8 @@ Print 'Comments!'",
                 "(Foo: (Bar: (Baz: \"b\")))"
             );
 
+            yield return new DeserializationTestInstance("(Foo.Bar.Baz:'b')['Foo.Bar.Baz']", "b");
+
             yield return new DeserializationTestInstance(
                 "(Foo.Bar:'a' Foo.Baz:'b')",
                 "(Foo: (Bar: \"a\" Baz: \"b\"))"

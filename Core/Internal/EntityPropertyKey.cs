@@ -10,24 +10,44 @@ namespace Reductech.EDR.Core.Internal
 /// The name of an entity property
 /// </summary>
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
-public record EntityPropertyKey(IReadOnlyList<string> Values)
+public record EntityPropertyKey
     #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
 {
     /// <summary>
+    /// Create a new EntityPropertyKey
+    /// </summary>
+    public EntityPropertyKey(IEnumerable<string> values)
+    {
+        KeyNames =
+            values.SelectMany(
+                    x => x.Split(
+                        ".",
+                        StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries
+                    )
+                )
+                .ToList();
+    }
+
+    /// <summary>
+    /// The property Keys
+    /// </summary>
+    public IReadOnlyList<string> KeyNames { get; }
+
+    /// <summary>
     /// Create an EntityPropertyKey from a string
     /// </summary>
-    public EntityPropertyKey(string s) : this(new List<string>() { s }) { }
+    public EntityPropertyKey(string s) : this(new List<string> { s }) { }
 
     /// <inheritdoc />
     public override int GetHashCode()
     {
-        if (Values.Count == 0)
+        if (KeyNames.Count == 0)
             return 0;
 
         return HashCode.Combine(
-            Values.Count,
-            Values.First().ToLowerInvariant().GetHashCode(),
-            Values.Last().ToLowerInvariant().GetHashCode()
+            KeyNames.Count,
+            KeyNames.First().ToLowerInvariant().GetHashCode(),
+            KeyNames.Last().ToLowerInvariant().GetHashCode()
         );
     }
 
@@ -36,18 +56,18 @@ public record EntityPropertyKey(IReadOnlyList<string> Values)
     /// </summary>
     public (string firstKey, Maybe<EntityPropertyKey> remainder) Split()
     {
-        if (Values.Count == 1)
-            return (Values.First(), Maybe<EntityPropertyKey>.None);
+        if (KeyNames.Count == 1)
+            return (KeyNames.First(), Maybe<EntityPropertyKey>.None);
 
-        var remainder = new EntityPropertyKey(Values.Skip(1).ToList());
+        var remainder = new EntityPropertyKey(KeyNames.Skip(1).ToList());
 
-        return (Values.First(), remainder);
+        return (KeyNames.First(), remainder);
     }
 
     /// <summary>
     /// String representation of this String
     /// </summary>
-    public string AsString => string.Join(".", Values);
+    public string AsString => string.Join(".", KeyNames);
 
     /// <inheritdoc />
     public override string ToString() => AsString;
@@ -61,7 +81,7 @@ public record EntityPropertyKey(IReadOnlyList<string> Values)
         if (ReferenceEquals(this, other))
             return true;
 
-        return Values.SequenceEqual(other.Values, StringComparer.OrdinalIgnoreCase);
+        return KeyNames.SequenceEqual(other.KeyNames, StringComparer.OrdinalIgnoreCase);
     }
 }
 
