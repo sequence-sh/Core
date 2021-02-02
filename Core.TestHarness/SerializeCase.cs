@@ -48,7 +48,7 @@ public abstract partial class StepTestBase<TStep, TOutput>
 
     public static SerializeCase CreateDefaultSerializeCase()
     {
-        var (step, values) = CreateStepWithDefaultOrArbitraryValuesAsync();
+        var (step, values) = CreateStepWithDefaultOrArbitraryValues();
 
         var stepName           = new TStep().StepFactory.TypeName;
         var expectedSCLBuilder = new StringBuilder();

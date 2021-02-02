@@ -54,6 +54,17 @@ public partial class ElementAtIndexTests : StepTestBase<ElementAtIndex<StringStr
     }
 
     /// <inheritdoc />
+    protected override IEnumerable<SerializeCase> SerializeCases
+    {
+        get
+        {
+            var (step, _) = CreateStepWithDefaultOrArbitraryValues();
+
+            yield return new SerializeCase("Default", step, "[\"Foo0\", \"Foo1\", \"Foo2\"][3]");
+        }
+    }
+
+    /// <inheritdoc />
     protected override IEnumerable<ErrorCase> ErrorCases
     {
         get

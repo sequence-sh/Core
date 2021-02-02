@@ -20,7 +20,7 @@ namespace Reductech.EDR.Core.TestHarness
 public abstract partial class StepTestBase<TStep, TOutput>
 {
     protected static (TStep step, Dictionary<string, string> values)
-        CreateStepWithDefaultOrArbitraryValuesAsync()
+        CreateStepWithDefaultOrArbitraryValues()
     {
         var instance = new TStep();
 

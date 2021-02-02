@@ -6,6 +6,7 @@ using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
+using Reductech.EDR.Core.Internal.Serialization;
 
 namespace Reductech.EDR.Core.Steps
 {
@@ -62,6 +63,9 @@ public sealed class EntityGetValue : CompoundStep<StringStream>
 
     /// <inheritdoc />
     public override IStepFactory StepFactory => EntityGetValueStepFactory.Instance;
+
+    /// <inheritdoc />
+    public override bool ShouldBracketWhenSerialized => false;
 }
 
 /// <summary>
@@ -77,7 +81,8 @@ public sealed class EntityGetValueStepFactory : SimpleStepFactory<EntityGetValue
     public static SimpleStepFactory<EntityGetValue, StringStream> Instance { get; } =
         new EntityGetValueStepFactory();
 
-    //TODO step serializer
+    /// <inheritdoc />
+    public override IStepSerializer Serializer => EntityGetValueSerializer.Instance;
 }
 
 }
