@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Newtonsoft.Json.Linq;
 using Reductech.EDR.Core.Entities;
+using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Internal.Serialization;
 
@@ -50,34 +51,48 @@ public sealed class Entity : IEnumerable<EntityProperty>, IEquatable<Entity>
     /// <summary>
     /// Creates a new Entity
     /// </summary>
-    public static Entity Create(params (string key, object? property)[] properties) =>
-        Create(properties.AsEnumerable());
+    public static Entity Create(params (string key, object? property)[] properties) => Create(
+        properties.Select(x => (new EntityPropertyKey(x.key), x.property))
+    );
 
     /// <summary>
     /// Create and entity from a JObject
     /// </summary>
     public static Entity Create(JObject jObject)
     {
-        return Create(jObject.Properties().Select(x => (x.Name, x.Value as object))!);
+        return Create(
+            jObject.Properties().Select(x => (new EntityPropertyKey(x.Name), x.Value as object))!
+        );
     }
 
     /// <summary>
     /// Creates a new Entity
     /// </summary>
     public static Entity Create(
-        IEnumerable<(string key, object? property)> properties,
+        IEnumerable<(EntityPropertyKey key, object? property)> properties,
         char? multiValueDelimiter = null)
     {
-        var dict = properties.Select(
-                (x, i) =>
-                    new EntityProperty(
-                        x.key,
-                        EntityValue.CreateFromObject(x.property, multiValueDelimiter),
-                        null,
-                        i
-                    )
-            )
-            .ToImmutableDictionary(x => x.Name, StringComparer.OrdinalIgnoreCase);
+        var dict =
+            properties.Select(
+                    p =>
+                    {
+                        (string firstKey, Maybe<EntityPropertyKey> remainder) = p.key.Split();
+                        return (firstKey, remainder, p.property);
+                    }
+                )
+                .GroupBy(x => x.firstKey, x => (x.remainder, x.property))
+                .Select(
+                    (group, i) =>
+                    {
+                        var ev = EntityValue.CreateFromProperties(
+                            group.ToList(),
+                            multiValueDelimiter
+                        );
+
+                        return new EntityProperty(group.Key, ev, null, i);
+                    }
+                )
+                .ToImmutableDictionary(x => x.Name);
 
         return new Entity(dict);
     }
@@ -101,6 +116,20 @@ public sealed class Entity : IEnumerable<EntityProperty>, IEquatable<Entity>
         }
 
         return new Entity(newDict);
+    }
+
+    /// <summary>
+    /// Combine two entities.
+    /// Properties on the other entity take precedence.
+    /// </summary>
+    public Entity Combine(Entity other)
+    {
+        var current = this;
+
+        foreach (var ep in other)
+            current = current.WithProperty(ep.Name, ep.BestValue);
+
+        return current;
     }
 
     /// <summary>

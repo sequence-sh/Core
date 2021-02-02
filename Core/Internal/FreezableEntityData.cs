@@ -11,58 +11,40 @@ namespace Reductech.EDR.Core.Internal
 /// <summary>
 /// The data used by a Freezable Step.
 /// </summary>
-public sealed class FreezableEntityData : IEquatable<FreezableEntityData>
+public record FreezableEntityData(
+    IReadOnlyDictionary<EntityPropertyKey, FreezableStepProperty> EntityProperties,
+    IErrorLocation Location)
 {
-    /// <summary>
-    /// Creates a new FreezableStepData
-    /// </summary>
-    public FreezableEntityData(
-        IReadOnlyDictionary<string, FreezableStepProperty> entityProperties,
-        IErrorLocation location)
-    {
-        EntityProperties = entityProperties;
-        Location         = location;
-    }
-
-    /// <summary>
-    /// The step properties.
-    /// </summary>
-    public IReadOnlyDictionary<string, FreezableStepProperty> EntityProperties { get; }
-
-    /// <summary>
-    /// The location where this data comes from.
-    /// </summary>
-    public IErrorLocation Location { get; }
-
     /// <summary>
     /// Gets a variable name.
     /// </summary>
-    public Result<VariableName, IError> GetVariableName(string name, string typeName) =>
+    public Result<VariableName, IError> GetVariableName(EntityPropertyKey name, string typeName) =>
         EntityProperties.TryFindOrFail(
                 name,
-                () => ErrorHelper.MissingParameterError(name).WithLocation(Location)
+                () => ErrorHelper.MissingParameterError(name.AsString).WithLocation(Location)
             )
-            .Bind(x => x.AsVariableName(name));
+            .Bind(x => x.AsVariableName(name.AsString));
 
     /// <summary>
     /// Gets an argument.
     /// </summary>
-    public Result<IFreezableStep, IError> GetStep(string name, string typeName) => EntityProperties
-        .TryFindOrFail(
-            name,
-            () => ErrorHelper.MissingParameterError(name).WithLocation(Location)
-        )
-        .Map(x => x.ConvertToStep());
+    public Result<IFreezableStep, IError> GetStep(EntityPropertyKey name, string typeName) =>
+        EntityProperties
+            .TryFindOrFail(
+                name,
+                () => ErrorHelper.MissingParameterError(name.AsString).WithLocation(Location)
+            )
+            .Map(x => x.ConvertToStep());
 
     /// <summary>
     /// Gets a list argument.
     /// </summary>
     public Result<IReadOnlyList<IFreezableStep>, IError>
-        GetStepList(string name, string typeName) => EntityProperties.TryFindOrFail(
+        GetStepList(EntityPropertyKey name, string typeName) => EntityProperties.TryFindOrFail(
             name,
-            () => ErrorHelper.MissingParameterError(name).WithLocation(Location)
+            () => ErrorHelper.MissingParameterError(name.AsString).WithLocation(Location)
         )
-        .Bind(x => x.AsStepList(name));
+        .Bind(x => x.AsStepList(name.AsString));
 
     /// <inheritdoc />
     public override string ToString()
@@ -77,7 +59,7 @@ public sealed class FreezableEntityData : IEquatable<FreezableEntityData>
     }
 
     /// <inheritdoc />
-    public bool Equals(FreezableEntityData? other)
+    public virtual bool Equals(FreezableEntityData? other)
     {
         if (other is null)
             return false;
@@ -90,8 +72,8 @@ public sealed class FreezableEntityData : IEquatable<FreezableEntityData>
         return result;
 
         static bool DictionariesEqual1(
-            IReadOnlyDictionary<string, FreezableStepProperty> dict1,
-            IReadOnlyDictionary<string, FreezableStepProperty> dict2)
+            IReadOnlyDictionary<EntityPropertyKey, FreezableStepProperty> dict1,
+            IReadOnlyDictionary<EntityPropertyKey, FreezableStepProperty> dict2)
         {
             if (dict1.Count != dict2.Count)
                 return false;
@@ -110,24 +92,7 @@ public sealed class FreezableEntityData : IEquatable<FreezableEntityData>
     }
 
     /// <inheritdoc />
-    public override bool Equals(object? obj) => ReferenceEquals(this, obj)
-                                             || obj is FreezableEntityData other
-                                             && Equals(this, other);
-
-    /// <inheritdoc />
     public override int GetHashCode() => EntityProperties.Count;
-
-    /// <summary>
-    /// Equals Operator
-    /// </summary>
-    public static bool operator ==(FreezableEntityData? left, FreezableEntityData? right) =>
-        Equals(left, right);
-
-    /// <summary>
-    /// Not Equals Operator
-    /// </summary>
-    public static bool operator !=(FreezableEntityData? left, FreezableEntityData? right) =>
-        !Equals(left, right);
 
     /// <summary>
     /// Gets the variables set by steps in this FreezableStepData.

@@ -530,12 +530,12 @@ public static class SCLParsing
             return new FreezableStepProperty(step, new TextLocation(context));
         }
 
-        private Result<IReadOnlyDictionary<string, FreezableStepProperty>, IError>
+        private Result<IReadOnlyDictionary<EntityPropertyKey, FreezableStepProperty>, IError>
             AggregateEntityProperties(
                 IEnumerable<SCLParser.EntityPropertyContext> entityProperties,
                 IErrorLocation location)
         {
-            var l      = new List<(string key, FreezableStepProperty member)>();
+            var l      = new List<(EntityPropertyKey key, FreezableStepProperty member)>();
             var errors = new List<IError>();
 
             foreach (var r in entityProperties.Select(GetEntityProperty))
@@ -558,9 +558,10 @@ public static class SCLParsing
             }
 
             if (errors.Any())
-                return Result.Failure<IReadOnlyDictionary<string, FreezableStepProperty>, IError>(
-                    ErrorList.Combine(errors)
-                );
+                return Result
+                    .Failure<IReadOnlyDictionary<EntityPropertyKey, FreezableStepProperty>, IError>(
+                        ErrorList.Combine(errors)
+                    );
 
             var dict = l.ToDictionary(x => x.key, x => x.member);
 
@@ -604,15 +605,16 @@ public static class SCLParsing
             return dict;
         }
 
-        private Result<(string name, FreezableStepProperty value), IError> GetEntityProperty(
-            SCLParser.EntityPropertyContext context)
+        private Result<(EntityPropertyKey names, FreezableStepProperty value), IError>
+            GetEntityProperty(SCLParser.EntityPropertyContext context)
         {
-            var key = context.NAME().Symbol.Text;
+            var key = new EntityPropertyKey(context.NAME().Select(x => x.Symbol.Text).ToList());
 
             var value = Visit(context.term());
 
             if (value.IsFailure)
-                return value.ConvertFailure<(string name, FreezableStepProperty value)>();
+                return value
+                    .ConvertFailure<(EntityPropertyKey name, FreezableStepProperty value)>();
 
             return (key, value.Value);
         }

@@ -123,39 +123,6 @@ public abstract partial class StepTestBase<TStep, TOutput>
         }
     }
 
-    private static async Task MatchStepPropertyInfoAsync(
-        PropertyInfo stepPropertyInfo,
-        Func<PropertyInfo, Task> variableNameAction,
-        Func<PropertyInfo, Task> stepPropertyAction,
-        Func<PropertyInfo, Task> stepListAction)
-    {
-        var actionsToDo = new List<Func<PropertyInfo, Task>>();
-
-        if (stepPropertyInfo.IsDecoratedWith<VariableNameAttribute>())
-            actionsToDo.Add(variableNameAction);
-
-        if (stepPropertyInfo.IsDecoratedWith<StepPropertyAttribute>())
-            actionsToDo.Add(stepPropertyAction);
-
-        if (stepPropertyInfo.IsDecoratedWith<StepListPropertyAttribute>())
-            actionsToDo.Add(stepListAction);
-
-        switch (actionsToDo.Count)
-        {
-            case 0:
-                throw new XunitException(
-                    $"{stepPropertyInfo.Name} does not have a valid attribute"
-                );
-            case 1:
-                await actionsToDo.Single()(stepPropertyInfo);
-                return;
-            default:
-                throw new XunitException(
-                    $"{stepPropertyInfo.Name} has more than one step property base attribute"
-                );
-        }
-    }
-
     private static T MatchStepPropertyInfo<T>(
         PropertyInfo stepPropertyInfo,
         Func<PropertyInfo, T> variableNameAction,
@@ -343,10 +310,14 @@ public abstract partial class StepTestBase<TStep, TOutput>
 
         static Entity CreateSimpleEntity(ref int index1)
         {
-            var pairs = new List<(string, object?)> { ("Prop1", $"Val{index1}") };
+            var pairs =
+                new List<(EntityPropertyKey, object?)>
+                {
+                    (new EntityPropertyKey("Prop1"), $"Val{index1}")
+                };
 
             index1++;
-            pairs.Add(("Prop2", $"Val{index1}"));
+            pairs.Add((new EntityPropertyKey("Prop2"), $"Val{index1}"));
             index1++;
 
             var entity = Entity.Create(pairs);

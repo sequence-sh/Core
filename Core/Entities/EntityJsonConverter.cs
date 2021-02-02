@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
+using Reductech.EDR.Core.Internal;
 
 namespace Reductech.EDR.Core.Entities
 {
@@ -61,7 +62,9 @@ public class EntityJsonConverter : JsonConverter
         JsonSerializer serializer)
     {
         var objectDict = serializer.Deserialize<Dictionary<string, object>>(reader);
-        var entity     = Entity.Create(objectDict!.Select(x => (x.Key, x.Value))!);
+
+        var entity =
+            Entity.Create(objectDict!.Select(x => (new EntityPropertyKey(x.Key), x.Value))!);
 
         return entity;
     }

@@ -169,7 +169,7 @@ public static class CSVReader
         {
             var dict = row as IDictionary<string, object>;
 
-            var values = dict!.Select(x => (x.Key, x.Value));
+            var values = dict!.Select(x => (new EntityPropertyKey(x.Key), x.Value));
 
             var entity = Entity.Create(values!, multiValueDelimiter);
             yield return entity;
