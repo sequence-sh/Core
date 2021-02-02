@@ -264,8 +264,16 @@ Print 'Comments!'",
                 "1"
             );
 
-            yield return new DeserializationTestInstance(@"['a','b','c'][0] | Print", 'a');
+            yield return new DeserializationTestInstance(@"['a','b','c'][0] | Print",     'a');
+            yield return new DeserializationTestInstance(@"['a','b','c'][(1+1)] | Print", 'c');
+
             yield return new DeserializationTestInstance(@"(Foo:'a')['Foo'] | Print", 'a');
+            yield return new DeserializationTestInstance(@"(Foo:'a')['FOO'] | Print", 'a');
+
+            yield return new DeserializationTestInstance(
+                @"(Foo:'a')[(StringToCase 'foo' 'Upper')] | Print",
+                'a'
+            );
 
             yield return new DeserializationTestInstance(
                 @"ForEach ['a','b','c'] (Print <char>) <char>",
