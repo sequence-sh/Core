@@ -14,26 +14,17 @@ namespace Reductech.EDR.Core.Internal
 /// <summary>
 /// A step that creates and returns an entity.
 /// </summary>
-public class CreateEntityStep : IStep<Entity>
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+public record CreateEntityStep
+    (IReadOnlyDictionary<EntityPropertyKey, IStep> Properties) : IStep<Entity>
+    #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
 {
-    /// <summary>
-    /// Create a new CreateEntityStep
-    /// </summary>
-    /// <param name="properties"></param>
-    public CreateEntityStep(IReadOnlyDictionary<string, IStep> properties) =>
-        Properties = properties;
-
-    /// <summary>
-    /// The entity properties
-    /// </summary>
-    public IReadOnlyDictionary<string, IStep> Properties { get; }
-
     /// <inheritdoc />
     public async Task<Result<Entity, IError>> Run(
         IStateMonad stateMonad,
         CancellationToken cancellationToken)
     {
-        var pairs = new List<(string, object?)>();
+        var pairs = new List<(EntityPropertyKey, object?)>();
 
         foreach (var (key, step) in Properties)
         {

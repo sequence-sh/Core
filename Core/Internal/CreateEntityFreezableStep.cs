@@ -34,7 +34,7 @@ public class CreateEntityFreezableStep : IFreezableStep
     /// <inheritdoc />
     public Result<IStep, IError> TryFreeze(StepContext stepContext)
     {
-        var results = new List<Result<(string name, IStep value), IError>>();
+        var results = new List<Result<(EntityPropertyKey name, IStep value), IError>>();
 
         foreach (var (propertyName, stepMember) in FreezableEntityData.EntityProperties)
         {

@@ -270,6 +270,8 @@ Print 'Comments!'",
             yield return new DeserializationTestInstance(@"(Foo:'a')['Foo'] | Print", 'a');
             yield return new DeserializationTestInstance(@"(Foo:'a')['FOO'] | Print", 'a');
 
+            yield return new DeserializationTestInstance(@"(Foo:'a', Bar:'b')['Bar'] | Print", 'b');
+
             yield return new DeserializationTestInstance(
                 @"(Foo:'a')[(StringToCase 'foo' 'Upper')] | Print",
                 'a'
@@ -280,6 +282,20 @@ Print 'Comments!'",
                 "a",
                 "b",
                 "c"
+            );
+
+            yield return new DeserializationTestInstance("(Foo.Bar:'b')", "(Foo: (Bar: \"b\"))");
+
+            yield return new DeserializationTestInstance(
+                "(Foo.Bar.Baz:'b')",
+                "(Foo: (Bar: (Baz: \"b\")))"
+            );
+
+            yield return new DeserializationTestInstance("(Foo.Bar.Baz:'b')['Foo.Bar.Baz']", "b");
+
+            yield return new DeserializationTestInstance(
+                "(Foo.Bar:'a' Foo.Baz:'b')",
+                "(Foo: (Bar: \"a\" Baz: \"b\"))"
             );
 
             yield return new DeserializationTestInstance(

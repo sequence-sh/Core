@@ -6,6 +6,7 @@ using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
+using Reductech.EDR.Core.Internal.Serialization;
 
 namespace Reductech.EDR.Core.Steps
 {
@@ -32,7 +33,9 @@ public sealed class EntityGetValue : CompoundStep<StringStream>
         if (propertyResult.IsFailure)
             return propertyResult.ConvertFailure<StringStream>();
 
-        var entityValue = entity.Value.TryGetValue(propertyResult.Value)
+        var epk = new EntityPropertyKey(propertyResult.Value);
+
+        var entityValue = entity.Value.TryGetValue(epk)
             .Map(x => x.GetString());
 
         string resultString = entityValue.HasValue ? entityValue.Value : "";
@@ -60,6 +63,9 @@ public sealed class EntityGetValue : CompoundStep<StringStream>
 
     /// <inheritdoc />
     public override IStepFactory StepFactory => EntityGetValueStepFactory.Instance;
+
+    /// <inheritdoc />
+    public override bool ShouldBracketWhenSerialized => false;
 }
 
 /// <summary>
@@ -74,6 +80,9 @@ public sealed class EntityGetValueStepFactory : SimpleStepFactory<EntityGetValue
     /// </summary>
     public static SimpleStepFactory<EntityGetValue, StringStream> Instance { get; } =
         new EntityGetValueStepFactory();
+
+    /// <inheritdoc />
+    public override IStepSerializer Serializer => EntityGetValueSerializer.Instance;
 }
 
 }

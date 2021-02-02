@@ -515,8 +515,8 @@ public static class SCLParsing
         public override Result<FreezableStepProperty, IError> VisitEntity(
             SCLParser.EntityContext context)
         {
-            var members = AggregateNamedArguments(
-                context.namedArgument(),
+            var members = AggregateEntityProperties(
+                context.entityProperty(),
                 new TextLocation(context)
             );
 
@@ -528,6 +528,44 @@ public static class SCLParsing
             );
 
             return new FreezableStepProperty(step, new TextLocation(context));
+        }
+
+        private Result<IReadOnlyDictionary<EntityPropertyKey, FreezableStepProperty>, IError>
+            AggregateEntityProperties(
+                IEnumerable<SCLParser.EntityPropertyContext> entityProperties,
+                IErrorLocation location)
+        {
+            var l      = new List<(EntityPropertyKey key, FreezableStepProperty member)>();
+            var errors = new List<IError>();
+
+            foreach (var r in entityProperties.Select(GetEntityProperty))
+            {
+                if (r.IsFailure)
+                    errors.Add(r.Error);
+                else
+                    l.Add(r.Value);
+            }
+
+            foreach (var duplicateKeys in l.GroupBy(x => x.key).Where(x => x.Count() > 1))
+            {
+                errors.Add(
+                    new SingleError(
+                        location,
+                        ErrorCode.DuplicateParameter,
+                        duplicateKeys.Key
+                    )
+                );
+            }
+
+            if (errors.Any())
+                return Result
+                    .Failure<IReadOnlyDictionary<EntityPropertyKey, FreezableStepProperty>, IError>(
+                        ErrorList.Combine(errors)
+                    );
+
+            var dict = l.ToDictionary(x => x.key, x => x.member);
+
+            return dict;
         }
 
         private Result<IReadOnlyDictionary<string, FreezableStepProperty>, IError>
@@ -565,6 +603,20 @@ public static class SCLParsing
             var dict = l.ToDictionary(x => x.key, x => x.member);
 
             return dict;
+        }
+
+        private Result<(EntityPropertyKey names, FreezableStepProperty value), IError>
+            GetEntityProperty(SCLParser.EntityPropertyContext context)
+        {
+            var key = new EntityPropertyKey(context.NAME().Select(x => x.Symbol.Text).ToList());
+
+            var value = Visit(context.term());
+
+            if (value.IsFailure)
+                return value
+                    .ConvertFailure<(EntityPropertyKey name, FreezableStepProperty value)>();
+
+            return (key, value.Value);
         }
 
         private Result<(string name, FreezableStepProperty value), IError> GetNamedArgument(

@@ -75,6 +75,28 @@ public static class Extensions
     /// </summary>
     public static IEnumerable<T> WhereNotNull<T>(this IEnumerable<T?> source) where T : class =>
         (from val in source where val != null select val)!;
+
+    /// <summary>
+    /// Tries to get the first two elements of a sequence
+    /// </summary>
+    public static Maybe<(T first, T second)> GetFirstTwo<T>(this IEnumerable<T> enumerable)
+    {
+        var first  = Maybe<T>.None;
+        var second = Maybe<T>.None;
+
+        foreach (var t in enumerable.Take(2))
+        {
+            if (first.HasNoValue)
+                first = t;
+            else
+                second = t;
+        }
+
+        if (first.HasValue && second.HasValue)
+            return (first.Value, second.Value);
+
+        return Maybe<(T first, T second)>.None;
+    }
 }
 
 }

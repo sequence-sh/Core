@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Globalization;
 using System.Linq;
@@ -40,6 +41,98 @@ public sealed class EntityValue : OneOfBase<DBNull, string, int, double, bool, E
     public string DateOutputFormat => string.IsNullOrWhiteSpace(OutputFormat)
         ? Constants.DateTimeFormat
         : OutputFormat;
+
+    /// <summary>
+    /// Create an entity from structured entity properties
+    /// </summary>
+    public static EntityValue CreateFromProperties(
+        IReadOnlyList<(Maybe<EntityPropertyKey> key, object? argValue)> properties,
+        char? multiValueDelimiter)
+    {
+        if (properties.Count == 0)
+            return new EntityValue(DBNull.Value);
+
+        if (properties.Count == 1 && properties.Single().key.HasNoValue)
+            return CreateFromObject(properties.Single().argValue, multiValueDelimiter);
+
+        var entityProperties =
+            new Dictionary<string, EntityProperty>(StringComparer.OrdinalIgnoreCase);
+
+        void SetEntityProperty(string key, EntityValue ev)
+        {
+            EntityProperty newProperty;
+
+            if (entityProperties.TryGetValue(key, out var existingValue))
+            {
+                if (ev.IsT7)
+                {
+                    if (existingValue.BestValue.IsT7)
+                    {
+                        var nEntity = existingValue.BestValue.AsT7.Combine(ev.AsT7);
+
+                        newProperty = new EntityProperty(
+                            key,
+                            new EntityValue(nEntity),
+                            null,
+                            existingValue.Order
+                        );
+                    }
+                    else
+                    {
+                        //Ignore the old property
+                        newProperty = new EntityProperty(key, ev, null, existingValue.Order);
+                    }
+                }
+                else if (existingValue.BestValue.IsT7)
+                {
+                    var nEntity =
+                        existingValue.BestValue.AsT7.WithProperty(Entity.PrimitiveKey, ev);
+
+                    newProperty = new EntityProperty(
+                        key,
+                        new EntityValue(nEntity),
+                        null,
+                        existingValue.Order
+                    );
+                }
+                else //overwrite the existing property
+                    newProperty = new EntityProperty(key, ev, null, existingValue.Order);
+            }
+            else //New property
+                newProperty = new EntityProperty(key, ev, null, entityProperties.Count);
+
+            entityProperties[key] = newProperty;
+        }
+
+        foreach (var (key, argValue) in properties)
+        {
+            if (key.HasNoValue)
+            {
+                var ev = CreateFromObject(argValue, multiValueDelimiter);
+
+                if (ev.IsT7)
+                    foreach (var entityProperty in ev.AsT7.Dictionary)
+                        SetEntityProperty(entityProperty.Key, entityProperty.Value.BestValue);
+                else
+                    SetEntityProperty(Entity.PrimitiveKey, ev);
+            }
+            else
+            {
+                var (firstKey, remainder) = key.Value.Split();
+
+                var ev = CreateFromProperties(
+                    new[] { (remainder, argValue) },
+                    multiValueDelimiter
+                );
+
+                SetEntityProperty(firstKey, ev);
+            }
+        }
+
+        var newEntity = new Entity(entityProperties.ToImmutableDictionary());
+
+        return new EntityValue(newEntity);
+    }
 
     /// <summary>
     /// Create an entity from an object

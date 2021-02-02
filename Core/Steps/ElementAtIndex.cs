@@ -6,6 +6,7 @@ using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
+using Reductech.EDR.Core.Internal.Serialization;
 
 namespace Reductech.EDR.Core.Steps
 {
@@ -21,7 +22,7 @@ public sealed class ElementAtIndex<T> : CompoundStep<T>
     /// </summary>
     [StepProperty(1)]
     [Required]
-    public IStep<Core.Array<T>> Array { get; set; } = null!;
+    public IStep<Array<T>> Array { get; set; } = null!;
 
     /// <summary>
     /// The index to get the element at.
@@ -57,6 +58,9 @@ public sealed class ElementAtIndex<T> : CompoundStep<T>
 
     /// <inheritdoc />
     public override IStepFactory StepFactory => ElementAtIndexStepFactory.Instance;
+
+    /// <inheritdoc />
+    public override bool ShouldBracketWhenSerialized => false;
 }
 
 /// <summary>
@@ -76,6 +80,9 @@ public sealed class ElementAtIndexStepFactory : GenericStepFactory
 
     /// <inheritdoc />
     public override string OutputTypeExplanation => "T";
+
+    /// <inheritdoc />
+    public override IStepSerializer Serializer => ElementAtIndexSerializer.Instance;
 
     /// <inheritdoc />
     protected override ITypeReference GetOutputTypeReference(ITypeReference memberTypeReference) =>
