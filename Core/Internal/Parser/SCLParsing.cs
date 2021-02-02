@@ -342,22 +342,13 @@ public static class SCLParsing
             );
         }
 
-        /// <inheritdoc />
-        public override Result<FreezableStepProperty, IError> VisitQuotedString(
-            SCLParser.QuotedStringContext context)
+        private static string GetString(SCLParser.QuotedStringContext context)
         {
             string s = context.DOUBLEQUOTEDSTRING() != null
                 ? UnescapeDoubleQuoted(context.DOUBLEQUOTEDSTRING().GetText())
                 : UnescapeSingleQuoted(context.SINGLEQUOTEDSTRING().GetText());
 
-            var stringStream = new StringStream(s);
-
-            var member = new FreezableStepProperty(
-                new StringConstantFreezable(stringStream),
-                new TextLocation(context)
-            );
-
-            return member;
+            return s;
 
             static string UnescapeDoubleQuoted(string txt)
             {
@@ -414,6 +405,22 @@ public static class SCLParsing
                     _    => null
                 };
             }
+        }
+
+        /// <inheritdoc />
+        public override Result<FreezableStepProperty, IError> VisitQuotedString(
+            SCLParser.QuotedStringContext context)
+        {
+            string s = GetString(context);
+
+            var stringStream = new StringStream(s);
+
+            var member = new FreezableStepProperty(
+                new StringConstantFreezable(stringStream),
+                new TextLocation(context)
+            );
+
+            return member;
         }
 
         /// <inheritdoc />
@@ -608,7 +615,9 @@ public static class SCLParsing
         private Result<(EntityPropertyKey names, FreezableStepProperty value), IError>
             GetEntityProperty(SCLParser.EntityPropertyContext context)
         {
-            var key = new EntityPropertyKey(context.NAME().Select(x => x.Symbol.Text).ToList());
+            var key = new EntityPropertyKey(
+                context.entityPropertyName().Select(GetString).ToList()
+            );
 
             var value = Visit(context.term());
 
@@ -617,6 +626,14 @@ public static class SCLParsing
                     .ConvertFailure<(EntityPropertyKey name, FreezableStepProperty value)>();
 
             return (key, value.Value);
+
+            static string GetString(SCLParser.EntityPropertyNameContext context)
+            {
+                if (context.NAME() != null)
+                    return context.NAME().Symbol.Text;
+
+                return Visitor.GetString(context.quotedString());
+            }
         }
 
         private Result<(string name, FreezableStepProperty value), IError> GetNamedArgument(
