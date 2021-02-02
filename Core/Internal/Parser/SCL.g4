@@ -21,8 +21,9 @@ infixOperator		: DASH
 					| GREATERTHAN ;
 infixOperation		: term infixOperator term ;
 namedArgument		: NAME COLON term ;
+entityProperty		: NAME COLON term ;
 function			: NAME (term)* (namedArgument)* ;
-entity				: OPENBRACKET (namedArgument COMMA?)*  CLOSEBRACKET ;
+entity				: OPENBRACKET (entityProperty COMMA?)*  CLOSEBRACKET ;
 bracketedStep		: OPENBRACKET step CLOSEBRACKET ;
 boolean				: TRUE | FALSE ;
 dateTime			: DATETIME ;
