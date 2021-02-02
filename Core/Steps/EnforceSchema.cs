@@ -40,18 +40,18 @@ public sealed class EnforceSchema : CompoundStep<Array<Entity>>
         if (schema.IsFailure)
             return schema.ConvertFailure<Array<Entity>>();
 
-        Maybe<ErrorBehaviour> errorBehaviour;
+        Maybe<ErrorBehavior> errorBehavior;
 
-        if (ErrorBehaviour == null)
-            errorBehaviour = Maybe<ErrorBehaviour>.None;
+        if (ErrorBehavior == null)
+            errorBehavior = Maybe<ErrorBehavior>.None;
         else
         {
-            var errorBehaviourResult = await ErrorBehaviour.Run(stateMonad, cancellationToken);
+            var errorBehaviorResult = await ErrorBehavior.Run(stateMonad, cancellationToken);
 
-            if (errorBehaviourResult.IsFailure)
-                return errorBehaviourResult.ConvertFailure<Array<Entity>>();
+            if (errorBehaviorResult.IsFailure)
+                return errorBehaviorResult.ConvertFailure<Array<Entity>>();
 
-            errorBehaviour = Maybe<ErrorBehaviour>.From(errorBehaviourResult.Value);
+            errorBehavior = Maybe<ErrorBehavior>.From(errorBehaviorResult.Value);
         }
 
         var newStream = entityStream.Value.SelectMany(ApplySchema);
@@ -61,7 +61,7 @@ public sealed class EnforceSchema : CompoundStep<Array<Entity>>
         async IAsyncEnumerable<Entity> ApplySchema(Entity entity)
         {
             await ValueTask.CompletedTask;
-            var result = schema.Value.ApplyToEntity(entity, stateMonad.Logger, errorBehaviour);
+            var result = schema.Value.ApplyToEntity(entity, stateMonad.Logger, errorBehavior);
 
             if (result.IsFailure)
                 throw new ErrorException(result.Error.WithLocation(this));
@@ -91,8 +91,8 @@ public sealed class EnforceSchema : CompoundStep<Array<Entity>>
     /// How to behave if an error occurs.
     /// </summary>
     [StepProperty(3)]
-    [DefaultValueExplanation("Use the ErrorBehaviour defined in the schema")]
-    public IStep<ErrorBehaviour>? ErrorBehaviour { get; set; } = null;
+    [DefaultValueExplanation("Use the ErrorBehavior defined in the schema")]
+    public IStep<ErrorBehavior>? ErrorBehavior { get; set; } = null;
 
     /// <inheritdoc />
     public override IStepFactory StepFactory => EnforceSchemaStepFactory.Instance;

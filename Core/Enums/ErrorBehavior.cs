@@ -4,7 +4,7 @@
 /// <summary>
 /// How to respond to a data error
 /// </summary>
-public enum ErrorBehaviour
+public enum ErrorBehavior
 {
     /// <summary>
     /// On Error: Stop the process

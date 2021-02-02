@@ -57,10 +57,10 @@ public sealed class SchemaProperty
     public string? Regex { get; set; }
 
     /// <summary>
-    /// The error behaviour, overriding the default value of the schema.
+    /// The error behavior, overriding the default value of the schema.
     /// </summary>
     [ConfigProperty(6)]
-    public ErrorBehaviour? ErrorBehaviour { get; set; }
+    public ErrorBehavior? ErrorBehavior { get; set; }
 
     /// <summary>
     /// Tries to create a schema from an entity.
@@ -96,10 +96,10 @@ public sealed class SchemaProperty
         );
 
         results.Add(
-            entity.TrySetEnum<ErrorBehaviour>(
+            entity.TrySetEnum<ErrorBehavior>(
                 true,
-                nameof(ErrorBehaviour),
-                e => schemaProperty.ErrorBehaviour = e
+                nameof(ErrorBehavior),
+                e => schemaProperty.ErrorBehavior = e
             )
         );
 
@@ -156,7 +156,7 @@ public sealed class SchemaProperty
             (nameof(DateInputFormats), EntityValue.CreateFromObject(DateInputFormats)),
             (nameof(DateOutputFormat), EntityValue.CreateFromObject(DateOutputFormat)),
             (nameof(Regex), EntityValue.CreateFromObject(Regex)),
-            (nameof(ErrorBehaviour), EntityValue.CreateFromObject(ErrorBehaviour)),
+            (nameof(ErrorBehavior), EntityValue.CreateFromObject(ErrorBehavior)),
         }.Select((x, i) => new EntityProperty(x.Item1, x.Item2, null, i));
 
         var entity = new Entity(schemaProperties);
