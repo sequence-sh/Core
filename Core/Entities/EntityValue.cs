@@ -27,15 +27,19 @@ public sealed class EntityValue : OneOfBase<DBNull, string, int, double, bool, E
     public EntityValue(
         OneOf<DBNull, string, int, double, bool, Enumeration, DateTime, Entity,
             ImmutableList<EntityValue>> value,
-        string? outputFormat = null) : base(value)
-    {
-        OutputFormat = outputFormat;
-    }
+        string? outputFormat = null) : base(value) => OutputFormat = outputFormat;
 
     /// <summary>
     /// The output format if this is a DateTime and this has been set by a schema
     /// </summary>
     public readonly string? OutputFormat;
+
+    /// <summary>
+    /// The DateOutputFormat to use
+    /// </summary>
+    public string DateOutputFormat => string.IsNullOrWhiteSpace(OutputFormat)
+        ? Constants.DateTimeFormat
+        : OutputFormat;
 
     /// <summary>
     /// Create an entity from an object
@@ -315,7 +319,7 @@ public sealed class EntityValue : OneOfBase<DBNull, string, int, double, bool, E
             return schemaProperty.Type switch
             {
                 SchemaPropertyType.String => (
-                    new EntityValue(dt.ToString(OutputFormat ?? Constants.DateTimeFormat)), true),
+                    new EntityValue(dt.ToString(DateOutputFormat)), true),
                 SchemaPropertyType.Date => (this, false),
                 _                       => CouldNotConvert(dt)
             };
@@ -430,7 +434,7 @@ public sealed class EntityValue : OneOfBase<DBNull, string, int, double, bool, E
             x => x.ToString(Constants.DoubleFormat),
             x => x.ToString(),
             x => x.ToString(),
-            x => x.ToString(OutputFormat ?? Constants.DateTimeFormat),
+            x => x.ToString(DateOutputFormat),
             x => x.ToString(),
             x => x.Count + " elements"
         );

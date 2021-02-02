@@ -85,7 +85,7 @@ public static class SerializationMethods
             x => x.ToString(Constants.DoubleFormat),
             x => x.ToString(),
             x => x.ToString(),
-            x => x.ToString(entityValue.OutputFormat ?? Constants.DateTimeFormat),
+            x => x.ToString(entityValue.DateOutputFormat),
             x => x.Serialize(),
             x => SerializeList(x.Select(y => y.Serialize()))
         );
