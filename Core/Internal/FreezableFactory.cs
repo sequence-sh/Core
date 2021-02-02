@@ -187,32 +187,11 @@ public static class FreezableFactory
 /// </summary>
 public static class InfixHelper
 {
-    private class OperatorData
-    {
-        public OperatorData(
-            string stepName,
-            string leftName,
-            string rightName,
-            string operatorStepName,
-            IFreezableStep operatorStep)
-        {
-            LeftName         = leftName;
-            RightName        = rightName;
-            OperatorStepName = operatorStepName;
-            OperatorStep     = operatorStep;
-            StepName         = stepName;
-        }
-
-        public string StepName { get; }
-
-        public string LeftName { get; }
-
-        public string RightName { get; }
-
-        public string OperatorStepName { get; }
-
-        public IFreezableStep OperatorStep { get; }
-    }
+    private record OperatorData(
+        string StepName,
+        string LeftName,
+        string RightName,
+        (string Name, IFreezableStep Step)? Operator) { }
 
     /// <summary>
     /// Creates an infix operator step
@@ -237,16 +216,22 @@ public static class InfixHelper
         if (errors.Any())
             return Result.Failure<FreezableStepProperty, IError>(ErrorList.Combine(errors));
 
+        var stepParameterDict = new StepParameterDict
+        {
+            { new StepParameterReference(opData!.LeftName), left.Value },
+            { new StepParameterReference(opData.RightName), right.Value },
+        };
+
+        if (opData.Operator.HasValue)
+        {
+            stepParameterDict.Add(
+                new StepParameterReference(opData.Operator.Value.Name),
+                new FreezableStepProperty(opData.Operator.Value.Step, errorLocation)
+            );
+        }
+
         var data = new FreezableStepData(
-            new StepParameterDict
-            {
-                {
-                    new StepParameterReference(opData!.OperatorStepName),
-                    new FreezableStepProperty(opData.OperatorStep, errorLocation)
-                },
-                { new StepParameterReference(opData.LeftName), left.Value },
-                { new StepParameterReference(opData.RightName), right.Value },
-            },
+            stepParameterDict,
             errorLocation
         );
 
@@ -263,8 +248,11 @@ public static class InfixHelper
                     nameof(ApplyMathOperator),
                     nameof(ApplyMathOperator.Left),
                     nameof(ApplyMathOperator.Right),
-                    nameof(ApplyMathOperator.Operator),
-                    new EnumConstantFreezable(new Enumeration(nameof(MathOperator), mo.ToString()))
+                    (
+                        nameof(ApplyMathOperator.Operator),
+                        new EnumConstantFreezable(
+                            new Enumeration(nameof(MathOperator), mo.ToString())
+                        ))
                 )
             )
             .Concat(
@@ -275,10 +263,11 @@ public static class InfixHelper
                             nameof(ApplyBooleanOperator),
                             nameof(ApplyBooleanOperator.Left),
                             nameof(ApplyBooleanOperator.Right),
-                            nameof(ApplyBooleanOperator.Operator),
-                            new EnumConstantFreezable(
-                                new Enumeration(nameof(BooleanOperator), mo.ToString())
-                            )
+                            (
+                                nameof(ApplyBooleanOperator.Operator),
+                                new EnumConstantFreezable(
+                                    new Enumeration(nameof(BooleanOperator), mo.ToString())
+                                ))
                         )
                     )
             )
@@ -290,12 +279,24 @@ public static class InfixHelper
                             CompareStepFactory.Instance.TypeName,
                             nameof(Compare<int>.Left),
                             nameof(Compare<int>.Right),
-                            nameof(Compare<int>.Operator),
-                            new EnumConstantFreezable(
-                                new Enumeration(nameof(CompareOperator), mo.ToString())
-                            )
+                            (
+                                nameof(Compare<int>.Operator),
+                                new EnumConstantFreezable(
+                                    new Enumeration(nameof(CompareOperator), mo.ToString())
+                                ))
                         )
                     )
+            )
+            .Append(
+                new KeyValuePair<string, OperatorData>(
+                    "with",
+                    new OperatorData(
+                        EntityCombineStepFactory.Instance.TypeName,
+                        nameof(EntityCombine.First),
+                        nameof(EntityCombine.Second),
+                        null
+                    )
+                )
             )
             .Where(x => x.Key != MathOperator.None.ToString())
             .ToDictionary(x => x.Key, x => x.Value, StringComparer.OrdinalIgnoreCase);

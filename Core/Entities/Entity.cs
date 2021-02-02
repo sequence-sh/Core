@@ -104,16 +104,37 @@ public sealed class Entity : IEnumerable<EntityProperty>, IEquatable<Entity>
     {
         ImmutableDictionary<string, EntityProperty> newDict;
 
+        EntityProperty newProperty;
+
         if (Dictionary.TryGetValue(key, out var ep))
         {
-            var newProperty = new EntityProperty(ep.Name, newValue, null, ep.Order);
-            newDict = Dictionary.SetItem(key, newProperty);
+            EntityValue newPropertyValue;
+
+            if (ep.BestValue.TryPickT7(out var existingEntity, out _))
+            {
+                Entity combinedEntity;
+
+                if (newValue.TryPickT7(out var newEntity, out _))
+                    combinedEntity = existingEntity.Combine(newEntity);
+                else
+                    combinedEntity = existingEntity.WithProperty(PrimitiveKey, newValue);
+
+                newPropertyValue = new EntityValue(combinedEntity);
+            }
+            else
+            {
+                //overwrite the property
+                newPropertyValue = newValue;
+            }
+
+            newProperty = new EntityProperty(ep.Name, newPropertyValue, null, ep.Order);
         }
         else
         {
-            var property = new EntityProperty(key, newValue, null, Dictionary.Count);
-            newDict = Dictionary.Add(key, property);
+            newProperty = new EntityProperty(key, newValue, null, Dictionary.Count);
         }
+
+        newDict = Dictionary.SetItem(key, newProperty);
 
         return new Entity(newDict);
     }
