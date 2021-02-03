@@ -3,10 +3,8 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using CSharpFunctionalExtensions;
-using Reductech.EDR.Core.Enums;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Steps;
-using Reductech.EDR.Core.Util;
 using StepParameterDict =
     System.Collections.Generic.Dictionary<Reductech.EDR.Core.Internal.StepParameterReference,
         Reductech.EDR.Core.Internal.FreezableStepProperty>;
@@ -187,119 +185,194 @@ public static class FreezableFactory
 /// </summary>
 public static class InfixHelper
 {
-    private record OperatorData(
-        string StepName,
-        string LeftName,
-        string RightName,
-        (string Name, IFreezableStep Step)? Operator) { }
+    private record OperatorData1(string OperatorString, string StepName, string TermsName) { }
 
     /// <summary>
-    /// Creates an infix operator step
+    /// Try to create an infix step
     /// </summary>
     public static Result<FreezableStepProperty, IError> TryCreateStep(
         IErrorLocation errorLocation,
-        Result<FreezableStepProperty, IError> left,
-        Result<FreezableStepProperty, IError> right,
-        string op)
+        string op,
+        IReadOnlyList<Result<FreezableStepProperty, IError>> terms)
     {
-        List<IError> errors = new();
+        List<IError>                errors     = new();
+        List<FreezableStepProperty> properties = new();
 
-        if (left.IsFailure)
-            errors.Add(left.Error);
-
-        if (right.IsFailure)
-            errors.Add(right.Error);
-
-        if (!OperatorDataDictionary.TryGetValue(op, out var opData))
-            errors.Add(new SingleError(errorLocation, ErrorCode.CouldNotParse, op, "Operator"));
+        foreach (var result in terms)
+        {
+            if (result.IsFailure)
+                errors.Add(result.Error);
+            else
+                properties.Add(result.Value);
+        }
 
         if (errors.Any())
             return Result.Failure<FreezableStepProperty, IError>(ErrorList.Combine(errors));
 
-        var stepParameterDict = new StepParameterDict
-        {
-            { new StepParameterReference(opData!.LeftName), left.Value },
-            { new StepParameterReference(opData.RightName), right.Value },
-        };
+        var operatorData = OperatorLookup[op].ToList();
 
-        if (opData.Operator.HasValue)
+        if (!operatorData.Any())
+            return new SingleError(errorLocation, ErrorCode.CouldNotParse, op, "Operator");
+
+        List<IFreezableStep> freezableSteps = new();
+
+        foreach (var opData in operatorData)
         {
-            stepParameterDict.Add(
-                new StepParameterReference(opData.Operator.Value.Name),
-                new FreezableStepProperty(opData.Operator.Value.Step, errorLocation)
+            var stepParameterDict = new StepParameterDict()
+            {
+                {
+                    new StepParameterReference(opData.TermsName), new FreezableStepProperty(
+                        properties.Select(x => x.ConvertToStep()).ToImmutableList(),
+                        errorLocation
+                    )
+                }
+            };
+
+            var data = new FreezableStepData(
+                stepParameterDict,
+                errorLocation
             );
+
+            var step = new CompoundFreezableStep(opData.StepName, data, null);
+            freezableSteps.Add(step);
         }
 
-        var data = new FreezableStepData(
-            stepParameterDict,
-            errorLocation
-        );
+        if (freezableSteps.Count == 1)
+            return new FreezableStepProperty(freezableSteps.Single(), errorLocation);
 
-        var step = new CompoundFreezableStep(opData.StepName, data, null);
+        var alt = new OptionFreezableStep(freezableSteps);
 
-        return new FreezableStepProperty(step, errorLocation);
+        return new FreezableStepProperty(alt, errorLocation);
     }
 
-    private static readonly IReadOnlyDictionary<string, OperatorData> OperatorDataDictionary =
-        Enum.GetValues<MathOperator>()
-            .ToDictionary(
-                mo => mo.GetDisplayName(),
-                mo => new OperatorData(
-                    nameof(ApplyMathOperator),
-                    nameof(ApplyMathOperator.Left),
-                    nameof(ApplyMathOperator.Right),
-                    (
-                        nameof(ApplyMathOperator.Operator),
-                        new EnumConstantFreezable(
-                            new Enumeration(nameof(MathOperator), mo.ToString())
-                        ))
-                )
-            )
-            .Concat(
-                Enum.GetValues<BooleanOperator>()
-                    .ToDictionary(
-                        mo => mo.GetDisplayName(),
-                        mo => new OperatorData(
-                            nameof(ApplyBooleanOperator),
-                            nameof(ApplyBooleanOperator.Left),
-                            nameof(ApplyBooleanOperator.Right),
-                            (
-                                nameof(ApplyBooleanOperator.Operator),
-                                new EnumConstantFreezable(
-                                    new Enumeration(nameof(BooleanOperator), mo.ToString())
-                                ))
-                        )
-                    )
-            )
-            .Concat(
-                Enum.GetValues<CompareOperator>()
-                    .ToDictionary(
-                        mo => mo.GetDisplayName(),
-                        mo => new OperatorData(
-                            CompareStepFactory.Instance.TypeName,
-                            nameof(Compare<int>.Left),
-                            nameof(Compare<int>.Right),
-                            (
-                                nameof(Compare<int>.Operator),
-                                new EnumConstantFreezable(
-                                    new Enumeration(nameof(CompareOperator), mo.ToString())
-                                ))
-                        )
-                    )
-            )
-            .Append(
-                new KeyValuePair<string, OperatorData>(
-                    "with",
-                    new OperatorData(
-                        EntityCombineStepFactory.Instance.TypeName,
-                        nameof(EntityCombine.First),
-                        nameof(EntityCombine.Second),
-                        null
-                    )
-                )
-            )
-            .Where(x => x.Key != MathOperator.None.ToString())
-            .ToDictionary(x => x.Key, x => x.Value, StringComparer.OrdinalIgnoreCase);
+    private static readonly ILookup<string, OperatorData1> OperatorLookup =
+        new List<OperatorData1>()
+            {
+                new("+", nameof(Sum), nameof(Sum.Terms)),
+                new("-", nameof(Subtract), nameof(Subtract.Terms)),
+                new("*", nameof(Product), nameof(Product.Terms)),
+                new("/", nameof(Divide), nameof(Divide.Terms)),
+                new("%", nameof(Modulo), nameof(Modulo.Terms)),
+                new("^", nameof(Power), nameof(Power.Terms)),
+                new("&&", nameof(And), nameof(And.Terms)),
+                new("||", nameof(Or), nameof(Or.Terms)),
+                new("==", "Equals", "Terms"),
+                new("!=", "NotEquals", "Terms"),
+                new("<", "LessThan", "Terms"),
+                new("<=", "LessThanOrEqual", "Terms"),
+                new(">", "GreaterThan", "Terms"),
+                new(">=", "GreaterThanOrEqual", "Terms"),
+                new("+", nameof(EntityCombine), nameof(EntityCombine.Terms)),
+            }
+            .ToLookup(x => x.OperatorString, StringComparer.OrdinalIgnoreCase);
+
+    ///// <summary>
+    ///// Creates an infix operator step
+    ///// </summary>
+    //public static Result<FreezableStepProperty, IError> TryCreateStep(
+    //    IErrorLocation errorLocation,
+    //    Result<FreezableStepProperty, IError> left,
+    //    Result<FreezableStepProperty, IError> right,
+    //    string op)
+    //{
+    //    List<IError> errors = new();
+
+    //    if (left.IsFailure)
+    //        errors.Add(left.Error);
+
+    //    if (right.IsFailure)
+    //        errors.Add(right.Error);
+
+    //    if (!OperatorDataDictionary.TryGetValue(op, out var opData))
+    //        errors.Add(new SingleError(errorLocation, ErrorCode.CouldNotParse, op, "Operator"));
+
+    //    if (errors.Any())
+    //        return Result.Failure<FreezableStepProperty, IError>(ErrorList.Combine(errors));
+
+    //    var stepParameterDict = new StepParameterDict
+    //    {
+    //        { new StepParameterReference(opData!.LeftName), left.Value },
+    //        { new StepParameterReference(opData.RightName), right.Value },
+    //    };
+
+    //    if (opData.Operator.HasValue)
+    //    {
+    //        stepParameterDict.Add(
+    //            new StepParameterReference(opData.Operator.Value.Name),
+    //            new FreezableStepProperty(opData.Operator.Value.Step, errorLocation)
+    //        );
+    //    }
+
+    //    var data = new FreezableStepData(
+    //        stepParameterDict,
+    //        errorLocation
+    //    );
+
+    //    var step = new CompoundFreezableStep(opData.StepName, data, null);
+
+    //    return new FreezableStepProperty(step, errorLocation);
+    //}
+
+    //private static readonly IReadOnlyDictionary<string, OperatorData> OperatorDataDictionary =
+    //    Enum.GetValues<MathOperator>()
+    //        .ToDictionary(
+    //            mo => mo.GetDisplayName(),
+    //            mo => new OperatorData(
+    //                nameof(ApplyMathOperator),
+    //                nameof(ApplyMathOperator.Left),
+    //                nameof(ApplyMathOperator.Right),
+    //                (
+    //                    nameof(ApplyMathOperator.Operator),
+    //                    new EnumConstantFreezable(
+    //                        new Enumeration(nameof(MathOperator), mo.ToString())
+    //                    ))
+    //            )
+    //        )
+    //        .Concat(
+    //            Enum.GetValues<BooleanOperator>()
+    //                .ToDictionary(
+    //                    mo => mo.GetDisplayName(),
+    //                    mo => new OperatorData(
+    //                        nameof(ApplyBooleanOperator),
+    //                        nameof(ApplyBooleanOperator.Left),
+    //                        nameof(ApplyBooleanOperator.Right),
+    //                        (
+    //                            nameof(ApplyBooleanOperator.Operator),
+    //                            new EnumConstantFreezable(
+    //                                new Enumeration(nameof(BooleanOperator), mo.ToString())
+    //                            ))
+    //                    )
+    //                )
+    //        )
+    //        .Concat(
+    //            Enum.GetValues<CompareOperator>()
+    //                .ToDictionary(
+    //                    mo => mo.GetDisplayName(),
+    //                    mo => new OperatorData(
+    //                        CompareStepFactory.Instance.TypeName,
+    //                        nameof(Compare<int>.Left),
+    //                        nameof(Compare<int>.Right),
+    //                        (
+    //                            nameof(Compare<int>.Operator),
+    //                            new EnumConstantFreezable(
+    //                                new Enumeration(nameof(CompareOperator), mo.ToString())
+    //                            ))
+    //                    )
+    //                )
+    //        )
+    //        .Append(
+    //            new KeyValuePair<string, OperatorData>(
+    //                "with",
+    //                new OperatorData(
+    //                    EntityCombineStepFactory.Instance.TypeName,
+    //                    nameof(EntityCombine.First),
+    //                    nameof(EntityCombine.Second),
+    //                    null
+    //                )
+    //            )
+    //        )
+    //        .Where(x => x.Key != MathOperator.None.ToString())
+    //        .ToDictionary(x => x.Key, x => x.Value, StringComparer.OrdinalIgnoreCase);
 }
 
 }

@@ -221,15 +221,24 @@ public static class SCLParsing
         public override Result<FreezableStepProperty, IError> VisitInfixOperation(
             SCLParser.InfixOperationContext context)
         {
-            var left           = Visit(context.term(0));
-            var right          = Visit(context.term(1));
-            var operatorSymbol = context.infixOperator().GetText();
+            var operatorSymbols =
+                context.infixOperator().Select(x => x.GetText()).Distinct().ToList();
+
+            if (operatorSymbols.Count != 1)
+            {
+                return Result.Failure<FreezableStepProperty, IError>(
+                    ErrorCode.SCLSyntaxError.ToErrorBuilder("Invalid mix of operators")
+                        .WithLocation(new TextLocation(context))
+                );
+            }
+
+            var operatorSymbol = operatorSymbols.Single();
+            var terms          = context.term().Select(Visit).ToList();
 
             var result = InfixHelper.TryCreateStep(
                 new TextLocation(context),
-                left,
-                right,
-                operatorSymbol
+                operatorSymbol,
+                terms
             );
 
             return result;
