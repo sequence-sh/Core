@@ -263,6 +263,8 @@ public static class InfixHelper
                 new(">", "GreaterThan", "Terms"),
                 new(">=", "GreaterThanOrEqual", "Terms"),
                 new("+", nameof(EntityCombine), nameof(EntityCombine.Terms)),
+                new("+", nameof(StringJoin), nameof(StringJoin.Strings)),
+                new("+", "ArrayConcat", nameof(ArrayConcat<int>.Arrays)),
             }
             .ToLookup(x => x.OperatorString, StringComparer.OrdinalIgnoreCase);
 
