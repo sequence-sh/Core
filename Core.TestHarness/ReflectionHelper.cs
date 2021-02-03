@@ -35,7 +35,8 @@ public abstract partial class StepTestBase<TStep, TOutput>
                                      .GetCustomAttribute<StepPropertyBaseAttribute>())
             )
             .Where(x => x.attribute != null)
-            .OrderBy(x => x.attribute!.Order)
+            .OrderByDescending(x => x.attribute!.Order != null)
+            .ThenBy(x => x.attribute!.Order)
             .Select(x => x.propertyInfo)
         )
             MatchStepPropertyInfo(propertyInfo, SetVariableName, SetStep, SetStepList);

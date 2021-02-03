@@ -121,7 +121,7 @@ public sealed class RegexReplace : CompoundStep<string>
     {
         return baseContext.TryCloneWithScopedStep(
             Variable,
-            new ActualTypeReference(typeof(string)),
+            new ActualTypeReference(typeof(StringStream)),
             scopedStep,
             new StepErrorLocation(this)
         );

@@ -36,6 +36,52 @@ public partial class RegexReplaceTests : StepTestBase<RegexReplace, string>
                 },
                 "Number _1_"
             );
+
+            yield return new StepCase(
+                "No Replacement",
+                new RegexReplace()
+                {
+                    String     = Constant("Number One"),
+                    Pattern    = Constant(@"\d+"),
+                    IgnoreCase = Constant(false),
+                    Function = new StringJoin()
+                    {
+                        Strings = new ArrayNew<StringStream>
+                        {
+                            Elements = new List<IStep<StringStream>>
+                            {
+                                Constant("_"),
+                                GetVariable<StringStream>(VariableName.Match),
+                                Constant("_")
+                            }
+                        }
+                    }
+                },
+                "Number One"
+            );
+
+            yield return new StepCase(
+                "Multiple Replacements",
+                new RegexReplace()
+                {
+                    String     = Constant("Number 1, 2, 3"),
+                    Pattern    = Constant(@"\d+"),
+                    IgnoreCase = Constant(false),
+                    Function = new StringJoin()
+                    {
+                        Strings = new ArrayNew<StringStream>
+                        {
+                            Elements = new List<IStep<StringStream>>
+                            {
+                                Constant("_"),
+                                GetVariable<StringStream>(VariableName.Match),
+                                Constant("_")
+                            }
+                        }
+                    }
+                },
+                "Number _1_, _2_, _3_"
+            );
         }
     }
 }
