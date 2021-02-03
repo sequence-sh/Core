@@ -15,28 +15,25 @@ public partial class ModuloTests : StepTestBase<Modulo, int>
         {
             yield return new StepCase(
                 "No numbers",
-                new Modulo()
-                {
-                    Numbers = new ArrayNew<int>() { Elements = new List<IStep<int>>() }
-                },
+                new Modulo() { Terms = new ArrayNew<int>() { Elements = new List<IStep<int>>() } },
                 0
             );
 
             yield return new StepCase(
                 "One number",
-                new Modulo() { Numbers = StaticHelpers.Array(2) },
+                new Modulo() { Terms = StaticHelpers.Array(2) },
                 2
             );
 
             yield return new StepCase(
                 "Two numbers",
-                new Modulo() { Numbers = StaticHelpers.Array(5, 3) },
+                new Modulo() { Terms = StaticHelpers.Array(5, 3) },
                 2
             );
 
             yield return new StepCase(
                 "Three numbers",
-                new Modulo() { Numbers = StaticHelpers.Array(14, 5, 3) },
+                new Modulo() { Terms = StaticHelpers.Array(14, 5, 3) },
                 1
             );
         }

@@ -17,26 +17,26 @@ public partial class SubtractTests : StepTestBase<Subtract, int>
                 "No numbers",
                 new Subtract()
                 {
-                    Numbers = new ArrayNew<int>() { Elements = new List<IStep<int>>() }
+                    Terms = new ArrayNew<int>() { Elements = new List<IStep<int>>() }
                 },
                 0
             );
 
             yield return new StepCase(
                 "One number",
-                new Subtract() { Numbers = StaticHelpers.Array(2) },
+                new Subtract() { Terms = StaticHelpers.Array(2) },
                 2
             );
 
             yield return new StepCase(
                 "Two numbers",
-                new Subtract() { Numbers = StaticHelpers.Array(2, 3) },
+                new Subtract() { Terms = StaticHelpers.Array(2, 3) },
                 -1
             );
 
             yield return new StepCase(
                 "Three numbers",
-                new Subtract() { Numbers = StaticHelpers.Array(2, 3, 4) },
+                new Subtract() { Terms = StaticHelpers.Array(2, 3, 4) },
                 -5
             );
         }

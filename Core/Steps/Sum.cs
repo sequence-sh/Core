@@ -13,42 +13,66 @@ namespace Reductech.EDR.Core.Steps
 {
 
 /// <summary>
+/// Returns true if all terms are true
+/// </summary>
+public sealed class And : BaseOperatorStep<And, bool, bool>
+{
+    /// <inheritdoc />
+    protected override bool Operate(IEnumerable<bool> terms)
+    {
+        return terms.All(x => x);
+    }
+}
+
+/// <summary>
+/// Returns true if any terms are true
+/// </summary>
+public sealed class Or : BaseOperatorStep<Or, bool, bool>
+{
+    /// <inheritdoc />
+    protected override bool Operate(IEnumerable<bool> terms)
+    {
+        return terms.Any(x => x);
+    }
+}
+
+/// <summary>
 /// Calculate the sum of a list of numbers
 /// </summary>
 [Alias("Add")]
-public sealed class Sum : MathOperatorStep<Sum>
+public sealed class Sum : BaseOperatorStep<Sum, int, int>
 {
     /// <inheritdoc />
-    protected override int Operate(IEnumerable<int> numbers)
+    protected override int Operate(IEnumerable<int> terms)
     {
-        return numbers.Sum();
+        return terms.Sum();
     }
 }
 
 /// <summary>
 /// Calculate the product of a list of numbers
 /// </summary>
-public sealed class Product : MathOperatorStep<Product>
+public sealed class Product : BaseOperatorStep<Product, int, int>
 {
     /// <inheritdoc />
-    protected override int Operate(IEnumerable<int> numbers)
+    protected override int Operate(IEnumerable<int> terms)
     {
-        return numbers.Aggregate(1, (a, b) => a * b);
+        return terms.Aggregate(1, (a, b) => a * b);
     }
 }
 
 /// <summary>
 /// Subtract a list of numbers from a number
 /// </summary>
-public sealed class Subtract : MathOperatorStep<Subtract>
+public sealed class Subtract : BaseOperatorStep<Subtract, int, int>
 {
     /// <inheritdoc />
-    protected override int Operate(IEnumerable<int> numbers)
+    protected override int Operate(IEnumerable<int> terms)
     {
         var total = 0;
         var first = true;
 
-        foreach (var number in numbers)
+        foreach (var number in terms)
         {
             if (first)
             {
@@ -68,15 +92,15 @@ public sealed class Subtract : MathOperatorStep<Subtract>
 /// <summary>
 /// Divide a number by a list of numbers
 /// </summary>
-public sealed class Divide : MathOperatorStep<Divide>
+public sealed class Divide : BaseOperatorStep<Divide, int, int>
 {
     /// <inheritdoc />
-    protected override int Operate(IEnumerable<int> numbers)
+    protected override int Operate(IEnumerable<int> terms)
     {
         var total = 0;
         var first = true;
 
-        foreach (var number in numbers)
+        foreach (var number in terms)
         {
             if (first)
             {
@@ -96,15 +120,15 @@ public sealed class Divide : MathOperatorStep<Divide>
 /// <summary>
 /// Modulo a number by a list of numbers sequentially
 /// </summary>
-public sealed class Modulo : MathOperatorStep<Modulo>
+public sealed class Modulo : BaseOperatorStep<Modulo, int, int>
 {
     /// <inheritdoc />
-    protected override int Operate(IEnumerable<int> numbers)
+    protected override int Operate(IEnumerable<int> terms)
     {
         var total = 0;
         var first = true;
 
-        foreach (var number in numbers)
+        foreach (var number in terms)
         {
             if (first)
             {
@@ -124,15 +148,15 @@ public sealed class Modulo : MathOperatorStep<Modulo>
 /// <summary>
 /// Raises a number to the power of a list of numbers sequentially
 /// </summary>
-public sealed class Power : MathOperatorStep<Power>
+public sealed class Power : BaseOperatorStep<Power, int, int>
 {
     /// <inheritdoc />
-    protected override int Operate(IEnumerable<int> numbers)
+    protected override int Operate(IEnumerable<int> terms)
     {
         var total = 0;
         var first = true;
 
-        foreach (var number in numbers)
+        foreach (var number in terms)
         {
             if (first)
             {
@@ -152,31 +176,31 @@ public sealed class Power : MathOperatorStep<Power>
 /// <summary>
 /// Base class for all math operations
 /// </summary>
-public abstract class MathOperatorStep<TStep> : CompoundStep<int>
-    where TStep : MathOperatorStep<TStep>, new()
+public abstract class BaseOperatorStep<TStep, TElement, TOutput> : CompoundStep<TOutput>
+    where TStep : BaseOperatorStep<TStep, TElement, TOutput>, new()
 {
     /// <summary>
-    /// The numbers to operate on
+    /// The terms to operate on
     /// </summary>
     [StepProperty(1)]
     [Required]
-    public IStep<Array<int>> Numbers { get; set; } = null!;
+    public IStep<Array<TElement>> Terms { get; set; } = null!;
 
     /// <inheritdoc />
-    public override IStepFactory StepFactory { get; } = new SimpleStepFactory<TStep, int>();
+    public override IStepFactory StepFactory { get; } = new SimpleStepFactory<TStep, TOutput>();
 
     /// <inheritdoc />
-    protected override async Task<Result<int, IError>> Run(
+    protected override async Task<Result<TOutput, IError>> Run(
         IStateMonad stateMonad,
         CancellationToken cancellationToken)
     {
-        var numbersResult =
-            await Numbers.Run(stateMonad, cancellationToken).Bind(x => x.GetElements());
+        var termsResult =
+            await Terms.Run(stateMonad, cancellationToken).Bind(x => x.GetElements());
 
-        if (numbersResult.IsFailure)
-            return numbersResult.ConvertFailure<int>();
+        if (termsResult.IsFailure)
+            return termsResult.ConvertFailure<TOutput>();
 
-        var r = Operate(numbersResult.Value);
+        var r = Operate(termsResult.Value);
 
         return r;
     }
@@ -184,7 +208,7 @@ public abstract class MathOperatorStep<TStep> : CompoundStep<int>
     /// <summary>
     /// Calculate the result
     /// </summary>
-    protected abstract int Operate(IEnumerable<int> numbers);
+    protected abstract TOutput Operate(IEnumerable<TElement> terms);
 }
 
 }

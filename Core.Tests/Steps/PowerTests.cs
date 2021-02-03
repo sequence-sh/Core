@@ -15,25 +15,25 @@ public partial class PowerTests : StepTestBase<Power, int>
         {
             yield return new StepCase(
                 "No numbers",
-                new Power() { Numbers = new ArrayNew<int>() { Elements = new List<IStep<int>>() } },
+                new Power() { Terms = new ArrayNew<int>() { Elements = new List<IStep<int>>() } },
                 0
             );
 
             yield return new StepCase(
                 "One number",
-                new Power() { Numbers = StaticHelpers.Array(2) },
+                new Power() { Terms = StaticHelpers.Array(2) },
                 2
             );
 
             yield return new StepCase(
                 "Two numbers",
-                new Power() { Numbers = StaticHelpers.Array(2, 3) },
+                new Power() { Terms = StaticHelpers.Array(2, 3) },
                 8
             );
 
             yield return new StepCase(
                 "Three numbers",
-                new Power() { Numbers = StaticHelpers.Array(2, 3, 4) },
+                new Power() { Terms = StaticHelpers.Array(2, 3, 4) },
                 4096
             );
         }
