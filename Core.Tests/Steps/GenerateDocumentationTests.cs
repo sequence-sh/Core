@@ -88,18 +88,18 @@ public partial class GenerateDocumentationTests : StepTestBase<GenerateDocumenta
             (string nameof, string category, string comment) notHeader = (
                 "Not", "Core", "Negation of a boolean value.");
 
-            var applyMathOperator = File(
-                "ApplyMathOperator.md",
-                "ApplyMathOperator",
-                "## ApplyMathOperator *ApplyMathOperator* **Int32**\r\n\r\nApplies a mathematical operator to two integers. Returns the result of the operation.\r\n\r\n|Parameter|Type |Required|Summary |\r\n|:-------:|:--------------------------------------:|:------:|:--------------------:|\r\n|Left |`int` |☑️ |The left operand. |\r\n|Operator |[MathOperator](../Enums/MathOperator.md)|☑️ |The operator to apply.|\r\n|Right |`int` |☑️ |The right operand. |",
-                "Core",
-                "Core"
-            );
+            //var applyMathOperator = File(
+            //    "ApplyMathOperator.md",
+            //    "ApplyMathOperator",
+            //    "## ApplyMathOperator *ApplyMathOperator* **Int32**\r\n\r\nApplies a mathematical operator to two integers. Returns the result of the operation.\r\n\r\n|Parameter|Type |Required|Summary |\r\n|:-------:|:--------------------------------------:|:------:|:--------------------:|\r\n|Left |`int` |☑️ |The left operand. |\r\n|Operator |[MathOperator](../Enums/MathOperator.md)|☑️ |The operator to apply.|\r\n|Right |`int` |☑️ |The right operand. |",
+            //    "Core",
+            //    "Core"
+            //);
 
-            (string nameof, string category, string comment) mathHeader = (
-                "ApplyMathOperator",
-                "Core",
-                "Applies a mathematical operator to two integers. Returns the result of the operation.");
+            //(string nameof, string category, string comment) mathHeader = (
+            //    "ApplyMathOperator",
+            //    "Core",
+            //    "Applies a mathematical operator to two integers. Returns the result of the operation.");
 
             (string nameof, string category, string comment) exampleStepHeader = (
                 "DocumentationExampleStep",
@@ -130,24 +130,24 @@ public partial class GenerateDocumentationTests : StepTestBase<GenerateDocumenta
                 ToLogs(Entities(Contents(notHeader), not))
             ).WithStepFactoryStore(StepFactoryStore.Create(NotStepFactory.Instance));
 
-            yield return new StepCase(
-                "Generate Math Documentation",
-                printDocumentation,
-                Unit.Default,
-                ToLogs(
-                    Entities(
-                        Contents(mathHeader),
-                        applyMathOperator,
-                        File(
-                            "MathOperator.md",
-                            "MathOperator",
-                            "## MathOperator\r\nAn operator that can be applied to two numbers.\r\n\r\n|Name |Summary | |:------:|:--------------------------------------------------------------------------------------------------------:|\r\n|None |Sentinel value |\r\n|Add |Add the left and right operands. |\r\n|Subtract|Subtract the right operand from the left. |\r\n|Multiply|Multiply the left and right operands. |\r\n|Divide |Divide the left operand by the right. Attempting to divide by zero will result in an error. |\r\n|Modulo |Reduce the left operand modulo the right. |\r\n|Power |Raise the left operand to the power of the right. If the right operand is negative, zero will be returned.|",
-                            "Enums",
-                            "Enums"
-                        )
-                    )
-                )
-            ).WithStepFactoryStore(StepFactoryStore.Create(ApplyMathOperatorStepFactory.Instance));
+            //yield return new StepCase(
+            //    "Generate Math Documentation",
+            //    printDocumentation,
+            //    Unit.Default,
+            //    ToLogs(
+            //        Entities(
+            //            Contents(mathHeader),
+            //            applyMathOperator,
+            //            File(
+            //                "MathOperator.md",
+            //                "MathOperator",
+            //                "## MathOperator\r\nAn operator that can be applied to two numbers.\r\n\r\n|Name |Summary | |:------:|:--------------------------------------------------------------------------------------------------------:|\r\n|None |Sentinel value |\r\n|Add |Add the left and right operands. |\r\n|Subtract|Subtract the right operand from the left. |\r\n|Multiply|Multiply the left and right operands. |\r\n|Divide |Divide the left operand by the right. Attempting to divide by zero will result in an error. |\r\n|Modulo |Reduce the left operand modulo the right. |\r\n|Power |Raise the left operand to the power of the right. If the right operand is negative, zero will be returned.|",
+            //                "Enums",
+            //                "Enums"
+            //            )
+            //        )
+            //    )
+            //).WithStepFactoryStore(StepFactoryStore.Create(Add.Instance));
 
             yield return new StepCase(
                 "Example step",

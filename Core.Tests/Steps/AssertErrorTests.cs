@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using Reductech.EDR.Core.Enums;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.TestHarness;
@@ -35,15 +34,7 @@ public partial class AssertErrorTests : StepTestBase<AssertError, Unit>
                 "Print divide by zero",
                 new AssertError
                 {
-                    Step = new Print<int>
-                    {
-                        Value = new ApplyMathOperator()
-                        {
-                            Left     = Constant(1),
-                            Operator = Constant(MathOperator.Divide),
-                            Right    = Constant(0),
-                        }
-                    }
+                    Step = new Print<int> { Value = new Divide() { Terms = Array(1, 0) } }
                 },
                 Unit.Default,
                 "ApplyMathOperator Failed with message: Attempt to Divide by Zero.",
