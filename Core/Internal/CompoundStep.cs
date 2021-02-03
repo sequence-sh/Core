@@ -152,14 +152,15 @@ public abstract class CompoundStep<T> : ICompoundStep<T>
                                          .GetCustomAttribute<StepPropertyBaseAttribute>())
                 )
                 .Where(x => x.attribute != null)
-                .OrderBy(x => x.attribute!.Order)
+                .OrderByDescending(x => x.attribute!.Order != null)
+                .ThenBy(x => x.attribute!.Order)
                 .SelectMany((x, i) => GetMember(x, i).ToEnumerable());
 
             return r;
 
             Maybe<StepProperty> GetMember(
                 (PropertyInfo propertyInfo, StepPropertyBaseAttribute? attribute) arg1,
-                int arg2)
+                int index)
             {
                 var (propertyInfo, _) = arg1;
                 var val = propertyInfo.GetValue(this);
@@ -187,7 +188,7 @@ public abstract class CompoundStep<T> : ICompoundStep<T>
 
                 return new StepProperty(
                     propertyInfo.Name,
-                    arg2,
+                    index,
                     oneOf.Value,
                     logAttribute,
                     scopedFunctionAttribute,
