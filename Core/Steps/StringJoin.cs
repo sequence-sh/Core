@@ -18,18 +18,18 @@ namespace Reductech.EDR.Core.Steps
 public sealed class StringJoin : CompoundStep<StringStream>
 {
     /// <summary>
-    /// The delimiter to use.
+    /// The string to join.
     /// </summary>
     [StepProperty(1)]
     [Required]
-    public IStep<StringStream> Delimiter { get; set; } = null!;
+    public IStep<Array<StringStream>> Strings { get; set; } = null!;
 
     /// <summary>
-    /// The string to join.
+    /// The delimiter to use.
     /// </summary>
     [StepProperty(2)]
-    [Required]
-    public IStep<Core.Array<StringStream>> Strings { get; set; } = null!;
+    [DefaultValueExplanation("Empty String")]
+    public IStep<StringStream> Delimiter { get; set; } = new StringConstant("");
 
     /// <inheritdoc />
     protected override async Task<Result<StringStream, IError>> Run(
