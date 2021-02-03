@@ -90,43 +90,46 @@ public class StepFactoryStore
                 .Select(CreateStepFactory)
                 .ToList();
 
-        static IStepFactory CreateStepFactory(Type stepType)
+        return Create(factories);
+    }
+
+    /// <summary>
+    /// Create a StepFactory from a step type
+    /// </summary>
+    public static IStepFactory CreateStepFactory(Type stepType)
+    {
+        Type closedType;
+
+        if (stepType.IsGenericType)
         {
-            Type closedType;
+            var arguments = (stepType as TypeInfo).GenericTypeParameters
+                .Select(x => typeof(int))
+                .ToArray();
 
-            if (stepType.IsGenericType)
+            try
             {
-                var arguments = (stepType as TypeInfo).GenericTypeParameters
-                    .Select(x => typeof(int))
-                    .ToArray();
-
-                try
-                {
-                    closedType = stepType.MakeGenericType(arguments);
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e);
-                    throw;
-                }
+                closedType = stepType.MakeGenericType(arguments);
             }
-            else
+            catch (Exception e)
             {
-                closedType = stepType;
+                Console.WriteLine(e);
+                throw;
             }
-
-            var instance = Activator.CreateInstance(closedType);
-            var step     = instance as ICompoundStep;
-
-            var stepFactory = step!.StepFactory;
-
-            if (stepFactory is null)
-                throw new Exception($"Step Factory for {stepType.Name} is null");
-
-            return step!.StepFactory;
+        }
+        else
+        {
+            closedType = stepType;
         }
 
-        return Create(factories);
+        var instance = Activator.CreateInstance(closedType);
+        var step     = instance as ICompoundStep;
+
+        var stepFactory = step!.StepFactory;
+
+        if (stepFactory is null)
+            throw new Exception($"Step Factory for {stepType.Name} is null");
+
+        return step!.StepFactory;
     }
 
     /// <summary>

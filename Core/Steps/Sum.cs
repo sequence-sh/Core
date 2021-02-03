@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
@@ -17,11 +16,8 @@ namespace Reductech.EDR.Core.Steps
 /// Calculate the sum of a list of numbers
 /// </summary>
 [Alias("Add")]
-public sealed class Sum : MathOperatorStep
+public sealed class Sum : MathOperatorStep<Sum>
 {
-    /// <inheritdoc />
-    public override IStepFactory StepFactory { get; } = new SimpleStepFactory<Sum, int>();
-
     /// <inheritdoc />
     protected override int Operate(IEnumerable<int> numbers)
     {
@@ -30,9 +26,134 @@ public sealed class Sum : MathOperatorStep
 }
 
 /// <summary>
+/// Calculate the product of a list of numbers
+/// </summary>
+public sealed class Product : MathOperatorStep<Product>
+{
+    /// <inheritdoc />
+    protected override int Operate(IEnumerable<int> numbers)
+    {
+        return numbers.Aggregate(1, (a, b) => a * b);
+    }
+}
+
+/// <summary>
+/// Subtract a list of numbers from a number
+/// </summary>
+public sealed class Subtract : MathOperatorStep<Subtract>
+{
+    /// <inheritdoc />
+    protected override int Operate(IEnumerable<int> numbers)
+    {
+        var total = 0;
+        var first = true;
+
+        foreach (var number in numbers)
+        {
+            if (first)
+            {
+                total += number;
+                first =  false;
+            }
+            else
+            {
+                total -= number;
+            }
+        }
+
+        return total;
+    }
+}
+
+/// <summary>
+/// Divide a number by a list of numbers
+/// </summary>
+public sealed class Divide : MathOperatorStep<Divide>
+{
+    /// <inheritdoc />
+    protected override int Operate(IEnumerable<int> numbers)
+    {
+        var total = 0;
+        var first = true;
+
+        foreach (var number in numbers)
+        {
+            if (first)
+            {
+                total += number;
+                first =  false;
+            }
+            else
+            {
+                total /= number;
+            }
+        }
+
+        return total;
+    }
+}
+
+/// <summary>
+/// Modulo a number by a list of numbers sequentially
+/// </summary>
+public sealed class Modulo : MathOperatorStep<Modulo>
+{
+    /// <inheritdoc />
+    protected override int Operate(IEnumerable<int> numbers)
+    {
+        var total = 0;
+        var first = true;
+
+        foreach (var number in numbers)
+        {
+            if (first)
+            {
+                total += number;
+                first =  false;
+            }
+            else
+            {
+                total %= number;
+            }
+        }
+
+        return total;
+    }
+}
+
+/// <summary>
+/// Raises a number to the power of a list of numbers sequentially
+/// </summary>
+public sealed class Power : MathOperatorStep<Power>
+{
+    /// <inheritdoc />
+    protected override int Operate(IEnumerable<int> numbers)
+    {
+        var total = 0;
+        var first = true;
+
+        foreach (var number in numbers)
+        {
+            if (first)
+            {
+                total += number;
+                first =  false;
+            }
+            else
+            {
+                total = Convert.ToInt32(Math.Pow(total, number));
+            }
+        }
+
+        return total;
+    }
+}
+
+/// <summary>
 /// Base class for all math operations
 /// </summary>
-public abstract class MathOperatorStep : CompoundStep<int>
+public abstract class MathOperatorStep<TStep> : CompoundStep<int>
+    where TStep : MathOperatorStep<TStep>, new()
 {
     /// <summary>
     /// The numbers to operate on
@@ -40,6 +161,9 @@ public abstract class MathOperatorStep : CompoundStep<int>
     [StepProperty(1)]
     [Required]
     public IStep<Array<int>> Numbers { get; set; } = null!;
+
+    /// <inheritdoc />
+    public override IStepFactory StepFactory { get; } = new SimpleStepFactory<TStep, int>();
 
     /// <inheritdoc />
     protected override async Task<Result<int, IError>> Run(
