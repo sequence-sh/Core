@@ -45,18 +45,28 @@ public partial class LoggingTests
                 "Print (1 + 1)",
                 CheckMessageAndScope(
                     LogLevel.Trace,
-                    "Print Started with Parameters: [Value, ApplyMathOperator]",
+                    "Print Started with Parameters: [Value, Sum]",
                     "Print"
                 ),
                 CheckMessageAndScope(
                     LogLevel.Trace,
-                    "ApplyMathOperator Started with Parameters: [Left, 1], [Operator, Add], [Right, 1]",
-                    "ApplyMathOperator"
+                    "Sum Started with Parameters: [Terms, ArrayNew]",
+                    "Sum"
                 ),
                 CheckMessageAndScope(
                     LogLevel.Trace,
-                    "ApplyMathOperator Completed Successfully with Result: 2",
-                    "ApplyMathOperator"
+                    "ArrayNew Started with Parameters: [Elements, 2 Elements]",
+                    "ArrayNew"
+                ),
+                CheckMessageAndScope(
+                    LogLevel.Trace,
+                    "ArrayNew Completed Successfully with Result: 2 Elements",
+                    "ArrayNew"
+                ),
+                CheckMessageAndScope(
+                    LogLevel.Trace,
+                    "Sum Completed Successfully with Result: 2",
+                    "ArrayNew"
                 ),
                 CheckMessageAndScope(LogLevel.Information, "2", null),
                 CheckMessageAndScope(
@@ -76,18 +86,28 @@ public partial class LoggingTests
                 ),
                 CheckMessageAndScope(
                     LogLevel.Trace,
-                    "Print Started with Parameters: [Value, ApplyMathOperator]",
+                    "Print Started with Parameters: [Value, Divide]",
                     "Print"
                 ),
                 CheckMessageAndScope(
                     LogLevel.Trace,
-                    "ApplyMathOperator Started with Parameters: [Left, 1], [Operator, Divide], [Right, 0]",
-                    "ApplyMathOperator"
+                    "Divide Started with Parameters: [Terms, ArrayNew]",
+                    "Divide"
+                ),
+                CheckMessageAndScope(
+                    LogLevel.Trace,
+                    "ArrayNew Started with Parameters: [Elements, 2 Elements]",
+                    "ArrayNew"
+                ),
+                CheckMessageAndScope(
+                    LogLevel.Trace,
+                    "ArrayNew Completed Successfully with Result: 2 Elements",
+                    "ArrayNew"
                 ),
                 CheckMessageAndScope(
                     LogLevel.Warning,
-                    "ApplyMathOperator Failed with message: Attempt to Divide by Zero.",
-                    "ApplyMathOperator"
+                    "Divide Failed with message: Attempt to Divide by Zero.",
+                    "ArrayNew"
                 ),
                 CheckMessageAndScope(
                     LogLevel.Warning,

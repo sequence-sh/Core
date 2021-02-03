@@ -19,7 +19,7 @@ public partial class AssertErrorTests : StepTestBase<AssertError, Unit>
                 "Print Divide by zero",
                 "AssertError Step: (Print Value: (1 / 0))",
                 Unit.Default,
-                "ApplyMathOperator Failed with message: Attempt to Divide by Zero.",
+                "Divide Failed with message: Attempt to Divide by Zero.",
                 "Print Failed with message: Attempt to Divide by Zero."
             );
         }
@@ -37,7 +37,7 @@ public partial class AssertErrorTests : StepTestBase<AssertError, Unit>
                     Step = new Print<int> { Value = new Divide() { Terms = Array(1, 0) } }
                 },
                 Unit.Default,
-                "ApplyMathOperator Failed with message: Attempt to Divide by Zero.",
+                "Divide Failed with message: Attempt to Divide by Zero.",
                 "Print Failed with message: Attempt to Divide by Zero."
             );
         }
