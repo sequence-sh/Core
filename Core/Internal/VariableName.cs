@@ -69,6 +69,11 @@ public readonly struct VariableName : IEquatable<VariableName>
     public static VariableName Entity { get; } = new("Entity");
 
     /// <summary>
+    /// The variable that Regex matches will be set to.
+    /// </summary>
+    public static VariableName Match { get; } = new("Match");
+
+    /// <summary>
     /// The variable name that indexes in for loops will be set to
     /// </summary>
     public static VariableName Index { get; } = new("i");
