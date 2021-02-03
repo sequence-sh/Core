@@ -59,7 +59,7 @@ public sealed class RegexReplace : CompoundStep<string>
             using var scopedMonad = new ScopedStateMonad(
                 stateMonad,
                 currentState,
-                new KeyValuePair<VariableName, object>(Variable, match.Value)
+                new KeyValuePair<VariableName, object>(Variable, new StringStream(match.Value))
             );
 
             var result = await Function.Run(scopedMonad, cancellationToken)
@@ -93,16 +93,9 @@ public sealed class RegexReplace : CompoundStep<string>
     public IStep<StringStream> Pattern { get; set; } = null!;
 
     /// <summary>
-    /// Whether the regex should ignore case.
-    /// </summary>
-    [StepProperty()]
-    [DefaultValueExplanation("False")]
-    public IStep<bool> IgnoreCase { get; set; } = new BoolConstant(false);
-
-    /// <summary>
     /// A function to take the regex match and return the new string
     /// </summary>
-    [StepProperty(2)]
+    [StepProperty(3)]
     [Required]
     [ScopedFunction]
     public IStep<StringStream> Function { get; set; } = null!;
@@ -110,9 +103,16 @@ public sealed class RegexReplace : CompoundStep<string>
     /// <summary>
     /// The variable name to use for the match in the function.
     /// </summary>
-    [VariableName(3)]
+    [VariableName(4)]
     [DefaultValueExplanation("<Match>")]
     public VariableName Variable { get; set; } = VariableName.Match;
+
+    /// <summary>
+    /// Whether the regex should ignore case.
+    /// </summary>
+    [StepProperty()]
+    [DefaultValueExplanation("False")]
+    public IStep<bool> IgnoreCase { get; set; } = new BoolConstant(false);
 
     /// <inheritdoc />
     public override Result<StepContext, IError> TryGetScopedContext(

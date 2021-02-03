@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.TestHarness;
-using Xunit.Abstractions;
 using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 
 namespace Reductech.EDR.Core.Tests.Steps
@@ -39,7 +34,7 @@ public partial class RegexReplaceTests : StepTestBase<RegexReplace, string>
                         }
                     }
                 },
-                ""
+                "Number _1_"
             );
         }
     }
