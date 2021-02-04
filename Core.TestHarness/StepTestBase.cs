@@ -143,27 +143,7 @@ public abstract partial class StepTestBase<TStep, TOutput> : IStepTestBase
         instance.StepFactory.StepType.Name.Should()
             .Be(typeof(TStep).Name); //Compare type names because of generic types
 
-        var stepFactoryType = instance.StepFactory.GetType();
-
-        stepFactoryType.Name.Should().StartWith(typeof(TStep).Name.Trim('`', '1'));
-
-        var constructor = stepFactoryType.GetConstructor(System.Array.Empty<Type>());
-
-        constructor.Should()
-            .BeNull($"{StepName} should not have a public parameterless constructor");
-
-        var instanceProperty = stepFactoryType.GetProperty(
-            "Instance",
-            BindingFlags.Static | BindingFlags.Public | BindingFlags.GetProperty
-        );
-
-        instanceProperty.Should()
-            .NotBeNull($"{StepName} should have a public static Get property named 'Instance'");
-
-        instanceProperty.Should().NotBeWritable($"{StepName}.Instance should be readonly");
-
-        instanceProperty!.PropertyType.Should()
-            .BeAssignableTo<IStepFactory>($"{StepName}.Instance should return an IStepFactory");
+        typeof(TStep).Should().BeAssignableTo(instance.StepFactory.StepType);
     }
 }
 

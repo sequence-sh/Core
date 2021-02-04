@@ -236,6 +236,18 @@ public abstract partial class StepTestBase<TStep, TOutput>
 
             step = Array(list.ToArray());
         }
+        else if (outputType == typeof(Array<bool>))
+        {
+            var list = new List<bool>();
+
+            for (var i = 0; i < 3; i++)
+            {
+                list.Add(i % 2 == 0);
+                index++;
+            }
+
+            step = Array(list.ToArray());
+        }
         else if (outputType == typeof(Array<Entity>))
         {
             var entityStream = CreateSimpleEntityStream(ref index);

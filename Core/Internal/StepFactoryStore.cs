@@ -80,21 +80,56 @@ public class StepFactoryStore
     {
         var factories =
             assemblyMemberTypes
-                .Prepend(typeof(IStep))
+                .Prepend(typeof(ICompoundStep))
                 .Select(Assembly.GetAssembly)
                 .Distinct()
                 .SelectMany(a => a!.GetTypes())
                 .Distinct()
                 .Where(x => !x.IsAbstract)
-                .Where(x => typeof(IStepFactory).IsAssignableFrom(x))
-                .Select(
-                    x => x.GetProperty("Instance", BindingFlags.Public | BindingFlags.Static)!
-                        .GetValue(null)
-                )
-                .Cast<IStepFactory>()
+                .Where(x => typeof(ICompoundStep).IsAssignableFrom(x))
+                .Select(CreateStepFactory)
                 .ToList();
 
         return Create(factories);
+    }
+
+    /// <summary>
+    /// Create a StepFactory from a step type
+    /// </summary>
+    public static IStepFactory CreateStepFactory(Type stepType)
+    {
+        Type closedType;
+
+        if (stepType.IsGenericType)
+        {
+            var arguments = (stepType as TypeInfo).GenericTypeParameters
+                .Select(x => typeof(int))
+                .ToArray();
+
+            try
+            {
+                closedType = stepType.MakeGenericType(arguments);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
+        }
+        else
+        {
+            closedType = stepType;
+        }
+
+        var instance = Activator.CreateInstance(closedType);
+        var step     = instance as ICompoundStep;
+
+        var stepFactory = step!.StepFactory;
+
+        if (stepFactory is null)
+            throw new Exception($"Step Factory for {stepType.Name} is null");
+
+        return step!.StepFactory;
     }
 
     /// <summary>

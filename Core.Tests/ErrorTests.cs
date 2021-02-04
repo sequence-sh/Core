@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
-using Reductech.EDR.Core.Enums;
 using Reductech.EDR.Core.ExternalProcesses;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
@@ -63,12 +62,7 @@ public partial class RunErrorTests
 
             yield return new ErrorTestFunction(
                 "Divide by zero",
-                new ApplyMathOperator
-                {
-                    Left     = Constant(1),
-                    Right    = Constant(0),
-                    Operator = Constant(MathOperator.Divide)
-                },
+                new Divide() { Terms = Array(1, 0) },
                 new ErrorBuilder(ErrorCode.DivideByZero)
             );
 

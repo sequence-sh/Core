@@ -56,12 +56,14 @@ public partial class DeserializationErrorTests
 
             yield return new DeserializationErrorCase(
                 "Foreach ['one', 'two'] (Print (<Entity> + 1))",
-                ("'Left' cannot take the value 'Get <Entity>'", "ApplyMathOperator")
+                ("'StringJoin' cannot take the value '1'",
+                 "StringJoin")
             );
 
             yield return new DeserializationErrorCase(
                 "Foreach ['one', 'two'] (Print (<Num> + 1)) <Num>",
-                ("'Left' cannot take the value 'Get <Num>'", "ApplyMathOperator")
+                ("'StringJoin' cannot take the value '1'",
+                 "StringJoin")
             );
 
             yield return new DeserializationErrorCase(

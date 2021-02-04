@@ -472,8 +472,7 @@ public abstract class StepFactory : IStepFactory
         }
         catch (ArgumentException e)
         {
-            if (e.Message.Contains("violates the constraint of type")
-             && openGenericType == typeof(Compare<>))
+            if (e.Message.Contains("violates the constraint of type"))
             {
                 var parameterTypeName = parameterType.GetDisplayName();
                 return new ErrorBuilder(ErrorCode.TypeNotComparable, parameterTypeName);

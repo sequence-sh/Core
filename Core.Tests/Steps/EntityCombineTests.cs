@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.TestHarness;
 using static Reductech.EDR.Core.TestHarness.StaticHelpers;
@@ -18,8 +17,7 @@ public partial class EntityCombineTests : StepTestBase<EntityCombine, Entity>
                 "Combine two simple entities",
                 new EntityCombine
                 {
-                    First  = Constant(CreateEntity(("Foo", 1))),
-                    Second = Constant(CreateEntity(("Bar", 2))),
+                    Terms = Array(CreateEntity(("Foo", 1)), CreateEntity(("Bar", 2)))
                 },
                 CreateEntity(("Foo", 1), ("Bar", 2))
             );
@@ -28,8 +26,10 @@ public partial class EntityCombineTests : StepTestBase<EntityCombine, Entity>
                 "Combine two simple entities with property override",
                 new EntityCombine
                 {
-                    First  = Constant(CreateEntity(("Foo", 1), ("Bar", 1))),
-                    Second = Constant(CreateEntity(("Bar", 2))),
+                    Terms = Array(
+                        CreateEntity(("Foo", 1), ("Bar", 1)),
+                        CreateEntity(("Bar", 2))
+                    )
                 },
                 CreateEntity(("Foo", 1), ("Bar", 2))
             );
@@ -38,8 +38,10 @@ public partial class EntityCombineTests : StepTestBase<EntityCombine, Entity>
                 "Combine nested entities",
                 new EntityCombine
                 {
-                    First  = Constant(CreateEntity(("Foo", CreateEntity(("Bar", 2))))),
-                    Second = Constant(CreateEntity(("Foo", CreateEntity(("Baz", 3))))),
+                    Terms = Array(
+                        CreateEntity(("Foo", CreateEntity(("Bar", 2)))),
+                        CreateEntity(("Foo", CreateEntity(("Baz", 3))))
+                    )
                 },
                 CreateEntity(("Foo", CreateEntity(("Bar", 2), ("Baz", 3))))
             );
@@ -56,7 +58,7 @@ public partial class EntityCombineTests : StepTestBase<EntityCombine, Entity>
             yield return new SerializeCase(
                 "Default",
                 step,
-                @"(Prop1: ""Val0"" Prop2: ""Val1"") with (Prop1: ""Val2"" Prop2: ""Val3"")"
+                @"(Prop1: ""Val0"" Prop2: ""Val1"") + (Prop1: ""Val2"" Prop2: ""Val3"") + (Prop1: ""Val4"" Prop2: ""Val5"")"
             );
         }
     }

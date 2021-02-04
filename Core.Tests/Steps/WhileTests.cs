@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using Reductech.EDR.Core.Enums;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.TestHarness;
@@ -18,20 +17,24 @@ public partial class WhileTests : StepTestBase<While, Unit>
         {
             yield return new StepCase(
                 "Repeat while Foo < 5",
-                new Core.Steps.Sequence<Unit>
+                new Sequence<Unit>
                 {
                     InitialSteps = new List<IStep<Unit>> { SetVariable("Foo", 1) },
-                    FinalStep = new While()
+                    FinalStep = new While
                     {
                         Action = new IncrementVariable
                         {
                             Amount = Constant(1), Variable = new VariableName("Foo")
                         },
-                        Condition = new Compare<int>
+                        Condition = new LessThan<int>
                         {
-                            Left     = GetVariable<int>("Foo"),
-                            Right    = Constant(5),
-                            Operator = Constant(CompareOperator.LessThan)
+                            Terms = new ArrayNew<int>
+                            {
+                                Elements = new[]
+                                {
+                                    GetVariable<int>("Foo"), Constant(5)
+                                }
+                            }
                         }
                     }
                 },

@@ -167,16 +167,6 @@ Print 'Comments!'",
             yield return new DeserializationTestInstance("StringIsEmpty 'World' | Print", false);
 
             yield return new DeserializationTestInstance(
-                "3 | ApplyMathOperator 'Add' 4 | ApplyMathOperator 'Multiply' 5 | Print",
-                35
-            );
-
-            yield return new DeserializationTestInstance(
-                "Print (3 | ApplyMathOperator 'Add' 4 | ApplyMathOperator 'Multiply' 5)",
-                35
-            );
-
-            yield return new DeserializationTestInstance(
                 @"
 - <ArrayVar> = ['abc', '123']
 - Print(ArrayLength <ArrayVar>)",
@@ -293,9 +283,28 @@ Print 'Comments!'",
 
             yield return new DeserializationTestInstance("(Foo.Bar:'b')", "(Foo: (Bar: \"b\"))");
 
+            yield return new DeserializationTestInstance("'a' + 'b' + 'c'", "abc");
+
             yield return new DeserializationTestInstance(
-                "(Foo: 'a') with (Bar: 'b')",
+                "(Foo: 'a') + (Bar: 'b')",
                 "(Foo: \"a\" Bar: \"b\")"
+            );
+
+            yield return new DeserializationTestInstance(
+                "(Foo: 'a') + (Bar: 'b') + (Baz: 'c')",
+                "(Foo: \"a\" Bar: \"b\" Baz: \"c\")"
+            );
+
+            yield return new DeserializationTestInstance("[1,2,3][2]", "3");
+
+            yield return new DeserializationTestInstance(
+                "([1,2] + [3,4] + [5,6])[5]",
+                "6"
+            );
+
+            yield return new DeserializationTestInstance(
+                "((foo:'a') + (bar:'b'))['bar']",
+                "b"
             );
 
             yield return new DeserializationTestInstance(
