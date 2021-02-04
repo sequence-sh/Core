@@ -56,14 +56,14 @@ public partial class DeserializationErrorTests
 
             yield return new DeserializationErrorCase(
                 "Foreach ['one', 'two'] (Print (<Entity> + 1))",
-                ("Could not infer type",
-                 "Line: 1, Col: 31, Idx: 31 - Line: 1, Col: 42, Idx: 42 Text: <Entity> + 1")
+                ("'StringJoin' cannot take the value '1'",
+                 "StringJoin")
             );
 
             yield return new DeserializationErrorCase(
                 "Foreach ['one', 'two'] (Print (<Num> + 1)) <Num>",
-                ("Could not infer type",
-                 "Line: 1, Col: 31, Idx: 31 - Line: 1, Col: 39, Idx: 39 Text: <Num> + 1")
+                ("'StringJoin' cannot take the value '1'",
+                 "StringJoin")
             );
 
             yield return new DeserializationErrorCase(

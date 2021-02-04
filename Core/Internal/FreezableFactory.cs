@@ -248,6 +248,7 @@ public static class InfixHelper
     private static readonly ILookup<string, OperatorData1> OperatorLookup =
         new List<OperatorData1>()
             {
+                new("+", "ArrayConcat", nameof(ArrayConcat<int>.Arrays)),
                 new("+", nameof(Sum), nameof(Sum.Terms)),
                 new("-", nameof(Subtract), nameof(Subtract.Terms)),
                 new("*", nameof(Product), nameof(Product.Terms)),
@@ -264,117 +265,8 @@ public static class InfixHelper
                 new(">=", "GreaterThanOrEqual", "Terms"),
                 new("+", nameof(EntityCombine), nameof(EntityCombine.Terms)),
                 new("+", nameof(StringJoin), nameof(StringJoin.Strings)),
-                new("+", "ArrayConcat", nameof(ArrayConcat<int>.Arrays)),
             }
             .ToLookup(x => x.OperatorString, StringComparer.OrdinalIgnoreCase);
-
-    ///// <summary>
-    ///// Creates an infix operator step
-    ///// </summary>
-    //public static Result<FreezableStepProperty, IError> TryCreateStep(
-    //    IErrorLocation errorLocation,
-    //    Result<FreezableStepProperty, IError> left,
-    //    Result<FreezableStepProperty, IError> right,
-    //    string op)
-    //{
-    //    List<IError> errors = new();
-
-    //    if (left.IsFailure)
-    //        errors.Add(left.Error);
-
-    //    if (right.IsFailure)
-    //        errors.Add(right.Error);
-
-    //    if (!OperatorDataDictionary.TryGetValue(op, out var opData))
-    //        errors.Add(new SingleError(errorLocation, ErrorCode.CouldNotParse, op, "Operator"));
-
-    //    if (errors.Any())
-    //        return Result.Failure<FreezableStepProperty, IError>(ErrorList.Combine(errors));
-
-    //    var stepParameterDict = new StepParameterDict
-    //    {
-    //        { new StepParameterReference(opData!.LeftName), left.Value },
-    //        { new StepParameterReference(opData.RightName), right.Value },
-    //    };
-
-    //    if (opData.Operator.HasValue)
-    //    {
-    //        stepParameterDict.Add(
-    //            new StepParameterReference(opData.Operator.Value.Name),
-    //            new FreezableStepProperty(opData.Operator.Value.Step, errorLocation)
-    //        );
-    //    }
-
-    //    var data = new FreezableStepData(
-    //        stepParameterDict,
-    //        errorLocation
-    //    );
-
-    //    var step = new CompoundFreezableStep(opData.StepName, data, null);
-
-    //    return new FreezableStepProperty(step, errorLocation);
-    //}
-
-    //private static readonly IReadOnlyDictionary<string, OperatorData> OperatorDataDictionary =
-    //    Enum.GetValues<MathOperator>()
-    //        .ToDictionary(
-    //            mo => mo.GetDisplayName(),
-    //            mo => new OperatorData(
-    //                nameof(ApplyMathOperator),
-    //                nameof(ApplyMathOperator.Left),
-    //                nameof(ApplyMathOperator.Right),
-    //                (
-    //                    nameof(ApplyMathOperator.Operator),
-    //                    new EnumConstantFreezable(
-    //                        new Enumeration(nameof(MathOperator), mo.ToString())
-    //                    ))
-    //            )
-    //        )
-    //        .Concat(
-    //            Enum.GetValues<BooleanOperator>()
-    //                .ToDictionary(
-    //                    mo => mo.GetDisplayName(),
-    //                    mo => new OperatorData(
-    //                        nameof(ApplyBooleanOperator),
-    //                        nameof(ApplyBooleanOperator.Left),
-    //                        nameof(ApplyBooleanOperator.Right),
-    //                        (
-    //                            nameof(ApplyBooleanOperator.Operator),
-    //                            new EnumConstantFreezable(
-    //                                new Enumeration(nameof(BooleanOperator), mo.ToString())
-    //                            ))
-    //                    )
-    //                )
-    //        )
-    //        .Concat(
-    //            Enum.GetValues<CompareOperator>()
-    //                .ToDictionary(
-    //                    mo => mo.GetDisplayName(),
-    //                    mo => new OperatorData(
-    //                        CompareStepFactory.Instance.TypeName,
-    //                        nameof(Compare<int>.Left),
-    //                        nameof(Compare<int>.Right),
-    //                        (
-    //                            nameof(Compare<int>.Operator),
-    //                            new EnumConstantFreezable(
-    //                                new Enumeration(nameof(CompareOperator), mo.ToString())
-    //                            ))
-    //                    )
-    //                )
-    //        )
-    //        .Append(
-    //            new KeyValuePair<string, OperatorData>(
-    //                "with",
-    //                new OperatorData(
-    //                    EntityCombineStepFactory.Instance.TypeName,
-    //                    nameof(EntityCombine.First),
-    //                    nameof(EntityCombine.Second),
-    //                    null
-    //                )
-    //            )
-    //        )
-    //        .Where(x => x.Key != MathOperator.None.ToString())
-    //        .ToDictionary(x => x.Key, x => x.Value, StringComparer.OrdinalIgnoreCase);
 }
 
 }
