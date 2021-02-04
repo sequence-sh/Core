@@ -14,11 +14,22 @@ namespace Reductech.EDR.Core.Steps
 {
 
 /// <summary>
+/// A step that declares a new array
+/// </summary>
+public interface IArrayNewStep
+{
+    /// <summary>
+    /// The elements of the array
+    /// </summary>
+    IEnumerable<IStep> ElementSteps { get; } //This is used by ChainInfixSerializer
+}
+
+/// <summary>
 /// Represents an ordered collection of objects.
 /// </summary>
 [Alias("Array")]
 [Alias("NewArray")]
-public sealed class ArrayNew<T> : CompoundStep<Array<T>>
+public sealed class ArrayNew<T> : CompoundStep<Array<T>>, IArrayNewStep
 {
     /// <inheritdoc />
     protected override async Task<Result<Array<T>, IError>> Run(
@@ -44,6 +55,9 @@ public sealed class ArrayNew<T> : CompoundStep<Array<T>>
     [StepListProperty(1)]
     [Required]
     public IReadOnlyList<IStep<T>> Elements { get; set; } = null!;
+
+    /// <inheritdoc />
+    public IEnumerable<IStep> ElementSteps => Elements;
 }
 
 /// <summary>
@@ -66,7 +80,7 @@ public class ArrayNewStepFactory : GenericStepFactory
 
     /// <inheritdoc />
     protected override ITypeReference GetOutputTypeReference(ITypeReference memberTypeReference) =>
-        new GenericTypeReference(typeof(Core.Array<>), new[] { memberTypeReference });
+        new GenericTypeReference(typeof(Array<>), new[] { memberTypeReference });
 
     /// <inheritdoc />
     protected override Result<ITypeReference, IError> GetMemberType(

@@ -38,6 +38,17 @@ public partial class AndTests : StepTestBase<And, bool>
             );
         }
     }
+
+    /// <inheritdoc />
+    protected override IEnumerable<SerializeCase> SerializeCases
+    {
+        get
+        {
+            var case1 = CreateDefaultSerializeCase();
+
+            yield return case1 with { ExpectedSCL = "True && False && True" };
+        }
+    }
 }
 
 }

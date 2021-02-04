@@ -37,6 +37,21 @@ public partial class LessThanOrEqualTests : StepTestBase<LessThanOrEqual<int>, b
             );
         }
     }
+
+    /// <inheritdoc />
+    protected override IEnumerable<SerializeCase> SerializeCases
+    {
+        get
+        {
+            var (step, _) = CreateStepWithDefaultOrArbitraryValues();
+
+            yield return new SerializeCase(
+                "Default",
+                step,
+                @"0 <= 1 <= 2"
+            );
+        }
+    }
 }
 
 }

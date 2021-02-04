@@ -16,6 +16,9 @@ public sealed class And : BaseOperatorStep<And, bool, bool>
     {
         return terms.All(x => x);
     }
+
+    /// <inheritdoc />
+    public override string Operator => "&&";
 }
 
 }

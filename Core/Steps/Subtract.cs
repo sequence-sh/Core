@@ -31,6 +31,9 @@ public sealed class Subtract : BaseOperatorStep<Subtract, int, int>
 
         return total;
     }
+
+    /// <inheritdoc />
+    public override string Operator => "-";
 }
 
 }

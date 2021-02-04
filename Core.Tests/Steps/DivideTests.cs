@@ -38,6 +38,17 @@ public partial class DivideTests : StepTestBase<Divide, int>
             );
         }
     }
+
+    /// <inheritdoc />
+    protected override IEnumerable<SerializeCase> SerializeCases
+    {
+        get
+        {
+            var case1 = CreateDefaultSerializeCase();
+
+            yield return case1 with { ExpectedSCL = "0 / 1 / 2" };
+        }
+    }
 }
 
 }

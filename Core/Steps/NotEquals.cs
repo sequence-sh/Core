@@ -11,6 +11,9 @@ public sealed class NotEquals<T> : CompareBaseOperatorStep<NotEquals<T>, T>
 {
     /// <inheritdoc />
     protected override bool CheckComparisonValue(int v) => v != 0;
+
+    /// <inheritdoc />
+    public override string Operator => "!=";
 }
 
 }

@@ -16,6 +16,9 @@ public sealed class Product : BaseOperatorStep<Product, int, int>
     {
         return terms.Aggregate(1, (a, b) => a * b);
     }
+
+    /// <inheritdoc />
+    public override string Operator => "*";
 }
 
 }

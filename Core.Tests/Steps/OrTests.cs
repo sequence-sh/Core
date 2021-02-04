@@ -38,6 +38,21 @@ public partial class OrTests : StepTestBase<Or, bool>
             );
         }
     }
+
+    /// <inheritdoc />
+    protected override IEnumerable<SerializeCase> SerializeCases
+    {
+        get
+        {
+            var (step, _) = CreateStepWithDefaultOrArbitraryValues();
+
+            yield return new SerializeCase(
+                "Default",
+                step,
+                @"True || False || True"
+            );
+        }
+    }
 }
 
 }

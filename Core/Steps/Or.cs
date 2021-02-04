@@ -16,6 +16,9 @@ public sealed class Or : BaseOperatorStep<Or, bool, bool>
     {
         return terms.Any(x => x);
     }
+
+    /// <inheritdoc />
+    public override string Operator => "||";
 }
 
 }

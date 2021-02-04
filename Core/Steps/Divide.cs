@@ -34,6 +34,9 @@ public sealed class Divide : BaseOperatorStep<Divide, int, int>
 
         return total;
     }
+
+    /// <inheritdoc />
+    public override string Operator => "/";
 }
 
 }

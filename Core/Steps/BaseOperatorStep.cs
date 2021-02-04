@@ -6,6 +6,7 @@ using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
+using Reductech.EDR.Core.Internal.Serialization;
 
 namespace Reductech.EDR.Core.Steps
 {
@@ -24,7 +25,7 @@ public abstract class BaseOperatorStep<TStep, TElement, TOutput> : CompoundStep<
     public IStep<Array<TElement>> Terms { get; set; } = null!;
 
     /// <inheritdoc />
-    public override IStepFactory StepFactory { get; } = new SimpleStepFactory<TStep, TOutput>();
+    public override IStepFactory StepFactory { get; } = ChainInfixStepFactory.Instance;
 
     /// <inheritdoc />
     protected override async Task<Result<TOutput, IError>> Run(
@@ -46,9 +47,32 @@ public abstract class BaseOperatorStep<TStep, TElement, TOutput> : CompoundStep<
     }
 
     /// <summary>
+    /// The operator
+    /// </summary>
+    public abstract string Operator { get; }
+
+    /// <summary>
     /// Calculate the result
     /// </summary>
     protected abstract Result<TOutput, IErrorBuilder> Operate(IEnumerable<TElement> terms);
+
+    /// <summary>
+    /// Step factory for chain infix steps
+    /// </summary>
+    protected class ChainInfixStepFactory : SimpleStepFactory<TStep, TOutput>
+    {
+        private ChainInfixStepFactory() { }
+
+        /// <summary>
+        /// The instance
+        /// </summary>
+        public static SimpleStepFactory<TStep, TOutput> Instance { get; } =
+            new ChainInfixStepFactory();
+
+        /// <inheritdoc />
+        public override IStepSerializer Serializer { get; } =
+            new ChainInfixSerializer(FormatTypeName(typeof(TStep)), new TStep().Operator);
+    }
 }
 
 }

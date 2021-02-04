@@ -11,6 +11,9 @@ public sealed class LessThan<T> : CompareBaseOperatorStep<LessThan<T>, T>
 {
     /// <inheritdoc />
     protected override bool CheckComparisonValue(int v) => v < 0;
+
+    /// <inheritdoc />
+    public override string Operator => "<";
 }
 
 }

@@ -38,6 +38,21 @@ public partial class ModuloTests : StepTestBase<Modulo, int>
             );
         }
     }
+
+    /// <inheritdoc />
+    protected override IEnumerable<SerializeCase> SerializeCases
+    {
+        get
+        {
+            var (step, _) = CreateStepWithDefaultOrArbitraryValues();
+
+            yield return new SerializeCase(
+                "Default",
+                step,
+                @"0 % 1 % 2"
+            );
+        }
+    }
 }
 
 }

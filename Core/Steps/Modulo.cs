@@ -31,6 +31,9 @@ public sealed class Modulo : BaseOperatorStep<Modulo, int, int>
 
         return total;
     }
+
+    /// <inheritdoc />
+    public override string Operator => "%";
 }
 
 }

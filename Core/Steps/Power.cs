@@ -32,6 +32,9 @@ public sealed class Power : BaseOperatorStep<Power, int, int>
 
         return total;
     }
+
+    /// <inheritdoc />
+    public override string Operator => "^";
 }
 
 }

@@ -14,6 +14,9 @@ namespace Reductech.EDR.Core.Steps
 public sealed class Sum : BaseOperatorStep<Sum, int, int>
 {
     /// <inheritdoc />
+    public override string Operator => "+";
+
+    /// <inheritdoc />
     protected override Result<int, IErrorBuilder> Operate(IEnumerable<int> terms)
     {
         return terms.Sum();

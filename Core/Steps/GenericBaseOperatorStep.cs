@@ -2,6 +2,7 @@
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
+using Reductech.EDR.Core.Internal.Serialization;
 
 namespace Reductech.EDR.Core.Steps
 {
@@ -14,13 +15,20 @@ public abstract class
     where TStep : BaseOperatorStep<TStep, TElement, TOutput>, new()
 {
     /// <inheritdoc />
-    public override IStepFactory StepFactory { get; } = new GenericBaseOperatorStepFactory();
+    public override IStepFactory StepFactory { get; } = GenericBaseOperatorStepFactory.Instance;
 
     /// <summary>
     /// Compares two items.
     /// </summary>
     public sealed class GenericBaseOperatorStepFactory : GenericStepFactory
     {
+        private GenericBaseOperatorStepFactory() { }
+
+        /// <summary>
+        /// The instance
+        /// </summary>
+        public static GenericBaseOperatorStepFactory Instance { get; } = new();
+
         /// <inheritdoc />
         public override Type StepType => typeof(TStep).GetGenericTypeDefinition();
 
@@ -49,15 +57,11 @@ public abstract class
             return result;
         }
 
-        ///// <inheritdoc />
-        //public override IStepSerializer Serializer => new StepSerializer(
-        //    TypeName,
-        //    new StepComponent(nameof(Compare<int>.Left)),
-        //    SpaceComponent.Instance,
-        //    new EnumDisplayComponent<CompareOperator>(nameof(Compare<int>.Operator)),
-        //    SpaceComponent.Instance,
-        //    new StepComponent(nameof(Compare<int>.Right))
-        //);
+        /// <inheritdoc />
+        public override IStepSerializer Serializer { get; } = new ChainInfixSerializer(
+            FormatTypeName(typeof(TStep)),
+            new TStep().Operator
+        );
     }
 }
 
