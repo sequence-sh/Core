@@ -67,6 +67,9 @@ public static class Extensions
         new Action<Mock<IConsole>, MockRepository>((a, _) => action(a))
     );
 
+    public static T WithConsoleAction<T>(this T cws, Action<Mock<IConsole>, MockRepository> action)
+        where T : ICaseWithSetup => WithAction(cws, action);
+
     public static T WithCompressionAction<T>(this T cws, Action<Mock<ICompression>> action)
         where T : ICaseWithSetup => WithAction(
         cws,

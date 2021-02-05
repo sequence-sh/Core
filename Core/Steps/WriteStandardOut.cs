@@ -49,7 +49,7 @@ public class WriteStandardOut : CompoundStep<Unit>
     /// The data to write
     /// </summary>
 
-    [StepProperty(0)]
+    [StepProperty(1)]
     [Required]
     public IStep<StringStream> Data { get; set; } = null!;
 
