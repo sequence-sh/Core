@@ -18,7 +18,7 @@ public class FakeFileStreamAdapter : StreamAdapter, IFileStream
 
     /// <inheritdoc />
     public FakeFileStreamAdapter([NotNull] string s) : this(
-        new MemoryStream(Encoding.ASCII.GetBytes("Hello World"))
+        new MemoryStream(Encoding.ASCII.GetBytes(s))
     ) { }
 
     /// <inheritdoc />
