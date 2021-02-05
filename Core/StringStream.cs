@@ -6,7 +6,11 @@ using System.Threading.Tasks;
 using Reductech.EDR.Core.Enums;
 using Reductech.EDR.Core.Internal.Serialization;
 using Reductech.EDR.Core.Util;
-using Option = OneOf.OneOf<string, (System.IO.Stream, Reductech.EDR.Core.Enums.EncodingEnum)>;
+using Thinktecture;
+using Thinktecture.IO;
+using Thinktecture.IO.Adapters;
+using Option =
+    OneOf.OneOf<string, (Thinktecture.IO.IStream, Reductech.EDR.Core.Enums.EncodingEnum)>;
 
 namespace Reductech.EDR.Core
 {
@@ -21,7 +25,13 @@ public sealed class StringStream : IEquatable<StringStream>, IComparable<StringS
     /// <summary>
     /// Create a new DataStream
     /// </summary>
-    public StringStream(Stream stream, EncodingEnum encoding) => Value = (stream, encoding);
+    public StringStream(IStream stream, EncodingEnum encoding) => Value = (stream, encoding);
+
+    /// <summary>
+    /// Create a new DataStream
+    /// </summary>
+    public StringStream(Stream stream, EncodingEnum encoding) =>
+        Value = (new StreamAdapter(stream), encoding);
 
     /// <summary>
     /// Create a new DataStream from a string
@@ -69,8 +79,18 @@ public sealed class StringStream : IEquatable<StringStream>, IComparable<StringS
             if (stream.CanSeek)
                 stream.Position = 0;
 
-            using StreamReader reader = new(stream, encodingEnum.Convert(), leaveOpen: false);
-            var                s      = await reader.ReadToEndAsync();
+            if (stream is FakeFileStreamAdapter fake) //This is a hack
+                stream = new StreamAdapter(fake.Stream);
+
+            using IStreamReader reader = new StreamReaderAdapter(
+                stream,
+                encodingEnum.Convert(),
+                true,
+                -1,
+                false
+            );
+
+            var s = await reader.ReadToEndAsync();
 
             Value = s;
 
@@ -97,8 +117,16 @@ public sealed class StringStream : IEquatable<StringStream>, IComparable<StringS
             var (stream, encodingEnum) = Value.AsT1;
 
             stream.Position = 0;
-            using StreamReader reader = new(stream, encodingEnum.Convert(), leaveOpen: false);
-            var                s      = reader.ReadToEnd();
+
+            using var reader = new StreamReaderAdapter(
+                stream,
+                encodingEnum.Convert(),
+                true,
+                -1,
+                false
+            );
+
+            var s = reader.ReadToEnd();
 
             Value = s;
 
@@ -125,7 +153,7 @@ public sealed class StringStream : IEquatable<StringStream>, IComparable<StringS
     /// You should dispose of this stream after using it.
     /// </summary>
     /// <returns></returns>
-    public (Stream stream, EncodingEnum encodingEnum) GetStream()
+    public (IStream stream, EncodingEnum encodingEnum) GetStream()
     {
         _semaphore.Wait();
 
@@ -138,7 +166,7 @@ public sealed class StringStream : IEquatable<StringStream>, IComparable<StringS
                     byte[]       byteArray = Encoding.UTF8.GetBytes(x);
                     MemoryStream stream    = new(byteArray);
 
-                    return (stream, EncodingEnum.UTF8);
+                    return (new StreamAdapter(stream), EncodingEnum.UTF8);
                 },
                 x => x
             );

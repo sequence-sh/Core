@@ -3,6 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Attributes;
+using Reductech.EDR.Core.ExternalProcesses;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Internal.Logging;
@@ -31,14 +32,14 @@ public class DeleteItem : CompoundStep<Unit>
 
         Result<Unit, IErrorBuilder> result;
 
-        if (stateMonad.FileSystemHelper.DoesDirectoryExist(path))
+        if (stateMonad.ExternalContext.FileSystemHelper.Directory.Exists(path))
         {
-            result = stateMonad.FileSystemHelper.DeleteDirectory(path, true);
+            result = stateMonad.ExternalContext.FileSystemHelper.DeleteDirectory(path, true);
             stateMonad.Logger.LogSituation(LogSituation.DirectoryDeleted, new[] { path });
         }
-        else if (stateMonad.FileSystemHelper.DoesFileExist(path))
+        else if (stateMonad.ExternalContext.FileSystemHelper.File.Exists(path))
         {
-            result = stateMonad.FileSystemHelper.DeleteFile(path);
+            result = stateMonad.ExternalContext.FileSystemHelper.DeleteFile(path);
             stateMonad.Logger.LogSituation(LogSituation.FileDeleted, new[] { path });
         }
         else

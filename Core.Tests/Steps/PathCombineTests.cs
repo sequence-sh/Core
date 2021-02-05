@@ -38,22 +38,21 @@ public partial class PathCombineTests : StepTestBase<PathCombine, StringStream>
             );
 
             yield return new StepCase(
-                    "Relative",
-                    new PathCombine
+                "Relative",
+                new PathCombine
+                {
+                    Paths = new ArrayNew<StringStream>
                     {
-                        Paths = new ArrayNew<StringStream>
+                        Elements = new List<IStep<StringStream>>()
                         {
-                            Elements = new List<IStep<StringStream>>()
-                            {
-                                Constant("Hello"), Constant("World")
-                            }
+                            Constant("Hello"), Constant("World")
                         }
-                    },
-                    expected
-                )
-                .WithFileSystemAction(
-                    x => x.Setup(a => a.GetCurrentDirectory()).Returns(currentDirectory)
-                );
+                    }
+                },
+                expected
+            ).WithDirectoryAction(
+                x => x.Setup(d => d.GetCurrentDirectory()).Returns(currentDirectory)
+            );
         }
     }
 }

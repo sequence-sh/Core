@@ -53,7 +53,7 @@ public sealed class RunExternalProcess : CompoundStep<Unit>
             return encodingResult.ConvertFailure<Unit>();
 
         var r = await
-            stateMonad.ExternalProcessRunner.RunExternalProcess(
+            stateMonad.ExternalContext.ExternalProcessRunner.RunExternalProcess(
                     pathResult.Value,
                     stateMonad.Logger,
                     IgnoreNoneErrorHandler.Instance,

@@ -67,6 +67,8 @@
     <PackageReference Include="OneOf" Version="3.0.163" />
     <PackageReference Include="System.Configuration.ConfigurationManager" Version="5.0.0" />
     <PackageReference Include="System.Linq.Async" Version="5.0.0" />
+    <PackageReference Include="Thinktecture.Console.Abstractions" Version="2.5.0" />
+    <PackageReference Include="Thinktecture.IO.FileSystem.Abstractions" Version="2.5.0" />
   </ItemGroup>
 
   <ItemGroup>

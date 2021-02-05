@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Enums;
+using Reductech.EDR.Core.ExternalProcesses;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
 
@@ -37,7 +38,8 @@ public sealed class FileRead : CompoundStep<StringStream>
         if (decompress.IsFailure)
             return decompress.ConvertFailure<StringStream>();
 
-        var result = stateMonad.FileSystemHelper.ReadFile(path.Value, decompress.Value)
+        var result = stateMonad.ExternalContext.FileSystemHelper
+            .ReadFile(path.Value, decompress.Value)
             .MapError(x => x.WithLocation(this))
             .Map(x => new StringStream(x, encoding.Value)); //TODO fix
 

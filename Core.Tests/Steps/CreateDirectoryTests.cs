@@ -1,8 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.TestHarness;
 using Reductech.EDR.Core.Util;
+using Thinktecture.IO;
 using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 
 namespace Reductech.EDR.Core.Tests.Steps
@@ -19,10 +21,9 @@ public partial class CreateDirectoryTests : StepTestBase<CreateDirectory, Unit>
                 "Create Directory",
                 new CreateDirectory { Path = Constant("MyPath") },
                 Unit.Default
-            ).WithFileSystemAction(
+            ).WithDirectoryAction(
                 x =>
-                    x.Setup(h => h.CreateDirectory("MyPath"))
-                        .Returns(Unit.Default)
+                    x.Setup(h => h.CreateDirectory("MyPath")).Returns((IDirectoryInfo)null!)
             );
         }
     }
@@ -33,15 +34,13 @@ public partial class CreateDirectoryTests : StepTestBase<CreateDirectory, Unit>
         get
         {
             yield return new DeserializeCase(
-                    "Create Directory",
-                    "CreateDirectory Path: 'MyPath'",
-                    Unit.Default
-                )
-                .WithFileSystemAction(
-                    x =>
-                        x.Setup(h => h.CreateDirectory("MyPath"))
-                            .Returns(Unit.Default)
-                );
+                "Create Directory",
+                "CreateDirectory Path: 'MyPath'",
+                Unit.Default
+            ).WithDirectoryAction(
+                x =>
+                    x.Setup(h => h.CreateDirectory("MyPath")).Returns((IDirectoryInfo)null!)
+            );
         }
     }
 
@@ -53,12 +52,15 @@ public partial class CreateDirectoryTests : StepTestBase<CreateDirectory, Unit>
             yield return new ErrorCase(
                     "Error returned",
                     new CreateDirectory { Path = Constant("MyPath") },
-                    new ErrorBuilder(ErrorCode.Test, "ValueIf Error")
+                    new ErrorBuilder(
+                        ErrorCode.ExternalProcessError,
+                        "Exception of type 'System.Exception' was thrown."
+                    )
                 )
-                .WithFileSystemAction(
+                .WithDirectoryAction(
                     x =>
                         x.Setup(h => h.CreateDirectory("MyPath"))
-                            .Returns(new ErrorBuilder(ErrorCode.Test, "ValueIf Error"))
+                            .Throws<Exception>()
                 );
         }
     }

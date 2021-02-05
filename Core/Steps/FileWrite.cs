@@ -3,6 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Attributes;
+using Reductech.EDR.Core.ExternalProcesses;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Util;
@@ -39,11 +40,16 @@ public sealed class FileWrite : CompoundStep<Unit>
 
         var stream = stringStreamResult.Value.GetStream().stream;
 
-        var r = await stateMonad.FileSystemHelper
-            .WriteFileAsync(path.Value, stream, compressResult.Value, cancellationToken)
+        var r = await stateMonad.ExternalContext.FileSystemHelper
+            .WriteFileAsync(
+                path.Value,
+                stream,
+                compressResult.Value,
+                cancellationToken
+            )
             .MapError(x => x.WithLocation(this));
 
-        await stream.DisposeAsync();
+        stream.Dispose();
 
         return r;
     }

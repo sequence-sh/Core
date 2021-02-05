@@ -3,13 +3,14 @@ using System.IO;
 using System.Text;
 using FluentAssertions;
 using Reductech.EDR.Core.Enums;
+using Thinktecture.IO.Adapters;
 using Xunit;
 using Xunit.Sdk;
 
 namespace Reductech.EDR.Core.Tests
 {
 
-public partial class StringStreamTests
+public class StringStreamTests
 {
     public const string StringToTest = "Hello World";
 
@@ -50,7 +51,7 @@ public partial class StringStreamTests
 
         var (stream, encodingEnum) = ss.GetStream();
 
-        var sr = new StreamReader(stream, encodingEnum.Convert());
+        var sr = new StreamReaderAdapter(stream, encodingEnum.Convert());
 
         sr.ReadToEnd().Should().Be(StringToTest);
     }
@@ -64,7 +65,7 @@ public partial class StringStreamTests
 
         var (stream, encodingEnum) = ss.GetStream();
 
-        var sr = new StreamReader(stream, encodingEnum.Convert());
+        var sr = new StreamReaderAdapter(stream, encodingEnum.Convert());
 
         sr.ReadToEnd().Should().Be(StringToTest);
     }
