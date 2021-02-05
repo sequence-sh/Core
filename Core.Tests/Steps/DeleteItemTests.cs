@@ -23,6 +23,7 @@ public partial class DeleteItemTests : StepTestBase<DeleteItem, Unit>
                         //, "Directory 'My Path' Deleted."
                     )
                     .WithDirectoryAction(x => x.Setup(a => a.Exists("My Path")).Returns(true))
+                    .WithDirectoryAction(x => x.Setup(a => a.Delete("My Path", true)))
                 ;
 
             yield return new StepCase(
@@ -53,7 +54,10 @@ public partial class DeleteItemTests : StepTestBase<DeleteItem, Unit>
             yield return new ErrorCase(
                     "Could not delete file",
                     new DeleteItem { Path = Constant("My Path") },
-                    new ErrorBuilder(ErrorCode.Test, "ValueIf Error")
+                    new ErrorBuilder(
+                        ErrorCode.ExternalProcessError,
+                        "Exception of type 'System.Exception' was thrown."
+                    )
                 )
                 .WithDirectoryAction(x => x.Setup(a => a.Exists("My Path")).Returns(true))
                 .WithDirectoryAction(

@@ -31,7 +31,7 @@ public static class FileSystemHelper
         #pragma warning disable CA1031 // Do not catch general exception types
         catch (Exception e)
         {
-            r = new ErrorBuilder(ErrorCode.ExternalProcessError, e.Message);
+            r = ErrorCode.ExternalProcessError.ToErrorBuilder(e.Message);
         }
 
         return r;
@@ -57,7 +57,7 @@ public static class FileSystemHelper
         #pragma warning disable CA1031 // Do not catch general exception types
         catch (Exception e)
         {
-            r1 = new ErrorBuilder(ErrorCode.ExternalProcessError, e.Message);
+            r1 = ErrorCode.ExternalProcessError.ToErrorBuilder(e.Message);
         }
         #pragma warning restore CA1031 // Do not catch general exception types
 
@@ -79,7 +79,7 @@ public static class FileSystemHelper
         #pragma warning disable CA1031 // Do not catch general exception types
         catch (Exception e)
         {
-            return new ErrorBuilder(e, ErrorCode.ExternalProcessError);
+            return ErrorCode.ExternalProcessError.ToErrorBuilder(e.Message);
         }
         #pragma warning restore CA1031 // Do not catch general exception types
 
@@ -98,7 +98,7 @@ public static class FileSystemHelper
         #pragma warning disable CA1031 // Do not catch general exception types
         catch (Exception e)
         {
-            return new ErrorBuilder(e, ErrorCode.ExternalProcessError);
+            return ErrorCode.ExternalProcessError.ToErrorBuilder(e.Message);
         }
         #pragma warning restore CA1031 // Do not catch general exception types
 
@@ -130,7 +130,7 @@ public static class FileSystemHelper
         #pragma warning disable CA1031 // Do not catch general exception types
         catch (Exception e)
         {
-            result = new ErrorBuilder(ErrorCode.ExternalProcessError, e.Message);
+            result = ErrorCode.ExternalProcessError.ToErrorBuilder(e.Message);
         }
         #pragma warning restore CA1031 // Do not catch general exception types
 
@@ -162,7 +162,7 @@ public static class FileSystemHelper
         catch (Exception e)
         {
             error = Maybe<IErrorBuilder>.From(
-                new ErrorBuilder(ErrorCode.ExternalProcessError, e.Message)
+                ErrorCode.ExternalProcessError.ToErrorBuilder(e.Message)
             );
         }
         #pragma warning restore CA1031 // Do not catch general exception types
@@ -190,7 +190,7 @@ public static class FileSystemHelper
             IStream writeStream = fileSystem.File.Create(path);
 
             if (compress)
-                writeStream = fileSystem.Compression.Decompress(writeStream);
+                writeStream = fileSystem.Compression.Compress(writeStream);
 
             await stream.CopyToAsync(writeStream, cancellationToken);
             writeStream.Close();
@@ -200,7 +200,7 @@ public static class FileSystemHelper
         catch (Exception e)
         {
             error = Maybe<IErrorBuilder>.From(
-                new ErrorBuilder(ErrorCode.ExternalProcessError, e.Message)
+                ErrorCode.ExternalProcessError.ToErrorBuilder(e.Message)
             );
         }
         #pragma warning restore CA1031 // Do not catch general exception types

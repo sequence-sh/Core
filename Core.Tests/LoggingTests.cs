@@ -12,8 +12,6 @@ using Reductech.EDR.Core.Internal.Serialization;
 using Reductech.EDR.Core.TestHarness;
 using Xunit.Abstractions;
 using AutoTheory;
-using Thinktecture.IO;
-using Thinktecture.IO.Adapters;
 
 namespace Reductech.EDR.Core.Tests
 {
@@ -251,8 +249,7 @@ public partial class LoggingTests
                             s.Seek(0, SeekOrigin.Begin);
                             sw.Flush();
 
-                            return
-                                new StreamAdapter(s) as IFileStream; //Will be cast to IStream later
+                            return new FakeFileStreamAdapter(s);
                         }
                     )
             );

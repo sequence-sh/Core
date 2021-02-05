@@ -28,30 +28,32 @@ public partial class FileReadTests : StepTestBase<FileRead, StringStream>
                 "Hello World"
             ).WithFileAction(
                 x => x.Setup(f => f.OpenRead("File.txt"))
-                    .Returns(
-                        (new StreamAdapter(
-                            new MemoryStream(Encoding.ASCII.GetBytes("Hello World"))
-                        ) as IFileStream)!
-                    )
+                    .Returns(new FakeFileStreamAdapter("Hello World"))
             );
 
             yield return new StepCase(
-                "Print file text compressed",
-                new Print<StringStream>
-                {
-                    Value = new FileRead
+                    "Print file text compressed",
+                    new Print<StringStream>
                     {
-                        Path = Constant("File.txt"), Decompress = Constant(true)
-                    }
-                },
-                Unit.Default,
-                "Hello World"
-            ).WithCompressionAction(
-                x => x.Setup(c => c.Decompress(It.IsAny<IStream>()))
-                    .Returns(
-                        new StreamAdapter(new MemoryStream(Encoding.ASCII.GetBytes("Hello World")))
-                    )
-            );
+                        Value = new FileRead
+                        {
+                            Path = Constant("File.txt"), Decompress = Constant(true)
+                        }
+                    },
+                    Unit.Default,
+                    "Hello World"
+                ).WithFileAction(
+                    x => x.Setup(f => f.OpenRead("File.txt"))
+                        .Returns(new FakeFileStreamAdapter("Hello World"))
+                )
+                .WithCompressionAction(
+                    x => x.Setup(c => c.Decompress(It.IsAny<IStream>()))
+                        .Returns(
+                            new StreamAdapter(
+                                new MemoryStream(Encoding.ASCII.GetBytes("Hello World"))
+                            )
+                        )
+                );
         }
     }
 
@@ -67,11 +69,7 @@ public partial class FileReadTests : StepTestBase<FileRead, StringStream>
                 "Hello World"
             ).WithFileAction(
                 x => x.Setup(f => f.OpenRead("File.txt"))
-                    .Returns(
-                        (new StreamAdapter(
-                            new MemoryStream(Encoding.ASCII.GetBytes("Hello World"))
-                        ) as IFileStream)!
-                    )
+                    .Returns(new FakeFileStreamAdapter("Hello World"))
             );
 
             yield return new DeserializeCase(
@@ -81,11 +79,7 @@ public partial class FileReadTests : StepTestBase<FileRead, StringStream>
                 "Hello World"
             ).WithFileAction(
                 x => x.Setup(f => f.OpenRead("File.txt"))
-                    .Returns(
-                        (new StreamAdapter(
-                            new MemoryStream(Encoding.ASCII.GetBytes("Hello World"))
-                        ) as IFileStream)!
-                    )
+                    .Returns(new FakeFileStreamAdapter("Hello World"))
             );
 
             yield return new DeserializeCase(
@@ -95,11 +89,7 @@ public partial class FileReadTests : StepTestBase<FileRead, StringStream>
                 "Hello World"
             ).WithFileAction(
                 x => x.Setup(f => f.OpenRead("File.txt"))
-                    .Returns(
-                        (new StreamAdapter(
-                            new MemoryStream(Encoding.ASCII.GetBytes("Hello World"))
-                        ) as IFileStream)!
-                    )
+                    .Returns(new FakeFileStreamAdapter("Hello World"))
             );
         }
     }
@@ -112,7 +102,10 @@ public partial class FileReadTests : StepTestBase<FileRead, StringStream>
             yield return new ErrorCase(
                 "ValueIf Error",
                 new FileRead { Path = Constant("File.txt"), },
-                new ErrorBuilder(ErrorCode.Test, "ValueIf Error")
+                new ErrorBuilder(
+                    ErrorCode.ExternalProcessError,
+                    "Exception of type 'System.Exception' was thrown."
+                )
             ).WithFileAction(
                 x => x.Setup(f => f.OpenRead("File.txt"))
                     .Throws<Exception>()

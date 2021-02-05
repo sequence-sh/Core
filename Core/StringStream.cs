@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Reductech.EDR.Core.Enums;
 using Reductech.EDR.Core.Internal.Serialization;
 using Reductech.EDR.Core.Util;
+using Thinktecture;
 using Thinktecture.IO;
 using Thinktecture.IO.Adapters;
 using Option =
@@ -77,6 +78,9 @@ public sealed class StringStream : IEquatable<StringStream>, IComparable<StringS
 
             if (stream.CanSeek)
                 stream.Position = 0;
+
+            if (stream is FakeFileStreamAdapter fake) //This is a hack
+                stream = new StreamAdapter(fake.Stream);
 
             using IStreamReader reader = new StreamReaderAdapter(
                 stream,
