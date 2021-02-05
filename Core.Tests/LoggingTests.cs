@@ -13,6 +13,7 @@ using Reductech.EDR.Core.Internal.Serialization;
 using Reductech.EDR.Core.TestHarness;
 using Xunit.Abstractions;
 using AutoTheory;
+using Thinktecture;
 
 namespace Reductech.EDR.Core.Tests
 {
@@ -304,20 +305,26 @@ public partial class LoggingTests
             var loggerFactory = TestLoggerFactory.Create();
             loggerFactory.AddXunit(testOutputHelper);
 
-            var logger         = loggerFactory.CreateLogger("Test");
-            var repo           = new MockRepository(MockBehavior.Strict);
+            var logger = loggerFactory.CreateLogger("Test");
+            var repo   = new MockRepository(MockBehavior.Strict);
+
             var fileSystemMock = repo.Create<IFileSystemHelper>();
 
             if (FileSystemActions != null)
                 foreach (var fileSystemAction in FileSystemActions)
                     fileSystemAction(fileSystemMock);
 
+            var context = new ExternalContext(
+                fileSystemMock.Object,
+                repo.Create<IExternalProcessRunner>().Object,
+                repo.Create<IConsole>().Object
+            );
+
             var sclRunner = new SCLRunner(
                 SCLSettings.EmptySettings,
                 logger,
-                repo.Create<IExternalProcessRunner>().Object,
-                fileSystemMock.Object,
-                spf
+                spf,
+                context
             );
 
             var r = await sclRunner.RunSequenceFromTextAsync(SCL, CancellationToken.None);

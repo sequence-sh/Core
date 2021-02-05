@@ -5,7 +5,6 @@ using System.Collections.Immutable;
 using System.Linq;
 using CSharpFunctionalExtensions;
 using Microsoft.Extensions.Logging;
-using Reductech.EDR.Core.ExternalProcesses;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Internal.Logging;
@@ -54,10 +53,7 @@ public sealed class ScopedStateMonad : IStateMonad
     public SCLSettings Settings => BaseStateMonad.Settings;
 
     /// <inheritdoc />
-    public IExternalProcessRunner ExternalProcessRunner => BaseStateMonad.ExternalProcessRunner;
-
-    /// <inheritdoc />
-    public IFileSystemHelper FileSystemHelper => BaseStateMonad.FileSystemHelper;
+    public IExternalContext ExternalContext => BaseStateMonad.ExternalContext;
 
     /// <inheritdoc />
     public StepFactoryStore StepFactoryStore => BaseStateMonad.StepFactoryStore;
@@ -94,7 +90,7 @@ public sealed class ScopedStateMonad : IStateMonad
     /// <inheritdoc />
     public Result<Unit, IError> SetVariable<T>(VariableName key, T variable)
     {
-        _scopedStateDictionary.AddOrUpdate(key, _ => variable!, (_1, _2) => variable!);
+        _scopedStateDictionary.AddOrUpdate(key, _ => variable!, (_, _) => variable!);
 
         if (_fixedState.ContainsKey(key))
             Logger.LogSituation(LogSituation.SetVariableOutOfScope, new object[] { key });

@@ -10,6 +10,7 @@ using Reductech.EDR.Core.ExternalProcesses;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Serialization;
 using Reductech.EDR.Core.TestHarness;
+using Thinktecture;
 using Xunit.Abstractions;
 
 namespace Reductech.EDR.Core.Tests
@@ -366,12 +367,17 @@ Print 'Comments!'",
             loggerFactory.AddXunit(testOutputHelper);
             var mockFactory = new MockRepository(MockBehavior.Strict);
 
+            var externalContext = new ExternalContext(
+                mockFactory.Create<IFileSystemHelper>().Object,
+                mockFactory.Create<IExternalProcessRunner>().Object,
+                mockFactory.Create<IConsole>().Object
+            );
+
             var runner = new SCLRunner(
                 SCLSettings.EmptySettings,
                 loggerFactory.CreateLogger("Test"),
-                mockFactory.Create<IExternalProcessRunner>().Object,
-                mockFactory.Create<IFileSystemHelper>().Object,
-                stepFactoryStore
+                stepFactoryStore,
+                externalContext
             );
 
             var result = await runner.RunSequenceFromTextAsync(SCL, CancellationToken.None);

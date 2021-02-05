@@ -39,7 +39,7 @@ public sealed class FileWrite : CompoundStep<Unit>
 
         var stream = stringStreamResult.Value.GetStream().stream;
 
-        var r = await stateMonad.FileSystemHelper
+        var r = await stateMonad.ExternalContext.FileSystemHelper
             .WriteFileAsync(path.Value, stream, compressResult.Value, cancellationToken)
             .MapError(x => x.WithLocation(this));
 

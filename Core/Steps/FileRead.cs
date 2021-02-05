@@ -37,7 +37,8 @@ public sealed class FileRead : CompoundStep<StringStream>
         if (decompress.IsFailure)
             return decompress.ConvertFailure<StringStream>();
 
-        var result = stateMonad.FileSystemHelper.ReadFile(path.Value, decompress.Value)
+        var result = stateMonad.ExternalContext.FileSystemHelper
+            .ReadFile(path.Value, decompress.Value)
             .MapError(x => x.WithLocation(this))
             .Map(x => new StringStream(x, encoding.Value)); //TODO fix
 

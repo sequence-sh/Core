@@ -39,7 +39,7 @@ public class FileExtract : CompoundStep<Unit>
             return overwriteResult.ConvertFailure<Unit>();
 
         var result =
-            stateMonad.FileSystemHelper.ExtractToDirectory(
+            stateMonad.ExternalContext.FileSystemHelper.ExtractToDirectory(
                 archivePathResult.Value,
                 destinationResult.Value,
                 overwriteResult.Value

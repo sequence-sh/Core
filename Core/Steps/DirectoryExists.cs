@@ -35,7 +35,7 @@ public class DirectoryExists : CompoundStep<bool>
 
         var pathString = await pathResult.Value.GetStringAsync();
 
-        var r = stateMonad.FileSystemHelper.DoesDirectoryExist(pathString);
+        var r = stateMonad.ExternalContext.FileSystemHelper.DoesDirectoryExist(pathString);
         return r;
     }
 

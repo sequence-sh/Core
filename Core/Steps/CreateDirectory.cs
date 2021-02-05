@@ -29,7 +29,7 @@ public class CreateDirectory : CompoundStep<Unit>
 
         var pathString = await pathResult.Value.GetStringAsync();
 
-        var r = stateMonad.FileSystemHelper.CreateDirectory(pathString)
+        var r = stateMonad.ExternalContext.FileSystemHelper.CreateDirectory(pathString)
             .MapError(x => x.WithLocation(this));
 
         return r;

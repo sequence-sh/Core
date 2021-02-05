@@ -8,9 +8,51 @@ using Reductech.EDR.Core.ExternalProcesses;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Util;
+using Thinktecture;
+using Thinktecture.Adapters;
 
 namespace Reductech.EDR.Core
 {
+
+/// <summary>
+/// The external context of a sequence.
+/// Includes the file system, external processes, and the console
+/// </summary>
+public interface IExternalContext
+{
+    /// <summary>
+    /// For interacting with the file system
+    /// </summary>
+    public IFileSystemHelper FileSystemHelper { get; }
+
+    /// <summary>
+    /// For interacting with external processes
+    /// </summary>
+    public IExternalProcessRunner ExternalProcessRunner { get; }
+
+    /// <summary>
+    /// For interacting with the console
+    /// </summary>
+    public IConsole Console { get; }
+}
+
+/// <summary>
+/// The external context of a sequence.
+/// </summary>
+public sealed record ExternalContext(
+    IFileSystemHelper FileSystemHelper,
+    IExternalProcessRunner ExternalProcessRunner,
+    IConsole Console) : IExternalContext
+{
+    /// <summary>
+    /// The real external context
+    /// </summary>
+    public static readonly ExternalContext ConcreteInstance = new(
+        ExternalProcesses.FileSystemHelper.Instance,
+        ExternalProcesses.ExternalProcessRunner.Instance,
+        new ConsoleAdapter()
+    );
+}
 
 /// <summary>
 /// The state monad that is passed between steps.
@@ -28,14 +70,9 @@ public interface IStateMonad : IDisposable
     SCLSettings Settings { get; }
 
     /// <summary>
-    /// The runner of external processes.
+    /// The external context
     /// </summary>
-    IExternalProcessRunner ExternalProcessRunner { get; }
-
-    /// <summary>
-    /// Interacts with the file system.
-    /// </summary>
-    IFileSystemHelper FileSystemHelper { get; }
+    IExternalContext ExternalContext { get; }
 
     /// <summary>
     /// The step factory store. Maps from step names to step factories.
@@ -74,8 +111,7 @@ public interface IStateMonad : IDisposable
 /// </summary>
 public sealed class StateMonad : IStateMonad
 {
-    private readonly ConcurrentDictionary<VariableName, object> _stateDictionary =
-        new ConcurrentDictionary<VariableName, object>();
+    private readonly ConcurrentDictionary<VariableName, object> _stateDictionary = new();
 
     /// <summary>
     /// Create a new StateMonad
@@ -83,15 +119,13 @@ public sealed class StateMonad : IStateMonad
     public StateMonad(
         ILogger logger,
         SCLSettings settings,
-        IExternalProcessRunner externalProcessRunner,
-        IFileSystemHelper fileSystemHelper,
-        StepFactoryStore stepFactoryStore)
+        StepFactoryStore stepFactoryStore,
+        IExternalContext externalContext)
     {
-        Logger                = logger;
-        Settings              = settings;
-        ExternalProcessRunner = externalProcessRunner;
-        FileSystemHelper      = fileSystemHelper;
-        StepFactoryStore      = stepFactoryStore;
+        Logger           = logger;
+        Settings         = settings;
+        StepFactoryStore = stepFactoryStore;
+        ExternalContext  = externalContext;
     }
 
     /// <summary>
@@ -105,14 +139,9 @@ public sealed class StateMonad : IStateMonad
     public SCLSettings Settings { get; }
 
     /// <summary>
-    /// The runner of external processes.
+    /// The external context
     /// </summary>
-    public IExternalProcessRunner ExternalProcessRunner { get; }
-
-    /// <summary>
-    /// Interacts with the file system.
-    /// </summary>
-    public IFileSystemHelper FileSystemHelper { get; }
+    public IExternalContext ExternalContext { get; }
 
     /// <summary>
     /// The step factory store. Maps from step names to step factories.

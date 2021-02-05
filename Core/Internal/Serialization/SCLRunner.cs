@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using JetBrains.Annotations;
 using Microsoft.Extensions.Logging;
-using Reductech.EDR.Core.ExternalProcesses;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Internal.Parser;
 using Reductech.EDR.Core.Steps;
@@ -27,25 +26,22 @@ public sealed class SCLRunner
     public SCLRunner(
         SCLSettings settings,
         ILogger logger,
-        IExternalProcessRunner externalProcessRunner,
-        IFileSystemHelper fileSystemHelper,
         StepFactoryStore stepFactoryStore,
+        IExternalContext externalContext,
         params KeyValuePair<string, object>[] loggingData)
     {
-        _settings              = settings;
-        _logger                = logger;
-        _externalProcessRunner = externalProcessRunner;
-        _stepFactoryStore      = stepFactoryStore;
-        _fileSystemHelper      = fileSystemHelper;
+        _settings         = settings;
+        _logger           = logger;
+        _stepFactoryStore = stepFactoryStore;
+        _externalContext  = externalContext;
 
         _loggingData = loggingData.ToDictionary(x => x.Key, x => x.Value);
     }
 
     private readonly SCLSettings _settings;
     private readonly ILogger _logger;
-    private readonly IExternalProcessRunner _externalProcessRunner;
-    private readonly IFileSystemHelper _fileSystemHelper;
     private readonly StepFactoryStore _stepFactoryStore;
+    private readonly IExternalContext _externalContext;
 
     private readonly IReadOnlyDictionary<string, object> _loggingData;
 
@@ -72,9 +68,8 @@ public sealed class SCLRunner
         using var stateMonad = new StateMonad(
             _logger,
             _settings,
-            _externalProcessRunner,
-            _fileSystemHelper,
-            _stepFactoryStore
+            _stepFactoryStore,
+            _externalContext
         );
 
         var runResult = await stepResult.Value.Run(stateMonad, cancellationToken);

@@ -11,6 +11,7 @@ using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.Util;
 using AutoTheory;
+using Thinktecture;
 using Xunit.Abstractions;
 using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 
@@ -147,12 +148,17 @@ public partial class RunErrorTests
             var spf  = StepFactoryStore.CreateUsingReflection(typeof(IStep));
             var repo = new MockRepository(MockBehavior.Strict);
 
+            var externalContext = new ExternalContext(
+                repo.Create<IFileSystemHelper>().Object,
+                repo.Create<IExternalProcessRunner>().Object,
+                repo.Create<IConsole>().Object
+            );
+
             using var state = new StateMonad(
                 NullLogger.Instance,
                 SCLSettings.EmptySettings,
-                repo.Create<IExternalProcessRunner>().Object,
-                repo.Create<IFileSystemHelper>().Object,
-                spf
+                spf,
+                externalContext
             );
 
             var r = await Process.Run<object>(state, CancellationToken.None);

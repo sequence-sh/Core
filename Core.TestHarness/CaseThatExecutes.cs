@@ -12,6 +12,7 @@ using Reductech.EDR.Core.ExternalProcesses;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Util;
+using Thinktecture;
 using Xunit.Abstractions;
 using Xunit.Sdk;
 
@@ -97,6 +98,13 @@ public abstract partial class StepTestBase<TStep, TOutput>
         {
             var externalProcessRunner = GetExternalProcessRunner(mockRepository);
             var fileSystemHelper      = GetFileSystemHelper(mockRepository);
+            var console               = GetConsole(mockRepository);
+
+            var externalContext = new ExternalContext(
+                fileSystemHelper,
+                externalProcessRunner,
+                console
+            );
 
             var sfs = StepFactoryStoreToUse.Unwrap(
                 StepFactoryStore.CreateUsingReflection(typeof(IStep), typeof(TStep))
@@ -105,15 +113,24 @@ public abstract partial class StepTestBase<TStep, TOutput>
             var stateMonad = new StateMonad(
                 logger,
                 Settings,
-                externalProcessRunner,
-                fileSystemHelper,
-                sfs
+                sfs,
+                externalContext
             );
 
             foreach (var action in InitialStateActions)
                 action(stateMonad);
 
             return stateMonad;
+        }
+
+        public virtual IConsole GetConsole(MockRepository mockRepository)
+        {
+            var mock = mockRepository.Create<IConsole>();
+
+            foreach (var action in _consoleActions)
+                action(mock);
+
+            return mock.Object;
         }
 
         public virtual IExternalProcessRunner GetExternalProcessRunner(
@@ -144,6 +161,12 @@ public abstract partial class StepTestBase<TStep, TOutput>
         /// <inheritdoc />
         public void AddFileSystemAction(Action<Mock<IFileSystemHelper>> action) =>
             _fileSystemActions.Add(action);
+
+        /// <inheritdoc />
+        public void AddConsoleAction(Action<Mock<IConsole>> action) => _consoleActions.Add(action);
+
+        private readonly List<Action<Mock<IConsole>>> _consoleActions =
+            new();
 
         private readonly List<Action<Mock<IExternalProcessRunner>>> _externalProcessRunnerActions =
             new();

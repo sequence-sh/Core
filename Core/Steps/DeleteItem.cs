@@ -31,14 +31,14 @@ public class DeleteItem : CompoundStep<Unit>
 
         Result<Unit, IErrorBuilder> result;
 
-        if (stateMonad.FileSystemHelper.DoesDirectoryExist(path))
+        if (stateMonad.ExternalContext.FileSystemHelper.DoesDirectoryExist(path))
         {
-            result = stateMonad.FileSystemHelper.DeleteDirectory(path, true);
+            result = stateMonad.ExternalContext.FileSystemHelper.DeleteDirectory(path, true);
             stateMonad.Logger.LogSituation(LogSituation.DirectoryDeleted, new[] { path });
         }
-        else if (stateMonad.FileSystemHelper.DoesFileExist(path))
+        else if (stateMonad.ExternalContext.FileSystemHelper.DoesFileExist(path))
         {
-            result = stateMonad.FileSystemHelper.DeleteFile(path);
+            result = stateMonad.ExternalContext.FileSystemHelper.DeleteFile(path);
             stateMonad.Logger.LogSituation(LogSituation.FileDeleted, new[] { path });
         }
         else

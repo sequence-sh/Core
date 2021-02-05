@@ -35,7 +35,7 @@ public class FileExists : CompoundStep<bool>
         if (pathResult.IsFailure)
             return pathResult.ConvertFailure<bool>();
 
-        var r = stateMonad.FileSystemHelper.DoesFileExist(pathResult.Value);
+        var r = stateMonad.ExternalContext.FileSystemHelper.DoesFileExist(pathResult.Value);
         return r;
     }
 

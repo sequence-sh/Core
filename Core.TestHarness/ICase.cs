@@ -5,6 +5,7 @@ using CSharpFunctionalExtensions;
 using Moq;
 using Reductech.EDR.Core.ExternalProcesses;
 using Reductech.EDR.Core.Internal;
+using Thinktecture;
 
 namespace Reductech.EDR.Core.TestHarness
 {
@@ -22,6 +23,7 @@ public interface ICaseThatExecutes : IAsyncTestInstance
 
     void AddExternalProcessRunnerAction(Action<Mock<IExternalProcessRunner>> action);
     void AddFileSystemAction(Action<Mock<IFileSystemHelper>> action);
+    void AddConsoleAction(Action<Mock<IConsole>> action);
 
     SCLSettings Settings { get; set; }
 }
