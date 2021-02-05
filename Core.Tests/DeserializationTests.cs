@@ -6,11 +6,9 @@ using AutoTheory;
 using MELT;
 using Microsoft.Extensions.Logging;
 using Moq;
-using Reductech.EDR.Core.ExternalProcesses;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Serialization;
 using Reductech.EDR.Core.TestHarness;
-using Thinktecture;
 using Xunit.Abstractions;
 
 namespace Reductech.EDR.Core.Tests
@@ -343,7 +341,7 @@ Print 'Comments!'",
         }
     }
 
-    public record DeserializationTestInstance : IAsyncTestInstance
+    public record DeserializationTestInstance : IAsyncTestInstance, ICaseWithSetup
     {
         public DeserializationTestInstance(string scl, params object[] expectedLoggedValues)
         {
@@ -365,13 +363,9 @@ Print 'Comments!'",
             var stepFactoryStore = StepFactoryStore.CreateUsingReflection(typeof(StepFactory));
             var loggerFactory    = TestLoggerFactory.Create();
             loggerFactory.AddXunit(testOutputHelper);
-            var mockFactory = new MockRepository(MockBehavior.Strict);
+            var repository = new MockRepository(MockBehavior.Strict);
 
-            var externalContext = new ExternalContext(
-                mockFactory.Create<IFileSystemHelper>().Object,
-                mockFactory.Create<IExternalProcessRunner>().Object,
-                mockFactory.Create<IConsole>().Object
-            );
+            var externalContext = ExternalContextSetupHelper.GetExternalContext(repository);
 
             var runner = new SCLRunner(
                 SCLSettings.EmptySettings,
@@ -390,6 +384,9 @@ Print 'Comments!'",
                 ExpectedLoggedValues
             );
         }
+
+        /// <inheritdoc />
+        public ExternalContextSetupHelper ExternalContextSetupHelper { get; } = new();
     }
 }
 

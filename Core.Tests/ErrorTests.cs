@@ -5,13 +5,12 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
-using Reductech.EDR.Core.ExternalProcesses;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.Util;
 using AutoTheory;
-using Thinktecture;
+using Reductech.EDR.Core.TestHarness;
 using Xunit.Abstractions;
 using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 
@@ -120,7 +119,7 @@ public partial class RunErrorTests
 
     public static readonly VariableName FooString = new("Foo");
 
-    public record ErrorTestFunction : IAsyncTestInstance
+    public record ErrorTestFunction : IAsyncTestInstance, ICaseWithSetup
     {
         public ErrorTestFunction(string name, IStep process, IErrorBuilder expectedErrors)
         {
@@ -148,11 +147,7 @@ public partial class RunErrorTests
             var spf  = StepFactoryStore.CreateUsingReflection(typeof(IStep));
             var repo = new MockRepository(MockBehavior.Strict);
 
-            var externalContext = new ExternalContext(
-                repo.Create<IFileSystemHelper>().Object,
-                repo.Create<IExternalProcessRunner>().Object,
-                repo.Create<IConsole>().Object
-            );
+            var externalContext = ExternalContextSetupHelper.GetExternalContext(repo);
 
             using var state = new StateMonad(
                 NullLogger.Instance,
@@ -167,6 +162,9 @@ public partial class RunErrorTests
 
             r.Error.GetAllErrors().Should().BeEquivalentTo(ExpectedErrors.GetAllErrors());
         }
+
+        /// <inheritdoc />
+        public ExternalContextSetupHelper ExternalContextSetupHelper { get; } = new();
     }
 }
 

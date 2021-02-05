@@ -15,6 +15,7 @@ using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.Enums;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
+using Thinktecture.IO.Adapters;
 
 namespace Reductech.EDR.Core.Util
 {
@@ -105,7 +106,7 @@ public static class CSVWriter
                 dateTimeResult.Value,
                 cancellationToken
             )
-            .Map(x => new StringStream(x, encodingResult.Value));
+            .Map(x => new StringStream(new StreamAdapter(x), encodingResult.Value));
 
         return result;
     }

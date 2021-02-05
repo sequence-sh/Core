@@ -14,12 +14,11 @@ public partial class DirectoryExistsTests : StepTestBase<DirectoryExists, bool>
         get
         {
             yield return new StepCase(
-                "Directory Exists",
-                new DirectoryExists { Path = Constant("My Path") },
-                true
-            ).WithFileSystemAction(
-                x => x.Setup(a => a.DoesDirectoryExist("My Path")).Returns(true)
-            );
+                    "Directory Exists",
+                    new DirectoryExists { Path = Constant("My Path") },
+                    true
+                )
+                .WithDirectoryAction(x => x.Setup(a => a.Exists("My Path")).Returns(true));
         }
     }
 }

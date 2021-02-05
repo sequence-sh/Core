@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.TestHarness;
@@ -19,10 +20,9 @@ public partial class CreateDirectoryTests : StepTestBase<CreateDirectory, Unit>
                 "Create Directory",
                 new CreateDirectory { Path = Constant("MyPath") },
                 Unit.Default
-            ).WithFileSystemAction(
+            ).WithDirectoryAction(
                 x =>
                     x.Setup(h => h.CreateDirectory("MyPath"))
-                        .Returns(Unit.Default)
             );
         }
     }
@@ -33,15 +33,13 @@ public partial class CreateDirectoryTests : StepTestBase<CreateDirectory, Unit>
         get
         {
             yield return new DeserializeCase(
-                    "Create Directory",
-                    "CreateDirectory Path: 'MyPath'",
-                    Unit.Default
-                )
-                .WithFileSystemAction(
-                    x =>
-                        x.Setup(h => h.CreateDirectory("MyPath"))
-                            .Returns(Unit.Default)
-                );
+                "Create Directory",
+                "CreateDirectory Path: 'MyPath'",
+                Unit.Default
+            ).WithDirectoryAction(
+                x =>
+                    x.Setup(h => h.CreateDirectory("MyPath"))
+            );
         }
     }
 
@@ -55,10 +53,10 @@ public partial class CreateDirectoryTests : StepTestBase<CreateDirectory, Unit>
                     new CreateDirectory { Path = Constant("MyPath") },
                     new ErrorBuilder(ErrorCode.Test, "ValueIf Error")
                 )
-                .WithFileSystemAction(
+                .WithDirectoryAction(
                     x =>
                         x.Setup(h => h.CreateDirectory("MyPath"))
-                            .Returns(new ErrorBuilder(ErrorCode.Test, "ValueIf Error"))
+                            .Throws<Exception>()
                 );
         }
     }

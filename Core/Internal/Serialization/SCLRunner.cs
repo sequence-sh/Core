@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using JetBrains.Annotations;
 using Microsoft.Extensions.Logging;
+using Reductech.EDR.Core.Abstractions;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Internal.Parser;
 using Reductech.EDR.Core.Steps;

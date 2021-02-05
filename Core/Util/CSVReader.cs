@@ -10,6 +10,7 @@ using CsvHelper.Configuration;
 using Reductech.EDR.Core.Enums;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
+using Thinktecture;
 
 namespace Reductech.EDR.Core.Util
 {
@@ -161,7 +162,7 @@ public static class CSVReader
         else
             configuration.AllowComments = false;
 
-        var textReader = new StreamReader(stream, encodingEnum.Convert());
+        var textReader = new StreamReader(stream.ToImplementation()!, encodingEnum.Convert());
 
         var reader = new CsvReader(textReader, configuration);
 

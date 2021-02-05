@@ -1,10 +1,14 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using Moq;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.TestHarness;
 using Reductech.EDR.Core.Util;
+using Thinktecture.IO;
+using Thinktecture.IO.Adapters;
 using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 
 namespace Reductech.EDR.Core.Tests.Steps
@@ -22,9 +26,13 @@ public partial class FileReadTests : StepTestBase<FileRead, StringStream>
                 new Print<StringStream> { Value = new FileRead { Path = Constant("File.txt"), } },
                 Unit.Default,
                 "Hello World"
-            ).WithFileSystemAction(
-                x => x.Setup(a => a.ReadFile("File.txt", false))
-                    .Returns(new MemoryStream(Encoding.ASCII.GetBytes("Hello World")))
+            ).WithFileAction(
+                x => x.Setup(f => f.OpenRead("File.txt"))
+                    .Returns(
+                        (new StreamAdapter(
+                            new MemoryStream(Encoding.ASCII.GetBytes("Hello World"))
+                        ) as IFileStream)!
+                    )
             );
 
             yield return new StepCase(
@@ -38,9 +46,11 @@ public partial class FileReadTests : StepTestBase<FileRead, StringStream>
                 },
                 Unit.Default,
                 "Hello World"
-            ).WithFileSystemAction(
-                x => x.Setup(a => a.ReadFile("File.txt", true))
-                    .Returns(new MemoryStream(Encoding.ASCII.GetBytes("Hello World")))
+            ).WithCompressionAction(
+                x => x.Setup(c => c.Decompress(It.IsAny<IStream>()))
+                    .Returns(
+                        new StreamAdapter(new MemoryStream(Encoding.ASCII.GetBytes("Hello World")))
+                    )
             );
         }
     }
@@ -55,10 +65,13 @@ public partial class FileReadTests : StepTestBase<FileRead, StringStream>
                 "Print Value: (FileRead Path: 'File.txt')",
                 Unit.Default,
                 "Hello World"
-            ).WithFileSystemAction(
-                x =>
-                    x.Setup(a => a.ReadFile("File.txt", false))
-                        .Returns(new MemoryStream(Encoding.ASCII.GetBytes("Hello World")))
+            ).WithFileAction(
+                x => x.Setup(f => f.OpenRead("File.txt"))
+                    .Returns(
+                        (new StreamAdapter(
+                            new MemoryStream(Encoding.ASCII.GetBytes("Hello World"))
+                        ) as IFileStream)!
+                    )
             );
 
             yield return new DeserializeCase(
@@ -66,10 +79,13 @@ public partial class FileReadTests : StepTestBase<FileRead, StringStream>
                 "Print (FileRead 'File.txt')",
                 Unit.Default,
                 "Hello World"
-            ).WithFileSystemAction(
-                x =>
-                    x.Setup(a => a.ReadFile("File.txt", false))
-                        .Returns(new MemoryStream(Encoding.ASCII.GetBytes("Hello World")))
+            ).WithFileAction(
+                x => x.Setup(f => f.OpenRead("File.txt"))
+                    .Returns(
+                        (new StreamAdapter(
+                            new MemoryStream(Encoding.ASCII.GetBytes("Hello World"))
+                        ) as IFileStream)!
+                    )
             );
 
             yield return new DeserializeCase(
@@ -77,10 +93,13 @@ public partial class FileReadTests : StepTestBase<FileRead, StringStream>
                 "Print Value: (ReadFromFile Path: 'File.txt')",
                 Unit.Default,
                 "Hello World"
-            ).WithFileSystemAction(
-                x =>
-                    x.Setup(a => a.ReadFile("File.txt", false))
-                        .Returns(new MemoryStream(Encoding.ASCII.GetBytes("Hello World")))
+            ).WithFileAction(
+                x => x.Setup(f => f.OpenRead("File.txt"))
+                    .Returns(
+                        (new StreamAdapter(
+                            new MemoryStream(Encoding.ASCII.GetBytes("Hello World"))
+                        ) as IFileStream)!
+                    )
             );
         }
     }
@@ -91,14 +110,13 @@ public partial class FileReadTests : StepTestBase<FileRead, StringStream>
         get
         {
             yield return new ErrorCase(
-                    "ValueIf Error",
-                    new FileRead { Path = Constant("File.txt"), },
-                    new ErrorBuilder(ErrorCode.Test, "ValueIf Error")
-                )
-                .WithFileSystemAction(
-                    x => x.Setup(a => a.ReadFile("File.txt", false))
-                        .Returns(new ErrorBuilder(ErrorCode.Test, "ValueIf Error"))
-                );
+                "ValueIf Error",
+                new FileRead { Path = Constant("File.txt"), },
+                new ErrorBuilder(ErrorCode.Test, "ValueIf Error")
+            ).WithFileAction(
+                x => x.Setup(f => f.OpenRead("File.txt"))
+                    .Throws<Exception>()
+            );
         }
     }
 }

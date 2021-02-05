@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Microsoft.Extensions.Logging;
+using Reductech.EDR.Core.Abstractions;
 using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Parser;
@@ -54,7 +55,7 @@ public partial class ExampleTests
             TestOutputHelper.BuildLogger(),
             SCLSettings.EmptySettings,
             sfs,
-            ExternalContext.ConcreteInstance
+            ExternalContext.Default
         );
 
         var r = await stepResult.Value.Run<Unit>(monad, CancellationToken.None);
@@ -92,7 +93,7 @@ Bar: (Type: 'String' Multiplicity: 'ExactlyOne')
             SCLSettings.EmptySettings,
             logger,
             sfs,
-            ExternalContext.ConcreteInstance
+            ExternalContext.Default
         );
 
         var r = await runner.RunSequenceFromTextAsync(scl, CancellationToken.None);
@@ -179,7 +180,7 @@ Bar: (Type: 'String' Multiplicity: 'ExactlyOne')
             TestOutputHelper.BuildLogger(),
             SCLSettings.EmptySettings,
             StepFactoryStore.CreateUsingReflection(),
-            ExternalContext.ConcreteInstance
+            ExternalContext.Default
         );
 
         var r = await (step as IStep<Unit>).Run(monad, CancellationToken.None);

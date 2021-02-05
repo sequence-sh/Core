@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.TestHarness;
@@ -16,17 +17,13 @@ public partial class DeleteItemTests : StepTestBase<DeleteItem, Unit>
         get
         {
             yield return new StepCase(
-                    "Delete Directory",
-                    new DeleteItem { Path = Constant("My Path") },
-                    Unit.Default
-                    //, "Directory 'My Path' Deleted."
-                )
-                .WithFileSystemAction(
-                    x => x.Setup(a => a.DoesDirectoryExist("My Path")).Returns(true)
-                )
-                .WithFileSystemAction(
-                    x => x.Setup(a => a.DeleteDirectory("My Path", true)).Returns(Unit.Default)
-                );
+                        "Delete Directory",
+                        new DeleteItem { Path = Constant("My Path") },
+                        Unit.Default
+                        //, "Directory 'My Path' Deleted."
+                    )
+                    .WithDirectoryAction(x => x.Setup(a => a.Exists("My Path")).Returns(true))
+                ;
 
             yield return new StepCase(
                     "Delete File",
@@ -34,24 +31,17 @@ public partial class DeleteItemTests : StepTestBase<DeleteItem, Unit>
                     Unit.Default
                     // , "File 'My Path' Deleted."
                 )
-                .WithFileSystemAction(
-                    x => x.Setup(a => a.DoesDirectoryExist("My Path")).Returns(false)
-                )
-                .WithFileSystemAction(x => x.Setup(a => a.DoesFileExist("My Path")).Returns(true))
-                .WithFileSystemAction(
-                    x => x.Setup(a => a.DeleteFile("My Path")).Returns(Unit.Default)
-                );
+                .WithDirectoryAction(x => x.Setup(a => a.Exists("My Path")).Returns(false))
+                .WithFileAction(x => x.Setup(a => a.Exists("My Path")).Returns(true))
+                .WithFileAction(x => x.Setup(a => a.Delete("My Path")));
 
             yield return new StepCase(
                     "Item does not exist",
                     new DeleteItem { Path = Constant("My Path") },
                     Unit.Default
                     //, "Item 'My Path' did not exist."
-                )
-                .WithFileSystemAction(
-                    x => x.Setup(a => a.DoesDirectoryExist("My Path")).Returns(false)
-                )
-                .WithFileSystemAction(x => x.Setup(a => a.DoesFileExist("My Path")).Returns(false));
+                ).WithDirectoryAction(x => x.Setup(a => a.Exists("My Path")).Returns(false))
+                .WithFileAction(x => x.Setup(a => a.Exists("My Path")).Returns(false));
         }
     }
 
@@ -65,12 +55,9 @@ public partial class DeleteItemTests : StepTestBase<DeleteItem, Unit>
                     new DeleteItem { Path = Constant("My Path") },
                     new ErrorBuilder(ErrorCode.Test, "ValueIf Error")
                 )
-                .WithFileSystemAction(
-                    x => x.Setup(a => a.DoesDirectoryExist("My Path")).Returns(true)
-                )
-                .WithFileSystemAction(
-                    x => x.Setup(a => a.DeleteDirectory("My Path", true))
-                        .Returns(new ErrorBuilder(ErrorCode.Test, "ValueIf Error"))
+                .WithDirectoryAction(x => x.Setup(a => a.Exists("My Path")).Returns(true))
+                .WithDirectoryAction(
+                    x => x.Setup(a => a.Delete("My Path", true)).Throws<Exception>()
                 );
         }
     }

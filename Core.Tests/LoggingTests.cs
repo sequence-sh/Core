@@ -7,13 +7,13 @@ using FluentAssertions;
 using MELT;
 using Microsoft.Extensions.Logging;
 using Moq;
-using Reductech.EDR.Core.ExternalProcesses;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Serialization;
 using Reductech.EDR.Core.TestHarness;
 using Xunit.Abstractions;
 using AutoTheory;
-using Thinktecture;
+using Thinktecture.IO;
+using Thinktecture.IO.Adapters;
 
 namespace Reductech.EDR.Core.Tests
 {
@@ -122,103 +122,99 @@ public partial class LoggingTests
                 )
             );
 
-            yield return new LoggingTestCase(
-                "No Path to combine",
-                "Print (PathCombine [])",
-                CheckMessageAndScope(
-                    LogLevel.Trace,
-                    "Print Started with Parameters: [Value, PathCombine]",
-                    null
-                ),
-                CheckMessageAndScope(
-                    LogLevel.Trace,
-                    "PathCombine Started with Parameters: [Paths, ArrayNew]",
-                    null
-                ),
-                CheckMessageAndScope(
-                    LogLevel.Trace,
-                    "ArrayNew Started with Parameters: [Elements, 0 Elements]",
-                    null
-                ),
-                CheckMessageAndScope(
-                    LogLevel.Trace,
-                    "ArrayNew Completed Successfully with Result: 0 Elements",
-                    null
-                ),
-                CheckMessageAndScope(
-                    LogLevel.Warning,
-                    "No path was provided. Returning the Current Directory: MyDir",
-                    null
-                ),
-                CheckMessageAndScope(
-                    LogLevel.Trace,
-                    "PathCombine Completed Successfully with Result: string Length: 5",
-                    null
-                ),
-                CheckMessageAndScope(LogLevel.Information, @"MyDir", null),
-                CheckMessageAndScope(
-                    LogLevel.Trace,
-                    "Print Completed Successfully with Result: Unit",
-                    null
-                )
-            )
-            {
-                FileSystemActions = new List<Action<Mock<IFileSystemHelper>>>
-                {
-                    x => x.Setup(f => f.GetCurrentDirectory()).Returns("MyDir")
-                }
-            };
+            yield return new
+                LoggingTestCase(
+                    "No Path to combine",
+                    "Print (PathCombine [])",
+                    CheckMessageAndScope(
+                        LogLevel.Trace,
+                        "Print Started with Parameters: [Value, PathCombine]",
+                        null
+                    ),
+                    CheckMessageAndScope(
+                        LogLevel.Trace,
+                        "PathCombine Started with Parameters: [Paths, ArrayNew]",
+                        null
+                    ),
+                    CheckMessageAndScope(
+                        LogLevel.Trace,
+                        "ArrayNew Started with Parameters: [Elements, 0 Elements]",
+                        null
+                    ),
+                    CheckMessageAndScope(
+                        LogLevel.Trace,
+                        "ArrayNew Completed Successfully with Result: 0 Elements",
+                        null
+                    ),
+                    CheckMessageAndScope(
+                        LogLevel.Warning,
+                        "No path was provided. Returning the Current Directory: MyDir",
+                        null
+                    ),
+                    CheckMessageAndScope(
+                        LogLevel.Trace,
+                        "PathCombine Completed Successfully with Result: string Length: 5",
+                        null
+                    ),
+                    CheckMessageAndScope(LogLevel.Information, @"MyDir", null),
+                    CheckMessageAndScope(
+                        LogLevel.Trace,
+                        "Print Completed Successfully with Result: Unit",
+                        null
+                    )
+                ).WithDirectoryAction(
+                x =>
+                    x.Setup(f => f.GetCurrentDirectory()).Returns("MyDir")
+            );
 
             yield return new LoggingTestCase(
-                "Unqualified Path to combine",
-                "Print (PathCombine ['File'])",
-                CheckMessageAndScope(
-                    LogLevel.Trace,
-                    "Print Started with Parameters: [Value, PathCombine]",
-                    null
-                ),
-                CheckMessageAndScope(
-                    LogLevel.Trace,
-                    "PathCombine Started with Parameters: [Paths, ArrayNew]",
-                    null
-                ),
-                CheckMessageAndScope(
-                    LogLevel.Trace,
-                    "ArrayNew Started with Parameters: [Elements, 1 Elements]",
-                    null
-                ),
-                CheckMessageAndScope(
-                    LogLevel.Trace,
-                    "ArrayNew Completed Successfully with Result: 1 Elements",
-                    null
-                ),
-                CheckMessageAndScope(
-                    LogLevel.Debug,
-                    "Path MyDir was not fully qualified. Prepending the Current Directory: MyDir",
-                    null
-                ),
-                CheckMessageAndScope(
-                    LogLevel.Trace,
-                    "PathCombine Completed Successfully with Result: string Length: 10",
-                    null
-                ),
-                x =>
-                {
-                    x.LogLevel.Should().Be(LogLevel.Information);
-                    x.Message.Should().BeOneOf(@"MyDir\File", @"MyDir/File");
-                },
-                CheckMessageAndScope(
-                    LogLevel.Trace,
-                    "Print Completed Successfully with Result: Unit",
-                    null
+                    "Unqualified Path to combine",
+                    "Print (PathCombine ['File'])",
+                    CheckMessageAndScope(
+                        LogLevel.Trace,
+                        "Print Started with Parameters: [Value, PathCombine]",
+                        null
+                    ),
+                    CheckMessageAndScope(
+                        LogLevel.Trace,
+                        "PathCombine Started with Parameters: [Paths, ArrayNew]",
+                        null
+                    ),
+                    CheckMessageAndScope(
+                        LogLevel.Trace,
+                        "ArrayNew Started with Parameters: [Elements, 1 Elements]",
+                        null
+                    ),
+                    CheckMessageAndScope(
+                        LogLevel.Trace,
+                        "ArrayNew Completed Successfully with Result: 1 Elements",
+                        null
+                    ),
+                    CheckMessageAndScope(
+                        LogLevel.Debug,
+                        "Path MyDir was not fully qualified. Prepending the Current Directory: MyDir",
+                        null
+                    ),
+                    CheckMessageAndScope(
+                        LogLevel.Trace,
+                        "PathCombine Completed Successfully with Result: string Length: 10",
+                        null
+                    ),
+                    x =>
+                    {
+                        x.LogLevel.Should().Be(LogLevel.Information);
+                        x.Message.Should().BeOneOf(@"MyDir\File", @"MyDir/File");
+                    },
+                    CheckMessageAndScope(
+                        LogLevel.Trace,
+                        "Print Completed Successfully with Result: Unit",
+                        null
+                    )
                 )
-            )
-            {
-                FileSystemActions = new List<Action<Mock<IFileSystemHelper>>>
-                {
-                    x => x.Setup(f => f.GetCurrentDirectory()).Returns("MyDir")
-                }
-            };
+                .WithDirectoryAction(
+                    x =>
+                        x.Setup(f => f.GetCurrentDirectory()).Returns("MyDir")
+                );
 
             yield return new LoggingTestCase(
                 "File Read",
@@ -244,24 +240,22 @@ public partial class LoggingTests
                     "Print Completed Successfully with Result: Unit",
                     null
                 )
-            )
-            {
-                FileSystemActions = new List<Action<Mock<IFileSystemHelper>>>
-                {
-                    x => x.Setup(a => a.ReadFile("MyFile", false))
-                        .Returns(
-                            () =>
-                            {
-                                var s  = new MemoryStream();
-                                var sw = new StreamWriter(s);
-                                sw.Write("MyData");
-                                s.Seek(0, SeekOrigin.Begin);
-                                sw.Flush();
-                                return s;
-                            }
-                        )
-                }
-            };
+            ).WithFileAction(
+                x => x.Setup(a => a.OpenRead("MyFile"))
+                    .Returns(
+                        () =>
+                        {
+                            var s  = new MemoryStream();
+                            var sw = new StreamWriter(s);
+                            sw.Write("MyData");
+                            s.Seek(0, SeekOrigin.Begin);
+                            sw.Flush();
+
+                            return
+                                new StreamAdapter(s) as IFileStream; //Will be cast to IStream later
+                        }
+                    )
+            );
         }
     }
 
@@ -281,7 +275,7 @@ public partial class LoggingTests
         };
     }
 
-    public record LoggingTestCase : IAsyncTestInstance
+    public record LoggingTestCase : IAsyncTestInstance, ICaseWithSetup
     {
         public LoggingTestCase(string name, string scl, params Action<LogEntry>[] expectedLogs)
         {
@@ -295,7 +289,7 @@ public partial class LoggingTests
         public string SCL { get; set; }
         public IReadOnlyList<Action<LogEntry>> ExpectedLogs { get; set; }
 
-        public List<Action<Mock<IFileSystemHelper>>>? FileSystemActions { get; set; }
+        //public List<Action<Mock<IFileSystemHelper>>>? FileSystemActions { get; set; }
 
         /// <inheritdoc />
         public async Task RunAsync(ITestOutputHelper testOutputHelper)
@@ -308,17 +302,7 @@ public partial class LoggingTests
             var logger = loggerFactory.CreateLogger("Test");
             var repo   = new MockRepository(MockBehavior.Strict);
 
-            var fileSystemMock = repo.Create<IFileSystemHelper>();
-
-            if (FileSystemActions != null)
-                foreach (var fileSystemAction in FileSystemActions)
-                    fileSystemAction(fileSystemMock);
-
-            var context = new ExternalContext(
-                fileSystemMock.Object,
-                repo.Create<IExternalProcessRunner>().Object,
-                repo.Create<IConsole>().Object
-            );
+            var context = ExternalContextSetupHelper.GetExternalContext(repo);
 
             var sclRunner = new SCLRunner(
                 SCLSettings.EmptySettings,
@@ -333,6 +317,9 @@ public partial class LoggingTests
 
             loggerFactory.Sink.LogEntries.Should().SatisfyRespectively(ExpectedLogs);
         }
+
+        /// <inheritdoc />
+        public ExternalContextSetupHelper ExternalContextSetupHelper { get; } = new();
     }
 }
 

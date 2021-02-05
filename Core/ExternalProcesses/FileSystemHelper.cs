@@ -1,35 +1,31 @@
 ﻿using System;
-using System.IO;
-using System.IO.Compression;
 using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Util;
+using Thinktecture.IO;
 
 namespace Reductech.EDR.Core.ExternalProcesses
 {
 
 /// <summary>
-/// Interacts with the file system in the normal way.
+/// Contains static methods for interacting with files
 /// </summary>
-public class FileSystemHelper : IFileSystemHelper
+public static class FileSystemHelper
 {
-    private FileSystemHelper() { }
-
     /// <summary>
-    /// The instance.
+    /// Create a Directory
     /// </summary>
-    public static IFileSystemHelper Instance { get; } = new FileSystemHelper();
-
-    /// <inheritdoc />
-    public Result<Unit, IErrorBuilder> CreateDirectory(string path)
+    public static Result<Unit, IErrorBuilder> CreateDirectory(
+        this IFileSystem fileSystem,
+        string path)
     {
         Result<Unit, IErrorBuilder> r;
 
         try
         {
-            Directory.CreateDirectory(path);
+            fileSystem.Directory.CreateDirectory(path);
             r = Unit.Default;
         }
         #pragma warning disable CA1031 // Do not catch general exception types
@@ -44,7 +40,8 @@ public class FileSystemHelper : IFileSystemHelper
     /// <summary>
     /// Creates a new file and writes in the text.
     /// </summary>
-    public async Task<Result<Unit, IErrorBuilder>> CreateFileAsync(
+    public static async Task<Result<Unit, IErrorBuilder>> CreateFileAsync(
+        this IFileSystem fileSystem,
         string path,
         string text,
         CancellationToken ca)
@@ -53,7 +50,7 @@ public class FileSystemHelper : IFileSystemHelper
 
         try
         {
-            await using var sw = File.CreateText(path);
+            using var sw = fileSystem.File.CreateText(path);
             await sw.WriteAsync(text.AsMemory(), ca);
             r1 = Unit.Default;
         }
@@ -67,18 +64,17 @@ public class FileSystemHelper : IFileSystemHelper
         return r1;
     }
 
-    /// <inheritdoc />
-    public bool DoesFileExist(string path) => File.Exists(path);
-
-    /// <inheritdoc />
-    public bool DoesDirectoryExist(string path) => Directory.Exists(path);
-
-    /// <inheritdoc />
-    public Result<Unit, IErrorBuilder> DeleteDirectory(string path, bool recursive)
+    /// <summary>
+    /// Delete a directory
+    /// </summary>
+    public static Result<Unit, IErrorBuilder> DeleteDirectory(
+        this IFileSystem fileSystem,
+        string path,
+        bool recursive)
     {
         try
         {
-            Directory.Delete(path, recursive);
+            fileSystem.Directory.Delete(path, recursive);
         }
         #pragma warning disable CA1031 // Do not catch general exception types
         catch (Exception e)
@@ -90,12 +86,14 @@ public class FileSystemHelper : IFileSystemHelper
         return Unit.Default;
     }
 
-    /// <inheritdoc />
-    public Result<Unit, IErrorBuilder> DeleteFile(string path)
+    /// <summary>
+    /// Delete a file
+    /// </summary>
+    public static Result<Unit, IErrorBuilder> DeleteFile(this IFileSystem fileSystem, string path)
     {
         try
         {
-            File.Delete(path);
+            fileSystem.File.Delete(path);
         }
         #pragma warning disable CA1031 // Do not catch general exception types
         catch (Exception e)
@@ -107,22 +105,27 @@ public class FileSystemHelper : IFileSystemHelper
         return Unit.Default;
     }
 
-    /// <inheritdoc />
-    public Result<Stream, IErrorBuilder> ReadFile(string path, bool decompress)
+    /// <summary>
+    /// Read a file
+    /// </summary>
+    public static Result<IStream, IErrorBuilder> ReadFile(
+        this IFileSystem fileSystem,
+        string path,
+        bool decompress)
     {
-        Result<Stream, IErrorBuilder> result;
+        Result<IStream, IErrorBuilder> result;
 
         try
 
         {
-            Stream fs = File.OpenRead(path);
+            IStream fs = fileSystem.File.OpenRead(path);
 
             if (decompress)
             {
-                fs = new GZipStream(fs, CompressionMode.Decompress);
+                fs = fileSystem.Compression.Decompress(fs);
             }
 
-            result = fs;
+            result = Result.Success<IStream, IErrorBuilder>(fs);
         }
         #pragma warning disable CA1031 // Do not catch general exception types
         catch (Exception e)
@@ -134,8 +137,11 @@ public class FileSystemHelper : IFileSystemHelper
         return result;
     }
 
-    /// <inheritdoc />
-    public Result<Unit, IErrorBuilder> ExtractToDirectory(
+    /// <summary>
+    /// Extract a file to a directory
+    /// </summary>
+    public static Result<Unit, IErrorBuilder> ExtractToDirectory(
+        this IFileSystem fileSystem,
         string sourceArchivePath,
         string destinationDirectoryPath,
         bool overwrite)
@@ -144,7 +150,12 @@ public class FileSystemHelper : IFileSystemHelper
 
         try
         {
-            ZipFile.ExtractToDirectory(sourceArchivePath, destinationDirectoryPath, overwrite);
+            fileSystem.Compression.ExtractToDirectory(
+                sourceArchivePath,
+                destinationDirectoryPath,
+                overwrite
+            );
+
             error = Maybe<IErrorBuilder>.None;
         }
         #pragma warning disable CA1031 // Do not catch general exception types
@@ -162,10 +173,13 @@ public class FileSystemHelper : IFileSystemHelper
         return Unit.Default;
     }
 
-    /// <inheritdoc />
-    public async Task<Result<Unit, IErrorBuilder>> WriteFileAsync(
+    /// <summary>
+    /// Writes a file asynchronously
+    /// </summary>
+    public static async Task<Result<Unit, IErrorBuilder>> WriteFileAsync(
+        this IFileSystem fileSystem,
         string path,
-        Stream stream,
+        IStream stream,
         bool compress,
         CancellationToken cancellationToken)
     {
@@ -173,10 +187,10 @@ public class FileSystemHelper : IFileSystemHelper
 
         try
         {
-            Stream writeStream = File.Create(path);
+            IStream writeStream = fileSystem.File.Create(path);
 
             if (compress)
-                writeStream = new GZipStream(writeStream, CompressionMode.Compress);
+                writeStream = fileSystem.Compression.Decompress(writeStream);
 
             await stream.CopyToAsync(writeStream, cancellationToken);
             writeStream.Close();
@@ -196,9 +210,6 @@ public class FileSystemHelper : IFileSystemHelper
 
         return Unit.Default;
     }
-
-    /// <inheritdoc />
-    public string GetCurrentDirectory() => Directory.GetCurrentDirectory();
 }
 
 }
