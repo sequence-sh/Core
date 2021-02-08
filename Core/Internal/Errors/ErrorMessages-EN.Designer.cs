@@ -223,6 +223,15 @@ namespace Reductech.EDR.Core.Internal.Errors {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Could not get context &apos;{0}&apos;.
+        /// </summary>
+        internal static string MissingContext {
+            get {
+                return ResourceManager.GetString("MissingContext", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to {0} was missing or empty..
         /// </summary>
         internal static string MissingParameter {

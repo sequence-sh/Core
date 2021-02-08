@@ -171,6 +171,9 @@
   <data name="InvalidCast" xml:space="preserve">
     <value>'{0}' cannot take the value '{1}'</value>
   </data>
+  <data name="MissingContext" xml:space="preserve">
+    <value>Could not get context '{0}'</value>
+  </data>
   <data name="MissingParameter" xml:space="preserve">
     <value>{0} was missing or empty.</value>
   </data>

@@ -112,6 +112,11 @@ public sealed record ErrorCode : ErrorCodeBase
     public static readonly ErrorCode InvalidCast = new(nameof(InvalidCast));
 
     /// <summary>
+    /// Could not get context '{0}'
+    /// </summary>
+    public static readonly ErrorCode MissingContext = new(nameof(MissingContext));
+
+    /// <summary>
     /// {0} was missing or empty.
     /// </summary>
     public static readonly ErrorCode MissingParameter = new(nameof(MissingParameter));
