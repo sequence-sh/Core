@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.TestHarness;
 
@@ -33,6 +34,22 @@ public partial class EqualsTests : StepTestBase<Equals<int>, bool>
             yield return new StepCase(
                 "Three numbers true",
                 new Equals<int>() { Terms = StaticHelpers.Array(2, 2, 2) },
+                true
+            );
+
+            yield return new StepCase(
+                "Steps are operators",
+                new Equals<int>()
+                {
+                    Terms = new ArrayNew<int>()
+                    {
+                        Elements = new List<IStep<int>>()
+                        {
+                            new Sum() { Terms     = StaticHelpers.Array(2, 2) },
+                            new Product() { Terms = StaticHelpers.Array(2, 2) },
+                        }
+                    }
+                },
                 true
             );
         }

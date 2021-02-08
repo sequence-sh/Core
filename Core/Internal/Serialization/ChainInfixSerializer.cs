@@ -24,7 +24,17 @@ public record ChainInfixSerializer(string StepName, string Operator) : IStepSeri
         {
             var text = string.Join(
                 $" {Operator} ",
-                arrayNewStep.ElementSteps.Select(x => x.Serialize())
+                arrayNewStep.ElementSteps.Select(
+                    x =>
+                    {
+                        if (x.ShouldBracketWhenSerialized)
+                        {
+                            return $"({x.Serialize()})";
+                        }
+
+                        return x.Serialize();
+                    }
+                )
             );
 
             return text;
