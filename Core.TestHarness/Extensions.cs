@@ -86,17 +86,20 @@ public static class Extensions
         return cws;
     }
 
-    private static T WithContext<T>(this T cws, object context)
+    private static T WithContext<T>(this T cws, string name, object context)
         where T : ICaseWithSetup
     {
-        cws.ExternalContextSetupHelper.AddContextObject(context);
+        cws.ExternalContextSetupHelper.AddContextObject(name, context);
         return cws;
     }
 
-    private static T WithContextMock<T>(this T cws, Func<MockRepository, Mock> function)
+    private static T WithContextMock<T>(
+        this T cws,
+        string name,
+        Func<MockRepository, Mock> function)
         where T : ICaseWithSetup
     {
-        cws.ExternalContextSetupHelper.AddContextMock(function);
+        cws.ExternalContextSetupHelper.AddContextMock(name, function);
         return cws;
     }
 

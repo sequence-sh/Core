@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.ExternalProcesses;
 using Reductech.EDR.Core.Internal.Errors;
@@ -15,7 +16,7 @@ public sealed record ExternalContext(
     IFileSystem FileSystemHelper,
     IExternalProcessRunner ExternalProcessRunner,
     IConsole Console,
-    params object[] InjectedContexts) : IExternalContext
+    params (string name, object context)[] InjectedContexts) : IExternalContext
 {
     /// <summary>
     /// The real external context
@@ -27,15 +28,18 @@ public sealed record ExternalContext(
     );
 
     /// <inheritdoc />
-    public Result<T, ErrorBuilder> TryGetContext<T>()
+    public Result<T, ErrorBuilder> TryGetContext<T>(string key) where T : class
     {
-        var first = InjectedContexts.OfType<T>().TryFirst();
+        var first = InjectedContexts
+            .Where(x => x.name.Equals(key, StringComparison.OrdinalIgnoreCase))
+            .TryFirst();
 
-        if (first.HasValue)
-            return first.Value;
+        if (first.HasValue && first.Value.context is T context)
+        {
+            return context;
+        }
 
         var error = ErrorCode.MissingContext.ToErrorBuilder(typeof(T).Name);
-
         return error;
     }
 }
