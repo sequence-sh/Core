@@ -52,6 +52,14 @@ public sealed class ExternalContextSetupHelper
         return mock.Object;
     }
 
+    public void AddContextObject(object o) => _contextObjects.Add(o);
+
+    public void AddContextMock(Func<MockRepository, Mock> createFunc) =>
+        _contextMocks.Add(createFunc);
+
+    private readonly List<object> _contextObjects = new();
+    private readonly List<Func<MockRepository, Mock>> _contextMocks = new();
+
     public IExternalContext GetExternalContext(MockRepository mockRepository)
     {
         var externalProcessRunner = GetAndSetupMock<IExternalProcessRunner>(mockRepository);
@@ -59,6 +67,16 @@ public sealed class ExternalContextSetupHelper
         var file                  = GetAndSetupMock<IFile>(mockRepository);
         var directory             = GetAndSetupMock<IDirectory>(mockRepository);
         var compression           = GetAndSetupMock<ICompression>(mockRepository);
+
+        var objects = new List<object>();
+
+        objects.AddRange(_contextObjects);
+
+        foreach (var contextMock in _contextMocks)
+        {
+            var mock = contextMock(mockRepository);
+            objects.Add(mock.Object);
+        }
 
         var externalContext = new ExternalContext(
             new FileSystemAdapter(directory, file, compression),

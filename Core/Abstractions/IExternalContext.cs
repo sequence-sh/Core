@@ -1,4 +1,6 @@
-﻿using Reductech.EDR.Core.ExternalProcesses;
+﻿using CSharpFunctionalExtensions;
+using Reductech.EDR.Core.ExternalProcesses;
+using Reductech.EDR.Core.Internal.Errors;
 using Thinktecture;
 
 namespace Reductech.EDR.Core.Abstractions
@@ -24,6 +26,12 @@ public interface IExternalContext
     /// For interacting with the console
     /// </summary>
     public IConsole Console { get; }
+
+    /// <summary>
+    /// Get context of a given type.
+    /// Allows for type injection.
+    /// </summary>
+    public Result<T, ErrorBuilder> TryGetContext<T>();
 }
 
 }

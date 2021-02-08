@@ -86,6 +86,20 @@ public static class Extensions
         return cws;
     }
 
+    private static T WithContext<T>(this T cws, object context)
+        where T : ICaseWithSetup
+    {
+        cws.ExternalContextSetupHelper.AddContextObject(context);
+        return cws;
+    }
+
+    private static T WithContextMock<T>(this T cws, Func<MockRepository, Mock> function)
+        where T : ICaseWithSetup
+    {
+        cws.ExternalContextSetupHelper.AddContextMock(function);
+        return cws;
+    }
+
     /// <summary>
     /// Asserts that this task should result in success.
     /// </summary>
