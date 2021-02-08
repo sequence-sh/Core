@@ -15,8 +15,24 @@ public partial class PrintTests : StepTestBase<Print<StringStream>, Unit>
         get
         {
             yield return new StepCase(
-                "Print something",
-                new Print<StringStream>() { Value = Constant("Hello") },
+                "Print Something",
+                new Print<StringStream> { Value = Constant("Hello") },
+                Unit.Default
+            ).WithConsoleAction(x => x.Setup(c => c.WriteLine("Hello")));
+        }
+    }
+}
+
+public partial class LogTests : StepTestBase<Log<StringStream>, Unit>
+{
+    /// <inheritdoc />
+    protected override IEnumerable<StepCase> StepCases
+    {
+        get
+        {
+            yield return new StepCase(
+                "Log something",
+                new Log<StringStream>() { Value = Constant("Hello") },
                 Unit.Default,
                 "Hello"
             );
@@ -30,13 +46,6 @@ public partial class PrintTests : StepTestBase<Print<StringStream>, Unit>
         {
             yield return new DeserializeCase(
                 "Named argument",
-                "Print Value: 'Hello'",
-                Unit.Default,
-                "Hello"
-            );
-
-            yield return new DeserializeCase(
-                "Log Alias",
                 "Log Value: 'Hello'",
                 Unit.Default,
                 "Hello"
@@ -44,7 +53,7 @@ public partial class PrintTests : StepTestBase<Print<StringStream>, Unit>
 
             yield return new DeserializeCase(
                 "Ordered Argument",
-                "Print 'Hello'",
+                "Log 'Hello'",
                 Unit.Default,
                 "Hello"
             );

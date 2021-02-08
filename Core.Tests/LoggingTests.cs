@@ -24,28 +24,28 @@ public partial class LoggingTests
         get
         {
             yield return new LoggingTestCase(
-                "Print 1",
-                "Print 1",
+                "Log 1",
+                "Log 1",
                 CheckMessageAndScope(
                     LogLevel.Trace,
-                    "Print Started with Parameters: [Value, 1]",
-                    "Print"
+                    "Log Started with Parameters: [Value, 1]",
+                    "Log"
                 ),
-                CheckMessageAndScope(LogLevel.Information, "1", "Print"),
+                CheckMessageAndScope(LogLevel.Information, "1", "Log"),
                 CheckMessageAndScope(
                     LogLevel.Trace,
-                    "Print Completed Successfully with Result: Unit",
-                    "Print"
+                    "Log Completed Successfully with Result: Unit",
+                    "Log"
                 )
             );
 
             yield return new LoggingTestCase(
-                "Print 1 + 1",
-                "Print (1 + 1)",
+                "Log 1 + 1",
+                "Log (1 + 1)",
                 CheckMessageAndScope(
                     LogLevel.Trace,
-                    "Print Started with Parameters: [Value, Sum]",
-                    "Print"
+                    "Log Started with Parameters: [Value, Sum]",
+                    "Log"
                 ),
                 CheckMessageAndScope(
                     LogLevel.Trace,
@@ -70,23 +70,23 @@ public partial class LoggingTests
                 CheckMessageAndScope(LogLevel.Information, "2", null),
                 CheckMessageAndScope(
                     LogLevel.Trace,
-                    "Print Completed Successfully with Result: Unit",
+                    "Log Completed Successfully with Result: Unit",
                     null
                 )
             );
 
             yield return new LoggingTestCase(
                 "Error",
-                "AssertError (Print (1 / 0))",
+                "AssertError (Log (1 / 0))",
                 CheckMessageAndScope(
                     LogLevel.Trace,
-                    "AssertError Started with Parameters: [Step, Print]",
+                    "AssertError Started with Parameters: [Step, Log]",
                     "AssertError"
                 ),
                 CheckMessageAndScope(
                     LogLevel.Trace,
-                    "Print Started with Parameters: [Value, Divide]",
-                    "Print"
+                    "Log Started with Parameters: [Value, Divide]",
+                    "Log"
                 ),
                 CheckMessageAndScope(
                     LogLevel.Trace,
@@ -110,7 +110,7 @@ public partial class LoggingTests
                 ),
                 CheckMessageAndScope(
                     LogLevel.Warning,
-                    "Print Failed with message: Attempt to Divide by Zero.",
+                    "Log Failed with message: Attempt to Divide by Zero.",
                     null
                 ),
                 CheckMessageAndScope(
@@ -123,10 +123,10 @@ public partial class LoggingTests
             yield return new
                 LoggingTestCase(
                     "No Path to combine",
-                    "Print (PathCombine [])",
+                    "Log (PathCombine [])",
                     CheckMessageAndScope(
                         LogLevel.Trace,
-                        "Print Started with Parameters: [Value, PathCombine]",
+                        "Log Started with Parameters: [Value, PathCombine]",
                         null
                     ),
                     CheckMessageAndScope(
@@ -157,7 +157,7 @@ public partial class LoggingTests
                     CheckMessageAndScope(LogLevel.Information, @"MyDir", null),
                     CheckMessageAndScope(
                         LogLevel.Trace,
-                        "Print Completed Successfully with Result: Unit",
+                        "Log Completed Successfully with Result: Unit",
                         null
                     )
                 ).WithDirectoryAction(
@@ -167,10 +167,10 @@ public partial class LoggingTests
 
             yield return new LoggingTestCase(
                     "Unqualified Path to combine",
-                    "Print (PathCombine ['File'])",
+                    "Log (PathCombine ['File'])",
                     CheckMessageAndScope(
                         LogLevel.Trace,
-                        "Print Started with Parameters: [Value, PathCombine]",
+                        "Log Started with Parameters: [Value, PathCombine]",
                         null
                     ),
                     CheckMessageAndScope(
@@ -205,7 +205,7 @@ public partial class LoggingTests
                     },
                     CheckMessageAndScope(
                         LogLevel.Trace,
-                        "Print Completed Successfully with Result: Unit",
+                        "Log Completed Successfully with Result: Unit",
                         null
                     )
                 )
@@ -216,10 +216,10 @@ public partial class LoggingTests
 
             yield return new LoggingTestCase(
                 "File Read",
-                "FileRead 'MyFile' | Print",
+                "FileRead 'MyFile' | Log",
                 CheckMessageAndScope(
                     LogLevel.Trace,
-                    "Print Started with Parameters: [Value, FileRead]",
+                    "Log Started with Parameters: [Value, FileRead]",
                     null
                 ),
                 CheckMessageAndScope(
@@ -235,7 +235,7 @@ public partial class LoggingTests
                 CheckMessageAndScope(LogLevel.Information, "MyData", null),
                 CheckMessageAndScope(
                     LogLevel.Trace,
-                    "Print Completed Successfully with Result: Unit",
+                    "Log Completed Successfully with Result: Unit",
                     null
                 )
             ).WithFileAction(

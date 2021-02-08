@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
+using Microsoft.Extensions.Logging;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
@@ -13,9 +14,10 @@ namespace Reductech.EDR.Core.Steps
 {
 
 /// <summary>
-/// Prints a value to the console.
+/// Write a value to the logs
 /// </summary>
-public sealed class Print<T> : CompoundStep<Unit>
+/// <typeparam name="T"></typeparam>
+public sealed class Log<T> : CompoundStep<Unit>
 {
     /// <inheritdoc />
     protected override async Task<Result<Unit, IError>> Run(
@@ -36,32 +38,32 @@ public sealed class Print<T> : CompoundStep<Unit>
             _               => r.Value?.ToString()!
         };
 
-        stateMonad.ExternalContext.Console.WriteLine(stringToPrint);
+        stateMonad.Logger.LogInformation(stringToPrint);
 
         return Unit.Default;
     }
 
     /// <summary>
-    /// The Value to Print.
+    /// The Value to Log.
     /// </summary>
     [StepProperty(1)]
     [Required]
     public IStep<T> Value { get; set; } = null!;
 
     /// <inheritdoc />
-    public override IStepFactory StepFactory => PrintStepFactory.Instance;
+    public override IStepFactory StepFactory => LogStepFactory.Instance;
 
-    private sealed class PrintStepFactory : GenericStepFactory
+    private sealed class LogStepFactory : GenericStepFactory
     {
-        private PrintStepFactory() { }
+        private LogStepFactory() { }
 
         /// <summary>
         /// The instance.
         /// </summary>
-        public static GenericStepFactory Instance { get; } = new PrintStepFactory();
+        public static GenericStepFactory Instance { get; } = new LogStepFactory();
 
         /// <inheritdoc />
-        public override Type StepType => typeof(Print<>);
+        public override Type StepType => typeof(Log<>);
 
         /// <inheritdoc />
         protected override ITypeReference
@@ -75,7 +77,7 @@ public sealed class Print<T> : CompoundStep<Unit>
         protected override Result<ITypeReference, IError> GetMemberType(
             FreezableStepData freezableStepData,
             TypeResolver typeResolver) => freezableStepData
-            .TryGetStep(nameof(Print<object>.Value), StepType)
+            .TryGetStep(nameof(Log<object>.Value), StepType)
             .Bind(x => x.TryGetOutputTypeReference(typeResolver));
     }
 }

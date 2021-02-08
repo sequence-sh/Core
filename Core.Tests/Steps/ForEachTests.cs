@@ -20,7 +20,7 @@ public partial class ForEachTests : StepTestBase<ForEach<int>, Unit>
                 "Default Variable Name",
                 new ForEach<int>
                 {
-                    Action = new Print<int> { Value = GetVariable<int>(VariableName.Entity) },
+                    Action = new Log<int> { Value = GetVariable<int>(VariableName.Entity) },
                     Array  = Array(3, 2, 1)
                 },
                 Unit.Default,
@@ -33,7 +33,7 @@ public partial class ForEachTests : StepTestBase<ForEach<int>, Unit>
                 "Custom Variable Name",
                 new ForEach<int>
                 {
-                    Action   = new Print<int> { Value = GetVariable<int>("Foo") },
+                    Action   = new Log<int> { Value = GetVariable<int>("Foo") },
                     Array    = Array(3, 2, 1),
                     Variable = new VariableName("Foo")
                 },
@@ -52,7 +52,7 @@ public partial class ForEachTests : StepTestBase<ForEach<int>, Unit>
         {
             yield return new DeserializeCase(
                 "Default Variable Name",
-                "Foreach [3,2,1]  (Print Value: <Entity>)",
+                "Foreach [3,2,1]  (Log Value: <Entity>)",
                 Unit.Default,
                 "3",
                 "2",
@@ -61,7 +61,7 @@ public partial class ForEachTests : StepTestBase<ForEach<int>, Unit>
 
             yield return new DeserializeCase(
                 "Named Variable",
-                "Foreach [3,2,1] (Print Value: <Foo>) <Foo>",
+                "Foreach [3,2,1] (Log Value: <Foo>) <Foo>",
                 Unit.Default,
                 "3",
                 "2",
@@ -70,8 +70,8 @@ public partial class ForEachTests : StepTestBase<ForEach<int>, Unit>
 
             yield return new DeserializeCase(
                 "Scoped Variable Overloading",
-                @"- Foreach [1,2,3] (Print <Entity>) #Here <Entity> is an int
-- Foreach ['one', 'two','three'] (Print <Entity>) #Here <Entity> is a string
+                @"- Foreach [1,2,3] (Log <Entity>) #Here <Entity> is an int
+- Foreach ['one', 'two','three'] (Log <Entity>) #Here <Entity> is a string
 ",
                 Unit.Default,
                 "1",

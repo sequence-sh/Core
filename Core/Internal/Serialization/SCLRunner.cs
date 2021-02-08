@@ -86,13 +86,13 @@ public sealed class SCLRunner
         if (step is IStep<Unit> unitStep)
             return unitStep;
 
-        IStep<Unit> print = SurroundWithPrint(step as dynamic);
-        return print;
+        IStep<Unit> log = SurroundWithLog(step as dynamic);
+        return log;
     }
 
-    private static IStep<Unit> SurroundWithPrint<T>(IStep<T> step)
+    private static IStep<Unit> SurroundWithLog<T>(IStep<T> step)
     {
-        var p = new Print<T>() { Value = step };
+        var p = new Log<T>() { Value = step };
 
         return p;
     }

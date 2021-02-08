@@ -23,7 +23,7 @@ public partial class ArrayDistinctTests : StepTestBase<ArrayDistinct<Entity>, Ar
                 "Distinct case sensitive",
                 new ForEach<Entity>
                 {
-                    Action = new Print<Entity> { Value = GetVariable<Entity>(foreachVar) },
+                    Action = new Log<Entity> { Value = GetVariable<Entity>(foreachVar) },
                     Array = new ArrayDistinct<Entity>
                     {
                         Array = Array(
@@ -52,7 +52,7 @@ public partial class ArrayDistinctTests : StepTestBase<ArrayDistinct<Entity>, Ar
                 "Distinct case insensitive",
                 new ForEach<Entity>
                 {
-                    Action = new Print<Entity> { Value = GetEntityVariable },
+                    Action = new Log<Entity> { Value = GetEntityVariable },
                     Array = new ArrayDistinct<Entity>
                     {
                         Array = Array(

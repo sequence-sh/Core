@@ -19,7 +19,7 @@ public partial class ArrayConcatTests : StepTestBase<ArrayConcat<Entity>, Array<
                 "One stream",
                 new ForEach<Entity>
                 {
-                    Action = new Print<Entity> { Value = GetEntityVariable },
+                    Action = new Log<Entity> { Value = GetEntityVariable },
                     Array = new ArrayConcat<Entity>
                     {
                         Arrays = new ArrayNew<Array<Entity>>
@@ -44,7 +44,7 @@ public partial class ArrayConcatTests : StepTestBase<ArrayConcat<Entity>, Array<
                 "Two streams",
                 new ForEach<Entity>
                 {
-                    Action = new Print<Entity> { Value = GetEntityVariable },
+                    Action = new Log<Entity> { Value = GetEntityVariable },
                     Array = new ArrayConcat<Entity>
                     {
                         Arrays = new ArrayNew<Array<Entity>>

@@ -20,9 +20,9 @@ public partial class ForTests : StepTestBase<For, Unit>
                 "Increment 1",
                 new For
                 {
-                    Action = new Print<int> { Value = GetVariable<int>(VariableName.Index.Name) },
-                    From = Constant(1),
-                    To = Constant(3),
+                    Action    = new Log<int> { Value = GetVariable<int>(VariableName.Index.Name) },
+                    From      = Constant(1),
+                    To        = Constant(3),
                     Increment = Constant(1),
                 },
                 Unit.Default,
@@ -35,9 +35,9 @@ public partial class ForTests : StepTestBase<For, Unit>
                 "Increment 2",
                 new For
                 {
-                    Action = new Print<int> { Value = GetVariable<int>(VariableName.Index.Name) },
-                    From = Constant(1),
-                    To = Constant(6),
+                    Action    = new Log<int> { Value = GetVariable<int>(VariableName.Index.Name) },
+                    From      = Constant(1),
+                    To        = Constant(6),
                     Increment = Constant(2),
                 },
                 Unit.Default,
@@ -50,9 +50,9 @@ public partial class ForTests : StepTestBase<For, Unit>
                 "Increment -1",
                 new For
                 {
-                    Action = new Print<int> { Value = GetVariable<int>(VariableName.Index.Name) },
-                    From = Constant(3),
-                    To = Constant(1),
+                    Action    = new Log<int> { Value = GetVariable<int>(VariableName.Index.Name) },
+                    From      = Constant(3),
+                    To        = Constant(1),
                     Increment = Constant(-1),
                 },
                 Unit.Default,
@@ -65,9 +65,9 @@ public partial class ForTests : StepTestBase<For, Unit>
                 "Increment No range",
                 new For
                 {
-                    Action = new Print<int> { Value = GetVariable<int>(VariableName.Index.Name) },
-                    From = Constant(3),
-                    To = Constant(1),
+                    Action    = new Log<int> { Value = GetVariable<int>(VariableName.Index.Name) },
+                    From      = Constant(3),
+                    To        = Constant(1),
                     Increment = Constant(1),
                 },
                 Unit.Default
@@ -82,7 +82,7 @@ public partial class ForTests : StepTestBase<For, Unit>
         {
             yield return new DeserializeCase(
                 "Increment 1",
-                "For Action: (Print Value: <i>) From: 1 To: 3 Increment: 1",
+                "For Action: (Log Value: <i>) From: 1 To: 3 Increment: 1",
                 Unit.Default,
                 "1",
                 "2",
@@ -100,7 +100,7 @@ public partial class ForTests : StepTestBase<For, Unit>
                         "ValueIf increment 0",
                         new For
                         {
-                            Action = new Print<int>
+                            Action = new Log<int>
                             {
                                 Value = GetVariable<int>(VariableName.Index.Name)
                             },

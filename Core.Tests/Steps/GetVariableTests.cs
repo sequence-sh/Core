@@ -23,7 +23,7 @@ public partial class GetVariableTests : StepTestBase<GetVariable<int>, int>
                     {
                         Variable = new VariableName("Foo"), Value = Constant(42)
                     },
-                    new Print<int>
+                    new Log<int>
                     {
                         Value = new GetVariable<int>
                         {
@@ -46,7 +46,7 @@ public partial class GetVariableTests : StepTestBase<GetVariable<int>, int>
         {
             yield return new DeserializeCase(
                     "Short Form",
-                    $"- <Foo> = 42\r\n- Print Value: <Foo>",
+                    $"- <Foo> = 42\r\n- Log Value: <Foo>",
                     (Unit.Default),
                     "42"
                 )

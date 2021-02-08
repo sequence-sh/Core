@@ -43,7 +43,7 @@ public partial class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Enti
                     name,
                     new ForEach<Entity>
                     {
-                        Action = new Print<Entity>
+                        Action = new Log<Entity>
                         {
                             Value = GetVariable<Entity>(VariableName.Entity)
                         },
@@ -262,7 +262,7 @@ public partial class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Enti
                         {
                             new ForEach<Entity>
                             {
-                                Action = new Print<Entity>
+                                Action = new Log<Entity>
                                 {
                                     Value = GetVariable<Entity>(VariableName.Entity)
                                 },

@@ -20,7 +20,7 @@ public partial class EntityMapTests : StepTestBase<EntityMap, Array<Entity>>
                 "Add property",
                 new ForEach<Entity>
                 {
-                    Action = new Print<Entity> { Value = GetEntityVariable },
+                    Action = new Log<Entity> { Value = GetEntityVariable },
                     Array = new EntityMap
                     {
                         EntityStream = Array(
@@ -45,7 +45,7 @@ public partial class EntityMapTests : StepTestBase<EntityMap, Array<Entity>>
                 "Change property",
                 new ForEach<Entity>
                 {
-                    Action = new Print<Entity> { Value = GetEntityVariable },
+                    Action = new Log<Entity> { Value = GetEntityVariable },
                     Array = new EntityMap
                     {
                         EntityStream = Array(

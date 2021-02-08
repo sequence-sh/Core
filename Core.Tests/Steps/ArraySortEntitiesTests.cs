@@ -31,7 +31,7 @@ public partial class ArraySortEntitiesTests : StepTestBase<ArraySort<Entity>, Ar
                             Entity = GetEntityVariable, Property = Constant("Foo")
                         }
                     },
-                    Action   = new Print<Entity> { Value = GetEntityVariable },
+                    Action   = new Log<Entity> { Value = GetEntityVariable },
                     Variable = VariableName.Entity
                 },
                 Unit.Default,
@@ -57,7 +57,7 @@ public partial class ArraySortEntitiesTests : StepTestBase<ArraySort<Entity>, Ar
                             Entity = GetEntityVariable, Property = Constant("Foo")
                         }
                     },
-                    Action   = new Print<Entity> { Value = GetEntityVariable },
+                    Action   = new Log<Entity> { Value = GetEntityVariable },
                     Variable = VariableName.Entity
                 },
                 Unit.Default,
@@ -84,7 +84,7 @@ public partial class ArraySortEntitiesTests : StepTestBase<ArraySort<Entity>, Ar
                             Entity = GetEntityVariable, Property = Constant("Foo")
                         }
                     },
-                    Action   = new Print<Entity> { Value = GetEntityVariable },
+                    Action   = new Log<Entity> { Value = GetEntityVariable },
                     Variable = VariableName.Entity
                 },
                 Unit.Default,
