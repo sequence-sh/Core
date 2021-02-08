@@ -117,22 +117,22 @@ public partial class GenerateDocumentationTests : StepTestBase<GenerateDocumenta
             static string[] ToLogs(Array<Entity> array) =>
                 array.GetElements().Value.Select(x => x.Serialize()).ToArray();
 
-            var printDocumentation = new ForEach<Entity>()
+            var LogDocumentation = new ForEach<Entity>()
             {
                 Array  = new GenerateDocumentation(),
-                Action = new Print<Entity>() { Value = GetEntityVariable }
+                Action = new Log<Entity>() { Value = GetEntityVariable }
             };
 
             yield return new StepCase(
                 "Generate Not Documentation",
-                printDocumentation,
+                LogDocumentation,
                 Unit.Default,
                 ToLogs(Entities(Contents(notHeader), not))
             ).WithStepFactoryStore(StepFactoryStore.Create(NotStepFactory.Instance));
 
             //yield return new StepCase(
             //    "Generate Math Documentation",
-            //    printDocumentation,
+            //    LogDocumentation,
             //    Unit.Default,
             //    ToLogs(
             //        Entities(
@@ -151,7 +151,7 @@ public partial class GenerateDocumentationTests : StepTestBase<GenerateDocumenta
 
             yield return new StepCase(
                 "Example step",
-                printDocumentation,
+                LogDocumentation,
                 Unit.Default,
                 ToLogs(Entities(Contents(exampleStepHeader), documentationExample))
             ).WithStepFactoryStore(
@@ -160,7 +160,7 @@ public partial class GenerateDocumentationTests : StepTestBase<GenerateDocumenta
 
             yield return new StepCase(
                 "Two InitialSteps",
-                printDocumentation,
+                LogDocumentation,
                 Unit.Default,
                 ToLogs(Entities(Contents(notHeader, exampleStepHeader), not, documentationExample))
             ).WithStepFactoryStore(

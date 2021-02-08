@@ -20,7 +20,7 @@ public partial class ArrayFilterTests : StepTestBase<ArrayFilter<Entity>, Array<
                 "Filter stuff",
                 new ForEach<Entity>
                 {
-                    Action = new Print<Entity> { Value = GetEntityVariable },
+                    Action = new Log<Entity> { Value = GetEntityVariable },
                     Array = new ArrayFilter<Entity>
                     {
                         Array = Array(
@@ -47,7 +47,7 @@ public partial class ArrayFilterTests : StepTestBase<ArrayFilter<Entity>, Array<
                 "Filter stuff with custom variable name",
                 new ForEach<Entity>
                 {
-                    Action   = new Print<Entity> { Value = GetVariable<Entity>("ForeachVar") },
+                    Action   = new Log<Entity> { Value = GetVariable<Entity>("ForeachVar") },
                     Variable = new VariableName("ForeachVar"),
                     Array = new ArrayFilter<Entity>
                     {

@@ -17,7 +17,7 @@ public partial class FromCSVTests : StepTestBase<FromCSV, Array<Entity>>
         get
         {
             yield return new StepCase(
-                "Read CSV and print all lines",
+                "Read CSV and Log all lines",
                 new ForEach<Entity>
                 {
                     Array = new FromCSV
@@ -26,7 +26,7 @@ public partial class FromCSVTests : StepTestBase<FromCSV, Array<Entity>>
                             $@"Foo,Bar{Environment.NewLine}Hello,World{Environment.NewLine}Hello 2,World 2"
                         )
                     },
-                    Action = new Print<Entity>
+                    Action = new Log<Entity>
                     {
                         Value = new GetVariable<Entity> { Variable = VariableName.Entity }
                     },
@@ -38,7 +38,7 @@ public partial class FromCSVTests : StepTestBase<FromCSV, Array<Entity>>
             );
 
             yield return new StepCase(
-                "Read CSV and print all lines should ignore missing columns",
+                "Read CSV and Log all lines should ignore missing columns",
                 new ForEach<Entity>
                 {
                     Array = new FromCSV
@@ -47,7 +47,7 @@ public partial class FromCSVTests : StepTestBase<FromCSV, Array<Entity>>
                             $@"Foo{Environment.NewLine}Hello,World{Environment.NewLine}Hello 2,World 2"
                         )
                     },
-                    Action = new Print<Entity>
+                    Action = new Log<Entity>
                     {
                         Value = new GetVariable<Entity> { Variable = VariableName.Entity }
                     },
@@ -59,7 +59,7 @@ public partial class FromCSVTests : StepTestBase<FromCSV, Array<Entity>>
             );
 
             yield return new StepCase(
-                "Read CSV and print all lines should ignore comments",
+                "Read CSV and Log all lines should ignore comments",
                 new ForEach<Entity>
                 {
                     Array = new FromCSV
@@ -68,7 +68,7 @@ public partial class FromCSVTests : StepTestBase<FromCSV, Array<Entity>>
                             $@"#this is a comment{Environment.NewLine}Foo{Environment.NewLine}Hello,World{Environment.NewLine}Hello 2,World 2"
                         )
                     },
-                    Action = new Print<Entity>
+                    Action = new Log<Entity>
                     {
                         Value = new GetVariable<Entity> { Variable = VariableName.Entity }
                     },

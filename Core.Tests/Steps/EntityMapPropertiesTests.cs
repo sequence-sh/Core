@@ -19,7 +19,7 @@ public partial class EntityMapPropertiesTests : StepTestBase<EntityMapProperties
                 "Map some fields",
                 new ForEach<Entity>
                 {
-                    Action = new Print<Entity> { Value = GetVariable<Entity>(VariableName.Entity) },
+                    Action = new Log<Entity> { Value = GetVariable<Entity>(VariableName.Entity) },
                     Array =
                         new EntityMapProperties
                         {

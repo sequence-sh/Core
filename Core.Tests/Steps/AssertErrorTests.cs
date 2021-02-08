@@ -16,11 +16,11 @@ public partial class AssertErrorTests : StepTestBase<AssertError, Unit>
         get
         {
             yield return new DeserializeCase(
-                "Print Divide by zero",
-                "AssertError Step: (Print Value: (1 / 0))",
+                "Log Divide by zero",
+                "AssertError Step: (Log Value: (1 / 0))",
                 Unit.Default,
                 "Divide Failed with message: Attempt to Divide by Zero.",
-                "Print Failed with message: Attempt to Divide by Zero."
+                "Log Failed with message: Attempt to Divide by Zero."
             );
         }
     }
@@ -31,14 +31,14 @@ public partial class AssertErrorTests : StepTestBase<AssertError, Unit>
         get
         {
             yield return new StepCase(
-                "Print divide by zero",
+                "Log divide by zero",
                 new AssertError
                 {
-                    Step = new Print<int> { Value = new Divide() { Terms = Array(1, 0) } }
+                    Step = new Log<int> { Value = new Divide() { Terms = Array(1, 0) } }
                 },
                 Unit.Default,
                 "Divide Failed with message: Attempt to Divide by Zero.",
-                "Print Failed with message: Attempt to Divide by Zero."
+                "Log Failed with message: Attempt to Divide by Zero."
             );
         }
     }
@@ -52,9 +52,9 @@ public partial class AssertErrorTests : StepTestBase<AssertError, Unit>
                 "Successful Step",
                 new AssertError
                 {
-                    Step = new Print<StringStream> { Value = Constant("Hello World") }
+                    Step = new Log<StringStream> { Value = Constant("Hello World") }
                 },
-                new ErrorBuilder(ErrorCode.AssertionFailed, Constant("Print").Name)
+                new ErrorBuilder(ErrorCode.AssertionFailed, Constant("Log").Name)
             );
         }
     }

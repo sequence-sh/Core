@@ -18,13 +18,13 @@ public partial class SequenceTests : StepTestBase<Sequence<StringStream>, String
         get
         {
             yield return new StepCase(
-                "Print then print",
+                "Log then Log",
                 new Sequence<StringStream>
                 {
                     InitialSteps = new List<IStep<Unit>>
                     {
-                        new Print<StringStream> { Value = Constant("Hello") },
-                        new Print<StringStream> { Value = Constant("World") }
+                        new Log<StringStream> { Value = Constant("Hello") },
+                        new Log<StringStream> { Value = Constant("World") }
                     },
                     FinalStep = Constant("Goodbye")
                 },
@@ -41,8 +41,8 @@ public partial class SequenceTests : StepTestBase<Sequence<StringStream>, String
         get
         {
             yield return new DeserializeCase(
-                "Print then print",
-                "- Print Value: 'Hello'\n- Print Value: 'World'",
+                "Log then Log",
+                "- Log Value: 'Hello'\n- Log Value: 'World'",
                 (Unit.Default),
                 "Hello",
                 "World"

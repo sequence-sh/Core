@@ -16,8 +16,8 @@ public partial class IfTests : StepTestBase<If, Unit>
         get
         {
             yield return new DeserializeCase(
-                "If true print something",
-                "If Condition: true Then: (Print Value: 'Hello World')",
+                "If true Log something",
+                "If Condition: true Then: (Log Value: 'Hello World')",
                 Unit.Default,
                 "Hello World"
             );
@@ -30,33 +30,33 @@ public partial class IfTests : StepTestBase<If, Unit>
         get
         {
             yield return new StepCase(
-                "If true print something",
+                "If true Log something",
                 new If
                 {
                     Condition = Constant(true),
-                    Then      = new Print<StringStream>() { Value = Constant("Hello World") }
+                    Then      = new Log<StringStream>() { Value = Constant("Hello World") }
                 },
                 Unit.Default,
                 "Hello World"
             );
 
             yield return new StepCase(
-                "If false print nothing",
+                "If false Log nothing",
                 new If
                 {
                     Condition = Constant(false),
-                    Then      = new Print<StringStream> { Value = Constant("Hello World") }
+                    Then      = new Log<StringStream> { Value = Constant("Hello World") }
                 },
                 Unit.Default
             );
 
             yield return new StepCase(
-                "If false print something else",
+                "If false Log something else",
                 new If
                 {
                     Condition = Constant(false),
-                    Then      = new Print<StringStream> { Value = Constant("Hello World") },
-                    Else      = new Print<StringStream> { Value = Constant("Goodbye World") },
+                    Then      = new Log<StringStream> { Value = Constant("Hello World") },
+                    Else      = new Log<StringStream> { Value = Constant("Goodbye World") },
                 },
                 Unit.Default,
                 "Goodbye World"

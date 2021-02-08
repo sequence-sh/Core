@@ -22,8 +22,8 @@ public partial class FileReadTests : StepTestBase<FileRead, StringStream>
         get
         {
             yield return new StepCase(
-                "Print file text",
-                new Print<StringStream> { Value = new FileRead { Path = Constant("File.txt"), } },
+                "Log file text",
+                new Log<StringStream> { Value = new FileRead { Path = Constant("File.txt"), } },
                 Unit.Default,
                 "Hello World"
             ).WithFileAction(
@@ -32,8 +32,8 @@ public partial class FileReadTests : StepTestBase<FileRead, StringStream>
             );
 
             yield return new StepCase(
-                    "Print file text compressed",
-                    new Print<StringStream>
+                    "Log file text compressed",
+                    new Log<StringStream>
                     {
                         Value = new FileRead
                         {
@@ -64,7 +64,7 @@ public partial class FileReadTests : StepTestBase<FileRead, StringStream>
         {
             yield return new DeserializeCase(
                 "Default",
-                "Print Value: (FileRead Path: 'File.txt')",
+                "Log Value: (FileRead Path: 'File.txt')",
                 Unit.Default,
                 "Hello World"
             ).WithFileAction(
@@ -74,7 +74,7 @@ public partial class FileReadTests : StepTestBase<FileRead, StringStream>
 
             yield return new DeserializeCase(
                 "Ordered Args",
-                "Print (FileRead 'File.txt')",
+                "Log (FileRead 'File.txt')",
                 Unit.Default,
                 "Hello World"
             ).WithFileAction(
@@ -84,7 +84,7 @@ public partial class FileReadTests : StepTestBase<FileRead, StringStream>
 
             yield return new DeserializeCase(
                 "Alias",
-                "Print Value: (ReadFromFile Path: 'File.txt')",
+                "Log Value: (ReadFromFile Path: 'File.txt')",
                 Unit.Default,
                 "Hello World"
             ).WithFileAction(

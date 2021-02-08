@@ -17,7 +17,7 @@ public partial class FromConcordanceTests : StepTestBase<FromConcordance, Array<
         get
         {
             yield return new StepCase(
-                "Read Concordance and print all lines",
+                "Read Concordance and Log all lines",
                 new ForEach<Entity>
                 {
                     Array = new FromConcordance()
@@ -26,7 +26,7 @@ public partial class FromConcordanceTests : StepTestBase<FromConcordance, Array<
                             $@"þFooþþBarþ{Environment.NewLine}þHelloþþWorldþ{Environment.NewLine}þHello 2þþWorld 2þ"
                         )
                     },
-                    Action = new Print<Entity>
+                    Action = new Log<Entity>
                     {
                         Value = new GetVariable<Entity>() { Variable = VariableName.Entity }
                     },
@@ -38,7 +38,7 @@ public partial class FromConcordanceTests : StepTestBase<FromConcordance, Array<
             );
 
             yield return new StepCase(
-                "Read Concordance with multiValue and print all lines",
+                "Read Concordance with multiValue and Log all lines",
                 new ForEach<Entity>
                 {
                     Array = new FromConcordance
@@ -47,7 +47,7 @@ public partial class FromConcordanceTests : StepTestBase<FromConcordance, Array<
                             $@"þFooþþBarþ{Environment.NewLine}þHelloþþWorld|Earthþ{Environment.NewLine}þHello 2þþWorld 2|Earth 2þ"
                         )
                     },
-                    Action = new Print<Entity>
+                    Action = new Log<Entity>
                     {
                         Value = new GetVariable<Entity> { Variable = VariableName.Entity }
                     },

@@ -16,8 +16,8 @@ public partial class DoXTimesTests : StepTestBase<DoXTimes, Unit>
         get
         {
             yield return new StepCase(
-                "Print something three times",
-                new DoXTimes { Action = new Print<int> { Value = Constant(6) }, X = Constant(3) },
+                "Log something three times",
+                new DoXTimes { Action = new Log<int> { Value = Constant(6) }, X = Constant(3) },
                 Unit.Default,
                 "6",
                 "6",
@@ -32,9 +32,9 @@ public partial class DoXTimesTests : StepTestBase<DoXTimes, Unit>
                     {
                         InitialSteps = new List<IStep<Unit>>()
                         {
-                            new Print<int> { Value = Constant(3) },
+                            new Log<int> { Value = Constant(3) },
                         },
-                        FinalStep = new Print<int> { Value = Constant(3) },
+                        FinalStep = new Log<int> { Value = Constant(3) },
                     },
                     X = Constant(3)
                 },
@@ -55,8 +55,8 @@ public partial class DoXTimesTests : StepTestBase<DoXTimes, Unit>
         get
         {
             yield return new DeserializeCase(
-                "Print something three times",
-                "DoXTimes Action: (Print Value: 6) X: 3",
+                "Log something three times",
+                "DoXTimes Action: (Log Value: 6) X: 3",
                 Unit.Default,
                 "6",
                 "6",
