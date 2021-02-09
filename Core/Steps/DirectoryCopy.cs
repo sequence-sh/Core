@@ -83,12 +83,13 @@ public class DirectoryCopy : CompoundStep<Unit>
     /// <summary>
     /// True to also copy subdirectories
     /// </summary>
-    [StepProperty(3)]
+    [StepProperty(4)]
     [DefaultValueExplanation("false")]
     public IStep<bool> CopySubDirectories { get; set; } = new BoolConstant(false);
 
     /// <inheritdoc />
-    public override IStepFactory StepFactory { get; } = new SimpleStepFactory<FileCopy, Unit>();
+    public override IStepFactory StepFactory { get; } =
+        new SimpleStepFactory<DirectoryCopy, Unit>();
 
     private static Result<Unit, IErrorBuilder> DoCopy(
         string sourceDirName,
@@ -121,7 +122,7 @@ public class DirectoryCopy : CompoundStep<Unit>
             {
                 string newPath = Path.Combine(
                     destDirName,
-                    Path.GetDirectoryName(subDirectory) ?? ""
+                    Path.GetFileName(subDirectory) ?? ""
                 );
 
                 var r = DoCopy(
