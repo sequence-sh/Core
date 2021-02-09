@@ -262,6 +262,11 @@ public sealed record ErrorCode : ErrorCodeBase
     /// </summary>
     public static readonly ErrorCode CannotConvertNestedList =
         new(nameof(CannotConvertNestedList));
+
+    /// <summary>
+    /// Directory does not exist or could not be found: '{0}'
+    /// </summary>
+    public static readonly ErrorCode DirectoryNotFound = new(nameof(DirectoryNotFound));
 }
 
 }
