@@ -147,6 +147,9 @@
   <data name="CSVError" xml:space="preserve">
     <value>Error Reading CSV</value>
   </data>
+  <data name="DirectoryNotFound" xml:space="preserve">
+    <value>Directory does not exist or could not be found: '{0}'</value>
+  </data>
   <data name="DivideByZero" xml:space="preserve">
     <value>Attempt to Divide by Zero.</value>
   </data>
