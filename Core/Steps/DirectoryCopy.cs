@@ -122,7 +122,7 @@ public class DirectoryCopy : CompoundStep<Unit>
             {
                 string newPath = Path.Combine(
                     destDirName,
-                    Path.GetFileName(subDirectory) ?? ""
+                    Path.GetRelativePath(sourceDirName, subDirectory)
                 );
 
                 var r = DoCopy(
