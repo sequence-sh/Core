@@ -112,6 +112,7 @@ public class DirectoryCopy : CompoundStep<Unit>
         foreach (var file in files)
         {
             string newPath = Path.Combine(destDirName, Path.GetFileName(file));
+
             fileSystem.File.Copy(file, newPath, overwrite);
         }
 
