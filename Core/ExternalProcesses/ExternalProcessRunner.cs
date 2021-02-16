@@ -33,6 +33,7 @@ public class ExternalProcessRunner : IExternalProcessRunner
     public Result<IExternalProcessReference, IErrorBuilder> StartExternalProcess(
         string processPath,
         IEnumerable<string> arguments,
+        IReadOnlyDictionary<string, string> environmentVariables,
         Encoding encoding,
         ILogger logger)
     {
@@ -59,9 +60,17 @@ public class ExternalProcessRunner : IExternalProcessRunner
                 CreateNoWindow         = true,
                 StandardErrorEncoding  = encoding,
                 StandardOutputEncoding = encoding,
-                RedirectStandardInput  = true
+                RedirectStandardInput  = true,
             }
         };
+
+        foreach (var (key, value) in environmentVariables)
+        {
+            pProcess.StartInfo.EnvironmentVariables.Add(
+                key,
+                value
+            );
+        }
 
         var started = pProcess.Start();
 
@@ -88,6 +97,7 @@ public class ExternalProcessRunner : IExternalProcessRunner
         ILogger logger,
         IErrorHandler errorHandler,
         IEnumerable<string> arguments,
+        IReadOnlyDictionary<string, string> environmentVariables,
         Encoding encoding,
         CancellationToken cancellationToken)
     {
@@ -113,9 +123,17 @@ public class ExternalProcessRunner : IExternalProcessRunner
                 WindowStyle            = ProcessWindowStyle.Hidden, //don't display a window
                 CreateNoWindow         = true,
                 StandardErrorEncoding  = encoding,
-                StandardOutputEncoding = encoding,
+                StandardOutputEncoding = encoding
             }
         };
+
+        foreach (var (key, value) in environmentVariables)
+        {
+            pProcess.StartInfo.EnvironmentVariables.Add(
+                key,
+                value
+            );
+        }
 
         var errors = new List<IErrorBuilder>();
 

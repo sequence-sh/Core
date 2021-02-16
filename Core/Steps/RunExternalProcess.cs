@@ -58,6 +58,7 @@ public sealed class RunExternalProcess : CompoundStep<Unit>
                     stateMonad.Logger,
                     IgnoreNoneErrorHandler.Instance,
                     arguments,
+                    new Dictionary<string, string>(), //TODO let user control this
                     encodingResult.Value.Convert(),
                     cancellationToken
                 )
