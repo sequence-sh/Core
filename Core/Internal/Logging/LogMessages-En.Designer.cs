@@ -97,6 +97,15 @@ namespace Reductech.EDR.Core.Internal.Logging {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to ExternalProcess {process} started with arguments &apos;{arguments}&apos;.
+        /// </summary>
+        internal static string ExternalProcessStarted {
+            get {
+                return ResourceManager.GetString("ExternalProcessStarted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to File Deleted: {Path}.
         /// </summary>
         internal static string FileDeleted {

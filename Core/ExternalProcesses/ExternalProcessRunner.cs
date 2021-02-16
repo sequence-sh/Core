@@ -11,6 +11,7 @@ using CSharpFunctionalExtensions;
 using Microsoft.Extensions.Logging;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
+using Reductech.EDR.Core.Internal.Logging;
 using Reductech.EDR.Core.Util;
 
 namespace Reductech.EDR.Core.ExternalProcesses
@@ -32,12 +33,18 @@ public class ExternalProcessRunner : IExternalProcessRunner
     public Result<IExternalProcessReference, IErrorBuilder> StartExternalProcess(
         string processPath,
         IEnumerable<string> arguments,
-        Encoding encoding)
+        Encoding encoding,
+        ILogger logger)
     {
         if (!File.Exists(processPath))
             return new ErrorBuilder(ErrorCode.ExternalProcessNotFound, processPath);
 
         var argumentString = string.Join(' ', arguments.Select(EncodeParameterArgument));
+
+        logger.LogSituation(
+            LogSituation.ExternalProcessStarted,
+            new object[] { processPath, argumentString }
+        );
 
         var pProcess = new Process
         {
@@ -88,6 +95,11 @@ public class ExternalProcessRunner : IExternalProcessRunner
             return new ErrorBuilder(ErrorCode.ExternalProcessNotFound, processPath);
 
         var argumentString = string.Join(' ', arguments.Select(EncodeParameterArgument));
+
+        logger.LogSituation(
+            LogSituation.ExternalProcessStarted,
+            new object[] { processPath, argumentString }
+        );
 
         using var pProcess = new Process
         {

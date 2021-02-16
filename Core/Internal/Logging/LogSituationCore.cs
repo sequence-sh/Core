@@ -102,6 +102,14 @@ public sealed record LogSituation : LogSituationBase
         nameof(SchemaViolation),
         LogLevel.Warning
     );
+
+    /// <summary>
+    /// ExternalProcess {process} started with arguments '{arguments}'
+    /// </summary>
+    public static readonly LogSituation ExternalProcessStarted = new(
+        nameof(ExternalProcessStarted),
+        LogLevel.Information
+    );
 }
 
 }

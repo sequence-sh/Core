@@ -39,7 +39,8 @@ public interface IExternalProcessRunner
     Result<IExternalProcessReference, IErrorBuilder> StartExternalProcess(
         string processPath,
         IEnumerable<string> arguments,
-        Encoding encoding);
+        Encoding encoding,
+        ILogger logger);
 }
 
 }

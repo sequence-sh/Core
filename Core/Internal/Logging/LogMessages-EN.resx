@@ -129,6 +129,9 @@
   <data name="ExitStepSuccess" xml:space="preserve">
     <value>{StepName} Completed Successfully with Result: {Result}</value>
   </data>
+  <data name="ExternalProcessStarted" xml:space="preserve">
+    <value>ExternalProcess {process} started with arguments '{arguments}'</value>
+  </data>
   <data name="FileDeleted" xml:space="preserve">
     <value>File Deleted: {Path}</value>
   </data>
