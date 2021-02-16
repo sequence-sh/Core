@@ -26,6 +26,7 @@ public partial class LoggingTests
             yield return new LoggingTestCase(
                 "Log 1",
                 "Log 1",
+                CheckMessageAndScope(LogLevel.Trace, "Sequence Started with Settings: ()", null),
                 CheckMessageAndScope(
                     LogLevel.Trace,
                     "Log Started with Parameters: [Value, 1]",
@@ -42,6 +43,7 @@ public partial class LoggingTests
             yield return new LoggingTestCase(
                 "Log 1 + 1",
                 "Log (1 + 1)",
+                CheckMessageAndScope(LogLevel.Trace, "Sequence Started with Settings: ()", null),
                 CheckMessageAndScope(
                     LogLevel.Trace,
                     "Log Started with Parameters: [Value, Sum]",
@@ -78,6 +80,7 @@ public partial class LoggingTests
             yield return new LoggingTestCase(
                 "Error",
                 "AssertError (Log (1 / 0))",
+                CheckMessageAndScope(LogLevel.Trace, "Sequence Started with Settings: ()", null),
                 CheckMessageAndScope(
                     LogLevel.Trace,
                     "AssertError Started with Parameters: [Step, Log]",
@@ -126,6 +129,11 @@ public partial class LoggingTests
                     "Log (PathCombine [])",
                     CheckMessageAndScope(
                         LogLevel.Trace,
+                        "Sequence Started with Settings: ()",
+                        null
+                    ),
+                    CheckMessageAndScope(
+                        LogLevel.Trace,
                         "Log Started with Parameters: [Value, PathCombine]",
                         null
                     ),
@@ -168,6 +176,11 @@ public partial class LoggingTests
             yield return new LoggingTestCase(
                     "Unqualified Path to combine",
                     "Log (PathCombine ['File'])",
+                    CheckMessageAndScope(
+                        LogLevel.Trace,
+                        "Sequence Started with Settings: ()",
+                        null
+                    ),
                     CheckMessageAndScope(
                         LogLevel.Trace,
                         "Log Started with Parameters: [Value, PathCombine]",
@@ -217,6 +230,7 @@ public partial class LoggingTests
             yield return new LoggingTestCase(
                 "File Read",
                 "FileRead 'MyFile' | Log",
+                CheckMessageAndScope(LogLevel.Trace, "Sequence Started with Settings: ()", null),
                 CheckMessageAndScope(
                     LogLevel.Trace,
                     "Log Started with Parameters: [Value, FileRead]",
@@ -285,8 +299,6 @@ public partial class LoggingTests
 
         public string SCL { get; set; }
         public IReadOnlyList<Action<LogEntry>> ExpectedLogs { get; set; }
-
-        //public List<Action<Mock<IFileSystemHelper>>>? FileSystemActions { get; set; }
 
         /// <inheritdoc />
         public async Task RunAsync(ITestOutputHelper testOutputHelper)

@@ -102,6 +102,22 @@ public sealed record LogSituation : LogSituationBase
         nameof(SchemaViolation),
         LogLevel.Warning
     );
+
+    /// <summary>
+    /// ExternalProcess {process} started with arguments: '{arguments}' and environmentVariables: '{environmentVariables}'
+    /// </summary>
+    public static readonly LogSituation ExternalProcessStarted = new(
+        nameof(ExternalProcessStarted),
+        LogLevel.Trace
+    );
+
+    /// <summary>
+    /// Sequence Started with Settings: {settings}
+    /// </summary>
+    public static readonly LogSituation SequenceStarted = new(
+        nameof(SequenceStarted),
+        LogLevel.Trace
+    );
 }
 
 }

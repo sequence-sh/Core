@@ -44,19 +44,22 @@ public partial class RunExternalProcessTests : StepTestBase<RunExternalProcess, 
                                         It.IsAny<ILogger>(),
                                         It.IsAny<IErrorHandler>(),
                                         It.IsAny<IEnumerable<string>>(),
+                                        It.IsAny<IReadOnlyDictionary<string, string>>(),
                                         Encoding.ASCII,
                                         It.IsAny<CancellationToken>()
                                     )
                                 )
                                 .Callback<string, ILogger, IErrorHandler, IEnumerable<string>,
+                                    IReadOnlyDictionary<string, string>,
                                     Encoding, CancellationToken>(
                                     (
-                                        a,
+                                        _,
                                         b,
-                                        c,
-                                        d,
-                                        e,
-                                        ct) => b.LogInformation("My Message")
+                                        _,
+                                        _,
+                                        _,
+                                        _,
+                                        _) => b.LogInformation("My Message")
                                 )
                                 .ReturnsAsync(Unit.Default)
                     )

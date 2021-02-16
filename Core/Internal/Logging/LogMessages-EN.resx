@@ -129,6 +129,9 @@
   <data name="ExitStepSuccess" xml:space="preserve">
     <value>{StepName} Completed Successfully with Result: {Result}</value>
   </data>
+  <data name="ExternalProcessStarted" xml:space="preserve">
+    <value>ExternalProcess {process} started with arguments: '{arguments}' and environmentVariables: '{environmentVariables}'</value>
+  </data>
   <data name="FileDeleted" xml:space="preserve">
     <value>File Deleted: {Path}</value>
   </data>
@@ -146,6 +149,9 @@
   </data>
   <data name="SchemaViolation" xml:space="preserve">
     <value>Schema violation: {message}</value>
+  </data>
+  <data name="SequenceStarted" xml:space="preserve">
+    <value>Sequence Started with Settings: {settings}</value>
   </data>
   <data name="SetVariableOutOfScope" xml:space="preserve">
     <value>Could not set variable {variable} as it was out of scope.</value>

@@ -11,6 +11,7 @@ using CSharpFunctionalExtensions;
 using Microsoft.Extensions.Logging;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
+using Reductech.EDR.Core.Internal.Logging;
 using Reductech.EDR.Core.Util;
 
 namespace Reductech.EDR.Core.ExternalProcesses
@@ -32,7 +33,9 @@ public class ExternalProcessRunner : IExternalProcessRunner
     public Result<IExternalProcessReference, IErrorBuilder> StartExternalProcess(
         string processPath,
         IEnumerable<string> arguments,
-        Encoding encoding)
+        IReadOnlyDictionary<string, string> environmentVariables,
+        Encoding encoding,
+        ILogger logger)
     {
         if (!File.Exists(processPath))
             return new ErrorBuilder(ErrorCode.ExternalProcessNotFound, processPath);
@@ -52,9 +55,27 @@ public class ExternalProcessRunner : IExternalProcessRunner
                 CreateNoWindow         = true,
                 StandardErrorEncoding  = encoding,
                 StandardOutputEncoding = encoding,
-                RedirectStandardInput  = true
+                RedirectStandardInput  = true,
             }
         };
+
+        foreach (var (key, value) in environmentVariables)
+        {
+            pProcess.StartInfo.EnvironmentVariables.Add(
+                key,
+                value
+            );
+        }
+
+        var evString = string.Join(
+            ", ",
+            pProcess.StartInfo.Environment.Select(a => $"{a.Key}: {a.Value}")
+        );
+
+        logger.LogSituation(
+            LogSituation.ExternalProcessStarted,
+            new object[] { processPath, argumentString, evString }
+        );
 
         var started = pProcess.Start();
 
@@ -81,6 +102,7 @@ public class ExternalProcessRunner : IExternalProcessRunner
         ILogger logger,
         IErrorHandler errorHandler,
         IEnumerable<string> arguments,
+        IReadOnlyDictionary<string, string> environmentVariables,
         Encoding encoding,
         CancellationToken cancellationToken)
     {
@@ -88,6 +110,11 @@ public class ExternalProcessRunner : IExternalProcessRunner
             return new ErrorBuilder(ErrorCode.ExternalProcessNotFound, processPath);
 
         var argumentString = string.Join(' ', arguments.Select(EncodeParameterArgument));
+
+        logger.LogSituation(
+            LogSituation.ExternalProcessStarted,
+            new object[] { processPath, argumentString }
+        );
 
         using var pProcess = new Process
         {
@@ -101,9 +128,17 @@ public class ExternalProcessRunner : IExternalProcessRunner
                 WindowStyle            = ProcessWindowStyle.Hidden, //don't display a window
                 CreateNoWindow         = true,
                 StandardErrorEncoding  = encoding,
-                StandardOutputEncoding = encoding,
+                StandardOutputEncoding = encoding
             }
         };
+
+        foreach (var (key, value) in environmentVariables)
+        {
+            pProcess.StartInfo.EnvironmentVariables.Add(
+                key,
+                value
+            );
+        }
 
         var errors = new List<IErrorBuilder>();
 
