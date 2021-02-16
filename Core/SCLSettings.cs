@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using Microsoft.Extensions.Configuration;
@@ -38,7 +39,17 @@ public record SCLSettings(Entity Entity)
 
         static EntityProperty CreateObject(IConfigurationSection section)
         {
-            if (section.GetChildren().Any())
+            if (section.GetChildren().Any() && section.GetChildren()
+                .Select((c, i) => (c, i))
+                .All(x => int.TryParse(x.c.Key, out var v) && v == x.i)) //This is a list
+            {
+                var list = section.GetChildren()
+                    .Select(x => EntityValue.CreateFromObject(x.Value))
+                    .ToImmutableList();
+
+                return new EntityProperty(section.Key, new EntityValue(list), null, 0);
+            }
+            else if (section.GetChildren().Any())
             {
                 var properties = section.GetChildren().Select(CreateObject).ToList();
 
