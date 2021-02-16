@@ -30,6 +30,45 @@ public partial class SettingsTests
 
         var udBool = settings.Entity.TryGetNestedBool("Connectors", "Nuix", "UseDongle");
         udBool.Should().BeTrue();
+
+        var featuresList = settings.Entity.TryGetNestedList("Connectors", "Nuix", "Features");
+
+        featuresList.HasValue.Should().BeTrue();
+
+        featuresList.Value.Should()
+            .BeEquivalentTo(
+                "ANALYSIS",
+                "CASE_CREATION",
+                "EXPORT_ITEMS",
+                "METADATA_IMPORT",
+                "OCR_PROCESSING",
+                "PRODUCTION_SET"
+            );
+
+        var consoleArgsList = settings.Entity.TryGetNestedList(
+            "Connectors",
+            "Nuix",
+            "ConsoleArguments"
+        );
+
+        consoleArgsList.HasValue.Should().BeTrue();
+
+        consoleArgsList.Value.Should()
+            .BeEquivalentTo(
+                "-Dnuix.licence.handlers=server",
+                "-Dnuix.registry.servers=licenseSource"
+            );
+
+        var username = settings.Entity.TryGetNestedString(
+            "Connectors",
+            "Nuix",
+            "EnvironmentVariables",
+            "NUIX_USERNAME"
+        );
+
+        username.HasValue.Should().BeTrue();
+
+        username.Value.Should().BeEquivalentTo("myName");
     }
 
     [Fact]
@@ -67,12 +106,6 @@ public partial class SettingsTests
 
         var useDongleBool = settings.Entity.TryGetNestedBool("Connectors", "Nuix", "UseDongle");
         useDongleBool.Should().BeTrue();
-
-        var featuresList = settings.Entity.TryGetNestedList("Connectors", "Nuix", "Features");
-
-        featuresList.HasValue.Should().BeTrue();
-
-        featuresList.Value.Should().BeEquivalentTo("a", "b", "c");
     }
 
     private const string ConnectorJson =
@@ -82,6 +115,16 @@ public partial class SettingsTests
       ""useDongle"": true,
       ""exeConsolePath"": ""C:\\Program Files\\Nuix\\Nuix 8.8\\nuix_console.exe"",
       ""version"": ""8.8"",
+       
+""ConsoleArguments"": [
+    ""-Dnuix.licence.handlers=server"",
+    ""-Dnuix.registry.servers=licenseSource""
+    ],
+    ""EnvironmentVariables"": {
+        ""NUIX_USERNAME"": ""myName"",
+        ""NUIX_PASSWORD"": ""myPassword""
+    },
+
       ""features"": [
         ""ANALYSIS"",
         ""CASE_CREATION"",
