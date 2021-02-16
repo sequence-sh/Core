@@ -108,7 +108,15 @@ public sealed record LogSituation : LogSituationBase
     /// </summary>
     public static readonly LogSituation ExternalProcessStarted = new(
         nameof(ExternalProcessStarted),
-        LogLevel.Information
+        LogLevel.Trace
+    );
+
+    /// <summary>
+    /// Sequence Started with Settings: {settings}
+    /// </summary>
+    public static readonly LogSituation SequenceStarted = new(
+        nameof(SequenceStarted),
+        LogLevel.Trace
     );
 }
 

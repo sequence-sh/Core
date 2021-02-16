@@ -150,6 +150,9 @@
   <data name="SchemaViolation" xml:space="preserve">
     <value>Schema violation: {message}</value>
   </data>
+  <data name="SequenceStarted" xml:space="preserve">
+    <value>Sequence Started with Settings: {settings}</value>
+  </data>
   <data name="SetVariableOutOfScope" xml:space="preserve">
     <value>Could not set variable {variable} as it was out of scope.</value>
   </data>

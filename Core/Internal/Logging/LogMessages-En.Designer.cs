@@ -160,6 +160,15 @@ namespace Reductech.EDR.Core.Internal.Logging {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Sequence Started with Settings: {settings}.
+        /// </summary>
+        internal static string SequenceStarted {
+            get {
+                return ResourceManager.GetString("SequenceStarted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Could not set variable {variable} as it was out of scope..
         /// </summary>
         internal static string SetVariableOutOfScope {
