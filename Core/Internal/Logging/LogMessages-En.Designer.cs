@@ -97,7 +97,7 @@ namespace Reductech.EDR.Core.Internal.Logging {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to ExternalProcess {process} started with arguments &apos;{arguments}&apos;.
+        ///   Looks up a localized string similar to ExternalProcess {process} started with arguments: &apos;{arguments}&apos; and environmentVariables: &apos;{environmentVariables}&apos;.
         /// </summary>
         internal static string ExternalProcessStarted {
             get {

@@ -104,7 +104,7 @@ public sealed record LogSituation : LogSituationBase
     );
 
     /// <summary>
-    /// ExternalProcess {process} started with arguments '{arguments}'
+    /// ExternalProcess {process} started with arguments: '{arguments}' and environmentVariables: '{environmentVariables}'
     /// </summary>
     public static readonly LogSituation ExternalProcessStarted = new(
         nameof(ExternalProcessStarted),

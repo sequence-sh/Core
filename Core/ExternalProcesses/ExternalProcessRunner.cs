@@ -42,11 +42,6 @@ public class ExternalProcessRunner : IExternalProcessRunner
 
         var argumentString = string.Join(' ', arguments.Select(EncodeParameterArgument));
 
-        logger.LogSituation(
-            LogSituation.ExternalProcessStarted,
-            new object[] { processPath, argumentString }
-        );
-
         var pProcess = new Process
         {
             StartInfo =
@@ -71,6 +66,16 @@ public class ExternalProcessRunner : IExternalProcessRunner
                 value
             );
         }
+
+        var evString = string.Join(
+            ", ",
+            pProcess.StartInfo.Environment.Select(a => $"{a.Key}: {a.Value}")
+        );
+
+        logger.LogSituation(
+            LogSituation.ExternalProcessStarted,
+            new object[] { processPath, argumentString, evString }
+        );
 
         var started = pProcess.Start();
 

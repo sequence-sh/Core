@@ -130,7 +130,7 @@
     <value>{StepName} Completed Successfully with Result: {Result}</value>
   </data>
   <data name="ExternalProcessStarted" xml:space="preserve">
-    <value>ExternalProcess {process} started with arguments '{arguments}'</value>
+    <value>ExternalProcess {process} started with arguments: '{arguments}' and environmentVariables: '{environmentVariables}'</value>
   </data>
   <data name="FileDeleted" xml:space="preserve">
     <value>File Deleted: {Path}</value>
