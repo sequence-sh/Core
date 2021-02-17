@@ -22,7 +22,7 @@ public record StringConstantFreezable
     public override string StepName => Value.Name;
 
     /// <inheritdoc />
-    public override Result<IStep, IError> TryFreeze(StepContext stepContext) =>
+    public override Result<IStep, IError> TryFreeze(TypeResolver typeResolver) =>
         new StringConstant(Value);
 
     /// <inheritdoc />
@@ -39,7 +39,7 @@ public record IntConstantFreezable
     public override string StepName => Value.ToString();
 
     /// <inheritdoc />
-    public override Result<IStep, IError> TryFreeze(StepContext stepContext) =>
+    public override Result<IStep, IError> TryFreeze(TypeResolver typeResolver) =>
         new IntConstant(Value);
 
     /// <inheritdoc />
@@ -56,7 +56,7 @@ public record DoubleConstantFreezable
     public override string StepName => Value.ToString(Constants.DoubleFormat);
 
     /// <inheritdoc />
-    public override Result<IStep, IError> TryFreeze(StepContext stepContext) =>
+    public override Result<IStep, IError> TryFreeze(TypeResolver typeResolver) =>
         new DoubleConstant(Value);
 
     /// <inheritdoc />
@@ -73,7 +73,7 @@ public record BoolConstantFreezable
     public override string StepName => Value.ToString();
 
     /// <inheritdoc />
-    public override Result<IStep, IError> TryFreeze(StepContext stepContext) =>
+    public override Result<IStep, IError> TryFreeze(TypeResolver typeResolver) =>
         new BoolConstant(Value);
 
     /// <inheritdoc />
@@ -93,7 +93,7 @@ public record DateTimeConstantFreezable
     public override string StepName => Value.ToString(Constants.DateTimeFormat);
 
     /// <inheritdoc />
-    public override Result<IStep, IError> TryFreeze(StepContext stepContext) =>
+    public override Result<IStep, IError> TryFreeze(TypeResolver typeResolver) =>
         new DateTimeConstant(Value);
 
     /// <inheritdoc />
@@ -110,7 +110,7 @@ public record EntityConstantFreezable
     public override string StepName => Value.Serialize();
 
     /// <inheritdoc />
-    public override Result<IStep, IError> TryFreeze(StepContext stepContext) =>
+    public override Result<IStep, IError> TryFreeze(TypeResolver typeResolver) =>
         new EntityConstant(Value);
 
     /// <inheritdoc />
@@ -130,9 +130,9 @@ public record EnumConstantFreezable
     public override string StepName => Value.ToString();
 
     /// <inheritdoc />
-    public override Result<IStep, IError> TryFreeze(StepContext stepContext)
+    public override Result<IStep, IError> TryFreeze(TypeResolver typeResolver)
     {
-        var type = TryGetType(stepContext.TypeResolver);
+        var type = TryGetType(typeResolver);
 
         if (type.IsFailure)
             return type.ConvertFailure<IStep>();
@@ -218,7 +218,7 @@ public abstract record ConstantFreezableBase<T>
     public abstract string StepName { get; }
 
     /// <inheritdoc />
-    public abstract Result<IStep, IError> TryFreeze(StepContext stepContext);
+    public abstract Result<IStep, IError> TryFreeze(TypeResolver typeResolver);
 
     /// <inheritdoc />
     public Result<IReadOnlyCollection<(VariableName variableName, Maybe<ITypeReference>)>, IError>

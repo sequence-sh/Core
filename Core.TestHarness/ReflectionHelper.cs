@@ -129,23 +129,23 @@ public abstract partial class StepTestBase<TStep, TOutput>
         Func<PropertyInfo, T> stepPropertyAction,
         Func<PropertyInfo, T> stepListAction)
     {
-        var actionsToDo = new List<Func<PropertyInfo, T>>();
+        var actions = new List<Func<PropertyInfo, T>>();
 
         if (stepPropertyInfo.IsDecoratedWith<VariableNameAttribute>())
-            actionsToDo.Add(variableNameAction);
+            actions.Add(variableNameAction);
 
         if (stepPropertyInfo.IsDecoratedWith<StepPropertyAttribute>())
-            actionsToDo.Add(stepPropertyAction);
+            actions.Add(stepPropertyAction);
 
         if (stepPropertyInfo.IsDecoratedWith<StepListPropertyAttribute>())
-            actionsToDo.Add(stepListAction);
+            actions.Add(stepListAction);
 
-        return actionsToDo.Count switch
+        return actions.Count switch
         {
             0 => throw new XunitException(
                 $"{stepPropertyInfo.Name} does not have a valid attribute"
             ),
-            1 => actionsToDo.Single()(stepPropertyInfo),
+            1 => actions.Single()(stepPropertyInfo),
             _ => throw new XunitException(
                 $"{stepPropertyInfo.Name} has more than one step property base attribute"
             )

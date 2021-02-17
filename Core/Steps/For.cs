@@ -112,11 +112,11 @@ public sealed class For : CompoundStep<Unit>
     }
 
     /// <inheritdoc />
-    public override Result<StepContext, IError> TryGetScopedContext(
-        StepContext baseContext,
+    public override Result<TypeResolver, IError> TryGetScopedTypeResolver(
+        TypeResolver baseTypeResolver,
         IFreezableStep scopedStep)
     {
-        return baseContext.TryCloneWithScopedStep(
+        return baseTypeResolver.TryCloneWithScopedStep(
             Variable,
             new ActualTypeReference(typeof(int)),
             scopedStep,

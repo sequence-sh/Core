@@ -98,11 +98,11 @@ public sealed class ArrayDistinct<T> : CompoundStep<Array<T>>
     public override IStepFactory StepFactory => ArrayDistinctStepFactory.Instance;
 
     /// <inheritdoc />
-    public override Result<StepContext, IError> TryGetScopedContext(
-        StepContext baseContext,
+    public override Result<TypeResolver, IError> TryGetScopedTypeResolver(
+        TypeResolver baseTypeResolver,
         IFreezableStep scopedStep)
     {
-        return baseContext.TryCloneWithScopedStep(
+        return baseTypeResolver.TryCloneWithScopedStep(
             Variable,
             new ActualTypeReference(typeof(T)),
             scopedStep,

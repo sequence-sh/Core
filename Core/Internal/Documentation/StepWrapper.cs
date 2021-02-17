@@ -35,7 +35,7 @@ public class StepWrapper : IDocumented
             .ToList();
 
         Parameters =
-            RelevantProperties.Select(GetPropertyWrapper).ToList(); //TODO get default values
+            RelevantProperties.Select(GetPropertyWrapper).ToList();
 
         Requirements = grouping.Key.Requirements.Select(x => $"Requires {x}").ToList();
 
@@ -106,7 +106,7 @@ public class StepWrapper : IDocumented
 
             var dvs = explanation == null
                 ? defaultValueString
-                : $"{explanation}"; //TODO make italic somehow
+                : $"{explanation}";
 
             if (!string.IsNullOrWhiteSpace(dvs))
                 extraFields.Add("Default Value", dvs);

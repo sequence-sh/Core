@@ -71,8 +71,8 @@ public sealed class ForEach<T> : CompoundStep<Unit>
     }
 
     /// <inheritdoc />
-    public override Result<StepContext, IError> TryGetScopedContext(
-        StepContext baseContext,
+    public override Result<TypeResolver, IError> TryGetScopedTypeResolver(
+        TypeResolver baseContext,
         IFreezableStep scopedStep)
     {
         return baseContext.TryCloneWithScopedStep(

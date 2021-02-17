@@ -115,8 +115,8 @@ public sealed class RegexReplace : CompoundStep<string>
     public IStep<bool> IgnoreCase { get; set; } = new BoolConstant(false);
 
     /// <inheritdoc />
-    public override Result<StepContext, IError> TryGetScopedContext(
-        StepContext baseContext,
+    public override Result<TypeResolver, IError> TryGetScopedTypeResolver(
+        TypeResolver baseContext,
         IFreezableStep scopedStep)
     {
         return baseContext.TryCloneWithScopedStep(

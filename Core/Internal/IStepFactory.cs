@@ -56,7 +56,7 @@ public interface IStepFactory
     /// Try to create the instance of this type and set all arguments.
     /// </summary>
     Result<IStep, IError> TryFreeze(
-        StepContext stepContext,
+        TypeResolver typeResolver,
         FreezableStepData freezeData,
         Configuration? configuration);
 

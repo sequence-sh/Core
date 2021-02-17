@@ -24,7 +24,7 @@ public interface IFreezableStep : IEquatable<IFreezableStep>
     /// <summary>
     /// Try to freeze this step.
     /// </summary>
-    Result<IStep, IError> TryFreeze(StepContext stepContext);
+    Result<IStep, IError> TryFreeze(TypeResolver typeResolver);
 
     /// <summary>
     /// Gets the variables set by this step and its children and the types of those variables if they can be resolved at this time.
@@ -42,7 +42,7 @@ public interface IFreezableStep : IEquatable<IFreezableStep>
     /// <summary>
     /// Tries to freeze this step.
     /// </summary>
-    public Result<IStep, IError> TryFreeze(StepFactoryStore stepFactoryStore) => StepContext
+    public Result<IStep, IError> TryFreeze(StepFactoryStore stepFactoryStore) => TypeResolver
         .TryCreate(stepFactoryStore, this)
         .Bind(TryFreeze);
 }

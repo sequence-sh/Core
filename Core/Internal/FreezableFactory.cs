@@ -17,8 +17,6 @@ namespace Reductech.EDR.Core.Internal
 /// </summary>
 public static class FreezableFactory
 {
-    //TODO move other CreateFreezable methods here
-
     /// <summary>
     /// Create a new Freezable EntityGetValue
     /// </summary>

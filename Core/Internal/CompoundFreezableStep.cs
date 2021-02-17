@@ -39,13 +39,13 @@ public sealed class OptionFreezableStep : IFreezableStep
         other is OptionFreezableStep ofs && Options.SequenceEqual(ofs.Options);
 
     /// <inheritdoc />
-    public Result<IStep, IError> TryFreeze(StepContext stepContext)
+    public Result<IStep, IError> TryFreeze(TypeResolver typeResolver)
     {
         IError? error = null;
 
         foreach (var freezableStep in Options)
         {
-            var r = freezableStep.TryFreeze(stepContext);
+            var r = freezableStep.TryFreeze(typeResolver);
 
             if (r.IsSuccess)
                 return r;
@@ -129,12 +129,12 @@ public sealed record CompoundFreezableStep(
     }
 
     /// <inheritdoc />
-    public Result<IStep, IError> TryFreeze(StepContext stepContext)
+    public Result<IStep, IError> TryFreeze(TypeResolver typeResolver)
     {
-        return TryGetStepFactory(stepContext.TypeResolver.StepFactoryStore)
+        return TryGetStepFactory(typeResolver.StepFactoryStore)
             .Bind(
                 x =>
-                    x.TryFreeze(stepContext, FreezableStepData, StepConfiguration)
+                    x.TryFreeze(typeResolver, FreezableStepData, StepConfiguration)
             );
     }
 

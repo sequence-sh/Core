@@ -72,8 +72,8 @@ public sealed class EntityMap : CompoundStep<Array<Entity>>
     public VariableName Variable { get; set; } = VariableName.Entity;
 
     /// <inheritdoc />
-    public override Result<StepContext, IError> TryGetScopedContext(
-        StepContext baseContext,
+    public override Result<TypeResolver, IError> TryGetScopedTypeResolver(
+        TypeResolver baseContext,
         IFreezableStep scopedStep)
     {
         return baseContext.TryCloneWithScopedStep(

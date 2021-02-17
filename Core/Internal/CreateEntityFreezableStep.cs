@@ -27,14 +27,14 @@ public record CreateEntityFreezableStep(
     public TextLocation? TextLocation => FreezableEntityData.Location;
 
     /// <inheritdoc />
-    public Result<IStep, IError> TryFreeze(StepContext stepContext)
+    public Result<IStep, IError> TryFreeze(TypeResolver typeResolver)
     {
         var results = new List<Result<(EntityPropertyKey name, IStep value), IError>>();
 
         foreach (var (propertyName, stepMember) in FreezableEntityData.EntityProperties)
         {
             var frozen = stepMember.ConvertToStep()
-                .TryFreeze(stepContext)
+                .TryFreeze(typeResolver)
                 .Map(s => (propertyName, s));
 
             results.Add(frozen);

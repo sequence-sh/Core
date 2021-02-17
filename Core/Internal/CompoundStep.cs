@@ -237,8 +237,8 @@ public abstract class CompoundStep<T> : ICompoundStep<T>
     public virtual Result<Unit, IError> VerifyThis(SCLSettings settings) => Unit.Default;
 
     /// <inheritdoc />
-    public virtual Result<StepContext, IError> TryGetScopedContext(
-        StepContext baseContext,
+    public virtual Result<TypeResolver, IError> TryGetScopedTypeResolver(
+        TypeResolver baseTypeResolver,
         IFreezableStep scopedStep) => (SingleError)ErrorCode.CannotCreateScopedContext
         .ToErrorBuilder(Name)
         .WithLocation(this);
