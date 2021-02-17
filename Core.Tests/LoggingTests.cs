@@ -19,7 +19,9 @@ namespace Reductech.EDR.Core.Tests
 public partial class LoggingTests
 {
     [GenerateAsyncTheory("CheckLogging")]
+    #pragma warning disable CA1822 // Mark members as static
     public IEnumerable<LoggingTestCase> TestCases
+        #pragma warning restore CA1822 // Mark members as static
     {
         get
         {
