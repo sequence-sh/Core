@@ -49,7 +49,7 @@ public partial class ExampleTests
                 string.Join(
                     ", ",
                     stepResult.Error.GetAllErrors()
-                        .Select(x => x.Message + " " + x.Location.AsString)
+                        .Select(x => x.Message + " " + x.Location.AsString())
                 )
             );
 

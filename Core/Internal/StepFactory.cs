@@ -9,6 +9,7 @@ using CSharpFunctionalExtensions;
 using Namotion.Reflection;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal.Errors;
+using Reductech.EDR.Core.Internal.Parser;
 using Reductech.EDR.Core.Internal.Serialization;
 using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.Util;
@@ -150,6 +151,7 @@ public abstract class StepFactory : IStepFactory
 
         var step = instanceResult.Value;
         step.Configuration = configuration;
+        step.TextLocation  = freezeData.Location;
 
         var errors = new List<IError>();
 
@@ -171,7 +173,7 @@ public abstract class StepFactory : IStepFactory
             else
                 errors.Add(
                     ErrorHelper.UnexpectedParameterError(key.Name, TypeName)
-                        .WithLocation(freezeData.Location)
+                        .WithLocation(new ErrorLocation(TypeName, freezeData.Location))
                 );
         }
 
@@ -182,11 +184,8 @@ public abstract class StepFactory : IStepFactory
 
         foreach (var propertyInfo in duplicates)
             errors.Add(
-                new SingleError(
-                    freezeData.Location,
-                    ErrorCode.DuplicateParameter,
-                    propertyInfo.Name
-                )
+                ErrorCode.DuplicateParameter.ToErrorBuilder(propertyInfo.Name)
+                    .WithLocation(freezeData)
             );
 
         if (errors.Any())
@@ -255,7 +254,7 @@ public abstract class StepFactory : IStepFactory
         PropertyInfo propertyInfo,
         ICompoundStep parentStep,
         VariableName variableName,
-        IErrorLocation stepMemberLocation,
+        TextLocation? stepMemberLocation,
         StepContext stepContext)
     {
         if (propertyInfo.PropertyType.IsInstanceOfType(variableName))

@@ -106,7 +106,7 @@ public sealed class ArraySort<T> : CompoundStep<Array<T>>
             Variable,
             new ActualTypeReference(typeof(T)),
             scopedStep,
-            new StepErrorLocation(this)
+            new ErrorLocation(this)
         );
     }
 

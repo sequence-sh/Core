@@ -9,28 +9,22 @@ namespace Reductech.EDR.Core.Internal.Errors
 public static class ErrorLocationHelper
 {
     /// <summary>
-    /// Add a StepErrorLocation
+    /// Add a ErrorLocation
     /// </summary>
     public static IError WithLocation(this IErrorBuilder errorBuilder, IStep step) =>
-        errorBuilder.WithLocation(new StepErrorLocation(step));
+        errorBuilder.WithLocation(new ErrorLocation(step.Name, step.TextLocation));
 
     /// <summary>
-    /// Add a FreezableStepErrorLocation
+    /// Add a FreezableErrorLocation
     /// </summary>
     public static IError WithLocation(this IErrorBuilder errorBuilder, IFreezableStep step) =>
-        errorBuilder.WithLocation(new FreezableStepErrorLocation(step));
+        errorBuilder.WithLocation(new ErrorLocation(step.StepName, step.TextLocation));
 
     /// <summary>
-    /// Add a FreezableStepErrorLocation
+    /// Add a FreezableErrorLocation
     /// </summary>
     public static IError WithLocation(this IErrorBuilder errorBuilder, FreezableStepData data) =>
-        errorBuilder.WithLocation(data.Location);
-
-    /// <summary>
-    /// Add a TextLocation
-    /// </summary>
-    public static IError WithLocation(this IErrorBuilder errorBuilder, TextLocation token) =>
-        errorBuilder.WithLocation(token);
+        errorBuilder.WithLocation(data.Location ?? ErrorLocation.EmptyLocation);
 }
 
 }

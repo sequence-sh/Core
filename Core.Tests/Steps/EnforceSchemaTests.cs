@@ -273,7 +273,7 @@ public partial class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Enti
                         FinalStep = new DoNothing()
                     },
                     new ErrorBuilder(expectedErrorCode, expectedErrorArgs).WithLocation(
-                        new StepErrorLocation(enforceSchema)
+                        new ErrorLocation(enforceSchema)
                     )
                 );
             }

@@ -2,6 +2,7 @@
 using System.Linq;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Internal.Errors;
+using Reductech.EDR.Core.Internal.Parser;
 
 namespace Reductech.EDR.Core.Internal
 {
@@ -9,19 +10,11 @@ namespace Reductech.EDR.Core.Internal
 /// <summary>
 /// Freezes into a create entity step
 /// </summary>
-public class CreateEntityFreezableStep : IFreezableStep
+public record CreateEntityFreezableStep(
+        #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+        FreezableEntityData FreezableEntityData) : IFreezableStep
+    #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
 {
-    /// <summary>
-    /// Create a new CreateEntityFreezableStep
-    /// </summary>
-    /// <param name="data"></param>
-    public CreateEntityFreezableStep(FreezableEntityData data) => FreezableEntityData = data;
-
-    /// <summary>
-    /// The data
-    /// </summary>
-    public FreezableEntityData FreezableEntityData { get; }
-
     /// <inheritdoc />
     public bool Equals(IFreezableStep? other) => other is CreateEntityFreezableStep oStep
                                               && FreezableEntityData.Equals(
@@ -30,6 +23,9 @@ public class CreateEntityFreezableStep : IFreezableStep
 
     /// <inheritdoc />
     public string StepName => "Create Entity";
+
+    /// <inheritdoc />
+    public TextLocation? TextLocation => FreezableEntityData.Location;
 
     /// <inheritdoc />
     public Result<IStep, IError> TryFreeze(StepContext stepContext)

@@ -123,7 +123,7 @@ public sealed class RegexReplace : CompoundStep<string>
             Variable,
             new ActualTypeReference(typeof(StringStream)),
             scopedStep,
-            new StepErrorLocation(this)
+            new ErrorLocation(this)
         );
     }
 

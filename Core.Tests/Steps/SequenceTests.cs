@@ -87,7 +87,7 @@ public partial class SequenceTests : StepTestBase<Sequence<StringStream>, String
                     FinalStep = Constant("Final")
                 },
                 new SingleError(
-                    EntireSequenceLocation.Instance,
+                    ErrorLocation.EmptyLocation,
                     ErrorCode.Test,
                     "Initial step Fail"
                 )
@@ -101,7 +101,7 @@ public partial class SequenceTests : StepTestBase<Sequence<StringStream>, String
                     FinalStep    = new FailStep<StringStream> { ErrorMessage = "Final step Fail" }
                 },
                 new SingleError(
-                    EntireSequenceLocation.Instance,
+                    ErrorLocation.EmptyLocation,
                     ErrorCode.Test,
                     "Final step Fail"
                 )

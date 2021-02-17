@@ -132,16 +132,38 @@ public sealed class SCLRunner
         #pragma warning disable CA1031 // Do not catch general exception types
         catch (Exception e)
         {
-            result = new SingleError(
-                EntireSequenceLocation.Instance,
-                e,
-                ErrorCode.ExternalProcessError
-            );
+            return ErrorCode.ExternalProcessError.ToErrorBuilder(e)
+                .WithLocationSingle(ErrorLocation.EmptyLocation);
         }
         #pragma warning restore CA1031 // Do not catch general exception types
 
         var result2 = await result.Bind(x => RunSequenceFromTextAsync(x, cancellationToken));
         return result2;
+    }
+
+    /// <summary>
+    /// Logs an error
+    /// </summary>
+    public static void LogError(ILogger logger, IError error)
+    {
+        foreach (var singleError in error.GetAllErrors())
+        {
+            if (singleError.Exception != null)
+                logger.LogError(
+                    singleError.Exception,
+                    "{Error} - {StepName} {Location}",
+                    singleError.Message,
+                    singleError.Location.StepName,
+                    singleError.Location.TextLocation
+                );
+            else
+                logger.LogError(
+                    "{Error} - {StepName} {Location}",
+                    singleError.Message,
+                    singleError.Location.StepName,
+                    singleError.Location.TextLocation
+                );
+        }
     }
 }
 

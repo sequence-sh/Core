@@ -1,112 +1,82 @@
-﻿namespace Reductech.EDR.Core.Internal.Errors
-{
+﻿//using Reductech.EDR.Core.Internal.Parser;
 
-/// <summary>
-/// A location with no information
-/// </summary>
-public class EmptyLocation : IErrorLocation
-{
-    private EmptyLocation() { }
-
-    /// <summary>
-    /// The instance.
-    /// </summary>
-    public static IErrorLocation Instance { get; } = new EmptyLocation();
-
-    /// <inheritdoc />
-    public bool Equals(IErrorLocation? other) => other is EmptyLocation;
-
-    /// <inheritdoc />
-    public string AsString => "No Location";
-}
+//namespace Reductech.EDR.Core.Internal.Errors
+//{
 
 ///// <summary>
-///// An error location composed of multiple locations.
+///// A location with no information
 ///// </summary>
-//public class ErrorLocationList : IErrorLocation
+//public class EmptyLocation : IErrorLocation
 //{
-//    public ErrorLocationList(ImmutableList<IErrorLocation> locations) => Locations = locations;
+//    private EmptyLocation() { }
 
 //    /// <summary>
-//    /// The ErrorLocations
+//    /// The instance.
 //    /// </summary>
-//    public ImmutableList<IErrorLocation> Locations { get; }
+//    public static IErrorLocation Instance { get; } = new EmptyLocation();
+
+//    /// <inheritdoc />
+//    public bool Equals(IErrorLocation? other) => other is EmptyLocation;
+
+//    /// <inheritdoc />
+//    public string AsString => "No Location";
+
+//    /// <inheritdoc />
+//    public string? StepName => null;
+
+//    /// <inheritdoc />
+//    public TextLocation? TextLocation => null;
+//}
+
+///// <summary>
+///// The error location was the entire sequence.
+///// </summary>
+//public class EntireSequenceLocation : IErrorLocation
+//{
+//    private EntireSequenceLocation() { }
+
+//    /// <summary>
+//    /// The instance.
+//    /// </summary>
+//    public static IErrorLocation Instance { get; } = new EntireSequenceLocation();
+
+//    /// <inheritdoc />
+//    public string AsString => "Entire Sequence";
+
+//    /// <inheritdoc />
+//    public string? StepName => null;
+
+//    /// <inheritdoc />
+//    public TextLocation? TextLocation => null;
 
 //    /// <inheritdoc />
 //    public bool Equals(IErrorLocation? other)
 //    {
-//        if (other is ErrorLocationList cel && Locations.SequenceEqual(cel.Locations))
+//        if (other is null)
+//            return false;
+
+//        if (ReferenceEquals(this, other))
 //            return true;
 
-//        if (Locations.Count == 1)
-//            return Locations.Single().Equals(other);
-
-//        return false;
+//        return other is EntireSequenceLocation;
 //    }
 
 //    /// <inheritdoc />
-//    public string AsString => string.Join("; ", Locations.Select(x => x.AsString));
-
-//    /// <summary>
-//    /// Combine several ErrorLocations into a single ErrorLocation.
-//    /// </summary>
-//    public static IErrorLocation Combine(IEnumerable<IErrorLocation> locations)
+//    public override bool Equals(object? obj)
 //    {
-//        var list = locations
-//            .SelectMany(x => x is ErrorLocationList ell ? ell.Locations : ImmutableList.Create(x))
-//            .Where(x=> x != EmptyLocation.Instance)
-//            .ToImmutableList();
+//        if (obj is null)
+//            return false;
 
-//        return list.Count switch
-//        {
-//            0 => EmptyLocation.Instance,
-//            1 => list.Single(),
-//            _ => new ErrorLocationList(list)
-//        };
+//        if (ReferenceEquals(this, obj))
+//            return true;
+
+//        return obj is IErrorLocation errorLocation && Equals(errorLocation);
 //    }
+
+//    /// <inheritdoc />
+//    public override int GetHashCode() => 42;
 //}
 
-/// <summary>
-/// The error location was the entire sequence.
-/// </summary>
-public class EntireSequenceLocation : IErrorLocation
-{
-    private EntireSequenceLocation() { }
+//}
 
-    /// <summary>
-    /// The instance.
-    /// </summary>
-    public static IErrorLocation Instance { get; } = new EntireSequenceLocation();
 
-    /// <inheritdoc />
-    public string AsString => "Entire Sequence";
-
-    /// <inheritdoc />
-    public bool Equals(IErrorLocation? other)
-    {
-        if (other is null)
-            return false;
-
-        if (ReferenceEquals(this, other))
-            return true;
-
-        return other is EntireSequenceLocation;
-    }
-
-    /// <inheritdoc />
-    public override bool Equals(object? obj)
-    {
-        if (obj is null)
-            return false;
-
-        if (ReferenceEquals(this, obj))
-            return true;
-
-        return obj is IErrorLocation errorLocation && Equals(errorLocation);
-    }
-
-    /// <inheritdoc />
-    public override int GetHashCode() => 42;
-}
-
-}

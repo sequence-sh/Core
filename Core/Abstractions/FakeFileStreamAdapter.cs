@@ -6,7 +6,7 @@ using Thinktecture.IO;
 using Thinktecture.IO.Adapters;
 using Thinktecture.Win32.SafeHandles;
 
-namespace Reductech.EDR.Core
+namespace Reductech.EDR.Core.Abstractions
 {
 
 public class FakeFileStreamAdapter : StreamAdapter, IFileStream

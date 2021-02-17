@@ -80,7 +80,7 @@ public sealed class EntityMap : CompoundStep<Array<Entity>>
             Variable,
             new ActualTypeReference(typeof(Entity)),
             scopedStep,
-            new StepErrorLocation(this)
+            new ErrorLocation(this)
         );
     }
 

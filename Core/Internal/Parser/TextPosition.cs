@@ -1,8 +1,7 @@
 ﻿using Antlr4.Runtime;
 using Antlr4.Runtime.Misc;
-using Reductech.EDR.Core.Internal.Errors;
 
-namespace Reductech.EDR.Core.Internal.Parser
+namespace Reductech.EDR.Core.Internal.Parser //TODO move
 {
 
 /// <summary>
@@ -33,9 +32,8 @@ public sealed record TextPosition(int Line, int Column, int Index)
 /// <summary>
 /// A location within a piece of text
 /// </summary>
-public sealed record TextLocation
-    #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
-    (string Text, TextPosition Start, TextPosition Stop) : IErrorLocation
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+public sealed record TextLocation(string Text, TextPosition Start, TextPosition Stop)
     #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
 {
     /// <summary>
@@ -57,10 +55,9 @@ public sealed record TextLocation
             TextPosition.CreateStop(context.Stop)
         ) { }
 
-    /// <inheritdoc />
-    public bool Equals(IErrorLocation? other) => other is TextLocation tl && Equals(tl);
-
-    /// <inheritdoc />
+    /// <summary>
+    /// The text location as a string
+    /// </summary>
     public string AsString => $"{Start} - {Stop} Text: {Text}";
 
     /// <inheritdoc />

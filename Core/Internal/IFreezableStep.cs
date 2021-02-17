@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Internal.Errors;
+using Reductech.EDR.Core.Internal.Parser;
 
 namespace Reductech.EDR.Core.Internal
 {
@@ -15,6 +16,11 @@ public interface IFreezableStep : IEquatable<IFreezableStep>
     /// The human-readable name of this step.
     /// </summary>
     string StepName { get; }
+
+    /// <summary>
+    /// The SCL text location where this step comes from
+    /// </summary>
+    public TextLocation? TextLocation { get; }
 
     /// <summary>
     /// Try to freeze this step.

@@ -62,7 +62,7 @@ public partial class ValueIfTests : StepTestBase<ValueIf<int>, int>
                     Else      = new FailStep<Unit> { ErrorMessage = "Else Fail" },
                 },
                 new SingleError(
-                    EntireSequenceLocation.Instance,
+                    ErrorLocation.EmptyLocation,
                     ErrorCode.Test,
                     "Condition Fail"
                 )
@@ -77,7 +77,7 @@ public partial class ValueIfTests : StepTestBase<ValueIf<int>, int>
                     Else      = new FailStep<Unit> { ErrorMessage = "Else Fail" },
                 },
                 new SingleError(
-                    EntireSequenceLocation.Instance,
+                    ErrorLocation.EmptyLocation,
                     ErrorCode.Test,
                     "Then Fail"
                 )
@@ -92,7 +92,7 @@ public partial class ValueIfTests : StepTestBase<ValueIf<int>, int>
                     Else      = new FailStep<Unit> { ErrorMessage = "Else Fail" },
                 },
                 new SingleError(
-                    EntireSequenceLocation.Instance,
+                    ErrorLocation.EmptyLocation,
                     ErrorCode.Test,
                     "Else Fail"
                 )

@@ -13,7 +13,7 @@ public class SingleError : IError
     /// <summary>
     /// Create a new SingleError.
     /// </summary>
-    public SingleError(IErrorLocation location, Exception exception, ErrorCodeBase errorCodeBase)
+    public SingleError(ErrorLocation location, Exception exception, ErrorCodeBase errorCodeBase)
     {
         Location     = location;
         ErrorBuilder = new ErrorBuilder(exception, errorCodeBase);
@@ -22,7 +22,7 @@ public class SingleError : IError
     /// <summary>
     /// Create a new SingleError.
     /// </summary>
-    public SingleError(IErrorLocation location, ErrorCodeBase errorCodeBase, params object?[] args)
+    public SingleError(ErrorLocation location, ErrorCodeBase errorCodeBase, params object?[] args)
     {
         Location     = location;
         ErrorBuilder = new ErrorBuilder(errorCodeBase, args);
@@ -31,7 +31,7 @@ public class SingleError : IError
     /// <summary>
     /// Create a new SingleError.
     /// </summary>
-    public SingleError(IErrorLocation location, ErrorBuilder errorBuilder)
+    public SingleError(ErrorLocation location, ErrorBuilder errorBuilder)
     {
         Location     = location;
         ErrorBuilder = errorBuilder;
@@ -45,7 +45,7 @@ public class SingleError : IError
     /// <summary>
     /// The location where this error arose. This could be a line number.
     /// </summary>
-    public IErrorLocation Location { get; }
+    public ErrorLocation Location { get; }
 
     /// <summary>
     /// The ErrorBuilder
@@ -70,7 +70,7 @@ public class SingleError : IError
     public IErrorBuilder ToErrorBuilder => ErrorBuilder;
 
     /// <inheritdoc />
-    public override string ToString() => Message + " in " + Location.AsString;
+    public override string ToString() => Message + " in " + Location.AsString();
 
     /// <inheritdoc />
     public bool Equals(IError? other)

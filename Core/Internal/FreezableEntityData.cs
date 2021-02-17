@@ -1,8 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Internal.Errors;
+using Reductech.EDR.Core.Internal.Parser;
 using Reductech.EDR.Core.Util;
 
 namespace Reductech.EDR.Core.Internal
@@ -11,9 +11,11 @@ namespace Reductech.EDR.Core.Internal
 /// <summary>
 /// The data used by a Freezable Step.
 /// </summary>
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 public record FreezableEntityData(
-    IReadOnlyDictionary<EntityPropertyKey, FreezableStepProperty> EntityProperties,
-    IErrorLocation Location)
+        IReadOnlyDictionary<EntityPropertyKey, FreezableStepProperty> EntityProperties,
+        TextLocation? Location)
+    #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
 {
     /// <summary>
     /// Gets a variable name.
@@ -21,7 +23,8 @@ public record FreezableEntityData(
     public Result<VariableName, IError> GetVariableName(EntityPropertyKey name, string typeName) =>
         EntityProperties.TryFindOrFail(
                 name,
-                () => ErrorHelper.MissingParameterError(name.AsString).WithLocation(Location)
+                () => ErrorHelper.MissingParameterError(name.AsString)
+                    .WithLocation(new ErrorLocation(typeName, Location))
             )
             .Bind(x => x.AsVariableName(name.AsString));
 
@@ -32,7 +35,8 @@ public record FreezableEntityData(
         EntityProperties
             .TryFindOrFail(
                 name,
-                () => ErrorHelper.MissingParameterError(name.AsString).WithLocation(Location)
+                () => ErrorHelper.MissingParameterError(name.AsString)
+                    .WithLocation(new ErrorLocation(typeName, Location))
             )
             .Map(x => x.ConvertToStep());
 
@@ -42,7 +46,8 @@ public record FreezableEntityData(
     public Result<IReadOnlyList<IFreezableStep>, IError>
         GetStepList(EntityPropertyKey name, string typeName) => EntityProperties.TryFindOrFail(
             name,
-            () => ErrorHelper.MissingParameterError(name.AsString).WithLocation(Location)
+            () => ErrorHelper.MissingParameterError(name.AsString)
+                .WithLocation(new ErrorLocation(typeName, Location))
         )
         .Bind(x => x.AsStepList(name.AsString));
 

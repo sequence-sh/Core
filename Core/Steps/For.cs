@@ -82,7 +82,7 @@ public sealed class For : CompoundStep<Unit>
             return setResult.ConvertFailure<Unit>();
 
         if (increment.Value == 0)
-            return new SingleError(new StepErrorLocation(this), ErrorCode.DivideByZero);
+            return new SingleError(new ErrorLocation(this), ErrorCode.DivideByZero);
 
         while (increment.Value > 0 ? currentValue <= to.Value : currentValue >= to.Value)
         {
@@ -120,7 +120,7 @@ public sealed class For : CompoundStep<Unit>
             Variable,
             new ActualTypeReference(typeof(int)),
             scopedStep,
-            new StepErrorLocation(this)
+            new ErrorLocation(this)
         );
     }
 

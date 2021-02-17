@@ -202,7 +202,7 @@ public sealed class Array<T> : IArray, IEquatable<Array<T>>
     /// </summary>
     public async Task<Result<T, IError>> ElementAtAsync(
         int index,
-        IErrorLocation location,
+        ErrorLocation location,
         CancellationToken cancellation)
     {
         if (index < 0)

@@ -79,7 +79,7 @@ public sealed class ForEach<T> : CompoundStep<Unit>
             Variable,
             new ActualTypeReference(typeof(T)),
             scopedStep,
-            new StepErrorLocation(this)
+            new ErrorLocation(this)
         );
     }
 

@@ -26,7 +26,7 @@ public sealed class AssertError : CompoundStep<Unit>
             return Unit.Default;
 
         return new SingleError(
-            new StepErrorLocation(this),
+            new ErrorLocation(this),
             ErrorCode.AssertionFailed,
             Step.Name
         );

@@ -49,7 +49,7 @@ public sealed class ElementAtIndex<T> : CompoundStep<T>
 
         var r = await arrayResult.Value.ElementAtAsync(
             indexResult.Value,
-            new StepErrorLocation(this),
+            new ErrorLocation(this),
             cancellationToken
         );
 

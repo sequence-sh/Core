@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Internal.Errors;
+using Reductech.EDR.Core.Internal.Parser;
 using Reductech.EDR.Core.Util;
 
 namespace Reductech.EDR.Core.Internal
@@ -17,16 +18,19 @@ public sealed class OptionFreezableStep : IFreezableStep
     /// <summary>
     /// Create a new OptionFreezableStep
     /// </summary>
-    /// <param name="options"></param>
-    public OptionFreezableStep(IReadOnlyList<IFreezableStep> options)
+    public OptionFreezableStep(IReadOnlyList<IFreezableStep> options, TextLocation? textLocation)
     {
-        Options = options;
+        Options      = options;
+        TextLocation = textLocation;
     }
 
     /// <summary>
     /// The options
     /// </summary>
     public IReadOnlyList<IFreezableStep> Options { get; }
+
+    /// <inheritdoc />
+    public TextLocation? TextLocation { get; }
 
     /// <inheritdoc />
     public string StepName => string.Join(" or ", Options);
@@ -102,34 +106,14 @@ public sealed class OptionFreezableStep : IFreezableStep
 /// <summary>
 /// A step that is not a constant or a variable reference.
 /// </summary>
-public sealed class CompoundFreezableStep : IFreezableStep
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+public sealed record CompoundFreezableStep(
+        string StepName,
+        FreezableStepData FreezableStepData,
+        Configuration? StepConfiguration,
+        TextLocation? TextLocation) : IFreezableStep
+    #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
 {
-    /// <summary>
-    /// Creates a new CompoundFreezableStep.
-    /// </summary>
-    public CompoundFreezableStep(
-        string stepName,
-        FreezableStepData freezableStepData,
-        Configuration? stepConfiguration)
-    {
-        StepName          = stepName;
-        FreezableStepData = freezableStepData;
-        StepConfiguration = stepConfiguration;
-    }
-
-    /// <inheritdoc />
-    public string StepName { get; }
-
-    /// <summary>
-    /// The data for this step.
-    /// </summary>
-    public FreezableStepData FreezableStepData { get; }
-
-    /// <summary>
-    /// Configuration for this step.
-    /// </summary>
-    public Configuration? StepConfiguration { get; }
-
     /// <summary>
     /// Try to get this step factory from the store.
     /// </summary>
@@ -139,7 +123,7 @@ public sealed class CompoundFreezableStep : IFreezableStep
             stepFactoryStore.Dictionary.TryFindOrFail(
                 StepName,
                 () => ErrorHelper.MissingStepError(StepName)
-                    .WithLocation(FreezableStepData.Location)
+                    .WithLocation(FreezableStepData)
             );
 
         return r;
@@ -204,10 +188,6 @@ public sealed class CompoundFreezableStep : IFreezableStep
 
         return false;
     }
-
-    /// <inheritdoc />
-    public override bool Equals(object? obj) =>
-        ReferenceEquals(this, obj) || obj is IFreezableStep other && Equals(other);
 
     /// <inheritdoc />
     public override int GetHashCode() => HashCode.Combine(

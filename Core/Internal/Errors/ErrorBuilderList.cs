@@ -21,7 +21,7 @@ public class ErrorBuilderList : IErrorBuilder
     public IReadOnlyCollection<ErrorBuilder> ErrorBuilders { get; }
 
     /// <inheritdoc />
-    public IError WithLocation(IErrorLocation location) => new ErrorList(
+    public IError WithLocation(ErrorLocation location) => new ErrorList(
         ErrorBuilders.Select(x => x.WithLocationSingle(location)).ToList()
     );
 

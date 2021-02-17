@@ -31,7 +31,7 @@ public static class CSVReader
         IStep<StringStream> commentCharacter,
         IStep<StringStream> quoteCharacter,
         IStep<StringStream> multiValueDelimiter,
-        IErrorLocation errorLocation,
+        ErrorLocation errorLocation,
         CancellationToken cancellationToken)
     {
         var testStreamResult = await stream.Run(stateMonad, cancellationToken);
@@ -98,7 +98,7 @@ public static class CSVReader
         IStep<StringStream> step,
         string propertyName,
         IStateMonad stateMonad,
-        IErrorLocation errorLocation,
+        ErrorLocation errorLocation,
         CancellationToken cancellationToken)
     {
         var charResult = await step.Run(stateMonad, cancellationToken)
@@ -133,7 +133,7 @@ public static class CSVReader
         char? quoteCharacter,
         char? commentCharacter,
         char? multiValueDelimiter,
-        IErrorLocation location)
+        ErrorLocation location)
     {
         var (stream, encodingEnum) = stringStream.GetStream();
 

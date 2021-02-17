@@ -12,6 +12,7 @@ using Reductech.EDR.Core.Internal.Serialization;
 using Reductech.EDR.Core.TestHarness;
 using Xunit.Abstractions;
 using AutoTheory;
+using Reductech.EDR.Core.Abstractions;
 
 namespace Reductech.EDR.Core.Tests
 {

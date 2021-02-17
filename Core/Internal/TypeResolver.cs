@@ -73,7 +73,7 @@ public sealed class TypeResolver
                     var addResult = TryAddType(variableName, maybe.Value);
 
                     if (addResult.IsFailure)
-                        errors.Add(addResult.Error.WithLocation(EntireSequenceLocation.Instance));
+                        errors.Add(addResult.Error.WithLocation(ErrorLocation.EmptyLocation));
                     else if (!addResult.Value)
                         unresolvableVariableNames.Add(variableName);
                 }
@@ -97,7 +97,7 @@ public sealed class TypeResolver
                             .Select(
                                 x =>
                                     new SingleError(
-                                        EntireSequenceLocation.Instance,
+                                        ErrorLocation.EmptyLocation,
                                         ErrorCode.CouldNotResolveVariable,
                                         x.Name
                                     )

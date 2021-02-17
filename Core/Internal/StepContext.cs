@@ -24,7 +24,7 @@ public sealed class StepContext //TODO remove this type and move all logic to Ty
         VariableName vn,
         ITypeReference typeReference,
         IFreezableStep scopedStep,
-        IErrorLocation errorLocation)
+        ErrorLocation errorLocation)
     {
         var newTypeResolver = TypeResolver.Copy();
 

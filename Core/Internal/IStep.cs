@@ -3,6 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Internal.Errors;
+using Reductech.EDR.Core.Internal.Parser;
 using Reductech.EDR.Core.Util;
 
 namespace Reductech.EDR.Core.Internal
@@ -43,6 +44,11 @@ public interface IStep
     /// Configuration for this step.
     /// </summary>
     Configuration? Configuration { get; set; }
+
+    /// <summary>
+    /// The text location for this step.
+    /// </summary>
+    public TextLocation? TextLocation { get; set; }
 
     /// <summary>
     /// The output type. Will be the generic type in IStep&lt;T&gt;
