@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Threading.Tasks;
 using FluentAssertions.Common;
 using Namotion.Reflection;
 using Reductech.EDR.Core.Attributes;

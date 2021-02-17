@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using Reductech.EDR.Core.Util;
 
 namespace Reductech.EDR.Core.Internal.Serialization

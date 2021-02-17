@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
@@ -9,13 +8,9 @@ using MELT;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Namotion.Reflection;
-using Reductech.EDR.Core.Abstractions;
-using Reductech.EDR.Core.ExternalProcesses;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Util;
-using Thinktecture;
-using Thinktecture.IO;
 using Xunit.Abstractions;
 using Xunit.Sdk;
 

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Internal.Errors;
-using Reductech.EDR.Core.Internal.Parser;
 using StepParameterDict =
     System.Collections.Generic.IReadOnlyDictionary<
         Reductech.EDR.Core.Internal.StepParameterReference,

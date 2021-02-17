@@ -1,6 +1,4 @@
-﻿using Reductech.EDR.Core.Internal.Parser;
-
-namespace Reductech.EDR.Core.Internal.Errors
+﻿namespace Reductech.EDR.Core.Internal.Errors
 {
 
 /// <summary>

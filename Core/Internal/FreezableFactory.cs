@@ -4,7 +4,6 @@ using System.Collections.Immutable;
 using System.Linq;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Internal.Errors;
-using Reductech.EDR.Core.Internal.Parser;
 using Reductech.EDR.Core.Steps;
 using StepParameterDict =
     System.Collections.Generic.Dictionary<Reductech.EDR.Core.Internal.StepParameterReference,

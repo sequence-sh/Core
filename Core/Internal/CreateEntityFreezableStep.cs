@@ -2,7 +2,6 @@
 using System.Linq;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Internal.Errors;
-using Reductech.EDR.Core.Internal.Parser;
 
 namespace Reductech.EDR.Core.Internal
 {
