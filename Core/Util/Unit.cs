@@ -9,7 +9,7 @@ public sealed class Unit
     /// <summary>
     /// The Unit.
     /// </summary>
-    public static readonly Unit Default = new Unit();
+    public static readonly Unit Default = new();
 
     private Unit() { }
 }

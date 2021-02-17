@@ -98,15 +98,15 @@ public sealed class ArraySort<T> : CompoundStep<Array<T>>
     }
 
     /// <inheritdoc />
-    public override Result<StepContext, IError> TryGetScopedContext(
-        StepContext baseContext,
+    public override Result<TypeResolver, IError> TryGetScopedTypeResolver(
+        TypeResolver baseContext,
         IFreezableStep scopedStep)
     {
         return baseContext.TryCloneWithScopedStep(
             Variable,
             new ActualTypeReference(typeof(T)),
             scopedStep,
-            new StepErrorLocation(this)
+            new ErrorLocation(this)
         );
     }
 

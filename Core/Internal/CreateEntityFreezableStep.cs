@@ -9,19 +9,11 @@ namespace Reductech.EDR.Core.Internal
 /// <summary>
 /// Freezes into a create entity step
 /// </summary>
-public class CreateEntityFreezableStep : IFreezableStep
+public record CreateEntityFreezableStep(
+        #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+        FreezableEntityData FreezableEntityData) : IFreezableStep
+    #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
 {
-    /// <summary>
-    /// Create a new CreateEntityFreezableStep
-    /// </summary>
-    /// <param name="data"></param>
-    public CreateEntityFreezableStep(FreezableEntityData data) => FreezableEntityData = data;
-
-    /// <summary>
-    /// The data
-    /// </summary>
-    public FreezableEntityData FreezableEntityData { get; }
-
     /// <inheritdoc />
     public bool Equals(IFreezableStep? other) => other is CreateEntityFreezableStep oStep
                                               && FreezableEntityData.Equals(
@@ -32,14 +24,17 @@ public class CreateEntityFreezableStep : IFreezableStep
     public string StepName => "Create Entity";
 
     /// <inheritdoc />
-    public Result<IStep, IError> TryFreeze(StepContext stepContext)
+    public TextLocation? TextLocation => FreezableEntityData.Location;
+
+    /// <inheritdoc />
+    public Result<IStep, IError> TryFreeze(TypeResolver typeResolver)
     {
         var results = new List<Result<(EntityPropertyKey name, IStep value), IError>>();
 
         foreach (var (propertyName, stepMember) in FreezableEntityData.EntityProperties)
         {
             var frozen = stepMember.ConvertToStep()
-                .TryFreeze(stepContext)
+                .TryFreeze(typeResolver)
                 .Map(s => (propertyName, s));
 
             results.Add(frozen);

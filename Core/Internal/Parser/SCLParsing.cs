@@ -29,7 +29,7 @@ public static class SCLParsing
     {
         if (string.IsNullOrWhiteSpace(text))
             return new SingleError(
-                EntireSequenceLocation.Instance,
+                ErrorLocation.EmptyLocation,
                 ErrorCode.EmptySequence
             );
 
@@ -76,7 +76,7 @@ public static class SCLParsing
         /// <summary>
         /// Errors found by this error listener.
         /// </summary>
-        public readonly List<IError> Errors = new List<IError>();
+        public readonly List<IError> Errors = new();
 
         /// <inheritdoc />
         public override void SyntaxError(
@@ -88,11 +88,9 @@ public static class SCLParsing
             string msg,
             RecognitionException e)
         {
-            var error = new SingleError(
-                new TextLocation(offendingSymbol),
-                ErrorCode.SCLSyntaxError,
-                msg
-            );
+            var error =
+                ErrorCode.SCLSyntaxError.ToErrorBuilder(msg)
+                    .WithLocation(new TextLocation(offendingSymbol));
 
             Errors.Add(error);
         }
@@ -130,7 +128,10 @@ public static class SCLParsing
                 return result.ConvertFailure<FreezableStepProperty>();
 
             if (result.Value.Count == 0)
-                return new SingleError(new TextLocation(context), ErrorCode.EmptySequence);
+                return new SingleError(
+                    new TextLocation(context),
+                    ErrorCode.EmptySequence
+                );
 
             var sequence = CreateFreezableSequence(
                 result.Value.SkipLast(1).ToList(),
@@ -139,7 +140,10 @@ public static class SCLParsing
                 new TextLocation(context)
             );
 
-            return new FreezableStepProperty(sequence, new TextLocation(context));
+            return new FreezableStepProperty(
+                sequence,
+                new TextLocation(context)
+            );
         }
 
         /// <inheritdoc />
@@ -159,9 +163,11 @@ public static class SCLParsing
         {
             var b = context.TRUE() != null;
 
+            var location = new TextLocation(context);
+
             var member = new FreezableStepProperty(
-                new BoolConstantFreezable(b),
-                new TextLocation(context)
+                new BoolConstantFreezable(b, location),
+                location
             );
 
             return member;
@@ -171,21 +177,23 @@ public static class SCLParsing
         public override Result<FreezableStepProperty, IError> VisitDateTime(
             SCLParser.DateTimeContext context)
         {
+            var location = new TextLocation(context);
+
             if (!DateTime.TryParse(context.GetText(), out var dateTime))
             {
                 var message = context.GetText();
 
                 return new SingleError(
-                    new TextLocation(context),
+                    location,
                     ErrorCode.CouldNotParse,
                     message,
                     nameof(DateTime)
                 );
             }
 
-            var constant = new DateTimeConstantFreezable(dateTime);
+            var constant = new DateTimeConstantFreezable(dateTime, location);
 
-            var member = new FreezableStepProperty(constant, new TextLocation(context));
+            var member = new FreezableStepProperty(constant, location);
             return member;
         }
 
@@ -246,19 +254,13 @@ public static class SCLParsing
 
         /// <inheritdoc />
         public override Result<FreezableStepProperty, IError> VisitErrorNode(IErrorNode node) =>
-            new SingleError(
-                new TextLocation(node.Symbol),
-                ErrorCode.SCLSyntaxError,
-                node.GetText()
-            );
+            ErrorCode.SCLSyntaxError.ToErrorBuilder(node.GetText())
+                .WithLocationSingle(new TextLocation(node.Symbol));
 
         private static SingleError ParseError(ParserRuleContext pt)
         {
-            return new(
-                new TextLocation(pt.exception.OffendingToken),
-                ErrorCode.SCLSyntaxError,
-                GetMessage(pt.exception)
-            );
+            return ErrorCode.SCLSyntaxError.ToErrorBuilder(GetMessage(pt.exception))
+                .WithLocationSingle(new TextLocation(pt.exception.OffendingToken));
         }
 
         private static string GetMessage(RecognitionException re)
@@ -309,9 +311,11 @@ public static class SCLParsing
             var prefix = context.NAME(0).GetText();
             var suffix = context.NAME(1).GetText();
 
+            var location = new TextLocation(context);
+
             var member = new FreezableStepProperty(
-                new EnumConstantFreezable(new Enumeration(prefix, suffix)),
-                new TextLocation(context)
+                new EnumConstantFreezable(new Enumeration(prefix, suffix), location),
+                location
             );
 
             return member;
@@ -321,13 +325,14 @@ public static class SCLParsing
         public override Result<FreezableStepProperty, IError> VisitNumber(
             SCLParser.NumberContext context)
         {
-            var text = context.GetText();
+            var text     = context.GetText();
+            var location = new TextLocation(context);
 
             if (int.TryParse(text, out var num))
             {
                 var member = new FreezableStepProperty(
-                    new IntConstantFreezable(num),
-                    new TextLocation(context)
+                    new IntConstantFreezable(num, location),
+                    location
                 );
 
                 return member;
@@ -336,7 +341,7 @@ public static class SCLParsing
             if (double.TryParse(text, out var d))
             {
                 var member = new FreezableStepProperty(
-                    new DoubleConstantFreezable(d),
+                    new DoubleConstantFreezable(d, location),
                     new TextLocation(context)
                 );
 
@@ -344,7 +349,7 @@ public static class SCLParsing
             }
 
             return new SingleError(
-                new TextLocation(context),
+                location,
                 ErrorCode.CouldNotParse,
                 context.GetText(),
                 "Number"
@@ -423,10 +428,11 @@ public static class SCLParsing
             string s = GetString(context);
 
             var stringStream = new StringStream(s);
+            var location     = new TextLocation(context);
 
             var member = new FreezableStepProperty(
-                new StringConstantFreezable(stringStream),
-                new TextLocation(context)
+                new StringConstantFreezable(stringStream, location),
+                location
             );
 
             return member;
@@ -462,10 +468,9 @@ public static class SCLParsing
                     dict.Add(new StepParameterReference(number), term.Value);
             }
 
-            var members = AggregateNamedArguments(
-                context.namedArgument(),
-                new TextLocation(context)
-            );
+            var location = new TextLocation(context);
+
+            var members = AggregateNamedArguments(context.namedArgument(), location);
 
             if (members.IsFailure)
                 errors.Add(members.Error);
@@ -478,7 +483,7 @@ public static class SCLParsing
 
             var fsd = new FreezableStepData(dict, new TextLocation(context));
 
-            var cfs = new CompoundFreezableStep(name, fsd, null);
+            var cfs = new CompoundFreezableStep(name, fsd, null, location);
 
             return new FreezableStepProperty(cfs, new TextLocation(context));
         }
@@ -506,10 +511,9 @@ public static class SCLParsing
                     dict.Add(new StepParameterReference(number), term.Value);
             }
 
-            var members = AggregateNamedArguments(
-                context.namedArgument(),
-                new TextLocation(context)
-            );
+            var location = new TextLocation(context);
+
+            var members = AggregateNamedArguments(context.namedArgument(), location);
 
             if (members.IsFailure)
                 errors.Add(members.Error);
@@ -522,7 +526,7 @@ public static class SCLParsing
 
             var fsd = new FreezableStepData(dict, new TextLocation(context));
 
-            var cfs = new CompoundFreezableStep(name, fsd, null);
+            var cfs = new CompoundFreezableStep(name, fsd, null, location);
 
             return new FreezableStepProperty(cfs, new TextLocation(context));
         }
@@ -549,7 +553,7 @@ public static class SCLParsing
         private Result<IReadOnlyDictionary<EntityPropertyKey, FreezableStepProperty>, IError>
             AggregateEntityProperties(
                 IEnumerable<SCLParser.EntityPropertyContext> entityProperties,
-                IErrorLocation location)
+                ErrorLocation location)
         {
             var l      = new List<(EntityPropertyKey key, FreezableStepProperty member)>();
             var errors = new List<IError>();
@@ -587,7 +591,7 @@ public static class SCLParsing
         private Result<IReadOnlyDictionary<string, FreezableStepProperty>, IError>
             AggregateNamedArguments(
                 IEnumerable<SCLParser.NamedArgumentContext> namedArguments,
-                IErrorLocation location)
+                ErrorLocation location)
         {
             var l      = new List<(string key, FreezableStepProperty member)>();
             var errors = new List<IError>();
@@ -625,7 +629,7 @@ public static class SCLParsing
             GetEntityProperty(SCLParser.EntityPropertyContext context)
         {
             var key = new EntityPropertyKey(
-                context.entityPropertyName().Select(GetString).ToList()
+                context.entityPropertyName().Select(GetContextString).ToList()
             );
 
             var value = Visit(context.term());
@@ -636,7 +640,7 @@ public static class SCLParsing
 
             return (key, value.Value);
 
-            static string GetString(SCLParser.EntityPropertyNameContext context)
+            static string GetContextString(SCLParser.EntityPropertyNameContext context)
             {
                 if (context.NAME() != null)
                     return context.NAME().Symbol.Text;

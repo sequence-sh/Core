@@ -19,26 +19,26 @@ public sealed class FreezableStepProperty :
     /// <summary>
     /// Create a new FreezableStepProperty
     /// </summary>
-    public FreezableStepProperty(VariableName variableName, IErrorLocation location)
+    public FreezableStepProperty(VariableName variableName, TextLocation? location)
         : base(variableName) => Location = location;
 
     /// <summary>
     /// Create a new FreezableStepProperty
     /// </summary>
-    public FreezableStepProperty(IFreezableStep step, IErrorLocation location)
+    public FreezableStepProperty(IFreezableStep step, TextLocation? location)
         : base(OneOf<VariableName, IFreezableStep, ImmutableList<IFreezableStep>>.FromT1(step)) =>
         Location = location;
 
     /// <summary>
     /// Create a new FreezableStepProperty
     /// </summary>
-    public FreezableStepProperty(ImmutableList<IFreezableStep> stepList, IErrorLocation location)
+    public FreezableStepProperty(ImmutableList<IFreezableStep> stepList, TextLocation? location)
         : base(stepList) => Location = location;
 
     /// <summary>
     /// The location where this stepMember comes from.
     /// </summary>
-    public IErrorLocation Location { get; }
+    public TextLocation? Location { get; }
 
     /// <summary>
     /// The member type of this Step Member.

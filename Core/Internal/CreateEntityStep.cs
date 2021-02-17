@@ -50,15 +50,10 @@ public record CreateEntityStep
             Properties.ToDictionary(
                 x => x.Key,
                 x =>
-                    new FreezableStepProperty(
-                        x.Value.Unfreeze(),
-                        new StepErrorLocation(x.Value)
-                    )
+                    new FreezableStepProperty(x.Value.Unfreeze(), TextLocation)
             );
 
-        return new CreateEntityFreezableStep(
-            new FreezableEntityData(dictionary, new StepErrorLocation(this))
-        );
+        return new CreateEntityFreezableStep(new FreezableEntityData(dictionary, TextLocation));
     }
 
     /// <inheritdoc />
@@ -68,12 +63,11 @@ public record CreateEntityStep
     {
         return await Run(stateMonad, cancellationToken)
             .BindCast<Entity, T, IError>(
-                new SingleError(
-                    new StepErrorLocation(this),
-                    ErrorCode.InvalidCast,
-                    Name,
-                    typeof(T).Name
-                )
+                ErrorCode.InvalidCast.ToErrorBuilder(
+                        Name,
+                        typeof(T).Name
+                    )
+                    .WithLocation(this)
             );
     }
 
@@ -87,7 +81,10 @@ public record CreateEntityStep
     }
 
     /// <inheritdoc />
-    public Configuration? Configuration { get; set; } = null;
+    public Configuration? Configuration { get; set; }
+
+    /// <inheritdoc />
+    public TextLocation? TextLocation { get; set; }
 
     /// <inheritdoc />
     public Type OutputType => typeof(Entity);

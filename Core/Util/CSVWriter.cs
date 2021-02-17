@@ -37,7 +37,7 @@ public static class CSVWriter
         IStep<bool> alwaysQuote,
         IStep<StringStream> multiValueDelimiter,
         IStep<StringStream> dateTimeFormat,
-        IErrorLocation errorLocation,
+        ErrorLocation errorLocation,
         CancellationToken cancellationToken)
     {
         var entityStreamResult = await entityStream.Run(stateMonad, cancellationToken);

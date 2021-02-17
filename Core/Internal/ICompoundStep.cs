@@ -24,8 +24,8 @@ public interface ICompoundStep : IStep
     /// Tries to get the scoped context for this step.
     /// Returns an error if this step does not have any scoped functions.
     /// </summary>
-    Result<StepContext, IError> TryGetScopedContext(
-        StepContext baseContext,
+    Result<TypeResolver, IError> TryGetScopedTypeResolver(
+        TypeResolver baseTypeResolver,
         IFreezableStep scopedStep);
 }
 

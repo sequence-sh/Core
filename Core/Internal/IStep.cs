@@ -45,6 +45,11 @@ public interface IStep
     Configuration? Configuration { get; set; }
 
     /// <summary>
+    /// The text location for this step.
+    /// </summary>
+    public TextLocation? TextLocation { get; set; }
+
+    /// <summary>
     /// The output type. Will be the generic type in IStep&lt;T&gt;
     /// </summary>
     Type OutputType { get; }

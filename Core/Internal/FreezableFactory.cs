@@ -17,8 +17,6 @@ namespace Reductech.EDR.Core.Internal
 /// </summary>
 public static class FreezableFactory
 {
-    //TODO move other CreateFreezable methods here
-
     /// <summary>
     /// Create a new Freezable EntityGetValue
     /// </summary>
@@ -26,7 +24,7 @@ public static class FreezableFactory
         IFreezableStep entityOrArray,
         IFreezableStep indexer,
         Configuration? configuration,
-        IErrorLocation location)
+        TextLocation? location)
     {
         var entityGetValueDict = new StepParameterDict
         {
@@ -45,7 +43,8 @@ public static class FreezableFactory
         var entityGetValueStep = new CompoundFreezableStep(
             EntityGetValueStepFactory.Instance.TypeName,
             entityGetValueData,
-            configuration
+            configuration,
+            location
         );
 
         var elementAtIndexDict = new StepParameterDict
@@ -65,10 +64,11 @@ public static class FreezableFactory
         var elementAtStep = new CompoundFreezableStep(
             ElementAtIndexStepFactory.Instance.TypeName,
             elementAtData,
-            configuration
+            configuration,
+            location
         );
 
-        var result = new OptionFreezableStep(new[] { entityGetValueStep, elementAtStep });
+        var result = new OptionFreezableStep(new[] { entityGetValueStep, elementAtStep }, location);
         return result;
     }
 
@@ -79,7 +79,7 @@ public static class FreezableFactory
         IEnumerable<IFreezableStep> steps,
         IFreezableStep finalStep,
         Configuration? configuration,
-        IErrorLocation location)
+        TextLocation? location)
     {
         var dict = new StepParameterDict
         {
@@ -95,7 +95,12 @@ public static class FreezableFactory
 
         var fpd = new FreezableStepData(dict, location);
 
-        return new CompoundFreezableStep(SequenceStepFactory.Instance.TypeName, fpd, configuration);
+        return new CompoundFreezableStep(
+            SequenceStepFactory.Instance.TypeName,
+            fpd,
+            configuration,
+            location
+        );
     }
 
     /// <summary>
@@ -103,7 +108,7 @@ public static class FreezableFactory
     /// </summary>
     public static IFreezableStep CreateFreezableGetVariable(
         VariableName variableName,
-        IErrorLocation location)
+        TextLocation? location)
     {
         var dict = new StepParameterDict
         {
@@ -113,8 +118,14 @@ public static class FreezableFactory
             }
         };
 
-        var fpd  = new FreezableStepData(dict, location);
-        var step = new CompoundFreezableStep(GetVariableStepFactory.Instance.TypeName, fpd, null);
+        var fpd = new FreezableStepData(dict, location);
+
+        var step = new CompoundFreezableStep(
+            GetVariableStepFactory.Instance.TypeName,
+            fpd,
+            null,
+            location
+        );
 
         return step;
     }
@@ -125,7 +136,7 @@ public static class FreezableFactory
     public static IFreezableStep CreateFreezableSetVariable(
         FreezableStepProperty variableName,
         FreezableStepProperty value,
-        IErrorLocation location)
+        TextLocation location)
     {
         var dict = new StepParameterDict
         {
@@ -133,8 +144,14 @@ public static class FreezableFactory
             { new StepParameterReference(nameof(SetVariable<object>.Value)), value },
         };
 
-        var fpd  = new FreezableStepData(dict, location);
-        var step = new CompoundFreezableStep(SetVariableStepFactory.Instance.TypeName, fpd, null);
+        var fpd = new FreezableStepData(dict, location);
+
+        var step = new CompoundFreezableStep(
+            SetVariableStepFactory.Instance.TypeName,
+            fpd,
+            null,
+            location
+        );
 
         return step;
     }
@@ -142,7 +159,7 @@ public static class FreezableFactory
     /// <summary>
     /// Create a freezable Not step.
     /// </summary>
-    public static IFreezableStep CreateFreezableNot(IFreezableStep boolean, IErrorLocation location)
+    public static IFreezableStep CreateFreezableNot(IFreezableStep boolean, TextLocation location)
     {
         var dict = new StepParameterDict
         {
@@ -153,7 +170,7 @@ public static class FreezableFactory
         };
 
         var fpd  = new FreezableStepData(dict, location);
-        var step = new CompoundFreezableStep(NotStepFactory.Instance.TypeName, fpd, null);
+        var step = new CompoundFreezableStep(NotStepFactory.Instance.TypeName, fpd, null, location);
 
         return step;
     }
@@ -164,7 +181,7 @@ public static class FreezableFactory
     public static IFreezableStep CreateFreezableList(
         ImmutableList<IFreezableStep> elements,
         Configuration? configuration,
-        IErrorLocation location)
+        TextLocation? location)
     {
         var dict = new StepParameterDict
         {
@@ -176,7 +193,12 @@ public static class FreezableFactory
 
         var fpd = new FreezableStepData(dict, location);
 
-        return new CompoundFreezableStep(ArrayNewStepFactory.Instance.TypeName, fpd, configuration);
+        return new CompoundFreezableStep(
+            ArrayNewStepFactory.Instance.TypeName,
+            fpd,
+            configuration,
+            location
+        );
     }
 }
 
@@ -191,7 +213,7 @@ public static class InfixHelper
     /// Try to create an infix step
     /// </summary>
     public static Result<FreezableStepProperty, IError> TryCreateStep(
-        IErrorLocation errorLocation,
+        TextLocation textLocation,
         string op,
         IReadOnlyList<Result<FreezableStepProperty, IError>> terms)
     {
@@ -212,37 +234,42 @@ public static class InfixHelper
         var operatorData = OperatorLookup[op].ToList();
 
         if (!operatorData.Any())
-            return new SingleError(errorLocation, ErrorCode.CouldNotParse, op, "Operator");
+            return new SingleError(
+                textLocation,
+                ErrorCode.CouldNotParse,
+                op,
+                "Operator"
+            );
 
         List<IFreezableStep> freezableSteps = new();
 
-        foreach (var opData in operatorData)
+        foreach (var (_, stepName, termsName) in operatorData)
         {
             var stepParameterDict = new StepParameterDict()
             {
                 {
-                    new StepParameterReference(opData.TermsName), new FreezableStepProperty(
+                    new StepParameterReference(termsName), new FreezableStepProperty(
                         properties.Select(x => x.ConvertToStep()).ToImmutableList(),
-                        errorLocation
+                        textLocation
                     )
                 }
             };
 
             var data = new FreezableStepData(
                 stepParameterDict,
-                errorLocation
+                textLocation
             );
 
-            var step = new CompoundFreezableStep(opData.StepName, data, null);
+            var step = new CompoundFreezableStep(stepName, data, null, textLocation);
             freezableSteps.Add(step);
         }
 
         if (freezableSteps.Count == 1)
-            return new FreezableStepProperty(freezableSteps.Single(), errorLocation);
+            return new FreezableStepProperty(freezableSteps.Single(), textLocation);
 
-        var alt = new OptionFreezableStep(freezableSteps);
+        var alt = new OptionFreezableStep(freezableSteps, textLocation);
 
-        return new FreezableStepProperty(alt, errorLocation);
+        return new FreezableStepProperty(alt, textLocation);
     }
 
     private static readonly ILookup<string, OperatorData1> OperatorLookup =

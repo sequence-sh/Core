@@ -15,7 +15,7 @@ public sealed record LogSituation : LogSituationBase
     public override string GetLocalizedString()
     {
         var localizedMessage = LogMessages_EN
-            .ResourceManager.GetString(Code); //TODO static method to get this
+            .ResourceManager.GetString(Code);
 
         Debug.Assert(localizedMessage != null, nameof(localizedMessage) + " != null");
         return localizedMessage;

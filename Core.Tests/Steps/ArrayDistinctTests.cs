@@ -93,7 +93,7 @@ public partial class ArrayDistinctTests : StepTestBase<ArrayDistinct<Entity>, Ar
                     KeySelector = Constant("A")
                 },
                 new SingleError(
-                    EntireSequenceLocation.Instance,
+                    ErrorLocation.EmptyLocation,
                     ErrorCode.Test,
                     "Stream Fail"
                 )

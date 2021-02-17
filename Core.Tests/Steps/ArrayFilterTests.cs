@@ -90,7 +90,7 @@ public partial class ArrayFilterTests : StepTestBase<ArrayFilter<Entity>, Array<
                     Predicate = Constant(true)
                 },
                 new SingleError(
-                    EntireSequenceLocation.Instance,
+                    ErrorLocation.EmptyLocation,
                     ErrorCode.Test,
                     "Stream Fail"
                 )

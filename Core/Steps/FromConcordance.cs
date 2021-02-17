@@ -29,7 +29,7 @@ public sealed class FromConcordance : CompoundStep<Core.Array<Entity>>
             new StringConstant(new StringStream("")),
             QuoteCharacter,
             MultiValueDelimiter,
-            new StepErrorLocation(this),
+            new ErrorLocation(this),
             cancellationToken
         );
 

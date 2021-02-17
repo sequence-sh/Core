@@ -13,10 +13,12 @@ namespace Reductech.EDR.Core.Abstractions
 /// The external context of a sequence.
 /// </summary>
 public sealed record ExternalContext(
-    IFileSystem FileSystemHelper,
-    IExternalProcessRunner ExternalProcessRunner,
-    IConsole Console,
-    params (string name, object context)[] InjectedContexts) : IExternalContext
+        #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+        IFileSystem FileSystemHelper,
+        IExternalProcessRunner ExternalProcessRunner,
+        IConsole Console,
+        params (string name, object context)[] InjectedContexts) : IExternalContext
+    #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
 {
     /// <summary>
     /// The real external context

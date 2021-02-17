@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Internal.Errors;
@@ -15,7 +16,7 @@ public sealed class TypeResolver
     /// <summary>
     /// Create a new TypeResolver
     /// </summary>
-    public TypeResolver(
+    private TypeResolver(
         StepFactoryStore stepFactoryStore,
         Dictionary<VariableName, ActualTypeReference>? myDictionary = null)
     {
@@ -48,6 +49,53 @@ public sealed class TypeResolver
     public StepFactoryStore StepFactoryStore { get; }
 
     /// <summary>
+    /// Try to Clone this context with additional set variables.
+    /// </summary>
+    public Result<TypeResolver, IError> TryCloneWithScopedStep(
+        VariableName vn,
+        ITypeReference typeReference,
+        IFreezableStep scopedStep,
+        ErrorLocation errorLocation)
+    {
+        var newTypeResolver = Copy();
+
+        var r1 = newTypeResolver.TryAddType(vn, typeReference);
+
+        if (r1.IsFailure)
+            return r1.ConvertFailure<TypeResolver>().MapError(x => x.WithLocation(errorLocation));
+
+        var r2 = newTypeResolver.TryAddTypeHierarchy(scopedStep);
+
+        if (r2.IsFailure)
+            return r2.ConvertFailure<TypeResolver>();
+
+        return newTypeResolver;
+    }
+
+    /// <summary>
+    /// Gets the type referred to by a reference.
+    /// </summary>
+    public Result<Type, IErrorBuilder> TryGetTypeFromReference(ITypeReference typeReference) =>
+        typeReference.TryGetActualTypeReference(this).Map(x => x.Type);
+
+    /// <summary>
+    /// Tries to create a new TypeResolver.
+    /// </summary>
+    public static Result<TypeResolver, IError> TryCreate(
+        StepFactoryStore stepFactoryStore,
+        IFreezableStep topLevelStep)
+    {
+        var typeResolver = new TypeResolver(stepFactoryStore);
+
+        var r = typeResolver.TryAddTypeHierarchy(topLevelStep);
+
+        if (r.IsFailure)
+            return r.ConvertFailure<TypeResolver>();
+
+        return typeResolver;
+    }
+
+    /// <summary>
     /// Try to add this step and all its children to this TypeResolver.
     /// </summary>
     public Result<Unit, IError> TryAddTypeHierarchy(IFreezableStep topLevelStep)
@@ -73,7 +121,7 @@ public sealed class TypeResolver
                     var addResult = TryAddType(variableName, maybe.Value);
 
                     if (addResult.IsFailure)
-                        errors.Add(addResult.Error.WithLocation(EntireSequenceLocation.Instance));
+                        errors.Add(addResult.Error.WithLocation(ErrorLocation.EmptyLocation));
                     else if (!addResult.Value)
                         unresolvableVariableNames.Add(variableName);
                 }
@@ -97,7 +145,7 @@ public sealed class TypeResolver
                             .Select(
                                 x =>
                                     new SingleError(
-                                        EntireSequenceLocation.Instance,
+                                        ErrorLocation.EmptyLocation,
                                         ErrorCode.CouldNotResolveVariable,
                                         x.Name
                                     )

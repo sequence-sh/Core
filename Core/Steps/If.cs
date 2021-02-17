@@ -74,7 +74,7 @@ public sealed class IfStepFactory : SimpleStepFactory<If, Unit>
     /// <summary>
     /// The instance.
     /// </summary>
-    public static IfStepFactory Instance { get; } = new IfStepFactory();
+    public static IfStepFactory Instance { get; } = new();
 }
 
 }

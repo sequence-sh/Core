@@ -85,7 +85,7 @@ public sealed class StringToDate : CompoundStep<DateTime>
         catch (CultureNotFoundException)
         {
             return new SingleError(
-                new StepErrorLocation(this),
+                new ErrorLocation(this),
                 ErrorCode.CouldNotParse,
                 cultureResult.Value,
                 nameof(Culture)
@@ -103,7 +103,7 @@ public sealed class StringToDate : CompoundStep<DateTime>
             catch (FormatException fe)
             {
                 return new SingleError(
-                    new StepErrorLocation(this),
+                    new ErrorLocation(this),
                     fe,
                     ErrorCode.CouldNotParse
                 );
@@ -118,7 +118,7 @@ public sealed class StringToDate : CompoundStep<DateTime>
             catch (FormatException fe)
             {
                 return new SingleError(
-                    new StepErrorLocation(this),
+                    new ErrorLocation(this),
                     fe,
                     ErrorCode.CouldNotParse
                 );

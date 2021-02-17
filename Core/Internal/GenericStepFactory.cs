@@ -22,9 +22,11 @@ public abstract class GenericStepFactory : StepFactory
 
     /// <inheritdoc />
     protected override Result<ICompoundStep, IError> TryCreateInstance(
-        StepContext stepContext,
-        FreezableStepData freezeData) => GetMemberType(freezeData, stepContext.TypeResolver)
-        .Bind(x => stepContext.TryGetTypeFromReference(x).MapError(e => e.WithLocation(freezeData)))
+        TypeResolver typeResolver,
+        FreezableStepData freezeData) => GetMemberType(freezeData, typeResolver)
+        .Bind(
+            x => typeResolver.TryGetTypeFromReference(x).MapError(e => e.WithLocation(freezeData))
+        )
         .Bind(x => TryCreateGeneric(StepType, x).MapError(e => e.WithLocation(freezeData)));
 
     /// <summary>

@@ -104,7 +104,7 @@ public abstract class StepFactory : IStepFactory
     /// Creates an instance of this type.
     /// </summary>
     protected abstract Result<ICompoundStep, IError> TryCreateInstance(
-        StepContext stepContext,
+        TypeResolver typeResolver,
         FreezableStepData freezeData);
 
     /// <inheritdoc />
@@ -139,17 +139,18 @@ public abstract class StepFactory : IStepFactory
 
     /// <inheritdoc />
     public Result<IStep, IError> TryFreeze(
-        StepContext stepContext,
+        TypeResolver typeResolver,
         FreezableStepData freezeData,
         Configuration? configuration)
     {
-        var instanceResult = TryCreateInstance(stepContext, freezeData);
+        var instanceResult = TryCreateInstance(typeResolver, freezeData);
 
         if (instanceResult.IsFailure)
             return instanceResult.ConvertFailure<IStep>();
 
         var step = instanceResult.Value;
         step.Configuration = configuration;
+        step.TextLocation  = freezeData.Location;
 
         var errors = new List<IError>();
 
@@ -171,7 +172,7 @@ public abstract class StepFactory : IStepFactory
             else
                 errors.Add(
                     ErrorHelper.UnexpectedParameterError(key.Name, TypeName)
-                        .WithLocation(freezeData.Location)
+                        .WithLocation(new ErrorLocation(TypeName, freezeData.Location))
                 );
         }
 
@@ -182,11 +183,8 @@ public abstract class StepFactory : IStepFactory
 
         foreach (var propertyInfo in duplicates)
             errors.Add(
-                new SingleError(
-                    freezeData.Location,
-                    ErrorCode.DuplicateParameter,
-                    propertyInfo.Name
-                )
+                ErrorCode.DuplicateParameter.ToErrorBuilder(propertyInfo.Name)
+                    .WithLocation(freezeData)
             );
 
         if (errors.Any())
@@ -213,10 +211,10 @@ public abstract class StepFactory : IStepFactory
                         step,
                         vn,
                         stepMember.Location,
-                        stepContext
+                        typeResolver
                     ),
-                    s => TrySetStep(propertyInfo, step, s, stepContext),
-                    sList => TrySetStepList(propertyInfo, step, sList, stepContext)
+                    s => TrySetStep(propertyInfo, step, s, typeResolver),
+                    sList => TrySetStepList(propertyInfo, step, sList, typeResolver)
                 );
 
             if (result.IsFailure)
@@ -227,7 +225,7 @@ public abstract class StepFactory : IStepFactory
         {
             foreach (var (freezableStep, propertyInfo) in scopedFunctions)
             {
-                var scopedContext = step.TryGetScopedContext(stepContext, freezableStep);
+                var scopedContext = step.TryGetScopedTypeResolver(typeResolver, freezableStep);
 
                 if (scopedContext.IsFailure)
                     errors.Add(scopedContext.Error);
@@ -255,8 +253,8 @@ public abstract class StepFactory : IStepFactory
         PropertyInfo propertyInfo,
         ICompoundStep parentStep,
         VariableName variableName,
-        IErrorLocation stepMemberLocation,
-        StepContext stepContext)
+        TextLocation? stepMemberLocation,
+        TypeResolver typeResolver)
     {
         if (propertyInfo.PropertyType.IsInstanceOfType(variableName))
         {
@@ -266,16 +264,16 @@ public abstract class StepFactory : IStepFactory
 
         var step = FreezableFactory.CreateFreezableGetVariable(variableName, stepMemberLocation);
 
-        return TrySetStep(propertyInfo, parentStep, step, stepContext);
+        return TrySetStep(propertyInfo, parentStep, step, typeResolver);
     }
 
     private static Result<Unit, IError> TrySetStep(
         PropertyInfo propertyInfo,
         ICompoundStep parentStep,
         IFreezableStep freezableStep,
-        StepContext stepContext)
+        TypeResolver typeResolver)
     {
-        var freezeResult = freezableStep.TryFreeze(stepContext);
+        var freezeResult = freezableStep.TryFreeze(typeResolver);
 
         if (freezeResult.IsFailure)
             return freezeResult.ConvertFailure<Unit>();
@@ -330,7 +328,7 @@ public abstract class StepFactory : IStepFactory
         PropertyInfo propertyInfo,
         ICompoundStep parentStep,
         IReadOnlyList<IFreezableStep> freezableStepList,
-        StepContext stepContext)
+        TypeResolver typeResolver)
     {
         if (propertyInfo.GetCustomAttribute<StepListPropertyAttribute>() != null)
             return SetStepList();
@@ -373,7 +371,7 @@ public abstract class StepFactory : IStepFactory
 
             foreach (var freezableStep in freezableStepList)
             {
-                var freezeResult = freezableStep.TryFreeze(stepContext);
+                var freezeResult = freezableStep.TryFreeze(typeResolver);
 
                 if (freezeResult.IsFailure)
                     errors.Add(freezeResult.Error);
@@ -421,7 +419,7 @@ public abstract class StepFactory : IStepFactory
 
             foreach (var freezableStep in freezableStepList)
             {
-                var freezeResult = freezableStep.TryFreeze(stepContext);
+                var freezeResult = freezableStep.TryFreeze(typeResolver);
 
                 if (freezeResult.IsFailure)
                     errors.Add(freezeResult.Error);
@@ -453,7 +451,7 @@ public abstract class StepFactory : IStepFactory
         }
     }
 
-    private static readonly Regex SpaceRegex = new Regex(@"\s+", RegexOptions.Compiled);
+    private static readonly Regex SpaceRegex = new(@"\s+", RegexOptions.Compiled);
     private static string CompressSpaces(string stepName) => SpaceRegex.Replace(stepName, " ");
 
     /// <summary>

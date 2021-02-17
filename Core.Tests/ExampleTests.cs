@@ -27,7 +27,9 @@ namespace Reductech.EDR.Core.Tests
 [AutoTheory.UseTestOutputHelper]
 public partial class ExampleTests
 {
+    #pragma warning disable xUnit1004 // Test methods should not be skipped
     [Theory(Skip = "skip")]
+    #pragma warning restore xUnit1004 // Test methods should not be skipped
     [Trait("Category", "Integration")]
     [InlineData(@"C:\Users\wainw\source\repos\Reductech\edr\Examples\Sort.scl")]
     [InlineData(@"C:\Users\wainw\source\repos\Reductech\edr\Examples\EntityMapProperties.scl")]
@@ -47,7 +49,7 @@ public partial class ExampleTests
                 string.Join(
                     ", ",
                     stepResult.Error.GetAllErrors()
-                        .Select(x => x.Message + " " + x.Location.AsString)
+                        .Select(x => x.Message + " " + x.Location.AsString())
                 )
             );
 
@@ -101,7 +103,9 @@ Bar: (Type: 'String' Multiplicity: 'ExactlyOne')
         r.ShouldBeSuccessful(x => x.ToString()!);
     }
 
+    #pragma warning disable xUnit1004 // Test methods should not be skipped
     [Fact(Skip = "skip")]
+    #pragma warning restore xUnit1004 // Test methods should not be skipped
     [Trait("Category", "Integration")]
     public async Task RunObjectSequence()
     {

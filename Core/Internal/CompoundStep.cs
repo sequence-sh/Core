@@ -53,7 +53,8 @@ public abstract class CompoundStep<T> : ICompoundStep<T>
             {
                 stateMonad.Logger.LogSituation(
                     LogSituation.ExitStepFailure,
-                    new[] { Name, result.Error.AsString }
+                    Name,
+                    result.Error.AsString
                 );
             }
             else
@@ -62,7 +63,8 @@ public abstract class CompoundStep<T> : ICompoundStep<T>
 
                 stateMonad.Logger.LogSituation(
                     LogSituation.ExitStepSuccess,
-                    new[] { Name, resultValue }
+                    Name,
+                    resultValue
                 );
             }
 
@@ -89,12 +91,7 @@ public abstract class CompoundStep<T> : ICompoundStep<T>
     {
         return Run(stateMonad, cancellationToken)
             .BindCast<T, T1, IError>(
-                new SingleError(
-                    new StepErrorLocation(this),
-                    ErrorCode.InvalidCast,
-                    typeof(T),
-                    typeof(T1)
-                )
+                ErrorCode.InvalidCast.ToErrorBuilder(typeof(T), typeof(T1)).WithLocation(this)
             );
     }
 
@@ -116,6 +113,11 @@ public abstract class CompoundStep<T> : ICompoundStep<T>
     /// Configuration for this step.
     /// </summary>
     public Configuration? Configuration { get; set; }
+
+    /// <summary>
+    /// The text location for this step.
+    /// </summary>
+    public TextLocation? TextLocation { get; set; }
 
     /// <inheritdoc />
     public virtual IEnumerable<Requirement> RuntimeRequirements
@@ -207,20 +209,17 @@ public abstract class CompoundStep<T> : ICompoundStep<T>
                 .ToDictionary(
                     x => new StepParameterReference(x.Name),
                     x => x.Match(
-                        vn => new FreezableStepProperty(vn, new StepErrorLocation(this)),
-                        s => new FreezableStepProperty(
-                            s.Unfreeze(),
-                            new StepErrorLocation(this)
-                        ),
+                        vn => new FreezableStepProperty(vn,          TextLocation),
+                        s => new FreezableStepProperty(s.Unfreeze(), TextLocation),
                         sl =>
                             new FreezableStepProperty(
                                 sl.Select(s => s.Unfreeze()).ToImmutableList(),
-                                new StepErrorLocation(this)
+                                TextLocation
                             )
                     )
                 );
 
-            return new FreezableStepData(dict, new StepErrorLocation(this));
+            return new FreezableStepData(dict, TextLocation);
         }
     }
 
@@ -228,7 +227,8 @@ public abstract class CompoundStep<T> : ICompoundStep<T>
     public IFreezableStep Unfreeze() => new CompoundFreezableStep(
         StepFactory.TypeName,
         FreezableStepData,
-        Configuration
+        Configuration,
+        TextLocation
     );
 
     /// <summary>
@@ -237,13 +237,11 @@ public abstract class CompoundStep<T> : ICompoundStep<T>
     public virtual Result<Unit, IError> VerifyThis(SCLSettings settings) => Unit.Default;
 
     /// <inheritdoc />
-    public virtual Result<StepContext, IError> TryGetScopedContext(
-        StepContext baseContext,
-        IFreezableStep scopedStep) => new SingleError(
-        new StepErrorLocation(this),
-        ErrorCode.CannotCreateScopedContext,
-        Name
-    );
+    public virtual Result<TypeResolver, IError> TryGetScopedTypeResolver(
+        TypeResolver baseTypeResolver,
+        IFreezableStep scopedStep) => (SingleError)ErrorCode.CannotCreateScopedContext
+        .ToErrorBuilder(Name)
+        .WithLocation(this);
 
     /// <inheritdoc />
     public Result<Unit, IError> Verify(SCLSettings settings)

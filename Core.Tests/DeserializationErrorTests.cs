@@ -21,7 +21,7 @@ public partial class DeserializationErrorTests
         {
             yield return new DeserializationErrorCase(
                 "",
-                ("SCL is empty.", EntireSequenceLocation.Instance.AsString)
+                ("SCL is empty.", ErrorLocation.EmptyLocation.AsString())
             );
 
             yield return new DeserializationErrorCase(
@@ -33,7 +33,7 @@ public partial class DeserializationErrorTests
             yield return new DeserializationErrorCase(
                 "Print Value: 'hello' Term: 'world'",
                 ("Unexpected Parameter 'Term' in 'Print'",
-                 "Line: 1, Col: 0, Idx: 0 - Line: 1, Col: 33, Idx: 33 Text: Print Value: 'hello' Term: 'world'")
+                 "Print - Line: 1, Col: 0, Idx: 0 - Line: 1, Col: 33, Idx: 33 Text: Print Value: 'hello' Term: 'world'")
             );
 
             yield return new DeserializationErrorCase(
@@ -57,13 +57,13 @@ public partial class DeserializationErrorTests
             yield return new DeserializationErrorCase(
                 "Foreach ['one', 'two'] (Print (<Entity> + 1))",
                 ("'StringJoin' cannot take the value '1'",
-                 "StringJoin")
+                 "StringJoin - Line: 1, Col: 31, Idx: 31 - Line: 1, Col: 42, Idx: 42 Text: <Entity> + 1")
             );
 
             yield return new DeserializationErrorCase(
                 "Foreach ['one', 'two'] (Print (<Num> + 1)) <Num>",
                 ("'StringJoin' cannot take the value '1'",
-                 "StringJoin")
+                 "StringJoin - Line: 1, Col: 31, Idx: 31 - Line: 1, Col: 39, Idx: 39 Text: <Num> + 1")
             );
 
             yield return new DeserializationErrorCase(
@@ -109,7 +109,9 @@ public partial class DeserializationErrorTests
             result.IsFailure.Should().BeTrue("Case should fail");
 
             var realErrorPairs =
-                result.Error.GetAllErrors().Select(x => (x.Message, x.Location.AsString)).ToArray();
+                result.Error.GetAllErrors()
+                    .Select(x => (x.Message, x.Location.AsString()))
+                    .ToArray();
 
             realErrorPairs.Should().BeEquivalentTo(ExpectedErrors);
         }

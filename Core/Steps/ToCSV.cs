@@ -32,7 +32,7 @@ public sealed class ToCSV : CompoundStep<StringStream>
             AlwaysQuote,
             MultiValueDelimiter,
             DateTimeFormat,
-            new StepErrorLocation(this),
+            new ErrorLocation(this),
             cancellationToken
         );
 

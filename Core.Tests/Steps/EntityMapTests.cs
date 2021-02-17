@@ -83,7 +83,7 @@ public partial class EntityMapTests : StepTestBase<EntityMap, Array<Entity>>
                     Function     = Constant(Entity.Create(("Key", "Value")))
                 },
                 new SingleError(
-                    EntireSequenceLocation.Instance,
+                    ErrorLocation.EmptyLocation,
                     ErrorCode.Test,
                     "Stream Fail"
                 )

@@ -182,12 +182,12 @@ public class ExternalProcessRunner : IExternalProcessRunner
         return Unit.Default;
     }
 
-    private static readonly Regex BackslashRegex = new Regex(
+    private static readonly Regex BackslashRegex = new(
         @"(\\*)" + "\"",
         RegexOptions.Compiled
     );
 
-    private static readonly Regex TermWithSpaceRegex = new Regex(
+    private static readonly Regex TermWithSpaceRegex = new(
         @"^(.*\s.*?)(\\*)$",
         RegexOptions.Compiled | RegexOptions.Singleline
     );

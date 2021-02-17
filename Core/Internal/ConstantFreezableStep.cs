@@ -12,16 +12,17 @@ namespace Reductech.EDR.Core.Internal
 /// <summary>
 /// A constant string
 /// </summary>
-public class StringConstantFreezable : ConstantFreezableBase<StringStream>
+public record StringConstantFreezable
+    (StringStream Value, TextLocation? TextLocation) : ConstantFreezableBase<StringStream>(
+        Value,
+        TextLocation
+    )
 {
-    /// <inheritdoc />
-    public StringConstantFreezable(StringStream value) : base(value) { }
-
     /// <inheritdoc />
     public override string StepName => Value.Name;
 
     /// <inheritdoc />
-    public override Result<IStep, IError> TryFreeze(StepContext stepContext) =>
+    public override Result<IStep, IError> TryFreeze(TypeResolver typeResolver) =>
         new StringConstant(Value);
 
     /// <inheritdoc />
@@ -31,16 +32,14 @@ public class StringConstantFreezable : ConstantFreezableBase<StringStream>
 /// <summary>
 /// A constant int
 /// </summary>
-public class IntConstantFreezable : ConstantFreezableBase<int>
+public record IntConstantFreezable
+    (int Value, TextLocation? TextLocation) : ConstantFreezableBase<int>(Value, TextLocation)
 {
-    /// <inheritdoc />
-    public IntConstantFreezable(int value) : base(value) { }
-
     /// <inheritdoc />
     public override string StepName => Value.ToString();
 
     /// <inheritdoc />
-    public override Result<IStep, IError> TryFreeze(StepContext stepContext) =>
+    public override Result<IStep, IError> TryFreeze(TypeResolver typeResolver) =>
         new IntConstant(Value);
 
     /// <inheritdoc />
@@ -50,16 +49,14 @@ public class IntConstantFreezable : ConstantFreezableBase<int>
 /// <summary>
 /// A constant double
 /// </summary>
-public class DoubleConstantFreezable : ConstantFreezableBase<double>
+public record DoubleConstantFreezable
+    (double Value, TextLocation? TextLocation) : ConstantFreezableBase<double>(Value, TextLocation)
 {
-    /// <inheritdoc />
-    public DoubleConstantFreezable(double value) : base(value) { }
-
     /// <inheritdoc />
     public override string StepName => Value.ToString(Constants.DoubleFormat);
 
     /// <inheritdoc />
-    public override Result<IStep, IError> TryFreeze(StepContext stepContext) =>
+    public override Result<IStep, IError> TryFreeze(TypeResolver typeResolver) =>
         new DoubleConstant(Value);
 
     /// <inheritdoc />
@@ -69,16 +66,14 @@ public class DoubleConstantFreezable : ConstantFreezableBase<double>
 /// <summary>
 /// A constant bool
 /// </summary>
-public class BoolConstantFreezable : ConstantFreezableBase<bool>
+public record BoolConstantFreezable
+    (bool Value, TextLocation? TextLocation) : ConstantFreezableBase<bool>(Value, TextLocation)
 {
-    /// <inheritdoc />
-    public BoolConstantFreezable(bool value) : base(value) { }
-
     /// <inheritdoc />
     public override string StepName => Value.ToString();
 
     /// <inheritdoc />
-    public override Result<IStep, IError> TryFreeze(StepContext stepContext) =>
+    public override Result<IStep, IError> TryFreeze(TypeResolver typeResolver) =>
         new BoolConstant(Value);
 
     /// <inheritdoc />
@@ -88,16 +83,17 @@ public class BoolConstantFreezable : ConstantFreezableBase<bool>
 /// <summary>
 /// A constant DateTime
 /// </summary>
-public class DateTimeConstantFreezable : ConstantFreezableBase<DateTime>
+public record DateTimeConstantFreezable
+    (DateTime Value, TextLocation? TextLocation) : ConstantFreezableBase<DateTime>(
+        Value,
+        TextLocation
+    )
 {
-    /// <inheritdoc />
-    public DateTimeConstantFreezable(DateTime value) : base(value) { }
-
     /// <inheritdoc />
     public override string StepName => Value.ToString(Constants.DateTimeFormat);
 
     /// <inheritdoc />
-    public override Result<IStep, IError> TryFreeze(StepContext stepContext) =>
+    public override Result<IStep, IError> TryFreeze(TypeResolver typeResolver) =>
         new DateTimeConstant(Value);
 
     /// <inheritdoc />
@@ -107,16 +103,14 @@ public class DateTimeConstantFreezable : ConstantFreezableBase<DateTime>
 /// <summary>
 /// An entity Constant
 /// </summary>
-public class EntityConstantFreezable : ConstantFreezableBase<Entity>
+public record EntityConstantFreezable
+    (Entity Value, TextLocation? TextLocation) : ConstantFreezableBase<Entity>(Value, TextLocation)
 {
-    /// <inheritdoc />
-    public EntityConstantFreezable(Entity value) : base(value) { }
-
     /// <inheritdoc />
     public override string StepName => Value.Serialize();
 
     /// <inheritdoc />
-    public override Result<IStep, IError> TryFreeze(StepContext stepContext) =>
+    public override Result<IStep, IError> TryFreeze(TypeResolver typeResolver) =>
         new EntityConstant(Value);
 
     /// <inheritdoc />
@@ -126,18 +120,19 @@ public class EntityConstantFreezable : ConstantFreezableBase<Entity>
 /// <summary>
 /// An Enum Constant
 /// </summary>
-public class EnumConstantFreezable : ConstantFreezableBase<Enumeration>
+public record EnumConstantFreezable
+    (Enumeration Value, TextLocation? TextLocation) : ConstantFreezableBase<Enumeration>(
+        Value,
+        TextLocation
+    )
 {
-    /// <inheritdoc />
-    public EnumConstantFreezable(Enumeration value) : base(value) { }
-
     /// <inheritdoc />
     public override string StepName => Value.ToString();
 
     /// <inheritdoc />
-    public override Result<IStep, IError> TryFreeze(StepContext stepContext)
+    public override Result<IStep, IError> TryFreeze(TypeResolver typeResolver)
     {
-        var type = TryGetType(stepContext.TypeResolver);
+        var type = TryGetType(typeResolver);
 
         if (type.IsFailure)
             return type.ConvertFailure<IStep>();
@@ -145,11 +140,8 @@ public class EnumConstantFreezable : ConstantFreezableBase<Enumeration>
         if (Enum.TryParse(type.Value, Value.Value, false, out var o))
             return TryCreateEnumConstant(o!).MapError(x => x.WithLocation(this));
 
-        return new SingleError(
-            new FreezableStepErrorLocation(this),
-            ErrorCode.UnexpectedEnumValue,
-            Value.Type
-        );
+        return (SingleError)ErrorCode.UnexpectedEnumValue.ToErrorBuilder(Value.Type, Value.Value)
+            .WithLocation(this);
     }
 
     /// <inheritdoc />
@@ -165,11 +157,8 @@ public class EnumConstantFreezable : ConstantFreezableBase<Enumeration>
         if (typeResolver.StepFactoryStore.EnumTypesDictionary.TryGetValue(Value.Type, out var t))
             return t;
 
-        return new SingleError(
-            new FreezableStepErrorLocation(this),
-            ErrorCode.UnexpectedEnumType,
-            Value.Type
-        );
+        return (SingleError)ErrorCode.UnexpectedEnumType.ToErrorBuilder(Value.Type)
+            .WithLocation(this);
     }
 
     /// <summary>
@@ -220,23 +209,16 @@ public interface IConstantFreezableStep : IFreezableStep
 /// <summary>
 /// The base class for freezable constants
 /// </summary>
-public abstract class ConstantFreezableBase<T> : IConstantFreezableStep
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+public abstract record ConstantFreezableBase<T>
+    (T Value, TextLocation? TextLocation) : IConstantFreezableStep
+    #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
 {
-    /// <summary>
-    /// Create a new ConstantFreezable
-    /// </summary>
-    protected ConstantFreezableBase(T value) => Value = value;
-
-    /// <summary>
-    /// The constant value
-    /// </summary>
-    public T Value { get; }
-
     /// <inheritdoc />
     public abstract string StepName { get; }
 
     /// <inheritdoc />
-    public abstract Result<IStep, IError> TryFreeze(StepContext stepContext);
+    public abstract Result<IStep, IError> TryFreeze(TypeResolver typeResolver);
 
     /// <inheritdoc />
     public Result<IReadOnlyCollection<(VariableName variableName, Maybe<ITypeReference>)>, IError>
@@ -265,10 +247,6 @@ public abstract class ConstantFreezableBase<T> : IConstantFreezableStep
 
         return r;
     }
-
-    /// <inheritdoc />
-    public override bool Equals(object? obj) =>
-        ReferenceEquals(this, obj) || obj is IFreezableStep other && Equals(other);
 
     /// <inheritdoc />
     public override int GetHashCode() => Value!.GetHashCode();

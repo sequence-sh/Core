@@ -29,7 +29,7 @@ public sealed class FromCSV : CompoundStep<Core.Array<Entity>>
             CommentCharacter,
             QuoteCharacter,
             MultiValueDelimiter,
-            new StepErrorLocation(this),
+            new ErrorLocation(this),
             cancellationToken
         );
 

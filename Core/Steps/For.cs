@@ -82,7 +82,7 @@ public sealed class For : CompoundStep<Unit>
             return setResult.ConvertFailure<Unit>();
 
         if (increment.Value == 0)
-            return new SingleError(new StepErrorLocation(this), ErrorCode.DivideByZero);
+            return new SingleError(new ErrorLocation(this), ErrorCode.DivideByZero);
 
         while (increment.Value > 0 ? currentValue <= to.Value : currentValue >= to.Value)
         {
@@ -112,15 +112,15 @@ public sealed class For : CompoundStep<Unit>
     }
 
     /// <inheritdoc />
-    public override Result<StepContext, IError> TryGetScopedContext(
-        StepContext baseContext,
+    public override Result<TypeResolver, IError> TryGetScopedTypeResolver(
+        TypeResolver baseTypeResolver,
         IFreezableStep scopedStep)
     {
-        return baseContext.TryCloneWithScopedStep(
+        return baseTypeResolver.TryCloneWithScopedStep(
             Variable,
             new ActualTypeReference(typeof(int)),
             scopedStep,
-            new StepErrorLocation(this)
+            new ErrorLocation(this)
         );
     }
 

@@ -19,7 +19,7 @@ public sealed class FreezableStepData : IEquatable<FreezableStepData>
     /// <summary>
     /// Creates a new FreezableStepData
     /// </summary>
-    public FreezableStepData(StepParameterDict stepProperties, IErrorLocation location)
+    public FreezableStepData(StepParameterDict stepProperties, TextLocation? location)
     {
         StepProperties = stepProperties;
         Location       = location;
@@ -33,7 +33,7 @@ public sealed class FreezableStepData : IEquatable<FreezableStepData>
     /// <summary>
     /// The location where this data comes from.
     /// </summary>
-    public IErrorLocation Location { get; }
+    public TextLocation? Location { get; }
 
     private Result<T, IError> TryGetValue<T>(
         string propertyName,
@@ -50,7 +50,8 @@ public sealed class FreezableStepData : IEquatable<FreezableStepData>
                 return extractValue(value);
 
         return Result.Failure<T, IError>(
-            ErrorHelper.MissingParameterError(propertyName).WithLocation(Location)
+            ErrorHelper.MissingParameterError(propertyName)
+                .WithLocation(new ErrorLocation(stepType.Name, Location))
         );
     }
 

@@ -14,7 +14,7 @@ public sealed record ErrorCode : ErrorCodeBase
     public override string GetFormatString()
     {
         var localizedMessage =
-            ErrorMessages_EN.ResourceManager.GetString(Code); //TODO static method to get this
+            ErrorMessages_EN.ResourceManager.GetString(Code);
 
         Debug.Assert(localizedMessage != null, nameof(localizedMessage) + " != null");
         return localizedMessage;

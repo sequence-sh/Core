@@ -102,7 +102,7 @@ public class StepFactoryStore
 
         if (stepType.IsGenericType)
         {
-            var arguments = (stepType as TypeInfo).GenericTypeParameters
+            var arguments = ((TypeInfo)stepType).GenericTypeParameters
                 .Select(x => typeof(int))
                 .ToArray();
 

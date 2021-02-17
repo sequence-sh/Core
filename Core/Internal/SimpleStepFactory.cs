@@ -22,7 +22,7 @@ public class SimpleStepFactory<TStep, TOutput> : StepFactory
 
     /// <inheritdoc />
     protected override Result<ICompoundStep, IError> TryCreateInstance(
-        StepContext stepContext,
+        TypeResolver typeResolver,
         FreezableStepData freezeData) => new TStep();
 
     /// <inheritdoc />
