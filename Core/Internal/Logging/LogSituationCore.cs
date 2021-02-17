@@ -104,11 +104,11 @@ public sealed record LogSituation : LogSituationBase
     );
 
     /// <summary>
-    /// ExternalProcess {process} started with arguments: '{arguments}' and environmentVariables: '{environmentVariables}'
+    /// ExternalProcess {process} started with arguments: '{arguments}'
     /// </summary>
     public static readonly LogSituation ExternalProcessStarted = new(
         nameof(ExternalProcessStarted),
-        LogLevel.Trace
+        LogLevel.Debug
     );
 
     /// <summary>
@@ -133,6 +133,14 @@ public sealed record LogSituation : LogSituationBase
     public static readonly LogSituation SequenceCompleted = new(
         nameof(SequenceCompleted),
         LogLevel.Debug
+    );
+
+    /// <summary>
+    /// {EnvironmentVariableName}: {EnvironmentVariableValue}
+    /// </summary>
+    public static readonly LogSituation EnvironmentVariable = new(
+        nameof(EnvironmentVariable),
+        LogLevel.Trace
     );
 }
 

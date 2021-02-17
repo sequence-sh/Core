@@ -126,6 +126,9 @@
   <data name="EnterStep" xml:space="preserve">
     <value>{StepName} Started with Parameters: {Parameters}</value>
   </data>
+  <data name="EnvironmentVariable" xml:space="preserve">
+    <value>{EnvironmentVariableName}: {EnvironmentVariableValue}</value>
+  </data>
   <data name="ExitStepFailure" xml:space="preserve">
     <value>{StepName} Failed with message: {Message}</value>
   </data>
@@ -133,7 +136,7 @@
     <value>{StepName} Completed Successfully with Result: {Result}</value>
   </data>
   <data name="ExternalProcessStarted" xml:space="preserve">
-    <value>ExternalProcess {process} started with arguments: '{arguments}' and environmentVariables: '{environmentVariables}'</value>
+    <value>ExternalProcess {process} started with arguments: '{arguments}'</value>
   </data>
   <data name="FileDeleted" xml:space="preserve">
     <value>File Deleted: {Path}</value>

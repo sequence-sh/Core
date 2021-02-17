@@ -88,6 +88,15 @@ namespace Reductech.EDR.Core.Internal.Logging {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to {EnvironmentVariableName}: {EnvironmentVariableValue}.
+        /// </summary>
+        internal static string EnvironmentVariable {
+            get {
+                return ResourceManager.GetString("EnvironmentVariable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to {StepName} Failed with message: {Message}.
         /// </summary>
         internal static string ExitStepFailure {
@@ -106,7 +115,7 @@ namespace Reductech.EDR.Core.Internal.Logging {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to ExternalProcess {process} started with arguments: &apos;{arguments}&apos; and environmentVariables: &apos;{environmentVariables}&apos;.
+        ///   Looks up a localized string similar to ExternalProcess {process} started with arguments: &apos;{arguments}&apos;.
         /// </summary>
         internal static string ExternalProcessStarted {
             get {
