@@ -26,7 +26,7 @@ public partial class LoggingTests
             yield return new LoggingTestCase(
                 "Log 1",
                 "Log 1",
-                CheckMessageAndScope(LogLevel.Trace, "Sequence Started with Settings: ()", null),
+                CheckMessageAndScope(LogLevel.Debug, "EDR Sequence Started", null),
                 CheckMessageAndScope(
                     LogLevel.Trace,
                     "Log Started with Parameters: [Value, 1]",
@@ -37,13 +37,14 @@ public partial class LoggingTests
                     LogLevel.Trace,
                     "Log Completed Successfully with Result: Unit",
                     "Log"
-                )
+                ),
+                CheckMessageAndScope(LogLevel.Debug, "EDR Sequence Completed", null)
             );
 
             yield return new LoggingTestCase(
                 "Log 1 + 1",
                 "Log (1 + 1)",
-                CheckMessageAndScope(LogLevel.Trace, "Sequence Started with Settings: ()", null),
+                CheckMessageAndScope(LogLevel.Debug, "EDR Sequence Started", null),
                 CheckMessageAndScope(
                     LogLevel.Trace,
                     "Log Started with Parameters: [Value, Sum]",
@@ -74,13 +75,14 @@ public partial class LoggingTests
                     LogLevel.Trace,
                     "Log Completed Successfully with Result: Unit",
                     null
-                )
+                ),
+                CheckMessageAndScope(LogLevel.Debug, "EDR Sequence Completed", null)
             );
 
             yield return new LoggingTestCase(
                 "Error",
                 "AssertError (Log (1 / 0))",
-                CheckMessageAndScope(LogLevel.Trace, "Sequence Started with Settings: ()", null),
+                CheckMessageAndScope(LogLevel.Debug, "EDR Sequence Started", null),
                 CheckMessageAndScope(
                     LogLevel.Trace,
                     "AssertError Started with Parameters: [Step, Log]",
@@ -120,18 +122,15 @@ public partial class LoggingTests
                     LogLevel.Trace,
                     "AssertError Completed Successfully with Result: Unit",
                     null
-                )
+                ),
+                CheckMessageAndScope(LogLevel.Debug, "EDR Sequence Completed", null)
             );
 
             yield return new
                 LoggingTestCase(
                     "No Path to combine",
                     "Log (PathCombine [])",
-                    CheckMessageAndScope(
-                        LogLevel.Trace,
-                        "Sequence Started with Settings: ()",
-                        null
-                    ),
+                    CheckMessageAndScope(LogLevel.Debug, "EDR Sequence Started", null),
                     CheckMessageAndScope(
                         LogLevel.Trace,
                         "Log Started with Parameters: [Value, PathCombine]",
@@ -167,7 +166,8 @@ public partial class LoggingTests
                         LogLevel.Trace,
                         "Log Completed Successfully with Result: Unit",
                         null
-                    )
+                    ),
+                    CheckMessageAndScope(LogLevel.Debug, "EDR Sequence Completed", null)
                 ).WithDirectoryAction(
                 x =>
                     x.Setup(f => f.GetCurrentDirectory()).Returns("MyDir")
@@ -176,11 +176,7 @@ public partial class LoggingTests
             yield return new LoggingTestCase(
                     "Unqualified Path to combine",
                     "Log (PathCombine ['File'])",
-                    CheckMessageAndScope(
-                        LogLevel.Trace,
-                        "Sequence Started with Settings: ()",
-                        null
-                    ),
+                    CheckMessageAndScope(LogLevel.Debug, "EDR Sequence Started", null),
                     CheckMessageAndScope(
                         LogLevel.Trace,
                         "Log Started with Parameters: [Value, PathCombine]",
@@ -220,7 +216,8 @@ public partial class LoggingTests
                         LogLevel.Trace,
                         "Log Completed Successfully with Result: Unit",
                         null
-                    )
+                    ),
+                    CheckMessageAndScope(LogLevel.Debug, "EDR Sequence Completed", null)
                 )
                 .WithDirectoryAction(
                     x =>
@@ -230,7 +227,7 @@ public partial class LoggingTests
             yield return new LoggingTestCase(
                 "File Read",
                 "FileRead 'MyFile' | Log",
-                CheckMessageAndScope(LogLevel.Trace, "Sequence Started with Settings: ()", null),
+                CheckMessageAndScope(LogLevel.Debug, "EDR Sequence Started", null),
                 CheckMessageAndScope(
                     LogLevel.Trace,
                     "Log Started with Parameters: [Value, FileRead]",
@@ -251,7 +248,8 @@ public partial class LoggingTests
                     LogLevel.Trace,
                     "Log Completed Successfully with Result: Unit",
                     null
-                )
+                ),
+                CheckMessageAndScope(LogLevel.Debug, "EDR Sequence Completed", null)
             ).WithFileAction(
                 x => x.Setup(a => a.OpenRead("MyFile"))
                     .Returns(
