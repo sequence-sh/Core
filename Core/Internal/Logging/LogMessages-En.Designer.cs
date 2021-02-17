@@ -61,6 +61,15 @@ namespace Reductech.EDR.Core.Internal.Logging {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to ConnectorSettings: {settings}.
+        /// </summary>
+        internal static string ConnectorSettings {
+            get {
+                return ResourceManager.GetString("ConnectorSettings", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Directory Deleted: {Path}.
         /// </summary>
         internal static string DirectoryDeleted {
@@ -160,7 +169,16 @@ namespace Reductech.EDR.Core.Internal.Logging {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Sequence Started with Settings: {settings}.
+        ///   Looks up a localized string similar to EDR Sequence Completed.
+        /// </summary>
+        internal static string SequenceCompleted {
+            get {
+                return ResourceManager.GetString("SequenceCompleted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to EDR Sequence Started.
         /// </summary>
         internal static string SequenceStarted {
             get {

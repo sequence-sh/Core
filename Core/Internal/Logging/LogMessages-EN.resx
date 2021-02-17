@@ -117,6 +117,9 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="ConnectorSettings" xml:space="preserve">
+    <value>ConnectorSettings: {settings}</value>
+  </data>
   <data name="DirectoryDeleted" xml:space="preserve">
     <value>Directory Deleted: {Path}</value>
   </data>
@@ -150,8 +153,11 @@
   <data name="SchemaViolation" xml:space="preserve">
     <value>Schema violation: {message}</value>
   </data>
+  <data name="SequenceCompleted" xml:space="preserve">
+    <value>EDR Sequence Completed</value>
+  </data>
   <data name="SequenceStarted" xml:space="preserve">
-    <value>Sequence Started with Settings: {settings}</value>
+    <value>EDR Sequence Started</value>
   </data>
   <data name="SetVariableOutOfScope" xml:space="preserve">
     <value>Could not set variable {variable} as it was out of scope.</value>

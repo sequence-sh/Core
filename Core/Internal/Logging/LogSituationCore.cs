@@ -112,11 +112,27 @@ public sealed record LogSituation : LogSituationBase
     );
 
     /// <summary>
-    /// Sequence Started with Settings: {settings}
+    /// EDR Sequence Started
     /// </summary>
     public static readonly LogSituation SequenceStarted = new(
         nameof(SequenceStarted),
+        LogLevel.Debug
+    );
+
+    /// <summary>
+    /// ConnectorSettings: {settings}
+    /// </summary>
+    public static readonly LogSituation ConnectorSettings = new(
+        nameof(ConnectorSettings),
         LogLevel.Trace
+    );
+
+    /// <summary>
+    /// EDR Sequence Completed
+    /// </summary>
+    public static readonly LogSituation SequenceCompleted = new(
+        nameof(SequenceCompleted),
+        LogLevel.Debug
     );
 }
 

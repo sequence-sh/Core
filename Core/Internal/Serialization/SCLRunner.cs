@@ -74,12 +74,21 @@ public sealed class SCLRunner
             _externalContext
         );
 
-        _logger.LogSituation(
-            LogSituation.SequenceStarted,
-            new object[] { _settings.Entity.Serialize() }
-        );
+        _logger.LogSituation(LogSituation.SequenceStarted);
+
+        var connectorSettings = _settings.Entity.TryGetValue(SCLSettings.ConnectorsKey);
+
+        if (connectorSettings.HasValue)
+        {
+            _logger.LogSituation(
+                LogSituation.ConnectorSettings,
+                connectorSettings.Value.Serialize()
+            );
+        }
 
         var runResult = await stepResult.Value.Run(stateMonad, cancellationToken);
+
+        _logger.LogSituation(LogSituation.SequenceCompleted);
 
         return runResult;
     }
@@ -98,7 +107,7 @@ public sealed class SCLRunner
 
     private static IStep<Unit> SurroundWithLog<T>(IStep<T> step)
     {
-        var p = new Log<T>() { Value = step };
+        var p = new Log<T> { Value = step };
 
         return p;
     }
