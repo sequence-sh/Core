@@ -117,11 +117,17 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="ConnectorSettings" xml:space="preserve">
+    <value>ConnectorSettings: {settings}</value>
+  </data>
   <data name="DirectoryDeleted" xml:space="preserve">
     <value>Directory Deleted: {Path}</value>
   </data>
   <data name="EnterStep" xml:space="preserve">
     <value>{StepName} Started with Parameters: {Parameters}</value>
+  </data>
+  <data name="EnvironmentVariable" xml:space="preserve">
+    <value>{EnvironmentVariableName}: {EnvironmentVariableValue}</value>
   </data>
   <data name="ExitStepFailure" xml:space="preserve">
     <value>{StepName} Failed with message: {Message}</value>
@@ -130,7 +136,7 @@
     <value>{StepName} Completed Successfully with Result: {Result}</value>
   </data>
   <data name="ExternalProcessStarted" xml:space="preserve">
-    <value>ExternalProcess {process} started with arguments: '{arguments}' and environmentVariables: '{environmentVariables}'</value>
+    <value>ExternalProcess {process} started with arguments: '{arguments}'</value>
   </data>
   <data name="FileDeleted" xml:space="preserve">
     <value>File Deleted: {Path}</value>
@@ -150,8 +156,11 @@
   <data name="SchemaViolation" xml:space="preserve">
     <value>Schema violation: {message}</value>
   </data>
+  <data name="SequenceCompleted" xml:space="preserve">
+    <value>EDR Sequence Completed</value>
+  </data>
   <data name="SequenceStarted" xml:space="preserve">
-    <value>Sequence Started with Settings: {settings}</value>
+    <value>EDR Sequence Started</value>
   </data>
   <data name="SetVariableOutOfScope" xml:space="preserve">
     <value>Could not set variable {variable} as it was out of scope.</value>

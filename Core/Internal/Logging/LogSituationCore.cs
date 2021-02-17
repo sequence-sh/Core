@@ -104,18 +104,42 @@ public sealed record LogSituation : LogSituationBase
     );
 
     /// <summary>
-    /// ExternalProcess {process} started with arguments: '{arguments}' and environmentVariables: '{environmentVariables}'
+    /// ExternalProcess {process} started with arguments: '{arguments}'
     /// </summary>
     public static readonly LogSituation ExternalProcessStarted = new(
         nameof(ExternalProcessStarted),
+        LogLevel.Debug
+    );
+
+    /// <summary>
+    /// EDR Sequence Started
+    /// </summary>
+    public static readonly LogSituation SequenceStarted = new(
+        nameof(SequenceStarted),
+        LogLevel.Debug
+    );
+
+    /// <summary>
+    /// ConnectorSettings: {settings}
+    /// </summary>
+    public static readonly LogSituation ConnectorSettings = new(
+        nameof(ConnectorSettings),
         LogLevel.Trace
     );
 
     /// <summary>
-    /// Sequence Started with Settings: {settings}
+    /// EDR Sequence Completed
     /// </summary>
-    public static readonly LogSituation SequenceStarted = new(
-        nameof(SequenceStarted),
+    public static readonly LogSituation SequenceCompleted = new(
+        nameof(SequenceCompleted),
+        LogLevel.Debug
+    );
+
+    /// <summary>
+    /// {EnvironmentVariableName}: {EnvironmentVariableValue}
+    /// </summary>
+    public static readonly LogSituation EnvironmentVariable = new(
+        nameof(EnvironmentVariable),
         LogLevel.Trace
     );
 }

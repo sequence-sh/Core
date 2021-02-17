@@ -67,15 +67,10 @@ public class ExternalProcessRunner : IExternalProcessRunner
             );
         }
 
-        var evString = string.Join(
-            ", ",
-            pProcess.StartInfo.Environment.Select(a => $"{a.Key}: {a.Value}")
-        );
+        logger.LogSituation(LogSituation.ExternalProcessStarted, processPath, argumentString);
 
-        logger.LogSituation(
-            LogSituation.ExternalProcessStarted,
-            new object[] { processPath, argumentString, evString }
-        );
+        foreach (var (key, value) in pProcess.StartInfo.Environment)
+            logger.LogSituation(LogSituation.EnvironmentVariable, key, value);
 
         var started = pProcess.Start();
 
@@ -111,10 +106,7 @@ public class ExternalProcessRunner : IExternalProcessRunner
 
         var argumentString = string.Join(' ', arguments.Select(EncodeParameterArgument));
 
-        logger.LogSituation(
-            LogSituation.ExternalProcessStarted,
-            new object[] { processPath, argumentString }
-        );
+        logger.LogSituation(LogSituation.ExternalProcessStarted, processPath, argumentString);
 
         using var pProcess = new Process
         {
@@ -139,6 +131,9 @@ public class ExternalProcessRunner : IExternalProcessRunner
                 value
             );
         }
+
+        foreach (var (key, value) in pProcess.StartInfo.Environment)
+            logger.LogSituation(LogSituation.EnvironmentVariable, key, value);
 
         var errors = new List<IErrorBuilder>();
 

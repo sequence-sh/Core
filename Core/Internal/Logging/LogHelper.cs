@@ -17,6 +17,16 @@ public static class LogHelper
     public static void LogSituation<T>(
         this ILogger logger,
         T situation,
+        params object?[] args) where T : LogSituationBase =>
+        LogSituation(logger, situation, args.AsEnumerable());
+
+    /// <summary>
+    /// Logs a message for the particular situation.
+    /// Will use the resource to localize the message
+    /// </summary>
+    public static void LogSituation<T>(
+        this ILogger logger,
+        T situation,
         IEnumerable<object?> args) where T : LogSituationBase
     {
         var logLevel = situation.LogLevel;

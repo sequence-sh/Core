@@ -61,6 +61,15 @@ namespace Reductech.EDR.Core.Internal.Logging {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to ConnectorSettings: {settings}.
+        /// </summary>
+        internal static string ConnectorSettings {
+            get {
+                return ResourceManager.GetString("ConnectorSettings", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Directory Deleted: {Path}.
         /// </summary>
         internal static string DirectoryDeleted {
@@ -75,6 +84,15 @@ namespace Reductech.EDR.Core.Internal.Logging {
         internal static string EnterStep {
             get {
                 return ResourceManager.GetString("EnterStep", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {EnvironmentVariableName}: {EnvironmentVariableValue}.
+        /// </summary>
+        internal static string EnvironmentVariable {
+            get {
+                return ResourceManager.GetString("EnvironmentVariable", resourceCulture);
             }
         }
         
@@ -97,7 +115,7 @@ namespace Reductech.EDR.Core.Internal.Logging {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to ExternalProcess {process} started with arguments: &apos;{arguments}&apos; and environmentVariables: &apos;{environmentVariables}&apos;.
+        ///   Looks up a localized string similar to ExternalProcess {process} started with arguments: &apos;{arguments}&apos;.
         /// </summary>
         internal static string ExternalProcessStarted {
             get {
@@ -160,7 +178,16 @@ namespace Reductech.EDR.Core.Internal.Logging {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Sequence Started with Settings: {settings}.
+        ///   Looks up a localized string similar to EDR Sequence Completed.
+        /// </summary>
+        internal static string SequenceCompleted {
+            get {
+                return ResourceManager.GetString("SequenceCompleted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to EDR Sequence Started.
         /// </summary>
         internal static string SequenceStarted {
             get {
