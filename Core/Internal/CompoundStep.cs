@@ -53,7 +53,8 @@ public abstract class CompoundStep<T> : ICompoundStep<T>
             {
                 stateMonad.Logger.LogSituation(
                     LogSituation.ExitStepFailure,
-                    new[] { Name, result.Error.AsString }
+                    Name,
+                    result.Error.AsString
                 );
             }
             else
@@ -62,7 +63,8 @@ public abstract class CompoundStep<T> : ICompoundStep<T>
 
                 stateMonad.Logger.LogSituation(
                     LogSituation.ExitStepSuccess,
-                    new[] { Name, resultValue }
+                    Name,
+                    resultValue
                 );
             }
 

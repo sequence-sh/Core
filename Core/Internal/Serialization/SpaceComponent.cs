@@ -14,7 +14,7 @@ public class SpaceComponent : ISerializerBlock
     /// <summary>
     /// The instance
     /// </summary>
-    public static SpaceComponent Instance { get; } = new SpaceComponent();
+    public static SpaceComponent Instance { get; } = new();
 
     /// <inheritdoc />
     public Result<string> TryGetSegmentText(IReadOnlyDictionary<string, StepProperty> dictionary) =>

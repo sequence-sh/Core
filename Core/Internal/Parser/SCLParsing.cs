@@ -76,7 +76,7 @@ public static class SCLParsing
         /// <summary>
         /// Errors found by this error listener.
         /// </summary>
-        public readonly List<IError> Errors = new List<IError>();
+        public readonly List<IError> Errors = new();
 
         /// <inheritdoc />
         public override void SyntaxError(

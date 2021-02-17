@@ -174,7 +174,7 @@ public sealed class Schema
         {
             var warningList = ErrorBuilderList.Combine(warnings);
 
-            logger.LogSituation(LogSituation.SchemaViolation, new[] { warningList.AsString });
+            logger.LogSituation(LogSituation.SchemaViolation, warningList.AsString);
         }
 
         if (!returnEntity)

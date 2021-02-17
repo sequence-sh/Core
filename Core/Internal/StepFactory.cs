@@ -453,7 +453,7 @@ public abstract class StepFactory : IStepFactory
         }
     }
 
-    private static readonly Regex SpaceRegex = new Regex(@"\s+", RegexOptions.Compiled);
+    private static readonly Regex SpaceRegex = new(@"\s+", RegexOptions.Compiled);
     private static string CompressSpaces(string stepName) => SpaceRegex.Replace(stepName, " ");
 
     /// <summary>

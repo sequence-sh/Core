@@ -58,8 +58,7 @@ public class ErrorBuilder : IErrorBuilder, IEquatable<IErrorBuilder>
     /// <summary>
     /// Returns a SingleError with the given location.
     /// </summary>
-    public SingleError WithLocationSingle(IErrorLocation location) =>
-        new SingleError(location, this);
+    public SingleError WithLocationSingle(IErrorLocation location) => new(location, this);
 
     /// <inheritdoc />
     public string AsString => Data.Match(

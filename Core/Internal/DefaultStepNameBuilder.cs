@@ -13,7 +13,7 @@ public class DefaultStepNameBuilder : IStepNameBuilder
     /// <summary>
     /// The instance.
     /// </summary>
-    public static DefaultStepNameBuilder Instance { get; } = new DefaultStepNameBuilder();
+    public static DefaultStepNameBuilder Instance { get; } = new();
 
     /// <inheritdoc />
     public string GetFromArguments(FreezableStepData freezableStepData, IStepFactory stepFactory)
