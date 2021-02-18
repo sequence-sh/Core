@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
+using Divergic.Logging.Xunit;
 using FluentAssertions;
 using MELT;
 using Microsoft.Extensions.Logging;
@@ -28,8 +29,13 @@ public abstract partial class StepTestBase<TStep, TOutput>
         /// <inheritdoc />
         public async Task RunAsync(ITestOutputHelper testOutputHelper)
         {
-            var loggerFactory = TestLoggerFactory.Create();
-            loggerFactory.AddXunit(testOutputHelper);
+            var loggerFactory =
+                TestLoggerFactory.Create();
+
+            loggerFactory.AddXunit(
+                testOutputHelper,
+                new LoggingConfig() { LogLevel = OutputLogLevel }
+            );
 
             var step = await GetStepAsync(testOutputHelper);
 
@@ -74,6 +80,8 @@ public abstract partial class StepTestBase<TStep, TOutput>
 
         /// <inheritdoc />
         public override string ToString() => Name;
+
+        public virtual LogLevel OutputLogLevel { get; } = LogLevel.Debug;
 
         public abstract Task<IStep> GetStepAsync(ITestOutputHelper testOutputHelper);
 
