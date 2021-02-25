@@ -30,7 +30,7 @@ public sealed class EntityMap : CompoundStep<Array<Entity>>
 
         async ValueTask<Entity> Action(Entity record)
         {
-            using var scopedMonad = new ScopedStateMonad(
+            await using var scopedMonad = new ScopedStateMonad(
                 stateMonad,
                 currentState,
                 new KeyValuePair<VariableName, object>(Variable, record)

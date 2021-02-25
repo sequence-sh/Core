@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Linq;
+using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Microsoft.Extensions.Logging;
 using Reductech.EDR.Core.Abstractions;
@@ -109,7 +109,7 @@ public sealed class StateMonad : IStateMonad
     /// <summary>
     /// Creates or set the value of this variable.
     /// </summary>
-    public Result<Unit, IError> SetVariable<T>(
+    public async Task<Result<Unit, IError>> SetVariableAsync<T>(
         VariableName key,
         T variable,
         bool disposeOld,
@@ -118,17 +118,13 @@ public sealed class StateMonad : IStateMonad
         if (Disposed)
             throw new ObjectDisposedException("State Monad was disposed");
 
+        await RemoveVariableAsync(key, disposeOld, callingStep);
+
         _stateDictionary
             .AddOrUpdate(
                 key,
                 _ => variable!,
-                (_, old) =>
-                {
-                    if (disposeOld)
-                        DisposeVariable(old, this);
-
-                    return variable!;
-                }
+                (_, _) => variable!
             );
 
         return Unit.Default;
@@ -137,7 +133,7 @@ public sealed class StateMonad : IStateMonad
     /// <summary>
     /// Removes the variable if it exists.
     /// </summary>
-    public void RemoveVariable(VariableName key, bool dispose, IStep? callingStep)
+    public async Task RemoveVariableAsync(VariableName key, bool dispose, IStep? callingStep)
     {
         if (Disposed)
             throw new ObjectDisposedException("State Monad was disposed");
@@ -146,13 +142,13 @@ public sealed class StateMonad : IStateMonad
             return;
 
         if (dispose)
-            DisposeVariable(variable, this);
+            await DisposeVariableAsync(variable, this);
     }
 
-    internal static void DisposeVariable(object variable, IStateMonad stateMonad)
+    internal static async Task DisposeVariableAsync(object variable, IStateMonad stateMonad)
     {
         if (variable is IStateDisposable stateDisposable)
-            stateDisposable.Dispose(stateMonad);
+            await stateDisposable.DisposeAsync(stateMonad);
 
         if (variable is IDisposable disposable)
             disposable.Dispose();
@@ -163,17 +159,15 @@ public sealed class StateMonad : IStateMonad
     /// </summary>
     public bool Disposed { get; private set; }
 
-    /// <summary>
-    /// Dispose of this State Monad
-    /// </summary>
-    public void Dispose()
+    /// <inheritdoc />
+    public async ValueTask DisposeAsync()
     {
         if (!Disposed)
         {
             Disposed = true;
 
             foreach (var v in _stateDictionary.Values)
-                DisposeVariable(v, this);
+                await DisposeVariableAsync(v, this);
         }
     }
 }
@@ -187,7 +181,7 @@ public interface IStateDisposable
     /// Performs application defined functions associated with freeing resources
     /// </summary>
     /// <param name="state"></param>
-    void Dispose(IStateMonad state);
+    Task DisposeAsync(IStateMonad state);
 }
 
 }

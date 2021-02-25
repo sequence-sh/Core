@@ -56,7 +56,7 @@ public sealed class RegexReplace : CompoundStep<string>
         {
             sb.Append(input, lastIndex, match.Index - lastIndex);
 
-            using var scopedMonad = new ScopedStateMonad(
+            await using var scopedMonad = new ScopedStateMonad(
                 stateMonad,
                 currentState,
                 new KeyValuePair<VariableName, object>(Variable, new StringStream(match.Value))

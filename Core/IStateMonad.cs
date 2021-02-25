@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Microsoft.Extensions.Logging;
 using Reductech.EDR.Core.Abstractions;
@@ -14,7 +15,7 @@ namespace Reductech.EDR.Core
 /// <summary>
 /// The state monad that is passed between steps.
 /// </summary>
-public interface IStateMonad : IDisposable
+public interface IStateMonad : IAsyncDisposable
 {
     /// <summary>
     /// Constant metadata for the entire sequence
@@ -60,7 +61,7 @@ public interface IStateMonad : IDisposable
     /// <summary>
     /// Creates or set the value of this variable.
     /// </summary>
-    Result<Unit, IError> SetVariable<T>(
+    Task<Result<Unit, IError>> SetVariableAsync<T>(
         VariableName key,
         T variable,
         bool disposeOld,
@@ -69,7 +70,7 @@ public interface IStateMonad : IDisposable
     /// <summary>
     /// Removes the variable if it exists.
     /// </summary>
-    void RemoveVariable(VariableName key, bool dispose, IStep? callingStep);
+    Task RemoveVariableAsync(VariableName key, bool dispose, IStep? callingStep);
 
     /// <summary>
     /// Logs a message not associated with a situation.

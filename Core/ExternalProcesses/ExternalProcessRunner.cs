@@ -36,7 +36,7 @@ public class ExternalProcessRunner : IExternalProcessRunner
         IReadOnlyDictionary<string, string> environmentVariables,
         Encoding encoding,
         IStateMonad stateMonad,
-        IStep callingStep)
+        IStep? callingStep)
     {
         if (!File.Exists(processPath))
             return new ErrorBuilder(ErrorCode.ExternalProcessNotFound, processPath);
@@ -101,7 +101,7 @@ public class ExternalProcessRunner : IExternalProcessRunner
         IReadOnlyDictionary<string, string> environmentVariables,
         Encoding encoding,
         IStateMonad stateMonad,
-        IStep callingStep,
+        IStep? callingStep,
         CancellationToken cancellationToken)
     {
         if (!File.Exists(processPath))

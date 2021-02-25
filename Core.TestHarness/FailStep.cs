@@ -16,7 +16,8 @@ namespace Reductech.EDR.Core.TestHarness
 public abstract partial class StepTestBase<TStep, TOutput>
 {
     protected static
-        IEnumerable<(TStep step, IError expectedError, IReadOnlyCollection<Action<IStateMonad>>)>
+        IEnumerable<(TStep step, IError expectedError, IReadOnlyCollection<Func<IStateMonad, Task>>)
+        >
         CreateStepsWithFailStepsAsValues(object? defaultVariableValue)
     {
         var allProperties = typeof(TStep).GetProperties()
@@ -30,7 +31,7 @@ public abstract partial class StepTestBase<TStep, TOutput>
                 continue; //Don't bother testing this
 
             var     instance     = new TStep();
-            var     stateActions = new List<Action<IStateMonad>>();
+            var     stateActions = new List<Func<IStateMonad, Task>>();
             IError? error        = null;
 
             foreach (var propertyInfo in allProperties)
@@ -68,7 +69,12 @@ public abstract partial class StepTestBase<TStep, TOutput>
                     if (variableWasSet && defaultVariableValue != null)
                     {
                         stateActions.Add(
-                            x => x.SetVariable(FooVariableName(), defaultVariableValue, true, null)
+                            x => x.SetVariableAsync(
+                                FooVariableName(),
+                                defaultVariableValue,
+                                true,
+                                null
+                            )
                         );
                     }
                 }

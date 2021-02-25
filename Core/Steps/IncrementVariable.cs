@@ -45,7 +45,12 @@ public sealed class IncrementVariable : CompoundStep<Unit>
         if (amount.IsFailure)
             return amount.ConvertFailure<Unit>();
 
-        var r = stateMonad.SetVariable(Variable, variable.Value + amount.Value, false, this);
+        var r = await stateMonad.SetVariableAsync(
+            Variable,
+            variable.Value + amount.Value,
+            false,
+            this
+        );
 
         return r;
     }

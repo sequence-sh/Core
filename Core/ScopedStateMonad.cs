@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
+using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Microsoft.Extensions.Logging;
 using Reductech.EDR.Core.Abstractions;
@@ -29,13 +30,6 @@ public sealed class ScopedStateMonad : IStateMonad
         _fixedState            = fixedState;
         BaseStateMonad         = baseStateMonad;
         _scopedStateDictionary = new ConcurrentDictionary<VariableName, object>(state);
-    }
-
-    /// <inheritdoc />
-    public void Dispose()
-    {
-        foreach (var value in _scopedStateDictionary.Values)
-            StateMonad.DisposeVariable(value, this);
     }
 
     private readonly ConcurrentDictionary<VariableName, object> _scopedStateDictionary;
@@ -89,41 +83,29 @@ public sealed class ScopedStateMonad : IStateMonad
         _fixedState.ContainsKey(variable);
 
     /// <inheritdoc />
-    public Result<Unit, IError> SetVariable<T>(
+    public async Task<Result<Unit, IError>> SetVariableAsync<T>(
         VariableName key,
         T variable,
         bool disposeOld,
         IStep? callingStep)
     {
+        await RemoveVariableAsync(key, disposeOld, callingStep);
+
         _scopedStateDictionary.AddOrUpdate(
             key,
             _ => variable!,
-            (_, old) =>
-            {
-                if (disposeOld)
-                    StateMonad.DisposeVariable(old, this);
-
-                return variable!;
-            }
+            (_, _) => variable!
         );
-
-        if (_fixedState.ContainsKey(key))
-            Logger.LogSituation(
-                LogSituation.SetVariableOutOfScope,
-                callingStep,
-                this,
-                new[] { key }
-            );
 
         return Unit.Default;
     }
 
     /// <inheritdoc />
-    public void RemoveVariable(VariableName key, bool dispose, IStep? callingStep)
+    public async Task RemoveVariableAsync(VariableName key, bool dispose, IStep? callingStep)
     {
         if (_scopedStateDictionary.Remove(key, out var v) && dispose)
         {
-            StateMonad.DisposeVariable(v, this);
+            await StateMonad.DisposeVariableAsync(v, this);
         }
 
         if (_fixedState.ContainsKey(key))
@@ -133,6 +115,13 @@ public sealed class ScopedStateMonad : IStateMonad
                 this,
                 new[] { key }
             );
+    }
+
+    /// <inheritdoc />
+    public async ValueTask DisposeAsync()
+    {
+        foreach (var value in _scopedStateDictionary.Values)
+            await StateMonad.DisposeVariableAsync(value, this);
     }
 }
 

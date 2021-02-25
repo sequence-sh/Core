@@ -33,7 +33,7 @@ public sealed class ArrayFilter<T> : CompoundStep<Array<T>>
 
         async IAsyncEnumerable<T> Filter(T record)
         {
-            using var scopedMonad = new ScopedStateMonad(
+            await using var scopedMonad = new ScopedStateMonad(
                 stateMonad,
                 currentState,
                 new KeyValuePair<VariableName, object>(Variable, record!)
