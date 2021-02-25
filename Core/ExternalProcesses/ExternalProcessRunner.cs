@@ -85,18 +85,12 @@ public class ExternalProcessRunner : IExternalProcessRunner
         if (!started)
             return new ErrorBuilder(ErrorCode.ExternalProcessError, "Could not start");
 
-        AppDomain.CurrentDomain.ProcessExit  += KillProcess;
-        AppDomain.CurrentDomain.DomainUnload += KillProcess;
-
         var reference = new ExternalProcessReference(pProcess);
 
-        return reference;
+        AppDomain.CurrentDomain.ProcessExit  += (_, _) => reference.Dispose();
+        AppDomain.CurrentDomain.DomainUnload += (_, _) => reference.Dispose();
 
-        void KillProcess(object? sender, EventArgs e)
-        {
-            if (!pProcess.HasExited)
-                pProcess.Kill(true);
-        }
+        return reference;
     }
 
     /// <inheritdoc />

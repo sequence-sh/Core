@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Concurrent;
+﻿using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
@@ -35,10 +34,8 @@ public sealed class ScopedStateMonad : IStateMonad
     /// <inheritdoc />
     public void Dispose()
     {
-        foreach (var disposable in _scopedStateDictionary.Values.OfType<IDisposable>())
-        {
-            disposable.Dispose();
-        }
+        foreach (var value in _scopedStateDictionary.Values)
+            StateMonad.DisposeVariable(value, this);
     }
 
     private readonly ConcurrentDictionary<VariableName, object> _scopedStateDictionary;
@@ -92,34 +89,49 @@ public sealed class ScopedStateMonad : IStateMonad
         _fixedState.ContainsKey(variable);
 
     /// <inheritdoc />
-    public Result<Unit, IError> SetVariable<T>(VariableName key, T variable, IStep callingStep)
+    public Result<Unit, IError> SetVariable<T>(
+        VariableName key,
+        T variable,
+        bool disposeOld,
+        IStep? callingStep)
     {
-        _scopedStateDictionary.AddOrUpdate(key, _ => variable!, (_, _) => variable!);
+        _scopedStateDictionary.AddOrUpdate(
+            key,
+            _ => variable!,
+            (_, old) =>
+            {
+                if (disposeOld)
+                    StateMonad.DisposeVariable(old, this);
+
+                return variable!;
+            }
+        );
 
         if (_fixedState.ContainsKey(key))
             Logger.LogSituation(
                 LogSituation.SetVariableOutOfScope,
                 callingStep,
                 this,
-                new object[] { key }
+                new[] { key }
             );
 
         return Unit.Default;
     }
 
     /// <inheritdoc />
-    public void RemoveVariable(VariableName key, bool dispose, IStep callingStep)
+    public void RemoveVariable(VariableName key, bool dispose, IStep? callingStep)
     {
-        if (_scopedStateDictionary.Remove(key, out var v))
-            if (v is IDisposable d)
-                d.Dispose();
+        if (_scopedStateDictionary.Remove(key, out var v) && dispose)
+        {
+            StateMonad.DisposeVariable(v, this);
+        }
 
         if (_fixedState.ContainsKey(key))
             Logger.LogSituation(
                 LogSituation.RemoveVariableOutOfScope,
                 callingStep,
                 this,
-                new object[] { key }
+                new[] { key }
             );
     }
 }
