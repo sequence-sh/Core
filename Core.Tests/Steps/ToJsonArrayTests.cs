@@ -6,7 +6,7 @@ using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 namespace Reductech.EDR.Core.Tests.Steps
 {
 
-public partial class ToJsonTests : StepTestBase<ToJson, StringStream>
+public partial class ToJsonTests : StepTestBase<ToJsonArray, StringStream>
 {
     /// <inheritdoc />
     protected override IEnumerable<StepCase> StepCases
@@ -15,13 +15,13 @@ public partial class ToJsonTests : StepTestBase<ToJson, StringStream>
         {
             yield return new StepCase(
                 "Single Property",
-                new ToJson() { Entities = Array(Entity.Create(("Foo", 1))) },
+                new ToJsonArray() { Entities = Array(Entity.Create(("Foo", 1))) },
                 "[{\"Foo\":1}]"
             );
 
             yield return new StepCase(
                 "Two Entities",
-                new ToJson()
+                new ToJsonArray()
                 {
                     Entities = Array(Entity.Create(("Foo", 1)), Entity.Create(("Foo", 2)))
                 },
@@ -30,7 +30,7 @@ public partial class ToJsonTests : StepTestBase<ToJson, StringStream>
 
             yield return new StepCase(
                 "List property",
-                new ToJson()
+                new ToJsonArray()
                 {
                     Entities = Array(
                         Entity.Create(("Foo", 1), ("Bar", new[] { "a", "b", "c" }))
@@ -41,7 +41,7 @@ public partial class ToJsonTests : StepTestBase<ToJson, StringStream>
 
             yield return new StepCase(
                 "Nested Entities",
-                new ToJson()
+                new ToJsonArray()
                 {
                     Entities = Array(
                         Entity.Create(

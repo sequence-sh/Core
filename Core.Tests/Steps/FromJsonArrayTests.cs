@@ -5,7 +5,7 @@ using Reductech.EDR.Core.TestHarness;
 namespace Reductech.EDR.Core.Tests.Steps
 {
 
-public partial class FromJsonTests : StepTestBase<FromJson, Array<Entity>>
+public partial class FromJsonTests : StepTestBase<FromJsonArray, Array<Entity>>
 {
     /// <inheritdoc />
     protected override IEnumerable<StepCase> StepCases
@@ -19,19 +19,19 @@ public partial class FromJsonTests : StepTestBase<FromJson, Array<Entity>>
 
             yield return new StepCase(
                 "Single Property",
-                new FromJson { Stream = StaticHelpers.Constant("[{\"Foo\":1}]") },
+                new FromJsonArray { Stream = StaticHelpers.Constant("[{\"Foo\":1}]") },
                 new Array<Entity>(new List<Entity>() { Entity.Create(("Foo", 1)) })
             );
 
             yield return new StepCase(
                 "Two Entities",
-                new FromJson { Stream = StaticHelpers.Constant("[{\"Foo\":1},{\"Foo\":2}]") },
+                new FromJsonArray { Stream = StaticHelpers.Constant("[{\"Foo\":1},{\"Foo\":2}]") },
                 CreateArray(Entity.Create(("Foo", 1)), Entity.Create(("Foo", 2)))
             );
 
             yield return new StepCase(
                 "List property",
-                new FromJson
+                new FromJsonArray
                 {
                     Stream = StaticHelpers.Constant(
                         @"[{""Foo"":1,""Bar"":[""a"",""b"",""c""]}]"
@@ -42,7 +42,7 @@ public partial class FromJsonTests : StepTestBase<FromJson, Array<Entity>>
 
             yield return new StepCase(
                 "Nested Entities",
-                new FromJson
+                new FromJsonArray
                 {
                     Stream = StaticHelpers.Constant(
                         @"[{""Foo"":1,""Bar"":[""a"",""b"",""c""],""Baz"":{""Foo"":2,""Bar"":[""d"",""e"",""f""]}}]"

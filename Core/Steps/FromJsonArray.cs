@@ -15,7 +15,7 @@ namespace Reductech.EDR.Core.Steps
 /// <summary>
 /// Create entities from a Json Stream
 /// </summary>
-public sealed class FromJson : CompoundStep<Array<Entity>>
+public sealed class FromJsonArray : CompoundStep<Array<Entity>>
 {
     /// <inheritdoc />
     protected override async Task<Result<Array<Entity>, IError>> Run(
@@ -50,14 +50,14 @@ public sealed class FromJson : CompoundStep<Array<Entity>>
 /// <summary>
 /// Create entities from a Json Stream
 /// </summary>
-public sealed class FromJsonStepFactory : SimpleStepFactory<FromJson, Array<Entity>>
+public sealed class FromJsonStepFactory : SimpleStepFactory<FromJsonArray, Array<Entity>>
 {
     private FromJsonStepFactory() { }
 
     /// <summary>
     /// The Instance
     /// </summary>
-    public static SimpleStepFactory<FromJson, Array<Entity>> Instance { get; } =
+    public static SimpleStepFactory<FromJsonArray, Array<Entity>> Instance { get; } =
         new FromJsonStepFactory();
 }
 

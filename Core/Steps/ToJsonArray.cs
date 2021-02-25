@@ -14,7 +14,7 @@ namespace Reductech.EDR.Core.Steps
 /// <summary>
 /// Write entities to a stream in Json format.
 /// </summary>
-public sealed class ToJson : CompoundStep<StringStream>
+public sealed class ToJsonArray : CompoundStep<StringStream>
 {
     /// <inheritdoc />
     protected override async Task<Result<StringStream, IError>> Run(
@@ -55,14 +55,14 @@ public sealed class ToJson : CompoundStep<StringStream>
 /// <summary>
 /// Write entities to a stream in Json format.
 /// </summary>
-public sealed class ToJsonStepFactory : SimpleStepFactory<ToJson, StringStream>
+public sealed class ToJsonStepFactory : SimpleStepFactory<ToJsonArray, StringStream>
 {
     private ToJsonStepFactory() { }
 
     /// <summary>
     /// The instance.
     /// </summary>
-    public static SimpleStepFactory<ToJson, StringStream> Instance { get; } =
+    public static SimpleStepFactory<ToJsonArray, StringStream> Instance { get; } =
         new ToJsonStepFactory();
 }
 
