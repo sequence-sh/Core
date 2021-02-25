@@ -363,7 +363,7 @@ public abstract partial class StepTestBase<TStep, TOutput>
         else if (outputType == typeof(int))
             getElement = Constant;
         else if (outputType == typeof(Entity))
-            getElement = i => Constant(CreateEntity(("Foo", $"Val + {i}")));
+            getElement = i => Constant(Entity.Create(("Foo", $"Val + {i}")));
         else
             throw new XunitException(
                 $"Cannot create default value for {outputType.GetDisplayName()} List"

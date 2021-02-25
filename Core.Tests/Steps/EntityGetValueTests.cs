@@ -17,7 +17,7 @@ public partial class EntityGetValueTests : StepTestBase<EntityGetValue, StringSt
                 "Get Simple Property",
                 new EntityGetValue
                 {
-                    Entity   = Constant(CreateEntity(("Foo", "Hello"), ("Bar", "World"))),
+                    Entity   = Constant(Entity.Create(("Foo", "Hello"), ("Bar", "World"))),
                     Property = Constant("Foo")
                 },
                 "Hello"
@@ -27,7 +27,7 @@ public partial class EntityGetValueTests : StepTestBase<EntityGetValue, StringSt
                 "Get Missing Property",
                 new EntityGetValue
                 {
-                    Entity   = Constant(CreateEntity(("Foo", "Hello"), ("Bar", "World"))),
+                    Entity   = Constant(Entity.Create(("Foo", "Hello"), ("Bar", "World"))),
                     Property = Constant("Foot")
                 },
                 ""
@@ -37,7 +37,7 @@ public partial class EntityGetValueTests : StepTestBase<EntityGetValue, StringSt
                 "Get Empty Property",
                 new EntityGetValue
                 {
-                    Entity   = Constant(CreateEntity(("Foo", ""), ("Bar", "World"))),
+                    Entity   = Constant(Entity.Create(("Foo", ""), ("Bar", "World"))),
                     Property = Constant("Foo")
                 },
                 ""
@@ -47,7 +47,7 @@ public partial class EntityGetValueTests : StepTestBase<EntityGetValue, StringSt
                 "Get List Property",
                 new EntityGetValue
                 {
-                    Entity   = Constant(CreateEntity(("Foo", new[] { "Hello", "World" }))),
+                    Entity   = Constant(Entity.Create(("Foo", new[] { "Hello", "World" }))),
                     Property = Constant("Foo")
                 },
                 "Hello,World"

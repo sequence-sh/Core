@@ -24,8 +24,8 @@ public partial class EntityMapTests : StepTestBase<EntityMap, Array<Entity>>
                     Array = new EntityMap
                     {
                         EntityStream = Array(
-                            CreateEntity(("Foo", "Hello")),
-                            CreateEntity(("Foo", "Hello 2"))
+                            Entity.Create(("Foo", "Hello")),
+                            Entity.Create(("Foo", "Hello 2"))
                         ),
                         Function = new EntitySetValue<StringStream>
                         {
@@ -49,8 +49,8 @@ public partial class EntityMapTests : StepTestBase<EntityMap, Array<Entity>>
                     Array = new EntityMap
                     {
                         EntityStream = Array(
-                            CreateEntity(("Foo", "Hello"),   ("Bar", "Earth")),
-                            CreateEntity(("Foo", "Hello 2"), ("Bar", "Earth"))
+                            Entity.Create(("Foo", "Hello"),   ("Bar", "Earth")),
+                            Entity.Create(("Foo", "Hello 2"), ("Bar", "Earth"))
                         ),
                         Function = new EntitySetValue<StringStream>
                         {

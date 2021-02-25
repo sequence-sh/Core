@@ -17,22 +17,22 @@ public partial class EntitySetValueTests : StepTestBase<EntitySetValue<StringStr
                 "Set new property",
                 new EntitySetValue<StringStream>
                 {
-                    Entity   = Constant(CreateEntity(("Foo", "Hello"))),
+                    Entity   = Constant(Entity.Create(("Foo", "Hello"))),
                     Property = Constant("Bar"),
                     Value    = Constant("World"),
                 },
-                CreateEntity(("Foo", "Hello"), ("Bar", "World"))
+                Entity.Create(("Foo", "Hello"), ("Bar", "World"))
             );
 
             yield return new StepCase(
                 "Change existing property",
                 new EntitySetValue<StringStream>
                 {
-                    Entity   = Constant(CreateEntity(("Foo", "Hello"), ("Bar", "Earth"))),
+                    Entity   = Constant(Entity.Create(("Foo", "Hello"), ("Bar", "Earth"))),
                     Property = Constant("Bar"),
                     Value    = Constant("World"),
                 },
-                CreateEntity(("Foo", "Hello"), ("Bar", "World"))
+                Entity.Create(("Foo", "Hello"), ("Bar", "World"))
             );
         }
     }

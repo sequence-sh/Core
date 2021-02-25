@@ -24,16 +24,16 @@ public partial class EntityMapPropertiesTests : StepTestBase<EntityMapProperties
                         new EntityMapProperties
                         {
                             EntityStream = Array(
-                                CreateEntity(
+                                Entity.Create(
                                     ("Food", "Hello"),
                                     ("Bar", "World")
                                 ),
-                                CreateEntity(
+                                Entity.Create(
                                     ("Food", "Hello 2"),
                                     ("Bar", "World 2")
                                 )
                             ),
-                            Mappings = Constant(CreateEntity(("Food", "Foo")))
+                            Mappings = Constant(Entity.Create(("Food", "Foo")))
                         },
                     Variable = VariableName.Entity
                 },

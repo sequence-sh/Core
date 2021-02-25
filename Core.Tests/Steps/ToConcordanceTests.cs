@@ -22,8 +22,8 @@ public partial class ToConcordanceTests : StepTestBase<ToConcordance, StringStre
                     Value = new ToConcordance()
                     {
                         Entities = Array(
-                            CreateEntity(("Foo", "Hello"),   ("Bar", "World")),
-                            CreateEntity(("Foo", "Hello 2"), ("Bar", "World 2"))
+                            Entity.Create(("Foo", "Hello"),   ("Bar", "World")),
+                            Entity.Create(("Foo", "Hello 2"), ("Bar", "World 2"))
                         )
                     }
                 },

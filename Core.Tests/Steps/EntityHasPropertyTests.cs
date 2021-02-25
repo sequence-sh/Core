@@ -18,7 +18,7 @@ public partial class EntityHasPropertyTests : StepTestBase<EntityHasProperty, bo
                 new EntityHasProperty
                 {
                     Property = Constant("Foo"),
-                    Entity   = Constant(CreateEntity(("Foo", "Hello")))
+                    Entity   = Constant(Entity.Create(("Foo", "Hello")))
                 },
                 true
             );
@@ -28,7 +28,7 @@ public partial class EntityHasPropertyTests : StepTestBase<EntityHasProperty, bo
                 new EntityHasProperty
                 {
                     Property = Constant("Bar"),
-                    Entity   = Constant(CreateEntity(("Hello", "World")))
+                    Entity   = Constant(Entity.Create(("Hello", "World")))
                 },
                 false
             );

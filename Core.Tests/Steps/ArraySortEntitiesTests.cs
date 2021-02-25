@@ -22,9 +22,9 @@ public partial class ArraySortEntitiesTests : StepTestBase<ArraySort<Entity>, Ar
                     Array = new ArraySort<Entity>
                     {
                         Array = Array(
-                            CreateEntity(("Foo", "Gamma")),
-                            CreateEntity(("Foo", "Alpha")),
-                            CreateEntity(("Foo", "Beta"))
+                            Entity.Create(("Foo", "Gamma")),
+                            Entity.Create(("Foo", "Alpha")),
+                            Entity.Create(("Foo", "Beta"))
                         ),
                         KeySelector = new EntityGetValue
                         {
@@ -48,9 +48,9 @@ public partial class ArraySortEntitiesTests : StepTestBase<ArraySort<Entity>, Ar
                     {
                         Descending = Constant(true),
                         Array = Array(
-                            CreateEntity(("Foo", "Gamma")),
-                            CreateEntity(("Foo", "Alpha")),
-                            CreateEntity(("Foo", "Beta"))
+                            Entity.Create(("Foo", "Gamma")),
+                            Entity.Create(("Foo", "Alpha")),
+                            Entity.Create(("Foo", "Beta"))
                         ),
                         KeySelector = new EntityGetValue
                         {
@@ -74,10 +74,10 @@ public partial class ArraySortEntitiesTests : StepTestBase<ArraySort<Entity>, Ar
                     {
                         Descending = Constant(true),
                         Array = Array(
-                            CreateEntity(("Foo", "Gamma")),
-                            CreateEntity(("Foo", "Alpha")),
-                            CreateEntity(("Foo", "Beta")),
-                            CreateEntity(("Bar", "Delta"))
+                            Entity.Create(("Foo", "Gamma")),
+                            Entity.Create(("Foo", "Alpha")),
+                            Entity.Create(("Foo", "Beta")),
+                            Entity.Create(("Bar", "Delta"))
                         ),
                         KeySelector = new EntityGetValue
                         {
