@@ -38,7 +38,7 @@ public sealed class Log<T> : CompoundStep<Unit>
             _               => r.Value?.ToString()!
         };
 
-        stateMonad.Logger.LogInformation(stringToPrint);
+        stateMonad.Log(LogLevel.Information, stringToPrint, this);
 
         return Unit.Default;
     }
