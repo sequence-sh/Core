@@ -27,8 +27,8 @@ public partial class ArrayConcatTests : StepTestBase<ArrayConcat<Entity>, Array<
                             Elements = new List<IStep<Array<Entity>>>
                             {
                                 Array(
-                                    CreateEntity(("Foo", "Alpha")),
-                                    CreateEntity(("Foo", "Beta"))
+                                    Entity.Create(("Foo", "Alpha")),
+                                    Entity.Create(("Foo", "Beta"))
                                 )
                             }
                         }
@@ -52,12 +52,12 @@ public partial class ArrayConcatTests : StepTestBase<ArrayConcat<Entity>, Array<
                             Elements = new List<IStep<Array<Entity>>>
                             {
                                 Array(
-                                    CreateEntity(("Foo", "Alpha")),
-                                    CreateEntity(("Foo", "Beta"))
+                                    Entity.Create(("Foo", "Alpha")),
+                                    Entity.Create(("Foo", "Beta"))
                                 ),
                                 Array(
-                                    CreateEntity(("Foo", "Gamma")),
-                                    CreateEntity(("Foo", "Delta"))
+                                    Entity.Create(("Foo", "Gamma")),
+                                    Entity.Create(("Foo", "Delta"))
                                 )
                             }
                         }

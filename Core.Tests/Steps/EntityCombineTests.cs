@@ -17,9 +17,9 @@ public partial class EntityCombineTests : StepTestBase<EntityCombine, Entity>
                 "Combine two simple entities",
                 new EntityCombine
                 {
-                    Terms = Array(CreateEntity(("Foo", 1)), CreateEntity(("Bar", 2)))
+                    Terms = Array(Entity.Create(("Foo", 1)), Entity.Create(("Bar", 2)))
                 },
-                CreateEntity(("Foo", 1), ("Bar", 2))
+                Entity.Create(("Foo", 1), ("Bar", 2))
             );
 
             yield return new StepCase(
@@ -27,11 +27,11 @@ public partial class EntityCombineTests : StepTestBase<EntityCombine, Entity>
                 new EntityCombine
                 {
                     Terms = Array(
-                        CreateEntity(("Foo", 1), ("Bar", 1)),
-                        CreateEntity(("Bar", 2))
+                        Entity.Create(("Foo", 1), ("Bar", 1)),
+                        Entity.Create(("Bar", 2))
                     )
                 },
-                CreateEntity(("Foo", 1), ("Bar", 2))
+                Entity.Create(("Foo", 1), ("Bar", 2))
             );
 
             yield return new StepCase(
@@ -39,11 +39,11 @@ public partial class EntityCombineTests : StepTestBase<EntityCombine, Entity>
                 new EntityCombine
                 {
                     Terms = Array(
-                        CreateEntity(("Foo", CreateEntity(("Bar", 2)))),
-                        CreateEntity(("Foo", CreateEntity(("Baz", 3))))
+                        Entity.Create(("Foo", Entity.Create(("Bar", 2)))),
+                        Entity.Create(("Foo", Entity.Create(("Baz", 3))))
                     )
                 },
-                CreateEntity(("Foo", CreateEntity(("Bar", 2), ("Baz", 3))))
+                Entity.Create(("Foo", Entity.Create(("Bar", 2), ("Baz", 3))))
             );
         }
     }

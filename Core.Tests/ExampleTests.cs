@@ -66,7 +66,7 @@ public partial class ExampleTests
         r.ShouldBeSuccessful(x => x.ToString()!);
     }
 
-    [Fact]
+    [Fact(Skip = "true")]
     [Trait("Category", "Integration")]
     public async Task RunSCLSequence()
     {

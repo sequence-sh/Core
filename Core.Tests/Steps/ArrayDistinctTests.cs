@@ -27,11 +27,11 @@ public partial class ArrayDistinctTests : StepTestBase<ArrayDistinct<Entity>, Ar
                     Array = new ArrayDistinct<Entity>
                     {
                         Array = Array(
-                            CreateEntity(("Foo", "Alpha")),
-                            CreateEntity(("Foo", "Alpha")),
-                            CreateEntity(("Foo", "ALPHA")),
-                            CreateEntity(("Foo", "Beta")),
-                            CreateEntity(("Foo", "Beta"))
+                            Entity.Create(("Foo", "Alpha")),
+                            Entity.Create(("Foo", "Alpha")),
+                            Entity.Create(("Foo", "ALPHA")),
+                            Entity.Create(("Foo", "Beta")),
+                            Entity.Create(("Foo", "Beta"))
                         ),
                         KeySelector = new EntityGetValue
                         {
@@ -56,11 +56,11 @@ public partial class ArrayDistinctTests : StepTestBase<ArrayDistinct<Entity>, Ar
                     Array = new ArrayDistinct<Entity>
                     {
                         Array = Array(
-                            CreateEntity(("Foo", "Alpha")),
-                            CreateEntity(("Foo", "Alpha")),
-                            CreateEntity(("Foo", "ALPHA")),
-                            CreateEntity(("Foo", "Beta")),
-                            CreateEntity(("Foo", "Beta"))
+                            Entity.Create(("Foo", "Alpha")),
+                            Entity.Create(("Foo", "Alpha")),
+                            Entity.Create(("Foo", "ALPHA")),
+                            Entity.Create(("Foo", "Beta")),
+                            Entity.Create(("Foo", "Beta"))
                         ),
                         KeySelector =
                             new EntityGetValue

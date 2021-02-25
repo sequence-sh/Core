@@ -24,11 +24,11 @@ public partial class ArrayFilterTests : StepTestBase<ArrayFilter<Entity>, Array<
                     Array = new ArrayFilter<Entity>
                     {
                         Array = Array(
-                            CreateEntity(("Foo", "Alpha")),
-                            CreateEntity(("Bar", "Alpha")),
-                            CreateEntity(("Foo", "ALPHA")),
-                            CreateEntity(("Foo", "Beta")),
-                            CreateEntity(("Bar", "Beta"))
+                            Entity.Create(("Foo", "Alpha")),
+                            Entity.Create(("Bar", "Alpha")),
+                            Entity.Create(("Foo", "ALPHA")),
+                            Entity.Create(("Foo", "Beta")),
+                            Entity.Create(("Bar", "Beta"))
                         ),
                         Predicate = new EntityHasProperty()
                         {
@@ -52,11 +52,11 @@ public partial class ArrayFilterTests : StepTestBase<ArrayFilter<Entity>, Array<
                     Array = new ArrayFilter<Entity>
                     {
                         Array = Array(
-                            CreateEntity(("Foo", "Alpha")),
-                            CreateEntity(("Bar", "Alpha")),
-                            CreateEntity(("Foo", "ALPHA")),
-                            CreateEntity(("Foo", "Beta")),
-                            CreateEntity(("Bar", "Beta"))
+                            Entity.Create(("Foo", "Alpha")),
+                            Entity.Create(("Bar", "Alpha")),
+                            Entity.Create(("Foo", "ALPHA")),
+                            Entity.Create(("Foo", "Beta")),
+                            Entity.Create(("Bar", "Beta"))
                         ),
                         Predicate =
                             new EntityHasProperty()

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
@@ -14,12 +15,12 @@ namespace Reductech.EDR.Core.Steps
 {
 
 /// <summary>
-/// Create an entity from a Json Stream
+/// Create entities from a Json Stream
 /// </summary>
-public sealed class FromJson : CompoundStep<Entity>
+public sealed class FromJsonArray : CompoundStep<Array<Entity>>
 {
     /// <inheritdoc />
-    protected override async Task<Result<Entity, IError>> Run(
+    protected override async Task<Result<Array<Entity>, IError>> Run(
         IStateMonad stateMonad,
         CancellationToken cancellationToken)
     {
@@ -27,13 +28,13 @@ public sealed class FromJson : CompoundStep<Entity>
             .Map(x => x.GetStringAsync());
 
         if (text.IsFailure)
-            return text.ConvertFailure<Entity>();
+            return text.ConvertFailure<Array<Entity>>();
 
-        Entity? entity;
+        List<Entity>? entities;
 
         try
         {
-            entity = JsonConvert.DeserializeObject<Entity>(
+            entities = JsonConvert.DeserializeObject<List<Entity>>(
                 text.Value,
                 EntityJsonConverter.Instance
             );
@@ -41,17 +42,17 @@ public sealed class FromJson : CompoundStep<Entity>
         catch (Exception e)
         {
             stateMonad.Log(LogLevel.Error, e.Message, this);
-            entity = null;
+            entities = null;
         }
 
-        if (entity is null)
+        if (entities is null)
             return
-                Result.Failure<Entity, IError>(
+                Result.Failure<Array<Entity>, IError>(
                     ErrorCode.CouldNotParse.ToErrorBuilder(text.Value, "JSON")
                         .WithLocation(this)
                 );
 
-        return entity;
+        return new Array<Entity>(entities!);
     }
 
     /// <summary>
@@ -63,7 +64,7 @@ public sealed class FromJson : CompoundStep<Entity>
 
     /// <inheritdoc />
     public override IStepFactory StepFactory { get; } =
-        new SimpleStepFactory<FromJson, Entity>();
+        new SimpleStepFactory<FromJsonArray, Array<Entity>>();
 }
 
 }

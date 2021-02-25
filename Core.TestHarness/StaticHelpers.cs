@@ -58,7 +58,6 @@ public static class StaticHelpers
     public static IStep<Array<Entity>> Array(params Entity[] elements) =>
         new ArrayNew<Entity> { Elements = elements.Select(Constant).ToList() };
 
-    //public static IStep<AsyncList<EntityStream>> Array(params EntityStream[] elements) => new Array<EntityStream> { Elements = elements.Select(Constant).ToList() };
     public static IStep<Array<StringStream>> Array(params string[] elements) =>
         new ArrayNew<StringStream> { Elements = elements.Select(Constant).ToList() };
 
@@ -72,9 +71,6 @@ public static class StaticHelpers
         new GetVariable<TNew> { Variable = variableName };
 
     public static IStep<Entity> GetEntityVariable => GetVariable<Entity>(VariableName.Entity);
-
-    public static Entity CreateEntity(params (string key, object? value)[] pairs) =>
-        Entity.Create(pairs);
 
     public static Schema CreateSchema(
         string name,

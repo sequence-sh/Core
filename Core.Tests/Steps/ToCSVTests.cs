@@ -22,8 +22,8 @@ public partial class ToCSVTests : StepTestBase<ToCSV, StringStream>
                     Value = new ToCSV
                     {
                         Entities = Array(
-                            CreateEntity(("Foo", "Hello"),   ("Bar", "World")),
-                            CreateEntity(("Foo", "Hello 2"), ("Bar", "World 2"))
+                            Entity.Create(("Foo", "Hello"),   ("Bar", "World")),
+                            Entity.Create(("Foo", "Hello 2"), ("Bar", "World 2"))
                         )
                     }
                 },
@@ -38,8 +38,8 @@ public partial class ToCSVTests : StepTestBase<ToCSV, StringStream>
                     Value = new ToCSV
                     {
                         Entities = Array(
-                            CreateEntity(("Foo", "Hello"),   ("Bar", "World")),
-                            CreateEntity(("Foo", "Hello 2"), ("Bar", "World 2"))
+                            Entity.Create(("Foo", "Hello"),   ("Bar", "World")),
+                            Entity.Create(("Foo", "Hello 2"), ("Bar", "World 2"))
                         ),
                         Delimiter = Constant("\t")
                     }
