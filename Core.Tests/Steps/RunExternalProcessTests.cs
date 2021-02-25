@@ -41,25 +41,34 @@ public partial class RunExternalProcessTests : StepTestBase<RunExternalProcess, 
                             x.Setup(
                                     a => a.RunExternalProcess(
                                         "Process.exe",
-                                        It.IsAny<ILogger>(),
                                         It.IsAny<IErrorHandler>(),
                                         It.IsAny<IEnumerable<string>>(),
                                         It.IsAny<IReadOnlyDictionary<string, string>>(),
                                         Encoding.ASCII,
+                                        It.IsAny<IStateMonad>(),
+                                        It.IsAny<IStep>(),
                                         It.IsAny<CancellationToken>()
                                     )
                                 )
-                                .Callback<string, ILogger, IErrorHandler, IEnumerable<string>,
+                                .Callback<string, IErrorHandler, IEnumerable<string>,
                                     IReadOnlyDictionary<string, string>,
-                                    Encoding, CancellationToken>(
+                                    Encoding,
+                                    IStateMonad,
+                                    IStep,
+                                    CancellationToken>(
                                     (
                                         _,
-                                        b,
                                         _,
                                         _,
                                         _,
                                         _,
-                                        _) => b.LogInformation("My Message")
+                                        stateMonad,
+                                        _,
+                                        _) => stateMonad.Log(
+                                        LogLevel.Information,
+                                        "My Message",
+                                        null
+                                    )
                                 )
                                 .ReturnsAsync(Unit.Default)
                     )

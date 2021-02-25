@@ -48,6 +48,9 @@ public sealed class ScopedStateMonad : IStateMonad
     private readonly ImmutableDictionary<VariableName, object> _fixedState;
 
     /// <inheritdoc />
+    public object SequenceMetadata => BaseStateMonad.SequenceMetadata;
+
+    /// <inheritdoc />
     public ILogger Logger => BaseStateMonad.Logger;
 
     /// <inheritdoc />
@@ -89,25 +92,35 @@ public sealed class ScopedStateMonad : IStateMonad
         _fixedState.ContainsKey(variable);
 
     /// <inheritdoc />
-    public Result<Unit, IError> SetVariable<T>(VariableName key, T variable)
+    public Result<Unit, IError> SetVariable<T>(VariableName key, T variable, IStep callingStep)
     {
         _scopedStateDictionary.AddOrUpdate(key, _ => variable!, (_, _) => variable!);
 
         if (_fixedState.ContainsKey(key))
-            Logger.LogSituation(LogSituation.SetVariableOutOfScope, new object[] { key });
+            Logger.LogSituation(
+                LogSituation.SetVariableOutOfScope,
+                callingStep,
+                this,
+                new object[] { key }
+            );
 
         return Unit.Default;
     }
 
     /// <inheritdoc />
-    public void RemoveVariable(VariableName key, bool dispose)
+    public void RemoveVariable(VariableName key, bool dispose, IStep callingStep)
     {
         if (_scopedStateDictionary.Remove(key, out var v))
             if (v is IDisposable d)
                 d.Dispose();
 
         if (_fixedState.ContainsKey(key))
-            Logger.LogSituation(LogSituation.RemoveVariableOutOfScope, new object[] { key });
+            Logger.LogSituation(
+                LogSituation.RemoveVariableOutOfScope,
+                callingStep,
+                this,
+                new object[] { key }
+            );
     }
 }
 

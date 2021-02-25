@@ -55,11 +55,12 @@ public sealed class RunExternalProcess : CompoundStep<Unit>
         var r = await
             stateMonad.ExternalContext.ExternalProcessRunner.RunExternalProcess(
                     pathResult.Value,
-                    stateMonad.Logger,
                     IgnoreNoneErrorHandler.Instance,
                     arguments,
                     new Dictionary<string, string>(), //TODO let user control this
                     encodingResult.Value.Convert(),
+                    stateMonad,
+                    this,
                     cancellationToken
                 )
                 .MapError(x => x.WithLocation(this));

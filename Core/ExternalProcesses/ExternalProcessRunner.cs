@@ -35,7 +35,8 @@ public class ExternalProcessRunner : IExternalProcessRunner
         IEnumerable<string> arguments,
         IReadOnlyDictionary<string, string> environmentVariables,
         Encoding encoding,
-        ILogger logger)
+        IStateMonad stateMonad,
+        IStep callingStep)
     {
         if (!File.Exists(processPath))
             return new ErrorBuilder(ErrorCode.ExternalProcessNotFound, processPath);
@@ -67,10 +68,17 @@ public class ExternalProcessRunner : IExternalProcessRunner
             );
         }
 
-        logger.LogSituation(LogSituation.ExternalProcessStarted, processPath, argumentString);
+        LogSituation.ExternalProcessStarted.Log(
+            stateMonad,
+            callingStep,
+            processPath,
+            argumentString
+        );
 
         foreach (var (key, value) in pProcess.StartInfo.Environment)
-            logger.LogSituation(LogSituation.EnvironmentVariable, key, value);
+        {
+            LogSituation.EnvironmentVariable.Log(stateMonad, callingStep, key, value);
+        }
 
         var started = pProcess.Start();
 
@@ -94,11 +102,12 @@ public class ExternalProcessRunner : IExternalProcessRunner
     /// <inheritdoc />
     public async Task<Result<Unit, IErrorBuilder>> RunExternalProcess(
         string processPath,
-        ILogger logger,
         IErrorHandler errorHandler,
         IEnumerable<string> arguments,
         IReadOnlyDictionary<string, string> environmentVariables,
         Encoding encoding,
+        IStateMonad stateMonad,
+        IStep callingStep,
         CancellationToken cancellationToken)
     {
         if (!File.Exists(processPath))
@@ -106,7 +115,12 @@ public class ExternalProcessRunner : IExternalProcessRunner
 
         var argumentString = string.Join(' ', arguments.Select(EncodeParameterArgument));
 
-        logger.LogSituation(LogSituation.ExternalProcessStarted, processPath, argumentString);
+        LogSituation.ExternalProcessStarted.Log(
+            stateMonad,
+            callingStep,
+            processPath,
+            argumentString
+        );
 
         using var pProcess = new Process
         {
@@ -133,7 +147,9 @@ public class ExternalProcessRunner : IExternalProcessRunner
         }
 
         foreach (var (key, value) in pProcess.StartInfo.Environment)
-            logger.LogSituation(LogSituation.EnvironmentVariable, key, value);
+        {
+            LogSituation.EnvironmentVariable.Log(stateMonad, callingStep, key, value);
+        }
 
         var errors = new List<IErrorBuilder>();
 
@@ -155,12 +171,12 @@ public class ExternalProcessRunner : IExternalProcessRunner
                     var errorText = string.IsNullOrWhiteSpace(line) ? "Unknown Error" : line;
 
                     if (errorHandler.ShouldIgnoreError(errorText))
-                        logger.LogWarning(line);
+                        stateMonad.Log(LogLevel.Warning, line, callingStep);
                     else
                         errors.Add(new ErrorBuilder(ErrorCode.ExternalProcessError, errorText));
                 }
                 else
-                    logger.LogInformation(line);
+                    stateMonad.Log(LogLevel.Information, line, callingStep);
             }
 
             // ReSharper disable once MethodHasAsyncOverloadWithCancellation - run on a separate thread

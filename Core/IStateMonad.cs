@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using Reductech.EDR.Core.Abstractions;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
+using Reductech.EDR.Core.Internal.Logging;
 using Reductech.EDR.Core.Util;
 
 namespace Reductech.EDR.Core
@@ -15,6 +16,11 @@ namespace Reductech.EDR.Core
 /// </summary>
 public interface IStateMonad : IDisposable
 {
+    /// <summary>
+    /// Constant metadata for the entire sequence
+    /// </summary>
+    object SequenceMetadata { get; }
+
     /// <summary>
     /// The logger that steps will use to output messages.
     /// </summary>
@@ -54,12 +60,18 @@ public interface IStateMonad : IDisposable
     /// <summary>
     /// Creates or set the value of this variable.
     /// </summary>
-    Result<Unit, IError> SetVariable<T>(VariableName key, T variable);
+    Result<Unit, IError> SetVariable<T>(VariableName key, T variable, IStep callingStep);
 
     /// <summary>
     /// Removes the variable if it exists.
     /// </summary>
-    void RemoveVariable(VariableName key, bool dispose);
+    void RemoveVariable(VariableName key, bool dispose, IStep callingStep);
+
+    /// <summary>
+    /// Logs a message not associated with a situation.
+    /// </summary>
+    void Log(LogLevel logLevel, string message, IStep? callingStep) =>
+        Logger.LogMessage(logLevel, message, callingStep, this);
 }
 
 }

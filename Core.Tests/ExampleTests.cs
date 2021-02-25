@@ -57,7 +57,8 @@ public partial class ExampleTests
             TestOutputHelper.BuildLogger(),
             SCLSettings.EmptySettings,
             sfs,
-            ExternalContext.Default
+            ExternalContext.Default,
+            new object()
         );
 
         var r = await stepResult.Value.Run<Unit>(monad, CancellationToken.None);
@@ -88,7 +89,7 @@ Bar: (Type: 'String' Multiplicity: 'ExactlyOne')
         //- <docs> | ArrayDistinct (From <entity> 'Directory') | ForEach (CreateDirectory (PathCombine ['Documentation', (From <Entity> 'Directory')]))
         //- <docs> | Foreach (FileWrite (From <Entity> 'FileText') (PathCombine ['Documentation', (From <Entity> 'Directory'), (From <Entity> 'FileName')]))";
 
-        var logger = TestOutputHelper.BuildLogger(LogLevel.Information);
+        var logger = TestOutputHelper.BuildLogger(LogLevel.Trace);
         var sfs    = StepFactoryStore.CreateUsingReflection();
 
         var runner = new SCLRunner(
@@ -98,7 +99,11 @@ Bar: (Type: 'String' Multiplicity: 'ExactlyOne')
             ExternalContext.Default
         );
 
-        var r = await runner.RunSequenceFromTextAsync(scl, CancellationToken.None);
+        var r = await runner.RunSequenceFromTextAsync(
+            scl,
+            new Dictionary<string, object>(),
+            CancellationToken.None
+        );
 
         r.ShouldBeSuccessful(x => x.ToString()!);
     }
@@ -184,7 +189,8 @@ Bar: (Type: 'String' Multiplicity: 'ExactlyOne')
             TestOutputHelper.BuildLogger(),
             SCLSettings.EmptySettings,
             StepFactoryStore.CreateUsingReflection(),
-            ExternalContext.Default
+            ExternalContext.Default,
+            new object()
         );
 
         var r = await (step as IStep<Unit>).Run(monad, CancellationToken.None);
