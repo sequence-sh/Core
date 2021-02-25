@@ -60,12 +60,16 @@ public interface IStateMonad : IDisposable
     /// <summary>
     /// Creates or set the value of this variable.
     /// </summary>
-    Result<Unit, IError> SetVariable<T>(VariableName key, T variable, IStep callingStep);
+    Result<Unit, IError> SetVariable<T>(
+        VariableName key,
+        T variable,
+        bool disposeOld,
+        IStep? callingStep);
 
     /// <summary>
     /// Removes the variable if it exists.
     /// </summary>
-    void RemoveVariable(VariableName key, bool dispose, IStep callingStep);
+    void RemoveVariable(VariableName key, bool dispose, IStep? callingStep);
 
     /// <summary>
     /// Logs a message not associated with a situation.

@@ -109,13 +109,27 @@ public sealed class StateMonad : IStateMonad
     /// <summary>
     /// Creates or set the value of this variable.
     /// </summary>
-    public Result<Unit, IError> SetVariable<T>(VariableName key, T variable, IStep callingStep)
+    public Result<Unit, IError> SetVariable<T>(
+        VariableName key,
+        T variable,
+        bool disposeOld,
+        IStep? callingStep)
     {
         if (Disposed)
             throw new ObjectDisposedException("State Monad was disposed");
 
         _stateDictionary
-            .AddOrUpdate(key, _ => variable!, (_, _) => variable!);
+            .AddOrUpdate(
+                key,
+                _ => variable!,
+                (_, old) =>
+                {
+                    if (disposeOld)
+                        DisposeVariable(old, this);
+
+                    return variable!;
+                }
+            );
 
         return Unit.Default;
     }
@@ -123,7 +137,7 @@ public sealed class StateMonad : IStateMonad
     /// <summary>
     /// Removes the variable if it exists.
     /// </summary>
-    public void RemoveVariable(VariableName key, bool dispose, IStep callingStep)
+    public void RemoveVariable(VariableName key, bool dispose, IStep? callingStep)
     {
         if (Disposed)
             throw new ObjectDisposedException("State Monad was disposed");
@@ -131,7 +145,16 @@ public sealed class StateMonad : IStateMonad
         if (!_stateDictionary.Remove(key, out var variable))
             return;
 
-        if (dispose && variable is IDisposable disposable)
+        if (dispose)
+            DisposeVariable(variable, this);
+    }
+
+    internal static void DisposeVariable(object variable, IStateMonad stateMonad)
+    {
+        if (variable is IStateDisposable stateDisposable)
+            stateDisposable.Dispose(stateMonad);
+
+        if (variable is IDisposable disposable)
             disposable.Dispose();
     }
 
@@ -149,12 +172,22 @@ public sealed class StateMonad : IStateMonad
         {
             Disposed = true;
 
-            foreach (var val in _stateDictionary.Values.OfType<IDisposable>())
-            {
-                val.Dispose();
-            }
+            foreach (var v in _stateDictionary.Values)
+                DisposeVariable(v, this);
         }
     }
+}
+
+/// <summary>
+/// An element which may require a reference to the state to dispose more effectively.
+/// </summary>
+public interface IStateDisposable
+{
+    /// <summary>
+    /// Performs application defined functions associated with freeing resources
+    /// </summary>
+    /// <param name="state"></param>
+    void Dispose(IStateMonad state);
 }
 
 }
