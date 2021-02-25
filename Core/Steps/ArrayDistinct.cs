@@ -43,7 +43,7 @@ public sealed class ArrayDistinct<T> : CompoundStep<Array<T>>
 
         async IAsyncEnumerable<T> Filter(T element)
         {
-            using var scopedMonad = new ScopedStateMonad(
+            await using var scopedMonad = new ScopedStateMonad(
                 stateMonad,
                 currentState,
                 new KeyValuePair<VariableName, object>(Variable, element!)

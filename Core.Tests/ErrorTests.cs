@@ -149,7 +149,7 @@ public partial class RunErrorTests
 
             var externalContext = ExternalContextSetupHelper.GetExternalContext(repo);
 
-            using var state = new StateMonad(
+            await using var state = new StateMonad(
                 NullLogger.Instance,
                 SCLSettings.EmptySettings,
                 spf,

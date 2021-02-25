@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Immutable;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Reductech.EDR.Core.Abstractions;
@@ -15,7 +16,7 @@ public partial class StateMonadTests
     public interface IDoubleDisposable : IStateDisposable, IDisposable { }
 
     [Fact]
-    public void StateMonadShouldDisposeVariablesThatItRemoves()
+    public async Task StateMonadShouldDisposeVariablesThatItRemoves()
     {
         var repo = new MockRepository(MockBehavior.Strict);
 
@@ -23,18 +24,18 @@ public partial class StateMonadTests
 
         var monad = CreateMonad(repo);
 
-        sd.Setup(x => x.Dispose(monad));
+        sd.Setup(x => x.DisposeAsync(monad)).Returns(Task.CompletedTask);
         sd.Setup(x => x.Dispose());
 
-        monad.SetVariable(new VariableName("V"), sd.Object, false, null);
+        await monad.SetVariableAsync(new VariableName("V"), sd.Object, false, null);
 
-        monad.RemoveVariable(new VariableName("V"), true, null);
+        await monad.RemoveVariableAsync(new VariableName("V"), true, null);
 
         repo.VerifyAll();
     }
 
     [Fact]
-    public void StateMonadShouldDisposeVariablesWhenItIsDisposed()
+    public async Task StateMonadShouldDisposeVariablesWhenItIsDisposed()
     {
         var repo = new MockRepository(MockBehavior.Strict);
 
@@ -43,18 +44,18 @@ public partial class StateMonadTests
         var monad = CreateMonad(repo);
 
         // ReSharper disable once AccessToDisposedClosure
-        sd.Setup(x => x.Dispose(monad));
+        sd.Setup(x => x.DisposeAsync(monad)).Returns(Task.CompletedTask);
         sd.Setup(x => x.Dispose());
 
-        monad.SetVariable(new VariableName("V"), sd.Object, false, null);
+        await monad.SetVariableAsync(new VariableName("V"), sd.Object, false, null);
 
-        monad.Dispose();
+        await monad.DisposeAsync();
 
         repo.VerifyAll();
     }
 
     [Fact]
-    public void ScopedStateMonadShouldDisposeVariablesThatItRemoves()
+    public async Task ScopedStateMonadShouldDisposeVariablesThatItRemoves()
     {
         var repo = new MockRepository(MockBehavior.Strict);
 
@@ -67,18 +68,18 @@ public partial class StateMonadTests
             ImmutableDictionary<VariableName, object>.Empty
         );
 
-        sd.Setup(x => x.Dispose(scopedMonad));
+        sd.Setup(x => x.DisposeAsync(scopedMonad)).Returns(Task.CompletedTask);
         sd.Setup(x => x.Dispose());
 
-        scopedMonad.SetVariable(new VariableName("V"), sd.Object, false, null);
+        await scopedMonad.SetVariableAsync(new VariableName("V"), sd.Object, false, null);
 
-        scopedMonad.RemoveVariable(new VariableName("V"), true, null);
+        await scopedMonad.RemoveVariableAsync(new VariableName("V"), true, null);
 
         repo.VerifyAll();
     }
 
     [Fact]
-    public void ScopedStateMonadShouldDisposeVariablesWhenItIsDisposed()
+    public async Task ScopedStateMonadShouldDisposeVariablesWhenItIsDisposed()
     {
         var repo = new MockRepository(MockBehavior.Strict);
 
@@ -92,17 +93,17 @@ public partial class StateMonadTests
         );
 
         // ReSharper disable once AccessToDisposedClosure
-        sd.Setup(x => x.Dispose(scopedMonad));
+        sd.Setup(x => x.DisposeAsync(scopedMonad)).Returns(Task.CompletedTask);
         sd.Setup(x => x.Dispose());
 
-        scopedMonad.SetVariable(new VariableName("V"), sd.Object, false, null);
+        await scopedMonad.SetVariableAsync(new VariableName("V"), sd.Object, false, null);
 
-        scopedMonad.Dispose();
+        await scopedMonad.DisposeAsync();
 
         repo.VerifyAll();
     }
 
-    private static IStateMonad CreateMonad(MockRepository repo)
+    private IStateMonad CreateMonad(MockRepository repo)
     {
         return
             new StateMonad(

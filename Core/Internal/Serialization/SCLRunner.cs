@@ -73,7 +73,7 @@ public sealed class SCLRunner
 
         using var loggingScope = _logger.BeginScope("EDR");
 
-        using IStateMonad stateMonad = new StateMonad(
+        await using IStateMonad stateMonad = new StateMonad(
             _logger,
             _settings,
             _stepFactoryStore,

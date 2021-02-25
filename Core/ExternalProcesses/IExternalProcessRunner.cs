@@ -34,7 +34,7 @@ public interface IExternalProcessRunner
         IReadOnlyDictionary<string, string> environmentVariables,
         Encoding encoding,
         IStateMonad stateMonad,
-        IStep callingStep,
+        IStep? callingStep,
         CancellationToken cancellationToken);
 
     /// <summary>
@@ -46,7 +46,7 @@ public interface IExternalProcessRunner
         IReadOnlyDictionary<string, string> environmentVariables,
         Encoding encoding,
         IStateMonad stateMonad,
-        IStep callingStep);
+        IStep? callingStep);
 }
 
 }

@@ -41,7 +41,7 @@ public abstract partial class StepTestBase<TStep, TOutput>
 
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
-            using var stateMonad = GetStateMonad(
+            await using var stateMonad = await GetStateMonad(
                 mockRepository,
                 loggerFactory.CreateLogger("Test")
             );
@@ -100,7 +100,9 @@ public abstract partial class StepTestBase<TStep, TOutput>
             }
         }
 
-        public virtual StateMonad GetStateMonad(MockRepository mockRepository, ILogger logger)
+        public virtual async Task<StateMonad> GetStateMonad(
+            MockRepository mockRepository,
+            ILogger logger)
         {
             var externalContext = ExternalContextSetupHelper.GetExternalContext(mockRepository);
 
@@ -117,7 +119,7 @@ public abstract partial class StepTestBase<TStep, TOutput>
             );
 
             foreach (var action in InitialStateActions)
-                action(stateMonad);
+                await action(stateMonad);
 
             return stateMonad;
         }
@@ -132,7 +134,7 @@ public abstract partial class StepTestBase<TStep, TOutput>
         /// <inheritdoc />
         public Maybe<StepFactoryStore> StepFactoryStoreToUse { get; set; }
 
-        public List<Action<IStateMonad>> InitialStateActions { get; } = new();
+        public List<Func<IStateMonad, Task>> InitialStateActions { get; } = new();
 
         /// <inheritdoc />
         public SCLSettings Settings { get; set; } = SCLSettings.EmptySettings;
