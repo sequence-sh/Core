@@ -68,7 +68,7 @@ public abstract partial class StepTestBase<TStep, TOutput>
                     if (variableWasSet && defaultVariableValue != null)
                     {
                         stateActions.Add(
-                            x => x.SetVariable(FooVariableName(), defaultVariableValue, null)
+                            x => x.SetVariable(FooVariableName(), defaultVariableValue, true, null)
                         );
                     }
                 }
