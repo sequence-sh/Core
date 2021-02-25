@@ -76,7 +76,7 @@ public sealed class For : CompoundStep<Unit>
 
         var currentValue = from.Value;
 
-        var setResult = stateMonad.SetVariable(variableName, currentValue);
+        var setResult = stateMonad.SetVariable(variableName, currentValue, this);
 
         if (setResult.IsFailure)
             return setResult.ConvertFailure<Unit>();
@@ -100,13 +100,13 @@ public sealed class For : CompoundStep<Unit>
             currentValue =  currentValueResult.Value;
             currentValue += increment.Value;
 
-            var setResult2 = stateMonad.SetVariable(variableName, currentValue);
+            var setResult2 = stateMonad.SetVariable(variableName, currentValue, this);
 
             if (setResult2.IsFailure)
                 return setResult.ConvertFailure<Unit>();
         }
 
-        stateMonad.RemoveVariable(VariableName.Index, false);
+        stateMonad.RemoveVariable(VariableName.Index, false, this);
 
         return Unit.Default;
     }

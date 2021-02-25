@@ -49,7 +49,7 @@ public sealed class AppendString : CompoundStep<Unit>
 
         var newValue = await currentValue.Value.GetStringAsync() + str.Value;
 
-        var r = stateMonad.SetVariable(Variable, new StringStream(newValue));
+        var r = stateMonad.SetVariable(Variable, new StringStream(newValue), this);
 
         if (r.IsFailure)
             return r.ConvertFailure<Unit>();

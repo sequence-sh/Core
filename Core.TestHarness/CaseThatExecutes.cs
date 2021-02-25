@@ -112,7 +112,8 @@ public abstract partial class StepTestBase<TStep, TOutput>
                 logger,
                 Settings,
                 sfs,
-                externalContext
+                externalContext,
+                new object()
             );
 
             foreach (var action in InitialStateActions)

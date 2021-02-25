@@ -321,7 +321,11 @@ public partial class LoggingTests
                 context
             );
 
-            var r = await sclRunner.RunSequenceFromTextAsync(SCL, CancellationToken.None);
+            var r = await sclRunner.RunSequenceFromTextAsync(
+                SCL,
+                new Dictionary<string, object>(),
+                CancellationToken.None
+            );
 
             r.ShouldBeSuccessful(x => x.ToString()!);
 

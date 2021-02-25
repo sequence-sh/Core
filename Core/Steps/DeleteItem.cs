@@ -35,21 +35,17 @@ public class DeleteItem : CompoundStep<Unit>
         if (stateMonad.ExternalContext.FileSystemHelper.Directory.Exists(path))
         {
             result = stateMonad.ExternalContext.FileSystemHelper.DeleteDirectory(path, true);
-            stateMonad.Logger.LogSituation(LogSituation.DirectoryDeleted, path);
+            LogSituation.DirectoryDeleted.Log(stateMonad, this, path);
         }
         else if (stateMonad.ExternalContext.FileSystemHelper.File.Exists(path))
         {
             result = stateMonad.ExternalContext.FileSystemHelper.DeleteFile(path);
-            stateMonad.Logger.LogSituation(LogSituation.FileDeleted, path);
+            LogSituation.FileDeleted.Log(stateMonad, this, path);
         }
         else
         {
             result = Unit.Default;
-
-            stateMonad.Logger.LogSituation(
-                LogSituation.ItemToDeleteDidNotExist,
-                path
-            );
+            LogSituation.ItemToDeleteDidNotExist.Log(stateMonad, this, path);
         }
 
         return result.MapError(x => x.WithLocation(this));

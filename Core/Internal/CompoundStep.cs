@@ -35,37 +35,27 @@ public abstract class CompoundStep<T> : ICompoundStep<T>
     {
         using (stateMonad.Logger.BeginScope(Name))
         {
-            IEnumerable<object> GetEnterStepArgs()
+            object[] GetEnterStepArgs()
             {
-                yield return Name;
-
                 var properties = AllProperties
                     .ToDictionary(x => x.Name, x => x.GetLogName());
 
-                yield return properties;
+                return new object[] { Name, properties };
             }
 
-            stateMonad.Logger.LogSituation(LogSituation.EnterStep, GetEnterStepArgs());
+            LogSituation.EnterStep.Log(stateMonad, this, GetEnterStepArgs());
 
             var result = await Run(stateMonad, cancellationToken);
 
             if (result.IsFailure)
             {
-                stateMonad.Logger.LogSituation(
-                    LogSituation.ExitStepFailure,
-                    Name,
-                    result.Error.AsString
-                );
+                LogSituation.ExitStepFailure.Log(stateMonad, this, Name, result.Error.AsString);
             }
             else
             {
                 var resultValue = SerializeOutput(result.Value);
 
-                stateMonad.Logger.LogSituation(
-                    LogSituation.ExitStepSuccess,
-                    Name,
-                    resultValue
-                );
+                LogSituation.ExitStepSuccess.Log(stateMonad, this, Name, resultValue);
             }
 
             return result;

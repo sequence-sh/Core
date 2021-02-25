@@ -14,6 +14,7 @@ namespace Reductech.EDR.Core
 
 /// <summary>
 /// The state monad that is passed between steps.
+/// Mutable.
 /// </summary>
 public sealed class StateMonad : IStateMonad
 {
@@ -26,12 +27,14 @@ public sealed class StateMonad : IStateMonad
         ILogger logger,
         SCLSettings settings,
         StepFactoryStore stepFactoryStore,
-        IExternalContext externalContext)
+        IExternalContext externalContext,
+        object sequenceMetadata)
     {
         Logger           = logger;
         Settings         = settings;
         StepFactoryStore = stepFactoryStore;
         ExternalContext  = externalContext;
+        SequenceMetadata = sequenceMetadata;
     }
 
     /// <summary>
@@ -45,14 +48,19 @@ public sealed class StateMonad : IStateMonad
     public SCLSettings Settings { get; }
 
     /// <summary>
+    /// The step factory store. Maps from step names to step factories.
+    /// </summary>
+    public StepFactoryStore StepFactoryStore { get; }
+
+    /// <summary>
     /// The external context
     /// </summary>
     public IExternalContext ExternalContext { get; }
 
     /// <summary>
-    /// The step factory store. Maps from step names to step factories.
+    /// Constant metadata for the entire sequence
     /// </summary>
-    public StepFactoryStore StepFactoryStore { get; }
+    public object SequenceMetadata { get; }
 
     /// <summary>
     /// Gets all VariableNames and associated objects.
@@ -101,7 +109,7 @@ public sealed class StateMonad : IStateMonad
     /// <summary>
     /// Creates or set the value of this variable.
     /// </summary>
-    public Result<Unit, IError> SetVariable<T>(VariableName key, T variable)
+    public Result<Unit, IError> SetVariable<T>(VariableName key, T variable, IStep callingStep)
     {
         if (Disposed)
             throw new ObjectDisposedException("State Monad was disposed");
@@ -115,7 +123,7 @@ public sealed class StateMonad : IStateMonad
     /// <summary>
     /// Removes the variable if it exists.
     /// </summary>
-    public void RemoveVariable(VariableName key, bool dispose)
+    public void RemoveVariable(VariableName key, bool dispose, IStep callingStep)
     {
         if (Disposed)
             throw new ObjectDisposedException("State Monad was disposed");

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.IO;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
@@ -29,15 +29,12 @@ public sealed class SCLRunner
         SCLSettings settings,
         ILogger logger,
         StepFactoryStore stepFactoryStore,
-        IExternalContext externalContext,
-        params KeyValuePair<string, object>[] loggingData)
+        IExternalContext externalContext)
     {
         _settings         = settings;
         _logger           = logger;
         _stepFactoryStore = stepFactoryStore;
         _externalContext  = externalContext;
-
-        _loggingData = loggingData.ToDictionary(x => x.Key, x => x.Value);
     }
 
     private readonly SCLSettings _settings;
@@ -45,50 +42,61 @@ public sealed class SCLRunner
     private readonly StepFactoryStore _stepFactoryStore;
     private readonly IExternalContext _externalContext;
 
-    private readonly IReadOnlyDictionary<string, object> _loggingData;
-
     /// <summary>
     /// Run step defined in an SCL string.
     /// </summary>
     /// <param name="text">SCL representing the step.</param>
+    /// <param name="sequenceMetadata">Additional information about the sequence</param>
     /// <param name="cancellationToken">Cancellation ErrorLocation</param>
     /// <returns></returns>
     [UsedImplicitly]
     public async Task<Result<Unit, IError>> RunSequenceFromTextAsync(
         string text,
+        Dictionary<string, object> sequenceMetadata,
         CancellationToken cancellationToken)
     {
         var stepResult = SCLParsing.ParseSequence(text)
             .Bind(x => x.TryFreeze(_stepFactoryStore))
             .Map(ConvertToUnitStep);
 
+        sequenceMetadata["SequenceId"] = Guid.NewGuid();
+
+        var eo = new ExpandoObject();
+
+        foreach (var o in sequenceMetadata)
+        {
+            (eo as ICollection<KeyValuePair<string, object>>).Add(o);
+        }
+
         if (stepResult.IsFailure)
             return stepResult.ConvertFailure<Unit>();
 
-        using var loggingScope = _logger.BeginScope(_loggingData);
+        using var loggingScope = _logger.BeginScope("EDR");
 
-        using var stateMonad = new StateMonad(
+        using IStateMonad stateMonad = new StateMonad(
             _logger,
             _settings,
             _stepFactoryStore,
-            _externalContext
+            _externalContext,
+            eo
         );
 
-        _logger.LogSituation(LogSituation.SequenceStarted);
+        LogSituation.SequenceStarted.Log(stateMonad, null);
 
         var connectorSettings = _settings.Entity.TryGetValue(SCLSettings.ConnectorsKey);
 
         if (connectorSettings.HasValue)
         {
-            _logger.LogSituation(
-                LogSituation.ConnectorSettings,
+            LogSituation.ConnectorSettings.Log(
+                stateMonad,
+                null,
                 connectorSettings.Value.Serialize()
             );
         }
 
         var runResult = await stepResult.Value.Run(stateMonad, cancellationToken);
 
-        _logger.LogSituation(LogSituation.SequenceCompleted);
+        LogSituation.SequenceCompleted.Log(stateMonad, null);
 
         return runResult;
     }
@@ -116,11 +124,13 @@ public sealed class SCLRunner
     /// Run step defined in an SCL file.
     /// </summary>
     /// <param name="path">Path to the SCL file.</param>
+    /// <param name="sequenceMetadata">Additional metadata about the sequence</param>
     /// <param name="cancellationToken">The cancellation token</param>
     /// <returns></returns>
     [UsedImplicitly]
     public async Task<Result<Unit, IError>> RunSequenceFromPathAsync(
         string path,
+        Dictionary<string, object> sequenceMetadata,
         CancellationToken cancellationToken)
     {
         Result<string, IError> result;
@@ -137,7 +147,12 @@ public sealed class SCLRunner
         }
         #pragma warning restore CA1031 // Do not catch general exception types
 
-        var result2 = await result.Bind(x => RunSequenceFromTextAsync(x, cancellationToken));
+        sequenceMetadata["SCLPath"] = path;
+
+        var result2 = await result.Bind(
+            x => RunSequenceFromTextAsync(x, sequenceMetadata, cancellationToken)
+        );
+
         return result2;
     }
 
