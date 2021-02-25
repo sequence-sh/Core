@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
@@ -15,12 +14,12 @@ namespace Reductech.EDR.Core.Steps
 {
 
 /// <summary>
-/// Create entities from a Json Stream
+/// Create an entity from a Json Stream
 /// </summary>
-public sealed class FromJsonArray : CompoundStep<Array<Entity>>
+public sealed class FromJson : CompoundStep<Entity>
 {
     /// <inheritdoc />
-    protected override async Task<Result<Array<Entity>, IError>> Run(
+    protected override async Task<Result<Entity, IError>> Run(
         IStateMonad stateMonad,
         CancellationToken cancellationToken)
     {
@@ -28,13 +27,13 @@ public sealed class FromJsonArray : CompoundStep<Array<Entity>>
             .Map(x => x.GetStringAsync());
 
         if (text.IsFailure)
-            return text.ConvertFailure<Array<Entity>>();
+            return text.ConvertFailure<Entity>();
 
-        List<Entity>? entities;
+        Entity? entity;
 
         try
         {
-            entities = JsonConvert.DeserializeObject<List<Entity>>(
+            entity = JsonConvert.DeserializeObject<Entity>(
                 text.Value,
                 EntityJsonConverter.Instance
             );
@@ -42,17 +41,17 @@ public sealed class FromJsonArray : CompoundStep<Array<Entity>>
         catch (Exception e)
         {
             stateMonad.Log(LogLevel.Error, e.Message, this);
-            entities = null;
+            entity = null;
         }
 
-        if (entities is null)
+        if (entity is null)
             return
-                Result.Failure<Array<Entity>, IError>(
+                Result.Failure<Entity, IError>(
                     ErrorCode.CouldNotParse.ToErrorBuilder(text.Value, "JSON")
                         .WithLocation(this)
                 );
 
-        return new Array<Entity>(entities!);
+        return entity;
     }
 
     /// <summary>
@@ -64,7 +63,7 @@ public sealed class FromJsonArray : CompoundStep<Array<Entity>>
 
     /// <inheritdoc />
     public override IStepFactory StepFactory { get; } =
-        new SimpleStepFactory<FromJsonArray, Array<Entity>>();
+        new SimpleStepFactory<FromJson, Entity>();
 }
 
 }

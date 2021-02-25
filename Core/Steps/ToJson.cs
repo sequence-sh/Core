@@ -12,28 +12,22 @@ namespace Reductech.EDR.Core.Steps
 {
 
 /// <summary>
-/// Write entities to a stream in Json format.
+/// Writes an entity to a stream in JSON format
 /// </summary>
-public sealed class ToJsonArray : CompoundStep<StringStream>
+public sealed class ToJson : CompoundStep<StringStream>
 {
     /// <inheritdoc />
     protected override async Task<Result<StringStream, IError>> Run(
         IStateMonad stateMonad,
         CancellationToken cancellationToken)
     {
-        //TODO maybe stream the result?
-        var list = await Entities.Run(stateMonad, cancellationToken);
+        var entity = await Entity.Run(stateMonad, cancellationToken);
 
-        if (list.IsFailure)
-            return list.ConvertFailure<StringStream>();
-
-        var elements = await list.Value.GetElementsAsync(cancellationToken);
-
-        if (elements.IsFailure)
-            return elements.ConvertFailure<StringStream>();
+        if (entity.IsFailure)
+            return entity.ConvertFailure<StringStream>();
 
         var jsonString = JsonConvert.SerializeObject(
-            elements.Value,
+            entity.Value,
             Formatting.None,
             EntityJsonConverter.Instance
         );
@@ -42,15 +36,15 @@ public sealed class ToJsonArray : CompoundStep<StringStream>
     }
 
     /// <summary>
-    /// The entities to write.
+    /// The entity to write.
     /// </summary>
     [StepProperty(1)]
     [Required]
-    public IStep<Array<Entity>> Entities { get; set; } = null!;
+    public IStep<Entity> Entity { get; set; } = null!;
 
     /// <inheritdoc />
     public override IStepFactory StepFactory { get; } =
-        new SimpleStepFactory<ToJsonArray, StringStream>();
+        new SimpleStepFactory<ToJson, StringStream>();
 }
 
 }
