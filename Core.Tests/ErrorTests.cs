@@ -153,7 +153,8 @@ public partial class RunErrorTests
                 NullLogger.Instance,
                 SCLSettings.EmptySettings,
                 spf,
-                externalContext
+                externalContext,
+                new()
             );
 
             var r = await Process.Run<object>(state, CancellationToken.None);

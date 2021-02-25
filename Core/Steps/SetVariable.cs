@@ -24,7 +24,7 @@ public sealed class SetVariable<T> : CompoundStep<Unit>
         CancellationToken cancellationToken)
     {
         return await Value.Run(stateMonad, cancellationToken)
-            .Bind(x => stateMonad.SetVariable(Variable, x));
+            .Bind(x => stateMonad.SetVariable(Variable, x, this));
     }
 
     /// <inheritdoc />

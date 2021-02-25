@@ -374,7 +374,11 @@ Log 'Comments!'",
                 externalContext
             );
 
-            var result = await runner.RunSequenceFromTextAsync(SCL, CancellationToken.None);
+            var result = await runner.RunSequenceFromTextAsync(
+                SCL,
+                new Dictionary<string, object>(),
+                CancellationToken.None
+            );
 
             result.ShouldBeSuccessful(x => x.ToString()!);
 

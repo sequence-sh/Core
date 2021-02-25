@@ -61,7 +61,7 @@ public sealed class EnforceSchema : CompoundStep<Array<Entity>>
         async IAsyncEnumerable<Entity> ApplySchema(Entity entity)
         {
             await ValueTask.CompletedTask;
-            var result = schema.Value.ApplyToEntity(entity, stateMonad.Logger, errorBehavior);
+            var result = schema.Value.ApplyToEntity(entity, this, stateMonad, errorBehavior);
 
             if (result.IsFailure)
                 throw new ErrorException(result.Error.WithLocation(this));

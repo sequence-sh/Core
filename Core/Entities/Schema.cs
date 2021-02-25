@@ -5,6 +5,7 @@ using CSharpFunctionalExtensions;
 using Microsoft.Extensions.Logging;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Enums;
+using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Internal.Logging;
 using Reductech.EDR.Core.Util;
@@ -55,7 +56,8 @@ public sealed class Schema
     /// </summary>
     public Result<Maybe<Entity>, IErrorBuilder> ApplyToEntity(
         Entity entity,
-        ILogger logger,
+        IStep callingStep,
+        IStateMonad stateMonad,
         Maybe<ErrorBehavior> errorBehaviorOverride)
     {
         var remainingProperties = Properties
@@ -174,7 +176,7 @@ public sealed class Schema
         {
             var warningList = ErrorBuilderList.Combine(warnings);
 
-            logger.LogSituation(LogSituation.SchemaViolation, warningList.AsString);
+            LogSituation.SchemaViolation.Log(stateMonad, callingStep, warningList.AsString);
         }
 
         if (!returnEntity)
