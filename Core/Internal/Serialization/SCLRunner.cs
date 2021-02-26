@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Dynamic;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -55,69 +54,9 @@ public sealed class SCLRunner
         Dictionary<string, object> sequenceMetadata,
         CancellationToken cancellationToken)
     {
-        var stepResult = SCLParsing.ParseSequence(text)
-            .Bind(x => x.TryFreeze(_stepFactoryStore))
-            .Map(ConvertToUnitStep);
-
-        sequenceMetadata["SequenceId"] = Guid.NewGuid();
-
-        var eo = new ExpandoObject();
-
-        foreach (var o in sequenceMetadata)
-        {
-            (eo as ICollection<KeyValuePair<string, object>>).Add(o);
-        }
-
-        if (stepResult.IsFailure)
-            return stepResult.ConvertFailure<Unit>();
-
-        using var loggingScope = _logger.BeginScope("EDR");
-
-        await using IStateMonad stateMonad = new StateMonad(
-            _logger,
-            _settings,
-            _stepFactoryStore,
-            _externalContext,
-            eo
-        );
-
-        LogSituation.SequenceStarted.Log(stateMonad, null);
-
-        var connectorSettings = _settings.Entity.TryGetValue(SCLSettings.ConnectorsKey);
-
-        if (connectorSettings.HasValue)
-        {
-            LogSituation.ConnectorSettings.Log(
-                stateMonad,
-                null,
-                connectorSettings.Value.Serialize()
-            );
-        }
-
-        var runResult = await stepResult.Value.Run(stateMonad, cancellationToken);
-
-        LogSituation.SequenceCompleted.Log(stateMonad, null);
-
-        return runResult;
-    }
-
-    /// <summary>
-    /// Converts the step to a unit step for running.
-    /// </summary>
-    public static IStep<Unit> ConvertToUnitStep(IStep step)
-    {
-        if (step is IStep<Unit> unitStep)
-            return unitStep;
-
-        IStep<Unit> log = SurroundWithLog(step as dynamic);
-        return log;
-    }
-
-    private static IStep<Unit> SurroundWithLog<T>(IStep<T> step)
-    {
-        var p = new Log<T> { Value = step };
-
-        return p;
+        sequenceMetadata[SCLTextName]    = text;
+        sequenceMetadata[SequenceIdName] = Guid.NewGuid();
+        return await RunSequence(text, sequenceMetadata, cancellationToken);
     }
 
     /// <summary>
@@ -147,13 +86,103 @@ public sealed class SCLRunner
         }
         #pragma warning restore CA1031 // Do not catch general exception types
 
-        sequenceMetadata["SCLPath"] = path;
+        sequenceMetadata[SCLPathName]    = path;
+        sequenceMetadata[SequenceIdName] = Guid.NewGuid();
 
-        var result2 = await result.Bind(
-            x => RunSequenceFromTextAsync(x, sequenceMetadata, cancellationToken)
-        );
+        var result2 = await result.Bind(x => RunSequence(x, sequenceMetadata, cancellationToken));
 
         return result2;
+    }
+
+    /// <summary>
+    /// The name of the SequenceId log property.
+    /// </summary>
+    public const string SequenceIdName = "SequenceId";
+
+    /// <summary>
+    /// The name of the SCL Path log property
+    /// </summary>
+    public const string SCLPathName = "SCLPath";
+
+    /// <summary>
+    /// The name of the SCL Text log property
+    /// </summary>
+    public const string SCLTextName = "SCLText";
+
+    /// <summary>
+    /// The top level logging scope.
+    /// </summary>
+    public const string TopLevelLoggingScope = "EDR";
+
+    /// <summary>
+    /// Runs an SCL sequence without injecting any metadata
+    /// </summary>
+    public async Task<Result<Unit, IError>> RunSequence(
+        string text,
+        IReadOnlyDictionary<string, object> sequenceMetadata,
+        CancellationToken cancellationToken)
+    {
+        var stepResult = SCLParsing.ParseSequence(text)
+            .Bind(x => x.TryFreeze(_stepFactoryStore))
+            .Map(ConvertToUnitStep);
+
+        if (stepResult.IsFailure)
+            return stepResult.ConvertFailure<Unit>();
+
+        using var loggingScope = _logger.BeginScope(TopLevelLoggingScope);
+
+        var stateMonad = new StateMonad(
+            _logger,
+            _settings,
+            _stepFactoryStore,
+            _externalContext,
+            sequenceMetadata
+        );
+
+        LogSituation.SequenceStarted.Log(stateMonad, null);
+
+        var connectorSettings = _settings.Entity.TryGetValue(SCLSettings.ConnectorsKey);
+
+        if (connectorSettings.HasValue)
+        {
+            LogSituation.ConnectorSettings.Log(
+                stateMonad,
+                null,
+                connectorSettings.Value.Serialize()
+            );
+        }
+
+        var runResult = await stepResult.Value.Run(stateMonad, cancellationToken);
+
+        await stateMonad.DisposeAsync();
+
+        _logger.LogSituation(
+            LogSituation.SequenceCompleted,
+            null,
+            sequenceMetadata,
+            Array.Empty<object?>()
+        );
+
+        return runResult;
+    }
+
+    /// <summary>
+    /// Converts the step to a unit step for running.
+    /// </summary>
+    public static IStep<Unit> ConvertToUnitStep(IStep step)
+    {
+        if (step is IStep<Unit> unitStep)
+            return unitStep;
+
+        IStep<Unit> log = SurroundWithLog(step as dynamic);
+        return log;
+    }
+
+    private static IStep<Unit> SurroundWithLog<T>(IStep<T> step)
+    {
+        var p = new Log<T> { Value = step };
+
+        return p;
     }
 
     /// <summary>

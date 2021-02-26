@@ -154,7 +154,7 @@ public partial class RunErrorTests
                 SCLSettings.EmptySettings,
                 spf,
                 externalContext,
-                new()
+                new Dictionary<string, object>()
             );
 
             var r = await Process.Run<object>(state, CancellationToken.None);

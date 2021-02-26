@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -111,7 +112,7 @@ public partial class StateMonadTests
                 new SCLSettings(Entity.Create()),
                 StepFactoryStore.Create(),
                 repo.OneOf<IExternalContext>(),
-                repo.OneOf<object>()
+                repo.OneOf<IReadOnlyDictionary<string, object>>()
             );
     }
 }

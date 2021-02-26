@@ -38,15 +38,9 @@ public abstract record LogSituationBase(string Code, LogLevel LogLevel)
 
         var message = _logValuesFormatter.Format(args);
 
-        var values = _logValuesFormatter.GetValues(args);
+        var values = _logValuesFormatter.GetValues(args).ToDictionary(x => x.Key, x => x.Value);
 
-        var obj     = new ExpandoObject();
-        var objDict = (ICollection<KeyValuePair<string, object>>)obj!;
-
-        foreach (var kvp in values)
-            objDict.Add(kvp);
-
-        return (message, obj);
+        return (message, values);
     }
 
     private LogValuesFormatter? _logValuesFormatter;
