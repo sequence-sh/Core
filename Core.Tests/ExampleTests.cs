@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
+using Divergic.Logging.Xunit;
 using Microsoft.Extensions.Logging;
 using Reductech.EDR.Core.Abstractions;
 using Reductech.EDR.Core.Entities;
@@ -58,7 +59,7 @@ public partial class ExampleTests
             SCLSettings.EmptySettings,
             sfs,
             ExternalContext.Default,
-            new object()
+            new Dictionary<string, object>()
         );
 
         var r = await stepResult.Value.Run<Unit>(monad, CancellationToken.None);
@@ -66,7 +67,8 @@ public partial class ExampleTests
         r.ShouldBeSuccessful(x => x.ToString()!);
     }
 
-    [Fact(Skip = "true")]
+    //[Fact(Skip = "true")]
+    [Fact]
     [Trait("Category", "Integration")]
     public async Task RunSCLSequence()
     {
@@ -77,7 +79,7 @@ Properties:(
 Foo: (Type: 'String' Multiplicity: 'ExactlyOne')
 Bar: (Type: 'String' Multiplicity: 'ExactlyOne')
 ))
-- FileWrite (ToJson [<schema>]) 'Schema.json'";
+- FileWrite (ToJsonArray [<schema>]) 'Schema.json'";
         //@"FileWrite 'Dinosaur Dinosaur Dinosaur' 'C:\Users\wainw\source\repos\Reductech\core\TestFile.txt' true";
         //            @"GenerateDocumentation | Foreach (
         //- Print (From <Entity> ""FileName"")
@@ -89,8 +91,10 @@ Bar: (Type: 'String' Multiplicity: 'ExactlyOne')
         //- <docs> | ArrayDistinct (From <entity> 'Directory') | ForEach (CreateDirectory (PathCombine ['Documentation', (From <Entity> 'Directory')]))
         //- <docs> | Foreach (FileWrite (From <Entity> 'FileText') (PathCombine ['Documentation', (From <Entity> 'Directory'), (From <Entity> 'FileName')]))";
 
-        var logger = TestOutputHelper.BuildLogger(LogLevel.Trace);
-        var sfs    = StepFactoryStore.CreateUsingReflection();
+        var logger =
+            TestOutputHelper.BuildLogger(new LoggingConfig() { LogLevel = LogLevel.Trace });
+
+        var sfs = StepFactoryStore.CreateUsingReflection();
 
         var runner = new SCLRunner(
             SCLSettings.EmptySettings,
@@ -190,7 +194,7 @@ Bar: (Type: 'String' Multiplicity: 'ExactlyOne')
             SCLSettings.EmptySettings,
             StepFactoryStore.CreateUsingReflection(),
             ExternalContext.Default,
-            new object()
+            new Dictionary<string, object>()
         );
 
         var r = await (step as IStep<Unit>).Run(monad, CancellationToken.None);

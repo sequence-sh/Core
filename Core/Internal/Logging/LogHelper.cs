@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using System.Collections;
+using System.Collections.Generic;
+using Microsoft.Extensions.Logging;
 
 namespace Reductech.EDR.Core.Internal.Logging
 {
@@ -13,11 +15,32 @@ public record LogMessage(
         object? MessageParams,
         string? StepName,
         TextLocation? Location,
-        object SequenceInfo)
+        IReadOnlyDictionary<string, object> SequenceInfo) : IEnumerable<KeyValuePair<string, object>
+    >
     #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
 {
     /// <inheritdoc />
+    public IEnumerator<KeyValuePair<string, object>> GetEnumerator()
+    {
+        yield return new KeyValuePair<string, object>(nameof(Message), Message);
+
+        if (MessageParams is not null)
+            yield return new KeyValuePair<string, object>(nameof(MessageParams), MessageParams);
+
+        if (StepName is not null)
+            yield return new KeyValuePair<string, object>(nameof(StepName), StepName);
+
+        if (Location is not null)
+            yield return new KeyValuePair<string, object>(nameof(Location), Location);
+
+        yield return new KeyValuePair<string, object>(nameof(SequenceInfo), SequenceInfo);
+    }
+
+    /// <inheritdoc />
     public override string ToString() => Message;
+
+    /// <inheritdoc />
+    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 }
 
 /// <summary>
@@ -34,7 +57,24 @@ public static class LogHelper
         T situation,
         IStep? step,
         IStateMonad monad,
-        params object?[] args) where T : LogSituationBase
+        params object?[] args) where T : LogSituationBase => LogSituation(
+        logger,
+        situation,
+        step,
+        monad.SequenceMetadata,
+        args
+    );
+
+    /// <summary>
+    /// Logs a message for the particular situation.
+    /// Will use the resource to localize the message
+    /// </summary>
+    public static void LogSituation<T>(
+        this ILogger logger,
+        T situation,
+        IStep? step,
+        IReadOnlyDictionary<string, object> sequenceMetadata,
+        object?[] args) where T : LogSituationBase
     {
         var logLevel = situation.LogLevel;
 
@@ -47,7 +87,7 @@ public static class LogHelper
                 q.properties,
                 step?.Name,
                 step?.TextLocation,
-                monad.SequenceMetadata
+                sequenceMetadata
             );
 
             logger.Log(logLevel, default, logMessage, null, (x, _) => x.ToString());

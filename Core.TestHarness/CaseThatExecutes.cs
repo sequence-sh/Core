@@ -115,7 +115,7 @@ public abstract partial class StepTestBase<TStep, TOutput>
                 Settings,
                 sfs,
                 externalContext,
-                new object()
+                new Dictionary<string, object>()
             );
 
             foreach (var action in InitialStateActions)

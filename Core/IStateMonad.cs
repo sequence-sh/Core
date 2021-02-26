@@ -20,7 +20,7 @@ public interface IStateMonad : IAsyncDisposable
     /// <summary>
     /// Constant metadata for the entire sequence
     /// </summary>
-    object SequenceMetadata { get; }
+    IReadOnlyDictionary<string, object> SequenceMetadata { get; }
 
     /// <summary>
     /// The logger that steps will use to output messages.

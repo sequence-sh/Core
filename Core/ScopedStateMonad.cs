@@ -39,7 +39,7 @@ public sealed class ScopedStateMonad : IStateMonad
     private readonly ImmutableDictionary<VariableName, object> _fixedState;
 
     /// <inheritdoc />
-    public object SequenceMetadata => BaseStateMonad.SequenceMetadata;
+    public IReadOnlyDictionary<string, object> SequenceMetadata => BaseStateMonad.SequenceMetadata;
 
     /// <inheritdoc />
     public ILogger Logger => BaseStateMonad.Logger;

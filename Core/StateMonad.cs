@@ -28,7 +28,7 @@ public sealed class StateMonad : IStateMonad
         SCLSettings settings,
         StepFactoryStore stepFactoryStore,
         IExternalContext externalContext,
-        object sequenceMetadata)
+        IReadOnlyDictionary<string, object> sequenceMetadata)
     {
         Logger           = logger;
         Settings         = settings;
@@ -60,7 +60,7 @@ public sealed class StateMonad : IStateMonad
     /// <summary>
     /// Constant metadata for the entire sequence
     /// </summary>
-    public object SequenceMetadata { get; }
+    public IReadOnlyDictionary<string, object> SequenceMetadata { get; }
 
     /// <summary>
     /// Gets all VariableNames and associated objects.
