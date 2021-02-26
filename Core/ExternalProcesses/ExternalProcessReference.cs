@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Threading.Channels;
 using Reductech.EDR.Core.Internal;
@@ -43,6 +44,7 @@ public sealed class ExternalProcessReference : IExternalProcessReference
             Process.Dispose();
         }
         catch (Win32Exception) { }
+        catch (InvalidOperationException) { }
     }
 
     /// <inheritdoc />
