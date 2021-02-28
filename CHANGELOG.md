@@ -9,29 +9,28 @@
 - Created `FromJsonArray`
 - Created `ToJsonArray`
 - [ Added `Hash` Step ](https://docs.reductech.io/edr/steps/Core/Hash.html)
-- Added FileMove
-- Added FileCopy
 - Added DirectoryMove
 - Added DirectoryCopy
+- Added FileMove
+- Added FileCopy
+- Added `EntityCombine` step 
 - `Print` renamed to `Log`
 - Added `Print` which writes an entity to the console
 - Created `ReadStandardIn` step that returns a StringStream of data from the standard input
-
 - Created `WriteStandardOut` step that writes a StringStream to standard output
 - [ Added `RegexMatch` Step ](https://docs.reductech.io/edr/steps/Core/RegexMatch.html)
 - [ Added `RegexReplace` Step ](https://docs.reductech.io/edr/steps/Core/RegexReplace.html)
 
 ### Sequence Configuration Language
 
-- Removed `ApplyMathOperator`, `ApplyBooleanOperator`, `Compare`
-- Removed `with` keyword
+- All operators can now be chained
+- `+` operator can now be used for `Sum`, `StringConcatenate`, or `EntityCombine`
+- The `+` operator now combines entities
 - Added `Sum`, `Product`, `Subtract`, `Divide`, `Modulo` `Power`
 - Added `And`, `Or`
 - Added `Equals`, `NotEquals`, `LessThan`, `LessThanOrEqual`, `GreaterThan`, `GreaterThanOrEqual`
-- All operators can now be chained
-- `+` operator can now be used for `Sum`, `StringConcatenate`, or `EntityCombine`
-- Added `EntityCombine` step 
-- The `+` operator now combines entities
+- Removed `ApplyMathOperator`, `ApplyBooleanOperator`, `Compare`
+- Removed `with` keyword
 - Strings can be used to name entity properties in SCL
 - Commas are now optional in SCL arrays
 - Enabled nested entity access in SCL e.g. `<entity>['Property.Name.Multiplicity']`
@@ -40,12 +39,12 @@
 
 ### Core SDK
 
-- `IStateMonad` now implements `IAsyncDisposable` not `IDisposable`
-- `IStateMonad` `GetVariable` and `SetVariable` are now Async
-- External context abstracted using https://github.com/PawelGerr/Thinktecture.Abstractions
 - Added `DateInputFormat` and `DateOutputFormat` to `SchemaProperty`
 - Added `DefaultErrorBehaviour` to `Schema`
 - Added `ErrorBehaviour` to `SchemaProperty `
+- `IStateMonad` now implements `IAsyncDisposable` not `IDisposable`
+- `IStateMonad` `GetVariable` and `SetVariable` are now Async
+- External context abstracted using https://github.com/PawelGerr/Thinktecture.Abstractions
 
 ### Logging and Monitoring
 
