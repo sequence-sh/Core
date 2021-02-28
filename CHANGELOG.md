@@ -1,3 +1,100 @@
+# v0.5.0 (2021-02-28)
+
+## Summary of Changes
+
+### Steps
+
+- `FromJson` now parses Json object and returns an `Entity`
+- `ToJson` now takes an `Entity` and returns a Json object string
+- Created `FromJsonArray`
+- Created `ToJsonArray`
+- [ Added `Hash` Step ](https://docs.reductech.io/edr/steps/Core/Hash.html)
+- Added FileMove
+- Added FileCopy
+- Added DirectoryMove
+- Added DirectoryCopy
+- `Print` renamed to `Log`
+- Added `Print` which writes an entity to the console
+- Created `ReadStandardIn` step that returns a StringStream of data from the standard input
+
+- Created `WriteStandardOut` step that writes a StringStream to standard output
+- [ Added `RegexMatch` Step ](https://docs.reductech.io/edr/steps/Core/RegexMatch.html)
+- [ Added `RegexReplace` Step ](https://docs.reductech.io/edr/steps/Core/RegexReplace.html)
+
+### Sequence Configuration Language
+
+- Removed `ApplyMathOperator`, `ApplyBooleanOperator`, `Compare`
+- Removed `with` keyword
+- Added `Sum`, `Product`, `Subtract`, `Divide`, `Modulo` `Power`
+- Added `And`, `Or`
+- Added `Equals`, `NotEquals`, `LessThan`, `LessThanOrEqual`, `GreaterThan`, `GreaterThanOrEqual`
+- All operators can now be chained
+- `+` operator can now be used for `Sum`, `StringConcatenate`, or `EntityCombine`
+- Added `EntityCombine` step 
+- The `+` operator now combines entities
+- Strings can be used to name entity properties in SCL
+- Commas are now optional in SCL arrays
+- Enabled nested entity access in SCL e.g. `<entity>['Property.Name.Multiplicity']`
+- Added Array access operator to SCL: `[1,2,3][0]`
+- Added Entity access operator to SCL: `(Property: 'Value')['Property']`
+
+### Core SDK
+
+- `IStateMonad` now implements `IAsyncDisposable` not `IDisposable`
+- `IStateMonad` `GetVariable` and `SetVariable` are now Async
+- External context abstracted using https://github.com/PawelGerr/Thinktecture.Abstractions
+- Added `DateInputFormat` and `DateOutputFormat` to `SchemaProperty`
+- Added `DefaultErrorBehaviour` to `Schema`
+- Added `ErrorBehaviour` to `SchemaProperty `
+
+### Logging and Monitoring
+
+- Logged messages now have the following properties: `Message` `MessageParams` `StepName` `Location` `SequenceInfo`
+- Additional log messages added at the start and end of each sequence
+
+## Issues Closed in this Release
+
+### New Features
+
+- StateMonad methods should be async and it should implement IAsyncDisposable #198
+- Create ToJsonArray and FromJsonArray and change ToJson and FromJSon to produce/return single entities to make Json more intuitive for technicians #196
+- StateMonad should more elegantly get rid of nested variables #197
+- Use structured logging, so that technicians can more easily aggregate edr log information #195
+- Make Testing Log level configurable to prevent exposure of secrets in CI #193
+- Errors should have separate properties for  StepName, and TextLocation #191
+- Adjust logging in Core to make it easier to integrate with ELK stack #190
+- Enable trace logging in more areas to make problems easier to diagnose #188
+- Add a Hash step to Hash Strings so technicians can produce hashes for files #186
+- Create steps to move and copy files and directories #185
+- Allow abstraction of SQL Connections #184
+- Rename `Print` to `Log` and create a new `Print` step that prints to the console #182
+- Create ReadStandardIn and WriteStandardOut to allow interaction with other console applications such as singer #180
+- Allow Operator overloading and chaining to make SCL more intuitive for technicians #128
+- Add RegexMatch and RegexReplace steps #177
+- Add 'EntityCombine' step and with operator to allow easy entity modification #174
+- Allow strings as entity property names to support multi-word names #175
+- Make commas optional in arrays #176
+- Allow nested property identifiers in entity declarations and entity access #173
+- Allow Square brackets for array and entity access in SCL to make the language easier for technicians #172
+- Add DateInputFormat and DateOutputFormat to SchemaProperty to make date handling easier for technicians #170
+- Add ErrorBehaviour Property for schemas to let technicians configure the Error behaviour for individual properties #171
+
+### Bug Fixes
+
+- Log Step should have StepName property logged #194
+- Bug: Lists in configuration are not handled correctly #189
+- Bug: Infix operators with steps are not serialized correctly #183
+
+### Maintenance
+
+- Use external libraries for abstractions to aid testing and improve code coverage #181
+
+### Other
+
+- Logging should support NLog #201
+- Catch InvalidOperationException in ExternalProcessReference dispose #199
+- Change ErrorBehaviour to ErrorBehavior to continue the common software engineering practice of using US spellings #179
+
 ## v0.4.0 (2021-01-29)
 
 Major rework of the language and data streaming features so lots of **breaking changes** including:
