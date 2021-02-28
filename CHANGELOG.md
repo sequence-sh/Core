@@ -94,7 +94,7 @@
 - Catch InvalidOperationException in ExternalProcessReference dispose #199
 - Change ErrorBehaviour to ErrorBehavior to continue the common software engineering practice of using US spellings #179
 
-## v0.4.0 (2021-01-29)
+# v0.4.0 (2021-01-29)
 
 Major rework of the language and data streaming features so lots of **breaking changes** including:
 
@@ -173,7 +173,7 @@ Major rework of the language and data streaming features so lots of **breaking c
 - Add .editorconfig file and standardize formatting #148
 - Update to .NET 5.0 #43
 
-## v0.3.0 (2020-11-27)
+# v0.3.0 (2020-11-27)
 
 **Breaking changes** - Step and argument names have changed to make them more
 consistent. Step names now follow the convention of _NamespaceAction_, e.g.
@@ -216,7 +216,7 @@ consistent. Step names now follow the convention of _NamespaceAction_, e.g.
 
 - Change references to StateMonad to IStateMonad in Process Run Overloads #107
 
-## v0.2.1 (2020-11-03)
+# v0.2.1 (2020-11-03)
 
 ### New Features
 
@@ -241,7 +241,7 @@ consistent. Step names now follow the convention of _NamespaceAction_, e.g.
 
 - Make error messages more verbose, so technicians can debug their yaml more easily #85
 
-## v0.2.0 (2020-10-02)
+# v0.2.0 (2020-10-02)
 
 The Core SDK has been reworked to use a procedural paradigm instead
 of injection. See here for more details: https://gitlab.com/groups/reductech/edr/-/epics/6
@@ -313,7 +313,7 @@ For more details: https://gitlab.com/groups/reductech/-/epics/5
 
 - Change order of chain arguments #13
 
-## v0.1.0 (2020-03-13)
+# v0.1.0 (2020-03-13)
 
 Initial release of Core designed to work by injecting output of
 a previous process into the current one.
