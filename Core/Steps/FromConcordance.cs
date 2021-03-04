@@ -15,10 +15,10 @@ namespace Reductech.EDR.Core.Steps
 /// The same as FromCSV but with different default values.
 /// </summary>
 [Alias("ConvertConcordanceToEntity")]
-public sealed class FromConcordance : CompoundStep<Core.Array<Entity>>
+public sealed class FromConcordance : CompoundStep<Array<Entity>>
 {
     /// <inheritdoc />
-    protected override async Task<Result<Core.Array<Entity>, IError>> Run(
+    protected override async Task<Result<Array<Entity>, IError>> Run(
         IStateMonad stateMonad,
         CancellationToken cancellationToken)
     {
@@ -77,23 +77,8 @@ public sealed class FromConcordance : CompoundStep<Core.Array<Entity>>
         new StringConstant(new StringStream("|"));
 
     /// <inheritdoc />
-    public override IStepFactory StepFactory => FromConcordanceStepFactory.Instance;
-}
-
-/// <summary>
-/// Extracts entities from a Concordance stream.
-/// The same as FromCSV but with different default values.
-/// </summary>
-public sealed class
-    FromConcordanceStepFactory : SimpleStepFactory<FromConcordance, Core.Array<Entity>>
-{
-    private FromConcordanceStepFactory() { }
-
-    /// <summary>
-    /// The instance.
-    /// </summary>
-    public static SimpleStepFactory<FromConcordance, Core.Array<Entity>> Instance { get; } =
-        new FromConcordanceStepFactory();
+    public override IStepFactory StepFactory { get; } =
+        new SimpleStepFactory<FromConcordance, Array<Entity>>();
 }
 
 }

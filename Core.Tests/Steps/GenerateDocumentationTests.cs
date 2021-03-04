@@ -57,13 +57,14 @@ public partial class GenerateDocumentationTests : StepTestBase<GenerateDocumenta
                 var nameSpaces    = string.Join("", Enumerable.Repeat(' ', maxNameLength - 4));
                 var commentSpaces = string.Join("", Enumerable.Repeat(' ', maxCommentLength - 7));
 
-                var nameDashes    = string.Join("", Enumerable.Repeat('-', maxNameLength - 2));
-                var commentDashes = string.Join("", Enumerable.Repeat('-', maxCommentLength - 2));
+                var nameDashes    = string.Join("", Enumerable.Repeat('-', maxNameLength - 1));
+                var commentDashes = string.Join("", Enumerable.Repeat('-', maxCommentLength - 1));
 
                 var sb = new StringBuilder();
                 sb.AppendLine("# Contents");
+                sb.AppendLine();
                 sb.AppendLine($"|Step{nameSpaces}|Summary{commentSpaces}|");
-                sb.AppendLine($"|:{nameDashes}:|:{commentDashes}:|");
+                sb.AppendLine($"|:{nameDashes}|:{commentDashes}|");
 
                 foreach (var (name, category, comment) in steps)
                 {
@@ -71,6 +72,8 @@ public partial class GenerateDocumentationTests : StepTestBase<GenerateDocumenta
                         $"|{GetNameTerm(name, category).PadRight(maxNameLength)}|{comment.PadRight(maxCommentLength)}|"
                     );
                 }
+
+                sb.AppendLine();
 
                 var text = sb.ToString().Trim();
 
@@ -80,26 +83,13 @@ public partial class GenerateDocumentationTests : StepTestBase<GenerateDocumenta
             var not = File(
                 "Not.md",
                 "Not",
-                "## Not *Not* **Boolean**\r\n\r\nNegation of a boolean value.\r\n\r\n|Parameter|Type |Required|Summary |\r\n|:-------:|:----:|:------:|:------------------:|\r\n|Boolean |`bool`|☑️ |The value to negate.|",
+                "## Not _Alias_:`Not`\r\n\r\n_Output_:`Boolean`\r\n\r\nNegation of a boolean value.\r\n\r\n\r\n|Parameter|Type |Required|Summary |\r\n|:--------|:----:|:------:|:-------------------|\r\n|Boolean |`bool`|✔ |The value to negate.|",
                 "Core",
                 "Core"
             );
 
             (string nameof, string category, string comment) notHeader = (
                 "Not", "Core", "Negation of a boolean value.");
-
-            //var applyMathOperator = File(
-            //    "ApplyMathOperator.md",
-            //    "ApplyMathOperator",
-            //    "## ApplyMathOperator *ApplyMathOperator* **Int32**\r\n\r\nApplies a mathematical operator to two integers. Returns the result of the operation.\r\n\r\n|Parameter|Type |Required|Summary |\r\n|:-------:|:--------------------------------------:|:------:|:--------------------:|\r\n|Left |`int` |☑️ |The left operand. |\r\n|Operator |[MathOperator](../Enums/MathOperator.md)|☑️ |The operator to apply.|\r\n|Right |`int` |☑️ |The right operand. |",
-            //    "Core",
-            //    "Core"
-            //);
-
-            //(string nameof, string category, string comment) mathHeader = (
-            //    "ApplyMathOperator",
-            //    "Core",
-            //    "Applies a mathematical operator to two integers. Returns the result of the operation.");
 
             (string nameof, string category, string comment) exampleStepHeader = (
                 "DocumentationExampleStep",
@@ -109,7 +99,7 @@ public partial class GenerateDocumentationTests : StepTestBase<GenerateDocumenta
             var documentationExample = File(
                 "DocumentationExampleStep.md",
                 "DocumentationExampleStep",
-                "## DocumentationExampleStep *DocumentationExampleStep* **StringStream**\r\n\r\n*Requires ValueIf Library Version 1.2*\r\n\r\n|Parameter|Type |Required|Summary|Allowed Range |Default Value|Example|Recommended Range|Recommended Value|Requirements|See Also|URL |Value Delimiter|\r\n|:-------:|:------------:|:------:|:-----:|:------------:|:-----------:|:-----:|:---------------:|:---------------:|:----------:|:------:|:----------------:|:-------------:|\r\n|Alpha |`int` |☑️ | |Greater than 1| |1234 |100-300 |201 |Greek 2.1 |Beta |[Alpha](alpha.com)| |\r\n|Beta |`string` | | | |Two hundred | | | | |Alpha | | |\r\n|Gamma |`VariableName`| | | | | | | | | | | |\r\n|Delta |IStep<`bool`> | | | | | | | | | | |, |",
+                "## DocumentationExampleStep _Alias_:`DocumentationExampleStep`\r\n\r\n_Output_:`StringStream`\r\n\r\n*Requires ValueIf Library Version 1.2*\r\n\r\n\r\n|Parameter|Type |Required|Allowed Range |Default Value|Example|Recommended Range|Recommended Value|Requirements|See Also|URL |Value Delimiter|Summary|\r\n|:--------|:------------:|:------:|:------------:|:-----------:|:-----:|:---------------:|:---------------:|:----------:|:------:|:----------------:|:-------------:|:------|\r\n|Alpha |`int` |✔ |Greater than 1| |1234 |100-300 |201 |Greek 2.1 |Beta |[Alpha](alpha.com)| | |\r\n|Beta |`string` | | |Two hundred | | | | |Alpha | | | |\r\n|Gamma |`VariableName`| | | | | | | | | | | |\r\n|Delta |IStep<`bool`> | | | | | | | | | |, | |",
                 "Examples",
                 "Examples"
             );

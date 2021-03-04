@@ -1,65 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 
 namespace Reductech.EDR.Core.Internal.Documentation
 {
 
 internal static class Prettifier
 {
-    internal static IEnumerable<string> CreateMarkdownTable(
-        IEnumerable<IReadOnlyCollection<string?>> rows)
+    public record Cell(string EscapedText, int EscapedTextWidth, Alignment Alignment)
     {
-        var data = rows.SelectMany(
-                (row, rowNumber) =>
-                    row.Select(
-                        (text, columnNumber) =>
-                            (rowNumber, columnNumber, text: Escape(text))
-                    )
-            )
-            .ToList();
-
-        var columnWidthDictionary = data.GroupBy(x => x.columnNumber)
-            .ToDictionary(
-                x => x.Key,
-                x => x.Max(c => c.text.EnumerateRunes().Count())
-            );
-
-        foreach (var grouping in
-            data.GroupBy(d => d.rowNumber).OrderBy(x => x.Key))
+        public static Cell Create(string? rawText, Alignment alignment)
         {
-            var terms = new List<string>();
-            var i     = 0;
-
-            foreach (var (_, columnNumber, text) in grouping.OrderBy(r => r.columnNumber))
-            {
-                while (i < columnNumber)
-                {
-                    terms.Add(new string(' ', columnWidthDictionary[i]));
-                    i++;
-                }
-
-                terms.Add(text.PadRight(columnWidthDictionary[columnNumber]));
-                i++;
-            }
-
-            while (i < columnWidthDictionary.Count)
-            {
-                terms.Add(new string(' ', columnWidthDictionary[i]));
-                i++;
-            }
-
-            var s = $"|{string.Join('|', terms)}|";
-            yield return s;
-
-            if (grouping.Key == 0) //create dashes row
-            {
-                yield return @$"|{
-                        string.Join('|', columnWidthDictionary
-                                        .OrderBy(x => x.Key)
-                                        .Select(x => ":" + new string('-', Math.Max(x.Value - 2, 1)) + ":"))
-                    }|";
-            }
+            var escapedText      = Escape(rawText);
+            var escapedTextWidth = escapedText.EnumerateRunes().Count();
+            return new Cell(escapedText, escapedTextWidth, alignment);
         }
 
         static string Escape(string? s)
@@ -73,47 +28,77 @@ internal static class Prettifier
         }
     }
 
-    internal static IEnumerable<string> ArrangeIntoColumns(
-        IEnumerable<IReadOnlyCollection<string?>> rows)
+    public enum Alignment { Centre, LeftJustified, RightJustified };
+
+    internal static void CreateMarkdownTable(
+        IReadOnlyList<Cell> headers,
+        IEnumerable<IReadOnlyCollection<string?>> rawRows,
+        StringBuilder sb)
     {
-        var data = rows.SelectMany(
-                (row, rowNumber) =>
-                    row.SelectMany(
-                        (text, columnNumber) =>
-                            (text ?? string.Empty).Split("\n")
-                            .Select(
-                                (line, lineNumber) => (rowNumber, lineNumber, columnNumber, line)
-                            )
-                    )
+        var rows = rawRows.Select(CreateRow).ToList();
+
+        IReadOnlyList<Cell> CreateRow(IReadOnlyCollection<string?> rawRow)
+        {
+            if (rawRow.Count > headers.Count)
+                throw new Exception("Row is longer than the number of headers");
+
+            return rawRow.Select((x, i) => Cell.Create(x, headers[i].Alignment))
+                .ToList();
+        }
+
+        var maxRowWidths = headers.Select(
+                (x, i) =>
+                {
+                    var maxCellWidth = rows.Select(r => r[i].EscapedTextWidth).Max();
+
+                    return Math.Max(maxCellWidth, x.EscapedTextWidth);
+                }
             )
             .ToList();
 
-        var columnWidthDictionary = data.GroupBy(x => x.columnNumber)
-            .ToDictionary(x => x.Key, x => x.Max(y => y.line.EnumerateRunes().Count()));
+        CreateMarkDownRow(headers);
 
-        foreach (var grouping in
-            data.GroupBy(d => (d.rowNumber, d.lineNumber))
-                .OrderBy(x => x.Key.rowNumber)
-                .ThenBy(x => x.Key.lineNumber)
-        )
+        sb.AppendLine();
+
+        foreach (var (header, maxWidth) in headers.Zip(maxRowWidths))
         {
-            var terms = new List<string>();
-            var i     = 0;
+            sb.Append("|");
+            var padding = header.Alignment == Alignment.Centre ? maxWidth - 2 : maxWidth - 1;
 
-            foreach (var (_, _, columnNumber, line) in grouping.OrderBy(r => r.columnNumber))
+            padding = Math.Max(1, padding);
+
+            if (header.Alignment != Alignment.RightJustified)
+                sb.Append(":");
+
+            sb.Append(new string('-', padding));
+
+            if (header.Alignment != Alignment.LeftJustified)
+                sb.Append(":");
+        }
+
+        sb.Append("|");
+
+        foreach (var row in rows)
+            CreateMarkDownRow(row);
+
+        sb.AppendLine();
+
+        void CreateMarkDownRow(IReadOnlyList<Cell> cells)
+        {
+            sb.AppendLine();
+
+            for (var index = 0; index < cells.Count; index++)
             {
-                while (i < columnNumber)
-                {
-                    terms.Add(new string(' ', columnWidthDictionary[i]));
-                    i++;
-                }
+                var cell       = cells[index];
+                var width      = maxRowWidths[index];
+                var whitespace = new string(' ', width - cell.EscapedTextWidth);
 
-                terms.Add(line.PadRight(columnWidthDictionary[columnNumber]));
-                i++;
+                sb.Append('|');
+                sb.Append(cell.EscapedText);
+                sb.Append(whitespace);
             }
 
-            var s = string.Join(' ', terms).TrimEnd();
-            yield return s;
+            sb.Append('|');
         }
     }
 }

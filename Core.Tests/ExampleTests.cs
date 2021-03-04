@@ -67,32 +67,43 @@ public partial class ExampleTests
         r.ShouldBeSuccessful(x => x.ToString()!);
     }
 
-    //[Fact(Skip = "true")]
-    [Fact]
+    [Fact(Skip = "true")]
+    //[Fact]
     [Trait("Category", "Integration")]
     public async Task RunSCLSequence()
     {
-        const string scl = @"- <schema> = (
-Name: 'My Schema' 
-AllowExtraProperties: false
-Properties:(
-Foo: (Type: 'String' Multiplicity: 'ExactlyOne')
-Bar: (Type: 'String' Multiplicity: 'ExactlyOne')
-))
-- FileWrite (ToJsonArray [<schema>]) 'Schema.json'";
-        //@"FileWrite 'Dinosaur Dinosaur Dinosaur' 'C:\Users\wainw\source\repos\Reductech\core\TestFile.txt' true";
-        //            @"GenerateDocumentation | Foreach (
-        //- Print (From <Entity> ""FileName"")
-        //- Print(From <Entity> ""Title"")
-        //- Print(From <Entity> ""Directory"")
-        //- Print(From <Entity> ""Category"")
+        const string scl = @"
+- <root> = 'Documentation'
+- <docs> = GenerateDocumentation
+
+# Create a directory for each connector
+- <docs>
+  | ArrayDistinct (From <Entity> 'Directory')
+  | ForEach (
+      CreateDirectory (PathCombine [<root>, (From <Entity> 'Directory')])
+    )
+
+# Export all steps to .\<root>\ConnectorName\StepName.md
+- <docs>
+  | Foreach (
+      FileWrite
+        (From <Entity> 'FileText')
+        (PathCombine [<root>, (From <Entity> 'Directory'), (From <Entity> 'FileName')])
+    )
+
+";
+
+        //    @"GenerateDocumentation | Foreach (
+        //- Log <Entity>['FileText']
         //)";
+        //@"FileWrite 'Dinosaur Dinosaur Dinosaur' 'C:\Users\wainw\source\repos\Reductech\core\TestFile.txt' true";
+        //
         //            @"- <docs> = GenerateDocumentation
         //- <docs> | ArrayDistinct (From <entity> 'Directory') | ForEach (CreateDirectory (PathCombine ['Documentation', (From <Entity> 'Directory')]))
         //- <docs> | Foreach (FileWrite (From <Entity> 'FileText') (PathCombine ['Documentation', (From <Entity> 'Directory'), (From <Entity> 'FileName')]))";
 
         var logger =
-            TestOutputHelper.BuildLogger(new LoggingConfig() { LogLevel = LogLevel.Trace });
+            TestOutputHelper.BuildLogger(new LoggingConfig() { LogLevel = LogLevel.Information });
 
         var sfs = StepFactoryStore.CreateUsingReflection();
 
