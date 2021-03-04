@@ -2,10 +2,21 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Text;
 using Namotion.Reflection;
 
 namespace Reductech.EDR.Core.Internal.Documentation
 {
+
+/// <summary>
+/// A Document Written in MarkDown
+/// </summary>
+public record MarkdownDocument(
+    string FileName,
+    string Title,
+    string FileText,
+    string Directory,
+    string Category);
 
 internal static class DocumentationCreator
 {
@@ -13,24 +24,28 @@ internal static class DocumentationCreator
     /// Creates documentation for a list of entities
     /// </summary>
     public static
-        IEnumerable<(string fileName, string title, string fileText, string directory, string
-            category)> CreateDocumentation(IEnumerable<IDocumented> entities)
+        IEnumerable<MarkdownDocument> CreateDocumentation(IEnumerable<IDocumented> entities)
     {
         var enumTypes = new HashSet<Type>();
 
         var categories = entities.GroupBy(x => x.DocumentationCategory).ToList();
 
-        var contentsLines = new List<string> { $"# Contents" };
+        var sb = new StringBuilder();
+
+        sb.AppendLine("# Contents");
 
         var contentsRows = categories.SelectMany(x => x)
             .Select(x => new[] { $"[{x.Name}]({x.DocumentationCategory}/{x.FileName})", x.Summary })
-            .Prepend(new[] { "Step", "Summary" }) //Header row
             .ToList();
 
-        var contentsTableLines = Prettifier.CreateMarkdownTable(contentsRows);
-        contentsLines.AddRange(contentsTableLines);
+        var contentsHeader = new[] { "Step", "Summary" }.Select(
+                x => Prettifier.Cell.Create(x, Prettifier.Alignment.LeftJustified)
+            )
+            .ToList();
 
-        yield return ("Contents.md", "Contents", JoinLines(contentsLines), "", "");
+        Prettifier.CreateMarkdownTable(contentsHeader, contentsRows, sb);
+
+        yield return new("Contents.md", "Contents", sb.ToString().Trim(), "", "");
 
         foreach (var category in categories)
         {
@@ -42,10 +57,9 @@ internal static class DocumentationCreator
                         .Where(t => t.IsEnum)
                 );
 
-                var pageLines = GetPageLines(doc);
+                var pageText = GetPageText(doc);
 
-                yield return (doc.FileName, doc.Name, JoinLines(pageLines), category.Key,
-                              category.Key);
+                yield return new(doc.FileName, doc.Name, pageText, category.Key, category.Key);
             }
         }
 
@@ -53,13 +67,11 @@ internal static class DocumentationCreator
         {
             foreach (var type in enumTypes.OrderBy(x => x.Name))
             {
-                var enumLines = GetEnumLines(type);
+                var enumPageText = GetEnumPageText(type);
 
-                yield return (type.Name + ".md", type.Name, JoinLines(enumLines), "Enums", "Enums");
+                yield return new(type.Name + ".md", type.Name, enumPageText, "Enums", "Enums");
             }
         }
-
-        static string JoinLines(IEnumerable<string> lines) => string.Join("\r\n", lines).Trim();
     }
 
     private static string Escape(string? s)
@@ -71,30 +83,33 @@ internal static class DocumentationCreator
             .Replace("\n",   " ");
     }
 
-    private static IEnumerable<string> GetPageLines(IDocumented doc)
+    private static string GetPageText(IDocumented doc)
     {
-        yield return $"## {doc.Name}";
+        var sb = new StringBuilder();
 
-        var names = string.Join(@" \| ", doc.AllNames.Select(x => $"*{x}*"));
+        sb.AppendLine($"## {doc.Name}");
 
-        yield return $"{names}";
+        var aliases = string.Join(@", ", doc.AllNames.Select(x => $"`{x}`"));
+
+        sb.AppendLine($"_Alias_:{aliases}");
+        sb.AppendLine();
 
         if (!string.IsNullOrWhiteSpace(doc.TypeDetails))
         {
-            yield return $"**{doc.TypeDetails}**";
-            yield return "";
+            sb.AppendLine($"_Output_:`{doc.TypeDetails}`");
+            sb.AppendLine();
         }
 
         foreach (var docRequirement in doc.Requirements)
         {
-            yield return $"*{docRequirement}*";
-            yield return "";
+            sb.AppendLine($"*{docRequirement}*");
+            sb.AppendLine();
         }
 
         if (!string.IsNullOrWhiteSpace(doc.Summary))
         {
-            yield return Escape(doc.Summary);
-            yield return "";
+            sb.AppendLine(Escape(doc.Summary).Trim());
+            sb.AppendLine();
         }
 
         if (doc.Parameters.Any())
@@ -104,78 +119,82 @@ internal static class DocumentationCreator
                 .OrderBy(x => x)
                 .ToList();
 
-            var headers = new List<string?> { "Parameter", "Type", "Required", "Summary" };
-            headers.AddRange(extraColumns);
-            var parameterRows = new List<List<string?>> { headers };
+            var headers = new List<Prettifier.Cell>()
+            {
+                Prettifier.Cell.Create("Parameter", Prettifier.Alignment.LeftJustified),
+                Prettifier.Cell.Create("Type",      Prettifier.Alignment.Centre),
+                Prettifier.Cell.Create("Required",  Prettifier.Alignment.Centre),
+            };
 
-            parameterRows.AddRange(
-                doc.Parameters
-                    .Select(
-                        rp =>
-
-                        {
-                            var r = new List<string?>
-                            {
-                                rp.Name,
-                                TypeNameHelper.GetMarkupTypeName(rp.Type),
-                                rp.Required ? "☑️" : "",
-                                rp.Summary
-                            };
-
-                            foreach (var extraColumn in extraColumns)
-                            {
-                                var columnValue = rp.ExtraFields.TryGetValue(
-                                    extraColumn,
-                                    out var cv
-                                )
-                                    ? cv
-                                    : null;
-
-                                r.Add(columnValue);
-                            }
-
-                            return r;
-                        }
-                    )
+            headers.AddRange(
+                extraColumns.Select(x => Prettifier.Cell.Create(x, Prettifier.Alignment.Centre))
             );
 
-            var table = Prettifier.CreateMarkdownTable(parameterRows).ToList();
+            headers.Add(Prettifier.Cell.Create("Summary", Prettifier.Alignment.LeftJustified));
 
-            foreach (var line in table)
-            {
-                yield return line;
-            }
+            var parameterRows = doc.Parameters
+                .Select(
+                    rp =>
 
-            yield return "";
+                    {
+                        var r = new List<string?>
+                        {
+                            rp.Name,
+                            TypeNameHelper.GetMarkupTypeName(rp.Type),
+                            rp.Required ? "✔" : "",
+                        };
+
+                        foreach (var extraColumn in extraColumns)
+                        {
+                            var columnValue = rp.ExtraFields.TryGetValue(
+                                extraColumn,
+                                out var cv
+                            )
+                                ? cv
+                                : null;
+
+                            r.Add(columnValue);
+                        }
+
+                        r.Add(rp.Summary);
+
+                        return r;
+                    }
+                )
+                .ToList();
+
+            Prettifier.CreateMarkdownTable(headers, parameterRows, sb);
         }
+
+        return sb.ToString().Trim();
     }
 
-    private static IEnumerable<string> GetEnumLines(Type type)
+    private static string GetEnumPageText(Type type)
     {
-        yield return $"## {Escape(type.Name)}";
+        var sb = new StringBuilder();
+        sb.AppendLine($"## {Escape(type.Name)}");
 
         var summary = type.GetXmlDocsSummary();
 
         if (!string.IsNullOrWhiteSpace(summary))
         {
-            yield return Escape(summary);
-            yield return string.Empty;
+            sb.AppendLine(Escape(summary));
+            sb.AppendLine();
         }
 
-        var parameterRows = new List<string?[]> { new[] { "Name", "Summary" } };
+        var headers = new[] { "Name", "Summary" }.Select(
+                x => Prettifier.Cell.Create(x, Prettifier.Alignment.LeftJustified)
+            )
+            .ToList();
 
-        parameterRows.AddRange(
-            type.GetFields(BindingFlags.Public | BindingFlags.Static)
-                .OrderBy(GetEnumFieldValue)
-                .Select(fieldInfo => new[] { fieldInfo.Name, fieldInfo.GetXmlDocsSummary() })
-        );
+        var parameterRows = type.GetFields(BindingFlags.Public | BindingFlags.Static)
+            .OrderBy(GetEnumFieldValue)
+            .Select(fieldInfo => new[] { fieldInfo.Name, fieldInfo.GetXmlDocsSummary() })
+            .ToList();
 
-        var table = Prettifier.CreateMarkdownTable(parameterRows).ToList();
+        Prettifier.CreateMarkdownTable(headers, parameterRows, sb);
 
-        foreach (var l in table)
-            yield return l;
-
-        yield return string.Empty;
+        return sb.ToString().Trim();
 
         static object GetEnumFieldValue(MemberInfo memberInfo)
         {

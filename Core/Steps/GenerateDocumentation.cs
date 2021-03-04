@@ -33,11 +33,11 @@ public sealed class
         var entities =
             files.Select(
                     x => Entity.Create(
-                        ("FileName", x.fileName),
-                        ("Title", x.title),
-                        ("FileText", x.fileText),
-                        ("Directory", x.directory),
-                        ("Category", x.category)
+                        ("FileName", x.FileName),
+                        ("Title", x.Title),
+                        ("FileText", x.FileText),
+                        ("Directory", x.Directory),
+                        ("Category", x.Category)
                     )
                 )
                 .ToList();

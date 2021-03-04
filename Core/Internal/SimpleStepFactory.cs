@@ -26,7 +26,7 @@ public class SimpleStepFactory<TStep, TOutput> : StepFactory
         FreezableStepData freezeData) => new TStep();
 
     /// <inheritdoc />
-    public override string OutputTypeExplanation => typeof(TOutput).Name;
+    public override string OutputTypeExplanation => typeof(TOutput).Name.Replace("`1", "<T>");
 }
 
 }
