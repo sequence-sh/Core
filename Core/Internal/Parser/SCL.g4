@@ -35,7 +35,7 @@ term				: simpleTerm #SimpleTerm1
 					| bracketedStep  #BracketedStep1
                     | arrayOrEntity=term OPENSQUAREBRACKET indexer=term CLOSESQUAREBRACKET #ArrayAccess
                     ;
-step				: <assoc=right> step PIPE NAME (term)* (namedArgument)* #PipeFunction
+step				: <assoc=right> step PIPE function #PipeFunction
 					| function #Function1
 					| infixOperation #InfixOperation1
 					| setVariable #SetVariable1

@@ -7,7 +7,7 @@ using Namotion.Reflection;
 namespace Reductech.EDR.Core.Internal.Documentation
 {
 
-internal static class DocumentationCreator
+public static class DocumentationCreator
 {
     /// <summary>
     /// Creates documentation for a list of entities
@@ -71,7 +71,7 @@ internal static class DocumentationCreator
             .Replace("\n",   " ");
     }
 
-    private static IEnumerable<string> GetPageLines(IDocumented doc)
+    public static IEnumerable<string> GetPageLines(IDocumented doc)
     {
         yield return $"## {doc.Name}";
 

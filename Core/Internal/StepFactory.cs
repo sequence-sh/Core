@@ -137,6 +137,23 @@ public abstract class StepFactory : IStepFactory
         .Where(property => property.GetCustomAttribute<RequiredAttribute>() != null)
         .Select(property => property.Name);
 
+    private IReadOnlyDictionary<StepParameterReference, PropertyInfo>? _propertyDictionary;
+
+    /// <inheritdoc />
+    public IReadOnlyDictionary<StepParameterReference, PropertyInfo> PropertyDictionary
+    {
+        get
+        {
+            return _propertyDictionary ??= this.StepType
+                .GetProperties()
+                .SelectMany(
+                    propertyInfo => StepParameterReference.GetPossibleReferences(propertyInfo)
+                        .Select(key => (propertyInfo, key))
+                )
+                .ToDictionary(x => x.key, x => x.propertyInfo);
+        }
+    }
+
     /// <inheritdoc />
     public Result<IStep, IError> TryFreeze(
         TypeResolver typeResolver,

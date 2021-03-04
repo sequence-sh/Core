@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
+using System.Reflection;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Internal.Serialization;
@@ -27,6 +28,11 @@ public interface IStepFactory
     /// The category of the step. Used for documentation.
     /// </summary>
     public string Category { get; }
+
+    /// <summary>
+    /// Dictionary mapping parameter references to properties.
+    /// </summary>
+    IReadOnlyDictionary<StepParameterReference, PropertyInfo> PropertyDictionary { get; }
 
     /// <summary>
     /// Tries to get a reference to the output type of this step.
