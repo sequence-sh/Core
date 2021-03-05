@@ -442,7 +442,7 @@ public static class SCLParsing
         public override Result<FreezableStepProperty, IError> VisitPipeFunction(
             SCLParser.PipeFunctionContext context)
         {
-            var name = context.NAME().Symbol.Text;
+            var name = context.function().NAME().Symbol.Text;
 
             var errors = new List<IError>();
             var dict   = new StepParameterDict();
@@ -454,7 +454,8 @@ public static class SCLParsing
             else
                 dict.Add(new StepParameterReference(1), firstStep.Value);
 
-            var numberedArguments = context.term()
+            var numberedArguments = context.function()
+                .term()
                 .Select(
                     (term, i) =>
                         (term: Visit(term), number: OneOf<string, int>.FromT1(i + 2))
@@ -470,7 +471,7 @@ public static class SCLParsing
 
             var location = new TextLocation(context);
 
-            var members = AggregateNamedArguments(context.namedArgument(), location);
+            var members = AggregateNamedArguments(context.function().namedArgument(), location);
 
             if (members.IsFailure)
                 errors.Add(members.Error);

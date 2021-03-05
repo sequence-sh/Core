@@ -46,6 +46,15 @@ public sealed record TextLocation(string Text, TextPosition Start, TextPosition 
 
         return text;
     }
+
+    public bool Contains(TextPosition position)
+    {
+        if (position.CompareTo(Start) >= 0)
+            if (position.CompareTo(Stop) <= 0)
+                return true;
+
+        return false;
+    }
 }
 
 }

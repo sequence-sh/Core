@@ -9,16 +9,9 @@ namespace Reductech.EDR.Core.Internal.Documentation
 {
 
 /// <summary>
-/// A Document Written in MarkDown
+/// Contains helper methods for creating documentation
 /// </summary>
-public record MarkdownDocument(
-    string FileName,
-    string Title,
-    string FileText,
-    string Directory,
-    string Category);
-
-internal static class DocumentationCreator
+public static class DocumentationCreator
 {
     /// <summary>
     /// Creates documentation for a list of entities
@@ -83,7 +76,10 @@ internal static class DocumentationCreator
             .Replace("\n",   " ");
     }
 
-    private static string GetPageText(IDocumented doc)
+    /// <summary>
+    /// Gets the documentation page for a step
+    /// </summary>
+    public static string GetPageText(IDocumented doc)
     {
         var sb = new StringBuilder();
 
