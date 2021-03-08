@@ -10,6 +10,7 @@ using Newtonsoft.Json.Linq;
 using OneOf;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
+using Reductech.EDR.Core.Internal.Serialization;
 using Reductech.EDR.Core.Util;
 
 namespace Reductech.EDR.Core.Entities
@@ -472,6 +473,84 @@ public sealed class EntityValue : OneOfBase<DBNull, string, int, double, bool, E
 
             return newList;
         }
+    }
+
+    /// <summary>
+    /// If this is a primitive, get a string representation
+    /// </summary>
+    public string? GetPrimitiveString()
+    {
+        return Match<string?>(
+            _ => null, //null
+            @string => @string,
+            integer => integer.ToString(),
+            @double => @double.ToString("R"),
+            @bool => @bool.ToString(),
+            enumeration => enumeration.Value,
+            dateTime => dateTime.ToString("o"),
+            _ => null, //entity
+            _ => null  //list
+        );
+    }
+
+    public Result<T, IErrorBuilder> TryGetValue<T>()
+    {
+        if (typeof(T) == typeof(Entity))
+        {
+            if (TryPickT7(out var entity, out _) && entity is T t)
+                return t;
+        }
+        else if (typeof(T) == typeof(int))
+        {
+            if (TryPickT2(out var integer, out _) && integer is T t)
+                return t;
+
+            if (int.TryParse(GetPrimitiveString() ?? "", out var i) && i is T t2)
+                return t2;
+        }
+
+        else if (typeof(T) == typeof(double))
+        {
+            if (TryPickT3(out var number, out _) && number is T t)
+                return t;
+
+            if (double.TryParse(GetPrimitiveString() ?? "", out var d) && d is T t2)
+                return t2;
+        }
+        else if (typeof(T).IsEnum)
+        {
+            if (Enum.TryParse(typeof(T), GetPrimitiveString(), true, out var r) && r is T t)
+                return t;
+        }
+        else if (typeof(T) == typeof(DateTime))
+        {
+            if (TryPickT6(out var dt, out _) && dt is T t)
+                return t;
+
+            if (DateTime.TryParse(GetPrimitiveString() ?? "", out var d) && d is T t2)
+                return t2;
+        }
+        else if (typeof(T) == typeof(string))
+        {
+            if (TryPickT1(out var s, out _) && s is T t)
+                return t;
+
+            var ser = this.Serialize();
+
+            if (ser is T t2)
+                return t2;
+        }
+        else if (typeof(T).IsAssignableTo(typeof(IEnumerable)) && typeof(T).IsGenericType)
+        {
+            if (TryPickT8(out var l, out _))
+            {
+                var genericType = typeof(T).GenericTypeArguments[0];
+
+                throw new Exception("Could not deserialize array");
+            }
+        }
+
+        return ErrorCode.CouldNotConvertEntityValue.ToErrorBuilder(typeof(T).Name);
     }
 
     /// <inheritdoc />

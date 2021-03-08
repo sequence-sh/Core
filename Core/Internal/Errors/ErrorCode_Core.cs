@@ -267,6 +267,12 @@ public sealed record ErrorCode : ErrorCodeBase
     /// Directory does not exist or could not be found: '{0}'
     /// </summary>
     public static readonly ErrorCode DirectoryNotFound = new(nameof(DirectoryNotFound));
+
+    /// <summary>
+    /// Could not convert entity value to {0}.
+    /// </summary>
+    public static readonly ErrorCode CouldNotConvertEntityValue =
+        new(nameof(CouldNotConvertEntityValue));
 }
 
 }
