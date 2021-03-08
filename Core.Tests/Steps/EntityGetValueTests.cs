@@ -6,7 +6,7 @@ using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 namespace Reductech.EDR.Core.Tests.Steps
 {
 
-public partial class EntityGetValueTests : StepTestBase<EntityGetValue, StringStream>
+public partial class EntityGetValueTests : StepTestBase<EntityGetValue<StringStream>, StringStream>
 {
     /// <inheritdoc />
     protected override IEnumerable<StepCase> StepCases
@@ -15,7 +15,7 @@ public partial class EntityGetValueTests : StepTestBase<EntityGetValue, StringSt
         {
             yield return new StepCase(
                 "Get Simple Property",
-                new EntityGetValue
+                new EntityGetValue<StringStream>
                 {
                     Entity   = Constant(Entity.Create(("Foo", "Hello"), ("Bar", "World"))),
                     Property = Constant("Foo")
@@ -25,7 +25,7 @@ public partial class EntityGetValueTests : StepTestBase<EntityGetValue, StringSt
 
             yield return new StepCase(
                 "Get Missing Property",
-                new EntityGetValue
+                new EntityGetValue<StringStream>
                 {
                     Entity   = Constant(Entity.Create(("Foo", "Hello"), ("Bar", "World"))),
                     Property = Constant("Foot")
@@ -35,7 +35,7 @@ public partial class EntityGetValueTests : StepTestBase<EntityGetValue, StringSt
 
             yield return new StepCase(
                 "Get Empty Property",
-                new EntityGetValue
+                new EntityGetValue<StringStream>
                 {
                     Entity   = Constant(Entity.Create(("Foo", ""), ("Bar", "World"))),
                     Property = Constant("Foo")
@@ -45,7 +45,7 @@ public partial class EntityGetValueTests : StepTestBase<EntityGetValue, StringSt
 
             yield return new StepCase(
                 "Get List Property",
-                new EntityGetValue
+                new EntityGetValue<StringStream>
                 {
                     Entity   = Constant(Entity.Create(("Foo", new[] { "Hello", "World" }))),
                     Property = Constant("Foo")

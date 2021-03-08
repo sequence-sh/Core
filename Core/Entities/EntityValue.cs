@@ -540,6 +540,16 @@ public sealed class EntityValue : OneOfBase<DBNull, string, int, double, bool, E
             if (ser is T t2)
                 return t2;
         }
+        else if (typeof(T) == typeof(StringStream))
+        {
+            if (TryPickT1(out var s, out _) && new StringStream(s) is T t)
+                return t;
+
+            var ser = new StringStream(this.Serialize());
+
+            if (ser is T t2)
+                return t2;
+        }
         else if (typeof(T).IsAssignableTo(typeof(IEnumerable)) && typeof(T).IsGenericType)
         {
             if (TryPickT8(out var l, out _))

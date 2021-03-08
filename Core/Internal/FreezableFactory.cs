@@ -29,11 +29,11 @@ public static class FreezableFactory
         var entityGetValueDict = new StepParameterDict
         {
             {
-                new StepParameterReference(nameof(EntityGetValue.Entity)),
+                new StepParameterReference(nameof(EntityGetValue<int>.Entity)),
                 new FreezableStepProperty(entityOrArray, location)
             },
             {
-                new StepParameterReference(nameof(EntityGetValue.Property)),
+                new StepParameterReference(nameof(EntityGetValue<int>.Property)),
                 new FreezableStepProperty(indexer, location)
             },
         };
@@ -41,7 +41,7 @@ public static class FreezableFactory
         var entityGetValueData = new FreezableStepData(entityGetValueDict, location);
 
         var entityGetValueStep = new CompoundFreezableStep(
-            EntityGetValueStepFactory.Instance.TypeName,
+            "EntityGetValue",
             entityGetValueData,
             configuration,
             location

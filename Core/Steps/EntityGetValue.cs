@@ -39,13 +39,11 @@ public sealed class EntityGetValue<T> : CompoundStep<T>
                     ErrorCode.SchemaViolationMissingProperty.ToErrorBuilder(propertyResult.Value) as
                         IErrorBuilder
                 )
-                .Bind(x=>x.TryGetValue<T>())
+                .Bind(x => x.TryGetValue<T>())
                 .MapError(x => x.WithLocation(this))
             ;
 
         return entityValue;
-
-        
     }
 
     /// <summary>
@@ -84,7 +82,7 @@ public sealed class EntityGetValue<T> : CompoundStep<T>
         /// <inheritdoc />
         protected override ITypeReference GetOutputTypeReference(ITypeReference memberTypeReference)
         {
-            //memberTypeReference.
+            throw new NotImplementedException();
         }
 
         /// <inheritdoc />
