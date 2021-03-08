@@ -72,16 +72,6 @@ public interface IStepFactory
     string OutputTypeExplanation { get; }
 
     /// <summary>
-    /// Gets the type of this member.
-    /// </summary>
-    (MemberType memberType, Type? type) GetExpectedMemberType(string name);
-
-    /// <summary>
-    /// Gets all the properties required by this step.
-    /// </summary>
-    IEnumerable<string> RequiredProperties { get; }
-
-    /// <summary>
     /// Gets all enum types used by this step.
     /// </summary>
     IEnumerable<Type> EnumTypes { get; }

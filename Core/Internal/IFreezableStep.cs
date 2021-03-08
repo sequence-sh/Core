@@ -28,7 +28,6 @@ public interface IFreezableStep : IEquatable<IFreezableStep>
 
     /// <summary>
     /// Gets the variables set by this step and its children and the types of those variables if they can be resolved at this time.
-    /// Does not include reserved variables e.g. Entity
     /// Returns an error if the type name cannot be resolved
     /// </summary>
     Result<IReadOnlyCollection<(VariableName variableName, Maybe<ITypeReference>)>, IError>
