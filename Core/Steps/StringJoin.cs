@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
@@ -51,13 +50,10 @@ public sealed class StringJoin : CompoundStep<StringStream>
         if (listResult.Value.Count == 0)
             return new StringStream(string.Empty);
 
-        if (listResult.Value.Count == 1)
-            return listResult.Value.Single();
-
         var strings = new List<string>();
 
-        foreach (var stringStream in listResult.Value)
-            strings.Add(await stringStream.GetStringAsync());
+        foreach (var ss in listResult.Value)
+            strings.Add(await ss.GetStringAsync());
 
         var resultString = string.Join(delimiter.Value, strings);
 
@@ -65,21 +61,8 @@ public sealed class StringJoin : CompoundStep<StringStream>
     }
 
     /// <inheritdoc />
-    public override IStepFactory StepFactory => StringJoinStepFactory.Instance;
-}
-
-/// <summary>
-/// Join strings with a delimiter.
-/// </summary>
-public sealed class StringJoinStepFactory : SimpleStepFactory<StringJoin, StringStream>
-{
-    private StringJoinStepFactory() { }
-
-    /// <summary>
-    /// The instance
-    /// </summary>
-    public static SimpleStepFactory<StringJoin, StringStream> Instance { get; } =
-        new StringJoinStepFactory();
+    public override IStepFactory StepFactory { get; } = new
+        SimpleStepFactory<StringJoin, StringStream>();
 }
 
 }

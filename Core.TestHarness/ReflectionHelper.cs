@@ -342,15 +342,13 @@ public abstract partial class StepTestBase<TStep, TOutput>
         int numberOfElements,
         ref int index)
     {
-        var stepType   = tList.GenericTypeArguments.First();
-        var outputType = stepType.GenericTypeArguments.First();
-
-        var listType = typeof(List<>).MakeGenericType(stepType);
-        var list     = Activator.CreateInstance(listType)!;
-
-        var addMethod = list.GetType().GetMethod(nameof(List<object>.Add))!;
-
         Func<int, object> getElement;
+
+        Type stepType = !tList.GenericTypeArguments.First().IsGenericType
+            ? typeof(IStep<Unit>)
+            : tList.GenericTypeArguments.First();
+
+        var outputType = stepType.GenericTypeArguments.First();
 
         if (outputType == typeof(Unit))
             getElement = _ => new DoNothing();
@@ -368,6 +366,10 @@ public abstract partial class StepTestBase<TStep, TOutput>
             throw new XunitException(
                 $"Cannot create default value for {outputType.GetDisplayName()} List"
             );
+
+        var listType  = typeof(List<>).MakeGenericType(stepType);
+        var list      = Activator.CreateInstance(listType)!;
+        var addMethod = list.GetType().GetMethod(nameof(List<object>.Add))!;
 
         for (var i = 0; i < numberOfElements; i++)
         {

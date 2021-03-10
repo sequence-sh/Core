@@ -73,6 +73,32 @@ public static class FreezableFactory
     }
 
     /// <summary>
+    /// Create a new Freezable Interpolated string
+    /// </summary>
+    public static IFreezableStep CreateFreezableInterpolatedString(
+        IEnumerable<IFreezableStep> steps,
+        Configuration? configuration,
+        TextLocation? location)
+    {
+        var dict = new StepParameterDict
+        {
+            {
+                new StepParameterReference(nameof(StringInterpolate.Strings)),
+                new FreezableStepProperty(steps.ToImmutableList(), location)
+            },
+        };
+
+        var fpd = new FreezableStepData(dict, location);
+
+        return new CompoundFreezableStep(
+            nameof(StringInterpolate),
+            fpd,
+            configuration,
+            location
+        );
+    }
+
+    /// <summary>
     /// Create a new Freezable Sequence
     /// </summary>
     public static IFreezableStep CreateFreezableSequence(

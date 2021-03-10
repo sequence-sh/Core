@@ -29,14 +29,7 @@ public sealed class Log<T> : CompoundStep<Unit>
         if (r.IsFailure)
             return r.ConvertFailure<Unit>();
 
-        string stringToPrint = r.Value switch
-        {
-            Entity entity   => entity.Serialize(),
-            StringStream ss => await ss.GetStringAsync(),
-            DateTime dt     => dt.ToString(Constants.DateTimeFormat),
-            double d        => d.ToString(Constants.DoubleFormat),
-            _               => r.Value?.ToString()!
-        };
+        var stringToPrint = await SerializationMethods.GetStringAsync(r.Value);
 
         stateMonad.Log(LogLevel.Information, stringToPrint, this);
 
