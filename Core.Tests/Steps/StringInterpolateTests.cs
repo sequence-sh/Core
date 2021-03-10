@@ -42,6 +42,28 @@ public partial class StringInterpolateTests : StepTestBase<StringInterpolate, St
     }
 
     /// <inheritdoc />
+    protected override IEnumerable<DeserializeCase> DeserializeCases
+    {
+        get
+        {
+            yield return new DeserializeCase("Interpolated string 1", "$\"abc\"",      "abc");
+            yield return new DeserializeCase("Interpolated string 2", "$\"abc{123}\"", "abc123");
+
+            yield return new DeserializeCase(
+                "Interpolated string 3",
+                "$\"abc{123}def\"",
+                "abc123def"
+            );
+
+            yield return new DeserializeCase(
+                "Interpolated string 4",
+                "$\"abc{100 + 23}def\"",
+                "abc123def"
+            );
+        }
+    }
+
+    /// <inheritdoc />
     protected override IEnumerable<SerializeCase> SerializeCases
     {
         get
