@@ -79,7 +79,7 @@ public sealed class ValueIfStepFactory : GenericStepFactory
         memberTypeReference;
 
     /// <inheritdoc />
-    protected override Result<TypeReference, IError> GetMemberType(
+    protected override Result<TypeReference, IError> GetGenericTypeParameter(
         TypeReference expectedTypeReference,
         FreezableStepData freezableStepData,
         TypeResolver typeResolver) => freezableStepData

@@ -99,7 +99,7 @@ public sealed class EntitySetValueStepFactory : GenericStepFactory
         new TypeReference.Actual(SCLType.Entity);
 
     /// <inheritdoc />
-    protected override Result<TypeReference, IError> GetMemberType(
+    protected override Result<TypeReference, IError> GetGenericTypeParameter(
         TypeReference expectedTypeReference,
         FreezableStepData freezableStepData,
         TypeResolver typeResolver)

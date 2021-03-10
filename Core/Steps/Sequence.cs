@@ -75,7 +75,7 @@ public sealed class SequenceStepFactory : GenericStepFactory
         memberTypeReference;
 
     /// <inheritdoc />
-    protected override Result<TypeReference, IError> GetMemberType(
+    protected override Result<TypeReference, IError> GetGenericTypeParameter(
         TypeReference expectedTypeReference,
         FreezableStepData freezableStepData,
         TypeResolver typeResolver) => freezableStepData

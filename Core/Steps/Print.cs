@@ -72,7 +72,7 @@ public sealed class Print<T> : CompoundStep<Unit>
         public override string OutputTypeExplanation => nameof(Unit);
 
         /// <inheritdoc />
-        protected override Result<TypeReference, IError> GetMemberType(
+        protected override Result<TypeReference, IError> GetGenericTypeParameter(
             TypeReference expectedTypeReference,
             FreezableStepData freezableStepData,
             TypeResolver typeResolver) => freezableStepData

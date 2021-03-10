@@ -81,7 +81,7 @@ public sealed class EntityGetValue<T> : CompoundStep<T>
         public override string OutputTypeExplanation => "The required type";
 
         /// <inheritdoc />
-        protected override Result<TypeReference, IError> GetMemberType(
+        protected override Result<TypeReference, IError> GetGenericTypeParameter(
             TypeReference expectedTypeReference,
             FreezableStepData freezableStepData,
             TypeResolver typeResolver)

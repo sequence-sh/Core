@@ -72,7 +72,7 @@ public sealed class ArrayConcatStepFactory : GenericStepFactory
         new TypeReference.Array(memberTypeReference);
 
     /// <inheritdoc />
-    protected override Result<TypeReference, IError> GetMemberType(
+    protected override Result<TypeReference, IError> GetGenericTypeParameter(
         TypeReference expectedTypeReference,
         FreezableStepData freezableStepData,
         TypeResolver typeResolver)

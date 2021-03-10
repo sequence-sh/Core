@@ -77,7 +77,7 @@ public sealed class RepeatStepFactory : GenericStepFactory
         new TypeReference.Array(memberTypeReference);
 
     /// <inheritdoc />
-    protected override Result<TypeReference, IError> GetMemberType(
+    protected override Result<TypeReference, IError> GetGenericTypeParameter(
         TypeReference expectedTypeReference,
         FreezableStepData freezableStepData,
         TypeResolver typeResolver)

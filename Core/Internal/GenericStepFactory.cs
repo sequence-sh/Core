@@ -13,7 +13,7 @@ public abstract class GenericStepFactory : StepFactory
     public override Result<TypeReference, IError> TryGetOutputTypeReference(
         TypeReference expectedTypeReference,
         FreezableStepData freezableStepData,
-        TypeResolver typeResolver) => GetMemberType(
+        TypeResolver typeResolver) => GetGenericTypeParameter(
             expectedTypeReference,
             freezableStepData,
             typeResolver
@@ -29,7 +29,7 @@ public abstract class GenericStepFactory : StepFactory
     protected override Result<ICompoundStep, IError> TryCreateInstance(
         TypeReference expectedTypeReference,
         FreezableStepData freezeData,
-        TypeResolver typeResolver) => GetMemberType(
+        TypeResolver typeResolver) => GetGenericTypeParameter(
             expectedTypeReference,
             freezeData,
             typeResolver
@@ -40,7 +40,7 @@ public abstract class GenericStepFactory : StepFactory
     /// <summary>
     /// Gets the type
     /// </summary>
-    protected abstract Result<TypeReference, IError> GetMemberType(
+    protected abstract Result<TypeReference, IError> GetGenericTypeParameter(
         TypeReference expectedTypeReference,
         FreezableStepData freezableStepData,
         TypeResolver typeResolver);

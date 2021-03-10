@@ -68,7 +68,7 @@ public class SetVariableStepFactory : GenericStepFactory
         TypeReference.Unit.Instance;
 
     /// <inheritdoc />
-    protected override Result<TypeReference, IError> GetMemberType(
+    protected override Result<TypeReference, IError> GetGenericTypeParameter(
         TypeReference expectedTypeReference,
         FreezableStepData freezableStepData,
         TypeResolver typeResolver)
@@ -95,7 +95,11 @@ public class SetVariableStepFactory : GenericStepFactory
         if (vn.IsFailure)
             yield break;
 
-        var memberType = GetMemberType(expectedTypeReference, freezableStepData, typeResolver);
+        var memberType = GetGenericTypeParameter(
+            expectedTypeReference,
+            freezableStepData,
+            typeResolver
+        );
 
         if (memberType.IsFailure)
             yield return (vn.Value, TypeReference.Unknown.Instance);

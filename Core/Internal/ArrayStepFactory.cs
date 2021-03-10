@@ -21,7 +21,7 @@ public abstract class ArrayStepFactory : GenericStepFactory
     protected abstract string ArrayPropertyName { get; }
 
     /// <inheritdoc />
-    protected override Result<TypeReference, IError> GetMemberType(
+    protected override Result<TypeReference, IError> GetGenericTypeParameter(
         TypeReference expectedTypeReference,
         FreezableStepData freezableStepData,
         TypeResolver typeResolver)
