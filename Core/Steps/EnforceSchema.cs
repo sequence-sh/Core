@@ -117,7 +117,7 @@ public sealed class EnforceSchemaStepFactory : SimpleStepFactory<EnforceSchema, 
         get
         {
             yield return typeof(Multiplicity);
-            yield return typeof(SchemaPropertyType);
+            yield return typeof(SCLType);
         }
     }
 }

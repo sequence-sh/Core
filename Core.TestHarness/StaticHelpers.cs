@@ -75,7 +75,7 @@ public static class StaticHelpers
     public static Schema CreateSchema(
         string name,
         bool allowExtraProperties,
-        params (string propertyName, SchemaPropertyType type, Multiplicity multiplicity)[]
+        params (string propertyName, SCLType type, Multiplicity multiplicity)[]
             properties)
     {
         return CreateSchema(
@@ -92,7 +92,7 @@ public static class StaticHelpers
     public static Schema CreateSchema(
         string name,
         bool allowExtraProperties,
-        params (string propertyName, SchemaPropertyType type, string? enumType, Multiplicity
+        params (string propertyName, SCLType type, string? enumType, Multiplicity
             multiplicity, string? regex, List<string>? values, List<string>? inputFormats, string?
             outputFormat)[] properties)
     {

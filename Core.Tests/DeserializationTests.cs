@@ -21,6 +21,28 @@ public partial class DeserializationTests
     {
         get
         {
+            yield return new DeserializationTestInstance("(Foo: 1)['Foo'] + 3",               4);
+            yield return new DeserializationTestInstance("(Foo: (Bar: 1))['Foo']['Bar'] + 3", 4);
+            yield return new DeserializationTestInstance("(Foo: (Bar: 1))['Foo.Bar'] + 3",    4);
+
+            yield return new DeserializationTestInstance("ArrayLength (Foo: [1,2,3])['Foo']", 3);
+            yield return new DeserializationTestInstance("3 * (Foo: [1,2,3])['Foo'][2]",      9);
+
+            yield return new DeserializationTestInstance(
+                "3 * (Foo:(Bar:([1,2,3])))['Foo.Bar'][2]",
+                9
+            );
+
+            yield return new DeserializationTestInstance(
+                "3 * (Foo:(Bar:([[1,1,1],[2,2,2],[3,4,5]])))['Foo.Bar'][2][0]",
+                9
+            );
+
+            yield return new DeserializationTestInstance("(Foo: [1,2])['Foo']", "[1, 2]");
+            yield return new DeserializationTestInstance("(Foo: [1,2])",        "(Foo: [1, 2])");
+
+            yield return new DeserializationTestInstance("ArrayLength([1,2] + [3,4])", "4");
+
             yield return new DeserializationTestInstance("'Hello World'", "Hello World");
             yield return new DeserializationTestInstance("123",           "123");
             yield return new DeserializationTestInstance("1 + 2",         "3");

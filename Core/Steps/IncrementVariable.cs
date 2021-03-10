@@ -73,7 +73,8 @@ public sealed class IncrementVariableStepFactory : SimpleStepFactory<IncrementVa
         new IncrementVariableStepFactory();
 
     /// <inheritdoc />
-    public override IEnumerable<(VariableName variableName, Maybe<ITypeReference>)> GetVariablesSet(
+    public override IEnumerable<(VariableName variableName, TypeReference type)> GetVariablesSet(
+        TypeReference expectedTypeReference,
         FreezableStepData freezableStepData,
         TypeResolver typeResolver)
     {
@@ -82,7 +83,7 @@ public sealed class IncrementVariableStepFactory : SimpleStepFactory<IncrementVa
         if (vn.IsFailure)
             yield break;
 
-        yield return (vn.Value, Maybe<ITypeReference>.From(new ActualTypeReference(typeof(int))));
+        yield return (vn.Value, new TypeReference.Actual(SCLType.Integer));
     }
 }
 

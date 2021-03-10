@@ -27,14 +27,23 @@ public record CreateEntityFreezableStep(
     public TextLocation? TextLocation => FreezableEntityData.Location;
 
     /// <inheritdoc />
-    public Result<IStep, IError> TryFreeze(TypeResolver typeResolver)
+    public Result<IStep, IError> TryFreeze(TypeReference expectedType, TypeResolver typeResolver)
     {
+        var checkResult = expectedType.CheckAllows(
+                new TypeReference.Actual(SCLType.Entity),
+                typeof(CreateEntityStep)
+            )
+            .MapError(x => x.WithLocation(this));
+
+        if (checkResult.IsFailure)
+            return checkResult.ConvertFailure<IStep>();
+
         var results = new List<Result<(EntityPropertyKey name, IStep value), IError>>();
 
         foreach (var (propertyName, stepMember) in FreezableEntityData.EntityProperties)
         {
             var frozen = stepMember.ConvertToStep()
-                .TryFreeze(typeResolver)
+                .TryFreeze(TypeReference.Any.Instance, typeResolver)
                 .Map(s => (propertyName, s));
 
             results.Add(frozen);
@@ -54,15 +63,16 @@ public record CreateEntityFreezableStep(
     }
 
     /// <inheritdoc />
-    public Result<IReadOnlyCollection<(VariableName variableName, Maybe<ITypeReference>)>, IError>
-        GetVariablesSet(TypeResolver typeResolver)
+    public Result<IReadOnlyCollection<(VariableName variableName, TypeReference)>, IError>
+        GetVariablesSet(TypeReference expectedType, TypeResolver typeResolver)
     {
-        return FreezableEntityData.GetVariablesSet(typeResolver);
+        return FreezableEntityData.GetVariablesSet(expectedType, typeResolver);
     }
 
     /// <inheritdoc />
-    public Result<ITypeReference, IError> TryGetOutputTypeReference(TypeResolver typeResolver) =>
-        new ActualTypeReference(typeof(Entity));
+    public Result<TypeReference, IError> TryGetOutputTypeReference(
+        TypeReference expectedType,
+        TypeResolver typeResolver) => new TypeReference.Actual(SCLType.Entity);
 }
 
 }

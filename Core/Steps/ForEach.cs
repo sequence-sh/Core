@@ -77,7 +77,8 @@ public sealed class ForEach<T> : CompoundStep<Unit>
     {
         return baseContext.TryCloneWithScopedStep(
             Variable,
-            new ActualTypeReference(typeof(T)),
+            TypeReference.Create(typeof(T)),
+            TypeReference.Unit.Instance,
             scopedStep,
             new ErrorLocation(this)
         );
@@ -90,7 +91,7 @@ public sealed class ForEach<T> : CompoundStep<Unit>
 /// <summary>
 /// Do an action for each member of the list.
 /// </summary>
-public sealed class ForEachStepFactory : GenericStepFactory
+public sealed class ForEachStepFactory : ArrayStepFactory
 {
     private ForEachStepFactory() { }
 
@@ -103,20 +104,20 @@ public sealed class ForEachStepFactory : GenericStepFactory
     public override Type StepType => typeof(ForEach<>);
 
     /// <inheritdoc />
-    protected override ITypeReference GetOutputTypeReference(ITypeReference memberTypeReference) =>
-        new ActualTypeReference(typeof(Unit));
+    protected override TypeReference GetOutputTypeReference(TypeReference memberTypeReference) =>
+        TypeReference.Unit.Instance;
 
     /// <inheritdoc />
-    protected override Result<ITypeReference, IError> GetMemberType(
-        FreezableStepData freezableStepData,
-        TypeResolver typeResolver) => freezableStepData
-        .TryGetStep(nameof(ForEach<object>.Array), StepType)
-        .Bind(x => x.TryGetOutputTypeReference(typeResolver))
-        .Bind(
-            x => x.TryGetGenericTypeReference(typeResolver, 0)
-                .MapError(e => e.WithLocation(freezableStepData))
-        )
-        .Map(x => x as ITypeReference);
+    protected override Result<TypeReference, IErrorBuilder> GetExpectedArrayTypeReference(
+        TypeReference expectedTypeReference)
+    {
+        return expectedTypeReference
+            .CheckAllows(TypeReference.Unit.Instance, StepType)
+            .Map(_ => new TypeReference.Array(TypeReference.Any.Instance) as TypeReference);
+    }
+
+    /// <inheritdoc />
+    protected override string ArrayPropertyName => nameof(ForEach<object>.Array);
 
     /// <inheritdoc />
     public override string OutputTypeExplanation => nameof(Unit);

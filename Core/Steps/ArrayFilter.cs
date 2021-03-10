@@ -85,7 +85,8 @@ public sealed class ArrayFilter<T> : CompoundStep<Array<T>>
     {
         return baseContext.TryCloneWithScopedStep(
             Variable,
-            new ActualTypeReference(typeof(T)),
+            TypeReference.Create(typeof(T)),
+            new TypeReference.Actual(SCLType.Bool),
             scopedStep,
             new ErrorLocation(this)
         );
@@ -95,7 +96,7 @@ public sealed class ArrayFilter<T> : CompoundStep<Array<T>>
 /// <summary>
 /// Filter entities according to a function.
 /// </summary>
-public sealed class ArrayFilterStepFactory : GenericStepFactory
+public sealed class ArrayFilterStepFactory : ArrayStepFactory
 {
     private ArrayFilterStepFactory() { }
 
@@ -105,20 +106,18 @@ public sealed class ArrayFilterStepFactory : GenericStepFactory
     public static GenericStepFactory Instance { get; } = new ArrayFilterStepFactory();
 
     /// <inheritdoc />
-    protected override ITypeReference GetOutputTypeReference(ITypeReference memberTypeReference) =>
-        new GenericTypeReference(typeof(Array<>), new[] { memberTypeReference });
+    protected override TypeReference GetOutputTypeReference(TypeReference memberTypeReference) =>
+        new TypeReference.Array(memberTypeReference);
 
     /// <inheritdoc />
-    protected override Result<ITypeReference, IError> GetMemberType(
-        FreezableStepData freezableStepData,
-        TypeResolver typeResolver) => freezableStepData
-        .TryGetStep(nameof(ArrayFilter<object>.Array), StepType)
-        .Bind(x => x.TryGetOutputTypeReference(typeResolver))
-        .Bind(
-            x => x.TryGetGenericTypeReference(typeResolver, 0)
-                .MapError(e => e.WithLocation(freezableStepData))
-        )
-        .Map(x => x as ITypeReference);
+    protected override Result<TypeReference, IErrorBuilder> GetExpectedArrayTypeReference(
+        TypeReference expectedTypeReference)
+    {
+        return expectedTypeReference;
+    }
+
+    /// <inheritdoc />
+    protected override string ArrayPropertyName => nameof(ArrayFilter<object>.Array);
 
     /// <inheritdoc />
     public override Type StepType => typeof(ArrayFilter<>);

@@ -64,19 +64,23 @@ public sealed class Print<T> : CompoundStep<Unit>
         public override Type StepType => typeof(Print<>);
 
         /// <inheritdoc />
-        protected override ITypeReference
-            GetOutputTypeReference(ITypeReference memberTypeReference) =>
-            new ActualTypeReference(typeof(Unit));
+        protected override TypeReference
+            GetOutputTypeReference(TypeReference memberTypeReference) =>
+            TypeReference.Unit.Instance;
 
         /// <inheritdoc />
         public override string OutputTypeExplanation => nameof(Unit);
 
         /// <inheritdoc />
-        protected override Result<ITypeReference, IError> GetMemberType(
+        protected override Result<TypeReference, IError> GetMemberType(
+            TypeReference expectedTypeReference,
             FreezableStepData freezableStepData,
             TypeResolver typeResolver) => freezableStepData
             .TryGetStep(nameof(Print<object>.Value), StepType)
-            .Bind(x => x.TryGetOutputTypeReference(typeResolver));
+            .Bind(x => x.TryGetOutputTypeReference(TypeReference.Any.Instance, typeResolver))
+            .Map(
+                x => x == TypeReference.Any.Instance ? new TypeReference.Actual(SCLType.String) : x
+            );
     }
 }
 

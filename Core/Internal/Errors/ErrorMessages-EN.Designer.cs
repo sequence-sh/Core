@@ -457,6 +457,15 @@ namespace Reductech.EDR.Core.Internal.Errors {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to {0} has output type {1}, not {2}.
+        /// </summary>
+        internal static string WrongOutputType {
+            get {
+                return ResourceManager.GetString("WrongOutputType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to {0} was a {1}, not a {2}.
         /// </summary>
         internal static string WrongParameterType {

@@ -16,10 +16,10 @@ namespace Reductech.EDR.Core.Steps
 /// <summary>
 /// Replace every regex match in the string with the result of a particular function
 /// </summary>
-public sealed class RegexReplace : CompoundStep<string>
+public sealed class RegexReplace : CompoundStep<StringStream>
 {
     /// <inheritdoc />
-    protected override async Task<Result<string, IError>> Run(
+    protected override async Task<Result<StringStream, IError>> Run(
         IStateMonad stateMonad,
         CancellationToken cancellationToken)
     {
@@ -27,18 +27,18 @@ public sealed class RegexReplace : CompoundStep<string>
             await String.Run(stateMonad, cancellationToken).Map(x => x.GetStringAsync());
 
         if (stringResult.IsFailure)
-            return stringResult.ConvertFailure<string>();
+            return stringResult.ConvertFailure<StringStream>();
 
         var patternResult =
             await Pattern.Run(stateMonad, cancellationToken).Map(x => x.GetStringAsync());
 
         if (patternResult.IsFailure)
-            return patternResult.ConvertFailure<string>();
+            return patternResult.ConvertFailure<StringStream>();
 
         var ignoreCaseResult = await IgnoreCase.Run(stateMonad, cancellationToken);
 
         if (ignoreCaseResult.IsFailure)
-            return ignoreCaseResult.ConvertFailure<string>();
+            return ignoreCaseResult.ConvertFailure<StringStream>();
 
         var currentState = stateMonad.GetState().ToImmutableDictionary();
 
@@ -66,7 +66,7 @@ public sealed class RegexReplace : CompoundStep<string>
                 .Map(x => x.GetStringAsync());
 
             if (result.IsFailure)
-                return result.ConvertFailure<string>();
+                return result.ConvertFailure<StringStream>();
 
             sb.Append(result.Value);
 
@@ -74,7 +74,7 @@ public sealed class RegexReplace : CompoundStep<string>
         }
 
         sb.Append(input, lastIndex, input.Length - lastIndex);
-        return sb.ToString();
+        return new StringStream(sb.ToString());
     }
 
     /// <summary>
@@ -121,28 +121,16 @@ public sealed class RegexReplace : CompoundStep<string>
     {
         return baseContext.TryCloneWithScopedStep(
             Variable,
-            new ActualTypeReference(typeof(StringStream)),
+            new TypeReference.Actual(SCLType.String),
+            new TypeReference.Actual(SCLType.String),
             scopedStep,
             new ErrorLocation(this)
         );
     }
 
     /// <inheritdoc />
-    public override IStepFactory StepFactory => RegexReplaceStepFactory.Instance;
-}
-
-/// <summary>
-/// Replace every regex match in the string with the result of a particular function
-/// </summary>
-public sealed class RegexReplaceStepFactory : SimpleStepFactory<RegexReplace, string>
-{
-    private RegexReplaceStepFactory() { }
-
-    /// <summary>
-    /// The instance
-    /// </summary>
-    public static SimpleStepFactory<RegexReplace, string> Instance { get; } =
-        new RegexReplaceStepFactory();
+    public override IStepFactory StepFactory { get; } =
+        new SimpleStepFactory<RegexReplace, StringStream>();
 }
 
 }

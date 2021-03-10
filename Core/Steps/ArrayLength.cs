@@ -39,7 +39,7 @@ public sealed class ArrayLength<T> : CompoundStep<int>
 /// <summary>
 /// Counts the elements in an array.
 /// </summary>
-public sealed class ArrayLengthStepFactory : GenericStepFactory
+public sealed class ArrayLengthStepFactory : ArrayStepFactory
 {
     private ArrayLengthStepFactory() { }
 
@@ -55,24 +55,26 @@ public sealed class ArrayLengthStepFactory : GenericStepFactory
     public override string OutputTypeExplanation => nameof(Int32);
 
     /// <inheritdoc />
-    protected override ITypeReference GetOutputTypeReference(ITypeReference memberTypeReference) =>
-        new ActualTypeReference(typeof(int));
+    protected override TypeReference GetOutputTypeReference(TypeReference memberTypeReference) =>
+        new TypeReference.Actual(SCLType.Integer);
 
     /// <inheritdoc />
-    protected override Result<ITypeReference, IError> GetMemberType(
-        FreezableStepData freezableStepData,
-        TypeResolver typeResolver)
+    protected override Result<TypeReference, IErrorBuilder> GetExpectedArrayTypeReference(
+        TypeReference expectedTypeReference)
     {
-        var r1 = freezableStepData.TryGetStep(nameof(ArrayLength<object>.Array), StepType)
-            .Bind(x => x.TryGetOutputTypeReference(typeResolver))
-            .Bind(
-                x => x.TryGetGenericTypeReference(typeResolver, 0)
-                    .MapError(e => e.WithLocation(freezableStepData))
-            )
-            .Map(x => x as ITypeReference);
+        var r = expectedTypeReference.CheckAllows(
+            new TypeReference.Actual(SCLType.Integer),
+            StepType
+        );
 
-        return r1;
+        if (r.IsFailure)
+            return r.ConvertFailure<TypeReference>();
+
+        return new TypeReference.Array(TypeReference.Any.Instance);
     }
+
+    /// <inheritdoc />
+    protected override string ArrayPropertyName => nameof(ArrayLength<object>.Array);
 }
 
 }

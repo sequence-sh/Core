@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Internal.Errors;
@@ -8,99 +7,6 @@ using Reductech.EDR.Core.Util;
 
 namespace Reductech.EDR.Core.Internal
 {
-
-/// <summary>
-/// A step that could be one of several options
-/// </summary>
-public sealed class OptionFreezableStep : IFreezableStep
-{
-    /// <summary>
-    /// Create a new OptionFreezableStep
-    /// </summary>
-    public OptionFreezableStep(IReadOnlyList<IFreezableStep> options, TextLocation? textLocation)
-    {
-        Options      = options;
-        TextLocation = textLocation;
-    }
-
-    /// <summary>
-    /// The options
-    /// </summary>
-    public IReadOnlyList<IFreezableStep> Options { get; }
-
-    /// <inheritdoc />
-    public TextLocation? TextLocation { get; }
-
-    /// <inheritdoc />
-    public string StepName => string.Join(" or ", Options);
-
-    /// <inheritdoc />
-    public bool Equals(IFreezableStep? other) =>
-        other is OptionFreezableStep ofs && Options.SequenceEqual(ofs.Options);
-
-    /// <inheritdoc />
-    public Result<IStep, IError> TryFreeze(TypeResolver typeResolver)
-    {
-        IError? error = null;
-
-        foreach (var freezableStep in Options)
-        {
-            var r = freezableStep.TryFreeze(typeResolver);
-
-            if (r.IsSuccess)
-                return r;
-            else
-                error = r.Error;
-        }
-
-        Debug.Assert(error != null, "OptionFreezableStep should have at least one option");
-
-        return Result.Failure<IStep, IError>(error);
-    }
-
-    /// <inheritdoc />
-    public Result<IReadOnlyCollection<(VariableName variableName, Maybe<ITypeReference>)>, IError>
-        GetVariablesSet(TypeResolver typeResolver)
-    {
-        IError? error = null;
-
-        foreach (var freezableStep in Options)
-        {
-            var r = freezableStep.GetVariablesSet(typeResolver);
-
-            if (r.IsSuccess)
-                return r;
-            else
-                error = r.Error;
-        }
-
-        Debug.Assert(error != null, "OptionFreezableStep should have at least one option");
-
-        return Result
-            .Failure<IReadOnlyCollection<(VariableName variableName, Maybe<ITypeReference>)>, IError
-            >(error);
-    }
-
-    /// <inheritdoc />
-    public Result<ITypeReference, IError> TryGetOutputTypeReference(TypeResolver typeResolver)
-    {
-        IError? error = null;
-
-        foreach (var freezableStep in Options)
-        {
-            var r = freezableStep.TryGetOutputTypeReference(typeResolver);
-
-            if (r.IsSuccess)
-                return r;
-            else
-                error = r.Error;
-        }
-
-        Debug.Assert(error != null, "OptionFreezableStep should have at least one option");
-
-        return Result.Failure<ITypeReference, IError>(error);
-    }
-}
 
 /// <summary>
 /// A step that is not a constant or a variable reference.
@@ -129,41 +35,45 @@ public sealed record CompoundFreezableStep(
     }
 
     /// <inheritdoc />
-    public Result<IStep, IError> TryFreeze(TypeResolver typeResolver)
+    public Result<IStep, IError> TryFreeze(TypeReference expectedType, TypeResolver typeResolver)
     {
         return TryGetStepFactory(typeResolver.StepFactoryStore)
             .Bind(
                 x =>
-                    x.TryFreeze(typeResolver, FreezableStepData, StepConfiguration)
+                    x.TryFreeze(expectedType, typeResolver, FreezableStepData, StepConfiguration)
             );
     }
 
     /// <inheritdoc />
-    public Result<IReadOnlyCollection<(VariableName variableName, Maybe<ITypeReference>)>, IError>
-        GetVariablesSet(TypeResolver typeResolver)
+    public Result<IReadOnlyCollection<(VariableName variableName, TypeReference)>, IError>
+        GetVariablesSet(TypeReference expectedType, TypeResolver typeResolver)
     {
         var stepFactory = TryGetStepFactory(typeResolver.StepFactoryStore);
 
         if (stepFactory.IsFailure)
             return stepFactory
                 .ConvertFailure<IReadOnlyCollection<(VariableName variableName,
-                    Maybe<ITypeReference>)>>();
+                    TypeReference)>>();
 
-        var dataResult = FreezableStepData.GetVariablesSet(StepName, typeResolver);
+        var dataResult = FreezableStepData.GetVariablesSet(StepName, expectedType, typeResolver);
 
         if (dataResult.IsFailure)
             return dataResult;
 
         return dataResult.Value
-            .Concat(stepFactory.Value.GetVariablesSet(FreezableStepData, typeResolver))
+            .Concat(
+                stepFactory.Value.GetVariablesSet(expectedType, FreezableStepData, typeResolver)
+            )
             .ToList();
     }
 
     /// <inheritdoc />
-    public Result<ITypeReference, IError> TryGetOutputTypeReference(TypeResolver typeResolver)
+    public Result<TypeReference, IError> TryGetOutputTypeReference(
+        TypeReference expectedType,
+        TypeResolver typeResolver)
     {
         return TryGetStepFactory(typeResolver.StepFactoryStore)
-            .Bind(x => x.TryGetOutputTypeReference(FreezableStepData, typeResolver));
+            .Bind(x => x.TryGetOutputTypeReference(expectedType, FreezableStepData, typeResolver));
     }
 
     /// <inheritdoc />

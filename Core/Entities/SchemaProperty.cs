@@ -18,7 +18,7 @@ public sealed class SchemaProperty
     /// The type of the property.
     /// </summary>
     [ConfigProperty(1)]
-    public SchemaPropertyType Type { get; set; }
+    public SCLType Type { get; set; }
 
     /// <summary>
     /// If this is an enum, the name of the enum
@@ -72,7 +72,7 @@ public sealed class SchemaProperty
         var schemaProperty = new SchemaProperty();
 
         results.Add(
-            entity.TrySetEnum<SchemaPropertyType>(
+            entity.TrySetEnum<SCLType>(
                 false,
                 nameof(Type),
                 s => schemaProperty.Type = s

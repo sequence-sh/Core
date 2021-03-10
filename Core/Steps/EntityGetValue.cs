@@ -4,8 +4,10 @@ using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Attributes;
+using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
+using Reductech.EDR.Core.Internal.Serialization;
 
 namespace Reductech.EDR.Core.Steps
 {
@@ -34,16 +36,15 @@ public sealed class EntityGetValue<T> : CompoundStep<T>
 
         var epk = new EntityPropertyKey(propertyResult.Value);
 
-        var entityValue = entity.Value.TryGetValue(epk)
-                .ToResult(
-                    ErrorCode.SchemaViolationMissingProperty.ToErrorBuilder(propertyResult.Value) as
-                        IErrorBuilder
-                )
-                .Bind(x => x.TryGetValue<T>())
-                .MapError(x => x.WithLocation(this))
-            ;
+        var entityValue = entity.Value.TryGetValue(epk);
 
-        return entityValue;
+        if (entityValue.HasNoValue)
+            return EntityValue.GetDefaultValue<T>();
+
+        var result = entityValue.Value.TryGetValue<T>()
+            .MapError(x => x.WithLocation(this));
+
+        return result;
     }
 
     /// <summary>
@@ -80,36 +81,23 @@ public sealed class EntityGetValue<T> : CompoundStep<T>
         public override string OutputTypeExplanation => "The required type";
 
         /// <inheritdoc />
-        protected override ITypeReference GetOutputTypeReference(ITypeReference memberTypeReference)
-        {
-            throw new NotImplementedException();
-        }
-
-        /// <inheritdoc />
-        protected override Result<ITypeReference, IError> GetMemberType(
+        protected override Result<TypeReference, IError> GetMemberType(
+            TypeReference expectedTypeReference,
             FreezableStepData freezableStepData,
             TypeResolver typeResolver)
         {
-            throw new NotImplementedException();
+            return expectedTypeReference;
         }
+
+        /// <inheritdoc />
+        protected override TypeReference GetOutputTypeReference(TypeReference memberTypeReference)
+        {
+            return memberTypeReference;
+        }
+
+        /// <inheritdoc />
+        public override IStepSerializer Serializer => EntityGetValueSerializer.Instance;
     }
 }
-
-///// <summary>
-///// Gets the value of a property from an entity
-///// </summary>
-//public sealed class EntityGetValueStepFactory : SimpleStepFactory<EntityGetValue, T>
-//{
-//    private EntityGetValueStepFactory() { }
-
-//    /// <summary>
-//    /// The instance.
-//    /// </summary>
-//    public static SimpleStepFactory<EntityGetValue, StringStream> Instance { get; } =
-//        new EntityGetValueStepFactory();
-
-//    /// <inheritdoc />
-//    public override IStepSerializer Serializer => EntityGetValueSerializer.Instance;
-//}
 
 }

@@ -252,6 +252,11 @@ public sealed record ErrorCode : ErrorCodeBase
     public static readonly ErrorCode WrongVariableType = new(nameof(WrongVariableType));
 
     /// <summary>
+    /// {0} has output type {1}, not {2}
+    /// </summary>
+    public static readonly ErrorCode WrongOutputType = new(nameof(WrongOutputType));
+
+    /// <summary>
     /// Cannot convert a nested entity to {0}.
     /// </summary>
     public static readonly ErrorCode CannotConvertNestedEntity =

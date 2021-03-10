@@ -23,15 +23,15 @@ public partial class EntityGetValueTests : StepTestBase<EntityGetValue<StringStr
                 "Hello"
             );
 
-            yield return new StepCase(
-                "Get Missing Property",
-                new EntityGetValue<StringStream>
-                {
-                    Entity   = Constant(Entity.Create(("Foo", "Hello"), ("Bar", "World"))),
-                    Property = Constant("Foot")
-                },
-                ""
-            );
+            //yield return new StepCase(
+            //    "Get Missing Property",
+            //    new EntityGetValue<StringStream>
+            //    {
+            //        Entity   = Constant(Entity.Create(("Foo", "Hello"), ("Bar", "World"))),
+            //        Property = Constant("Foot")
+            //    },
+            //    ""
+            //);
 
             yield return new StepCase(
                 "Get Empty Property",
@@ -50,7 +50,7 @@ public partial class EntityGetValueTests : StepTestBase<EntityGetValue<StringStr
                     Entity   = Constant(Entity.Create(("Foo", new[] { "Hello", "World" }))),
                     Property = Constant("Foo")
                 },
-                "Hello,World"
+                "[\"Hello\", \"World\"]"
             );
         }
     }

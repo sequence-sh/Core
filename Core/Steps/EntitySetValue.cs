@@ -95,16 +95,29 @@ public sealed class EntitySetValueStepFactory : GenericStepFactory
     public override string OutputTypeExplanation => nameof(Entity);
 
     /// <inheritdoc />
-    protected override ITypeReference GetOutputTypeReference(ITypeReference memberTypeReference) =>
-        new ActualTypeReference(typeof(Entity));
+    protected override TypeReference GetOutputTypeReference(TypeReference memberTypeReference) =>
+        new TypeReference.Actual(SCLType.Entity);
 
     /// <inheritdoc />
-    protected override Result<ITypeReference, IError> GetMemberType(
+    protected override Result<TypeReference, IError> GetMemberType(
+        TypeReference expectedTypeReference,
         FreezableStepData freezableStepData,
         TypeResolver typeResolver)
     {
+        if (!expectedTypeReference.Allow(new TypeReference.Actual(SCLType.Entity)))
+        {
+            return Result.Failure<TypeReference, IError>(
+                ErrorCode.WrongParameterType.ToErrorBuilder(
+                        StepType.Name,
+                        nameof(Entity),
+                        expectedTypeReference.Name
+                    )
+                    .WithLocation(freezableStepData)
+            );
+        }
+
         var r1 = freezableStepData.TryGetStep(nameof(EntitySetValue<object>.Value), StepType)
-            .Bind(x => x.TryGetOutputTypeReference(typeResolver));
+            .Bind(x => x.TryGetOutputTypeReference(TypeReference.Any.Instance, typeResolver));
 
         return r1;
     }

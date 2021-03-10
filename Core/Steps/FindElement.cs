@@ -21,7 +21,7 @@ public sealed class FindElement<T> : CompoundStep<int>
     /// </summary>
     [StepProperty(1)]
     [Required]
-    public IStep<Core.Array<T>> Array { get; set; } = null!;
+    public IStep<Array<T>> Array { get; set; } = null!;
 
     /// <summary>
     /// The element to look for.
@@ -58,7 +58,7 @@ public sealed class FindElement<T> : CompoundStep<int>
 /// <summary>
 /// Gets the first index of an element in an array.
 /// </summary>
-public sealed class FindElementStepFactory : GenericStepFactory
+public sealed class FindElementStepFactory : ArrayStepFactory
 {
     private FindElementStepFactory() { }
 
@@ -74,20 +74,20 @@ public sealed class FindElementStepFactory : GenericStepFactory
     public override string OutputTypeExplanation => nameof(Int32);
 
     /// <inheritdoc />
-    protected override ITypeReference GetOutputTypeReference(ITypeReference memberTypeReference) =>
-        new ActualTypeReference(typeof(int));
+    protected override TypeReference GetOutputTypeReference(TypeReference memberTypeReference) =>
+        new TypeReference.Actual(SCLType.Integer);
 
     /// <inheritdoc />
-    protected override Result<ITypeReference, IError> GetMemberType(
-        FreezableStepData freezableStepData,
-        TypeResolver typeResolver) => freezableStepData
-        .TryGetStep(nameof(FindElement<object>.Array), StepType)
-        .Bind(x => x.TryGetOutputTypeReference(typeResolver))
-        .Bind(
-            x => x.TryGetGenericTypeReference(typeResolver, 0)
-                .MapError(e => e.WithLocation(freezableStepData))
-        )
-        .Map(x => x as ITypeReference);
+    protected override Result<TypeReference, IErrorBuilder> GetExpectedArrayTypeReference(
+        TypeReference expectedTypeReference)
+    {
+        return expectedTypeReference
+            .CheckAllows(new TypeReference.Actual(SCLType.Integer), StepType)
+            .Map(_ => new TypeReference.Array(TypeReference.Any.Instance) as TypeReference);
+    }
+
+    /// <inheritdoc />
+    protected override string ArrayPropertyName => nameof(FindElement<object>.Array);
 }
 
 }

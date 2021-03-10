@@ -123,7 +123,7 @@ public sealed class SCLRunner
         CancellationToken cancellationToken)
     {
         var stepResult = SCLParsing.ParseSequence(text)
-            .Bind(x => x.TryFreeze(_stepFactoryStore))
+            .Bind(x => x.TryFreeze(TypeReference.Any.Instance, _stepFactoryStore))
             .Map(ConvertToUnitStep);
 
         if (stepResult.IsFailure)

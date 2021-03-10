@@ -18,7 +18,8 @@ public class ErrorBuilder : IErrorBuilder, IEquatable<IErrorBuilder>
     {
         ErrorCodeBase = errorCodeBase;
         Data          = data;
-        Timestamp     = DateTime.Now;
+
+        Timestamp = DateTime.Now;
     }
 
     /// <summary>

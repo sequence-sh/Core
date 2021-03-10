@@ -29,8 +29,8 @@ public sealed class If : CompoundStep<Unit>
 
                     if (Else != null)
                         return Else.Run(stateMonad, cancellationToken);
-                    else
-                        return Task.FromResult(Result.Success<Unit, IError>(Unit.Default));
+
+                    return Task.FromResult(Result.Success<Unit, IError>(Unit.Default));
                 }
             );
 

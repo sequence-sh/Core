@@ -43,7 +43,8 @@ public partial class ExampleTests
 
         var sfs = StepFactoryStore.CreateUsingReflection();
 
-        var stepResult = SCLParsing.ParseSequence(scl).Bind(x => x.TryFreeze(sfs));
+        var stepResult = SCLParsing.ParseSequence(scl)
+            .Bind(x => x.TryFreeze(TypeReference.Any.Instance, sfs));
 
         if (stepResult.IsFailure)
             throw new XunitException(
@@ -157,17 +158,13 @@ public partial class ExampleTests
                             Properties = new Dictionary<string, SchemaProperty>()
                             {
                                 {
-                                    "Name",
-                                    new SchemaProperty { Type = SchemaPropertyType.String }
+                                    "Name", new SchemaProperty { Type = SCLType.String }
                                 },
                                 {
                                     "ArrayLength",
-                                    new SchemaProperty { Type = SchemaPropertyType.Double }
+                                    new SchemaProperty { Type = SCLType.Double }
                                 },
-                                {
-                                    "Period",
-                                    new SchemaProperty { Type = SchemaPropertyType.String }
-                                },
+                                { "Period", new SchemaProperty { Type = SCLType.String } },
                             }
                         }.ConvertToEntity()
                     )

@@ -35,9 +35,19 @@ public abstract class StepFactory : IStepFactory
     }
 
     /// <inheritdoc />
-    public abstract Result<ITypeReference, IError> TryGetOutputTypeReference(
+    public abstract Result<TypeReference, IError> TryGetOutputTypeReference(
+        TypeReference expectedTypeReference,
         FreezableStepData freezableStepData,
         TypeResolver typeResolver);
+
+    /// <inheritdoc />
+    public virtual IEnumerable<(VariableName variableName, TypeReference type)> GetVariablesSet(
+        TypeReference expectedTypeReference,
+        FreezableStepData freezableStepData,
+        TypeResolver typeResolver)
+    {
+        yield break;
+    }
 
     /// <inheritdoc />
     public string TypeName => FormatTypeName(StepType);
@@ -87,14 +97,6 @@ public abstract class StepFactory : IStepFactory
     public abstract string OutputTypeExplanation { get; }
 
     /// <inheritdoc />
-    public virtual IEnumerable<(VariableName variableName, Maybe<ITypeReference>)> GetVariablesSet(
-        FreezableStepData freezableStepData,
-        TypeResolver typeResolver)
-    {
-        yield break;
-    }
-
-    /// <inheritdoc />
     public virtual IStepSerializer Serializer => new FunctionSerializer(TypeName);
 
     /// <inheritdoc />
@@ -104,43 +106,14 @@ public abstract class StepFactory : IStepFactory
     /// Creates an instance of this type.
     /// </summary>
     protected abstract Result<ICompoundStep, IError> TryCreateInstance(
-        TypeResolver typeResolver,
-        FreezableStepData freezeData);
-
-    /// <inheritdoc />
-    public (MemberType memberType, Type? type) GetExpectedMemberType(string name)
-    {
-        var propertyInfo = StepType.GetProperty(
-            name,
-            BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance
-        );
-
-        if (propertyInfo == null)
-            return (MemberType.NotAMember, null);
-
-        if (propertyInfo.GetCustomAttribute<VariableNameAttribute>() != null)
-            return (MemberType.VariableName, null);
-
-        if (propertyInfo.GetCustomAttribute<StepPropertyAttribute>() != null)
-            return (MemberType.Step, propertyInfo.PropertyType.GenericTypeArguments.First());
-
-        if (propertyInfo.GetCustomAttribute<StepListPropertyAttribute>() != null)
-            return (MemberType.StepList,
-                    propertyInfo.PropertyType.GenericTypeArguments.First()
-                        .GenericTypeArguments.First());
-
-        return (MemberType.NotAMember, null);
-    }
-
-    /// <inheritdoc />
-    public IEnumerable<string> RequiredProperties => StepType.GetProperties()
-        .Where(property => property.GetCustomAttribute<RequiredAttribute>() != null)
-        .Select(property => property.Name);
+        TypeReference expectedTypeReference,
+        FreezableStepData freezeData,
+        TypeResolver typeResolver);
 
     private IReadOnlyDictionary<StepParameterReference, PropertyInfo>? _propertyDictionary;
 
     /// <inheritdoc />
-    public IReadOnlyDictionary<StepParameterReference, PropertyInfo> PropertyDictionary
+    public IReadOnlyDictionary<StepParameterReference, PropertyInfo> ParameterDictionary
     {
         get
         {
@@ -156,11 +129,12 @@ public abstract class StepFactory : IStepFactory
 
     /// <inheritdoc />
     public Result<IStep, IError> TryFreeze(
+        TypeReference expectedTypeReference,
         TypeResolver typeResolver,
         FreezableStepData freezeData,
         Configuration? configuration)
     {
-        var instanceResult = TryCreateInstance(typeResolver, freezeData);
+        var instanceResult = TryCreateInstance(expectedTypeReference, freezeData, typeResolver);
 
         if (instanceResult.IsFailure)
             return instanceResult.ConvertFailure<IStep>();
@@ -207,7 +181,10 @@ public abstract class StepFactory : IStepFactory
         if (errors.Any())
             return Result.Failure<IStep, IError>(ErrorList.Combine(errors));
 
-        var remainingRequired = RequiredProperties.ToHashSet(StringComparer.OrdinalIgnoreCase);
+        var remainingRequired =
+            ParameterDictionary.Values.Where(x => x.GetCustomAttributes<RequiredAttribute>().Any())
+                .Select(x => x.Name)
+                .ToHashSet();
 
         List<(IFreezableStep, PropertyInfo)> scopedFunctions = new();
 
@@ -290,7 +267,10 @@ public abstract class StepFactory : IStepFactory
         IFreezableStep freezableStep,
         TypeResolver typeResolver)
     {
-        var freezeResult = freezableStep.TryFreeze(typeResolver);
+        var freezeResult = freezableStep.TryFreeze(
+            TypeReference.CreateFromStepType(propertyInfo.PropertyType),
+            typeResolver
+        );
 
         if (freezeResult.IsFailure)
             return freezeResult.ConvertFailure<Unit>();
@@ -337,6 +317,11 @@ public abstract class StepFactory : IStepFactory
                 }
             }
         }
+        else if (propertyInfo.PropertyType.IsGenericType
+              && propertyInfo.PropertyType.GenericTypeArguments.First() == typeof(object))
+        {
+            return Result.Success<IStep, IErrorBuilder>(stepToSet);
+        }
 
         return new ErrorBuilder(ErrorCode.InvalidCast, propertyInfo.Name, stepToSet.Name);
     }
@@ -379,8 +364,8 @@ public abstract class StepFactory : IStepFactory
 
         Result<Unit, IError> SetStepList()
         {
-            var argument = propertyInfo.PropertyType.GenericTypeArguments.Single();
-            var listType = typeof(List<>).MakeGenericType(argument);
+            var argumentType = propertyInfo.PropertyType.GenericTypeArguments.Single();
+            var listType     = typeof(List<>).MakeGenericType(argumentType);
 
             var list      = Activator.CreateInstance(listType);
             var addMethod = listType.GetMethod(nameof(List<object>.Add))!;
@@ -388,16 +373,19 @@ public abstract class StepFactory : IStepFactory
 
             foreach (var freezableStep in freezableStepList)
             {
-                var freezeResult = freezableStep.TryFreeze(typeResolver);
+                var freezeResult = freezableStep.TryFreeze(
+                    TypeReference.Create(argumentType),
+                    typeResolver
+                );
 
                 if (freezeResult.IsFailure)
                     errors.Add(freezeResult.Error);
                 else if (freezeResult.Value is IConstantStep constant
-                      && argument.IsInstanceOfType(constant.ValueObject))
+                      && argumentType.IsInstanceOfType(constant.ValueObject))
                 {
                     addMethod.Invoke(list, new[] { constant.ValueObject });
                 }
-                else if (argument.IsInstanceOfType(freezeResult.Value))
+                else if (argumentType.IsInstanceOfType(freezeResult.Value))
                 {
                     addMethod.Invoke(list, new object?[] { freezeResult.Value });
                 }
@@ -436,7 +424,10 @@ public abstract class StepFactory : IStepFactory
 
             foreach (var freezableStep in freezableStepList)
             {
-                var freezeResult = freezableStep.TryFreeze(typeResolver);
+                var freezeResult = freezableStep.TryFreeze(
+                    TypeReference.Create(nestedArgument),
+                    typeResolver
+                );
 
                 if (freezeResult.IsFailure)
                     errors.Add(freezeResult.Error);
