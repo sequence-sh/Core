@@ -138,6 +138,9 @@
   <data name="ConflictingParameters" xml:space="preserve">
     <value>Parameters {0} and {1} are in conflict.</value>
   </data>
+  <data name="CouldNotConvertEntityValue" xml:space="preserve">
+    <value>Could not convert entity value to {0}.</value>
+  </data>
   <data name="CouldNotParse" xml:space="preserve">
     <value>Could not parse '{0}' as {1}</value>
   </data>
@@ -245,6 +248,9 @@
   </data>
   <data name="Unknown" xml:space="preserve">
     <value>Unknown Error: '{0}'</value>
+  </data>
+  <data name="WrongOutputType" xml:space="preserve">
+    <value>{0} has output type {1}, not {2}</value>
   </data>
   <data name="WrongParameterType" xml:space="preserve">
     <value>{0} was a {1}, not a {2}</value>

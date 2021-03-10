@@ -104,7 +104,8 @@ public sealed class ArrayDistinct<T> : CompoundStep<Array<T>>
     {
         return baseTypeResolver.TryCloneWithScopedStep(
             Variable,
-            new ActualTypeReference(typeof(T)),
+            TypeReference.Create(typeof(T)),
+            new TypeReference.Actual(SCLType.String),
             scopedStep,
             new ErrorLocation(this)
         );
@@ -114,7 +115,7 @@ public sealed class ArrayDistinct<T> : CompoundStep<Array<T>>
 /// <summary>
 /// Removes duplicate entities.
 /// </summary>
-public sealed class ArrayDistinctStepFactory : GenericStepFactory
+public sealed class ArrayDistinctStepFactory : ArrayStepFactory
 {
     private ArrayDistinctStepFactory() { }
 
@@ -124,20 +125,18 @@ public sealed class ArrayDistinctStepFactory : GenericStepFactory
     public static GenericStepFactory Instance { get; } = new ArrayDistinctStepFactory();
 
     /// <inheritdoc />
-    protected override ITypeReference GetOutputTypeReference(ITypeReference memberTypeReference) =>
-        new GenericTypeReference(typeof(Array<>), new[] { memberTypeReference });
+    protected override TypeReference GetOutputTypeReference(TypeReference memberTypeReference) =>
+        new TypeReference.Array(memberTypeReference);
 
     /// <inheritdoc />
-    protected override Result<ITypeReference, IError> GetMemberType(
-        FreezableStepData freezableStepData,
-        TypeResolver typeResolver) => freezableStepData
-        .TryGetStep(nameof(ArrayFilter<object>.Array), StepType)
-        .Bind(x => x.TryGetOutputTypeReference(typeResolver))
-        .Bind(
-            x => x.TryGetGenericTypeReference(typeResolver, 0)
-                .MapError(e => e.WithLocation(freezableStepData))
-        )
-        .Map(x => x as ITypeReference);
+    protected override Result<TypeReference, IErrorBuilder> GetExpectedArrayTypeReference(
+        TypeReference expectedTypeReference)
+    {
+        return expectedTypeReference;
+    }
+
+    /// <inheritdoc />
+    protected override string ArrayPropertyName => nameof(ArrayDistinct<object>.Array);
 
     /// <inheritdoc />
     public override Type StepType => typeof(ArrayDistinct<>);

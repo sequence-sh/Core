@@ -39,6 +39,11 @@ public sealed class StringStream : IEquatable<StringStream>, IComparable<StringS
     public StringStream(string s) => Value = s;
 
     /// <summary>
+    /// Empty StringStream
+    /// </summary>
+    public static StringStream Empty { get; } = new("");
+
+    /// <summary>
     /// The Value of this
     /// </summary>
     public Option Value { get; private set; }

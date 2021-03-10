@@ -64,24 +64,26 @@ public class SetVariableStepFactory : GenericStepFactory
     public override string OutputTypeExplanation => nameof(Unit);
 
     /// <inheritdoc />
-    protected override ITypeReference GetOutputTypeReference(ITypeReference memberTypeReference) =>
-        new ActualTypeReference(typeof(Unit));
+    protected override TypeReference GetOutputTypeReference(TypeReference memberTypeReference) =>
+        TypeReference.Unit.Instance;
 
     /// <inheritdoc />
-    protected override Result<ITypeReference, IError> GetMemberType(
+    protected override Result<TypeReference, IError> GetGenericTypeParameter(
+        TypeReference expectedTypeReference,
         FreezableStepData freezableStepData,
         TypeResolver typeResolver)
     {
         var r =
             freezableStepData
                 .TryGetStep(nameof(SetVariable<object>.Value), StepType)
-                .Bind(x => x.TryGetOutputTypeReference(typeResolver));
+                .Bind(x => x.TryGetOutputTypeReference(TypeReference.Any.Instance, typeResolver));
 
         return r;
     }
 
     /// <inheritdoc />
-    public override IEnumerable<(VariableName variableName, Maybe<ITypeReference>)> GetVariablesSet(
+    public override IEnumerable<(VariableName variableName, TypeReference type)> GetVariablesSet(
+        TypeReference expectedTypeReference,
         FreezableStepData freezableStepData,
         TypeResolver typeResolver)
     {
@@ -93,12 +95,16 @@ public class SetVariableStepFactory : GenericStepFactory
         if (vn.IsFailure)
             yield break;
 
-        var memberType = GetMemberType(freezableStepData, typeResolver);
+        var memberType = GetGenericTypeParameter(
+            expectedTypeReference,
+            freezableStepData,
+            typeResolver
+        );
 
         if (memberType.IsFailure)
-            yield return (vn.Value, Maybe<ITypeReference>.None);
+            yield return (vn.Value, TypeReference.Unknown.Instance);
         else
-            yield return (vn.Value, Maybe<ITypeReference>.From(memberType.Value));
+            yield return (vn.Value, memberType.Value);
     }
 
     /// <inheritdoc />

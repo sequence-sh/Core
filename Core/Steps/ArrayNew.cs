@@ -79,24 +79,28 @@ public class ArrayNewStepFactory : GenericStepFactory
     public override string OutputTypeExplanation => "Array<T>";
 
     /// <inheritdoc />
-    protected override ITypeReference GetOutputTypeReference(ITypeReference memberTypeReference) =>
-        new GenericTypeReference(typeof(Array<>), new[] { memberTypeReference });
+    protected override TypeReference GetOutputTypeReference(TypeReference memberTypeReference) =>
+        new TypeReference.Array(memberTypeReference);
 
     /// <inheritdoc />
-    protected override Result<ITypeReference, IError> GetMemberType(
+    protected override Result<TypeReference, IError> GetGenericTypeParameter(
+        TypeReference expectedTypeReference,
         FreezableStepData freezableStepData,
         TypeResolver typeResolver)
     {
+        var mtr = expectedTypeReference.TryGetArrayMemberTypeReference(typeResolver)
+            .MapError(x => x.WithLocation(freezableStepData));
+
+        if (mtr.IsFailure)
+            return mtr.ConvertFailure<TypeReference>();
+
         var result =
             freezableStepData.TryGetStepList(nameof(ArrayNew<object>.Elements), StepType)
                 .Bind(
-                    x => x.Select(r => r.TryGetOutputTypeReference(typeResolver))
+                    x => x.Select(r => r.TryGetOutputTypeReference(mtr.Value, typeResolver))
                         .Combine(ErrorList.Combine)
                 )
-                .Bind(
-                    x => MultipleTypeReference.TryCreate(x, TypeName)
-                        .MapError(e => e.WithLocation(freezableStepData))
-                );
+                .Map(TypeReference.Create);
 
         return result;
     }

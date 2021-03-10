@@ -51,6 +51,11 @@ public abstract partial class StepTestBase<TStep, TOutput>
                 var result = await outputStep.Run<TOutput>(stateMonad, CancellationToken.None);
                 CheckOutputResult(result);
             }
+            else if (step is IStep<object> objectStep)
+            {
+                var result = await objectStep.Run<TOutput>(stateMonad, CancellationToken.None);
+                CheckOutputResult(result);
+            }
             else if (step is IStep<Unit> unitStep)
             {
                 var result = await unitStep.Run<Unit>(stateMonad, CancellationToken.None);

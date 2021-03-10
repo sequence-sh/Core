@@ -7,7 +7,7 @@ using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 namespace Reductech.EDR.Core.Tests.Steps
 {
 
-public partial class RegexReplaceTests : StepTestBase<RegexReplace, string>
+public partial class RegexReplaceTests : StepTestBase<RegexReplace, StringStream>
 {
     /// <inheritdoc />
     protected override IEnumerable<StepCase> StepCases

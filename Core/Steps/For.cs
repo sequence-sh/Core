@@ -123,27 +123,15 @@ public sealed class For : CompoundStep<Unit>
     {
         return baseTypeResolver.TryCloneWithScopedStep(
             Variable,
-            new ActualTypeReference(typeof(int)),
+            new TypeReference.Actual(SCLType.Integer),
+            TypeReference.Unit.Instance,
             scopedStep,
             new ErrorLocation(this)
         );
     }
 
     /// <inheritdoc />
-    public override IStepFactory StepFactory => ForStepFactory.Instance;
-}
-
-/// <summary>
-/// Do an action for each value of a given variable in a range.
-/// </summary>
-public class ForStepFactory : SimpleStepFactory<For, Unit>
-{
-    private ForStepFactory() { }
-
-    /// <summary>
-    /// The instance.
-    /// </summary>
-    public static SimpleStepFactory<For, Unit> Instance { get; } = new ForStepFactory();
+    public override IStepFactory StepFactory { get; } = new SimpleStepFactory<For, Unit>();
 }
 
 }

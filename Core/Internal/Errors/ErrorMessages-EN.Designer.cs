@@ -124,6 +124,15 @@ namespace Reductech.EDR.Core.Internal.Errors {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Could not convert entity value to {0}..
+        /// </summary>
+        internal static string CouldNotConvertEntityValue {
+            get {
+                return ResourceManager.GetString("CouldNotConvertEntityValue", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Could not parse &apos;{0}&apos; as {1}.
         /// </summary>
         internal static string CouldNotParse {
@@ -444,6 +453,15 @@ namespace Reductech.EDR.Core.Internal.Errors {
         internal static string Unknown {
             get {
                 return ResourceManager.GetString("Unknown", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} has output type {1}, not {2}.
+        /// </summary>
+        internal static string WrongOutputType {
+            get {
+                return ResourceManager.GetString("WrongOutputType", resourceCulture);
             }
         }
         

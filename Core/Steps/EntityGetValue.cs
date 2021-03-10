@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
@@ -15,34 +16,35 @@ namespace Reductech.EDR.Core.Steps
 /// Gets the value of a property from an entity
 /// </summary>
 [Alias("From")]
-public sealed class EntityGetValue : CompoundStep<StringStream>
+public sealed class EntityGetValue<T> : CompoundStep<T>
 {
     /// <inheritdoc />
-    protected override async Task<Result<StringStream, IError>> Run(
+    protected override async Task<Result<T, IError>> Run(
         IStateMonad stateMonad,
         CancellationToken cancellationToken)
     {
         var entity = await Entity.Run(stateMonad, cancellationToken);
 
         if (entity.IsFailure)
-            return entity.ConvertFailure<StringStream>();
+            return entity.ConvertFailure<T>();
 
         var propertyResult = await Property.Run(stateMonad, cancellationToken)
             .Map(x => x.GetStringAsync());
 
         if (propertyResult.IsFailure)
-            return propertyResult.ConvertFailure<StringStream>();
+            return propertyResult.ConvertFailure<T>();
 
         var epk = new EntityPropertyKey(propertyResult.Value);
 
-        var entityValue = entity.Value.TryGetValue(epk)
-            .Map(x => x.GetString());
+        var entityValue = entity.Value.TryGetValue(epk);
 
-        string resultString = entityValue.HasValue ? entityValue.Value : "";
+        if (entityValue.HasNoValue)
+            return EntityValue.GetDefaultValue<T>();
 
-        var resultStream = new StringStream(resultString);
+        var result = entityValue.Value.TryGetValue<T>()
+            .MapError(x => x.WithLocation(this));
 
-        return resultStream;
+        return result;
     }
 
     /// <summary>
@@ -66,23 +68,36 @@ public sealed class EntityGetValue : CompoundStep<StringStream>
 
     /// <inheritdoc />
     public override bool ShouldBracketWhenSerialized => false;
-}
 
-/// <summary>
-/// Gets the value of a property from an entity
-/// </summary>
-public sealed class EntityGetValueStepFactory : SimpleStepFactory<EntityGetValue, StringStream>
-{
-    private EntityGetValueStepFactory() { }
+    private sealed class EntityGetValueStepFactory : GenericStepFactory
+    {
+        private EntityGetValueStepFactory() { }
+        public static GenericStepFactory Instance { get; } = new EntityGetValueStepFactory();
 
-    /// <summary>
-    /// The instance.
-    /// </summary>
-    public static SimpleStepFactory<EntityGetValue, StringStream> Instance { get; } =
-        new EntityGetValueStepFactory();
+        /// <inheritdoc />
+        public override Type StepType { get; } = typeof(EntityGetValue<>);
 
-    /// <inheritdoc />
-    public override IStepSerializer Serializer => EntityGetValueSerializer.Instance;
+        /// <inheritdoc />
+        public override string OutputTypeExplanation => "The required type";
+
+        /// <inheritdoc />
+        protected override Result<TypeReference, IError> GetGenericTypeParameter(
+            TypeReference expectedTypeReference,
+            FreezableStepData freezableStepData,
+            TypeResolver typeResolver)
+        {
+            return expectedTypeReference;
+        }
+
+        /// <inheritdoc />
+        protected override TypeReference GetOutputTypeReference(TypeReference memberTypeReference)
+        {
+            return memberTypeReference;
+        }
+
+        /// <inheritdoc />
+        public override IStepSerializer Serializer => EntityGetValueSerializer.Instance;
+    }
 }
 
 }

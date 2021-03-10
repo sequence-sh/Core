@@ -14,45 +14,54 @@ public abstract class
     GenericBaseOperatorStep<TStep, TElement, TOutput> : BaseOperatorStep<TStep, TElement, TOutput>
     where TStep : BaseOperatorStep<TStep, TElement, TOutput>, new()
 {
-    /// <inheritdoc />
-    public override IStepFactory StepFactory { get; } = GenericBaseOperatorStepFactory.Instance;
+    ///// <inheritdoc />
+    //public override IStepFactory StepFactory { get; } = GenericBaseOperatorStepFactory.Instance;
 
     /// <summary>
     /// Compares two items.
     /// </summary>
     public sealed class GenericBaseOperatorStepFactory : GenericStepFactory
     {
-        private GenericBaseOperatorStepFactory() { }
+        public GenericBaseOperatorStepFactory(SCLType elementType, SCLType outputType)
+        {
+            ElementType = elementType;
+            OutputType  = outputType;
+        }
 
-        /// <summary>
-        /// The instance
-        /// </summary>
-        public static GenericBaseOperatorStepFactory Instance { get; } = new();
+        public SCLType ElementType { get; }
+        public SCLType OutputType { get; }
 
         /// <inheritdoc />
         public override Type StepType => typeof(TStep).GetGenericTypeDefinition();
 
         /// <inheritdoc />
-        public override string OutputTypeExplanation => nameof(Boolean);
+        public override string OutputTypeExplanation => OutputType.ToString();
 
         /// <inheritdoc />
-        protected override ITypeReference
-            GetOutputTypeReference(ITypeReference memberTypeReference) =>
-            new ActualTypeReference(typeof(bool));
+        protected override TypeReference
+            GetOutputTypeReference(TypeReference memberTypeReference) =>
+            new TypeReference.Actual(OutputType);
 
         /// <inheritdoc />
-        protected override Result<ITypeReference, IError> GetMemberType(
+        protected override Result<TypeReference, IError> GetGenericTypeParameter(
+            TypeReference expectedTypeReference,
             FreezableStepData freezableStepData,
             TypeResolver typeResolver)
         {
+            expectedTypeReference.CheckAllows(new TypeReference.Actual(OutputType), StepType);
+
             var result = freezableStepData
                 .TryGetStep(nameof(Terms), StepType)
-                .Bind(x => x.TryGetOutputTypeReference(typeResolver))
                 .Bind(
-                    x => x.TryGetGenericTypeReference(typeResolver, 0)
-                        .MapError(e => e.WithLocation(freezableStepData))
+                    x => x.TryGetOutputTypeReference(
+                        new TypeReference.Array(new TypeReference.Actual(ElementType)),
+                        typeResolver
+                    )
                 )
-                .Map(x => x as ITypeReference);
+                .Bind(
+                    x => x.TryGetArrayMemberTypeReference(typeResolver)
+                        .MapError(e => e.WithLocation(freezableStepData))
+                );
 
             return result;
         }

@@ -78,28 +78,16 @@ public sealed class EntityMap : CompoundStep<Array<Entity>>
     {
         return baseContext.TryCloneWithScopedStep(
             Variable,
-            new ActualTypeReference(typeof(Entity)),
+            new TypeReference.Actual(SCLType.Entity),
+            new TypeReference.Actual(SCLType.Entity),
             scopedStep,
             new ErrorLocation(this)
         );
     }
 
     /// <inheritdoc />
-    public override IStepFactory StepFactory => EntityMapStepFactory.Instance;
-}
-
-/// <summary>
-/// Apply a function to every entity in an entity stream.
-/// </summary>
-public sealed class EntityMapStepFactory : SimpleStepFactory<EntityMap, Array<Entity>>
-{
-    private EntityMapStepFactory() { }
-
-    /// <summary>
-    /// The instance.
-    /// </summary>
-    public static SimpleStepFactory<EntityMap, Array<Entity>> Instance { get; } =
-        new EntityMapStepFactory();
+    public override IStepFactory StepFactory { get; } =
+        new SimpleStepFactory<EntityMap, Array<Entity>>();
 }
 
 }

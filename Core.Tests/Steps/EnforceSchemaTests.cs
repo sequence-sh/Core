@@ -70,8 +70,8 @@ public partial class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Enti
                 CreateSchema(
                     "ValueIf Schema",
                     false,
-                    ("foo", SchemaPropertyType.String, Multiplicity.ExactlyOne),
-                    ("Bar", SchemaPropertyType.Integer, Multiplicity.ExactlyOne)
+                    ("foo", SCLType.String, Multiplicity.ExactlyOne),
+                    ("Bar", SCLType.Integer, Multiplicity.ExactlyOne)
                 ),
                 "(Foo: \"Hello\" Bar: 1)",
                 "(Foo: \"Hello 2\" Bar: 2)"
@@ -83,7 +83,7 @@ public partial class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Enti
                 CreateSchema(
                     "ValueIf Schema",
                     false,
-                    ("Foo", SchemaPropertyType.Integer, Multiplicity.ExactlyOne)
+                    ("Foo", SCLType.Integer, Multiplicity.ExactlyOne)
                 ),
                 "(Foo: 100)"
             );
@@ -94,7 +94,7 @@ public partial class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Enti
                 CreateSchema(
                     "ValueIf Schema",
                     false,
-                    ("Foo", SchemaPropertyType.Double, Multiplicity.ExactlyOne)
+                    ("Foo", SCLType.Double, Multiplicity.ExactlyOne)
                 ),
                 "(Foo: 100.345)"
             );
@@ -105,7 +105,7 @@ public partial class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Enti
                 CreateSchema(
                     "ValueIf Schema",
                     false,
-                    ("Foo", SchemaPropertyType.Bool, Multiplicity.ExactlyOne)
+                    ("Foo", SCLType.Bool, Multiplicity.ExactlyOne)
                 ),
                 "(Foo: True)"
             );
@@ -116,7 +116,7 @@ public partial class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Enti
                 CreateSchema(
                     "ValueIf Schema",
                     false,
-                    ("Foo", SchemaPropertyType.Date, Multiplicity.ExactlyOne)
+                    ("Foo", SCLType.Date, Multiplicity.ExactlyOne)
                 ),
                 "(Foo: 2020-10-11T15:45:44.0000000)"
             );
@@ -127,7 +127,7 @@ public partial class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Enti
                 CreateSchema(
                     "ValueIf Schema",
                     false,
-                    ("Foo", SchemaPropertyType.Date, null, Multiplicity.ExactlyOne, null, null,
+                    ("Foo", SCLType.Date, null, Multiplicity.ExactlyOne, null, null,
                      new List<string> { "yyyy" }, null)
                 ),
                 "(Foo: 2020-01-01T00:00:00.0000000)"
@@ -139,7 +139,7 @@ public partial class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Enti
                 CreateSchema(
                     "ValueIf Schema",
                     false,
-                    ("Foo", SchemaPropertyType.Date, null, Multiplicity.ExactlyOne, null, null,
+                    ("Foo", SCLType.Date, null, Multiplicity.ExactlyOne, null, null,
                      new List<string> { "yyyy" }, "yyyy-mm-dd")
                 ),
                 "(Foo: 2020-00-01)"
@@ -151,7 +151,7 @@ public partial class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Enti
                 CreateSchema(
                     "ValueIf Schema",
                     false,
-                    ("Foo", SchemaPropertyType.Integer, null, Multiplicity.ExactlyOne, @"\d+", null,
+                    ("Foo", SCLType.Integer, null, Multiplicity.ExactlyOne, @"\d+", null,
                      null, null)
                 ),
                 "(Foo: 100)"
@@ -163,7 +163,7 @@ public partial class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Enti
                 CreateSchema(
                     "ValueIf Schema",
                     false,
-                    ("Foo", SchemaPropertyType.Enum, "Word", Multiplicity.ExactlyOne, null,
+                    ("Foo", SCLType.Enum, "Word", Multiplicity.ExactlyOne, null,
                      new List<string> { "Hello", "World" }, null, null)
                 ),
                 "(Foo: Word.hello)"
@@ -176,7 +176,7 @@ public partial class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Enti
                     CreateSchema(
                         "ValueIf Schema",
                         false,
-                        ("Foo", SchemaPropertyType.Integer, Multiplicity.Any)
+                        ("Foo", SCLType.Integer, Multiplicity.Any)
                     ),
                     ErrorBehavior.Error
                 ),
@@ -190,7 +190,7 @@ public partial class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Enti
                     CreateSchema(
                         "ValueIf Schema",
                         false,
-                        ("Foo", SchemaPropertyType.Integer, Multiplicity.Any)
+                        ("Foo", SCLType.Integer, Multiplicity.Any)
                     ),
                     ErrorBehavior.Warning
                 ),
@@ -205,7 +205,7 @@ public partial class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Enti
                     CreateSchema(
                         "ValueIf Schema",
                         false,
-                        ("Foo", SchemaPropertyType.Integer, Multiplicity.Any)
+                        ("Foo", SCLType.Integer, Multiplicity.Any)
                     ),
                     ErrorBehavior.Skip
                 )
@@ -218,7 +218,7 @@ public partial class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Enti
                     CreateSchema(
                         "ValueIf Schema",
                         false,
-                        ("Foo", SchemaPropertyType.Integer, Multiplicity.Any)
+                        ("Foo", SCLType.Integer, Multiplicity.Any)
                     ),
                     ErrorBehavior.Ignore
                 ),
@@ -284,7 +284,7 @@ public partial class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Enti
                 CreateSchema(
                     "ValueIf Schema",
                     false,
-                    ("Foo", SchemaPropertyType.Integer, Multiplicity.Any)
+                    ("Foo", SCLType.Integer, Multiplicity.Any)
                 ),
                 ErrorCode.SchemaViolationWrongType,
                 "Hello",
@@ -297,7 +297,7 @@ public partial class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Enti
                 CreateSchema(
                     "ValueIf Schema",
                     false,
-                    ("Foo", SchemaPropertyType.Enum, "Food", Multiplicity.Any, null,
+                    ("Foo", SCLType.Enum, "Food", Multiplicity.Any, null,
                      new List<string> { "Meat", "Chips" }, null, null)
                 ),
                 ErrorCode.SchemaViolationWrongType,
@@ -311,7 +311,7 @@ public partial class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Enti
                 CreateSchema(
                     "ValueIf Schema",
                     false,
-                    ("Foo", SchemaPropertyType.Enum, null, Multiplicity.Any, null,
+                    ("Foo", SCLType.Enum, null, Multiplicity.Any, null,
                      new List<string> { "Meat", "Chips" }, null, null)
                 ),
                 ErrorCode.SchemaInvalidMissingEnum
@@ -323,7 +323,7 @@ public partial class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Enti
                 CreateSchema(
                     "ValueIf Schema",
                     false,
-                    ("Foo", SchemaPropertyType.String, null, Multiplicity.Any, @"\d+", null, null,
+                    ("Foo", SCLType.String, null, Multiplicity.Any, @"\d+", null, null,
                      null)
                 ),
                 ErrorCode.SchemaViolationUnmatchedRegex,
@@ -337,8 +337,8 @@ public partial class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Enti
                 CreateSchema(
                     "ValueIf Schema",
                     false,
-                    ("Foo", SchemaPropertyType.String, Multiplicity.Any),
-                    ("Bar", SchemaPropertyType.String, Multiplicity.AtLeastOne)
+                    ("Foo", SCLType.String, Multiplicity.Any),
+                    ("Bar", SCLType.String, Multiplicity.AtLeastOne)
                 ),
                 ErrorCode.SchemaViolationMissingProperty,
                 "Bar"
@@ -350,7 +350,7 @@ public partial class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Enti
                 CreateSchema(
                     "ValueIf Schema",
                     false,
-                    ("Foo", SchemaPropertyType.String, Multiplicity.Any)
+                    ("Foo", SCLType.String, Multiplicity.Any)
                 ),
                 ErrorCode.SchemaViolationUnexpectedProperty,
                 "Bar"
@@ -364,8 +364,8 @@ public partial class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Enti
         var schema = CreateSchema(
             "ValueIf Schema",
             false,
-            ("foo", SchemaPropertyType.String, Multiplicity.ExactlyOne),
-            ("Bar", SchemaPropertyType.Integer, Multiplicity.ExactlyOne)
+            ("foo", SCLType.String, Multiplicity.ExactlyOne),
+            ("Bar", SCLType.Integer, Multiplicity.ExactlyOne)
         );
 
         schema.Name.Should().Be("ValueIf Schema");
@@ -380,7 +380,7 @@ public partial class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Enti
         sc1.Values.Should().BeNull();
         sc1.Multiplicity.Should().Be(Multiplicity.ExactlyOne);
         sc1.Regex.Should().BeNull();
-        sc1.Type.Should().Be(SchemaPropertyType.String);
+        sc1.Type.Should().Be(SCLType.String);
     }
 
     [Fact]
@@ -389,8 +389,8 @@ public partial class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Enti
         var schema = CreateSchema(
             "ValueIf Schema",
             false,
-            ("foo", SchemaPropertyType.String, Multiplicity.ExactlyOne),
-            ("Bar", SchemaPropertyType.Integer, Multiplicity.ExactlyOne)
+            ("foo", SCLType.String, Multiplicity.ExactlyOne),
+            ("Bar", SCLType.Integer, Multiplicity.ExactlyOne)
         );
 
         var entity = schema.ConvertToEntity();

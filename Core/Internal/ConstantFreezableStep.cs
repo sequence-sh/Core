@@ -22,8 +22,9 @@ public record StringConstantFreezable
     public override string StepName => Value.Name;
 
     /// <inheritdoc />
-    public override Result<IStep, IError> TryFreeze(TypeResolver typeResolver) =>
-        new StringConstant(Value);
+    public override Result<IStep, IError> TryFreeze(
+        TypeReference expectedType,
+        TypeResolver typeResolver) => new StringConstant(Value);
 
     /// <inheritdoc />
     public override string Serialize() => Value.Serialize();
@@ -39,8 +40,9 @@ public record IntConstantFreezable
     public override string StepName => Value.ToString();
 
     /// <inheritdoc />
-    public override Result<IStep, IError> TryFreeze(TypeResolver typeResolver) =>
-        new IntConstant(Value);
+    public override Result<IStep, IError> TryFreeze(
+        TypeReference expectedType,
+        TypeResolver typeResolver) => new IntConstant(Value);
 
     /// <inheritdoc />
     public override string Serialize() => Value.ToString();
@@ -56,8 +58,9 @@ public record DoubleConstantFreezable
     public override string StepName => Value.ToString(Constants.DoubleFormat);
 
     /// <inheritdoc />
-    public override Result<IStep, IError> TryFreeze(TypeResolver typeResolver) =>
-        new DoubleConstant(Value);
+    public override Result<IStep, IError> TryFreeze(
+        TypeReference expectedType,
+        TypeResolver typeResolver) => new DoubleConstant(Value);
 
     /// <inheritdoc />
     public override string Serialize() => Value.ToString(Constants.DoubleFormat);
@@ -73,8 +76,9 @@ public record BoolConstantFreezable
     public override string StepName => Value.ToString();
 
     /// <inheritdoc />
-    public override Result<IStep, IError> TryFreeze(TypeResolver typeResolver) =>
-        new BoolConstant(Value);
+    public override Result<IStep, IError> TryFreeze(
+        TypeReference expectedType,
+        TypeResolver typeResolver) => new BoolConstant(Value);
 
     /// <inheritdoc />
     public override string Serialize() => Value.ToString();
@@ -93,8 +97,9 @@ public record DateTimeConstantFreezable
     public override string StepName => Value.ToString(Constants.DateTimeFormat);
 
     /// <inheritdoc />
-    public override Result<IStep, IError> TryFreeze(TypeResolver typeResolver) =>
-        new DateTimeConstant(Value);
+    public override Result<IStep, IError> TryFreeze(
+        TypeReference expectedType,
+        TypeResolver typeResolver) => new DateTimeConstant(Value);
 
     /// <inheritdoc />
     public override string Serialize() => Value.ToString(Constants.DateTimeFormat);
@@ -110,8 +115,9 @@ public record EntityConstantFreezable
     public override string StepName => Value.Serialize();
 
     /// <inheritdoc />
-    public override Result<IStep, IError> TryFreeze(TypeResolver typeResolver) =>
-        new EntityConstant(Value);
+    public override Result<IStep, IError> TryFreeze(
+        TypeReference expectedType,
+        TypeResolver typeResolver) => new EntityConstant(Value);
 
     /// <inheritdoc />
     public override string Serialize() => Value.ToString();
@@ -130,7 +136,9 @@ public record EnumConstantFreezable
     public override string StepName => Value.ToString();
 
     /// <inheritdoc />
-    public override Result<IStep, IError> TryFreeze(TypeResolver typeResolver)
+    public override Result<IStep, IError> TryFreeze(
+        TypeReference expectedType,
+        TypeResolver typeResolver)
     {
         var type = TryGetType(typeResolver);
 
@@ -145,9 +153,10 @@ public record EnumConstantFreezable
     }
 
     /// <inheritdoc />
-    public override Result<ITypeReference, IError>
-        TryGetOutputTypeReference(TypeResolver typeResolver) => TryGetType(typeResolver)
-        .Map(x => new ActualTypeReference(x) as ITypeReference);
+    public override Result<TypeReference, IError> TryGetOutputTypeReference(
+        TypeReference expectedType,
+        TypeResolver typeResolver) => TryGetType(typeResolver)
+        .Map(TypeReference.Create);
 
     /// <inheritdoc />
     public override string Serialize() => Value.ToString();
@@ -218,20 +227,23 @@ public abstract record ConstantFreezableBase<T>
     public abstract string StepName { get; }
 
     /// <inheritdoc />
-    public abstract Result<IStep, IError> TryFreeze(TypeResolver typeResolver);
+    public abstract Result<IStep, IError> TryFreeze(
+        TypeReference expectedType,
+        TypeResolver typeResolver);
 
     /// <inheritdoc />
-    public Result<IReadOnlyCollection<(VariableName variableName, Maybe<ITypeReference>)>, IError>
-        GetVariablesSet(TypeResolver typeResolver)
+    public Result<IReadOnlyCollection<(VariableName variableName, TypeReference)>, IError>
+        GetVariablesSet(TypeReference expectedType, TypeResolver typeResolver)
     {
-        return new List<(VariableName variableName, Maybe<ITypeReference>)>();
+        return new List<(VariableName variableName, TypeReference)>();
     }
 
     /// <inheritdoc />
-    public virtual Result<ITypeReference, IError> TryGetOutputTypeReference(
+    public virtual Result<TypeReference, IError> TryGetOutputTypeReference(
+        TypeReference expectedType,
         TypeResolver typeResolver)
     {
-        return new ActualTypeReference(typeof(T));
+        return TypeReference.Create(typeof(T));
     }
 
     /// <inheritdoc />

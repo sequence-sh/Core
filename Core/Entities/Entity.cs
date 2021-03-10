@@ -39,6 +39,11 @@ public sealed class Entity : IEnumerable<EntityProperty>, IEquatable<Entity>
     }
 
     /// <summary>
+    /// Empty entity
+    /// </summary>
+    public static Entity Empty { get; } = new(ImmutableDictionary<string, EntityProperty>.Empty);
+
+    /// <summary>
     /// The dictionary of property values.
     /// </summary>
     public ImmutableDictionary<string, EntityProperty> Dictionary { get; }

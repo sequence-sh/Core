@@ -24,27 +24,31 @@ public interface IFreezableStep : IEquatable<IFreezableStep>
     /// <summary>
     /// Try to freeze this step.
     /// </summary>
-    Result<IStep, IError> TryFreeze(TypeResolver typeResolver);
+    Result<IStep, IError> TryFreeze(TypeReference expectedType, TypeResolver typeResolver);
 
     /// <summary>
     /// Gets the variables set by this step and its children and the types of those variables if they can be resolved at this time.
-    /// Does not include reserved variables e.g. Entity
     /// Returns an error if the type name cannot be resolved
     /// </summary>
-    Result<IReadOnlyCollection<(VariableName variableName, Maybe<ITypeReference>)>, IError>
-        GetVariablesSet(TypeResolver typeResolver);
+    Result<IReadOnlyCollection<(VariableName variableName, TypeReference)>, IError> GetVariablesSet(
+        TypeReference expectedType,
+        TypeResolver typeResolver);
 
     /// <summary>
     /// The output type of this step. Will be unit if the step does not have an output.
     /// </summary>
-    Result<ITypeReference, IError> TryGetOutputTypeReference(TypeResolver typeResolver);
+    Result<TypeReference, IError> TryGetOutputTypeReference(
+        TypeReference expectedType,
+        TypeResolver typeResolver);
 
     /// <summary>
     /// Tries to freeze this step.
     /// </summary>
-    public Result<IStep, IError> TryFreeze(StepFactoryStore stepFactoryStore) => TypeResolver
-        .TryCreate(stepFactoryStore, this)
-        .Bind(TryFreeze);
+    public Result<IStep, IError> TryFreeze(
+        TypeReference expectedType,
+        StepFactoryStore stepFactoryStore) => TypeResolver
+        .TryCreate(stepFactoryStore, expectedType, this)
+        .Bind(typeResolver => TryFreeze(expectedType, typeResolver));
 }
 
 }

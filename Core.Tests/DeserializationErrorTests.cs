@@ -36,11 +36,11 @@ public partial class DeserializationErrorTests
                  "Print - Line: 1, Col: 0, Idx: 0 - Line: 1, Col: 33, Idx: 33 Text: Print Value: 'hello' Term: 'world'")
             );
 
-            yield return new DeserializationErrorCase(
-                "Print(['abc', '123'] == ['abc', '123'])",
-                ("Type ArrayOfStringStream is not comparable and so cannot be used for sorting.",
-                 "Line: 1, Col: 6, Idx: 6 - Line: 1, Col: 37, Idx: 37 Text: ['abc', '123'] == ['abc', '123']")
-            );
+            //yield return new DeserializationErrorCase(
+            //    "Print(['abc', '123'] == ['abc', '123'])",
+            //    ("Type ArrayOfStringStream is not comparable and so cannot be used for sorting.",
+            //     "Line: 1, Col: 6, Idx: 6 - Line: 1, Col: 37, Idx: 37 Text: ['abc', '123'] == ['abc', '123']")
+            //);
 
             yield return new DeserializationErrorCase(
                 "MyMegaFunction true",
@@ -56,14 +56,14 @@ public partial class DeserializationErrorTests
 
             yield return new DeserializationErrorCase(
                 "Foreach ['one', 'two'] (Print (<Entity> + 1))",
-                ("'StringJoin' cannot take the value '1'",
-                 "StringJoin - Line: 1, Col: 31, Idx: 31 - Line: 1, Col: 42, Idx: 42 Text: <Entity> + 1")
+                ("StringJoin has output type String, not Integer",
+                 "Line: 1, Col: 31, Idx: 31 - Line: 1, Col: 42, Idx: 42 Text: <Entity> + 1")
             );
 
             yield return new DeserializationErrorCase(
                 "Foreach ['one', 'two'] (Print (<Num> + 1)) <Num>",
-                ("'StringJoin' cannot take the value '1'",
-                 "StringJoin - Line: 1, Col: 31, Idx: 31 - Line: 1, Col: 39, Idx: 39 Text: <Num> + 1")
+                ("StringJoin has output type String, not Integer",
+                 "Line: 1, Col: 31, Idx: 31 - Line: 1, Col: 39, Idx: 39 Text: <Num> + 1")
             );
 
             yield return new DeserializationErrorCase(
@@ -103,7 +103,7 @@ public partial class DeserializationErrorTests
             var sfs = StepFactoryStore.CreateUsingReflection(typeof(IFreezableStep));
 
             var result = SCLParsing.ParseSequence(SCL)
-                .Bind(x => x.TryFreeze(sfs))
+                .Bind(x => x.TryFreeze(TypeReference.Any.Instance, sfs))
                 .Map(SCLRunner.ConvertToUnitStep);
 
             result.IsFailure.Should().BeTrue("Case should fail");

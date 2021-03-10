@@ -14,7 +14,7 @@ namespace Reductech.EDR.Core.Steps
 /// <summary>
 /// Creates an array by repeating an element.
 /// </summary>
-public sealed class Repeat<T> : CompoundStep<Core.Array<T>>
+public sealed class Repeat<T> : CompoundStep<Array<T>>
 {
     /// <summary>
     /// The element to repeat.
@@ -31,19 +31,19 @@ public sealed class Repeat<T> : CompoundStep<Core.Array<T>>
     public IStep<int> Number { get; set; } = null!;
 
     /// <inheritdoc />
-    protected override async Task<Result<Core.Array<T>, IError>> Run(
+    protected override async Task<Result<Array<T>, IError>> Run(
         IStateMonad stateMonad,
         CancellationToken cancellationToken)
     {
         var element = await Element.Run(stateMonad, cancellationToken);
 
         if (element.IsFailure)
-            return element.ConvertFailure<Core.Array<T>>();
+            return element.ConvertFailure<Array<T>>();
 
         var number = await Number.Run(stateMonad, cancellationToken);
 
         if (number.IsFailure)
-            return number.ConvertFailure<Core.Array<T>>();
+            return number.ConvertFailure<Array<T>>();
 
         var result = Enumerable.Repeat(element.Value, number.Value).ToSequence();
 
@@ -73,15 +73,19 @@ public sealed class RepeatStepFactory : GenericStepFactory
     public override string OutputTypeExplanation => "ArrayList<T>";
 
     /// <inheritdoc />
-    protected override ITypeReference GetOutputTypeReference(ITypeReference memberTypeReference) =>
-        new GenericTypeReference(typeof(Core.Array<>), new[] { memberTypeReference });
+    protected override TypeReference GetOutputTypeReference(TypeReference memberTypeReference) =>
+        new TypeReference.Array(memberTypeReference);
 
     /// <inheritdoc />
-    protected override Result<ITypeReference, IError> GetMemberType(
+    protected override Result<TypeReference, IError> GetGenericTypeParameter(
+        TypeReference expectedTypeReference,
         FreezableStepData freezableStepData,
-        TypeResolver typeResolver) => freezableStepData
-        .TryGetStep(nameof(Repeat<object>.Element), StepType)
-        .Bind(x => x.TryGetOutputTypeReference(typeResolver));
+        TypeResolver typeResolver)
+    {
+        return freezableStepData
+            .TryGetStep(nameof(Repeat<object>.Element), StepType)
+            .Bind(x => x.TryGetOutputTypeReference(TypeReference.Any.Instance, typeResolver));
+    }
 }
 
 }

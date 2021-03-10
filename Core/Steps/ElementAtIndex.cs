@@ -66,7 +66,7 @@ public sealed class ElementAtIndex<T> : CompoundStep<T>
 /// <summary>
 /// Gets the array element at a particular index.
 /// </summary>
-public sealed class ElementAtIndexStepFactory : GenericStepFactory
+public sealed class ElementAtIndexStepFactory : ArrayStepFactory
 {
     private ElementAtIndexStepFactory() { }
 
@@ -85,20 +85,18 @@ public sealed class ElementAtIndexStepFactory : GenericStepFactory
     public override IStepSerializer Serializer => ElementAtIndexSerializer.Instance;
 
     /// <inheritdoc />
-    protected override ITypeReference GetOutputTypeReference(ITypeReference memberTypeReference) =>
+    protected override TypeReference GetOutputTypeReference(TypeReference memberTypeReference) =>
         memberTypeReference;
 
     /// <inheritdoc />
-    protected override Result<ITypeReference, IError> GetMemberType(
-        FreezableStepData freezableStepData,
-        TypeResolver typeResolver) => freezableStepData
-        .TryGetStep(nameof(ElementAtIndex<object>.Array), StepType)
-        .Bind(x => x.TryGetOutputTypeReference(typeResolver))
-        .Bind(
-            x => x.TryGetGenericTypeReference(typeResolver, 0)
-                .MapError(e => e.WithLocation(freezableStepData))
-        )
-        .Map(x => x as ITypeReference);
+    protected override Result<TypeReference, IErrorBuilder> GetExpectedArrayTypeReference(
+        TypeReference expectedTypeReference)
+    {
+        return new TypeReference.Array(expectedTypeReference);
+    }
+
+    /// <inheritdoc />
+    protected override string ArrayPropertyName => nameof(ElementAtIndex<object>.Array);
 }
 
 }

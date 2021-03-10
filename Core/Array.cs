@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -17,9 +18,24 @@ namespace Reductech.EDR.Core
 public sealed class Array<T> : IArray, IEquatable<Array<T>>
 {
     /// <summary>
+    /// Create an empty array
+    /// </summary>
+    public Array()
+    {
+        Option = OneOf<IReadOnlyList<T>, IAsyncEnumerable<T>>.FromT0(ImmutableList<T>.Empty);
+    }
+
+    /// <summary>
     /// Create a new Array
     /// </summary>
-    public Array(OneOf<IReadOnlyList<T>, IAsyncEnumerable<T>> option) => Option = option;
+    public Array(IReadOnlyList<T> list) =>
+        Option = OneOf<IReadOnlyList<T>, IAsyncEnumerable<T>>.FromT0(list);
+
+    /// <summary>
+    /// Create a new Array
+    /// </summary>
+    public Array(IAsyncEnumerable<T> asyncEnumerable) =>
+        Option = OneOf<IReadOnlyList<T>, IAsyncEnumerable<T>>.FromT1(asyncEnumerable);
 
     /// <summary>
     /// The option.
@@ -76,7 +92,7 @@ public sealed class Array<T> : IArray, IEquatable<Array<T>>
         else
             asyncEnumerable = Option.AsT1.OrderBy(x => x);
 
-        return new Array<T>(OneOf<IReadOnlyList<T>, IAsyncEnumerable<T>>.FromT1(asyncEnumerable));
+        return new Array<T>(asyncEnumerable);
     }
 
     /// <summary>
@@ -94,7 +110,7 @@ public sealed class Array<T> : IArray, IEquatable<Array<T>>
         else
             asyncEnumerable2 = asyncEnumerable1.OrderByAwaitWithCancellation(func);
 
-        return new Array<T>(OneOf<IReadOnlyList<T>, IAsyncEnumerable<T>>.FromT1(asyncEnumerable2));
+        return new Array<T>(asyncEnumerable2);
     }
 
     /// <summary>
@@ -379,16 +395,22 @@ public static class ArrayHelper
     /// <summary>
     /// Converts an enumerable to a Sequence
     /// </summary>
-    public static Array<T> ToSequence<T>(this IAsyncEnumerable<T> enumerable) => new(
-        OneOf<IReadOnlyList<T>, IAsyncEnumerable<T>>.FromT1(enumerable)
-    );
+    public static Array<T> ToSequence<T>(this IAsyncEnumerable<T> enumerable) => new(enumerable);
 
     /// <summary>
     /// Converts an asyncEnumerable to a Sequence
     /// </summary>
-    public static Array<T> ToSequence<T>(this IEnumerable<T> enumerable) => new(
-        OneOf<IReadOnlyList<T>, IAsyncEnumerable<T>>.FromT0(enumerable.ToList())
-    );
+    public static Array<T> ToSequence<T>(this IEnumerable<T> enumerable) =>
+        new(enumerable.ToList());
+
+    /// <summary>
+    /// Creates an array from an enumerable of objects
+    /// </summary>
+    public static Array<T> CreateArray<T>(IEnumerable<object> elementsEnum)
+    {
+        var r = new Array<T>(elementsEnum.Cast<T>().ToList());
+        return r;
+    }
 }
 
 }

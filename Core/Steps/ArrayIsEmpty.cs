@@ -41,7 +41,7 @@ public sealed class ArrayIsEmpty<T> : CompoundStep<bool>
 /// <summary>
 /// Checks if an array is empty.
 /// </summary>
-public sealed class ArrayIsEmptyStepFactory : GenericStepFactory
+public sealed class ArrayIsEmptyStepFactory : ArrayStepFactory
 {
     private ArrayIsEmptyStepFactory() { }
 
@@ -57,20 +57,20 @@ public sealed class ArrayIsEmptyStepFactory : GenericStepFactory
     public override string OutputTypeExplanation => nameof(Boolean);
 
     /// <inheritdoc />
-    protected override ITypeReference GetOutputTypeReference(ITypeReference memberTypeReference) =>
-        new ActualTypeReference(typeof(bool));
+    protected override TypeReference GetOutputTypeReference(TypeReference memberTypeReference) =>
+        new TypeReference.Actual(SCLType.Bool);
 
     /// <inheritdoc />
-    protected override Result<ITypeReference, IError> GetMemberType(
-        FreezableStepData freezableStepData,
-        TypeResolver typeResolver) => freezableStepData
-        .TryGetStep(nameof(ArrayIsEmpty<object>.Array), StepType)
-        .Bind(x => x.TryGetOutputTypeReference(typeResolver))
-        .Bind(
-            x => x.TryGetGenericTypeReference(typeResolver, 0)
-                .MapError(e => e.WithLocation(freezableStepData))
-        )
-        .Map(x => x as ITypeReference);
+    protected override string ArrayPropertyName => nameof(ArrayIsEmpty<object>.Array);
+
+    /// <inheritdoc />
+    protected override Result<TypeReference, IErrorBuilder> GetExpectedArrayTypeReference(
+        TypeReference expectedTypeReference)
+    {
+        return expectedTypeReference
+            .CheckAllows(new TypeReference.Actual(SCLType.Bool), StepType)
+            .Map(_ => new TypeReference.Array(TypeReference.Any.Instance) as TypeReference);
+    }
 }
 
 }

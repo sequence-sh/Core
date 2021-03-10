@@ -54,15 +54,16 @@ public class GetVariableStepFactory : GenericStepFactory
     public override Type StepType => typeof(GetVariable<>);
 
     /// <inheritdoc />
-    protected override ITypeReference GetOutputTypeReference(ITypeReference memberTypeReference) =>
+    protected override TypeReference GetOutputTypeReference(TypeReference memberTypeReference) =>
         memberTypeReference;
 
     /// <inheritdoc />
-    protected override Result<ITypeReference, IError> GetMemberType(
+    protected override Result<TypeReference, IError> GetGenericTypeParameter(
+        TypeReference expectedTypeReference,
         FreezableStepData freezableStepData,
         TypeResolver typeResolver) => freezableStepData
         .TryGetVariableName(nameof(GetVariable<object>.Variable), StepType)
-        .Map(x => new VariableTypeReference(x) as ITypeReference);
+        .Map(x => new TypeReference.Variable(x) as TypeReference);
 
     /// <inheritdoc />
     public override string OutputTypeExplanation => "T";

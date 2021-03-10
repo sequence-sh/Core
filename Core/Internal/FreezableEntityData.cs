@@ -101,10 +101,10 @@ public record FreezableEntityData(
     /// <summary>
     /// Gets the variables set by steps in this FreezableStepData.
     /// </summary>
-    public Result<IReadOnlyCollection<(VariableName variableName, Maybe<ITypeReference>)>, IError>
-        GetVariablesSet(TypeResolver typeResolver)
+    public Result<IReadOnlyCollection<(VariableName variableName, TypeReference)>, IError>
+        GetVariablesSet(TypeReference expectedType, TypeResolver typeResolver)
     {
-        var variables = new List<(VariableName variableName, Maybe<ITypeReference>)>();
+        var variables = new List<(VariableName variableName, TypeReference)>();
         var errors    = new List<IError>();
 
         foreach (var stepProperty in EntityProperties)
@@ -122,19 +122,20 @@ public record FreezableEntityData(
 
         if (errors.Any())
             return Result
-                .Failure<IReadOnlyCollection<(VariableName variableName, Maybe<ITypeReference>)>,
+                .Failure<IReadOnlyCollection<(VariableName variableName, TypeReference)>,
                     IError>(ErrorList.Combine(errors));
 
         return variables;
 
         void LocalGetVariablesSet(IFreezableStep freezableStep)
         {
-            var variablesSet = freezableStep.GetVariablesSet(typeResolver);
+            var variablesSet = freezableStep.GetVariablesSet(expectedType, typeResolver);
 
             if (variablesSet.IsFailure)
                 errors.Add(variablesSet.Error);
 
-            variables.AddRange(variablesSet.Value);
+            else
+                variables.AddRange(variablesSet.Value);
         }
     }
 }

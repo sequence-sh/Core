@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Internal.Errors;
@@ -18,10 +17,10 @@ public sealed class TypeResolver
     /// </summary>
     private TypeResolver(
         StepFactoryStore stepFactoryStore,
-        Dictionary<VariableName, ActualTypeReference>? myDictionary = null)
+        Dictionary<VariableName, TypeReference>? myDictionary = null)
     {
         StepFactoryStore = stepFactoryStore;
-        MyDictionary     = myDictionary ?? new Dictionary<VariableName, ActualTypeReference>();
+        MyDictionary     = myDictionary ?? new Dictionary<VariableName, TypeReference>();
     }
 
     /// <summary>
@@ -36,12 +35,12 @@ public sealed class TypeResolver
     /// <inheritdoc />
     public override string ToString() => Dictionary.Count + " Types";
 
-    private Dictionary<VariableName, ActualTypeReference> MyDictionary { get; }
+    private Dictionary<VariableName, TypeReference> MyDictionary { get; }
 
     /// <summary>
     /// The dictionary mapping VariableNames to ActualTypeReferences
     /// </summary>
-    public IReadOnlyDictionary<VariableName, ActualTypeReference> Dictionary => MyDictionary;
+    public IReadOnlyDictionary<VariableName, TypeReference> Dictionary => MyDictionary;
 
     /// <summary>
     /// The StepFactoryStory
@@ -53,7 +52,8 @@ public sealed class TypeResolver
     /// </summary>
     public Result<TypeResolver, IError> TryCloneWithScopedStep(
         VariableName vn,
-        ITypeReference typeReference,
+        TypeReference typeReference,
+        TypeReference expectedScopedStepOutputType,
         IFreezableStep scopedStep,
         ErrorLocation errorLocation)
     {
@@ -64,7 +64,7 @@ public sealed class TypeResolver
         if (r1.IsFailure)
             return r1.ConvertFailure<TypeResolver>().MapError(x => x.WithLocation(errorLocation));
 
-        var r2 = newTypeResolver.TryAddTypeHierarchy(scopedStep);
+        var r2 = newTypeResolver.TryAddTypeHierarchy(expectedScopedStepOutputType, scopedStep);
 
         if (r2.IsFailure)
             return r2.ConvertFailure<TypeResolver>();
@@ -73,21 +73,16 @@ public sealed class TypeResolver
     }
 
     /// <summary>
-    /// Gets the type referred to by a reference.
-    /// </summary>
-    public Result<Type, IErrorBuilder> TryGetTypeFromReference(ITypeReference typeReference) =>
-        typeReference.TryGetActualTypeReference(this).Map(x => x.Type);
-
-    /// <summary>
     /// Tries to create a new TypeResolver.
     /// </summary>
     public static Result<TypeResolver, IError> TryCreate(
         StepFactoryStore stepFactoryStore,
+        TypeReference expectedStepOutputType,
         IFreezableStep topLevelStep)
     {
         var typeResolver = new TypeResolver(stepFactoryStore);
 
-        var r = typeResolver.TryAddTypeHierarchy(topLevelStep);
+        var r = typeResolver.TryAddTypeHierarchy(expectedStepOutputType, topLevelStep);
 
         if (r.IsFailure)
             return r.ConvertFailure<TypeResolver>();
@@ -98,7 +93,9 @@ public sealed class TypeResolver
     /// <summary>
     /// Try to add this step and all its children to this TypeResolver.
     /// </summary>
-    public Result<Unit, IError> TryAddTypeHierarchy(IFreezableStep topLevelStep)
+    public Result<Unit, IError> TryAddTypeHierarchy(
+        TypeReference expectedType,
+        IFreezableStep topLevelStep)
     {
         int? numberUnresolved = null;
 
@@ -107,23 +104,21 @@ public sealed class TypeResolver
             var unresolvableVariableNames = new List<VariableName>();
             var errors                    = new List<IError>();
 
-            var result = topLevelStep.GetVariablesSet(this);
+            var result = topLevelStep.GetVariablesSet(expectedType, this);
 
             if (result.IsFailure)
                 return result.ConvertFailure<Unit>();
 
-            foreach (var (variableName, maybe) in result.Value)
+            foreach (var (variableName, typeReference) in result.Value)
             {
-                if (maybe.HasNoValue)
+                if (typeReference is TypeReference.Unknown)
                     unresolvableVariableNames.Add(variableName);
                 else
                 {
-                    var addResult = TryAddType(variableName, maybe.Value);
+                    var addResult = TryAddType(variableName, typeReference);
 
                     if (addResult.IsFailure)
                         errors.Add(addResult.Error.WithLocation(ErrorLocation.EmptyLocation));
-                    else if (!addResult.Value)
-                        unresolvableVariableNames.Add(variableName);
                 }
             }
 
@@ -162,30 +157,25 @@ public sealed class TypeResolver
     /// <summary>
     /// Tries to add a variableName with this type to the type resolver.
     /// </summary>
-    public Result<bool, IErrorBuilder> TryAddType(
+    public Result<Unit, IErrorBuilder> TryAddType(
         VariableName variable,
-        ITypeReference typeReference)
+        TypeReference typeReference)
     {
-        var actualType = typeReference.GetActualTypeReferenceIfResolvable(this);
+        var actualType = typeReference.TryGetType(this);
 
         if (actualType.IsFailure)
-            return actualType.ConvertFailure<bool>();
-
-        if (actualType.Value.HasNoValue)
-            return false;
-
-        var actualTypeReference = actualType.Value.Value;
+            return actualType.ConvertFailure<Unit>();
 
         if (MyDictionary.TryGetValue(variable, out var previous))
         {
-            if (previous.Equals(actualTypeReference))
-                return true;
+            if (previous.Equals(typeReference))
+                return Unit.Default;
 
             return new ErrorBuilder(ErrorCode.CannotInferType);
         }
 
-        MyDictionary.Add(variable, actualTypeReference);
-        return true;
+        MyDictionary.Add(variable, typeReference);
+        return Unit.Default;
     }
 }
 

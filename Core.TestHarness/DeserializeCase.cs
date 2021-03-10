@@ -61,7 +61,7 @@ public abstract partial class StepTestBase<TStep, TOutput>
 
             deserializeResult.ShouldBeSuccessful(x => x.ToString()!);
 
-            var freezeResult = deserializeResult.Value.TryFreeze(sfs);
+            var freezeResult = deserializeResult.Value.TryFreeze(TypeReference.Any.Instance, sfs);
             freezeResult.ShouldBeSuccessful(x => x.ToString()!);
 
             return freezeResult.Value;

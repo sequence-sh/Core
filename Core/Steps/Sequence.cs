@@ -71,15 +71,16 @@ public sealed class SequenceStepFactory : GenericStepFactory
     public override Type StepType => typeof(Sequence<>);
 
     /// <inheritdoc />
-    protected override ITypeReference GetOutputTypeReference(ITypeReference memberTypeReference) =>
+    protected override TypeReference GetOutputTypeReference(TypeReference memberTypeReference) =>
         memberTypeReference;
 
     /// <inheritdoc />
-    protected override Result<ITypeReference, IError> GetMemberType(
+    protected override Result<TypeReference, IError> GetGenericTypeParameter(
+        TypeReference expectedTypeReference,
         FreezableStepData freezableStepData,
         TypeResolver typeResolver) => freezableStepData
         .TryGetStep(nameof(Sequence<object>.FinalStep), StepType)
-        .Bind(x => x.TryGetOutputTypeReference(typeResolver));
+        .Bind(x => x.TryGetOutputTypeReference(TypeReference.Any.Instance, typeResolver));
 
     /// <inheritdoc />
     public override string OutputTypeExplanation => "The same type as the final step";

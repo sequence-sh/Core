@@ -252,6 +252,11 @@ public sealed record ErrorCode : ErrorCodeBase
     public static readonly ErrorCode WrongVariableType = new(nameof(WrongVariableType));
 
     /// <summary>
+    /// {0} has output type {1}, not {2}
+    /// </summary>
+    public static readonly ErrorCode WrongOutputType = new(nameof(WrongOutputType));
+
+    /// <summary>
     /// Cannot convert a nested entity to {0}.
     /// </summary>
     public static readonly ErrorCode CannotConvertNestedEntity =
@@ -267,6 +272,12 @@ public sealed record ErrorCode : ErrorCodeBase
     /// Directory does not exist or could not be found: '{0}'
     /// </summary>
     public static readonly ErrorCode DirectoryNotFound = new(nameof(DirectoryNotFound));
+
+    /// <summary>
+    /// Could not convert entity value to {0}.
+    /// </summary>
+    public static readonly ErrorCode CouldNotConvertEntityValue =
+        new(nameof(CouldNotConvertEntityValue));
 }
 
 }

@@ -10,29 +10,38 @@ namespace Reductech.EDR.Core.Internal
 public abstract class GenericStepFactory : StepFactory
 {
     /// <inheritdoc />
-    public override Result<ITypeReference, IError> TryGetOutputTypeReference(
+    public override Result<TypeReference, IError> TryGetOutputTypeReference(
+        TypeReference expectedTypeReference,
         FreezableStepData freezableStepData,
-        TypeResolver typeResolver) => GetMemberType(freezableStepData, typeResolver)
+        TypeResolver typeResolver) => GetGenericTypeParameter(
+            expectedTypeReference,
+            freezableStepData,
+            typeResolver
+        )
         .Map(GetOutputTypeReference);
 
     /// <summary>
     /// Gets the output type from the member type.
     /// </summary>
-    protected abstract ITypeReference GetOutputTypeReference(ITypeReference memberTypeReference);
+    protected abstract TypeReference GetOutputTypeReference(TypeReference memberTypeReference);
 
     /// <inheritdoc />
     protected override Result<ICompoundStep, IError> TryCreateInstance(
-        TypeResolver typeResolver,
-        FreezableStepData freezeData) => GetMemberType(freezeData, typeResolver)
-        .Bind(
-            x => typeResolver.TryGetTypeFromReference(x).MapError(e => e.WithLocation(freezeData))
+        TypeReference expectedTypeReference,
+        FreezableStepData freezeData,
+        TypeResolver typeResolver) => GetGenericTypeParameter(
+            expectedTypeReference,
+            freezeData,
+            typeResolver
         )
+        .Bind(x => x.TryGetType(typeResolver).MapError(e => e.WithLocation(freezeData)))
         .Bind(x => TryCreateGeneric(StepType, x).MapError(e => e.WithLocation(freezeData)));
 
     /// <summary>
     /// Gets the type
     /// </summary>
-    protected abstract Result<ITypeReference, IError> GetMemberType(
+    protected abstract Result<TypeReference, IError> GetGenericTypeParameter(
+        TypeReference expectedTypeReference,
         FreezableStepData freezableStepData,
         TypeResolver typeResolver);
 }

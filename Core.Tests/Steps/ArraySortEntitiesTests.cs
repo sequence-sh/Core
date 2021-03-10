@@ -26,7 +26,7 @@ public partial class ArraySortEntitiesTests : StepTestBase<ArraySort<Entity>, Ar
                             Entity.Create(("Foo", "Alpha")),
                             Entity.Create(("Foo", "Beta"))
                         ),
-                        KeySelector = new EntityGetValue
+                        KeySelector = new EntityGetValue<StringStream>
                         {
                             Entity = GetEntityVariable, Property = Constant("Foo")
                         }
@@ -52,7 +52,7 @@ public partial class ArraySortEntitiesTests : StepTestBase<ArraySort<Entity>, Ar
                             Entity.Create(("Foo", "Alpha")),
                             Entity.Create(("Foo", "Beta"))
                         ),
-                        KeySelector = new EntityGetValue
+                        KeySelector = new EntityGetValue<StringStream>
                         {
                             Entity = GetEntityVariable, Property = Constant("Foo")
                         }
@@ -79,7 +79,7 @@ public partial class ArraySortEntitiesTests : StepTestBase<ArraySort<Entity>, Ar
                             Entity.Create(("Foo", "Beta")),
                             Entity.Create(("Bar", "Delta"))
                         ),
-                        KeySelector = new EntityGetValue
+                        KeySelector = new EntityGetValue<StringStream>
                         {
                             Entity = GetEntityVariable, Property = Constant("Foo")
                         }

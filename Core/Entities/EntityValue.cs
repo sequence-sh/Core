@@ -10,6 +10,7 @@ using Newtonsoft.Json.Linq;
 using OneOf;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
+using Reductech.EDR.Core.Internal.Serialization;
 using Reductech.EDR.Core.Util;
 
 namespace Reductech.EDR.Core.Entities
@@ -286,22 +287,22 @@ public sealed class EntityValue : OneOfBase<DBNull, string, int, double, bool, E
         {
             switch (schemaProperty.Type)
             {
-                case SchemaPropertyType.String: return (this, false);
-                case SchemaPropertyType.Integer:
+                case SCLType.String: return (this, false);
+                case SCLType.Integer:
                 {
                     if (int.TryParse(s, out var i))
                         return (new EntityValue(i), true);
 
                     break;
                 }
-                case SchemaPropertyType.Double:
+                case SCLType.Double:
                 {
                     if (double.TryParse(s, out var d))
                         return (new EntityValue(d), true);
 
                     break;
                 }
-                case SchemaPropertyType.Enum:
+                case SCLType.Enum:
                 {
                     if (string.IsNullOrWhiteSpace(schemaProperty.EnumType))
                         return new ErrorBuilder(ErrorCode.SchemaInvalidMissingEnum);
@@ -314,14 +315,14 @@ public sealed class EntityValue : OneOfBase<DBNull, string, int, double, bool, E
 
                     break;
                 }
-                case SchemaPropertyType.Bool:
+                case SCLType.Bool:
                 {
                     if (bool.TryParse(s, out var b))
                         return (new EntityValue(b), true);
 
                     break;
                 }
-                case SchemaPropertyType.Date:
+                case SCLType.Date:
                 {
                     if (schemaProperty.DateInputFormats != null &&
                         DateTime.TryParseExact(
@@ -351,10 +352,10 @@ public sealed class EntityValue : OneOfBase<DBNull, string, int, double, bool, E
         {
             return schemaProperty.Type switch
             {
-                SchemaPropertyType.String  => (new EntityValue(i.ToString()), true),
-                SchemaPropertyType.Integer => (this, false),
-                SchemaPropertyType.Double  => (new EntityValue(Convert.ToDouble(i)), true),
-                _                          => CouldNotConvert(i)
+                SCLType.String  => (new EntityValue(i.ToString()), true),
+                SCLType.Integer => (this, false),
+                SCLType.Double  => (new EntityValue(Convert.ToDouble(i)), true),
+                _               => CouldNotConvert(i)
             };
         }
 
@@ -362,10 +363,10 @@ public sealed class EntityValue : OneOfBase<DBNull, string, int, double, bool, E
         {
             return schemaProperty.Type switch
             {
-                SchemaPropertyType.String => (
+                SCLType.String => (
                     new EntityValue(d.ToString(Constants.DoubleFormat)), false),
-                SchemaPropertyType.Double => (this, true),
-                _                         => CouldNotConvert(d)
+                SCLType.Double => (this, true),
+                _              => CouldNotConvert(d)
             };
         }
 
@@ -373,9 +374,9 @@ public sealed class EntityValue : OneOfBase<DBNull, string, int, double, bool, E
         {
             return schemaProperty.Type switch
             {
-                SchemaPropertyType.String => (new EntityValue(b.ToString()), true),
-                SchemaPropertyType.Bool   => (this, false),
-                _                         => CouldNotConvert(b)
+                SCLType.String => (new EntityValue(b.ToString()), true),
+                SCLType.Bool   => (this, false),
+                _              => CouldNotConvert(b)
             };
         }
 
@@ -383,8 +384,8 @@ public sealed class EntityValue : OneOfBase<DBNull, string, int, double, bool, E
         {
             switch (schemaProperty.Type)
             {
-                case SchemaPropertyType.String: return (this, false);
-                case SchemaPropertyType.Enum:
+                case SCLType.String: return (this, false);
+                case SCLType.Enum:
                 {
                     if (schemaProperty.EnumType == null)
                         return new ErrorBuilder(ErrorCode.SchemaInvalidMissingEnum);
@@ -411,10 +412,10 @@ public sealed class EntityValue : OneOfBase<DBNull, string, int, double, bool, E
         {
             return schemaProperty.Type switch
             {
-                SchemaPropertyType.String => (
+                SCLType.String => (
                     new EntityValue(dt.ToString(DateOutputFormat)), true),
-                SchemaPropertyType.Date => (this, false),
-                _                       => CouldNotConvert(dt)
+                SCLType.Date => (this, false),
+                _            => CouldNotConvert(dt)
             };
         }
 
@@ -422,9 +423,9 @@ public sealed class EntityValue : OneOfBase<DBNull, string, int, double, bool, E
         {
             return schemaProperty.Type switch
             {
-                SchemaPropertyType.String => (new EntityValue(e.ToString()), true),
-                SchemaPropertyType.Enum   => (this, false),
-                _                         => CouldNotConvert(e)
+                SCLType.String => (new EntityValue(e.ToString()), true),
+                SCLType.Enum   => (this, false),
+                _              => CouldNotConvert(e)
             };
         }
 
@@ -472,6 +473,145 @@ public sealed class EntityValue : OneOfBase<DBNull, string, int, double, bool, E
 
             return newList;
         }
+    }
+
+    /// <summary>
+    /// If this is a primitive, get a string representation
+    /// </summary>
+    public string? GetPrimitiveString()
+    {
+        return Match<string?>(
+            _ => null, //null
+            @string => @string,
+            integer => integer.ToString(),
+            @double => @double.ToString("R"),
+            @bool => @bool.ToString(),
+            enumeration => enumeration.Value,
+            dateTime => dateTime.ToString("o"),
+            _ => null, //entity
+            _ => null  //list
+        );
+    }
+
+    /// <summary>
+    /// Gets the default entity value for a particular type
+    /// </summary>
+    public static T GetDefaultValue<T>()
+    {
+        if (Entity.Empty is T tEntity)
+            return tEntity;
+
+        if (StringStream.Empty is T tStringStream)
+            return tStringStream;
+
+        if ("" is T tString)
+            return tString;
+
+        if (typeof(T).IsAssignableTo(typeof(IEnumerable)) && typeof(T).IsGenericType)
+        {
+            var param = typeof(T).GenericTypeArguments[0];
+            var array = typeof(Array<>).MakeGenericType(param);
+
+            var arrayInstance = Activator.CreateInstance(array);
+
+            if (arrayInstance is T tArray)
+                return tArray;
+        }
+
+        return default!;
+    }
+
+    private Result<object, IErrorBuilder> TryGetValue(Type type)
+    {
+        if (type == typeof(Entity))
+        {
+            if (TryPickT7(out var entity, out _))
+                return entity;
+        }
+        else if (type == typeof(int))
+        {
+            if (TryPickT2(out var integer, out _))
+                return integer;
+
+            if (int.TryParse(GetPrimitiveString() ?? "", out var i))
+                return i;
+        }
+
+        else if (type == typeof(double))
+        {
+            if (TryPickT3(out var number, out _))
+                return number;
+
+            if (double.TryParse(GetPrimitiveString() ?? "", out var d))
+                return d;
+        }
+        else if (type.IsEnum)
+        {
+            if (Enum.TryParse(type, GetPrimitiveString(), true, out var r))
+                return r!;
+        }
+        else if (type == typeof(DateTime))
+        {
+            if (TryPickT6(out var dt, out _))
+                return dt;
+
+            if (DateTime.TryParse(GetPrimitiveString() ?? "", out var d))
+                return d;
+        }
+        else if (type == typeof(string))
+        {
+            if (TryPickT1(out var s, out _))
+                return s;
+
+            var ser = this.Serialize();
+
+            return ser;
+        }
+        else if (type == typeof(StringStream) || type == typeof(object))
+        {
+            if (TryPickT1(out var s, out _))
+                return new StringStream(s);
+
+            var ser = new StringStream(this.Serialize());
+
+            return ser;
+        }
+        else if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Array<>))
+        {
+            if (TryPickT8(out var l, out _))
+            {
+                var genericType = type.GenericTypeArguments[0];
+
+                var elements = l.Select(x => x.TryGetValue(genericType))
+                    .Combine(ErrorBuilderList.Combine);
+
+                if (elements.IsFailure)
+                    return elements.ConvertFailure<object>();
+
+                var createArrayMethod =
+                    typeof(ArrayHelper).GetMethod(nameof(ArrayHelper.CreateArray))!
+                        .MakeGenericMethod(genericType);
+
+                var arrayInstance = createArrayMethod.Invoke(null, new[] { elements.Value });
+
+                return arrayInstance!;
+            }
+        }
+
+        return ErrorCode.CouldNotConvertEntityValue.ToErrorBuilder(type.Name);
+    }
+
+    /// <summary>
+    /// Tries to get the value if it is a particular type
+    /// </summary>
+    public Result<T, IErrorBuilder> TryGetValue<T>()
+    {
+        var r = TryGetValue(typeof(T));
+
+        if (r.IsFailure)
+            return r.ConvertFailure<T>();
+
+        return (T)r.Value!;
     }
 
     /// <inheritdoc />

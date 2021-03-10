@@ -75,23 +75,23 @@ public sealed class ValueIfStepFactory : GenericStepFactory
     public override string OutputTypeExplanation => "T";
 
     /// <inheritdoc />
-    protected override ITypeReference GetOutputTypeReference(ITypeReference memberTypeReference) =>
+    protected override TypeReference GetOutputTypeReference(TypeReference memberTypeReference) =>
         memberTypeReference;
 
     /// <inheritdoc />
-    protected override Result<ITypeReference, IError> GetMemberType(
+    protected override Result<TypeReference, IError> GetGenericTypeParameter(
+        TypeReference expectedTypeReference,
         FreezableStepData freezableStepData,
         TypeResolver typeResolver) => freezableStepData
         .TryGetStep(nameof(ValueIf<object>.Then), StepType)
         .Compose(() => freezableStepData.TryGetStep(nameof(ValueIf<object>.Else), StepType))
         .Bind(
-            x => x.Item1.TryGetOutputTypeReference(typeResolver)
-                .Compose(() => x.Item2.TryGetOutputTypeReference(typeResolver))
+            x => x.Item1.TryGetOutputTypeReference(expectedTypeReference, typeResolver)
+                .Compose(
+                    () => x.Item2.TryGetOutputTypeReference(expectedTypeReference, typeResolver)
+                )
         )
-        .Bind(
-            x => MultipleTypeReference.TryCreate(new[] { x.Item1, x.Item2 }, TypeName)
-                .MapError(e => e.WithLocation(freezableStepData))
-        );
+        .Map(x => TypeReference.Create(new[] { x.Item1, x.Item2 }));
 }
 
 }

@@ -33,7 +33,7 @@ public partial class ArrayDistinctTests : StepTestBase<ArrayDistinct<Entity>, Ar
                             Entity.Create(("Foo", "Beta")),
                             Entity.Create(("Foo", "Beta"))
                         ),
-                        KeySelector = new EntityGetValue
+                        KeySelector = new EntityGetValue<StringStream>
                         {
                             Property = Constant("Foo"),
                             Entity   = GetVariable<Entity>(distinctVar)
@@ -63,7 +63,7 @@ public partial class ArrayDistinctTests : StepTestBase<ArrayDistinct<Entity>, Ar
                             Entity.Create(("Foo", "Beta"))
                         ),
                         KeySelector =
-                            new EntityGetValue
+                            new EntityGetValue<StringStream>
                             {
                                 Property = Constant("Foo"), Entity = GetEntityVariable
                             },
