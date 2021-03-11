@@ -46,22 +46,8 @@ public sealed class
     }
 
     /// <inheritdoc />
-    public override IStepFactory StepFactory => GenerateDocumentationStepFactory.Instance;
-}
-
-/// <summary>
-/// Generates documentation for all available steps.
-/// </summary>
-public sealed class
-    GenerateDocumentationStepFactory : SimpleStepFactory<GenerateDocumentation, Array<Entity>>
-{
-    private GenerateDocumentationStepFactory() { }
-
-    /// <summary>
-    /// The instance.
-    /// </summary>
-    public static SimpleStepFactory<GenerateDocumentation, Array<Entity>> Instance { get; } =
-        new GenerateDocumentationStepFactory();
+    public override IStepFactory StepFactory { get; } =
+        new SimpleStepFactory<GenerateDocumentation, Array<Entity>>();
 }
 
 }
