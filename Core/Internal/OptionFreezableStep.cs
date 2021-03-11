@@ -91,7 +91,15 @@ public sealed class OptionFreezableStep : IFreezableStep
             var r = freezableStep.TryGetOutputTypeReference(expectedType, typeResolver);
 
             if (r.IsSuccess)
-                return r;
+            {
+                var freezeResult = freezableStep.TryFreeze(expectedType, typeResolver);
+
+                if (freezeResult.IsSuccess)
+                    return r;
+
+                error = freezeResult.Error;
+            }
+
             else
                 error = r.Error;
         }
