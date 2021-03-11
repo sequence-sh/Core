@@ -28,7 +28,8 @@ entity				: OPENBRACKET (entityProperty COMMA?)*  CLOSEBRACKET ;
 bracketedStep		: OPENBRACKET step CLOSEBRACKET ;
 boolean				: TRUE | FALSE ;
 dateTime			: DATETIME ;
-quotedString		: DOUBLEQUOTEDSTRING | SINGLEQUOTEDSTRING ;
+interpolatedString	: OPENISTRING step (ISTRINGSEGMENT step)* CLOSEISTRING;
+quotedString		: DOUBLEQUOTEDSTRING | SINGLEQUOTEDSTRING | SIMPLEISTRING ;
 number              : NUMBER (DOT NUMBER)? ;
 enumeration			: NAME DOT NAME ;
 term				: simpleTerm #SimpleTerm1
@@ -47,6 +48,7 @@ simpleTerm			: number
 					| dateTime
                     | enumeration
                     | quotedString
+					| interpolatedString
                     | getVariable
                     | entity
                     | array;
@@ -75,10 +77,13 @@ LESSTHAN            : '<' ;
 GREATERTHAN         : '>' ;
 EQUALS				: '=' ;
 COLON				: ':' ;
+DOLLAR              : '$' ;
 OPENBRACKET			: '(' ;
 CLOSEBRACKET		: ')' ;
 OPENSQUAREBRACKET	: '[' ;
 CLOSESQUAREBRACKET	: ']' ;
+OPENBRACE       	: '{' ;
+CLOSEBRACE      	: '}' ;
 COMMA			    : ',' ;
 PIPE				: '|' ;
 NEWCOMMAND			: ('\r'? '\n' | '\r')+ (' ' | '\t')* DASH (' ' | '\t')+ ;
@@ -87,7 +92,13 @@ fragment DIGIT		: [0-9];
 VARIABLENAME		: LESSTHAN [a-zA-Z0-9_]+ GREATERTHAN ;
 DATETIME			: DIGIT DIGIT DIGIT DIGIT DASH DIGIT DIGIT DASH DIGIT DIGIT ([Tt] DIGIT DIGIT COLON DIGIT DIGIT COLON DIGIT DIGIT ('.' DIGIT+)?)? ;
 NUMBER				: DASH? DIGIT+ ;
-DOUBLEQUOTEDSTRING	: '"' (~('"' | '\\' | '\r' | '\n' | '\t') | '\\' ('"' | '\\' | 'r' | 'n' | 't'))* '"' ;
+fragment ISTRINGCHAR: (~('"' | '\\' | '\r' | '\n' | '\t' | '{' | '}') | '\\' ('"' | '\\' | 'r' | 'n' | 't' | '{{' | '}}'));
+OPENISTRING         : DOLLAR '"' ISTRINGCHAR* OPENBRACE;
+ISTRINGSEGMENT		: CLOSEBRACE ISTRINGCHAR* OPENBRACE;
+CLOSEISTRING		: CLOSEBRACE ISTRINGCHAR* '"';
+SIMPLEISTRING		: DOLLAR '"' ISTRINGCHAR* '"';
+fragment DQSCHAR	: (~('"' | '\\' | '\r' | '\n' | '\t') | '\\' ('"' | '\\' | 'r' | 'n' | 't'));
+DOUBLEQUOTEDSTRING	: '"' DQSCHAR* '"' ;
 SINGLEQUOTEDSTRING	: '\'' (~('\'') | '\'\'')* '\'' ;
 TRUE				: [Tt] [Rr] [Uu] [Ee];
 FALSE				: [Ff] [Aa] [Ll] [Ss] [Ee];

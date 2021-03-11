@@ -21,6 +21,18 @@ public partial class DeserializationTests
     {
         get
         {
+            yield return new DeserializationTestInstance("Log ('a' + 'b')", "ab");
+
+            yield return new DeserializationTestInstance(
+                "- <foo> = (a:'1') + (b:'2')\r\n- Log <foo>",
+                "(a: \"1\" b: \"2\")"
+            );
+
+            yield return new DeserializationTestInstance(
+                "Log ((a:'1') + (b:'2'))",
+                "(a: \"1\" b: \"2\")"
+            );
+
             yield return new DeserializationTestInstance("(Foo: 1)['Foo'] + 3",               4);
             yield return new DeserializationTestInstance("(Foo: (Bar: 1))['Foo']['Bar'] + 3", 4);
             yield return new DeserializationTestInstance("(Foo: (Bar: 1))['Foo.Bar'] + 3",    4);

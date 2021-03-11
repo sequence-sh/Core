@@ -27,14 +27,7 @@ public sealed class Print<T> : CompoundStep<Unit>
         if (r.IsFailure)
             return r.ConvertFailure<Unit>();
 
-        string stringToPrint = r.Value switch
-        {
-            Entity entity   => entity.Serialize(),
-            StringStream ss => await ss.GetStringAsync(),
-            DateTime dt     => dt.ToString(Constants.DateTimeFormat),
-            double d        => d.ToString(Constants.DoubleFormat),
-            _               => r.Value?.ToString()!
-        };
+        string stringToPrint = await SerializationMethods.GetStringAsync(r.Value);
 
         stateMonad.ExternalContext.Console.WriteLine(stringToPrint);
 

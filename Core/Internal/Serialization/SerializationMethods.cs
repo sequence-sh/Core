@@ -1,6 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.Util;
 
@@ -36,6 +38,18 @@ public static class SerializationMethods
     /// </summary>
     public static string DoubleQuote(string s)
     {
+        var result = "\"" + Escape(s) + "\"";
+
+        return result;
+    }
+
+    /// <summary>
+    /// Escapes a string for double quotes
+    /// </summary>
+    /// <param name="s"></param>
+    /// <returns></returns>
+    public static string Escape(string s)
+    {
         var result = s
                 .Replace("\\", @"\\") //Needs to come first
                 .Replace("\r", @"\r")
@@ -43,8 +57,6 @@ public static class SerializationMethods
                 .Replace("\t", @"\t")
                 .Replace("\"", @"\""")
             ;
-
-        result = "\"" + result + "\"";
 
         return result;
     }
@@ -89,6 +101,22 @@ public static class SerializationMethods
             x => x.Serialize(),
             x => SerializeList(x.Select(y => y.Serialize()))
         );
+    }
+
+    /// <summary>
+    /// Converts an object to a string suitable from printing
+    /// </summary>
+    public static async Task<string> GetStringAsync(object? obj)
+    {
+        return
+            obj switch
+            {
+                Entity entity   => entity.Serialize(),
+                StringStream ss => await ss.GetStringAsync(),
+                DateTime dt     => dt.ToString(Constants.DateTimeFormat),
+                double d        => d.ToString(Constants.DoubleFormat),
+                _               => obj?.ToString()!
+            };
     }
 }
 

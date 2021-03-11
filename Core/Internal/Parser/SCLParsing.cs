@@ -358,67 +358,18 @@ public static class SCLParsing
 
         private static string GetString(SCLParser.QuotedStringContext context)
         {
-            string s = context.DOUBLEQUOTEDSTRING() != null
-                ? UnescapeDoubleQuoted(context.DOUBLEQUOTEDSTRING().GetText())
-                : UnescapeSingleQuoted(context.SINGLEQUOTEDSTRING().GetText());
+            string s;
+
+            if (context.DOUBLEQUOTEDSTRING() != null)
+                s = UnescapeDoubleQuoted(context.DOUBLEQUOTEDSTRING().GetText());
+            else if (context.SINGLEQUOTEDSTRING() != null)
+                s = UnescapeSingleQuoted(context.SINGLEQUOTEDSTRING().GetText());
+            else if (context.SIMPLEISTRING() != null)
+                s = UnescapeInterpolated(context.SIMPLEISTRING().GetText(), true);
+            else
+                throw new Exception($"Could not parse {context}");
 
             return s;
-
-            static string UnescapeDoubleQuoted(string txt)
-            {
-                txt = txt[1..^1]; //Remove quotes
-
-                if (string.IsNullOrEmpty(txt)) { return txt; }
-
-                var sb = new StringBuilder(txt.Length);
-
-                for (var ix = 0; ix < txt.Length;)
-                {
-                    var jx = txt.IndexOf('\\', ix);
-
-                    if (jx < 0 || jx == txt.Length - 1)
-                        jx = txt.Length;
-
-                    sb.Append(txt, ix, jx - ix);
-
-                    if (jx >= txt.Length)
-                        break;
-
-                    var escapedChar = GetEscapedChar(txt, jx);
-
-                    if (escapedChar.HasValue)
-                        sb.Append(escapedChar.Value);
-                    else
-                        sb.Append('\\').Append(txt[jx + 1]);
-
-                    ix = jx + 2;
-                }
-
-                return sb.ToString();
-            }
-
-            static string UnescapeSingleQuoted(string s)
-            {
-                s = s[1..^1]; //Remove quotes
-
-                s = s
-                    .Replace("''", "'");
-
-                return s;
-            }
-
-            static char? GetEscapedChar(string txt, int jx)
-            {
-                return txt[jx + 1] switch
-                {
-                    '"'  => '"',
-                    'n'  => '\n',
-                    'r'  => '\r',
-                    't'  => '\t',
-                    '\\' => '\\',
-                    _    => null
-                };
-            }
         }
 
         /// <inheritdoc />
@@ -436,6 +387,150 @@ public static class SCLParsing
             );
 
             return member;
+        }
+
+        /// <inheritdoc />
+        public override Result<FreezableStepProperty, IError> VisitInterpolatedString(
+            SCLParser.InterpolatedStringContext context)
+        {
+            var steps  = new List<IFreezableStep>();
+            var errors = new List<IError>();
+
+            for (var i = 0; i < context.ChildCount; i++)
+            {
+                var index = i / 2;
+
+                if (i % 2 == 0)
+                {
+                    var s         = (ITerminalNode)context.GetChild(i);
+                    var text      = s.GetText();
+                    var unescaped = UnescapeInterpolated(text, i == 0);
+
+                    var cs = new StringConstantFreezable(
+                        new StringStream(unescaped),
+                        new TextLocation(s.Symbol)
+                    );
+
+                    steps.Add(cs);
+                }
+                else
+                {
+                    var s = context.step(index);
+                    var r = Visit(s);
+
+                    if (r.IsSuccess) { steps.Add(r.Value.ConvertToStep()); }
+                    else { errors.Add(r.Error); }
+                }
+            }
+
+            if (errors.Any())
+            {
+                var e = ErrorList.Combine(errors);
+                return Result.Failure<FreezableStepProperty, IError>(e);
+            }
+
+            var freezableStep =
+                CreateFreezableInterpolatedString(
+                    steps,
+                    null,
+                    new TextLocation(context)
+                );
+
+            return new FreezableStepProperty(freezableStep, new TextLocation(context));
+        }
+
+        static string UnescapeInterpolated(string txt, bool removeDollar)
+        {
+            if (removeDollar)
+                txt = txt[1..];
+
+            txt = txt[1..^1]; //Remove quotes and dollar
+
+            if (string.IsNullOrEmpty(txt)) { return txt; }
+
+            txt = txt.Replace("{{", "{");
+
+            var sb = new StringBuilder(txt.Length);
+
+            for (var ix = 0; ix < txt.Length;)
+            {
+                var jx = txt.IndexOf('\\', ix);
+
+                if (jx < 0 || jx == txt.Length - 1)
+                    jx = txt.Length;
+
+                sb.Append(txt, ix, jx - ix);
+
+                if (jx >= txt.Length)
+                    break;
+
+                var escapedChar = GetEscapedChar(txt, jx);
+
+                if (escapedChar.HasValue)
+                    sb.Append(escapedChar.Value);
+                else
+                    sb.Append('\\').Append(txt[jx + 1]);
+
+                ix = jx + 2;
+            }
+
+            return sb.ToString();
+        }
+
+        static string UnescapeDoubleQuoted(string txt)
+        {
+            txt = txt[1..^1]; //Remove quotes
+
+            if (string.IsNullOrEmpty(txt)) { return txt; }
+
+            var sb = new StringBuilder(txt.Length);
+
+            for (var ix = 0; ix < txt.Length;)
+            {
+                var jx = txt.IndexOf('\\', ix);
+
+                if (jx < 0 || jx == txt.Length - 1)
+                    jx = txt.Length;
+
+                sb.Append(txt, ix, jx - ix);
+
+                if (jx >= txt.Length)
+                    break;
+
+                var escapedChar = GetEscapedChar(txt, jx);
+
+                if (escapedChar.HasValue)
+                    sb.Append(escapedChar.Value);
+                else
+                    sb.Append('\\').Append(txt[jx + 1]);
+
+                ix = jx + 2;
+            }
+
+            return sb.ToString();
+        }
+
+        static string UnescapeSingleQuoted(string s)
+        {
+            s = s[1..^1]; //Remove quotes
+
+            s = s
+                .Replace("''", "'");
+
+            return s;
+        }
+
+        static char? GetEscapedChar(string txt, int jx)
+        {
+            return txt[jx + 1] switch
+            {
+                '"'  => '"',
+                'n'  => '\n',
+                'r'  => '\r',
+                't'  => '\t',
+                '\\' => '\\',
+                _    => null
+            };
         }
 
         /// <inheritdoc />

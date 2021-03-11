@@ -56,22 +56,22 @@ public partial class DeserializationErrorTests
 
             yield return new DeserializationErrorCase(
                 "Foreach ['one', 'two'] (Print (<Entity> + 1))",
-                ("StringJoin has output type String, not Integer",
-                 "Line: 1, Col: 31, Idx: 31 - Line: 1, Col: 42, Idx: 42 Text: <Entity> + 1")
+                ("'StringJoin' cannot take the value '1'",
+                 "StringJoin - Line: 1, Col: 31, Idx: 31 - Line: 1, Col: 42, Idx: 42 Text: <Entity> + 1")
             );
 
             yield return new DeserializationErrorCase(
                 "Foreach ['one', 'two'] (Print (<Num> + 1)) <Num>",
-                ("StringJoin has output type String, not Integer",
-                 "Line: 1, Col: 31, Idx: 31 - Line: 1, Col: 39, Idx: 39 Text: <Num> + 1")
+                ("'StringJoin' cannot take the value '1'",
+                 "StringJoin - Line: 1, Col: 31, Idx: 31 - Line: 1, Col: 39, Idx: 39 Text: <Num> + 1")
             );
 
             yield return new DeserializationErrorCase(
                 "Foreach ['one', 'two') (Print <Num>) <Num>", //The ) should be a ]
                 (
-                    @"Syntax Error: extraneous input ')' expecting {'(', '[', ']', ',', VARIABLENAME, DATETIME, NUMBER, DOUBLEQUOTEDSTRING, SINGLEQUOTEDSTRING, TRUE, FALSE, NAME}",
+                    @"Syntax Error: extraneous input ')' expecting {'(', '[', ']', ',', VARIABLENAME, DATETIME, NUMBER, OPENISTRING, SIMPLEISTRING, DOUBLEQUOTEDSTRING, SINGLEQUOTEDSTRING, TRUE, FALSE, NAME}",
                     @"Line: 1, Col: 21, Idx: 21 - Line: 1, Col: 21, Idx: 21 Text: )"),
-                (@"Syntax Error: mismatched input '<EOF>' expecting {'(', '[', ']', ',', VARIABLENAME, DATETIME, NUMBER, DOUBLEQUOTEDSTRING, SINGLEQUOTEDSTRING, TRUE, FALSE, NAME}",
+                (@"Syntax Error: mismatched input '<EOF>' expecting {'(', '[', ']', ',', VARIABLENAME, DATETIME, NUMBER, OPENISTRING, SIMPLEISTRING, DOUBLEQUOTEDSTRING, SINGLEQUOTEDSTRING, TRUE, FALSE, NAME}",
                  @"Line: 1, Col: 42, Idx: 42 - Line: 1, Col: 41, Idx: 41 Text: <EOF>"
                 )
             );

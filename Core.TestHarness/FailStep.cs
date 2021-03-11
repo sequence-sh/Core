@@ -166,7 +166,9 @@ public abstract partial class StepTestBase<TStep, TOutput>
 
         var addMethod = list.GetType().GetMethod(nameof(List<object>.Add))!;
 
-        var elementType = stepType.GenericTypeArguments.First();
+        var elementType = stepType.IsGenericType
+            ? stepType.GenericTypeArguments.First()
+            : typeof(IStep);
 
         var step = CreateFailStepOfType(elementType, errorMessage);
         addMethod.Invoke(list, new object[] { step });
