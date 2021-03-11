@@ -15,6 +15,11 @@ public interface IParameter
     string Name { get; }
 
     /// <summary>
+    /// Aliases for this parameter
+    /// </summary>
+    IReadOnlyCollection<string> Aliases { get; }
+
+    /// <summary>
     /// /// A summary of what this parameter does.
     /// </summary>
     string Summary { get; }

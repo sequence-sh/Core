@@ -99,7 +99,8 @@ public partial class GenerateDocumentationTests : StepTestBase<GenerateDocumenta
             var documentationExample = File(
                 "DocumentationExampleStep.md",
                 "DocumentationExampleStep",
-                "## DocumentationExampleStep _Alias_:`DocumentationExampleStep`\r\n\r\n_Output_:`StringStream`\r\n\r\n*Requires ValueIf Library Version 1.2*\r\n\r\n\r\n|Parameter|Type |Required|Allowed Range |Default Value|Example|Recommended Range|Recommended Value|Requirements|See Also|URL |Value Delimiter|Summary|\r\n|:--------|:------------:|:------:|:------------:|:-----------:|:-----:|:---------------:|:---------------:|:----------:|:------:|:----------------:|:-------------:|:------|\r\n|Alpha |`int` |✔ |Greater than 1| |1234 |100-300 |201 |Greek 2.1 |Beta |[Alpha](alpha.com)| | |\r\n|Beta |`string` | | |Two hundred | | | | |Alpha | | | |\r\n|Gamma |`VariableName`| | | | | | | | | | | |\r\n|Delta |IStep<`bool`> | | | | | | | | | |, | |",
+                //"## DocumentationExampleStep _Alias_:`DocumentationExampleStep`\r\n\r\n_Output_:`StringStream`\r\n\r\n*Requires ValueIf Library Version 1.2*\r\n\r\n\r\n|Parameter |Type |Required|Allowed Range |Default Value|Example|Recommended Range|Recommended Value|Requirements|See Also|URL |Value Delimiter|Summary|\r\n|:--------|:------------:|:------:|:------------:|:-----------:|:-----:|:---------------:|:---------------:|:----------:|:------:|:----------------:|:-------------:|:------|\r\n|Alpha |`int` |✔ |Greater than 1| |1234 |100-300 |201 |Greek 2.1 |Beta |[Alpha](alpha.com)| | |\r\n|Beta |`string` | | |Two hundred | | | | |Alpha | | | |\r\n|Gamma |`VariableName`| | | | | | | | | | | |\r\n|Delta |IStep<`bool`> | | | | | | | | | |, | |",
+                "## DocumentationExampleStep _Alias_:`DocumentationExampleStep`\r\n\r\n_Output_:`StringStream`\r\n\r\n*Requires ValueIf Library Version 1.2*\r\n\r\n\r\n|Parameter |Type |Required|Allowed Range |Default Value|Example|Recommended Range|Recommended Value|Requirements|See Also|URL |Value Delimiter|Summary|\r\n|:--------------|:------------:|:------:|:------------:|:-----------:|:-----:|:---------------:|:---------------:|:----------:|:------:|:----------------:|:-------------:|:------|\r\n|Alpha<br>_Alef_|`int` |✔ |Greater than 1| |1234 |100-300 |201 |Greek 2.1 |Beta |[Alpha](alpha.com)| | |\r\n|Beta |`string` | | |Two hundred | | | | |Alpha | | | |\r\n|Gamma |`VariableName`| | | | | | | | | | | |\r\n|Delta |IStep<`bool`> | | | | | | | | | |, | |",
                 "Examples",
                 "Examples"
             );
@@ -222,6 +223,7 @@ public partial class GenerateDocumentationTests : StepTestBase<GenerateDocumenta
         [RecommendedValue("201")]
         [RequiredVersion("Greek", "2.1")]
         [SeeAlso("Beta")]
+        [Alias("Alef")]
         // ReSharper disable UnusedMember.Local
         public IStep<int> Alpha { get; set; } = null!;
 

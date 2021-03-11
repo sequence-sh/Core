@@ -133,9 +133,14 @@ public static class DocumentationCreator
                     rp =>
 
                     {
+                        var nameString = string.Join(
+                            "<br>",
+                            rp.Aliases.Select(x => $"_{x}_").Prepend(rp.Name)
+                        );
+
                         var r = new List<string?>
                         {
-                            rp.Name,
+                            nameString,
                             TypeNameHelper.GetMarkupTypeName(rp.Type),
                             rp.Required ? "✔" : "",
                         };

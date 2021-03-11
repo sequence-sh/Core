@@ -196,6 +196,12 @@ public class StepWrapper : IDocumented
         /// </summary>
         public string Name => _propertyInfo.Name;
 
+        /// <inheritdoc />
+        public IReadOnlyCollection<string> Aliases => _propertyInfo
+            .GetCustomAttributes<AliasAttribute>()
+            .Select(x => x.Name)
+            .ToList();
+
         /// <summary>
         /// A summary of the property.
         /// </summary>
