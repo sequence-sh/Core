@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Reflection;
@@ -14,9 +15,12 @@ namespace Reductech.EDR.Core.Internal
 public class StepFactoryStore
 {
     private StepFactoryStore(
+        IReadOnlyList<ConnectorInformation> connectorInformations,
         IReadOnlyDictionary<string, IStepFactory> dictionary,
         IReadOnlyDictionary<string, Type> enumTypesDictionary)
     {
+        ConnectorInformations = connectorInformations;
+
         Dictionary = dictionary.ToDictionary(
             x => x.Key!,
             x => x.Value!,
@@ -33,13 +37,16 @@ public class StepFactoryStore
     /// <summary>
     /// Creates a new StepFactoryStore.
     /// </summary>
-    public static StepFactoryStore Create(params IStepFactory[] factories) =>
-        Create(factories.AsEnumerable());
+    public static StepFactoryStore Create(
+        IReadOnlyList<ConnectorInformation> connectorInformations,
+        params IStepFactory[] factories) => Create(connectorInformations, factories.AsEnumerable());
 
     /// <summary>
     /// Creates a new StepFactoryStore.
     /// </summary>
-    public static StepFactoryStore Create(IEnumerable<IStepFactory> factories)
+    public static StepFactoryStore Create(
+        IReadOnlyList<ConnectorInformation> connectorInformations,
+        IEnumerable<IStepFactory> factories)
     {
         var dictionary = factories
             .SelectMany(factory => GetStepNames(factory).Select(name => (factory, name)))
@@ -49,7 +56,7 @@ public class StepFactoryStore
             .Distinct()
             .ToDictionary(x => x.Name, StringComparer.OrdinalIgnoreCase);
 
-        return new StepFactoryStore(dictionary, enumTypesDictionary!);
+        return new StepFactoryStore(connectorInformations, dictionary, enumTypesDictionary!);
     }
 
     private static IEnumerable<string> GetStepNames(IStepFactory stepFactory)
@@ -78,11 +85,14 @@ public class StepFactoryStore
     /// <returns></returns>
     public static StepFactoryStore CreateUsingReflection(params Type[] assemblyMemberTypes)
     {
+        var assemblies = assemblyMemberTypes
+            .Prepend(typeof(ICompoundStep))
+            .Select(Assembly.GetAssembly)
+            .Distinct()
+            .ToList();
+
         var factories =
-            assemblyMemberTypes
-                .Prepend(typeof(ICompoundStep))
-                .Select(Assembly.GetAssembly)
-                .Distinct()
+            assemblies
                 .SelectMany(a => a!.GetTypes())
                 .Distinct()
                 .Where(x => !x.IsAbstract)
@@ -90,7 +100,9 @@ public class StepFactoryStore
                 .Select(CreateStepFactory)
                 .ToList();
 
-        return Create(factories);
+        var connectorInfo = assemblies.Select(ConnectorInformation.Create!).ToList();
+
+        return Create(connectorInfo, factories);
     }
 
     /// <summary>
@@ -103,7 +115,7 @@ public class StepFactoryStore
         if (stepType.IsGenericType)
         {
             var arguments = ((TypeInfo)stepType).GenericTypeParameters
-                .Select(x => typeof(int))
+                .Select(_ => typeof(int)) //arbitrarily choose int as the type
                 .ToArray();
 
             try
@@ -133,6 +145,11 @@ public class StepFactoryStore
     }
 
     /// <summary>
+    /// Information about the available connectors
+    /// </summary>
+    public IReadOnlyList<ConnectorInformation> ConnectorInformations { get; }
+
+    /// <summary>
     /// Types of enumerations that can be used by these steps.
     /// </summary>
     public IReadOnlyDictionary<string, Type> EnumTypesDictionary { get; }
@@ -141,6 +158,23 @@ public class StepFactoryStore
     /// Dictionary mapping step names to step factories.
     /// </summary>
     public IReadOnlyDictionary<string, IStepFactory> Dictionary { get; }
+}
+
+/// <summary>
+/// Information about a connector
+/// </summary>
+public record ConnectorInformation(string Name, string Version)
+{
+    /// <summary>
+    /// Create from an assembly
+    /// </summary>
+    public static ConnectorInformation Create(Assembly assembly)
+    {
+        FileVersionInfo fileVersionInfo = FileVersionInfo.GetVersionInfo(assembly.Location);
+        string          version         = fileVersionInfo.ProductVersion!;
+
+        return new ConnectorInformation(assembly.GetName().Name!, version);
+    }
 }
 
 }

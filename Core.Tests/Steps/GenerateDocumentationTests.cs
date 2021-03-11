@@ -108,7 +108,7 @@ public partial class GenerateDocumentationTests : StepTestBase<GenerateDocumenta
             static string[] ToLogs(Array<Entity> array) =>
                 array.GetElements().Value.Select(x => x.Serialize()).ToArray();
 
-            var LogDocumentation = new ForEach<Entity>()
+            var logDocumentation = new ForEach<Entity>()
             {
                 Array  = new GenerateDocumentation(),
                 Action = new Log<Entity>() { Value = GetEntityVariable }
@@ -116,10 +116,15 @@ public partial class GenerateDocumentationTests : StepTestBase<GenerateDocumenta
 
             yield return new StepCase(
                 "Generate Not Documentation",
-                LogDocumentation,
+                logDocumentation,
                 Unit.Default,
                 ToLogs(Entities(Contents(notHeader), not))
-            ).WithStepFactoryStore(StepFactoryStore.Create(NotStepFactory.Instance));
+            ).WithStepFactoryStore(
+                StepFactoryStore.Create(
+                    System.Array.Empty<ConnectorInformation>(),
+                    NotStepFactory.Instance
+                )
+            );
 
             //yield return new StepCase(
             //    "Generate Math Documentation",
@@ -142,20 +147,24 @@ public partial class GenerateDocumentationTests : StepTestBase<GenerateDocumenta
 
             yield return new StepCase(
                 "Example step",
-                LogDocumentation,
+                logDocumentation,
                 Unit.Default,
                 ToLogs(Entities(Contents(exampleStepHeader), documentationExample))
             ).WithStepFactoryStore(
-                StepFactoryStore.Create(DocumentationExampleStepFactory.Instance)
+                StepFactoryStore.Create(
+                    System.Array.Empty<ConnectorInformation>(),
+                    DocumentationExampleStepFactory.Instance
+                )
             );
 
             yield return new StepCase(
                 "Two InitialSteps",
-                LogDocumentation,
+                logDocumentation,
                 Unit.Default,
                 ToLogs(Entities(Contents(notHeader, exampleStepHeader), not, documentationExample))
             ).WithStepFactoryStore(
                 StepFactoryStore.Create(
+                    System.Array.Empty<ConnectorInformation>(),
                     NotStepFactory.Instance,
                     DocumentationExampleStepFactory.Instance
                 )
