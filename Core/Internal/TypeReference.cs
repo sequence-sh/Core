@@ -174,12 +174,25 @@ public abstract record TypeReference
     /// </summary>
     public sealed record Multiple(IReadOnlySet<TypeReference> Options) : TypeReference
     {
-        /// <param name="typeResolver"></param>
         /// <inheritdoc />
         public override Result<Type, IErrorBuilder> TryGetType(TypeResolver typeResolver)
         {
             if (Options.Count == 1)
                 return Options.Single().TryGetType(typeResolver);
+
+            var possibleTypes = Options.Where(x => x != Any.Instance)
+                .Select(x => x.TryGetType(typeResolver))
+                .Combine(ErrorBuilderList.Combine)
+                .Map(x => x.Distinct().ToList());
+
+            if (possibleTypes.IsFailure)
+                return possibleTypes.ConvertFailure<Type>();
+
+            if (possibleTypes.Value.Count == 0)
+                return typeof(object);
+
+            if (possibleTypes.Value.Count == 1)
+                return possibleTypes.Value.Single();
 
             return ErrorCode.CannotInferType.ToErrorBuilder();
         }

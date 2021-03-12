@@ -21,6 +21,12 @@ public partial class DeserializationTests
     {
         get
         {
+            yield return new DeserializationTestInstance("2.1 == 2.5",    false);
+            yield return new DeserializationTestInstance("true == false", false);
+            yield return new DeserializationTestInstance("'yes' == 'no'", false);
+            yield return new DeserializationTestInstance("1 == 2",        false);
+            yield return new DeserializationTestInstance("2.5 < 2.1",     false);
+
             yield return new DeserializationTestInstance("Log ('a' + 'b')", "ab");
 
             yield return new DeserializationTestInstance(

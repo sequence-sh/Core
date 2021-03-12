@@ -117,7 +117,7 @@ public abstract class StepFactory : IStepFactory
     {
         get
         {
-            return _propertyDictionary ??= this.StepType
+            return _propertyDictionary ??= StepType
                 .GetProperties()
                 .SelectMany(
                     propertyInfo => StepParameterReference.GetPossibleReferences(propertyInfo)
