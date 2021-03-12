@@ -15,6 +15,8 @@ public interface ICompoundStep : IStep
     /// </summary>
     IStepFactory StepFactory { get; }
 
+    IEnumerable<StepProperty> AllProperties { get; }
+
     /// <summary>
     /// Requirements for this step that can only be determined at runtime.
     /// </summary>
