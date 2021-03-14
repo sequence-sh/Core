@@ -1,7 +1,3 @@
-[![pipeline status](https://gitlab.com/reductech/edr/core/badges/master/pipeline.svg)](https://gitlab.com/reductech/edr/core/-/commits/master)
-[![coverage report](https://gitlab.com/reductech/edr/core/badges/master/coverage.svg)](https://gitlab.com/reductech/edr/core/-/commits/master)
-[![Gitter](https://badges.gitter.im/reductech/edr.svg)](https://gitter.im/reductech/edr?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
-
 # EDR Core SDK
 
 Reductech EDR is a collection of libraries that automates

@@ -1,3 +1,39 @@
+# v0.6.0 (2021-03-14)
+
+## Summary of Changes
+
+### Steps
+
+- Added
+  - GetConnectorInformation
+
+### Sequence Configuration Language
+
+- It's now possible to interpolate strings using the `$` prefix
+
+```scala
+- <First> = "John"
+- <Last> = "Jones"
+- <Name> = $"{<First>} {<Last>}"
+```
+
+- `EntityGetValue` can now retrieve nested entities
+
+## Issues Closed in this Release
+
+### New Features
+
+- Add a step to get the current version of core or connector #211
+- Add parameter aliases to GenerateDocumentation #210
+- Allow String interpolation to make SCL easier to use #187
+- Allow EntityGetValue to retrieve values of type other than string #208
+- Make changes to support vs code extension #205
+- Improve look and feel of the documentation #207
+
+### Bug Fixes
+
+- Bug: Compare Operator cannot compare types other than integers #212
+
 # v0.5.0 (2021-02-28)
 
 ## Summary of Changes
@@ -13,7 +49,7 @@
 - Added DirectoryCopy
 - Added FileMove
 - Added FileCopy
-- Added `EntityCombine` step 
+- Added `EntityCombine` step
 - `Print` renamed to `Log`
 - Added `Print` which writes an entity to the console
 - Created `ReadStandardIn` step that returns a StringStream of data from the standard input
@@ -60,7 +96,7 @@
 - StateMonad should more elegantly get rid of nested variables #197
 - Use structured logging, so that technicians can more easily aggregate edr log information #195
 - Make Testing Log level configurable to prevent exposure of secrets in CI #193
-- Errors should have separate properties for  StepName, and TextLocation #191
+- Errors should have separate properties for StepName, and TextLocation #191
 - Adjust logging in Core to make it easier to integrate with ELK stack #190
 - Enable trace logging in more areas to make problems easier to diagnose #188
 - Add a Hash step to Hash Strings so technicians can produce hashes for files #186
