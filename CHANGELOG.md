@@ -1,3 +1,20 @@
+# v0.6.0 (2021-03-14)
+
+## Issues Closed in this Release
+
+### New Features
+
+- Add a step to get the current version of core or connector #211
+- Add parameter aliases to GenerateDocumentation #210
+- Allow String interpolation to make SCL easier to use #187
+- Allow EntityGetValue to retrieve values of type other than string #208
+- Make changes to support vs code extension #205
+- Improve look and feel of the documentation #207
+
+### Bug Fixes
+
+- Bug: Compare Operator cannot compare types other than integers #212
+
 # v0.5.0 (2021-02-28)
 
 ## Summary of Changes
