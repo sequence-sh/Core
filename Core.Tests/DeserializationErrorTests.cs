@@ -56,14 +56,14 @@ public partial class DeserializationErrorTests
 
             yield return new DeserializationErrorCase(
                 "Foreach ['one', 'two'] (Print (<Entity> + 1))",
-                ("'StringJoin' cannot take the value '1'",
-                 "StringJoin - Line: 1, Col: 31, Idx: 31 - Line: 1, Col: 42, Idx: 42 Text: <Entity> + 1")
+                ("IntConstant has output type Integer, not String",
+                 "1 - Line: 1, Col: 42, Idx: 42 - Line: 1, Col: 42, Idx: 42 Text: 1")
             );
 
             yield return new DeserializationErrorCase(
                 "Foreach ['one', 'two'] (Print (<Num> + 1)) <Num>",
-                ("'StringJoin' cannot take the value '1'",
-                 "StringJoin - Line: 1, Col: 31, Idx: 31 - Line: 1, Col: 39, Idx: 39 Text: <Num> + 1")
+                ("IntConstant has output type Integer, not String",
+                 "1 - Line: 1, Col: 39, Idx: 39 - Line: 1, Col: 39, Idx: 39 Text: 1")
             );
 
             yield return new DeserializationErrorCase(

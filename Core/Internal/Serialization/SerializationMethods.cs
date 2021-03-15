@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -114,7 +115,7 @@ public static class SerializationMethods
                 Entity entity   => entity.Serialize(),
                 StringStream ss => await ss.GetStringAsync(),
                 DateTime dt     => dt.ToString(Constants.DateTimeFormat),
-                double d        => d.ToString(Constants.DoubleFormat),
+                double d        => d.ToString(Constants.DoubleFormat, new NumberFormatInfo() { }),
                 _               => obj?.ToString()!
             };
     }

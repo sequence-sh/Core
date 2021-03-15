@@ -6,15 +6,15 @@ namespace Reductech.EDR.Core.Steps
 {
 
 /// <summary>
-/// Modulo a number by a list of integers sequentially
+/// Divide a double by a list of doubles
 /// </summary>
-public sealed class Modulo : BaseOperatorStep<Modulo, int, int>
+public sealed class DoubleDivide : BaseOperatorStep<DoubleDivide, double, double>
 {
     /// <inheritdoc />
-    protected override Result<int, IErrorBuilder> Operate(IEnumerable<int> terms)
+    protected override Result<double, IErrorBuilder> Operate(IEnumerable<double> terms)
     {
-        var total = 0;
-        var first = true;
+        double total = 0;
+        var    first = true;
 
         foreach (var number in terms)
         {
@@ -25,7 +25,10 @@ public sealed class Modulo : BaseOperatorStep<Modulo, int, int>
             }
             else
             {
-                total %= number;
+                if (number == 0)
+                    return ErrorCode.DivideByZero.ToErrorBuilder();
+
+                total /= number;
             }
         }
 
@@ -33,7 +36,7 @@ public sealed class Modulo : BaseOperatorStep<Modulo, int, int>
     }
 
     /// <inheritdoc />
-    public override string Operator => "%";
+    public override string Operator => "/";
 }
 
 }

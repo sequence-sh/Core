@@ -46,7 +46,7 @@ public record IntConstantFreezable
     {
         var intCheckResult = expectedType.CheckAllows(
             TypeReference.Actual.Integer,
-            typeof(IntConstantFreezable)
+            typeof(IntConstant)
         );
 
         if (intCheckResult.IsSuccess)
@@ -54,7 +54,7 @@ public record IntConstantFreezable
 
         var doubleCheckResult = expectedType.CheckAllows(
             TypeReference.Actual.Double,
-            typeof(IntConstantFreezable)
+            typeof(DoubleConstant)
         );
 
         if (doubleCheckResult.IsSuccess)
