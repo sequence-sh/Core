@@ -30,7 +30,7 @@ public record CreateEntityFreezableStep(
     public Result<IStep, IError> TryFreeze(TypeReference expectedType, TypeResolver typeResolver)
     {
         var checkResult = expectedType.CheckAllows(
-                new TypeReference.Actual(SCLType.Entity),
+                TypeReference.Actual.Entity,
                 typeof(CreateEntityStep)
             )
             .MapError(x => x.WithLocation(this));
@@ -72,7 +72,7 @@ public record CreateEntityFreezableStep(
     /// <inheritdoc />
     public Result<TypeReference, IError> TryGetOutputTypeReference(
         TypeReference expectedType,
-        TypeResolver typeResolver) => new TypeReference.Actual(SCLType.Entity);
+        TypeResolver typeResolver) => TypeReference.Actual.Entity;
 }
 
 }

@@ -78,8 +78,8 @@ public sealed class EntityMap : CompoundStep<Array<Entity>>
     {
         return baseContext.TryCloneWithScopedStep(
             Variable,
-            new TypeReference.Actual(SCLType.Entity),
-            new TypeReference.Actual(SCLType.Entity),
+            TypeReference.Actual.Entity,
+            TypeReference.Actual.Entity,
             scopedStep,
             new ErrorLocation(this)
         );

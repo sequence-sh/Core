@@ -89,7 +89,7 @@ public sealed class AppendString : CompoundStep<Unit>
 
             yield return (
                 vn.Value,
-                new TypeReference.Actual(SCLType.String));
+                TypeReference.Actual.String);
         }
     }
 }

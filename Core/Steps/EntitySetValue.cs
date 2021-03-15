@@ -96,7 +96,7 @@ public sealed class EntitySetValueStepFactory : GenericStepFactory
 
     /// <inheritdoc />
     protected override TypeReference GetOutputTypeReference(TypeReference memberTypeReference) =>
-        new TypeReference.Actual(SCLType.Entity);
+        TypeReference.Actual.Entity;
 
     /// <inheritdoc />
     protected override Result<TypeReference, IError> GetGenericTypeParameter(
@@ -104,7 +104,7 @@ public sealed class EntitySetValueStepFactory : GenericStepFactory
         FreezableStepData freezableStepData,
         TypeResolver typeResolver)
     {
-        if (!expectedTypeReference.Allow(new TypeReference.Actual(SCLType.Entity)))
+        if (!expectedTypeReference.Allow(TypeReference.Actual.Entity))
         {
             return Result.Failure<TypeReference, IError>(
                 ErrorCode.WrongParameterType.ToErrorBuilder(

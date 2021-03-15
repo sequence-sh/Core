@@ -105,7 +105,7 @@ public sealed class ArraySort<T> : CompoundStep<Array<T>>
         return baseContext.TryCloneWithScopedStep(
             Variable,
             TypeReference.Create(typeof(T)),
-            new TypeReference.Actual(SCLType.String),
+            TypeReference.Actual.String,
             scopedStep,
             new ErrorLocation(this)
         );

@@ -52,7 +52,7 @@ public abstract record TypeReference
     /// <summary>
     /// A particular type
     /// </summary>
-    public sealed record Actual(SCLType Type) : TypeReference
+    public sealed record Actual : TypeReference
     {
         /// <param name="typeResolver"></param>
         /// <inheritdoc />
@@ -72,6 +72,39 @@ public abstract record TypeReference
 
         /// <inheritdoc />
         public override string Name => Type.ToString();
+
+        private Actual(SCLType type) => Type = type;
+
+        /// <summary>
+        /// The expected type
+        /// </summary>
+        public SCLType Type { get; }
+
+        public static Actual String { get; } = new(SCLType.String);
+        public static Actual Integer { get; } = new(SCLType.Integer);
+        public static Actual Double { get; } = new(SCLType.Double);
+        public static Actual Enum { get; } = new(SCLType.Enum);
+        public static Actual Bool { get; } = new(SCLType.Bool);
+        public static Actual Date { get; } = new(SCLType.Date);
+        public static Actual Entity { get; } = new(SCLType.Entity);
+
+        /// <summary>
+        /// Create an actual type
+        /// </summary>
+        public static Actual Create(SCLType type)
+        {
+            return type switch
+            {
+                SCLType.String  => String,
+                SCLType.Integer => Integer,
+                SCLType.Double  => Double,
+                SCLType.Enum    => Enum,
+                SCLType.Bool    => Bool,
+                SCLType.Date    => Date,
+                SCLType.Entity  => Entity,
+                _               => throw new ArgumentOutOfRangeException(nameof(type), type, null)
+            };
+        }
     }
 
     /// <summary>
@@ -343,7 +376,7 @@ public abstract record TypeReference
         var sclType = t.GetSCLType();
 
         if (sclType is not null)
-            return new Actual(sclType.Value);
+            return Actual.Create(sclType.Value);
 
         if (t == typeof(object))
             return Any.Instance;
@@ -381,7 +414,7 @@ public abstract record TypeReference
     /// <summary>
     /// Converts an SCL type to TypeReference
     /// </summary>
-    public static explicit operator TypeReference(SCLType sclType) => new Actual(sclType);
+    public static explicit operator TypeReference(SCLType sclType) => Actual.Create(sclType);
 
     /// <summary>
     /// Gets the type referred to by a reference.

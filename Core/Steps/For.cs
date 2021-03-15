@@ -123,7 +123,7 @@ public sealed class For : CompoundStep<Unit>
     {
         return baseTypeResolver.TryCloneWithScopedStep(
             Variable,
-            new TypeReference.Actual(SCLType.Integer),
+            TypeReference.Actual.Integer,
             TypeReference.Unit.Instance,
             scopedStep,
             new ErrorLocation(this)

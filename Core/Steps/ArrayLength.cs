@@ -56,14 +56,14 @@ public sealed class ArrayLengthStepFactory : ArrayStepFactory
 
     /// <inheritdoc />
     protected override TypeReference GetOutputTypeReference(TypeReference memberTypeReference) =>
-        new TypeReference.Actual(SCLType.Integer);
+        TypeReference.Actual.Integer;
 
     /// <inheritdoc />
     protected override Result<TypeReference, IErrorBuilder> GetExpectedArrayTypeReference(
         TypeReference expectedTypeReference)
     {
         var r = expectedTypeReference.CheckAllows(
-            new TypeReference.Actual(SCLType.Integer),
+            TypeReference.Actual.Integer,
             StepType
         );
 
