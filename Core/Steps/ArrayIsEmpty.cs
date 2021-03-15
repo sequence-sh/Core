@@ -58,7 +58,7 @@ public sealed class ArrayIsEmptyStepFactory : ArrayStepFactory
 
     /// <inheritdoc />
     protected override TypeReference GetOutputTypeReference(TypeReference memberTypeReference) =>
-        new TypeReference.Actual(SCLType.Bool);
+        TypeReference.Actual.Bool;
 
     /// <inheritdoc />
     protected override string ArrayPropertyName => nameof(ArrayIsEmpty<object>.Array);
@@ -68,7 +68,7 @@ public sealed class ArrayIsEmptyStepFactory : ArrayStepFactory
         TypeReference expectedTypeReference)
     {
         return expectedTypeReference
-            .CheckAllows(new TypeReference.Actual(SCLType.Bool), StepType)
+            .CheckAllows(TypeReference.Actual.Bool, StepType)
             .Map(_ => new TypeReference.Array(TypeReference.Any.Instance) as TypeReference);
     }
 }

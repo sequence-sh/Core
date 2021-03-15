@@ -86,7 +86,7 @@ public sealed class ArrayFilter<T> : CompoundStep<Array<T>>
         return baseContext.TryCloneWithScopedStep(
             Variable,
             TypeReference.Create(typeof(T)),
-            new TypeReference.Actual(SCLType.Bool),
+            TypeReference.Actual.Bool,
             scopedStep,
             new ErrorLocation(this)
         );

@@ -21,7 +21,12 @@ public partial class DeserializationTests
     {
         get
         {
+            yield return new DeserializationTestInstance("1.1 + 1.2",     "2.3");
+            yield return new DeserializationTestInstance("1.1 + 1",       "2.1");
+            yield return new DeserializationTestInstance("(1.2 - 1) > 0", true);
+
             yield return new DeserializationTestInstance("2.1 == 2.5",    false);
+            yield return new DeserializationTestInstance("2.0 == 2",      true);
             yield return new DeserializationTestInstance("true == false", false);
             yield return new DeserializationTestInstance("'yes' == 'no'", false);
             yield return new DeserializationTestInstance("1 == 2",        false);

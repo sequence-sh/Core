@@ -83,7 +83,7 @@ public sealed class IncrementVariableStepFactory : SimpleStepFactory<IncrementVa
         if (vn.IsFailure)
             yield break;
 
-        yield return (vn.Value, new TypeReference.Actual(SCLType.Integer));
+        yield return (vn.Value, TypeReference.Actual.Integer);
     }
 }
 

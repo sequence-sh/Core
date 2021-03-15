@@ -70,8 +70,7 @@ public abstract class
 
         /// <inheritdoc />
         protected override TypeReference
-            GetOutputTypeReference(TypeReference memberTypeReference) =>
-            new TypeReference.Actual(SCLType.Bool);
+            GetOutputTypeReference(TypeReference memberTypeReference) => TypeReference.Actual.Bool;
 
         /// <inheritdoc />
         protected override Result<TypeReference, IError> GetGenericTypeParameter(
@@ -80,7 +79,7 @@ public abstract class
             TypeResolver typeResolver)
         {
             var checkResult = expectedTypeReference
-                .CheckAllows(new TypeReference.Actual(SCLType.Bool), StepType)
+                .CheckAllows(TypeReference.Actual.Bool, StepType)
                 .MapError(x => x.WithLocation(freezableStepData));
 
             if (checkResult.IsFailure)

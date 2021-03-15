@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Internal.Errors;
 
@@ -7,15 +6,15 @@ namespace Reductech.EDR.Core.Steps
 {
 
 /// <summary>
-/// Raises an integer to the power of a list of integers sequentially
+/// Subtract a list of numbers from a number
 /// </summary>
-public sealed class Power : BaseOperatorStep<Power, int, int>
+public sealed class DoubleSubtract : BaseOperatorStep<DoubleSubtract, double, double>
 {
     /// <inheritdoc />
-    protected override Result<int, IErrorBuilder> Operate(IEnumerable<int> terms)
+    protected override Result<double, IErrorBuilder> Operate(IEnumerable<double> terms)
     {
-        var total = 0;
-        var first = true;
+        double total = 0;
+        var    first = true;
 
         foreach (var number in terms)
         {
@@ -26,7 +25,7 @@ public sealed class Power : BaseOperatorStep<Power, int, int>
             }
             else
             {
-                total = Convert.ToInt32(Math.Pow(total, number));
+                total -= number;
             }
         }
 
@@ -34,7 +33,7 @@ public sealed class Power : BaseOperatorStep<Power, int, int>
     }
 
     /// <inheritdoc />
-    public override string Operator => "^";
+    public override string Operator => "-";
 }
 
 }

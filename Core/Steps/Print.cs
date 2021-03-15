@@ -71,9 +71,7 @@ public sealed class Print<T> : CompoundStep<Unit>
             TypeResolver typeResolver) => freezableStepData
             .TryGetStep(nameof(Print<object>.Value), StepType)
             .Bind(x => x.TryGetOutputTypeReference(TypeReference.Any.Instance, typeResolver))
-            .Map(
-                x => x == TypeReference.Any.Instance ? new TypeReference.Actual(SCLType.String) : x
-            );
+            .Map(x => x == TypeReference.Any.Instance ? TypeReference.Actual.String : x);
     }
 }
 

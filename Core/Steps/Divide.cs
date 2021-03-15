@@ -6,7 +6,7 @@ namespace Reductech.EDR.Core.Steps
 {
 
 /// <summary>
-/// Divide a number by a list of numbers
+/// Divide an integer by a list of integers
 /// </summary>
 public sealed class Divide : BaseOperatorStep<Divide, int, int>
 {

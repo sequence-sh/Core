@@ -7,14 +7,14 @@ namespace Reductech.EDR.Core.Steps
 {
 
 /// <summary>
-/// Calculate the product of a list of integers
+/// Calculate the product of a list of doubles
 /// </summary>
-public sealed class Product : BaseOperatorStep<Product, int, int>
+public sealed class DoubleProduct : BaseOperatorStep<DoubleProduct, double, double>
 {
     /// <inheritdoc />
-    protected override Result<int, IErrorBuilder> Operate(IEnumerable<int> terms)
+    protected override Result<double, IErrorBuilder> Operate(IEnumerable<double> terms)
     {
-        return terms.Aggregate(1, (a, b) => a * b);
+        return terms.Aggregate(1d, (a, b) => a * b);
     }
 
     /// <inheritdoc />

@@ -7,15 +7,15 @@ namespace Reductech.EDR.Core.Steps
 {
 
 /// <summary>
-/// Raises an integer to the power of a list of integers sequentially
+/// Raises a double to the power of a list of integers sequentially
 /// </summary>
-public sealed class Power : BaseOperatorStep<Power, int, int>
+public sealed class DoublePower : BaseOperatorStep<DoublePower, double, double>
 {
     /// <inheritdoc />
-    protected override Result<int, IErrorBuilder> Operate(IEnumerable<int> terms)
+    protected override Result<double, IErrorBuilder> Operate(IEnumerable<double> terms)
     {
-        var total = 0;
-        var first = true;
+        double total = 0;
+        var    first = true;
 
         foreach (var number in terms)
         {
@@ -26,7 +26,7 @@ public sealed class Power : BaseOperatorStep<Power, int, int>
             }
             else
             {
-                total = Convert.ToInt32(Math.Pow(total, number));
+                total = Math.Pow(total, number);
             }
         }
 

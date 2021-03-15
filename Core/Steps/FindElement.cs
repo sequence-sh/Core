@@ -75,14 +75,14 @@ public sealed class FindElementStepFactory : ArrayStepFactory
 
     /// <inheritdoc />
     protected override TypeReference GetOutputTypeReference(TypeReference memberTypeReference) =>
-        new TypeReference.Actual(SCLType.Integer);
+        TypeReference.Actual.Integer;
 
     /// <inheritdoc />
     protected override Result<TypeReference, IErrorBuilder> GetExpectedArrayTypeReference(
         TypeReference expectedTypeReference)
     {
         return expectedTypeReference
-            .CheckAllows(new TypeReference.Actual(SCLType.Integer), StepType)
+            .CheckAllows(TypeReference.Actual.Integer, StepType)
             .Map(_ => new TypeReference.Array(TypeReference.Any.Instance) as TypeReference);
     }
 

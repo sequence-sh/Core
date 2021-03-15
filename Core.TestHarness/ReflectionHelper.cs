@@ -235,6 +235,18 @@ public abstract partial class StepTestBase<TStep, TOutput>
 
             step = Array(list.ToArray());
         }
+        else if (outputType == typeof(Array<double>))
+        {
+            var list = new List<double>();
+
+            for (var i = 0; i < 3; i++)
+            {
+                list.Add(index * 1.1);
+                index++;
+            }
+
+            step = Array(list.ToArray());
+        }
         else if (outputType == typeof(Array<bool>))
         {
             var list = new List<bool>();
