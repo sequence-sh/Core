@@ -42,7 +42,26 @@ public record IntConstantFreezable
     /// <inheritdoc />
     public override Result<IStep, IError> TryFreeze(
         TypeReference expectedType,
-        TypeResolver typeResolver) => new IntConstant(Value);
+        TypeResolver typeResolver)
+    {
+        var intCheckResult = expectedType.CheckAllows(
+            TypeReference.Actual.Integer,
+            typeof(IntConstantFreezable)
+        );
+
+        if (intCheckResult.IsSuccess)
+            return new IntConstant(Value);
+
+        var doubleCheckResult = expectedType.CheckAllows(
+            TypeReference.Actual.Double,
+            typeof(IntConstantFreezable)
+        );
+
+        if (doubleCheckResult.IsSuccess)
+            return new DoubleConstant(Value);
+
+        return intCheckResult.MapError(x => x.WithLocation(this)).ConvertFailure<IStep>();
+    }
 
     /// <inheritdoc />
     public override string Serialize() => Value.ToString();

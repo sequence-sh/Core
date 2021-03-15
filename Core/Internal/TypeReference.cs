@@ -67,7 +67,16 @@ public abstract record TypeReference
         /// <inheritdoc />
         public override bool Allow(TypeReference other)
         {
-            return other is Actual a && a.Type == Type;
+            if (other is Actual a)
+            {
+                if (a.Type == Type)
+                    return true;
+
+                //if (Type == SCLType.Double || a.Type == SCLType.Integer)
+                //    return true;
+            }
+
+            return false;
         }
 
         /// <inheritdoc />
@@ -226,6 +235,13 @@ public abstract record TypeReference
 
             if (possibleTypes.Value.Count == 1)
                 return possibleTypes.Value.Single();
+
+            if (possibleTypes.Value.Count == 2)
+            {
+                if (possibleTypes.Value.Contains(typeof(double))
+                 && possibleTypes.Value.Contains(typeof(int)))
+                    return typeof(double);
+            }
 
             return ErrorCode.CannotInferType.ToErrorBuilder();
         }
