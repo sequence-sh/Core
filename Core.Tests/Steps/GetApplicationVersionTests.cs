@@ -16,7 +16,7 @@ public partial class
         get
         {
             var expectedOutput =
-                ConnectorInformation.Create(Assembly.GetEntryAssembly()!).ToString();
+                ConnectorInformation.TryCreate(Assembly.GetEntryAssembly()!)!.ToString();
 
             //This will be the the ReSharper Test Runner
 
