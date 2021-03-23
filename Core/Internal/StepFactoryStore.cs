@@ -5,6 +5,7 @@ using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Reflection;
 using Reductech.EDR.Core.Attributes;
+using Reductech.EDR.Core.Util;
 
 namespace Reductech.EDR.Core.Internal
 {
@@ -100,7 +101,8 @@ public class StepFactoryStore
                 .Select(CreateStepFactory)
                 .ToList();
 
-        var connectorInfo = assemblies.Select(ConnectorInformation.Create!).ToList();
+        var connectorInfo =
+            assemblies.Select(ConnectorInformation.TryCreate!).WhereNotNull().ToList();
 
         return Create(connectorInfo, factories);
     }
@@ -168,12 +170,22 @@ public record ConnectorInformation(string Name, string Version)
     /// <summary>
     /// Create from an assembly
     /// </summary>
-    public static ConnectorInformation Create(Assembly assembly)
+    public static ConnectorInformation? TryCreate(Assembly? assembly)
     {
-        FileVersionInfo fileVersionInfo = FileVersionInfo.GetVersionInfo(assembly.Location);
-        string          version         = fileVersionInfo.ProductVersion!;
+        if (assembly is null)
+            return null;
 
-        return new ConnectorInformation(assembly.GetName().Name!, version);
+        try
+        {
+            FileVersionInfo fileVersionInfo = FileVersionInfo.GetVersionInfo(assembly.Location);
+            string          version         = fileVersionInfo.ProductVersion!;
+
+            return new ConnectorInformation(assembly.GetName().Name!, version);
+        }
+        catch (Exception)
+        {
+            return null;
+        }
     }
 
     /// <inheritdoc />

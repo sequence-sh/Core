@@ -20,9 +20,13 @@ public sealed class GetApplicationVersion : CompoundStep<StringStream>
     {
         await Task.CompletedTask;
 
-        var entryAssembly = Assembly.GetEntryAssembly()!;
+        var entryAssembly = Assembly.GetEntryAssembly();
 
-        var ci = ConnectorInformation.Create(entryAssembly);
+        var ci = ConnectorInformation.TryCreate(entryAssembly);
+
+        if (ci is null)
+            return new StringStream("Unknown Version");
+
         return new StringStream(ci.ToString());
     }
 
