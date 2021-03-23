@@ -175,6 +175,12 @@ public record ConnectorInformation(string Name, string Version)
 
         return new ConnectorInformation(assembly.GetName().Name!, version);
     }
+
+    /// <inheritdoc />
+    public override string ToString()
+    {
+        return $"{Name} {Version}";
+    }
 }
 
 }
