@@ -41,11 +41,6 @@ public interface IStep
     bool ShouldBracketWhenSerialized { get; }
 
     /// <summary>
-    /// Configuration for this step.
-    /// </summary>
-    Configuration? Configuration { get; set; }
-
-    /// <summary>
     /// The text location for this step.
     /// </summary>
     public TextLocation? TextLocation { get; set; }

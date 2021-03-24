@@ -40,7 +40,7 @@ public sealed record CompoundFreezableStep(
         return TryGetStepFactory(typeResolver.StepFactoryStore)
             .Bind(
                 x =>
-                    x.TryFreeze(expectedType, typeResolver, FreezableStepData, StepConfiguration)
+                    x.TryFreeze(expectedType, typeResolver, FreezableStepData)
             );
     }
 
