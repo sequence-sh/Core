@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using CSharpFunctionalExtensions;
+﻿using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Internal.Errors;
 
 namespace Reductech.EDR.Core.Internal
@@ -14,13 +13,6 @@ public interface ICompoundStep : IStep
     /// The factory used to create steps of this type.
     /// </summary>
     IStepFactory StepFactory { get; }
-
-    IEnumerable<StepProperty> AllProperties { get; }
-
-    /// <summary>
-    /// Requirements for this step that can only be determined at runtime.
-    /// </summary>
-    IEnumerable<Requirement> RuntimeRequirements { get; }
 
     /// <summary>
     /// Tries to get the scoped context for this step.

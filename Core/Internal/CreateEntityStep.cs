@@ -113,6 +113,15 @@ public record CreateEntityStep
     }
 
     /// <inheritdoc />
+    public IEnumerable<Requirement> RuntimeRequirements
+    {
+        get
+        {
+            return Properties.SelectMany(x => x.Value.RuntimeRequirements);
+        }
+    }
+
+    /// <inheritdoc />
     public bool ShouldBracketWhenSerialized => false;
 }
 

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
@@ -58,6 +59,11 @@ public interface IStep
     /// Serialize this step.
     /// </summary>
     string Serialize();
+
+    /// <summary>
+    /// Requirements for this step that can only be determined at runtime.
+    /// </summary>
+    IEnumerable<Requirement> RuntimeRequirements { get; }
 }
 
 /// <summary>
