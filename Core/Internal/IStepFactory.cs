@@ -66,8 +66,7 @@ public interface IStepFactory
     Result<IStep, IError> TryFreeze(
         TypeReference expectedTypeReference,
         TypeResolver typeResolver,
-        FreezableStepData freezeData,
-        Configuration? configuration);
+        FreezableStepData freezeData);
 
     /// <summary>
     /// Human readable explanation of the output type.

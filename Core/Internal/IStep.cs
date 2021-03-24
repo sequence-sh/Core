@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
@@ -40,11 +41,6 @@ public interface IStep
     bool ShouldBracketWhenSerialized { get; }
 
     /// <summary>
-    /// Configuration for this step.
-    /// </summary>
-    Configuration? Configuration { get; set; }
-
-    /// <summary>
     /// The text location for this step.
     /// </summary>
     public TextLocation? TextLocation { get; set; }
@@ -58,6 +54,11 @@ public interface IStep
     /// Serialize this step.
     /// </summary>
     string Serialize();
+
+    /// <summary>
+    /// Requirements for this step that can only be determined at runtime.
+    /// </summary>
+    IEnumerable<Requirement> RuntimeRequirements { get; }
 }
 
 /// <summary>

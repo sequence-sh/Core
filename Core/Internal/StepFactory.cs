@@ -131,8 +131,7 @@ public abstract class StepFactory : IStepFactory
     public Result<IStep, IError> TryFreeze(
         TypeReference expectedTypeReference,
         TypeResolver typeResolver,
-        FreezableStepData freezeData,
-        Configuration? configuration)
+        FreezableStepData freezeData)
     {
         var instanceResult = TryCreateInstance(expectedTypeReference, freezeData, typeResolver);
 
@@ -140,8 +139,7 @@ public abstract class StepFactory : IStepFactory
             return instanceResult.ConvertFailure<IStep>();
 
         var step = instanceResult.Value;
-        step.Configuration = configuration;
-        step.TextLocation  = freezeData.Location;
+        step.TextLocation = freezeData.Location;
 
         var errors = new List<IError>();
 

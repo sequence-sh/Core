@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
@@ -61,6 +62,15 @@ public abstract record ConstantBase<T>(T Value) : IStep<T>, IConstantStep
 
     /// <inheritdoc />
     public abstract string Serialize();
+
+    /// <inheritdoc />
+    public IEnumerable<Requirement> RuntimeRequirements
+    {
+        get
+        {
+            yield break;
+        }
+    }
 
     /// <inheritdoc />
     public bool ShouldBracketWhenSerialized => false;
