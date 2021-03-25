@@ -107,8 +107,6 @@ public sealed class Entity : IEnumerable<EntityProperty>, IEquatable<Entity>
     /// </summary>
     public Entity WithProperty(string key, EntityValue newValue)
     {
-        ImmutableDictionary<string, EntityProperty> newDict;
-
         EntityProperty newProperty;
 
         if (Dictionary.TryGetValue(key, out var ep))
@@ -139,7 +137,7 @@ public sealed class Entity : IEnumerable<EntityProperty>, IEquatable<Entity>
             newProperty = new EntityProperty(key, newValue, null, Dictionary.Count);
         }
 
-        newDict = Dictionary.SetItem(key, newProperty);
+        ImmutableDictionary<string, EntityProperty> newDict = Dictionary.SetItem(key, newProperty);
 
         return new Entity(newDict);
     }

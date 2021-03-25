@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
 using Reductech.EDR.Core.Enums;
@@ -9,6 +10,7 @@ namespace Reductech.EDR.Core.Entities
 /// <summary>
 /// A single property in a a schema.
 /// </summary>
+[Serializable]
 public sealed class SchemaProperty
 {
     /// <summary>
