@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Reductech.EDR.Core.Attributes;
+using Newtonsoft.Json;
 
 namespace Reductech.EDR.Core
 {
@@ -13,25 +13,25 @@ public sealed class Configuration
     /// <summary>
     /// Additional requirements, beyond the default for this step.
     /// </summary>
-    [ConfigProperty(1)]
+    [JsonProperty]
     public List<Requirement>? AdditionalRequirements { get; set; }
 
     /// <summary>
     /// Tags that the target machine must have (defined in a the config file) for this to be run on that machine.
     /// </summary>
-    [ConfigProperty(2)]
+    [JsonProperty]
     public List<string>? TargetMachineTags { get; set; }
 
     /// <summary>
     /// Conditional true, this step will not be split into multiple steps.
     /// </summary>
-    [ConfigProperty(3)]
+    [JsonProperty]
     public bool DoNotSplit { get; set; }
 
     /// <summary>
     /// The priority of this step. InitialSteps with higher priorities will be run first.
     /// </summary>
-    [ConfigProperty(5)]
+    [JsonProperty]
     public byte? Priority { get; set; }
 
     /// <summary>
