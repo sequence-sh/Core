@@ -545,6 +545,14 @@ public sealed class EntityValue : OneOfBase<DBNull, string, int, double, bool, E
             if (double.TryParse(GetPrimitiveString() ?? "", out var d))
                 return d;
         }
+        else if (type == typeof(bool))
+        {
+            if (TryPickT4(out var boolValue, out _))
+                return boolValue;
+
+            if (bool.TryParse(GetPrimitiveString() ?? "", out var b))
+                return b;
+        }
         else if (type.IsEnum)
         {
             if (Enum.TryParse(type, GetPrimitiveString(), true, out var r))
