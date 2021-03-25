@@ -2,12 +2,10 @@
 using System.Collections.Generic;
 using CSharpFunctionalExtensions;
 using FluentAssertions;
-using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Parser;
 using Reductech.EDR.Core.TestHarness;
 using Xunit;
-using Xunit.Sdk;
 
 namespace Reductech.EDR.Core.Tests
 {
@@ -34,7 +32,7 @@ public class EntityConversionTests
     };
 
     private const string TestConfigurationString =
-        "(AdditionalRequirements: [(Name: \"Test Requirement 1\" MinVersion: (Major: 1 Minor: 2 Build: 3 Revision: 4 MajorRevision: 0 MinorRevision: 4) MaxVersion: (Major: 5 Minor: 6 Build: 7 Revision: 8 MajorRevision: 0 MinorRevision: 8) Notes: \"Test Notes\" Features: [\"Apple\", \"Banana\"]), (Name: \"Test Requirement 2\")] TargetMachineTags: [\"alpha\", \"beta\"] DoNotSplit: True Priority: 3)";
+        "(AdditionalRequirements: [(Name: \"Test Requirement 1\" MinVersion: \"1.2.3.4\" MaxVersion: \"5.6.7.8\" Notes: \"Test Notes\" Features: [\"Apple\", \"Banana\"]), (Name: \"Test Requirement 2\")] TargetMachineTags: [\"alpha\", \"beta\"] DoNotSplit: True Priority: 3)";
 
     [Fact]
     public void ConfigurationShouldConvertToEntityCorrectly()
@@ -55,13 +53,12 @@ public class EntityConversionTests
                         TypeReference.Actual.Entity,
                         StepFactoryStore.CreateUsingReflection()
                     )
-                );
+                )
+                .Map(x => x.TryConvertToEntityValue());
 
         parseResult.ShouldBeSuccessful(x => x.AsString);
 
-        if (parseResult.Value is CreateEntityStep ec) { return null; }
-
-        throw new XunitException($"Could not parse {s} as entity");
+        return parseResult.Value.Value.AsT7; //could throw exception
     }
 
     [Fact]

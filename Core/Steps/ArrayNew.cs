@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Attributes;
+using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Internal.Serialization;
@@ -58,6 +60,24 @@ public sealed class ArrayNew<T> : CompoundStep<Array<T>>, IArrayNewStep
 
     /// <inheritdoc />
     public IEnumerable<IStep> ElementSteps => Elements;
+
+    /// <inheritdoc />
+    public override Maybe<EntityValue> TryConvertToEntityValue()
+    {
+        var builder = ImmutableList<EntityValue>.Empty.ToBuilder();
+
+        foreach (var element in Elements)
+        {
+            var ev = element.TryConvertToEntityValue();
+
+            if (ev.HasNoValue)
+                return Maybe<EntityValue>.None;
+
+            builder.Add(ev.Value);
+        }
+
+        return new EntityValue(builder.ToImmutable());
+    }
 }
 
 /// <summary>

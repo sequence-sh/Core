@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using CSharpFunctionalExtensions;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.Internal.Errors;
 
@@ -31,15 +32,24 @@ public static class EntityConversionHelpers
             var json = JsonConvert.SerializeObject(
                 entity,
                 Formatting.None,
-                EntityJsonConverter.Instance
+                EntityJsonConverter.Instance,
+                new VersionConverter()
             );
 
-            var schema = JsonConvert.DeserializeObject<T>(json);
-            return schema;
+            var obj = JsonConvert.DeserializeObject<T>(
+                json,
+                EntityJsonConverter.Instance,
+                new VersionConverter()
+            );
+
+            if (obj is null)
+                return ErrorCode.CouldNotParse.ToErrorBuilder(json, typeof(T).Name);
+
+            return obj;
         }
         catch (Exception e)
         {
-            return ErrorCode.CannotConvertNestedEntity.ToErrorBuilder(e);
+            return ErrorCode.CouldNotParse.ToErrorBuilder(e);
         }
     }
 
