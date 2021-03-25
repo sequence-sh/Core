@@ -143,6 +143,7 @@ public sealed class EntityValue : OneOfBase<DBNull, string, int, double, bool, E
         switch (argValue)
         {
             case null:             return new EntityValue(DBNull.Value);
+            case EntityValue ev:   return ev;
             case StringStream ss1: return Create(ss1.GetString(), multiValueDelimiter);
             case string s:         return Create(s,               multiValueDelimiter);
             case int i:            return new EntityValue(i);
@@ -159,6 +160,7 @@ public sealed class EntityValue : OneOfBase<DBNull, string, int, double, bool, E
             case JObject jo: return new EntityValue(Entity.Create(jo));
             case Entity entity: return new EntityValue(entity);
             case IEntityConvertible ec: return new EntityValue(ec.ConvertToEntity());
+            case Version version: return new EntityValue(version.ToString());
             case IDictionary dict:
             {
                 var builder = ImmutableDictionary<string, EntityProperty>.Empty.ToBuilder();

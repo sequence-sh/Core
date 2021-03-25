@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
+using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Util;
 
@@ -38,6 +39,25 @@ public record CreateEntityStep
         }
 
         return Entity.Create(pairs);
+    }
+
+    /// <inheritdoc />
+    public Maybe<EntityValue> TryConvertToEntityValue()
+    {
+        var pairs = new List<(EntityPropertyKey, object?)>();
+
+        foreach (var (key, value) in Properties)
+        {
+            var ev = value.TryConvertToEntityValue();
+
+            if (ev.HasNoValue)
+                return Maybe<EntityValue>.None;
+
+            pairs.Add((key, ev.Value));
+        }
+
+        var entity = Entity.Create(pairs);
+        return new EntityValue(entity);
     }
 
     /// <inheritdoc />

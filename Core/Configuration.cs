@@ -68,6 +68,18 @@ public sealed class Configuration : IEntityConvertible
 
         return distinct ? l1.Concat(l2).Distinct().ToList() : l1.Concat(l2).ToList();
     }
+
+    /// <inheritdoc />
+    public override bool Equals(object? obj) =>
+        obj is Configuration configuration && ToTuple.Equals(configuration.ToTuple);
+
+    /// <inheritdoc />
+    public override int GetHashCode() => ToTuple.GetHashCode();
+
+    private object ToTuple => (
+        string.Join(",", AdditionalRequirements ?? new List<Requirement>()),
+        string.Join(",", TargetMachineTags ?? new List<string>()),
+        DoNotSplit, Priority);
 }
 
 }
