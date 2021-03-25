@@ -33,8 +33,7 @@ public sealed class EnforceSchema : CompoundStep<Array<Entity>>
         if (schemaEntity.IsFailure)
             return schemaEntity.ConvertFailure<Array<Entity>>();
 
-        var schema = Entities.Schema
-            .TryCreateFromEntity(schemaEntity.Value)
+        var schema = EntityConversionHelpers.TryCreateFromEntity<Schema>(schemaEntity.Value)
             .MapError(e => e.WithLocation(this));
 
         if (schema.IsFailure)

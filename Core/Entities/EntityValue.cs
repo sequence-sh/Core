@@ -143,9 +143,12 @@ public sealed class EntityValue : OneOfBase<DBNull, string, int, double, bool, E
         switch (argValue)
         {
             case null:             return new EntityValue(DBNull.Value);
+            case EntityValue ev:   return ev;
             case StringStream ss1: return Create(ss1.GetString(), multiValueDelimiter);
             case string s:         return Create(s,               multiValueDelimiter);
             case int i:            return new EntityValue(i);
+            case byte @byte:       return new EntityValue(@byte);
+            case short @short:     return new EntityValue(@short);
             case bool b:           return new EntityValue(b);
             case double d:         return new EntityValue(d);
             case long ln when ln < int.MaxValue && ln > int.MinValue:
@@ -156,6 +159,8 @@ public sealed class EntityValue : OneOfBase<DBNull, string, int, double, bool, E
             case JValue jv: return CreateFromObject(jv.Value, multiValueDelimiter);
             case JObject jo: return new EntityValue(Entity.Create(jo));
             case Entity entity: return new EntityValue(entity);
+            case IEntityConvertible ec: return new EntityValue(ec.ConvertToEntity());
+            case Version version: return new EntityValue(version.ToString());
             case IDictionary dict:
             {
                 var builder = ImmutableDictionary<string, EntityProperty>.Empty.ToBuilder();
@@ -189,10 +194,23 @@ public sealed class EntityValue : OneOfBase<DBNull, string, int, double, bool, E
                     "Attempt to set EntityValue to a Result - you should check the result for failure and then set it to the value of the result",
                     nameof(argValue)
                 );
+
             default:
+
+            {
+                if (argValue.GetType()
+                    .GetCustomAttributes(true)
+                    .OfType<SerializableAttribute>()
+                    .Any())
+                {
+                    var entity = EntityConversionHelpers.ConvertToEntity(argValue);
+                    return new EntityValue(entity);
+                }
+
                 throw new ArgumentException(
                     $"Attempt to set EntityValue to {argValue.GetType().Name}"
                 );
+            }
         }
 
         static EntityValue Create(string s, char? multiValueDelimiter)
@@ -600,7 +618,10 @@ public sealed class EntityValue : OneOfBase<DBNull, string, int, double, bool, E
                     typeof(ArrayHelper).GetMethod(nameof(ArrayHelper.CreateArray))!
                         .MakeGenericMethod(genericType);
 
-                var arrayInstance = createArrayMethod.Invoke(null, new[] { elements.Value });
+                var arrayInstance = createArrayMethod.Invoke(
+                    null,
+                    new object?[] { elements.Value }
+                );
 
                 return arrayInstance!;
             }

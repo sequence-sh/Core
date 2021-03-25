@@ -1,10 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
-using CSharpFunctionalExtensions;
-using Reductech.EDR.Core.Attributes;
+using Newtonsoft.Json;
 using Reductech.EDR.Core.Enums;
-using Reductech.EDR.Core.Internal.Errors;
-using Reductech.EDR.Core.Util;
 
 namespace Reductech.EDR.Core.Entities
 {
@@ -12,134 +10,56 @@ namespace Reductech.EDR.Core.Entities
 /// <summary>
 /// A single property in a a schema.
 /// </summary>
+[Serializable]
 public sealed class SchemaProperty
 {
     /// <summary>
     /// The type of the property.
     /// </summary>
-    [ConfigProperty(1)]
+    [JsonProperty]
     public SCLType Type { get; set; }
 
     /// <summary>
     /// If this is an enum, the name of the enum
     /// </summary>
-    [ConfigProperty(2)]
+    [JsonProperty]
     public string? EnumType { get; set; }
 
     /// <summary>
     /// The multiplicity of the property.
     /// </summary>
-    [ConfigProperty(3)]
+    [JsonProperty]
     public Multiplicity Multiplicity { get; set; } = Multiplicity.Any;
 
     /// <summary>
     /// If this is an enum, the allowed values.
     /// </summary>
-    [ConfigProperty(4)]
+    [JsonProperty]
     public IReadOnlyList<string>? Values { get; set; }
 
     /// <summary>
     /// The allowed formats for the date
     /// </summary>
-    [ConfigProperty(5)]
+    [JsonProperty]
     public IReadOnlyList<string>? DateInputFormats { get; set; }
 
     /// <summary>
     /// The output format for the date
     /// </summary>
-    [ConfigProperty(6)]
+    [JsonProperty]
     public string? DateOutputFormat { get; set; }
 
     /// <summary>
     /// A regex to validate the string form of the field value
     /// </summary>
-    [ConfigProperty(5)]
+    [JsonProperty]
     public string? Regex { get; set; }
 
     /// <summary>
     /// The error behavior, overriding the default value of the schema.
     /// </summary>
-    [ConfigProperty(6)]
+    [JsonProperty]
     public ErrorBehavior? ErrorBehavior { get; set; }
-
-    /// <summary>
-    /// Tries to create a schema from an entity.
-    /// Ignores unexpected properties.
-    /// </summary>
-    public static Result<SchemaProperty, IErrorBuilder> TryCreateFromEntity(Entity entity)
-    {
-        var results        = new List<Result<Unit, IErrorBuilder>>();
-        var schemaProperty = new SchemaProperty();
-
-        results.Add(
-            entity.TrySetEnum<SCLType>(
-                false,
-                nameof(Type),
-                s => schemaProperty.Type = s
-            )
-        );
-
-        results.Add(
-            entity.TrySetString(
-                true,
-                nameof(EnumType),
-                s => schemaProperty.EnumType = s
-            )
-        );
-
-        results.Add(
-            entity.TrySetEnum<Multiplicity>(
-                false,
-                nameof(Multiplicity),
-                s => schemaProperty.Multiplicity = s
-            )
-        );
-
-        results.Add(
-            entity.TrySetEnum<ErrorBehavior>(
-                true,
-                nameof(ErrorBehavior),
-                e => schemaProperty.ErrorBehavior = e
-            )
-        );
-
-        results.Add(
-            entity.TrySetStringList(
-                true,
-                nameof(Values),
-                s => schemaProperty.Values = s
-            )
-        );
-
-        results.Add(
-            entity.TrySetStringList(
-                true,
-                nameof(DateInputFormats),
-                s => schemaProperty.DateInputFormats = s
-            )
-        );
-
-        results.Add(
-            entity.TrySetString(
-                true,
-                nameof(DateOutputFormat),
-                s => schemaProperty.DateOutputFormat = s
-            )
-        );
-
-        results.Add(
-            entity.TrySetString(
-                true,
-                nameof(Regex),
-                s => schemaProperty.Regex = s
-            )
-        );
-
-        var r = results.Combine(ErrorBuilderList.Combine)
-            .Map(_ => schemaProperty);
-
-        return r;
-    }
 
     /// <summary>
     /// Convert this SchemaProperty to an entity

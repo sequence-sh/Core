@@ -2,13 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using CSharpFunctionalExtensions;
-using Microsoft.Extensions.Logging;
-using Reductech.EDR.Core.Attributes;
+using Newtonsoft.Json;
 using Reductech.EDR.Core.Enums;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Internal.Logging;
-using Reductech.EDR.Core.Util;
 
 namespace Reductech.EDR.Core.Entities
 {
@@ -17,31 +15,31 @@ namespace Reductech.EDR.Core.Entities
 /// An entity schema.
 /// Enforces that the entity matches certain constraints.
 /// </summary>
-public sealed class Schema
+[Serializable]
+public sealed class Schema : IEntityConvertible
 {
     /// <summary>
     /// The name of the schema.
     /// </summary>
-    [ConfigProperty(1)]
+    [JsonProperty]
     public string Name { get; set; } = null!;
 
     /// <summary>
     /// The schema properties.
     /// </summary>
-    [ConfigProperty(2)]
-    public Dictionary<string, SchemaProperty> Properties { get; set; } =
-        null!; //public setter for deserialization
+    [JsonProperty]
+    public Dictionary<string, SchemaProperty> Properties { get; set; } = null!;
 
     /// <summary>
     /// Whether properties other than the explicitly defined properties are allowed.
     /// </summary>
-    [ConfigProperty(3)]
+    [JsonProperty]
     public bool AllowExtraProperties { get; set; } = true;
 
     /// <summary>
     /// The default error behavior. This can be overriden by the individual properties or by the value passed to the EnforceSchema method.
     /// </summary>
-    [ConfigProperty(4)]
+    [JsonProperty]
     public ErrorBehavior DefaultErrorBehavior { get; set; } = ErrorBehavior.Fail;
 
     /// <inheritdoc />
@@ -188,92 +186,6 @@ public sealed class Schema
         var resultEntity = new Entity(newProperties);
 
         return Maybe<Entity>.From(resultEntity);
-    }
-
-    /// <summary>
-    /// Tries to create a schema from an entity.
-    /// Ignores unexpected properties.
-    /// </summary>
-    public static Result<Schema, IErrorBuilder> TryCreateFromEntity(Entity entity)
-    {
-        var results = new List<Result<Unit, IErrorBuilder>>();
-        var schema  = new Schema();
-
-        results.Add(entity.TrySetString(false, nameof(Name), s => schema.Name = s));
-
-        results.Add(
-            entity.TrySetBoolean(
-                true,
-                nameof(AllowExtraProperties),
-                s => schema.AllowExtraProperties = s
-            )
-        );
-
-        results.Add(
-            entity.TrySetEnum<ErrorBehavior>(
-                true,
-                nameof(DefaultErrorBehavior),
-                eb => schema.DefaultErrorBehavior = eb
-            )
-        );
-
-        results.Add(
-            entity.TrySetDictionary(
-                true,
-                nameof(Properties),
-                ev =>
-                {
-                    var childEntity = ev.TryGetEntity();
-
-                    if (childEntity.HasValue)
-                        return SchemaProperty.TryCreateFromEntity(childEntity.Value);
-
-                    return new ErrorBuilder(
-                        ErrorCode.InvalidCast,
-                        ev,
-                        nameof(SchemaProperty)
-                    );
-                },
-                d => schema.Properties = d
-            )
-        );
-
-        var r = results.Combine(ErrorBuilderList.Combine)
-            .Map(_ => schema);
-
-        return r;
-    }
-
-    /// <summary>
-    /// Converts a schema to an entity for deserialization
-    /// </summary>
-    public Entity ConvertToEntity()
-    {
-        var propertiesEntity =
-            new Entity(
-                Properties.Select(
-                    (x, i) =>
-                        new EntityProperty(
-                            x.Key,
-                            new EntityValue(x.Value.ConvertToEntity()),
-                            null,
-                            i
-                        )
-                )
-            );
-
-        var topProperties = new[]
-        {
-            (nameof(Name), EntityValue.CreateFromObject(Name)),
-            (nameof(AllowExtraProperties), EntityValue.CreateFromObject(AllowExtraProperties)), (
-                nameof(DefaultErrorBehavior),
-                EntityValue.CreateFromObject(DefaultErrorBehavior)),
-            (nameof(Properties), EntityValue.CreateFromObject(propertiesEntity)),
-        }.Select((x, i) => new EntityProperty(x.Item1, x.Item2, null, i));
-
-        var entity = new Entity(topProperties);
-
-        return entity;
     }
 }
 

@@ -1,4 +1,7 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics;
+using System.Reflection;
+using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.TestHarness;
 
@@ -13,7 +16,15 @@ public partial class
     {
         get
         {
-            var coreEntity = Entity.Create(("Name", "Reductech.EDR.Core"), ("Version", "0.6.0"));
+            var coreAssembly = Assembly.GetAssembly(typeof(IStep));
+            var fileVersion  = FileVersionInfo.GetVersionInfo(coreAssembly!.Location);
+
+            var version = fileVersion.ProductVersion;
+
+            var coreEntity = Entity.Create(
+                ("Name", "Reductech.EDR.Core"),
+                ("Version", version)
+            ); //This version number need to be bumped
 
             yield return new StepCase(
                 "Core",

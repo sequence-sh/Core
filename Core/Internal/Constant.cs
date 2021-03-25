@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
+using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Internal.Serialization;
 using Reductech.EDR.Core.Util;
@@ -52,9 +53,6 @@ public abstract record ConstantBase<T>(T Value) : IStep<T>, IConstantStep
     public Result<Unit, IError> Verify(SCLSettings settings) => Unit.Default;
 
     /// <inheritdoc />
-    public Configuration? Configuration { get; set; }
-
-    /// <inheritdoc />
     public TextLocation? TextLocation { get; set; }
 
     /// <inheritdoc />
@@ -73,6 +71,15 @@ public abstract record ConstantBase<T>(T Value) : IStep<T>, IConstantStep
     }
 
     /// <inheritdoc />
+    public Maybe<EntityValue> TryConvertToEntityValue() => ToEntityValue();
+
+    /// <summary>
+    /// Converts this to an EntityValue
+    /// </summary>
+    /// <returns></returns>
+    protected abstract EntityValue ToEntityValue();
+
+    /// <inheritdoc />
     public bool ShouldBracketWhenSerialized => false;
 }
 
@@ -87,6 +94,9 @@ public record StringConstant
 
     /// <inheritdoc />
     public override string Serialize() => Value.Serialize();
+
+    /// <inheritdoc />
+    protected override EntityValue ToEntityValue() => new(Value.GetString());
 }
 
 /// <summary>
@@ -99,6 +109,9 @@ public record IntConstant(int Value) : ConstantBase<int>(Value)
 
     /// <inheritdoc />
     public override string Serialize() => Value.ToString();
+
+    /// <inheritdoc />
+    protected override EntityValue ToEntityValue() => new(Value);
 }
 
 /// <summary>
@@ -111,6 +124,9 @@ public record DoubleConstant(double Value) : ConstantBase<double>(Value)
 
     /// <inheritdoc />
     public override string Serialize() => Value.ToString(Constants.DoubleFormat);
+
+    /// <inheritdoc />
+    protected override EntityValue ToEntityValue() => new(Value);
 }
 
 /// <summary>
@@ -123,6 +139,9 @@ public record BoolConstant(bool Value) : ConstantBase<bool>(Value)
 
     /// <inheritdoc />
     public override string Serialize() => Value.ToString();
+
+    /// <inheritdoc />
+    protected override EntityValue ToEntityValue() => new(Value);
 }
 
 /// <summary>
@@ -134,7 +153,7 @@ public record EnumConstant<T>(T Value) : ConstantBase<T>(Value) where T : Enum
     public override IFreezableStep Unfreeze()
     {
         return new EnumConstantFreezable(
-            new Enumeration(typeof(T).Name, Value.ToString()),
+            ToEnumeration(),
             TextLocation
         );
     }
@@ -142,9 +161,13 @@ public record EnumConstant<T>(T Value) : ConstantBase<T>(Value) where T : Enum
     /// <inheritdoc />
     public override string Serialize()
     {
-        var enumeration = new Enumeration(typeof(T).Name, Value.ToString());
-        return enumeration.ToString();
+        return ToEnumeration().ToString();
     }
+
+    private Enumeration ToEnumeration() => new(typeof(T).Name, Value.ToString());
+
+    /// <inheritdoc />
+    protected override EntityValue ToEntityValue() => new(ToEnumeration());
 }
 
 /// <summary>
@@ -157,6 +180,9 @@ public record DateTimeConstant(DateTime Value) : ConstantBase<DateTime>(Value)
 
     /// <inheritdoc />
     public override string Serialize() => Value.ToString(Constants.DateTimeFormat);
+
+    /// <inheritdoc />
+    protected override EntityValue ToEntityValue() => new(Value);
 }
 
 /// <summary>
@@ -169,6 +195,9 @@ public record EntityConstant(Entity Value) : ConstantBase<Entity>(Value)
 
     /// <inheritdoc />
     public override string Serialize() => Value.Serialize();
+
+    /// <inheritdoc />
+    protected override EntityValue ToEntityValue() => new(Value);
 }
 
 }

@@ -15,7 +15,6 @@ namespace Reductech.EDR.Core.Internal
 public sealed record CompoundFreezableStep(
         string StepName,
         FreezableStepData FreezableStepData,
-        Configuration? StepConfiguration,
         TextLocation? TextLocation) : IFreezableStep
     #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
 {
@@ -91,8 +90,7 @@ public sealed record CompoundFreezableStep(
         if (other is CompoundFreezableStep fs)
         {
             return StepName.Equals(fs.StepName, StringComparison.OrdinalIgnoreCase) &&
-                   FreezableStepData.Equals(fs.FreezableStepData) &&
-                   Equals(StepConfiguration, fs.StepConfiguration);
+                   FreezableStepData.Equals(fs.FreezableStepData);
         }
 
         return false;
@@ -101,8 +99,7 @@ public sealed record CompoundFreezableStep(
     /// <inheritdoc />
     public override int GetHashCode() => HashCode.Combine(
         StepName,
-        FreezableStepData,
-        StepConfiguration
+        FreezableStepData
     );
 }
 

@@ -68,7 +68,7 @@ public sealed class FreezableStepProperty :
 
         return Result.Failure<VariableName, IError>(
             ErrorHelper.WrongParameterTypeError(propertyName, MemberType, MemberType.VariableName)
-                .WithLocation(Location)
+                .WithLocation(Location ?? ErrorLocation.EmptyLocation)
         );
     }
 
@@ -82,7 +82,7 @@ public sealed class FreezableStepProperty :
 
         return Result.Failure<IReadOnlyList<IFreezableStep>, IError>(
             ErrorHelper.WrongParameterTypeError(propertyName, MemberType, MemberType.StepList)
-                .WithLocation(Location)
+                .WithLocation(Location ?? ErrorLocation.EmptyLocation)
         );
     }
 
@@ -103,7 +103,7 @@ public sealed class FreezableStepProperty :
             MapStepListToArray(stepList);
 
         IFreezableStep MapStepListToArray(ImmutableList<IFreezableStep> stepList) =>
-            FreezableFactory.CreateFreezableList(stepList, null, Location);
+            FreezableFactory.CreateFreezableList(stepList, Location);
 
         IFreezableStep MapVariableName(VariableName vn) =>
             FreezableFactory.CreateFreezableGetVariable(vn, Location);

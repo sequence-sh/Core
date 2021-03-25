@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using OneOf;
 using Reductech.EDR.Core.Attributes;
+using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Internal.Logging;
 using Reductech.EDR.Core.Util;
@@ -100,11 +101,6 @@ public abstract class CompoundStep<T> : ICompoundStep<T>
     public override string ToString() => Name;
 
     /// <summary>
-    /// Configuration for this step.
-    /// </summary>
-    public Configuration? Configuration { get; set; }
-
-    /// <summary>
     /// The text location for this step.
     /// </summary>
     public TextLocation? TextLocation { get; set; }
@@ -143,6 +139,9 @@ public abstract class CompoundStep<T> : ICompoundStep<T>
             }
         }
     }
+
+    /// <inheritdoc />
+    public virtual Maybe<EntityValue> TryConvertToEntityValue() => Maybe<EntityValue>.None;
 
     /// <inheritdoc />
     public virtual bool ShouldBracketWhenSerialized => true;
@@ -238,7 +237,6 @@ public abstract class CompoundStep<T> : ICompoundStep<T>
     public IFreezableStep Unfreeze() => new CompoundFreezableStep(
         StepFactory.TypeName,
         FreezableStepData,
-        Configuration,
         TextLocation
     );
 

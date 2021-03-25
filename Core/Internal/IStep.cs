@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
+using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Util;
 
@@ -59,6 +60,11 @@ public interface IStep
     /// Requirements for this step that can only be determined at runtime.
     /// </summary>
     IEnumerable<Requirement> RuntimeRequirements { get; }
+
+    /// <summary>
+    /// If this step has a constant, state-independent value, calculate it.
+    /// </summary>
+    Maybe<EntityValue> TryConvertToEntityValue();
 }
 
 /// <summary>
