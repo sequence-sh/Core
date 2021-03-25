@@ -136,7 +136,6 @@ public static class SCLParsing
             var sequence = CreateFreezableSequence(
                 result.Value.SkipLast(1).ToList(),
                 result.Value.Last(),
-                null,
                 new TextLocation(context)
             );
 
@@ -214,7 +213,6 @@ public static class SCLParsing
             var step = CreateFreezableArrayAccess(
                 arrayResult.Value,
                 indexerResult.Value,
-                null,
                 new TextLocation(context)
             );
 
@@ -432,7 +430,6 @@ public static class SCLParsing
             var freezableStep =
                 CreateFreezableInterpolatedString(
                     steps,
-                    null,
                     new TextLocation(context)
                 );
 
@@ -579,7 +576,7 @@ public static class SCLParsing
 
             var fsd = new FreezableStepData(dict, new TextLocation(context));
 
-            var cfs = new CompoundFreezableStep(name, fsd, null, location);
+            var cfs = new CompoundFreezableStep(name, fsd, location);
 
             return new FreezableStepProperty(cfs, new TextLocation(context));
         }
@@ -622,7 +619,7 @@ public static class SCLParsing
 
             var fsd = new FreezableStepData(dict, new TextLocation(context));
 
-            var cfs = new CompoundFreezableStep(name, fsd, null, location);
+            var cfs = new CompoundFreezableStep(name, fsd, location);
 
             return new FreezableStepProperty(cfs, new TextLocation(context));
         }

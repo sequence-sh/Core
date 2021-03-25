@@ -52,9 +52,6 @@ public abstract record ConstantBase<T>(T Value) : IStep<T>, IConstantStep
     public Result<Unit, IError> Verify(SCLSettings settings) => Unit.Default;
 
     /// <inheritdoc />
-    public Configuration? Configuration { get; set; }
-
-    /// <inheritdoc />
     public TextLocation? TextLocation { get; set; }
 
     /// <inheritdoc />

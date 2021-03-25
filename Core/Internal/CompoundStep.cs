@@ -100,11 +100,6 @@ public abstract class CompoundStep<T> : ICompoundStep<T>
     public override string ToString() => Name;
 
     /// <summary>
-    /// Configuration for this step.
-    /// </summary>
-    public Configuration? Configuration { get; set; }
-
-    /// <summary>
     /// The text location for this step.
     /// </summary>
     public TextLocation? TextLocation { get; set; }
@@ -238,7 +233,6 @@ public abstract class CompoundStep<T> : ICompoundStep<T>
     public IFreezableStep Unfreeze() => new CompoundFreezableStep(
         StepFactory.TypeName,
         FreezableStepData,
-        Configuration,
         TextLocation
     );
 
