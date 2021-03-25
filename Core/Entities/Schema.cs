@@ -187,61 +187,6 @@ public sealed class Schema : IEntityConvertible
 
         return Maybe<Entity>.From(resultEntity);
     }
-
-    ///// <summary>
-    ///// Tries to create a schema from an entity.
-    ///// Ignores unexpected properties.
-    ///// </summary>
-    //public static Result<Schema, IErrorBuilder> TryCreateFromEntity(Entity entity)
-    //{
-    //    try
-    //    {
-    //        var json = JsonConvert.SerializeObject(
-    //            entity,
-    //            Formatting.None,
-    //            EntityJsonConverter.Instance
-    //        );
-
-    //        var schema = JsonConvert.DeserializeObject<Schema>(json);
-    //        return schema;
-    //    }
-    //    catch (Exception e)
-    //    {
-    //        return ErrorCode.CannotConvertNestedEntity.ToErrorBuilder(e);
-    //    }
-    //}
-
-    ///// <summary>
-    ///// Converts a schema to an entity for deserialization
-    ///// </summary>
-    //public Entity ConvertToEntity()
-    //{
-    //    var propertiesEntity =
-    //        new Entity(
-    //            Properties.Select(
-    //                (x, i) =>
-    //                    new EntityProperty(
-    //                        x.Key,
-    //                        new EntityValue(x.Value.ConvertToEntity()),
-    //                        null,
-    //                        i
-    //                    )
-    //            )
-    //        );
-
-    //    var topProperties = new[]
-    //    {
-    //        (nameof(Name), EntityValue.CreateFromObject(Name)),
-    //        (nameof(AllowExtraProperties), EntityValue.CreateFromObject(AllowExtraProperties)), (
-    //            nameof(DefaultErrorBehavior),
-    //            EntityValue.CreateFromObject(DefaultErrorBehavior)),
-    //        (nameof(Properties), EntityValue.CreateFromObject(propertiesEntity)),
-    //    }.Select((x, i) => new EntityProperty(x.Item1, x.Item2, null, i));
-
-    //    var entity = new Entity(topProperties);
-
-    //    return entity;
-    //}
 }
 
 }

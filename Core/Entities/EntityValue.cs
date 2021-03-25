@@ -146,6 +146,8 @@ public sealed class EntityValue : OneOfBase<DBNull, string, int, double, bool, E
             case StringStream ss1: return Create(ss1.GetString(), multiValueDelimiter);
             case string s:         return Create(s,               multiValueDelimiter);
             case int i:            return new EntityValue(i);
+            case byte @byte:       return new EntityValue(@byte);
+            case short @short:     return new EntityValue(@short);
             case bool b:           return new EntityValue(b);
             case double d:         return new EntityValue(d);
             case long ln when ln < int.MaxValue && ln > int.MinValue:

@@ -62,15 +62,17 @@ public static class EntityConversionHelpers
 
         var i = 0;
 
-        foreach (var propertyInfo in properties.Where(
-            x => x.GetCustomAttributes<JsonPropertyAttribute>()
-                .Any()
-        ))
+        foreach (var propertyInfo in properties)
         {
             var value = propertyInfo.GetValue(obj);
-            var ev    = EntityValue.CreateFromObject(value);
-            var ep    = new EntityProperty(propertyInfo.Name, ev, null, i);
-            props.Add(ep);
+
+            if (value is not null)
+            {
+                var ev = EntityValue.CreateFromObject(value);
+                var ep = new EntityProperty(propertyInfo.Name, ev, null, i);
+                props.Add(ep);
+            }
+
             i++;
         }
 

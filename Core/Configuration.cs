@@ -10,7 +10,7 @@ namespace Reductech.EDR.Core
 /// Additional configuration that may be needed in some use cases.
 /// </summary>
 [Serializable]
-public sealed class Configuration
+public sealed class Configuration : IEntityConvertible
 {
     /// <summary>
     /// Additional requirements, beyond the default for this step.

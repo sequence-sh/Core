@@ -15,7 +15,7 @@ namespace Reductech.EDR.Core
 /// A requirement of a step.
 /// </summary>
 [Serializable]
-public sealed class Requirement
+public sealed class Requirement : IEntityConvertible
 {
     /// <summary>
     /// The name of the required software.
