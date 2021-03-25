@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using CSharpFunctionalExtensions;
-using Reductech.EDR.Core.Attributes;
+using Newtonsoft.Json;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Util;
 
@@ -19,7 +19,7 @@ public sealed class Requirement
     /// <summary>
     /// The name of the required software.
     /// </summary>
-    [ConfigProperty(1)]
+    [JsonProperty]
     [Required]
     #pragma warning disable 8618
     public string Name { get; set; }
@@ -28,23 +28,25 @@ public sealed class Requirement
     /// <summary>
     /// The minimum required version. Inclusive.
     /// </summary>
-    [ConfigProperty(1)]
+    [JsonProperty]
     public Version? MinVersion { get; set; }
 
     /// <summary>
     /// The version above the highest allowed version.
     /// </summary>
-    [ConfigProperty(1)]
+    [JsonProperty]
     public Version? MaxVersion { get; set; }
 
     /// <summary>
     /// Notes on the requirement.
     /// </summary>
+    [JsonProperty]
     public string? Notes { get; set; }
 
     /// <summary>
     /// Required Features
     /// </summary>
+    [JsonProperty]
     public IReadOnlyList<string>? Features { get; set; }
 
     /// <summary>

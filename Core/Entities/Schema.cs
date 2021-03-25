@@ -2,13 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using CSharpFunctionalExtensions;
-using Microsoft.Extensions.Logging;
-using Reductech.EDR.Core.Attributes;
+using Newtonsoft.Json;
 using Reductech.EDR.Core.Enums;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Internal.Logging;
-using Reductech.EDR.Core.Util;
 
 namespace Reductech.EDR.Core.Entities
 {
@@ -22,26 +20,25 @@ public sealed class Schema
     /// <summary>
     /// The name of the schema.
     /// </summary>
-    [ConfigProperty(1)]
+    [JsonProperty]
     public string Name { get; set; } = null!;
 
     /// <summary>
     /// The schema properties.
     /// </summary>
-    [ConfigProperty(2)]
-    public Dictionary<string, SchemaProperty> Properties { get; set; } =
-        null!; //public setter for deserialization
+    [JsonProperty]
+    public Dictionary<string, SchemaProperty> Properties { get; set; } = null!;
 
     /// <summary>
     /// Whether properties other than the explicitly defined properties are allowed.
     /// </summary>
-    [ConfigProperty(3)]
+    [JsonProperty]
     public bool AllowExtraProperties { get; set; } = true;
 
     /// <summary>
     /// The default error behavior. This can be overriden by the individual properties or by the value passed to the EnforceSchema method.
     /// </summary>
-    [ConfigProperty(4)]
+    [JsonProperty]
     public ErrorBehavior DefaultErrorBehavior { get; set; } = ErrorBehavior.Fail;
 
     /// <inheritdoc />
@@ -196,52 +193,21 @@ public sealed class Schema
     /// </summary>
     public static Result<Schema, IErrorBuilder> TryCreateFromEntity(Entity entity)
     {
-        var results = new List<Result<Unit, IErrorBuilder>>();
-        var schema  = new Schema();
+        try
+        {
+            var json = JsonConvert.SerializeObject(
+                entity,
+                Formatting.None,
+                EntityJsonConverter.Instance
+            );
 
-        results.Add(entity.TrySetString(false, nameof(Name), s => schema.Name = s));
-
-        results.Add(
-            entity.TrySetBoolean(
-                true,
-                nameof(AllowExtraProperties),
-                s => schema.AllowExtraProperties = s
-            )
-        );
-
-        results.Add(
-            entity.TrySetEnum<ErrorBehavior>(
-                true,
-                nameof(DefaultErrorBehavior),
-                eb => schema.DefaultErrorBehavior = eb
-            )
-        );
-
-        results.Add(
-            entity.TrySetDictionary(
-                true,
-                nameof(Properties),
-                ev =>
-                {
-                    var childEntity = ev.TryGetEntity();
-
-                    if (childEntity.HasValue)
-                        return SchemaProperty.TryCreateFromEntity(childEntity.Value);
-
-                    return new ErrorBuilder(
-                        ErrorCode.InvalidCast,
-                        ev,
-                        nameof(SchemaProperty)
-                    );
-                },
-                d => schema.Properties = d
-            )
-        );
-
-        var r = results.Combine(ErrorBuilderList.Combine)
-            .Map(_ => schema);
-
-        return r;
+            var schema = JsonConvert.DeserializeObject<Schema>(json);
+            return schema;
+        }
+        catch (Exception e)
+        {
+            return ErrorCode.CannotConvertNestedEntity.ToErrorBuilder(e);
+        }
     }
 
     /// <summary>
