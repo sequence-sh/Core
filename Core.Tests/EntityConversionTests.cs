@@ -1,9 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using CSharpFunctionalExtensions;
 using FluentAssertions;
 using Reductech.EDR.Core.Entities;
+using Reductech.EDR.Core.Internal;
+using Reductech.EDR.Core.Internal.Parser;
 using Reductech.EDR.Core.TestHarness;
 using Xunit;
+using Xunit.Sdk;
 
 namespace Reductech.EDR.Core.Tests
 {
@@ -42,10 +46,28 @@ public class EntityConversionTests
         s.Should().Be(TestConfigurationString);
     }
 
+    private static Entity CreateEntityFromString(string s)
+    {
+        var parseResult =
+            SCLParsing.ParseSequence(s)
+                .Bind(
+                    x => x.TryFreeze(
+                        TypeReference.Actual.Entity,
+                        StepFactoryStore.CreateUsingReflection()
+                    )
+                );
+
+        parseResult.ShouldBeSuccessful(x => x.AsString);
+
+        if (parseResult.Value is CreateEntityStep ec) { return null; }
+
+        throw new XunitException($"Could not parse {s} as entity");
+    }
+
     [Fact]
     public void EntityShouldConvertToConfigurationCorrectly()
     {
-        var entity = new Entity(new List<EntityProperty>());
+        var entity = CreateEntityFromString(TestConfigurationString);
 
         var configurationResult =
             EntityConversionHelpers.TryCreateFromEntity<Configuration>(entity);

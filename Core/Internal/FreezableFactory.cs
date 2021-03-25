@@ -23,7 +23,6 @@ public static class FreezableFactory
     public static IFreezableStep CreateFreezableArrayAccess(
         IFreezableStep entityOrArray,
         IFreezableStep indexer,
-        Configuration? configuration,
         TextLocation? location)
     {
         var entityGetValueDict = new StepParameterDict
@@ -43,7 +42,6 @@ public static class FreezableFactory
         var entityGetValueStep = new CompoundFreezableStep(
             "EntityGetValue",
             entityGetValueData,
-            configuration,
             location
         );
 
@@ -64,7 +62,6 @@ public static class FreezableFactory
         var elementAtStep = new CompoundFreezableStep(
             ElementAtIndexStepFactory.Instance.TypeName,
             elementAtData,
-            configuration,
             location
         );
 
@@ -77,7 +74,6 @@ public static class FreezableFactory
     /// </summary>
     public static IFreezableStep CreateFreezableInterpolatedString(
         IEnumerable<IFreezableStep> steps,
-        Configuration? configuration,
         TextLocation? location)
     {
         var dict = new StepParameterDict
@@ -93,7 +89,6 @@ public static class FreezableFactory
         return new CompoundFreezableStep(
             nameof(StringInterpolate),
             fpd,
-            configuration,
             location
         );
     }
@@ -104,7 +99,6 @@ public static class FreezableFactory
     public static IFreezableStep CreateFreezableSequence(
         IEnumerable<IFreezableStep> steps,
         IFreezableStep finalStep,
-        Configuration? configuration,
         TextLocation? location)
     {
         var dict = new StepParameterDict
@@ -124,7 +118,6 @@ public static class FreezableFactory
         return new CompoundFreezableStep(
             SequenceStepFactory.Instance.TypeName,
             fpd,
-            configuration,
             location
         );
     }
@@ -149,7 +142,6 @@ public static class FreezableFactory
         var step = new CompoundFreezableStep(
             GetVariableStepFactory.Instance.TypeName,
             fpd,
-            null,
             location
         );
 
@@ -175,7 +167,6 @@ public static class FreezableFactory
         var step = new CompoundFreezableStep(
             SetVariableStepFactory.Instance.TypeName,
             fpd,
-            null,
             location
         );
 
@@ -196,7 +187,7 @@ public static class FreezableFactory
         };
 
         var fpd  = new FreezableStepData(dict, location);
-        var step = new CompoundFreezableStep(NotStepFactory.Instance.TypeName, fpd, null, location);
+        var step = new CompoundFreezableStep(NotStepFactory.Instance.TypeName, fpd, location);
 
         return step;
     }
@@ -206,7 +197,6 @@ public static class FreezableFactory
     /// </summary>
     public static IFreezableStep CreateFreezableList(
         ImmutableList<IFreezableStep> elements,
-        Configuration? configuration,
         TextLocation? location)
     {
         var dict = new StepParameterDict
@@ -222,7 +212,6 @@ public static class FreezableFactory
         return new CompoundFreezableStep(
             ArrayNewStepFactory.Instance.TypeName,
             fpd,
-            configuration,
             location
         );
     }
@@ -286,7 +275,7 @@ public static class InfixHelper
                 textLocation
             );
 
-            var step = new CompoundFreezableStep(stepName, data, null, textLocation);
+            var step = new CompoundFreezableStep(stepName, data, textLocation);
             freezableSteps.Add(step);
         }
 

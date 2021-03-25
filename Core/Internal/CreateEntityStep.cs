@@ -81,9 +81,6 @@ public record CreateEntityStep
     }
 
     /// <inheritdoc />
-    public Configuration? Configuration { get; set; }
-
-    /// <inheritdoc />
     public TextLocation? TextLocation { get; set; }
 
     /// <inheritdoc />
