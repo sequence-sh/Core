@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
 
@@ -8,6 +9,7 @@ namespace Reductech.EDR.Core
 /// <summary>
 /// Additional configuration that may be needed in some use cases.
 /// </summary>
+[Serializable]
 public sealed class Configuration
 {
     /// <summary>

@@ -14,6 +14,7 @@ namespace Reductech.EDR.Core
 /// <summary>
 /// A requirement of a step.
 /// </summary>
+[Serializable]
 public sealed class Requirement
 {
     /// <summary>
