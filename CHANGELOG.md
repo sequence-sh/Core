@@ -1,5 +1,12 @@
 # v0.7.0 (2021-03-26)
 
+## Summary of Changes
+
+### Steps
+
+- Added
+  - GetApplicationVersion
+
 ## Issues Closed in this Release
 
 ### New Features
@@ -11,8 +18,8 @@
 ### Bug Fixes
 
 - EntityGetValue returns errors for boolean property values #219
-- Bug: GetConnectorInformation throws exception when application is a single file #216
-- Bug: Numerical operations do not work with doubles #213
+- GetConnectorInformation throws exception when application is a single file #216
+- Numerical operations do not work with doubles #213
 
 # v0.6.0 (2021-03-14)
 
