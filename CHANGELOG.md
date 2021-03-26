@@ -1,3 +1,26 @@
+# v0.7.0 (2021-03-26)
+
+## Summary of Changes
+
+### Steps
+
+- Added
+  - GetApplicationVersion
+
+## Issues Closed in this Release
+
+### New Features
+
+- Create methods to convert Entities to Configuration, Requirement, and Version objects #218
+- Add functionality to help with configuration and requirements. #217
+- Create a GetApplicationVersion Step to help with logging #215
+
+### Bug Fixes
+
+- EntityGetValue returns errors for boolean property values #219
+- GetConnectorInformation throws exception when application is a single file #216
+- Numerical operations do not work with doubles #213
+
 # v0.6.0 (2021-03-14)
 
 ## Summary of Changes
