@@ -61,21 +61,8 @@ public sealed class StringToCase : CompoundStep<StringStream>
     };
 
     /// <inheritdoc />
-    public override IStepFactory StepFactory => StringToCaseStepFactory.Instance;
-}
-
-/// <summary>
-/// Converts a string to a particular case.
-/// </summary>
-public sealed class StringToCaseStepFactory : SimpleStepFactory<StringToCase, StringStream>
-{
-    private StringToCaseStepFactory() { }
-
-    /// <summary>
-    /// The instance.
-    /// </summary>
-    public static SimpleStepFactory<StringToCase, StringStream> Instance { get; } =
-        new StringToCaseStepFactory();
+    public override IStepFactory StepFactory { get; } =
+        new SimpleStepFactory<StringToCase, StringStream>();
 }
 
 }

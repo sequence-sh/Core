@@ -94,29 +94,29 @@ public sealed class EnforceSchema : CompoundStep<Array<Entity>>
     public IStep<ErrorBehavior>? ErrorBehavior { get; set; } = null;
 
     /// <inheritdoc />
-    public override IStepFactory StepFactory => EnforceSchemaStepFactory.Instance;
-}
-
-/// <summary>
-/// Enforce that the schema is valid for all entities
-/// </summary>
-public sealed class EnforceSchemaStepFactory : SimpleStepFactory<EnforceSchema, Array<Entity>>
-{
-    private EnforceSchemaStepFactory() { }
+    public override IStepFactory StepFactory { get; } = EnforceSchemaStepFactory.Instance;
 
     /// <summary>
-    /// The instance
+    /// Enforce that the schema is valid for all entities
     /// </summary>
-    public static SimpleStepFactory<EnforceSchema, Array<Entity>> Instance { get; } =
-        new EnforceSchemaStepFactory();
-
-    /// <inheritdoc />
-    public override IEnumerable<Type> ExtraEnumTypes
+    private sealed class EnforceSchemaStepFactory : SimpleStepFactory<EnforceSchema, Array<Entity>>
     {
-        get
+        private EnforceSchemaStepFactory() { }
+
+        /// <summary>
+        /// The instance
+        /// </summary>
+        public static SimpleStepFactory<EnforceSchema, Array<Entity>> Instance { get; } =
+            new EnforceSchemaStepFactory();
+
+        /// <inheritdoc />
+        public override IEnumerable<Type> ExtraEnumTypes
         {
-            yield return typeof(Multiplicity);
-            yield return typeof(SCLType);
+            get
+            {
+                yield return typeof(Multiplicity);
+                yield return typeof(SCLType);
+            }
         }
     }
 }

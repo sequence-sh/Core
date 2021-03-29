@@ -122,28 +122,9 @@ public partial class GenerateDocumentationTests : StepTestBase<GenerateDocumenta
             ).WithStepFactoryStore(
                 StepFactoryStore.Create(
                     System.Array.Empty<ConnectorInformation>(),
-                    NotStepFactory.Instance
+                    new SimpleStepFactory<Not, bool>()
                 )
             );
-
-            //yield return new StepCase(
-            //    "Generate Math Documentation",
-            //    LogDocumentation,
-            //    Unit.Default,
-            //    ToLogs(
-            //        Entities(
-            //            Contents(mathHeader),
-            //            applyMathOperator,
-            //            File(
-            //                "MathOperator.md",
-            //                "MathOperator",
-            //                "## MathOperator\r\nAn operator that can be applied to two numbers.\r\n\r\n|Name |Summary | |:------:|:--------------------------------------------------------------------------------------------------------:|\r\n|None |Sentinel value |\r\n|Add |Add the left and right operands. |\r\n|Subtract|Subtract the right operand from the left. |\r\n|Multiply|Multiply the left and right operands. |\r\n|Divide |Divide the left operand by the right. Attempting to divide by zero will result in an error. |\r\n|Modulo |Reduce the left operand modulo the right. |\r\n|Power |Raise the left operand to the power of the right. If the right operand is negative, zero will be returned.|",
-            //                "Enums",
-            //                "Enums"
-            //            )
-            //        )
-            //    )
-            //).WithStepFactoryStore(StepFactoryStore.Create(Add.Instance));
 
             yield return new StepCase(
                 "Example step",
@@ -165,7 +146,7 @@ public partial class GenerateDocumentationTests : StepTestBase<GenerateDocumenta
             ).WithStepFactoryStore(
                 StepFactoryStore.Create(
                     System.Array.Empty<ConnectorInformation>(),
-                    NotStepFactory.Instance,
+                    new SimpleStepFactory<Not, bool>(),
                     DocumentationExampleStepFactory.Instance
                 )
             );

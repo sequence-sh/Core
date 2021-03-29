@@ -52,21 +52,8 @@ public sealed class EntityHasProperty : CompoundStep<bool>
     public IStep<StringStream> Property { get; set; } = null!;
 
     /// <inheritdoc />
-    public override IStepFactory StepFactory => EntityHasPropertyStepFactory.Instance;
-}
-
-/// <summary>
-/// Checks if an entity has a particular property.
-/// </summary>
-public sealed class EntityHasPropertyStepFactory : SimpleStepFactory<EntityHasProperty, bool>
-{
-    private EntityHasPropertyStepFactory() { }
-
-    /// <summary>
-    /// The instance.
-    /// </summary>
-    public static SimpleStepFactory<EntityHasProperty, bool> Instance { get; } =
-        new EntityHasPropertyStepFactory();
+    public override IStepFactory StepFactory { get; } =
+        new SimpleStepFactory<EntityHasProperty, bool>();
 }
 
 }

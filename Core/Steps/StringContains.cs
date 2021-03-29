@@ -68,21 +68,8 @@ public sealed class StringContains : CompoundStep<bool>
     public IStep<bool> IgnoreCase { get; set; } = new BoolConstant(false);
 
     /// <inheritdoc />
-    public override IStepFactory StepFactory => StringContainsFactory.Instance;
-}
-
-/// <summary>
-/// Returns true if the String contains the substring.
-/// </summary>
-public sealed class StringContainsFactory : SimpleStepFactory<StringContains, bool>
-{
-    private StringContainsFactory() { }
-
-    /// <summary>
-    /// The instance.
-    /// </summary>
-    public static SimpleStepFactory<StringContains, bool> Instance { get; } =
-        new StringContainsFactory();
+    public override IStepFactory StepFactory { get; } =
+        new SimpleStepFactory<StringContains, bool>();
 }
 
 }

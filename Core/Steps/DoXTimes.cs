@@ -51,20 +51,7 @@ public sealed class DoXTimes : CompoundStep<Unit>
     }
 
     /// <inheritdoc />
-    public override IStepFactory StepFactory => DoXTimesStepFactory.Instance;
-}
-
-/// <summary>
-/// Repeat a step a set number of times.
-/// </summary>
-public sealed class DoXTimesStepFactory : SimpleStepFactory<DoXTimes, Unit>
-{
-    private DoXTimesStepFactory() { }
-
-    /// <summary>
-    /// The instance.
-    /// </summary>
-    public static SimpleStepFactory<DoXTimes, Unit> Instance { get; } = new DoXTimesStepFactory();
+    public override IStepFactory StepFactory { get; } = new SimpleStepFactory<DoXTimes, Unit>();
 }
 
 }

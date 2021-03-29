@@ -37,21 +37,8 @@ public sealed class StringIsEmpty : CompoundStep<bool>
     public IStep<StringStream> String { get; set; } = null!;
 
     /// <inheritdoc />
-    public override IStepFactory StepFactory => StringIsEmptyStepFactory.Instance;
-}
-
-/// <summary>
-/// Returns whether a string is empty.
-/// </summary>
-public sealed class StringIsEmptyStepFactory : SimpleStepFactory<StringIsEmpty, bool>
-{
-    private StringIsEmptyStepFactory() { }
-
-    /// <summary>
-    /// The instance
-    /// </summary>
-    public static SimpleStepFactory<StringIsEmpty, bool> Instance { get; } =
-        new StringIsEmptyStepFactory();
+    public override IStepFactory StepFactory { get; } =
+        new SimpleStepFactory<StringIsEmpty, bool>();
 }
 
 }

@@ -52,39 +52,40 @@ public sealed class Repeat<T> : CompoundStep<Array<T>>
 
     /// <inheritdoc />
     public override IStepFactory StepFactory => RepeatStepFactory.Instance;
-}
-
-/// <summary>
-/// Creates an array by repeating an element.
-/// </summary>
-public sealed class RepeatStepFactory : GenericStepFactory
-{
-    private RepeatStepFactory() { }
 
     /// <summary>
-    /// The instance.
+    /// Creates an array by repeating an element.
     /// </summary>
-    public static GenericStepFactory Instance { get; } = new RepeatStepFactory();
-
-    /// <inheritdoc />
-    public override Type StepType => typeof(Repeat<>);
-
-    /// <inheritdoc />
-    public override string OutputTypeExplanation => "ArrayList<T>";
-
-    /// <inheritdoc />
-    protected override TypeReference GetOutputTypeReference(TypeReference memberTypeReference) =>
-        new TypeReference.Array(memberTypeReference);
-
-    /// <inheritdoc />
-    protected override Result<TypeReference, IError> GetGenericTypeParameter(
-        TypeReference expectedTypeReference,
-        FreezableStepData freezableStepData,
-        TypeResolver typeResolver)
+    private sealed class RepeatStepFactory : GenericStepFactory
     {
-        return freezableStepData
-            .TryGetStep(nameof(Repeat<object>.Element), StepType)
-            .Bind(x => x.TryGetOutputTypeReference(TypeReference.Any.Instance, typeResolver));
+        private RepeatStepFactory() { }
+
+        /// <summary>
+        /// The instance.
+        /// </summary>
+        public static GenericStepFactory Instance { get; } = new RepeatStepFactory();
+
+        /// <inheritdoc />
+        public override Type StepType => typeof(Repeat<>);
+
+        /// <inheritdoc />
+        public override string OutputTypeExplanation => "ArrayList<T>";
+
+        /// <inheritdoc />
+        protected override TypeReference
+            GetOutputTypeReference(TypeReference memberTypeReference) =>
+            new TypeReference.Array(memberTypeReference);
+
+        /// <inheritdoc />
+        protected override Result<TypeReference, IError> GetGenericTypeParameter(
+            TypeReference expectedTypeReference,
+            FreezableStepData freezableStepData,
+            TypeResolver typeResolver)
+        {
+            return freezableStepData
+                .TryGetStep(nameof(Repeat<object>.Element), StepType)
+                .Bind(x => x.TryGetOutputTypeReference(TypeReference.Any.Instance, typeResolver));
+        }
     }
 }
 

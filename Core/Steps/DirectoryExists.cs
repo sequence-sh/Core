@@ -40,21 +40,8 @@ public class DirectoryExists : CompoundStep<bool>
     }
 
     /// <inheritdoc />
-    public override IStepFactory StepFactory => DirectoryExistsStepFactory.Instance;
-}
-
-/// <summary>
-/// Returns whether a directory on the file system exists.
-/// </summary>
-public class DirectoryExistsStepFactory : SimpleStepFactory<DirectoryExists, bool>
-{
-    private DirectoryExistsStepFactory() { }
-
-    /// <summary>
-    /// The instance.
-    /// </summary>
-    public static SimpleStepFactory<DirectoryExists, bool> Instance { get; } =
-        new DirectoryExistsStepFactory();
+    public override IStepFactory StepFactory { get; } =
+        new SimpleStepFactory<DirectoryExists, bool>();
 }
 
 }

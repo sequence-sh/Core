@@ -44,20 +44,7 @@ public sealed class FromIDX : CompoundStep<Entity>
     public IStep<StringStream> Stream { get; set; } = null!;
 
     /// <inheritdoc />
-    public override IStepFactory StepFactory => FromIDXStepFactory.Instance;
-}
-
-/// <summary>
-/// Create an entity from an IDX Stream
-/// </summary>
-public sealed class FromIDXStepFactory : SimpleStepFactory<FromIDX, Entity>
-{
-    private FromIDXStepFactory() { }
-
-    /// <summary>
-    /// The Instance
-    /// </summary>
-    public static SimpleStepFactory<FromIDX, Entity> Instance { get; } = new FromIDXStepFactory();
+    public override IStepFactory StepFactory { get; } = new SimpleStepFactory<FromIDX, Entity>();
 }
 
 }

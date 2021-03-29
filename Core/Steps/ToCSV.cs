@@ -104,21 +104,8 @@ public sealed class ToCSV : CompoundStep<StringStream>
         new StringConstant(new StringStream("O"));
 
     /// <inheritdoc />
-    public override IStepFactory StepFactory => ToCSVFactory.Instance;
-}
-
-/// <summary>
-/// Write entities to a stream in CSV format.
-/// The same as ToConcordance but with different default values.
-/// </summary>
-public sealed class ToCSVFactory : SimpleStepFactory<ToCSV, StringStream>
-{
-    private ToCSVFactory() { }
-
-    /// <summary>
-    /// The instance.
-    /// </summary>
-    public static SimpleStepFactory<ToCSV, StringStream> Instance { get; } = new ToCSVFactory();
+    public override IStepFactory StepFactory { get; } =
+        new SimpleStepFactory<ToCSV, StringStream>();
 }
 
 }

@@ -66,21 +66,8 @@ public sealed class GetSubstring : CompoundStep<StringStream>
     }
 
     /// <inheritdoc />
-    public override IStepFactory StepFactory => GetSubstringStepFactory.Instance;
-}
-
-/// <summary>
-/// Gets a substring from a string.
-/// </summary>
-public sealed class GetSubstringStepFactory : SimpleStepFactory<GetSubstring, StringStream>
-{
-    private GetSubstringStepFactory() { }
-
-    /// <summary>
-    /// The instance.
-    /// </summary>
-    public static SimpleStepFactory<GetSubstring, StringStream> Instance { get; } =
-        new GetSubstringStepFactory();
+    public override IStepFactory StepFactory { get; } =
+        new SimpleStepFactory<GetSubstring, StringStream>();
 }
 
 }

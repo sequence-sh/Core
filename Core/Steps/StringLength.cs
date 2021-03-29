@@ -29,8 +29,6 @@ public sealed class StringLength : CompoundStep<int>
         var str = await String.Run(stateMonad, cancellationToken)
             .Map(async x => await x.GetStringAsync());
 
-        ;
-
         if (str.IsFailure)
             return str.ConvertFailure<int>();
 
@@ -38,21 +36,7 @@ public sealed class StringLength : CompoundStep<int>
     }
 
     /// <inheritdoc />
-    public override IStepFactory StepFactory => StringLengthStepFactory.Instance;
-}
-
-/// <summary>
-/// Calculates the length of the string.
-/// </summary>
-public sealed class StringLengthStepFactory : SimpleStepFactory<StringLength, int>
-{
-    private StringLengthStepFactory() { }
-
-    /// <summary>
-    /// The instance
-    /// </summary>
-    public static SimpleStepFactory<StringLength, int> Instance { get; } =
-        new StringLengthStepFactory();
+    public override IStepFactory StepFactory { get; } = new SimpleStepFactory<StringLength, int>();
 }
 
 }

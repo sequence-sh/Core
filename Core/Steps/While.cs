@@ -56,20 +56,7 @@ public sealed class While : CompoundStep<Unit>
     public IStep<Unit> Action { get; set; } = null!;
 
     /// <inheritdoc />
-    public override IStepFactory StepFactory => WhileStepFactory.Instance;
-}
-
-/// <summary>
-/// Repeat an action while the condition is met.
-/// </summary>
-public sealed class WhileStepFactory : SimpleStepFactory<While, Unit>
-{
-    private WhileStepFactory() { }
-
-    /// <summary>
-    /// The instance.
-    /// </summary>
-    public static SimpleStepFactory<While, Unit> Instance { get; } = new WhileStepFactory();
+    public override IStepFactory StepFactory { get; } = new SimpleStepFactory<While, Unit>();
 }
 
 }

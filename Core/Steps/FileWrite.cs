@@ -78,20 +78,7 @@ public sealed class FileWrite : CompoundStep<Unit>
     public IStep<bool> Compress { get; set; } = new BoolConstant(false);
 
     /// <inheritdoc />
-    public override IStepFactory StepFactory => FileWriteStepFactory.Instance;
-}
-
-/// <summary>
-/// Writes a file to the local file system.
-/// </summary>
-public sealed class FileWriteStepFactory : SimpleStepFactory<FileWrite, Unit>
-{
-    private FileWriteStepFactory() { }
-
-    /// <summary>
-    /// The instance.
-    /// </summary>
-    public static SimpleStepFactory<FileWrite, Unit> Instance { get; } = new FileWriteStepFactory();
+    public override IStepFactory StepFactory { get; } = new SimpleStepFactory<FileWrite, Unit>();
 }
 
 }

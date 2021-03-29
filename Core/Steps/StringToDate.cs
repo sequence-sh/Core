@@ -129,21 +129,8 @@ public sealed class StringToDate : CompoundStep<DateTime>
     }
 
     /// <inheritdoc />
-    public override IStepFactory StepFactory => StringToDateStepFactory.Instance;
-}
-
-/// <summary>
-/// Parses a string and returns a DateTime object.
-/// </summary>
-public sealed class StringToDateStepFactory : SimpleStepFactory<StringToDate, DateTime>
-{
-    private StringToDateStepFactory() { }
-
-    /// <summary>
-    /// The instance.
-    /// </summary>
-    public static SimpleStepFactory<StringToDate, DateTime> Instance { get; } =
-        new StringToDateStepFactory();
+    public override IStepFactory StepFactory { get; } =
+        new SimpleStepFactory<StringToDate, DateTime>();
 }
 
 }

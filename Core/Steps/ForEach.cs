@@ -86,41 +86,42 @@ public sealed class ForEach<T> : CompoundStep<Unit>
 
     /// <inheritdoc />
     public override IStepFactory StepFactory => ForEachStepFactory.Instance;
-}
-
-/// <summary>
-/// Do an action for each member of the list.
-/// </summary>
-public sealed class ForEachStepFactory : ArrayStepFactory
-{
-    private ForEachStepFactory() { }
 
     /// <summary>
-    /// The instance.
+    /// Do an action for each member of the list.
     /// </summary>
-    public static StepFactory Instance { get; } = new ForEachStepFactory();
-
-    /// <inheritdoc />
-    public override Type StepType => typeof(ForEach<>);
-
-    /// <inheritdoc />
-    protected override TypeReference GetOutputTypeReference(TypeReference memberTypeReference) =>
-        TypeReference.Unit.Instance;
-
-    /// <inheritdoc />
-    protected override Result<TypeReference, IErrorBuilder> GetExpectedArrayTypeReference(
-        TypeReference expectedTypeReference)
+    private sealed class ForEachStepFactory : ArrayStepFactory
     {
-        return expectedTypeReference
-            .CheckAllows(TypeReference.Unit.Instance, StepType)
-            .Map(_ => new TypeReference.Array(TypeReference.Any.Instance) as TypeReference);
+        private ForEachStepFactory() { }
+
+        /// <summary>
+        /// The instance.
+        /// </summary>
+        public static StepFactory Instance { get; } = new ForEachStepFactory();
+
+        /// <inheritdoc />
+        public override Type StepType => typeof(ForEach<>);
+
+        /// <inheritdoc />
+        protected override TypeReference
+            GetOutputTypeReference(TypeReference memberTypeReference) =>
+            TypeReference.Unit.Instance;
+
+        /// <inheritdoc />
+        protected override Result<TypeReference, IErrorBuilder> GetExpectedArrayTypeReference(
+            TypeReference expectedTypeReference)
+        {
+            return expectedTypeReference
+                .CheckAllows(TypeReference.Unit.Instance, StepType)
+                .Map(_ => new TypeReference.Array(TypeReference.Any.Instance) as TypeReference);
+        }
+
+        /// <inheritdoc />
+        protected override string ArrayPropertyName => nameof(ForEach<object>.Array);
+
+        /// <inheritdoc />
+        public override string OutputTypeExplanation => nameof(Unit);
     }
-
-    /// <inheritdoc />
-    protected override string ArrayPropertyName => nameof(ForEach<object>.Array);
-
-    /// <inheritdoc />
-    public override string OutputTypeExplanation => nameof(Unit);
 }
 
 }

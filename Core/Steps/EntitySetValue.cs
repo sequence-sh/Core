@@ -73,53 +73,54 @@ public sealed class EntitySetValue<T> : CompoundStep<Entity>
 
     /// <inheritdoc />
     public override IStepFactory StepFactory => EntitySetValueStepFactory.Instance;
-}
-
-/// <summary>
-/// Returns a copy of the entity with this property set.
-/// Will add a new property if the property is not already present.
-/// </summary>
-public sealed class EntitySetValueStepFactory : GenericStepFactory
-{
-    private EntitySetValueStepFactory() { }
 
     /// <summary>
-    /// The instance.
+    /// Returns a copy of the entity with this property set.
+    /// Will add a new property if the property is not already present.
     /// </summary>
-    public static GenericStepFactory Instance { get; } = new EntitySetValueStepFactory();
-
-    /// <inheritdoc />
-    public override Type StepType => typeof(EntitySetValue<>);
-
-    /// <inheritdoc />
-    public override string OutputTypeExplanation => nameof(Entity);
-
-    /// <inheritdoc />
-    protected override TypeReference GetOutputTypeReference(TypeReference memberTypeReference) =>
-        TypeReference.Actual.Entity;
-
-    /// <inheritdoc />
-    protected override Result<TypeReference, IError> GetGenericTypeParameter(
-        TypeReference expectedTypeReference,
-        FreezableStepData freezableStepData,
-        TypeResolver typeResolver)
+    private sealed class EntitySetValueStepFactory : GenericStepFactory
     {
-        if (!expectedTypeReference.Allow(TypeReference.Actual.Entity))
+        private EntitySetValueStepFactory() { }
+
+        /// <summary>
+        /// The instance.
+        /// </summary>
+        public static GenericStepFactory Instance { get; } = new EntitySetValueStepFactory();
+
+        /// <inheritdoc />
+        public override Type StepType => typeof(EntitySetValue<>);
+
+        /// <inheritdoc />
+        public override string OutputTypeExplanation => nameof(Entity);
+
+        /// <inheritdoc />
+        protected override TypeReference
+            GetOutputTypeReference(TypeReference memberTypeReference) =>
+            TypeReference.Actual.Entity;
+
+        /// <inheritdoc />
+        protected override Result<TypeReference, IError> GetGenericTypeParameter(
+            TypeReference expectedTypeReference,
+            FreezableStepData freezableStepData,
+            TypeResolver typeResolver)
         {
-            return Result.Failure<TypeReference, IError>(
-                ErrorCode.WrongParameterType.ToErrorBuilder(
-                        StepType.Name,
-                        nameof(Entity),
-                        expectedTypeReference.Name
-                    )
-                    .WithLocation(freezableStepData)
-            );
+            if (!expectedTypeReference.Allow(TypeReference.Actual.Entity))
+            {
+                return Result.Failure<TypeReference, IError>(
+                    ErrorCode.WrongParameterType.ToErrorBuilder(
+                            StepType.Name,
+                            nameof(Entity),
+                            expectedTypeReference.Name
+                        )
+                        .WithLocation(freezableStepData)
+                );
+            }
+
+            var r1 = freezableStepData.TryGetStep(nameof(EntitySetValue<object>.Value), StepType)
+                .Bind(x => x.TryGetOutputTypeReference(TypeReference.Any.Instance, typeResolver));
+
+            return r1;
         }
-
-        var r1 = freezableStepData.TryGetStep(nameof(EntitySetValue<object>.Value), StepType)
-            .Bind(x => x.TryGetOutputTypeReference(TypeReference.Any.Instance, typeResolver));
-
-        return r1;
     }
 }
 

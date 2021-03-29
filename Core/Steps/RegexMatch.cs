@@ -70,21 +70,7 @@ public sealed class RegexMatch : CompoundStep<bool>
     public IStep<bool> IgnoreCase { get; set; } = new BoolConstant(false);
 
     /// <inheritdoc />
-    public override IStepFactory StepFactory => RegexMatchFactory.Instance;
-}
-
-/// <summary>
-/// Returns true if a string is matched by a particular regular expression
-/// </summary>
-public sealed class RegexMatchFactory : SimpleStepFactory<RegexMatch, bool>
-{
-    private RegexMatchFactory() { }
-
-    /// <summary>
-    /// The instance.
-    /// </summary>
-    public static SimpleStepFactory<RegexMatch, bool> Instance { get; } =
-        new RegexMatchFactory();
+    public override IStepFactory StepFactory { get; } = new SimpleStepFactory<RegexMatch, bool>();
 }
 
 }

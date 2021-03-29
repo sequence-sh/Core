@@ -40,21 +40,7 @@ public class FileExists : CompoundStep<bool>
     }
 
     /// <inheritdoc />
-    public override IStepFactory StepFactory => FileExistsStepFactory.Instance;
-}
-
-/// <summary>
-/// Returns whether a file on the file system exists.
-/// </summary>
-public class FileExistsStepFactory : SimpleStepFactory<FileExists, bool>
-{
-    private FileExistsStepFactory() { }
-
-    /// <summary>
-    /// The instance.
-    /// </summary>
-    public static SimpleStepFactory<FileExists, bool> Instance { get; } =
-        new FileExistsStepFactory();
+    public override IStepFactory StepFactory { get; } = new SimpleStepFactory<FileExists, bool>();
 }
 
 }

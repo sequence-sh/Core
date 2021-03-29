@@ -15,7 +15,7 @@ namespace Reductech.EDR.Core.Steps
 /// Splits a string.
 /// </summary>
 [Alias("SplitString")]
-public sealed class StringSplit : CompoundStep<Core.Array<StringStream>>
+public sealed class StringSplit : CompoundStep<Array<StringStream>>
 {
     /// <summary>
     /// The string to split.
@@ -32,7 +32,7 @@ public sealed class StringSplit : CompoundStep<Core.Array<StringStream>>
     public IStep<StringStream> Delimiter { get; set; } = null!;
 
     /// <inheritdoc />
-    protected override async Task<Result<Core.Array<StringStream>, IError>> Run(
+    protected override async Task<Result<Array<StringStream>, IError>> Run(
         IStateMonad stateMonad,
         CancellationToken cancellationToken)
     {
@@ -40,13 +40,13 @@ public sealed class StringSplit : CompoundStep<Core.Array<StringStream>>
             .Map(async x => await x.GetStringAsync());
 
         if (stringResult.IsFailure)
-            return stringResult.ConvertFailure<Core.Array<StringStream>>();
+            return stringResult.ConvertFailure<Array<StringStream>>();
 
         var delimiterResult = await Delimiter.Run(stateMonad, cancellationToken)
             .Map(async x => await x.GetStringAsync());
 
         if (delimiterResult.IsFailure)
-            return delimiterResult.ConvertFailure<Core.Array<StringStream>>();
+            return delimiterResult.ConvertFailure<Array<StringStream>>();
 
         var results = stringResult.Value
             .Split(new[] { delimiterResult.Value }, StringSplitOptions.None)
@@ -58,21 +58,8 @@ public sealed class StringSplit : CompoundStep<Core.Array<StringStream>>
     }
 
     /// <inheritdoc />
-    public override IStepFactory StepFactory => StringSplitStepFactory.Instance;
-}
-
-/// <summary>
-/// Splits a string.
-/// </summary>
-public class StringSplitStepFactory : SimpleStepFactory<StringSplit, Core.Array<StringStream>>
-{
-    private StringSplitStepFactory() { }
-
-    /// <summary>
-    /// The instance.
-    /// </summary>
-    public static SimpleStepFactory<StringSplit, Core.Array<StringStream>> Instance { get; } =
-        new StringSplitStepFactory();
+    public override IStepFactory StepFactory { get; } =
+        new SimpleStepFactory<StringSplit, Array<StringStream>>();
 }
 
 }

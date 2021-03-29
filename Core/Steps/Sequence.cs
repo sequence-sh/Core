@@ -53,40 +53,40 @@ public sealed class Sequence<T> : CompoundStep<T>
     [StepProperty(2)]
     [Required]
     public IStep<T> FinalStep { get; set; } = null!;
-}
-
-/// <summary>
-/// A sequence of steps to be run one after the other.
-/// </summary>
-public sealed class SequenceStepFactory : GenericStepFactory
-{
-    private SequenceStepFactory() { }
 
     /// <summary>
-    /// The instance.
+    /// A sequence of steps to be run one after the other.
     /// </summary>
-    public static StepFactory Instance { get; } = new SequenceStepFactory();
+    private sealed class SequenceStepFactory : GenericStepFactory
+    {
+        private SequenceStepFactory() { }
 
-    /// <inheritdoc />
-    public override Type StepType => typeof(Sequence<>);
+        /// <summary>
+        /// The instance.
+        /// </summary>
+        public static StepFactory Instance { get; } = new SequenceStepFactory();
 
-    /// <inheritdoc />
-    protected override TypeReference GetOutputTypeReference(TypeReference memberTypeReference) =>
-        memberTypeReference;
+        /// <inheritdoc />
+        public override Type StepType => typeof(Sequence<>);
 
-    /// <inheritdoc />
-    protected override Result<TypeReference, IError> GetGenericTypeParameter(
-        TypeReference expectedTypeReference,
-        FreezableStepData freezableStepData,
-        TypeResolver typeResolver) => freezableStepData
-        .TryGetStep(nameof(Sequence<object>.FinalStep), StepType)
-        .Bind(x => x.TryGetOutputTypeReference(TypeReference.Any.Instance, typeResolver));
+        /// <inheritdoc />
+        protected override TypeReference
+            GetOutputTypeReference(TypeReference memberTypeReference) => memberTypeReference;
 
-    /// <inheritdoc />
-    public override string OutputTypeExplanation => "The same type as the final step";
+        /// <inheritdoc />
+        protected override Result<TypeReference, IError> GetGenericTypeParameter(
+            TypeReference expectedTypeReference,
+            FreezableStepData freezableStepData,
+            TypeResolver typeResolver) => freezableStepData
+            .TryGetStep(nameof(Sequence<object>.FinalStep), StepType)
+            .Bind(x => x.TryGetOutputTypeReference(TypeReference.Any.Instance, typeResolver));
 
-    /// <inheritdoc />
-    public override IStepSerializer Serializer { get; } = SequenceSerializer.Instance;
+        /// <inheritdoc />
+        public override string OutputTypeExplanation => "The same type as the final step";
+
+        /// <inheritdoc />
+        public override IStepSerializer Serializer { get; } = SequenceSerializer.Instance;
+    }
 }
 
 }

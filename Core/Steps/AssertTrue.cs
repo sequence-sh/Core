@@ -33,7 +33,7 @@ public sealed class AssertTrue : CompoundStep<Unit>
     }
 
     /// <inheritdoc />
-    public override IStepFactory StepFactory => AssertTrueStepFactory.Instance;
+    public override IStepFactory StepFactory { get; } = new SimpleStepFactory<AssertTrue, Unit>();
 
     /// <summary>
     /// The bool to test.
@@ -41,20 +41,6 @@ public sealed class AssertTrue : CompoundStep<Unit>
     [StepProperty(1)]
     [Required]
     public IStep<bool> Boolean { get; set; } = null!;
-}
-
-/// <summary>
-/// Returns an error if the nested step does not return true.
-/// </summary>
-public sealed class AssertTrueStepFactory : SimpleStepFactory<AssertTrue, Unit>
-{
-    private AssertTrueStepFactory() { }
-
-    /// <summary>
-    /// The instance.
-    /// </summary>
-    public static SimpleStepFactory<AssertTrue, Unit> Instance { get; } =
-        new AssertTrueStepFactory();
 }
 
 }

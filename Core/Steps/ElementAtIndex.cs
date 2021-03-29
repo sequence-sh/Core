@@ -61,42 +61,42 @@ public sealed class ElementAtIndex<T> : CompoundStep<T>
 
     /// <inheritdoc />
     public override bool ShouldBracketWhenSerialized => false;
-}
-
-/// <summary>
-/// Gets the array element at a particular index.
-/// </summary>
-public sealed class ElementAtIndexStepFactory : ArrayStepFactory
-{
-    private ElementAtIndexStepFactory() { }
 
     /// <summary>
-    /// The instance.
+    /// Gets the array element at a particular index.
     /// </summary>
-    public static GenericStepFactory Instance { get; } = new ElementAtIndexStepFactory();
-
-    /// <inheritdoc />
-    public override Type StepType => typeof(ElementAtIndex<>);
-
-    /// <inheritdoc />
-    public override string OutputTypeExplanation => "T";
-
-    /// <inheritdoc />
-    public override IStepSerializer Serializer => ElementAtIndexSerializer.Instance;
-
-    /// <inheritdoc />
-    protected override TypeReference GetOutputTypeReference(TypeReference memberTypeReference) =>
-        memberTypeReference;
-
-    /// <inheritdoc />
-    protected override Result<TypeReference, IErrorBuilder> GetExpectedArrayTypeReference(
-        TypeReference expectedTypeReference)
+    private sealed class ElementAtIndexStepFactory : ArrayStepFactory
     {
-        return new TypeReference.Array(expectedTypeReference);
-    }
+        private ElementAtIndexStepFactory() { }
 
-    /// <inheritdoc />
-    protected override string ArrayPropertyName => nameof(ElementAtIndex<object>.Array);
+        /// <summary>
+        /// The instance.
+        /// </summary>
+        public static GenericStepFactory Instance { get; } = new ElementAtIndexStepFactory();
+
+        /// <inheritdoc />
+        public override Type StepType => typeof(ElementAtIndex<>);
+
+        /// <inheritdoc />
+        public override string OutputTypeExplanation => "T";
+
+        /// <inheritdoc />
+        public override IStepSerializer Serializer => ElementAtIndexSerializer.Instance;
+
+        /// <inheritdoc />
+        protected override TypeReference
+            GetOutputTypeReference(TypeReference memberTypeReference) => memberTypeReference;
+
+        /// <inheritdoc />
+        protected override Result<TypeReference, IErrorBuilder> GetExpectedArrayTypeReference(
+            TypeReference expectedTypeReference)
+        {
+            return new TypeReference.Array(expectedTypeReference);
+        }
+
+        /// <inheritdoc />
+        protected override string ArrayPropertyName => nameof(ElementAtIndex<object>.Array);
+    }
 }
 
 }

@@ -55,21 +55,8 @@ public sealed class DateToString : CompoundStep<StringStream>
     }
 
     /// <inheritdoc />
-    public override IStepFactory StepFactory => DateToStringStepFactory.Instance;
-}
-
-/// <summary>
-/// Returns the 
-/// </summary>
-public sealed class DateToStringStepFactory : SimpleStepFactory<DateToString, StringStream>
-{
-    private DateToStringStepFactory() { }
-
-    /// <summary>
-    /// The instance.
-    /// </summary>
-    public static SimpleStepFactory<DateToString, StringStream> Instance { get; } =
-        new DateToStringStepFactory();
+    public override IStepFactory StepFactory { get; } =
+        new SimpleStepFactory<DateToString, StringStream>();
 }
 
 }

@@ -52,21 +52,8 @@ public sealed class FindLastSubstring : CompoundStep<int>
     }
 
     /// <inheritdoc />
-    public override IStepFactory StepFactory => FindLastSubstringStepFactory.Instance;
-}
-
-/// <summary>
-/// Gets the last instance of substring in a string.
-/// </summary>
-public sealed class FindLastSubstringStepFactory : SimpleStepFactory<FindLastSubstring, int>
-{
-    private FindLastSubstringStepFactory() { }
-
-    /// <summary>
-    /// The instance
-    /// </summary>
-    public static SimpleStepFactory<FindLastSubstring, int> Instance { get; } =
-        new FindLastSubstringStepFactory();
+    public override IStepFactory StepFactory { get; } =
+        new SimpleStepFactory<FindLastSubstring, int>();
 }
 
 }
