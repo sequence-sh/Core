@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
@@ -33,13 +34,13 @@ public partial class LoggingTests
                 CheckMessageAndScope(
                     LogLevel.Trace,
                     "Log Started with Parameters: [Value, 1]",
-                    "Log"
+                    new[] { "Log" }
                 ),
-                CheckMessageAndScope(LogLevel.Information, "1", "Log"),
+                CheckMessageAndScope(LogLevel.Information, "1", new[] { "Log" }),
                 CheckMessageAndScope(
                     LogLevel.Trace,
                     "Log Completed Successfully with Result: Unit",
-                    "Log"
+                    new[] { "Log" }
                 ),
                 CheckMessageAndScope(LogLevel.Debug, "EDR Sequence Completed", null)
             );
@@ -51,33 +52,33 @@ public partial class LoggingTests
                 CheckMessageAndScope(
                     LogLevel.Trace,
                     "Log Started with Parameters: [Value, Sum]",
-                    "Log"
+                    new[] { "Log" }
                 ),
                 CheckMessageAndScope(
                     LogLevel.Trace,
                     "Sum Started with Parameters: [Terms, ArrayNew]",
-                    "Sum"
+                    new[] { "Log", "Sum", }
                 ),
                 CheckMessageAndScope(
                     LogLevel.Trace,
                     "ArrayNew Started with Parameters: [Elements, 2 Elements]",
-                    "ArrayNew"
+                    new[] { "Log", "Sum", "ArrayNew" }
                 ),
                 CheckMessageAndScope(
                     LogLevel.Trace,
                     "ArrayNew Completed Successfully with Result: 2 Elements",
-                    "ArrayNew"
+                    new[] { "Log", "Sum", "ArrayNew" }
                 ),
                 CheckMessageAndScope(
                     LogLevel.Trace,
                     "Sum Completed Successfully with Result: 2",
-                    "ArrayNew"
+                    new[] { "Log", "Sum" }
                 ),
-                CheckMessageAndScope(LogLevel.Information, "2", null),
+                CheckMessageAndScope(LogLevel.Information, "2", new[] { "Log", }),
                 CheckMessageAndScope(
                     LogLevel.Trace,
                     "Log Completed Successfully with Result: Unit",
-                    null
+                    new[] { "Log", }
                 ),
                 CheckMessageAndScope(LogLevel.Debug, "EDR Sequence Completed", null)
             );
@@ -89,42 +90,42 @@ public partial class LoggingTests
                 CheckMessageAndScope(
                     LogLevel.Trace,
                     "AssertError Started with Parameters: [Step, Log]",
-                    "AssertError"
+                    new[] { "AssertError" }
                 ),
                 CheckMessageAndScope(
                     LogLevel.Trace,
                     "Log Started with Parameters: [Value, Divide]",
-                    "Log"
+                    new[] { "AssertError", "Log" }
                 ),
                 CheckMessageAndScope(
                     LogLevel.Trace,
                     "Divide Started with Parameters: [Terms, ArrayNew]",
-                    "Divide"
+                    new[] { "AssertError", "Log", "Divide" }
                 ),
                 CheckMessageAndScope(
                     LogLevel.Trace,
                     "ArrayNew Started with Parameters: [Elements, 2 Elements]",
-                    "ArrayNew"
+                    new[] { "AssertError", "Log", "Divide", "ArrayNew" }
                 ),
                 CheckMessageAndScope(
                     LogLevel.Trace,
                     "ArrayNew Completed Successfully with Result: 2 Elements",
-                    "ArrayNew"
+                    new[] { "AssertError", "Log", "Divide", "ArrayNew" }
                 ),
                 CheckMessageAndScope(
                     LogLevel.Warning,
                     "Divide Failed with message: Attempt to Divide by Zero.",
-                    "ArrayNew"
+                    new[] { "AssertError", "Log", "Divide" }
                 ),
                 CheckMessageAndScope(
                     LogLevel.Warning,
                     "Log Failed with message: Attempt to Divide by Zero.",
-                    null
+                    new[] { "AssertError", "Log" }
                 ),
                 CheckMessageAndScope(
                     LogLevel.Trace,
                     "AssertError Completed Successfully with Result: Unit",
-                    null
+                    new[] { "AssertError" }
                 ),
                 CheckMessageAndScope(LogLevel.Debug, "EDR Sequence Completed", null)
             );
@@ -137,38 +138,42 @@ public partial class LoggingTests
                     CheckMessageAndScope(
                         LogLevel.Trace,
                         "Log Started with Parameters: [Value, PathCombine]",
-                        null
+                        new[] { "Log" }
                     ),
                     CheckMessageAndScope(
                         LogLevel.Trace,
                         "PathCombine Started with Parameters: [Paths, ArrayNew]",
-                        null
+                        new[] { "Log", "PathCombine" }
                     ),
                     CheckMessageAndScope(
                         LogLevel.Trace,
                         "ArrayNew Started with Parameters: [Elements, 0 Elements]",
-                        null
+                        new[] { "Log", "PathCombine", "ArrayNew" }
                     ),
                     CheckMessageAndScope(
                         LogLevel.Trace,
                         "ArrayNew Completed Successfully with Result: 0 Elements",
-                        null
+                        new[] { "Log", "PathCombine", "ArrayNew" }
                     ),
                     CheckMessageAndScope(
                         LogLevel.Warning,
                         "No path was provided. Returning the Current Directory: MyDir",
-                        null
+                        new[] { "Log", "PathCombine" }
                     ),
                     CheckMessageAndScope(
                         LogLevel.Trace,
                         "PathCombine Completed Successfully with Result: string Length: 5",
-                        null
+                        new[] { "Log", "PathCombine" }
                     ),
-                    CheckMessageAndScope(LogLevel.Information, @"MyDir", null),
+                    CheckMessageAndScope(
+                        LogLevel.Information,
+                        @"MyDir",
+                        new[] { "Log" }
+                    ),
                     CheckMessageAndScope(
                         LogLevel.Trace,
                         "Log Completed Successfully with Result: Unit",
-                        null
+                        new[] { "Log" }
                     ),
                     CheckMessageAndScope(LogLevel.Debug, "EDR Sequence Completed", null)
                 ).WithDirectoryAction(
@@ -183,32 +188,32 @@ public partial class LoggingTests
                     CheckMessageAndScope(
                         LogLevel.Trace,
                         "Log Started with Parameters: [Value, PathCombine]",
-                        null
+                        new[] { "Log" }
                     ),
                     CheckMessageAndScope(
                         LogLevel.Trace,
                         "PathCombine Started with Parameters: [Paths, ArrayNew]",
-                        null
+                        new[] { "Log", "PathCombine" }
                     ),
                     CheckMessageAndScope(
                         LogLevel.Trace,
                         "ArrayNew Started with Parameters: [Elements, 1 Elements]",
-                        null
+                        new[] { "Log", "PathCombine", "ArrayNew" }
                     ),
                     CheckMessageAndScope(
                         LogLevel.Trace,
                         "ArrayNew Completed Successfully with Result: 1 Elements",
-                        null
+                        new[] { "Log", "PathCombine", "ArrayNew" }
                     ),
                     CheckMessageAndScope(
                         LogLevel.Debug,
                         "Path MyDir was not fully qualified. Prepending the Current Directory: MyDir",
-                        null
+                        new[] { "Log", "PathCombine" }
                     ),
                     CheckMessageAndScope(
                         LogLevel.Trace,
                         "PathCombine Completed Successfully with Result: string Length: 10",
-                        null
+                        new[] { "Log", "PathCombine", }
                     ),
                     x =>
                     {
@@ -218,7 +223,7 @@ public partial class LoggingTests
                     CheckMessageAndScope(
                         LogLevel.Trace,
                         "Log Completed Successfully with Result: Unit",
-                        null
+                        new[] { "Log" }
                     ),
                     CheckMessageAndScope(LogLevel.Debug, "EDR Sequence Completed", null)
                 )
@@ -234,23 +239,23 @@ public partial class LoggingTests
                 CheckMessageAndScope(
                     LogLevel.Trace,
                     "Log Started with Parameters: [Value, FileRead]",
-                    null
+                    new[] { "Log" }
                 ),
                 CheckMessageAndScope(
                     LogLevel.Trace,
                     "FileRead Started with Parameters: [Path, \"MyFile\"], [Encoding, UTF8], [Decompress, False]",
-                    null
+                    new[] { "Log", "FileRead" }
                 ),
                 CheckMessageAndScope(
                     LogLevel.Trace,
                     "FileRead Completed Successfully with Result: UTF8-Stream",
-                    null
+                    new[] { "Log", "FileRead" }
                 ),
-                CheckMessageAndScope(LogLevel.Information, "MyData", null),
+                CheckMessageAndScope(LogLevel.Information, "MyData", new[] { "Log" }),
                 CheckMessageAndScope(
                     LogLevel.Trace,
                     "Log Completed Successfully with Result: Unit",
-                    null
+                    new[] { "Log" }
                 ),
                 CheckMessageAndScope(LogLevel.Debug, "EDR Sequence Completed", null)
             ).WithFileAction(
@@ -274,16 +279,21 @@ public partial class LoggingTests
     private static Action<LogEntry> CheckMessageAndScope(
         LogLevel logLevel,
         string expectedMessage,
-        string? expectedScope)
+        IReadOnlyList<string>? expectedScopes)
     {
         return entry =>
         {
             entry.LogLevel.Should().Be(logLevel);
             entry.Message.Should().Be(expectedMessage);
 
-            if (expectedScope != null
-            ) //TODO make this parameter not optional once the bug in MELT is fixed
-                entry.Scope.Message.Should().Be(expectedScope);
+            var trueExpectedScopes =
+                expectedScopes is null
+                    ? new List<string>() { "EDR" }
+                    : expectedScopes.Prepend("EDR").ToList();
+
+            entry.Scopes.Select(x => x.Message)
+                .Should()
+                .BeEquivalentTo(trueExpectedScopes);
         };
     }
 
