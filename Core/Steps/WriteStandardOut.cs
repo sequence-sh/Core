@@ -26,11 +26,11 @@ public class WriteStandardOut : CompoundStep<Unit>
         if (data.IsFailure)
             return data.ConvertFailure<Unit>();
 
-        var streamResult = data.Value.GetStream();
+        var (stream, _) = data.Value.GetStream();
 
         try
         {
-            await streamResult.stream.CopyToAsync(
+            await stream.CopyToAsync(
                 stateMonad.ExternalContext.Console.OpenStandardOutput(),
                 cancellationToken
             );

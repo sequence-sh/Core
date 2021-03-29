@@ -205,6 +205,16 @@ public static class Extensions
 
         result.Error.Should().Be(expectedError);
     }
+
+    public static void ShouldHaveValue<T>(this Maybe<T> maybe)
+    {
+        maybe.HasValue.Should().BeTrue("Maybe should have value");
+    }
+
+    public static void ShouldHaveNoValue<T>(this Maybe<T> maybe)
+    {
+        maybe.HasValue.Should().BeFalse("Maybe should have no value");
+    }
 }
 
 }
