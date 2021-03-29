@@ -60,7 +60,7 @@ public static class FreezableFactory
         var elementAtData = new FreezableStepData(elementAtIndexDict, location);
 
         var elementAtStep = new CompoundFreezableStep(
-            ElementAtIndexStepFactory.Instance.TypeName,
+            "ElementAtIndex",
             elementAtData,
             location
         );
@@ -116,7 +116,7 @@ public static class FreezableFactory
         var fpd = new FreezableStepData(dict, location);
 
         return new CompoundFreezableStep(
-            SequenceStepFactory.Instance.TypeName,
+            "Sequence",
             fpd,
             location
         );
@@ -140,7 +140,7 @@ public static class FreezableFactory
         var fpd = new FreezableStepData(dict, location);
 
         var step = new CompoundFreezableStep(
-            GetVariableStepFactory.Instance.TypeName,
+            "GetVariable",
             fpd,
             location
         );
@@ -165,7 +165,7 @@ public static class FreezableFactory
         var fpd = new FreezableStepData(dict, location);
 
         var step = new CompoundFreezableStep(
-            SetVariableStepFactory.Instance.TypeName,
+            "SetVariable",
             fpd,
             location
         );
@@ -187,7 +187,7 @@ public static class FreezableFactory
         };
 
         var fpd  = new FreezableStepData(dict, location);
-        var step = new CompoundFreezableStep(NotStepFactory.Instance.TypeName, fpd, location);
+        var step = new CompoundFreezableStep(nameof(Not), fpd, location);
 
         return step;
     }
@@ -210,7 +210,7 @@ public static class FreezableFactory
         var fpd = new FreezableStepData(dict, location);
 
         return new CompoundFreezableStep(
-            ArrayNewStepFactory.Instance.TypeName,
+            "ArrayNew",
             fpd,
             location
         );

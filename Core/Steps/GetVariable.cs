@@ -36,43 +36,43 @@ public sealed class GetVariable<T> : CompoundStep<T>
 
     /// <inheritdoc />
     public override string Name => Variable == default ? base.Name : $"Get {Variable.Serialize()}";
-}
-
-/// <summary>
-/// Gets the value of a named variable.
-/// </summary>
-public class GetVariableStepFactory : GenericStepFactory
-{
-    private GetVariableStepFactory() { }
 
     /// <summary>
-    /// The Instance.
+    /// Gets the value of a named variable.
     /// </summary>
-    public static GenericStepFactory Instance { get; } = new GetVariableStepFactory();
+    private class GetVariableStepFactory : GenericStepFactory
+    {
+        private GetVariableStepFactory() { }
 
-    /// <inheritdoc />
-    public override Type StepType => typeof(GetVariable<>);
+        /// <summary>
+        /// The Instance.
+        /// </summary>
+        public static GenericStepFactory Instance { get; } = new GetVariableStepFactory();
 
-    /// <inheritdoc />
-    protected override TypeReference GetOutputTypeReference(TypeReference memberTypeReference) =>
-        memberTypeReference;
+        /// <inheritdoc />
+        public override Type StepType => typeof(GetVariable<>);
 
-    /// <inheritdoc />
-    protected override Result<TypeReference, IError> GetGenericTypeParameter(
-        TypeReference expectedTypeReference,
-        FreezableStepData freezableStepData,
-        TypeResolver typeResolver) => freezableStepData
-        .TryGetVariableName(nameof(GetVariable<object>.Variable), StepType)
-        .Map(x => new TypeReference.Variable(x) as TypeReference);
+        /// <inheritdoc />
+        protected override TypeReference
+            GetOutputTypeReference(TypeReference memberTypeReference) => memberTypeReference;
 
-    /// <inheritdoc />
-    public override string OutputTypeExplanation => "T";
+        /// <inheritdoc />
+        protected override Result<TypeReference, IError> GetGenericTypeParameter(
+            TypeReference expectedTypeReference,
+            FreezableStepData freezableStepData,
+            TypeResolver typeResolver) => freezableStepData
+            .TryGetVariableName(nameof(GetVariable<object>.Variable), StepType)
+            .Map(x => new TypeReference.Variable(x) as TypeReference);
 
-    /// <inheritdoc />
-    public override IStepSerializer Serializer => new StepSerializer(
-        TypeName,
-        new StepComponent(nameof(GetVariable<object>.Variable))
-    );
+        /// <inheritdoc />
+        public override string OutputTypeExplanation => "T";
+
+        /// <inheritdoc />
+        public override IStepSerializer Serializer => new StepSerializer(
+            TypeName,
+            new StepComponent(nameof(GetVariable<object>.Variable))
+        );
+    }
 }
 
 }

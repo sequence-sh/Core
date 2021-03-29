@@ -52,22 +52,7 @@ public sealed class FindSubstring : CompoundStep<int>
     }
 
     /// <inheritdoc />
-    public override IStepFactory StepFactory => FindSubstringStepFactory.Instance;
-}
-
-/// <summary>
-/// Gets the first instance of a substring in a string.
-/// Returns -1 if the substring is not present.
-/// </summary>
-public sealed class FindSubstringStepFactory : SimpleStepFactory<FindSubstring, int>
-{
-    private FindSubstringStepFactory() { }
-
-    /// <summary>
-    /// The instance
-    /// </summary>
-    public static SimpleStepFactory<FindSubstring, int> Instance { get; } =
-        new FindSubstringStepFactory();
+    public override IStepFactory StepFactory { get; } = new SimpleStepFactory<FindSubstring, int>();
 }
 
 }

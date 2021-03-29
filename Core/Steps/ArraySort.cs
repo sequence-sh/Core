@@ -113,39 +113,40 @@ public sealed class ArraySort<T> : CompoundStep<Array<T>>
 
     /// <inheritdoc />
     public override IStepFactory StepFactory => ArraySortStepFactory.Instance;
-}
-
-/// <summary>
-/// Reorder an array.
-/// </summary>
-public sealed class ArraySortStepFactory : ArrayStepFactory
-{
-    private ArraySortStepFactory() { }
 
     /// <summary>
-    /// The instance.
+    /// Reorder an array.
     /// </summary>
-    public static GenericStepFactory Instance { get; } = new ArraySortStepFactory();
-
-    /// <inheritdoc />
-    public override Type StepType => typeof(ArraySort<>);
-
-    /// <inheritdoc />
-    protected override TypeReference GetOutputTypeReference(TypeReference memberTypeReference) =>
-        new TypeReference.Array(memberTypeReference);
-
-    /// <inheritdoc />
-    public override string OutputTypeExplanation => "Array<T>";
-
-    /// <inheritdoc />
-    protected override Result<TypeReference, IErrorBuilder> GetExpectedArrayTypeReference(
-        TypeReference expectedTypeReference)
+    private sealed class ArraySortStepFactory : ArrayStepFactory
     {
-        return expectedTypeReference;
-    }
+        private ArraySortStepFactory() { }
 
-    /// <inheritdoc />
-    protected override string ArrayPropertyName => nameof(ArraySort<object>.Array);
+        /// <summary>
+        /// The instance.
+        /// </summary>
+        public static GenericStepFactory Instance { get; } = new ArraySortStepFactory();
+
+        /// <inheritdoc />
+        public override Type StepType => typeof(ArraySort<>);
+
+        /// <inheritdoc />
+        protected override TypeReference
+            GetOutputTypeReference(TypeReference memberTypeReference) =>
+            new TypeReference.Array(memberTypeReference);
+
+        /// <inheritdoc />
+        public override string OutputTypeExplanation => "Array<T>";
+
+        /// <inheritdoc />
+        protected override Result<TypeReference, IErrorBuilder> GetExpectedArrayTypeReference(
+            TypeReference expectedTypeReference)
+        {
+            return expectedTypeReference;
+        }
+
+        /// <inheritdoc />
+        protected override string ArrayPropertyName => nameof(ArraySort<object>.Array);
+    }
 }
 
 }

@@ -53,41 +53,42 @@ public sealed class FindElement<T> : CompoundStep<int>
 
     /// <inheritdoc />
     public override IStepFactory StepFactory => FindElementStepFactory.Instance;
-}
-
-/// <summary>
-/// Gets the first index of an element in an array.
-/// </summary>
-public sealed class FindElementStepFactory : ArrayStepFactory
-{
-    private FindElementStepFactory() { }
 
     /// <summary>
-    /// The instance.
+    /// Gets the first index of an element in an array.
     /// </summary>
-    public static GenericStepFactory Instance { get; } = new FindElementStepFactory();
-
-    /// <inheritdoc />
-    public override Type StepType => typeof(FindElement<>);
-
-    /// <inheritdoc />
-    public override string OutputTypeExplanation => nameof(Int32);
-
-    /// <inheritdoc />
-    protected override TypeReference GetOutputTypeReference(TypeReference memberTypeReference) =>
-        TypeReference.Actual.Integer;
-
-    /// <inheritdoc />
-    protected override Result<TypeReference, IErrorBuilder> GetExpectedArrayTypeReference(
-        TypeReference expectedTypeReference)
+    public sealed class FindElementStepFactory : ArrayStepFactory
     {
-        return expectedTypeReference
-            .CheckAllows(TypeReference.Actual.Integer, StepType)
-            .Map(_ => new TypeReference.Array(TypeReference.Any.Instance) as TypeReference);
-    }
+        private FindElementStepFactory() { }
 
-    /// <inheritdoc />
-    protected override string ArrayPropertyName => nameof(FindElement<object>.Array);
+        /// <summary>
+        /// The instance.
+        /// </summary>
+        public static GenericStepFactory Instance { get; } = new FindElementStepFactory();
+
+        /// <inheritdoc />
+        public override Type StepType => typeof(FindElement<>);
+
+        /// <inheritdoc />
+        public override string OutputTypeExplanation => nameof(Int32);
+
+        /// <inheritdoc />
+        protected override TypeReference
+            GetOutputTypeReference(TypeReference memberTypeReference) =>
+            TypeReference.Actual.Integer;
+
+        /// <inheritdoc />
+        protected override Result<TypeReference, IErrorBuilder> GetExpectedArrayTypeReference(
+            TypeReference expectedTypeReference)
+        {
+            return expectedTypeReference
+                .CheckAllows(TypeReference.Actual.Integer, StepType)
+                .Map(_ => new TypeReference.Array(TypeReference.Any.Instance) as TypeReference);
+        }
+
+        /// <inheritdoc />
+        protected override string ArrayPropertyName => nameof(FindElement<object>.Array);
+    }
 }
 
 }

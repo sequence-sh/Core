@@ -110,39 +110,40 @@ public sealed class ArrayDistinct<T> : CompoundStep<Array<T>>
             new ErrorLocation(this)
         );
     }
-}
-
-/// <summary>
-/// Removes duplicate entities.
-/// </summary>
-public sealed class ArrayDistinctStepFactory : ArrayStepFactory
-{
-    private ArrayDistinctStepFactory() { }
 
     /// <summary>
-    /// The Instance
+    /// Removes duplicate entities.
     /// </summary>
-    public static GenericStepFactory Instance { get; } = new ArrayDistinctStepFactory();
-
-    /// <inheritdoc />
-    protected override TypeReference GetOutputTypeReference(TypeReference memberTypeReference) =>
-        new TypeReference.Array(memberTypeReference);
-
-    /// <inheritdoc />
-    protected override Result<TypeReference, IErrorBuilder> GetExpectedArrayTypeReference(
-        TypeReference expectedTypeReference)
+    private sealed class ArrayDistinctStepFactory : ArrayStepFactory
     {
-        return expectedTypeReference;
+        private ArrayDistinctStepFactory() { }
+
+        /// <summary>
+        /// The Instance
+        /// </summary>
+        public static GenericStepFactory Instance { get; } = new ArrayDistinctStepFactory();
+
+        /// <inheritdoc />
+        protected override TypeReference
+            GetOutputTypeReference(TypeReference memberTypeReference) =>
+            new TypeReference.Array(memberTypeReference);
+
+        /// <inheritdoc />
+        protected override Result<TypeReference, IErrorBuilder> GetExpectedArrayTypeReference(
+            TypeReference expectedTypeReference)
+        {
+            return expectedTypeReference;
+        }
+
+        /// <inheritdoc />
+        protected override string ArrayPropertyName => nameof(ArrayDistinct<object>.Array);
+
+        /// <inheritdoc />
+        public override Type StepType => typeof(ArrayDistinct<>);
+
+        /// <inheritdoc />
+        public override string OutputTypeExplanation => "Array<T>";
     }
-
-    /// <inheritdoc />
-    protected override string ArrayPropertyName => nameof(ArrayDistinct<object>.Array);
-
-    /// <inheritdoc />
-    public override Type StepType => typeof(ArrayDistinct<>);
-
-    /// <inheritdoc />
-    public override string OutputTypeExplanation => "Array<T>";
 }
 
 }

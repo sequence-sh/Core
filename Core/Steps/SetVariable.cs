@@ -43,79 +43,83 @@ public sealed class SetVariable<T> : CompoundStep<Unit>
     [StepProperty(2)]
     [Required]
     public IStep<T> Value { get; set; } = null!;
-}
-
-/// <summary>
-/// Sets the value of a named variable.
-/// </summary>
-public class SetVariableStepFactory : GenericStepFactory
-{
-    private SetVariableStepFactory() { }
 
     /// <summary>
-    /// The instance.
+    /// Sets the value of a named variable.
     /// </summary>
-    public static GenericStepFactory Instance { get; } = new SetVariableStepFactory();
-
-    /// <inheritdoc />
-    public override Type StepType => typeof(SetVariable<>);
-
-    /// <inheritdoc />
-    public override string OutputTypeExplanation => nameof(Unit);
-
-    /// <inheritdoc />
-    protected override TypeReference GetOutputTypeReference(TypeReference memberTypeReference) =>
-        TypeReference.Unit.Instance;
-
-    /// <inheritdoc />
-    protected override Result<TypeReference, IError> GetGenericTypeParameter(
-        TypeReference expectedTypeReference,
-        FreezableStepData freezableStepData,
-        TypeResolver typeResolver)
+    private class SetVariableStepFactory : GenericStepFactory
     {
-        var r =
-            freezableStepData
-                .TryGetStep(nameof(SetVariable<object>.Value), StepType)
-                .Bind(x => x.TryGetOutputTypeReference(TypeReference.Any.Instance, typeResolver));
+        private SetVariableStepFactory() { }
 
-        return r;
-    }
+        /// <summary>
+        /// The instance.
+        /// </summary>
+        public static GenericStepFactory Instance { get; } = new SetVariableStepFactory();
 
-    /// <inheritdoc />
-    public override IEnumerable<(VariableName variableName, TypeReference type)> GetVariablesSet(
-        TypeReference expectedTypeReference,
-        FreezableStepData freezableStepData,
-        TypeResolver typeResolver)
-    {
-        var vn = freezableStepData.TryGetVariableName(
-            nameof(SetVariable<object>.Variable),
-            StepType
+        /// <inheritdoc />
+        public override Type StepType => typeof(SetVariable<>);
+
+        /// <inheritdoc />
+        public override string OutputTypeExplanation => nameof(Unit);
+
+        /// <inheritdoc />
+        protected override TypeReference
+            GetOutputTypeReference(TypeReference memberTypeReference) =>
+            TypeReference.Unit.Instance;
+
+        /// <inheritdoc />
+        protected override Result<TypeReference, IError> GetGenericTypeParameter(
+            TypeReference expectedTypeReference,
+            FreezableStepData freezableStepData,
+            TypeResolver typeResolver)
+        {
+            var r =
+                freezableStepData
+                    .TryGetStep(nameof(SetVariable<object>.Value), StepType)
+                    .Bind(
+                        x => x.TryGetOutputTypeReference(TypeReference.Any.Instance, typeResolver)
+                    );
+
+            return r;
+        }
+
+        /// <inheritdoc />
+        public override IEnumerable<(VariableName variableName, TypeReference type)>
+            GetVariablesSet(
+                TypeReference expectedTypeReference,
+                FreezableStepData freezableStepData,
+                TypeResolver typeResolver)
+        {
+            var vn = freezableStepData.TryGetVariableName(
+                nameof(SetVariable<object>.Variable),
+                StepType
+            );
+
+            if (vn.IsFailure)
+                yield break;
+
+            var memberType = GetGenericTypeParameter(
+                expectedTypeReference,
+                freezableStepData,
+                typeResolver
+            );
+
+            if (memberType.IsFailure)
+                yield return (vn.Value, TypeReference.Unknown.Instance);
+            else
+                yield return (vn.Value, memberType.Value);
+        }
+
+        /// <inheritdoc />
+        public override IStepSerializer Serializer => new StepSerializer(
+            TypeName,
+            new StepComponent(nameof(SetVariable<object>.Variable)),
+            SpaceComponent.Instance,
+            new FixedStringComponent("="),
+            SpaceComponent.Instance,
+            new StepComponent(nameof(SetVariable<object>.Value))
         );
-
-        if (vn.IsFailure)
-            yield break;
-
-        var memberType = GetGenericTypeParameter(
-            expectedTypeReference,
-            freezableStepData,
-            typeResolver
-        );
-
-        if (memberType.IsFailure)
-            yield return (vn.Value, TypeReference.Unknown.Instance);
-        else
-            yield return (vn.Value, memberType.Value);
     }
-
-    /// <inheritdoc />
-    public override IStepSerializer Serializer => new StepSerializer(
-        TypeName,
-        new StepComponent(nameof(SetVariable<object>.Variable)),
-        SpaceComponent.Instance,
-        new FixedStringComponent("="),
-        SpaceComponent.Instance,
-        new StepComponent(nameof(SetVariable<object>.Value))
-    );
 }
 
 }

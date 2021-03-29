@@ -31,27 +31,27 @@ public sealed class Not : CompoundStep<bool>
     [StepProperty(1)]
     [Required]
     public IStep<bool> Boolean { get; set; } = null!;
-}
-
-/// <summary>
-/// Negation of a boolean value.
-/// </summary>
-public class NotStepFactory : SimpleStepFactory<Not, bool>
-{
-    private NotStepFactory() { }
 
     /// <summary>
-    /// The instance.
+    /// Negation of a boolean value.
     /// </summary>
-    public static StepFactory Instance { get; } = new NotStepFactory();
+    private class NotStepFactory : SimpleStepFactory<Not, bool>
+    {
+        private NotStepFactory() { }
 
-    ///// <inheritdoc /> //TODO uncomment
-    //public override IStepSerializer Serializer =>
-    //    new StepSerializer(TypeName, new FixedStringComponent("not"),
-    //    new FixedStringComponent("("),
-    //    new StepComponent(nameof(Not.Boolean)),
-    //    new FixedStringComponent(")")
-    //);
+        /// <summary>
+        /// The instance.
+        /// </summary>
+        public static StepFactory Instance { get; } = new NotStepFactory();
+
+        ///// <inheritdoc /> //TODO uncomment
+        //public override IStepSerializer Serializer =>
+        //    new StepSerializer(TypeName, new FixedStringComponent("not"),
+        //    new FixedStringComponent("("),
+        //    new StepComponent(nameof(Not.Boolean)),
+        //    new FixedStringComponent(")")
+        //);
+    }
 }
 
 }

@@ -57,33 +57,37 @@ public sealed class IncrementVariable : CompoundStep<Unit>
 
     /// <inheritdoc />
     public override IStepFactory StepFactory => IncrementVariableStepFactory.Instance;
-}
-
-/// <summary>
-/// Increment an integer variable by a particular amount
-/// </summary>
-public sealed class IncrementVariableStepFactory : SimpleStepFactory<IncrementVariable, Unit>
-{
-    private IncrementVariableStepFactory() { }
 
     /// <summary>
-    /// The instance.
+    /// Increment an integer variable by a particular amount
     /// </summary>
-    public static SimpleStepFactory<IncrementVariable, Unit> Instance { get; } =
-        new IncrementVariableStepFactory();
-
-    /// <inheritdoc />
-    public override IEnumerable<(VariableName variableName, TypeReference type)> GetVariablesSet(
-        TypeReference expectedTypeReference,
-        FreezableStepData freezableStepData,
-        TypeResolver typeResolver)
+    private sealed class IncrementVariableStepFactory : SimpleStepFactory<IncrementVariable, Unit>
     {
-        var vn = freezableStepData.TryGetVariableName(nameof(IncrementVariable.Variable), StepType);
+        private IncrementVariableStepFactory() { }
 
-        if (vn.IsFailure)
-            yield break;
+        /// <summary>
+        /// The instance.
+        /// </summary>
+        public static SimpleStepFactory<IncrementVariable, Unit> Instance { get; } =
+            new IncrementVariableStepFactory();
 
-        yield return (vn.Value, TypeReference.Actual.Integer);
+        /// <inheritdoc />
+        public override IEnumerable<(VariableName variableName, TypeReference type)>
+            GetVariablesSet(
+                TypeReference expectedTypeReference,
+                FreezableStepData freezableStepData,
+                TypeResolver typeResolver)
+        {
+            var vn = freezableStepData.TryGetVariableName(
+                nameof(IncrementVariable.Variable),
+                StepType
+            );
+
+            if (vn.IsFailure)
+                yield break;
+
+            yield return (vn.Value, TypeReference.Actual.Integer);
+        }
     }
 }
 

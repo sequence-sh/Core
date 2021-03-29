@@ -36,6 +36,10 @@
     </Antlr4>
   </ItemGroup>
 
+  <PropertyGroup>
+    <Antlr4UseCSharpGenerator>True</Antlr4UseCSharpGenerator>
+  </PropertyGroup>
+
   <ItemGroup Condition="'$(CI)' != ''">
     <None Include="Antlr/*" />
   </ItemGroup>

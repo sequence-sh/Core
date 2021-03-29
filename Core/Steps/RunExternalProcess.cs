@@ -92,21 +92,8 @@ public sealed class RunExternalProcess : CompoundStep<Unit>
         new EnumConstant<EncodingEnum>(EncodingEnum.Default);
 
     /// <inheritdoc />
-    public override IStepFactory StepFactory => RunExternalProcessStepFactory.Instance;
-}
-
-/// <summary>
-/// Runs an external executable program.
-/// </summary>
-public sealed class RunExternalProcessStepFactory : SimpleStepFactory<RunExternalProcess, Unit>
-{
-    private RunExternalProcessStepFactory() { }
-
-    /// <summary>
-    /// The instance.
-    /// </summary>
-    public static SimpleStepFactory<RunExternalProcess, Unit> Instance { get; } =
-        new RunExternalProcessStepFactory();
+    public override IStepFactory StepFactory { get; } =
+        new SimpleStepFactory<RunExternalProcess, Unit>();
 }
 
 }

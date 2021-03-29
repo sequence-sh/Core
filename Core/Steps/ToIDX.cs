@@ -60,21 +60,8 @@ public sealed class ToIDX : CompoundStep<StringStream>
     public IStep<bool> ConvertToDocument { get; set; } = new BoolConstant(true);
 
     /// <inheritdoc />
-    public override IStepFactory StepFactory => ToIDXStepFactory.Instance;
-}
-
-/// <summary>
-/// Write entities to a stream in IDX format.
-/// </summary>
-public sealed class ToIDXStepFactory : SimpleStepFactory<ToIDX, StringStream>
-{
-    private ToIDXStepFactory() { }
-
-    /// <summary>
-    /// The instance
-    /// </summary>
-    public static SimpleStepFactory<ToIDX, StringStream> Instance { get; } =
-        new ToIDXStepFactory();
+    public override IStepFactory StepFactory { get; } =
+        new SimpleStepFactory<ToIDX, StringStream>();
 }
 
 }

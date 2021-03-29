@@ -36,40 +36,40 @@ public sealed class ArrayIsEmpty<T> : CompoundStep<bool>
 
     /// <inheritdoc />
     public override IStepFactory StepFactory => ArrayIsEmptyStepFactory.Instance;
-}
-
-/// <summary>
-/// Checks if an array is empty.
-/// </summary>
-public sealed class ArrayIsEmptyStepFactory : ArrayStepFactory
-{
-    private ArrayIsEmptyStepFactory() { }
 
     /// <summary>
-    /// The instance.
+    /// Checks if an array is empty.
     /// </summary>
-    public static GenericStepFactory Instance { get; } = new ArrayIsEmptyStepFactory();
-
-    /// <inheritdoc />
-    public override Type StepType => typeof(ArrayIsEmpty<>);
-
-    /// <inheritdoc />
-    public override string OutputTypeExplanation => nameof(Boolean);
-
-    /// <inheritdoc />
-    protected override TypeReference GetOutputTypeReference(TypeReference memberTypeReference) =>
-        TypeReference.Actual.Bool;
-
-    /// <inheritdoc />
-    protected override string ArrayPropertyName => nameof(ArrayIsEmpty<object>.Array);
-
-    /// <inheritdoc />
-    protected override Result<TypeReference, IErrorBuilder> GetExpectedArrayTypeReference(
-        TypeReference expectedTypeReference)
+    private sealed class ArrayIsEmptyStepFactory : ArrayStepFactory
     {
-        return expectedTypeReference
-            .CheckAllows(TypeReference.Actual.Bool, StepType)
-            .Map(_ => new TypeReference.Array(TypeReference.Any.Instance) as TypeReference);
+        private ArrayIsEmptyStepFactory() { }
+
+        /// <summary>
+        /// The instance.
+        /// </summary>
+        public static GenericStepFactory Instance { get; } = new ArrayIsEmptyStepFactory();
+
+        /// <inheritdoc />
+        public override Type StepType => typeof(ArrayIsEmpty<>);
+
+        /// <inheritdoc />
+        public override string OutputTypeExplanation => nameof(Boolean);
+
+        /// <inheritdoc />
+        protected override TypeReference
+            GetOutputTypeReference(TypeReference memberTypeReference) => TypeReference.Actual.Bool;
+
+        /// <inheritdoc />
+        protected override string ArrayPropertyName => nameof(ArrayIsEmpty<object>.Array);
+
+        /// <inheritdoc />
+        protected override Result<TypeReference, IErrorBuilder> GetExpectedArrayTypeReference(
+            TypeReference expectedTypeReference)
+        {
+            return expectedTypeReference
+                .CheckAllows(TypeReference.Actual.Bool, StepType)
+                .Map(_ => new TypeReference.Array(TypeReference.Any.Instance) as TypeReference);
+        }
     }
 }
 

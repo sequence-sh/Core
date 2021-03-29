@@ -69,21 +69,8 @@ public sealed class PathCombine : CompoundStep<StringStream>
     public IStep<Array<StringStream>> Paths { get; set; } = null!;
 
     /// <inheritdoc />
-    public override IStepFactory StepFactory => PathCombineStepFactory.Instance;
-}
-
-/// <summary>
-/// Combine Paths
-/// </summary>
-public class PathCombineStepFactory : SimpleStepFactory<PathCombine, StringStream>
-{
-    private PathCombineStepFactory() { }
-
-    /// <summary>
-    /// The instance.
-    /// </summary>
-    public static SimpleStepFactory<PathCombine, StringStream> Instance { get; } =
-        new PathCombineStepFactory();
+    public override IStepFactory StepFactory { get; } =
+        new SimpleStepFactory<PathCombine, StringStream>();
 }
 
 }

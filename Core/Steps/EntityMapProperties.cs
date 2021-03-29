@@ -87,21 +87,8 @@ public class EntityMapProperties : CompoundStep<Array<Entity>>
     public IStep<Entity> Mappings { get; set; } = null!;
 
     /// <inheritdoc />
-    public override IStepFactory StepFactory => EntityMapPropertiesStepFactory.Instance;
-}
-
-/// <summary>
-/// Change the name of entity fields.
-/// </summary>
-public class EntityMapPropertiesStepFactory : SimpleStepFactory<EntityMapProperties, Array<Entity>>
-{
-    private EntityMapPropertiesStepFactory() { }
-
-    /// <summary>
-    /// The instance.
-    /// </summary>
-    public static SimpleStepFactory<EntityMapProperties, Array<Entity>> Instance { get; } =
-        new EntityMapPropertiesStepFactory();
+    public override IStepFactory StepFactory { get; } =
+        new SimpleStepFactory<EntityMapProperties, Array<Entity>>();
 }
 
 }

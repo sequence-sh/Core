@@ -33,7 +33,7 @@ public sealed class AssertError : CompoundStep<Unit>
     }
 
     /// <inheritdoc />
-    public override IStepFactory StepFactory => AssertErrorStepFactory.Instance;
+    public override IStepFactory StepFactory { get; } = new SimpleStepFactory<AssertError, Unit>();
 
     /// <summary>
     /// The step to test.
@@ -41,20 +41,6 @@ public sealed class AssertError : CompoundStep<Unit>
     [StepProperty(1)]
     [Required]
     public IStep<Unit> Step { get; set; } = null!;
-}
-
-/// <summary>
-/// Returns success if the ValueIf step returns an error and a failure otherwise.
-/// </summary>
-public sealed class AssertErrorStepFactory : SimpleStepFactory<AssertError, Unit>
-{
-    private AssertErrorStepFactory() { }
-
-    /// <summary>
-    /// The instance.
-    /// </summary>
-    public static SimpleStepFactory<AssertError, Unit> Instance { get; } =
-        new AssertErrorStepFactory();
 }
 
 }

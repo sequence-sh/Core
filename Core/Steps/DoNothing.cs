@@ -26,20 +26,7 @@ public class DoNothing : CompoundStep<Unit>
     public override bool ShouldBracketWhenSerialized => false;
 
     /// <inheritdoc />
-    public override IStepFactory StepFactory => DoNothingStepFactory.Instance;
-}
-
-/// <summary>
-/// Does nothing.
-/// </summary>
-public class DoNothingStepFactory : SimpleStepFactory<DoNothing, Unit>
-{
-    private DoNothingStepFactory() { }
-
-    /// <summary>
-    /// This instance.
-    /// </summary>
-    public static SimpleStepFactory<DoNothing, Unit> Instance { get; } = new DoNothingStepFactory();
+    public override IStepFactory StepFactory { get; } = new SimpleStepFactory<DoNothing, Unit>();
 }
 
 }

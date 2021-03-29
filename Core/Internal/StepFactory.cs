@@ -449,12 +449,18 @@ public abstract class StepFactory : IStepFactory
             if (errors.Any())
                 return Result.Failure<Unit, IError>(ErrorList.Combine(errors));
 
-            object array = ArrayNewStepFactory.CreateArray(list as dynamic);
+            object array = CreateArray(list as dynamic);
 
             propertyInfo.SetValue(parentStep, array);
 
             return Unit.Default;
         }
+    }
+
+    private static ArrayNew<T> CreateArray<T>(List<IStep<T>> list)
+    {
+        var step = ArrayNew<T>.CreateArray(list);
+        return step;
     }
 
     private static readonly Regex SpaceRegex = new(@"\s+", RegexOptions.Compiled);

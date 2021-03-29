@@ -54,21 +54,8 @@ public sealed class CharAtIndex : CompoundStep<StringStream>
     }
 
     /// <inheritdoc />
-    public override IStepFactory StepFactory => CharAtIndexStepFactory.Instance;
-}
-
-/// <summary>
-/// Gets the letters that appears at a specific index
-/// </summary>
-public sealed class CharAtIndexStepFactory : SimpleStepFactory<CharAtIndex, StringStream>
-{
-    private CharAtIndexStepFactory() { }
-
-    /// <summary>
-    /// The instance.
-    /// </summary>
-    public static SimpleStepFactory<CharAtIndex, StringStream> Instance { get; } =
-        new CharAtIndexStepFactory();
+    public override IStepFactory StepFactory { get; } =
+        new SimpleStepFactory<CharAtIndex, StringStream>();
 }
 
 }

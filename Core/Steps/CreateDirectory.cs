@@ -44,22 +44,8 @@ public class CreateDirectory : CompoundStep<Unit>
     public IStep<StringStream> Path { get; set; } = null!;
 
     /// <inheritdoc />
-    public override IStepFactory StepFactory => CreateDirectoryStepFactory.Instance;
-}
-
-/// <summary>
-/// Creates a new directory in the file system.
-/// Will create all directories and subdirectories in the specified path unless they already exist.
-/// </summary>
-public class CreateDirectoryStepFactory : SimpleStepFactory<CreateDirectory, Unit>
-{
-    private CreateDirectoryStepFactory() { }
-
-    /// <summary>
-    /// The instance.
-    /// </summary>
-    public static SimpleStepFactory<CreateDirectory, Unit> Instance { get; } =
-        new CreateDirectoryStepFactory();
+    public override IStepFactory StepFactory { get; } =
+        new SimpleStepFactory<CreateDirectory, Unit>();
 }
 
 }

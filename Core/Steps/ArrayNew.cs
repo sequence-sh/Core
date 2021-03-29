@@ -46,9 +46,6 @@ public sealed class ArrayNew<T> : CompoundStep<Array<T>>, IArrayNewStep
     }
 
     /// <inheritdoc />
-    public override IStepFactory StepFactory => ArrayNewStepFactory.Instance;
-
-    /// <inheritdoc />
     public override bool ShouldBracketWhenSerialized => false;
 
     /// <summary>
@@ -78,62 +75,66 @@ public sealed class ArrayNew<T> : CompoundStep<Array<T>>, IArrayNewStep
 
         return new EntityValue(builder.ToImmutable());
     }
-}
-
-/// <summary>
-/// The factory for creating Arrays.
-/// </summary>
-public class ArrayNewStepFactory : GenericStepFactory
-{
-    private ArrayNewStepFactory() { }
-
-    /// <summary>
-    /// The instance.
-    /// </summary>
-    public static GenericStepFactory Instance { get; } = new ArrayNewStepFactory();
-
-    /// <inheritdoc />
-    public override Type StepType => typeof(ArrayNew<>);
-
-    /// <inheritdoc />
-    public override string OutputTypeExplanation => "Array<T>";
-
-    /// <inheritdoc />
-    protected override TypeReference GetOutputTypeReference(TypeReference memberTypeReference) =>
-        new TypeReference.Array(memberTypeReference);
-
-    /// <inheritdoc />
-    protected override Result<TypeReference, IError> GetGenericTypeParameter(
-        TypeReference expectedTypeReference,
-        FreezableStepData freezableStepData,
-        TypeResolver typeResolver)
-    {
-        var mtr = expectedTypeReference.TryGetArrayMemberTypeReference(typeResolver)
-            .MapError(x => x.WithLocation(freezableStepData));
-
-        if (mtr.IsFailure)
-            return mtr.ConvertFailure<TypeReference>();
-
-        var result =
-            freezableStepData.TryGetStepList(nameof(ArrayNew<object>.Elements), StepType)
-                .Bind(
-                    x => x.Select(r => r.TryGetOutputTypeReference(mtr.Value, typeResolver))
-                        .Combine(ErrorList.Combine)
-                )
-                .Map(TypeReference.Create);
-
-        return result;
-    }
-
-    /// <inheritdoc />
-    public override IStepSerializer Serializer => ArraySerializer.Instance;
 
     /// <summary>
     /// Creates an array.
     /// </summary>
-    public static ArrayNew<T> CreateArray<T>(List<IStep<T>> stepList)
+    public static ArrayNew<T> CreateArray(List<IStep<T>> stepList)
     {
         return new() { Elements = stepList };
+    }
+
+    /// <inheritdoc />
+    public override IStepFactory StepFactory => ArrayNewStepFactory.Instance;
+
+    /// <summary>
+    /// The factory for creating Arrays.
+    /// </summary>
+    private class ArrayNewStepFactory : GenericStepFactory
+    {
+        private ArrayNewStepFactory() { }
+
+        /// <summary>
+        /// The instance.
+        /// </summary>
+        public static GenericStepFactory Instance { get; } = new ArrayNewStepFactory();
+
+        /// <inheritdoc />
+        public override Type StepType => typeof(ArrayNew<>);
+
+        /// <inheritdoc />
+        public override string OutputTypeExplanation => "Array<T>";
+
+        /// <inheritdoc />
+        protected override TypeReference
+            GetOutputTypeReference(TypeReference memberTypeReference) =>
+            new TypeReference.Array(memberTypeReference);
+
+        /// <inheritdoc />
+        protected override Result<TypeReference, IError> GetGenericTypeParameter(
+            TypeReference expectedTypeReference,
+            FreezableStepData freezableStepData,
+            TypeResolver typeResolver)
+        {
+            var mtr = expectedTypeReference.TryGetArrayMemberTypeReference(typeResolver)
+                .MapError(x => x.WithLocation(freezableStepData));
+
+            if (mtr.IsFailure)
+                return mtr.ConvertFailure<TypeReference>();
+
+            var result =
+                freezableStepData.TryGetStepList(nameof(ArrayNew<object>.Elements), StepType)
+                    .Bind(
+                        x => x.Select(r => r.TryGetOutputTypeReference(mtr.Value, typeResolver))
+                            .Combine(ErrorList.Combine)
+                    )
+                    .Map(TypeReference.Create);
+
+            return result;
+        }
+
+        /// <inheritdoc />
+        public override IStepSerializer Serializer => ArraySerializer.Instance;
     }
 }
 

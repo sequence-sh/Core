@@ -75,21 +75,7 @@ public class FileExtract : CompoundStep<Unit>
     public IStep<bool> Overwrite { get; set; } = new BoolConstant(false);
 
     /// <inheritdoc />
-    public override IStepFactory StepFactory => FileExtractStepFactory.Instance;
-}
-
-/// <summary>
-/// Extract a file in the file system.
-/// </summary>
-public class FileExtractStepFactory : SimpleStepFactory<FileExtract, Unit>
-{
-    private FileExtractStepFactory() { }
-
-    /// <summary>
-    /// The instance.
-    /// </summary>
-    public static SimpleStepFactory<FileExtract, Unit> Instance { get; } =
-        new FileExtractStepFactory();
+    public override IStepFactory StepFactory { get; } = new SimpleStepFactory<FileExtract, Unit>();
 }
 
 }

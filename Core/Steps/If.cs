@@ -37,9 +37,6 @@ public sealed class If : CompoundStep<Unit>
         return result;
     }
 
-    /// <inheritdoc />
-    public override IStepFactory StepFactory => IfStepFactory.Instance;
-
     /// <summary>
     /// Whether to follow the Then Branch
     /// </summary>
@@ -62,19 +59,9 @@ public sealed class If : CompoundStep<Unit>
     [StepProperty(3)]
     [DefaultValueExplanation("Do Nothing")]
     public IStep<Unit>? Else { get; set; } = null;
-}
 
-/// <summary>
-/// Executes a statement if a condition is true.
-/// </summary>
-public sealed class IfStepFactory : SimpleStepFactory<If, Unit>
-{
-    private IfStepFactory() { }
-
-    /// <summary>
-    /// The instance.
-    /// </summary>
-    public static IfStepFactory Instance { get; } = new();
+    /// <inheritdoc />
+    public override IStepFactory StepFactory { get; } = new SimpleStepFactory<If, Unit>();
 }
 
 }

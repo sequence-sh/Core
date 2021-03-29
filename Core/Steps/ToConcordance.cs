@@ -40,14 +40,15 @@ public sealed class ToConcordance : CompoundStep<StringStream>
     }
 
     /// <inheritdoc />
-    public override IStepFactory StepFactory => ToConcordanceStepFactory.Instance;
+    public override IStepFactory StepFactory { get; } =
+        new SimpleStepFactory<ToConcordance, StringStream>();
 
     /// <summary>
     /// The entities to write.
     /// </summary>
     [StepProperty(1)]
     [Required]
-    public IStep<Core.Array<Entity>> Entities { get; set; } = null!;
+    public IStep<Array<Entity>> Entities { get; set; } = null!;
 
     /// <summary>
     /// How the stream is encoded.
@@ -106,21 +107,6 @@ public sealed class ToConcordance : CompoundStep<StringStream>
     [Log(LogOutputLevel.Trace)]
     public IStep<StringStream> DateTimeFormat { get; set; } =
         new StringConstant(new StringStream("O"));
-}
-
-/// <summary>
-/// Write entities to a stream in concordance format.
-/// The same as ToCSV but with different default values.
-/// </summary>
-public sealed class ToConcordanceStepFactory : SimpleStepFactory<ToConcordance, StringStream>
-{
-    private ToConcordanceStepFactory() { }
-
-    /// <summary>
-    /// The instance.
-    /// </summary>
-    public static SimpleStepFactory<ToConcordance, StringStream> Instance { get; } =
-        new ToConcordanceStepFactory();
 }
 
 }

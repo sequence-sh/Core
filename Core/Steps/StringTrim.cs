@@ -60,21 +60,8 @@ public sealed class StringTrim : CompoundStep<StringStream>
     };
 
     /// <inheritdoc />
-    public override IStepFactory StepFactory => StringTrimStepFactory.Instance;
-}
-
-/// <summary>
-/// Trims a string.
-/// </summary>
-public sealed class StringTrimStepFactory : SimpleStepFactory<StringTrim, StringStream>
-{
-    private StringTrimStepFactory() { }
-
-    /// <summary>
-    /// The instance.
-    /// </summary>
-    public static SimpleStepFactory<StringTrim, StringStream> Instance { get; } =
-        new StringTrimStepFactory();
+    public override IStepFactory StepFactory { get; } =
+        new SimpleStepFactory<StringTrim, StringStream>();
 }
 
 }

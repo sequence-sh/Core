@@ -70,21 +70,8 @@ public sealed class FileRead : CompoundStep<StringStream>
     public IStep<bool> Decompress { get; set; } = new BoolConstant(false);
 
     /// <inheritdoc />
-    public override IStepFactory StepFactory => FileReadStepFactory.Instance;
-}
-
-/// <summary>
-/// Reads text from a file.
-/// </summary>
-public sealed class FileReadStepFactory : SimpleStepFactory<FileRead, StringStream>
-{
-    private FileReadStepFactory() { }
-
-    /// <summary>
-    /// The instance.
-    /// </summary>
-    public static SimpleStepFactory<FileRead, StringStream> Instance { get; } =
-        new FileReadStepFactory();
+    public override IStepFactory StepFactory { get; } =
+        new SimpleStepFactory<FileRead, StringStream>();
 }
 
 }

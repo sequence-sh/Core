@@ -31,9 +31,6 @@ public sealed class ValueIf<T> : CompoundStep<T>
         return result;
     }
 
-    /// <inheritdoc />
-    public override IStepFactory StepFactory => ValueIfStepFactory.Instance;
-
     /// <summary>
     /// Whether to follow the Then Branch
     /// </summary>
@@ -54,44 +51,47 @@ public sealed class ValueIf<T> : CompoundStep<T>
     [StepProperty(3)]
     [Required]
     public IStep<T> Else { get; set; } = null!;
-}
 
-/// <summary>
-/// Returns one result if a condition is true and another if the condition is false.
-/// </summary>
-public sealed class ValueIfStepFactory : GenericStepFactory
-{
-    private ValueIfStepFactory() { }
+    /// <inheritdoc />
+    public override IStepFactory StepFactory => ValueIfStepFactory.Instance;
 
     /// <summary>
-    /// The instance.
+    /// Returns one result if a condition is true and another if the condition is false.
     /// </summary>
-    public static GenericStepFactory Instance { get; } = new ValueIfStepFactory();
+    private sealed class ValueIfStepFactory : GenericStepFactory
+    {
+        private ValueIfStepFactory() { }
 
-    /// <inheritdoc />
-    public override Type StepType => typeof(ValueIf<>);
+        /// <summary>
+        /// The instance.
+        /// </summary>
+        public static GenericStepFactory Instance { get; } = new ValueIfStepFactory();
 
-    /// <inheritdoc />
-    public override string OutputTypeExplanation => "T";
+        /// <inheritdoc />
+        public override Type StepType => typeof(ValueIf<>);
 
-    /// <inheritdoc />
-    protected override TypeReference GetOutputTypeReference(TypeReference memberTypeReference) =>
-        memberTypeReference;
+        /// <inheritdoc />
+        public override string OutputTypeExplanation => "T";
 
-    /// <inheritdoc />
-    protected override Result<TypeReference, IError> GetGenericTypeParameter(
-        TypeReference expectedTypeReference,
-        FreezableStepData freezableStepData,
-        TypeResolver typeResolver) => freezableStepData
-        .TryGetStep(nameof(ValueIf<object>.Then), StepType)
-        .Compose(() => freezableStepData.TryGetStep(nameof(ValueIf<object>.Else), StepType))
-        .Bind(
-            x => x.Item1.TryGetOutputTypeReference(expectedTypeReference, typeResolver)
-                .Compose(
-                    () => x.Item2.TryGetOutputTypeReference(expectedTypeReference, typeResolver)
-                )
-        )
-        .Map(x => TypeReference.Create(new[] { x.Item1, x.Item2 }));
+        /// <inheritdoc />
+        protected override TypeReference
+            GetOutputTypeReference(TypeReference memberTypeReference) => memberTypeReference;
+
+        /// <inheritdoc />
+        protected override Result<TypeReference, IError> GetGenericTypeParameter(
+            TypeReference expectedTypeReference,
+            FreezableStepData freezableStepData,
+            TypeResolver typeResolver) => freezableStepData
+            .TryGetStep(nameof(ValueIf<object>.Then), StepType)
+            .Compose(() => freezableStepData.TryGetStep(nameof(ValueIf<object>.Else), StepType))
+            .Bind(
+                x => x.Item1.TryGetOutputTypeReference(expectedTypeReference, typeResolver)
+                    .Compose(
+                        () => x.Item2.TryGetOutputTypeReference(expectedTypeReference, typeResolver)
+                    )
+            )
+            .Map(x => TypeReference.Create(new[] { x.Item1, x.Item2 }));
+    }
 }
 
 }

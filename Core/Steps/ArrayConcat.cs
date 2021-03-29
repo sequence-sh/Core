@@ -50,70 +50,74 @@ public sealed class ArrayConcat<T> : CompoundStep<Array<T>>
 
     /// <inheritdoc />
     public override IStepFactory StepFactory => ArrayConcatStepFactory.Instance;
-}
-
-/// <summary>
-/// Concatenates streams of entities
-/// </summary>
-public sealed class ArrayConcatStepFactory : GenericStepFactory
-{
-    private ArrayConcatStepFactory() { }
 
     /// <summary>
-    /// The Instance
+    /// Concatenates streams of entities
     /// </summary>
-    public static GenericStepFactory Instance { get; } = new ArrayConcatStepFactory();
-
-    /// <inheritdoc />
-    public override Type StepType => typeof(ArrayConcat<>);
-
-    /// <inheritdoc />
-    protected override TypeReference GetOutputTypeReference(TypeReference memberTypeReference) =>
-        new TypeReference.Array(memberTypeReference);
-
-    /// <inheritdoc />
-    protected override Result<TypeReference, IError> GetGenericTypeParameter(
-        TypeReference expectedTypeReference,
-        FreezableStepData freezableStepData,
-        TypeResolver typeResolver)
+    private sealed class ArrayConcatStepFactory : GenericStepFactory
     {
-        var expectedMemberType = expectedTypeReference
-            .TryGetArrayMemberTypeReference(typeResolver)
-            .MapError(x => x.WithLocation(freezableStepData));
+        private ArrayConcatStepFactory() { }
 
-        if (expectedMemberType.IsFailure)
-            return expectedMemberType.ConvertFailure<TypeReference>();
+        /// <summary>
+        /// The Instance
+        /// </summary>
+        public static GenericStepFactory Instance { get; } = new ArrayConcatStepFactory();
 
-        var arraysStep = freezableStepData.TryGetStep(nameof(ArrayConcat<object>.Arrays), StepType);
+        /// <inheritdoc />
+        public override Type StepType => typeof(ArrayConcat<>);
 
-        if (arraysStep.IsFailure)
-            return arraysStep.ConvertFailure<TypeReference>();
+        /// <inheritdoc />
+        protected override TypeReference
+            GetOutputTypeReference(TypeReference memberTypeReference) =>
+            new TypeReference.Array(memberTypeReference);
 
-        var expectedArraysStepType =
-            new TypeReference.Array(new TypeReference.Array(expectedMemberType.Value));
+        /// <inheritdoc />
+        protected override Result<TypeReference, IError> GetGenericTypeParameter(
+            TypeReference expectedTypeReference,
+            FreezableStepData freezableStepData,
+            TypeResolver typeResolver)
+        {
+            var expectedMemberType = expectedTypeReference
+                .TryGetArrayMemberTypeReference(typeResolver)
+                .MapError(x => x.WithLocation(freezableStepData));
 
-        var arraysStepGenericType = arraysStep.Value.TryGetOutputTypeReference(
-                    expectedArraysStepType,
-                    typeResolver
-                )
-                .Bind(
-                    x => x.TryGetArrayMemberTypeReference(typeResolver)
-                        .MapError(e => e.WithLocation(freezableStepData))
-                )
-                .Bind(
-                    x => x.TryGetArrayMemberTypeReference(typeResolver)
-                        .MapError(e => e.WithLocation(freezableStepData))
-                )
-            ;
+            if (expectedMemberType.IsFailure)
+                return expectedMemberType.ConvertFailure<TypeReference>();
 
-        if (arraysStepGenericType.IsFailure)
-            return arraysStepGenericType.ConvertFailure<TypeReference>();
+            var arraysStep = freezableStepData.TryGetStep(
+                nameof(ArrayConcat<object>.Arrays),
+                StepType
+            );
 
-        return arraysStepGenericType;
+            if (arraysStep.IsFailure)
+                return arraysStep.ConvertFailure<TypeReference>();
+
+            var expectedArraysStepType =
+                new TypeReference.Array(new TypeReference.Array(expectedMemberType.Value));
+
+            var arraysStepGenericType = arraysStep.Value.TryGetOutputTypeReference(
+                        expectedArraysStepType,
+                        typeResolver
+                    )
+                    .Bind(
+                        x => x.TryGetArrayMemberTypeReference(typeResolver)
+                            .MapError(e => e.WithLocation(freezableStepData))
+                    )
+                    .Bind(
+                        x => x.TryGetArrayMemberTypeReference(typeResolver)
+                            .MapError(e => e.WithLocation(freezableStepData))
+                    )
+                ;
+
+            if (arraysStepGenericType.IsFailure)
+                return arraysStepGenericType.ConvertFailure<TypeReference>();
+
+            return arraysStepGenericType;
+        }
+
+        /// <inheritdoc />
+        public override string OutputTypeExplanation => "Array<T>";
     }
-
-    /// <inheritdoc />
-    public override string OutputTypeExplanation => "Array<T>";
 }
 
 }
