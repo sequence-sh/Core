@@ -76,9 +76,6 @@ public sealed class ArrayFilter<T> : CompoundStep<Array<T>>
     public VariableName Variable { get; set; } = VariableName.Entity;
 
     /// <inheritdoc />
-    public override IStepFactory StepFactory => ArrayFilterStepFactory.Instance;
-
-    /// <inheritdoc />
     public override Result<TypeResolver, IError> TryGetScopedTypeResolver(
         TypeResolver baseContext,
         IFreezableStep scopedStep)
@@ -91,39 +88,43 @@ public sealed class ArrayFilter<T> : CompoundStep<Array<T>>
             new ErrorLocation(this)
         );
     }
-}
 
-/// <summary>
-/// Filter entities according to a function.
-/// </summary>
-public sealed class ArrayFilterStepFactory : ArrayStepFactory
-{
-    private ArrayFilterStepFactory() { }
+    /// <inheritdoc />
+    public override IStepFactory StepFactory => ArrayFilterStepFactory.Instance;
 
     /// <summary>
-    /// The instance
+    /// Filter entities according to a function.
     /// </summary>
-    public static GenericStepFactory Instance { get; } = new ArrayFilterStepFactory();
-
-    /// <inheritdoc />
-    protected override TypeReference GetOutputTypeReference(TypeReference memberTypeReference) =>
-        new TypeReference.Array(memberTypeReference);
-
-    /// <inheritdoc />
-    protected override Result<TypeReference, IErrorBuilder> GetExpectedArrayTypeReference(
-        TypeReference expectedTypeReference)
+    private sealed class ArrayFilterStepFactory : ArrayStepFactory
     {
-        return expectedTypeReference;
+        private ArrayFilterStepFactory() { }
+
+        /// <summary>
+        /// The instance
+        /// </summary>
+        public static GenericStepFactory Instance { get; } = new ArrayFilterStepFactory();
+
+        /// <inheritdoc />
+        protected override TypeReference
+            GetOutputTypeReference(TypeReference memberTypeReference) =>
+            new TypeReference.Array(memberTypeReference);
+
+        /// <inheritdoc />
+        protected override Result<TypeReference, IErrorBuilder> GetExpectedArrayTypeReference(
+            TypeReference expectedTypeReference)
+        {
+            return expectedTypeReference;
+        }
+
+        /// <inheritdoc />
+        protected override string ArrayPropertyName => nameof(ArrayFilter<object>.Array);
+
+        /// <inheritdoc />
+        public override Type StepType => typeof(ArrayFilter<>);
+
+        /// <inheritdoc />
+        public override string OutputTypeExplanation => "Array<T>";
     }
-
-    /// <inheritdoc />
-    protected override string ArrayPropertyName => nameof(ArrayFilter<object>.Array);
-
-    /// <inheritdoc />
-    public override Type StepType => typeof(ArrayFilter<>);
-
-    /// <inheritdoc />
-    public override string OutputTypeExplanation => "Array<T>";
 }
 
 }

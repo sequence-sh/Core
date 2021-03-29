@@ -34,47 +34,48 @@ public sealed class ArrayLength<T> : CompoundStep<int>
 
     /// <inheritdoc />
     public override IStepFactory StepFactory => ArrayLengthStepFactory.Instance;
-}
-
-/// <summary>
-/// Counts the elements in an array.
-/// </summary>
-public sealed class ArrayLengthStepFactory : ArrayStepFactory
-{
-    private ArrayLengthStepFactory() { }
 
     /// <summary>
-    /// The instance.
+    /// Counts the elements in an array.
     /// </summary>
-    public static GenericStepFactory Instance { get; } = new ArrayLengthStepFactory();
-
-    /// <inheritdoc />
-    public override Type StepType => typeof(ArrayLength<>);
-
-    /// <inheritdoc />
-    public override string OutputTypeExplanation => nameof(Int32);
-
-    /// <inheritdoc />
-    protected override TypeReference GetOutputTypeReference(TypeReference memberTypeReference) =>
-        TypeReference.Actual.Integer;
-
-    /// <inheritdoc />
-    protected override Result<TypeReference, IErrorBuilder> GetExpectedArrayTypeReference(
-        TypeReference expectedTypeReference)
+    private sealed class ArrayLengthStepFactory : ArrayStepFactory
     {
-        var r = expectedTypeReference.CheckAllows(
-            TypeReference.Actual.Integer,
-            StepType
-        );
+        private ArrayLengthStepFactory() { }
 
-        if (r.IsFailure)
-            return r.ConvertFailure<TypeReference>();
+        /// <summary>
+        /// The instance.
+        /// </summary>
+        public static GenericStepFactory Instance { get; } = new ArrayLengthStepFactory();
 
-        return new TypeReference.Array(TypeReference.Any.Instance);
+        /// <inheritdoc />
+        public override Type StepType => typeof(ArrayLength<>);
+
+        /// <inheritdoc />
+        public override string OutputTypeExplanation => nameof(Int32);
+
+        /// <inheritdoc />
+        protected override TypeReference
+            GetOutputTypeReference(TypeReference memberTypeReference) =>
+            TypeReference.Actual.Integer;
+
+        /// <inheritdoc />
+        protected override Result<TypeReference, IErrorBuilder> GetExpectedArrayTypeReference(
+            TypeReference expectedTypeReference)
+        {
+            var r = expectedTypeReference.CheckAllows(
+                TypeReference.Actual.Integer,
+                StepType
+            );
+
+            if (r.IsFailure)
+                return r.ConvertFailure<TypeReference>();
+
+            return new TypeReference.Array(TypeReference.Any.Instance);
+        }
+
+        /// <inheritdoc />
+        protected override string ArrayPropertyName => nameof(ArrayLength<object>.Array);
     }
-
-    /// <inheritdoc />
-    protected override string ArrayPropertyName => nameof(ArrayLength<object>.Array);
 }
 
 }

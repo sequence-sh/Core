@@ -210,7 +210,7 @@ public static class FreezableFactory
         var fpd = new FreezableStepData(dict, location);
 
         return new CompoundFreezableStep(
-            ArrayNewStepFactory.Instance.TypeName,
+            "ArrayNew",
             fpd,
             location
         );
