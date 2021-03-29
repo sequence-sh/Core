@@ -17,9 +17,10 @@ public record ChainInfixSerializer(string StepName, string Operator) : IStepSeri
     {
         var properties = stepProperties as StepProperty[] ?? stepProperties.ToArray();
 
-        if (properties.Length == 1 && properties.Single().TryPickT1(out var elementsStep, out _)
-                                   && elementsStep is IArrayNewStep arrayNewStep
-                                   && arrayNewStep.ElementSteps.Count() > 1)
+        if (properties.Length == 1 && properties.Single() is StepProperty.SingleStepProperty
+        {
+            Step: IArrayNewStep arrayNewStep
+        } && arrayNewStep.ElementSteps.Count() > 1)
         {
             var text = string.Join(
                 $" {Operator} ",

@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
-using OneOf;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal.Serialization;
 
@@ -11,120 +10,152 @@ namespace Reductech.EDR.Core.Internal
 /// <summary>
 /// A property of a step
 /// </summary>
-public class StepProperty : OneOfBase<VariableName, IStep, IReadOnlyList<IStep>>
+public abstract record StepProperty
+(
+    string Name,
+    int Index,
+    LogAttribute? LogAttribute,
+    ScopedFunctionAttribute? ScopedFunctionAttribute,
+    ImmutableList<RequiredVersionAttribute> RequiredVersions)
 {
     /// <summary>
-    /// Create a new StepProperty
+    /// A variable name
     /// </summary>
-    public StepProperty(
-        string name,
-        int index,
-        OneOf<VariableName, IStep, IReadOnlyList<IStep>> value,
-        LogAttribute? logAttribute,
-        ScopedFunctionAttribute? scopedFunctionAttribute,
-        ImmutableList<RequiredVersionAttribute> requiredVersions) : base(value)
+    public record VariableNameProperty(
+        VariableName VariableName,
+        string Name,
+        int Index,
+        LogAttribute? LogAttribute,
+        ScopedFunctionAttribute? ScopedFunctionAttribute,
+        ImmutableList<RequiredVersionAttribute> RequiredVersions) : StepProperty(
+        Name,
+        Index,
+        LogAttribute,
+        ScopedFunctionAttribute,
+        RequiredVersions
+    )
     {
-        Name                    = name;
-        Index                   = index;
-        LogAttribute            = logAttribute;
-        ScopedFunctionAttribute = scopedFunctionAttribute;
-        RequiredVersions        = requiredVersions;
+        /// <inheritdoc />
+        public override string GetLogName() => VariableName.ToString();
+
+        /// <inheritdoc />
+        public override string ToString() => $"{Name} = {VariableName}";
+
+        /// <inheritdoc />
+        protected override string SerializeValue() => VariableName.Serialize();
+
+        /// <inheritdoc />
+        protected override bool ShouldBracketWhenSerialized { get; } = false;
     }
 
     /// <summary>
-    /// The name of the property
+    /// A single step
     /// </summary>
-    public string Name { get; }
+    public record SingleStepProperty(
+        IStep Step,
+        string Name,
+        int Index,
+        LogAttribute? LogAttribute,
+        ScopedFunctionAttribute? ScopedFunctionAttribute,
+        ImmutableList<RequiredVersionAttribute> RequiredVersions) : StepProperty(
+        Name,
+        Index,
+        LogAttribute,
+        ScopedFunctionAttribute,
+        RequiredVersions
+    )
+    {
+        /// <inheritdoc />
+        public override string GetLogName()
+        {
+            return Step switch
+            {
+                StringConstant str => str.Value.NameInLogs(
+                    LogAttribute?.LogOutputLevel != LogOutputLevel.None
+                ),
+                IConstantStep constant            => constant.Name,
+                CreateEntityStep createEntityStep => createEntityStep.Name,
+                ICompoundStep                     => Step.Name,
+                _                                 => Step.Name
+            };
+        }
+
+        /// <inheritdoc />
+        public override string ToString() => $"{Name} = {Step}";
+
+        /// <inheritdoc />
+        protected override string SerializeValue() => Step.Serialize();
+
+        /// <inheritdoc />
+        protected override bool ShouldBracketWhenSerialized { get; } =
+            Step.ShouldBracketWhenSerialized;
+    }
 
     /// <summary>
-    /// The position of this property among the other properties
+    /// A property which is a list of steps
     /// </summary>
-    public new int Index { get; }
+    public record StepListProperty(
+        IReadOnlyList<IStep> StepList,
+        string Name,
+        int Index,
+        LogAttribute? LogAttribute,
+        ScopedFunctionAttribute? ScopedFunctionAttribute,
+        ImmutableList<RequiredVersionAttribute> RequiredVersions) : StepProperty(
+        Name,
+        Index,
+        LogAttribute,
+        ScopedFunctionAttribute,
+        RequiredVersions
+    )
+    {
+        /// <inheritdoc />
+        public override string GetLogName()
+        {
+            return StepList.Count + " Elements";
+        }
+
+        /// <inheritdoc />
+        public override string ToString() => $"{Name} = {StepList}";
+
+        /// <inheritdoc />
+        protected override string SerializeValue()
+        {
+            var l = StepList.Select(s => s.Serialize()).ToList();
+            return SerializationMethods.SerializeList(l);
+        }
+
+        /// <inheritdoc />
+        protected override bool ShouldBracketWhenSerialized { get; } = false;
+    }
 
     /// <summary>
-    /// An attribute that says whether to log this property
+    /// Get the serialized value
     /// </summary>
-    public LogAttribute? LogAttribute { get; }
+    protected abstract string SerializeValue();
 
     /// <summary>
-    /// An attribute that indicates this is a scoped function property
+    /// Whether the value should be bracketed when it was serialized
     /// </summary>
-    public ScopedFunctionAttribute? ScopedFunctionAttribute { get; }
+    protected abstract bool ShouldBracketWhenSerialized { get; }
 
     /// <summary>
-    /// The required version of this property.
-    /// </summary>
-    public ImmutableList<RequiredVersionAttribute> RequiredVersions { get; }
-
-    /// <inheritdoc />
-    public override string ToString() => Name + " = " + Match(
-        x => x.ToString(),
-        x => x.ToString(),
-        x => x.ToString()
-    );
-
-    /// <summary>
-    /// Serialize the property value
+    /// Serialize this
     /// </summary>
     public string Serialize()
     {
-        var result =
-            Match(
-                vn => vn.Serialize(),
-                x =>
-                {
-                    var r = x.Serialize();
-                    return r;
-                },
-                l =>
-                {
-                    var r = SerializeEnumerable(l);
-                    return r;
-                }
-            );
+        var v = SerializeValue();
 
-        if (IsT1 && AsT1.ShouldBracketWhenSerialized)
-            result = "(" + result + ")";
+        if (ShouldBracketWhenSerialized)
+            return $"({v})";
 
-        return result;
-
-        static string SerializeEnumerable(IEnumerable<IStep> enumerable)
-        {
-            var l = enumerable.Select(s => s.Serialize()).ToList();
-
-            return SerializationMethods.SerializeList(l);
-        }
+        return v;
     }
 
     /// <summary>
-    /// Get the name as it will appear in a log file.
+    /// Gets the name as it will appear in the log file.
     /// </summary>
     /// <returns></returns>
-    public string GetLogName()
-    {
-        return Match(
-            vn => vn.ToString(),
-            step =>
-            {
-                return step switch
-                {
-                    StringConstant str => str.Value.NameInLogs(
-                        LogAttribute?.LogOutputLevel != LogOutputLevel.None
-                    ),
-                    IConstantStep constant            => constant.Name,
-                    CreateEntityStep createEntityStep => createEntityStep.Name,
-                    ICompoundStep                     => step.Name,
-                    _                                 => step.Name
-                };
-            },
-            GetListValue
-        );
-
-        static string GetListValue(IReadOnlyList<IStep> list)
-        {
-            return list.Count + " Elements";
-        }
-    }
+    public abstract string GetLogName();
 }
 
 }

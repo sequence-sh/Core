@@ -83,7 +83,9 @@ public sealed class StringInterpolate : CompoundStep<StringStream>
                 sb.Append('$');
                 sb.Append('"');
 
-                foreach (var step in stepProperties.Single().AsT2)
+                foreach (var step in stepProperties.Cast<StepProperty.StepListProperty>()
+                    .Single()
+                    .StepList)
                 {
                     if (step is StringConstant sc)
                     {
