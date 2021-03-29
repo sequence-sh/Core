@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using AutoTheory;
 using FluentAssertions;
 using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.Internal;
@@ -8,6 +9,7 @@ using Xunit;
 namespace Reductech.EDR.Core.Tests
 {
 
+[UseTestOutputHelper]
 public partial class EntityTests
 {
     [Theory]
