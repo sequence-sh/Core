@@ -8,9 +8,7 @@ namespace Reductech.EDR.Core.Internal.Serialization
 /// <summary>
 /// Serializer for steps with chain infix operators
 /// </summary>
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 public record ChainInfixSerializer(string StepName, string Operator) : IStepSerializer
-    #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
 {
     /// <inheritdoc />
     public string Serialize(IEnumerable<StepProperty> stepProperties)

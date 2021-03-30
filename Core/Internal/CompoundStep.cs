@@ -223,44 +223,6 @@ public abstract class CompoundStep<T> : ICompoundStep<T>
         }
     }
 
-    private FreezableStepData FreezableStepData
-    {
-        get
-        {
-            var dict = AllProperties
-                .OrderBy(x => x.Index)
-                .ToDictionary(
-                    x => new StepParameterReference(x.Name),
-                    x => x switch
-                    {
-                        StepProperty.SingleStepProperty singleStepProperty =>
-                            new FreezableStepProperty(
-                                singleStepProperty.Step.Unfreeze(),
-                                TextLocation
-                            ),
-                        StepProperty.StepListProperty stepListProperty => new FreezableStepProperty(
-                            stepListProperty.StepList.Select(s => s.Unfreeze()).ToImmutableList(),
-                            TextLocation
-                        ),
-                        StepProperty.VariableNameProperty vnp => new FreezableStepProperty(
-                            vnp.VariableName,
-                            TextLocation
-                        ),
-                        _ => throw new ArgumentOutOfRangeException(nameof(x), x, null)
-                    }
-                );
-
-            return new FreezableStepData(dict, TextLocation);
-        }
-    }
-
-    /// <inheritdoc />
-    public IFreezableStep Unfreeze() => new CompoundFreezableStep(
-        StepFactory.TypeName,
-        FreezableStepData,
-        TextLocation
-    );
-
     /// <summary>
     /// Check that this step meets requirements
     /// </summary>

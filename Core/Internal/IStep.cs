@@ -21,12 +21,6 @@ public interface IStep
     string Name { get; }
 
     /// <summary>
-    /// Convert this Step into a FreezableStep.
-    /// Useful for equality comparison.
-    /// </summary>
-    IFreezableStep Unfreeze();
-
-    /// <summary>
     /// Run this step and return the result, assuming it is the specified type.
     /// </summary>
     Task<Result<T, IError>> Run<T>(IStateMonad stateMonad, CancellationToken cancellationToken);

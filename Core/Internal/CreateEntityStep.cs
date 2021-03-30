@@ -15,10 +15,8 @@ namespace Reductech.EDR.Core.Internal
 /// <summary>
 /// A step that creates and returns an entity.
 /// </summary>
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 public record CreateEntityStep
     (IReadOnlyDictionary<EntityPropertyKey, IStep> Properties) : IStep<Entity>
-    #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
 {
     /// <inheritdoc />
     public async Task<Result<Entity, IError>> Run(
@@ -62,19 +60,6 @@ public record CreateEntityStep
 
     /// <inheritdoc />
     public string Name => "Create Entity";
-
-    /// <inheritdoc />
-    public IFreezableStep Unfreeze()
-    {
-        var dictionary =
-            Properties.ToDictionary(
-                x => x.Key,
-                x =>
-                    new FreezableStepProperty(x.Value.Unfreeze(), TextLocation)
-            );
-
-        return new CreateEntityFreezableStep(new FreezableEntityData(dictionary, TextLocation));
-    }
 
     /// <inheritdoc />
     public async Task<Result<T, IError>> Run<T>(
