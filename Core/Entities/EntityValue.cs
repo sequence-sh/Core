@@ -33,9 +33,6 @@ public abstract record EntityValue
         public static Null Instance { get; } = new();
 
         /// <inheritdoc />
-        public override string ToString() => "Empty";
-
-        /// <inheritdoc />
         protected override Result<(EntityValue value, bool changed), IErrorBuilder> TryConvertBase(
             SchemaProperty schemaProperty)
         {
@@ -75,9 +72,6 @@ public abstract record EntityValue
     /// </summary>
     public record String(string Value) : EntityValue
     {
-        /// <inheritdoc />
-        public override string ToString() => Value;
-
         /// <inheritdoc />
         public override string GetPrimitiveString()
         {
@@ -194,9 +188,6 @@ public abstract record EntityValue
     public record Integer(int Value) : EntityValue
     {
         /// <inheritdoc />
-        public override string ToString() => Value.ToString();
-
-        /// <inheritdoc />
         public override string GetFormattedString(
             char delimiter,
             string dateTimeFormat) => Value.ToString();
@@ -242,9 +233,6 @@ public abstract record EntityValue
     public record Double(double Value) : EntityValue
     {
         /// <inheritdoc />
-        public override string ToString() => Value.ToString(Constants.DoubleFormat);
-
-        /// <inheritdoc />
         public override string GetFormattedString(
             char delimiter,
             string dateTimeFormat) => Value.ToString(Constants.DoubleFormat);
@@ -287,9 +275,6 @@ public abstract record EntityValue
     public record Boolean(bool Value) : EntityValue
     {
         /// <inheritdoc />
-        public override string ToString() => Value.ToString();
-
-        /// <inheritdoc />
         public override string GetPrimitiveString() => Value.ToString();
 
         /// <inheritdoc />
@@ -330,9 +315,6 @@ public abstract record EntityValue
     /// </summary>
     public record EnumerationValue(Enumeration Value) : EntityValue
     {
-        /// <inheritdoc />
-        public override string ToString() => Value.ToString();
-
         /// <inheritdoc />
         public override string GetPrimitiveString() => Value.Value;
 

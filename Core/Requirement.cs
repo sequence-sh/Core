@@ -67,7 +67,10 @@ public sealed class Requirement : IEntityConvertible
 
                 if (connectorVersion.HasValue)
                 {
-                    if (Version.TryParse(connectorVersion.Value.ToString(), out var version))
+                    if (Version.TryParse(
+                        connectorVersion.Value.GetPrimitiveString(),
+                        out var version
+                    ))
                     {
                         if (MaxVersion != null && MaxVersion < version)
                             return ErrorCode.RequirementNotMet.ToErrorBuilder(this);
@@ -84,7 +87,7 @@ public sealed class Requirement : IEntityConvertible
                              && connectorFeatures.Value is EntityValue.NestedList featuresList)
                             {
                                 var missingFeatures = Features.Except(
-                                    featuresList.Value.Select(x => x.ToString()),
+                                    featuresList.Value.Select(x => x.GetPrimitiveString()),
                                     StringComparer.OrdinalIgnoreCase
                                 );
 

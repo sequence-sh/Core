@@ -22,7 +22,7 @@ public partial class SettingsTests
                 .Value
                 as EntityValue.NestedEntity
             )!.Value.TryGetValue("UseDongle")
-            .Value.ToString()
+            .Value.GetPrimitiveString()
             .Should()
             .Be(true.ToString());
 

@@ -38,7 +38,7 @@ public static class EntityExtensions
         if (lastProp.HasNoValue)
             return Maybe<string>.None;
 
-        return lastProp.Value.ToString();
+        return lastProp.Value.GetPrimitiveString() ?? "";
     }
 
     /// <summary>
@@ -88,7 +88,7 @@ public static class EntityExtensions
         if (lastProp.Value is not EntityValue.NestedList list)
             return Maybe<string[]>.None;
 
-        var stringArray = Enumerable.ToArray(list.Value.Select(x => x.ToString()));
+        var stringArray = Enumerable.ToArray(list.Value.Select(x => x.GetPrimitiveString() ?? ""));
         return stringArray;
     }
 }

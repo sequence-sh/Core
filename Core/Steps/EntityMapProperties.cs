@@ -26,7 +26,7 @@ public class EntityMapProperties : CompoundStep<Array<Entity>>
         var mappings = await Mappings.Run(stateMonad, cancellationToken)
             .Map(
                 e => e
-                    .ToDictionary(x => x.Name, x => x.BestValue.ToString())
+                    .ToDictionary(x => x.Name, x => x.BestValue.GetPrimitiveString())
             );
 
         if (mappings.IsFailure)
