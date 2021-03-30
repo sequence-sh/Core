@@ -28,29 +28,32 @@ public class EntityJsonConverter : JsonConverter
         if (entityObject is not Entity entity)
             return;
 
-        var dictionary = new Dictionary<string, object?>();
-
-        foreach (var entityProperty in entity)
-        {
-            var value = GetObject(entityProperty.BestValue);
-            dictionary.Add(entityProperty.Name, value);
-        }
+        var dictionary = CreateDictionary(entity);
 
         serializer.Serialize(writer, dictionary);
 
-        static object? GetObject(EntityValue ev)
+        static Dictionary<string, object?> CreateDictionary(Entity entity)
         {
-            return ev.Match(
-                _ => null as object,
-                x => x,
-                x => x,
-                x => x,
-                x => x,
-                x => x.Value,
-                x => x,
-                x => x,
-                x => x.Select(GetObject).ToList()
-            );
+            var dictionary = new Dictionary<string, object?>();
+
+            foreach (var entityProperty in entity)
+            {
+                var value = GetObject(entityProperty.BestValue);
+                dictionary.Add(entityProperty.Name, value);
+            }
+
+            return dictionary;
+
+            static object? GetObject(EntityValue ev)
+            {
+                return ev switch
+                {
+                    EntityValue.NestedEntity nestedEntity => CreateDictionary(nestedEntity.Value),
+                    EntityValue.EnumerationValue enumerationValue => enumerationValue.Value.Value,
+                    EntityValue.NestedList list => list.Value.Select(GetObject).ToList(),
+                    _ => ev.ObjectValue
+                };
+            }
         }
     }
 

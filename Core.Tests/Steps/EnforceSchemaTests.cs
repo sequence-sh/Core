@@ -395,7 +395,7 @@ public partial class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Enti
 
         var entity = schema.ConvertToEntity();
 
-        var name = entity.TryGetValue(nameof(schema.Name)).Map(x => x.GetString());
+        var name = entity.TryGetValue(nameof(schema.Name)).Map(x => x.GetPrimitiveString());
 
         name.HasValue.Should().BeTrue();
 
@@ -405,9 +405,7 @@ public partial class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Enti
 
         properties.HasValue.Should().BeTrue();
 
-        var propertiesEntity = properties.Value.TryGetEntity();
-
-        propertiesEntity.HasValue.Should().BeTrue();
+        properties.Value.Should().BeOfType<EntityValue.NestedEntity>();
     }
 }
 

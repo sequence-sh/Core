@@ -3,6 +3,7 @@ using System.Linq;
 using AutoTheory;
 using FluentAssertions;
 using Microsoft.Extensions.Configuration;
+using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.TestHarness;
 using Xunit;
@@ -46,9 +47,9 @@ public partial class SCLSettingsTests
 
         nestedKey2.ShouldHaveValue();
 
-        nestedKey2.Value.IsT8.Should().BeTrue("Value should be a list");
+        nestedKey2.Value.Should().BeOfType<EntityValue.NestedList>("Value should be a list");
 
-        nestedKey2.Value.AsT8.Select(x => x.GetPrimitiveString())
+        (nestedKey2.Value as EntityValue.NestedList)!.Value.Select(x => x.GetPrimitiveString())
             .Should()
             .BeEquivalentTo(new object[] { "alpha", "beta", "gamma" });
     }

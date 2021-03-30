@@ -73,7 +73,7 @@ public sealed class ArrayNew<T> : CompoundStep<Array<T>>, IArrayNewStep
             builder.Add(ev.Value);
         }
 
-        return new EntityValue(builder.ToImmutable());
+        return new EntityValue.NestedList(builder.ToImmutable());
     }
 
     /// <summary>

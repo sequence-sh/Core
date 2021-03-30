@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Internal.Errors;
@@ -84,6 +82,17 @@ public static class FunctionalExtensions
     {
         if (maybe.HasValue)
             yield return maybe.Value;
+    }
+
+    /// <summary>
+    /// Gets the value if the result was successful
+    /// </summary>
+    public static Maybe<T> ToMaybe<T, TError>(this Result<T, TError> result)
+    {
+        if (result.IsSuccess)
+            return result.Value;
+
+        return Maybe<T>.None;
     }
 }
 

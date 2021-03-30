@@ -57,7 +57,7 @@ public record CreateEntityStep
         }
 
         var entity = Entity.Create(pairs);
-        return new EntityValue(entity);
+        return new EntityValue.NestedEntity(entity);
     }
 
     /// <inheritdoc />

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using CSharpFunctionalExtensions;
 using Newtonsoft.Json;
+using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Util;
 
@@ -56,13 +57,13 @@ public sealed class Requirement : IEntityConvertible
     public Result<Unit, IErrorBuilder> Check(SCLSettings settings)
     {
         if (settings.Entity.Dictionary.TryGetValue(SCLSettings.ConnectorsKey, out var connectors)
-         && connectors.BestValue.TryPickT7(out var connectorsEntity, out _))
+         && connectors.BestValue is EntityValue.NestedEntity connectorsEntity)
         {
-            var connector = connectorsEntity.TryGetValue(Name);
+            var connector = connectorsEntity.Value.TryGetValue(Name);
 
-            if (connector.HasValue && connector.Value.TryPickT7(out var connectorEntity, out _))
+            if (connector.HasValue && connector.Value is EntityValue.NestedEntity connectorEntity)
             {
-                var connectorVersion = connectorEntity.TryGetValue(SCLSettings.VersionKey);
+                var connectorVersion = connectorEntity.Value.TryGetValue(SCLSettings.VersionKey);
 
                 if (connectorVersion.HasValue)
                 {
@@ -77,13 +78,13 @@ public sealed class Requirement : IEntityConvertible
                         if (Features != null && Features.Any())
                         {
                             var connectorFeatures =
-                                connectorEntity.TryGetValue(SCLSettings.FeaturesKey);
+                                connectorEntity.Value.TryGetValue(SCLSettings.FeaturesKey);
 
                             if (connectorFeatures.HasValue
-                             && connectorFeatures.Value.TryPickT8(out var featuresList, out _))
+                             && connectorFeatures.Value is EntityValue.NestedList featuresList)
                             {
                                 var missingFeatures = Features.Except(
-                                    featuresList.Select(x => x.ToString()),
+                                    featuresList.Value.Select(x => x.ToString()),
                                     StringComparer.OrdinalIgnoreCase
                                 );
 

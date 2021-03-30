@@ -11,7 +11,6 @@ using CSharpFunctionalExtensions;
 using CsvHelper;
 using CsvHelper.Configuration;
 using CsvHelper.TypeConversion;
-using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.Enums;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
@@ -174,33 +173,12 @@ public static class CSVWriter
 
             foreach (var entityProperty in entity)
             {
-                var s = GetString(entityProperty.BestValue, delimiter, dateTimeFormat);
+                var s = entityProperty.BestValue.GetFormattedString(delimiter, dateTimeFormat);
 
                 expandoObject[entityProperty.Name] = s;
             }
 
             return expandoObject;
-
-            static string GetString(EntityValue ev, char delimiter, string dateTimeFormat)
-            {
-                var valueString = ev.Match(
-                    _ => "",
-                    x => x,
-                    x => x.ToString(),
-                    x => x.ToString(Constants.DoubleFormat),
-                    x => x.ToString(),
-                    x => x.ToString(),
-                    x => x.ToString(dateTimeFormat),
-                    x => x.ToString(),
-                    x =>
-                        string.Join(
-                            delimiter,
-                            x.Select(ev1 => GetString(ev1, delimiter, dateTimeFormat))
-                        )
-                );
-
-                return valueString;
-            }
         }
     }
 }
