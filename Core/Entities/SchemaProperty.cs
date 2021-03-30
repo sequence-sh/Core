@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using Newtonsoft.Json;
 using Reductech.EDR.Core.Enums;
 
@@ -60,28 +59,6 @@ public sealed class SchemaProperty
     /// </summary>
     [JsonProperty]
     public ErrorBehavior? ErrorBehavior { get; set; }
-
-    /// <summary>
-    /// Convert this SchemaProperty to an entity
-    /// </summary>
-    /// <returns></returns>
-    public Entity ConvertToEntity()
-    {
-        var schemaProperties = new[]
-        {
-            (nameof(Type), EntityValue.CreateFromObject(Type)),
-            (nameof(EnumType), EntityValue.CreateFromObject(EnumType)),
-            (nameof(Multiplicity), EntityValue.CreateFromObject(Multiplicity)),
-            (nameof(Values), EntityValue.CreateFromObject(Values)),
-            (nameof(DateInputFormats), EntityValue.CreateFromObject(DateInputFormats)),
-            (nameof(DateOutputFormat), EntityValue.CreateFromObject(DateOutputFormat)),
-            (nameof(Regex), EntityValue.CreateFromObject(Regex)),
-            (nameof(ErrorBehavior), EntityValue.CreateFromObject(ErrorBehavior)),
-        }.Select((x, i) => new EntityProperty(x.Item1, x.Item2, null, i));
-
-        var entity = new Entity(schemaProperties);
-        return entity;
-    }
 }
 
 }

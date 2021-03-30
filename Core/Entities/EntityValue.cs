@@ -18,14 +18,14 @@ namespace Reductech.EDR.Core.Entities
 /// <summary>
 /// The value of an entity property.
 /// </summary>
-public abstract record EntityValue
+public abstract record EntityValue(object? ObjectValue)
 {
     /// <summary>
     /// The Null value
     /// </summary>
     public record Null : EntityValue
     {
-        private Null() { }
+        private Null() : base(null as object) { }
 
         /// <summary>
         /// The instance
@@ -53,9 +53,6 @@ public abstract record EntityValue
         }
 
         /// <inheritdoc />
-        public override object? ObjectValue { get; } = null;
-
-        /// <inheritdoc />
         public override string GetFormattedString(
             char delimiter,
             string dateTimeFormat) => "";
@@ -70,16 +67,13 @@ public abstract record EntityValue
     /// <summary>
     /// A string value
     /// </summary>
-    public record String(string Value) : EntityValue
+    public record String(string Value) : EntityValue(Value)
     {
         /// <inheritdoc />
         public override string GetPrimitiveString()
         {
             return Value;
         }
-
-        /// <inheritdoc />
-        public override object ObjectValue => Value;
 
         /// <inheritdoc />
         public override string Serialize()
@@ -185,15 +179,12 @@ public abstract record EntityValue
     /// <summary>
     /// An integer value
     /// </summary>
-    public record Integer(int Value) : EntityValue
+    public record Integer(int Value) : EntityValue(Value)
     {
         /// <inheritdoc />
         public override string GetFormattedString(
             char delimiter,
             string dateTimeFormat) => Value.ToString();
-
-        /// <inheritdoc />
-        public override object ObjectValue => Value;
 
         /// <inheritdoc />
         public override string GetPrimitiveString()
@@ -230,15 +221,12 @@ public abstract record EntityValue
     /// <summary>
     /// A double precision floating point value
     /// </summary>
-    public record Double(double Value) : EntityValue
+    public record Double(double Value) : EntityValue(Value)
     {
         /// <inheritdoc />
         public override string GetFormattedString(
             char delimiter,
             string dateTimeFormat) => Value.ToString(Constants.DoubleFormat);
-
-        /// <inheritdoc />
-        public override object ObjectValue => Value;
 
         /// <inheritdoc />
         public override string GetPrimitiveString() => Value.ToString("R");
@@ -272,16 +260,13 @@ public abstract record EntityValue
     /// <summary>
     /// A boolean value
     /// </summary>
-    public record Boolean(bool Value) : EntityValue
+    public record Boolean(bool Value) : EntityValue(Value)
     {
         /// <inheritdoc />
         public override string GetPrimitiveString() => Value.ToString();
 
         /// <inheritdoc />
         public override string Serialize() => Value.ToString();
-
-        /// <inheritdoc />
-        public override object ObjectValue => Value;
 
         /// <inheritdoc />
         public override string GetFormattedString(
@@ -313,16 +298,13 @@ public abstract record EntityValue
     /// <summary>
     /// An enumeration value
     /// </summary>
-    public record EnumerationValue(Enumeration Value) : EntityValue
+    public record EnumerationValue(Enumeration Value) : EntityValue(Value)
     {
         /// <inheritdoc />
         public override string GetPrimitiveString() => Value.Value;
 
         /// <inheritdoc />
         public override string Serialize() => Value.ToString();
-
-        /// <inheritdoc />
-        public override object ObjectValue => Value;
 
         /// <inheritdoc />
         public override string GetFormattedString(
@@ -375,7 +357,7 @@ public abstract record EntityValue
     /// <summary>
     /// A date time value
     /// </summary>
-    public record Date(DateTime Value, string DateOutputFormat) : EntityValue
+    public record Date(DateTime Value, string DateOutputFormat) : EntityValue(Value)
     {
         /// <summary>
         /// Create a date with the default DateTimeFormat
@@ -384,9 +366,6 @@ public abstract record EntityValue
 
         /// <inheritdoc />
         public override string GetPrimitiveString() => Value.ToString("o");
-
-        /// <inheritdoc />
-        public override object ObjectValue => Value;
 
         /// <inheritdoc />
         public override string Serialize() => Value.ToString(DateOutputFormat);
@@ -425,16 +404,13 @@ public abstract record EntityValue
     /// <summary>
     /// A nested entity value
     /// </summary>
-    public record NestedEntity(Entity Value) : EntityValue
+    public record NestedEntity(Entity Value) : EntityValue(Value)
     {
         /// <inheritdoc />
         public override string? GetPrimitiveString() => null;
 
         /// <inheritdoc />
         public override string Serialize() => Value.Serialize();
-
-        /// <inheritdoc />
-        public override object ObjectValue => Value;
 
         /// <inheritdoc />
         public override string GetFormattedString(
@@ -469,7 +445,7 @@ public abstract record EntityValue
     /// <summary>
     /// A list of values
     /// </summary>
-    public record NestedList(ImmutableList<EntityValue> Value) : EntityValue
+    public record NestedList(ImmutableList<EntityValue> Value) : EntityValue(Value)
     {
         /// <inheritdoc />
         public override string? GetPrimitiveString() => null;
@@ -487,9 +463,6 @@ public abstract record EntityValue
             delimiter,
             Value.Select(ev1 => ev1.GetFormattedString(delimiter, dateTimeFormat))
         );
-
-        /// <inheritdoc />
-        public override object ObjectValue => Value;
 
         /// <inheritdoc />
         public virtual bool Equals(NestedList? other)
@@ -850,11 +823,6 @@ public abstract record EntityValue
     /// Serialize this value as it will appear in SCL
     /// </summary>
     public abstract string Serialize();
-
-    /// <summary>
-    /// The object value
-    /// </summary>
-    public abstract object? ObjectValue { get; }
 
     /// <summary>
     /// Gets a string with the given format
