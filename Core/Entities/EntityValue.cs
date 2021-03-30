@@ -158,7 +158,7 @@ public abstract record EntityValue
                     if (schemaProperty.DateInputFormats != null &&
                         DateTime.TryParseExact(
                             Value,
-                            schemaProperty.DateInputFormats.ToArray(),
+                            Enumerable.ToArray(schemaProperty.DateInputFormats),
                             null,
                             DateTimeStyles.None,
                             out var dt1
@@ -895,15 +895,14 @@ public abstract record EntityValue
         if ("" is T tString)
             return tString;
 
-        if (typeof(T).IsAssignableTo(typeof(IEnumerable)) && typeof(T).IsGenericType)
+        if (typeof(T).IsAssignableTo(typeof(IArray)) && typeof(T).IsGenericType)
         {
             var param = typeof(T).GenericTypeArguments[0];
             var array = typeof(Array<>).MakeGenericType(param);
 
             var arrayInstance = Activator.CreateInstance(array);
 
-            if (arrayInstance is T tArray)
-                return tArray;
+            return (T)arrayInstance!;
         }
 
         return default!;

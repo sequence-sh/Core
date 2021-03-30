@@ -81,11 +81,12 @@ public static class StaticHelpers
         return CreateSchema(
             name,
             allowExtraProperties,
-            properties.Select(
-                    p => (p.propertyName, p.type, null as string, p.multiplicity, null as string,
-                          null as List<string>, null as List<string>, null as string)
+            Enumerable.ToArray(
+                    properties.Select(
+                        p => (p.propertyName, p.type, null as string, p.multiplicity, null as string,
+                              null as List<string>, null as List<string>, null as string)
+                    )
                 )
-                .ToArray()
         );
     }
 

@@ -16,13 +16,13 @@ public partial class RepeatTests : StepTestBase<Repeat<int>, Array<int>>
             yield return new StepCase(
                 "Repeat number",
                 new Repeat<int>() { Element = Constant(6), Number = Constant(3) },
-                new List<int>() { 6, 6, 6 }.ToSequence()
+                ArrayHelper.ToArray(new List<int>() { 6, 6, 6 })
             );
 
             yield return new StepCase(
                 "Repeat zero times",
                 new Repeat<int>() { Element = Constant(6), Number = Constant(0) },
-                new List<int>().ToSequence()
+                ArrayHelper.ToArray(new List<int>())
             );
         }
     }
@@ -35,7 +35,7 @@ public partial class RepeatTests : StepTestBase<Repeat<int>, Array<int>>
             yield return new DeserializeCase(
                 "Repeat number",
                 "Repeat Element: 6 Number: 3",
-                new List<int>() { 6, 6, 6 }.ToSequence()
+                ArrayHelper.ToArray(new List<int>() { 6, 6, 6 })
             );
         }
     }

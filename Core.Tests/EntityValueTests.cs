@@ -202,6 +202,19 @@ public partial class EntityValueTests
                 .BeEquivalentTo(expectedList.Value);
         }
     }
+
+    [Fact]
+    public void TestGetDefaultValue()
+    {
+        EntityValue.GetDefaultValue<Entity>().Should().Equal(Entity.Empty);
+        EntityValue.GetDefaultValue<StringStream>().Should().Be(StringStream.Empty);
+        EntityValue.GetDefaultValue<string>().Should().Be(string.Empty);
+        EntityValue.GetDefaultValue<int>().Should().Be(0);
+        EntityValue.GetDefaultValue<double>().Should().Be(0.0);
+        EntityValue.GetDefaultValue<bool>().Should().Be(false);
+        EntityValue.GetDefaultValue<Array<int>>().Should().Be(new Array<int>());
+        EntityValue.GetDefaultValue<Array<double>>().Should().Be(new Array<double>());
+    }
 }
 
 }

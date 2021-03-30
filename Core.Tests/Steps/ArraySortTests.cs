@@ -19,16 +19,18 @@ public partial class ArraySortTests : StepTestBase<ArraySort<int>, Array<int>>
                 {
                     Array = Array(8, 6, 7, 5, 3, 0, 9), Descending = Constant(false)
                 },
-                new List<int>()
-                {
-                    0,
-                    3,
-                    5,
-                    6,
-                    7,
-                    8,
-                    9
-                }.ToSequence()
+                ArrayHelper.ToArray(
+                    new List<int>()
+                    {
+                        0,
+                        3,
+                        5,
+                        6,
+                        7,
+                        8,
+                        9
+                    }
+                )
             );
 
             yield return new StepCase(
@@ -37,16 +39,18 @@ public partial class ArraySortTests : StepTestBase<ArraySort<int>, Array<int>>
                 {
                     Array = Array(8, 6, 7, 5, 3, 0, 9), Descending = Constant(true)
                 },
-                new List<int>()
-                {
-                    9,
-                    8,
-                    7,
-                    6,
-                    5,
-                    3,
-                    0
-                }.ToSequence()
+                ArrayHelper.ToArray(
+                    new List<int>()
+                    {
+                        9,
+                        8,
+                        7,
+                        6,
+                        5,
+                        3,
+                        0
+                    }
+                )
             );
         }
     }
@@ -59,16 +63,18 @@ public partial class ArraySortTests : StepTestBase<ArraySort<int>, Array<int>>
             yield return new DeserializeCase(
                 "Sort Ascending",
                 "ArraySort Array: [8,6,7,5,3,0,9]",
-                new List<int>()
-                {
-                    0,
-                    3,
-                    5,
-                    6,
-                    7,
-                    8,
-                    9
-                }.ToSequence()
+                ArrayHelper.ToArray(
+                    new List<int>()
+                    {
+                        0,
+                        3,
+                        5,
+                        6,
+                        7,
+                        8,
+                        9
+                    }
+                )
             );
         }
     }

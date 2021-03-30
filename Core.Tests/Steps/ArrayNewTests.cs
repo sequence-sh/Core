@@ -18,13 +18,13 @@ public partial class ArrayNewTests : StepTestBase<ArrayNew<int>, Array<int>>
             yield return new DeserializeCase(
                 "Three elements explicit form",
                 "Array Elements: [1, 2, 3]",
-                new List<int> { 1, 2, 3 }.ToSequence()
+                ArrayHelper.ToArray(new List<int> { 1, 2, 3 })
             );
 
             yield return new DeserializeCase(
                 "Three elements simple form",
                 "Array Elements: [1, 2, 3]",
-                new List<int> { 1, 2, 3 }.ToSequence()
+                ArrayHelper.ToArray(new List<int> { 1, 2, 3 })
             );
         }
     }
@@ -40,7 +40,7 @@ public partial class ArrayNewTests : StepTestBase<ArrayNew<int>, Array<int>>
                 {
                     Elements = new List<IStep<int>> { Constant(1), Constant(2), Constant(3), }
                 },
-                new List<int> { 1, 2, 3 }.ToSequence()
+                ArrayHelper.ToArray(new List<int> { 1, 2, 3 })
             );
         }
     }

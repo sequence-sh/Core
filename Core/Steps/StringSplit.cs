@@ -48,11 +48,12 @@ public sealed class StringSplit : CompoundStep<Array<StringStream>>
         if (delimiterResult.IsFailure)
             return delimiterResult.ConvertFailure<Array<StringStream>>();
 
-        var results = stringResult.Value
-            .Split(new[] { delimiterResult.Value }, StringSplitOptions.None)
-            .Select(x => new StringStream(x))
-            .ToList()
-            .ToSequence();
+        var results = ArrayHelper.ToArray(
+            stringResult.Value
+                .Split(new[] { delimiterResult.Value }, StringSplitOptions.None)
+                .Select(x => new StringStream(x))
+                .ToList()
+        );
 
         return results;
     }

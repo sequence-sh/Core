@@ -40,7 +40,7 @@ public sealed class ArrayNew<T> : CompoundStep<Array<T>>, IArrayNewStep
     {
         var result = await Elements.Select(x => x.Run(stateMonad, cancellationToken))
             .Combine(ErrorList.Combine)
-            .Map(x => x.ToList().ToSequence());
+            .Map(x => ArrayHelper.ToArray(x.ToList()));
 
         return result;
     }
