@@ -791,6 +791,9 @@ public abstract record EntityValue
 
         static EntityValue Create(string s, char? multiValueDelimiter)
         {
+            if (string.IsNullOrWhiteSpace(s))
+                return Null.Instance;
+
             if (multiValueDelimiter == null)
                 return new String(s);
 
