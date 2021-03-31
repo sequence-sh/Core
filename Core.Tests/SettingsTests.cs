@@ -16,10 +16,13 @@ public partial class SettingsTests
 
         TestOutputHelper.WriteLine(settings.ToString());
 
-        settings.Entity.TryGetValue("Connectors")
-            .Value.AsT7.TryGetValue("Nuix")
-            .Value.AsT7.TryGetValue("UseDongle")
-            .Value.ToString()
+        (
+                (settings.Entity.TryGetValue("Connectors").Value as EntityValue.NestedEntity)!.Value
+                .TryGetValue("Nuix")
+                .Value
+                as EntityValue.NestedEntity
+            )!.Value.TryGetValue("UseDongle")
+            .Value.GetPrimitiveString()
             .Should()
             .Be(true.ToString());
 
@@ -91,13 +94,6 @@ public partial class SettingsTests
 
         TestOutputHelper.WriteLine(settings.ToString());
 
-        settings.Entity.TryGetValue("Connectors")
-            .Value.AsT7.TryGetValue("Nuix")
-            .Value.AsT7.TryGetValue("UseDongle")
-            .Value.ToString()
-            .Should()
-            .Be(true.ToString());
-
         var useDongleString = settings.Entity.TryGetNestedString("Connectors", "Nuix", "UseDongle");
 
         useDongleString.HasValue.Should().BeTrue();
@@ -115,7 +111,7 @@ public partial class SettingsTests
       ""useDongle"": true,
       ""exeConsolePath"": ""C:\\Program Files\\Nuix\\Nuix 8.8\\nuix_console.exe"",
       ""version"": ""8.8"",
-       
+
 ""ConsoleArguments"": [
     ""-Dnuix.licence.handlers=server"",
     ""-Dnuix.registry.servers=licenseSource""

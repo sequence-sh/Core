@@ -96,7 +96,7 @@ public record StringConstant
     public override string Serialize() => Value.Serialize();
 
     /// <inheritdoc />
-    protected override EntityValue ToEntityValue() => new(Value.GetString());
+    protected override EntityValue ToEntityValue() => new EntityValue.String(Value.GetString());
 }
 
 /// <summary>
@@ -111,7 +111,7 @@ public record IntConstant(int Value) : ConstantBase<int>(Value)
     public override string Serialize() => Value.ToString();
 
     /// <inheritdoc />
-    protected override EntityValue ToEntityValue() => new(Value);
+    protected override EntityValue ToEntityValue() => new EntityValue.Integer(Value);
 }
 
 /// <summary>
@@ -126,7 +126,7 @@ public record DoubleConstant(double Value) : ConstantBase<double>(Value)
     public override string Serialize() => Value.ToString(Constants.DoubleFormat);
 
     /// <inheritdoc />
-    protected override EntityValue ToEntityValue() => new(Value);
+    protected override EntityValue ToEntityValue() => new EntityValue.Double(Value);
 }
 
 /// <summary>
@@ -141,7 +141,7 @@ public record BoolConstant(bool Value) : ConstantBase<bool>(Value)
     public override string Serialize() => Value.ToString();
 
     /// <inheritdoc />
-    protected override EntityValue ToEntityValue() => new(Value);
+    protected override EntityValue ToEntityValue() => new EntityValue.Boolean(Value);
 }
 
 /// <summary>
@@ -167,7 +167,8 @@ public record EnumConstant<T>(T Value) : ConstantBase<T>(Value) where T : Enum
     private Enumeration ToEnumeration() => new(typeof(T).Name, Value.ToString());
 
     /// <inheritdoc />
-    protected override EntityValue ToEntityValue() => new(ToEnumeration());
+    protected override EntityValue ToEntityValue() =>
+        new EntityValue.EnumerationValue(ToEnumeration());
 }
 
 /// <summary>
@@ -182,7 +183,7 @@ public record DateTimeConstant(DateTime Value) : ConstantBase<DateTime>(Value)
     public override string Serialize() => Value.ToString(Constants.DateTimeFormat);
 
     /// <inheritdoc />
-    protected override EntityValue ToEntityValue() => new(Value);
+    protected override EntityValue ToEntityValue() => new EntityValue.Date(Value);
 }
 
 /// <summary>
@@ -197,7 +198,7 @@ public record EntityConstant(Entity Value) : ConstantBase<Entity>(Value)
     public override string Serialize() => Value.Serialize();
 
     /// <inheritdoc />
-    protected override EntityValue ToEntityValue() => new(Value);
+    protected override EntityValue ToEntityValue() => new EntityValue.NestedEntity(Value);
 }
 
 }

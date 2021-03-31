@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using CSharpFunctionalExtensions;
 using FluentAssertions;
+using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Parser;
 using Reductech.EDR.Core.TestHarness;
@@ -58,7 +59,7 @@ public class EntityConversionTests
 
         parseResult.ShouldBeSuccessful(x => x.AsString);
 
-        return parseResult.Value.Value.AsT7; //could throw exception
+        return (parseResult.Value.Value as EntityValue.NestedEntity)!.Value; //could throw exception
     }
 
     [Fact]

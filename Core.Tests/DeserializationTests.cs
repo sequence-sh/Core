@@ -327,6 +327,11 @@ Log 'Comments!'",
 
             yield return new DeserializationTestInstance("(Foo.Bar:'b')", "(Foo: (Bar: \"b\"))");
 
+            yield return new DeserializationTestInstance(
+                "(Foo.Bar:(Baz: 'a' Zab: 'b'))",
+                "(Foo: (Bar: (Baz: \"a\" Zab: \"b\")))"
+            );
+
             yield return new DeserializationTestInstance("'a' + 'b' + 'c'", "abc");
 
             yield return new DeserializationTestInstance(
@@ -354,6 +359,11 @@ Log 'Comments!'",
             yield return new DeserializationTestInstance(
                 "(Foo.Bar.Baz:'b')",
                 "(Foo: (Bar: (Baz: \"b\")))"
+            );
+
+            yield return new DeserializationTestInstance(
+                "(Foo.Bar: 'a' Foo.Baz: 'b')",
+                "(Foo: (Bar: \"a\" Baz: \"b\"))"
             );
 
             yield return new DeserializationTestInstance("(Foo.Bar.Baz:'b')['Foo.Bar.Baz']",   "b");

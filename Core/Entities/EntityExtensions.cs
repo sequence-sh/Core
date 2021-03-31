@@ -27,8 +27,8 @@ public static class EntityExtensions
             if (v.HasNoValue)
                 return Maybe<string>.None;
 
-            if (v.Value.TryPickT7(out var e, out _))
-                current = e;
+            if (v.Value is EntityValue.NestedEntity ne)
+                current = ne.Value;
             else
                 return Maybe<string>.None;
         }
@@ -38,7 +38,7 @@ public static class EntityExtensions
         if (lastProp.HasNoValue)
             return Maybe<string>.None;
 
-        return lastProp.Value.ToString();
+        return lastProp.Value.GetPrimitiveString() ?? "";
     }
 
     /// <summary>
@@ -74,8 +74,8 @@ public static class EntityExtensions
             if (v.HasNoValue)
                 return Maybe<string[]>.None;
 
-            if (v.Value.TryPickT7(out var e, out _))
-                current = e;
+            if (v.Value is EntityValue.NestedEntity ne)
+                current = ne.Value;
             else
                 return Maybe<string[]>.None;
         }
@@ -85,10 +85,10 @@ public static class EntityExtensions
         if (lastProp.HasNoValue)
             return Maybe<string[]>.None;
 
-        if (!lastProp.Value.TryPickT8(out var list, out _))
+        if (lastProp.Value is not EntityValue.NestedList list)
             return Maybe<string[]>.None;
 
-        var stringArray = list.Select(x => x.ToString()).ToArray();
+        var stringArray = Enumerable.ToArray(list.Value.Select(x => x.GetPrimitiveString() ?? ""));
         return stringArray;
     }
 }

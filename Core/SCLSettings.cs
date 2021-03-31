@@ -46,21 +46,24 @@ public record SCLSettings(Entity Entity)
                     .Select(x => EntityValue.CreateFromObject(x.Value))
                     .ToImmutableList();
 
-                return new EntityProperty(section.Key, new EntityValue(list), null, 0);
+                return new EntityProperty(section.Key, new EntityValue.NestedList(list), null, 0);
             }
-            else if (section.GetChildren().Any())
+
+            if (section.GetChildren().Any())
             {
                 var properties = section.GetChildren().Select(CreateObject).ToList();
+                var entity     = new Entity(properties);
 
-                var entity = new Entity(properties);
+                return new EntityProperty(
+                    section.Key,
+                    new EntityValue.NestedEntity(entity),
+                    null,
+                    0
+                );
+            }
 
-                return new EntityProperty(section.Key, new EntityValue(entity), null, 0);
-            }
-            else
-            {
-                var ev = new EntityValue(section.Value);
-                return new EntityProperty(section.Key, ev, null, 0);
-            }
+            var ev = new EntityValue.String(section.Value);
+            return new EntityProperty(section.Key, ev, null, 0);
         }
     }
 

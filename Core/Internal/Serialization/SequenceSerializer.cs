@@ -25,14 +25,14 @@ public sealed class SequenceSerializer : IStepSerializer
 
         var sb = new StringBuilder();
 
-        if (dict.TryGetValue(nameof(Sequence<object>.InitialSteps), out var stepList)
-         && stepList.IsT2)
-            foreach (var step in stepList.AsT2)
+        if (dict.TryGetValue(nameof(Sequence<object>.InitialSteps), out var sp)
+         && sp is StepProperty.StepListProperty stepList)
+            foreach (var step in stepList.StepList)
                 sb.AppendLine("- " + step.Serialize());
 
         if (dict.TryGetValue(nameof(Sequence<object>.FinalStep), out var finalStep)
-         && finalStep.IsT1)
-            sb.AppendLine("- " + finalStep.AsT1.Serialize());
+         && finalStep is StepProperty.SingleStepProperty stepProperty)
+            sb.AppendLine("- " + stepProperty.Serialize());
 
         var s = sb.ToString();
 

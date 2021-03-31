@@ -106,7 +106,7 @@ public partial class GenerateDocumentationTests : StepTestBase<GenerateDocumenta
             );
 
             static string[] ToLogs(Array<Entity> array) =>
-                array.GetElements().Value.Select(x => x.Serialize()).ToArray();
+                Enumerable.ToArray(array.GetElements().Value.Select(x => x.Serialize()));
 
             var logDocumentation = new ForEach<Entity>()
             {

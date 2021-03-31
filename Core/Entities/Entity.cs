@@ -113,16 +113,16 @@ public sealed class Entity : IEnumerable<EntityProperty>, IEquatable<Entity>
         {
             EntityValue newPropertyValue;
 
-            if (ep.BestValue.TryPickT7(out var existingEntity, out _))
+            if (ep.BestValue is EntityValue.NestedEntity existingEntity)
             {
                 Entity combinedEntity;
 
-                if (newValue.TryPickT7(out var newEntity, out _))
-                    combinedEntity = existingEntity.Combine(newEntity);
+                if (newValue is EntityValue.NestedEntity newEntity)
+                    combinedEntity = existingEntity.Value.Combine(newEntity.Value);
                 else
-                    combinedEntity = existingEntity.WithProperty(PrimitiveKey, newValue);
+                    combinedEntity = existingEntity.Value.WithProperty(PrimitiveKey, newValue);
 
-                newPropertyValue = new EntityValue(combinedEntity);
+                newPropertyValue = new EntityValue.NestedEntity(combinedEntity);
             }
             else
             {
@@ -174,11 +174,12 @@ public sealed class Entity : IEnumerable<EntityProperty>, IEquatable<Entity>
         if (remainder.HasNoValue)
             return ep.BestValue;
 
-        if (!ep.BestValue.TryPickT7(out var nested, out _))
-            return
-                Maybe<EntityValue>.None; //We can't get the nested property as this is not an entity
+        if (ep.BestValue is EntityValue.NestedEntity nestedEntity)
+            return nestedEntity.Value.TryGetValue(remainder.Value);
+        //We can't get the nested property as this is not an entity
 
-        return nested.TryGetValue(remainder.Value);
+        return
+            Maybe<EntityValue>.None;
     }
 
     /// <inheritdoc />

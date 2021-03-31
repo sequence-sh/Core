@@ -12,6 +12,7 @@ using Reductech.EDR.Core.TestHarness;
 using Reductech.EDR.Core.Util;
 using Xunit;
 using static Reductech.EDR.Core.TestHarness.StaticHelpers;
+using Extensions = Reductech.EDR.Core.Util.Extensions;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
@@ -25,6 +26,8 @@ public partial class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Enti
         CultureInfo.DefaultThreadCurrentCulture   = new CultureInfo("en-GB");
         CultureInfo.DefaultThreadCurrentUICulture = new CultureInfo("en-GB");
     }
+
+    const string SchemaName = "ValueIf Schema";
 
     /// <inheritdoc />
     protected override IEnumerable<StepCase> StepCases
@@ -68,7 +71,7 @@ public partial class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Enti
                     Entity.Create(("Foo", "Hello 2"), ("Bar", "2"))
                 },
                 CreateSchema(
-                    "ValueIf Schema",
+                    SchemaName,
                     false,
                     ("foo", SCLType.String, Multiplicity.ExactlyOne),
                     ("Bar", SCLType.Integer, Multiplicity.ExactlyOne)
@@ -81,7 +84,7 @@ public partial class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Enti
                 "Cast int",
                 new List<Entity> { Entity.Create(("Foo", "100")) },
                 CreateSchema(
-                    "ValueIf Schema",
+                    SchemaName,
                     false,
                     ("Foo", SCLType.Integer, Multiplicity.ExactlyOne)
                 ),
@@ -92,7 +95,7 @@ public partial class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Enti
                 "Cast double",
                 new List<Entity> { Entity.Create(("Foo", "100.345")) },
                 CreateSchema(
-                    "ValueIf Schema",
+                    SchemaName,
                     false,
                     ("Foo", SCLType.Double, Multiplicity.ExactlyOne)
                 ),
@@ -103,7 +106,7 @@ public partial class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Enti
                 "Cast bool",
                 new List<Entity> { Entity.Create(("Foo", "true")) },
                 CreateSchema(
-                    "ValueIf Schema",
+                    SchemaName,
                     false,
                     ("Foo", SCLType.Bool, Multiplicity.ExactlyOne)
                 ),
@@ -114,7 +117,7 @@ public partial class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Enti
                 "Cast date time",
                 new List<Entity> { Entity.Create(("Foo", "11/10/2020 3:45:44 PM")) },
                 CreateSchema(
-                    "ValueIf Schema",
+                    SchemaName,
                     false,
                     ("Foo", SCLType.Date, Multiplicity.ExactlyOne)
                 ),
@@ -125,7 +128,7 @@ public partial class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Enti
                 "Cast date time with input format",
                 new List<Entity> { Entity.Create(("Foo", "2020")) },
                 CreateSchema(
-                    "ValueIf Schema",
+                    SchemaName,
                     false,
                     ("Foo", SCLType.Date, null, Multiplicity.ExactlyOne, null, null,
                      new List<string> { "yyyy" }, null)
@@ -137,7 +140,7 @@ public partial class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Enti
                 "Cast date time with input format and output format",
                 new List<Entity> { Entity.Create(("Foo", "2020")) },
                 CreateSchema(
-                    "ValueIf Schema",
+                    SchemaName,
                     false,
                     ("Foo", SCLType.Date, null, Multiplicity.ExactlyOne, null, null,
                      new List<string> { "yyyy" }, "yyyy-mm-dd")
@@ -149,7 +152,7 @@ public partial class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Enti
                 "Match regex",
                 new List<Entity> { Entity.Create(("Foo", "100")) },
                 CreateSchema(
-                    "ValueIf Schema",
+                    SchemaName,
                     false,
                     ("Foo", SCLType.Integer, null, Multiplicity.ExactlyOne, @"\d+", null,
                      null, null)
@@ -161,7 +164,7 @@ public partial class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Enti
                 "Match enum",
                 new List<Entity> { Entity.Create(("Foo", "hello")) },
                 CreateSchema(
-                    "ValueIf Schema",
+                    SchemaName,
                     false,
                     ("Foo", SCLType.Enum, "Word", Multiplicity.ExactlyOne, null,
                      new List<string> { "Hello", "World" }, null, null)
@@ -170,30 +173,63 @@ public partial class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Enti
             );
 
             yield return CreateCase(
+                "Null with multiplicity any",
+                new List<Entity> { Entity.Create(("Foo", null)) },
+                CreateSchema(
+                    SchemaName,
+                    false,
+                    ("Foo", SCLType.Integer, null, Multiplicity.Any, null,
+                     null, null, null)
+                ),
+                "(Foo: \"\")"
+            );
+
+            yield return CreateCase(
+                "Null with multiplicity UpToOne",
+                new List<Entity> { Entity.Create(("Foo", null)) },
+                CreateSchema(
+                    SchemaName,
+                    false,
+                    ("Foo", SCLType.Integer, null, Multiplicity.UpToOne, null,
+                     null, null, null)
+                ),
+                "(Foo: \"\")"
+            );
+
+            yield return CreateCase(
+                "Null with multiplicity ExactlyOne",
+                new List<Entity> { Entity.Create(("Foo", null)) },
+                CreateSchema(
+                        SchemaName,
+                        false,
+                        ("Foo", SCLType.Integer, null, Multiplicity.ExactlyOne, null,
+                         null, null, null)
+                    )
+                    .WithErrorBehavior(ErrorBehavior.Error),
+                "Schema violation: Schema Violated: Expected not null"
+            );
+
+            yield return CreateCase(
                 "Could not cast: Behavior: Error",
                 new List<Entity> { Entity.Create(("Foo", "Hello")) },
-                WithErrorBehavior(
-                    CreateSchema(
-                        "ValueIf Schema",
+                CreateSchema(
+                        SchemaName,
                         false,
                         ("Foo", SCLType.Integer, Multiplicity.Any)
-                    ),
-                    ErrorBehavior.Error
-                ),
+                    )
+                    .WithErrorBehavior(ErrorBehavior.Error),
                 "Schema violation: Schema Violated: 'Hello' is not a Integer"
             );
 
             yield return CreateCase(
                 "Could not cast: Behavior: Warning",
                 new List<Entity> { Entity.Create(("Foo", "Hello")) },
-                WithErrorBehavior(
-                    CreateSchema(
-                        "ValueIf Schema",
+                CreateSchema(
+                        SchemaName,
                         false,
                         ("Foo", SCLType.Integer, Multiplicity.Any)
-                    ),
-                    ErrorBehavior.Warning
-                ),
+                    )
+                    .WithErrorBehavior(ErrorBehavior.Warning),
                 "Schema violation: Schema Violated: 'Hello' is not a Integer",
                 "(Foo: \"Hello\")"
             );
@@ -201,36 +237,26 @@ public partial class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Enti
             yield return CreateCase(
                 "Could not cast: Behavior: Skip",
                 new List<Entity> { Entity.Create(("Foo", "Hello")) },
-                WithErrorBehavior(
-                    CreateSchema(
-                        "ValueIf Schema",
+                CreateSchema(
+                        SchemaName,
                         false,
                         ("Foo", SCLType.Integer, Multiplicity.Any)
-                    ),
-                    ErrorBehavior.Skip
-                )
+                    )
+                    .WithErrorBehavior(ErrorBehavior.Skip)
             );
 
             yield return CreateCase(
                 "Could not cast: Behavior: Ignore",
                 new List<Entity> { Entity.Create(("Foo", "Hello")) },
-                WithErrorBehavior(
-                    CreateSchema(
-                        "ValueIf Schema",
+                CreateSchema(
+                        SchemaName,
                         false,
                         ("Foo", SCLType.Integer, Multiplicity.Any)
-                    ),
-                    ErrorBehavior.Ignore
-                ),
+                    )
+                    .WithErrorBehavior(ErrorBehavior.Ignore),
                 "(Foo: \"Hello\")"
             );
         }
-    }
-
-    private static Schema WithErrorBehavior(Schema schema, ErrorBehavior eb)
-    {
-        schema.DefaultErrorBehavior = eb;
-        return schema;
     }
 
     /// <inheritdoc />
@@ -282,7 +308,7 @@ public partial class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Enti
                 "Could not cast",
                 new List<Entity> { Entity.Create(("Foo", "Hello")) },
                 CreateSchema(
-                    "ValueIf Schema",
+                    SchemaName,
                     false,
                     ("Foo", SCLType.Integer, Multiplicity.Any)
                 ),
@@ -295,7 +321,7 @@ public partial class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Enti
                 "Missing enum value",
                 new List<Entity> { Entity.Create(("Foo", "Fish")) },
                 CreateSchema(
-                    "ValueIf Schema",
+                    SchemaName,
                     false,
                     ("Foo", SCLType.Enum, "Food", Multiplicity.Any, null,
                      new List<string> { "Meat", "Chips" }, null, null)
@@ -309,7 +335,7 @@ public partial class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Enti
                 "Missing enum name",
                 new List<Entity> { Entity.Create(("Foo", "Meat")) },
                 CreateSchema(
-                    "ValueIf Schema",
+                    SchemaName,
                     false,
                     ("Foo", SCLType.Enum, null, Multiplicity.Any, null,
                      new List<string> { "Meat", "Chips" }, null, null)
@@ -321,7 +347,7 @@ public partial class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Enti
                 "Regex not matched",
                 new List<Entity> { Entity.Create(("Foo", "Fish")) },
                 CreateSchema(
-                    "ValueIf Schema",
+                    SchemaName,
                     false,
                     ("Foo", SCLType.String, null, Multiplicity.Any, @"\d+", null, null,
                      null)
@@ -335,7 +361,7 @@ public partial class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Enti
                 "Missing property",
                 new List<Entity> { Entity.Create(("Foo", "Fish")) },
                 CreateSchema(
-                    "ValueIf Schema",
+                    SchemaName,
                     false,
                     ("Foo", SCLType.String, Multiplicity.Any),
                     ("Bar", SCLType.String, Multiplicity.AtLeastOne)
@@ -348,7 +374,7 @@ public partial class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Enti
                 "Extra property",
                 new List<Entity> { Entity.Create(("Foo", "Fish"), ("Bar", "Fly")) },
                 CreateSchema(
-                    "ValueIf Schema",
+                    SchemaName,
                     false,
                     ("Foo", SCLType.String, Multiplicity.Any)
                 ),
@@ -362,13 +388,13 @@ public partial class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Enti
     public void TestCreateSchema()
     {
         var schema = CreateSchema(
-            "ValueIf Schema",
+            SchemaName,
             false,
             ("foo", SCLType.String, Multiplicity.ExactlyOne),
             ("Bar", SCLType.Integer, Multiplicity.ExactlyOne)
         );
 
-        schema.Name.Should().Be("ValueIf Schema");
+        schema.Name.Should().Be(SchemaName);
 
         schema.AllowExtraProperties.Should().BeFalse();
 
@@ -387,7 +413,7 @@ public partial class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Enti
     public void TestSchemaConvertToEntity()
     {
         var schema = CreateSchema(
-            "ValueIf Schema",
+            SchemaName,
             false,
             ("foo", SCLType.String, Multiplicity.ExactlyOne),
             ("Bar", SCLType.Integer, Multiplicity.ExactlyOne)
@@ -395,19 +421,17 @@ public partial class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Enti
 
         var entity = schema.ConvertToEntity();
 
-        var name = entity.TryGetValue(nameof(schema.Name)).Map(x => x.GetString());
+        var name = entity.TryGetValue(nameof(schema.Name)).Map(x => x.GetPrimitiveString());
 
         name.HasValue.Should().BeTrue();
 
-        name.Value.Should().Be("ValueIf Schema");
+        name.Value.Should().Be(SchemaName);
 
         var properties = entity.TryGetValue(nameof(schema.Properties));
 
         properties.HasValue.Should().BeTrue();
 
-        var propertiesEntity = properties.Value.TryGetEntity();
-
-        propertiesEntity.HasValue.Should().BeTrue();
+        properties.Value.Should().BeOfType<EntityValue.NestedEntity>();
     }
 }
 

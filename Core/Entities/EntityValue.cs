@@ -7,7 +7,6 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using CSharpFunctionalExtensions;
 using Newtonsoft.Json.Linq;
-using OneOf;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Internal.Serialization;
@@ -19,29 +18,560 @@ namespace Reductech.EDR.Core.Entities
 /// <summary>
 /// The value of an entity property.
 /// </summary>
-public sealed class EntityValue : OneOfBase<DBNull, string, int, double, bool, Enumeration, DateTime
-                                    , Entity, ImmutableList<EntityValue>
-                                  >, IEquatable<EntityValue>
+public abstract record EntityValue(object? ObjectValue)
 {
     /// <summary>
-    /// Create a new entityValue
+    /// The Null value
     /// </summary>
-    public EntityValue(
-        OneOf<DBNull, string, int, double, bool, Enumeration, DateTime, Entity,
-            ImmutableList<EntityValue>> value,
-        string? outputFormat = null) : base(value) => OutputFormat = outputFormat;
+    public record Null : EntityValue
+    {
+        private Null() : base(null as object) { }
+
+        /// <summary>
+        /// The instance
+        /// </summary>
+        public static Null Instance { get; } = new();
+
+        /// <inheritdoc />
+        protected override Result<(EntityValue value, bool changed), IErrorBuilder> TryConvertBase(
+            SchemaProperty schemaProperty)
+        {
+            if (schemaProperty.Multiplicity == Multiplicity.Any ||
+                schemaProperty.Multiplicity == Multiplicity.UpToOne)
+                return (this, false);
+
+            return new ErrorBuilder(ErrorCode.SchemaViolationUnexpectedNull);
+        }
+
+        /// <inheritdoc />
+        public override string? GetPrimitiveString() => null;
+
+        /// <inheritdoc />
+        public override string Serialize()
+        {
+            return SerializationMethods.DoubleQuote("");
+        }
+
+        /// <inheritdoc />
+        public override string GetFormattedString(
+            char delimiter,
+            string dateTimeFormat) => "";
+
+        /// <inheritdoc />
+        protected override Maybe<object> AsType(Type type)
+        {
+            return Maybe<object>.None;
+        }
+    }
 
     /// <summary>
-    /// The output format if this is a DateTime and this has been set by a schema
+    /// A string value
     /// </summary>
-    public readonly string? OutputFormat;
+    public record String(string Value) : EntityValue(Value)
+    {
+        /// <inheritdoc />
+        public override string GetPrimitiveString()
+        {
+            return Value;
+        }
+
+        /// <inheritdoc />
+        public override string Serialize()
+        {
+            return SerializationMethods.DoubleQuote(Value);
+        }
+
+        /// <inheritdoc />
+        public override string GetFormattedString(
+            char delimiter,
+            string dateTimeFormat) => Value;
+
+        /// <inheritdoc />
+        protected override Maybe<object> AsType(Type type)
+        {
+            if (type == typeof(string))
+                return Value;
+
+            if (type == typeof(StringStream) || type == typeof(object))
+                return new StringStream(Value);
+
+            return Maybe<object>.None;
+        }
+
+        /// <inheritdoc />
+        protected override Result<(EntityValue value, bool changed), IErrorBuilder> TryConvertBase(
+            SchemaProperty schemaProperty)
+        {
+            switch (schemaProperty.Type)
+            {
+                case SCLType.String: return (this, false);
+                case SCLType.Integer:
+                {
+                    if (int.TryParse(Value, out var i))
+                        return (new Integer(i), true);
+
+                    break;
+                }
+                case SCLType.Double:
+                {
+                    if (double.TryParse(Value, out var d))
+                        return (new Double(d), true);
+
+                    break;
+                }
+                case SCLType.Enum:
+                {
+                    if (string.IsNullOrWhiteSpace(schemaProperty.EnumType))
+                        return new ErrorBuilder(ErrorCode.SchemaInvalidMissingEnum);
+
+                    if (schemaProperty.Values == null || !schemaProperty.Values.Any())
+                        return new ErrorBuilder(ErrorCode.SchemaInvalidNoEnumValues);
+
+                    if (schemaProperty.Values.Contains(Value, StringComparer.OrdinalIgnoreCase))
+                        return (
+                            new EnumerationValue(new Enumeration(schemaProperty.EnumType, Value)),
+                            true);
+
+                    break;
+                }
+                case SCLType.Bool:
+                {
+                    if (bool.TryParse(Value, out var b))
+                        return (new Boolean(b), true);
+
+                    break;
+                }
+                case SCLType.Date:
+                {
+                    if (schemaProperty.DateInputFormats != null &&
+                        DateTime.TryParseExact(
+                            Value,
+                            Enumerable.ToArray(schemaProperty.DateInputFormats),
+                            null,
+                            DateTimeStyles.None,
+                            out var dt1
+                        ))
+
+                    {
+                        return (
+                            new Date(
+                                dt1,
+                                schemaProperty.DateOutputFormat ?? Constants.DateTimeFormat
+                            ), true);
+                    }
+
+                    if (DateTime.TryParse(Value, out var dt))
+                        return (
+                            new Date(
+                                dt,
+                                schemaProperty.DateOutputFormat ?? Constants.DateTimeFormat
+                            ), true);
+
+                    break;
+                }
+                default: return CouldNotConvert(Value, schemaProperty);
+            }
+
+            return CouldNotConvert(Value, schemaProperty);
+        }
+    }
 
     /// <summary>
-    /// The DateOutputFormat to use
+    /// An integer value
     /// </summary>
-    public string DateOutputFormat => string.IsNullOrWhiteSpace(OutputFormat)
-        ? Constants.DateTimeFormat
-        : OutputFormat;
+    public record Integer(int Value) : EntityValue(Value)
+    {
+        /// <inheritdoc />
+        public override string GetFormattedString(
+            char delimiter,
+            string dateTimeFormat) => Value.ToString();
+
+        /// <inheritdoc />
+        public override string GetPrimitiveString()
+        {
+            return Value.ToString();
+        }
+
+        /// <inheritdoc />
+        public override string Serialize() => Value.ToString();
+
+        /// <inheritdoc />
+        protected override Maybe<object> AsType(Type type)
+        {
+            if (type == typeof(int) || type == typeof(Double))
+                return Value;
+
+            return Maybe<object>.None;
+        }
+
+        /// <inheritdoc />
+        protected override Result<(EntityValue value, bool changed), IErrorBuilder> TryConvertBase(
+            SchemaProperty schemaProperty)
+        {
+            return schemaProperty.Type switch
+            {
+                SCLType.String  => (new String(Value.ToString()), true),
+                SCLType.Integer => (this, false),
+                SCLType.Double  => (new Double(Convert.ToDouble(Value)), true),
+                _               => CouldNotConvert(Value, schemaProperty)
+            };
+        }
+    }
+
+    /// <summary>
+    /// A double precision floating point value
+    /// </summary>
+    public record Double(double Value) : EntityValue(Value)
+    {
+        /// <inheritdoc />
+        public override string GetFormattedString(
+            char delimiter,
+            string dateTimeFormat) => Value.ToString(Constants.DoubleFormat);
+
+        /// <inheritdoc />
+        public override string GetPrimitiveString() => Value.ToString("R");
+
+        /// <inheritdoc />
+        public override string Serialize() => Value.ToString(Constants.DoubleFormat);
+
+        /// <inheritdoc />
+        protected override Maybe<object> AsType(Type type)
+        {
+            if (type == typeof(double))
+                return Value;
+
+            return Maybe<object>.None;
+        }
+
+        /// <inheritdoc />
+        protected override Result<(EntityValue value, bool changed), IErrorBuilder> TryConvertBase(
+            SchemaProperty schemaProperty)
+        {
+            return schemaProperty.Type switch
+            {
+                SCLType.String => (
+                    new String(Value.ToString(Constants.DoubleFormat)), false),
+                SCLType.Double => (this, true),
+                _              => CouldNotConvert(Value, schemaProperty)
+            };
+        }
+    }
+
+    /// <summary>
+    /// A boolean value
+    /// </summary>
+    public record Boolean(bool Value) : EntityValue(Value)
+    {
+        /// <inheritdoc />
+        public override string GetPrimitiveString() => Value.ToString();
+
+        /// <inheritdoc />
+        public override string Serialize() => Value.ToString();
+
+        /// <inheritdoc />
+        public override string GetFormattedString(
+            char delimiter,
+            string dateTimeFormat) => Value.ToString();
+
+        /// <inheritdoc />
+        protected override Result<(EntityValue value, bool changed), IErrorBuilder> TryConvertBase(
+            SchemaProperty schemaProperty)
+        {
+            return schemaProperty.Type switch
+            {
+                SCLType.String => (new String(Value.ToString()), true),
+                SCLType.Bool   => (this, false),
+                _              => CouldNotConvert(Value, schemaProperty)
+            };
+        }
+
+        /// <inheritdoc />
+        protected override Maybe<object> AsType(Type type)
+        {
+            if (type == typeof(bool))
+                return Value;
+
+            return Maybe<object>.None;
+        }
+    } //TODO constant values
+
+    /// <summary>
+    /// An enumeration value
+    /// </summary>
+    public record EnumerationValue(Enumeration Value) : EntityValue(Value)
+    {
+        /// <inheritdoc />
+        public override string GetPrimitiveString() => Value.Value;
+
+        /// <inheritdoc />
+        public override string Serialize() => Value.ToString();
+
+        /// <inheritdoc />
+        public override string GetFormattedString(
+            char delimiter,
+            string dateTimeFormat) => Value.ToString();
+
+        /// <inheritdoc />
+        protected override Maybe<object> AsType(Type type)
+        {
+            return Maybe<object>.None;
+        }
+
+        /// <inheritdoc />
+        protected override Result<(EntityValue value, bool changed), IErrorBuilder> TryConvertBase(
+            SchemaProperty schemaProperty)
+        {
+            switch (schemaProperty.Type)
+            {
+                case SCLType.String: return (this, false);
+                case SCLType.Enum:
+                {
+                    if (schemaProperty.EnumType == null)
+                        return new ErrorBuilder(ErrorCode.SchemaInvalidMissingEnum);
+
+                    if (schemaProperty.Values == null || !schemaProperty.Values.Any())
+                        return new ErrorBuilder(ErrorCode.SchemaInvalidNoEnumValues);
+
+                    if (schemaProperty.Values.Contains(
+                        Value.Value,
+                        StringComparer.OrdinalIgnoreCase
+                    ))
+                    {
+                        if (schemaProperty.EnumType == Value.Type)
+                            return (this, false);
+
+                        return (
+                            new EnumerationValue(
+                                new Enumeration(schemaProperty.EnumType, Value.Value)
+                            ),
+                            true);
+                    }
+
+                    return CouldNotConvert(Value, schemaProperty);
+                }
+                default: return CouldNotConvert(Value, schemaProperty);
+            }
+        }
+    }
+
+    /// <summary>
+    /// A date time value
+    /// </summary>
+    public record Date(DateTime Value, string DateOutputFormat) : EntityValue(Value)
+    {
+        /// <summary>
+        /// Create a date with the default DateTimeFormat
+        /// </summary>
+        public Date(DateTime value) : this(value, Constants.DateTimeFormat) { }
+
+        /// <inheritdoc />
+        public override string GetPrimitiveString() => Value.ToString("o");
+
+        /// <inheritdoc />
+        public override string Serialize() => Value.ToString(DateOutputFormat);
+
+        /// <inheritdoc />
+        public override string GetFormattedString(
+            char delimiter,
+            string dateTimeFormat) => Value.ToString(dateTimeFormat);
+
+        /// <inheritdoc />
+        protected override Maybe<object> AsType(Type type)
+        {
+            if (type == typeof(DateTime))
+                return Value;
+
+            return Maybe<object>.None;
+        }
+
+        /// <inheritdoc />
+        public override string ToString() => Value.ToString(DateOutputFormat);
+
+        /// <inheritdoc />
+        protected override Result<(EntityValue value, bool changed), IErrorBuilder> TryConvertBase(
+            SchemaProperty schemaProperty)
+        {
+            return schemaProperty.Type switch
+            {
+                SCLType.String => (
+                    new String(Value.ToString(DateOutputFormat)), true),
+                SCLType.Date => (this, false),
+                _            => CouldNotConvert(Value, schemaProperty)
+            };
+        }
+    }
+
+    /// <summary>
+    /// A nested entity value
+    /// </summary>
+    public record NestedEntity(Entity Value) : EntityValue(Value)
+    {
+        /// <inheritdoc />
+        public override string? GetPrimitiveString() => null;
+
+        /// <inheritdoc />
+        public override string Serialize() => Value.Serialize();
+
+        /// <inheritdoc />
+        public override string GetFormattedString(
+            char delimiter,
+            string dateTimeFormat) => Value.ToString();
+
+        /// <inheritdoc />
+        protected override Maybe<object> AsType(Type type)
+        {
+            if (type == typeof(Entity))
+                return Value;
+
+            return Maybe<object>.None;
+        }
+
+        /// <inheritdoc />
+        public override string ToString() => Value.ToString();
+
+        /// <inheritdoc />
+        protected override Result<(EntityValue value, bool changed), IErrorBuilder> TryConvertBase(
+            SchemaProperty schemaProperty)
+        {
+            return schemaProperty.Type switch
+            {
+                SCLType.String => (new String(Value.ToString()), true),
+                SCLType.Enum   => (this, false),
+                _              => CouldNotConvert(Value, schemaProperty)
+            };
+        }
+    }
+
+    /// <summary>
+    /// A list of values
+    /// </summary>
+    public record NestedList(ImmutableList<EntityValue> Value) : EntityValue(Value)
+    {
+        /// <inheritdoc />
+        public override string? GetPrimitiveString() => null;
+
+        /// <inheritdoc />
+        public override string Serialize()
+        {
+            return SerializationMethods.SerializeList(Value.Select(y => y.Serialize()));
+        }
+
+        /// <inheritdoc />
+        public override string GetFormattedString(
+            char delimiter,
+            string dateTimeFormat) => string.Join(
+            delimiter,
+            Value.Select(ev1 => ev1.GetFormattedString(delimiter, dateTimeFormat))
+        );
+
+        /// <inheritdoc />
+        public virtual bool Equals(NestedList? other)
+        {
+            return other is not null && Value.SequenceEqual(other.Value);
+        }
+
+        /// <inheritdoc />
+        public override int GetHashCode()
+        {
+            if (Value.IsEmpty)
+                return 0;
+
+            return HashCode.Combine(Value.First(), Value.Last(), Value.Count);
+        }
+
+        /// <inheritdoc />
+        public override string ToString()
+        {
+            return Value.Count + " elements";
+        }
+
+        /// <inheritdoc />
+        protected override Maybe<object> AsType(Type type)
+        {
+            if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Array<>))
+            {
+                var genericType = type.GenericTypeArguments[0];
+
+                var elements = Value.Select(x => x.TryGetValue(genericType))
+                    .Combine(ErrorBuilderList.Combine);
+
+                if (elements.IsFailure)
+                    return elements.ConvertFailure<object>();
+
+                var createArrayMethod =
+                    typeof(ArrayHelper).GetMethod(nameof(ArrayHelper.CreateArray))!
+                        .MakeGenericMethod(genericType);
+
+                var arrayInstance = createArrayMethod.Invoke(
+                    null,
+                    new object?[] { elements.Value }
+                );
+
+                return arrayInstance!;
+            }
+
+            return Maybe<object>.None;
+        }
+
+        /// <inheritdoc />
+        public override EntityValue Combine(EntityValue other)
+        {
+            ImmutableList<EntityValue> newList;
+
+            if (other is NestedList otherList)
+                newList = Value.AddRange(otherList.Value);
+            else
+                newList = Value.Add(other);
+
+            return new NestedList(newList);
+        }
+
+        /// <inheritdoc />
+        protected override Result<(EntityValue value, bool changed), IErrorBuilder> TryConvertBase(
+            SchemaProperty schemaProperty)
+        {
+            if (schemaProperty.Multiplicity == Multiplicity.UpToOne ||
+                schemaProperty.Multiplicity == Multiplicity.ExactlyOne)
+            {
+                if (Value.Count == 1)
+                    return Value.Single().TryConvert(schemaProperty);
+
+                if (Value.Count == 0 && schemaProperty.Multiplicity == Multiplicity.UpToOne)
+                    return (Null.Instance, true);
+
+                return new ErrorBuilder(ErrorCode.SchemaViolationUnexpectedList);
+            }
+
+            var sp = new SchemaProperty
+            {
+                EnumType         = schemaProperty.EnumType,
+                Values           = schemaProperty.Values,
+                ErrorBehavior    = schemaProperty.ErrorBehavior,
+                DateInputFormats = schemaProperty.DateInputFormats,
+                DateOutputFormat = schemaProperty.DateOutputFormat,
+                Multiplicity     = Multiplicity.ExactlyOne,
+                Regex            = schemaProperty.Regex,
+                Type             = schemaProperty.Type
+            };
+
+            var newList = Value.Select(x => x.TryConvert(sp))
+                .Combine(ErrorBuilderList.Combine)
+                .Map(
+                    x => x.Aggregate(
+                        (list: ImmutableList<EntityValue>.Empty, changed: false),
+                        (a, b) => (a.list.Add(b.value), a.changed || b.changed)
+                    )
+                )
+                .Map(
+                    x =>
+                        x.changed
+                            ? (new NestedList(x.list) as EntityValue, true)
+                            : (this, false)
+                );
+
+            return newList;
+        }
+    }
 
     /// <summary>
     /// Create an entity from structured entity properties
@@ -51,7 +581,7 @@ public sealed class EntityValue : OneOfBase<DBNull, string, int, double, bool, E
         char? multiValueDelimiter)
     {
         if (properties.Count == 0)
-            return new EntityValue(DBNull.Value);
+            return Null.Instance;
 
         if (properties.Count == 1 && properties.Single().key.HasNoValue)
             return CreateFromObject(properties.Single().argValue, multiValueDelimiter);
@@ -65,15 +595,15 @@ public sealed class EntityValue : OneOfBase<DBNull, string, int, double, bool, E
 
             if (entityProperties.TryGetValue(key, out var existingValue))
             {
-                if (ev.IsT7)
+                if (ev is NestedEntity nestedEntity)
                 {
-                    if (existingValue.BestValue.IsT7)
+                    if (existingValue.BestValue is NestedEntity existingNestedEntity)
                     {
-                        var nEntity = existingValue.BestValue.AsT7.Combine(ev.AsT7);
+                        var nEntity = existingNestedEntity.Value.Combine(nestedEntity.Value);
 
                         newProperty = new EntityProperty(
                             key,
-                            new EntityValue(nEntity),
+                            new NestedEntity(nEntity),
                             null,
                             existingValue.Order
                         );
@@ -84,14 +614,14 @@ public sealed class EntityValue : OneOfBase<DBNull, string, int, double, bool, E
                         newProperty = new EntityProperty(key, ev, null, existingValue.Order);
                     }
                 }
-                else if (existingValue.BestValue.IsT7)
+                else if (existingValue.BestValue is NestedEntity existingNestedEntity)
                 {
                     var nEntity =
-                        existingValue.BestValue.AsT7.WithProperty(Entity.PrimitiveKey, ev);
+                        existingNestedEntity.Value.WithProperty(Entity.PrimitiveKey, ev);
 
                     newProperty = new EntityProperty(
                         key,
-                        new EntityValue(nEntity),
+                        new NestedEntity(nEntity),
                         null,
                         existingValue.Order
                     );
@@ -111,9 +641,9 @@ public sealed class EntityValue : OneOfBase<DBNull, string, int, double, bool, E
             {
                 var ev = CreateFromObject(argValue, multiValueDelimiter);
 
-                if (ev.IsT7)
-                    foreach (var entityProperty in ev.AsT7.Dictionary)
-                        SetEntityProperty(entityProperty.Key, entityProperty.Value.BestValue);
+                if (ev is NestedEntity ne)
+                    foreach (var (nestedKey, value) in ne.Value.Dictionary)
+                        SetEntityProperty(nestedKey, value.BestValue);
                 else
                     SetEntityProperty(Entity.PrimitiveKey, ev);
             }
@@ -132,7 +662,7 @@ public sealed class EntityValue : OneOfBase<DBNull, string, int, double, bool, E
 
         var newEntity = new Entity(entityProperties.ToImmutableDictionary());
 
-        return new EntityValue(newEntity);
+        return new NestedEntity(newEntity);
     }
 
     /// <summary>
@@ -142,25 +672,26 @@ public sealed class EntityValue : OneOfBase<DBNull, string, int, double, bool, E
     {
         switch (argValue)
         {
-            case null:             return new EntityValue(DBNull.Value);
+            case null:             return Null.Instance;
             case EntityValue ev:   return ev;
             case StringStream ss1: return Create(ss1.GetString(), multiValueDelimiter);
             case string s:         return Create(s,               multiValueDelimiter);
-            case int i:            return new EntityValue(i);
-            case byte @byte:       return new EntityValue(@byte);
-            case short @short:     return new EntityValue(@short);
-            case bool b:           return new EntityValue(b);
-            case double d:         return new EntityValue(d);
+            case int i:            return new Integer(i);
+            case byte @byte:       return new Integer(@byte);
+            case short @short:     return new Integer(@short);
+            case bool b:           return new Boolean(b);
+            case double d:         return new Double(d);
             case long ln when ln < int.MaxValue && ln > int.MinValue:
-                return new EntityValue(Convert.ToInt32(ln));
-            case Enumeration e1: return new EntityValue(e1);
-            case DateTime dt: return new EntityValue(dt);
-            case Enum e: return new EntityValue(new Enumeration(e.GetType().Name, e.ToString()));
-            case JValue jv: return CreateFromObject(jv.Value, multiValueDelimiter);
-            case JObject jo: return new EntityValue(Entity.Create(jo));
-            case Entity entity: return new EntityValue(entity);
-            case IEntityConvertible ec: return new EntityValue(ec.ConvertToEntity());
-            case Version version: return new EntityValue(version.ToString());
+                return new Integer(Convert.ToInt32(ln));
+            case Enumeration e1: return new EnumerationValue(e1);
+            case DateTime dt:    return new Date(dt);
+            case Enum e:
+                return new EnumerationValue(new Enumeration(e.GetType().Name, e.ToString()));
+            case JValue jv:             return CreateFromObject(jv.Value, multiValueDelimiter);
+            case JObject jo:            return new NestedEntity(Entity.Create(jo));
+            case Entity entity:         return new NestedEntity(entity);
+            case IEntityConvertible ec: return new NestedEntity(ec.ConvertToEntity());
+            case Version version:       return new String(version.ToString());
             case IDictionary dict:
             {
                 var builder = ImmutableDictionary<string, EntityProperty>.Empty.ToBuilder();
@@ -176,7 +707,7 @@ public sealed class EntityValue : OneOfBase<DBNull, string, int, double, bool, E
                 }
 
                 var entity = new Entity(builder.ToImmutable());
-                return new EntityValue(entity);
+                return new NestedEntity(entity);
             }
             case IEnumerable e2:
             {
@@ -185,9 +716,9 @@ public sealed class EntityValue : OneOfBase<DBNull, string, int, double, bool, E
                     .ToImmutableList();
 
                 if (!newEnumerable.Any())
-                    return new EntityValue(DBNull.Value);
+                    return Null.Instance;
 
-                return new EntityValue(newEnumerable);
+                return new NestedList(newEnumerable);
             }
             case IResult:
                 throw new ArgumentException(
@@ -204,7 +735,7 @@ public sealed class EntityValue : OneOfBase<DBNull, string, int, double, bool, E
                     .Any())
                 {
                     var entity = EntityConversionHelpers.ConvertToEntity(argValue);
-                    return new EntityValue(entity);
+                    return new NestedEntity(entity);
                 }
 
                 throw new ArgumentException(
@@ -215,44 +746,52 @@ public sealed class EntityValue : OneOfBase<DBNull, string, int, double, bool, E
 
         static EntityValue Create(string s, char? multiValueDelimiter)
         {
+            if (string.IsNullOrWhiteSpace(s))
+                return Null.Instance;
+
             if (multiValueDelimiter == null)
-                return new EntityValue(s);
+                return new String(s);
 
             var stringArray = s.Split(multiValueDelimiter.Value);
 
             if (stringArray.Length > 1)
-                return new EntityValue(
-                    stringArray.Select(s => new EntityValue(s)).ToImmutableList()
+                return new NestedList(
+                    stringArray.Select(s => new String(s)).ToImmutableList<EntityValue>()
                 );
 
-            return new EntityValue(s);
+            return new String(s);
         }
     }
 
     /// <summary>
     /// Combine this with another EntityValue
     /// </summary>
-    public EntityValue Combine(EntityValue other)
+    public virtual EntityValue Combine(EntityValue other)
     {
         ImmutableList<EntityValue> newList;
 
-        if (TryPickT8(out var thisList, out _))
-        {
-            if (other.TryPickT8(out var otherList, out _))
-                newList = thisList.AddRange(otherList);
-            else
-                newList = thisList.Add(other);
-        }
+        if (other is NestedList otherList)
+            newList = otherList.Value.Insert(0, this);
         else
-        {
-            if (other.TryPickT8(out var otherList, out _))
-                newList = otherList.Insert(0, this);
-            else
-                newList = ImmutableList.Create(this, other);
-        }
+            newList = ImmutableList.Create(this, other);
 
-        return new EntityValue(newList);
+        return new NestedList(newList);
     }
+
+    /// <summary>
+    /// Tries to convert a value to match the schema
+    /// </summary>
+    protected abstract Result<(EntityValue value, bool changed), IErrorBuilder> TryConvertBase(
+        SchemaProperty schemaProperty);
+
+    /// <summary>
+    /// Error returned when a value cannot be converted
+    /// </summary>
+    protected ErrorBuilder CouldNotConvert(object o, SchemaProperty schemaProperty) => new(
+        ErrorCode.SchemaViolationWrongType,
+        o,
+        schemaProperty.Type
+    );
 
     /// <summary>
     /// Tries to convert the value so it matches the schema.
@@ -262,254 +801,35 @@ public sealed class EntityValue : OneOfBase<DBNull, string, int, double, bool, E
     {
         if (schemaProperty.Regex != null)
         {
-            var s = this.GetString();
+            var primitiveString = GetPrimitiveString();
 
-            if (!Regex.IsMatch(s, schemaProperty.Regex))
+            if (primitiveString is null || !Regex.IsMatch(primitiveString, schemaProperty.Regex))
                 return new ErrorBuilder(
                     ErrorCode.SchemaViolationUnmatchedRegex,
-                    s,
+                    primitiveString,
                     schemaProperty.Regex
                 );
         }
 
-        ErrorBuilder CouldNotConvert(object o) => new(
-            ErrorCode.SchemaViolationWrongType,
-            o,
-            schemaProperty.Type
-        );
-
-        var r = Match(
-            MatchDbNull,
-            MatchString,
-            MatchInt,
-            MatchDouble,
-            MatchBool,
-            MatchEnum,
-            MatchDateTime,
-            MatchEntity,
-            MatchList
-        );
-
-        return r;
-
-        Result<(EntityValue value, bool changed), IErrorBuilder> MatchDbNull(DBNull dbNull)
-        {
-            if (schemaProperty.Multiplicity == Multiplicity.Any ||
-                schemaProperty.Multiplicity == Multiplicity.UpToOne)
-                return (this, false);
-
-            return new ErrorBuilder(ErrorCode.SchemaViolationUnexpectedNull);
-        }
-
-        Result<(EntityValue value, bool changed), IErrorBuilder> MatchString(string s)
-        {
-            switch (schemaProperty.Type)
-            {
-                case SCLType.String: return (this, false);
-                case SCLType.Integer:
-                {
-                    if (int.TryParse(s, out var i))
-                        return (new EntityValue(i), true);
-
-                    break;
-                }
-                case SCLType.Double:
-                {
-                    if (double.TryParse(s, out var d))
-                        return (new EntityValue(d), true);
-
-                    break;
-                }
-                case SCLType.Enum:
-                {
-                    if (string.IsNullOrWhiteSpace(schemaProperty.EnumType))
-                        return new ErrorBuilder(ErrorCode.SchemaInvalidMissingEnum);
-
-                    if (schemaProperty.Values == null || !schemaProperty.Values.Any())
-                        return new ErrorBuilder(ErrorCode.SchemaInvalidNoEnumValues);
-
-                    if (schemaProperty.Values.Contains(s, StringComparer.OrdinalIgnoreCase))
-                        return (new EntityValue(new Enumeration(schemaProperty.EnumType, s)), true);
-
-                    break;
-                }
-                case SCLType.Bool:
-                {
-                    if (bool.TryParse(s, out var b))
-                        return (new EntityValue(b), true);
-
-                    break;
-                }
-                case SCLType.Date:
-                {
-                    if (schemaProperty.DateInputFormats != null &&
-                        DateTime.TryParseExact(
-                            s,
-                            schemaProperty.DateInputFormats.ToArray(),
-                            null,
-                            DateTimeStyles.None,
-                            out var dt1
-                        ))
-
-                    {
-                        return (new EntityValue(dt1, schemaProperty.DateOutputFormat), true);
-                    }
-
-                    if (DateTime.TryParse(s, out var dt))
-                        return (new EntityValue(dt, schemaProperty.DateOutputFormat), true);
-
-                    break;
-                }
-                default: return CouldNotConvert(s);
-            }
-
-            return CouldNotConvert(s);
-        }
-
-        Result<(EntityValue value, bool changed), IErrorBuilder> MatchInt(int i)
-        {
-            return schemaProperty.Type switch
-            {
-                SCLType.String  => (new EntityValue(i.ToString()), true),
-                SCLType.Integer => (this, false),
-                SCLType.Double  => (new EntityValue(Convert.ToDouble(i)), true),
-                _               => CouldNotConvert(i)
-            };
-        }
-
-        Result<(EntityValue value, bool changed), IErrorBuilder> MatchDouble(double d)
-        {
-            return schemaProperty.Type switch
-            {
-                SCLType.String => (
-                    new EntityValue(d.ToString(Constants.DoubleFormat)), false),
-                SCLType.Double => (this, true),
-                _              => CouldNotConvert(d)
-            };
-        }
-
-        Result<(EntityValue value, bool changed), IErrorBuilder> MatchBool(bool b)
-        {
-            return schemaProperty.Type switch
-            {
-                SCLType.String => (new EntityValue(b.ToString()), true),
-                SCLType.Bool   => (this, false),
-                _              => CouldNotConvert(b)
-            };
-        }
-
-        Result<(EntityValue value, bool changed), IErrorBuilder> MatchEnum(Enumeration e)
-        {
-            switch (schemaProperty.Type)
-            {
-                case SCLType.String: return (this, false);
-                case SCLType.Enum:
-                {
-                    if (schemaProperty.EnumType == null)
-                        return new ErrorBuilder(ErrorCode.SchemaInvalidMissingEnum);
-
-                    if (schemaProperty.Values == null || !schemaProperty.Values.Any())
-                        return new ErrorBuilder(ErrorCode.SchemaInvalidNoEnumValues);
-
-                    if (schemaProperty.Values.Contains(e.Value, StringComparer.OrdinalIgnoreCase))
-                    {
-                        if (schemaProperty.EnumType == e.Type)
-                            return (this, false);
-
-                        return (new EntityValue(new Enumeration(schemaProperty.EnumType, e.Value)),
-                                true);
-                    }
-
-                    return CouldNotConvert(e);
-                }
-                default: return CouldNotConvert(e);
-            }
-        }
-
-        Result<(EntityValue value, bool changed), IErrorBuilder> MatchDateTime(DateTime dt)
-        {
-            return schemaProperty.Type switch
-            {
-                SCLType.String => (
-                    new EntityValue(dt.ToString(DateOutputFormat)), true),
-                SCLType.Date => (this, false),
-                _            => CouldNotConvert(dt)
-            };
-        }
-
-        Result<(EntityValue value, bool changed), IErrorBuilder> MatchEntity(Entity e)
-        {
-            return schemaProperty.Type switch
-            {
-                SCLType.String => (new EntityValue(e.ToString()), true),
-                SCLType.Enum   => (this, false),
-                _              => CouldNotConvert(e)
-            };
-        }
-
-        Result<(EntityValue value, bool changed), IErrorBuilder> MatchList(
-            ImmutableList<EntityValue> list)
-        {
-            if (schemaProperty.Multiplicity == Multiplicity.UpToOne ||
-                schemaProperty.Multiplicity == Multiplicity.ExactlyOne)
-            {
-                if (list.Count == 1)
-                    return list.Single().TryConvert(schemaProperty);
-
-                if (list.Count == 0 && schemaProperty.Multiplicity == Multiplicity.UpToOne)
-                    return (new EntityValue(DBNull.Value), true);
-
-                return new ErrorBuilder(ErrorCode.SchemaViolationUnexpectedList);
-            }
-
-            var sp = new SchemaProperty
-            {
-                EnumType         = schemaProperty.EnumType,
-                Values           = schemaProperty.Values,
-                ErrorBehavior    = schemaProperty.ErrorBehavior,
-                DateInputFormats = schemaProperty.DateInputFormats,
-                DateOutputFormat = schemaProperty.DateOutputFormat,
-                Multiplicity     = Multiplicity.ExactlyOne,
-                Regex            = schemaProperty.Regex,
-                Type             = schemaProperty.Type
-            };
-
-            var newList = list.Select(x => x.TryConvert(sp))
-                .Combine(ErrorBuilderList.Combine)
-                .Map(
-                    x => x.Aggregate(
-                        (list: ImmutableList<EntityValue>.Empty, changed: false),
-                        (a, b) => (a.list.Add(b.value), a.changed || b.changed)
-                    )
-                )
-                .Map(
-                    x =>
-                        x.changed
-                            ? (new EntityValue(x.list, schemaProperty.DateOutputFormat), true)
-                            : (this, false)
-                );
-
-            return newList;
-        }
+        return TryConvertBase(schemaProperty);
     }
 
     /// <summary>
     /// If this is a primitive, get a string representation
     /// </summary>
-    public string? GetPrimitiveString()
-    {
-        return Match<string?>(
-            _ => null, //null
-            @string => @string,
-            integer => integer.ToString(),
-            @double => @double.ToString("R"),
-            @bool => @bool.ToString(),
-            enumeration => enumeration.Value,
-            dateTime => dateTime.ToString("o"),
-            _ => null, //entity
-            _ => null  //list
-        );
-    }
+    public abstract string? GetPrimitiveString();
+
+    /// <summary>
+    /// Serialize this value as it will appear in SCL
+    /// </summary>
+    public abstract string Serialize();
+
+    /// <summary>
+    /// Gets a string with the given format
+    /// </summary>
+    public abstract string GetFormattedString(
+        char delimiter,
+        string dateTimeFormat);
 
     /// <summary>
     /// Gets the default entity value for a particular type
@@ -525,106 +845,73 @@ public sealed class EntityValue : OneOfBase<DBNull, string, int, double, bool, E
         if ("" is T tString)
             return tString;
 
-        if (typeof(T).IsAssignableTo(typeof(IEnumerable)) && typeof(T).IsGenericType)
+        if (typeof(T).IsAssignableTo(typeof(IArray)) && typeof(T).IsGenericType)
         {
             var param = typeof(T).GenericTypeArguments[0];
             var array = typeof(Array<>).MakeGenericType(param);
 
             var arrayInstance = Activator.CreateInstance(array);
 
-            if (arrayInstance is T tArray)
-                return tArray;
+            return (T)arrayInstance!;
         }
 
         return default!;
     }
 
+    /// <summary>
+    /// Returns the value, if it is of a particular type
+    /// </summary>
+    protected abstract Maybe<object> AsType(Type type);
+
     private Result<object, IErrorBuilder> TryGetValue(Type type)
     {
-        if (type == typeof(Entity))
-        {
-            if (TryPickT7(out var entity, out _))
-                return entity;
-        }
-        else if (type == typeof(int))
-        {
-            if (TryPickT2(out var integer, out _))
-                return integer;
+        var maybeObject = AsType(type);
 
-            if (int.TryParse(GetPrimitiveString() ?? "", out var i))
+        if (maybeObject.HasValue)
+            return maybeObject.Value;
+
+        var primitive = GetPrimitiveString();
+
+        if (type == typeof(int))
+        {
+            if (int.TryParse(primitive ?? "", out var i))
                 return i;
         }
 
         else if (type == typeof(double))
         {
-            if (TryPickT3(out var number, out _))
-                return number;
-
-            if (double.TryParse(GetPrimitiveString() ?? "", out var d))
+            if (double.TryParse(primitive ?? "", out var d))
                 return d;
         }
         else if (type == typeof(bool))
         {
-            if (TryPickT4(out var boolValue, out _))
-                return boolValue;
-
-            if (bool.TryParse(GetPrimitiveString() ?? "", out var b))
+            if (bool.TryParse(primitive ?? "", out var b))
                 return b;
         }
         else if (type.IsEnum)
         {
-            if (Enum.TryParse(type, GetPrimitiveString(), true, out var r))
+            if (!int.TryParse(primitive, out _) && //prevent int conversion
+                Enum.TryParse(type, primitive, true, out var r)
+            )
                 return r!;
         }
         else if (type == typeof(DateTime))
         {
-            if (TryPickT6(out var dt, out _))
-                return dt;
-
-            if (DateTime.TryParse(GetPrimitiveString() ?? "", out var d))
+            if (!double.TryParse(primitive, out _) && //prevent double conversion
+                DateTime.TryParse(primitive ?? "", out var d))
                 return d;
         }
         else if (type == typeof(string))
         {
-            if (TryPickT1(out var s, out _))
-                return s;
-
-            var ser = this.Serialize();
+            var ser = Serialize();
 
             return ser;
         }
         else if (type == typeof(StringStream) || type == typeof(object))
         {
-            if (TryPickT1(out var s, out _))
-                return new StringStream(s);
-
-            var ser = new StringStream(this.Serialize());
+            var ser = new StringStream(Serialize());
 
             return ser;
-        }
-        else if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Array<>))
-        {
-            if (TryPickT8(out var l, out _))
-            {
-                var genericType = type.GenericTypeArguments[0];
-
-                var elements = l.Select(x => x.TryGetValue(genericType))
-                    .Combine(ErrorBuilderList.Combine);
-
-                if (elements.IsFailure)
-                    return elements.ConvertFailure<object>();
-
-                var createArrayMethod =
-                    typeof(ArrayHelper).GetMethod(nameof(ArrayHelper.CreateArray))!
-                        .MakeGenericMethod(genericType);
-
-                var arrayInstance = createArrayMethod.Invoke(
-                    null,
-                    new object?[] { elements.Value }
-                );
-
-                return arrayInstance!;
-            }
         }
 
         return ErrorCode.CouldNotConvertEntityValue.ToErrorBuilder(type.Name);
@@ -641,65 +928,6 @@ public sealed class EntityValue : OneOfBase<DBNull, string, int, double, bool, E
             return r.ConvertFailure<T>();
 
         return (T)r.Value!;
-    }
-
-    /// <inheritdoc />
-    public bool Equals(EntityValue? other)
-    {
-        if (other is null)
-            return false;
-
-        if (Index != other.Index)
-            return false;
-
-        if (OutputFormat != other.OutputFormat)
-            return false;
-
-        var r = Match(
-            _ => other.IsT0,
-            a => a.Equals(other.AsT1),
-            a => a.Equals(other.AsT2),
-            a => a.Equals(other.AsT3),
-            a => a.Equals(other.AsT4),
-            a => a.Equals(other.AsT5),
-            a => a.Equals(other.AsT6),
-            a => a.Equals(other.AsT7),
-            a => a.SequenceEqual(other.AsT8)
-        );
-
-        return r;
-    }
-
-    /// <inheritdoc />
-    public override bool Equals(object? obj)
-    {
-        if (obj is null)
-            return false;
-
-        if (ReferenceEquals(this, obj))
-            return true;
-
-        return obj is EntityValue ev && Equals(ev);
-    }
-
-    /// <inheritdoc />
-    public override int GetHashCode() =>
-        Value.GetHashCode(); //TODO get hash code from immutable list
-
-    /// <inheritdoc />
-    public override string ToString()
-    {
-        return Match(
-            _ => "Empty",
-            x => x,
-            x => x.ToString(),
-            x => x.ToString(Constants.DoubleFormat),
-            x => x.ToString(),
-            x => x.ToString(),
-            x => x.ToString(DateOutputFormat),
-            x => x.ToString(),
-            x => x.Count + " elements"
-        );
     }
 }
 

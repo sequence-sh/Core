@@ -27,13 +27,21 @@ public class EnumDisplayComponent<T> : ISerializerBlock where T : Enum
     {
         return dictionary.TryFindOrFail(PropertyName, $"Missing Property {PropertyName}")
             .Bind(
-                x => x.Match(
-                    _ => Result.Failure<string>("Operator is VariableName"),
-                    s => s is EnumConstant<T> cs
-                        ? cs.Value.GetDisplayName()
-                        : Result.Failure<string>("Operator is non constant step"),
-                    sl => Result.Failure<string>("Operator is Step List")
-                )
+                x =>
+                    x switch
+                    {
+                        StepProperty.SingleStepProperty singleStepProperty => singleStepProperty
+                            .Step is EnumConstant<T> cs
+                            ? cs.Value.GetDisplayName()
+                            : Result.Failure<string>("Operator is non constant step"),
+                        StepProperty.StepListProperty => Result.Failure<string>(
+                            "Operator is Step List"
+                        ),
+                        StepProperty.VariableNameProperty => Result.Failure<string>(
+                            "Operator is VariableName"
+                        ),
+                        _ => throw new ArgumentOutOfRangeException(nameof(x))
+                    }
             );
     }
 }

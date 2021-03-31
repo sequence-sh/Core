@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.Util;
 
 namespace Reductech.EDR.Core.Internal.Serialization
@@ -87,24 +85,6 @@ public static class SerializationMethods
     }
 
     /// <summary>
-    /// Serialize an EntityValue
-    /// </summary>
-    public static string Serialize(this EntityValue entityValue)
-    {
-        return entityValue.Match(
-            _ => DoubleQuote(""),
-            DoubleQuote,
-            x => x.ToString(),
-            x => x.ToString(Constants.DoubleFormat),
-            x => x.ToString(),
-            x => x.ToString(),
-            x => x.ToString(entityValue.DateOutputFormat),
-            x => x.Serialize(),
-            x => SerializeList(x.Select(y => y.Serialize()))
-        );
-    }
-
-    /// <summary>
     /// Converts an object to a string suitable from printing
     /// </summary>
     public static async Task<string> GetStringAsync(object? obj)
@@ -115,7 +95,7 @@ public static class SerializationMethods
                 Entity entity   => entity.Serialize(),
                 StringStream ss => await ss.GetStringAsync(),
                 DateTime dt     => dt.ToString(Constants.DateTimeFormat),
-                double d        => d.ToString(Constants.DoubleFormat, new NumberFormatInfo() { }),
+                double d        => d.ToString(Constants.DoubleFormat, new NumberFormatInfo()),
                 _               => obj?.ToString()!
             };
     }

@@ -6,7 +6,6 @@ using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
-using OneOf;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.Internal.Errors;
@@ -124,18 +123,14 @@ public abstract class CompoundStep<T> : ICompoundStep<T>
 
             static IEnumerable<Requirement> GetNestedRequirements(StepProperty stepProperty)
             {
-                if (stepProperty.TryPickT1(out var step, out var rem1))
+                return stepProperty switch
                 {
-                    return step.RuntimeRequirements;
-                }
-
-                if (rem1.TryPickT1(out var steps, out _))
-                {
-                    var result = steps.SelectMany(x => x.RuntimeRequirements);
-                    return result;
-                }
-
-                return new List<Requirement>(); //Variables have no requirements
+                    StepProperty.SingleStepProperty ssp => ssp.Step.RuntimeRequirements,
+                    StepProperty.StepListProperty slp => slp.StepList.SelectMany(
+                        x => x.RuntimeRequirements
+                    ),
+                    _ => new List<Requirement>()
+                };
             }
         }
     }
@@ -177,68 +172,56 @@ public abstract class CompoundStep<T> : ICompoundStep<T>
                 var (propertyInfo, _) = arg1;
                 var val = propertyInfo.GetValue(this);
 
-                var oneOf =
-                    val switch
-                    {
-                        IStep step =>
-                            OneOf<VariableName, IStep, IReadOnlyList<IStep>>.FromT1(step),
-                        IEnumerable<IStep> enumerable =>
-                            OneOf<VariableName, IStep, IReadOnlyList<IStep>>.FromT2(
-                                enumerable.ToList()
-                            ),
-                        VariableName vn => vn,
-                        _               => null as OneOf<VariableName, IStep, IReadOnlyList<IStep>>?
-                    };
-
-                if (!oneOf.HasValue)
-                    return Maybe<StepProperty>.None;
-
                 var logAttribute = propertyInfo.GetCustomAttribute<LogAttribute>();
 
                 var scopedFunctionAttribute =
                     propertyInfo.GetCustomAttribute<ScopedFunctionAttribute>();
 
-                return new StepProperty(
-                    propertyInfo.Name,
-                    index,
-                    oneOf.Value,
-                    logAttribute,
-                    scopedFunctionAttribute,
-                    propertyInfo.GetCustomAttributes<RequiredVersionAttribute>().ToImmutableList()
-                );
+                var requiredVersions = propertyInfo.GetCustomAttributes<RequiredVersionAttribute>()
+                    .ToImmutableList();
+
+                if (val is IStep step)
+                {
+                    return new StepProperty.SingleStepProperty(
+                        step,
+                        propertyInfo.Name,
+                        index,
+                        logAttribute,
+                        scopedFunctionAttribute,
+                        requiredVersions
+                    );
+                }
+
+                if (val is VariableName vn)
+                {
+                    return new StepProperty.VariableNameProperty(
+                        vn,
+                        propertyInfo.Name,
+                        index,
+                        logAttribute,
+                        scopedFunctionAttribute,
+                        requiredVersions
+                    );
+                }
+
+                if (val is IEnumerable<IStep> enumerable)
+                {
+                    var list = enumerable.ToList();
+
+                    return new StepProperty.StepListProperty(
+                        list,
+                        propertyInfo.Name,
+                        index,
+                        logAttribute,
+                        scopedFunctionAttribute,
+                        requiredVersions
+                    );
+                }
+
+                return Maybe<StepProperty>.None;
             }
         }
     }
-
-    private FreezableStepData FreezableStepData
-    {
-        get
-        {
-            var dict = AllProperties
-                .OrderBy(x => x.Index)
-                .ToDictionary(
-                    x => new StepParameterReference(x.Name),
-                    x => x.Match(
-                        vn => new FreezableStepProperty(vn,          TextLocation),
-                        s => new FreezableStepProperty(s.Unfreeze(), TextLocation),
-                        sl =>
-                            new FreezableStepProperty(
-                                sl.Select(s => s.Unfreeze()).ToImmutableList(),
-                                TextLocation
-                            )
-                    )
-                );
-
-            return new FreezableStepData(dict, TextLocation);
-        }
-    }
-
-    /// <inheritdoc />
-    public IFreezableStep Unfreeze() => new CompoundFreezableStep(
-        StepFactory.TypeName,
-        FreezableStepData,
-        TextLocation
-    );
 
     /// <summary>
     /// Check that this step meets requirements
@@ -262,13 +245,17 @@ public abstract class CompoundStep<T> : ICompoundStep<T>
 
         var r3 = AllProperties
             .Select(
-                x => x.Match(
-                    _ => Unit.Default,
-                    s => s.Verify(settings),
-                    sl => sl.Select(s => s.Verify(settings))
+                x => x switch
+                {
+                    StepProperty.SingleStepProperty singleStepProperty => singleStepProperty.Step
+                        .Verify(settings),
+                    StepProperty.StepListProperty stepListProperty => stepListProperty.StepList
+                        .Select(s => s.Verify(settings))
                         .Combine(ErrorList.Combine)
-                        .Map(_ => Unit.Default)
-                )
+                        .Map(_ => Unit.Default),
+                    StepProperty.VariableNameProperty _ => Unit.Default,
+                    _ => throw new ArgumentOutOfRangeException(nameof(x), x, null)
+                }
             );
 
         var finalResult = r0.Concat(rRequirements)

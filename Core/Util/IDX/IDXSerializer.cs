@@ -104,7 +104,7 @@ public static class IDXSerializer
         EntityValue entityValue,
         SpecialField field)
     {
-        if (entityValue.TryPickT0(out _, out var r0))
+        if (entityValue is EntityValue.Null)
             return Unit.Default;
 
         void AppendString(string s1) //TODO escape value
@@ -130,53 +130,56 @@ public static class IDXSerializer
             sb.AppendLine(line);
         }
 
-        if (r0.TryPickT0(out var s, out var r1))
+        if (entityValue is EntityValue.String s)
         {
-            AppendString(s);
+            AppendString(s.Value);
             return Unit.Default;
         }
 
-        if (r1.TryPickT0(out var i, out var r2))
+        if (entityValue is EntityValue.Integer i)
         {
-            AppendField(i.ToString());
+            AppendField(i.Value.ToString());
             return Unit.Default;
         }
 
-        if (r2.TryPickT0(out var d, out var r3))
+        if (entityValue is EntityValue.Double d)
         {
-            AppendField(d.ToString(Constants.DoubleFormat));
+            AppendField(d.Value.ToString(Constants.DoubleFormat));
             return Unit.Default;
         }
 
-        if (r3.TryPickT0(out var b, out var r4))
+        if (entityValue is EntityValue.Boolean b)
         {
-            AppendField(b.ToString());
+            AppendField(b.Value.ToString());
             return Unit.Default;
         }
 
-        if (r4.TryPickT0(out var e, out var r5))
+        if (entityValue is EntityValue.EnumerationValue ev)
         {
-            AppendField(e.ToString());
+            AppendField(ev.Value.ToString());
             return Unit.Default;
         }
 
-        if (r5.TryPickT0(out var dt, out var r6))
+        if (entityValue is EntityValue.Date date)
         {
-            AppendField(dt.ToString("yyyy/MM/dd"));
+            AppendField(date.Value.ToString("yyyy/MM/dd"));
             return Unit.Default;
         }
 
-        if (r6.TryPickT0(out _, out var list))
+        if (entityValue is EntityValue.NestedEntity)
             return ErrorCode.CannotConvertNestedEntity.ToErrorBuilder("IDX");
 
-        if (!field.AllowList)
-            return ErrorCode.CannotConvertNestedList.ToErrorBuilder("IDX");
-
-        for (var j = 0; j < list.Count; j++)
+        if (entityValue is EntityValue.NestedList list)
         {
-            var member       = list[j];
-            var newFieldName = $"{field.Name}{j + 1}";
-            TryAppendValue(sb, member, field with { AllowList = false, Name = newFieldName });
+            if (!field.AllowList)
+                return ErrorCode.CannotConvertNestedList.ToErrorBuilder("IDX");
+
+            for (var j = 0; j < list.Value.Count; j++)
+            {
+                var member       = list.Value[j];
+                var newFieldName = $"{field.Name}{j + 1}";
+                TryAppendValue(sb, member, field with { AllowList = false, Name = newFieldName });
+            }
         }
 
         return Unit.Default;
