@@ -104,6 +104,11 @@ public record CreateEntityStep
         {
             var valueString = value.Serialize();
 
+            if (value.ShouldBracketWhenSerialized)
+            {
+                valueString = $"({valueString})";
+            }
+
             results.Add($"{key}: {valueString}");
         }
 
