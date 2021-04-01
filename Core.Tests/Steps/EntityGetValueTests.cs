@@ -35,6 +35,27 @@ public partial class EntityGetValueTests : StepTestBase<EntityGetValue<StringStr
                 },
                 "TextCase.Lower"
             );
+
+            yield return new StepCase(
+                "Entity is not a constant",
+                new EntityGetValue<StringStream>()
+                {
+                    Entity = new CreateEntityStep(
+                        new Dictionary<EntityPropertyKey, IStep>()
+                        {
+                            {
+                                new EntityPropertyKey("Foo"),
+                                new GetSubstring()
+                                {
+                                    String = Constant("Hello World"), Length = Constant(5)
+                                }
+                            }
+                        }
+                    ),
+                    Property = Constant("Foo")
+                },
+                "Hello"
+            );
         }
     }
 
