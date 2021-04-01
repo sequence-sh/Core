@@ -239,7 +239,11 @@ public static class SCLParsing
             }
 
             var operatorSymbol = operatorSymbols.Single();
-            var terms          = context.term().Select(Visit).ToList();
+
+            var terms = context.term()
+                .Select(x => Visit(x))
+                .Where(x => x.IsFailure || x.Value != null)
+                .ToList();
 
             var result = InfixHelper.TryCreateStep(
                 new TextLocation(context),
