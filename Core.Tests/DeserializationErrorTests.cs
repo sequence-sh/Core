@@ -36,6 +36,12 @@ public partial class DeserializationErrorTests
                  "Print - Line: 1, Col: 0, Idx: 0 - Line: 1, Col: 33, Idx: 33 Text: Print Value: 'hello' Term: 'world'")
             );
 
+            yield return new DeserializationErrorCase(
+                "1/",
+                ("Syntax Error: mismatched input '<EOF>' expecting {'(', '[', VARIABLENAME, DATETIME, NUMBER, OPENISTRING, SIMPLEISTRING, DOUBLEQUOTEDSTRING, SINGLEQUOTEDSTRING, TRUE, FALSE, NAME}",
+                 "Line: 1, Col: 2, Idx: 2 - Line: 1, Col: 1, Idx: 1 Text: <EOF>")
+            );
+
             //yield return new DeserializationErrorCase(
             //    "Print(['abc', '123'] == ['abc', '123'])",
             //    ("Type ArrayOfStringStream is not comparable and so cannot be used for sorting.",
