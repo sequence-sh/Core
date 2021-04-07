@@ -13,7 +13,7 @@ public record ChainInfixSerializer(string StepName, string Operator) : IStepSeri
     /// <inheritdoc />
     public string Serialize(IEnumerable<StepProperty> stepProperties)
     {
-        var properties = stepProperties as StepProperty[] ?? Enumerable.ToArray(stepProperties);
+        var properties = stepProperties as StepProperty[] ?? stepProperties.ToArray();
 
         if (properties.Length == 1 && properties.Single() is StepProperty.SingleStepProperty
         {

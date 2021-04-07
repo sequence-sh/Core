@@ -88,7 +88,7 @@ public static class EntityExtensions
         if (lastProp.Value is not EntityValue.NestedList list)
             return Maybe<string[]>.None;
 
-        var stringArray = Enumerable.ToArray(list.Value.Select(x => x.GetPrimitiveString() ?? ""));
+        var stringArray = list.Value.Select(x => x.GetPrimitiveString() ?? "").ToArray();
         return stringArray;
     }
 }

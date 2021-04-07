@@ -16,7 +16,7 @@ public partial class SplitStringTests : StepTestBase<StringSplit, Array<StringSt
             yield return new StepCase(
                 "Split a string",
                 new StringSplit() { String = Constant("Hello World"), Delimiter = Constant(" ") },
-                ArrayHelper.ToArray(new List<StringStream>() { "Hello", "World" })
+                new List<StringStream>() { "Hello", "World" }.ToSCLArray()
             );
         }
     }
@@ -29,7 +29,7 @@ public partial class SplitStringTests : StepTestBase<StringSplit, Array<StringSt
             yield return new DeserializeCase(
                 "Split a string",
                 "StringSplit String: 'Hello World' Delimiter: ' '",
-                ArrayHelper.ToArray(new List<StringStream> { "Hello", "World" })
+                new List<StringStream> { "Hello", "World" }.ToSCLArray()
             );
         }
     }
