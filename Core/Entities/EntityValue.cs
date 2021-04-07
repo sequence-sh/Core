@@ -146,7 +146,7 @@ public abstract record EntityValue(object? ObjectValue)
                     if (schemaProperty.DateInputFormats != null &&
                         DateTime.TryParseExact(
                             Value,
-                            Enumerable.ToArray(schemaProperty.DateInputFormats),
+                            schemaProperty.DateInputFormats.ToArray(),
                             null,
                             DateTimeStyles.None,
                             out var dt1

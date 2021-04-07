@@ -86,7 +86,7 @@ public static class CSVReader
                 multiValueResult.Value,
                 errorLocation
             )
-            .ToArray();
+            .ToSCLArray();
 
         return asyncEnumerable;
     }

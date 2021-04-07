@@ -45,7 +45,7 @@ public sealed class Repeat<T> : CompoundStep<Array<T>>
         if (number.IsFailure)
             return number.ConvertFailure<Array<T>>();
 
-        var result = Enumerable.Repeat(element.Value, number.Value).ToArray();
+        var result = Enumerable.Repeat(element.Value, number.Value).ToSCLArray();
 
         return result;
     }

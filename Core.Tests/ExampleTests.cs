@@ -151,27 +151,22 @@ public partial class ExampleTests
                 {
                     Variable = new VariableName("Schema"),
                     Value = Constant(
-                        EntityConversionHelpers.ConvertToEntity(
-                            new Schema
+                        new Schema
+                        {
+                            AllowExtraProperties = false,
+                            Name                 = "Dinosaur",
+                            Properties = new Dictionary<string, SchemaProperty>()
                             {
-                                AllowExtraProperties = false,
-                                Name                 = "Dinosaur",
-                                Properties = new Dictionary<string, SchemaProperty>()
                                 {
-                                    {
-                                        "Name", new SchemaProperty { Type = SCLType.String }
-                                    },
-                                    {
-                                        "ArrayLength",
-                                        new SchemaProperty { Type = SCLType.Double }
-                                    },
-                                    {
-                                        "Period",
-                                        new SchemaProperty { Type = SCLType.String }
-                                    },
-                                }
+                                    "Name", new SchemaProperty { Type = SCLType.String }
+                                },
+                                {
+                                    "ArrayLength",
+                                    new SchemaProperty { Type = SCLType.Double }
+                                },
+                                { "Period", new SchemaProperty { Type = SCLType.String } },
                             }
-                        )
+                        }.ConvertToEntity()
                     )
                 },
                 new FileWrite

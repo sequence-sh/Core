@@ -115,10 +115,9 @@ public partial class DeserializationErrorTests
             result.IsFailure.Should().BeTrue("Case should fail");
 
             var realErrorPairs =
-                Enumerable.ToArray(
-                    result.Error.GetAllErrors()
-                        .Select(x => (x.Message, x.Location.AsString()))
-                );
+                result.Error.GetAllErrors()
+                    .Select(x => (x.Message, x.Location.AsString()))
+                    .ToArray();
 
             realErrorPairs.Should().BeEquivalentTo(ExpectedErrors);
         }

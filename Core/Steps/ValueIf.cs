@@ -82,8 +82,8 @@ public sealed class ValueIf<T> : CompoundStep<T>
             TypeReference expectedTypeReference,
             FreezableStepData freezableStepData,
             TypeResolver typeResolver) => freezableStepData
-            .TryGetStep(nameof(ValueIf<object>.Then), StepType)
-            .Compose(() => freezableStepData.TryGetStep(nameof(ValueIf<object>.Else), StepType))
+            .TryGetStep(nameof(Then), StepType)
+            .Compose(() => freezableStepData.TryGetStep(nameof(Else), StepType))
             .Bind(
                 x => x.Item1.TryGetOutputTypeReference(expectedTypeReference, typeResolver)
                     .Compose(

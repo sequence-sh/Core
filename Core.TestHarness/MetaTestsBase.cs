@@ -41,11 +41,10 @@ public abstract class MetaTestsBase
     {
         var constructor = testType.GetConstructors().First();
 
-        var parameters = Enumerable.ToArray(
-            constructor.GetParameters()
-                .Select(x => x.DefaultValue ?? null)
-                .Select(x => x == DBNull.Value ? null : x)
-        );
+        var parameters = constructor.GetParameters()
+            .Select(x => x.DefaultValue ?? null)
+            .Select(x => x == DBNull.Value ? null : x)
+            .ToArray();
 
         var instance = constructor.Invoke(parameters);
 

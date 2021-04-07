@@ -164,7 +164,7 @@ public sealed class Array<T> : IArray, IEquatable<Array<T>>
         IAsyncEnumerable<T> asyncEnumerable =
             Option.IsT0 ? Option.AsT0.ToAsyncEnumerable() : Option.AsT1;
 
-        var r = asyncEnumerable.SelectMany(selector).ToArray();
+        var r = asyncEnumerable.SelectMany(selector).ToSCLArray();
 
         return r;
     }
@@ -177,7 +177,7 @@ public sealed class Array<T> : IArray, IEquatable<Array<T>>
         IAsyncEnumerable<T> asyncEnumerable =
             Option.IsT0 ? Option.AsT0.ToAsyncEnumerable() : Option.AsT1;
 
-        var r = asyncEnumerable.SelectAwait(selector).ToArray();
+        var r = asyncEnumerable.SelectAwait(selector).ToSCLArray();
 
         return r;
     }
@@ -190,7 +190,7 @@ public sealed class Array<T> : IArray, IEquatable<Array<T>>
         IAsyncEnumerable<T> asyncEnumerable =
             Option.IsT0 ? Option.AsT0.ToAsyncEnumerable() : Option.AsT1;
 
-        var r = asyncEnumerable.Select(selector).ToArray();
+        var r = asyncEnumerable.Select(selector).ToSCLArray();
 
         return r;
     }
@@ -395,12 +395,13 @@ public static class ArrayHelper
     /// <summary>
     /// Converts an enumerable to a Sequence
     /// </summary>
-    public static Array<T> ToArray<T>(this IAsyncEnumerable<T> enumerable) => new(enumerable);
+    public static Array<T> ToSCLArray<T>(this IAsyncEnumerable<T> enumerable) => new(enumerable);
 
     /// <summary>
     /// Converts an asyncEnumerable to a Sequence
     /// </summary>
-    public static Array<T> ToArray<T>(this IEnumerable<T> enumerable) => new(enumerable.ToList());
+    public static Array<T> ToSCLArray<T>(this IEnumerable<T> enumerable) =>
+        new(enumerable.ToList());
 
     /// <summary>
     /// Creates an array from an enumerable of objects
