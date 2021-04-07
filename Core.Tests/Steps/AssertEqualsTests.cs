@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.TestHarness;
 using Reductech.EDR.Core.Util;
@@ -38,6 +39,46 @@ public partial class AssertEqualTests : StepTestBase<AssertEqual<StringStream>, 
                 },
                 Unit.Default
             );
+
+            yield return new StepCase(
+                "Compare to entity int property",
+                new AssertEqual<int>
+                {
+                    Left = Constant(1),
+                    Right = new EntityGetValue<int>
+                    {
+                        Entity   = Constant(Entity.Create(("Foo", 1))),
+                        Property = Constant("Foo")
+                    }
+                },
+                Unit.Default
+            );
+
+            yield return new StepCase(
+                "Compare to entity property from variable",
+                new Sequence<Unit>()
+                {
+                    InitialSteps =
+                        new[]
+                        {
+                            new SetVariable<Entity>()
+                            {
+                                Variable = new VariableName("MyEntity"),
+                                Value    = Constant(Entity.Create(("Foo", 1)))
+                            }
+                        },
+                    FinalStep = new AssertEqual<int>
+                    {
+                        Left = Constant(1),
+                        Right = new EntityGetValue<int>
+                        {
+                            Entity   = GetVariable<Entity>("MyEntity"),
+                            Property = Constant("Foo")
+                        }
+                    }
+                },
+                Unit.Default
+            ) { IgnoreFinalState = true };
 
             yield return new StepCase(
                 "Strings not equal",
