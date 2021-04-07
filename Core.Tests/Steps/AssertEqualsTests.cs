@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.TestHarness;
 using Reductech.EDR.Core.Util;
@@ -60,6 +56,19 @@ public partial class AssertEqualTests : StepTestBase<AssertEqual<StringStream>, 
                 new AssertError()
                 {
                     Step = new AssertEqual<int> { Left = Constant(2), Right = Constant(3) }
+                },
+                Unit.Default
+            ) { IgnoreLoggedValues = true };
+
+            yield return new StepCase(
+                "Entities not equal",
+                new AssertError()
+                {
+                    Step = new AssertEqual<Entity>
+                    {
+                        Left  = Constant(Entity.Create(("a", 1))),
+                        Right = Constant(Entity.Create(("b", 1)))
+                    }
                 },
                 Unit.Default
             ) { IgnoreLoggedValues = true };

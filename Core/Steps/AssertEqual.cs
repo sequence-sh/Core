@@ -16,7 +16,7 @@ namespace Reductech.EDR.Core.Steps
 /// Asserts that two objects are equal.
 /// Both objects must have the same type.
 /// </summary>
-public sealed class AssertEqual<T> : CompoundStep<Unit> where T : IComparable
+public sealed class AssertEqual<T> : CompoundStep<Unit>
 {
     /// <inheritdoc />
     protected override async Task<Result<Unit, IError>> Run(
@@ -33,9 +33,9 @@ public sealed class AssertEqual<T> : CompoundStep<Unit> where T : IComparable
         if (right.IsFailure)
             return right.ConvertFailure<Unit>();
 
-        var r = left.Value.CompareTo(right.Value);
+        var r = left.Value is not null && left.Value.Equals(right.Value);
 
-        if (r == 0)
+        if (r)
             return Unit.Default;
 
         var lString = await SerializationMethods.GetStringAsync(left.Value);
