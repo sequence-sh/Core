@@ -120,7 +120,21 @@ public abstract record StepProperty
         /// <inheritdoc />
         protected override string SerializeValue()
         {
-            var l = StepList.Select(s => s.Serialize()).ToList();
+            var l = StepList.Select(
+                    s =>
+                    {
+                        var ser = s.Serialize();
+
+                        if (s.ShouldBracketWhenSerialized)
+                        {
+                            return $"({ser})";
+                        }
+
+                        return ser;
+                    }
+                )
+                .ToList();
+
             return SerializationMethods.SerializeList(l);
         }
 
