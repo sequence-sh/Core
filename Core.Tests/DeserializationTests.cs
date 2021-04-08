@@ -393,6 +393,22 @@ Log 'Comments!'",
                 "b",
                 "c"
             );
+
+            yield return new DeserializationTestInstance(
+                @"
+- <bar> = 'b'
+- ['a', <bar>, 'c']
+",
+                "3 Elements"
+            );
+
+            yield return new DeserializationTestInstance(
+                @"
+- <bar> = ('letter': 'b')['letter']
+- ['a', <bar>, 'c']
+",
+                "3 Elements"
+            );
         }
     }
 

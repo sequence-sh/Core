@@ -177,6 +177,18 @@ public sealed class TypeResolver
         MyDictionary.Add(variable, typeReference);
         return Unit.Default;
     }
+
+    /// <summary>
+    /// Resolve this type reference if it is variable and in the dictionary.
+    /// </summary>
+    public TypeReference? MaybeResolve(TypeReference typeReference)
+    {
+        if (typeReference is TypeReference.Variable vr
+         && Dictionary.TryGetValue(vr.VariableName, out var tr))
+            return tr;
+
+        return null;
+    }
 }
 
 }

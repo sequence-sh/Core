@@ -18,6 +18,29 @@ public partial class SequenceTests : StepTestBase<Sequence<StringStream>, String
         get
         {
             yield return new StepCase(
+                "No initial steps",
+                new Sequence<StringStream>
+                {
+                    InitialSteps = new List<IStep<Unit>>(), FinalStep = Constant("Goodbye")
+                },
+                "Goodbye"
+            );
+
+            yield return new StepCase(
+                "Nested Sequence",
+                new Sequence<StringStream>
+                {
+                    InitialSteps = new List<IStep<Unit>>(),
+                    FinalStep = new Sequence<StringStream>
+                    {
+                        InitialSteps = new List<IStep<Unit>>(),
+                        FinalStep    = Constant("Goodbye")
+                    }
+                },
+                "Goodbye"
+            );
+
+            yield return new StepCase(
                 "Log then Log",
                 new Sequence<StringStream>
                 {

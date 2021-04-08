@@ -79,7 +79,7 @@ public abstract class
             TypeResolver typeResolver)
         {
             var checkResult = expectedTypeReference
-                .CheckAllows(TypeReference.Actual.Bool, StepType)
+                .CheckAllows(TypeReference.Actual.Bool, StepType, typeResolver)
                 .MapError(x => x.WithLocation(freezableStepData));
 
             if (checkResult.IsFailure)

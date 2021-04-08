@@ -112,7 +112,7 @@ public sealed class ForEach<T> : CompoundStep<Unit>
             TypeReference expectedTypeReference)
         {
             return expectedTypeReference
-                .CheckAllows(TypeReference.Unit.Instance, StepType)
+                .CheckAllows(TypeReference.Unit.Instance, StepType, null)
                 .Map(_ => new TypeReference.Array(TypeReference.Any.Instance) as TypeReference);
         }
 

@@ -25,7 +25,7 @@ public static class FunctionalExtensions
         if (converted is T objConverted)
             return objConverted;
 
-        return new ErrorBuilder(ErrorCode.InvalidCast, obj, typeof(T).Name);
+        return ErrorCode.InvalidCast.ToErrorBuilder(obj, typeof(T).Name);
     }
 
     /// <summary>

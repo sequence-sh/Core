@@ -67,7 +67,7 @@ public sealed class ArrayIsEmpty<T> : CompoundStep<bool>
             TypeReference expectedTypeReference)
         {
             return expectedTypeReference
-                .CheckAllows(TypeReference.Actual.Bool, StepType)
+                .CheckAllows(TypeReference.Actual.Bool, StepType, null)
                 .Map(_ => new TypeReference.Array(TypeReference.Any.Instance) as TypeReference);
         }
     }

@@ -40,7 +40,7 @@ public abstract record TypeReference
         }
 
         /// <inheritdoc />
-        public override bool Allow(TypeReference other)
+        public override bool Allow(TypeReference other, TypeResolver? typeResolver)
         {
             return true;
         }
@@ -65,8 +65,10 @@ public abstract record TypeReference
             Type.GetCSharpType();
 
         /// <inheritdoc />
-        public override bool Allow(TypeReference other)
+        public override bool Allow(TypeReference other, TypeResolver? typeResolver)
         {
+            other = typeResolver?.MaybeResolve(other) ?? other;
+
             if (other is Actual a)
             {
                 if (a.Type == Type)
@@ -141,8 +143,10 @@ public abstract record TypeReference
         }
 
         /// <inheritdoc />
-        public override bool Allow(TypeReference other)
+        public override bool Allow(TypeReference other, TypeResolver? typeResolver)
         {
+            other = typeResolver?.MaybeResolve(other) ?? other;
+
             return other is Unit;
         }
 
@@ -163,8 +167,10 @@ public abstract record TypeReference
         }
 
         /// <inheritdoc />
-        public override bool Allow(TypeReference other)
+        public override bool Allow(TypeReference other, TypeResolver? typeResolver)
         {
+            other = typeResolver?.MaybeResolve(other) ?? other;
+
             return other is Enum e && EnumType == e.EnumType;
         }
 
@@ -194,9 +200,11 @@ public abstract record TypeReference
         }
 
         /// <inheritdoc />
-        public override bool Allow(TypeReference other)
+        public override bool Allow(TypeReference other, TypeResolver? typeResolver)
         {
-            return other is Array array && MemberType.Allow(array.MemberType);
+            other = typeResolver?.MaybeResolve(other) ?? other;
+
+            return other is Array array && MemberType.Allow(array.MemberType, typeResolver);
         }
 
         /// <inheritdoc />
@@ -225,7 +233,7 @@ public abstract record TypeReference
             var possibleTypes = Options.Where(x => x != Any.Instance)
                 .Select(x => x.TryGetType(typeResolver))
                 .Combine(ErrorBuilderList.Combine)
-                .Map(x => x.Distinct().ToList());
+                .Map(x => x.Distinct().Where(t => t != typeof(object)).ToList());
 
             if (possibleTypes.IsFailure)
                 return possibleTypes.ConvertFailure<Type>();
@@ -247,9 +255,11 @@ public abstract record TypeReference
         }
 
         /// <inheritdoc />
-        public override bool Allow(TypeReference other)
+        public override bool Allow(TypeReference other, TypeResolver? typeResolver)
         {
-            return Options.Any(x => x.Allow(other));
+            other = typeResolver?.MaybeResolve(other) ?? other;
+
+            return Options.Any(x => x.Allow(other, typeResolver));
         }
 
         /// <inheritdoc />
@@ -316,9 +326,13 @@ public abstract record TypeReference
         }
 
         /// <inheritdoc />
-        public override bool Allow(TypeReference other)
+        public override bool Allow(TypeReference other, TypeResolver? typeResolver)
         {
-            return true;
+            if (typeResolver is null
+             || !typeResolver.Dictionary.TryGetValue(VariableName, out var resolvedType))
+                return true;
+
+            return resolvedType.Allow(other, typeResolver);
         }
 
         /// <inheritdoc />
@@ -353,7 +367,7 @@ public abstract record TypeReference
         }
 
         /// <inheritdoc />
-        public override bool Allow(TypeReference other)
+        public override bool Allow(TypeReference other, TypeResolver? typeResolver)
         {
             return true;
         }
@@ -371,6 +385,10 @@ public abstract record TypeReference
         {
             var nested = stepType.GenericTypeArguments[0];
             return Create(nested);
+        }
+        else if (stepType == typeof(IStep))
+        {
+            return Any.Instance;
         }
 
         throw new Exception("Type was not a step type");
@@ -441,7 +459,7 @@ public abstract record TypeReference
     /// <summary>
     /// Whether this allows the other type reference
     /// </summary>
-    public abstract bool Allow(TypeReference other);
+    public abstract bool Allow(TypeReference other, TypeResolver? typeResolver);
 
     /// <summary>
     /// Check that this property allows a particular type
@@ -449,9 +467,10 @@ public abstract record TypeReference
     /// <returns></returns>
     public Result<Util.Unit, IErrorBuilder> CheckAllows(
         TypeReference reference,
-        Type stepType)
+        Type stepType,
+        TypeResolver? typeResolver)
     {
-        if (Allow(reference))
+        if (Allow(reference, typeResolver))
             return Util.Unit.Default;
 
         return Result.Failure<Util.Unit, IErrorBuilder>(

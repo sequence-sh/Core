@@ -64,7 +64,8 @@ public sealed class ArrayLength<T> : CompoundStep<int>
         {
             var r = expectedTypeReference.CheckAllows(
                 TypeReference.Actual.Integer,
-                StepType
+                StepType,
+                null
             );
 
             if (r.IsFailure)
