@@ -60,9 +60,35 @@ public sealed class GetVariable<T> : CompoundStep<T>
         protected override Result<TypeReference, IError> GetGenericTypeParameter(
             TypeReference expectedTypeReference,
             FreezableStepData freezableStepData,
-            TypeResolver typeResolver) => freezableStepData
-            .TryGetVariableName(nameof(GetVariable<object>.Variable), StepType)
-            .Map(x => new TypeReference.Variable(x) as TypeReference);
+            TypeResolver typeResolver)
+        {
+            var variableName = freezableStepData
+                .TryGetVariableName(nameof(GetVariable<object>.Variable), StepType);
+
+            if (variableName.IsFailure)
+                return variableName.ConvertFailure<TypeReference>();
+
+            if (expectedTypeReference != TypeReference.Unknown.Instance
+             && typeResolver.Dictionary.TryGetValue(variableName.Value, out var tr))
+            {
+                if (tr.Allow(expectedTypeReference, typeResolver))
+                {
+                    return expectedTypeReference;
+                }
+                else if (expectedTypeReference.Allow(tr, typeResolver))
+                {
+                    return tr;
+                }
+
+                return Result.Failure<TypeReference, IError>(
+                    ErrorCode.WrongOutputType
+                        .ToErrorBuilder(TypeName, tr.Name, expectedTypeReference.Name)
+                        .WithLocation(freezableStepData)
+                );
+            }
+
+            return new TypeReference.Variable(variableName.Value);
+        }
 
         /// <inheritdoc />
         public override string OutputTypeExplanation => "T";

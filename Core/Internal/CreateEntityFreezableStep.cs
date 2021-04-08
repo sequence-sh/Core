@@ -31,7 +31,8 @@ public record CreateEntityFreezableStep(
     {
         var checkResult = expectedType.CheckAllows(
                 TypeReference.Actual.Entity,
-                typeof(CreateEntityStep)
+                typeof(CreateEntityStep),
+                typeResolver
             )
             .MapError(x => x.WithLocation(this));
 

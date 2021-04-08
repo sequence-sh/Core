@@ -46,7 +46,8 @@ public record IntConstantFreezable
     {
         var intCheckResult = expectedType.CheckAllows(
             TypeReference.Actual.Integer,
-            typeof(IntConstant)
+            typeof(IntConstant),
+            null
         );
 
         if (intCheckResult.IsSuccess)
@@ -54,7 +55,8 @@ public record IntConstantFreezable
 
         var doubleCheckResult = expectedType.CheckAllows(
             TypeReference.Actual.Double,
-            typeof(DoubleConstant)
+            typeof(DoubleConstant),
+            null
         );
 
         if (doubleCheckResult.IsSuccess)
@@ -212,7 +214,7 @@ public record EnumConstantFreezable
         #pragma warning disable CA1031 // Do not catch general exception types
         catch (Exception e)
         {
-            return new ErrorBuilder(e, ErrorCode.InvalidCast);
+            return ErrorCode.InvalidCast.ToErrorBuilder(e);
         }
         #pragma warning restore CA1031 // Do not catch general exception types
     }

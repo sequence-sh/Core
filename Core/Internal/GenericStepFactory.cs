@@ -1,4 +1,5 @@
-﻿using CSharpFunctionalExtensions;
+﻿using System;
+using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Internal.Errors;
 
 namespace Reductech.EDR.Core.Internal
@@ -29,13 +30,23 @@ public abstract class GenericStepFactory : StepFactory
     protected override Result<ICompoundStep, IError> TryCreateInstance(
         TypeReference expectedTypeReference,
         FreezableStepData freezeData,
-        TypeResolver typeResolver) => GetGenericTypeParameter(
+        TypeResolver typeResolver)
+    {
+        var genericTypeParameter = GetGenericTypeParameter(
             expectedTypeReference,
             freezeData,
             typeResolver
-        )
-        .Bind(x => x.TryGetType(typeResolver).MapError(e => e.WithLocation(freezeData)))
-        .Bind(x => TryCreateGeneric(StepType, x).MapError(e => e.WithLocation(freezeData)));
+        );
+
+        if (genericTypeParameter.IsFailure)
+            return genericTypeParameter.ConvertFailure<ICompoundStep>();
+
+        var result = genericTypeParameter.Value.TryGetType(typeResolver)
+            .Bind(x => TryCreateGeneric(StepType, x))
+            .MapError(e => e.WithLocation(freezeData));
+
+        return result;
+    }
 
     /// <summary>
     /// Gets the type

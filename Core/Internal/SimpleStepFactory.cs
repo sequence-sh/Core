@@ -20,7 +20,7 @@ public class SimpleStepFactory<TStep, TOutput> : StepFactory
         var reference = TypeReference.Create(typeof(TOutput));
 
         return expectedTypeReference
-            .CheckAllows(reference, StepType)
+            .CheckAllows(reference, StepType, typeResolver)
             .MapError(x => x.WithLocation(freezableStepData))
             .Map(_ => reference);
     }

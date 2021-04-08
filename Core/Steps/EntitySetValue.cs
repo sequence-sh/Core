@@ -104,7 +104,7 @@ public sealed class EntitySetValue<T> : CompoundStep<Entity>
             FreezableStepData freezableStepData,
             TypeResolver typeResolver)
         {
-            if (!expectedTypeReference.Allow(TypeReference.Actual.Entity))
+            if (!expectedTypeReference.Allow(TypeReference.Actual.Entity, typeResolver))
             {
                 return Result.Failure<TypeReference, IError>(
                     ErrorCode.WrongParameterType.ToErrorBuilder(

@@ -321,7 +321,7 @@ public abstract class StepFactory : IStepFactory
             return Result.Success<IStep, IErrorBuilder>(stepToSet);
         }
 
-        return new ErrorBuilder(ErrorCode.InvalidCast, propertyInfo.Name, stepToSet.Name);
+        return ErrorCode.InvalidCast.ToErrorBuilder(propertyInfo.Name, stepToSet.Name);
     }
 
     private static Result<Unit, IError> TrySetStepList(
@@ -362,36 +362,40 @@ public abstract class StepFactory : IStepFactory
 
         Result<Unit, IError> SetStepList()
         {
-            var argumentType = propertyInfo.PropertyType.GenericTypeArguments.Single();
-            var listType     = typeof(List<>).MakeGenericType(argumentType);
+            var stepType = propertyInfo.PropertyType.GenericTypeArguments.Single();
+
+            TypeReference expectedElementType = TypeReference.CreateFromStepType(stepType);
+
+            var listType = typeof(List<>).MakeGenericType(stepType);
 
             var list      = Activator.CreateInstance(listType);
             var addMethod = listType.GetMethod(nameof(List<object>.Add))!;
             var errors    = new List<IError>();
 
-            foreach (var freezableStep in freezableStepList)
+            for (var index = 0; index < freezableStepList.Count; index++)
             {
+                var freezableStep = freezableStepList[index];
+
                 var freezeResult = freezableStep.TryFreeze(
-                    TypeReference.Create(argumentType),
+                    expectedElementType,
                     typeResolver
                 );
 
                 if (freezeResult.IsFailure)
                     errors.Add(freezeResult.Error);
                 else if (freezeResult.Value is IConstantStep constant
-                      && argumentType.IsInstanceOfType(constant.ValueObject))
+                      && stepType.IsInstanceOfType(constant.ValueObject))
                 {
                     addMethod.Invoke(list, new[] { constant.ValueObject });
                 }
-                else if (argumentType.IsInstanceOfType(freezeResult.Value))
+                else if (stepType.IsInstanceOfType(freezeResult.Value))
                 {
                     addMethod.Invoke(list, new object?[] { freezeResult.Value });
                 }
                 else
                 {
-                    var error = new ErrorBuilder(
-                            ErrorCode.InvalidCast,
-                            parentStep.StepFactory.TypeName,
+                    var error = ErrorCode.InvalidCast.ToErrorBuilder(
+                            propertyInfo.Name + $"[{index}]",
                             CompressSpaces(freezeResult.Value.Name)
                         )
                         .WithLocation(parentStep);
@@ -435,8 +439,7 @@ public abstract class StepFactory : IStepFactory
                 }
                 else
                 {
-                    var error = new ErrorBuilder(
-                            ErrorCode.InvalidCast,
+                    var error = ErrorCode.InvalidCast.ToErrorBuilder(
                             parentStep.StepFactory.TypeName,
                             CompressSpaces(freezeResult.Value.Name)
                         )
@@ -488,12 +491,12 @@ public abstract class StepFactory : IStepFactory
                 return new ErrorBuilder(ErrorCode.TypeNotComparable, parameterTypeName);
             }
 
-            return new ErrorBuilder(e, ErrorCode.InvalidCast);
+            return ErrorCode.InvalidCast.ToErrorBuilder(e);
         }
         #pragma warning disable CA1031 // Do not catch general exception types
         catch (Exception e)
         {
-            return new ErrorBuilder(e, ErrorCode.InvalidCast);
+            return ErrorCode.InvalidCast.ToErrorBuilder(e);
         }
         #pragma warning restore CA1031 // Do not catch general exception types
 

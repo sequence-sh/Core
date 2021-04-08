@@ -82,7 +82,7 @@ public sealed class FindElement<T> : CompoundStep<int>
             TypeReference expectedTypeReference)
         {
             return expectedTypeReference
-                .CheckAllows(TypeReference.Actual.Integer, StepType)
+                .CheckAllows(TypeReference.Actual.Integer, StepType, null)
                 .Map(_ => new TypeReference.Array(TypeReference.Any.Instance) as TypeReference);
         }
 
