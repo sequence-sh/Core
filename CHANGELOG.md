@@ -2,14 +2,11 @@
 
 ## Summary of Changes
 
-### Sequence Configuration Language
+### Steps
 
-- Added `AssertEqual` Step
-
----
-- Added `GetSettings` Step
-
----
+- Added
+  - `AssertEqual`
+  - `GetSettings`
 
 ## Issues Closed in this Release
 
