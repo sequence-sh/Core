@@ -14,7 +14,8 @@ namespace Reductech.EDR.Core.Steps
 {
 
 /// <summary>
-/// Combine Paths
+/// Combine Paths.
+/// If the resulting path is not fully qualified it will be prefixed with the current working directory.
 /// </summary>
 [Alias("JoinPath")]
 [Alias("ResolvePath")]
