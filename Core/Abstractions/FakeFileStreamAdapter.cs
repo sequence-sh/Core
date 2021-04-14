@@ -9,9 +9,16 @@ using Thinktecture.Win32.SafeHandles;
 namespace Reductech.EDR.Core.Abstractions
 {
 
+/// <summary>
+/// Implementation of IFileStream that uses an underlying stream
+/// </summary>
 public class FakeFileStreamAdapter : StreamAdapter, IFileStream
 {
-    [NotNull] public Stream Stream { get; }
+    /// <summary>
+    /// The underlying stream
+    /// </summary>
+    [NotNull]
+    public Stream Stream { get; }
 
     /// <inheritdoc />
     public FakeFileStreamAdapter([NotNull] Stream stream) : base(stream) => Stream = stream;
@@ -46,13 +53,13 @@ public class FakeFileStreamAdapter : StreamAdapter, IFileStream
     }
 
     /// <inheritdoc />
-    public bool IsAsync { get; }
+    public bool IsAsync => false;
 
     /// <inheritdoc />
     public string Name => "Fake File Stream";
 
     /// <inheritdoc />
-    public ISafeFileHandle SafeFileHandle { get; }
+    public ISafeFileHandle SafeFileHandle { get; } = null!;
 }
 
 }

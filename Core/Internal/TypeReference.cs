@@ -91,12 +91,39 @@ public abstract record TypeReference
         /// </summary>
         public SCLType Type { get; }
 
+        /// <summary>
+        /// A string
+        /// </summary>
         public static Actual String { get; } = new(SCLType.String);
+
+        /// <summary>
+        /// An integer
+        /// </summary>
         public static Actual Integer { get; } = new(SCLType.Integer);
+
+        /// <summary>
+        /// A double
+        /// </summary>
         public static Actual Double { get; } = new(SCLType.Double);
-        public static Actual Enum { get; } = new(SCLType.Enum);
+
+        /// <summary>
+        /// A boolean
+        /// </summary>
         public static Actual Bool { get; } = new(SCLType.Bool);
+
+        /// <summary>
+        /// An Enum
+        /// </summary>
+        public new static Actual Enum { get; } = new(SCLType.Enum); //TODO remove this
+
+        /// <summary>
+        /// A date
+        /// </summary>
         public static Actual Date { get; } = new(SCLType.Date);
+
+        /// <summary>
+        /// An entity
+        /// </summary>
         public static Actual Entity { get; } = new(SCLType.Entity);
 
         /// <summary>

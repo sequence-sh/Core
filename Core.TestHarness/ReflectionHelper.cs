@@ -89,7 +89,7 @@ public abstract partial class StepTestBase<TStep, TOutput>
 
                 foreach (var step in currentValue)
                 {
-                    var s = step.Serialize(); // await GetStringAsync(step);
+                    var s = step.Serialize();
                     elements.Add(s);
                 }
 
@@ -104,7 +104,7 @@ public abstract partial class StepTestBase<TStep, TOutput>
 
                 foreach (var step in newValue)
                 {
-                    var e = step.Serialize(); // await GetStringAsync(step);
+                    var e = step.Serialize();
                     elements.Add(e);
                 }
 

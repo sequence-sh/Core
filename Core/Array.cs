@@ -257,7 +257,7 @@ public sealed class Array<T> : IArray, IEquatable<Array<T>>
         if (Option.IsT0)
             return Result.Success<IReadOnlyList<T>, IError>(Option.AsT0);
 
-        var r = await TryRun<List<T>>(Option.AsT1, (x, c) => x.ToListAsync(c), cancellation);
+        var r = await TryRun(Option.AsT1, (x, c) => x.ToListAsync(c), cancellation);
 
         if (r.IsFailure)
             return r.ConvertFailure<IReadOnlyList<T>>();
@@ -273,7 +273,7 @@ public sealed class Array<T> : IArray, IEquatable<Array<T>>
         if (Option.IsT0)
             return Result.Success<IReadOnlyList<T>, IError>(Option.AsT0);
 
-        var r = TryRun<List<T>>(Option.AsT1, (x, c) => x.ToListAsync(c), CancellationToken.None)
+        var r = TryRun(Option.AsT1, (x, c) => x.ToListAsync(c), CancellationToken.None)
             .Result;
 
         if (r.IsFailure)
