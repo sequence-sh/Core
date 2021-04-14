@@ -50,14 +50,14 @@ public sealed class EntityMap : CompoundStep<Array<Entity>>
     }
 
     /// <summary>
-    /// The entities to sort
+    /// The entities to map
     /// </summary>
     [StepProperty(1)]
     [Required]
     public IStep<Array<Entity>> EntityStream { get; set; } = null!;
 
     /// <summary>
-    /// A function to get the mapped entity, using the variable &lt;Entity&gt;
+    /// A function to get the mapped entity
     /// </summary>
     [StepProperty(2)]
     [Required]
