@@ -34,8 +34,7 @@ public abstract partial class StepTestBase<TStep, TOutput> : IStepTestBase
     [Fact]
     public void All_Properties_should_have_distinct_consecutive_positive_orders()
     {
-        var instance = new TStep();
-        var errors   = new List<string>();
+        var errors = new List<string>();
 
         var properties = typeof(TStep).GetProperties()
             .Select(

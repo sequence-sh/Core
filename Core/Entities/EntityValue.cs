@@ -681,7 +681,7 @@ public abstract record EntityValue(object? ObjectValue)
             case short @short:     return new Integer(@short);
             case bool b:           return new Boolean(b);
             case double d:         return new Double(d);
-            case long ln when ln < int.MaxValue && ln > int.MinValue:
+            case long ln and < int.MaxValue and > int.MinValue:
                 return new Integer(Convert.ToInt32(ln));
             case Enumeration e1: return new EnumerationValue(e1);
             case DateTime dt:    return new Date(dt);
@@ -787,7 +787,7 @@ public abstract record EntityValue(object? ObjectValue)
     /// <summary>
     /// Error returned when a value cannot be converted
     /// </summary>
-    protected ErrorBuilder CouldNotConvert(object o, SchemaProperty schemaProperty) => new(
+    protected static ErrorBuilder CouldNotConvert(object o, SchemaProperty schemaProperty) => new(
         ErrorCode.SchemaViolationWrongType,
         o,
         schemaProperty.Type

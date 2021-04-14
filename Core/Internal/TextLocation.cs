@@ -7,9 +7,7 @@ namespace Reductech.EDR.Core.Internal
 /// <summary>
 /// A location within a piece of text
 /// </summary>
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 public sealed record TextLocation(string Text, TextPosition Start, TextPosition Stop)
-    #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
 {
     /// <summary>
     /// Create a textLocation from a token
@@ -47,6 +45,11 @@ public sealed record TextLocation(string Text, TextPosition Start, TextPosition 
         return text;
     }
 
+    /// <summary>
+    /// Whether the location contains this position
+    /// </summary>
+    /// <param name="position"></param>
+    /// <returns></returns>
     public bool Contains(TextPosition position)
     {
         if (position.CompareTo(Start) >= 0)
