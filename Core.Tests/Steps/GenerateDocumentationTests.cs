@@ -83,7 +83,7 @@ public partial class GenerateDocumentationTests : StepTestBase<GenerateDocumenta
             var not = File(
                 "Not.md",
                 "Not",
-                "## Not _Alias_:`Not`\r\n\r\n_Output_:`Boolean`\r\n\r\nNegation of a boolean value.\r\n\r\n\r\n|Parameter|Type |Required|Summary |\r\n|:--------|:----:|:------:|:-------------------|\r\n|Boolean |`bool`|✔ |The value to negate.|",
+                "## Not\n_Alias_:`Not`\n\n_Output_:`Boolean`\n\nNegation of a boolean value.\n\n\n|Parameter|Type |Required|Summary |\n|:--------|:----:|:------:|:-------------------|\n|Boolean |`bool`|✔ |The value to negate.|",
                 "Core",
                 "Core"
             );
@@ -99,8 +99,7 @@ public partial class GenerateDocumentationTests : StepTestBase<GenerateDocumenta
             var documentationExample = File(
                 "DocumentationExampleStep.md",
                 "DocumentationExampleStep",
-                //"## DocumentationExampleStep _Alias_:`DocumentationExampleStep`\r\n\r\n_Output_:`StringStream`\r\n\r\n*Requires ValueIf Library Version 1.2*\r\n\r\n\r\n|Parameter |Type |Required|Allowed Range |Default Value|Example|Recommended Range|Recommended Value|Requirements|See Also|URL |Value Delimiter|Summary|\r\n|:--------|:------------:|:------:|:------------:|:-----------:|:-----:|:---------------:|:---------------:|:----------:|:------:|:----------------:|:-------------:|:------|\r\n|Alpha |`int` |✔ |Greater than 1| |1234 |100-300 |201 |Greek 2.1 |Beta |[Alpha](alpha.com)| | |\r\n|Beta |`string` | | |Two hundred | | | | |Alpha | | | |\r\n|Gamma |`VariableName`| | | | | | | | | | | |\r\n|Delta |IStep<`bool`> | | | | | | | | | |, | |",
-                "## DocumentationExampleStep _Alias_:`DocumentationExampleStep`\r\n\r\n_Output_:`StringStream`\r\n\r\n*Requires ValueIf Library Version 1.2*\r\n\r\n\r\n|Parameter |Type |Required|Allowed Range |Default Value|Example|Recommended Range|Recommended Value|Requirements|See Also|URL |Value Delimiter|Summary|\r\n|:--------------|:------------:|:------:|:------------:|:-----------:|:-----:|:---------------:|:---------------:|:----------:|:------:|:----------------:|:-------------:|:------|\r\n|Alpha<br>_Alef_|`int` |✔ |Greater than 1| |1234 |100-300 |201 |Greek 2.1 |Beta |[Alpha](alpha.com)| | |\r\n|Beta |`string` | | |Two hundred | | | | |Alpha | | | |\r\n|Gamma |`VariableName`| | | | | | | | | | | |\r\n|Delta |IStep<`bool`> | | | | | | | | | |, | |",
+                "## DocumentationExampleStep\n_Alias_:`DocumentationExampleStep`\n\n_Output_:`StringStream`\n\n*Requires ValueIf Library Version 1.2*\n\n\n|Parameter |Type |Required|Allowed Range |Default Value|Example|Recommended Range|Recommended Value|Requirements|See Also|URL |Value Delimiter|Summary|\n|:--------------|:------------:|:------:|:------------:|:-----------:|:-----:|:---------------:|:---------------:|:----------:|:------:|:----------------:|:-------------:|:------|\n|Alpha<br>_Alef_|`int` |✔ |Greater than 1| |1234 |100-300 |201 |Greek 2.1 |Beta |[Alpha](alpha.com)| | |\n|Beta |`string` | | |Two hundred | | | | |Alpha | | | |\n|Gamma |`VariableName`| | | | | | | | | | | |\n|Delta |IStep<`bool`> | | | | | | | | | |, | |",
                 "Examples",
                 "Examples"
             );

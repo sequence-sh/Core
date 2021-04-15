@@ -28,15 +28,36 @@ public sealed class SequenceSerializer : IStepSerializer
         if (dict.TryGetValue(nameof(Sequence<object>.InitialSteps), out var sp)
          && sp is StepProperty.StepListProperty stepList)
             foreach (var step in stepList.StepList)
-                sb.AppendLine("- " + step.Serialize());
+                AddStep(sb, step, 0);
 
         if (dict.TryGetValue(nameof(Sequence<object>.FinalStep), out var finalStep)
          && finalStep is StepProperty.SingleStepProperty stepProperty)
-            sb.AppendLine("- " + stepProperty.Serialize());
+            AddStep(sb, stepProperty.Step, 0);
 
         var s = sb.ToString();
 
         return s;
+
+        static void AddStep(StringBuilder sb, IStep step, int nestingLevel)
+        {
+            var indentation = new string('\t', nestingLevel);
+
+            if (step is ISequenceStep sequence)
+            {
+                sb.AppendLine($"{indentation}- (");
+
+                foreach (var nestedStep in sequence.AllSteps)
+                {
+                    AddStep(sb, nestedStep, nestingLevel + 1);
+                }
+
+                sb.AppendLine($"{indentation})");
+            }
+            else
+            {
+                sb.AppendLine($"{indentation}- {step.Serialize()}");
+            }
+        }
     }
 }
 

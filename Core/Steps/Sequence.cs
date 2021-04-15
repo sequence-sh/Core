@@ -16,7 +16,18 @@ namespace Reductech.EDR.Core.Steps
 /// <summary>
 /// A chain of steps to be run one after the other.
 /// </summary>
-public sealed class Sequence<T> : CompoundStep<T>
+public interface ISequenceStep
+{
+    /// <summary>
+    /// The steps in the sequence in order
+    /// </summary>
+    IEnumerable<IStep> AllSteps { get; }
+}
+
+/// <summary>
+/// A chain of steps to be run one after the other.
+/// </summary>
+public sealed class Sequence<T> : CompoundStep<T>, ISequenceStep
 {
     /// <inheritdoc />
     protected override async Task<Result<T, IError>> Run(
@@ -42,15 +53,15 @@ public sealed class Sequence<T> : CompoundStep<T>
     /// <summary>
     /// The steps of this sequence apart from the final step.
     /// </summary>
-    [StepListProperty(1)]
-    [Required]
-    public IReadOnlyList<IStep<Unit>> InitialSteps { get; set; } = null!;
+    [StepListProperty]
+    [DefaultValueExplanation("Empty")]
+    public IReadOnlyList<IStep<Unit>> InitialSteps { get; set; } = new List<IStep<Unit>>();
 
     /// <summary>
     /// The final step of the sequence.
     /// Will be the return value.
     /// </summary>
-    [StepProperty(2)]
+    [StepProperty]
     [Required]
     public IStep<T> FinalStep { get; set; } = null!;
 
@@ -86,6 +97,18 @@ public sealed class Sequence<T> : CompoundStep<T>
 
         /// <inheritdoc />
         public override IStepSerializer Serializer { get; } = SequenceSerializer.Instance;
+    }
+
+    /// <inheritdoc />
+    public IEnumerable<IStep> AllSteps
+    {
+        get
+        {
+            foreach (var step in InitialSteps)
+                yield return step;
+
+            yield return FinalStep;
+        }
     }
 }
 

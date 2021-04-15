@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Reductech.EDR.Core.Enums;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Steps;
@@ -19,25 +20,38 @@ public partial class SequenceTests : StepTestBase<Sequence<StringStream>, String
         {
             yield return new StepCase(
                 "No initial steps",
+                new Sequence<StringStream> { FinalStep = Constant("Goodbye") },
+                "Goodbye"
+            );
+
+            yield return new StepCase(
+                "Sequence nested in final steps",
                 new Sequence<StringStream>
                 {
-                    InitialSteps = new List<IStep<Unit>>(), FinalStep = Constant("Goodbye")
+                    FinalStep = new Sequence<StringStream> { FinalStep = Constant("Goodbye") }
                 },
                 "Goodbye"
             );
 
             yield return new StepCase(
-                "Nested Sequence",
+                "Sequence nested in initial steps",
                 new Sequence<StringStream>
                 {
-                    InitialSteps = new List<IStep<Unit>>(),
-                    FinalStep = new Sequence<StringStream>
+                    InitialSteps = new List<IStep<Unit>>
                     {
-                        InitialSteps = new List<IStep<Unit>>(),
-                        FinalStep    = Constant("Goodbye")
-                    }
+                        new Sequence<Unit>
+                        {
+                            InitialSteps = new List<IStep<Unit>>
+                            {
+                                new Log<StringStream> { Value = Constant("Hello") }
+                            },
+                            FinalStep = new DoNothing()
+                        }
+                    },
+                    FinalStep = Constant("Goodbye")
                 },
-                "Goodbye"
+                "Goodbye",
+                "Hello"
             );
 
             yield return new StepCase(
@@ -89,6 +103,61 @@ public partial class SequenceTests : StepTestBase<Sequence<StringStream>, String
                     FinalStep = Constant("Hello World")
                 },
                 $"- DoNothing{Environment.NewLine}- DoNothing{Environment.NewLine}- DoNothing{Environment.NewLine}- \"Hello World\"{Environment.NewLine}"
+            );
+
+            yield return new SerializeCase(
+                "Final step is a compound step",
+                new Sequence<StringStream>()
+                {
+                    FinalStep = new StringToCase()
+                    {
+                        Case   = new EnumConstant<TextCase>(TextCase.Upper),
+                        String = Constant("Hello")
+                    }
+                },
+                @"- StringToCase String: ""Hello"" Case: TextCase.Upper"
+            );
+
+            yield return new SerializeCase(
+                "Sequence Nested in initial steps",
+                new Sequence<StringStream>
+                {
+                    InitialSteps = new List<IStep<Unit>>
+                    {
+                        new Sequence<Unit>
+                        {
+                            InitialSteps = new List<IStep<Unit>>
+                            {
+                                new Log<StringStream> { Value = Constant("Hello") }
+                            },
+                            FinalStep = new DoNothing()
+                        }
+                    },
+                    FinalStep = Constant("Goodbye")
+                },
+                "\n- (\n\t- Log Value: \"Hello\"\n\t- DoNothing\n)\n- \"Goodbye\""
+            );
+
+            yield return new SerializeCase(
+                "Sequence Nested in final steps",
+                new Sequence<StringStream>
+                {
+                    FinalStep = new Sequence<StringStream> { FinalStep = Constant("Goodbye") }
+                },
+                "- (\n\t- \"Goodbye\"\n)"
+            );
+
+            yield return new SerializeCase(
+                "Double nested Sequence",
+                new Sequence<StringStream>
+                {
+                    FinalStep = new Sequence<StringStream>
+                    {
+                        FinalStep =
+                            new Sequence<StringStream> { FinalStep = Constant("Goodbye") }
+                    }
+                },
+                "- (\n\t- (\n\t\t- \"Goodbye\"\n\t)\n)"
             );
         }
     }
