@@ -36,11 +36,12 @@ public abstract partial class StepTestBase<TStep, TOutput>
         /// <inheritdoc />
         public async Task RunAsync(ITestOutputHelper testOutputHelper)
         {
-            var realSCL = Step.Serialize();
+            var realSCL = SpaceCompressor.CompressNewLines(Step.Serialize().TrimEnd());
 
             testOutputHelper.WriteLine(realSCL);
+            var trueExpected = SpaceCompressor.CompressNewLines(ExpectedSCL.Trim());
 
-            realSCL.Should().Be(ExpectedSCL);
+            realSCL.Should().Be(trueExpected);
 
             await Task.CompletedTask;
         }

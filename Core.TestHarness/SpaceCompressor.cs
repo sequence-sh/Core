@@ -10,7 +10,10 @@ public static class SpaceCompressor
     /// </summary>
     private static readonly Regex SpaceRegex = new(@"(?:\s+|\\r\\n|\\n)", RegexOptions.Compiled);
 
-    public static string CompressSpaces(string stepName) => SpaceRegex.Replace(stepName, " ");
+    private static readonly Regex NewLineRegex = new(@"(?:\\r\\n|\\n)", RegexOptions.Compiled);
+
+    public static string CompressSpaces(string text) => SpaceRegex.Replace(text, " ");
+    public static string CompressNewLines(string text) => NewLineRegex.Replace(text, " ");
 }
 
 }
