@@ -135,7 +135,7 @@ public partial class SequenceTests : StepTestBase<Sequence<StringStream>, String
                     },
                     FinalStep = Constant("Goodbye")
                 },
-                "\r\n- (\r\n\t- Log Value: \"Hello\"\r\n\t- DoNothing\r\n)\r\n- \"Goodbye\""
+                "\n- (\n\t- Log Value: \"Hello\"\n\t- DoNothing\n)\n- \"Goodbye\""
             );
 
             yield return new SerializeCase(
@@ -144,7 +144,7 @@ public partial class SequenceTests : StepTestBase<Sequence<StringStream>, String
                 {
                     FinalStep = new Sequence<StringStream> { FinalStep = Constant("Goodbye") }
                 },
-                "- (\r\n\t- \"Goodbye\"\r\n)"
+                "- (\n\t- \"Goodbye\"\n)"
             );
 
             yield return new SerializeCase(
@@ -157,7 +157,7 @@ public partial class SequenceTests : StepTestBase<Sequence<StringStream>, String
                             new Sequence<StringStream> { FinalStep = Constant("Goodbye") }
                     }
                 },
-                "- (\r\n\t- (\r\n\t\t- \"Goodbye\"\r\n\t)\r\n)"
+                "- (\n\t- (\n\t\t- \"Goodbye\"\n\t)\n)"
             );
         }
     }
