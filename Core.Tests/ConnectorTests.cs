@@ -1,8 +1,10 @@
 ﻿using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Divergic.Logging.Xunit;
+using Newtonsoft.Json;
 using Reductech.EDR.Core.Abstractions;
 using Reductech.EDR.Core.Connectors;
 using Reductech.EDR.Core.Internal;
@@ -16,20 +18,27 @@ namespace Reductech.EDR.Core.Tests
 [AutoTheory.UseTestOutputHelper]
 public partial class ConnectorTests
 {
+    public static string RelativePath = Path.Combine(
+        "ExampleConnector",
+        "bin",
+        "Debug",
+        "net5.0",
+        "ExampleConnector.dll"
+    );
+
     [Fact]
     public async Task TestConnectorFromSettings()
     {
         var logger = new TestOutputLogger("Step Logger", TestOutputHelper);
 
-        var connectorsString = @"
-{
-""connectors"": {
-    ""example"":{
-        ""path"": ""ExampleConnector\\bin\\Debug\\net5.0\\ExampleConnector.dll""
+        var connectorsString = $@"{{
+""connectors"": {{
+    ""example"":{{
+        ""path"": {JsonConvert.SerializeObject(RelativePath)}
         
-    }
-}
-}";
+    }}
+}}
+}}";
 
         var settings = SCLSettings.CreateFromString(connectorsString);
 
@@ -59,8 +68,7 @@ public partial class ConnectorTests
     {
         var logger = new TestOutputLogger("Step Logger", TestOutputHelper);
 
-        var relativePath = @"ExampleConnector\bin\Debug\net5.0\ExampleConnector.dll";
-        var absolutePath = PluginLoadContext.GetAbsolutePath(relativePath);
+        var absolutePath = PluginLoadContext.GetAbsolutePath(RelativePath);
 
         var assembly = PluginLoadContext.LoadPlugin(
             absolutePath,
