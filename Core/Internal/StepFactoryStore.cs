@@ -84,16 +84,10 @@ public class StepFactoryStore
     /// Create a step factory store using all StepFactories in the assembly.
     /// </summary>
     /// <returns></returns>
-    public static StepFactoryStore CreateUsingReflection(params Type[] assemblyMemberTypes)
+    public static StepFactoryStore CreateFromAssemblies(params Assembly[] assemblies)
     {
-        var assemblies = assemblyMemberTypes
-            .Prepend(typeof(ICompoundStep))
-            .Select(Assembly.GetAssembly)
-            .Distinct()
-            .ToList();
-
         var factories =
-            assemblies
+            assemblies.Prepend(typeof(IStep).Assembly)
                 .SelectMany(a => a!.GetTypes())
                 .Distinct()
                 .Where(x => !x.IsAbstract)
@@ -105,45 +99,42 @@ public class StepFactoryStore
             assemblies.Select(ConnectorInformation.TryCreate!).WhereNotNull().ToList();
 
         return Create(connectorInfo, factories);
-    }
 
-    /// <summary>
-    /// Create a StepFactory from a step type
-    /// </summary>
-    public static IStepFactory CreateStepFactory(Type stepType)
-    {
-        Type closedType;
-
-        if (stepType.IsGenericType)
+        static IStepFactory CreateStepFactory(Type stepType)
         {
-            var arguments = ((TypeInfo)stepType).GenericTypeParameters
-                .Select(_ => typeof(int))
-                .ToArray();
+            Type closedType;
 
-            try
+            if (stepType.IsGenericType)
             {
-                closedType = stepType.MakeGenericType(arguments);
+                var arguments = ((TypeInfo)stepType).GenericTypeParameters
+                    .Select(_ => typeof(int))
+                    .ToArray();
+
+                try
+                {
+                    closedType = stepType.MakeGenericType(arguments);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                    throw;
+                }
             }
-            catch (Exception e)
+            else
             {
-                Console.WriteLine(e);
-                throw;
+                closedType = stepType;
             }
+
+            var instance = Activator.CreateInstance(closedType);
+            var step     = instance as ICompoundStep;
+
+            var stepFactory = step!.StepFactory;
+
+            if (stepFactory is null)
+                throw new Exception($"Step Factory for {stepType.Name} is null");
+
+            return step!.StepFactory;
         }
-        else
-        {
-            closedType = stepType;
-        }
-
-        var instance = Activator.CreateInstance(closedType);
-        var step     = instance as ICompoundStep;
-
-        var stepFactory = step!.StepFactory;
-
-        if (stepFactory is null)
-            throw new Exception($"Step Factory for {stepType.Name} is null");
-
-        return step!.StepFactory;
     }
 
     /// <summary>

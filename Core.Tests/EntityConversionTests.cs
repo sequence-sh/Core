@@ -52,7 +52,7 @@ public class EntityConversionTests
                 .Bind(
                     x => x.TryFreeze(
                         TypeReference.Actual.Entity,
-                        StepFactoryStore.CreateUsingReflection()
+                        StepFactoryStore.CreateFromAssemblies()
                     )
                 )
                 .Map(x => x.TryConvertToEntityValue());

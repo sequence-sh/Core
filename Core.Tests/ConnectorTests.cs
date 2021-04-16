@@ -40,7 +40,7 @@ public partial class ConnectorTests
             TestOutputHelper.WriteLine(type.Name);
         }
 
-        var stepFactoryStore = StepFactoryStore.CreateUsingReflection(stepTypes.First());
+        var stepFactoryStore = StepFactoryStore.CreateFromAssemblies(assembly.Value);
 
         var runner = new SCLRunner(
             SCLSettings.EmptySettings,

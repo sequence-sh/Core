@@ -431,7 +431,7 @@ Log 'Comments!'",
         {
             testOutputHelper.WriteLine(SCL);
 
-            var stepFactoryStore = StepFactoryStore.CreateUsingReflection(typeof(StepFactory));
+            var stepFactoryStore = StepFactoryStore.CreateFromAssemblies();
             var loggerFactory    = TestLoggerFactory.Create();
             loggerFactory.AddXunit(testOutputHelper);
             var repository = new MockRepository(MockBehavior.Strict);

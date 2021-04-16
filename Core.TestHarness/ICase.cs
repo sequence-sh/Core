@@ -22,6 +22,10 @@ public interface ICaseThatExecutes : IAsyncTestInstance, ICaseWithSetup
 
     public bool IgnoreFinalState { get; set; }
 
+    /// <summary>
+    /// The step factory store to use for running the step.
+    /// The default step factory store will still be used for deserialization.
+    /// </summary>
     Maybe<StepFactoryStore> StepFactoryStoreToUse { get; set; }
 
     SCLSettings Settings { get; set; }

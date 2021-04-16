@@ -41,7 +41,7 @@ public partial class ExampleTests
 
         TestOutputHelper.WriteLine(scl);
 
-        var sfs = StepFactoryStore.CreateUsingReflection();
+        var sfs = StepFactoryStore.CreateFromAssemblies();
 
         var stepResult = SCLParsing.ParseSequence(scl)
             .Bind(x => x.TryFreeze(TypeReference.Any.Instance, sfs));
@@ -94,19 +94,10 @@ public partial class ExampleTests
 
 ";
 
-        //    @"GenerateDocumentation | Foreach (
-        //- Log <Entity>['FileText']
-        //)";
-        //@"FileWrite 'Dinosaur Dinosaur Dinosaur' 'C:\Users\wainw\source\repos\Reductech\core\TestFile.txt' true";
-        //
-        //            @"- <docs> = GenerateDocumentation
-        //- <docs> | ArrayDistinct (From <entity> 'Directory') | ForEach (CreateDirectory (PathCombine ['Documentation', (From <Entity> 'Directory')]))
-        //- <docs> | Foreach (FileWrite (From <Entity> 'FileText') (PathCombine ['Documentation', (From <Entity> 'Directory'), (From <Entity> 'FileName')]))";
-
         var logger =
             TestOutputHelper.BuildLogger(new LoggingConfig() { LogLevel = LogLevel.Information });
 
-        var sfs = StepFactoryStore.CreateUsingReflection();
+        var sfs = StepFactoryStore.CreateFromAssemblies();
 
         var runner = new SCLRunner(
             SCLSettings.EmptySettings,
@@ -200,7 +191,7 @@ public partial class ExampleTests
         var monad = new StateMonad(
             TestOutputHelper.BuildLogger(),
             SCLSettings.EmptySettings,
-            StepFactoryStore.CreateUsingReflection(),
+            StepFactoryStore.CreateFromAssemblies(),
             ExternalContext.Default,
             new Dictionary<string, object>()
         );
