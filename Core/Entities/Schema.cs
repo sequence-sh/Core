@@ -46,7 +46,7 @@ public sealed class Schema : IEntityConvertible
     public override string ToString()
     {
         // ReSharper disable once ConstantNullCoalescingCondition
-        return Name ?? "Schema";
+        return Name;
     }
 
     /// <summary>

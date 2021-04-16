@@ -4,7 +4,12 @@ using System.Diagnostics;
 using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Reflection;
+using CSharpFunctionalExtensions;
+using Microsoft.Extensions.Logging;
 using Reductech.EDR.Core.Attributes;
+using Reductech.EDR.Core.Connectors;
+using Reductech.EDR.Core.Entities;
+using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Util;
 
 namespace Reductech.EDR.Core.Internal
@@ -78,6 +83,48 @@ public class StepFactoryStore
             return false;
 
         return factory.IsScopedFunction(stepParameterReference);
+    }
+
+    /// <summary>
+    /// Create a step factory store by loading connectors from paths specified in the SCLSettings
+    /// </summary>
+    public static Result<StepFactoryStore, IErrorBuilder> CreateFromSettings(
+        SCLSettings sclSettings,
+        ILogger logger)
+    {
+        List<string> connectorPaths;
+
+        var connectors = sclSettings.Entity.TryGetValue("connectors");
+
+        if (connectors.HasValue && connectors.Value is EntityValue.NestedEntity nestedEntity)
+        {
+            connectorPaths = new List<string>();
+
+            foreach (var connectorProperty in nestedEntity.Value)
+                if (connectorProperty.BestValue is EntityValue.NestedEntity connector)
+                {
+                    var path = connector.Value.TryGetNestedString("path");
+
+                    if (path.HasValue)
+                        connectorPaths.Add(path.Value);
+                }
+        }
+        else
+        {
+            connectorPaths = new List<string>();
+        }
+
+        var assemblies = connectorPaths
+            .Select(PluginLoadContext.GetAbsolutePath)
+            .Select(x => PluginLoadContext.LoadPlugin(x, logger))
+            .Combine(x => x.ToArray(), ErrorBuilderList.Combine);
+
+        if (assemblies.IsFailure)
+            return assemblies.ConvertFailure<StepFactoryStore>();
+
+        var stepFactoryStore = CreateFromAssemblies(assemblies.Value);
+
+        return stepFactoryStore;
     }
 
     /// <summary>

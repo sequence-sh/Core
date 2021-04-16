@@ -17,6 +17,44 @@ namespace Reductech.EDR.Core.Tests
 public partial class ConnectorTests
 {
     [Fact]
+    public async Task TestConnectorFromSettings()
+    {
+        var logger = new TestOutputLogger("Step Logger", TestOutputHelper);
+
+        var connectorsString = @"
+{
+""connectors"": {
+    ""example"":{
+        ""path"": ""ExampleConnector\\bin\\Debug\\net5.0\\ExampleConnector.dll""
+        
+    }
+}
+}";
+
+        var settings = SCLSettings.CreateFromString(connectorsString);
+
+        var stepFactoryStoreResult = StepFactoryStore.CreateFromSettings(settings, logger);
+
+        stepFactoryStoreResult.ShouldBeSuccessful(x => x.AsString);
+
+        var runner = new SCLRunner(
+            SCLSettings.EmptySettings,
+            logger,
+            stepFactoryStoreResult.Value,
+            ExternalContext.Default
+        );
+
+        var r = await
+            runner.RunSequenceFromTextAsync(
+                "Log (GetTestString)",
+                new Dictionary<string, object>(),
+                CancellationToken.None
+            );
+
+        r.ShouldBeSuccessful(x => x.AsString);
+    }
+
+    [Fact]
     public async Task TestConnector()
     {
         var logger = new TestOutputLogger("Step Logger", TestOutputHelper);
