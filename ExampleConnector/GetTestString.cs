@@ -20,7 +20,7 @@ public sealed class GetTestString : CompoundStep<StringStream>
         return new StringStream(TestString + " " + System.Drawing.Color.AliceBlue);
     }
 
-    public const string TestString = "The Ultimate Test String";
+    public const string TestString = "The Color is";
 
     /// <inheritdoc />
     public override IStepFactory StepFactory { get; } =
