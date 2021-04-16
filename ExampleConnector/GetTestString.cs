@@ -17,7 +17,7 @@ public sealed class GetTestString : CompoundStep<StringStream>
     {
         await Task.CompletedTask;
 
-        return new StringStream(TestString);
+        return new StringStream(TestString + " " + System.Drawing.Color.AliceBlue);
     }
 
     public const string TestString = "The Ultimate Test String";
