@@ -88,7 +88,7 @@ public class StepFactoryStore
     /// <summary>
     /// Create a step factory store by loading connectors from paths specified in the SCLSettings
     /// </summary>
-    public static Result<StepFactoryStore, IErrorBuilder> CreateFromSettings(
+    public static Result<StepFactoryStore, IErrorBuilder> TryCreateFromSettings(
         SCLSettings sclSettings,
         ILogger logger)
     {
@@ -133,12 +133,15 @@ public class StepFactoryStore
     /// <returns></returns>
     public static StepFactoryStore CreateFromAssemblies(params Assembly[] assemblies)
     {
+        var steps = assemblies.Prepend(typeof(IStep).Assembly)
+            .SelectMany(a => a!.GetTypes())
+            .Distinct()
+            .Where(x => !x.IsAbstract)
+            .Where(x => typeof(ICompoundStep).IsAssignableFrom(x))
+            .ToList();
+
         var factories =
-            assemblies.Prepend(typeof(IStep).Assembly)
-                .SelectMany(a => a!.GetTypes())
-                .Distinct()
-                .Where(x => !x.IsAbstract)
-                .Where(x => typeof(ICompoundStep).IsAssignableFrom(x))
+            steps
                 .Select(CreateStepFactory)
                 .ToList();
 

@@ -42,7 +42,7 @@ public partial class ConnectorTests
 
         var settings = SCLSettings.CreateFromString(connectorsString);
 
-        var stepFactoryStoreResult = StepFactoryStore.CreateFromSettings(settings, logger);
+        var stepFactoryStoreResult = StepFactoryStore.TryCreateFromSettings(settings, logger);
 
         stepFactoryStoreResult.ShouldBeSuccessful(x => x.AsString);
 
