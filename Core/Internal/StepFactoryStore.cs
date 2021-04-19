@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Reflection;
@@ -201,38 +200,17 @@ public class StepFactoryStore
     /// Dictionary mapping step names to step factories.
     /// </summary>
     public IReadOnlyDictionary<string, IStepFactory> Dictionary { get; }
-}
 
-/// <summary>
-/// Information about a connector
-/// </summary>
-public record ConnectorInformation(string Name, string Version)
-{
     /// <summary>
-    /// Create from an assembly
+    /// Tries to get contexts injected by connectors
     /// </summary>
-    public static ConnectorInformation? TryCreate(Assembly? assembly)
+    public Result<(string Name, object Context)[], IErrorBuilder> TryGetInjectedContexts(
+        SCLSettings settings)
     {
-        if (assembly is null)
-            return null;
+        var contexts = ConnectorInformations.Select(x => x.TryGetInjectedContexts(settings))
+            .Combine(x => x.SelectMany(y => y).ToArray(), ErrorBuilderList.Combine);
 
-        try
-        {
-            FileVersionInfo fileVersionInfo = FileVersionInfo.GetVersionInfo(assembly.Location);
-            string          version         = fileVersionInfo.ProductVersion!;
-
-            return new ConnectorInformation(assembly.GetName().Name!, version);
-        }
-        catch (Exception)
-        {
-            return null;
-        }
-    }
-
-    /// <inheritdoc />
-    public override string ToString()
-    {
-        return $"{Name} {Version}";
+        return contexts;
     }
 }
 
