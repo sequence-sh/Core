@@ -27,6 +27,13 @@ public sealed class ToJsonArray : CompoundStep<StringStream>
         if (list.IsFailure)
             return list.ConvertFailure<StringStream>();
 
+        var formatResult = await FormatOutput.Run(stateMonad, cancellationToken);
+
+        if (formatResult.IsFailure)
+            return formatResult.ConvertFailure<StringStream>();
+
+        var formatting = formatResult.Value ? Formatting.Indented : Formatting.None;
+
         var elements = await list.Value.GetElementsAsync(cancellationToken);
 
         if (elements.IsFailure)
@@ -34,7 +41,7 @@ public sealed class ToJsonArray : CompoundStep<StringStream>
 
         var jsonString = JsonConvert.SerializeObject(
             elements.Value,
-            Formatting.None,
+            formatting,
             EntityJsonConverter.Instance
         );
 
@@ -47,6 +54,13 @@ public sealed class ToJsonArray : CompoundStep<StringStream>
     [StepProperty(1)]
     [Required]
     public IStep<Array<Entity>> Entities { get; set; } = null!;
+
+    /// <summary>
+    /// Whether to format to the Json output
+    /// </summary>
+    [StepProperty(2)]
+    [DefaultValueExplanation("true")]
+    public IStep<bool> FormatOutput { get; set; } = new BoolConstant(true);
 
     /// <inheritdoc />
     public override IStepFactory StepFactory { get; } =

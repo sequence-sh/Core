@@ -15,15 +15,28 @@ public partial class ToJsonArrayTests : StepTestBase<ToJsonArray, StringStream>
         {
             yield return new StepCase(
                 "Single Property",
-                new ToJsonArray() { Entities = Array(Entity.Create(("Foo", 1))) },
+                new ToJsonArray()
+                {
+                    Entities = Array(Entity.Create(("Foo", 1))), FormatOutput = Constant(false)
+                },
                 "[{\"Foo\":1}]"
+            );
+
+            yield return new StepCase(
+                "Single Property Formatted",
+                new ToJsonArray()
+                {
+                    Entities = Array(Entity.Create(("Foo", 1))), FormatOutput = Constant(true)
+                },
+                "[\t{\t\"Foo\":\t1\t}\t]"
             );
 
             yield return new StepCase(
                 "Two Entities",
                 new ToJsonArray()
                 {
-                    Entities = Array(Entity.Create(("Foo", 1)), Entity.Create(("Foo", 2)))
+                    Entities     = Array(Entity.Create(("Foo", 1)), Entity.Create(("Foo", 2))),
+                    FormatOutput = Constant(false)
                 },
                 "[{\"Foo\":1},{\"Foo\":2}]"
             );
@@ -34,7 +47,8 @@ public partial class ToJsonArrayTests : StepTestBase<ToJsonArray, StringStream>
                 {
                     Entities = Array(
                         Entity.Create(("Foo", 1), ("Bar", new[] { "a", "b", "c" }))
-                    )
+                    ),
+                    FormatOutput = Constant(false)
                 },
                 @"[{""Foo"":1,""Bar"":[""a"",""b"",""c""]}]"
             );
@@ -49,7 +63,8 @@ public partial class ToJsonArrayTests : StepTestBase<ToJsonArray, StringStream>
                             ("Bar", new[] { "a", "b", "c" }),
                             ("Baz", Entity.Create(("Foo", 2), ("Bar", new[] { "d", "e", "f" })))
                         )
-                    )
+                    ),
+                    FormatOutput = Constant(false)
                 },
                 @"[{""Foo"":1,""Bar"":[""a"",""b"",""c""],""Baz"":{""Foo"":2,""Bar"":[""d"",""e"",""f""]}}]"
             );
