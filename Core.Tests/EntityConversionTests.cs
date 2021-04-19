@@ -76,6 +76,39 @@ public class EntityConversionTests
 
         conf.Should().Be(TestConfiguration);
     }
+
+    [Fact]
+    public void ShortShouldConvertCorrectly()
+    {
+        var e = Entity.Create(("short", Convert.ToInt16(11)));
+
+        e.TryGetValue("short").ShouldHaveValue();
+        e.TryGetValue("short").Value.Should().Be(new EntityValue.Integer(11));
+    }
+
+    [Fact]
+    public void EnumerationShouldConvertCorrectly()
+    {
+        var e = Entity.Create(("enumeration", new Enumeration("letter", "alpha")));
+
+        e.TryGetValue("enumeration").ShouldHaveValue();
+
+        e.TryGetValue("enumeration")
+            .Value.Should()
+            .Be(new EntityValue.EnumerationValue(new Enumeration("letter", "alpha")));
+    }
+
+    [Fact]
+    public void EmptyListShouldConvertCorrectly()
+    {
+        var e = Entity.Create(("emptyList", new List<int>()));
+
+        e.TryGetValue("emptyList").ShouldHaveValue();
+
+        e.TryGetValue("emptyList")
+            .Value.Should()
+            .Be(EntityValue.Null.Instance);
+    }
 }
 
 }

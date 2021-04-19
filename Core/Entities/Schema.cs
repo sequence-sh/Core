@@ -42,6 +42,20 @@ public sealed class Schema : IEntityConvertible
     [JsonProperty]
     public ErrorBehavior DefaultErrorBehavior { get; set; } = ErrorBehavior.Fail;
 
+    /// <summary>
+    /// The allowed formats for dates.
+    /// This can be overwritten by individual schema properties.
+    /// </summary>
+    [JsonProperty]
+    public IReadOnlyList<string>? DefaultDateInputFormats { get; set; }
+
+    /// <summary>
+    /// The output format for dates.
+    /// This can be overwritten by individual schema properties.
+    /// </summary>
+    [JsonProperty]
+    public string? DefaultDateOutputFormat { get; set; }
+
     /// <inheritdoc />
     public override string ToString() => Name;
 
@@ -94,13 +108,13 @@ public sealed class Schema : IEntityConvertible
         if (errorBehaviorOverride.HasValue)
             generalErrorBehavior = errorBehaviorOverride.Value;
         else
-            generalErrorBehavior = this.DefaultErrorBehavior;
+            generalErrorBehavior = DefaultErrorBehavior;
 
         foreach (var entityProperty in entity)
         {
             if (remainingProperties.Remove(entityProperty.Name, out var schemaProperty))
             {
-                var convertResult = entityProperty.BestValue.TryConvert(schemaProperty);
+                var convertResult = entityProperty.BestValue.TryConvert(this, schemaProperty);
 
                 if (convertResult.IsSuccess)
                 {

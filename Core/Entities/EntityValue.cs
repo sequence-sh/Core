@@ -34,10 +34,10 @@ public abstract record EntityValue(object? ObjectValue)
 
         /// <inheritdoc />
         protected override Result<(EntityValue value, bool changed), IErrorBuilder> TryConvertBase(
+            Schema schema,
             SchemaProperty schemaProperty)
         {
-            if (schemaProperty.Multiplicity == Multiplicity.Any ||
-                schemaProperty.Multiplicity == Multiplicity.UpToOne)
+            if (schemaProperty.Multiplicity is Multiplicity.Any or Multiplicity.UpToOne)
                 return (this, false);
 
             return new ErrorBuilder(ErrorCode.SchemaViolationUnexpectedNull);
@@ -100,6 +100,7 @@ public abstract record EntityValue(object? ObjectValue)
 
         /// <inheritdoc />
         protected override Result<(EntityValue value, bool changed), IErrorBuilder> TryConvertBase(
+            Schema schema,
             SchemaProperty schemaProperty)
         {
             switch (schemaProperty.Type)
@@ -143,10 +144,13 @@ public abstract record EntityValue(object? ObjectValue)
                 }
                 case SCLType.Date:
                 {
-                    if (schemaProperty.DateInputFormats != null &&
+                    var inputFormats = schemaProperty.DateInputFormats
+                                    ?? schema.DefaultDateInputFormats;
+
+                    if (inputFormats is not null &&
                         DateTime.TryParseExact(
                             Value,
-                            schemaProperty.DateInputFormats.ToArray(),
+                            inputFormats.ToArray(),
                             null,
                             DateTimeStyles.None,
                             out var dt1
@@ -156,7 +160,7 @@ public abstract record EntityValue(object? ObjectValue)
                         return (
                             new Date(
                                 dt1,
-                                schemaProperty.DateOutputFormat ?? Constants.DateTimeFormat
+                                schemaProperty.DateOutputFormat ?? schema.DefaultDateOutputFormat
                             ), true);
                     }
 
@@ -164,7 +168,7 @@ public abstract record EntityValue(object? ObjectValue)
                         return (
                             new Date(
                                 dt,
-                                schemaProperty.DateOutputFormat ?? Constants.DateTimeFormat
+                                schemaProperty.DateOutputFormat ?? schema.DefaultDateOutputFormat
                             ), true);
 
                     break;
@@ -206,6 +210,7 @@ public abstract record EntityValue(object? ObjectValue)
 
         /// <inheritdoc />
         protected override Result<(EntityValue value, bool changed), IErrorBuilder> TryConvertBase(
+            Schema schema,
             SchemaProperty schemaProperty)
         {
             return schemaProperty.Type switch
@@ -245,6 +250,7 @@ public abstract record EntityValue(object? ObjectValue)
 
         /// <inheritdoc />
         protected override Result<(EntityValue value, bool changed), IErrorBuilder> TryConvertBase(
+            Schema schema,
             SchemaProperty schemaProperty)
         {
             return schemaProperty.Type switch
@@ -275,6 +281,7 @@ public abstract record EntityValue(object? ObjectValue)
 
         /// <inheritdoc />
         protected override Result<(EntityValue value, bool changed), IErrorBuilder> TryConvertBase(
+            Schema schema,
             SchemaProperty schemaProperty)
         {
             return schemaProperty.Type switch
@@ -319,6 +326,7 @@ public abstract record EntityValue(object? ObjectValue)
 
         /// <inheritdoc />
         protected override Result<(EntityValue value, bool changed), IErrorBuilder> TryConvertBase(
+            Schema schema,
             SchemaProperty schemaProperty)
         {
             switch (schemaProperty.Type)
@@ -357,18 +365,14 @@ public abstract record EntityValue(object? ObjectValue)
     /// <summary>
     /// A date time value
     /// </summary>
-    public record Date(DateTime Value, string DateOutputFormat) : EntityValue(Value)
+    public record Date(DateTime Value, string? DateOutputFormat) : EntityValue(Value)
     {
-        /// <summary>
-        /// Create a date with the default DateTimeFormat
-        /// </summary>
-        public Date(DateTime value) : this(value, Constants.DateTimeFormat) { }
-
         /// <inheritdoc />
         public override string GetPrimitiveString() => Value.ToString("o");
 
         /// <inheritdoc />
-        public override string Serialize() => Value.ToString(DateOutputFormat);
+        public override string Serialize() =>
+            Value.ToString(DateOutputFormat ?? Constants.DateTimeFormat);
 
         /// <inheritdoc />
         public override string GetFormattedString(
@@ -385,16 +389,24 @@ public abstract record EntityValue(object? ObjectValue)
         }
 
         /// <inheritdoc />
-        public override string ToString() => Value.ToString(DateOutputFormat);
+        public override string ToString() =>
+            Value.ToString(DateOutputFormat ?? Constants.DateTimeFormat);
 
         /// <inheritdoc />
         protected override Result<(EntityValue value, bool changed), IErrorBuilder> TryConvertBase(
+            Schema schema,
             SchemaProperty schemaProperty)
         {
             return schemaProperty.Type switch
             {
                 SCLType.String => (
-                    new String(Value.ToString(DateOutputFormat)), true),
+                    new String(
+                        Value.ToString(
+                            DateOutputFormat
+                         ?? Constants
+                                .DateTimeFormat //Note: we don't use the schema date output format here
+                        )
+                    ), true),
                 SCLType.Date => (this, false),
                 _            => CouldNotConvert(Value, schemaProperty)
             };
@@ -431,6 +443,7 @@ public abstract record EntityValue(object? ObjectValue)
 
         /// <inheritdoc />
         protected override Result<(EntityValue value, bool changed), IErrorBuilder> TryConvertBase(
+            Schema schema,
             SchemaProperty schemaProperty)
         {
             return schemaProperty.Type switch
@@ -528,13 +541,14 @@ public abstract record EntityValue(object? ObjectValue)
 
         /// <inheritdoc />
         protected override Result<(EntityValue value, bool changed), IErrorBuilder> TryConvertBase(
+            Schema schema,
             SchemaProperty schemaProperty)
         {
             if (schemaProperty.Multiplicity == Multiplicity.UpToOne ||
                 schemaProperty.Multiplicity == Multiplicity.ExactlyOne)
             {
                 if (Value.Count == 1)
-                    return Value.Single().TryConvert(schemaProperty);
+                    return Value.Single().TryConvert(schema, schemaProperty);
 
                 if (Value.Count == 0 && schemaProperty.Multiplicity == Multiplicity.UpToOne)
                     return (Null.Instance, true);
@@ -554,7 +568,7 @@ public abstract record EntityValue(object? ObjectValue)
                 Type             = schemaProperty.Type
             };
 
-            var newList = Value.Select(x => x.TryConvert(sp))
+            var newList = Value.Select(x => x.TryConvert(schema, sp))
                 .Combine(ErrorBuilderList.Combine)
                 .Map(
                     x => x.Aggregate(
@@ -684,7 +698,7 @@ public abstract record EntityValue(object? ObjectValue)
             case long ln and < int.MaxValue and > int.MinValue:
                 return new Integer(Convert.ToInt32(ln));
             case Enumeration e1: return new EnumerationValue(e1);
-            case DateTime dt:    return new Date(dt);
+            case DateTime dt:    return new Date(dt, null);
             case Enum e:
                 return new EnumerationValue(new Enumeration(e.GetType().Name, e.ToString()));
             case JValue jv:             return CreateFromObject(jv.Value, multiValueDelimiter);
@@ -782,6 +796,7 @@ public abstract record EntityValue(object? ObjectValue)
     /// Tries to convert a value to match the schema
     /// </summary>
     protected abstract Result<(EntityValue value, bool changed), IErrorBuilder> TryConvertBase(
+        Schema schema,
         SchemaProperty schemaProperty);
 
     /// <summary>
@@ -797,6 +812,7 @@ public abstract record EntityValue(object? ObjectValue)
     /// Tries to convert the value so it matches the schema.
     /// </summary>
     public Result<(EntityValue value, bool changed), IErrorBuilder> TryConvert(
+        Schema schema,
         SchemaProperty schemaProperty)
     {
         if (schemaProperty.Regex != null)
@@ -811,7 +827,7 @@ public abstract record EntityValue(object? ObjectValue)
                 );
         }
 
-        return TryConvertBase(schemaProperty);
+        return TryConvertBase(schema, schemaProperty);
     }
 
     /// <summary>
