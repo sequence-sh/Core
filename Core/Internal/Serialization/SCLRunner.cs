@@ -122,7 +122,7 @@ public sealed class SCLRunner
         IReadOnlyDictionary<string, object> sequenceMetadata,
         CancellationToken cancellationToken)
     {
-        var stepResult = SCLParsing.ParseSequence(text)
+        var stepResult = SCLParsing.TryParseStep(text)
             .Bind(x => x.TryFreeze(TypeReference.Any.Instance, _stepFactoryStore))
             .Map(ConvertToUnitStep);
 

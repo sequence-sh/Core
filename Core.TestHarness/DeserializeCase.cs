@@ -60,7 +60,7 @@ public abstract partial class StepTestBase<TStep, TOutput>
 
             testOutputHelper.WriteLine(SCL);
 
-            var deserializeResult = SCLParsing.ParseSequence(SCL);
+            var deserializeResult = SCLParsing.TryParseStep(SCL);
 
             deserializeResult.ShouldBeSuccessful(x => x.ToString()!);
 

@@ -44,7 +44,7 @@ public partial class ExampleTests
 
         var sfs = StepFactoryStore.CreateFromAssemblies();
 
-        var stepResult = SCLParsing.ParseSequence(scl)
+        var stepResult = SCLParsing.TryParseStep(scl)
             .Bind(x => x.TryFreeze(TypeReference.Any.Instance, sfs));
 
         if (stepResult.IsFailure)

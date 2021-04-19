@@ -108,7 +108,7 @@ public partial class DeserializationErrorTests
         {
             var sfs = StepFactoryStore.CreateFromAssemblies();
 
-            var result = SCLParsing.ParseSequence(SCL)
+            var result = SCLParsing.TryParseStep(SCL)
                 .Bind(x => x.TryFreeze(TypeReference.Any.Instance, sfs))
                 .Map(SCLRunner.ConvertToUnitStep);
 

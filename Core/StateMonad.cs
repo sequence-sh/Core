@@ -98,6 +98,16 @@ public sealed class StateMonad : IStateMonad
         if (value is T typedValue)
             return Maybe<T>.From(typedValue);
 
+        if (typeof(T) == typeof(StringStream))
+        {
+            var ss = new StringStream(value.ToString()!);
+
+            if (ss is T t)
+            {
+                return Maybe<T>.From(t);
+            }
+        }
+
         return new ErrorBuilder(ErrorCode.WrongVariableType, key, typeof(T).Name);
     }
 
