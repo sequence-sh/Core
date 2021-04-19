@@ -43,11 +43,7 @@ public sealed class Schema : IEntityConvertible
     public ErrorBehavior DefaultErrorBehavior { get; set; } = ErrorBehavior.Fail;
 
     /// <inheritdoc />
-    public override string ToString()
-    {
-        // ReSharper disable once ConstantNullCoalescingCondition
-        return Name;
-    }
+    public override string ToString() => Name;
 
     /// <summary>
     /// Attempts to apply this schema to an entity.
@@ -147,6 +143,8 @@ public sealed class Schema : IEntityConvertible
                 {
                     case ExtraPropertyBehavior.Fail:
                     {
+                        changed = true;
+
                         var errorBuilder = new ErrorBuilder(
                             ErrorCode.SchemaViolationUnexpectedProperty,
                             entityProperty.Name
@@ -157,11 +155,13 @@ public sealed class Schema : IEntityConvertible
                     }
                     case ExtraPropertyBehavior.Remove:
                     {
-                        //Do nothing
+                        changed = true;
                         break;
                     }
                     case ExtraPropertyBehavior.Warn:
                     {
+                        changed = true;
+
                         var errorBuilder = new ErrorBuilder(
                             ErrorCode.SchemaViolationUnexpectedProperty,
                             entityProperty.Name
@@ -181,10 +181,7 @@ public sealed class Schema : IEntityConvertible
         }
 
         foreach (var (key, _) in remainingProperties
-            .Where(
-                x => x.Value.Multiplicity == Multiplicity.ExactlyOne
-                  || x.Value.Multiplicity == Multiplicity.AtLeastOne
-            ))
+            .Where(x => x.Value.Multiplicity is Multiplicity.ExactlyOne or Multiplicity.AtLeastOne))
         {
             var error = new ErrorBuilder(ErrorCode.SchemaViolationMissingProperty, key);
             HandleError(error, generalErrorBehavior);

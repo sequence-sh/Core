@@ -255,6 +255,40 @@ public partial class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Enti
                     .WithErrorBehavior(ErrorBehavior.Ignore),
                 "(Foo: \"Hello\")"
             );
+
+            yield return CreateCase(
+                "Extra Property: Allow",
+                new List<Entity> { Entity.Create(("Foo", "Hello"), ("Bar", "World")) },
+                CreateSchema(
+                    SchemaName,
+                    ExtraPropertyBehavior.Allow,
+                    ("Foo", SCLType.String, Multiplicity.Any)
+                ),
+                "(Foo: \"Hello\" Bar: \"World\")"
+            );
+
+            yield return CreateCase(
+                "Extra Property: Remove",
+                new List<Entity> { Entity.Create(("Foo", "Hello"), ("Bar", "World")) },
+                CreateSchema(
+                    SchemaName,
+                    ExtraPropertyBehavior.Remove,
+                    ("Foo", SCLType.String, Multiplicity.Any)
+                ),
+                "(Foo: \"Hello\")"
+            );
+
+            yield return CreateCase(
+                "Extra Property: Warning",
+                new List<Entity> { Entity.Create(("Foo", "Hello"), ("Bar", "World")) },
+                CreateSchema(
+                    SchemaName,
+                    ExtraPropertyBehavior.Warn,
+                    ("Foo", SCLType.String, Multiplicity.Any)
+                ),
+                "Schema violation: Schema Violated: Unexpected Property: 'Bar'",
+                "(Foo: \"Hello\")"
+            );
         }
     }
 
