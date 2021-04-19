@@ -12,7 +12,6 @@ using Reductech.EDR.Core.TestHarness;
 using Reductech.EDR.Core.Util;
 using Xunit;
 using static Reductech.EDR.Core.TestHarness.StaticHelpers;
-using Extensions = Reductech.EDR.Core.Util.Extensions;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
@@ -72,7 +71,7 @@ public partial class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Enti
                 },
                 CreateSchema(
                     SchemaName,
-                    false,
+                    ExtraPropertyBehavior.Fail,
                     ("foo", SCLType.String, Multiplicity.ExactlyOne),
                     ("Bar", SCLType.Integer, Multiplicity.ExactlyOne)
                 ),
@@ -85,7 +84,7 @@ public partial class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Enti
                 new List<Entity> { Entity.Create(("Foo", "100")) },
                 CreateSchema(
                     SchemaName,
-                    false,
+                    ExtraPropertyBehavior.Fail,
                     ("Foo", SCLType.Integer, Multiplicity.ExactlyOne)
                 ),
                 "(Foo: 100)"
@@ -96,7 +95,7 @@ public partial class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Enti
                 new List<Entity> { Entity.Create(("Foo", "100.345")) },
                 CreateSchema(
                     SchemaName,
-                    false,
+                    ExtraPropertyBehavior.Fail,
                     ("Foo", SCLType.Double, Multiplicity.ExactlyOne)
                 ),
                 "(Foo: 100.345)"
@@ -107,7 +106,7 @@ public partial class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Enti
                 new List<Entity> { Entity.Create(("Foo", "true")) },
                 CreateSchema(
                     SchemaName,
-                    false,
+                    ExtraPropertyBehavior.Fail,
                     ("Foo", SCLType.Bool, Multiplicity.ExactlyOne)
                 ),
                 "(Foo: True)"
@@ -118,7 +117,7 @@ public partial class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Enti
                 new List<Entity> { Entity.Create(("Foo", "11/10/2020 3:45:44 PM")) },
                 CreateSchema(
                     SchemaName,
-                    false,
+                    ExtraPropertyBehavior.Fail,
                     ("Foo", SCLType.Date, Multiplicity.ExactlyOne)
                 ),
                 "(Foo: 2020-10-11T15:45:44.0000000)"
@@ -129,7 +128,7 @@ public partial class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Enti
                 new List<Entity> { Entity.Create(("Foo", "2020")) },
                 CreateSchema(
                     SchemaName,
-                    false,
+                    ExtraPropertyBehavior.Fail,
                     ("Foo", SCLType.Date, null, Multiplicity.ExactlyOne, null, null,
                      new List<string> { "yyyy" }, null)
                 ),
@@ -141,7 +140,7 @@ public partial class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Enti
                 new List<Entity> { Entity.Create(("Foo", "2020")) },
                 CreateSchema(
                     SchemaName,
-                    false,
+                    ExtraPropertyBehavior.Fail,
                     ("Foo", SCLType.Date, null, Multiplicity.ExactlyOne, null, null,
                      new List<string> { "yyyy" }, "yyyy-mm-dd")
                 ),
@@ -153,7 +152,7 @@ public partial class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Enti
                 new List<Entity> { Entity.Create(("Foo", "100")) },
                 CreateSchema(
                     SchemaName,
-                    false,
+                    ExtraPropertyBehavior.Fail,
                     ("Foo", SCLType.Integer, null, Multiplicity.ExactlyOne, @"\d+", null,
                      null, null)
                 ),
@@ -165,7 +164,7 @@ public partial class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Enti
                 new List<Entity> { Entity.Create(("Foo", "hello")) },
                 CreateSchema(
                     SchemaName,
-                    false,
+                    ExtraPropertyBehavior.Fail,
                     ("Foo", SCLType.Enum, "Word", Multiplicity.ExactlyOne, null,
                      new List<string> { "Hello", "World" }, null, null)
                 ),
@@ -177,7 +176,7 @@ public partial class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Enti
                 new List<Entity> { Entity.Create(("Foo", null)) },
                 CreateSchema(
                     SchemaName,
-                    false,
+                    ExtraPropertyBehavior.Fail,
                     ("Foo", SCLType.Integer, null, Multiplicity.Any, null,
                      null, null, null)
                 ),
@@ -189,7 +188,7 @@ public partial class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Enti
                 new List<Entity> { Entity.Create(("Foo", null)) },
                 CreateSchema(
                     SchemaName,
-                    false,
+                    ExtraPropertyBehavior.Fail,
                     ("Foo", SCLType.Integer, null, Multiplicity.UpToOne, null,
                      null, null, null)
                 ),
@@ -201,7 +200,7 @@ public partial class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Enti
                 new List<Entity> { Entity.Create(("Foo", null)) },
                 CreateSchema(
                         SchemaName,
-                        false,
+                        ExtraPropertyBehavior.Fail,
                         ("Foo", SCLType.Integer, null, Multiplicity.ExactlyOne, null,
                          null, null, null)
                     )
@@ -214,7 +213,7 @@ public partial class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Enti
                 new List<Entity> { Entity.Create(("Foo", "Hello")) },
                 CreateSchema(
                         SchemaName,
-                        false,
+                        ExtraPropertyBehavior.Fail,
                         ("Foo", SCLType.Integer, Multiplicity.Any)
                     )
                     .WithErrorBehavior(ErrorBehavior.Error),
@@ -226,7 +225,7 @@ public partial class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Enti
                 new List<Entity> { Entity.Create(("Foo", "Hello")) },
                 CreateSchema(
                         SchemaName,
-                        false,
+                        ExtraPropertyBehavior.Fail,
                         ("Foo", SCLType.Integer, Multiplicity.Any)
                     )
                     .WithErrorBehavior(ErrorBehavior.Warning),
@@ -239,7 +238,7 @@ public partial class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Enti
                 new List<Entity> { Entity.Create(("Foo", "Hello")) },
                 CreateSchema(
                         SchemaName,
-                        false,
+                        ExtraPropertyBehavior.Fail,
                         ("Foo", SCLType.Integer, Multiplicity.Any)
                     )
                     .WithErrorBehavior(ErrorBehavior.Skip)
@@ -250,7 +249,7 @@ public partial class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Enti
                 new List<Entity> { Entity.Create(("Foo", "Hello")) },
                 CreateSchema(
                         SchemaName,
-                        false,
+                        ExtraPropertyBehavior.Fail,
                         ("Foo", SCLType.Integer, Multiplicity.Any)
                     )
                     .WithErrorBehavior(ErrorBehavior.Ignore),
@@ -309,7 +308,7 @@ public partial class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Enti
                 new List<Entity> { Entity.Create(("Foo", "Hello")) },
                 CreateSchema(
                     SchemaName,
-                    false,
+                    ExtraPropertyBehavior.Fail,
                     ("Foo", SCLType.Integer, Multiplicity.Any)
                 ),
                 ErrorCode.SchemaViolationWrongType,
@@ -322,7 +321,7 @@ public partial class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Enti
                 new List<Entity> { Entity.Create(("Foo", "Fish")) },
                 CreateSchema(
                     SchemaName,
-                    false,
+                    ExtraPropertyBehavior.Fail,
                     ("Foo", SCLType.Enum, "Food", Multiplicity.Any, null,
                      new List<string> { "Meat", "Chips" }, null, null)
                 ),
@@ -336,7 +335,7 @@ public partial class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Enti
                 new List<Entity> { Entity.Create(("Foo", "Meat")) },
                 CreateSchema(
                     SchemaName,
-                    false,
+                    ExtraPropertyBehavior.Fail,
                     ("Foo", SCLType.Enum, null, Multiplicity.Any, null,
                      new List<string> { "Meat", "Chips" }, null, null)
                 ),
@@ -348,7 +347,7 @@ public partial class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Enti
                 new List<Entity> { Entity.Create(("Foo", "Fish")) },
                 CreateSchema(
                     SchemaName,
-                    false,
+                    ExtraPropertyBehavior.Fail,
                     ("Foo", SCLType.String, null, Multiplicity.Any, @"\d+", null, null,
                      null)
                 ),
@@ -362,7 +361,7 @@ public partial class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Enti
                 new List<Entity> { Entity.Create(("Foo", "Fish")) },
                 CreateSchema(
                     SchemaName,
-                    false,
+                    ExtraPropertyBehavior.Fail,
                     ("Foo", SCLType.String, Multiplicity.Any),
                     ("Bar", SCLType.String, Multiplicity.AtLeastOne)
                 ),
@@ -375,7 +374,7 @@ public partial class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Enti
                 new List<Entity> { Entity.Create(("Foo", "Fish"), ("Bar", "Fly")) },
                 CreateSchema(
                     SchemaName,
-                    false,
+                    ExtraPropertyBehavior.Fail,
                     ("Foo", SCLType.String, Multiplicity.Any)
                 ),
                 ErrorCode.SchemaViolationUnexpectedProperty,
@@ -389,14 +388,14 @@ public partial class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Enti
     {
         var schema = CreateSchema(
             SchemaName,
-            false,
+            ExtraPropertyBehavior.Fail,
             ("foo", SCLType.String, Multiplicity.ExactlyOne),
             ("Bar", SCLType.Integer, Multiplicity.ExactlyOne)
         );
 
         schema.Name.Should().Be(SchemaName);
 
-        schema.AllowExtraProperties.Should().BeFalse();
+        schema.ExtraProperties.Should().Be(ExtraPropertyBehavior.Fail);
 
         schema.Properties.Count.Should().Be(2);
 
@@ -414,7 +413,7 @@ public partial class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Enti
     {
         var schema = CreateSchema(
             SchemaName,
-            false,
+            ExtraPropertyBehavior.Fail,
             ("foo", SCLType.String, Multiplicity.ExactlyOne),
             ("Bar", SCLType.Integer, Multiplicity.ExactlyOne)
         );

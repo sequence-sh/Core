@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Reductech.EDR.Core.Entities;
+using Reductech.EDR.Core.Enums;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.Util;
@@ -74,7 +75,7 @@ public static class StaticHelpers
 
     public static Schema CreateSchema(
         string name,
-        bool allowExtraProperties,
+        ExtraPropertyBehavior allowExtraProperties,
         params (string propertyName, SCLType type, Multiplicity multiplicity)[]
             properties)
     {
@@ -91,15 +92,15 @@ public static class StaticHelpers
 
     public static Schema CreateSchema(
         string name,
-        bool allowExtraProperties,
+        ExtraPropertyBehavior extraPropertyBehavior,
         params (string propertyName, SCLType type, string? enumType, Multiplicity
             multiplicity, string? regex, List<string>? values, List<string>? inputFormats, string?
             outputFormat)[] properties)
     {
         return new()
         {
-            Name                 = name,
-            AllowExtraProperties = allowExtraProperties,
+            Name            = name,
+            ExtraProperties = extraPropertyBehavior,
             Properties = properties.ToDictionary(
                 x => x.propertyName,
                 x => new SchemaProperty

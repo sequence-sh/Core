@@ -34,7 +34,7 @@ public sealed class Schema : IEntityConvertible
     /// Whether properties other than the explicitly defined properties are allowed.
     /// </summary>
     [JsonProperty]
-    public bool AllowExtraProperties { get; set; } = true;
+    public ExtraPropertyBehavior ExtraProperties { get; set; } = ExtraPropertyBehavior.Allow;
 
     /// <summary>
     /// The default error behavior. This can be overriden by the individual properties or by the value passed to the EnforceSchema method.
@@ -141,16 +141,42 @@ public sealed class Schema : IEntityConvertible
                     HandleError(convertResult.Error, errorBehavior);
                 }
             }
-            else if (AllowExtraProperties) //This entity has a property that is not in the schema
-                newProperties.Add(entityProperty);
             else
             {
-                var errorBuilder = new ErrorBuilder(
-                    ErrorCode.SchemaViolationUnexpectedProperty,
-                    entityProperty.Name
-                );
+                switch (ExtraProperties)
+                {
+                    case ExtraPropertyBehavior.Fail:
+                    {
+                        var errorBuilder = new ErrorBuilder(
+                            ErrorCode.SchemaViolationUnexpectedProperty,
+                            entityProperty.Name
+                        );
 
-                HandleError(errorBuilder, generalErrorBehavior);
+                        HandleError(errorBuilder, ErrorBehavior.Fail);
+                        break;
+                    }
+                    case ExtraPropertyBehavior.Remove:
+                    {
+                        //Do nothing
+                        break;
+                    }
+                    case ExtraPropertyBehavior.Warn:
+                    {
+                        var errorBuilder = new ErrorBuilder(
+                            ErrorCode.SchemaViolationUnexpectedProperty,
+                            entityProperty.Name
+                        );
+
+                        HandleError(errorBuilder, ErrorBehavior.Warning);
+                        break;
+                    }
+                    case ExtraPropertyBehavior.Allow:
+                    {
+                        newProperties.Add(entityProperty);
+                        break;
+                    }
+                    default: throw new ArgumentOutOfRangeException();
+                }
             }
         }
 

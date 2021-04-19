@@ -116,6 +116,8 @@ public sealed class EnforceSchema : CompoundStep<Array<Entity>>
             {
                 yield return typeof(Multiplicity);
                 yield return typeof(SCLType);
+                yield return typeof(ErrorBehavior);
+                yield return typeof(ExtraPropertyBehavior);
             }
         }
     }

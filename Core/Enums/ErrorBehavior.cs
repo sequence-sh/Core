@@ -7,7 +7,7 @@
 public enum ErrorBehavior
 {
     /// <summary>
-    /// On Error: Stop the process
+    /// On Error: Stop the sequence and return failure
     /// </summary>
     Fail,
 

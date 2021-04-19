@@ -8,6 +8,7 @@ using Divergic.Logging.Xunit;
 using Microsoft.Extensions.Logging;
 using Reductech.EDR.Core.Abstractions;
 using Reductech.EDR.Core.Entities;
+using Reductech.EDR.Core.Enums;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Parser;
 using Reductech.EDR.Core.Internal.Serialization;
@@ -144,9 +145,9 @@ public partial class ExampleTests
                     Value = Constant(
                         new Schema
                         {
-                            AllowExtraProperties = false,
-                            Name                 = "Dinosaur",
-                            Properties = new Dictionary<string, SchemaProperty>()
+                            ExtraProperties = ExtraPropertyBehavior.Fail,
+                            Name            = "Dinosaur",
+                            Properties = new Dictionary<string, SchemaProperty>
                             {
                                 {
                                     "Name", new SchemaProperty { Type = SCLType.String }
