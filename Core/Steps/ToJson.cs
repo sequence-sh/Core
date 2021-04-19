@@ -26,9 +26,16 @@ public sealed class ToJson : CompoundStep<StringStream>
         if (entity.IsFailure)
             return entity.ConvertFailure<StringStream>();
 
+        var formatResult = await FormatOutput.Run(stateMonad, cancellationToken);
+
+        if (formatResult.IsFailure)
+            return formatResult.ConvertFailure<StringStream>();
+
+        var formatting = formatResult.Value ? Formatting.Indented : Formatting.None;
+
         var jsonString = JsonConvert.SerializeObject(
             entity.Value,
-            Formatting.None,
+            formatting,
             EntityJsonConverter.Instance
         );
 
@@ -41,6 +48,13 @@ public sealed class ToJson : CompoundStep<StringStream>
     [StepProperty(1)]
     [Required]
     public IStep<Entity> Entity { get; set; } = null!;
+
+    /// <summary>
+    /// Whether to indent to the Json output
+    /// </summary>
+    [StepProperty(2)]
+    [DefaultValueExplanation("true")]
+    public IStep<bool> FormatOutput { get; set; } = new BoolConstant(true);
 
     /// <inheritdoc />
     public override IStepFactory StepFactory { get; } =
