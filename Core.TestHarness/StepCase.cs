@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Internal;
@@ -77,7 +78,7 @@ public abstract partial class StepTestBase<TStep, TOutput>
             testOutputHelper.WriteLine("");
             testOutputHelper.WriteLine(scl);
 
-            var sfs = StepFactoryStore.CreateUsingReflection(typeof(IStep), typeof(TStep));
+            var sfs = StepFactoryStore.CreateFromAssemblies(Assembly.GetAssembly(typeof(TStep))!);
 
             var deserializeResult = SCLParsing.ParseSequence(scl);
 

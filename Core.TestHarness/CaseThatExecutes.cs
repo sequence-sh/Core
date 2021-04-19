@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
@@ -112,7 +113,7 @@ public abstract partial class StepTestBase<TStep, TOutput>
             var externalContext = ExternalContextSetupHelper.GetExternalContext(mockRepository);
 
             var sfs = StepFactoryStoreToUse.Unwrap(
-                StepFactoryStore.CreateUsingReflection(typeof(IStep), typeof(TStep))
+                StepFactoryStore.CreateFromAssemblies(Assembly.GetAssembly(typeof(TStep))!)
             );
 
             var stateMonad = new StateMonad(

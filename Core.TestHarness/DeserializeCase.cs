@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Reflection;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Internal;
@@ -53,7 +54,9 @@ public abstract partial class StepTestBase<TStep, TOutput>
         {
             await Task.CompletedTask;
 
-            var sfs = StepFactoryStore.CreateUsingReflection(typeof(IStep), typeof(TStep));
+            var sfs = StepFactoryStoreToUse.Unwrap(
+                StepFactoryStore.CreateFromAssemblies(Assembly.GetAssembly(typeof(TStep))!)
+            );
 
             testOutputHelper.WriteLine(SCL);
 

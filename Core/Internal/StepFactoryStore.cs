@@ -4,7 +4,12 @@ using System.Diagnostics;
 using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Reflection;
+using CSharpFunctionalExtensions;
+using Microsoft.Extensions.Logging;
 using Reductech.EDR.Core.Attributes;
+using Reductech.EDR.Core.Connectors;
+using Reductech.EDR.Core.Entities;
+using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Util;
 
 namespace Reductech.EDR.Core.Internal
@@ -81,23 +86,62 @@ public class StepFactoryStore
     }
 
     /// <summary>
+    /// Create a step factory store by loading connectors from paths specified in the SCLSettings
+    /// </summary>
+    public static Result<StepFactoryStore, IErrorBuilder> TryCreateFromSettings(
+        SCLSettings sclSettings,
+        ILogger logger)
+    {
+        List<string> connectorPaths;
+
+        var connectors = sclSettings.Entity.TryGetValue("connectors");
+
+        if (connectors.HasValue && connectors.Value is EntityValue.NestedEntity nestedEntity)
+        {
+            connectorPaths = new List<string>();
+
+            foreach (var connectorProperty in nestedEntity.Value)
+                if (connectorProperty.BestValue is EntityValue.NestedEntity connector)
+                {
+                    var path = connector.Value.TryGetNestedString("path");
+
+                    if (path.HasValue)
+                        connectorPaths.Add(path.Value);
+                }
+        }
+        else
+        {
+            connectorPaths = new List<string>();
+        }
+
+        var assemblies = connectorPaths
+            .Select(PluginLoadContext.GetAbsolutePath)
+            .Select(x => PluginLoadContext.LoadPlugin(x, logger))
+            .Combine(x => x.ToArray(), ErrorBuilderList.Combine);
+
+        if (assemblies.IsFailure)
+            return assemblies.ConvertFailure<StepFactoryStore>();
+
+        var stepFactoryStore = CreateFromAssemblies(assemblies.Value);
+
+        return stepFactoryStore;
+    }
+
+    /// <summary>
     /// Create a step factory store using all StepFactories in the assembly.
     /// </summary>
     /// <returns></returns>
-    public static StepFactoryStore CreateUsingReflection(params Type[] assemblyMemberTypes)
+    public static StepFactoryStore CreateFromAssemblies(params Assembly[] assemblies)
     {
-        var assemblies = assemblyMemberTypes
-            .Prepend(typeof(ICompoundStep))
-            .Select(Assembly.GetAssembly)
+        var steps = assemblies.Prepend(typeof(IStep).Assembly)
+            .SelectMany(a => a!.GetTypes())
             .Distinct()
+            .Where(x => !x.IsAbstract)
+            .Where(x => typeof(ICompoundStep).IsAssignableFrom(x))
             .ToList();
 
         var factories =
-            assemblies
-                .SelectMany(a => a!.GetTypes())
-                .Distinct()
-                .Where(x => !x.IsAbstract)
-                .Where(x => typeof(ICompoundStep).IsAssignableFrom(x))
+            steps
                 .Select(CreateStepFactory)
                 .ToList();
 
@@ -105,45 +149,42 @@ public class StepFactoryStore
             assemblies.Select(ConnectorInformation.TryCreate!).WhereNotNull().ToList();
 
         return Create(connectorInfo, factories);
-    }
 
-    /// <summary>
-    /// Create a StepFactory from a step type
-    /// </summary>
-    public static IStepFactory CreateStepFactory(Type stepType)
-    {
-        Type closedType;
-
-        if (stepType.IsGenericType)
+        static IStepFactory CreateStepFactory(Type stepType)
         {
-            var arguments = ((TypeInfo)stepType).GenericTypeParameters
-                .Select(_ => typeof(int))
-                .ToArray();
+            Type closedType;
 
-            try
+            if (stepType.IsGenericType)
             {
-                closedType = stepType.MakeGenericType(arguments);
+                var arguments = ((TypeInfo)stepType).GenericTypeParameters
+                    .Select(_ => typeof(int))
+                    .ToArray();
+
+                try
+                {
+                    closedType = stepType.MakeGenericType(arguments);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                    throw;
+                }
             }
-            catch (Exception e)
+            else
             {
-                Console.WriteLine(e);
-                throw;
+                closedType = stepType;
             }
+
+            var instance = Activator.CreateInstance(closedType);
+            var step     = instance as ICompoundStep;
+
+            var stepFactory = step!.StepFactory;
+
+            if (stepFactory is null)
+                throw new Exception($"Step Factory for {stepType.Name} is null");
+
+            return step!.StepFactory;
         }
-        else
-        {
-            closedType = stepType;
-        }
-
-        var instance = Activator.CreateInstance(closedType);
-        var step     = instance as ICompoundStep;
-
-        var stepFactory = step!.StepFactory;
-
-        if (stepFactory is null)
-            throw new Exception($"Step Factory for {stepType.Name} is null");
-
-        return step!.StepFactory;
     }
 
     /// <summary>

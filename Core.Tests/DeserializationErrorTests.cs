@@ -106,7 +106,7 @@ public partial class DeserializationErrorTests
         /// <inheritdoc />
         public void Run(ITestOutputHelper testOutputHelper)
         {
-            var sfs = StepFactoryStore.CreateUsingReflection(typeof(IFreezableStep));
+            var sfs = StepFactoryStore.CreateFromAssemblies();
 
             var result = SCLParsing.ParseSequence(SCL)
                 .Bind(x => x.TryFreeze(TypeReference.Any.Instance, sfs))

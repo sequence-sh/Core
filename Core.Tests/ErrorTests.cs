@@ -144,7 +144,7 @@ public partial class RunErrorTests
         /// <inheritdoc />
         public async Task RunAsync(ITestOutputHelper testOutputHelper)
         {
-            var spf  = StepFactoryStore.CreateUsingReflection(typeof(IStep));
+            var spf  = StepFactoryStore.CreateFromAssemblies();
             var repo = new MockRepository(MockBehavior.Strict);
 
             var externalContext = ExternalContextSetupHelper.GetExternalContext(repo);
