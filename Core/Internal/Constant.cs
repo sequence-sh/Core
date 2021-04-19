@@ -183,7 +183,7 @@ public record DateTimeConstant(DateTime Value) : ConstantBase<DateTime>(Value)
     public override string Serialize() => Value.ToString(Constants.DateTimeFormat);
 
     /// <inheritdoc />
-    protected override EntityValue ToEntityValue() => new EntityValue.Date(Value);
+    protected override EntityValue ToEntityValue() => new EntityValue.Date(Value, null);
 }
 
 /// <summary>

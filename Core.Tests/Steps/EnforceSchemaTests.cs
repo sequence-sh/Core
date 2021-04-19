@@ -136,6 +136,28 @@ public partial class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Enti
             );
 
             yield return CreateCase(
+                "Cast date time with default input format",
+                new List<Entity> { Entity.Create(("Foo", "2020")) },
+                new Schema()
+                {
+                    Name                    = SchemaName,
+                    DefaultDateInputFormats = new List<string> { "yyyy" },
+                    DefaultErrorBehavior    = ErrorBehavior.Fail,
+                    Properties = new Dictionary<string, SchemaProperty>()
+                    {
+                        {
+                            "Foo",
+                            new SchemaProperty
+                            {
+                                Type = SCLType.Date, Multiplicity = Multiplicity.ExactlyOne
+                            }
+                        }
+                    }
+                },
+                "(Foo: 2020-01-01T00:00:00.0000000)"
+            );
+
+            yield return CreateCase(
                 "Cast date time with input format and output format",
                 new List<Entity> { Entity.Create(("Foo", "2020")) },
                 CreateSchema(
@@ -144,6 +166,29 @@ public partial class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Enti
                     ("Foo", SCLType.Date, null, Multiplicity.ExactlyOne, null, null,
                      new List<string> { "yyyy" }, "yyyy-mm-dd")
                 ),
+                "(Foo: 2020-00-01)"
+            );
+
+            yield return CreateCase(
+                "Cast date time with default input format and default output format",
+                new List<Entity> { Entity.Create(("Foo", "2020")) },
+                new Schema()
+                {
+                    Name                    = SchemaName,
+                    DefaultDateInputFormats = new List<string> { "yyyy" },
+                    DefaultDateOutputFormat = "yyyy-mm-dd",
+                    DefaultErrorBehavior    = ErrorBehavior.Fail,
+                    Properties = new Dictionary<string, SchemaProperty>()
+                    {
+                        {
+                            "Foo",
+                            new SchemaProperty
+                            {
+                                Type = SCLType.Date, Multiplicity = Multiplicity.ExactlyOne
+                            }
+                        }
+                    }
+                },
                 "(Foo: 2020-00-01)"
             );
 
