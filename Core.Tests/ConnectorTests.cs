@@ -34,7 +34,8 @@ public partial class ConnectorTests
         var connectorsString = $@"{{
 ""connectors"": {{
     ""example"":{{
-        ""path"": {JsonConvert.SerializeObject(RelativePath)}
+        ""path"": {JsonConvert.SerializeObject(RelativePath)},
+           ""ColorSource"": ""Red""
         
     }}
 }}
@@ -46,11 +47,20 @@ public partial class ConnectorTests
 
         stepFactoryStoreResult.ShouldBeSuccessful(x => x.AsString);
 
+        var injectedContextsResult = stepFactoryStoreResult.Value.TryGetInjectedContexts(settings);
+
+        injectedContextsResult.ShouldBeSuccessful(x => x.AsString);
+
+        var externalContext = ExternalContext.Default with
+        {
+            InjectedContexts = injectedContextsResult.Value
+        };
+
         var runner = new SCLRunner(
             SCLSettings.EmptySettings,
             logger,
             stepFactoryStoreResult.Value,
-            ExternalContext.Default
+            externalContext
         );
 
         var r = await
@@ -88,11 +98,30 @@ public partial class ConnectorTests
 
         var stepFactoryStore = StepFactoryStore.CreateFromAssemblies(assembly.Value);
 
+        var injectedContextsResult = stepFactoryStore.TryGetInjectedContexts(
+            new SCLSettings(
+                Entity.Create(
+                    new List<(EntityPropertyKey key, object? property)>()
+                    {
+                        (new EntityPropertyKey(new[] { "connectors", "example", "colorSource" }),
+                         "Red")
+                    }
+                )
+            )
+        );
+
+        injectedContextsResult.ShouldBeSuccessful(x => x.AsString);
+
+        var externalContext = ExternalContext.Default with
+        {
+            InjectedContexts = injectedContextsResult.Value
+        };
+
         var runner = new SCLRunner(
             SCLSettings.EmptySettings,
             logger,
             stepFactoryStore,
-            ExternalContext.Default
+            externalContext
         );
 
         var r = await
