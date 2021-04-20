@@ -7,7 +7,6 @@ using System.Text;
 using Antlr4.Runtime;
 using Antlr4.Runtime.Tree;
 using CSharpFunctionalExtensions;
-using OneOf;
 using Reductech.EDR.Core.Internal.Errors;
 using static Reductech.EDR.Core.Internal.FreezableFactory;
 using StepParameterDict =
@@ -238,7 +237,7 @@ public static class SCLParsing
             var operatorSymbol = operatorSymbols.Single();
 
             var terms = context.term()
-                .Select(x => Visit(x))
+                .Select(Visit)
                 .Where(x => x.IsFailure || x.Value != null)
                 .ToList();
 
@@ -545,13 +544,13 @@ public static class SCLParsing
             if (firstStep.IsFailure)
                 errors.Add(firstStep.Error);
             else
-                dict.Add(new StepParameterReference(1), firstStep.Value);
+                dict.Add(new StepParameterReference.Index(1), firstStep.Value);
 
             var numberedArguments = context.function()
                 .term()
                 .Select(
                     (term, i) =>
-                        (term: Visit(term), number: OneOf<string, int>.FromT1(i + 2))
+                        (term: Visit(term), number: i + 2)
                 );
 
             foreach (var (term, number) in numberedArguments)
@@ -559,7 +558,7 @@ public static class SCLParsing
                 if (term.IsFailure)
                     errors.Add(term.Error);
                 else
-                    dict.Add(new StepParameterReference(number), term.Value);
+                    dict.Add(new StepParameterReference.Index(number), term.Value);
             }
 
             var location = new TextLocation(context);
@@ -570,7 +569,7 @@ public static class SCLParsing
                 errors.Add(members.Error);
             else
                 foreach (var (key, value) in members.Value)
-                    dict.Add(new StepParameterReference(key), value);
+                    dict.Add(new StepParameterReference.Named(key), value);
 
             if (errors.Any())
                 return Result.Failure<FreezableStepProperty, IError>(ErrorList.Combine(errors));
@@ -594,7 +593,7 @@ public static class SCLParsing
             var numberedArguments = context.term()
                 .Select(
                     (term, i) =>
-                        (term: Visit(term), number: OneOf<string, int>.FromT1(i + 1))
+                        (term: Visit(term), number: i + 1)
                 );
 
             foreach (var (term, number) in numberedArguments)
@@ -602,7 +601,7 @@ public static class SCLParsing
                 if (term.IsFailure)
                     errors.Add(term.Error);
                 else
-                    dict.Add(new StepParameterReference(number), term.Value);
+                    dict.Add(new StepParameterReference.Index(number), term.Value);
             }
 
             var location = new TextLocation(context);
@@ -613,7 +612,7 @@ public static class SCLParsing
                 errors.Add(members.Error);
             else
                 foreach (var (key, value) in members.Value)
-                    dict.Add(new StepParameterReference(key), value);
+                    dict.Add(new StepParameterReference.Named(key), value);
 
             if (errors.Any())
                 return Result.Failure<FreezableStepProperty, IError>(ErrorList.Combine(errors));

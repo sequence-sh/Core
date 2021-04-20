@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
-using OneOf;
 using Reductech.EDR.Core.Attributes;
 
 namespace Reductech.EDR.Core.Internal
@@ -9,19 +8,42 @@ namespace Reductech.EDR.Core.Internal
 
 /// <summary>
 /// A reference to a step property.
-/// Either the name of the property or the argument order
+/// Either the name of the property or the parameter order
 /// </summary>
-public readonly struct StepParameterReference : IEquatable<StepParameterReference>
+public abstract record StepParameterReference
 {
     /// <summary>
-    /// Create a new StepParameterReference
+    /// A reference by parameter order
     /// </summary>
-    public StepParameterReference(OneOf<string, int> value) => Value = value;
+    public record Index(int I) : StepParameterReference
+    {
+        /// <inheritdoc />
+        public override string Name => $"Parameter {I}";
+    }
 
     /// <summary>
-    /// Either the name of the property or the argument order
+    /// A reference by parameter name
     /// </summary>
-    public OneOf<string, int> Value { get; }
+    public record Named(string ParameterName) : StepParameterReference
+    {
+        /// <inheritdoc />
+        public override string Name => ParameterName;
+
+        /// <inheritdoc />
+        public virtual bool Equals(Named? other)
+        {
+            if (other is null)
+                return false;
+
+            return ParameterName.Equals(other.ParameterName, StringComparison.OrdinalIgnoreCase);
+        }
+
+        /// <inheritdoc />
+        public override int GetHashCode()
+        {
+            return Name.GetHashCode(StringComparison.OrdinalIgnoreCase);
+        }
+    }
 
     /// <inheritdoc />
     public override string ToString() => Name;
@@ -29,41 +51,7 @@ public readonly struct StepParameterReference : IEquatable<StepParameterReferenc
     /// <summary>
     /// This reference, in human readable form
     /// </summary>
-    public string Name => Value.Match(x => x, x => $"Parameter {x}");
-
-    /// <inheritdoc />
-    public bool Equals(StepParameterReference other)
-    {
-        if (Value.IsT0 && other.Value.IsT0)
-            return Value.AsT0.Equals(other.Value.AsT0, StringComparison.OrdinalIgnoreCase);
-
-        if (Value.IsT1 && other.Value.IsT1)
-            return Value.AsT1.Equals(other.Value.AsT1);
-
-        return false;
-    }
-
-    /// <inheritdoc />
-    public override bool Equals(object? obj) =>
-        obj is StepParameterReference other && Equals(other);
-
-    /// <inheritdoc />
-    public override int GetHashCode() => Value.Match(
-        x => StringComparer.OrdinalIgnoreCase.GetHashCode(x),
-        x => x
-    );
-
-    /// <summary>
-    /// Equals operator
-    /// </summary>
-    public static bool operator ==(StepParameterReference left, StepParameterReference right) =>
-        left.Equals(right);
-
-    /// <summary>
-    /// Not Equals operator
-    /// </summary>
-    public static bool operator !=(StepParameterReference left, StepParameterReference right) =>
-        !left.Equals(right);
+    public abstract string Name { get; }
 
     /// <summary>
     /// Gets possible StepParameterReferences for this property.
@@ -75,13 +63,13 @@ public readonly struct StepParameterReference : IEquatable<StepParameterReferenc
         if (attribute == null)
             yield break;
 
-        yield return new StepParameterReference(propertyInfo.Name);
+        yield return new Named(propertyInfo.Name);
 
         if (attribute.Order.HasValue)
-            yield return new StepParameterReference(attribute.Order.Value);
+            yield return new Index(attribute.Order.Value);
 
         foreach (var alias in propertyInfo.GetCustomAttributes<AliasAttribute>())
-            yield return new StepParameterReference(alias.Name);
+            yield return new Named(alias.Name);
     }
 }
 
