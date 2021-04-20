@@ -376,8 +376,8 @@ public static class SCLParsing
         {
             string s = GetString(context);
 
-            var stringStream = new StringStream(s);
-            var location     = new TextLocation(context);
+            StringStream stringStream = s;
+            var          location     = new TextLocation(context);
 
             var member = new FreezableStepProperty.Step(
                 new StringConstantFreezable(stringStream, location),
@@ -405,7 +405,7 @@ public static class SCLParsing
                     var unescaped = UnescapeInterpolated(text, i == 0);
 
                     var cs = new StringConstantFreezable(
-                        new StringStream(unescaped),
+                        unescaped,
                         new TextLocation(s.Symbol)
                     );
 

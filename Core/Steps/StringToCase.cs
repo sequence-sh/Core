@@ -47,9 +47,9 @@ public sealed class StringToCase : CompoundStep<StringStream>
         if (caseResult.IsFailure)
             return caseResult.ConvertFailure<StringStream>();
 
-        var r = Convert(stringResult.Value, caseResult.Value);
+        StringStream r = Convert(stringResult.Value, caseResult.Value);
 
-        return new StringStream(r);
+        return r;
     }
 
     private static string Convert(string s, TextCase textCase) => textCase switch

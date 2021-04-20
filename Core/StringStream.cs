@@ -9,8 +9,6 @@ using Reductech.EDR.Core.Internal.Serialization;
 using Reductech.EDR.Core.Util;
 using Thinktecture.IO;
 using Thinktecture.IO.Adapters;
-using Option =
-    OneOf.OneOf<string, (Thinktecture.IO.IStream, Reductech.EDR.Core.Enums.EncodingEnum)>;
 
 namespace Reductech.EDR.Core
 {
@@ -25,18 +23,19 @@ public sealed class StringStream : IEquatable<StringStream>, IComparable<StringS
     /// <summary>
     /// Create a new DataStream
     /// </summary>
-    public StringStream(IStream stream, EncodingEnum encoding) => Value = (stream, encoding);
+    public StringStream(IStream stream, EncodingEnum encoding) =>
+        Value = new StringStreamData.StreamData(stream, encoding);
 
     /// <summary>
     /// Create a new DataStream
     /// </summary>
     public StringStream(Stream stream, EncodingEnum encoding) =>
-        Value = (new StreamAdapter(stream), encoding);
+        Value = new StringStreamData.StreamData(new StreamAdapter(stream), encoding);
 
     /// <summary>
     /// Create a new DataStream from a string
     /// </summary>
-    public StringStream(string s) => Value = s;
+    public StringStream(string s) => Value = new StringStreamData.ConstantData(s);
 
     /// <summary>
     /// Empty StringStream
@@ -46,59 +45,151 @@ public sealed class StringStream : IEquatable<StringStream>, IComparable<StringS
     /// <summary>
     /// The Value of this
     /// </summary>
-    public Option Value { get; private set; }
+    private StringStreamData Value { get; set; }
+
+    private abstract record StringStreamData : IDisposable
+    {
+        public record ConstantData(string Underlying) : StringStreamData
+        {
+            /// <inheritdoc />
+            public override async ValueTask<string> GetStringAsync()
+            {
+                await Task.CompletedTask;
+                return Underlying;
+            }
+
+            /// <inheritdoc />
+            public override string GetString()
+            {
+                return Underlying;
+            }
+
+            /// <inheritdoc />
+            public override string Name => Underlying;
+
+            /// <inheritdoc />
+            public override string NameInLogs(bool reveal)
+            {
+                return
+                    reveal
+                        ? SerializationMethods.DoubleQuote(Underlying)
+                        : $"string Length: {Underlying.Length}";
+            }
+
+            /// <inheritdoc />
+            public override (IStream stream, EncodingEnum encodingEnum) GetStream()
+            {
+                byte[]       byteArray = Encoding.UTF8.GetBytes(Underlying);
+                MemoryStream stream    = new(byteArray);
+
+                return (new StreamAdapter(stream), EncodingEnum.UTF8);
+            }
+
+            /// <inheritdoc />
+            public override void Dispose() { }
+        }
+
+        public record StreamData(IStream Stream, EncodingEnum Encoding) : StringStreamData
+        {
+            /// <inheritdoc />
+            public override async ValueTask<string> GetStringAsync()
+            {
+                var stream = Stream;
+
+                if (stream.CanSeek)
+                    stream.Position = 0;
+
+                if (stream is FakeFileStreamAdapter fake) //This is a hack
+                    stream = new StreamAdapter(fake.Stream);
+
+                using IStreamReader reader = new StreamReaderAdapter(
+                    stream,
+                    Encoding.Convert(),
+                    true,
+                    -1,
+                    false
+                );
+
+                var s = await reader.ReadToEndAsync();
+
+                return s;
+            }
+
+            /// <inheritdoc />
+            public override string GetString()
+            {
+                Stream.Position = 0;
+
+                using var reader = new StreamReaderAdapter(
+                    Stream,
+                    Encoding.Convert(),
+                    true,
+                    -1,
+                    false
+                );
+
+                var s = reader.ReadToEnd();
+                return s;
+            }
+
+            /// <inheritdoc />
+            public override string Name => "StringStream";
+
+            /// <inheritdoc />
+            public override string NameInLogs(bool reveal)
+            {
+                return Encoding.GetDisplayName() + "-Stream";
+            }
+
+            /// <inheritdoc />
+            public override void Dispose()
+            {
+                Stream.Dispose();
+            }
+
+            /// <inheritdoc />
+            public override (IStream stream, EncodingEnum encodingEnum) GetStream()
+            {
+                return (Stream, Encoding);
+            }
+        }
+
+        public abstract (IStream stream, EncodingEnum encodingEnum) GetStream();
+        public abstract ValueTask<string> GetStringAsync();
+        public abstract string GetString();
+
+        public abstract string Name { get; }
+        public abstract string NameInLogs(bool reveal);
+
+        /// <inheritdoc />
+        public abstract void Dispose();
+    }
 
     /// <inheritdoc />
-    public override string ToString() => Name;
+    public override string ToString() => Value.ToString();
 
     private readonly SemaphoreSlim _semaphore = new(1);
 
     /// <summary>
-    /// If this is a string, the string.
-    /// If this is a stream, "StringStream"
-    /// </summary>
-    public string Name => Value.Match(x => x, _ => "StringStream");
-
-    /// <summary>
     /// How this stringStream will appear in the logs.
     /// </summary>
-    public string NameInLogs(bool reveal) => Value.TryPickT0(out var text, out var remainder)
-        ? reveal ? Serialize() //TODO truncate
-        : $"string Length: {text.Length}"
-        : remainder.Item2.GetDisplayName() + "-Stream";
+    public string NameInLogs(bool reveal) => Value.NameInLogs(reveal);
 
     /// <summary>
     /// If this is a string, return the string, otherwise read the stream as a string.
     /// </summary>
     public async Task<string> GetStringAsync()
     {
+        if (Value is StringStreamData.ConstantData cd)
+            return cd.Underlying;
+
         await _semaphore.WaitAsync();
 
         try
         {
-            if (Value.IsT0)
-                return Value.AsT0;
+            var s = await Value.GetStringAsync();
 
-            var (stream, encodingEnum) = Value.AsT1;
-
-            if (stream.CanSeek)
-                stream.Position = 0;
-
-            if (stream is FakeFileStreamAdapter fake) //This is a hack
-                stream = new StreamAdapter(fake.Stream);
-
-            using IStreamReader reader = new StreamReaderAdapter(
-                stream,
-                encodingEnum.Convert(),
-                true,
-                -1,
-                false
-            );
-
-            var s = await reader.ReadToEndAsync();
-
-            Value = s;
-
+            Value = new StringStreamData.ConstantData(s);
             return s;
         }
         finally
@@ -112,28 +203,16 @@ public sealed class StringStream : IEquatable<StringStream>, IComparable<StringS
     /// </summary>
     public string GetString()
     {
+        if (Value is StringStreamData.ConstantData cd)
+            return cd.Underlying;
+
         _semaphore.Wait();
 
         try
         {
-            if (Value.IsT0)
-                return Value.AsT0;
+            var s = Value.GetString();
 
-            var (stream, encodingEnum) = Value.AsT1;
-
-            stream.Position = 0;
-
-            using var reader = new StreamReaderAdapter(
-                stream,
-                encodingEnum.Convert(),
-                true,
-                -1,
-                false
-            );
-
-            var s = reader.ReadToEnd();
-
-            Value = s;
+            Value = new StringStreamData.ConstantData(s);
 
             return s;
         }
@@ -164,17 +243,7 @@ public sealed class StringStream : IEquatable<StringStream>, IComparable<StringS
 
         try
         {
-            return Value.Match(
-                x =>
-                {
-                    // convert string to stream
-                    byte[]       byteArray = Encoding.UTF8.GetBytes(x);
-                    MemoryStream stream    = new(byteArray);
-
-                    return (new StreamAdapter(stream), EncodingEnum.UTF8);
-                },
-                x => x
-            );
+            return Value.GetStream();
         }
         finally
         {
@@ -253,8 +322,7 @@ public sealed class StringStream : IEquatable<StringStream>, IComparable<StringS
     {
         _semaphore.Dispose();
 
-        if (Value.IsT1)
-            Value.AsT1.Item1.Dispose();
+        Value.Dispose();
     }
 }
 

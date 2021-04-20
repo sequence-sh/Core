@@ -16,7 +16,7 @@ public partial class HashTests : StepTestBase<Hash, StringStream>
             yield return new StepCase(
                 "Test md5",
                 new Hash() { Data = Constant("abc") },
-                new StringStream("�P�<�O�֖?}(�r")
+                "�P�<�O�֖?}(�r"
             );
         }
     }

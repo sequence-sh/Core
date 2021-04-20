@@ -18,7 +18,7 @@ public partial class ReadStandardInTests : StepTestBase<ReadStandardIn, StringSt
             yield return new StepCase(
                 "Basic Test",
                 new ReadStandardIn(),
-                new StringStream("Hello World")
+                "Hello World"
             ).WithConsoleAction(
                 x => x.Setup(c => c.OpenStandardInput())
                     .Returns(

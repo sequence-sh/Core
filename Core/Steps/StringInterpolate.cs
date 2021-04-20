@@ -38,7 +38,7 @@ public sealed class StringInterpolate : CompoundStep<StringStream>
             sb.Append(s);
         }
 
-        var ss = new StringStream(sb.ToString());
+        StringStream ss = sb.ToString();
 
         return ss;
     }

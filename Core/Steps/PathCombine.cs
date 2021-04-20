@@ -57,9 +57,9 @@ public sealed class PathCombine : CompoundStep<StringStream>
             LogSituation.QualifyingPath.Log(stateMonad, this, paths[0], currentDirectory);
         }
 
-        var result = Path.Combine(paths.ToArray());
+        StringStream result = Path.Combine(paths.ToArray());
 
-        return new StringStream(result);
+        return result;
     }
 
     /// <summary>

@@ -81,7 +81,7 @@ public partial class RunStepTests : StepTestBase<RunStep<Unit>, Unit>
             var data = new TheoryData<object, bool>
             {
                 { true, false },
-                { new StringStream("Hello World"), false },
+                { "Hello World", false },
                 { new List<int> { 1, 2, 3 }.ToSCLArray(), false },
                 { Entity.Create(("a", 1)), false }
             };

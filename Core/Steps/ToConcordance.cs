@@ -65,7 +65,7 @@ public sealed class ToConcordance : CompoundStep<StringStream>
     [DefaultValueExplanation("\u0014")]
     [Log(LogOutputLevel.Trace)]
     public IStep<StringStream> Delimiter { get; set; } =
-        new StringConstant(new StringStream("\u0014"));
+        new StringConstant("\u0014");
 
     /// <summary>
     /// The quote character to use.
@@ -77,7 +77,7 @@ public sealed class ToConcordance : CompoundStep<StringStream>
     [SingleCharacter]
     [Log(LogOutputLevel.Trace)]
     public IStep<StringStream> QuoteCharacter { get; set; } =
-        new StringConstant(new StringStream("\u00FE"));
+        new StringConstant("\u00FE");
 
     /// <summary>
     /// Whether to always quote all fields and headers.
@@ -96,7 +96,7 @@ public sealed class ToConcordance : CompoundStep<StringStream>
     [SingleCharacter]
     [Log(LogOutputLevel.Trace)]
     public IStep<StringStream> MultiValueDelimiter { get; set; } =
-        new StringConstant(new StringStream("|"));
+        new StringConstant("|");
 
     /// <summary>
     /// The format to use for DateTime fields.
@@ -106,7 +106,7 @@ public sealed class ToConcordance : CompoundStep<StringStream>
     [Example("yyyy/MM/dd HH:mm:ss")]
     [Log(LogOutputLevel.Trace)]
     public IStep<StringStream> DateTimeFormat { get; set; } =
-        new StringConstant(new StringStream("O"));
+        new StringConstant("O");
 }
 
 }

@@ -31,7 +31,7 @@ public sealed class DateToString : CompoundStep<StringStream>
     [DefaultValueExplanation("yyyy/MM/dd HH:mm:ss")]
     [Example("O")]
     public IStep<StringStream> Format { get; set; } =
-        new StringConstant(new StringStream("yyyy/MM/dd HH:mm:ss"));
+        new StringConstant("yyyy/MM/dd HH:mm:ss");
 
     /// <inheritdoc />
     protected override async Task<Result<StringStream, IError>> Run(

@@ -48,7 +48,7 @@ public sealed class StringJoin : CompoundStep<StringStream>
             return delimiter.ConvertFailure<StringStream>();
 
         if (listResult.Value.Count == 0)
-            return new StringStream(string.Empty);
+            return StringStream.Empty;
 
         var strings = new List<string>();
 

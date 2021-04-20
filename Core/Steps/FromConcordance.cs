@@ -26,7 +26,7 @@ public sealed class FromConcordance : CompoundStep<Array<Entity>>
             stateMonad,
             Stream,
             Delimiter,
-            new StringConstant(new StringStream("")),
+            new StringConstant(""),
             QuoteCharacter,
             MultiValueDelimiter,
             new ErrorLocation(this),
@@ -50,7 +50,7 @@ public sealed class FromConcordance : CompoundStep<Array<Entity>>
     [DefaultValueExplanation("\\u0014 - DC4")]
     [Log(LogOutputLevel.Trace)]
     public IStep<StringStream> Delimiter { get; set; } =
-        new StringConstant(new StringStream("\u0014"));
+        new StringConstant("\u0014");
 
     /// <summary>
     /// The quote character to use.
@@ -62,7 +62,7 @@ public sealed class FromConcordance : CompoundStep<Array<Entity>>
     [SingleCharacter]
     [Log(LogOutputLevel.Trace)]
     public IStep<StringStream> QuoteCharacter { get; set; } =
-        new StringConstant(new StringStream("\u00FE"));
+        new StringConstant("\u00FE");
 
     /// <summary>
     /// The multi value delimiter character to use.
@@ -74,7 +74,7 @@ public sealed class FromConcordance : CompoundStep<Array<Entity>>
     [SingleCharacter]
     [Log(LogOutputLevel.Trace)]
     public IStep<StringStream> MultiValueDelimiter { get; set; } =
-        new StringConstant(new StringStream("|"));
+        new StringConstant("|");
 
     /// <inheritdoc />
     public override IStepFactory StepFactory { get; } =

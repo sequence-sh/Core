@@ -304,14 +304,18 @@ public abstract class StepFactory : IStepFactory
         if (propertyInfo.PropertyType.IsInstanceOfType(stepToSet))
             return Result.Success<IStep, IErrorBuilder>(stepToSet); //No coercion required
 
-        if (propertyInfo.PropertyType.IsGenericType && stepToSet is StringConstant constant
-                                                    && constant.Value.Value.IsT0)
+        if (propertyInfo.PropertyType.IsGenericType && stepToSet is StringConstant stringConstant)
         {
             if (propertyInfo.PropertyType.GenericTypeArguments.First().IsEnum)
             {
                 var enumType = propertyInfo.PropertyType.GenericTypeArguments.First();
 
-                if (Enum.TryParse(enumType, constant.Value.Value.AsT0, true, out var enumValue))
+                if (Enum.TryParse(
+                    enumType,
+                    stringConstant.Value.GetString(),
+                    true,
+                    out var enumValue
+                ))
                 {
                     var step = EnumConstantFreezable.TryCreateEnumConstant(enumValue!);
                     return step;
@@ -319,7 +323,7 @@ public abstract class StepFactory : IStepFactory
             }
             else if (propertyInfo.PropertyType.GenericTypeArguments.First() == typeof(DateTime))
             {
-                if (DateTime.TryParse(constant.Value.Value.AsT0, out var dt))
+                if (DateTime.TryParse(stringConstant.Value.GetString(), out var dt))
                 {
                     var step = new DateTimeConstant(dt);
                     return Result.Success<IStep, IErrorBuilder>(step);
