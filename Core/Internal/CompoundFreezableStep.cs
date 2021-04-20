@@ -26,7 +26,7 @@ public sealed record CompoundFreezableStep(
         var r =
             stepFactoryStore.Dictionary.TryFindOrFail(
                 StepName,
-                () => ErrorHelper.MissingStepError(StepName)
+                () => ErrorCode.StepDoesNotExist.ToErrorBuilder(StepName)
                     .WithLocation(FreezableStepData)
             );
 
