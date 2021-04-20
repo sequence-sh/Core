@@ -250,7 +250,7 @@ public partial class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Enti
                          null, null, null)
                     )
                     .WithErrorBehavior(ErrorBehavior.Error),
-                "Schema violation: Schema Violated: Expected not null"
+                "Schema violation: Schema Violated: Expected 'Foo' to not be null in (Foo: \"\")"
             );
 
             yield return CreateCase(
@@ -262,7 +262,7 @@ public partial class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Enti
                         ("Foo", SCLType.Integer, Multiplicity.Any)
                     )
                     .WithErrorBehavior(ErrorBehavior.Error),
-                "Schema violation: Schema Violated: 'Hello' is not a Integer"
+                "Schema violation: Schema Violated: 'Hello' is not a Integer in (Foo: \"Hello\")"
             );
 
             yield return CreateCase(
@@ -274,7 +274,7 @@ public partial class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Enti
                         ("Foo", SCLType.Integer, Multiplicity.Any)
                     )
                     .WithErrorBehavior(ErrorBehavior.Warning),
-                "Schema violation: Schema Violated: 'Hello' is not a Integer",
+                "Schema violation: Schema Violated: 'Hello' is not a Integer in (Foo: \"Hello\")",
                 "(Foo: \"Hello\")"
             );
 
@@ -331,7 +331,7 @@ public partial class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Enti
                     ExtraPropertyBehavior.Warn,
                     ("Foo", SCLType.String, Multiplicity.Any)
                 ),
-                "Schema violation: Schema Violated: Unexpected Property: 'Bar'",
+                "Schema violation: Schema Violated: Unexpected Property: 'Bar' in (Foo: \"Hello\" Bar: \"World\")",
                 "(Foo: \"Hello\")"
             );
         }
@@ -382,9 +382,14 @@ public partial class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Enti
                 );
             }
 
+            var fooHello = Entity.Create(("Foo", "Hello"));
+            var fooFish  = Entity.Create(("Foo", "Fish"));
+            var fooMeat  = Entity.Create(("Foo", "Meat"));
+            var barFly   = Entity.Create(("Bar", "Fly"));
+
             yield return CreateCase(
                 "Could not cast",
-                new List<Entity> { Entity.Create(("Foo", "Hello")) },
+                new List<Entity> { fooHello },
                 CreateSchema(
                     SchemaName,
                     ExtraPropertyBehavior.Fail,
@@ -392,12 +397,13 @@ public partial class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Enti
                 ),
                 ErrorCode.SchemaViolationWrongType,
                 "Hello",
-                "Integer"
+                "Integer",
+                fooHello
             );
 
             yield return CreateCase(
                 "Missing enum value",
-                new List<Entity> { Entity.Create(("Foo", "Fish")) },
+                new List<Entity> { fooFish },
                 CreateSchema(
                     SchemaName,
                     ExtraPropertyBehavior.Fail,
@@ -406,12 +412,13 @@ public partial class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Enti
                 ),
                 ErrorCode.SchemaViolationWrongType,
                 "Fish",
-                "Enum"
+                "Enum",
+                fooFish
             );
 
             yield return CreateCase(
                 "Missing enum name",
-                new List<Entity> { Entity.Create(("Foo", "Meat")) },
+                new List<Entity> { fooMeat },
                 CreateSchema(
                     SchemaName,
                     ExtraPropertyBehavior.Fail,
@@ -423,7 +430,7 @@ public partial class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Enti
 
             yield return CreateCase(
                 "Regex not matched",
-                new List<Entity> { Entity.Create(("Foo", "Fish")) },
+                new List<Entity> { fooFish },
                 CreateSchema(
                     SchemaName,
                     ExtraPropertyBehavior.Fail,
@@ -432,12 +439,13 @@ public partial class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Enti
                 ),
                 ErrorCode.SchemaViolationUnmatchedRegex,
                 "Fish",
-                @"\d+"
+                @"\d+",
+                fooFish
             );
 
             yield return CreateCase(
                 "Missing property",
-                new List<Entity> { Entity.Create(("Foo", "Fish")) },
+                new List<Entity> { fooFish },
                 CreateSchema(
                     SchemaName,
                     ExtraPropertyBehavior.Fail,
@@ -445,19 +453,21 @@ public partial class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Enti
                     ("Bar", SCLType.String, Multiplicity.AtLeastOne)
                 ),
                 ErrorCode.SchemaViolationMissingProperty,
-                "Bar"
+                "Bar",
+                fooFish
             );
 
             yield return CreateCase(
                 "Extra property",
-                new List<Entity> { Entity.Create(("Foo", "Fish"), ("Bar", "Fly")) },
+                new List<Entity> { fooFish, barFly },
                 CreateSchema(
                     SchemaName,
                     ExtraPropertyBehavior.Fail,
                     ("Foo", SCLType.String, Multiplicity.Any)
                 ),
                 ErrorCode.SchemaViolationUnexpectedProperty,
-                "Bar"
+                "Bar",
+                barFly
             );
         }
     }

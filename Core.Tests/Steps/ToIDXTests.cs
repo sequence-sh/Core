@@ -50,10 +50,12 @@ public partial class ToIDXTests : StepTestBase<ToIDX, StringStream>
     {
         get
         {
+            var foo1 = Entity.Create(("Foo", 1));
+
             yield return new ErrorCase(
                 "Single Property",
-                new ToIDX() { Entity = Constant(Entity.Create(("Foo", 1))) },
-                ErrorCode.SchemaViolationMissingProperty.ToErrorBuilder("DREREFERENCE")
+                new ToIDX() { Entity = Constant(foo1) },
+                ErrorCode.SchemaViolationMissingProperty.ToErrorBuilder("DREREFERENCE", foo1)
             );
         }
     }
