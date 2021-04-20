@@ -14,9 +14,7 @@ namespace Reductech.EDR.Core.Internal
 /// <summary>
 /// A step that returns a constant value.
 /// </summary>
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 public abstract record ConstantBase<T>(T Value) : IStep<T>, IConstantStep
-    #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
 {
     /// <inheritdoc />
     public async Task<Result<T, IError>> Run(
@@ -32,9 +30,6 @@ public abstract record ConstantBase<T>(T Value) : IStep<T>, IConstantStep
 
     /// <inheritdoc />
     public object ValueObject => Value!;
-
-    /// <inheritdoc />
-    public abstract IFreezableStep Unfreeze();
 
     /// <inheritdoc />
     public async Task<Result<T1, IError>> Run<T1>(
@@ -90,9 +85,6 @@ public record StringConstant
     (StringStream Value) : ConstantBase<StringStream>(Value)
 {
     /// <inheritdoc />
-    public override IFreezableStep Unfreeze() => new StringConstantFreezable(Value, TextLocation);
-
-    /// <inheritdoc />
     public override string Serialize() => Value.Serialize();
 
     /// <inheritdoc />
@@ -104,9 +96,6 @@ public record StringConstant
 /// </summary>
 public record IntConstant(int Value) : ConstantBase<int>(Value)
 {
-    /// <inheritdoc />
-    public override IFreezableStep Unfreeze() => new IntConstantFreezable(Value, TextLocation);
-
     /// <inheritdoc />
     public override string Serialize() => Value.ToString();
 
@@ -120,9 +109,6 @@ public record IntConstant(int Value) : ConstantBase<int>(Value)
 public record DoubleConstant(double Value) : ConstantBase<double>(Value)
 {
     /// <inheritdoc />
-    public override IFreezableStep Unfreeze() => new DoubleConstantFreezable(Value, TextLocation);
-
-    /// <inheritdoc />
     public override string Serialize() => Value.ToString(Constants.DoubleFormat);
 
     /// <inheritdoc />
@@ -135,9 +121,6 @@ public record DoubleConstant(double Value) : ConstantBase<double>(Value)
 public record BoolConstant(bool Value) : ConstantBase<bool>(Value)
 {
     /// <inheritdoc />
-    public override IFreezableStep Unfreeze() => new BoolConstantFreezable(Value, TextLocation);
-
-    /// <inheritdoc />
     public override string Serialize() => Value.ToString();
 
     /// <inheritdoc />
@@ -149,15 +132,6 @@ public record BoolConstant(bool Value) : ConstantBase<bool>(Value)
 /// </summary>
 public record EnumConstant<T>(T Value) : ConstantBase<T>(Value) where T : Enum
 {
-    /// <inheritdoc />
-    public override IFreezableStep Unfreeze()
-    {
-        return new EnumConstantFreezable(
-            ToEnumeration(),
-            TextLocation
-        );
-    }
-
     /// <inheritdoc />
     public override string Serialize()
     {
@@ -177,9 +151,6 @@ public record EnumConstant<T>(T Value) : ConstantBase<T>(Value) where T : Enum
 public record DateTimeConstant(DateTime Value) : ConstantBase<DateTime>(Value)
 {
     /// <inheritdoc />
-    public override IFreezableStep Unfreeze() => new DateTimeConstantFreezable(Value, TextLocation);
-
-    /// <inheritdoc />
     public override string Serialize() => Value.ToString(Constants.DateTimeFormat);
 
     /// <inheritdoc />
@@ -191,9 +162,6 @@ public record DateTimeConstant(DateTime Value) : ConstantBase<DateTime>(Value)
 /// </summary>
 public record EntityConstant(Entity Value) : ConstantBase<Entity>(Value)
 {
-    /// <inheritdoc />
-    public override IFreezableStep Unfreeze() => new EntityConstantFreezable(Value, TextLocation);
-
     /// <inheritdoc />
     public override string Serialize() => Value.Serialize();
 
