@@ -109,8 +109,8 @@ public sealed class EntitySetValue<T> : CompoundStep<Entity>
                 return Result.Failure<TypeReference, IError>(
                     ErrorCode.WrongParameterType.ToErrorBuilder(
                             StepType.Name,
-                            nameof(Entity),
-                            expectedTypeReference.Name
+                            expectedTypeReference.Name,
+                            nameof(Entity)
                         )
                         .WithLocation(freezableStepData)
                 );

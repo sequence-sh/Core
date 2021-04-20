@@ -466,7 +466,7 @@ namespace Reductech.EDR.Core.Internal.Errors {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to {0} was a {1}, not a {2}.
+        ///   Looks up a localized string similar to Parameter &apos;{0}&apos; expects type {1}, but was a {2}.
         /// </summary>
         internal static string WrongParameterType {
             get {

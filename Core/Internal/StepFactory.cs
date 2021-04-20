@@ -342,20 +342,20 @@ public abstract class StepFactory : IStepFactory
                 return SetArray(argument);
 
             return Result.Failure<Unit, IError>(
-                ErrorHelper.WrongParameterTypeError(
+                ErrorCode.WrongParameterType.ToErrorBuilder(
                         propertyInfo.Name,
-                        MemberType.StepList,
-                        MemberType.Step
+                        argument.Name,
+                        "Array/Sequence"
                     )
                     .WithLocation(parentStep)
             );
         }
 
         return Result.Failure<Unit, IError>(
-            ErrorHelper.WrongParameterTypeError(
+            ErrorCode.WrongParameterType.ToErrorBuilder(
                     propertyInfo.Name,
-                    MemberType.StepList,
-                    MemberType.VariableName
+                    MemberType.VariableName,
+                    MemberType.StepList
                 )
                 .WithLocation(parentStep)
         );

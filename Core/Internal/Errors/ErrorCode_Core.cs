@@ -342,7 +342,7 @@ public sealed record ErrorCode : ErrorCodeBase
                                   WrongOutputType));
 
     /// <summary>
-    /// {0} was a {1}, not a {2}
+    /// Parameter '{0}' expects type {1}, but was a {2}
     /// </summary>
     public static readonly ErrorCode
         WrongParameterType = new(nameof(
