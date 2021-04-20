@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Internal.Errors;
@@ -109,15 +110,21 @@ public record FreezableEntityData(
 
         foreach (var stepProperty in EntityProperties)
         {
-            stepProperty.Value.Switch(
-                _ => { },
-                LocalGetVariablesSet,
-                l =>
+            switch (stepProperty.Value)
+            {
+                case FreezableStepProperty.Step step:
+                    LocalGetVariablesSet(step.FreezableStep);
+                    break;
+                case FreezableStepProperty.StepList stepList:
                 {
-                    foreach (var step in l)
+                    foreach (var step in stepList.List)
                         LocalGetVariablesSet(step);
+
+                    break;
                 }
-            );
+                case FreezableStepProperty.Variable _: break;
+                default:                               throw new ArgumentOutOfRangeException();
+            }
         }
 
         if (errors.Any())

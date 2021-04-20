@@ -29,11 +29,11 @@ public static class FreezableFactory
         {
             {
                 new StepParameterReference(nameof(EntityGetValue<int>.Entity)),
-                new FreezableStepProperty(entityOrArray, location)
+                new FreezableStepProperty.Step(entityOrArray, location)
             },
             {
                 new StepParameterReference(nameof(EntityGetValue<int>.Property)),
-                new FreezableStepProperty(indexer, location)
+                new FreezableStepProperty.Step(indexer, location)
             },
         };
 
@@ -49,11 +49,11 @@ public static class FreezableFactory
         {
             {
                 new StepParameterReference(nameof(ElementAtIndex<object>.Array)),
-                new FreezableStepProperty(entityOrArray, location)
+                new FreezableStepProperty.Step(entityOrArray, location)
             },
             {
                 new StepParameterReference(nameof(ElementAtIndex<object>.Index)),
-                new FreezableStepProperty(indexer, location)
+                new FreezableStepProperty.Step(indexer, location)
             },
         };
 
@@ -80,7 +80,7 @@ public static class FreezableFactory
         {
             {
                 new StepParameterReference(nameof(StringInterpolate.Strings)),
-                new FreezableStepProperty(steps.ToImmutableList(), location)
+                new FreezableStepProperty.StepList(steps.ToImmutableList(), location)
             },
         };
 
@@ -105,11 +105,11 @@ public static class FreezableFactory
         {
             {
                 new StepParameterReference(nameof(Sequence<object>.InitialSteps)),
-                new FreezableStepProperty(steps.ToImmutableList(), location)
+                new FreezableStepProperty.StepList(steps.ToImmutableList(), location)
             },
             {
                 new StepParameterReference(nameof(Sequence<object>.FinalStep)),
-                new FreezableStepProperty(finalStep, location)
+                new FreezableStepProperty.Step(finalStep, location)
             },
         };
 
@@ -133,7 +133,7 @@ public static class FreezableFactory
         {
             {
                 new StepParameterReference(nameof(GetVariable<object>.Variable)),
-                new FreezableStepProperty(variableName, location)
+                new FreezableStepProperty.Variable(variableName, location)
             }
         };
 
@@ -182,7 +182,7 @@ public static class FreezableFactory
         {
             {
                 new StepParameterReference(nameof(Not.Boolean)),
-                new FreezableStepProperty(boolean, location)
+                new FreezableStepProperty.Step(boolean, location)
             },
         };
 
@@ -203,7 +203,7 @@ public static class FreezableFactory
         {
             {
                 new StepParameterReference(nameof(ArrayNew<object>.Elements)),
-                new FreezableStepProperty(elements, location)
+                new FreezableStepProperty.StepList(elements, location)
             }
         };
 
@@ -222,7 +222,7 @@ public static class FreezableFactory
 /// </summary>
 public static class InfixHelper
 {
-    private record OperatorData1(string OperatorString, string StepName, string TermsName) { }
+    private record OperatorData1(string OperatorString, string StepName, string TermsName);
 
     /// <summary>
     /// Try to create an infix step
@@ -263,7 +263,7 @@ public static class InfixHelper
             var stepParameterDict = new StepParameterDict()
             {
                 {
-                    new StepParameterReference(termsName), new FreezableStepProperty(
+                    new StepParameterReference(termsName), new FreezableStepProperty.StepList(
                         properties.Select(x => x.ConvertToStep()).ToImmutableList(),
                         textLocation
                     )
@@ -280,11 +280,11 @@ public static class InfixHelper
         }
 
         if (freezableSteps.Count == 1)
-            return new FreezableStepProperty(freezableSteps.Single(), textLocation);
+            return new FreezableStepProperty.Step(freezableSteps.Single(), textLocation);
 
         var alt = new OptionFreezableStep(freezableSteps, textLocation);
 
-        return new FreezableStepProperty(alt, textLocation);
+        return new FreezableStepProperty.Step(alt, textLocation);
     }
 
     private static readonly ILookup<string, OperatorData1> OperatorLookup =
