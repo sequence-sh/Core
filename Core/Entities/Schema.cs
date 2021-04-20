@@ -114,7 +114,12 @@ public sealed class Schema : IEntityConvertible
         {
             if (remainingProperties.Remove(entityProperty.Name, out var schemaProperty))
             {
-                var convertResult = entityProperty.BestValue.TryConvert(this, schemaProperty);
+                var convertResult = entityProperty.BestValue.TryConvert(
+                    this,
+                    entityProperty.Name,
+                    schemaProperty,
+                    entity
+                );
 
                 if (convertResult.IsSuccess)
                 {
@@ -159,10 +164,11 @@ public sealed class Schema : IEntityConvertible
                     {
                         changed = true;
 
-                        var errorBuilder = new ErrorBuilder(
-                            ErrorCode.SchemaViolationUnexpectedProperty,
-                            entityProperty.Name
-                        );
+                        var errorBuilder =
+                            ErrorCode.SchemaViolationUnexpectedProperty.ToErrorBuilder(
+                                entityProperty.Name,
+                                entity
+                            );
 
                         HandleError(errorBuilder, ErrorBehavior.Fail);
                         break;
@@ -176,10 +182,11 @@ public sealed class Schema : IEntityConvertible
                     {
                         changed = true;
 
-                        var errorBuilder = new ErrorBuilder(
-                            ErrorCode.SchemaViolationUnexpectedProperty,
-                            entityProperty.Name
-                        );
+                        var errorBuilder =
+                            ErrorCode.SchemaViolationUnexpectedProperty.ToErrorBuilder(
+                                entityProperty.Name,
+                                entity
+                            );
 
                         HandleError(errorBuilder, ErrorBehavior.Warning);
                         break;
@@ -197,7 +204,7 @@ public sealed class Schema : IEntityConvertible
         foreach (var (key, _) in remainingProperties
             .Where(x => x.Value.Multiplicity is Multiplicity.ExactlyOne or Multiplicity.AtLeastOne))
         {
-            var error = new ErrorBuilder(ErrorCode.SchemaViolationMissingProperty, key);
+            var error = ErrorCode.SchemaViolationMissingProperty.ToErrorBuilder(key, entity);
             HandleError(error, generalErrorBehavior);
         }
 

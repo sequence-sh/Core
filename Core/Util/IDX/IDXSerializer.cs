@@ -70,7 +70,10 @@ public static class IDXSerializer
                     return v;
             }
             else if (dreField.Mandatory)
-                return ErrorCode.SchemaViolationMissingProperty.ToErrorBuilder(dreField.Name);
+                return ErrorCode.SchemaViolationMissingProperty.ToErrorBuilder(
+                    dreField.Name,
+                    entity
+                );
         }
 
         foreach (var entityProperty in entity)

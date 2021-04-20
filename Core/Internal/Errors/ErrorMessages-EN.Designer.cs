@@ -313,7 +313,7 @@ namespace Reductech.EDR.Core.Internal.Errors {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Schema Violated: Missing Property: &apos;{0}&apos;.
+        ///   Looks up a localized string similar to Schema Violated: Missing Property: &apos;{0}&apos; in {1}.
         /// </summary>
         internal static string SchemaViolationMissingProperty {
             get {
@@ -322,7 +322,7 @@ namespace Reductech.EDR.Core.Internal.Errors {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Schema Violated: Did not expect a list.
+        ///   Looks up a localized string similar to Schema Violated: Did not expect a list for &apos;{0}&apos; in {1}.
         /// </summary>
         internal static string SchemaViolationUnexpectedList {
             get {
@@ -331,7 +331,7 @@ namespace Reductech.EDR.Core.Internal.Errors {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Schema Violated: Expected not null.
+        ///   Looks up a localized string similar to Schema Violated: Expected &apos;{0}&apos; to not be null in {1}.
         /// </summary>
         internal static string SchemaViolationUnexpectedNull {
             get {
@@ -340,7 +340,7 @@ namespace Reductech.EDR.Core.Internal.Errors {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Schema Violated: Unexpected Property: &apos;{0}&apos;.
+        ///   Looks up a localized string similar to Schema Violated: Unexpected Property: &apos;{0}&apos; in {1}.
         /// </summary>
         internal static string SchemaViolationUnexpectedProperty {
             get {
@@ -349,7 +349,7 @@ namespace Reductech.EDR.Core.Internal.Errors {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Schema Violated: &apos;{0}&apos; does not match regex &apos;{1}&apos;.
+        ///   Looks up a localized string similar to Schema Violated: &apos;{0}&apos; does not match regex &apos;{1}&apos; in {2}.
         /// </summary>
         internal static string SchemaViolationUnmatchedRegex {
             get {
@@ -358,7 +358,7 @@ namespace Reductech.EDR.Core.Internal.Errors {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Schema Violated: &apos;{0}&apos; is not a {1}.
+        ///   Looks up a localized string similar to Schema Violated: &apos;{0}&apos; is not a {1} in {2}.
         /// </summary>
         internal static string SchemaViolationWrongType {
             get {

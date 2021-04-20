@@ -35,12 +35,14 @@ public abstract record EntityValue(object? ObjectValue)
         /// <inheritdoc />
         protected override Result<(EntityValue value, bool changed), IErrorBuilder> TryConvertBase(
             Schema schema,
-            SchemaProperty schemaProperty)
+            string propertyName,
+            SchemaProperty schemaProperty,
+            Entity entity)
         {
             if (schemaProperty.Multiplicity is Multiplicity.Any or Multiplicity.UpToOne)
                 return (this, false);
 
-            return new ErrorBuilder(ErrorCode.SchemaViolationUnexpectedNull);
+            return ErrorCode.SchemaViolationUnexpectedNull.ToErrorBuilder(propertyName, entity);
         }
 
         /// <inheritdoc />
@@ -101,7 +103,9 @@ public abstract record EntityValue(object? ObjectValue)
         /// <inheritdoc />
         protected override Result<(EntityValue value, bool changed), IErrorBuilder> TryConvertBase(
             Schema schema,
-            SchemaProperty schemaProperty)
+            string propertyName,
+            SchemaProperty schemaProperty,
+            Entity entity)
         {
             switch (schemaProperty.Type)
             {
@@ -173,10 +177,10 @@ public abstract record EntityValue(object? ObjectValue)
 
                     break;
                 }
-                default: return CouldNotConvert(Value, schemaProperty);
+                default: return CouldNotConvert(Value, schemaProperty, entity);
             }
 
-            return CouldNotConvert(Value, schemaProperty);
+            return CouldNotConvert(Value, schemaProperty, entity);
         }
     }
 
@@ -211,14 +215,16 @@ public abstract record EntityValue(object? ObjectValue)
         /// <inheritdoc />
         protected override Result<(EntityValue value, bool changed), IErrorBuilder> TryConvertBase(
             Schema schema,
-            SchemaProperty schemaProperty)
+            string propertyName,
+            SchemaProperty schemaProperty,
+            Entity entity)
         {
             return schemaProperty.Type switch
             {
                 SCLType.String  => (new String(Value.ToString()), true),
                 SCLType.Integer => (this, false),
                 SCLType.Double  => (new Double(Convert.ToDouble(Value)), true),
-                _               => CouldNotConvert(Value, schemaProperty)
+                _               => CouldNotConvert(Value, schemaProperty, entity)
             };
         }
     }
@@ -251,14 +257,16 @@ public abstract record EntityValue(object? ObjectValue)
         /// <inheritdoc />
         protected override Result<(EntityValue value, bool changed), IErrorBuilder> TryConvertBase(
             Schema schema,
-            SchemaProperty schemaProperty)
+            string propertyName,
+            SchemaProperty schemaProperty,
+            Entity entity)
         {
             return schemaProperty.Type switch
             {
                 SCLType.String => (
                     new String(Value.ToString(Constants.DoubleFormat)), false),
                 SCLType.Double => (this, true),
-                _              => CouldNotConvert(Value, schemaProperty)
+                _              => CouldNotConvert(Value, schemaProperty, entity)
             };
         }
     }
@@ -282,13 +290,15 @@ public abstract record EntityValue(object? ObjectValue)
         /// <inheritdoc />
         protected override Result<(EntityValue value, bool changed), IErrorBuilder> TryConvertBase(
             Schema schema,
-            SchemaProperty schemaProperty)
+            string propertyName,
+            SchemaProperty schemaProperty,
+            Entity entity)
         {
             return schemaProperty.Type switch
             {
                 SCLType.String => (new String(Value.ToString()), true),
                 SCLType.Bool   => (this, false),
-                _              => CouldNotConvert(Value, schemaProperty)
+                _              => CouldNotConvert(Value, schemaProperty, entity)
             };
         }
 
@@ -327,7 +337,9 @@ public abstract record EntityValue(object? ObjectValue)
         /// <inheritdoc />
         protected override Result<(EntityValue value, bool changed), IErrorBuilder> TryConvertBase(
             Schema schema,
-            SchemaProperty schemaProperty)
+            string propertyName,
+            SchemaProperty schemaProperty,
+            Entity entity)
         {
             switch (schemaProperty.Type)
             {
@@ -355,9 +367,9 @@ public abstract record EntityValue(object? ObjectValue)
                             true);
                     }
 
-                    return CouldNotConvert(Value, schemaProperty);
+                    return CouldNotConvert(Value, schemaProperty, entity);
                 }
-                default: return CouldNotConvert(Value, schemaProperty);
+                default: return CouldNotConvert(Value, schemaProperty, entity);
             }
         }
     }
@@ -395,7 +407,9 @@ public abstract record EntityValue(object? ObjectValue)
         /// <inheritdoc />
         protected override Result<(EntityValue value, bool changed), IErrorBuilder> TryConvertBase(
             Schema schema,
-            SchemaProperty schemaProperty)
+            string propertyName,
+            SchemaProperty schemaProperty,
+            Entity entity)
         {
             return schemaProperty.Type switch
             {
@@ -408,7 +422,7 @@ public abstract record EntityValue(object? ObjectValue)
                         )
                     ), true),
                 SCLType.Date => (this, false),
-                _            => CouldNotConvert(Value, schemaProperty)
+                _            => CouldNotConvert(Value, schemaProperty, entity)
             };
         }
     }
@@ -444,13 +458,15 @@ public abstract record EntityValue(object? ObjectValue)
         /// <inheritdoc />
         protected override Result<(EntityValue value, bool changed), IErrorBuilder> TryConvertBase(
             Schema schema,
-            SchemaProperty schemaProperty)
+            string propertyName,
+            SchemaProperty schemaProperty,
+            Entity entity)
         {
             return schemaProperty.Type switch
             {
                 SCLType.String => (new String(Value.ToString()), true),
                 SCLType.Enum   => (this, false),
-                _              => CouldNotConvert(Value, schemaProperty)
+                _              => CouldNotConvert(Value, schemaProperty, entity)
             };
         }
     }
@@ -542,18 +558,19 @@ public abstract record EntityValue(object? ObjectValue)
         /// <inheritdoc />
         protected override Result<(EntityValue value, bool changed), IErrorBuilder> TryConvertBase(
             Schema schema,
-            SchemaProperty schemaProperty)
+            string propertyName,
+            SchemaProperty schemaProperty,
+            Entity entity)
         {
-            if (schemaProperty.Multiplicity == Multiplicity.UpToOne ||
-                schemaProperty.Multiplicity == Multiplicity.ExactlyOne)
+            if (schemaProperty.Multiplicity is Multiplicity.UpToOne or Multiplicity.ExactlyOne)
             {
                 if (Value.Count == 1)
-                    return Value.Single().TryConvert(schema, schemaProperty);
+                    return Value.Single().TryConvert(schema, propertyName, schemaProperty, entity);
 
                 if (Value.Count == 0 && schemaProperty.Multiplicity == Multiplicity.UpToOne)
                     return (Null.Instance, true);
 
-                return new ErrorBuilder(ErrorCode.SchemaViolationUnexpectedList);
+                return ErrorCode.SchemaViolationUnexpectedList.ToErrorBuilder(propertyName, entity);
             }
 
             var sp = new SchemaProperty
@@ -568,7 +585,7 @@ public abstract record EntityValue(object? ObjectValue)
                 Type             = schemaProperty.Type
             };
 
-            var newList = Value.Select(x => x.TryConvert(schema, sp))
+            var newList = Value.Select(x => x.TryConvert(schema, propertyName, sp, entity))
                 .Combine(ErrorBuilderList.Combine)
                 .Map(
                     x => x.Aggregate(
@@ -797,15 +814,20 @@ public abstract record EntityValue(object? ObjectValue)
     /// </summary>
     protected abstract Result<(EntityValue value, bool changed), IErrorBuilder> TryConvertBase(
         Schema schema,
-        SchemaProperty schemaProperty);
+        string propertyName,
+        SchemaProperty schemaProperty,
+        Entity entity);
 
     /// <summary>
     /// Error returned when a value cannot be converted
     /// </summary>
-    protected static ErrorBuilder CouldNotConvert(object o, SchemaProperty schemaProperty) => new(
-        ErrorCode.SchemaViolationWrongType,
+    protected static ErrorBuilder CouldNotConvert(
+        object o,
+        SchemaProperty schemaProperty,
+        Entity entity) => ErrorCode.SchemaViolationWrongType.ToErrorBuilder(
         o,
-        schemaProperty.Type
+        schemaProperty.Type,
+        entity
     );
 
     /// <summary>
@@ -813,7 +835,9 @@ public abstract record EntityValue(object? ObjectValue)
     /// </summary>
     public Result<(EntityValue value, bool changed), IErrorBuilder> TryConvert(
         Schema schema,
-        SchemaProperty schemaProperty)
+        string propertyName,
+        SchemaProperty schemaProperty,
+        Entity entity)
     {
         if (schemaProperty.Regex != null)
         {
@@ -823,11 +847,12 @@ public abstract record EntityValue(object? ObjectValue)
                 return new ErrorBuilder(
                     ErrorCode.SchemaViolationUnmatchedRegex,
                     primitiveString,
-                    schemaProperty.Regex
+                    schemaProperty.Regex,
+                    entity
                 );
         }
 
-        return TryConvertBase(schema, schemaProperty);
+        return TryConvertBase(schema, propertyName, schemaProperty, entity);
     }
 
     /// <summary>
