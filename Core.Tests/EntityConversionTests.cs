@@ -48,7 +48,7 @@ public class EntityConversionTests
     private static Entity CreateEntityFromString(string s)
     {
         var parseResult =
-            SCLParsing.ParseSequence(s)
+            SCLParsing.TryParseStep(s)
                 .Bind(
                     x => x.TryFreeze(
                         TypeReference.Actual.Entity,

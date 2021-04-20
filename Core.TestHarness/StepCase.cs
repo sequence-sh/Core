@@ -80,7 +80,7 @@ public abstract partial class StepTestBase<TStep, TOutput>
 
             var sfs = StepFactoryStore.CreateFromAssemblies(Assembly.GetAssembly(typeof(TStep))!);
 
-            var deserializeResult = SCLParsing.ParseSequence(scl);
+            var deserializeResult = SCLParsing.TryParseStep(scl);
 
             deserializeResult.ShouldBeSuccessful(x => x.ToString()!);
 

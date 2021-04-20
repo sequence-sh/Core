@@ -23,9 +23,9 @@ namespace Reductech.EDR.Core.Internal.Parser
 public static class SCLParsing
 {
     /// <summary>
-    /// Deserialize this SCL into a step.
+    /// Try to parse this SCL text as a step
     /// </summary>
-    public static Result<IFreezableStep, IError> ParseSequence(string text)
+    public static Result<IFreezableStep, IError> TryParseStep(string text)
     {
         if (string.IsNullOrWhiteSpace(text))
             return new SingleError(
@@ -38,10 +38,7 @@ public static class SCLParsing
         return r;
     }
 
-    /// <summary>
-    /// Try to parse this SCL text
-    /// </summary>
-    public static Result<FreezableStepProperty, IError> TryParse(string text)
+    private static Result<FreezableStepProperty, IError> TryParse(string text)
     {
         var inputStream       = new AntlrInputStream(text);
         var lexer             = new SCLLexer(inputStream);
