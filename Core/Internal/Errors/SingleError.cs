@@ -43,6 +43,9 @@ public record SingleError(ErrorLocation Location, ErrorBuilder ErrorBuilder) : I
     public string AsString => Message;
 
     /// <inheritdoc />
+    public string AsStringWithLocation => $"{Message} in {Location}";
+
+    /// <inheritdoc />
     public IErrorBuilder ToErrorBuilder => ErrorBuilder;
 
     /// <inheritdoc />

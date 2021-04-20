@@ -99,7 +99,7 @@ public partial class RunStepTests : StepTestBase<RunStep<Unit>, Unit>
         if (expectError)
             r.ShouldBeFailure();
         else
-            r.ShouldBeSuccessful(x => x.AsString);
+            r.ShouldBeSuccessful();
     }
 }
 

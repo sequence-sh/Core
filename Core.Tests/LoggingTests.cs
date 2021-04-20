@@ -337,7 +337,7 @@ public partial class LoggingTests
                 CancellationToken.None
             );
 
-            r.ShouldBeSuccessful(x => x.ToString()!);
+            r.ShouldBeSuccessful();
 
             loggerFactory.Sink.LogEntries.Should().SatisfyRespectively(ExpectedLogs);
         }

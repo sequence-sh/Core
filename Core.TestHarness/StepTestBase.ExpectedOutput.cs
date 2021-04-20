@@ -17,9 +17,7 @@ public abstract partial class StepTestBase<TStep, TOutput>
         /// <inheritdoc />
         public override void CheckOutputResult(Result<TOutput, IError> outputResult)
         {
-            outputResult.ShouldBeSuccessful(
-                x => (x is SingleError se) ? $"{se.Message} in {se.Location}" : x.AsString
-            );
+            outputResult.ShouldBeSuccessful();
 
             outputResult.Value.Should().Be(Unit.Default);
         }
@@ -27,9 +25,7 @@ public abstract partial class StepTestBase<TStep, TOutput>
         /// <inheritdoc />
         public override void CheckUnitResult(Result<Unit, IError> result)
         {
-            result.ShouldBeSuccessful(
-                x => (x is SingleError se) ? $"{se.Message} in {se.Location}" : x.AsString
-            );
+            result.ShouldBeSuccessful();
         }
 
         public static explicit operator ExpectedUnitOutput(Unit _) => Instance;
@@ -40,9 +36,7 @@ public abstract partial class StepTestBase<TStep, TOutput>
         /// <inheritdoc />
         public override void CheckOutputResult(Result<TOutput, IError> outputResult)
         {
-            outputResult.ShouldBeSuccessful(
-                x => (x is SingleError se) ? $"{se.Message} in {se.Location}" : x.AsString
-            );
+            outputResult.ShouldBeSuccessful();
 
             if (outputResult.Value is string sActual && Expected is string sExpected)
                 CompressSpaces(sActual).Should().Be(CompressSpaces(sExpected));
@@ -58,9 +52,7 @@ public abstract partial class StepTestBase<TStep, TOutput>
         /// <inheritdoc />
         public override void CheckUnitResult(Result<Unit, IError> result)
         {
-            result.ShouldBeSuccessful(
-                x => (x is SingleError se) ? $"{se.Message} in {se.Location}" : x.AsString
-            );
+            result.ShouldBeSuccessful();
 
             Expected.Should().Be(Unit.Default);
         }

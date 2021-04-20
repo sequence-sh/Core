@@ -45,11 +45,11 @@ public partial class ConnectorTests
 
         var stepFactoryStoreResult = StepFactoryStore.TryCreateFromSettings(settings, logger);
 
-        stepFactoryStoreResult.ShouldBeSuccessful(x => x.AsString);
+        stepFactoryStoreResult.ShouldBeSuccessful();
 
         var injectedContextsResult = stepFactoryStoreResult.Value.TryGetInjectedContexts(settings);
 
-        injectedContextsResult.ShouldBeSuccessful(x => x.AsString);
+        injectedContextsResult.ShouldBeSuccessful();
 
         var externalContext = ExternalContext.Default with
         {
@@ -70,7 +70,7 @@ public partial class ConnectorTests
                 CancellationToken.None
             );
 
-        r.ShouldBeSuccessful(x => x.AsString);
+        r.ShouldBeSuccessful();
     }
 
     [Fact]
@@ -85,7 +85,7 @@ public partial class ConnectorTests
             logger
         );
 
-        assembly.ShouldBeSuccessful(x => x.AsString);
+        assembly.ShouldBeSuccessful();
 
         var stepTypes = assembly.Value.GetTypes()
             .Where(x => typeof(IStep).IsAssignableFrom(x))
@@ -110,7 +110,7 @@ public partial class ConnectorTests
             )
         );
 
-        injectedContextsResult.ShouldBeSuccessful(x => x.AsString);
+        injectedContextsResult.ShouldBeSuccessful();
 
         var externalContext = ExternalContext.Default with
         {
@@ -131,7 +131,7 @@ public partial class ConnectorTests
                 CancellationToken.None
             );
 
-        r.ShouldBeSuccessful(x => x.AsString);
+        r.ShouldBeSuccessful();
     }
 }
 

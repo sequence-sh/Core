@@ -119,7 +119,7 @@ public partial class PropertyRequirementTests
             var r = Step.Verify(Settings);
 
             if (ExpectSuccess)
-                r.ShouldBeSuccessful(x => x.AsString);
+                r.ShouldBeSuccessful();
             else
                 r.ShouldBeFailure();
         }

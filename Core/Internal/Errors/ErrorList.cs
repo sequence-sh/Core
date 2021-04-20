@@ -26,6 +26,12 @@ public class ErrorList : IError
     public string AsString => string.Join("; ", _allErrors.Select(x => x.AsString));
 
     /// <inheritdoc />
+    public string AsStringWithLocation => string.Join(
+        "; ",
+        _allErrors.Select(x => x.AsStringWithLocation)
+    );
+
+    /// <inheritdoc />
     public IErrorBuilder ToErrorBuilder
     {
         get
