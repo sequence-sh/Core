@@ -57,7 +57,7 @@ public class EntityConversionTests
                 )
                 .Map(x => x.TryConvertToEntityValue());
 
-        parseResult.ShouldBeSuccessful(x => x.AsString);
+        parseResult.ShouldBeSuccessful();
 
         return (parseResult.Value.Value as EntityValue.NestedEntity)!.Value; //could throw exception
     }
@@ -70,7 +70,7 @@ public class EntityConversionTests
         var configurationResult =
             EntityConversionHelpers.TryCreateFromEntity<Configuration>(entity);
 
-        configurationResult.ShouldBeSuccessful(x => x.AsString);
+        configurationResult.ShouldBeSuccessful();
 
         var conf = configurationResult.Value;
 

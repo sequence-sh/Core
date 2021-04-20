@@ -30,7 +30,7 @@ public sealed record ExternalContext(
     );
 
     /// <inheritdoc />
-    public Result<T, ErrorBuilder> TryGetContext<T>(string key) where T : class
+    public Result<T, IErrorBuilder> TryGetContext<T>(string key) where T : class
     {
         var first = InjectedContexts
             .Where(x => x.name.Equals(key, StringComparison.OrdinalIgnoreCase))

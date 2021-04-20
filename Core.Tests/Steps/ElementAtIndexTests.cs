@@ -42,13 +42,13 @@ public partial class ElementAtIndexTests : StepTestBase<ElementAtIndex<StringStr
             yield return new DeserializeCase(
                 "Index 0",
                 "ElementAtIndex Array: ['Hello', 'World'] Index: 0",
-                new StringStream("Hello")
+                "Hello"
             );
 
             yield return new DeserializeCase(
                 "Index 1",
                 "ElementAtIndex Array: ['Hello', 'World'] Index: 1",
-                new StringStream("World")
+                "World"
             );
         }
     }

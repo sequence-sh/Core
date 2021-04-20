@@ -32,7 +32,7 @@ public partial class GetSubstringTests : StepTestBase<GetSubstring, StringStream
             yield return new DeserializeCase(
                 "ArrayLength 3",
                 "GetSubstring String: 'Hello World' Index: 1 Length: 3",
-                new StringStream("ell")
+                "ell"
             );
         }
     }

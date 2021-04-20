@@ -42,9 +42,8 @@ public sealed class StringToDate : CompoundStep<DateTime>
     [StepProperty(3)]
     [DefaultValueExplanation("Current culture")]
     [Example("en-GB")]
-    public IStep<StringStream> Culture { get; set; } = new StringConstant(
-        new StringStream(CultureInfo.CurrentCulture.Name)
-    );
+    public IStep<StringStream> Culture { get; set; } =
+        new StringConstant(CultureInfo.CurrentCulture.Name);
 
     /// <inheritdoc />
     protected override async Task<Result<DateTime, IError>> Run(

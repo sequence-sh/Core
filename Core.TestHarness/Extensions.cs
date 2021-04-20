@@ -6,6 +6,7 @@ using Moq;
 using Reductech.EDR.Core.Abstractions;
 using Reductech.EDR.Core.ExternalProcesses;
 using Reductech.EDR.Core.Internal;
+using Reductech.EDR.Core.Internal.Errors;
 using Thinktecture;
 using Thinktecture.IO;
 using Xunit;
@@ -147,14 +148,27 @@ public static class Extensions
     /// <summary>
     /// Asserts that this result was successful.
     /// </summary>
-    public static void ShouldBeSuccessful<T, TE>(
-        this Result<T, TE> result,
-        Func<TE, string> convert)
+    public static void ShouldBeSuccessful<T>(this Result<T, IError> result)
     {
         var (_, isFailure, _, error) = result;
 
         if (isFailure)
-            throw new XunitException(convert(error));
+        {
+            throw new XunitException(error.AsStringWithLocation);
+        }
+    }
+
+    /// <summary>
+    /// Asserts that this result was successful.
+    /// </summary>
+    public static void ShouldBeSuccessful<T>(this Result<T, IErrorBuilder> result)
+    {
+        var (_, isFailure, _, error) = result;
+
+        if (isFailure)
+        {
+            throw new XunitException(error.AsString);
+        }
     }
 
     /// <summary>

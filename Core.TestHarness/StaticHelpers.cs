@@ -36,7 +36,7 @@ public static class StaticHelpers
     public static IStep<Unit> SetVariable<T>(string name, T value) where T : Enum =>
         new SetVariable<T> { Variable = new VariableName(name), Value = Constant(value) };
 
-    public static StringConstant Constant(string value) => new(new StringStream(value));
+    public static StringConstant Constant(string value) => new(value);
     public static IntConstant Constant(int value) => new(value);
     public static DoubleConstant Constant(double value) => new(value);
     public static BoolConstant Constant(bool value) => new((value));

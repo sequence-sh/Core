@@ -46,9 +46,9 @@ public sealed class StringTrim : CompoundStep<StringStream>
         if (sideResult.IsFailure)
             return sideResult.ConvertFailure<StringStream>();
 
-        var r = TrimString(stringResult.Value, sideResult.Value);
+        StringStream r = TrimString(stringResult.Value, sideResult.Value);
 
-        return new StringStream(r);
+        return r;
     }
 
     private static string TrimString(string s, TrimSide side) => side switch

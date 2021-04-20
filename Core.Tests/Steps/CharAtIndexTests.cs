@@ -29,7 +29,7 @@ public partial class CharAtIndexTests : StepTestBase<CharAtIndex, StringStream>
             yield return new DeserializeCase(
                 "Index is present",
                 "CharAtIndex Index: 1 String: 'Hello'",
-                new StringStream("e")
+                "e"
             );
         }
     }

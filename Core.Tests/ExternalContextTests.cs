@@ -21,7 +21,7 @@ public partial class ExternalContextTests
 
         var retrievedObject = context.TryGetContext<List<string>>("list");
 
-        retrievedObject.ShouldBeSuccessful(x => x.AsString);
+        retrievedObject.ShouldBeSuccessful();
 
         retrievedObject.Value.Should().BeEquivalentTo(objectToInject);
     }

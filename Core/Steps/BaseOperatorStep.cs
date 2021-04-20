@@ -33,7 +33,8 @@ public abstract class BaseOperatorStep<TStep, TElement, TOutput> : CompoundStep<
         CancellationToken cancellationToken)
     {
         var termsResult =
-            await Terms.Run(stateMonad, cancellationToken).Bind(x => x.GetElements());
+            await Terms.Run(stateMonad, cancellationToken)
+                .Bind(x => x.GetElementsAsync(cancellationToken));
 
         if (termsResult.IsFailure)
             return termsResult.ConvertFailure<TOutput>();

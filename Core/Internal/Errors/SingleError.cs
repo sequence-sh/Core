@@ -8,34 +8,19 @@ namespace Reductech.EDR.Core.Internal.Errors
 /// <summary>
 /// An single error.
 /// </summary>
-public class SingleError : IError
+public record SingleError(ErrorLocation Location, ErrorBuilder ErrorBuilder) : IError
 {
     /// <summary>
     /// Create a new SingleError.
     /// </summary>
     public SingleError(ErrorLocation location, Exception exception, ErrorCodeBase errorCodeBase)
-    {
-        Location     = location;
-        ErrorBuilder = new ErrorBuilder(exception, errorCodeBase);
-    }
+        : this(location, new ErrorBuilder(exception, errorCodeBase)) { }
 
     /// <summary>
     /// Create a new SingleError.
     /// </summary>
     public SingleError(ErrorLocation location, ErrorCodeBase errorCodeBase, params object?[] args)
-    {
-        Location     = location;
-        ErrorBuilder = new ErrorBuilder(errorCodeBase, args);
-    }
-
-    /// <summary>
-    /// Create a new SingleError.
-    /// </summary>
-    public SingleError(ErrorLocation location, ErrorBuilder errorBuilder)
-    {
-        Location     = location;
-        ErrorBuilder = errorBuilder;
-    }
+        : this(location, new ErrorBuilder(errorCodeBase, args)) { }
 
     /// <summary>
     /// Error Message String.
@@ -43,19 +28,10 @@ public class SingleError : IError
     public string Message => ErrorBuilder.AsString;
 
     /// <summary>
-    /// The location where this error arose. This could be a line number.
-    /// </summary>
-    public ErrorLocation Location { get; }
-
-    /// <summary>
-    /// The ErrorBuilder
-    /// </summary>
-    public ErrorBuilder ErrorBuilder { get; }
-
-    /// <summary>
     /// Associated Exception if there is one
     /// </summary>
-    public Exception? Exception => ErrorBuilder.Data.TryPickT0(out var e, out _) ? e : null;
+    public Exception? Exception =>
+        ErrorBuilder.Data is ErrorData.ExceptionData ed ? ed.Exception : null;
 
     /// <inheritdoc />
     public IEnumerable<SingleError> GetAllErrors()
@@ -65,6 +41,9 @@ public class SingleError : IError
 
     /// <inheritdoc />
     public string AsString => Message;
+
+    /// <inheritdoc />
+    public string AsStringWithLocation => $"{Message} in {Location}";
 
     /// <inheritdoc />
     public IErrorBuilder ToErrorBuilder => ErrorBuilder;
@@ -83,27 +62,6 @@ public class SingleError : IError
             _                       => false
         };
     }
-
-    private bool Equals(SingleError other)
-    {
-        return ErrorBuilder == other.ErrorBuilder &&
-               Location.Equals(other.Location);
-    }
-
-    /// <inheritdoc />
-    public override bool Equals(object? obj)
-    {
-        if (obj is null)
-            return false;
-
-        if (ReferenceEquals(this, obj))
-            return true;
-
-        return obj is IError error && Equals(error);
-    }
-
-    /// <inheritdoc />
-    public override int GetHashCode() => HashCode.Combine(ErrorBuilder, Location);
 }
 
 }

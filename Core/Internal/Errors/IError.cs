@@ -16,8 +16,15 @@ public interface IError : IEquatable<IError>
 
     /// <summary>
     /// The error as a string.
+    /// Does not include the location
     /// </summary>
     string AsString { get; }
+
+    /// <summary>
+    /// The error as a string.
+    /// Includes the location
+    /// </summary>
+    string AsStringWithLocation { get; }
 
     /// <summary>
     /// Converts this Error to an ErrorBuilder

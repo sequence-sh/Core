@@ -25,7 +25,7 @@ public partial class GenerateDocumentationTests : StepTestBase<GenerateDocumenta
     {
         get
         {
-            static Array<Entity> Entities(params Entity[] entities) => new(entities);
+            static Array<Entity> Entities(params Entity[] entities) => entities.ToSCLArray();
 
             static Entity File(
                 string fileName,
@@ -104,8 +104,10 @@ public partial class GenerateDocumentationTests : StepTestBase<GenerateDocumenta
                 "Examples"
             );
 
-            static string[] ToLogs(Array<Entity> array) =>
-                array.GetElements().Value.Select(x => x.Serialize()).ToArray();
+            static string[] ToLogs(Array<Entity> array) => array
+                .GetElementsAsync(CancellationToken.None)
+                .Result.Value.Select(x => x.Serialize())
+                .ToArray();
 
             var logDocumentation = new ForEach<Entity>()
             {

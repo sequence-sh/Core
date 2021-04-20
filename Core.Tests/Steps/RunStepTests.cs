@@ -81,8 +81,8 @@ public partial class RunStepTests : StepTestBase<RunStep<Unit>, Unit>
             var data = new TheoryData<object, bool>
             {
                 { true, false },
-                { new StringStream("Hello World"), false },
-                { new Array<int>(new List<int> { 1, 2, 3 }), false },
+                { "Hello World", false },
+                { new List<int> { 1, 2, 3 }.ToSCLArray(), false },
                 { Entity.Create(("a", 1)), false }
             };
 
@@ -99,7 +99,7 @@ public partial class RunStepTests : StepTestBase<RunStep<Unit>, Unit>
         if (expectError)
             r.ShouldBeFailure();
         else
-            r.ShouldBeSuccessful(x => x.AsString);
+            r.ShouldBeSuccessful();
     }
 }
 

@@ -17,7 +17,7 @@ public class StringStreamTests
     [Fact]
     public void GetString_should_work_with_basic_String()
     {
-        var ss = new StringStream(StringToTest);
+        StringStream ss = StringToTest;
 
         ss.GetString().Should().Be(StringToTest);
     }

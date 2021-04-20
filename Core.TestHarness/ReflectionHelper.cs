@@ -301,7 +301,7 @@ public abstract partial class StepTestBase<TStep, TOutput>
             var s = "DataStream" + index;
             index++;
 
-            step = new StringConstant(new StringStream(s));
+            step = new StringConstant(s);
         }
         else if (outputType == typeof(Schema))
         {

@@ -40,9 +40,9 @@ public sealed class
                         ("Category", x.Category)
                     )
                 )
-                .ToList();
+                .ToSCLArray();
 
-        return new Array<Entity>(entities);
+        return entities;
     }
 
     /// <inheritdoc />

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using OneOf;
 
 namespace Reductech.EDR.Core.Internal.Errors
 {
@@ -9,27 +8,30 @@ namespace Reductech.EDR.Core.Internal.Errors
 /// <summary>
 /// A single error builder
 /// </summary>
-public class ErrorBuilder : IErrorBuilder, IEquatable<IErrorBuilder>
+public record ErrorBuilder(ErrorCodeBase ErrorCode, ErrorData Data) : IErrorBuilder
 {
     /// <summary>
     /// Create a new SingleErrorBuilder
     /// </summary>
-    public ErrorBuilder(ErrorCodeBase errorCodeBase, params object?[] data)
+    public ErrorBuilder(ErrorCodeBase errorCode, params object?[] data) : this(
+        errorCode,
+        new ErrorData.ObjectData(data)
+    )
     {
-        ErrorCodeBase = errorCodeBase;
-        Data          = data;
-
+        Data      = new ErrorData.ObjectData(data);
         Timestamp = DateTime.Now;
     }
 
     /// <summary>
     /// Create a new SingleErrorBuilder
     /// </summary>
-    public ErrorBuilder(Exception exception, ErrorCodeBase errorCodeBase)
+    public ErrorBuilder(Exception exception, ErrorCodeBase errorCode) : this(
+        errorCode,
+        new ErrorData.ExceptionData(exception)
+    )
     {
-        ErrorCodeBase = errorCodeBase;
-        Data          = exception;
-        Timestamp     = DateTime.Now;
+        Data      = new ErrorData.ExceptionData(exception);
+        Timestamp = DateTime.Now;
     }
 
     /// <inheritdoc />
@@ -47,30 +49,12 @@ public class ErrorBuilder : IErrorBuilder, IEquatable<IErrorBuilder>
     public DateTime Timestamp { get; }
 
     /// <summary>
-    /// The Error Code
-    /// </summary>
-    public ErrorCodeBase ErrorCodeBase { get; }
-
-    /// <summary>
-    /// The data
-    /// </summary>
-    public OneOf<Exception, object?[]> Data { get; }
-
-    /// <summary>
     /// Returns a SingleError with the given location.
     /// </summary>
     public SingleError WithLocationSingle(ErrorLocation location) => new(location, this);
 
     /// <inheritdoc />
-    public string AsString => Data.Match(
-        x => x.Message,
-        args => ErrorCodeBase.GetFormattedMessage(args)
-    );
-
-    /// <summary>
-    /// Equals method
-    /// </summary>
-    protected bool Equals(ErrorBuilder other) => AsString == other.AsString;
+    public string AsString => Data.AsString(ErrorCode);
 
     /// <summary>
     /// Equals method
@@ -87,32 +71,85 @@ public class ErrorBuilder : IErrorBuilder, IEquatable<IErrorBuilder>
     }
 
     /// <inheritdoc />
-    public override bool Equals(object? obj)
+    public override int GetHashCode()
     {
-        if (obj is null)
-            return false;
-
-        if (ReferenceEquals(this, obj))
-            return true;
-
-        if (obj is ErrorBuilder seb)
-            return Equals(seb);
-
-        return false;
+        return HashCode.Combine(ErrorCode, Data);
     }
 
     /// <inheritdoc />
-    public override int GetHashCode() => AsString.GetHashCode();
+    public virtual bool Equals(ErrorBuilder? other)
+    {
+        if (other is null)
+            return false;
+
+        return ErrorCode.Equals(other.ErrorCode) && Data.Equals(other.Data);
+    }
+}
+
+/// <summary>
+/// Error builder data
+/// </summary>
+public abstract record ErrorData
+{
+    /// <summary>
+    /// An exception
+    /// </summary>
+    public record ExceptionData(Exception Exception) : ErrorData, IEquatable<ErrorData>
+    {
+        /// <inheritdoc />
+        public override string AsString(ErrorCodeBase errorCode)
+        {
+            return Exception.Message;
+        }
+
+        /// <inheritdoc />
+        public virtual bool Equals(ExceptionData? other)
+        {
+            if (other is null)
+                return false;
+
+            return Exception.Message.Equals(other.Exception.Message);
+        }
+
+        /// <inheritdoc />
+        public override int GetHashCode()
+        {
+            return Exception.Message.GetHashCode();
+        }
+    }
 
     /// <summary>
-    /// Equals operator
+    /// Data based on objects
     /// </summary>
-    public static bool operator ==(ErrorBuilder? left, ErrorBuilder? right) => Equals(left, right);
+    public record ObjectData(object?[] Arguments) : ErrorData, IEquatable<ErrorData>
+    {
+        /// <inheritdoc />
+        public override string AsString(ErrorCodeBase errorCode)
+        {
+            return errorCode.GetFormattedMessage(Arguments);
+        }
+
+        /// <inheritdoc />
+        public virtual bool Equals(ObjectData? other)
+        {
+            if (other is null)
+                return false;
+
+            return Arguments.Select(x => x?.ToString())
+                .SequenceEqual(other.Arguments.Select(x => x?.ToString()));
+        }
+
+        /// <inheritdoc />
+        public override int GetHashCode()
+        {
+            return Arguments.Length;
+        }
+    }
 
     /// <summary>
-    /// NotEquals operator
+    /// This ErrorData as a string
     /// </summary>
-    public static bool operator !=(ErrorBuilder? left, ErrorBuilder? right) => !Equals(left, right);
+    public abstract string AsString(ErrorCodeBase errorCode);
 }
 
 }

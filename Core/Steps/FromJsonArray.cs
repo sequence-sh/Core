@@ -52,7 +52,7 @@ public sealed class FromJsonArray : CompoundStep<Array<Entity>>
                         .WithLocation(this)
                 );
 
-        return new Array<Entity>(entities!);
+        return entities.ToSCLArray();
     }
 
     /// <summary>

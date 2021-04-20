@@ -40,13 +40,11 @@ public class Hash : CompoundStep<StringStream>
             cancellationToken
         );
 
-        var result = Encoding.UTF8.GetString(hash);
-
-        var ss = new StringStream(result);
+        StringStream result = Encoding.UTF8.GetString(hash);
 
         hashAlgorithm.Dispose();
 
-        return ss;
+        return result;
     }
 
     /// <summary>

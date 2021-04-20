@@ -66,7 +66,7 @@ public partial class ExampleTests
 
         var r = await stepResult.Value.Run<Unit>(monad, CancellationToken.None);
 
-        r.ShouldBeSuccessful(x => x.ToString()!);
+        r.ShouldBeSuccessful();
     }
 
     [Fact(Skip = "true")]
@@ -113,7 +113,7 @@ public partial class ExampleTests
             CancellationToken.None
         );
 
-        r.ShouldBeSuccessful(x => x.ToString()!);
+        r.ShouldBeSuccessful();
     }
 
     #pragma warning disable xUnit1004 // Test methods should not be skipped
@@ -199,7 +199,7 @@ public partial class ExampleTests
 
         var r = await (step as IStep<Unit>).Run(monad, CancellationToken.None);
 
-        r.ShouldBeSuccessful(x => x.ToString()!);
+        r.ShouldBeSuccessful();
     }
 }
 

@@ -451,7 +451,7 @@ Log 'Comments!'",
                 CancellationToken.None
             );
 
-            result.ShouldBeSuccessful(x => x.ToString()!);
+            result.ShouldBeSuccessful();
 
             LogChecker.CheckLoggedValues(
                 loggerFactory,

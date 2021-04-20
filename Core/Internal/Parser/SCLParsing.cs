@@ -7,7 +7,6 @@ using System.Text;
 using Antlr4.Runtime;
 using Antlr4.Runtime.Tree;
 using CSharpFunctionalExtensions;
-using OneOf;
 using Reductech.EDR.Core.Internal.Errors;
 using static Reductech.EDR.Core.Internal.FreezableFactory;
 using StepParameterDict =
@@ -136,7 +135,7 @@ public static class SCLParsing
                 new TextLocation(context)
             );
 
-            return new FreezableStepProperty(
+            return new FreezableStepProperty.Step(
                 sequence,
                 new TextLocation(context)
             );
@@ -161,7 +160,7 @@ public static class SCLParsing
 
             var location = new TextLocation(context);
 
-            var member = new FreezableStepProperty(
+            var member = new FreezableStepProperty.Step(
                 new BoolConstantFreezable(b, location),
                 location
             );
@@ -189,7 +188,7 @@ public static class SCLParsing
 
             var constant = new DateTimeConstantFreezable(dateTime, location);
 
-            var member = new FreezableStepProperty(constant, location);
+            var member = new FreezableStepProperty.Step(constant, location);
             return member;
         }
 
@@ -213,7 +212,7 @@ public static class SCLParsing
                 new TextLocation(context)
             );
 
-            return new FreezableStepProperty(step, new TextLocation(context));
+            return new FreezableStepProperty.Step(step, new TextLocation(context));
         }
 
         /// <inheritdoc />
@@ -238,7 +237,7 @@ public static class SCLParsing
             var operatorSymbol = operatorSymbols.Single();
 
             var terms = context.term()
-                .Select(x => Visit(x))
+                .Select(Visit)
                 .Where(x => x.IsFailure || x.Value != null)
                 .ToList();
 
@@ -289,7 +288,7 @@ public static class SCLParsing
 
             var step = CreateFreezableSetVariable(vn, member.Value, new TextLocation(context));
 
-            return new FreezableStepProperty(step, new TextLocation(context));
+            return new FreezableStepProperty.Step(step, new TextLocation(context));
         }
 
         /// <inheritdoc />
@@ -312,7 +311,7 @@ public static class SCLParsing
 
             var location = new TextLocation(context);
 
-            var member = new FreezableStepProperty(
+            var member = new FreezableStepProperty.Step(
                 new EnumConstantFreezable(new Enumeration(prefix, suffix), location),
                 location
             );
@@ -329,7 +328,7 @@ public static class SCLParsing
 
             if (int.TryParse(text, out var num))
             {
-                var member = new FreezableStepProperty(
+                var member = new FreezableStepProperty.Step(
                     new IntConstantFreezable(num, location),
                     location
                 );
@@ -339,7 +338,7 @@ public static class SCLParsing
 
             if (double.TryParse(text, out var d))
             {
-                var member = new FreezableStepProperty(
+                var member = new FreezableStepProperty.Step(
                     new DoubleConstantFreezable(d, location),
                     new TextLocation(context)
                 );
@@ -377,10 +376,10 @@ public static class SCLParsing
         {
             string s = GetString(context);
 
-            var stringStream = new StringStream(s);
-            var location     = new TextLocation(context);
+            StringStream stringStream = s;
+            var          location     = new TextLocation(context);
 
-            var member = new FreezableStepProperty(
+            var member = new FreezableStepProperty.Step(
                 new StringConstantFreezable(stringStream, location),
                 location
             );
@@ -406,7 +405,7 @@ public static class SCLParsing
                     var unescaped = UnescapeInterpolated(text, i == 0);
 
                     var cs = new StringConstantFreezable(
-                        new StringStream(unescaped),
+                        unescaped,
                         new TextLocation(s.Symbol)
                     );
 
@@ -434,7 +433,7 @@ public static class SCLParsing
                     new TextLocation(context)
                 );
 
-            return new FreezableStepProperty(freezableStep, new TextLocation(context));
+            return new FreezableStepProperty.Step(freezableStep, new TextLocation(context));
         }
 
         static string UnescapeInterpolated(string txt, bool removeDollar)
@@ -545,13 +544,13 @@ public static class SCLParsing
             if (firstStep.IsFailure)
                 errors.Add(firstStep.Error);
             else
-                dict.Add(new StepParameterReference(1), firstStep.Value);
+                dict.Add(new StepParameterReference.Index(1), firstStep.Value);
 
             var numberedArguments = context.function()
                 .term()
                 .Select(
                     (term, i) =>
-                        (term: Visit(term), number: OneOf<string, int>.FromT1(i + 2))
+                        (term: Visit(term), number: i + 2)
                 );
 
             foreach (var (term, number) in numberedArguments)
@@ -559,7 +558,7 @@ public static class SCLParsing
                 if (term.IsFailure)
                     errors.Add(term.Error);
                 else
-                    dict.Add(new StepParameterReference(number), term.Value);
+                    dict.Add(new StepParameterReference.Index(number), term.Value);
             }
 
             var location = new TextLocation(context);
@@ -570,7 +569,7 @@ public static class SCLParsing
                 errors.Add(members.Error);
             else
                 foreach (var (key, value) in members.Value)
-                    dict.Add(new StepParameterReference(key), value);
+                    dict.Add(new StepParameterReference.Named(key), value);
 
             if (errors.Any())
                 return Result.Failure<FreezableStepProperty, IError>(ErrorList.Combine(errors));
@@ -579,7 +578,7 @@ public static class SCLParsing
 
             var cfs = new CompoundFreezableStep(name, fsd, location);
 
-            return new FreezableStepProperty(cfs, new TextLocation(context));
+            return new FreezableStepProperty.Step(cfs, new TextLocation(context));
         }
 
         /// <inheritdoc />
@@ -594,7 +593,7 @@ public static class SCLParsing
             var numberedArguments = context.term()
                 .Select(
                     (term, i) =>
-                        (term: Visit(term), number: OneOf<string, int>.FromT1(i + 1))
+                        (term: Visit(term), number: i + 1)
                 );
 
             foreach (var (term, number) in numberedArguments)
@@ -602,7 +601,7 @@ public static class SCLParsing
                 if (term.IsFailure)
                     errors.Add(term.Error);
                 else
-                    dict.Add(new StepParameterReference(number), term.Value);
+                    dict.Add(new StepParameterReference.Index(number), term.Value);
             }
 
             var location = new TextLocation(context);
@@ -613,7 +612,7 @@ public static class SCLParsing
                 errors.Add(members.Error);
             else
                 foreach (var (key, value) in members.Value)
-                    dict.Add(new StepParameterReference(key), value);
+                    dict.Add(new StepParameterReference.Named(key), value);
 
             if (errors.Any())
                 return Result.Failure<FreezableStepProperty, IError>(ErrorList.Combine(errors));
@@ -622,7 +621,7 @@ public static class SCLParsing
 
             var cfs = new CompoundFreezableStep(name, fsd, location);
 
-            return new FreezableStepProperty(cfs, new TextLocation(context));
+            return new FreezableStepProperty.Step(cfs, new TextLocation(context));
         }
 
         /// <inheritdoc />
@@ -641,7 +640,7 @@ public static class SCLParsing
                 new FreezableEntityData(members.Value, new TextLocation(context))
             );
 
-            return new FreezableStepProperty(step, new TextLocation(context));
+            return new FreezableStepProperty.Step(step, new TextLocation(context));
         }
 
         private Result<IReadOnlyDictionary<EntityPropertyKey, FreezableStepProperty>, IError>
@@ -767,7 +766,7 @@ public static class SCLParsing
 
             var vn = new VariableName(text.TrimStart('<').TrimEnd('>'));
 
-            return new FreezableStepProperty(vn, new TextLocation(node.Symbol));
+            return new FreezableStepProperty.Variable(vn, new TextLocation(node.Symbol));
         }
 
         private static Result<FreezableStepProperty, IError> Aggregate(
@@ -790,7 +789,7 @@ public static class SCLParsing
             if (errors.Any())
                 return Result.Failure<FreezableStepProperty, IError>(ErrorList.Combine(errors));
 
-            return new FreezableStepProperty(l.ToImmutable(), textLocation);
+            return new FreezableStepProperty.StepList(l.ToImmutable(), textLocation);
         }
     }
 }

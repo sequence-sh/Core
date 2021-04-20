@@ -50,7 +50,7 @@ public sealed class StringSplit : CompoundStep<Array<StringStream>>
 
         var results = stringResult.Value
             .Split(new[] { delimiterResult.Value }, StringSplitOptions.None)
-            .Select(x => new StringStream(x))
+            .Select(x => new StringStream(x) as StringStream)
             .ToList()
             .ToSCLArray();
 

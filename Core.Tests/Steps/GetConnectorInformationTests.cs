@@ -29,7 +29,7 @@ public partial class
             yield return new StepCase(
                 "Core",
                 new GetConnectorInformation(),
-                new Array<Entity>(new[] { coreEntity })
+                new[] { coreEntity }.ToSCLArray()
             );
         }
     }

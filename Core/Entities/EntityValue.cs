@@ -889,7 +889,7 @@ public abstract record EntityValue(object? ObjectValue)
         if (typeof(T).IsAssignableTo(typeof(IArray)) && typeof(T).IsGenericType)
         {
             var param = typeof(T).GenericTypeArguments[0];
-            var array = typeof(Array<>).MakeGenericType(param);
+            var array = typeof(EagerArray<>).MakeGenericType(param);
 
             var arrayInstance = Activator.CreateInstance(array);
 

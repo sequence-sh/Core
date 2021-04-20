@@ -196,18 +196,29 @@ public abstract class StepFactory : IStepFactory
 
             remainingRequired.Remove(propertyInfo.Name);
 
-            var result =
-                stepMember.Match(
-                    vn => TrySetVariableName(
-                        propertyInfo,
-                        step,
-                        vn,
-                        stepMember.Location,
-                        typeResolver
-                    ),
-                    s => TrySetStep(propertyInfo, step, s, typeResolver),
-                    sList => TrySetStepList(propertyInfo, step, sList, typeResolver)
-                );
+            var result = stepMember switch
+            {
+                FreezableStepProperty.Variable vn => TrySetVariableName(
+                    propertyInfo,
+                    step,
+                    vn.VName,
+                    stepMember.Location,
+                    typeResolver
+                ),
+                FreezableStepProperty.Step memberStep => TrySetStep(
+                    propertyInfo,
+                    step,
+                    memberStep.FreezableStep,
+                    typeResolver
+                ),
+                FreezableStepProperty.StepList sList => TrySetStepList(
+                    propertyInfo,
+                    step,
+                    sList.List,
+                    typeResolver
+                ),
+                _ => throw new ArgumentException("Step member wrong type"),
+            };
 
             if (result.IsFailure)
                 errors.Add(result.Error);
@@ -293,14 +304,18 @@ public abstract class StepFactory : IStepFactory
         if (propertyInfo.PropertyType.IsInstanceOfType(stepToSet))
             return Result.Success<IStep, IErrorBuilder>(stepToSet); //No coercion required
 
-        if (propertyInfo.PropertyType.IsGenericType && stepToSet is StringConstant constant
-                                                    && constant.Value.Value.IsT0)
+        if (propertyInfo.PropertyType.IsGenericType && stepToSet is StringConstant stringConstant)
         {
             if (propertyInfo.PropertyType.GenericTypeArguments.First().IsEnum)
             {
                 var enumType = propertyInfo.PropertyType.GenericTypeArguments.First();
 
-                if (Enum.TryParse(enumType, constant.Value.Value.AsT0, true, out var enumValue))
+                if (Enum.TryParse(
+                    enumType,
+                    stringConstant.Value.GetString(),
+                    true,
+                    out var enumValue
+                ))
                 {
                     var step = EnumConstantFreezable.TryCreateEnumConstant(enumValue!);
                     return step;
@@ -308,7 +323,7 @@ public abstract class StepFactory : IStepFactory
             }
             else if (propertyInfo.PropertyType.GenericTypeArguments.First() == typeof(DateTime))
             {
-                if (DateTime.TryParse(constant.Value.Value.AsT0, out var dt))
+                if (DateTime.TryParse(stringConstant.Value.GetString(), out var dt))
                 {
                     var step = new DateTimeConstant(dt);
                     return Result.Success<IStep, IErrorBuilder>(step);
@@ -543,7 +558,10 @@ public abstract class StepFactory : IStepFactory
     private static string GetLastTerm(string s) =>
         s.Split('.', StringSplitOptions.RemoveEmptyEntries).Last();
 
-    private Lazy<IReadOnlySet<StepParameterReference>> ScopedFunctionParameterReferences { get; }
+    private Lazy<IReadOnlySet<StepParameterReference>> ScopedFunctionParameterReferences
+    {
+        get;
+    }
 
     /// <inheritdoc />
     public bool IsScopedFunction(StepParameterReference stepParameterReference) =>

@@ -31,7 +31,7 @@ public interface IExternalContext
     /// Get context of a given type.
     /// Allows for type injection.
     /// </summary>
-    public Result<T, ErrorBuilder> TryGetContext<T>(string name) where T : class;
+    public Result<T, IErrorBuilder> TryGetContext<T>(string name) where T : class;
 }
 
 }

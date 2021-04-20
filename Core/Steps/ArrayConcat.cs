@@ -1,6 +1,5 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
@@ -27,16 +26,7 @@ public sealed class ArrayConcat<T> : CompoundStep<Array<T>>
             return streamsResult.ConvertFailure<Array<T>>();
 
         var result =
-            streamsResult.Value.SelectMany(
-                al =>
-                {
-                    var asyncEnumerable = al.Option.IsT0
-                        ? al.Option.AsT0.ToAsyncEnumerable()
-                        : al.Option.AsT1;
-
-                    return asyncEnumerable;
-                }
-            );
+            streamsResult.Value.SelectMany(al => al.GetAsyncEnumerable());
 
         return result;
     }

@@ -60,9 +60,9 @@ public sealed class GetSubstring : CompoundStep<StringStream>
         if (index.Value < 0 || index.Value >= str.Length)
             return new SingleError(new ErrorLocation(this), ErrorCode.IndexOutOfBounds);
 
-        var resultString = str.Substring(index.Value, length.Value);
+        StringStream resultString = str.Substring(index.Value, length.Value);
 
-        return new StringStream(resultString);
+        return resultString;
     }
 
     /// <inheritdoc />

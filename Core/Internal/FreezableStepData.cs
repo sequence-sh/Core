@@ -159,15 +159,23 @@ public sealed class FreezableStepData : IEquatable<FreezableStepData>
         foreach (var (key, freezableStepProperty) in StepProperties)
         {
             if (!typeResolver.StepFactoryStore.IsScopedFunction(stepName, key))
-                freezableStepProperty.Switch(
-                    _ => { },
-                    LocalGetVariablesSet,
-                    l =>
+            {
+                switch (freezableStepProperty)
+                {
+                    case FreezableStepProperty.Step step:
+                        LocalGetVariablesSet(step.FreezableStep);
+                        break;
+                    case FreezableStepProperty.StepList stepList:
                     {
-                        foreach (var step in l)
+                        foreach (var step in stepList.List)
                             LocalGetVariablesSet(step);
+
+                        break;
                     }
-                );
+                    case FreezableStepProperty.Variable _: break;
+                    default:                               throw new ArgumentOutOfRangeException();
+                }
+            }
         }
 
         if (errors.Any())

@@ -19,7 +19,7 @@ public record StringConstantFreezable
     )
 {
     /// <inheritdoc />
-    public override string StepName => Value.Name;
+    public override string StepName => Value.GetString();
 
     /// <inheritdoc />
     public override Result<IStep, IError> TryFreeze(

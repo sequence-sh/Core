@@ -33,17 +33,17 @@ public abstract partial class StepTestBase<TStep, TOutput>
             params string[] expectedLoggedValues) : base(name, expectedLoggedValues)
         {
             SCL            = scl;
-            ExpectedOutput = expectedOutput;
+            ExpectedOutput = new ExpectedValueOutput(expectedOutput);
         }
 
         public DeserializeCase(
             string name,
             string scl,
-            Unit expectedOutput,
+            Unit _,
             params string[] expectedLoggedValues) : base(name, expectedLoggedValues)
         {
             SCL            = scl;
-            ExpectedOutput = new ExpectedOutput(expectedOutput);
+            ExpectedOutput = ExpectedUnitOutput.Instance;
         }
 
         public string SCL { get; }
@@ -62,10 +62,10 @@ public abstract partial class StepTestBase<TStep, TOutput>
 
             var deserializeResult = SCLParsing.TryParseStep(SCL);
 
-            deserializeResult.ShouldBeSuccessful(x => x.ToString()!);
+            deserializeResult.ShouldBeSuccessful();
 
             var freezeResult = deserializeResult.Value.TryFreeze(TypeReference.Any.Instance, sfs);
-            freezeResult.ShouldBeSuccessful(x => x.ToString()!);
+            freezeResult.ShouldBeSuccessful();
 
             return freezeResult.Value;
         }
