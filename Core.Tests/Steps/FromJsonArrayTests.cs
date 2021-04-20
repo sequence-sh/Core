@@ -69,7 +69,7 @@ public partial class FromJsonArrayTests : StepTestBase<FromJsonArray, Array<Enti
         {
             static Array<Entity> CreateArray(params Entity[] entities)
             {
-                return new(entities);
+                return entities.ToSCLArray();
             }
 
             yield return new StepCase(

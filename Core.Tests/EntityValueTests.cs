@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using AutoTheory;
 using CSharpFunctionalExtensions;
 using FluentAssertions;
@@ -196,7 +197,8 @@ public partial class EntityValueTests
 
         if (actualList.HasValue)
         {
-            actualList.Value.GetElements()
+            actualList.Value.GetElementsAsync(CancellationToken.None)
+                .Result
                 .Value.Select(x => x.GetString())
                 .Should()
                 .BeEquivalentTo(expectedList.Value);
@@ -212,8 +214,8 @@ public partial class EntityValueTests
         EntityValue.GetDefaultValue<int>().Should().Be(0);
         EntityValue.GetDefaultValue<double>().Should().Be(0.0);
         EntityValue.GetDefaultValue<bool>().Should().Be(false);
-        EntityValue.GetDefaultValue<Array<int>>().Should().Be(new Array<int>());
-        EntityValue.GetDefaultValue<Array<double>>().Should().Be(new Array<double>());
+        EntityValue.GetDefaultValue<Array<int>>().Should().Be(Array<int>.Empty);
+        EntityValue.GetDefaultValue<Array<double>>().Should().Be(Array<double>.Empty);
     }
 }
 

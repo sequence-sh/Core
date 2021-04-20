@@ -31,7 +31,7 @@ public sealed class GetConnectorInformation : CompoundStep<Array<Entity>>
             entities.Add(entity);
         }
 
-        return new Array<Entity>(entities);
+        return entities.ToSCLArray();
     }
 
     /// <inheritdoc />

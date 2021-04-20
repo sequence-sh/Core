@@ -195,25 +195,36 @@ public abstract class StepFactory : IStepFactory
             }
 
             remainingRequired.Remove(propertyInfo.Name);
-                var result = stepMember switch
-                {
-                    FreezableStepProperty.Variable vn => TrySetVariableName(
-                                           propertyInfo,
-                                           step,
-                                           vn.VName,
-                                           stepMember.Location,
-                                           typeResolver
-                                       ),
-                    FreezableStepProperty.Step memberStep => TrySetStep(propertyInfo, step, memberStep.FreezableStep, typeResolver),
-                    FreezableStepProperty.StepList sList => TrySetStepList(propertyInfo, step, sList.List, typeResolver),
-                    _ => throw new ArgumentException("Step member wrong type"),
-                };
 
-                if (result.IsFailure)
+            var result = stepMember switch
+            {
+                FreezableStepProperty.Variable vn => TrySetVariableName(
+                    propertyInfo,
+                    step,
+                    vn.VName,
+                    stepMember.Location,
+                    typeResolver
+                ),
+                FreezableStepProperty.Step memberStep => TrySetStep(
+                    propertyInfo,
+                    step,
+                    memberStep.FreezableStep,
+                    typeResolver
+                ),
+                FreezableStepProperty.StepList sList => TrySetStepList(
+                    propertyInfo,
+                    step,
+                    sList.List,
+                    typeResolver
+                ),
+                _ => throw new ArgumentException("Step member wrong type"),
+            };
+
+            if (result.IsFailure)
                 errors.Add(result.Error);
-            }
+        }
 
-            if (scopedFunctions.Any())
+        if (scopedFunctions.Any())
         {
             foreach (var (freezableStep, propertyInfo) in scopedFunctions)
             {
@@ -239,9 +250,9 @@ public abstract class StepFactory : IStepFactory
             return Result.Failure<IStep, IError>(ErrorList.Combine(errors));
 
         return Result.Success<IStep, IError>(step);
-        }
+    }
 
-        private static Result<Unit, IError> TrySetVariableName(
+    private static Result<Unit, IError> TrySetVariableName(
         PropertyInfo propertyInfo,
         ICompoundStep parentStep,
         VariableName variableName,
@@ -543,11 +554,14 @@ public abstract class StepFactory : IStepFactory
     private static string GetLastTerm(string s) =>
         s.Split('.', StringSplitOptions.RemoveEmptyEntries).Last();
 
-    private Lazy<IReadOnlySet<StepParameterReference>> ScopedFunctionParameterReferences { get; }
+    private Lazy<IReadOnlySet<StepParameterReference>> ScopedFunctionParameterReferences
+    {
+        get;
+    }
 
     /// <inheritdoc />
     public bool IsScopedFunction(StepParameterReference stepParameterReference) =>
         ScopedFunctionParameterReferences.Value.Contains(stepParameterReference);
-    }
+}
 
 }

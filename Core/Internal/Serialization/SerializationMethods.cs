@@ -96,6 +96,7 @@ public static class SerializationMethods
                 StringStream ss => await ss.GetStringAsync(),
                 DateTime dt     => dt.ToString(Constants.DateTimeFormat),
                 double d        => d.ToString(Constants.DoubleFormat, new NumberFormatInfo()),
+                IArray array    => array.NameInLogs,
                 _               => obj?.ToString()!
             };
     }

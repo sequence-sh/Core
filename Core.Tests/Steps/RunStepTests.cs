@@ -82,7 +82,7 @@ public partial class RunStepTests : StepTestBase<RunStep<Unit>, Unit>
             {
                 { true, false },
                 { new StringStream("Hello World"), false },
-                { new Array<int>(new List<int> { 1, 2, 3 }), false },
+                { new List<int> { 1, 2, 3 }.ToSCLArray(), false },
                 { Entity.Create(("a", 1)), false }
             };
 
