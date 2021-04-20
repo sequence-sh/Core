@@ -32,14 +32,14 @@ public abstract partial class StepTestBase<TStep, TOutput>
             TStep step,
             TOutput expectedOutput,
             params string[] expectedLoggedValues)
-            : this(name, step, new ExpectedOutput(expectedOutput), expectedLoggedValues) { }
+            : this(name, step, new ExpectedValueOutput(expectedOutput), expectedLoggedValues) { }
 
         public StepCase(
             string name,
             IStep<Unit> step,
-            Unit unit,
+            Unit _,
             params string[] expectedLoggedValues)
-            : this(name, step, new ExpectedOutput(unit), expectedLoggedValues) { }
+            : this(name, step, ExpectedUnitOutput.Instance, expectedLoggedValues) { }
 
         protected StepCase(
             string name,
