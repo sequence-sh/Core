@@ -160,7 +160,7 @@ public abstract class StepFactory : IStepFactory
                 pairs.Add((stepMember, propertyInfo));
             else
                 errors.Add(
-                    ErrorHelper.UnexpectedParameterError(key.Name, TypeName)
+                    ErrorCode.UnexpectedParameter.ToErrorBuilder(key.Name, TypeName)
                         .WithLocation(new ErrorLocation(TypeName, freezeData.Location))
                 );
         }
@@ -233,7 +233,7 @@ public abstract class StepFactory : IStepFactory
         }
 
         foreach (var property in remainingRequired)
-            errors.Add(ErrorHelper.MissingParameterError(property).WithLocation(step));
+            errors.Add(ErrorCode.MissingParameter.ToErrorBuilder(property).WithLocation(step));
 
         if (errors.Any())
             return Result.Failure<IStep, IError>(ErrorList.Combine(errors));
@@ -342,20 +342,20 @@ public abstract class StepFactory : IStepFactory
                 return SetArray(argument);
 
             return Result.Failure<Unit, IError>(
-                ErrorHelper.WrongParameterTypeError(
+                ErrorCode.WrongParameterType.ToErrorBuilder(
                         propertyInfo.Name,
-                        MemberType.StepList,
-                        MemberType.Step
+                        argument.Name,
+                        "Array/Sequence"
                     )
                     .WithLocation(parentStep)
             );
         }
 
         return Result.Failure<Unit, IError>(
-            ErrorHelper.WrongParameterTypeError(
+            ErrorCode.WrongParameterType.ToErrorBuilder(
                     propertyInfo.Name,
-                    MemberType.StepList,
-                    MemberType.VariableName
+                    MemberType.VariableName,
+                    MemberType.StepList
                 )
                 .WithLocation(parentStep)
         );

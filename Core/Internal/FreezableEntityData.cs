@@ -22,7 +22,7 @@ public record FreezableEntityData(
     public Result<VariableName, IError> GetVariableName(EntityPropertyKey name, string typeName) =>
         EntityProperties.TryFindOrFail(
                 name,
-                () => ErrorHelper.MissingParameterError(name.AsString)
+                () => ErrorCode.MissingParameter.ToErrorBuilder(name.AsString)
                     .WithLocation(new ErrorLocation(typeName, Location))
             )
             .Bind(x => x.AsVariableName(name.AsString));
@@ -34,7 +34,7 @@ public record FreezableEntityData(
         EntityProperties
             .TryFindOrFail(
                 name,
-                () => ErrorHelper.MissingParameterError(name.AsString)
+                () => ErrorCode.MissingParameter.ToErrorBuilder(name.AsString)
                     .WithLocation(new ErrorLocation(typeName, Location))
             )
             .Map(x => x.ConvertToStep());
@@ -45,7 +45,7 @@ public record FreezableEntityData(
     public Result<IReadOnlyList<IFreezableStep>, IError>
         GetStepList(EntityPropertyKey name, string typeName) => EntityProperties.TryFindOrFail(
             name,
-            () => ErrorHelper.MissingParameterError(name.AsString)
+            () => ErrorCode.MissingParameter.ToErrorBuilder(name.AsString)
                 .WithLocation(new ErrorLocation(typeName, Location))
         )
         .Bind(x => x.AsStepList(name.AsString));

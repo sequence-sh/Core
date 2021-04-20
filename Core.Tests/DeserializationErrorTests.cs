@@ -25,6 +25,12 @@ public partial class DeserializationErrorTests
             );
 
             yield return new DeserializationErrorCase(
+                "- FileWrite (ToJson [<schema>]) 'ArtistSchema.json'",
+                ("Parameter 'Entity' expects type Entity, but was a Array/Sequence",
+                 "ToJson - Line: 1, Col: 13, Idx: 13 - Line: 1, Col: 29, Idx: 29 Text: ToJson [<schema>]")
+            );
+
+            yield return new DeserializationErrorCase(
                 "Print Value: 'Hello' Value: 'World'",
                 ("Duplicate Parameter: Value.",
                  "Line: 1, Col: 0, Idx: 0 - Line: 1, Col: 34, Idx: 34 Text: Print Value: 'Hello' Value: 'World'")

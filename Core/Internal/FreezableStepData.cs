@@ -50,7 +50,7 @@ public sealed class FreezableStepData : IEquatable<FreezableStepData>
                 return extractValue(value);
 
         return Result.Failure<T, IError>(
-            ErrorHelper.MissingParameterError(propertyName)
+            ErrorCode.MissingParameter.ToErrorBuilder(propertyName)
                 .WithLocation(new ErrorLocation(stepType.Name, Location))
         );
     }

@@ -61,13 +61,17 @@ public sealed class FreezableStepProperty :
     /// <summary>
     /// Gets the stepMember if it is a Variable.
     /// </summary>
-    public Result<VariableName, IError> AsVariableName(string propertyName)
+    public Result<VariableName, IError> AsVariableName(string parameterName)
     {
         if (TryPickT0(out var vn, out _))
             return Result.Success<VariableName, IError>(vn);
 
         return Result.Failure<VariableName, IError>(
-            ErrorHelper.WrongParameterTypeError(propertyName, MemberType, MemberType.VariableName)
+            ErrorCode.WrongParameterType.ToErrorBuilder(
+                    parameterName,
+                    MemberType.VariableName,
+                    MemberType
+                )
                 .WithLocation(Location ?? ErrorLocation.EmptyLocation)
         );
     }
@@ -75,13 +79,13 @@ public sealed class FreezableStepProperty :
     /// <summary>
     /// Gets the stepMember if it is a list of freezable steps.
     /// </summary>
-    public Result<IReadOnlyList<IFreezableStep>, IError> AsStepList(string propertyName)
+    public Result<IReadOnlyList<IFreezableStep>, IError> AsStepList(string parameterName)
     {
         if (TryPickT2(out var l, out _))
             return Result.Success<IReadOnlyList<IFreezableStep>, IError>(l);
 
         return Result.Failure<IReadOnlyList<IFreezableStep>, IError>(
-            ErrorHelper.WrongParameterTypeError(propertyName, MemberType, MemberType.StepList)
+            ErrorCode.WrongParameterType.ToErrorBuilder(parameterName, "Array/Sequence", MemberType)
                 .WithLocation(Location ?? ErrorLocation.EmptyLocation)
         );
     }
