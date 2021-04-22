@@ -232,47 +232,47 @@ public partial class LoggingTests
                         x.Setup(f => f.GetCurrentDirectory()).Returns("MyDir")
                 );
 
-            yield return new LoggingTestCase(
-                "File Read",
-                "FileRead 'MyFile' | Log",
-                CheckMessageAndScope(LogLevel.Debug, "EDR Sequence Started", null),
-                CheckMessageAndScope(
-                    LogLevel.Trace,
-                    "Log Started with Parameters: [Value, FileRead]",
-                    new[] { "Log" }
-                ),
-                CheckMessageAndScope(
-                    LogLevel.Trace,
-                    "FileRead Started with Parameters: [Path, \"MyFile\"], [Encoding, UTF8], [Decompress, False]",
-                    new[] { "Log", "FileRead" }
-                ),
-                CheckMessageAndScope(
-                    LogLevel.Trace,
-                    "FileRead Completed Successfully with Result: UTF8-Stream",
-                    new[] { "Log", "FileRead" }
-                ),
-                CheckMessageAndScope(LogLevel.Information, "MyData", new[] { "Log" }),
-                CheckMessageAndScope(
-                    LogLevel.Trace,
-                    "Log Completed Successfully with Result: Unit",
-                    new[] { "Log" }
-                ),
-                CheckMessageAndScope(LogLevel.Debug, "EDR Sequence Completed", null)
-            ).WithFileAction(
-                x => x.Setup(a => a.OpenRead("MyFile"))
-                    .Returns(
-                        () =>
-                        {
-                            var s  = new MemoryStream();
-                            var sw = new StreamWriter(s);
-                            sw.Write("MyData");
-                            s.Seek(0, SeekOrigin.Begin);
-                            sw.Flush();
+            //yield return new LoggingTestCase(
+            //    "File Read",
+            //    "FileRead 'MyFile' | Log",
+            //    CheckMessageAndScope(LogLevel.Debug, "EDR Sequence Started", null),
+            //    CheckMessageAndScope(
+            //        LogLevel.Trace,
+            //        "Log Started with Parameters: [Value, FileRead]",
+            //        new[] { "Log" }
+            //    ),
+            //    CheckMessageAndScope(
+            //        LogLevel.Trace,
+            //        "FileRead Started with Parameters: [Path, \"MyFile\"], [Encoding, UTF8], [Decompress, False]",
+            //        new[] { "Log", "FileRead" }
+            //    ),
+            //    CheckMessageAndScope(
+            //        LogLevel.Trace,
+            //        "FileRead Completed Successfully with Result: UTF8-Stream",
+            //        new[] { "Log", "FileRead" }
+            //    ),
+            //    CheckMessageAndScope(LogLevel.Information, "MyData", new[] { "Log" }),
+            //    CheckMessageAndScope(
+            //        LogLevel.Trace,
+            //        "Log Completed Successfully with Result: Unit",
+            //        new[] { "Log" }
+            //    ),
+            //    CheckMessageAndScope(LogLevel.Debug, "EDR Sequence Completed", null)
+            //).WithFileAction(
+            //    x => x.Setup(a => a.OpenRead("MyFile"))
+            //        .Returns(
+            //            () =>
+            //            {
+            //                var s  = new MemoryStream();
+            //                var sw = new StreamWriter(s);
+            //                sw.Write("MyData");
+            //                s.Seek(0, SeekOrigin.Begin);
+            //                sw.Flush();
 
-                            return new FakeFileStreamAdapter(s);
-                        }
-                    )
-            );
+            //                return new FakeFileStreamAdapter(s);
+            //            }
+            //        )
+            //);
         }
     }
 
