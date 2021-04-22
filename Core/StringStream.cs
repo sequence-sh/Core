@@ -3,12 +3,9 @@ using System.IO;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Reductech.EDR.Core.Abstractions;
 using Reductech.EDR.Core.Enums;
 using Reductech.EDR.Core.Internal.Serialization;
 using Reductech.EDR.Core.Util;
-using Thinktecture.IO;
-using Thinktecture.IO.Adapters;
 
 namespace Reductech.EDR.Core
 {
@@ -23,14 +20,8 @@ public sealed class StringStream : IEquatable<StringStream>, IComparable<StringS
     /// <summary>
     /// Create a new DataStream
     /// </summary>
-    public StringStream(IStream stream, EncodingEnum encoding) =>
-        Value = new StringStreamData.StreamData(stream, encoding);
-
-    /// <summary>
-    /// Create a new DataStream
-    /// </summary>
     public StringStream(Stream stream, EncodingEnum encoding) =>
-        Value = new StringStreamData.StreamData(new StreamAdapter(stream), encoding);
+        Value = new StringStreamData.StreamData(stream, encoding);
 
     /// <summary>
     /// Create a new DataStream from a string
@@ -77,19 +68,19 @@ public sealed class StringStream : IEquatable<StringStream>, IComparable<StringS
             }
 
             /// <inheritdoc />
-            public override (IStream stream, EncodingEnum encodingEnum) GetStream()
+            public override (Stream stream, EncodingEnum encodingEnum) GetStream()
             {
                 byte[]       byteArray = Encoding.UTF8.GetBytes(Underlying);
                 MemoryStream stream    = new(byteArray);
 
-                return (new StreamAdapter(stream), EncodingEnum.UTF8);
+                return (stream, EncodingEnum.UTF8);
             }
 
             /// <inheritdoc />
             public override void Dispose() { }
         }
 
-        public record StreamData(IStream Stream, EncodingEnum Encoding) : StringStreamData
+        public record StreamData(Stream Stream, EncodingEnum Encoding) : StringStreamData
         {
             /// <inheritdoc />
             public override async ValueTask<string> GetStringAsync()
@@ -99,10 +90,7 @@ public sealed class StringStream : IEquatable<StringStream>, IComparable<StringS
                 if (stream.CanSeek)
                     stream.Position = 0;
 
-                if (stream is FakeFileStreamAdapter fake) //This is a hack
-                    stream = new StreamAdapter(fake.Stream);
-
-                using IStreamReader reader = new StreamReaderAdapter(
+                using StreamReader reader = new(
                     stream,
                     Encoding.Convert(),
                     true,
@@ -120,7 +108,7 @@ public sealed class StringStream : IEquatable<StringStream>, IComparable<StringS
             {
                 Stream.Position = 0;
 
-                using var reader = new StreamReaderAdapter(
+                using var reader = new StreamReader(
                     Stream,
                     Encoding.Convert(),
                     true,
@@ -148,13 +136,13 @@ public sealed class StringStream : IEquatable<StringStream>, IComparable<StringS
             }
 
             /// <inheritdoc />
-            public override (IStream stream, EncodingEnum encodingEnum) GetStream()
+            public override (Stream stream, EncodingEnum encodingEnum) GetStream()
             {
                 return (Stream, Encoding);
             }
         }
 
-        public abstract (IStream stream, EncodingEnum encodingEnum) GetStream();
+        public abstract (Stream stream, EncodingEnum encodingEnum) GetStream();
         public abstract ValueTask<string> GetStringAsync();
         public abstract string GetString();
 
@@ -237,7 +225,7 @@ public sealed class StringStream : IEquatable<StringStream>, IComparable<StringS
     /// You should dispose of this stream after using it.
     /// </summary>
     /// <returns></returns>
-    public (IStream stream, EncodingEnum encodingEnum) GetStream()
+    public (Stream stream, EncodingEnum encodingEnum) GetStream()
     {
         _semaphore.Wait();
 

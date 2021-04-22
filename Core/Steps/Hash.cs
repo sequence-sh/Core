@@ -8,7 +8,6 @@ using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
-using Thinktecture;
 
 namespace Reductech.EDR.Core.Steps
 {
@@ -36,7 +35,7 @@ public class Hash : CompoundStep<StringStream>
         var hashAlgorithm = Create(algorithm.Value);
 
         var hash = await hashAlgorithm.ComputeHashAsync(
-            data.Value.GetStream().stream.ToImplementation()!,
+            data.Value.GetStream().stream,
             cancellationToken
         );
 

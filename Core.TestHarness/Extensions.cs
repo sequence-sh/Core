@@ -7,8 +7,6 @@ using Reductech.EDR.Core.Abstractions;
 using Reductech.EDR.Core.ExternalProcesses;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
-using Thinktecture;
-using Thinktecture.IO;
 using Xunit;
 using Xunit.Sdk;
 
@@ -47,21 +45,6 @@ public static class Extensions
         new Action<Mock<IExternalProcessRunner>, MockRepository>((a, _) => action(a))
     );
 
-    public static T WithFileAction<T>(this T cws, Action<Mock<IFile>, MockRepository> action)
-        where T : ICaseWithSetup => WithAction(cws, action);
-
-    public static T WithFileAction<T>(this T cws, Action<Mock<IFile>> action)
-        where T : ICaseWithSetup => WithAction(
-        cws,
-        new Action<Mock<IFile>, MockRepository>((a, _) => action(a))
-    );
-
-    public static T WithDirectoryAction<T>(this T cws, Action<Mock<IDirectory>> action)
-        where T : ICaseWithSetup => WithAction(
-        cws,
-        new Action<Mock<IDirectory>, MockRepository>((a, _) => action(a))
-    );
-
     public static T WithConsoleAction<T>(this T cws, Action<Mock<IConsole>> action)
         where T : ICaseWithSetup => WithAction(
         cws,
@@ -70,12 +53,6 @@ public static class Extensions
 
     public static T WithConsoleAction<T>(this T cws, Action<Mock<IConsole>, MockRepository> action)
         where T : ICaseWithSetup => WithAction(cws, action);
-
-    public static T WithCompressionAction<T>(this T cws, Action<Mock<ICompression>> action)
-        where T : ICaseWithSetup => WithAction(
-        cws,
-        new Action<Mock<ICompression>, MockRepository>((a, _) => action(a))
-    );
 
     private static T WithAction<T, TObject>(
         this T cws,

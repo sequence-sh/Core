@@ -17,7 +17,7 @@ public partial class ExternalContextTests
     {
         var objectToInject = new List<string>() { "Hello World" };
 
-        var context = new ExternalContext(null!, null!, null!, ("list", objectToInject));
+        var context = new ExternalContext(null!, null!, ("list", objectToInject));
 
         var retrievedObject = context.TryGetContext<List<string>>("list");
 
@@ -29,7 +29,7 @@ public partial class ExternalContextTests
     [Fact]
     public void AttemptToRetrieveMissingObjectShouldReturnError()
     {
-        var context = new ExternalContext(null!, null!, null!);
+        var context = new ExternalContext(null!, null!);
 
         var retrievedObject = context.TryGetContext<string>("list");
 
