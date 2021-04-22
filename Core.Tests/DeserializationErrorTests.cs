@@ -25,9 +25,9 @@ public partial class DeserializationErrorTests
             );
 
             yield return new DeserializationErrorCase(
-                "- FileWrite (ToJson [<schema>]) 'ArtistSchema.json'",
+                "- EntityGetValue [1,2] 'a'",
                 ("Parameter 'Entity' expects type Entity, but was a Array/Sequence",
-                 "ToJson - Line: 1, Col: 13, Idx: 13 - Line: 1, Col: 29, Idx: 29 Text: ToJson [<schema>]")
+                 "EntityGetValue - Line: 1, Col: 2, Idx: 2 - Line: 1, Col: 25, Idx: 25 Text: EntityGetValue [1,2] 'a'")
             );
 
             yield return new DeserializationErrorCase(

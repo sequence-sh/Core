@@ -61,14 +61,11 @@
     <PackageReference Include="Antlr4.Runtime.Standard" Version="4.9.1" />
     <PackageReference Include="Antlr4BuildTasks" Version="8.10.0" />
     <PackageReference Include="CSharpFunctionalExtensions" Version="2.15.1" />
-    <PackageReference Include="CsvHelper" Version="19.0.0" />
-    <PackageReference Include="JetBrains.Annotations" Version="2020.3.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="5.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="5.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="5.0.0" />
     <PackageReference Include="Namotion.Reflection" Version="1.0.18" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-    <PackageReference Include="System.Configuration.ConfigurationManager" Version="5.0.0" />
     <PackageReference Include="System.Linq.Async" Version="5.0.0" />
     <PackageReference Include="Thinktecture.Console.Abstractions" Version="2.5.0" />
     <PackageReference Include="Thinktecture.IO.FileSystem.Abstractions" Version="2.5.0" />

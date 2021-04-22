@@ -17,16 +17,13 @@ public class FakeFileStreamAdapter : StreamAdapter, IFileStream
     /// <summary>
     /// The underlying stream
     /// </summary>
-    [NotNull]
     public Stream Stream { get; }
 
     /// <inheritdoc />
-    public FakeFileStreamAdapter([NotNull] Stream stream) : base(stream) => Stream = stream;
+    public FakeFileStreamAdapter(Stream stream) : base(stream) => Stream = stream;
 
     /// <inheritdoc />
-    public FakeFileStreamAdapter([NotNull] string s) : this(
-        new MemoryStream(Encoding.ASCII.GetBytes(s))
-    ) { }
+    public FakeFileStreamAdapter(string s) : this(new MemoryStream(Encoding.ASCII.GetBytes(s))) { }
 
     /// <inheritdoc />
     public new FileStream UnsafeConvert()
