@@ -4,7 +4,6 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
-using JetBrains.Annotations;
 using Microsoft.Extensions.Logging;
 using Reductech.EDR.Core.Abstractions;
 using Reductech.EDR.Core.Internal.Errors;
@@ -48,7 +47,6 @@ public sealed class SCLRunner
     /// <param name="sequenceMetadata">Additional information about the sequence</param>
     /// <param name="cancellationToken">Cancellation ErrorLocation</param>
     /// <returns></returns>
-    [UsedImplicitly]
     public async Task<Result<Unit, IError>> RunSequenceFromTextAsync(
         string text,
         Dictionary<string, object> sequenceMetadata,
@@ -66,7 +64,6 @@ public sealed class SCLRunner
     /// <param name="sequenceMetadata">Additional metadata about the sequence</param>
     /// <param name="cancellationToken">The cancellation token</param>
     /// <returns></returns>
-    [UsedImplicitly]
     public async Task<Result<Unit, IError>> RunSequenceFromPathAsync(
         string path,
         Dictionary<string, object> sequenceMetadata,

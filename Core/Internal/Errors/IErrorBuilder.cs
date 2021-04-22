@@ -12,7 +12,6 @@ public interface IErrorBuilder
     /// <summary>
     /// Converts this errorBuilder to an error
     /// </summary>
-    [Pure]
     public IError WithLocation(ErrorLocation location);
 
     /// <summary>
