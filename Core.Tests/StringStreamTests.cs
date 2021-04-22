@@ -3,7 +3,6 @@ using System.IO;
 using System.Text;
 using FluentAssertions;
 using Reductech.EDR.Core.Enums;
-using Thinktecture.IO.Adapters;
 using Xunit;
 using Xunit.Sdk;
 
@@ -51,7 +50,7 @@ public class StringStreamTests
 
         var (stream, encodingEnum) = ss.GetStream();
 
-        var sr = new StreamReaderAdapter(stream, encodingEnum.Convert());
+        var sr = new StreamReader(stream, encodingEnum.Convert());
 
         sr.ReadToEnd().Should().Be(StringToTest);
     }
@@ -65,7 +64,7 @@ public class StringStreamTests
 
         var (stream, encodingEnum) = ss.GetStream();
 
-        var sr = new StreamReaderAdapter(stream, encodingEnum.Convert());
+        var sr = new StreamReader(stream, encodingEnum.Convert());
 
         sr.ReadToEnd().Should().Be(StringToTest);
     }

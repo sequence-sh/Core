@@ -66,9 +66,8 @@
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="5.0.0" />
     <PackageReference Include="Namotion.Reflection" Version="1.0.18" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    <PackageReference Include="System.IO.Abstractions" Version="13.2.29" />
     <PackageReference Include="System.Linq.Async" Version="5.0.0" />
-    <PackageReference Include="Thinktecture.Console.Abstractions" Version="2.5.0" />
-    <PackageReference Include="Thinktecture.IO.FileSystem.Abstractions" Version="2.5.0" />
   </ItemGroup>
 
   <ItemGroup>

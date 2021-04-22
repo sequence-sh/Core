@@ -7,8 +7,6 @@ using Moq;
 using Reductech.EDR.Core.Abstractions;
 using Reductech.EDR.Core.ExternalProcesses;
 using Reductech.EDR.Core.Internal;
-using Thinktecture;
-using Thinktecture.IO;
 
 namespace Reductech.EDR.Core.TestHarness
 {
@@ -70,9 +68,6 @@ public sealed class ExternalContextSetupHelper
     {
         var externalProcessRunner = GetAndSetupMock<IExternalProcessRunner>(mockRepository);
         var console               = GetAndSetupMock<IConsole>(mockRepository);
-        var file                  = GetAndSetupMock<IFile>(mockRepository);
-        var directory             = GetAndSetupMock<IDirectory>(mockRepository);
-        var compression           = GetAndSetupMock<ICompression>(mockRepository);
 
         var objects = new List<(string, object)>();
 
@@ -85,7 +80,6 @@ public sealed class ExternalContextSetupHelper
         }
 
         var externalContext = new ExternalContext(
-            new FileSystemAdapter(directory, file, compression),
             externalProcessRunner,
             console,
             objects.ToArray()

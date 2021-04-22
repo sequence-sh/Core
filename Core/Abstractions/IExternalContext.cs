@@ -1,7 +1,6 @@
 ﻿using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.ExternalProcesses;
 using Reductech.EDR.Core.Internal.Errors;
-using Thinktecture;
 
 namespace Reductech.EDR.Core.Abstractions
 {
@@ -12,11 +11,6 @@ namespace Reductech.EDR.Core.Abstractions
 /// </summary>
 public interface IExternalContext
 {
-    /// <summary>
-    /// For interacting with the file system
-    /// </summary>
-    public IFileSystem FileSystemHelper { get; }
-
     /// <summary>
     /// For interacting with external processes
     /// </summary>

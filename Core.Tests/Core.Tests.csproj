@@ -55,7 +55,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Core.TestHarness\Core.TestHarness.csproj" />
-    <ProjectReference Include="..\Core\Core.csproj" />
   </ItemGroup>
 
 </Project>

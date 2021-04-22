@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -13,7 +12,6 @@ using Reductech.EDR.Core.Internal.Serialization;
 using Reductech.EDR.Core.TestHarness;
 using Xunit.Abstractions;
 using AutoTheory;
-using Reductech.EDR.Core.Abstractions;
 
 namespace Reductech.EDR.Core.Tests
 {
@@ -128,150 +126,6 @@ public partial class LoggingTests
                     new[] { "AssertError" }
                 ),
                 CheckMessageAndScope(LogLevel.Debug, "EDR Sequence Completed", null)
-            );
-
-            yield return new
-                LoggingTestCase(
-                    "No Path to combine",
-                    "Log (PathCombine [])",
-                    CheckMessageAndScope(LogLevel.Debug, "EDR Sequence Started", null),
-                    CheckMessageAndScope(
-                        LogLevel.Trace,
-                        "Log Started with Parameters: [Value, PathCombine]",
-                        new[] { "Log" }
-                    ),
-                    CheckMessageAndScope(
-                        LogLevel.Trace,
-                        "PathCombine Started with Parameters: [Paths, ArrayNew]",
-                        new[] { "Log", "PathCombine" }
-                    ),
-                    CheckMessageAndScope(
-                        LogLevel.Trace,
-                        "ArrayNew Started with Parameters: [Elements, 0 Elements]",
-                        new[] { "Log", "PathCombine", "ArrayNew" }
-                    ),
-                    CheckMessageAndScope(
-                        LogLevel.Trace,
-                        "ArrayNew Completed Successfully with Result: 0 Elements",
-                        new[] { "Log", "PathCombine", "ArrayNew" }
-                    ),
-                    CheckMessageAndScope(
-                        LogLevel.Warning,
-                        "No path was provided. Returning the Current Directory: MyDir",
-                        new[] { "Log", "PathCombine" }
-                    ),
-                    CheckMessageAndScope(
-                        LogLevel.Trace,
-                        "PathCombine Completed Successfully with Result: string Length: 5",
-                        new[] { "Log", "PathCombine" }
-                    ),
-                    CheckMessageAndScope(
-                        LogLevel.Information,
-                        @"MyDir",
-                        new[] { "Log" }
-                    ),
-                    CheckMessageAndScope(
-                        LogLevel.Trace,
-                        "Log Completed Successfully with Result: Unit",
-                        new[] { "Log" }
-                    ),
-                    CheckMessageAndScope(LogLevel.Debug, "EDR Sequence Completed", null)
-                ).WithDirectoryAction(
-                x =>
-                    x.Setup(f => f.GetCurrentDirectory()).Returns("MyDir")
-            );
-
-            yield return new LoggingTestCase(
-                    "Unqualified Path to combine",
-                    "Log (PathCombine ['File'])",
-                    CheckMessageAndScope(LogLevel.Debug, "EDR Sequence Started", null),
-                    CheckMessageAndScope(
-                        LogLevel.Trace,
-                        "Log Started with Parameters: [Value, PathCombine]",
-                        new[] { "Log" }
-                    ),
-                    CheckMessageAndScope(
-                        LogLevel.Trace,
-                        "PathCombine Started with Parameters: [Paths, ArrayNew]",
-                        new[] { "Log", "PathCombine" }
-                    ),
-                    CheckMessageAndScope(
-                        LogLevel.Trace,
-                        "ArrayNew Started with Parameters: [Elements, 1 Elements]",
-                        new[] { "Log", "PathCombine", "ArrayNew" }
-                    ),
-                    CheckMessageAndScope(
-                        LogLevel.Trace,
-                        "ArrayNew Completed Successfully with Result: 1 Elements",
-                        new[] { "Log", "PathCombine", "ArrayNew" }
-                    ),
-                    CheckMessageAndScope(
-                        LogLevel.Debug,
-                        "Path MyDir was not fully qualified. Prepending the Current Directory: MyDir",
-                        new[] { "Log", "PathCombine" }
-                    ),
-                    CheckMessageAndScope(
-                        LogLevel.Trace,
-                        "PathCombine Completed Successfully with Result: string Length: 10",
-                        new[] { "Log", "PathCombine", }
-                    ),
-                    x =>
-                    {
-                        x.LogLevel.Should().Be(LogLevel.Information);
-                        x.Message.Should().BeOneOf(@"MyDir\File", @"MyDir/File");
-                    },
-                    CheckMessageAndScope(
-                        LogLevel.Trace,
-                        "Log Completed Successfully with Result: Unit",
-                        new[] { "Log" }
-                    ),
-                    CheckMessageAndScope(LogLevel.Debug, "EDR Sequence Completed", null)
-                )
-                .WithDirectoryAction(
-                    x =>
-                        x.Setup(f => f.GetCurrentDirectory()).Returns("MyDir")
-                );
-
-            yield return new LoggingTestCase(
-                "File Read",
-                "FileRead 'MyFile' | Log",
-                CheckMessageAndScope(LogLevel.Debug, "EDR Sequence Started", null),
-                CheckMessageAndScope(
-                    LogLevel.Trace,
-                    "Log Started with Parameters: [Value, FileRead]",
-                    new[] { "Log" }
-                ),
-                CheckMessageAndScope(
-                    LogLevel.Trace,
-                    "FileRead Started with Parameters: [Path, \"MyFile\"], [Encoding, UTF8], [Decompress, False]",
-                    new[] { "Log", "FileRead" }
-                ),
-                CheckMessageAndScope(
-                    LogLevel.Trace,
-                    "FileRead Completed Successfully with Result: UTF8-Stream",
-                    new[] { "Log", "FileRead" }
-                ),
-                CheckMessageAndScope(LogLevel.Information, "MyData", new[] { "Log" }),
-                CheckMessageAndScope(
-                    LogLevel.Trace,
-                    "Log Completed Successfully with Result: Unit",
-                    new[] { "Log" }
-                ),
-                CheckMessageAndScope(LogLevel.Debug, "EDR Sequence Completed", null)
-            ).WithFileAction(
-                x => x.Setup(a => a.OpenRead("MyFile"))
-                    .Returns(
-                        () =>
-                        {
-                            var s  = new MemoryStream();
-                            var sw = new StreamWriter(s);
-                            sw.Write("MyData");
-                            s.Seek(0, SeekOrigin.Begin);
-                            sw.Flush();
-
-                            return new FakeFileStreamAdapter(s);
-                        }
-                    )
             );
         }
     }
