@@ -67,6 +67,12 @@ public record ErrorLocation(string? StepName, TextLocation? TextLocation)
 
         return $"{StepName} - {TextLocation}";
     }
+
+    /// <inheritdoc />
+    public override string ToString()
+    {
+        return AsString();
+    }
 }
 
 }

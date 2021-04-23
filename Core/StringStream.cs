@@ -154,7 +154,7 @@ public sealed class StringStream : IEquatable<StringStream>, IComparable<StringS
     }
 
     /// <inheritdoc />
-    public override string ToString() => Value.ToString();
+    public override string ToString() => GetString();
 
     private readonly SemaphoreSlim _semaphore = new(1);
 

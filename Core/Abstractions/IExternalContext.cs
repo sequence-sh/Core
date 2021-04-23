@@ -26,6 +26,11 @@ public interface IExternalContext
     /// Allows for type injection.
     /// </summary>
     public Result<T, IErrorBuilder> TryGetContext<T>(string name) where T : class;
+
+    /// <summary>
+    /// /// Injected contexts
+    /// </summary>
+    public (string name, object context)[] InjectedContexts { get; }
 }
 
 }
