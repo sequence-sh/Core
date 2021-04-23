@@ -61,6 +61,7 @@ public abstract partial class StepTestBase<TStep, TOutput>
         public override void CheckOutputResult(Result<TOutput, IError> result)
         {
             var result2 = result.Bind(GetValue);
+            result2.ShouldBeFailure();
 
             result2.Error.Should().Be(ExpectedError);
         }

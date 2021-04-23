@@ -10,6 +10,7 @@ using MELT;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Namotion.Reflection;
+using Reductech.EDR.Core.Abstractions;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Util;
@@ -82,6 +83,11 @@ public abstract partial class StepTestBase<TStep, TOutput>
                     );
 
             mockRepository.VerifyAll();
+
+            foreach (var finalContextCheck in FinalContextChecks)
+            {
+                finalContextCheck(stateMonad.ExternalContext);
+            }
         }
 
         /// <inheritdoc />
@@ -94,7 +100,8 @@ public abstract partial class StepTestBase<TStep, TOutput>
         public abstract void CheckUnitResult(Result<Unit, IError> result);
         public abstract void CheckOutputResult(Result<TOutput, IError> result);
 
-        public virtual void CheckLoggedValues(ITestLoggerFactory loggerFactory)
+        public virtual void
+            CheckLoggedValues(ITestLoggerFactory loggerFactory) //Only check information or above???
         {
             if (!IgnoreLoggedValues)
             {
@@ -150,6 +157,8 @@ public abstract partial class StepTestBase<TStep, TOutput>
 
         public IReadOnlyCollection<string> ExpectedLoggedValues { get; set; } =
             ExpectedLoggedValues;
+
+        public List<Action<IExternalContext>> FinalContextChecks { get; } = new();
     }
 }
 
