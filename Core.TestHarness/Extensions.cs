@@ -38,6 +38,13 @@ public static class Extensions
         return cws;
     }
 
+    public static T WithFinalContextCheck<T>(this T cws, Action<IExternalContext> contextCheck)
+        where T : ICaseThatExecutes
+    {
+        cws.FinalContextChecks.Add(contextCheck);
+        return cws;
+    }
+
     public static T WithExternalProcessAction<T>(
         this T cws,
         Action<Mock<IExternalProcessRunner>> action) where T : ICaseWithSetup => WithAction(
