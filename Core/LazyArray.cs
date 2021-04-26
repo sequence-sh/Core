@@ -59,6 +59,21 @@ public sealed record LazyArray<T>
     }
 
     /// <inheritdoc />
+    public override async Task<Result<EagerArray<T>, IError>> Evaluate(
+        CancellationToken cancellation)
+    {
+        try
+        {
+            var list = await AsyncEnumerable.ToListAsync(cancellation);
+            return new EagerArray<T>(list);
+        }
+        catch (ErrorException e)
+        {
+            return Result.Failure<EagerArray<T>, IError>(e.Error);
+        }
+    }
+
+    /// <inheritdoc />
     public override async Task<Result<Unit, IError>> ForEach(
         Func<T, CancellationToken, ValueTask<Result<Unit, IError>>> func,
         CancellationToken cancellation)

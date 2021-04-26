@@ -43,6 +43,11 @@ public abstract record Array<T> : IArray
     public abstract Array<T> Sort(bool descending);
 
     /// <summary>
+    /// Evaluate the array - reading the results to memory
+    /// </summary>
+    public abstract Task<Result<EagerArray<T>, IError>> Evaluate(CancellationToken cancellation);
+
+    /// <summary>
     /// Change the ordering of the Array
     /// </summary>
     public Array<T> Sort<TKey>(
