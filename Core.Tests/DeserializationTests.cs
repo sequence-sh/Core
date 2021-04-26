@@ -79,6 +79,9 @@ public partial class DeserializationTests
                 "Hello World"
             );
 
+            yield return new DeserializationTestInstance(@"(a:'x')['a'] | Log", "x");
+            yield return new DeserializationTestInstance(@"(a:'')['a'] | Log",  "");
+
             yield return new DeserializationTestInstance(
                 @"Log 'Mark''s string'",
                 "Mark's string"

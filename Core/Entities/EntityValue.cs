@@ -46,7 +46,7 @@ public abstract record EntityValue(object? ObjectValue)
         }
 
         /// <inheritdoc />
-        public override string? GetPrimitiveString() => null;
+        public override string GetPrimitiveString() => "";
 
         /// <inheritdoc />
         public override string Serialize()
@@ -318,7 +318,7 @@ public abstract record EntityValue(object? ObjectValue)
     public record EnumerationValue(Enumeration Value) : EntityValue(Value)
     {
         /// <inheritdoc />
-        public override string GetPrimitiveString() => Value.Value;
+        public override string GetPrimitiveString() => Value.ToString();
 
         /// <inheritdoc />
         public override string Serialize() => Value.ToString();
@@ -380,7 +380,8 @@ public abstract record EntityValue(object? ObjectValue)
     public record Date(DateTime Value, string? DateOutputFormat) : EntityValue(Value)
     {
         /// <inheritdoc />
-        public override string GetPrimitiveString() => Value.ToString("o");
+        public override string GetPrimitiveString() =>
+            Value.ToString(DateOutputFormat ?? Constants.DateTimeFormat);
 
         /// <inheritdoc />
         public override string Serialize() =>
@@ -433,7 +434,7 @@ public abstract record EntityValue(object? ObjectValue)
     public record NestedEntity(Entity Value) : EntityValue(Value)
     {
         /// <inheritdoc />
-        public override string? GetPrimitiveString() => null;
+        public override string GetPrimitiveString() => Value.ToString();
 
         /// <inheritdoc />
         public override string Serialize() => Value.Serialize();
@@ -477,7 +478,8 @@ public abstract record EntityValue(object? ObjectValue)
     public record NestedList(ImmutableList<EntityValue> Value) : EntityValue(Value)
     {
         /// <inheritdoc />
-        public override string? GetPrimitiveString() => null;
+        public override string GetPrimitiveString() =>
+            SerializationMethods.SerializeList(Value.Select(y => y.Serialize()));
 
         /// <inheritdoc />
         public override string Serialize()
@@ -540,19 +542,6 @@ public abstract record EntityValue(object? ObjectValue)
             }
 
             return Maybe<object>.None;
-        }
-
-        /// <inheritdoc />
-        public override EntityValue Combine(EntityValue other)
-        {
-            ImmutableList<EntityValue> newList;
-
-            if (other is NestedList otherList)
-                newList = Value.AddRange(otherList.Value);
-            else
-                newList = Value.Add(other);
-
-            return new NestedList(newList);
         }
 
         /// <inheritdoc />
@@ -795,21 +784,6 @@ public abstract record EntityValue(object? ObjectValue)
     }
 
     /// <summary>
-    /// Combine this with another EntityValue
-    /// </summary>
-    public virtual EntityValue Combine(EntityValue other)
-    {
-        ImmutableList<EntityValue> newList;
-
-        if (other is NestedList otherList)
-            newList = otherList.Value.Insert(0, this);
-        else
-            newList = ImmutableList.Create(this, other);
-
-        return new NestedList(newList);
-    }
-
-    /// <summary>
     /// Tries to convert a value to match the schema
     /// </summary>
     protected abstract Result<(EntityValue value, bool changed), IErrorBuilder> TryConvertBase(
@@ -843,7 +817,7 @@ public abstract record EntityValue(object? ObjectValue)
         {
             var primitiveString = GetPrimitiveString();
 
-            if (primitiveString is null || !Regex.IsMatch(primitiveString, schemaProperty.Regex))
+            if (!Regex.IsMatch(primitiveString, schemaProperty.Regex))
                 return new ErrorBuilder(
                     ErrorCode.SchemaViolationUnmatchedRegex,
                     primitiveString,
@@ -858,7 +832,7 @@ public abstract record EntityValue(object? ObjectValue)
     /// <summary>
     /// If this is a primitive, get a string representation
     /// </summary>
-    public abstract string? GetPrimitiveString();
+    public abstract string GetPrimitiveString();
 
     /// <summary>
     /// Serialize this value as it will appear in SCL
@@ -915,31 +889,36 @@ public abstract record EntityValue(object? ObjectValue)
 
         if (type == typeof(int))
         {
-            if (int.TryParse(primitive ?? "", out var i))
+            if (int.TryParse(primitive, out var i))
                 return i;
         }
 
         else if (type == typeof(double))
         {
-            if (double.TryParse(primitive ?? "", out var d))
+            if (double.TryParse(primitive, out var d))
                 return d;
         }
         else if (type == typeof(bool))
         {
-            if (bool.TryParse(primitive ?? "", out var b))
+            if (bool.TryParse(primitive, out var b))
                 return b;
         }
         else if (type.IsEnum)
         {
-            if (!int.TryParse(primitive, out _) && //prevent int conversion
-                Enum.TryParse(type, primitive, true, out var r)
+            if (this is EnumerationValue enumeration)
+            {
+                if (Enum.TryParse(type, enumeration.Value.Value, true, out var ro))
+                    return ro!;
+            }
+            else if (!int.TryParse(primitive, out _) && //prevent int conversion
+                     Enum.TryParse(type, primitive, true, out var r)
             )
                 return r!;
         }
         else if (type == typeof(DateTime))
         {
             if (!double.TryParse(primitive, out _) && //prevent double conversion
-                DateTime.TryParse(primitive ?? "", out var d))
+                DateTime.TryParse(primitive, out var d))
                 return d;
         }
         else if (type == typeof(string))
@@ -950,7 +929,7 @@ public abstract record EntityValue(object? ObjectValue)
         }
         else if (type == typeof(StringStream) || type == typeof(object))
         {
-            var ser = new StringStream(Serialize());
+            var ser = new StringStream(GetPrimitiveString());
 
             return ser;
         }

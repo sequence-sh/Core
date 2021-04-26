@@ -101,7 +101,7 @@ public partial class EntityGetValueTypeTests : StepTestBase<AssertTrue, Unit>
 
             yield return new StepCase(
                 "Get Simple Property (Empty)",
-                GetTestCase(Constant("\"\""), TheEntity, "Empty"),
+                GetTestCase(Constant(""), TheEntity, "Empty"),
                 Unit.Default
             );
 
