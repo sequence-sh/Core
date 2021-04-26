@@ -52,6 +52,14 @@ public sealed record EagerArray<T>(IReadOnlyList<T> List) : Array<T>, IEquatable
     }
 
     /// <inheritdoc />
+    public override async Task<Result<EagerArray<T>, IError>> Evaluate(
+        CancellationToken cancellation)
+    {
+        await Task.CompletedTask;
+        return this;
+    }
+
+    /// <inheritdoc />
     public override async Task<Result<Unit, IError>> ForEach(
         Func<T, CancellationToken, ValueTask<Result<Unit, IError>>> func,
         CancellationToken cancellation)
