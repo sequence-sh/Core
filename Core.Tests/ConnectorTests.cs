@@ -101,7 +101,7 @@ public partial class ConnectorTests
         var injectedContextsResult = stepFactoryStore.TryGetInjectedContexts(
             new SCLSettings(
                 Entity.Create(
-                    new List<(EntityPropertyKey key, object? property)>()
+                    new List<(EntityPropertyKey key, object? value)>()
                     {
                         (new EntityPropertyKey(new[] { "connectors", "example", "colorSource" }),
                          "Red")

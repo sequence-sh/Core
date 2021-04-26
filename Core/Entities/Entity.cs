@@ -56,8 +56,8 @@ public sealed class Entity : IEnumerable<EntityProperty>, IEquatable<Entity>
     /// <summary>
     /// Creates a new Entity
     /// </summary>
-    public static Entity Create(params (string key, object? property)[] properties) => Create(
-        properties.Select(x => (new EntityPropertyKey(x.key), x.property))
+    public static Entity Create(params (string key, object? value)[] properties) => Create(
+        properties.Select(x => (new EntityPropertyKey(x.key), x.value))
     );
 
     /// <summary>
@@ -74,7 +74,7 @@ public sealed class Entity : IEnumerable<EntityProperty>, IEquatable<Entity>
     /// Creates a new Entity
     /// </summary>
     public static Entity Create(
-        IEnumerable<(EntityPropertyKey key, object? property)> properties,
+        IEnumerable<(EntityPropertyKey key, object? value)> properties,
         char? multiValueDelimiter = null)
     {
         var dict =
@@ -82,10 +82,10 @@ public sealed class Entity : IEnumerable<EntityProperty>, IEquatable<Entity>
                     p =>
                     {
                         (string firstKey, Maybe<EntityPropertyKey> remainder) = p.key.Split();
-                        return (firstKey, remainder, p.property);
+                        return (firstKey, remainder, p.value);
                     }
                 )
-                .GroupBy(x => x.firstKey, x => (x.remainder, x.property))
+                .GroupBy(x => x.firstKey, x => (x.remainder, x.value))
                 .Select(
                     (group, i) =>
                     {
@@ -138,6 +138,19 @@ public sealed class Entity : IEnumerable<EntityProperty>, IEquatable<Entity>
         }
 
         ImmutableDictionary<string, EntityProperty> newDict = Dictionary.SetItem(key, newProperty);
+
+        return new Entity(newDict);
+    }
+
+    /// <summary>
+    /// Returns a copy of this entity with the specified property removed
+    /// </summary>
+    public Entity RemoveProperty(string propertyName)
+    {
+        if (!Dictionary.ContainsKey(propertyName))
+            return this; //No property to remove
+
+        var newDict = this.Dictionary.Remove(propertyName);
 
         return new Entity(newDict);
     }
