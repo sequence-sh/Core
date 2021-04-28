@@ -168,7 +168,7 @@ public partial class LoggingTests
         /// <inheritdoc />
         public async Task RunAsync(ITestOutputHelper testOutputHelper)
         {
-            var spf = StepFactoryStore.CreateFromAssemblies();
+            var spf = StepFactoryStore.Create();
 
             var loggerFactory = TestLoggerFactory.Create();
             loggerFactory.AddXunit(testOutputHelper);

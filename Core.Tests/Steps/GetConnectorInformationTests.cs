@@ -22,7 +22,7 @@ public partial class
             var version = fileVersion.ProductVersion;
 
             var coreEntity = Entity.Create(
-                ("Name", "Reductech.EDR.Core"),
+                ("Id", "Reductech.EDR.Core"),
                 ("Version", version)
             ); //This version number need to be bumped
 

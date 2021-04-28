@@ -16,12 +16,27 @@ namespace Reductech.EDR.Core.Internal
 /// </summary>
 public class StepFactoryStore
 {
+    /// <summary>
+    /// Information about the available connectors
+    /// </summary>
+    public IReadOnlyList<ConnectorData> ConnectorData { get; }
+
+    /// <summary>
+    /// Types of enumerations that can be used by these steps.
+    /// </summary>
+    public IReadOnlyDictionary<string, Type> EnumTypesDictionary { get; }
+
+    /// <summary>
+    /// Dictionary mapping step names to step factories.
+    /// </summary>
+    public IReadOnlyDictionary<string, IStepFactory> Dictionary { get; }
+
     private StepFactoryStore(
-        IReadOnlyList<ConnectorInformation> connectorInformations,
+        IReadOnlyList<ConnectorData> connectorData,
         IReadOnlyDictionary<string, IStepFactory> dictionary,
         IReadOnlyDictionary<string, Type> enumTypesDictionary)
     {
-        ConnectorInformations = connectorInformations;
+        ConnectorData = connectorData;
 
         Dictionary = dictionary.ToDictionary(
             x => x.Key!,
@@ -34,31 +49,6 @@ public class StepFactoryStore
             x => x.Value!,
             StringComparer.OrdinalIgnoreCase
         )!;
-    }
-
-    /// <summary>
-    /// Creates a new StepFactoryStore.
-    /// </summary>
-    public static StepFactoryStore Create(
-        IReadOnlyList<ConnectorInformation> connectorInformations,
-        params IStepFactory[] factories) => Create(connectorInformations, factories.AsEnumerable());
-
-    /// <summary>
-    /// Creates a new StepFactoryStore.
-    /// </summary>
-    public static StepFactoryStore Create(
-        IReadOnlyList<ConnectorInformation> connectorInformations,
-        IEnumerable<IStepFactory> factories)
-    {
-        var dictionary = factories
-            .SelectMany(factory => GetStepNames(factory).Select(name => (factory, name)))
-            .ToDictionary(x => x.name, x => x.factory);
-
-        var enumTypesDictionary = dictionary.Values.SelectMany(x => x.EnumTypes)
-            .Distinct()
-            .ToDictionary(x => x.Name, StringComparer.OrdinalIgnoreCase);
-
-        return new StepFactoryStore(connectorInformations, dictionary, enumTypesDictionary!);
     }
 
     private static IEnumerable<string> GetStepNames(IStepFactory stepFactory)
@@ -82,14 +72,62 @@ public class StepFactoryStore
     }
 
     /// <summary>
-    /// Create a step factory store using all StepFactories in the assembly.
+    /// Creates a StepFactoryStore with steps from the given assemblies
     /// </summary>
-    /// <returns></returns>
-    public static StepFactoryStore CreateFromAssemblies(
-        params (Assembly assembly, ConnectorSettings settings)[] assemblies)
+    public static StepFactoryStore Create(SCLSettings settings, params Assembly[] assemblies)
     {
-        var steps = assemblies.Select(x => x.assembly)
+        var settingsDict = ConnectorSettings.CreateFromSCLSettings(settings)
+            .Select(x => x.Settings)
+            .ToDictionary(x => x.Id);
+
+        var data = new List<ConnectorData>();
+
+        foreach (var assembly in assemblies)
+        {
+            var connectorSettings = ConnectorSettings.DefaultForAssembly(assembly);
+
+            if (settingsDict.TryGetValue(assembly.GetName().Name!, out var cs))
+                connectorSettings = cs;
+
+            data.Add(new ConnectorData(connectorSettings, assembly));
+        }
+
+        return Create(data.ToArray());
+    }
+
+    /// <summary>
+    /// Create a step factory store
+    /// </summary>
+    public static StepFactoryStore Create(
+        IReadOnlyList<ConnectorData> connectorData,
+        params IStepFactory[] factories) => Create(connectorData, factories.ToList());
+
+    /// <summary>
+    /// Create a step factory store
+    /// </summary>
+    public static StepFactoryStore Create(
+        IReadOnlyList<ConnectorData> connectorData,
+        IReadOnlyCollection<IStepFactory> factories)
+    {
+        var dictionary = factories
+            .SelectMany(factory => GetStepNames(factory).Select(name => (factory, name)))
+            .ToDictionary(x => x.name, x => x.factory);
+
+        var enumTypesDictionary = dictionary.Values.SelectMany(x => x.EnumTypes)
+            .Distinct()
+            .ToDictionary(x => x.Name, StringComparer.OrdinalIgnoreCase);
+
+        return new StepFactoryStore(connectorData, dictionary, enumTypesDictionary);
+    }
+
+    /// <summary>
+    /// Create a step factory store
+    /// </summary>
+    public static StepFactoryStore Create(params ConnectorData[] connectorData)
+    {
+        var steps = connectorData.Select(x => x.Assembly)
             .Prepend(typeof(IStep).Assembly)
+            .WhereNotNull()
             .SelectMany(a => a!.GetTypes())
             .Distinct()
             .Where(x => !x.IsAbstract)
@@ -101,12 +139,7 @@ public class StepFactoryStore
                 .Select(CreateStepFactory)
                 .ToList();
 
-        var connectorInfo =
-            assemblies.Select(p => ConnectorInformation.TryCreate(p.assembly, p.settings))
-                .WhereNotNull()
-                .ToList();
-
-        return Create(connectorInfo, factories);
+        return Create(connectorData, factories);
 
         static IStepFactory CreateStepFactory(Type stepType)
         {
@@ -146,27 +179,12 @@ public class StepFactoryStore
     }
 
     /// <summary>
-    /// Information about the available connectors
-    /// </summary>
-    public IReadOnlyList<ConnectorInformation> ConnectorInformations { get; }
-
-    /// <summary>
-    /// Types of enumerations that can be used by these steps.
-    /// </summary>
-    public IReadOnlyDictionary<string, Type> EnumTypesDictionary { get; }
-
-    /// <summary>
-    /// Dictionary mapping step names to step factories.
-    /// </summary>
-    public IReadOnlyDictionary<string, IStepFactory> Dictionary { get; }
-
-    /// <summary>
     /// Tries to get contexts injected by connectors
     /// </summary>
     public Result<(string Name, object Context)[], IErrorBuilder> TryGetInjectedContexts(
         SCLSettings settings)
     {
-        var contexts = ConnectorInformations.Select(x => x.TryGetInjectedContexts(settings))
+        var contexts = ConnectorData.Select(x => x.TryGetInjectedContexts(settings))
             .Combine(x => x.SelectMany(y => y).ToArray(), ErrorBuilderList.Combine);
 
         return contexts;

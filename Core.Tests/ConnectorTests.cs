@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Divergic.Logging.Xunit;
-using Newtonsoft.Json;
 using Reductech.EDR.Core.Abstractions;
 using Reductech.EDR.Core.Connectors;
 using Reductech.EDR.Core.Internal;
@@ -96,8 +95,8 @@ public partial class ConnectorTests
             TestOutputHelper.WriteLine(type.Name);
         }
 
-        var stepFactoryStore = StepFactoryStore.CreateFromAssemblies(
-            (assembly.Value, ConnectorSettings.DefaultForAssembly(assembly.Value))
+        var stepFactoryStore = StepFactoryStore.Create(
+            new ConnectorData(ConnectorSettings.DefaultForAssembly(assembly.Value), assembly.Value)
         );
 
         var injectedContextsResult = stepFactoryStore.TryGetInjectedContexts(

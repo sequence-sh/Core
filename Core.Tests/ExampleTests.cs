@@ -42,7 +42,7 @@ public partial class ExampleTests
 
         TestOutputHelper.WriteLine(scl);
 
-        var sfs = StepFactoryStore.CreateFromAssemblies();
+        var sfs = StepFactoryStore.Create();
 
         var stepResult = SCLParsing.TryParseStep(scl)
             .Bind(x => x.TryFreeze(TypeReference.Any.Instance, sfs));
@@ -98,7 +98,7 @@ public partial class ExampleTests
         var logger =
             TestOutputHelper.BuildLogger(new LoggingConfig() { LogLevel = LogLevel.Information });
 
-        var sfs = StepFactoryStore.CreateFromAssemblies();
+        var sfs = StepFactoryStore.Create();
 
         var runner = new SCLRunner(
             SCLSettings.EmptySettings,

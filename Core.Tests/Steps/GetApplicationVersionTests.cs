@@ -23,10 +23,7 @@ public partial class
             Console.WriteLine(assemblyName);
 
             var expectedOutput =
-                ConnectorInformation.TryCreate(
-                    entryAssembly,
-                    ConnectorSettings.DefaultForAssembly(entryAssembly)
-                )!.ToString();
+                ConnectorSettings.DefaultForAssembly(entryAssembly).VersionString();
 
             //This will be the the ReSharper Test Runner
 
