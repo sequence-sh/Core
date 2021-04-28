@@ -21,11 +21,11 @@ public sealed class GetConnectorInformation : CompoundStep<Array<Entity>>
         await Task.CompletedTask;
         var entities = new List<Entity>();
 
-        foreach (var connectorInformation in stateMonad.StepFactoryStore.ConnectorInformations)
+        foreach (var (connectorSettings, _) in stateMonad.StepFactoryStore.ConnectorData)
         {
             var entity = Entity.Create(
-                (nameof(ConnectorInformation.Name), connectorInformation.Name),
-                (nameof(ConnectorInformation.Version), connectorInformation.Version)
+                (nameof(ConnectorSettings.Id), connectorSettings.Id),
+                (nameof(ConnectorSettings.Version), connectorSettings.Version)
             );
 
             entities.Add(entity);

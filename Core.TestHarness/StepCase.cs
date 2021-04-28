@@ -80,22 +80,10 @@ public abstract partial class StepTestBase<TStep, TOutput>
             testOutputHelper.WriteLine(scl);
 
             //we need to get the settings
-            var connectorSettingsDict = ConnectorSettings.CreateFromSCLSettings(Settings)
-                .ToDictionary(x => x.Key, x => x.Settings, StringComparer.OrdinalIgnoreCase);
 
-            var tStepAssembly = Assembly.GetAssembly(typeof(TStep));
+            var tStepAssembly = Assembly.GetAssembly(typeof(TStep))!;
 
-            if (!connectorSettingsDict.TryGetValue(
-                tStepAssembly.FullName,
-                out var connectorSettings
-            ))
-            {
-                connectorSettings = ConnectorSettings.DefaultForAssembly(tStepAssembly);
-            }
-
-            var sfs = StepFactoryStore.CreateFromAssemblies(
-                (Assembly.GetAssembly(typeof(TStep))!, connectorSettings)
-            );
+            var sfs = StepFactoryStore.Create(Settings, tStepAssembly);
 
             var deserializeResult = SCLParsing.TryParseStep(scl);
 

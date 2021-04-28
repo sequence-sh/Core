@@ -79,6 +79,18 @@ public sealed class ConnectorSettings : IEntityConvertible
     /// </summary>
     [JsonProperty(propertyName: "settings")]
     public Entity Settings { get; set; }
+
+    /// <summary>
+    /// String representation
+    /// </summary>
+    /// <returns></returns>
+    public string VersionString() => $"{Id} {Version}";
+
+    /// <inheritdoc />
+    public override string ToString()
+    {
+        return VersionString();
+    }
 }
 
 }

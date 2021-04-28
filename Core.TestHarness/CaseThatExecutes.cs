@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
@@ -12,7 +11,6 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using Namotion.Reflection;
 using Reductech.EDR.Core.Abstractions;
-using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Util;
@@ -121,22 +119,10 @@ public abstract partial class StepTestBase<TStep, TOutput>
         {
             var externalContext = ExternalContextSetupHelper.GetExternalContext(mockRepository);
 
-            //we need to get the settings
-            var connectorSettingsDict = ConnectorSettings.CreateFromSCLSettings(Settings)
-                .ToDictionary(x => x.Key, x => x.Settings, StringComparer.OrdinalIgnoreCase);
-
-            var tStepAssembly = Assembly.GetAssembly(typeof(TStep));
-
-            if (!connectorSettingsDict.TryGetValue(
-                tStepAssembly.FullName,
-                out var connectorSettings
-            ))
-            {
-                connectorSettings = ConnectorSettings.DefaultForAssembly(tStepAssembly);
-            }
+            var tStepAssembly = Assembly.GetAssembly(typeof(TStep))!;
 
             var sfs = StepFactoryStoreToUse.Unwrap(
-                StepFactoryStore.CreateFromAssemblies((tStepAssembly, connectorSettings))
+                StepFactoryStore.Create(Settings, tStepAssembly)
             );
 
             var stateMonad = new StateMonad(

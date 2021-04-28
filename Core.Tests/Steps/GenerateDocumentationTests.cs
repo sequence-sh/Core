@@ -122,7 +122,7 @@ public partial class GenerateDocumentationTests : StepTestBase<GenerateDocumenta
                 ToLogs(Entities(Contents(notHeader), not))
             ).WithStepFactoryStore(
                 StepFactoryStore.Create(
-                    System.Array.Empty<ConnectorInformation>(),
+                    System.Array.Empty<ConnectorData>(),
                     new SimpleStepFactory<Not, bool>()
                 )
             );
@@ -134,7 +134,7 @@ public partial class GenerateDocumentationTests : StepTestBase<GenerateDocumenta
                 ToLogs(Entities(Contents(exampleStepHeader), documentationExample))
             ).WithStepFactoryStore(
                 StepFactoryStore.Create(
-                    System.Array.Empty<ConnectorInformation>(),
+                    System.Array.Empty<ConnectorData>(),
                     DocumentationExampleStepFactory.Instance
                 )
             );
@@ -146,7 +146,7 @@ public partial class GenerateDocumentationTests : StepTestBase<GenerateDocumenta
                 ToLogs(Entities(Contents(notHeader, exampleStepHeader), not, documentationExample))
             ).WithStepFactoryStore(
                 StepFactoryStore.Create(
-                    System.Array.Empty<ConnectorInformation>(),
+                    System.Array.Empty<ConnectorData>(),
                     new SimpleStepFactory<Not, bool>(),
                     DocumentationExampleStepFactory.Instance
                 )
