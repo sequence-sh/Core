@@ -14,12 +14,6 @@ namespace Reductech.EDR.Core.Internal
 [Serializable]
 public sealed class ConnectorSettings : IEntityConvertible
 {
-    /// <summary>
-    /// Connector settings for Core
-    /// </summary>
-    public static ConnectorSettings CoreConnectorSettings { get; }
-        = DefaultForAssembly(Assembly.GetAssembly(typeof(IStep)));
-
     public static ConnectorSettings DefaultForAssembly(Assembly assembly)
     {
         return new()

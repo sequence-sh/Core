@@ -78,6 +78,24 @@ public class EntityConversionTests
     }
 
     [Fact]
+    public void ConvertToEntityShouldConvertNestedEntities()
+    {
+        var settings = new ConnectorSettings()
+        {
+            Enable   = true,
+            Id       = "Ultimate",
+            Version  = new Version(3, 1).ToString(),
+            Settings = Entity.Create(("a", 1), ("b", 2))
+        };
+
+        var entity = settings.ConvertToEntity();
+
+        var s = entity.ToString();
+
+        s.Should().Be(@"(Id: ""Ultimate"" Enable: True Version: ""3.1"" Settings: (a: 1 b: 2))");
+    }
+
+    [Fact]
     public void ShortShouldConvertCorrectly()
     {
         var e = Entity.Create(("short", Convert.ToInt16(11)));

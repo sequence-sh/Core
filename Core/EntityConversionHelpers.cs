@@ -66,7 +66,7 @@ public static class EntityConversionHelpers
     /// </summary>
     public static Entity ConvertToEntity(object obj)
     {
-        var properties = obj.GetType().GetProperties();
+        var properties = obj.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
 
         var props = new List<EntityProperty>();
 
