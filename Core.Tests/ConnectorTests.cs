@@ -26,52 +26,52 @@ public partial class ConnectorTests
         "ExampleConnector.dll"
     );
 
-    [Fact]
-    public async Task TestConnectorFromSettings()
-    {
-        var logger = new TestOutputLogger("Step Logger", TestOutputHelper);
+    //    [Fact]
+    //    public async Task TestConnectorFromSettings()
+    //    {
+    //        var logger = new TestOutputLogger("Step Logger", TestOutputHelper);
 
-        var connectorsString = $@"{{
-""connectors"": {{
-    ""example"":{{
-        ""path"": {JsonConvert.SerializeObject(RelativePath)},
-           ""ColorSource"": ""Red""
-        
-    }}
-}}
-}}";
+    //        var connectorsString = $@"{{
+    //""connectors"": {{
+    //    ""example"":{{
+    //        ""path"": {JsonConvert.SerializeObject(RelativePath)},
+    //           ""ColorSource"": ""Red""
 
-        var settings = SCLSettings.CreateFromString(connectorsString);
+    //    }}
+    //}}
+    //}}";
 
-        var stepFactoryStoreResult = StepFactoryStore.TryCreateFromSettings(settings, logger);
+    //        var settings = SCLSettings.CreateFromString(connectorsString);
 
-        stepFactoryStoreResult.ShouldBeSuccessful();
+    //        var stepFactoryStoreResult = StepFactoryStore.TryCreateFromSettings(settings, logger);
 
-        var injectedContextsResult = stepFactoryStoreResult.Value.TryGetInjectedContexts(settings);
+    //        stepFactoryStoreResult.ShouldBeSuccessful();
 
-        injectedContextsResult.ShouldBeSuccessful();
+    //        var injectedContextsResult = stepFactoryStoreResult.Value.TryGetInjectedContexts(settings);
 
-        var externalContext = ExternalContext.Default with
-        {
-            InjectedContexts = injectedContextsResult.Value
-        };
+    //        injectedContextsResult.ShouldBeSuccessful();
 
-        var runner = new SCLRunner(
-            SCLSettings.EmptySettings,
-            logger,
-            stepFactoryStoreResult.Value,
-            externalContext
-        );
+    //        var externalContext = ExternalContext.Default with
+    //        {
+    //            InjectedContexts = injectedContextsResult.Value
+    //        };
 
-        var r = await
-            runner.RunSequenceFromTextAsync(
-                "Log (GetTestString)",
-                new Dictionary<string, object>(),
-                CancellationToken.None
-            );
+    //        var runner = new SCLRunner(
+    //            SCLSettings.EmptySettings,
+    //            logger,
+    //            stepFactoryStoreResult.Value,
+    //            externalContext
+    //        );
 
-        r.ShouldBeSuccessful();
-    }
+    //        var r = await
+    //            runner.RunSequenceFromTextAsync(
+    //                "Log (GetTestString)",
+    //                new Dictionary<string, object>(),
+    //                CancellationToken.None
+    //            );
+
+    //        r.ShouldBeSuccessful();
+    //    }
 
     [Fact]
     public async Task TestConnector()
@@ -96,7 +96,9 @@ public partial class ConnectorTests
             TestOutputHelper.WriteLine(type.Name);
         }
 
-        var stepFactoryStore = StepFactoryStore.CreateFromAssemblies(assembly.Value);
+        var stepFactoryStore = StepFactoryStore.CreateFromAssemblies(
+            (assembly.Value, ConnectorSettings.DefaultForAssembly(assembly.Value))
+        );
 
         var injectedContextsResult = stepFactoryStore.TryGetInjectedContexts(
             new SCLSettings(

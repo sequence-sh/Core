@@ -122,6 +122,17 @@ public sealed record EagerArray<T>(IReadOnlyList<T> List) : Array<T>, IEquatable
     bool IEquatable<Array<T>>.Equals(Array<T>? other) => Equals(this, other);
 
     /// <inheritdoc />
+    public override string ToString()
+    {
+        switch (List.Count)
+        {
+            case 0:     return "Empty Eager Array";
+            case <= 10: return "[" + string.Join(", ", List.Select(x => x!.ToString())) + "]";
+            default:    return $"Eager Array with {List.Count} Elements";
+        }
+    }
+
+    /// <inheritdoc />
     public bool Equals(EagerArray<T>? other)
     {
         return Equals(this, other);

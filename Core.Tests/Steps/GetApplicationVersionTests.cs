@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Reflection;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Steps;
@@ -15,8 +16,17 @@ public partial class
     {
         get
         {
+            var entryAssembly = Assembly.GetEntryAssembly()!;
+
+            var assemblyName = entryAssembly.GetName();
+
+            Console.WriteLine(assemblyName);
+
             var expectedOutput =
-                ConnectorInformation.TryCreate(Assembly.GetEntryAssembly()!)!.ToString();
+                ConnectorInformation.TryCreate(
+                    entryAssembly,
+                    ConnectorSettings.DefaultForAssembly(entryAssembly)
+                )!.ToString();
 
             //This will be the the ReSharper Test Runner
 
