@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System.Diagnostics;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
@@ -22,12 +23,17 @@ public sealed class GetApplicationVersion : CompoundStep<StringStream>
 
         var entryAssembly = Assembly.GetEntryAssembly();
 
-        var ci = ConnectorInformation.TryCreate(entryAssembly);
-
-        if (ci is null)
+        if (entryAssembly is null)
             return new StringStream("Unknown Version");
 
-        return new StringStream(ci.ToString());
+        FileVersionInfo fileVersionInfo = FileVersionInfo.GetVersionInfo(entryAssembly.Location);
+        string          version         = fileVersionInfo.ProductVersion!;
+
+        var name = entryAssembly.GetName().Name;
+
+        var text = $"{name} {version}";
+
+        return new StringStream(text);
     }
 
     /// <inheritdoc />

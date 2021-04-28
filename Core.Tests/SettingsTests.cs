@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using FluentAssertions;
 using Reductech.EDR.Core.Entities;
+using Reductech.EDR.Core.Internal;
 using Xunit;
 
 namespace Reductech.EDR.Core.Tests
@@ -10,31 +12,66 @@ namespace Reductech.EDR.Core.Tests
 public partial class SettingsTests
 {
     [Fact]
+    public void TestGettingConnectorSettingsFromString()
+    {
+        var settings = SCLSettings.CreateFromString(ConnectorJson);
+
+        var connectorSettings = ConnectorSettings.CreateFromSCLSettings(settings).ToList();
+
+        connectorSettings.Should().HaveCount(1);
+
+        var nuixSettings = connectorSettings.Single().Settings;
+
+        nuixSettings.Id.Should().Be("Reductech.EDR.Nuix");
+        nuixSettings.Version.Should().Be("0.9.0");
+        nuixSettings.Enable.Should().Be(true);
+
+        nuixSettings.Settings.TryGetNestedBool("UseDongle").Should().BeTrue();
+    }
+
+    [Fact]
     public void TestCreatingSettingsFromString()
     {
         var settings = SCLSettings.CreateFromString(ConnectorJson);
 
         TestOutputHelper.WriteLine(settings.ToString());
 
-        (
-                (settings.Entity.TryGetValue("Connectors").Value as EntityValue.NestedEntity)!.Value
-                .TryGetValue("Nuix")
-                .Value
-                as EntityValue.NestedEntity
-            )!.Value.TryGetValue("UseDongle")
+        settings.Entity.TryGetNestedEntity("Connectors")
+            .Value
+            .TryGetNestedEntity("Nuix")
+            .Value
+            .TryGetNestedEntity("Settings")
+            .Value
+            .TryGetValue("UseDongle")
             .Value.GetPrimitiveString()
             .Should()
             .Be(true.ToString());
 
-        var udString = settings.Entity.TryGetNestedString("Connectors", "Nuix", "UseDongle");
+        var udString = settings.Entity.TryGetNestedString(
+            "Connectors",
+            "Nuix",
+            "Settings",
+            "UseDongle"
+        );
 
         udString.HasValue.Should().BeTrue();
         udString.Value.Should().Be(true.ToString());
 
-        var udBool = settings.Entity.TryGetNestedBool("Connectors", "Nuix", "UseDongle");
+        var udBool = settings.Entity.TryGetNestedBool(
+            "Connectors",
+            "Nuix",
+            "Settings",
+            "UseDongle"
+        );
+
         udBool.Should().BeTrue();
 
-        var featuresList = settings.Entity.TryGetNestedList("Connectors", "Nuix", "Features");
+        var featuresList = settings.Entity.TryGetNestedList(
+            "Connectors",
+            "Nuix",
+            "Settings",
+            "Features"
+        );
 
         featuresList.HasValue.Should().BeTrue();
 
@@ -51,6 +88,7 @@ public partial class SettingsTests
         var consoleArgsList = settings.Entity.TryGetNestedList(
             "Connectors",
             "Nuix",
+            "Settings",
             "ConsoleArguments"
         );
 
@@ -65,6 +103,7 @@ public partial class SettingsTests
         var username = settings.Entity.TryGetNestedString(
             "Connectors",
             "Nuix",
+            "Settings",
             "EnvironmentVariables",
             "NUIX_USERNAME"
         );
@@ -106,65 +145,66 @@ public partial class SettingsTests
 
     private const string ConnectorJson =
         @"{
-  ""connectors"": {
-    ""nuix"": {
-      ""useDongle"": true,
-      ""exeConsolePath"": ""C:\\Program Files\\Nuix\\Nuix 8.8\\nuix_console.exe"",
-      ""version"": ""8.8"",
-
-""ConsoleArguments"": [
-    ""-Dnuix.licence.handlers=server"",
-    ""-Dnuix.registry.servers=licenseSource""
-    ],
-    ""EnvironmentVariables"": {
-        ""NUIX_USERNAME"": ""myName"",
-        ""NUIX_PASSWORD"": ""myPassword""
-    },
-
-      ""features"": [
-        ""ANALYSIS"",
-        ""CASE_CREATION"",
-        ""EXPORT_ITEMS"",
-        ""METADATA_IMPORT"",
-        ""OCR_PROCESSING"",
-        ""PRODUCTION_SET""
-      ]
-    }
-  },
-  ""nlog"": {
-    ""throwConfigExceptions"": true,
-    ""targets"": {
-      ""fileTarget"": {
-        ""type"": ""File"",
-        ""fileName"": ""${basedir:fixtempdir=true}\\edr.log"",
-        ""layout"": ""${date} ${level:uppercase=true} ${message} ${exception}""
-      },
-      ""consoleInfo"": {
-        ""type"": ""Console"",
-        ""layout"": ""${date} ${message}""
-      },
-      ""consoleError"": {
-        ""type"": ""Console"",
-        ""layout"": ""${date} ${level:uppercase=true} ${message}"",
-        ""error"": true
-      }
-    },
-    ""rules"": [
-      {
-        ""logger"": ""*"",
-        ""minLevel"": ""Error"",
-        ""writeTo"": ""fileTarget,consoleError"",
-        ""final"": true
-      },
-      {
-        ""logger"": ""*"",
-        ""minLevel"": ""Trace"",
-        ""writeTo"": ""fileTarget,consoleInfo""
-      }
-    ]
-  }
-}
-";
+	""connectors"": {
+		""nuix"": {
+			""id"": ""Reductech.EDR.Nuix"",
+			""version"": ""0.9.0"",
+			""settings"": {
+				""useDongle"": true,
+				""exeConsolePath"": ""C:\\Program Files\\Nuix\\Nuix 8.8\\nuix_console.exe"",
+				""version"": ""8.8"",
+				""ConsoleArguments"": [
+					""-Dnuix.licence.handlers=server"",
+					""-Dnuix.registry.servers=licenseSource""
+				],
+				""EnvironmentVariables"": {
+					""NUIX_USERNAME"": ""myName"",
+					""NUIX_PASSWORD"": ""myPassword""
+				},
+				""features"": [
+					""ANALYSIS"",
+					""CASE_CREATION"",
+					""EXPORT_ITEMS"",
+					""METADATA_IMPORT"",
+					""OCR_PROCESSING"",
+					""PRODUCTION_SET""
+				]
+			}
+		}
+	},
+	""nlog"": {
+		""throwConfigExceptions"": true,
+		""targets"": {
+			""fileTarget"": {
+				""type"": ""File"",
+				""fileName"": ""${basedir:fixtempdir=true}\\edr.log"",
+				""layout"": ""${date} ${level:uppercase=true} ${message} ${exception}""
+			},
+			""consoleInfo"": {
+				""type"": ""Console"",
+				""layout"": ""${date} ${message}""
+			},
+			""consoleError"": {
+				""type"": ""Console"",
+				""layout"": ""${date} ${level:uppercase=true} ${message}"",
+				""error"": true
+			}
+		},
+		""rules"": [
+			{
+				""logger"": ""*"",
+				""minLevel"": ""Error"",
+				""writeTo"": ""fileTarget,consoleError"",
+				""final"": true
+			},
+			{
+				""logger"": ""*"",
+				""minLevel"": ""Trace"",
+				""writeTo"": ""fileTarget,consoleInfo""
+			}
+		]
+	}
+}";
 }
 
 }

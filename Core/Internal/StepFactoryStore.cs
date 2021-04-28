@@ -4,10 +4,7 @@ using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Reflection;
 using CSharpFunctionalExtensions;
-using Microsoft.Extensions.Logging;
 using Reductech.EDR.Core.Attributes;
-using Reductech.EDR.Core.Connectors;
-using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Util;
 
@@ -85,54 +82,14 @@ public class StepFactoryStore
     }
 
     /// <summary>
-    /// Create a step factory store by loading connectors from paths specified in the SCLSettings
-    /// </summary>
-    public static Result<StepFactoryStore, IErrorBuilder> TryCreateFromSettings(
-        SCLSettings sclSettings,
-        ILogger logger)
-    {
-        List<string> connectorPaths;
-
-        var connectors = sclSettings.Entity.TryGetValue("connectors");
-
-        if (connectors.HasValue && connectors.Value is EntityValue.NestedEntity nestedEntity)
-        {
-            connectorPaths = new List<string>();
-
-            foreach (var connectorProperty in nestedEntity.Value)
-                if (connectorProperty.BestValue is EntityValue.NestedEntity connector)
-                {
-                    var path = connector.Value.TryGetNestedString("path");
-
-                    if (path.HasValue)
-                        connectorPaths.Add(path.Value);
-                }
-        }
-        else
-        {
-            connectorPaths = new List<string>();
-        }
-
-        var assemblies = connectorPaths
-            .Select(PluginLoadContext.GetAbsolutePath)
-            .Select(x => PluginLoadContext.LoadPlugin(x, logger))
-            .Combine(x => x.ToArray(), ErrorBuilderList.Combine);
-
-        if (assemblies.IsFailure)
-            return assemblies.ConvertFailure<StepFactoryStore>();
-
-        var stepFactoryStore = CreateFromAssemblies(assemblies.Value);
-
-        return stepFactoryStore;
-    }
-
-    /// <summary>
     /// Create a step factory store using all StepFactories in the assembly.
     /// </summary>
     /// <returns></returns>
-    public static StepFactoryStore CreateFromAssemblies(params Assembly[] assemblies)
+    public static StepFactoryStore CreateFromAssemblies(
+        params (Assembly assembly, ConnectorSettings settings)[] assemblies)
     {
-        var steps = assemblies.Prepend(typeof(IStep).Assembly)
+        var steps = assemblies.Select(x => x.assembly)
+            .Prepend(typeof(IStep).Assembly)
             .SelectMany(a => a!.GetTypes())
             .Distinct()
             .Where(x => !x.IsAbstract)
@@ -145,7 +102,9 @@ public class StepFactoryStore
                 .ToList();
 
         var connectorInfo =
-            assemblies.Select(ConnectorInformation.TryCreate!).WhereNotNull().ToList();
+            assemblies.Select(p => ConnectorInformation.TryCreate(p.assembly, p.settings))
+                .WhereNotNull()
+                .ToList();
 
         return Create(connectorInfo, factories);
 

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using CSharpFunctionalExtensions;
@@ -15,21 +14,24 @@ namespace Reductech.EDR.Core.Internal
 public record ConnectorInformation(
     string Name,
     string Version,
+    Entity Settings, //Special settings for this connector
     IConnectorInjection[] ConnectorInjections)
 {
     /// <summary>
     /// Create from an assembly
     /// </summary>
-    public static ConnectorInformation? TryCreate(Assembly? assembly)
+    public static ConnectorInformation? TryCreate(Assembly? assembly, ConnectorSettings settings)
     {
         if (assembly is null)
             return null;
 
+        if (!settings.Enable)
+            return null;
+
         try
         {
-            FileVersionInfo fileVersionInfo = FileVersionInfo.GetVersionInfo(assembly.Location);
-            string          version         = fileVersionInfo.ProductVersion!;
-
+            //FileVersionInfo fileVersionInfo = FileVersionInfo.GetVersionInfo(assembly.Location);
+            //string          version         = fileVersionInfo.ProductVersion!;
             var connectorInjections = assembly.GetTypes()
                 .Where(x => !x.IsAbstract)
                 .Where(x => typeof(IConnectorInjection).IsAssignableFrom(x))
@@ -37,7 +39,12 @@ public record ConnectorInformation(
                 .Cast<IConnectorInjection>()
                 .ToArray();
 
-            return new ConnectorInformation(assembly.GetName().Name!, version, connectorInjections);
+            return new ConnectorInformation(
+                settings.Id,
+                settings.Version,
+                settings.Settings,
+                connectorInjections
+            );
         }
         catch (Exception)
         {

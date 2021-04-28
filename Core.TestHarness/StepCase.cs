@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -78,7 +79,23 @@ public abstract partial class StepTestBase<TStep, TOutput>
             testOutputHelper.WriteLine("");
             testOutputHelper.WriteLine(scl);
 
-            var sfs = StepFactoryStore.CreateFromAssemblies(Assembly.GetAssembly(typeof(TStep))!);
+            //we need to get the settings
+            var connectorSettingsDict = ConnectorSettings.CreateFromSCLSettings(Settings)
+                .ToDictionary(x => x.Key, x => x.Settings, StringComparer.OrdinalIgnoreCase);
+
+            var tStepAssembly = Assembly.GetAssembly(typeof(TStep));
+
+            if (!connectorSettingsDict.TryGetValue(
+                tStepAssembly.FullName,
+                out var connectorSettings
+            ))
+            {
+                connectorSettings = ConnectorSettings.DefaultForAssembly(tStepAssembly);
+            }
+
+            var sfs = StepFactoryStore.CreateFromAssemblies(
+                (Assembly.GetAssembly(typeof(TStep))!, connectorSettings)
+            );
 
             var deserializeResult = SCLParsing.TryParseStep(scl);
 
