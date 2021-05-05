@@ -167,24 +167,26 @@ public sealed class Requirement : IEntityConvertible
         {
             if (group.Count() == 1)
                 yield return group.Single();
-
-            var highestMaxVersion = group.Select(x => x.MaxVersion).Max();
-            var lowestMinVersion  = group.Select(x => x.MinVersion).Min();
-            var notes             = group.Select(x => x.Notes).WhereNotNull().Distinct().ToList();
-            var text              = notes.Any() ? string.Join("; ", notes) : null;
-
-            var features = group.SelectMany(x => x.Features ?? new List<string>())
-                .Distinct(StringComparer.OrdinalIgnoreCase)
-                .ToList();
-
-            yield return new Requirement
+            else
             {
-                MaxVersion = highestMaxVersion,
-                MinVersion = lowestMinVersion,
-                Name       = group.Key,
-                Notes      = text,
-                Features   = features
-            };
+                var highestMaxVersion = group.Select(x => x.MaxVersion).Max();
+                var lowestMinVersion = group.Select(x => x.MinVersion).Min();
+                var notes = group.Select(x => x.Notes).WhereNotNull().Distinct().ToList();
+                var text = notes.Any() ? string.Join("; ", notes) : null;
+
+                var features = group.SelectMany(x => x.Features ?? new List<string>())
+                    .Distinct(StringComparer.OrdinalIgnoreCase)
+                    .ToList();
+
+                yield return new Requirement
+                {
+                    MaxVersion = highestMaxVersion,
+                    MinVersion = lowestMinVersion,
+                    Name       = group.Key,
+                    Notes      = text,
+                    Features   = features
+                };
+            }
         }
     }
 }
