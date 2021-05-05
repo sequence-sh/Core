@@ -52,10 +52,11 @@ public class PluginLoadContext : AssemblyLoadContext
         ILogger logger)
     {
         logger.LogInformation($"Loading assembly from path: {absolutePath}");
-        PluginLoadContext loadContext = new(absolutePath);
 
         try
         {
+            PluginLoadContext loadContext = new(absolutePath);
+
             var assembly = loadContext.LoadFromAssemblyName(
                 new AssemblyName(Path.GetFileNameWithoutExtension(absolutePath))
             );
