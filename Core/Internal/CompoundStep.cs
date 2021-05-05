@@ -114,20 +114,20 @@ public abstract class CompoundStep<T> : ICompoundStep<T>
                 .Select(x => x.ToRequirement())
                 .ToList();
 
-            var nestedRequirements = AllProperties.SelectMany(GetNestedRequirements);
+            var nestedRequirements = AllProperties.SelectMany(GetNestedRequirements).ToList();
 
             requirements.AddRange(nestedRequirements);
 
-            var groupedRequirements = Requirement.CompressRequirements(requirements);
+            var groupedRequirements = Requirement.CompressRequirements(requirements).ToList();
             return groupedRequirements;
 
             static IEnumerable<Requirement> GetNestedRequirements(StepProperty stepProperty)
             {
                 return stepProperty switch
                 {
-                    StepProperty.SingleStepProperty ssp => ssp.Step.RuntimeRequirements,
+                    StepProperty.SingleStepProperty ssp => ssp.Step.GetAllRequirements(),
                     StepProperty.StepListProperty slp => slp.StepList.SelectMany(
-                        x => x.RuntimeRequirements
+                        x => x.GetAllRequirements()
                     ),
                     _ => new List<Requirement>()
                 };

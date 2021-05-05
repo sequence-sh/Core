@@ -17,7 +17,7 @@ namespace Reductech.EDR.Core.Tests
 [AutoTheory.UseTestOutputHelper]
 public partial class ConnectorTests
 {
-    public static string RelativePath = Path.Combine(
+    private static readonly string RelativePath = Path.Combine(
         "ExampleConnector",
         "bin",
         "Debug",
