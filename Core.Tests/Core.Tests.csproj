@@ -16,6 +16,7 @@
     <Authors>Reductech</Authors>
     <Company>Reductech</Company>
     <Copyright>Copyright (c) 2021 Reductech Ltd</Copyright>
+    <AssemblyName>Reductech.EDR.Core.Tests</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>

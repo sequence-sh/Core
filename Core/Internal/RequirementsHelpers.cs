@@ -1,6 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
+using System.Reflection;
 
 namespace Reductech.EDR.Core.Internal
 {
@@ -15,15 +14,27 @@ public static class RequirementsHelpers
     /// </summary>
     public static IEnumerable<Requirement> GetAllRequirements(this IStep step)
     {
-        if (step is not ICompoundStep cs)
-            return ArraySegment<Requirement>.Empty;
+        var requirements = new HashSet<Requirement>();
 
-        var baseRequirements    = cs.StepFactory.Requirements.ToList();
-        var runtimeRequirements = cs.RuntimeRequirements.ToList();
+        var stepAssembly     = Assembly.GetAssembly(step.GetType());
+        var stepAssemblyName = stepAssembly?.GetName()?.Name;
 
-        var rRequirements = baseRequirements.Concat(runtimeRequirements).ToHashSet();
-        return rRequirements;
+        if (stepAssemblyName is not null && stepAssemblyName != CoreAssemblyName)
+        {
+            requirements.Add(new Requirement() { Name = stepAssemblyName });
+        }
+
+        if (step is ICompoundStep cs)
+        {
+            requirements.UnionWith(cs.StepFactory.Requirements);
+            requirements.UnionWith(cs.RuntimeRequirements);
+        }
+
+        return requirements;
     }
+
+    private static readonly string CoreAssemblyName =
+        Assembly.GetAssembly(typeof(IStep))!.GetName().Name!;
 }
 
 }

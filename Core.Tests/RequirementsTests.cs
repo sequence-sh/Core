@@ -19,6 +19,9 @@ namespace Reductech.EDR.Core.Tests
 [AutoTheory.UseTestOutputHelper]
 public partial class RequirementsTests
 {
+    public static readonly List<Requirement> BaseRequirements =
+        new() { new Requirement { Name = "Reductech.EDR.Core.Tests" } };
+
     [Fact]
     public void BasicStepShouldHaveNoRequirements()
     {
@@ -36,7 +39,10 @@ public partial class RequirementsTests
 
         var requirements = step.GetAllRequirements().ToList();
 
-        requirements.Should().BeEquivalentTo(new Requirement() { Name = "FixedRequirement" });
+        requirements.Should()
+            .BeEquivalentTo(
+                BaseRequirements.Append(new Requirement() { Name = "FixedRequirement" })
+            );
     }
 
     [Fact]
@@ -46,7 +52,10 @@ public partial class RequirementsTests
 
         var requirements = step.GetAllRequirements().ToList();
 
-        requirements.Should().BeEquivalentTo(new Requirement() { Name = "FixedRequirement" });
+        requirements.Should()
+            .BeEquivalentTo(
+                BaseRequirements.Append(new Requirement() { Name = "FixedRequirement" })
+            );
     }
 
     [Fact]
@@ -58,12 +67,14 @@ public partial class RequirementsTests
 
         requirements.Should()
             .BeEquivalentTo(
-                new Requirement()
-                {
-                    Name       = "MySoftware",
-                    MinVersion = new Version("1.0.0"),
-                    MaxVersion = new Version("2.0.0")
-                }
+                BaseRequirements.Append(
+                    new Requirement()
+                    {
+                        Name       = "MySoftware",
+                        MinVersion = new Version("1.0.0"),
+                        MaxVersion = new Version("2.0.0")
+                    }
+                )
             );
     }
 
@@ -79,12 +90,14 @@ public partial class RequirementsTests
 
         requirements.Should()
             .BeEquivalentTo(
-                new Requirement()
-                {
-                    Name       = "MySoftware",
-                    MinVersion = new Version("1.0.0"),
-                    MaxVersion = new Version("2.0.0")
-                }
+                BaseRequirements.Append(
+                    new Requirement()
+                    {
+                        Name       = "MySoftware",
+                        MinVersion = new Version("1.0.0"),
+                        MaxVersion = new Version("2.0.0")
+                    }
+                )
             );
     }
 
@@ -101,7 +114,7 @@ public partial class RequirementsTests
         [Required]
         [StepProperty(1)]
         [RequiredVersion("MySoftware", minRequiredVersion: "1.0.0", maxRequiredVersion: "2.0.0")]
-        public IStep<int> BaseStep { get; set; }
+        public IStep<int> BaseStep { get; set; } = null!;
 
         /// <inheritdoc />
         public override IStepFactory StepFactory =>
@@ -115,6 +128,7 @@ public partial class RequirementsTests
             IStateMonad stateMonad,
             CancellationToken cancellationToken)
         {
+            await Task.CompletedTask;
             return 1;
         }
 
@@ -130,15 +144,9 @@ public partial class RequirementsTests
                 new FixedRequirementsStepFactory();
 
             /// <inheritdoc />
-            public override IEnumerable<Requirement> Requirements
-            {
-                get
-                {
-                    return base.Requirements.Prepend(
-                        new Requirement() { Name = "FixedRequirement" }
-                    );
-                }
-            }
+            public override IEnumerable<Requirement> Requirements => base.Requirements.Prepend(
+                new Requirement() { Name = "FixedRequirement" }
+            );
         }
     }
 }
