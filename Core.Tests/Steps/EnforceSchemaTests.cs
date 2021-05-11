@@ -250,7 +250,7 @@ public partial class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Enti
                          null, null, null)
                     )
                     .WithErrorBehavior(ErrorBehavior.Error),
-                "Schema violation: Schema Violated: Expected 'Foo' to not be null in (Foo: \"\")"
+                "Schema violation: Expected 'Foo' to not be null in (Foo: \"\")"
             );
 
             yield return CreateCase(
@@ -262,7 +262,7 @@ public partial class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Enti
                         ("Foo", SCLType.Integer, Multiplicity.Any)
                     )
                     .WithErrorBehavior(ErrorBehavior.Error),
-                "Schema violation: Schema Violated: 'Hello' is not a Integer in (Foo: \"Hello\")"
+                "Schema violation: 'Hello' is not a Integer in (Foo: \"Hello\")"
             );
 
             yield return CreateCase(
@@ -274,7 +274,7 @@ public partial class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Enti
                         ("Foo", SCLType.Integer, Multiplicity.Any)
                     )
                     .WithErrorBehavior(ErrorBehavior.Warning),
-                "Schema violation: Schema Violated: 'Hello' is not a Integer in (Foo: \"Hello\")",
+                "Schema violation: 'Hello' is not a Integer in (Foo: \"Hello\")",
                 "(Foo: \"Hello\")"
             );
 
@@ -331,7 +331,7 @@ public partial class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Enti
                     ExtraPropertyBehavior.Warn,
                     ("Foo", SCLType.String, Multiplicity.Any)
                 ),
-                "Schema violation: Schema Violated: Unexpected Property: 'Bar' in (Foo: \"Hello\" Bar: \"World\")",
+                "Schema violation: Unexpected Property: 'Bar' in (Foo: \"Hello\" Bar: \"World\")",
                 "(Foo: \"Hello\")"
             );
         }
