@@ -202,22 +202,22 @@
     <value>SchemaInvalid: No Enum values defined</value>
   </data>
   <data name="SchemaViolationMissingProperty" xml:space="preserve">
-    <value>Schema Violated: Missing Property: '{0}' in {1}</value>
+    <value>Missing Property: '{0}' in {1}</value>
   </data>
   <data name="SchemaViolationUnexpectedList" xml:space="preserve">
-    <value>Schema Violated: Did not expect a list for '{0}' in {1}</value>
+    <value>Did not expect a list for '{0}' in {1}</value>
   </data>
   <data name="SchemaViolationUnexpectedNull" xml:space="preserve">
-    <value>Schema Violated: Expected '{0}' to not be null in {1}</value>
+    <value>Expected '{0}' to not be null in {1}</value>
   </data>
   <data name="SchemaViolationUnexpectedProperty" xml:space="preserve">
-    <value>Schema Violated: Unexpected Property: '{0}' in {1}</value>
+    <value>Unexpected Property: '{0}' in {1}</value>
   </data>
   <data name="SchemaViolationUnmatchedRegex" xml:space="preserve">
-    <value>Schema Violated: '{0}' does not match regex '{1}' in {2}</value>
+    <value>'{0}' does not match regex '{1}' in {2}</value>
   </data>
   <data name="SchemaViolationWrongType" xml:space="preserve">
-    <value>Schema Violated: '{0}' is not a {1} in {2}</value>
+    <value>'{0}' is not a {1} in {2}</value>
   </data>
   <data name="SCLSyntaxError" xml:space="preserve">
     <value>Syntax Error: {0}</value>

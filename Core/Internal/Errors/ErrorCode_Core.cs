@@ -223,42 +223,42 @@ public sealed record ErrorCode : ErrorCodeBase
                                             SchemaInvalidNoEnumValues));
 
     /// <summary>
-    /// Schema Violated: Missing Property: '{0}' in {1}
+    /// Missing Property: '{0}' in {1}
     /// </summary>
     public static readonly ErrorCode
         SchemaViolationMissingProperty = new(nameof(
                                                  SchemaViolationMissingProperty));
 
     /// <summary>
-    /// Schema Violated: Did not expect a list for '{0}' in {1}
+    /// Did not expect a list for '{0}' in {1}
     /// </summary>
     public static readonly ErrorCode
         SchemaViolationUnexpectedList = new(nameof(
                                                 SchemaViolationUnexpectedList));
 
     /// <summary>
-    /// Schema Violated: Expected '{0}' to not be null in {1}
+    /// Expected '{0}' to not be null in {1}
     /// </summary>
     public static readonly ErrorCode
         SchemaViolationUnexpectedNull = new(nameof(
                                                 SchemaViolationUnexpectedNull));
 
     /// <summary>
-    /// Schema Violated: Unexpected Property: '{0}' in {1}
+    /// Unexpected Property: '{0}' in {1}
     /// </summary>
     public static readonly ErrorCode
         SchemaViolationUnexpectedProperty = new(nameof(
                                                     SchemaViolationUnexpectedProperty));
 
     /// <summary>
-    /// Schema Violated: '{0}' does not match regex '{1}' in {2}
+    /// '{0}' does not match regex '{1}' in {2}
     /// </summary>
     public static readonly ErrorCode
         SchemaViolationUnmatchedRegex = new(nameof(
                                                 SchemaViolationUnmatchedRegex));
 
     /// <summary>
-    /// Schema Violated: '{0}' is not a {1} in {2}
+    /// '{0}' is not a {1} in {2}
     /// </summary>
     public static readonly ErrorCode
         SchemaViolationWrongType = new(nameof(

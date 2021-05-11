@@ -171,7 +171,7 @@ public sealed class TypeResolver
             if (previous.Equals(typeReference))
                 return Unit.Default;
 
-            return new ErrorBuilder(ErrorCode.CannotInferType);
+            return ErrorCode.WrongVariableType.ToErrorBuilder(variable.Name, typeReference.Name);
         }
 
         MyDictionary.Add(variable, typeReference);

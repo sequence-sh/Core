@@ -47,7 +47,7 @@ public sealed class OptionFreezableStep : IFreezableStep
 
             if (r.IsSuccess)
                 return r;
-            else
+            else if (error is null)
                 error = r.Error;
         }
 

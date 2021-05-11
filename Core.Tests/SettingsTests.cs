@@ -200,7 +200,8 @@ public partial class SettingsTests
 			{
 				""logger"": ""*"",
 				""minLevel"": ""Trace"",
-				""writeTo"": ""fileTarget,consoleInfo""
+				""write
+"": ""fileTarget,consoleInfo""
 			}
 		]
 	}
