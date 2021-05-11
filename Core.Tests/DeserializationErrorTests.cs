@@ -48,6 +48,18 @@ public partial class DeserializationErrorTests
                  "Line: 1, Col: 2, Idx: 2 - Line: 1, Col: 1, Idx: 1 Text: <EOF>")
             );
 
+            yield return new DeserializationErrorCase(
+                "- 'hello'\r\n- 'world'",
+                ("'InitialSteps[0]' cannot take the value 'hello'",
+                 "Sequence - Line: 1, Col: 0, Idx: 0 - Line: 2, Col: 8, Idx: 19 Text: - 'hello'\r\n- 'world'")
+            );
+
+            yield return new DeserializationErrorCase(
+                "- 1 + 1\r\n- 2 + 2",
+                ("ArrayConcat has output type Array<T>, not Unit",
+                 "Line: 1, Col: 2, Idx: 2 - Line: 1, Col: 6, Idx: 6 Text: 1 + 1")
+            );
+
             //yield return new DeserializationErrorCase(
             //    "Print(['abc', '123'] == ['abc', '123'])",
             //    ("Type ArrayOfStringStream is not comparable and so cannot be used for sorting.",

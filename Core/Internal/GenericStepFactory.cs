@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Linq;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Internal.Errors;
+using Reductech.EDR.Core.Util;
 
 namespace Reductech.EDR.Core.Internal
 {
@@ -39,7 +41,20 @@ public abstract class GenericStepFactory : StepFactory
         );
 
         if (genericTypeParameter.IsFailure)
+        {
+            var firstError = genericTypeParameter.Error.GetAllErrors().First();
+
+            if (firstError.ErrorBuilder.ErrorCode
+             == ErrorCode.CannotInferType) //Get a more specific error
+                return ErrorCode.WrongOutputType.ToErrorBuilder(
+                        TypeName,
+                        OutputTypeExplanation,
+                        expectedTypeReference.Name
+                    )
+                    .WithLocationSingle(firstError.Location);
+
             return genericTypeParameter.ConvertFailure<ICompoundStep>();
+        }
 
         var result = genericTypeParameter.Value.TryGetType(typeResolver)
             .Bind(x => TryCreateGeneric(StepType, x))
