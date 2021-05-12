@@ -120,7 +120,7 @@ public partial class GenerateDocumentationTests : StepTestBase<GenerateDocumenta
                 logDocumentation,
                 Unit.Default,
                 ToLogs(Entities(Contents(notHeader), not))
-            ).WithStepFactoryStore(
+            ) { TestDeserializeAndRun = false }.WithStepFactoryStore(
                 StepFactoryStore.Create(
                     System.Array.Empty<ConnectorData>(),
                     new SimpleStepFactory<Not, bool>()
@@ -132,7 +132,7 @@ public partial class GenerateDocumentationTests : StepTestBase<GenerateDocumenta
                 logDocumentation,
                 Unit.Default,
                 ToLogs(Entities(Contents(exampleStepHeader), documentationExample))
-            ).WithStepFactoryStore(
+            ) { TestDeserializeAndRun = false }.WithStepFactoryStore(
                 StepFactoryStore.Create(
                     System.Array.Empty<ConnectorData>(),
                     DocumentationExampleStepFactory.Instance
@@ -144,7 +144,7 @@ public partial class GenerateDocumentationTests : StepTestBase<GenerateDocumenta
                 logDocumentation,
                 Unit.Default,
                 ToLogs(Entities(Contents(notHeader, exampleStepHeader), not, documentationExample))
-            ).WithStepFactoryStore(
+            ) { TestDeserializeAndRun = false }.WithStepFactoryStore(
                 StepFactoryStore.Create(
                     System.Array.Empty<ConnectorData>(),
                     new SimpleStepFactory<Not, bool>(),

@@ -21,8 +21,9 @@ public abstract partial class StepTestBase<TStep, TOutput>
     public IEnumerable<StepCase> RunCases => StepCases;
 
     [AutoTheory.GenerateAsyncTheory("DeserializeAndRun")]
-    public IEnumerable<StepCase> DeserializeAndRunCases =>
-        StepCases.Select(x => x with { SerializeFirst = true });
+    public IEnumerable<StepCase> DeserializeAndRunCases => StepCases
+        .Where(x => x.TestDeserializeAndRun)
+        .Select(x => x with { SerializeFirst = true });
 
     #pragma warning disable CA1034 // Nested types should not be visible
     public record StepCase : CaseThatExecutes
@@ -60,6 +61,8 @@ public abstract partial class StepTestBase<TStep, TOutput>
         /// </summary>
         public ExpectedOutput ExpectedOutput { get; }
 
+        public bool TestDeserializeAndRun { get; set; } = true;
+
         /// <inheritdoc />
         public override string ToString() => Name;
 
@@ -83,7 +86,9 @@ public abstract partial class StepTestBase<TStep, TOutput>
 
             var tStepAssembly = Assembly.GetAssembly(typeof(TStep))!;
 
-            var sfs = StepFactoryStore.Create(Settings, tStepAssembly);
+            var sfs = StepFactoryStoreToUse.Unwrap(
+                StepFactoryStore.Create(Settings, tStepAssembly)
+            );
 
             var deserializeResult = SCLParsing.TryParseStep(scl);
 
