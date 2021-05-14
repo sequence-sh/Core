@@ -4,8 +4,39 @@
 
 ### Steps
 
-- Added `EvaluateArray` step
-- Added `RunSCL` step
+- Added
+  - `EvaluateArray`
+  - `RunSCL`
+
+Steps that that work with the file system and with structured data have been
+moved to separate connectors:
+
+- Moved to the [FileSystem](https://gitlab.com/reductech/edr/connectors/filesystem) Connector
+
+  - `DirectoryCopy`
+  - `DirectoryExists`
+  - `DirectoryMove`
+  - `CreateDirectory`
+  - `FileCopy`
+  - `FileExists`
+  - `FileExtract`
+  - `FileMove`
+  - `FileRead`
+  - `FileWrite`
+  - `DeleteItem`
+  - `PathCombine`
+
+- Moved to the [StructuredData](https://gitlab.com/reductech/edr/connectors/structureddata) Connector
+  - `FromConcordance`
+  - `FromCSV`
+  - `FromIDX`
+  - `FromJson`
+  - `FromJsonArray`
+  - `ToConcordance`
+  - `ToCSV`
+  - `ToIDX`
+  - `ToJson`
+  - `ToJsonArray`
 
 ### Core SDK
 
@@ -14,36 +45,12 @@
 
 ### Connector Updates
 
+- Connectors can be dynamically loaded at runtime
 - Connector Settings now support plugins
-- `DirectoryCopy` was moved to `FileSystem` connector
-- `DirectoryExists` was moved to `FileSystem` connector
-- `DirectoryMove` was moved to `FileSystem` connector
-- `CreateDirectory` was moved to `FileSystem` connector
-- `FileCopy` was moved to `FileSystem` connector
-- `FileExists` was moved to `FileSystem` connector
-- `FileExtract` was moved to `FileSystem` connector
-- `FileMove` was moved to `FileSystem` connector
-- `FileRead` was moved to `FileSystem` connector
-- `FileWrite` was moved to `FileSystem` connector
-- `DeleteItem` was moved to `FileSystem` connector
-- `PathCombine` was moved to `FileSystem` connector
-- `FromConcordance` was moved to the `StructuredData` connector
-- `FromCSV` was moved to the `StructuredData` connector
-- `FromIDX` was moved to the `StructuredData` connector
-- `FromJson` was moved to the `StructuredData` connector
-- `FromJsonArray` was moved to the `StructuredData` connector
-- `ToConcordance` was moved to the `StructuredData` connector
-- `ToCSV` was moved to the `StructuredData` connector
-- `ToIDX` was moved to the `StructuredData` connector
-- `ToJson` was moved to the `StructuredData` connector
-- `ToJsonArray` was moved to the `StructuredData` connector
 
 ### Data Interchange Format
 
 - `Schema.AllowExtraProperties` changed to `Schema.ExtraProperties` which can take `Allow`, `Warn`, `Remove`, or `Fail`
-
-
-- Connectors can be dynamically loaded at runtime
 
 ## Issues Closed in this Release
 
@@ -56,6 +63,7 @@
 - Refactor Connector Settings #251
 - Change Connector settings objects to support plugins #250
 - Create an Evaluate Step to allow technicians to use arrays more than once #245
+- Create a 'Run' step that runs another step and ignores the output #232
 - Add a step to remove properties from an entity #248
 - Allow tests to check final context #244
 - Split File System steps into their own connector #239
@@ -78,10 +86,6 @@
 ### Maintenance
 
 - Allow DeserializeAndRun step cases to use a custom step factory #255
-
-### Other
-
-- Create a 'Run' step that runs another step and ignores the output #232
 
 # v0.8.0 (2021-04-08)
 
