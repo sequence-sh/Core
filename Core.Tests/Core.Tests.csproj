@@ -6,6 +6,7 @@
     <IsPublishable>false</IsPublishable>
     <IsTestProject>true</IsTestProject>
     <RootNamespace>Reductech.EDR.Core.Tests</RootNamespace>
+    <AssemblyName>Reductech.EDR.Core.Tests</AssemblyName>
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
@@ -16,7 +17,6 @@
     <Authors>Reductech</Authors>
     <Company>Reductech</Company>
     <Copyright>Copyright (c) 2021 Reductech Ltd</Copyright>
-    <AssemblyName>Reductech.EDR.Core.Tests</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>

@@ -25,53 +25,6 @@ public partial class ConnectorTests
         "ExampleConnector.dll"
     );
 
-    //    [Fact]
-    //    public async Task TestConnectorFromSettings()
-    //    {
-    //        var logger = new TestOutputLogger("Step Logger", TestOutputHelper);
-
-    //        var connectorsString = $@"{{
-    //""connectors"": {{
-    //    ""example"":{{
-    //        ""path"": {JsonConvert.SerializeObject(RelativePath)},
-    //           ""ColorSource"": ""Red""
-
-    //    }}
-    //}}
-    //}}";
-
-    //        var settings = SCLSettings.CreateFromString(connectorsString);
-
-    //        var stepFactoryStoreResult = StepFactoryStore.TryCreateFromSettings(settings, logger);
-
-    //        stepFactoryStoreResult.ShouldBeSuccessful();
-
-    //        var injectedContextsResult = stepFactoryStoreResult.Value.TryGetInjectedContexts(settings);
-
-    //        injectedContextsResult.ShouldBeSuccessful();
-
-    //        var externalContext = ExternalContext.Default with
-    //        {
-    //            InjectedContexts = injectedContextsResult.Value
-    //        };
-
-    //        var runner = new SCLRunner(
-    //            SCLSettings.EmptySettings,
-    //            logger,
-    //            stepFactoryStoreResult.Value,
-    //            externalContext
-    //        );
-
-    //        var r = await
-    //            runner.RunSequenceFromTextAsync(
-    //                "Log (GetTestString)",
-    //                new Dictionary<string, object>(),
-    //                CancellationToken.None
-    //            );
-
-    //        r.ShouldBeSuccessful();
-    //    }
-
     [Fact]
     public async Task TestConnector()
     {
