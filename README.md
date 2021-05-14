@@ -12,7 +12,6 @@ called Sequences using the Sequence Configuration Language (SCL).
 - An interpreter for the Sequence Configuration Language
 - A collection of application-independent Steps that:
   - Can be used to import/export data and structure workflows
-  - Work with various file formats: CSV, Json, Concordance
   - Manipulate strings, e.g. Append, Concatenate, ChangeCase
   - Enforce data standards and convert between various formats through the use of Schemas
   - Create and manipulate entities (structured objects that represent data)
@@ -23,13 +22,15 @@ Connectors are collections of Steps that are for use with
 a particular application. A Step is a unit of work in an application
 such as creating a case, ingesting data, searching or exporting data.
 
-### [Try SCL](https://gitlab.com/reductech/edr/edr/-/releases)
+## Try SCL
+
+Download `EDR`, the console application that runs SCL here: https://gitlab.com/reductech/edr/edr/-/releases
 
 ## Documentation
 
 - Documentation is available here: https://docs.reductech.io
-- A quick-start is available here: https://docs.reductech.io/howto/quick-start.html
-- Developers documentation is available here: https://docs.reductech.io/developers/intro.html
+- A quick-start is available here: https://docs.reductech.io/edr/how-to/quick-start.html
+- Everything you want to know about SCL: https://docs.reductech.io/edr/how-to/scl/sequence-configuration-language.html
 
 ## E-discovery Reduct
 

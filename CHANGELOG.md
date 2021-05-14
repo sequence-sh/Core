@@ -1,3 +1,92 @@
+# v0.9.0 (2021-05-14)
+
+## Summary of Changes
+
+### Steps
+
+- Added
+  - `EvaluateArray`
+  - `RunSCL`
+
+Steps that that work with the file system and with structured data have been
+moved to separate connectors:
+
+- Moved to the [FileSystem](https://gitlab.com/reductech/edr/connectors/filesystem) Connector
+
+  - `DirectoryCopy`
+  - `DirectoryExists`
+  - `DirectoryMove`
+  - `CreateDirectory`
+  - `FileCopy`
+  - `FileExists`
+  - `FileExtract`
+  - `FileMove`
+  - `FileRead`
+  - `FileWrite`
+  - `DeleteItem`
+  - `PathCombine`
+
+- Moved to the [StructuredData](https://gitlab.com/reductech/edr/connectors/structureddata) Connector
+  - `FromConcordance`
+  - `FromCSV`
+  - `FromIDX`
+  - `FromJson`
+  - `FromJsonArray`
+  - `ToConcordance`
+  - `ToCSV`
+  - `ToIDX`
+  - `ToJson`
+  - `ToJsonArray`
+
+### Core SDK
+
+- `ToJson` now formats output by default. This can be overriden by setting `FormatOutput` to false
+- `ToJsonArray` now formats output by default. This can be overriden by setting `FormatOutput` to false
+
+### Connector Updates
+
+- Connectors can be dynamically loaded at runtime
+- Connector Settings now support plugins
+
+### Data Interchange Format
+
+- `Schema.AllowExtraProperties` changed to `Schema.ExtraProperties` which can take `Allow`, `Warn`, `Remove`, or `Fail`
+
+## Issues Closed in this Release
+
+### New Features
+
+- Change message log level for PluginLoadContext to debug #256
+- Improve error messages when parsing SCL #221
+- Plugins should automatically introduce requirements #254
+- Add a helper method to get all Step Requirements to support the orchestrator #253
+- Refactor Connector Settings #251
+- Change Connector settings objects to support plugins #250
+- Create an Evaluate Step to allow technicians to use arrays more than once #245
+- Create a 'Run' step that runs another step and ignores the output #232
+- Add a step to remove properties from an entity #248
+- Allow tests to check final context #244
+- Split File System steps into their own connector #239
+- Split StructuredData steps into their own connector #240
+- Specify parameter type in error messages #206
+- EnforceSchema should print location when errors occur #237
+- Add step to allow running scl files in a sequence #241
+- Add a default date input/output format for schemas #236
+- ToJson and ToJsonArray should format output #238
+- Allow schemas to filter out extra properties #235
+- Create a system for allowing plugins to inject external contexts #242
+- It should be possible to load connectors as plugins to allow developers to create their own connectors #234
+
+### Bug Fixes
+
+- ConvertToEntity throws StackOverflowException when converting nested entities #252
+- Empty string in Entities are returning double quotes #247
+- Serialized nested sequences should only have one dash at the start #229
+
+### Maintenance
+
+- Allow DeserializeAndRun step cases to use a custom step factory #255
+
 # v0.8.0 (2021-04-08)
 
 ## Summary of Changes
