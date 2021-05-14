@@ -58,4 +58,8 @@
     <ProjectReference Include="..\Core.TestHarness\Core.TestHarness.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\ExampleConnector\ExampleConnector.csproj" />
+  </ItemGroup>
+
 </Project>
