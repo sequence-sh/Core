@@ -17,9 +17,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <!--<PackageReference Include="Reductech.EDR.Core" Version="0.8.0">
-          <ExcludeAssets>runtime</ExcludeAssets>
-    </PackageReference>-->
     <PackageReference Include="System.Drawing.Common" Version="5.0.2" />
   </ItemGroup>
 
@@ -28,7 +25,10 @@
       <Private>false</Private>
       <ExcludeAssets>runtime</ExcludeAssets>
     </ProjectReference>
-
   </ItemGroup>
+
+  <Target Name="CopyOutput" AfterTargets="Build">
+    <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(ProjectDir)\bin\" />
+  </Target>
 
 </Project>
