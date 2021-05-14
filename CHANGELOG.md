@@ -1,3 +1,88 @@
+# v0.9.0 (2021-05-14)
+
+## Summary of Changes
+
+### Steps
+
+- Added `EvaluateArray` step
+- Added `RunSCL` step
+
+### Core SDK
+
+- `ToJson` now formats output by default. This can be overriden by setting `FormatOutput` to false
+- `ToJsonArray` now formats output by default. This can be overriden by setting `FormatOutput` to false
+
+### Connector Updates
+
+- Connector Settings now support plugins
+- `DirectoryCopy` was moved to `FileSystem` connector
+- `DirectoryExists` was moved to `FileSystem` connector
+- `DirectoryMove` was moved to `FileSystem` connector
+- `CreateDirectory` was moved to `FileSystem` connector
+- `FileCopy` was moved to `FileSystem` connector
+- `FileExists` was moved to `FileSystem` connector
+- `FileExtract` was moved to `FileSystem` connector
+- `FileMove` was moved to `FileSystem` connector
+- `FileRead` was moved to `FileSystem` connector
+- `FileWrite` was moved to `FileSystem` connector
+- `DeleteItem` was moved to `FileSystem` connector
+- `PathCombine` was moved to `FileSystem` connector
+- `FromConcordance` was moved to the `StructuredData` connector
+- `FromCSV` was moved to the `StructuredData` connector
+- `FromIDX` was moved to the `StructuredData` connector
+- `FromJson` was moved to the `StructuredData` connector
+- `FromJsonArray` was moved to the `StructuredData` connector
+- `ToConcordance` was moved to the `StructuredData` connector
+- `ToCSV` was moved to the `StructuredData` connector
+- `ToIDX` was moved to the `StructuredData` connector
+- `ToJson` was moved to the `StructuredData` connector
+- `ToJsonArray` was moved to the `StructuredData` connector
+
+### Data Interchange Format
+
+- `Schema.AllowExtraProperties` changed to `Schema.ExtraProperties` which can take `Allow`, `Warn`, `Remove`, or `Fail`
+
+
+- Connectors can be dynamically loaded at runtime
+
+## Issues Closed in this Release
+
+### New Features
+
+- Change message log level for PluginLoadContext to debug #256
+- Improve error messages when parsing SCL #221
+- Plugins should automatically introduce requirements #254
+- Add a helper method to get all Step Requirements to support the orchestrator #253
+- Refactor Connector Settings #251
+- Change Connector settings objects to support plugins #250
+- Create an Evaluate Step to allow technicians to use arrays more than once #245
+- Add a step to remove properties from an entity #248
+- Allow tests to check final context #244
+- Split File System steps into their own connector #239
+- Split StructuredData steps into their own connector #240
+- Specify parameter type in error messages #206
+- EnforceSchema should print location when errors occur #237
+- Add step to allow running scl files in a sequence #241
+- Add a default date input/output format for schemas #236
+- ToJson and ToJsonArray should format output #238
+- Allow schemas to filter out extra properties #235
+- Create a system for allowing plugins to inject external contexts #242
+- It should be possible to load connectors as plugins to allow developers to create their own connectors #234
+
+### Bug Fixes
+
+- ConvertToEntity throws StackOverflowException when converting nested entities #252
+- Empty string in Entities are returning double quotes #247
+- Serialized nested sequences should only have one dash at the start #229
+
+### Maintenance
+
+- Allow DeserializeAndRun step cases to use a custom step factory #255
+
+### Other
+
+- Create a 'Run' step that runs another step and ignores the output #232
+
 # v0.8.0 (2021-04-08)
 
 ## Summary of Changes
