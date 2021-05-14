@@ -51,7 +51,7 @@ public class PluginLoadContext : AssemblyLoadContext
         string absolutePath,
         ILogger logger)
     {
-        logger.LogInformation($"Loading assembly from path: {absolutePath}");
+        logger.LogDebug($"Loading assembly from path: {absolutePath}");
 
         try
         {
@@ -61,7 +61,7 @@ public class PluginLoadContext : AssemblyLoadContext
                 new AssemblyName(Path.GetFileNameWithoutExtension(absolutePath))
             );
 
-            logger.LogInformation($"Loaded assembly: {assembly.FullName}");
+            logger.LogDebug($"Successfully loaded assembly: {assembly.FullName}");
 
             return assembly;
         }
