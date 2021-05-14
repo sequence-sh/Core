@@ -20,8 +20,6 @@ public partial class ConnectorTests
     private static readonly string RelativePath = Path.Combine(
         "ExampleConnector",
         "bin",
-        "Debug",
-        "net5.0",
         "ExampleConnector.dll"
     );
 
