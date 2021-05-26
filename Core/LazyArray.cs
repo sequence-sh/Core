@@ -155,10 +155,16 @@ public sealed record LazyArray<T>
     bool IEquatable<Array<T>>.Equals(Array<T>? other) => Equals(this, other);
 
     /// <inheritdoc />
+    protected override Type EqualityContract => typeof(Array<T>);
+
+    /// <inheritdoc />
     public bool Equals(LazyArray<T>? other)
     {
         return Equals(this, other);
     }
+
+    /// <inheritdoc />
+    public override string ToString() => NameInLogs;
 }
 
 }

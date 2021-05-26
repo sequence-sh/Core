@@ -133,6 +133,9 @@ public sealed record EagerArray<T>(IReadOnlyList<T> List) : Array<T>, IEquatable
     }
 
     /// <inheritdoc />
+    protected override Type EqualityContract => typeof(Array<T>);
+
+    /// <inheritdoc />
     public bool Equals(EagerArray<T>? other)
     {
         return Equals(this, other);

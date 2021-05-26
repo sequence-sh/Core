@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using AutoTheory;
 using FluentAssertions;
@@ -12,10 +13,10 @@ namespace Reductech.EDR.Core.Tests
 /// <summary>
 /// Tests equals and get hash code for various objects
 /// </summary>
-[AutoTheory.UseTestOutputHelper]
+[UseTestOutputHelper]
 public partial class EqualityTests
 {
-    [AutoTheory.GenerateTheory("Arrays")]
+    [GenerateTheory("Arrays")]
     public IEnumerable<EqualityTestInstance<Array<int>>> ArrayTestInstances
     {
         get
@@ -38,6 +39,12 @@ public partial class EqualityTests
 
                 var ea = new LazyArray<int>(GetStuff());
 
+                return ea;
+            }
+
+            static Array<int> GetLazyArray(params int[] numbers)
+            {
+                var ea = new LazyArray<int>(numbers.ToAsyncEnumerable());
                 return ea;
             }
 
@@ -88,27 +95,37 @@ public partial class EqualityTests
                 new EagerArray<int>(new[] { 1, 2, 3 }),
                 false
             );
+
+            yield return new EqualityTestInstance<Array<int>>(
+                GetLazyArray(1, 2, 3),
+                new EagerArray<int>(new[] { 1, 2, 3 }),
+                true
+            );
         }
     }
 
     public record EqualityTestInstance<T>(T Left, T? Right, bool ShouldBeEqual) : ITestInstance
+        where T : IEquatable<T>
     {
         /// <inheritdoc />
         public void Run(ITestOutputHelper testOutputHelper)
         {
-            var equal          = Left!.Equals(Right);
+            var lrEquals       = Left!.Equals(Right);
+            var rlEquals       = Right is not null && Right.Equals(Left);
             var leftHash       = Left.GetHashCode();
             var rightHash      = Right?.GetHashCode() ?? -1;
             var hashCodesEqual = leftHash == rightHash;
 
             if (ShouldBeEqual)
             {
-                equal.Should().BeTrue("they should be equal");
+                lrEquals.Should().BeTrue("left should equal right");
+                rlEquals.Should().BeTrue("right should equal left");
                 hashCodesEqual.Should().BeTrue("Hash codes should be equal");
             }
             else
             {
-                equal.Should().BeFalse("they should not be equal");
+                lrEquals.Should().BeFalse("left should not equal right");
+                rlEquals.Should().BeFalse("right should not equal left");
                 hashCodesEqual.Should().BeFalse("Hash codes should not be equal");
             }
         }
