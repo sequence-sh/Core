@@ -105,7 +105,31 @@ public class ExternalProcessRunner : IExternalProcessRunner
         CancellationToken cancellationToken)
     {
         if (!File.Exists(processPath))
-            return new ErrorBuilder(ErrorCode.ExternalProcessNotFound, processPath);
+        {
+            var environmentPath = Environment.GetEnvironmentVariable("PATH") ?? "";
+
+            var paths = environmentPath.Split(Path.PathSeparator)
+                .Distinct()
+                .Where(x => !string.IsNullOrWhiteSpace(x))
+                .ToList();
+
+            var found = false;
+
+            foreach (var path in paths)
+            {
+                var newPath = Path.Combine(path, processPath);
+
+                if (File.Exists(newPath))
+                {
+                    processPath = newPath;
+                    found       = true;
+                    break;
+                }
+            }
+
+            if (!found)
+                return new ErrorBuilder(ErrorCode.ExternalProcessNotFound, processPath);
+        }
 
         var argumentString = string.Join(' ', arguments.Select(EncodeParameterArgument));
 
