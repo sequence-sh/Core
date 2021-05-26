@@ -4,6 +4,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
+using Divergic.Logging.Xunit;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -20,20 +21,7 @@ namespace Reductech.EDR.Core.Tests
 [AutoTheory.UseTestOutputHelper]
 public partial class ExternalProcessTests
 {
-    public static StateMonad CreateStateMonad(ILogger logger)
-    {
-        var repo = new MockRepository(MockBehavior.Strict);
-
-        var stateMonad = new StateMonad(
-            logger,
-            SCLSettings.EmptySettings,
-            StepFactoryStore.Create(),
-            repo.OneOf<IExternalContext>(),
-            new Dictionary<string, object>()
-        );
-
-        return stateMonad;
-    }
+#region RunExternalProcess
 
     [Fact]
     public async Task RunExternalProcess_ShouldErrorIfProcessIsMissing()
@@ -186,6 +174,116 @@ public partial class ExternalProcessTests
         result.Error.AsString.Should().Contain("test error");
     }
 
+#endregion
+
+#region StartExternalProcess
+
+    [Fact]
+    public async Task StartExternalProcess_ShouldErrorIfProcessIsMissing()
+    {
+        var stateMonad =
+            CreateStateMonad(new TestOutputLogger("ExternalProcess", TestOutputHelper));
+
+        var startProcessResult = ExternalProcessRunner.Instance.StartExternalProcess(
+            "MyRidiculousImpossibleProcess",
+            new List<string>() { "--command", "write-output 'hello'" },
+            new Dictionary<string, string>(),
+            Encoding.Default,
+            stateMonad,
+            null
+        );
+
+        startProcessResult.ShouldBeFailure(
+            ErrorCode.ExternalProcessNotFound.ToErrorBuilder("MyRidiculousImpossibleProcess")
+        );
+    }
+
+    [Fact]
+    public async Task StartExternalProcess_MustRunProcess()
+    {
+        var stateMonad =
+            CreateStateMonad(new TestOutputLogger("ExternalProcess", TestOutputHelper));
+
+        var startProcessResult = ExternalProcessRunner.Instance.StartExternalProcess(
+            "pwsh",
+            new List<string>() { "--command", "write-output 'hello'" },
+            new Dictionary<string, string>(),
+            Encoding.Default,
+            stateMonad,
+            null
+        );
+
+        startProcessResult.ShouldBeSuccessful();
+
+        var outputLines = await startProcessResult.Value.OutputChannel
+            .ReadAllAsync(CancellationToken.None)
+            .ToListAsync();
+
+        outputLines.Select(x => x.source).Should().AllBeEquivalentTo(StreamSource.Output);
+
+        startProcessResult.Value.WaitForExit(null);
+
+        outputLines.Select(x => x.line).Should().BeEquivalentTo("hello");
+    }
+
+    [Fact]
+    public async Task StartExternalProcess_MustPassEnvironmentVariables()
+    {
+        var stateMonad =
+            CreateStateMonad(new TestOutputLogger("ExternalProcess", TestOutputHelper));
+
+        var startProcessResult = ExternalProcessRunner.Instance.StartExternalProcess(
+            "pwsh",
+            new List<string>() { "--command", "write-output $env:TestVariable" },
+            new Dictionary<string, string>() { { "TestVariable", "hello" } },
+            Encoding.Default,
+            stateMonad,
+            null
+        );
+
+        startProcessResult.ShouldBeSuccessful();
+
+        var outputLines = await startProcessResult.Value.OutputChannel
+            .ReadAllAsync(CancellationToken.None)
+            .ToListAsync();
+
+        outputLines.Select(x => x.source).Should().AllBeEquivalentTo(StreamSource.Output);
+
+        startProcessResult.Value.WaitForExit(1000);
+        startProcessResult.Value.Dispose();
+
+        outputLines.Select(x => x.line).Should().BeEquivalentTo("hello");
+    }
+
+    [Fact]
+    public async Task StartExternalProcess_MustOutputErrors()
+    {
+        var stateMonad =
+            CreateStateMonad(new TestOutputLogger("ExternalProcess", TestOutputHelper));
+
+        var startProcessResult = ExternalProcessRunner.Instance.StartExternalProcess(
+            "pwsh",
+            new List<string>() { "--command", "write-error 'test error'" },
+            new Dictionary<string, string>(),
+            Encoding.Default,
+            stateMonad,
+            null
+        );
+
+        startProcessResult.ShouldBeSuccessful();
+
+        var outputLines = await startProcessResult.Value.OutputChannel
+            .ReadAllAsync(CancellationToken.None)
+            .ToListAsync();
+
+        startProcessResult.Value.WaitForExit(1000);
+        startProcessResult.Value.Dispose();
+
+        outputLines.Should().Contain(("[91mWrite-Error: [91mtest error[0m", StreamSource.Error));
+    }
+
+#endregion
+
     private class SelectiveErrorHandler : IErrorHandler
     {
         public readonly string IgnoreRegex;
@@ -201,6 +299,21 @@ public partial class ExternalProcessTests
             var r = Regex.IsMatch(s, IgnoreRegex);
             return r;
         }
+    }
+
+    public static StateMonad CreateStateMonad(ILogger logger)
+    {
+        var repo = new MockRepository(MockBehavior.Strict);
+
+        var stateMonad = new StateMonad(
+            logger,
+            SCLSettings.EmptySettings,
+            StepFactoryStore.Create(),
+            repo.OneOf<IExternalContext>(),
+            new Dictionary<string, object>()
+        );
+
+        return stateMonad;
     }
 }
 
