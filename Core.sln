@@ -12,6 +12,16 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{F8DABCAF-4BB1-4FF9-A1F2-E426A2CF9673}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
+		.gitignore = .gitignore
+		.gitlab-ci.yml = .gitlab-ci.yml
+		.gitlab\issue_templates\Bug.md = .gitlab\issue_templates\Bug.md
+		CHANGELOG.md = CHANGELOG.md
+		codecov.yml = codecov.yml
+		coverlet.runsettings = coverlet.runsettings
+		.config\dotnet-tools.json = .config\dotnet-tools.json
+		.gitlab\issue_templates\Feature.md = .gitlab\issue_templates\Feature.md
+		LICENSE = LICENSE
+		README.md = README.md
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExampleConnector", "ExampleConnector\ExampleConnector.csproj", "{6389F27C-02A4-4323-A082-8A364F6D4296}"
