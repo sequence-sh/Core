@@ -179,7 +179,7 @@ public partial class ExternalProcessTests
 #region StartExternalProcess
 
     [Fact]
-    public async Task StartExternalProcess_ShouldErrorIfProcessIsMissing()
+    public void StartExternalProcess_ShouldErrorIfProcessIsMissing()
     {
         var stateMonad =
             CreateStateMonad(new TestOutputLogger("ExternalProcess", TestOutputHelper));
