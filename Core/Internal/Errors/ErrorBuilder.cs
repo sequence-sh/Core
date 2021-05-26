@@ -56,6 +56,12 @@ public record ErrorBuilder(ErrorCodeBase ErrorCode, ErrorData Data) : IErrorBuil
     /// <inheritdoc />
     public string AsString => Data.AsString(ErrorCode);
 
+    /// <inheritdoc />
+    public override string ToString()
+    {
+        return AsString;
+    }
+
     /// <summary>
     /// Equals method
     /// </summary>

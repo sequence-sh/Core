@@ -16,6 +16,43 @@ namespace Reductech.EDR.Core.Tests
 [UseTestOutputHelper]
 public partial class EqualityTests
 {
+    [GenerateTheory("ErrorBuilders")]
+    public IEnumerable<EqualityTestInstance<IErrorBuilder>> ErrorBuilderTestInstances
+    {
+        get
+        {
+            yield return new EqualityTestInstance<IErrorBuilder>(
+                ErrorCode.Test.ToErrorBuilder("abc"),
+                ErrorCode.Test.ToErrorBuilder("abc"),
+                true
+            );
+
+            yield return new EqualityTestInstance<IErrorBuilder>(
+                ErrorCode.Test.ToErrorBuilder("abc"),
+                ErrorCode.Test.ToErrorBuilder("123"),
+                false
+            );
+
+            yield return new EqualityTestInstance<IErrorBuilder>(
+                ErrorCode.Test.ToErrorBuilder("123"),
+                new ErrorBuilderList(new[] { ErrorCode.Test.ToErrorBuilder("123") }),
+                true
+            );
+
+            yield return new EqualityTestInstance<IErrorBuilder>(
+                ErrorCode.Test.ToErrorBuilder("234"),
+                new ErrorBuilderList(
+                    new[]
+                    {
+                        ErrorCode.Test.ToErrorBuilder("234"),
+                        ErrorCode.Test.ToErrorBuilder("567")
+                    }
+                ),
+                true
+            );
+        }
+    }
+
     [GenerateTheory("Arrays")]
     public IEnumerable<EqualityTestInstance<Array<int>>> ArrayTestInstances
     {
@@ -105,13 +142,25 @@ public partial class EqualityTests
     }
 
     public record EqualityTestInstance<T>(T Left, T? Right, bool ShouldBeEqual) : ITestInstance
-        where T : IEquatable<T>
+
     {
         /// <inheritdoc />
         public void Run(ITestOutputHelper testOutputHelper)
         {
-            var lrEquals       = Left!.Equals(Right);
-            var rlEquals       = Right is not null && Right.Equals(Left);
+            bool lrEquals;
+            bool rlEquals;
+
+            if (Left is IEquatable<T> eL && Right is IEquatable<T> eR)
+            {
+                lrEquals = eL.Equals(Right);
+                rlEquals = eR.Equals(Left);
+            }
+            else
+            {
+                lrEquals = Left!.Equals(Right);
+                rlEquals = Right is not null && Right.Equals(Left);
+            }
+
             var leftHash       = Left.GetHashCode();
             var rightHash      = Right?.GetHashCode() ?? -1;
             var hashCodesEqual = leftHash == rightHash;
