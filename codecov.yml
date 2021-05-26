@@ -1,0 +1,3 @@
+ignore:
+  - 'ExampleConnector/'
+  - '*.Tests/'
