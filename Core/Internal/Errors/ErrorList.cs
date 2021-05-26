@@ -75,10 +75,20 @@ public class ErrorList : IError
     }
 
     /// <inheritdoc />
-    public override int GetHashCode() => HashCode.Combine(
-        _allErrors.First().GetHashCode(),
-        _allErrors.Count
-    );
+    public override int GetHashCode()
+    {
+        if (_allErrors.Count == 0)
+            return 0;
+
+        if (_allErrors.Count == 1)
+            return _allErrors.First().GetHashCode();
+
+        return HashCode.Combine(
+            _allErrors.Count,
+            _allErrors.First().GetHashCode(),
+            _allErrors.Last().GetHashCode()
+        );
+    }
 }
 
 }

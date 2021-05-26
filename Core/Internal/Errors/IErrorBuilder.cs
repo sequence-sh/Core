@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Reductech.EDR.Core.Internal.Errors
 {
@@ -6,7 +7,7 @@ namespace Reductech.EDR.Core.Internal.Errors
 /// <summary>
 /// An error without a location.
 /// </summary>
-public interface IErrorBuilder
+public interface IErrorBuilder : IEquatable<IErrorBuilder>
 {
     /// <summary>
     /// Converts this errorBuilder to an error

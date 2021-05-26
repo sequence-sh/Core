@@ -12,7 +12,7 @@ namespace Reductech.EDR.Core
 {
 
 /// <summary>
-/// Either a list of an asynchronous list
+/// Either a list or an asynchronous list
 /// </summary>
 public abstract record Array<T> : IArray
 {

@@ -56,6 +56,12 @@ public record ErrorBuilder(ErrorCodeBase ErrorCode, ErrorData Data) : IErrorBuil
     /// <inheritdoc />
     public string AsString => Data.AsString(ErrorCode);
 
+    /// <inheritdoc />
+    public override string ToString()
+    {
+        return AsString;
+    }
+
     /// <summary>
     /// Equals method
     /// </summary>
@@ -142,7 +148,12 @@ public abstract record ErrorData
         /// <inheritdoc />
         public override int GetHashCode()
         {
-            return Arguments.Length;
+            if (Arguments.Length == 0)
+                return 0;
+
+            var r = HashCode.Combine(Arguments.Length, Arguments.First(), Arguments.Last());
+
+            return r;
         }
     }
 
