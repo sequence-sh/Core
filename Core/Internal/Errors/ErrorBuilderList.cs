@@ -47,23 +47,6 @@ public class ErrorBuilderList : IErrorBuilder
 
         return new ErrorBuilderList(errors);
     }
-
-    /// <summary>
-    /// Combine multiple error builders.
-    /// Returns null if there were no error builders
-    /// </summary>
-    public static IErrorBuilder? MaybeCombine(IEnumerable<IErrorBuilder?> errorBuilders)
-    {
-        var errors = errorBuilders.WhereNotNull().SelectMany(x => x.GetErrorBuilders()).ToList();
-
-        if (errors.Count <= 0)
-            return null;
-
-        if (errors.Count == 1)
-            return errors.Single();
-
-        return new ErrorBuilderList(errors);
-    }
 }
 
 }
