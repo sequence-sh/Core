@@ -38,8 +38,10 @@ public class ExternalProcessRunner : IExternalProcessRunner
         IStateMonad stateMonad,
         IStep? callingStep)
     {
-        if (!File.Exists(processPath))
-            return new ErrorBuilder(ErrorCode.ExternalProcessNotFound, processPath);
+        var absolutePath = GetAbsolutePath(processPath);
+
+        if (absolutePath.IsFailure)
+            return absolutePath.ConvertFailure<IExternalProcessReference>();
 
         var argumentString = string.Join(' ', arguments.Select(EncodeParameterArgument));
 
@@ -47,7 +49,7 @@ public class ExternalProcessRunner : IExternalProcessRunner
         {
             StartInfo =
             {
-                FileName               = processPath,
+                FileName               = absolutePath.Value,
                 Arguments              = argumentString,
                 UseShellExecute        = false,
                 RedirectStandardOutput = true,
@@ -71,7 +73,7 @@ public class ExternalProcessRunner : IExternalProcessRunner
         LogSituation.ExternalProcessStarted.Log(
             stateMonad,
             callingStep,
-            processPath,
+            absolutePath.Value,
             argumentString
         );
 
@@ -104,39 +106,17 @@ public class ExternalProcessRunner : IExternalProcessRunner
         IStep? callingStep,
         CancellationToken cancellationToken)
     {
-        if (!File.Exists(processPath))
-        {
-            var environmentPath = Environment.GetEnvironmentVariable("PATH") ?? "";
+        var absolutePath = GetAbsolutePath(processPath);
 
-            var paths = environmentPath.Split(Path.PathSeparator)
-                .Distinct()
-                .Where(x => !string.IsNullOrWhiteSpace(x))
-                .ToList();
-
-            var found = false;
-
-            foreach (var path in paths)
-            {
-                var newPath = Path.Combine(path, processPath);
-
-                if (File.Exists(newPath))
-                {
-                    processPath = newPath;
-                    found       = true;
-                    break;
-                }
-            }
-
-            if (!found)
-                return new ErrorBuilder(ErrorCode.ExternalProcessNotFound, processPath);
-        }
+        if (absolutePath.IsFailure)
+            return absolutePath.ConvertFailure<Unit>();
 
         var argumentString = string.Join(' ', arguments.Select(EncodeParameterArgument));
 
         LogSituation.ExternalProcessStarted.Log(
             stateMonad,
             callingStep,
-            processPath,
+            absolutePath.Value,
             argumentString
         );
 
@@ -144,7 +124,7 @@ public class ExternalProcessRunner : IExternalProcessRunner
         {
             StartInfo =
             {
-                FileName               = processPath,
+                FileName               = absolutePath.Value,
                 Arguments              = argumentString,
                 UseShellExecute        = false,
                 RedirectStandardOutput = true,
@@ -225,6 +205,40 @@ public class ExternalProcessRunner : IExternalProcessRunner
         @"^(.*\s.*?)(\\*)$",
         RegexOptions.Compiled | RegexOptions.Singleline
     );
+
+    private static Result<string, IErrorBuilder> GetAbsolutePath(string processPath)
+    {
+        if (!File.Exists(processPath))
+        {
+            var environmentPath = Environment.GetEnvironmentVariable("PATH") ?? "";
+
+            var paths = environmentPath.Split(Path.PathSeparator)
+                .Distinct()
+                .Where(x => !string.IsNullOrWhiteSpace(x))
+                .ToList();
+
+            foreach (var path in paths)
+            {
+                foreach (var executableExtension in ExecutableExtensions)
+                {
+                    var executable = processPath + executableExtension;
+                    var newPath    = Path.Combine(path, executable);
+
+                    if (File.Exists(newPath))
+                    {
+                        return newPath;
+                    }
+                }
+            }
+
+            return new ErrorBuilder(ErrorCode.ExternalProcessNotFound, processPath);
+        }
+
+        return processPath;
+    }
+
+    private static readonly string[] ExecutableExtensions = new[] { "", ".exe" };
+    // { ".exe", ".com", ".bat", ".sh", ".vbs", ".vbscript", ".vbe", ".js", ".rb", ".cmd", ".cpl", ".ws", ".wsf", ".msc", ".gadget" };
 
     private static string EncodeParameterArgument(string original)
     {

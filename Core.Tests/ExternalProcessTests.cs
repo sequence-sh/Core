@@ -37,7 +37,7 @@ public partial class ExternalProcessTests
         );
 
         var result = await ExternalProcessRunner.Instance.RunExternalProcess(
-            "pwsh.exe",
+            "pwsh",
             IgnoreNoneErrorHandler.Instance,
             new List<string>() { "--command", "write-output 'hello'" },
             new Dictionary<string, string>(),
