@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Reductech.EDR.Core.Internal.Errors
@@ -45,6 +46,32 @@ public class ErrorBuilderList : IErrorBuilder
             return errors.Single();
 
         return new ErrorBuilderList(errors);
+    }
+
+    /// <inheritdoc />
+    public bool Equals(IErrorBuilder? other)
+    {
+        if (other is null)
+            return ErrorBuilders.Count == 0;
+
+        if (ErrorBuilders.Count == 1 && other is ErrorBuilder eb)
+        {
+            return ErrorBuilders.Single().Equals(eb);
+        }
+
+        return GetErrorBuilders().SequenceEqual(other.GetErrorBuilders());
+    }
+
+    /// <inheritdoc />
+    public override int GetHashCode()
+    {
+        if (ErrorBuilders.Count == 0)
+            return 0;
+
+        else if (ErrorBuilders.Count == 1)
+            return ErrorBuilders.Single().GetHashCode();
+
+        return HashCode.Combine(ErrorBuilders.Count, ErrorBuilders.First(), ErrorBuilders.Last());
     }
 }
 
