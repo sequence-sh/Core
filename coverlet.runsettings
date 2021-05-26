@@ -8,6 +8,7 @@
           <UseSourceLink>true</UseSourceLink>
           <IncludeTestAssembly>false</IncludeTestAssembly>
           <Exclude>[ExampleConnector]*</Exclude>
+          <ExcludeByFile>**/*.Designer.cs</ExcludeByFile>
         </Configuration>
       </DataCollector>
     </DataCollectors>
