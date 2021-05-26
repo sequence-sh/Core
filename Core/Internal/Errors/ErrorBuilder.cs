@@ -142,7 +142,12 @@ public abstract record ErrorData
         /// <inheritdoc />
         public override int GetHashCode()
         {
-            return Arguments.Length;
+            if (Arguments.Length == 0)
+                return 0;
+
+            var r = HashCode.Combine(Arguments.Length, Arguments.First(), Arguments.Last());
+
+            return r;
         }
     }
 
