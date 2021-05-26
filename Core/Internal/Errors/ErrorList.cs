@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Reductech.EDR.Core.Util;
 
 namespace Reductech.EDR.Core.Internal.Errors
 {
@@ -49,25 +48,6 @@ public class ErrorList : IError
     public static IError Combine(IEnumerable<IError> source)
     {
         var errors = source.SelectMany(x => x.GetAllErrors()).ToList();
-
-        if (errors.Count == 1)
-            return errors.Single();
-
-        return new ErrorList(errors);
-    }
-
-    /// <summary>
-    /// Combine multiple run errors.
-    /// </summary>
-    public static IError? CombineOrNull(IEnumerable<IError?> source)
-    {
-        var errors = source
-            .WhereNotNull()
-            .SelectMany(x => x.GetAllErrors())
-            .ToList();
-
-        if (!errors.Any())
-            return null;
 
         if (errors.Count == 1)
             return errors.Single();
