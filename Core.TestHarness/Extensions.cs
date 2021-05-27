@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using FluentAssertions;
+using Microsoft.Extensions.Logging;
 using Moq;
 using Reductech.EDR.Core.Abstractions;
 using Reductech.EDR.Core.ExternalProcesses;
@@ -86,6 +87,13 @@ public static class Extensions
     {
         cws.ExternalContextSetupHelper.AddContextMock(name, function);
         return cws;
+    }
+
+    public static T WithCheckLogLevel<T>(this T cte, LogLevel logLevel)
+        where T : ICaseThatExecutes
+    {
+        cte.CheckLogLevel = logLevel;
+        return cte;
     }
 
     /// <summary>

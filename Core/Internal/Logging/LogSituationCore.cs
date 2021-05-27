@@ -39,7 +39,7 @@ public sealed record LogSituation : LogSituationBase
     /// </summary>
     public static readonly LogSituation ExitStepFailure = new(
         nameof(ExitStepFailure),
-        LogLevel.Warning
+        LogLevel.Trace
     );
 
     /// <summary>

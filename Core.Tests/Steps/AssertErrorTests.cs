@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Microsoft.Extensions.Logging;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.TestHarness;
@@ -19,9 +20,13 @@ public partial class AssertErrorTests : StepTestBase<AssertError, Unit>
                 "Log Divide by zero",
                 "AssertError Step: (Log Value: (1 / 0))",
                 Unit.Default,
+                "Log Started with Parameters: [Value, Divide]",
+                "Divide Started with Parameters: [Terms, ArrayNew]",
+                "ArrayNew Started with Parameters: [Elements, 2 Elements]",
+                "ArrayNew Completed Successfully with Result: 2 Elements",
                 "Divide Failed with message: Attempt to Divide by Zero.",
                 "Log Failed with message: Attempt to Divide by Zero."
-            );
+            ).WithCheckLogLevel(LogLevel.Trace);
         }
     }
 
@@ -37,9 +42,13 @@ public partial class AssertErrorTests : StepTestBase<AssertError, Unit>
                     Step = new Log<int> { Value = new Divide() { Terms = Array(1, 0) } }
                 },
                 Unit.Default,
+                "Log Started with Parameters: [Value, Divide]",
+                "Divide Started with Parameters: [Terms, ArrayNew]",
+                "ArrayNew Started with Parameters: [Elements, 2 Elements]",
+                "ArrayNew Completed Successfully with Result: 2 Elements",
                 "Divide Failed with message: Attempt to Divide by Zero.",
                 "Log Failed with message: Attempt to Divide by Zero."
-            );
+            ).WithCheckLogLevel(LogLevel.Trace);
         }
     }
 

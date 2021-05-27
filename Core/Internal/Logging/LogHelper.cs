@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
+using Reductech.EDR.Core.Internal.Errors;
 
 namespace Reductech.EDR.Core.Internal.Logging
 {
@@ -114,6 +115,34 @@ public static class LogHelper
         );
 
         logger.Log(level, default, logMessage, null, (x, _) => x.Message);
+    }
+
+    /// <summary>
+    /// Logs a Core error
+    /// </summary>
+    public static void LogError(this ILogger logger, IError error)
+    {
+        const string errorFormat = "{Error} (Step: {StepName}{Location})";
+
+        foreach (var singleError in error.GetAllErrors())
+        {
+            var loc = singleError.Location.TextLocation == null
+                ? string.Empty
+                : $" {singleError.Location.TextLocation}";
+
+            var stepName = singleError.Location.StepName ?? "n/a";
+
+            if (singleError.Exception != null)
+                logger.LogError(
+                    singleError.Exception,
+                    errorFormat,
+                    singleError.Message,
+                    stepName,
+                    loc
+                );
+            else
+                logger.LogError(errorFormat, singleError.Message, stepName, loc);
+        }
     }
 }
 
