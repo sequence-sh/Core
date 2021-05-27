@@ -122,25 +122,26 @@ public static class LogHelper
     /// </summary>
     public static void LogError(this ILogger logger, IError error)
     {
-        const string format = "{Error} (Step: {StepName} {Location})";
+        const string errorFormat = "{Error} (Step: {StepName}{Location})";
 
         foreach (var singleError in error.GetAllErrors())
         {
+            var loc = singleError.Location.TextLocation == null
+                ? string.Empty
+                : $" {singleError.Location.TextLocation}";
+
+            var stepName = singleError.Location.StepName ?? "n/a";
+
             if (singleError.Exception != null)
                 logger.LogError(
                     singleError.Exception,
-                    format,
+                    errorFormat,
                     singleError.Message,
-                    singleError.Location.StepName,
-                    singleError.Location.TextLocation
+                    stepName,
+                    loc
                 );
             else
-                logger.LogError(
-                    format,
-                    singleError.Message,
-                    singleError.Location.StepName,
-                    singleError.Location.TextLocation
-                );
+                logger.LogError(errorFormat, singleError.Message, stepName, loc);
         }
     }
 }
