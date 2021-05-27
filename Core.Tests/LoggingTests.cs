@@ -111,12 +111,12 @@ public partial class LoggingTests
                     new[] { "AssertError", "Log", "Divide", "ArrayNew" }
                 ),
                 CheckMessageAndScope(
-                    LogLevel.Warning,
+                    LogLevel.Trace,
                     "Divide Failed with message: Attempt to Divide by Zero.",
                     new[] { "AssertError", "Log", "Divide" }
                 ),
                 CheckMessageAndScope(
-                    LogLevel.Warning,
+                    LogLevel.Trace,
                     "Log Failed with message: Attempt to Divide by Zero.",
                     new[] { "AssertError", "Log" }
                 ),
