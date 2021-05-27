@@ -100,14 +100,13 @@ public abstract partial class StepTestBase<TStep, TOutput>
         public abstract void CheckUnitResult(Result<Unit, IError> result);
         public abstract void CheckOutputResult(Result<TOutput, IError> result);
 
-        public virtual void
-            CheckLoggedValues(ITestLoggerFactory loggerFactory) //Only check information or above???
+        public virtual void CheckLoggedValues(ITestLoggerFactory loggerFactory)
         {
             if (!IgnoreLoggedValues)
             {
                 LogChecker.CheckLoggedValues(
                     loggerFactory,
-                    LogLevel.Information,
+                    CheckLogLevel,
                     ExpectedLoggedValues
                 );
             }
@@ -153,6 +152,8 @@ public abstract partial class StepTestBase<TStep, TOutput>
 
         /// <inheritdoc />
         public SCLSettings Settings { get; set; } = SCLSettings.EmptySettings;
+
+        public LogLevel CheckLogLevel { get; set; } = LogLevel.Information;
 
         public Dictionary<VariableName, object> ExpectedFinalState { get; } = new();
         public string Name { get; set; } = Name;

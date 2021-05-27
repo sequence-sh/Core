@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using AutoTheory;
 using CSharpFunctionalExtensions;
+using Microsoft.Extensions.Logging;
 using Moq;
 using Reductech.EDR.Core.Abstractions;
 using Reductech.EDR.Core.ExternalProcesses;
@@ -29,6 +30,8 @@ public interface ICaseThatExecutes : IAsyncTestInstance, ICaseWithSetup
     Maybe<StepFactoryStore> StepFactoryStoreToUse { get; set; }
 
     SCLSettings Settings { get; set; }
+
+    LogLevel CheckLogLevel { get; set; }
 }
 
 public interface ICaseWithSetup
