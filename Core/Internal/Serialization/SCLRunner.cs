@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
@@ -55,40 +54,6 @@ public sealed class SCLRunner
         sequenceMetadata[SCLTextName]    = text;
         sequenceMetadata[SequenceIdName] = Guid.NewGuid();
         return await RunSequence(text, sequenceMetadata, cancellationToken);
-    }
-
-    /// <summary>
-    /// Run step defined in an SCL file.
-    /// </summary>
-    /// <param name="path">Path to the SCL file.</param>
-    /// <param name="sequenceMetadata">Additional metadata about the sequence</param>
-    /// <param name="cancellationToken">The cancellation token</param>
-    /// <returns></returns>
-    public async Task<Result<Unit, IError>> RunSequenceFromPathAsync(
-        string path,
-        Dictionary<string, object> sequenceMetadata,
-        CancellationToken cancellationToken)
-    {
-        Result<string, IError> result;
-
-        try
-        {
-            result = await File.ReadAllTextAsync(path, cancellationToken);
-        }
-        #pragma warning disable CA1031 // Do not catch general exception types
-        catch (Exception e)
-        {
-            return ErrorCode.ExternalProcessError.ToErrorBuilder(e)
-                .WithLocationSingle(ErrorLocation.EmptyLocation);
-        }
-        #pragma warning restore CA1031 // Do not catch general exception types
-
-        sequenceMetadata[SCLPathName]    = path;
-        sequenceMetadata[SequenceIdName] = Guid.NewGuid();
-
-        var result2 = await result.Bind(x => RunSequence(x, sequenceMetadata, cancellationToken));
-
-        return result2;
     }
 
     /// <summary>
