@@ -83,6 +83,13 @@ public partial class DeserializationTests
             yield return new DeserializationTestInstance(@"(a:'')['a'] | Log",  "");
 
             yield return new DeserializationTestInstance(
+                @"- <textCase> = TextCase.Lower
+- <result> = StringToCase 'HELLO' <textCase>
+- log <result>",
+                "hello"
+            );
+
+            yield return new DeserializationTestInstance(
                 @"Log 'Mark''s string'",
                 "Mark's string"
             );

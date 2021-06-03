@@ -112,11 +112,6 @@ public abstract record TypeReference
         public static Actual Bool { get; } = new(SCLType.Bool);
 
         /// <summary>
-        /// An Enum
-        /// </summary>
-        public new static Actual Enum { get; } = new(SCLType.Enum); //TODO remove this
-
-        /// <summary>
         /// A date
         /// </summary>
         public static Actual Date { get; } = new(SCLType.Date);
@@ -127,20 +122,25 @@ public abstract record TypeReference
         public static Actual Entity { get; } = new(SCLType.Entity);
 
         /// <summary>
-        /// Create an actual type
+        /// Create an actual type.
+        /// This does not work for Enum types
         /// </summary>
-        public static Actual Create(SCLType type)
+        internal static Actual Create(SCLType type)
         {
             return type switch
             {
                 SCLType.String  => String,
                 SCLType.Integer => Integer,
                 SCLType.Double  => Double,
-                SCLType.Enum    => Enum,
                 SCLType.Bool    => Bool,
                 SCLType.Date    => Date,
                 SCLType.Entity  => Entity,
-                _               => throw new ArgumentOutOfRangeException(nameof(type), type, null)
+                SCLType.Enum => throw new ArgumentOutOfRangeException(
+                    nameof(type),
+                    type,
+                    "Cannot convert enum type to actual"
+                ),
+                _ => throw new ArgumentOutOfRangeException(nameof(type), type, null)
             };
         }
     }
@@ -436,16 +436,14 @@ public abstract record TypeReference
 
         var sclType = t.GetSCLType();
 
-        if (sclType is not null)
-            return Actual.Create(sclType.Value);
-
-        if (t == typeof(object))
-            return Any.Instance;
-
-        if (t == typeof(Util.Unit))
-            return Unit.Instance;
-
-        return Unknown.Instance;
+        return sclType switch
+        {
+            null when t == typeof(object)    => Any.Instance,
+            null when t == typeof(Util.Unit) => Unit.Instance,
+            null                             => Unknown.Instance,
+            SCLType.Enum                     => new Enum(t),
+            _                                => Actual.Create(sclType.Value)
+        };
     }
 
     /// <summary>
@@ -471,11 +469,6 @@ public abstract record TypeReference
     /// <returns></returns>
     public abstract Result<TypeReference, IErrorBuilder> TryGetArrayMemberTypeReference(
         TypeResolver typeResolver);
-
-    /// <summary>
-    /// Converts an SCL type to TypeReference
-    /// </summary>
-    public static explicit operator TypeReference(SCLType sclType) => Actual.Create(sclType);
 
     /// <summary>
     /// Gets the type referred to by a reference.
