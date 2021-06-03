@@ -111,10 +111,10 @@ public abstract record TypeReference
         /// </summary>
         public static Actual Bool { get; } = new(SCLType.Bool);
 
-        ///// <summary>
-        ///// An Enum
-        ///// </summary>
-        //public new static Actual Enum { get; } = new(SCLType.Enum); //TODO remove this
+        /// <summary>
+        /// An Enum
+        /// </summary>
+        public new static Actual Enum { get; } = new(SCLType.Enum); //TODO remove this
 
         /// <summary>
         /// A date
@@ -136,7 +136,7 @@ public abstract record TypeReference
                 SCLType.String  => String,
                 SCLType.Integer => Integer,
                 SCLType.Double  => Double,
-                SCLType.Enum    => String,
+                SCLType.Enum    => Enum,
                 SCLType.Bool    => Bool,
                 SCLType.Date    => Date,
                 SCLType.Entity  => Entity,
@@ -181,34 +181,34 @@ public abstract record TypeReference
         public override string Name => nameof(Unit);
     }
 
-    ///// <summary>
-    ///// An enum type
-    ///// </summary>
-    //public sealed record Enum(Type EnumType) : TypeReference
-    //{
-    //    /// <param name="typeResolver"></param>
-    //    /// <inheritdoc />
-    //    public override Result<Type, IErrorBuilder> TryGetType(TypeResolver typeResolver)
-    //    {
-    //        return EnumType;
-    //    }
+    /// <summary>
+    /// An enum type
+    /// </summary>
+    public sealed record Enum(Type EnumType) : TypeReference
+    {
+        /// <param name="typeResolver"></param>
+        /// <inheritdoc />
+        public override Result<Type, IErrorBuilder> TryGetType(TypeResolver typeResolver)
+        {
+            return EnumType;
+        }
 
-    //    /// <inheritdoc />
-    //    public override bool Allow(TypeReference other, TypeResolver? typeResolver)
-    //    {
-    //        other = typeResolver?.MaybeResolve(other) ?? other;
+        /// <inheritdoc />
+        public override bool Allow(TypeReference other, TypeResolver? typeResolver)
+        {
+            other = typeResolver?.MaybeResolve(other) ?? other;
 
-    //        return other is Enum e && EnumType == e.EnumType;
-    //    }
+            return other is Enum e && EnumType == e.EnumType;
+        }
 
-    //    /// <inheritdoc />
-    //    public override string Name => EnumType.Name;
+        /// <inheritdoc />
+        public override string Name => EnumType.Name;
 
-    //    /// <param name="typeResolver"></param>
-    //    /// <inheritdoc />
-    //    public override Result<TypeReference, IErrorBuilder> TryGetArrayMemberTypeReference(
-    //        TypeResolver typeResolver) => ErrorCode.CannotInferType.ToErrorBuilder();
-    //}
+        /// <param name="typeResolver"></param>
+        /// <inheritdoc />
+        public override Result<TypeReference, IErrorBuilder> TryGetArrayMemberTypeReference(
+            TypeResolver typeResolver) => ErrorCode.CannotInferType.ToErrorBuilder();
+    }
 
     /// <summary>
     /// An array of the type
