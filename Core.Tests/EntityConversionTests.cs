@@ -51,7 +51,11 @@ public class EntityConversionTests
             SCLParsing.TryParseStep(s)
                 .Bind(
                     x => x.TryFreeze(
-                        TypeReference.Actual.Entity,
+                        new CallerMetadata(
+                            nameof(EntityConversionTests),
+                            nameof(Entity),
+                            TypeReference.Actual.Entity
+                        ),
                         StepFactoryStore.Create()
                     )
                 )

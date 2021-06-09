@@ -12,10 +12,10 @@ public abstract class GenericStepFactory : StepFactory
 {
     /// <inheritdoc />
     public override Result<TypeReference, IError> TryGetOutputTypeReference(
-        TypeReference expectedTypeReference,
+        CallerMetadata callerMetadata,
         FreezableStepData freezableStepData,
         TypeResolver typeResolver) => GetGenericTypeParameter(
-            expectedTypeReference,
+            callerMetadata,
             freezableStepData,
             typeResolver
         )
@@ -28,12 +28,12 @@ public abstract class GenericStepFactory : StepFactory
 
     /// <inheritdoc />
     protected override Result<ICompoundStep, IError> TryCreateInstance(
-        TypeReference expectedTypeReference,
+        CallerMetadata callerMetadata,
         FreezableStepData freezeData,
         TypeResolver typeResolver)
     {
         var genericTypeParameter = GetGenericTypeParameter(
-            expectedTypeReference,
+            callerMetadata,
             freezeData,
             typeResolver
         );
@@ -44,12 +44,11 @@ public abstract class GenericStepFactory : StepFactory
 
             if (firstError.ErrorBuilder.ErrorCode
              == ErrorCode.CannotInferType) //Get a more specific error
-                return ErrorCode.WrongOutputType.ToErrorBuilder(
-                        TypeName,
-                        OutputTypeExplanation,
-                        expectedTypeReference.Name
-                    )
-                    .WithLocationSingle(firstError.Location);
+                return callerMetadata.GetWrongTypeError(
+                    this.TypeName,
+                    OutputTypeExplanation,
+                    firstError.Location
+                );
 
             return genericTypeParameter.ConvertFailure<ICompoundStep>();
         }
@@ -65,7 +64,7 @@ public abstract class GenericStepFactory : StepFactory
     /// Gets the type
     /// </summary>
     protected abstract Result<TypeReference, IError> GetGenericTypeParameter(
-        TypeReference expectedTypeReference,
+        CallerMetadata callerMetadata,
         FreezableStepData freezableStepData,
         TypeResolver typeResolver);
 }

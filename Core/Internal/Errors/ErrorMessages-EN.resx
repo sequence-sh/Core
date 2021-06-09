@@ -249,11 +249,8 @@
   <data name="Unknown" xml:space="preserve">
     <value>Unknown Error: '{0}'</value>
   </data>
-  <data name="WrongOutputType" xml:space="preserve">
-    <value>{0} has output type {1}, not {2}</value>
-  </data>
-  <data name="WrongParameterType" xml:space="preserve">
-    <value>Parameter '{0}' expects type {1}, but was a {2}</value>
+  <data name="WrongType" xml:space="preserve">
+    <value>{0} expected {1} for parameter {2} but {3} has type {4}</value>
   </data>
   <data name="WrongVariableType" xml:space="preserve">
     <value>Variable '{0}' does not have type '{1}'.</value>

@@ -83,7 +83,7 @@ public sealed class ArrayFilter<T> : CompoundStep<Array<T>>
         return baseContext.TryCloneWithScopedStep(
             Variable,
             TypeReference.Create(typeof(T)),
-            TypeReference.Actual.Bool,
+            new CallerMetadata(Name, nameof(Predicate), TypeReference.Actual.Bool),
             scopedStep,
             new ErrorLocation(this)
         );
@@ -111,9 +111,9 @@ public sealed class ArrayFilter<T> : CompoundStep<Array<T>>
 
         /// <inheritdoc />
         protected override Result<TypeReference, IErrorBuilder> GetExpectedArrayTypeReference(
-            TypeReference expectedTypeReference)
+            CallerMetadata callerMetadata)
         {
-            return expectedTypeReference;
+            return callerMetadata.ExpectedType;
         }
 
         /// <inheritdoc />

@@ -38,7 +38,7 @@ public interface IStepFactory
     /// Tries to get a reference to the output type of this step.
     /// </summary>
     Result<TypeReference, IError> TryGetOutputTypeReference(
-        TypeReference expectedOutputType,
+        CallerMetadata callerMetadata,
         FreezableStepData freezeData,
         TypeResolver typeResolver);
 
@@ -46,7 +46,7 @@ public interface IStepFactory
     /// Gets all type references set by this method and their values if they can be calculated.
     /// </summary>
     IEnumerable<(VariableName variableName, TypeReference type)> GetVariablesSet(
-        TypeReference expectedOutputType,
+        CallerMetadata callerMetadata,
         FreezableStepData freezableStepData,
         TypeResolver typeResolver);
 
@@ -64,7 +64,7 @@ public interface IStepFactory
     /// Try to create the instance of this type and set all arguments.
     /// </summary>
     Result<IStep, IError> TryFreeze(
-        TypeReference expectedTypeReference,
+        CallerMetadata callerMetadata,
         TypeResolver typeResolver,
         FreezableStepData freezeData);
 

@@ -37,13 +37,13 @@ public sealed class OptionFreezableStep : IFreezableStep
         other is OptionFreezableStep ofs && Options.SequenceEqual(ofs.Options);
 
     /// <inheritdoc />
-    public Result<IStep, IError> TryFreeze(TypeReference expectedType, TypeResolver typeResolver)
+    public Result<IStep, IError> TryFreeze(CallerMetadata callerMetadata, TypeResolver typeResolver)
     {
         IError? error = null;
 
         foreach (var freezableStep in Options)
         {
-            var r = freezableStep.TryFreeze(expectedType, typeResolver);
+            var r = freezableStep.TryFreeze(callerMetadata, typeResolver);
 
             if (r.IsSuccess)
                 return r;
@@ -58,13 +58,13 @@ public sealed class OptionFreezableStep : IFreezableStep
 
     /// <inheritdoc />
     public Result<IReadOnlyCollection<(VariableName variableName, TypeReference)>, IError>
-        GetVariablesSet(TypeReference expectedType, TypeResolver typeResolver)
+        GetVariablesSet(CallerMetadata callerMetadata, TypeResolver typeResolver)
     {
         IError? error = null;
 
         foreach (var freezableStep in Options)
         {
-            var r = freezableStep.GetVariablesSet(expectedType, typeResolver);
+            var r = freezableStep.GetVariablesSet(callerMetadata, typeResolver);
 
             if (r.IsSuccess)
                 return r;
@@ -81,18 +81,18 @@ public sealed class OptionFreezableStep : IFreezableStep
 
     /// <inheritdoc />
     public Result<TypeReference, IError> TryGetOutputTypeReference(
-        TypeReference expectedType,
+        CallerMetadata callerMetadata,
         TypeResolver typeResolver)
     {
         IError? error = null;
 
         foreach (var freezableStep in Options)
         {
-            var r = freezableStep.TryGetOutputTypeReference(expectedType, typeResolver);
+            var r = freezableStep.TryGetOutputTypeReference(callerMetadata, typeResolver);
 
             if (r.IsSuccess)
             {
-                var freezeResult = freezableStep.TryFreeze(expectedType, typeResolver);
+                var freezeResult = freezableStep.TryFreeze(callerMetadata, typeResolver);
 
                 if (freezeResult.IsSuccess)
                     return r;

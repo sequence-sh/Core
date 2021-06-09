@@ -60,11 +60,10 @@ public sealed class ArrayLength<T> : CompoundStep<int>
 
         /// <inheritdoc />
         protected override Result<TypeReference, IErrorBuilder> GetExpectedArrayTypeReference(
-            TypeReference expectedTypeReference)
+            CallerMetadata callerMetadata)
         {
-            var r = expectedTypeReference.CheckAllows(
+            var r = callerMetadata.CheckAllows(
                 TypeReference.Actual.Integer,
-                StepType,
                 null
             );
 

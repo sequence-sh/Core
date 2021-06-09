@@ -64,10 +64,10 @@ public sealed class ArrayIsEmpty<T> : CompoundStep<bool>
 
         /// <inheritdoc />
         protected override Result<TypeReference, IErrorBuilder> GetExpectedArrayTypeReference(
-            TypeReference expectedTypeReference)
+            CallerMetadata callerMetadata)
         {
-            return expectedTypeReference
-                .CheckAllows(TypeReference.Actual.Bool, StepType, null)
+            return callerMetadata
+                .CheckAllows(TypeReference.Actual.Bool, null)
                 .Map(_ => new TypeReference.Array(TypeReference.Any.Instance) as TypeReference);
         }
     }

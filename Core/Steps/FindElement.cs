@@ -79,10 +79,10 @@ public sealed class FindElement<T> : CompoundStep<int>
 
         /// <inheritdoc />
         protected override Result<TypeReference, IErrorBuilder> GetExpectedArrayTypeReference(
-            TypeReference expectedTypeReference)
+            CallerMetadata callerMetadata)
         {
-            return expectedTypeReference
-                .CheckAllows(TypeReference.Actual.Integer, StepType, null)
+            return callerMetadata
+                .CheckAllows(TypeReference.Actual.Integer, null)
                 .Map(_ => new TypeReference.Array(TypeReference.Any.Instance) as TypeReference);
         }
 

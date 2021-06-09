@@ -53,7 +53,7 @@ public sealed class TypeResolver
     public Result<TypeResolver, IError> TryCloneWithScopedStep(
         VariableName vn,
         TypeReference typeReference,
-        TypeReference expectedScopedStepOutputType,
+        CallerMetadata scopedCallerMetadata,
         IFreezableStep scopedStep,
         ErrorLocation errorLocation)
     {
@@ -64,7 +64,7 @@ public sealed class TypeResolver
         if (r1.IsFailure)
             return r1.ConvertFailure<TypeResolver>().MapError(x => x.WithLocation(errorLocation));
 
-        var r2 = newTypeResolver.TryAddTypeHierarchy(expectedScopedStepOutputType, scopedStep);
+        var r2 = newTypeResolver.TryAddTypeHierarchy(scopedCallerMetadata, scopedStep);
 
         if (r2.IsFailure)
             return r2.ConvertFailure<TypeResolver>();
@@ -77,12 +77,12 @@ public sealed class TypeResolver
     /// </summary>
     public static Result<TypeResolver, IError> TryCreate(
         StepFactoryStore stepFactoryStore,
-        TypeReference expectedStepOutputType,
+        CallerMetadata callerMetadata,
         IFreezableStep topLevelStep)
     {
         var typeResolver = new TypeResolver(stepFactoryStore);
 
-        var r = typeResolver.TryAddTypeHierarchy(expectedStepOutputType, topLevelStep);
+        var r = typeResolver.TryAddTypeHierarchy(callerMetadata, topLevelStep);
 
         if (r.IsFailure)
             return r.ConvertFailure<TypeResolver>();
@@ -94,7 +94,7 @@ public sealed class TypeResolver
     /// Try to add this step and all its children to this TypeResolver.
     /// </summary>
     public Result<Unit, IError> TryAddTypeHierarchy(
-        TypeReference expectedType,
+        CallerMetadata callerMetadata,
         IFreezableStep topLevelStep)
     {
         int? numberUnresolved = null;
@@ -104,7 +104,7 @@ public sealed class TypeResolver
             var unresolvableVariableNames = new List<VariableName>();
             var errors                    = new List<IError>();
 
-            var result = topLevelStep.GetVariablesSet(expectedType, this);
+            var result = topLevelStep.GetVariablesSet(callerMetadata, this);
 
             if (result.IsFailure)
                 return result.ConvertFailure<Unit>();

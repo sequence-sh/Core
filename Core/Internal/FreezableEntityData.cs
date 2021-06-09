@@ -103,7 +103,7 @@ public record FreezableEntityData(
     /// Gets the variables set by steps in this FreezableStepData.
     /// </summary>
     public Result<IReadOnlyCollection<(VariableName variableName, TypeReference)>, IError>
-        GetVariablesSet(TypeReference expectedType, TypeResolver typeResolver)
+        GetVariablesSet(CallerMetadata callerMetadata, TypeResolver typeResolver)
     {
         var variables = new List<(VariableName variableName, TypeReference)>();
         var errors    = new List<IError>();
@@ -136,7 +136,7 @@ public record FreezableEntityData(
 
         void LocalGetVariablesSet(IFreezableStep freezableStep)
         {
-            var variablesSet = freezableStep.GetVariablesSet(expectedType, typeResolver);
+            var variablesSet = freezableStep.GetVariablesSet(callerMetadata, typeResolver);
 
             if (variablesSet.IsFailure)
                 errors.Add(variablesSet.Error);

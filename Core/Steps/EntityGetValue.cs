@@ -82,11 +82,11 @@ public sealed class EntityGetValue<T> : CompoundStep<T>
 
         /// <inheritdoc />
         protected override Result<TypeReference, IError> GetGenericTypeParameter(
-            TypeReference expectedTypeReference,
+            CallerMetadata callerMetadata,
             FreezableStepData freezableStepData,
             TypeResolver typeResolver)
         {
-            return expectedTypeReference;
+            return callerMetadata.ExpectedType;
         }
 
         /// <inheritdoc />

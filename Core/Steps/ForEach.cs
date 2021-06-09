@@ -78,7 +78,7 @@ public sealed class ForEach<T> : CompoundStep<Unit>
         return baseContext.TryCloneWithScopedStep(
             Variable,
             TypeReference.Create(typeof(T)),
-            TypeReference.Unit.Instance,
+            new CallerMetadata(Name, nameof(Action), TypeReference.Unit.Instance),
             scopedStep,
             new ErrorLocation(this)
         );
@@ -109,10 +109,10 @@ public sealed class ForEach<T> : CompoundStep<Unit>
 
         /// <inheritdoc />
         protected override Result<TypeReference, IErrorBuilder> GetExpectedArrayTypeReference(
-            TypeReference expectedTypeReference)
+            CallerMetadata callerMetadata)
         {
-            return expectedTypeReference
-                .CheckAllows(TypeReference.Unit.Instance, StepType, null)
+            return callerMetadata
+                .CheckAllows(TypeReference.Unit.Instance, null)
                 .Map(_ => new TypeReference.Array(TypeReference.Any.Instance) as TypeReference);
         }
 

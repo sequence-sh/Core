@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -7,6 +6,7 @@ using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Internal.Parser;
+using Reductech.EDR.Core.Internal.Serialization;
 using Reductech.EDR.Core.Util;
 using Xunit.Abstractions;
 
@@ -94,7 +94,7 @@ public abstract partial class StepTestBase<TStep, TOutput>
 
             deserializeResult.ShouldBeSuccessful();
 
-            var freezeResult = deserializeResult.Value.TryFreeze(TypeReference.Any.Instance, sfs);
+            var freezeResult = deserializeResult.Value.TryFreeze(SCLRunner.RootCallerMetadata, sfs);
 
             freezeResult.ShouldBeSuccessful();
 

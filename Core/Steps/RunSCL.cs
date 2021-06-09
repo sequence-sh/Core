@@ -50,7 +50,12 @@ public sealed class RunSCL : CompoundStep<Unit>
         }
 
         var stepResult = SCLParsing.TryParseStep(sclResult.Value)
-            .Bind(x => x.TryFreeze(TypeReference.Unit.Instance, stateMonad.StepFactoryStore));
+            .Bind(
+                x => x.TryFreeze(
+                    new CallerMetadata(Name, nameof(SCL), TypeReference.Unit.Instance),
+                    stateMonad.StepFactoryStore
+                )
+            );
 
         if (stepResult.IsFailure)
             return stepResult.ConvertFailure<Unit>();
@@ -105,14 +110,18 @@ public sealed class RunSCL : CompoundStep<Unit>
         /// <inheritdoc />
         public override IEnumerable<(VariableName variableName, TypeReference type)>
             GetVariablesSet(
-                TypeReference expectedTypeReference,
+                CallerMetadata callerMetadata,
                 FreezableStepData freezableStepData,
                 TypeResolver typeResolver)
         {
             var export = freezableStepData.TryGetStep(nameof(Export), StepType)
                     .Bind(
                         x => x.TryFreeze(
-                            new TypeReference.Array(TypeReference.Actual.String),
+                            new CallerMetadata(
+                                TypeName,
+                                nameof(Export),
+                                new TypeReference.Array(TypeReference.Actual.String)
+                            ),
                             typeResolver
                         )
                     )
@@ -134,7 +143,7 @@ public sealed class RunSCL : CompoundStep<Unit>
             }
 
             foreach (var pair in base.GetVariablesSet(
-                expectedTypeReference,
+                callerMetadata,
                 freezableStepData,
                 typeResolver
             ))

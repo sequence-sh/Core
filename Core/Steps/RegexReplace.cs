@@ -122,7 +122,7 @@ public sealed class RegexReplace : CompoundStep<StringStream>
         return baseContext.TryCloneWithScopedStep(
             Variable,
             TypeReference.Actual.String,
-            TypeReference.Actual.String,
+            new CallerMetadata(Name, nameof(Function), TypeReference.Actual.String),
             scopedStep,
             new ErrorLocation(this)
         );

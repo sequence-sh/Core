@@ -13,14 +13,14 @@ public class SimpleStepFactory<TStep, TOutput> : StepFactory
 {
     /// <inheritdoc />
     public override Result<TypeReference, IError> TryGetOutputTypeReference(
-        TypeReference expectedTypeReference,
+        CallerMetadata callerMetadata,
         FreezableStepData freezableStepData,
         TypeResolver typeResolver)
     {
         var reference = TypeReference.Create(typeof(TOutput));
 
-        return expectedTypeReference
-            .CheckAllows(reference, StepType, typeResolver)
+        return callerMetadata
+            .CheckAllows(reference, typeResolver)
             .MapError(x => x.WithLocation(freezableStepData))
             .Map(_ => reference);
     }
@@ -30,11 +30,11 @@ public class SimpleStepFactory<TStep, TOutput> : StepFactory
 
     /// <inheritdoc />
     protected override Result<ICompoundStep, IError> TryCreateInstance(
-        TypeReference expectedTypeReference,
+        CallerMetadata callerMetadata,
         FreezableStepData freezableStepData,
         TypeResolver typeResolver)
     {
-        var r = TryGetOutputTypeReference(expectedTypeReference, freezableStepData, typeResolver);
+        var r = TryGetOutputTypeReference(callerMetadata, freezableStepData, typeResolver);
 
         if (r.IsFailure)
             return r.ConvertFailure<ICompoundStep>();

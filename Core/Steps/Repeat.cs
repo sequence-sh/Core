@@ -78,13 +78,22 @@ public sealed class Repeat<T> : CompoundStep<Array<T>>
 
         /// <inheritdoc />
         protected override Result<TypeReference, IError> GetGenericTypeParameter(
-            TypeReference expectedTypeReference,
+            CallerMetadata callerMetadata,
             FreezableStepData freezableStepData,
             TypeResolver typeResolver)
         {
             return freezableStepData
                 .TryGetStep(nameof(Repeat<object>.Element), StepType)
-                .Bind(x => x.TryGetOutputTypeReference(TypeReference.Any.Instance, typeResolver));
+                .Bind(
+                    x => x.TryGetOutputTypeReference(
+                        new CallerMetadata(
+                            TypeName,
+                            nameof(Repeat<object>.Element),
+                            TypeReference.Any.Instance
+                        ),
+                        typeResolver
+                    )
+                );
         }
     }
 }

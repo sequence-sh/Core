@@ -80,7 +80,7 @@ public sealed class ArrayMap<T> : CompoundStep<Array<T>>
         return baseContext.TryCloneWithScopedStep(
             Variable,
             TypeReference.Create(typeof(T)),
-            TypeReference.Create(typeof(T)),
+            new CallerMetadata(Name, nameof(Function), TypeReference.Create(typeof(T))),
             scopedStep,
             new ErrorLocation(this)
         );
@@ -108,9 +108,9 @@ public sealed class ArrayMap<T> : CompoundStep<Array<T>>
 
         /// <inheritdoc />
         protected override Result<TypeReference, IErrorBuilder> GetExpectedArrayTypeReference(
-            TypeReference expectedTypeReference)
+            CallerMetadata callerMetadata)
         {
-            return expectedTypeReference;
+            return callerMetadata.ExpectedType;
         }
 
         /// <inheritdoc />

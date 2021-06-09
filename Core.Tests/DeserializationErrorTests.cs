@@ -26,7 +26,7 @@ public partial class DeserializationErrorTests
 
             yield return new DeserializationErrorCase(
                 "- EntityGetValue [1,2] 'a'",
-                ("Parameter 'Entity' expects type Entity, but was a Array/Sequence",
+                ("EntityGetValue expected Entity for parameter Entity but ArrayNew has type Array/Sequence",
                  "EntityGetValue - Line: 1, Col: 2, Idx: 2 - Line: 1, Col: 25, Idx: 25 Text: EntityGetValue [1,2] 'a'")
             );
 
@@ -56,10 +56,16 @@ public partial class DeserializationErrorTests
 
             yield return new DeserializationErrorCase(
                 "- 1 + 1\r\n- 2 + 2",
-                ("ArrayConcat has output type Array<T>, not Unit",
+                ("Sequence expected Unit for parameter InitialSteps[0] but ArrayConcat has type Array<T>",
                  "Line: 1, Col: 2, Idx: 2 - Line: 1, Col: 6, Idx: 6 Text: 1 + 1")
             );
 
+            yield return new DeserializationErrorCase(
+                @"- <MyVar> = 1
+- print (stringtodate <MyVar>)",
+                ("StringToDate expected String for parameter StringToDate but <MyVar> has type Integer",
+                 "GetVariable - Line: 2, Col: 22, Idx: 37 - Line: 2, Col: 28, Idx: 43 Text: <MyVar>")
+            );
             //yield return new DeserializationErrorCase(
             //    "Print(['abc', '123'] == ['abc', '123'])",
             //    ("Type ArrayOfStringStream is not comparable and so cannot be used for sorting.",
@@ -80,13 +86,13 @@ public partial class DeserializationErrorTests
 
             yield return new DeserializationErrorCase(
                 "Foreach ['one', 'two'] (Print (<Entity> + 1))",
-                ("IntConstant has output type Integer, not String",
+                ("StringJoin expected String for parameter Strings but Step has type Integer",
                  "1 - Line: 1, Col: 42, Idx: 42 - Line: 1, Col: 42, Idx: 42 Text: 1")
             );
 
             yield return new DeserializationErrorCase(
                 "Foreach ['one', 'two'] (Print (<Num> + 1)) <Num>",
-                ("IntConstant has output type Integer, not String",
+                ("StringJoin expected String for parameter Strings but Step has type Integer",
                  "1 - Line: 1, Col: 39, Idx: 39 - Line: 1, Col: 39, Idx: 39 Text: 1")
             );
 
@@ -127,7 +133,7 @@ public partial class DeserializationErrorTests
             var sfs = StepFactoryStore.Create();
 
             var result = SCLParsing.TryParseStep(SCL)
-                .Bind(x => x.TryFreeze(TypeReference.Any.Instance, sfs))
+                .Bind(x => x.TryFreeze(SCLRunner.RootCallerMetadata, sfs))
                 .Map(SCLRunner.ConvertToUnitStep);
 
             result.IsFailure.Should().BeTrue("Case should fail");

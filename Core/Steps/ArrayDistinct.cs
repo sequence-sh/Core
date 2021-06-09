@@ -105,7 +105,7 @@ public sealed class ArrayDistinct<T> : CompoundStep<Array<T>>
         return baseTypeResolver.TryCloneWithScopedStep(
             Variable,
             TypeReference.Create(typeof(T)),
-            TypeReference.Actual.String,
+            new CallerMetadata(Name, nameof(KeySelector), TypeReference.Actual.String),
             scopedStep,
             new ErrorLocation(this)
         );
@@ -130,9 +130,9 @@ public sealed class ArrayDistinct<T> : CompoundStep<Array<T>>
 
         /// <inheritdoc />
         protected override Result<TypeReference, IErrorBuilder> GetExpectedArrayTypeReference(
-            TypeReference expectedTypeReference)
+            CallerMetadata callerMetada)
         {
-            return expectedTypeReference;
+            return callerMetada.ExpectedType;
         }
 
         /// <inheritdoc />

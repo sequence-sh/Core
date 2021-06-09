@@ -105,7 +105,11 @@ public sealed class ArraySort<T> : CompoundStep<Array<T>>
         return baseContext.TryCloneWithScopedStep(
             Variable,
             TypeReference.Create(typeof(T)),
-            TypeReference.Actual.String,
+            new CallerMetadata(
+                Name,
+                nameof(KeySelector),
+                TypeReference.Create(typeof(StringStream))
+            ),
             scopedStep,
             new ErrorLocation(this)
         );
@@ -139,9 +143,9 @@ public sealed class ArraySort<T> : CompoundStep<Array<T>>
 
         /// <inheritdoc />
         protected override Result<TypeReference, IErrorBuilder> GetExpectedArrayTypeReference(
-            TypeReference expectedTypeReference)
+            CallerMetadata callerMetadata)
         {
-            return expectedTypeReference;
+            return callerMetadata.ExpectedType;
         }
 
         /// <inheritdoc />

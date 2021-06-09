@@ -63,11 +63,11 @@ public sealed class ArrayConcat<T> : CompoundStep<Array<T>>
 
         /// <inheritdoc />
         protected override Result<TypeReference, IError> GetGenericTypeParameter(
-            TypeReference expectedTypeReference,
+            CallerMetadata callerMetada,
             FreezableStepData freezableStepData,
             TypeResolver typeResolver)
         {
-            var expectedMemberType = expectedTypeReference
+            var expectedMemberType = callerMetada.ExpectedType
                 .TryGetArrayMemberTypeReference(typeResolver)
                 .MapError(x => x.WithLocation(freezableStepData));
 
@@ -86,7 +86,11 @@ public sealed class ArrayConcat<T> : CompoundStep<Array<T>>
                 new TypeReference.Array(new TypeReference.Array(expectedMemberType.Value));
 
             var arraysStepGenericType = arraysStep.Value.TryGetOutputTypeReference(
-                        expectedArraysStepType,
+                        new CallerMetadata(
+                            TypeName,
+                            nameof(ArrayConcat<object>.Arrays),
+                            expectedArraysStepType
+                        ),
                         typeResolver
                     )
                     .Bind(

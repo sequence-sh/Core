@@ -36,13 +36,13 @@ public abstract class StepFactory : IStepFactory
 
     /// <inheritdoc />
     public abstract Result<TypeReference, IError> TryGetOutputTypeReference(
-        TypeReference expectedTypeReference,
+        CallerMetadata callerMetadata,
         FreezableStepData freezableStepData,
         TypeResolver typeResolver);
 
     /// <inheritdoc />
     public virtual IEnumerable<(VariableName variableName, TypeReference type)> GetVariablesSet(
-        TypeReference expectedTypeReference,
+        CallerMetadata callerMetadata,
         FreezableStepData freezableStepData,
         TypeResolver typeResolver)
     {
@@ -106,7 +106,7 @@ public abstract class StepFactory : IStepFactory
     /// Creates an instance of this type.
     /// </summary>
     protected abstract Result<ICompoundStep, IError> TryCreateInstance(
-        TypeReference expectedTypeReference,
+        CallerMetadata callerMetadata,
         FreezableStepData freezeData,
         TypeResolver typeResolver);
 
@@ -129,11 +129,11 @@ public abstract class StepFactory : IStepFactory
 
     /// <inheritdoc />
     public Result<IStep, IError> TryFreeze(
-        TypeReference expectedTypeReference,
+        CallerMetadata callerMetadata,
         TypeResolver typeResolver,
         FreezableStepData freezeData)
     {
-        var instanceResult = TryCreateInstance(expectedTypeReference, freezeData, typeResolver);
+        var instanceResult = TryCreateInstance(callerMetadata, freezeData, typeResolver);
 
         if (instanceResult.IsFailure)
             return instanceResult.ConvertFailure<IStep>();
@@ -194,6 +194,16 @@ public abstract class StepFactory : IStepFactory
                 continue;
             }
 
+            var nestedCallerMetadata =
+                new CallerMetadata(
+                    TypeName,
+                    propertyInfo.Name,
+                    TypeReference.Create(
+                        propertyInfo.PropertyType.GenericTypeArguments.FirstOrDefault()
+                     ?? typeof(object)
+                    )
+                );
+
             remainingRequired.Remove(propertyInfo.Name);
 
             var result = stepMember switch
@@ -212,9 +222,10 @@ public abstract class StepFactory : IStepFactory
                     typeResolver
                 ),
                 FreezableStepProperty.StepList sList => TrySetStepList(
+                    nestedCallerMetadata,
                     propertyInfo,
                     step,
-                    sList.List,
+                    sList,
                     typeResolver
                 ),
                 _ => throw new ArgumentException("Step member wrong type"),
@@ -277,7 +288,11 @@ public abstract class StepFactory : IStepFactory
         TypeResolver typeResolver)
     {
         var freezeResult = freezableStep.TryFreeze(
-            TypeReference.CreateFromStepType(propertyInfo.PropertyType),
+            new CallerMetadata(
+                parentStep.Name,
+                parentStep.Name,
+                TypeReference.CreateFromStepType(propertyInfo.PropertyType)
+            ),
             typeResolver
         );
 
@@ -340,9 +355,10 @@ public abstract class StepFactory : IStepFactory
     }
 
     private static Result<Unit, IError> TrySetStepList(
+        CallerMetadata callerMetadata,
         PropertyInfo propertyInfo,
         ICompoundStep parentStep,
-        IReadOnlyList<IFreezableStep> freezableStepList,
+        FreezableStepProperty.StepList stepList,
         TypeResolver typeResolver)
     {
         if (propertyInfo.GetCustomAttribute<StepListPropertyAttribute>() != null)
@@ -356,23 +372,17 @@ public abstract class StepFactory : IStepFactory
              && typeof(IArray).IsAssignableFrom(argument))
                 return SetArray(argument);
 
-            return Result.Failure<Unit, IError>(
-                ErrorCode.WrongParameterType.ToErrorBuilder(
-                        propertyInfo.Name,
-                        argument.Name,
-                        "Array/Sequence"
-                    )
-                    .WithLocation(parentStep)
+            return callerMetadata.GetWrongTypeError(
+                stepList.ConvertToStep().StepName,
+                "Array/Sequence",
+                new ErrorLocation(parentStep.Name, parentStep.TextLocation)
             );
         }
 
-        return Result.Failure<Unit, IError>(
-            ErrorCode.WrongParameterType.ToErrorBuilder(
-                    propertyInfo.Name,
-                    MemberType.VariableName,
-                    MemberType.StepList
-                )
-                .WithLocation(parentStep)
+        return callerMetadata.GetWrongTypeError(
+            stepList.ConvertToStep().StepName,
+            nameof(VariableName),
+            new ErrorLocation(parentStep.Name, parentStep.TextLocation)
         );
 
         Result<Unit, IError> SetStepList()
@@ -387,12 +397,18 @@ public abstract class StepFactory : IStepFactory
             var addMethod = listType.GetMethod(nameof(List<object>.Add))!;
             var errors    = new List<IError>();
 
-            for (var index = 0; index < freezableStepList.Count; index++)
+            for (var index = 0; index < stepList.List.Count; index++)
             {
-                var freezableStep = freezableStepList[index];
+                var nestedCallerMetadata = new CallerMetadata(
+                    parentStep.Name,
+                    propertyInfo.Name + $"[{index}]",
+                    expectedElementType
+                );
+
+                var freezableStep = stepList.List[index];
 
                 var freezeResult = freezableStep.TryFreeze(
-                    expectedElementType,
+                    nestedCallerMetadata,
                     typeResolver
                 );
 
@@ -439,10 +455,16 @@ public abstract class StepFactory : IStepFactory
             var list   = Activator.CreateInstance(listType);
             var errors = new List<IError>();
 
-            foreach (var freezableStep in freezableStepList)
+            var nestedCallerMetadata = new CallerMetadata(
+                parentStep.Name,
+                propertyInfo.Name,
+                TypeReference.Create(nestedArgument)
+            );
+
+            foreach (var freezableStep in stepList.List)
             {
                 var freezeResult = freezableStep.TryFreeze(
-                    TypeReference.Create(nestedArgument),
+                    nestedCallerMetadata,
                     typeResolver
                 );
 

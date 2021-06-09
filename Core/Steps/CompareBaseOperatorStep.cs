@@ -74,12 +74,12 @@ public abstract class
 
         /// <inheritdoc />
         protected override Result<TypeReference, IError> GetGenericTypeParameter(
-            TypeReference expectedTypeReference,
+            CallerMetadata callerMetadata,
             FreezableStepData freezableStepData,
             TypeResolver typeResolver)
         {
-            var checkResult = expectedTypeReference
-                .CheckAllows(TypeReference.Actual.Bool, StepType, typeResolver)
+            var checkResult = callerMetadata
+                .CheckAllows(TypeReference.Actual.Bool, typeResolver)
                 .MapError(x => x.WithLocation(freezableStepData));
 
             if (checkResult.IsFailure)
@@ -89,7 +89,11 @@ public abstract class
                 .TryGetStep(nameof(Terms), StepType)
                 .Bind(
                     x => x.TryGetOutputTypeReference(
-                        new TypeReference.Array(TypeReference.Any.Instance),
+                        new CallerMetadata(
+                            TypeName,
+                            nameof(Terms),
+                            new TypeReference.Array(TypeReference.Any.Instance)
+                        ),
                         typeResolver
                     )
                 )
