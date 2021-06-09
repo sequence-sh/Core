@@ -15,7 +15,6 @@ public abstract class
     CompareBaseOperatorStep<TStep, TElement> : BaseOperatorStep<TStep, TElement,
         bool>
     where TStep : BaseOperatorStep<TStep, TElement, bool>, new()
-    where TElement : IComparable<TElement>
 {
     /// <summary>
     /// Check the result of comparing a term with the next term
@@ -31,13 +30,14 @@ public abstract class
     /// <inheritdoc />
     protected override Result<bool, IErrorBuilder> Operate(IEnumerable<TElement> terms)
     {
-        var last = Maybe<TElement>.None;
+        var last     = Maybe<TElement>.None;
+        var comparer = Comparer<TElement>.Default;
 
         foreach (var term in terms)
         {
             if (last.HasValue)
             {
-                var comparisonValue = last.Value.CompareTo(term);
+                var comparisonValue = comparer.Compare(last.Value, term);
                 var checkResult     = CheckComparisonValue(comparisonValue);
 
                 if (!checkResult)

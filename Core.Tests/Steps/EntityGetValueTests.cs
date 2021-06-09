@@ -140,7 +140,7 @@ public partial class EntityGetValueTypeTests : StepTestBase<AssertTrue, Unit>
     private static AssertTrue GetTestCase<T>(
         IStep<T> expected,
         Entity entity,
-        string propertyName) where T : IComparable<T> => new()
+        string propertyName) => new()
     {
         Boolean = new Equals<T>
         {

@@ -7,7 +7,6 @@ namespace Reductech.EDR.Core.Steps
 /// Returns true is all terms are equal
 /// </summary>
 public sealed class Equals<T> : CompareBaseOperatorStep<Equals<T>, T>
-    where T : IComparable<T>
 {
     /// <inheritdoc />
     protected override bool CheckComparisonValue(int v) => v == 0;

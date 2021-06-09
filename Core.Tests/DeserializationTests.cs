@@ -308,6 +308,14 @@ Log 'Comments!'",
                 "1"
             );
 
+            yield return new DeserializationTestInstance(
+                @"
+- <docs> = GenerateDocumentation
+- log <docs>[0]['FileName']
+",
+                "Contents.md"
+            );
+
             yield return new DeserializationTestInstance(@"['a','b','c'][0] | Log",     'a');
             yield return new DeserializationTestInstance(@"['a','b','c'][(1+1)] | Log", 'c');
 
@@ -333,6 +341,26 @@ Log 'Comments!'",
                 "a",
                 "b",
                 "c"
+            );
+
+            yield return new DeserializationTestInstance(
+                "(Foo: 'a')['Foo'] == (Foo: 'a')['Foo']",
+                true
+            );
+
+            yield return new DeserializationTestInstance(
+                "(Foo: 'a')['Foo'] == (Foo: 'b')['Foo']",
+                false
+            );
+
+            yield return new DeserializationTestInstance(
+                "(Foo: 1)['Foo'] == (Foo: '1')['Foo']",
+                true
+            );
+
+            yield return new DeserializationTestInstance(
+                "(Foo: 1)['Foo'] < (Foo: 2)['Foo']",
+                true
             );
 
             yield return new DeserializationTestInstance("(Foo.Bar:'b')", "(Foo: (Bar: \"b\"))");
