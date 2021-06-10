@@ -110,6 +110,12 @@ public partial class DeserializationErrorTests
                 (@"Syntax Error: No Viable Alternative - '""""' was unexpected.",
                  @"Line: 2, Col: 20, Idx: 35 - Line: 2, Col: 21, Idx: 36 Text: """"")
             );
+
+            yield return new DeserializationErrorCase(
+                "-<array> = [('Foo': 1), ('Foo': 2)]\r\n- StringIsEmpty <array>[0]",
+                (
+                    "", "")
+            );
         }
     }
 
