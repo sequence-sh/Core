@@ -62,7 +62,8 @@ public sealed class RunSCL : CompoundStep<Unit>
 
         await using var monad2 = new ScopedStateMonad(
             stateMonad,
-            ImmutableDictionary<VariableName, object>.Empty
+            ImmutableDictionary<VariableName, object>.Empty,
+            Maybe<VariableName>.None
         );
 
         await stepResult.Value.Run<Unit>(monad2, cancellationToken);

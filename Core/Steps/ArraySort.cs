@@ -79,6 +79,7 @@ public sealed class ArraySort<T> : CompoundStep<Array<T>>
                 var scopedMonad = new ScopedStateMonad(
                     stateMonad,
                     currentState,
+                    Variable,
                     new KeyValuePair<VariableName, object>(VariableName.Entity, entity!)
                 );
 

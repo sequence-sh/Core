@@ -305,6 +305,56 @@ public abstract record TypeReference
     }
 
     /// <summary>
+    /// The automatic variable
+    /// </summary>
+    public sealed record AutomaticVariable : TypeReference
+    {
+        private AutomaticVariable() { }
+
+        /// <summary>
+        /// The Automatic Variable instance
+        /// </summary>
+        public static AutomaticVariable Instance { get; } = new();
+
+        /// <inheritdoc />
+        public override Result<TypeReference, IErrorBuilder> TryGetArrayMemberTypeReference(
+            TypeResolver typeResolver)
+        {
+            if (typeResolver.AutomaticVariableName.HasNoValue)
+                return ErrorCode.AutomaticVariableNotSet.ToErrorBuilder();
+
+            var variable = new Variable(typeResolver.AutomaticVariableName.Value);
+
+            return variable.TryGetArrayMemberTypeReference(typeResolver);
+        }
+
+        /// <inheritdoc />
+        public override Result<Type, IErrorBuilder> TryGetType(TypeResolver typeResolver)
+        {
+            if (typeResolver.AutomaticVariableName.HasNoValue)
+                return ErrorCode.AutomaticVariableNotSet.ToErrorBuilder();
+
+            var variable = new Variable(typeResolver.AutomaticVariableName.Value);
+
+            return variable.TryGetType(typeResolver);
+        }
+
+        /// <inheritdoc />
+        public override bool Allow(TypeReference other, TypeResolver? typeResolver)
+        {
+            if (typeResolver is null || typeResolver.AutomaticVariableName.HasNoValue)
+                return false;
+
+            var variable = new Variable(typeResolver.AutomaticVariableName.Value);
+
+            return variable.Allow(other, typeResolver);
+        }
+
+        /// <inheritdoc />
+        public override string Name => nameof(AutomaticVariable);
+    }
+
+    /// <summary>
     /// A variable reference
     /// </summary>
     public sealed record Variable(VariableName VariableName) : TypeReference

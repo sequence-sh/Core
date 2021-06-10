@@ -59,6 +59,7 @@ public sealed class RegexReplace : CompoundStep<StringStream>
             await using var scopedMonad = new ScopedStateMonad(
                 stateMonad,
                 currentState,
+                Variable,
                 new KeyValuePair<VariableName, object>(Variable, new StringStream(match.Value))
             );
 

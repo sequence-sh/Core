@@ -17,10 +17,12 @@ public sealed class TypeResolver
     /// </summary>
     private TypeResolver(
         StepFactoryStore stepFactoryStore,
+        Maybe<VariableName> automaticVariableName,
         Dictionary<VariableName, TypeReference>? myDictionary = null)
     {
-        StepFactoryStore = stepFactoryStore;
-        MyDictionary     = myDictionary ?? new Dictionary<VariableName, TypeReference>();
+        StepFactoryStore      = stepFactoryStore;
+        AutomaticVariableName = automaticVariableName;
+        MyDictionary          = myDictionary ?? new Dictionary<VariableName, TypeReference>();
     }
 
     /// <summary>
@@ -29,7 +31,7 @@ public sealed class TypeResolver
     public TypeResolver Copy()
     {
         var dictClone = MyDictionary.ToDictionary(x => x.Key, x => x.Value);
-        return new TypeResolver(StepFactoryStore, dictClone);
+        return new TypeResolver(StepFactoryStore, AutomaticVariableName, dictClone);
     }
 
     /// <inheritdoc />
@@ -41,6 +43,11 @@ public sealed class TypeResolver
     /// The dictionary mapping VariableNames to ActualTypeReferences
     /// </summary>
     public IReadOnlyDictionary<VariableName, TypeReference> Dictionary => MyDictionary;
+
+    /// <summary>
+    /// The name of the automatic variable
+    /// </summary>
+    public Maybe<VariableName> AutomaticVariableName { get; }
 
     /// <summary>
     /// The StepFactoryStory
@@ -78,9 +85,10 @@ public sealed class TypeResolver
     public static Result<TypeResolver, IError> TryCreate(
         StepFactoryStore stepFactoryStore,
         CallerMetadata callerMetadata,
+        Maybe<VariableName> automaticVariableName,
         IFreezableStep topLevelStep)
     {
-        var typeResolver = new TypeResolver(stepFactoryStore);
+        var typeResolver = new TypeResolver(stepFactoryStore, automaticVariableName);
 
         var r = typeResolver.TryAddTypeHierarchy(callerMetadata, topLevelStep);
 
@@ -186,6 +194,13 @@ public sealed class TypeResolver
         if (typeReference is TypeReference.Variable vr
          && Dictionary.TryGetValue(vr.VariableName, out var tr))
             return tr;
+
+        if (typeReference is TypeReference.AutomaticVariable && AutomaticVariableName.HasValue
+                                                             && Dictionary.TryGetValue(
+                                                                    AutomaticVariableName.Value,
+                                                                    out var tr2
+                                                                ))
+            return tr2;
 
         return null;
     }

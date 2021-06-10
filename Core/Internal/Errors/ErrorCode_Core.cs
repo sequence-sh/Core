@@ -347,6 +347,11 @@ public sealed record ErrorCode : ErrorCodeBase
         WrongVariableType = new(nameof(
                                     WrongVariableType));
 
+    /// <summary>
+    /// The automatic variable was not set.
+    /// </summary>
+    public static readonly ErrorCode AutomaticVariableNotSet = new(nameof(AutomaticVariableNotSet));
+
 #endregion Cases
 }
 

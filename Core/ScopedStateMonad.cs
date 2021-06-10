@@ -25,9 +25,11 @@ public sealed class ScopedStateMonad : IStateMonad
     public ScopedStateMonad(
         IStateMonad baseStateMonad,
         ImmutableDictionary<VariableName, object> fixedState,
+        Maybe<VariableName> automaticVariable,
         params KeyValuePair<VariableName, object>[] state)
     {
         _fixedState            = fixedState;
+        AutomaticVariable      = automaticVariable;
         BaseStateMonad         = baseStateMonad;
         _scopedStateDictionary = new ConcurrentDictionary<VariableName, object>(state);
     }
@@ -116,6 +118,9 @@ public sealed class ScopedStateMonad : IStateMonad
                 new[] { key }
             );
     }
+
+    /// <inheritdoc />
+    public Maybe<VariableName> AutomaticVariable { get; }
 
     /// <inheritdoc />
     public async ValueTask DisposeAsync()

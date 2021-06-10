@@ -58,6 +58,7 @@ public sealed class ForEach<T> : CompoundStep<Unit>
             var scopedMonad = new ScopedStateMonad(
                 stateMonad,
                 currentState,
+                Variable,
                 new KeyValuePair<VariableName, object>(Variable, element!)
             );
 

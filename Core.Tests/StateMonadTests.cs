@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Threading.Tasks;
+using CSharpFunctionalExtensions;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Reductech.EDR.Core.Abstractions;
@@ -66,7 +67,8 @@ public partial class StateMonadTests
 
         var scopedMonad = new ScopedStateMonad(
             monad1,
-            ImmutableDictionary<VariableName, object>.Empty
+            ImmutableDictionary<VariableName, object>.Empty,
+            Maybe<VariableName>.None
         );
 
         sd.Setup(x => x.DisposeAsync(scopedMonad)).Returns(Task.CompletedTask);
@@ -90,7 +92,8 @@ public partial class StateMonadTests
 
         var scopedMonad = new ScopedStateMonad(
             monad1,
-            ImmutableDictionary<VariableName, object>.Empty
+            ImmutableDictionary<VariableName, object>.Empty,
+            Maybe<VariableName>.None
         );
 
         // ReSharper disable once AccessToDisposedClosure
