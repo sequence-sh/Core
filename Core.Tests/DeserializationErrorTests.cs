@@ -56,7 +56,7 @@ public partial class DeserializationErrorTests
 
             yield return new DeserializationErrorCase(
                 "- 1 + 1\r\n- 2 + 2",
-                ("Sequence expected Unit for parameter InitialSteps[0] but ArrayConcat has type Array<T>",
+                ("Sequence expected Unit for parameter InitialSteps[0] but Step has type Integer",
                  "Line: 1, Col: 2, Idx: 2 - Line: 1, Col: 6, Idx: 6 Text: 1 + 1")
             );
 
@@ -114,7 +114,8 @@ public partial class DeserializationErrorTests
             yield return new DeserializationErrorCase(
                 "-<array> = [('Foo': 1), ('Foo': 2)]\r\n- StringIsEmpty <array>[0]",
                 (
-                    "", "")
+                    "ElementAtIndex expected Array<String> for parameter Array but <array> has type Array<Entity>",
+                    "GetVariable - Line: 2, Col: 16, Idx: 53 - Line: 2, Col: 22, Idx: 59 Text: <array>")
             );
         }
     }
