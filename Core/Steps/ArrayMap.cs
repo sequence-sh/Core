@@ -74,10 +74,10 @@ public sealed class ArrayMap<T> : CompoundStep<Array<T>>
 
     /// <inheritdoc />
     public override Result<TypeResolver, IError> TryGetScopedTypeResolver(
-        TypeResolver baseContext,
+        TypeResolver baseTypeResolver,
         IFreezableStep scopedStep)
     {
-        return baseContext.TryCloneWithScopedStep(
+        return baseTypeResolver.TryCloneWithScopedStep(
             Variable,
             TypeReference.Create(typeof(T)),
             new CallerMetadata(Name, nameof(Function), TypeReference.Create(typeof(T))),

@@ -290,7 +290,7 @@ public abstract class StepFactory : IStepFactory
         var freezeResult = freezableStep.TryFreeze(
             new CallerMetadata(
                 parentStep.Name,
-                parentStep.Name,
+                propertyInfo.Name,
                 TypeReference.CreateFromStepType(propertyInfo.PropertyType)
             ),
             typeResolver
