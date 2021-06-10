@@ -23,7 +23,7 @@ public record StringConstantFreezable
 
     /// <inheritdoc />
     public override Result<IStep, IError> TryFreeze(
-        TypeReference expectedType,
+        CallerMetadata callerMetadata,
         TypeResolver typeResolver) => new StringConstant(Value);
 
     /// <inheritdoc />
@@ -41,21 +41,19 @@ public record IntConstantFreezable
 
     /// <inheritdoc />
     public override Result<IStep, IError> TryFreeze(
-        TypeReference expectedType,
+        CallerMetadata callerMetadata,
         TypeResolver typeResolver)
     {
-        var intCheckResult = expectedType.CheckAllows(
+        var intCheckResult = callerMetadata.CheckAllows(
             TypeReference.Actual.Integer,
-            typeof(IntConstant),
             null
         );
 
         if (intCheckResult.IsSuccess)
             return new IntConstant(Value);
 
-        var doubleCheckResult = expectedType.CheckAllows(
+        var doubleCheckResult = callerMetadata.CheckAllows(
             TypeReference.Actual.Double,
-            typeof(DoubleConstant),
             null
         );
 
@@ -80,7 +78,7 @@ public record DoubleConstantFreezable
 
     /// <inheritdoc />
     public override Result<IStep, IError> TryFreeze(
-        TypeReference expectedType,
+        CallerMetadata callerMetadata,
         TypeResolver typeResolver) => new DoubleConstant(Value);
 
     /// <inheritdoc />
@@ -98,7 +96,7 @@ public record BoolConstantFreezable
 
     /// <inheritdoc />
     public override Result<IStep, IError> TryFreeze(
-        TypeReference expectedType,
+        CallerMetadata callerMetadata,
         TypeResolver typeResolver) => new BoolConstant(Value);
 
     /// <inheritdoc />
@@ -119,7 +117,7 @@ public record DateTimeConstantFreezable
 
     /// <inheritdoc />
     public override Result<IStep, IError> TryFreeze(
-        TypeReference expectedType,
+        CallerMetadata callerMetadata,
         TypeResolver typeResolver) => new DateTimeConstant(Value);
 
     /// <inheritdoc />
@@ -137,7 +135,7 @@ public record EntityConstantFreezable
 
     /// <inheritdoc />
     public override Result<IStep, IError> TryFreeze(
-        TypeReference expectedType,
+        CallerMetadata callerMetadata,
         TypeResolver typeResolver) => new EntityConstant(Value);
 
     /// <inheritdoc />
@@ -158,7 +156,7 @@ public record EnumConstantFreezable
 
     /// <inheritdoc />
     public override Result<IStep, IError> TryFreeze(
-        TypeReference expectedType,
+        CallerMetadata callerMetadata,
         TypeResolver typeResolver)
     {
         var type = TryGetType(typeResolver);
@@ -175,7 +173,7 @@ public record EnumConstantFreezable
 
     /// <inheritdoc />
     public override Result<TypeReference, IError> TryGetOutputTypeReference(
-        TypeReference expectedType,
+        CallerMetadata callerMetadata,
         TypeResolver typeResolver) => TryGetType(typeResolver)
         .Map(TypeReference.Create);
 
@@ -249,19 +247,19 @@ public abstract record ConstantFreezableBase<T>
 
     /// <inheritdoc />
     public abstract Result<IStep, IError> TryFreeze(
-        TypeReference expectedType,
+        CallerMetadata callerMetadata,
         TypeResolver typeResolver);
 
     /// <inheritdoc />
     public Result<IReadOnlyCollection<(VariableName variableName, TypeReference)>, IError>
-        GetVariablesSet(TypeReference expectedType, TypeResolver typeResolver)
+        GetVariablesSet(CallerMetadata callerMetadata, TypeResolver typeResolver)
     {
         return new List<(VariableName variableName, TypeReference)>();
     }
 
     /// <inheritdoc />
     public virtual Result<TypeReference, IError> TryGetOutputTypeReference(
-        TypeReference expectedType,
+        CallerMetadata callerMetadata,
         TypeResolver typeResolver)
     {
         return TypeReference.Create(typeof(T));

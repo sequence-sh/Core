@@ -61,9 +61,9 @@ public class ArrayEvaluate<T> : CompoundStep<Array<T>>
 
         /// <inheritdoc />
         protected override Result<TypeReference, IErrorBuilder> GetExpectedArrayTypeReference(
-            TypeReference expectedTypeReference)
+            CallerMetadata callerMetadata)
         {
-            return expectedTypeReference;
+            return callerMetadata.ExpectedType;
         }
 
         /// <inheritdoc />

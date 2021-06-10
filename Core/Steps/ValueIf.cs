@@ -6,7 +6,6 @@ using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
-using Reductech.EDR.Core.Util;
 
 namespace Reductech.EDR.Core.Steps
 {
@@ -79,21 +78,37 @@ public sealed class ValueIf<T> : CompoundStep<T>
 
         /// <inheritdoc />
         protected override Result<TypeReference, IError> GetGenericTypeParameter(
-            TypeReference expectedTypeReference,
+            CallerMetadata callerMetadata,
             FreezableStepData freezableStepData,
-            TypeResolver typeResolver) => freezableStepData
-            .TryGetStep(nameof(Then), StepType)
-            .Compose(() => freezableStepData.TryGetStep(nameof(Else), StepType))
-            .Bind(
-                x => x.Item1.TryGetOutputTypeReference(TypeReference.Any.Instance, typeResolver)
-                    .Compose(
-                        () => x.Item2.TryGetOutputTypeReference(
-                            TypeReference.Any.Instance,
-                            typeResolver
-                        )
+            TypeResolver typeResolver)
+        {
+            var then = freezableStepData
+                .TryGetStep(nameof(Then), StepType)
+                .Bind(
+                    x => x.TryGetOutputTypeReference(
+                        new CallerMetadata(TypeName, nameof(Then), TypeReference.Any.Instance),
+                        typeResolver
                     )
-            )
-            .Map(x => TypeReference.Create(new[] { x.Item1, x.Item2 }));
+                );
+
+            if (then.IsFailure)
+                return then.ConvertFailure<TypeReference>();
+
+            var elseV = freezableStepData
+                .TryGetStep(nameof(Else), StepType)
+                .Bind(
+                    x => x.TryGetOutputTypeReference(
+                        new CallerMetadata(TypeName, nameof(Else), TypeReference.Any.Instance),
+                        typeResolver
+                    )
+                );
+
+            if (elseV.IsFailure)
+                return elseV.ConvertFailure<TypeReference>();
+
+            var r = TypeReference.Create(new[] { then.Value, elseV.Value });
+            return r;
+        }
     }
 }
 

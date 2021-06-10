@@ -68,11 +68,20 @@ public sealed class Log<T> : CompoundStep<Unit>
 
         /// <inheritdoc />
         protected override Result<TypeReference, IError> GetGenericTypeParameter(
-            TypeReference expectedTypeReference,
+            CallerMetadata callerMetadata,
             FreezableStepData freezableStepData,
             TypeResolver typeResolver) => freezableStepData
             .TryGetStep(nameof(Log<object>.Value), StepType)
-            .Bind(x => x.TryGetOutputTypeReference(TypeReference.Any.Instance, typeResolver))
+            .Bind(
+                x => x.TryGetOutputTypeReference(
+                    new CallerMetadata(
+                        TypeName,
+                        nameof(Log<object>.Value),
+                        TypeReference.Any.Instance
+                    ),
+                    typeResolver
+                )
+            )
             .Map(x => x == TypeReference.Any.Instance ? TypeReference.Actual.String : x);
     }
 }

@@ -482,27 +482,6 @@ public abstract record TypeReference
     public abstract bool Allow(TypeReference other, TypeResolver? typeResolver);
 
     /// <summary>
-    /// Check that this property allows a particular type
-    /// </summary>
-    /// <returns></returns>
-    public Result<Util.Unit, IErrorBuilder> CheckAllows(
-        TypeReference reference,
-        Type stepType,
-        TypeResolver? typeResolver)
-    {
-        if (Allow(reference, typeResolver))
-            return Util.Unit.Default;
-
-        return Result.Failure<Util.Unit, IErrorBuilder>(
-            ErrorCode.WrongOutputType.ToErrorBuilder(
-                stepType.Name,
-                reference.Name,
-                Name
-            )
-        );
-    }
-
-    /// <summary>
     /// The name of this type
     /// </summary>
     public abstract string Name { get; }

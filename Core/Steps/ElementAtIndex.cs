@@ -89,9 +89,9 @@ public sealed class ElementAtIndex<T> : CompoundStep<T>
 
         /// <inheritdoc />
         protected override Result<TypeReference, IErrorBuilder> GetExpectedArrayTypeReference(
-            TypeReference expectedTypeReference)
+            CallerMetadata callerMetadata)
         {
-            return new TypeReference.Array(expectedTypeReference);
+            return new TypeReference.Array(callerMetadata.ExpectedType);
         }
 
         /// <inheritdoc />

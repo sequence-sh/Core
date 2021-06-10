@@ -335,18 +335,10 @@ public sealed record ErrorCode : ErrorCodeBase
                           Unknown));
 
     /// <summary>
-    /// {0} has output type {1}, not {2}
+    /// {0} expected {1} for parameter {2} but {3} is {4}
     /// </summary>
     public static readonly ErrorCode
-        WrongOutputType = new(nameof(
-                                  WrongOutputType));
-
-    /// <summary>
-    /// Parameter '{0}' expects type {1}, but was a {2}
-    /// </summary>
-    public static readonly ErrorCode
-        WrongParameterType = new(nameof(
-                                     WrongParameterType));
+        WrongType = new(nameof(WrongType));
 
     /// <summary>
     /// Variable '{0}' does not have type '{1}'.

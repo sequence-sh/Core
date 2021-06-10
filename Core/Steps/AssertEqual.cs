@@ -84,20 +84,30 @@ public sealed class AssertEqual<T> : CompoundStep<Unit>
 
         /// <inheritdoc />
         protected override Result<TypeReference, IError> GetGenericTypeParameter(
-            TypeReference expectedTypeReference,
+            CallerMetadata callerMetadata,
             FreezableStepData freezableStepData,
             TypeResolver typeResolver)
         {
             var left = freezableStepData
                 .TryGetStep(nameof(Left), StepType)
-                .Bind(x => x.TryGetOutputTypeReference(TypeReference.Any.Instance, typeResolver));
+                .Bind(
+                    x => x.TryGetOutputTypeReference(
+                        new CallerMetadata(TypeName, nameof(Left), TypeReference.Any.Instance),
+                        typeResolver
+                    )
+                );
 
             if (left.IsFailure)
                 return left.ConvertFailure<TypeReference>();
 
             var right = freezableStepData
                 .TryGetStep(nameof(Right), StepType)
-                .Bind(x => x.TryGetOutputTypeReference(TypeReference.Any.Instance, typeResolver));
+                .Bind(
+                    x => x.TryGetOutputTypeReference(
+                        new CallerMetadata(TypeName, nameof(Right), TypeReference.Any.Instance),
+                        typeResolver
+                    )
+                );
 
             if (right.IsFailure)
                 return right.ConvertFailure<TypeReference>();

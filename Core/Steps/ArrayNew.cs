@@ -112,11 +112,11 @@ public sealed class ArrayNew<T> : CompoundStep<Array<T>>, IArrayNewStep
 
         /// <inheritdoc />
         protected override Result<TypeReference, IError> GetGenericTypeParameter(
-            TypeReference expectedTypeReference,
+            CallerMetadata callerMetadata,
             FreezableStepData freezableStepData,
             TypeResolver typeResolver)
         {
-            var mtr = expectedTypeReference.TryGetArrayMemberTypeReference(typeResolver)
+            var mtr = callerMetadata.ExpectedType.TryGetArrayMemberTypeReference(typeResolver)
                 .MapError(x => x.WithLocation(freezableStepData));
 
             if (mtr.IsFailure)
@@ -125,7 +125,16 @@ public sealed class ArrayNew<T> : CompoundStep<Array<T>>, IArrayNewStep
             var result =
                 freezableStepData.TryGetStepList(nameof(ArrayNew<object>.Elements), StepType)
                     .Bind(
-                        x => x.Select(r => r.TryGetOutputTypeReference(mtr.Value, typeResolver))
+                        x => x.Select(
+                                r => r.TryGetOutputTypeReference(
+                                    new CallerMetadata(
+                                        TypeName,
+                                        nameof(ArrayNew<int>.Elements),
+                                        mtr.Value
+                                    ),
+                                    typeResolver
+                                )
+                            )
                             .Combine(ErrorList.Combine)
                     )
                     .Map(TypeReference.Create);

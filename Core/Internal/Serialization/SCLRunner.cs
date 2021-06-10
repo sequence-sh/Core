@@ -77,6 +77,15 @@ public sealed class SCLRunner
     public const string TopLevelLoggingScope = "EDR";
 
     /// <summary>
+    /// Caller metadata for the entire sequence.
+    /// </summary>
+    public static readonly CallerMetadata RootCallerMetadata = new(
+        "Sequence",
+        "Root",
+        TypeReference.Any.Instance
+    );
+
+    /// <summary>
     /// Runs an SCL sequence without injecting any metadata
     /// </summary>
     public async Task<Result<Unit, IError>> RunSequence(
@@ -85,7 +94,7 @@ public sealed class SCLRunner
         CancellationToken cancellationToken)
     {
         var stepResult = SCLParsing.TryParseStep(text)
-            .Bind(x => x.TryFreeze(TypeReference.Any.Instance, _stepFactoryStore))
+            .Bind(x => x.TryFreeze(RootCallerMetadata, _stepFactoryStore))
             .Map(ConvertToUnitStep);
 
         if (stepResult.IsFailure)

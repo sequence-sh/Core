@@ -58,7 +58,7 @@ public sealed class GetVariable<T> : CompoundStep<T>
 
         /// <inheritdoc />
         protected override Result<TypeReference, IError> GetGenericTypeParameter(
-            TypeReference expectedTypeReference,
+            CallerMetadata callerMetadata,
             FreezableStepData freezableStepData,
             TypeResolver typeResolver)
         {
@@ -67,6 +67,8 @@ public sealed class GetVariable<T> : CompoundStep<T>
 
             if (variableName.IsFailure)
                 return variableName.ConvertFailure<TypeReference>();
+
+            var expectedTypeReference = callerMetadata.ExpectedType;
 
             if (expectedTypeReference != TypeReference.Unknown.Instance
              && typeResolver.Dictionary.TryGetValue(variableName.Value, out var tr))
@@ -80,10 +82,13 @@ public sealed class GetVariable<T> : CompoundStep<T>
                     return tr;
                 }
 
-                return Result.Failure<TypeReference, IError>(
-                    ErrorCode.WrongOutputType
-                        .ToErrorBuilder(TypeName, tr.Name, expectedTypeReference.Name)
-                        .WithLocation(freezableStepData)
+                return callerMetadata.GetWrongTypeError(
+                    variableName.Value.Serialize(),
+                    tr.Name,
+                    new ErrorLocation(
+                        TypeName,
+                        freezableStepData.Location
+                    )
                 );
             }
 

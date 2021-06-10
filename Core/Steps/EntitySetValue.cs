@@ -100,24 +100,27 @@ public sealed class EntitySetValue<T> : CompoundStep<Entity>
 
         /// <inheritdoc />
         protected override Result<TypeReference, IError> GetGenericTypeParameter(
-            TypeReference expectedTypeReference,
+            CallerMetadata callerMetadata,
             FreezableStepData freezableStepData,
             TypeResolver typeResolver)
         {
-            if (!expectedTypeReference.Allow(TypeReference.Actual.Entity, typeResolver))
-            {
-                return Result.Failure<TypeReference, IError>(
-                    ErrorCode.WrongParameterType.ToErrorBuilder(
-                            StepType.Name,
-                            expectedTypeReference.Name,
-                            nameof(Entity)
-                        )
-                        .WithLocation(freezableStepData)
-                );
-            }
+            var allowResult = callerMetadata.CheckAllows(TypeReference.Actual.Entity, typeResolver)
+                .MapError(x => x.WithLocation(freezableStepData));
+
+            if (allowResult.IsFailure)
+                return allowResult.ConvertFailure<TypeReference>();
 
             var r1 = freezableStepData.TryGetStep(nameof(EntitySetValue<object>.Value), StepType)
-                .Bind(x => x.TryGetOutputTypeReference(TypeReference.Any.Instance, typeResolver));
+                .Bind(
+                    x => x.TryGetOutputTypeReference(
+                        new CallerMetadata(
+                            TypeName,
+                            nameof(EntitySetValue<object>.Value),
+                            TypeReference.Any.Instance
+                        ),
+                        typeResolver
+                    )
+                );
 
             return r1;
         }

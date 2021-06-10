@@ -13,7 +13,7 @@ public abstract class ArrayStepFactory : GenericStepFactory
     /// Possible array output types
     /// </summary>
     protected abstract Result<TypeReference, IErrorBuilder> GetExpectedArrayTypeReference(
-        TypeReference expectedTypeReference);
+        CallerMetadata callerMetadata);
 
     /// <summary>
     /// The name of the array property
@@ -22,12 +22,12 @@ public abstract class ArrayStepFactory : GenericStepFactory
 
     /// <inheritdoc />
     protected override Result<TypeReference, IError> GetGenericTypeParameter(
-        TypeReference expectedTypeReference,
+        CallerMetadata callerMetadata,
         FreezableStepData freezableStepData,
         TypeResolver typeResolver)
     {
         var expectedMemberTypeReference =
-            GetExpectedArrayTypeReference(expectedTypeReference)
+            GetExpectedArrayTypeReference(callerMetadata)
                 .MapError(x => x.WithLocation(freezableStepData));
 
         if (expectedMemberTypeReference.IsFailure)
@@ -38,8 +38,14 @@ public abstract class ArrayStepFactory : GenericStepFactory
         if (step.IsFailure)
             return step.ConvertFailure<TypeReference>();
 
+        var nestedCallerMetadata = new CallerMetadata(
+            TypeName,
+            ArrayPropertyName,
+            expectedMemberTypeReference.Value
+        );
+
         var outputTypeReference = step.Value.TryGetOutputTypeReference(
-            expectedMemberTypeReference.Value,
+            nestedCallerMetadata,
             typeResolver
         );
 

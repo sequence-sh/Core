@@ -124,7 +124,7 @@ public sealed class For : CompoundStep<Unit>
         return baseTypeResolver.TryCloneWithScopedStep(
             Variable,
             TypeReference.Actual.Integer,
-            TypeReference.Unit.Instance,
+            new CallerMetadata(Name, nameof(Action), TypeReference.Unit.Instance),
             scopedStep,
             new ErrorLocation(this)
         );

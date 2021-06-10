@@ -108,14 +108,13 @@ public sealed class RunStep<T> : CompoundStep<Unit>
 
         /// <inheritdoc />
         protected override Result<TypeReference, IError> GetGenericTypeParameter(
-            TypeReference expectedTypeReference,
+            CallerMetadata callerMetadata,
             FreezableStepData freezableStepData,
             TypeResolver typeResolver)
         {
             var checkResult =
-                expectedTypeReference.CheckAllows(
+                callerMetadata.CheckAllows(
                     TypeReference.Unit.Instance,
-                    StepType,
                     typeResolver
                 );
 
@@ -124,7 +123,16 @@ public sealed class RunStep<T> : CompoundStep<Unit>
                     .MapError(x => x.WithLocation(freezableStepData));
 
             var stepTypeReference = freezableStepData.TryGetStep(nameof(Step), StepType)
-                .Bind(x => x.TryGetOutputTypeReference(TypeReference.Any.Instance, typeResolver));
+                .Bind(
+                    x => x.TryGetOutputTypeReference(
+                        new CallerMetadata(
+                            TypeName,
+                            nameof(RunStep<object>.Step),
+                            TypeReference.Any.Instance
+                        ),
+                        typeResolver
+                    )
+                );
 
             return stepTypeReference;
         }

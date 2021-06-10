@@ -151,7 +151,7 @@ public sealed class FreezableStepData : IEquatable<FreezableStepData>
     /// Gets the variables set by steps in this FreezableStepData.
     /// </summary>
     public Result<IReadOnlyCollection<(VariableName variableName, TypeReference)>, IError>
-        GetVariablesSet(string stepName, TypeReference expectedType, TypeResolver typeResolver)
+        GetVariablesSet(string stepName, CallerMetadata callerMetadata, TypeResolver typeResolver)
     {
         var variables = new List<(VariableName variableName, TypeReference)>();
         var errors    = new List<IError>();
@@ -187,7 +187,7 @@ public sealed class FreezableStepData : IEquatable<FreezableStepData>
 
         void LocalGetVariablesSet(IFreezableStep freezableStep)
         {
-            var variablesSet = freezableStep.GetVariablesSet(expectedType, typeResolver);
+            var variablesSet = freezableStep.GetVariablesSet(callerMetadata, typeResolver);
 
             if (variablesSet.IsFailure)
                 errors.Add(variablesSet.Error);

@@ -86,11 +86,20 @@ public sealed class Sequence<T> : CompoundStep<T>, ISequenceStep
 
         /// <inheritdoc />
         protected override Result<TypeReference, IError> GetGenericTypeParameter(
-            TypeReference expectedTypeReference,
+            CallerMetadata callerMetadata,
             FreezableStepData freezableStepData,
             TypeResolver typeResolver) => freezableStepData
             .TryGetStep(nameof(Sequence<object>.FinalStep), StepType)
-            .Bind(x => x.TryGetOutputTypeReference(TypeReference.Any.Instance, typeResolver));
+            .Bind(
+                x => x.TryGetOutputTypeReference(
+                    new CallerMetadata(
+                        TypeName,
+                        nameof(Sequence<object>.FinalStep),
+                        TypeReference.Any.Instance
+                    ),
+                    typeResolver
+                )
+            );
 
         /// <inheritdoc />
         public override string OutputTypeExplanation => "The same type as the final step";

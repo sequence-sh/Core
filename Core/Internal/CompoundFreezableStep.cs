@@ -34,18 +34,18 @@ public sealed record CompoundFreezableStep(
     }
 
     /// <inheritdoc />
-    public Result<IStep, IError> TryFreeze(TypeReference expectedType, TypeResolver typeResolver)
+    public Result<IStep, IError> TryFreeze(CallerMetadata callerMetadata, TypeResolver typeResolver)
     {
         return TryGetStepFactory(typeResolver.StepFactoryStore)
             .Bind(
                 x =>
-                    x.TryFreeze(expectedType, typeResolver, FreezableStepData)
+                    x.TryFreeze(callerMetadata, typeResolver, FreezableStepData)
             );
     }
 
     /// <inheritdoc />
     public Result<IReadOnlyCollection<(VariableName variableName, TypeReference)>, IError>
-        GetVariablesSet(TypeReference expectedType, TypeResolver typeResolver)
+        GetVariablesSet(CallerMetadata callerMetadata, TypeResolver typeResolver)
     {
         var stepFactory = TryGetStepFactory(typeResolver.StepFactoryStore);
 
@@ -54,25 +54,27 @@ public sealed record CompoundFreezableStep(
                 .ConvertFailure<IReadOnlyCollection<(VariableName variableName,
                     TypeReference)>>();
 
-        var dataResult = FreezableStepData.GetVariablesSet(StepName, expectedType, typeResolver);
+        var dataResult = FreezableStepData.GetVariablesSet(StepName, callerMetadata, typeResolver);
 
         if (dataResult.IsFailure)
             return dataResult;
 
         return dataResult.Value
             .Concat(
-                stepFactory.Value.GetVariablesSet(expectedType, FreezableStepData, typeResolver)
+                stepFactory.Value.GetVariablesSet(callerMetadata, FreezableStepData, typeResolver)
             )
             .ToList();
     }
 
     /// <inheritdoc />
     public Result<TypeReference, IError> TryGetOutputTypeReference(
-        TypeReference expectedType,
+        CallerMetadata callerMetadata,
         TypeResolver typeResolver)
     {
         return TryGetStepFactory(typeResolver.StepFactoryStore)
-            .Bind(x => x.TryGetOutputTypeReference(expectedType, FreezableStepData, typeResolver));
+            .Bind(
+                x => x.TryGetOutputTypeReference(callerMetadata, FreezableStepData, typeResolver)
+            );
     }
 
     /// <inheritdoc />

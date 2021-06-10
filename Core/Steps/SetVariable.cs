@@ -69,7 +69,7 @@ public sealed class SetVariable<T> : CompoundStep<Unit>
 
         /// <inheritdoc />
         protected override Result<TypeReference, IError> GetGenericTypeParameter(
-            TypeReference expectedTypeReference,
+            CallerMetadata callerMetadata,
             FreezableStepData freezableStepData,
             TypeResolver typeResolver)
         {
@@ -77,7 +77,14 @@ public sealed class SetVariable<T> : CompoundStep<Unit>
                 freezableStepData
                     .TryGetStep(nameof(SetVariable<object>.Value), StepType)
                     .Bind(
-                        x => x.TryGetOutputTypeReference(TypeReference.Any.Instance, typeResolver)
+                        x => x.TryGetOutputTypeReference(
+                            new CallerMetadata(
+                                TypeName,
+                                nameof(SetVariable<object>.Value),
+                                TypeReference.Any.Instance
+                            ),
+                            typeResolver
+                        )
                     );
 
             return r;
@@ -86,7 +93,7 @@ public sealed class SetVariable<T> : CompoundStep<Unit>
         /// <inheritdoc />
         public override IEnumerable<(VariableName variableName, TypeReference type)>
             GetVariablesSet(
-                TypeReference expectedTypeReference,
+                CallerMetadata callerMetadata,
                 FreezableStepData freezableStepData,
                 TypeResolver typeResolver)
         {
@@ -99,7 +106,7 @@ public sealed class SetVariable<T> : CompoundStep<Unit>
                 yield break;
 
             var memberType = GetGenericTypeParameter(
-                expectedTypeReference,
+                callerMetadata,
                 freezableStepData,
                 typeResolver
             );

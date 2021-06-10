@@ -23,10 +23,12 @@ public abstract record FreezableStepProperty(TextLocation? Location)
     public virtual Result<VariableName, IError> AsVariableName(string parameterName)
     {
         return Result.Failure<VariableName, IError>(
-            ErrorCode.WrongParameterType.ToErrorBuilder(
+            ErrorCode.WrongType.ToErrorBuilder(
+                    "Step",
+                    nameof(VariableName),
                     parameterName,
-                    MemberType.VariableName,
-                    MemberType
+                    "Value",
+                    MemberType.ToString()
                 )
                 .WithLocation(Location ?? ErrorLocation.EmptyLocation)
         );
@@ -38,7 +40,13 @@ public abstract record FreezableStepProperty(TextLocation? Location)
     public virtual Result<IReadOnlyList<IFreezableStep>, IError> AsStepList(string parameterName)
     {
         return Result.Failure<IReadOnlyList<IFreezableStep>, IError>(
-            ErrorCode.WrongParameterType.ToErrorBuilder(parameterName, "Array/Sequence", MemberType)
+            ErrorCode.WrongType.ToErrorBuilder(
+                    "Step",
+                    "Array/Sequence",
+                    parameterName,
+                    "Value",
+                    MemberType.ToString()
+                )
                 .WithLocation(Location ?? ErrorLocation.EmptyLocation)
         );
     }
