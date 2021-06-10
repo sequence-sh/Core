@@ -90,6 +90,30 @@ public abstract record Array<T> : IArray
     }
 
     /// <summary>
+    /// Group values by a selector
+    /// </summary>
+    public Array<Entity> GroupByAwait(Func<T, ValueTask<StringStream>> selector)
+    {
+        var r =
+            GetAsyncEnumerable()
+                .GroupByAwait(selector)
+                .SelectAwait(
+                    async
+                        x =>
+                    {
+                        var values = await x.ToListAsync();
+
+                        var e = Entity.Create(("Key", x.Key), ("Values", values));
+
+                        return e;
+                    }
+                )
+                .ToSCLArray();
+
+        return r;
+    }
+
+    /// <summary>
     /// Perform an action on every member of the sequence
     /// </summary>
     public Array<TResult> Select<TResult>(Func<T, TResult> selector)
