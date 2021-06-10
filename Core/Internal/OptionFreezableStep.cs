@@ -39,21 +39,35 @@ public sealed class OptionFreezableStep : IFreezableStep
     /// <inheritdoc />
     public Result<IStep, IError> TryFreeze(CallerMetadata callerMetadata, TypeResolver typeResolver)
     {
-        IError? error = null;
+        var optionErrors = new List<(IFreezableStep step, IError error)>();
 
         foreach (var freezableStep in Options)
+            //Go through the options - use the first successful option or the first error
         {
             var r = freezableStep.TryFreeze(callerMetadata, typeResolver);
 
             if (r.IsSuccess)
                 return r;
-            else if (error is null)
-                error = r.Error;
+
+            optionErrors.Add((freezableStep, r.Error));
         }
 
-        Debug.Assert(error != null, "OptionFreezableStep should have at least one option");
+        Debug.Assert(optionErrors.Any(), "OptionFreezableStep should have at least one option");
 
-        return Result.Failure<IStep, IError>(error);
+        //These all failed, but try to find one that was close to working
+        foreach (var (step, error) in optionErrors)
+        {
+            var r = step.TryFreeze(
+                callerMetadata with { ExpectedType = TypeReference.Any.Instance },
+                typeResolver
+            );
+
+            if (
+                r.IsSuccess) //This would have succeeded if the caller step expected a different type, so return the unexpected type error
+                return Result.Failure<IStep, IError>(error);
+        }
+
+        return Result.Failure<IStep, IError>(optionErrors.First().error);
     }
 
     /// <inheritdoc />

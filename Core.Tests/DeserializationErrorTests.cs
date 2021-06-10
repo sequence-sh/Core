@@ -56,7 +56,7 @@ public partial class DeserializationErrorTests
 
             yield return new DeserializationErrorCase(
                 "- 1 + 1\r\n- 2 + 2",
-                ("Sequence expected Unit for parameter InitialSteps[0] but ArrayConcat has type Array<T>",
+                ("Sequence expected Unit for parameter InitialSteps[0] but Step has type Integer",
                  "Line: 1, Col: 2, Idx: 2 - Line: 1, Col: 6, Idx: 6 Text: 1 + 1")
             );
 
@@ -109,6 +109,13 @@ public partial class DeserializationErrorTests
                 "- <Input> = [\r\n    (prop1: \"\"value1\"\" prop2: 2),\r\n    (prop1: \"\"value3\"\" prop2: 4),\r\n  ]",
                 (@"Syntax Error: No Viable Alternative - '""""' was unexpected.",
                  @"Line: 2, Col: 20, Idx: 35 - Line: 2, Col: 21, Idx: 36 Text: """"")
+            );
+
+            yield return new DeserializationErrorCase(
+                "-<array> = [('Foo': 1), ('Foo': 2)]\r\n- StringIsEmpty <array>[0]",
+                (
+                    "ElementAtIndex expected Array<String> for parameter Array but <array> has type Array<Entity>",
+                    "GetVariable - Line: 2, Col: 16, Idx: 53 - Line: 2, Col: 22, Idx: 59 Text: <array>")
             );
         }
     }
