@@ -62,7 +62,7 @@ public partial class DeserializationErrorTests
 
             yield return new DeserializationErrorCase(
                 "- <MyVar> = 1\r\n- print (stringtodate <MyVar>)",
-                ("StringToDate expected String for parameter StringToDate but <MyVar> has type Integer",
+                ("StringToDate expected String for parameter Date but <MyVar> has type Integer",
                  "GetVariable - Line: 2, Col: 22, Idx: 37 - Line: 2, Col: 28, Idx: 43 Text: <MyVar>")
             );
             //yield return new DeserializationErrorCase(

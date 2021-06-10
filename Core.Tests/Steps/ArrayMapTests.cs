@@ -4,6 +4,7 @@ using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.TestHarness;
 using Reductech.EDR.Core.Util;
+using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
@@ -19,18 +20,18 @@ public partial class ArrayMapTests : StepTestBase<ArrayMap<Entity>, Array<Entity
                 "Add property",
                 new ForEach<Entity>
                 {
-                    Action = new Log<Entity> { Value = StaticHelpers.GetEntityVariable },
-                    Array = new ArrayMap<Entity>()
+                    Action = new Log<Entity> { Value = GetEntityVariable },
+                    Array = new ArrayMap<Entity>
                     {
-                        Array = StaticHelpers.Array(
+                        Array = Array(
                             Entity.Create(("Foo", "Hello")),
                             Entity.Create(("Foo", "Hello 2"))
                         ),
                         Function = new EntitySetValue<StringStream>
                         {
-                            Entity   = StaticHelpers.GetEntityVariable,
-                            Property = StaticHelpers.Constant("Bar"),
-                            Value    = StaticHelpers.Constant("World")
+                            Entity   = GetEntityVariable,
+                            Property = Constant("Bar"),
+                            Value    = Constant("World")
                         }
                     },
                     Variable = VariableName.Entity
@@ -44,18 +45,18 @@ public partial class ArrayMapTests : StepTestBase<ArrayMap<Entity>, Array<Entity
                 "Change property",
                 new ForEach<Entity>
                 {
-                    Action = new Log<Entity> { Value = StaticHelpers.GetEntityVariable },
-                    Array = new ArrayMap<Entity>()
+                    Action = new Log<Entity> { Value = GetEntityVariable },
+                    Array = new ArrayMap<Entity>
                     {
-                        Array = StaticHelpers.Array(
+                        Array = Array(
                             Entity.Create(("Foo", "Hello"),   ("Bar", "Earth")),
                             Entity.Create(("Foo", "Hello 2"), ("Bar", "Earth"))
                         ),
                         Function = new EntitySetValue<StringStream>
                         {
-                            Entity   = StaticHelpers.GetEntityVariable,
-                            Property = StaticHelpers.Constant("Bar"),
-                            Value    = StaticHelpers.Constant("World")
+                            Entity   = GetEntityVariable,
+                            Property = Constant("Bar"),
+                            Value    = Constant("World")
                         }
                     },
                     Variable = VariableName.Entity
@@ -76,10 +77,10 @@ public partial class ArrayMapTests : StepTestBase<ArrayMap<Entity>, Array<Entity
 
             yield return new ErrorCase(
                 "Stream error",
-                new ArrayMap<Entity>()
+                new ArrayMap<Entity>
                 {
                     Array    = new FailStep<Array<Entity>> { ErrorMessage = "Stream Fail" },
-                    Function = StaticHelpers.Constant(Entity.Create(("Key", "Value")))
+                    Function = Constant(Entity.Create(("Key", "Value")))
                 },
                 new SingleError(
                     ErrorLocation.EmptyLocation,
