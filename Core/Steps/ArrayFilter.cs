@@ -36,6 +36,7 @@ public sealed class ArrayFilter<T> : CompoundStep<Array<T>>
             await using var scopedMonad = new ScopedStateMonad(
                 stateMonad,
                 currentState,
+                Variable,
                 new KeyValuePair<VariableName, object>(Variable, record!)
             );
 

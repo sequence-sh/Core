@@ -70,6 +70,15 @@ namespace Reductech.EDR.Core.Internal.Errors {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The automatic variable was not set..
+        /// </summary>
+        internal static string AutomaticVariableNotSet {
+            get {
+                return ResourceManager.GetString("AutomaticVariableNotSet", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Cannot convert a nested entity to {0}..
         /// </summary>
         internal static string CannotConvertNestedEntity {

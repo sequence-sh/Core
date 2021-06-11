@@ -155,6 +155,9 @@ public sealed class StateMonad : IStateMonad
             await DisposeVariableAsync(variable, this);
     }
 
+    /// <inheritdoc />
+    public Maybe<VariableName> AutomaticVariable => Maybe<VariableName>.None;
+
     internal static async Task DisposeVariableAsync(object variable, IStateMonad stateMonad)
     {
         if (variable is IStateDisposable stateDisposable)

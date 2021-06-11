@@ -77,6 +77,11 @@ public interface IStateMonad : IAsyncDisposable
     /// </summary>
     void Log(LogLevel logLevel, string message, IStep? callingStep) =>
         Logger.LogMessage(logLevel, message, callingStep, this);
+
+    /// <summary>
+    /// The most recent automatic variable introduced, if there is one.
+    /// </summary>
+    Maybe<VariableName> AutomaticVariable { get; }
 }
 
 }

@@ -47,7 +47,7 @@ public interface IFreezableStep : IEquatable<IFreezableStep>
     public Result<IStep, IError> TryFreeze(
         CallerMetadata callerMetadata,
         StepFactoryStore stepFactoryStore) => TypeResolver
-        .TryCreate(stepFactoryStore, callerMetadata, this)
+        .TryCreate(stepFactoryStore, callerMetadata, Maybe<VariableName>.None, this)
         .Bind(typeResolver => TryFreeze(callerMetadata, typeResolver));
 }
 

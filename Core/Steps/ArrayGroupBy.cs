@@ -35,6 +35,7 @@ public sealed class ArrayGroupBy<T> : CompoundStep<Array<Entity>>
             await using var scopedMonad = new ScopedStateMonad(
                 stateMonad,
                 currentState,
+                Variable,
                 new KeyValuePair<VariableName, object>(Variable, record!)
             );
 

@@ -4,6 +4,7 @@
  */
 setVariable			: VARIABLENAME EQUALS step;
 getVariable         : VARIABLENAME ;
+getAutomaticVariable : AUTOMATICVARIABLE ;
 array				: OPENSQUAREBRACKET ( term COMMA? )* CLOSESQUAREBRACKET ;
 infixOperator		: DASH
 					| PLUS
@@ -50,6 +51,7 @@ simpleTerm			: number
                     | quotedString
 					| interpolatedString
                     | getVariable
+                    | getAutomaticVariable
                     | entity
                     | array;
 stepSequence		: (NEWCOMMAND | DASH) step (NEWCOMMAND step)* ;
@@ -89,6 +91,7 @@ PIPE				: '|' ;
 NEWCOMMAND			: ('\r'? '\n' | '\r')+ (' ' | '\t')* DASH (' ' | '\t')+ ;
 DOT                 : '.' ;
 fragment DIGIT		: [0-9];
+AUTOMATICVARIABLE   : LESSTHAN GREATERTHAN ;
 VARIABLENAME		: LESSTHAN [a-zA-Z0-9_]+ GREATERTHAN ;
 DATETIME			: DIGIT DIGIT DIGIT DIGIT DASH DIGIT DIGIT DASH DIGIT DIGIT ([Tt] DIGIT DIGIT COLON DIGIT DIGIT COLON DIGIT DIGIT ('.' DIGIT+)?)? ;
 NUMBER				: DASH? DIGIT+ ;
