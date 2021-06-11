@@ -44,7 +44,7 @@ public partial class DeserializationErrorTests
 
             yield return new DeserializationErrorCase(
                 "1/",
-                ("Syntax Error: mismatched input '<EOF>' expecting {'(', '[', VARIABLENAME, DATETIME, NUMBER, OPENISTRING, SIMPLEISTRING, DOUBLEQUOTEDSTRING, SINGLEQUOTEDSTRING, TRUE, FALSE, NAME}",
+                ("Syntax Error: mismatched input '<EOF>' expecting {'(', '[', AUTOMATICVARIABLE, VARIABLENAME, DATETIME, NUMBER, OPENISTRING, SIMPLEISTRING, DOUBLEQUOTEDSTRING, SINGLEQUOTEDSTRING, TRUE, FALSE, NAME}",
                  "Line: 1, Col: 2, Idx: 2 - Line: 1, Col: 1, Idx: 1 Text: <EOF>")
             );
 
@@ -65,6 +65,13 @@ public partial class DeserializationErrorTests
                 ("StringToDate expected String for parameter Date but <MyVar> has type Integer",
                  "GetVariable - Line: 2, Col: 22, Idx: 37 - Line: 2, Col: 28, Idx: 43 Text: <MyVar>")
             );
+
+            yield return new DeserializationErrorCase(
+                "<>",
+                ("The automatic variable was not set.",
+                 "GetAutomaticVariable - Line: 1, Col: 0, Idx: 0 - Line: 1, Col: 1, Idx: 1 Text: <>")
+            );
+
             //yield return new DeserializationErrorCase(
             //    "Print(['abc', '123'] == ['abc', '123'])",
             //    ("Type ArrayOfStringStream is not comparable and so cannot be used for sorting.",
@@ -98,9 +105,9 @@ public partial class DeserializationErrorTests
             yield return new DeserializationErrorCase(
                 "Foreach ['one', 'two') (Print <Num>) <Num>", //The ) should be a ]
                 (
-                    @"Syntax Error: extraneous input ')' expecting {'(', '[', ']', ',', VARIABLENAME, DATETIME, NUMBER, OPENISTRING, SIMPLEISTRING, DOUBLEQUOTEDSTRING, SINGLEQUOTEDSTRING, TRUE, FALSE, NAME}",
+                    @"Syntax Error: extraneous input ')' expecting {'(', '[', ']', ',', AUTOMATICVARIABLE, VARIABLENAME, DATETIME, NUMBER, OPENISTRING, SIMPLEISTRING, DOUBLEQUOTEDSTRING, SINGLEQUOTEDSTRING, TRUE, FALSE, NAME}",
                     @"Line: 1, Col: 21, Idx: 21 - Line: 1, Col: 21, Idx: 21 Text: )"),
-                (@"Syntax Error: mismatched input '<EOF>' expecting {'(', '[', ']', ',', VARIABLENAME, DATETIME, NUMBER, OPENISTRING, SIMPLEISTRING, DOUBLEQUOTEDSTRING, SINGLEQUOTEDSTRING, TRUE, FALSE, NAME}",
+                (@"Syntax Error: mismatched input '<EOF>' expecting {'(', '[', ']', ',', AUTOMATICVARIABLE, VARIABLENAME, DATETIME, NUMBER, OPENISTRING, SIMPLEISTRING, DOUBLEQUOTEDSTRING, SINGLEQUOTEDSTRING, TRUE, FALSE, NAME}",
                  @"Line: 1, Col: 42, Idx: 42 - Line: 1, Col: 41, Idx: 41 Text: <EOF>"
                 )
             );

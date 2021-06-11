@@ -8,6 +8,7 @@ using Antlr4.Runtime;
 using Antlr4.Runtime.Tree;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Internal.Errors;
+using Reductech.EDR.Core.Steps;
 using static Reductech.EDR.Core.Internal.FreezableFactory;
 using StepParameterDict =
     System.Collections.Generic.Dictionary<Reductech.EDR.Core.Internal.StepParameterReference,
@@ -297,6 +298,21 @@ public static class SCLParsing
         {
             var vn = GetVariableName(context.VARIABLENAME());
             return vn;
+        }
+
+        /// <inheritdoc />
+        public override Result<FreezableStepProperty, IError> VisitGetAutomaticVariable(
+            SCLParser.GetAutomaticVariableContext context)
+        {
+            var location = new TextLocation(context);
+
+            var cfs = new CompoundFreezableStep(
+                "GetAutomaticVariable",
+                new FreezableStepData(new StepParameterDict(), location),
+                location
+            );
+
+            return new FreezableStepProperty.Step(cfs, location);
         }
 
         /// <inheritdoc />

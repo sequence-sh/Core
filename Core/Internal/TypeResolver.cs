@@ -47,7 +47,7 @@ public sealed class TypeResolver
     /// <summary>
     /// The name of the automatic variable
     /// </summary>
-    public Maybe<VariableName> AutomaticVariableName { get; }
+    public Maybe<VariableName> AutomaticVariableName { get; private set; }
 
     /// <summary>
     /// The StepFactoryStory
@@ -75,6 +75,8 @@ public sealed class TypeResolver
 
         if (r2.IsFailure)
             return r2.ConvertFailure<TypeResolver>();
+
+        newTypeResolver.AutomaticVariableName = vn;
 
         return newTypeResolver;
     }

@@ -35,6 +35,9 @@ public sealed class GetAutomaticVariable<T> : CompoundStep<T>
     }
 
     /// <inheritdoc />
+    public override bool ShouldBracketWhenSerialized => false;
+
+    /// <inheritdoc />
     public override IStepFactory StepFactory => GetAutomaticVariableStepFactory.Instance;
 
     private class GetAutomaticVariableStepFactory : GenericStepFactory
