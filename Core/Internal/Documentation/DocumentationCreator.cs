@@ -17,54 +17,110 @@ public static class DocumentationCreator
     /// Creates documentation for a list of entities
     /// </summary>
     public static
-        IEnumerable<MarkdownDocument> CreateDocumentation(IEnumerable<IDocumented> entities)
+        DocumentationCreationResult CreateDocumentation(IEnumerable<IDocumented> entities)
     {
         var enumTypes = new HashSet<Type>();
 
+        MainContents mainContents;
+
         var categories = entities.GroupBy(x => x.DocumentationCategory).ToList();
 
-        var sb = new StringBuilder();
+        {
+            var contentsStringBuilder = new StringBuilder();
 
-        sb.AppendLine("# Contents");
+            contentsStringBuilder.AppendLine("# Contents");
 
-        var contentsRows = categories.SelectMany(x => x)
-            .Select(x => new[] { $"[{x.Name}]({x.DocumentationCategory}/{x.FileName})", x.Summary })
-            .ToList();
+            var contentsRows = categories.SelectMany(x => x)
+                .Select(
+                    x => new[] { $"[{x.Name}]({x.DocumentationCategory}/{x.FileName})", x.Summary }
+                )
+                .ToList();
 
-        var contentsHeader = new[] { "Step", "Summary" }.Select(
-                x => Prettifier.Cell.Create(x, Prettifier.Alignment.LeftJustified)
-            )
-            .ToList();
+            var contentsHeader = new[] { "Step", "Summary" }.Select(
+                    x => Prettifier.Cell.Create(x, Prettifier.Alignment.LeftJustified)
+                )
+                .ToList();
 
-        Prettifier.CreateMarkdownTable(contentsHeader, contentsRows, sb);
+            Prettifier.CreateMarkdownTable(contentsHeader, contentsRows, contentsStringBuilder);
 
-        yield return new("Contents.md", "Contents", sb.ToString().Trim(), "", "");
+            mainContents = new MainContents(
+                "Contents.md",
+                "Contents",
+                contentsStringBuilder.ToString().Trim(),
+                ""
+            );
+        }
+
+        var documentationCategories = new List<DocumentationCategory>();
 
         foreach (var category in categories)
         {
+            CategoryContents categoryContents;
+
+            //Category Contents Page
+            {
+                var contentsStringBuilder = new StringBuilder();
+
+                contentsStringBuilder.AppendLine("# Contents");
+
+                var contentsRows = categories.SelectMany(x => x)
+                    .Select(
+                        x => new[]
+                        {
+                            $"[{x.Name}]({x.DocumentationCategory}/{x.FileName})", x.Summary
+                        }
+                    )
+                    .ToList();
+
+                var contentsHeader = new[] { "Step", "Summary" }.Select(
+                        x => Prettifier.Cell.Create(x, Prettifier.Alignment.LeftJustified)
+                    )
+                    .ToList();
+
+                Prettifier.CreateMarkdownTable(contentsHeader, contentsRows, contentsStringBuilder);
+
+                categoryContents = new CategoryContents(
+                    "Contents.md",
+                    "Contents",
+                    contentsStringBuilder.ToString().Trim(),
+                    category.Key,
+                    category.Key
+                );
+            }
+
+            List<StepPage> stepPages = new();
+
+            //Individual Category Pages
             foreach (var doc in category)
             {
                 enumTypes.UnionWith(
                     doc.Parameters.Select(x => x.Type)
                         .Select(x => Nullable.GetUnderlyingType(x) ?? x)
-                        .Where(t => t.IsEnum)
+                        .Where(t => !t.IsSignatureType && t.IsEnum)
                 );
 
-                var pageText = GetPageText(doc);
-
-                yield return new(doc.FileName, doc.Name, pageText, category.Key, category.Key);
+                var stepPage = GetPageText(doc);
+                stepPages.Add(stepPage);
             }
+
+            documentationCategories.Add(new DocumentationCategory(categoryContents, stepPages));
         }
+
+        var enums = new List<EnumPage>();
 
         if (enumTypes.Any())
         {
             foreach (var type in enumTypes.OrderBy(x => x.Name))
             {
-                var enumPageText = GetEnumPageText(type);
-
-                yield return new(type.Name + ".md", type.Name, enumPageText, "Enums", "Enums");
+                var enumData = GetEnumPage(type);
+                enums.Add(enumData);
             }
         }
+
+        var result =
+            new DocumentationCreationResult(mainContents, documentationCategories, enums);
+
+        return result;
     }
 
     private static string Escape(string? s)
@@ -79,7 +135,7 @@ public static class DocumentationCreator
     /// <summary>
     /// Gets the documentation page for a step
     /// </summary>
-    public static string GetPageText(IDocumented doc)
+    public static StepPage GetPageText(IDocumented doc)
     {
         var sb = new StringBuilder();
 
@@ -107,6 +163,17 @@ public static class DocumentationCreator
             sb.AppendLine(Escape(doc.Summary).Trim());
             sb.AppendLine();
         }
+
+        var stepParameters = doc.Parameters.Select(
+                x => new StepParameter(
+                    x.Name,
+                    TypeNameHelper.GetHumanReadableTypeName(x.Type),
+                    x.Summary,
+                    x.Required,
+                    x.Aliases.ToList()
+                )
+            )
+            .ToList();
 
         if (doc.Parameters.Any())
         {
@@ -167,20 +234,33 @@ public static class DocumentationCreator
             Prettifier.CreateMarkdownTable(headers, parameterRows, sb);
         }
 
-        return sb.ToString().Trim();
+        var stepPage = new StepPage(
+            doc.FileName,
+            doc.Name,
+            sb.ToString().Trim(),
+            doc.DocumentationCategory,
+            doc.DocumentationCategory,
+            doc.Name,
+            doc.AllNames,
+            doc.Summary,
+            doc.TypeDetails ?? "",
+            stepParameters
+        );
+
+        return stepPage;
     }
 
-    private static string GetEnumPageText(Type type)
+    private static EnumPage GetEnumPage(Type type)
     {
-        var sb = new StringBuilder();
-        sb.AppendLine($"## {Escape(type.Name)}");
+        var textStringBuilder = new StringBuilder();
+        textStringBuilder.AppendLine($"## {Escape(type.Name)}");
 
         var summary = type.GetXmlDocsSummary();
 
         if (!string.IsNullOrWhiteSpace(summary))
         {
-            sb.AppendLine(Escape(summary));
-            sb.AppendLine();
+            textStringBuilder.AppendLine(Escape(summary));
+            textStringBuilder.AppendLine();
         }
 
         var headers = new[] { "Name", "Summary" }.Select(
@@ -188,14 +268,24 @@ public static class DocumentationCreator
             )
             .ToList();
 
-        var parameterRows = type.GetFields(BindingFlags.Public | BindingFlags.Static)
+        var enumValues = type.GetFields(BindingFlags.Public | BindingFlags.Static)
             .OrderBy(GetEnumFieldValue)
-            .Select(fieldInfo => new[] { fieldInfo.Name, fieldInfo.GetXmlDocsSummary() })
+            .Select(x => new EnumValue(x.Name, x.GetXmlDocsSummary()))
             .ToList();
 
-        Prettifier.CreateMarkdownTable(headers, parameterRows, sb);
+        var parameterRows = enumValues
+            .Select(fieldInfo => new[] { fieldInfo.Name, fieldInfo.Summary })
+            .ToList();
 
-        return sb.ToString().Trim();
+        Prettifier.CreateMarkdownTable(headers, parameterRows, textStringBuilder);
+
+        return new EnumPage(
+            type.Name + ".md",
+            type.Name,
+            textStringBuilder.ToString().Trim(),
+            "",
+            enumValues
+        );
 
         static object GetEnumFieldValue(MemberInfo memberInfo)
         {

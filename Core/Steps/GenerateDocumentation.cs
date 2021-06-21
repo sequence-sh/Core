@@ -13,10 +13,10 @@ namespace Reductech.EDR.Core.Steps
 /// Generates documentation for all available steps.
 /// </summary>
 public sealed class
-    GenerateDocumentation : CompoundStep<Array<Entity>>
+    GenerateDocumentation : CompoundStep<Entity>
 {
     /// <inheritdoc />
-    protected override async Task<Result<Array<Entity>, IError>> Run(
+    protected override async Task<Result<Entity, IError>> Run(
         IStateMonad stateMonad,
         CancellationToken cancellationToken)
     {
@@ -28,26 +28,14 @@ public sealed class
             .Select(x => new StepWrapper(x))
             .ToList();
 
-        var files = DocumentationCreator.CreateDocumentation(documented);
+        var creationResult = DocumentationCreator.CreateDocumentation(documented);
 
-        var entities =
-            files.Select(
-                    x => Entity.Create(
-                        ("FileName", x.FileName),
-                        ("Title", x.Title),
-                        ("FileText", x.FileText),
-                        ("Directory", x.Directory),
-                        ("Category", x.Category)
-                    )
-                )
-                .ToSCLArray();
-
-        return entities;
+        return creationResult.ConvertToEntity();
     }
 
     /// <inheritdoc />
     public override IStepFactory StepFactory { get; } =
-        new SimpleStepFactory<GenerateDocumentation, Array<Entity>>();
+        new SimpleStepFactory<GenerateDocumentation, Entity>();
 }
 
 }
