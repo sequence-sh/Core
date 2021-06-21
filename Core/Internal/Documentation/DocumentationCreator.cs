@@ -99,7 +99,7 @@ public static class DocumentationCreator
                         .Where(t => !t.IsSignatureType && t.IsEnum)
                 );
 
-                var stepPage = GetPageText(doc);
+                var stepPage = GetStepPage(doc);
                 stepPages.Add(stepPage);
             }
 
@@ -135,7 +135,7 @@ public static class DocumentationCreator
     /// <summary>
     /// Gets the documentation page for a step
     /// </summary>
-    public static StepPage GetPageText(IDocumented doc)
+    public static StepPage GetStepPage(IDocumented doc)
     {
         var sb = new StringBuilder();
 

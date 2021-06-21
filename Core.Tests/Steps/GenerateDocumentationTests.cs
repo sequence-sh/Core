@@ -14,7 +14,6 @@ using Reductech.EDR.Core.Internal.Serialization;
 using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.TestHarness;
 using Reductech.EDR.Core.Util;
-using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
@@ -26,23 +25,7 @@ public partial class GenerateDocumentationTests : StepTestBase<GenerateDocumenta
     {
         get
         {
-            static Array<Entity> Entities(params Entity[] entities) => entities.ToSCLArray();
-
-            //static Entity File(
-            //    string fileName,
-            //    string title,
-            //    string fileText,
-            //    string directory,
-            //    string category)
-            //{
-            //    return Entity.Create(
-            //        ("FileName", fileName),
-            //        ("Title", title),
-            //        ("FileText", fileText),
-            //        ("Directory", directory),
-            //        ("Category", category)
-            //    );
-            //}
+            var logDocumentation = new Log<Entity> { Value = new GenerateDocumentation() };
 
             static MainContents Contents(
                 params (string name, string category, string comment)[] steps)
@@ -82,15 +65,62 @@ public partial class GenerateDocumentationTests : StepTestBase<GenerateDocumenta
                 return new MainContents("Contents.md", "Contents", text, " ");
             }
 
-            //var not = File(
-            //    "Not.md",
-            //    "Not",
-            //    "## Not\n_Alias_:`Not`\n\n_Output_:`Boolean`\n\nNegation of a boolean value.\n\n\n|Parameter|Type |Required|Summary |\n|:--------|:----:|:------:|:-------------------|\n|Boolean |`bool`|✔ |The value to negate.|",
-            //    "Core",
-            //    "Core"
-            //);
+            (string nameof, string category, string comment) notHeader = (
+                "Not", "Core", "Negation of a boolean value.");
 
-            //(string nameof, string category, string comment) notHeader = ("Not", "Core", "Negation of a boolean value.");
+            var notStepPage = new StepPage(
+                "Not.md",
+                "Not",
+                "## Not\n_Alias_:`Not`\n\n_Output_:`Boolean`\n\nNegation of a boolean value.\n\n\n|Parameter|Type |Required|Summary |\n|:--------|:----:|:------:|:-------------------|\n|Boolean |`bool`|✔ |The value to negate.|",
+                "Core",
+                "Core",
+                "Not",
+                new List<string>() { "Not" },
+                "Negation of a boolean value.",
+                "Boolean",
+                new List<StepParameter>()
+                {
+                    new(
+                        "Boolean",
+                        "bool",
+                        "The value to negate.",
+                        true,
+                        new List<string>()
+                    )
+                }
+            );
+
+            var notContents = Contents(notHeader);
+
+            var notDocumentationEntity = new DocumentationCreationResult(
+                notContents,
+                new[]
+                {
+                    new DocumentationCategory(
+                        new CategoryContents(
+                            notContents.FileName,
+                            notContents.Title,
+                            notContents.FileText,
+                            "Core",
+                            "Core"
+                        ),
+                        new List<StepPage>() { notStepPage }
+                    ),
+                },
+                new EnumPage[] { }
+            );
+
+            yield return new StepCase(
+                "Generate Not Documentation",
+                logDocumentation,
+                Unit.Default,
+                notDocumentationEntity.ConvertToEntity().Serialize()
+            ) { TestDeserializeAndRun = false }.WithStepFactoryStore(
+                StepFactoryStore.Create(
+                    System.Array.Empty<ConnectorData>(),
+                    new SimpleStepFactory<Not, bool>()
+                )
+            );
 
             (string nameof, string category, string comment) exampleStepHeader = (
                 "DocumentationExampleStep",
@@ -99,7 +129,50 @@ public partial class GenerateDocumentationTests : StepTestBase<GenerateDocumenta
 
             var exampleContents = Contents(exampleStepHeader);
 
-            var documentationExample = new DocumentationCreationResult(
+            var documentationStepPage = new StepPage(
+                "DocumentationExampleStep.md",
+                "DocumentationExampleStep",
+                "## DocumentationExampleStep\n_Alias_:`DocumentationExampleStep`\n\n_Output_:`StringStream`\n\n*Requires ValueIf Library Version 1.2*\n\n\n|Parameter |Type |Required|Allowed Range |Default Value|Example|Recommended Range|Recommended Value|Requirements|See Also|URL |Value Delimiter|Summary|\n|:--------------|:------------:|:------:|:------------:|:-----------:|:-----:|:---------------:|:---------------:|:----------:|:------:|:----------------:|:-------------:|:------|\n|Alpha<br>_Alef_|`int` |✔ |Greater than 1| |1234 |100-300 |201 |Greek 2.1 |Beta |[Alpha](alpha.com)| | |\n|Beta |`string` | | |Two hundred | | | | |Alpha | | | |\n|Gamma |`VariableName`| | | | | | | | | | | |\n|Delta |List<`bool`> | | | | | | | | | |, | |",
+                "Examples",
+                "Examples",
+                "DocumentationExampleStep",
+                new[] { "DocumentationExampleStep" },
+                "",
+                "StringStream",
+                new[]
+                {
+                    new StepParameter(
+                        "Alpha",
+                        "int",
+                        "",
+                        true,
+                        new[] { "Alef" }
+                    ),
+                    new StepParameter(
+                        "Beta",
+                        "string",
+                        "",
+                        false,
+                        new List<string>()
+                    ),
+                    new StepParameter(
+                        "Gamma",
+                        "VariableName",
+                        "",
+                        false,
+                        new List<string>()
+                    ),
+                    new StepParameter(
+                        "Delta",
+                        "List<bool>",
+                        "",
+                        false,
+                        new List<string>()
+                    ),
+                }
+            );
+
+            var exampleCreationResult = new DocumentationCreationResult(
                 exampleContents,
                 new[]
                 {
@@ -111,99 +184,23 @@ public partial class GenerateDocumentationTests : StepTestBase<GenerateDocumenta
                             "Examples",
                             "Examples"
                         ),
-                        new List<StepPage>()
-                        {
-                            new StepPage(
-                                "DocumentationExampleStep.md",
-                                "DocumentationExampleStep",
-                                "## DocumentationExampleStep\n_Alias_:`DocumentationExampleStep`\n\n_Output_:`StringStream`\n\n*Requires ValueIf Library Version 1.2*\n\n\n|Parameter |Type |Required|Allowed Range |Default Value|Example|Recommended Range|Recommended Value|Requirements|See Also|URL |Value Delimiter|Summary|\n|:--------------|:------------:|:------:|:------------:|:-----------:|:-----:|:---------------:|:---------------:|:----------:|:------:|:----------------:|:-------------:|:------|\n|Alpha<br>_Alef_|`int` |✔ |Greater than 1| |1234 |100-300 |201 |Greek 2.1 |Beta |[Alpha](alpha.com)| | |\n|Beta |`string` | | |Two hundred | | | | |Alpha | | | |\n|Gamma |`VariableName`| | | | | | | | | | | |\n|Delta |List<`bool`> | | | | | | | | | |, | |",
-                                "Examples",
-                                "Examples",
-                                "DocumentationExampleStep",
-                                new[] { "DocumentationExampleStep" },
-                                "",
-                                "StringStream",
-                                new[]
-                                {
-                                    new StepParameter(
-                                        "Alpha",
-                                        "int",
-                                        "",
-                                        true,
-                                        new[] { "Alef" }
-                                    ),
-                                    new StepParameter(
-                                        "Beta",
-                                        "string",
-                                        "",
-                                        false,
-                                        new List<string>()
-                                    ),
-                                    new StepParameter(
-                                        "Gamma",
-                                        "VariableName",
-                                        "",
-                                        false,
-                                        new List<string>()
-                                    ),
-                                    new StepParameter(
-                                        "Delta",
-                                        "List<bool>",
-                                        "",
-                                        false,
-                                        new List<string>()
-                                    ),
-                                }
-                            )
-                        }
+                        new List<StepPage>() { documentationStepPage }
                     )
                 },
                 new EnumPage[] { }
             );
 
-            //static string[] ToLogs(Array<Entity> array) => array
-            //    .GetElementsAsync(CancellationToken.None)
-            //    .Result.Value.Select(x => x.Serialize())
-            //    .ToArray();
-
-            var logDocumentation = new Log<Entity> { Value = new GenerateDocumentation() };
-
             yield return new StepCase(
                 "Example step",
                 logDocumentation,
                 Unit.Default,
-                documentationExample.ConvertToEntity().Serialize()
+                exampleCreationResult.ConvertToEntity().Serialize()
             ) { TestDeserializeAndRun = false }.WithStepFactoryStore(
                 StepFactoryStore.Create(
                     System.Array.Empty<ConnectorData>(),
                     DocumentationExampleStepFactory.Instance
                 )
             );
-
-            //yield return new StepCase(
-            //    "Generate Not Documentation",
-            //    logDocumentation,
-            //    Unit.Default,
-            //    ToLogs(Entities(Contents(notHeader), not))
-            //) { TestDeserializeAndRun = false }.WithStepFactoryStore(
-            //    StepFactoryStore.Create(
-            //        System.Array.Empty<ConnectorData>(),
-            //        new SimpleStepFactory<Not, bool>()
-            //    )
-            //);
-
-            //yield return new StepCase(
-            //    "Two InitialSteps",
-            //    logDocumentation,
-            //    Unit.Default,
-            //    ToLogs(Entities(Contents(notHeader, exampleStepHeader), not, documentationExample))
-            //) { TestDeserializeAndRun = false }.WithStepFactoryStore(
-            //    StepFactoryStore.Create(
-            //        System.Array.Empty<ConnectorData>(),
-            //        new SimpleStepFactory<Not, bool>(),
-            //        DocumentationExampleStepFactory.Instance
-            //    )
-            //);
         }
     }
 
