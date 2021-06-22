@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
-using Reductech.EDR.Core.Internal;
+using Reductech.EDR.ConnectorManagement;
 using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.TestHarness;
 
