@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using CSharpFunctionalExtensions;
 using FluentAssertions;
+using Reductech.EDR.ConnectorManagement;
 using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Parser;
@@ -84,19 +85,19 @@ public class EntityConversionTests
     [Fact]
     public void ConvertToEntityShouldConvertNestedEntities()
     {
-        var settings = new ConnectorSettings()
+        var settings = new ConnectorSettings
         {
             Enable   = true,
             Id       = "Ultimate",
             Version  = new Version(3, 1).ToString(),
-            Settings = Entity.Create(("a", 1), ("b", 2))
+            Settings = new Dictionary<string, object> { { "a", 1 }, { "b", 2 } }
         };
 
-        var entity = settings.ConvertToEntity();
+        var entity = EntityConversionHelpers.ConvertToEntity(settings);
 
         var s = entity.ToString();
 
-        s.Should().Be(@"(Id: ""Ultimate"" Enable: True Version: ""3.1"" Settings: (a: 1 b: 2))");
+        s.Should().Be(@"(Id: ""Ultimate"" Version: ""3.1"" Enable: True Settings: (a: 1 b: 2))");
     }
 
     [Fact]

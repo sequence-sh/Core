@@ -4,8 +4,8 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Divergic.Logging.Xunit;
+using Reductech.EDR.ConnectorManagement;
 using Reductech.EDR.Core.Abstractions;
-using Reductech.EDR.Core.Connectors;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Serialization;
 using Reductech.EDR.Core.TestHarness;
@@ -35,9 +35,9 @@ public partial class ConnectorTests
             logger
         );
 
-        assembly.ShouldBeSuccessful();
+        Assert.NotNull(assembly);
 
-        var stepTypes = assembly.Value.GetTypes()
+        var stepTypes = assembly.GetTypes()
             .Where(x => typeof(IStep).IsAssignableFrom(x))
             .ToList();
 
@@ -47,7 +47,7 @@ public partial class ConnectorTests
         }
 
         var stepFactoryStore = StepFactoryStore.Create(
-            new ConnectorData(ConnectorSettings.DefaultForAssembly(assembly.Value), assembly.Value)
+            new ConnectorData(ConnectorSettings.DefaultForAssembly(assembly), assembly)
         );
 
         var injectedContextsResult = stepFactoryStore.TryGetInjectedContexts(
