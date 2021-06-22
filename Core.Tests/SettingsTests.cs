@@ -1,8 +1,6 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using FluentAssertions;
 using Reductech.EDR.Core.Entities;
-using Reductech.EDR.Core.Internal;
 using Xunit;
 
 namespace Reductech.EDR.Core.Tests
@@ -11,24 +9,6 @@ namespace Reductech.EDR.Core.Tests
 [AutoTheory.UseTestOutputHelper]
 public partial class SettingsTests
 {
-    [Fact]
-    public void TestGettingConnectorSettingsFromString()
-    {
-        var settings = SCLSettings.CreateFromString(ConnectorJson);
-
-        var connectorSettings = ConnectorSettings.CreateFromSCLSettings(settings).ToList();
-
-        connectorSettings.Should().HaveCount(1);
-
-        var nuixSettings = connectorSettings.Single().Settings;
-
-        nuixSettings.Id.Should().Be("Reductech.EDR.Nuix");
-        nuixSettings.Version.Should().Be("0.9.0");
-        nuixSettings.Enable.Should().Be(true);
-
-        nuixSettings.Settings.TryGetNestedBool("UseDongle").Should().BeTrue();
-    }
-
     [Fact]
     public void TestCreatingSettingsFromString()
     {
