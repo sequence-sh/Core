@@ -311,7 +311,7 @@ Log 'Comments!'",
             yield return new DeserializationTestInstance(
                 @"
 - <docs> = GenerateDocumentation
-- log <docs>[0]['FileName']
+- log <docs>['MainContents']['FileName']
 ",
                 "Contents.md"
             );

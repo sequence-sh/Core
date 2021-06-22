@@ -12,7 +12,7 @@ internal static class TypeNameHelper
         if (TypeAliases.TryGetValue(t, out var name))
             return $"`{name}`";
 
-        if (t.IsEnum)
+        if (!t.IsSignatureType && t.IsEnum)
             return $"[{t.Name}](../Enums/{t.Name}.md)";
 
         if (!t.IsGenericType)
@@ -37,7 +37,7 @@ internal static class TypeNameHelper
 
     public static string GetHumanReadableTypeName(Type t)
     {
-        if (t.IsEnum)
+        if (!t.IsSignatureType && t.IsEnum)
             return t.Name;
 
         if (TypeAliases.TryGetValue(t, out var name))

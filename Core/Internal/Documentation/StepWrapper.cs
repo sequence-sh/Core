@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Reflection;
+using System.Xml;
 using Namotion.Reflection;
 using Reductech.EDR.Core.Attributes;
 
@@ -169,9 +170,25 @@ public class StepWrapper : IDocumented
 
             ExtraFields = extraFields;
 
-            Type = _propertyInfo.PropertyType.IsGenericType
-                ? _propertyInfo.PropertyType.GetGenericArguments()[0]
-                : _propertyInfo.PropertyType;
+            static Type TryGetNested(Type t) => t.IsGenericType ? t.GetGenericArguments()[0] : t;
+
+            if (propertyInfo.GetCustomAttribute<StepPropertyAttribute>() is not null)
+            {
+                Type = TryGetNested(_propertyInfo.PropertyType);
+            }
+            else if (propertyInfo.GetCustomAttribute<StepListPropertyAttribute>() is not null)
+            {
+                Type = Type.MakeGenericSignatureType(
+                    typeof(List<>),
+                    TryGetNested(TryGetNested(_propertyInfo.PropertyType))
+                );
+            }
+            else if (propertyInfo.GetCustomAttribute<VariableNameAttribute>() is not null)
+            {
+                Type = typeof(VariableName);
+            }
+            else
+                Type = TryGetNested(_propertyInfo.PropertyType);
         }
 
         private static void AddFieldFromAttribute<T>(
