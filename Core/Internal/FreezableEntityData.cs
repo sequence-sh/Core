@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Internal.Errors;
-using Reductech.EDR.Core.Util;
 
 namespace Reductech.EDR.Core.Internal
 {
@@ -20,50 +19,13 @@ public record FreezableEntityData(
     /// <inheritdoc />
     public override string ToString()
     {
-        var keys      = EntityProperties.OrderBy(x => x);
-        var keyString = string.Join("; ", keys);
+        var keyString = string.Join("; ", EntityProperties);
 
         if (string.IsNullOrWhiteSpace(keyString))
             return "Empty";
 
         return keyString;
     }
-
-    /// <inheritdoc />
-    public virtual bool Equals(FreezableEntityData? other)
-    {
-        if (other is null)
-            return false;
-
-        if (ReferenceEquals(this, other))
-            return true;
-
-        var result = DictionariesEqual1(EntityProperties, other.EntityProperties);
-
-        return result;
-
-        static bool DictionariesEqual1(
-            IReadOnlyDictionary<EntityPropertyKey, FreezableStepProperty> dict1,
-            IReadOnlyDictionary<EntityPropertyKey, FreezableStepProperty> dict2)
-        {
-            if (dict1.Count != dict2.Count)
-                return false;
-
-            foreach (var key in dict1.Keys)
-            {
-                if (!dict2.ContainsKey(key))
-                    return false;
-
-                if (!dict1[key].Equals(dict2[key]))
-                    return false;
-            }
-
-            return true;
-        }
-    }
-
-    /// <inheritdoc />
-    public override int GetHashCode() => EntityProperties.Count;
 
     /// <summary>
     /// Gets the variables set by steps in this FreezableStepData.
