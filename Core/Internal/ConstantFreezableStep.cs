@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Internal.Errors;
-using Reductech.EDR.Core.Internal.Serialization;
 using Reductech.EDR.Core.Util;
 using DateTime = System.DateTime;
 
@@ -122,24 +121,6 @@ public record DateTimeConstantFreezable
 
     /// <inheritdoc />
     public override string Serialize() => Value.ToString(Constants.DateTimeFormat);
-}
-
-/// <summary>
-/// An entity Constant
-/// </summary>
-public record EntityConstantFreezable
-    (Entity Value, TextLocation? TextLocation) : ConstantFreezableBase<Entity>(Value, TextLocation)
-{
-    /// <inheritdoc />
-    public override string StepName => Value.Serialize();
-
-    /// <inheritdoc />
-    public override Result<IStep, IError> TryFreeze(
-        CallerMetadata callerMetadata,
-        TypeResolver typeResolver) => new EntityConstant(Value);
-
-    /// <inheritdoc />
-    public override string Serialize() => Value.ToString();
 }
 
 /// <summary>
