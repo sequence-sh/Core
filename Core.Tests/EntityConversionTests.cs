@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using CSharpFunctionalExtensions;
 using FluentAssertions;
-using Reductech.EDR.ConnectorManagement;
+using Reductech.EDR.ConnectorManagement.Base;
 using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Parser;

@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using Reductech.EDR.ConnectorManagement;
+using Reductech.EDR.ConnectorManagement.Base;
 using Reductech.EDR.Core.Entities;
 
 namespace Reductech.EDR.Core.Connectors

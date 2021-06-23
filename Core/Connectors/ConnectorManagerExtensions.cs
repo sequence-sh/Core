@@ -2,8 +2,8 @@
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Reductech.EDR.ConnectorManagement;
 using Reductech.EDR.Core.Internal;
+using Reductech.EDR.ConnectorManagement.Base;
 
 namespace Reductech.EDR.Core.Connectors
 {

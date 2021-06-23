@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
-using Reductech.EDR.ConnectorManagement;
+using Reductech.EDR.ConnectorManagement.Base;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Documentation;
@@ -108,7 +108,7 @@ public partial class GenerateDocumentationTests : StepTestBase<GenerateDocumenta
                         new List<StepPage>() { notStepPage }
                     ),
                 },
-                new EnumPage[] { }
+                Array.Empty<EnumPage>()
             );
 
             yield return new StepCase(
@@ -188,7 +188,7 @@ public partial class GenerateDocumentationTests : StepTestBase<GenerateDocumenta
                         new List<StepPage>() { documentationStepPage }
                     )
                 },
-                new EnumPage[] { }
+                Array.Empty<EnumPage>()
             );
 
             yield return new StepCase(

@@ -4,7 +4,7 @@ using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Reflection;
 using CSharpFunctionalExtensions;
-using Reductech.EDR.ConnectorManagement;
+using Reductech.EDR.ConnectorManagement.Base;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Connectors;
 using Reductech.EDR.Core.Internal.Errors;

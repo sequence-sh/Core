@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Reductech.EDR.ConnectorManagement.Base;
 using Divergic.Logging.Xunit;
 using Reductech.EDR.ConnectorManagement;
 using Reductech.EDR.Core.Abstractions;

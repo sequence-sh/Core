@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using CSharpFunctionalExtensions;
-using Reductech.EDR.ConnectorManagement;
 using Reductech.EDR.Core.Internal.Errors;
+using Reductech.EDR.ConnectorManagement.Base;
 
 namespace Reductech.EDR.Core.Connectors
 {

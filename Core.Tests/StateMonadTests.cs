@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Microsoft.Extensions.Logging;
 using Moq;
-using Reductech.EDR.ConnectorManagement;
+using Reductech.EDR.ConnectorManagement.Base;
 using Reductech.EDR.Core.Abstractions;
 using Reductech.EDR.Core.Internal;
 using Xunit;
@@ -108,7 +108,7 @@ public partial class StateMonadTests
         repo.VerifyAll();
     }
 
-    private IStateMonad CreateMonad(MockRepository repo)
+    private static IStateMonad CreateMonad(MockRepository repo)
     {
         return
             new StateMonad(
