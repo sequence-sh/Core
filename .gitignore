@@ -382,3 +382,5 @@ FodyWeavers.xsd
 /Core/Antlr
 /TestCSV2.csv
 /TestCSV.csv
+
+!Core.Tests/Connectors/*.nupkg

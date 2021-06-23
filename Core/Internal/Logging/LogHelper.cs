@@ -11,14 +11,12 @@ namespace Reductech.EDR.Core.Internal.Logging
 /// These will be passed to the ILogger instance.
 /// </summary>
 public record LogMessage(
-        #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
-        string Message,
-        object? MessageParams,
-        string? StepName,
-        TextLocation? Location,
-        IReadOnlyDictionary<string, object> SequenceInfo) : IEnumerable<KeyValuePair<string, object>
-    >
-    #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
+    string Message,
+    object? MessageParams,
+    string? StepName,
+    TextLocation? Location,
+    IReadOnlyDictionary<string, object> SequenceInfo) : IEnumerable<KeyValuePair<string, object>
+>
 {
     /// <inheritdoc />
     public IEnumerator<KeyValuePair<string, object>> GetEnumerator()

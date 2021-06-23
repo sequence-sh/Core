@@ -2,6 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
+using Reductech.EDR.ConnectorManagement.Base;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
 

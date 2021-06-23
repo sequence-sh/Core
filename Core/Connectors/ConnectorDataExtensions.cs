@@ -1,25 +1,23 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using CSharpFunctionalExtensions;
-using Reductech.EDR.Core.Connectors;
 using Reductech.EDR.Core.Internal.Errors;
+using Reductech.EDR.ConnectorManagement.Base;
 
-namespace Reductech.EDR.Core.Internal
+namespace Reductech.EDR.Core.Connectors
 {
 
 /// <summary>
-/// Information about a connector
+/// Provides Core-specific extension methods for ConnectorData
 /// </summary>
-public record ConnectorData(
-    ConnectorSettings ConnectorSettings,
-    Assembly? Assembly)
+public static class ConnectorDataExtensions
 {
     /// <summary>
     /// Get injections for this connector
     /// </summary>
-    public IReadOnlyCollection<IConnectorInjection> GetConnectorInjections() => Assembly?.GetTypes()
+    public static IReadOnlyCollection<IConnectorInjection> GetConnectorInjections(
+        this ConnectorData connectorData) => connectorData.Assembly?.GetTypes()
         .Where(x => !x.IsAbstract)
         .Where(x => typeof(IConnectorInjection).IsAssignableFrom(x))
         .Select(Activator.CreateInstance)
@@ -29,18 +27,16 @@ public record ConnectorData(
     /// <summary>
     /// Tries to get contexts injected by connectors
     /// </summary>
-    public Result<(string Name, object Context)[], IErrorBuilder> TryGetInjectedContexts(
+    public static Result<(string Name, object Context)[], IErrorBuilder> TryGetInjectedContexts(
+        this ConnectorData connectorData,
         SCLSettings settings)
     {
-        var contexts = GetConnectorInjections()
+        var contexts = connectorData.GetConnectorInjections()
             .Select(x => x.TryGetInjectedContexts(settings))
             .Combine(x => x.SelectMany(y => y).ToArray(), ErrorBuilderList.Combine);
 
         return contexts;
     }
-
-    /// <inheritdoc />
-    public override string ToString() => ConnectorSettings.ToString()!;
 }
 
 }

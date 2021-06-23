@@ -4,7 +4,9 @@ using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Reflection;
 using CSharpFunctionalExtensions;
+using Reductech.EDR.ConnectorManagement.Base;
 using Reductech.EDR.Core.Attributes;
+using Reductech.EDR.Core.Connectors;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Util;
 
@@ -76,7 +78,7 @@ public class StepFactoryStore
     /// </summary>
     public static StepFactoryStore Create(SCLSettings settings, params Assembly[] assemblies)
     {
-        var settingsDict = ConnectorSettings.CreateFromSCLSettings(settings)
+        var settingsDict = ConnectorSettingsHelper.CreateFromSCLSettings(settings)
             .Select(x => x.Settings)
             .ToDictionary(x => x.Id);
 
