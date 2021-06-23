@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Newtonsoft.Json;
+using System.Runtime.Serialization;
 
 namespace Reductech.EDR.Core.Internal.Documentation
 {
@@ -9,17 +9,17 @@ namespace Reductech.EDR.Core.Internal.Documentation
 /// <summary>
 /// The result of Generating Documentation
 /// </summary>
-[Serializable]
+[DataContract]
 public record DocumentationCreationResult
 (
-    [JsonProperty] MainContents MainContents,
-    [JsonProperty] IReadOnlyList<DocumentationCategory> Categories,
-    [JsonProperty] IReadOnlyList<EnumPage> Enums) : IEntityConvertible
+    [property: DataMember] MainContents MainContents,
+    [property: DataMember] IReadOnlyList<DocumentationCategory> Categories,
+    [property: DataMember] IReadOnlyList<EnumPage> Enums) : IEntityConvertible
 {
     /// <summary>
     /// Every documentation page
     /// </summary>
-    [JsonProperty]
+    [property: DataMember]
     public IReadOnlyList<DocumentationPage> AllPages
     {
         get
@@ -52,47 +52,47 @@ public record DocumentationCreationResult
 /// <summary>
 /// The steps from a single connector
 /// </summary>
-[Serializable]
+[DataContract]
 public record DocumentationCategory(
-    [JsonProperty] CategoryContents CategoryContents,
-    [JsonProperty] IReadOnlyList<StepPage> Steps) : IEntityConvertible;
+    [property: DataMember] CategoryContents CategoryContents,
+    [property: DataMember] IReadOnlyList<StepPage> Steps) : IEntityConvertible;
 
 /// <summary>
 /// The main contents page
 /// </summary>
-[Serializable]
+[DataContract]
 public record MainContents(
-    [JsonProperty] string FileName,
-    [JsonProperty] string Title,
-    [JsonProperty] string FileText,
-    [JsonProperty] string Directory) : ContentsPage(FileName, Title, FileText, Directory);
+    string FileName,
+    string Title,
+    string FileText,
+    string Directory) : ContentsPage(FileName, Title, FileText, Directory);
 
 /// <summary>
 /// The contents page for a category
 /// </summary>
-[Serializable]
+[DataContract]
 public record CategoryContents(
-    [JsonProperty] string FileName,
-    [JsonProperty] string Title,
-    [JsonProperty] string FileText,
-    [JsonProperty] string Directory,
-    [JsonProperty] string Category) : ContentsPage(FileName, Title, FileText, Directory);
+    string FileName,
+    string Title,
+    string FileText,
+    string Directory,
+    [property: DataMember] string Category) : ContentsPage(FileName, Title, FileText, Directory);
 
 /// <summary>
 /// The documentation page for a single step
 /// </summary>
-[Serializable]
+[DataContract]
 public record StepPage(
-    [JsonProperty] string FileName,
-    [JsonProperty] string Title,
-    [JsonProperty] string FileText,
-    [JsonProperty] string Directory,
-    [JsonProperty] string Category,
-    [JsonProperty] string StepName,
-    [JsonProperty] IReadOnlyList<string> Aliases,
-    [JsonProperty] string Summary,
-    [JsonProperty] string ReturnType,
-    [JsonProperty] IReadOnlyList<StepParameter> StepParameters) : DocumentationPage(
+    string FileName,
+    string Title,
+    string FileText,
+    string Directory,
+    [property: DataMember] string Category,
+    [property: DataMember] string StepName,
+    [property: DataMember] IReadOnlyList<string> Aliases,
+    [property: DataMember] string Summary,
+    [property: DataMember] string ReturnType,
+    [property: DataMember] IReadOnlyList<StepParameter> StepParameters) : DocumentationPage(
     FileName,
     Title,
     FileText,
@@ -106,24 +106,24 @@ public record StepPage(
 /// <summary>
 /// Documentation for a step parameter
 /// </summary>
-[Serializable]
+[DataContract]
 public record StepParameter(
-    [JsonProperty] string Name,
-    [JsonProperty] string Type,
-    [JsonProperty] string Summary,
-    [JsonProperty] bool Required,
-    [JsonProperty] IReadOnlyList<string> Aliases) : IEntityConvertible;
+    [property: DataMember] string Name,
+    [property: DataMember] string Type,
+    [property: DataMember] string Summary,
+    [property: DataMember] bool Required,
+    [property: DataMember] IReadOnlyList<string> Aliases) : IEntityConvertible;
 
 /// <summary>
 /// The documentation page for an enum
 /// </summary>
-[Serializable]
+[DataContract]
 public record EnumPage(
-    [JsonProperty] string FileName,
-    [JsonProperty] string Title,
-    [JsonProperty] string FileText,
-    [JsonProperty] string Directory,
-    [JsonProperty] IReadOnlyList<EnumValue> Values) : DocumentationPage(
+    string FileName,
+    string Title,
+    string FileText,
+    string Directory,
+    [property: DataMember] IReadOnlyList<EnumValue> Values) : DocumentationPage(
     FileName,
     Title,
     FileText,
@@ -137,40 +137,40 @@ public record EnumPage(
 /// <summary>
 /// The value for an enum
 /// </summary>
-[Serializable]
+[DataContract]
 public record EnumValue(
-    [JsonProperty] string Name,
-    [JsonProperty] string Summary) : IEntityConvertible;
+    [property: DataMember] string Name,
+    [property: DataMember] string Summary) : IEntityConvertible;
 
 /// <summary>
 /// A contents page
 /// </summary>
-[Serializable]
+[DataContract]
 public abstract record ContentsPage(
-    [JsonProperty] string FileName,
-    [JsonProperty] string Title,
-    [JsonProperty] string FileText,
-    [JsonProperty] string Directory) : DocumentationPage(FileName, Title, FileText, Directory)
+    string FileName,
+    string Title,
+    string FileText,
+    string Directory) : DocumentationPage(FileName, Title, FileText, Directory)
 {
     /// <inheritdoc />
-    [JsonProperty]
+    [property: DataMember]
     public override string PageType => "Contents";
 }
 
 /// <summary>
 /// A documentation page
 /// </summary>
-[Serializable]
+[DataContract]
 public abstract record DocumentationPage(
-    [JsonProperty] string FileName,
-    [JsonProperty] string Title,
-    [JsonProperty] string FileText,
-    [JsonProperty] string Directory) : IEntityConvertible
+    [property: DataMember] string FileName,
+    [property: DataMember] string Title,
+    [property: DataMember] string FileText,
+    [property: DataMember] string Directory) : IEntityConvertible
 {
     /// <summary>
     /// The type of the page
     /// </summary>
-    [JsonProperty]
+    [property: DataMember]
     public abstract string PageType { get; }
 }
 

@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Text;
 using CSharpFunctionalExtensions;
-using Newtonsoft.Json;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Util;
@@ -15,13 +15,13 @@ namespace Reductech.EDR.Core
 /// <summary>
 /// A requirement of a step.
 /// </summary>
-[Serializable]
+[DataContract]
 public sealed class Requirement : IEntityConvertible
 {
     /// <summary>
     /// The name of the required software.
     /// </summary>
-    [JsonProperty]
+    [property: DataMember]
     [Required]
     #pragma warning disable 8618
     public string Name { get; set; }
@@ -30,25 +30,25 @@ public sealed class Requirement : IEntityConvertible
     /// <summary>
     /// The minimum required version. Inclusive.
     /// </summary>
-    [JsonProperty]
+    [property: DataMember]
     public Version? MinVersion { get; set; }
 
     /// <summary>
     /// The version above the highest allowed version.
     /// </summary>
-    [JsonProperty]
+    [property: DataMember]
     public Version? MaxVersion { get; set; }
 
     /// <summary>
     /// Notes on the requirement.
     /// </summary>
-    [JsonProperty]
+    [property: DataMember]
     public string? Notes { get; set; }
 
     /// <summary>
     /// Required Features
     /// </summary>
-    [JsonProperty]
+    [property: DataMember]
     public IReadOnlyList<string>? Features { get; set; }
 
     /// <summary>
