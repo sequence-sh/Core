@@ -52,15 +52,16 @@ public partial class ConnectorTests
         );
 
         var injectedContextsResult = stepFactoryStore.TryGetInjectedContexts(
-            new SCLSettings(
-                Entity.Create(
-                    new List<(EntityPropertyKey key, object? value)>()
-                    {
-                        (new EntityPropertyKey(new[] { "connectors", "example", "colorSource" }),
-                         "Red")
-                    }
-                )
-            )
+
+            //new SCLSettings(
+            //    Entity.Create(
+            //        new List<(EntityPropertyKey key, object? value)>()
+            //        {
+            //            (new EntityPropertyKey(new[] { "connectors", "example", "colorSource" }),
+            //             "Red")
+            //        }
+            //    )
+            //)
         );
 
         injectedContextsResult.ShouldBeSuccessful();
@@ -71,7 +72,6 @@ public partial class ConnectorTests
         };
 
         var runner = new SCLRunner(
-            SCLSettings.EmptySettings,
             logger,
             stepFactoryStore,
             externalContext

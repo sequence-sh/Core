@@ -47,9 +47,6 @@ public sealed class ScopedStateMonad : IStateMonad
     public ILogger Logger => BaseStateMonad.Logger;
 
     /// <inheritdoc />
-    public SCLSettings Settings => BaseStateMonad.Settings;
-
-    /// <inheritdoc />
     public IExternalContext ExternalContext => BaseStateMonad.ExternalContext;
 
     /// <inheritdoc />

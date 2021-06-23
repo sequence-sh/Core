@@ -28,11 +28,6 @@ public interface IStateMonad : IAsyncDisposable
     ILogger Logger { get; }
 
     /// <summary>
-    /// The settings for this step.
-    /// </summary>
-    SCLSettings Settings { get; }
-
-    /// <summary>
     /// The external context
     /// </summary>
     IExternalContext ExternalContext { get; }

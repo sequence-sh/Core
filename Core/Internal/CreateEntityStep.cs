@@ -77,9 +77,9 @@ public record CreateEntityStep
     }
 
     /// <inheritdoc />
-    public Result<Unit, IError> Verify(SCLSettings settings)
+    public Result<Unit, IError> Verify(StepFactoryStore stepFactoryStore)
     {
-        var r = Properties.Select(x => x.Value.Verify(settings))
+        var r = Properties.Select(x => x.Value.Verify(stepFactoryStore))
             .Combine(_ => Unit.Default, ErrorList.Combine);
 
         return r;

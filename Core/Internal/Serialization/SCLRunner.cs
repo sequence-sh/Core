@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Microsoft.Extensions.Logging;
 using Reductech.EDR.Core.Abstractions;
+using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Internal.Logging;
 using Reductech.EDR.Core.Internal.Parser;
@@ -23,18 +25,15 @@ public sealed class SCLRunner
     /// Creates a new SCL Runner
     /// </summary>
     public SCLRunner(
-        SCLSettings settings,
         ILogger logger,
         StepFactoryStore stepFactoryStore,
         IExternalContext externalContext)
     {
-        _settings         = settings;
         _logger           = logger;
         _stepFactoryStore = stepFactoryStore;
         _externalContext  = externalContext;
     }
 
-    private readonly SCLSettings _settings;
     private readonly ILogger _logger;
     private readonly StepFactoryStore _stepFactoryStore;
     private readonly IExternalContext _externalContext;
@@ -104,7 +103,6 @@ public sealed class SCLRunner
 
         var stateMonad = new StateMonad(
             _logger,
-            _settings,
             _stepFactoryStore,
             _externalContext,
             sequenceMetadata
@@ -112,14 +110,18 @@ public sealed class SCLRunner
 
         LogSituation.SequenceStarted.Log(stateMonad, null);
 
-        var connectorSettings = _settings.Entity.TryGetValue(SCLSettings.ConnectorsKey);
-
-        if (connectorSettings.HasValue)
+        if (_stepFactoryStore.ConnectorData.Any())
         {
+            var settingsEntity = EntityValue.CreateFromObject(
+                _stepFactoryStore.ConnectorData
+                    .Select(x => EntityValue.CreateFromObject(x.ConnectorSettings))
+                    .ToList()
+            );
+
             LogSituation.ConnectorSettings.Log(
                 stateMonad,
                 null,
-                connectorSettings.Value.Serialize()
+                settingsEntity.Serialize()
             );
         }
 

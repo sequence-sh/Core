@@ -28,11 +28,10 @@ public static class ConnectorDataExtensions
     /// Tries to get contexts injected by connectors
     /// </summary>
     public static Result<(string Name, object Context)[], IErrorBuilder> TryGetInjectedContexts(
-        this ConnectorData connectorData,
-        SCLSettings settings)
+        this ConnectorData connectorData)
     {
         var contexts = connectorData.GetConnectorInjections()
-            .Select(x => x.TryGetInjectedContexts(settings))
+            .Select(x => x.TryGetInjectedContexts())
             .Combine(x => x.SelectMany(y => y).ToArray(), ErrorBuilderList.Combine);
 
         return contexts;

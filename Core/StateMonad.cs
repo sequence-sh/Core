@@ -25,13 +25,11 @@ public sealed class StateMonad : IStateMonad
     /// </summary>
     public StateMonad(
         ILogger logger,
-        SCLSettings settings,
         StepFactoryStore stepFactoryStore,
         IExternalContext externalContext,
         IReadOnlyDictionary<string, object> sequenceMetadata)
     {
         Logger           = logger;
-        Settings         = settings;
         StepFactoryStore = stepFactoryStore;
         ExternalContext  = externalContext;
         SequenceMetadata = sequenceMetadata;
@@ -41,11 +39,6 @@ public sealed class StateMonad : IStateMonad
     /// The logger that steps will use to output messages.
     /// </summary>
     public ILogger Logger { get; }
-
-    /// <summary>
-    /// The settings for this step.
-    /// </summary>
-    public SCLSettings Settings { get; }
 
     /// <summary>
     /// The step factory store. Maps from step names to step factories.

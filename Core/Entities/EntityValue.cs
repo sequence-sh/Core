@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Globalization;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Text.RegularExpressions;
 using CSharpFunctionalExtensions;
 using Newtonsoft.Json.Linq;
@@ -750,9 +751,14 @@ public abstract record EntityValue(object? ObjectValue)
 
             {
                 if (argValue.GetType()
-                    .GetCustomAttributes(true)
-                    .OfType<SerializableAttribute>()
-                    .Any())
+                        .GetCustomAttributes(true)
+                        .OfType<SerializableAttribute>()
+                        .Any() ||
+                    argValue.GetType()
+                        .GetCustomAttributes(true)
+                        .OfType<DataContractAttribute>()
+                        .Any()
+                )
                 {
                     var entity = EntityConversionHelpers.ConvertToEntity(argValue);
                     return new NestedEntity(entity);

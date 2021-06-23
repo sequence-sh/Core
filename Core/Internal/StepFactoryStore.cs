@@ -76,21 +76,13 @@ public class StepFactoryStore
     /// <summary>
     /// Creates a StepFactoryStore with steps from the given assemblies
     /// </summary>
-    public static StepFactoryStore Create(SCLSettings settings, params Assembly[] assemblies)
+    public static StepFactoryStore CreateFromAssemblies(params Assembly[] assemblies)
     {
-        var settingsDict = ConnectorSettingsHelper.CreateFromSCLSettings(settings)
-            .Select(x => x.Settings)
-            .ToDictionary(x => x.Id);
-
         var data = new List<ConnectorData>();
 
         foreach (var assembly in assemblies)
         {
             var connectorSettings = ConnectorSettings.DefaultForAssembly(assembly);
-
-            if (settingsDict.TryGetValue(assembly.GetName().Name!, out var cs))
-                connectorSettings = cs;
-
             data.Add(new ConnectorData(connectorSettings, assembly));
         }
 
@@ -183,10 +175,9 @@ public class StepFactoryStore
     /// <summary>
     /// Tries to get contexts injected by connectors
     /// </summary>
-    public Result<(string Name, object Context)[], IErrorBuilder> TryGetInjectedContexts(
-        SCLSettings settings)
+    public Result<(string Name, object Context)[], IErrorBuilder> TryGetInjectedContexts()
     {
-        var contexts = ConnectorData.Select(x => x.TryGetInjectedContexts(settings))
+        var contexts = ConnectorData.Select(x => x.TryGetInjectedContexts())
             .Combine(x => x.SelectMany(y => y).ToArray(), ErrorBuilderList.Combine);
 
         return contexts;

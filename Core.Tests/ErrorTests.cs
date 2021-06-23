@@ -151,7 +151,6 @@ public partial class RunErrorTests
 
             await using var state = new StateMonad(
                 NullLogger.Instance,
-                SCLSettings.EmptySettings,
                 spf,
                 externalContext,
                 new Dictionary<string, object>()

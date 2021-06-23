@@ -29,8 +29,6 @@ public interface ICaseThatExecutes : IAsyncTestInstance, ICaseWithSetup
     /// </summary>
     Maybe<StepFactoryStore> StepFactoryStoreToUse { get; set; }
 
-    SCLSettings Settings { get; set; }
-
     LogLevel CheckLogLevel { get; set; }
 }
 
