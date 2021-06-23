@@ -17,40 +17,6 @@ public record FreezableEntityData(
         TextLocation? Location)
     #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
 {
-    /// <summary>
-    /// Gets a variable name.
-    /// </summary>
-    public Result<VariableName, IError> GetVariableName(EntityPropertyKey name, string typeName) =>
-        EntityProperties.TryFindOrFail(
-                name,
-                () => ErrorCode.MissingParameter.ToErrorBuilder(name.AsString)
-                    .WithLocation(new ErrorLocation(typeName, Location))
-            )
-            .Bind(x => x.AsVariableName(name.AsString));
-
-    /// <summary>
-    /// Gets an argument.
-    /// </summary>
-    public Result<IFreezableStep, IError> GetStep(EntityPropertyKey name, string typeName) =>
-        EntityProperties
-            .TryFindOrFail(
-                name,
-                () => ErrorCode.MissingParameter.ToErrorBuilder(name.AsString)
-                    .WithLocation(new ErrorLocation(typeName, Location))
-            )
-            .Map(x => x.ConvertToStep());
-
-    /// <summary>
-    /// Gets a list argument.
-    /// </summary>
-    public Result<IReadOnlyList<IFreezableStep>, IError>
-        GetStepList(EntityPropertyKey name, string typeName) => EntityProperties.TryFindOrFail(
-            name,
-            () => ErrorCode.MissingParameter.ToErrorBuilder(name.AsString)
-                .WithLocation(new ErrorLocation(typeName, Location))
-        )
-        .Bind(x => x.AsStepList(name.AsString));
-
     /// <inheritdoc />
     public override string ToString()
     {
