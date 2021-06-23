@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Microsoft.Extensions.Logging;
 using Reductech.EDR.Core.Abstractions;
-using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Internal.Logging;
 using Reductech.EDR.Core.Internal.Parser;
@@ -112,16 +111,10 @@ public sealed class SCLRunner
 
         if (_stepFactoryStore.ConnectorData.Any())
         {
-            var settingsEntity = EntityValue.CreateFromObject(
-                _stepFactoryStore.ConnectorData
-                    .Select(x => EntityValue.CreateFromObject(x.ConnectorSettings))
-                    .ToList()
-            );
-
             LogSituation.ConnectorSettings.Log(
                 stateMonad,
                 null,
-                settingsEntity.Serialize()
+                stateMonad.Settings.Serialize()
             );
         }
 

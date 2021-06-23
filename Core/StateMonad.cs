@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Microsoft.Extensions.Logging;
 using Reductech.EDR.Core.Abstractions;
+using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Util;
@@ -33,6 +35,17 @@ public sealed class StateMonad : IStateMonad
         StepFactoryStore = stepFactoryStore;
         ExternalContext  = externalContext;
         SequenceMetadata = sequenceMetadata;
+
+        var connectorsSetting = EntityValue.CreateFromObject(
+            StepFactoryStore.ConnectorData
+                .Select(
+                    x => EntityValue
+                        .CreateFromObject(x.ConnectorSettings)
+                )
+                .ToList()
+        );
+
+        Settings = Entity.Create(("Connectors", connectorsSetting));
     }
 
     /// <summary>
@@ -150,6 +163,9 @@ public sealed class StateMonad : IStateMonad
 
     /// <inheritdoc />
     public Maybe<VariableName> AutomaticVariable => Maybe<VariableName>.None;
+
+    /// <inheritdoc />
+    public Entity Settings { get; }
 
     internal static async Task DisposeVariableAsync(object variable, IStateMonad stateMonad)
     {

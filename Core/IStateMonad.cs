@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Microsoft.Extensions.Logging;
 using Reductech.EDR.Core.Abstractions;
+using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Internal.Logging;
@@ -77,6 +79,11 @@ public interface IStateMonad : IAsyncDisposable
     /// The most recent automatic variable introduced, if there is one.
     /// </summary>
     Maybe<VariableName> AutomaticVariable { get; }
+
+    /// <summary>
+    /// A settings Entity containing Connector Settings
+    /// </summary>
+    Entity Settings { get; }
 }
 
 }

@@ -1,34 +1,76 @@
-﻿//using System.Collections.Generic;
-//using Reductech.EDR.Core.Steps;
-//using Reductech.EDR.Core.TestHarness;
+﻿using System;
+using System.Collections.Generic;
+using Reductech.EDR.ConnectorManagement.Base;
+using Reductech.EDR.Core.Internal;
+using Reductech.EDR.Core.Internal.Serialization;
+using Reductech.EDR.Core.Steps;
+using Reductech.EDR.Core.TestHarness;
+using Reductech.EDR.Core.Util;
 
-//namespace Reductech.EDR.Core.Tests.Steps
-//{
+namespace Reductech.EDR.Core.Tests.Steps
+{
 
-//public partial class GetSettingsTests : StepTestBase<GetSettings, Entity>
-//{
-//    /// <inheritdoc />
-//    protected override IEnumerable<StepCase> StepCases
-//    {
-//        get
-//        {
-//            yield return new StepCase(
-//                "Default Settings",
-//                new GetSettings(),
-//                Entity.Empty
-//            );
+public partial class GetSettingsTests : StepTestBase<GetSettings, Entity>
+{
+    /// <inheritdoc />
+    protected override IEnumerable<StepCase> StepCases
+    {
+        get
+        {
+            var version = typeof(IStep).Assembly.GetName().Version!;
 
-//            var entity1 = Entity.Create(("a", 1), ("b", 2));
+            var baseEntity =
+                Entity.Create(
+                    ("Connectors",
+                     new[]
+                     {
+                         new ConnectorSettings()
+                         {
+                             Id      = "Reductech.EDR.Core",
+                             Version = version.ToString(3),
+                             Enable  = true
+                         }
+                     }
+                    )
+                );
 
-//            yield return new StepCase(
-//                "Extra Settings",
-//                new GetSettings(),
-//                entity1
-//            ).WithSettings(new SCLSettings(entity1));
-//        }
-//    }
-//}
+            yield return new StepCase(
+                "Default Settings",
+                new Log<Entity> { Value = new GetSettings() },
+                Unit.Default,
+                baseEntity.Serialize()
+            );
 
-//}
+            var newConnectorSettings = new ConnectorSettings
+            {
+                Enable   = true,
+                Id       = "MyConnector",
+                Version  = new Version(1, 2, 3, 4).ToString(),
+                Settings = new Dictionary<string, object>() { { "a", 1 }, { "b", 2 } }
+            };
 
+            var entity2 =
+                Entity.Create(
+                    ("Connectors",
+                     new[] { newConnectorSettings }
+                    )
+                );
 
+            yield return new StepCase(
+                "Extra Settings",
+                new Log<Entity> { Value = new GetSettings() },
+                Unit.Default,
+                entity2.Serialize()
+            ).WithStepFactoryStore(
+                StepFactoryStore.Create(
+                    new ConnectorData(
+                        newConnectorSettings,
+                        null
+                    )
+                )
+            );
+        }
+    }
+}
+
+}

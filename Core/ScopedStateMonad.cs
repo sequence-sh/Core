@@ -120,6 +120,9 @@ public sealed class ScopedStateMonad : IStateMonad
     public Maybe<VariableName> AutomaticVariable { get; }
 
     /// <inheritdoc />
+    public Entity Settings => BaseStateMonad.Settings;
+
+    /// <inheritdoc />
     public async ValueTask DisposeAsync()
     {
         foreach (var value in _scopedStateDictionary.Values)
