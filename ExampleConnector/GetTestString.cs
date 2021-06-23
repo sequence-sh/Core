@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core;
 using Reductech.EDR.Core.Connectors;
-using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
 
@@ -16,26 +15,11 @@ public sealed class ColorInjector : IConnectorInjection
 {
     /// <inheritdoc />
     public Result<IReadOnlyCollection<(string Name, object Context)>, IErrorBuilder>
-        TryGetInjectedContexts(SCLSettings settings)
+        TryGetInjectedContexts()
     {
-        var colorName =
-            settings.Entity.TryGetNestedString(
-                "connectors",
-                "example",
-                ColorSource.KeyName
-            );
-
-        if (colorName.HasNoValue)
-            return ErrorCode.MissingStepSettingsValue.ToErrorBuilder(
-                "example",
-                ColorSource.KeyName
-            );
-
-        var color = Color.FromName(colorName.Value);
-
         var list = new List<(string Name, object Context)>()
         {
-            { (ColorSource.KeyName, new ColorSource(color)) }
+            { (ColorSource.KeyName, new ColorSource(Color.Crimson)) }
         };
 
         return list;

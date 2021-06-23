@@ -121,12 +121,11 @@ public abstract partial class StepTestBase<TStep, TOutput>
             var tStepAssembly = Assembly.GetAssembly(typeof(TStep))!;
 
             var sfs = StepFactoryStoreToUse.Unwrap(
-                StepFactoryStore.Create(Settings, tStepAssembly)
+                StepFactoryStore.CreateFromAssemblies(tStepAssembly)
             );
 
             var stateMonad = new StateMonad(
                 logger,
-                Settings,
                 sfs,
                 externalContext,
                 new Dictionary<string, object>()
@@ -149,9 +148,6 @@ public abstract partial class StepTestBase<TStep, TOutput>
         public Maybe<StepFactoryStore> StepFactoryStoreToUse { get; set; }
 
         public List<Func<IStateMonad, Task>> InitialStateActions { get; } = new();
-
-        /// <inheritdoc />
-        public SCLSettings Settings { get; set; } = SCLSettings.EmptySettings;
 
         public LogLevel CheckLogLevel { get; set; } = LogLevel.Information;
 

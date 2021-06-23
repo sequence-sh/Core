@@ -18,7 +18,7 @@ public sealed class GetSettings : CompoundStep<Entity>
         CancellationToken cancellationToken)
     {
         await Task.CompletedTask;
-        var entity = stateMonad.Settings.Entity;
+        var entity = stateMonad.Settings;
 
         return entity;
     }

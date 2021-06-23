@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using CSharpFunctionalExtensions;
 using Newtonsoft.Json;
-using Reductech.EDR.Core.Entities;
+using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Util;
 
@@ -52,75 +52,56 @@ public sealed class Requirement : IEntityConvertible
     public IReadOnlyList<string>? Features { get; set; }
 
     /// <summary>
+    /// The key to the features property
+    /// </summary>
+    public const string FeaturesKey = "Features";
+
+    /// <summary>
     /// Check that the requirement is met by these settings.
     /// </summary>
-    public Result<Unit, IErrorBuilder> Check(SCLSettings settings)
+    public Result<Unit, IErrorBuilder> Check(StepFactoryStore stepFactoryStore)
     {
-        if (settings.Entity.Dictionary.TryGetValue(SCLSettings.ConnectorsKey, out var connectors)
-         && connectors.BestValue is EntityValue.NestedEntity connectorsEntity)
+        var connectorSettings = stepFactoryStore.ConnectorData.Select(x => x.ConnectorSettings)
+            .FirstOrDefault(x => x.Id.Equals(Name, StringComparison.OrdinalIgnoreCase));
+
+        if (connectorSettings is null)
+            return ErrorCode.MissingStepSettings.ToErrorBuilder(Name);
+
+        var version = Version.TryParse(connectorSettings.Version, out var v)
+            ? v
+            : new Version(0, 0);
+
+        if (MaxVersion != null && MaxVersion < version)
+            return ErrorCode.RequirementNotMet.ToErrorBuilder(this);
+
+        if (MinVersion != null && MinVersion > version)
+            return ErrorCode.RequirementNotMet.ToErrorBuilder(this);
+
+        if (Features != null && Features.Any())
         {
-            var connector = connectorsEntity.Value.TryGetValue(Name);
+            var connectorFeatures = connectorSettings.Settings?[FeaturesKey];
 
-            if (connector.HasValue && connector.Value is EntityValue.NestedEntity connectorEntity)
+            if (connectorFeatures is not null
+             && connectorFeatures is IEnumerable<string> featuresList)
             {
-                var connectorVersion = connectorEntity.Value.TryGetValue(SCLSettings.VersionKey);
+                var missingFeatures = Features.Except(
+                    featuresList,
+                    StringComparer.OrdinalIgnoreCase
+                );
 
-                if (connectorVersion.HasValue)
+                if (missingFeatures.Any())
                 {
-                    if (Version.TryParse(
-                        connectorVersion.Value.GetPrimitiveString(),
-                        out var version
-                    ))
-                    {
-                        if (MaxVersion != null && MaxVersion < version)
-                            return ErrorCode.RequirementNotMet.ToErrorBuilder(this);
-
-                        if (MinVersion != null && MinVersion > version)
-                            return ErrorCode.RequirementNotMet.ToErrorBuilder(this);
-
-                        if (Features != null && Features.Any())
-                        {
-                            var connectorFeatures =
-                                connectorEntity.Value.TryGetValue(SCLSettings.FeaturesKey);
-
-                            if (connectorFeatures.HasValue
-                             && connectorFeatures.Value is EntityValue.NestedList featuresList)
-                            {
-                                var missingFeatures = Features.Except(
-                                    featuresList.Value.Select(x => x.GetPrimitiveString()),
-                                    StringComparer.OrdinalIgnoreCase
-                                );
-
-                                if (missingFeatures.Any())
-                                {
-                                    return ErrorCode.RequirementNotMet.ToErrorBuilder(this);
-                                }
-                            }
-                            else
-                                return ErrorCode.MissingStepSettingsValue.ToErrorBuilder(
-                                    Name,
-                                    SCLSettings.FeaturesKey
-                                );
-                        }
-
-                        return Unit.Default;
-                    }
-
-                    return ErrorCode.CouldNotParse.ToErrorBuilder(
-                        connectorVersion.Value.ToString()!,
-                        "Version"
-                    );
+                    return ErrorCode.RequirementNotMet.ToErrorBuilder(this);
                 }
-
+            }
+            else
                 return ErrorCode.MissingStepSettingsValue.ToErrorBuilder(
                     Name,
-                    SCLSettings.VersionKey
+                    FeaturesKey
                 );
-            }
         }
-        else { }
 
-        return ErrorCode.MissingStepSettings.ToErrorBuilder(Name);
+        return Unit.Default;
     }
 
     /// <inheritdoc />

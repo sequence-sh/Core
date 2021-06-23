@@ -54,7 +54,6 @@ public partial class ExampleTests
 
         var monad = new StateMonad(
             TestOutputHelper.BuildLogger(),
-            SCLSettings.EmptySettings,
             sfs,
             ExternalContext.Default,
             new Dictionary<string, object>()
@@ -97,7 +96,6 @@ public partial class ExampleTests
         var sfs = StepFactoryStore.Create();
 
         var runner = new SCLRunner(
-            SCLSettings.EmptySettings,
             logger,
             sfs,
             ExternalContext.Default

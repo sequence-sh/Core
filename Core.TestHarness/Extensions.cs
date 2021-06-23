@@ -33,11 +33,11 @@ public static class Extensions
         return cws;
     }
 
-    public static T WithSettings<T>(this T cws, SCLSettings settings) where T : ICaseThatExecutes
-    {
-        cws.Settings = settings;
-        return cws;
-    }
+    //public static T WithSettings<T>(this T cws, SCLSettings settings) where T : ICaseThatExecutes
+    //{
+    //    cws.Settings = settings;
+    //    return cws;
+    //}
 
     public static T WithFinalContextCheck<T>(this T cws, Action<IExternalContext> contextCheck)
         where T : ICaseThatExecutes

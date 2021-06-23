@@ -113,7 +113,6 @@ public partial class StateMonadTests
         return
             new StateMonad(
                 repo.OneOf<ILogger>(),
-                new SCLSettings(Entity.Create()),
                 StepFactoryStore.Create(Array.Empty<ConnectorData>()),
                 repo.OneOf<IExternalContext>(),
                 repo.OneOf<IReadOnlyDictionary<string, object>>()

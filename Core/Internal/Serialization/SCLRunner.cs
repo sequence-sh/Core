@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
@@ -23,18 +24,15 @@ public sealed class SCLRunner
     /// Creates a new SCL Runner
     /// </summary>
     public SCLRunner(
-        SCLSettings settings,
         ILogger logger,
         StepFactoryStore stepFactoryStore,
         IExternalContext externalContext)
     {
-        _settings         = settings;
         _logger           = logger;
         _stepFactoryStore = stepFactoryStore;
         _externalContext  = externalContext;
     }
 
-    private readonly SCLSettings _settings;
     private readonly ILogger _logger;
     private readonly StepFactoryStore _stepFactoryStore;
     private readonly IExternalContext _externalContext;
@@ -104,7 +102,6 @@ public sealed class SCLRunner
 
         var stateMonad = new StateMonad(
             _logger,
-            _settings,
             _stepFactoryStore,
             _externalContext,
             sequenceMetadata
@@ -112,14 +109,12 @@ public sealed class SCLRunner
 
         LogSituation.SequenceStarted.Log(stateMonad, null);
 
-        var connectorSettings = _settings.Entity.TryGetValue(SCLSettings.ConnectorsKey);
-
-        if (connectorSettings.HasValue)
+        if (_stepFactoryStore.ConnectorData.Any())
         {
             LogSituation.ConnectorSettings.Log(
                 stateMonad,
                 null,
-                connectorSettings.Value.Serialize()
+                stateMonad.Settings.Serialize()
             );
         }
 

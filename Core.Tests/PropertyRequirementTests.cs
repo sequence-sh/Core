@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using AutoTheory;
 using CSharpFunctionalExtensions;
+using Reductech.EDR.ConnectorManagement.Base;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
@@ -26,14 +26,14 @@ public partial class PropertyRequirementTests
             yield return new TestCase(
                 "No Requirement",
                 new RequirementTestStep(),
-                SCLSettings.EmptySettings,
+                null,
                 true
             );
 
             yield return new TestCase(
                 "Requirement not met",
                 new RequirementTestStep { RequirementStep = placeholder },
-                SCLSettings.EmptySettings,
+                null,
                 false
             );
 
@@ -110,13 +110,24 @@ public partial class PropertyRequirementTests
     private record TestCase(
         string Name,
         RequirementTestStep Step,
-        SCLSettings Settings,
+        ConnectorSettings? ConnectorSettings,
         bool ExpectSuccess) : ITestInstance
     {
         /// <inheritdoc />
         public void Run(ITestOutputHelper testOutputHelper)
         {
-            var r = Step.Verify(Settings);
+            ConnectorData[] connectorData;
+
+            if (ConnectorSettings is null)
+                connectorData = new ConnectorData[0];
+            else
+            {
+                connectorData = new[] { new ConnectorData(ConnectorSettings, null) };
+            }
+
+            var sfs = StepFactoryStore.Create(connectorData);
+
+            var r = Step.Verify(sfs);
 
             if (ExpectSuccess)
                 r.ShouldBeSuccessful();
@@ -125,27 +136,19 @@ public partial class PropertyRequirementTests
         }
     }
 
-    private static SCLSettings CreateWidgetSettings(Version version, params string[] features)
+    private static ConnectorSettings CreateWidgetSettings(Version version, params string[] features)
     {
-        string featuresString;
+        var connectorSettings =
+            new ConnectorSettings
+            {
+                Id      = "Widget",
+                Version = version.ToString(),
+                Enable  = true,
+                Settings =
+                    new Dictionary<string, object> { { Requirement.FeaturesKey, features } }
+            };
 
-        if (features.Any())
-            featuresString = ", \"features\": ["
-                           + string.Join(", ", features.Select(f => $"\"{f}\"")) + "]";
-        else
-            featuresString = "";
-
-        var connectorsString =
-            $@"{{
-  ""connectors"": {{
-    ""widget"": {{
-      ""version"": ""{version}""
-      {featuresString}
-    }}
-  }}
-}}";
-
-        return SCLSettings.CreateFromString(connectorsString);
+        return connectorSettings;
     }
 
     private class RequirementTestStep : CompoundStep<bool>

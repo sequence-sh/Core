@@ -81,7 +81,7 @@ public sealed class Entity : IEnumerable<EntityProperty>, IEquatable<Entity>
             properties.Select(
                     p =>
                     {
-                        (string firstKey, Maybe<EntityPropertyKey> remainder) = p.key.Split();
+                        (string firstKey, var remainder) = p.key.Split();
                         return (firstKey, remainder, p.value);
                     }
                 )

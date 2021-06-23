@@ -28,7 +28,7 @@ public interface IStep
     /// <summary>
     /// Verify that this step can be run with the current settings.
     /// </summary>
-    public Result<Unit, IError> Verify(SCLSettings settings);
+    public Result<Unit, IError> Verify(StepFactoryStore stepFactoryStore);
 
     /// <summary>
     /// Whether this term should be bracketed when serialized

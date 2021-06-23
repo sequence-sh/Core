@@ -307,7 +307,6 @@ public partial class ExternalProcessTests
 
         var stateMonad = new StateMonad(
             logger,
-            SCLSettings.EmptySettings,
             StepFactoryStore.Create(),
             repo.OneOf<IExternalContext>(),
             new Dictionary<string, object>()

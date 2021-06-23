@@ -47,9 +47,6 @@ public sealed class ScopedStateMonad : IStateMonad
     public ILogger Logger => BaseStateMonad.Logger;
 
     /// <inheritdoc />
-    public SCLSettings Settings => BaseStateMonad.Settings;
-
-    /// <inheritdoc />
     public IExternalContext ExternalContext => BaseStateMonad.ExternalContext;
 
     /// <inheritdoc />
@@ -121,6 +118,9 @@ public sealed class ScopedStateMonad : IStateMonad
 
     /// <inheritdoc />
     public Maybe<VariableName> AutomaticVariable { get; }
+
+    /// <inheritdoc />
+    public Entity Settings => BaseStateMonad.Settings;
 
     /// <inheritdoc />
     public async ValueTask DisposeAsync()

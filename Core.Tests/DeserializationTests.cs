@@ -477,7 +477,6 @@ Log 'Comments!'",
             var externalContext = ExternalContextSetupHelper.GetExternalContext(repository);
 
             var runner = new SCLRunner(
-                SCLSettings.EmptySettings,
                 loggerFactory.CreateLogger("Test"),
                 stepFactoryStore,
                 externalContext

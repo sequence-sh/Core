@@ -226,7 +226,8 @@ public abstract class CompoundStep<T> : ICompoundStep<T>
     /// <summary>
     /// Check that this step meets requirements
     /// </summary>
-    public virtual Result<Unit, IError> VerifyThis(SCLSettings settings) => Unit.Default;
+    public virtual Result<Unit, IError> VerifyThis(StepFactoryStore stepFactoryStore) =>
+        Unit.Default;
 
     /// <inheritdoc />
     public virtual Result<TypeResolver, IError> TryGetScopedTypeResolver(
@@ -236,21 +237,21 @@ public abstract class CompoundStep<T> : ICompoundStep<T>
         .WithLocation(this);
 
     /// <inheritdoc />
-    public Result<Unit, IError> Verify(SCLSettings settings)
+    public Result<Unit, IError> Verify(StepFactoryStore stepFactoryStore)
     {
-        var r0 = new[] { VerifyThis(settings) };
+        var r0 = new[] { VerifyThis(stepFactoryStore) };
 
         var rRequirements = StepFactory.Requirements.Concat(RuntimeRequirements)
-            .Select(req => req.Check(settings).MapError(x => x.WithLocation(this)));
+            .Select(req => req.Check(stepFactoryStore).MapError(x => x.WithLocation(this)));
 
         var r3 = AllProperties
             .Select(
                 x => x switch
                 {
                     StepProperty.SingleStepProperty singleStepProperty => singleStepProperty.Step
-                        .Verify(settings),
+                        .Verify(stepFactoryStore),
                     StepProperty.StepListProperty stepListProperty => stepListProperty.StepList
-                        .Select(s => s.Verify(settings))
+                        .Select(s => s.Verify(stepFactoryStore))
                         .Combine(ErrorList.Combine)
                         .Map(_ => Unit.Default),
                     StepProperty.VariableNameProperty _ => Unit.Default,

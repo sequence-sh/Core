@@ -1,211 +1,213 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using FluentAssertions;
-using Reductech.EDR.Core.Connectors;
-using Reductech.EDR.Core.Entities;
-using Xunit;
+﻿//using System.Collections.Generic;
+//using System.Linq;
+//using FluentAssertions;
+//using Reductech.EDR.Core.Connectors;
+//using Reductech.EDR.Core.Entities;
+//using Xunit;
 
-namespace Reductech.EDR.Core.Tests
-{
+//namespace Reductech.EDR.Core.Tests
+//{
 
-[AutoTheory.UseTestOutputHelper]
-public partial class SettingsTests
-{
-    [Fact]
-    public void TestGettingConnectorSettingsFromString()
-    {
-        var settings = SCLSettings.CreateFromString(ConnectorJson);
+//[AutoTheory.UseTestOutputHelper]
+//public partial class SettingsTests
+//{
+//    [Fact]
+//    public void TestGettingConnectorSettingsFromString()
+//    {
+//        var settings = SCLSettings.CreateFromString(ConnectorJson);
 
-        var connectorSettings = ConnectorSettingsHelper.CreateFromSCLSettings(settings).ToList();
+//        var connectorSettings = ConnectorSettingsHelper.CreateFromSCLSettings(settings).ToList();
 
-        connectorSettings.Should().HaveCount(1);
+//        connectorSettings.Should().HaveCount(1);
 
-        var nuixSettings = connectorSettings.Single().Settings;
+//        var nuixSettings = connectorSettings.Single().Settings;
 
-        nuixSettings.Id.Should().Be("Reductech.EDR.Nuix");
-        nuixSettings.Version.Should().Be("0.9.0");
-        nuixSettings.Enable.Should().Be(true);
+//        nuixSettings.Id.Should().Be("Reductech.EDR.Nuix");
+//        nuixSettings.Version.Should().Be("0.9.0");
+//        nuixSettings.Enable.Should().Be(true);
 
-        ((bool)nuixSettings.Settings!["useDongle"]).Should().BeTrue();
-    }
+//        ((bool)nuixSettings.Settings!["useDongle"]).Should().BeTrue();
+//    }
 
-    [Fact]
-    public void TestCreatingSettingsFromString()
-    {
-        var settings = SCLSettings.CreateFromString(ConnectorJson);
+//    [Fact]
+//    public void TestCreatingSettingsFromString()
+//    {
+//        var settings = SCLSettings.CreateFromString(ConnectorJson);
 
-        TestOutputHelper.WriteLine(settings.ToString());
+//        TestOutputHelper.WriteLine(settings.ToString());
 
-        settings.Entity.TryGetNestedEntity("Connectors")
-            .Value
-            .TryGetNestedEntity("Nuix")
-            .Value
-            .TryGetNestedEntity("Settings")
-            .Value
-            .TryGetValue("UseDongle")
-            .Value.GetPrimitiveString()
-            .Should()
-            .Be(true.ToString());
+//        settings.Entity.TryGetNestedEntity("Connectors")
+//            .Value
+//            .TryGetNestedEntity("Nuix")
+//            .Value
+//            .TryGetNestedEntity("Settings")
+//            .Value
+//            .TryGetValue("UseDongle")
+//            .Value.GetPrimitiveString()
+//            .Should()
+//            .Be(true.ToString());
 
-        var udString = settings.Entity.TryGetNestedString(
-            "Connectors",
-            "Nuix",
-            "Settings",
-            "UseDongle"
-        );
+//        var udString = settings.Entity.TryGetNestedString(
+//            "Connectors",
+//            "Nuix",
+//            "Settings",
+//            "UseDongle"
+//        );
 
-        udString.HasValue.Should().BeTrue();
-        udString.Value.Should().Be(true.ToString());
+//        udString.HasValue.Should().BeTrue();
+//        udString.Value.Should().Be(true.ToString());
 
-        var udBool = settings.Entity.TryGetNestedBool(
-            "Connectors",
-            "Nuix",
-            "Settings",
-            "UseDongle"
-        );
+//        var udBool = settings.Entity.TryGetNestedBool(
+//            "Connectors",
+//            "Nuix",
+//            "Settings",
+//            "UseDongle"
+//        );
 
-        udBool.Should().BeTrue();
+//        udBool.Should().BeTrue();
 
-        var featuresList = settings.Entity.TryGetNestedList(
-            "Connectors",
-            "Nuix",
-            "Settings",
-            "Features"
-        );
+//        var featuresList = settings.Entity.TryGetNestedList(
+//            "Connectors",
+//            "Nuix",
+//            "Settings",
+//            "Features"
+//        );
 
-        featuresList.HasValue.Should().BeTrue();
+//        featuresList.HasValue.Should().BeTrue();
 
-        featuresList.Value.Should()
-            .BeEquivalentTo(
-                "ANALYSIS",
-                "CASE_CREATION",
-                "EXPORT_ITEMS",
-                "METADATA_IMPORT",
-                "OCR_PROCESSING",
-                "PRODUCTION_SET"
-            );
+//        featuresList.Value.Should()
+//            .BeEquivalentTo(
+//                "ANALYSIS",
+//                "CASE_CREATION",
+//                "EXPORT_ITEMS",
+//                "METADATA_IMPORT",
+//                "OCR_PROCESSING",
+//                "PRODUCTION_SET"
+//            );
 
-        var consoleArgsList = settings.Entity.TryGetNestedList(
-            "Connectors",
-            "Nuix",
-            "Settings",
-            "ConsoleArguments"
-        );
+//        var consoleArgsList = settings.Entity.TryGetNestedList(
+//            "Connectors",
+//            "Nuix",
+//            "Settings",
+//            "ConsoleArguments"
+//        );
 
-        consoleArgsList.HasValue.Should().BeTrue();
+//        consoleArgsList.HasValue.Should().BeTrue();
 
-        consoleArgsList.Value.Should()
-            .BeEquivalentTo(
-                "-Dnuix.licence.handlers=server",
-                "-Dnuix.registry.servers=licenseSource"
-            );
+//        consoleArgsList.Value.Should()
+//            .BeEquivalentTo(
+//                "-Dnuix.licence.handlers=server",
+//                "-Dnuix.registry.servers=licenseSource"
+//            );
 
-        var username = settings.Entity.TryGetNestedString(
-            "Connectors",
-            "Nuix",
-            "Settings",
-            "EnvironmentVariables",
-            "NUIX_USERNAME"
-        );
+//        var username = settings.Entity.TryGetNestedString(
+//            "Connectors",
+//            "Nuix",
+//            "Settings",
+//            "EnvironmentVariables",
+//            "NUIX_USERNAME"
+//        );
 
-        username.HasValue.Should().BeTrue();
+//        username.HasValue.Should().BeTrue();
 
-        username.Value.Should().BeEquivalentTo("myName");
-    }
+//        username.Value.Should().BeEquivalentTo("myName");
+//    }
 
-    [Fact]
-    public void TestCreatingSettingsFromDictionary()
-    {
-        var dict = new Dictionary<string, object>()
-        {
-            {
-                "nuix",
-                new Dictionary<string, object>()
-                {
-                    { "UseDongle", true }, { "Features", new List<string>() { "a", "b", "c" } }
-                }
-            }
-        };
+//    [Fact]
+//    public void TestCreatingSettingsFromDictionary()
+//    {
+//        var dict = new Dictionary<string, object>()
+//        {
+//            {
+//                "nuix",
+//                new Dictionary<string, object>()
+//                {
+//                    { "UseDongle", true }, { "Features", new List<string>() { "a", "b", "c" } }
+//                }
+//            }
+//        };
 
-        var entity = Entity.Create(("Connectors", dict));
+//        var entity = Entity.Create(("Connectors", dict));
 
-        var settings = new SCLSettings(entity);
+//        var settings = new SCLSettings(entity);
 
-        TestOutputHelper.WriteLine(settings.ToString());
+//        TestOutputHelper.WriteLine(settings.ToString());
 
-        var useDongleString = settings.Entity.TryGetNestedString("Connectors", "Nuix", "UseDongle");
+//        var useDongleString = settings.Entity.TryGetNestedString("Connectors", "Nuix", "UseDongle");
 
-        useDongleString.HasValue.Should().BeTrue();
+//        useDongleString.HasValue.Should().BeTrue();
 
-        useDongleString.Value.Should().Be(true.ToString());
+//        useDongleString.Value.Should().Be(true.ToString());
 
-        var useDongleBool = settings.Entity.TryGetNestedBool("Connectors", "Nuix", "UseDongle");
-        useDongleBool.Should().BeTrue();
-    }
+//        var useDongleBool = settings.Entity.TryGetNestedBool("Connectors", "Nuix", "UseDongle");
+//        useDongleBool.Should().BeTrue();
+//    }
 
-    private const string ConnectorJson =
-        @"{
-	""connectors"": {
-		""nuix"": {
-			""id"": ""Reductech.EDR.Nuix"",
-			""version"": ""0.9.0"",
-			""settings"": {
-				""useDongle"": true,
-				""exeConsolePath"": ""C:\\Program Files\\Nuix\\Nuix 8.8\\nuix_console.exe"",
-				""version"": ""8.8"",
-				""ConsoleArguments"": [
-					""-Dnuix.licence.handlers=server"",
-					""-Dnuix.registry.servers=licenseSource""
-				],
-				""EnvironmentVariables"": {
-					""NUIX_USERNAME"": ""myName"",
-					""NUIX_PASSWORD"": ""myPassword""
-				},
-				""features"": [
-					""ANALYSIS"",
-					""CASE_CREATION"",
-					""EXPORT_ITEMS"",
-					""METADATA_IMPORT"",
-					""OCR_PROCESSING"",
-					""PRODUCTION_SET""
-				]
-			}
-		}
-	},
-	""nlog"": {
-		""throwConfigExceptions"": true,
-		""targets"": {
-			""fileTarget"": {
-				""type"": ""File"",
-				""fileName"": ""${basedir:fixtempdir=true}\\edr.log"",
-				""layout"": ""${date} ${level:uppercase=true} ${message} ${exception}""
-			},
-			""consoleInfo"": {
-				""type"": ""Console"",
-				""layout"": ""${date} ${message}""
-			},
-			""consoleError"": {
-				""type"": ""Console"",
-				""layout"": ""${date} ${level:uppercase=true} ${message}"",
-				""error"": true
-			}
-		},
-		""rules"": [
-			{
-				""logger"": ""*"",
-				""minLevel"": ""Error"",
-				""writeTo"": ""fileTarget,consoleError"",
-				""final"": true
-			},
-			{
-				""logger"": ""*"",
-				""minLevel"": ""Trace"",
-				""write
-"": ""fileTarget,consoleInfo""
-			}
-		]
-	}
-}";
-}
+//    private const string ConnectorJson =
+//        @"{
+//	""connectors"": {
+//		""nuix"": {
+//			""id"": ""Reductech.EDR.Nuix"",
+//			""version"": ""0.9.0"",
+//			""settings"": {
+//				""useDongle"": true,
+//				""exeConsolePath"": ""C:\\Program Files\\Nuix\\Nuix 8.8\\nuix_console.exe"",
+//				""version"": ""8.8"",
+//				""ConsoleArguments"": [
+//					""-Dnuix.licence.handlers=server"",
+//					""-Dnuix.registry.servers=licenseSource""
+//				],
+//				""EnvironmentVariables"": {
+//					""NUIX_USERNAME"": ""myName"",
+//					""NUIX_PASSWORD"": ""myPassword""
+//				},
+//				""features"": [
+//					""ANALYSIS"",
+//					""CASE_CREATION"",
+//					""EXPORT_ITEMS"",
+//					""METADATA_IMPORT"",
+//					""OCR_PROCESSING"",
+//					""PRODUCTION_SET""
+//				]
+//			}
+//		}
+//	},
+//	""nlog"": {
+//		""throwConfigExceptions"": true,
+//		""targets"": {
+//			""fileTarget"": {
+//				""type"": ""File"",
+//				""fileName"": ""${basedir:fixtempdir=true}\\edr.log"",
+//				""layout"": ""${date} ${level:uppercase=true} ${message} ${exception}""
+//			},
+//			""consoleInfo"": {
+//				""type"": ""Console"",
+//				""layout"": ""${date} ${message}""
+//			},
+//			""consoleError"": {
+//				""type"": ""Console"",
+//				""layout"": ""${date} ${level:uppercase=true} ${message}"",
+//				""error"": true
+//			}
+//		},
+//		""rules"": [
+//			{
+//				""logger"": ""*"",
+//				""minLevel"": ""Error"",
+//				""writeTo"": ""fileTarget,consoleError"",
+//				""final"": true
+//			},
+//			{
+//				""logger"": ""*"",
+//				""minLevel"": ""Trace"",
+//				""write
+//"": ""fileTarget,consoleInfo""
+//			}
+//		]
+//	}
+//}";
+//}
 
-}
+//}
+
+

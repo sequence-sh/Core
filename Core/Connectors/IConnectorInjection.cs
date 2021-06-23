@@ -14,7 +14,7 @@ public interface IConnectorInjection
     /// Tries to get external contexts to inject
     /// </summary>
     Result<IReadOnlyCollection<(string Name, object Context)>, IErrorBuilder>
-        TryGetInjectedContexts(SCLSettings settings);
+        TryGetInjectedContexts();
 }
 
 }

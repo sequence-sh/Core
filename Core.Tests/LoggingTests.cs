@@ -179,7 +179,6 @@ public partial class LoggingTests
             var context = ExternalContextSetupHelper.GetExternalContext(repo);
 
             var sclRunner = new SCLRunner(
-                SCLSettings.EmptySettings,
                 logger,
                 spf,
                 context
