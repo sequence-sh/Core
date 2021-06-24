@@ -9,9 +9,7 @@ namespace Reductech.EDR.Core.Internal
 /// <summary>
 /// The name of an entity property
 /// </summary>
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 public record EntityPropertyKey
-    #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
 {
     /// <summary>
     /// Create a new EntityPropertyKey

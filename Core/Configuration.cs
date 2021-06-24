@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Newtonsoft.Json;
+﻿using System.Collections.Generic;
+using System.Runtime.Serialization;
 
 namespace Reductech.EDR.Core
 {
@@ -9,31 +7,31 @@ namespace Reductech.EDR.Core
 /// <summary>
 /// Additional configuration that may be needed in some use cases.
 /// </summary>
-[Serializable]
+[DataContract]
 public sealed class Configuration : IEntityConvertible
 {
     /// <summary>
     /// Additional requirements, beyond the default for this step.
     /// </summary>
-    [JsonProperty]
+    [property: DataMember]
     public IReadOnlyList<Requirement>? AdditionalRequirements { get; set; }
 
     /// <summary>
     /// Tags that the target machine must have (defined in a the config file) for this to be run on that machine.
     /// </summary>
-    [JsonProperty]
+    [property: DataMember]
     public IReadOnlyList<string>? TargetMachineTags { get; set; }
 
     /// <summary>
     /// Conditional true, this step will not be split into multiple steps.
     /// </summary>
-    [JsonProperty]
+    [property: DataMember]
     public bool DoNotSplit { get; set; }
 
     /// <summary>
     /// The priority of this step. InitialSteps with higher priorities will be run first.
     /// </summary>
-    [JsonProperty]
+    [property: DataMember]
     public byte? Priority { get; set; }
 
     /// <inheritdoc />

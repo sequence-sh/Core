@@ -14,7 +14,7 @@ namespace Reductech.EDR.Core.Internal
 /// <summary>
 /// The data used by a Freezable Step.
 /// </summary>
-public sealed class FreezableStepData : IEquatable<FreezableStepData>
+public sealed class FreezableStepData
 {
     /// <summary>
     /// Creates a new FreezableStepData
@@ -87,65 +87,13 @@ public sealed class FreezableStepData : IEquatable<FreezableStepData>
     /// <inheritdoc />
     public override string ToString()
     {
-        var keys      = StepProperties.OrderBy(x => x);
-        var keyString = string.Join("; ", keys);
+        var keyString = string.Join("; ", StepProperties);
 
         if (string.IsNullOrWhiteSpace(keyString))
             return "Empty";
 
         return keyString;
     }
-
-    /// <inheritdoc />
-    public bool Equals(FreezableStepData? other)
-    {
-        if (other is null)
-            return false;
-
-        if (ReferenceEquals(this, other))
-            return true;
-
-        var result = DictionariesEqual1(StepProperties, other.StepProperties);
-
-        return result;
-
-        static bool DictionariesEqual1(StepParameterDict dict1, StepParameterDict dict2)
-        {
-            if (dict1.Count != dict2.Count)
-                return false;
-
-            foreach (var key in dict1.Keys)
-            {
-                if (!dict2.ContainsKey(key))
-                    return false;
-
-                if (!dict1[key].Equals(dict2[key]))
-                    return false;
-            }
-
-            return true;
-        }
-    }
-
-    /// <inheritdoc />
-    public override bool Equals(object? obj) => ReferenceEquals(this, obj)
-                                             || obj is FreezableStepData other
-                                             && Equals(this, other);
-
-    /// <inheritdoc />
-    public override int GetHashCode() => StepProperties.Count;
-
-    /// <summary>
-    /// Equals Operator
-    /// </summary>
-    public static bool operator ==(FreezableStepData? left, FreezableStepData? right) =>
-        Equals(left, right);
-
-    /// <summary>
-    /// Not Equals Operator
-    /// </summary>
-    public static bool operator !=(FreezableStepData? left, FreezableStepData? right) =>
-        !Equals(left, right);
 
     /// <summary>
     /// Gets the variables set by steps in this FreezableStepData.

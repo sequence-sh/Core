@@ -124,6 +124,18 @@ public partial class DeserializationErrorTests
                     "ElementAtIndex expected Array<String> for parameter Array but <array> has type Array<Entity>",
                     "GetVariable - Line: 2, Col: 16, Idx: 53 - Line: 2, Col: 22, Idx: 59 Text: <array>")
             );
+
+            yield return new DeserializationErrorCase(
+                "IncrementVariable 'hello' 1",
+                ("'Variable' cannot take the value 'hello'",
+                 "IncrementVariable - Line: 1, Col: 0, Idx: 0 - Line: 1, Col: 26, Idx: 26 Text: IncrementVariable 'hello' 1")
+            );
+
+            yield return new DeserializationErrorCase(
+                "Sum 1",
+                ("Sum expected Array<Integer> for parameter Terms but Step has type Integer",
+                 "1 - Line: 1, Col: 4, Idx: 4 - Line: 1, Col: 4, Idx: 4 Text: 1")
+            );
         }
     }
 
