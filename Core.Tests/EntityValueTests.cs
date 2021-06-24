@@ -7,6 +7,8 @@ using CSharpFunctionalExtensions;
 using FluentAssertions;
 using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.Enums;
+using Reductech.EDR.Core.Internal;
+using Reductech.EDR.Core.TestHarness;
 using Reductech.EDR.Core.Util;
 using Xunit;
 
@@ -168,29 +170,114 @@ public partial class EntityValueTests
         Maybe<Entity> expectedEntity,
         Maybe<IReadOnlyList<string>> expectedList)
     {
-        var entityValue = EntityValue.CreateFromObject(o);
+        EntityValue entityValue = EntityValue.CreateFromObject(o);
+
+        void TestActual<T>(Maybe<T> expected)
+        {
+            var actual = entityValue.TryGetValue<T>().ToMaybe();
+            actual.Should().Be(expected);
+        }
+
+        var testConversion = !(entityValue is EntityValue.NestedList or EntityValue.NestedEntity);
+
+        void TestConvert<T>(SchemaProperty schemaProperty, Maybe<T> maybe)
+        {
+            if (!testConversion)
+                return;
+
+            const string myProp = "MyProp";
+            var          e      = Entity.Create((myProp, entityValue));
+
+            var schema = new Schema()
+            {
+                Properties = new Dictionary<string, SchemaProperty>()
+                {
+                    { myProp, schemaProperty }
+                }
+            };
+
+            var convertResult = entityValue.TryConvert(
+                schema,
+                myProp,
+                schemaProperty,
+                e
+            );
+
+            if (maybe.HasNoValue)
+                convertResult.ShouldBeFailure();
+            else
+            {
+                convertResult.ShouldBeSuccessful();
+                var expectedEV = EntityValue.CreateFromObject(maybe.Value);
+
+                if (convertResult.Value.value.ObjectValue is Enumeration enumeration)
+                {
+                    var real = enumeration.Type + "." + enumeration.Value;
+                    real.Should().Be(expectedEV.ObjectValue.ToString());
+                }
+                else
+                {
+                    convertResult.Value.value.ObjectValue.Should().Be(expectedEV.ObjectValue);
+                }
+            }
+        }
 
         var actualString = entityValue.TryGetValue<string>().Value;
         actualString.Should().Be(expectedString);
 
-        var actualInt = entityValue.TryGetValue<int>().ToMaybe();
-        actualInt.Should().Be(expectedInt);
+        TestConvert(
+            new SchemaProperty() { Type = SCLType.String, Multiplicity = Multiplicity.ExactlyOne },
+            Maybe<string>.From(expectedString)
+        );
 
-        var actualDouble = entityValue.TryGetValue<double>().ToMaybe();
-        actualDouble.Should().Be(expectedDouble);
+        TestActual(expectedInt);
 
-        var actualBool = entityValue.TryGetValue<bool>().ToMaybe();
-        actualBool.Should().Be(expectedBool);
+        TestConvert(
+            new SchemaProperty() { Type = SCLType.Integer, Multiplicity = Multiplicity.ExactlyOne },
+            expectedInt
+        );
+
+        TestActual(expectedDouble);
+
+        TestConvert(
+            new SchemaProperty() { Type = SCLType.Double, Multiplicity = Multiplicity.ExactlyOne },
+            expectedDouble
+        );
+
+        TestActual(expectedBool);
+
+        TestConvert(
+            new SchemaProperty() { Type = SCLType.Bool, Multiplicity = Multiplicity.ExactlyOne },
+            expectedBool
+        );
 
         var actualEnumeration = entityValue.TryGetValue<EncodingEnum>().ToMaybe();
-
         actualEnumeration.Should().Be(expectedEnumeration);
 
-        var actualDateTime = entityValue.TryGetValue<DateTime>().ToMaybe();
-        actualDateTime.Should().Be(expectedDateTime);
+        TestConvert(
+            new SchemaProperty()
+            {
+                Type         = SCLType.Enum,
+                EnumType     = nameof(EncodingEnum),
+                Values       = Enum.GetNames<EncodingEnum>(),
+                Multiplicity = Multiplicity.ExactlyOne
+            },
+            expectedEnumeration
+        );
 
-        var actualEntity = entityValue.TryGetValue<Entity>().ToMaybe();
-        actualEntity.Should().Be(expectedEntity);
+        TestActual(expectedDateTime);
+
+        TestConvert(
+            new SchemaProperty() { Type = SCLType.Date, Multiplicity = Multiplicity.ExactlyOne },
+            expectedDateTime
+        );
+
+        TestActual(expectedEntity);
+
+        TestConvert(
+            new SchemaProperty() { Type = SCLType.Entity, Multiplicity = Multiplicity.ExactlyOne },
+            expectedEntity
+        );
 
         var actualList = entityValue.TryGetValue<Array<StringStream>>().ToMaybe();
         actualList.HasValue.Should().Be(expectedList.HasValue);

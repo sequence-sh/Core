@@ -43,17 +43,20 @@ public abstract record EntityValue(object? ObjectValue)
             if (schemaProperty.Multiplicity is Multiplicity.Any or Multiplicity.UpToOne)
                 return (this, false);
 
-            return ErrorCode.SchemaViolationUnexpectedNull.ToErrorBuilder(propertyName, entity);
+            return schemaProperty.Type switch
+            {
+                SCLType.String => (new String(Serialized), true),
+                _ => ErrorCode.SchemaViolationUnexpectedNull.ToErrorBuilder(propertyName, entity)
+            };
         }
 
         /// <inheritdoc />
         public override string GetPrimitiveString() => "";
 
         /// <inheritdoc />
-        public override string Serialize()
-        {
-            return SerializationMethods.DoubleQuote("");
-        }
+        public override string Serialize() => Serialized;
+
+        private static readonly string Serialized = SerializationMethods.DoubleQuote("");
 
         /// <inheritdoc />
         public override string GetFormattedString(
@@ -713,6 +716,7 @@ public abstract record EntityValue(object? ObjectValue)
             case Entity entity:         return new NestedEntity(entity);
             case IEntityConvertible ec: return new NestedEntity(ec.ConvertToEntity());
             case Version version:       return new String(version.ToString());
+
             case IDictionary dict:
             {
                 var builder = ImmutableDictionary<string, EntityProperty>.Empty.ToBuilder();
