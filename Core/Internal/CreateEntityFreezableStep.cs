@@ -9,10 +9,7 @@ namespace Reductech.EDR.Core.Internal
 /// <summary>
 /// Freezes into a create entity step
 /// </summary>
-public record CreateEntityFreezableStep(
-        #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
-        FreezableEntityData FreezableEntityData) : IFreezableStep
-    #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
+public record CreateEntityFreezableStep(FreezableEntityData FreezableEntityData) : IFreezableStep
 {
     /// <inheritdoc />
     public bool Equals(IFreezableStep? other) => other is CreateEntityFreezableStep oStep

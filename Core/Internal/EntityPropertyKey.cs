@@ -17,14 +17,20 @@ public record EntityPropertyKey
     public EntityPropertyKey(IEnumerable<string> values)
     {
         KeyNames =
-            values.SelectMany(
-                    x => x.Split(
-                        ".",
-                        StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries
-                    )
-                )
+            values
+                //.SelectMany(
+                //    x => x.Split(
+                //        ".",
+                //        StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries
+                //    )
+                //)
                 .ToList();
     }
+
+    /// <summary>
+    /// Create a new EntityPropertyKey
+    /// </summary>
+    public EntityPropertyKey(params string[] values) : this(values.AsEnumerable()) { }
 
     /// <summary>
     /// The property Keys
