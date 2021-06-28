@@ -737,9 +737,12 @@ public static class SCLParsing
         private Result<(EntityPropertyKey names, FreezableStepProperty value), IError>
             GetEntityProperty(SCLParser.EntityPropertyContext context)
         {
-            var key = new EntityPropertyKey(
-                context.entityPropertyName().Select(GetContextString).ToList()
-            );
+            var keyComponents = context.entityPropertyName()
+                .Select(GetContextString)
+                .SelectMany(x => x.Split('.'))
+                .ToList();
+
+            var key = new EntityPropertyKey(keyComponents);
 
             var value = Visit(context.term());
 
