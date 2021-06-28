@@ -20,7 +20,31 @@ namespace Reductech.EDR.Core
 /// </summary>
 public sealed class StateMonad : IStateMonad
 {
+    /// <summary>
+    /// The Connectors key in the settings entity
+    /// </summary>
+    public const string ConnectorsKey = "Connectors";
+
     private readonly ConcurrentDictionary<VariableName, object> _stateDictionary = new();
+
+    /// <summary>
+    /// Create the settings entity from the Step Factory Store
+    /// </summary>
+    public static Entity CreateSettingsEntity(StepFactoryStore stepFactoryStore)
+    {
+        var connectorsSetting = EntityValue.CreateFromObject(
+            stepFactoryStore.ConnectorData
+                .ToDictionary(
+                    x => x.ConnectorSettings.Id,
+                    x => EntityValue
+                        .CreateFromObject(x.ConnectorSettings)
+                )
+        );
+
+        var settings = Entity.Create((ConnectorsKey, connectorsSetting));
+
+        return settings;
+    }
 
     /// <summary>
     /// Create a new StateMonad
@@ -36,16 +60,7 @@ public sealed class StateMonad : IStateMonad
         ExternalContext  = externalContext;
         SequenceMetadata = sequenceMetadata;
 
-        var connectorsSetting = EntityValue.CreateFromObject(
-            StepFactoryStore.ConnectorData
-                .Select(
-                    x => EntityValue
-                        .CreateFromObject(x.ConnectorSettings)
-                )
-                .ToList()
-        );
-
-        Settings = Entity.Create(("Connectors", connectorsSetting));
+        Settings = CreateSettingsEntity(stepFactoryStore);
     }
 
     /// <summary>
