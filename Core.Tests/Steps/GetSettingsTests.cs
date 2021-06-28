@@ -22,13 +22,16 @@ public partial class GetSettingsTests : StepTestBase<GetSettings, Entity>
             var baseEntity =
                 Entity.Create(
                     ("Connectors",
-                     new[]
+                     new Dictionary<string, object>()
                      {
-                         new ConnectorSettings()
                          {
-                             Id      = "Reductech.EDR.Core",
-                             Version = version.ToString(3),
-                             Enable  = true
+                             "Reductech.EDR.Core",
+                             new ConnectorSettings()
+                             {
+                                 Id      = "Reductech.EDR.Core",
+                                 Version = version.ToString(3),
+                                 Enable  = true
+                             }
                          }
                      }
                     )
@@ -52,7 +55,7 @@ public partial class GetSettingsTests : StepTestBase<GetSettings, Entity>
             var entity2 =
                 Entity.Create(
                     ("Connectors",
-                     new[] { newConnectorSettings }
+                     new Dictionary<string, object>() { { "MyConnector", newConnectorSettings } }
                     )
                 );
 
