@@ -94,13 +94,6 @@ public class StepFactoryStore
     /// </summary>
     public static StepFactoryStore Create(
         IReadOnlyList<ConnectorData> connectorData,
-        params IStepFactory[] factories) => Create(connectorData, factories.ToList());
-
-    /// <summary>
-    /// Create a step factory store
-    /// </summary>
-    public static StepFactoryStore Create(
-        IReadOnlyList<ConnectorData> connectorData,
         IReadOnlyCollection<IStepFactory> factories)
     {
         var dictionary = factories

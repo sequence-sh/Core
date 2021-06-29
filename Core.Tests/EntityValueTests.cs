@@ -208,16 +208,17 @@ public partial class EntityValueTests
             else
             {
                 convertResult.ShouldBeSuccessful();
-                var expectedEV = EntityValue.CreateFromObject(maybe.Value);
+                var expectedEntityValue = EntityValue.CreateFromObject(maybe.Value);
 
                 if (convertResult.Value.value.ObjectValue is Enumeration enumeration)
                 {
                     var real = enumeration.Type + "." + enumeration.Value;
-                    real.Should().Be(expectedEV.ObjectValue.ToString());
+                    real.Should().Be(expectedEntityValue.ObjectValue!.ToString());
                 }
                 else
                 {
-                    convertResult.Value.value.ObjectValue.Should().Be(expectedEV.ObjectValue);
+                    convertResult.Value.value.ObjectValue.Should()
+                        .Be(expectedEntityValue.ObjectValue);
                 }
             }
         }
