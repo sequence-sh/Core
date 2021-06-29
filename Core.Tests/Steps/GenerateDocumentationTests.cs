@@ -119,7 +119,7 @@ public partial class GenerateDocumentationTests : StepTestBase<GenerateDocumenta
             ) { TestDeserializeAndRun = false }.WithStepFactoryStore(
                 StepFactoryStore.Create(
                     Array.Empty<ConnectorData>(),
-                    new SimpleStepFactory<Not, bool>()
+                    new[] { new SimpleStepFactory<Not, bool>() }
                 )
             );
 
@@ -198,8 +198,8 @@ public partial class GenerateDocumentationTests : StepTestBase<GenerateDocumenta
                 exampleCreationResult.ConvertToEntity().Serialize()
             ) { TestDeserializeAndRun = false }.WithStepFactoryStore(
                 StepFactoryStore.Create(
-                    System.Array.Empty<ConnectorData>(),
-                    DocumentationExampleStepFactory.Instance
+                    Array.Empty<ConnectorData>(),
+                    new[] { DocumentationExampleStepFactory.Instance }
                 )
             );
         }
