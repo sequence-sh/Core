@@ -1,3 +1,52 @@
+# v0.10.0 (2021-07-02)
+
+## Summary of Changes
+
+### Steps
+
+- Added ArrayGroupBy Step
+
+### Sequence Configuration Language
+
+- Added the automatic variable '<>', which can be used instead of the lowest level function variable.
+
+### Logging and Monitoring
+
+- Added `WithCheckLogLevel` extension method to `ICaseThatExecutes` allowing the verbosity
+of the test log messages to be changed
+
+## Issues Closed in this Release
+
+### New Features
+
+- Move ConnectorData and Settings to ConnectorManager #276
+- GenerateDocumentation should return complete metadata for steps #273
+- Add a shorthand for the entity automatic variable #271
+- Create an ArrayGroupBy Step #272
+- Improve error messages for type mismatches #268
+
+### Bug Fixes
+
+- Passing array to a string parameter should not result in IntConstant error #269
+- Comparison of EntityValues results in an Error #270
+- Setting a variable to an enum value results in an error #267
+
+### Maintenance
+
+- Prevent using the wrong constructor of StepFactoryStore #281
+- EntityPropertyKey constructor should not split on dots #280
+- Connector Settings Entity should have a nested Entity rather than a nested list #279
+- Improve unit tests and increase code coverage #278
+- Remove SCLSettings #277
+- Remove SCLRunner.RunSequenceFromPathAsync method #264
+- Change log level for non-terminating errors to trace #263
+- Refactor SCLRunner.LogError as an extension for ILogger #265
+- Create tests to improve coverage in commonly used classes #261
+- Add tests for Errors #262
+- Create integration tests for ExternalProcessRunner #260
+- Exclude ExampleConnector from test coverage #259
+- Exclude ExampleConnector from test coverage #259
+
 # v0.9.0 (2021-05-14)
 
 ## Summary of Changes
