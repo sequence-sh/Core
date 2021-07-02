@@ -50,3 +50,5 @@ mutation testing:
     - rt-windows
   needs:
     - compile grammar
+  rules:
+    - when: never
