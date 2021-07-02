@@ -66,7 +66,7 @@
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="5.0.0" />
     <PackageReference Include="Namotion.Reflection" Version="1.0.23" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-    <PackageReference Include="Reductech.EDR.ConnectorManager.Base" Version="0.3.0-a.master.2106231105" />
+    <PackageReference Include="Reductech.EDR.ConnectorManager.Base" Version="0.3.0-a.master.2107012146" />
     <PackageReference Include="System.Linq.Async" Version="5.0.0" />
   </ItemGroup>
 
