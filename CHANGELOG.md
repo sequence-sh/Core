@@ -4,11 +4,11 @@
 
 ### Steps
 
-- Added ArrayGroupBy Step
+- Added `ArrayGroupBy` Step
 
 ### Sequence Configuration Language
 
-- Added the automatic variable '<>', which can be used instead of the lowest level function variable.
+- Added the automatic variable `<>` which can be used instead of `Entity`
 
 ### Logging and Monitoring
 
