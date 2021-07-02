@@ -13,7 +13,7 @@
 ### Logging and Monitoring
 
 - Added `WithCheckLogLevel` extension method to `ICaseThatExecutes` allowing the verbosity
-of the test log messages to be changed
+  of the test log messages to be changed
 
 ## Issues Closed in this Release
 
@@ -44,7 +44,6 @@ of the test log messages to be changed
 - Create tests to improve coverage in commonly used classes #261
 - Add tests for Errors #262
 - Create integration tests for ExternalProcessRunner #260
-- Exclude ExampleConnector from test coverage #259
 - Exclude ExampleConnector from test coverage #259
 
 # v0.9.0 (2021-05-14)
