@@ -45,17 +45,16 @@ public partial class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Enti
                     name,
                     new ForEach<Entity>
                     {
-                        Action = new Log<Entity>
-                        {
-                            Value = GetVariable<Entity>(VariableName.Entity)
-                        },
+                        Action = new LambdaFunction<Entity, Unit>(
+                            null,
+                            new Log<Entity> { Value = GetEntityVariable }
+                        ),
                         Array =
                             new EnforceSchema
                             {
                                 EntityStream = Array(entities.ToArray()),
                                 Schema       = Constant(schemaEntity)
                             },
-                        Variable = VariableName.Entity
                     },
                     Unit.Default,
                     expectedLogValues
@@ -366,12 +365,11 @@ public partial class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Enti
                         {
                             new ForEach<Entity>
                             {
-                                Action = new Log<Entity>
-                                {
-                                    Value = GetVariable<Entity>(VariableName.Entity)
-                                },
-                                Array    = enforceSchema,
-                                Variable = VariableName.Entity
+                                Action = new LambdaFunction<Entity, Unit>(
+                                    null,
+                                    new Log<Entity> { Value = GetEntityVariable }
+                                ),
+                                Array = enforceSchema,
                             }
                         },
                         FinalStep = new DoNothing()

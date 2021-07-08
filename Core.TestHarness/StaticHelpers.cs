@@ -71,7 +71,8 @@ public static class StaticHelpers
     public static IStep<TNew> GetVariable<TNew>(VariableName variableName) =>
         new GetVariable<TNew> { Variable = variableName };
 
-    public static IStep<Entity> GetEntityVariable => GetVariable<Entity>(VariableName.Entity);
+    public static IStep<Entity> GetEntityVariable =>
+        GetVariable<Entity>(VariableName.Item); //TODO rename
 
     public static Schema CreateSchema(
         string name,

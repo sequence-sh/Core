@@ -79,6 +79,24 @@ public abstract record FreezableStepProperty(TextLocation? Location)
     }
 
     /// <summary>
+    /// A Lambda Function
+    /// </summary>
+    public sealed record Lambda(
+        VariableName? VName,
+        IFreezableStep FreezableStep,
+        TextLocation? Location) : FreezableStepProperty(Location)
+    {
+        /// <inheritdoc />
+        public override MemberType MemberType => MemberType.Lambda;
+
+        /// <inheritdoc />
+        public override IFreezableStep ConvertToStep()
+        {
+            return FreezableStep; //This may not be correct //TODO remove
+        }
+    }
+
+    /// <summary>
     /// A step member
     /// </summary>
     public sealed record Step

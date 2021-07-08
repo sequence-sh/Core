@@ -34,11 +34,11 @@ public sealed class ArrayMap<T> : CompoundStep<Array<T>>
             await using var scopedMonad = new ScopedStateMonad(
                 stateMonad,
                 currentState,
-                Variable,
-                new KeyValuePair<VariableName, object>(Variable, record!)
+                Function.VariableNameOrItem,
+                new KeyValuePair<VariableName, object>(Function.VariableNameOrItem, record!)
             );
 
-            var result = await Function.Run(scopedMonad, cancellationToken);
+            var result = await Function.StepTyped.Run(scopedMonad, cancellationToken);
 
             if (result.IsFailure)
                 throw new ErrorException(result.Error);
@@ -61,31 +61,9 @@ public sealed class ArrayMap<T> : CompoundStep<Array<T>>
     /// <summary>
     /// A function to get the mapped entity
     /// </summary>
-    [StepProperty(2)]
-    [ScopedFunction]
+    [FunctionProperty(2)]
     [Required]
-    public IStep<T> Function { get; set; } = null!;
-
-    /// <summary>
-    /// The variable name to use in the predicate.
-    /// </summary>
-    [VariableName(3)]
-    [DefaultValueExplanation("<Entity>")]
-    public VariableName Variable { get; set; } = VariableName.Entity;
-
-    /// <inheritdoc />
-    public override Result<TypeResolver, IError> TryGetScopedTypeResolver(
-        TypeResolver baseTypeResolver,
-        IFreezableStep scopedStep)
-    {
-        return baseTypeResolver.TryCloneWithScopedStep(
-            Variable,
-            TypeReference.Create(typeof(T)),
-            new CallerMetadata(Name, nameof(Function), TypeReference.Create(typeof(T))),
-            scopedStep,
-            new ErrorLocation(this)
-        );
-    }
+    public LambdaFunction<T, T> Function { get; set; } = null!;
 
     /// <inheritdoc />
     public override IStepFactory StepFactory => ArrayMapStepFactory.Instance;

@@ -19,7 +19,11 @@ public partial class ArrayConcatTests : StepTestBase<ArrayConcat<Entity>, Array<
                 "One stream",
                 new ForEach<Entity>
                 {
-                    Action = new Log<Entity> { Value = GetEntityVariable },
+                    Action =
+                        new LambdaFunction<Entity, Unit>(
+                            null,
+                            new Log<Entity> { Value = GetEntityVariable }
+                        ),
                     Array = new ArrayConcat<Entity>
                     {
                         Arrays = new ArrayNew<Array<Entity>>
@@ -32,8 +36,7 @@ public partial class ArrayConcatTests : StepTestBase<ArrayConcat<Entity>, Array<
                                 )
                             }
                         }
-                    },
-                    Variable = VariableName.Entity
+                    }
                 },
                 Unit.Default,
                 "(Foo: \"Alpha\")",
@@ -44,7 +47,11 @@ public partial class ArrayConcatTests : StepTestBase<ArrayConcat<Entity>, Array<
                 "Two streams",
                 new ForEach<Entity>
                 {
-                    Action = new Log<Entity> { Value = GetEntityVariable },
+                    Action =
+                        new LambdaFunction<Entity, Unit>(
+                            null,
+                            new Log<Entity> { Value = GetEntityVariable }
+                        ),
                     Array = new ArrayConcat<Entity>
                     {
                         Arrays = new ArrayNew<Array<Entity>>
@@ -61,8 +68,7 @@ public partial class ArrayConcatTests : StepTestBase<ArrayConcat<Entity>, Array<
                                 )
                             }
                         }
-                    },
-                    Variable = VariableName.Entity
+                    }
                 },
                 Unit.Default,
                 "(Foo: \"Alpha\")",

@@ -174,9 +174,6 @@ public abstract class CompoundStep<T> : ICompoundStep<T>
 
                 var logAttribute = propertyInfo.GetCustomAttribute<LogAttribute>();
 
-                var scopedFunctionAttribute =
-                    propertyInfo.GetCustomAttribute<ScopedFunctionAttribute>();
-
                 var requiredVersions = propertyInfo.GetCustomAttributes<RequiredVersionAttribute>()
                     .ToImmutableList();
 
@@ -187,7 +184,17 @@ public abstract class CompoundStep<T> : ICompoundStep<T>
                         propertyInfo.Name,
                         index,
                         logAttribute,
-                        scopedFunctionAttribute,
+                        requiredVersions
+                    );
+                }
+
+                if (val is LambdaFunction lf)
+                {
+                    return new StepProperty.LambdaFunctionProperty(
+                        lf,
+                        propertyInfo.Name,
+                        index,
+                        logAttribute,
                         requiredVersions
                     );
                 }
@@ -199,7 +206,6 @@ public abstract class CompoundStep<T> : ICompoundStep<T>
                         propertyInfo.Name,
                         index,
                         logAttribute,
-                        scopedFunctionAttribute,
                         requiredVersions
                     );
                 }
@@ -213,7 +219,6 @@ public abstract class CompoundStep<T> : ICompoundStep<T>
                         propertyInfo.Name,
                         index,
                         logAttribute,
-                        scopedFunctionAttribute,
                         requiredVersions
                     );
                 }
@@ -228,13 +233,6 @@ public abstract class CompoundStep<T> : ICompoundStep<T>
     /// </summary>
     public virtual Result<Unit, IError> VerifyThis(StepFactoryStore stepFactoryStore) =>
         Unit.Default;
-
-    /// <inheritdoc />
-    public virtual Result<TypeResolver, IError> TryGetScopedTypeResolver(
-        TypeResolver baseTypeResolver,
-        IFreezableStep scopedStep) => (SingleError)ErrorCode.CannotCreateScopedContext
-        .ToErrorBuilder(Name)
-        .WithLocation(this);
 
     /// <inheritdoc />
     public Result<Unit, IError> Verify(StepFactoryStore stepFactoryStore)

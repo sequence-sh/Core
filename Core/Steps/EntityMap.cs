@@ -33,11 +33,11 @@ public sealed class EntityMap : CompoundStep<Array<Entity>>
             await using var scopedMonad = new ScopedStateMonad(
                 stateMonad,
                 currentState,
-                Variable,
-                new KeyValuePair<VariableName, object>(Variable, record)
+                Function.VariableNameOrItem,
+                new KeyValuePair<VariableName, object>(Function.VariableNameOrItem, record)
             );
 
-            var result = await Function.Run(scopedMonad, cancellationToken);
+            var result = await Function.StepTyped.Run(scopedMonad, cancellationToken);
 
             if (result.IsFailure)
                 throw new ErrorException(result.Error);
@@ -62,29 +62,7 @@ public sealed class EntityMap : CompoundStep<Array<Entity>>
     /// </summary>
     [StepProperty(2)]
     [Required]
-    [ScopedFunction]
-    public IStep<Entity> Function { get; set; } = null!;
-
-    /// <summary>
-    /// The variable name to use in the function.
-    /// </summary>
-    [VariableName(3)]
-    [DefaultValueExplanation("<Entity>")]
-    public VariableName Variable { get; set; } = VariableName.Entity;
-
-    /// <inheritdoc />
-    public override Result<TypeResolver, IError> TryGetScopedTypeResolver(
-        TypeResolver baseContext,
-        IFreezableStep scopedStep)
-    {
-        return baseContext.TryCloneWithScopedStep(
-            Variable,
-            TypeReference.Actual.Entity,
-            new CallerMetadata(Name, nameof(Function), TypeReference.Actual.Entity),
-            scopedStep,
-            new ErrorLocation(this)
-        );
-    }
+    public LambdaFunction<Entity, Entity> Function { get; set; } = null!;
 
     /// <inheritdoc />
     public override IStepFactory StepFactory { get; } =

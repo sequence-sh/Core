@@ -106,23 +106,25 @@ public sealed class FreezableStepData
 
         foreach (var (key, freezableStepProperty) in StepProperties)
         {
-            if (!typeResolver.StepFactoryStore.IsScopedFunction(stepName, key))
+            switch (freezableStepProperty)
             {
-                switch (freezableStepProperty)
+                case FreezableStepProperty.Step step:
+                    LocalGetVariablesSet(step.FreezableStep);
+                    break;
+                case FreezableStepProperty.StepList stepList:
                 {
-                    case FreezableStepProperty.Step step:
-                        LocalGetVariablesSet(step.FreezableStep);
-                        break;
-                    case FreezableStepProperty.StepList stepList:
-                    {
-                        foreach (var step in stepList.List)
-                            LocalGetVariablesSet(step);
+                    foreach (var step in stepList.List)
+                        LocalGetVariablesSet(step);
 
-                        break;
-                    }
-                    case FreezableStepProperty.Variable _: break;
-                    default:                               throw new ArgumentOutOfRangeException();
+                    break;
                 }
+                case FreezableStepProperty.Lambda lambda:
+                {
+                    GetVariablesSetByLambda(lambda.FreezableStep, lambda.VName);
+                    break;
+                }
+                case FreezableStepProperty.Variable _: break;
+                default:                               throw new ArgumentOutOfRangeException();
             }
         }
 
@@ -139,6 +141,20 @@ public sealed class FreezableStepData
 
             if (variablesSet.IsFailure)
                 errors.Add(variablesSet.Error);
+            else
+                variables.AddRange(variablesSet.Value);
+        }
+
+        void GetVariablesSetByLambda(IFreezableStep freezableStep, VariableName? lambdaVariable)
+        {
+            var variablesSet = freezableStep.GetVariablesSet(callerMetadata, typeResolver);
+
+            if (variablesSet.IsFailure)
+                errors.Add(variablesSet.Error);
+            else if (lambdaVariable is not null)
+                variables.AddRange(
+                    variablesSet.Value.Where(x => x.variableName != lambdaVariable.Value)
+                );
             else
                 variables.AddRange(variablesSet.Value);
         }

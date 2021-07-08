@@ -56,17 +56,20 @@ public partial class RunStepTests : StepTestBase<RunStep<Unit>, Unit>
                     Step = new ArrayMap<int>()
                     {
                         Array = Array(3, 2, 1, 0),
-                        Function = new Divide()
-                        {
-                            Terms = new ArrayNew<int>()
+                        Function = new LambdaFunction<int, int>(
+                            null,
+                            new Divide()
                             {
-                                Elements = new[]
+                                Terms = new ArrayNew<int>()
                                 {
-                                    Constant(1),
-                                    GetVariable<int>(VariableName.Entity)
+                                    Elements = new[]
+                                    {
+                                        Constant(1),
+                                        GetVariable<int>(VariableName.Item)
+                                    }
                                 }
                             }
-                        }
+                        )
                     }
                 },
                 ErrorCode.DivideByZero.ToErrorBuilder().WithLocation(divide)

@@ -20,7 +20,10 @@ public partial class ForTests : StepTestBase<For, Unit>
                 "Increment 1",
                 new For
                 {
-                    Action    = new Log<int> { Value = GetVariable<int>(VariableName.Index.Name) },
+                    Action = new LambdaFunction<int, Unit>(
+                        null,
+                        new Log<int> { Value = GetVariable<int>(VariableName.Item) }
+                    ),
                     From      = Constant(1),
                     To        = Constant(3),
                     Increment = Constant(1),
@@ -35,7 +38,10 @@ public partial class ForTests : StepTestBase<For, Unit>
                 "Increment 2",
                 new For
                 {
-                    Action    = new Log<int> { Value = GetVariable<int>(VariableName.Index.Name) },
+                    Action = new LambdaFunction<int, Unit>(
+                        null,
+                        new Log<int> { Value = GetVariable<int>(VariableName.Item) }
+                    ),
                     From      = Constant(1),
                     To        = Constant(6),
                     Increment = Constant(2),
@@ -50,7 +56,10 @@ public partial class ForTests : StepTestBase<For, Unit>
                 "Increment -1",
                 new For
                 {
-                    Action    = new Log<int> { Value = GetVariable<int>(VariableName.Index.Name) },
+                    Action = new LambdaFunction<int, Unit>(
+                        null,
+                        new Log<int> { Value = GetVariable<int>(VariableName.Item) }
+                    ),
                     From      = Constant(3),
                     To        = Constant(1),
                     Increment = Constant(-1),
@@ -65,7 +74,10 @@ public partial class ForTests : StepTestBase<For, Unit>
                 "Increment No range",
                 new For
                 {
-                    Action    = new Log<int> { Value = GetVariable<int>(VariableName.Index.Name) },
+                    Action = new LambdaFunction<int, Unit>(
+                        null,
+                        new Log<int> { Value = GetVariable<int>(VariableName.Item) }
+                    ),
                     From      = Constant(3),
                     To        = Constant(1),
                     Increment = Constant(1),
@@ -100,17 +112,17 @@ public partial class ForTests : StepTestBase<For, Unit>
                         "ValueIf increment 0",
                         new For
                         {
-                            Action = new Log<int>
-                            {
-                                Value = GetVariable<int>(VariableName.Index.Name)
-                            },
+                            Action = new LambdaFunction<int, Unit>(
+                                null,
+                                new Log<int> { Value = GetVariable<int>(VariableName.Item) }
+                            ),
                             From      = Constant(1),
                             To        = Constant(3),
                             Increment = Constant(0)
                         },
                         new ErrorBuilder(ErrorCode.DivideByZero)
                     )
-                    .WithExpectedFinalState(VariableName.Index.Name, 1)
+                    .WithExpectedFinalState(VariableName.Item.Name, 1)
                 ;
 
             foreach (var errorCase in base.ErrorCases)

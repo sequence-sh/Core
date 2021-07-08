@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Reflection;
 using CSharpFunctionalExtensions;
@@ -41,16 +40,16 @@ public class StepFactoryStore
         ConnectorData = connectorData;
 
         Dictionary = dictionary.ToDictionary(
-            x => x.Key!,
-            x => x.Value!,
+            x => x.Key,
+            x => x.Value,
             StringComparer.OrdinalIgnoreCase
-        )!;
+        );
 
         EnumTypesDictionary = enumTypesDictionary.ToDictionary(
-            x => x.Key!,
-            x => x.Value!,
+            x => x.Key,
+            x => x.Value,
             StringComparer.OrdinalIgnoreCase
-        )!;
+        );
     }
 
     private static IEnumerable<string> GetStepNames(IStepFactory stepFactory)
@@ -59,18 +58,6 @@ public class StepFactoryStore
 
         foreach (var alias in stepFactory.StepType.GetCustomAttributes<AliasAttribute>())
             yield return alias.Name;
-    }
-
-    /// <summary>
-    /// Is this property a scoped function
-    /// </summary>
-    [Pure]
-    public bool IsScopedFunction(string stepName, StepParameterReference stepParameterReference)
-    {
-        if (!Dictionary.TryGetValue(stepName, out var factory))
-            return false;
-
-        return factory.IsScopedFunction(stepParameterReference);
     }
 
     /// <summary>
@@ -115,7 +102,7 @@ public class StepFactoryStore
         var steps = connectorData.Select(x => x.Assembly)
             .Prepend(typeof(IStep).Assembly)
             .WhereNotNull()
-            .SelectMany(a => a!.GetTypes())
+            .SelectMany(a => a.GetTypes())
             .Distinct()
             .Where(x => !x.IsAbstract)
             .Where(x => typeof(ICompoundStep).IsAssignableFrom(x))
@@ -156,12 +143,12 @@ public class StepFactoryStore
             var instance = Activator.CreateInstance(closedType);
             var step     = instance as ICompoundStep;
 
-            var stepFactory = step!.StepFactory;
+            var stepFactory = step?.StepFactory;
 
             if (stepFactory is null)
                 throw new Exception($"Step Factory for {stepType.Name} is null");
 
-            return step!.StepFactory;
+            return stepFactory;
         }
     }
 

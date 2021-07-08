@@ -91,7 +91,7 @@ public partial class DeserializationErrorTests
             );
 
             yield return new DeserializationErrorCase(
-                "Foreach ['one', 'two'] (Print (<Entity> + 1))",
+                "Foreach ['one', 'two'] (Print (<item> + 1))",
                 ("StringJoin expected String for parameter Strings but Step has type Integer",
                  "1 - Line: 1, Col: 42, Idx: 42 - Line: 1, Col: 42, Idx: 42 Text: 1")
             );
@@ -121,7 +121,7 @@ public partial class DeserializationErrorTests
             yield return new DeserializationErrorCase(
                 "-<array> = [('Foo': 1), ('Foo': 2)]\r\n- StringIsEmpty <array>[0]",
                 (
-                    "ElementAtIndex expected Array<String> for parameter Array but <array> has type Array<Entity>",
+                    "ElementAtIndex expected Array<String> for parameter Array but <array> has type Array<item>",
                     "GetVariable - Line: 2, Col: 16, Idx: 53 - Line: 2, Col: 22, Idx: 59 Text: <array>")
             );
 

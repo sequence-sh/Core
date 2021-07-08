@@ -25,16 +25,18 @@ public partial class GetAutomaticVariableTests : StepTestBase<GetAutomaticVariab
                         Array = new ArrayMap<int>
                         {
                             Array = Array(1, 2, 3),
-                            Function = new Sum
-                            {
-                                Terms = ArrayNew<int>.CreateArray(
-                                    new List<IStep<int>>
-                                    {
-                                        new GetAutomaticVariable<int>(),
-                                        Constant(13)
-                                    }
-                                )
-                            }
+                            Function = new LambdaFunction<int, int>(
+                                null,
+                                new Sum
+                                {
+                                    Terms = ArrayNew<int>.CreateArray(
+                                        new List<IStep<int>>
+                                        {
+                                            new GetAutomaticVariable<int>(), Constant(13)
+                                        }
+                                    )
+                                }
+                            )
                         }
                     }
                 },
@@ -52,17 +54,20 @@ public partial class GetAutomaticVariableTests : StepTestBase<GetAutomaticVariab
                         Array = new ArrayMap<int>()
                         {
                             Array = Array(1, 2, 3),
-                            Function = new Sum()
-                            {
-                                Terms = ArrayNew<int>.CreateArray(
-                                    new List<IStep<int>>()
+                            Function =
+                                new LambdaFunction<int, int>(
+                                    new VariableName("MyVar"),
+                                    new Sum()
                                     {
-                                        new GetAutomaticVariable<int>(),
-                                        Constant(13)
+                                        Terms = ArrayNew<int>.CreateArray(
+                                            new List<IStep<int>>()
+                                            {
+                                                new GetAutomaticVariable<int>(),
+                                                Constant(13)
+                                            }
+                                        )
                                     }
-                                )
-                            },
-                            Variable = new VariableName("MyVar")
+                                ),
                         }
                     }
                 },
@@ -80,40 +85,46 @@ public partial class GetAutomaticVariableTests : StepTestBase<GetAutomaticVariab
                         Array = new ArrayMap<int>()
                         {
                             Array = Array(1, 2, 3),
-                            Function = new Sum()
-                            {
-                                Terms = ArrayNew<int>.CreateArray(
-                                    new List<IStep<int>>()
-                                    {
-                                        new GetAutomaticVariable<int>(),
-                                        new ElementAtIndex<int>()
+                            Function = new LambdaFunction<int, int>(
+                                null,
+                                new Sum()
+                                {
+                                    Terms = ArrayNew<int>.CreateArray(
+                                        new List<IStep<int>>()
                                         {
-                                            Array = new ArrayMap<int>()
+                                            new GetAutomaticVariable<int>(),
+                                            new ElementAtIndex<int>()
                                             {
-                                                Array = Array(1, 2, 3),
-                                                Function = new Sum()
+                                                Array = new ArrayMap<int>()
                                                 {
-                                                    Terms =
-                                                        ArrayNew<
-                                                                int>
-                                                            .CreateArray(
-                                                                new List
-                                                                <IStep
-                                                                    <int>>()
-                                                                {
-                                                                    new
-                                                                        GetAutomaticVariable
-                                                                        <int>(),
-                                                                    Constant(12)
-                                                                }
-                                                            )
+                                                    Array = Array(1, 2, 3),
+                                                    Function = new LambdaFunction<int, int>(
+                                                        null,
+                                                        new Sum()
+                                                        {
+                                                            Terms =
+                                                                ArrayNew<
+                                                                        int>
+                                                                    .CreateArray(
+                                                                        new List
+                                                                        <IStep
+                                                                            <int>>()
+                                                                        {
+                                                                            new
+                                                                                GetAutomaticVariable
+                                                                                <int>(),
+                                                                            Constant(12)
+                                                                        }
+                                                                    )
+                                                        }
+                                                    )
                                                 },
-                                            },
-                                            Index = Constant(0)
+                                                Index = Constant(0)
+                                            }
                                         }
-                                    }
-                                )
-                            }
+                                    )
+                                }
+                            )
                         }
                     }
                 },

@@ -265,7 +265,7 @@ Log 'Comments!'",
             yield return new DeserializationTestInstance(
                 @"
 - <ArrayVar> = ['abc', '123']
-- Foreach <ArrayVar> (Log <Element>) <Element>",
+- Foreach <ArrayVar> (Log <Item>)",
                 "abc",
                 "123"
             );
@@ -273,14 +273,14 @@ Log 'Comments!'",
             yield return new DeserializationTestInstance(
                 @"
 - <ArrayVar> = [(str: 'abc' num: '123')]
-- Foreach <ArrayVar> (Log <Entity>)",
+- Foreach <ArrayVar> (Log <item>)",
                 "(str: \"abc\" num: \"123\")"
             );
 
             yield return new DeserializationTestInstance(
                 @"
 - <ArrayVar> = [(str: 'abc' num: '123')]
-- EntityForeach <ArrayVar> (Log <Entity>)",
+- EntityForeach <ArrayVar> (Log <item>)",
                 "(str: \"abc\" num: \"123\")"
             );
 
@@ -288,7 +288,7 @@ Log 'Comments!'",
                 @"
 - <ArrayVar1> = ['abc', '123']
 - <ArrayVar2> = (Repeat <ArrayVar1> 2)
-- Foreach <ArrayVar2> (Log (ArrayLength <Element>)) <Element>",
+- Foreach <ArrayVar2> (Log (ArrayLength <Item>))",
                 "2",
                 "2"
             );
@@ -330,14 +330,14 @@ Log 'Comments!'",
             );
 
             yield return new DeserializationTestInstance(
-                @"ForEach ['a','b','c'] (Log <char>) <char>",
+                @"ForEach ['a','b','c'] (Log <item>)",
                 "a",
                 "b",
                 "c"
             );
 
             yield return new DeserializationTestInstance(
-                @"ForEach ['a' 'b' 'c'] (Log <char>) <char>",
+                @"ForEach ['a' 'b' 'c'] (Log <item>)",
                 "a",
                 "b",
                 "c"
@@ -425,8 +425,7 @@ Log 'Comments!'",
             yield return new DeserializationTestInstance(
                 @"ForEach
 ['a','b','c']
-(Log <char>)
-<char>",
+(Log <item>)",
                 "a",
                 "b",
                 "c"

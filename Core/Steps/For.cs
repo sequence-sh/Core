@@ -40,24 +40,15 @@ public sealed class For : CompoundStep<Unit>
     /// The action to perform repeatedly.
     /// </summary>
     [StepProperty(4)]
-    [ScopedFunction]
     [Required]
-    public IStep<Unit> Action { get; set; } = null!;
-
-    /// <summary>
-    /// The name of the variable to use within the action.
-    /// </summary>
-    [VariableName(5)]
-    [DefaultValueExplanation("<i>")]
-
-    public VariableName Variable { get; set; } = VariableName.Index;
+    public LambdaFunction<int, Unit> Action { get; set; } = null!;
 
     /// <inheritdoc />
     protected override async Task<Result<Unit, IError>> Run(
         IStateMonad stateMonad,
         CancellationToken cancellationToken)
     {
-        var variableName = VariableName.Index;
+        var variableName = Action.VariableNameOrItem;
 
         var from = await From.Run(stateMonad, cancellationToken);
 
@@ -76,6 +67,8 @@ public sealed class For : CompoundStep<Unit>
 
         var currentValue = from.Value;
 
+        //Todo usae scoped state monad
+
         var setResult = await stateMonad.SetVariableAsync(variableName, currentValue, false, this);
 
         if (setResult.IsFailure)
@@ -86,7 +79,7 @@ public sealed class For : CompoundStep<Unit>
 
         while (increment.Value > 0 ? currentValue <= to.Value : currentValue >= to.Value)
         {
-            var r = await Action.Run(stateMonad, cancellationToken);
+            var r = await Action.StepTyped.Run(stateMonad, cancellationToken);
 
             if (r.IsFailure)
                 return r;
@@ -111,23 +104,9 @@ public sealed class For : CompoundStep<Unit>
                 return setResult.ConvertFailure<Unit>();
         }
 
-        await stateMonad.RemoveVariableAsync(VariableName.Index, false, this);
+        await stateMonad.RemoveVariableAsync(VariableName.Item, false, this);
 
         return Unit.Default;
-    }
-
-    /// <inheritdoc />
-    public override Result<TypeResolver, IError> TryGetScopedTypeResolver(
-        TypeResolver baseTypeResolver,
-        IFreezableStep scopedStep)
-    {
-        return baseTypeResolver.TryCloneWithScopedStep(
-            Variable,
-            TypeReference.Actual.Integer,
-            new CallerMetadata(Name, nameof(Action), TypeReference.Unit.Instance),
-            scopedStep,
-            new ErrorLocation(this)
-        );
     }
 
     /// <inheritdoc />

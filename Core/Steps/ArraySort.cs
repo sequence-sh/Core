@@ -31,9 +31,8 @@ public sealed class ArraySort<T> : CompoundStep<Array<T>>
     /// To sort by multiple properties, concatenate several keys
     /// </summary>
     [StepProperty(2)]
-    [ScopedFunction]
     [DefaultValueExplanation("Default Ordering")]
-    public IStep<StringStream>? KeySelector { get; set; } = null!;
+    public LambdaFunction<T, StringStream>? KeySelector { get; set; } = null!;
 
     /// <summary>
     /// Whether to sort in descending order.
@@ -41,13 +40,6 @@ public sealed class ArraySort<T> : CompoundStep<Array<T>>
     [StepProperty(3)]
     [DefaultValueExplanation("False")]
     public IStep<bool> Descending { get; set; } = new BoolConstant(false);
-
-    /// <summary>
-    /// The variable name to use in the keySelector if there is one.
-    /// </summary>
-    [VariableName(4)]
-    [DefaultValueExplanation("<Entity>")]
-    public VariableName Variable { get; set; } = VariableName.Entity;
 
     /// <inheritdoc />
     protected override async Task<Result<Array<T>, IError>> Run(
@@ -79,11 +71,14 @@ public sealed class ArraySort<T> : CompoundStep<Array<T>>
                 var scopedMonad = new ScopedStateMonad(
                     stateMonad,
                     currentState,
-                    Variable,
-                    new KeyValuePair<VariableName, object>(VariableName.Entity, entity!)
+                    KeySelector.VariableNameOrItem,
+                    new KeyValuePair<VariableName, object>(
+                        KeySelector.VariableNameOrItem,
+                        entity!
+                    )
                 );
 
-                var result = await KeySelector.Run(scopedMonad, cancellation)
+                var result = await KeySelector.StepTyped.Run(scopedMonad, cancellation)
                     .Map(x => x.GetStringAsync());
 
                 if (result.IsFailure)
@@ -96,24 +91,6 @@ public sealed class ArraySort<T> : CompoundStep<Array<T>>
         }
 
         return sortedArray;
-    }
-
-    /// <inheritdoc />
-    public override Result<TypeResolver, IError> TryGetScopedTypeResolver(
-        TypeResolver baseContext,
-        IFreezableStep scopedStep)
-    {
-        return baseContext.TryCloneWithScopedStep(
-            Variable,
-            TypeReference.Create(typeof(T)),
-            new CallerMetadata(
-                Name,
-                nameof(KeySelector),
-                TypeReference.Create(typeof(StringStream))
-            ),
-            scopedStep,
-            new ErrorLocation(this)
-        );
     }
 
     /// <inheritdoc />

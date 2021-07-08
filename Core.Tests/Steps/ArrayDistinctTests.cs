@@ -23,7 +23,10 @@ public partial class ArrayDistinctTests : StepTestBase<ArrayDistinct<Entity>, Ar
                 "Distinct case sensitive",
                 new ForEach<Entity>
                 {
-                    Action = new Log<Entity> { Value = GetVariable<Entity>(foreachVar) },
+                    Action = new LambdaFunction<Entity, Unit>(
+                        foreachVar,
+                        new Log<Entity> { Value = GetVariable<Entity>(foreachVar) }
+                    ),
                     Array = new ArrayDistinct<Entity>
                     {
                         Array = Array(
@@ -33,14 +36,15 @@ public partial class ArrayDistinctTests : StepTestBase<ArrayDistinct<Entity>, Ar
                             Entity.Create(("Foo", "Beta")),
                             Entity.Create(("Foo", "Beta"))
                         ),
-                        KeySelector = new EntityGetValue<StringStream>
-                        {
-                            Property = Constant("Foo"),
-                            Entity   = GetVariable<Entity>(distinctVar)
-                        },
-                        Variable = distinctVar
+                        KeySelector = new LambdaFunction<Entity, StringStream>(
+                            distinctVar,
+                            new EntityGetValue<StringStream>
+                            {
+                                Property = Constant("Foo"),
+                                Entity   = GetVariable<Entity>(distinctVar)
+                            }
+                        )
                     },
-                    Variable = foreachVar
                 },
                 Unit.Default,
                 "(Foo: \"Alpha\")",
@@ -52,7 +56,10 @@ public partial class ArrayDistinctTests : StepTestBase<ArrayDistinct<Entity>, Ar
                 "Distinct case insensitive",
                 new ForEach<Entity>
                 {
-                    Action = new Log<Entity> { Value = GetEntityVariable },
+                    Action = new LambdaFunction<Entity, Unit>(
+                        VariableName.Item,
+                        new Log<Entity> { Value = GetEntityVariable }
+                    ),
                     Array = new ArrayDistinct<Entity>
                     {
                         Array = Array(
@@ -62,14 +69,15 @@ public partial class ArrayDistinctTests : StepTestBase<ArrayDistinct<Entity>, Ar
                             Entity.Create(("Foo", "Beta")),
                             Entity.Create(("Foo", "Beta"))
                         ),
-                        KeySelector =
+                        KeySelector = new LambdaFunction<Entity, StringStream>(
+                            VariableName.Item,
                             new EntityGetValue<StringStream>
                             {
                                 Property = Constant("Foo"), Entity = GetEntityVariable
-                            },
+                            }
+                        ),
                         IgnoreCase = Constant(true)
                     },
-                    Variable = VariableName.Entity
                 },
                 Unit.Default,
                 "(Foo: \"Alpha\")",
@@ -90,7 +98,7 @@ public partial class ArrayDistinctTests : StepTestBase<ArrayDistinct<Entity>, Ar
                 new ArrayDistinct<Entity>
                 {
                     Array       = new FailStep<Array<Entity>> { ErrorMessage = "Stream Fail" },
-                    KeySelector = Constant("A")
+                    KeySelector = new LambdaFunction<Entity, StringStream>(null, Constant("A"))
                 },
                 new SingleError(
                     ErrorLocation.EmptyLocation,

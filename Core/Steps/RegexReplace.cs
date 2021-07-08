@@ -59,11 +59,14 @@ public sealed class RegexReplace : CompoundStep<StringStream>
             await using var scopedMonad = new ScopedStateMonad(
                 stateMonad,
                 currentState,
-                Variable,
-                new KeyValuePair<VariableName, object>(Variable, new StringStream(match.Value))
+                Function.VariableNameOrItem,
+                new KeyValuePair<VariableName, object>(
+                    Function.VariableNameOrItem,
+                    new StringStream(match.Value)
+                )
             );
 
-            var result = await Function.Run(scopedMonad, cancellationToken)
+            var result = await Function.StepTyped.Run(scopedMonad, cancellationToken)
                 .Map(x => x.GetStringAsync());
 
             if (result.IsFailure)
@@ -96,17 +99,9 @@ public sealed class RegexReplace : CompoundStep<StringStream>
     /// <summary>
     /// A function to take the regex match and return the new string
     /// </summary>
-    [StepProperty(3)]
+    [FunctionProperty(3)]
     [Required]
-    [ScopedFunction]
-    public IStep<StringStream> Function { get; set; } = null!;
-
-    /// <summary>
-    /// The variable name to use for the match in the function.
-    /// </summary>
-    [VariableName(4)]
-    [DefaultValueExplanation("<Match>")]
-    public VariableName Variable { get; set; } = VariableName.Match;
+    public LambdaFunction<StringStream, StringStream> Function { get; set; } = null!;
 
     /// <summary>
     /// Whether the regex should ignore case.
@@ -114,20 +109,6 @@ public sealed class RegexReplace : CompoundStep<StringStream>
     [StepProperty()]
     [DefaultValueExplanation("False")]
     public IStep<bool> IgnoreCase { get; set; } = new BoolConstant(false);
-
-    /// <inheritdoc />
-    public override Result<TypeResolver, IError> TryGetScopedTypeResolver(
-        TypeResolver baseContext,
-        IFreezableStep scopedStep)
-    {
-        return baseContext.TryCloneWithScopedStep(
-            Variable,
-            TypeReference.Actual.String,
-            new CallerMetadata(Name, nameof(Function), TypeReference.Actual.String),
-            scopedStep,
-            new ErrorLocation(this)
-        );
-    }
 
     /// <inheritdoc />
     public override IStepFactory StepFactory { get; } =

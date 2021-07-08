@@ -15,9 +15,43 @@ public abstract record StepProperty
     string Name,
     int Index,
     LogAttribute? LogAttribute,
-    ScopedFunctionAttribute? ScopedFunctionAttribute,
     ImmutableList<RequiredVersionAttribute> RequiredVersions)
 {
+    /// <summary>
+    /// A lambda function
+    /// </summary>
+    public record LambdaFunctionProperty
+    (
+        LambdaFunction LambdaFunction,
+        string Name,
+        int Index,
+        LogAttribute? LogAttribute,
+        ImmutableList<RequiredVersionAttribute> RequiredVersions) : StepProperty(
+        Name,
+        Index,
+        LogAttribute,
+        RequiredVersions
+    )
+    {
+        /// <inheritdoc />
+        protected override string SerializeValue()
+        {
+            return LambdaFunction.Serialize();
+        }
+
+        /// <inheritdoc />
+        public override string ToString() => $"{Name} = {SerializeValue()}";
+
+        /// <inheritdoc />
+        protected override bool ShouldBracketWhenSerialized => true;
+
+        /// <inheritdoc />
+        public override string GetLogName()
+        {
+            return SerializeValue();
+        }
+    }
+
     /// <summary>
     /// A variable name
     /// </summary>
@@ -26,12 +60,10 @@ public abstract record StepProperty
         string Name,
         int Index,
         LogAttribute? LogAttribute,
-        ScopedFunctionAttribute? ScopedFunctionAttribute,
         ImmutableList<RequiredVersionAttribute> RequiredVersions) : StepProperty(
         Name,
         Index,
         LogAttribute,
-        ScopedFunctionAttribute,
         RequiredVersions
     )
     {
@@ -56,12 +88,10 @@ public abstract record StepProperty
         string Name,
         int Index,
         LogAttribute? LogAttribute,
-        ScopedFunctionAttribute? ScopedFunctionAttribute,
         ImmutableList<RequiredVersionAttribute> RequiredVersions) : StepProperty(
         Name,
         Index,
         LogAttribute,
-        ScopedFunctionAttribute,
         RequiredVersions
     )
     {
@@ -99,12 +129,10 @@ public abstract record StepProperty
         string Name,
         int Index,
         LogAttribute? LogAttribute,
-        ScopedFunctionAttribute? ScopedFunctionAttribute,
         ImmutableList<RequiredVersionAttribute> RequiredVersions) : StepProperty(
         Name,
         Index,
         LogAttribute,
-        ScopedFunctionAttribute,
         RequiredVersions
     )
     {

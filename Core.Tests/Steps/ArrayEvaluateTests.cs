@@ -29,17 +29,19 @@ public partial class ArrayEvaluateTests : StepTestBase<ArrayEvaluate<int>, Array
                         new ArrayMap<int>()
                         {
                             Array = Array(1, 2, 3),
-                            Function = new Product()
-                            {
-                                Terms = new ArrayNew<int>()
+                            Function = new LambdaFunction<int, int>(
+                                new VariableName("number"),
+                                new Product()
                                 {
-                                    Elements = new List<IStep<int>>()
+                                    Terms = new ArrayNew<int>()
                                     {
-                                        Constant(2), GetVariable<int>("number")
+                                        Elements = new List<IStep<int>>()
+                                        {
+                                            Constant(2), GetVariable<int>("number")
+                                        }
                                     }
                                 }
-                            },
-                            Variable = new VariableName("number")
+                            )
                         }
                 },
                 new EagerArray<int>(new[] { 2, 4, 6 })
@@ -60,18 +62,20 @@ public partial class ArrayEvaluateTests : StepTestBase<ArrayEvaluate<int>, Array
                                     new ArrayMap<int>()
                                     {
                                         Array = Array(1, 2, 3),
-                                        Function = new Product()
-                                        {
-                                            Terms = new ArrayNew<int>()
+                                        Function = new LambdaFunction<int, int>(
+                                            new VariableName("number"),
+                                            new Product()
                                             {
-                                                Elements = new List<IStep<int>>()
+                                                Terms = new ArrayNew<int>()
                                                 {
-                                                    Constant(1),
-                                                    GetVariable<int>("number")
+                                                    Elements = new List<IStep<int>>()
+                                                    {
+                                                        Constant(1),
+                                                        GetVariable<int>("number")
+                                                    }
                                                 }
                                             }
-                                        },
-                                        Variable = new VariableName("number")
+                                        )
                                     }
                             },
                         },
