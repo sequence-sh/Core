@@ -232,7 +232,7 @@ public abstract record ConstantFreezableBase<T>
     /// <inheritdoc />
     public Result<IReadOnlyCollection<(VariableName variableName, TypeReference typeReference)>,
             IError>
-        GetVariablesSet(CallerMetadata callerMetadata, TypeResolver typeResolver)
+        GetVariablesUsed(CallerMetadata callerMetadata, TypeResolver typeResolver)
     {
         return new List<(VariableName variableName, TypeReference)>();
     }

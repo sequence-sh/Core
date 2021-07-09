@@ -103,7 +103,7 @@ public sealed class ArrayNew<T> : CompoundStep<Array<T>>, IArrayNewStep
         public override Type StepType => typeof(ArrayNew<>);
 
         /// <inheritdoc />
-        public override string OutputTypeExplanation => "Array<T>";
+        public override string OutputTypeExplanation => "Array of T";
 
         /// <inheritdoc />
         protected override TypeReference

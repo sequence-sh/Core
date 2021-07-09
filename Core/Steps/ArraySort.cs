@@ -117,7 +117,7 @@ public sealed class ArraySort<T> : CompoundStep<Array<T>>
             new TypeReference.Array(memberTypeReference);
 
         /// <inheritdoc />
-        public override string OutputTypeExplanation => "Array<T>";
+        public override string OutputTypeExplanation => "Array of T";
 
         /// <inheritdoc />
         protected override Result<TypeReference, IErrorBuilder> GetExpectedArrayTypeReference(

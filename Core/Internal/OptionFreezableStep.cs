@@ -73,13 +73,13 @@ public sealed class OptionFreezableStep : IFreezableStep
     /// <inheritdoc />
     public Result<IReadOnlyCollection<(VariableName variableName, TypeReference typeReference)>,
             IError>
-        GetVariablesSet(CallerMetadata callerMetadata, TypeResolver typeResolver)
+        GetVariablesUsed(CallerMetadata callerMetadata, TypeResolver typeResolver)
     {
         IError? error = null;
 
         foreach (var freezableStep in Options)
         {
-            var r = freezableStep.GetVariablesSet(callerMetadata, typeResolver);
+            var r = freezableStep.GetVariablesUsed(callerMetadata, typeResolver);
 
             if (r.IsSuccess)
             {

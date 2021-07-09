@@ -78,7 +78,7 @@ public sealed class ArrayGroupBy<T> : CompoundStep<Array<Entity>>
         public override Type StepType => typeof(ArrayGroupBy<>);
 
         /// <inheritdoc />
-        public override string OutputTypeExplanation => "Array<Entity>";
+        public override string OutputTypeExplanation => "Array of Entity";
 
         /// <inheritdoc />
         protected override TypeReference GetOutputTypeReference(TypeReference memberTypeReference)

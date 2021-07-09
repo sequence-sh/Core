@@ -110,7 +110,7 @@ public sealed class ArrayConcat<T> : CompoundStep<Array<T>>
         }
 
         /// <inheritdoc />
-        public override string OutputTypeExplanation => "Array<T>";
+        public override string OutputTypeExplanation => "Array of T";
     }
 }
 

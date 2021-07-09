@@ -28,7 +28,7 @@ public abstract class StepFactory : IStepFactory
         TypeResolver typeResolver);
 
     /// <inheritdoc />
-    public virtual IEnumerable<(VariableName variableName, TypeReference type)> GetVariablesSet(
+    public virtual IEnumerable<(VariableName variableName, TypeReference type)> GetVariablesUsed(
         CallerMetadata callerMetadata,
         FreezableStepData freezableStepData,
         TypeResolver typeResolver)

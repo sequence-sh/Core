@@ -111,7 +111,7 @@ public sealed class FreezableStepData
     /// Gets the variables set by steps in this FreezableStepData.
     /// </summary>
     public Result<IReadOnlyCollection<(VariableName variableName, TypeReference)>, IError>
-        GetVariablesSet(string stepName, CallerMetadata callerMetadata, TypeResolver typeResolver)
+        GetVariablesUsed(string stepName, CallerMetadata callerMetadata, TypeResolver typeResolver)
     {
         var variables   = new List<(VariableName variableName, TypeReference)>();
         var errors      = new List<IError>();
@@ -204,7 +204,7 @@ public sealed class FreezableStepData
 
             var childCallerMetadata = new CallerMetadata(stepName, stepParameterReference.Name, tr);
             //change caller metadata
-            var variablesSet = freezableStep.GetVariablesSet(childCallerMetadata, typeResolver);
+            var variablesSet = freezableStep.GetVariablesUsed(childCallerMetadata, typeResolver);
 
             if (variablesSet.IsFailure)
                 errors.Add(variablesSet.Error);
@@ -236,7 +236,7 @@ public sealed class FreezableStepData
             var childCallerMetadata = new CallerMetadata(stepName, stepParameterReference.Name, tr);
 
             var vn           = lambdaVariable ?? VariableName.Item;
-            var variablesSet = freezableStep.GetVariablesSet(childCallerMetadata, typeResolver);
+            var variablesSet = freezableStep.GetVariablesUsed(childCallerMetadata, typeResolver);
 
             if (variablesSet.IsFailure)
                 errors.Add(variablesSet.Error);

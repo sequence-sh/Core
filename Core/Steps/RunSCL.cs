@@ -110,7 +110,7 @@ public sealed class RunSCL : CompoundStep<Unit>
 
         /// <inheritdoc />
         public override IEnumerable<(VariableName variableName, TypeReference type)>
-            GetVariablesSet(
+            GetVariablesUsed(
                 CallerMetadata callerMetadata,
                 FreezableStepData freezableStepData,
                 TypeResolver typeResolver)
@@ -143,7 +143,7 @@ public sealed class RunSCL : CompoundStep<Unit>
                 }
             }
 
-            foreach (var pair in base.GetVariablesSet(
+            foreach (var pair in base.GetVariablesUsed(
                 callerMetadata,
                 freezableStepData,
                 typeResolver

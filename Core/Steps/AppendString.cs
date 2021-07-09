@@ -77,7 +77,7 @@ public sealed class AppendString : CompoundStep<Unit>
 
         /// <inheritdoc />
         public override IEnumerable<(VariableName variableName, TypeReference type)>
-            GetVariablesSet(
+            GetVariablesUsed(
                 CallerMetadata callerMetadata,
                 FreezableStepData freezableStepData,
                 TypeResolver typeResolver)

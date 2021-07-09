@@ -98,7 +98,7 @@ public sealed class GetVariable<T> : CompoundStep<T>
 
         /// <inheritdoc />
         public override IEnumerable<(VariableName variableName, TypeReference type)>
-            GetVariablesSet(
+            GetVariablesUsed(
                 CallerMetadata callerMetadata,
                 FreezableStepData freezableStepData,
                 TypeResolver typeResolver)

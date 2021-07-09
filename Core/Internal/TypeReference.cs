@@ -267,7 +267,8 @@ public abstract record TypeReference
         }
 
         /// <inheritdoc />
-        public override string Name => $"Array<{MemberType.Name}>"; //TODO: Change to Array of Name
+        public override string Name =>
+            $"Array of {MemberType.Name}"; //TODO: Change to Array of Name
 
         /// <param name="typeResolver"></param>
         /// <inheritdoc />

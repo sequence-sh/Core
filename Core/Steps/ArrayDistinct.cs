@@ -124,7 +124,7 @@ public sealed class ArrayDistinct<T> : CompoundStep<Array<T>>
         public override Type StepType => typeof(ArrayDistinct<>);
 
         /// <inheritdoc />
-        public override string OutputTypeExplanation => "Array<T>";
+        public override string OutputTypeExplanation => "Array of T";
     }
 }
 

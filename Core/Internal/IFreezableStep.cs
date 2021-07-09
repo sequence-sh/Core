@@ -27,11 +27,11 @@ public interface IFreezableStep : IEquatable<IFreezableStep>
     Result<IStep, IError> TryFreeze(CallerMetadata callerMetadata, TypeResolver typeResolver);
 
     /// <summary>
-    /// Gets the variables set by this step and its children and the types of those variables if they can be resolved at this time.
+    /// Gets the variables used by this step and its children and the types of those variables if they can be resolved at this time.
     /// Returns an error if the type name cannot be resolved
     /// </summary>
     Result<IReadOnlyCollection<(VariableName variableName, TypeReference typeReference)>, IError>
-        GetVariablesSet(
+        GetVariablesUsed(
             CallerMetadata callerMetadata,
             TypeResolver typeResolver);
 

@@ -114,7 +114,7 @@ public sealed class TypeResolver
             var unresolvableVariableNames = new List<VariableName>();
             var errors                    = new List<IError>();
 
-            var result = topLevelStep.GetVariablesSet(callerMetadata, this);
+            var result = topLevelStep.GetVariablesUsed(callerMetadata, this);
 
             if (result.IsFailure)
                 return result.ConvertFailure<Unit>();
