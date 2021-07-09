@@ -109,20 +109,19 @@ public partial class ForTests : StepTestBase<For, Unit>
         get
         {
             yield return new ErrorCase(
-                        "ValueIf increment 0",
-                        new For
-                        {
-                            Action = new LambdaFunction<int, Unit>(
-                                null,
-                                new Log<int> { Value = GetVariable<int>(VariableName.Item) }
-                            ),
-                            From      = Constant(1),
-                            To        = Constant(3),
-                            Increment = Constant(0)
-                        },
-                        new ErrorBuilder(ErrorCode.DivideByZero)
-                    )
-                    .WithExpectedFinalState(VariableName.Item.Name, 1)
+                    "ValueIf increment 0",
+                    new For
+                    {
+                        Action = new LambdaFunction<int, Unit>(
+                            null,
+                            new Log<int> { Value = GetVariable<int>(VariableName.Item) }
+                        ),
+                        From      = Constant(1),
+                        To        = Constant(3),
+                        Increment = Constant(0)
+                    },
+                    new ErrorBuilder(ErrorCode.DivideByZero)
+                )
                 ;
 
             foreach (var errorCase in base.ErrorCases)

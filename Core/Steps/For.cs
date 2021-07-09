@@ -1,4 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
@@ -65,26 +67,26 @@ public sealed class For : CompoundStep<Unit>
         if (increment.IsFailure)
             return increment.ConvertFailure<Unit>();
 
-        var currentValue = from.Value;
-
-        //Todo usae scoped state monad
-
-        var setResult = await stateMonad.SetVariableAsync(variableName, currentValue, false, this);
-
-        if (setResult.IsFailure)
-            return setResult.ConvertFailure<Unit>();
-
         if (increment.Value == 0)
             return new SingleError(new ErrorLocation(this), ErrorCode.DivideByZero);
 
+        var currentValue = from.Value;
+
+        var scopedStateMonad = new ScopedStateMonad(
+            stateMonad,
+            stateMonad.GetState().ToImmutableDictionary(),
+            variableName,
+            new KeyValuePair<VariableName, object>(variableName, currentValue)
+        );
+
         while (increment.Value > 0 ? currentValue <= to.Value : currentValue >= to.Value)
         {
-            var r = await Action.StepTyped.Run(stateMonad, cancellationToken);
+            var r = await Action.StepTyped.Run(scopedStateMonad, cancellationToken);
 
             if (r.IsFailure)
                 return r;
 
-            var currentValueResult = stateMonad.GetVariable<int>(variableName)
+            var currentValueResult = scopedStateMonad.GetVariable<int>(variableName)
                 .MapError(e => e.WithLocation(this));
 
             if (currentValueResult.IsFailure)
@@ -93,7 +95,7 @@ public sealed class For : CompoundStep<Unit>
             currentValue =  currentValueResult.Value;
             currentValue += increment.Value;
 
-            var setResult2 = await stateMonad.SetVariableAsync(
+            var setResult2 = await scopedStateMonad.SetVariableAsync(
                 variableName,
                 currentValue,
                 false,
@@ -101,10 +103,8 @@ public sealed class For : CompoundStep<Unit>
             );
 
             if (setResult2.IsFailure)
-                return setResult.ConvertFailure<Unit>();
+                return setResult2.ConvertFailure<Unit>();
         }
-
-        await stateMonad.RemoveVariableAsync(VariableName.Item, false, this);
 
         return Unit.Default;
     }
