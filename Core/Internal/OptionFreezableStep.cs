@@ -15,7 +15,7 @@ public sealed class OptionFreezableStep : IFreezableStep
     /// <summary>
     /// Create a new OptionFreezableStep
     /// </summary>
-    public OptionFreezableStep(IReadOnlyList<IFreezableStep> options, TextLocation? textLocation)
+    public OptionFreezableStep(IReadOnlyList<IFreezableStep> options, TextLocation textLocation)
     {
         Options      = options;
         TextLocation = textLocation;
@@ -27,7 +27,7 @@ public sealed class OptionFreezableStep : IFreezableStep
     public IReadOnlyList<IFreezableStep> Options { get; }
 
     /// <inheritdoc />
-    public TextLocation? TextLocation { get; }
+    public TextLocation TextLocation { get; }
 
     /// <inheritdoc />
     public string StepName => string.Join(" or ", Options);
@@ -71,7 +71,8 @@ public sealed class OptionFreezableStep : IFreezableStep
     }
 
     /// <inheritdoc />
-    public Result<IReadOnlyCollection<(VariableName variableName, TypeReference)>, IError>
+    public Result<IReadOnlyCollection<(VariableName variableName, TypeReference typeReference)>,
+            IError>
         GetVariablesSet(CallerMetadata callerMetadata, TypeResolver typeResolver)
     {
         IError? error = null;
@@ -81,7 +82,24 @@ public sealed class OptionFreezableStep : IFreezableStep
             var r = freezableStep.GetVariablesSet(callerMetadata, typeResolver);
 
             if (r.IsSuccess)
-                return r;
+            {
+                var canAdd = true;
+
+                foreach (var (variableName, typeReference) in r.Value)
+                {
+                    var canAddResult = typeResolver.CanAddType(variableName, typeReference);
+
+                    if (canAddResult.IsFailure)
+                    {
+                        canAdd = false;
+                        error  = canAddResult.Error.WithLocation(this);
+                    }
+                }
+
+                if (canAdd)
+                    return r;
+            }
+
             else
                 error = r.Error;
         }

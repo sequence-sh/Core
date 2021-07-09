@@ -10,7 +10,7 @@ namespace Reductech.EDR.Core.Internal
 /// <summary>
 /// Any member of a step.
 /// </summary>
-public abstract record FreezableStepProperty(TextLocation? Location)
+public abstract record FreezableStepProperty(TextLocation Location)
 {
     /// <summary>
     /// The member type of this Step Member.
@@ -30,7 +30,7 @@ public abstract record FreezableStepProperty(TextLocation? Location)
                     "Value",
                     MemberType.ToString()
                 )
-                .WithLocation(Location ?? ErrorLocation.EmptyLocation)
+                .WithLocation(Location)
         );
     }
 
@@ -47,7 +47,7 @@ public abstract record FreezableStepProperty(TextLocation? Location)
                     "Value",
                     MemberType.ToString()
                 )
-                .WithLocation(Location ?? ErrorLocation.EmptyLocation)
+                .WithLocation(Location)
         );
     }
 
@@ -69,7 +69,7 @@ public abstract record FreezableStepProperty(TextLocation? Location)
     /// A variable name member
     /// </summary>
     public sealed record Variable
-        (VariableName VName, TextLocation? Location) : FreezableStepProperty(Location)
+        (VariableName VName, TextLocation Location) : FreezableStepProperty(Location)
     {
         /// <inheritdoc />
         public override Result<VariableName, IError> AsVariableName(string parameterName)
@@ -93,7 +93,7 @@ public abstract record FreezableStepProperty(TextLocation? Location)
     public sealed record Lambda(
         VariableName? VName,
         IFreezableStep FreezableStep,
-        TextLocation? Location) : FreezableStepProperty(Location)
+        TextLocation Location) : FreezableStepProperty(Location)
     {
         /// <inheritdoc />
         public override MemberType MemberType => MemberType.Lambda;
@@ -120,7 +120,7 @@ public abstract record FreezableStepProperty(TextLocation? Location)
     /// A step member
     /// </summary>
     public sealed record Step
-        (IFreezableStep FreezableStep, TextLocation? Location) : FreezableStepProperty(Location)
+        (IFreezableStep FreezableStep, TextLocation Location) : FreezableStepProperty(Location)
     {
         /// <inheritdoc />
         public override MemberType MemberType => MemberType.Step;
@@ -136,7 +136,7 @@ public abstract record FreezableStepProperty(TextLocation? Location)
     /// A step list member
     /// </summary>
     public sealed record StepList
-        (ImmutableList<IFreezableStep> List, TextLocation? Location) : FreezableStepProperty(
+        (ImmutableList<IFreezableStep> List, TextLocation Location) : FreezableStepProperty(
             Location
         )
     {

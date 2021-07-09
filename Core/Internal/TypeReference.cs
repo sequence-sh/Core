@@ -13,6 +13,35 @@ namespace Reductech.EDR.Core.Internal
 public abstract record TypeReference
 {
     /// <summary>
+    /// Gets the array member type if available
+    /// </summary>
+    /// <param name="typeResolver"></param>
+    /// <returns></returns>
+    public abstract Result<TypeReference, IErrorBuilder> TryGetArrayMemberTypeReference(
+        TypeResolver typeResolver);
+
+    /// <summary>
+    /// Gets the type referred to by a reference.
+    /// </summary>
+    /// <param name="typeResolver"></param>
+    public abstract Result<Type, IErrorBuilder> TryGetType(TypeResolver typeResolver);
+
+    /// <summary>
+    /// Whether this allows the other type reference
+    /// </summary>
+    public abstract bool Allow(TypeReference other, TypeResolver? typeResolver);
+
+    /// <summary>
+    /// The name of this type
+    /// </summary>
+    public abstract string Name { get; }
+
+    /// <summary>
+    /// Is this unknown or a array of unknown
+    /// </summary>
+    public virtual bool IsUnknown => false;
+
+    /// <summary>
     /// The type could be any type
     /// </summary>
     public sealed record Any : TypeReference
@@ -57,7 +86,8 @@ public abstract record TypeReference
         /// <param name="typeResolver"></param>
         /// <inheritdoc />
         public override Result<TypeReference, IErrorBuilder> TryGetArrayMemberTypeReference(
-            TypeResolver typeResolver) => ErrorCode.CannotInferType.ToErrorBuilder();
+            TypeResolver typeResolver) =>
+            ErrorCode.CannotInferType.ToErrorBuilder($"{Type} is not an Array Type");
 
         /// <param name="typeResolver"></param>
         /// <inheritdoc />
@@ -160,7 +190,8 @@ public abstract record TypeReference
         /// <param name="typeResolver"></param>
         /// <inheritdoc />
         public override Result<TypeReference, IErrorBuilder> TryGetArrayMemberTypeReference(
-            TypeResolver typeResolver) => ErrorCode.CannotInferType.ToErrorBuilder();
+            TypeResolver typeResolver) =>
+            ErrorCode.CannotInferType.ToErrorBuilder($"Unit is not an Array Type");
 
         /// <param name="typeResolver"></param>
         /// <inheritdoc />
@@ -207,7 +238,8 @@ public abstract record TypeReference
         /// <param name="typeResolver"></param>
         /// <inheritdoc />
         public override Result<TypeReference, IErrorBuilder> TryGetArrayMemberTypeReference(
-            TypeResolver typeResolver) => ErrorCode.CannotInferType.ToErrorBuilder();
+            TypeResolver typeResolver) =>
+            ErrorCode.CannotInferType.ToErrorBuilder($"{EnumType.Name} is not an Array Type");
     }
 
     /// <summary>
@@ -235,7 +267,7 @@ public abstract record TypeReference
         }
 
         /// <inheritdoc />
-        public override string Name => $"Array<{MemberType.Name}>";
+        public override string Name => $"Array<{MemberType.Name}>"; //TODO: Change to Array of Name
 
         /// <param name="typeResolver"></param>
         /// <inheritdoc />
@@ -244,6 +276,9 @@ public abstract record TypeReference
         {
             return MemberType;
         }
+
+        /// <inheritdoc />
+        public override bool IsUnknown => MemberType.IsUnknown;
     }
 
     /// <summary>
@@ -278,7 +313,11 @@ public abstract record TypeReference
                     return typeof(double);
             }
 
-            return ErrorCode.CannotInferType.ToErrorBuilder();
+            var optionsString = string.Join(", ", Options.Distinct().Select(x => x.Name));
+
+            return ErrorCode.CannotInferType.ToErrorBuilder(
+                $"Cannot coerce {optionsString} to a single type"
+            );
         }
 
         /// <inheritdoc />
@@ -300,8 +339,11 @@ public abstract record TypeReference
             if (Options.Count == 1)
                 return Options.Single().TryGetArrayMemberTypeReference(typeResolver);
 
-            return ErrorCode.CannotInferType.ToErrorBuilder();
+            return ErrorCode.CannotInferType.ToErrorBuilder($"Option type is not an Array Type");
         }
+
+        /// <inheritdoc />
+        public override bool IsUnknown => Options.All(x => x.IsUnknown);
     }
 
     /// <summary>
@@ -378,7 +420,7 @@ public abstract record TypeReference
                     return tr.TryGetArrayMemberTypeReference(typeResolver);
             }
 
-            return ErrorCode.CannotInferType.ToErrorBuilder();
+            return ErrorCode.CannotInferType.ToErrorBuilder($"{VariableName} is not an Array Type");
         }
 
         /// <param name="typeResolver"></param>
@@ -399,7 +441,9 @@ public abstract record TypeReference
                     return tr.TryGetType(typeResolver);
             }
 
-            return ErrorCode.CannotInferType.ToErrorBuilder();
+            return ErrorCode.CannotInferType.ToErrorBuilder(
+                $"{VariableName} could not be inferred"
+            );
         }
 
         /// <inheritdoc />
@@ -440,7 +484,7 @@ public abstract record TypeReference
         /// <inheritdoc />
         public override Result<Type, IErrorBuilder> TryGetType(TypeResolver typeResolver)
         {
-            return ErrorCode.CannotInferType.ToErrorBuilder();
+            return ErrorCode.CannotInferType.ToErrorBuilder($"Unknown type");
         }
 
         /// <inheritdoc />
@@ -451,6 +495,9 @@ public abstract record TypeReference
 
         /// <inheritdoc />
         public override string Name => nameof(Unknown);
+
+        /// <inheritdoc />
+        public override bool IsUnknown => true;
     }
 
     /// <summary>
@@ -463,6 +510,12 @@ public abstract record TypeReference
             var nested = stepType.GenericTypeArguments[0];
             return Create(nested);
         }
+        else if (stepType.IsGenericType
+              && stepType.GetGenericTypeDefinition() == typeof(LambdaFunction<,>))
+        {
+            var nested = stepType.GenericTypeArguments[1];
+            return Create(nested);
+        }
         else if (stepType == typeof(IStep))
         {
             return Any.Instance;
@@ -470,7 +523,7 @@ public abstract record TypeReference
         else if (stepType == typeof(VariableName))
             return AutomaticVariable.Instance;
 
-        throw new Exception("Type was not a step type");
+        throw new Exception($"Type '{stepType}' was not a step type");
     }
 
     /// <summary>
@@ -513,30 +566,6 @@ public abstract record TypeReference
 
         return new Multiple(references);
     }
-
-    /// <summary>
-    /// Gets the array member type if available
-    /// </summary>
-    /// <param name="typeResolver"></param>
-    /// <returns></returns>
-    public abstract Result<TypeReference, IErrorBuilder> TryGetArrayMemberTypeReference(
-        TypeResolver typeResolver);
-
-    /// <summary>
-    /// Gets the type referred to by a reference.
-    /// </summary>
-    /// <param name="typeResolver"></param>
-    public abstract Result<Type, IErrorBuilder> TryGetType(TypeResolver typeResolver);
-
-    /// <summary>
-    /// Whether this allows the other type reference
-    /// </summary>
-    public abstract bool Allow(TypeReference other, TypeResolver? typeResolver);
-
-    /// <summary>
-    /// The name of this type
-    /// </summary>
-    public abstract string Name { get; }
 }
 
 }

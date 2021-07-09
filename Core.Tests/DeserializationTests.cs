@@ -453,6 +453,20 @@ Log 'Comments!'",
                 2,
                 3
             );
+
+            yield return new DeserializationTestInstance(
+                "Foreach (foo: [(bar:1), (bar:2), (bar:3)])['foo'] (log <item>['bar'])",
+                1,
+                2,
+                3
+            );
+
+            yield return new DeserializationTestInstance(
+                "Foreach (foo: [(bar:1), (bar:2), (bar:3)])['foo'] (<myVar> => log <myVar>['bar'])",
+                1,
+                2,
+                3
+            );
         }
     }
 

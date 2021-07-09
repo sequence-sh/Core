@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
@@ -70,7 +71,7 @@ public sealed class GetVariable<T> : CompoundStep<T>
 
             var expectedTypeReference = callerMetadata.ExpectedType;
 
-            if (expectedTypeReference != TypeReference.Unknown.Instance
+            if (!expectedTypeReference.IsUnknown
              && typeResolver.Dictionary.TryGetValue(variableName.Value, out var tr))
             {
                 if (tr.Allow(expectedTypeReference, typeResolver))
@@ -93,6 +94,24 @@ public sealed class GetVariable<T> : CompoundStep<T>
             }
 
             return new TypeReference.Variable(variableName.Value);
+        }
+
+        /// <inheritdoc />
+        public override IEnumerable<(VariableName variableName, TypeReference type)>
+            GetVariablesSet(
+                CallerMetadata callerMetadata,
+                FreezableStepData freezableStepData,
+                TypeResolver typeResolver)
+        {
+            var vn = freezableStepData.TryGetVariableName(
+                nameof(GetVariable<object>.Variable),
+                StepType
+            );
+
+            if (vn.IsFailure)
+                yield break;
+
+            yield return (vn.Value, callerMetadata.ExpectedType);
         }
 
         /// <inheritdoc />

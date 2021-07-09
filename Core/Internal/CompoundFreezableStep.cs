@@ -11,12 +11,10 @@ namespace Reductech.EDR.Core.Internal
 /// <summary>
 /// A step that is not a constant or a variable reference.
 /// </summary>
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 public sealed record CompoundFreezableStep(
-        string StepName,
-        FreezableStepData FreezableStepData,
-        TextLocation? TextLocation) : IFreezableStep
-    #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
+    string StepName,
+    FreezableStepData FreezableStepData,
+    TextLocation TextLocation) : IFreezableStep
 {
     /// <summary>
     /// Try to get this step factory from the store.
@@ -44,7 +42,8 @@ public sealed record CompoundFreezableStep(
     }
 
     /// <inheritdoc />
-    public Result<IReadOnlyCollection<(VariableName variableName, TypeReference)>, IError>
+    public Result<IReadOnlyCollection<(VariableName variableName, TypeReference typeReference)>,
+            IError>
         GetVariablesSet(CallerMetadata callerMetadata, TypeResolver typeResolver)
     {
         var stepFactory = TryGetStepFactory(typeResolver.StepFactoryStore);
@@ -59,11 +58,11 @@ public sealed record CompoundFreezableStep(
         if (dataResult.IsFailure)
             return dataResult;
 
-        return dataResult.Value
-            .Concat(
-                stepFactory.Value.GetVariablesSet(callerMetadata, FreezableStepData, typeResolver)
-            )
+        var sfResult = stepFactory.Value
+            .GetVariablesSet(callerMetadata, FreezableStepData, typeResolver)
             .ToList();
+
+        return dataResult.Value.Concat(sfResult).ToList();
     }
 
     /// <inheritdoc />

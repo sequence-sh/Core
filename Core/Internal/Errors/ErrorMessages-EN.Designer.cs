@@ -115,7 +115,7 @@ namespace Reductech.EDR.Core.Internal.Errors {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Could not infer type.
+        ///   Looks up a localized string similar to Could not infer type - {0}.
         /// </summary>
         internal static string CannotInferType {
             get {

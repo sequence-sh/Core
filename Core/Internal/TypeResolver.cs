@@ -69,7 +69,7 @@ public sealed class TypeResolver
 
         if (r1.IsFailure)
             return r1.ConvertFailure<TypeResolver>()
-                .MapError(x => x.WithLocation(lambda.Location ?? ErrorLocation.EmptyLocation));
+                .MapError(x => x.WithLocation(lambda.Location));
 
         var r2 = newTypeResolver.TryAddTypeHierarchy(scopedCallerMetadata, lambda.FreezableStep);
 
@@ -121,19 +121,23 @@ public sealed class TypeResolver
 
             foreach (var (variableName, typeReference) in result.Value)
             {
-                if (typeReference is TypeReference.Unknown)
+                if (typeReference.IsUnknown)
                     unresolvableVariableNames.Add(variableName);
                 else
                 {
                     var addResult = TryAddType(variableName, typeReference);
 
                     if (addResult.IsFailure)
-                        errors.Add(addResult.Error.WithLocation(ErrorLocation.EmptyLocation));
+                        errors.Add(addResult.Error.WithLocation(topLevelStep.TextLocation));
                 }
             }
 
             if (errors.Any())
                 return Result.Failure<Unit, IError>(ErrorList.Combine(errors));
+
+            unresolvableVariableNames.RemoveAll(
+                Dictionary.ContainsKey
+            ); //remove all unresolvable variables that we have resolved some other way
 
             if (!unresolvableVariableNames.Any())
                 break; //We've resolved everything. Yey!
@@ -149,11 +153,8 @@ public sealed class TypeResolver
                         unresolvableVariableNames.Distinct()
                             .Select(
                                 x =>
-                                    new SingleError(
-                                        ErrorLocation.EmptyLocation,
-                                        ErrorCode.CouldNotResolveVariable,
-                                        x.Name
-                                    )
+                                    ErrorCode.CouldNotResolveVariable.ToErrorBuilder(x.Name)
+                                        .WithLocationSingle(ErrorLocation.EmptyLocation)
                             )
                     );
 
@@ -171,21 +172,49 @@ public sealed class TypeResolver
         VariableName variable,
         TypeReference typeReference)
     {
+        var can = CanAddType(variable, typeReference);
+
+        if (can.IsSuccess)
+        {
+            if (can.Value)
+                MyDictionary[variable] = typeReference;
+
+            return Unit.Default;
+        }
+
+        return can.ConvertFailure<Unit>();
+    }
+
+    /// <summary>
+    /// Determines whether a particular variable can be added to the type resolver.
+    /// Returns true if it should be added, false if it is already present
+    /// </summary>
+    public Result<bool, IErrorBuilder> CanAddType(
+        VariableName variable,
+        TypeReference typeReference)
+    {
         var actualType = typeReference.TryGetType(this);
 
         if (actualType.IsFailure)
-            return actualType.ConvertFailure<Unit>();
+            return actualType.ConvertFailure<bool>();
 
         if (MyDictionary.TryGetValue(variable, out var previous))
         {
-            if (previous.Equals(typeReference))
-                return Unit.Default;
+            if (previous.Equals(typeReference)
+             || typeReference.Allow(previous, this)) //The variable already had this type reference
+                return false;
 
-            return ErrorCode.WrongVariableType.ToErrorBuilder(variable.Name, typeReference.Name);
+            if (!previous.Allow(
+                typeReference,
+                this
+            ))
+                return ErrorCode.WrongVariableType.ToErrorBuilder(
+                    variable.Name,
+                    typeReference.Name
+                );
         }
 
-        MyDictionary.Add(variable, typeReference);
-        return Unit.Default;
+        return true;
     }
 
     /// <summary>

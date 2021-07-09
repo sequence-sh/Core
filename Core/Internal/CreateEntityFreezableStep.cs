@@ -21,7 +21,7 @@ public record CreateEntityFreezableStep(FreezableEntityData FreezableEntityData)
     public string StepName => "Create Entity";
 
     /// <inheritdoc />
-    public TextLocation? TextLocation => FreezableEntityData.Location;
+    public TextLocation TextLocation => FreezableEntityData.Location;
 
     /// <inheritdoc />
     public Result<IStep, IError> TryFreeze(CallerMetadata callerMetadata, TypeResolver typeResolver)
@@ -66,7 +66,8 @@ public record CreateEntityFreezableStep(FreezableEntityData FreezableEntityData)
     }
 
     /// <inheritdoc />
-    public Result<IReadOnlyCollection<(VariableName variableName, TypeReference)>, IError>
+    public Result<IReadOnlyCollection<(VariableName variableName, TypeReference typeReference)>,
+            IError>
         GetVariablesSet(CallerMetadata callerMetadata, TypeResolver typeResolver)
     {
         return FreezableEntityData.GetVariablesSet(callerMetadata, typeResolver);

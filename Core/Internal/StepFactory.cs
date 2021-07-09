@@ -234,7 +234,7 @@ public abstract class StepFactory : IStepFactory
         PropertyInfo propertyInfo,
         ICompoundStep parentStep,
         VariableName variableName,
-        TextLocation? stepMemberLocation,
+        TextLocation stepMemberLocation,
         TypeResolver typeResolver)
     {
         if (propertyInfo.PropertyType.IsInstanceOfType(variableName))
@@ -294,7 +294,7 @@ public abstract class StepFactory : IStepFactory
         catch (Exception e) //I'm nervous this might happen
         {
             var error = ErrorCode.Unknown.ToErrorBuilder(e)
-                .WithLocationSingle(lambda.Location ?? ErrorLocation.EmptyLocation);
+                .WithLocationSingle(lambda.Location);
 
             return error;
         }

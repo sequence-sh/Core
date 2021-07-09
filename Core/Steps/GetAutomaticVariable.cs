@@ -56,6 +56,16 @@ public sealed class GetAutomaticVariable<T> : CompoundStep<T>
             GetOutputTypeReference(TypeReference memberTypeReference) => memberTypeReference;
 
         /// <inheritdoc />
+        public override IEnumerable<(VariableName variableName, TypeReference type)>
+            GetVariablesSet(
+                CallerMetadata callerMetadata,
+                FreezableStepData freezableStepData,
+                TypeResolver typeResolver)
+        {
+            yield return (VariableName.Item, callerMetadata.ExpectedType);
+        }
+
+        /// <inheritdoc />
         protected override Result<TypeReference, IError> GetGenericTypeParameter(
             CallerMetadata callerMetadata,
             FreezableStepData freezableStepData,
@@ -74,7 +84,7 @@ public sealed class GetAutomaticVariable<T> : CompoundStep<T>
 
             var expectedTypeReference = callerMetadata.ExpectedType;
 
-            if (expectedTypeReference != TypeReference.Unknown.Instance
+            if (!expectedTypeReference.IsUnknown
              && typeResolver.Dictionary.TryGetValue(avr.Value, out var tr))
             {
                 if (tr.Allow(expectedTypeReference, typeResolver))

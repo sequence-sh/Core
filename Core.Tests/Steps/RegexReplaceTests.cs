@@ -22,7 +22,7 @@ public partial class RegexReplaceTests : StepTestBase<RegexReplace, StringStream
                     Pattern    = Constant(@"\d+"),
                     IgnoreCase = Constant(false),
                     Function = new LambdaFunction<StringStream, StringStream>(
-                        null,
+                        VariableName.Item,
                         new StringJoin()
                         {
                             Strings = new ArrayNew<StringStream>
@@ -48,7 +48,7 @@ public partial class RegexReplaceTests : StepTestBase<RegexReplace, StringStream
                     Pattern    = Constant(@"\d+"),
                     IgnoreCase = Constant(false),
                     Function = new LambdaFunction<StringStream, StringStream>(
-                        null,
+                        VariableName.Item,
                         new StringJoin()
                         {
                             Strings = new ArrayNew<StringStream>
@@ -74,7 +74,7 @@ public partial class RegexReplaceTests : StepTestBase<RegexReplace, StringStream
                     Pattern    = Constant(@"\d+"),
                     IgnoreCase = Constant(false),
                     Function = new LambdaFunction<StringStream, StringStream>(
-                        null,
+                        VariableName.Item,
                         new StringJoin()
                         {
                             Strings = new ArrayNew<StringStream>

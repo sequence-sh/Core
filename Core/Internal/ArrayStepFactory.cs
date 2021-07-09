@@ -1,6 +1,7 @@
 ﻿using System;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Internal.Errors;
+using Reductech.EDR.Core.Util;
 
 namespace Reductech.EDR.Core.Internal
 {
@@ -58,21 +59,24 @@ public abstract class ArrayStepFactory : GenericStepFactory
         if (outputTypeReference.IsFailure)
             return outputTypeReference.ConvertFailure<TypeReference>();
 
-        var arrayMemberType = outputTypeReference.Value
+        var arrayMemberTypeResult = outputTypeReference.Value
             .TryGetArrayMemberTypeReference(typeResolver)
             .MapError(e => e.WithLocation(freezableStepData));
 
+        TypeReference arrayMemberType =
+            arrayMemberTypeResult.ToMaybe().Unwrap(TypeReference.Unknown.Instance);
+
         if (LambdaPropertyName is null)
-            return arrayMemberType.Value;
+            return arrayMemberType;
 
         var lambda = freezableStepData.TryGetLambda(LambdaPropertyName, StepType);
 
         if (lambda.IsFailure)
-            return lambda.ConvertFailure<TypeReference>();
+            return arrayMemberType; //lambda is optional
 
         var nestedTypeResolver = typeResolver.TryCloneWithScopedLambda(
             lambda.Value,
-            arrayMemberType.Value,
+            arrayMemberType,
             callerMetadata
         );
 

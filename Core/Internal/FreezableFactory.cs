@@ -23,7 +23,7 @@ public static class FreezableFactory
     public static IFreezableStep CreateFreezableArrayAccess(
         IFreezableStep entityOrArray,
         IFreezableStep indexer,
-        TextLocation? location)
+        TextLocation location)
     {
         var entityGetValueDict = new StepParameterDict
         {
@@ -74,7 +74,7 @@ public static class FreezableFactory
     /// </summary>
     public static IFreezableStep CreateFreezableInterpolatedString(
         IEnumerable<IFreezableStep> steps,
-        TextLocation? location)
+        TextLocation location)
     {
         var dict = new StepParameterDict
         {
@@ -99,7 +99,7 @@ public static class FreezableFactory
     public static IFreezableStep CreateFreezableSequence(
         IEnumerable<IFreezableStep> steps,
         IFreezableStep finalStep,
-        TextLocation? location)
+        TextLocation location)
     {
         var dict = new StepParameterDict
         {
@@ -127,7 +127,7 @@ public static class FreezableFactory
     /// </summary>
     public static IFreezableStep CreateFreezableGetVariable(
         VariableName variableName,
-        TextLocation? location)
+        TextLocation location)
     {
         var dict = new StepParameterDict
         {
@@ -199,7 +199,7 @@ public static class FreezableFactory
     /// </summary>
     public static IFreezableStep CreateFreezableList(
         ImmutableList<IFreezableStep> elements,
-        TextLocation? location)
+        TextLocation location)
     {
         var dict = new StepParameterDict
         {

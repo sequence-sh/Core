@@ -97,13 +97,13 @@ public partial class DeserializationErrorTests
             );
 
             yield return new DeserializationErrorCase(
-                "Foreach ['one', 'two'] (Print (<Num> + 1)) <Num>",
+                "Foreach ['one', 'two'] (Print (<Num> => <Num> + 1)) ",
                 ("StringJoin expected String for parameter Strings but Step has type Integer",
                  "1 - Line: 1, Col: 39, Idx: 39 - Line: 1, Col: 39, Idx: 39 Text: 1")
             );
 
             yield return new DeserializationErrorCase(
-                "Foreach ['one', 'two') (Print <Num>) <Num>", //The ) should be a ]
+                "Foreach ['one', 'two') (<Num> => Print <Num>) ", //The ) should be a ]
                 (
                     @"Syntax Error: extraneous input ')' expecting {'(', '[', ']', ',', AUTOMATICVARIABLE, VARIABLENAME, DATETIME, NUMBER, OPENISTRING, SIMPLEISTRING, DOUBLEQUOTEDSTRING, SINGLEQUOTEDSTRING, TRUE, FALSE, NAME}",
                     @"Line: 1, Col: 21, Idx: 21 - Line: 1, Col: 21, Idx: 21 Text: )"),
@@ -119,9 +119,9 @@ public partial class DeserializationErrorTests
             );
 
             yield return new DeserializationErrorCase(
-                "-<array> = [('Foo': 1), ('Foo': 2)]\r\n- StringIsEmpty <array>[0]",
+                "-<array> = [('Foo': 1), ('Foo': 2)]\r\n- StringIsEmpty <array>[0]", //TODO try to get both error messages
                 (
-                    "ElementAtIndex expected Array<String> for parameter Array but <array> has type Array<item>",
+                    "ElementAtIndex expected Array<String> for parameter Array but <array> has type Array<Entity>",
                     "GetVariable - Line: 2, Col: 16, Idx: 53 - Line: 2, Col: 22, Idx: 59 Text: <array>")
             );
 

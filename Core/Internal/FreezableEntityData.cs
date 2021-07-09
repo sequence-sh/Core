@@ -10,11 +10,9 @@ namespace Reductech.EDR.Core.Internal
 /// <summary>
 /// The data used by a Freezable Step.
 /// </summary>
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 public record FreezableEntityData(
-        IReadOnlyDictionary<EntityPropertyKey, FreezableStepProperty> EntityProperties,
-        TextLocation? Location)
-    #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
+    IReadOnlyDictionary<EntityPropertyKey, FreezableStepProperty> EntityProperties,
+    TextLocation Location)
 {
     /// <inheritdoc />
     public override string ToString()
