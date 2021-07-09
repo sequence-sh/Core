@@ -118,6 +118,9 @@ public sealed class ArrayDistinct<T> : CompoundStep<Array<T>>
         protected override string ArrayPropertyName => nameof(ArrayDistinct<object>.Array);
 
         /// <inheritdoc />
+        protected override string LambdaPropertyName => nameof(ArrayDistinct<object>.KeySelector);
+
+        /// <inheritdoc />
         public override Type StepType => typeof(ArrayDistinct<>);
 
         /// <inheritdoc />

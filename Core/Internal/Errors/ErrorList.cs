@@ -47,7 +47,7 @@ public class ErrorList : IError
     /// </summary>
     public static IError Combine(IEnumerable<IError> source)
     {
-        var errors = source.SelectMany(x => x.GetAllErrors()).ToList();
+        var errors = source.SelectMany(x => x.GetAllErrors()).Distinct().ToList();
 
         if (errors.Count == 1)
             return errors.Single();

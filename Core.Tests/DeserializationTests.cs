@@ -446,6 +446,13 @@ Log 'Comments!'",
 ",
                 "3 Elements"
             );
+
+            yield return new DeserializationTestInstance(
+                "Foreach (foo: [(bar:1), (bar:2), (bar:3)])['foo'] (log <>['bar'])",
+                1,
+                2,
+                3
+            );
         }
     }
 

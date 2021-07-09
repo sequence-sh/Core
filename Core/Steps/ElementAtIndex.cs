@@ -96,6 +96,9 @@ public sealed class ElementAtIndex<T> : CompoundStep<T>
 
         /// <inheritdoc />
         protected override string ArrayPropertyName => nameof(ElementAtIndex<object>.Array);
+
+        /// <inheritdoc />
+        protected override string? LambdaPropertyName => null;
     }
 }
 

@@ -267,12 +267,10 @@ public abstract class StepFactory : IStepFactory
             outputTypeReference
         );
 
-        var typeResolverResult = typeResolver.TryCloneWithScopedStep(
-            lambda.VName ?? VariableName.Item,
+        var typeResolverResult = typeResolver.TryCloneWithScopedLambda(
+            lambda,
             inputTypeReference,
-            callerMetadata,
-            lambda.FreezableStep,
-            lambda.Location ?? ErrorLocation.EmptyLocation
+            callerMetadata
         );
 
         if (typeResolverResult.IsFailure)

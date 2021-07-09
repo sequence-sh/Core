@@ -103,6 +103,8 @@ public sealed class ArrayFilter<T> : CompoundStep<Array<T>>
 
         /// <inheritdoc />
         public override string OutputTypeExplanation => "Array<T>";
+
+        protected override string LambdaPropertyName => nameof(ArrayFilter<object>.Predicate);
     }
 }
 

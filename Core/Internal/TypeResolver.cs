@@ -55,23 +55,23 @@ public sealed class TypeResolver
     public StepFactoryStore StepFactoryStore { get; }
 
     /// <summary>
-    /// Try to Clone this context with additional set variables.
+    /// Try to Clone this context with additional set variables from a lambda function
     /// </summary>
-    public Result<TypeResolver, IError> TryCloneWithScopedStep(
-        VariableName vn,
+    public Result<TypeResolver, IError> TryCloneWithScopedLambda(
+        FreezableStepProperty.Lambda lambda,
         TypeReference typeReference,
-        CallerMetadata scopedCallerMetadata,
-        IFreezableStep scopedStep,
-        ErrorLocation errorLocation)
+        CallerMetadata scopedCallerMetadata)
     {
         var newTypeResolver = Copy();
+        var vn              = lambda.VariableNameOrItem;
 
         var r1 = newTypeResolver.TryAddType(vn, typeReference);
 
         if (r1.IsFailure)
-            return r1.ConvertFailure<TypeResolver>().MapError(x => x.WithLocation(errorLocation));
+            return r1.ConvertFailure<TypeResolver>()
+                .MapError(x => x.WithLocation(lambda.Location ?? ErrorLocation.EmptyLocation));
 
-        var r2 = newTypeResolver.TryAddTypeHierarchy(scopedCallerMetadata, scopedStep);
+        var r2 = newTypeResolver.TryAddTypeHierarchy(scopedCallerMetadata, lambda.FreezableStep);
 
         if (r2.IsFailure)
             return r2.ConvertFailure<TypeResolver>();

@@ -53,6 +53,8 @@ public class ArrayEvaluate<T> : CompoundStep<Array<T>>
         /// <inheritdoc />
         public override string OutputTypeExplanation => "Array<T>";
 
+        protected override string? LambdaPropertyName => null;
+
         /// <inheritdoc />
         protected override TypeReference GetOutputTypeReference(TypeReference memberTypeReference)
         {

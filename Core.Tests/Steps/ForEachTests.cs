@@ -66,7 +66,7 @@ public partial class ForEachTests : StepTestBase<ForEach<int>, Unit>
 
             yield return new DeserializeCase(
                 "Named Variable",
-                "Foreach [3,2,1] (Log Value: <Foo>) <Foo>",
+                "Foreach [3,2,1] (<Foo> => Log Value: <Foo>)",
                 Unit.Default,
                 "3",
                 "2",

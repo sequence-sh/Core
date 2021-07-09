@@ -14,7 +14,6 @@ public record LambdaFunction<TInput, TOutput> : LambdaFunction
     /// <summary>
     /// A lambda function
     /// </summary>
-    /// <typeparam name="T"></typeparam>
     public LambdaFunction(VariableName? variable, IStep<TOutput> stepTyped) : base(
         variable,
         stepTyped

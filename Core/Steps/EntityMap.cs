@@ -60,7 +60,7 @@ public sealed class EntityMap : CompoundStep<Array<Entity>>
     /// <summary>
     /// A function to get the mapped entity
     /// </summary>
-    [StepProperty(2)]
+    [FunctionProperty(2)]
     [Required]
     public LambdaFunction<Entity, Entity> Function { get; set; } = null!;
 

@@ -1,4 +1,5 @@
-﻿using CSharpFunctionalExtensions;
+﻿using System;
+using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Internal.Errors;
 
 namespace Reductech.EDR.Core.Internal
@@ -19,6 +20,11 @@ public abstract class ArrayStepFactory : GenericStepFactory
     /// The name of the array property
     /// </summary>
     protected abstract string ArrayPropertyName { get; }
+
+    /// <summary>
+    /// The name of the lambda property
+    /// </summary>
+    protected abstract string? LambdaPropertyName { get; }
 
     /// <inheritdoc />
     protected override Result<TypeReference, IError> GetGenericTypeParameter(
@@ -56,7 +62,29 @@ public abstract class ArrayStepFactory : GenericStepFactory
             .TryGetArrayMemberTypeReference(typeResolver)
             .MapError(e => e.WithLocation(freezableStepData));
 
-        return arrayMemberType;
+        if (LambdaPropertyName is null)
+            return arrayMemberType.Value;
+
+        var lambda = freezableStepData.TryGetLambda(LambdaPropertyName, StepType);
+
+        if (lambda.IsFailure)
+            return lambda.ConvertFailure<TypeReference>();
+
+        var nestedTypeResolver = typeResolver.TryCloneWithScopedLambda(
+            lambda.Value,
+            arrayMemberType.Value,
+            callerMetadata
+        );
+
+        if (nestedTypeResolver.IsFailure)
+            return nestedTypeResolver.ConvertFailure<TypeReference>();
+
+        var realType = nestedTypeResolver.Value.Dictionary[lambda.Value.VariableNameOrItem];
+
+        if (realType is null)
+            throw new Exception("Could not expected type from type resolver");
+
+        return realType;
     }
 }
 

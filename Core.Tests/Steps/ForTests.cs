@@ -94,7 +94,7 @@ public partial class ForTests : StepTestBase<For, Unit>
         {
             yield return new DeserializeCase(
                 "Increment 1",
-                "For Action: (Log Value: <i>) From: 1 To: 3 Increment: 1",
+                "For Action: (Log Value: <item>) From: 1 To: 3 Increment: 1",
                 Unit.Default,
                 "1",
                 "2",

@@ -99,6 +99,9 @@ public sealed class ForEach<T> : CompoundStep<Unit>
         protected override string ArrayPropertyName => nameof(ForEach<object>.Array);
 
         /// <inheritdoc />
+        protected override string LambdaPropertyName => nameof(ForEach<object>.Action);
+
+        /// <inheritdoc />
         public override string OutputTypeExplanation => nameof(Unit);
     }
 }

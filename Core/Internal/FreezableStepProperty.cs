@@ -57,6 +57,15 @@ public abstract record FreezableStepProperty(TextLocation? Location)
     public abstract IFreezableStep ConvertToStep();
 
     /// <summary>
+    /// Tries to convert this step member to a Lambda
+    /// </summary>
+    /// <returns></returns>
+    public virtual Lambda ConvertToLambda()
+    {
+        return new Lambda(null, ConvertToStep(), Location);
+    }
+
+    /// <summary>
     /// A variable name member
     /// </summary>
     public sealed record Variable
@@ -89,10 +98,21 @@ public abstract record FreezableStepProperty(TextLocation? Location)
         /// <inheritdoc />
         public override MemberType MemberType => MemberType.Lambda;
 
+        /// <summary>
+        /// The VariableName or Item
+        /// </summary>
+        public VariableName VariableNameOrItem => VName ?? VariableName.Item;
+
         /// <inheritdoc />
         public override IFreezableStep ConvertToStep()
         {
             return FreezableStep; //This may not be correct //TODO remove
+        }
+
+        /// <inheritdoc />
+        public override Lambda ConvertToLambda()
+        {
+            return this;
         }
     }
 

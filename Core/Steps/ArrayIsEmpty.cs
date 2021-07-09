@@ -70,6 +70,9 @@ public sealed class ArrayIsEmpty<T> : CompoundStep<bool>
                 .CheckAllows(TypeReference.Actual.Bool, null)
                 .Map(_ => new TypeReference.Array(TypeReference.Any.Instance) as TypeReference);
         }
+
+        /// <inheritdoc />
+        protected override string? LambdaPropertyName => null;
     }
 }
 

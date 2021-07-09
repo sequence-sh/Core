@@ -78,6 +78,18 @@ public sealed class FreezableStepData
         );
 
     /// <summary>
+    /// Gets a step argument
+    /// </summary>
+    public Result<FreezableStepProperty.Lambda, IError> TryGetLambda(
+        string propertyName,
+        Type stepType) => TryGetValue(
+        propertyName,
+        stepType,
+        x =>
+            Result.Success<FreezableStepProperty.Lambda, IError>(x.ConvertToLambda())
+    );
+
+    /// <summary>
     /// Gets a variable name.
     /// </summary>
     public Result<IReadOnlyList<IFreezableStep>, IError> TryGetStepList(
@@ -104,7 +116,7 @@ public sealed class FreezableStepData
         var variables = new List<(VariableName variableName, TypeReference)>();
         var errors    = new List<IError>();
 
-        foreach (var (key, freezableStepProperty) in StepProperties)
+        foreach (var (_, freezableStepProperty) in StepProperties)
         {
             switch (freezableStepProperty)
             {
@@ -147,16 +159,13 @@ public sealed class FreezableStepData
 
         void GetVariablesSetByLambda(IFreezableStep freezableStep, VariableName? lambdaVariable)
         {
+            var vn           = lambdaVariable ?? VariableName.Item;
             var variablesSet = freezableStep.GetVariablesSet(callerMetadata, typeResolver);
 
             if (variablesSet.IsFailure)
                 errors.Add(variablesSet.Error);
-            else if (lambdaVariable is not null)
-                variables.AddRange(
-                    variablesSet.Value.Where(x => x.variableName != lambdaVariable.Value)
-                );
             else
-                variables.AddRange(variablesSet.Value);
+                variables.AddRange(variablesSet.Value.Where(x => x.variableName != vn));
         }
     }
 }

@@ -103,6 +103,8 @@ public sealed class ArrayGroupBy<T> : CompoundStep<Array<Entity>>
 
         /// <inheritdoc />
         protected override string ArrayPropertyName => nameof(ArrayGroupBy<object>.Array);
+
+        protected override string LambdaPropertyName => nameof(ArrayGroupBy<object>.Function);
     }
 }
 

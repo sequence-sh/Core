@@ -146,13 +146,20 @@ public abstract partial class StepTestBase<TStep, TOutput>
             var errorMessage = property.Name + " Error";
 
             var step = CreateFailStepOfType(
-                property.PropertyType.GenericTypeArguments.First(),
+                property.PropertyType.GenericTypeArguments[1],
                 errorMessage
             );
 
-            var lambda = Activator.CreateInstance(property.PropertyType, null, step);
-
-            property.SetValue(instance, lambda);
+            try
+            {
+                var lambda = Activator.CreateInstance(property.PropertyType, null, step);
+                property.SetValue(instance, lambda);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
 
             return new SingleError(
                 ErrorLocation.EmptyLocation,

@@ -100,6 +100,8 @@ public sealed class ArrayMap<T> : CompoundStep<Array<T>>
 
         /// <inheritdoc />
         public override string OutputTypeExplanation => "Array<T>";
+
+        protected override string LambdaPropertyName => nameof(ArrayMap<object>.Function);
     }
 }
 

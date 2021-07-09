@@ -39,7 +39,7 @@ public sealed class For : CompoundStep<Unit>
     /// <summary>
     /// The action to perform repeatedly.
     /// </summary>
-    [StepProperty(4)]
+    [FunctionProperty(4)]
     [Required]
     public LambdaFunction<int, Unit> Action { get; set; } = null!;
 

@@ -30,7 +30,7 @@ public sealed class ArraySort<T> : CompoundStep<Array<T>>
     /// A function that gets the key to sort by from the variable &lt;Entity&gt;
     /// To sort by multiple properties, concatenate several keys
     /// </summary>
-    [StepProperty(2)]
+    [FunctionProperty(2)]
     [DefaultValueExplanation("Default Ordering")]
     public LambdaFunction<T, StringStream>? KeySelector { get; set; } = null!;
 
@@ -128,6 +128,8 @@ public sealed class ArraySort<T> : CompoundStep<Array<T>>
 
         /// <inheritdoc />
         protected override string ArrayPropertyName => nameof(ArraySort<object>.Array);
+
+        protected override string LambdaPropertyName => nameof(ArraySort<object>.KeySelector);
     }
 }
 
