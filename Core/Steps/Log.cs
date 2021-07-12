@@ -16,7 +16,7 @@ namespace Reductech.EDR.Core.Steps
 /// <summary>
 /// Write a value to the logs
 /// </summary>
-/// <typeparam name="T"></typeparam>
+[SCLExample("Log 'Hello'", "Writes 'Hello' to the console.", null, "Hello")]
 public sealed class Log<T> : CompoundStep<Unit>
 {
     /// <inheritdoc />

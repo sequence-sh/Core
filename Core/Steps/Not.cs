@@ -12,6 +12,8 @@ namespace Reductech.EDR.Core.Steps
 /// <summary>
 /// Negation of a boolean value.
 /// </summary>
+[SCLExample("Not true",  null, "false")]
+[SCLExample("Not false", null, "true")]
 public sealed class Not : CompoundStep<bool>
 {
     /// <inheritdoc />
