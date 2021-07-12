@@ -71,13 +71,14 @@ public sealed class OptionFreezableStep : IFreezableStep
     }
 
     /// <inheritdoc />
-    public Result<IReadOnlyCollection<(VariableName variableName, TypeReference typeReference)>,
+    public Result<IReadOnlyCollection<UsedVariable>,
             IError>
         GetVariablesUsed(CallerMetadata callerMetadata, TypeResolver typeResolver)
     {
-        IError? error = null;
+        var errors = new List<IError>();
 
-        foreach (var freezableStep in Options)
+        foreach (var freezableStep in
+            Options) //TODO define some sort of ordering of these options. e.g. look at the type of the index
         {
             var r = freezableStep.GetVariablesUsed(callerMetadata, typeResolver);
 
@@ -85,30 +86,32 @@ public sealed class OptionFreezableStep : IFreezableStep
             {
                 var canAdd = true;
 
-                foreach (var (variableName, typeReference) in r.Value)
+                foreach (var (variableName, typeReference, _) in r.Value)
                 {
                     var canAddResult = typeResolver.CanAddType(variableName, typeReference);
 
                     if (canAddResult.IsFailure)
                     {
                         canAdd = false;
-                        error  = canAddResult.Error.WithLocation(this);
+                        errors.Add(canAddResult.Error.WithLocation(this));
                     }
                 }
 
                 if (canAdd)
+                {
                     return r;
+                }
             }
 
             else
-                error = r.Error;
+                errors.Add(r.Error);
         }
 
-        Debug.Assert(error != null, "OptionFreezableStep should have at least one option");
+        Debug.Assert(errors.Any(), "OptionFreezableStep should have at least one option");
 
         return Result
-            .Failure<IReadOnlyCollection<(VariableName variableName, TypeReference)>, IError
-            >(error);
+            .Failure<IReadOnlyCollection<UsedVariable>,
+                IError>(ErrorList.Combine(errors));
     }
 
     /// <inheritdoc />

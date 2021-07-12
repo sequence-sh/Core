@@ -467,6 +467,24 @@ Log 'Comments!'",
                 2,
                 3
             );
+
+            yield return new DeserializationTestInstance(
+                "- foreach [1,2,3] (log <item>)\r\n- foreach [true, false] (log <item>)",
+                1,
+                2,
+                3,
+                true,
+                false
+            );
+
+            yield return new DeserializationTestInstance(
+                "- foreach [1,2,3] (log (<item> + 1))\r\n- foreach [true, false] (log (not <item>))",
+                2,
+                3,
+                4,
+                false,
+                true
+            );
         }
     }
 

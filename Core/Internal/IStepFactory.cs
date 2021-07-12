@@ -44,7 +44,7 @@ public interface IStepFactory
     /// <summary>
     /// Gets all type references set by this method and their values if they can be calculated.
     /// </summary>
-    IEnumerable<(VariableName variableName, TypeReference type)> GetVariablesUsed(
+    IEnumerable<UsedVariable> GetVariablesUsed(
         CallerMetadata callerMetadata,
         FreezableStepData freezableStepData,
         TypeResolver typeResolver);

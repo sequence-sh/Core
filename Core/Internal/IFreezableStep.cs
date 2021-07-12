@@ -30,7 +30,7 @@ public interface IFreezableStep : IEquatable<IFreezableStep>
     /// Gets the variables used by this step and its children and the types of those variables if they can be resolved at this time.
     /// Returns an error if the type name cannot be resolved
     /// </summary>
-    Result<IReadOnlyCollection<(VariableName variableName, TypeReference typeReference)>, IError>
+    Result<IReadOnlyCollection<UsedVariable>, IError>
         GetVariablesUsed(
             CallerMetadata callerMetadata,
             TypeResolver typeResolver);
@@ -47,9 +47,18 @@ public interface IFreezableStep : IEquatable<IFreezableStep>
     /// </summary>
     public Result<IStep, IError> TryFreeze(
         CallerMetadata callerMetadata,
-        StepFactoryStore stepFactoryStore) => TypeResolver
-        .TryCreate(stepFactoryStore, callerMetadata, Maybe<VariableName>.None, this)
-        .Bind(typeResolver => TryFreeze(callerMetadata, typeResolver));
+        StepFactoryStore stepFactoryStore)
+    {
+        var typeResolver = TypeResolver
+            .TryCreate(stepFactoryStore, callerMetadata, Maybe<VariableName>.None, this);
+
+        if (typeResolver.IsFailure)
+            return typeResolver.ConvertFailure<IStep>();
+
+        var freezeResult = TryFreeze(callerMetadata, typeResolver.Value);
+
+        return freezeResult;
+    }
 }
 
 }

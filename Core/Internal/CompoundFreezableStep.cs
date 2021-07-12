@@ -42,7 +42,7 @@ public sealed record CompoundFreezableStep(
     }
 
     /// <inheritdoc />
-    public Result<IReadOnlyCollection<(VariableName variableName, TypeReference typeReference)>,
+    public Result<IReadOnlyCollection<UsedVariable>,
             IError>
         GetVariablesUsed(CallerMetadata callerMetadata, TypeResolver typeResolver)
     {
@@ -50,8 +50,7 @@ public sealed record CompoundFreezableStep(
 
         if (stepFactory.IsFailure)
             return stepFactory
-                .ConvertFailure<IReadOnlyCollection<(VariableName variableName,
-                    TypeReference)>>();
+                .ConvertFailure<IReadOnlyCollection<UsedVariable>>();
 
         var dataResult = FreezableStepData.GetVariablesUsed(StepName, callerMetadata, typeResolver);
 

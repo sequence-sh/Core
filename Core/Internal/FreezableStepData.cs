@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using CSharpFunctionalExtensions;
+using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal.Errors;
 using StepParameterDict =
     System.Collections.Generic.IReadOnlyDictionary<
@@ -110,10 +112,10 @@ public sealed class FreezableStepData
     /// <summary>
     /// Gets the variables set by steps in this FreezableStepData.
     /// </summary>
-    public Result<IReadOnlyCollection<(VariableName variableName, TypeReference)>, IError>
+    public Result<IReadOnlyCollection<UsedVariable>, IError>
         GetVariablesUsed(string stepName, CallerMetadata callerMetadata, TypeResolver typeResolver)
     {
-        var variables   = new List<(VariableName variableName, TypeReference)>();
+        var variables   = new List<UsedVariable>();
         var errors      = new List<IError>();
         var stepFactory = typeResolver.StepFactoryStore.Dictionary[stepName];
 
@@ -122,18 +124,18 @@ public sealed class FreezableStepData
             switch (freezableStepProperty)
             {
                 case FreezableStepProperty.Step step:
-                    LocalGetVariablesSet(step.FreezableStep, key, false);
+                    LocalGetVariablesUsed(step.FreezableStep, key, false);
                     break;
                 case FreezableStepProperty.StepList stepList:
                 {
                     foreach (var step in stepList.List)
-                        LocalGetVariablesSet(step, key, true);
+                        LocalGetVariablesUsed(step, key, true);
 
                     break;
                 }
                 case FreezableStepProperty.Lambda lambda:
                 {
-                    GetVariablesSetByLambda(lambda.FreezableStep, lambda.VName, key);
+                    GetVariablesUsedByLambda(lambda.FreezableStep, lambda.VName, key);
                     break;
                 }
                 case FreezableStepProperty.Variable _: break;
@@ -143,12 +145,12 @@ public sealed class FreezableStepData
 
         if (errors.Any())
             return Result
-                .Failure<IReadOnlyCollection<(VariableName variableName, TypeReference)>,
+                .Failure<IReadOnlyCollection<UsedVariable>,
                     IError>(ErrorList.Combine(errors));
 
         return variables;
 
-        void LocalGetVariablesSet(
+        void LocalGetVariablesUsed(
             IFreezableStep freezableStep,
             StepParameterReference stepParameterReference,
             bool isList)
@@ -189,14 +191,30 @@ public sealed class FreezableStepData
 
                     if (memberTypeReference.IsFailure)
                     {
-                        errors.Add(memberTypeReference.Error.WithLocation(Location));
+                        var badStep = StepProperties[stepParameterReference];
+
+                        errors.Add(
+                            ErrorCode.WrongType.ToErrorBuilder(
+                                    stepName,
+                                    arrayTypeReference.Name,
+                                    parameter.Name,
+                                    badStep.Location.Text,
+                                    "Array/Sequence"
+                                )
+                                .WithLocation(badStep.Location)
+                        );
+
                         return;
                     }
 
                     tr = memberTypeReference.Value;
                 }
             }
-
+            else if (parameter.GetCustomAttribute<FunctionPropertyAttribute>() is not null)
+            {
+                GetVariablesUsedByLambda(freezableStep, null, stepParameterReference);
+                return;
+            }
             else
             {
                 tr = TypeReference.CreateFromStepType(parameter.PropertyType);
@@ -212,7 +230,7 @@ public sealed class FreezableStepData
                 variables.AddRange(variablesSet.Value);
         }
 
-        void GetVariablesSetByLambda(
+        void GetVariablesUsedByLambda(
             IFreezableStep freezableStep,
             VariableName? lambdaVariable,
             StepParameterReference stepParameterReference)
@@ -241,7 +259,7 @@ public sealed class FreezableStepData
             if (variablesSet.IsFailure)
                 errors.Add(variablesSet.Error);
             else
-                variables.AddRange(variablesSet.Value.Where(x => x.variableName != vn));
+                variables.AddRange(variablesSet.Value.Where(x => x.VariableName != vn));
         }
     }
 }

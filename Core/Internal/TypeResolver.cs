@@ -64,19 +64,32 @@ public sealed class TypeResolver
     {
         var newTypeResolver = Copy();
         var vn              = lambda.VariableNameOrItem;
+        newTypeResolver.AutomaticVariableName = vn;
 
         var r1 = newTypeResolver.TryAddType(vn, typeReference);
 
         if (r1.IsFailure)
+        {
+            if (r1.Error.GetErrorBuilders().Count() == 1
+             && r1.Error.GetErrorBuilders().Single().ErrorCode
+             == ErrorCode.WrongVariableType) //Get a better error message
+            {
+                var r3 = lambda.FreezableStep.TryFreeze(scopedCallerMetadata, newTypeResolver);
+
+                if (r3.IsFailure)
+                    return r3.ConvertFailure<TypeResolver>();
+            }
+
             return r1.ConvertFailure<TypeResolver>()
                 .MapError(x => x.WithLocation(lambda.Location));
+        }
 
         var r2 = newTypeResolver.TryAddTypeHierarchy(scopedCallerMetadata, lambda.FreezableStep);
 
         if (r2.IsFailure)
+        {
             return r2.ConvertFailure<TypeResolver>();
-
-        newTypeResolver.AutomaticVariableName = vn;
+        }
 
         return newTypeResolver;
     }
@@ -119,7 +132,7 @@ public sealed class TypeResolver
             if (result.IsFailure)
                 return result.ConvertFailure<Unit>();
 
-            foreach (var (variableName, typeReference) in result.Value)
+            foreach (var (variableName, typeReference, location) in result.Value)
             {
                 if (typeReference.IsUnknown)
                     unresolvableVariableNames.Add(variableName);
@@ -128,7 +141,7 @@ public sealed class TypeResolver
                     var addResult = TryAddType(variableName, typeReference);
 
                     if (addResult.IsFailure)
-                        errors.Add(addResult.Error.WithLocation(topLevelStep.TextLocation));
+                        errors.Add(addResult.Error.WithLocation(location));
                 }
             }
 

@@ -66,7 +66,7 @@ public record CreateEntityFreezableStep(FreezableEntityData FreezableEntityData)
     }
 
     /// <inheritdoc />
-    public Result<IReadOnlyCollection<(VariableName variableName, TypeReference typeReference)>,
+    public Result<IReadOnlyCollection<UsedVariable>,
             IError>
         GetVariablesUsed(CallerMetadata callerMetadata, TypeResolver typeResolver)
     {

@@ -230,11 +230,11 @@ public abstract record ConstantFreezableBase<T>
         TypeResolver typeResolver);
 
     /// <inheritdoc />
-    public Result<IReadOnlyCollection<(VariableName variableName, TypeReference typeReference)>,
+    public Result<IReadOnlyCollection<UsedVariable>,
             IError>
         GetVariablesUsed(CallerMetadata callerMetadata, TypeResolver typeResolver)
     {
-        return new List<(VariableName variableName, TypeReference)>();
+        return Array.Empty<UsedVariable>();
     }
 
     /// <inheritdoc />

@@ -40,16 +40,6 @@ public abstract class GenericStepFactory : StepFactory
 
         if (genericTypeParameter.IsFailure)
         {
-            //var firstError = genericTypeParameter.Error.GetAllErrors().First();
-
-            //if (firstError.ErrorBuilder.ErrorCode
-            // == ErrorCode.CannotInferType) //Get a more specific error
-            //    return callerMetadata.GetWrongTypeError(
-            //        this.TypeName,
-            //        OutputTypeExplanation,
-            //        firstError.Location
-            //    );
-
             return genericTypeParameter.ConvertFailure<ICompoundStep>();
         }
 

@@ -56,13 +56,13 @@ public sealed class GetAutomaticVariable<T> : CompoundStep<T>
             GetOutputTypeReference(TypeReference memberTypeReference) => memberTypeReference;
 
         /// <inheritdoc />
-        public override IEnumerable<(VariableName variableName, TypeReference type)>
-            GetVariablesUsed(
-                CallerMetadata callerMetadata,
-                FreezableStepData freezableStepData,
-                TypeResolver typeResolver)
+        public override IEnumerable<UsedVariable> GetVariablesUsed(
+            CallerMetadata callerMetadata,
+            FreezableStepData freezableStepData,
+            TypeResolver typeResolver)
         {
-            yield return (VariableName.Item, callerMetadata.ExpectedType);
+            yield return new(VariableName.Item, callerMetadata.ExpectedType, freezableStepData
+                                 .Location);
         }
 
         /// <inheritdoc />

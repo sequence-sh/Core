@@ -28,10 +28,10 @@ public record FreezableEntityData(
     /// <summary>
     /// Gets the variables set by steps in this FreezableStepData.
     /// </summary>
-    public Result<IReadOnlyCollection<(VariableName variableName, TypeReference)>, IError>
+    public Result<IReadOnlyCollection<UsedVariable>, IError>
         GetVariablesUsed(CallerMetadata callerMetadata, TypeResolver typeResolver)
     {
-        var variables = new List<(VariableName variableName, TypeReference)>();
+        var variables = new List<UsedVariable>();
         var errors    = new List<IError>();
 
         foreach (var stepProperty in EntityProperties)
@@ -55,7 +55,7 @@ public record FreezableEntityData(
 
         if (errors.Any())
             return Result
-                .Failure<IReadOnlyCollection<(VariableName variableName, TypeReference)>,
+                .Failure<IReadOnlyCollection<UsedVariable>,
                     IError>(ErrorList.Combine(errors));
 
         return variables;
