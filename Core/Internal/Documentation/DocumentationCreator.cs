@@ -283,7 +283,7 @@ public static class DocumentationCreator
             type.Name + ".md",
             type.Name,
             textStringBuilder.ToString().Trim(),
-            "",
+            "Enums",
             enumValues
         );
 

@@ -26,6 +26,12 @@ public partial class GenerateDocumentationTests : StepTestBase<GenerateDocumenta
     {
         get
         {
+            yield return new StepCase(
+                "Generate Everything",
+                new Log<Entity>() { Value = new GenerateDocumentation() },
+                Unit.Default
+            ) { IgnoreLoggedValues = true };
+
             var logDocumentation = new Log<Entity> { Value = new GenerateDocumentation() };
 
             static MainContents Contents(
