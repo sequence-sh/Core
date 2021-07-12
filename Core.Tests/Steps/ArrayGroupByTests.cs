@@ -19,10 +19,13 @@ public partial class ArrayGroupByIntTests : StepTestBase<ArrayGroupBy<int>, Arra
                 new ArrayGroupBy<int>()
                 {
                     Array = Array(1, 2, 1, 2, 3),
-                    Function = new StringInterpolate()
-                    {
-                        Strings = new[] { GetVariable<StringStream>(VariableName.Entity) }
-                    }
+                    Function = new LambdaFunction<int, StringStream>(
+                        null,
+                        new StringInterpolate()
+                        {
+                            Strings = new[] { GetVariable<StringStream>(VariableName.Item) }
+                        }
+                    )
                 },
                 new EagerArray<Entity>(
                     new List<Entity>()
@@ -55,10 +58,13 @@ public partial class ArrayGroupByEntityTests : StepTestBase<ArrayGroupBy<Entity>
                         Entity.Create(("Val", 2)),
                         Entity.Create(("Val", 3))
                     ),
-                    Function = new EntityGetValue<StringStream>()
-                    {
-                        Entity = GetEntityVariable, Property = Constant("Val")
-                    }
+                    Function = new LambdaFunction<Entity, StringStream>(
+                        null,
+                        new EntityGetValue<StringStream>()
+                        {
+                            Entity = GetEntityVariable, Property = Constant("Val")
+                        }
+                    )
                 },
                 new EagerArray<Entity>(
                     new List<Entity>()

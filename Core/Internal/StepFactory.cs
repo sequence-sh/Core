@@ -21,19 +21,6 @@ namespace Reductech.EDR.Core.Internal
 /// </summary>
 public abstract class StepFactory : IStepFactory
 {
-    /// <summary>
-    /// Create a new StepFactory
-    /// </summary>
-    protected StepFactory()
-    {
-        ScopedFunctionParameterReferences = new Lazy<IReadOnlySet<StepParameterReference>>(
-            () => StepType.GetProperties()
-                .Where(x => x.GetCustomAttribute<ScopedFunctionAttribute>() != null)
-                .SelectMany(StepParameterReference.GetPossibleReferences)
-                .ToHashSet()
-        );
-    }
-
     /// <inheritdoc />
     public abstract Result<TypeReference, IError> TryGetOutputTypeReference(
         CallerMetadata callerMetadata,
@@ -41,7 +28,7 @@ public abstract class StepFactory : IStepFactory
         TypeResolver typeResolver);
 
     /// <inheritdoc />
-    public virtual IEnumerable<(VariableName variableName, TypeReference type)> GetVariablesSet(
+    public virtual IEnumerable<UsedVariable> GetVariablesUsed(
         CallerMetadata callerMetadata,
         FreezableStepData freezableStepData,
         TypeResolver typeResolver)
@@ -184,16 +171,8 @@ public abstract class StepFactory : IStepFactory
                 .Select(x => x.Name)
                 .ToHashSet();
 
-        List<(IFreezableStep, PropertyInfo)> scopedFunctions = new();
-
         foreach (var (stepMember, propertyInfo) in pairs)
         {
-            if (propertyInfo.GetCustomAttribute<ScopedFunctionAttribute>() != null)
-            {
-                scopedFunctions.Add((stepMember.ConvertToStep(), propertyInfo));
-                continue;
-            }
-
             var nestedCallerMetadata =
                 new CallerMetadata(
                     TypeName,
@@ -228,30 +207,18 @@ public abstract class StepFactory : IStepFactory
                     sList,
                     typeResolver
                 ),
+                FreezableStepProperty.Lambda lambda => TrySetLambda(
+                    propertyInfo,
+                    step,
+                    lambda,
+                    typeResolver
+                ),
+
                 _ => throw new ArgumentException("Step member wrong type"),
             };
 
             if (result.IsFailure)
                 errors.Add(result.Error);
-        }
-
-        if (scopedFunctions.Any())
-        {
-            foreach (var (freezableStep, propertyInfo) in scopedFunctions)
-            {
-                var scopedContext = step.TryGetScopedTypeResolver(typeResolver, freezableStep);
-
-                if (scopedContext.IsFailure)
-                    errors.Add(scopedContext.Error);
-                else
-                {
-                    remainingRequired.Remove(propertyInfo.Name);
-                    var result = TrySetStep(propertyInfo, step, freezableStep, scopedContext.Value);
-
-                    if (result.IsFailure)
-                        errors.Add(result.Error);
-                }
-            }
         }
 
         foreach (var property in remainingRequired)
@@ -267,7 +234,7 @@ public abstract class StepFactory : IStepFactory
         PropertyInfo propertyInfo,
         ICompoundStep parentStep,
         VariableName variableName,
-        TextLocation? stepMemberLocation,
+        TextLocation stepMemberLocation,
         TypeResolver typeResolver)
     {
         if (propertyInfo.PropertyType.IsInstanceOfType(variableName))
@@ -281,12 +248,76 @@ public abstract class StepFactory : IStepFactory
         return TrySetStep(propertyInfo, parentStep, step, typeResolver);
     }
 
+    private static Result<Unit, IError> TrySetLambda(
+        PropertyInfo propertyInfo,
+        ICompoundStep parentStep,
+        FreezableStepProperty.Lambda lambda,
+        TypeResolver typeResolver)
+    {
+        var typeToSet          = propertyInfo.PropertyType;
+        var inputTypeArgument  = typeToSet.GenericTypeArguments[0];
+        var inputTypeReference = TypeReference.Create(inputTypeArgument);
+
+        var outputTypeArgument  = typeToSet.GenericTypeArguments[1];
+        var outputTypeReference = TypeReference.Create(outputTypeArgument);
+
+        var callerMetadata = new CallerMetadata(
+            parentStep.Name,
+            propertyInfo.Name,
+            outputTypeReference
+        );
+
+        var typeResolverResult = typeResolver.TryCloneWithScopedLambda(
+            lambda,
+            inputTypeReference,
+            callerMetadata
+        );
+
+        if (typeResolverResult.IsFailure)
+            return typeResolverResult.ConvertFailure<Unit>();
+
+        var frozenStep = lambda.FreezableStep.TryFreeze(callerMetadata, typeResolverResult.Value);
+
+        if (frozenStep.IsFailure)
+            return frozenStep.ConvertFailure<Unit>();
+
+        try
+        {
+            var lambdaInstance = Activator.CreateInstance(
+                typeToSet,
+                lambda.VName,
+                frozenStep.Value
+            );
+
+            propertyInfo.SetValue(parentStep, lambdaInstance);
+        }
+        catch (Exception e) //I'm nervous this might happen
+        {
+            var error = ErrorCode.Unknown.ToErrorBuilder(e)
+                .WithLocationSingle(lambda.Location);
+
+            return error;
+        }
+
+        return Unit.Default;
+    }
+
     private static Result<Unit, IError> TrySetStep(
         PropertyInfo propertyInfo,
         ICompoundStep parentStep,
         IFreezableStep freezableStep,
         TypeResolver typeResolver)
     {
+        if (propertyInfo.GetCustomAttribute<FunctionPropertyAttribute>() is not null)
+        {
+            return TrySetLambda(
+                propertyInfo,
+                parentStep,
+                new FreezableStepProperty.Lambda(null, freezableStep, freezableStep.TextLocation),
+                typeResolver
+            );
+        }
+
         var freezeResult = freezableStep.TryFreeze(
             new CallerMetadata(
                 parentStep.Name,
@@ -299,7 +330,11 @@ public abstract class StepFactory : IStepFactory
         if (freezeResult.IsFailure)
             return freezeResult.ConvertFailure<Unit>();
 
-        var stepToSet = TryCoerceStep(propertyInfo, freezeResult.Value);
+        var stepToSet = TryCoerceStep(
+            propertyInfo.Name,
+            propertyInfo.PropertyType,
+            freezeResult.Value
+        );
 
         if (stepToSet.IsFailure)
             return stepToSet.MapError(x => x.WithLocation(parentStep)).ConvertFailure<Unit>();
@@ -313,17 +348,18 @@ public abstract class StepFactory : IStepFactory
     }
 
     private static Result<IStep, IErrorBuilder> TryCoerceStep(
-        PropertyInfo propertyInfo,
+        string propertyName,
+        Type propertyType,
         IStep stepToSet)
     {
-        if (propertyInfo.PropertyType.IsInstanceOfType(stepToSet))
+        if (propertyType.IsInstanceOfType(stepToSet))
             return Result.Success<IStep, IErrorBuilder>(stepToSet); //No coercion required
 
-        if (propertyInfo.PropertyType.IsGenericType && stepToSet is StringConstant stringConstant)
+        if (propertyType.IsGenericType && stepToSet is StringConstant stringConstant)
         {
-            if (propertyInfo.PropertyType.GenericTypeArguments.First().IsEnum)
+            if (propertyType.GenericTypeArguments.First().IsEnum)
             {
-                var enumType = propertyInfo.PropertyType.GenericTypeArguments.First();
+                var enumType = propertyType.GenericTypeArguments.First();
 
                 if (Enum.TryParse(
                     enumType,
@@ -336,7 +372,7 @@ public abstract class StepFactory : IStepFactory
                     return step;
                 }
             }
-            else if (propertyInfo.PropertyType.GenericTypeArguments.First() == typeof(DateTime))
+            else if (propertyType.GenericTypeArguments.First() == typeof(DateTime))
             {
                 if (DateTime.TryParse(stringConstant.Value.GetString(), out var dt))
                 {
@@ -345,13 +381,13 @@ public abstract class StepFactory : IStepFactory
                 }
             }
         }
-        else if (propertyInfo.PropertyType.IsGenericType
-              && propertyInfo.PropertyType.GenericTypeArguments.First() == typeof(object))
+        else if (propertyType.IsGenericType
+              && propertyType.GenericTypeArguments.First() == typeof(object))
         {
             return Result.Success<IStep, IErrorBuilder>(stepToSet);
         }
 
-        return ErrorCode.InvalidCast.ToErrorBuilder(propertyInfo.Name, stepToSet.Name);
+        return ErrorCode.InvalidCast.ToErrorBuilder(propertyName, stepToSet.Name);
     }
 
     private static Result<Unit, IError> TrySetStepList(
@@ -579,15 +615,6 @@ public abstract class StepFactory : IStepFactory
 
     private static string GetLastTerm(string s) =>
         s.Split('.', StringSplitOptions.RemoveEmptyEntries).Last();
-
-    private Lazy<IReadOnlySet<StepParameterReference>> ScopedFunctionParameterReferences
-    {
-        get;
-    }
-
-    /// <inheritdoc />
-    public bool IsScopedFunction(StepParameterReference stepParameterReference) =>
-        ScopedFunctionParameterReferences.Value.Contains(stepParameterReference);
 }
 
 }

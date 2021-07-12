@@ -62,7 +62,7 @@ public sealed record ErrorCode : ErrorCodeBase
                                             CannotCreateScopedContext));
 
     /// <summary>
-    /// Could not infer type
+    /// Could not infer type - {0}
     /// </summary>
     public static readonly ErrorCode
         CannotInferType = new(nameof(

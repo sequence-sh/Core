@@ -20,7 +20,10 @@ public partial class ArrayFilterTests : StepTestBase<ArrayFilter<Entity>, Array<
                 "Filter stuff",
                 new ForEach<Entity>
                 {
-                    Action = new Log<Entity> { Value = GetEntityVariable },
+                    Action = new LambdaFunction<Entity, Unit>(
+                        null,
+                        new Log<Entity> { Value = GetEntityVariable }
+                    ),
                     Array = new ArrayFilter<Entity>
                     {
                         Array = Array(
@@ -30,12 +33,14 @@ public partial class ArrayFilterTests : StepTestBase<ArrayFilter<Entity>, Array<
                             Entity.Create(("Foo", "Beta")),
                             Entity.Create(("Bar", "Beta"))
                         ),
-                        Predicate = new EntityHasProperty()
-                        {
-                            Property = Constant("Foo"), Entity = GetEntityVariable
-                        },
-                    },
-                    Variable = VariableName.Entity
+                        Predicate = new LambdaFunction<Entity, bool>(
+                            null,
+                            new EntityHasProperty()
+                            {
+                                Property = Constant("Foo"), Entity = GetEntityVariable
+                            }
+                        )
+                    }
                 },
                 Unit.Default,
                 "(Foo: \"Alpha\")",
@@ -47,8 +52,10 @@ public partial class ArrayFilterTests : StepTestBase<ArrayFilter<Entity>, Array<
                 "Filter stuff with custom variable name",
                 new ForEach<Entity>
                 {
-                    Action   = new Log<Entity> { Value = GetVariable<Entity>("ForeachVar") },
-                    Variable = new VariableName("ForeachVar"),
+                    Action = new LambdaFunction<Entity, Unit>(
+                        new VariableName("ForeachVar"),
+                        new Log<Entity> { Value = GetVariable<Entity>("ForeachVar") }
+                    ),
                     Array = new ArrayFilter<Entity>
                     {
                         Array = Array(
@@ -58,13 +65,14 @@ public partial class ArrayFilterTests : StepTestBase<ArrayFilter<Entity>, Array<
                             Entity.Create(("Foo", "Beta")),
                             Entity.Create(("Bar", "Beta"))
                         ),
-                        Predicate =
+                        Predicate = new LambdaFunction<Entity, bool>(
+                            new VariableName("FilterVar"),
                             new EntityHasProperty()
                             {
                                 Property = Constant("Foo"),
                                 Entity   = GetVariable<Entity>("FilterVar")
-                            },
-                        Variable = new VariableName("FilterVar")
+                            }
+                        )
                     }
                 },
                 Unit.Default,
@@ -87,7 +95,7 @@ public partial class ArrayFilterTests : StepTestBase<ArrayFilter<Entity>, Array<
                 new ArrayFilter<Entity>()
                 {
                     Array     = new FailStep<Array<Entity>>() { ErrorMessage = "Stream Fail" },
-                    Predicate = Constant(true)
+                    Predicate = new LambdaFunction<Entity, bool>(null, Constant(true))
                 },
                 new SingleError(
                     ErrorLocation.EmptyLocation,

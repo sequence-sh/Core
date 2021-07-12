@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using CSharpFunctionalExtensions;
+using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal.Errors;
 using StepParameterDict =
     System.Collections.Generic.IReadOnlyDictionary<
@@ -19,7 +21,7 @@ public sealed class FreezableStepData
     /// <summary>
     /// Creates a new FreezableStepData
     /// </summary>
-    public FreezableStepData(StepParameterDict stepProperties, TextLocation? location)
+    public FreezableStepData(StepParameterDict stepProperties, TextLocation location)
     {
         StepProperties = stepProperties;
         Location       = location;
@@ -33,7 +35,7 @@ public sealed class FreezableStepData
     /// <summary>
     /// The location where this data comes from.
     /// </summary>
-    public TextLocation? Location { get; }
+    public TextLocation Location { get; }
 
     private Result<T, IError> TryGetValue<T>(
         string propertyName,
@@ -78,6 +80,18 @@ public sealed class FreezableStepData
         );
 
     /// <summary>
+    /// Gets a step argument
+    /// </summary>
+    public Result<FreezableStepProperty.Lambda, IError> TryGetLambda(
+        string propertyName,
+        Type stepType) => TryGetValue(
+        propertyName,
+        stepType,
+        x =>
+            Result.Success<FreezableStepProperty.Lambda, IError>(x.ConvertToLambda())
+    );
+
+    /// <summary>
     /// Gets a variable name.
     /// </summary>
     public Result<IReadOnlyList<IFreezableStep>, IError> TryGetStepList(
@@ -98,49 +112,154 @@ public sealed class FreezableStepData
     /// <summary>
     /// Gets the variables set by steps in this FreezableStepData.
     /// </summary>
-    public Result<IReadOnlyCollection<(VariableName variableName, TypeReference)>, IError>
-        GetVariablesSet(string stepName, CallerMetadata callerMetadata, TypeResolver typeResolver)
+    public Result<IReadOnlyCollection<UsedVariable>, IError>
+        GetVariablesUsed(string stepName, CallerMetadata callerMetadata, TypeResolver typeResolver)
     {
-        var variables = new List<(VariableName variableName, TypeReference)>();
-        var errors    = new List<IError>();
+        var variables   = new List<UsedVariable>();
+        var errors      = new List<IError>();
+        var stepFactory = typeResolver.StepFactoryStore.Dictionary[stepName];
 
         foreach (var (key, freezableStepProperty) in StepProperties)
         {
-            if (!typeResolver.StepFactoryStore.IsScopedFunction(stepName, key))
+            switch (freezableStepProperty)
             {
-                switch (freezableStepProperty)
+                case FreezableStepProperty.Step step:
+                    LocalGetVariablesUsed(step.FreezableStep, key, false);
+                    break;
+                case FreezableStepProperty.StepList stepList:
                 {
-                    case FreezableStepProperty.Step step:
-                        LocalGetVariablesSet(step.FreezableStep);
-                        break;
-                    case FreezableStepProperty.StepList stepList:
-                    {
-                        foreach (var step in stepList.List)
-                            LocalGetVariablesSet(step);
+                    foreach (var step in stepList.List)
+                        LocalGetVariablesUsed(step, key, true);
 
-                        break;
-                    }
-                    case FreezableStepProperty.Variable _: break;
-                    default:                               throw new ArgumentOutOfRangeException();
+                    break;
                 }
+                case FreezableStepProperty.Lambda lambda:
+                {
+                    GetVariablesUsedByLambda(lambda.FreezableStep, lambda.VName, key);
+                    break;
+                }
+                case FreezableStepProperty.Variable _: break;
+                default:                               throw new ArgumentOutOfRangeException();
             }
         }
 
         if (errors.Any())
             return Result
-                .Failure<IReadOnlyCollection<(VariableName variableName, TypeReference)>,
+                .Failure<IReadOnlyCollection<UsedVariable>,
                     IError>(ErrorList.Combine(errors));
 
         return variables;
 
-        void LocalGetVariablesSet(IFreezableStep freezableStep)
+        void LocalGetVariablesUsed(
+            IFreezableStep freezableStep,
+            StepParameterReference stepParameterReference,
+            bool isList)
         {
-            var variablesSet = freezableStep.GetVariablesSet(callerMetadata, typeResolver);
+            if (!stepFactory.ParameterDictionary.TryGetValue(
+                stepParameterReference,
+                out var parameter
+            ))
+            {
+                errors.Add(
+                    ErrorCode.UnexpectedParameter
+                        .ToErrorBuilder(stepParameterReference.Name, stepName)
+                        .WithLocationSingle(Location)
+                );
+
+                return;
+            }
+
+            TypeReference tr;
+
+            if (isList)
+            {
+                if (parameter.PropertyType.IsGenericType
+                 && parameter.PropertyType.GetGenericTypeDefinition()
+                 == typeof(IReadOnlyList<>))
+                {
+                    var stepType = parameter.PropertyType.GenericTypeArguments[0];
+                    tr = TypeReference.CreateFromStepType(stepType);
+                }
+
+                else
+                {
+                    var arrayTypeReference =
+                        TypeReference.CreateFromStepType(parameter.PropertyType);
+
+                    var memberTypeReference =
+                        arrayTypeReference.TryGetArrayMemberTypeReference(typeResolver);
+
+                    if (memberTypeReference.IsFailure)
+                    {
+                        var badStep = StepProperties[stepParameterReference];
+
+                        errors.Add(
+                            ErrorCode.WrongType.ToErrorBuilder(
+                                    stepName,
+                                    arrayTypeReference.Name,
+                                    parameter.Name,
+                                    badStep.Location.Text,
+                                    "Array/Sequence"
+                                )
+                                .WithLocation(badStep.Location)
+                        );
+
+                        return;
+                    }
+
+                    tr = memberTypeReference.Value;
+                }
+            }
+            else if (parameter.GetCustomAttribute<FunctionPropertyAttribute>() is not null)
+            {
+                GetVariablesUsedByLambda(freezableStep, null, stepParameterReference);
+                return;
+            }
+            else
+            {
+                tr = TypeReference.CreateFromStepType(parameter.PropertyType);
+            }
+
+            var childCallerMetadata = new CallerMetadata(stepName, stepParameterReference.Name, tr);
+            //change caller metadata
+            var variablesSet = freezableStep.GetVariablesUsed(childCallerMetadata, typeResolver);
 
             if (variablesSet.IsFailure)
                 errors.Add(variablesSet.Error);
             else
                 variables.AddRange(variablesSet.Value);
+        }
+
+        void GetVariablesUsedByLambda(
+            IFreezableStep freezableStep,
+            VariableName? lambdaVariable,
+            StepParameterReference stepParameterReference)
+        {
+            if (!stepFactory.ParameterDictionary.TryGetValue(
+                stepParameterReference,
+                out var parameter
+            ))
+            {
+                errors.Add(
+                    ErrorCode.UnexpectedParameter
+                        .ToErrorBuilder(stepParameterReference.Name, stepName)
+                        .WithLocationSingle(Location)
+                );
+
+                return;
+            }
+
+            var tr = TypeReference.CreateFromStepType(parameter.PropertyType);
+
+            var childCallerMetadata = new CallerMetadata(stepName, stepParameterReference.Name, tr);
+
+            var vn           = lambdaVariable ?? VariableName.Item;
+            var variablesSet = freezableStep.GetVariablesUsed(childCallerMetadata, typeResolver);
+
+            if (variablesSet.IsFailure)
+                errors.Add(variablesSet.Error);
+            else
+                variables.AddRange(variablesSet.Value.Where(x => x.VariableName != vn));
         }
     }
 }

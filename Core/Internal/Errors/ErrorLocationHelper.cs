@@ -22,7 +22,7 @@ public static class ErrorLocationHelper
     /// Add a FreezableErrorLocation
     /// </summary>
     public static IError WithLocation(this IErrorBuilder errorBuilder, FreezableStepData data) =>
-        errorBuilder.WithLocation(data.Location ?? ErrorLocation.EmptyLocation);
+        errorBuilder.WithLocation(data.Location);
 }
 
 }

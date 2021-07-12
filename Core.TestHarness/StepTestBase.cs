@@ -32,6 +32,40 @@ public abstract partial class StepTestBase<TStep, TOutput> : IStepTestBase
     public Type StepType => typeof(TStep);
 
     [Fact]
+    public void All_Properties_should_have_correct_attribute()
+    {
+        var properties = typeof(TStep).GetProperties()
+            .Select(
+                propertyInfo =>
+                    (propertyInfo,
+                     attribute: propertyInfo.GetCustomAttribute<StepPropertyBaseAttribute>())
+            )
+            .Where(x => x.attribute != null)
+            .ToList();
+
+        foreach (var (propertyInfo, attribute) in properties)
+        {
+            switch (attribute)
+            {
+                case null: break;
+                case FunctionPropertyAttribute _:
+                    propertyInfo.PropertyType.Should().BeAssignableTo(typeof(LambdaFunction));
+                    break;
+                case StepListPropertyAttribute _:
+                    propertyInfo.PropertyType.Should().BeAssignableTo(typeof(IReadOnlyList<>));
+                    break;
+                case StepPropertyAttribute _:
+                    propertyInfo.PropertyType.Should().BeAssignableTo<IStep>();
+                    break;
+                case VariableNameAttribute _:
+                    propertyInfo.PropertyType.Should().BeAssignableTo(typeof(VariableName));
+                    break;
+                default: throw new ArgumentOutOfRangeException(nameof(attribute));
+            }
+        }
+    }
+
+    [Fact]
     public void All_Properties_should_have_distinct_consecutive_positive_orders()
     {
         var errors = new List<string>();

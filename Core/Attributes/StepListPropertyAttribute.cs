@@ -1,4 +1,5 @@
 ﻿using System;
+using Reductech.EDR.Core.Internal;
 
 namespace Reductech.EDR.Core.Attributes
 {
@@ -14,6 +15,9 @@ public sealed class StepListPropertyAttribute : StepPropertyBaseAttribute
 
     /// <inheritdoc />
     public StepListPropertyAttribute() { }
+
+    /// <inheritdoc />
+    public override MemberType MemberType => MemberType.StepList;
 }
 
 }

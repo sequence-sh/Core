@@ -53,6 +53,7 @@ public abstract partial class StepTestBase<TStep, TOutput>
                                     );
                             },
                             x => SetFailStep(x, instance),
+                            x => SetFailLambda(x, instance),
                             x => SetFailStepList(x, instance)
                         );
                 }
@@ -63,6 +64,7 @@ public abstract partial class StepTestBase<TStep, TOutput>
                             propertyInfo,
                             x => SetVariableName(x, instance),
                             x => SetStep(x, instance),
+                            x => SetLambda(x, instance),
                             x => SetStepList(x, instance)
                         );
 
@@ -106,6 +108,25 @@ public abstract partial class StepTestBase<TStep, TOutput>
             return false;
         }
 
+        static bool SetLambda(PropertyInfo property, object instance)
+        {
+            if (!property.PropertyType.GenericTypeArguments.Any())
+                throw new Exception($"Property {property} has no generic arguments");
+
+            var (step, _, _) = CreateSimpleStep(
+                property.PropertyType.GenericTypeArguments[1],
+                property.Name,
+                1,
+                false
+            );
+
+            var lambda = Activator.CreateInstance(property.PropertyType, null, step);
+
+            property.SetValue(instance, lambda);
+
+            return false;
+        }
+
         static bool SetStepList(PropertyInfo property, object instance)
         {
             var i = 0;
@@ -118,6 +139,33 @@ public abstract partial class StepTestBase<TStep, TOutput>
 
             property.SetValue(instance, newValue);
             return false;
+        }
+
+        static IError SetFailLambda(PropertyInfo property, object instance)
+        {
+            var errorMessage = property.Name + " Error";
+
+            var step = CreateFailStepOfType(
+                property.PropertyType.GenericTypeArguments[1],
+                errorMessage
+            );
+
+            try
+            {
+                var lambda = Activator.CreateInstance(property.PropertyType, null, step);
+                property.SetValue(instance, lambda);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
+
+            return new SingleError(
+                ErrorLocation.EmptyLocation,
+                ErrorCode.Test,
+                errorMessage
+            );
         }
 
         static IError SetFailStep(PropertyInfo property, object instance)

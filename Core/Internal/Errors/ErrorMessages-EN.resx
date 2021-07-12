@@ -136,7 +136,7 @@
     <value>{0} cannot create a scoped context</value>
   </data>
   <data name="CannotInferType" xml:space="preserve">
-    <value>Could not infer type</value>
+    <value>Could not infer type - {0}</value>
   </data>
   <data name="ConflictingParameters" xml:space="preserve">
     <value>Parameters {0} and {1} are in conflict.</value>

@@ -20,7 +20,10 @@ public partial class ForTests : StepTestBase<For, Unit>
                 "Increment 1",
                 new For
                 {
-                    Action    = new Log<int> { Value = GetVariable<int>(VariableName.Index.Name) },
+                    Action = new LambdaFunction<int, Unit>(
+                        null,
+                        new Log<int> { Value = GetVariable<int>(VariableName.Item) }
+                    ),
                     From      = Constant(1),
                     To        = Constant(3),
                     Increment = Constant(1),
@@ -35,7 +38,10 @@ public partial class ForTests : StepTestBase<For, Unit>
                 "Increment 2",
                 new For
                 {
-                    Action    = new Log<int> { Value = GetVariable<int>(VariableName.Index.Name) },
+                    Action = new LambdaFunction<int, Unit>(
+                        null,
+                        new Log<int> { Value = GetVariable<int>(VariableName.Item) }
+                    ),
                     From      = Constant(1),
                     To        = Constant(6),
                     Increment = Constant(2),
@@ -50,7 +56,10 @@ public partial class ForTests : StepTestBase<For, Unit>
                 "Increment -1",
                 new For
                 {
-                    Action    = new Log<int> { Value = GetVariable<int>(VariableName.Index.Name) },
+                    Action = new LambdaFunction<int, Unit>(
+                        null,
+                        new Log<int> { Value = GetVariable<int>(VariableName.Item) }
+                    ),
                     From      = Constant(3),
                     To        = Constant(1),
                     Increment = Constant(-1),
@@ -65,7 +74,10 @@ public partial class ForTests : StepTestBase<For, Unit>
                 "Increment No range",
                 new For
                 {
-                    Action    = new Log<int> { Value = GetVariable<int>(VariableName.Index.Name) },
+                    Action = new LambdaFunction<int, Unit>(
+                        null,
+                        new Log<int> { Value = GetVariable<int>(VariableName.Item) }
+                    ),
                     From      = Constant(3),
                     To        = Constant(1),
                     Increment = Constant(1),
@@ -82,7 +94,7 @@ public partial class ForTests : StepTestBase<For, Unit>
         {
             yield return new DeserializeCase(
                 "Increment 1",
-                "For Action: (Log Value: <i>) From: 1 To: 3 Increment: 1",
+                "For Action: (Log Value: <item>) From: 1 To: 3 Increment: 1",
                 Unit.Default,
                 "1",
                 "2",
@@ -97,20 +109,19 @@ public partial class ForTests : StepTestBase<For, Unit>
         get
         {
             yield return new ErrorCase(
-                        "ValueIf increment 0",
-                        new For
-                        {
-                            Action = new Log<int>
-                            {
-                                Value = GetVariable<int>(VariableName.Index.Name)
-                            },
-                            From      = Constant(1),
-                            To        = Constant(3),
-                            Increment = Constant(0)
-                        },
-                        new ErrorBuilder(ErrorCode.DivideByZero)
-                    )
-                    .WithExpectedFinalState(VariableName.Index.Name, 1)
+                    "ValueIf increment 0",
+                    new For
+                    {
+                        Action = new LambdaFunction<int, Unit>(
+                            null,
+                            new Log<int> { Value = GetVariable<int>(VariableName.Item) }
+                        ),
+                        From      = Constant(1),
+                        To        = Constant(3),
+                        Increment = Constant(0)
+                    },
+                    new ErrorBuilder(ErrorCode.DivideByZero)
+                )
                 ;
 
             foreach (var errorCase in base.ErrorCases)

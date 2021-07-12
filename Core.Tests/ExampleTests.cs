@@ -75,17 +75,17 @@ public partial class ExampleTests
 
 # Create a directory for each connector
 - <docs>
-  | ArrayDistinct (From <Entity> 'Directory')
+  | ArrayDistinct (From <item> 'Directory')
   | ForEach (
-      CreateDirectory (PathCombine [<root>, (From <Entity> 'Directory')])
+      CreateDirectory (PathCombine [<root>, (From <item> 'Directory')])
     )
 
 # Export all steps to .\<root>\ConnectorName\StepName.md
 - <docs>
   | Foreach (
       FileWrite
-        (From <Entity> 'FileText')
-        (PathCombine [<root>, (From <Entity> 'Directory'), (From <Entity> 'FileName')])
+        (From <item> 'FileText')
+        (PathCombine [<root>, (From <item> 'Directory'), (From <item> 'FileName')])
     )
 
 ";

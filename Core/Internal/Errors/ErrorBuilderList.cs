@@ -40,7 +40,7 @@ public class ErrorBuilderList : IErrorBuilder
     /// </summary>
     public static IErrorBuilder Combine(IEnumerable<IErrorBuilder> errorBuilders)
     {
-        var errors = errorBuilders.SelectMany(x => x.GetErrorBuilders()).ToList();
+        var errors = errorBuilders.SelectMany(x => x.GetErrorBuilders()).Distinct().ToList();
 
         if (errors.Count == 1)
             return errors.Single();

@@ -35,11 +35,11 @@ public sealed class ArrayGroupBy<T> : CompoundStep<Array<Entity>>
             await using var scopedMonad = new ScopedStateMonad(
                 stateMonad,
                 currentState,
-                Variable,
-                new KeyValuePair<VariableName, object>(Variable, record!)
+                Function.VariableNameOrItem,
+                new KeyValuePair<VariableName, object>(Function.VariableNameOrItem, record!)
             );
 
-            var result = await Function.Run(scopedMonad, cancellationToken);
+            var result = await Function.StepTyped.Run(scopedMonad, cancellationToken);
 
             if (result.IsFailure)
                 throw new ErrorException(result.Error);
@@ -52,21 +52,6 @@ public sealed class ArrayGroupBy<T> : CompoundStep<Array<Entity>>
         return newStream;
     }
 
-    /// <inheritdoc />
-    public override Result<TypeResolver, IError> TryGetScopedTypeResolver(
-        TypeResolver baseTypeResolver,
-        IFreezableStep scopedStep)
-    {
-        return baseTypeResolver
-            .TryCloneWithScopedStep(
-                Variable,
-                TypeReference.Create(typeof(T)),
-                new CallerMetadata(Name, nameof(Function), TypeReference.Create(typeof(T))),
-                scopedStep,
-                new ErrorLocation(this)
-            );
-    }
-
     /// <summary>
     /// The array to map
     /// </summary>
@@ -77,17 +62,9 @@ public sealed class ArrayGroupBy<T> : CompoundStep<Array<Entity>>
     /// <summary>
     /// A function to get the mapped entity
     /// </summary>
-    [StepProperty(2)]
-    [ScopedFunction]
+    [FunctionProperty(2)]
     [Required]
-    public IStep<StringStream> Function { get; set; } = null!;
-
-    /// <summary>
-    /// The variable name to use in the predicate.
-    /// </summary>
-    [VariableName(3)]
-    [DefaultValueExplanation("<Entity>")]
-    public VariableName Variable { get; set; } = VariableName.Entity;
+    public LambdaFunction<T, StringStream> Function { get; set; } = null!;
 
     /// <inheritdoc />
     public override IStepFactory StepFactory => ArrayGroupByStepFactory.Instance;
@@ -101,7 +78,7 @@ public sealed class ArrayGroupBy<T> : CompoundStep<Array<Entity>>
         public override Type StepType => typeof(ArrayGroupBy<>);
 
         /// <inheritdoc />
-        public override string OutputTypeExplanation => "Array<Entity>";
+        public override string OutputTypeExplanation => "Array of Entity";
 
         /// <inheritdoc />
         protected override TypeReference GetOutputTypeReference(TypeReference memberTypeReference)
@@ -126,6 +103,8 @@ public sealed class ArrayGroupBy<T> : CompoundStep<Array<Entity>>
 
         /// <inheritdoc />
         protected override string ArrayPropertyName => nameof(ArrayGroupBy<object>.Array);
+
+        protected override string LambdaPropertyName => nameof(ArrayGroupBy<object>.Function);
     }
 }
 

@@ -8,7 +8,6 @@ using Antlr4.Runtime;
 using Antlr4.Runtime.Tree;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Internal.Errors;
-using Reductech.EDR.Core.Steps;
 using static Reductech.EDR.Core.Internal.FreezableFactory;
 using StepParameterDict =
     System.Collections.Generic.Dictionary<Reductech.EDR.Core.Internal.StepParameterReference,
@@ -544,6 +543,28 @@ public static class SCLParsing
                 '\\' => '\\',
                 _    => null
             };
+        }
+
+        /// <inheritdoc />
+        public override Result<FreezableStepProperty, IError> VisitLambda(
+            SCLParser.LambdaContext context)
+        {
+            var vnText = context.VARIABLENAME()?.Symbol.Text;
+
+            VariableName? vn = vnText is null
+                ? null
+                : new VariableName(vnText.TrimStart('<').TrimEnd('>'));
+
+            var step = Visit(context.step());
+
+            if (step.IsFailure)
+                return step;
+
+            var location = new TextLocation(context);
+
+            var lambda = new FreezableStepProperty.Lambda(vn, step.Value.ConvertToStep(), location);
+
+            return lambda;
         }
 
         /// <inheritdoc />

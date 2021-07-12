@@ -1,4 +1,5 @@
 ﻿using System;
+using Reductech.EDR.Core.Internal;
 
 namespace Reductech.EDR.Core.Attributes
 {
@@ -23,6 +24,11 @@ public abstract class StepPropertyBaseAttribute : Attribute
     /// The order where this property should appear.
     /// </summary>
     public int? Order { get; }
+
+    /// <summary>
+    /// The member type of this step property
+    /// </summary>
+    public abstract MemberType MemberType { get; }
 }
 
 }

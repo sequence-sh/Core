@@ -91,11 +91,10 @@ public sealed class SetVariable<T> : CompoundStep<Unit>
         }
 
         /// <inheritdoc />
-        public override IEnumerable<(VariableName variableName, TypeReference type)>
-            GetVariablesSet(
-                CallerMetadata callerMetadata,
-                FreezableStepData freezableStepData,
-                TypeResolver typeResolver)
+        public override IEnumerable<UsedVariable> GetVariablesUsed(
+            CallerMetadata callerMetadata,
+            FreezableStepData freezableStepData,
+            TypeResolver typeResolver)
         {
             var vn = freezableStepData.TryGetVariableName(
                 nameof(SetVariable<object>.Variable),
@@ -112,9 +111,10 @@ public sealed class SetVariable<T> : CompoundStep<Unit>
             );
 
             if (memberType.IsFailure)
-                yield return (vn.Value, TypeReference.Unknown.Instance);
+                yield return new(vn.Value, TypeReference.Unknown.Instance, freezableStepData
+                                     .Location);
             else
-                yield return (vn.Value, memberType.Value);
+                yield return new(vn.Value, memberType.Value, freezableStepData.Location);
         }
 
         /// <inheritdoc />

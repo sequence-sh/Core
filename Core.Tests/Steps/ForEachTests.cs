@@ -20,8 +20,11 @@ public partial class ForEachTests : StepTestBase<ForEach<int>, Unit>
                 "Default Variable Name",
                 new ForEach<int>
                 {
-                    Action = new Log<int> { Value = GetVariable<int>(VariableName.Entity) },
-                    Array  = Array(3, 2, 1)
+                    Action = new LambdaFunction<int, Unit>(
+                        null,
+                        new Log<int> { Value = GetVariable<int>(VariableName.Item) }
+                    ),
+                    Array = Array(3, 2, 1)
                 },
                 Unit.Default,
                 "3",
@@ -33,9 +36,11 @@ public partial class ForEachTests : StepTestBase<ForEach<int>, Unit>
                 "Custom Variable Name",
                 new ForEach<int>
                 {
-                    Action   = new Log<int> { Value = GetVariable<int>("Foo") },
-                    Array    = Array(3, 2, 1),
-                    Variable = new VariableName("Foo")
+                    Action = new LambdaFunction<int, Unit>(
+                        new VariableName("Foo"),
+                        new Log<int> { Value = GetVariable<int>("Foo") }
+                    ),
+                    Array = Array(3, 2, 1),
                 },
                 Unit.Default,
                 "3",
@@ -52,7 +57,7 @@ public partial class ForEachTests : StepTestBase<ForEach<int>, Unit>
         {
             yield return new DeserializeCase(
                 "Default Variable Name",
-                "Foreach [3,2,1]  (Log Value: <Entity>)",
+                "Foreach [3,2,1]  (Log Value: <item>)",
                 Unit.Default,
                 "3",
                 "2",
@@ -61,7 +66,7 @@ public partial class ForEachTests : StepTestBase<ForEach<int>, Unit>
 
             yield return new DeserializeCase(
                 "Named Variable",
-                "Foreach [3,2,1] (Log Value: <Foo>) <Foo>",
+                "Foreach [3,2,1] (<Foo> => Log Value: <Foo>)",
                 Unit.Default,
                 "3",
                 "2",
@@ -70,8 +75,8 @@ public partial class ForEachTests : StepTestBase<ForEach<int>, Unit>
 
             yield return new DeserializeCase(
                 "Scoped Variable Overloading",
-                @"- Foreach [1,2,3] (Log <Entity>) #Here <Entity> is an int
-- Foreach ['one', 'two','three'] (Log <Entity>) #Here <Entity> is a string
+                @"- Foreach [1,2,3] (Log <item>) #Here <item> is an int
+- Foreach ['one', 'two','three'] (Log <item>) #Here <item> is a string
 ",
                 Unit.Default,
                 "1",
@@ -106,9 +111,11 @@ public partial class ForEachTests : StepTestBase<ForEach<int>, Unit>
                 "Action Failure",
                 new ForEach<int>
                 {
-                    Array    = Array(1),
-                    Action   = new FailStep<Unit> { ErrorMessage = "Action Failure" },
-                    Variable = VariableName.Index
+                    Array = Array(1),
+                    Action = new LambdaFunction<int, Unit>(
+                        null,
+                        new FailStep<Unit> { ErrorMessage = "Action Failure" }
+                    ),
                 },
                 new SingleError(
                     ErrorLocation.EmptyLocation,

@@ -72,11 +72,10 @@ public sealed class IncrementVariable : CompoundStep<Unit>
             new IncrementVariableStepFactory();
 
         /// <inheritdoc />
-        public override IEnumerable<(VariableName variableName, TypeReference type)>
-            GetVariablesSet(
-                CallerMetadata callerMetadata,
-                FreezableStepData freezableStepData,
-                TypeResolver typeResolver)
+        public override IEnumerable<UsedVariable> GetVariablesUsed(
+            CallerMetadata callerMetadata,
+            FreezableStepData freezableStepData,
+            TypeResolver typeResolver)
         {
             var vn = freezableStepData.TryGetVariableName(
                 nameof(IncrementVariable.Variable),
@@ -86,7 +85,7 @@ public sealed class IncrementVariable : CompoundStep<Unit>
             if (vn.IsFailure)
                 yield break;
 
-            yield return (vn.Value, TypeReference.Actual.Integer);
+            yield return new(vn.Value, TypeReference.Actual.Integer, freezableStepData.Location);
         }
     }
 }

@@ -14,7 +14,7 @@ public class ErrorListTests
     {
         var errors = new[]
         {
-            new SingleError(ErrorLocation.EmptyLocation, ErrorCode.CannotInferType),
+            new SingleError(ErrorLocation.EmptyLocation, ErrorCode.CannotInferType, "Blah"),
             new SingleError(ErrorLocation.EmptyLocation, ErrorCode.CSVError)
         };
 
@@ -31,7 +31,7 @@ public class ErrorListTests
     {
         var errors = new[]
         {
-            new SingleError(ErrorLocation.EmptyLocation, ErrorCode.CannotInferType),
+            new SingleError(ErrorLocation.EmptyLocation, ErrorCode.CannotInferType, "Blah"),
             new SingleError(ErrorLocation.EmptyLocation, ErrorCode.CSVError)
         };
 
@@ -48,7 +48,7 @@ public class ErrorListTests
     {
         var errors = new[]
         {
-            new SingleError(ErrorLocation.EmptyLocation, ErrorCode.CannotInferType),
+            new SingleError(ErrorLocation.EmptyLocation, ErrorCode.CannotInferType, "Blah"),
             new SingleError(ErrorLocation.EmptyLocation, ErrorCode.CSVError)
         };
 

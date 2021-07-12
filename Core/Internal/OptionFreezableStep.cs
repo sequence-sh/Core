@@ -15,7 +15,7 @@ public sealed class OptionFreezableStep : IFreezableStep
     /// <summary>
     /// Create a new OptionFreezableStep
     /// </summary>
-    public OptionFreezableStep(IReadOnlyList<IFreezableStep> options, TextLocation? textLocation)
+    public OptionFreezableStep(IReadOnlyList<IFreezableStep> options, TextLocation textLocation)
     {
         Options      = options;
         TextLocation = textLocation;
@@ -27,7 +27,7 @@ public sealed class OptionFreezableStep : IFreezableStep
     public IReadOnlyList<IFreezableStep> Options { get; }
 
     /// <inheritdoc />
-    public TextLocation? TextLocation { get; }
+    public TextLocation TextLocation { get; }
 
     /// <inheritdoc />
     public string StepName => string.Join(" or ", Options);
@@ -71,26 +71,47 @@ public sealed class OptionFreezableStep : IFreezableStep
     }
 
     /// <inheritdoc />
-    public Result<IReadOnlyCollection<(VariableName variableName, TypeReference)>, IError>
-        GetVariablesSet(CallerMetadata callerMetadata, TypeResolver typeResolver)
+    public Result<IReadOnlyCollection<UsedVariable>,
+            IError>
+        GetVariablesUsed(CallerMetadata callerMetadata, TypeResolver typeResolver)
     {
-        IError? error = null;
+        var errors = new List<IError>();
 
-        foreach (var freezableStep in Options)
+        foreach (var freezableStep in
+            Options) //TODO define some sort of ordering of these options. e.g. look at the type of the index
         {
-            var r = freezableStep.GetVariablesSet(callerMetadata, typeResolver);
+            var r = freezableStep.GetVariablesUsed(callerMetadata, typeResolver);
 
             if (r.IsSuccess)
-                return r;
+            {
+                var canAdd = true;
+
+                foreach (var (variableName, typeReference, _) in r.Value)
+                {
+                    var canAddResult = typeResolver.CanAddType(variableName, typeReference);
+
+                    if (canAddResult.IsFailure)
+                    {
+                        canAdd = false;
+                        errors.Add(canAddResult.Error.WithLocation(this));
+                    }
+                }
+
+                if (canAdd)
+                {
+                    return r;
+                }
+            }
+
             else
-                error = r.Error;
+                errors.Add(r.Error);
         }
 
-        Debug.Assert(error != null, "OptionFreezableStep should have at least one option");
+        Debug.Assert(errors.Any(), "OptionFreezableStep should have at least one option");
 
         return Result
-            .Failure<IReadOnlyCollection<(VariableName variableName, TypeReference)>, IError
-            >(error);
+            .Failure<IReadOnlyCollection<UsedVariable>,
+                IError>(ErrorList.Combine(errors));
     }
 
     /// <inheritdoc />

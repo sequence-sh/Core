@@ -46,11 +46,11 @@ public sealed class ArrayDistinct<T> : CompoundStep<Array<T>>
             await using var scopedMonad = new ScopedStateMonad(
                 stateMonad,
                 currentState,
-                Variable,
-                new KeyValuePair<VariableName, object>(Variable, element!)
+                KeySelector.VariableNameOrItem,
+                new KeyValuePair<VariableName, object>(KeySelector.VariableNameOrItem, element!)
             );
 
-            var result = await KeySelector.Run(scopedMonad, cancellationToken)
+            var result = await KeySelector.StepTyped.Run(scopedMonad, cancellationToken)
                 .Map(async x => await x.GetStringAsync());
 
             if (result.IsFailure)
@@ -76,10 +76,9 @@ public sealed class ArrayDistinct<T> : CompoundStep<Array<T>>
     /// A function that gets the key to distinct by from the variable
     /// To distinct by multiple properties, concatenate several keys
     /// </summary>
-    [StepProperty(2)]
-    [ScopedFunction]
+    [FunctionProperty(2)]
     [Required]
-    public IStep<StringStream> KeySelector { get; set; } = null!;
+    public LambdaFunction<T, StringStream> KeySelector { get; set; } = null!;
 
     /// <summary>
     /// Whether to ignore case when comparing strings.
@@ -88,29 +87,8 @@ public sealed class ArrayDistinct<T> : CompoundStep<Array<T>>
     [DefaultValueExplanation("False")]
     public IStep<bool> IgnoreCase { get; set; } = new BoolConstant(false);
 
-    /// <summary>
-    /// The variable name to use in the predicate.
-    /// </summary>
-    [VariableName(4)]
-    [DefaultValueExplanation("<Entity>")]
-    public VariableName Variable { get; set; } = VariableName.Entity;
-
     /// <inheritdoc />
     public override IStepFactory StepFactory => ArrayDistinctStepFactory.Instance;
-
-    /// <inheritdoc />
-    public override Result<TypeResolver, IError> TryGetScopedTypeResolver(
-        TypeResolver baseTypeResolver,
-        IFreezableStep scopedStep)
-    {
-        return baseTypeResolver.TryCloneWithScopedStep(
-            Variable,
-            TypeReference.Create(typeof(T)),
-            new CallerMetadata(Name, nameof(KeySelector), TypeReference.Actual.String),
-            scopedStep,
-            new ErrorLocation(this)
-        );
-    }
 
     /// <summary>
     /// Removes duplicate entities.
@@ -140,10 +118,13 @@ public sealed class ArrayDistinct<T> : CompoundStep<Array<T>>
         protected override string ArrayPropertyName => nameof(ArrayDistinct<object>.Array);
 
         /// <inheritdoc />
+        protected override string LambdaPropertyName => nameof(ArrayDistinct<object>.KeySelector);
+
+        /// <inheritdoc />
         public override Type StepType => typeof(ArrayDistinct<>);
 
         /// <inheritdoc />
-        public override string OutputTypeExplanation => "Array<T>";
+        public override string OutputTypeExplanation => "Array of T";
     }
 }
 

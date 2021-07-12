@@ -24,7 +24,12 @@ public enum MemberType
     /// <summary>
     /// A list of steps
     /// </summary>
-    StepList
+    StepList,
+
+    /// <summary>
+    /// A lambda function
+    /// </summary>
+    Lambda
 }
 
 }

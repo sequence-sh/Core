@@ -19,7 +19,10 @@ public partial class EntityMapPropertiesTests : StepTestBase<EntityMapProperties
                 "Map some fields",
                 new ForEach<Entity>
                 {
-                    Action = new Log<Entity> { Value = GetVariable<Entity>(VariableName.Entity) },
+                    Action = new LambdaFunction<Entity, Unit>(
+                        null,
+                        new Log<Entity> { Value = GetEntityVariable }
+                    ),
                     Array =
                         new EntityMapProperties
                         {
@@ -34,8 +37,7 @@ public partial class EntityMapPropertiesTests : StepTestBase<EntityMapProperties
                                 )
                             ),
                             Mappings = Constant(Entity.Create(("Food", "Foo")))
-                        },
-                    Variable = VariableName.Entity
+                        }
                 },
                 Unit.Default,
                 "(Foo: \"Hello\" Bar: \"World\")",

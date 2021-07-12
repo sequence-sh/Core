@@ -55,28 +55,41 @@ public sealed class TypeResolver
     public StepFactoryStore StepFactoryStore { get; }
 
     /// <summary>
-    /// Try to Clone this context with additional set variables.
+    /// Try to Clone this context with additional set variables from a lambda function
     /// </summary>
-    public Result<TypeResolver, IError> TryCloneWithScopedStep(
-        VariableName vn,
+    public Result<TypeResolver, IError> TryCloneWithScopedLambda(
+        FreezableStepProperty.Lambda lambda,
         TypeReference typeReference,
-        CallerMetadata scopedCallerMetadata,
-        IFreezableStep scopedStep,
-        ErrorLocation errorLocation)
+        CallerMetadata scopedCallerMetadata)
     {
         var newTypeResolver = Copy();
+        var vn              = lambda.VariableNameOrItem;
+        newTypeResolver.AutomaticVariableName = vn;
 
         var r1 = newTypeResolver.TryAddType(vn, typeReference);
 
         if (r1.IsFailure)
-            return r1.ConvertFailure<TypeResolver>().MapError(x => x.WithLocation(errorLocation));
+        {
+            if (r1.Error.GetErrorBuilders().Count() == 1
+             && r1.Error.GetErrorBuilders().Single().ErrorCode
+             == ErrorCode.WrongVariableType) //Get a better error message
+            {
+                var r3 = lambda.FreezableStep.TryFreeze(scopedCallerMetadata, newTypeResolver);
 
-        var r2 = newTypeResolver.TryAddTypeHierarchy(scopedCallerMetadata, scopedStep);
+                if (r3.IsFailure)
+                    return r3.ConvertFailure<TypeResolver>();
+            }
+
+            return r1.ConvertFailure<TypeResolver>()
+                .MapError(x => x.WithLocation(lambda.Location));
+        }
+
+        var r2 = newTypeResolver.TryAddTypeHierarchy(scopedCallerMetadata, lambda.FreezableStep);
 
         if (r2.IsFailure)
+        {
             return r2.ConvertFailure<TypeResolver>();
-
-        newTypeResolver.AutomaticVariableName = vn;
+        }
 
         return newTypeResolver;
     }
@@ -114,26 +127,30 @@ public sealed class TypeResolver
             var unresolvableVariableNames = new List<VariableName>();
             var errors                    = new List<IError>();
 
-            var result = topLevelStep.GetVariablesSet(callerMetadata, this);
+            var result = topLevelStep.GetVariablesUsed(callerMetadata, this);
 
             if (result.IsFailure)
                 return result.ConvertFailure<Unit>();
 
-            foreach (var (variableName, typeReference) in result.Value)
+            foreach (var (variableName, typeReference, location) in result.Value)
             {
-                if (typeReference is TypeReference.Unknown)
+                if (typeReference.IsUnknown)
                     unresolvableVariableNames.Add(variableName);
                 else
                 {
                     var addResult = TryAddType(variableName, typeReference);
 
                     if (addResult.IsFailure)
-                        errors.Add(addResult.Error.WithLocation(ErrorLocation.EmptyLocation));
+                        errors.Add(addResult.Error.WithLocation(location));
                 }
             }
 
             if (errors.Any())
                 return Result.Failure<Unit, IError>(ErrorList.Combine(errors));
+
+            unresolvableVariableNames.RemoveAll(
+                Dictionary.ContainsKey
+            ); //remove all unresolvable variables that we have resolved some other way
 
             if (!unresolvableVariableNames.Any())
                 break; //We've resolved everything. Yey!
@@ -149,11 +166,8 @@ public sealed class TypeResolver
                         unresolvableVariableNames.Distinct()
                             .Select(
                                 x =>
-                                    new SingleError(
-                                        ErrorLocation.EmptyLocation,
-                                        ErrorCode.CouldNotResolveVariable,
-                                        x.Name
-                                    )
+                                    ErrorCode.CouldNotResolveVariable.ToErrorBuilder(x.Name)
+                                        .WithLocationSingle(ErrorLocation.EmptyLocation)
                             )
                     );
 
@@ -171,21 +185,49 @@ public sealed class TypeResolver
         VariableName variable,
         TypeReference typeReference)
     {
+        var can = CanAddType(variable, typeReference);
+
+        if (can.IsSuccess)
+        {
+            if (can.Value)
+                MyDictionary[variable] = typeReference;
+
+            return Unit.Default;
+        }
+
+        return can.ConvertFailure<Unit>();
+    }
+
+    /// <summary>
+    /// Determines whether a particular variable can be added to the type resolver.
+    /// Returns true if it should be added, false if it is already present
+    /// </summary>
+    public Result<bool, IErrorBuilder> CanAddType(
+        VariableName variable,
+        TypeReference typeReference)
+    {
         var actualType = typeReference.TryGetType(this);
 
         if (actualType.IsFailure)
-            return actualType.ConvertFailure<Unit>();
+            return actualType.ConvertFailure<bool>();
 
         if (MyDictionary.TryGetValue(variable, out var previous))
         {
-            if (previous.Equals(typeReference))
-                return Unit.Default;
+            if (previous.Equals(typeReference)
+             || typeReference.Allow(previous, this)) //The variable already had this type reference
+                return false;
 
-            return ErrorCode.WrongVariableType.ToErrorBuilder(variable.Name, typeReference.Name);
+            if (!previous.Allow(
+                typeReference,
+                this
+            ))
+                return ErrorCode.WrongVariableType.ToErrorBuilder(
+                    variable.Name,
+                    typeReference.Name
+                );
         }
 
-        MyDictionary.Add(variable, typeReference);
-        return Unit.Default;
+        return true;
     }
 
     /// <summary>

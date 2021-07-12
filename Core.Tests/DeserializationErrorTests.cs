@@ -26,8 +26,8 @@ public partial class DeserializationErrorTests
 
             yield return new DeserializationErrorCase(
                 "- EntityGetValue [1,2] 'a'",
-                ("EntityGetValue expected Entity for parameter Entity but ArrayNew has type Array/Sequence",
-                 "EntityGetValue - Line: 1, Col: 2, Idx: 2 - Line: 1, Col: 25, Idx: 25 Text: EntityGetValue [1,2] 'a'")
+                ("EntityGetValue expected Entity for parameter Entity but [1,2] has type Array/Sequence",
+                 "Line: 1, Col: 17, Idx: 17 - Line: 1, Col: 21, Idx: 21 Text: [1,2]")
             );
 
             yield return new DeserializationErrorCase(
@@ -39,7 +39,7 @@ public partial class DeserializationErrorTests
             yield return new DeserializationErrorCase(
                 "Print Value: 'hello' Term: 'world'",
                 ("Unexpected Parameter 'Term' in 'Print'",
-                 "Print - Line: 1, Col: 0, Idx: 0 - Line: 1, Col: 33, Idx: 33 Text: Print Value: 'hello' Term: 'world'")
+                 "Line: 1, Col: 0, Idx: 0 - Line: 1, Col: 33, Idx: 33 Text: Print Value: 'hello' Term: 'world'")
             );
 
             yield return new DeserializationErrorCase(
@@ -68,15 +68,11 @@ public partial class DeserializationErrorTests
 
             yield return new DeserializationErrorCase(
                 "<>",
-                ("The automatic variable was not set.",
-                 "GetAutomaticVariable - Line: 1, Col: 0, Idx: 0 - Line: 1, Col: 1, Idx: 1 Text: <>")
+                (
+                    "The automatic variable was not set.",
+                    "GetAutomaticVariable - Line: 1, Col: 0, Idx: 0 - Line: 1, Col: 1, Idx: 1 Text: <>"
+                )
             );
-
-            //yield return new DeserializationErrorCase(
-            //    "Print(['abc', '123'] == ['abc', '123'])",
-            //    ("Type ArrayOfStringStream is not comparable and so cannot be used for sorting.",
-            //     "Line: 1, Col: 6, Idx: 6 - Line: 1, Col: 37, Idx: 37 Text: ['abc', '123'] == ['abc', '123']")
-            //);
 
             yield return new DeserializationErrorCase(
                 "MyMegaFunction true",
@@ -91,24 +87,26 @@ public partial class DeserializationErrorTests
             );
 
             yield return new DeserializationErrorCase(
-                "Foreach ['one', 'two'] (Print (<Entity> + 1))",
+                "Foreach ['one', 'two'] (Print (<item> + 1))",
                 ("StringJoin expected String for parameter Strings but Step has type Integer",
-                 "1 - Line: 1, Col: 42, Idx: 42 - Line: 1, Col: 42, Idx: 42 Text: 1")
+                 "1 - Line: 1, Col: 40, Idx: 40 - Line: 1, Col: 40, Idx: 40 Text: 1")
             );
 
             yield return new DeserializationErrorCase(
-                "Foreach ['one', 'two'] (Print (<Num> + 1)) <Num>",
+                "Foreach ['one', 'two'] (Print (<Num> => <Num> + 1)) ",
+                ("Could not infer type - <Num> could not be inferred",
+                 "Line: 1, Col: 40, Idx: 40 - Line: 1, Col: 44, Idx: 44 Text: <Num>"),
                 ("StringJoin expected String for parameter Strings but Step has type Integer",
-                 "1 - Line: 1, Col: 39, Idx: 39 - Line: 1, Col: 39, Idx: 39 Text: 1")
+                 "1 - Line: 1, Col: 48, Idx: 48 - Line: 1, Col: 48, Idx: 48 Text: 1")
             );
 
             yield return new DeserializationErrorCase(
-                "Foreach ['one', 'two') (Print <Num>) <Num>", //The ) should be a ]
+                "Foreach ['one', 'two') (<Num> => Print <Num>) ", //The ) should be a ]
                 (
                     @"Syntax Error: extraneous input ')' expecting {'(', '[', ']', ',', AUTOMATICVARIABLE, VARIABLENAME, DATETIME, NUMBER, OPENISTRING, SIMPLEISTRING, DOUBLEQUOTEDSTRING, SINGLEQUOTEDSTRING, TRUE, FALSE, NAME}",
                     @"Line: 1, Col: 21, Idx: 21 - Line: 1, Col: 21, Idx: 21 Text: )"),
                 (@"Syntax Error: mismatched input '<EOF>' expecting {'(', '[', ']', ',', AUTOMATICVARIABLE, VARIABLENAME, DATETIME, NUMBER, OPENISTRING, SIMPLEISTRING, DOUBLEQUOTEDSTRING, SINGLEQUOTEDSTRING, TRUE, FALSE, NAME}",
-                 @"Line: 1, Col: 42, Idx: 42 - Line: 1, Col: 41, Idx: 41 Text: <EOF>"
+                 @"Line: 1, Col: 46, Idx: 46 - Line: 1, Col: 45, Idx: 45 Text: <EOF>"
                 )
             );
 
@@ -119,10 +117,10 @@ public partial class DeserializationErrorTests
             );
 
             yield return new DeserializationErrorCase(
-                "-<array> = [('Foo': 1), ('Foo': 2)]\r\n- StringIsEmpty <array>[0]",
+                "- <array> = [('Foo': 1), ('Foo': 2)]\r\n- StringIsEmpty <array>[0]",
                 (
-                    "ElementAtIndex expected Array<String> for parameter Array but <array> has type Array<Entity>",
-                    "GetVariable - Line: 2, Col: 16, Idx: 53 - Line: 2, Col: 22, Idx: 59 Text: <array>")
+                    "Variable 'array' does not have type 'Entity'.",
+                    "Line: 2, Col: 16, Idx: 54 - Line: 2, Col: 22, Idx: 60 Text: <array>")
             );
 
             yield return new DeserializationErrorCase(
@@ -133,7 +131,7 @@ public partial class DeserializationErrorTests
 
             yield return new DeserializationErrorCase(
                 "Sum 1",
-                ("Sum expected Array<Integer> for parameter Terms but Step has type Integer",
+                ("Sum expected Array of Integer for parameter Terms but Step has type Integer",
                  "1 - Line: 1, Col: 4, Idx: 4 - Line: 1, Col: 4, Idx: 4 Text: 1")
             );
         }
@@ -155,6 +153,8 @@ public partial class DeserializationErrorTests
         /// <inheritdoc />
         public void Run(ITestOutputHelper testOutputHelper)
         {
+            testOutputHelper.WriteLine(SCL);
+
             var sfs = StepFactoryStore.Create();
 
             var result = SCLParsing.TryParseStep(SCL)

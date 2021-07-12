@@ -38,7 +38,7 @@ public abstract partial class StepTestBase<TStep, TOutput>
             .ThenBy(x => x.attribute!.Order)
             .Select(x => x.propertyInfo)
         )
-            MatchStepPropertyInfo(propertyInfo, SetVariableName, SetStep, SetStepList);
+            MatchStepPropertyInfo(propertyInfo, SetVariableName, SetStep, SetLambda, SetStepList);
 
         return (instance, values);
 
@@ -75,6 +75,47 @@ public abstract partial class StepTestBase<TStep, TOutput>
             else
             {
                 var s = ((IStep)currentValue).Serialize();
+                values.Add(property.Name, s);
+            }
+
+            return Unit.Default;
+        }
+
+        Unit SetLambda(PropertyInfo property)
+        {
+            var currentValue = property.GetValue(instance);
+
+            if (currentValue == null)
+            {
+                var (step, value, newIndex) = CreateSimpleStep(
+                    property.PropertyType.GenericTypeArguments[1],
+                    property.Name,
+                    index,
+                    false
+                );
+
+                index = newIndex;
+                values.Add(property.Name, $"(<> => {value})");
+
+                try
+                {
+                    var lambda = Activator.CreateInstance(
+                        property.PropertyType,
+                        null as VariableName?,
+                        step
+                    );
+
+                    property.SetValue(instance, lambda);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                    throw;
+                }
+            }
+            else
+            {
+                var s = ((LambdaFunction)currentValue).Serialize();
                 values.Add(property.Name, s);
             }
 
@@ -127,6 +168,7 @@ public abstract partial class StepTestBase<TStep, TOutput>
         PropertyInfo stepPropertyInfo,
         Func<PropertyInfo, T> variableNameAction,
         Func<PropertyInfo, T> stepPropertyAction,
+        Func<PropertyInfo, T> lambdaAction,
         Func<PropertyInfo, T> stepListAction)
     {
         var actions = new List<Func<PropertyInfo, T>>();
@@ -139,6 +181,9 @@ public abstract partial class StepTestBase<TStep, TOutput>
 
         if (stepPropertyInfo.IsDecoratedWith<StepListPropertyAttribute>())
             actions.Add(stepListAction);
+
+        if (stepPropertyInfo.IsDecoratedWith<FunctionPropertyAttribute>())
+            actions.Add(lambdaAction);
 
         return actions.Count switch
         {
@@ -158,7 +203,19 @@ public abstract partial class StepTestBase<TStep, TOutput>
     {
         var tStep = propertyInfo.PropertyType;
 
-        var   outputType = tStep.GenericTypeArguments.First();
+        var outputType = tStep.GenericTypeArguments.First();
+
+        var singleChar = propertyInfo.GetCustomAttribute<SingleCharacterAttribute>() != null;
+
+        return CreateSimpleStep(outputType, tStep.Name, index, singleChar);
+    }
+
+    private static (IStep step, string value, int newIndex) CreateSimpleStep(
+        Type outputType,
+        string stepName,
+        int index,
+        bool singleChar)
+    {
         IStep step;
 
         if (outputType == typeof(Unit))
@@ -170,8 +227,7 @@ public abstract partial class StepTestBase<TStep, TOutput>
         {
             string s;
 
-            if (propertyInfo != null
-             && propertyInfo.GetCustomAttribute<SingleCharacterAttribute>() != null)
+            if (singleChar)
                 s = "" + index;
             else
                 s = "Bar" + index;
@@ -182,7 +238,7 @@ public abstract partial class StepTestBase<TStep, TOutput>
         else if (outputType == typeof(string))
         {
             throw new Exception(
-                $"{tStep.Name} should not have output type 'String' - it should be 'StringStream'"
+                $"{stepName} should not have output type 'String' - it should be 'StringStream'"
             );
         }
 
@@ -287,7 +343,7 @@ public abstract partial class StepTestBase<TStep, TOutput>
         else if (outputType == typeof(Stream))
         {
             throw new Exception(
-                $"{tStep.Name} should not have output type 'Stream' - it should be 'StringStream'"
+                $"{stepName} should not have output type 'Stream' - it should be 'StringStream'"
             );
         }
         else if (outputType == typeof(Entity))
@@ -306,7 +362,7 @@ public abstract partial class StepTestBase<TStep, TOutput>
         else if (outputType == typeof(Schema))
         {
             throw new Exception(
-                $"{tStep.Name} should not have output type 'Schema' - it should be 'Entity'"
+                $"{stepName} should not have output type 'Schema' - it should be 'Entity'"
             );
         }
         else

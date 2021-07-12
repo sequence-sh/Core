@@ -109,11 +109,10 @@ public sealed class RunSCL : CompoundStep<Unit>
         public static SimpleStepFactory<RunSCL, Unit> Instance { get; } = new RunSCLStepFactory();
 
         /// <inheritdoc />
-        public override IEnumerable<(VariableName variableName, TypeReference type)>
-            GetVariablesSet(
-                CallerMetadata callerMetadata,
-                FreezableStepData freezableStepData,
-                TypeResolver typeResolver)
+        public override IEnumerable<UsedVariable> GetVariablesUsed(
+            CallerMetadata callerMetadata,
+            FreezableStepData freezableStepData,
+            TypeResolver typeResolver)
         {
             var export = freezableStepData.TryGetStep(nameof(Export), StepType)
                     .Bind(
@@ -138,12 +137,13 @@ public sealed class RunSCL : CompoundStep<Unit>
                     {
                         var name = entityValue.GetPrimitiveString();
 
-                        yield return (new VariableName(name!), TypeReference.Any.Instance);
+                        yield return new(new VariableName(name!), TypeReference.Any.Instance,
+                                         freezableStepData.Location);
                     }
                 }
             }
 
-            foreach (var pair in base.GetVariablesSet(
+            foreach (var pair in base.GetVariablesUsed(
                 callerMetadata,
                 freezableStepData,
                 typeResolver

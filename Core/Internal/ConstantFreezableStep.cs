@@ -12,7 +12,7 @@ namespace Reductech.EDR.Core.Internal
 /// A constant string
 /// </summary>
 public record StringConstantFreezable
-    (StringStream Value, TextLocation? TextLocation) : ConstantFreezableBase<StringStream>(
+    (StringStream Value, TextLocation TextLocation) : ConstantFreezableBase<StringStream>(
         Value,
         TextLocation
     )
@@ -33,7 +33,7 @@ public record StringConstantFreezable
 /// A constant int
 /// </summary>
 public record IntConstantFreezable
-    (int Value, TextLocation? TextLocation) : ConstantFreezableBase<int>(Value, TextLocation)
+    (int Value, TextLocation TextLocation) : ConstantFreezableBase<int>(Value, TextLocation)
 {
     /// <inheritdoc />
     public override string StepName => Value.ToString();
@@ -70,7 +70,7 @@ public record IntConstantFreezable
 /// A constant double
 /// </summary>
 public record DoubleConstantFreezable
-    (double Value, TextLocation? TextLocation) : ConstantFreezableBase<double>(Value, TextLocation)
+    (double Value, TextLocation TextLocation) : ConstantFreezableBase<double>(Value, TextLocation)
 {
     /// <inheritdoc />
     public override string StepName => Value.ToString(Constants.DoubleFormat);
@@ -88,7 +88,7 @@ public record DoubleConstantFreezable
 /// A constant bool
 /// </summary>
 public record BoolConstantFreezable
-    (bool Value, TextLocation? TextLocation) : ConstantFreezableBase<bool>(Value, TextLocation)
+    (bool Value, TextLocation TextLocation) : ConstantFreezableBase<bool>(Value, TextLocation)
 {
     /// <inheritdoc />
     public override string StepName => Value.ToString();
@@ -106,7 +106,7 @@ public record BoolConstantFreezable
 /// A constant DateTime
 /// </summary>
 public record DateTimeConstantFreezable
-    (DateTime Value, TextLocation? TextLocation) : ConstantFreezableBase<DateTime>(
+    (DateTime Value, TextLocation TextLocation) : ConstantFreezableBase<DateTime>(
         Value,
         TextLocation
     )
@@ -127,7 +127,7 @@ public record DateTimeConstantFreezable
 /// An Enum Constant
 /// </summary>
 public record EnumConstantFreezable
-    (Enumeration Value, TextLocation? TextLocation) : ConstantFreezableBase<Enumeration>(
+    (Enumeration Value, TextLocation TextLocation) : ConstantFreezableBase<Enumeration>(
         Value,
         TextLocation
     )
@@ -218,10 +218,8 @@ public interface IConstantFreezableStep : IFreezableStep
 /// <summary>
 /// The base class for freezable constants
 /// </summary>
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 public abstract record ConstantFreezableBase<T>
-    (T Value, TextLocation? TextLocation) : IConstantFreezableStep
-    #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
+    (T Value, TextLocation TextLocation) : IConstantFreezableStep
 {
     /// <inheritdoc />
     public abstract string StepName { get; }
@@ -232,10 +230,11 @@ public abstract record ConstantFreezableBase<T>
         TypeResolver typeResolver);
 
     /// <inheritdoc />
-    public Result<IReadOnlyCollection<(VariableName variableName, TypeReference)>, IError>
-        GetVariablesSet(CallerMetadata callerMetadata, TypeResolver typeResolver)
+    public Result<IReadOnlyCollection<UsedVariable>,
+            IError>
+        GetVariablesUsed(CallerMetadata callerMetadata, TypeResolver typeResolver)
     {
-        return new List<(VariableName variableName, TypeReference)>();
+        return Array.Empty<UsedVariable>();
     }
 
     /// <inheritdoc />

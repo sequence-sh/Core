@@ -76,20 +76,19 @@ public sealed class AppendString : CompoundStep<Unit>
             new AppendStringStepFactory();
 
         /// <inheritdoc />
-        public override IEnumerable<(VariableName variableName, TypeReference type)>
-            GetVariablesSet(
-                CallerMetadata callerMetadata,
-                FreezableStepData freezableStepData,
-                TypeResolver typeResolver)
+        public override IEnumerable<UsedVariable> GetVariablesUsed(
+            CallerMetadata callerMetadata,
+            FreezableStepData freezableStepData,
+            TypeResolver typeResolver)
         {
             var vn = freezableStepData.TryGetVariableName(nameof(AppendString.Variable), StepType);
 
             if (vn.IsFailure)
                 yield break;
 
-            yield return (
+            yield return new(
                 vn.Value,
-                TypeReference.Actual.String);
+                TypeReference.Actual.String, freezableStepData.Location);
         }
     }
 }

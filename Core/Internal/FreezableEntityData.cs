@@ -10,11 +10,9 @@ namespace Reductech.EDR.Core.Internal
 /// <summary>
 /// The data used by a Freezable Step.
 /// </summary>
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 public record FreezableEntityData(
-        IReadOnlyDictionary<EntityPropertyKey, FreezableStepProperty> EntityProperties,
-        TextLocation? Location)
-    #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
+    IReadOnlyDictionary<EntityPropertyKey, FreezableStepProperty> EntityProperties,
+    TextLocation Location)
 {
     /// <inheritdoc />
     public override string ToString()
@@ -30,10 +28,10 @@ public record FreezableEntityData(
     /// <summary>
     /// Gets the variables set by steps in this FreezableStepData.
     /// </summary>
-    public Result<IReadOnlyCollection<(VariableName variableName, TypeReference)>, IError>
-        GetVariablesSet(CallerMetadata callerMetadata, TypeResolver typeResolver)
+    public Result<IReadOnlyCollection<UsedVariable>, IError>
+        GetVariablesUsed(CallerMetadata callerMetadata, TypeResolver typeResolver)
     {
-        var variables = new List<(VariableName variableName, TypeReference)>();
+        var variables = new List<UsedVariable>();
         var errors    = new List<IError>();
 
         foreach (var stepProperty in EntityProperties)
@@ -57,14 +55,14 @@ public record FreezableEntityData(
 
         if (errors.Any())
             return Result
-                .Failure<IReadOnlyCollection<(VariableName variableName, TypeReference)>,
+                .Failure<IReadOnlyCollection<UsedVariable>,
                     IError>(ErrorList.Combine(errors));
 
         return variables;
 
         void LocalGetVariablesSet(IFreezableStep freezableStep)
         {
-            var variablesSet = freezableStep.GetVariablesSet(callerMetadata, typeResolver);
+            var variablesSet = freezableStep.GetVariablesUsed(callerMetadata, typeResolver);
 
             if (variablesSet.IsFailure)
                 errors.Add(variablesSet.Error);

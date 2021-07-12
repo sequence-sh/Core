@@ -1,5 +1,8 @@
-﻿using CSharpFunctionalExtensions;
+﻿using System;
+using System.Linq;
+using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Internal.Errors;
+using Reductech.EDR.Core.Util;
 
 namespace Reductech.EDR.Core.Internal
 {
@@ -19,6 +22,11 @@ public abstract class ArrayStepFactory : GenericStepFactory
     /// The name of the array property
     /// </summary>
     protected abstract string ArrayPropertyName { get; }
+
+    /// <summary>
+    /// The name of the lambda property
+    /// </summary>
+    protected abstract string? LambdaPropertyName { get; }
 
     /// <inheritdoc />
     protected override Result<TypeReference, IError> GetGenericTypeParameter(
@@ -52,11 +60,36 @@ public abstract class ArrayStepFactory : GenericStepFactory
         if (outputTypeReference.IsFailure)
             return outputTypeReference.ConvertFailure<TypeReference>();
 
-        var arrayMemberType = outputTypeReference.Value
+        var arrayMemberTypeResult = outputTypeReference.Value
             .TryGetArrayMemberTypeReference(typeResolver)
             .MapError(e => e.WithLocation(freezableStepData));
 
-        return arrayMemberType;
+        TypeReference arrayMemberType =
+            arrayMemberTypeResult.ToMaybe().Unwrap(TypeReference.Unknown.Instance);
+
+        if (LambdaPropertyName is null)
+            return arrayMemberType;
+
+        var lambda = freezableStepData.TryGetLambda(LambdaPropertyName, StepType);
+
+        if (lambda.IsFailure)
+            return arrayMemberType; //lambda is optional
+
+        var nestedTypeResolver = typeResolver.TryCloneWithScopedLambda(
+            lambda.Value,
+            arrayMemberType,
+            callerMetadata
+        );
+
+        if (nestedTypeResolver.IsFailure)
+            return nestedTypeResolver.ConvertFailure<TypeReference>();
+
+        var realType = nestedTypeResolver.Value.Dictionary[lambda.Value.VariableNameOrItem];
+
+        if (realType is null)
+            throw new Exception("Could not expected type from type resolver");
+
+        return realType;
     }
 }
 

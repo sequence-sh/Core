@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
 using System.Reflection;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Internal.Errors;
@@ -45,7 +44,7 @@ public interface IStepFactory
     /// <summary>
     /// Gets all type references set by this method and their values if they can be calculated.
     /// </summary>
-    IEnumerable<(VariableName variableName, TypeReference type)> GetVariablesSet(
+    IEnumerable<UsedVariable> GetVariablesUsed(
         CallerMetadata callerMetadata,
         FreezableStepData freezableStepData,
         TypeResolver typeResolver);
@@ -77,12 +76,6 @@ public interface IStepFactory
     /// Gets all enum types used by this step.
     /// </summary>
     IEnumerable<Type> EnumTypes { get; }
-
-    /// <summary>
-    /// Does this reference a scoped property.
-    /// </summary>
-    [Pure]
-    bool IsScopedFunction(StepParameterReference stepParameterReference);
 }
 
 }

@@ -88,6 +88,9 @@ public sealed class FindElement<T> : CompoundStep<int>
 
         /// <inheritdoc />
         protected override string ArrayPropertyName => nameof(FindElement<object>.Array);
+
+        /// <inheritdoc />
+        protected override string? LambdaPropertyName => null;
     }
 }
 

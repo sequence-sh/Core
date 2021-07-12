@@ -11,12 +11,10 @@ namespace Reductech.EDR.Core.Internal
 /// <summary>
 /// A step that is not a constant or a variable reference.
 /// </summary>
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 public sealed record CompoundFreezableStep(
-        string StepName,
-        FreezableStepData FreezableStepData,
-        TextLocation? TextLocation) : IFreezableStep
-    #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
+    string StepName,
+    FreezableStepData FreezableStepData,
+    TextLocation TextLocation) : IFreezableStep
 {
     /// <summary>
     /// Try to get this step factory from the store.
@@ -44,26 +42,26 @@ public sealed record CompoundFreezableStep(
     }
 
     /// <inheritdoc />
-    public Result<IReadOnlyCollection<(VariableName variableName, TypeReference)>, IError>
-        GetVariablesSet(CallerMetadata callerMetadata, TypeResolver typeResolver)
+    public Result<IReadOnlyCollection<UsedVariable>,
+            IError>
+        GetVariablesUsed(CallerMetadata callerMetadata, TypeResolver typeResolver)
     {
         var stepFactory = TryGetStepFactory(typeResolver.StepFactoryStore);
 
         if (stepFactory.IsFailure)
             return stepFactory
-                .ConvertFailure<IReadOnlyCollection<(VariableName variableName,
-                    TypeReference)>>();
+                .ConvertFailure<IReadOnlyCollection<UsedVariable>>();
 
-        var dataResult = FreezableStepData.GetVariablesSet(StepName, callerMetadata, typeResolver);
+        var dataResult = FreezableStepData.GetVariablesUsed(StepName, callerMetadata, typeResolver);
 
         if (dataResult.IsFailure)
             return dataResult;
 
-        return dataResult.Value
-            .Concat(
-                stepFactory.Value.GetVariablesSet(callerMetadata, FreezableStepData, typeResolver)
-            )
+        var sfResult = stepFactory.Value
+            .GetVariablesUsed(callerMetadata, FreezableStepData, typeResolver)
             .ToList();
+
+        return dataResult.Value.Concat(sfResult).ToList();
     }
 
     /// <inheritdoc />

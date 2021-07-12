@@ -27,6 +27,7 @@ namedArgument		: NAME COLON term ;
 function			: NAME (term)* (namedArgument)* ;
 entity				: OPENBRACKET (entityProperty COMMA?)*  CLOSEBRACKET ;
 bracketedStep		: OPENBRACKET step CLOSEBRACKET ;
+lambda              : OPENBRACKET (VARIABLENAME | AUTOMATICVARIABLE) ARROW step CLOSEBRACKET ;
 boolean				: TRUE | FALSE ;
 dateTime			: DATETIME ;
 interpolatedString	: OPENISTRING step (ISTRINGSEGMENT step)* CLOSEISTRING;
@@ -50,6 +51,7 @@ simpleTerm			: number
                     | enumeration
                     | quotedString
 					| interpolatedString
+                    | lambda
                     | getVariable
                     | getAutomaticVariable
                     | entity
@@ -71,6 +73,7 @@ PERCENT             : '%' ;
 CARROT              : '^' ;
 AND					: '&&' ;
 OR					: '||' ;
+ARROW               : '=>';
 DOUBLEEQUALS        : '==' ;
 NOTEQUALS           : '!=' ;
 LESSTHANEQUALS      : '<=' ;

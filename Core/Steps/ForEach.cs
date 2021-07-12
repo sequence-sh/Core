@@ -29,17 +29,9 @@ public sealed class ForEach<T> : CompoundStep<Unit>
     /// <summary>
     /// The action to perform repeatedly.
     /// </summary>
-    [StepProperty(2)]
-    [ScopedFunction]
+    [FunctionProperty(2)]
     [Required]
-    public IStep<Unit> Action { get; set; } = null!;
-
-    /// <summary>
-    /// The name of the variable to loop over.
-    /// </summary>
-    [VariableName(3)]
-    [DefaultValueExplanation("<Entity>")]
-    public VariableName Variable { get; set; } = VariableName.Entity;
+    public LambdaFunction<T, Unit> Action { get; set; } = null!;
 
     /// <inheritdoc />
     protected override async Task<Result<Unit, IError>> Run(
@@ -58,31 +50,17 @@ public sealed class ForEach<T> : CompoundStep<Unit>
             var scopedMonad = new ScopedStateMonad(
                 stateMonad,
                 currentState,
-                Variable,
-                new KeyValuePair<VariableName, object>(Variable, element!)
+                Action.VariableNameOrItem,
+                new KeyValuePair<VariableName, object>(Action.VariableNameOrItem, element!)
             );
 
-            var result = await Action.Run(scopedMonad, cancellation);
+            var result = await Action.StepTyped.Run(scopedMonad, cancellation);
             return result;
         }
 
         var finalResult = await elements.Value.ForEach(Apply, cancellationToken);
 
         return finalResult;
-    }
-
-    /// <inheritdoc />
-    public override Result<TypeResolver, IError> TryGetScopedTypeResolver(
-        TypeResolver baseContext,
-        IFreezableStep scopedStep)
-    {
-        return baseContext.TryCloneWithScopedStep(
-            Variable,
-            TypeReference.Create(typeof(T)),
-            new CallerMetadata(Name, nameof(Action), TypeReference.Unit.Instance),
-            scopedStep,
-            new ErrorLocation(this)
-        );
     }
 
     /// <inheritdoc />
@@ -119,6 +97,9 @@ public sealed class ForEach<T> : CompoundStep<Unit>
 
         /// <inheritdoc />
         protected override string ArrayPropertyName => nameof(ForEach<object>.Array);
+
+        /// <inheritdoc />
+        protected override string LambdaPropertyName => nameof(ForEach<object>.Action);
 
         /// <inheritdoc />
         public override string OutputTypeExplanation => nameof(Unit);

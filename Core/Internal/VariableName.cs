@@ -62,21 +62,26 @@ public readonly struct VariableName : IEquatable<VariableName>
     /// <returns></returns>
     public string Serialize() => $"<{Name}>";
 
-    /// <summary>
-    /// The variable that entities will be set to.
-    /// </summary>
+    ///// <summary>
+    ///// The variable that entities will be set to.
+    ///// </summary>
 
-    public static VariableName Entity { get; } = new("Entity");
+    //public static VariableName Entity { get; } = new("Entity");
+
+    ///// <summary>
+    ///// The variable that Regex matches will be set to.
+    ///// </summary>
+    //public static VariableName Match { get; } = new("Match");
+
+    ///// <summary>
+    ///// The variable name that indexes in for loops will be set to
+    ///// </summary>
+    //public static VariableName Index { get; } = new("i");
 
     /// <summary>
-    /// The variable that Regex matches will be set to.
+    /// Automatic variable name
     /// </summary>
-    public static VariableName Match { get; } = new("Match");
-
-    /// <summary>
-    /// The variable name that indexes in for loops will be set to
-    /// </summary>
-    public static VariableName Index { get; } = new("i");
+    public static VariableName Item { get; } = new("item");
 }
 
 }

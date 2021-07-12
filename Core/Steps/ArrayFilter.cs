@@ -36,11 +36,11 @@ public sealed class ArrayFilter<T> : CompoundStep<Array<T>>
             await using var scopedMonad = new ScopedStateMonad(
                 stateMonad,
                 currentState,
-                Variable,
-                new KeyValuePair<VariableName, object>(Variable, record!)
+                Predicate.VariableNameOrItem,
+                new KeyValuePair<VariableName, object>(Predicate.VariableNameOrItem, record!)
             );
 
-            var result = await Predicate.Run(scopedMonad, cancellationToken);
+            var result = await Predicate.StepTyped.Run(scopedMonad, cancellationToken);
 
             if (result.IsFailure)
                 throw new ErrorException(result.Error);
@@ -64,31 +64,9 @@ public sealed class ArrayFilter<T> : CompoundStep<Array<T>>
     /// <summary>
     /// A function that determines whether an entity should be included.
     /// </summary>
-    [StepProperty(2)]
-    [ScopedFunction]
+    [FunctionProperty(2)]
     [Required]
-    public IStep<bool> Predicate { get; set; } = null!;
-
-    /// <summary>
-    /// The variable name to use in the predicate.
-    /// </summary>
-    [VariableName(3)]
-    [DefaultValueExplanation("<Entity>")]
-    public VariableName Variable { get; set; } = VariableName.Entity;
-
-    /// <inheritdoc />
-    public override Result<TypeResolver, IError> TryGetScopedTypeResolver(
-        TypeResolver baseContext,
-        IFreezableStep scopedStep)
-    {
-        return baseContext.TryCloneWithScopedStep(
-            Variable,
-            TypeReference.Create(typeof(T)),
-            new CallerMetadata(Name, nameof(Predicate), TypeReference.Actual.Bool),
-            scopedStep,
-            new ErrorLocation(this)
-        );
-    }
+    public LambdaFunction<T, bool> Predicate { get; set; } = null!;
 
     /// <inheritdoc />
     public override IStepFactory StepFactory => ArrayFilterStepFactory.Instance;
@@ -124,7 +102,9 @@ public sealed class ArrayFilter<T> : CompoundStep<Array<T>>
         public override Type StepType => typeof(ArrayFilter<>);
 
         /// <inheritdoc />
-        public override string OutputTypeExplanation => "Array<T>";
+        public override string OutputTypeExplanation => "Array of T";
+
+        protected override string LambdaPropertyName => nameof(ArrayFilter<object>.Predicate);
     }
 }
 

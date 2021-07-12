@@ -20,21 +20,26 @@ public partial class ArrayMapTests : StepTestBase<ArrayMap<Entity>, Array<Entity
                 "Add property",
                 new ForEach<Entity>
                 {
-                    Action = new Log<Entity> { Value = GetEntityVariable },
+                    Action = new LambdaFunction<Entity, Unit>(
+                        null,
+                        new Log<Entity> { Value = GetEntityVariable }
+                    ),
                     Array = new ArrayMap<Entity>
                     {
                         Array = Array(
                             Entity.Create(("Foo", "Hello")),
                             Entity.Create(("Foo", "Hello 2"))
                         ),
-                        Function = new EntitySetValue<StringStream>
-                        {
-                            Entity   = GetEntityVariable,
-                            Property = Constant("Bar"),
-                            Value    = Constant("World")
-                        }
-                    },
-                    Variable = VariableName.Entity
+                        Function = new LambdaFunction<Entity, Entity>(
+                            null,
+                            new EntitySetValue<StringStream>
+                            {
+                                Entity   = GetEntityVariable,
+                                Property = Constant("Bar"),
+                                Value    = Constant("World")
+                            }
+                        )
+                    }
                 },
                 Unit.Default,
                 "(Foo: \"Hello\" Bar: \"World\")",
@@ -45,21 +50,26 @@ public partial class ArrayMapTests : StepTestBase<ArrayMap<Entity>, Array<Entity
                 "Change property",
                 new ForEach<Entity>
                 {
-                    Action = new Log<Entity> { Value = GetEntityVariable },
+                    Action = new LambdaFunction<Entity, Unit>(
+                        null,
+                        new Log<Entity> { Value = GetEntityVariable }
+                    ),
                     Array = new ArrayMap<Entity>
                     {
                         Array = Array(
                             Entity.Create(("Foo", "Hello"),   ("Bar", "Earth")),
                             Entity.Create(("Foo", "Hello 2"), ("Bar", "Earth"))
                         ),
-                        Function = new EntitySetValue<StringStream>
-                        {
-                            Entity   = GetEntityVariable,
-                            Property = Constant("Bar"),
-                            Value    = Constant("World")
-                        }
-                    },
-                    Variable = VariableName.Entity
+                        Function = new LambdaFunction<Entity, Entity>(
+                            null,
+                            new EntitySetValue<StringStream>
+                            {
+                                Entity   = GetEntityVariable,
+                                Property = Constant("Bar"),
+                                Value    = Constant("World")
+                            }
+                        )
+                    }
                 },
                 Unit.Default,
                 "(Foo: \"Hello\" Bar: \"World\")",
@@ -79,8 +89,11 @@ public partial class ArrayMapTests : StepTestBase<ArrayMap<Entity>, Array<Entity
                 "Stream error",
                 new ArrayMap<Entity>
                 {
-                    Array    = new FailStep<Array<Entity>> { ErrorMessage = "Stream Fail" },
-                    Function = Constant(Entity.Create(("Key", "Value")))
+                    Array = new FailStep<Array<Entity>> { ErrorMessage = "Stream Fail" },
+                    Function = new LambdaFunction<Entity, Entity>(
+                        null,
+                        Constant(Entity.Create(("Key", "Value")))
+                    )
                 },
                 new SingleError(
                     ErrorLocation.EmptyLocation,

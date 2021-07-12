@@ -75,6 +75,8 @@ public sealed class ArrayLength<T> : CompoundStep<int>
 
         /// <inheritdoc />
         protected override string ArrayPropertyName => nameof(ArrayLength<object>.Array);
+
+        protected override string? LambdaPropertyName => null;
     }
 }
 

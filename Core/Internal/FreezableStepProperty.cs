@@ -10,7 +10,7 @@ namespace Reductech.EDR.Core.Internal
 /// <summary>
 /// Any member of a step.
 /// </summary>
-public abstract record FreezableStepProperty(TextLocation? Location)
+public abstract record FreezableStepProperty(TextLocation Location)
 {
     /// <summary>
     /// The member type of this Step Member.
@@ -30,7 +30,7 @@ public abstract record FreezableStepProperty(TextLocation? Location)
                     "Value",
                     MemberType.ToString()
                 )
-                .WithLocation(Location ?? ErrorLocation.EmptyLocation)
+                .WithLocation(Location)
         );
     }
 
@@ -47,7 +47,7 @@ public abstract record FreezableStepProperty(TextLocation? Location)
                     "Value",
                     MemberType.ToString()
                 )
-                .WithLocation(Location ?? ErrorLocation.EmptyLocation)
+                .WithLocation(Location)
         );
     }
 
@@ -57,10 +57,19 @@ public abstract record FreezableStepProperty(TextLocation? Location)
     public abstract IFreezableStep ConvertToStep();
 
     /// <summary>
+    /// Tries to convert this step member to a Lambda
+    /// </summary>
+    /// <returns></returns>
+    public virtual Lambda ConvertToLambda()
+    {
+        return new Lambda(null, ConvertToStep(), Location);
+    }
+
+    /// <summary>
     /// A variable name member
     /// </summary>
     public sealed record Variable
-        (VariableName VName, TextLocation? Location) : FreezableStepProperty(Location)
+        (VariableName VName, TextLocation Location) : FreezableStepProperty(Location)
     {
         /// <inheritdoc />
         public override Result<VariableName, IError> AsVariableName(string parameterName)
@@ -79,10 +88,39 @@ public abstract record FreezableStepProperty(TextLocation? Location)
     }
 
     /// <summary>
+    /// A Lambda Function
+    /// </summary>
+    public sealed record Lambda(
+        VariableName? VName,
+        IFreezableStep FreezableStep,
+        TextLocation Location) : FreezableStepProperty(Location)
+    {
+        /// <inheritdoc />
+        public override MemberType MemberType => MemberType.Lambda;
+
+        /// <summary>
+        /// The VariableName or Item
+        /// </summary>
+        public VariableName VariableNameOrItem => VName ?? VariableName.Item;
+
+        /// <inheritdoc />
+        public override IFreezableStep ConvertToStep()
+        {
+            return FreezableStep; //This may not be correct //TODO remove
+        }
+
+        /// <inheritdoc />
+        public override Lambda ConvertToLambda()
+        {
+            return this;
+        }
+    }
+
+    /// <summary>
     /// A step member
     /// </summary>
     public sealed record Step
-        (IFreezableStep FreezableStep, TextLocation? Location) : FreezableStepProperty(Location)
+        (IFreezableStep FreezableStep, TextLocation Location) : FreezableStepProperty(Location)
     {
         /// <inheritdoc />
         public override MemberType MemberType => MemberType.Step;
@@ -98,7 +136,7 @@ public abstract record FreezableStepProperty(TextLocation? Location)
     /// A step list member
     /// </summary>
     public sealed record StepList
-        (ImmutableList<IFreezableStep> List, TextLocation? Location) : FreezableStepProperty(
+        (ImmutableList<IFreezableStep> List, TextLocation Location) : FreezableStepProperty(
             Location
         )
     {

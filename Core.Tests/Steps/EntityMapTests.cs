@@ -20,21 +20,26 @@ public partial class EntityMapTests : StepTestBase<EntityMap, Array<Entity>>
                 "Add property",
                 new ForEach<Entity>
                 {
-                    Action = new Log<Entity> { Value = GetEntityVariable },
+                    Action = new LambdaFunction<Entity, Unit>(
+                        null,
+                        new Log<Entity> { Value = GetEntityVariable }
+                    ),
                     Array = new EntityMap
                     {
                         EntityStream = Array(
                             Entity.Create(("Foo", "Hello")),
                             Entity.Create(("Foo", "Hello 2"))
                         ),
-                        Function = new EntitySetValue<StringStream>
-                        {
-                            Entity   = GetEntityVariable,
-                            Property = Constant("Bar"),
-                            Value    = Constant("World")
-                        }
-                    },
-                    Variable = VariableName.Entity
+                        Function = new LambdaFunction<Entity, Entity>(
+                            null,
+                            new EntitySetValue<StringStream>
+                            {
+                                Entity   = GetEntityVariable,
+                                Property = Constant("Bar"),
+                                Value    = Constant("World")
+                            }
+                        )
+                    }
                 },
                 Unit.Default,
                 "(Foo: \"Hello\" Bar: \"World\")",
@@ -45,21 +50,26 @@ public partial class EntityMapTests : StepTestBase<EntityMap, Array<Entity>>
                 "Change property",
                 new ForEach<Entity>
                 {
-                    Action = new Log<Entity> { Value = GetEntityVariable },
+                    Action = new LambdaFunction<Entity, Unit>(
+                        null,
+                        new Log<Entity> { Value = GetEntityVariable }
+                    ),
                     Array = new EntityMap
                     {
                         EntityStream = Array(
                             Entity.Create(("Foo", "Hello"),   ("Bar", "Earth")),
                             Entity.Create(("Foo", "Hello 2"), ("Bar", "Earth"))
                         ),
-                        Function = new EntitySetValue<StringStream>
-                        {
-                            Entity   = GetEntityVariable,
-                            Property = Constant("Bar"),
-                            Value    = Constant("World")
-                        }
-                    },
-                    Variable = VariableName.Entity
+                        Function = new LambdaFunction<Entity, Entity>(
+                            null,
+                            new EntitySetValue<StringStream>
+                            {
+                                Entity   = GetEntityVariable,
+                                Property = Constant("Bar"),
+                                Value    = Constant("World")
+                            }
+                        )
+                    }
                 },
                 Unit.Default,
                 "(Foo: \"Hello\" Bar: \"World\")",
@@ -80,7 +90,10 @@ public partial class EntityMapTests : StepTestBase<EntityMap, Array<Entity>>
                 new EntityMap
                 {
                     EntityStream = new FailStep<Array<Entity>> { ErrorMessage = "Stream Fail" },
-                    Function     = Constant(Entity.Create(("Key", "Value")))
+                    Function = new LambdaFunction<Entity, Entity>(
+                        null,
+                        Constant(Entity.Create(("Key", "Value")))
+                    )
                 },
                 new SingleError(
                     ErrorLocation.EmptyLocation,

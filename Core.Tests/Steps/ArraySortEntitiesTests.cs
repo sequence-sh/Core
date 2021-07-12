@@ -26,13 +26,18 @@ public partial class ArraySortEntitiesTests : StepTestBase<ArraySort<Entity>, Ar
                             Entity.Create(("Foo", "Alpha")),
                             Entity.Create(("Foo", "Beta"))
                         ),
-                        KeySelector = new EntityGetValue<StringStream>
-                        {
-                            Entity = GetEntityVariable, Property = Constant("Foo")
-                        }
+                        KeySelector = new LambdaFunction<Entity, StringStream>(
+                            null,
+                            new EntityGetValue<StringStream>
+                            {
+                                Entity = GetEntityVariable, Property = Constant("Foo")
+                            }
+                        )
                     },
-                    Action   = new Log<Entity> { Value = GetEntityVariable },
-                    Variable = VariableName.Entity
+                    Action = new LambdaFunction<Entity, Unit>(
+                        null,
+                        new Log<Entity> { Value = GetEntityVariable }
+                    ),
                 },
                 Unit.Default,
                 "(Foo: \"Alpha\")",
@@ -52,13 +57,18 @@ public partial class ArraySortEntitiesTests : StepTestBase<ArraySort<Entity>, Ar
                             Entity.Create(("Foo", "Alpha")),
                             Entity.Create(("Foo", "Beta"))
                         ),
-                        KeySelector = new EntityGetValue<StringStream>
-                        {
-                            Entity = GetEntityVariable, Property = Constant("Foo")
-                        }
+                        KeySelector = new LambdaFunction<Entity, StringStream>(
+                            null,
+                            new EntityGetValue<StringStream>
+                            {
+                                Entity = GetEntityVariable, Property = Constant("Foo")
+                            }
+                        )
                     },
-                    Action   = new Log<Entity> { Value = GetEntityVariable },
-                    Variable = VariableName.Entity
+                    Action = new LambdaFunction<Entity, Unit>(
+                        null,
+                        new Log<Entity> { Value = GetEntityVariable }
+                    )
                 },
                 Unit.Default,
                 "(Foo: \"Gamma\")",
@@ -79,13 +89,18 @@ public partial class ArraySortEntitiesTests : StepTestBase<ArraySort<Entity>, Ar
                             Entity.Create(("Foo", "Beta")),
                             Entity.Create(("Bar", "Delta"))
                         ),
-                        KeySelector = new EntityGetValue<StringStream>
-                        {
-                            Entity = GetEntityVariable, Property = Constant("Foo")
-                        }
+                        KeySelector = new LambdaFunction<Entity, StringStream>(
+                            null,
+                            new EntityGetValue<StringStream>
+                            {
+                                Entity = GetEntityVariable, Property = Constant("Foo")
+                            }
+                        )
                     },
-                    Action   = new Log<Entity> { Value = GetEntityVariable },
-                    Variable = VariableName.Entity
+                    Action = new LambdaFunction<Entity, Unit>(
+                        null,
+                        new Log<Entity> { Value = GetEntityVariable }
+                    ),
                 },
                 Unit.Default,
                 "(Foo: \"Gamma\")",

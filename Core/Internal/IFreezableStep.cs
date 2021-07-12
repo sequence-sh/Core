@@ -19,7 +19,7 @@ public interface IFreezableStep : IEquatable<IFreezableStep>
     /// <summary>
     /// The SCL text location where this step comes from
     /// </summary>
-    public TextLocation? TextLocation { get; }
+    public TextLocation TextLocation { get; }
 
     /// <summary>
     /// Try to freeze this step.
@@ -27,12 +27,13 @@ public interface IFreezableStep : IEquatable<IFreezableStep>
     Result<IStep, IError> TryFreeze(CallerMetadata callerMetadata, TypeResolver typeResolver);
 
     /// <summary>
-    /// Gets the variables set by this step and its children and the types of those variables if they can be resolved at this time.
+    /// Gets the variables used by this step and its children and the types of those variables if they can be resolved at this time.
     /// Returns an error if the type name cannot be resolved
     /// </summary>
-    Result<IReadOnlyCollection<(VariableName variableName, TypeReference)>, IError> GetVariablesSet(
-        CallerMetadata callerMetadata,
-        TypeResolver typeResolver);
+    Result<IReadOnlyCollection<UsedVariable>, IError>
+        GetVariablesUsed(
+            CallerMetadata callerMetadata,
+            TypeResolver typeResolver);
 
     /// <summary>
     /// The output type of this step. Will be unit if the step does not have an output.
@@ -46,9 +47,18 @@ public interface IFreezableStep : IEquatable<IFreezableStep>
     /// </summary>
     public Result<IStep, IError> TryFreeze(
         CallerMetadata callerMetadata,
-        StepFactoryStore stepFactoryStore) => TypeResolver
-        .TryCreate(stepFactoryStore, callerMetadata, Maybe<VariableName>.None, this)
-        .Bind(typeResolver => TryFreeze(callerMetadata, typeResolver));
+        StepFactoryStore stepFactoryStore)
+    {
+        var typeResolver = TypeResolver
+            .TryCreate(stepFactoryStore, callerMetadata, Maybe<VariableName>.None, this);
+
+        if (typeResolver.IsFailure)
+            return typeResolver.ConvertFailure<IStep>();
+
+        var freezeResult = TryFreeze(callerMetadata, typeResolver.Value);
+
+        return freezeResult;
+    }
 }
 
 }

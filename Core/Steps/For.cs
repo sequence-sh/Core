@@ -1,4 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
@@ -39,25 +41,16 @@ public sealed class For : CompoundStep<Unit>
     /// <summary>
     /// The action to perform repeatedly.
     /// </summary>
-    [StepProperty(4)]
-    [ScopedFunction]
+    [FunctionProperty(4)]
     [Required]
-    public IStep<Unit> Action { get; set; } = null!;
-
-    /// <summary>
-    /// The name of the variable to use within the action.
-    /// </summary>
-    [VariableName(5)]
-    [DefaultValueExplanation("<i>")]
-
-    public VariableName Variable { get; set; } = VariableName.Index;
+    public LambdaFunction<int, Unit> Action { get; set; } = null!;
 
     /// <inheritdoc />
     protected override async Task<Result<Unit, IError>> Run(
         IStateMonad stateMonad,
         CancellationToken cancellationToken)
     {
-        var variableName = VariableName.Index;
+        var variableName = Action.VariableNameOrItem;
 
         var from = await From.Run(stateMonad, cancellationToken);
 
@@ -74,24 +67,26 @@ public sealed class For : CompoundStep<Unit>
         if (increment.IsFailure)
             return increment.ConvertFailure<Unit>();
 
-        var currentValue = from.Value;
-
-        var setResult = await stateMonad.SetVariableAsync(variableName, currentValue, false, this);
-
-        if (setResult.IsFailure)
-            return setResult.ConvertFailure<Unit>();
-
         if (increment.Value == 0)
             return new SingleError(new ErrorLocation(this), ErrorCode.DivideByZero);
 
+        var currentValue = from.Value;
+
+        var scopedStateMonad = new ScopedStateMonad(
+            stateMonad,
+            stateMonad.GetState().ToImmutableDictionary(),
+            variableName,
+            new KeyValuePair<VariableName, object>(variableName, currentValue)
+        );
+
         while (increment.Value > 0 ? currentValue <= to.Value : currentValue >= to.Value)
         {
-            var r = await Action.Run(stateMonad, cancellationToken);
+            var r = await Action.StepTyped.Run(scopedStateMonad, cancellationToken);
 
             if (r.IsFailure)
                 return r;
 
-            var currentValueResult = stateMonad.GetVariable<int>(variableName)
+            var currentValueResult = scopedStateMonad.GetVariable<int>(variableName)
                 .MapError(e => e.WithLocation(this));
 
             if (currentValueResult.IsFailure)
@@ -100,7 +95,7 @@ public sealed class For : CompoundStep<Unit>
             currentValue =  currentValueResult.Value;
             currentValue += increment.Value;
 
-            var setResult2 = await stateMonad.SetVariableAsync(
+            var setResult2 = await scopedStateMonad.SetVariableAsync(
                 variableName,
                 currentValue,
                 false,
@@ -108,26 +103,10 @@ public sealed class For : CompoundStep<Unit>
             );
 
             if (setResult2.IsFailure)
-                return setResult.ConvertFailure<Unit>();
+                return setResult2.ConvertFailure<Unit>();
         }
 
-        await stateMonad.RemoveVariableAsync(VariableName.Index, false, this);
-
         return Unit.Default;
-    }
-
-    /// <inheritdoc />
-    public override Result<TypeResolver, IError> TryGetScopedTypeResolver(
-        TypeResolver baseTypeResolver,
-        IFreezableStep scopedStep)
-    {
-        return baseTypeResolver.TryCloneWithScopedStep(
-            Variable,
-            TypeReference.Actual.Integer,
-            new CallerMetadata(Name, nameof(Action), TypeReference.Unit.Instance),
-            scopedStep,
-            new ErrorLocation(this)
-        );
     }
 
     /// <inheritdoc />
