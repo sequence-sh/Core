@@ -12,8 +12,8 @@ public sealed class SCLExampleAttribute : Attribute
     /// <inheritdoc />
     public SCLExampleAttribute(
         string scl,
-        string? description,
-        string? expectedOutput,
+        string? expectedOutput = null,
+        string? description = null,
         params string[]? expectedLogs)
     {
         SCL            = scl;

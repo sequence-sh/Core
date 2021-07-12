@@ -14,6 +14,12 @@ namespace Reductech.EDR.Core.Steps
 /// <summary>
 /// Appends a string to an existing string variable.
 /// </summary>
+[SCLExample(
+    "- <var> = 'hello'\r\n- AppendString <var> ' world'\r\n- log <var>",
+    null,
+    null,
+    "hello world"
+)]
 public sealed class AppendString : CompoundStep<Unit>
 {
     /// <summary>

@@ -12,6 +12,7 @@ namespace Reductech.EDR.Core.Steps
 /// <summary>
 /// Gets the letters that appears at a specific index
 /// </summary>
+[SCLExample("CharAtIndex 'hello' 1", "e")]
 public sealed class CharAtIndex : CompoundStep<StringStream>
 {
     /// <summary>

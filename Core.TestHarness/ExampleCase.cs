@@ -56,11 +56,17 @@ public abstract partial class StepTestBase<TStep, TOutput>
         await exampleCase.RunAsync(testOutputHelper);
     }
 
-    public record ExampleCase(SCLExampleAttribute SCLExampleAttribute) : CaseThatExecutes(
-        SCLExampleAttribute.SCL,
-        SCLExampleAttribute.ExpectedLogs
-    )
+    public record ExampleCase : CaseThatExecutes
     {
+        public ExampleCase(SCLExampleAttribute sclExampleAttribute) : base(
+            sclExampleAttribute.SCL,
+            sclExampleAttribute.ExpectedLogs ?? new string[] { }
+        )
+        {
+            SCLExampleAttribute = sclExampleAttribute;
+            IgnoreFinalState    = true;
+        }
+
         /// <inheritdoc />
         public override async Task<IStep> GetStepAsync(ITestOutputHelper testOutputHelper)
         {
@@ -122,7 +128,8 @@ public abstract partial class StepTestBase<TStep, TOutput>
                 }
                 else
                 {
-                    actualString = CompressSpaces(SerializationMethods.GetString(result.Value));
+                    actualString =
+                        CompressSpaces(SerializationMethods.SerializeObject(result.Value));
                 }
 
                 actualString.Should().Be(expectedString);
@@ -137,6 +144,8 @@ public abstract partial class StepTestBase<TStep, TOutput>
 
             base.CheckLoggedValues(loggerFactory);
         }
+
+        public SCLExampleAttribute SCLExampleAttribute { get; init; }
     }
 }
 

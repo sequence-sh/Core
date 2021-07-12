@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
@@ -13,6 +14,7 @@ namespace Reductech.EDR.Core.Steps
 /// <summary>
 /// Delay for a specified amount of time
 /// </summary>
+[SCLExample("Delay 10", description: "Delay 10 milliseconds.")]
 public sealed class Delay : CompoundStep<Unit>
 {
     /// <inheritdoc />

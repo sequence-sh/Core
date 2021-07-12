@@ -101,6 +101,21 @@ public static class SerializationMethods
             };
     }
 
+    public static string SerializeObject(object? obj)
+    {
+        return
+            obj switch
+            {
+                Entity entity   => entity.Serialize(),
+                StringStream ss => ss.Serialize(),
+                DateTime dt     => dt.ToString(Constants.DateTimeFormat),
+                double d        => d.ToString(Constants.DoubleFormat, new NumberFormatInfo()),
+                Enumeration enu => enu.Serialize,
+                IArray array    => array.Serialize,
+                _               => obj?.ToString()!
+            };
+    }
+
     /// <summary>
     /// Converts an object to a string suitable from printing
     /// </summary>

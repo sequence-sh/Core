@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Internal.Errors;
+using Reductech.EDR.Core.Internal.Serialization;
 using Reductech.EDR.Core.Util;
 
 namespace Reductech.EDR.Core
@@ -144,6 +145,24 @@ public sealed record LazyArray<T>
             return r.ConvertFailure<IReadOnlyList<T>>();
 
         return r.Value;
+    }
+
+    /// <inheritdoc />
+    public override string Serialize
+    {
+        get
+        {
+            var r = GetElementsAsync(CancellationToken.None)
+                .Result;
+
+            if (r.IsSuccess)
+                return SerializationMethods.SerializeList(
+                    r.Value
+                        .Select(x => SerializationMethods.SerializeObject(x))
+                );
+
+            return r.Error.AsString;
+        }
     }
 
     /// <inheritdoc />

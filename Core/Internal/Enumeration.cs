@@ -7,12 +7,15 @@ namespace Reductech.EDR.Core.Internal
 /// <summary>
 /// A member of a set of predefined values
 /// </summary>
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 public sealed record Enumeration(string Type, string Value)
-    #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
 {
     /// <inheritdoc />
-    public override string ToString() => Type + "." + Value;
+    public override string ToString() => Serialize;
+
+    /// <summary>
+    /// Serialize this enumeration
+    /// </summary>
+    public string Serialize => Type + "." + Value;
 
     /// <summary>
     /// Try to convert this to a C# enum

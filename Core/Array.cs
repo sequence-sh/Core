@@ -143,10 +143,6 @@ public abstract record Array<T> : IArray
     public abstract Task<Result<IReadOnlyList<T>, IError>> GetElementsAsync(
         CancellationToken cancellation);
 
-    ///// <inheritdoc />
-    //public Result<List<object>, IError> GetObjects() =>
-    //    GetElements().Map(x => x.Cast<object>().ToList());
-
     /// <inheritdoc />
     public Task<Result<List<object>, IError>> GetObjectsAsync(CancellationToken cancellation)
     {
@@ -155,6 +151,9 @@ public abstract record Array<T> : IArray
 
     /// <inheritdoc />
     public abstract string NameInLogs { get; }
+
+    /// <inheritdoc />
+    public abstract string Serialize { get; }
 
     /// <summary>
     /// Equality comparison
@@ -213,6 +212,11 @@ public interface IArray
     /// How this Array will appear in the logs.
     /// </summary>
     public string NameInLogs { get; }
+
+    /// <summary>
+    /// Serialize this array
+    /// </summary>
+    public string Serialize { get; }
 }
 
 /// <summary>
