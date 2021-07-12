@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Reflection;
-using System.Xml;
 using Namotion.Reflection;
 using Reductech.EDR.Core.Attributes;
 
@@ -189,6 +188,8 @@ public class StepWrapper : IDocumented
             }
             else
                 Type = TryGetNested(_propertyInfo.PropertyType);
+
+            Position = propertyInfo.GetCustomAttribute<StepPropertyBaseAttribute>()?.Order;
         }
 
         private static void AddFieldFromAttribute<T>(
@@ -208,9 +209,7 @@ public class StepWrapper : IDocumented
                 dictionary.Add(name, attributeText);
         }
 
-        /// <summary>
-        /// The name of the property.
-        /// </summary>
+        /// <inheritdoc />
         public string Name => _propertyInfo.Name;
 
         /// <inheritdoc />
@@ -219,20 +218,17 @@ public class StepWrapper : IDocumented
             .Select(x => x.Name)
             .ToList();
 
-        /// <summary>
-        /// A summary of the property.
-        /// </summary>
+        /// <inheritdoc />
         public string Summary => _propertyInfo.GetXmlDocsSummary();
 
-        /// <summary>
-        /// The type of this property.
-        /// </summary>
+        /// <inheritdoc />
         public Type Type { get; }
 
-        /// <summary>
-        /// Whether this property must be set.
-        /// </summary>
+        /// <inheritdoc />
         public bool Required { get; }
+
+        /// <inheritdoc />
+        public int? Position { get; }
 
         /// <inheritdoc />
         public IReadOnlyDictionary<string, string> ExtraFields { get; }

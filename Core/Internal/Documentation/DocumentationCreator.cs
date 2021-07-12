@@ -187,6 +187,7 @@ public static class DocumentationCreator
                 Prettifier.Cell.Create("Parameter", Prettifier.Alignment.LeftJustified),
                 Prettifier.Cell.Create("Type",      Prettifier.Alignment.Centre),
                 Prettifier.Cell.Create("Required",  Prettifier.Alignment.Centre),
+                Prettifier.Cell.Create("Position",  Prettifier.Alignment.Centre),
             };
 
             headers.AddRange(
@@ -210,6 +211,7 @@ public static class DocumentationCreator
                             nameString,
                             TypeNameHelper.GetMarkupTypeName(rp.Type),
                             rp.Required ? "✔" : "",
+                            rp.Position?.ToString() ?? ""
                         };
 
                         foreach (var extraColumn in extraColumns)

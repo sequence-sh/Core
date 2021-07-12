@@ -35,6 +35,11 @@ public interface IParameter
     bool Required { get; }
 
     /// <summary>
+    /// The position, if this parameter can be used as a positional parameter
+    /// </summary>
+    int? Position { get; }
+
+    /// <summary>
     /// Extra fields e.g. Examples, Default Values, Requirements
     /// </summary>
     IReadOnlyDictionary<string, string> ExtraFields { get; }
