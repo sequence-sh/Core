@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Reductech.EDR.Core.Attributes;
 
 namespace Reductech.EDR.Core.Internal.Documentation
 {
@@ -6,7 +7,7 @@ namespace Reductech.EDR.Core.Internal.Documentation
 /// <summary>
 /// Something that will be shown in the documentation
 /// </summary>
-public interface IDocumented
+public interface IDocumentedStep
 {
     /// <summary>
     /// What category this item will belong in.
@@ -47,6 +48,11 @@ public interface IDocumented
     /// All Names including aliases
     /// </summary>
     IReadOnlyList<string> AllNames { get; }
+
+    /// <summary>
+    /// Examples of this step's usage
+    /// </summary>
+    IReadOnlyList<SCLExampleAttribute> Examples { get; }
 }
 
 }

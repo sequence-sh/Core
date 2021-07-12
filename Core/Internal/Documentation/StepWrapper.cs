@@ -12,7 +12,7 @@ namespace Reductech.EDR.Core.Internal.Documentation
 /// <summary>
 /// A wrapper for this documented object.
 /// </summary>
-public class StepWrapper : IDocumented
+public class StepWrapper : IDocumentedStep
 {
     /// <summary>
     /// Creates a new StepWrapper.
@@ -42,6 +42,8 @@ public class StepWrapper : IDocumented
         TypeDetails = grouping.Key.OutputTypeExplanation;
 
         AllNames = grouping.ToList();
+
+        Examples = Factory.StepType.GetCustomAttributes<SCLExampleAttribute>().ToList();
     }
 
     private static PropertyWrapper GetPropertyWrapper(PropertyInfo propertyInfo) =>
@@ -77,6 +79,9 @@ public class StepWrapper : IDocumented
 
     /// <inheritdoc />
     public IReadOnlyList<string> AllNames { get; }
+
+    /// <inheritdoc />
+    public IReadOnlyList<SCLExampleAttribute> Examples { get; }
 
     /// <summary>
     /// The wrapper for a property.

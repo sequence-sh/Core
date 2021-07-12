@@ -17,7 +17,7 @@ public static class DocumentationCreator
     /// Creates documentation for a list of entities
     /// </summary>
     public static
-        DocumentationCreationResult CreateDocumentation(IEnumerable<IDocumented> entities)
+        DocumentationCreationResult CreateDocumentation(IEnumerable<IDocumentedStep> entities)
     {
         var enumTypes = new HashSet<Type>();
 
@@ -135,7 +135,7 @@ public static class DocumentationCreator
     /// <summary>
     /// Gets the documentation page for a step
     /// </summary>
-    public static StepPage GetStepPage(IDocumented doc)
+    public static StepPage GetStepPage(IDocumentedStep doc)
     {
         var sb = new StringBuilder();
 
@@ -177,12 +177,12 @@ public static class DocumentationCreator
 
         if (doc.Parameters.Any())
         {
-            var extraColumns = doc.Parameters.SelectMany(x => x.ExtraFields.Keys)
+            var extraParameterColumns = doc.Parameters.SelectMany(x => x.ExtraFields.Keys)
                 .Distinct()
                 .OrderBy(x => x)
                 .ToList();
 
-            var headers = new List<Prettifier.Cell>()
+            var parameterHeaders = new List<Prettifier.Cell>()
             {
                 Prettifier.Cell.Create("Parameter", Prettifier.Alignment.LeftJustified),
                 Prettifier.Cell.Create("Type",      Prettifier.Alignment.Centre),
@@ -190,11 +190,15 @@ public static class DocumentationCreator
                 Prettifier.Cell.Create("Position",  Prettifier.Alignment.Centre),
             };
 
-            headers.AddRange(
-                extraColumns.Select(x => Prettifier.Cell.Create(x, Prettifier.Alignment.Centre))
+            parameterHeaders.AddRange(
+                extraParameterColumns.Select(
+                    x => Prettifier.Cell.Create(x, Prettifier.Alignment.Centre)
+                )
             );
 
-            headers.Add(Prettifier.Cell.Create("Summary", Prettifier.Alignment.LeftJustified));
+            parameterHeaders.Add(
+                Prettifier.Cell.Create("Summary", Prettifier.Alignment.LeftJustified)
+            );
 
             var parameterRows = doc.Parameters
                 .Select(
@@ -214,7 +218,7 @@ public static class DocumentationCreator
                             rp.Position?.ToString() ?? ""
                         };
 
-                        foreach (var extraColumn in extraColumns)
+                        foreach (var extraColumn in extraParameterColumns)
                         {
                             var columnValue = rp.ExtraFields.TryGetValue(
                                 extraColumn,
@@ -233,7 +237,66 @@ public static class DocumentationCreator
                 )
                 .ToList();
 
-            Prettifier.CreateMarkdownTable(headers, parameterRows, sb);
+            Prettifier.CreateMarkdownTable(parameterHeaders, parameterRows, sb);
+        }
+
+        if (doc.Examples.Any())
+        {
+            sb.AppendLine();
+
+            var showDescription    = doc.Examples.Any(x => x.Description is not null);
+            var showExpectedOutput = doc.Examples.Any(x => x.ExpectedOutput is not null);
+
+            var showExpectedLoggedValues =
+                doc.Examples.Any(x => x.ExpectedLogs is not null && x.ExpectedLogs.Any());
+
+            var exampleHeaders = new List<Prettifier.Cell>
+            {
+                Prettifier.Cell.Create("Example SCL", Prettifier.Alignment.LeftJustified),
+            };
+
+            if (showDescription)
+                exampleHeaders.Add(
+                    Prettifier.Cell.Create("Description", Prettifier.Alignment.Centre)
+                );
+
+            if (showExpectedOutput)
+                exampleHeaders.Add(
+                    Prettifier.Cell.Create("Expected Output", Prettifier.Alignment.Centre)
+                );
+
+            if (showExpectedLoggedValues)
+                exampleHeaders.Add(
+                    Prettifier.Cell.Create("Expected Logged Values", Prettifier.Alignment.Centre)
+                );
+
+            var exampleRows = doc.Examples.Select(
+                    x =>
+                    {
+                        var list = new List<string>() { x.SCL, };
+
+                        if (showDescription)
+                            list.Add(x.Description ?? "");
+
+                        if (showExpectedOutput)
+                            list.Add(x.ExpectedOutput ?? "");
+
+                        if (showExpectedLoggedValues)
+                            list.Add(
+                                x.ExpectedLogs is null
+                                    ? ""
+                                    : string.Join(
+                                        "\r\n",
+                                        x.ExpectedLogs
+                                    )
+                            );
+
+                        return list;
+                    }
+                )
+                .ToList();
+
+            Prettifier.CreateMarkdownTable(exampleHeaders, exampleRows, sb);
         }
 
         var stepPage = new StepPage(
