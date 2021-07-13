@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Internal.Errors;
+using Reductech.EDR.Core.Internal.Serialization;
 using Reductech.EDR.Core.Util;
 
 namespace Reductech.EDR.Core
@@ -115,6 +116,12 @@ public sealed record EagerArray<T>(IReadOnlyList<T> List) : Array<T>, IEquatable
 
     /// <inheritdoc />
     public override string NameInLogs => List.Count + " Elements";
+
+    /// <inheritdoc />
+    public override string Serialize =>
+        SerializationMethods.SerializeList(
+            List.Select(x => SerializationMethods.SerializeObject(x))
+        );
 
     /// <inheritdoc />
     public override int GetHashCode() => GetHashCodeValue(this);

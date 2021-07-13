@@ -13,6 +13,7 @@ namespace Reductech.EDR.Core.Steps
 /// <summary>
 /// Returns an error if the nested step does not return true.
 /// </summary>
+[SCLExample("AssertTrue ((2 + 2) == 4)")]
 public sealed class AssertTrue : CompoundStep<Unit>
 {
     /// <inheritdoc />

@@ -78,7 +78,7 @@ public partial class GenerateDocumentationTests : StepTestBase<GenerateDocumenta
             var notStepPage = new StepPage(
                 "Not.md",
                 "Not",
-                "## Not _Alias_:`Not`\n\n_Output_:`Boolean`\n\nNegation of a boolean value.\n\n\n|Parameter|Type |Required|Position|Summary |\n|:--------|:----:|:------:|:------:|:-------------------|\n|Boolean |`bool`|✔ |1 |The value to negate.|",
+                "## Not _Alias_:`Not`\n\n_Output_:`Boolean`\n\nNegation of a boolean value.\n\n\n|Parameter|Type |Required|Position|Summary |\n|:--------|:----:|:------:|:------:|:-------------------|\n|Boolean |`bool`|✔ |1 |The value to negate.|\n\n\n|Example SCL|Expected Output|\n|:----------|:-------------:|\n|Not true |False |\n|Not false |True |",
                 "Core",
                 "Core",
                 "Not",

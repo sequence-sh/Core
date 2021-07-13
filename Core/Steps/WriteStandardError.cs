@@ -14,6 +14,11 @@ namespace Reductech.EDR.Core.Steps
 /// <summary>
 /// Writes to the console standard error
 /// </summary>
+[SCLExample(
+    "WriteStandardError 'Something Went Wrong'",
+    Description    = "Writes to the Standard Error",
+    ExecuteInTests = false
+)]
 public class WriteStandardError : CompoundStep<Unit>
 {
     /// <inheritdoc />

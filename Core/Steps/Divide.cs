@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using CSharpFunctionalExtensions;
+using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal.Errors;
 
 namespace Reductech.EDR.Core.Steps
@@ -8,6 +9,7 @@ namespace Reductech.EDR.Core.Steps
 /// <summary>
 /// Divide an integer by a list of integers
 /// </summary>
+[SCLExample("5 / 2", "2")]
 public sealed class Divide : BaseOperatorStep<Divide, int, int>
 {
     /// <inheritdoc />

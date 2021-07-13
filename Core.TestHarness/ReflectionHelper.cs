@@ -281,15 +281,7 @@ public abstract partial class StepTestBase<TStep, TOutput>
         }
         else if (outputType == typeof(Array<int>))
         {
-            var list = new List<int>();
-
-            for (var i = 0; i < 3; i++)
-            {
-                list.Add(index);
-                index++;
-            }
-
-            step = Array(list.ToArray());
+            step = CreateIntArray(ref index);
         }
         else if (outputType == typeof(Array<double>))
         {
@@ -331,6 +323,15 @@ public abstract partial class StepTestBase<TStep, TOutput>
             };
 
             step = new ArrayNew<Array<Entity>> { Elements = entityStreamList };
+        }
+        else if (outputType == typeof(Array<Array<int>>))
+        {
+            var intArrayList = new List<IStep<Array<int>>>
+            {
+                CreateIntArray(ref index), CreateIntArray(ref index), CreateIntArray(ref index),
+            };
+
+            step = new ArrayNew<Array<int>> { Elements = intArrayList };
         }
 
         else if (outputType.IsEnum)
@@ -402,6 +403,19 @@ public abstract partial class StepTestBase<TStep, TOutput>
 
             var entity = Entity.Create(pairs);
             return entity;
+        }
+
+        static IStep<Array<int>> CreateIntArray(ref int index)
+        {
+            var list = new List<int>();
+
+            for (var i = 0; i < 3; i++)
+            {
+                list.Add(index);
+                index++;
+            }
+
+            return Array(list.ToArray());
         }
     }
 

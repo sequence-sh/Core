@@ -13,6 +13,7 @@ namespace Reductech.EDR.Core.Steps
 /// <summary>
 /// Returns success if the ValueIf step returns an error and a failure otherwise.
 /// </summary>
+[SCLExample("AssertError (log (1 / 0))")]
 public sealed class AssertError : CompoundStep<Unit>
 {
     /// <inheritdoc />
