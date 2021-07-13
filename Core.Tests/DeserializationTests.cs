@@ -313,7 +313,35 @@ Log 'Comments!'",
 - <docs> = GenerateDocumentation
 - log <docs>['MainContents']['FileName']
 ",
-                "Contents.md"
+                "all.md"
+            );
+
+            //            yield return new DeserializationTestInstance(
+            //                @"
+            //- <docs> = (GenerateDocumentation)['AllPages']
+            //- <docs> | ForEach (
+            //    - log <>['FileName']
+            //)
+            //",
+            //                "all.md"
+            //            );
+
+            //            yield return new DeserializationTestInstance(
+            //                @"
+            //- <docs> = (GenerateDocumentation)['AllPages']
+            //-  ForEach <docs> (log <>['FileName'])
+            //",
+            //                "all.md"
+            //            );
+
+            yield return new DeserializationTestInstance(
+                @"
+- (GenerateDocumentation)['AllPages'] | ArrayFilter (<>['FileName'] == 'Not.md') | ForEach (
+    - <path> = $""{<>['Directory']}/{<>['FileName']}""
+    - log <path>
+)
+",
+                "Core/Not.md"
             );
 
             yield return new DeserializationTestInstance(@"['a','b','c'][0] | Log",     'a');

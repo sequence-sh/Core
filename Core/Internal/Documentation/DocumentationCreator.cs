@@ -28,7 +28,7 @@ public static class DocumentationCreator
         {
             var contentsStringBuilder = new StringBuilder();
 
-            contentsStringBuilder.AppendLine("# Contents");
+            contentsStringBuilder.AppendLine("# EDR Steps");
 
             var contentsRows = categories.SelectMany(x => x)
                 .Select(
@@ -44,8 +44,8 @@ public static class DocumentationCreator
             Prettifier.CreateMarkdownTable(contentsHeader, contentsRows, contentsStringBuilder);
 
             mainContents = new MainContents(
-                "Contents.md",
-                "Contents",
+                "all.md",
+                "all",
                 contentsStringBuilder.ToString().Trim(),
                 ""
             );
@@ -61,7 +61,7 @@ public static class DocumentationCreator
             {
                 var contentsStringBuilder = new StringBuilder();
 
-                contentsStringBuilder.AppendLine("# Contents");
+                contentsStringBuilder.AppendLine("# EDR Steps");
 
                 var contentsRows = categories.SelectMany(x => x)
                     .Select(
@@ -80,10 +80,10 @@ public static class DocumentationCreator
                 Prettifier.CreateMarkdownTable(contentsHeader, contentsRows, contentsStringBuilder);
 
                 categoryContents = new CategoryContents(
-                    "Contents.md",
-                    "Contents",
-                    contentsStringBuilder.ToString().Trim(),
+                    $"{category.Key}.md",
                     category.Key,
+                    contentsStringBuilder.ToString().Trim(),
+                    "",
                     category.Key
                 );
             }

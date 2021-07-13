@@ -124,12 +124,12 @@ public sealed class FreezableStepData
             switch (freezableStepProperty)
             {
                 case FreezableStepProperty.Step step:
-                    LocalGetVariablesUsed(step.FreezableStep, key, false);
+                    GetVariablesUsedByStep(step.FreezableStep, key, false);
                     break;
                 case FreezableStepProperty.StepList stepList:
                 {
                     foreach (var step in stepList.List)
-                        LocalGetVariablesUsed(step, key, true);
+                        GetVariablesUsedByStep(step, key, true);
 
                     break;
                 }
@@ -138,8 +138,13 @@ public sealed class FreezableStepData
                     GetVariablesUsedByLambda(lambda.FreezableStep, lambda.VName, key);
                     break;
                 }
-                case FreezableStepProperty.Variable _: break;
-                default:                               throw new ArgumentOutOfRangeException();
+                case FreezableStepProperty.Variable vName:
+                {
+                    GetVariablesUsedByVariableName(vName, key);
+                    break;
+                }
+
+                default: throw new ArgumentOutOfRangeException();
             }
         }
 
@@ -150,7 +155,33 @@ public sealed class FreezableStepData
 
         return variables;
 
-        void LocalGetVariablesUsed(
+        void GetVariablesUsedByVariableName(
+            FreezableStepProperty.Variable vName,
+            StepParameterReference stepParameterReference)
+        {
+            //Is this variable name actually a GetVariable step
+            if (!stepFactory.ParameterDictionary.TryGetValue(
+                stepParameterReference,
+                out var parameter
+            ))
+            {
+                errors.Add(
+                    ErrorCode.UnexpectedParameter
+                        .ToErrorBuilder(stepParameterReference.Name, stepName)
+                        .WithLocationSingle(Location)
+                );
+
+                return;
+            }
+
+            if (parameter.GetCustomAttribute<StepPropertyAttribute>() is not null)
+            {
+                var step = vName.ConvertToStep();
+                GetVariablesUsedByStep(step, stepParameterReference, false);
+            }
+        }
+
+        void GetVariablesUsedByStep(
             IFreezableStep freezableStep,
             StepParameterReference stepParameterReference,
             bool isList)

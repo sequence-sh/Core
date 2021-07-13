@@ -224,7 +224,21 @@ public class StepWrapper : IDocumentedStep
             .ToList();
 
         /// <inheritdoc />
-        public string Summary => _propertyInfo.GetXmlDocsSummary();
+        public string Summary
+        {
+            get
+            {
+                try
+                {
+                    var summary = _propertyInfo.GetXmlDocsSummary();
+                    return summary;
+                }
+                catch (NullReferenceException) //This annoyingly happens for some reason
+                {
+                    return "";
+                }
+            }
+        }
 
         /// <inheritdoc />
         public Type Type { get; }
