@@ -41,6 +41,9 @@ public abstract partial class StepTestBase<TStep, TOutput>
 
             var step = await GetStepAsync(testOutputHelper);
 
+            if (!ShouldExecute)
+                return;
+
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
             await using var stateMonad = await GetStateMonad(
@@ -143,6 +146,11 @@ public abstract partial class StepTestBase<TStep, TOutput>
         public bool IgnoreFinalState { get; set; }
 
         public bool IgnoreLoggedValues { get; set; }
+
+        /// <summary>
+        /// Whether the SCL should be executed
+        /// </summary>
+        public virtual bool ShouldExecute => true;
 
         /// <inheritdoc />
         public Maybe<StepFactoryStore> StepFactoryStoreToUse { get; set; }

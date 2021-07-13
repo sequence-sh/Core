@@ -98,6 +98,9 @@ public abstract partial class StepTestBase<TStep, TOutput>
         }
 
         /// <inheritdoc />
+        public override bool ShouldExecute => SCLExampleAttribute.ExecuteInTests;
+
+        /// <inheritdoc />
         public override void CheckUnitResult(Result<Unit, IError> result)
         {
             result.ShouldBeSuccessful();

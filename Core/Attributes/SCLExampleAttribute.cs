@@ -41,6 +41,11 @@ public sealed class SCLExampleAttribute : Attribute
     /// Expected messages logged by the example
     /// </summary>
     public string[]? ExpectedLogs { get; set; }
+
+    /// <summary>
+    /// Whether this example will be executed in unit tests. (Deserialization will still be tested)
+    /// </summary>
+    public bool ExecuteInTests { get; set; } = true;
 }
 
 }
