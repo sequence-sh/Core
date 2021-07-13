@@ -61,7 +61,7 @@ public static class DocumentationCreator
             {
                 var contentsStringBuilder = new StringBuilder();
 
-                contentsStringBuilder.AppendLine("# Contents");
+                contentsStringBuilder.AppendLine("# EDR Steps");
 
                 var contentsRows = categories.SelectMany(x => x)
                     .Select(

@@ -316,16 +316,23 @@ Log 'Comments!'",
                 "all.md"
             );
 
-            yield return new DeserializationTestInstance(
-                @"
-- <docs> = (GenerateDocumentation)['AllPages']
-- <docs> | ForEach (
-    - <path> = $""{<>['Directory']}/{<>['FileName']}""
-    - log <path>
-)
-",
-                "all.md"
-            );
+            //            yield return new DeserializationTestInstance(
+            //                @"
+            //- <docs> = (GenerateDocumentation)['AllPages']
+            //- <docs> | ForEach (
+            //    - log <>['FileName']
+            //)
+            //",
+            //                "all.md"
+            //            );
+
+            //            yield return new DeserializationTestInstance(
+            //                @"
+            //- <docs> = (GenerateDocumentation)['AllPages']
+            //-  ForEach <docs> (log <>['FileName'])
+            //",
+            //                "all.md"
+            //            );
 
             yield return new DeserializationTestInstance(
                 @"

@@ -16,13 +16,12 @@ namespace Reductech.EDR.Core.Steps
 [SCLExample(
     @"
 - <root> = 'edr/steps'
-- <docs> = (GenerateDocumentation)['AllPages']
-- <docs> | ForEach (
+- (GenerateDocumentation)['AllPages'] | ForEach (
     - <path> = $""{<root>}/{<>['Directory']}/{<>['FileName']}""
     - log <path>
 )",
-    Description = "Logs all the file paths"
-    //ExecuteInTests = false
+    Description    = "Logs all the file paths",
+    ExecuteInTests = false
 )]
 public sealed class
     GenerateDocumentation : CompoundStep<Entity>

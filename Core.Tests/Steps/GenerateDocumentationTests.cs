@@ -53,7 +53,7 @@ public partial class GenerateDocumentationTests : StepTestBase<GenerateDocumenta
                 var commentDashes = string.Join("", Enumerable.Repeat('-', maxCommentLength - 1));
 
                 var sb = new StringBuilder();
-                sb.AppendLine("# Contents");
+                sb.AppendLine("# EDR Steps");
                 sb.AppendLine();
                 sb.AppendLine($"|Step{nameSpaces}|Summary{commentSpaces}|");
                 sb.AppendLine($"|:{nameDashes}|:{commentDashes}|");
@@ -69,7 +69,7 @@ public partial class GenerateDocumentationTests : StepTestBase<GenerateDocumenta
 
                 var text = sb.ToString().Trim();
 
-                return new MainContents("Contents.md", "Contents", text, " ");
+                return new MainContents($"all.md", "all", text, "");
             }
 
             (string nameof, string category, string comment) notHeader = (
@@ -105,10 +105,10 @@ public partial class GenerateDocumentationTests : StepTestBase<GenerateDocumenta
                 {
                     new DocumentationCategory(
                         new CategoryContents(
-                            notContents.FileName,
-                            notContents.Title,
-                            notContents.FileText,
+                            "Core.md",
                             "Core",
+                            notContents.FileText,
+                            "",
                             "Core"
                         ),
                         new List<StepPage>() { notStepPage }
@@ -185,10 +185,10 @@ public partial class GenerateDocumentationTests : StepTestBase<GenerateDocumenta
                 {
                     new DocumentationCategory(
                         new CategoryContents(
-                            exampleContents.FileName,
-                            exampleContents.Title,
-                            exampleContents.FileText,
+                            "Examples.md",
                             "Examples",
+                            exampleContents.FileText,
+                            "",
                             "Examples"
                         ),
                         new List<StepPage>() { documentationStepPage }
