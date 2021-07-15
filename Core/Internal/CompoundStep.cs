@@ -109,9 +109,11 @@ public abstract class CompoundStep<T> : ICompoundStep<T>
     {
         get
         {
+            var connectorName = GetType().Assembly.GetName().Name!;
+
             var requirements = AllProperties
                 .SelectMany(x => x.RequiredVersions)
-                .Select(x => x.ToRequirement())
+                .Select(x => x.ToRequirement(connectorName))
                 .ToList();
 
             var nestedRequirements = AllProperties.SelectMany(GetNestedRequirements).ToList();
@@ -174,7 +176,10 @@ public abstract class CompoundStep<T> : ICompoundStep<T>
 
                 var logAttribute = propertyInfo.GetCustomAttribute<LogAttribute>();
 
-                var requiredVersions = propertyInfo.GetCustomAttributes<RequiredVersionAttribute>()
+                var scopedFunctionAttribute =
+                    propertyInfo.GetCustomAttribute<ScopedFunctionAttribute>();
+
+                var requiredVersions = propertyInfo.GetCustomAttributes<RequirementAttribute>()
                     .ToImmutableList();
 
                 if (val is IStep step)

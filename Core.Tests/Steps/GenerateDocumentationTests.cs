@@ -236,10 +236,8 @@ public partial class GenerateDocumentationTests : StepTestBase<GenerateDocumenta
         {
             get
             {
-                yield return new Requirement
-                {
-                    Name = "ValueIf Library", MinVersion = new Version(1, 2)
-                };
+                yield return new VersionRequirement("ValueIf Library", "Version", new Version(1, 2))
+                    { };
             }
         }
 

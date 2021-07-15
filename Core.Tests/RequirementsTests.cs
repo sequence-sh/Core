@@ -20,7 +20,7 @@ namespace Reductech.EDR.Core.Tests
 public partial class RequirementsTests
 {
     public static readonly List<Requirement> BaseRequirements =
-        new() { new Requirement { Name = "Reductech.EDR.Core.Tests" } };
+        new() { new ConnectorRequirement("Reductech.EDR.Core.Tests") };
 
     [Fact]
     public void BasicStepShouldHaveNoRequirements()
@@ -41,7 +41,9 @@ public partial class RequirementsTests
 
         requirements.Should()
             .BeEquivalentTo(
-                BaseRequirements.Append(new Requirement() { Name = "FixedRequirement" })
+                BaseRequirements.Append(
+                    new VersionRequirement("Reductech.EDR.Core.Tests", "FixedRequirement")
+                )
             );
     }
 
@@ -54,26 +56,28 @@ public partial class RequirementsTests
 
         requirements.Should()
             .BeEquivalentTo(
-                BaseRequirements.Append(new Requirement() { Name = "FixedRequirement" })
+                BaseRequirements.Append(
+                    new VersionRequirement("Reductech.EDR.Core.Tests", "FixedRequirement")
+                )
             );
     }
 
     [Fact]
     public void RuntimeRequirementsStepShouldHaveRequirements()
     {
-        var step = new RuntimeRequirementsStep() { BaseStep = Constant(1) };
+        var step = new RuntimeRequirementsStep { BaseStep = Constant(1) };
 
         var requirements = step.GetAllRequirements().ToList();
 
         requirements.Should()
             .BeEquivalentTo(
                 BaseRequirements.Append(
-                    new Requirement()
-                    {
-                        Name       = "MySoftware",
-                        MinVersion = new Version("1.0.0"),
-                        MaxVersion = new Version("2.0.0")
-                    }
+                    new VersionRequirement(
+                        "Reductech.EDR.Core.Tests",
+                        "MySoftware",
+                        new Version("1.0.0"),
+                        new Version("2.0.0")
+                    )
                 )
             );
     }
@@ -91,12 +95,12 @@ public partial class RequirementsTests
         requirements.Should()
             .BeEquivalentTo(
                 BaseRequirements.Append(
-                    new Requirement()
-                    {
-                        Name       = "MySoftware",
-                        MinVersion = new Version("1.0.0"),
-                        MaxVersion = new Version("2.0.0")
-                    }
+                    new VersionRequirement(
+                        "Reductech.EDR.Core.Tests",
+                        "MySoftware",
+                        new Version("1.0.0"),
+                        new Version("2.0.0")
+                    )
                 )
             );
     }
@@ -113,7 +117,11 @@ public partial class RequirementsTests
 
         [Required]
         [StepProperty(1)]
-        [RequiredVersion("MySoftware", minRequiredVersion: "1.0.0", maxRequiredVersion: "2.0.0")]
+        [RequiredVersion(
+            "MySoftware",
+            minRequiredVersion: "1.0.0",
+            maxRequiredVersion: "2.0.0"
+        )]
         public IStep<int> BaseStep { get; set; } = null!;
 
         /// <inheritdoc />
@@ -145,7 +153,7 @@ public partial class RequirementsTests
 
             /// <inheritdoc />
             public override IEnumerable<Requirement> Requirements => base.Requirements.Prepend(
-                new Requirement() { Name = "FixedRequirement" }
+                new VersionRequirement("Reductech.EDR.Core.Tests", "FixedRequirement")
             );
         }
     }

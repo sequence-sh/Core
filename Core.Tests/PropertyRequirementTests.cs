@@ -119,7 +119,7 @@ public partial class PropertyRequirementTests
             ConnectorData[] connectorData;
 
             if (ConnectorSettings is null)
-                connectorData = new ConnectorData[0];
+                connectorData = Array.Empty<ConnectorData>();
             else
             {
                 connectorData = new[] { new ConnectorData(ConnectorSettings, null) };
@@ -141,11 +141,15 @@ public partial class PropertyRequirementTests
         var connectorSettings =
             new ConnectorSettings
             {
-                Id      = "Widget",
-                Version = version.ToString(),
+                Id      = "Reductech.EDR.Core.Tests",
+                Version = new Version(1, 0).ToString(),
                 Enable  = true,
                 Settings =
-                    new Dictionary<string, object> { { Requirement.FeaturesKey, features } }
+                    new Dictionary<string, object>
+                    {
+                        { RequirementTestStep.VersionKey, version },
+                        { RequirementTestStep.FeaturesKey, features },
+                    }
             };
 
         return connectorSettings;
@@ -153,6 +157,9 @@ public partial class PropertyRequirementTests
 
     private class RequirementTestStep : CompoundStep<bool>
     {
+        public const string VersionKey = "WidgetVersion";
+        public const string FeaturesKey = "WidgetFeatures";
+
         /// <inheritdoc />
         protected override async Task<Result<bool, IError>> Run(
             IStateMonad stateMonad,
@@ -164,22 +171,22 @@ public partial class PropertyRequirementTests
 
         [StepProperty(1)]
         [DefaultValueExplanation("Nothing")]
-        [RequiredVersion("Widget", null)]
+        [RequiredVersion(VersionKey, null)]
         public IStep<bool>? RequirementStep { get; init; }
 
         [StepProperty(2)]
         [DefaultValueExplanation("Nothing")]
-        [RequiredVersion("Widget", "2.0")]
+        [RequiredVersion(VersionKey, "2.0")]
         public IStep<bool>? MinVersionStep { get; init; }
 
         [StepProperty(3)]
         [DefaultValueExplanation("Nothing")]
-        [RequiredVersion("Widget", null, "5.0")]
+        [RequiredVersion(VersionKey, null, "5.0")]
         public IStep<bool>? MaxVersionStep { get; init; }
 
         [StepProperty(4)]
         [DefaultValueExplanation("Nothing")]
-        [RequiredVersion("Widget", null, null, null, "sprocket")]
+        [RequiredFeature(FeaturesKey, "sprocket")]
         public IStep<bool>? RequiredFeatureStep { get; init; }
 
         /// <inheritdoc />

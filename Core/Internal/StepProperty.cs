@@ -15,7 +15,8 @@ public abstract record StepProperty
     string Name,
     int Index,
     LogAttribute? LogAttribute,
-    ImmutableList<RequiredVersionAttribute> RequiredVersions)
+    ScopedFunctionAttribute? ScopedFunctionAttribute,
+    ImmutableList<RequirementAttribute> RequiredVersions)
 {
     /// <summary>
     /// A lambda function
@@ -60,7 +61,8 @@ public abstract record StepProperty
         string Name,
         int Index,
         LogAttribute? LogAttribute,
-        ImmutableList<RequiredVersionAttribute> RequiredVersions) : StepProperty(
+        ScopedFunctionAttribute? ScopedFunctionAttribute,
+        ImmutableList<RequirementAttribute> RequiredVersions) : StepProperty(
         Name,
         Index,
         LogAttribute,
@@ -88,7 +90,8 @@ public abstract record StepProperty
         string Name,
         int Index,
         LogAttribute? LogAttribute,
-        ImmutableList<RequiredVersionAttribute> RequiredVersions) : StepProperty(
+        ScopedFunctionAttribute? ScopedFunctionAttribute,
+        ImmutableList<RequirementAttribute> RequiredVersions) : StepProperty(
         Name,
         Index,
         LogAttribute,
@@ -129,7 +132,8 @@ public abstract record StepProperty
         string Name,
         int Index,
         LogAttribute? LogAttribute,
-        ImmutableList<RequiredVersionAttribute> RequiredVersions) : StepProperty(
+        ScopedFunctionAttribute? ScopedFunctionAttribute,
+        ImmutableList<RequirementAttribute> RequiredVersions) : StepProperty(
         Name,
         Index,
         LogAttribute,
