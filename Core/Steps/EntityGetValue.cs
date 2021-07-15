@@ -34,9 +34,17 @@ public sealed class EntityGetValue<T> : CompoundStep<T>
         if (propertyResult.IsFailure)
             return propertyResult.ConvertFailure<T>();
 
-        var keys = propertyResult.Value.Split(".");
+        EntityPropertyKey epk;
 
-        var epk = new EntityPropertyKey(keys);
+        if (propertyResult.Value.StartsWith("$"))
+        {
+            epk = new EntityPropertyKey(propertyResult.Value.TrimStart('$'));
+        }
+        else
+        {
+            var keys = propertyResult.Value.Split(".");
+            epk = new EntityPropertyKey(keys);
+        }
 
         var entityValue = entity.Value.TryGetValue(epk);
 
