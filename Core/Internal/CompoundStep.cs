@@ -176,9 +176,6 @@ public abstract class CompoundStep<T> : ICompoundStep<T>
 
                 var logAttribute = propertyInfo.GetCustomAttribute<LogAttribute>();
 
-                var scopedFunctionAttribute =
-                    propertyInfo.GetCustomAttribute<ScopedFunctionAttribute>();
-
                 var requiredVersions = propertyInfo.GetCustomAttributes<RequirementAttribute>()
                     .ToImmutableList();
 

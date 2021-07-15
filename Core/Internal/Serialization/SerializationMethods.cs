@@ -101,6 +101,9 @@ public static class SerializationMethods
             };
     }
 
+    /// <summary>
+    /// Serialize any object
+    /// </summary>
     public static string SerializeObject(object? obj)
     {
         return
