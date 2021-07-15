@@ -254,6 +254,10 @@ public abstract class CompoundStep<T> : ICompoundStep<T>
                         .Select(s => s.Verify(stepFactoryStore))
                         .Combine(ErrorList.Combine)
                         .Map(_ => Unit.Default),
+                    StepProperty.LambdaFunctionProperty lambda => lambda.LambdaFunction.Step.Verify(
+                        stepFactoryStore
+                    ),
+
                     StepProperty.VariableNameProperty _ => Unit.Default,
                     _ => throw new ArgumentOutOfRangeException(nameof(x), x, null)
                 }
