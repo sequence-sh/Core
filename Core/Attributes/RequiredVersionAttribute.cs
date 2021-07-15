@@ -1,40 +1,83 @@
 ﻿using System;
+using System.Collections.Immutable;
 
 namespace Reductech.EDR.Core.Attributes
 {
 
 /// <summary>
+/// Additional requirements of this property
+/// </summary>
+[AttributeUsage(AttributeTargets.Property)]
+public abstract class RequirementAttribute : Attribute
+{
+    /// <summary>
+    /// Convert this requirement attribute to a requirement
+    /// </summary>
+    public abstract Requirement ToRequirement(string connectorName);
+}
+
+/// <summary>
+/// Use this attribute to denote required features.
+/// </summary>
+public sealed class RequiredFeatureAttribute : RequirementAttribute
+{
+    /// <inheritdoc />
+    public RequiredFeatureAttribute(string featureKey, params string[] requiredFeatures)
+    {
+        FeatureKey       = featureKey;
+        RequiredFeatures = requiredFeatures;
+    }
+
+    /// <summary>
+    /// The key of this feature
+    /// </summary>
+    public string FeatureKey { get; set; }
+
+    /// <summary>
+    ///The required features
+    /// </summary>
+    public string[] RequiredFeatures { get; set; }
+
+    /// <inheritdoc />
+    public override Requirement ToRequirement(string connectorName)
+    {
+        return new FeatureRequirement(
+            connectorName,
+            FeatureKey,
+            RequiredFeatures.ToImmutableList()
+        );
+    }
+}
+
+/// <summary>
 /// Use this attribute to denote the required version of some software.
 /// </summary>
 [AttributeUsage(AttributeTargets.Property)]
-public sealed class RequiredVersionAttribute : Attribute
+public sealed class RequiredVersionAttribute : RequirementAttribute
 {
     /// <summary>
     /// Create a new RequiredVersion attribute
     /// </summary>
-    /// <param name="softwareName">e.g. "Nuix"</param>
+    /// <param name="versionKey">e.g. "NuixVersion"</param>
     /// <param name="minRequiredVersion">e.g. "6.2"</param>
     /// <param name="maxRequiredVersion">e.g. "8.4"</param>
     /// <param name="notes">Special notes</param>
-    /// <param name="features">Features</param>
     public RequiredVersionAttribute(
-        string softwareName,
+        string versionKey,
         string? minRequiredVersion,
         string? maxRequiredVersion = null,
-        string? notes = null,
-        params string[] features)
+        string? notes = null)
     {
-        SoftwareName       = softwareName;
+        VersionKey         = versionKey;
         Notes              = notes;
-        Features           = features;
         MinRequiredVersion = minRequiredVersion == null ? null : new Version(minRequiredVersion);
         MaxRequiredVersion = maxRequiredVersion == null ? null : new Version(maxRequiredVersion);
     }
 
     /// <summary>
-    /// The software whose version is required.
+    /// The key of the version property
     /// </summary>
-    public string SoftwareName { get; }
+    public string VersionKey { get; }
 
     /// <summary>
     /// The minimum required version. Inclusive.
@@ -52,11 +95,6 @@ public sealed class RequiredVersionAttribute : Attribute
     public string? Notes { get; }
 
     /// <summary>
-    /// The required features
-    /// </summary>
-    public string[] Features { get; }
-
-    /// <summary>
     /// The required version in human readable form.
     /// </summary>
     public string Text
@@ -64,15 +102,15 @@ public sealed class RequiredVersionAttribute : Attribute
         get
         {
             if (MinRequiredVersion != null && MaxRequiredVersion != null)
-                return $"{SoftwareName} {MinRequiredVersion}-{MaxRequiredVersion}";
+                return $"{VersionKey} {MinRequiredVersion}-{MaxRequiredVersion}";
 
             if (MinRequiredVersion != null)
-                return $"{SoftwareName} {MinRequiredVersion}";
+                return $"{VersionKey} {MinRequiredVersion}";
 
             if (MaxRequiredVersion != null)
-                return $"{SoftwareName} Up To {MaxRequiredVersion}";
+                return $"{VersionKey} Up To {MaxRequiredVersion}";
 
-            return SoftwareName;
+            return VersionKey;
         }
     }
 
@@ -82,16 +120,15 @@ public sealed class RequiredVersionAttribute : Attribute
     /// <summary>
     /// Convert this to a requirement.
     /// </summary>
-    public Requirement ToRequirement()
+    public override Requirement ToRequirement(string connectorName)
     {
-        return new()
-        {
-            MaxVersion = MaxRequiredVersion,
-            MinVersion = MinRequiredVersion,
-            Name       = SoftwareName,
-            Notes      = Notes,
-            Features   = Features
-        };
+        return new VersionRequirement(
+            connectorName,
+            VersionKey,
+            MinRequiredVersion,
+            MaxRequiredVersion,
+            Notes
+        );
     }
 }
 

@@ -14,6 +14,8 @@ namespace Reductech.EDR.Core.Tests
 
 public class EntityConversionTests
 {
+    private const string ConnectorName = "Reductech.EDR.Core.Tests";
+
     private static readonly Configuration TestConfiguration = new()
     {
         DoNotSplit        = true,
@@ -21,20 +23,33 @@ public class EntityConversionTests
         TargetMachineTags = new List<string>() { "alpha", "beta" },
         AdditionalRequirements = new List<Requirement>()
         {
-            new()
-            {
-                Name       = "Test Requirement 1",
-                Features   = new List<string> { "Apple", "Banana" },
-                Notes      = "Test Notes",
-                MinVersion = new Version(1, 2, 3, 4),
-                MaxVersion = new Version(5, 6, 7, 8)
-            },
-            new() { Name = "Test Requirement 2" }
+            new FeatureRequirement(
+                ConnectorName,
+                "Features",
+                new List<string> { "Apple", "Banana" }
+            ),
+            new VersionRequirement(
+                ConnectorName,
+                "Version",
+                new Version(1, 2, 3, 4),
+                new Version(5, 6, 7, 8)
+            )
         }
     };
 
+    private static readonly Configuration TestConfiguration2 = new()
+    {
+        DoNotSplit             = true,
+        Priority               = 3,
+        TargetMachineTags      = new List<string>() { "alpha", "beta" },
+        AdditionalRequirements = new List<Requirement>() { }
+    };
+
     private const string TestConfigurationString =
-        "(AdditionalRequirements: [(Name: \"Test Requirement 1\" MinVersion: \"1.2.3.4\" MaxVersion: \"5.6.7.8\" Notes: \"Test Notes\" Features: [\"Apple\", \"Banana\"]), (Name: \"Test Requirement 2\")] TargetMachineTags: [\"alpha\", \"beta\"] DoNotSplit: True Priority: 3)";
+        "(AdditionalRequirements: [(FeaturesKey: \"Features\" RequiredFeatures: [\"Apple\", \"Banana\"] ConnectorName: \"Reductech.EDR.Core.Tests\"), (VersionKey: \"Version\" MinVersion: \"1.2.3.4\" MaxVersion: \"5.6.7.8\" ConnectorName: \"Reductech.EDR.Core.Tests\")] TargetMachineTags: [\"alpha\", \"beta\"] DoNotSplit: True Priority: 3)";
+
+    private const string TestConfiguration2String =
+        "(AdditionalRequirements: \"\" TargetMachineTags: [\"alpha\", \"beta\"] DoNotSplit: True Priority: 3)";
 
     [Fact]
     public void ConfigurationShouldConvertToEntityCorrectly()
@@ -44,6 +59,16 @@ public class EntityConversionTests
         var s = entity.ToString();
 
         s.Should().Be(TestConfigurationString);
+    }
+
+    [Fact]
+    public void ConfigurationShouldConvertToEntityCorrectly2()
+    {
+        var entity = TestConfiguration2.ConvertToEntity();
+
+        var s = entity.ToString();
+
+        s.Should().Be(TestConfiguration2String);
     }
 
     private static Entity CreateEntityFromString(string s)
@@ -70,7 +95,7 @@ public class EntityConversionTests
     [Fact]
     public void EntityShouldConvertToConfigurationCorrectly()
     {
-        var entity = CreateEntityFromString(TestConfigurationString);
+        var entity = CreateEntityFromString(TestConfiguration2String);
 
         var configurationResult =
             EntityConversionHelpers.TryCreateFromEntity<Configuration>(entity);
@@ -79,7 +104,7 @@ public class EntityConversionTests
 
         var conf = configurationResult.Value;
 
-        conf.Should().Be(TestConfiguration);
+        conf.Should().Be(TestConfiguration2);
     }
 
     [Fact]

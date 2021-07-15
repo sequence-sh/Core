@@ -16,12 +16,11 @@ public static class RequirementsHelpers
     {
         var requirements = new HashSet<Requirement>();
 
-        var stepAssembly     = Assembly.GetAssembly(step.GetType());
-        var stepAssemblyName = stepAssembly?.GetName()?.Name;
+        var stepAssemblyName = step.GetType().Assembly.GetName().Name;
 
         if (stepAssemblyName is not null && stepAssemblyName != CoreAssemblyName)
         {
-            requirements.Add(new Requirement() { Name = stepAssemblyName });
+            requirements.Add(new ConnectorRequirement(stepAssemblyName));
         }
 
         if (step is ICompoundStep cs)
