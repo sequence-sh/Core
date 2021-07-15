@@ -51,6 +51,12 @@ public abstract partial class StepTestBase<TStep, TOutput>
                 loggerFactory.CreateLogger("Test")
             );
 
+            if (ShouldVerify)
+            {
+                var verifyResult = step.Verify(stateMonad.StepFactoryStore);
+                verifyResult.ShouldBeSuccessful();
+            }
+
             if (step is IStep<TOutput> outputStep)
             {
                 var result = await outputStep.Run<TOutput>(stateMonad, CancellationToken.None);
@@ -92,6 +98,11 @@ public abstract partial class StepTestBase<TStep, TOutput>
                 finalContextCheck(stateMonad.ExternalContext);
             }
         }
+
+        /// <summary>
+        /// Should the SCL be verified before running
+        /// </summary>
+        public virtual bool ShouldVerify => true;
 
         /// <inheritdoc />
         public override string ToString() => Name;

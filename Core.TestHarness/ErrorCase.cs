@@ -65,6 +65,9 @@ public abstract partial class StepTestBase<TStep, TOutput>
 
             result2.Error.Should().Be(ExpectedError);
         }
+
+        /// <inheritdoc />
+        public override bool ShouldVerify => false;
     }
 
     private static Result<Unit, IError> GetValue(TOutput result)
