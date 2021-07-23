@@ -5,6 +5,7 @@ using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
+using Reductech.EDR.Core.Util;
 
 namespace Reductech.EDR.Core.Steps
 {
@@ -34,22 +35,21 @@ public sealed class CharAtIndex : CompoundStep<StringStream>
         IStateMonad stateMonad,
         CancellationToken cancellationToken)
     {
-        var index = await Index.Run(stateMonad, cancellationToken);
+        var r = await stateMonad.RunStepsAsync(
+            String.WrapStringStream(),
+            Index,
+            cancellationToken
+        );
 
-        if (index.IsFailure)
-            return index.ConvertFailure<StringStream>();
+        if (r.IsFailure)
+            return r.ConvertFailure<StringStream>();
 
-        var stringStreamResult = await String.Run(stateMonad, cancellationToken);
+        var (str, index) = r.Value;
 
-        if (stringStreamResult.IsFailure)
-            return stringStreamResult;
-
-        var str = await stringStreamResult.Value.GetStringAsync();
-
-        if (index.Value < 0 || index.Value >= str.Length)
+        if (index < 0 || index >= str.Length)
             return new SingleError(new ErrorLocation(this), ErrorCode.IndexOutOfBounds);
 
-        var character = str[index.Value].ToString();
+        var character = str[index].ToString();
 
         return new StringStream(character);
     }

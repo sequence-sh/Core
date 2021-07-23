@@ -8,6 +8,7 @@ using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
+using Reductech.EDR.Core.Util;
 
 namespace Reductech.EDR.Core.Steps
 {
@@ -23,22 +24,20 @@ public class EntityMapProperties : CompoundStep<Array<Entity>>
         IStateMonad stateMonad,
         CancellationToken cancellationToken)
     {
-        var mappings = await Mappings.Run(stateMonad, cancellationToken)
-            .Map(
-                e => e
-                    .ToDictionary(x => x.Name, x => x.BestValue.GetPrimitiveString())
-            );
+        var r = await stateMonad.RunStepsAsync(EntityStream, Mappings, cancellationToken);
 
-        if (mappings.IsFailure)
-            return mappings.ConvertFailure<Array<Entity>>();
+        if (r.IsFailure)
+            return r.ConvertFailure<Array<Entity>>();
 
-        var entityStream = await EntityStream.Run(stateMonad, cancellationToken);
+        var (entityStream, mappings) = r.Value;
 
-        if (entityStream.IsFailure)
-            return entityStream.ConvertFailure<Array<Entity>>();
+        var mappingsDict = mappings.ToDictionary(
+            x => x.Name,
+            x => x.BestValue.GetPrimitiveString()
+        );
 
-        var newEntityStream = entityStream.Value
-            .Select(e => ChangeHeader(e, mappings.Value));
+        var newEntityStream = entityStream
+            .Select(e => ChangeHeader(e, mappingsDict));
 
         return newEntityStream;
 

@@ -13,7 +13,7 @@ namespace Reductech.EDR.Core.Steps
 /// <summary>
 /// Repeat a step a set number of times.
 /// </summary>
-public sealed class DoXTimes : CompoundStep<Unit>
+public sealed class DoXTimes : CompoundStep<Unit> //TODO replace with a lambda function
 {
     /// <summary>
     /// The action to perform repeatedly.

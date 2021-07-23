@@ -5,6 +5,7 @@ using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
+using Reductech.EDR.Core.Util;
 
 namespace Reductech.EDR.Core.Steps
 {
@@ -20,21 +21,20 @@ public sealed class EntityHasProperty : CompoundStep<bool>
         IStateMonad stateMonad,
         CancellationToken cancellationToken)
     {
-        var entity = await Entity.Run(stateMonad, cancellationToken);
+        var r = await stateMonad.RunStepsAsync(
+            Entity,
+            Property.WrapStringStream(),
+            cancellationToken
+        );
 
-        if (entity.IsFailure)
-            return entity.ConvertFailure<bool>();
+        if (r.IsFailure)
+            return r.ConvertFailure<bool>();
 
-        var propertyResult = await Property.Run(stateMonad, cancellationToken);
+        var (entity, property) = r.Value;
 
-        if (propertyResult.IsFailure)
-            return propertyResult.ConvertFailure<bool>();
+        var result = entity.TryGetValue(property).HasValue;
 
-        var propertyName = await propertyResult.Value.GetStringAsync();
-
-        var r = entity.Value.TryGetValue(propertyName).HasValue;
-
-        return r;
+        return result;
     }
 
     /// <summary>

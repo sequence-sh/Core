@@ -8,6 +8,7 @@ using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Internal.Serialization;
+using Reductech.EDR.Core.Util;
 
 namespace Reductech.EDR.Core.Steps
 {
@@ -23,30 +24,30 @@ public sealed class EntityGetValue<T> : CompoundStep<T>
         IStateMonad stateMonad,
         CancellationToken cancellationToken)
     {
-        var entity = await Entity.Run(stateMonad, cancellationToken);
+        var r = await stateMonad.RunStepsAsync(
+            Entity,
+            Property.WrapStringStream(),
+            cancellationToken
+        );
 
-        if (entity.IsFailure)
-            return entity.ConvertFailure<T>();
+        if (r.IsFailure)
+            return r.ConvertFailure<T>();
 
-        var propertyResult = await Property.Run(stateMonad, cancellationToken)
-            .Map(x => x.GetStringAsync());
-
-        if (propertyResult.IsFailure)
-            return propertyResult.ConvertFailure<T>();
+        var (entity, property) = r.Value;
 
         EntityPropertyKey epk;
 
-        if (propertyResult.Value.StartsWith("$"))
+        if (property.StartsWith("$"))
         {
-            epk = new EntityPropertyKey(propertyResult.Value.TrimStart('$'));
+            epk = new EntityPropertyKey(property.TrimStart('$'));
         }
         else
         {
-            var keys = propertyResult.Value.Split(".");
+            var keys = property.Split(".");
             epk = new EntityPropertyKey(keys);
         }
 
-        var entityValue = entity.Value.TryGetValue(epk);
+        var entityValue = entity.TryGetValue(epk);
 
         if (entityValue.HasNoValue)
             return EntityValue.GetDefaultValue<T>();

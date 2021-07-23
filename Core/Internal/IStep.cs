@@ -64,7 +64,12 @@ public interface IStep
 /// <summary>
 /// A step that can be run.
 /// </summary>
-public interface IStep<T> : IStep
+public interface IStep<T> : IStep, IRunnableStep<T> { }
+
+/// <summary>
+/// Something that can be run like a step
+/// </summary>
+public interface IRunnableStep<T>
 {
     /// <summary>
     /// Run this step and return the result.
