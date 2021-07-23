@@ -174,6 +174,10 @@ public static partial class StepHelpers
                 return Result.Success<Maybe<T>, IError>(Maybe<T>.None);
 
             var r = await _step.Run(stateMonad, cancellationToken);
+
+            if (r.IsFailure)
+                return r.ConvertFailure<Maybe<T>>();
+
             return Maybe<T>.From(r.Value);
         }
     }
