@@ -16,9 +16,9 @@ public static partial class StepHelpers
     [GeneratedCode("CreateStepHelpers", "1")]
     public static async Task<Result<(T1, T2, T3), IError>> RunStepsAsync<T1, T2, T3>(
         this IStateMonad stateMonad,
-        IStep<T1> s1,
-        IStep<T2> s2,
-        IStep<T3> s3,
+        IRunnableStep<T1> s1,
+        IRunnableStep<T2> s2,
+        IRunnableStep<T3> s3,
         CancellationToken cancellationToken)
     {
         var p = await RunStepsAsync(stateMonad, s1, s2, cancellationToken);
@@ -41,10 +41,10 @@ public static partial class StepHelpers
     [GeneratedCode("CreateStepHelpers", "1")]
     public static async Task<Result<(T1, T2, T3, T4), IError>> RunStepsAsync<T1, T2, T3, T4>(
         this IStateMonad stateMonad,
-        IStep<T1> s1,
-        IStep<T2> s2,
-        IStep<T3> s3,
-        IStep<T4> s4,
+        IRunnableStep<T1> s1,
+        IRunnableStep<T2> s2,
+        IRunnableStep<T3> s3,
+        IRunnableStep<T4> s4,
         CancellationToken cancellationToken)
     {
         var p = await RunStepsAsync(stateMonad, s1, s2, s3, cancellationToken);
@@ -68,11 +68,11 @@ public static partial class StepHelpers
     public static async Task<Result<(T1, T2, T3, T4, T5), IError>>
         RunStepsAsync<T1, T2, T3, T4, T5>(
             this IStateMonad stateMonad,
-            IStep<T1> s1,
-            IStep<T2> s2,
-            IStep<T3> s3,
-            IStep<T4> s4,
-            IStep<T5> s5,
+            IRunnableStep<T1> s1,
+            IRunnableStep<T2> s2,
+            IRunnableStep<T3> s3,
+            IRunnableStep<T4> s4,
+            IRunnableStep<T5> s5,
             CancellationToken cancellationToken)
     {
         var p = await RunStepsAsync(stateMonad, s1, s2, s3, s4, cancellationToken);
@@ -96,12 +96,12 @@ public static partial class StepHelpers
     public static async Task<Result<(T1, T2, T3, T4, T5, T6), IError>>
         RunStepsAsync<T1, T2, T3, T4, T5, T6>(
             this IStateMonad stateMonad,
-            IStep<T1> s1,
-            IStep<T2> s2,
-            IStep<T3> s3,
-            IStep<T4> s4,
-            IStep<T5> s5,
-            IStep<T6> s6,
+            IRunnableStep<T1> s1,
+            IRunnableStep<T2> s2,
+            IRunnableStep<T3> s3,
+            IRunnableStep<T4> s4,
+            IRunnableStep<T5> s5,
+            IRunnableStep<T6> s6,
             CancellationToken cancellationToken)
     {
         var p = await RunStepsAsync(stateMonad, s1, s2, s3, s4, s5, cancellationToken);
@@ -127,13 +127,13 @@ public static partial class StepHelpers
     public static async Task<Result<(T1, T2, T3, T4, T5, T6, T7), IError>>
         RunStepsAsync<T1, T2, T3, T4, T5, T6, T7>(
             this IStateMonad stateMonad,
-            IStep<T1> s1,
-            IStep<T2> s2,
-            IStep<T3> s3,
-            IStep<T4> s4,
-            IStep<T5> s5,
-            IStep<T6> s6,
-            IStep<T7> s7,
+            IRunnableStep<T1> s1,
+            IRunnableStep<T2> s2,
+            IRunnableStep<T3> s3,
+            IRunnableStep<T4> s4,
+            IRunnableStep<T5> s5,
+            IRunnableStep<T6> s6,
+            IRunnableStep<T7> s7,
             CancellationToken cancellationToken)
     {
         var p = await RunStepsAsync(stateMonad, s1, s2, s3, s4, s5, s6, cancellationToken);
@@ -159,14 +159,14 @@ public static partial class StepHelpers
     public static async Task<Result<(T1, T2, T3, T4, T5, T6, T7, T8), IError>>
         RunStepsAsync<T1, T2, T3, T4, T5, T6, T7, T8>(
             this IStateMonad stateMonad,
-            IStep<T1> s1,
-            IStep<T2> s2,
-            IStep<T3> s3,
-            IStep<T4> s4,
-            IStep<T5> s5,
-            IStep<T6> s6,
-            IStep<T7> s7,
-            IStep<T8> s8,
+            IRunnableStep<T1> s1,
+            IRunnableStep<T2> s2,
+            IRunnableStep<T3> s3,
+            IRunnableStep<T4> s4,
+            IRunnableStep<T5> s5,
+            IRunnableStep<T6> s6,
+            IRunnableStep<T7> s7,
+            IRunnableStep<T8> s8,
             CancellationToken cancellationToken)
     {
         var p = await RunStepsAsync(stateMonad, s1, s2, s3, s4, s5, s6, s7, cancellationToken);

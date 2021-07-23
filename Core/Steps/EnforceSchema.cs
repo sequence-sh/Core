@@ -9,6 +9,7 @@ using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.Enums;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
+using Reductech.EDR.Core.Util;
 
 namespace Reductech.EDR.Core.Steps
 {
@@ -23,44 +24,26 @@ public sealed class EnforceSchema : CompoundStep<Array<Entity>>
         IStateMonad stateMonad,
         CancellationToken cancellationToken)
     {
-        var entityStream = await EntityStream.Run(stateMonad, cancellationToken);
+        var r = await stateMonad.RunStepsAsync(
+            EntityStream,
+            Schema.WrapEntityConversion<Schema>(this),
+            ErrorBehavior.WrapNullable(),
+            cancellationToken
+        );
 
-        if (entityStream.IsFailure)
-            return entityStream.ConvertFailure<Array<Entity>>();
+        if (r.IsFailure)
+            return r.ConvertFailure<Array<Entity>>();
 
-        var schemaEntity = await Schema.Run(stateMonad, cancellationToken);
+        var (entityStream, schema, errorBehavior) = r.Value;
 
-        if (schemaEntity.IsFailure)
-            return schemaEntity.ConvertFailure<Array<Entity>>();
-
-        var schema = EntityConversionHelpers.TryCreateFromEntity<Schema>(schemaEntity.Value)
-            .MapError(e => e.WithLocation(this));
-
-        if (schema.IsFailure)
-            return schema.ConvertFailure<Array<Entity>>();
-
-        Maybe<ErrorBehavior> errorBehavior;
-
-        if (ErrorBehavior == null)
-            errorBehavior = Maybe<ErrorBehavior>.None;
-        else
-        {
-            var errorBehaviorResult = await ErrorBehavior.Run(stateMonad, cancellationToken);
-
-            if (errorBehaviorResult.IsFailure)
-                return errorBehaviorResult.ConvertFailure<Array<Entity>>();
-
-            errorBehavior = Maybe<ErrorBehavior>.From(errorBehaviorResult.Value);
-        }
-
-        var newStream = entityStream.Value.SelectMany(ApplySchema);
+        var newStream = entityStream.SelectMany(ApplySchema);
 
         return newStream;
 
         async IAsyncEnumerable<Entity> ApplySchema(Entity entity)
         {
             await ValueTask.CompletedTask;
-            var result = schema.Value.ApplyToEntity(entity, this, stateMonad, errorBehavior);
+            var result = schema.ApplyToEntity(entity, this, stateMonad, errorBehavior);
 
             if (result.IsFailure)
                 throw new ErrorException(result.Error.WithLocation(this));

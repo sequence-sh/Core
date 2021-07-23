@@ -7,6 +7,7 @@ using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Internal.Serialization;
+using Reductech.EDR.Core.Util;
 
 namespace Reductech.EDR.Core.Steps
 {
@@ -37,23 +38,20 @@ public sealed class ElementAtIndex<T> : CompoundStep<T>
         IStateMonad stateMonad,
         CancellationToken cancellationToken)
     {
-        var arrayResult = await Array.Run(stateMonad, cancellationToken);
+        var r = await stateMonad.RunStepsAsync(Array, Index, cancellationToken);
 
-        if (arrayResult.IsFailure)
-            return arrayResult.ConvertFailure<T>();
+        if (r.IsFailure)
+            return r.ConvertFailure<T>();
 
-        var indexResult = await Index.Run(stateMonad, cancellationToken);
+        var (array, index) = r.Value;
 
-        if (indexResult.IsFailure)
-            return indexResult.ConvertFailure<T>();
-
-        var r = await arrayResult.Value.ElementAtAsync(
-            indexResult.Value,
+        var result = await array.ElementAtAsync(
+            index,
             new ErrorLocation(this),
             cancellationToken
         );
 
-        return r;
+        return result;
     }
 
     /// <inheritdoc />
