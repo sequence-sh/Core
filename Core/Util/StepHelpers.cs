@@ -128,10 +128,13 @@ public static partial class StepHelpers
         return new NullableStepWrapper<T>(step);
     }
 
-    public static async Task<Result<(T1, T2), IError>> RunSteps<T1, T2>(
+    /// <summary>
+    /// Evaluates steps and combines their results
+    /// </summary>
+    public static async Task<Result<(T1, T2), IError>> RunStepsAsync<T1, T2>(
+        this IStateMonad stateMonad,
         IRunnableStep<T1> s1,
         IRunnableStep<T2> s2,
-        IStateMonad stateMonad,
         CancellationToken cancellationToken)
     {
         var r1 = await s1.Run(stateMonad, cancellationToken);

@@ -29,7 +29,7 @@ public abstract class CompoundStep<T> : ICompoundStep<T>
         CancellationToken cancellationToken);
 
     /// <inheritdoc />
-    async Task<Result<T, IError>> IStep<T>.Run(
+    async Task<Result<T, IError>> IRunnableStep<T>.Run(
         IStateMonad stateMonad,
         CancellationToken cancellationToken)
     {

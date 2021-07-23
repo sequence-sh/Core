@@ -5,6 +5,7 @@ using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
+using Reductech.EDR.Core.Util;
 
 namespace Reductech.EDR.Core.Steps
 {
@@ -40,18 +41,14 @@ public sealed class DateToString : CompoundStep<StringStream>
         IStateMonad stateMonad,
         CancellationToken cancellationToken)
     {
-        var dateResult = await Date.Run(stateMonad, cancellationToken);
+        var r = await stateMonad.RunStepsAsync(Date, Format.WrapStringStream(), cancellationToken);
 
-        if (dateResult.IsFailure)
-            return dateResult.ConvertFailure<StringStream>();
+        if (r.IsFailure)
+            return r.ConvertFailure<StringStream>();
 
-        var formatResult = await Format.Run(stateMonad, cancellationToken)
-            .Map(async x => await x.GetStringAsync());
+        var (date, format) = r.Value;
 
-        if (formatResult.IsFailure)
-            return formatResult.ConvertFailure<StringStream>();
-
-        var dateOut = dateResult.Value.ToString(formatResult.Value);
+        var dateOut = date.ToString(format);
 
         return new StringStream(dateOut);
     }
