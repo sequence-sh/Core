@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
@@ -44,9 +45,23 @@ public static partial class StepHelpers
     /// Converts this to a RunnableStep with a nullable result type
     /// </summary>
     public static IRunnableStep<Maybe<T>> WrapNullable<T>(this IRunnableStep<T>? step)
-        where T : struct
     {
         return new NullableStepWrapper<T>(step);
+    }
+
+    /// <summary>
+    /// Converts this to a RunnableStep with a nullable result type
+    /// </summary>
+    public static IRunnableStep<Maybe<T2>> WrapNullable<T1, T2>(
+        this IRunnableStep<T1>? step,
+        Func<IRunnableStep<T1>, IRunnableStep<T2>> map)
+    {
+        if (step is null)
+            return new NullableStepWrapper<T2>(null);
+
+        var mappedStep = map(step);
+
+        return new NullableStepWrapper<T2>(mappedStep);
     }
 
     /// <summary>
@@ -106,38 +121,6 @@ public static partial class StepHelpers
         }
     }
 
-    private class StringStreamArrayWrapper : IRunnableStep<IReadOnlyList<string>>
-    {
-        private readonly IRunnableStep<Array<StringStream>> _step;
-
-        public StringStreamArrayWrapper(IRunnableStep<Array<StringStream>> step)
-        {
-            _step = step;
-        }
-
-        /// <inheritdoc />
-        public async Task<Result<IReadOnlyList<string>, IError>> Run(
-            IStateMonad stateMonad,
-            CancellationToken cancellationToken)
-        {
-            var r = await _step.Run(stateMonad, cancellationToken)
-                .Bind(x => x.GetElementsAsync(cancellationToken));
-
-            if (r.IsFailure)
-                return r.ConvertFailure<IReadOnlyList<string>>();
-
-            var l = new List<string>(r.Value.Count);
-
-            foreach (var stringStream in r.Value)
-            {
-                var s = await stringStream.GetStringAsync();
-                l.Add(s);
-            }
-
-            return l;
-        }
-    }
-
     private class StringStreamWrapper : IRunnableStep<string>
     {
         private readonly IRunnableStep<StringStream> _step;
@@ -179,6 +162,38 @@ public static partial class StepHelpers
                 return r.ConvertFailure<Maybe<T>>();
 
             return Maybe<T>.From(r.Value);
+        }
+    }
+
+    private class StringStreamArrayWrapper : IRunnableStep<IReadOnlyList<string>>
+    {
+        private readonly IRunnableStep<Array<StringStream>> _step;
+
+        public StringStreamArrayWrapper(IRunnableStep<Array<StringStream>> step)
+        {
+            _step = step;
+        }
+
+        /// <inheritdoc />
+        public async Task<Result<IReadOnlyList<string>, IError>> Run(
+            IStateMonad stateMonad,
+            CancellationToken cancellationToken)
+        {
+            var r = await _step.Run(stateMonad, cancellationToken)
+                .Bind(x => x.GetElementsAsync(cancellationToken));
+
+            if (r.IsFailure)
+                return r.ConvertFailure<IReadOnlyList<string>>();
+
+            var l = new List<string>(r.Value.Count);
+
+            foreach (var stringStream in r.Value)
+            {
+                var s = await stringStream.GetStringAsync();
+                l.Add(s);
+            }
+
+            return l;
         }
     }
 
