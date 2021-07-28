@@ -34,19 +34,6 @@ public partial class EntityHasPropertyTests : StepTestBase<EntityHasProperty, bo
             );
         }
     }
-
-    //        /// <inheritdoc />
-    //        protected override IEnumerable<SerializeCase> SerializeCases
-    //        {
-    //            get
-    //            {
-    //                yield return new SerializeCase("default",
-    //                    CreateStepWithDefaultOrArbitraryValuesAsync().step,
-    //                    @"Do: EntityHasProperty
-    //Entity: (Prop1 = 'Val0',Prop2 = 'Val1')
-    //Property: 'Bar2'");
-    //            }
-    //        }
 }
 
 }
