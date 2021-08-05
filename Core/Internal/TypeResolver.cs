@@ -233,20 +233,26 @@ public sealed class TypeResolver
     /// <summary>
     /// Resolve this type reference if it is variable and in the dictionary.
     /// </summary>
-    public TypeReference? MaybeResolve(TypeReference typeReference)
+    public TypeReference MaybeResolve(TypeReference typeReference)
     {
-        if (typeReference is TypeReference.Variable vr
-         && Dictionary.TryGetValue(vr.VariableName, out var tr))
-            return tr;
-
-        if (typeReference is TypeReference.AutomaticVariable && AutomaticVariableName.HasValue
-                                                             && Dictionary.TryGetValue(
-                                                                    AutomaticVariableName.Value,
-                                                                    out var tr2
-                                                                ))
-            return tr2;
-
-        return null;
+        while (true)
+        {
+            switch (typeReference)
+            {
+                case TypeReference.Variable vr
+                    when Dictionary.TryGetValue(vr.VariableName, out var tr):
+                    typeReference = tr;
+                    continue;
+                case TypeReference.AutomaticVariable when AutomaticVariableName.HasValue
+                                                       && Dictionary.TryGetValue(
+                                                              AutomaticVariableName.Value,
+                                                              out var tr2
+                                                          ):
+                    typeReference = tr2;
+                    continue;
+                default: return typeReference;
+            }
+        }
     }
 }
 

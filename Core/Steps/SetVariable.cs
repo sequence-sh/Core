@@ -73,18 +73,44 @@ public sealed class SetVariable<T> : CompoundStep<Unit>
             FreezableStepData freezableStepData,
             TypeResolver typeResolver)
         {
+            var valueType = GetValueType(freezableStepData, typeResolver);
+
+            if (valueType.IsFailure)
+                return valueType.ConvertFailure<TypeReference>();
+
+            var vn = freezableStepData
+                .TryGetVariableName(nameof(SetVariable<object>.Variable), StepType)
+                .Map(x => new TypeReference.Variable(x));
+
+            if (vn.IsFailure)
+                return vn.ConvertFailure<TypeReference>();
+
+            if (valueType.Value.Allow(vn.Value, typeResolver))
+                return vn.Value;
+
+            return Result.Failure<TypeReference, IError>(
+                ErrorCode.WrongVariableType.ToErrorBuilder(vn.Value.Name, valueType.Value.Name)
+                    .WithLocation(freezableStepData)
+            );
+        }
+
+        private Result<TypeReference, IError> GetValueType(
+            FreezableStepData freezableStepData,
+            TypeResolver typeResolver)
+        {
             var r =
                 freezableStepData
                     .TryGetStep(nameof(SetVariable<object>.Value), StepType)
                     .Bind(
-                        x => x.TryGetOutputTypeReference(
-                            new CallerMetadata(
-                                TypeName,
-                                nameof(SetVariable<object>.Value),
-                                TypeReference.Any.Instance
-                            ),
-                            typeResolver
-                        )
+                        x =>
+                            x.TryGetOutputTypeReference(
+                                new CallerMetadata(
+                                    TypeName,
+                                    nameof(SetVariable<object>.Value),
+                                    TypeReference.Any.Instance
+                                ),
+                                typeResolver
+                            )
                     );
 
             return r;
@@ -104,15 +130,18 @@ public sealed class SetVariable<T> : CompoundStep<Unit>
             if (vn.IsFailure)
                 yield break;
 
-            var memberType = GetGenericTypeParameter(
-                callerMetadata,
+            var memberType = GetValueType(
                 freezableStepData,
                 typeResolver
             );
 
             if (memberType.IsFailure)
-                yield return new(vn.Value, TypeReference.Unknown.Instance, freezableStepData
-                                     .Location);
+                yield return new(
+                    vn.Value,
+                    TypeReference.Unknown.Instance,
+                    freezableStepData
+                        .Location
+                );
             else
                 yield return new(vn.Value, memberType.Value, freezableStepData.Location);
         }

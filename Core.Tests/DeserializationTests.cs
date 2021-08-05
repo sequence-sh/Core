@@ -513,6 +513,15 @@ Log 'Comments!'",
                 false,
                 true
             );
+
+            yield return new DeserializationTestInstance(
+                @"
+- <num> = (num: 12345)['num']
+- IncrementVariable <num>
+- log <num>
+",
+                12346
+            );
         }
     }
 
