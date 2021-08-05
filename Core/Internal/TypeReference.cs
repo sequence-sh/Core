@@ -103,9 +103,6 @@ public abstract record TypeReference
             {
                 if (a.Type == Type)
                     return true;
-
-                //if (Type == SCLType.Double || a.Type == SCLType.Integer)
-                //    return true;
             }
 
             return false;
