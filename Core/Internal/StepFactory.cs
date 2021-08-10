@@ -7,6 +7,7 @@ using System.Reflection;
 using System.Text.RegularExpressions;
 using CSharpFunctionalExtensions;
 using Namotion.Reflection;
+using OneOf;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Internal.Serialization;
@@ -58,18 +59,23 @@ public abstract class StepFactory : IStepFactory
                         property => property.GetCustomAttribute<StepPropertyBaseAttribute>() != null
                     )
                     .Select(x => x.PropertyType)
-                    .Select(GetUnderlyingType)
+                    .SelectMany(GetUnderlyingTypes)
                     .Where(x => x.IsEnum)
                     .Concat(ExtraEnumTypes);
 
-            static Type GetUnderlyingType(Type t)
+            static IEnumerable<Type> GetUnderlyingTypes(Type t)
             {
-                while (true)
+                if (!t.GenericTypeArguments.Any())
+                    yield return t;
+                else
                 {
-                    if (!t.GenericTypeArguments.Any())
-                        return t;
-
-                    t = t.GenericTypeArguments.First();
+                    foreach (var arg in t.GenericTypeArguments)
+                    {
+                        foreach (var underlyingType in GetUnderlyingTypes(arg))
+                        {
+                            yield return underlyingType;
+                        }
+                    }
                 }
             }
         }
@@ -355,36 +361,56 @@ public abstract class StepFactory : IStepFactory
         if (propertyType.IsInstanceOfType(stepToSet))
             return Result.Success<IStep, IErrorBuilder>(stepToSet); //No coercion required
 
-        if (propertyType.IsGenericType && stepToSet is StringConstant stringConstant)
+        if (propertyType.IsGenericType)
         {
-            if (propertyType.GenericTypeArguments.First().IsEnum)
-            {
-                var enumType = propertyType.GenericTypeArguments.First();
+            var nestedType = propertyType.GenericTypeArguments.First();
 
-                if (Enum.TryParse(
-                    enumType,
-                    stringConstant.Value.GetString(),
-                    true,
-                    out var enumValue
-                ))
-                {
-                    var step = EnumConstantFreezable.TryCreateEnumConstant(enumValue!);
-                    return step;
-                }
-            }
-            else if (propertyType.GenericTypeArguments.First() == typeof(DateTime))
+            if (nestedType.GetInterfaces().Contains(typeof(IOneOf)))
             {
-                if (DateTime.TryParse(stringConstant.Value.GetString(), out var dt))
+                var oneOfTypes = nestedType.GenericTypeArguments;
+
+                foreach (var oneOfType in oneOfTypes)
                 {
-                    var step = new DateTimeConstant(dt);
-                    return Result.Success<IStep, IErrorBuilder>(step);
+                    var stepType     = typeof(IStep<>).MakeGenericType(oneOfType);
+                    var coerceResult = TryCoerceStep(propertyName, stepType, stepToSet);
+
+                    if (coerceResult.IsSuccess)
+                    {
+                        var resultStep = OneOfStep.Create(nestedType, stepToSet);
+                        return Result.Success<IStep, IErrorBuilder>(resultStep);
+                    }
                 }
             }
-        }
-        else if (propertyType.IsGenericType
-              && propertyType.GenericTypeArguments.First() == typeof(object))
-        {
-            return Result.Success<IStep, IErrorBuilder>(stepToSet);
+            else if (stepToSet is StringConstant stringConstant)
+            {
+                if (nestedType.IsEnum)
+                {
+                    var enumType = propertyType.GenericTypeArguments.First();
+
+                    if (Enum.TryParse(
+                        enumType,
+                        stringConstant.Value.GetString(),
+                        true,
+                        out var enumValue
+                    ))
+                    {
+                        var step = EnumConstantFreezable.TryCreateEnumConstant(enumValue!);
+                        return step;
+                    }
+                }
+                else if (nestedType == typeof(DateTime))
+                {
+                    if (DateTime.TryParse(stringConstant.Value.GetString(), out var dt))
+                    {
+                        var step = new DateTimeConstant(dt);
+                        return Result.Success<IStep, IErrorBuilder>(step);
+                    }
+                }
+            }
+            else if (nestedType == typeof(object))
+            {
+                return Result.Success<IStep, IErrorBuilder>(stepToSet);
+            }
         }
 
         return ErrorCode.InvalidCast.ToErrorBuilder(propertyName, stepToSet.Name);
