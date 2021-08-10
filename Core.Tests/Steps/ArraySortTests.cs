@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
+using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.TestHarness;
 using static Reductech.EDR.Core.TestHarness.StaticHelpers;
@@ -13,40 +15,46 @@ public partial class ArraySortTests : StepTestBase<ArraySort<int>, Array<int>>
     {
         get
         {
+            var elements = new[] { 8, 6, 7, 5, 3, 0, 9 };
+
             yield return new StepCase(
-                "Ascending",
+                "SortOrder False",
                 new ArraySort<int>()
                 {
-                    Array = Array(8, 6, 7, 5, 3, 0, 9), Descending = Constant(false)
+                    Array      = Array(elements),
+                    Descending = new OneOfStep<bool, SortOrder>(Constant(false))
                 },
-                new List<int>()
-                {
-                    0,
-                    3,
-                    5,
-                    6,
-                    7,
-                    8,
-                    9
-                }.ToSCLArray()
+                elements.OrderBy(x => x).ToSCLArray()
             );
 
             yield return new StepCase(
-                "Descending",
+                "SortOrder true",
                 new ArraySort<int>()
                 {
-                    Array = Array(8, 6, 7, 5, 3, 0, 9), Descending = Constant(true)
+                    Array      = Array(elements),
+                    Descending = new OneOfStep<bool, SortOrder>(Constant(true))
                 },
-                new List<int>()
+                elements.OrderByDescending(x => x).ToSCLArray()
+            );
+
+            yield return new StepCase(
+                "SortOrder Ascending",
+                new ArraySort<int>()
                 {
-                    9,
-                    8,
-                    7,
-                    6,
-                    5,
-                    3,
-                    0
-                }.ToSCLArray()
+                    Array      = Array(elements),
+                    Descending = new OneOfStep<bool, SortOrder>(Constant(SortOrder.Ascending))
+                },
+                elements.OrderBy(x => x).ToSCLArray()
+            );
+
+            yield return new StepCase(
+                "SortOrder Descending",
+                new ArraySort<int>()
+                {
+                    Array      = Array(elements),
+                    Descending = new OneOfStep<bool, SortOrder>(Constant(SortOrder.Descending))
+                },
+                elements.OrderByDescending(x => x).ToSCLArray()
             );
         }
     }

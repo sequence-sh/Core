@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using FluentAssertions.Common;
 using Namotion.Reflection;
+using OneOf;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.Internal;
@@ -365,6 +366,14 @@ public abstract partial class StepTestBase<TStep, TOutput>
             throw new Exception(
                 $"{stepName} should not have output type 'Schema' - it should be 'Entity'"
             );
+        }
+        else if (outputType.IsGenericType && outputType.GetInterfaces().Contains(typeof(IOneOf)))
+        {
+            var arg1 = outputType.GenericTypeArguments[0];
+            var (step1, _, newIndex) = CreateSimpleStep(arg1, stepName, index, singleChar);
+            index                    = newIndex;
+
+            step = OneOfStep.Create(outputType, step1);
         }
         else
             throw new XunitException(

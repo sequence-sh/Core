@@ -51,7 +51,7 @@ public partial class ArraySortEntitiesTests : StepTestBase<ArraySort<Entity>, Ar
                 {
                     Array = new ArraySort<Entity>
                     {
-                        Descending = Constant(true),
+                        Descending = new OneOfStep<bool, SortOrder>(Constant(true)),
                         Array = Array(
                             Entity.Create(("Foo", "Gamma")),
                             Entity.Create(("Foo", "Alpha")),
@@ -82,7 +82,7 @@ public partial class ArraySortEntitiesTests : StepTestBase<ArraySort<Entity>, Ar
                 {
                     Array = new ArraySort<Entity>
                     {
-                        Descending = Constant(true),
+                        Descending = new OneOfStep<bool, SortOrder>(Constant(true)),
                         Array = Array(
                             Entity.Create(("Foo", "Gamma")),
                             Entity.Create(("Foo", "Alpha")),

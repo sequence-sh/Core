@@ -5,12 +5,29 @@ using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
+using OneOf;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
 
 namespace Reductech.EDR.Core.Steps
 {
+
+/// <summary>
+/// The direction to sort the elements
+/// </summary>
+public enum SortOrder
+{
+    /// <summary>
+    /// Ascending order. 'a' first
+    /// </summary>
+    Ascending,
+
+    /// <summary>
+    /// Descending order. 'z' first
+    /// </summary>
+    Descending
+}
 
 /// <summary>
 /// Reorder an array
@@ -39,7 +56,8 @@ public sealed class ArraySort<T> : CompoundStep<Array<T>>
     /// </summary>
     [StepProperty(3)]
     [DefaultValueExplanation("False")]
-    public IStep<bool> Descending { get; set; } = new BoolConstant(false);
+    public IStep<OneOf<bool, SortOrder>> Descending { get; set; } =
+        new OneOfStep<bool, SortOrder>(new BoolConstant(false));
 
     /// <inheritdoc />
     protected override async Task<Result<Array<T>, IError>> Run(
@@ -56,11 +74,12 @@ public sealed class ArraySort<T> : CompoundStep<Array<T>>
         if (descending.IsFailure)
             return descending.ConvertFailure<Array<T>>();
 
+        var sortOrderIsDescending = descending.Value.Match(x => x, x => x == SortOrder.Descending);
         Array<T> sortedArray;
 
         if (KeySelector == null)
         {
-            sortedArray = array.Value.Sort(descending.Value);
+            sortedArray = array.Value.Sort(sortOrderIsDescending);
         }
         else
         {
@@ -87,7 +106,7 @@ public sealed class ArraySort<T> : CompoundStep<Array<T>>
                 return result.Value;
             }
 
-            sortedArray = array.Value.Sort(descending.Value, GetKey);
+            sortedArray = array.Value.Sort(sortOrderIsDescending, GetKey);
         }
 
         return sortedArray;

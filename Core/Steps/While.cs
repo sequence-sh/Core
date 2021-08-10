@@ -46,14 +46,14 @@ public sealed class While : CompoundStep<Unit>
     /// </summary>
     [StepProperty(1)]
     [Required]
-    public IStep<bool> Condition { get; set; } = null!;
+    public IStep<bool> Condition { get; set; } = null!; //TODO lambda
 
     /// <summary>
     /// The action to perform repeatedly.
     /// </summary>
     [StepProperty(2)]
     [Required]
-    public IStep<Unit> Action { get; set; } = null!;
+    public IStep<Unit> Action { get; set; } = null!; //TODO lambda
 
     /// <inheritdoc />
     public override IStepFactory StepFactory { get; } = new SimpleStepFactory<While, Unit>();
