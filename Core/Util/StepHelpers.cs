@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
+using OneOf;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
 
@@ -98,6 +99,153 @@ public static partial class StepHelpers
             return r2.ConvertFailure<(T1, T2)>();
 
         return (r1.Value, r2.Value);
+    }
+
+    /// <summary>
+    /// Lets you apply mappings to the result of a one of step
+    /// </summary>
+    public static IRunnableStep<OneOf<T0B, T1B>> WrapOneOf<T0A, T1A, T0B, T1B>(
+        this IRunnableStep<OneOf<T0A, T1A>> step,
+        Func<T0A, CancellationToken, Task<Result<T0B, IError>>> map0,
+        Func<T1A, CancellationToken, Task<Result<T1B, IError>>> map1)
+    {
+        return new OneOfWrapper<T0A, T1A, T0B, T1B>(step, map0, map1);
+    }
+
+    /// <summary>
+    /// Lets you apply mappings to the result of a one of step
+    /// </summary>
+    public static IRunnableStep<OneOf<T0B, T1B, T2B>> WrapOneOf<T0A, T1A, T2A, T0B, T1B, T2B>(
+        this IRunnableStep<OneOf<T0A, T1A, T2A>> step,
+        Func<T0A, CancellationToken, Task<Result<T0B, IError>>> map0,
+        Func<T1A, CancellationToken, Task<Result<T1B, IError>>> map1,
+        Func<T2A, CancellationToken, Task<Result<T2B, IError>>> map2)
+    {
+        return new OneOfWrapper<T0A, T1A, T2A, T0B, T1B, T2B>(step, map0, map1, map2);
+    }
+
+    /// <summary>
+    /// Does nothing
+    /// </summary>
+    public static Task<Result<T, IError>> NoMap<T>(T t, CancellationToken _)
+    {
+        return Task.FromResult(Result.Success<T, IError>(t));
+    }
+
+    /// <summary>
+    /// Converts a StringStream to a String
+    /// </summary>
+    public static async Task<Result<string, IError>> MapStringStream(
+        StringStream s,
+        CancellationToken cancellationToken)
+    {
+        return await s.GetStringAsync();
+    }
+
+    /// <summary>
+    /// Converts an array to a list
+    /// </summary>
+    public static Task<Result<IReadOnlyList<T>, IError>> MapArray<T>(
+        Array<T> array,
+        CancellationToken cancellationToken)
+    {
+        return array.GetElementsAsync(cancellationToken);
+    }
+
+    private class OneOfWrapper<T0A, T1A, T0B, T1B> : IRunnableStep<OneOf<T0B, T1B>>
+    {
+        private readonly IRunnableStep<OneOf<T0A, T1A>> _step;
+        private readonly Func<T0A, CancellationToken, Task<Result<T0B, IError>>> _map0;
+        private readonly Func<T1A, CancellationToken, Task<Result<T1B, IError>>> _map1;
+
+        public OneOfWrapper(
+            IRunnableStep<OneOf<T0A, T1A>> step,
+            Func<T0A, CancellationToken, Task<Result<T0B, IError>>> map0,
+            Func<T1A, CancellationToken, Task<Result<T1B, IError>>> map1)
+        {
+            _step = step;
+            _map0 = map0;
+            _map1 = map1;
+        }
+
+        /// <inheritdoc />
+        public async Task<Result<OneOf<T0B, T1B>, IError>> Run(
+            IStateMonad stateMonad,
+            CancellationToken cancellationToken)
+        {
+            var r1 = await _step.Run(stateMonad, cancellationToken);
+
+            if (r1.IsFailure)
+                return r1.ConvertFailure<OneOf<T0B, T1B>>();
+
+            if (r1.Value.TryPickT0(out var t0A, out var t1A))
+            {
+                var r2 = await _map0(t0A, cancellationToken)
+                    .Map(OneOf<T0B, T1B>.FromT0);
+
+                return r2;
+            }
+            else
+            {
+                var r2 = await _map1(t1A, cancellationToken)
+                    .Map(OneOf<T0B, T1B>.FromT1);
+
+                return r2;
+            }
+        }
+    }
+
+    private class OneOfWrapper<T0A, T1A, T2A, T0B, T1B, T2B> : IRunnableStep<OneOf<T0B, T1B, T2B>>
+    {
+        private readonly IRunnableStep<OneOf<T0A, T1A, T2A>> _step;
+        private readonly Func<T0A, CancellationToken, Task<Result<T0B, IError>>> _map0;
+        private readonly Func<T1A, CancellationToken, Task<Result<T1B, IError>>> _map1;
+        private readonly Func<T2A, CancellationToken, Task<Result<T2B, IError>>> _map2;
+
+        public OneOfWrapper(
+            IRunnableStep<OneOf<T0A, T1A, T2A>> step,
+            Func<T0A, CancellationToken, Task<Result<T0B, IError>>> map0,
+            Func<T1A, CancellationToken, Task<Result<T1B, IError>>> map1,
+            Func<T2A, CancellationToken, Task<Result<T2B, IError>>> map2)
+        {
+            _step = step;
+            _map0 = map0;
+            _map1 = map1;
+            _map2 = map2;
+        }
+
+        /// <inheritdoc />
+        public async Task<Result<OneOf<T0B, T1B, T2B>, IError>> Run(
+            IStateMonad stateMonad,
+            CancellationToken cancellationToken)
+        {
+            var r1 = await _step.Run(stateMonad, cancellationToken);
+
+            if (r1.IsFailure)
+                return r1.ConvertFailure<OneOf<T0B, T1B, T2B>>();
+
+            if (r1.Value.TryPickT0(out var t0A, out var oo2))
+            {
+                var r2 = await _map0(t0A, cancellationToken)
+                    .Map(OneOf<T0B, T1B, T2B>.FromT0);
+
+                return r2;
+            }
+            else if (oo2.TryPickT0(out var t1A, out var t2A))
+            {
+                var r2 = await _map1(t1A, cancellationToken)
+                    .Map(OneOf<T0B, T1B, T2B>.FromT1);
+
+                return r2;
+            }
+            else
+            {
+                var r2 = await _map2(t2A, cancellationToken)
+                    .Map(OneOf<T0B, T1B, T2B>.FromT2);
+
+                return r2;
+            }
+        }
     }
 
     private class ArrayWrapper<T> : IRunnableStep<IReadOnlyList<T>>

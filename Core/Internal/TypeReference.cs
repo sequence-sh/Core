@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using CSharpFunctionalExtensions;
+using OneOf;
 using Reductech.EDR.Core.Internal.Errors;
 
 namespace Reductech.EDR.Core.Internal
@@ -240,6 +241,67 @@ public abstract record TypeReference
     }
 
     /// <summary>
+    /// A discriminated union type
+    /// </summary>
+    public sealed record OneOf(TypeReference[] Options) : TypeReference
+    {
+        /// <inheritdoc />
+        public override string Name => "OneOf" + string.Join("Or", Options.Select(x => x.Name));
+
+        /// <inheritdoc />
+        public override Result<TypeReference, IErrorBuilder> TryGetArrayMemberTypeReference(
+            TypeResolver typeResolver)
+        {
+            foreach (var typeReference in Options)
+            {
+                var r = typeReference.TryGetArrayMemberTypeReference(typeResolver);
+
+                if (r.IsSuccess)
+                    return r;
+
+            }
+
+
+            return ErrorCode.CannotInferType.ToErrorBuilder($"OneOf is not an Array Type");
+        }
+
+        /// <inheritdoc />
+        public override Result<Type, IErrorBuilder> TryGetType(TypeResolver typeResolver)
+        {
+            var types = new List<Type>();
+
+            foreach (var typeReference in Options)
+            {
+                var t = typeReference.TryGetType(typeResolver);
+
+                if (t.IsFailure)
+                    return t.ConvertFailure<Type>();
+
+                types.Add(t.Value);
+            }
+
+            Type genericOneOfType;
+
+            if (types.Count == 2)
+                genericOneOfType = typeof(OneOf<,>);
+            else if (types.Count == 3)
+                genericOneOfType = typeof(OneOf<,,>);
+            else
+                throw new Exception($"Cannot create a OneOf with {types.Count} type arguments");
+
+            var actualOneOfType = genericOneOfType.MakeGenericType(types.ToArray());
+
+            return actualOneOfType;
+        }
+
+        /// <inheritdoc />
+        public override bool Allow(TypeReference other, TypeResolver? typeResolver)
+        {
+            return Options.Any(x => x.Allow(other, typeResolver));
+        }
+    }
+
+    /// <summary>
     /// An array of the type
     /// </summary>
     public sealed record Array(TypeReference MemberType) : TypeReference
@@ -264,7 +326,7 @@ public abstract record TypeReference
         }
 
         /// <inheritdoc />
-        public override string Name => $"Array of {MemberType.Name}";
+        public override string Name => $"ArrayOf{MemberType.Name}";
 
         /// <param name="typeResolver"></param>
         /// <inheritdoc />
@@ -528,12 +590,21 @@ public abstract record TypeReference
     /// </summary>
     public static TypeReference Create(Type t)
     {
-        if (t.IsGenericType && t.GetGenericTypeDefinition() == typeof(Array<>))
+        if (t.IsGenericType)
         {
-            var nested = t.GenericTypeArguments[0];
+            if (t.GetGenericTypeDefinition() == typeof(Array<>))
+            {
+                var nested          = t.GenericTypeArguments[0];
+                var nestedReference = Create(nested);
+                return new Array(nestedReference);
+            }
+            else if (t.GetInterfaces().Contains(typeof(IOneOf)))
+            {
+                var nestedTypeReferences =
+                    t.GenericTypeArguments.Select(Create).ToArray();
 
-            var nestedReference = Create(nested);
-            return new Array(nestedReference);
+                return new OneOf(nestedTypeReferences);
+            }
         }
 
         var sclType = t.GetSCLType();

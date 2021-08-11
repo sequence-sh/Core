@@ -131,7 +131,7 @@ public partial class DeserializationErrorTests
 
             yield return new DeserializationErrorCase(
                 "Sum 1",
-                ("Sum expected Array of Integer for parameter Terms but Step has type Integer",
+                ("Sum expected ArrayOfInteger for parameter Terms but Step has type Integer",
                  "1 - Line: 1, Col: 4, Idx: 4 - Line: 1, Col: 4, Idx: 4 Text: 1")
             );
         }
