@@ -428,11 +428,28 @@ public abstract class StepFactory : IStepFactory
 
         if (propertyInfo.GetCustomAttribute<StepPropertyAttribute>() != null)
         {
-            var argument = propertyInfo.PropertyType.GenericTypeArguments.Single();
+            var stepType = propertyInfo.PropertyType.GenericTypeArguments.Single();
 
-            if (argument.GenericTypeArguments.Length == 1
-             && typeof(IArray).IsAssignableFrom(argument))
-                return SetArray(argument);
+            if (stepType.GenericTypeArguments.Length == 1
+             && typeof(IArray).IsAssignableFrom(stepType))
+                return SetArray(stepType);
+
+            if (stepType.GetInterfaces().Contains(typeof(IOneOf)))
+            {
+                foreach (var optionType in stepType.GenericTypeArguments)
+                {
+                    if (typeof(IArray).IsAssignableFrom(optionType)
+                     && optionType.GenericTypeArguments.Length == 1)
+                    {
+                        var r = SetArray(optionType);
+
+                        if (r.IsSuccess)
+                            return r;
+                    }
+                }
+                
+            }
+
 
             return callerMetadata.GetWrongTypeError(
                 stepList.ConvertToStep().StepName,
@@ -551,9 +568,15 @@ public abstract class StepFactory : IStepFactory
             if (errors.Any())
                 return Result.Failure<Unit, IError>(ErrorList.Combine(errors));
 
-            object array = CreateArray(list as dynamic);
+            IStep stepToSet = CreateArray(list as dynamic);
 
-            propertyInfo.SetValue(parentStep, array);
+            if (propertyInfo.PropertyType.GenericTypeArguments[0].GetInterfaces().Contains(typeof(IOneOf)))
+            {
+                stepToSet = OneOfStep.Create(propertyInfo.PropertyType.GenericTypeArguments[0], stepToSet);
+            }
+            
+
+            propertyInfo.SetValue(parentStep, stepToSet);
 
             return Unit.Default;
         }

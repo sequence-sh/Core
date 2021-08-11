@@ -1,8 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
+using OneOf;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
 
@@ -10,74 +10,10 @@ namespace Reductech.EDR.Core.Util
 {
 
 /// <summary>
-/// Contains methods to help steps evaluate their parameters
+/// Contains helper methods for running steps
 /// </summary>
 public static partial class StepHelpers
 {
-    /// <summary>
-    /// Converts this to a RunnableStep that returns an array of string
-    /// WARNING: Only use this if you want the array to be fully evaluated immediately
-    /// </summary>
-    public static IRunnableStep<IReadOnlyList<string>> WrapStringStreamArray(
-        this IRunnableStep<Array<StringStream>> step)
-    {
-        return new StringStreamArrayWrapper(step);
-    }
-
-    /// <summary>
-    /// Converts this to a RunnableStep that returns a list.
-    /// WARNING: Only use this if you want the array to be fully evaluated immediately
-    /// </summary>
-    public static IRunnableStep<IReadOnlyList<T>> WrapArray<T>(this IRunnableStep<Array<T>> step)
-    {
-        return new ArrayWrapper<T>(step);
-    }
-
-    /// <summary>
-    /// Converts this to a RunnableStep that returns a string
-    /// </summary>
-    public static IRunnableStep<string> WrapStringStream(this IRunnableStep<StringStream> step)
-    {
-        return new StringStreamWrapper(step);
-    }
-
-    /// <summary>
-    /// Converts this to a RunnableStep with a nullable result type
-    /// </summary>
-    public static IRunnableStep<Maybe<T>> WrapNullable<T>(this IRunnableStep<T>? step)
-    {
-        return new NullableStepWrapper<T>(step);
-    }
-
-    /// <summary>
-    /// Converts this to a RunnableStep with a nullable result type
-    /// </summary>
-    public static IRunnableStep<Maybe<T2>> WrapNullable<T1, T2>(
-        this IRunnableStep<T1>? step,
-        Func<IRunnableStep<T1>, IRunnableStep<T2>> map)
-    {
-        if (step is null)
-            return new NullableStepWrapper<T2>(null);
-
-        var mappedStep = map(step);
-
-        return new NullableStepWrapper<T2>(mappedStep);
-    }
-
-    /// <summary>
-    /// Wraps a step with entity conversion
-    /// </summary>
-    /// <typeparam name="T">The type to convert the entity into</typeparam>
-    /// <param name="step">The step which returns the entity</param>
-    /// <param name="parentStep">The parent step (for error location)</param>
-    /// <returns></returns>
-    public static IRunnableStep<T> WrapEntityConversion<T>(
-        this IRunnableStep<Entity> step,
-        IStep parentStep)
-    {
-        return new EntityConversionWrapper<T>(step, parentStep);
-    }
-
     /// <summary>
     /// Evaluates steps and combines their results
     /// </summary>
@@ -100,131 +36,363 @@ public static partial class StepHelpers
         return (r1.Value, r2.Value);
     }
 
-    private class ArrayWrapper<T> : IRunnableStep<IReadOnlyList<T>>
+    /// <summary>
+    /// Wrap the output of a step - automatically converting it to a different type
+    /// </summary>
+    public static IRunnableStep<TOut> WrapStep<TIn, TOut>(
+        this IStep<TIn> step,
+        IStepValueMap<TIn, TOut> map)
     {
-        private readonly IRunnableStep<Array<T>> _step;
+        return new StepValueMapper<TIn, TOut>(step, map);
+    }
 
-        public ArrayWrapper(IRunnableStep<Array<T>> step)
-        {
-            _step = step;
-        }
+    /// <summary>
+    /// Converts this to a RunnableStep that returns an array of string
+    /// WARNING: Only use this if you want the array to be fully evaluated immediately
+    /// </summary>
+    public static IRunnableStep<IReadOnlyList<string>> WrapStringStreamArray(
+        this IStep<Array<StringStream>> step) => WrapStep(
+        step,
+        StepMaps.Array(StepMaps.String())
+    );
 
+    /// <summary>
+    /// Converts this to a RunnableStep that returns a list.
+    /// WARNING: Only use this if you want the array to be fully evaluated immediately
+    /// </summary>
+    public static IRunnableStep<IReadOnlyList<T>> WrapArray<T>(this IStep<Array<T>> step) =>
+        WrapStep(step, StepMaps.Array<T>());
+
+    /// <summary>
+    /// Converts this to a RunnableStep that returns a string
+    /// </summary>
+    public static IRunnableStep<string> WrapStringStream(this IStep<StringStream> step) =>
+        WrapStep(step, StepMaps.String());
+
+    /// <summary>
+    /// Maps a OneOf with two type options
+    /// </summary>
+    public static IRunnableStep<OneOf<TOut0, TOut1>>
+        WrapOneOf<TIn0, TIn1, TOut0, TOut1>(
+            this IStep<OneOf<TIn0, TIn1>> step,
+            IStepValueMap<TIn0, TOut0> map0,
+            IStepValueMap<TIn1, TOut1> map1) => WrapStep(step, StepMaps.OneOf(map0, map1));
+
+    /// <summary>
+    /// Maps a OneOf with three type options
+    /// </summary>
+    public static IRunnableStep<OneOf<TOut0, TOut1, TOut2>>
+        WrapOneOf<TIn0, TIn1, TIn2, TOut0, TOut1, TOut2>(
+            this IStep<OneOf<TIn0, TIn1, TIn2>> step,
+            IStepValueMap<TIn0, TOut0> map0,
+            IStepValueMap<TIn1, TOut1> map1,
+            IStepValueMap<TIn2, TOut2> map2) => WrapStep(step, StepMaps.OneOf(map0, map1, map2));
+
+    /// <summary>
+    /// Converts this to a RunnableStep with a nullable result type
+    /// </summary>
+    public static IRunnableStep<Maybe<T>> WrapNullable<T>(this IStep<T>? step) =>
+        WrapNullable(step, StepMaps.DoNothing<T>());
+
+    /// <summary>
+    /// Converts this to a RunnableStep with a nullable result type
+    /// </summary>
+    public static IRunnableStep<Maybe<TOut>> WrapNullable<TIn, TOut>(
+        this IStep<TIn>? step,
+        IStepValueMap<TIn, TOut> map)
+    {
+        if (step is null)
+            return new NullableStepWrapper<TIn, TOut>(null, map);
+
+        return new NullableStepWrapper<TIn, TOut>(step, map);
+    }
+
+    /// <summary>
+    /// Wraps a step with entity conversion
+    /// </summary>
+    /// <typeparam name="T">The type to convert the entity into</typeparam>
+    /// <param name="step">The step which returns the entity</param>
+    /// <param name="parentStep">The parent step (for error location)</param>
+    /// <returns></returns>
+    public static IRunnableStep<T> WrapEntityConversion<T>(
+        this IStep<Entity> step,
+        IStep parentStep) => WrapStep(step, StepMaps.ConvertEntity<T>(parentStep));
+
+    private sealed record StepValueMapper<TIn, TOut>(
+            IRunnableStep<TIn> Step,
+            IStepValueMap<TIn, TOut> Map)
+        : IRunnableStep<TOut>
+    {
         /// <inheritdoc />
-        public async Task<Result<IReadOnlyList<T>, IError>> Run(
+        public async Task<Result<TOut, IError>> Run(
             IStateMonad stateMonad,
             CancellationToken cancellationToken)
         {
-            var r = await _step.Run(stateMonad, cancellationToken)
-                .Bind(x => x.GetElementsAsync(cancellationToken));
+            var r = await Step.Run(stateMonad, cancellationToken)
+                    .Bind(x => Map.Map(x, cancellationToken))
+                ;
 
             return r;
         }
     }
 
-    private class StringStreamWrapper : IRunnableStep<string>
+    /// <summary>
+    /// Wraps a nullable step
+    /// </summary>
+    private record NullableStepWrapper<TIn, TOut>
+        (IStep<TIn>? Step, IStepValueMap<TIn, TOut> Map) : IRunnableStep<Maybe<TOut>>
     {
-        private readonly IRunnableStep<StringStream> _step;
-
-        public StringStreamWrapper(IRunnableStep<StringStream> step)
-        {
-            _step = step;
-        }
-
         /// <inheritdoc />
-        public async Task<Result<string, IError>> Run(
+        public async Task<Result<Maybe<TOut>, IError>> Run(
             IStateMonad stateMonad,
             CancellationToken cancellationToken)
         {
-            return await _step.Run(stateMonad, cancellationToken).Map(x => x.GetStringAsync());
-        }
-    }
+            if (Step is null)
+                return Result.Success<Maybe<TOut>, IError>(Maybe<TOut>.None);
 
-    private class NullableStepWrapper<T> : IRunnableStep<Maybe<T>>
-    {
-        private readonly IRunnableStep<T>? _step;
-
-        public NullableStepWrapper(IRunnableStep<T>? step)
-        {
-            _step = step;
-        }
-
-        /// <inheritdoc />
-        public async Task<Result<Maybe<T>, IError>> Run(
-            IStateMonad stateMonad,
-            CancellationToken cancellationToken)
-        {
-            if (_step is null)
-                return Result.Success<Maybe<T>, IError>(Maybe<T>.None);
-
-            var r = await _step.Run(stateMonad, cancellationToken);
+            var r = await Step.Run(stateMonad, cancellationToken);
 
             if (r.IsFailure)
-                return r.ConvertFailure<Maybe<T>>();
+                return r.ConvertFailure<Maybe<TOut>>();
 
-            return Maybe<T>.From(r.Value);
+            var r2 = await Map.Map(r.Value, cancellationToken)
+                .Map(Maybe.From);
+
+            return r2;
         }
     }
+}
 
-    private class StringStreamArrayWrapper : IRunnableStep<IReadOnlyList<string>>
+/// <summary>
+/// Maps the results of steps
+/// </summary>
+public interface IStepValueMap<in TIn, TOut>
+{
+    /// <summary>
+    /// Map the result of the step
+    /// </summary>
+    Task<Result<TOut, IError>> Map(TIn t, CancellationToken cancellationToken);
+}
+
+/// <summary>
+/// Contains methods to help map the results of steps
+/// </summary>
+public static class StepMaps
+{
+    /// <summary>
+    /// Maps StringStreams to strings
+    /// </summary>
+    public static IStepValueMap<Entity, T> ConvertEntity<T>(IStep parentStep) =>
+        new EntityConversionMap<T>(parentStep);
+
+    /// <summary>
+    /// Converts an entity to a particular type
+    /// </summary>
+    /// <typeparam name="T">The type to convert to</typeparam>
+    private record EntityConversionMap<T>(IStep ParentStep) : IStepValueMap<Entity, T>
     {
-        private readonly IRunnableStep<Array<StringStream>> _step;
-
-        public StringStreamArrayWrapper(IRunnableStep<Array<StringStream>> step)
-        {
-            _step = step;
-        }
-
         /// <inheritdoc />
-        public async Task<Result<IReadOnlyList<string>, IError>> Run(
-            IStateMonad stateMonad,
-            CancellationToken cancellationToken)
+        public async Task<Result<T, IError>> Map(Entity t, CancellationToken cancellationToken)
         {
-            var r = await _step.Run(stateMonad, cancellationToken)
-                .Bind(x => x.GetElementsAsync(cancellationToken));
+            await Task.CompletedTask;
 
-            if (r.IsFailure)
-                return r.ConvertFailure<IReadOnlyList<string>>();
-
-            var l = new List<string>(r.Value.Count);
-
-            foreach (var stringStream in r.Value)
-            {
-                var s = await stringStream.GetStringAsync();
-                l.Add(s);
-            }
-
-            return l;
-        }
-    }
-
-    private class EntityConversionWrapper<T> : IRunnableStep<T>
-    {
-        private readonly IRunnableStep<Entity> _step;
-        private readonly IStep _parentStep;
-
-        public EntityConversionWrapper(IRunnableStep<Entity> step, IStep parentStep)
-        {
-            _step       = step;
-            _parentStep = parentStep;
-        }
-
-        /// <inheritdoc />
-        public async Task<Result<T, IError>> Run(
-            IStateMonad stateMonad,
-            CancellationToken cancellationToken)
-        {
-            var eResult = await _step.Run(stateMonad, cancellationToken);
-
-            if (eResult.IsFailure)
-                return eResult.ConvertFailure<T>();
-
-            var conversionResult = EntityConversionHelpers.TryCreateFromEntity<T>(eResult.Value)
-                .MapError(x => x.WithLocation(_parentStep));
+            var conversionResult = EntityConversionHelpers.TryCreateFromEntity<T>(t)
+                .MapError(x => x.WithLocation(ParentStep));
 
             if (conversionResult.IsFailure)
                 return conversionResult.ConvertFailure<T>();
 
             return conversionResult.Value;
+        }
+    }
+
+    /// <summary>
+    /// Maps a OneOf with two type options
+    /// </summary>
+    public static IStepValueMap<OneOf<TIn0, TIn1>, OneOf<TOut0, TOut1>>
+        OneOf<TIn0, TIn1, TOut0, TOut1>(
+            IStepValueMap<TIn0, TOut0> map0,
+            IStepValueMap<TIn1, TOut1> map1) => new OneOfMap<TIn0, TIn1, TOut0, TOut1>(map0, map1);
+
+    /// <summary>
+    /// Maps a OneOf with three type options
+    /// </summary>
+    public static IStepValueMap<OneOf<TIn0, TIn1, TIn2>, OneOf<TOut0, TOut1, TOut2>>
+        OneOf<TIn0, TIn1, TIn2, TOut0, TOut1, TOut2>(
+            IStepValueMap<TIn0, TOut0> map0,
+            IStepValueMap<TIn1, TOut1> map1,
+            IStepValueMap<TIn2, TOut2> map2) =>
+        new OneOfMap<TIn0, TIn1, TIn2, TOut0, TOut1, TOut2>(map0, map1, map2);
+
+    /// <summary>
+    /// Maps a OneOf with two type options
+    /// </summary>
+    private record OneOfMap<TIn0, TIn1, TOut0, TOut1>
+        (
+            IStepValueMap<TIn0, TOut0> Map0,
+            IStepValueMap<TIn1, TOut1> Map1)
+        : IStepValueMap<OneOf<TIn0, TIn1>, OneOf<TOut0, TOut1>>
+    {
+        /// <inheritdoc />
+        public async Task<Result<OneOf<TOut0, TOut1>, IError>> Map(
+            OneOf<TIn0, TIn1> t,
+            CancellationToken cancellationToken)
+        {
+            if (t.TryPickT0(out var t0A, out var t1A))
+            {
+                var r2 = await Map0.Map(t0A, cancellationToken)
+                    .Map(OneOf<TOut0, TOut1>.FromT0);
+
+                return r2;
+            }
+            else
+            {
+                var r2 = await Map1.Map(t1A, cancellationToken)
+                    .Map(OneOf<TOut0, TOut1>.FromT1);
+
+                return r2;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Maps a OneOf with three type options
+    /// </summary>
+    private record OneOfMap<TIn0, TIn1, TIn2, TOut0, TOut1, TOut2>
+        (
+            IStepValueMap<TIn0, TOut0> Map0,
+            IStepValueMap<TIn1, TOut1> Map1,
+            IStepValueMap<TIn2, TOut2> Map2)
+        : IStepValueMap<OneOf<TIn0, TIn1, TIn2>, OneOf<TOut0, TOut1, TOut2>>
+    {
+        /// <inheritdoc />
+        public async Task<Result<OneOf<TOut0, TOut1, TOut2>, IError>> Map(
+            OneOf<TIn0, TIn1, TIn2> t,
+            CancellationToken cancellationToken)
+        {
+            if (t.TryPickT0(out var t0A, out var oneOf2))
+            {
+                var r2 = await Map0.Map(t0A, cancellationToken)
+                    .Map(OneOf<TOut0, TOut1, TOut2>.FromT0);
+
+                return r2;
+            }
+            else if (oneOf2.TryPickT0(out var t1A, out var t2A))
+            {
+                var r2 = await Map1.Map(t1A, cancellationToken)
+                    .Map(OneOf<TOut0, TOut1, TOut2>.FromT1);
+
+                return r2;
+            }
+            else
+            {
+                var r2 = await Map2.Map(t2A, cancellationToken)
+                    .Map(OneOf<TOut0, TOut1, TOut2>.FromT2);
+
+                return r2;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Maps StringStreams to strings
+    /// </summary>
+    public static IStepValueMap<StringStream, string> String() => StringMap.Instance;
+
+    /// <summary>
+    /// Maps StringStreams to strings
+    /// </summary>
+    private record StringMap : IStepValueMap<StringStream, string>
+    {
+        private StringMap() { }
+
+        /// <summary>
+        /// The instance
+        /// </summary>
+        public static StringMap Instance { get; } = new();
+
+        /// <inheritdoc />
+        public async Task<Result<string, IError>> Map(
+            StringStream t,
+            CancellationToken cancellationToken)
+        {
+            return await t.GetStringAsync();
+        }
+    }
+
+    /// <summary>
+    /// Maps an element to itself
+    /// </summary>
+    public static IStepValueMap<T, T> DoNothing<T>() => DoNothingMap<T>.Instance;
+
+    /// <summary>
+    /// Maps elements to themselves
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    private record DoNothingMap<T> : IStepValueMap<T, T>
+    {
+        private DoNothingMap() { }
+
+        /// <summary>
+        /// The instance
+        /// </summary>
+        public static DoNothingMap<T> Instance { get; } = new();
+
+        /// <inheritdoc />
+        public async Task<Result<T, IError>> Map(T t, CancellationToken _)
+        {
+            await Task.CompletedTask;
+            return t;
+        }
+    }
+
+    /// <summary>
+    /// Maps the elements of an array
+    /// </summary>
+    public static IStepValueMap<Array<TIn>, IReadOnlyList<TIn>> Array<TIn>() =>
+        new ArrayMap<TIn, TIn>(DoNothing<TIn>());
+
+    /// <summary>
+    /// Maps the elements of an array
+    /// </summary>
+    public static IStepValueMap<Array<TIn>, IReadOnlyList<TOut>> Array<TIn, TOut>(
+        IStepValueMap<TIn, TOut> nestedMap) => new ArrayMap<TIn, TOut>(nestedMap);
+
+    /// <summary>
+    /// Maps the elements of an array
+    /// </summary>
+    /// <typeparam name="TIn"></typeparam>
+    /// <typeparam name="TOut"></typeparam>
+    private record ArrayMap<TIn, TOut>
+        (IStepValueMap<TIn, TOut> NestedMap) : IStepValueMap<Array<TIn>, IReadOnlyList<TOut>>
+    {
+        /// <inheritdoc />
+        public async Task<Result<IReadOnlyList<TOut>, IError>> Map(
+            Array<TIn> t,
+            CancellationToken cancellationToken)
+        {
+            var r = await t.GetElementsAsync(cancellationToken);
+
+            if (r.IsFailure)
+                return r.ConvertFailure<IReadOnlyList<TOut>>();
+
+            if (NestedMap is DoNothingMap<TIn>
+             && r.Value is IReadOnlyList<TOut> outList) //for performance
+                return Result.Success<IReadOnlyList<TOut>, IError>(outList);
+
+            var list = new List<TOut>(r.Value.Count);
+
+            foreach (var m in r.Value)
+            {
+                var o = await NestedMap.Map(m, cancellationToken);
+
+                if (o.IsFailure)
+                    return o.ConvertFailure<IReadOnlyList<TOut>>();
+
+                list.Add(o.Value);
+            }
+
+            return list;
         }
     }
 }
