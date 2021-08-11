@@ -63,7 +63,7 @@ public partial class StepHelpersTest
                 Constant(2),
                 Constant(3),
                 Array(4, 5, 6).WrapArray(),
-                (null as IRunnableStep<int>).WrapNullable(),
+                (null as IStep<int>).WrapNullable(),
                 cancellationToken: CancellationToken.None
             );
 
