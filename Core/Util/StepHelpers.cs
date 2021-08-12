@@ -40,7 +40,7 @@ public static partial class StepHelpers
     /// Wrap the output of a step - automatically converting it to a different type
     /// </summary>
     public static IRunnableStep<TOut> WrapStep<TIn, TOut>(
-        this IStep<TIn> step,
+        this IRunnableStep<TIn> step,
         IStepValueMap<TIn, TOut> map)
     {
         return new StepValueMapper<TIn, TOut>(step, map);
@@ -51,7 +51,7 @@ public static partial class StepHelpers
     /// WARNING: Only use this if you want the array to be fully evaluated immediately
     /// </summary>
     public static IRunnableStep<IReadOnlyList<string>> WrapStringStreamArray(
-        this IStep<Array<StringStream>> step) => WrapStep(
+        this IRunnableStep<Array<StringStream>> step) => WrapStep(
         step,
         StepMaps.Array(StepMaps.String())
     );
@@ -60,7 +60,7 @@ public static partial class StepHelpers
     /// Converts this to a RunnableStep that returns a list.
     /// WARNING: Only use this if you want the array to be fully evaluated immediately
     /// </summary>
-    public static IRunnableStep<IReadOnlyList<T>> WrapArray<T>(this IStep<Array<T>> step) =>
+    public static IRunnableStep<IReadOnlyList<T>> WrapArray<T>(this IRunnableStep<Array<T>> step) =>
         WrapStep(step, StepMaps.Array<T>());
 
     /// <summary>
@@ -74,7 +74,7 @@ public static partial class StepHelpers
     /// </summary>
     public static IRunnableStep<OneOf<TOut0, TOut1>>
         WrapOneOf<TIn0, TIn1, TOut0, TOut1>(
-            this IStep<OneOf<TIn0, TIn1>> step,
+            this IRunnableStep<OneOf<TIn0, TIn1>> step,
             IStepValueMap<TIn0, TOut0> map0,
             IStepValueMap<TIn1, TOut1> map1) => WrapStep(step, StepMaps.OneOf(map0, map1));
 
@@ -83,7 +83,7 @@ public static partial class StepHelpers
     /// </summary>
     public static IRunnableStep<OneOf<TOut0, TOut1, TOut2>>
         WrapOneOf<TIn0, TIn1, TIn2, TOut0, TOut1, TOut2>(
-            this IStep<OneOf<TIn0, TIn1, TIn2>> step,
+            this IRunnableStep<OneOf<TIn0, TIn1, TIn2>> step,
             IStepValueMap<TIn0, TOut0> map0,
             IStepValueMap<TIn1, TOut1> map1,
             IStepValueMap<TIn2, TOut2> map2) => WrapStep(step, StepMaps.OneOf(map0, map1, map2));
@@ -91,14 +91,14 @@ public static partial class StepHelpers
     /// <summary>
     /// Converts this to a RunnableStep with a nullable result type
     /// </summary>
-    public static IRunnableStep<Maybe<T>> WrapNullable<T>(this IStep<T>? step) =>
+    public static IRunnableStep<Maybe<T>> WrapNullable<T>(this IRunnableStep<T>? step) =>
         WrapNullable(step, StepMaps.DoNothing<T>());
 
     /// <summary>
     /// Converts this to a RunnableStep with a nullable result type
     /// </summary>
     public static IRunnableStep<Maybe<TOut>> WrapNullable<TIn, TOut>(
-        this IStep<TIn>? step,
+        this IRunnableStep<TIn>? step,
         IStepValueMap<TIn, TOut> map)
     {
         if (step is null)
@@ -115,7 +115,7 @@ public static partial class StepHelpers
     /// <param name="parentStep">The parent step (for error location)</param>
     /// <returns></returns>
     public static IRunnableStep<T> WrapEntityConversion<T>(
-        this IStep<Entity> step,
+        this IRunnableStep<Entity> step,
         IStep parentStep) => WrapStep(step, StepMaps.ConvertEntity<T>(parentStep));
 
     private sealed record StepValueMapper<TIn, TOut>(
@@ -140,7 +140,7 @@ public static partial class StepHelpers
     /// Wraps a nullable step
     /// </summary>
     private record NullableStepWrapper<TIn, TOut>
-        (IStep<TIn>? Step, IStepValueMap<TIn, TOut> Map) : IRunnableStep<Maybe<TOut>>
+        (IRunnableStep<TIn>? Step, IStepValueMap<TIn, TOut> Map) : IRunnableStep<Maybe<TOut>>
     {
         /// <inheritdoc />
         public async Task<Result<Maybe<TOut>, IError>> Run(
