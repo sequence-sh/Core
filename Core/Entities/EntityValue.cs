@@ -4,10 +4,12 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Globalization;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.Serialization;
 using System.Text.RegularExpressions;
 using CSharpFunctionalExtensions;
 using Newtonsoft.Json.Linq;
+using OneOf;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Internal.Serialization;
@@ -942,6 +944,31 @@ public abstract record EntityValue(object? ObjectValue)
             var ser = new StringStream(GetPrimitiveString());
 
             return ser;
+        }
+        else if (type.GetInterfaces().Contains(typeof(IOneOf)))
+        {
+            var i = 0;
+
+            foreach (var typeGenericTypeArgument in type.GenericTypeArguments)
+            {
+                var value = TryGetValue(typeGenericTypeArgument);
+
+                if (value.IsSuccess)
+                {
+                    var methodName = $"FromT{0}";
+
+                    var method = type.GetMethod(
+                        methodName,
+                        BindingFlags.Static | BindingFlags.Public
+                    )!;
+
+                    var oneOfThing = method.Invoke(null, new[] { value.Value });
+
+                    return oneOfThing;
+                }
+
+                i++;
+            }
         }
 
         return ErrorCode.CouldNotConvertEntityValue.ToErrorBuilder(type.Name);

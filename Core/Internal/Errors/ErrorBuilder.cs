@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.Linq;
 
 namespace Reductech.EDR.Core.Internal.Errors
@@ -35,6 +36,7 @@ public record ErrorBuilder(ErrorCodeBase ErrorCode, ErrorData Data) : IErrorBuil
     }
 
     /// <inheritdoc />
+    [Pure]
     public IError WithLocation(ErrorLocation location) => WithLocationSingle(location);
 
     /// <inheritdoc />
@@ -51,6 +53,7 @@ public record ErrorBuilder(ErrorCodeBase ErrorCode, ErrorData Data) : IErrorBuil
     /// <summary>
     /// Returns a SingleError with the given location.
     /// </summary>
+    [Pure]
     public SingleError WithLocationSingle(ErrorLocation location) => new(location, this);
 
     /// <inheritdoc />

@@ -522,6 +522,40 @@ Log 'Comments!'",
 ",
                 12346
             );
+
+            yield return new DeserializationTestInstance(
+                @"
+- <var> = false
+- ArraySort Array: [1,3,2] Descending: <var>
+| foreach (log <>)
+",
+                1,
+                2,
+                3
+            );
+
+            yield return new DeserializationTestInstance(
+                @"
+- <var> = SortOrder.Ascending
+- ArraySort Array: [1,3,2] Descending: <var>
+| foreach (log <>)
+",
+                1,
+                2,
+                3
+            );
+
+            yield return new DeserializationTestInstance(
+                @"
+- <entity> = (direction: false)
+- <var> = <entity>['direction']
+- ArraySort Array: [1,3,2] Descending: <var>
+| foreach (log <>)
+",
+                1,
+                2,
+                3
+            );
         }
     }
 

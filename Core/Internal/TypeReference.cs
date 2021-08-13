@@ -258,9 +258,7 @@ public abstract record TypeReference
 
                 if (r.IsSuccess)
                     return r;
-
             }
-
 
             return ErrorCode.CannotInferType.ToErrorBuilder($"OneOf is not an Array Type");
         }
@@ -297,7 +295,20 @@ public abstract record TypeReference
         /// <inheritdoc />
         public override bool Allow(TypeReference other, TypeResolver? typeResolver)
         {
-            return Options.Any(x => x.Allow(other, typeResolver));
+            if (other is OneOf otherOneOf)
+            {
+                foreach (var otherOption in otherOneOf.Options)
+                {
+                    if (!Allow(otherOption, typeResolver))
+                        return false;
+                }
+
+                return true;
+            }
+            else
+            {
+                return Options.Any(x => x.Allow(other, typeResolver));
+            }
         }
     }
 
