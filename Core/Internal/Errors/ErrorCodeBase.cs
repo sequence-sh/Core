@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.Contracts;
 
 namespace Reductech.EDR.Core.Internal.Errors
 {
@@ -29,14 +30,17 @@ public abstract record ErrorCodeBase(string Code)
     /// </summary>
     public string Code { get; init; } = Code;
 
+    
     /// <summary>
     /// Create an errorBuilder from this errorCode and some data.
     /// </summary>
+    [Pure]
     public ErrorBuilder ToErrorBuilder(params object[] data) => new(this, data);
 
     /// <summary>
     /// Create an errorBuilder from this errorCode and an exception
     /// </summary>
+    [Pure]
     public ErrorBuilder ToErrorBuilder(Exception exception) => new(exception, this);
 }
 
