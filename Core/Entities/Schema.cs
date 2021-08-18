@@ -37,7 +37,8 @@ public sealed class Schema : IEntityConvertible
     public ExtraPropertyBehavior ExtraProperties { get; set; } = ExtraPropertyBehavior.Allow;
 
     /// <summary>
-    /// The default error behavior. This can be overriden by the individual properties or by the value passed to the EnforceSchema method.
+    /// The default error behavior.
+    /// This can be overriden by the individual properties or by the value passed to the EnforceSchema method.
     /// </summary>
     [property: DataMember]
     public ErrorBehavior DefaultErrorBehavior { get; set; } = ErrorBehavior.Fail;
