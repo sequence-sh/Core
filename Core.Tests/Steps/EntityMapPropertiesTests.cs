@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Reductech.EDR.Core.Internal;
+using Reductech.EDR.Core.Internal.Serialization;
 using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.TestHarness;
 using Reductech.EDR.Core.Util;
@@ -40,8 +41,8 @@ public partial class EntityMapPropertiesTests : StepTestBase<EntityMapProperties
                         }
                 },
                 Unit.Default,
-                "(Foo: \"Hello\" Bar: \"World\")",
-                "(Foo: \"Hello 2\" Bar: \"World 2\")"
+                Entity.Create(("Foo", "Hello"),   ("Bar", "World")).Serialize(),
+                Entity.Create(("Foo", "Hello 2"), ("Bar", "World 2")).Serialize()
             );
         }
     }

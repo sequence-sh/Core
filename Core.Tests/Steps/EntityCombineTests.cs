@@ -58,7 +58,7 @@ public partial class EntityCombineTests : StepTestBase<EntityCombine, Entity>
             yield return new SerializeCase(
                 "Default",
                 step,
-                @"(Prop1: ""Val0"" Prop2: ""Val1"") + (Prop1: ""Val2"" Prop2: ""Val3"") + (Prop1: ""Val4"" Prop2: ""Val5"")"
+                @"('Prop1': ""Val0"" 'Prop2': ""Val1"") + ('Prop1': ""Val2"" 'Prop2': ""Val3"") + ('Prop1': ""Val4"" 'Prop2': ""Val5"")"
             );
         }
     }

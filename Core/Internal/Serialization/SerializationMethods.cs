@@ -73,7 +73,7 @@ public static class SerializationMethods
         var results = new List<string>();
 
         foreach (var property in entity)
-            results.Add($"{property.Name}: {property.BestValue.Serialize()}");
+            results.Add($"'{property.Name}': {property.BestValue.Serialize()}");
 
         sb.AppendJoin(" ", results);
 

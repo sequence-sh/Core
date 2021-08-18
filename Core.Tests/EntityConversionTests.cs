@@ -46,10 +46,10 @@ public class EntityConversionTests
     };
 
     private const string TestConfigurationString =
-        "(AdditionalRequirements: [(FeaturesKey: \"Features\" RequiredFeatures: [\"Apple\", \"Banana\"] ConnectorName: \"Reductech.EDR.Core.Tests\"), (VersionKey: \"Version\" MinVersion: \"1.2.3.4\" MaxVersion: \"5.6.7.8\" ConnectorName: \"Reductech.EDR.Core.Tests\")] TargetMachineTags: [\"alpha\", \"beta\"] DoNotSplit: True Priority: 3)";
+        "('AdditionalRequirements': [('FeaturesKey': \"Features\" 'RequiredFeatures': [\"Apple\", \"Banana\"] 'ConnectorName': \"Reductech.EDR.Core.Tests\"), ('VersionKey': \"Version\" 'MinVersion': \"1.2.3.4\" 'MaxVersion': \"5.6.7.8\" 'ConnectorName': \"Reductech.EDR.Core.Tests\")] 'TargetMachineTags': [\"alpha\", \"beta\"] 'DoNotSplit': True 'Priority': 3)";
 
     private const string TestConfiguration2String =
-        "(AdditionalRequirements: \"\" TargetMachineTags: [\"alpha\", \"beta\"] DoNotSplit: True Priority: 3)";
+        "('AdditionalRequirements': \"\" 'TargetMachineTags': [\"alpha\", \"beta\"] 'DoNotSplit': True 'Priority': 3)";
 
     [Fact]
     public void ConfigurationShouldConvertToEntityCorrectly()
@@ -122,7 +122,10 @@ public class EntityConversionTests
 
         var s = entity.ToString();
 
-        s.Should().Be(@"(Id: ""Ultimate"" Version: ""3.1"" Enable: True Settings: (a: 1 b: 2))");
+        s.Should()
+            .Be(
+                @"('Id': ""Ultimate"" 'Version': ""3.1"" 'Enable': True 'Settings': ('a': 1 'b': 2))"
+            );
     }
 
     [Fact]

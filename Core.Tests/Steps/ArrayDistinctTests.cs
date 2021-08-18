@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
+using Reductech.EDR.Core.Internal.Serialization;
 using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.TestHarness;
 using Reductech.EDR.Core.Util;
@@ -47,9 +48,9 @@ public partial class ArrayDistinctTests : StepTestBase<ArrayDistinct<Entity>, Ar
                     },
                 },
                 Unit.Default,
-                "(Foo: \"Alpha\")",
-                "(Foo: \"ALPHA\")",
-                "(Foo: \"Beta\")"
+                Entity.Create(("Foo", "Alpha")).Serialize(),
+                Entity.Create(("Foo", "ALPHA")).Serialize(),
+                Entity.Create(("Foo", "Beta")).Serialize()
             );
 
             yield return new StepCase(
@@ -80,8 +81,8 @@ public partial class ArrayDistinctTests : StepTestBase<ArrayDistinct<Entity>, Ar
                     },
                 },
                 Unit.Default,
-                "(Foo: \"Alpha\")",
-                "(Foo: \"Beta\")"
+                Entity.Create(("Foo", "Alpha")).Serialize(),
+                Entity.Create(("Foo", "Beta")).Serialize()
             );
         }
     }
