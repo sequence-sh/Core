@@ -69,7 +69,7 @@ public partial class EntityGetValueTests : StepTestBase<EntityGetValue<StringStr
             yield return new SerializeCase(
                 "Default",
                 step,
-                "(Prop1: \"Val0\" Prop2: \"Val1\")[\"Bar2\"]"
+                "('Prop1': \"Val0\" 'Prop2': \"Val1\")[\"Bar2\"]"
             );
         }
     }

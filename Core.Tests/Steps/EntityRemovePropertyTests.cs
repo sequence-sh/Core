@@ -40,6 +40,16 @@ public partial class EntityRemovePropertyTests : StepTestBase<EntityRemoveProper
                 },
                 Entity.Create()
             );
+
+            yield return new StepCase(
+                "Remove multi word property",
+                new EntityRemoveProperty()
+                {
+                    Entity   = Constant(Entity.Create(("my property", 2))),
+                    Property = Constant("my property")
+                },
+                Entity.Create()
+            );
         }
     }
 }

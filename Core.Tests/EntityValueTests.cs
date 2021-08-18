@@ -133,7 +133,7 @@ public partial class EntityValueTests
 
             Add(
                 Entity.Create(("a", 1), ("b", 2)),
-                "(a: 1 b: 2)",
+                "('a': 1 'b': 2)",
                 Maybe<int>.None,
                 Maybe<double>.None,
                 Maybe<bool>.None,

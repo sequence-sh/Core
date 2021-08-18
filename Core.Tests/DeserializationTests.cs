@@ -36,12 +36,12 @@ public partial class DeserializationTests
 
             yield return new DeserializationTestInstance(
                 "- <foo> = (a:'1') + (b:'2')\r\n- Log <foo>",
-                "(a: \"1\" b: \"2\")"
+                "('a': \"1\" 'b': \"2\")"
             );
 
             yield return new DeserializationTestInstance(
                 "Log ((a:'1') + (b:'2'))",
-                "(a: \"1\" b: \"2\")"
+                "('a': \"1\" 'b': \"2\")"
             );
 
             yield return new DeserializationTestInstance("(Foo: 1)['Foo'] + 3",               4);
@@ -62,7 +62,7 @@ public partial class DeserializationTests
             );
 
             yield return new DeserializationTestInstance("(Foo: [1,2])['Foo']", "[1, 2]");
-            yield return new DeserializationTestInstance("(Foo: [1,2])",        "(Foo: [1, 2])");
+            yield return new DeserializationTestInstance("(Foo: [1,2])",        "('Foo': [1, 2])");
 
             yield return new DeserializationTestInstance("ArrayLength([1,2] + [3,4])", "4");
 
@@ -70,7 +70,7 @@ public partial class DeserializationTests
             yield return new DeserializationTestInstance("123",           "123");
             yield return new DeserializationTestInstance("1 + 2",         "3");
             yield return new DeserializationTestInstance("3.3",           "3.3");
-            yield return new DeserializationTestInstance("(double: 3.3)", "(double: 3.3)");
+            yield return new DeserializationTestInstance("(double: 3.3)", "('double': 3.3)");
 
             yield return new DeserializationTestInstance(
                 @"- <Foo> = 'Hello World'
@@ -274,14 +274,14 @@ Log 'Comments!'",
                 @"
 - <ArrayVar> = [(str: 'abc' num: '123')]
 - Foreach <ArrayVar> (Log <item>)",
-                "(str: \"abc\" num: \"123\")"
+                "('str': \"abc\" 'num': \"123\")"
             );
 
             yield return new DeserializationTestInstance(
                 @"
 - <ArrayVar> = [(str: 'abc' num: '123')]
 - EntityForeach <ArrayVar> (Log <item>)",
-                "(str: \"abc\" num: \"123\")"
+                "('str': \"abc\" 'num': \"123\")"
             );
 
             yield return new DeserializationTestInstance(
@@ -391,23 +391,26 @@ Log 'Comments!'",
                 true
             );
 
-            yield return new DeserializationTestInstance("(Foo.Bar:'b')", "(Foo: (Bar: \"b\"))");
+            yield return new DeserializationTestInstance(
+                "(Foo.Bar:'b')",
+                "('Foo': ('Bar': \"b\"))"
+            );
 
             yield return new DeserializationTestInstance(
                 "(Foo.Bar:(Baz: 'a' Zab: 'b'))",
-                "(Foo: (Bar: (Baz: \"a\" Zab: \"b\")))"
+                "('Foo': ('Bar': ('Baz': \"a\" 'Zab': \"b\")))"
             );
 
             yield return new DeserializationTestInstance("'a' + 'b' + 'c'", "abc");
 
             yield return new DeserializationTestInstance(
                 "(Foo: 'a') + (Bar: 'b')",
-                "(Foo: \"a\" Bar: \"b\")"
+                "('Foo': \"a\" 'Bar': \"b\")"
             );
 
             yield return new DeserializationTestInstance(
                 "(Foo: 'a') + (Bar: 'b') + (Baz: 'c')",
-                "(Foo: \"a\" Bar: \"b\" Baz: \"c\")"
+                "('Foo': \"a\" 'Bar': \"b\" 'Baz': \"c\")"
             );
 
             yield return new DeserializationTestInstance("[1,2,3][2]", "3");
@@ -424,12 +427,12 @@ Log 'Comments!'",
 
             yield return new DeserializationTestInstance(
                 "(Foo.Bar.Baz:'b')",
-                "(Foo: (Bar: (Baz: \"b\")))"
+                "('Foo': ('Bar': ('Baz': \"b\")))"
             );
 
             yield return new DeserializationTestInstance(
                 "(Foo.Bar: 'a' Foo.Baz: 'b')",
-                "(Foo: (Bar: \"a\" Baz: \"b\"))"
+                "('Foo': ('Bar': \"a\" 'Baz': \"b\"))"
             );
 
             yield return new DeserializationTestInstance("(Foo.Bar.Baz:'b')['Foo.Bar.Baz']",   "b");
@@ -447,7 +450,7 @@ Log 'Comments!'",
 
             yield return new DeserializationTestInstance(
                 "(Foo.Bar:'a' Foo.Baz:'b')",
-                "(Foo: (Bar: \"a\" Baz: \"b\"))"
+                "('Foo': ('Bar': \"a\" 'Baz': \"b\"))"
             );
 
             yield return new DeserializationTestInstance(

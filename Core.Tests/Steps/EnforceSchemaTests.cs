@@ -74,8 +74,8 @@ public partial class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Enti
                     ("foo", SCLType.String, Multiplicity.ExactlyOne),
                     ("Bar", SCLType.Integer, Multiplicity.ExactlyOne)
                 ),
-                "(Foo: \"Hello\" Bar: 1)",
-                "(Foo: \"Hello 2\" Bar: 2)"
+                "('Foo': \"Hello\" 'Bar': 1)",
+                "('Foo': \"Hello 2\" 'Bar': 2)"
             );
 
             yield return CreateCase(
@@ -86,7 +86,7 @@ public partial class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Enti
                     ExtraPropertyBehavior.Fail,
                     ("Foo", SCLType.Integer, Multiplicity.ExactlyOne)
                 ),
-                "(Foo: 100)"
+                "('Foo': 100)"
             );
 
             yield return CreateCase(
@@ -97,7 +97,7 @@ public partial class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Enti
                     ExtraPropertyBehavior.Fail,
                     ("Foo", SCLType.Double, Multiplicity.ExactlyOne)
                 ),
-                "(Foo: 100.345)"
+                "('Foo': 100.345)"
             );
 
             yield return CreateCase(
@@ -108,7 +108,7 @@ public partial class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Enti
                     ExtraPropertyBehavior.Fail,
                     ("Foo", SCLType.Bool, Multiplicity.ExactlyOne)
                 ),
-                "(Foo: True)"
+                "('Foo': True)"
             );
 
             yield return CreateCase(
@@ -119,7 +119,7 @@ public partial class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Enti
                     ExtraPropertyBehavior.Fail,
                     ("Foo", SCLType.Date, Multiplicity.ExactlyOne)
                 ),
-                "(Foo: 2020-10-11T15:45:44.0000000)"
+                "('Foo': 2020-10-11T15:45:44.0000000)"
             );
 
             yield return CreateCase(
@@ -131,7 +131,7 @@ public partial class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Enti
                     ("Foo", SCLType.Date, null, Multiplicity.ExactlyOne, null, null,
                      new List<string> { "yyyy" }, null)
                 ),
-                "(Foo: 2020-01-01T00:00:00.0000000)"
+                "('Foo': 2020-01-01T00:00:00.0000000)"
             );
 
             yield return CreateCase(
@@ -153,7 +153,7 @@ public partial class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Enti
                         }
                     }
                 },
-                "(Foo: 2020-01-01T00:00:00.0000000)"
+                "('Foo': 2020-01-01T00:00:00.0000000)"
             );
 
             yield return CreateCase(
@@ -165,7 +165,7 @@ public partial class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Enti
                     ("Foo", SCLType.Date, null, Multiplicity.ExactlyOne, null, null,
                      new List<string> { "yyyy" }, "yyyy-mm-dd")
                 ),
-                "(Foo: 2020-00-01)"
+                "('Foo': 2020-00-01)"
             );
 
             yield return CreateCase(
@@ -188,7 +188,7 @@ public partial class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Enti
                         }
                     }
                 },
-                "(Foo: 2020-00-01)"
+                "('Foo': 2020-00-01)"
             );
 
             yield return CreateCase(
@@ -200,7 +200,7 @@ public partial class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Enti
                     ("Foo", SCLType.Integer, null, Multiplicity.ExactlyOne, @"\d+", null,
                      null, null)
                 ),
-                "(Foo: 100)"
+                "('Foo': 100)"
             );
 
             yield return CreateCase(
@@ -212,7 +212,7 @@ public partial class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Enti
                     ("Foo", SCLType.Enum, "Word", Multiplicity.ExactlyOne, null,
                      new List<string> { "Hello", "World" }, null, null)
                 ),
-                "(Foo: Word.hello)"
+                "('Foo': Word.hello)"
             );
 
             yield return CreateCase(
@@ -224,7 +224,7 @@ public partial class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Enti
                     ("Foo", SCLType.Integer, null, Multiplicity.Any, null,
                      null, null, null)
                 ),
-                "(Foo: \"\")"
+                "('Foo': \"\")"
             );
 
             yield return CreateCase(
@@ -236,7 +236,7 @@ public partial class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Enti
                     ("Foo", SCLType.Integer, null, Multiplicity.UpToOne, null,
                      null, null, null)
                 ),
-                "(Foo: \"\")"
+                "('Foo': \"\")"
             );
 
             yield return CreateCase(
@@ -249,7 +249,7 @@ public partial class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Enti
                          null, null, null)
                     )
                     .WithErrorBehavior(ErrorBehavior.Error),
-                "Schema violation: Expected 'Foo' to not be null in (Foo: \"\")"
+                "Schema violation: Expected 'Foo' to not be null in ('Foo': \"\")"
             );
 
             yield return CreateCase(
@@ -261,7 +261,7 @@ public partial class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Enti
                         ("Foo", SCLType.Integer, Multiplicity.Any)
                     )
                     .WithErrorBehavior(ErrorBehavior.Error),
-                "Schema violation: 'Hello' is not a Integer in (Foo: \"Hello\")"
+                "Schema violation: 'Hello' is not a Integer in ('Foo': \"Hello\")"
             );
 
             yield return CreateCase(
@@ -273,8 +273,8 @@ public partial class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Enti
                         ("Foo", SCLType.Integer, Multiplicity.Any)
                     )
                     .WithErrorBehavior(ErrorBehavior.Warning),
-                "Schema violation: 'Hello' is not a Integer in (Foo: \"Hello\")",
-                "(Foo: \"Hello\")"
+                "Schema violation: 'Hello' is not a Integer in ('Foo': \"Hello\")",
+                "('Foo': \"Hello\")"
             );
 
             yield return CreateCase(
@@ -297,7 +297,7 @@ public partial class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Enti
                         ("Foo", SCLType.Integer, Multiplicity.Any)
                     )
                     .WithErrorBehavior(ErrorBehavior.Ignore),
-                "(Foo: \"Hello\")"
+                "('Foo': \"Hello\")"
             );
 
             yield return CreateCase(
@@ -308,7 +308,7 @@ public partial class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Enti
                     ExtraPropertyBehavior.Allow,
                     ("Foo", SCLType.String, Multiplicity.Any)
                 ),
-                "(Foo: \"Hello\" Bar: \"World\")"
+                "('Foo': \"Hello\" 'Bar': \"World\")"
             );
 
             yield return CreateCase(
@@ -319,7 +319,7 @@ public partial class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Enti
                     ExtraPropertyBehavior.Remove,
                     ("Foo", SCLType.String, Multiplicity.Any)
                 ),
-                "(Foo: \"Hello\")"
+                "('Foo': \"Hello\")"
             );
 
             yield return CreateCase(
@@ -330,8 +330,8 @@ public partial class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Enti
                     ExtraPropertyBehavior.Warn,
                     ("Foo", SCLType.String, Multiplicity.Any)
                 ),
-                "Schema violation: Unexpected Property: 'Bar' in (Foo: \"Hello\" Bar: \"World\")",
-                "(Foo: \"Hello\")"
+                "Schema violation: Unexpected Property: 'Bar' in ('Foo': \"Hello\" 'Bar': \"World\")",
+                "('Foo': \"Hello\")"
             );
         }
     }

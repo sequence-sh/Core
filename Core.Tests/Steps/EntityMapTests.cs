@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
+using Reductech.EDR.Core.Internal.Serialization;
 using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.TestHarness;
 using Reductech.EDR.Core.Util;
@@ -42,8 +43,8 @@ public partial class EntityMapTests : StepTestBase<EntityMap, Array<Entity>>
                     }
                 },
                 Unit.Default,
-                "(Foo: \"Hello\" Bar: \"World\")",
-                "(Foo: \"Hello 2\" Bar: \"World\")"
+                Entity.Create(("Foo", "Hello"),   ("Bar", "World")).Serialize(),
+                Entity.Create(("Foo", "Hello 2"), ("Bar", "World")).Serialize()
             );
 
             yield return new StepCase(
@@ -72,8 +73,8 @@ public partial class EntityMapTests : StepTestBase<EntityMap, Array<Entity>>
                     }
                 },
                 Unit.Default,
-                "(Foo: \"Hello\" Bar: \"World\")",
-                "(Foo: \"Hello 2\" Bar: \"World\")"
+                Entity.Create(("Foo", "Hello"),   ("Bar", "World")).Serialize(),
+                Entity.Create(("Foo", "Hello 2"), ("Bar", "World")).Serialize()
             );
         }
     }
