@@ -53,6 +53,18 @@ public sealed record EagerArray<T>(IReadOnlyList<T> List) : Array<T>, IEquatable
     }
 
     /// <inheritdoc />
+    public override Array<T> Take(int count)
+    {
+        return new EagerArray<T>(List.Take(count).ToList());
+    }
+
+    /// <inheritdoc />
+    public override Array<T> Skip(int count)
+    {
+        return new EagerArray<T>(List.Skip(count).ToList());
+    }
+
+    /// <inheritdoc />
     public override async Task<Result<EagerArray<T>, IError>> Evaluate(
         CancellationToken cancellation)
     {
