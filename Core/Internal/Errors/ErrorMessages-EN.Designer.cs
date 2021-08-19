@@ -79,6 +79,15 @@ namespace Reductech.EDR.Core.Internal.Errors {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Schema Property &apos;{0}&apos; cannot have {1} value &apos;{2}&apos; and &apos;{3}&apos;.
+        /// </summary>
+        internal static string CannotCombineSchemaProperties {
+            get {
+                return ResourceManager.GetString("CannotCombineSchemaProperties", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Cannot convert a nested entity to {0}..
         /// </summary>
         internal static string CannotConvertNestedEntity {

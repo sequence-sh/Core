@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.Enums;
@@ -102,7 +103,7 @@ public static class StaticHelpers
         {
             Name            = name,
             ExtraProperties = extraPropertyBehavior,
-            Properties = properties.ToDictionary(
+            Properties = properties.ToImmutableSortedDictionary(
                 x => x.propertyName,
                 x => new SchemaProperty
                 {

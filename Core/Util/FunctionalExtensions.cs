@@ -60,6 +60,43 @@ public static class FunctionalExtensions
     /// Create a tuple with 2 results.
     /// Func2 will not be evaluated unless result1 is success.
     /// </summary>
+    public static Result<(T1, T2, T3, T4, T5), TE> Compose<T1, T2, T3, T4, T5, TE>(
+        this Result<T1, TE> result1,
+        Func<Result<T2, TE>> func2,
+        Func<Result<T3, TE>> func3,
+        Func<Result<T4, TE>> func4,
+        Func<Result<T5, TE>> func5)
+    {
+        if (result1.IsFailure)
+            return result1.ConvertFailure<(T1, T2, T3, T4, T5)>();
+
+        var result2 = func2();
+
+        if (result2.IsFailure)
+            return result2.ConvertFailure<(T1, T2, T3, T4, T5)>();
+
+        var result3 = func3();
+
+        if (result3.IsFailure)
+            return result3.ConvertFailure<(T1, T2, T3, T4, T5)>();
+
+        var result4 = func4();
+
+        if (result4.IsFailure)
+            return result4.ConvertFailure<(T1, T2, T3, T4, T5)>();
+
+        var result5 = func5();
+
+        if (result5.IsFailure)
+            return result5.ConvertFailure<(T1, T2, T3, T4, T5)>();
+
+        return (result1.Value, result2.Value, result3.Value, result4.Value, result5.Value);
+    }
+
+    /// <summary>
+    /// Create a tuple with 5 results.
+    /// Func2 will not be evaluated unless result1 is success.
+    /// </summary>
     public static Result<(T1, T2), TE> Compose<T1, T2, TE>(
         this Result<T1, TE> result1,
         Func<Result<T2, TE>> func2)

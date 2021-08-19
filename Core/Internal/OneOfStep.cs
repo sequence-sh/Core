@@ -107,7 +107,14 @@ public class OneOfStep<T0, T1> : OneOfStep, IStep<OneOf<T0, T1>>
         Step = step;
     }
 
+    /// <summary>
+    /// Create a new OneOfStep
+    /// </summary>
     public OneOfStep(IStep<T0> step0) : this(OneOf<IStep<T0>, IStep<T1>>.FromT0(step0)) { }
+
+    /// <summary>
+    /// Create a new OneOfStep
+    /// </summary>
     public OneOfStep(IStep<T1> step1) : this(OneOf<IStep<T0>, IStep<T1>>.FromT1(step1)) { }
 
     /// <summary>
@@ -146,12 +153,21 @@ public class OneOfStep<T0, T1, T2> : OneOfStep, IStep<OneOf<T0, T1, T2>>
         Step = step;
     }
 
+    /// <summary>
+    /// Create a new OneOfStep
+    /// </summary>
     public OneOfStep(IStep<T0> step0) :
         this(OneOf<IStep<T0>, IStep<T1>, IStep<T2>>.FromT0(step0)) { }
 
+    /// <summary>
+    /// Create a new OneOfStep
+    /// </summary>
     public OneOfStep(IStep<T1> step1) :
         this(OneOf<IStep<T0>, IStep<T1>, IStep<T2>>.FromT1(step1)) { }
 
+    /// <summary>
+    /// Create a new OneOfStep
+    /// </summary>
     public OneOfStep(IStep<T2> step2) :
         this(OneOf<IStep<T0>, IStep<T1>, IStep<T2>>.FromT2(step2)) { }
 

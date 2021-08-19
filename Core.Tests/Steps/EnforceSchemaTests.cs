@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Globalization;
 using System.Linq;
 using CSharpFunctionalExtensions;
@@ -151,7 +152,7 @@ public partial class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Enti
                                 Type = SCLType.Date, Multiplicity = Multiplicity.ExactlyOne
                             }
                         }
-                    }
+                    }.ToImmutableSortedDictionary()
                 },
                 "('Foo': 2020-01-01T00:00:00.0000000)"
             );
@@ -186,7 +187,7 @@ public partial class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Enti
                                 Type = SCLType.Date, Multiplicity = Multiplicity.ExactlyOne
                             }
                         }
-                    }
+                    }.ToImmutableSortedDictionary()
                 },
                 "('Foo': 2020-00-01)"
             );
@@ -247,8 +248,10 @@ public partial class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Enti
                         ExtraPropertyBehavior.Fail,
                         ("Foo", SCLType.Integer, null, Multiplicity.ExactlyOne, null,
                          null, null, null)
-                    )
-                    .WithErrorBehavior(ErrorBehavior.Error),
+                    ) with
+                    {
+                        DefaultErrorBehavior = ErrorBehavior.Error
+                    },
                 "Schema violation: Expected 'Foo' to not be null in ('Foo': \"\")"
             );
 
@@ -259,8 +262,10 @@ public partial class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Enti
                         SchemaName,
                         ExtraPropertyBehavior.Fail,
                         ("Foo", SCLType.Integer, Multiplicity.Any)
-                    )
-                    .WithErrorBehavior(ErrorBehavior.Error),
+                    )with
+                    {
+                        DefaultErrorBehavior = ErrorBehavior.Error
+                    },
                 "Schema violation: 'Hello' is not a Integer in ('Foo': \"Hello\")"
             );
 
@@ -271,8 +276,10 @@ public partial class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Enti
                         SchemaName,
                         ExtraPropertyBehavior.Fail,
                         ("Foo", SCLType.Integer, Multiplicity.Any)
-                    )
-                    .WithErrorBehavior(ErrorBehavior.Warning),
+                    )with
+                    {
+                        DefaultErrorBehavior = ErrorBehavior.Warning
+                    },
                 "Schema violation: 'Hello' is not a Integer in ('Foo': \"Hello\")",
                 "('Foo': \"Hello\")"
             );
@@ -284,8 +291,10 @@ public partial class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Enti
                         SchemaName,
                         ExtraPropertyBehavior.Fail,
                         ("Foo", SCLType.Integer, Multiplicity.Any)
-                    )
-                    .WithErrorBehavior(ErrorBehavior.Skip)
+                    )with
+                    {
+                        DefaultErrorBehavior = ErrorBehavior.Skip
+                    }
             );
 
             yield return CreateCase(
@@ -295,8 +304,10 @@ public partial class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Enti
                         SchemaName,
                         ExtraPropertyBehavior.Fail,
                         ("Foo", SCLType.Integer, Multiplicity.Any)
-                    )
-                    .WithErrorBehavior(ErrorBehavior.Ignore),
+                    )with
+                    {
+                        DefaultErrorBehavior = ErrorBehavior.Ignore
+                    },
                 "('Foo': \"Hello\")"
             );
 
@@ -492,7 +503,15 @@ public partial class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Enti
         sc1.Values.Should().BeNull();
         sc1.Multiplicity.Should().Be(Multiplicity.ExactlyOne);
         sc1.Regex.Should().BeNull();
-        sc1.Type.Should().Be(SCLType.String);
+        sc1.Type.Should().Be(SCLType.Integer);
+
+        var sc2 = schema.Properties.Values.Skip(1).First();
+
+        sc2.EnumType.Should().BeNull();
+        sc2.Values.Should().BeNull();
+        sc2.Multiplicity.Should().Be(Multiplicity.ExactlyOne);
+        sc2.Regex.Should().BeNull();
+        sc2.Type.Should().Be(SCLType.String);
     }
 
     [Fact]

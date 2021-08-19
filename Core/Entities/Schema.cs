@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Runtime.Serialization;
 using CSharpFunctionalExtensions;
@@ -16,45 +17,46 @@ namespace Reductech.EDR.Core.Entities
 /// Enforces that the entity matches certain constraints.
 /// </summary>
 [DataContract]
-public sealed class Schema : IEntityConvertible
+public sealed record Schema : IEntityConvertible
 {
     /// <summary>
     /// The name of the schema.
     /// </summary>
     [property: DataMember]
-    public string Name { get; set; } = null!;
+    public string Name { get; init; } = null!;
 
     /// <summary>
     /// The schema properties.
     /// </summary>
     [property: DataMember]
-    public Dictionary<string, SchemaProperty> Properties { get; set; } = null!;
+    public ImmutableSortedDictionary<string, SchemaProperty> Properties { get; init; } = null!;
 
     /// <summary>
     /// Whether properties other than the explicitly defined properties are allowed.
     /// </summary>
     [property: DataMember]
-    public ExtraPropertyBehavior ExtraProperties { get; set; } = ExtraPropertyBehavior.Allow;
+    public ExtraPropertyBehavior ExtraProperties { get; init; } = ExtraPropertyBehavior.Allow;
 
     /// <summary>
-    /// The default error behavior. This can be overriden by the individual properties or by the value passed to the EnforceSchema method.
+    /// The default error behavior.
+    /// This can be overriden by the individual properties or by the value passed to the EnforceSchema method.
     /// </summary>
     [property: DataMember]
-    public ErrorBehavior DefaultErrorBehavior { get; set; } = ErrorBehavior.Fail;
+    public ErrorBehavior DefaultErrorBehavior { get; init; } = ErrorBehavior.Fail;
 
     /// <summary>
     /// The allowed formats for dates.
     /// This can be overwritten by individual schema properties.
     /// </summary>
     [property: DataMember]
-    public IReadOnlyList<string>? DefaultDateInputFormats { get; set; }
+    public IReadOnlyList<string>? DefaultDateInputFormats { get; init; }
 
     /// <summary>
     /// The output format for dates.
     /// This can be overwritten by individual schema properties.
     /// </summary>
     [property: DataMember]
-    public string? DefaultDateOutputFormat { get; set; }
+    public string? DefaultDateOutputFormat { get; init; }
 
     /// <inheritdoc />
     public override string ToString() => Name;

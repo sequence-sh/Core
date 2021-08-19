@@ -123,6 +123,9 @@
   <data name="AutomaticVariableNotSet" xml:space="preserve">
     <value>The automatic variable was not set.</value>
   </data>
+  <data name="CannotCombineSchemaProperties" xml:space="preserve">
+    <value>Schema Property '{0}' cannot have {1} value '{2}' and '{3}'</value>
+  </data>
   <data name="CannotConvertNestedEntity" xml:space="preserve">
     <value>Cannot convert a nested entity to {0}.</value>
   </data>

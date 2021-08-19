@@ -70,6 +70,13 @@ public abstract record EntityValue(object? ObjectValue)
         {
             return Maybe<object>.None;
         }
+
+        /// <inheritdoc />
+        public override Result<Maybe<SchemaProperty>, IErrorBuilder> TryCreateSchemaProperty(
+            string propertyName)
+        {
+            return Maybe<SchemaProperty>.None;
+        }
     }
 
     /// <summary>
@@ -188,6 +195,19 @@ public abstract record EntityValue(object? ObjectValue)
 
             return CouldNotConvert(Value, schemaProperty, entity);
         }
+
+        /// <inheritdoc />
+        public override Result<Maybe<SchemaProperty>, IErrorBuilder> TryCreateSchemaProperty(
+            string propertyName)
+        {
+            return Maybe<SchemaProperty>.From(
+                    new SchemaProperty
+                    {
+                        Type = SCLType.String, Multiplicity = Multiplicity.ExactlyOne
+                    }
+                )
+                ;
+        }
     }
 
     /// <summary>
@@ -233,6 +253,18 @@ public abstract record EntityValue(object? ObjectValue)
                 _               => CouldNotConvert(Value, schemaProperty, entity)
             };
         }
+
+        /// <inheritdoc />
+        public override Result<Maybe<SchemaProperty>, IErrorBuilder> TryCreateSchemaProperty(
+            string propertyName)
+        {
+            return Maybe<SchemaProperty>.From(
+                new SchemaProperty
+                {
+                    Type = SCLType.Integer, Multiplicity = Multiplicity.ExactlyOne
+                }
+            );
+        }
     }
 
     /// <summary>
@@ -275,6 +307,15 @@ public abstract record EntityValue(object? ObjectValue)
                 _              => CouldNotConvert(Value, schemaProperty, entity)
             };
         }
+
+        /// <inheritdoc />
+        public override Result<Maybe<SchemaProperty>, IErrorBuilder> TryCreateSchemaProperty(
+            string propertyName)
+        {
+            return Maybe<SchemaProperty>.From(
+                new SchemaProperty { Type = SCLType.Double, Multiplicity = Multiplicity.ExactlyOne }
+            );
+        }
     }
 
     /// <summary>
@@ -315,6 +356,15 @@ public abstract record EntityValue(object? ObjectValue)
                 return Value;
 
             return Maybe<object>.None;
+        }
+
+        /// <inheritdoc />
+        public override Result<Maybe<SchemaProperty>, IErrorBuilder> TryCreateSchemaProperty(
+            string propertyName)
+        {
+            return Maybe<SchemaProperty>.From(
+                new SchemaProperty { Type = SCLType.Bool, Multiplicity = Multiplicity.ExactlyOne }
+            );
         }
     } //TODO constant values
 
@@ -378,6 +428,20 @@ public abstract record EntityValue(object? ObjectValue)
                 default: return CouldNotConvert(Value, schemaProperty, entity);
             }
         }
+
+        /// <inheritdoc />
+        public override Result<Maybe<SchemaProperty>, IErrorBuilder> TryCreateSchemaProperty(
+            string propertyName)
+        {
+            return Maybe<SchemaProperty>.From(
+                new SchemaProperty
+                {
+                    Type         = SCLType.Enum,
+                    Multiplicity = Multiplicity.ExactlyOne,
+                    EnumType     = Value.Type
+                }
+            );
+        }
     }
 
     /// <summary>
@@ -432,6 +496,20 @@ public abstract record EntityValue(object? ObjectValue)
                 _            => CouldNotConvert(Value, schemaProperty, entity)
             };
         }
+
+        /// <inheritdoc />
+        public override Result<Maybe<SchemaProperty>, IErrorBuilder> TryCreateSchemaProperty(
+            string propertyName)
+        {
+            return Maybe<SchemaProperty>.From(
+                new SchemaProperty
+                {
+                    Type             = SCLType.Date,
+                    Multiplicity     = Multiplicity.ExactlyOne,
+                    DateOutputFormat = DateOutputFormat
+                }
+            );
+        }
     }
 
     /// <summary>
@@ -475,6 +553,18 @@ public abstract record EntityValue(object? ObjectValue)
                 SCLType.Enum   => (this, false),
                 _              => CouldNotConvert(Value, schemaProperty, entity)
             };
+        }
+
+        /// <inheritdoc />
+        public override Result<Maybe<SchemaProperty>, IErrorBuilder> TryCreateSchemaProperty(
+            string propertyName)
+        {
+            return Maybe<SchemaProperty>.From(
+                new SchemaProperty
+                {
+                    Type = SCLType.Entity, Multiplicity = Multiplicity.ExactlyOne,
+                }
+            );
         }
     }
 
@@ -520,6 +610,19 @@ public abstract record EntityValue(object? ObjectValue)
         public override string ToString()
         {
             return Value.Count + " elements";
+        }
+
+        /// <inheritdoc />
+        public override Result<Maybe<SchemaProperty>, IErrorBuilder> TryCreateSchemaProperty(
+            string propertyName)
+        {
+            var members = Value.Select(x => x.TryCreateSchemaProperty(propertyName))
+                .Combine(ErrorBuilderList.Combine);
+
+            if (members.IsFailure)
+                return members.ConvertFailure<Maybe<SchemaProperty>>();
+
+            return SchemaProperty.Combine(propertyName, members.Value, Value.Count);
         }
 
         /// <inheritdoc />
@@ -842,6 +945,13 @@ public abstract record EntityValue(object? ObjectValue)
     }
 
     /// <summary>
+    /// Create a schema property that could contain this entity value
+    /// </summary>
+    /// <returns></returns>
+    public abstract Result<Maybe<SchemaProperty>, IErrorBuilder> TryCreateSchemaProperty(
+        string propertyName);
+
+    /// <summary>
     /// If this is a primitive, get a string representation
     /// </summary>
     public abstract string GetPrimitiveString();
@@ -955,16 +1065,16 @@ public abstract record EntityValue(object? ObjectValue)
 
                 if (value.IsSuccess)
                 {
-                    var methodName = $"FromT{0}";
+                    var methodName = $"FromT{i}";
 
                     var method = type.GetMethod(
                         methodName,
                         BindingFlags.Static | BindingFlags.Public
                     )!;
 
-                    var oneOfThing = method.Invoke(null, new[] { value.Value });
+                    var oneOfThing = method.Invoke(null, new[] { value.Value })!;
 
-                    return oneOfThing;
+                    return Result.Success<object, IErrorBuilder>(oneOfThing);
                 }
 
                 i++;

@@ -43,6 +43,16 @@ public abstract record Array<T> : IArray
     public abstract Array<T> Sort(bool descending);
 
     /// <summary>
+    /// Take only the first n elements of the array
+    /// </summary>
+    public abstract Array<T> Take(int count);
+
+    /// <summary>
+    /// Skip the first n elements of the array
+    /// </summary>
+    public abstract Array<T> Skip(int count);
+
+    /// <summary>
     /// Evaluate the array - reading the results to memory
     /// </summary>
     public abstract Task<Result<EagerArray<T>, IError>> Evaluate(CancellationToken cancellation);
