@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading;
@@ -15,7 +16,7 @@ namespace Reductech.EDR.Core.Steps
 {
 
 /// <summary>
-/// Create a schema from an Arrayof Entity
+/// Create a schema from an Array of Entity
 /// </summary>
 public sealed class CreateSchema : CompoundStep<Entity>
 {
@@ -25,7 +26,7 @@ public sealed class CreateSchema : CompoundStep<Entity>
         CancellationToken cancellationToken)
     {
         var stepResult = await stateMonad.RunStepsAsync(
-            Array.WrapArray(),
+            Entities.WrapArray(),
             SchemaName.WrapStringStream(),
             ExtraPropertyBehaviour,
             DefaultErrorBehaviour,
@@ -40,42 +41,64 @@ public sealed class CreateSchema : CompoundStep<Entity>
         var (entities, schemaName, extraPropertyBehavior, errorBehavior, inputFormats, outputFormat
             ) = stepResult.Value;
 
+        var properties = GetSchemaProperties(entities);
+
+        if (properties.IsFailure)
+            return properties.MapError(x => x.WithLocation(this)).ConvertFailure<Entity>();
+
         var schema = new Schema
         {
-            Name                 = schemaName,
-            ExtraProperties      = extraPropertyBehavior,
-            DefaultErrorBehavior = errorBehavior,
-            Properties           = GetSchemaProperties(entities)
+            Name                    = schemaName,
+            ExtraProperties         = extraPropertyBehavior,
+            DefaultErrorBehavior    = errorBehavior,
+            Properties              = properties.Value,
+            DefaultDateInputFormats = inputFormats.Unwrap(),
+            DefaultDateOutputFormat = outputFormat.Unwrap()
         };
-
-        if (inputFormats.HasValue)
-            schema.DefaultDateInputFormats = inputFormats.Value;
-
-        if (outputFormat.HasValue)
-            schema.DefaultDateOutputFormat = outputFormat.Value;
 
         return schema.ConvertToEntity();
     }
 
-    private static Dictionary<string, SchemaProperty> GetSchemaProperties(
-        IReadOnlyList<Entity> entities)
+    private static Result<ImmutableSortedDictionary<string, SchemaProperty>, IErrorBuilder>
+        GetSchemaProperties(IReadOnlyCollection<Entity> entities)
     {
-        return
-            entities.SelectMany(GetSchemaPropertyPairs)
-                .GroupBy(x => x.Key, x => x.Value)
-                .Select(x => (x.Key, prop: SchemaProperty.Combine(x, entities.Count)))
-                .Where(x => x.prop.HasValue)
-                .ToDictionary(x => x.Key, x => x.prop.Value);
+        var pairs     = entities.SelectMany(GetSchemaPropertyPairs).ToList();
+        var failures1 = pairs.Where(x => x.IsFailure).ToList();
+
+        if (failures1.Any())
+            return Result.Failure<ImmutableSortedDictionary<string, SchemaProperty>, IErrorBuilder>(
+                ErrorBuilderList.Combine(failures1.Select(x => x.Error))
+            );
+
+        var result = pairs
+            .Select(x => x.Value)
+            .GroupBy(x => x.Key, x => x.Value)
+            .Select(x => (x.Key, prop: SchemaProperty.Combine(x.Key, x, entities.Count)))
+            .ToList();
+
+        var failures2 = result.Select(x => x.prop).Where(x => x.IsFailure).ToList();
+
+        if (failures2.Any())
+            return Result.Failure<ImmutableSortedDictionary<string, SchemaProperty>, IErrorBuilder>(
+                ErrorBuilderList.Combine(failures2.Select(x => x.Error))
+            );
+
+        return result
+            .Where(x => x.prop.Value.HasValue)
+            .ToImmutableSortedDictionary(x => x.Key, x => x.prop.Value.Value);
     }
 
-    private static IEnumerable<KeyValuePair<string, Maybe<SchemaProperty>>> GetSchemaPropertyPairs(
-        Entity entity)
+    private static IEnumerable<Result<KeyValuePair<string, Maybe<SchemaProperty>>, IErrorBuilder>>
+        GetSchemaPropertyPairs(Entity entity)
     {
         foreach (var entityProperty in entity.Dictionary.Values)
         {
+            var schemaPropertyResult =
+                entityProperty.BestValue.TryCreateSchemaProperty(entityProperty.Name);
+
             yield return new KeyValuePair<string, Maybe<SchemaProperty>>(
                 entityProperty.Name,
-                entityProperty.BestValue.CreateSchemaProperty()
+                schemaPropertyResult.Value
             );
         }
     }
@@ -89,7 +112,7 @@ public sealed class CreateSchema : CompoundStep<Entity>
     /// </summary>
     [StepProperty(1)]
     [Required]
-    public IStep<Array<Entity>> Array { get; set; } = null!;
+    public IStep<Array<Entity>> Entities { get; set; } = null!;
 
     /// <summary>
     /// The name of the schema to create

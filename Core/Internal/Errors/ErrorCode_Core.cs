@@ -37,302 +37,388 @@ public sealed record ErrorCode : ErrorCodeBase
     /// Cannot convert a nested entity to {0}.
     /// </summary>
     public static readonly ErrorCode
-        CannotConvertNestedEntity = new(nameof(
-                                            CannotConvertNestedEntity));
+        CannotConvertNestedEntity = new(
+            nameof(
+                CannotConvertNestedEntity)
+        );
 
     /// <summary>
     /// Cannot convert nested list to {0}.
     /// </summary>
     public static readonly ErrorCode
-        CannotConvertNestedList = new(nameof(
-                                          CannotConvertNestedList));
+        CannotConvertNestedList = new(
+            nameof(
+                CannotConvertNestedList)
+        );
 
     /// <summary>
     /// Could not create an instance of {0}&lt;{1}&gt;
     /// </summary>
     public static readonly ErrorCode
-        CannotCreateGeneric = new(nameof(
-                                      CannotCreateGeneric));
+        CannotCreateGeneric = new(
+            nameof(
+                CannotCreateGeneric)
+        );
 
     /// <summary>
     /// {0} cannot create a scoped context
     /// </summary>
     public static readonly ErrorCode
-        CannotCreateScopedContext = new(nameof(
-                                            CannotCreateScopedContext));
+        CannotCreateScopedContext = new(
+            nameof(
+                CannotCreateScopedContext)
+        );
 
     /// <summary>
     /// Could not infer type - {0}
     /// </summary>
     public static readonly ErrorCode
-        CannotInferType = new(nameof(
-                                  CannotInferType));
+        CannotInferType = new(
+            nameof(
+                CannotInferType)
+        );
 
     /// <summary>
     /// Parameters {0} and {1} are in conflict.
     /// </summary>
     public static readonly ErrorCode
-        ConflictingParameters = new(nameof(
-                                        ConflictingParameters));
+        ConflictingParameters = new(
+            nameof(
+                ConflictingParameters)
+        );
 
     /// <summary>
     /// Could not convert entity value to {0}.
     /// </summary>
     public static readonly ErrorCode
-        CouldNotConvertEntityValue = new(nameof(
-                                             CouldNotConvertEntityValue));
+        CouldNotConvertEntityValue = new(
+            nameof(
+                CouldNotConvertEntityValue)
+        );
 
     /// <summary>
     /// Could not parse '{0}' as {1}
     /// </summary>
     public static readonly ErrorCode
-        CouldNotParse = new(nameof(
-                                CouldNotParse));
+        CouldNotParse = new(
+            nameof(
+                CouldNotParse)
+        );
 
     /// <summary>
     /// Could not resolve variable '{0}'
     /// </summary>
     public static readonly ErrorCode
-        CouldNotResolveVariable = new(nameof(
-                                          CouldNotResolveVariable));
+        CouldNotResolveVariable = new(
+            nameof(
+                CouldNotResolveVariable)
+        );
 
     /// <summary>
     /// Error Reading CSV
     /// </summary>
     public static readonly ErrorCode
-        CSVError = new(nameof(
-                           CSVError));
+        CSVError = new(
+            nameof(
+                CSVError)
+        );
 
     /// <summary>
     /// Directory does not exist or could not be found: '{0}'
     /// </summary>
     public static readonly ErrorCode
-        DirectoryNotFound = new(nameof(
-                                    DirectoryNotFound));
+        DirectoryNotFound = new(
+            nameof(
+                DirectoryNotFound)
+        );
 
     /// <summary>
     /// Attempt to Divide by Zero.
     /// </summary>
     public static readonly ErrorCode
-        DivideByZero = new(nameof(
-                               DivideByZero));
+        DivideByZero = new(
+            nameof(
+                DivideByZero)
+        );
 
     /// <summary>
     /// Duplicate Parameter: {0}.
     /// </summary>
     public static readonly ErrorCode
-        DuplicateParameter = new(nameof(
-                                     DuplicateParameter));
+        DuplicateParameter = new(
+            nameof(
+                DuplicateParameter)
+        );
 
     /// <summary>
     /// SCL is empty.
     /// </summary>
     public static readonly ErrorCode
-        EmptySequence = new(nameof(
-                                EmptySequence));
+        EmptySequence = new(
+            nameof(
+                EmptySequence)
+        );
 
     /// <summary>
     /// External Process Failed: '{0}'
     /// </summary>
     public static readonly ErrorCode
-        ExternalProcessError = new(nameof(
-                                       ExternalProcessError));
+        ExternalProcessError = new(
+            nameof(
+                ExternalProcessError)
+        );
 
     /// <summary>
     /// External process {0} did not return an output of the expected form
     /// </summary>
     public static readonly ErrorCode
-        ExternalProcessMissingOutput = new(nameof(
-                                               ExternalProcessMissingOutput));
+        ExternalProcessMissingOutput = new(
+            nameof(
+                ExternalProcessMissingOutput)
+        );
 
     /// <summary>
     /// Could not find process '{0}'
     /// </summary>
     public static readonly ErrorCode
-        ExternalProcessNotFound = new(nameof(
-                                          ExternalProcessNotFound));
+        ExternalProcessNotFound = new(
+            nameof(
+                ExternalProcessNotFound)
+        );
 
     /// <summary>
     /// Index was outside the bounds of the array.
     /// </summary>
     public static readonly ErrorCode
-        IndexOutOfBounds = new(nameof(
-                                   IndexOutOfBounds));
+        IndexOutOfBounds = new(
+            nameof(
+                IndexOutOfBounds)
+        );
 
     /// <summary>
     /// '{0}' cannot take the value '{1}'
     /// </summary>
     public static readonly ErrorCode
-        InvalidCast = new(nameof(
-                              InvalidCast));
+        InvalidCast = new(
+            nameof(
+                InvalidCast)
+        );
 
     /// <summary>
     /// Could not get context '{0}'
     /// </summary>
     public static readonly ErrorCode
-        MissingContext = new(nameof(
-                                 MissingContext));
+        MissingContext = new(
+            nameof(
+                MissingContext)
+        );
 
     /// <summary>
     /// {0} was missing or empty.
     /// </summary>
     public static readonly ErrorCode
-        MissingParameter = new(nameof(
-                                   MissingParameter));
+        MissingParameter = new(
+            nameof(
+                MissingParameter)
+        );
 
     /// <summary>
     /// Could not get settings: {0}
     /// </summary>
     public static readonly ErrorCode
-        MissingStepSettings = new(nameof(
-                                      MissingStepSettings));
+        MissingStepSettings = new(
+            nameof(
+                MissingStepSettings)
+        );
 
     /// <summary>
     /// Could not get settings value: {0}.{1}
     /// </summary>
     public static readonly ErrorCode
-        MissingStepSettingsValue = new(nameof(
-                                           MissingStepSettingsValue));
+        MissingStepSettingsValue = new(
+            nameof(
+                MissingStepSettingsValue)
+        );
 
     /// <summary>
     /// Variable '{0}' does not exist.
     /// </summary>
     public static readonly ErrorCode
-        MissingVariable = new(nameof(
-                                  MissingVariable));
+        MissingVariable = new(
+            nameof(
+                MissingVariable)
+        );
 
     /// <summary>
     /// Requirement '{0}' not met.
     /// </summary>
     public static readonly ErrorCode
-        RequirementNotMet = new(nameof(
-                                    RequirementNotMet));
+        RequirementNotMet = new(
+            nameof(
+                RequirementNotMet)
+        );
 
     /// <summary>
     /// Schema Invalid: No Enum name defined
     /// </summary>
     public static readonly ErrorCode
-        SchemaInvalidMissingEnum = new(nameof(
-                                           SchemaInvalidMissingEnum));
+        SchemaInvalidMissingEnum = new(
+            nameof(
+                SchemaInvalidMissingEnum)
+        );
 
     /// <summary>
     /// SchemaInvalid: No Enum values defined
     /// </summary>
     public static readonly ErrorCode
-        SchemaInvalidNoEnumValues = new(nameof(
-                                            SchemaInvalidNoEnumValues));
+        SchemaInvalidNoEnumValues = new(
+            nameof(
+                SchemaInvalidNoEnumValues)
+        );
 
     /// <summary>
     /// Missing Property: '{0}' in {1}
     /// </summary>
     public static readonly ErrorCode
-        SchemaViolationMissingProperty = new(nameof(
-                                                 SchemaViolationMissingProperty));
+        SchemaViolationMissingProperty = new(
+            nameof(
+                SchemaViolationMissingProperty)
+        );
 
     /// <summary>
     /// Did not expect a list for '{0}' in {1}
     /// </summary>
     public static readonly ErrorCode
-        SchemaViolationUnexpectedList = new(nameof(
-                                                SchemaViolationUnexpectedList));
+        SchemaViolationUnexpectedList = new(
+            nameof(
+                SchemaViolationUnexpectedList)
+        );
 
     /// <summary>
     /// Expected '{0}' to not be null in {1}
     /// </summary>
     public static readonly ErrorCode
-        SchemaViolationUnexpectedNull = new(nameof(
-                                                SchemaViolationUnexpectedNull));
+        SchemaViolationUnexpectedNull = new(
+            nameof(
+                SchemaViolationUnexpectedNull)
+        );
 
     /// <summary>
     /// Unexpected Property: '{0}' in {1}
     /// </summary>
     public static readonly ErrorCode
-        SchemaViolationUnexpectedProperty = new(nameof(
-                                                    SchemaViolationUnexpectedProperty));
+        SchemaViolationUnexpectedProperty = new(
+            nameof(
+                SchemaViolationUnexpectedProperty)
+        );
 
     /// <summary>
     /// '{0}' does not match regex '{1}' in {2}
     /// </summary>
     public static readonly ErrorCode
-        SchemaViolationUnmatchedRegex = new(nameof(
-                                                SchemaViolationUnmatchedRegex));
+        SchemaViolationUnmatchedRegex = new(
+            nameof(
+                SchemaViolationUnmatchedRegex)
+        );
 
     /// <summary>
     /// '{0}' is not a {1} in {2}
     /// </summary>
     public static readonly ErrorCode
-        SchemaViolationWrongType = new(nameof(
-                                           SchemaViolationWrongType));
+        SchemaViolationWrongType = new(
+            nameof(
+                SchemaViolationWrongType)
+        );
 
     /// <summary>
     /// Syntax Error: {0}
     /// </summary>
     public static readonly ErrorCode
-        SCLSyntaxError = new(nameof(
-                                 SCLSyntaxError));
+        SCLSyntaxError = new(
+            nameof(
+                SCLSyntaxError)
+        );
 
     /// <summary>
     /// {0} should be a single character, but was '{1}'.
     /// </summary>
     public static readonly ErrorCode
-        SingleCharacterExpected = new(nameof(
-                                          SingleCharacterExpected));
+        SingleCharacterExpected = new(
+            nameof(
+                SingleCharacterExpected)
+        );
 
     /// <summary>
     /// The step '{0}' does not exist
     /// </summary>
     public static readonly ErrorCode
-        StepDoesNotExist = new(nameof(
-                                   StepDoesNotExist));
+        StepDoesNotExist = new(
+            nameof(
+                StepDoesNotExist)
+        );
 
     /// <summary>
     /// Test Error Message: '{0}'
     /// </summary>
     public static readonly ErrorCode
-        Test = new(nameof(
-                       Test));
+        Test = new(
+            nameof(
+                Test)
+        );
 
     /// <summary>
     /// Type {0} is not comparable and so cannot be used for sorting.
     /// </summary>
     public static readonly ErrorCode
-        TypeNotComparable = new(nameof(
-                                    TypeNotComparable));
+        TypeNotComparable = new(
+            nameof(
+                TypeNotComparable)
+        );
 
     /// <summary>
     /// Enum '{0}' does not exist
     /// </summary>
     public static readonly ErrorCode
-        UnexpectedEnumType = new(nameof(
-                                     UnexpectedEnumType));
+        UnexpectedEnumType = new(
+            nameof(
+                UnexpectedEnumType)
+        );
 
     /// <summary>
     /// Unexpected {0}: {1}
     /// </summary>
     public static readonly ErrorCode
-        UnexpectedEnumValue = new(nameof(
-                                      UnexpectedEnumValue));
+        UnexpectedEnumValue = new(
+            nameof(
+                UnexpectedEnumValue)
+        );
 
     /// <summary>
     /// Unexpected Parameter '{0}' in '{1}'
     /// </summary>
     public static readonly ErrorCode
-        UnexpectedParameter = new(nameof(
-                                      UnexpectedParameter));
+        UnexpectedParameter = new(
+            nameof(
+                UnexpectedParameter)
+        );
 
     /// <summary>
     /// An SCL Sequence should have a final return type of Unit. Try wrapping your sequence with 'Print'.
     /// </summary>
     public static readonly ErrorCode
-        UnitExpected = new(nameof(
-                               UnitExpected));
+        UnitExpected = new(
+            nameof(
+                UnitExpected)
+        );
 
     /// <summary>
     /// Unknown Error: '{0}'
     /// </summary>
     public static readonly ErrorCode
-        Unknown = new(nameof(
-                          Unknown));
+        Unknown = new(
+            nameof(
+                Unknown)
+        );
 
     /// <summary>
     /// {0} expected {1} for parameter {2} but {3} is {4}
@@ -344,8 +430,16 @@ public sealed record ErrorCode : ErrorCodeBase
     /// Variable '{0}' does not have type '{1}'.
     /// </summary>
     public static readonly ErrorCode
-        WrongVariableType = new(nameof(
-                                    WrongVariableType));
+        WrongVariableType = new(
+            nameof(
+                WrongVariableType)
+        );
+
+    /// <summary>
+    /// Schema Property '{0}' cannot have {1} value '{2}' and '{3}'
+    /// </summary>
+    public static readonly ErrorCode
+        CannotCombineSchemaProperties = new(nameof(CannotCombineSchemaProperties));
 
     /// <summary>
     /// The automatic variable was not set.

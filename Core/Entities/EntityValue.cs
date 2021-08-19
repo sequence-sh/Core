@@ -72,7 +72,8 @@ public abstract record EntityValue(object? ObjectValue)
         }
 
         /// <inheritdoc />
-        public override Maybe<SchemaProperty> CreateSchemaProperty()
+        public override Result<Maybe<SchemaProperty>, IErrorBuilder> TryCreateSchemaProperty(
+            string propertyName)
         {
             return Maybe<SchemaProperty>.None;
         }
@@ -196,12 +197,16 @@ public abstract record EntityValue(object? ObjectValue)
         }
 
         /// <inheritdoc />
-        public override Maybe<SchemaProperty> CreateSchemaProperty()
+        public override Result<Maybe<SchemaProperty>, IErrorBuilder> TryCreateSchemaProperty(
+            string propertyName)
         {
-            return new SchemaProperty
-            {
-                Type = SCLType.String, Multiplicity = Multiplicity.ExactlyOne
-            };
+            return Maybe<SchemaProperty>.From(
+                    new SchemaProperty
+                    {
+                        Type = SCLType.String, Multiplicity = Multiplicity.ExactlyOne
+                    }
+                )
+                ;
         }
     }
 
@@ -250,12 +255,15 @@ public abstract record EntityValue(object? ObjectValue)
         }
 
         /// <inheritdoc />
-        public override Maybe<SchemaProperty> CreateSchemaProperty()
+        public override Result<Maybe<SchemaProperty>, IErrorBuilder> TryCreateSchemaProperty(
+            string propertyName)
         {
-            return new SchemaProperty
-            {
-                Type = SCLType.Integer, Multiplicity = Multiplicity.ExactlyOne
-            };
+            return Maybe<SchemaProperty>.From(
+                new SchemaProperty
+                {
+                    Type = SCLType.Integer, Multiplicity = Multiplicity.ExactlyOne
+                }
+            );
         }
     }
 
@@ -301,12 +309,12 @@ public abstract record EntityValue(object? ObjectValue)
         }
 
         /// <inheritdoc />
-        public override Maybe<SchemaProperty> CreateSchemaProperty()
+        public override Result<Maybe<SchemaProperty>, IErrorBuilder> TryCreateSchemaProperty(
+            string propertyName)
         {
-            return new SchemaProperty
-            {
-                Type = SCLType.Double, Multiplicity = Multiplicity.ExactlyOne
-            };
+            return Maybe<SchemaProperty>.From(
+                new SchemaProperty { Type = SCLType.Double, Multiplicity = Multiplicity.ExactlyOne }
+            );
         }
     }
 
@@ -351,12 +359,12 @@ public abstract record EntityValue(object? ObjectValue)
         }
 
         /// <inheritdoc />
-        public override Maybe<SchemaProperty> CreateSchemaProperty()
+        public override Result<Maybe<SchemaProperty>, IErrorBuilder> TryCreateSchemaProperty(
+            string propertyName)
         {
-            return new SchemaProperty
-            {
-                Type = SCLType.Bool, Multiplicity = Multiplicity.ExactlyOne
-            };
+            return Maybe<SchemaProperty>.From(
+                new SchemaProperty { Type = SCLType.Bool, Multiplicity = Multiplicity.ExactlyOne }
+            );
         }
     } //TODO constant values
 
@@ -422,14 +430,17 @@ public abstract record EntityValue(object? ObjectValue)
         }
 
         /// <inheritdoc />
-        public override Maybe<SchemaProperty> CreateSchemaProperty()
+        public override Result<Maybe<SchemaProperty>, IErrorBuilder> TryCreateSchemaProperty(
+            string propertyName)
         {
-            return new SchemaProperty
-            {
-                Type         = SCLType.Enum,
-                Multiplicity = Multiplicity.ExactlyOne,
-                EnumType     = Value.Type
-            };
+            return Maybe<SchemaProperty>.From(
+                new SchemaProperty
+                {
+                    Type         = SCLType.Enum,
+                    Multiplicity = Multiplicity.ExactlyOne,
+                    EnumType     = Value.Type
+                }
+            );
         }
     }
 
@@ -487,14 +498,17 @@ public abstract record EntityValue(object? ObjectValue)
         }
 
         /// <inheritdoc />
-        public override Maybe<SchemaProperty> CreateSchemaProperty()
+        public override Result<Maybe<SchemaProperty>, IErrorBuilder> TryCreateSchemaProperty(
+            string propertyName)
         {
-            return new SchemaProperty
-            {
-                Type             = SCLType.Date,
-                Multiplicity     = Multiplicity.ExactlyOne,
-                DateOutputFormat = DateOutputFormat
-            };
+            return Maybe<SchemaProperty>.From(
+                new SchemaProperty
+                {
+                    Type             = SCLType.Date,
+                    Multiplicity     = Multiplicity.ExactlyOne,
+                    DateOutputFormat = DateOutputFormat
+                }
+            );
         }
     }
 
@@ -542,12 +556,15 @@ public abstract record EntityValue(object? ObjectValue)
         }
 
         /// <inheritdoc />
-        public override Maybe<SchemaProperty> CreateSchemaProperty()
+        public override Result<Maybe<SchemaProperty>, IErrorBuilder> TryCreateSchemaProperty(
+            string propertyName)
         {
-            return new SchemaProperty
-            {
-                Type = SCLType.Entity, Multiplicity = Multiplicity.ExactlyOne,
-            };
+            return Maybe<SchemaProperty>.From(
+                new SchemaProperty
+                {
+                    Type = SCLType.Entity, Multiplicity = Multiplicity.ExactlyOne,
+                }
+            );
         }
     }
 
@@ -596,9 +613,16 @@ public abstract record EntityValue(object? ObjectValue)
         }
 
         /// <inheritdoc />
-        public override Maybe<SchemaProperty> CreateSchemaProperty()
+        public override Result<Maybe<SchemaProperty>, IErrorBuilder> TryCreateSchemaProperty(
+            string propertyName)
         {
-            return SchemaProperty.Combine(Value.Select(x => x.CreateSchemaProperty()), Value.Count);
+            var members = Value.Select(x => x.TryCreateSchemaProperty(propertyName))
+                .Combine(ErrorBuilderList.Combine);
+
+            if (members.IsFailure)
+                return members.ConvertFailure<Maybe<SchemaProperty>>();
+
+            return SchemaProperty.Combine(propertyName, members.Value, Value.Count);
         }
 
         /// <inheritdoc />
@@ -924,7 +948,8 @@ public abstract record EntityValue(object? ObjectValue)
     /// Create a schema property that could contain this entity value
     /// </summary>
     /// <returns></returns>
-    public abstract Maybe<SchemaProperty> CreateSchemaProperty();
+    public abstract Result<Maybe<SchemaProperty>, IErrorBuilder> TryCreateSchemaProperty(
+        string propertyName);
 
     /// <summary>
     /// If this is a primitive, get a string representation
@@ -1040,7 +1065,7 @@ public abstract record EntityValue(object? ObjectValue)
 
                 if (value.IsSuccess)
                 {
-                    var methodName = $"FromT{0}";
+                    var methodName = $"FromT{i}";
 
                     var method = type.GetMethod(
                         methodName,

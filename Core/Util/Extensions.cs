@@ -4,8 +4,6 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Reflection;
 using CSharpFunctionalExtensions;
-using Reductech.EDR.Core.Entities;
-using Reductech.EDR.Core.Enums;
 
 namespace Reductech.EDR.Core.Util
 {
@@ -28,15 +26,6 @@ public static class Extensions
         var message = $"{exception.Message}\r\n{innerMessage}";
 
         return message;
-    }
-
-    /// <summary>
-    /// Returns this schema with the given ErrorBehaviour
-    /// </summary>
-    public static Schema WithErrorBehavior(this Schema schema, ErrorBehavior eb)
-    {
-        schema.DefaultErrorBehavior = eb;
-        return schema;
     }
 
     /// <summary>

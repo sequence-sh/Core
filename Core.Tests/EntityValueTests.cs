@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Threading;
 using AutoTheory;
@@ -190,10 +191,10 @@ public partial class EntityValueTests
 
             var schema = new Schema()
             {
-                Properties = new Dictionary<string, SchemaProperty>()
-                {
-                    { myProp, schemaProperty }
-                }
+                Properties = ImmutableSortedDictionary<string, SchemaProperty>.Empty.Add(
+                    myProp,
+                    schemaProperty
+                )
             };
 
             var convertResult = entityValue.TryConvert(
