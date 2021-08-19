@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -72,7 +73,7 @@ public sealed class CreateSchema : CompoundStep<Entity>
 
         var result = pairs
             .Select(x => x.Value)
-            .GroupBy(x => x.Key, x => x.Value)
+            .GroupBy(x => x.Key, x => x.Value, StringComparer.OrdinalIgnoreCase)
             .Select(x => (x.Key, prop: SchemaProperty.Combine(x.Key, x, entities.Count)))
             .ToList();
 

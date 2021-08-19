@@ -21,7 +21,7 @@ public partial class CreateSchemaTests : StepTestBase<CreateSchema, Entity>
                 new CreateSchema()
                 {
                     SchemaName = Constant("Test Schema"),
-                    Entities   = Array(Entity.Create(("StringProp1", "abc"), ("IntProp", 123)))
+                    Entities   = Array(Entity.Create(("StringProp1", "abc"), ("IntProp1", 123)))
                 },
                 new Schema()
                 {
@@ -38,10 +38,91 @@ public partial class CreateSchemaTests : StepTestBase<CreateSchema, Entity>
                                 }
                             },
                             {
-                                "IntProp",
+                                "IntProp1",
                                 new SchemaProperty()
                                 {
                                     Type         = SCLType.Integer,
+                                    Multiplicity = Multiplicity.ExactlyOne
+                                }
+                            },
+                        }.ToImmutableSortedDictionary(),
+                    ExtraProperties = ExtraPropertyBehavior.Fail
+                }.ConvertToEntity()
+            );
+
+            yield return new StepCase(
+                "Create Schema from multiple entities",
+                new CreateSchema()
+                {
+                    SchemaName = Constant("Test Schema"),
+                    Entities = Array(
+                        Entity.Create(("StringProp1", "abc"), ("IntProp1", 123)),
+                        Entity.Create(("StringProp1", "def"), ("intProp1", 456)),
+                        Entity.Create(("StringProp1", "def"), ("IntProp2", 123))
+                    )
+                },
+                new Schema()
+                {
+                    Name = "Test Schema",
+                    Properties =
+                        new Dictionary<string, SchemaProperty>()
+                        {
+                            {
+                                "StringProp1",
+                                new SchemaProperty()
+                                {
+                                    Type         = SCLType.String,
+                                    Multiplicity = Multiplicity.ExactlyOne
+                                }
+                            },
+                            {
+                                "IntProp1",
+                                new SchemaProperty()
+                                {
+                                    Type = SCLType.Integer, Multiplicity = Multiplicity.UpToOne
+                                }
+                            },
+                            {
+                                "IntProp2",
+                                new SchemaProperty()
+                                {
+                                    Type = SCLType.Integer, Multiplicity = Multiplicity.UpToOne
+                                }
+                            },
+                        }.ToImmutableSortedDictionary(),
+                    ExtraProperties = ExtraPropertyBehavior.Fail
+                }.ConvertToEntity()
+            );
+
+            yield return new StepCase(
+                "Create Schema from multiple entities with competing properties",
+                new CreateSchema()
+                {
+                    SchemaName = Constant("Test Schema"),
+                    Entities = Array(
+                        Entity.Create(("StringProp1", "abc"), ("NumProp1", 123)),
+                        Entity.Create(("StringProp1", "def"), ("numProp1", 45.6))
+                    )
+                },
+                new Schema()
+                {
+                    Name = "Test Schema",
+                    Properties =
+                        new Dictionary<string, SchemaProperty>()
+                        {
+                            {
+                                "NumProp1",
+                                new SchemaProperty()
+                                {
+                                    Type         = SCLType.Double,
+                                    Multiplicity = Multiplicity.ExactlyOne
+                                }
+                            },
+                            {
+                                "StringProp1",
+                                new SchemaProperty()
+                                {
+                                    Type         = SCLType.String,
                                     Multiplicity = Multiplicity.ExactlyOne
                                 }
                             },

@@ -136,7 +136,7 @@ public sealed record SchemaProperty
             SchemaProperty p1,
             SchemaProperty p2)
         {
-            var combineResult = TryCombine(propertyName, nameof(Type), p1.Type, p2.Type)
+            var combineResult = TryCombineTypes(propertyName, nameof(Type), p1.Type, p2.Type)
                 .Compose(
                     () => TryCombine(propertyName, nameof(EnumType), p1.EnumType, p2.EnumType),
                     () => TryCombine(
@@ -168,6 +168,25 @@ public sealed record SchemaProperty
                 DateInputFormats = CombineLists(p1.DateInputFormats, p2.DateInputFormats),
                 Values           = CombineLists(p1.Values,           p2.Values)
             };
+
+            static Result<SCLType, IErrorBuilder> TryCombineTypes(
+                string propertyName,
+                string propertyPropertyName,
+                SCLType t1,
+                SCLType t2)
+            {
+                if (t1 == t2)
+                    return t1;
+
+                if (t1 == SCLType.String || t2 == SCLType.String)
+                    return SCLType.String;
+
+                if (t1 == SCLType.Integer && t2 == SCLType.Double
+                 || t2 == SCLType.Integer && t1 == SCLType.Double)
+                    return SCLType.Double;
+
+                return SCLType.String; //Default value
+            }
 
             static Result<T, IErrorBuilder> TryCombine<T>(
                 string propertyName,
