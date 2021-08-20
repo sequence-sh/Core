@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.Util;
 
 namespace Reductech.EDR.Core.Internal.Serialization
@@ -63,7 +65,6 @@ public static class SerializationMethods
     /// <summary>
     /// Serialize this entity.
     /// </summary>
-    /// <returns></returns>
     public static string Serialize(this Entity entity)
     {
         var sb = new StringBuilder();
@@ -82,6 +83,118 @@ public static class SerializationMethods
         var result = sb.ToString();
 
         return result;
+    }
+
+    /// <summary>
+    /// Format this entity as a multiline indented string
+    /// </summary>
+    public static string Format(this Entity entity)
+    {
+        var sb = new StringBuilder();
+        FormatEntity(entity, sb, 0, null, null);
+        return sb.ToString();
+
+        static void FormatEntityValue(
+            StringBuilder sb,
+            int indentation,
+            EntityValue ev,
+            string? prefix,
+            string? suffix)
+        {
+            if (ev is EntityValue.NestedEntity nestedEntity)
+            {
+                FormatEntity(
+                    nestedEntity.Value,
+                    sb,
+                    indentation,
+                    prefix,
+                    suffix
+                );
+            }
+            else if (ev is EntityValue.NestedList nestedList)
+            {
+                if (nestedList.Value.Any(
+                    x => x is EntityValue.NestedEntity || x is EntityValue.NestedList
+                ))
+                {
+                    AppendLineIndented(
+                        sb,
+                        indentation,
+                        prefix + "["
+                    );
+
+                    indentation++;
+
+                    for (var index = 0; index < nestedList.Value.Count; index++)
+                    {
+                        var entityValue = nestedList.Value[index];
+                        var maybeComma  = index < nestedList.Value.Count - 1 ? "," : null;
+
+                        FormatEntityValue(
+                            sb,
+                            indentation,
+                            entityValue,
+                            null,
+                            maybeComma
+                        );
+                    }
+
+                    indentation--;
+                    AppendLineIndented(sb, indentation, "]" + suffix);
+                }
+                else
+                {
+                    var line = "[" + string.Join(", ", nestedList.Value.Select(x => x.Serialize()))
+                                   + "]";
+
+                    AppendLineIndented(
+                        sb,
+                        indentation,
+                        prefix + line + suffix
+                    );
+                }
+            }
+            else
+            {
+                AppendLineIndented(
+                    sb,
+                    indentation,
+                    prefix + ev.Serialize() + suffix
+                );
+            }
+        }
+
+        static void FormatEntity(
+            Entity entity,
+            StringBuilder sb,
+            int indentation,
+            string? prefix,
+            string? suffix)
+        {
+            AppendLineIndented(sb, indentation, prefix + "(");
+
+            indentation++;
+
+            foreach (var property in entity)
+            {
+                FormatEntityValue(
+                    sb,
+                    indentation,
+                    property.BestValue,
+                    $"'{property.Name}': ",
+                    null
+                );
+            }
+
+            indentation--;
+            AppendLineIndented(sb, indentation, ")" + suffix);
+        }
+
+        static void AppendLineIndented(StringBuilder sb, int indentation, string value)
+        {
+            sb.Append('\t', indentation);
+            sb.AppendLine(value);
+        }
     }
 
     /// <summary>
