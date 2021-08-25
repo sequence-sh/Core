@@ -16,6 +16,8 @@ namespace Reductech.EDR.Core.Steps
 /// If no date is specified, returns the current time.
 /// </summary>
 [Alias("ConvertStringToDate")]
+[Alias("ToDate")]
+[SCLExample("StringToDate '2020/10/20 20:30:40'", "2020-10-20T20:30:40.0000000")]
 public sealed class StringToDate : CompoundStep<DateTime>
 {
     /// <summary>
