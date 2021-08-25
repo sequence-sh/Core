@@ -56,6 +56,15 @@ public record ErrorBuilder(ErrorCodeBase ErrorCode, ErrorData Data) : IErrorBuil
     [Pure]
     public SingleError WithLocationSingle(ErrorLocation location) => new(location, this);
 
+    /// <summary>
+    /// Returns a SingleError with the given location.
+    /// </summary>
+    [Pure]
+    public SingleError WithLocationSingle(IStep step) => new(
+        new ErrorLocation(step.Name, step.TextLocation),
+        this
+    );
+
     /// <inheritdoc />
     public string AsString => Data.AsString(ErrorCode);
 
