@@ -17,6 +17,8 @@ namespace Reductech.EDR.Core.Steps
 /// Gets the value of a property from an entity
 /// </summary>
 [Alias("From")]
+[SCLExample("(foo: 123)['foo']",            expectedOutput: "123")]
+[SCLExample("(foo: (bar: 123))['foo.bar']", expectedOutput: "123")]
 public sealed class EntityGetValue<T> : CompoundStep<T>
 {
     /// <inheritdoc />
