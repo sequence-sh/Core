@@ -105,7 +105,9 @@ public class StepWrapper : IDocumentedStep
             var explanation = Required
                 ? null
                 : //Required properties should not have a default value
-                propertyInfo.GetCustomAttribute<DefaultValueExplanationAttribute>()?.Explanation;
+                propertyInfo.GetCustomAttributes<DefaultValueExplanationAttribute>()
+                    .FirstOrDefault()
+                    ?.Explanation;
 
             var extraFields = new Dictionary<string, string>();
 

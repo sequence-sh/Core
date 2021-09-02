@@ -136,17 +136,7 @@ public abstract partial class StepTestBase<TStep, TOutput> : IStepTestBase
 
             var defaultValue = propertyInfo.GetValue(instance);
 
-            if (required)
-            {
-                if (hasDefaultAttribute)
-                    errors.Add(
-                        $"{propName} has both required and defaultValueExplanation attributes"
-                    );
-
-                if (defaultValue != null && !(defaultValue is VariableName vn && vn == default))
-                    errors.Add($"{propName} is required but it has a default value");
-            }
-            else if (hasDefaultAttribute)
+            if (hasDefaultAttribute)
             {
                 if (defaultValue == null
                  && propertyInfo.ToContextualProperty().Nullability != Nullability.Nullable)
@@ -156,10 +146,31 @@ public abstract partial class StepTestBase<TStep, TOutput> : IStepTestBase
             }
             else
             {
-                errors.Add(
-                    $"{propName} has neither required nor defaultValueExplanation attributes"
-                );
+                if (required)
+                {
+                    if (defaultValue != null && !(defaultValue is VariableName vn && vn == default))
+                        errors.Add($"{propName} is required but it has a default value");
+                }
+                else
+                {
+                    errors.Add(
+                        $"{propName} has neither required nor defaultValueExplanation attributes"
+                    );
+                }
             }
+
+            //if (required)
+            //{
+            //    if (hasDefaultAttribute)
+            //        errors.Add(
+            //            $"{propName} has both required and defaultValueExplanation attributes"
+            //        );
+
+            //}
+            //else
+            //{
+
+            //}
         }
 
         if (errors.Any())
