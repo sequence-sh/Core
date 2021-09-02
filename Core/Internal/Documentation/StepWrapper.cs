@@ -203,7 +203,7 @@ public class StepWrapper : IDocumentedStep
             MemberInfo propertyInfo,
             Func<T, string> getAttributeText) where T : Attribute
         {
-            var t = propertyInfo.GetCustomAttribute<T>();
+            var t = propertyInfo.GetCustomAttributes<T>().FirstOrDefault();
 
             if (t == null)
                 return;
