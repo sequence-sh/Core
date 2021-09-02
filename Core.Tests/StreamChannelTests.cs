@@ -65,10 +65,13 @@ public partial class StreamChannelTests
 
         allText.Should()
             .BeEquivalentTo(
-                ("Hello", StreamReaderSource.StreamReaderOne),
-                ("World", StreamReaderSource.StreamReaderOne),
-                ("Goodbye", StreamReaderSource.StreamReaderTwo),
-                ("Earth", StreamReaderSource.StreamReaderTwo)
+                new[]
+                {
+                    ("Hello", StreamReaderSource.StreamReaderOne),
+                    ("World", StreamReaderSource.StreamReaderOne),
+                    ("Goodbye", StreamReaderSource.StreamReaderTwo),
+                    ("Earth", StreamReaderSource.StreamReaderTwo)
+                }
             );
     }
 

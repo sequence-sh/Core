@@ -21,7 +21,7 @@ public abstract partial class StepTestBase<TStep, TOutput>
         CreateStepsWithFailStepsAsValues(object? defaultVariableValue)
     {
         var allProperties = typeof(TStep).GetProperties()
-            .Where(x => x.IsDecoratedWith<StepPropertyBaseAttribute>())
+            .Where(x => x.GetCustomAttribute<StepPropertyBaseAttribute>() is not null)
             .OrderBy(x => x.Name)
             .ToList();
 

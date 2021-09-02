@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
@@ -160,7 +161,13 @@ public partial class RunErrorTests
 
             r.IsFailure.Should().BeTrue("Step should have failed");
 
-            r.Error.GetAllErrors().Should().BeEquivalentTo(ExpectedErrors.GetAllErrors());
+            r.Error.GetAllErrors()
+                .Select(x => (x.ErrorBuilder.ErrorCode, x.Location, x.Message))
+                .Should()
+                .BeEquivalentTo(
+                    ExpectedErrors.GetAllErrors()
+                        .Select(x => (x.ErrorBuilder.ErrorCode, x.Location, x.Message))
+                );
         }
 
         /// <inheritdoc />
