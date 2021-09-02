@@ -77,7 +77,7 @@ public partial class StepHelpersTest
         one.Should().Be(1);
         two.Should().Be(2);
         three.Should().Be(3);
-        fourFiveSix.Should().BeEquivalentTo(4, 5, 6);
+        fourFiveSix.Should().BeEquivalentTo(new[] { 4, 5, 6 });
         nullInt.ShouldHaveNoValue();
     }
 }

@@ -87,7 +87,7 @@ public abstract partial class StepTestBase<TStep, TOutput> : IStepTestBase
         foreach (var (propertyInfo, attribute) in properties)
         {
             var propName = $"{typeof(TStep).GetDisplayName()}.{propertyInfo.Name}";
-            var required = propertyInfo.IsDecoratedWith<RequiredAttribute>();
+            var required = propertyInfo.GetCustomAttribute<RequiredAttribute>() is not null;
 
             if (required)
             {
@@ -116,14 +116,14 @@ public abstract partial class StepTestBase<TStep, TOutput> : IStepTestBase
         var errors   = new List<string>();
 
         foreach (var propertyInfo in typeof(TStep).GetProperties()
-            .Where(x => x.IsDecoratedWith<StepPropertyBaseAttribute>()))
+            .Where(x => x.GetCustomAttribute<StepPropertyBaseAttribute>() is not null))
         {
             var propName = $"{typeof(TStep).GetDisplayName()}.{propertyInfo.Name}";
 
-            var required = propertyInfo.IsDecoratedWith<RequiredAttribute>();
+            var required = propertyInfo.GetCustomAttribute<RequiredAttribute>() is not null;
 
             var hasDefaultAttribute =
-                propertyInfo.IsDecoratedWith<DefaultValueExplanationAttribute>();
+                propertyInfo.GetCustomAttribute<DefaultValueExplanationAttribute>() is not null;
 
             if (propertyInfo.SetMethod == null || !propertyInfo.SetMethod.IsPublic)
                 errors.Add($"{propName} has no public setter");

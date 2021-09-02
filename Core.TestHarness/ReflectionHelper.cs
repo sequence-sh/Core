@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using FluentAssertions.Common;
 using Namotion.Reflection;
 using OneOf;
 using Reductech.EDR.Core.Attributes;
@@ -174,16 +173,16 @@ public abstract partial class StepTestBase<TStep, TOutput>
     {
         var actions = new List<Func<PropertyInfo, T>>();
 
-        if (stepPropertyInfo.IsDecoratedWith<VariableNameAttribute>())
+        if (stepPropertyInfo.GetCustomAttribute<VariableNameAttribute>() is not null)
             actions.Add(variableNameAction);
 
-        if (stepPropertyInfo.IsDecoratedWith<StepPropertyAttribute>())
+        if (stepPropertyInfo.GetCustomAttribute<StepPropertyAttribute>() is not null)
             actions.Add(stepPropertyAction);
 
-        if (stepPropertyInfo.IsDecoratedWith<StepListPropertyAttribute>())
+        if (stepPropertyInfo.GetCustomAttribute<StepListPropertyAttribute>() is not null)
             actions.Add(stepListAction);
 
-        if (stepPropertyInfo.IsDecoratedWith<FunctionPropertyAttribute>())
+        if (stepPropertyInfo.GetCustomAttribute<FunctionPropertyAttribute>() is not null)
             actions.Add(lambdaAction);
 
         return actions.Count switch
