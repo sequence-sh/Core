@@ -59,12 +59,12 @@
 
   <ItemGroup>
     <PackageReference Include="Antlr4.Runtime.Standard" Version="4.9.2" />
-    <PackageReference Include="Antlr4BuildTasks" Version="8.14.0" />
+    <PackageReference Include="Antlr4BuildTasks" Version="8.15.0" />
     <PackageReference Include="CSharpFunctionalExtensions" Version="2.20.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="5.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="5.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="5.0.0" />
-    <PackageReference Include="Namotion.Reflection" Version="1.0.23" />
+    <PackageReference Include="Namotion.Reflection" Version="2.0.3" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="OneOf" Version="3.0.190" />
     <PackageReference Include="Reductech.EDR.ConnectorManager.Base" Version="0.3.0" />
