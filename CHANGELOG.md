@@ -6,6 +6,15 @@
 
 - Added new lambda syntax for steps which take a function as a parameter.
 
+  Instead of writing `Foreach [1,2,3] (Log <x>) <x>` you now write `Foreach [1,2,3] (<x> => Log <x>) ` or `Foreach [1,2,3] (Log <>) `
+
+- Allowed Step Parameters to be Discriminated Unions. This allows a parameter to be e.g. either a name or an Id.
+
+- When accessing entity properties you can now use a dot to indicate a nested property
+
+  Instead of `(a:(b: 1))['a']['b']` you can now write `(a:(b: 1))['a.b']`
+
+
 ## Issues Closed in this Release
 
 ### New Features
@@ -13,14 +22,14 @@
 - Add Replace parameter to RegexReplace #295
 - Add a shorthand notation for accessing entity properties #300
 - Create a FormatEntity step which takes an entity and returns a nicely formatted string #318
-- Add a step to create a Schema from an Array<Entity> #317
+- Add a step to create a Schema from an `Array of Entity` #317
 - Allow discriminated unions as step parameters #312
-- Add ArrayFirst and ArrayLast steps #302
-- Create an EntityGetProperties step to return the names of all entity properties #274
-- Add a way to use EntityGetValue when the key contains a dot #307
-- Align GetDocumentation output with the current documentation #293
+- Add `ArrayFirst` and `ArrayLast` steps #302
+- Create an `EntityGetProperties` step to return the names of all entity properties #274
+- Add a way to use `EntityGetValue` when the key contains a dot #307
+- Align `GetDocumentation` output with the current documentation #293
 - Add step SCL examples to the documentation #294
-- Add parameter position to output of GetDocumentation #296
+- Add parameter position to output of `GetDocumentation` #296
 - Formally use lambda functions for 'linq' steps #291
 
 ### Bug Fixes
