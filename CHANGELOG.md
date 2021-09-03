@@ -14,7 +14,6 @@
 
   Instead of `(a:(b: 1))['a']['b']` you can now write `(a:(b: 1))['a.b']`
 
-
 ## Issues Closed in this Release
 
 ### New Features
