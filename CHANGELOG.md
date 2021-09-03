@@ -1,3 +1,55 @@
+# v0.11.0 (2021-09-03)
+
+## Summary of Changes
+
+### Sequence Configuration Language
+
+- Added new lambda syntax for steps which take a function as a parameter.
+
+  Instead of writing `Foreach [1,2,3] (Log <x>) <x>` you now write `Foreach [1,2,3] (<x> => Log <x>) ` or `Foreach [1,2,3] (Log <>) `
+
+- Allowed Step Parameters to be Discriminated Unions. This allows a parameter to be e.g. either a name or an Id.
+
+- When accessing entity properties you can now use a dot to indicate a nested property
+
+  Instead of `(a:(b: 1))['a']['b']` you can now write `(a:(b: 1))['a.b']`
+
+## Issues Closed in this Release
+
+### New Features
+
+- Add Replace parameter to RegexReplace #295
+- Add a shorthand notation for accessing entity properties #300
+- Create a FormatEntity step which takes an entity and returns a nicely formatted string #318
+- Add a step to create a Schema from an `Array of Entity` #317
+- Allow discriminated unions as step parameters #312
+- Add `ArrayFirst` and `ArrayLast` steps #302
+- Create an `EntityGetProperties` step to return the names of all entity properties #274
+- Add a way to use `EntityGetValue` when the key contains a dot #307
+- Align `GetDocumentation` output with the current documentation #293
+- Add step SCL examples to the documentation #294
+- Add parameter position to output of `GetDocumentation` #296
+- Formally use lambda functions for 'linq' steps #291
+
+### Bug Fixes
+
+- Creating a step wrapper throws an exception for some steps #321
+- Setting a OneOf parameter to a variable which was set from an entity value causes an error #315
+- Setting a variable to a property of an entity does not always convert the type correctly #311
+- ResultFailureException in NullableStepWrapper #309
+- Verify Method does not have a Switch Label for Lambda Functions #306
+- GetDocumentation enums directory should be enums #292
+
+### Maintenance
+
+- Step properties should be allowed to be both Required and having a default value #322
+- Change Entity Serialization so that property names are quoted #316
+- WrapStep should take IRunnableStep not IStep #314
+- Allow Step Parameters to be discriminated unions of arrays #313
+- Add more step wrappers and step helper functions #310
+- Create Helper methods to evaluate step parameters to reduce boiler plate code #308
+- RequiredVersionAttribute should check the version of other software, not the connector #304
+
 # v0.10.0 (2021-07-02)
 
 ## Summary of Changes
