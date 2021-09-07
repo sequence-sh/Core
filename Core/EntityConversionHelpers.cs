@@ -32,12 +32,14 @@ public static class EntityConversionHelpers
                 entity,
                 Formatting.None,
                 EntityJsonConverter.Instance,
+                RequirementConverter.Instance,
                 new VersionConverter()
             );
 
             var obj = JsonConvert.DeserializeObject<T>(
                 json,
                 EntityJsonConverter.Instance,
+                RequirementConverter.Instance,
                 new VersionConverter()
             );
 
