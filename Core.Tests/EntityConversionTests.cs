@@ -59,6 +59,10 @@ public class EntityConversionTests
         var s = entity.ToString();
 
         s.Should().Be(TestConfigurationString);
+
+        var config = EntityConversionHelpers.TryCreateFromEntity<Configuration>(entity);
+        config.ShouldBeSuccessful();
+        config.Value.ConvertToEntity().Should().BeEquivalentTo(entity);
     }
 
     [Fact]
@@ -69,6 +73,9 @@ public class EntityConversionTests
         var s = entity.ToString();
 
         s.Should().Be(TestConfiguration2String);
+
+        var config = EntityConversionHelpers.TryCreateFromEntity<Configuration>(entity);
+        config.ShouldBeSuccessful();
     }
 
     private static Entity CreateEntityFromString(string s)
