@@ -8,6 +8,17 @@ namespace Reductech.EDR.Core.Internal
 {
 
 /// <summary>
+/// Information about how this step was passed
+/// </summary>
+public sealed record StepMetadata(bool PassedAsInfix, bool Bracketed)
+{
+    /// <summary>
+    /// Default Step Metadata
+    /// </summary>
+    public static readonly StepMetadata Default = new(false, false);
+}
+
+/// <summary>
 /// Any member of a step.
 /// </summary>
 public abstract record FreezableStepProperty(TextLocation Location)
@@ -16,6 +27,11 @@ public abstract record FreezableStepProperty(TextLocation Location)
     /// The member type of this Step Member.
     /// </summary>
     public abstract MemberType MemberType { get; }
+
+    /// <summary>
+    /// Information about how this step was passed
+    /// </summary>
+    public StepMetadata StepMetadata { get; init; } = StepMetadata.Default;
 
     /// <summary>
     /// Gets the stepMember if it is a Variable.
@@ -66,6 +82,12 @@ public abstract record FreezableStepProperty(TextLocation Location)
     }
 
     /// <summary>
+    /// Move named arguments up a level if necessary
+    /// </summary>
+    public abstract Result<FreezableStepProperty, IError> ReorganizeNamedArguments(
+        StepFactoryStore stepFactoryStore);
+
+    /// <summary>
     /// A variable name member
     /// </summary>
     public sealed record Variable
@@ -81,6 +103,13 @@ public abstract record FreezableStepProperty(TextLocation Location)
         public override IFreezableStep ConvertToStep()
         {
             return FreezableFactory.CreateFreezableGetVariable(VName, Location);
+        }
+
+        /// <inheritdoc />
+        public override Result<FreezableStepProperty, IError> ReorganizeNamedArguments(
+            StepFactoryStore stepFactoryStore)
+        {
+            return this;
         }
 
         /// <inheritdoc />
@@ -114,6 +143,18 @@ public abstract record FreezableStepProperty(TextLocation Location)
         {
             return this;
         }
+
+        /// <inheritdoc />
+        public override Result<FreezableStepProperty, IError> ReorganizeNamedArguments(
+            StepFactoryStore stepFactoryStore)
+        {
+            var r = FreezableStep.ReorganizeNamedArguments(stepFactoryStore);
+
+            if (r.IsFailure)
+                return r.ConvertFailure<FreezableStepProperty>();
+
+            return this with { FreezableStep = r.Value };
+        }
     }
 
     /// <summary>
@@ -129,6 +170,18 @@ public abstract record FreezableStepProperty(TextLocation Location)
         public override IFreezableStep ConvertToStep()
         {
             return FreezableStep;
+        }
+
+        /// <inheritdoc />
+        public override Result<FreezableStepProperty, IError> ReorganizeNamedArguments(
+            StepFactoryStore stepFactoryStore)
+        {
+            var r = FreezableStep.ReorganizeNamedArguments(stepFactoryStore);
+
+            if (r.IsFailure)
+                return r.ConvertFailure<FreezableStepProperty>();
+
+            return this with { FreezableStep = r.Value };
         }
     }
 
@@ -174,6 +227,20 @@ public abstract record FreezableStepProperty(TextLocation Location)
         public override int GetHashCode()
         {
             return List.Count;
+        }
+
+        /// <inheritdoc />
+        public override Result<FreezableStepProperty, IError> ReorganizeNamedArguments(
+            StepFactoryStore stepFactoryStore)
+        {
+            var r = List.Select(x => x.ReorganizeNamedArguments(stepFactoryStore))
+                .Combine(ErrorList.Combine)
+                .Map(x => x.ToImmutableList());
+
+            if (r.IsFailure)
+                return r.ConvertFailure<FreezableStepProperty>();
+
+            return this with { List = r.Value };
         }
     }
 }

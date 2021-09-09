@@ -16,27 +16,8 @@ namespace Reductech.EDR.Core.Internal
 /// <summary>
 /// The data used by a Freezable Step.
 /// </summary>
-public sealed class FreezableStepData
+public sealed record FreezableStepData(StepParameterDict StepProperties, TextLocation Location)
 {
-    /// <summary>
-    /// Creates a new FreezableStepData
-    /// </summary>
-    public FreezableStepData(StepParameterDict stepProperties, TextLocation location)
-    {
-        StepProperties = stepProperties;
-        Location       = location;
-    }
-
-    /// <summary>
-    /// The step properties.
-    /// </summary>
-    public StepParameterDict StepProperties { get; }
-
-    /// <summary>
-    /// The location where this data comes from.
-    /// </summary>
-    public TextLocation Location { get; }
-
     private Result<T, IError> TryGetValue<T>(
         string propertyName,
         Type stepType,

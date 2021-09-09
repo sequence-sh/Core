@@ -578,11 +578,6 @@ Log 'Comments!'",
             );
 
             yield return new DeserializationTestInstance(
-                @"stringcontains stringtocase 'beta' textcase.upper stringtocase 'b' textcase.upper",
-                false
-            );
-
-            yield return new DeserializationTestInstance(
                 @"stringcontains (stringtrim ' abc ') (stringtocase 'b' textcase.upper)",
                 false
             );

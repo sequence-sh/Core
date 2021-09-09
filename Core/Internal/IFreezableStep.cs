@@ -43,19 +43,34 @@ public interface IFreezableStep : IEquatable<IFreezableStep>
         TypeResolver typeResolver);
 
     /// <summary>
+    /// Move named arguments up a level if necessary
+    /// </summary>
+    Result<IFreezableStep, IError> ReorganizeNamedArguments(StepFactoryStore stepFactoryStore);
+
+    /// <summary>
     /// Tries to freeze this step.
     /// </summary>
     public Result<IStep, IError> TryFreeze(
         CallerMetadata callerMetadata,
         StepFactoryStore stepFactoryStore)
     {
+        var thisReorganized = ReorganizeNamedArguments(stepFactoryStore);
+
+        if (thisReorganized.IsFailure)
+            return thisReorganized.ConvertFailure<IStep>();
+
         var typeResolver = TypeResolver
-            .TryCreate(stepFactoryStore, callerMetadata, Maybe<VariableName>.None, this);
+            .TryCreate(
+                stepFactoryStore,
+                callerMetadata,
+                Maybe<VariableName>.None,
+                thisReorganized.Value
+            );
 
         if (typeResolver.IsFailure)
             return typeResolver.ConvertFailure<IStep>();
 
-        var freezeResult = TryFreeze(callerMetadata, typeResolver.Value);
+        var freezeResult = thisReorganized.Value.TryFreeze(callerMetadata, typeResolver.Value);
 
         return freezeResult;
     }

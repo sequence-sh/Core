@@ -87,10 +87,10 @@ public sealed record CompoundFreezableStep(
         if (ReferenceEquals(this, other))
             return true;
 
-        if (other is CompoundFreezableStep fs)
+        if (other is CompoundFreezableStep(var stepName, var freezableStepData, _))
         {
-            return StepName.Equals(fs.StepName, StringComparison.OrdinalIgnoreCase) &&
-                   FreezableStepData.Equals(fs.FreezableStepData);
+            return StepName.Equals(stepName, StringComparison.OrdinalIgnoreCase) &&
+                   FreezableStepData.Equals(freezableStepData);
         }
 
         return false;
@@ -101,6 +101,71 @@ public sealed record CompoundFreezableStep(
         StepName,
         FreezableStepData
     );
+
+    /// <inheritdoc />
+    public Result<IFreezableStep, IError> ReorganizeNamedArguments(
+        StepFactoryStore stepFactoryStore)
+    {
+        var dict   = new Dictionary<StepParameterReference, FreezableStepProperty>();
+        var errors = new List<IError>();
+
+        foreach (var (key, value) in FreezableStepData.StepProperties)
+        {
+            var r = value.ReorganizeNamedArguments(stepFactoryStore);
+
+            if (r.IsFailure)
+                errors.Add(r.Error);
+            else if (
+                !r.Value.StepMetadata.Bracketed &&
+                !r.Value.StepMetadata.PassedAsInfix &&
+                r.Value is FreezableStepProperty.Step(
+                    CompoundFreezableStep(var stepName, var newStepData, var innerTextLocation), var
+                    outerTextLocation) &&
+                stepFactoryStore.Dictionary.TryGetValue(stepName, out var stepFactory)
+            )
+            {
+                var nestedDict = new Dictionary<StepParameterReference, FreezableStepProperty>();
+                var changed    = false;
+
+                foreach (var (stepParameterReference, freezableStepProperty) in newStepData
+                    .StepProperties)
+                {
+                    if (stepParameterReference is StepParameterReference.Named
+                     && !stepFactory.ParameterDictionary.ContainsKey(stepParameterReference))
+                    {
+                        dict.Add(stepParameterReference, freezableStepProperty);
+                    }
+                    else
+                    {
+                        nestedDict.Add(stepParameterReference, freezableStepProperty);
+                        changed = true;
+                    }
+                }
+
+                var newStep = changed
+                    ? new FreezableStepProperty.Step(
+                        new CompoundFreezableStep(
+                            stepName,
+                            newStepData with { StepProperties = nestedDict },
+                            innerTextLocation
+                        ),
+                        outerTextLocation
+                    )
+                    : r.Value;
+
+                dict.Add(key, newStep);
+            }
+            else
+            {
+                dict.Add(key, r.Value);
+            }
+        }
+
+        if (errors.Any())
+            return Result.Failure<IFreezableStep, IError>(ErrorList.Combine(errors));
+
+        return this with { FreezableStepData = FreezableStepData with { StepProperties = dict } };
+    }
 }
 
 }

@@ -246,6 +246,13 @@ public abstract record ConstantFreezableBase<T>
     }
 
     /// <inheritdoc />
+    public Result<IFreezableStep, IError> ReorganizeNamedArguments(
+        StepFactoryStore stepFactoryStore)
+    {
+        return this;
+    }
+
+    /// <inheritdoc />
     public bool Equals(IFreezableStep? other)
     {
         if (other is null)

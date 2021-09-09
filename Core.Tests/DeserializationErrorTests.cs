@@ -82,8 +82,8 @@ public partial class DeserializationErrorTests
 
             yield return new DeserializationErrorCase(
                 "Print (2 + 2",
-                ("Syntax Error: missing ')' at '<EOF>'",
-                 "Line: 1, Col: 12, Idx: 12 - Line: 1, Col: 11, Idx: 11 Text: <EOF>")
+                ("Syntax Error: mismatched input '(' expecting <EOF>",
+                 "Line: 1, Col: 6, Idx: 6 - Line: 1, Col: 6, Idx: 6 Text: (")
             );
 
             yield return new DeserializationErrorCase(
@@ -103,11 +103,8 @@ public partial class DeserializationErrorTests
             yield return new DeserializationErrorCase(
                 "Foreach ['one', 'two') (<Num> => Print <Num>) ", //The ) should be a ]
                 (
-                    @"Syntax Error: extraneous input ')' expecting {'(', '[', ']', ',', AUTOMATICVARIABLE, VARIABLENAME, DATETIME, NUMBER, OPENISTRING, SIMPLEISTRING, DOUBLEQUOTEDSTRING, SINGLEQUOTEDSTRING, TRUE, FALSE, NAME}",
-                    @"Line: 1, Col: 21, Idx: 21 - Line: 1, Col: 21, Idx: 21 Text: )"),
-                (@"Syntax Error: mismatched input '<EOF>' expecting {'(', '[', ']', ',', AUTOMATICVARIABLE, VARIABLENAME, DATETIME, NUMBER, OPENISTRING, SIMPLEISTRING, DOUBLEQUOTEDSTRING, SINGLEQUOTEDSTRING, TRUE, FALSE, NAME}",
-                 @"Line: 1, Col: 46, Idx: 46 - Line: 1, Col: 45, Idx: 45 Text: <EOF>"
-                )
+                    @"Syntax Error: mismatched input '[' expecting <EOF>",
+                    @"Line: 1, Col: 8, Idx: 8 - Line: 1, Col: 8, Idx: 8 Text: [")
             );
 
             yield return new DeserializationErrorCase(
@@ -133,6 +130,17 @@ public partial class DeserializationErrorTests
                 "Sum 1",
                 ("Sum expected ArrayOfInteger for parameter Terms but Step has type Integer",
                  "1 - Line: 1, Col: 4, Idx: 4 - Line: 1, Col: 4, Idx: 4 Text: 1")
+            );
+
+            yield return new DeserializationErrorCase(
+                "StringContains stringtrim 'abc' stringtrim ' b '",
+                (
+                    "StringTrim expected TrimSide for parameter Side but Step has type String",
+                    "Line: 1, Col: 32, Idx: 32 - Line: 1, Col: 47, Idx: 47 Text: stringtrim ' b '"
+                ),
+                ("Substring was missing or empty.",
+                 "StringContains - Line: 1, Col: 0, Idx: 0 - Line: 1, Col: 47, Idx: 47 Text: StringContains stringtrim 'abc' stringtrim ' b '"
+                )
             );
         }
     }

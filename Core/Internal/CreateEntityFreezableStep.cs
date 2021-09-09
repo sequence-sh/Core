@@ -77,6 +77,32 @@ public record CreateEntityFreezableStep(FreezableEntityData FreezableEntityData)
     public Result<TypeReference, IError> TryGetOutputTypeReference(
         CallerMetadata callerMetadata,
         TypeResolver typeResolver) => TypeReference.Actual.Entity;
+
+    /// <inheritdoc />
+    public Result<IFreezableStep, IError> ReorganizeNamedArguments(
+        StepFactoryStore stepFactoryStore)
+    {
+        var dict   = new Dictionary<EntityPropertyKey, FreezableStepProperty>();
+        var errors = new List<IError>();
+
+        foreach (var (key, value) in FreezableEntityData.EntityProperties)
+        {
+            var r = value.ReorganizeNamedArguments(stepFactoryStore);
+
+            if (r.IsFailure)
+                errors.Add(r.Error);
+            else
+                dict.Add(key, r.Value);
+        }
+
+        if (errors.Any())
+            return Result.Failure<IFreezableStep, IError>(ErrorList.Combine(errors));
+
+        return this with
+        {
+            FreezableEntityData = FreezableEntityData with { EntityProperties = dict }
+        };
+    }
 }
 
 }
