@@ -20,7 +20,7 @@ infixOperator		: DASH
 					| GREATERTHENEQUALS
 					| LESSTHAN
 					| GREATERTHAN;
-infixOperation		: term (infixOperator term)+ ;
+infixOperation		: infixableTerm (infixOperator infixableTerm)+ ;
 entityPropertyName  : NAME | quotedString;
 entityProperty		: entityPropertyName (DOT entityPropertyName)* COLON term ;
 namedArgument		: NAME COLON term ;
@@ -34,13 +34,19 @@ interpolatedString	: OPENISTRING step (ISTRINGSEGMENT step)* CLOSEISTRING;
 quotedString		: DOUBLEQUOTEDSTRING | SINGLEQUOTEDSTRING | SIMPLEISTRING ;
 number              : NUMBER (DOT NUMBER)? ;
 enumeration			: NAME DOT NAME ;
-term				: simpleTerm #SimpleTerm1
-					| bracketedStep  #BracketedStep1
-                    | arrayOrEntity=term OPENSQUAREBRACKET indexer=term CLOSESQUAREBRACKET #ArrayAccess
+
+infixableTerm       : simpleTerm #SimpleTerm1                                      
+					
+                    | arrayOrEntity=infixableTerm OPENSQUAREBRACKET indexer=term CLOSESQUAREBRACKET #ArrayAccess
+                    | bracketedStep  #BracketedStep1   
                     ;
-step				: <assoc=right> step PIPE function #PipeFunction
-					| function #Function1
-					| infixOperation #InfixOperation1
+
+term				: infixableTerm   #InfixableTerm1
+                    | function #Function1  
+                    
+                    | infixOperation #InfixOperation1
+                    ;
+step				: <assoc=right> step PIPE function #PipeFunction					
 					| setVariable #SetVariable1
 					| stepSequence #StepSequence1
 					| term #Term1

@@ -64,7 +64,10 @@ public partial class DeserializationTests
             yield return new DeserializationTestInstance("(Foo: [1,2])['Foo']", "[1, 2]");
             yield return new DeserializationTestInstance("(Foo: [1,2])",        "('Foo': [1, 2])");
 
-            yield return new DeserializationTestInstance("ArrayLength([1,2] + [3,4])", "4");
+            yield return new DeserializationTestInstance("ArrayLength([1,2] + [3,4])",         "4");
+            yield return new DeserializationTestInstance("ArrayLength Array: ([1,2] + [3,4])", "4");
+
+            yield return new DeserializationTestInstance("ArrayLength Array: [1,2,3,4]", "4");
 
             yield return new DeserializationTestInstance("'Hello World'", "Hello World");
             yield return new DeserializationTestInstance("123",           "123");
@@ -147,6 +150,10 @@ Log 'Comments!'",
                 ); //check 'not' delimiter
 
             yield return new DeserializationTestInstance(@"Log(2*3)", 6);
+
+            yield return new DeserializationTestInstance(@"Log Value: 2", 2);
+
+            yield return new DeserializationTestInstance(@"Log Value: not True", false);
 
             yield return new DeserializationTestInstance(@"Log(2 ^ 3)", 8);
 
@@ -558,6 +565,31 @@ Log 'Comments!'",
                 1,
                 2,
                 3
+            );
+
+            yield return new DeserializationTestInstance(
+                @"stringcontains 'a' + 'b' stringtocase 'b' textcase.upper",
+                false
+            );
+
+            yield return new DeserializationTestInstance(
+                @"stringcontains ('a' + 'b') stringtocase 'b' textcase.upper",
+                false
+            );
+
+            yield return new DeserializationTestInstance(
+                @"stringcontains stringtocase 'beta' textcase.upper stringtocase 'b' textcase.upper",
+                false
+            );
+
+            yield return new DeserializationTestInstance(
+                @"stringcontains (stringtrim ' abc ') (stringtocase 'b' textcase.upper)",
+                false
+            );
+
+            yield return new DeserializationTestInstance(
+                @"stringcontains stringtrim ' abc ' substring: stringtocase 'b' textcase.upper",
+                false
             );
         }
     }

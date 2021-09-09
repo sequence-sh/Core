@@ -236,7 +236,7 @@ public static class SCLParsing
 
             var operatorSymbol = operatorSymbols.Single();
 
-            var terms = context.term()
+            var terms = context.infixableTerm()
                 .Select(Visit)
                 .Where(x => x.IsFailure || x.Value != null)
                 .ToList();
