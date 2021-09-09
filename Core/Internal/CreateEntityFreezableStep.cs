@@ -79,24 +79,15 @@ public record CreateEntityFreezableStep(FreezableEntityData FreezableEntityData)
         TypeResolver typeResolver) => TypeReference.Actual.Entity;
 
     /// <inheritdoc />
-    public Result<IFreezableStep, IError> ReorganizeNamedArguments(
-        StepFactoryStore stepFactoryStore)
+    public IFreezableStep ReorganizeNamedArguments(StepFactoryStore stepFactoryStore)
     {
-        var dict   = new Dictionary<EntityPropertyKey, FreezableStepProperty>();
-        var errors = new List<IError>();
+        var dict = new Dictionary<EntityPropertyKey, FreezableStepProperty>();
 
         foreach (var (key, value) in FreezableEntityData.EntityProperties)
         {
             var r = value.ReorganizeNamedArguments(stepFactoryStore);
-
-            if (r.IsFailure)
-                errors.Add(r.Error);
-            else
-                dict.Add(key, r.Value);
+            dict.Add(key, r);
         }
-
-        if (errors.Any())
-            return Result.Failure<IFreezableStep, IError>(ErrorList.Combine(errors));
 
         return this with
         {

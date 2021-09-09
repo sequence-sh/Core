@@ -246,8 +246,7 @@ public abstract record ConstantFreezableBase<T>
     }
 
     /// <inheritdoc />
-    public Result<IFreezableStep, IError> ReorganizeNamedArguments(
-        StepFactoryStore stepFactoryStore)
+    public IFreezableStep ReorganizeNamedArguments(StepFactoryStore stepFactoryStore)
     {
         return this;
     }

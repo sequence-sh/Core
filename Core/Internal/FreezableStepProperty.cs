@@ -84,7 +84,7 @@ public abstract record FreezableStepProperty(TextLocation Location)
     /// <summary>
     /// Move named arguments up a level if necessary
     /// </summary>
-    public abstract Result<FreezableStepProperty, IError> ReorganizeNamedArguments(
+    public abstract FreezableStepProperty ReorganizeNamedArguments(
         StepFactoryStore stepFactoryStore);
 
     /// <summary>
@@ -106,7 +106,7 @@ public abstract record FreezableStepProperty(TextLocation Location)
         }
 
         /// <inheritdoc />
-        public override Result<FreezableStepProperty, IError> ReorganizeNamedArguments(
+        public override FreezableStepProperty ReorganizeNamedArguments(
             StepFactoryStore stepFactoryStore)
         {
             return this;
@@ -145,15 +145,11 @@ public abstract record FreezableStepProperty(TextLocation Location)
         }
 
         /// <inheritdoc />
-        public override Result<FreezableStepProperty, IError> ReorganizeNamedArguments(
+        public override FreezableStepProperty ReorganizeNamedArguments(
             StepFactoryStore stepFactoryStore)
         {
             var r = FreezableStep.ReorganizeNamedArguments(stepFactoryStore);
-
-            if (r.IsFailure)
-                return r.ConvertFailure<FreezableStepProperty>();
-
-            return this with { FreezableStep = r.Value };
+            return this with { FreezableStep = r };
         }
     }
 
@@ -173,15 +169,12 @@ public abstract record FreezableStepProperty(TextLocation Location)
         }
 
         /// <inheritdoc />
-        public override Result<FreezableStepProperty, IError> ReorganizeNamedArguments(
+        public override FreezableStepProperty ReorganizeNamedArguments(
             StepFactoryStore stepFactoryStore)
         {
             var r = FreezableStep.ReorganizeNamedArguments(stepFactoryStore);
 
-            if (r.IsFailure)
-                return r.ConvertFailure<FreezableStepProperty>();
-
-            return this with { FreezableStep = r.Value };
+            return this with { FreezableStep = r };
         }
     }
 
@@ -230,17 +223,13 @@ public abstract record FreezableStepProperty(TextLocation Location)
         }
 
         /// <inheritdoc />
-        public override Result<FreezableStepProperty, IError> ReorganizeNamedArguments(
+        public override FreezableStepProperty ReorganizeNamedArguments(
             StepFactoryStore stepFactoryStore)
         {
             var r = List.Select(x => x.ReorganizeNamedArguments(stepFactoryStore))
-                .Combine(ErrorList.Combine)
-                .Map(x => x.ToImmutableList());
+                .ToImmutableList();
 
-            if (r.IsFailure)
-                return r.ConvertFailure<FreezableStepProperty>();
-
-            return this with { List = r.Value };
+            return this with { List = r };
         }
     }
 }

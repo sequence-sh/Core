@@ -56,20 +56,12 @@ public sealed record OptionFreezableStep(
     }
 
     /// <inheritdoc />
-    public Result<IFreezableStep, IError> ReorganizeNamedArguments(
-        StepFactoryStore stepFactoryStore)
+    public IFreezableStep ReorganizeNamedArguments(StepFactoryStore stepFactoryStore)
     {
         var newOptions = Options.Select(x => x.ReorganizeNamedArguments(stepFactoryStore))
-            .Where(x => x.IsSuccess)
-            .Select(x => x.Value)
             .ToList();
 
-        if (newOptions.Any())
-            return this with { Options = newOptions };
-
-        return Options.Select(x => x.ReorganizeNamedArguments(stepFactoryStore))
-            .Combine(ErrorList.Combine)
-            .ConvertFailure<IFreezableStep>();
+        return this with { Options = newOptions };
     }
 
     /// <inheritdoc />

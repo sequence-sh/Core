@@ -103,22 +103,18 @@ public sealed record CompoundFreezableStep(
     );
 
     /// <inheritdoc />
-    public Result<IFreezableStep, IError> ReorganizeNamedArguments(
-        StepFactoryStore stepFactoryStore)
+    public IFreezableStep ReorganizeNamedArguments(StepFactoryStore stepFactoryStore)
     {
-        var dict   = new Dictionary<StepParameterReference, FreezableStepProperty>();
-        var errors = new List<IError>();
+        var dict = new Dictionary<StepParameterReference, FreezableStepProperty>();
 
         foreach (var (key, value) in FreezableStepData.StepProperties)
         {
             var r = value.ReorganizeNamedArguments(stepFactoryStore);
 
-            if (r.IsFailure)
-                errors.Add(r.Error);
-            else if (
-                !r.Value.StepMetadata.Bracketed &&
-                !r.Value.StepMetadata.PassedAsInfix &&
-                r.Value is FreezableStepProperty.Step(
+            if (
+                !r.StepMetadata.Bracketed &&
+                !r.StepMetadata.PassedAsInfix &&
+                r is FreezableStepProperty.Step(
                     CompoundFreezableStep(var stepName, var newStepData, var innerTextLocation), var
                     outerTextLocation) &&
                 stepFactoryStore.Dictionary.TryGetValue(stepName, out var stepFactory)
@@ -151,18 +147,15 @@ public sealed record CompoundFreezableStep(
                         ),
                         outerTextLocation
                     )
-                    : r.Value;
+                    : r;
 
                 dict.Add(key, newStep);
             }
             else
             {
-                dict.Add(key, r.Value);
+                dict.Add(key, r);
             }
         }
-
-        if (errors.Any())
-            return Result.Failure<IFreezableStep, IError>(ErrorList.Combine(errors));
 
         return this with { FreezableStepData = FreezableStepData with { StepProperties = dict } };
     }
