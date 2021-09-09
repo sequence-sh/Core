@@ -10,25 +10,10 @@ namespace Reductech.EDR.Core.Internal
 /// <summary>
 /// A step that could be one of several options
 /// </summary>
-public sealed class OptionFreezableStep : IFreezableStep
+public sealed record OptionFreezableStep(
+    IReadOnlyList<IFreezableStep> Options,
+    TextLocation TextLocation) : IFreezableStep
 {
-    /// <summary>
-    /// Create a new OptionFreezableStep
-    /// </summary>
-    public OptionFreezableStep(IReadOnlyList<IFreezableStep> options, TextLocation textLocation)
-    {
-        Options      = options;
-        TextLocation = textLocation;
-    }
-
-    /// <summary>
-    /// The options
-    /// </summary>
-    public IReadOnlyList<IFreezableStep> Options { get; }
-
-    /// <inheritdoc />
-    public TextLocation TextLocation { get; }
-
     /// <inheritdoc />
     public string StepName => string.Join(" or ", Options);
 
@@ -68,6 +53,15 @@ public sealed class OptionFreezableStep : IFreezableStep
         }
 
         return Result.Failure<IStep, IError>(optionErrors.First().error);
+    }
+
+    /// <inheritdoc />
+    public IFreezableStep ReorganizeNamedArguments(StepFactoryStore stepFactoryStore)
+    {
+        var newOptions = Options.Select(x => x.ReorganizeNamedArguments(stepFactoryStore))
+            .ToList();
+
+        return this with { Options = newOptions };
     }
 
     /// <inheritdoc />

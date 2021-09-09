@@ -217,7 +217,8 @@ public static class SCLParsing
 
         /// <inheritdoc />
         public override Result<FreezableStepProperty, IError> VisitBracketedStep(
-            SCLParser.BracketedStepContext context) => Visit(context.step());
+            SCLParser.BracketedStepContext context) => Visit(context.step())
+            .Map(x => x with { StepMetadata = x.StepMetadata with { Bracketed = true } });
 
         /// <inheritdoc />
         public override Result<FreezableStepProperty, IError> VisitInfixOperation(
@@ -236,7 +237,7 @@ public static class SCLParsing
 
             var operatorSymbol = operatorSymbols.Single();
 
-            var terms = context.term()
+            var terms = context.infixableTerm()
                 .Select(Visit)
                 .Where(x => x.IsFailure || x.Value != null)
                 .ToList();
@@ -581,7 +582,16 @@ public static class SCLParsing
             if (firstStep.IsFailure)
                 errors.Add(firstStep.Error);
             else
-                dict.Add(new StepParameterReference.Index(1), firstStep.Value);
+                dict.Add(
+                    new StepParameterReference.Index(1),
+                    firstStep.Value with
+                    {
+                        StepMetadata = firstStep.Value.StepMetadata with
+                        {
+                            PassedAsInfix = true
+                        }
+                    }
+                );
 
             var numberedArguments = context.function()
                 .term()

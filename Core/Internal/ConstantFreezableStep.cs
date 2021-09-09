@@ -145,7 +145,7 @@ public record EnumConstantFreezable
         if (type.IsFailure)
             return type.ConvertFailure<IStep>();
 
-        if (Enum.TryParse(type.Value, Value.Value, false, out var o))
+        if (Enum.TryParse(type.Value, Value.Value, true, out var o))
             return TryCreateEnumConstant(o!).MapError(x => x.WithLocation(this));
 
         return (SingleError)ErrorCode.UnexpectedEnumValue.ToErrorBuilder(Value.Type, Value.Value)
@@ -243,6 +243,12 @@ public abstract record ConstantFreezableBase<T>
         TypeResolver typeResolver)
     {
         return TypeReference.Create(typeof(T));
+    }
+
+    /// <inheritdoc />
+    public IFreezableStep ReorganizeNamedArguments(StepFactoryStore stepFactoryStore)
+    {
+        return this;
     }
 
     /// <inheritdoc />
