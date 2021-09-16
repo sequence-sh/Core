@@ -586,6 +586,17 @@ Log 'Comments!'",
                 @"stringcontains stringtrim ' abc ' substring: stringtocase 'b' textcase.upper",
                 false
             );
+
+            yield return new DeserializationTestInstance(
+                @"ArrayTake ['a' 'b' 'c'] 2 | foreach log <>",
+                "a",
+                "b"
+            );
+
+            yield return new DeserializationTestInstance(
+                @"ArraySkip ['a' 'b' 'c'] 2 | foreach log <>",
+                "c"
+            );
         }
     }
 

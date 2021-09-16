@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
@@ -47,8 +48,43 @@ public sealed class ArraySkip<T> : CompoundStep<Array<T>>
     public IStep<int> Count { get; set; } = null!;
 
     /// <inheritdoc />
-    public override IStepFactory StepFactory { get; } =
-        new SimpleStepFactory<ArraySkip<T>, Array<T>>();
+    public override IStepFactory StepFactory { get; } = ArraySkipStepFactory.Instance;
+
+    /// <summary>
+    /// Counts the elements in an array.
+    /// </summary>
+    private sealed class ArraySkipStepFactory : ArrayStepFactory
+    {
+        private ArraySkipStepFactory() { }
+
+        /// <summary>
+        /// The instance.
+        /// </summary>
+        public static GenericStepFactory Instance { get; } = new ArraySkipStepFactory();
+
+        /// <inheritdoc />
+        public override Type StepType => typeof(ArraySkip<>);
+
+        /// <inheritdoc />
+        public override string OutputTypeExplanation => "Array of T";
+
+        /// <inheritdoc />
+        protected override TypeReference
+            GetOutputTypeReference(TypeReference memberTypeReference) =>
+            new TypeReference.Array(memberTypeReference);
+
+        /// <inheritdoc />
+        protected override Result<TypeReference, IErrorBuilder> GetExpectedArrayTypeReference(
+            CallerMetadata callerMetadata)
+        {
+            return callerMetadata.ExpectedType;
+        }
+
+        /// <inheritdoc />
+        protected override string ArrayPropertyName => nameof(ArraySkip<object>.Array);
+
+        protected override string? LambdaPropertyName => null;
+    }
 }
 
 }

@@ -133,6 +133,16 @@ public partial class DeserializationErrorTests
             );
 
             yield return new DeserializationErrorCase(
+                "log <word>",
+                ("Could not resolve variable 'word'", "Unknown Location")
+            );
+
+            yield return new DeserializationErrorCase(
+                "- log <word>\r\n- log <word>",
+                ("Could not resolve variable 'word'", "Unknown Location")
+            );
+
+            yield return new DeserializationErrorCase(
                 "StringContains stringtrim 'abc' stringtrim ' b '",
                 (
                     "StringTrim expected TrimSide for parameter Side but Step has type String",
