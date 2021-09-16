@@ -48,8 +48,43 @@ public sealed class ArrayTake<T> : CompoundStep<Array<T>>
     public IStep<int> Count { get; set; } = null!;
 
     /// <inheritdoc />
-    public override IStepFactory StepFactory { get; } =
-        new SimpleStepFactory<ArrayTake<T>, Array<T>>();
+    public override IStepFactory StepFactory { get; } = ArrayTakeStepFactory.Instance;
+
+    /// <summary>
+    /// Counts the elements in an array.
+    /// </summary>
+    private sealed class ArrayTakeStepFactory : ArrayStepFactory
+    {
+        private ArrayTakeStepFactory() { }
+
+        /// <summary>
+        /// The instance.
+        /// </summary>
+        public static GenericStepFactory Instance { get; } = new ArrayTakeStepFactory();
+
+        /// <inheritdoc />
+        public override Type StepType => typeof(ArrayTake<>);
+
+        /// <inheritdoc />
+        public override string OutputTypeExplanation => "Array of T";
+
+        /// <inheritdoc />
+        protected override TypeReference
+            GetOutputTypeReference(TypeReference memberTypeReference) =>
+            new TypeReference.Array(memberTypeReference);
+
+        /// <inheritdoc />
+        protected override Result<TypeReference, IErrorBuilder> GetExpectedArrayTypeReference(
+            CallerMetadata callerMetadata)
+        {
+            return callerMetadata.ExpectedType;
+        }
+
+        /// <inheritdoc />
+        protected override string ArrayPropertyName => nameof(ArrayTake<object>.Array);
+
+        protected override string? LambdaPropertyName => null;
+    }
 }
 
 }
