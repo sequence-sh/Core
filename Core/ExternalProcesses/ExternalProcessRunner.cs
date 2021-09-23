@@ -196,6 +196,9 @@ public class ExternalProcessRunner : IExternalProcessRunner
         return Unit.Default;
     }
 
+    /// <summary>
+    /// Matches an escaped character or a quotation mark
+    /// </summary>
     private static readonly Regex BackslashRegex = new(
         @"(\\*)" + "\"",
         RegexOptions.Compiled

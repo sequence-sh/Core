@@ -16,6 +16,57 @@ namespace Reductech.EDR.Core.Tests
 
 public partial class DeserializationTests
 {
+    public record DeserializationTestInstance : IAsyncTestInstance, ICaseWithSetup
+    {
+        public DeserializationTestInstance(string scl, params object[] expectedLoggedValues)
+        {
+            SCL                  = scl;
+            ExpectedLoggedValues = expectedLoggedValues.Select(x => x.ToString()!).ToList();
+        }
+
+        private string SCL { get; }
+
+        public string Name => SCL;
+
+        private IReadOnlyCollection<string> ExpectedLoggedValues { get; }
+
+        /// <inheritdoc />
+        public async Task RunAsync(ITestOutputHelper testOutputHelper)
+        {
+            testOutputHelper.WriteLine(SCL);
+
+            var stepFactoryStore = StepFactoryStore.Create();
+            var loggerFactory    = TestLoggerFactory.Create();
+            loggerFactory.AddXunit(testOutputHelper);
+            var repository = new MockRepository(MockBehavior.Strict);
+
+            var externalContext = ExternalContextSetupHelper.GetExternalContext(repository);
+
+            var runner = new SCLRunner(
+                loggerFactory.CreateLogger("Test"),
+                stepFactoryStore,
+                externalContext
+            );
+
+            var result = await runner.RunSequenceFromTextAsync(
+                SCL,
+                new Dictionary<string, object>(),
+                CancellationToken.None
+            );
+
+            result.ShouldBeSuccessful();
+
+            LogChecker.CheckLoggedValues(
+                loggerFactory,
+                LogLevel.Information,
+                ExpectedLoggedValues
+            );
+        }
+
+        /// <inheritdoc />
+        public ExternalContextSetupHelper ExternalContextSetupHelper { get; } = new();
+    }
+
     [GenerateAsyncTheory("Deserialize")]
     public IEnumerable<DeserializationTestInstance> TestCases
     {
@@ -597,58 +648,26 @@ Log 'Comments!'",
                 @"ArraySkip ['a' 'b' 'c'] 2 | foreach log <>",
                 "c"
             );
-        }
-    }
 
-    public record DeserializationTestInstance : IAsyncTestInstance, ICaseWithSetup
-    {
-        public DeserializationTestInstance(string scl, params object[] expectedLoggedValues)
-        {
-            SCL                  = scl;
-            ExpectedLoggedValues = expectedLoggedValues.Select(x => x.ToString()!).ToList();
-        }
-
-        private string SCL { get; }
-
-        public string Name => SCL;
-
-        private IReadOnlyCollection<string> ExpectedLoggedValues { get; }
-
-        /// <inheritdoc />
-        public async Task RunAsync(ITestOutputHelper testOutputHelper)
-        {
-            testOutputHelper.WriteLine(SCL);
-
-            var stepFactoryStore = StepFactoryStore.Create();
-            var loggerFactory    = TestLoggerFactory.Create();
-            loggerFactory.AddXunit(testOutputHelper);
-            var repository = new MockRepository(MockBehavior.Strict);
-
-            var externalContext = ExternalContextSetupHelper.GetExternalContext(repository);
-
-            var runner = new SCLRunner(
-                loggerFactory.CreateLogger("Test"),
-                stepFactoryStore,
-                externalContext
+            yield return new DeserializationTestInstance(
+                @"
+- <entity> = (a: 1)
+- <output> = <entity> + (b: 2)
+- log <output>
+",
+                "('a': 1 'b': 2)"
             );
 
-            var result = await runner.RunSequenceFromTextAsync(
-                SCL,
-                new Dictionary<string, object>(),
-                CancellationToken.None
-            );
-
-            result.ShouldBeSuccessful();
-
-            LogChecker.CheckLoggedValues(
-                loggerFactory,
-                LogLevel.Information,
-                ExpectedLoggedValues
+            yield return new DeserializationTestInstance(
+                @"
+- <entity1> = (a: 1)
+- <entity2> = (b: 2)
+- <output> = <entity1> + <entity2> + (c: 3)
+- log <output>
+",
+                "('a': 1 'b': 2 'c': 3)"
             );
         }
-
-        /// <inheritdoc />
-        public ExternalContextSetupHelper ExternalContextSetupHelper { get; } = new();
     }
 }
 

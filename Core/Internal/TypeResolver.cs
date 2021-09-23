@@ -84,12 +84,19 @@ public sealed class TypeResolver
                 .MapError(x => x.WithLocation(lambda.Location));
         }
 
+        //if (vn != VariableName.Item) //Mostly resolved the problem
+        //{
+        //    var r1b = newTypeResolver.TryAddType(VariableName.Item, typeReference);
+
+        //    if (r1b.IsFailure)
+        //        return r1b.ConvertFailure<TypeResolver>()
+        //            .MapError(x => x.WithLocation(lambda.Location));
+        //}
+
         var r2 = newTypeResolver.TryAddTypeHierarchy(scopedCallerMetadata, lambda.FreezableStep);
 
         if (r2.IsFailure)
-        {
             return r2.ConvertFailure<TypeResolver>();
-        }
 
         return newTypeResolver;
     }
@@ -206,11 +213,6 @@ public sealed class TypeResolver
         VariableName variable,
         TypeReference typeReference)
     {
-        var actualType = typeReference.TryGetType(this);
-
-        if (actualType.IsFailure)
-            return actualType.ConvertFailure<bool>();
-
         if (MyDictionary.TryGetValue(variable, out var previous))
         {
             if (previous.Equals(typeReference)
@@ -226,6 +228,11 @@ public sealed class TypeResolver
                     typeReference.Name
                 );
         }
+
+        var actualType = typeReference.TryGetType(this);
+
+        if (actualType.IsFailure)
+            return actualType.ConvertFailure<bool>();
 
         return true;
     }

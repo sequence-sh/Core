@@ -69,36 +69,69 @@ public sealed record OptionFreezableStep(
             IError>
         GetVariablesUsed(CallerMetadata callerMetadata, TypeResolver typeResolver)
     {
-        var errors = new List<IError>();
+        var errors          = new List<IError>();
+        var possibleChoices = new List<IReadOnlyCollection<UsedVariable>>();
 
-        foreach (var freezableStep in
-            Options) //TODO define some sort of ordering of these options. e.g. look at the type of the index
+        foreach (var freezableStep in Options)
         {
-            var r = freezableStep.GetVariablesUsed(callerMetadata, typeResolver);
+            var variablesUsed = freezableStep.GetVariablesUsed(callerMetadata, typeResolver);
 
-            if (r.IsSuccess)
+            if (!variablesUsed.IsSuccess)
+                errors.Add(variablesUsed.Error);
+            else
             {
                 var canAdd = true;
 
-                foreach (var (variableName, typeReference, _) in r.Value)
+                foreach (var (variableName, typeReference, _) in variablesUsed.Value)
                 {
-                    var canAddResult = typeResolver.CanAddType(variableName, typeReference);
+                    var addResult = typeResolver.CanAddType(variableName, typeReference);
 
-                    if (canAddResult.IsFailure)
+                    if (addResult.IsFailure)
                     {
                         canAdd = false;
-                        errors.Add(canAddResult.Error.WithLocation(this));
+                        errors.Add(addResult.Error.WithLocation(this));
+                        break;
                     }
                 }
 
-                if (canAdd)
-                {
-                    return r;
-                }
+                if (canAdd) //This is a possible option
+                    possibleChoices.Add(variablesUsed.Value);
             }
+        }
 
+        if (possibleChoices.Any())
+        {
+            //We've found at least one set of variables that works
+            if (possibleChoices.Count == 1) //the only choice
+                return Result.Success<IReadOnlyCollection<UsedVariable>, IError>(
+                    possibleChoices.Single()
+                );
             else
-                errors.Add(r.Error);
+            {
+                var newVariables = possibleChoices.SelectMany(x => x)
+                    .GroupBy(x => x.VariableName)
+                    .Select(
+                        group =>
+                        {
+                            if (group.Count() == 1)
+                                return group.Single();
+
+                            var possibleTypes =
+                                group.Select(x => x.TypeReference).Distinct().ToList();
+
+                            var typeReference = TypeReference.Create(possibleTypes);
+
+                            return new UsedVariable(
+                                group.Key,
+                                typeReference,
+                                group.First().Location
+                            );
+                        }
+                    )
+                    .ToList();
+
+                return newVariables;
+            }
         }
 
         Debug.Assert(errors.Any(), "OptionFreezableStep should have at least one option");
