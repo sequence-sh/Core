@@ -266,7 +266,7 @@ public abstract record TypeReference
         /// <inheritdoc />
         public override Result<Type, IErrorBuilder> TryGetType(TypeResolver typeResolver)
         {
-            var types = new List<Type>();
+            var types = new HashSet<Type>();
 
             foreach (var typeReference in Options)
             {
@@ -275,15 +275,32 @@ public abstract record TypeReference
                 if (t.IsFailure)
                     return t.ConvertFailure<Type>();
 
-                types.Add(t.Value);
+                if (t.Value != typeof(object))
+                    types.Add(t.Value);
             }
 
             Type genericOneOfType;
 
+            if (types.Count == 0)
+                return typeof(object);
+
+            if (types.Count == 1)
+                return types.Single();
+
             if (types.Count == 2)
+            {
+                if (types.Contains(typeof(int)) && types.Contains(typeof(double)))
+                    return typeof(double);
+
                 genericOneOfType = typeof(OneOf<,>);
+            }
+
             else if (types.Count == 3)
                 genericOneOfType = typeof(OneOf<,,>);
+            else if (types.Count == 4)
+                genericOneOfType = typeof(OneOf<,,,>);
+            else if (types.Count == 5)
+                genericOneOfType = typeof(OneOf<,,,,>);
             else
                 throw new Exception($"Cannot create a OneOf with {types.Count} type arguments");
 
@@ -351,70 +368,70 @@ public abstract record TypeReference
         public override bool IsUnknown => MemberType.IsUnknown;
     }
 
-    /// <summary>
-    /// One of several types
-    /// </summary>
-    public sealed record Multiple(IReadOnlySet<TypeReference> Options) : TypeReference
-    {
-        /// <inheritdoc />
-        public override Result<Type, IErrorBuilder> TryGetType(TypeResolver typeResolver)
-        {
-            if (Options.Count == 1)
-                return Options.Single().TryGetType(typeResolver);
+    ///// <summary>
+    ///// One of several types
+    ///// </summary>
+    //public sealed record Multiple(IReadOnlySet<TypeReference> Options) : TypeReference
+    //{
+    //    /// <inheritdoc />
+    //    public override Result<Type, IErrorBuilder> TryGetType(TypeResolver typeResolver)
+    //    {
+    //        if (Options.Count == 1)
+    //            return Options.Single().TryGetType(typeResolver);
 
-            var possibleTypes = Options.Where(x => x != Any.Instance)
-                .Select(x => x.TryGetType(typeResolver))
-                .Combine(ErrorBuilderList.Combine)
-                .Map(x => x.Distinct().Where(t => t != typeof(object)).ToList());
+    //        var possibleTypes = Options.Where(x => x != Any.Instance)
+    //            .Select(x => x.TryGetType(typeResolver))
+    //            .Combine(ErrorBuilderList.Combine)
+    //            .Map(x => x.Distinct().Where(t => t != typeof(object)).ToList());
 
-            if (possibleTypes.IsFailure)
-                return possibleTypes.ConvertFailure<Type>();
+    //        if (possibleTypes.IsFailure)
+    //            return possibleTypes.ConvertFailure<Type>();
 
-            if (possibleTypes.Value.Count == 0)
-                return typeof(object);
+    //        if (possibleTypes.Value.Count == 0)
+    //            return typeof(object);
 
-            if (possibleTypes.Value.Count == 1)
-                return possibleTypes.Value.Single();
+    //        if (possibleTypes.Value.Count == 1)
+    //            return possibleTypes.Value.Single();
 
-            if (possibleTypes.Value.Count == 2)
-            {
-                if (possibleTypes.Value.Contains(typeof(double))
-                 && possibleTypes.Value.Contains(typeof(int)))
-                    return typeof(double);
-            }
+    //        if (possibleTypes.Value.Count == 2)
+    //        {
+    //            if (possibleTypes.Value.Contains(typeof(double))
+    //             && possibleTypes.Value.Contains(typeof(int)))
+    //                return typeof(double);
+    //        }
 
-            var optionsString = string.Join(", ", Options.Distinct().Select(x => x.Name));
+    //        var optionsString = string.Join(", ", Options.Distinct().Select(x => x.Name));
 
-            return ErrorCode.CannotInferType.ToErrorBuilder(
-                $"Cannot coerce {optionsString} to a single type"
-            );
-        }
+    //        return ErrorCode.CannotInferType.ToErrorBuilder(
+    //            $"Cannot coerce {optionsString} to a single type"
+    //        );
+    //    }
 
-        /// <inheritdoc />
-        public override bool Allow(TypeReference other, TypeResolver? typeResolver)
-        {
-            other = typeResolver?.MaybeResolve(other) ?? other;
+    //    /// <inheritdoc />
+    //    public override bool Allow(TypeReference other, TypeResolver? typeResolver)
+    //    {
+    //        other = typeResolver?.MaybeResolve(other) ?? other;
 
-            return Options.Any(x => x.Allow(other, typeResolver));
-        }
+    //        return Options.Any(x => x.Allow(other, typeResolver));
+    //    }
 
-        /// <inheritdoc />
-        public override string Name => string.Join(" or ", Options.Select(x => x.Name));
+    //    /// <inheritdoc />
+    //    public override string Name => string.Join(" or ", Options.Select(x => x.Name));
 
-        /// <param name="typeResolver"></param>
-        /// <inheritdoc />
-        public override Result<TypeReference, IErrorBuilder> TryGetArrayMemberTypeReference(
-            TypeResolver typeResolver)
-        {
-            if (Options.Count == 1)
-                return Options.Single().TryGetArrayMemberTypeReference(typeResolver);
+    //    /// <param name="typeResolver"></param>
+    //    /// <inheritdoc />
+    //    public override Result<TypeReference, IErrorBuilder> TryGetArrayMemberTypeReference(
+    //        TypeResolver typeResolver)
+    //    {
+    //        if (Options.Count == 1)
+    //            return Options.Single().TryGetArrayMemberTypeReference(typeResolver);
 
-            return ErrorCode.CannotInferType.ToErrorBuilder($"Option type is not an Array Type");
-        }
+    //        return ErrorCode.CannotInferType.ToErrorBuilder($"Option type is not an Array Type");
+    //    }
 
-        /// <inheritdoc />
-        public override bool IsUnknown => Options.All(x => x.IsUnknown);
-    }
+    //    /// <inheritdoc />
+    //    public override bool IsUnknown => Options.All(x => x.IsUnknown);
+    //}
 
     /// <summary>
     /// The automatic variable
@@ -635,15 +652,15 @@ public abstract record TypeReference
     /// </summary>
     public static TypeReference Create(IEnumerable<TypeReference> typeReference)
     {
-        var references = typeReference.ToHashSet();
+        var references = typeReference.Distinct().ToArray();
 
-        if (references.Count == 0)
+        if (references.Length == 0)
             return Any.Instance;
 
-        if (references.Count == 1)
+        if (references.Length == 1)
             return references.Single();
 
-        return new Multiple(references);
+        return new OneOf(references);
     }
 }
 
