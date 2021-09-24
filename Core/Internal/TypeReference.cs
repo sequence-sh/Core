@@ -322,11 +322,44 @@ public abstract record TypeReference
 
                 return true;
             }
-            else
-            {
-                return Options.Any(x => x.Allow(other, typeResolver));
-            }
+
+            return Options.Any(x => x.Allow(other, typeResolver));
         }
+    }
+
+    /// <summary>
+    /// A dynamic type - the result of getting the value from an entity
+    /// </summary>
+    public sealed record Dynamic : TypeReference
+    {
+        private Dynamic() { }
+
+        /// <summary>
+        /// The instance of the the Dynamic Type
+        /// </summary>
+        public static Dynamic Instance { get; } = new();
+
+        /// <inheritdoc />
+        public override Result<TypeReference, IErrorBuilder> TryGetArrayMemberTypeReference(
+            TypeResolver typeResolver)
+        {
+            return Instance;
+        }
+
+        /// <inheritdoc />
+        public override Result<Type, IErrorBuilder> TryGetType(TypeResolver typeResolver)
+        {
+            return typeof(object);
+        }
+
+        /// <inheritdoc />
+        public override bool Allow(TypeReference other, TypeResolver? typeResolver)
+        {
+            return true;
+        }
+
+        /// <inheritdoc />
+        public override string Name => "Dynamic";
     }
 
     /// <summary>
@@ -367,71 +400,6 @@ public abstract record TypeReference
         /// <inheritdoc />
         public override bool IsUnknown => MemberType.IsUnknown;
     }
-
-    ///// <summary>
-    ///// One of several types
-    ///// </summary>
-    //public sealed record Multiple(IReadOnlySet<TypeReference> Options) : TypeReference
-    //{
-    //    /// <inheritdoc />
-    //    public override Result<Type, IErrorBuilder> TryGetType(TypeResolver typeResolver)
-    //    {
-    //        if (Options.Count == 1)
-    //            return Options.Single().TryGetType(typeResolver);
-
-    //        var possibleTypes = Options.Where(x => x != Any.Instance)
-    //            .Select(x => x.TryGetType(typeResolver))
-    //            .Combine(ErrorBuilderList.Combine)
-    //            .Map(x => x.Distinct().Where(t => t != typeof(object)).ToList());
-
-    //        if (possibleTypes.IsFailure)
-    //            return possibleTypes.ConvertFailure<Type>();
-
-    //        if (possibleTypes.Value.Count == 0)
-    //            return typeof(object);
-
-    //        if (possibleTypes.Value.Count == 1)
-    //            return possibleTypes.Value.Single();
-
-    //        if (possibleTypes.Value.Count == 2)
-    //        {
-    //            if (possibleTypes.Value.Contains(typeof(double))
-    //             && possibleTypes.Value.Contains(typeof(int)))
-    //                return typeof(double);
-    //        }
-
-    //        var optionsString = string.Join(", ", Options.Distinct().Select(x => x.Name));
-
-    //        return ErrorCode.CannotInferType.ToErrorBuilder(
-    //            $"Cannot coerce {optionsString} to a single type"
-    //        );
-    //    }
-
-    //    /// <inheritdoc />
-    //    public override bool Allow(TypeReference other, TypeResolver? typeResolver)
-    //    {
-    //        other = typeResolver?.MaybeResolve(other) ?? other;
-
-    //        return Options.Any(x => x.Allow(other, typeResolver));
-    //    }
-
-    //    /// <inheritdoc />
-    //    public override string Name => string.Join(" or ", Options.Select(x => x.Name));
-
-    //    /// <param name="typeResolver"></param>
-    //    /// <inheritdoc />
-    //    public override Result<TypeReference, IErrorBuilder> TryGetArrayMemberTypeReference(
-    //        TypeResolver typeResolver)
-    //    {
-    //        if (Options.Count == 1)
-    //            return Options.Single().TryGetArrayMemberTypeReference(typeResolver);
-
-    //        return ErrorCode.CannotInferType.ToErrorBuilder($"Option type is not an Array Type");
-    //    }
-
-    //    /// <inheritdoc />
-    //    public override bool IsUnknown => Options.All(x => x.IsUnknown);
-    //}
 
     /// <summary>
     /// The automatic variable
@@ -597,17 +565,20 @@ public abstract record TypeReference
             var nested = stepType.GenericTypeArguments[0];
             return Create(nested);
         }
-        else if (stepType.IsGenericType
-              && stepType.GetGenericTypeDefinition() == typeof(LambdaFunction<,>))
+
+        if (stepType.IsGenericType
+         && stepType.GetGenericTypeDefinition() == typeof(LambdaFunction<,>))
         {
             var nested = stepType.GenericTypeArguments[1];
             return Create(nested);
         }
-        else if (stepType == typeof(IStep))
+
+        if (stepType == typeof(IStep))
         {
             return Any.Instance;
         }
-        else if (stepType == typeof(VariableName))
+
+        if (stepType == typeof(VariableName))
             return AutomaticVariable.Instance;
 
         throw new Exception($"Type '{stepType}' was not a step type");
@@ -626,7 +597,8 @@ public abstract record TypeReference
                 var nestedReference = Create(nested);
                 return new Array(nestedReference);
             }
-            else if (t.GetInterfaces().Contains(typeof(IOneOf)))
+
+            if (t.GetInterfaces().Contains(typeof(IOneOf)))
             {
                 var nestedTypeReferences =
                     t.GenericTypeArguments.Select(Create).ToArray();

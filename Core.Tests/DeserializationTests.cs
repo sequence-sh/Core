@@ -670,10 +670,10 @@ Log 'Comments!'",
 
             yield return new DeserializationTestInstance(
                 @"
-- <docs> = (GenerateDocumentation)['AllPages'] | Evaluate
+- <docs> = (GenerateDocumentation)['AllPages'] | ArrayTake 50
 - log <docs>
 ",
-                "('a': 1 'b': 2 'c': 3)"
+                "50 Elements"
             );
 
             yield return new DeserializationTestInstance(

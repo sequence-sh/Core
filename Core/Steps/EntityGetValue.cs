@@ -99,6 +99,12 @@ public sealed class EntityGetValue<T> : CompoundStep<T>
             FreezableStepData freezableStepData,
             TypeResolver typeResolver)
         {
+            if (callerMetadata.ExpectedType.IsUnknown
+             || callerMetadata.ExpectedType == TypeReference.Any.Instance)
+            {
+                return TypeReference.Dynamic.Instance;
+            }
+
             return callerMetadata.ExpectedType;
         }
 
