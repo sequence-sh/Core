@@ -162,7 +162,8 @@ public sealed class TypeResolver
             if (!unresolvableVariableNames.Any())
                 break; //We've resolved everything. Yey!
 
-            if (numberUnresolved == null || numberUnresolved > unresolvableVariableNames.Count)
+            if (Dictionary.Any() && (numberUnresolved is null
+                                  || numberUnresolved > unresolvableVariableNames.Count))
                 numberUnresolved =
                     unresolvableVariableNames
                         .Count; //We have improved this number and can try again

@@ -69,7 +69,7 @@ public class ArrayEvaluate<T> : CompoundStep<Array<T>>
         }
 
         /// <inheritdoc />
-        protected override string ArrayPropertyName => nameof(ArrayMap<object>.Array);
+        protected override string ArrayPropertyName => nameof(ArrayEvaluate<object>.Array);
     }
 }
 

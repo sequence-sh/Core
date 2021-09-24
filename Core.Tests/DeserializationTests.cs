@@ -667,6 +667,30 @@ Log 'Comments!'",
 ",
                 "('a': 1 'b': 2 'c': 3)"
             );
+
+            yield return new DeserializationTestInstance(
+                @"
+- <docs> = (GenerateDocumentation)['AllPages'] | Evaluate
+- log <docs>
+",
+                "('a': 1 'b': 2 'c': 3)"
+            );
+
+            yield return new DeserializationTestInstance(
+                @"
+- <docs> = (a: [1,2,3])['a'] | Evaluate
+- log <docs>
+",
+                "3 Elements"
+            );
+
+            yield return new DeserializationTestInstance(
+                @"
+- <docs> = (a: [1,2,3])['a'] | ArrayMap (<>)
+- log <docs>
+",
+                "3 Elements"
+            );
         }
     }
 }
