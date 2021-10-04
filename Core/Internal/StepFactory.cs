@@ -447,9 +447,7 @@ public abstract class StepFactory : IStepFactory
                             return r;
                     }
                 }
-                
             }
-
 
             return callerMetadata.GetWrongTypeError(
                 stepList.ConvertToStep().StepName,
@@ -570,11 +568,15 @@ public abstract class StepFactory : IStepFactory
 
             IStep stepToSet = CreateArray(list as dynamic);
 
-            if (propertyInfo.PropertyType.GenericTypeArguments[0].GetInterfaces().Contains(typeof(IOneOf)))
+            if (propertyInfo.PropertyType.GenericTypeArguments[0]
+                .GetInterfaces()
+                .Contains(typeof(IOneOf)))
             {
-                stepToSet = OneOfStep.Create(propertyInfo.PropertyType.GenericTypeArguments[0], stepToSet);
+                stepToSet = OneOfStep.Create(
+                    propertyInfo.PropertyType.GenericTypeArguments[0],
+                    stepToSet
+                );
             }
-            
 
             propertyInfo.SetValue(parentStep, stepToSet);
 

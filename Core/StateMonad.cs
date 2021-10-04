@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Microsoft.Extensions.Logging;
@@ -127,6 +128,22 @@ public sealed class StateMonad : IStateMonad
             {
                 return Maybe<T>.From(t);
             }
+        }
+
+        if (value is IArray array && typeof(T).IsGenericType
+                                  && typeof(T).GetGenericTypeDefinition() == typeof(Array<>))
+        {
+            var method = typeof(T).GetMethod(
+                nameof(Array<object>.CreateByConverting),
+                BindingFlags.Public | BindingFlags.Static
+            );
+
+            var conversionResult = (Result<T, IErrorBuilder>)method.Invoke(null, new[] { array });
+
+            if (conversionResult.IsFailure)
+                return conversionResult.ConvertFailure<Maybe<T>>();
+
+            return Maybe<T>.From(conversionResult.Value);
         }
 
         return new ErrorBuilder(ErrorCode.WrongVariableType, key, typeof(T).Name);

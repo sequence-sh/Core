@@ -33,12 +33,12 @@ public abstract class ArrayStepFactory : GenericStepFactory
         FreezableStepData freezableStepData,
         TypeResolver typeResolver)
     {
-        var expectedMemberTypeReference =
+        var expectedArrayTypeReference =
             GetExpectedArrayTypeReference(callerMetadata)
                 .MapError(x => x.WithLocation(freezableStepData));
 
-        if (expectedMemberTypeReference.IsFailure)
-            return expectedMemberTypeReference.ConvertFailure<TypeReference>();
+        if (expectedArrayTypeReference.IsFailure)
+            return expectedArrayTypeReference.ConvertFailure<TypeReference>();
 
         var step = freezableStepData.TryGetStep(ArrayPropertyName, StepType);
 
@@ -48,7 +48,7 @@ public abstract class ArrayStepFactory : GenericStepFactory
         var nestedCallerMetadata = new CallerMetadata(
             TypeName,
             ArrayPropertyName,
-            expectedMemberTypeReference.Value
+            expectedArrayTypeReference.Value
         );
 
         var outputTypeReference = step.Value.TryGetOutputTypeReference(

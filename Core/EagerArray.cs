@@ -130,12 +130,6 @@ public sealed record EagerArray<T>(IReadOnlyList<T> List) : Array<T>, IEquatable
     public override string NameInLogs => List.Count + " Elements";
 
     /// <inheritdoc />
-    public override string Serialize =>
-        SerializationMethods.SerializeList(
-            List.Select(x => SerializationMethods.SerializeObject(x))
-        );
-
-    /// <inheritdoc />
     public override int GetHashCode() => GetHashCodeValue(this);
 
     bool IEquatable<Array<T>>.Equals(Array<T>? other) => Equals(this, other);
@@ -158,6 +152,21 @@ public sealed record EagerArray<T>(IReadOnlyList<T> List) : Array<T>, IEquatable
     public bool Equals(EagerArray<T>? other)
     {
         return Equals(this, other);
+    }
+
+    /// <inheritdoc />
+    public override string Serialize =>
+        SerializationMethods.SerializeList(
+            List.Select(x => SerializationMethods.SerializeObject(x))
+        );
+
+    /// <inheritdoc />
+    public override Result<Array<TElement>, IErrorBuilder> TryConvertElements<TElement>()
+    {
+        return List
+            .Select(x => x.TryConvert<TElement>())
+            .Combine(ErrorBuilderList.Combine)
+            .Map(x => x.ToSCLArray());
     }
 }
 

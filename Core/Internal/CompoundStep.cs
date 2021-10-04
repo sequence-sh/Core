@@ -75,7 +75,7 @@ public abstract class CompoundStep<T> : ICompoundStep<T>
     }
 
     /// <inheritdoc />
-    public Task<Result<T1, IError>> Run<T1>(
+    public virtual Task<Result<T1, IError>> Run<T1>(
         IStateMonad stateMonad,
         CancellationToken cancellationToken)
     {

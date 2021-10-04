@@ -15,7 +15,7 @@ public static class FunctionalExtensions
     /// <summary>
     /// Converts this object to type T. Returns failure if the cast fails.
     /// </summary>
-    public static Result<T, IErrorBuilder> TryConvert<T>(this object obj)
+    public static Result<T, IErrorBuilder> TryConvert<T>(this object? obj)
     {
         if (obj is T objAsT)
             return objAsT;
@@ -25,7 +25,7 @@ public static class FunctionalExtensions
         if (converted is T objConverted)
             return objConverted;
 
-        return ErrorCode.InvalidCast.ToErrorBuilder(obj, typeof(T).Name);
+        return ErrorCode.InvalidCast.ToErrorBuilder(obj ?? "null", typeof(T).Name);
     }
 
     /// <summary>

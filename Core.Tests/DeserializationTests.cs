@@ -134,7 +134,7 @@ public partial class DeserializationTests
             );
 
             yield return new DeserializationTestInstance(@"(a:'x')['a'] | Log", "x");
-            yield return new DeserializationTestInstance(@"(a:'')['a'] | Log",  "");
+            yield return new DeserializationTestInstance(@"(a:'')['a'] | Log",  "()");
 
             yield return new DeserializationTestInstance(
                 @"- <textCase> = TextCase.Lower
@@ -686,10 +686,12 @@ Log 'Comments!'",
 
             yield return new DeserializationTestInstance(
                 @"
-- <docs> = (a: [1,2,3])['a'] | ArrayMap (<>)
-- log <docs>
-",
-                "3 Elements"
+- <docs> = (GenerateDocumentation)['AllPages'] | Evaluate
+- <docs>
+| arraytake 1 | ForEach (<entityVar> =>
+    log (stringtrim <entityVar>['FileName'])
+  )",
+                "all.md"
             );
         }
     }

@@ -165,6 +165,17 @@ public abstract record Array<T> : IArray
     /// <inheritdoc />
     public abstract string Serialize { get; }
 
+    /// <inheritdoc />
+    public abstract Result<Array<TElement>, IErrorBuilder> TryConvertElements<TElement>();
+
+    /// <summary>
+    /// Create an array by converting elements
+    /// </summary>
+    public static Result<Array<T>, IErrorBuilder> CreateByConverting(IArray array)
+    {
+        return array.TryConvertElements<T>();
+    }
+
     /// <summary>
     /// Equality comparison
     /// </summary>
@@ -221,12 +232,17 @@ public interface IArray
     /// <summary>
     /// How this Array will appear in the logs.
     /// </summary>
-    public string NameInLogs { get; }
+    string NameInLogs { get; }
 
     /// <summary>
     /// Serialize this array
     /// </summary>
-    public string Serialize { get; }
+    string Serialize { get; }
+
+    /// <summary>
+    /// Attempts to convert the elements of the array to the chosen type
+    /// </summary>
+    Result<Array<TElement>, IErrorBuilder> TryConvertElements<TElement>();
 }
 
 /// <summary>

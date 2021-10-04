@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Internal;
@@ -30,15 +31,19 @@ public abstract class
     /// <inheritdoc />
     protected override Result<bool, IErrorBuilder> Operate(IEnumerable<TElement> terms)
     {
-        var last     = Maybe<TElement>.None;
-        var comparer = Comparer<TElement>.Default;
+        var       last     = Maybe<TElement>.None;
+        IComparer comparer = Comparer<TElement>.Default;
+
+        if (comparer.Equals(Comparer<object>.Default))
+            comparer = DefaultObjectComparer.Instance;
 
         foreach (var term in terms)
         {
             if (last.HasValue)
             {
                 var comparisonValue = comparer.Compare(last.Value, term);
-                var checkResult     = CheckComparisonValue(comparisonValue);
+
+                var checkResult = CheckComparisonValue(comparisonValue);
 
                 if (!checkResult)
                     return false;
@@ -48,6 +53,27 @@ public abstract class
         }
 
         return true;
+    }
+
+    private class DefaultObjectComparer : IComparer<object>, IComparer
+    {
+        private DefaultObjectComparer() { }
+        public static DefaultObjectComparer Instance { get; } = new();
+
+        public int Compare(object? x, object? y)
+        {
+            if (x is null || y is null)
+                return Comparer<object>.Default.Compare(x, y);
+
+            if (x.GetType() == y.GetType())
+            {
+                return Comparer<object>.Default.Compare(x, y);
+            }
+
+            var xString = x.ToString();
+            var yString = y.ToString();
+            return Comparer<string>.Default.Compare(xString, yString);
+        }
     }
 
     /// <summary>
