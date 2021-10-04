@@ -30,6 +30,14 @@ public sealed record LogSituation : LogSituationBase
     );
 
     /// <summary>
+    /// Error Caught in {StepName}: {Message}
+    /// </summary>
+    public static readonly LogSituation StepErrorWasCaught = new(
+        nameof(StepErrorWasCaught),
+        LogLevel.Information
+    );
+
+    /// <summary>
     /// {StepName} Started with Parameters: {Parameters}
     /// </summary>
     public static readonly LogSituation EnterStep = new(nameof(EnterStep), LogLevel.Trace);

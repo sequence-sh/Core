@@ -203,5 +203,14 @@ namespace Reductech.EDR.Core.Internal.Logging {
                 return ResourceManager.GetString("SetVariableOutOfScope", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Error Caught in {StepName}: {Message}.
+        /// </summary>
+        internal static string StepErrorWasCaught {
+            get {
+                return ResourceManager.GetString("StepErrorWasCaught", resourceCulture);
+            }
+        }
     }
 }

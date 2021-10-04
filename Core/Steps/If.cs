@@ -31,7 +31,9 @@ public sealed class If<T> : CompoundStep<T>
                     if (Else is not null)
                         return Else.Run(stateMonad, cancellationToken);
 
-                    return Task.FromResult(Result.Success<T, IError>(DefaultTypes.GetDefault<T>()));
+                    return Task.FromResult(
+                        Result.Success<T, IError>(DefaultValues.GetDefault<T>())
+                    );
                 }
             );
 

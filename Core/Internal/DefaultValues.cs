@@ -8,7 +8,7 @@ using Reductech.EDR.Core.Util;
 namespace Reductech.EDR.Core.Internal
 {
 
-public static class DefaultTypes
+public static class DefaultValues
 {
     public static T GetDefault<T>()
     {

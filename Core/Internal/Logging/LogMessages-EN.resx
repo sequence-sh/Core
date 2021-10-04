@@ -165,4 +165,7 @@
   <data name="SetVariableOutOfScope" xml:space="preserve">
     <value>Could not set variable {variable} as it was out of scope.</value>
   </data>
+  <data name="StepErrorWasCaught" xml:space="preserve">
+    <value>Error Caught in {StepName}: {Message}</value>
+  </data>
 </root>
