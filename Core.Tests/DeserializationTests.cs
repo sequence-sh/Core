@@ -693,6 +693,23 @@ Log 'Comments!'",
   )",
                 "all.md"
             );
+
+            yield return new DeserializationTestInstance(
+                "ValueIf  condition:true then:(log 't') else: (log 'f')",
+                "t"
+            );
+
+            yield return new DeserializationTestInstance(
+                "ValueIf  condition:true then:(log 't')",
+                "t"
+            );
+
+            yield return new DeserializationTestInstance(
+                "ValueIf  condition:false then:(log 't') else: (log 'f')",
+                "f"
+            );
+
+            yield return new DeserializationTestInstance("ValueIf  condition:false then:(log 't')");
         }
     }
 }
