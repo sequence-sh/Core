@@ -49,15 +49,15 @@ public sealed class SCLRunner
         Dictionary<string, object> sequenceMetadata,
         CancellationToken cancellationToken)
     {
-        sequenceMetadata[SCLTextName]    = text;
-        sequenceMetadata[SequenceIdName] = Guid.NewGuid();
+        sequenceMetadata[SCLTextName] = text;
+        sequenceMetadata[RunIdName]   = Guid.NewGuid();
         return await RunSequence(text, sequenceMetadata, cancellationToken);
     }
 
     /// <summary>
-    /// The name of the SequenceId log property.
+    /// The name of the RunId log property.
     /// </summary>
-    public const string SequenceIdName = "SequenceId";
+    public const string RunIdName = "RunId";
 
     /// <summary>
     /// The name of the SCL Path log property
