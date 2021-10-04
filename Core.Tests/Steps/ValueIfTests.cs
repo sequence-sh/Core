@@ -8,7 +8,7 @@ using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 namespace Reductech.EDR.Core.Tests.Steps
 {
 
-public partial class ValueIfTests : StepTestBase<ValueIf<int>, int>
+public partial class ValueIfTests : StepTestBase<If<int>, int>
 {
     /// <inheritdoc />
     protected override IEnumerable<StepCase> StepCases
@@ -17,7 +17,7 @@ public partial class ValueIfTests : StepTestBase<ValueIf<int>, int>
         {
             yield return new StepCase(
                 "ValueIf true",
-                new ValueIf<int>()
+                new If<int>()
                 {
                     Condition = Constant(true), Then = Constant(1), Else = Constant(2)
                 },
@@ -26,7 +26,7 @@ public partial class ValueIfTests : StepTestBase<ValueIf<int>, int>
 
             yield return new StepCase(
                 "ValueIf false",
-                new ValueIf<int>()
+                new If<int>()
                 {
                     Condition = Constant(false), Then = Constant(1), Else = Constant(2)
                 },
@@ -55,7 +55,7 @@ public partial class ValueIfTests : StepTestBase<ValueIf<int>, int>
         {
             yield return new ErrorCase(
                 "Condition is error",
-                new ValueIf<Unit>()
+                new If<Unit>()
                 {
                     Condition = new FailStep<bool> { ErrorMessage = "Condition Fail" },
                     Then      = new FailStep<Unit> { ErrorMessage = "Then Fail" },
@@ -70,7 +70,7 @@ public partial class ValueIfTests : StepTestBase<ValueIf<int>, int>
 
             yield return new ErrorCase(
                 "Then is error",
-                new ValueIf<Unit>()
+                new If<Unit>()
                 {
                     Condition = Constant(true),
                     Then      = new FailStep<Unit> { ErrorMessage = "Then Fail" },
@@ -85,7 +85,7 @@ public partial class ValueIfTests : StepTestBase<ValueIf<int>, int>
 
             yield return new ErrorCase(
                 "Else is error",
-                new ValueIf<Unit>()
+                new If<Unit>()
                 {
                     Condition = Constant(false),
                     Then      = new FailStep<Unit> { ErrorMessage = "Then Fail" },

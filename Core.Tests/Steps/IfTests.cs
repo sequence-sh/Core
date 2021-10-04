@@ -8,7 +8,7 @@ using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 namespace Reductech.EDR.Core.Tests.Steps
 {
 
-public partial class IfTests : StepTestBase<If, Unit>
+public partial class IfTests : StepTestBase<If<Unit>, Unit>
 {
     /// <inheritdoc />
     protected override IEnumerable<DeserializeCase> DeserializeCases
@@ -31,7 +31,7 @@ public partial class IfTests : StepTestBase<If, Unit>
         {
             yield return new StepCase(
                 "If true Log something",
-                new If
+                new If<Unit>
                 {
                     Condition = Constant(true),
                     Then      = new Log<StringStream>() { Value = Constant("Hello World") }
@@ -42,7 +42,7 @@ public partial class IfTests : StepTestBase<If, Unit>
 
             yield return new StepCase(
                 "If false Log nothing",
-                new If
+                new If<Unit>
                 {
                     Condition = Constant(false),
                     Then      = new Log<StringStream> { Value = Constant("Hello World") }
@@ -52,7 +52,7 @@ public partial class IfTests : StepTestBase<If, Unit>
 
             yield return new StepCase(
                 "If false Log something else",
-                new If
+                new If<Unit>
                 {
                     Condition = Constant(false),
                     Then      = new Log<StringStream> { Value = Constant("Hello World") },
@@ -71,7 +71,7 @@ public partial class IfTests : StepTestBase<If, Unit>
         {
             yield return new ErrorCase(
                 "Condition is error",
-                new If()
+                new If<Unit>()
                 {
                     Condition = new FailStep<bool> { ErrorMessage = "Condition Fail" },
                     Then      = new FailStep<Unit> { ErrorMessage = "Then Fail" },
@@ -86,7 +86,7 @@ public partial class IfTests : StepTestBase<If, Unit>
 
             yield return new ErrorCase(
                 "Then is error",
-                new If()
+                new If<Unit>()
                 {
                     Condition = Constant(true),
                     Then      = new FailStep<Unit> { ErrorMessage = "Then Fail" },
@@ -101,7 +101,7 @@ public partial class IfTests : StepTestBase<If, Unit>
 
             yield return new ErrorCase(
                 "Else is error",
-                new If()
+                new If<Unit>()
                 {
                     Condition = Constant(false),
                     Then      = new FailStep<Unit> { ErrorMessage = "Then Fail" },
