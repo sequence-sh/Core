@@ -1049,11 +1049,15 @@ public abstract record EntityValue(object? ObjectValue)
 
             return ser;
         }
-        else if (type == typeof(StringStream) || type == typeof(object))
+        else if (type == typeof(StringStream))
         {
             var ser = new StringStream(GetPrimitiveString());
 
             return ser;
+        }
+        else if (type == typeof(object))
+        {
+            return AsSCLObject(ObjectValue) ?? new StringStream(GetPrimitiveString());
         }
         else if (type.GetInterfaces().Contains(typeof(IOneOf)))
         {
@@ -1082,6 +1086,39 @@ public abstract record EntityValue(object? ObjectValue)
         }
 
         return ErrorCode.CouldNotConvertEntityValue.ToErrorBuilder(type.Name);
+    }
+
+    private static object? AsSCLObject(object? o)
+    {
+        if (o is null)
+            return Entity.Empty;
+
+        if (o is int i)
+            return i;
+
+        if (o is double d)
+            return d;
+
+        if (o is string s)
+            return new StringStream(s);
+
+        if (o is StringStream ss)
+            return ss;
+
+        if (o is DateTime dt)
+            return dt;
+
+        if (o is IArray)
+            return o;
+
+        if (o is Entity e)
+            return e;
+
+        //Enumeration and enum should map to null and get converted to stringstream
+        //if (o is Enumeration enumeration)
+        //    return enumeration;
+
+        return null;
     }
 
     /// <summary>

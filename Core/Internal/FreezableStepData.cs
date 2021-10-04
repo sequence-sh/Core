@@ -140,7 +140,6 @@ public sealed record FreezableStepData(StepParameterDict StepProperties, TextLoc
             FreezableStepProperty.Variable vName,
             StepParameterReference stepParameterReference)
         {
-            //Is this variable name actually a GetVariable step
             if (!stepFactory.ParameterDictionary.TryGetValue(
                 stepParameterReference,
                 out var parameter
@@ -157,9 +156,12 @@ public sealed record FreezableStepData(StepParameterDict StepProperties, TextLoc
 
             if (parameter.GetCustomAttribute<StepPropertyAttribute>() is not null)
             {
+                //This variable name is actually a GetVariable step
                 var step = vName.ConvertToStep();
                 GetVariablesUsedByStep(step, stepParameterReference, false);
             }
+
+            //Do nothing - this part will be handled by the get variable step
         }
 
         void GetVariablesUsedByStep(

@@ -70,28 +70,19 @@ public sealed class TypeResolver
 
         if (r1.IsFailure)
         {
-            if (r1.Error.GetErrorBuilders().Count() == 1
-             && r1.Error.GetErrorBuilders().Single().ErrorCode
-             == ErrorCode.WrongVariableType) //Get a better error message
-            {
-                var r3 = lambda.FreezableStep.TryFreeze(scopedCallerMetadata, newTypeResolver);
+            if (r1.Error.GetErrorBuilders().Count() != 1
+             || r1.Error.GetErrorBuilders().Single().ErrorCode != ErrorCode.WrongVariableType)
+                return r1.ConvertFailure<TypeResolver>()
+                    .MapError(x => x.WithLocation(lambda.Location));
 
-                if (r3.IsFailure)
-                    return r3.ConvertFailure<TypeResolver>();
-            }
+            var r3 = lambda.FreezableStep.TryFreeze(scopedCallerMetadata, newTypeResolver);
+
+            if (r3.IsFailure)
+                return r3.ConvertFailure<TypeResolver>();
 
             return r1.ConvertFailure<TypeResolver>()
                 .MapError(x => x.WithLocation(lambda.Location));
         }
-
-        //if (vn != VariableName.Item) //Mostly resolved the problem
-        //{
-        //    var r1b = newTypeResolver.TryAddType(VariableName.Item, typeReference);
-
-        //    if (r1b.IsFailure)
-        //        return r1b.ConvertFailure<TypeResolver>()
-        //            .MapError(x => x.WithLocation(lambda.Location));
-        //}
 
         var r2 = newTypeResolver.TryAddTypeHierarchy(scopedCallerMetadata, lambda.FreezableStep);
 
@@ -162,7 +153,8 @@ public sealed class TypeResolver
             if (!unresolvableVariableNames.Any())
                 break; //We've resolved everything. Yey!
 
-            if (numberUnresolved == null || numberUnresolved > unresolvableVariableNames.Count)
+            if (Dictionary.Any() && (numberUnresolved is null
+                                  || numberUnresolved > unresolvableVariableNames.Count))
                 numberUnresolved =
                     unresolvableVariableNames
                         .Count; //We have improved this number and can try again

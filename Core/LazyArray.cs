@@ -189,6 +189,24 @@ public sealed record LazyArray<T>
     }
 
     /// <inheritdoc />
+    public override Result<Array<TElement>, IErrorBuilder> TryConvertElements<TElement>()
+    {
+        var stuff =
+            GetAsyncEnumerable()
+                .Select(x => x.TryConvert<TElement>())
+                .Select(
+                    x => x.IsFailure
+                        ? throw new ErrorException(
+                            x.Error.WithLocation(ErrorLocation.EmptyLocation)
+                        ) //Todo correct error location
+                        : x.Value
+                )
+                .ToSCLArray();
+
+        return stuff;
+    }
+
+    /// <inheritdoc />
     public override string ToString() => NameInLogs;
 }
 

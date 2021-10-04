@@ -13,7 +13,8 @@ namespace Reductech.EDR.Core.Steps
 {
 
 /// <summary>
-/// Map each element of the array to a new value
+/// Map each element of the array to a new value.
+/// The new value must have the same type as the original value.
 /// </summary>
 public sealed class ArrayMap<T> : CompoundStep<Array<T>>
 {

@@ -22,7 +22,15 @@ namespace Reductech.EDR.Core.Steps
 public sealed class EntityGetValue<T> : CompoundStep<T>
 {
     /// <inheritdoc />
-    protected override async Task<Result<T, IError>> Run(
+    protected override Task<Result<T, IError>> Run(
+        IStateMonad stateMonad,
+        CancellationToken cancellationToken)
+    {
+        return Run<T>(stateMonad, cancellationToken);
+    }
+
+    /// <inheritdoc />
+    public override async Task<Result<T1, IError>> Run<T1>(
         IStateMonad stateMonad,
         CancellationToken cancellationToken)
     {
@@ -33,7 +41,7 @@ public sealed class EntityGetValue<T> : CompoundStep<T>
         );
 
         if (r.IsFailure)
-            return r.ConvertFailure<T>();
+            return r.ConvertFailure<T1>();
 
         var (entity, property) = r.Value;
 
@@ -52,9 +60,9 @@ public sealed class EntityGetValue<T> : CompoundStep<T>
         var entityValue = entity.TryGetValue(epk);
 
         if (entityValue.HasNoValue)
-            return EntityValue.GetDefaultValue<T>();
+            return EntityValue.GetDefaultValue<T1>();
 
-        var result = entityValue.Value.TryGetValue<T>()
+        var result = entityValue.Value.TryGetValue<T1>()
             .MapError(x => x.WithLocation(this));
 
         return result;
@@ -99,6 +107,12 @@ public sealed class EntityGetValue<T> : CompoundStep<T>
             FreezableStepData freezableStepData,
             TypeResolver typeResolver)
         {
+            if (callerMetadata.ExpectedType.IsUnknown
+             || callerMetadata.ExpectedType == TypeReference.Any.Instance)
+            {
+                return TypeReference.Dynamic.Instance;
+            }
+
             return callerMetadata.ExpectedType;
         }
 
