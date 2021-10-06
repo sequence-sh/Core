@@ -666,6 +666,25 @@ public abstract class StepFactory : IStepFactory
 
     private static string GetLastTerm(string s) =>
         s.Split('.', StringSplitOptions.RemoveEmptyEntries).Last();
+
+    /// <inheritdoc />
+    public string Summary => StepType.GetXmlDocsSummary();
+
+    /// <inheritdoc />
+    public IEnumerable<string> Names
+    {
+        get
+        {
+            yield return TypeName;
+
+            foreach (var alias in StepType.GetCustomAttributes<AliasAttribute>())
+                yield return alias.Name;
+        }
+    }
+
+    /// <inheritdoc />
+    public IEnumerable<SCLExampleAttribute> Examples =>
+        StepType.GetCustomAttributes<SCLExampleAttribute>();
 }
 
 }

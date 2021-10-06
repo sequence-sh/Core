@@ -4,7 +4,6 @@ using System.Linq;
 using System.Reflection;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.ConnectorManagement.Base;
-using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Connectors;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Util;
@@ -52,13 +51,13 @@ public class StepFactoryStore
         );
     }
 
-    private static IEnumerable<string> GetStepNames(IStepFactory stepFactory)
-    {
-        yield return stepFactory.TypeName;
+    //private static IEnumerable<string> GetStepNames(IStepFactory stepFactory)
+    //{
+    //    yield return stepFactory.TypeName;
 
-        foreach (var alias in stepFactory.StepType.GetCustomAttributes<AliasAttribute>())
-            yield return alias.Name;
-    }
+    //    foreach (var alias in stepFactory.StepType.GetCustomAttributes<AliasAttribute>())
+    //        yield return alias.Name;
+    //}
 
     /// <summary>
     /// Creates a StepFactoryStore with steps from the given assemblies
@@ -84,7 +83,7 @@ public class StepFactoryStore
         IReadOnlyCollection<IStepFactory> factories)
     {
         var dictionary = factories
-            .SelectMany(factory => GetStepNames(factory).Select(name => (factory, name)))
+            .SelectMany(factory => factory.Names.Select(name => (factory, name)))
             .ToDictionary(x => x.name, x => x.factory);
 
         var enumTypesDictionary = dictionary.Values.SelectMany(x => x.EnumTypes)

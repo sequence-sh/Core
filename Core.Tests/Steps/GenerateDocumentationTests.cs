@@ -208,6 +208,46 @@ public partial class GenerateDocumentationTests : StepTestBase<GenerateDocumenta
                     new[] { DocumentationExampleStepFactory.Instance }
                 )
             );
+
+            yield return new StepCase(
+                "Test all Step Names",
+                new ForEach<Entity>()
+                {
+                    Action =
+                        new LambdaFunction<Entity, Unit>(
+                            null,
+                            new Log<StringStream>()
+                            {
+                                Value =
+                                    new EntityGetValue<StringStream>()
+                                    {
+                                        Entity   = new GetAutomaticVariable<Entity>(),
+                                        Property = new StringConstant("Title")
+                                    }
+                            }
+                        ),
+                    Array = new ArrayTake<Entity>()
+                    {
+                        Array = new EntityGetValue<Array<Entity>>()
+                        {
+                            Entity   = new GenerateDocumentation(),
+                            Property = new StringConstant("AllPages")
+                        },
+                        Count = new IntConstant(10)
+                    }
+                },
+                Unit.Default,
+                "all",
+                "Core",
+                "And",
+                "AppendString",
+                "ArrayConcat",
+                "ArrayDistinct",
+                "ArrayEvaluate",
+                "ArrayFilter",
+                "ArrayFirst",
+                "ArrayGroupBy"
+            );
         }
     }
 

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Reflection;
 using CSharpFunctionalExtensions;
+using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Internal.Serialization;
 
@@ -17,11 +18,6 @@ public interface IStepFactory
     /// Unique name for this type of step.
     /// </summary>
     public string TypeName { get; }
-
-    /// <summary>
-    /// The type of the step to create.
-    /// </summary>
-    public Type StepType { get; }
 
     /// <summary>
     /// The category of the step. Used for documentation.
@@ -76,6 +72,15 @@ public interface IStepFactory
     /// Gets all enum types used by this step.
     /// </summary>
     IEnumerable<Type> EnumTypes { get; }
+
+    /// Step Summary
+    public string Summary { get; }
+
+    /// Names for this Step
+    public IEnumerable<string> Names { get; }
+
+    /// Examples for this step
+    public IEnumerable<SCLExampleAttribute> Examples { get; }
 }
 
 }

@@ -5,7 +5,6 @@ using System.Linq;
 using System.Reflection;
 using AutoTheory;
 using FluentAssertions;
-using FluentAssertions.Common;
 using Namotion.Reflection;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal;
@@ -184,10 +183,11 @@ public abstract partial class StepTestBase<TStep, TOutput> : IStepTestBase
 
         instance.StepFactory.Should().NotBeNull();
 
-        instance.StepFactory.StepType.Name.Should()
-            .Be(typeof(TStep).Name); //Compare type names because of generic types
+        var stepType = (instance.StepFactory as StepFactory)!.StepType;
 
-        typeof(TStep).Should().BeAssignableTo(instance.StepFactory.StepType);
+        stepType.Name.Should().Be(typeof(TStep).Name); //Compare type names because of generic types
+
+        typeof(TStep).Should().BeAssignableTo(stepType);
     }
 }
 

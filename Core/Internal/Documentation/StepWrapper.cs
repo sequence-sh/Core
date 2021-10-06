@@ -22,7 +22,7 @@ public class StepWrapper : IDocumentedStep
         Factory               = grouping.Key;
         DocumentationCategory = grouping.Key.Category;
 
-        RelevantProperties = grouping.Key.StepType.GetProperties()
+        RelevantProperties = grouping.Key.ParameterDictionary.Values.Distinct()
             .Select(
                 property => (
                     property, attribute: property.GetCustomAttribute<StepPropertyBaseAttribute>())
@@ -43,7 +43,7 @@ public class StepWrapper : IDocumentedStep
 
         AllNames = grouping.ToList();
 
-        Examples = Factory.StepType.GetCustomAttributes<SCLExampleAttribute>().ToList();
+        Examples = Factory.Examples.ToList();
     }
 
     private static PropertyWrapper GetPropertyWrapper(PropertyInfo propertyInfo) =>
@@ -55,13 +55,14 @@ public class StepWrapper : IDocumentedStep
     public string DocumentationCategory { get; }
 
     /// <inheritdoc />
-    public string Name => TypeNameHelper.GetHumanReadableTypeName(Factory.StepType);
+    public string Name =>
+        Factory.TypeName; // TypeNameHelper.GetHumanReadableTypeName(Factory.StepType);
 
     /// <inheritdoc />
     public string FileName => Factory.TypeName + ".md";
 
     /// <inheritdoc />
-    public string Summary => Factory.StepType.GetXmlDocsSummary();
+    public string Summary => Factory.Summary;
 
     /// <inheritdoc />
     public string? TypeDetails { get; }
