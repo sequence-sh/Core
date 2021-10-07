@@ -63,7 +63,7 @@ public partial class EntityFormatTests : StepTestBase<EntityFormat, StringStream
                 new StateMonad(
                     NullLogger.Instance,
                     StepFactoryStore.Create(),
-                    null,
+                    null!,
                     new Dictionary<string, object>()
                 ),
                 CancellationToken.None

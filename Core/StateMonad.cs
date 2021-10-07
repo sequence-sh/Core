@@ -138,7 +138,8 @@ public sealed class StateMonad : IStateMonad
                 BindingFlags.Public | BindingFlags.Static
             );
 
-            var conversionResult = (Result<T, IErrorBuilder>)method.Invoke(null, new[] { array });
+            var conversionResult =
+                (Result<T, IErrorBuilder>)method?.Invoke(null, new object?[] { array })!;
 
             if (conversionResult.IsFailure)
                 return conversionResult.ConvertFailure<Maybe<T>>();

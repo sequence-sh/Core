@@ -59,6 +59,9 @@ public sealed class SCLExampleAttribute : Attribute
     );
 }
 
+/// <summary>
+/// An SCL Example of using a particular step
+/// </summary>
 public record SCLExample(
     string SCL,
     string? Description,
