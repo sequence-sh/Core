@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
@@ -103,10 +102,10 @@ public abstract class StepFactory : IStepFactory
         FreezableStepData freezeData,
         TypeResolver typeResolver);
 
-    private IReadOnlyDictionary<StepParameterReference, PropertyInfo>? _propertyDictionary;
+    private IReadOnlyDictionary<StepParameterReference, IStepParameter>? _propertyDictionary;
 
     /// <inheritdoc />
-    public IReadOnlyDictionary<StepParameterReference, PropertyInfo> ParameterDictionary
+    public IReadOnlyDictionary<StepParameterReference, IStepParameter> ParameterDictionary
     {
         get
         {
@@ -114,9 +113,13 @@ public abstract class StepFactory : IStepFactory
                 .GetProperties()
                 .SelectMany(
                     propertyInfo => StepParameterReference.GetPossibleReferences(propertyInfo)
-                        .Select(key => (propertyInfo, key))
+                        .Select(key => (key, parameter: StepParameter.TryCreate(propertyInfo)))
                 )
-                .ToDictionary(x => x.key, x => x.propertyInfo);
+                .Where(x => x.parameter is not null)
+                .ToDictionary(
+                    x => x.key,
+                    x => x.parameter!
+                );
         }
     }
 
@@ -173,7 +176,7 @@ public abstract class StepFactory : IStepFactory
             return Result.Failure<IStep, IError>(ErrorList.Combine(errors));
 
         var remainingRequired =
-            ParameterDictionary.Values.Where(x => x.GetCustomAttributes<RequiredAttribute>().Any())
+            ParameterDictionary.Values.Where(x => x.Required)
                 .Select(x => x.Name)
                 .ToHashSet();
 
@@ -683,8 +686,8 @@ public abstract class StepFactory : IStepFactory
     }
 
     /// <inheritdoc />
-    public IEnumerable<SCLExampleAttribute> Examples =>
-        StepType.GetCustomAttributes<SCLExampleAttribute>();
+    public IEnumerable<SCLExample> Examples => StepType.GetCustomAttributes<SCLExampleAttribute>()
+        .Select(x => x.ToSCLExample);
 }
 
 }

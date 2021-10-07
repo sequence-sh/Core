@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using CSharpFunctionalExtensions;
-using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal.Errors;
 using StepParameterDict =
     System.Collections.Generic.IReadOnlyDictionary<
@@ -154,7 +152,7 @@ public sealed record FreezableStepData(StepParameterDict StepProperties, TextLoc
                 return;
             }
 
-            if (parameter.GetCustomAttribute<StepPropertyAttribute>() is not null)
+            if (parameter.MemberType == MemberType.Step)
             {
                 //This variable name is actually a GetVariable step
                 var step = vName.ConvertToStep();
@@ -187,18 +185,18 @@ public sealed record FreezableStepData(StepParameterDict StepProperties, TextLoc
 
             if (isList)
             {
-                if (parameter.PropertyType.IsGenericType
-                 && parameter.PropertyType.GetGenericTypeDefinition()
+                if (parameter.StepType.IsGenericType
+                 && parameter.StepType.GetGenericTypeDefinition()
                  == typeof(IReadOnlyList<>))
                 {
-                    var stepType = parameter.PropertyType.GenericTypeArguments[0];
+                    var stepType = parameter.StepType.GenericTypeArguments[0];
                     tr = TypeReference.CreateFromStepType(stepType);
                 }
 
                 else
                 {
                     var arrayTypeReference =
-                        TypeReference.CreateFromStepType(parameter.PropertyType);
+                        TypeReference.CreateFromStepType(parameter.StepType);
 
                     var memberTypeReference =
                         arrayTypeReference.TryGetArrayMemberTypeReference(typeResolver);
@@ -224,14 +222,14 @@ public sealed record FreezableStepData(StepParameterDict StepProperties, TextLoc
                     tr = memberTypeReference.Value;
                 }
             }
-            else if (parameter.GetCustomAttribute<FunctionPropertyAttribute>() is not null)
+            else if (parameter.MemberType == MemberType.Lambda)
             {
                 GetVariablesUsedByLambda(freezableStep, null, stepParameterReference);
                 return;
             }
             else
             {
-                tr = TypeReference.CreateFromStepType(parameter.PropertyType);
+                tr = TypeReference.CreateFromStepType(parameter.StepType);
             }
 
             var childCallerMetadata = new CallerMetadata(stepName, stepParameterReference.Name, tr);
@@ -263,7 +261,7 @@ public sealed record FreezableStepData(StepParameterDict StepProperties, TextLoc
                 return;
             }
 
-            var tr = TypeReference.CreateFromStepType(parameter.PropertyType);
+            var tr = TypeReference.CreateFromStepType(parameter.StepType);
 
             var childCallerMetadata = new CallerMetadata(stepName, stepParameterReference.Name, tr);
 

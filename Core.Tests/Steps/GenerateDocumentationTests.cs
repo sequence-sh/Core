@@ -15,6 +15,7 @@ using Reductech.EDR.Core.Internal.Serialization;
 using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.TestHarness;
 using Reductech.EDR.Core.Util;
+using StepParameter = Reductech.EDR.Core.Internal.Documentation.StepParameter;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
@@ -303,7 +304,7 @@ public partial class GenerateDocumentationTests : StepTestBase<GenerateDocumenta
         [StepProperty(1)]
         [Required]
         [AllowedRange("Greater than 1")]
-        [DocumentationURL("alpha.com")]
+        [DocumentationURL("alpha.com", "Alpha")]
         [Example("1234")]
         [RecommendedRange("100-300")]
         [RecommendedValue("201")]

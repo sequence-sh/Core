@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Reflection;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal.Errors;
@@ -27,7 +26,7 @@ public interface IStepFactory
     /// <summary>
     /// Dictionary mapping parameter references to properties.
     /// </summary>
-    IReadOnlyDictionary<StepParameterReference, PropertyInfo> ParameterDictionary { get; }
+    IReadOnlyDictionary<StepParameterReference, IStepParameter> ParameterDictionary { get; }
 
     /// <summary>
     /// Tries to get a reference to the output type of this step.
@@ -80,7 +79,7 @@ public interface IStepFactory
     public IEnumerable<string> Names { get; }
 
     /// Examples for this step
-    public IEnumerable<SCLExampleAttribute> Examples { get; }
+    public IEnumerable<SCLExample> Examples { get; }
 }
 
 }

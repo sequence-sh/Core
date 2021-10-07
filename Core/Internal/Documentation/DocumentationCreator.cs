@@ -94,7 +94,7 @@ public static class DocumentationCreator
             foreach (var doc in category)
             {
                 enumTypes.UnionWith(
-                    doc.Parameters.Select(x => x.Type)
+                    doc.Parameters.Select(x => x.ActualType)
                         .Select(x => Nullable.GetUnderlyingType(x) ?? x)
                         .Where(t => !t.IsSignatureType && t.IsEnum)
                 );
@@ -167,7 +167,7 @@ public static class DocumentationCreator
         var stepParameters = doc.Parameters.Select(
                 x => new StepParameter(
                     x.Name,
-                    TypeNameHelper.GetHumanReadableTypeName(x.Type),
+                    TypeNameHelper.GetHumanReadableTypeName(x.ActualType),
                     x.Summary,
                     x.Required,
                     x.Aliases.ToList()
@@ -213,9 +213,9 @@ public static class DocumentationCreator
                         var r = new List<string?>
                         {
                             nameString,
-                            TypeNameHelper.GetMarkupTypeName(rp.Type),
+                            TypeNameHelper.GetMarkupTypeName(rp.ActualType),
                             rp.Required ? "✔" : "",
-                            rp.Position?.ToString() ?? ""
+                            rp.Order?.ToString() ?? ""
                         };
 
                         foreach (var extraColumn in extraParameterColumns)

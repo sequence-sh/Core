@@ -7,7 +7,7 @@ namespace Reductech.EDR.Core.Attributes
 /// Indicates an example value for this parameter.
 /// </summary>
 [AttributeUsage(AttributeTargets.Property, AllowMultiple = true)]
-public sealed class ExampleAttribute : Attribute
+public sealed class ExampleAttribute : StepPropertyMetadataAttribute
 {
     /// <summary>
     /// Creates a new ExampleAttribute.
@@ -22,6 +22,12 @@ public sealed class ExampleAttribute : Attribute
     /// The example value.
     /// </summary>
     public string Example { get; }
+
+    /// <inheritdoc />
+    public override string MetadataFieldName => "Example";
+
+    /// <inheritdoc />
+    public override string MetadataFieldValue => Example;
 }
 
 }

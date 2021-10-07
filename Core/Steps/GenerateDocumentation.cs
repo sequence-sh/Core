@@ -20,7 +20,7 @@ namespace Reductech.EDR.Core.Steps
     - <path> = $""{<root>}/{<>['Directory']}/{<>['FileName']}""
     - log <path>
 )",
-    Description    = "Logs all the file paths",
+    Description = "Logs all the file paths",
     ExecuteInTests = false
 )]
 public sealed class
