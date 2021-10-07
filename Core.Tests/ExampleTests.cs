@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Divergic.Logging.Xunit;
+using Flurl.Http;
 using Microsoft.Extensions.Logging;
 using Reductech.EDR.Core.Abstractions;
 using Reductech.EDR.Core.Internal;
@@ -56,6 +57,7 @@ public partial class ExampleTests
             TestOutputHelper.BuildLogger(),
             sfs,
             ExternalContext.Default,
+            new FlurlClient(),
             new Dictionary<string, object>()
         );
 
@@ -98,7 +100,8 @@ public partial class ExampleTests
         var runner = new SCLRunner(
             logger,
             sfs,
-            ExternalContext.Default
+            ExternalContext.Default,
+            new FlurlClient()
         );
 
         var r = await runner.RunSequenceFromTextAsync(

@@ -51,18 +51,7 @@ public partial class ConnectorTests
             new ConnectorData(ConnectorSettings.DefaultForAssembly(assembly), assembly)
         );
 
-        var injectedContextsResult = stepFactoryStore.TryGetInjectedContexts(
-
-            //new SCLSettings(
-            //    Entity.Create(
-            //        new List<(EntityPropertyKey key, object? value)>()
-            //        {
-            //            (new EntityPropertyKey(new[] { "connectors", "example", "colorSource" }),
-            //             "Red")
-            //        }
-            //    )
-            //)
-        );
+        var injectedContextsResult = stepFactoryStore.TryGetInjectedContexts();
 
         injectedContextsResult.ShouldBeSuccessful();
 
@@ -74,7 +63,8 @@ public partial class ConnectorTests
         var runner = new SCLRunner(
             logger,
             stepFactoryStore,
-            externalContext
+            externalContext,
+            new FlurlClientSetupHelper().GetFlurlClient()
         );
 
         var r = await

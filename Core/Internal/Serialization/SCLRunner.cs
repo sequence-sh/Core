@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
+using Flurl.Http;
 using Microsoft.Extensions.Logging;
 using Reductech.EDR.Core.Abstractions;
 using Reductech.EDR.Core.Internal.Errors;
@@ -26,16 +27,19 @@ public sealed class SCLRunner
     public SCLRunner(
         ILogger logger,
         StepFactoryStore stepFactoryStore,
-        IExternalContext externalContext)
+        IExternalContext externalContext,
+        IFlurlClient flurlClient)
     {
         _logger           = logger;
         _stepFactoryStore = stepFactoryStore;
         _externalContext  = externalContext;
+        _flurlClient      = flurlClient;
     }
 
     private readonly ILogger _logger;
     private readonly StepFactoryStore _stepFactoryStore;
     private readonly IExternalContext _externalContext;
+    private readonly IFlurlClient _flurlClient;
 
     /// <summary>
     /// Run step defined in an SCL string.
@@ -104,6 +108,7 @@ public sealed class SCLRunner
             _logger,
             _stepFactoryStore,
             _externalContext,
+            _flurlClient,
             sequenceMetadata
         );
 

@@ -131,10 +131,11 @@ public abstract partial class StepTestBase<TStep, TOutput>
             ILogger logger)
         {
             var externalContext = ExternalContextSetupHelper.GetExternalContext(mockRepository);
+            var flurlClient     = FlurlClientSetupHelper.GetFlurlClient();
 
             var tStepAssembly = Assembly.GetAssembly(typeof(TStep))!;
 
-            var sfs = StepFactoryStoreToUse.Unwrap(
+            var sfs = StepFactoryStoreToUse.GetValueOrDefault(
                 StepFactoryStore.CreateFromAssemblies(tStepAssembly)
             );
 
@@ -142,6 +143,7 @@ public abstract partial class StepTestBase<TStep, TOutput>
                 logger,
                 sfs,
                 externalContext,
+                flurlClient,
                 new Dictionary<string, object>()
             );
 
@@ -152,6 +154,9 @@ public abstract partial class StepTestBase<TStep, TOutput>
         }
 
         public ExternalContextSetupHelper ExternalContextSetupHelper { get; } = new();
+
+        /// <inheritdoc />
+        public FlurlClientSetupHelper FlurlClientSetupHelper { get; } = new();
 
         /// <inheritdoc />
         public bool IgnoreFinalState { get; set; }

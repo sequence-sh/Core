@@ -4,6 +4,7 @@ using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
+using Flurl.Http;
 using Microsoft.Extensions.Logging;
 using Reductech.EDR.Core.Abstractions;
 using Reductech.EDR.Core.Internal;
@@ -47,6 +48,9 @@ public sealed class ScopedStateMonad : IStateMonad
     public ILogger Logger => BaseStateMonad.Logger;
 
     /// <inheritdoc />
+    public IFlurlClient FlurlClient => BaseStateMonad.FlurlClient;
+
+    /// <inheritdoc />
     public IExternalContext ExternalContext => BaseStateMonad.ExternalContext;
 
     /// <inheritdoc />
@@ -65,7 +69,7 @@ public sealed class ScopedStateMonad : IStateMonad
             return r1.ConvertFailure<T>();
 
         if (r1.Value.HasValue)
-            return r1.Value.Value;
+            return r1.Value.GetValueOrThrow();
 
         var r2 = StateMonad
             .TryGetVariableFromDictionary<T>(key, _fixedState)

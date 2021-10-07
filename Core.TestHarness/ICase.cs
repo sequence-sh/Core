@@ -1,8 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
+using System.Reflection;
 using AutoTheory;
 using CSharpFunctionalExtensions;
+using Flurl.Http;
+using Flurl.Http.Testing;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Reductech.EDR.Core.Abstractions;
@@ -35,6 +39,45 @@ public interface ICaseThatExecutes : IAsyncTestInstance, ICaseWithSetup
 public interface ICaseWithSetup
 {
     ExternalContextSetupHelper ExternalContextSetupHelper { get; }
+    FlurlClientSetupHelper FlurlClientSetupHelper { get; }
+}
+
+public sealed class FlurlClientSetupHelper
+{
+    private List<Action<HttpTest>> Actions { get; } = new();
+
+    public void AddHttpTestAction(Action<HttpTest> action) => Actions.Add(action);
+
+    public IFlurlClient GetFlurlClient()
+    {
+        var httpTest = new HttpTest();
+
+        foreach (var action in Actions)
+            action(httpTest);
+
+        httpTest.RespondWith(
+            "Http Call not set up",
+            status: 404
+        );
+
+        var flurlClient = GetFlurlClient(httpTest);
+
+        return flurlClient;
+    }
+
+    private static IFlurlClient GetFlurlClient(HttpTest httpTest)
+    {
+        var type = httpTest.GetType();
+
+        var property = type.GetProperty(
+            nameof(HttpClient),
+            BindingFlags.Instance | BindingFlags.NonPublic
+        );
+
+        var httpClient = (HttpClient)property.GetValue(httpTest)!;
+
+        return new FlurlClient(httpClient);
+    }
 }
 
 public sealed class ExternalContextSetupHelper

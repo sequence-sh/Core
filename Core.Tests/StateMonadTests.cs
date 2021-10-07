@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
+using Flurl.Http;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Reductech.EDR.ConnectorManagement.Base;
@@ -115,6 +116,7 @@ public partial class StateMonadTests
                 repo.OneOf<ILogger>(),
                 StepFactoryStore.Create(Array.Empty<ConnectorData>()),
                 repo.OneOf<IExternalContext>(),
+                repo.OneOf<IFlurlClient>(),
                 repo.OneOf<IReadOnlyDictionary<string, object>>()
             );
     }

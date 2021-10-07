@@ -176,12 +176,14 @@ public partial class LoggingTests
             var logger = loggerFactory.CreateLogger("Test");
             var repo   = new MockRepository(MockBehavior.Strict);
 
-            var context = ExternalContextSetupHelper.GetExternalContext(repo);
+            var context     = ExternalContextSetupHelper.GetExternalContext(repo);
+            var flurlClient = FlurlClientSetupHelper.GetFlurlClient();
 
             var sclRunner = new SCLRunner(
                 logger,
                 spf,
-                context
+                context,
+                flurlClient
             );
 
             var r = await sclRunner.RunSequenceFromTextAsync(
@@ -197,6 +199,9 @@ public partial class LoggingTests
 
         /// <inheritdoc />
         public ExternalContextSetupHelper ExternalContextSetupHelper { get; } = new();
+
+        /// <inheritdoc />
+        public FlurlClientSetupHelper FlurlClientSetupHelper { get; } = new();
     }
 }
 

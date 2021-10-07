@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
+using Flurl.Http;
 using Microsoft.Extensions.Logging;
 using Reductech.EDR.Core.Abstractions;
 using Reductech.EDR.Core.Entities;
@@ -54,11 +55,13 @@ public sealed class StateMonad : IStateMonad
         ILogger logger,
         StepFactoryStore stepFactoryStore,
         IExternalContext externalContext,
+        IFlurlClient flurlClient,
         IReadOnlyDictionary<string, object> sequenceMetadata)
     {
         Logger           = logger;
         StepFactoryStore = stepFactoryStore;
         ExternalContext  = externalContext;
+        FlurlClient      = flurlClient;
         SequenceMetadata = sequenceMetadata;
 
         Settings = CreateSettingsEntity(stepFactoryStore);
@@ -78,6 +81,9 @@ public sealed class StateMonad : IStateMonad
     /// The external context
     /// </summary>
     public IExternalContext ExternalContext { get; }
+
+    /// <inheritdoc />
+    public IFlurlClient FlurlClient { get; }
 
     /// <summary>
     /// Constant metadata for the entire sequence

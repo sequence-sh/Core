@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using FluentAssertions;
+using Flurl.Http.Testing;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Reductech.EDR.Core.Abstractions;
@@ -70,6 +71,13 @@ public static class Extensions
     {
         cws.ExternalContextSetupHelper.AddSetupAction(action);
         return cws;
+    }
+
+    public static T WithFlurlMocks<T>(this T stepCase, Action<HttpTest> setupHttpTest)
+        where T : ICaseWithSetup
+    {
+        stepCase.FlurlClientSetupHelper.AddHttpTestAction(setupHttpTest);
+        return stepCase;
     }
 
     public static T WithContext<T>(this T cws, string name, object context)

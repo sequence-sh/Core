@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
+using Flurl.Http;
 using Microsoft.Extensions.Logging;
 using Reductech.EDR.Core.Abstractions;
 using Reductech.EDR.Core.Internal;
@@ -26,6 +27,11 @@ public interface IStateMonad : IAsyncDisposable
     /// The logger that steps will use to output messages.
     /// </summary>
     ILogger Logger { get; }
+
+    /// <summary>
+    /// Flurl Client. Used for HTTP Requests
+    /// </summary>
+    IFlurlClient FlurlClient { get; }
 
     /// <summary>
     /// The external context
