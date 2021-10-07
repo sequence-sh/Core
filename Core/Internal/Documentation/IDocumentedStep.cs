@@ -42,7 +42,7 @@ public interface IDocumentedStep
     /// <summary>
     /// The parameters to the method.
     /// </summary>
-    IEnumerable<IParameter> Parameters { get; }
+    IEnumerable<IStepParameter> Parameters { get; }
 
     /// <summary>
     /// All Names including aliases
@@ -52,7 +52,7 @@ public interface IDocumentedStep
     /// <summary>
     /// Examples of this step's usage
     /// </summary>
-    IReadOnlyList<SCLExampleAttribute> Examples { get; }
+    IReadOnlyList<SCLExample> Examples { get; }
 }
 
 }

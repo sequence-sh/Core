@@ -46,6 +46,24 @@ public sealed class SCLExampleAttribute : Attribute
     /// Whether this example will be executed in unit tests. (Deserialization will still be tested)
     /// </summary>
     public bool ExecuteInTests { get; set; } = true;
+
+    /// <summary>
+    /// Convert this attribute to an SCL Example
+    /// </summary>
+    public SCLExample ToSCLExample => new(
+        SCL,
+        Description,
+        ExpectedOutput,
+        ExpectedLogs,
+        ExecuteInTests
+    );
 }
+
+public record SCLExample(
+    string SCL,
+    string? Description,
+    string? ExpectedOutput,
+    string[]? ExpectedLogs,
+    bool ExecuteInTests);
 
 }

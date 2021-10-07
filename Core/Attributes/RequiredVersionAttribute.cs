@@ -8,7 +8,7 @@ namespace Reductech.EDR.Core.Attributes
 /// Additional requirements of this property
 /// </summary>
 [AttributeUsage(AttributeTargets.Property)]
-public abstract class RequirementAttribute : Attribute
+public abstract class RequirementAttribute : StepPropertyMetadataAttribute
 {
     /// <summary>
     /// Convert this requirement attribute to a requirement
@@ -37,6 +37,13 @@ public sealed class RequiredFeatureAttribute : RequirementAttribute
     ///The required features
     /// </summary>
     public string[] RequiredFeatures { get; set; }
+
+    /// <inheritdoc />
+    public override string MetadataFieldName => "Requirements";
+
+    /// <inheritdoc />
+    public override string MetadataFieldValue =>
+        $"{FeatureKey}: {string.Join(", ", RequiredFeatures)}";
 
     /// <inheritdoc />
     public override Requirement ToRequirement(string connectorName)
@@ -113,6 +120,12 @@ public sealed class RequiredVersionAttribute : RequirementAttribute
             return VersionKey;
         }
     }
+
+    /// <inheritdoc />
+    public override string MetadataFieldName => "Requirements";
+
+    /// <inheritdoc />
+    public override string MetadataFieldValue => Text;
 
     /// <inheritdoc />
     public override string ToString() => Text;
