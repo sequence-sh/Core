@@ -2,13 +2,13 @@
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using FluentAssertions;
-using Flurl.Http.Testing;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Reductech.EDR.Core.Abstractions;
 using Reductech.EDR.Core.ExternalProcesses;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
+using RestSharp;
 using Xunit;
 using Xunit.Sdk;
 
@@ -73,10 +73,10 @@ public static class Extensions
         return cws;
     }
 
-    public static T WithFlurlMocks<T>(this T stepCase, Action<HttpTest> setupHttpTest)
+    public static T SetupHTTP<T>(this T stepCase, Action<Mock<IRestClient>> setupHttpTest)
         where T : ICaseWithSetup
     {
-        stepCase.FlurlClientSetupHelper.AddHttpTestAction(setupHttpTest);
+        stepCase.RESTClientSetupHelper.AddHttpTestAction(setupHttpTest);
         return stepCase;
     }
 

@@ -37,10 +37,11 @@
   <ItemGroup>
     <PackageReference Include="Divergic.Logging.Xunit" Version="3.6.0" />
     <PackageReference Include="FluentAssertions" Version="6.1.0" />
-    <PackageReference Include="Flurl.Http" Version="3.2.0" />
     <PackageReference Include="MELT.Xunit" Version="0.8.0" />
     <PackageReference Include="Moq" Version="4.16.1" />
+    <PackageReference Include="MoqRestSharp.Helpers" Version="2021.4.30" />
     <PackageReference Include="Reductech.Utilities.AutoTheoryGenerator" Version="0.6.0" />
+    <PackageReference Include="RestSharp" Version="106.12.0" />
     <PackageReference Include="xunit" Version="2.4.1" />
     <PackageReference Include="xunit.abstractions" Version="2.0.3" />
   </ItemGroup>

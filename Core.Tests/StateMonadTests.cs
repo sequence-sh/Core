@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
-using Flurl.Http;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Reductech.EDR.ConnectorManagement.Base;
 using Reductech.EDR.Core.Abstractions;
 using Reductech.EDR.Core.Internal;
+using RestSharp;
 using Xunit;
 
 namespace Reductech.EDR.Core.Tests
@@ -116,7 +116,7 @@ public partial class StateMonadTests
                 repo.OneOf<ILogger>(),
                 StepFactoryStore.Create(Array.Empty<ConnectorData>()),
                 repo.OneOf<IExternalContext>(),
-                repo.OneOf<IFlurlClient>(),
+                repo.OneOf<IRestClient>(),
                 repo.OneOf<IReadOnlyDictionary<string, object>>()
             );
     }

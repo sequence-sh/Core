@@ -4,13 +4,13 @@ using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
-using Flurl.Http;
 using Microsoft.Extensions.Logging;
 using Reductech.EDR.Core.Abstractions;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Internal.Logging;
 using Reductech.EDR.Core.Util;
+using RestSharp;
 
 namespace Reductech.EDR.Core
 {
@@ -48,7 +48,7 @@ public sealed class ScopedStateMonad : IStateMonad
     public ILogger Logger => BaseStateMonad.Logger;
 
     /// <inheritdoc />
-    public IFlurlClient FlurlClient => BaseStateMonad.FlurlClient;
+    public IRestClient RestClient => BaseStateMonad.RestClient;
 
     /// <inheritdoc />
     public IExternalContext ExternalContext => BaseStateMonad.ExternalContext;

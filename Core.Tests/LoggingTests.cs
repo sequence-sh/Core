@@ -177,7 +177,7 @@ public partial class LoggingTests
             var repo   = new MockRepository(MockBehavior.Strict);
 
             var context     = ExternalContextSetupHelper.GetExternalContext(repo);
-            var flurlClient = FlurlClientSetupHelper.GetFlurlClient();
+            var flurlClient = RESTClientSetupHelper.GetRESTClient(repo);
 
             var sclRunner = new SCLRunner(
                 logger,
@@ -201,7 +201,7 @@ public partial class LoggingTests
         public ExternalContextSetupHelper ExternalContextSetupHelper { get; } = new();
 
         /// <inheritdoc />
-        public FlurlClientSetupHelper FlurlClientSetupHelper { get; } = new();
+        public RESTClientSetupHelper RESTClientSetupHelper { get; } = new();
     }
 }
 

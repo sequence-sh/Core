@@ -3,7 +3,6 @@ using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
-using Flurl.Http;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Reductech.EDR.Core.Attributes;
@@ -11,6 +10,7 @@ using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Util;
+using RestSharp;
 
 namespace Reductech.EDR.Core.Steps.REST
 {
@@ -36,12 +36,13 @@ public sealed class RESTGetJSON : CompoundStep<Entity>
 
         var (url, headers) = stuff.Value;
 
-        var request = url.WithClient(stateMonad.FlurlClient);
+        IRestRequest request = new RestRequest(url, Method.GET);
 
         if (headers.HasValue)
             request = request.AddHeaders(headers.GetValueOrThrow());
 
-        var jsonString = await request.TryRun(x => x.GetStringAsync(cancellationToken));
+        var jsonString =
+            await request.TryRun(stateMonad.RestClient, cancellationToken);
 
         if (jsonString.IsFailure)
             return jsonString.ConvertFailure<Entity>().MapError(x => x.WithLocation(this));

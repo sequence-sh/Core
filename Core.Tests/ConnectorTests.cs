@@ -10,6 +10,7 @@ using Reductech.EDR.Core.Abstractions;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Serialization;
 using Reductech.EDR.Core.TestHarness;
+using RestSharp;
 using Xunit;
 
 namespace Reductech.EDR.Core.Tests
@@ -64,7 +65,7 @@ public partial class ConnectorTests
             logger,
             stepFactoryStore,
             externalContext,
-            new FlurlClientSetupHelper().GetFlurlClient()
+            new RestClient()
         );
 
         var r = await

@@ -149,7 +149,7 @@ public partial class RunErrorTests
             var repo = new MockRepository(MockBehavior.Strict);
 
             var externalContext = ExternalContextSetupHelper.GetExternalContext(repo);
-            var flurlClient     = FlurlClientSetupHelper.GetFlurlClient();
+            var flurlClient     = RESTClientSetupHelper.GetRESTClient(repo);
 
             await using var state = new StateMonad(
                 NullLogger.Instance,
@@ -176,7 +176,7 @@ public partial class RunErrorTests
         public ExternalContextSetupHelper ExternalContextSetupHelper { get; } = new();
 
         /// <inheritdoc />
-        public FlurlClientSetupHelper FlurlClientSetupHelper { get; } = new();
+        public RESTClientSetupHelper RESTClientSetupHelper { get; } = new();
     }
 }
 

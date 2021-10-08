@@ -5,7 +5,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Divergic.Logging.Xunit;
-using Flurl.Http;
 using Microsoft.Extensions.Logging;
 using Reductech.EDR.Core.Abstractions;
 using Reductech.EDR.Core.Internal;
@@ -13,6 +12,7 @@ using Reductech.EDR.Core.Internal.Parser;
 using Reductech.EDR.Core.Internal.Serialization;
 using Reductech.EDR.Core.TestHarness;
 using Reductech.EDR.Core.Util;
+using RestSharp;
 using Xunit;
 using Xunit.Abstractions;
 using Xunit.Sdk;
@@ -26,8 +26,10 @@ namespace Reductech.EDR.Core.Tests
 [AutoTheory.UseTestOutputHelper]
 public partial class ExampleTests
 {
+    public const string SkipString = "skip";
+
     #pragma warning disable xUnit1004 // Test methods should not be skipped
-    [Theory(Skip = "skip")]
+    [Theory(Skip = SkipString)]
     #pragma warning restore xUnit1004 // Test methods should not be skipped
     [Trait("Category", "Integration")]
     [InlineData(@"C:\Users\wainw\source\repos\Reductech\edr\Examples\Sort.scl")]
@@ -57,7 +59,7 @@ public partial class ExampleTests
             TestOutputHelper.BuildLogger(),
             sfs,
             ExternalContext.Default,
-            new FlurlClient(),
+            new RestClient(),
             new Dictionary<string, object>()
         );
 
@@ -89,9 +91,9 @@ public partial class ExampleTests
 Log (RestGETStream 'https://en.wikipedia.org/api/rest_v1/page/pdf/Edgar_Allan_Poe')
 ";
 
-    //[Theory(Skip = "true")]
-    [Theory()]
-    //[InlineData(GenerateDocumentationExample)]
+    [Theory(Skip = SkipString)]
+    //[Theory()]
+    [InlineData(GenerateDocumentationExample)]
     [InlineData(RESTGetExample)]
     [Trait("Category", "Integration")]
     public async Task RunSCLSequence(string scl)
@@ -105,7 +107,7 @@ Log (RestGETStream 'https://en.wikipedia.org/api/rest_v1/page/pdf/Edgar_Allan_Po
             logger,
             sfs,
             ExternalContext.Default,
-            new FlurlClient()
+            new RestClient()
         );
 
         var r = await runner.RunSequenceFromTextAsync(

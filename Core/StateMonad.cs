@@ -5,13 +5,13 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
-using Flurl.Http;
 using Microsoft.Extensions.Logging;
 using Reductech.EDR.Core.Abstractions;
 using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Util;
+using RestSharp;
 
 namespace Reductech.EDR.Core
 {
@@ -55,13 +55,13 @@ public sealed class StateMonad : IStateMonad
         ILogger logger,
         StepFactoryStore stepFactoryStore,
         IExternalContext externalContext,
-        IFlurlClient flurlClient,
+        IRestClient restClient,
         IReadOnlyDictionary<string, object> sequenceMetadata)
     {
         Logger           = logger;
         StepFactoryStore = stepFactoryStore;
         ExternalContext  = externalContext;
-        FlurlClient      = flurlClient;
+        RestClient       = restClient;
         SequenceMetadata = sequenceMetadata;
 
         Settings = CreateSettingsEntity(stepFactoryStore);
@@ -83,7 +83,7 @@ public sealed class StateMonad : IStateMonad
     public IExternalContext ExternalContext { get; }
 
     /// <inheritdoc />
-    public IFlurlClient FlurlClient { get; }
+    public IRestClient RestClient { get; }
 
     /// <summary>
     /// Constant metadata for the entire sequence

@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
-using Flurl.Http;
 using Microsoft.Extensions.Logging;
 using Reductech.EDR.Core.Abstractions;
 using Reductech.EDR.Core.Internal.Errors;
@@ -12,6 +11,7 @@ using Reductech.EDR.Core.Internal.Logging;
 using Reductech.EDR.Core.Internal.Parser;
 using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.Util;
+using RestSharp;
 
 namespace Reductech.EDR.Core.Internal.Serialization
 {
@@ -28,18 +28,18 @@ public sealed class SCLRunner
         ILogger logger,
         StepFactoryStore stepFactoryStore,
         IExternalContext externalContext,
-        IFlurlClient flurlClient)
+        IRestClient restClient)
     {
         _logger           = logger;
         _stepFactoryStore = stepFactoryStore;
         _externalContext  = externalContext;
-        _flurlClient      = flurlClient;
+        _restClient       = restClient;
     }
 
     private readonly ILogger _logger;
     private readonly StepFactoryStore _stepFactoryStore;
     private readonly IExternalContext _externalContext;
-    private readonly IFlurlClient _flurlClient;
+    private readonly IRestClient _restClient;
 
     /// <summary>
     /// Run step defined in an SCL string.
@@ -108,7 +108,7 @@ public sealed class SCLRunner
             _logger,
             _stepFactoryStore,
             _externalContext,
-            _flurlClient,
+            _restClient,
             sequenceMetadata
         );
 

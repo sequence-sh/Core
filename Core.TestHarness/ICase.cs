@@ -1,17 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http;
-using System.Reflection;
 using AutoTheory;
 using CSharpFunctionalExtensions;
-using Flurl.Http;
-using Flurl.Http.Testing;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Reductech.EDR.Core.Abstractions;
 using Reductech.EDR.Core.ExternalProcesses;
 using Reductech.EDR.Core.Internal;
+using RestSharp;
 
 namespace Reductech.EDR.Core.TestHarness
 {
@@ -39,44 +36,28 @@ public interface ICaseThatExecutes : IAsyncTestInstance, ICaseWithSetup
 public interface ICaseWithSetup
 {
     ExternalContextSetupHelper ExternalContextSetupHelper { get; }
-    FlurlClientSetupHelper FlurlClientSetupHelper { get; }
+    RESTClientSetupHelper RESTClientSetupHelper { get; }
 }
 
-public sealed class FlurlClientSetupHelper
+public sealed class RESTClientSetupHelper
 {
-    private List<Action<HttpTest>> Actions { get; } = new();
+    private List<Action<Mock<IRestClient>>> Actions { get; } = new();
 
-    public void AddHttpTestAction(Action<HttpTest> action) => Actions.Add(action);
+    public void AddHttpTestAction(Action<Mock<IRestClient>> action) => Actions.Add(action);
 
-    public IFlurlClient GetFlurlClient()
+    public IRestClient GetRESTClient(MockRepository mockRepository)
     {
-        var httpTest = new HttpTest();
+        var client = mockRepository.Create<IRestClient>();
 
         foreach (var action in Actions)
-            action(httpTest);
+            action(client);
 
-        httpTest.RespondWith(
-            "Http Call not set up",
-            status: 404
-        );
+        //httpTest.RespondWith(
+        //    "Http Call not set up",
+        //    status: 404
+        //);
 
-        var flurlClient = GetFlurlClient(httpTest);
-
-        return flurlClient;
-    }
-
-    private static IFlurlClient GetFlurlClient(HttpTest httpTest)
-    {
-        var type = httpTest.GetType();
-
-        var property = type.GetProperty(
-            nameof(HttpClient),
-            BindingFlags.Instance | BindingFlags.NonPublic
-        );
-
-        var httpClient = (HttpClient)property.GetValue(httpTest)!;
-
-        return new FlurlClient(httpClient);
+        return client.Object;
     }
 }
 

@@ -6,7 +6,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Divergic.Logging.Xunit;
 using FluentAssertions;
-using Flurl.Http;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Reductech.EDR.Core.Abstractions;
@@ -14,6 +13,7 @@ using Reductech.EDR.Core.ExternalProcesses;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.TestHarness;
+using RestSharp;
 using Xunit;
 
 namespace Reductech.EDR.Core.Tests
@@ -310,7 +310,7 @@ public partial class ExternalProcessTests
             logger,
             StepFactoryStore.Create(),
             repo.OneOf<IExternalContext>(),
-            repo.OneOf<IFlurlClient>(),
+            repo.OneOf<IRestClient>(),
             new Dictionary<string, object>()
         );
 

@@ -41,7 +41,7 @@ public partial class DeserializationTests
             var repository = new MockRepository(MockBehavior.Strict);
 
             var externalContext = ExternalContextSetupHelper.GetExternalContext(repository);
-            var flurlClient     = FlurlClientSetupHelper.GetFlurlClient();
+            var flurlClient     = RESTClientSetupHelper.GetRESTClient(repository);
 
             var runner = new SCLRunner(
                 loggerFactory.CreateLogger("Test"),
@@ -69,7 +69,7 @@ public partial class DeserializationTests
         public ExternalContextSetupHelper ExternalContextSetupHelper { get; } = new();
 
         /// <inheritdoc />
-        public FlurlClientSetupHelper FlurlClientSetupHelper { get; } = new();
+        public RESTClientSetupHelper RESTClientSetupHelper { get; } = new();
     }
 
     [GenerateAsyncTheory("Deserialize")]

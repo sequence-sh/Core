@@ -1,13 +1,14 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
-using Flurl.Http;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Enums;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Util;
+using RestSharp;
 
 namespace Reductech.EDR.Core.Steps.REST
 {
@@ -33,18 +34,23 @@ public sealed class RESTGetStream : CompoundStep<StringStream>
 
         var (url, headers) = stuff.Value;
 
-        var request = url.WithClient(stateMonad.FlurlClient);
+        IRestRequest request = new RestRequest(url, Method.GET);
 
         if (headers.HasValue)
             request = request.AddHeaders(headers.GetValueOrThrow());
 
-        var stream = await request.TryRun(x => x.GetStreamAsync(cancellationToken));
+        var stringResult = await request.TryRun(stateMonad.RestClient, cancellationToken);
 
-        if (stream.IsFailure)
-            return stream.ConvertFailure<StringStream>().MapError(x => x.WithLocation(this));
+        if (stringResult.IsFailure)
+            return stringResult.ConvertFailure<StringStream>().MapError(x => x.WithLocation(this));
 
-        var result = new StringStream(stream.Value, EncodingEnum.UTF8);
-        return result;
+        //var stream = await request.TryRun(x => x.GetStreamAsync(cancellationToken));
+
+        //if (stream.IsFailure)
+        //    return stream.ConvertFailure<StringStream>().MapError(x => x.WithLocation(this));
+
+        //var result = new StringStream(stream.Value, EncodingEnum.UTF8);
+        return new StringStream(stringResult.Value);
     }
 
     /// <summary>

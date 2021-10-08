@@ -131,7 +131,7 @@ public abstract partial class StepTestBase<TStep, TOutput>
             ILogger logger)
         {
             var externalContext = ExternalContextSetupHelper.GetExternalContext(mockRepository);
-            var flurlClient     = FlurlClientSetupHelper.GetFlurlClient();
+            var flurlClient     = RESTClientSetupHelper.GetRESTClient(mockRepository);
 
             var tStepAssembly = Assembly.GetAssembly(typeof(TStep))!;
 
@@ -156,7 +156,7 @@ public abstract partial class StepTestBase<TStep, TOutput>
         public ExternalContextSetupHelper ExternalContextSetupHelper { get; } = new();
 
         /// <inheritdoc />
-        public FlurlClientSetupHelper FlurlClientSetupHelper { get; } = new();
+        public RESTClientSetupHelper RESTClientSetupHelper { get; } = new();
 
         /// <inheritdoc />
         public bool IgnoreFinalState { get; set; }

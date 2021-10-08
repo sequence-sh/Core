@@ -2,13 +2,13 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
-using Flurl.Http;
 using Microsoft.Extensions.Logging;
 using Reductech.EDR.Core.Abstractions;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Internal.Logging;
 using Reductech.EDR.Core.Util;
+using RestSharp;
 
 namespace Reductech.EDR.Core
 {
@@ -31,7 +31,7 @@ public interface IStateMonad : IAsyncDisposable
     /// <summary>
     /// Flurl Client. Used for HTTP Requests
     /// </summary>
-    IFlurlClient FlurlClient { get; }
+    IRestClient RestClient { get; }
 
     /// <summary>
     /// The external context
