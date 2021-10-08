@@ -66,12 +66,7 @@ public partial class ExampleTests
         r.ShouldBeSuccessful();
     }
 
-    [Fact(Skip = "true")]
-    //[Fact]
-    [Trait("Category", "Integration")]
-    public async Task RunSCLSequence()
-    {
-        const string scl = @"
+    private const string GenerateDocumentationExample = @"
 - <root> = 'Documentation'
 - <docs> = GenerateDocumentation
 
@@ -88,10 +83,19 @@ public partial class ExampleTests
       FileWrite
         (From <item> 'FileText')
         (PathCombine [<root>, (From <item> 'Directory'), (From <item> 'FileName')])
-    )
+    )";
 
+    private const string RESTGetExample = @"
+Log (RestGETStream 'https://en.wikipedia.org/api/rest_v1/page/pdf/Edgar_Allan_Poe')
 ";
 
+    //[Theory(Skip = "true")]
+    [Theory()]
+    //[InlineData(GenerateDocumentationExample)]
+    [InlineData(RESTGetExample)]
+    [Trait("Category", "Integration")]
+    public async Task RunSCLSequence(string scl)
+    {
         var logger =
             TestOutputHelper.BuildLogger(new LoggingConfig() { LogLevel = LogLevel.Information });
 
@@ -112,92 +116,6 @@ public partial class ExampleTests
 
         r.ShouldBeSuccessful();
     }
-
-    //#pragma warning disable xUnit1004 // Test methods should not be skipped
-    //[Fact(Skip = "skip")]
-    //#pragma warning restore xUnit1004 // Test methods should not be skipped
-    //[Trait("Category", "Integration")]
-    //public async Task RunObjectSequence()
-    //{
-    //    var step = new Sequence<Unit>()
-    //    {
-    //        InitialSteps = new List<IStep<Unit>>
-    //        {
-    //            new SetVariable<Array<Entity>>
-    //            {
-    //                Variable = new VariableName("EntityStream"),
-    //                Value = new FromCSV
-    //                {
-    //                    Stream = new FileRead
-    //                    {
-    //                        Path = new StringConstant(
-    //                            @"C:\Users\wainw\source\repos\Reductech\edr\Examples\Dinosaurs.csv"
-    //                        )
-    //                    }
-    //                }
-    //            },
-    //            new SetVariable<Entity>()
-    //            {
-    //                Variable = new VariableName("Schema"),
-    //                Value = Constant(
-    //                    new Schema
-    //                    {
-    //                        ExtraProperties = ExtraPropertyBehavior.Fail,
-    //                        Name            = "Dinosaur",
-    //                        Properties = new Dictionary<string, SchemaProperty>
-    //                        {
-    //                            {
-    //                                "Name", new SchemaProperty { Type = SCLType.String }
-    //                            },
-    //                            {
-    //                                "ArrayLength",
-    //                                new SchemaProperty { Type = SCLType.Double }
-    //                            },
-    //                            { "Period", new SchemaProperty { Type = SCLType.String } },
-    //                        }
-    //                    }.ConvertToEntity()
-    //                )
-    //            },
-    //            new FileWrite
-    //            {
-    //                Path = new PathCombine { Paths = Array("MyFile.txt") },
-    //                Stream = new ToCSV
-    //                {
-    //                    Entities = new EnforceSchema()
-    //                    {
-    //                        EntityStream =
-    //                            new GetVariable<Array<Entity>>()
-    //                            {
-    //                                Variable =
-    //                                    new VariableName("EntityStream")
-    //                            },
-    //                        Schema = new GetVariable<Entity>()
-    //                        {
-    //                            Variable = new VariableName("Schema")
-    //                        }
-    //                    }
-    //                }
-    //            }
-    //        },
-    //        FinalStep = new DoNothing()
-    //    };
-
-    //    var scl = step.Serialize();
-
-    //    TestOutputHelper.WriteLine(scl);
-
-    //    var monad = new StateMonad(
-    //        TestOutputHelper.BuildLogger(),
-    //        SCLSettings.EmptySettings,
-    //        StepFactoryStore.CreateFromAssemblies(),
-    //        ExternalContext.Default,
-    //        new Dictionary<string, object>()
-    //    );
-
-    //    var r = await (step as IStep<Unit>).Run(monad, CancellationToken.None);
-
-    //    r.ShouldBeSuccessful();
-    //}
 }
 
 }

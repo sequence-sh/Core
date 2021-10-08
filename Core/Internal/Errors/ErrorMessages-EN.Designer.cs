@@ -304,6 +304,15 @@ namespace Reductech.EDR.Core.Internal.Errors {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Request Failed with status code {0}. {1} {2}.
+        /// </summary>
+        internal static string RequestFailed {
+            get {
+                return ResourceManager.GetString("RequestFailed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Requirement &apos;{0}&apos; not met..
         /// </summary>
         internal static string RequirementNotMet {

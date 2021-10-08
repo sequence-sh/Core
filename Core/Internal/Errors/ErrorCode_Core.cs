@@ -124,6 +124,11 @@ public sealed record ErrorCode : ErrorCodeBase
         );
 
     /// <summary>
+    /// Request Failed with status code {0}. {1} {2}
+    /// </summary>
+    public static readonly ErrorCode RequestFailed = new(nameof(RequestFailed));
+
+    /// <summary>
     /// Directory does not exist or could not be found: '{0}'
     /// </summary>
     public static readonly ErrorCode
