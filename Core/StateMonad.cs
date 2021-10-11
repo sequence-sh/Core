@@ -11,6 +11,7 @@ using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Util;
+using RestSharp;
 
 namespace Reductech.EDR.Core
 {
@@ -54,11 +55,13 @@ public sealed class StateMonad : IStateMonad
         ILogger logger,
         StepFactoryStore stepFactoryStore,
         IExternalContext externalContext,
+        IRestClient restClient,
         IReadOnlyDictionary<string, object> sequenceMetadata)
     {
         Logger           = logger;
         StepFactoryStore = stepFactoryStore;
         ExternalContext  = externalContext;
+        RestClient       = restClient;
         SequenceMetadata = sequenceMetadata;
 
         Settings = CreateSettingsEntity(stepFactoryStore);
@@ -78,6 +81,9 @@ public sealed class StateMonad : IStateMonad
     /// The external context
     /// </summary>
     public IExternalContext ExternalContext { get; }
+
+    /// <inheritdoc />
+    public IRestClient RestClient { get; }
 
     /// <summary>
     /// Constant metadata for the entire sequence
@@ -138,7 +144,8 @@ public sealed class StateMonad : IStateMonad
                 BindingFlags.Public | BindingFlags.Static
             );
 
-            var conversionResult = (Result<T, IErrorBuilder>)method.Invoke(null, new[] { array });
+            var conversionResult =
+                (Result<T, IErrorBuilder>)method?.Invoke(null, new object?[] { array })!;
 
             if (conversionResult.IsFailure)
                 return conversionResult.ConvertFailure<Maybe<T>>();

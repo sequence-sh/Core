@@ -8,6 +8,7 @@ using Reductech.EDR.Core.Abstractions;
 using Reductech.EDR.Core.ExternalProcesses;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
+using RestSharp;
 using Xunit;
 using Xunit.Sdk;
 
@@ -70,6 +71,13 @@ public static class Extensions
     {
         cws.ExternalContextSetupHelper.AddSetupAction(action);
         return cws;
+    }
+
+    public static T SetupHTTP<T>(this T stepCase, Action<Mock<IRestClient>> setupHttpTest)
+        where T : ICaseWithSetup
+    {
+        stepCase.RESTClientSetupHelper.AddHttpTestAction(setupHttpTest);
+        return stepCase;
     }
 
     public static T WithContext<T>(this T cws, string name, object context)

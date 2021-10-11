@@ -23,7 +23,8 @@ public partial class StepHelpersTest
         var sm = new StateMonad(
             NullLogger.Instance,
             StepFactoryStore.Create(),
-            null,
+            null!,
+            null!,
             new Dictionary<string, object>()
         );
 
@@ -50,7 +51,8 @@ public partial class StepHelpersTest
         var sm = new StateMonad(
             NullLogger.Instance,
             StepFactoryStore.Create(),
-            null,
+            null!,
+            null!,
             new Dictionary<string, object>()
         );
 

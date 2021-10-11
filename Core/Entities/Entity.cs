@@ -188,7 +188,7 @@ public sealed class Entity : IEnumerable<EntityProperty>, IEquatable<Entity>
             return ep.BestValue;
 
         if (ep.BestValue is EntityValue.NestedEntity nestedEntity)
-            return nestedEntity.Value.TryGetValue(remainder.Value);
+            return nestedEntity.Value.TryGetValue(remainder.GetValueOrThrow());
         //We can't get the nested property as this is not an entity
 
         return

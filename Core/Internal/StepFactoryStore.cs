@@ -4,9 +4,9 @@ using System.Linq;
 using System.Reflection;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.ConnectorManagement.Base;
+using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Connectors;
 using Reductech.EDR.Core.Internal.Errors;
-using Reductech.EDR.Core.Util;
 
 namespace Reductech.EDR.Core.Internal
 {
@@ -51,14 +51,6 @@ public class StepFactoryStore
         );
     }
 
-    //private static IEnumerable<string> GetStepNames(IStepFactory stepFactory)
-    //{
-    //    yield return stepFactory.TypeName;
-
-    //    foreach (var alias in stepFactory.StepType.GetCustomAttributes<AliasAttribute>())
-    //        yield return alias.Name;
-    //}
-
     /// <summary>
     /// Creates a StepFactoryStore with steps from the given assemblies
     /// </summary>
@@ -98,21 +90,50 @@ public class StepFactoryStore
     /// </summary>
     public static StepFactoryStore Create(params ConnectorData[] connectorData)
     {
-        var steps = connectorData.Select(x => x.Assembly)
-            .Prepend(typeof(IStep).Assembly)
-            .WhereNotNull()
-            .SelectMany(a => a.GetTypes())
-            .Distinct()
-            .Where(x => !x.IsAbstract)
-            .Where(x => typeof(ICompoundStep).IsAssignableFrom(x))
-            .ToList();
+        var stepFactories = new HashSet<IStepFactory>(StepFactoryComparer.Instance);
+        var coreAssembly  = typeof(IStep).Assembly;
 
-        var factories =
-            steps
-                .Select(CreateStepFactory)
-                .ToList();
+        var coreConnector = new ConnectorData(
+            ConnectorSettings.DefaultForAssembly(coreAssembly),
+            coreAssembly
+        );
 
-        return Create(connectorData, factories);
+        foreach (var (connectorSettings, assembly) in connectorData.Prepend(coreConnector))
+        {
+            if (assembly is null)
+                continue;
+
+            foreach (var stepType in assembly
+                .GetTypes()
+                .Where(x => !x.IsAbstract)
+                .Where(x => typeof(ICompoundStep).IsAssignableFrom(x))
+                .Where(x => x.GetCustomAttribute<NotAStaticStepAttribute>() is null)
+            )
+            {
+                var factory = CreateStepFactory(stepType);
+                stepFactories.Add(factory);
+            }
+
+            foreach (var dynamicType in assembly
+                .GetTypes()
+                .Where(x => !x.IsAbstract)
+                .Where(x => typeof(IDynamicStepGenerator).IsAssignableFrom(x))
+            )
+            {
+                stepFactories.UnionWith(CreateDynamicStepFactories(dynamicType, connectorSettings));
+            }
+        }
+
+        return Create(connectorData, stepFactories);
+
+        static IEnumerable<IStepFactory> CreateDynamicStepFactories(
+            Type stepType,
+            ConnectorSettings connectorSettings)
+        {
+            var generator = (IDynamicStepGenerator)Activator.CreateInstance(stepType)!;
+
+            return generator.CreateStepFactories(connectorSettings);
+        }
 
         static IStepFactory CreateStepFactory(Type stepType)
         {

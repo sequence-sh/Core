@@ -41,8 +41,8 @@ public class EntityConversionTests
     {
         DoNotSplit             = true,
         Priority               = 3,
-        TargetMachineTags      = new List<string>() { "alpha", "beta" },
-        AdditionalRequirements = new List<Requirement>() { }
+        TargetMachineTags      = new List<string> { "alpha", "beta" },
+        AdditionalRequirements = new List<Requirement>()
     };
 
     private const string TestConfigurationString =
@@ -96,7 +96,8 @@ public class EntityConversionTests
 
         parseResult.ShouldBeSuccessful();
 
-        return (parseResult.Value.Value as EntityValue.NestedEntity)!.Value; //could throw exception
+        return (parseResult.Value.GetValueOrThrow() as EntityValue.NestedEntity)!
+            .Value; //could throw exception
     }
 
     [Fact]
@@ -141,7 +142,7 @@ public class EntityConversionTests
         var e = Entity.Create(("short", Convert.ToInt16(11)));
 
         e.TryGetValue("short").ShouldHaveValue();
-        e.TryGetValue("short").Value.Should().Be(new EntityValue.Integer(11));
+        e.TryGetValue("short").GetValueOrThrow().Should().Be(new EntityValue.Integer(11));
     }
 
     [Fact]
@@ -152,7 +153,8 @@ public class EntityConversionTests
         e.TryGetValue("enumeration").ShouldHaveValue();
 
         e.TryGetValue("enumeration")
-            .Value.Should()
+            .GetValueOrThrow()
+            .Should()
             .Be(new EntityValue.EnumerationValue(new Enumeration("letter", "alpha")));
     }
 
@@ -164,7 +166,8 @@ public class EntityConversionTests
         e.TryGetValue("emptyList").ShouldHaveValue();
 
         e.TryGetValue("emptyList")
-            .Value.Should()
+            .GetValueOrThrow()
+            .Should()
             .Be(EntityValue.Null.Instance);
     }
 }

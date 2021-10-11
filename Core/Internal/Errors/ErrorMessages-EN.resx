@@ -198,6 +198,9 @@
   <data name="MissingVariable" xml:space="preserve">
     <value>Variable '{0}' does not exist.</value>
   </data>
+  <data name="RequestFailed" xml:space="preserve">
+    <value>Request Failed with status code {0}. {1} {2}</value>
+  </data>
   <data name="RequirementNotMet" xml:space="preserve">
     <value>Requirement '{0}' not met.</value>
   </data>

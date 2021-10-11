@@ -1,15 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Microsoft.Extensions.Logging;
 using Reductech.EDR.Core.Abstractions;
-using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Internal.Logging;
 using Reductech.EDR.Core.Util;
+using RestSharp;
 
 namespace Reductech.EDR.Core
 {
@@ -28,6 +27,11 @@ public interface IStateMonad : IAsyncDisposable
     /// The logger that steps will use to output messages.
     /// </summary>
     ILogger Logger { get; }
+
+    /// <summary>
+    /// Flurl Client. Used for HTTP Requests
+    /// </summary>
+    IRestClient RestClient { get; }
 
     /// <summary>
     /// The external context

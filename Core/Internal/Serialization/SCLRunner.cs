@@ -11,6 +11,7 @@ using Reductech.EDR.Core.Internal.Logging;
 using Reductech.EDR.Core.Internal.Parser;
 using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.Util;
+using RestSharp;
 
 namespace Reductech.EDR.Core.Internal.Serialization
 {
@@ -26,16 +27,19 @@ public sealed class SCLRunner
     public SCLRunner(
         ILogger logger,
         StepFactoryStore stepFactoryStore,
-        IExternalContext externalContext)
+        IExternalContext externalContext,
+        IRestClient restClient)
     {
         _logger           = logger;
         _stepFactoryStore = stepFactoryStore;
         _externalContext  = externalContext;
+        _restClient       = restClient;
     }
 
     private readonly ILogger _logger;
     private readonly StepFactoryStore _stepFactoryStore;
     private readonly IExternalContext _externalContext;
+    private readonly IRestClient _restClient;
 
     /// <summary>
     /// Run step defined in an SCL string.
@@ -104,6 +108,7 @@ public sealed class SCLRunner
             _logger,
             _stepFactoryStore,
             _externalContext,
+            _restClient,
             sequenceMetadata
         );
 

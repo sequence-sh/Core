@@ -10,6 +10,7 @@ using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Internal.Logging;
 using Reductech.EDR.Core.Util;
+using RestSharp;
 
 namespace Reductech.EDR.Core
 {
@@ -47,6 +48,9 @@ public sealed class ScopedStateMonad : IStateMonad
     public ILogger Logger => BaseStateMonad.Logger;
 
     /// <inheritdoc />
+    public IRestClient RestClient => BaseStateMonad.RestClient;
+
+    /// <inheritdoc />
     public IExternalContext ExternalContext => BaseStateMonad.ExternalContext;
 
     /// <inheritdoc />
@@ -65,7 +69,7 @@ public sealed class ScopedStateMonad : IStateMonad
             return r1.ConvertFailure<T>();
 
         if (r1.Value.HasValue)
-            return r1.Value.Value;
+            return r1.Value.GetValueOrThrow();
 
         var r2 = StateMonad
             .TryGetVariableFromDictionary<T>(key, _fixedState)

@@ -123,7 +123,10 @@ public sealed record FreezableStepData(StepParameterDict StepProperties, TextLoc
                     break;
                 }
 
-                default: throw new ArgumentOutOfRangeException();
+                default:
+                    throw new ArgumentOutOfRangeException(
+                        freezableStepProperty.MemberType.ToString()
+                    );
             }
         }
 

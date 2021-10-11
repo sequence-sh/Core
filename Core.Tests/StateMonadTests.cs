@@ -8,6 +8,7 @@ using Moq;
 using Reductech.EDR.ConnectorManagement.Base;
 using Reductech.EDR.Core.Abstractions;
 using Reductech.EDR.Core.Internal;
+using RestSharp;
 using Xunit;
 
 namespace Reductech.EDR.Core.Tests
@@ -115,6 +116,7 @@ public partial class StateMonadTests
                 repo.OneOf<ILogger>(),
                 StepFactoryStore.Create(Array.Empty<ConnectorData>()),
                 repo.OneOf<IExternalContext>(),
+                repo.OneOf<IRestClient>(),
                 repo.OneOf<IReadOnlyDictionary<string, object>>()
             );
     }

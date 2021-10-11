@@ -13,6 +13,7 @@ using Reductech.EDR.Core.ExternalProcesses;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.TestHarness;
+using RestSharp;
 using Xunit;
 
 namespace Reductech.EDR.Core.Tests
@@ -309,6 +310,7 @@ public partial class ExternalProcessTests
             logger,
             StepFactoryStore.Create(),
             repo.OneOf<IExternalContext>(),
+            repo.OneOf<IRestClient>(),
             new Dictionary<string, object>()
         );
 

@@ -530,13 +530,13 @@ public partial class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Enti
 
         name.HasValue.Should().BeTrue();
 
-        name.Value.Should().Be(SchemaName);
+        name.GetValueOrThrow().Should().Be(SchemaName);
 
         var properties = entity.TryGetValue(nameof(schema.Properties));
 
         properties.HasValue.Should().BeTrue();
 
-        properties.Value.Should().BeOfType<EntityValue.NestedEntity>();
+        properties.GetValueOrThrow().Should().BeOfType<EntityValue.NestedEntity>();
     }
 }
 

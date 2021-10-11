@@ -60,7 +60,7 @@ public abstract partial class StepTestBase<TStep, TOutput>
     {
         public ExampleCase(SCLExampleAttribute sclExampleAttribute) : base(
             sclExampleAttribute.SCL,
-            sclExampleAttribute.ExpectedLogs ?? new string[] { }
+            sclExampleAttribute.ExpectedLogs ?? System.Array.Empty<string>()
         )
         {
             SCLExampleAttribute = sclExampleAttribute;

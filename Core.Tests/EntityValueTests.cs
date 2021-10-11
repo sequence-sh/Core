@@ -209,11 +209,11 @@ public partial class EntityValueTests
             else
             {
                 convertResult.ShouldBeSuccessful();
-                var expectedEntityValue = EntityValue.CreateFromObject(maybe.Value);
+                var expectedEntityValue = EntityValue.CreateFromObject(maybe.GetValueOrThrow());
 
-                if (convertResult.Value.value.ObjectValue is Enumeration enumeration)
+                if (convertResult.Value.value.ObjectValue is Enumeration(var type, var value))
                 {
-                    var real = enumeration.Type + "." + enumeration.Value;
+                    var real = type + "." + value;
                     real.Should().Be(expectedEntityValue.ObjectValue!.ToString());
                 }
                 else
@@ -286,11 +286,12 @@ public partial class EntityValueTests
 
         if (actualList.HasValue)
         {
-            actualList.Value.GetElementsAsync(CancellationToken.None)
+            actualList.GetValueOrThrow()
+                .GetElementsAsync(CancellationToken.None)
                 .Result
                 .Value.Select(x => x.GetString())
                 .Should()
-                .BeEquivalentTo(expectedList.Value);
+                .BeEquivalentTo(expectedList.GetValueOrThrow());
         }
     }
 

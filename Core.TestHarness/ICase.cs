@@ -8,6 +8,7 @@ using Moq;
 using Reductech.EDR.Core.Abstractions;
 using Reductech.EDR.Core.ExternalProcesses;
 using Reductech.EDR.Core.Internal;
+using RestSharp;
 
 namespace Reductech.EDR.Core.TestHarness
 {
@@ -35,6 +36,29 @@ public interface ICaseThatExecutes : IAsyncTestInstance, ICaseWithSetup
 public interface ICaseWithSetup
 {
     ExternalContextSetupHelper ExternalContextSetupHelper { get; }
+    RESTClientSetupHelper RESTClientSetupHelper { get; }
+}
+
+public sealed class RESTClientSetupHelper
+{
+    private List<Action<Mock<IRestClient>>> Actions { get; } = new();
+
+    public void AddHttpTestAction(Action<Mock<IRestClient>> action) => Actions.Add(action);
+
+    public IRestClient GetRESTClient(MockRepository mockRepository)
+    {
+        var client = mockRepository.Create<IRestClient>();
+
+        foreach (var action in Actions)
+            action(client);
+
+        //httpTest.RespondWith(
+        //    "Http Call not set up",
+        //    status: 404
+        //);
+
+        return client.Object;
+    }
 }
 
 public sealed class ExternalContextSetupHelper

@@ -41,11 +41,13 @@ public partial class DeserializationTests
             var repository = new MockRepository(MockBehavior.Strict);
 
             var externalContext = ExternalContextSetupHelper.GetExternalContext(repository);
+            var flurlClient     = RESTClientSetupHelper.GetRESTClient(repository);
 
             var runner = new SCLRunner(
                 loggerFactory.CreateLogger("Test"),
                 stepFactoryStore,
-                externalContext
+                externalContext,
+                flurlClient
             );
 
             var result = await runner.RunSequenceFromTextAsync(
@@ -65,6 +67,9 @@ public partial class DeserializationTests
 
         /// <inheritdoc />
         public ExternalContextSetupHelper ExternalContextSetupHelper { get; } = new();
+
+        /// <inheritdoc />
+        public RESTClientSetupHelper RESTClientSetupHelper { get; } = new();
     }
 
     [GenerateAsyncTheory("Deserialize")]
