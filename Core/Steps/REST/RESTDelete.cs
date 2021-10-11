@@ -1,26 +1,24 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
-using Newtonsoft.Json;
-using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
+using Reductech.EDR.Core.Util;
 using RestSharp;
 
 namespace Reductech.EDR.Core.Steps.REST
 {
 
 /// <summary>
-/// Get data from a REST service
+/// Delete a REST resource
 /// </summary>
-public sealed class RESTGetStream : RESTStep<StringStream>
+public sealed class RESTDelete : RESTStep<Unit>
 {
     /// <inheritdoc />
-    public override IStepFactory StepFactory { get; } =
-        new SimpleStepFactory<RESTGetStream, StringStream>();
+    public override IStepFactory StepFactory { get; } = new SimpleStepFactory<RESTDelete, Unit>();
 
     /// <inheritdoc />
-    public override Method Method => Method.GET;
+    public override Method Method => Method.DELETE;
 
     /// <inheritdoc />
     protected override async Task<Result<IRestRequest, IError>> SetRequestBody(
@@ -33,9 +31,9 @@ public sealed class RESTGetStream : RESTStep<StringStream>
     }
 
     /// <inheritdoc />
-    protected override Result<StringStream, IErrorBuilder> GetResult(string s)
+    protected override Result<Unit, IErrorBuilder> GetResult(string s)
     {
-        return new StringStream(s);
+        return Unit.Default;
     }
 }
 
