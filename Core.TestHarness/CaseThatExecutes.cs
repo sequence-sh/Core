@@ -97,6 +97,11 @@ public abstract partial class StepTestBase<TStep, TOutput>
             {
                 finalContextCheck(stateMonad.ExternalContext);
             }
+
+            foreach (var finalCheck in FinalChecks)
+            {
+                finalCheck();
+            }
         }
 
         /// <summary>
@@ -131,7 +136,7 @@ public abstract partial class StepTestBase<TStep, TOutput>
             ILogger logger)
         {
             var externalContext = ExternalContextSetupHelper.GetExternalContext(mockRepository);
-            var flurlClient     = RESTClientSetupHelper.GetRESTClient(mockRepository);
+            var flurlClient     = RESTClientSetupHelper.GetRESTClient(mockRepository, FinalChecks);
 
             var tStepAssembly = Assembly.GetAssembly(typeof(TStep))!;
 
@@ -182,6 +187,8 @@ public abstract partial class StepTestBase<TStep, TOutput>
             ExpectedLoggedValues;
 
         public List<Action<IExternalContext>> FinalContextChecks { get; } = new();
+
+        public List<Action> FinalChecks { get; } = new();
     }
 }
 

@@ -37,25 +37,39 @@ public interface ICaseWithSetup
 {
     ExternalContextSetupHelper ExternalContextSetupHelper { get; }
     RESTClientSetupHelper RESTClientSetupHelper { get; }
+    public List<Action> FinalChecks { get; }
+}
+
+public sealed class RESTSetup
+{
+    public RESTSetup(
+        Func<Mock<IRestClient>, IRestResponse> setup,
+        Action<IRestRequest> checkRequest)
+    {
+        Setup        = setup;
+        CheckRequest = checkRequest;
+    }
+
+    public Func<Mock<IRestClient>, IRestResponse> Setup { get; }
+
+    public Action<IRestRequest> CheckRequest { get; }
 }
 
 public sealed class RESTClientSetupHelper
 {
-    private List<Action<Mock<IRestClient>>> Actions { get; } = new();
+    private List<RESTSetup> Setups { get; } = new();
 
-    public void AddHttpTestAction(Action<Mock<IRestClient>> action) => Actions.Add(action);
+    public void AddHttpTestAction(RESTSetup restSetup) => Setups.Add(restSetup);
 
-    public IRestClient GetRESTClient(MockRepository mockRepository)
+    public IRestClient GetRESTClient(MockRepository mockRepository, List<Action> finalChecks)
     {
         var client = mockRepository.Create<IRestClient>();
 
-        foreach (var action in Actions)
-            action(client);
-
-        //httpTest.RespondWith(
-        //    "Http Call not set up",
-        //    status: 404
-        //);
+        foreach (var setup in Setups)
+        {
+            var s = setup.Setup(client);
+            finalChecks.Add(() => setup.CheckRequest(s.Request));
+        }
 
         return client.Object;
     }

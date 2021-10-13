@@ -1,9 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Net;
+using FluentAssertions;
 using Moq.RestSharp.Helpers;
 using Reductech.EDR.Core.Steps.REST;
 using Reductech.EDR.Core.TestHarness;
 using Reductech.EDR.Core.Util;
+using RestSharp;
 
 namespace Reductech.EDR.Core.Tests.Steps.REST
 {
@@ -25,6 +27,11 @@ public partial class RESTPatchTests : StepTestBase<RESTPatch, Unit>
                     Unit.Default
                 )
                 .SetupHTTP(
+                    request =>
+                    {
+                        request.Method.Should().Be(Method.PATCH);
+                        request.Resource.Should().Be("http://www.abc.com");
+                    },
                     x =>
                         x.MockApiResponse()
                             .WithStatusCode(HttpStatusCode.OK)

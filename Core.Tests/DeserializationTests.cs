@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -41,7 +42,7 @@ public partial class DeserializationTests
             var repository = new MockRepository(MockBehavior.Strict);
 
             var externalContext = ExternalContextSetupHelper.GetExternalContext(repository);
-            var flurlClient     = RESTClientSetupHelper.GetRESTClient(repository);
+            var flurlClient     = RESTClientSetupHelper.GetRESTClient(repository, FinalChecks);
 
             var runner = new SCLRunner(
                 loggerFactory.CreateLogger("Test"),
@@ -58,6 +59,11 @@ public partial class DeserializationTests
 
             result.ShouldBeSuccessful();
 
+            foreach (var finalCheck in FinalChecks)
+            {
+                finalCheck();
+            }
+
             LogChecker.CheckLoggedValues(
                 loggerFactory,
                 LogLevel.Information,
@@ -70,6 +76,9 @@ public partial class DeserializationTests
 
         /// <inheritdoc />
         public RESTClientSetupHelper RESTClientSetupHelper { get; } = new();
+
+        /// <inheritdoc />
+        public List<Action> FinalChecks { get; } = new();
     }
 
     [GenerateAsyncTheory("Deserialize")]
