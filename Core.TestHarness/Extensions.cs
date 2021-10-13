@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using FluentAssertions;
@@ -9,6 +11,7 @@ using Reductech.EDR.Core.ExternalProcesses;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
 using RestSharp;
+using RestSharp.Extensions;
 using Xunit;
 using Xunit.Sdk;
 
@@ -34,17 +37,62 @@ public static class Extensions
         return cws;
     }
 
-    //public static T WithSettings<T>(this T cws, SCLSettings settings) where T : ICaseThatExecutes
-    //{
-    //    cws.Settings = settings;
-    //    return cws;
-    //}
-
     public static T WithFinalContextCheck<T>(this T cws, Action<IExternalContext> contextCheck)
         where T : ICaseThatExecutes
     {
         cws.FinalContextChecks.Add(contextCheck);
         return cws;
+    }
+
+    public static bool CheckRequest(
+        this IRestRequest request,
+        (string url, Method method, object? body) expected)
+    {
+        if (request.Method != expected.method)
+            return false;
+
+        var realURl = request.GetRealURL();
+
+        if (realURl != expected.url)
+            return false;
+
+        var realBody = request.GetRealBody();
+
+        if (!Equals(realBody, expected.body))
+            return false;
+
+        return true;
+    }
+
+    public static string GetRealURL(this IRestRequest request)
+    {
+        var list = request.Parameters.Where(p => p.Type == ParameterType.UrlSegment).ToList();
+        UriBuilder uriBuilder = new(request.Resource);
+
+        foreach (var parameter in list)
+        {
+            string oldValue = "{" + parameter.Name + "}";
+
+            uriBuilder.Path = uriBuilder.Path.UrlDecode()
+                .Replace(oldValue, parameter.Value?.ToString());
+        }
+
+        var result = uriBuilder.Uri.AbsoluteUri.TrimEnd('/');
+        return result;
+    }
+
+    public static object? GetRealBody(this IRestRequest request)
+    {
+        if (request.Body is not null)
+            return request.Body.Value;
+
+        foreach (var parameter in
+            request.Parameters.Where(x => x.Type == ParameterType.RequestBody))
+        {
+            return parameter.Value;
+        }
+
+        return null;
     }
 
     public static T WithExternalProcessAction<T>(
@@ -76,14 +124,56 @@ public static class Extensions
     /// <summary>
     /// Setup an HTTP request
     /// </summary>
-    public static T SetupHTTP<T>(
+    public static T SetupHTTPSuccess<T>(
         this T stepCase,
-        Action<IRestRequest> checkRequest,
-        Func<Mock<IRestClient>, IRestResponse> setupHttpTest)
+        (string uri,
+            Method method,
+            object? body) request,
+        HttpStatusCode responseStatusCode,
+        string responseContent = "")
         where T : ICaseWithSetup
     {
+        var response = new RestResponse()
+        {
+            Content        = responseContent,
+            ContentLength  = responseContent.Length,
+            ResponseStatus = ResponseStatus.Completed,
+            StatusCode     = responseStatusCode,
+        };
+
         stepCase.RESTClientSetupHelper.AddHttpTestAction(
-            new RESTSetup(setupHttpTest, checkRequest)
+            new RESTSetup(
+                x => x.CheckRequest(request),
+                response
+            )
+        );
+
+        return stepCase;
+    }
+
+    /// <summary>
+    /// Setup an HTTP request
+    /// </summary>
+    public static T SetupHTTPError<T>(
+        this T stepCase,
+        (string uri,
+            Method method,
+            object? body) request,
+        HttpStatusCode responseStatusCode,
+        string statusDescription,
+        string error)
+        where T : ICaseWithSetup
+    {
+        var response = new RestResponse()
+        {
+            ResponseStatus    = ResponseStatus.Error,
+            StatusCode        = responseStatusCode,
+            StatusDescription = statusDescription,
+            ErrorMessage      = error,
+        };
+
+        stepCase.RESTClientSetupHelper.AddHttpTestAction(
+            new RESTSetup(x => x.CheckRequest(request), response)
         );
 
         return stepCase;

@@ -1,7 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Net;
-using FluentAssertions;
-using Moq.RestSharp.Helpers;
 using Reductech.EDR.Core.Steps.REST;
 using Reductech.EDR.Core.TestHarness;
 using RestSharp;
@@ -22,17 +20,10 @@ public partial class RESTGetStreamTests : StepTestBase<RESTGetStream, StringStre
                     new RESTGetStream() { URL = Constant("http://www.abc.com") },
                     new StringStream("abc")
                 )
-                .SetupHTTP(
-                    request =>
-                    {
-                        request.Method.Should().Be(Method.GET);
-                        request.Resource.Should().Be("http://www.abc.com");
-                    },
-                    x =>
-                        x.MockApiResponse()
-                            .WithStatusCode(HttpStatusCode.OK)
-                            .ReturnsJsonString("abc")
-                            .MockExecuteAsync()
+                .SetupHTTPSuccess(
+                    ("http://www.abc.com", Method.GET, null),
+                    HttpStatusCode.OK,
+                    "abc"
                 );
         }
     }

@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Net;
 using FluentAssertions;
-using Moq.RestSharp.Helpers;
 using Reductech.EDR.Core.Steps.REST;
 using Reductech.EDR.Core.TestHarness;
 using Reductech.EDR.Core.Util;
@@ -26,16 +25,9 @@ public partial class RESTPutTests : StepTestBase<RESTPut, Unit>
                     },
                     Unit.Default
                 )
-                .SetupHTTP(
-                    request =>
-                    {
-                        request.Method.Should().Be(Method.PUT);
-                        request.Resource.Should().Be("http://www.abc.com");
-                    },
-                    x =>
-                        x.MockApiResponse()
-                            .WithStatusCode(HttpStatusCode.OK)
-                            .MockExecuteAsync()
+                .SetupHTTPSuccess(
+                    ("http://www.abc.com", Method.PUT, "{\"a\":123}"),
+                    HttpStatusCode.OK
                 );
         }
     }
