@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Net;
-using FluentAssertions;
-using Moq.RestSharp.Helpers;
+using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Steps.REST;
 using Reductech.EDR.Core.TestHarness;
 using Reductech.EDR.Core.Util;
@@ -22,17 +21,37 @@ public partial class RESTDeleteTests : StepTestBase<RESTDelete, Unit>
                     new RESTDelete() { URL = StaticHelpers.Constant("http://www.abc.com/1") },
                     Unit.Default
                 )
-                .SetupHTTP(
-                    request =>
-                    {
-                        request.Method.Should().Be(Method.DELETE);
-                        request.Resource.Should().Be("http://www.abc.com/1");
-                    },
-                    x =>
-                        x.MockApiResponse()
-                            .WithStatusCode(HttpStatusCode.OK)
-                            .MockExecuteAsync()
+                .SetupHTTPSuccess(
+                    ("http://www.abc.com/1", Method.DELETE, null),
+                    HttpStatusCode.OK
                 );
+        }
+    }
+
+    /// <inheritdoc />
+    protected override IEnumerable<ErrorCase> ErrorCases
+    {
+        get
+        {
+            yield return new ErrorCase(
+                "Request Failure",
+                new RESTDelete() { URL = StaticHelpers.Constant("http://www.abc.com/1") },
+                ErrorCode.RequestFailed.ToErrorBuilder(
+                    HttpStatusCode.Forbidden,
+                    "Test Forbidden",
+                    "Test Error"
+                )
+            ).SetupHTTPError(
+                ("http://www.abc.com/1", Method.DELETE, null),
+                HttpStatusCode.Forbidden,
+                "Test Forbidden",
+                "Test Error"
+            );
+
+            foreach (var errorCase in base.ErrorCases)
+            {
+                yield return errorCase;
+            }
         }
     }
 }

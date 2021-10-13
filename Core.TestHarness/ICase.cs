@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
+using System.Threading;
 using AutoTheory;
 using CSharpFunctionalExtensions;
 using Microsoft.Extensions.Logging;
@@ -42,17 +44,33 @@ public interface ICaseWithSetup
 
 public sealed class RESTSetup
 {
-    public RESTSetup(
-        Func<Mock<IRestClient>, IRestResponse> setup,
-        Action<IRestRequest> checkRequest)
+    public RESTSetup(Expression<Func<IRestRequest, bool>> checkRequest, IRestResponse response)
     {
-        Setup        = setup;
         CheckRequest = checkRequest;
+        Response     = response;
     }
 
-    public Func<Mock<IRestClient>, IRestResponse> Setup { get; }
+    public Expression<Func<IRestRequest, bool>> CheckRequest { get; }
 
-    public Action<IRestRequest> CheckRequest { get; }
+    public IRestResponse Response { get; }
+
+    public void SetupClient(Mock<IRestClient> client)
+    {
+        client
+            .Setup(
+                s => s.ExecuteAsync(
+                    It.Is(CheckRequest),
+                    It.IsAny<CancellationToken>()
+                )
+            )
+            .Callback<IRestRequest, CancellationToken>(
+                (request, _) =>
+                {
+                    Response.Request = request;
+                }
+            )
+            .ReturnsAsync(Response);
+    }
 }
 
 public sealed class RESTClientSetupHelper
@@ -66,10 +84,7 @@ public sealed class RESTClientSetupHelper
         var client = mockRepository.Create<IRestClient>();
 
         foreach (var setup in Setups)
-        {
-            var s = setup.Setup(client);
-            finalChecks.Add(() => setup.CheckRequest(s.Request));
-        }
+            setup.SetupClient(client);
 
         return client.Object;
     }
