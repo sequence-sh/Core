@@ -177,7 +177,7 @@ public partial class LoggingTests
             var repo   = new MockRepository(MockBehavior.Strict);
 
             var context     = ExternalContextSetupHelper.GetExternalContext(repo);
-            var flurlClient = RESTClientSetupHelper.GetRESTClient(repo);
+            var flurlClient = RESTClientSetupHelper.GetRESTClient(repo, FinalChecks);
 
             var sclRunner = new SCLRunner(
                 logger,
@@ -194,6 +194,11 @@ public partial class LoggingTests
 
             r.ShouldBeSuccessful();
 
+            foreach (var finalCheck in FinalChecks)
+            {
+                finalCheck();
+            }
+
             loggerFactory.Sink.LogEntries.Should().SatisfyRespectively(ExpectedLogs);
         }
 
@@ -202,6 +207,9 @@ public partial class LoggingTests
 
         /// <inheritdoc />
         public RESTClientSetupHelper RESTClientSetupHelper { get; } = new();
+
+        /// <inheritdoc />
+        public List<Action> FinalChecks { get; } = new();
     }
 }
 

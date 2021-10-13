@@ -73,10 +73,19 @@ public static class Extensions
         return cws;
     }
 
-    public static T SetupHTTP<T>(this T stepCase, Action<Mock<IRestClient>> setupHttpTest)
+    /// <summary>
+    /// Setup an HTTP request
+    /// </summary>
+    public static T SetupHTTP<T>(
+        this T stepCase,
+        Action<IRestRequest> checkRequest,
+        Func<Mock<IRestClient>, IRestResponse> setupHttpTest)
         where T : ICaseWithSetup
     {
-        stepCase.RESTClientSetupHelper.AddHttpTestAction(setupHttpTest);
+        stepCase.RESTClientSetupHelper.AddHttpTestAction(
+            new RESTSetup(setupHttpTest, checkRequest)
+        );
+
         return stepCase;
     }
 

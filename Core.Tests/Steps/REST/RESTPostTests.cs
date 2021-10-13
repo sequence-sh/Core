@@ -1,8 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Net;
+using FluentAssertions;
 using Moq.RestSharp.Helpers;
 using Reductech.EDR.Core.Steps.REST;
 using Reductech.EDR.Core.TestHarness;
+using RestSharp;
 
 namespace Reductech.EDR.Core.Tests.Steps.REST
 {
@@ -24,6 +26,11 @@ public partial class RESTPostTests : StepTestBase<RESTPost, StringStream>
                     new StringStream("12345")
                 )
                 .SetupHTTP(
+                    request =>
+                    {
+                        request.Method.Should().Be(Method.POST);
+                        request.Resource.Should().Be("http://www.abc.com");
+                    },
                     x =>
                         x.MockApiResponse()
                             .WithStatusCode(HttpStatusCode.OK)

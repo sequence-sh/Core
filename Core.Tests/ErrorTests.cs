@@ -149,7 +149,7 @@ public partial class RunErrorTests
             var repo = new MockRepository(MockBehavior.Strict);
 
             var externalContext = ExternalContextSetupHelper.GetExternalContext(repo);
-            var flurlClient     = RESTClientSetupHelper.GetRESTClient(repo);
+            var flurlClient     = RESTClientSetupHelper.GetRESTClient(repo, FinalChecks);
 
             await using var state = new StateMonad(
                 NullLogger.Instance,
@@ -170,6 +170,11 @@ public partial class RunErrorTests
                     ExpectedErrors.GetAllErrors()
                         .Select(x => (x.ErrorBuilder.ErrorCode, x.Location, x.Message))
                 );
+
+            foreach (var finalCheck in FinalChecks)
+            {
+                finalCheck();
+            }
         }
 
         /// <inheritdoc />
@@ -177,6 +182,8 @@ public partial class RunErrorTests
 
         /// <inheritdoc />
         public RESTClientSetupHelper RESTClientSetupHelper { get; } = new();
+
+        public List<Action> FinalChecks { get; } = new();
     }
 }
 
