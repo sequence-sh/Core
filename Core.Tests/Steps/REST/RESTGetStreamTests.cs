@@ -17,11 +17,16 @@ public partial class RESTGetStreamTests : StepTestBase<RESTGetStream, StringStre
         {
             yield return new StepCase(
                     "Basic Case",
-                    new RESTGetStream() { URL = Constant("http://www.abc.com") },
+                    new RESTGetStream()
+                    {
+                        BaseURL     = Constant("http://www.abc.com"),
+                        RelativeURL = Constant("Thing/1")
+                    },
                     new StringStream("abc")
                 )
                 .SetupHTTPSuccess(
-                    ("http://www.abc.com", Method.GET, null),
+                    "http://www.abc.com",
+                    ("Thing/1", Method.GET, null),
                     HttpStatusCode.OK,
                     "abc"
                 );

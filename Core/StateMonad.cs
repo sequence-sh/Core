@@ -11,7 +11,6 @@ using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Util;
-using RestSharp;
 
 namespace Reductech.EDR.Core
 {
@@ -55,14 +54,14 @@ public sealed class StateMonad : IStateMonad
         ILogger logger,
         StepFactoryStore stepFactoryStore,
         IExternalContext externalContext,
-        IRestClient restClient,
+        IRestClientFactory restClientFactory,
         IReadOnlyDictionary<string, object> sequenceMetadata)
     {
-        Logger           = logger;
-        StepFactoryStore = stepFactoryStore;
-        ExternalContext  = externalContext;
-        RestClient       = restClient;
-        SequenceMetadata = sequenceMetadata;
+        Logger            = logger;
+        StepFactoryStore  = stepFactoryStore;
+        ExternalContext   = externalContext;
+        RestClientFactory = restClientFactory;
+        SequenceMetadata  = sequenceMetadata;
 
         Settings = CreateSettingsEntity(stepFactoryStore);
     }
@@ -83,7 +82,7 @@ public sealed class StateMonad : IStateMonad
     public IExternalContext ExternalContext { get; }
 
     /// <inheritdoc />
-    public IRestClient RestClient { get; }
+    public IRestClientFactory RestClientFactory { get; }
 
     /// <summary>
     /// Constant metadata for the entire sequence

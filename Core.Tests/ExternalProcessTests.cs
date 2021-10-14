@@ -310,7 +310,7 @@ public partial class ExternalProcessTests
             logger,
             StepFactoryStore.Create(),
             repo.OneOf<IExternalContext>(),
-            repo.OneOf<IRestClient>(),
+            repo.OneOf<IRestClientFactory>(),
             new Dictionary<string, object>()
         );
 

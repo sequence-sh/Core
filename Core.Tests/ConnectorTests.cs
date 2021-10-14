@@ -65,7 +65,7 @@ public partial class ConnectorTests
             logger,
             stepFactoryStore,
             externalContext,
-            new RestClient()
+            DefaultRestClientFactory.Instance
         );
 
         var r = await

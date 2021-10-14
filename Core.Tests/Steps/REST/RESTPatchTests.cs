@@ -2,6 +2,7 @@
 using System.Net;
 using Reductech.EDR.Core.Steps.REST;
 using Reductech.EDR.Core.TestHarness;
+using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 using Reductech.EDR.Core.Util;
 using RestSharp;
 
@@ -19,13 +20,15 @@ public partial class RESTPatchTests : StepTestBase<RESTPatch, Unit>
                     "Basic Case",
                     new RESTPatch()
                     {
-                        URL    = StaticHelpers.Constant("http://www.abc.com"),
-                        Entity = StaticHelpers.Constant(Entity.Create(("a", 123)))
+                        BaseURL     = Constant("http://www.abc.com"),
+                        RelativeURL = Constant("Thing/1"),
+                        Entity      = Constant(Entity.Create(("a", 123)))
                     },
                     Unit.Default
                 )
                 .SetupHTTPSuccess(
-                    ("http://www.abc.com", Method.PATCH, "{\"a\":123}"),
+                    "http://www.abc.com",
+                    ("Thing/1", Method.PATCH, "{\"a\":123}"),
                     HttpStatusCode.OK
                 );
         }

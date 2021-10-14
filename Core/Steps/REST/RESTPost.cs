@@ -34,7 +34,7 @@ public sealed class RESTPost : RESTStep<StringStream>
     /// <summary>
     /// The Entity to create
     /// </summary>
-    [StepProperty(2)]
+    [StepProperty(3)]
     [Required]
     public IStep<Entity> Entity { get; set; } = null!;
 

@@ -31,7 +31,8 @@ public abstract class RESTStep<TOutput> : CompoundStep<TOutput>
         CancellationToken cancellationToken)
     {
         var stuff = await stateMonad.RunStepsAsync(
-            URL.WrapStringStream(),
+            BaseURL.WrapStringStream(),
+            RelativeURL.WrapStringStream(),
             Headers.WrapNullable(),
             cancellationToken
         );
@@ -39,9 +40,9 @@ public abstract class RESTStep<TOutput> : CompoundStep<TOutput>
         if (stuff.IsFailure)
             return stuff.ConvertFailure<TOutput>();
 
-        var (url, headers) = stuff.Value;
+        var (baseUrl, relativeUrl, headers) = stuff.Value;
 
-        IRestRequest request = new RestRequest(url, Method);
+        IRestRequest request = new RestRequest(relativeUrl, Method);
 
         if (headers.HasValue)
             request = request.AddHeaders(headers.GetValueOrThrow());
@@ -53,8 +54,10 @@ public abstract class RESTStep<TOutput> : CompoundStep<TOutput>
 
         request = setBodyResult.Value;
 
+        var restClient = stateMonad.RestClientFactory.CreateRestClient(baseUrl);
+
         var resultString =
-            await request.TryRun(stateMonad.RestClient, cancellationToken);
+            await request.TryRun(restClient, cancellationToken);
 
         if (resultString.IsFailure)
             return resultString.ConvertFailure<TOutput>().MapError(x => x.WithLocation(this));
@@ -78,11 +81,18 @@ public abstract class RESTStep<TOutput> : CompoundStep<TOutput>
     protected abstract Result<TOutput, IErrorBuilder> GetResult(string s);
 
     /// <summary>
-    /// The url to send the request to
+    /// The base url
     /// </summary>
     [StepProperty(1)]
     [Required]
-    public IStep<StringStream> URL { get; set; } = null!;
+    public IStep<StringStream> BaseURL { get; set; } = null!;
+
+    /// <summary>
+    /// The relative url
+    /// </summary>
+    [StepProperty(2)]
+    [Required]
+    public IStep<StringStream> RelativeURL { get; set; } = null!;
 
     /// <summary>
     /// Additional headers to send

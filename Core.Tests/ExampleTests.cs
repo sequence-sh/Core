@@ -59,7 +59,7 @@ public partial class ExampleTests
             TestOutputHelper.BuildLogger(),
             sfs,
             ExternalContext.Default,
-            new RestClient(),
+            DefaultRestClientFactory.Instance,
             new Dictionary<string, object>()
         );
 
@@ -107,7 +107,7 @@ Log (RestGETStream 'https://en.wikipedia.org/api/rest_v1/page/pdf/Edgar_Allan_Po
             logger,
             sfs,
             ExternalContext.Default,
-            new RestClient()
+            DefaultRestClientFactory.Instance
         );
 
         var r = await runner.RunSequenceFromTextAsync(

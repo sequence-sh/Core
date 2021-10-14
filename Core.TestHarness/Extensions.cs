@@ -11,7 +11,6 @@ using Reductech.EDR.Core.ExternalProcesses;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
 using RestSharp;
-using RestSharp.Extensions;
 using Xunit;
 using Xunit.Sdk;
 
@@ -46,14 +45,14 @@ public static class Extensions
 
     public static bool CheckRequest(
         this IRestRequest request,
-        (string url, Method method, object? body) expected)
+        (string resource, Method method, object? body) expected)
     {
         if (request.Method != expected.method)
             return false;
 
-        var realURl = request.GetRealURL();
+        var realURl = request.GetRealResource();
 
-        if (realURl != expected.url)
+        if (realURl != expected.resource)
             return false;
 
         var realBody = request.GetRealBody();
@@ -64,20 +63,18 @@ public static class Extensions
         return true;
     }
 
-    public static string GetRealURL(this IRestRequest request)
+    public static string GetRealResource(this IRestRequest request)
     {
-        var list = request.Parameters.Where(p => p.Type == ParameterType.UrlSegment).ToList();
-        UriBuilder uriBuilder = new(request.Resource);
+        var resource = request.Resource;
 
-        foreach (var parameter in list)
+        foreach (var parameter in request.Parameters.Where(p => p.Type == ParameterType.UrlSegment))
         {
             string oldValue = "{" + parameter.Name + "}";
 
-            uriBuilder.Path = uriBuilder.Path.UrlDecode()
-                .Replace(oldValue, parameter.Value?.ToString());
+            resource = resource.Replace(oldValue, parameter.Value?.ToString());
         }
 
-        var result = uriBuilder.Uri.AbsoluteUri.TrimEnd('/');
+        var result = resource.TrimEnd('/');
         return result;
     }
 
@@ -126,7 +123,8 @@ public static class Extensions
     /// </summary>
     public static T SetupHTTPSuccess<T>(
         this T stepCase,
-        (string uri,
+        string? baseUri,
+        (string resource,
             Method method,
             object? body) request,
         HttpStatusCode responseStatusCode,
@@ -143,6 +141,7 @@ public static class Extensions
 
         stepCase.RESTClientSetupHelper.AddHttpTestAction(
             new RESTSetup(
+                baseUri,
                 x => x.CheckRequest(request),
                 response
             )
@@ -156,7 +155,8 @@ public static class Extensions
     /// </summary>
     public static T SetupHTTPError<T>(
         this T stepCase,
-        (string uri,
+        string? baseUri,
+        (string resource,
             Method method,
             object? body) request,
         HttpStatusCode responseStatusCode,
@@ -173,7 +173,11 @@ public static class Extensions
         };
 
         stepCase.RESTClientSetupHelper.AddHttpTestAction(
-            new RESTSetup(x => x.CheckRequest(request), response)
+            new RESTSetup(
+                baseUri,
+                x => x.CheckRequest(request),
+                response
+            )
         );
 
         return stepCase;
