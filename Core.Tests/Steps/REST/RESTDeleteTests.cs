@@ -3,6 +3,7 @@ using System.Net;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Steps.REST;
 using Reductech.EDR.Core.TestHarness;
+using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 using Reductech.EDR.Core.Util;
 using RestSharp;
 
@@ -18,11 +19,16 @@ public partial class RESTDeleteTests : StepTestBase<RESTDelete, Unit>
         {
             yield return new StepCase(
                     "Basic Case",
-                    new RESTDelete() { URL = StaticHelpers.Constant("http://www.abc.com/1") },
+                    new RESTDelete()
+                    {
+                        BaseURL     = Constant("http://www.abc.com"),
+                        RelativeURL = Constant("Thing/1")
+                    },
                     Unit.Default
                 )
                 .SetupHTTPSuccess(
-                    ("http://www.abc.com/1", Method.DELETE, null),
+                    "http://www.abc.com",
+                    ("Thing/1", Method.DELETE, null),
                     HttpStatusCode.OK
                 );
         }
@@ -35,14 +41,18 @@ public partial class RESTDeleteTests : StepTestBase<RESTDelete, Unit>
         {
             yield return new ErrorCase(
                 "Request Failure",
-                new RESTDelete() { URL = StaticHelpers.Constant("http://www.abc.com/1") },
+                new RESTDelete()
+                {
+                    BaseURL = Constant("http://www.abc.com"), RelativeURL = Constant("Thing/1")
+                },
                 ErrorCode.RequestFailed.ToErrorBuilder(
                     HttpStatusCode.Forbidden,
                     "Test Forbidden",
                     "Test Error"
                 )
             ).SetupHTTPError(
-                ("http://www.abc.com/1", Method.DELETE, null),
+                "http://www.abc.com",
+                ("Thing/1", Method.DELETE, null),
                 HttpStatusCode.Forbidden,
                 "Test Forbidden",
                 "Test Error"

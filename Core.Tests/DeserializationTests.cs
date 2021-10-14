@@ -41,14 +41,15 @@ public partial class DeserializationTests
             loggerFactory.AddXunit(testOutputHelper);
             var repository = new MockRepository(MockBehavior.Strict);
 
-            var externalContext = ExternalContextSetupHelper.GetExternalContext(repository);
-            var flurlClient     = RESTClientSetupHelper.GetRESTClient(repository, FinalChecks);
+            var externalContext   = ExternalContextSetupHelper.GetExternalContext(repository);
+            var restClient        = RESTClientSetupHelper.GetRESTClient(repository, FinalChecks);
+            var restClientFactory = new SingleRestClientFactory(restClient);
 
             var runner = new SCLRunner(
                 loggerFactory.CreateLogger("Test"),
                 stepFactoryStore,
                 externalContext,
-                flurlClient
+                restClientFactory
             );
 
             var result = await runner.RunSequenceFromTextAsync(

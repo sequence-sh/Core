@@ -8,7 +8,6 @@ using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Internal.Logging;
 using Reductech.EDR.Core.Util;
-using RestSharp;
 
 namespace Reductech.EDR.Core
 {
@@ -29,9 +28,9 @@ public interface IStateMonad : IAsyncDisposable
     ILogger Logger { get; }
 
     /// <summary>
-    /// Flurl Client. Used for HTTP Requests
+    /// Factory for creating Rest Clients
     /// </summary>
-    IRestClient RestClient { get; }
+    IRestClientFactory RestClientFactory { get; }
 
     /// <summary>
     /// The external context

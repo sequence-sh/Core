@@ -176,14 +176,15 @@ public partial class LoggingTests
             var logger = loggerFactory.CreateLogger("Test");
             var repo   = new MockRepository(MockBehavior.Strict);
 
-            var context     = ExternalContextSetupHelper.GetExternalContext(repo);
-            var flurlClient = RESTClientSetupHelper.GetRESTClient(repo, FinalChecks);
+            var context           = ExternalContextSetupHelper.GetExternalContext(repo);
+            var restClient        = RESTClientSetupHelper.GetRESTClient(repo, FinalChecks);
+            var restClientFactory = new SingleRestClientFactory(restClient);
 
             var sclRunner = new SCLRunner(
                 logger,
                 spf,
                 context,
-                flurlClient
+                restClientFactory
             );
 
             var r = await sclRunner.RunSequenceFromTextAsync(

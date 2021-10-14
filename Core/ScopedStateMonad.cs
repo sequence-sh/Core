@@ -48,7 +48,7 @@ public sealed class ScopedStateMonad : IStateMonad
     public ILogger Logger => BaseStateMonad.Logger;
 
     /// <inheritdoc />
-    public IRestClient RestClient => BaseStateMonad.RestClient;
+    public IRestClientFactory RestClientFactory => BaseStateMonad.RestClientFactory;
 
     /// <inheritdoc />
     public IExternalContext ExternalContext => BaseStateMonad.ExternalContext;

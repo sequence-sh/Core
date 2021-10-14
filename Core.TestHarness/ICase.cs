@@ -44,18 +44,29 @@ public interface ICaseWithSetup
 
 public sealed class RESTSetup
 {
-    public RESTSetup(Expression<Func<IRestRequest, bool>> checkRequest, IRestResponse response)
+    public RESTSetup(
+        string? baseUri,
+        Expression<Func<IRestRequest, bool>> checkRequest,
+        IRestResponse response)
     {
+        BaseUri      = baseUri;
         CheckRequest = checkRequest;
         Response     = response;
     }
 
+    public string? BaseUri { get; }
     public Expression<Func<IRestRequest, bool>> CheckRequest { get; }
 
     public IRestResponse Response { get; }
 
     public void SetupClient(Mock<IRestClient> client)
     {
+        if (!string.IsNullOrWhiteSpace(BaseUri))
+        {
+            var uri = new Uri(BaseUri);
+            client.SetupSet<Uri>(x => x.BaseUrl = uri);
+        }
+
         client
             .Setup(
                 s => s.ExecuteAsync(
