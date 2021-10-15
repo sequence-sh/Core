@@ -1,36 +1,38 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Newtonsoft.Json;
-using Reductech.EDR.Core.Internal;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace Reductech.EDR.Core.Entities
 {
 
 /// <summary>
-/// Converts Entities to Json
+/// Converts Entities to and from Json
 /// </summary>
-public class EntityJsonConverter : JsonConverter
+public class EntityJsonConverter : JsonConverter<Entity>
 {
-    private EntityJsonConverter() { }
-
     /// <summary>
-    /// The instance.
+    /// The instance
     /// </summary>
     public static EntityJsonConverter Instance { get; } = new();
 
     /// <inheritdoc />
-    public override void WriteJson(
-        JsonWriter writer,
-        object? entityObject,
-        JsonSerializer serializer)
+    public override Entity Read(
+        ref Utf8JsonReader reader,
+        Type typeToConvert,
+        JsonSerializerOptions options)
     {
-        if (entityObject is not Entity entity)
-            return;
+        using JsonDocument document = JsonDocument.ParseValue(ref reader);
+        return Entity.Create(document.RootElement.Clone()); //TODO remove the Clone
+    }
 
-        var dictionary = CreateDictionary(entity);
+    /// <inheritdoc />
+    public override void Write(Utf8JsonWriter writer, Entity value, JsonSerializerOptions options)
+    {
+        var dictionary = CreateDictionary(value);
 
-        serializer.Serialize(writer, dictionary);
+        JsonSerializer.Serialize(writer, dictionary, options);
 
         static Dictionary<string, object?> CreateDictionary(Entity entity)
         {
@@ -51,29 +53,12 @@ public class EntityJsonConverter : JsonConverter
                     EntityValue.NestedEntity nestedEntity => CreateDictionary(nestedEntity.Value),
                     EntityValue.EnumerationValue enumerationValue => enumerationValue.Value.Value,
                     EntityValue.NestedList list => list.Value.Select(GetObject).ToList(),
+                    EntityValue.Null nullValue => null,
                     _ => ev.ObjectValue
                 };
             }
         }
     }
-
-    /// <inheritdoc />
-    public override object ReadJson(
-        JsonReader reader,
-        Type objectType,
-        object? existingValue,
-        JsonSerializer serializer)
-    {
-        var objectDict = serializer.Deserialize<Dictionary<string, object>>(reader);
-
-        var entity =
-            Entity.Create(objectDict!.Select(x => (new EntityPropertyKey(x.Key), x.Value))!);
-
-        return entity;
-    }
-
-    /// <inheritdoc />
-    public override bool CanConvert(Type objectType) => objectType == typeof(Entity);
 }
 
 }

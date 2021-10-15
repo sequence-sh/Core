@@ -6,9 +6,9 @@ using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
+using System.Text.Json;
 using System.Text.RegularExpressions;
 using CSharpFunctionalExtensions;
-using Newtonsoft.Json.Linq;
 using OneOf;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
@@ -53,17 +53,17 @@ public abstract record EntityValue(object? ObjectValue)
         }
 
         /// <inheritdoc />
-        public override string GetPrimitiveString() => "";
+        public override string GetPrimitiveString() => "null";
 
         /// <inheritdoc />
         public override string Serialize() => Serialized;
 
-        private static readonly string Serialized = SerializationMethods.DoubleQuote("");
+        private static readonly string Serialized = "null";
 
         /// <inheritdoc />
         public override string GetFormattedString(
             char delimiter,
-            string dateTimeFormat) => "";
+            string dateTimeFormat) => "null";
 
         /// <inheritdoc />
         protected override Maybe<object> AsType(Type type)
@@ -778,7 +778,7 @@ public abstract record EntityValue(object? ObjectValue)
             }
             else
             {
-                var (firstKey, remainder) = key.Value.Split();
+                var (firstKey, remainder) = key.GetValueOrThrow().Split();
 
                 var ev = CreateFromProperties(
                     new[] { (remainder, argValue) },
@@ -803,8 +803,8 @@ public abstract record EntityValue(object? ObjectValue)
         {
             case null:             return Null.Instance;
             case EntityValue ev:   return ev;
-            case StringStream ss1: return Create(ss1.GetString(), multiValueDelimiter);
-            case string s:         return Create(s,               multiValueDelimiter);
+            case StringStream ss1: return CreateFromString(ss1.GetString(), multiValueDelimiter);
+            case string s:         return CreateFromString(s,               multiValueDelimiter);
             case int i:            return new Integer(i);
             case byte @byte:       return new Integer(@byte);
             case short @short:     return new Integer(@short);
@@ -816,8 +816,7 @@ public abstract record EntityValue(object? ObjectValue)
             case DateTime dt:    return new Date(dt, null);
             case Enum e:
                 return new EnumerationValue(new Enumeration(e.GetType().Name, e.ToString()));
-            case JValue jv:             return CreateFromObject(jv.Value, multiValueDelimiter);
-            case JObject jo:            return new NestedEntity(Entity.Create(jo));
+            case JsonElement je:        return Create(je);
             case Entity entity:         return new NestedEntity(entity);
             case IEntityConvertible ec: return new NestedEntity(ec.ConvertToEntity());
             case Version version:       return new String(version.ToString());
@@ -879,7 +878,7 @@ public abstract record EntityValue(object? ObjectValue)
             }
         }
 
-        static EntityValue Create(string s, char? multiValueDelimiter)
+        static EntityValue CreateFromString(string s, char? multiValueDelimiter)
         {
             if (string.IsNullOrWhiteSpace(s))
                 return Null.Instance;
@@ -895,6 +894,46 @@ public abstract record EntityValue(object? ObjectValue)
                 );
 
             return new String(s);
+        }
+    }
+
+    /// <summary>
+    /// Create an EntityValue from a JsonElement
+    /// </summary>
+    public static EntityValue Create(JsonElement element)
+    {
+        switch (element.ValueKind)
+        {
+            case JsonValueKind.Undefined: return Null.Instance;
+            case JsonValueKind.Object:
+            {
+                var dict = element.EnumerateObject()
+                    .Select(
+                        (x, i) =>
+                            new EntityProperty(x.Name, Create(x.Value), null, i)
+                    )
+                    .ToImmutableDictionary(x => x.Name);
+
+                var entity = new Entity(dict);
+                return new NestedEntity(entity);
+            }
+            case JsonValueKind.Array:
+            {
+                var list = element.EnumerateArray().Select(Create).ToImmutableList();
+                return new NestedList(list);
+            }
+            case JsonValueKind.String: return new String(element.GetString()!);
+            case JsonValueKind.Number:
+            {
+                if (element.TryGetInt32(out var i))
+                    return new Integer(i);
+
+                return new Double(element.GetDouble());
+            }
+            case JsonValueKind.True: return new Boolean(true);
+            case JsonValueKind.False: return new Boolean(false);
+            case JsonValueKind.Null: return Null.Instance;
+            default: throw new ArgumentOutOfRangeException(element.ValueKind.ToString());
         }
     }
 
@@ -1005,7 +1044,7 @@ public abstract record EntityValue(object? ObjectValue)
         var maybeObject = AsType(type);
 
         if (maybeObject.HasValue)
-            return maybeObject.Value;
+            return maybeObject.GetValueOrThrow();
 
         var primitive = GetPrimitiveString();
 

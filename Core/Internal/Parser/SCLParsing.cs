@@ -153,6 +153,20 @@ public static class SCLParsing
         }
 
         /// <inheritdoc />
+        public override Result<FreezableStepProperty, IError> VisitNull(
+            SCLParser.NullContext context)
+        {
+            var location = new TextLocation(context);
+
+            var member = new FreezableStepProperty.Step(
+                new NullConstant(location),
+                location
+            );
+
+            return member;
+        }
+
+        /// <inheritdoc />
         public override Result<FreezableStepProperty, IError> VisitBoolean(
             SCLParser.BooleanContext context)
         {

@@ -1,21 +1,41 @@
 ﻿using System;
 using System.Collections.Generic;
-using Newtonsoft.Json;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace Reductech.EDR.Core
 {
 
 /// <summary>
-/// Json converter for requirement
+/// JSONConverter for Requirements
 /// </summary>
-public class RequirementConverter : JsonConverter<Requirement>
+public class RequirementJsonConverter : JsonConverter<Requirement>
 {
-    private RequirementConverter() { }
-
     /// <summary>
-    /// The instance
+    /// The Instance
     /// </summary>
-    public static JsonConverter<Requirement> Instance { get; } = new RequirementConverter();
+    public static JsonConverter<Requirement> Instance { get; } = new RequirementJsonConverter();
+
+    /// <inheritdoc />
+    public override Requirement? Read(
+        ref Utf8JsonReader reader,
+        Type typeToConvert,
+        JsonSerializerOptions options)
+    {
+        var mutableRequirement =
+            JsonSerializer.Deserialize<MutableRequirement>(ref reader, options);
+
+        return mutableRequirement?.ToRequirement();
+    }
+
+    /// <inheritdoc />
+    public override void Write(
+        Utf8JsonWriter writer,
+        Requirement value,
+        JsonSerializerOptions options)
+    {
+        JsonSerializer.Serialize(writer, MutableRequirement.Create(value));
+    }
 
     private class MutableRequirement
     {
@@ -74,30 +94,6 @@ public class RequirementConverter : JsonConverter<Requirement>
 
         public string? FeaturesKey { get; set; }
         public IReadOnlyList<string>? RequiredFeatures { get; set; }
-    }
-
-    /// <inheritdoc />
-    public override void WriteJson(
-        JsonWriter writer,
-        Requirement? value,
-        JsonSerializer serializer)
-    {
-        if (value == null)
-            writer.WriteNull();
-        else
-            serializer.Serialize(writer, MutableRequirement.Create(value));
-    }
-
-    /// <inheritdoc />
-    public override Requirement ReadJson(
-        JsonReader reader,
-        Type objectType,
-        Requirement? existingValue,
-        bool hasExistingValue,
-        JsonSerializer serializer)
-    {
-        var mutableRequirement = serializer.Deserialize<MutableRequirement>(reader)!;
-        return mutableRequirement.ToRequirement();
     }
 }
 

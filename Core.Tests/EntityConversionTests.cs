@@ -48,8 +48,8 @@ public class EntityConversionTests
     private const string TestConfigurationString =
         "('AdditionalRequirements': [('FeaturesKey': \"Features\" 'RequiredFeatures': [\"Apple\", \"Banana\"] 'ConnectorName': \"Reductech.EDR.Core.Tests\"), ('VersionKey': \"Version\" 'MinVersion': \"1.2.3.4\" 'MaxVersion': \"5.6.7.8\" 'ConnectorName': \"Reductech.EDR.Core.Tests\")] 'TargetMachineTags': [\"alpha\", \"beta\"] 'DoNotSplit': True 'Priority': 3)";
 
-    private const string TestConfiguration2String =
-        "('AdditionalRequirements': \"\" 'TargetMachineTags': [\"alpha\", \"beta\"] 'DoNotSplit': True 'Priority': 3)";
+    private const string TestConfigurationString2 =
+        "('AdditionalRequirements': null 'TargetMachineTags': [\"alpha\", \"beta\"] 'DoNotSplit': True 'Priority': 3)";
 
     [Fact]
     public void ConfigurationShouldConvertToEntityCorrectly()
@@ -72,7 +72,7 @@ public class EntityConversionTests
 
         var s = entity.ToString();
 
-        s.Should().Be(TestConfiguration2String);
+        s.Should().Be(TestConfigurationString2);
 
         var config = EntityConversionHelpers.TryCreateFromEntity<Configuration>(entity);
         config.ShouldBeSuccessful();
@@ -103,7 +103,7 @@ public class EntityConversionTests
     [Fact]
     public void EntityShouldConvertToConfigurationCorrectly()
     {
-        var entity = CreateEntityFromString(TestConfiguration2String);
+        var entity = CreateEntityFromString(TestConfigurationString2);
 
         var configurationResult =
             EntityConversionHelpers.TryCreateFromEntity<Configuration>(entity);

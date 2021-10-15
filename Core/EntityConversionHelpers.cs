@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Reflection;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using CSharpFunctionalExtensions;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
 using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.Internal.Errors;
 
@@ -28,23 +29,16 @@ public static class EntityConversionHelpers
     {
         try
         {
-            var json = JsonConvert.SerializeObject(
-                entity,
-                Formatting.None,
-                EntityJsonConverter.Instance,
-                RequirementConverter.Instance,
-                new VersionConverter()
-            );
+            var options = new JsonSerializerOptions()
+            {
+                Converters = { new JsonStringEnumConverter(), VersionJsonConverter.Instance }
+            };
 
-            var obj = JsonConvert.DeserializeObject<T>(
-                json,
-                EntityJsonConverter.Instance,
-                RequirementConverter.Instance,
-                new VersionConverter()
-            );
+            var entityJson = JsonSerializer.Serialize(entity, options);
+            var obj        = JsonSerializer.Deserialize<T>(entityJson, options);
 
             if (obj is null)
-                return ErrorCode.CouldNotParse.ToErrorBuilder(json, typeof(T).Name);
+                return ErrorCode.CouldNotParse.ToErrorBuilder(entityJson, typeof(T).Name);
 
             return obj;
         }

@@ -1,11 +1,10 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
-using Newtonsoft.Json;
 using Reductech.EDR.Core.Attributes;
-using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Util;
@@ -115,7 +114,8 @@ public abstract class RESTStep<TOutput> : CompoundStep<TOutput>
         if (r.IsFailure)
             return r.ConvertFailure<IRestRequest>();
 
-        var serializedObject = JsonConvert.SerializeObject(r.Value, EntityJsonConverter.Instance);
+        var serializedObject = JsonSerializer
+            .Serialize(r.Value);
 
         restRequest = restRequest.AddJsonBody(serializedObject);
 
@@ -125,16 +125,13 @@ public abstract class RESTStep<TOutput> : CompoundStep<TOutput>
     /// <summary>
     /// Try deserialize a string to an entity
     /// </summary>
-    protected static Result<Entity, IErrorBuilder> TryDeserializeToEntity(string jsonString)
+    public static Result<Entity, IErrorBuilder> TryDeserializeToEntity(string jsonString)
     {
         Entity? entity;
 
         try
         {
-            entity = JsonConvert.DeserializeObject<Entity>(
-                jsonString,
-                EntityJsonConverter.Instance
-            );
+            entity = JsonSerializer.Deserialize<Entity>(jsonString);
         }
         catch (Exception e)
         {
