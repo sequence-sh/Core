@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Runtime.Serialization;
+using System.Text.Json.Serialization;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.ConnectorManagement.Base;
 using Reductech.EDR.Core.Entities;
@@ -17,6 +18,7 @@ namespace Reductech.EDR.Core
 /// A requirement of a step or step property
 /// </summary>
 [DataContract]
+[JsonConverter(typeof(RequirementJsonConverter))]
 public abstract record Requirement([property: DataMember] string ConnectorName) : IEntityConvertible
 {
     /// <summary>

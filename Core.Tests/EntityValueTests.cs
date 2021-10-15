@@ -26,7 +26,7 @@ public partial class EntityValueTests
         {
             Add(
                 null!,
-                "\"\"",
+                "null",
                 Maybe<int>.None,
                 Maybe<double>.None,
                 Maybe<bool>.None,

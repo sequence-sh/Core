@@ -122,7 +122,11 @@ public sealed record SchemaProperty
         {
             if (property2.HasValue)
             {
-                return CombineSchemaProperties(propertyName, property1.Value, property2.Value)
+                return CombineSchemaProperties(
+                        propertyName,
+                        property1.GetValueOrThrow(),
+                        property2.GetValueOrThrow()
+                    )
                     .Map(Maybe<SchemaProperty>.From);
             }
 
@@ -170,8 +174,8 @@ public sealed record SchemaProperty
             };
 
             static Result<SCLType, IErrorBuilder> TryCombineTypes(
-                string propertyName,
-                string propertyPropertyName,
+                string _1,
+                string _2,
                 SCLType t1,
                 SCLType t2)
             {

@@ -225,7 +225,7 @@ public partial class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Enti
                     ("Foo", SCLType.Integer, null, Multiplicity.Any, null,
                      null, null, null)
                 ),
-                "('Foo': \"\")"
+                "('Foo': null)"
             );
 
             yield return CreateCase(
@@ -237,7 +237,7 @@ public partial class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Enti
                     ("Foo", SCLType.Integer, null, Multiplicity.UpToOne, null,
                      null, null, null)
                 ),
-                "('Foo': \"\")"
+                "('Foo': null)"
             );
 
             yield return CreateCase(
@@ -252,7 +252,7 @@ public partial class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Enti
                     {
                         DefaultErrorBehavior = ErrorBehavior.Error
                     },
-                "Schema violation: Expected 'Foo' to not be null in ('Foo': \"\")"
+                "Schema violation: Expected 'Foo' to not be null in ('Foo': null)"
             );
 
             yield return CreateCase(

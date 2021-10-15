@@ -3,10 +3,11 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
-using Newtonsoft.Json.Linq;
 using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
@@ -19,6 +20,7 @@ namespace Reductech.EDR.Core
 /// <summary>
 /// A piece of data.
 /// </summary>
+[JsonConverter(typeof(EntityJsonConverter))]
 public sealed class Entity : IEnumerable<EntityProperty>, IEquatable<Entity>
 {
     /// <summary>
@@ -61,12 +63,18 @@ public sealed class Entity : IEnumerable<EntityProperty>, IEquatable<Entity>
     );
 
     /// <summary>
-    /// Create and entity from a JObject
+    /// Create an entity from a JsonElement
     /// </summary>
-    public static Entity Create(JObject jObject)
+    public static Entity Create(JsonElement element)
     {
-        return Create(
-            jObject.Properties().Select(x => (new EntityPropertyKey(x.Name), x.Value as object))!
+        var ev = EntityValue.Create(element);
+
+        if (ev is EntityValue.NestedEntity nestedEntity)
+            return nestedEntity.Value;
+
+        return new Entity(
+            ImmutableDictionary<string, EntityProperty>.Empty
+                .Add(PrimitiveKey, new EntityProperty(PrimitiveKey, ev, null, 0))
         );
     }
 
@@ -150,7 +158,7 @@ public sealed class Entity : IEnumerable<EntityProperty>, IEquatable<Entity>
         if (!Dictionary.ContainsKey(propertyName))
             return this; //No property to remove
 
-        var newDict = this.Dictionary.Remove(propertyName);
+        var newDict = Dictionary.Remove(propertyName);
 
         return new Entity(newDict);
     }
