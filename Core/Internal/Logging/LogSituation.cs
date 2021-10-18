@@ -211,7 +211,7 @@ public abstract record LogSituationBase(string Code, LogLevel LogLevel)
 
         const string NullString = "(null)";
 
-        private object FormatArgument(object? value)
+        private static object FormatArgument(object? value)
         {
             return value switch
             {

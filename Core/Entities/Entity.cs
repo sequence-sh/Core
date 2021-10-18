@@ -103,9 +103,7 @@ public sealed class Entity : IEnumerable<EntityProperty>, IEquatable<Entity>
     /// <summary>
     /// Creates a new Entity
     /// </summary>
-    public static Entity Create(
-        IEnumerable<(EntityPropertyKey key, object? value)> properties,
-        char? multiValueDelimiter = null)
+    public static Entity Create(IEnumerable<(EntityPropertyKey key, object? value)> properties)
     {
         var dict =
             properties.Select(
@@ -119,10 +117,7 @@ public sealed class Entity : IEnumerable<EntityProperty>, IEquatable<Entity>
                 .Select(
                     (group, i) =>
                     {
-                        var ev = EntityValue.CreateFromProperties(
-                            group.ToList(),
-                            multiValueDelimiter
-                        );
+                        var ev = EntityValue.CreateFromProperties(group.ToList());
 
                         return new EntityProperty(group.Key, ev, i);
                     }

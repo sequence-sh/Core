@@ -132,7 +132,10 @@ public sealed class Validate : CompoundStep<Array<Entity>>
 
                         break;
                     }
-                    default: throw new ArgumentOutOfRangeException();
+                    default:
+                        throw new ArgumentOutOfRangeException(
+                            errorBehavior.GetValueOrDefault().ToString()
+                        );
                 }
             }
         }

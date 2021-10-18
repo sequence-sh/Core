@@ -347,14 +347,13 @@ public abstract record EntityValue(object? ObjectValue)
     /// Create an entity from structured entity properties
     /// </summary>
     public static EntityValue CreateFromProperties(
-        IReadOnlyList<(Maybe<EntityPropertyKey> key, object? argValue)> properties,
-        char? multiValueDelimiter)
+        IReadOnlyList<(Maybe<EntityPropertyKey> key, object? argValue)> properties)
     {
         if (properties.Count == 0)
             return Null.Instance;
 
         if (properties.Count == 1 && properties.Single().key.HasNoValue)
-            return CreateFromObject(properties.Single().argValue, multiValueDelimiter);
+            return CreateFromObject(properties.Single().argValue);
 
         var entityProperties =
             new Dictionary<string, EntityProperty>(StringComparer.OrdinalIgnoreCase);
@@ -407,7 +406,7 @@ public abstract record EntityValue(object? ObjectValue)
         {
             if (key.HasNoValue)
             {
-                var ev = CreateFromObject(argValue, multiValueDelimiter);
+                var ev = CreateFromObject(argValue);
 
                 if (ev is NestedEntity ne)
                     foreach (var (nestedKey, value) in ne.Value.Dictionary)
@@ -419,10 +418,7 @@ public abstract record EntityValue(object? ObjectValue)
             {
                 var (firstKey, remainder) = key.GetValueOrThrow().Split();
 
-                var ev = CreateFromProperties(
-                    new[] { (remainder, argValue) },
-                    multiValueDelimiter
-                );
+                var ev = CreateFromProperties(new[] { (remainder, argValue) });
 
                 SetEntityProperty(firstKey, ev);
             }
