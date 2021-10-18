@@ -4,11 +4,13 @@ using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
+using Json.Schema;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.Enums;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
+using Reductech.EDR.Core.Internal.Logging;
 using Reductech.EDR.Core.Util;
 
 namespace Reductech.EDR.Core.Steps
@@ -26,7 +28,7 @@ public sealed class EnforceSchema : CompoundStep<Array<Entity>>
     {
         var r = await stateMonad.RunStepsAsync(
             EntityStream,
-            Schema.WrapEntityConversion<Schema>(this),
+            Schema,
             ErrorBehavior.WrapNullable(),
             cancellationToken
         );
@@ -34,7 +36,20 @@ public sealed class EnforceSchema : CompoundStep<Array<Entity>>
         if (r.IsFailure)
             return r.ConvertFailure<Array<Entity>>();
 
-        var (entityStream, schema, errorBehavior) = r.Value;
+        var (entityStream, schemaEntity, errorBehavior) = r.Value;
+
+        JsonSchema schema;
+
+        try
+        {
+            schema = JsonSchema.FromText(schemaEntity.ToJsonElement().GetRawText());
+        }
+        catch (Exception e)
+        {
+            return Result.Failure<Array<Entity>, IError>(
+                ErrorCode.Unknown.ToErrorBuilder(e.Message).WithLocation(this)
+            );
+        }
 
         var newStream = entityStream.SelectMany(ApplySchema);
 
@@ -43,13 +58,52 @@ public sealed class EnforceSchema : CompoundStep<Array<Entity>>
         async IAsyncEnumerable<Entity> ApplySchema(Entity entity)
         {
             await ValueTask.CompletedTask;
-            var result = schema.ApplyToEntity(entity, this, stateMonad, errorBehavior);
+            var jsonElement = entity.ToJsonElement();
 
-            if (result.IsFailure)
-                throw new ErrorException(result.Error.WithLocation(this));
+            var result = schema.Validate(
+                jsonElement,
+                ValidationOptions.Default
+            ); //.ApplyToEntity(entity, this, stateMonad, errorBehavior);
 
-            if (result.Value.HasValue)
-                yield return result.Value.Value;
+            if (result.IsValid)
+                yield return entity;
+            else
+            {
+                switch (errorBehavior.GetValueOrDefault())
+                {
+                    case Enums.ErrorBehavior.Fail:
+                    {
+                        throw new ErrorException(
+                            ErrorCode.Unknown.ToErrorBuilder(result.Message!).WithLocation(this)
+                        );
+                    }
+                    case Enums.ErrorBehavior.Error:
+                    {
+                        LogWarning(result.Message!);
+                        break;
+                    }
+                    case Enums.ErrorBehavior.Warning:
+                    {
+                        LogWarning(result.Message!);
+                        yield return entity;
+
+                        break;
+                    }
+                    case Enums.ErrorBehavior.Skip: break;
+                    case Enums.ErrorBehavior.Ignore:
+                    {
+                        yield return entity;
+
+                        break;
+                    }
+                    default: throw new ArgumentOutOfRangeException();
+                }
+            }
+        }
+
+        void LogWarning(string message)
+        {
+            LogSituation.SchemaViolation.Log(stateMonad, this, message);
         }
     }
 

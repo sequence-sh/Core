@@ -2,12 +2,10 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
 using System.Text.Json;
-using System.Text.RegularExpressions;
 using CSharpFunctionalExtensions;
 using OneOf;
 using Reductech.EDR.Core.Internal;
@@ -35,22 +33,22 @@ public abstract record EntityValue(object? ObjectValue)
         /// </summary>
         public static Null Instance { get; } = new();
 
-        /// <inheritdoc />
-        protected override Result<(EntityValue value, bool changed), IErrorBuilder> TryConvertBase(
-            Schema schema,
-            string propertyName,
-            SchemaProperty schemaProperty,
-            Entity entity)
-        {
-            if (schemaProperty.Multiplicity is Multiplicity.Any or Multiplicity.UpToOne)
-                return (this, false);
+        ///// <inheritdoc />
+        //protected override Result<(EntityValue value, bool changed), IErrorBuilder> TryConvertBase(
+        //    Schema schema,
+        //    string propertyName,
+        //    SchemaProperty schemaProperty,
+        //    Entity entity)
+        //{
+        //    if (schemaProperty.Multiplicity is Multiplicity.Any or Multiplicity.UpToOne)
+        //        return (this, false);
 
-            return schemaProperty.Type switch
-            {
-                SCLType.String => (new String(Serialized), true),
-                _ => ErrorCode.SchemaViolationUnexpectedNull.ToErrorBuilder(propertyName, entity)
-            };
-        }
+        //    return schemaProperty.Type switch
+        //    {
+        //        SCLType.String => (new String(Serialized), true),
+        //        _ => ErrorCode.SchemaViolationUnexpectedNull.ToErrorBuilder(propertyName, entity)
+        //    };
+        //}
 
         /// <inheritdoc />
         public override string GetPrimitiveString() => "null";
@@ -69,13 +67,6 @@ public abstract record EntityValue(object? ObjectValue)
         protected override Maybe<object> AsType(Type type)
         {
             return Maybe<object>.None;
-        }
-
-        /// <inheritdoc />
-        public override Result<Maybe<SchemaProperty>, IErrorBuilder> TryCreateSchemaProperty(
-            string propertyName)
-        {
-            return Maybe<SchemaProperty>.None;
         }
     }
 
@@ -112,102 +103,6 @@ public abstract record EntityValue(object? ObjectValue)
 
             return Maybe<object>.None;
         }
-
-        /// <inheritdoc />
-        protected override Result<(EntityValue value, bool changed), IErrorBuilder> TryConvertBase(
-            Schema schema,
-            string propertyName,
-            SchemaProperty schemaProperty,
-            Entity entity)
-        {
-            switch (schemaProperty.Type)
-            {
-                case SCLType.String: return (this, false);
-                case SCLType.Integer:
-                {
-                    if (int.TryParse(Value, out var i))
-                        return (new Integer(i), true);
-
-                    break;
-                }
-                case SCLType.Double:
-                {
-                    if (double.TryParse(Value, out var d))
-                        return (new Double(d), true);
-
-                    break;
-                }
-                case SCLType.Enum:
-                {
-                    if (string.IsNullOrWhiteSpace(schemaProperty.EnumType))
-                        return new ErrorBuilder(ErrorCode.SchemaInvalidMissingEnum);
-
-                    if (schemaProperty.Values == null || !schemaProperty.Values.Any())
-                        return new ErrorBuilder(ErrorCode.SchemaInvalidNoEnumValues);
-
-                    if (schemaProperty.Values.Contains(Value, StringComparer.OrdinalIgnoreCase))
-                        return (
-                            new EnumerationValue(new Enumeration(schemaProperty.EnumType, Value)),
-                            true);
-
-                    break;
-                }
-                case SCLType.Bool:
-                {
-                    if (bool.TryParse(Value, out var b))
-                        return (new Boolean(b), true);
-
-                    break;
-                }
-                case SCLType.Date:
-                {
-                    var inputFormats = schemaProperty.DateInputFormats
-                                    ?? schema.DefaultDateInputFormats;
-
-                    if (inputFormats is not null &&
-                        DateTime.TryParseExact(
-                            Value,
-                            inputFormats.ToArray(),
-                            null,
-                            DateTimeStyles.None,
-                            out var dt1
-                        ))
-
-                    {
-                        return (
-                            new Date(
-                                dt1,
-                                schemaProperty.DateOutputFormat ?? schema.DefaultDateOutputFormat
-                            ), true);
-                    }
-
-                    if (DateTime.TryParse(Value, out var dt))
-                        return (
-                            new Date(
-                                dt,
-                                schemaProperty.DateOutputFormat ?? schema.DefaultDateOutputFormat
-                            ), true);
-
-                    break;
-                }
-                default: return CouldNotConvert(Value, schemaProperty, entity);
-            }
-
-            return CouldNotConvert(Value, schemaProperty, entity);
-        }
-
-        /// <inheritdoc />
-        public override Result<Maybe<SchemaProperty>, IErrorBuilder> TryCreateSchemaProperty(
-            string propertyName)
-        {
-            return Maybe<SchemaProperty>.From(
-                    new SchemaProperty
-                    {
-                        Type = SCLType.String, Multiplicity = Multiplicity.ExactlyOne
-                    }
-                )
-                ;
-        }
     }
 
     /// <summary>
@@ -237,34 +132,6 @@ public abstract record EntityValue(object? ObjectValue)
 
             return Maybe<object>.None;
         }
-
-        /// <inheritdoc />
-        protected override Result<(EntityValue value, bool changed), IErrorBuilder> TryConvertBase(
-            Schema schema,
-            string propertyName,
-            SchemaProperty schemaProperty,
-            Entity entity)
-        {
-            return schemaProperty.Type switch
-            {
-                SCLType.String  => (new String(Value.ToString()), true),
-                SCLType.Integer => (this, false),
-                SCLType.Double  => (new Double(Convert.ToDouble(Value)), true),
-                _               => CouldNotConvert(Value, schemaProperty, entity)
-            };
-        }
-
-        /// <inheritdoc />
-        public override Result<Maybe<SchemaProperty>, IErrorBuilder> TryCreateSchemaProperty(
-            string propertyName)
-        {
-            return Maybe<SchemaProperty>.From(
-                new SchemaProperty
-                {
-                    Type = SCLType.Integer, Multiplicity = Multiplicity.ExactlyOne
-                }
-            );
-        }
     }
 
     /// <summary>
@@ -291,31 +158,6 @@ public abstract record EntityValue(object? ObjectValue)
 
             return Maybe<object>.None;
         }
-
-        /// <inheritdoc />
-        protected override Result<(EntityValue value, bool changed), IErrorBuilder> TryConvertBase(
-            Schema schema,
-            string propertyName,
-            SchemaProperty schemaProperty,
-            Entity entity)
-        {
-            return schemaProperty.Type switch
-            {
-                SCLType.String => (
-                    new String(Value.ToString(Constants.DoubleFormat)), false),
-                SCLType.Double => (this, true),
-                _              => CouldNotConvert(Value, schemaProperty, entity)
-            };
-        }
-
-        /// <inheritdoc />
-        public override Result<Maybe<SchemaProperty>, IErrorBuilder> TryCreateSchemaProperty(
-            string propertyName)
-        {
-            return Maybe<SchemaProperty>.From(
-                new SchemaProperty { Type = SCLType.Double, Multiplicity = Multiplicity.ExactlyOne }
-            );
-        }
     }
 
     /// <summary>
@@ -335,36 +177,12 @@ public abstract record EntityValue(object? ObjectValue)
             string dateTimeFormat) => Value.ToString();
 
         /// <inheritdoc />
-        protected override Result<(EntityValue value, bool changed), IErrorBuilder> TryConvertBase(
-            Schema schema,
-            string propertyName,
-            SchemaProperty schemaProperty,
-            Entity entity)
-        {
-            return schemaProperty.Type switch
-            {
-                SCLType.String => (new String(Value.ToString()), true),
-                SCLType.Bool   => (this, false),
-                _              => CouldNotConvert(Value, schemaProperty, entity)
-            };
-        }
-
-        /// <inheritdoc />
         protected override Maybe<object> AsType(Type type)
         {
             if (type == typeof(bool))
                 return Value;
 
             return Maybe<object>.None;
-        }
-
-        /// <inheritdoc />
-        public override Result<Maybe<SchemaProperty>, IErrorBuilder> TryCreateSchemaProperty(
-            string propertyName)
-        {
-            return Maybe<SchemaProperty>.From(
-                new SchemaProperty { Type = SCLType.Bool, Multiplicity = Multiplicity.ExactlyOne }
-            );
         }
     } //TODO constant values
 
@@ -388,59 +206,6 @@ public abstract record EntityValue(object? ObjectValue)
         protected override Maybe<object> AsType(Type type)
         {
             return Maybe<object>.None;
-        }
-
-        /// <inheritdoc />
-        protected override Result<(EntityValue value, bool changed), IErrorBuilder> TryConvertBase(
-            Schema schema,
-            string propertyName,
-            SchemaProperty schemaProperty,
-            Entity entity)
-        {
-            switch (schemaProperty.Type)
-            {
-                case SCLType.String: return (this, false);
-                case SCLType.Enum:
-                {
-                    if (schemaProperty.EnumType == null)
-                        return new ErrorBuilder(ErrorCode.SchemaInvalidMissingEnum);
-
-                    if (schemaProperty.Values == null || !schemaProperty.Values.Any())
-                        return new ErrorBuilder(ErrorCode.SchemaInvalidNoEnumValues);
-
-                    if (schemaProperty.Values.Contains(
-                        Value.Value,
-                        StringComparer.OrdinalIgnoreCase
-                    ))
-                    {
-                        if (schemaProperty.EnumType == Value.Type)
-                            return (this, false);
-
-                        return (
-                            new EnumerationValue(
-                                new Enumeration(schemaProperty.EnumType, Value.Value)
-                            ),
-                            true);
-                    }
-
-                    return CouldNotConvert(Value, schemaProperty, entity);
-                }
-                default: return CouldNotConvert(Value, schemaProperty, entity);
-            }
-        }
-
-        /// <inheritdoc />
-        public override Result<Maybe<SchemaProperty>, IErrorBuilder> TryCreateSchemaProperty(
-            string propertyName)
-        {
-            return Maybe<SchemaProperty>.From(
-                new SchemaProperty
-                {
-                    Type         = SCLType.Enum,
-                    Multiplicity = Multiplicity.ExactlyOne,
-                    EnumType     = Value.Type
-                }
-            );
         }
     }
 
@@ -474,42 +239,6 @@ public abstract record EntityValue(object? ObjectValue)
         /// <inheritdoc />
         public override string ToString() =>
             Value.ToString(DateOutputFormat ?? Constants.DateTimeFormat);
-
-        /// <inheritdoc />
-        protected override Result<(EntityValue value, bool changed), IErrorBuilder> TryConvertBase(
-            Schema schema,
-            string propertyName,
-            SchemaProperty schemaProperty,
-            Entity entity)
-        {
-            return schemaProperty.Type switch
-            {
-                SCLType.String => (
-                    new String(
-                        Value.ToString(
-                            DateOutputFormat
-                         ?? Constants
-                                .DateTimeFormat //Note: we don't use the schema date output format here
-                        )
-                    ), true),
-                SCLType.Date => (this, false),
-                _            => CouldNotConvert(Value, schemaProperty, entity)
-            };
-        }
-
-        /// <inheritdoc />
-        public override Result<Maybe<SchemaProperty>, IErrorBuilder> TryCreateSchemaProperty(
-            string propertyName)
-        {
-            return Maybe<SchemaProperty>.From(
-                new SchemaProperty
-                {
-                    Type             = SCLType.Date,
-                    Multiplicity     = Multiplicity.ExactlyOne,
-                    DateOutputFormat = DateOutputFormat
-                }
-            );
-        }
     }
 
     /// <summary>
@@ -539,33 +268,6 @@ public abstract record EntityValue(object? ObjectValue)
 
         /// <inheritdoc />
         public override string ToString() => Value.ToString();
-
-        /// <inheritdoc />
-        protected override Result<(EntityValue value, bool changed), IErrorBuilder> TryConvertBase(
-            Schema schema,
-            string propertyName,
-            SchemaProperty schemaProperty,
-            Entity entity)
-        {
-            return schemaProperty.Type switch
-            {
-                SCLType.String => (new String(Value.ToString()), true),
-                SCLType.Enum   => (this, false),
-                _              => CouldNotConvert(Value, schemaProperty, entity)
-            };
-        }
-
-        /// <inheritdoc />
-        public override Result<Maybe<SchemaProperty>, IErrorBuilder> TryCreateSchemaProperty(
-            string propertyName)
-        {
-            return Maybe<SchemaProperty>.From(
-                new SchemaProperty
-                {
-                    Type = SCLType.Entity, Multiplicity = Multiplicity.ExactlyOne,
-                }
-            );
-        }
     }
 
     /// <summary>
@@ -613,19 +315,6 @@ public abstract record EntityValue(object? ObjectValue)
         }
 
         /// <inheritdoc />
-        public override Result<Maybe<SchemaProperty>, IErrorBuilder> TryCreateSchemaProperty(
-            string propertyName)
-        {
-            var members = Value.Select(x => x.TryCreateSchemaProperty(propertyName))
-                .Combine(ErrorBuilderList.Combine);
-
-            if (members.IsFailure)
-                return members.ConvertFailure<Maybe<SchemaProperty>>();
-
-            return SchemaProperty.Combine(propertyName, members.Value, Value.Count);
-        }
-
-        /// <inheritdoc />
         protected override Maybe<object> AsType(Type type)
         {
             if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Array<>))
@@ -651,54 +340,6 @@ public abstract record EntityValue(object? ObjectValue)
             }
 
             return Maybe<object>.None;
-        }
-
-        /// <inheritdoc />
-        protected override Result<(EntityValue value, bool changed), IErrorBuilder> TryConvertBase(
-            Schema schema,
-            string propertyName,
-            SchemaProperty schemaProperty,
-            Entity entity)
-        {
-            if (schemaProperty.Multiplicity is Multiplicity.UpToOne or Multiplicity.ExactlyOne)
-            {
-                if (Value.Count == 1)
-                    return Value.Single().TryConvert(schema, propertyName, schemaProperty, entity);
-
-                if (Value.Count == 0 && schemaProperty.Multiplicity == Multiplicity.UpToOne)
-                    return (Null.Instance, true);
-
-                return ErrorCode.SchemaViolationUnexpectedList.ToErrorBuilder(propertyName, entity);
-            }
-
-            var sp = new SchemaProperty
-            {
-                EnumType         = schemaProperty.EnumType,
-                Values           = schemaProperty.Values,
-                ErrorBehavior    = schemaProperty.ErrorBehavior,
-                DateInputFormats = schemaProperty.DateInputFormats,
-                DateOutputFormat = schemaProperty.DateOutputFormat,
-                Multiplicity     = Multiplicity.ExactlyOne,
-                Regex            = schemaProperty.Regex,
-                Type             = schemaProperty.Type
-            };
-
-            var newList = Value.Select(x => x.TryConvert(schema, propertyName, sp, entity))
-                .Combine(ErrorBuilderList.Combine)
-                .Map(
-                    x => x.Aggregate(
-                        (list: ImmutableList<EntityValue>.Empty, changed: false),
-                        (a, b) => (a.list.Add(b.value), a.changed || b.changed)
-                    )
-                )
-                .Map(
-                    x =>
-                        x.changed
-                            ? (new NestedList(x.list) as EntityValue, true)
-                            : (this, false)
-                );
-
-            return newList;
         }
     }
 
@@ -936,59 +577,6 @@ public abstract record EntityValue(object? ObjectValue)
             default: throw new ArgumentOutOfRangeException(element.ValueKind.ToString());
         }
     }
-
-    /// <summary>
-    /// Tries to convert a value to match the schema
-    /// </summary>
-    protected abstract Result<(EntityValue value, bool changed), IErrorBuilder> TryConvertBase(
-        Schema schema,
-        string propertyName,
-        SchemaProperty schemaProperty,
-        Entity entity);
-
-    /// <summary>
-    /// Error returned when a value cannot be converted
-    /// </summary>
-    protected static ErrorBuilder CouldNotConvert(
-        object o,
-        SchemaProperty schemaProperty,
-        Entity entity) => ErrorCode.SchemaViolationWrongType.ToErrorBuilder(
-        o,
-        schemaProperty.Type,
-        entity
-    );
-
-    /// <summary>
-    /// Tries to convert the value so it matches the schema.
-    /// </summary>
-    public Result<(EntityValue value, bool changed), IErrorBuilder> TryConvert(
-        Schema schema,
-        string propertyName,
-        SchemaProperty schemaProperty,
-        Entity entity)
-    {
-        if (schemaProperty.Regex != null)
-        {
-            var primitiveString = GetPrimitiveString();
-
-            if (!Regex.IsMatch(primitiveString, schemaProperty.Regex))
-                return new ErrorBuilder(
-                    ErrorCode.SchemaViolationUnmatchedRegex,
-                    primitiveString,
-                    schemaProperty.Regex,
-                    entity
-                );
-        }
-
-        return TryConvertBase(schema, propertyName, schemaProperty, entity);
-    }
-
-    /// <summary>
-    /// Create a schema property that could contain this entity value
-    /// </summary>
-    /// <returns></returns>
-    public abstract Result<Maybe<SchemaProperty>, IErrorBuilder> TryCreateSchemaProperty(
-        string propertyName);
 
     /// <summary>
     /// If this is a primitive, get a string representation

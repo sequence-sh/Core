@@ -360,12 +360,6 @@ public abstract partial class StepTestBase<TStep, TOutput>
 
             step = new StringConstant(s);
         }
-        else if (outputType == typeof(Schema))
-        {
-            throw new Exception(
-                $"{stepName} should not have output type 'Schema' - it should be 'Entity'"
-            );
-        }
         else if (outputType.IsGenericType && outputType.GetInterfaces().Contains(typeof(IOneOf)))
         {
             var arg1 = outputType.GenericTypeArguments[0];

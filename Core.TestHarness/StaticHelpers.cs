@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Linq;
-using Reductech.EDR.Core.Entities;
-using Reductech.EDR.Core.Enums;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.Util;
@@ -74,50 +70,6 @@ public static class StaticHelpers
 
     public static IStep<Entity> GetEntityVariable =>
         GetVariable<Entity>(VariableName.Item); //TODO rename
-
-    public static Schema CreateSchema(
-        string name,
-        ExtraPropertyBehavior allowExtraProperties,
-        params (string propertyName, SCLType type, Multiplicity multiplicity)[]
-            properties)
-    {
-        return CreateSchema(
-            name,
-            allowExtraProperties,
-            properties.Select(
-                    p => (p.propertyName, p.type, null as string, p.multiplicity, null as string,
-                          null as List<string>, null as List<string>, null as string)
-                )
-                .ToArray()
-        );
-    }
-
-    public static Schema CreateSchema(
-        string name,
-        ExtraPropertyBehavior extraPropertyBehavior,
-        params (string propertyName, SCLType type, string? enumType, Multiplicity
-            multiplicity, string? regex, List<string>? values, List<string>? inputFormats, string?
-            outputFormat)[] properties)
-    {
-        return new()
-        {
-            Name            = name,
-            ExtraProperties = extraPropertyBehavior,
-            Properties = properties.ToImmutableSortedDictionary(
-                x => x.propertyName,
-                x => new SchemaProperty
-                {
-                    EnumType         = x.enumType,
-                    Multiplicity     = x.multiplicity,
-                    Type             = x.type,
-                    Regex            = x.regex,
-                    Values           = x.values,
-                    DateInputFormats = x.inputFormats,
-                    DateOutputFormat = x.outputFormat
-                }
-            )
-        };
-    }
 }
 
 }

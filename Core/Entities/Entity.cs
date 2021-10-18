@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.IO;
 using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -76,6 +77,27 @@ public sealed class Entity : IEnumerable<EntityProperty>, IEquatable<Entity>
             ImmutableDictionary<string, EntityProperty>.Empty
                 .Add(PrimitiveKey, new EntityProperty(PrimitiveKey, ev, null, 0))
         );
+    }
+
+    /// <summary>
+    /// Convert this Entity to a Json Element
+    /// </summary>
+    public JsonElement ToJsonElement()
+    {
+        var options = new JsonSerializerOptions()
+        {
+            Converters = { new JsonStringEnumConverter() }
+        };
+
+        var stream = new MemoryStream();
+        var writer = new Utf8JsonWriter(stream);
+
+        EntityJsonConverter.Instance.Write(writer, this, options);
+
+        var reader = new Utf8JsonReader(stream.ToArray());
+
+        using JsonDocument document = JsonDocument.ParseValue(ref reader);
+        return document.RootElement.Clone();
     }
 
     /// <summary>
