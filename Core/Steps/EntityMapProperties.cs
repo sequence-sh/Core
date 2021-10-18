@@ -33,7 +33,7 @@ public class EntityMapProperties : CompoundStep<Array<Entity>>
 
         var mappingsDict = mappings.ToDictionary(
             x => x.Name,
-            x => x.BestValue.GetPrimitiveString()
+            x => x.Value.GetPrimitiveString()
         );
 
         var newEntityStream = entityStream
@@ -54,8 +54,7 @@ public class EntityMapProperties : CompoundStep<Array<Entity>>
 
                     var newProperty = new EntityProperty(
                         newKey,
-                        property.BaseValue,
-                        property.NewValue,
+                        property.Value,
                         property.Order
                     );
 

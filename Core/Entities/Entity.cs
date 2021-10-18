@@ -75,7 +75,7 @@ public sealed class Entity : IEnumerable<EntityProperty>, IEquatable<Entity>
 
         return new Entity(
             ImmutableDictionary<string, EntityProperty>.Empty
-                .Add(PrimitiveKey, new EntityProperty(PrimitiveKey, ev, null, 0))
+                .Add(PrimitiveKey, new EntityProperty(PrimitiveKey, ev, 0))
         );
     }
 
@@ -124,7 +124,7 @@ public sealed class Entity : IEnumerable<EntityProperty>, IEquatable<Entity>
                             multiValueDelimiter
                         );
 
-                        return new EntityProperty(group.Key, ev, null, i);
+                        return new EntityProperty(group.Key, ev, i);
                     }
                 )
                 .ToImmutableDictionary(x => x.Name);
@@ -141,9 +141,9 @@ public sealed class Entity : IEnumerable<EntityProperty>, IEquatable<Entity>
 
         if (Dictionary.TryGetValue(key, out var ep))
         {
-            EntityValue newPropertyValue;
+            EntityValue newValue2;
 
-            if (ep.BestValue is EntityValue.NestedEntity existingEntity)
+            if (ep.Value is EntityValue.NestedEntity existingEntity)
             {
                 Entity combinedEntity;
 
@@ -152,19 +152,19 @@ public sealed class Entity : IEnumerable<EntityProperty>, IEquatable<Entity>
                 else
                     combinedEntity = existingEntity.Value.WithProperty(PrimitiveKey, newValue);
 
-                newPropertyValue = new EntityValue.NestedEntity(combinedEntity);
+                newValue2 = new EntityValue.NestedEntity(combinedEntity);
             }
             else
             {
                 //overwrite the property
-                newPropertyValue = newValue;
+                newValue2 = newValue;
             }
 
-            newProperty = new EntityProperty(ep.Name, newPropertyValue, null, ep.Order);
+            newProperty = new EntityProperty(ep.Name, newValue2, ep.Order);
         }
         else
         {
-            newProperty = new EntityProperty(key, newValue, null, Dictionary.Count);
+            newProperty = new EntityProperty(key, newValue, Dictionary.Count);
         }
 
         ImmutableDictionary<string, EntityProperty> newDict = Dictionary.SetItem(key, newProperty);
@@ -194,7 +194,7 @@ public sealed class Entity : IEnumerable<EntityProperty>, IEquatable<Entity>
         var current = this;
 
         foreach (var ep in other)
-            current = current.WithProperty(ep.Name, ep.BestValue);
+            current = current.WithProperty(ep.Name, ep.Value);
 
         return current;
     }
@@ -215,9 +215,9 @@ public sealed class Entity : IEnumerable<EntityProperty>, IEquatable<Entity>
             return Maybe<EntityValue>.None;
 
         if (remainder.HasNoValue)
-            return ep.BestValue;
+            return ep.Value;
 
-        if (ep.BestValue is EntityValue.NestedEntity nestedEntity)
+        if (ep.Value is EntityValue.NestedEntity nestedEntity)
             return nestedEntity.Value.TryGetValue(remainder.GetValueOrThrow());
         //We can't get the nested property as this is not an entity
 

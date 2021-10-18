@@ -9,11 +9,18 @@ namespace Reductech.EDR.Core
 /// </summary>
 public class SingleRestClientFactory : IRestClientFactory
 {
+    /// <summary>
+    /// Returns a new SingleRestClientFactory
+    /// </summary>
+    /// <param name="restClient"></param>
     public SingleRestClientFactory(IRestClient restClient)
     {
         RestClient = restClient;
     }
 
+    /// <summary>
+    /// The Rest Client
+    /// </summary>
     public IRestClient RestClient { get; }
 
     /// <inheritdoc />

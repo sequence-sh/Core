@@ -22,7 +22,7 @@ public static class RestHelpers
         {
             request = request.AddHeader(
                 entityProperty.Name,
-                entityProperty.BestValue.GetPrimitiveString()
+                entityProperty.Value.GetPrimitiveString()
             );
         }
 

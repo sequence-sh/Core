@@ -65,7 +65,7 @@ public sealed class RunStep<T> : CompoundStep<Unit>
             {
                 foreach (var property in entity)
                 {
-                    var r = await ReadToEnd(property.BaseValue, cancellation);
+                    var r = await ReadToEnd(property.Value, cancellation);
 
                     if (r.IsFailure)
                         return r;

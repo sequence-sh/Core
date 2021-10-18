@@ -74,7 +74,7 @@ public static class SerializationMethods
         var results = new List<string>();
 
         foreach (var property in entity)
-            results.Add($"'{property.Name}': {property.BestValue.Serialize()}");
+            results.Add($"'{property.Name}': {property.Value.Serialize()}");
 
         sb.AppendJoin(" ", results);
 
@@ -180,7 +180,7 @@ public static class SerializationMethods
                 FormatEntityValue(
                     sb,
                     indentation,
-                    property.BestValue,
+                    property.Value,
                     $"'{property.Name}': ",
                     null
                 );

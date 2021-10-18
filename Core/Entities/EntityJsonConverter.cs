@@ -40,7 +40,7 @@ public class EntityJsonConverter : JsonConverter<Entity>
 
             foreach (var entityProperty in entity)
             {
-                var value = GetObject(entityProperty.BestValue);
+                var value = GetObject(entityProperty.Value);
                 dictionary.Add(entityProperty.Name, value);
             }
 
@@ -53,7 +53,7 @@ public class EntityJsonConverter : JsonConverter<Entity>
                     EntityValue.NestedEntity nestedEntity => CreateDictionary(nestedEntity.Value),
                     EntityValue.EnumerationValue enumerationValue => enumerationValue.Value.Value,
                     EntityValue.NestedList list => list.Value.Select(GetObject).ToList(),
-                    EntityValue.Null nullValue => null,
+                    EntityValue.Null _ => null,
                     _ => ev.ObjectValue
                 };
             }

@@ -74,7 +74,7 @@ public static class EntityConversionHelpers
             if (value is not null)
             {
                 var ev = EntityValue.CreateFromObject(value);
-                var ep = new EntityProperty(propertyInfo.Name, ev, null, i);
+                var ep = new EntityProperty(propertyInfo.Name, ev, i);
                 props.Add(ep);
             }
 

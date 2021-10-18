@@ -367,24 +367,23 @@ public abstract record EntityValue(object? ObjectValue)
             {
                 if (ev is NestedEntity nestedEntity)
                 {
-                    if (existingValue.BestValue is NestedEntity existingNestedEntity)
+                    if (existingValue.Value is NestedEntity existingNestedEntity)
                     {
                         var nEntity = existingNestedEntity.Value.Combine(nestedEntity.Value);
 
                         newProperty = new EntityProperty(
                             key,
                             new NestedEntity(nEntity),
-                            null,
                             existingValue.Order
                         );
                     }
                     else
                     {
                         //Ignore the old property
-                        newProperty = new EntityProperty(key, ev, null, existingValue.Order);
+                        newProperty = new EntityProperty(key, ev, existingValue.Order);
                     }
                 }
-                else if (existingValue.BestValue is NestedEntity existingNestedEntity)
+                else if (existingValue.Value is NestedEntity existingNestedEntity)
                 {
                     var nEntity =
                         existingNestedEntity.Value.WithProperty(Entity.PrimitiveKey, ev);
@@ -392,15 +391,14 @@ public abstract record EntityValue(object? ObjectValue)
                     newProperty = new EntityProperty(
                         key,
                         new NestedEntity(nEntity),
-                        null,
                         existingValue.Order
                     );
                 }
                 else //overwrite the existing property
-                    newProperty = new EntityProperty(key, ev, null, existingValue.Order);
+                    newProperty = new EntityProperty(key, ev, existingValue.Order);
             }
             else //New property
-                newProperty = new EntityProperty(key, ev, null, entityProperties.Count);
+                newProperty = new EntityProperty(key, ev, entityProperties.Count);
 
             entityProperties[key] = newProperty;
         }
@@ -413,7 +411,7 @@ public abstract record EntityValue(object? ObjectValue)
 
                 if (ev is NestedEntity ne)
                     foreach (var (nestedKey, value) in ne.Value.Dictionary)
-                        SetEntityProperty(nestedKey, value.BestValue);
+                        SetEntityProperty(nestedKey, value.Value);
                 else
                     SetEntityProperty(Entity.PrimitiveKey, ev);
             }
@@ -471,7 +469,7 @@ public abstract record EntityValue(object? ObjectValue)
                 {
                     var val = dictionaryEntry.Value;
                     var ev  = CreateFromObject(val);
-                    var ep  = new EntityProperty(dictionaryEntry.Key.ToString()!, ev, null, i);
+                    var ep  = new EntityProperty(dictionaryEntry.Key.ToString()!, ev, i);
                     builder.Add(dictionaryEntry.Key.ToString()!, ep);
                     i++;
                 }
@@ -551,7 +549,7 @@ public abstract record EntityValue(object? ObjectValue)
                 var dict = element.EnumerateObject()
                     .Select(
                         (x, i) =>
-                            new EntityProperty(x.Name, Create(x.Value), null, i)
+                            new EntityProperty(x.Name, Create(x.Value), i)
                     )
                     .ToImmutableDictionary(x => x.Name);
 

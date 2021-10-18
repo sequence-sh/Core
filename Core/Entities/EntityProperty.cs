@@ -11,12 +11,11 @@ public readonly struct EntityProperty : IEquatable<EntityProperty>
     /// <summary>
     /// Create a new Entity property
     /// </summary>
-    public EntityProperty(string name, EntityValue baseValue, EntityValue? newValue, int order)
+    public EntityProperty(string name, EntityValue value, int order)
     {
-        Name      = name;
-        BaseValue = baseValue;
-        NewValue  = newValue;
-        Order     = order;
+        Name  = name;
+        Value = value;
+        Order = order;
     }
 
     /// <summary>
@@ -25,31 +24,20 @@ public readonly struct EntityProperty : IEquatable<EntityProperty>
     public string Name { get; }
 
     /// <summary>
-    /// The base value of this property.
-    /// This will be the original value (unless it has been changed).
+    /// The value of this property
     /// </summary>
-    public EntityValue BaseValue { get; }
-
-    /// <summary>
-    /// The value of this property after schema application.
-    /// </summary>
-    public EntityValue? NewValue { get; }
+    public EntityValue Value { get; }
 
     /// <summary>
     /// Where in the ordered list of properties this appears.
     /// </summary>
     public int Order { get; }
 
-    /// <summary>
-    /// The NewValue, if present, otherwise the BaseValue
-    /// </summary>
-    public EntityValue BestValue => NewValue ?? BaseValue;
-
     /// <inheritdoc />
     public bool Equals(EntityProperty other)
     {
         var r = Name == other.Name
-             && BestValue.Equals(other.BestValue)
+             && Value.Equals(other.Value)
              && Order == other.Order;
 
         return r;
@@ -59,10 +47,10 @@ public readonly struct EntityProperty : IEquatable<EntityProperty>
     public override bool Equals(object? obj) => obj is EntityProperty other && Equals(other);
 
     /// <inheritdoc />
-    public override int GetHashCode() => HashCode.Combine(Name, BestValue, Order);
+    public override int GetHashCode() => HashCode.Combine(Name, Value, Order);
 
     /// <inheritdoc />
-    public override string ToString() => $"{Name}: {BestValue}";
+    public override string ToString() => $"{Name}: {Value}";
 
     /// <summary>
     /// Equals operator.
