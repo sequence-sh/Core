@@ -204,29 +204,8 @@
   <data name="RequirementNotMet" xml:space="preserve">
     <value>Requirement '{0}' not met.</value>
   </data>
-  <data name="SchemaInvalidMissingEnum" xml:space="preserve">
-    <value>Schema Invalid: No Enum name defined</value>
-  </data>
-  <data name="SchemaInvalidNoEnumValues" xml:space="preserve">
-    <value>SchemaInvalid: No Enum values defined</value>
-  </data>
-  <data name="SchemaViolationMissingProperty" xml:space="preserve">
-    <value>Missing Property: '{0}' in {1}</value>
-  </data>
-  <data name="SchemaViolationUnexpectedList" xml:space="preserve">
-    <value>Did not expect a list for '{0}' in {1}</value>
-  </data>
-  <data name="SchemaViolationUnexpectedNull" xml:space="preserve">
-    <value>Expected '{0}' to not be null in {1}</value>
-  </data>
-  <data name="SchemaViolationUnexpectedProperty" xml:space="preserve">
-    <value>Unexpected Property: '{0}' in {1}</value>
-  </data>
-  <data name="SchemaViolationUnmatchedRegex" xml:space="preserve">
-    <value>'{0}' does not match regex '{1}' in {2}</value>
-  </data>
-  <data name="SchemaViolationWrongType" xml:space="preserve">
-    <value>'{0}' is not a {1} in {2}</value>
+  <data name="SchemaViolation" xml:space="preserve">
+    <value>SchemaViolation: '{0}' at '{1}'.</value>
   </data>
   <data name="SCLSyntaxError" xml:space="preserve">
     <value>Syntax Error: {0}</value>

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
@@ -51,6 +52,11 @@ public sealed class EnforceSchema : CompoundStep<Array<Entity>>
             );
         }
 
+        ValidationOptions validationOptions = new()
+        {
+            OutputFormat = OutputFormat.Verbose, RequireFormatValidation = true,
+        };
+
         var newStream = entityStream.SelectMany(ApplySchema);
 
         return newStream;
@@ -62,8 +68,8 @@ public sealed class EnforceSchema : CompoundStep<Array<Entity>>
 
             var result = schema.Validate(
                 jsonElement,
-                ValidationOptions.Default
-            ); //.ApplyToEntity(entity, this, stateMonad, errorBehavior);
+                validationOptions
+            );
 
             if (result.IsValid)
                 yield return entity;
@@ -73,18 +79,36 @@ public sealed class EnforceSchema : CompoundStep<Array<Entity>>
                 {
                     case Enums.ErrorBehavior.Fail:
                     {
-                        throw new ErrorException(
-                            ErrorCode.Unknown.ToErrorBuilder(result.Message!).WithLocation(this)
-                        );
+                        var errors =
+                            ErrorBuilderList.Combine(
+                                    GetErrorMessages(result)
+                                        .Select(
+                                            x => ErrorCode.SchemaViolation.ToErrorBuilder(
+                                                x.message,
+                                                x.location
+                                            )
+                                        )
+                                )
+                                .WithLocation(this);
+
+                        throw new ErrorException(errors);
                     }
                     case Enums.ErrorBehavior.Error:
                     {
-                        LogWarning(result.Message!);
+                        foreach (var errorMessage in GetErrorMessages(result))
+                        {
+                            LogWarning(errorMessage);
+                        }
+
                         break;
                     }
                     case Enums.ErrorBehavior.Warning:
                     {
-                        LogWarning(result.Message!);
+                        foreach (var errorMessage in GetErrorMessages(result))
+                        {
+                            LogWarning(errorMessage);
+                        }
+
                         yield return entity;
 
                         break;
@@ -101,9 +125,24 @@ public sealed class EnforceSchema : CompoundStep<Array<Entity>>
             }
         }
 
-        void LogWarning(string message)
+        static IEnumerable<(string message, string location)> GetErrorMessages(
+            ValidationResults validationResults)
         {
-            LogSituation.SchemaViolation.Log(stateMonad, this, message);
+            if (!validationResults.IsValid)
+            {
+                if (validationResults.Message is not null)
+                    yield return (validationResults.Message,
+                                  validationResults.SchemaLocation.ToString());
+
+                foreach (var nestedResult in validationResults.NestedResults)
+                foreach (var errorMessage in GetErrorMessages(nestedResult))
+                    yield return errorMessage;
+            }
+        }
+
+        void LogWarning((string message, string location) pair)
+        {
+            LogSituation.SchemaViolation.Log(stateMonad, this, pair.message, pair.location);
         }
     }
 

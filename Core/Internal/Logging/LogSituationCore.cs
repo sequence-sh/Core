@@ -104,7 +104,7 @@ public sealed record LogSituation : LogSituationBase
     );
 
     /// <summary>
-    /// Schema violation: {message}
+    /// Schema violation: '{message}' at '{location}'.
     /// </summary>
     public static readonly LogSituation SchemaViolation = new(
         nameof(SchemaViolation),
