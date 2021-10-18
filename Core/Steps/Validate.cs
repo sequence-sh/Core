@@ -18,9 +18,10 @@ namespace Reductech.EDR.Core.Steps
 {
 
 /// <summary>
-/// Enforce that the schema is valid for all entities
+/// Validate that the schema is valid for all entities.
+/// Does not evaluate the entity stream.
 /// </summary>
-public sealed class EnforceSchema : CompoundStep<Array<Entity>>
+public sealed class Validate : CompoundStep<Array<Entity>>
 {
     /// <inheritdoc />
     protected override async Task<Result<Array<Entity>, IError>> Run(
@@ -175,14 +176,14 @@ public sealed class EnforceSchema : CompoundStep<Array<Entity>>
     /// <summary>
     /// Enforce that the schema is valid for all entities
     /// </summary>
-    private sealed class EnforceSchemaStepFactory : SimpleStepFactory<EnforceSchema, Array<Entity>>
+    private sealed class EnforceSchemaStepFactory : SimpleStepFactory<Validate, Array<Entity>>
     {
         private EnforceSchemaStepFactory() { }
 
         /// <summary>
         /// The instance
         /// </summary>
-        public static SimpleStepFactory<EnforceSchema, Array<Entity>> Instance { get; } =
+        public static SimpleStepFactory<Validate, Array<Entity>> Instance { get; } =
             new EnforceSchemaStepFactory();
 
         /// <inheritdoc />

@@ -17,7 +17,7 @@ using Xunit;
 namespace Reductech.EDR.Core.Tests.Steps
 {
 
-public partial class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Entity>>
+public partial class EnforceSchemaTests : StepTestBase<Validate, Array<Entity>>
 {
     #pragma warning disable CA1822 // Mark members as static
     partial void OnInitialized()
@@ -51,7 +51,7 @@ public partial class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Enti
                             new Log<Entity> { Value = GetEntityVariable }
                         ),
                         Array =
-                            new EnforceSchema
+                            new Validate
                             {
                                 EntityStream = Array(entities.ToArray()),
                                 Schema       = Constant(schemaEntity)
@@ -362,7 +362,7 @@ public partial class EnforceSchemaTests : StepTestBase<EnforceSchema, Array<Enti
             {
                 var schemaEntity = Entity.Create(schema.ToJsonDocument().RootElement);
 
-                var enforceSchema = new EnforceSchema
+                var enforceSchema = new Validate
                 {
                     EntityStream  = Array(entities.ToArray()),
                     Schema        = Constant(schemaEntity),
