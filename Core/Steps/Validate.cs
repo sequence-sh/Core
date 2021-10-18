@@ -17,6 +17,17 @@ using Reductech.EDR.Core.Util;
 namespace Reductech.EDR.Core.Steps
 {
 
+///// <summary>
+///// Attempts to transform entities in the stream so that they match the schema.
+/////
+///// Will transform string
+///// 
+///// </summary>
+//public sealed class Transform : CompoundStep<Array<Entity>>
+//{
+
+//}
+
 /// <summary>
 /// Validate that the schema is valid for all entities.
 /// Does not evaluate the entity stream.

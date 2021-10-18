@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using CSharpFunctionalExtensions;
 using FluentAssertions;
@@ -78,6 +79,34 @@ public partial class EnforceSchemaTests : StepTestBase<Validate, Array<Entity>>
                     ),
                 "('Foo': \"Hello\" 'Bar': 1)",
                 "('Foo': \"Hello 2\" 'Bar': 2)"
+            );
+
+            yield return CreateCase(
+                "Validate date as datetime",
+                new List<Entity> { Entity.Create(("MyDate", new DateTime(1990, 1, 6))), },
+                new JsonSchemaBuilder()
+                    .Title(SchemaName)
+                    .AdditionalItems(false)
+                    .Properties(
+                        ("MyDate",
+                         new JsonSchemaBuilder().Type(SchemaValueType.String)
+                             .Format(new Format("date-time")))
+                    ),
+                "('MyDate': 1990-01-06T00:00:00.0000000)"
+            );
+
+            yield return CreateCase(
+                "Validate string as date",
+                new List<Entity> { Entity.Create(("MyDate", "1990-01-06")), },
+                new JsonSchemaBuilder()
+                    .Title(SchemaName)
+                    .AdditionalItems(false)
+                    .Properties(
+                        ("MyDate",
+                         new JsonSchemaBuilder().Type(SchemaValueType.String)
+                             .Format(new Format("date")))
+                    ),
+                "('MyDate': \"1990-01-06\")"
             );
 
             //yield return CreateCase(
