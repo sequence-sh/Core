@@ -2,10 +2,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.IO;
+using System.Diagnostics.Contracts;
 using System.Linq;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
@@ -21,7 +19,6 @@ namespace Reductech.EDR.Core
 /// <summary>
 /// A piece of data.
 /// </summary>
-[JsonConverter(typeof(EntityJsonConverter))]
 public sealed class Entity : IEnumerable<EntityProperty>, IEquatable<Entity>
 {
     /// <summary>
@@ -64,46 +61,21 @@ public sealed class Entity : IEnumerable<EntityProperty>, IEquatable<Entity>
     );
 
     /// <summary>
-    /// Create an entity from a JsonElement
+    /// Create and entity from a JObject
     /// </summary>
-    public static Entity Create(JsonElement element)
+    public static Entity Create(JObject jObject)
     {
-        var ev = EntityValue.Create(element);
-
-        if (ev is EntityValue.NestedEntity nestedEntity)
-            return nestedEntity.Value;
-
-        return new Entity(
-            ImmutableDictionary<string, EntityProperty>.Empty
-                .Add(PrimitiveKey, new EntityProperty(PrimitiveKey, ev, 0))
+        return Create(
+            jObject.Properties().Select(x => (new EntityPropertyKey(x.Name), x.Value as object))!
         );
-    }
-
-    /// <summary>
-    /// Convert this Entity to a Json Element
-    /// </summary>
-    public JsonElement ToJsonElement()
-    {
-        var options = new JsonSerializerOptions()
-        {
-            Converters = { new JsonStringEnumConverter() }
-        };
-
-        var stream = new MemoryStream();
-        var writer = new Utf8JsonWriter(stream);
-
-        EntityJsonConverter.Instance.Write(writer, this, options);
-
-        var reader = new Utf8JsonReader(stream.ToArray());
-
-        using JsonDocument document = JsonDocument.ParseValue(ref reader);
-        return document.RootElement.Clone();
     }
 
     /// <summary>
     /// Creates a new Entity
     /// </summary>
-    public static Entity Create(IEnumerable<(EntityPropertyKey key, object? value)> properties)
+    public static Entity Create(
+        IEnumerable<(EntityPropertyKey key, object? value)> properties,
+        char? multiValueDelimiter = null)
     {
         var dict =
             properties.Select(
@@ -117,7 +89,10 @@ public sealed class Entity : IEnumerable<EntityProperty>, IEquatable<Entity>
                 .Select(
                     (group, i) =>
                     {
-                        var ev = EntityValue.CreateFromProperties(group.ToList());
+                        var ev = EntityValue.CreateFromProperties(
+                            group.ToList(),
+                            multiValueDelimiter
+                        );
 
                         return new EntityProperty(group.Key, ev, i);
                     }
@@ -136,7 +111,7 @@ public sealed class Entity : IEnumerable<EntityProperty>, IEquatable<Entity>
 
         if (Dictionary.TryGetValue(key, out var ep))
         {
-            EntityValue newValue2;
+            EntityValue newPropertyValue;
 
             if (ep.Value is EntityValue.NestedEntity existingEntity)
             {
@@ -147,15 +122,15 @@ public sealed class Entity : IEnumerable<EntityProperty>, IEquatable<Entity>
                 else
                     combinedEntity = existingEntity.Value.WithProperty(PrimitiveKey, newValue);
 
-                newValue2 = new EntityValue.NestedEntity(combinedEntity);
+                newPropertyValue = new EntityValue.NestedEntity(combinedEntity);
             }
             else
             {
                 //overwrite the property
-                newValue2 = newValue;
+                newPropertyValue = newValue;
             }
 
-            newProperty = new EntityProperty(ep.Name, newValue2, ep.Order);
+            newProperty = new EntityProperty(ep.Name, newPropertyValue, ep.Order);
         }
         else
         {
@@ -170,12 +145,13 @@ public sealed class Entity : IEnumerable<EntityProperty>, IEquatable<Entity>
     /// <summary>
     /// Returns a copy of this entity with the specified property removed
     /// </summary>
+    [Pure]
     public Entity RemoveProperty(string propertyName)
     {
         if (!Dictionary.ContainsKey(propertyName))
             return this; //No property to remove
 
-        var newDict = Dictionary.Remove(propertyName);
+        var newDict = this.Dictionary.Remove(propertyName);
 
         return new Entity(newDict);
     }
@@ -184,6 +160,7 @@ public sealed class Entity : IEnumerable<EntityProperty>, IEquatable<Entity>
     /// Combine two entities.
     /// Properties on the other entity take precedence.
     /// </summary>
+    [Pure]
     public Entity Combine(Entity other)
     {
         var current = this;

@@ -16,15 +16,7 @@ public record EntityPropertyKey
     /// </summary>
     public EntityPropertyKey(IEnumerable<string> values)
     {
-        KeyNames =
-            values
-                //.SelectMany(
-                //    x => x.Split(
-                //        ".",
-                //        StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries
-                //    )
-                //)
-                .ToList();
+        KeyNames = values.ToList();
     }
 
     /// <summary>
