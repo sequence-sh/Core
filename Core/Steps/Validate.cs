@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Json.Schema;
+using OneOf;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.Enums;
@@ -20,12 +21,59 @@ namespace Reductech.EDR.Core.Steps
 ///// <summary>
 ///// Attempts to transform entities in the stream so that they match the schema.
 /////
-///// Will transform string
+///// Will transform strings into ints, datetimes, booleans, array, or nulls where appropriate
 ///// 
 ///// </summary>
 //public sealed class Transform : CompoundStep<Array<Entity>>
 //{
+//    /// <inheritdoc />
+//    protected override Task<Result<Array<Entity>, IError>> Run(
+//        IStateMonad stateMonad,
+//        CancellationToken cancellationToken)
+//    {
+//        throw new NotImplementedException();
+//    }
 
+//    /// <summary>
+//    /// Entities to transform with the schema
+//    /// </summary>
+//    [StepProperty(1)]
+//    [Required]
+//    public IStep<Array<Entity>> EntityStream { get; set; } = null!;
+
+//    /// <summary>
+//    /// The schema to transform into
+//    /// </summary>
+//    [StepProperty(2)]
+//    [Required]
+//    public IStep<Entity> Schema { get; set; } = null!;
+
+//    /// <summary>
+//    /// ISO 8601 Date Formats to use for strings representing dates
+//    /// </summary>
+//    [StepProperty(3)]
+//    [DefaultValueExplanation("No Date Input")]
+//    public IStep<OneOf<StringStream, Array<StringStream>, Entity>>? DateInputFormats { get; set; } =
+//        null;
+
+//    /// <summary>
+//    /// Strings which represent truth
+//    /// </summary>
+//    [StepProperty(3)]
+//    [DefaultValueExplanation("True, Yes, or 1")]
+//    public IStep<OneOf<StringStream, Array<StringStream>, Entity>>? BooleanTrueFormats { get; set; }
+//        = new OneOfStep<StringStream, Array<StringStream>, Entity>(
+//            ArrayNew<StringStream>.CreateArray(
+//                new[] { "True", "Yes", "1" }.Select(
+//                        x => new StringConstant(new StringStream(x)) as IStep<StringStream>
+//                    )
+//                    .ToList()
+//            )
+//        );
+
+//    /// <inheritdoc />
+//    public override IStepFactory StepFactory { get; } =
+//        new SimpleStepFactory<Transform, Array<Entity>>();
 //}
 
 /// <summary>
@@ -162,16 +210,14 @@ public sealed class Validate : CompoundStep<Array<Entity>>
     }
 
     /// <summary>
-    /// Entities to enforce the schema on
+    /// Entities to validate with the schema
     /// </summary>
     [StepProperty(1)]
     [Required]
     public IStep<Array<Entity>> EntityStream { get; set; } = null!;
 
     /// <summary>
-    /// The schema to enforce.
-    /// This must be an entity with the properties of a schema.
-    /// All other properties will be ignored.
+    /// The Json Schema to validate.
     /// </summary>
     [StepProperty(2)]
     [Required]
@@ -185,33 +231,8 @@ public sealed class Validate : CompoundStep<Array<Entity>>
     public IStep<ErrorBehavior>? ErrorBehavior { get; set; } = null;
 
     /// <inheritdoc />
-    public override IStepFactory StepFactory { get; } = EnforceSchemaStepFactory.Instance;
-
-    /// <summary>
-    /// Enforce that the schema is valid for all entities
-    /// </summary>
-    private sealed class EnforceSchemaStepFactory : SimpleStepFactory<Validate, Array<Entity>>
-    {
-        private EnforceSchemaStepFactory() { }
-
-        /// <summary>
-        /// The instance
-        /// </summary>
-        public static SimpleStepFactory<Validate, Array<Entity>> Instance { get; } =
-            new EnforceSchemaStepFactory();
-
-        /// <inheritdoc />
-        public override IEnumerable<Type> ExtraEnumTypes
-        {
-            get
-            {
-                yield return typeof(Multiplicity);
-                yield return typeof(SCLType);
-                yield return typeof(ErrorBehavior);
-                yield return typeof(ExtraPropertyBehavior);
-            }
-        }
-    }
+    public override IStepFactory StepFactory { get; } =
+        new SimpleStepFactory<Validate, Array<Entity>>();
 }
 
 }
