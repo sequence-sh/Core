@@ -169,7 +169,7 @@ namespace Reductech.EDR.Core.Internal.Logging {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Schema violation: {message}.
+        ///   Looks up a localized string similar to Schema violation: &apos;{message}&apos; at &apos;{location}&apos;..
         /// </summary>
         internal static string SchemaViolation {
             get {

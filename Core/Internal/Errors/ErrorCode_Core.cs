@@ -22,8 +22,10 @@ public sealed record ErrorCode : ErrorCodeBase
 
     /*
      * To Generate:
-     * Replace ([^\t]+)\t([^\t]+)\t
+     * Replace (regex) ([^\t]+)\t([^\t]+)\t
      * With /// <summary>\r\n/// $2\r\n/// </summary>\r\npublic static readonly ErrorCode $1 = new\(nameof\($1\)\);\r\n
+     *
+     * Replace < and > in comments with &lt; and &gt;
      */
 
 #region Cases
@@ -32,6 +34,24 @@ public sealed record ErrorCode : ErrorCodeBase
     /// Assertion Failed '{0}'
     /// </summary>
     public static readonly ErrorCode AssertionFailed = new(nameof(AssertionFailed));
+
+    /// <summary>
+    /// The automatic variable was not set.
+    /// </summary>
+    public static readonly ErrorCode
+        AutomaticVariableNotSet = new(
+            nameof(
+                AutomaticVariableNotSet)
+        );
+
+    /// <summary>
+    /// Schema Property '{0}' cannot have {1} value '{2}' and '{3}'
+    /// </summary>
+    public static readonly ErrorCode
+        CannotCombineSchemaProperties = new(
+            nameof(
+                CannotCombineSchemaProperties)
+        );
 
     /// <summary>
     /// Cannot convert a nested entity to {0}.
@@ -122,11 +142,6 @@ public sealed record ErrorCode : ErrorCodeBase
             nameof(
                 CSVError)
         );
-
-    /// <summary>
-    /// Request Failed with status code {0}. {1} {2}
-    /// </summary>
-    public static readonly ErrorCode RequestFailed = new(nameof(RequestFailed));
 
     /// <summary>
     /// Directory does not exist or could not be found: '{0}'
@@ -255,6 +270,15 @@ public sealed record ErrorCode : ErrorCodeBase
         );
 
     /// <summary>
+    /// Request Failed with status code {0}. {1} {2}
+    /// </summary>
+    public static readonly ErrorCode
+        RequestFailed = new(
+            nameof(
+                RequestFailed)
+        );
+
+    /// <summary>
     /// Requirement '{0}' not met.
     /// </summary>
     public static readonly ErrorCode
@@ -264,75 +288,12 @@ public sealed record ErrorCode : ErrorCodeBase
         );
 
     /// <summary>
-    /// Schema Invalid: No Enum name defined
+    /// SchemaViolation: '{0}' at '{1}'.
     /// </summary>
     public static readonly ErrorCode
-        SchemaInvalidMissingEnum = new(
+        SchemaViolation = new(
             nameof(
-                SchemaInvalidMissingEnum)
-        );
-
-    /// <summary>
-    /// SchemaInvalid: No Enum values defined
-    /// </summary>
-    public static readonly ErrorCode
-        SchemaInvalidNoEnumValues = new(
-            nameof(
-                SchemaInvalidNoEnumValues)
-        );
-
-    /// <summary>
-    /// Missing Property: '{0}' in {1}
-    /// </summary>
-    public static readonly ErrorCode
-        SchemaViolationMissingProperty = new(
-            nameof(
-                SchemaViolationMissingProperty)
-        );
-
-    /// <summary>
-    /// Did not expect a list for '{0}' in {1}
-    /// </summary>
-    public static readonly ErrorCode
-        SchemaViolationUnexpectedList = new(
-            nameof(
-                SchemaViolationUnexpectedList)
-        );
-
-    /// <summary>
-    /// Expected '{0}' to not be null in {1}
-    /// </summary>
-    public static readonly ErrorCode
-        SchemaViolationUnexpectedNull = new(
-            nameof(
-                SchemaViolationUnexpectedNull)
-        );
-
-    /// <summary>
-    /// Unexpected Property: '{0}' in {1}
-    /// </summary>
-    public static readonly ErrorCode
-        SchemaViolationUnexpectedProperty = new(
-            nameof(
-                SchemaViolationUnexpectedProperty)
-        );
-
-    /// <summary>
-    /// '{0}' does not match regex '{1}' in {2}
-    /// </summary>
-    public static readonly ErrorCode
-        SchemaViolationUnmatchedRegex = new(
-            nameof(
-                SchemaViolationUnmatchedRegex)
-        );
-
-    /// <summary>
-    /// '{0}' is not a {1} in {2}
-    /// </summary>
-    public static readonly ErrorCode
-        SchemaViolationWrongType = new(
-            nameof(
-                SchemaViolationWrongType)
+                SchemaViolation)
         );
 
     /// <summary>
@@ -426,10 +387,22 @@ public sealed record ErrorCode : ErrorCodeBase
         );
 
     /// <summary>
-    /// {0} expected {1} for parameter {2} but {3} is {4}
+    /// Cannot Combine Schemas: '{0}'
     /// </summary>
     public static readonly ErrorCode
-        WrongType = new(nameof(WrongType));
+        CannotCombineSchemas = new(
+            nameof(
+                CannotCombineSchemas)
+        );
+
+    /// <summary>
+    /// {0} expected {1} for parameter {2} but {3} has type {4}
+    /// </summary>
+    public static readonly ErrorCode
+        WrongType = new(
+            nameof(
+                WrongType)
+        );
 
     /// <summary>
     /// Variable '{0}' does not have type '{1}'.
@@ -440,18 +413,7 @@ public sealed record ErrorCode : ErrorCodeBase
                 WrongVariableType)
         );
 
-    /// <summary>
-    /// Schema Property '{0}' cannot have {1} value '{2}' and '{3}'
-    /// </summary>
-    public static readonly ErrorCode
-        CannotCombineSchemaProperties = new(nameof(CannotCombineSchemaProperties));
-
-    /// <summary>
-    /// The automatic variable was not set.
-    /// </summary>
-    public static readonly ErrorCode AutomaticVariableNotSet = new(nameof(AutomaticVariableNotSet));
-
-#endregion Cases
+#endregion
 }
 
 }

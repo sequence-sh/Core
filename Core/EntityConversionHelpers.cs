@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -74,7 +73,7 @@ public static class EntityConversionHelpers
             if (value is not null)
             {
                 var ev = EntityValue.CreateFromObject(value);
-                var ep = new EntityProperty(propertyInfo.Name, ev, null, i);
+                var ep = new EntityProperty(propertyInfo.Name, ev, i);
                 props.Add(ep);
             }
 

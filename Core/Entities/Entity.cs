@@ -2,15 +2,15 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Diagnostics.Contracts;
+using System.IO;
 using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using System.Threading;
-using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
+using Generator.Equals;
 using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.Internal;
-using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Internal.Serialization;
 
 // ReSharper disable once CheckNamespace - we want this namespace to prevent clash with FunctionalExtensions
@@ -21,33 +21,38 @@ namespace Reductech.EDR.Core
 /// A piece of data.
 /// </summary>
 [JsonConverter(typeof(EntityJsonConverter))]
-public sealed class Entity : IEnumerable<EntityProperty>, IEquatable<Entity>
+[Equatable]
+public sealed partial record Entity
+    : IEnumerable<EntityProperty>
 {
     /// <summary>
-    /// Constructor
+    /// Creates a new entity
     /// </summary>
-    public Entity(ImmutableDictionary<string, EntityProperty> dictionary) =>
-        Dictionary = dictionary.WithComparers(StringComparer.OrdinalIgnoreCase);
+    public Entity(IEnumerable<EntityProperty> properties) : this(
+        properties.GroupBy(x => x.Name, StringComparer.OrdinalIgnoreCase)
+            .ToImmutableDictionary(
+                x => x.Key,
+                x => x.First(),
+                StringComparer.OrdinalIgnoreCase
+            )
+    ) { }
 
     /// <summary>
-    /// Constructor
+    /// Creates a new entity from a dictionary.
+    /// Be sure to set the string comparer on the dictionary.
     /// </summary>
-    public Entity(IEnumerable<EntityProperty> entityProperties)
-    {
-        Dictionary = entityProperties.ToImmutableDictionary(
-            x => x.Name,
-            StringComparer.OrdinalIgnoreCase
-        );
-    }
+    public Entity(ImmutableDictionary<string, EntityProperty> dictionary) =>
+        Dictionary = dictionary;
 
     /// <summary>
     /// Empty entity
     /// </summary>
-    public static Entity Empty { get; } = new(ImmutableDictionary<string, EntityProperty>.Empty);
+    public static Entity Empty { get; } = new(new List<EntityProperty>());
 
     /// <summary>
-    /// The dictionary of property values.
+    /// The dictionary
     /// </summary>
+    [OrderedEquality]
     public ImmutableDictionary<string, EntityProperty> Dictionary { get; }
 
     /// <summary>
@@ -58,6 +63,7 @@ public sealed class Entity : IEnumerable<EntityProperty>, IEquatable<Entity>
     /// <summary>
     /// Creates a new Entity
     /// </summary>
+    [Pure]
     public static Entity Create(params (string key, object? value)[] properties) => Create(
         properties.Select(x => (new EntityPropertyKey(x.key), x.value))
     );
@@ -65,6 +71,7 @@ public sealed class Entity : IEnumerable<EntityProperty>, IEquatable<Entity>
     /// <summary>
     /// Create an entity from a JsonElement
     /// </summary>
+    [Pure]
     public static Entity Create(JsonElement element)
     {
         var ev = EntityValue.Create(element);
@@ -72,20 +79,38 @@ public sealed class Entity : IEnumerable<EntityProperty>, IEquatable<Entity>
         if (ev is EntityValue.NestedEntity nestedEntity)
             return nestedEntity.Value;
 
-        return new Entity(
-            ImmutableDictionary<string, EntityProperty>.Empty
-                .Add(PrimitiveKey, new EntityProperty(PrimitiveKey, ev, null, 0))
-        );
+        return new Entity(new[] { new EntityProperty(PrimitiveKey, ev, 0) });
+    }
+
+    /// <summary>
+    /// Convert this Entity to a Json Element
+    /// </summary>
+    [Pure]
+    public JsonElement ToJsonElement()
+    {
+        var options = new JsonSerializerOptions()
+        {
+            Converters = { new JsonStringEnumConverter() }
+        };
+
+        var stream = new MemoryStream();
+        var writer = new Utf8JsonWriter(stream);
+
+        EntityJsonConverter.Instance.Write(writer, this, options);
+
+        var reader = new Utf8JsonReader(stream.ToArray());
+
+        using JsonDocument document = JsonDocument.ParseValue(ref reader);
+        return document.RootElement.Clone();
     }
 
     /// <summary>
     /// Creates a new Entity
     /// </summary>
-    public static Entity Create(
-        IEnumerable<(EntityPropertyKey key, object? value)> properties,
-        char? multiValueDelimiter = null)
+    [Pure]
+    public static Entity Create(IEnumerable<(EntityPropertyKey key, object? value)> properties)
     {
-        var dict =
+        var allProperties =
             properties.Select(
                     p =>
                     {
@@ -97,31 +122,28 @@ public sealed class Entity : IEnumerable<EntityProperty>, IEquatable<Entity>
                 .Select(
                     (group, i) =>
                     {
-                        var ev = EntityValue.CreateFromProperties(
-                            group.ToList(),
-                            multiValueDelimiter
-                        );
+                        var ev = EntityValue.CreateFromProperties(group.ToList());
 
-                        return new EntityProperty(group.Key, ev, null, i);
+                        return new EntityProperty(group.Key, ev, i);
                     }
-                )
-                .ToImmutableDictionary(x => x.Name);
+                );
 
-        return new Entity(dict);
+        return new Entity(allProperties);
     }
 
     /// <summary>
     /// Creates a copy of this with the property added or updated
     /// </summary>
+    [Pure]
     public Entity WithProperty(string key, EntityValue newValue)
     {
         EntityProperty newProperty;
 
         if (Dictionary.TryGetValue(key, out var ep))
         {
-            EntityValue newPropertyValue;
+            EntityValue newValue2;
 
-            if (ep.BestValue is EntityValue.NestedEntity existingEntity)
+            if (ep.Value is EntityValue.NestedEntity existingEntity)
             {
                 Entity combinedEntity;
 
@@ -130,19 +152,19 @@ public sealed class Entity : IEnumerable<EntityProperty>, IEquatable<Entity>
                 else
                     combinedEntity = existingEntity.Value.WithProperty(PrimitiveKey, newValue);
 
-                newPropertyValue = new EntityValue.NestedEntity(combinedEntity);
+                newValue2 = new EntityValue.NestedEntity(combinedEntity);
             }
             else
             {
                 //overwrite the property
-                newPropertyValue = newValue;
+                newValue2 = newValue;
             }
 
-            newProperty = new EntityProperty(ep.Name, newPropertyValue, null, ep.Order);
+            newProperty = new EntityProperty(ep.Name, newValue2, ep.Order);
         }
         else
         {
-            newProperty = new EntityProperty(key, newValue, null, Dictionary.Count);
+            newProperty = new EntityProperty(key, newValue, Dictionary.Count);
         }
 
         ImmutableDictionary<string, EntityProperty> newDict = Dictionary.SetItem(key, newProperty);
@@ -153,6 +175,7 @@ public sealed class Entity : IEnumerable<EntityProperty>, IEquatable<Entity>
     /// <summary>
     /// Returns a copy of this entity with the specified property removed
     /// </summary>
+    [Pure]
     public Entity RemoveProperty(string propertyName)
     {
         if (!Dictionary.ContainsKey(propertyName))
@@ -167,12 +190,13 @@ public sealed class Entity : IEnumerable<EntityProperty>, IEquatable<Entity>
     /// Combine two entities.
     /// Properties on the other entity take precedence.
     /// </summary>
+    [Pure]
     public Entity Combine(Entity other)
     {
         var current = this;
 
         foreach (var ep in other)
-            current = current.WithProperty(ep.Name, ep.BestValue);
+            current = current.WithProperty(ep.Name, ep.Value);
 
         return current;
     }
@@ -180,11 +204,13 @@ public sealed class Entity : IEnumerable<EntityProperty>, IEquatable<Entity>
     /// <summary>
     /// Try to get the value of a particular property
     /// </summary>
+    [Pure]
     public Maybe<EntityValue> TryGetValue(string key) => TryGetValue(new EntityPropertyKey(key));
 
     /// <summary>
     /// Try to get the value of a particular property
     /// </summary>
+    [Pure]
     public Maybe<EntityValue> TryGetValue(EntityPropertyKey key)
     {
         var (firstKey, remainder) = key.Split();
@@ -193,9 +219,9 @@ public sealed class Entity : IEnumerable<EntityProperty>, IEquatable<Entity>
             return Maybe<EntityValue>.None;
 
         if (remainder.HasNoValue)
-            return ep.BestValue;
+            return ep.Value;
 
-        if (ep.BestValue is EntityValue.NestedEntity nestedEntity)
+        if (ep.Value is EntityValue.NestedEntity nestedEntity)
             return nestedEntity.Value.TryGetValue(remainder.GetValueOrThrow());
         //We can't get the nested property as this is not an entity
 
@@ -204,81 +230,15 @@ public sealed class Entity : IEnumerable<EntityProperty>, IEquatable<Entity>
     }
 
     /// <inheritdoc />
+    [Pure]
     public IEnumerator<EntityProperty> GetEnumerator() =>
         Dictionary.Values.OrderBy(x => x.Order).GetEnumerator();
-
-    /// <inheritdoc />
-    public bool Equals(Entity? other)
-    {
-        if (other is null)
-            return false;
-
-        if (!Dictionary.Keys.SequenceEqual(other.Dictionary.Keys))
-            return false;
-
-        var r = Dictionary.Values.SequenceEqual(other.Dictionary.Values);
-
-        return r;
-    }
-
-    /// <inheritdoc />
-    public override bool Equals(object? obj)
-    {
-        if (obj is null)
-            return false;
-
-        if (ReferenceEquals(this, obj))
-            return true;
-
-        return obj is Entity e && Equals(e);
-    }
-
-    /// <inheritdoc />
-    public override int GetHashCode()
-    {
-        return Dictionary.Count switch
-        {
-            0 => 0,
-            1 => Dictionary.Single().Value.GetHashCode(),
-            _ => HashCode.Combine(Dictionary.Count, Dictionary.First().Value.GetHashCode())
-        };
-    }
 
     /// <inheritdoc />
     public override string ToString() => this.Serialize();
 
     /// <inheritdoc />
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-}
-
-/// <summary>
-/// Contains methods for helping with entities.
-/// </summary>
-public static class EntityHelper
-{
-    /// <summary>
-    /// Tries to convert an object into one suitable as an entity property.
-    /// </summary>
-    public static async Task<Result<object?, IError>> TryUnpackObjectAsync(
-        object? o,
-        CancellationToken cancellation)
-    {
-        if (o is IArray list)
-        {
-            var r = await list.GetObjectsAsync(cancellation);
-
-            if (r.IsFailure)
-                return r.ConvertFailure<object?>();
-
-            var q = await r.Value.Select(x => TryUnpackObjectAsync(x, cancellation))
-                .Combine(ErrorList.Combine)
-                .Map(x => x.ToList());
-
-            return q;
-        }
-
-        return Result.Success<object?, IError>(o);
-    }
 }
 
 }

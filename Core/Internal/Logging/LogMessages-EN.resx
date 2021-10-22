@@ -154,7 +154,7 @@
     <value>Could not remove variable {variable} as it was out of scope.</value>
   </data>
   <data name="SchemaViolation" xml:space="preserve">
-    <value>Schema violation: {message}</value>
+    <value>Schema violation: '{message}' at '{location}'.</value>
   </data>
   <data name="SequenceCompleted" xml:space="preserve">
     <value>EDR Sequence Completed</value>

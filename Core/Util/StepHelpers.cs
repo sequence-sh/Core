@@ -1,7 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
+using Json.Schema;
 using OneOf;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
@@ -191,6 +193,37 @@ public interface IStepValueMap<in TIn, TOut>
 /// </summary>
 public static class StepMaps
 {
+    /// <summary>
+    /// Maps StringStreams to strings
+    /// </summary>
+    public static IStepValueMap<Entity, JsonSchema> ConvertToSchema(IStep parentStep) =>
+        new SchemaMap(parentStep);
+
+    private record SchemaMap(IStep ParentStep) : IStepValueMap<Entity, JsonSchema>
+    {
+        /// <inheritdoc />
+        public async Task<Result<JsonSchema, IError>> Map(
+            Entity t,
+            CancellationToken cancellationToken)
+        {
+            await Task.CompletedTask;
+            JsonSchema schema;
+
+            try
+            {
+                schema = JsonSchema.FromText(t.ToJsonElement().GetRawText());
+            }
+            catch (Exception e)
+            {
+                return Result.Failure<JsonSchema, IError>(
+                    ErrorCode.Unknown.ToErrorBuilder(e.Message).WithLocation(ParentStep)
+                );
+            }
+
+            return schema;
+        }
+    }
+
     /// <summary>
     /// Maps StringStreams to strings
     /// </summary>

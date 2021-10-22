@@ -88,6 +88,15 @@ namespace Reductech.EDR.Core.Internal.Errors {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Cannot Combine Schemas: &apos;{0}&apos;.
+        /// </summary>
+        internal static string CannotCombineSchemas {
+            get {
+                return ResourceManager.GetString("CannotCombineSchemas", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Cannot convert a nested entity to {0}..
         /// </summary>
         internal static string CannotConvertNestedEntity {
@@ -322,74 +331,11 @@ namespace Reductech.EDR.Core.Internal.Errors {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Schema Invalid: No Enum name defined.
+        ///   Looks up a localized string similar to SchemaViolation: &apos;{0}&apos; at &apos;{1}&apos;..
         /// </summary>
-        internal static string SchemaInvalidMissingEnum {
+        internal static string SchemaViolation {
             get {
-                return ResourceManager.GetString("SchemaInvalidMissingEnum", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to SchemaInvalid: No Enum values defined.
-        /// </summary>
-        internal static string SchemaInvalidNoEnumValues {
-            get {
-                return ResourceManager.GetString("SchemaInvalidNoEnumValues", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Missing Property: &apos;{0}&apos; in {1}.
-        /// </summary>
-        internal static string SchemaViolationMissingProperty {
-            get {
-                return ResourceManager.GetString("SchemaViolationMissingProperty", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Did not expect a list for &apos;{0}&apos; in {1}.
-        /// </summary>
-        internal static string SchemaViolationUnexpectedList {
-            get {
-                return ResourceManager.GetString("SchemaViolationUnexpectedList", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Expected &apos;{0}&apos; to not be null in {1}.
-        /// </summary>
-        internal static string SchemaViolationUnexpectedNull {
-            get {
-                return ResourceManager.GetString("SchemaViolationUnexpectedNull", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Unexpected Property: &apos;{0}&apos; in {1}.
-        /// </summary>
-        internal static string SchemaViolationUnexpectedProperty {
-            get {
-                return ResourceManager.GetString("SchemaViolationUnexpectedProperty", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to &apos;{0}&apos; does not match regex &apos;{1}&apos; in {2}.
-        /// </summary>
-        internal static string SchemaViolationUnmatchedRegex {
-            get {
-                return ResourceManager.GetString("SchemaViolationUnmatchedRegex", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to &apos;{0}&apos; is not a {1} in {2}.
-        /// </summary>
-        internal static string SchemaViolationWrongType {
-            get {
-                return ResourceManager.GetString("SchemaViolationWrongType", resourceCulture);
+                return ResourceManager.GetString("SchemaViolation", resourceCulture);
             }
         }
         
