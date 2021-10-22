@@ -624,9 +624,10 @@ public abstract record EntityValue(object? ObjectValue)
             case JsonValueKind.Object:
             {
                 var dict = element.EnumerateObject()
+                    .GroupBy(x => x.Name, StringComparer.OrdinalIgnoreCase)
                     .Select(
                         (x, i) =>
-                            new EntityProperty(x.Name, Create(x.Value), i)
+                            new EntityProperty(x.First().Name, Create(x.First().Value), i)
                     )
                     .ToImmutableDictionary(x => x.Name, StringComparer.OrdinalIgnoreCase);
 

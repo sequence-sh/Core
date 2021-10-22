@@ -49,12 +49,14 @@ public sealed class CreateSchema : CompoundStep<Entity>
             .Type(SchemaValueType.Object)
             .AdditionalProperties(allowExtraProperties ? JsonSchema.True : JsonSchema.False);
 
-        var props = schema.Keywords?.OfType<PropertiesKeyword>().FirstOrDefault();
+        var props    = schema.Keywords?.OfType<PropertiesKeyword>().FirstOrDefault();
+        var required = schema.Keywords?.OfType<RequiredKeyword>().FirstOrDefault();
 
         if (props is not null)
-        {
             jsonSchemaBuilder.Properties(props.Properties);
-        }
+
+        if (required is not null)
+            jsonSchemaBuilder.Required(required.Properties);
 
         var schemaEntity = Entity.Create(jsonSchemaBuilder.Build().ToJsonDocument().RootElement);
         return schemaEntity;

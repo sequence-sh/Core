@@ -13,8 +13,14 @@ public partial class CreateSchemaTests : StepTestBase<CreateSchema, Entity>
     public static Entity Create(JsonSchema schema) =>
         Entity.Create(schema.ToJsonDocument().RootElement);
 
-    public JsonSchema AnyString => new JsonSchemaBuilder().Type(SchemaValueType.String).Build();
-    public JsonSchema AnyInt => new JsonSchemaBuilder().Type(SchemaValueType.Integer).Build();
+    public static JsonSchema AnyString =>
+        new JsonSchemaBuilder().Type(SchemaValueType.String).Build();
+
+    public static JsonSchema AnyInt =>
+        new JsonSchemaBuilder().Type(SchemaValueType.Integer).Build();
+
+    public static JsonSchema AnyNumber =>
+        new JsonSchemaBuilder().Type(SchemaValueType.Number).Build();
 
     /// <inheritdoc />
     protected override IEnumerable<StepCase> StepCases
@@ -37,115 +43,102 @@ public partial class CreateSchemaTests : StepTestBase<CreateSchema, Entity>
                             ("StringProp1", AnyString),
                             ("IntProp1", AnyInt)
                         )
+                        .Required("StringProp1", "IntProp1")
                 )
-
-                //new Schema()
-                //{
-                //    Name = "Test Schema",
-                //    Properties =
-                //        new Dictionary<string, SchemaProperty>()
-                //        {
-                //            {
-                //                "StringProp1",
-                //                new SchemaProperty()
-                //                {
-                //                    Type         = SCLType.String,
-                //                    Multiplicity = Multiplicity.ExactlyOne
-                //                }
-                //            },
-                //            {
-                //                "IntProp1",
-                //                new SchemaProperty()
-                //                {
-                //                    Type         = SCLType.Integer,
-                //                    Multiplicity = Multiplicity.ExactlyOne
-                //                }
-                //            },
-                //        }.ToImmutableSortedDictionary(),
-                //    ExtraProperties = ExtraPropertyBehavior.Fail
-                //}.ConvertToEntity()
             );
 
-            //yield return new StepCase(
-            //    "Create Schema from multiple entities",
-            //    new CreateSchema()
-            //    {
-            //        SchemaName = Constant("Test Schema"),
-            //        Entities = Array(
-            //            Entity.Create(("StringProp1", "abc"), ("IntProp1", 123)),
-            //            Entity.Create(("StringProp1", "def"), ("intProp1", 456)),
-            //            Entity.Create(("StringProp1", "def"), ("IntProp2", 123))
-            //        )
-            //    },
-            //    new Schema()
-            //    {
-            //        Name = "Test Schema",
-            //        Properties =
-            //            new Dictionary<string, SchemaProperty>()
-            //            {
-            //                {
-            //                    "StringProp1",
-            //                    new SchemaProperty()
-            //                    {
-            //                        Type         = SCLType.String,
-            //                        Multiplicity = Multiplicity.ExactlyOne
-            //                    }
-            //                },
-            //                {
-            //                    "IntProp1",
-            //                    new SchemaProperty()
-            //                    {
-            //                        Type = SCLType.Integer, Multiplicity = Multiplicity.UpToOne
-            //                    }
-            //                },
-            //                {
-            //                    "IntProp2",
-            //                    new SchemaProperty()
-            //                    {
-            //                        Type = SCLType.Integer, Multiplicity = Multiplicity.UpToOne
-            //                    }
-            //                },
-            //            }.ToImmutableSortedDictionary(),
-            //        ExtraProperties = ExtraPropertyBehavior.Fail
-            //    }.ConvertToEntity()
-            //);
+            yield return new StepCase(
+                "Create Schema from multiple entities",
+                new CreateSchema()
+                {
+                    SchemaName = Constant("Test Schema"),
+                    Entities = Array(
+                        Entity.Create(("StringProp1", "abc"), ("IntProp1", 123)),
+                        Entity.Create(("StringProp1", "def"), ("intProp1", 456)),
+                        Entity.Create(("StringProp1", "def"), ("IntProp2", 123))
+                    )
+                },
+                Create(
+                    new JsonSchemaBuilder()
+                        .Title("Test Schema")
+                        .Type(SchemaValueType.Object)
+                        .AdditionalProperties(JsonSchema.False)
+                        .Properties(
+                            ("StringProp1", AnyString),
+                            ("IntProp1", AnyInt),
+                            ("IntProp2", AnyInt)
+                        )
+                        .Required("StringProp1")
+                )
+            );
 
-            //yield return new StepCase(
-            //    "Create Schema from multiple entities with competing properties",
-            //    new CreateSchema()
-            //    {
-            //        SchemaName = Constant("Test Schema"),
-            //        Entities = Array(
-            //            Entity.Create(("StringProp1", "abc"), ("NumProp1", 123)),
-            //            Entity.Create(("StringProp1", "def"), ("numProp1", 45.6))
-            //        )
-            //    },
-            //    new Schema()
-            //    {
-            //        Name = "Test Schema",
-            //        Properties =
-            //            new Dictionary<string, SchemaProperty>()
-            //            {
-            //                {
-            //                    "NumProp1",
-            //                    new SchemaProperty()
-            //                    {
-            //                        Type         = SCLType.Double,
-            //                        Multiplicity = Multiplicity.ExactlyOne
-            //                    }
-            //                },
-            //                {
-            //                    "StringProp1",
-            //                    new SchemaProperty()
-            //                    {
-            //                        Type         = SCLType.String,
-            //                        Multiplicity = Multiplicity.ExactlyOne
-            //                    }
-            //                },
-            //            }.ToImmutableSortedDictionary(),
-            //        ExtraProperties = ExtraPropertyBehavior.Fail
-            //    }.ConvertToEntity()
-            //);
+            yield return new StepCase(
+                "Create Schema from multiple entities with competing properties",
+                new CreateSchema()
+                {
+                    SchemaName = Constant("Test Schema"),
+                    Entities = Array(
+                        Entity.Create(("StringProp1", "abc"), ("NumProp1", 123)),
+                        Entity.Create(("StringProp1", "def"), ("numProp1", 45.6))
+                    )
+                },
+                Create(
+                    new JsonSchemaBuilder()
+                        .Title("Test Schema")
+                        .Type(SchemaValueType.Object)
+                        .AdditionalProperties(JsonSchema.False)
+                        .Properties(
+                            ("StringProp1", AnyString),
+                            ("NumProp1", AnyNumber)
+                        )
+                        .Required("StringProp1", "NumProp1")
+                )
+            );
+
+            yield return new StepCase(
+                "Create Schema where properties don't appear on all entities",
+                new CreateSchema()
+                {
+                    SchemaName = Constant("Test Schema"),
+                    Entities = Array(
+                        Entity.Create(("StringProp1", "abc")),
+                        Entity.Create(("NumProp1", 123))
+                    )
+                },
+                Create(
+                    new JsonSchemaBuilder()
+                        .Title("Test Schema")
+                        .Type(SchemaValueType.Object)
+                        .AdditionalProperties(JsonSchema.False)
+                        .Properties(
+                            ("StringProp1", AnyString),
+                            ("NumProp1", AnyInt)
+                        )
+                )
+            );
+
+            yield return new StepCase(
+                "Combine String and Int properties",
+                new CreateSchema()
+                {
+                    SchemaName = Constant("Test Schema"),
+                    Entities = Array(
+                        Entity.Create(("MyProp1", "abc"), ("MyProp2", 456)),
+                        Entity.Create(("MyProp1", 123),   ("MyProp2", "def"))
+                    )
+                },
+                Create(
+                    new JsonSchemaBuilder()
+                        .Title("Test Schema")
+                        .Type(SchemaValueType.Object)
+                        .AdditionalProperties(JsonSchema.False)
+                        .Properties(
+                            ("MyProp1", AnyString),
+                            ("MyProp2", AnyString)
+                        )
+                        .Required("MyProp1", "MyProp2")
+                )
+            );
         }
     }
 }

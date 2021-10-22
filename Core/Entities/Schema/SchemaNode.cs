@@ -36,10 +36,10 @@ public abstract record SchemaNode<TData1, TData2>(
     public override SchemaNode Combine(SchemaNode other)
     {
         if (other.IsMorePermissive(this))
-            return this;
+            return other;
 
         if (IsMorePermissive(other))
-            return other;
+            return this;
 
         if (other is SchemaNode<TData1, TData2> otherNode)
         {
@@ -100,10 +100,10 @@ public abstract record SchemaNode<TData1>(
     public override SchemaNode Combine(SchemaNode other)
     {
         if (other.IsMorePermissive(this))
-            return this;
+            return other;
 
         if (IsMorePermissive(other))
-            return other;
+            return this;
 
         if (other is SchemaNode<TData1> otherNode)
         {
@@ -292,10 +292,10 @@ public abstract record SchemaNode(EnumeratedValuesNodeData EnumeratedValuesNodeD
     public virtual SchemaNode Combine(SchemaNode otherNode)
     {
         if (otherNode.IsMorePermissive(this))
-            return this;
+            return otherNode;
 
         if (IsMorePermissive(otherNode))
-            return otherNode;
+            return this;
 
         if (CanCombineWith(otherNode))
         {
