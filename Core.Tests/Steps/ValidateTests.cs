@@ -18,7 +18,7 @@ using Xunit;
 namespace Reductech.EDR.Core.Tests.Steps
 {
 
-public partial class EnforceSchemaTests : StepTestBase<Validate, Array<Entity>>
+public partial class ValidateTests : StepTestBase<Validate, Array<Entity>>
 {
     #pragma warning disable CA1822 // Mark members as static
     partial void OnInitialized()
@@ -28,7 +28,7 @@ public partial class EnforceSchemaTests : StepTestBase<Validate, Array<Entity>>
         CultureInfo.DefaultThreadCurrentUICulture = new CultureInfo("en-GB");
     }
 
-    const string SchemaName = "ValueIf Schema";
+    const string SchemaName = "My Schema";
 
     /// <inheritdoc />
     protected override IEnumerable<StepCase> StepCases

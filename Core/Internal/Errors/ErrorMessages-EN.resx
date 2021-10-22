@@ -126,6 +126,9 @@
   <data name="CannotCombineSchemaProperties" xml:space="preserve">
     <value>Schema Property '{0}' cannot have {1} value '{2}' and '{3}'</value>
   </data>
+  <data name="CannotCombineSchemas" xml:space="preserve">
+    <value>Cannot Combine Schemas: '{0}'</value>
+  </data>
   <data name="CannotConvertNestedEntity" xml:space="preserve">
     <value>Cannot convert a nested entity to {0}.</value>
   </data>

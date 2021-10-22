@@ -2,12 +2,16 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using CSharpFunctionalExtensions;
+using Json.More;
 using OneOf;
+using Reductech.EDR.Core.Entities.Schema;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Internal.Serialization;
@@ -33,23 +37,6 @@ public abstract record EntityValue(object? ObjectValue)
         /// </summary>
         public static Null Instance { get; } = new();
 
-        ///// <inheritdoc />
-        //protected override Result<(EntityValue value, bool changed), IErrorBuilder> TryConvertBase(
-        //    Schema schema,
-        //    string propertyName,
-        //    SchemaProperty schemaProperty,
-        //    Entity entity)
-        //{
-        //    if (schemaProperty.Multiplicity is Multiplicity.Any or Multiplicity.UpToOne)
-        //        return (this, false);
-
-        //    return schemaProperty.Type switch
-        //    {
-        //        SCLType.String => (new String(Serialized), true),
-        //        _ => ErrorCode.SchemaViolationUnexpectedNull.ToErrorBuilder(propertyName, entity)
-        //    };
-        //}
-
         /// <inheritdoc />
         public override string GetPrimitiveString() => "null";
 
@@ -68,6 +55,12 @@ public abstract record EntityValue(object? ObjectValue)
         {
             return Maybe<object>.None;
         }
+
+        /// <inheritdoc />
+        public override SchemaNode ToSchemaNode() => NullNode.Instance;
+
+        /// <inheritdoc />
+        public override string ToString() => GetPrimitiveString();
     }
 
     /// <summary>
@@ -103,6 +96,15 @@ public abstract record EntityValue(object? ObjectValue)
 
             return Maybe<object>.None;
         }
+
+        /// <inheritdoc />
+        public override SchemaNode ToSchemaNode()
+        {
+            return StringNode.Default;
+        }
+
+        /// <inheritdoc />
+        public override string ToString() => GetPrimitiveString();
     }
 
     /// <summary>
@@ -132,6 +134,15 @@ public abstract record EntityValue(object? ObjectValue)
 
             return Maybe<object>.None;
         }
+
+        /// <inheritdoc />
+        public override SchemaNode ToSchemaNode()
+        {
+            return IntegerNode.Default;
+        }
+
+        /// <inheritdoc />
+        public override string ToString() => GetPrimitiveString();
     }
 
     /// <summary>
@@ -158,6 +169,15 @@ public abstract record EntityValue(object? ObjectValue)
 
             return Maybe<object>.None;
         }
+
+        /// <inheritdoc />
+        public override SchemaNode ToSchemaNode()
+        {
+            return NumberNode.Default;
+        }
+
+        /// <inheritdoc />
+        public override string ToString() => GetPrimitiveString();
     }
 
     /// <summary>
@@ -165,6 +185,12 @@ public abstract record EntityValue(object? ObjectValue)
     /// </summary>
     public record Boolean(bool Value) : EntityValue(Value)
     {
+        /// <inheritdoc />
+        public override SchemaNode ToSchemaNode()
+        {
+            return BooleanNode.Default;
+        }
+
         /// <inheritdoc />
         public override string GetPrimitiveString() => Value.ToString();
 
@@ -184,6 +210,9 @@ public abstract record EntityValue(object? ObjectValue)
 
             return Maybe<object>.None;
         }
+
+        /// <inheritdoc />
+        public override string ToString() => GetPrimitiveString();
     } //TODO constant values
 
     /// <summary>
@@ -207,20 +236,37 @@ public abstract record EntityValue(object? ObjectValue)
         {
             return Maybe<object>.None;
         }
+
+        /// <inheritdoc />
+        public override SchemaNode ToSchemaNode()
+        {
+            return StringNode.Default;
+        }
+
+        /// <inheritdoc />
+        public override string ToString() => GetPrimitiveString();
     }
 
     /// <summary>
     /// A date time value
     /// </summary>
-    public record Date(DateTime Value, string? DateOutputFormat) : EntityValue(Value)
+    public record DateTime(System.DateTime Value) : EntityValue(Value)
     {
         /// <inheritdoc />
-        public override string GetPrimitiveString() =>
-            Value.ToString(DateOutputFormat ?? Constants.DateTimeFormat);
+        public override SchemaNode ToSchemaNode()
+        {
+            return new StringNode(
+                EnumeratedValuesNodeData.Empty,
+                DateTimeStringFormat.Instance,
+                StringRestrictions.NoRestrictions
+            );
+        }
 
         /// <inheritdoc />
-        public override string Serialize() =>
-            Value.ToString(DateOutputFormat ?? Constants.DateTimeFormat);
+        public override string GetPrimitiveString() => Value.ToString(Constants.DateTimeFormat);
+
+        /// <inheritdoc />
+        public override string Serialize() => Value.ToString(Constants.DateTimeFormat);
 
         /// <inheritdoc />
         public override string GetFormattedString(
@@ -230,15 +276,14 @@ public abstract record EntityValue(object? ObjectValue)
         /// <inheritdoc />
         protected override Maybe<object> AsType(Type type)
         {
-            if (type == typeof(DateTime))
+            if (type == typeof(System.DateTime))
                 return Value;
 
             return Maybe<object>.None;
         }
 
         /// <inheritdoc />
-        public override string ToString() =>
-            Value.ToString(DateOutputFormat ?? Constants.DateTimeFormat);
+        public override string ToString() => GetPrimitiveString();
     }
 
     /// <summary>
@@ -268,6 +313,24 @@ public abstract record EntityValue(object? ObjectValue)
 
         /// <inheritdoc />
         public override string ToString() => Value.ToString();
+
+        /// <inheritdoc />
+        public override SchemaNode ToSchemaNode()
+        {
+            var dictionary = new Dictionary<string, (SchemaNode Node, bool Required)>();
+
+            foreach (var (key, property) in Value.Dictionary.OrderBy(x => x.Value.Order))
+            {
+                var node = property.Value.ToSchemaNode();
+                dictionary[key] = (node, true);
+            }
+
+            return new EntityNode(
+                EnumeratedValuesNodeData.Empty,
+                new EntityAdditionalItems(FalseNode.Instance),
+                new EntityPropertiesData(dictionary)
+            );
+        }
     }
 
     /// <summary>
@@ -312,6 +375,23 @@ public abstract record EntityValue(object? ObjectValue)
         public override string ToString()
         {
             return Value.Count + " elements";
+        }
+
+        /// <inheritdoc />
+        public override SchemaNode ToSchemaNode()
+        {
+            SchemaNode additionalItems = new TrueNode();
+
+            foreach (var entityValue in Value)
+            {
+                var n = entityValue.ToSchemaNode();
+                additionalItems = additionalItems.Combine(n);
+            }
+
+            return new ArrayNode(
+                EnumeratedValuesNodeData.Empty,
+                new ItemsData(ImmutableList<SchemaNode>.Empty, additionalItems)
+            );
         }
 
         /// <inheritdoc />
@@ -447,8 +527,8 @@ public abstract record EntityValue(object? ObjectValue)
             case double d:         return new Double(d);
             case long ln and < int.MaxValue and > int.MinValue:
                 return new Integer(Convert.ToInt32(ln));
-            case Enumeration e1: return new EnumerationValue(e1);
-            case DateTime dt:    return new Date(dt, null);
+            case Enumeration e1:     return new EnumerationValue(e1);
+            case System.DateTime dt: return new DateTime(dt);
             case Enum e:
                 return new EnumerationValue(new Enumeration(e.GetType().Name, e.ToString()));
             case JsonElement je:        return Create(je);
@@ -459,7 +539,8 @@ public abstract record EntityValue(object? ObjectValue)
             case IDictionary dict:
             {
                 var builder = ImmutableDictionary<string, EntityProperty>.Empty.ToBuilder();
-                var i       = 0;
+                builder.KeyComparer = StringComparer.OrdinalIgnoreCase;
+                var i = 0;
 
                 foreach (DictionaryEntry dictionaryEntry in dict)
                 {
@@ -547,7 +628,7 @@ public abstract record EntityValue(object? ObjectValue)
                         (x, i) =>
                             new EntityProperty(x.Name, Create(x.Value), i)
                     )
-                    .ToImmutableDictionary(x => x.Name);
+                    .ToImmutableDictionary(x => x.Name, StringComparer.OrdinalIgnoreCase);
 
                 var entity = new Entity(dict);
                 return new NestedEntity(entity);
@@ -570,6 +651,28 @@ public abstract record EntityValue(object? ObjectValue)
             case JsonValueKind.Null: return Null.Instance;
             default: throw new ArgumentOutOfRangeException(element.ValueKind.ToString());
         }
+    }
+
+    /// <summary>
+    /// Gets a schema node which could match this entity value
+    /// </summary>
+    [Pure]
+    public abstract SchemaNode ToSchemaNode();
+
+    /// <summary>
+    /// Convert this Entity to a Json Element
+    /// </summary>
+    [Pure]
+    public JsonElement ToJsonElement()
+    {
+        var options = new JsonSerializerOptions()
+        {
+            Converters = { new JsonStringEnumConverter() }
+        };
+
+        var element = ObjectValue.ToJsonDocument(options).RootElement.Clone();
+
+        return element;
     }
 
     /// <summary>
@@ -658,10 +761,10 @@ public abstract record EntityValue(object? ObjectValue)
             )
                 return r!;
         }
-        else if (type == typeof(DateTime))
+        else if (type == typeof(System.DateTime))
         {
             if (!double.TryParse(primitive, out _) && //prevent double conversion
-                DateTime.TryParse(primitive, out var d))
+                System.DateTime.TryParse(primitive, out var d))
                 return d;
         }
         else if (type == typeof(string))
@@ -726,7 +829,7 @@ public abstract record EntityValue(object? ObjectValue)
         if (o is StringStream ss)
             return ss;
 
-        if (o is DateTime dt)
+        if (o is System.DateTime dt)
             return dt;
 
         if (o is IArray)

@@ -1,13 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
-using Json.Schema;
 using OneOf;
 using Reductech.EDR.Core.Attributes;
+using Reductech.EDR.Core.Entities;
+using Reductech.EDR.Core.Entities.Schema;
 using Reductech.EDR.Core.Enums;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
@@ -25,28 +27,6 @@ namespace Reductech.EDR.Core.Steps
 /// </summary>
 public sealed class Transform : CompoundStep<Array<Entity>>
 {
-    //public static Result<Entity, IErrorBuilder> TryTransform(Entity entity, JsonSchema schema)
-    //{
-    //    //TODO improve performance
-
-    //    HashSet<string> requiredProperties = new();
-
-    //    if (schema.Keywords is not null)
-    //        foreach (var required in schema.Keywords.OfType<RequiredKeyword>())
-    //            requiredProperties.UnionWith(required.Properties);
-
-    //    if (schema.Keywords is not null)
-    //    {
-    //        foreach (var properties in schema.Keywords.OfType<PropertiesKeyword>())
-    //        {
-    //            foreach (var (propertyName, nestedSchema) in properties.Properties)
-    //            {
-    //                //nestedSchema.
-    //            }
-    //        }
-    //    }
-    //}
-
     /// <inheritdoc />
     protected override async Task<Result<Array<Entity>, IError>> Run(
         IStateMonad stateMonad,
@@ -66,6 +46,7 @@ public sealed class Transform : CompoundStep<Array<Entity>>
             BooleanTrueFormats.WrapNullable(inputFormatMap),
             BooleanFalseFormats.WrapNullable(inputFormatMap),
             NullFormats.WrapNullable(inputFormatMap),
+            ArrayDelimiters.WrapNullable(inputFormatMap),
             CaseSensitive,
             RemoveExtraProperties.WrapNullable(),
             cancellationToken
@@ -81,8 +62,21 @@ public sealed class Transform : CompoundStep<Array<Entity>>
             boolTrueFormats,
             boolFalseFormats,
             nullFormats,
+            delimiters,
             caseSensitive,
             removeExtraMaybe) = stepsResult.Value;
+
+        SchemaNode topNode = SchemaNode.Create(schema);
+
+        TransformSettings transformSettings = new(
+            Formatter.Create(dateInputFormats),
+            Formatter.Create(boolTrueFormats),
+            Formatter.Create(boolFalseFormats),
+            Formatter.Create(nullFormats),
+            Formatter.Create(delimiters),
+            caseSensitive,
+            removeExtraMaybe
+        );
 
         var newEntityStream = entityStream.SelectMany(TryTransform);
 
@@ -91,51 +85,52 @@ public sealed class Transform : CompoundStep<Array<Entity>>
         async IAsyncEnumerable<Entity> TryTransform(Entity entity)
         {
             await ValueTask.CompletedTask;
-            var jsonElement = entity.ToJsonElement();
 
-            var result = schema.Validate(
-                jsonElement,
-                validationOptions
+            var result = topNode.TryTransform(
+                "",
+                new EntityValue.NestedEntity(entity),
+                transformSettings
             );
 
-            if (result.IsValid)
-                yield return entity;
+            if (result.IsSuccess)
+            {
+                if (result.Value.HasValue)
+                {
+                    if (result.Value.GetValueOrThrow() is EntityValue.NestedEntity ne)
+                        yield return ne.Value;
+                    else
+                        yield return new Entity(
+                            new[]
+                            {
+                                new EntityProperty(
+                                    Entity.PrimitiveKey,
+                                    result.Value.GetValueOrThrow(),
+                                    1
+                                )
+                            }.ToImmutableDictionary(x => x.Name, StringComparer.OrdinalIgnoreCase)
+                        );
+                }
+                else
+                    yield return entity; //no change
+            }
+
             else
             {
                 switch (errorBehavior)
                 {
                     case Enums.ErrorBehavior.Fail:
                     {
-                        var errors =
-                            ErrorBuilderList.Combine(
-                                    GetErrorMessages(result)
-                                        .Select(
-                                            x => ErrorCode.SchemaViolation.ToErrorBuilder(
-                                                x.message,
-                                                x.location
-                                            )
-                                        )
-                                )
-                                .WithLocation(this);
-
-                        throw new ErrorException(errors);
+                        throw new ErrorException(result.Error.WithLocation(this));
                     }
                     case Enums.ErrorBehavior.Error:
                     {
-                        foreach (var errorMessage in GetErrorMessages(result))
-                        {
-                            LogWarning(errorMessage);
-                        }
+                        LogWarning(result.Error);
 
                         break;
                     }
                     case Enums.ErrorBehavior.Warning:
                     {
-                        foreach (var errorMessage in GetErrorMessages(result))
-                        {
-                            LogWarning(errorMessage);
-                        }
-
+                        LogWarning(result.Error);
                         yield return entity;
 
                         break;
@@ -152,24 +147,21 @@ public sealed class Transform : CompoundStep<Array<Entity>>
             }
         }
 
-        static IEnumerable<(string message, string location)> GetErrorMessages(
-            ValidationResults validationResults)
+        void LogWarning(IErrorBuilder errorBuilder)
         {
-            if (!validationResults.IsValid)
+            if (errorBuilder is ErrorBuilderList ebl)
             {
-                if (validationResults.Message is not null)
-                    yield return (validationResults.Message,
-                                  validationResults.SchemaLocation.ToString());
-
-                foreach (var nestedResult in validationResults.NestedResults)
-                foreach (var errorMessage in GetErrorMessages(nestedResult))
-                    yield return errorMessage;
+                foreach (var errorBuilder1 in ebl.ErrorBuilders)
+                {
+                    LogWarning(errorBuilder1);
+                }
             }
-        }
-
-        void LogWarning((string message, string location) pair)
-        {
-            LogSituation.SchemaViolation.Log(stateMonad, this, pair.message, pair.location);
+            else if (errorBuilder is ErrorBuilder(var errorCodeBase, var errorData)
+                  && errorCodeBase == ErrorCode.SchemaViolation
+                  && errorData is ErrorData.ObjectData objData)
+            {
+                LogSituation.SchemaViolation.Log(stateMonad, this, objData.Arguments);
+            }
         }
     }
 

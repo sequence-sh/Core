@@ -57,8 +57,8 @@ public static class FunctionalExtensions
     }
 
     /// <summary>
-    /// Create a tuple with 2 results.
-    /// Func2 will not be evaluated unless result1 is success.
+    /// Create a tuple with 5 results.
+    /// Func2 will not be evaluated unless result1 is success and so on.
     /// </summary>
     public static Result<(T1, T2, T3, T4, T5), TE> Compose<T1, T2, T3, T4, T5, TE>(
         this Result<T1, TE> result1,
@@ -95,6 +95,31 @@ public static class FunctionalExtensions
 
     /// <summary>
     /// Create a tuple with 5 results.
+    /// Func2 will not be evaluated unless result1 is success and so on.
+    /// </summary>
+    public static Result<(T1, T2, T3), TE> Compose<T1, T2, T3, TE>(
+        this Result<T1, TE> result1,
+        Func<Result<T2, TE>> func2,
+        Func<Result<T3, TE>> func3)
+    {
+        if (result1.IsFailure)
+            return result1.ConvertFailure<(T1, T2, T3)>();
+
+        var result2 = func2();
+
+        if (result2.IsFailure)
+            return result2.ConvertFailure<(T1, T2, T3)>();
+
+        var result3 = func3();
+
+        if (result3.IsFailure)
+            return result3.ConvertFailure<(T1, T2, T3)>();
+
+        return (result1.Value, result2.Value, result3.Value);
+    }
+
+    /// <summary>
+    /// Create a tuple with 2 results.
     /// Func2 will not be evaluated unless result1 is success.
     /// </summary>
     public static Result<(T1, T2), TE> Compose<T1, T2, TE>(
@@ -118,7 +143,7 @@ public static class FunctionalExtensions
     public static IEnumerable<T> ToEnumerable<T>(this Maybe<T> maybe)
     {
         if (maybe.HasValue)
-            yield return maybe.Value;
+            yield return maybe.GetValueOrThrow();
     }
 
     /// <summary>

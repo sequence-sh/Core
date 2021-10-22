@@ -387,6 +387,15 @@ public sealed record ErrorCode : ErrorCodeBase
         );
 
     /// <summary>
+    /// Cannot Combine Schemas: '{0}'
+    /// </summary>
+    public static readonly ErrorCode
+        CannotCombineSchemas = new(
+            nameof(
+                CannotCombineSchemas)
+        );
+
+    /// <summary>
     /// {0} expected {1} for parameter {2} but {3} has type {4}
     /// </summary>
     public static readonly ErrorCode

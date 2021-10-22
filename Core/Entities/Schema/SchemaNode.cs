@@ -1,136 +1,347 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.Diagnostics.Contracts;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Text.Json;
 using CSharpFunctionalExtensions;
-using JetBrains.Annotations;
 using Json.Schema;
-using OneOf;
-using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
 
 namespace Reductech.EDR.Core.Entities.Schema
 {
 
-public abstract record SchemaNode
-{
-    public SchemaNode Create(JsonSchema Schema) { }
-
-    public abstract Result<Maybe<EntityValue>, IErrorBuilder> TryTransform(
-        string propertyName,
-        EntityValue entityValue);
-}
-
-public record EntityNode(
-    bool AllowExtra,
-    IReadOnlyDictionary<string, (SchemaNode Node, bool Required)> Nodes) : SchemaNode
+/// <summary>
+/// A schema node with one additional item of data
+/// </summary>
+public abstract record SchemaNode<TData1, TData2>(
+    EnumeratedValuesNodeData EnumeratedValuesNodeData,
+    TData1 Data1,
+    TData2 Data2) : SchemaNode(EnumeratedValuesNodeData)
+    where TData1 : NodeData<TData1>
+    where TData2 : NodeData<TData2>
 {
     /// <inheritdoc />
-    public override Result<Maybe<EntityValue>, IErrorBuilder> TryTransform(
-        string propertyName,
-        EntityValue entityValue)
+    public override IEnumerable<INodeData> NodeData
     {
-        if (entityValue is not EntityValue.NestedEntity nestedEntity)
-            return ErrorCode.SchemaViolation.ToErrorBuilder("Not an entity", propertyName);
-
-        var errors             = new List<IErrorBuilder>();
-        var requiredProperties = Nodes.Where(x => x.Value.Required).Select(x => x.Key).ToHashSet();
-
-        var newEntity = nestedEntity.Value;
-
-        foreach (var entityProperty in nestedEntity.Value)
+        get
         {
-            if (Nodes.TryGetValue(entityProperty.Name, out var node))
-            {
-                var r = node.Node.TryTransform(
-                    propertyName + "." + entityProperty.Name,
-                    entityProperty.Value
-                );
+            yield return EnumeratedValuesNodeData;
+            yield return Data1;
+            yield return Data2;
+        }
+    }
 
-                if (r.IsFailure)
-                    errors.Add(r.Error);
-            }
-            else if (!AllowExtra)
+    /// <inheritdoc />
+    public override SchemaNode Combine(SchemaNode other)
+    {
+        if (other.IsMorePermissive(this))
+            return this;
+
+        if (IsMorePermissive(other))
+            return other;
+
+        if (other is SchemaNode<TData1, TData2> otherNode)
+        {
+            if (this.CanCombineWith(otherNode))
             {
-                newEntity.RemoveProperty(entityProperty.Name);
+                var evndCombined =
+                    EnumeratedValuesNodeData.Combine(otherNode.EnumeratedValuesNodeData);
+
+                var data1Combined = Data1.Combine(otherNode.Data1);
+                var data2Combined = Data2.Combine(otherNode.Data2);
+
+                return this with
+                {
+                    EnumeratedValuesNodeData = evndCombined,
+                    Data1 = data1Combined,
+                    Data2 = data2Combined
+                };
+            }
+            else if (otherNode.CanCombineWith(this))
+            {
+                var evndCombined =
+                    otherNode.EnumeratedValuesNodeData.Combine(EnumeratedValuesNodeData);
+
+                var data1Combined = otherNode.Data1.Combine(Data1);
+                var data2Combined = otherNode.Data2.Combine(Data2);
+
+                return otherNode with
+                {
+                    EnumeratedValuesNodeData = evndCombined,
+                    Data1 = data1Combined,
+                    Data2 = data2Combined
+                };
             }
         }
+
+        return TrueNode.Instance;
     }
 }
 
-public record SchemaSettings(
-    Formatter DateFormatter,
-    Formatter TruthFormatter,
-    Formatter FalseFormatter,
-    Formatter NullFormatter,
-    bool CaseSensitive,
-    Maybe<bool> RemoveExtra) { }
-
-public class Formatter : OneOfBase<IReadOnlyList<string>,
-    IReadOnlyDictionary<string, IReadOnlyList<string>>>
+/// <summary>
+/// A schema node with one additional item of data
+/// </summary>
+public abstract record SchemaNode<TData1>(
+    EnumeratedValuesNodeData EnumeratedValuesNodeData,
+    TData1 Data1) : SchemaNode(EnumeratedValuesNodeData) where TData1 : NodeData<TData1>
 {
-    public Maybe<T> TryMatch<T>(
-        string propertyName,
-        string propertyValue,
-        Func<(string value, string format), Maybe<T>> getValue)
+    /// <inheritdoc />
+    public override IEnumerable<INodeData> NodeData
     {
-        if (!TryPickT0(out var list, out var dict))
+        get
         {
-            if (!dict.TryGetValue(propertyName, out var list2))
-            {
-                return Maybe<T>.None;
-            }
-
-            list = list2;
+            yield return EnumeratedValuesNodeData;
+            yield return Data1;
         }
-
-        foreach (var format in list)
-        {
-            var v = getValue((propertyValue, format));
-
-            if (v.HasValue)
-                return v;
-        }
-
-        return Maybe<T>.None;
     }
 
-    public static Formatter Create(OneOf<string, IReadOnlyList<string>, Entity> data)
+    /// <inheritdoc />
+    public override SchemaNode Combine(SchemaNode other)
     {
-        if (data.TryPickT0(out var s, out var r1))
+        if (other.IsMorePermissive(this))
+            return this;
+
+        if (IsMorePermissive(other))
+            return other;
+
+        if (other is SchemaNode<TData1> otherNode)
         {
-            return new Formatter(new List<string>() { s });
+            if (this.CanCombineWith(otherNode))
+            {
+                var evndCombined =
+                    EnumeratedValuesNodeData.Combine(otherNode.EnumeratedValuesNodeData);
+
+                var dataCombined = Data1.Combine(otherNode.Data1);
+
+                return this with { EnumeratedValuesNodeData = evndCombined, Data1 = dataCombined };
+            }
+            else if (otherNode.CanCombineWith(this))
+            {
+                var evndCombined =
+                    otherNode.EnumeratedValuesNodeData.Combine(EnumeratedValuesNodeData);
+
+                var dataCombined = otherNode.Data1.Combine(Data1);
+
+                return otherNode with
+                {
+                    EnumeratedValuesNodeData = evndCombined, Data1 = dataCombined
+                };
+            }
         }
 
-        if (r1.TryPickT0(out var list, out var entity))
-            return new Formatter(
-                OneOf<IReadOnlyList<string>, IReadOnlyDictionary<string, IReadOnlyList<string>>>
-                    .FromT0(list)
-            );
+        return TrueNode.Instance;
+    }
+}
 
-        var dict = new Dictionary<string, IReadOnlyList<string>>(StringComparer.OrdinalIgnoreCase);
+/// <summary>
+/// A Node in a schema
+/// </summary>
+public abstract record SchemaNode(EnumeratedValuesNodeData EnumeratedValuesNodeData)
+{
+    /// <summary>
+    /// Create a schema node from a Json Schema
+    /// </summary>
+    [Pure]
+    public static SchemaNode Create(JsonSchema schema)
+    {
+        if (schema.Keywords is null)
+            return TrueNode.Instance;
 
-        foreach (var prop in entity)
+        var type = schema.Keywords.OfType<TypeKeyword>().FirstOrDefault()
+                ?? new TypeKeyword(SchemaValueType.Object);
+
+        EnumeratedValuesNodeData enumeratedValuesNodeData;
+
+        var constantValue = schema.Keywords.OfType<ConstKeyword>()
+            .Select(x => x.Value.Clone() as JsonElement?)
+            .FirstOrDefault();
+
+        if (constantValue is not null)
+            enumeratedValuesNodeData =
+                new EnumeratedValuesNodeData(new[] { EntityValue.Create(constantValue.Value), });
+        else
         {
-            if (prop.Value is EntityValue.NestedList nl)
-                dict.Add(prop.Name, nl.Value.Select(x => x.GetPrimitiveString()).ToList());
+            var enumValues = schema.Keywords.OfType<EnumKeyword>()
+                .Select(x => x.Values)
+                .FirstOrDefault();
+
+            if (enumValues is not null)
+                enumeratedValuesNodeData =
+                    new EnumeratedValuesNodeData(enumValues.Select(EntityValue.Create).ToList());
+
             else
-                dict.Add(prop.Name, new List<string>() { prop.Value.GetPrimitiveString() });
+                enumeratedValuesNodeData = EnumeratedValuesNodeData.Empty;
         }
 
-        return new Formatter(dict);
+        switch (type.Type)
+        {
+            case SchemaValueType.Object:
+            {
+                var allowExtra = schema.Keywords?.OfType<AdditionalPropertiesKeyword>()
+                    .Select(x => Create(x.Schema))
+                    .FirstOrDefault() ?? TrueNode.Instance;
+
+                var requiredProperties =
+                    schema.Keywords?.OfType<RequiredKeyword>()
+                        .SelectMany(x => x.Properties)
+                        .ToHashSet() ?? new HashSet<string>();
+
+                var nodes = schema.Keywords!.OfType<PropertiesKeyword>()
+                    .SelectMany(x => x.Properties)
+                    .ToDictionary(
+                        x => x.Key,
+                        x => (
+                            Create(x.Value),
+                            requiredProperties.Contains(x.Key)),
+                        StringComparer.OrdinalIgnoreCase
+                    );
+
+                return new EntityNode(
+                    enumeratedValuesNodeData,
+                    new EntityAdditionalItems(allowExtra),
+                    new EntityPropertiesData(nodes)
+                );
+            }
+            case SchemaValueType.Array:
+            {
+                var prefixItems = schema.Keywords!.OfType<PrefixItemsKeyword>()
+                    .SelectMany(x => x.ArraySchemas)
+                    .Select(Create)
+                    .ToImmutableList();
+
+                var additionalItems = schema.Keywords!.OfType<AdditionalItemsKeyword>()
+                    .Select(x => x.Schema)
+                    .Select(Create)
+                    .FirstOrDefault() ?? TrueNode.Instance;
+
+                return new ArrayNode(
+                    enumeratedValuesNodeData,
+                    new ItemsData(prefixItems, additionalItems)
+                );
+            }
+            case SchemaValueType.Boolean: return BooleanNode.Default;
+            case SchemaValueType.String:
+            {
+                var format = StringFormat.Create(
+                    schema.Keywords!.OfType<FormatKeyword>()
+                        .Select(x => x.Value.Key)
+                        .FirstOrDefault()
+                );
+
+                var restrictions = StringRestrictions.Create(schema);
+
+                return new StringNode(enumeratedValuesNodeData, format, restrictions);
+            }
+            case SchemaValueType.Number:
+                return new IntegerNode(enumeratedValuesNodeData, NumberRestrictions.Create(schema));
+            case SchemaValueType.Integer:
+                return new IntegerNode(enumeratedValuesNodeData, NumberRestrictions.Create(schema));
+            case SchemaValueType.Null: return NullNode.Instance;
+            default:                   throw new ArgumentOutOfRangeException(type.Type.ToString());
+        }
     }
 
     /// <summary>
-    /// Empty conversion mode
+    /// Convert this to a Json Schema
     /// </summary>
-    public static Formatter Empty { get; } = new(new List<string>());
+    /// <returns></returns>
+    [Pure]
+    public JsonSchema ToJsonSchema()
+    {
+        var builder = new JsonSchemaBuilder().Type(SchemaValueType);
 
-    /// <inheritdoc />
-    protected Formatter(
-        OneOf<IReadOnlyList<string>, IReadOnlyDictionary<string, IReadOnlyList<string>>> input) :
-        base(input) { }
+        foreach (var nodeData in NodeData)
+        {
+            nodeData.SetBuilder(builder);
+        }
+
+        return builder.Build();
+    }
+
+    /// <summary>
+    /// Gets all node data for this Schema
+    /// </summary>
+    [Pure]
+    public abstract IEnumerable<INodeData> NodeData { get; }
+
+    /// <summary>
+    /// The Schema Value type
+    /// </summary>
+    [Pure]
+    public abstract SchemaValueType SchemaValueType { get; }
+
+    /// <summary>
+    /// Is this more general or equal to the other schema node
+    /// </summary>
+    [Pure]
+    public abstract bool IsMorePermissive(SchemaNode other);
+
+    /// <summary>
+    /// Can this combine with the other node
+    /// </summary>
+    protected virtual bool CanCombineWith(SchemaNode other)
+    {
+        return GetType() == other.GetType();
+    }
+
+    /// <summary>
+    /// Try to combine this node with another schema node
+    /// </summary>
+    [Pure]
+    public virtual SchemaNode Combine(SchemaNode otherNode)
+    {
+        if (otherNode.IsMorePermissive(this))
+            return this;
+
+        if (IsMorePermissive(otherNode))
+            return otherNode;
+
+        if (CanCombineWith(otherNode))
+        {
+            var combineResult = EnumeratedValuesNodeData
+                .Combine(otherNode.EnumeratedValuesNodeData);
+
+            return this with { EnumeratedValuesNodeData = combineResult };
+        }
+        else if (otherNode.CanCombineWith(this))
+        {
+            var combineResult = otherNode.EnumeratedValuesNodeData
+                .Combine(EnumeratedValuesNodeData);
+
+            return otherNode with { EnumeratedValuesNodeData = combineResult };
+        }
+
+        return TrueNode.Instance;
+    }
+
+    /// <summary>
+    /// Try to transform this entity to match this schema
+    /// </summary>
+    [Pure]
+    public Result<Maybe<EntityValue>, IErrorBuilder> TryTransform(
+        string propertyName,
+        EntityValue entityValue,
+        TransformSettings transformSettings)
+    {
+        if (!EnumeratedValuesNodeData.Allow(entityValue, transformSettings))
+            return ErrorCode.SchemaViolation.ToErrorBuilder(
+                $"Value not allowed: {entityValue}",
+                propertyName
+            );
+
+        var r = TryTransform1(propertyName, entityValue, transformSettings);
+
+        return r;
+    }
+
+    /// <summary>
+    /// Try to transform the entity value
+    /// </summary>
+    protected abstract Result<Maybe<EntityValue>, IErrorBuilder> TryTransform1(
+        string propertyName,
+        EntityValue entityValue,
+        TransformSettings transformSettings);
 }
 
 }

@@ -88,6 +88,15 @@ namespace Reductech.EDR.Core.Internal.Errors {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Cannot Combine Schemas: &apos;{0}&apos;.
+        /// </summary>
+        internal static string CannotCombineSchemas {
+            get {
+                return ResourceManager.GetString("CannotCombineSchemas", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Cannot convert a nested entity to {0}..
         /// </summary>
         internal static string CannotConvertNestedEntity {

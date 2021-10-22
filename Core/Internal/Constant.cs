@@ -172,7 +172,7 @@ public record DateTimeConstant(DateTime Value) : ConstantBase<DateTime>(Value)
     public override string Name => Value.ToString(Constants.DateTimeFormat);
 
     /// <inheritdoc />
-    protected override EntityValue ToEntityValue() => new EntityValue.Date(Value, null);
+    protected override EntityValue ToEntityValue() => new EntityValue.DateTime(Value);
 }
 
 /// <summary>
