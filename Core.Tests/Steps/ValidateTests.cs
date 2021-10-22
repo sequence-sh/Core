@@ -14,6 +14,7 @@ using Reductech.EDR.Core.TestHarness;
 using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 using Reductech.EDR.Core.Util;
 using Xunit;
+using static Reductech.EDR.Core.Tests.SchemaHelpers;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
@@ -436,74 +437,55 @@ public partial class ValidateTests : StepTestBase<Validate, Array<Entity>>
                 "#/properties/Foo/type"
             );
 
-            //yield return CreateCase(
-            //    "Missing enum value",
-            //    new List<Entity> { fooFish },
-            //    CreateSchema(
-            //        SchemaName,
-            //        ExtraPropertyBehavior.Fail,
-            //        ("Foo", SCLType.Enum, "Food", Multiplicity.Any, null,
-            //         new List<string> { "Meat", "Chips" }, null, null)
-            //    ),
-            //    ErrorCode.SchemaViolationWrongType,
-            //    "Fish",
-            //    "Enum",
-            //    fooFish
-            //);
+            yield return CreateCase(
+                "Missing enum value",
+                new List<Entity> { fooFish },
+                new JsonSchemaBuilder()
+                    .Properties(("Foo", EnumProperty("Apple", "Orange"))),
+                ErrorCode.SchemaViolation,
+                "Expected value to match one of the values specified by the enum",
+                "#/properties/Foo/enum"
+            );
 
-            //yield return CreateCase(
-            //    "Missing enum name",
-            //    new List<Entity> { fooMeat },
-            //    CreateSchema(
-            //        SchemaName,
-            //        ExtraPropertyBehavior.Fail,
-            //        ("Foo", SCLType.Enum, null, Multiplicity.Any, null,
-            //         new List<string> { "Meat", "Chips" }, null, null)
-            //    ),
-            //    ErrorCode.SchemaInvalidMissingEnum
-            //);
+            yield return CreateCase(
+                "Regex not matched",
+                new List<Entity> { fooFish },
+                new JsonSchemaBuilder()
+                    .Properties(
+                        ("Foo",
+                         new JsonSchemaBuilder().Type(SchemaValueType.String)
+                             .Pattern("apple|orange")
+                             .Build())
+                    ),
+                ErrorCode.SchemaViolation,
+                "The string value was not a match for the indicated regular expression",
+                "#/properties/Foo/pattern"
+            );
 
-            //yield return CreateCase(
-            //    "Regex not matched",
-            //    new List<Entity> { fooFish },
-            //    CreateSchema(
-            //        SchemaName,
-            //        ExtraPropertyBehavior.Fail,
-            //        ("Foo", SCLType.String, null, Multiplicity.Any, @"\d+", null, null,
-            //         null)
-            //    ),
-            //    ErrorCode.SchemaViolationUnmatchedRegex,
-            //    "Fish",
-            //    @"\d+",
-            //    fooFish
-            //);
+            yield return CreateCase(
+                "Missing property",
+                new List<Entity> { fooFish },
+                new JsonSchemaBuilder()
+                    .Properties(
+                        ("Foo", AnyString),
+                        ("Bar", AnyString)
+                    )
+                    .Required("Foo", "Bar"),
+                ErrorCode.SchemaViolation,
+                "Required properties [Bar] were not present",
+                "#/required"
+            );
 
-            //yield return CreateCase(
-            //    "Missing property",
-            //    new List<Entity> { fooFish },
-            //    CreateSchema(
-            //        SchemaName,
-            //        ExtraPropertyBehavior.Fail,
-            //        ("Foo", SCLType.String, Multiplicity.Any),
-            //        ("Bar", SCLType.String, Multiplicity.AtLeastOne)
-            //    ),
-            //    ErrorCode.SchemaViolationMissingProperty,
-            //    "Bar",
-            //    fooFish
-            //);
-
-            //yield return CreateCase(
-            //    "Extra property",
-            //    new List<Entity> { fooFish, barFly },
-            //    CreateSchema(
-            //        SchemaName,
-            //        ExtraPropertyBehavior.Fail,
-            //        ("Foo", SCLType.String, Multiplicity.Any)
-            //    ),
-            //    ErrorCode.SchemaViolationUnexpectedProperty,
-            //    "Bar",
-            //    barFly
-            //);
+            yield return CreateCase(
+                "Extra property",
+                new List<Entity> { fooFish },
+                new JsonSchemaBuilder()
+                    .Properties(("Bar", AnyString))
+                    .AdditionalProperties(JsonSchema.False),
+                ErrorCode.SchemaViolation,
+                "All values fail against the false schema",
+                "#/additionalProperties/$false"
+            );
         }
     }
 

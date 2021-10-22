@@ -4,24 +4,13 @@ using Json.Schema;
 using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.TestHarness;
 using static Reductech.EDR.Core.TestHarness.StaticHelpers;
+using static Reductech.EDR.Core.Tests.SchemaHelpers;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
 
 public partial class CreateSchemaTests : StepTestBase<CreateSchema, Entity>
 {
-    public static Entity Create(JsonSchema schema) =>
-        Entity.Create(schema.ToJsonDocument().RootElement);
-
-    public static JsonSchema AnyString =>
-        new JsonSchemaBuilder().Type(SchemaValueType.String).Build();
-
-    public static JsonSchema AnyInt =>
-        new JsonSchemaBuilder().Type(SchemaValueType.Integer).Build();
-
-    public static JsonSchema AnyNumber =>
-        new JsonSchemaBuilder().Type(SchemaValueType.Number).Build();
-
     /// <inheritdoc />
     protected override IEnumerable<StepCase> StepCases
     {

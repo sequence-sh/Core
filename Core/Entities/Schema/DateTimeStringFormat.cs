@@ -32,14 +32,20 @@ public record DateTimeStringFormat : StringFormat
         }
 
         var primitive = entityValue.GetPrimitiveString();
-        var formats   = transformSettings.DateFormatter.GetFormats(propertyName).ToArray();
+
+        if (DateTime.TryParse(primitive, out var dt1))
+        {
+            return Maybe<EntityValue>.From(new EntityValue.DateTime(dt1));
+        }
+
+        var formats = transformSettings.DateFormatter.GetFormats(propertyName).ToArray();
 
         if (!formats.Any())
             formats = null;
 
-        if (DateTime.TryParseExact(primitive, formats, null, DateTimeStyles.None, out var dt))
+        if (DateTime.TryParseExact(primitive, formats, null, DateTimeStyles.None, out var dt2))
         {
-            return Maybe<EntityValue>.From(new EntityValue.DateTime(dt));
+            return Maybe<EntityValue>.From(new EntityValue.DateTime(dt2));
         }
 
         return ErrorCode.SchemaViolation.ToErrorBuilder(

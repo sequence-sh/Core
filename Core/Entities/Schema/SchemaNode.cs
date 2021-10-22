@@ -210,9 +210,10 @@ public abstract record SchemaNode(EnumeratedValuesNodeData EnumeratedValuesNodeD
                     .Select(Create)
                     .ToImmutableList();
 
-                var additionalItems = schema.Keywords!.OfType<AdditionalItemsKeyword>()
-                    .Select(x => x.Schema)
-                    .Select(Create)
+                var additionalItems = schema.Keywords!.OfType<ItemsKeyword>()
+                    .Select(x => x.SingleSchema)
+                    .Where(x => x != null)
+                    .Select(Create!)
                     .FirstOrDefault() ?? TrueNode.Instance;
 
                 return new ArrayNode(
