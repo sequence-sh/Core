@@ -43,7 +43,7 @@ public sealed class EntitySetValue<T> : CompoundStep<Entity>
 
         var entityValue = EntityValue.CreateFromObject(valueResult.Value);
 
-        var newEntity = entityResult.Value.WithProperty(propertyName, entityValue);
+        var newEntity = entityResult.Value.WithProperty(propertyName, entityValue, null);
 
         return newEntity;
     }

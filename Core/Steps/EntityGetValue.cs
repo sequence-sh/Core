@@ -62,7 +62,8 @@ public sealed class EntityGetValue<T> : CompoundStep<T>
         if (entityValue.HasNoValue)
             return EntityValue.GetDefaultValue<T1>();
 
-        var result = entityValue.Value.TryGetValue<T1>()
+        var result = entityValue.GetValueOrThrow()
+            .TryGetValue<T1>()
             .MapError(x => x.WithLocation(this));
 
         return result;

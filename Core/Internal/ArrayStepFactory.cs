@@ -64,7 +64,7 @@ public abstract class ArrayStepFactory : GenericStepFactory
             .MapError(e => e.WithLocation(freezableStepData));
 
         TypeReference arrayMemberType =
-            arrayMemberTypeResult.ToMaybe().Unwrap(TypeReference.Unknown.Instance);
+            arrayMemberTypeResult.ToMaybe().GetValueOrDefault(TypeReference.Unknown.Instance);
 
         if (LambdaPropertyName is null)
             return arrayMemberType;

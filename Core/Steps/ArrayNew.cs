@@ -70,7 +70,7 @@ public sealed class ArrayNew<T> : CompoundStep<Array<T>>, IArrayNewStep
             if (ev.HasNoValue)
                 return Maybe<EntityValue>.None;
 
-            builder.Add(ev.Value);
+            builder.Add(ev.GetValueOrThrow());
         }
 
         return new EntityValue.NestedList(builder.ToImmutable());

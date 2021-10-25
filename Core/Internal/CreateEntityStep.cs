@@ -51,7 +51,7 @@ public record CreateEntityStep
             if (ev.HasNoValue)
                 return Maybe<EntityValue>.None;
 
-            pairs.Add((key, ev.Value));
+            pairs.Add((key, ev.GetValueOrThrow()));
         }
 
         var entity = Entity.Create(pairs);

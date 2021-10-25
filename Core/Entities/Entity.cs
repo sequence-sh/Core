@@ -135,7 +135,7 @@ public sealed partial record Entity
     /// Creates a copy of this with the property added or updated
     /// </summary>
     [Pure]
-    public Entity WithProperty(string key, EntityValue newValue)
+    public Entity WithProperty(string key, EntityValue newValue, int? order)
     {
         EntityProperty newProperty;
 
@@ -150,7 +150,11 @@ public sealed partial record Entity
                 if (newValue is EntityValue.NestedEntity newEntity)
                     combinedEntity = existingEntity.Value.Combine(newEntity.Value);
                 else
-                    combinedEntity = existingEntity.Value.WithProperty(PrimitiveKey, newValue);
+                    combinedEntity = existingEntity.Value.WithProperty(
+                        PrimitiveKey,
+                        newValue,
+                        null
+                    );
 
                 newValue2 = new EntityValue.NestedEntity(combinedEntity);
             }
@@ -164,7 +168,7 @@ public sealed partial record Entity
         }
         else
         {
-            newProperty = new EntityProperty(key, newValue, Dictionary.Count);
+            newProperty = new EntityProperty(key, newValue, order ?? Dictionary.Count);
         }
 
         ImmutableDictionary<string, EntityProperty> newDict = Dictionary.SetItem(key, newProperty);
@@ -187,6 +191,82 @@ public sealed partial record Entity
     }
 
     /// <summary>
+    /// Remove properties from an entity.
+    /// Removing the last nested property on an entity will also remove that entity
+    /// </summary>
+    [Pure]
+    public Maybe<Entity> TryRemoveProperties(IEnumerable<EntityPropertyKey> properties)
+    {
+        var newEntity = this;
+        var changed   = false;
+
+        foreach (var entityPropertyKey in properties)
+        {
+            var e = newEntity.TryRemoveProperty(entityPropertyKey);
+
+            if (e.HasValue)
+            {
+                newEntity = e.GetValueOrThrow();
+                changed   = true;
+            }
+        }
+
+        if (!changed)
+            return Maybe<Entity>.None;
+
+        return newEntity;
+    }
+
+    /// <summary>
+    /// Try to remove a property from the entity
+    /// Removing the last nested property on an entity will also remove that entity
+    /// </summary>
+    public Maybe<Entity> TryRemoveProperty(EntityPropertyKey entityPropertyKey)
+    {
+        var (firstKey, remainder) = entityPropertyKey.Split();
+
+        if (!Dictionary.ContainsKey(firstKey))
+            return Maybe<Entity>.None;
+
+        if (remainder.HasNoValue)
+        {
+            var newDict = Dictionary.Remove(firstKey);
+            return new Entity(newDict);
+        }
+
+        if (Dictionary.TryGetValue(firstKey, out var ep)
+         && ep.Value is EntityValue.NestedEntity nestedEntity)
+        {
+            var rem = remainder.GetValueOrThrow();
+            var em  = nestedEntity.Value.TryRemoveProperty(rem);
+
+            if (em.HasValue)
+            {
+                var newNestedEntity = em.GetValueOrThrow();
+
+                if (newNestedEntity.Dictionary.IsEmpty)
+                {
+                    var newDict = Dictionary.Remove(firstKey);
+                    return new Entity(newDict);
+                }
+                else
+                {
+                    var newProperty = new EntityProperty(
+                        firstKey,
+                        new EntityValue.NestedEntity(newNestedEntity),
+                        ep.Order
+                    );
+
+                    var newDict = Dictionary.SetItem(firstKey, newProperty);
+                    return new Entity(newDict);
+                }
+            }
+        }
+
+        return Maybe<Entity>.None;
+    }
+
+    /// <summary>
     /// Combine two entities.
     /// Properties on the other entity take precedence.
     /// </summary>
@@ -196,7 +276,7 @@ public sealed partial record Entity
         var current = this;
 
         foreach (var ep in other)
-            current = current.WithProperty(ep.Name, ep.Value);
+            current = current.WithProperty(ep.Name, ep.Value, null);
 
         return current;
     }
@@ -211,22 +291,29 @@ public sealed partial record Entity
     /// Try to get the value of a particular property
     /// </summary>
     [Pure]
-    public Maybe<EntityValue> TryGetValue(EntityPropertyKey key)
+    public Maybe<EntityValue> TryGetValue(EntityPropertyKey key) =>
+        TryGetProperty(key).Map(x => x.Value);
+
+    /// <summary>
+    /// Try to get a particular property
+    /// </summary>
+    [Pure]
+    public Maybe<EntityProperty> TryGetProperty(EntityPropertyKey key)
     {
         var (firstKey, remainder) = key.Split();
 
         if (!Dictionary.TryGetValue(firstKey, out var ep))
-            return Maybe<EntityValue>.None;
+            return Maybe<EntityProperty>.None;
 
         if (remainder.HasNoValue)
-            return ep.Value;
+            return ep;
 
         if (ep.Value is EntityValue.NestedEntity nestedEntity)
-            return nestedEntity.Value.TryGetValue(remainder.GetValueOrThrow());
+            return nestedEntity.Value.TryGetProperty(remainder.GetValueOrThrow());
         //We can't get the nested property as this is not an entity
 
         return
-            Maybe<EntityValue>.None;
+            Maybe<EntityProperty>.None;
     }
 
     /// <inheritdoc />

@@ -85,6 +85,9 @@ public class RequirementJsonConverter : JsonConverter<Requirement>
             return new ConnectorRequirement(ConnectorName);
         }
 
+        /// <summary>
+        /// The name of the connector
+        /// </summary>
         public string ConnectorName { get; set; }
 
         public string? VersionKey { get; set; }

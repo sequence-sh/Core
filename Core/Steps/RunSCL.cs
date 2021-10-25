@@ -131,14 +131,17 @@ public sealed class RunSCL : CompoundStep<Unit>
             {
                 var ev = export.Value.TryConvertToEntityValue();
 
-                if (ev.HasValue && ev.Value is EntityValue.NestedList nestedList)
+                if (ev.HasValue && ev.GetValueOrThrow() is EntityValue.NestedList nestedList)
                 {
                     foreach (var entityValue in nestedList.Value)
                     {
                         var name = entityValue.GetPrimitiveString();
 
-                        yield return new(new VariableName(name!), TypeReference.Any.Instance,
-                                         freezableStepData.Location);
+                        yield return new(
+                            new VariableName(name),
+                            TypeReference.Any.Instance,
+                            freezableStepData.Location
+                        );
                     }
                 }
             }

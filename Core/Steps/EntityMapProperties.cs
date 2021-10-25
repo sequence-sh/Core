@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading;
@@ -33,40 +34,72 @@ public class EntityMapProperties : CompoundStep<Array<Entity>>
 
         var mappingsDict = mappings.ToDictionary(
             x => x.Name,
-            x => x.Value.GetPrimitiveString()
+            x => GetStringList(x.Value),
+            StringComparer.OrdinalIgnoreCase
         );
 
+        var propertiesToRemove = mappingsDict
+            .SelectMany(x => x.Value)
+            .ToHashSet();
+
         var newEntityStream = entityStream
-            .Select(e => ChangeHeader(e, mappingsDict));
+            .Select(e => ChangePropertyNames(e, mappingsDict, propertiesToRemove));
 
         return newEntityStream;
 
-        static Entity ChangeHeader(Entity entity, IReadOnlyDictionary<string, string> mappings)
+        static Entity ChangePropertyNames(
+            Entity entity,
+            IReadOnlyDictionary<string, IReadOnlyList<EntityPropertyKey>> mappings,
+            IEnumerable<EntityPropertyKey> propertiesToRemove)
         {
-            var builder = entity.Dictionary.ToBuilder();
             var changed = false;
 
-            foreach (var property in entity)
-            {
-                if (mappings.TryGetValue(property.Name, out var newKey))
-                {
-                    builder.Remove(property.Name);
+            var newEntity = entity;
 
-                    var newProperty = new EntityProperty(
-                        newKey,
-                        property.Value,
-                        property.Order
+            foreach (var (newName, propertyKeys) in mappings)
+            foreach (var entityPropertyKey in propertyKeys)
+            {
+                var value = entity.TryGetProperty(entityPropertyKey);
+
+                if (value.HasValue)
+                {
+                    changed = true;
+                    var newProperty = value.GetValueOrThrow();
+
+                    newEntity = newEntity.WithProperty(
+                        newName,
+                        newProperty.Value,
+                        newProperty.Order
                     );
 
-                    builder.Add(newKey, newProperty);
-                    changed = true;
+                    break;
                 }
+            }
+
+            var withoutProperties = newEntity.TryRemoveProperties(propertiesToRemove);
+
+            if (withoutProperties.HasValue)
+            {
+                newEntity = withoutProperties.GetValueOrThrow();
+                changed   = true;
             }
 
             if (!changed)
                 return entity;
 
-            return new Entity(builder.ToImmutable());
+            return newEntity;
+        }
+
+        static IReadOnlyList<EntityPropertyKey> GetStringList(EntityValue ev)
+        {
+            if (ev is EntityValue.NestedList nestedList)
+            {
+                return nestedList.Value
+                    .Select(x => EntityPropertyKey.Create(x.GetPrimitiveString()))
+                    .ToList();
+            }
+
+            return new[] { EntityPropertyKey.Create(ev.GetPrimitiveString()) };
         }
     }
 
@@ -78,7 +111,9 @@ public class EntityMapProperties : CompoundStep<Array<Entity>>
     public IStep<Array<Entity>> EntityStream { get; set; } = null!;
 
     /// <summary>
-    /// An entity containing mappings
+    /// An entity containing mappings.
+    /// The keys in the entity will be the new column names.
+    /// The value of each property should either the the name of the source column or a list of source column names
     /// </summary>
     [StepProperty(2)]
     [Required]

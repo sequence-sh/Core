@@ -34,7 +34,7 @@ interpolatedString	: OPENISTRING step (ISTRINGSEGMENT step)* CLOSEISTRING;
 quotedString		: DOUBLEQUOTEDSTRING | SINGLEQUOTEDSTRING | SIMPLEISTRING ;
 number              : NUMBER (DOT NUMBER)? ;
 enumeration			: NAME DOT NAME ;
-null                : NULL ;
+nullValue           : NULLVALUE ;
 
 infixableTerm       : simpleTerm #SimpleTerm1                                      
 					
@@ -52,7 +52,7 @@ step				: <assoc=right> step PIPE function #PipeFunction
 					| stepSequence #StepSequence1
 					| term #Term1
 					;
-simpleTerm			: null
+simpleTerm			: nullValue
                     | number
                     | boolean
 					| dateTime
@@ -116,6 +116,6 @@ DOUBLEQUOTEDSTRING	: '"' DQSCHAR* '"' ;
 SINGLEQUOTEDSTRING	: '\'' (~('\'') | '\'\'')* '\'' ;
 TRUE				: [Tt] [Rr] [Uu] [Ee];
 FALSE				: [Ff] [Aa] [Ll] [Ss] [Ee];
-NULL                : [Nn] [Uu] [Ll] [Ll];
+NULLVALUE           : [Nn] [Uu] [Ll] [Ll];
 NAME				: [a-zA-Z0-9_]+;
 WHITESPACE			: (' ' | '\t' | '\r' | '\n') -> channel(HIDDEN) ;
