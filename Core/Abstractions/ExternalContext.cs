@@ -30,7 +30,7 @@ public sealed record ExternalContext(
             .Where(x => x.name.Equals(key, StringComparison.OrdinalIgnoreCase))
             .TryFirst();
 
-        if (first.HasValue && first.Value.context is T context)
+        if (first.HasValue && first.GetValueOrThrow().context is T context)
         {
             return context;
         }

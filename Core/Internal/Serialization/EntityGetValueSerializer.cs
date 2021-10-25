@@ -19,7 +19,7 @@ public class EntityGetValueSerializer : IStepSerializer
     /// <inheritdoc />
     public string Serialize(IEnumerable<StepProperty> stepProperties)
     {
-        var (first, second) = stepProperties.GetFirstTwo().Value;
+        var (first, second) = stepProperties.GetFirstTwo().GetValueOrThrow();
 
         var entity = first.Serialize();
 

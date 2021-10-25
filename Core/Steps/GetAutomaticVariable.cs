@@ -28,7 +28,7 @@ public sealed class GetAutomaticVariable<T> : CompoundStep<T>
                 ErrorCode.AutomaticVariableNotSet.ToErrorBuilder().WithLocation(this)
             );
 
-        var result = stateMonad.GetVariable<T>(stateMonad.AutomaticVariable.Value)
+        var result = stateMonad.GetVariable<T>(stateMonad.AutomaticVariable.GetValueOrThrow())
             .MapError(x => x.WithLocation(this));
 
         return result;
@@ -61,8 +61,12 @@ public sealed class GetAutomaticVariable<T> : CompoundStep<T>
             FreezableStepData freezableStepData,
             TypeResolver typeResolver)
         {
-            yield return new(VariableName.Item, callerMetadata.ExpectedType, freezableStepData
-                                 .Location);
+            yield return new(
+                VariableName.Item,
+                callerMetadata.ExpectedType,
+                freezableStepData
+                    .Location
+            );
         }
 
         /// <inheritdoc />
@@ -85,7 +89,7 @@ public sealed class GetAutomaticVariable<T> : CompoundStep<T>
             var expectedTypeReference = callerMetadata.ExpectedType;
 
             if (!expectedTypeReference.IsUnknown
-             && typeResolver.Dictionary.TryGetValue(avr.Value, out var tr))
+             && typeResolver.Dictionary.TryGetValue(avr.GetValueOrThrow(), out var tr))
             {
                 if (tr.Allow(expectedTypeReference, typeResolver))
                 {
@@ -97,7 +101,7 @@ public sealed class GetAutomaticVariable<T> : CompoundStep<T>
                 }
 
                 return callerMetadata.GetWrongTypeError(
-                    avr.Value.Serialize(),
+                    avr.GetValueOrThrow().Serialize(),
                     tr.Name,
                     new ErrorLocation(
                         TypeName,

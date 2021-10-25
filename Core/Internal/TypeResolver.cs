@@ -244,7 +244,8 @@ public sealed class TypeResolver
                     continue;
                 case TypeReference.AutomaticVariable when AutomaticVariableName.HasValue
                                                        && Dictionary.TryGetValue(
-                                                              AutomaticVariableName.Value,
+                                                              AutomaticVariableName
+                                                                  .GetValueOrThrow(),
                                                               out var tr2
                                                           ):
                     typeReference = tr2;

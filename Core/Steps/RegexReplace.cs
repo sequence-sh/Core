@@ -101,7 +101,7 @@ public sealed class RegexReplace : CompoundStep<StringStream>
 
                 resultValue =
                     GroupsRegex.Replace(
-                        replacement.Value,
+                        replacement.GetValueOrThrow(),
                         match1 =>
                         {
                             var num = int.Parse(match1.Groups["number"].Value);

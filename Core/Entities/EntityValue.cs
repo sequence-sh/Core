@@ -465,7 +465,7 @@ public abstract record EntityValue(object? ObjectValue)
                 else if (existingValue.Value is NestedEntity existingNestedEntity)
                 {
                     var nEntity =
-                        existingNestedEntity.Value.WithProperty(Entity.PrimitiveKey, ev);
+                        existingNestedEntity.Value.WithProperty(Entity.PrimitiveKey, ev, null);
 
                     newProperty = new EntityProperty(
                         key,

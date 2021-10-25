@@ -1,15 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Reductech.EDR.Core.Util;
+﻿using Reductech.EDR.Core.Util;
 
 namespace Reductech.EDR.Core.Internal
 {
 
+/// <summary>
+/// Contains helper methods for getting default values
+/// </summary>
 public static class DefaultValues
 {
+    /// <summary>
+    /// Gets the default value for a type
+    /// </summary>
     public static T GetDefault<T>()
     {
         if (Unit.Default is T tUnit)

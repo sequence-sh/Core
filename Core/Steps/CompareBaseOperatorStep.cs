@@ -41,7 +41,7 @@ public abstract class
         {
             if (last.HasValue)
             {
-                var comparisonValue = comparer.Compare(last.Value, term);
+                var comparisonValue = comparer.Compare(last.GetValueOrThrow(), term);
 
                 var checkResult = CheckComparisonValue(comparisonValue);
 

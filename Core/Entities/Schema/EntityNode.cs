@@ -72,7 +72,8 @@ public record EntityNode(
                 {
                     newEntity = newEntity.WithProperty(
                         entityProperty.Name,
-                        r.Value.GetValueOrThrow()
+                        r.Value.GetValueOrThrow(),
+                        null
                     );
 
                     changed = true;

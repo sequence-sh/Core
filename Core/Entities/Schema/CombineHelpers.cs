@@ -8,6 +8,9 @@ namespace Reductech.EDR.Core.Entities.Schema
 /// </summary>
 public static class CombineHelpers
 {
+    /// <summary>
+    /// Combine two structs
+    /// </summary>
     public static T? Combine<T>(
         T? t1,
         T? t2,
@@ -26,6 +29,9 @@ public static class CombineHelpers
         return chooseFunc(t1.Value, t2.Value);
     }
 
+    /// <summary>
+    /// Combine two objects
+    /// </summary>
     public static T? Combine<T>(
         T? t1,
         T? t2,

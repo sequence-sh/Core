@@ -420,7 +420,7 @@ public abstract record TypeReference
             if (typeResolver.AutomaticVariableName.HasNoValue)
                 return ErrorCode.AutomaticVariableNotSet.ToErrorBuilder();
 
-            var variable = new Variable(typeResolver.AutomaticVariableName.Value);
+            var variable = new Variable(typeResolver.AutomaticVariableName.GetValueOrThrow());
 
             return variable.TryGetArrayMemberTypeReference(typeResolver);
         }
@@ -431,7 +431,7 @@ public abstract record TypeReference
             if (typeResolver.AutomaticVariableName.HasNoValue)
                 return ErrorCode.AutomaticVariableNotSet.ToErrorBuilder();
 
-            var variable = new Variable(typeResolver.AutomaticVariableName.Value);
+            var variable = new Variable(typeResolver.AutomaticVariableName.GetValueOrThrow());
 
             return variable.TryGetType(typeResolver);
         }
@@ -442,7 +442,7 @@ public abstract record TypeReference
             if (typeResolver is null || typeResolver.AutomaticVariableName.HasNoValue)
                 return false;
 
-            var variable = new Variable(typeResolver.AutomaticVariableName.Value);
+            var variable = new Variable(typeResolver.AutomaticVariableName.GetValueOrThrow());
 
             return variable.Allow(other, typeResolver);
         }
