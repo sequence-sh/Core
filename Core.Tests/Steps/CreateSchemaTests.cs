@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
-using Json.More;
 using Json.Schema;
+using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.TestHarness;
 using static Reductech.EDR.Core.TestHarness.StaticHelpers;
-using static Reductech.EDR.Core.Tests.SchemaHelpers;
+using static Reductech.EDR.Core.TestHarness.SchemaHelpers;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
@@ -23,17 +23,17 @@ public partial class CreateSchemaTests : StepTestBase<CreateSchema, Entity>
                     SchemaName = Constant("Test Schema"),
                     Entities   = Array(Entity.Create(("StringProp1", "abc"), ("IntProp1", 123)))
                 },
-                Create(
-                    new JsonSchemaBuilder()
-                        .Title("Test Schema")
-                        .Type(SchemaValueType.Object)
-                        .AdditionalProperties(JsonSchema.False)
-                        .Properties(
-                            ("StringProp1", AnyString),
-                            ("IntProp1", AnyInt)
-                        )
-                        .Required("StringProp1", "IntProp1")
-                )
+                new JsonSchemaBuilder()
+                    .Title("Test Schema")
+                    .Type(SchemaValueType.Object)
+                    .AdditionalProperties(JsonSchema.False)
+                    .Properties(
+                        ("StringProp1", AnyString),
+                        ("IntProp1", AnyInt)
+                    )
+                    .Required("StringProp1", "IntProp1")
+                    .Build()
+                    .ConvertToEntity()
             );
 
             yield return new StepCase(
@@ -47,18 +47,18 @@ public partial class CreateSchemaTests : StepTestBase<CreateSchema, Entity>
                         Entity.Create(("StringProp1", "def"), ("IntProp2", 123))
                     )
                 },
-                Create(
-                    new JsonSchemaBuilder()
-                        .Title("Test Schema")
-                        .Type(SchemaValueType.Object)
-                        .AdditionalProperties(JsonSchema.False)
-                        .Properties(
-                            ("StringProp1", AnyString),
-                            ("IntProp1", AnyInt),
-                            ("IntProp2", AnyInt)
-                        )
-                        .Required("StringProp1")
-                )
+                new JsonSchemaBuilder()
+                    .Title("Test Schema")
+                    .Type(SchemaValueType.Object)
+                    .AdditionalProperties(JsonSchema.False)
+                    .Properties(
+                        ("StringProp1", AnyString),
+                        ("IntProp1", AnyInt),
+                        ("IntProp2", AnyInt)
+                    )
+                    .Required("StringProp1")
+                    .Build()
+                    .ConvertToEntity()
             );
 
             yield return new StepCase(
@@ -71,17 +71,17 @@ public partial class CreateSchemaTests : StepTestBase<CreateSchema, Entity>
                         Entity.Create(("StringProp1", "def"), ("numProp1", 45.6))
                     )
                 },
-                Create(
-                    new JsonSchemaBuilder()
-                        .Title("Test Schema")
-                        .Type(SchemaValueType.Object)
-                        .AdditionalProperties(JsonSchema.False)
-                        .Properties(
-                            ("StringProp1", AnyString),
-                            ("NumProp1", AnyNumber)
-                        )
-                        .Required("StringProp1", "NumProp1")
-                )
+                new JsonSchemaBuilder()
+                    .Title("Test Schema")
+                    .Type(SchemaValueType.Object)
+                    .AdditionalProperties(JsonSchema.False)
+                    .Properties(
+                        ("StringProp1", AnyString),
+                        ("NumProp1", AnyNumber)
+                    )
+                    .Required("StringProp1", "NumProp1")
+                    .Build()
+                    .ConvertToEntity()
             );
 
             yield return new StepCase(
@@ -94,16 +94,16 @@ public partial class CreateSchemaTests : StepTestBase<CreateSchema, Entity>
                         Entity.Create(("NumProp1", 123))
                     )
                 },
-                Create(
-                    new JsonSchemaBuilder()
-                        .Title("Test Schema")
-                        .Type(SchemaValueType.Object)
-                        .AdditionalProperties(JsonSchema.False)
-                        .Properties(
-                            ("StringProp1", AnyString),
-                            ("NumProp1", AnyInt)
-                        )
-                )
+                new JsonSchemaBuilder()
+                    .Title("Test Schema")
+                    .Type(SchemaValueType.Object)
+                    .AdditionalProperties(JsonSchema.False)
+                    .Properties(
+                        ("StringProp1", AnyString),
+                        ("NumProp1", AnyInt)
+                    )
+                    .Build()
+                    .ConvertToEntity()
             );
 
             yield return new StepCase(
@@ -116,17 +116,17 @@ public partial class CreateSchemaTests : StepTestBase<CreateSchema, Entity>
                         Entity.Create(("MyProp1", 123),   ("MyProp2", "def"))
                     )
                 },
-                Create(
-                    new JsonSchemaBuilder()
-                        .Title("Test Schema")
-                        .Type(SchemaValueType.Object)
-                        .AdditionalProperties(JsonSchema.False)
-                        .Properties(
-                            ("MyProp1", AnyString),
-                            ("MyProp2", AnyString)
-                        )
-                        .Required("MyProp1", "MyProp2")
-                )
+                new JsonSchemaBuilder()
+                    .Title("Test Schema")
+                    .Type(SchemaValueType.Object)
+                    .AdditionalProperties(JsonSchema.False)
+                    .Properties(
+                        ("MyProp1", AnyString),
+                        ("MyProp2", AnyString)
+                    )
+                    .Required("MyProp1", "MyProp2")
+                    .Build()
+                    .ConvertToEntity()
             );
         }
     }
