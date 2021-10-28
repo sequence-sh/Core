@@ -30,7 +30,8 @@ public static class EntityConversionHelpers
         {
             var options = new JsonSerializerOptions()
             {
-                Converters = { new JsonStringEnumConverter(), VersionJsonConverter.Instance }
+                Converters = { new JsonStringEnumConverter(), VersionJsonConverter.Instance },
+                PropertyNameCaseInsensitive = true
             };
 
             var entityJson = JsonSerializer.Serialize(entity, options);

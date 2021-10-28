@@ -14,7 +14,7 @@ using Reductech.EDR.Core.TestHarness;
 using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 using Reductech.EDR.Core.Util;
 using Xunit;
-using static Reductech.EDR.Core.Tests.SchemaHelpers;
+using static Reductech.EDR.Core.TestHarness.SchemaHelpers;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
@@ -42,7 +42,7 @@ public partial class ValidateTests : StepTestBase<Validate, Array<Entity>>
                 JsonSchema schema,
                 params string[] expectedLogValues)
             {
-                var schemaEntity = Entity.Create(schema.ToJsonDocument().RootElement);
+                var schemaEntity = schema.ConvertToEntity();
 
                 return new StepCase(
                     name,
@@ -390,7 +390,7 @@ public partial class ValidateTests : StepTestBase<Validate, Array<Entity>>
                 ErrorCode expectedErrorCode,
                 params object[] expectedErrorArgs)
             {
-                var schemaEntity = Entity.Create(schema.ToJsonDocument().RootElement);
+                var schemaEntity = schema.ConvertToEntity();
 
                 var enforceSchema = new Validate
                 {
@@ -424,8 +424,6 @@ public partial class ValidateTests : StepTestBase<Validate, Array<Entity>>
 
             var fooHello = Entity.Create(("Foo", "Hello"));
             var fooFish  = Entity.Create(("Foo", "Fish"));
-            var fooMeat  = Entity.Create(("Foo", "Meat"));
-            var barFly   = Entity.Create(("Bar", "Fly"));
 
             yield return CreateCase(
                 "Could not cast",
@@ -509,7 +507,7 @@ public partial class ValidateTests : StepTestBase<Validate, Array<Entity>>
 
         var schema = builder.Build();
 
-        var entity = Entity.Create(schema.ToJsonDocument().RootElement);
+        var entity = schema.ConvertToEntity();
 
         var name = entity.TryGetValue("Title").Map(x => x.GetPrimitiveString());
 

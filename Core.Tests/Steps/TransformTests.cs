@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using Json.More;
 using Json.Schema;
+using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.Enums;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
@@ -10,7 +11,7 @@ using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.TestHarness;
 using Reductech.EDR.Core.Util;
 using static Reductech.EDR.Core.TestHarness.StaticHelpers;
-using static Reductech.EDR.Core.Tests.SchemaHelpers;
+using static Reductech.EDR.Core.TestHarness.SchemaHelpers;
 
 namespace Reductech.EDR.Core.Tests.Steps
 {
@@ -39,7 +40,7 @@ public partial class TransformTests : StepTestBase<Transform, Array<Entity>>
                 Action<Transform> setTransform,
                 params string[] expectedLogValues)
             {
-                var schemaEntity = Entity.Create(schema.ToJsonDocument().RootElement);
+                var schemaEntity = schema.ConvertToEntity();
 
                 var transform = new Transform
                 {
@@ -208,7 +209,7 @@ public partial class TransformTests : StepTestBase<Transform, Array<Entity>>
                 ErrorCode expectedErrorCode,
                 params object[] expectedErrorArgs)
             {
-                var schemaEntity = Entity.Create(schema.ToJsonDocument().RootElement);
+                var schemaEntity = schema.ConvertToEntity();
 
                 var enforceSchema = new Transform
                 {

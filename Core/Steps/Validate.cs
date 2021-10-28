@@ -5,8 +5,8 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
-using Json.Schema;
 using Reductech.EDR.Core.Attributes;
+using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.Enums;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
@@ -39,11 +39,6 @@ public sealed class Validate : CompoundStep<Array<Entity>>
 
         var (entityStream, schema, errorBehavior) = r.Value;
 
-        ValidationOptions validationOptions = new()
-        {
-            OutputFormat = OutputFormat.Verbose, RequireFormatValidation = true,
-        };
-
         var newStream = entityStream.SelectMany(ApplySchema);
 
         return newStream;
@@ -55,7 +50,7 @@ public sealed class Validate : CompoundStep<Array<Entity>>
 
             var result = schema.Validate(
                 jsonElement,
-                validationOptions
+                SchemaExtensions.DefaultValidationOptions
             );
 
             if (result.IsValid)
@@ -68,7 +63,7 @@ public sealed class Validate : CompoundStep<Array<Entity>>
                     {
                         var errors =
                             ErrorBuilderList.Combine(
-                                    GetErrorMessages(result)
+                                    result.GetErrorMessages()
                                         .Select(
                                             x => ErrorCode.SchemaViolation.ToErrorBuilder(
                                                 x.message,
@@ -82,7 +77,7 @@ public sealed class Validate : CompoundStep<Array<Entity>>
                     }
                     case Enums.ErrorBehavior.Error:
                     {
-                        foreach (var errorMessage in GetErrorMessages(result))
+                        foreach (var errorMessage in result.GetErrorMessages())
                         {
                             LogWarning(errorMessage);
                         }
@@ -91,7 +86,7 @@ public sealed class Validate : CompoundStep<Array<Entity>>
                     }
                     case Enums.ErrorBehavior.Warning:
                     {
-                        foreach (var errorMessage in GetErrorMessages(result))
+                        foreach (var errorMessage in result.GetErrorMessages())
                         {
                             LogWarning(errorMessage);
                         }
@@ -109,21 +104,6 @@ public sealed class Validate : CompoundStep<Array<Entity>>
                     }
                     default: throw new ArgumentOutOfRangeException(errorBehavior.ToString());
                 }
-            }
-        }
-
-        static IEnumerable<(string message, string location)> GetErrorMessages(
-            ValidationResults validationResults)
-        {
-            if (!validationResults.IsValid)
-            {
-                if (validationResults.Message is not null)
-                    yield return (validationResults.Message,
-                                  validationResults.SchemaLocation.ToString());
-
-                foreach (var nestedResult in validationResults.NestedResults)
-                foreach (var errorMessage in GetErrorMessages(nestedResult))
-                    yield return errorMessage;
             }
         }
 
