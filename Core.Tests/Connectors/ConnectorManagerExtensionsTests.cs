@@ -119,10 +119,7 @@ public class ConnectorManagerExtensionsTests
     {
         var repo = new MockRepository(MockBehavior.Strict);
 
-        var sfs = await _manager.GetStepFactoryStoreAsync(
-            repo.OneOf<IExternalContext>(),
-            repo.OneOf<IRestClientFactory>()
-        );
+        var sfs = await _manager.GetStepFactoryStoreAsync(repo.OneOf<IExternalContext>());
 
         Assert.NotNull(sfs);
     }
@@ -142,10 +139,7 @@ public class ConnectorManagerExtensionsTests
 
         var error =
             await Assert.ThrowsAsync<ConnectorManagerExtensions.ConnectorConfigurationException>(
-                () => manager.GetStepFactoryStoreAsync(
-                    repo.OneOf<IExternalContext>(),
-                    repo.OneOf<IRestClientFactory>()
-                )
+                () => manager.GetStepFactoryStoreAsync(repo.OneOf<IExternalContext>())
             );
 
         Assert.Equal("Could not validate installed connectors.", error.Message);
@@ -174,10 +168,7 @@ public class ConnectorManagerExtensionsTests
 
         var error =
             await Assert.ThrowsAsync<ConnectorManagerExtensions.ConnectorConfigurationException>(
-                () => mock.Object.GetStepFactoryStoreAsync(
-                    repo.OneOf<IExternalContext>(),
-                    repo.OneOf<IRestClientFactory>()
-                )
+                () => mock.Object.GetStepFactoryStoreAsync(repo.OneOf<IExternalContext>())
             );
 
         Assert.Equal(

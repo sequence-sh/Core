@@ -55,7 +55,7 @@ public class StepFactoryStore
     /// <summary>
     /// Creates a StepFactoryStore with steps from the given assemblies
     /// </summary>
-    public static StepFactoryStore CreateFromAssemblies(
+    public static Result<StepFactoryStore, IErrorBuilder> TryCreateFromAssemblies(
         IExternalContext externalContext,
         params Assembly[] assemblies)
     {
@@ -67,7 +67,7 @@ public class StepFactoryStore
             data.Add(new ConnectorData(connectorSettings, assembly));
         }
 
-        return Create(externalContext, data.ToArray());
+        return TryCreate(externalContext, data.ToArray());
     }
 
     /// <summary>
@@ -93,17 +93,18 @@ public class StepFactoryStore
     /// </summary>
     public static StepFactoryStore Create()
     {
-        return Create(null!, Array.Empty<ConnectorData>());
+        return TryCreate(null!, Array.Empty<ConnectorData>()).Value;
     }
 
     /// <summary>
     /// Create a step factory store
     /// </summary>
-    public static StepFactoryStore Create(
+    public static Result<StepFactoryStore, IErrorBuilder> TryCreate(
         IExternalContext externalContext,
         params ConnectorData[] connectorData)
     {
         var stepFactories = new HashSet<IStepFactory>(StepFactoryComparer.Instance);
+        var errors        = new List<IErrorBuilder>();
         var coreAssembly  = typeof(IStep).Assembly;
 
         var coreConnector = new ConnectorData(
@@ -130,29 +131,36 @@ public class StepFactoryStore
             foreach (var dynamicType in assembly
                 .GetTypes()
                 .Where(x => !x.IsAbstract)
-                .Where(x => typeof(IDynamicStepGenerator).IsAssignableFrom(x))
-            )
+                .Where(x => typeof(IDynamicStepGenerator).IsAssignableFrom(x)))
             {
-                stepFactories.UnionWith(
-                    CreateDynamicStepFactories(
-                        dynamicType,
-                        connectorSettings,
-                        externalContext
-                    )
+                var factories = TryCreateDynamicStepFactories(
+                    dynamicType,
+                    connectorSettings,
+                    externalContext
                 );
+
+                if (factories.IsFailure)
+                    errors.Add(factories.Error);
+
+                stepFactories.UnionWith(factories.Value);
             }
         }
 
+        if (errors.Any())
+            return Result.Failure<StepFactoryStore, IErrorBuilder>(
+                ErrorBuilderList.Combine(errors)
+            );
+
         return Create(connectorData, stepFactories);
 
-        static IEnumerable<IStepFactory> CreateDynamicStepFactories(
+        static Result<IReadOnlyList<IStepFactory>, IErrorBuilder> TryCreateDynamicStepFactories(
             Type stepType,
             ConnectorSettings connectorSettings,
             IExternalContext externalContext)
         {
             var generator = (IDynamicStepGenerator)Activator.CreateInstance(stepType)!;
 
-            return generator.CreateStepFactories(
+            return generator.TryCreateStepFactories(
                 connectorSettings,
                 externalContext
             );

@@ -29,11 +29,33 @@ public static class FunctionalExtensions
     }
 
     /// <summary>
+    /// Get the value or throw an exception
+    /// </summary>
+    public static T GetOrThrow<T>(this Result<T, IErrorBuilder> result)
+    {
+        if (result.IsSuccess)
+            return result.Value;
+
+        throw new Exception(result.Error.AsString);
+    }
+
+    /// <summary>
+    /// Get the value or throw an exception
+    /// </summary>
+    public static T GetOrThrow<T>(this Result<T, IError> result)
+    {
+        if (result.IsSuccess)
+            return result.Value;
+
+        throw new Exception(result.Error.AsString);
+    }
+
+    /// <summary>
     /// Casts the result to type T2.
     /// Returns failure if this cast is not possible.
     /// </summary>
     public static Result<T2, TE>
-        BindCast<T1, T2, TE>(this Result<T1, TE> result, TE error) // where T2 : T1
+        BindCast<T1, T2, TE>(this Result<T1, TE> result, TE error)
     {
         if (result.IsFailure)
             return result.ConvertFailure<T2>();

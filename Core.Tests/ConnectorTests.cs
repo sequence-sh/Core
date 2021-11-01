@@ -11,6 +11,7 @@ using Reductech.EDR.Core.Abstractions;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Serialization;
 using Reductech.EDR.Core.TestHarness;
+using Reductech.EDR.Core.Util;
 using Xunit;
 
 namespace Reductech.EDR.Core.Tests
@@ -50,10 +51,11 @@ public partial class ConnectorTests
 
         var mockRepository = new MockRepository(MockBehavior.Strict);
 
-        var stepFactoryStore = StepFactoryStore.Create(
-            mockRepository.OneOf<IExternalContext>(),
-            new ConnectorData(ConnectorSettings.DefaultForAssembly(assembly), assembly)
-        );
+        var stepFactoryStore = StepFactoryStore.TryCreate(
+                mockRepository.OneOf<IExternalContext>(),
+                new ConnectorData(ConnectorSettings.DefaultForAssembly(assembly), assembly)
+            )
+            .GetOrThrow();
 
         var injectedContextsResult = stepFactoryStore.TryGetInjectedContexts();
 

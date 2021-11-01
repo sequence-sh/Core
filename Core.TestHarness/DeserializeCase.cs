@@ -61,10 +61,11 @@ public abstract partial class StepTestBase<TStep, TOutput>
             var tStepAssembly = Assembly.GetAssembly(typeof(TStep))!;
 
             var sfs = StepFactoryStoreToUse.GetValueOrDefault(
-                StepFactoryStore.CreateFromAssemblies(
-                    externalContext,
-                    tStepAssembly
-                )
+                StepFactoryStore.TryCreateFromAssemblies(
+                        externalContext,
+                        tStepAssembly
+                    )
+                    .GetOrThrow()
             );
 
             testOutputHelper.WriteLine(SCL);

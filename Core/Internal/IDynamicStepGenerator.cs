@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
+using CSharpFunctionalExtensions;
 using Reductech.EDR.ConnectorManagement.Base;
 using Reductech.EDR.Core.Abstractions;
+using Reductech.EDR.Core.Internal.Errors;
 
 namespace Reductech.EDR.Core.Internal
 {
@@ -13,7 +15,7 @@ public interface IDynamicStepGenerator
     /// <summary>
     /// Creates step factories.
     /// </summary>
-    IEnumerable<IStepFactory> CreateStepFactories(
+    Result<IReadOnlyList<IStepFactory>, IErrorBuilder> TryCreateStepFactories(
         ConnectorSettings connectorSettings,
         IExternalContext externalContext);
 }
