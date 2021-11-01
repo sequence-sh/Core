@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.ConnectorManagement.Base;
+using Reductech.EDR.Core.Abstractions;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Connectors;
 using Reductech.EDR.Core.Internal.Errors;
@@ -54,7 +55,10 @@ public class StepFactoryStore
     /// <summary>
     /// Creates a StepFactoryStore with steps from the given assemblies
     /// </summary>
-    public static StepFactoryStore CreateFromAssemblies(params Assembly[] assemblies)
+    public static StepFactoryStore CreateFromAssemblies(
+        IExternalContext externalContext,
+        IRestClientFactory restClientFactory,
+        params Assembly[] assemblies)
     {
         var data = new List<ConnectorData>();
 
@@ -64,7 +68,7 @@ public class StepFactoryStore
             data.Add(new ConnectorData(connectorSettings, assembly));
         }
 
-        return Create(data.ToArray());
+        return Create(externalContext, restClientFactory, data.ToArray());
     }
 
     /// <summary>
@@ -86,9 +90,20 @@ public class StepFactoryStore
     }
 
     /// <summary>
+    /// Create a step factory store with just the core steps
+    /// </summary>
+    public static StepFactoryStore Create()
+    {
+        return Create(null!, null!, Array.Empty<ConnectorData>());
+    }
+
+    /// <summary>
     /// Create a step factory store
     /// </summary>
-    public static StepFactoryStore Create(params ConnectorData[] connectorData)
+    public static StepFactoryStore Create(
+        IExternalContext externalContext,
+        IRestClientFactory restClientFactory,
+        params ConnectorData[] connectorData)
     {
         var stepFactories = new HashSet<IStepFactory>(StepFactoryComparer.Instance);
         var coreAssembly  = typeof(IStep).Assembly;
@@ -120,7 +135,14 @@ public class StepFactoryStore
                 .Where(x => typeof(IDynamicStepGenerator).IsAssignableFrom(x))
             )
             {
-                stepFactories.UnionWith(CreateDynamicStepFactories(dynamicType, connectorSettings));
+                stepFactories.UnionWith(
+                    CreateDynamicStepFactories(
+                        dynamicType,
+                        connectorSettings,
+                        externalContext,
+                        restClientFactory
+                    )
+                );
             }
         }
 
@@ -128,11 +150,17 @@ public class StepFactoryStore
 
         static IEnumerable<IStepFactory> CreateDynamicStepFactories(
             Type stepType,
-            ConnectorSettings connectorSettings)
+            ConnectorSettings connectorSettings,
+            IExternalContext externalContext,
+            IRestClientFactory restClientFactory)
         {
             var generator = (IDynamicStepGenerator)Activator.CreateInstance(stepType)!;
 
-            return generator.CreateStepFactories(connectorSettings);
+            return generator.CreateStepFactories(
+                connectorSettings,
+                externalContext,
+                restClientFactory
+            );
         }
 
         static IStepFactory CreateStepFactory(Type stepType)

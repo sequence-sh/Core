@@ -39,15 +39,21 @@ public abstract partial class StepTestBase<TStep, TOutput>
                 new LoggingConfig() { LogLevel = OutputLogLevel }
             );
 
-            var step = await GetStepAsync(testOutputHelper);
+            var mockRepository = new MockRepository(MockBehavior.Strict);
+
+            var externalContext = ExternalContextSetupHelper.GetExternalContext(mockRepository);
+            var restClient      = RESTClientSetupHelper.GetRESTClient(mockRepository, FinalChecks);
+
+            var restClientFactory = new SingleRestClientFactory(restClient);
+
+            var step = await GetStepAsync(externalContext, restClientFactory, testOutputHelper);
 
             if (!ShouldExecute)
                 return;
 
-            var mockRepository = new MockRepository(MockBehavior.Strict);
-
             await using var stateMonad = await GetStateMonad(
-                mockRepository,
+                externalContext,
+                restClientFactory,
                 loggerFactory.CreateLogger("Test")
             );
 
@@ -114,7 +120,10 @@ public abstract partial class StepTestBase<TStep, TOutput>
 
         public virtual LogLevel OutputLogLevel { get; } = LogLevel.Debug;
 
-        public abstract Task<IStep> GetStepAsync(ITestOutputHelper testOutputHelper);
+        public abstract Task<IStep> GetStepAsync(
+            IExternalContext externalContext,
+            IRestClientFactory restClientFactory,
+            ITestOutputHelper testOutputHelper);
 
         public abstract void CheckUnitResult(Result<Unit, IError> result);
         public abstract void CheckOutputResult(Result<TOutput, IError> result);
@@ -132,18 +141,18 @@ public abstract partial class StepTestBase<TStep, TOutput>
         }
 
         public virtual async Task<StateMonad> GetStateMonad(
-            MockRepository mockRepository,
+            IExternalContext externalContext,
+            IRestClientFactory restClientFactory,
             ILogger logger)
         {
-            var externalContext = ExternalContextSetupHelper.GetExternalContext(mockRepository);
-            var restClient      = RESTClientSetupHelper.GetRESTClient(mockRepository, FinalChecks);
-
-            var restClientFactory = new SingleRestClientFactory(restClient);
-
             var tStepAssembly = Assembly.GetAssembly(typeof(TStep))!;
 
             var sfs = StepFactoryStoreToUse.GetValueOrDefault(
-                StepFactoryStore.CreateFromAssemblies(tStepAssembly)
+                StepFactoryStore.CreateFromAssemblies(
+                    externalContext,
+                    restClientFactory,
+                    tStepAssembly
+                )
             );
 
             var stateMonad = new StateMonad(

@@ -4,6 +4,8 @@ using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using FluentAssertions;
 using Microsoft.Extensions.Logging.Abstractions;
+using Moq;
+using Reductech.EDR.Core.Abstractions;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Parser;
 using Reductech.EDR.Core.Internal.Serialization;
@@ -49,9 +51,15 @@ public partial class EntityFormatTests : StepTestBase<EntityFormat, StringStream
 
         TestOutputHelper.WriteLine(formatted);
 
+        var stepFactoryStore = StepFactoryStore.Create();
+
         var parseResult = SCLParsing.TryParseStep(formatted)
-                .Bind(x => x.TryFreeze(SCLRunner.RootCallerMetadata, StepFactoryStore.Create()))
-            ;
+            .Bind(
+                x => x.TryFreeze(
+                    SCLRunner.RootCallerMetadata,
+                    stepFactoryStore
+                )
+            );
 
         parseResult.ShouldBeSuccessful();
 
@@ -62,7 +70,7 @@ public partial class EntityFormatTests : StepTestBase<EntityFormat, StringStream
             parseResult.Value.Run<Entity>(
                 new StateMonad(
                     NullLogger.Instance,
-                    StepFactoryStore.Create(),
+                    stepFactoryStore,
                     null!,
                     null!,
                     new Dictionary<string, object>()

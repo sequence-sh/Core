@@ -4,7 +4,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using AutoTheory;
 using CSharpFunctionalExtensions;
+using Moq;
 using Reductech.EDR.ConnectorManagement.Base;
+using Reductech.EDR.Core.Abstractions;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
@@ -125,7 +127,13 @@ public partial class PropertyRequirementTests
                 connectorData = new[] { new ConnectorData(ConnectorSettings, null) };
             }
 
-            var sfs = StepFactoryStore.Create(connectorData);
+            var mockRepository = new MockRepository(MockBehavior.Strict);
+
+            var sfs = StepFactoryStore.Create(
+                mockRepository.OneOf<IExternalContext>(),
+                mockRepository.OneOf<IRestClientFactory>(),
+                connectorData
+            );
 
             var r = Step.Verify(sfs);
 

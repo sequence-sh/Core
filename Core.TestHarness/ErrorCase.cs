@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using FluentAssertions;
+using Reductech.EDR.Core.Abstractions;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Util;
@@ -42,7 +43,10 @@ public abstract partial class StepTestBase<TStep, TOutput>
         public IError ExpectedError { get; }
 
         /// <inheritdoc />
-        public override async Task<IStep> GetStepAsync(ITestOutputHelper testOutputHelper)
+        public override async Task<IStep> GetStepAsync(
+            IExternalContext externalContext,
+            IRestClientFactory restClientFactory,
+            ITestOutputHelper testOutputHelper)
         {
             await Task.CompletedTask;
             return Step;

@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.ConnectorManagement.Base;
+using Reductech.EDR.Core.Abstractions;
 
 namespace Reductech.EDR.Core.Connectors
 {
@@ -19,6 +20,8 @@ public static class ConnectorManagerExtensions
     /// <returns></returns>
     public static async Task<StepFactoryStore> GetStepFactoryStoreAsync(
         this IConnectorManager connectorManager,
+        IExternalContext externalContext,
+        IRestClientFactory restClientFactory,
         CancellationToken ct = default,
         params ConnectorData[] additionalConnectors)
     {
@@ -36,7 +39,11 @@ public static class ConnectorManagerExtensions
             );
 
         var stepFactoryStore =
-            StepFactoryStore.Create(connectors.Concat(additionalConnectors).ToArray());
+            StepFactoryStore.Create(
+                externalContext,
+                restClientFactory,
+                connectors.Concat(additionalConnectors).ToArray()
+            );
 
         return stepFactoryStore;
     }
