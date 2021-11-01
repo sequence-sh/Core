@@ -16,7 +16,6 @@ namespace Reductech.EDR.Core.Steps.REST
 /// <summary>
 /// A step that calls a rest service
 /// </summary>
-/// <typeparam name="TOutput"></typeparam>
 public abstract class RESTStep<TOutput> : CompoundStep<TOutput>
 {
     /// <summary>

@@ -63,13 +63,14 @@ public partial class GetSettingsTests : StepTestBase<GetSettings, Entity>
 
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
-            var stepFactoryStore = StepFactoryStore.Create(
-                mockRepository.OneOf<IExternalContext>(),
-                new ConnectorData(
-                    newConnectorSettings,
-                    null
+            var stepFactoryStore = StepFactoryStore.TryCreate(
+                    mockRepository.OneOf<IExternalContext>(),
+                    new ConnectorData(
+                        newConnectorSettings,
+                        null
+                    )
                 )
-            );
+                .GetOrThrow();
 
             yield return new StepCase(
                 "Extra Settings",

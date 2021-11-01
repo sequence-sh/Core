@@ -11,6 +11,7 @@ using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.TestHarness;
+using Reductech.EDR.Core.Util;
 using Xunit.Abstractions;
 
 namespace Reductech.EDR.Core.Tests
@@ -129,10 +130,11 @@ public partial class PropertyRequirementTests
 
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
-            var sfs = StepFactoryStore.Create(
-                mockRepository.OneOf<IExternalContext>(),
-                connectorData
-            );
+            var sfs = StepFactoryStore.TryCreate(
+                    mockRepository.OneOf<IExternalContext>(),
+                    connectorData
+                )
+                .GetOrThrow();
 
             var r = Step.Verify(sfs);
 
