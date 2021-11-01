@@ -10,7 +10,6 @@ using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Internal.Logging;
 using Reductech.EDR.Core.Util;
-using RestSharp;
 
 namespace Reductech.EDR.Core
 {
@@ -46,9 +45,6 @@ public sealed class ScopedStateMonad : IStateMonad
 
     /// <inheritdoc />
     public ILogger Logger => BaseStateMonad.Logger;
-
-    /// <inheritdoc />
-    public IRestClientFactory RestClientFactory => BaseStateMonad.RestClientFactory;
 
     /// <inheritdoc />
     public IExternalContext ExternalContext => BaseStateMonad.ExternalContext;

@@ -131,7 +131,9 @@ public sealed class ExternalContextSetupHelper
     private readonly List<(string name, Func<MockRepository, Mock> contextFunc)> _contextMocks =
         new();
 
-    public IExternalContext GetExternalContext(MockRepository mockRepository)
+    public IExternalContext GetExternalContext(
+        MockRepository mockRepository,
+        IRestClientFactory restClientFactory)
     {
         var externalProcessRunner = GetAndSetupMock<IExternalProcessRunner>(mockRepository);
         var console               = GetAndSetupMock<IConsole>(mockRepository);
@@ -148,6 +150,7 @@ public sealed class ExternalContextSetupHelper
 
         var externalContext = new ExternalContext(
             externalProcessRunner,
+            restClientFactory,
             console,
             objects.ToArray()
         );

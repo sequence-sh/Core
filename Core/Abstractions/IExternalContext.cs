@@ -17,6 +17,12 @@ public interface IExternalContext
     public IExternalProcessRunner ExternalProcessRunner { get; }
 
     /// <summary>
+    /// The REST Client Factory.
+    /// Creates REST Clients for interacting with web services.
+    /// </summary>
+    public IRestClientFactory RestClientFactory { get; }
+
+    /// <summary>
     /// For interacting with the console
     /// </summary>
     public IConsole Console { get; }

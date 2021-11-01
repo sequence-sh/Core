@@ -15,8 +15,7 @@ public interface IDynamicStepGenerator
     /// </summary>
     IEnumerable<IStepFactory> CreateStepFactories(
         ConnectorSettings connectorSettings,
-        IExternalContext externalContext,
-        IRestClientFactory restClientFactory);
+        IExternalContext externalContext);
 }
 
 }

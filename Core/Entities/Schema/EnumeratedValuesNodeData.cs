@@ -6,6 +6,9 @@ using Json.Schema;
 namespace Reductech.EDR.Core.Entities.Schema
 {
 
+/// <summary>
+/// Node data for enumerated values. Restricts the possible values of the node to one of several possible values.
+/// </summary>
 [Equatable]
 public partial record EnumeratedValuesNodeData(
     [property: OrderedEquality] IReadOnlyList<EntityValue>? AllowedValues) : NodeData<

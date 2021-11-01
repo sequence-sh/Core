@@ -4,8 +4,6 @@ using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using FluentAssertions;
 using Microsoft.Extensions.Logging.Abstractions;
-using Moq;
-using Reductech.EDR.Core.Abstractions;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Parser;
 using Reductech.EDR.Core.Internal.Serialization;
@@ -71,7 +69,6 @@ public partial class EntityFormatTests : StepTestBase<EntityFormat, StringStream
                 new StateMonad(
                     NullLogger.Instance,
                     stepFactoryStore,
-                    null!,
                     null!,
                     new Dictionary<string, object>()
                 ),

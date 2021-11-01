@@ -88,7 +88,7 @@ public class RequirementJsonConverter : JsonConverter<Requirement>
         /// <summary>
         /// The name of the connector
         /// </summary>
-        public string ConnectorName { get; set; }
+        public string ConnectorName { get; set; } = null!;
 
         public string? VersionKey { get; set; }
         public Version? MinVersion { get; set; }

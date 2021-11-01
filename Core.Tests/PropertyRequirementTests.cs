@@ -131,7 +131,6 @@ public partial class PropertyRequirementTests
 
             var sfs = StepFactoryStore.Create(
                 mockRepository.OneOf<IExternalContext>(),
-                mockRepository.OneOf<IRestClientFactory>(),
                 connectorData
             );
 

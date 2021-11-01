@@ -148,15 +148,16 @@ public partial class RunErrorTests
             var spf  = StepFactoryStore.Create();
             var repo = new MockRepository(MockBehavior.Strict);
 
-            var externalContext   = ExternalContextSetupHelper.GetExternalContext(repo);
             var restClient        = RESTClientSetupHelper.GetRESTClient(repo, FinalChecks);
             var restClientFactory = new SingleRestClientFactory(restClient);
+
+            var externalContext =
+                ExternalContextSetupHelper.GetExternalContext(repo, restClientFactory);
 
             await using var state = new StateMonad(
                 NullLogger.Instance,
                 spf,
                 externalContext,
-                restClientFactory,
                 new Dictionary<string, object>()
             );
 

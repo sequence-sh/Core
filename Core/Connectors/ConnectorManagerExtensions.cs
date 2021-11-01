@@ -41,7 +41,6 @@ public static class ConnectorManagerExtensions
         var stepFactoryStore =
             StepFactoryStore.Create(
                 externalContext,
-                restClientFactory,
                 connectors.Concat(additionalConnectors).ToArray()
             );
 

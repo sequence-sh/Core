@@ -65,7 +65,7 @@ public static class Extensions
         var r = dictionary.TryFind(key);
 
         if (r.HasValue)
-            return r.Value!;
+            return r.GetValueOrThrow()!;
 
         return error()!;
     }
@@ -93,7 +93,7 @@ public static class Extensions
         }
 
         if (first.HasValue && second.HasValue)
-            return (first.Value, second.Value);
+            return (first.GetValueOrThrow(), second.GetValueOrThrow());
 
         return Maybe<(T first, T second)>.None;
     }

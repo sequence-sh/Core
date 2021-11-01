@@ -31,7 +31,8 @@ public class NullConstant : IConstantStep, IConstantFreezableStep
         IStateMonad stateMonad,
         CancellationToken cancellationToken)
     {
-        return Result.Success<T, IError>(default);
+        await Task.CompletedTask;
+        return Result.Success<T, IError>(default!);
     }
 
     /// <inheritdoc />
@@ -47,7 +48,7 @@ public class NullConstant : IConstantStep, IConstantFreezableStep
     public string StepName => "Null";
 
     /// <summary>
-    /// The Text Location
+    /// The Text Location where the Null constant appeared
     /// </summary>
     public TextLocation? TextLocation { get; set; }
 
@@ -103,7 +104,10 @@ public class NullConstant : IConstantStep, IConstantFreezableStep
         return EntityValue.Null.Instance;
     }
 
-    public object ValueObject => null;
+    /// <summary>
+    /// The value
+    /// </summary>
+    public object ValueObject => null!;
 
     /// <inheritdoc />
     string IConstantFreezableStep.Serialize()
