@@ -12,6 +12,7 @@ using Moq;
 using NuGet.Packaging;
 using Reductech.EDR.ConnectorManagement;
 using Reductech.EDR.ConnectorManagement.Base;
+using Reductech.EDR.Core.Abstractions;
 using Reductech.EDR.Core.Connectors;
 using Xunit;
 
@@ -116,7 +117,13 @@ public class ConnectorManagerExtensionsTests
     [Fact]
     public async Task GetStepFactoryStoreAsync_ReturnsStepFactory()
     {
-        var sfs = await _manager.GetStepFactoryStoreAsync();
+        var repo = new MockRepository(MockBehavior.Strict);
+
+        var sfs = await _manager.GetStepFactoryStoreAsync(
+            repo.OneOf<IExternalContext>(),
+            repo.OneOf<IRestClientFactory>()
+        );
+
         Assert.NotNull(sfs);
     }
 
@@ -131,9 +138,14 @@ public class ConnectorManagerExtensionsTests
             _fileSystem
         );
 
+        var repo = new MockRepository(MockBehavior.Strict);
+
         var error =
             await Assert.ThrowsAsync<ConnectorManagerExtensions.ConnectorConfigurationException>(
-                () => manager.GetStepFactoryStoreAsync()
+                () => manager.GetStepFactoryStoreAsync(
+                    repo.OneOf<IExternalContext>(),
+                    repo.OneOf<IRestClientFactory>()
+                )
             );
 
         Assert.Equal("Could not validate installed connectors.", error.Message);
@@ -158,9 +170,14 @@ public class ConnectorManagerExtensionsTests
             _fileSystem
         );
 
+        var repo = new MockRepository(MockBehavior.Strict);
+
         var error =
             await Assert.ThrowsAsync<ConnectorManagerExtensions.ConnectorConfigurationException>(
-                () => mock.Object.GetStepFactoryStoreAsync()
+                () => mock.Object.GetStepFactoryStoreAsync(
+                    repo.OneOf<IExternalContext>(),
+                    repo.OneOf<IRestClientFactory>()
+                )
             );
 
         Assert.Equal(

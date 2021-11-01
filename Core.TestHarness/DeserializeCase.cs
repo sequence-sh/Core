@@ -2,6 +2,7 @@
 using System.Reflection;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
+using Reductech.EDR.Core.Abstractions;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Internal.Parser;
@@ -51,14 +52,21 @@ public abstract partial class StepTestBase<TStep, TOutput>
         public ExpectedOutput ExpectedOutput { get; }
 
         /// <inheritdoc />
-        public override async Task<IStep> GetStepAsync(ITestOutputHelper testOutputHelper)
+        public override async Task<IStep> GetStepAsync(
+            IExternalContext externalContext,
+            IRestClientFactory restClientFactory,
+            ITestOutputHelper testOutputHelper)
         {
             await Task.CompletedTask;
 
             var tStepAssembly = Assembly.GetAssembly(typeof(TStep))!;
 
-            var sfs = StepFactoryStoreToUse.Unwrap(
-                StepFactoryStore.CreateFromAssemblies(tStepAssembly)
+            var sfs = StepFactoryStoreToUse.GetValueOrDefault(
+                StepFactoryStore.CreateFromAssemblies(
+                    externalContext,
+                    restClientFactory,
+                    tStepAssembly
+                )
             );
 
             testOutputHelper.WriteLine(SCL);

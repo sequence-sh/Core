@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using FluentAssertions;
 using MELT;
+using Reductech.EDR.Core.Abstractions;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
@@ -68,7 +69,10 @@ public abstract partial class StepTestBase<TStep, TOutput>
         }
 
         /// <inheritdoc />
-        public override async Task<IStep> GetStepAsync(ITestOutputHelper testOutputHelper)
+        public override async Task<IStep> GetStepAsync(
+            IExternalContext externalContext,
+            IRestClientFactory restClientFactory,
+            ITestOutputHelper testOutputHelper)
         {
             await Task.CompletedTask;
             testOutputHelper.WriteLine("SCL:");
@@ -82,8 +86,12 @@ public abstract partial class StepTestBase<TStep, TOutput>
 
             var tStepAssembly = Assembly.GetAssembly(typeof(TStep))!;
 
-            var sfs = StepFactoryStoreToUse.Unwrap(
-                StepFactoryStore.CreateFromAssemblies(tStepAssembly)
+            var sfs = StepFactoryStoreToUse.GetValueOrDefault(
+                StepFactoryStore.CreateFromAssemblies(
+                    externalContext,
+                    restClientFactory,
+                    tStepAssembly
+                )
             );
 
             var deserializeResult = SCLParsing.TryParseStep(SCLExampleAttribute.SCL);

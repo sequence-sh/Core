@@ -129,7 +129,9 @@ public partial class RegexReplaceTests : StepTestBase<RegexReplace, StringStream
             )
         };
 
-        var verifyResult = step.VerifyThis(StepFactoryStore.Create());
+        var stepFactoryStore = StepFactoryStore.Create();
+
+        var verifyResult = step.VerifyThis(stepFactoryStore);
 
         verifyResult.ShouldBeFailure();
 

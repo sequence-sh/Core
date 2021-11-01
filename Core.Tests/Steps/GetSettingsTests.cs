@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using Moq;
 using Reductech.EDR.ConnectorManagement.Base;
+using Reductech.EDR.Core.Abstractions;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Serialization;
 using Reductech.EDR.Core.Steps;
@@ -59,19 +61,23 @@ public partial class GetSettingsTests : StepTestBase<GetSettings, Entity>
                     )
                 );
 
+            var mockRepository = new MockRepository(MockBehavior.Strict);
+
+            var stepFactoryStore = StepFactoryStore.Create(
+                mockRepository.OneOf<IExternalContext>(),
+                mockRepository.OneOf<IRestClientFactory>(),
+                new ConnectorData(
+                    newConnectorSettings,
+                    null
+                )
+            );
+
             yield return new StepCase(
                 "Extra Settings",
                 new Log<Entity> { Value = new GetSettings() },
                 Unit.Default,
                 entity2.Serialize()
-            ).WithStepFactoryStore(
-                StepFactoryStore.Create(
-                    new ConnectorData(
-                        newConnectorSettings,
-                        null
-                    )
-                )
-            );
+            ).WithStepFactoryStore(stepFactoryStore);
         }
     }
 }

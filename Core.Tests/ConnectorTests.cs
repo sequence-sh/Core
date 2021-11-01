@@ -5,12 +5,12 @@ using System.Threading;
 using System.Threading.Tasks;
 using Reductech.EDR.ConnectorManagement.Base;
 using Divergic.Logging.Xunit;
+using Moq;
 using Reductech.EDR.ConnectorManagement;
 using Reductech.EDR.Core.Abstractions;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Serialization;
 using Reductech.EDR.Core.TestHarness;
-using RestSharp;
 using Xunit;
 
 namespace Reductech.EDR.Core.Tests
@@ -48,7 +48,11 @@ public partial class ConnectorTests
             TestOutputHelper.WriteLine(type.Name);
         }
 
+        var mockRepository = new MockRepository(MockBehavior.Strict);
+
         var stepFactoryStore = StepFactoryStore.Create(
+            mockRepository.OneOf<IExternalContext>(),
+            mockRepository.OneOf<IRestClientFactory>(),
             new ConnectorData(ConnectorSettings.DefaultForAssembly(assembly), assembly)
         );
 
