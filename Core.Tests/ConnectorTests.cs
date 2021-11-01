@@ -52,7 +52,6 @@ public partial class ConnectorTests
 
         var stepFactoryStore = StepFactoryStore.Create(
             mockRepository.OneOf<IExternalContext>(),
-            mockRepository.OneOf<IRestClientFactory>(),
             new ConnectorData(ConnectorSettings.DefaultForAssembly(assembly), assembly)
         );
 
@@ -68,8 +67,7 @@ public partial class ConnectorTests
         var runner = new SCLRunner(
             logger,
             stepFactoryStore,
-            externalContext,
-            DefaultRestClientFactory.Instance
+            externalContext
         );
 
         var r = await

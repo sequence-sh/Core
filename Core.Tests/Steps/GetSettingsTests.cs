@@ -65,7 +65,6 @@ public partial class GetSettingsTests : StepTestBase<GetSettings, Entity>
 
             var stepFactoryStore = StepFactoryStore.Create(
                 mockRepository.OneOf<IExternalContext>(),
-                mockRepository.OneOf<IRestClientFactory>(),
                 new ConnectorData(
                     newConnectorSettings,
                     null

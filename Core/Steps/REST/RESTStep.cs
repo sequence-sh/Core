@@ -53,7 +53,7 @@ public abstract class RESTStep<TOutput> : CompoundStep<TOutput>
 
         request = setBodyResult.Value;
 
-        var restClient = stateMonad.RestClientFactory.CreateRestClient(baseUrl);
+        var restClient = stateMonad.ExternalContext.RestClientFactory.CreateRestClient(baseUrl);
 
         var resultString =
             await request.TryRun(restClient, cancellationToken);

@@ -12,6 +12,7 @@ namespace Reductech.EDR.Core.Abstractions
 /// </summary>
 public sealed record ExternalContext(
     IExternalProcessRunner ExternalProcessRunner,
+    IRestClientFactory RestClientFactory,
     IConsole Console,
     params (string name, object context)[] InjectedContexts) : IExternalContext
 {
@@ -20,6 +21,7 @@ public sealed record ExternalContext(
     /// </summary>
     public static readonly ExternalContext Default = new(
         ExternalProcesses.ExternalProcessRunner.Instance,
+        DefaultRestClientFactory.Instance,
         ConsoleAdapter.Instance
     );
 

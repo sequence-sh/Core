@@ -28,11 +28,6 @@ public interface IStateMonad : IAsyncDisposable
     ILogger Logger { get; }
 
     /// <summary>
-    /// Factory for creating Rest Clients
-    /// </summary>
-    IRestClientFactory RestClientFactory { get; }
-
-    /// <summary>
     /// The external context
     /// </summary>
     IExternalContext ExternalContext { get; }

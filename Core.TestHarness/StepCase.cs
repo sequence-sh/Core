@@ -72,7 +72,6 @@ public abstract partial class StepTestBase<TStep, TOutput>
         /// <inheritdoc />
         public override async Task<IStep> GetStepAsync(
             IExternalContext externalContext,
-            IRestClientFactory restClientFactory,
             ITestOutputHelper testOutputHelper)
         {
             await ValueTask.CompletedTask;
@@ -93,7 +92,6 @@ public abstract partial class StepTestBase<TStep, TOutput>
             var sfs = StepFactoryStoreToUse.GetValueOrDefault(
                 StepFactoryStore.CreateFromAssemblies(
                     externalContext,
-                    restClientFactory,
                     tStepAssembly
                 )
             );

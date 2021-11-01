@@ -54,14 +54,12 @@ public sealed class StateMonad : IStateMonad
         ILogger logger,
         StepFactoryStore stepFactoryStore,
         IExternalContext externalContext,
-        IRestClientFactory restClientFactory,
         IReadOnlyDictionary<string, object> sequenceMetadata)
     {
-        Logger            = logger;
-        StepFactoryStore  = stepFactoryStore;
-        ExternalContext   = externalContext;
-        RestClientFactory = restClientFactory;
-        SequenceMetadata  = sequenceMetadata;
+        Logger           = logger;
+        StepFactoryStore = stepFactoryStore;
+        ExternalContext  = externalContext;
+        SequenceMetadata = sequenceMetadata;
 
         Settings = CreateSettingsEntity(stepFactoryStore);
     }
@@ -80,9 +78,6 @@ public sealed class StateMonad : IStateMonad
     /// The external context
     /// </summary>
     public IExternalContext ExternalContext { get; }
-
-    /// <inheritdoc />
-    public IRestClientFactory RestClientFactory { get; }
 
     /// <summary>
     /// Constant metadata for the entire sequence

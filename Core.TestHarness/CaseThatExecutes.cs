@@ -41,19 +41,19 @@ public abstract partial class StepTestBase<TStep, TOutput>
 
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
-            var externalContext = ExternalContextSetupHelper.GetExternalContext(mockRepository);
-            var restClient      = RESTClientSetupHelper.GetRESTClient(mockRepository, FinalChecks);
-
+            var restClient = RESTClientSetupHelper.GetRESTClient(mockRepository, FinalChecks);
             var restClientFactory = new SingleRestClientFactory(restClient);
 
-            var step = await GetStepAsync(externalContext, restClientFactory, testOutputHelper);
+            var externalContext =
+                ExternalContextSetupHelper.GetExternalContext(mockRepository, restClientFactory);
+
+            var step = await GetStepAsync(externalContext, testOutputHelper);
 
             if (!ShouldExecute)
                 return;
 
             await using var stateMonad = await GetStateMonad(
                 externalContext,
-                restClientFactory,
                 loggerFactory.CreateLogger("Test")
             );
 
@@ -122,7 +122,6 @@ public abstract partial class StepTestBase<TStep, TOutput>
 
         public abstract Task<IStep> GetStepAsync(
             IExternalContext externalContext,
-            IRestClientFactory restClientFactory,
             ITestOutputHelper testOutputHelper);
 
         public abstract void CheckUnitResult(Result<Unit, IError> result);
@@ -142,7 +141,6 @@ public abstract partial class StepTestBase<TStep, TOutput>
 
         public virtual async Task<StateMonad> GetStateMonad(
             IExternalContext externalContext,
-            IRestClientFactory restClientFactory,
             ILogger logger)
         {
             var tStepAssembly = Assembly.GetAssembly(typeof(TStep))!;
@@ -150,7 +148,6 @@ public abstract partial class StepTestBase<TStep, TOutput>
             var sfs = StepFactoryStoreToUse.GetValueOrDefault(
                 StepFactoryStore.CreateFromAssemblies(
                     externalContext,
-                    restClientFactory,
                     tStepAssembly
                 )
             );
@@ -159,7 +156,6 @@ public abstract partial class StepTestBase<TStep, TOutput>
                 logger,
                 sfs,
                 externalContext,
-                restClientFactory,
                 new Dictionary<string, object>()
             );
 

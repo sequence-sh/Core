@@ -116,7 +116,6 @@ public partial class StateMonadTests
                 repo.OneOf<ILogger>(),
                 StepFactoryStore.Create(),
                 repo.OneOf<IExternalContext>(),
-                repo.OneOf<IRestClientFactory>(),
                 repo.OneOf<IReadOnlyDictionary<string, object>>()
             );
     }

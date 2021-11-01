@@ -12,7 +12,6 @@ using Reductech.EDR.Core.Internal.Parser;
 using Reductech.EDR.Core.Internal.Serialization;
 using Reductech.EDR.Core.TestHarness;
 using Reductech.EDR.Core.Util;
-using RestSharp;
 using Xunit;
 using Xunit.Abstractions;
 using Xunit.Sdk;
@@ -59,7 +58,6 @@ public partial class ExampleTests
             TestOutputHelper.BuildLogger(),
             sfs,
             ExternalContext.Default,
-            DefaultRestClientFactory.Instance,
             new Dictionary<string, object>()
         );
 
@@ -106,8 +104,7 @@ Log (RestGETStream 'https://en.wikipedia.org/api/rest_v1/page/pdf/Edgar_Allan_Po
         var runner = new SCLRunner(
             logger,
             sfs,
-            ExternalContext.Default,
-            DefaultRestClientFactory.Instance
+            ExternalContext.Default
         );
 
         var r = await runner.RunSequenceFromTextAsync(
