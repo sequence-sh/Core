@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
+using OneOf;
 using Reductech.EDR.ConnectorManagement.Base;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal;
@@ -206,37 +207,54 @@ public partial class GenerateDocumentationTests : StepTestBase<GenerateDocumenta
             ) { TestDeserializeAndRun = false }.WithStepFactoryStore(
                 StepFactoryStore.Create(
                     Array.Empty<ConnectorData>(),
-                    new[] { DocumentationExampleStepFactory.Instance }
+                    new[] { DocumentationExampleStep.DocumentationExampleStepFactory.Instance }
+                )
+            );
+
+            var logFirstTenPageTitles = new ForEach<Entity>()
+            {
+                Action =
+                    new LambdaFunction<Entity, Unit>(
+                        null,
+                        new Log<StringStream>()
+                        {
+                            Value =
+                                new EntityGetValue<StringStream>()
+                                {
+                                    Entity   = new GetAutomaticVariable<Entity>(),
+                                    Property = new StringConstant("Title")
+                                }
+                        }
+                    ),
+                Array = new ArrayTake<Entity>()
+                {
+                    Array = new EntityGetValue<Array<Entity>>()
+                    {
+                        Entity   = new GenerateDocumentation(),
+                        Property = new StringConstant("AllPages")
+                    },
+                    Count = new IntConstant(10)
+                }
+            };
+
+            yield return new StepCase(
+                "OneOfEnums",
+                logFirstTenPageTitles,
+                Unit.Default,
+                "all",
+                "Tests",
+                "DocumentationExampleStep2",
+                "TextCase"
+            ) { TestDeserializeAndRun = false }.WithStepFactoryStore(
+                StepFactoryStore.Create(
+                    Array.Empty<ConnectorData>(),
+                    new[] { new DocumentationExampleStep2().StepFactory }
                 )
             );
 
             yield return new StepCase(
                 "Test all Step Names",
-                new ForEach<Entity>()
-                {
-                    Action =
-                        new LambdaFunction<Entity, Unit>(
-                            null,
-                            new Log<StringStream>()
-                            {
-                                Value =
-                                    new EntityGetValue<StringStream>()
-                                    {
-                                        Entity   = new GetAutomaticVariable<Entity>(),
-                                        Property = new StringConstant("Title")
-                                    }
-                            }
-                        ),
-                    Array = new ArrayTake<Entity>()
-                    {
-                        Array = new EntityGetValue<Array<Entity>>()
-                        {
-                            Entity   = new GenerateDocumentation(),
-                            Property = new StringConstant("AllPages")
-                        },
-                        Count = new IntConstant(10)
-                    }
-                },
+                logFirstTenPageTitles,
                 Unit.Default,
                 "all",
                 "Core",
@@ -264,26 +282,26 @@ public partial class GenerateDocumentationTests : StepTestBase<GenerateDocumenta
         get { yield break; }
     }
 
-    private class
-        DocumentationExampleStepFactory : SimpleStepFactory<DocumentationExampleStep, StringStream>
+    private class DocumentationExampleStep2 : CompoundStep<StringStream>
     {
-        private DocumentationExampleStepFactory() { }
-
-        public static SimpleStepFactory<DocumentationExampleStep, StringStream> Instance { get; } =
-            new DocumentationExampleStepFactory();
-
         /// <inheritdoc />
-        public override IEnumerable<Requirement> Requirements
+        protected override async Task<Result<StringStream, IError>> Run(
+            IStateMonad stateMonad,
+            CancellationToken cancellationToken)
         {
-            get
-            {
-                yield return new VersionRequirement("ValueIf Library", "Version", new Version(1, 2))
-                    { };
-            }
+            throw new Exception("Cannot run Documentation Example Step");
         }
 
+        /// <summary>
+        /// The alpha property. Required.
+        /// </summary>
+        [StepProperty(2)]
+        [Required]
+        public IStep<OneOf<int, Enums.TextCase>> Alpha { get; set; } = null!;
+
         /// <inheritdoc />
-        public override string Category => "Examples";
+        public override IStepFactory StepFactory { get; } =
+            new SimpleStepFactory<DocumentationExampleStep2, StringStream>();
     }
 
     private class DocumentationExampleStep : CompoundStep<StringStream>
@@ -338,6 +356,35 @@ public partial class GenerateDocumentationTests : StepTestBase<GenerateDocumenta
 
         /// <inheritdoc />
         public override IStepFactory StepFactory => DocumentationExampleStepFactory.Instance;
+
+        public class
+            DocumentationExampleStepFactory : SimpleStepFactory<DocumentationExampleStep,
+                StringStream>
+        {
+            private DocumentationExampleStepFactory() { }
+
+            public static SimpleStepFactory<DocumentationExampleStep, StringStream> Instance
+            {
+                get;
+            } =
+                new DocumentationExampleStepFactory();
+
+            /// <inheritdoc />
+            public override IEnumerable<Requirement> Requirements
+            {
+                get
+                {
+                    yield return new VersionRequirement(
+                        "ValueIf Library",
+                        "Version",
+                        new Version(1, 2)
+                    );
+                }
+            }
+
+            /// <inheritdoc />
+            public override string Category => "Examples";
+        }
     }
 }
 
