@@ -95,8 +95,7 @@ public static class DocumentationCreator
             {
                 enumTypes.UnionWith(
                     doc.Parameters.Select(x => x.ActualType)
-                        .Select(x => Nullable.GetUnderlyingType(x) ?? x)
-                        .Where(t => !t.IsSignatureType && t.IsEnum)
+                        .SelectMany(GetEnumTypes)
                 );
 
                 var stepPage = GetStepPage(doc);
@@ -104,6 +103,19 @@ public static class DocumentationCreator
             }
 
             documentationCategories.Add(new DocumentationCategory(categoryContents, stepPages));
+        }
+
+        static IEnumerable<Type> GetEnumTypes(Type type)
+        {
+            type = Nullable.GetUnderlyingType(type) ?? type;
+
+            if (!type.IsSignatureType && type.IsEnum)
+                yield return type;
+
+            else if (type.IsGenericType)
+                foreach (var gta in type.GenericTypeArguments)
+                foreach (var enumType in GetEnumTypes(gta))
+                    yield return enumType;
         }
 
         var enums = new List<EnumPage>();
