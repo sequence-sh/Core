@@ -160,6 +160,15 @@ namespace Reductech.EDR.Core.Internal.Errors {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Could not Create StepFactoryStore: {0}.
+        /// </summary>
+        internal static string CouldNotCreateStepFactoryStore {
+            get {
+                return ResourceManager.GetString("CouldNotCreateStepFactoryStore", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Could not parse &apos;{0}&apos; as {1}.
         /// </summary>
         internal static string CouldNotParse {

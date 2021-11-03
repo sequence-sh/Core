@@ -141,8 +141,8 @@ public class StepFactoryStore
 
                 if (factories.IsFailure)
                     errors.Add(factories.Error);
-
-                stepFactories.UnionWith(factories.Value);
+                else
+                    stepFactories.UnionWith(factories.Value);
             }
         }
 

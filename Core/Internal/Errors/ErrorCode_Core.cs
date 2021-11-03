@@ -413,6 +413,12 @@ public sealed record ErrorCode : ErrorCodeBase
                 WrongVariableType)
         );
 
+    /// <summary>
+    /// Could not Create StepFactoryStore: {0}
+    /// </summary>
+    public static readonly ErrorCode
+        CouldNotCreateStepFactoryStore = new(nameof(CouldNotCreateStepFactoryStore));
+
 #endregion
 }
 

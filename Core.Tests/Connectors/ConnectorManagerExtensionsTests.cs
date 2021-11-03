@@ -6,6 +6,7 @@ using System.IO.Abstractions.TestingHelpers;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
+using FluentAssertions;
 using MELT;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -14,6 +15,8 @@ using Reductech.EDR.ConnectorManagement;
 using Reductech.EDR.ConnectorManagement.Base;
 using Reductech.EDR.Core.Abstractions;
 using Reductech.EDR.Core.Connectors;
+using Reductech.EDR.Core.Internal.Errors;
+using Reductech.EDR.Core.TestHarness;
 using Xunit;
 
 namespace Reductech.EDR.Core.Tests.Connectors
@@ -121,7 +124,7 @@ public class ConnectorManagerExtensionsTests
 
         var sfs = await _manager.GetStepFactoryStoreAsync(repo.OneOf<IExternalContext>());
 
-        Assert.NotNull(sfs);
+        sfs.ShouldBeSuccessful();
     }
 
     [Fact]
@@ -137,16 +140,19 @@ public class ConnectorManagerExtensionsTests
 
         var repo = new MockRepository(MockBehavior.Strict);
 
-        var error =
-            await Assert.ThrowsAsync<ConnectorManagerExtensions.ConnectorConfigurationException>(
-                () => manager.GetStepFactoryStoreAsync(repo.OneOf<IExternalContext>())
-            );
+        var r = await manager.GetStepFactoryStoreAsync(repo.OneOf<IExternalContext>());
 
-        Assert.Equal("Could not validate installed connectors.", error.Message);
+        r.ShouldBeFailure();
+
+        r.Error.Should()
+            .Be(
+                ErrorCode.CouldNotCreateStepFactoryStore
+                    .ToErrorBuilder("Could not validate installed connectors.")
+            );
     }
 
     [Fact]
-    public async Task GetStepFactoryStoreAsync_WhenSame_Throws()
+    public async Task GetStepFactoryStoreAsync_WhenSame_ReturnsError()
     {
         await _config.AddAsync(
             "Reductech.EDR.Connectors.StructuredData -old",
@@ -166,15 +172,17 @@ public class ConnectorManagerExtensionsTests
 
         var repo = new MockRepository(MockBehavior.Strict);
 
-        var error =
-            await Assert.ThrowsAsync<ConnectorManagerExtensions.ConnectorConfigurationException>(
-                () => mock.Object.GetStepFactoryStoreAsync(repo.OneOf<IExternalContext>())
-            );
+        var r = await mock.Object.GetStepFactoryStoreAsync(repo.OneOf<IExternalContext>());
 
-        Assert.Equal(
-            "When using multiple configurations with the same connector id, at most one can be enabled.",
-            error.Message
-        );
+        r.ShouldBeFailure();
+
+        r.Error.Should()
+            .Be(
+                ErrorCode.CouldNotCreateStepFactoryStore
+                    .ToErrorBuilder(
+                        "When using multiple configurations with the same connector id, at most one can be enabled."
+                    )
+            );
     }
 }
 
