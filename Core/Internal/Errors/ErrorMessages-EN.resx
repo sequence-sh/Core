@@ -150,6 +150,9 @@
   <data name="CouldNotConvertEntityValue" xml:space="preserve">
     <value>Could not convert entity value to {0}.</value>
   </data>
+  <data name="CouldNotCreateStepFactoryStore" xml:space="preserve">
+    <value>Could not Create StepFactoryStore: {0}</value>
+  </data>
   <data name="CouldNotParse" xml:space="preserve">
     <value>Could not parse '{0}' as {1}</value>
   </data>
