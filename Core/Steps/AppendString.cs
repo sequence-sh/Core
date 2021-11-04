@@ -59,7 +59,8 @@ public sealed class AppendString : CompoundStep<Unit>
             Variable,
             new StringStream(newValue),
             false,
-            this
+            this,
+            cancellationToken
         );
 
         if (r.IsFailure)
@@ -94,7 +95,9 @@ public sealed class AppendString : CompoundStep<Unit>
 
             yield return new(
                 vn.Value,
-                TypeReference.Actual.String, freezableStepData.Location);
+                TypeReference.Actual.String,
+                freezableStepData.Location
+            );
         }
     }
 }

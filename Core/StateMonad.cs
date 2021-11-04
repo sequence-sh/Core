@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Microsoft.Extensions.Logging;
@@ -162,18 +163,35 @@ public sealed class StateMonad : IStateMonad
         VariableName key,
         T variable,
         bool disposeOld,
-        IStep? callingStep)
+        IStep? callingStep,
+        CancellationToken cancellation)
     {
         if (Disposed)
             throw new ObjectDisposedException("State Monad was disposed");
 
         await RemoveVariableAsync(key, disposeOld, callingStep);
 
+        object value;
+
+        if (variable is IArray arrayVariable)
+        {
+            var result = await arrayVariable.EnsureEvaluated(cancellation);
+
+            if (result.IsFailure)
+                return result.ConvertFailure<Unit>();
+
+            value = result.Value;
+        }
+        else
+        {
+            value = variable!;
+        }
+
         _stateDictionary
             .AddOrUpdate(
                 key,
-                _ => variable!,
-                (_, _) => variable!
+                _ => value,
+                (_, _) => value
             );
 
         return Unit.Default;

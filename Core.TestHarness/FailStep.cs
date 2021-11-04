@@ -75,7 +75,8 @@ public abstract partial class StepTestBase<TStep, TOutput>
                                 FooVariableName(),
                                 defaultVariableValue,
                                 true,
-                                null
+                                null,
+                                CancellationToken.None
                             )
                         );
                     }

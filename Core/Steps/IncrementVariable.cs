@@ -49,7 +49,8 @@ public sealed class IncrementVariable : CompoundStep<Unit>
             Variable,
             variable.Value + amount.Value,
             false,
-            this
+            this,
+            cancellationToken
         );
 
         return r;

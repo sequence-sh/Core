@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Microsoft.Extensions.Logging;
@@ -86,14 +87,31 @@ public sealed class ScopedStateMonad : IStateMonad
         VariableName key,
         T variable,
         bool disposeOld,
-        IStep? callingStep)
+        IStep? callingStep,
+        CancellationToken cancellation)
     {
         await RemoveVariableAsync(key, disposeOld, callingStep);
 
+        object value;
+
+        if (variable is IArray arrayVariable)
+        {
+            var result = await arrayVariable.EnsureEvaluated(cancellation);
+
+            if (result.IsFailure)
+                return result.ConvertFailure<Unit>();
+
+            value = result.Value;
+        }
+        else
+        {
+            value = variable!;
+        }
+
         _scopedStateDictionary.AddOrUpdate(
             key,
-            _ => variable!,
-            (_, _) => variable!
+            _ => value,
+            (_, _) => value
         );
 
         return Unit.Default;
