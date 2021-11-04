@@ -512,14 +512,14 @@ public abstract record EntityValue(object? ObjectValue)
     /// <summary>
     /// Create an entity from an object
     /// </summary>
-    public static EntityValue CreateFromObject(object? argValue, char? multiValueDelimiter = null)
+    public static EntityValue CreateFromObject(object? argValue)
     {
         switch (argValue)
         {
             case null:             return Null.Instance;
             case EntityValue ev:   return ev;
-            case StringStream ss1: return CreateFromString(ss1.GetString(), multiValueDelimiter);
-            case string s:         return CreateFromString(s,               multiValueDelimiter);
+            case StringStream ss1: return CreateFromString(ss1.GetString());
+            case string s:         return CreateFromString(s);
             case int i:            return new Integer(i);
             case byte @byte:       return new Integer(@byte);
             case short @short:     return new Integer(@short);
@@ -557,7 +557,7 @@ public abstract record EntityValue(object? ObjectValue)
             case IEnumerable e2:
             {
                 var newEnumerable = e2.Cast<object>()
-                    .Select(v => CreateFromObject(v, multiValueDelimiter))
+                    .Select(v => CreateFromObject(v))
                     .ToImmutableList();
 
                 if (!newEnumerable.Any())
@@ -594,20 +594,10 @@ public abstract record EntityValue(object? ObjectValue)
             }
         }
 
-        static EntityValue CreateFromString(string s, char? multiValueDelimiter)
+        static EntityValue CreateFromString(string s)
         {
             if (string.IsNullOrWhiteSpace(s))
                 return Null.Instance;
-
-            if (multiValueDelimiter == null)
-                return new String(s);
-
-            var stringArray = s.Split(multiValueDelimiter.Value);
-
-            if (stringArray.Length > 1)
-                return new NestedList(
-                    stringArray.Select(s => new String(s)).ToImmutableList<EntityValue>()
-                );
 
             return new String(s);
         }

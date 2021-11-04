@@ -99,7 +99,8 @@ public sealed class For : CompoundStep<Unit>
                 variableName,
                 currentValue,
                 false,
-                this
+                this,
+                cancellationToken
             );
 
             if (setResult2.IsFailure)

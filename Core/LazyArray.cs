@@ -66,6 +66,15 @@ public sealed record LazyArray<T>
     public override Array<T> Skip(int count) => new LazyArray<T>(AsyncEnumerable.Skip(count));
 
     /// <inheritdoc />
+    public override Task<Result<IArray, IError>> EnsureEvaluated(CancellationToken cancellation)
+    {
+        var r = Evaluate(cancellation)
+            .Map(x => x as IArray);
+
+        return r;
+    }
+
+    /// <inheritdoc />
     public override async Task<Result<EagerArray<T>, IError>> Evaluate(
         CancellationToken cancellation)
     {

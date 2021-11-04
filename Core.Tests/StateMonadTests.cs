@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Microsoft.Extensions.Logging;
 using Moq;
-using Reductech.EDR.ConnectorManagement.Base;
 using Reductech.EDR.Core.Abstractions;
 using Reductech.EDR.Core.Internal;
-using RestSharp;
 using Xunit;
 
 namespace Reductech.EDR.Core.Tests
@@ -31,7 +30,13 @@ public partial class StateMonadTests
         sd.Setup(x => x.DisposeAsync(monad)).Returns(Task.CompletedTask);
         sd.Setup(x => x.Dispose());
 
-        await monad.SetVariableAsync(new VariableName("V"), sd.Object, false, null);
+        await monad.SetVariableAsync(
+            new VariableName("V"),
+            sd.Object,
+            false,
+            null,
+            CancellationToken.None
+        );
 
         await monad.RemoveVariableAsync(new VariableName("V"), true, null);
 
@@ -51,7 +56,13 @@ public partial class StateMonadTests
         sd.Setup(x => x.DisposeAsync(monad)).Returns(Task.CompletedTask);
         sd.Setup(x => x.Dispose());
 
-        await monad.SetVariableAsync(new VariableName("V"), sd.Object, false, null);
+        await monad.SetVariableAsync(
+            new VariableName("V"),
+            sd.Object,
+            false,
+            null,
+            CancellationToken.None
+        );
 
         await monad.DisposeAsync();
 
@@ -76,7 +87,13 @@ public partial class StateMonadTests
         sd.Setup(x => x.DisposeAsync(scopedMonad)).Returns(Task.CompletedTask);
         sd.Setup(x => x.Dispose());
 
-        await scopedMonad.SetVariableAsync(new VariableName("V"), sd.Object, false, null);
+        await scopedMonad.SetVariableAsync(
+            new VariableName("V"),
+            sd.Object,
+            false,
+            null,
+            CancellationToken.None
+        );
 
         await scopedMonad.RemoveVariableAsync(new VariableName("V"), true, null);
 
@@ -102,7 +119,13 @@ public partial class StateMonadTests
         sd.Setup(x => x.DisposeAsync(scopedMonad)).Returns(Task.CompletedTask);
         sd.Setup(x => x.Dispose());
 
-        await scopedMonad.SetVariableAsync(new VariableName("V"), sd.Object, false, null);
+        await scopedMonad.SetVariableAsync(
+            new VariableName("V"),
+            sd.Object,
+            false,
+            null,
+            CancellationToken.None
+        );
 
         await scopedMonad.DisposeAsync();
 

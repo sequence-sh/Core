@@ -80,7 +80,7 @@ public sealed class RunSCL : CompoundStep<Unit>
                 this
             ); //Remove the variable to prevent it being disposed
 
-            await stateMonad.SetVariableAsync(variable, valueV, true, this);
+            await stateMonad.SetVariableAsync(variable, valueV, true, this, cancellationToken);
         }
 
         return Unit.Default;

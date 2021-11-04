@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -168,6 +169,9 @@ public abstract record Array<T> : IArray
     /// <inheritdoc />
     public abstract Result<Array<TElement>, IErrorBuilder> TryConvertElements<TElement>();
 
+    /// <inheritdoc />
+    public abstract Task<Result<IArray, IError>> EnsureEvaluated(CancellationToken cancellation);
+
     /// <summary>
     /// Create an array by converting elements
     /// </summary>
@@ -243,6 +247,12 @@ public interface IArray
     /// Attempts to convert the elements of the array to the chosen type
     /// </summary>
     Result<Array<TElement>, IErrorBuilder> TryConvertElements<TElement>();
+
+    /// <summary>
+    /// Ensure that this array is evaluated
+    /// </summary>
+    [Pure]
+    Task<Result<IArray, IError>> EnsureEvaluated(CancellationToken cancellation);
 }
 
 /// <summary>

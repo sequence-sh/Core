@@ -262,10 +262,10 @@ public partial class GenerateDocumentationTests : StepTestBase<GenerateDocumenta
                 "AppendString",
                 "ArrayConcat",
                 "ArrayDistinct",
-                "ArrayEvaluate",
                 "ArrayFilter",
                 "ArrayFirst",
-                "ArrayGroupBy"
+                "ArrayGroupBy",
+                "ArrayIsEmpty"
             );
         }
     }

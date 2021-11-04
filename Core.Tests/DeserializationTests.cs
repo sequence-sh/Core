@@ -694,7 +694,7 @@ Log 'Comments!'",
 
             yield return new DeserializationTestInstance(
                 @"
-- <docs> = (a: [1,2,3])['a'] | Evaluate
+- <docs> = (a: [1,2,3])['a'] | arrayskip 0
 - log <docs>
 ",
                 "3 Elements"
@@ -702,9 +702,9 @@ Log 'Comments!'",
 
             yield return new DeserializationTestInstance(
                 @"
-- <docs> = (GenerateDocumentation)['AllPages'] | Evaluate
-- <docs>
-| arraytake 1 | ForEach (<entityVar> =>
+- <docs> = (GenerateDocumentation)['AllPages'] | arraytake 1
+- <docs> 
+ | ForEach (<entityVar> =>
     log (stringtrim <entityVar>['FileName'])
   )",
                 "all.md"
@@ -726,6 +726,20 @@ Log 'Comments!'",
             );
 
             yield return new DeserializationTestInstance("ValueIf  condition:false then:(log 't')");
+
+            yield return new DeserializationTestInstance(
+                @"
+- <array> = [1,2,3] | ArrayMap (<> * 2)
+- Foreach <array> (log <>)
+- Foreach <array> (log <>)
+",
+                2,
+                4,
+                6,
+                2,
+                4,
+                6
+            );
         }
     }
 }

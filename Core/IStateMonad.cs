@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Microsoft.Extensions.Logging;
@@ -60,7 +61,8 @@ public interface IStateMonad : IAsyncDisposable
         VariableName key,
         T variable,
         bool disposeOld,
-        IStep? callingStep);
+        IStep? callingStep,
+        CancellationToken cancellation);
 
     /// <summary>
     /// Removes the variable if it exists.
