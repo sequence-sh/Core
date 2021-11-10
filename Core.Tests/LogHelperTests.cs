@@ -22,6 +22,8 @@ public class LogHelperTests
             "params",
             "step",
             new TextLocation("Text", new TextPosition(1, 1, 1), new TextPosition(2, 2, 2)),
+            LogSituation.SequenceStarted,
+            DateTime.MinValue,
             new ReadOnlyDictionary<string, object>(new Dictionary<string, object>())
         );
 
