@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
 using Reductech.EDR.Core.Internal.Errors;
@@ -15,6 +16,8 @@ public record LogMessage(
     object? MessageParams,
     string? StepName,
     TextLocation? Location,
+    LogSituationBase? LogSituation,
+    DateTime DateTime,
     IReadOnlyDictionary<string, object> SequenceInfo) : IEnumerable<KeyValuePair<string, object>
 >
 {
@@ -32,6 +35,10 @@ public record LogMessage(
         if (Location is not null)
             yield return new KeyValuePair<string, object>(nameof(Location), Location);
 
+        if (LogSituation is not null)
+            yield return new KeyValuePair<string, object>(nameof(LogSituation), LogSituation);
+
+        yield return new KeyValuePair<string, object>(nameof(DateTime),     DateTime);
         yield return new KeyValuePair<string, object>(nameof(SequenceInfo), SequenceInfo);
     }
 
@@ -77,20 +84,22 @@ public static class LogHelper
     {
         var logLevel = situation.LogLevel;
 
-        if (logger.IsEnabled(logLevel))
-        {
-            var q = situation.GetLocalizedString(args);
+        if (!logger.IsEnabled(logLevel))
+            return;
 
-            var logMessage = new LogMessage(
-                q.message,
-                q.properties,
-                step?.Name,
-                step?.TextLocation,
-                sequenceMetadata
-            );
+        var (message, properties) = situation.GetLocalizedString(args);
 
-            logger.Log(logLevel, default, logMessage, null, (x, _) => x.ToString());
-        }
+        var logMessage = new LogMessage(
+            message,
+            properties,
+            step?.Name,
+            step?.TextLocation,
+            situation,
+            DateTime.Now,
+            sequenceMetadata
+        );
+
+        logger.Log(logLevel, default, logMessage, null, (x, _) => x.ToString());
     }
 
     /// <summary>
@@ -109,6 +118,8 @@ public static class LogHelper
             null,
             step?.Name,
             step?.TextLocation,
+            null,
+            DateTime.Now,
             monad.SequenceMetadata
         );
 
