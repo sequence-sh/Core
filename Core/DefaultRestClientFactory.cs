@@ -1,4 +1,6 @@
-﻿using RestSharp;
+﻿using System.Text.Json;
+using RestSharp;
+using RestSharp.Serializers.SystemTextJson;
 
 namespace Reductech.EDR.Core
 {
@@ -18,7 +20,13 @@ public class DefaultRestClientFactory : IRestClientFactory
     /// <inheritdoc />
     public IRestClient CreateRestClient(string baseUri)
     {
-        return new RestClient(baseUri);
+        var client = new RestClient(baseUri);
+
+        client.UseSystemTextJson(
+            new JsonSerializerOptions() { PropertyNameCaseInsensitive = false }
+        );
+
+        return client;
     }
 }
 
