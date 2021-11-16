@@ -19,7 +19,7 @@ public partial class GetAutomaticVariableTests : StepTestBase<GetAutomaticVariab
                 "Basic use",
                 new Log<int>
                 {
-                    Value = new ElementAtIndex<int>
+                    Value = new ArrayElementAtIndex<int>
                     {
                         Index = Constant(0),
                         Array = new ArrayMap<int>
@@ -48,7 +48,7 @@ public partial class GetAutomaticVariableTests : StepTestBase<GetAutomaticVariab
                 "Basic use with different variable name",
                 new Log<int>()
                 {
-                    Value = new ElementAtIndex<int>()
+                    Value = new ArrayElementAtIndex<int>()
                     {
                         Index = Constant(0),
                         Array = new ArrayMap<int>()
@@ -79,7 +79,7 @@ public partial class GetAutomaticVariableTests : StepTestBase<GetAutomaticVariab
                 "Nested",
                 new Log<int>()
                 {
-                    Value = new ElementAtIndex<int>()
+                    Value = new ArrayElementAtIndex<int>()
                     {
                         Index = Constant(0),
                         Array = new ArrayMap<int>()
@@ -93,7 +93,7 @@ public partial class GetAutomaticVariableTests : StepTestBase<GetAutomaticVariab
                                         new List<IStep<int>>()
                                         {
                                             new GetAutomaticVariable<int>(),
-                                            new ElementAtIndex<int>()
+                                            new ArrayElementAtIndex<int>()
                                             {
                                                 Array = new ArrayMap<int>()
                                                 {

@@ -69,13 +69,13 @@ public partial class RunErrorTests
 
             yield return new ErrorTestFunction(
                 "Array Index minus one",
-                new ElementAtIndex<bool> { Array = Array(true), Index = Constant(-1) },
+                new ArrayElementAtIndex<bool> { Array = Array(true), Index = Constant(-1) },
                 new ErrorBuilder(ErrorCode.IndexOutOfBounds)
             );
 
             yield return new ErrorTestFunction(
                 "Array Index out of bounds",
-                new ElementAtIndex<bool>
+                new ArrayElementAtIndex<bool>
                 {
                     Array = new ArrayNew<bool>
                     {

@@ -325,7 +325,7 @@ Log 'Comments!'",
             yield return new DeserializationTestInstance(
                 @"
 - <ArrayVar> =  ['abc', '123']
-- Log(ElementAtIndex <ArrayVar> 1)",
+- Log(ArrayElementAtIndex <ArrayVar> 1)",
                 "123"
             );
 
@@ -371,7 +371,7 @@ Log 'Comments!'",
                 @"
 - <ArrayVar> = ['abc', 'def']
 - <Sorted> = (ArraySort <ArrayVar>)
-- Log (ElementAtIndex <Sorted> 0)",
+- Log (ArrayElementAtIndex <Sorted> 0)",
                 "abc"
             );
 
