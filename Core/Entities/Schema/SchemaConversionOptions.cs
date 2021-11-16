@@ -21,7 +21,7 @@ public record SchemaConversionOptions(
     {
         if (DateInputFormats is not null)
         {
-            foreach (var format in DateInputFormats.GetFormats(path))
+            foreach (var format in DateInputFormats.GetFormats(path.TrimStart('/')))
             {
                 if (DateTime.TryParseExact(
                         value,

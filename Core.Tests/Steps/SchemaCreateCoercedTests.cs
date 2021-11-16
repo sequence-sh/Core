@@ -146,6 +146,52 @@ public partial class SchemaCreateCoercedTests : StepTestBase<SchemaCreateCoerced
                     .Build()
                     .ConvertToEntity()
             );
+
+            yield return new StepCase(
+                "Create Schema with path dependent specified type conversions",
+                new SchemaCreateCoerced()
+                {
+                    SchemaName = Constant("Test Schema"),
+                    Entities = Array(
+                        Entity.Create(
+                            ("BoolProp", "untrue"),
+                            ("NullProp", "nothing"),
+                            ("DateProp1", "1990-01-06"),
+                            ("DateProp2", "06-01-1990")
+                        )
+                    ),
+                    BooleanFalseFormats =
+                        new OneOfStep<StringStream, Array<StringStream>, Entity>(
+                            Constant("untrue")
+                        ),
+                    NullFormats =
+                        new OneOfStep<StringStream, Array<StringStream>, Entity>(
+                            Constant("nothing")
+                        ),
+                    DateInputFormats =
+                        new OneOfStep<StringStream, Array<StringStream>, Entity>(
+                            Constant(
+                                Entity.Create(
+                                    ("DateProp1", "yyyy-MM-dd"),
+                                    ("DateProp2", "dd-MM-yyyy")
+                                )
+                            )
+                        )
+                },
+                new JsonSchemaBuilder()
+                    .Title("Test Schema")
+                    .Type(SchemaValueType.Object)
+                    .AdditionalProperties(JsonSchema.False)
+                    .Properties(
+                        ("BoolProp", AnyBool),
+                        ("NullProp", SchemaNull),
+                        ("DateProp1", AnyDateTime),
+                        ("DateProp2", AnyDateTime)
+                    )
+                    .Required("BoolProp", "NullProp", "DateProp1", "DateProp2")
+                    .Build()
+                    .ConvertToEntity()
+            );
         }
     }
 }
