@@ -34,6 +34,22 @@ public class Formatter : OneOfBase<IReadOnlyList<string>,
         }
     }
 
+    public bool IsMatch(string value, string path, bool caseSensitive)
+    {
+        var comparer = caseSensitive ? StringComparer.Ordinal : StringComparer.OrdinalIgnoreCase;
+
+        if (TryPickT0(out var list, out var dict))
+        {
+            if (list.Contains(value, comparer))
+                return true;
+        }
+        else if (dict.TryGetValue(path, out var newList))
+            if (newList.Contains(value, comparer))
+                return true;
+
+        return false;
+    }
+
     /// <summary>
     /// Create a new Formatter
     /// </summary>

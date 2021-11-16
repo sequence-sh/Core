@@ -32,11 +32,12 @@ public sealed class Transform : CompoundStep<Array<Entity>>
         IStateMonad stateMonad,
         CancellationToken cancellationToken)
     {
-        var inputFormatMap = StepMaps.OneOf(
-            StepMaps.String(),
-            StepMaps.Array(StepMaps.String()),
-            StepMaps.DoNothing<Entity>()
-        );
+        var inputFormatMap =
+            StepMaps.OneOf(
+                StepMaps.String(),
+                StepMaps.Array(StepMaps.String()),
+                StepMaps.DoNothing<Entity>()
+            );
 
         var stepsResult = await stateMonad.RunStepsAsync(
             EntityStream,
