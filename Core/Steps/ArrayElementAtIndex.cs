@@ -16,6 +16,7 @@ namespace Reductech.EDR.Core.Steps
 /// Gets the array element at a particular index.
 /// </summary>
 [Alias("FromArray")]
+[Alias("ElementAtIndex")]
 public sealed class ArrayElementAtIndex<T> : CompoundStep<T>
 {
     /// <summary>
