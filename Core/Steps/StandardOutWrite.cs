@@ -14,6 +14,11 @@ namespace Reductech.EDR.Core.Steps
 /// <summary>
 /// Writes to the console standard output
 /// </summary>
+[Alias("ToStandardOut")]
+[Alias("WriteStandardOut")]
+[Alias("ToStdOut")]
+[Alias("WriteStdOut")]
+[Alias("StdOutWrite")]
 public class StandardOutWrite : CompoundStep<Unit>
 {
     /// <inheritdoc />
