@@ -12,13 +12,14 @@ namespace Reductech.EDR.Core.Steps
 
 /// <summary>
 /// Gets the last instance of substring in a string.
+/// The index starts at 0.
 /// Returns -1 if the substring is not present
 /// </summary>
 [Alias("LastIndexOfSubstring")]
 [Alias("FindLastSubstring")]
 [Alias("FindLastInstance")]
 [SCLExample("StringFindLast SubString: 'ello' InString: 'hello hello!'", "7")]
-[SCLExample("FindLastInstance Of: 'ello' In: 'hello hello!'", "7")]
+[SCLExample("FindLastInstance Of: 'ello' In: 'hello hello!'",            "7")]
 public sealed class StringFindLast : CompoundStep<int>
 {
     /// <summary>
