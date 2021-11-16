@@ -12,9 +12,13 @@ namespace Reductech.EDR.Core.Steps
 
 /// <summary>
 /// Gets the index of the first instance of a substring in a string.
+/// The index starts at 0.
 /// Returns -1 if the substring is not present.
 /// </summary>
 [Alias("IndexOfSubstring")]
+[Alias("FindInstance")]
+[SCLExample("StringFind SubString: 'ello' InString: 'hello hello!'", "1")]
+[SCLExample("FindInstance Of: 'ello' In: 'hello hello!'",            "1")]
 public sealed class StringFind : CompoundStep<int>
 {
     /// <summary>
@@ -22,6 +26,8 @@ public sealed class StringFind : CompoundStep<int>
     /// </summary>
     [StepProperty(1)]
     [Required]
+    [Alias("In")]
+    [Alias("InString")]
     public IStep<StringStream> String { get; set; } = null!;
 
     /// <summary>
@@ -29,6 +35,7 @@ public sealed class StringFind : CompoundStep<int>
     /// </summary>
     [StepProperty(2)]
     [Required]
+    [Alias("Of")]
     public IStep<StringStream> SubString { get; set; } = null!;
 
     /// <inheritdoc />
