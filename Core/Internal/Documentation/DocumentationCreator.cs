@@ -244,7 +244,7 @@ public static class DocumentationCreator
                                 ? cv
                                 : null;
 
-                            r.Add(columnValue);
+                            r.Add(Escape(columnValue));
                         }
 
                         r.Add(rp.Summary);
