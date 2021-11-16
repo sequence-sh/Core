@@ -19,6 +19,11 @@ namespace Reductech.EDR.Core.Steps
     Description    = "Writes to the Standard Error",
     ExecuteInTests = false
 )]
+[Alias("ToStandardError")]
+[Alias("WriteStandardError")]
+[Alias("ToStdErr")]
+[Alias("WriteStdErr")]
+[Alias("StdErrWrite")]
 public class StandardErrorWrite : CompoundStep<Unit>
 {
     /// <inheritdoc />
