@@ -15,6 +15,10 @@ namespace Reductech.EDR.Core.Steps
 /// Returns -1 if the substring is not present
 /// </summary>
 [Alias("LastIndexOfSubstring")]
+[Alias("FindLastSubstring")]
+[Alias("FindLastInstance")]
+[SCLExample("StringFindLast SubString: 'ello' InString: 'hello hello!'", "7")]
+[SCLExample("FindLastInstance Of: 'ello' In: 'hello hello!'", "7")]
 public sealed class StringFindLast : CompoundStep<int>
 {
     /// <summary>
@@ -22,6 +26,8 @@ public sealed class StringFindLast : CompoundStep<int>
     /// </summary>
     [StepProperty(1)]
     [Required]
+    [Alias("In")]
+    [Alias("InString")]
     public IStep<StringStream> String { get; set; } = null!;
 
     /// <summary>
@@ -29,6 +35,7 @@ public sealed class StringFindLast : CompoundStep<int>
     /// </summary>
     [StepProperty(2)]
     [Required]
+    [Alias("Of")]
     public IStep<StringStream> SubString { get; set; } = null!;
 
     /// <inheritdoc />
