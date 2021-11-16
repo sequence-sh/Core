@@ -21,7 +21,7 @@ using StepParameter = Reductech.EDR.Core.Internal.Documentation.StepParameter;
 namespace Reductech.EDR.Core.Tests.Steps
 {
 
-public partial class GenerateDocumentationTests : StepTestBase<GenerateDocumentation, Entity>
+public partial class DocumentationCreateTests : StepTestBase<DocumentationCreate, Entity>
 {
     /// <inheritdoc />
     protected override IEnumerable<StepCase> StepCases
@@ -30,11 +30,11 @@ public partial class GenerateDocumentationTests : StepTestBase<GenerateDocumenta
         {
             yield return new StepCase(
                 "Generate Everything",
-                new Log<Entity>() { Value = new GenerateDocumentation() },
+                new Log<Entity>() { Value = new DocumentationCreate() },
                 Unit.Default
             ) { IgnoreLoggedValues = true };
 
-            var logDocumentation = new Log<Entity> { Value = new GenerateDocumentation() };
+            var logDocumentation = new Log<Entity> { Value = new DocumentationCreate() };
 
             static MainContents Contents(
                 bool listCategories,
@@ -278,7 +278,7 @@ public partial class GenerateDocumentationTests : StepTestBase<GenerateDocumenta
                 {
                     Array = new EntityGetValue<Array<Entity>>()
                     {
-                        Entity   = new GenerateDocumentation(),
+                        Entity   = new DocumentationCreate(),
                         Property = new StringConstant("AllPages")
                     },
                     Count = new IntConstant(10)
