@@ -18,6 +18,8 @@ namespace Reductech.EDR.Core.Steps
 /// Create a new schema by analysing the entity properties and values in
 /// an array or an entity stream
 /// </summary>
+[Alias("GenerateSchema")]
+[Alias("CreateSchema")]
 public sealed class SchemaCreate : CompoundStep<Entity>
 {
     /// <inheritdoc />
@@ -40,10 +42,10 @@ public sealed class SchemaCreate : CompoundStep<Entity>
             allowExtraProperties
             ) = stepResult.Value;
 
-        var schema =
-            entities.Select(x => new EntityValue.NestedEntity(x).ToSchemaNode("null", null))
-                .Aggregate((a, b) => a.Combine(b))
-                .ToJsonSchema();
+        var schema = entities
+            .Select(x => new EntityValue.NestedEntity(x).ToSchemaNode("null", null))
+            .Aggregate((a, b) => a.Combine(b))
+            .ToJsonSchema();
 
         var jsonSchemaBuilder = new JsonSchemaBuilder()
             .Title(schemaName)
@@ -72,6 +74,7 @@ public sealed class SchemaCreate : CompoundStep<Entity>
     /// </summary>
     [StepProperty(1)]
     [Required]
+    [Alias("From")]
     public IStep<Array<Entity>> Entities { get; set; } = null!;
 
     /// <summary>
@@ -79,6 +82,7 @@ public sealed class SchemaCreate : CompoundStep<Entity>
     /// </summary>
     [StepProperty]
     [DefaultValueExplanation("Schema")]
+    [Alias("Name")]
     public IStep<StringStream> SchemaName { get; set; } = new StringConstant("Schema");
 
     /// <summary>
