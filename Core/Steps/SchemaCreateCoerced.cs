@@ -119,9 +119,11 @@ public sealed class SchemaCreateCoerced : CompoundStep<Entity>
     /// This can either be a string, and array of string, or an entity mapping field names to strings or arrays of string
     /// </summary>
     [StepProperty()]
-    [DefaultValueExplanation("No Date Input")]
+    [DefaultValueExplanation("yyyy-MM-ddTHH:mm:ssK")]
     public IStep<OneOf<StringStream, Array<StringStream>, Entity>>? DateInputFormats { get; set; } =
-        null;
+        new OneOfStep<StringStream, Array<StringStream>, Entity>(
+            new StringConstant("yyyy-MM-ddTHH:mm:ssK")
+        );
 
     /// <summary>
     /// Strings which represent truth.

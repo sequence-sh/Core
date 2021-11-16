@@ -148,6 +148,23 @@ public partial class SchemaCreateCoercedTests : StepTestBase<SchemaCreateCoerced
             );
 
             yield return new StepCase(
+                "Create Schema with date",
+                new SchemaCreateCoerced()
+                {
+                    SchemaName = Constant("Test Schema"),
+                    Entities   = Array(Entity.Create(("DateProp", "2018-11-13T20:20:39+00:00"))),
+                },
+                new JsonSchemaBuilder()
+                    .Title("Test Schema")
+                    .Type(SchemaValueType.Object)
+                    .AdditionalProperties(JsonSchema.False)
+                    .Properties(("DateProp", AnyDateTime))
+                    .Required("DateProp")
+                    .Build()
+                    .ConvertToEntity()
+            );
+
+            yield return new StepCase(
                 "Create Schema with path dependent specified type conversions",
                 new SchemaCreateCoerced()
                 {
