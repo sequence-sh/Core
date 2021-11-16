@@ -23,6 +23,8 @@ namespace Reductech.EDR.Core.Steps
     ExecuteInTests = false
 )]
 [SCLExample("GenerateDocumentation | EntityFormat", ExampleOutput, ExecuteInTests = false)]
+[Alias("DocGen")]
+[Alias("GenerateDocumentation")]
 public sealed class DocumentationCreate : CompoundStep<Entity>
 {
     /// <inheritdoc />
