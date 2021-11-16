@@ -37,34 +37,82 @@ public partial class GenerateDocumentationTests : StepTestBase<GenerateDocumenta
             var logDocumentation = new Log<Entity> { Value = new GenerateDocumentation() };
 
             static MainContents Contents(
+                bool listCategories,
                 params (string name, string category, string comment)[] steps)
             {
-                static string GetNameTerm(string n, string category) => $"[{n}]({category}/{n}.md)";
+                static string GetNameTerm((string name, string category, string _) x) =>
+                    $"[{x.name}]({x.category}/{x.name}.md)";
 
-                var maxNameLength = Math.Max(
-                    4,
-                    steps.Max(x => GetNameTerm(x.name, x.category).Length)
-                );
+                List<(string header,
+                        Func<(string name, string category, string comment), string> getValue)>
+                    headerOptions;
 
-                var maxCommentLength = Math.Max(7, steps.Max(x => x.comment.Length));
-
-                var nameSpaces    = string.Join("", Enumerable.Repeat(' ', maxNameLength - 4));
-                var commentSpaces = string.Join("", Enumerable.Repeat(' ', maxCommentLength - 7));
-
-                var nameDashes    = string.Join("", Enumerable.Repeat('-', maxNameLength - 1));
-                var commentDashes = string.Join("", Enumerable.Repeat('-', maxCommentLength - 1));
+                if (listCategories)
+                {
+                    headerOptions =
+                        new List<(string header,
+                            Func<(string name, string category, string comment), string> getValue
+                            )>()
+                        {
+                            ("Step", GetNameTerm),
+                            ("Connector", x => x.category),
+                            ("Summary", x => x.comment)
+                        };
+                }
+                else
+                {
+                    headerOptions =
+                        new List<(string header,
+                            Func<(string name, string category, string comment), string> getValue
+                            )>() { ("Step", GetNameTerm), ("Summary", x => x.comment) };
+                }
 
                 var sb = new StringBuilder();
                 sb.AppendLine("# EDR Steps");
                 sb.AppendLine();
-                sb.AppendLine($"|Step{nameSpaces}|Summary{commentSpaces}|");
-                sb.AppendLine($"|:{nameDashes}|:{commentDashes}|");
 
-                foreach (var (name, category, comment) in steps)
+                foreach (var headerOption in headerOptions)
                 {
-                    sb.AppendLine(
-                        $"|{GetNameTerm(name, category).PadRight(maxNameLength)}|{comment.PadRight(maxCommentLength)}|"
+                    var maxLength = Math.Max(
+                        headerOption.header.Length,
+                        steps.Select(headerOption.getValue).Max(x => x.Length)
                     );
+
+                    sb.Append($"|{headerOption.header.PadRight(maxLength)}");
+                }
+
+                sb.AppendLine("|");
+
+                foreach (var headerOption in headerOptions)
+                {
+                    var maxLength = Math.Max(
+                        headerOption.header.Length,
+                        steps.Select(headerOption.getValue).Max(x => x.Length)
+                    );
+
+                    sb.Append("|:");
+                    sb.Append(new string('-', maxLength - 1));
+                }
+
+                sb.AppendLine("|");
+
+                foreach (var step in steps)
+                {
+                    foreach (var headerOption in headerOptions)
+                    {
+                        sb.Append("|");
+
+                        var maxLength = Math.Max(
+                            headerOption.header.Length,
+                            steps.Select(headerOption.getValue).Max(x => x.Length)
+                        );
+
+                        var term = headerOption.getValue(step).PadRight(maxLength);
+
+                        sb.Append(term);
+                    }
+
+                    sb.AppendLine("|");
                 }
 
                 sb.AppendLine();
@@ -99,7 +147,7 @@ public partial class GenerateDocumentationTests : StepTestBase<GenerateDocumenta
                 }
             );
 
-            var notContents = Contents(notHeader);
+            var notContents = Contents(true, notHeader);
 
             var notDocumentationEntity = new DocumentationCreationResult(
                 notContents,
@@ -109,7 +157,7 @@ public partial class GenerateDocumentationTests : StepTestBase<GenerateDocumenta
                         new CategoryContents(
                             "Core.md",
                             "Core",
-                            notContents.FileText,
+                            Contents(false, notHeader).FileText,
                             "",
                             "Core"
                         ),
@@ -135,8 +183,6 @@ public partial class GenerateDocumentationTests : StepTestBase<GenerateDocumenta
                 "DocumentationExampleStep",
                 "Examples",
                 "");
-
-            var exampleContents = Contents(exampleStepHeader);
 
             var documentationStepPage = new StepPage(
                 "DocumentationExampleStep.md",
@@ -181,6 +227,8 @@ public partial class GenerateDocumentationTests : StepTestBase<GenerateDocumenta
                 }
             );
 
+            var exampleContents = Contents(true, exampleStepHeader);
+
             var exampleCreationResult = new DocumentationCreationResult(
                 exampleContents,
                 new[]
@@ -189,7 +237,7 @@ public partial class GenerateDocumentationTests : StepTestBase<GenerateDocumenta
                         new CategoryContents(
                             "Examples.md",
                             "Examples",
-                            exampleContents.FileText,
+                            Contents(false, exampleStepHeader).FileText,
                             "",
                             "Examples"
                         ),
@@ -273,13 +321,19 @@ public partial class GenerateDocumentationTests : StepTestBase<GenerateDocumenta
     /// <inheritdoc />
     protected override IEnumerable<DeserializeCase> DeserializeCases
     {
-        get { yield break; }
+        get
+        {
+            yield break;
+        }
     }
 
     /// <inheritdoc />
     protected override IEnumerable<ErrorCase> ErrorCases
     {
-        get { yield break; }
+        get
+        {
+            yield break;
+        }
     }
 
     private class DocumentationExampleStep2 : CompoundStep<StringStream>

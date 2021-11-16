@@ -31,12 +31,17 @@ public static class DocumentationCreator
             contentsStringBuilder.AppendLine("# EDR Steps");
 
             var contentsRows = categories.SelectMany(x => x)
+                .OrderBy(x => x.Name)
                 .Select(
-                    x => new[] { $"[{x.Name}]({x.DocumentationCategory}/{x.FileName})", x.Summary }
+                    x => new[]
+                    {
+                        $"[{x.Name}]({x.DocumentationCategory}/{x.FileName})",
+                        x.DocumentationCategory, x.Summary
+                    }
                 )
                 .ToList();
 
-            var contentsHeader = new[] { "Step", "Summary" }.Select(
+            var contentsHeader = new[] { "Step", "Connector", "Summary" }.Select(
                     x => Prettifier.Cell.Create(x, Prettifier.Alignment.LeftJustified)
                 )
                 .ToList();
