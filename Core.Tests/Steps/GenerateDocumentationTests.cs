@@ -307,13 +307,13 @@ public partial class GenerateDocumentationTests : StepTestBase<GenerateDocumenta
                 "all",
                 "Core",
                 "And",
-                "AppendString",
                 "ArrayConcat",
                 "ArrayDistinct",
                 "ArrayFilter",
                 "ArrayFirst",
                 "ArrayGroupBy",
-                "ArrayIsEmpty"
+                "ArrayIsEmpty",
+                "ArrayLast"
             );
         }
     }
