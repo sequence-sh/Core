@@ -40,7 +40,7 @@ public sealed class CreateSchema : CompoundStep<Entity>
             ) = stepResult.Value;
 
         var schema =
-            entities.Select(x => new EntityValue.NestedEntity(x).ToSchemaNode())
+            entities.Select(x => new EntityValue.NestedEntity(x).ToSchemaNode("null", null))
                 .Aggregate((a, b) => a.Combine(b))
                 .ToJsonSchema();
 

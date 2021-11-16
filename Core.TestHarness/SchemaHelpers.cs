@@ -34,6 +34,9 @@ public static class SchemaHelpers
     public static JsonSchema AnyArray =>
         new JsonSchemaBuilder().Type(SchemaValueType.Array).Build();
 
+    public static JsonSchema SchemaNull =>
+        new JsonSchemaBuilder().Type(SchemaValueType.Null).Build();
+
     public static JsonSchema AnyDateTime => new JsonSchemaBuilder().Type(SchemaValueType.String)
         .Format(new Format("date-time"))
         .Build();

@@ -57,7 +57,9 @@ public abstract record EntityValue(object? ObjectValue)
         }
 
         /// <inheritdoc />
-        public override SchemaNode ToSchemaNode() => NullNode.Instance;
+        public override SchemaNode ToSchemaNode(
+            string path,
+            SchemaConversionOptions? schemaConversionOptions) => NullNode.Instance;
 
         /// <inheritdoc />
         public override string ToString() => GetPrimitiveString();
@@ -98,9 +100,14 @@ public abstract record EntityValue(object? ObjectValue)
         }
 
         /// <inheritdoc />
-        public override SchemaNode ToSchemaNode()
+        public override SchemaNode ToSchemaNode(
+            string path,
+            SchemaConversionOptions? schemaConversionOptions)
         {
-            return StringNode.Default;
+            if (schemaConversionOptions is null)
+                return StringNode.Default;
+
+            return schemaConversionOptions.GetNode(Value, path);
         }
 
         /// <inheritdoc />
@@ -136,7 +143,9 @@ public abstract record EntityValue(object? ObjectValue)
         }
 
         /// <inheritdoc />
-        public override SchemaNode ToSchemaNode()
+        public override SchemaNode ToSchemaNode(
+            string path,
+            SchemaConversionOptions? schemaConversionOptions)
         {
             return IntegerNode.Default;
         }
@@ -171,7 +180,9 @@ public abstract record EntityValue(object? ObjectValue)
         }
 
         /// <inheritdoc />
-        public override SchemaNode ToSchemaNode()
+        public override SchemaNode ToSchemaNode(
+            string path,
+            SchemaConversionOptions? schemaConversionOptions)
         {
             return NumberNode.Default;
         }
@@ -186,7 +197,9 @@ public abstract record EntityValue(object? ObjectValue)
     public record Boolean(bool Value) : EntityValue(Value)
     {
         /// <inheritdoc />
-        public override SchemaNode ToSchemaNode()
+        public override SchemaNode ToSchemaNode(
+            string path,
+            SchemaConversionOptions? schemaConversionOptions)
         {
             return BooleanNode.Default;
         }
@@ -238,9 +251,11 @@ public abstract record EntityValue(object? ObjectValue)
         }
 
         /// <inheritdoc />
-        public override SchemaNode ToSchemaNode()
+        public override SchemaNode ToSchemaNode(
+            string path,
+            SchemaConversionOptions? schemaConversionOptions)
         {
-            return StringNode.Default;
+            return StringNode.Default; //TODO enum
         }
 
         /// <inheritdoc />
@@ -253,7 +268,9 @@ public abstract record EntityValue(object? ObjectValue)
     public record DateTime(System.DateTime Value) : EntityValue(Value)
     {
         /// <inheritdoc />
-        public override SchemaNode ToSchemaNode()
+        public override SchemaNode ToSchemaNode(
+            string path,
+            SchemaConversionOptions? schemaConversionOptions)
         {
             return new StringNode(
                 EnumeratedValuesNodeData.Empty,
@@ -315,13 +332,15 @@ public abstract record EntityValue(object? ObjectValue)
         public override string ToString() => Value.ToString();
 
         /// <inheritdoc />
-        public override SchemaNode ToSchemaNode()
+        public override SchemaNode ToSchemaNode(
+            string path,
+            SchemaConversionOptions? schemaConversionOptions)
         {
             var dictionary = new Dictionary<string, (SchemaNode Node, bool Required)>();
 
             foreach (var (key, property) in Value.Dictionary.OrderBy(x => x.Value.Order))
             {
-                var node = property.Value.ToSchemaNode();
+                var node = property.Value.ToSchemaNode($"{path}/{key}", schemaConversionOptions);
                 dictionary[key] = (node, true);
             }
 
@@ -378,13 +397,16 @@ public abstract record EntityValue(object? ObjectValue)
         }
 
         /// <inheritdoc />
-        public override SchemaNode ToSchemaNode()
+        public override SchemaNode ToSchemaNode(
+            string path,
+            SchemaConversionOptions? schemaConversionOptions)
         {
             SchemaNode additionalItems = new TrueNode();
 
-            foreach (var entityValue in Value)
+            for (var index = 0; index < Value.Count; index++)
             {
-                var n = entityValue.ToSchemaNode();
+                var entityValue = Value[index];
+                var n = entityValue.ToSchemaNode(path + $"[{index}]", schemaConversionOptions);
                 additionalItems = additionalItems.Combine(n);
             }
 
@@ -557,7 +579,7 @@ public abstract record EntityValue(object? ObjectValue)
             case IEnumerable e2:
             {
                 var newEnumerable = e2.Cast<object>()
-                    .Select(v => CreateFromObject(v))
+                    .Select(CreateFromObject)
                     .ToImmutableList();
 
                 if (!newEnumerable.Any())
@@ -582,7 +604,7 @@ public abstract record EntityValue(object? ObjectValue)
                         .GetCustomAttributes(true)
                         .OfType<DataContractAttribute>()
                         .Any()
-                )
+                   )
                 {
                     var entity = EntityConversionHelpers.ConvertToEntity(argValue);
                     return new NestedEntity(entity);
@@ -648,7 +670,9 @@ public abstract record EntityValue(object? ObjectValue)
     /// Gets a schema node which could match this entity value
     /// </summary>
     [Pure]
-    public abstract SchemaNode ToSchemaNode();
+    public abstract SchemaNode ToSchemaNode(
+        string path,
+        SchemaConversionOptions? schemaConversionOptions);
 
     /// <summary>
     /// Convert this Entity to a Json Element
@@ -749,7 +773,7 @@ public abstract record EntityValue(object? ObjectValue)
             }
             else if (!int.TryParse(primitive, out _) && //prevent int conversion
                      Enum.TryParse(type, primitive, true, out var r)
-            )
+                    )
                 return r!;
         }
         else if (type == typeof(System.DateTime))
