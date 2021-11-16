@@ -113,7 +113,7 @@ public partial class ValidateTests : StepTestBase<Validate, Array<Entity>>
             //yield return CreateCase(
             //    "Cast int",
             //    new List<Entity> { Entity.Create(("Foo", "100")) },
-            //    CreateSchema(
+            //    SchemaCreate(
             //        SchemaName,
             //        ExtraPropertyBehavior.Fail,
             //        ("Foo", SCLType.Integer, Multiplicity.ExactlyOne)
@@ -124,7 +124,7 @@ public partial class ValidateTests : StepTestBase<Validate, Array<Entity>>
             //yield return CreateCase(
             //    "Cast double",
             //    new List<Entity> { Entity.Create(("Foo", "100.345")) },
-            //    CreateSchema(
+            //    SchemaCreate(
             //        SchemaName,
             //        ExtraPropertyBehavior.Fail,
             //        ("Foo", SCLType.Double, Multiplicity.ExactlyOne)
@@ -135,7 +135,7 @@ public partial class ValidateTests : StepTestBase<Validate, Array<Entity>>
             //yield return CreateCase(
             //    "Cast bool",
             //    new List<Entity> { Entity.Create(("Foo", "true")) },
-            //    CreateSchema(
+            //    SchemaCreate(
             //        SchemaName,
             //        ExtraPropertyBehavior.Fail,
             //        ("Foo", SCLType.Bool, Multiplicity.ExactlyOne)
@@ -146,7 +146,7 @@ public partial class ValidateTests : StepTestBase<Validate, Array<Entity>>
             //yield return CreateCase(
             //    "Cast date time",
             //    new List<Entity> { Entity.Create(("Foo", "11/10/2020 3:45:44 PM")) },
-            //    CreateSchema(
+            //    SchemaCreate(
             //        SchemaName,
             //        ExtraPropertyBehavior.Fail,
             //        ("Foo", SCLType.Date, Multiplicity.ExactlyOne)
@@ -157,7 +157,7 @@ public partial class ValidateTests : StepTestBase<Validate, Array<Entity>>
             //yield return CreateCase(
             //    "Cast date time with input format",
             //    new List<Entity> { Entity.Create(("Foo", "2020")) },
-            //    CreateSchema(
+            //    SchemaCreate(
             //        SchemaName,
             //        ExtraPropertyBehavior.Fail,
             //        ("Foo", SCLType.Date, null, Multiplicity.ExactlyOne, null, null,
@@ -191,7 +191,7 @@ public partial class ValidateTests : StepTestBase<Validate, Array<Entity>>
             //yield return CreateCase(
             //    "Cast date time with input format and output format",
             //    new List<Entity> { Entity.Create(("Foo", "2020")) },
-            //    CreateSchema(
+            //    SchemaCreate(
             //        SchemaName,
             //        ExtraPropertyBehavior.Fail,
             //        ("Foo", SCLType.Date, null, Multiplicity.ExactlyOne, null, null,
@@ -226,7 +226,7 @@ public partial class ValidateTests : StepTestBase<Validate, Array<Entity>>
             //yield return CreateCase(
             //    "Match regex",
             //    new List<Entity> { Entity.Create(("Foo", "100")) },
-            //    CreateSchema(
+            //    SchemaCreate(
             //        SchemaName,
             //        ExtraPropertyBehavior.Fail,
             //        ("Foo", SCLType.Integer, null, Multiplicity.ExactlyOne, @"\d+", null,
@@ -238,7 +238,7 @@ public partial class ValidateTests : StepTestBase<Validate, Array<Entity>>
             //yield return CreateCase(
             //    "Match enum",
             //    new List<Entity> { Entity.Create(("Foo", "hello")) },
-            //    CreateSchema(
+            //    SchemaCreate(
             //        SchemaName,
             //        ExtraPropertyBehavior.Fail,
             //        ("Foo", SCLType.Enum, "Word", Multiplicity.ExactlyOne, null,
@@ -250,7 +250,7 @@ public partial class ValidateTests : StepTestBase<Validate, Array<Entity>>
             //yield return CreateCase(
             //    "Null with multiplicity any",
             //    new List<Entity> { Entity.Create(("Foo", null)) },
-            //    CreateSchema(
+            //    SchemaCreate(
             //        SchemaName,
             //        ExtraPropertyBehavior.Fail,
             //        ("Foo", SCLType.Integer, null, Multiplicity.Any, null,
@@ -262,7 +262,7 @@ public partial class ValidateTests : StepTestBase<Validate, Array<Entity>>
             //yield return CreateCase(
             //    "Null with multiplicity UpToOne",
             //    new List<Entity> { Entity.Create(("Foo", null)) },
-            //    CreateSchema(
+            //    SchemaCreate(
             //        SchemaName,
             //        ExtraPropertyBehavior.Fail,
             //        ("Foo", SCLType.Integer, null, Multiplicity.UpToOne, null,
@@ -274,7 +274,7 @@ public partial class ValidateTests : StepTestBase<Validate, Array<Entity>>
             //yield return CreateCase(
             //    "Null with multiplicity ExactlyOne",
             //    new List<Entity> { Entity.Create(("Foo", null)) },
-            //    CreateSchema(
+            //    SchemaCreate(
             //            SchemaName,
             //            ExtraPropertyBehavior.Fail,
             //            ("Foo", SCLType.Integer, null, Multiplicity.ExactlyOne, null,
@@ -289,7 +289,7 @@ public partial class ValidateTests : StepTestBase<Validate, Array<Entity>>
             //yield return CreateCase(
             //    "Could not cast: Behavior: Error",
             //    new List<Entity> { Entity.Create(("Foo", "Hello")) },
-            //    CreateSchema(
+            //    SchemaCreate(
             //            SchemaName,
             //            ExtraPropertyBehavior.Fail,
             //            ("Foo", SCLType.Integer, Multiplicity.Any)
@@ -303,7 +303,7 @@ public partial class ValidateTests : StepTestBase<Validate, Array<Entity>>
             //yield return CreateCase(
             //    "Could not cast: Behavior: Warning",
             //    new List<Entity> { Entity.Create(("Foo", "Hello")) },
-            //    CreateSchema(
+            //    SchemaCreate(
             //            SchemaName,
             //            ExtraPropertyBehavior.Fail,
             //            ("Foo", SCLType.Integer, Multiplicity.Any)
@@ -318,7 +318,7 @@ public partial class ValidateTests : StepTestBase<Validate, Array<Entity>>
             //yield return CreateCase(
             //    "Could not cast: Behavior: Skip",
             //    new List<Entity> { Entity.Create(("Foo", "Hello")) },
-            //    CreateSchema(
+            //    SchemaCreate(
             //            SchemaName,
             //            ExtraPropertyBehavior.Fail,
             //            ("Foo", SCLType.Integer, Multiplicity.Any)
@@ -331,7 +331,7 @@ public partial class ValidateTests : StepTestBase<Validate, Array<Entity>>
             //yield return CreateCase(
             //    "Could not cast: Behavior: Ignore",
             //    new List<Entity> { Entity.Create(("Foo", "Hello")) },
-            //    CreateSchema(
+            //    SchemaCreate(
             //            SchemaName,
             //            ExtraPropertyBehavior.Fail,
             //            ("Foo", SCLType.Integer, Multiplicity.Any)
@@ -345,7 +345,7 @@ public partial class ValidateTests : StepTestBase<Validate, Array<Entity>>
             //yield return CreateCase(
             //    "Extra Property: Allow",
             //    new List<Entity> { Entity.Create(("Foo", "Hello"), ("Bar", "World")) },
-            //    CreateSchema(
+            //    SchemaCreate(
             //        SchemaName,
             //        ExtraPropertyBehavior.Allow,
             //        ("Foo", SCLType.String, Multiplicity.Any)
@@ -356,7 +356,7 @@ public partial class ValidateTests : StepTestBase<Validate, Array<Entity>>
             //yield return CreateCase(
             //    "Extra Property: Remove",
             //    new List<Entity> { Entity.Create(("Foo", "Hello"), ("Bar", "World")) },
-            //    CreateSchema(
+            //    SchemaCreate(
             //        SchemaName,
             //        ExtraPropertyBehavior.Remove,
             //        ("Foo", SCLType.String, Multiplicity.Any)
@@ -367,7 +367,7 @@ public partial class ValidateTests : StepTestBase<Validate, Array<Entity>>
             //yield return CreateCase(
             //    "Extra Property: Warning",
             //    new List<Entity> { Entity.Create(("Foo", "Hello"), ("Bar", "World")) },
-            //    CreateSchema(
+            //    SchemaCreate(
             //        SchemaName,
             //        ExtraPropertyBehavior.Warn,
             //        ("Foo", SCLType.String, Multiplicity.Any)

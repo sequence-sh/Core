@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -15,9 +15,10 @@ namespace Reductech.EDR.Core.Steps
 {
 
 /// <summary>
-/// Create a schema from an Array of Entity
+/// Create a new schema by analysing the entity properties and values in
+/// an array or an entity stream
 /// </summary>
-public sealed class CreateSchema : CompoundStep<Entity>
+public sealed class SchemaCreate : CompoundStep<Entity>
 {
     /// <inheritdoc />
     protected override async Task<Result<Entity, IError>> Run(
@@ -64,10 +65,10 @@ public sealed class CreateSchema : CompoundStep<Entity>
 
     /// <inheritdoc />
     public override IStepFactory StepFactory { get; } =
-        new SimpleStepFactory<CreateSchema, Entity>();
+        new SimpleStepFactory<SchemaCreate, Entity>();
 
     /// <summary>
-    /// The array to get the lat element of
+    /// The array or entity stream to analyse
     /// </summary>
     [StepProperty(1)]
     [Required]
