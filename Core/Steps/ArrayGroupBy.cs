@@ -13,9 +13,19 @@ namespace Reductech.EDR.Core.Steps
 {
 
 /// <summary>
-/// Group array elements by the result of a function.
-/// Entities in the resulting array will have two properties 'Key' and 'Values'
+/// Group elements in an array or entities in a stream using a function.
+/// Entities in the resulting array will have two properties `Key` and `Values`.
+/// The `Key` will be set according to the result of the function.
 /// </summary>
+[SCLExample(
+    @"Group Array: [
+  ('type': 'A', 'value': 1)
+  ('type': 'B', 'value': 2)
+  ('type': 'A', 'value': 3)
+] Using: (<item>['type'])",
+    "[('Key': \"A\" 'Values': [('type': \"A\" 'value': 1), ('type': \"A\" 'value': 3)]), ('Key': \"B\" 'Values': [('type': \"B\" 'value': 2)])]"
+)]
+[Alias("Group")]
 public sealed class ArrayGroupBy<T> : CompoundStep<Array<Entity>>
 {
     /// <inheritdoc />
@@ -53,17 +63,19 @@ public sealed class ArrayGroupBy<T> : CompoundStep<Array<Entity>>
     }
 
     /// <summary>
-    /// The array to map
+    /// The array or entity stream to group
     /// </summary>
     [StepProperty(1)]
     [Required]
     public IStep<Array<T>> Array { get; set; } = null!;
 
     /// <summary>
-    /// A function to get the mapped entity
+    /// A function to use to group entities
     /// </summary>
     [FunctionProperty(2)]
     [Required]
+    [Alias("By")]
+    [Alias("Using")]
     public LambdaFunction<T, StringStream> Function { get; set; } = null!;
 
     /// <inheritdoc />
