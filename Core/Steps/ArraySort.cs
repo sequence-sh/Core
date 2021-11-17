@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.ComponentModel.DataAnnotations;
@@ -30,26 +30,36 @@ public enum SortOrder
 }
 
 /// <summary>
-/// Reorder an array
+/// Reorder an array or entity stream
 /// </summary>
 [Alias("SortArray")]
 [Alias("Sort")]
 [SCLExample("ArraySort [2, 4, 1, 3] Descending: true", "[4, 3, 2, 1]")]
+[SCLExample(
+    @"Sort [
+  ('type': 'C', 'value': 1)
+  ('type': 'A', 'value': 2)
+  ('type': 'B', 'value': 3)
+] Using: (<>['type'])",
+    "[('type': \"A\" 'value': 2), ('type': \"B\" 'value': 3), ('type': \"C\" 'value': 1)]"
+)]
 public sealed class ArraySort<T> : CompoundStep<Array<T>>
 {
     /// <summary>
-    /// The array to sort.
+    /// The array or entity stream to sort
     /// </summary>
     [StepProperty(1)]
     [Required]
     public IStep<Array<T>> Array { get; set; } = null!;
 
     /// <summary>
-    /// A function that gets the key to sort by from the variable &lt;Entity&gt;
+    /// A function that gets the key to sort by. Use this function to select
+    /// an entity property that will be used for sorting.
     /// To sort by multiple properties, concatenate several keys
     /// </summary>
     [FunctionProperty(2)]
     [DefaultValueExplanation("Default Ordering")]
+    [Alias("Using")]
     public LambdaFunction<T, StringStream>? KeySelector { get; set; } = null!;
 
     /// <summary>
