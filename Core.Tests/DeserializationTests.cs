@@ -332,7 +332,7 @@ Log 'Comments!'",
             yield return new DeserializationTestInstance(
                 @"
 - <ArrayVar> = ['abc', '123']
-- Log(FindElement <ArrayVar> '123')",
+- Log(ArrayFind <ArrayVar> '123')",
                 "1"
             );
 

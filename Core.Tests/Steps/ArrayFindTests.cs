@@ -6,7 +6,7 @@ using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 namespace Reductech.EDR.Core.Tests.Steps
 {
 
-public partial class FindElementTests : StepTestBase<FindElement<StringStream>, int>
+public partial class ArrayFindTests : StepTestBase<ArrayFind<StringStream>, int>
 {
     /// <inheritdoc />
     protected override IEnumerable<StepCase> StepCases
@@ -15,7 +15,7 @@ public partial class FindElementTests : StepTestBase<FindElement<StringStream>, 
         {
             yield return new StepCase(
                 "Simple case",
-                new FindElement<StringStream>()
+                new ArrayFind<StringStream>()
                 {
                     Array = Array(("Hello"), ("World")), Element = Constant("World")
                 },
@@ -24,7 +24,7 @@ public partial class FindElementTests : StepTestBase<FindElement<StringStream>, 
 
             yield return new StepCase(
                 "Duplicate Element",
-                new FindElement<StringStream>
+                new ArrayFind<StringStream>
                 {
                     Array = Array(("Hello"), ("World"), ("World")), Element = Constant("World")
                 },
@@ -33,7 +33,7 @@ public partial class FindElementTests : StepTestBase<FindElement<StringStream>, 
 
             yield return new StepCase(
                 "Element not present",
-                new FindElement<StringStream>
+                new ArrayFind<StringStream>
                 {
                     Array = Array(("Hello"), ("World"), ("World")), Element = Constant("Mark")
                 },
@@ -49,7 +49,7 @@ public partial class FindElementTests : StepTestBase<FindElement<StringStream>, 
         {
             yield return new DeserializeCase(
                 "Simple Case",
-                "FindElement Array: ['Hello', 'World'] Element: 'World'",
+                "ArrayFind Array: ['Hello', 'World'] Element: 'World'",
                 1
             );
         }

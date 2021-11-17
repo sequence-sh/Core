@@ -14,7 +14,7 @@ namespace Reductech.EDR.Core.Steps
 /// Gets the first index of an element in an array.
 /// Returns -1 if the element is not present.
 /// </summary>
-public sealed class FindElement<T> : CompoundStep<int>
+public sealed class ArrayFind<T> : CompoundStep<int>
 {
     /// <summary>
     /// The array to check.
@@ -52,22 +52,22 @@ public sealed class FindElement<T> : CompoundStep<int>
     }
 
     /// <inheritdoc />
-    public override IStepFactory StepFactory => FindElementStepFactory.Instance;
+    public override IStepFactory StepFactory => ArrayFindStepFactory.Instance;
 
     /// <summary>
     /// Gets the first index of an element in an array.
     /// </summary>
-    public sealed class FindElementStepFactory : ArrayStepFactory
+    public sealed class ArrayFindStepFactory : ArrayStepFactory
     {
-        private FindElementStepFactory() { }
+        private ArrayFindStepFactory() { }
 
         /// <summary>
         /// The instance.
         /// </summary>
-        public static GenericStepFactory Instance { get; } = new FindElementStepFactory();
+        public static GenericStepFactory Instance { get; } = new ArrayFindStepFactory();
 
         /// <inheritdoc />
-        public override Type StepType => typeof(FindElement<>);
+        public override Type StepType => typeof(ArrayFind<>);
 
         /// <inheritdoc />
         public override string OutputTypeExplanation => nameof(Int32);
@@ -87,7 +87,7 @@ public sealed class FindElement<T> : CompoundStep<int>
         }
 
         /// <inheritdoc />
-        protected override string ArrayPropertyName => nameof(FindElement<object>.Array);
+        protected override string ArrayPropertyName => nameof(ArrayFind<object>.Array);
 
         /// <inheritdoc />
         protected override string? LambdaPropertyName => null;

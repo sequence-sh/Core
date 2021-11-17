@@ -311,9 +311,9 @@ public partial class DocumentationCreateTests : StepTestBase<DocumentationCreate
                 "ArrayDistinct",
                 "ArrayElementAtIndex",
                 "ArrayFilter",
+                "ArrayFind",
                 "ArrayFirst",
-                "ArrayGroupBy",
-                "ArrayIsEmpty"
+                "ArrayGroupBy"
             );
         }
     }
