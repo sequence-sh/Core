@@ -16,6 +16,11 @@ namespace Reductech.EDR.Core.Steps
 /// Will add a new property if the property is not already present.
 /// </summary>
 [Alias("In")]
+[SCLExample(
+    "EntitySetValue Entity: ('type': 'A', 'value': 1) Property: 'type' Value: 'C'",
+    "('type': \"C\" 'value': 1)"
+)]
+[SCLExample("In ('type': 'C', 'value': 1) Set: 'type' To: 'A'", "('type': \"A\" 'value': 1)")]
 public sealed class EntitySetValue<T> : CompoundStep<Entity>
 {
     /// <inheritdoc />
