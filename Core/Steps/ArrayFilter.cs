@@ -21,7 +21,14 @@ namespace Reductech.EDR.Core.Steps
     "ArrayFilter [('value': 'A'), ('value': 'B'), ('value': 'C')] Predicate: (<>['value'] != 'B')",
     "[('value': \"A\"), ('value': \"C\")]"
 )]
-[SCLExample("Filter <MyCsvFile> Using: (<>['column1'] == 'TypeA')", DeserializeInTests = false)]
+[SCLExample(
+    "Filter <MyCsvFile> Using: (<>['column1'] == 'TypeA')",
+    null,
+    null,
+    new[] { "MyCsvFile" },
+    new[] { "[]" },
+    ExecuteInTests = false
+)]
 public sealed class ArrayFilter<T> : CompoundStep<Array<T>>
 {
     /// <inheritdoc />
