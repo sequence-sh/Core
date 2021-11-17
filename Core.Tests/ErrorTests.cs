@@ -100,7 +100,7 @@ public partial class RunErrorTests
 
             yield return new ErrorTestFunction(
                 "Get substring minus one",
-                new GetSubstring
+                new StringSubstring
                 {
                     Index = Constant(-1), String = Constant("Foo"), Length = Constant(10)
                 },
@@ -109,7 +109,7 @@ public partial class RunErrorTests
 
             yield return new ErrorTestFunction(
                 "Get substring out of bounds",
-                new GetSubstring
+                new StringSubstring
                 {
                     Index = Constant(5), String = Constant("Foo"), Length = Constant(10)
                 },

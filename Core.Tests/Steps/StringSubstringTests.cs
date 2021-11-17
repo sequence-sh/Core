@@ -6,7 +6,7 @@ using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 namespace Reductech.EDR.Core.Tests.Steps
 {
 
-public partial class GetSubstringTests : StepTestBase<GetSubstring, StringStream>
+public partial class StringSubstringTests : StepTestBase<StringSubstring, StringStream>
 {
     /// <inheritdoc />
     protected override IEnumerable<StepCase> StepCases
@@ -15,7 +15,7 @@ public partial class GetSubstringTests : StepTestBase<GetSubstring, StringStream
         {
             yield return new StepCase(
                 "Substring length 3",
-                new GetSubstring
+                new StringSubstring
                 {
                     String = Constant("Hello World"), Index = Constant(1), Length = Constant(3)
                 },
@@ -31,7 +31,7 @@ public partial class GetSubstringTests : StepTestBase<GetSubstring, StringStream
         {
             yield return new DeserializeCase(
                 "ArrayLength 3",
-                "GetSubstring String: 'Hello World' Index: 1 Length: 3",
+                "StringSubstring String: 'Hello World' Index: 1 Length: 3",
                 "ell"
             );
         }

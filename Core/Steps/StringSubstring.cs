@@ -12,7 +12,8 @@ namespace Reductech.EDR.Core.Steps
 /// <summary>
 /// Gets a substring from a string.
 /// </summary>
-public sealed class GetSubstring : CompoundStep<StringStream>
+[Alias("GetSubstring")]
+public sealed class StringSubstring : CompoundStep<StringStream>
 {
     /// <summary>
     /// The string to extract a substring from.
@@ -67,7 +68,7 @@ public sealed class GetSubstring : CompoundStep<StringStream>
 
     /// <inheritdoc />
     public override IStepFactory StepFactory { get; } =
-        new SimpleStepFactory<GetSubstring, StringStream>();
+        new SimpleStepFactory<StringSubstring, StringStream>();
 }
 
 }
