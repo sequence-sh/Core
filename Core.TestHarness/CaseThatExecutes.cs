@@ -80,11 +80,8 @@ public abstract partial class StepTestBase<TStep, TOutput>
             }
             else
             {
-                var stepType = step.GetType().GetDisplayName();
-
-                throw new XunitException(
-                    $"{stepType} does not have output type {nameof(Unit)} or {typeof(TOutput).Name}"
-                );
+                var result = await step.Run<object>(stateMonad, CancellationToken.None);
+                CheckObjectResult(step, result);
             }
 
             CheckLoggedValues(loggerFactory);
@@ -126,6 +123,15 @@ public abstract partial class StepTestBase<TStep, TOutput>
 
         public abstract void CheckUnitResult(Result<Unit, IError> result);
         public abstract void CheckOutputResult(Result<TOutput, IError> result);
+
+        public virtual void CheckObjectResult(IStep step, Result<object, IError> result)
+        {
+            var stepType = step.GetType().GetDisplayName();
+
+            throw new XunitException(
+                $"{stepType} does not have output type {nameof(Unit)} or {typeof(TOutput).Name}"
+            );
+        }
 
         public virtual void CheckLoggedValues(ITestLoggerFactory loggerFactory)
         {

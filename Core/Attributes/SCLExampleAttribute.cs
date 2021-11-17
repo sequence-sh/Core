@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Linq;
+using Reductech.EDR.Core.Entities;
 
 namespace Reductech.EDR.Core.Attributes
 {
@@ -14,12 +16,36 @@ public sealed class SCLExampleAttribute : Attribute
         string scl,
         string? expectedOutput = null,
         string? description = null,
+        params string[]? expectedLogs) : this(
+        scl,
+        expectedOutput,
+        description,
+        null,
+        null,
+        expectedLogs:
+        expectedLogs
+    ) { }
+
+    public SCLExampleAttribute(
+        string scl,
+        string? expectedOutput,
+        string? description,
+        string[]? variableNamesToInject,
+        string[]? variableValuesToInject,
         params string[]? expectedLogs)
     {
         SCL            = scl;
         Description    = description;
         ExpectedOutput = expectedOutput;
-        ExpectedLogs   = expectedLogs;
+
+        if (variableNamesToInject is not null && variableValuesToInject is not null)
+        {
+            VariableInjections = variableNamesToInject.Zip(variableValuesToInject)
+                .Select(x => (x.First, x.Second))
+                .ToArray();
+        }
+
+        ExpectedLogs = expectedLogs;
     }
 
     /// <summary>
@@ -43,6 +69,11 @@ public sealed class SCLExampleAttribute : Attribute
     public string[]? ExpectedLogs { get; set; }
 
     /// <summary>
+    /// Variables to inject into the test
+    /// </summary>
+    public (string VariableName, string Value)[]? VariableInjections { get; set; }
+
+    /// <summary>
     /// Whether this example will be executed in unit tests. (Deserialization will still be tested)
     /// </summary>
     public bool ExecuteInTests { get; set; } = true;
@@ -55,8 +86,23 @@ public sealed class SCLExampleAttribute : Attribute
         Description,
         ExpectedOutput,
         ExpectedLogs,
+        VariableInjections,
         ExecuteInTests
     );
+
+    //private object? ConvertValue(object? o)
+    //{
+    //    var ev = EntityValue.CreateFromObject(o);
+
+    //    if (ev is EntityValue.NestedList nl)
+    //    {
+    //        return nl.Value.Select(x => ConvertValue(x.ObjectValue)).ToSCLArray();
+    //    }
+
+    //    var ov = ev.ObjectValue;
+
+    //    return ov;
+    //}
 }
 
 /// <summary>
@@ -67,6 +113,7 @@ public record SCLExample(
     string? Description,
     string? ExpectedOutput,
     string[]? ExpectedLogs,
+    (string VariableName, string Value)[]? VariableInjections,
     bool ExecuteInTests);
 
 }

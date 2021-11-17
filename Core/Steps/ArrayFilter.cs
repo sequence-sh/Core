@@ -17,6 +17,13 @@ namespace Reductech.EDR.Core.Steps
 /// </summary>
 [Alias("FilterArray")]
 [Alias("Filter")]
+[SCLExample(
+    "Filter <MyCsvFile> Predicate: (<>['column1'] == 'TypeA')",
+    "[('column1': \"TypeA\" 'column2': 1)]",
+    null,
+    new[] { "MyCsvFile" },
+    new[] { "[(column1: 'TypeA', column2: 1),(column1: 'TypeB', column2: 2)]" }
+)]
 public sealed class ArrayFilter<T> : CompoundStep<Array<T>>
 {
     /// <inheritdoc />

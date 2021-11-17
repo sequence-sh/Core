@@ -591,7 +591,11 @@ public abstract record TypeReference
     {
         if (t.IsGenericType)
         {
-            if (t.GetGenericTypeDefinition() == typeof(Array<>))
+            var genericTypeDefinition = t.GetGenericTypeDefinition();
+
+            if (genericTypeDefinition == typeof(Array<>) ||
+                genericTypeDefinition == typeof(EagerArray<>) ||
+                genericTypeDefinition == typeof(LazyArray<>))
             {
                 var nested          = t.GenericTypeArguments[0];
                 var nestedReference = Create(nested);

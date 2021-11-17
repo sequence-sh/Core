@@ -1,9 +1,13 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
+using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using FluentAssertions;
 using MELT;
+using Microsoft.Extensions.Logging;
 using Reductech.EDR.Core.Abstractions;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal;
@@ -42,7 +46,7 @@ public abstract partial class StepTestBase<TStep, TOutput>
     public async Task TestExamples(string scl)
     {
         if (scl == "Skip")
-            return; //Skip
+            return;
 
         var tohProperty = GetType().GetProperty(nameof(TestOutputHelper))!;
 
@@ -73,9 +77,33 @@ public abstract partial class StepTestBase<TStep, TOutput>
             IExternalContext externalContext,
             ITestOutputHelper testOutputHelper)
         {
+            string realSCL;
+
+            StringBuilder sclPrefix = new();
+
+            if (SCLExampleAttribute.VariableInjections is not null)
+            {
+                foreach (var (variableName, value) in SCLExampleAttribute.VariableInjections)
+                {
+                    var line = $"- <{variableName}> = {value}";
+                    sclPrefix.AppendLine(line);
+                }
+
+                var suffix = SCLExampleAttribute.SCL;
+
+                if (!suffix.StartsWith('-'))
+                    suffix = "- " + suffix;
+
+                realSCL = sclPrefix + suffix;
+            }
+            else
+            {
+                realSCL = SCLExampleAttribute.SCL;
+            }
+
             await Task.CompletedTask;
             testOutputHelper.WriteLine("SCL:");
-            testOutputHelper.WriteLine(SCLExampleAttribute.SCL);
+            testOutputHelper.WriteLine(realSCL);
 
             if (SCLExampleAttribute.Description is not null)
             {
@@ -93,11 +121,14 @@ public abstract partial class StepTestBase<TStep, TOutput>
                     .GetOrThrow()
             );
 
-            var deserializeResult = SCLParsing.TryParseStep(SCLExampleAttribute.SCL);
+            var deserializeResult = SCLParsing.TryParseStep(realSCL);
 
             deserializeResult.ShouldBeSuccessful();
 
-            var freezeResult = deserializeResult.Value.TryFreeze(SCLRunner.RootCallerMetadata, sfs);
+            var freezeResult = deserializeResult.Value.TryFreeze(
+                SCLRunner.RootCallerMetadata,
+                sfs
+            );
 
             freezeResult.ShouldBeSuccessful();
 
@@ -118,6 +149,36 @@ public abstract partial class StepTestBase<TStep, TOutput>
 
         /// <inheritdoc />
         public override void CheckOutputResult(Result<TOutput, IError> result)
+        {
+            result.ShouldBeSuccessful();
+
+            if (SCLExampleAttribute.ExpectedOutput is null)
+                result.Value.Should().Be(Unit.Default);
+            else
+            {
+                string actualString;
+                var    expectedString = CompressSpaces(SCLExampleAttribute.ExpectedOutput);
+
+                if (result.Value is StringStream ss)
+                {
+                    actualString = CompressSpaces(ss.GetString());
+                }
+                else if (result.Value is string s)
+                {
+                    actualString = CompressSpaces(s);
+                }
+                else
+                {
+                    actualString =
+                        CompressSpaces(SerializationMethods.SerializeObject(result.Value));
+                }
+
+                actualString.Should().Be(expectedString);
+            }
+        }
+
+        /// <inheritdoc />
+        public override void CheckObjectResult(IStep step, Result<object, IError> result)
         {
             result.ShouldBeSuccessful();
 
