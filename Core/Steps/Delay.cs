@@ -14,6 +14,7 @@ namespace Reductech.EDR.Core.Steps
 /// <summary>
 /// Delay for a specified amount of time
 /// </summary>
+[Alias("Sleep")]
 [SCLExample("Delay 10", description: "Delay 10 milliseconds.")]
 public sealed class Delay : CompoundStep<Unit>
 {
@@ -37,6 +38,7 @@ public sealed class Delay : CompoundStep<Unit>
     /// </summary>
     [StepProperty(1)]
     [Required]
+    [Alias("ms")]
     public IStep<int> Milliseconds { get; set; } = null!;
 
     /// <inheritdoc />
