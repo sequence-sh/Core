@@ -290,13 +290,13 @@ public static class DocumentationCreator
             var exampleRows = doc.Examples.Select(
                     x =>
                     {
-                        var list = new List<string>() { x.SCL, };
+                        var list = new List<string>() { Escape(x.SCL) };
 
                         if (showDescription)
-                            list.Add(x.Description ?? "");
+                            list.Add(Escape(x.Description ?? ""));
 
                         if (showExpectedOutput)
-                            list.Add(x.ExpectedOutput ?? "");
+                            list.Add(Escape(x.ExpectedOutput ?? ""));
 
                         if (showExpectedLoggedValues)
                             list.Add(
@@ -304,7 +304,7 @@ public static class DocumentationCreator
                                     ? ""
                                     : string.Join(
                                         "\r\n",
-                                        x.ExpectedLogs
+                                        x.ExpectedLogs.Select(Escape)
                                     )
                             );
 
