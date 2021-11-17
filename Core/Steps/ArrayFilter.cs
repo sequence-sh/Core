@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.ComponentModel.DataAnnotations;
@@ -13,17 +13,15 @@ namespace Reductech.EDR.Core.Steps
 {
 
 /// <summary>
-/// Filter an array according to a function.
+/// Filter an array or entity stream using a conditional statement
 /// </summary>
 [Alias("FilterArray")]
 [Alias("Filter")]
 [SCLExample(
-    "Filter <MyCsvFile> Predicate: (<>['column1'] == 'TypeA')",
-    "[('column1': \"TypeA\" 'column2': 1)]",
-    null,
-    new[] { "MyCsvFile" },
-    new[] { "[(column1: 'TypeA', column2: 1),(column1: 'TypeB', column2: 2)]" }
+    "ArrayFilter [('value': 'A'), ('value': 'B'), ('value': 'C')] Predicate: (<>['value'] != 'B')",
+    "[('value': \"A\"), ('value': \"C\")]"
 )]
+[SCLExample("Filter <MyCsvFile> Using: (<>['column1'] == 'TypeA')", DeserializeInTests = false)]
 public sealed class ArrayFilter<T> : CompoundStep<Array<T>>
 {
     /// <inheritdoc />
@@ -73,6 +71,7 @@ public sealed class ArrayFilter<T> : CompoundStep<Array<T>>
     /// </summary>
     [FunctionProperty(2)]
     [Required]
+    [Alias("Using")]
     public LambdaFunction<T, bool> Predicate { get; set; } = null!;
 
     /// <inheritdoc />
