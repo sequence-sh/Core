@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using Reductech.EDR.Core.Entities;
 
 namespace Reductech.EDR.Core.Attributes
 {

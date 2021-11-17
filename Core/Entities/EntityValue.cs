@@ -604,7 +604,7 @@ public abstract record EntityValue(object? ObjectValue)
                         .GetCustomAttributes(true)
                         .OfType<DataContractAttribute>()
                         .Any()
-                   )
+                )
                 {
                     var entity = EntityConversionHelpers.ConvertToEntity(argValue);
                     return new NestedEntity(entity);
@@ -773,7 +773,7 @@ public abstract record EntityValue(object? ObjectValue)
             }
             else if (!int.TryParse(primitive, out _) && //prevent int conversion
                      Enum.TryParse(type, primitive, true, out var r)
-                    )
+            )
                 return r!;
         }
         else if (type == typeof(System.DateTime))

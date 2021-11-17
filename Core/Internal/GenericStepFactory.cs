@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using CSharpFunctionalExtensions;
+﻿using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Internal.Errors;
 
 namespace Reductech.EDR.Core.Internal

@@ -30,7 +30,6 @@ public abstract record ErrorCodeBase(string Code)
     /// </summary>
     public string Code { get; init; } = Code;
 
-    
     /// <summary>
     /// Create an errorBuilder from this errorCode and some data.
     /// </summary>
