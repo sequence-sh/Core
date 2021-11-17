@@ -16,6 +16,12 @@ namespace Reductech.EDR.Core.Steps
 /// Removes duplicate entities.
 /// </summary>
 [Alias("Distinct")]
+[Alias("RemoveDuplicates")]
+[SCLExample("[1, 2, 2, 3, 3] | RemoveDuplicates", "[1, 2, 3]", ExecuteInTests = false)]
+[SCLExample(
+    "[('a': 1 'b': 2), ('a': 1 'b': 2), ('a': 3 'b': 4)] | ArrayDistinct",
+    "[('a': 1 'b': 2), ('a': 3 'b': 4)]"
+)]
 public sealed class ArrayDistinct<T> : CompoundStep<Array<T>>
 {
     /// <inheritdoc />
