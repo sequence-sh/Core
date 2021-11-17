@@ -14,6 +14,15 @@ namespace Reductech.EDR.Core.Steps
 /// <summary>
 /// Increment an integer variable by a particular amount
 /// </summary>
+[SCLExample(
+    "- <var> = 1\n- IncrementVariable Variable: <var> Amount: 2\n- Log <var>",
+    ExpectedLogs = new[] { "3" }
+)]
+[SCLExample(
+    "- <var> = 1\n- Increment <var> By: 2\n- Log <var>",
+    ExpectedLogs = new[] { "3" }
+)]
+[Alias("Increment")]
 public sealed class IncrementVariable : CompoundStep<Unit>
 {
     /// <summary>
@@ -28,6 +37,7 @@ public sealed class IncrementVariable : CompoundStep<Unit>
     /// </summary>
     [StepProperty(2)]
     [DefaultValueExplanation("1")]
+    [Alias("By")]
     public IStep<int> Amount { get; set; } = new IntConstant(1);
 
     /// <inheritdoc />
