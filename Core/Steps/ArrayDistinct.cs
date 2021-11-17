@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.ComponentModel.DataAnnotations;
@@ -16,14 +16,6 @@ namespace Reductech.EDR.Core.Steps
 /// Removes duplicate entities.
 /// </summary>
 [Alias("Distinct")]
-[SCLExample("ArrayDistinct [1,2,2,3] (<>=> $\"{<>}\")", "[1, 2, 3]")]
-[SCLExample(
-    "- ArrayDistinct <a> (<>=> $\"{<>}\")",
-    "[1, 2, 3]",
-    null,
-    new[] { "a" },
-    new[] { "[1,2,2,3]" }
-)]
 public sealed class ArrayDistinct<T> : CompoundStep<Array<T>>
 {
     /// <inheritdoc />
@@ -85,8 +77,10 @@ public sealed class ArrayDistinct<T> : CompoundStep<Array<T>>
     /// To distinct by multiple properties, concatenate several keys
     /// </summary>
     [FunctionProperty(2)]
-    [Required]
-    public LambdaFunction<T, StringStream> KeySelector { get; set; } = null!;
+    [DefaultValueExplanation("The item/entity")]
+    [Alias("Using")]
+    public LambdaFunction<T, StringStream> KeySelector { get; set; }
+        = new(null, new StringInterpolate { Strings = new[] { new GetAutomaticVariable<T>() } });
 
     /// <summary>
     /// Whether to ignore case when comparing strings.

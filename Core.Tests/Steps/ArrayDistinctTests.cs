@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Internal.Serialization;
@@ -86,6 +87,15 @@ public partial class ArrayDistinctTests : StepTestBase<ArrayDistinct<Entity>, Ar
             );
         }
     }
+
+    /// <inheritdoc />
+    protected override IEnumerable<SerializeCase> SerializeCases => base.SerializeCases.Select(
+        x => x with
+        {
+            ExpectedSCL =
+            @"ArrayDistinct Array: [('Prop1': ""Val0"" 'Prop2': ""Val1""), ('Prop1': ""Val2"" 'Prop2': ""Val3""), ('Prop1': ""Val4"" 'Prop2': ""Val5"")] KeySelector: (<> => $""{<>}"") IgnoreCase: False"
+        }
+    );
 
     /// <inheritdoc />
     protected override IEnumerable<ErrorCase> ErrorCases
