@@ -14,7 +14,7 @@ namespace Reductech.EDR.Core.Steps
 {
 
 /// <summary>
-/// Do an action for each member of the list.
+/// Do an action for each element in an array or entity in an entity stream.
 /// </summary>
 [Alias("EntityForEach")]
 [Alias("ForEachItem")]
@@ -22,7 +22,7 @@ namespace Reductech.EDR.Core.Steps
 public sealed class ForEach<T> : CompoundStep<Unit>
 {
     /// <summary>
-    /// The elements to iterate over.
+    /// The array or entity stream to iterate over
     /// </summary>
     [StepProperty(1)]
     [Required]
@@ -30,7 +30,7 @@ public sealed class ForEach<T> : CompoundStep<Unit>
     public IStep<Array<T>> Array { get; set; } = null!;
 
     /// <summary>
-    /// The action to perform repeatedly.
+    /// The action to perform on each iteration
     /// </summary>
     [FunctionProperty(2)]
     [Required]
