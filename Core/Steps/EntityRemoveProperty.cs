@@ -12,6 +12,13 @@ namespace Reductech.EDR.Core.Steps
 /// <summary>
 /// Returns a copy of the entity with the specified property removed
 /// </summary>
+[SCLExample(
+    "EntityRemoveProperty Entity: ('type': 'A', 'value': 1) Property: 'type'",
+    "('value': 1)"
+)]
+[SCLExample("Remove From: ('type': 'A', 'value': 1) Property: 'value'", "('type': \"A\")")]
+[Alias("Remove")]
+[Alias("RemoveProperty")]
 public sealed class EntityRemoveProperty : CompoundStep<Entity>
 {
     /// <inheritdoc />
@@ -40,6 +47,7 @@ public sealed class EntityRemoveProperty : CompoundStep<Entity>
     /// </summary>
     [StepProperty(1)]
     [Required]
+    [Alias("From")]
     public IStep<Entity> Entity { get; set; } = null!;
 
     /// <summary>
