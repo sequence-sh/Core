@@ -17,6 +17,8 @@ namespace Reductech.EDR.Core.Steps
 /// Do an action for each member of the list.
 /// </summary>
 [Alias("EntityForEach")]
+[Alias("ForEachItem")]
+[SCLExample("ForEachItem In: [1, 2, 3] Do: (Log <item>)", ExpectedLogs = new[] { "1", "2", "3" })]
 public sealed class ForEach<T> : CompoundStep<Unit>
 {
     /// <summary>
@@ -24,6 +26,7 @@ public sealed class ForEach<T> : CompoundStep<Unit>
     /// </summary>
     [StepProperty(1)]
     [Required]
+    [Alias("In")]
     public IStep<Array<T>> Array { get; set; } = null!;
 
     /// <summary>
@@ -31,6 +34,7 @@ public sealed class ForEach<T> : CompoundStep<Unit>
     /// </summary>
     [FunctionProperty(2)]
     [Required]
+    [Alias("Do")]
     public LambdaFunction<T, Unit> Action { get; set; } = null!;
 
     /// <inheritdoc />
