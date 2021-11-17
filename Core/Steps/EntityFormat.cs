@@ -13,6 +13,7 @@ namespace Reductech.EDR.Core.Steps
 /// <summary>
 /// Formats an entity as a string
 /// </summary>
+[Alias("Format")]
 public sealed class EntityFormat : CompoundStep<StringStream>
 {
     /// <inheritdoc />
