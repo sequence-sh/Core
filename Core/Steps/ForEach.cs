@@ -18,6 +18,7 @@ namespace Reductech.EDR.Core.Steps
 /// </summary>
 [Alias("EntityForEach")]
 [Alias("ForEachItem")]
+[SCLExample("ForEach [1, 2, 3] Action: (Log <item>)", ExpectedLogs     = new[] { "1", "2", "3" })]
 [SCLExample("ForEachItem In: [1, 2, 3] Do: (Log <item>)", ExpectedLogs = new[] { "1", "2", "3" })]
 public sealed class ForEach<T> : CompoundStep<Unit>
 {
