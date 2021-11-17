@@ -212,9 +212,9 @@ public sealed class TypeResolver
                 return false;
 
             if (!previous.Allow(
-                typeReference,
-                this
-            ))
+                    typeReference,
+                    this
+                ))
                 return ErrorCode.WrongVariableType.ToErrorBuilder(
                     variable.Name,
                     typeReference.Name

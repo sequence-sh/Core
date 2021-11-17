@@ -34,6 +34,7 @@ public enum SortOrder
 /// </summary>
 [Alias("SortArray")]
 [Alias("Sort")]
+[SCLExample("ArraySort [2, 4, 1, 3] Descending: true", "[4, 3, 2, 1]")]
 public sealed class ArraySort<T> : CompoundStep<Array<T>>
 {
     /// <summary>
