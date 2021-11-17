@@ -13,7 +13,8 @@ namespace Reductech.EDR.Core.Steps
 /// <summary>
 /// Returns true if a string is matched by a particular regular expression
 /// </summary>
-public sealed class RegexMatch : CompoundStep<bool>
+[Alias("RegexMatch")]
+public sealed class StringMatch : CompoundStep<bool>
 {
     /// <inheritdoc />
     protected override async Task<Result<bool, IError>> Run(
@@ -70,7 +71,7 @@ public sealed class RegexMatch : CompoundStep<bool>
     public IStep<bool> IgnoreCase { get; set; } = new BoolConstant(false);
 
     /// <inheritdoc />
-    public override IStepFactory StepFactory { get; } = new SimpleStepFactory<RegexMatch, bool>();
+    public override IStepFactory StepFactory { get; } = new SimpleStepFactory<StringMatch, bool>();
 }
 
 }

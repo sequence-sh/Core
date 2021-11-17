@@ -6,7 +6,7 @@ using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 namespace Reductech.EDR.Core.Tests.Steps
 {
 
-public partial class RegexMatchTests : StepTestBase<RegexMatch, bool>
+public partial class StringMatchTests : StepTestBase<StringMatch, bool>
 {
     /// <inheritdoc />
     protected override IEnumerable<StepCase> StepCases
@@ -15,7 +15,7 @@ public partial class RegexMatchTests : StepTestBase<RegexMatch, bool>
         {
             yield return new StepCase(
                 "Simple true match",
-                new RegexMatch()
+                new StringMatch()
                 {
                     String     = Constant("hello"),
                     Pattern    = Constant(@"h\w+"),
@@ -26,7 +26,7 @@ public partial class RegexMatchTests : StepTestBase<RegexMatch, bool>
 
             yield return new StepCase(
                 "Simple false match",
-                new RegexMatch()
+                new StringMatch()
                 {
                     String     = Constant("hello"),
                     Pattern    = Constant(@"H\w+"),
@@ -37,7 +37,7 @@ public partial class RegexMatchTests : StepTestBase<RegexMatch, bool>
 
             yield return new StepCase(
                 "Ignore case true match",
-                new RegexMatch()
+                new StringMatch()
                 {
                     String     = Constant("hello"),
                     Pattern    = Constant(@"H\w+"),
