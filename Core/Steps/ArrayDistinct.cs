@@ -13,7 +13,9 @@ namespace Reductech.EDR.Core.Steps
 {
 
 /// <summary>
-/// Removes duplicate entities.
+/// Removes duplicate elements in an array or entities in an entity stream.
+/// By default, all entity properties are used to determine duplicates. This
+/// behaviour can be changed by using the `KeySelector` parameter.
 /// </summary>
 [Alias("Distinct")]
 [Alias("RemoveDuplicates")]
@@ -76,6 +78,7 @@ public sealed class ArrayDistinct<T> : CompoundStep<Array<T>>
     /// </summary>
     [StepProperty(1)]
     [Required]
+    [Alias("In")]
     public IStep<Array<T>> Array { get; set; } = null!;
 
     /// <summary>
