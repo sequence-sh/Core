@@ -12,8 +12,14 @@ namespace Reductech.EDR.Core.Steps
 
 /// <summary>
 /// Gets the first index of an element in an array.
+/// The index starts at 0.
 /// Returns -1 if the element is not present.
 /// </summary>
+[Alias("FindElement")]
+[Alias("Find")]
+[SCLExample("ArrayFind Array: [1, 2, 3] Element: 2", "1")]
+[SCLExample("Find In: ['a', 'b', 'c'] Item: 'a'",    "0")]
+[SCLExample("Find In: ['a', 'b', 'c'] Item: 'd'",    "-1")]
 public sealed class ArrayFind<T> : CompoundStep<int>
 {
     /// <summary>
@@ -21,6 +27,7 @@ public sealed class ArrayFind<T> : CompoundStep<int>
     /// </summary>
     [StepProperty(1)]
     [Required]
+    [Alias("In")]
     public IStep<Array<T>> Array { get; set; } = null!;
 
     /// <summary>
@@ -28,6 +35,7 @@ public sealed class ArrayFind<T> : CompoundStep<int>
     /// </summary>
     [StepProperty(2)]
     [Required]
+    [Alias("Item")]
     public IStep<T> Element { get; set; } = null!;
 
     /// <inheritdoc />
