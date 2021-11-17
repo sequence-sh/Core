@@ -17,6 +17,8 @@ namespace Reductech.EDR.Core.Steps
     "EntityGetProperties (property1: 1, property2: 2)",
     ExpectedOutput = "[\"property1\", \"property2\"]"
 )]
+[Alias("GetProps")]
+[Alias("GetProperties")]
 public sealed class EntityGetProperties : CompoundStep<Array<StringStream>>
 {
     /// <inheritdoc />
