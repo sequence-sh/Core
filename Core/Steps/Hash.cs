@@ -13,7 +13,7 @@ namespace Reductech.EDR.Core.Steps
 {
 
 /// <summary>
-/// Produce a hash for some data
+/// Produce a hash for some data using the specified hash algorithm
 /// </summary>
 public class Hash : CompoundStep<StringStream>
 {
@@ -47,7 +47,7 @@ public class Hash : CompoundStep<StringStream>
     }
 
     /// <summary>
-    /// The data to hash
+    /// The string or data stream to hash
     /// </summary>
     [Required]
     [StepProperty(1)]
