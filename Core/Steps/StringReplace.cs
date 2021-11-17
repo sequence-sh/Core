@@ -17,7 +17,11 @@ namespace Reductech.EDR.Core.Steps
 /// <summary>
 /// Replace every regex match in the string with the result of a particular function
 /// </summary>
-[SCLExample("StringReplace 'number 1' '1' 'one'", "number one", description: "Basic Replacement")]
+[SCLExample(
+    "StringReplace String: 'number 1' Find: '1' Replace: 'one'",
+    "number one",
+    description: "Basic Replacement"
+)]
 [SCLExample(
     "StringReplace 'number 1' '\\w+' Function: (stringToCase <> TextCase.Upper)",
     "NUMBER 1",
@@ -140,6 +144,7 @@ public sealed class StringReplace : CompoundStep<StringStream>
     /// </summary>
     [StepProperty(1)]
     [Required]
+    [Alias("In")]
     public IStep<StringStream> String { get; set; } = null!;
 
     /// <summary>
@@ -148,6 +153,7 @@ public sealed class StringReplace : CompoundStep<StringStream>
     /// </summary>
     [StepProperty(2)]
     [Required]
+    [Alias("Find")]
     public IStep<StringStream> Pattern { get; set; } = null!;
 
     /// <summary>
