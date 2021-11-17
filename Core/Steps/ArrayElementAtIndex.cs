@@ -14,9 +14,11 @@ namespace Reductech.EDR.Core.Steps
 
 /// <summary>
 /// Gets the array element at a particular index.
+/// The first element has an index of 0.
 /// </summary>
 [Alias("FromArray")]
 [Alias("ElementAtIndex")]
+[SCLExample("FromArray ['A', 'B', 'C'] GetElement: 1", "B")]
 public sealed class ArrayElementAtIndex<T> : CompoundStep<T>
 {
     /// <summary>
