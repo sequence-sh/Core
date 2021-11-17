@@ -27,6 +27,7 @@ public sealed class DoXTimes : CompoundStep<Unit> //TODO replace with a lambda f
     /// </summary>
     [StepProperty(2)]
     [Required]
+    [Alias("Times")]
     public IStep<int> X { get; set; } = null!;
 
     /// <inheritdoc />
