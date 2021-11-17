@@ -13,6 +13,9 @@ namespace Reductech.EDR.Core.Steps
 /// <summary>
 /// Returns true if a string is matched by a particular regular expression
 /// </summary>
+[SCLExample("StringMatch String: 'aaaabbbbccc' Pattern: 'a+b+c+'", "True")]
+[SCLExample("IsMatch String: 'abracadabra' Regex: 'ab\\w+?ab'",    "True")]
+[Alias("IsMatch")]
 [Alias("RegexMatch")]
 public sealed class StringMatch : CompoundStep<bool>
 {
@@ -61,6 +64,7 @@ public sealed class StringMatch : CompoundStep<bool>
     /// </summary>
     [StepProperty(2)]
     [Required]
+    [Alias("Regex")]
     public IStep<StringStream> Pattern { get; set; } = null!;
 
     /// <summary>
