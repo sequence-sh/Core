@@ -28,6 +28,7 @@ public sealed class StringJoin : CompoundStep<StringStream>
     /// </summary>
     [StepProperty(2)]
     [DefaultValueExplanation("Empty String")]
+    [Alias("Using")]
     public IStep<StringStream> Delimiter { get; set; } = new StringConstant("");
 
     /// <inheritdoc />
