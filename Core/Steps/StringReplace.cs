@@ -17,18 +17,23 @@ namespace Reductech.EDR.Core.Steps
 /// <summary>
 /// Replace every regex match in the string with the result of a particular function
 /// </summary>
-[SCLExample("RegexReplace 'number 1' '1' 'one'", "number one", description: "Basic Replacement")]
 [SCLExample(
-    "RegexReplace 'number 1' '\\w+' Function: (stringToCase <> TextCase.Upper)",
+    "StringReplace String: 'number 1' Find: '1' Replace: 'one'",
+    "number one",
+    description: "Basic Replacement"
+)]
+[SCLExample(
+    "StringReplace 'number 1' '\\w+' Function: (stringToCase <> TextCase.Upper)",
     "NUMBER 1",
     description: "Replace using a function"
 )]
 [SCLExample(
-    "RegexReplace 'number 13' '(\\w+)\\s+(\\d+)' '$2 was your $1'",
+    "StringReplace 'number 13' '(\\w+)\\s+(\\d+)' '$2 was your $1'",
     "13 was your number",
     "Replace captured groups"
 )]
-public sealed class RegexReplace : CompoundStep<StringStream>
+[Alias("RegexReplace")]
+public sealed class StringReplace : CompoundStep<StringStream>
 {
     /// <inheritdoc />
     protected override async Task<Result<StringStream, IError>> Run(
@@ -139,6 +144,7 @@ public sealed class RegexReplace : CompoundStep<StringStream>
     /// </summary>
     [StepProperty(1)]
     [Required]
+    [Alias("In")]
     public IStep<StringStream> String { get; set; } = null!;
 
     /// <summary>
@@ -147,6 +153,7 @@ public sealed class RegexReplace : CompoundStep<StringStream>
     /// </summary>
     [StepProperty(2)]
     [Required]
+    [Alias("Find")]
     public IStep<StringStream> Pattern { get; set; } = null!;
 
     /// <summary>
@@ -173,7 +180,7 @@ public sealed class RegexReplace : CompoundStep<StringStream>
 
     /// <inheritdoc />
     public override IStepFactory StepFactory { get; } =
-        new SimpleStepFactory<RegexReplace, StringStream>();
+        new SimpleStepFactory<StringReplace, StringStream>();
 
     /// <summary>
     /// Regex for matching regex groups

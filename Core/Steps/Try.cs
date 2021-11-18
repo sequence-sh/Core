@@ -23,15 +23,15 @@ namespace Reductech.EDR.Core.Steps
 [SCLExample(
     "Try (1 / 0)",
     "0",
-    Description = "If the alternative is not set the default value is used.",
+    Description  = "If the alternative is not set the default value is used.",
     ExpectedLogs = new[] { "Error Caught in Divide: Attempt to Divide by Zero." }
 )]
 [SCLExample(
-    "Try (ElementAtIndex [0,1,2,3] 4 ) 4",
+    "Try (ArrayElementAtIndex [0,1,2,3] 4 ) 4",
     "4",
     ExpectedLogs = new[]
     {
-        "Error Caught in ElementAtIndex: Index was outside the bounds of the array."
+        "Error Caught in ArrayElementAtIndex: Index was outside the bounds of the array."
     }
 )]
 public sealed class Try<T> : CompoundStep<T>

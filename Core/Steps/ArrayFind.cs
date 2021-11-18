@@ -12,15 +12,22 @@ namespace Reductech.EDR.Core.Steps
 
 /// <summary>
 /// Gets the first index of an element in an array.
+/// The index starts at 0.
 /// Returns -1 if the element is not present.
 /// </summary>
-public sealed class FindElement<T> : CompoundStep<int>
+[Alias("FindElement")]
+[Alias("Find")]
+[SCLExample("ArrayFind Array: [1, 2, 3] Element: 2", "1")]
+[SCLExample("Find In: ['a', 'b', 'c'] Item: 'a'",    "0")]
+[SCLExample("Find In: ['a', 'b', 'c'] Item: 'd'",    "-1")]
+public sealed class ArrayFind<T> : CompoundStep<int>
 {
     /// <summary>
     /// The array to check.
     /// </summary>
     [StepProperty(1)]
     [Required]
+    [Alias("In")]
     public IStep<Array<T>> Array { get; set; } = null!;
 
     /// <summary>
@@ -28,6 +35,7 @@ public sealed class FindElement<T> : CompoundStep<int>
     /// </summary>
     [StepProperty(2)]
     [Required]
+    [Alias("Item")]
     public IStep<T> Element { get; set; } = null!;
 
     /// <inheritdoc />
@@ -52,22 +60,22 @@ public sealed class FindElement<T> : CompoundStep<int>
     }
 
     /// <inheritdoc />
-    public override IStepFactory StepFactory => FindElementStepFactory.Instance;
+    public override IStepFactory StepFactory => ArrayFindStepFactory.Instance;
 
     /// <summary>
     /// Gets the first index of an element in an array.
     /// </summary>
-    public sealed class FindElementStepFactory : ArrayStepFactory
+    public sealed class ArrayFindStepFactory : ArrayStepFactory
     {
-        private FindElementStepFactory() { }
+        private ArrayFindStepFactory() { }
 
         /// <summary>
         /// The instance.
         /// </summary>
-        public static GenericStepFactory Instance { get; } = new FindElementStepFactory();
+        public static GenericStepFactory Instance { get; } = new ArrayFindStepFactory();
 
         /// <inheritdoc />
-        public override Type StepType => typeof(FindElement<>);
+        public override Type StepType => typeof(ArrayFind<>);
 
         /// <inheritdoc />
         public override string OutputTypeExplanation => nameof(Int32);
@@ -87,7 +95,7 @@ public sealed class FindElement<T> : CompoundStep<int>
         }
 
         /// <inheritdoc />
-        protected override string ArrayPropertyName => nameof(FindElement<object>.Array);
+        protected override string ArrayPropertyName => nameof(ArrayFind<object>.Array);
 
         /// <inheritdoc />
         protected override string? LambdaPropertyName => null;

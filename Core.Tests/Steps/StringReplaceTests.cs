@@ -10,7 +10,7 @@ using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 namespace Reductech.EDR.Core.Tests.Steps
 {
 
-public partial class RegexReplaceTests : StepTestBase<RegexReplace, StringStream>
+public partial class StringReplaceTests : StepTestBase<StringReplace, StringStream>
 {
     /// <inheritdoc />
     protected override IEnumerable<StepCase> StepCases
@@ -19,7 +19,7 @@ public partial class RegexReplaceTests : StepTestBase<RegexReplace, StringStream
         {
             yield return new StepCase(
                 "Simple Replace",
-                new RegexReplace()
+                new StringReplace()
                 {
                     String     = Constant("Number 1"),
                     Pattern    = Constant(@"\d+"),
@@ -45,7 +45,7 @@ public partial class RegexReplaceTests : StepTestBase<RegexReplace, StringStream
 
             yield return new StepCase(
                 "No Replacement",
-                new RegexReplace()
+                new StringReplace()
                 {
                     String     = Constant("Number One"),
                     Pattern    = Constant(@"\d+"),
@@ -71,7 +71,7 @@ public partial class RegexReplaceTests : StepTestBase<RegexReplace, StringStream
 
             yield return new StepCase(
                 "Multiple Replacements",
-                new RegexReplace()
+                new StringReplace()
                 {
                     String     = Constant("Number 1, 2, 3"),
                     Pattern    = Constant(@"\d+"),
@@ -109,8 +109,8 @@ public partial class RegexReplaceTests : StepTestBase<RegexReplace, StringStream
 
             yield return new ErrorCase(
                 "Neither Replace nor Function is set",
-                new RegexReplace() { String = Constant("blah"), Pattern = Constant("Pattern") },
-                ErrorCode.MissingParameter.ToErrorBuilder(nameof(RegexReplace.Replace))
+                new StringReplace() { String = Constant("blah"), Pattern = Constant("Pattern") },
+                ErrorCode.MissingParameter.ToErrorBuilder(nameof(StringReplace.Replace))
             );
         }
     }
@@ -118,7 +118,7 @@ public partial class RegexReplaceTests : StepTestBase<RegexReplace, StringStream
     [Fact]
     public void ConflictingParametersShouldNotPassVerify()
     {
-        var step = new RegexReplace()
+        var step = new StringReplace()
         {
             String  = Constant("blah"),
             Pattern = Constant("Pattern"),
@@ -138,8 +138,8 @@ public partial class RegexReplaceTests : StepTestBase<RegexReplace, StringStream
         verifyResult.Error.ToErrorBuilder.Should()
             .Be(
                 ErrorCode.ConflictingParameters.ToErrorBuilder(
-                    nameof(RegexReplace.Replace),
-                    nameof(RegexReplace.Function)
+                    nameof(StringReplace.Replace),
+                    nameof(StringReplace.Function)
                 )
             );
     }

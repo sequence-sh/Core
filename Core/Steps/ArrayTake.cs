@@ -12,10 +12,11 @@ namespace Reductech.EDR.Core.Steps
 {
 
 /// <summary>
-/// Take the first n elements of the array
+/// Take the first n elements of an array or entity stream
 /// </summary>
 [Alias("Take")]
-[SCLExample("ArrayTake [1, 2, 3] 2", ExpectedOutput = "[1, 2]")]
+[SCLExample("ArrayTake [1, 2, 3] 2",               "[1, 2]")]
+[SCLExample("Take From: [1, 2, 3, 4, 5] Count: 3", "[1, 2, 3]")]
 public sealed class ArrayTake<T> : CompoundStep<Array<T>>
 {
     /// <inheritdoc />
@@ -34,14 +35,15 @@ public sealed class ArrayTake<T> : CompoundStep<Array<T>>
     }
 
     /// <summary>
-    /// The array to take elements from
+    /// The array or entity stream to take elements from
     /// </summary>
     [StepProperty(1)]
     [Required]
+    [Alias("From")]
     public IStep<Array<T>> Array { get; set; } = null!;
 
     /// <summary>
-    /// The number of elements to take
+    /// The number of elements/entities to take
     /// </summary>
     [StepProperty(2)]
     [Required]

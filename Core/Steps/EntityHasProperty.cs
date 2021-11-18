@@ -14,6 +14,9 @@ namespace Reductech.EDR.Core.Steps
 /// Checks if an entity has a particular property.
 /// </summary>
 [Alias("DoesEntityHave")]
+[Alias("DoesEntity")]
+[SCLExample("DoesEntity ('type': 'C', 'value': 1) Have: 'type'",  "True")]
+[SCLExample("EntityHasProperty ('type': 'C', 'value': 1) 'name'", "False")]
 public sealed class EntityHasProperty : CompoundStep<bool>
 {
     /// <inheritdoc />
@@ -49,6 +52,7 @@ public sealed class EntityHasProperty : CompoundStep<bool>
     /// </summary>
     [StepProperty(2)]
     [Required]
+    [Alias("Have")]
     public IStep<StringStream> Property { get; set; } = null!;
 
     /// <inheritdoc />

@@ -16,7 +16,11 @@ namespace Reductech.EDR.Core.Steps
 /// <summary>
 /// Joins strings.
 /// Supports string interpolation.
+/// To use string interpolation, the string must be enclosed in double
+/// quotes and prefixed with a dollar-sign ($). Then, anything in curly
+/// brackets { and } will be evaluated as SCL.
 /// </summary>
+[SCLExample("$\"The answer is {6 + (6 ^ 2)}\"", "The answer is 42")]
 public sealed class StringInterpolate : CompoundStep<StringStream>
 {
     /// <inheritdoc />

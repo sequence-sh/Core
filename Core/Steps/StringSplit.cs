@@ -29,6 +29,7 @@ public sealed class StringSplit : CompoundStep<Array<StringStream>>
     /// </summary>
     [StepProperty(2)]
     [Required]
+    [Alias("Using")]
     public IStep<StringStream> Delimiter { get; set; } = null!;
 
     /// <inheritdoc />

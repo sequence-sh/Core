@@ -15,9 +15,23 @@ namespace Reductech.EDR.Core.Steps
 {
 
 /// <summary>
-/// Change the name of entity fields.
+/// Rename entity properties
 /// </summary>
 [Alias("RenameEntityFields")]
+[Alias("RenameProperties")]
+[Alias("RenameProps")]
+[SCLExample(
+    @"EntityMapProperties In: [
+  ('typeA': 'A', 'valueA': 1)
+  ('typeB': 'B', 'valueB': 2)
+  ('typeA': 'A', 'valueA': 3)
+] Mappings: ('value': ['valueA', 'valueB'] 'type': ['typeA', 'typeB'])",
+    "[('type': \"A\" 'value': 1), ('type': \"B\" 'value': 2), ('type': \"A\" 'value': 3)]"
+)]
+[SCLExample(
+    "RenameProperties In: [('a': 1), ('b': 1), ('c': 1)] To: ('value': ['a', 'b', 'c'])",
+    "[('value': 1), ('value': 1), ('value': 1)]"
+)]
 public class EntityMapProperties : CompoundStep<Array<Entity>>
 {
     /// <inheritdoc />
@@ -108,15 +122,17 @@ public class EntityMapProperties : CompoundStep<Array<Entity>>
     /// </summary>
     [StepProperty(1)]
     [Required]
+    [Alias("In")]
     public IStep<Array<Entity>> EntityStream { get; set; } = null!;
 
     /// <summary>
     /// An entity containing mappings.
     /// The keys in the entity will be the new column names.
-    /// The value of each property should either the the name of the source column or a list of source column names
+    /// The value of each property should either the name of the source column or a list of source column names
     /// </summary>
     [StepProperty(2)]
     [Required]
+    [Alias("To")]
     public IStep<Entity> Mappings { get; set; } = null!;
 
     /// <inheritdoc />

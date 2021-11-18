@@ -5,16 +5,16 @@ namespace Reductech.EDR.Core.Internal.Serialization
 {
 
 /// <summary>
-/// Serializer for ElementAtIndex
+/// Serializer for ArrayElementAtIndex
 /// </summary>
-public class ElementAtIndexSerializer : IStepSerializer
+public class ArrayElementAtIndexSerializer : IStepSerializer
 {
-    private ElementAtIndexSerializer() { }
+    private ArrayElementAtIndexSerializer() { }
 
     /// <summary>
     /// The instance
     /// </summary>
-    public static IStepSerializer Instance { get; } = new ElementAtIndexSerializer();
+    public static IStepSerializer Instance { get; } = new ArrayElementAtIndexSerializer();
 
     /// <inheritdoc />
     public string Serialize(IEnumerable<StepProperty> stepProperties)

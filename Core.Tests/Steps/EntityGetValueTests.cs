@@ -45,7 +45,7 @@ public partial class EntityGetValueTests : StepTestBase<EntityGetValue<StringStr
                         {
                             {
                                 new EntityPropertyKey("Foo"),
-                                new GetSubstring()
+                                new StringSubstring()
                                 {
                                     String = Constant("Hello World"), Length = Constant(5)
                                 }

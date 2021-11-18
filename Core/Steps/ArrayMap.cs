@@ -13,9 +13,22 @@ namespace Reductech.EDR.Core.Steps
 {
 
 /// <summary>
-/// Map each element of the array to a new value.
+/// Map each element of an array or entity stream to a new value.
+/// This Step can be used to update elements of an array, or to update
+/// entity property values.
 /// The new value must have the same type as the original value.
 /// </summary>
+[SCLExample("ArrayMap [1, 2, 3, 4] Function: (<> + 1)", "[2, 3, 4, 5]")]
+[SCLExample(
+    @"Map Array: [
+  ('type': 'A', 'value': 1)
+  ('type': 'B', 'value': 2)
+  ('type': 'A', 'value': 3)
+] Using: (In <> Set: 'value' To: (<>['value'] + 1))",
+    "[('type': \"A\" 'value': 2), ('type': \"B\" 'value': 3), ('type': \"A\" 'value': 4)]"
+)]
+[Alias("EntityMap")] // legacy name
+[Alias("Map")]
 public sealed class ArrayMap<T> : CompoundStep<Array<T>>
 {
     /// <inheritdoc />
@@ -53,17 +66,18 @@ public sealed class ArrayMap<T> : CompoundStep<Array<T>>
     }
 
     /// <summary>
-    /// The array to map
+    /// The array or entity stream to map
     /// </summary>
     [StepProperty(1)]
     [Required]
     public IStep<Array<T>> Array { get; set; } = null!;
 
     /// <summary>
-    /// A function to get the mapped entity
+    /// A function to update the values and return the mapped entity
     /// </summary>
     [FunctionProperty(2)]
     [Required]
+    [Alias("Using")]
     public LambdaFunction<T, T> Function { get; set; } = null!;
 
     /// <inheritdoc />

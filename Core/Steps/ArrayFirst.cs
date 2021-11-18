@@ -10,11 +10,12 @@ namespace Reductech.EDR.Core.Steps
 {
 
 /// <summary>
-/// Gets the first element of an array
+/// Gets the first element of an array or entity stream
 /// </summary>
-/// <typeparam name="T"></typeparam>
 [Alias("First")]
-[SCLExample("ArrayFirst [1,2,3]", ExpectedOutput = "1")]
+[Alias("GetFirstItem")]
+[SCLExample("ArrayFirst [1,2,3]", ExpectedOutput       = "1")]
+[SCLExample("GetFirstItem In: [1,2,3]", ExpectedOutput = "1")]
 public sealed class ArrayFirst<T> : CompoundStep<T>
 {
     /// <inheritdoc />
@@ -31,6 +32,7 @@ public sealed class ArrayFirst<T> : CompoundStep<T>
     /// </summary>
     [StepProperty(1)]
     [Required]
+    [Alias("In")]
     public IStep<Array<T>> Array { get; set; } = null!;
 
     /// <inheritdoc />

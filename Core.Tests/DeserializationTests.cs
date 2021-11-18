@@ -325,14 +325,14 @@ Log 'Comments!'",
             yield return new DeserializationTestInstance(
                 @"
 - <ArrayVar> =  ['abc', '123']
-- Log(ElementAtIndex <ArrayVar> 1)",
+- Log(ArrayElementAtIndex <ArrayVar> 1)",
                 "123"
             );
 
             yield return new DeserializationTestInstance(
                 @"
 - <ArrayVar> = ['abc', '123']
-- Log(FindElement <ArrayVar> '123')",
+- Log(ArrayFind <ArrayVar> '123')",
                 "1"
             );
 
@@ -371,7 +371,7 @@ Log 'Comments!'",
                 @"
 - <ArrayVar> = ['abc', 'def']
 - <Sorted> = (ArraySort <ArrayVar>)
-- Log (ElementAtIndex <Sorted> 0)",
+- Log (ArrayElementAtIndex <Sorted> 0)",
                 "abc"
             );
 
@@ -384,7 +384,7 @@ Log 'Comments!'",
 
             yield return new DeserializationTestInstance(
                 @"
-- <docs> = GenerateDocumentation
+- <docs> = DocumentationCreate
 - log <docs>['MainContents']['FileName']
 ",
                 "all.md"
@@ -392,7 +392,7 @@ Log 'Comments!'",
 
             //            yield return new DeserializationTestInstance(
             //                @"
-            //- <docs> = (GenerateDocumentation)['AllPages']
+            //- <docs> = (DocumentationCreate)['AllPages']
             //- <docs> | ForEach (
             //    - log <>['FileName']
             //)
@@ -402,7 +402,7 @@ Log 'Comments!'",
 
             //            yield return new DeserializationTestInstance(
             //                @"
-            //- <docs> = (GenerateDocumentation)['AllPages']
+            //- <docs> = (DocumentationCreate)['AllPages']
             //-  ForEach <docs> (log <>['FileName'])
             //",
             //                "all.md"
@@ -410,7 +410,7 @@ Log 'Comments!'",
 
             yield return new DeserializationTestInstance(
                 @"
-- (GenerateDocumentation)['AllPages'] | ArrayFilter (<>['FileName'] == 'Not.md') | ForEach (
+- (DocumentationCreate)['AllPages'] | ArrayFilter (<>['FileName'] == 'Not.md') | ForEach (
     - <path> = $""{<>['Directory']}/{<>['FileName']}""
     - log <path>
 )
@@ -686,7 +686,7 @@ Log 'Comments!'",
 
             yield return new DeserializationTestInstance(
                 @"
-- <docs> = (GenerateDocumentation)['AllPages'] | ArrayTake 50
+- <docs> = (DocumentationCreate)['AllPages'] | ArrayTake 50
 - log <docs>
 ",
                 "50 Elements"
@@ -702,7 +702,7 @@ Log 'Comments!'",
 
             yield return new DeserializationTestInstance(
                 @"
-- <docs> = (GenerateDocumentation)['AllPages'] | arraytake 1
+- <docs> = (DocumentationCreate)['AllPages'] | arraytake 1
 - <docs> 
  | ForEach (<entityVar> =>
     log (stringtrim <entityVar>['FileName'])

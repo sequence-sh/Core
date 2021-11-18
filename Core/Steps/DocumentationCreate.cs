@@ -14,18 +14,18 @@ namespace Reductech.EDR.Core.Steps
 /// Generates documentation for all available steps.
 /// </summary>
 [SCLExample(
-    @"
-- <root> = 'edr/steps'
-- (GenerateDocumentation)['AllPages'] | ForEach (
+    @"- <root> = 'edr/steps'
+- (DocumentationCreate)['AllPages'] | ForEach (
     - <path> = $""{<root>}/{<>['Directory']}/{<>['FileName']}""
     - log <path>
 )",
-    Description = "Logs all the file paths",
+    Description    = "Logs all the file paths",
     ExecuteInTests = false
 )]
 [SCLExample("GenerateDocumentation | EntityFormat", ExampleOutput, ExecuteInTests = false)]
-public sealed class
-    GenerateDocumentation : CompoundStep<Entity>
+[Alias("DocGen")]
+[Alias("GenerateDocumentation")]
+public sealed class DocumentationCreate : CompoundStep<Entity>
 {
     /// <inheritdoc />
     protected override async Task<Result<Entity, IError>> Run(
@@ -47,7 +47,7 @@ public sealed class
 
     /// <inheritdoc />
     public override IStepFactory StepFactory { get; } =
-        new SimpleStepFactory<GenerateDocumentation, Entity>();
+        new SimpleStepFactory<DocumentationCreate, Entity>();
 
     const string ExampleOutput =
         @"(

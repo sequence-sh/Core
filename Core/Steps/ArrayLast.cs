@@ -11,10 +11,12 @@ namespace Reductech.EDR.Core.Steps
 {
 
 /// <summary>
-/// Gets the last element of the array
+/// Gets the last element of an array or entity stream
 /// </summary>
 [Alias("Last")]
-[SCLExample("ArrayLast [1,2,3]", ExpectedOutput = "3")]
+[Alias("GetLastItem")]
+[SCLExample("ArrayLast [1,2,3]", ExpectedOutput       = "3")]
+[SCLExample("GetLastItem In: [1,2,3]", ExpectedOutput = "3")]
 public sealed class ArrayLast<T> : CompoundStep<T>
 {
     /// <inheritdoc />
@@ -40,10 +42,11 @@ public sealed class ArrayLast<T> : CompoundStep<T>
     public override IStepFactory StepFactory => new SimpleStepFactory<ArrayLast<T>, T>();
 
     /// <summary>
-    /// The array to get the lat element of
+    /// The array to get the last element of
     /// </summary>
     [StepProperty(1)]
     [Required]
+    [Alias("In")]
     public IStep<Array<T>> Array { get; set; } = null!;
 }
 

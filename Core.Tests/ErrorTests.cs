@@ -69,13 +69,13 @@ public partial class RunErrorTests
 
             yield return new ErrorTestFunction(
                 "Array Index minus one",
-                new ElementAtIndex<bool> { Array = Array(true), Index = Constant(-1) },
+                new ArrayElementAtIndex<bool> { Array = Array(true), Index = Constant(-1) },
                 new ErrorBuilder(ErrorCode.IndexOutOfBounds)
             );
 
             yield return new ErrorTestFunction(
                 "Array Index out of bounds",
-                new ElementAtIndex<bool>
+                new ArrayElementAtIndex<bool>
                 {
                     Array = new ArrayNew<bool>
                     {
@@ -100,7 +100,7 @@ public partial class RunErrorTests
 
             yield return new ErrorTestFunction(
                 "Get substring minus one",
-                new GetSubstring
+                new StringSubstring
                 {
                     Index = Constant(-1), String = Constant("Foo"), Length = Constant(10)
                 },
@@ -109,7 +109,7 @@ public partial class RunErrorTests
 
             yield return new ErrorTestFunction(
                 "Get substring out of bounds",
-                new GetSubstring
+                new StringSubstring
                 {
                     Index = Constant(5), String = Constant("Foo"), Length = Constant(10)
                 },

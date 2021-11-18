@@ -17,9 +17,17 @@ namespace Reductech.EDR.Core.Steps
 {
 
 /// <summary>
-/// Create a schema from an Array of Entity.
-/// String properties will be converted to other types when possible.
+/// Create a new schema by analysing the entity properties and values in
+/// an array or an entity stream.
+/// This Step is best used with flat data sources such as Concordance or
+/// CSV as it does additional processing to infer the data types of strings.
 /// </summary>
+[Alias("GenerateSchemaCoerced")]
+[SCLExample(
+    "SchemaCreateCoerced Entities: [('StringProperty': \"abc\" 'IntegerProperty': \"123\")] SchemaName: 'My Schema'",
+    "('title': \"My Schema\" 'type': \"object\" 'additionalProperties': False 'properties': ('StringProperty': ('type': \"string\") 'IntegerProperty': ('type': \"integer\")) 'required': [\"StringProperty\", \"IntegerProperty\"])",
+    "Even though IntegerProperty is represented as a string in the input entity (quoted), it is converted to an integer in the schema."
+)]
 public sealed class SchemaCreateCoerced : CompoundStep<Entity>
 {
     /// <inheritdoc />

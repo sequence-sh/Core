@@ -12,10 +12,11 @@ namespace Reductech.EDR.Core.Steps
 {
 
 /// <summary>
-/// Skip the first n elements of the array
+/// Skip the first n elements of an array or entity stream
 /// </summary>
 [Alias("Skip")]
-[SCLExample("ArraySkip [1, 2, 3] 2", ExpectedOutput = "[3]")]
+[SCLExample("ArraySkip [1, 2, 3] 2",             "[3]")]
+[SCLExample("Skip In: [1, 2, 3, 4, 5] Count: 3", "[4, 5]")]
 public sealed class ArraySkip<T> : CompoundStep<Array<T>>
 {
     /// <inheritdoc />
@@ -38,10 +39,11 @@ public sealed class ArraySkip<T> : CompoundStep<Array<T>>
     /// </summary>
     [StepProperty(1)]
     [Required]
+    [Alias("In")]
     public IStep<Array<T>> Array { get; set; } = null!;
 
     /// <summary>
-    /// The number of elements to skip
+    /// The number of elements/entities to skip
     /// </summary>
     [StepProperty(2)]
     [Required]

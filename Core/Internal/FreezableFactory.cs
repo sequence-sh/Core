@@ -48,11 +48,11 @@ public static class FreezableFactory
         var elementAtIndexDict = new StepParameterDict
         {
             {
-                new StepParameterReference.Named(nameof(ElementAtIndex<object>.Array)),
+                new StepParameterReference.Named(nameof(ArrayElementAtIndex<object>.Array)),
                 new FreezableStepProperty.Step(entityOrArray, location)
             },
             {
-                new StepParameterReference.Named(nameof(ElementAtIndex<object>.Index)),
+                new StepParameterReference.Named(nameof(ArrayElementAtIndex<object>.Index)),
                 new FreezableStepProperty.Step(indexer, location)
             },
         };
@@ -60,7 +60,7 @@ public static class FreezableFactory
         var elementAtData = new FreezableStepData(elementAtIndexDict, location);
 
         var elementAtStep = new CompoundFreezableStep(
-            "ElementAtIndex",
+            "ArrayElementAtIndex",
             elementAtData,
             location
         );

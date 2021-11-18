@@ -31,6 +31,7 @@ public interface IArrayNewStep
 /// </summary>
 [Alias("Array")]
 [Alias("NewArray")]
+[Alias("ArrayCreate")]
 public sealed class ArrayNew<T> : CompoundStep<Array<T>>, IArrayNewStep
 {
     /// <inheritdoc />
@@ -53,6 +54,7 @@ public sealed class ArrayNew<T> : CompoundStep<Array<T>>, IArrayNewStep
     /// </summary>
     [StepListProperty(1)]
     [Required]
+    [Alias("Items")]
     public IReadOnlyList<IStep<T>> Elements { get; set; } = null!;
 
     /// <inheritdoc />

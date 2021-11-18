@@ -23,8 +23,11 @@ namespace Reductech.EDR.Core.Steps
 /// Attempts to transform entities in the stream so that they match the schema.
 ///
 /// Will transform strings into ints, datetimes, booleans, array, or nulls where appropriate
-/// 
+///
+/// For more information on schemas please see the
+/// [documentation](https://docs.reductech.io/edr/how-to/scl/schemas.html). 
 /// </summary>
+[Alias("SchemaTransform")]
 public sealed class Transform : CompoundStep<Array<Entity>>
 {
     /// <inheritdoc />

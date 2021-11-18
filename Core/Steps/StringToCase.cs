@@ -15,6 +15,10 @@ namespace Reductech.EDR.Core.Steps
 /// <summary>
 /// Converts a string to a particular case.
 /// </summary>
+[Alias("ChangeCase")]
+[Alias("ToCase")]
+[SCLExample("StringToCase String: 'string to change' Case: TextCase.Title", "String To Change")]
+[SCLExample("ChangeCase Of: 'string to change' To: 'Upper'",                "STRING TO CHANGE")]
 public sealed class StringToCase : CompoundStep<StringStream>
 {
     /// <summary>
@@ -22,6 +26,7 @@ public sealed class StringToCase : CompoundStep<StringStream>
     /// </summary>
     [StepProperty(1)]
     [Required]
+    [Alias("Of")]
     public IStep<StringStream> String { get; set; } = null!;
 
     /// <summary>
@@ -29,6 +34,7 @@ public sealed class StringToCase : CompoundStep<StringStream>
     /// </summary>
     [StepProperty(2)]
     [Required]
+    [Alias("To")]
     public IStep<TextCase> Case { get; set; } = null!;
 
     /// <inheritdoc />

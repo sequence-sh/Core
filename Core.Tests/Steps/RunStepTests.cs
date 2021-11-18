@@ -64,8 +64,7 @@ public partial class RunStepTests : StepTestBase<RunStep<Unit>, Unit>
                                 {
                                     Elements = new[]
                                     {
-                                        Constant(1),
-                                        GetVariable<int>(VariableName.Item)
+                                        Constant(1), GetVariable<int>(VariableName.Item)
                                     }
                                 }
                             }

@@ -66,9 +66,9 @@ public partial class ExampleTests
         r.ShouldBeSuccessful();
     }
 
-    private const string GenerateDocumentationExample = @"
+    private const string DocumentationCreateExample = @"
 - <root> = 'Documentation'
-- <docs> = GenerateDocumentation
+- <docs> = DocumentationCreate
 
 # Create a directory for each connector
 - <docs>
@@ -91,7 +91,7 @@ Log (RestGETStream 'https://en.wikipedia.org/api/rest_v1/page/pdf/Edgar_Allan_Po
 
     [Theory(Skip = SkipString)]
     //[Theory()]
-    [InlineData(GenerateDocumentationExample)]
+    [InlineData(DocumentationCreateExample)]
     [InlineData(RESTGetExample)]
     [Trait("Category", "Integration")]
     public async Task RunSCLSequence(string scl)

@@ -13,6 +13,11 @@ namespace Reductech.EDR.Core.Steps
 /// <summary>
 /// Returns true if the String contains the substring.
 /// </summary>
+[Alias("DoesString")]
+[Alias("DoesStringContain")]
+[SCLExample("StringContains String: 'hello there' Substring: 'there'", "True")]
+[SCLExample("StringContains String: 'hello there' Substring: 'world'", "False")]
+[SCLExample("DoesString 'hello there' Contain: 'ello'",                "True")]
 public sealed class StringContains : CompoundStep<bool>
 {
     /// <inheritdoc />
@@ -47,17 +52,18 @@ public sealed class StringContains : CompoundStep<bool>
     }
 
     /// <summary>
-    /// The superstring
+    /// The superstring to check
     /// </summary>
     [StepProperty(1)]
     [Required]
     public IStep<StringStream> String { get; set; } = null!;
 
     /// <summary>
-    /// The substring
+    /// The substring to find
     /// </summary>
     [StepProperty(2)]
     [Required]
+    [Alias("Contain")]
     public IStep<StringStream> Substring { get; set; } = null!;
 
     /// <summary>

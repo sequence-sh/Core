@@ -24,12 +24,12 @@ public record SchemaConversionOptions(
             foreach (var format in DateInputFormats.GetFormats(path.TrimStart('/')))
             {
                 if (DateTime.TryParseExact(
-                        value,
-                        format,
-                        CultureInfo.InvariantCulture,
-                        DateTimeStyles.None,
-                        out _
-                    ))
+                    value,
+                    format,
+                    CultureInfo.InvariantCulture,
+                    DateTimeStyles.None,
+                    out _
+                ))
                 {
                     return new StringNode(
                         EnumeratedValuesNodeData.Empty,

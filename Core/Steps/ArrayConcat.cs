@@ -11,10 +11,12 @@ namespace Reductech.EDR.Core.Steps
 {
 
 /// <summary>
-/// Concatenates streams of entities
+/// Concatenates arrays or streams of entities
 /// </summary>
-[SCLExample("[1,2,3] + [4,5,6]",              "[1, 2, 3, 4, 5, 6]")]
-[SCLExample("ArrayConcat [[1,2,3], [4,5,6]]", "[1, 2, 3, 4, 5, 6]")]
+[SCLExample("[1,2,3] + [4,5,6]",                      "[1, 2, 3, 4, 5, 6]")]
+[SCLExample("ArrayConcat [[1,2,3], [4,5,6]]",         "[1, 2, 3, 4, 5, 6]")]
+[SCLExample("Combine Arrays: [[1, 2, 3], [4, 5, 6]]", "[1, 2, 3, 4, 5, 6]")]
+[Alias("Combine")]
 public sealed class ArrayConcat<T> : CompoundStep<Array<T>>
 {
     /// <inheritdoc />
