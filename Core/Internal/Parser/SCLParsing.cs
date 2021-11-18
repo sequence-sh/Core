@@ -153,6 +153,17 @@ public static class SCLParsing
         }
 
         /// <inheritdoc />
+        public override Result<FreezableStepProperty, IError> VisitUnbracketedArray(
+            SCLParser.UnbracketedArrayContext context)
+        {
+            var members =
+                context.nonArrayTerm().Select(Visit);
+
+            var r = Aggregate(new TextLocation(context), members);
+            return r;
+        }
+
+        /// <inheritdoc />
         public override Result<FreezableStepProperty, IError> VisitNullValue(
             SCLParser.NullValueContext context)
         {

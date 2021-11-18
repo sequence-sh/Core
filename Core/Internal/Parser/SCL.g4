@@ -6,6 +6,7 @@ setVariable			: VARIABLENAME EQUALS step;
 getVariable         : VARIABLENAME ;
 getAutomaticVariable : AUTOMATICVARIABLE ;
 array				: OPENSQUAREBRACKET ( term COMMA? )* CLOSESQUAREBRACKET ;
+unbracketedArray	: ( nonArrayTerm COMMA )+ nonArrayTerm ;
 infixOperator		: DASH
 					| PLUS
 					| ASTERIX
@@ -52,7 +53,7 @@ step				: <assoc=right> step PIPE function #PipeFunction
 					| stepSequence #StepSequence1
 					| term #Term1
 					;
-simpleTerm			: nullValue
+nonArrayTerm        : nullValue
                     | number
                     | boolean
 					| dateTime
@@ -63,7 +64,10 @@ simpleTerm			: nullValue
                     | getVariable
                     | getAutomaticVariable
                     | entity
-                    | array;
+                    | array
+                    ;
+simpleTerm			: nonArrayTerm
+                    | unbracketedArray ;
 stepSequence		: (NEWCOMMAND | DASH) step (NEWCOMMAND step)* ;
 fullSequence		: (step | stepSequence)  EOF ;
 
