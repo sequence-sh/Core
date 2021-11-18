@@ -53,6 +53,7 @@ public sealed class While : CompoundStep<Unit>
     /// </summary>
     [StepProperty(2)]
     [Required]
+    [Alias("Do")]
     public IStep<Unit> Action { get; set; } = null!; //TODO lambda
 
     /// <inheritdoc />
