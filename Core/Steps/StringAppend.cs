@@ -20,6 +20,7 @@ namespace Reductech.EDR.Core.Steps
     null,
     "hello world"
 )]
+[Alias("AppendString")]
 public sealed class StringAppend : CompoundStep<Unit>
 {
     /// <summary>
