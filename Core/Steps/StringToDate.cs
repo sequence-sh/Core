@@ -36,6 +36,7 @@ public sealed class StringToDate : CompoundStep<DateTime>
     [StepProperty(2)]
     [DefaultValueExplanation("Will use DateTime to try and convert.")]
     [Example("yyyy/MM/dd HH:mm:ss")]
+    [Alias("Format")]
     public IStep<StringStream>? InputFormat { get; set; } = null;
 
     /// <summary>
