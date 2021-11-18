@@ -15,7 +15,7 @@ namespace Reductech.EDR.Core.Steps
 /// Appends a string to an existing string variable.
 /// </summary>
 [SCLExample(
-    "- <var> = 'hello'\r\n- StringAppend <var> ' world'\r\n- log <var>",
+    "- <var> = 'hello'\n- StringAppend <var> ' world'\n- Log <var>",
     null,
     null,
     "hello world"
