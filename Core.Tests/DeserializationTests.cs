@@ -702,6 +702,14 @@ Log 'Comments!'",
 
             yield return new DeserializationTestInstance(
                 @"
+- <docs> = (a: 1,2,3)['a'] | arrayskip 0
+- log <docs>
+",
+                "3 Elements"
+            );
+
+            yield return new DeserializationTestInstance(
+                @"
 - <docs> = (DocumentationCreate)['AllPages'] | arraytake 1
 - <docs> 
  | ForEach (<entityVar> =>
@@ -730,6 +738,20 @@ Log 'Comments!'",
             yield return new DeserializationTestInstance(
                 @"
 - <array> = [1,2,3] | ArrayMap (<> * 2)
+- Foreach <array> (log <>)
+- Foreach <array> (log <>)
+",
+                2,
+                4,
+                6,
+                2,
+                4,
+                6
+            );
+
+            yield return new DeserializationTestInstance(
+                @"
+- <array> = 1,2,3 | ArrayMap (<> * 2)
 - Foreach <array> (log <>)
 - Foreach <array> (log <>)
 ",
