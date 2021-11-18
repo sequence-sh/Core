@@ -12,8 +12,11 @@ namespace Reductech.EDR.Core.Steps
 {
 
 /// <summary>
-/// Trims a string.
+/// Trims a string, removing whitespace from the `TrimSide`.
 /// </summary>
+[SCLExample("StringTrim String: '  spaces '",              "spaces")]
+[SCLExample("TrimString '  spaces ' Side: TrimSide.Start", "spaces ")]
+[Alias("TrimString")]
 public sealed class StringTrim : CompoundStep<StringStream>
 {
     /// <summary>
