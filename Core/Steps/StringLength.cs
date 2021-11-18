@@ -19,6 +19,7 @@ public sealed class StringLength : CompoundStep<int>
     /// </summary>
     [StepProperty(1)]
     [Required]
+    [Alias("Of")]
     public IStep<StringStream> String { get; set; } = null!;
 
     /// <inheritdoc />
