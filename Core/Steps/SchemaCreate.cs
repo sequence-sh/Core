@@ -16,10 +16,24 @@ namespace Reductech.EDR.Core.Steps
 
 /// <summary>
 /// Create a new schema by analysing the entity properties and values in
-/// an array or an entity stream
+/// an array or an entity stream.
+/// This Step is best used with data sources where the property values already
+/// have a data type (string, date, int...) such as JSON or databases.
+/// For generating schemas from flat data sources such as Concordance or
+/// CSV, use the `SchemaCreateCoerced` step, which will attempt to infer
+/// the property types.
 /// </summary>
 [Alias("GenerateSchema")]
 [Alias("CreateSchema")]
+[SCLExample(
+    "SchemaCreate Entities: [('StringProperty': \"abc\" 'IntegerProperty': 123)] SchemaName: 'My Schema'",
+    "('title': \"My Schema\" 'type': \"object\" 'additionalProperties': False 'properties': ('StringProperty': ('type': \"string\") 'IntegerProperty': ('type': \"integer\")) 'required': [\"StringProperty\", \"IntegerProperty\"])"
+)]
+[SCLExample(
+    "SchemaCreate Entities: [('StringProperty': \"abc\" 'IntegerProperty': \"123\")] SchemaName: 'My Schema'",
+    "('title': \"My Schema\" 'type': \"object\" 'additionalProperties': False 'properties': ('StringProperty': ('type': \"string\") 'IntegerProperty': ('type': \"string\")) 'required': [\"StringProperty\", \"IntegerProperty\"])",
+    "Since IntegerProperty is quoted, this step interprets it as a string."
+)]
 public sealed class SchemaCreate : CompoundStep<Entity>
 {
     /// <inheritdoc />
