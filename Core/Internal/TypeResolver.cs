@@ -211,10 +211,7 @@ public sealed class TypeResolver
              || typeReference.Allow(previous, this)) //The variable already had this type reference
                 return false;
 
-            if (!previous.Allow(
-                    typeReference,
-                    this
-                ))
+            if (!previous.Allow(typeReference, this))
                 return ErrorCode.WrongVariableType.ToErrorBuilder(
                     variable.Name,
                     typeReference.Name
