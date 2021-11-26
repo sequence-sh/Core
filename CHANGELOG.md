@@ -57,7 +57,6 @@
 - Removed `ArrayEvaluate`
 - Assigning an array to a variable automatically evaluates that array.
 - Creating a Step Factory can now result in an error.
-- Creating a Step Factory can now result in an error.
 - Brackets around steps are now optional in many cases
 
 
@@ -134,7 +133,6 @@ You could change the Error Behavior to do act differently for elements which do 
 - Add example of output for GenerateDocumentation step #288
 - Add a SchemaCreateCoerced step #349
 - Assigning an Array to a Variable should automatically Evaluate that Array #330
-- Creating Step Factories should be able to return errors #344
 - Creating Step Factories should be able to return errors #344
 - IDynamicStepGenerator CreateStepFactories should supply a web connection and a file system #342
 - EntityMapProperties should be able to map several #340
