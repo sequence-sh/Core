@@ -2,79 +2,16 @@
 
 ## Summary of Changes
 
-### Steps
+### Schemas
 
-- Renamed the following steps and added additional aliases:
+We now use JSON Schema for Schemas.
 
-| Step | New Name | Aliases |
-| :--- | :------- | :------ |
-| AppendString | StringAppend | AppendString |
-| CreateSchema | SchemaCreate | GenerateSchema, CreateSchema |
-| ElementAtIndex | ArrayElementAtIndex | ElementAtIndex, FromArray |
-| FindElement | ArrayFind | Find, FindElement |
-| FindLastSubstring | StringFindLast | LastIndexOfSubstring, FindLastInstance, FindLastSubstring |
-| FindSubstring | StringFind | IndexOfSubstring, FindInstance, FindSubstring |
-| GenerateDocumentation | DocumentationCreate | DocGen, GenerateDocumentation |
-| GetSubstring | StringSubstring | GetSubstring |
-| ReadStandardIn | StandardInRead | FromStandardIn, ReadStandardIn, FromStdIn, ReadStdIn, StdInRead |
-| RegexMatch | StringMatch | IsMatch, RegexMatch |
-| RegexReplace | StringReplace | RegexReplace |
-| WriteStandardError | StandardErrorWrite | ToStandardErr, WriteStandardErr, ToStdErr, WriteStdErr, StdErrWrite |
-| WriteStandardOut | StandardOutWrite | ToStandardOut, WriteStandardOut, ToStdOut, WriteStdOut, StdOutWrite |
+Schemas are a way to ensure that your data has a particular structure,
+for example you can control which properties are present and what types they have.
 
-- All renamed steps have an alias of the previous name, so there's not need to change SCL
-- Removed step
-  - `EntityMap` - duplicate of ArrayMap
-- Added additional parameter and step aliases to make SCL more like natural language
-- Many of the `Core` steps now have additional aliases. Some examples:
+#### Steps which use JSON Schema:
 
-| Step | Example |
-| ---- | ------- |
-| ArrayConcat | `Combine Arrays: [[1, 2, 3], [4, 5, 6]]` |
-| ArrayElementAtIndex | `FromArray ['A', 'B', 'C'] GetElement: 1` |
-| ArrayFilter | `Filter <MyCsvFile> Using: (<>['column1'] == 'TypeA')` |
-| ArrayFind | `Find In: ['a', 'b', 'c'] Item: 'a'` |
-| ArrayLast | `GetLastItem In: [1,2,3]` |
-| ArrayTake | `Take From: [1, 2, 3, 4, 5] Count: 3` |
-| EntityHasProperty | `DoesEntity ('type': 'C', 'value': 1) Have: 'type'` |
-| EntityMapProperties | `RenameProperties In: [('a': 1), ('b': 1), ('c': 1)] To: ('value': ['a', 'b', 'c'])` |
-| EntityRemoveProperty | `Remove From: ('type': 'A', 'value': 1) Property: 'value'` |
-| ForEach | `ForEachItem In: [1, 2, 3] Do: (Log <item>)` |
-| StringContains | `DoesString 'hello there' Contain: 'ello'` |
-| StringFind | `FindInstance Of: 'ello' In: 'hello hello!'` |
-| StringToCase | `ChangeCase Of: 'string to change' To: 'Upper'` |
-- Added `CreateSchemaCoerced` Step for creating schemas from csv data
-- EntityMapProperties can now take an array of values for each property and will use the first value which is not `null`
-- Removed `If` Step
-- Renamed `ValueIf` to `If`
-- `ValueIf` now returns the default value of `T` if the condition is false and `Else` is not set.
-
-### Sequence Configuration Language
-
-- Arrays can now be defined as a comma-separated list, without using square brackets:
-  - Before: `ForEach Array: [1, 2, 3] Action: (Print <>)`
-  - Now: `ForEach Array: 1, 2, 3 Action: (Print <>)`
-- Removed `ArrayEvaluate`
-- Assigning an array to a variable automatically evaluates that array.
-- Creating a Step Factory can now result in an error.
-- Brackets around steps are now optional in many cases
-
-
-Instead of `- If (DoesDirectoryExist <ProcessingPath>) (DeleteItem <ProcessingPath>)`
-
-You can now use `- If DoesDirectoryExist <ProcessingPath> Then: DeleteItem <ProcessingPath>`
-
-### Core SDK
-
-- IDynamicStepGenerator/CreateStepFactories should supplies a web connection and an external context
-We now use JSON Schema for Schemas 
-
-Schemas are a way to ensure that your data has a particular structure, for example you can control which properties are present and what types they have.
-
-
-### Steps which use JSON Schema:
-
-- `CreateSchema` creates a schema from an array of entities. 
+- `CreateSchema` creates a schema from an array of entities.
 
 The step will produce the most restrictive schema possible.
 
@@ -86,6 +23,7 @@ The step will produce the most restrictive schema possible.
 - `Transform` tries to adjust entities so that they fit a schema.
 
 This example transforms the 'Foo' value from a string to an integer.
+
 ```scala
 - <schema> = FromJSON '{"type": "object", "properties": {"foo": {"type": "integer"}}}'
 - <entities> = [('Foo': '1'), ('Foo': '2'), ('Foo': '3')]
@@ -93,13 +31,14 @@ This example transforms the 'Foo' value from a string to an integer.
 - <results> | ForEach | Log
 ```
 
-You can provide additional arguments to control 
+You can provide additional arguments to control
 
 - `Validate` ensures that every entity in an array exactly matches the schema
 
 This example filters the entities to only those where 'Foo' is a multiple of 2.
 
 You could change the Error Behavior to do act differently for elements which do not match.
+
 ```scala
 - <schema> = FromJSON '{"type": "object", "properties": {"foo": {"type": "integer", "MultipleOf": 2}}}'
 - <entities> = [('Foo': 1), ('Foo': 2), ('Foo': 3), ('Foo': 4)]
@@ -107,20 +46,93 @@ You could change the Error Behavior to do act differently for elements which do 
 - <results> | ForEach | Log
 ```
 
-### Resources for JSON Schemas:
+#### Resources for JSON Schemas:
 
 - [Official Website](https://json-schema.org/)
 - [JSON Schema Reference](https://json-schema.org/understanding-json-schema/reference/index.html)
 - [Online Validator](https://www.jsonschemavalidator.net/)
-- Added RESTGet
-- Added RESTPost
-- Added RESTPut
-- Added RESTPatch
-- Added RESTDelete
-- Added RESTOptions
+
+### REST methods
+
+The SDK now has steps for interacting with web/REST endpoints:
+
+- `RESTGet`
+- `RESTPost`
+- `RESTPut`
+- `RESTPatch`
+- `RESTDelete`
+- `RESTOptions`
+
+### Steps
+
+- Added `CreateSchemaCoerced` Step for creating schemas from CSV data
+- Added `RESTGet`
+- Added `RESTPost`
+- Added `RESTPut`
+- Added `RESTPatch`
+- Added `RESTDelete`
+- Added `RESTOptions`
 - Added `Try` step
+- Removed `ArrayEvaluate`
+- Removed `EntityMap` - duplicate of `ArrayMap`
+- Removed `If`
+- Renamed `ValueIf` to `If`
 
+Renamed the following steps and added additional aliases:
 
+| Step                  | New Name            | Aliases                                                             |
+| :-------------------- | :------------------ | :------------------------------------------------------------------ |
+| AppendString          | StringAppend        | AppendString                                                        |
+| CreateSchema          | SchemaCreate        | GenerateSchema, CreateSchema                                        |
+| ElementAtIndex        | ArrayElementAtIndex | ElementAtIndex, FromArray                                           |
+| FindElement           | ArrayFind           | Find, FindElement                                                   |
+| FindLastSubstring     | StringFindLast      | LastIndexOfSubstring, FindLastInstance, FindLastSubstring           |
+| FindSubstring         | StringFind          | IndexOfSubstring, FindInstance, FindSubstring                       |
+| GenerateDocumentation | DocumentationCreate | DocGen, GenerateDocumentation                                       |
+| GetSubstring          | StringSubstring     | GetSubstring                                                        |
+| ReadStandardIn        | StandardInRead      | FromStandardIn, ReadStandardIn, FromStdIn, ReadStdIn, StdInRead     |
+| RegexMatch            | StringMatch         | IsMatch, RegexMatch                                                 |
+| RegexReplace          | StringReplace       | RegexReplace                                                        |
+| WriteStandardError    | StandardErrorWrite  | ToStandardErr, WriteStandardErr, ToStdErr, WriteStdErr, StdErrWrite |
+| WriteStandardOut      | StandardOutWrite    | ToStandardOut, WriteStandardOut, ToStdOut, WriteStdOut, StdOutWrite |
+
+- All renamed steps have an alias of the previous name, so there's no need to change SCL
+- Added additional parameter and step aliases to make SCL more like natural language
+- Many of the `Core` steps now have additional aliases. Some examples:
+
+| Step                 | Example                                                                              |
+| -------------------- | ------------------------------------------------------------------------------------ |
+| ArrayConcat          | `Combine Arrays: [[1, 2, 3], [4, 5, 6]]`                                             |
+| ArrayElementAtIndex  | `FromArray ['A', 'B', 'C'] GetElement: 1`                                            |
+| ArrayFilter          | `Filter <MyCsvFile> Using: (<>['column1'] == 'TypeA')`                               |
+| ArrayFind            | `Find In: ['a', 'b', 'c'] Item: 'a'`                                                 |
+| ArrayLast            | `GetLastItem In: [1,2,3]`                                                            |
+| ArrayTake            | `Take From: [1, 2, 3, 4, 5] Count: 3`                                                |
+| EntityHasProperty    | `DoesEntity ('type': 'C', 'value': 1) Have: 'type'`                                  |
+| EntityMapProperties  | `RenameProperties In: [('a': 1), ('b': 1), ('c': 1)] To: ('value': ['a', 'b', 'c'])` |
+| EntityRemoveProperty | `Remove From: ('type': 'A', 'value': 1) Property: 'value'`                           |
+| ForEach              | `ForEachItem In: [1, 2, 3] Do: (Log <item>)`                                         |
+| StringContains       | `DoesString 'hello there' Contain: 'ello'`                                           |
+| StringFind           | `FindInstance Of: 'ello' In: 'hello hello!'`                                         |
+| StringToCase         | `ChangeCase Of: 'string to change' To: 'Upper'`                                      |
+
+- `EntityMapProperties` can now take an array of values for each property and will use the first value which is not `null`
+- `ValueIf` now returns the default value of `T` if the condition is false and `Else` is not set.
+
+### Sequence Configuration Language
+
+- Arrays can now be defined as a comma-separated list, without using square brackets:
+  - Before: `ForEach Array: [1, 2, 3] Action: (Print <>)`
+  - Now: `ForEach Array: 1, 2, 3 Action: (Print <>)`
+- Assigning an array to a variable automatically evaluates that array.
+- Brackets around steps are now optional in many cases:
+  - Instead of `- If (DoesDirectoryExist <ProcessingPath>) (DeleteItem <ProcessingPath>)`
+  - You can now use `- If DoesDirectoryExist <ProcessingPath> Then: DeleteItem <ProcessingPath>`
+
+### Core SDK
+
+- Creating a Step Factory can now result in an error.
+- IDynamicStepGenerator/CreateStepFactories should supplies a web connection and an external context
 - Added `IDynamicStepGenerator` to allow dynamic step creation
 
 ## Issues Closed in this Release
@@ -157,7 +169,7 @@ You could change the Error Behavior to do act differently for elements which do 
 
 - Create Examples for all Steps #298
 - Allow injecting variables into SCLExamples #351
-- GenerateDocumentation  should list steps in alphabetical order in all.md #348
+- GenerateDocumentation should list steps in alphabetical order in all.md #348
 - Rest Client Factory should use Text.Json for body serialization #347
 - Create a way to generate analytics #346
 - GenerateDocumentation should be able to see enums nested inside OneOfs #345
@@ -777,4 +789,3 @@ a previous process into the current one.
 ### Documentation
 
 - Add documentation
-
