@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -15,8 +16,10 @@ namespace Reductech.EDR.Core.Steps
 /// </summary>
 [Alias("Last")]
 [Alias("GetLastItem")]
-[SCLExample("ArrayLast [1,2,3]", ExpectedOutput       = "3")]
-[SCLExample("GetLastItem In: [1,2,3]", ExpectedOutput = "3")]
+[SCLExample("ArrayLast [1,2,3]",                        ExpectedOutput = "3")]
+[SCLExample("ArrayLast ['a', 'b', 'c']",                ExpectedOutput = "c")]
+[SCLExample("ArrayLast [('a': 1), ('a': 2), ('a': 3)]", ExpectedOutput = "('a': 3)")]
+[SCLExample("GetLastItem In: [1,2,3]",                  ExpectedOutput = "3")]
 public sealed class ArrayLast<T> : CompoundStep<T>
 {
     /// <inheritdoc />
@@ -39,7 +42,7 @@ public sealed class ArrayLast<T> : CompoundStep<T>
     }
 
     /// <inheritdoc />
-    public override IStepFactory StepFactory => new SimpleStepFactory<ArrayLast<T>, T>();
+    public override IStepFactory StepFactory => ArrayLastStepFactory.Instance;
 
     /// <summary>
     /// The array to get the last element of
@@ -48,6 +51,42 @@ public sealed class ArrayLast<T> : CompoundStep<T>
     [Required]
     [Alias("In")]
     public IStep<Array<T>> Array { get; set; } = null!;
+
+    /// <summary>
+    /// Gets the array element at a particular index.
+    /// </summary>
+    private sealed class ArrayLastStepFactory : ArrayStepFactory
+    {
+        private ArrayLastStepFactory() { }
+
+        /// <summary>
+        /// The instance.
+        /// </summary>
+        public static GenericStepFactory Instance { get; } = new ArrayLastStepFactory();
+
+        /// <inheritdoc />
+        public override Type StepType => typeof(ArrayLast<>);
+
+        /// <inheritdoc />
+        public override string OutputTypeExplanation => "T";
+
+        /// <inheritdoc />
+        protected override TypeReference
+            GetOutputTypeReference(TypeReference memberTypeReference) => memberTypeReference;
+
+        /// <inheritdoc />
+        protected override Result<TypeReference, IErrorBuilder> GetExpectedArrayTypeReference(
+            CallerMetadata callerMetadata)
+        {
+            return new TypeReference.Array(callerMetadata.ExpectedType);
+        }
+
+        /// <inheritdoc />
+        protected override string ArrayPropertyName => nameof(ArrayLast<object>.Array);
+
+        /// <inheritdoc />
+        protected override string? LambdaPropertyName => null;
+    }
 }
 
 }
