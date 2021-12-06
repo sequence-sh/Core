@@ -114,7 +114,7 @@ public sealed partial record Entity
             properties.Select(
                     p =>
                     {
-                        (string firstKey, var remainder) = p.key.Split();
+                        var (firstKey, remainder) = p.key.Split();
                         return (firstKey, remainder, p.value);
                     }
                 )
@@ -171,7 +171,7 @@ public sealed partial record Entity
             newProperty = new EntityProperty(key, newValue, order ?? Dictionary.Count);
         }
 
-        ImmutableDictionary<string, EntityProperty> newDict = Dictionary.SetItem(key, newProperty);
+        var newDict = Dictionary.SetItem(key, newProperty);
 
         return new Entity(newDict);
     }
@@ -234,36 +234,36 @@ public sealed partial record Entity
             return new Entity(newDict);
         }
 
-        if (Dictionary.TryGetValue(firstKey, out var ep)
-         && ep.Value is EntityValue.NestedEntity nestedEntity)
+        if (!Dictionary.TryGetValue(firstKey, out var ep)
+         || ep.Value is not EntityValue.NestedEntity nestedEntity)
+            return Maybe<Entity>.None;
+
         {
             var rem = remainder.GetValueOrThrow();
             var em  = nestedEntity.Value.TryRemoveProperty(rem);
 
-            if (em.HasValue)
+            if (!em.HasValue)
+                return Maybe<Entity>.None;
+
+            var newNestedEntity = em.GetValueOrThrow();
+
+            if (newNestedEntity.Dictionary.IsEmpty)
             {
-                var newNestedEntity = em.GetValueOrThrow();
+                var newDict = Dictionary.Remove(firstKey);
+                return new Entity(newDict);
+            }
+            else
+            {
+                var newProperty = new EntityProperty(
+                    firstKey,
+                    new EntityValue.NestedEntity(newNestedEntity),
+                    ep.Order
+                );
 
-                if (newNestedEntity.Dictionary.IsEmpty)
-                {
-                    var newDict = Dictionary.Remove(firstKey);
-                    return new Entity(newDict);
-                }
-                else
-                {
-                    var newProperty = new EntityProperty(
-                        firstKey,
-                        new EntityValue.NestedEntity(newNestedEntity),
-                        ep.Order
-                    );
-
-                    var newDict = Dictionary.SetItem(firstKey, newProperty);
-                    return new Entity(newDict);
-                }
+                var newDict = Dictionary.SetItem(firstKey, newProperty);
+                return new Entity(newDict);
             }
         }
-
-        return Maybe<Entity>.None;
     }
 
     /// <summary>

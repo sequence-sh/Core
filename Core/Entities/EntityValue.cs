@@ -23,14 +23,14 @@ namespace Reductech.EDR.Core.Entities
 /// <summary>
 /// The value of an entity property.
 /// </summary>
-public abstract record EntityValue(object? ObjectValue)
+public abstract record EntityValue(object ObjectValue)
 {
     /// <summary>
     /// The Null value
     /// </summary>
     public record Null : EntityValue
     {
-        private Null() : base(null as object) { }
+        private Null() : base(SCLNull.Instance) { }
 
         /// <summary>
         /// The instance
@@ -255,7 +255,7 @@ public abstract record EntityValue(object? ObjectValue)
             string path,
             SchemaConversionOptions? schemaConversionOptions)
         {
-            return StringNode.Default; //TODO enum
+            return StringNode.Default;
         }
 
         /// <inheritdoc />
@@ -539,6 +539,7 @@ public abstract record EntityValue(object? ObjectValue)
         switch (argValue)
         {
             case null:             return Null.Instance;
+            case SCLNull:          return Null.Instance;
             case EntityValue ev:   return ev;
             case StringStream ss1: return CreateFromString(ss1.GetString());
             case string s:         return CreateFromString(s);
@@ -604,7 +605,7 @@ public abstract record EntityValue(object? ObjectValue)
                         .GetCustomAttributes(true)
                         .OfType<DataContractAttribute>()
                         .Any()
-                )
+                   )
                 {
                     var entity = EntityConversionHelpers.ConvertToEntity(argValue);
                     return new NestedEntity(entity);
@@ -618,9 +619,6 @@ public abstract record EntityValue(object? ObjectValue)
 
         static EntityValue CreateFromString(string s)
         {
-            if (string.IsNullOrWhiteSpace(s))
-                return Null.Instance;
-
             return new String(s);
         }
     }
@@ -773,7 +771,7 @@ public abstract record EntityValue(object? ObjectValue)
             }
             else if (!int.TryParse(primitive, out _) && //prevent int conversion
                      Enum.TryParse(type, primitive, true, out var r)
-            )
+                    )
                 return r!;
         }
         else if (type == typeof(System.DateTime))
@@ -796,7 +794,7 @@ public abstract record EntityValue(object? ObjectValue)
         }
         else if (type == typeof(object))
         {
-            return AsSCLObject(ObjectValue) ?? new StringStream(GetPrimitiveString());
+            return AsSCLObject(ObjectValue); // new StringStream(GetPrimitiveString());
         }
         else if (type.GetInterfaces().Contains(typeof(IOneOf)))
         {
@@ -827,10 +825,10 @@ public abstract record EntityValue(object? ObjectValue)
         return ErrorCode.CouldNotConvertEntityValue.ToErrorBuilder(type.Name);
     }
 
-    private static object? AsSCLObject(object? o)
+    private static object AsSCLObject(object? o)
     {
         if (o is null)
-            return Entity.Empty;
+            return SCLNull.Instance;
 
         if (o is int i)
             return i;
@@ -853,11 +851,15 @@ public abstract record EntityValue(object? ObjectValue)
         if (o is Entity e)
             return e;
 
-        //Enumeration and enum should map to null and get converted to stringstream
-        //if (o is Enumeration enumeration)
-        //    return enumeration;
+        if (o is IEnumerable enumerable)
+            return SerializationMethods.SerializeList(
+                enumerable.OfType<object>().Select(SerializationMethods.SerializeObject)
+            );
 
-        return null;
+        if (o is Enumeration enumeration)
+            return enumeration;
+
+        return SCLNull.Instance;
     }
 
     /// <summary>

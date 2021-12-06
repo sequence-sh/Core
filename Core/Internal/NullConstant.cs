@@ -13,7 +13,7 @@ namespace Reductech.EDR.Core.Internal
 /// <summary>
 /// Null constant
 /// </summary>
-public class NullConstant : IConstantStep, IConstantFreezableStep, IStep<object>
+public class NullConstant : IConstantStep, IConstantFreezableStep, IStep<SCLNull>
 {
     /// <summary>
     /// Constructor
@@ -50,7 +50,7 @@ public class NullConstant : IConstantStep, IConstantFreezableStep, IStep<object>
     /// <summary>
     /// The Text Location where the Null constant appeared
     /// </summary>
-    public TextLocation? TextLocation { get; set; }
+    public TextLocation TextLocation { get; set; }
 
     /// <inheritdoc />
     public Result<IStep, IError> TryFreeze(CallerMetadata callerMetadata, TypeResolver typeResolver)
@@ -71,7 +71,7 @@ public class NullConstant : IConstantStep, IConstantFreezableStep, IStep<object>
         CallerMetadata callerMetadata,
         TypeResolver typeResolver)
     {
-        return TypeReference.Any.Instance;
+        return TypeReference.Actual.Null;
     }
 
     /// <inheritdoc />
@@ -81,7 +81,7 @@ public class NullConstant : IConstantStep, IConstantFreezableStep, IStep<object>
     }
 
     /// <inheritdoc />
-    public Type OutputType => typeof(object);
+    public Type OutputType => typeof(SCLNull);
 
     /// <inheritdoc />
     string IStep.Serialize()
@@ -107,7 +107,7 @@ public class NullConstant : IConstantStep, IConstantFreezableStep, IStep<object>
     /// <summary>
     /// The value
     /// </summary>
-    public object ValueObject => null!;
+    public object ValueObject => SCLNull.Instance;
 
     /// <inheritdoc />
     string IConstantFreezableStep.Serialize()
@@ -122,11 +122,11 @@ public class NullConstant : IConstantStep, IConstantFreezableStep, IStep<object>
     }
 
     /// <inheritdoc />
-    public async Task<Result<object, IError>> Run(
+    public async Task<Result<SCLNull, IError>> Run(
         IStateMonad stateMonad,
         CancellationToken cancellationToken)
     {
-        return Result.Success<object, IError>(null);
+        return SCLNull.Instance;
     }
 }
 

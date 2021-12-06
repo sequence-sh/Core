@@ -18,6 +18,7 @@ namespace Reductech.EDR.Core.Steps
 /// </summary>
 [Alias("From")]
 [SCLExample("(foo: 123)['foo']",                           "123")]
+[SCLExample("(foo: 123)['bar']",                           "")]
 [SCLExample("(foo: (bar: 123))['foo.bar']",                "123")]
 [SCLExample("From ('type': 'C', 'value': 1) Get: 'value'", "1")]
 public sealed class EntityGetValue<T> : CompoundStep<T>

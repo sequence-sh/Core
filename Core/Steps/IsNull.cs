@@ -17,7 +17,6 @@ namespace Reductech.EDR.Core.Steps
 [SCLExample("IsNull 1",              "False")]
 [SCLExample("IsNull (a: Null)['a']", "True")]
 [SCLExample("IsNull (a: 1)['a']",    "False")]
-[SCLExample("IsNull (a: 1)['b']",    "True")]
 public sealed class IsNull<T> : CompoundStep<bool>
 {
     /// <inheritdoc />
@@ -30,7 +29,7 @@ public sealed class IsNull<T> : CompoundStep<bool>
         if (result.IsFailure)
             return result.ConvertFailure<bool>();
 
-        if (result.Value is null)
+        if (result.Value is SCLNull)
             return true;
 
         return false;
