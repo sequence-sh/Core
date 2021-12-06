@@ -13,7 +13,7 @@ namespace Reductech.EDR.Core.Internal
 /// <summary>
 /// Null constant
 /// </summary>
-public class NullConstant : IConstantStep, IConstantFreezableStep
+public class NullConstant : IConstantStep, IConstantFreezableStep, IStep<object>
 {
     /// <summary>
     /// Constructor
@@ -42,7 +42,7 @@ public class NullConstant : IConstantStep, IConstantFreezableStep
     }
 
     /// <inheritdoc />
-    public bool ShouldBracketWhenSerialized => throw new NotImplementedException();
+    public bool ShouldBracketWhenSerialized => false;
 
     /// <inheritdoc />
     public string StepName => "Null";
@@ -119,6 +119,14 @@ public class NullConstant : IConstantStep, IConstantFreezableStep
     public bool Equals(IFreezableStep? other)
     {
         return other is NullConstant;
+    }
+
+    /// <inheritdoc />
+    public async Task<Result<object, IError>> Run(
+        IStateMonad stateMonad,
+        CancellationToken cancellationToken)
+    {
+        return Result.Success<object, IError>(null);
     }
 }
 
