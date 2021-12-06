@@ -10,7 +10,7 @@ using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 namespace Reductech.EDR.Core.Tests.Steps
 {
 
-public partial class ArrayMapTests : StepTestBase<ArrayMap<Entity>, Array<Entity>>
+public partial class ArrayMapTests : StepTestBase<ArrayMap<Entity, Entity>, Array<Entity>>
 {
     /// <inheritdoc />
     protected override IEnumerable<StepCase> StepCases
@@ -25,7 +25,7 @@ public partial class ArrayMapTests : StepTestBase<ArrayMap<Entity>, Array<Entity
                         null,
                         new Log<Entity> { Value = GetEntityVariable }
                     ),
-                    Array = new ArrayMap<Entity>
+                    Array = new ArrayMap<Entity, Entity>
                     {
                         Array = Array(
                             Entity.Create(("Foo", "Hello")),
@@ -55,7 +55,7 @@ public partial class ArrayMapTests : StepTestBase<ArrayMap<Entity>, Array<Entity
                         null,
                         new Log<Entity> { Value = GetEntityVariable }
                     ),
-                    Array = new ArrayMap<Entity>
+                    Array = new ArrayMap<Entity, Entity>
                     {
                         Array = Array(
                             Entity.Create(("Foo", "Hello"),   ("Bar", "Earth")),
@@ -88,7 +88,7 @@ public partial class ArrayMapTests : StepTestBase<ArrayMap<Entity>, Array<Entity
 
             yield return new ErrorCase(
                 "Stream error",
-                new ArrayMap<Entity>
+                new ArrayMap<Entity, Entity>
                 {
                     Array = new FailStep<Array<Entity>> { ErrorMessage = "Stream Fail" },
                     Function = new LambdaFunction<Entity, Entity>(
