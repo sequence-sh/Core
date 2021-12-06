@@ -391,11 +391,11 @@ public abstract class StepFactory : IStepFactory
                     var enumType = propertyType.GenericTypeArguments.First();
 
                     if (Enum.TryParse(
-                        enumType,
-                        stringConstant.Value.GetString(),
-                        true,
-                        out var enumValue
-                    ))
+                            enumType,
+                            stringConstant.Value.GetString(),
+                            true,
+                            out var enumValue
+                        ))
                     {
                         var step = EnumConstantFreezable.TryCreateEnumConstant(enumValue!);
                         return step;
@@ -634,6 +634,41 @@ public abstract class StepFactory : IStepFactory
             ErrorCode.CannotCreateGeneric,
             openGenericType.Name.Split("`")[0],
             parameterType.GetDisplayName()
+        );
+    }
+
+    /// <summary>
+    /// Creates a typed generic step with multiple type arguments.
+    /// </summary>
+    protected static Result<ICompoundStep, IErrorBuilder> TryCreateGeneric(
+        Type openGenericType,
+        Type[] parameterTypes)
+    {
+        object? r;
+
+        try
+        {
+            var genericType = openGenericType.MakeGenericType(parameterTypes);
+            r = Activator.CreateInstance(genericType);
+        }
+        catch (ArgumentException e)
+        {
+            return ErrorCode.InvalidCast.ToErrorBuilder(e);
+        }
+        #pragma warning disable CA1031 // Do not catch general exception types
+        catch (Exception e)
+        {
+            return ErrorCode.InvalidCast.ToErrorBuilder(e);
+        }
+        #pragma warning restore CA1031 // Do not catch general exception types
+
+        if (r is ICompoundStep rp)
+            return Result.Success<ICompoundStep, IErrorBuilder>(rp);
+
+        return new ErrorBuilder(
+            ErrorCode.CannotCreateGeneric,
+            openGenericType.Name.Split("`")[0],
+            string.Join(",", parameterTypes.Select(x => x.GetDisplayName()))
         );
     }
 

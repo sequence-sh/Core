@@ -53,7 +53,7 @@ public partial class RunStepTests : StepTestBase<RunStep<Unit>, Unit>
                 "Test Error in Array",
                 new RunStep<Array<int>>
                 {
-                    Step = new ArrayMap<int>()
+                    Step = new ArrayMap<int, int>()
                     {
                         Array = Array(3, 2, 1, 0),
                         Function = new LambdaFunction<int, int>(

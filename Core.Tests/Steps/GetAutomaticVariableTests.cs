@@ -22,7 +22,7 @@ public partial class GetAutomaticVariableTests : StepTestBase<GetAutomaticVariab
                     Value = new ArrayElementAtIndex<int>
                     {
                         Index = Constant(0),
-                        Array = new ArrayMap<int>
+                        Array = new ArrayMap<int, int>
                         {
                             Array = Array(1, 2, 3),
                             Function = new LambdaFunction<int, int>(
@@ -51,7 +51,7 @@ public partial class GetAutomaticVariableTests : StepTestBase<GetAutomaticVariab
                     Value = new ArrayElementAtIndex<int>()
                     {
                         Index = Constant(0),
-                        Array = new ArrayMap<int>()
+                        Array = new ArrayMap<int, int>()
                         {
                             Array = Array(1, 2, 3),
                             Function =
@@ -82,7 +82,7 @@ public partial class GetAutomaticVariableTests : StepTestBase<GetAutomaticVariab
                     Value = new ArrayElementAtIndex<int>()
                     {
                         Index = Constant(0),
-                        Array = new ArrayMap<int>()
+                        Array = new ArrayMap<int, int>()
                         {
                             Array = Array(1, 2, 3),
                             Function = new LambdaFunction<int, int>(
@@ -95,7 +95,7 @@ public partial class GetAutomaticVariableTests : StepTestBase<GetAutomaticVariab
                                             new GetAutomaticVariable<int>(),
                                             new ArrayElementAtIndex<int>()
                                             {
-                                                Array = new ArrayMap<int>()
+                                                Array = new ArrayMap<int, int>()
                                                 {
                                                     Array = Array(1, 2, 3),
                                                     Function = new LambdaFunction<int, int>(
