@@ -79,7 +79,7 @@ public partial class EntityGetValueTypeTests : StepTestBase<AssertTrue, Unit>
 {
     private static Entity TheEntity => Entity.Create(
         ("String", "Hello"),
-        ("Empty", ""),
+        ("Empty", null),
         ("BoolTrue", true),
         ("BoolFalse", false),
         ("Int", 123),

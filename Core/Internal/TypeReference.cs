@@ -150,6 +150,11 @@ public abstract record TypeReference
         public static Actual Entity { get; } = new(SCLType.Entity);
 
         /// <summary>
+        /// A null value
+        /// </summary>
+        public static Actual Null { get; } = new(SCLType.Null);
+
+        /// <summary>
         /// Create an actual type.
         /// This does not work for Enum types
         /// </summary>
@@ -163,6 +168,7 @@ public abstract record TypeReference
                 SCLType.Bool    => Bool,
                 SCLType.Date    => Date,
                 SCLType.Entity  => Entity,
+                SCLType.Null    => Null,
                 SCLType.Enum => throw new ArgumentOutOfRangeException(
                     nameof(type),
                     type,
