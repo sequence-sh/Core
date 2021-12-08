@@ -419,6 +419,11 @@ public sealed record ErrorCode : ErrorCodeBase
     public static readonly ErrorCode
         CouldNotCreateStepFactoryStore = new(nameof(CouldNotCreateStepFactoryStore));
 
+    /// <summary>
+    /// The types '{0}' and '{1}' are incompatible.
+    /// </summary>
+    public static readonly ErrorCode TypesIncompatible = new(nameof(TypesIncompatible));
+
 #endregion
 }
 

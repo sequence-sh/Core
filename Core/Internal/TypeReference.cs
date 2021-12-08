@@ -33,6 +33,51 @@ public abstract record TypeReference
     public abstract bool Allow(TypeReference other, TypeResolver? typeResolver);
 
     /// <summary>
+    /// Try to combine this type reference with another
+    /// </summary>
+    public Result<TypeReference, IErrorBuilder> TryCombine(
+        TypeReference other,
+        TypeResolver? typeResolver)
+    {
+        if (this is Unknown)
+            return other;
+
+        if (other is Unknown)
+            return this;
+
+        if (this is Array thisArray)
+        {
+            if (other is Dynamic or Any)
+            {
+                var result = thisArray.MemberType.TryCombine(other, typeResolver)
+                    .Map(x => new Array(x) as TypeReference);
+
+                return result;
+            }
+
+            if (other is Array otherArray)
+            {
+                var result = thisArray.MemberType.TryCombine(otherArray.MemberType, typeResolver)
+                    .Map(x => new Array(x) as TypeReference);
+
+                return result;
+            }
+        }
+        else if (other is Array) //Flip to get the array logic in the other direction
+        {
+            return other.TryCombine(this, typeResolver);
+        }
+
+        if (other.Allow(this, typeResolver))
+            return this;
+
+        if (Allow(other, typeResolver))
+            return other; //Return the more restricted type
+
+        return ErrorCode.TypesIncompatible.ToErrorBuilder(Name, other.Name);
+    }
+
+    /// <summary>
     /// The name of this type
     /// </summary>
     public abstract string Name { get; }

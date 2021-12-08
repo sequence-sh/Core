@@ -19,7 +19,7 @@ namespace Reductech.EDR.Core.Internal.Errors {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class ErrorMessages_EN {
@@ -390,6 +390,15 @@ namespace Reductech.EDR.Core.Internal.Errors {
         internal static string TypeNotComparable {
             get {
                 return ResourceManager.GetString("TypeNotComparable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The types &apos;{0}&apos; and &apos;{1}&apos; are incompatible..
+        /// </summary>
+        internal static string TypesIncompatible {
+            get {
+                return ResourceManager.GetString("TypesIncompatible", resourceCulture);
             }
         }
         

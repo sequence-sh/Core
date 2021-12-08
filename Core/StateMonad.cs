@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Microsoft.Extensions.Logging;
+using OneOf;
 using Reductech.EDR.Core.Abstractions;
 using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.Internal;
@@ -118,37 +119,47 @@ public sealed class StateMonad : IStateMonad
         if (!dictionary.TryGetValue(key, out var value))
             return Maybe<T>.None;
 
-        if (value is T typedValue)
-            return Maybe<T>.From(typedValue);
+        return TryConvertValue(value, key);
 
-        if (typeof(T) == typeof(StringStream))
+        static Result<Maybe<T>, IErrorBuilder> TryConvertValue(object? value, VariableName key)
         {
-            var ss = new StringStream(value.ToString()!);
+            if (value is T typedValue)
+                return Maybe<T>.From(typedValue);
 
-            if (ss is T t)
+            if (typeof(T) == typeof(StringStream))
             {
-                return Maybe<T>.From(t);
+                var ss = new StringStream(value?.ToString()!);
+
+                if (ss is T t)
+                {
+                    return Maybe<T>.From(t);
+                }
             }
+
+            if (value is IArray array && typeof(T).IsGenericType
+                                      && typeof(T).GetGenericTypeDefinition() == typeof(Array<>))
+            {
+                var method = typeof(T).GetMethod(
+                    nameof(Array<object>.CreateByConverting),
+                    BindingFlags.Public | BindingFlags.Static
+                );
+
+                var conversionResult =
+                    (Result<T, IErrorBuilder>)method?.Invoke(null, new object?[] { array })!;
+
+                if (conversionResult.IsFailure)
+                    return conversionResult.ConvertFailure<Maybe<T>>();
+
+                return Maybe<T>.From(conversionResult.Value);
+            }
+
+            if (value is IOneOf valueOneOf)
+            {
+                return TryConvertValue(valueOneOf.Value, key);
+            }
+
+            return new ErrorBuilder(ErrorCode.WrongVariableType, key, typeof(T).Name);
         }
-
-        if (value is IArray array && typeof(T).IsGenericType
-                                  && typeof(T).GetGenericTypeDefinition() == typeof(Array<>))
-        {
-            var method = typeof(T).GetMethod(
-                nameof(Array<object>.CreateByConverting),
-                BindingFlags.Public | BindingFlags.Static
-            );
-
-            var conversionResult =
-                (Result<T, IErrorBuilder>)method?.Invoke(null, new object?[] { array })!;
-
-            if (conversionResult.IsFailure)
-                return conversionResult.ConvertFailure<Maybe<T>>();
-
-            return Maybe<T>.From(conversionResult.Value);
-        }
-
-        return new ErrorBuilder(ErrorCode.WrongVariableType, key, typeof(T).Name);
     }
 
     /// <summary>
