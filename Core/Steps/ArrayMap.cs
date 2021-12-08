@@ -166,22 +166,8 @@ public sealed class ArrayMap<TIn, TOut> : CompoundStep<Array<TOut>>
             if (expectedType.IsFailure)
                 return expectedType;
 
-            if (outputMemberType.Value.Allow(expectedType.Value, typeResolver))
-                return expectedType.Value;
-
-            if (expectedType.Value.Allow(outputMemberType.Value, typeResolver))
-                return outputMemberType.Value;
-
-            return Result.Failure<TypeReference, IError>(
-                ErrorCode.WrongType.ToErrorBuilder(
-                        callerMetadata.StepName,
-                        expectedType.Value.Name,
-                        callerMetadata.ParameterName,
-                        StepType.Name,
-                        outputMemberType.Value.Name
-                    )
-                    .WithLocation(freezableStepData)
-            );
+            return outputMemberType.Value.TryCombine(expectedType.Value, typeResolver)
+                .MapError(x => x.WithLocation(freezableStepData));
         }
 
         private Result<TypeReference, IError> TryGetInputMemberType(

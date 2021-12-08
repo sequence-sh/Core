@@ -88,26 +88,10 @@ public sealed class GetAutomaticVariable<T> : CompoundStep<T>
 
             var expectedTypeReference = callerMetadata.ExpectedType;
 
-            if (!expectedTypeReference.IsUnknown
-             && typeResolver.Dictionary.TryGetValue(avr.GetValueOrThrow(), out var tr))
+            if (typeResolver.Dictionary.TryGetValue(avr.GetValueOrThrow(), out var tr))
             {
-                if (tr.Allow(expectedTypeReference, typeResolver))
-                {
-                    return expectedTypeReference;
-                }
-                else if (expectedTypeReference.Allow(tr, typeResolver))
-                {
-                    return tr;
-                }
-
-                return callerMetadata.GetWrongTypeError(
-                    avr.GetValueOrThrow().Serialize(),
-                    tr.Name,
-                    new ErrorLocation(
-                        TypeName,
-                        freezableStepData.Location
-                    )
-                );
+                var result = tr.TryCombine(expectedTypeReference, typeResolver);
+                return result.MapError(x => x.WithLocation(freezableStepData));
             }
 
             return TypeReference.AutomaticVariable.Instance;
