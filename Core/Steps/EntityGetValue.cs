@@ -21,6 +21,16 @@ namespace Reductech.EDR.Core.Steps
 [SCLExample("(foo: 123)['bar']",                           "")]
 [SCLExample("(foo: (bar: 123))['foo.bar']",                "123")]
 [SCLExample("From ('type': 'C', 'value': 1) Get: 'value'", "1")]
+[SCLExample(
+    "- <myVar> = ('a':[1,2,3])['a']\r\n- <myVar> | Foreach (log (<>))",
+    IncludeInDocumentation = false,
+    ExpectedLogs = new[] { "1", "2", "3" }
+)]
+[SCLExample(
+    "- <myVar> = ('a':[1,2,3])['a']\r\n- <myVar> | Foreach (log (<> + 1))",
+    IncludeInDocumentation = false,
+    ExpectedLogs = new[] { "2", "3", "4" }
+)]
 public sealed class EntityGetValue<T> : CompoundStep<T>
 {
     /// <inheritdoc />

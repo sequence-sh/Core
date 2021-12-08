@@ -228,6 +228,9 @@
   <data name="TypeNotComparable" xml:space="preserve">
     <value>Type {0} is not comparable and so cannot be used for sorting.</value>
   </data>
+  <data name="TypesIncompatible" xml:space="preserve">
+    <value>The types '{0}' and '{1}' are incompatible.</value>
+  </data>
   <data name="UnexpectedEnumType" xml:space="preserve">
     <value>Enum '{0}' does not exist</value>
   </data>

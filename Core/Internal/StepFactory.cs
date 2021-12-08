@@ -722,6 +722,7 @@ public abstract class StepFactory : IStepFactory
 
     /// <inheritdoc />
     public IEnumerable<SCLExample> Examples => StepType.GetCustomAttributes<SCLExampleAttribute>()
+        .Where(x => x.IncludeInDocumentation)
         .Select(x => x.ToSCLExample);
 }
 

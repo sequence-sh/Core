@@ -122,7 +122,7 @@ public sealed class TypeResolver
 
         while (true)
         {
-            var unresolvableVariableNames = new List<VariableName>();
+            var unresolvableVariableNames = new List<UsedVariable>();
             var errors                    = new List<IError>();
 
             var result = topLevelStep.GetVariablesUsed(callerMetadata, this);
@@ -130,48 +130,78 @@ public sealed class TypeResolver
             if (result.IsFailure)
                 return result.ConvertFailure<Unit>();
 
-            foreach (var (variableName, typeReference, location) in result.Value)
+            foreach (var usedVariable in result.Value)
             {
-                if (typeReference.IsUnknown)
-                    unresolvableVariableNames.Add(variableName);
+                if (usedVariable.TypeReference.IsUnknown)
+                    unresolvableVariableNames.Add(usedVariable);
                 else
                 {
-                    var addResult = TryAddType(variableName, typeReference);
+                    var addResult = TryAddType(
+                        usedVariable.VariableName,
+                        usedVariable.TypeReference
+                    );
 
                     if (addResult.IsFailure)
-                        errors.Add(addResult.Error.WithLocation(location));
+                        errors.Add(addResult.Error.WithLocation(usedVariable.Location));
                 }
             }
 
             if (errors.Any())
                 return Result.Failure<Unit, IError>(ErrorList.Combine(errors));
 
-            unresolvableVariableNames.RemoveAll(
-                Dictionary.ContainsKey
-            ); //remove all unresolvable variables that we have resolved some other way
-
-            if (!unresolvableVariableNames.Any())
-                break; //We've resolved everything. Yey!
-
-            if (Dictionary.Any() && (numberUnresolved is null
-                                  || numberUnresolved > unresolvableVariableNames.Count))
-                numberUnresolved =
-                    unresolvableVariableNames
-                        .Count; //We have improved this number and can try again
-            else
+            foreach (var usedVariable in unresolvableVariableNames.ToList())
             {
-                var error =
-                    ErrorList.Combine(
-                        unresolvableVariableNames.Distinct()
-                            .Select(
-                                x =>
-                                    ErrorCode.CouldNotResolveVariable.ToErrorBuilder(x.Name)
-                                        .WithLocationSingle(ErrorLocation.EmptyLocation)
-                            )
+                if (Dictionary.TryGetValue(usedVariable.VariableName, out var resolvedType))
+                {
+                    unresolvableVariableNames.Remove(usedVariable);
+
+                    var combinedTypeResult = resolvedType.TryCombine(
+                        usedVariable.TypeReference,
+                        this
                     );
 
-                return Result.Failure<Unit, IError>(error);
+                    if (combinedTypeResult.IsFailure)
+                        errors.Add(combinedTypeResult.Error.WithLocation(usedVariable.Location));
+                    else if (combinedTypeResult.Value != resolvedType)
+                    {
+                        var addResult = TryAddType(
+                            usedVariable.VariableName,
+                            combinedTypeResult.Value
+                        );
+
+                        if (addResult.IsFailure)
+                            errors.Add(addResult.Error.WithLocation(usedVariable.Location));
+                    }
+                }
             }
+
+            if (!errors.Any())
+            {
+                if (!unresolvableVariableNames.Any())
+                    break;
+
+                if (Dictionary.Any() && (numberUnresolved is null
+                                      || numberUnresolved > unresolvableVariableNames.Count))
+                {
+                    numberUnresolved =
+                        unresolvableVariableNames
+                            .Count; //We have improved this number and can try again
+
+                    continue;
+                }
+            }
+
+            errors.AddRange(
+                unresolvableVariableNames.Distinct()
+                    .Select(
+                        x =>
+                            ErrorCode.CouldNotResolveVariable
+                                .ToErrorBuilder(x.VariableName.Name)
+                                .WithLocationSingle(x.Location)
+                    )
+            );
+
+            return Result.Failure<Unit, IError>(ErrorList.Combine(errors));
         }
 
         return Unit.Default;

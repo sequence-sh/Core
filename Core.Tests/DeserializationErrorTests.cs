@@ -134,12 +134,16 @@ public partial class DeserializationErrorTests
 
             yield return new DeserializationErrorCase(
                 "log <word>",
-                ("Could not resolve variable 'word'", "Unknown Location")
+                ("Could not resolve variable 'word'",
+                 "Line: 1, Col: 4, Idx: 4 - Line: 1, Col: 9, Idx: 9 Text: <word>")
             );
 
             yield return new DeserializationErrorCase(
                 "- log <word>\r\n- log <word>",
-                ("Could not resolve variable 'word'", "Unknown Location")
+                ("Could not resolve variable 'word'",
+                 "Line: 1, Col: 6, Idx: 6 - Line: 1, Col: 11, Idx: 11 Text: <word>"),
+                ("Could not resolve variable 'word'",
+                 "Line: 2, Col: 6, Idx: 20 - Line: 2, Col: 11, Idx: 25 Text: <word>")
             );
 
             yield return new DeserializationErrorCase(

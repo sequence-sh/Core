@@ -25,6 +25,9 @@ public sealed class SCLExampleAttribute : Attribute
         expectedLogs
     ) { }
 
+    /// <summary>
+    /// Create a new SCLExampleAttribute
+    /// </summary>
     public SCLExampleAttribute(
         string scl,
         string? expectedOutput,
@@ -76,6 +79,11 @@ public sealed class SCLExampleAttribute : Attribute
     /// Whether this example will be executed in unit tests. (Deserialization will still be tested)
     /// </summary>
     public bool ExecuteInTests { get; set; } = true;
+
+    /// <summary>
+    /// Whether to include this example in th e documentation
+    /// </summary>
+    public bool IncludeInDocumentation { get; set; } = true;
 
     /// <summary>
     /// Convert this attribute to an SCL Example
