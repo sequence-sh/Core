@@ -13,8 +13,7 @@ using StepParameterDict =
     System.Collections.Generic.Dictionary<Reductech.EDR.Core.Internal.StepParameterReference,
         Reductech.EDR.Core.Internal.FreezableStepProperty>;
 
-namespace Reductech.EDR.Core.Internal.Parser
-{
+namespace Reductech.EDR.Core.Internal.Parser;
 
 /// <summary>
 /// Contains methods for parsing sequences
@@ -867,6 +866,4 @@ public static class SCLParsing
             return new FreezableStepProperty.StepList(l.ToImmutable(), textLocation);
         }
     }
-}
-
 }

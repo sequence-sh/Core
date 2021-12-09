@@ -1,8 +1,7 @@
 ﻿using System.Collections.Generic;
 using CSharpFunctionalExtensions;
 
-namespace Reductech.EDR.Core.Internal.Serialization
-{
+namespace Reductech.EDR.Core.Internal.Serialization;
 
 /// <summary>
 /// Include a required space in serialization.
@@ -19,6 +18,4 @@ public class SpaceComponent : ISerializerBlock
     /// <inheritdoc />
     public Result<string> TryGetSegmentText(IReadOnlyDictionary<string, StepProperty> dictionary) =>
         " ";
-}
-
 }

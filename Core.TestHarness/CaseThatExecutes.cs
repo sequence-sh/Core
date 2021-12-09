@@ -17,8 +17,7 @@ using Reductech.EDR.Core.Util;
 using Xunit.Abstractions;
 using Xunit.Sdk;
 
-namespace Reductech.EDR.Core.TestHarness
-{
+namespace Reductech.EDR.Core.TestHarness;
 
 public abstract partial class StepTestBase<TStep, TOutput>
 {
@@ -204,6 +203,4 @@ public abstract partial class StepTestBase<TStep, TOutput>
 
         public List<Action> FinalChecks { get; } = new();
     }
-}
-
 }

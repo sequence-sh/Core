@@ -20,8 +20,7 @@ using Xunit.Abstractions;
 using Xunit.Sdk;
 using static Reductech.EDR.Core.TestHarness.SpaceCompressor;
 
-namespace Reductech.EDR.Core.TestHarness
-{
+namespace Reductech.EDR.Core.TestHarness;
 
 public abstract partial class StepTestBase<TStep, TOutput>
 {
@@ -218,6 +217,4 @@ public abstract partial class StepTestBase<TStep, TOutput>
 
         public SCLExampleAttribute SCLExampleAttribute { get; init; }
     }
-}
-
 }

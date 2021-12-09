@@ -1,5 +1,4 @@
-﻿namespace Reductech.EDR.Core
-{
+﻿namespace Reductech.EDR.Core;
 
 /// <summary>
 /// The Null value in SCL
@@ -12,6 +11,4 @@ public record SCLNull
     /// The instance
     /// </summary>
     public static SCLNull Instance { get; } = new();
-}
-
 }

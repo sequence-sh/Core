@@ -4,8 +4,7 @@ using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
 using Reductech.EDR.Core.Internal.Errors;
 
-namespace Reductech.EDR.Core.Internal.Logging
-{
+namespace Reductech.EDR.Core.Internal.Logging;
 
 /// <summary>
 /// A log message.
@@ -153,6 +152,4 @@ public static class LogHelper
                 logger.LogError(errorFormat, singleError.Message, stepName, loc);
         }
     }
-}
-
 }

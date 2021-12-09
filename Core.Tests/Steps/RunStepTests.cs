@@ -8,8 +8,7 @@ using Reductech.EDR.Core.Util;
 using Xunit;
 using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 
-namespace Reductech.EDR.Core.Tests.Steps
-{
+namespace Reductech.EDR.Core.Tests.Steps;
 
 public partial class RunStepTests : StepTestBase<RunStep<Unit>, Unit>
 {
@@ -103,6 +102,4 @@ public partial class RunStepTests : StepTestBase<RunStep<Unit>, Unit>
         else
             r.ShouldBeSuccessful();
     }
-}
-
 }

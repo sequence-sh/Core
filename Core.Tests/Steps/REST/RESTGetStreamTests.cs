@@ -5,8 +5,7 @@ using Reductech.EDR.Core.TestHarness;
 using RestSharp;
 using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 
-namespace Reductech.EDR.Core.Tests.Steps.REST
-{
+namespace Reductech.EDR.Core.Tests.Steps.REST;
 
 public partial class RESTGetStreamTests : StepTestBase<RESTGetStream, StringStream>
 {
@@ -32,6 +31,4 @@ public partial class RESTGetStreamTests : StepTestBase<RESTGetStream, StringStre
                 );
         }
     }
-}
-
 }

@@ -5,8 +5,7 @@ using System.Linq;
 using System.Reflection;
 using CSharpFunctionalExtensions;
 
-namespace Reductech.EDR.Core.Util
-{
+namespace Reductech.EDR.Core.Util;
 
 /// <summary>
 /// SerializationMethods methods.
@@ -97,6 +96,4 @@ public static class Extensions
 
         return Maybe<(T first, T second)>.None;
     }
-}
-
 }

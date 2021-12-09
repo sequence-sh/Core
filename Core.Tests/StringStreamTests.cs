@@ -6,8 +6,7 @@ using Reductech.EDR.Core.Enums;
 using Xunit;
 using Xunit.Sdk;
 
-namespace Reductech.EDR.Core.Tests
-{
+namespace Reductech.EDR.Core.Tests;
 
 public class StringStreamTests
 {
@@ -92,6 +91,4 @@ public class StringStreamTests
         if (!alreadyDisposed)
             throw new XunitException("Stream had not yet been disposed");
     }
-}
-
 }

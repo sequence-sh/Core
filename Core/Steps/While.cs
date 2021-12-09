@@ -7,8 +7,7 @@ using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Util;
 
-namespace Reductech.EDR.Core.Steps
-{
+namespace Reductech.EDR.Core.Steps;
 
 /// <summary>
 /// Repeat an action while the condition is met.
@@ -58,6 +57,4 @@ public sealed class While : CompoundStep<Unit>
 
     /// <inheritdoc />
     public override IStepFactory StepFactory { get; } = new SimpleStepFactory<While, Unit>();
-}
-
 }

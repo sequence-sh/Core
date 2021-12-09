@@ -6,8 +6,7 @@ using Reductech.EDR.ConnectorManagement.Base;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
 
-namespace Reductech.EDR.Core.Steps
-{
+namespace Reductech.EDR.Core.Steps;
 
 /// <summary>
 /// Gets information about connectors
@@ -38,6 +37,4 @@ public sealed class GetConnectorInformation : CompoundStep<Array<Entity>>
     /// <inheritdoc />
     public override IStepFactory StepFactory { get; } =
         new SimpleStepFactory<GetConnectorInformation, Array<Entity>>();
-}
-
 }

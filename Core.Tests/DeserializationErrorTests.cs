@@ -9,8 +9,7 @@ using Reductech.EDR.Core.Internal.Parser;
 using Reductech.EDR.Core.Internal.Serialization;
 using Xunit.Abstractions;
 
-namespace Reductech.EDR.Core.Tests
-{
+namespace Reductech.EDR.Core.Tests;
 
 public partial class DeserializationErrorTests
 {
@@ -195,6 +194,4 @@ public partial class DeserializationErrorTests
 
         public string Name => SCL;
     }
-}
-
 }

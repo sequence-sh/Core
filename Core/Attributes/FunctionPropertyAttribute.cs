@@ -1,8 +1,7 @@
 using System;
 using Reductech.EDR.Core.Internal;
 
-namespace Reductech.EDR.Core.Attributes
-{
+namespace Reductech.EDR.Core.Attributes;
 
 /// <summary>
 /// Indicates that this property is a function.
@@ -18,6 +17,4 @@ public sealed class FunctionPropertyAttribute : StepPropertyBaseAttribute
 
     /// <inheritdoc />
     public override MemberType MemberType => MemberType.Lambda;
-}
-
 }

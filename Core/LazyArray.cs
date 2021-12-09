@@ -8,8 +8,7 @@ using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Internal.Serialization;
 using Reductech.EDR.Core.Util;
 
-namespace Reductech.EDR.Core
-{
+namespace Reductech.EDR.Core;
 
 /// <summary>
 /// An array backed by an async collection
@@ -217,6 +216,4 @@ public sealed record LazyArray<T>
 
     /// <inheritdoc />
     public override string ToString() => NameInLogs;
-}
-
 }

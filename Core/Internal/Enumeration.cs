@@ -1,8 +1,7 @@
 ﻿using System;
 using CSharpFunctionalExtensions;
 
-namespace Reductech.EDR.Core.Internal
-{
+namespace Reductech.EDR.Core.Internal;
 
 /// <summary>
 /// A member of a set of predefined values
@@ -27,6 +26,4 @@ public sealed record Enumeration(string Type, string Value)
 
         return Maybe<T>.None;
     }
-}
-
 }

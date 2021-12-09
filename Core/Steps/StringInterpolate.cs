@@ -10,8 +10,7 @@ using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Internal.Serialization;
 
-namespace Reductech.EDR.Core.Steps
-{
+namespace Reductech.EDR.Core.Steps;
 
 /// <summary>
 /// Joins strings.
@@ -88,8 +87,8 @@ public sealed class StringInterpolate : CompoundStep<StringStream>
                 sb.Append('"');
 
                 foreach (var step in stepProperties.Cast<StepProperty.StepListProperty>()
-                    .Single()
-                    .StepList)
+                             .Single()
+                             .StepList)
                 {
                     if (step is StringConstant sc)
                     {
@@ -110,6 +109,4 @@ public sealed class StringInterpolate : CompoundStep<StringStream>
             }
         }
     }
-}
-
 }

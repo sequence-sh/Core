@@ -3,8 +3,7 @@ using System.Collections.Generic;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Internal.Errors;
 
-namespace Reductech.EDR.Core.Internal
-{
+namespace Reductech.EDR.Core.Internal;
 
 /// <summary>
 /// A step which can be frozen.
@@ -71,6 +70,4 @@ public interface IFreezableStep : IEquatable<IFreezableStep>
 
         return freezeResult;
     }
-}
-
 }

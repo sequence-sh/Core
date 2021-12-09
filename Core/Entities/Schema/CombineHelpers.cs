@@ -1,7 +1,6 @@
 ﻿using System;
 
-namespace Reductech.EDR.Core.Entities.Schema
-{
+namespace Reductech.EDR.Core.Entities.Schema;
 
 /// <summary>
 /// Contains methods to help with combining values
@@ -49,6 +48,4 @@ public static class CombineHelpers
 
         return chooseFunc(t1, t2)!;
     }
-}
-
 }

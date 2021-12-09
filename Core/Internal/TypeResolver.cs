@@ -4,8 +4,7 @@ using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Util;
 
-namespace Reductech.EDR.Core.Internal
-{
+namespace Reductech.EDR.Core.Internal;
 
 /// <summary>
 /// Gets the actual type from a type reference.
@@ -281,6 +280,4 @@ public sealed class TypeResolver
             }
         }
     }
-}
-
 }

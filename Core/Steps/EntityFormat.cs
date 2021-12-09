@@ -7,8 +7,7 @@ using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Internal.Serialization;
 
-namespace Reductech.EDR.Core.Steps
-{
+namespace Reductech.EDR.Core.Steps;
 
 /// <summary>
 /// Formats an entity as a string
@@ -41,6 +40,4 @@ public sealed class EntityFormat : CompoundStep<StringStream>
     /// <inheritdoc />
     public override IStepFactory StepFactory { get; } =
         new SimpleStepFactory<EntityFormat, StringStream>();
-}
-
 }

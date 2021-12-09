@@ -3,8 +3,7 @@ using System.Linq;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Internal.Errors;
 
-namespace Reductech.EDR.Core.Internal
-{
+namespace Reductech.EDR.Core.Internal;
 
 /// <summary>
 /// Freezes into a create entity step
@@ -94,6 +93,4 @@ public record CreateEntityFreezableStep(FreezableEntityData FreezableEntityData)
             FreezableEntityData = FreezableEntityData with { EntityProperties = dict }
         };
     }
-}
-
 }

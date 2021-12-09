@@ -3,8 +3,7 @@ using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.TestHarness;
 
-namespace Reductech.EDR.Core.Tests.Steps
-{
+namespace Reductech.EDR.Core.Tests.Steps;
 
 public partial class DoubleSumTests : StepTestBase<DoubleSum, double>
 {
@@ -56,6 +55,4 @@ public partial class DoubleSumTests : StepTestBase<DoubleSum, double>
             );
         }
     }
-}
-
 }

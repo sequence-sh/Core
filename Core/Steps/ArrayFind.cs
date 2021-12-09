@@ -7,8 +7,7 @@ using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
 
-namespace Reductech.EDR.Core.Steps
-{
+namespace Reductech.EDR.Core.Steps;
 
 /// <summary>
 /// Gets the first index of an element in an array.
@@ -100,6 +99,4 @@ public sealed class ArrayFind<T> : CompoundStep<int>
         /// <inheritdoc />
         protected override string? LambdaPropertyName => null;
     }
-}
-
 }

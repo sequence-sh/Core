@@ -5,8 +5,7 @@ using Reductech.EDR.Core.TestHarness;
 using Reductech.EDR.Core.Util;
 using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 
-namespace Reductech.EDR.Core.Tests.Steps
-{
+namespace Reductech.EDR.Core.Tests.Steps;
 
 public partial class IncrementVariableTests : StepTestBase<IncrementVariable, Unit>
 {
@@ -72,6 +71,4 @@ public partial class IncrementVariableTests : StepTestBase<IncrementVariable, Un
 
     /// <inheritdoc />
     protected override IEnumerable<ErrorCase> ErrorCases => CreateDefaultErrorCases(1);
-}
-
 }

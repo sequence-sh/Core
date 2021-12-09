@@ -4,8 +4,7 @@ using Reductech.EDR.ConnectorManagement.Base;
 using Reductech.EDR.Core.Abstractions;
 using Reductech.EDR.Core.Internal.Errors;
 
-namespace Reductech.EDR.Core.Internal
-{
+namespace Reductech.EDR.Core.Internal;
 
 /// <summary>
 /// Generates step factories dynamically based on configuration.
@@ -18,6 +17,4 @@ public interface IDynamicStepGenerator
     Result<IReadOnlyList<IStepFactory>, IErrorBuilder> TryCreateStepFactories(
         ConnectorSettings connectorSettings,
         IExternalContext externalContext);
-}
-
 }

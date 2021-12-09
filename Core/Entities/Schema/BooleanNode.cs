@@ -4,8 +4,7 @@ using CSharpFunctionalExtensions;
 using Json.Schema;
 using Reductech.EDR.Core.Internal.Errors;
 
-namespace Reductech.EDR.Core.Entities.Schema
-{
+namespace Reductech.EDR.Core.Entities.Schema;
 
 /// <summary>
 /// Schema is matched by a boolean value
@@ -59,6 +58,4 @@ public record BooleanNode(EnumeratedValuesNodeData EnumeratedValuesNodeData) : S
 
         return ErrorCode.SchemaViolation.ToErrorBuilder("Should Be Boolean", propertyName);
     }
-}
-
 }

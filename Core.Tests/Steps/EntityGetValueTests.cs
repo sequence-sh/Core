@@ -6,8 +6,7 @@ using Reductech.EDR.Core.TestHarness;
 using Reductech.EDR.Core.Util;
 using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 
-namespace Reductech.EDR.Core.Tests.Steps
-{
+namespace Reductech.EDR.Core.Tests.Steps;
 
 public partial class EntityGetValueTests : StepTestBase<EntityGetValue<StringStream>, StringStream>
 {
@@ -158,6 +157,4 @@ public partial class EntityGetValueTypeTests : StepTestBase<AssertTrue, Unit>
             }
         }
     };
-}
-
 }

@@ -9,8 +9,7 @@ using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Internal.Serialization;
 
-namespace Reductech.EDR.Core.Steps
-{
+namespace Reductech.EDR.Core.Steps;
 
 /// <summary>
 /// Gets the value of a named variable.
@@ -106,6 +105,4 @@ public sealed class GetVariable<T> : CompoundStep<T>
             new StepComponent(nameof(GetVariable<object>.Variable))
         );
     }
-}
-
 }

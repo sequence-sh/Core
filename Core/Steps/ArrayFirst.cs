@@ -7,8 +7,7 @@ using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
 
-namespace Reductech.EDR.Core.Steps
-{
+namespace Reductech.EDR.Core.Steps;
 
 /// <summary>
 /// Gets the first element of an array or entity stream
@@ -76,6 +75,4 @@ public sealed class ArrayFirst<T> : CompoundStep<T>
         /// <inheritdoc />
         protected override string? LambdaPropertyName => null;
     }
-}
-
 }

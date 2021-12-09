@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Linq;
 
-namespace Reductech.EDR.Core.Attributes
-{
+namespace Reductech.EDR.Core.Attributes;
 
 /// <summary>
 /// An SCL example that will be displayed in the documentation and automatically tested
@@ -122,5 +121,3 @@ public record SCLExample(
     string[]? ExpectedLogs,
     (string VariableName, string Value)[]? VariableInjections,
     bool ExecuteInTests);
-
-}

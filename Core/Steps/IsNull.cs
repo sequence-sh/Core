@@ -7,8 +7,7 @@ using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
 
-namespace Reductech.EDR.Core.Steps
-{
+namespace Reductech.EDR.Core.Steps;
 
 /// <summary>
 /// Checks if a step returns null
@@ -79,6 +78,4 @@ public sealed class IsNull<T> : CompoundStep<bool>
             return typeReference;
         }
     }
-}
-
 }

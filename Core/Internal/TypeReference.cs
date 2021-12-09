@@ -5,8 +5,7 @@ using CSharpFunctionalExtensions;
 using OneOf;
 using Reductech.EDR.Core.Internal.Errors;
 
-namespace Reductech.EDR.Core.Internal
-{
+namespace Reductech.EDR.Core.Internal;
 
 /// <summary>
 /// A reference to a type
@@ -689,6 +688,4 @@ public abstract record TypeReference
 
         return new OneOf(references);
     }
-}
-
 }

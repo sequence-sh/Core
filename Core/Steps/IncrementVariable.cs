@@ -8,8 +8,7 @@ using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Util;
 
-namespace Reductech.EDR.Core.Steps
-{
+namespace Reductech.EDR.Core.Steps;
 
 /// <summary>
 /// Increment an integer variable by a particular amount
@@ -99,6 +98,4 @@ public sealed class IncrementVariable : CompoundStep<Unit>
             yield return new(vn.Value, TypeReference.Actual.Integer, freezableStepData.Location);
         }
     }
-}
-
 }

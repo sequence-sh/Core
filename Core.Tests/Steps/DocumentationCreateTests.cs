@@ -18,8 +18,7 @@ using Reductech.EDR.Core.TestHarness;
 using Reductech.EDR.Core.Util;
 using StepParameter = Reductech.EDR.Core.Internal.Documentation.StepParameter;
 
-namespace Reductech.EDR.Core.Tests.Steps
-{
+namespace Reductech.EDR.Core.Tests.Steps;
 
 public partial class DocumentationCreateTests : StepTestBase<DocumentationCreate, Entity>
 {
@@ -442,6 +441,4 @@ public partial class DocumentationCreateTests : StepTestBase<DocumentationCreate
             public override string Category => "Examples";
         }
     }
-}
-
 }

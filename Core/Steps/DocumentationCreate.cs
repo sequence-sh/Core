@@ -7,8 +7,7 @@ using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Documentation;
 using Reductech.EDR.Core.Internal.Errors;
 
-namespace Reductech.EDR.Core.Steps
-{
+namespace Reductech.EDR.Core.Steps;
 
 /// <summary>
 /// Generates documentation for all available steps.
@@ -19,7 +18,7 @@ namespace Reductech.EDR.Core.Steps
     - <path> = $""{<root>}/{<>['Directory']}/{<>['FileName']}""
     - log <path>
 )",
-    Description    = "Logs all the file paths",
+    Description = "Logs all the file paths",
     ExecuteInTests = false
 )]
 [SCLExample("GenerateDocumentation | EntityFormat", ExampleOutput, ExecuteInTests = false)]
@@ -134,6 +133,4 @@ public sealed class DocumentationCreate : CompoundStep<Entity>
   ]
 )
 ";
-}
-
 }

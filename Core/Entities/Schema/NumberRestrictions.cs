@@ -5,8 +5,7 @@ using Json.Schema;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Util;
 
-namespace Reductech.EDR.Core.Entities.Schema
-{
+namespace Reductech.EDR.Core.Entities.Schema;
 
 /// <summary>
 /// Restricts number values
@@ -197,6 +196,4 @@ public record NumberRestrictions(
         if (MultipleOf.HasValue)
             builder.MultipleOf(Convert.ToDecimal(MultipleOf.Value));
     }
-}
-
 }

@@ -1,7 +1,6 @@
 ﻿using System;
 
-namespace Reductech.EDR.Core
-{
+namespace Reductech.EDR.Core;
 
 /// <summary>
 /// A basic type in the SCL Type system
@@ -105,6 +104,4 @@ public static class SCLTypeHelper
 
         return null;
     }
-}
-
 }

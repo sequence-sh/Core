@@ -1,7 +1,6 @@
 ﻿using System;
 
-namespace Reductech.EDR.Core.Steps
-{
+namespace Reductech.EDR.Core.Steps;
 
 /// <summary>
 /// Returns true if each term is not equal to the next term
@@ -14,6 +13,4 @@ public sealed class NotEquals<T> : CompareBaseOperatorStep<NotEquals<T>, T>
 
     /// <inheritdoc />
     public override string Operator => "!=";
-}
-
 }

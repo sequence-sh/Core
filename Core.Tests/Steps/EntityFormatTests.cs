@@ -13,8 +13,7 @@ using Reductech.EDR.Core.Util;
 using Xunit;
 using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 
-namespace Reductech.EDR.Core.Tests.Steps
-{
+namespace Reductech.EDR.Core.Tests.Steps;
 
 public partial class EntityFormatTests : StepTestBase<EntityFormat, StringStream>
 {
@@ -166,6 +165,4 @@ public partial class EntityFormatTests : StepTestBase<EntityFormat, StringStream
             );
         }
     }
-}
-
 }

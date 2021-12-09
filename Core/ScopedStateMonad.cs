@@ -12,8 +12,7 @@ using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Internal.Logging;
 using Reductech.EDR.Core.Util;
 
-namespace Reductech.EDR.Core
-{
+namespace Reductech.EDR.Core;
 
 /// <summary>
 /// A state monad with additional state defined
@@ -146,6 +145,4 @@ public sealed class ScopedStateMonad : IStateMonad
         foreach (var value in _scopedStateDictionary.Values)
             await StateMonad.DisposeVariableAsync(value, this);
     }
-}
-
 }

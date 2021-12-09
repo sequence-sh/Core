@@ -8,8 +8,7 @@ using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
 
-namespace Reductech.EDR.Core.Steps
-{
+namespace Reductech.EDR.Core.Steps;
 
 /// <summary>
 /// Returns a copy of the entity with this property set.
@@ -130,6 +129,4 @@ public sealed class EntitySetValue<T> : CompoundStep<Entity>
             return r1;
         }
     }
-}
-
 }

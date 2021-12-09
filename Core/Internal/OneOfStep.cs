@@ -8,8 +8,7 @@ using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Util;
 
-namespace Reductech.EDR.Core.Internal
-{
+namespace Reductech.EDR.Core.Internal;
 
 /// <summary>
 /// A step that could have more than one possible type
@@ -193,6 +192,4 @@ public class OneOfStep<T0, T1, T2> : OneOfStep, IStep<OneOf<T0, T1, T2>>
             x => x.Run(stateMonad, cancellationToken).Map(OneOf<T0, T1, T2>.FromT2)
         );
     }
-}
-
 }

@@ -7,8 +7,7 @@ using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Util;
 
-namespace Reductech.EDR.Core.Steps
-{
+namespace Reductech.EDR.Core.Steps;
 
 /// <summary>
 /// Returns an error if the nested step does not return true.
@@ -42,6 +41,4 @@ public sealed class AssertTrue : CompoundStep<Unit>
     [StepProperty(1)]
     [Required]
     public IStep<bool> Boolean { get; set; } = null!;
-}
-
 }

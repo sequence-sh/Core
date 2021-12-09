@@ -3,8 +3,7 @@ using System.IO;
 using System.Threading.Channels;
 using System.Threading.Tasks;
 
-namespace Reductech.EDR.Core.Internal
-{
+namespace Reductech.EDR.Core.Internal;
 
 /// <summary>
 /// Converts a list of streams to a ChannelReader
@@ -68,6 +67,4 @@ public static class StreamChannelHelper
             }
         }
     }
-}
-
 }

@@ -9,8 +9,7 @@ using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
 
-namespace Reductech.EDR.Core.Steps
-{
+namespace Reductech.EDR.Core.Steps;
 
 /// <summary>
 /// Filter an array or entity stream using a conditional statement
@@ -119,6 +118,4 @@ public sealed class ArrayFilter<T> : CompoundStep<Array<T>>
 
         protected override string LambdaPropertyName => nameof(ArrayFilter<object>.Predicate);
     }
-}
-
 }

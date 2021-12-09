@@ -17,8 +17,7 @@ using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Internal.Serialization;
 using Reductech.EDR.Core.Util;
 
-namespace Reductech.EDR.Core.Entities
-{
+namespace Reductech.EDR.Core.Entities;
 
 /// <summary>
 /// The value of an entity property.
@@ -874,6 +873,4 @@ public abstract record EntityValue(object ObjectValue)
 
         return (T)r.Value!;
     }
-}
-
 }

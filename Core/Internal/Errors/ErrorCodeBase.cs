@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Diagnostics.Contracts;
 
-namespace Reductech.EDR.Core.Internal.Errors
-{
+namespace Reductech.EDR.Core.Internal.Errors;
 
 /// <summary>
 /// Identifying code for an error message.
@@ -41,6 +40,4 @@ public abstract record ErrorCodeBase(string Code)
     /// </summary>
     [Pure]
     public ErrorBuilder ToErrorBuilder(Exception exception) => new(exception, this);
-}
-
 }

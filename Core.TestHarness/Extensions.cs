@@ -14,8 +14,7 @@ using RestSharp;
 using Xunit;
 using Xunit.Sdk;
 
-namespace Reductech.EDR.Core.TestHarness
-{
+namespace Reductech.EDR.Core.TestHarness;
 
 public static class Extensions
 {
@@ -84,7 +83,7 @@ public static class Extensions
             return request.Body.Value;
 
         foreach (var parameter in
-            request.Parameters.Where(x => x.Type == ParameterType.RequestBody))
+                 request.Parameters.Where(x => x.Type == ParameterType.RequestBody))
         {
             return parameter.Value;
         }
@@ -332,6 +331,4 @@ public static class Extensions
     {
         maybe.HasValue.Should().BeFalse("Maybe should have no value");
     }
-}
-
 }

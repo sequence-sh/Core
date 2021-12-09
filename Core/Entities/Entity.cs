@@ -14,8 +14,7 @@ using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Serialization;
 
 // ReSharper disable once CheckNamespace - we want this namespace to prevent clash with FunctionalExtensions
-namespace Reductech.EDR.Core
-{
+namespace Reductech.EDR.Core;
 
 /// <summary>
 /// A piece of data.
@@ -326,6 +325,4 @@ public sealed partial record Entity
 
     /// <inheritdoc />
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-}
-
 }

@@ -7,15 +7,14 @@ using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
 
-namespace Reductech.EDR.Core.Steps
-{
+namespace Reductech.EDR.Core.Steps;
 
 /// <summary>
 /// Counts the elements in an array or entities in an entity stream.
 /// </summary>
 [Alias("Length")]
 [SCLExample("ArrayLength [1,2,3]", ExpectedOutput = "3")]
-[SCLExample("Length Of: [1,2,3]", ExpectedOutput  = "3")]
+[SCLExample("Length Of: [1,2,3]",  ExpectedOutput = "3")]
 public sealed class ArrayLength<T> : CompoundStep<int>
 {
     /// <summary>
@@ -81,6 +80,4 @@ public sealed class ArrayLength<T> : CompoundStep<int>
 
         protected override string? LambdaPropertyName => null;
     }
-}
-
 }

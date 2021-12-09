@@ -3,8 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using CSharpFunctionalExtensions;
 
-namespace Reductech.EDR.Core.Internal
-{
+namespace Reductech.EDR.Core.Internal;
 
 /// <summary>
 /// The name of an entity property
@@ -97,6 +96,4 @@ public record EntityPropertyKey
     /// The entity property key separator
     /// </summary>
     public const char Separator = '.';
-}
-
 }

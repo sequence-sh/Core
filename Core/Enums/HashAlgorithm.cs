@@ -1,5 +1,4 @@
-﻿namespace Reductech.EDR.Core.Enums
-{
+﻿namespace Reductech.EDR.Core.Enums;
 
 /// <summary>
 /// The algorithm to use for hashing
@@ -32,6 +31,4 @@ public enum HashAlgorithm
     /// </summary>
     SHA512
     // ReSharper restore InconsistentNaming
-}
-
 }

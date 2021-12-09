@@ -1,8 +1,7 @@
 ﻿using System.Collections.Generic;
 using Generator.Equals;
 
-namespace Reductech.EDR.Core.Internal.Analytics
-{
+namespace Reductech.EDR.Core.Internal.Analytics;
 
 /// <summary>
 /// Detailed analysis of a Sequence Run
@@ -16,6 +15,4 @@ public partial record DetailedAnalysis(
     {
         return string.Join("\r\n", Steps);
     }
-}
-
 }

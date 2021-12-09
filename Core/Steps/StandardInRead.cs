@@ -6,8 +6,7 @@ using Reductech.EDR.Core.Enums;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
 
-namespace Reductech.EDR.Core.Steps
-{
+namespace Reductech.EDR.Core.Steps;
 
 /// <summary>
 /// Reads the Console standard input
@@ -37,6 +36,4 @@ public class StandardInRead : CompoundStep<StringStream>
     /// <inheritdoc />
     public override IStepFactory StepFactory { get; } =
         new SimpleStepFactory<StandardInRead, StringStream>();
-}
-
 }

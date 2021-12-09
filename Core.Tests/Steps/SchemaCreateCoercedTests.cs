@@ -8,8 +8,7 @@ using Reductech.EDR.Core.TestHarness;
 using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 using static Reductech.EDR.Core.TestHarness.SchemaHelpers;
 
-namespace Reductech.EDR.Core.Tests.Steps
-{
+namespace Reductech.EDR.Core.Tests.Steps;
 
 public partial class SchemaCreateCoercedTests : StepTestBase<SchemaCreateCoerced, Entity>
 {
@@ -211,6 +210,4 @@ public partial class SchemaCreateCoercedTests : StepTestBase<SchemaCreateCoerced
             );
         }
     }
-}
-
 }

@@ -1,7 +1,6 @@
 ﻿using System;
 
-namespace Reductech.EDR.Core.Steps
-{
+namespace Reductech.EDR.Core.Steps;
 
 /// <summary>
 /// Returns true is all terms are equal
@@ -13,6 +12,4 @@ public sealed class Equals<T> : CompareBaseOperatorStep<Equals<T>, T>
 
     /// <inheritdoc />
     public override string Operator => "==";
-}
-
 }

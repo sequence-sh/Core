@@ -1,7 +1,6 @@
 ﻿using System;
 
-namespace Reductech.EDR.Core.Attributes
-{
+namespace Reductech.EDR.Core.Attributes;
 
 /// <summary>
 /// Indicates an example value for this parameter.
@@ -28,6 +27,4 @@ public sealed class ExampleAttribute : StepPropertyMetadataAttribute
 
     /// <inheritdoc />
     public override string MetadataFieldValue => Example;
-}
-
 }

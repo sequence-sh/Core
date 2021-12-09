@@ -2,8 +2,7 @@
 using System.Text.Json;
 using Json.Schema;
 
-namespace Reductech.EDR.Core.TestHarness
-{
+namespace Reductech.EDR.Core.TestHarness;
 
 public static class SchemaHelpers
 {
@@ -40,6 +39,4 @@ public static class SchemaHelpers
     public static JsonSchema AnyDateTime => new JsonSchemaBuilder().Type(SchemaValueType.String)
         .Format(new Format("date-time"))
         .Build();
-}
-
 }

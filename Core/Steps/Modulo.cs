@@ -2,8 +2,7 @@
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Internal.Errors;
 
-namespace Reductech.EDR.Core.Steps
-{
+namespace Reductech.EDR.Core.Steps;
 
 /// <summary>
 /// Modulo a number by a list of integers sequentially
@@ -34,6 +33,4 @@ public sealed class Modulo : BaseOperatorStep<Modulo, int, int>
 
     /// <inheritdoc />
     public override string Operator => "%";
-}
-
 }

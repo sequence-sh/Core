@@ -7,8 +7,7 @@ using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 using Reductech.EDR.Core.Util;
 using RestSharp;
 
-namespace Reductech.EDR.Core.Tests.Steps.REST
-{
+namespace Reductech.EDR.Core.Tests.Steps.REST;
 
 public partial class RESTDeleteTests : StepTestBase<RESTDelete, Unit>
 {
@@ -64,6 +63,4 @@ public partial class RESTDeleteTests : StepTestBase<RESTDelete, Unit>
             }
         }
     }
-}
-
 }

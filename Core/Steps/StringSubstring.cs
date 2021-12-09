@@ -6,8 +6,7 @@ using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
 
-namespace Reductech.EDR.Core.Steps
-{
+namespace Reductech.EDR.Core.Steps;
 
 /// <summary>
 /// Gets a substring from a string.
@@ -72,6 +71,4 @@ public sealed class StringSubstring : CompoundStep<StringStream>
     /// <inheritdoc />
     public override IStepFactory StepFactory { get; } =
         new SimpleStepFactory<StringSubstring, StringStream>();
-}
-
 }

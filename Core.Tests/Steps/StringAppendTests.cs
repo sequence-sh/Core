@@ -5,8 +5,7 @@ using Reductech.EDR.Core.TestHarness;
 using Reductech.EDR.Core.Util;
 using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 
-namespace Reductech.EDR.Core.Tests.Steps
-{
+namespace Reductech.EDR.Core.Tests.Steps;
 
 public partial class StringAppendTests : StepTestBase<StringAppend, Unit>
 {
@@ -54,6 +53,4 @@ public partial class StringAppendTests : StepTestBase<StringAppend, Unit>
                 .WithExpectedFinalState("Foo", "HelloWorld");
         }
     }
-}
-
 }

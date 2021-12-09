@@ -4,8 +4,7 @@ using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Util;
 
-namespace Reductech.EDR.Core.Internal
-{
+namespace Reductech.EDR.Core.Internal;
 
 /// <summary>
 /// A constant string
@@ -275,6 +274,4 @@ public abstract record ConstantFreezableBase<T>
 
     /// <inheritdoc />
     public abstract string Serialize();
-}
-
 }

@@ -1,5 +1,4 @@
-﻿namespace Reductech.EDR.Core.Internal
-{
+﻿namespace Reductech.EDR.Core.Internal;
 
 /// <summary>
 /// A runnable step that is not a constant.
@@ -16,5 +15,3 @@ public interface ICompoundStep : IStep
 /// A runnable step that is not a constant or enumerable.
 /// </summary>
 public interface ICompoundStep<T> : IStep<T>, ICompoundStep { }
-
-}

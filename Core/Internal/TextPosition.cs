@@ -2,8 +2,7 @@
 using Antlr4.Runtime;
 using Antlr4.Runtime.Misc;
 
-namespace Reductech.EDR.Core.Internal
-{
+namespace Reductech.EDR.Core.Internal;
 
 /// <summary>
 /// A position within a piece of text.
@@ -43,6 +42,4 @@ public sealed record TextPosition(int Line, int Column, int Index) : IComparable
 
         return Index.CompareTo(other.Index);
     }
-}
-
 }

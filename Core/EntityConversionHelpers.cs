@@ -7,8 +7,7 @@ using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.Internal.Errors;
 
-namespace Reductech.EDR.Core
-{
+namespace Reductech.EDR.Core;
 
 /// <summary>
 /// An object which can be converted to and from an entity
@@ -83,6 +82,4 @@ public static class EntityConversionHelpers
 
         return new Entity(props);
     }
-}
-
 }

@@ -6,8 +6,7 @@ using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
 
-namespace Reductech.EDR.Core.Steps
-{
+namespace Reductech.EDR.Core.Steps;
 
 /// <summary>
 /// Gets the current version of the application
@@ -39,6 +38,4 @@ public sealed class GetApplicationVersion : CompoundStep<StringStream>
     /// <inheritdoc />
     public override IStepFactory StepFactory { get; } =
         new SimpleStepFactory<GetApplicationVersion, StringStream>();
-}
-
 }

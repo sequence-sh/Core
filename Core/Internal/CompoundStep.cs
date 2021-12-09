@@ -12,8 +12,7 @@ using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Internal.Logging;
 using Reductech.EDR.Core.Util;
 
-namespace Reductech.EDR.Core.Internal
-{
+namespace Reductech.EDR.Core.Internal;
 
 /// <summary>
 /// A runnable step that is not a constant.
@@ -270,6 +269,4 @@ public abstract class CompoundStep<T> : ICompoundStep<T>
 
         return finalResult;
     }
-}
-
 }

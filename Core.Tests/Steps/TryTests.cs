@@ -3,8 +3,7 @@ using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.TestHarness;
 
-namespace Reductech.EDR.Core.Tests.Steps
-{
+namespace Reductech.EDR.Core.Tests.Steps;
 
 public partial class TryTests : StepTestBase<Try<int>, int>
 {
@@ -34,6 +33,4 @@ public partial class TryTests : StepTestBase<Try<int>, int>
             );
         }
     }
-}
-
 }

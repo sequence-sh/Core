@@ -16,8 +16,7 @@ using Xunit;
 using Xunit.Abstractions;
 using Xunit.Sdk;
 
-namespace Reductech.EDR.Core.Tests
-{
+namespace Reductech.EDR.Core.Tests;
 
 /// <summary>
 /// These are not really tests but ways to quickly and easily run steps
@@ -115,6 +114,4 @@ Log (RestGETStream 'https://en.wikipedia.org/api/rest_v1/page/pdf/Edgar_Allan_Po
 
         r.ShouldBeSuccessful();
     }
-}
-
 }

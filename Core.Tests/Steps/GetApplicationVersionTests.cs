@@ -5,8 +5,7 @@ using Reductech.EDR.ConnectorManagement.Base;
 using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.TestHarness;
 
-namespace Reductech.EDR.Core.Tests.Steps
-{
+namespace Reductech.EDR.Core.Tests.Steps;
 
 public partial class
     GetApplicationVersionTests : StepTestBase<GetApplicationVersion, StringStream>
@@ -34,6 +33,4 @@ public partial class
             );
         }
     }
-}
-
 }

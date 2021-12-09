@@ -2,8 +2,7 @@
 using Reductech.EDR.Core.ExternalProcesses;
 using Reductech.EDR.Core.Internal.Errors;
 
-namespace Reductech.EDR.Core.Abstractions
-{
+namespace Reductech.EDR.Core.Abstractions;
 
 /// <summary>
 /// The external context of a sequence.
@@ -37,6 +36,4 @@ public interface IExternalContext
     /// /// Injected contexts
     /// </summary>
     public (string name, object context)[] InjectedContexts { get; }
-}
-
 }

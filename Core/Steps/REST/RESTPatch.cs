@@ -8,8 +8,7 @@ using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Util;
 using RestSharp;
 
-namespace Reductech.EDR.Core.Steps.REST
-{
+namespace Reductech.EDR.Core.Steps.REST;
 
 /// <summary>
 /// Executes a REST Patch request
@@ -43,6 +42,4 @@ public sealed class RESTPatch : RESTStep<Unit>
     [StepProperty(3)]
     [Required]
     public IStep<Entity> Entity { get; set; } = null!;
-}
-
 }

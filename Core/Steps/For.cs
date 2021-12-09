@@ -9,8 +9,7 @@ using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Util;
 
-namespace Reductech.EDR.Core.Steps
-{
+namespace Reductech.EDR.Core.Steps;
 
 /// <summary>
 /// Do an action for each value of &lt;i&gt; in a range.
@@ -112,6 +111,4 @@ public sealed class For : CompoundStep<Unit>
 
     /// <inheritdoc />
     public override IStepFactory StepFactory { get; } = new SimpleStepFactory<For, Unit>();
-}
-
 }

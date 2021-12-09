@@ -1,8 +1,7 @@
 ﻿using System;
 using System.IO;
 
-namespace Reductech.EDR.Core.Abstractions
-{
+namespace Reductech.EDR.Core.Abstractions;
 
 /// <summary>
 /// Default IConsole Adapter.
@@ -28,6 +27,4 @@ public sealed class ConsoleAdapter : IConsole
 
     /// <inheritdoc />
     public Stream OpenStandardError() => Console.OpenStandardError();
-}
-
 }

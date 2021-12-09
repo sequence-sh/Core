@@ -12,8 +12,7 @@ using Reductech.EDR.Core.Internal.Parser;
 using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.Util;
 
-namespace Reductech.EDR.Core.Internal.Serialization
-{
+namespace Reductech.EDR.Core.Internal.Serialization;
 
 /// <summary>
 /// Runs processes from Text
@@ -150,6 +149,4 @@ public sealed class SCLRunner
 
         return p;
     }
-}
-
 }

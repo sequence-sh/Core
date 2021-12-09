@@ -5,8 +5,7 @@ using System.Reflection;
 using System.Text;
 using Namotion.Reflection;
 
-namespace Reductech.EDR.Core.Internal.Documentation
-{
+namespace Reductech.EDR.Core.Internal.Documentation;
 
 /// <summary>
 /// Contains helper methods for creating documentation
@@ -379,6 +378,4 @@ public static class DocumentationCreator
             return v;
         }
     }
-}
-
 }

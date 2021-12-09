@@ -1,7 +1,6 @@
 ﻿using System;
 
-namespace Reductech.EDR.Core.Attributes
-{
+namespace Reductech.EDR.Core.Attributes;
 
 /// <summary>
 /// Optional attribute allowing you to assign an alias to a step.
@@ -13,6 +12,4 @@ public sealed class StepAttribute : Attribute
     /// The new name for this step.
     /// </summary>
     public string? Alias { get; set; }
-}
-
 }

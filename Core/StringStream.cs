@@ -7,8 +7,7 @@ using Reductech.EDR.Core.Enums;
 using Reductech.EDR.Core.Internal.Serialization;
 using Reductech.EDR.Core.Util;
 
-namespace Reductech.EDR.Core
-{
+namespace Reductech.EDR.Core;
 
 /// <summary>
 /// A stream of data representing a string.
@@ -312,6 +311,4 @@ public sealed class StringStream : IEquatable<StringStream>, IComparable<StringS
 
         Value.Dispose();
     }
-}
-
 }

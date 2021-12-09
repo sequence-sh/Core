@@ -5,8 +5,7 @@ using Reductech.EDR.Core.TestHarness;
 using Reductech.EDR.Core.Util;
 using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 
-namespace Reductech.EDR.Core.Tests.Steps
-{
+namespace Reductech.EDR.Core.Tests.Steps;
 
 public partial class AssertTrueTests : StepTestBase<AssertTrue, Unit>
 {
@@ -51,6 +50,4 @@ public partial class AssertTrueTests : StepTestBase<AssertTrue, Unit>
                 yield return errorCase;
         }
     }
-}
-
 }

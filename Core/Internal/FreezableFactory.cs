@@ -9,8 +9,7 @@ using StepParameterDict =
     System.Collections.Generic.Dictionary<Reductech.EDR.Core.Internal.StepParameterReference,
         Reductech.EDR.Core.Internal.FreezableStepProperty>;
 
-namespace Reductech.EDR.Core.Internal
-{
+namespace Reductech.EDR.Core.Internal;
 
 /// <summary>
 /// Methods to create freezable types
@@ -316,6 +315,4 @@ public static class InfixHelper
                 new("+", nameof(StringJoin), nameof(StringJoin.Strings)),
             }
             .ToLookup(x => x.OperatorString, StringComparer.OrdinalIgnoreCase);
-}
-
 }

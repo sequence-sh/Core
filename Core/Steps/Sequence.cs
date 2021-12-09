@@ -10,8 +10,7 @@ using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Internal.Serialization;
 using Reductech.EDR.Core.Util;
 
-namespace Reductech.EDR.Core.Steps
-{
+namespace Reductech.EDR.Core.Steps;
 
 /// <summary>
 /// A chain of steps to be run one after the other.
@@ -119,6 +118,4 @@ public sealed class Sequence<T> : CompoundStep<T>, ISequenceStep
             yield return FinalStep;
         }
     }
-}
-
 }

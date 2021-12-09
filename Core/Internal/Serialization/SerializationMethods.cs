@@ -7,8 +7,7 @@ using System.Threading.Tasks;
 using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.Util;
 
-namespace Reductech.EDR.Core.Internal.Serialization
-{
+namespace Reductech.EDR.Core.Internal.Serialization;
 
 /// <summary>
 /// Serializes primitive types
@@ -246,6 +245,4 @@ public static class SerializationMethods
                 _               => GetString(obj)
             };
     }
-}
-
 }

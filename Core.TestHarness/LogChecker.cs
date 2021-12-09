@@ -6,8 +6,7 @@ using FluentAssertions;
 using MELT;
 using Microsoft.Extensions.Logging;
 
-namespace Reductech.EDR.Core.TestHarness
-{
+namespace Reductech.EDR.Core.TestHarness;
 
 public static class LogChecker
 {
@@ -40,6 +39,4 @@ public static class LogChecker
             infoOrHigherEntries.Should()
                 .SatisfyRespectively(assertions, "Log value should match expected");
     }
-}
-
 }

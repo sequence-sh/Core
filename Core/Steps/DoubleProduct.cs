@@ -3,8 +3,7 @@ using System.Linq;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Internal.Errors;
 
-namespace Reductech.EDR.Core.Steps
-{
+namespace Reductech.EDR.Core.Steps;
 
 /// <summary>
 /// Calculate the product of a list of doubles
@@ -19,6 +18,4 @@ public sealed class DoubleProduct : BaseOperatorStep<DoubleProduct, double, doub
 
     /// <inheritdoc />
     public override string Operator => "*";
-}
-
 }

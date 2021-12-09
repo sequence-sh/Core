@@ -1,8 +1,7 @@
 ﻿using System.Collections.Generic;
 using CSharpFunctionalExtensions;
 
-namespace Reductech.EDR.Core.Internal.Serialization
-{
+namespace Reductech.EDR.Core.Internal.Serialization;
 
 /// <summary>
 /// Contributes to the serialized string
@@ -13,6 +12,4 @@ public interface ISerializerBlock
     /// Gets the segment of serialized text if possible
     /// </summary>
     public Result<string> TryGetSegmentText(IReadOnlyDictionary<string, StepProperty> dictionary);
-}
-
 }

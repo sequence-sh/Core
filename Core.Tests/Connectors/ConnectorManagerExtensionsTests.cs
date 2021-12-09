@@ -19,8 +19,7 @@ using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.TestHarness;
 using Xunit;
 
-namespace Reductech.EDR.Core.Tests.Connectors
-{
+namespace Reductech.EDR.Core.Tests.Connectors;
 
 public class FakeConnectorRegistry : IConnectorRegistry
 {
@@ -184,6 +183,4 @@ public class ConnectorManagerExtensionsTests
                     )
             );
     }
-}
-
 }

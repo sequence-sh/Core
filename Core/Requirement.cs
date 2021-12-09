@@ -11,8 +11,7 @@ using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Util;
 
-namespace Reductech.EDR.Core
-{
+namespace Reductech.EDR.Core;
 
 /// <summary>
 /// A requirement of a step or step property
@@ -51,17 +50,20 @@ public abstract record Requirement([property: DataMember] string ConnectorName) 
         IReadOnlyCollection<Requirement> requirements)
     {
         foreach (var connectorRequirement in requirements
-            .OfType<ConnectorRequirement>()
-            .GroupBy(x => x.ConnectorName, StringComparer.OrdinalIgnoreCase)
-        )
+                     .OfType<ConnectorRequirement>()
+                     .GroupBy(x => x.ConnectorName, StringComparer.OrdinalIgnoreCase)
+                )
         {
             yield return connectorRequirement.First();
         }
 
         foreach (var featureGroup in requirements
-            .OfType<FeatureRequirement>()
-            .GroupBy(x => x.ConnectorName + x.FeaturesKey, StringComparer.OrdinalIgnoreCase)
-        )
+                     .OfType<FeatureRequirement>()
+                     .GroupBy(
+                         x => x.ConnectorName + x.FeaturesKey,
+                         StringComparer.OrdinalIgnoreCase
+                     )
+                )
         {
             var features = featureGroup.SelectMany(x => x.RequiredFeatures)
                 .Distinct(StringComparer.OrdinalIgnoreCase)
@@ -71,9 +73,9 @@ public abstract record Requirement([property: DataMember] string ConnectorName) 
         }
 
         foreach (var group in requirements
-            .OfType<VersionRequirement>()
-            .GroupBy(x => x.ConnectorName + x.VersionKey, StringComparer.OrdinalIgnoreCase)
-        )
+                     .OfType<VersionRequirement>()
+                     .GroupBy(x => x.ConnectorName + x.VersionKey, StringComparer.OrdinalIgnoreCase)
+                )
         {
             var highestMaxVersion = group.Select(x => x.MaxVersion).Max();
             var lowestMinVersion  = group.Select(x => x.MinVersion).Min();
@@ -213,6 +215,4 @@ public sealed record FeatureRequirement(
             return entityValue.GetPrimitiveString();
         }
     }
-}
-
 }

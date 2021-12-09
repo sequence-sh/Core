@@ -5,8 +5,7 @@ using Reductech.EDR.Core.TestHarness;
 using Reductech.EDR.Core.Util;
 using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 
-namespace Reductech.EDR.Core.Tests.Steps
-{
+namespace Reductech.EDR.Core.Tests.Steps;
 
 public partial class WhileTests : StepTestBase<While, Unit>
 {
@@ -56,6 +55,4 @@ public partial class WhileTests : StepTestBase<While, Unit>
                 .WithExpectedFinalState("Foo", 5);
         }
     }
-}
-
 }

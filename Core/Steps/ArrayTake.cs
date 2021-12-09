@@ -8,8 +8,7 @@ using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Util;
 
-namespace Reductech.EDR.Core.Steps
-{
+namespace Reductech.EDR.Core.Steps;
 
 /// <summary>
 /// Take the first n elements of an array or entity stream
@@ -87,6 +86,4 @@ public sealed class ArrayTake<T> : CompoundStep<Array<T>>
 
         protected override string? LambdaPropertyName => null;
     }
-}
-
 }

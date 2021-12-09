@@ -10,8 +10,7 @@ using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Util;
 using RestSharp;
 
-namespace Reductech.EDR.Core.Steps.REST
-{
+namespace Reductech.EDR.Core.Steps.REST;
 
 /// <summary>
 /// A step that calls a rest service
@@ -142,6 +141,4 @@ public abstract class RESTStep<TOutput> : CompoundStep<TOutput>
 
         return entity;
     }
-}
-
 }

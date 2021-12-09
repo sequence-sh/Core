@@ -8,8 +8,7 @@ using Reductech.EDR.Core.Connectors;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
 
-namespace ExampleConnector
-{
+namespace ExampleConnector;
 
 public sealed class ColorInjector : IConnectorInjection
 {
@@ -53,6 +52,4 @@ public sealed class GetTestString : CompoundStep<StringStream>
     /// <inheritdoc />
     public override IStepFactory StepFactory { get; } =
         new SimpleStepFactory<GetTestString, StringStream>();
-}
-
 }

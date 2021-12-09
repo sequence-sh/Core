@@ -7,8 +7,7 @@ using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
 
-namespace Reductech.EDR.Core.Steps
-{
+namespace Reductech.EDR.Core.Steps;
 
 /// <summary>
 /// Checks if an array is empty.
@@ -74,6 +73,4 @@ public sealed class ArrayIsEmpty<T> : CompoundStep<bool>
         /// <inheritdoc />
         protected override string? LambdaPropertyName => null;
     }
-}
-
 }

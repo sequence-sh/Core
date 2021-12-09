@@ -9,8 +9,7 @@ using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
 
-namespace Reductech.EDR.Core.Steps
-{
+namespace Reductech.EDR.Core.Steps;
 
 /// <summary>
 /// Group elements in an array or entities in a stream using a function.
@@ -118,6 +117,4 @@ public sealed class ArrayGroupBy<T> : CompoundStep<Array<Entity>>
 
         protected override string LambdaPropertyName => nameof(ArrayGroupBy<object>.Function);
     }
-}
-
 }

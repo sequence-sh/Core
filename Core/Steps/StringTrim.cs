@@ -8,8 +8,7 @@ using Reductech.EDR.Core.Enums;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
 
-namespace Reductech.EDR.Core.Steps
-{
+namespace Reductech.EDR.Core.Steps;
 
 /// <summary>
 /// Trims a string, removing whitespace from the `TrimSide`.
@@ -65,6 +64,4 @@ public sealed class StringTrim : CompoundStep<StringStream>
     /// <inheritdoc />
     public override IStepFactory StepFactory { get; } =
         new SimpleStepFactory<StringTrim, StringStream>();
-}
-
 }

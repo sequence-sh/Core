@@ -1,7 +1,6 @@
 ﻿using System.Diagnostics;
 
-namespace Reductech.EDR.Core.Internal.Errors
-{
+namespace Reductech.EDR.Core.Internal.Errors;
 
 /// <summary>
 /// Identifying code for an error message in Core
@@ -425,6 +424,4 @@ public sealed record ErrorCode : ErrorCodeBase
     public static readonly ErrorCode TypesIncompatible = new(nameof(TypesIncompatible));
 
 #endregion
-}
-
 }

@@ -2,8 +2,7 @@
 using System.IO;
 using System.Threading.Tasks;
 
-namespace Reductech.EDR.Core.Internal
-{
+namespace Reductech.EDR.Core.Internal;
 
 internal class StreamReaderWithSource<TEnum> : IStreamReader<(string line, TEnum source)>
     where TEnum : Enum
@@ -26,6 +25,4 @@ internal class StreamReaderWithSource<TEnum> : IStreamReader<(string line, TEnum
 
         return (line, _source);
     }
-}
-
 }

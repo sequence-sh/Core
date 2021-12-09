@@ -2,8 +2,7 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace Reductech.EDR.Core.Entities
-{
+namespace Reductech.EDR.Core.Entities;
 
 /// <summary>
 /// Converts Versions to and from JSON
@@ -36,6 +35,4 @@ public class VersionJsonConverter : JsonConverter<Version>
     {
         writer.WriteStringValue(value.ToString());
     }
-}
-
 }

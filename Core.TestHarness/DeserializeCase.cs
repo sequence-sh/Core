@@ -10,8 +10,7 @@ using Reductech.EDR.Core.Internal.Serialization;
 using Reductech.EDR.Core.Util;
 using Xunit.Abstractions;
 
-namespace Reductech.EDR.Core.TestHarness
-{
+namespace Reductech.EDR.Core.TestHarness;
 
 public abstract partial class StepTestBase<TStep, TOutput>
 {
@@ -88,6 +87,4 @@ public abstract partial class StepTestBase<TStep, TOutput>
         public override void CheckUnitResult(Result<Unit, IError> result) =>
             ExpectedOutput.CheckUnitResult(result);
     }
-}
-
 }

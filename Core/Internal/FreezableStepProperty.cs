@@ -4,8 +4,7 @@ using System.Linq;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Internal.Errors;
 
-namespace Reductech.EDR.Core.Internal
-{
+namespace Reductech.EDR.Core.Internal;
 
 /// <summary>
 /// Information about how this step was passed
@@ -232,6 +231,4 @@ public abstract record FreezableStepProperty(TextLocation Location)
             return this with { List = r };
         }
     }
-}
-
 }

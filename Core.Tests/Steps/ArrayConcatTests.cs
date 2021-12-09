@@ -2,8 +2,7 @@
 using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.TestHarness;
 
-namespace Reductech.EDR.Core.Tests.Steps
-{
+namespace Reductech.EDR.Core.Tests.Steps;
 
 public partial class ArrayConcatTests : StepTestBase<ArrayConcat<int>, Array<int>>
 {
@@ -12,6 +11,4 @@ public partial class ArrayConcatTests : StepTestBase<ArrayConcat<int>, Array<int
     {
         get { yield break; }
     }
-}
-
 }

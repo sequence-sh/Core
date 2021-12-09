@@ -1,5 +1,4 @@
-﻿namespace Reductech.EDR.Core.ExternalProcesses
-{
+﻿namespace Reductech.EDR.Core.ExternalProcesses;
 
 /// <summary>
 /// Which output a piece of data comes from
@@ -15,6 +14,4 @@ public enum StreamSource
     /// The error stream
     /// </summary>
     Error
-}
-
 }

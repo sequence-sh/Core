@@ -10,8 +10,7 @@ using Reductech.EDR.Core.Enums;
 using Reductech.EDR.Core.Internal.Errors;
 using Xunit.Abstractions;
 
-namespace Reductech.EDR.Core.Tests
-{
+namespace Reductech.EDR.Core.Tests;
 
 /// <summary>
 /// Tests equals and get hash code for various objects
@@ -271,6 +270,4 @@ public partial class EqualityTests
             );
         }
     }
-}
-
 }

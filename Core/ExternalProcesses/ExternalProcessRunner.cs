@@ -14,8 +14,7 @@ using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Internal.Logging;
 using Reductech.EDR.Core.Util;
 
-namespace Reductech.EDR.Core.ExternalProcesses
-{
+namespace Reductech.EDR.Core.ExternalProcesses;
 
 /// <summary>
 /// Basic external step runner.
@@ -162,7 +161,7 @@ public class ExternalProcessRunner : IExternalProcessRunner
                 );
 
             await foreach (var (line, streamSource) in channelReader.ReadAllAsync(cancellationToken)
-            )
+                          )
             {
                 if (streamSource == StreamSource.Error)
                 {
@@ -253,6 +252,4 @@ public class ExternalProcessRunner : IExternalProcessRunner
         value = TermWithSpaceRegex.Replace(value, "\"$1$2$2\"");
         return value;
     }
-}
-
 }

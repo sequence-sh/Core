@@ -2,8 +2,7 @@
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Internal.Errors;
 
-namespace Reductech.EDR.Core.Steps
-{
+namespace Reductech.EDR.Core.Steps;
 
 /// <summary>
 /// Divide a double by a list of doubles
@@ -37,6 +36,4 @@ public sealed class DoubleDivide : BaseOperatorStep<DoubleDivide, double, double
 
     /// <inheritdoc />
     public override string Operator => "/";
-}
-
 }

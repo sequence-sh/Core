@@ -13,8 +13,7 @@ using Reductech.EDR.Core.Util;
 using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 using static Reductech.EDR.Core.TestHarness.SchemaHelpers;
 
-namespace Reductech.EDR.Core.Tests.Steps
-{
+namespace Reductech.EDR.Core.Tests.Steps;
 
 public partial class TransformTests : StepTestBase<Transform, Array<Entity>>
 {
@@ -257,6 +256,4 @@ public partial class TransformTests : StepTestBase<Transform, Array<Entity>>
                 yield return baseErrorCase;
         }
     }
-}
-
 }

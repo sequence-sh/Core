@@ -5,8 +5,7 @@ using CSharpFunctionalExtensions;
 using Reductech.EDR.ConnectorManagement.Base;
 using Reductech.EDR.Core.Internal.Errors;
 
-namespace Reductech.EDR.Core.Connectors
-{
+namespace Reductech.EDR.Core.Connectors;
 
 /// <summary>
 /// Provides Core-specific extension methods for ConnectorData
@@ -36,6 +35,4 @@ public static class ConnectorDataExtensions
 
         return contexts;
     }
-}
-
 }

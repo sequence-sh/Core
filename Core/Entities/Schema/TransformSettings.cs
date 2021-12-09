@@ -1,7 +1,6 @@
 ﻿using CSharpFunctionalExtensions;
 
-namespace Reductech.EDR.Core.Entities.Schema
-{
+namespace Reductech.EDR.Core.Entities.Schema;
 
 /// <summary>
 /// Settings for using a Schema to Transform a value
@@ -14,5 +13,3 @@ public record TransformSettings(
     Formatter MultiValueFormatter,
     bool CaseSensitive,
     Maybe<bool> RemoveExtra) { }
-
-}

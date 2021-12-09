@@ -6,8 +6,7 @@ using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Util;
 using RestSharp;
 
-namespace Reductech.EDR.Core.Steps.REST
-{
+namespace Reductech.EDR.Core.Steps.REST;
 
 /// <summary>
 /// Delete a REST resource
@@ -35,6 +34,4 @@ public sealed class RESTDelete : RESTStep<Unit>
     {
         return Unit.Default;
     }
-}
-
 }

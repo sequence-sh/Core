@@ -9,8 +9,7 @@ using Reductech.EDR.Core.Internal.Parser;
 using Reductech.EDR.Core.TestHarness;
 using Xunit;
 
-namespace Reductech.EDR.Core.Tests
-{
+namespace Reductech.EDR.Core.Tests;
 
 public class EntityConversionTests
 {
@@ -170,6 +169,4 @@ public class EntityConversionTests
             .Should()
             .Be(EntityValue.Null.Instance);
     }
-}
-
 }

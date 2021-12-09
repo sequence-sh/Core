@@ -3,8 +3,7 @@ using System.Linq;
 using CSharpFunctionalExtensions;
 using Microsoft.Extensions.Logging;
 
-namespace Reductech.EDR.Core.Internal.Analytics
-{
+namespace Reductech.EDR.Core.Internal.Analytics;
 
 /// <summary>
 /// An instance of a step starting
@@ -70,6 +69,4 @@ public class MultiLogger : ILogger
                 disposable.Dispose();
         }
     }
-}
-
 }

@@ -1,8 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Runtime.Serialization;
 
-namespace Reductech.EDR.Core
-{
+namespace Reductech.EDR.Core;
 
 /// <summary>
 /// Additional configuration that may be needed in some use cases.
@@ -45,6 +44,4 @@ public sealed class Configuration : IEntityConvertible
         string.Join(",", AdditionalRequirements ?? new List<Requirement>()),
         string.Join(",", TargetMachineTags ?? new List<string>()),
         DoNotSplit, Priority);
-}
-
 }

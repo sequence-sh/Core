@@ -10,8 +10,7 @@ using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Internal.Logging;
 using Reductech.EDR.Core.Util;
 
-namespace Reductech.EDR.Core
-{
+namespace Reductech.EDR.Core;
 
 /// <summary>
 /// The state monad that is passed between steps.
@@ -84,6 +83,4 @@ public interface IStateMonad : IAsyncDisposable
     /// A settings Entity containing Connector Settings
     /// </summary>
     Entity Settings { get; }
-}
-
 }

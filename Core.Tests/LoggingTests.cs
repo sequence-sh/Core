@@ -13,8 +13,7 @@ using Reductech.EDR.Core.TestHarness;
 using Xunit.Abstractions;
 using AutoTheory;
 
-namespace Reductech.EDR.Core.Tests
-{
+namespace Reductech.EDR.Core.Tests;
 
 public partial class LoggingTests
 {
@@ -211,6 +210,4 @@ public partial class LoggingTests
         /// <inheritdoc />
         public List<Action> FinalChecks { get; } = new();
     }
-}
-
 }

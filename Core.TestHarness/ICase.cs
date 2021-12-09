@@ -12,8 +12,7 @@ using Reductech.EDR.Core.ExternalProcesses;
 using Reductech.EDR.Core.Internal;
 using RestSharp;
 
-namespace Reductech.EDR.Core.TestHarness
-{
+namespace Reductech.EDR.Core.TestHarness;
 
 /// <summary>
 /// A case that executes a step.
@@ -157,6 +156,4 @@ public sealed class ExternalContextSetupHelper
 
         return externalContext;
     }
-}
-
 }

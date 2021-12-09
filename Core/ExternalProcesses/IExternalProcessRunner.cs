@@ -7,8 +7,7 @@ using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Util;
 
-namespace Reductech.EDR.Core.ExternalProcesses
-{
+namespace Reductech.EDR.Core.ExternalProcesses;
 
 /// <summary>
 /// Runs external processes.
@@ -47,6 +46,4 @@ public interface IExternalProcessRunner
         Encoding encoding,
         IStateMonad stateMonad,
         IStep? callingStep);
-}
-
 }

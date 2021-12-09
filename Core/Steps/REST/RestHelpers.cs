@@ -5,8 +5,7 @@ using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Internal.Errors;
 using RestSharp;
 
-namespace Reductech.EDR.Core.Steps.REST
-{
+namespace Reductech.EDR.Core.Steps.REST;
 
 /// <summary>
 /// Contains methods to help with Flurl Requests
@@ -54,6 +53,4 @@ public static class RestHelpers
         return ErrorCode.RequestFailed
             .ToErrorBuilder(response.StatusCode, response.StatusDescription, response.ErrorMessage);
     }
-}
-
 }

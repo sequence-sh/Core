@@ -2,8 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Reductech.EDR.Core.Internal.Errors
-{
+namespace Reductech.EDR.Core.Internal.Errors;
 
 /// <summary>
 /// More than one errorBuilders
@@ -73,6 +72,4 @@ public class ErrorBuilderList : IErrorBuilder
 
         return HashCode.Combine(ErrorBuilders.Count, ErrorBuilders.First(), ErrorBuilders.Last());
     }
-}
-
 }

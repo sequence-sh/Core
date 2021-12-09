@@ -6,8 +6,7 @@ using System.Reflection;
 using Namotion.Reflection;
 using Reductech.EDR.Core.Attributes;
 
-namespace Reductech.EDR.Core.Internal
-{
+namespace Reductech.EDR.Core.Internal;
 
 /// <summary>
 /// A step parameter that uses a property info
@@ -66,8 +65,8 @@ public class StepParameter : IStepParameter
             extraFields.Add("Default Value", dvs);
 
         foreach (var stepPropertyMetadataAttribute in propertyInfo
-            .GetCustomAttributes<StepPropertyMetadataAttribute>()
-            .GroupBy(x => x.MetadataFieldName))
+                     .GetCustomAttributes<StepPropertyMetadataAttribute>()
+                     .GroupBy(x => x.MetadataFieldName))
         {
             var value = stepPropertyMetadataAttribute.Select(x => x.MetadataFieldValue).First();
             extraFields[stepPropertyMetadataAttribute.Key] = value;
@@ -128,6 +127,4 @@ public class StepParameter : IStepParameter
 
     /// <inheritdoc />
     public MemberType MemberType { get; }
-}
-
 }

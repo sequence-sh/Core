@@ -9,8 +9,7 @@ using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Internal.Serialization;
 using Reductech.EDR.Core.Util;
 
-namespace Reductech.EDR.Core.Steps
-{
+namespace Reductech.EDR.Core.Steps;
 
 /// <summary>
 /// Gets the array element at a particular index.
@@ -101,6 +100,4 @@ public sealed class ArrayElementAtIndex<T> : CompoundStep<T>
         /// <inheritdoc />
         protected override string? LambdaPropertyName => null;
     }
-}
-
 }

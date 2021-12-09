@@ -4,8 +4,7 @@ using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.ExternalProcesses;
 using Reductech.EDR.Core.Internal.Errors;
 
-namespace Reductech.EDR.Core.Abstractions
-{
+namespace Reductech.EDR.Core.Abstractions;
 
 /// <summary>
 /// The external context of a sequence.
@@ -40,6 +39,4 @@ public sealed record ExternalContext(
         var error = ErrorCode.MissingContext.ToErrorBuilder(typeof(T).Name);
         return error;
     }
-}
-
 }

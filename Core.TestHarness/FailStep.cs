@@ -10,8 +10,7 @@ using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
 
-namespace Reductech.EDR.Core.TestHarness
-{
+namespace Reductech.EDR.Core.TestHarness;
 
 public abstract partial class StepTestBase<TStep, TOutput>
 {
@@ -275,6 +274,4 @@ public abstract partial class StepTestBase<TStep, TOutput>
                 new FailStepFactory();
         }
     }
-}
-
 }

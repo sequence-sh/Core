@@ -12,8 +12,7 @@ using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Internal.Serialization;
 
-namespace Reductech.EDR.Core.Steps
-{
+namespace Reductech.EDR.Core.Steps;
 
 /// <summary>
 /// A step that declares a new array
@@ -147,6 +146,4 @@ public sealed class ArrayNew<T> : CompoundStep<Array<T>>, IArrayNewStep
         /// <inheritdoc />
         public override IStepSerializer Serializer => ArraySerializer.Instance;
     }
-}
-
 }

@@ -1,8 +1,7 @@
 ﻿using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Internal.Errors;
 
-namespace Reductech.EDR.Core.Internal
-{
+namespace Reductech.EDR.Core.Internal;
 
 /// <summary>
 /// Metadata associated with the calling step
@@ -53,6 +52,4 @@ public record CallerMetadata(string StepName, string ParameterName, TypeReferenc
 
         return GetWrongTypeErrorBuilder("Step", reference.Name);
     }
-}
-
 }

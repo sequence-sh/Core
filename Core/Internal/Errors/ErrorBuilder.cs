@@ -3,8 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Linq;
 
-namespace Reductech.EDR.Core.Internal.Errors
-{
+namespace Reductech.EDR.Core.Internal.Errors;
 
 /// <summary>
 /// A single error builder
@@ -173,6 +172,4 @@ public abstract record ErrorData
     /// This ErrorData as a string
     /// </summary>
     public abstract string AsString(ErrorCodeBase errorCode);
-}
-
 }

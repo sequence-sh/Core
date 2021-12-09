@@ -3,8 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Reductech.EDR.Core.Internal.Documentation
-{
+namespace Reductech.EDR.Core.Internal.Documentation;
 
 internal static class Prettifier
 {
@@ -101,6 +100,4 @@ internal static class Prettifier
             sb.Append('|');
         }
     }
-}
-
 }

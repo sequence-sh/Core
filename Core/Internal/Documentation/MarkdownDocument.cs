@@ -2,8 +2,7 @@
 using System.Linq;
 using System.Runtime.Serialization;
 
-namespace Reductech.EDR.Core.Internal.Documentation
-{
+namespace Reductech.EDR.Core.Internal.Documentation;
 
 /// <summary>
 /// The result of Generating Documentation
@@ -171,6 +170,4 @@ public abstract record DocumentationPage(
     /// </summary>
     [property: DataMember]
     public abstract string PageType { get; }
-}
-
 }

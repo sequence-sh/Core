@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Threading.Channels;
 
-namespace Reductech.EDR.Core.ExternalProcesses
-{
+namespace Reductech.EDR.Core.ExternalProcesses;
 
 /// <summary>
 /// A reference to a running external process.
@@ -23,6 +22,4 @@ public interface IExternalProcessReference : IDisposable
     /// Wait for the process to exit
     /// </summary>
     void WaitForExit(int? milliseconds);
-}
-
 }

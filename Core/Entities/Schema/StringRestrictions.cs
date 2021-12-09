@@ -7,8 +7,7 @@ using Json.Schema;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Util;
 
-namespace Reductech.EDR.Core.Entities.Schema
-{
+namespace Reductech.EDR.Core.Entities.Schema;
 
 /// <summary>
 /// Data for a node
@@ -140,6 +139,4 @@ public record StringRestrictions
     /// No String Restrictions
     /// </summary>
     public static readonly StringRestrictions NoRestrictions = new(null, null, null);
-}
-
 }

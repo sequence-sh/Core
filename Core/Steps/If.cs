@@ -7,8 +7,7 @@ using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
 
-namespace Reductech.EDR.Core.Steps
-{
+namespace Reductech.EDR.Core.Steps;
 
 /// <summary>
 /// Executes a statement if a condition is true.
@@ -121,6 +120,4 @@ public sealed class If<T> : CompoundStep<T>
             return r;
         }
     }
-}
-
 }

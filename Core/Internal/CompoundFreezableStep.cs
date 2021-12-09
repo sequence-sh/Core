@@ -5,8 +5,7 @@ using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Util;
 
-namespace Reductech.EDR.Core.Internal
-{
+namespace Reductech.EDR.Core.Internal;
 
 /// <summary>
 /// A step that is not a constant or a variable reference.
@@ -124,7 +123,7 @@ public sealed record CompoundFreezableStep(
                 var changed    = false;
 
                 foreach (var (stepParameterReference, freezableStepProperty) in newStepData
-                    .StepProperties)
+                             .StepProperties)
                 {
                     if (stepParameterReference is StepParameterReference.Named
                      && !stepFactory.ParameterDictionary.ContainsKey(stepParameterReference))
@@ -159,6 +158,4 @@ public sealed record CompoundFreezableStep(
 
         return this with { FreezableStepData = FreezableStepData with { StepProperties = dict } };
     }
-}
-
 }

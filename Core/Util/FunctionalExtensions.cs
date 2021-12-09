@@ -6,8 +6,7 @@ using CSharpFunctionalExtensions;
 using Namotion.Reflection;
 using Reductech.EDR.Core.Internal.Errors;
 
-namespace Reductech.EDR.Core.Util
-{
+namespace Reductech.EDR.Core.Util;
 
 /// <summary>
 /// Functional methods
@@ -206,6 +205,4 @@ public static class FunctionalExtensions
 
         return Maybe<T>.None;
     }
-}
-
 }

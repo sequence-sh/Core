@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Reductech.EDR.Core.Internal.Errors
-{
+namespace Reductech.EDR.Core.Internal.Errors;
 
 /// <summary>
 /// An error without a location.
@@ -23,6 +22,4 @@ public interface IErrorBuilder : IEquatable<IErrorBuilder>
     /// String representation of this ErrorBuilder.
     /// </summary>
     public string AsString { get; }
-}
-
 }

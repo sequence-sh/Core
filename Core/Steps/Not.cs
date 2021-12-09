@@ -6,8 +6,7 @@ using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
 
-namespace Reductech.EDR.Core.Steps
-{
+namespace Reductech.EDR.Core.Steps;
 
 /// <summary>
 /// Negation of a boolean value.
@@ -54,6 +53,4 @@ public sealed class Not : CompoundStep<bool>
         //    new FixedStringComponent(")")
         //);
     }
-}
-
 }

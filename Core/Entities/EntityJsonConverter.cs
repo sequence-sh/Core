@@ -4,8 +4,7 @@ using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace Reductech.EDR.Core.Entities
-{
+namespace Reductech.EDR.Core.Entities;
 
 /// <summary>
 /// Converts Entities to and from Json
@@ -59,6 +58,4 @@ public class EntityJsonConverter : JsonConverter<Entity>
             }
         }
     }
-}
-
 }

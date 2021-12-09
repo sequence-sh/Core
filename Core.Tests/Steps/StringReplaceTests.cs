@@ -7,8 +7,7 @@ using Reductech.EDR.Core.TestHarness;
 using Xunit;
 using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 
-namespace Reductech.EDR.Core.Tests.Steps
-{
+namespace Reductech.EDR.Core.Tests.Steps;
 
 public partial class StringReplaceTests : StepTestBase<StringReplace, StringStream>
 {
@@ -143,6 +142,4 @@ public partial class StringReplaceTests : StepTestBase<StringReplace, StringStre
                 )
             );
     }
-}
-
 }

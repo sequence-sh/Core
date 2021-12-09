@@ -12,8 +12,7 @@ using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Internal.Parser;
 using Reductech.EDR.Core.Util;
 
-namespace Reductech.EDR.Core.Steps
-{
+namespace Reductech.EDR.Core.Steps;
 
 /// <summary>
 /// Runs SCL defined in a StringStream
@@ -147,15 +146,13 @@ public sealed class RunSCL : CompoundStep<Unit>
             }
 
             foreach (var pair in base.GetVariablesUsed(
-                callerMetadata,
-                freezableStepData,
-                typeResolver
-            ))
+                         callerMetadata,
+                         freezableStepData,
+                         typeResolver
+                     ))
             {
                 yield return pair;
             }
         }
     }
-}
-
 }

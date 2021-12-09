@@ -1,7 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Reductech.EDR.Core.Enums
-{
+namespace Reductech.EDR.Core.Enums;
 
 /// <summary>
 /// An operator that can be applied to two numbers.
@@ -50,6 +49,4 @@ public enum MathOperator
     /// </summary>
     [Display(Name = "^")]
     Power
-}
-
 }

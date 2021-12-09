@@ -4,8 +4,7 @@ using System.Linq;
 using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal.Serialization;
 
-namespace Reductech.EDR.Core.Internal
-{
+namespace Reductech.EDR.Core.Internal;
 
 /// <summary>
 /// A property of a step
@@ -198,6 +197,4 @@ public abstract record StepProperty
     /// </summary>
     /// <returns></returns>
     public abstract string GetLogName();
-}
-
 }

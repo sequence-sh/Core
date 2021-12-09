@@ -8,8 +8,7 @@ using StepParameterDict =
         Reductech.EDR.Core.Internal.StepParameterReference,
         Reductech.EDR.Core.Internal.FreezableStepProperty>;
 
-namespace Reductech.EDR.Core.Internal
-{
+namespace Reductech.EDR.Core.Internal;
 
 /// <summary>
 /// The data used by a Freezable Step.
@@ -281,6 +280,4 @@ public sealed record FreezableStepData(StepParameterDict StepProperties, TextLoc
                 variables.AddRange(variablesSet.Value.Where(x => x.VariableName != vn));
         }
     }
-}
-
 }

@@ -7,8 +7,7 @@ using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Util;
 
-namespace Reductech.EDR.Core.Steps
-{
+namespace Reductech.EDR.Core.Steps;
 
 /// <summary>
 /// Returns success if the ValueIf step returns an error and a failure otherwise.
@@ -42,6 +41,4 @@ public sealed class AssertError : CompoundStep<Unit>
     [StepProperty(1)]
     [Required]
     public IStep<Unit> Step { get; set; } = null!;
-}
-
 }

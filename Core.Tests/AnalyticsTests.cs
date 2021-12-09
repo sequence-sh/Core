@@ -13,8 +13,7 @@ using Reductech.EDR.Core.TestHarness;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace Reductech.EDR.Core.Tests
-{
+namespace Reductech.EDR.Core.Tests;
 
 [UseTestOutputHelper]
 public partial class AnalyticsTests
@@ -96,6 +95,4 @@ public partial class AnalyticsTests
             .NotBeNullOrEmpty()
             .And.AllBe("Attempt to Divide by Zero.");
     }
-}
-
 }

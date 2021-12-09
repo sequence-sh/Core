@@ -3,8 +3,7 @@ using CSharpFunctionalExtensions;
 using Json.Schema;
 using Reductech.EDR.Core.Internal.Errors;
 
-namespace Reductech.EDR.Core.Entities.Schema
-{
+namespace Reductech.EDR.Core.Entities.Schema;
 
 /// <summary>
 /// Schema is always valid
@@ -80,6 +79,4 @@ public record FalseNode() : SchemaNode(EnumeratedValuesNodeData.Empty)
     {
         return ErrorCode.SchemaViolation.ToErrorBuilder("Always False", propertyName);
     }
-}
-
 }

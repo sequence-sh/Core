@@ -10,8 +10,7 @@ using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Util;
 
-namespace Reductech.EDR.Core.Steps
-{
+namespace Reductech.EDR.Core.Steps;
 
 /// <summary>
 /// Do an action for each element in an array or entity in an entity stream.
@@ -109,6 +108,4 @@ public sealed class ForEach<T> : CompoundStep<Unit>
         /// <inheritdoc />
         public override string OutputTypeExplanation => nameof(Unit);
     }
-}
-
 }

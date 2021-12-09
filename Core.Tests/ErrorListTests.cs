@@ -2,8 +2,7 @@
 using Reductech.EDR.Core.Internal.Errors;
 using Xunit;
 
-namespace Reductech.EDR.Core.Tests
-{
+namespace Reductech.EDR.Core.Tests;
 
 public class ErrorListTests
 {
@@ -63,6 +62,4 @@ public class ErrorListTests
             $"{errors[0].AsString}{ErrorSeparator}{errors[1].AsString}"
         );
     }
-}
-
 }

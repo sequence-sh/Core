@@ -2,8 +2,7 @@
 using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.TestHarness;
 
-namespace Reductech.EDR.Core.Tests.Steps
-{
+namespace Reductech.EDR.Core.Tests.Steps;
 
 public partial class GreaterThanOrEqualTests : StepTestBase<GreaterThanOrEqual<int>, bool>
 {
@@ -52,6 +51,4 @@ public partial class GreaterThanOrEqualTests : StepTestBase<GreaterThanOrEqual<i
             );
         }
     }
-}
-
 }

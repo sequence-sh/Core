@@ -3,8 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Generator.Equals;
 
-namespace Reductech.EDR.Core.Internal.Analytics
-{
+namespace Reductech.EDR.Core.Internal.Analytics;
 
 /// <summary>
 /// Detailed analysis of how a step is used in a sequence
@@ -32,6 +31,4 @@ public partial record DetailedStepAnalysis(
 
         return new { StepName, TextLocation, TotalTime, TimesRun }.ToString()!;
     }
-}
-
 }

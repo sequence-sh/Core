@@ -1,8 +1,7 @@
 ﻿using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Internal.Errors;
 
-namespace Reductech.EDR.Core.Entities.Schema
-{
+namespace Reductech.EDR.Core.Entities.Schema;
 
 /// <summary>
 /// A string format
@@ -40,6 +39,4 @@ public abstract record StringFormat : NodeData<StringFormat>
 
         return AnyStringFormat.Instance;
     }
-}
-
 }

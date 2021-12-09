@@ -9,8 +9,7 @@ using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Internal.Logging;
 using Xunit;
 
-namespace Reductech.EDR.Core.Tests
-{
+namespace Reductech.EDR.Core.Tests;
 
 public class LogHelperTests
 {
@@ -143,6 +142,4 @@ public class LogHelperTests
             l => l.LogLevel == LogLevel.Error && l.Message!.Equals(expected)
         );
     }
-}
-
 }

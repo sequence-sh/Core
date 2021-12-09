@@ -16,8 +16,7 @@ using Reductech.EDR.Core.Util;
 using Xunit;
 using static Reductech.EDR.Core.TestHarness.SchemaHelpers;
 
-namespace Reductech.EDR.Core.Tests.Steps
-{
+namespace Reductech.EDR.Core.Tests.Steps;
 
 public partial class ValidateTests : StepTestBase<Validate, Array<Entity>>
 {
@@ -521,6 +520,4 @@ public partial class ValidateTests : StepTestBase<Validate, Array<Entity>>
 
         properties.GetValueOrThrow().Should().BeOfType<EntityValue.NestedEntity>();
     }
-}
-
 }

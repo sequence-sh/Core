@@ -9,8 +9,7 @@ using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Internal.Serialization;
 using Reductech.EDR.Core.Util;
 
-namespace Reductech.EDR.Core.Steps
-{
+namespace Reductech.EDR.Core.Steps;
 
 /// <summary>
 /// Asserts that two objects are equal.
@@ -117,6 +116,4 @@ public sealed class AssertEqual<T> : CompoundStep<Unit>
             return r;
         }
     }
-}
-
 }

@@ -14,8 +14,7 @@ using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Util;
 
-namespace Reductech.EDR.Core
-{
+namespace Reductech.EDR.Core;
 
 /// <summary>
 /// The state monad that is passed between steps.
@@ -266,6 +265,4 @@ public interface IStateDisposable
     /// </summary>
     /// <param name="state"></param>
     Task DisposeAsync(IStateMonad state);
-}
-
 }

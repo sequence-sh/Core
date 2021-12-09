@@ -8,8 +8,7 @@ using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Internal.Serialization;
 using Reductech.EDR.Core.Util;
 
-namespace Reductech.EDR.Core.Internal
-{
+namespace Reductech.EDR.Core.Internal;
 
 /// <summary>
 /// A step that returns a constant value.
@@ -188,6 +187,4 @@ public record EntityConstant(Entity Value) : ConstantBase<Entity>(Value)
 
     /// <inheritdoc />
     protected override EntityValue ToEntityValue() => new EntityValue.NestedEntity(Value);
-}
-
 }

@@ -6,8 +6,7 @@ using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
 
-namespace Reductech.EDR.Core.Steps
-{
+namespace Reductech.EDR.Core.Steps;
 
 /// <summary>
 /// Returns a copy of the entity with the specified property removed
@@ -60,6 +59,4 @@ public sealed class EntityRemoveProperty : CompoundStep<Entity>
     /// <inheritdoc />
     public override IStepFactory StepFactory { get; } =
         new SimpleStepFactory<EntityRemoveProperty, Entity>();
-}
-
 }

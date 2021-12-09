@@ -9,8 +9,7 @@ using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
 
-namespace Reductech.EDR.Core.Steps
-{
+namespace Reductech.EDR.Core.Steps;
 
 /// <summary>
 /// Map each element of an array or entity stream to a new value.
@@ -228,6 +227,4 @@ public sealed class ArrayMap<TIn, TOut> : CompoundStep<Array<TOut>>
 
         private string LambdaPropertyName => nameof(ArrayMap<object, object>.Function);
     }
-}
-
 }

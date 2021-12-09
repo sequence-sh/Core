@@ -13,8 +13,7 @@ using Reductech.EDR.Core.Steps;
 using Xunit;
 using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 
-namespace Reductech.EDR.Core.Tests
-{
+namespace Reductech.EDR.Core.Tests;
 
 [AutoTheory.UseTestOutputHelper]
 public partial class RequirementsTests
@@ -157,6 +156,4 @@ public partial class RequirementsTests
             );
         }
     }
-}
-
 }

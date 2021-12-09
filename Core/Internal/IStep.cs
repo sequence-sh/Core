@@ -7,8 +7,7 @@ using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Util;
 
-namespace Reductech.EDR.Core.Internal
-{
+namespace Reductech.EDR.Core.Internal;
 
 /// <summary>
 /// A step that can be run.
@@ -75,6 +74,4 @@ public interface IRunnableStep<T>
     /// Run this step and return the result.
     /// </summary>
     Task<Result<T, IError>> Run(IStateMonad stateMonad, CancellationToken cancellationToken);
-}
-
 }

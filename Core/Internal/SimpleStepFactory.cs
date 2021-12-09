@@ -2,8 +2,7 @@
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Internal.Errors;
 
-namespace Reductech.EDR.Core.Internal
-{
+namespace Reductech.EDR.Core.Internal;
 
 /// <summary>
 /// A step factory that uses default values for most properties.
@@ -44,6 +43,4 @@ public class SimpleStepFactory<TStep, TOutput> : StepFactory
 
     /// <inheritdoc />
     public override string OutputTypeExplanation => typeof(TOutput).Name.Replace("`1", "<T>");
-}
-
 }

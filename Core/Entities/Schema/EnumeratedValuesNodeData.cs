@@ -3,8 +3,7 @@ using System.Linq;
 using Generator.Equals;
 using Json.Schema;
 
-namespace Reductech.EDR.Core.Entities.Schema
-{
+namespace Reductech.EDR.Core.Entities.Schema;
 
 /// <summary>
 /// Node data for enumerated values. Restricts the possible values of the node to one of several possible values.
@@ -62,6 +61,4 @@ public partial record EnumeratedValuesNodeData(
     /// Empty EnumeratedValuesNodeData
     /// </summary>
     public static EnumeratedValuesNodeData Empty { get; } = new(null as IReadOnlyList<EntityValue>);
-}
-
 }

@@ -5,8 +5,7 @@ using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Reductech.EDR.Core.Internal.Errors;
 
-namespace Reductech.EDR.Core
-{
+namespace Reductech.EDR.Core;
 
 /// <summary>
 /// Contains methods for helping with entities.
@@ -37,6 +36,4 @@ public static class EntityHelper
 
         return Result.Success<object?, IError>(o);
     }
-}
-
 }

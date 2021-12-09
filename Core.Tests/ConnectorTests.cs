@@ -14,8 +14,7 @@ using Reductech.EDR.Core.TestHarness;
 using Reductech.EDR.Core.Util;
 using Xunit;
 
-namespace Reductech.EDR.Core.Tests
-{
+namespace Reductech.EDR.Core.Tests;
 
 [AutoTheory.UseTestOutputHelper]
 public partial class ConnectorTests
@@ -81,6 +80,4 @@ public partial class ConnectorTests
 
         r.ShouldBeSuccessful();
     }
-}
-
 }

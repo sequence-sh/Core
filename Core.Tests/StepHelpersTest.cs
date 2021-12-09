@@ -11,8 +11,7 @@ using Reductech.EDR.Core.Util;
 using Xunit;
 using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 
-namespace Reductech.EDR.Core.Tests
-{
+namespace Reductech.EDR.Core.Tests;
 
 [UseTestOutputHelper]
 public partial class StepHelpersTest
@@ -80,6 +79,4 @@ public partial class StepHelpersTest
         fourFiveSix.Should().BeEquivalentTo(new[] { 4, 5, 6 });
         nullInt.ShouldHaveNoValue();
     }
-}
-
 }

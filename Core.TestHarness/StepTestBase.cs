@@ -11,8 +11,7 @@ using Reductech.EDR.Core.Internal;
 using Xunit;
 using Xunit.Sdk;
 
-namespace Reductech.EDR.Core.TestHarness
-{
+namespace Reductech.EDR.Core.TestHarness;
 
 public interface IStepTestBase
 {
@@ -115,7 +114,7 @@ public abstract partial class StepTestBase<TStep, TOutput> : IStepTestBase
         var errors   = new List<string>();
 
         foreach (var propertyInfo in typeof(TStep).GetProperties()
-            .Where(x => x.GetCustomAttribute<StepPropertyBaseAttribute>() is not null))
+                     .Where(x => x.GetCustomAttribute<StepPropertyBaseAttribute>() is not null))
         {
             var propName = $"{typeof(TStep).GetDisplayName()}.{propertyInfo.Name}";
 
@@ -189,6 +188,4 @@ public abstract partial class StepTestBase<TStep, TOutput> : IStepTestBase
 
         typeof(TStep).Should().BeAssignableTo(stepType);
     }
-}
-
 }

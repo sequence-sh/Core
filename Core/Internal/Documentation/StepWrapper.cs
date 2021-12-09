@@ -2,8 +2,7 @@
 using System.Linq;
 using Reductech.EDR.Core.Attributes;
 
-namespace Reductech.EDR.Core.Internal.Documentation
-{
+namespace Reductech.EDR.Core.Internal.Documentation;
 
 /// <summary>
 /// A wrapper for this documented object.
@@ -63,6 +62,4 @@ public class StepWrapper : IDocumentedStep
 
     /// <inheritdoc />
     public IReadOnlyList<SCLExample> Examples { get; }
-}
-
 }

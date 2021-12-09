@@ -2,8 +2,7 @@
 using System.Linq;
 using System.Text;
 
-namespace Reductech.EDR.Core.Internal.Serialization
-{
+namespace Reductech.EDR.Core.Internal.Serialization;
 
 /// <summary>
 /// The default step serializer for functions.
@@ -42,6 +41,4 @@ public sealed class FunctionSerializer : IStepSerializer
 
         return sb.ToString();
     }
-}
-
 }

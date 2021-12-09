@@ -1,7 +1,6 @@
 ﻿using System;
 
-namespace Reductech.EDR.Core.Steps
-{
+namespace Reductech.EDR.Core.Steps;
 
 /// <summary>
 /// Returns true if each term is less than or equals to the next term
@@ -13,6 +12,4 @@ public sealed class LessThanOrEqual<T> : CompareBaseOperatorStep<LessThanOrEqual
 
     /// <inheritdoc />
     public override string Operator => "<=";
-}
-
 }

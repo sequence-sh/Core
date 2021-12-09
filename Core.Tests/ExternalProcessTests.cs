@@ -16,8 +16,7 @@ using Reductech.EDR.Core.TestHarness;
 using RestSharp;
 using Xunit;
 
-namespace Reductech.EDR.Core.Tests
-{
+namespace Reductech.EDR.Core.Tests;
 
 [AutoTheory.UseTestOutputHelper]
 public partial class ExternalProcessTests
@@ -315,6 +314,4 @@ public partial class ExternalProcessTests
 
         return stateMonad;
     }
-}
-
 }

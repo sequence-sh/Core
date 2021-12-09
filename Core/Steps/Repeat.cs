@@ -8,8 +8,7 @@ using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
 
-namespace Reductech.EDR.Core.Steps
-{
+namespace Reductech.EDR.Core.Steps;
 
 /// <summary>
 /// Creates an array by repeating an element.
@@ -96,6 +95,4 @@ public sealed class Repeat<T> : CompoundStep<Array<T>>
                 );
         }
     }
-}
-
 }
