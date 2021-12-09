@@ -1,19 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using FluentAssertions;
-using Microsoft.Extensions.Logging.Abstractions;
-using Moq;
-using Reductech.EDR.Core.Internal;
-using Reductech.EDR.Core.Internal.Errors;
-using Reductech.EDR.Core.Steps;
-using Reductech.EDR.Core.Util;
-using AutoTheory;
+﻿using Microsoft.Extensions.Logging.Abstractions;
 using Reductech.EDR.Core.TestHarness;
-using Xunit.Abstractions;
-using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 
 namespace Reductech.EDR.Core.Tests;
 

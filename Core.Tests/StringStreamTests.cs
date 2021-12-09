@@ -1,10 +1,6 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.Text;
-using FluentAssertions;
 using Reductech.EDR.Core.Enums;
-using Xunit;
-using Xunit.Sdk;
 
 namespace Reductech.EDR.Core.Tests;
 

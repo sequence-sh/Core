@@ -1,23 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
+﻿using System.IO;
 using System.IO.Abstractions;
 using System.IO.Abstractions.TestingHelpers;
-using System.Reflection;
-using System.Threading;
-using System.Threading.Tasks;
-using FluentAssertions;
 using MELT;
-using Microsoft.Extensions.Logging;
-using Moq;
 using NuGet.Packaging;
 using Reductech.EDR.ConnectorManagement;
 using Reductech.EDR.ConnectorManagement.Base;
-using Reductech.EDR.Core.Abstractions;
 using Reductech.EDR.Core.Connectors;
-using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.TestHarness;
-using Xunit;
 
 namespace Reductech.EDR.Core.Tests.Connectors;
 

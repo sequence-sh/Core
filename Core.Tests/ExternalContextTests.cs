@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using FluentAssertions;
-using Reductech.EDR.Core.Abstractions;
-using Reductech.EDR.Core.Internal.Errors;
-using Reductech.EDR.Core.TestHarness;
-using Xunit;
+﻿using Reductech.EDR.Core.TestHarness;
 
 namespace Reductech.EDR.Core.Tests;
 

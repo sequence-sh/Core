@@ -1,10 +1,5 @@
-﻿using System.Collections.Generic;
-using Json.Schema;
-using Reductech.EDR.Core.Entities;
-using Reductech.EDR.Core.Internal;
-using Reductech.EDR.Core.Steps;
+﻿using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.TestHarness;
-using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 using static Reductech.EDR.Core.TestHarness.SchemaHelpers;
 
 namespace Reductech.EDR.Core.Tests.Steps;

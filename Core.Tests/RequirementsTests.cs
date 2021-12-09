@@ -1,19 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using CSharpFunctionalExtensions;
-using FluentAssertions;
-using Reductech.EDR.Core.Attributes;
-using Reductech.EDR.Core.Internal;
-using Reductech.EDR.Core.Internal.Errors;
-using Reductech.EDR.Core.Steps;
-using Xunit;
-using static Reductech.EDR.Core.TestHarness.StaticHelpers;
-
-namespace Reductech.EDR.Core.Tests;
+﻿namespace Reductech.EDR.Core.Tests;
 
 [AutoTheory.UseTestOutputHelper]
 public partial class RequirementsTests

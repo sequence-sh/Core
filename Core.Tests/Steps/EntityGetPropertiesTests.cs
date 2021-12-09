@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using Reductech.EDR.Core.Steps;
-using Reductech.EDR.Core.TestHarness;
+﻿using Reductech.EDR.Core.TestHarness;
 
 namespace Reductech.EDR.Core.Tests.Steps;
 

@@ -1,13 +1,6 @@
 ﻿using System.IO;
-using System.Linq;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using FluentAssertions;
-using Moq;
 using Reductech.EDR.Core.ExternalProcesses;
-using Reductech.EDR.Core.Internal;
-using Xunit;
 
 namespace Reductech.EDR.Core.Tests;
 

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Reflection;
-using Reductech.EDR.ConnectorManagement.Base;
-using Reductech.EDR.Core.Steps;
+﻿using Reductech.EDR.ConnectorManagement.Base;
 using Reductech.EDR.Core.TestHarness;
 
 namespace Reductech.EDR.Core.Tests.Steps;

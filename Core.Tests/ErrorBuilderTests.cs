@@ -1,8 +1,4 @@
-﻿using System;
-using Reductech.EDR.Core.Internal.Errors;
-using Xunit;
-
-namespace Reductech.EDR.Core.Tests;
+﻿namespace Reductech.EDR.Core.Tests;
 
 public class ErrorBuilderTests
 {
@@ -27,7 +23,7 @@ public class ErrorBuilderTests
 
         var el = new ErrorBuilderList(new[] { eb });
 
-        Assert.True(eb.Equals((IErrorBuilder)el));
+        Assert.True(eb.Equals(el));
     }
 
     [Fact]
@@ -76,7 +72,7 @@ public class ErrorBuilderTests
     [Fact]
     public void ObjectData_Equals_WhenObjectIsNull_ReturnsFalse()
     {
-        var ob = new ErrorData.ObjectData(Array.Empty<object>());
+        var ob = new ErrorData.ObjectData(System.Array.Empty<object>());
 
         Assert.False(ob.Equals(null));
     }

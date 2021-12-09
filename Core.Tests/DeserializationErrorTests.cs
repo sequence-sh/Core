@@ -1,13 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using AutoTheory;
-using CSharpFunctionalExtensions;
-using FluentAssertions;
-using Reductech.EDR.Core.Internal;
-using Reductech.EDR.Core.Internal.Errors;
-using Reductech.EDR.Core.Internal.Parser;
-using Reductech.EDR.Core.Internal.Serialization;
-using Xunit.Abstractions;
+﻿using Reductech.EDR.Core.Internal.Parser;
 
 namespace Reductech.EDR.Core.Tests;
 

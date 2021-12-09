@@ -1,13 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
+﻿using System.Collections.ObjectModel;
 using MELT;
-using Microsoft.Extensions.Logging;
-using Reductech.EDR.Core.Internal;
-using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.Internal.Logging;
-using Xunit;
 
 namespace Reductech.EDR.Core.Tests;
 

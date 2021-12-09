@@ -1,13 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using Moq;
-using Reductech.EDR.ConnectorManagement.Base;
-using Reductech.EDR.Core.Abstractions;
-using Reductech.EDR.Core.Internal;
-using Reductech.EDR.Core.Internal.Serialization;
-using Reductech.EDR.Core.Steps;
+﻿using Reductech.EDR.ConnectorManagement.Base;
 using Reductech.EDR.Core.TestHarness;
-using Reductech.EDR.Core.Util;
 
 namespace Reductech.EDR.Core.Tests.Steps;
 

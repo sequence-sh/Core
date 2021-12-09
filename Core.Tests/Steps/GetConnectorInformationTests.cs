@@ -1,8 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Diagnostics;
-using System.Reflection;
-using Reductech.EDR.Core.Internal;
-using Reductech.EDR.Core.Steps;
+﻿using System.Diagnostics;
 using Reductech.EDR.Core.TestHarness;
 
 namespace Reductech.EDR.Core.Tests.Steps;

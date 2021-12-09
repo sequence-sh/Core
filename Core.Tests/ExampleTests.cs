@@ -1,20 +1,7 @@
-﻿using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using CSharpFunctionalExtensions;
+﻿using System.IO;
 using Divergic.Logging.Xunit;
-using Microsoft.Extensions.Logging;
-using Reductech.EDR.Core.Abstractions;
-using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Parser;
-using Reductech.EDR.Core.Internal.Serialization;
 using Reductech.EDR.Core.TestHarness;
-using Reductech.EDR.Core.Util;
-using Xunit;
-using Xunit.Abstractions;
-using Xunit.Sdk;
 
 namespace Reductech.EDR.Core.Tests;
 

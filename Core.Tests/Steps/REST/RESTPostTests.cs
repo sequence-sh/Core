@@ -1,9 +1,6 @@
-﻿using System.Collections.Generic;
-using System.Net;
+﻿using System.Net;
 using Reductech.EDR.Core.Steps.REST;
 using Reductech.EDR.Core.TestHarness;
-using static Reductech.EDR.Core.TestHarness.StaticHelpers;
-using RestSharp;
 
 namespace Reductech.EDR.Core.Tests.Steps.REST;
 

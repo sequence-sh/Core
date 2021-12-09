@@ -1,14 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.Immutable;
-using System.Threading;
-using System.Threading.Tasks;
-using CSharpFunctionalExtensions;
-using Microsoft.Extensions.Logging;
-using Moq;
-using Reductech.EDR.Core.Abstractions;
-using Reductech.EDR.Core.Internal;
-using Xunit;
+﻿using System.Collections.Immutable;
 
 namespace Reductech.EDR.Core.Tests;
 

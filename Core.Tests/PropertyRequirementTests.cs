@@ -1,18 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
-using AutoTheory;
-using CSharpFunctionalExtensions;
-using Moq;
-using Reductech.EDR.ConnectorManagement.Base;
-using Reductech.EDR.Core.Abstractions;
-using Reductech.EDR.Core.Attributes;
-using Reductech.EDR.Core.Internal;
-using Reductech.EDR.Core.Internal.Errors;
-using Reductech.EDR.Core.TestHarness;
-using Reductech.EDR.Core.Util;
-using Xunit.Abstractions;
+﻿using Reductech.EDR.ConnectorManagement.Base;
 
 namespace Reductech.EDR.Core.Tests;
 
@@ -121,7 +107,7 @@ public partial class PropertyRequirementTests
             ConnectorData[] connectorData;
 
             if (ConnectorSettings is null)
-                connectorData = Array.Empty<ConnectorData>();
+                connectorData = System.Array.Empty<ConnectorData>();
             else
             {
                 connectorData = new[] { new ConnectorData(ConnectorSettings, null) };

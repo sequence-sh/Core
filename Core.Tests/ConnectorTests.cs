@@ -1,18 +1,8 @@
-﻿using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
+﻿using System.IO;
 using Reductech.EDR.ConnectorManagement.Base;
 using Divergic.Logging.Xunit;
-using Moq;
 using Reductech.EDR.ConnectorManagement;
-using Reductech.EDR.Core.Abstractions;
-using Reductech.EDR.Core.Internal;
-using Reductech.EDR.Core.Internal.Serialization;
 using Reductech.EDR.Core.TestHarness;
-using Reductech.EDR.Core.Util;
-using Xunit;
 
 namespace Reductech.EDR.Core.Tests;
 
