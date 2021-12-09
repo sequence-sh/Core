@@ -1,8 +1,4 @@
-﻿using System.Linq;
-using System.Text.Json;
-using Json.Schema;
-
-namespace Reductech.EDR.Core.TestHarness;
+﻿namespace Reductech.EDR.Core.TestHarness;
 
 public static class SchemaHelpers
 {

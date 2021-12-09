@@ -1,20 +1,5 @@
-﻿using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
-using CSharpFunctionalExtensions;
-using FluentAssertions;
-using MELT;
-using Reductech.EDR.Core.Abstractions;
-using Reductech.EDR.Core.Attributes;
-using Reductech.EDR.Core.Internal;
-using Reductech.EDR.Core.Internal.Errors;
+﻿using System.Text;
 using Reductech.EDR.Core.Internal.Parser;
-using Reductech.EDR.Core.Internal.Serialization;
-using Reductech.EDR.Core.Util;
-using Xunit;
-using Xunit.Abstractions;
-using Xunit.Sdk;
 using static Reductech.EDR.Core.TestHarness.SpaceCompressor;
 
 namespace Reductech.EDR.Core.TestHarness;

@@ -1,8 +1,4 @@
-﻿using CSharpFunctionalExtensions;
-using FluentAssertions;
-using Reductech.EDR.Core.Internal.Errors;
-using Reductech.EDR.Core.Util;
-using static Reductech.EDR.Core.TestHarness.SpaceCompressor;
+﻿using static Reductech.EDR.Core.TestHarness.SpaceCompressor;
 
 namespace Reductech.EDR.Core.TestHarness;
 

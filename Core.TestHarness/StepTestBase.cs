@@ -1,17 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Reflection;
-using AutoTheory;
-using FluentAssertions;
-using Namotion.Reflection;
-using Reductech.EDR.Core.Attributes;
-using Reductech.EDR.Core.Internal;
-using Xunit;
-using Xunit.Sdk;
-
-namespace Reductech.EDR.Core.TestHarness;
+﻿namespace Reductech.EDR.Core.TestHarness;
 
 public interface IStepTestBase
 {

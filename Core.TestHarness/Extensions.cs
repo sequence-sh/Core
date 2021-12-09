@@ -1,18 +1,5 @@
-﻿using System;
-using System.Linq;
-using System.Net;
-using System.Threading.Tasks;
-using CSharpFunctionalExtensions;
-using FluentAssertions;
-using Microsoft.Extensions.Logging;
-using Moq;
-using Reductech.EDR.Core.Abstractions;
+﻿using System.Net;
 using Reductech.EDR.Core.ExternalProcesses;
-using Reductech.EDR.Core.Internal;
-using Reductech.EDR.Core.Internal.Errors;
-using RestSharp;
-using Xunit;
-using Xunit.Sdk;
 
 namespace Reductech.EDR.Core.TestHarness;
 

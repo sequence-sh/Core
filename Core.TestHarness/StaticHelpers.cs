@@ -1,10 +1,4 @@
-﻿using System;
-using System.Linq;
-using Reductech.EDR.Core.Internal;
-using Reductech.EDR.Core.Steps;
-using Reductech.EDR.Core.Util;
-
-namespace Reductech.EDR.Core.TestHarness;
+﻿namespace Reductech.EDR.Core.TestHarness;
 
 public static class StaticHelpers
 {
