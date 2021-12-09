@@ -72,23 +72,23 @@ public partial class DocumentationCreateTests : StepTestBase<DocumentationCreate
                 sb.AppendLine($"# {category} Steps");
                 sb.AppendLine();
 
-                foreach (var headerOption in headerOptions)
+                foreach (var (header, getValue) in headerOptions)
                 {
                     var maxLength = Math.Max(
-                        headerOption.header.Length,
-                        steps.Select(headerOption.getValue).Max(x => x.Length)
+                        header.Length,
+                        steps.Select(getValue).Max(x => x.Length)
                     );
 
-                    sb.Append($"|{headerOption.header.PadRight(maxLength)}");
+                    sb.Append($"|{header.PadRight(maxLength)}");
                 }
 
                 sb.AppendLine("|");
 
-                foreach (var headerOption in headerOptions)
+                foreach (var (header, getValue) in headerOptions)
                 {
                     var maxLength = Math.Max(
-                        headerOption.header.Length,
-                        steps.Select(headerOption.getValue).Max(x => x.Length)
+                        header.Length,
+                        steps.Select(getValue).Max(x => x.Length)
                     );
 
                     sb.Append("|:");
@@ -99,16 +99,16 @@ public partial class DocumentationCreateTests : StepTestBase<DocumentationCreate
 
                 foreach (var step in steps)
                 {
-                    foreach (var headerOption in headerOptions)
+                    foreach (var (header, getValue) in headerOptions)
                     {
-                        sb.Append("|");
+                        sb.Append('|');
 
                         var maxLength = Math.Max(
-                            headerOption.header.Length,
-                            steps.Select(headerOption.getValue).Max(x => x.Length)
+                            header.Length,
+                            steps.Select(getValue).Max(x => x.Length)
                         );
 
-                        var term = headerOption.getValue(step).PadRight(maxLength);
+                        var term = getValue(step).PadRight(maxLength);
 
                         sb.Append(term);
                     }
@@ -344,6 +344,7 @@ public partial class DocumentationCreateTests : StepTestBase<DocumentationCreate
             IStateMonad stateMonad,
             CancellationToken cancellationToken)
         {
+            await Task.CompletedTask;
             throw new Exception("Cannot run Documentation Example Step");
         }
 
