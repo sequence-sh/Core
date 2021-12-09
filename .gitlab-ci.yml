@@ -53,5 +53,4 @@ mutation testing:
   rules:
     - when: never
     
-default:
-  image: mcr.microsoft.com/dotnet/sdk:6.0
+
