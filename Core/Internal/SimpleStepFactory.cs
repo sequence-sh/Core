@@ -1,8 +1,4 @@
-﻿using System;
-using CSharpFunctionalExtensions;
-using Reductech.EDR.Core.Internal.Errors;
-
-namespace Reductech.EDR.Core.Internal;
+﻿namespace Reductech.EDR.Core.Internal;
 
 /// <summary>
 /// A step factory that uses default values for most properties.

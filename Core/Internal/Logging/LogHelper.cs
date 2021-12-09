@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using Microsoft.Extensions.Logging;
-using Reductech.EDR.Core.Internal.Errors;
+﻿using Microsoft.Extensions.Logging;
 
 namespace Reductech.EDR.Core.Internal.Logging;
 

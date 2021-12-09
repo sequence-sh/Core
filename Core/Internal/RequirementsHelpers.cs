@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Reflection;
-
-namespace Reductech.EDR.Core.Internal;
+﻿namespace Reductech.EDR.Core.Internal;
 
 /// <summary>
 /// Contains methods to help with step requirements

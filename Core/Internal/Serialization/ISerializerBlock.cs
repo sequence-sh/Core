@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using CSharpFunctionalExtensions;
-
-namespace Reductech.EDR.Core.Internal.Serialization;
+﻿namespace Reductech.EDR.Core.Internal.Serialization;
 
 /// <summary>
 /// Contributes to the serialized string

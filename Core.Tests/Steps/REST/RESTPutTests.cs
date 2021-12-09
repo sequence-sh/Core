@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Net;
-using FluentAssertions;
 using Reductech.EDR.Core.Steps.REST;
 using Reductech.EDR.Core.TestHarness;
 using static Reductech.EDR.Core.TestHarness.StaticHelpers;

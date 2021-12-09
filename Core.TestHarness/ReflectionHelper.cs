@@ -6,7 +6,6 @@ using System.Reflection;
 using Namotion.Reflection;
 using OneOf;
 using Reductech.EDR.Core.Attributes;
-using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.Util;

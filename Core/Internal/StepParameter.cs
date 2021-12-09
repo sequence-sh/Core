@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Reflection;
-using Namotion.Reflection;
-using Reductech.EDR.Core.Attributes;
+﻿using Namotion.Reflection;
 
 namespace Reductech.EDR.Core.Internal;
 

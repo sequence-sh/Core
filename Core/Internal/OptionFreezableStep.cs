@@ -1,8 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using CSharpFunctionalExtensions;
-using Reductech.EDR.Core.Internal.Errors;
+﻿using System.Diagnostics;
 
 namespace Reductech.EDR.Core.Internal;
 

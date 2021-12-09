@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Reductech.EDR.Core.Entities.Schema;
+﻿namespace Reductech.EDR.Core.Entities.Schema;
 
 /// <summary>
 /// Contains methods to help with combining values

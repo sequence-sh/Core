@@ -1,8 +1,4 @@
-﻿using System;
-using System.Linq;
-using CSharpFunctionalExtensions;
-using Reductech.EDR.Core.ExternalProcesses;
-using Reductech.EDR.Core.Internal.Errors;
+﻿using Reductech.EDR.Core.ExternalProcesses;
 
 namespace Reductech.EDR.Core.Abstractions;
 

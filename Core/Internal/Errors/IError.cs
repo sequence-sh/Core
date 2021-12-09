@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace Reductech.EDR.Core.Internal.Errors;
+﻿namespace Reductech.EDR.Core.Internal.Errors;
 
 /// <summary>
 /// One or more errors caused

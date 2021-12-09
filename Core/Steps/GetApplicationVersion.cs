@@ -1,10 +1,4 @@
 ﻿using System.Diagnostics;
-using System.Reflection;
-using System.Threading;
-using System.Threading.Tasks;
-using CSharpFunctionalExtensions;
-using Reductech.EDR.Core.Internal;
-using Reductech.EDR.Core.Internal.Errors;
 
 namespace Reductech.EDR.Core.Steps;
 

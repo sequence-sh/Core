@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Generator.Equals;
+﻿using Generator.Equals;
 
 namespace Reductech.EDR.Core.Internal.Analytics;
 

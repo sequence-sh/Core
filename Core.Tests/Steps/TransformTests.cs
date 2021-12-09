@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
-using Json.More;
 using Json.Schema;
 using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.Enums;

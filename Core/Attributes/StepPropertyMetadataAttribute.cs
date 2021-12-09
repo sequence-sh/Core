@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Reductech.EDR.Core.Attributes;
+﻿namespace Reductech.EDR.Core.Attributes;
 
 /// <summary>
 /// Indicates Step Property Metadata as it will appear in the documentation

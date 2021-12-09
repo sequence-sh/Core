@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using CSharpFunctionalExtensions;
-using Reductech.EDR.Core.Attributes;
-using Reductech.EDR.Core.Internal.Errors;
-using Reductech.EDR.Core.Internal.Serialization;
-
-namespace Reductech.EDR.Core.Internal;
+﻿namespace Reductech.EDR.Core.Internal;
 
 /// <summary>
 /// A factory for creating steps.

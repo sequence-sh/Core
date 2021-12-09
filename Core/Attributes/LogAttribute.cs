@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Reductech.EDR.Core.Attributes;
+﻿namespace Reductech.EDR.Core.Attributes;
 
 /// <summary>
 /// Controls when a property value will output by the logger.

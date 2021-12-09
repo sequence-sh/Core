@@ -1,7 +1,4 @@
-﻿using System;
-using System.Diagnostics.Contracts;
-
-namespace Reductech.EDR.Core.Internal.Errors;
+﻿namespace Reductech.EDR.Core.Internal.Errors;
 
 /// <summary>
 /// Identifying code for an error message.

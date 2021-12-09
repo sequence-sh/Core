@@ -1,10 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Collections.Immutable;
-using System.Linq;
-using CSharpFunctionalExtensions;
-using Reductech.EDR.Core.Internal.Errors;
-
-namespace Reductech.EDR.Core.Internal;
+﻿namespace Reductech.EDR.Core.Internal;
 
 /// <summary>
 /// Information about how this step was passed

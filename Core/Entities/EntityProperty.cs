@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Reductech.EDR.Core.Entities;
+﻿namespace Reductech.EDR.Core.Entities;
 
 /// <summary>
 /// A property of an entity

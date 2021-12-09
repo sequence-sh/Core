@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Reductech.EDR.Core.Internal.Errors;
+﻿namespace Reductech.EDR.Core.Internal.Errors;
 
 /// <summary>
 /// An exception that wraps an error

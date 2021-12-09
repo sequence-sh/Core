@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace Reductech.EDR.Core.Enums;
+﻿namespace Reductech.EDR.Core.Enums;
 
 /// <summary>
 /// Determines what relationship between two operands causes the compare operator to return true.

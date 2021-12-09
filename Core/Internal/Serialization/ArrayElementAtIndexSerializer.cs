@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using Reductech.EDR.Core.Util;
-
-namespace Reductech.EDR.Core.Internal.Serialization;
+﻿namespace Reductech.EDR.Core.Internal.Serialization;
 
 /// <summary>
 /// Serializer for ArrayElementAtIndex

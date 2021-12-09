@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Immutable;
-
-namespace Reductech.EDR.Core.Attributes;
+﻿namespace Reductech.EDR.Core.Attributes;
 
 /// <summary>
 /// Additional requirements of this property

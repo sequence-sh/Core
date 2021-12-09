@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using CSharpFunctionalExtensions;
-using Reductech.EDR.Core.Util;
-
-namespace Reductech.EDR.Core.Internal.Serialization;
+﻿namespace Reductech.EDR.Core.Internal.Serialization;
 
 /// <summary>
 /// Deserializes a regex group into an enum using the display value of the enum.

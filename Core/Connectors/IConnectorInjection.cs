@@ -1,8 +1,4 @@
-﻿using System.Collections.Generic;
-using CSharpFunctionalExtensions;
-using Reductech.EDR.Core.Internal.Errors;
-
-namespace Reductech.EDR.Core.Connectors;
+﻿namespace Reductech.EDR.Core.Connectors;
 
 /// <summary>
 /// Injects necessary contexts for this connector

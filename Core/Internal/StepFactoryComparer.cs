@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace Reductech.EDR.Core.Internal;
+﻿namespace Reductech.EDR.Core.Internal;
 
 /// <summary>
 /// Default Comparer for step factories

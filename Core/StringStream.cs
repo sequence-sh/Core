@@ -1,11 +1,6 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using Reductech.EDR.Core.Enums;
-using Reductech.EDR.Core.Internal.Serialization;
-using Reductech.EDR.Core.Util;
 
 namespace Reductech.EDR.Core;
 

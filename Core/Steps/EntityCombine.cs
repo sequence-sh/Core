@@ -1,9 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using CSharpFunctionalExtensions;
-using Reductech.EDR.Core.Internal.Errors;
-
-namespace Reductech.EDR.Core.Steps;
+﻿namespace Reductech.EDR.Core.Steps;
 
 /// <summary>
 /// Combine two entities.

@@ -1,5 +1,3 @@
-using System;
-
 namespace Reductech.EDR.Core.Attributes;
 
 /// <summary>

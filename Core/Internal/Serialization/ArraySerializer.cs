@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-
-namespace Reductech.EDR.Core.Internal.Serialization;
+﻿namespace Reductech.EDR.Core.Internal.Serialization;
 
 /// <summary>
 /// Serializes an array

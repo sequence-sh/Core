@@ -1,8 +1,4 @@
-﻿using System.Collections.Generic;
-using CSharpFunctionalExtensions;
-using Reductech.EDR.ConnectorManagement.Base;
-using Reductech.EDR.Core.Abstractions;
-using Reductech.EDR.Core.Internal.Errors;
+﻿using Reductech.EDR.Core.Abstractions;
 
 namespace Reductech.EDR.Core.Internal;
 

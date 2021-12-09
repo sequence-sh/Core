@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Reflection;
-using System.Text.Json;
-using System.Text.Json.Serialization;
-using CSharpFunctionalExtensions;
-using Reductech.EDR.Core.Entities;
-using Reductech.EDR.Core.Internal.Errors;
+﻿using System.Text.Json.Serialization;
 
 namespace Reductech.EDR.Core;
 

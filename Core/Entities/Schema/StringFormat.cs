@@ -1,7 +1,4 @@
-﻿using CSharpFunctionalExtensions;
-using Reductech.EDR.Core.Internal.Errors;
-
-namespace Reductech.EDR.Core.Entities.Schema;
+﻿namespace Reductech.EDR.Core.Entities.Schema;
 
 /// <summary>
 /// A string format

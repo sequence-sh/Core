@@ -1,8 +1,4 @@
-﻿using System.Collections.Generic;
-using Json.More;
-using Json.Schema;
-
-namespace Reductech.EDR.Core.Entities;
+﻿namespace Reductech.EDR.Core.Entities;
 
 /// <summary>
 /// Extension methods to help with schemas

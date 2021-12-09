@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Reductech.EDR.Core.Attributes;
+﻿namespace Reductech.EDR.Core.Attributes;
 
 /// <summary>
 /// Optional attribute allowing you to assign an alias to a step.

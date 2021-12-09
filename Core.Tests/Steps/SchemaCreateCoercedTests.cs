@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Json.Schema;
 using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.Internal;

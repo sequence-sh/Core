@@ -1,8 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using Reductech.EDR.Core.Attributes;
-
-namespace Reductech.EDR.Core.Internal.Documentation;
+﻿namespace Reductech.EDR.Core.Internal.Documentation;
 
 /// <summary>
 /// A wrapper for this documented object.

@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using Reductech.EDR.Core.Attributes;
-
-namespace Reductech.EDR.Core.Internal.Documentation;
+﻿namespace Reductech.EDR.Core.Internal.Documentation;
 
 /// <summary>
 /// Something that will be shown in the documentation

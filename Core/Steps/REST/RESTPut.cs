@@ -1,14 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.Threading;
-using System.Threading.Tasks;
-using CSharpFunctionalExtensions;
-using Reductech.EDR.Core.Attributes;
-using Reductech.EDR.Core.Internal;
-using Reductech.EDR.Core.Internal.Errors;
-using Reductech.EDR.Core.Util;
-using RestSharp;
-
-namespace Reductech.EDR.Core.Steps.REST;
+﻿namespace Reductech.EDR.Core.Steps.REST;
 
 /// <summary>
 /// Executes a REST Put request

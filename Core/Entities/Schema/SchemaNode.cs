@@ -1,14 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.Immutable;
-using System.Diagnostics.Contracts;
-using System.Linq;
-using System.Text.Json;
-using CSharpFunctionalExtensions;
-using Json.Schema;
-using Reductech.EDR.Core.Internal.Errors;
-
-namespace Reductech.EDR.Core.Entities.Schema;
+﻿namespace Reductech.EDR.Core.Entities.Schema;
 
 /// <summary>
 /// A schema node with one additional item of data

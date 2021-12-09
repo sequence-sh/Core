@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using Generator.Equals;
-using Json.Schema;
+﻿using Generator.Equals;
 
 namespace Reductech.EDR.Core.Entities.Schema;
 

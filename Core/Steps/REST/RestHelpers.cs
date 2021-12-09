@@ -1,11 +1,4 @@
-﻿using System;
-using System.Threading;
-using System.Threading.Tasks;
-using CSharpFunctionalExtensions;
-using Reductech.EDR.Core.Internal.Errors;
-using RestSharp;
-
-namespace Reductech.EDR.Core.Steps.REST;
+﻿namespace Reductech.EDR.Core.Steps.REST;
 
 /// <summary>
 /// Contains methods to help with Flurl Requests

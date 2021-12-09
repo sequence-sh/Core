@@ -1,8 +1,6 @@
-﻿using System;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Diagnostics;
 using System.Threading.Channels;
-using Reductech.EDR.Core.Internal;
 
 namespace Reductech.EDR.Core.ExternalProcesses;
 

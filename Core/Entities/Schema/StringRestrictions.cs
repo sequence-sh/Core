@@ -1,11 +1,4 @@
-﻿using System;
-using System.Diagnostics.Contracts;
-using System.Linq;
-using System.Text.RegularExpressions;
-using CSharpFunctionalExtensions;
-using Json.Schema;
-using Reductech.EDR.Core.Internal.Errors;
-using Reductech.EDR.Core.Util;
+﻿using System.Text.RegularExpressions;
 
 namespace Reductech.EDR.Core.Entities.Schema;
 

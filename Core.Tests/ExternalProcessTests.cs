@@ -13,7 +13,6 @@ using Reductech.EDR.Core.ExternalProcesses;
 using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.TestHarness;
-using RestSharp;
 using Xunit;
 
 namespace Reductech.EDR.Core.Tests;

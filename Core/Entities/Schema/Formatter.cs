@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using CSharpFunctionalExtensions;
-using OneOf;
-
-namespace Reductech.EDR.Core.Entities.Schema;
+﻿namespace Reductech.EDR.Core.Entities.Schema;
 
 /// <summary>
 /// Used for formatting entity values

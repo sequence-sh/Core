@@ -1,8 +1,4 @@
-﻿using System.Collections.Generic;
-using CSharpFunctionalExtensions;
-using Reductech.EDR.Core.Internal.Errors;
-
-namespace Reductech.EDR.Core.Steps;
+﻿namespace Reductech.EDR.Core.Steps;
 
 /// <summary>
 /// Divide a double by a list of doubles

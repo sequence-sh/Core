@@ -1,7 +1,4 @@
-﻿using System;
-using System.Linq;
-using CSharpFunctionalExtensions;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 
 namespace Reductech.EDR.Core.Internal.Analytics;
 

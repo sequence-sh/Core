@@ -1,6 +1,4 @@
-﻿using System.Threading.Tasks;
-
-namespace Reductech.EDR.Core.Internal;
+﻿namespace Reductech.EDR.Core.Internal;
 
 /// <summary>
 /// Anything that implements ReadLineAsync

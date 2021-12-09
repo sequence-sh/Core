@@ -1,11 +1,4 @@
-﻿using System.Diagnostics.Contracts;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using CSharpFunctionalExtensions;
-using Reductech.EDR.Core.Internal.Errors;
-
-namespace Reductech.EDR.Core;
+﻿namespace Reductech.EDR.Core;
 
 /// <summary>
 /// Contains methods for helping with entities.
