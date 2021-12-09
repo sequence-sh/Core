@@ -223,7 +223,7 @@ public static class DocumentationCreator
 
                     {
                         var nameString = string.Join(
-                            "<br>",
+                            "<br/>",
                             rp.Aliases.Select(x => $"_{x}_").Prepend(rp.Name)
                         );
 

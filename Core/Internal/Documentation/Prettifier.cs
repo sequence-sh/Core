@@ -23,7 +23,7 @@ internal static class Prettifier
                 .Replace(@"\",   @"\\")
                 .Replace(@"*",   @"\*")
                 .Replace("|",    @"\|")
-                .Replace("\r\n", "<br>")
+                .Replace("\r\n", "<br/>")
                 .Replace("\n",   " ");
         }
     }
