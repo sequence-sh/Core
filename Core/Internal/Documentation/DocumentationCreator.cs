@@ -144,7 +144,8 @@ public static class DocumentationCreator
     {
         return (s ?? string.Empty)
             .Replace("|",    @"\|")
-            .Replace("<",    @"\<")
+            .Replace("<",    @"&lt;")
+            .Replace(">",    @"&gt;")
             .Replace("\r\n", " ")
             .Replace("\n",   " ");
     }
