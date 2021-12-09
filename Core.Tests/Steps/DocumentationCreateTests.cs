@@ -37,6 +37,7 @@ public partial class DocumentationCreateTests : StepTestBase<DocumentationCreate
             var logDocumentation = new Log<Entity> { Value = new DocumentationCreate() };
 
             static MainContents Contents(
+                string category,
                 bool listCategories,
                 params (string name, string category, string comment)[] steps)
             {
@@ -68,7 +69,7 @@ public partial class DocumentationCreateTests : StepTestBase<DocumentationCreate
                 }
 
                 var sb = new StringBuilder();
-                sb.AppendLine("# EDR Steps");
+                sb.AppendLine($"# {category} Steps");
                 sb.AppendLine();
 
                 foreach (var headerOption in headerOptions)
@@ -147,7 +148,7 @@ public partial class DocumentationCreateTests : StepTestBase<DocumentationCreate
                 }
             );
 
-            var notContents = Contents(true, notHeader);
+            var notContents = Contents("EDR", true, notHeader);
 
             var notDocumentationEntity = new DocumentationCreationResult(
                 notContents,
@@ -157,7 +158,7 @@ public partial class DocumentationCreateTests : StepTestBase<DocumentationCreate
                         new CategoryContents(
                             "Core.md",
                             "Core",
-                            Contents(false, notHeader).FileText,
+                            Contents("Core", false, notHeader).FileText,
                             "",
                             "Core"
                         ),
@@ -227,7 +228,7 @@ public partial class DocumentationCreateTests : StepTestBase<DocumentationCreate
                 }
             );
 
-            var exampleContents = Contents(true, exampleStepHeader);
+            var exampleContents = Contents("EDR", true, exampleStepHeader);
 
             var exampleCreationResult = new DocumentationCreationResult(
                 exampleContents,
@@ -237,7 +238,7 @@ public partial class DocumentationCreateTests : StepTestBase<DocumentationCreate
                         new CategoryContents(
                             "Examples.md",
                             "Examples",
-                            Contents(false, exampleStepHeader).FileText,
+                            Contents("Examples", false, exampleStepHeader).FileText,
                             "",
                             "Examples"
                         ),
