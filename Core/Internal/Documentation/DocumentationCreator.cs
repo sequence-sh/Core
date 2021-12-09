@@ -66,9 +66,9 @@ public static class DocumentationCreator
             {
                 var contentsStringBuilder = new StringBuilder();
 
-                contentsStringBuilder.AppendLine("# EDR Steps");
+                contentsStringBuilder.AppendLine($"# {category.Key} Steps");
 
-                var contentsRows = categories.SelectMany(x => x)
+                var contentsRows = category
                     .Select(
                         x => new[]
                         {
@@ -144,7 +144,8 @@ public static class DocumentationCreator
     {
         return (s ?? string.Empty)
             .Replace("|",    @"\|")
-            .Replace("<",    @"\<")
+            .Replace("<",    @"&lt;")
+            .Replace(">",    @"&gt;")
             .Replace("\r\n", " ")
             .Replace("\n",   " ");
     }
@@ -223,7 +224,7 @@ public static class DocumentationCreator
 
                     {
                         var nameString = string.Join(
-                            "<br>",
+                            "<br/>",
                             rp.Aliases.Select(x => $"_{x}_").Prepend(rp.Name)
                         );
 

@@ -37,6 +37,7 @@ public partial class DocumentationCreateTests : StepTestBase<DocumentationCreate
             var logDocumentation = new Log<Entity> { Value = new DocumentationCreate() };
 
             static MainContents Contents(
+                string category,
                 bool listCategories,
                 params (string name, string category, string comment)[] steps)
             {
@@ -68,7 +69,7 @@ public partial class DocumentationCreateTests : StepTestBase<DocumentationCreate
                 }
 
                 var sb = new StringBuilder();
-                sb.AppendLine("# EDR Steps");
+                sb.AppendLine($"# {category} Steps");
                 sb.AppendLine();
 
                 foreach (var headerOption in headerOptions)
@@ -147,7 +148,7 @@ public partial class DocumentationCreateTests : StepTestBase<DocumentationCreate
                 }
             );
 
-            var notContents = Contents(true, notHeader);
+            var notContents = Contents("EDR", true, notHeader);
 
             var notDocumentationEntity = new DocumentationCreationResult(
                 notContents,
@@ -157,7 +158,7 @@ public partial class DocumentationCreateTests : StepTestBase<DocumentationCreate
                         new CategoryContents(
                             "Core.md",
                             "Core",
-                            Contents(false, notHeader).FileText,
+                            Contents("Core", false, notHeader).FileText,
                             "",
                             "Core"
                         ),
@@ -187,7 +188,7 @@ public partial class DocumentationCreateTests : StepTestBase<DocumentationCreate
             var documentationStepPage = new StepPage(
                 "DocumentationExampleStep.md",
                 "DocumentationExampleStep",
-                "## DocumentationExampleStep _Alias_:`DocumentationExampleStep`\n\n_Output_:`StringStream`\n\n*Requires ValueIf Library.Version 1.2*\n\n\n|Parameter |Type |Required|Position|Allowed Range |Default Value|Example|Recommended Range|Recommended Value|Requirements|See Also|URL |Value Delimiter|Summary|\n|:--------------|:------------:|:------:|:------:|:------------:|:-----------:|:-----:|:---------------:|:---------------:|:----------:|:------:|:----------------:|:-------------:|:------|\n|Alpha<br>_Alef_|`int` |✔ |1 |Greater than 1| |1234 |100-300 |201 |Greek 2.1 |Beta |[Alpha](alpha.com)| | |\n|Beta |`string` | |2 | |Two hundred | | | | |Alpha | | | |\n|Gamma |`VariableName`| |3 | | | | | | | | | | |\n|Delta |List<`bool`> | |4 | | | | | | | | |, | |",
+                "## DocumentationExampleStep _Alias_:`DocumentationExampleStep`\n\n_Output_:`StringStream`\n\n*Requires ValueIf Library.Version 1.2*\n\n\n|Parameter |Type |Required|Position|Allowed Range |Default Value|Example|Recommended Range|Recommended Value|Requirements|See Also|URL |Value Delimiter|Summary|\n|:---------------|:------------:|:------:|:------:|:------------:|:-----------:|:-----:|:---------------:|:---------------:|:----------:|:------:|:----------------:|:-------------:|:------|\n|Alpha<br/>_Alef_|`int` |✔ |1 |Greater than 1| |1234 |100-300 |201 |Greek 2.1 |Beta |[Alpha](alpha.com)| | |\n|Beta |`string` | |2 | |Two hundred | | | | |Alpha | | | |\n|Gamma |`VariableName`| |3 | | | | | | | | | | |\n|Delta |List<`bool`> | |4 | | | | | | | | |, | |",
                 "Examples",
                 "Examples",
                 "DocumentationExampleStep",
@@ -227,7 +228,7 @@ public partial class DocumentationCreateTests : StepTestBase<DocumentationCreate
                 }
             );
 
-            var exampleContents = Contents(true, exampleStepHeader);
+            var exampleContents = Contents("EDR", true, exampleStepHeader);
 
             var exampleCreationResult = new DocumentationCreationResult(
                 exampleContents,
@@ -237,7 +238,7 @@ public partial class DocumentationCreateTests : StepTestBase<DocumentationCreate
                         new CategoryContents(
                             "Examples.md",
                             "Examples",
-                            Contents(false, exampleStepHeader).FileText,
+                            Contents("Examples", false, exampleStepHeader).FileText,
                             "",
                             "Examples"
                         ),
