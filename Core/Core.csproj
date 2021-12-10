@@ -45,15 +45,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Remove="packages\**" />
-    <Compile Remove="StrykerOutput\**" />
-    <EmbeddedResource Remove="packages\**" />
-    <EmbeddedResource Remove="StrykerOutput\**" />
-    <None Remove="packages\**" />
-    <None Remove="StrykerOutput\**" />
-  </ItemGroup>
-
-  <ItemGroup>
     <None Remove="Internal\Parser\SCL.g4" />
   </ItemGroup>
 
