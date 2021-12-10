@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
+﻿using System.Globalization;
 using System.Text;
 using Microsoft.Extensions.Logging;
 
-namespace Reductech.EDR.Core.Internal.Logging
-{
+namespace Reductech.EDR.Core.Internal.Logging;
 
 /// <summary>
 /// Identifying code for the log situation.
@@ -224,6 +219,4 @@ public abstract record LogSituationBase(string Code, LogLevel LogLevel)
             };
         }
     }
-}
-
 }

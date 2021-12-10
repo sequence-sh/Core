@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace Reductech.EDR.Core.Internal
-{
+﻿namespace Reductech.EDR.Core.Internal;
 
 /// <summary>
 /// Comparer for Step Parameters
@@ -39,6 +35,4 @@ public class StepParameterComparer : IEqualityComparer<IStepParameter>
     {
         return HashCode.Combine(obj.Name, obj.StepType);
     }
-}
-
 }

@@ -1,11 +1,8 @@
-﻿using System;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Diagnostics;
 using System.Threading.Channels;
-using Reductech.EDR.Core.Internal;
 
-namespace Reductech.EDR.Core.ExternalProcesses
-{
+namespace Reductech.EDR.Core.ExternalProcesses;
 
 /// <summary>
 /// A reference to a running external process.
@@ -61,6 +58,4 @@ public sealed class ExternalProcessReference : IExternalProcessReference
         else
             Process.WaitForExit();
     }
-}
-
 }

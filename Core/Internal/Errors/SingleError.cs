@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-
-namespace Reductech.EDR.Core.Internal.Errors
-{
+﻿namespace Reductech.EDR.Core.Internal.Errors;
 
 /// <summary>
 /// An single error.
@@ -62,6 +57,4 @@ public record SingleError(ErrorLocation Location, ErrorBuilder ErrorBuilder) : I
             _                       => false
         };
     }
-}
-
 }

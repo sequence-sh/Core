@@ -1,5 +1,4 @@
-﻿namespace Reductech.EDR.Core.ExternalProcesses
-{
+﻿namespace Reductech.EDR.Core.ExternalProcesses;
 
 /// <summary>
 /// Does not ignore any errors.
@@ -15,6 +14,4 @@ public class IgnoreNoneErrorHandler : IErrorHandler
 
     /// <inheritdoc />
     public bool ShouldIgnoreError(string s) => false;
-}
-
 }

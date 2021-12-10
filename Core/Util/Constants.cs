@@ -1,5 +1,4 @@
-﻿namespace Reductech.EDR.Core.Util
-{
+﻿namespace Reductech.EDR.Core.Util;
 
 /// <summary>
 /// Special constants. e.g. string formats
@@ -15,6 +14,4 @@ public static class Constants
     /// The format to use for DateTimes
     /// </summary>
     public const string DateTimeFormat = "O";
-}
-
 }

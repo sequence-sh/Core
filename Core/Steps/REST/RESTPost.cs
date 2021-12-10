@@ -1,14 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.Threading;
-using System.Threading.Tasks;
-using CSharpFunctionalExtensions;
-using Reductech.EDR.Core.Attributes;
-using Reductech.EDR.Core.Internal;
-using Reductech.EDR.Core.Internal.Errors;
-using RestSharp;
-
-namespace Reductech.EDR.Core.Steps.REST
-{
+﻿namespace Reductech.EDR.Core.Steps.REST;
 
 /// <summary>
 /// Create a REST resource and return the id of the created resource
@@ -43,6 +33,4 @@ public sealed class RESTPost : RESTStep<StringStream>
     {
         return new StringStream(s);
     }
-}
-
 }

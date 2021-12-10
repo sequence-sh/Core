@@ -1,8 +1,4 @@
-﻿using System;
-using RestSharp;
-
-namespace Reductech.EDR.Core
-{
+﻿namespace Reductech.EDR.Core;
 
 /// <summary>
 /// Rest Client Factory that always returns a particular rest client
@@ -31,6 +27,4 @@ public class SingleRestClientFactory : IRestClientFactory
 
         return RestClient;
     }
-}
-
 }

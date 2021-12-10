@@ -1,9 +1,4 @@
-﻿using System;
-using Reductech.EDR.Core.Internal.Errors;
-using Xunit;
-
-namespace Reductech.EDR.Core.Tests
-{
+﻿namespace Reductech.EDR.Core.Tests;
 
 public class SingleErrorTests
 {
@@ -30,6 +25,4 @@ public class SingleErrorTests
         var error    = new SingleError(location, ErrorCode.StepDoesNotExist, "test");
         Assert.Equal($"{error.Message} in {location.AsString()}", error.ToString());
     }
-}
-
 }

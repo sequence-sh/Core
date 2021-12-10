@@ -1,20 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using Namotion.Reflection;
-using OneOf;
-using Reductech.EDR.Core.Attributes;
-using Reductech.EDR.Core.Entities;
-using Reductech.EDR.Core.Internal;
-using Reductech.EDR.Core.Steps;
-using Reductech.EDR.Core.Util;
-using Xunit.Sdk;
-using static Reductech.EDR.Core.TestHarness.StaticHelpers;
+﻿using System.IO;
 
-namespace Reductech.EDR.Core.TestHarness
-{
+namespace Reductech.EDR.Core.TestHarness;
 
 public abstract partial class StepTestBase<TStep, TOutput>
 {
@@ -28,16 +14,16 @@ public abstract partial class StepTestBase<TStep, TOutput>
         var values = new Dictionary<string, string>();
 
         foreach (var propertyInfo in typeof(TStep).GetProperties()
-            .Select(
-                propertyInfo => (propertyInfo,
-                                 attribute: propertyInfo
-                                     .GetCustomAttribute<StepPropertyBaseAttribute>())
-            )
-            .Where(x => x.attribute != null)
-            .OrderByDescending(x => x.attribute!.Order != null)
-            .ThenBy(x => x.attribute!.Order)
-            .Select(x => x.propertyInfo)
-        )
+                     .Select(
+                         propertyInfo => (propertyInfo,
+                                          attribute: propertyInfo
+                                              .GetCustomAttribute<StepPropertyBaseAttribute>())
+                     )
+                     .Where(x => x.attribute != null)
+                     .OrderByDescending(x => x.attribute!.Order != null)
+                     .ThenBy(x => x.attribute!.Order)
+                     .Select(x => x.propertyInfo)
+                )
             MatchStepPropertyInfo(propertyInfo, SetVariableName, SetStep, SetLambda, SetStepList);
 
         return (instance, values);
@@ -464,6 +450,4 @@ public abstract partial class StepTestBase<TStep, TOutput>
 
         return (IEnumerable<IStep>)list;
     }
-}
-
 }

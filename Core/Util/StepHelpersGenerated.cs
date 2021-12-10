@@ -1,12 +1,6 @@
 ﻿using System.CodeDom.Compiler;
-using System.Threading;
-using System.Threading.Tasks;
-using CSharpFunctionalExtensions;
-using Reductech.EDR.Core.Internal;
-using Reductech.EDR.Core.Internal.Errors;
 
-namespace Reductech.EDR.Core.Util
-{
+namespace Reductech.EDR.Core.Util;
 
 public static partial class StepHelpers
 {
@@ -611,6 +605,4 @@ public static partial class StepHelpers
 
         return result;
     }
-}
-
 }

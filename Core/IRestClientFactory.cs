@@ -1,7 +1,4 @@
-﻿using RestSharp;
-
-namespace Reductech.EDR.Core
-{
+﻿namespace Reductech.EDR.Core;
 
 /// <summary>
 /// For Creating Rest Clients
@@ -12,6 +9,4 @@ public interface IRestClientFactory
     /// Create a new RestClient
     /// </summary>
     IRestClient CreateRestClient(string baseUri);
-}
-
 }

@@ -1,9 +1,4 @@
-﻿using CSharpFunctionalExtensions;
-using Json.Schema;
-using Reductech.EDR.Core.Internal.Errors;
-
-namespace Reductech.EDR.Core.Entities.Schema
-{
+﻿namespace Reductech.EDR.Core.Entities.Schema;
 
 /// <summary>
 /// Matches Strings
@@ -65,6 +60,4 @@ public record StringNode(
 
     /// <inheritdoc />
     public override SchemaValueType SchemaValueType => SchemaValueType.String;
-}
-
 }

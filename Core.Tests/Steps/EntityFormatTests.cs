@@ -1,20 +1,8 @@
-﻿using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
-using CSharpFunctionalExtensions;
-using FluentAssertions;
-using Microsoft.Extensions.Logging.Abstractions;
-using Reductech.EDR.Core.Internal;
+﻿using Microsoft.Extensions.Logging.Abstractions;
 using Reductech.EDR.Core.Internal.Parser;
-using Reductech.EDR.Core.Internal.Serialization;
-using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.TestHarness;
-using Reductech.EDR.Core.Util;
-using Xunit;
-using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 
-namespace Reductech.EDR.Core.Tests.Steps
-{
+namespace Reductech.EDR.Core.Tests.Steps;
 
 public partial class EntityFormatTests : StepTestBase<EntityFormat, StringStream>
 {
@@ -166,6 +154,4 @@ public partial class EntityFormatTests : StepTestBase<EntityFormat, StringStream
             );
         }
     }
-}
-
 }

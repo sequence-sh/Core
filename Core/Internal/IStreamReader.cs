@@ -1,7 +1,4 @@
-﻿using System.Threading.Tasks;
-
-namespace Reductech.EDR.Core.Internal
-{
+﻿namespace Reductech.EDR.Core.Internal;
 
 /// <summary>
 /// Anything that implements ReadLineAsync
@@ -13,6 +10,4 @@ public interface IStreamReader<T> where T : struct
     /// </summary>
     /// <returns></returns>
     Task<T?> ReadLineAsync();
-}
-
 }

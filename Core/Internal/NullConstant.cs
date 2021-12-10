@@ -1,14 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
-using CSharpFunctionalExtensions;
-using Reductech.EDR.Core.Entities;
-using Reductech.EDR.Core.Internal.Errors;
-using Reductech.EDR.Core.Util;
-
-namespace Reductech.EDR.Core.Internal
-{
+﻿namespace Reductech.EDR.Core.Internal;
 
 /// <summary>
 /// Null constant
@@ -128,6 +118,4 @@ public class NullConstant : IConstantStep, IConstantFreezableStep, IStep<SCLNull
     {
         return SCLNull.Instance;
     }
-}
-
 }

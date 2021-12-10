@@ -1,5 +1,4 @@
-﻿namespace Reductech.EDR.Core.Internal
-{
+﻿namespace Reductech.EDR.Core.Internal;
 
 /// <summary>
 /// A lambda function with typed parameters
@@ -66,6 +65,4 @@ public record LambdaFunction
     /// The step
     /// </summary>
     public IStep Step { get; init; }
-}
-
 }

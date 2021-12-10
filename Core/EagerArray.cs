@@ -1,16 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.Immutable;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using CSharpFunctionalExtensions;
-using Reductech.EDR.Core.Internal.Errors;
-using Reductech.EDR.Core.Internal.Serialization;
-using Reductech.EDR.Core.Util;
-
-namespace Reductech.EDR.Core
-{
+﻿namespace Reductech.EDR.Core;
 
 /// <summary>
 /// An array backed by a list
@@ -176,6 +164,4 @@ public sealed record EagerArray<T>(IReadOnlyList<T> List) : Array<T>, IEquatable
             .Combine(ErrorBuilderList.Combine)
             .Map(x => x.ToSCLArray());
     }
-}
-
 }

@@ -1,10 +1,4 @@
-﻿using System;
-using CSharpFunctionalExtensions;
-using Reductech.EDR.Core.Internal.Errors;
-using Reductech.EDR.Core.Util;
-
-namespace Reductech.EDR.Core.Internal
-{
+﻿namespace Reductech.EDR.Core.Internal;
 
 /// <summary>
 /// Step factory for types which manipulate arrays
@@ -90,6 +84,4 @@ public abstract class ArrayStepFactory : GenericStepFactory
 
         return realType;
     }
-}
-
 }

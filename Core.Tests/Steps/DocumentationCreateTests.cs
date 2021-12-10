@@ -1,25 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using CSharpFunctionalExtensions;
-using OneOf;
+﻿using System.Text;
 using Reductech.EDR.ConnectorManagement.Base;
-using Reductech.EDR.Core.Attributes;
-using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Documentation;
-using Reductech.EDR.Core.Internal.Errors;
-using Reductech.EDR.Core.Internal.Serialization;
-using Reductech.EDR.Core.Steps;
-using Reductech.EDR.Core.TestHarness;
-using Reductech.EDR.Core.Util;
 using StepParameter = Reductech.EDR.Core.Internal.Documentation.StepParameter;
 
-namespace Reductech.EDR.Core.Tests.Steps
-{
+namespace Reductech.EDR.Core.Tests.Steps;
 
 public partial class DocumentationCreateTests : StepTestBase<DocumentationCreate, Entity>
 {
@@ -72,23 +56,23 @@ public partial class DocumentationCreateTests : StepTestBase<DocumentationCreate
                 sb.AppendLine($"# {category} Steps");
                 sb.AppendLine();
 
-                foreach (var headerOption in headerOptions)
+                foreach (var (header, getValue) in headerOptions)
                 {
                     var maxLength = Math.Max(
-                        headerOption.header.Length,
-                        steps.Select(headerOption.getValue).Max(x => x.Length)
+                        header.Length,
+                        steps.Select(getValue).Max(x => x.Length)
                     );
 
-                    sb.Append($"|{headerOption.header.PadRight(maxLength)}");
+                    sb.Append($"|{header.PadRight(maxLength)}");
                 }
 
                 sb.AppendLine("|");
 
-                foreach (var headerOption in headerOptions)
+                foreach (var (header, getValue) in headerOptions)
                 {
                     var maxLength = Math.Max(
-                        headerOption.header.Length,
-                        steps.Select(headerOption.getValue).Max(x => x.Length)
+                        header.Length,
+                        steps.Select(getValue).Max(x => x.Length)
                     );
 
                     sb.Append("|:");
@@ -99,16 +83,16 @@ public partial class DocumentationCreateTests : StepTestBase<DocumentationCreate
 
                 foreach (var step in steps)
                 {
-                    foreach (var headerOption in headerOptions)
+                    foreach (var (header, getValue) in headerOptions)
                     {
-                        sb.Append("|");
+                        sb.Append('|');
 
                         var maxLength = Math.Max(
-                            headerOption.header.Length,
-                            steps.Select(headerOption.getValue).Max(x => x.Length)
+                            header.Length,
+                            steps.Select(getValue).Max(x => x.Length)
                         );
 
-                        var term = headerOption.getValue(step).PadRight(maxLength);
+                        var term = getValue(step).PadRight(maxLength);
 
                         sb.Append(term);
                     }
@@ -165,7 +149,7 @@ public partial class DocumentationCreateTests : StepTestBase<DocumentationCreate
                         new List<StepPage>() { notStepPage }
                     ),
                 },
-                Array.Empty<EnumPage>()
+                System.Array.Empty<EnumPage>()
             );
 
             yield return new StepCase(
@@ -175,7 +159,7 @@ public partial class DocumentationCreateTests : StepTestBase<DocumentationCreate
                 notDocumentationEntity.ConvertToEntity().Serialize()
             ) { TestDeserializeAndRun = false }.WithStepFactoryStore(
                 StepFactoryStore.Create(
-                    Array.Empty<ConnectorData>(),
+                    System.Array.Empty<ConnectorData>(),
                     new[] { new SimpleStepFactory<Not, bool>() }
                 )
             );
@@ -245,7 +229,7 @@ public partial class DocumentationCreateTests : StepTestBase<DocumentationCreate
                         new List<StepPage>() { documentationStepPage }
                     )
                 },
-                Array.Empty<EnumPage>()
+                System.Array.Empty<EnumPage>()
             );
 
             yield return new StepCase(
@@ -255,7 +239,7 @@ public partial class DocumentationCreateTests : StepTestBase<DocumentationCreate
                 exampleCreationResult.ConvertToEntity().Serialize()
             ) { TestDeserializeAndRun = false }.WithStepFactoryStore(
                 StepFactoryStore.Create(
-                    Array.Empty<ConnectorData>(),
+                    System.Array.Empty<ConnectorData>(),
                     new[] { DocumentationExampleStep.DocumentationExampleStepFactory.Instance }
                 )
             );
@@ -296,7 +280,7 @@ public partial class DocumentationCreateTests : StepTestBase<DocumentationCreate
                 "TextCase"
             ) { TestDeserializeAndRun = false }.WithStepFactoryStore(
                 StepFactoryStore.Create(
-                    Array.Empty<ConnectorData>(),
+                    System.Array.Empty<ConnectorData>(),
                     new[] { new DocumentationExampleStep2().StepFactory }
                 )
             );
@@ -344,6 +328,7 @@ public partial class DocumentationCreateTests : StepTestBase<DocumentationCreate
             IStateMonad stateMonad,
             CancellationToken cancellationToken)
         {
+            await Task.CompletedTask;
             throw new Exception("Cannot run Documentation Example Step");
         }
 
@@ -441,6 +426,4 @@ public partial class DocumentationCreateTests : StepTestBase<DocumentationCreate
             public override string Category => "Examples";
         }
     }
-}
-
 }

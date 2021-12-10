@@ -1,10 +1,7 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Text;
 using Reductech.EDR.Core.Steps;
 
-namespace Reductech.EDR.Core.Internal.Serialization
-{
+namespace Reductech.EDR.Core.Internal.Serialization;
 
 /// <summary>
 /// Serializes a sequence
@@ -59,6 +56,4 @@ public sealed class SequenceSerializer : IStepSerializer
             }
         }
     }
-}
-
 }

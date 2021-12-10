@@ -1,27 +1,8 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using CSharpFunctionalExtensions;
-using FluentAssertions;
-using MELT;
-using Microsoft.Extensions.Logging;
-using Reductech.EDR.Core.Abstractions;
-using Reductech.EDR.Core.Attributes;
-using Reductech.EDR.Core.Internal;
-using Reductech.EDR.Core.Internal.Errors;
+﻿using System.Text;
 using Reductech.EDR.Core.Internal.Parser;
-using Reductech.EDR.Core.Internal.Serialization;
-using Reductech.EDR.Core.Util;
-using Xunit;
-using Xunit.Abstractions;
-using Xunit.Sdk;
 using static Reductech.EDR.Core.TestHarness.SpaceCompressor;
 
-namespace Reductech.EDR.Core.TestHarness
-{
+namespace Reductech.EDR.Core.TestHarness;
 
 public abstract partial class StepTestBase<TStep, TOutput>
 {
@@ -218,6 +199,4 @@ public abstract partial class StepTestBase<TStep, TOutput>
 
         public SCLExampleAttribute SCLExampleAttribute { get; init; }
     }
-}
-
 }

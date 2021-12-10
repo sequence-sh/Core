@@ -1,5 +1,4 @@
-﻿namespace Reductech.EDR.Core.Util
-{
+﻿namespace Reductech.EDR.Core.Util;
 
 /// <summary>
 /// The result of a step with not return value.
@@ -12,6 +11,4 @@ public sealed class Unit
     public static readonly Unit Default = new();
 
     private Unit() { }
-}
-
 }

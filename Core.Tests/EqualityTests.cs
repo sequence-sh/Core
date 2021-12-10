@@ -1,17 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+﻿using System.IO;
 using System.Text;
-using System.Threading.Tasks;
-using AutoTheory;
-using FluentAssertions;
 using Reductech.EDR.Core.Enums;
-using Reductech.EDR.Core.Internal.Errors;
-using Xunit.Abstractions;
 
-namespace Reductech.EDR.Core.Tests
-{
+namespace Reductech.EDR.Core.Tests;
 
 /// <summary>
 /// Tests equals and get hash code for various objects
@@ -271,6 +262,4 @@ public partial class EqualityTests
             );
         }
     }
-}
-
 }

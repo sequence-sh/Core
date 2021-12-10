@@ -1,18 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
-using CSharpFunctionalExtensions;
-using FluentAssertions;
-using Reductech.EDR.Core.Abstractions;
-using Reductech.EDR.Core.Internal;
-using Reductech.EDR.Core.Internal.Errors;
-using Reductech.EDR.Core.Util;
-using Xunit.Abstractions;
-using Xunit.Sdk;
-
-namespace Reductech.EDR.Core.TestHarness
-{
+﻿namespace Reductech.EDR.Core.TestHarness;
 
 public abstract partial class StepTestBase<TStep, TOutput>
 {
@@ -106,6 +92,4 @@ public abstract partial class StepTestBase<TStep, TOutput>
             yield return errorCase;
         }
     }
-}
-
 }

@@ -1,19 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Threading;
-using AutoTheory;
-using CSharpFunctionalExtensions;
-using Microsoft.Extensions.Logging;
-using Moq;
-using Reductech.EDR.Core.Abstractions;
+﻿using System.Linq.Expressions;
 using Reductech.EDR.Core.ExternalProcesses;
-using Reductech.EDR.Core.Internal;
-using RestSharp;
 
-namespace Reductech.EDR.Core.TestHarness
-{
+namespace Reductech.EDR.Core.TestHarness;
 
 /// <summary>
 /// A case that executes a step.
@@ -157,6 +145,4 @@ public sealed class ExternalContextSetupHelper
 
         return externalContext;
     }
-}
-
 }

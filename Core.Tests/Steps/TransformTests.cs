@@ -1,20 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using Json.More;
-using Json.Schema;
+﻿using System.Globalization;
 using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.Enums;
-using Reductech.EDR.Core.Internal;
-using Reductech.EDR.Core.Internal.Errors;
-using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.TestHarness;
-using Reductech.EDR.Core.Util;
-using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 using static Reductech.EDR.Core.TestHarness.SchemaHelpers;
 
-namespace Reductech.EDR.Core.Tests.Steps
-{
+namespace Reductech.EDR.Core.Tests.Steps;
 
 public partial class TransformTests : StepTestBase<Transform, Array<Entity>>
 {
@@ -257,6 +247,4 @@ public partial class TransformTests : StepTestBase<Transform, Array<Entity>>
                 yield return baseErrorCase;
         }
     }
-}
-
 }

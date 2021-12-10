@@ -1,13 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Castle.Core.Internal;
-using FluentAssertions;
-using MELT;
-using Microsoft.Extensions.Logging;
+﻿using Castle.Core.Internal;
 
-namespace Reductech.EDR.Core.TestHarness
-{
+namespace Reductech.EDR.Core.TestHarness;
 
 public static class LogChecker
 {
@@ -22,7 +15,7 @@ public static class LogChecker
         var assertions = expectedLoggedValues.Select(
             expected =>
             {
-                return new Action<LogEntry>(
+                return new Action<MELT.LogEntry>(
                     entry =>
                     {
                         var actual    = SpaceCompressor.CompressSpaces(entry.Message!);
@@ -40,6 +33,4 @@ public static class LogChecker
             infoOrHigherEntries.Should()
                 .SatisfyRespectively(assertions, "Log value should match expected");
     }
-}
-
 }

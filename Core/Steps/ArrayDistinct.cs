@@ -1,16 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Collections.Immutable;
-using System.ComponentModel.DataAnnotations;
-using System.Threading;
-using System.Threading.Tasks;
-using CSharpFunctionalExtensions;
-using Reductech.EDR.Core.Attributes;
-using Reductech.EDR.Core.Internal;
-using Reductech.EDR.Core.Internal.Errors;
-
-namespace Reductech.EDR.Core.Steps
-{
+namespace Reductech.EDR.Core.Steps;
 
 /// <summary>
 /// Removes duplicate elements in an array or entities in an entity stream.
@@ -137,6 +125,4 @@ public sealed class ArrayDistinct<T> : CompoundStep<Array<T>>
         /// <inheritdoc />
         public override string OutputTypeExplanation => "Array of T";
     }
-}
-
 }

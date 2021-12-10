@@ -1,5 +1,4 @@
-﻿namespace Reductech.EDR.Core.Attributes
-{
+﻿namespace Reductech.EDR.Core.Attributes;
 
 /// <summary>
 /// Points to a documentation page for this parameter.
@@ -30,6 +29,4 @@ public sealed class DocumentationURLAttribute : StepPropertyMetadataAttribute
 
     /// <inheritdoc />
     public override string MetadataFieldValue => $"[{Label}]({DocumentationURL})";
-}
-
 }

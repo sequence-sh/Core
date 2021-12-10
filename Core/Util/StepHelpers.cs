@@ -1,15 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
-using CSharpFunctionalExtensions;
-using Json.Schema;
-using OneOf;
-using Reductech.EDR.Core.Internal;
-using Reductech.EDR.Core.Internal.Errors;
-
-namespace Reductech.EDR.Core.Util
-{
+﻿namespace Reductech.EDR.Core.Util;
 
 /// <summary>
 /// Contains helper methods for running steps
@@ -440,6 +429,4 @@ public static class StepMaps
             return list;
         }
     }
-}
-
 }

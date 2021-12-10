@@ -1,9 +1,4 @@
-﻿using CSharpFunctionalExtensions;
-using Json.Schema;
-using Reductech.EDR.Core.Internal.Errors;
-
-namespace Reductech.EDR.Core.Entities.Schema
-{
+﻿namespace Reductech.EDR.Core.Entities.Schema;
 
 /// <summary>
 /// Matches Integers
@@ -60,6 +55,4 @@ public record IntegerNode(
 
         return Maybe<EntityValue>.From(new EntityValue.Integer(i));
     }
-}
-
 }

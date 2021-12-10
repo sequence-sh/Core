@@ -1,9 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using CSharpFunctionalExtensions;
-
-namespace Reductech.EDR.Core.Internal.Serialization
-{
+﻿namespace Reductech.EDR.Core.Internal.Serialization;
 
 /// <summary>
 /// A custom step serializer.
@@ -50,6 +45,4 @@ public class StepSerializer : IStepSerializer
 
         return r;
     }
-}
-
 }

@@ -1,14 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using AutoTheory;
-using CSharpFunctionalExtensions;
-using FluentAssertions;
-using Reductech.EDR.Core.Entities;
-using Reductech.EDR.Core.Enums;
-using Xunit;
-
-namespace Reductech.EDR.Core.Tests
-{
+﻿namespace Reductech.EDR.Core.Tests;
 
 [UseTestOutputHelper]
 public partial class EntityValueTests
@@ -301,6 +291,4 @@ public partial class EntityValueTests
         EntityValue.GetDefaultValue<Array<int>>().Should().Be(Array<int>.Empty);
         EntityValue.GetDefaultValue<Array<double>>().Should().Be(Array<double>.Empty);
     }
-}
-
 }

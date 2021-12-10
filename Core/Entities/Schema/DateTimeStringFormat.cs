@@ -1,12 +1,6 @@
-﻿using System;
-using System.Globalization;
-using System.Linq;
-using CSharpFunctionalExtensions;
-using Json.Schema;
-using Reductech.EDR.Core.Internal.Errors;
+﻿using System.Globalization;
 
-namespace Reductech.EDR.Core.Entities.Schema
-{
+namespace Reductech.EDR.Core.Entities.Schema;
 
 /// <summary>
 /// The date-time string format format
@@ -59,6 +53,4 @@ public record DateTimeStringFormat : StringFormat
     {
         builder.Format(new Format("date-time"));
     }
-}
-
 }

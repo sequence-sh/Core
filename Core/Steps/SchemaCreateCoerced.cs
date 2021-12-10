@@ -1,20 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using CSharpFunctionalExtensions;
-using Json.More;
-using Json.Schema;
-using OneOf;
-using Reductech.EDR.Core.Attributes;
-using Reductech.EDR.Core.Entities;
-using Reductech.EDR.Core.Entities.Schema;
-using Reductech.EDR.Core.Internal;
-using Reductech.EDR.Core.Internal.Errors;
-using Reductech.EDR.Core.Util;
-
-namespace Reductech.EDR.Core.Steps
-{
+﻿namespace Reductech.EDR.Core.Steps;
 
 /// <summary>
 /// Create a new schema by analysing the entity properties and values in
@@ -184,6 +168,4 @@ public sealed class SchemaCreateCoerced : CompoundStep<Entity>
     [StepProperty]
     [DefaultValueExplanation("False")]
     public IStep<bool> CaseSensitive { get; set; } = new BoolConstant(false);
-}
-
 }

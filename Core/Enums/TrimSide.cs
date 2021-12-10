@@ -1,5 +1,4 @@
-﻿namespace Reductech.EDR.Core.Enums
-{
+﻿namespace Reductech.EDR.Core.Enums;
 
 /// <summary>
 /// The side of the string to trim.
@@ -20,6 +19,4 @@ public enum TrimSide
     /// Removes whitespace from both sides of the string.
     /// </summary>
     Both
-}
-
 }

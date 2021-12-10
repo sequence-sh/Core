@@ -1,9 +1,4 @@
-﻿using System.Collections.Generic;
-using CSharpFunctionalExtensions;
-using Reductech.EDR.Core.Internal.Errors;
-
-namespace Reductech.EDR.Core.Steps
-{
+﻿namespace Reductech.EDR.Core.Steps;
 
 /// <summary>
 /// Subtract a list of numbers from a number
@@ -34,6 +29,4 @@ public sealed class DoubleSubtract : BaseOperatorStep<DoubleSubtract, double, do
 
     /// <inheritdoc />
     public override string Operator => "-";
-}
-
 }

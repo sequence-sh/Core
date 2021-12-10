@@ -1,8 +1,4 @@
-﻿using CSharpFunctionalExtensions;
-using Reductech.EDR.Core.Internal.Errors;
-
-namespace Reductech.EDR.Core.Internal
-{
+﻿namespace Reductech.EDR.Core.Internal;
 
 /// <summary>
 /// Step factory for generic types.
@@ -56,6 +52,4 @@ public abstract class GenericStepFactory : StepFactory
         CallerMetadata callerMetadata,
         FreezableStepData freezableStepData,
         TypeResolver typeResolver);
-}
-
 }

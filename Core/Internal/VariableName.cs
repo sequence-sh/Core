@@ -1,7 +1,4 @@
-﻿using System;
-
-namespace Reductech.EDR.Core.Internal
-{
+﻿namespace Reductech.EDR.Core.Internal;
 
 /// <summary>
 /// The name of a variable that can be written and read from the step state.
@@ -82,6 +79,4 @@ public readonly struct VariableName : IEquatable<VariableName>
     /// Automatic variable name
     /// </summary>
     public static VariableName Item { get; } = new("item");
-}
-
 }

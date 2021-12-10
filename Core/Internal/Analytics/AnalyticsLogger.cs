@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using CSharpFunctionalExtensions;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Reductech.EDR.Core.Internal.Logging;
 
-namespace Reductech.EDR.Core.Internal.Analytics
-{
+namespace Reductech.EDR.Core.Internal.Analytics;
 
 /// <summary>
 /// A logger that logs analytics messages
@@ -84,6 +80,4 @@ public class AnalyticsLogger : ILogger
         /// <inheritdoc />
         public void Dispose() { }
     }
-}
-
 }

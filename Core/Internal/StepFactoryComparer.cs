@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace Reductech.EDR.Core.Internal
-{
+﻿namespace Reductech.EDR.Core.Internal;
 
 /// <summary>
 /// Default Comparer for step factories
@@ -35,6 +32,4 @@ public class StepFactoryComparer : IEqualityComparer<IStepFactory>
 
     /// <inheritdoc />
     public int GetHashCode(IStepFactory obj) => obj.TypeName.GetHashCode();
-}
-
 }

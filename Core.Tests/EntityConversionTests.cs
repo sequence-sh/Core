@@ -1,16 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using CSharpFunctionalExtensions;
-using FluentAssertions;
-using Reductech.EDR.ConnectorManagement.Base;
+﻿using Reductech.EDR.ConnectorManagement.Base;
 using Reductech.EDR.Core.Entities;
-using Reductech.EDR.Core.Internal;
 using Reductech.EDR.Core.Internal.Parser;
 using Reductech.EDR.Core.TestHarness;
-using Xunit;
 
-namespace Reductech.EDR.Core.Tests
-{
+namespace Reductech.EDR.Core.Tests;
 
 public class EntityConversionTests
 {
@@ -170,6 +163,4 @@ public class EntityConversionTests
             .Should()
             .Be(EntityValue.Null.Instance);
     }
-}
-
 }

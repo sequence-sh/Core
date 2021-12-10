@@ -1,18 +1,9 @@
-﻿using System.Collections.Generic;
-using System.Text;
-using System.Threading;
-using Microsoft.Extensions.Logging;
-using Moq;
+﻿using System.Text;
 using Reductech.EDR.Core.Enums;
 using Reductech.EDR.Core.ExternalProcesses;
-using Reductech.EDR.Core.Internal;
-using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.TestHarness;
-using Reductech.EDR.Core.Util;
-using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 
-namespace Reductech.EDR.Core.Tests.Steps
-{
+namespace Reductech.EDR.Core.Tests.Steps;
 
 public partial class RunExternalProcessTests : StepTestBase<RunExternalProcess, Unit>
 {
@@ -75,6 +66,4 @@ public partial class RunExternalProcessTests : StepTestBase<RunExternalProcess, 
                 ;
         }
     }
-}
-
 }

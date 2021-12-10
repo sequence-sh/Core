@@ -1,17 +1,7 @@
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Threading;
-using System.Threading.Tasks;
-using CSharpFunctionalExtensions;
-using Reductech.EDR.Core.Attributes;
 using Reductech.EDR.Core.Enums;
 using Reductech.EDR.Core.ExternalProcesses;
-using Reductech.EDR.Core.Internal;
-using Reductech.EDR.Core.Internal.Errors;
-using Reductech.EDR.Core.Util;
 
-namespace Reductech.EDR.Core.Steps
-{
+namespace Reductech.EDR.Core.Steps;
 
 /// <summary>
 /// Runs an external executable program.
@@ -94,6 +84,4 @@ public sealed class RunExternalProcess : CompoundStep<Unit>
     /// <inheritdoc />
     public override IStepFactory StepFactory { get; } =
         new SimpleStepFactory<RunExternalProcess, Unit>();
-}
-
 }

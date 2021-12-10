@@ -1,7 +1,4 @@
-﻿using Reductech.EDR.Core.Util;
-
-namespace Reductech.EDR.Core.Internal
-{
+﻿namespace Reductech.EDR.Core.Internal;
 
 /// <summary>
 /// Contains helper methods for getting default values
@@ -21,6 +18,4 @@ public static class DefaultValues
 
         return default(T); //TODO do better
     }
-}
-
 }

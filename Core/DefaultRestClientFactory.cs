@@ -1,9 +1,4 @@
-﻿using System.Text.Json;
-using RestSharp;
-using RestSharp.Serializers.SystemTextJson;
-
-namespace Reductech.EDR.Core
-{
+﻿namespace Reductech.EDR.Core;
 
 /// <summary>
 /// Uses a standard REST client
@@ -28,6 +23,4 @@ public class DefaultRestClientFactory : IRestClientFactory
 
         return client;
     }
-}
-
 }

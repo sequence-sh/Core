@@ -1,19 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.Immutable;
-using System.Linq;
-using System.Reflection;
-using System.Threading;
-using System.Threading.Tasks;
-using CSharpFunctionalExtensions;
-using Reductech.EDR.Core.Attributes;
-using Reductech.EDR.Core.Entities;
-using Reductech.EDR.Core.Internal.Errors;
-using Reductech.EDR.Core.Internal.Logging;
-using Reductech.EDR.Core.Util;
+﻿using Reductech.EDR.Core.Internal.Logging;
 
-namespace Reductech.EDR.Core.Internal
-{
+namespace Reductech.EDR.Core.Internal;
 
 /// <summary>
 /// A runnable step that is not a constant.
@@ -270,6 +257,4 @@ public abstract class CompoundStep<T> : ICompoundStep<T>
 
         return finalResult;
     }
-}
-
 }

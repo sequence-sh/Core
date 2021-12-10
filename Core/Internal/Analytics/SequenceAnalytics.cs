@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-
-namespace Reductech.EDR.Core.Internal.Analytics
-{
+﻿namespace Reductech.EDR.Core.Internal.Analytics;
 
 /// <summary>
 /// Analysis produced by a Sequence Logger
@@ -62,6 +57,4 @@ public class SequenceAnalytics
 
         return new DetailedAnalysis(results);
     }
-}
-
 }

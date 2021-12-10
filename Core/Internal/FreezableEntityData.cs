@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using CSharpFunctionalExtensions;
-using Reductech.EDR.Core.Internal.Errors;
-
-namespace Reductech.EDR.Core.Internal
-{
+﻿namespace Reductech.EDR.Core.Internal;
 
 /// <summary>
 /// The data used by a Freezable Step.
@@ -71,6 +64,4 @@ public record FreezableEntityData(
                 variables.AddRange(variablesSet.Value);
         }
     }
-}
-
 }

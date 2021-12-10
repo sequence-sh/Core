@@ -1,13 +1,8 @@
-﻿using System.Collections.Generic;
-using System.Net;
+﻿using System.Net;
 using Reductech.EDR.Core.Steps.REST;
 using Reductech.EDR.Core.TestHarness;
-using static Reductech.EDR.Core.TestHarness.StaticHelpers;
-using Reductech.EDR.Core.Util;
-using RestSharp;
 
-namespace Reductech.EDR.Core.Tests.Steps.REST
-{
+namespace Reductech.EDR.Core.Tests.Steps.REST;
 
 public partial class RESTPatchTests : StepTestBase<RESTPatch, Unit>
 {
@@ -33,6 +28,4 @@ public partial class RESTPatchTests : StepTestBase<RESTPatch, Unit>
                 );
         }
     }
-}
-
 }

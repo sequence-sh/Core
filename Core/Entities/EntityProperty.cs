@@ -1,7 +1,4 @@
-﻿using System;
-
-namespace Reductech.EDR.Core.Entities
-{
+﻿namespace Reductech.EDR.Core.Entities;
 
 /// <summary>
 /// A property of an entity
@@ -61,6 +58,4 @@ public readonly struct EntityProperty : IEquatable<EntityProperty>
     /// Not Equals operator.
     /// </summary>
     public static bool operator !=(EntityProperty left, EntityProperty right) => !(left == right);
-}
-
 }

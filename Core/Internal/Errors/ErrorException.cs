@@ -1,7 +1,4 @@
-﻿using System;
-
-namespace Reductech.EDR.Core.Internal.Errors
-{
+﻿namespace Reductech.EDR.Core.Internal.Errors;
 
 /// <summary>
 /// An exception that wraps an error
@@ -17,6 +14,4 @@ public class ErrorException : Exception
     /// The errorBuilder
     /// </summary>
     public IError Error { get; }
-}
-
 }

@@ -1,11 +1,8 @@
-﻿using System.Collections.Generic;
-using System.IO;
+﻿using System.IO;
 using System.Text;
-using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.TestHarness;
 
-namespace Reductech.EDR.Core.Tests.Steps
-{
+namespace Reductech.EDR.Core.Tests.Steps;
 
 public partial class StandardInReadTests : StepTestBase<StandardInRead, StringStream>
 {
@@ -24,6 +21,4 @@ public partial class StandardInReadTests : StepTestBase<StandardInRead, StringSt
             );
         }
     }
-}
-
 }

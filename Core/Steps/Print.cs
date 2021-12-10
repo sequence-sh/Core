@@ -1,16 +1,4 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations;
-using System.Threading;
-using System.Threading.Tasks;
-using CSharpFunctionalExtensions;
-using Reductech.EDR.Core.Attributes;
-using Reductech.EDR.Core.Internal;
-using Reductech.EDR.Core.Internal.Errors;
-using Reductech.EDR.Core.Internal.Serialization;
-using Reductech.EDR.Core.Util;
-
-namespace Reductech.EDR.Core.Steps
-{
+﻿namespace Reductech.EDR.Core.Steps;
 
 /// <summary>
 /// Prints a value to the console.
@@ -82,6 +70,4 @@ public sealed class Print<T> : CompoundStep<Unit>
             )
             .Map(x => x == TypeReference.Any.Instance ? TypeReference.Actual.String : x);
     }
-}
-
 }

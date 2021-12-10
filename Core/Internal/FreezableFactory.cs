@@ -1,16 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.Immutable;
-using System.Linq;
-using CSharpFunctionalExtensions;
-using Reductech.EDR.Core.Internal.Errors;
-using Reductech.EDR.Core.Steps;
+﻿using Reductech.EDR.Core.Steps;
 using StepParameterDict =
     System.Collections.Generic.Dictionary<Reductech.EDR.Core.Internal.StepParameterReference,
         Reductech.EDR.Core.Internal.FreezableStepProperty>;
 
-namespace Reductech.EDR.Core.Internal
-{
+namespace Reductech.EDR.Core.Internal;
 
 /// <summary>
 /// Methods to create freezable types
@@ -316,6 +309,4 @@ public static class InfixHelper
                 new("+", nameof(StringJoin), nameof(StringJoin.Strings)),
             }
             .ToLookup(x => x.OperatorString, StringComparer.OrdinalIgnoreCase);
-}
-
 }

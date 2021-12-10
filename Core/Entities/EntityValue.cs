@@ -1,24 +1,7 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Collections.Immutable;
-using System.Diagnostics.Contracts;
-using System.Linq;
-using System.Reflection;
-using System.Runtime.Serialization;
-using System.Text.Json;
+﻿using System.Runtime.Serialization;
 using System.Text.Json.Serialization;
-using CSharpFunctionalExtensions;
-using Json.More;
-using OneOf;
-using Reductech.EDR.Core.Entities.Schema;
-using Reductech.EDR.Core.Internal;
-using Reductech.EDR.Core.Internal.Errors;
-using Reductech.EDR.Core.Internal.Serialization;
-using Reductech.EDR.Core.Util;
 
-namespace Reductech.EDR.Core.Entities
-{
+namespace Reductech.EDR.Core.Entities;
 
 /// <summary>
 /// The value of an entity property.
@@ -874,6 +857,4 @@ public abstract record EntityValue(object ObjectValue)
 
         return (T)r.Value!;
     }
-}
-
 }

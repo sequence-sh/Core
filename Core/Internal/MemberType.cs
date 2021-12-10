@@ -1,5 +1,4 @@
-﻿namespace Reductech.EDR.Core.Internal
-{
+﻿namespace Reductech.EDR.Core.Internal;
 
 /// <summary>
 /// The type of a step member.
@@ -30,6 +29,4 @@ public enum MemberType
     /// A lambda function
     /// </summary>
     Lambda
-}
-
 }

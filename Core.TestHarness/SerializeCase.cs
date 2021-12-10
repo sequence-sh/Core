@@ -1,13 +1,6 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using AutoTheory;
-using FluentAssertions;
-using Xunit.Abstractions;
+﻿using System.Text;
 
-namespace Reductech.EDR.Core.TestHarness
-{
+namespace Reductech.EDR.Core.TestHarness;
 
 public abstract partial class StepTestBase<TStep, TOutput>
 {
@@ -65,6 +58,4 @@ public abstract partial class StepTestBase<TStep, TOutput>
 
         return c;
     }
-}
-
 }

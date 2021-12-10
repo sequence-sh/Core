@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Reflection;
-using Reductech.EDR.Core.Attributes;
-
-namespace Reductech.EDR.Core.Internal
-{
+﻿namespace Reductech.EDR.Core.Internal;
 
 /// <summary>
 /// A reference to a step property.
@@ -71,6 +65,4 @@ public abstract record StepParameterReference
         foreach (var alias in propertyInfo.GetCustomAttributes<AliasAttribute>())
             yield return new Named(alias.Name);
     }
-}
-
 }

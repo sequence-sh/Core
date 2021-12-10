@@ -1,20 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.Immutable;
-using System.Linq;
-using System.Reflection;
-using System.Text.RegularExpressions;
-using CSharpFunctionalExtensions;
+﻿using System.Text.RegularExpressions;
 using Namotion.Reflection;
-using OneOf;
-using Reductech.EDR.Core.Attributes;
-using Reductech.EDR.Core.Internal.Errors;
-using Reductech.EDR.Core.Internal.Serialization;
 using Reductech.EDR.Core.Steps;
-using Reductech.EDR.Core.Util;
 
-namespace Reductech.EDR.Core.Internal
-{
+namespace Reductech.EDR.Core.Internal;
 
 /// <summary>
 /// A factory for creating steps.
@@ -724,6 +712,4 @@ public abstract class StepFactory : IStepFactory
     public IEnumerable<SCLExample> Examples => StepType.GetCustomAttributes<SCLExampleAttribute>()
         .Where(x => x.IncludeInDocumentation)
         .Select(x => x.ToSCLExample);
-}
-
 }

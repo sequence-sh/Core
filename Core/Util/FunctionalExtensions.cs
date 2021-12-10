@@ -1,13 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Reflection;
-using System.Threading.Tasks;
-using CSharpFunctionalExtensions;
-using Namotion.Reflection;
-using Reductech.EDR.Core.Internal.Errors;
+﻿using Namotion.Reflection;
 
-namespace Reductech.EDR.Core.Util
-{
+namespace Reductech.EDR.Core.Util;
 
 /// <summary>
 /// Functional methods
@@ -206,6 +199,4 @@ public static class FunctionalExtensions
 
         return Maybe<T>.None;
     }
-}
-
 }

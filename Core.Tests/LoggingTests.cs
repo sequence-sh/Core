@@ -1,20 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using FluentAssertions;
-using MELT;
-using Microsoft.Extensions.Logging;
-using Moq;
-using Reductech.EDR.Core.Internal;
-using Reductech.EDR.Core.Internal.Serialization;
+﻿using MELT;
 using Reductech.EDR.Core.TestHarness;
-using Xunit.Abstractions;
-using AutoTheory;
 
-namespace Reductech.EDR.Core.Tests
-{
+namespace Reductech.EDR.Core.Tests;
 
 public partial class LoggingTests
 {
@@ -211,6 +198,4 @@ public partial class LoggingTests
         /// <inheritdoc />
         public List<Action> FinalChecks { get; } = new();
     }
-}
-
 }

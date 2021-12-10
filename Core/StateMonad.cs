@@ -1,21 +1,8 @@
-﻿using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Threading;
-using System.Threading.Tasks;
-using CSharpFunctionalExtensions;
+﻿using System.Collections.Concurrent;
 using Microsoft.Extensions.Logging;
-using OneOf;
 using Reductech.EDR.Core.Abstractions;
-using Reductech.EDR.Core.Entities;
-using Reductech.EDR.Core.Internal;
-using Reductech.EDR.Core.Internal.Errors;
-using Reductech.EDR.Core.Util;
 
-namespace Reductech.EDR.Core
-{
+namespace Reductech.EDR.Core;
 
 /// <summary>
 /// The state monad that is passed between steps.
@@ -266,6 +253,4 @@ public interface IStateDisposable
     /// </summary>
     /// <param name="state"></param>
     Task DisposeAsync(IStateMonad state);
-}
-
 }

@@ -1,11 +1,7 @@
-﻿using System.Collections.Generic;
-using Reductech.EDR.Core.Enums;
-using Reductech.EDR.Core.Steps;
+﻿using Reductech.EDR.Core.Enums;
 using Reductech.EDR.Core.TestHarness;
-using static Reductech.EDR.Core.TestHarness.StaticHelpers;
 
-namespace Reductech.EDR.Core.Tests.Steps
-{
+namespace Reductech.EDR.Core.Tests.Steps;
 
 public partial class StringTrimTests : StepTestBase<StringTrim, StringStream>
 {
@@ -46,6 +42,4 @@ public partial class StringTrimTests : StepTestBase<StringTrim, StringStream>
             );
         }
     }
-}
-
 }

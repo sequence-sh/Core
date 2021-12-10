@@ -1,5 +1,4 @@
-﻿namespace Reductech.EDR.Core.Attributes
-{
+﻿namespace Reductech.EDR.Core.Attributes;
 
 /// <summary>
 /// Indicates the recommended range for this parameter.
@@ -25,6 +24,4 @@ public sealed class RecommendedRangeAttribute : StepPropertyMetadataAttribute
 
     /// <inheritdoc />
     public override string MetadataFieldValue => RecommendedRange;
-}
-
 }

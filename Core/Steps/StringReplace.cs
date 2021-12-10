@@ -1,18 +1,7 @@
-﻿using System.Collections.Generic;
-using System.Collections.Immutable;
-using System.ComponentModel.DataAnnotations;
-using System.Text;
+﻿using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading;
-using System.Threading.Tasks;
-using CSharpFunctionalExtensions;
-using Reductech.EDR.Core.Attributes;
-using Reductech.EDR.Core.Internal;
-using Reductech.EDR.Core.Internal.Errors;
-using Reductech.EDR.Core.Util;
 
-namespace Reductech.EDR.Core.Steps
-{
+namespace Reductech.EDR.Core.Steps;
 
 /// <summary>
 /// Replace every regex match in the string with the result of a particular function
@@ -211,6 +200,4 @@ public sealed class StringReplace : CompoundStep<StringStream>
 
         return base.VerifyThis(stepFactoryStore);
     }
-}
-
 }

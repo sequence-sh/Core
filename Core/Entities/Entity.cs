@@ -1,21 +1,9 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Collections.Immutable;
-using System.Diagnostics.Contracts;
-using System.IO;
-using System.Linq;
-using System.Text.Json;
+﻿using System.IO;
 using System.Text.Json.Serialization;
-using CSharpFunctionalExtensions;
 using Generator.Equals;
-using Reductech.EDR.Core.Entities;
-using Reductech.EDR.Core.Internal;
-using Reductech.EDR.Core.Internal.Serialization;
 
 // ReSharper disable once CheckNamespace - we want this namespace to prevent clash with FunctionalExtensions
-namespace Reductech.EDR.Core
-{
+namespace Reductech.EDR.Core;
 
 /// <summary>
 /// A piece of data.
@@ -326,6 +314,4 @@ public sealed partial record Entity
 
     /// <inheritdoc />
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-}
-
 }

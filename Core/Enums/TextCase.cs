@@ -1,5 +1,4 @@
-﻿namespace Reductech.EDR.Core.Enums
-{
+﻿namespace Reductech.EDR.Core.Enums;
 
 /// <summary>
 /// The case to convert the text to.
@@ -20,6 +19,4 @@ public enum TextCase
     /// Only the first character in each word will be in upper case.
     /// </summary>
     Title
-}
-
 }

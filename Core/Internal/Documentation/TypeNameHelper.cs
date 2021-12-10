@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-
-namespace Reductech.EDR.Core.Internal.Documentation
-{
+﻿namespace Reductech.EDR.Core.Internal.Documentation;
 
 internal static class TypeNameHelper
 {
@@ -87,6 +82,4 @@ internal static class TypeNameHelper
             { typeof(DateTime), "dateTime" },
             { typeof(void), "void" }
         };
-}
-
 }

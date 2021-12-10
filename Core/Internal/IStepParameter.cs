@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace Reductech.EDR.Core.Internal
-{
+﻿namespace Reductech.EDR.Core.Internal;
 
 /// <summary>
 /// A parameter of a step
@@ -53,6 +49,4 @@ public interface IStepParameter
     /// The type of this parameter
     /// </summary>
     MemberType MemberType { get; }
-}
-
 }
