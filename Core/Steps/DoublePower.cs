@@ -3,10 +3,10 @@
 /// <summary>
 /// Raises a double to the power of a list of integers sequentially
 /// </summary>
-public sealed class DoublePower : BaseOperatorStep<DoublePower, double, double>
+public sealed class DoublePower : BaseOperatorStep<DoublePower, SCLDouble, SCLDouble>
 {
     /// <inheritdoc />
-    protected override Result<double, IErrorBuilder> Operate(IEnumerable<double> terms)
+    protected override Result<SCLDouble, IErrorBuilder> Operate(IEnumerable<SCLDouble> terms)
     {
         double total = 0;
         var    first = true;
@@ -15,16 +15,16 @@ public sealed class DoublePower : BaseOperatorStep<DoublePower, double, double>
         {
             if (first)
             {
-                total += number;
+                total += number.Value;
                 first =  false;
             }
             else
             {
-                total = Math.Pow(total, number);
+                total = Math.Pow(total, number.Value);
             }
         }
 
-        return total;
+        return total.ConvertToSCLObject();
     }
 
     /// <inheritdoc />

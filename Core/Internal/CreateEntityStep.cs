@@ -17,7 +17,7 @@ public record CreateEntityStep
 
         foreach (var (key, step) in Properties)
         {
-            var r = await step.Run<object>(stateMonad, cancellationToken)
+            var r = await step.Run<ISCLObject>(stateMonad, cancellationToken)
                 .Bind(x => EntityHelper.TryUnpackObjectAsync(x, cancellationToken));
 
             if (r.IsFailure)
@@ -54,7 +54,7 @@ public record CreateEntityStep
     /// <inheritdoc />
     public async Task<Result<T, IError>> Run<T>(
         IStateMonad stateMonad,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken) where T : ISCLObject
     {
         return await Run(stateMonad, cancellationToken)
             .BindCast<Entity, T, IError>(

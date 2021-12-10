@@ -214,7 +214,7 @@ public abstract record EntityValue(object ObjectValue)
     /// <summary>
     /// An enumeration value
     /// </summary>
-    public record EnumerationValue(Enumeration Value) : EntityValue(Value)
+    public record EnumerationValue(ISCLEnum Value) : EntityValue(Value)
     {
         /// <inheritdoc />
         public override string GetPrimitiveString() => Value.ToString();
@@ -533,10 +533,9 @@ public abstract record EntityValue(object ObjectValue)
             case double d:         return new Double(d);
             case long ln and < int.MaxValue and > int.MinValue:
                 return new Integer(Convert.ToInt32(ln));
-            case Enumeration e1:     return new EnumerationValue(e1);
-            case System.DateTime dt: return new DateTime(dt);
-            case Enum e:
-                return new EnumerationValue(new Enumeration(e.GetType().Name, e.ToString()));
+            case ISCLEnum e1:           return new EnumerationValue(e1);
+            case System.DateTime dt:    return new DateTime(dt);
+            case Enum e:                return new EnumerationValue(e.ConvertToSCLEnum());
             case JsonElement je:        return Create(je);
             case Entity entity:         return new NestedEntity(entity);
             case IEntityConvertible ec: return new NestedEntity(ec.ConvertToEntity());
@@ -749,7 +748,7 @@ public abstract record EntityValue(object ObjectValue)
         {
             if (this is EnumerationValue enumeration)
             {
-                if (Enum.TryParse(type, enumeration.Value.Value, true, out var ro))
+                if (Enum.TryParse(type, enumeration.Value.EnumValue, true, out var ro))
                     return ro!;
             }
             else if (!int.TryParse(primitive, out _) && //prevent int conversion
@@ -777,7 +776,7 @@ public abstract record EntityValue(object ObjectValue)
         }
         else if (type == typeof(object))
         {
-            return AsSCLObject(ObjectValue); // new StringStream(GetPrimitiveString());
+            return AsISCLObject(ObjectValue); // new StringStream(GetPrimitiveString());
         }
         else if (type.GetInterfaces().Contains(typeof(IOneOf)))
         {
@@ -808,7 +807,7 @@ public abstract record EntityValue(object ObjectValue)
         return ErrorCode.CouldNotConvertEntityValue.ToErrorBuilder(type.Name);
     }
 
-    private static object AsSCLObject(object? o)
+    private static object AsISCLObject(object? o)
     {
         if (o is null)
             return SCLNull.Instance;
@@ -839,7 +838,7 @@ public abstract record EntityValue(object ObjectValue)
                 enumerable.OfType<object>().Select(SerializationMethods.SerializeObject)
             );
 
-        if (o is Enumeration enumeration)
+        if (o is ISCLEnum enumeration)
             return enumeration;
 
         return SCLNull.Instance;

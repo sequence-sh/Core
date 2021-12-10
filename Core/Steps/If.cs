@@ -4,7 +4,7 @@
 /// Executes a statement if a condition is true.
 /// </summary>
 [Alias("ValueIf")]
-public sealed class If<T> : CompoundStep<T>
+public sealed class If<T> : CompoundStep<T> where T : ISCLObject
 {
     /// <inheritdoc />
     protected override async Task<Result<T, IError>> Run(
@@ -15,7 +15,7 @@ public sealed class If<T> : CompoundStep<T>
             .Bind(
                 r =>
                 {
-                    if (r)
+                    if (r.Value)
                         return Then.Run(stateMonad, cancellationToken);
 
                     if (Else is not null)
@@ -35,7 +35,7 @@ public sealed class If<T> : CompoundStep<T>
     /// </summary>
     [StepProperty(1)]
     [Required]
-    public IStep<bool> Condition { get; set; } = null!;
+    public IStep<SCLBool> Condition { get; set; } = null!;
 
     /// <summary>
     /// The Consequent. Returned if the condition is true.

@@ -4,6 +4,8 @@
 /// A lambda function with typed parameters
 /// </summary>
 public record LambdaFunction<TInput, TOutput> : LambdaFunction
+    where TInput : ISCLObject
+    where TOutput : ISCLObject
 {
     /// <summary>
     /// The Step to execute

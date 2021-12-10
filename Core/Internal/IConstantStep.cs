@@ -8,5 +8,5 @@ public interface IConstantStep : IStep
     /// <summary>
     /// The constant value
     /// </summary>
-    object ValueObject { get; }
+    ISCLObject Value { get; }
 }

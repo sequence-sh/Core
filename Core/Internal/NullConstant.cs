@@ -19,7 +19,7 @@ public class NullConstant : IConstantStep, IConstantFreezableStep, IStep<SCLNull
     /// <inheritdoc />
     public async Task<Result<T, IError>> Run<T>(
         IStateMonad stateMonad,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken) where T : ISCLObject
     {
         await Task.CompletedTask;
         return Result.Success<T, IError>(default!);
@@ -116,6 +116,10 @@ public class NullConstant : IConstantStep, IConstantFreezableStep, IStep<SCLNull
         IStateMonad stateMonad,
         CancellationToken cancellationToken)
     {
+        await Task.CompletedTask;
         return SCLNull.Instance;
     }
+
+    /// <inheritdoc />
+    public ISCLObject Value => SCLNull.Instance;
 }

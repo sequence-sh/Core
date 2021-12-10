@@ -11,7 +11,10 @@ public partial class ModuloTests : StepTestBase<Modulo, int>
         {
             yield return new StepCase(
                 "No numbers",
-                new Modulo() { Terms = new ArrayNew<int>() { Elements = new List<IStep<int>>() } },
+                new Modulo()
+                {
+                    Terms = new ArrayNew<int>() { Elements = new List<IStep<SCLInt>>() }
+                },
                 0
             );
 

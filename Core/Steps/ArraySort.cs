@@ -30,7 +30,7 @@ public enum SortOrder
 ] Using: (<>['type'])",
     "[('type': \"A\" 'value': 2), ('type': \"B\" 'value': 3), ('type': \"C\" 'value': 1)]"
 )]
-public sealed class ArraySort<T> : CompoundStep<Array<T>>
+public sealed class ArraySort<T> : CompoundStep<Array<T>> where T : ISCLObject
 {
     /// <summary>
     /// The array or entity stream to sort
@@ -54,8 +54,8 @@ public sealed class ArraySort<T> : CompoundStep<Array<T>>
     /// </summary>
     [StepProperty(3)]
     [DefaultValueExplanation("False")]
-    public IStep<OneOf<bool, SortOrder>> Descending { get; set; } =
-        new OneOfStep<bool, SortOrder>(new BoolConstant(false));
+    public IStep<SCLOneOf<SCLBool, SCLEnum<SortOrder>>> Descending { get; set; } =
+        new OneOfStep<SCLBool, SCLEnum<SortOrder>>(new BoolConstant(SCLBool.False));
 
     /// <inheritdoc />
     protected override async Task<Result<Array<T>, IError>> Run(
@@ -72,7 +72,11 @@ public sealed class ArraySort<T> : CompoundStep<Array<T>>
         if (descending.IsFailure)
             return descending.ConvertFailure<Array<T>>();
 
-        var sortOrderIsDescending = descending.Value.Match(x => x, x => x == SortOrder.Descending);
+        var sortOrderIsDescending = descending.Value.OneOf.Match(
+            x => x.Value,
+            x => x.Value == SortOrder.Descending
+        );
+
         Array<T> sortedArray;
 
         if (KeySelector == null)
@@ -91,7 +95,7 @@ public sealed class ArraySort<T> : CompoundStep<Array<T>>
                     KeySelector.VariableNameOrItem,
                     new KeyValuePair<VariableName, object>(
                         KeySelector.VariableNameOrItem,
-                        entity!
+                        entity
                     )
                 );
 
@@ -144,8 +148,8 @@ public sealed class ArraySort<T> : CompoundStep<Array<T>>
         }
 
         /// <inheritdoc />
-        protected override string ArrayPropertyName => nameof(ArraySort<object>.Array);
+        protected override string ArrayPropertyName => nameof(ArraySort<ISCLObject>.Array);
 
-        protected override string LambdaPropertyName => nameof(ArraySort<object>.KeySelector);
+        protected override string LambdaPropertyName => nameof(ArraySort<ISCLObject>.KeySelector);
     }
 }

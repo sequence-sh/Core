@@ -13,7 +13,8 @@ public interface IStep
     /// <summary>
     /// Run this step and return the result, assuming it is the specified type.
     /// </summary>
-    Task<Result<T, IError>> Run<T>(IStateMonad stateMonad, CancellationToken cancellationToken);
+    Task<Result<T, IError>> Run<T>(IStateMonad stateMonad, CancellationToken cancellationToken)
+        where T : ISCLObject;
 
     /// <summary>
     /// Verify that this step can be run with the current settings.
@@ -54,10 +55,11 @@ public interface IStep
 /// <summary>
 /// A step that can be run.
 /// </summary>
-public interface IStep<T> : IStep, IRunnableStep<T> { }
+public interface IStep<T> : IStep, IRunnableStep<T> where T : ISCLObject { }
 
 /// <summary>
-/// Something that can be run like a step
+/// Something that can be run like a step.
+/// Note that the return type does not have to be ISCLObject
 /// </summary>
 public interface IRunnableStep<T>
 {

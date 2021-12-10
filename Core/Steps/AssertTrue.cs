@@ -31,5 +31,5 @@ public sealed class AssertTrue : CompoundStep<Unit>
     /// </summary>
     [StepProperty(1)]
     [Required]
-    public IStep<bool> Boolean { get; set; } = null!;
+    public IStep<SCLBool> Boolean { get; set; } = null!;
 }

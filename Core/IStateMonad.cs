@@ -33,12 +33,12 @@ public interface IStateMonad : IAsyncDisposable
     /// Gets all VariableNames and associated objects.
     /// </summary>
     /// <returns></returns>
-    IEnumerable<KeyValuePair<VariableName, object>> GetState();
+    IEnumerable<KeyValuePair<VariableName, ISCLObject>> GetState();
 
     /// <summary>
     /// Gets the current value of this variable.
     /// </summary>
-    Result<T, IErrorBuilder> GetVariable<T>(VariableName key);
+    Result<T, IErrorBuilder> GetVariable<T>(VariableName key) where T : ISCLObject;
 
     /// <summary>
     /// Returns whether a particular variable has been set and not removed.
@@ -53,7 +53,7 @@ public interface IStateMonad : IAsyncDisposable
         T variable,
         bool disposeOld,
         IStep? callingStep,
-        CancellationToken cancellation);
+        CancellationToken cancellation) where T : ISCLObject;
 
     /// <summary>
     /// Removes the variable if it exists.

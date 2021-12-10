@@ -385,7 +385,9 @@ public abstract class StepFactory : IStepFactory
                             out var enumValue
                         ))
                     {
-                        var step = EnumConstantFreezable.TryCreateEnumConstant(enumValue!);
+                        var ev = SCLObjectHelper.ConvertToSCLEnumUnsafe(enumValue);
+
+                        var step = new EnumConstant(ev) { TextLocation = stepToSet.TextLocation };
                         return step;
                     }
                 }
@@ -393,7 +395,12 @@ public abstract class StepFactory : IStepFactory
                 {
                     if (DateTime.TryParse(stringConstant.Value.GetString(), out var dt))
                     {
-                        var step = new DateTimeConstant(dt);
+                        var step =
+                            new DateTimeConstant(new SCLDateTime(dt))
+                            {
+                                TextLocation = stepToSet.TextLocation
+                            };
+
                         return Result.Success<IStep, IErrorBuilder>(step);
                     }
                 }
@@ -457,7 +464,7 @@ public abstract class StepFactory : IStepFactory
         {
             var stepType = propertyInfo.PropertyType.GenericTypeArguments.Single();
 
-            TypeReference expectedElementType = TypeReference.CreateFromStepType(stepType);
+            var expectedElementType = TypeReference.CreateFromStepType(stepType);
 
             var listType = typeof(List<>).MakeGenericType(stepType);
 
@@ -483,9 +490,9 @@ public abstract class StepFactory : IStepFactory
                 if (freezeResult.IsFailure)
                     errors.Add(freezeResult.Error);
                 else if (freezeResult.Value is IConstantStep constant
-                      && stepType.IsInstanceOfType(constant.ValueObject))
+                      && stepType.IsInstanceOfType(constant.Value))
                 {
-                    addMethod.Invoke(list, new[] { constant.ValueObject });
+                    addMethod.Invoke(list, new object?[] { constant.Value });
                 }
                 else if (stepType.IsInstanceOfType(freezeResult.Value))
                 {
@@ -575,7 +582,7 @@ public abstract class StepFactory : IStepFactory
         }
     }
 
-    private static ArrayNew<T> CreateArray<T>(List<IStep<T>> list)
+    private static ArrayNew<T> CreateArray<T>(List<IStep<T>> list) where T : ISCLObject
     {
         var step = ArrayNew<T>.CreateArray(list);
         return step;

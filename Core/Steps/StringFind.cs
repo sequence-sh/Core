@@ -9,7 +9,7 @@
 [Alias("FindInstance")]
 [SCLExample("StringFind SubString: 'ello' InString: 'hello hello!'", "1")]
 [SCLExample("FindInstance Of: 'ello' In: 'hello hello!'",            "1")]
-public sealed class StringFind : CompoundStep<int>
+public sealed class StringFind : CompoundStep<SCLInt>
 {
     /// <summary>
     /// The string to check.

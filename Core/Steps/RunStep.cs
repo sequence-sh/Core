@@ -4,7 +4,7 @@
 /// Runs another step, reads the output to the end, and ignores it.
 /// </summary>
 [Alias("Run")]
-public sealed class RunStep<T> : CompoundStep<Unit>
+public sealed class RunStep<T> : CompoundStep<Unit> where T : ISCLObject
 {
     /// <inheritdoc />
     protected override async Task<Result<Unit, IError>> Run(
@@ -116,7 +116,7 @@ public sealed class RunStep<T> : CompoundStep<Unit>
                     x => x.TryGetOutputTypeReference(
                         new CallerMetadata(
                             TypeName,
-                            nameof(RunStep<object>.Step),
+                            nameof(RunStep<ISCLObject>.Step),
                             TypeReference.Any.Instance
                         ),
                         typeResolver

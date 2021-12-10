@@ -49,8 +49,8 @@ public class Hash : CompoundStep<StringStream>
     /// </summary>
     [StepProperty(2)]
     [DefaultValueExplanation("MD5")]
-    public IStep<Enums.HashAlgorithm> Algorithm { get; set; } =
-        new EnumConstant<Enums.HashAlgorithm>(Enums.HashAlgorithm.MD5);
+    public IStep<SCLEnum<Enums.HashAlgorithm>> Algorithm { get; set; } =
+        new EnumConstant(Enums.HashAlgorithm.MD5.ConvertToSCLEnum());
 
     /// <inheritdoc />
     public override IStepFactory StepFactory { get; } = new SimpleStepFactory<Hash, StringStream>();

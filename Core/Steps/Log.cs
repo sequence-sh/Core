@@ -6,7 +6,7 @@ namespace Reductech.EDR.Core.Steps;
 /// Write a value to the logs
 /// </summary>
 [SCLExample("Log 'Hello'", null, "Writes 'Hello' to the console.", "Hello")]
-public sealed class Log<T> : CompoundStep<Unit>
+public sealed class Log<T> : CompoundStep<Unit> where T : ISCLObject
 {
     /// <inheritdoc />
     protected override async Task<Result<Unit, IError>> Run(
@@ -60,12 +60,12 @@ public sealed class Log<T> : CompoundStep<Unit>
             CallerMetadata callerMetadata,
             FreezableStepData freezableStepData,
             TypeResolver typeResolver) => freezableStepData
-            .TryGetStep(nameof(Log<object>.Value), StepType)
+            .TryGetStep(nameof(Log<ISCLObject>.Value), StepType)
             .Bind(
                 x => x.TryGetOutputTypeReference(
                     new CallerMetadata(
                         TypeName,
-                        nameof(Log<object>.Value),
+                        nameof(Log<ISCLObject>.Value),
                         TypeReference.Any.Instance
                     ),
                     typeResolver

@@ -3,7 +3,8 @@
 /// <summary>
 /// A step that returns a constant value.
 /// </summary>
-public abstract record ConstantBase<T>(T Value) : IStep<T>, IConstantStep
+public abstract record ConstantBase<T>(T Value)
+    : IStep<T>, IConstantStep where T : ISCLObject
 {
     /// <inheritdoc />
     public async Task<Result<T, IError>> Run(
@@ -15,23 +16,22 @@ public abstract record ConstantBase<T>(T Value) : IStep<T>, IConstantStep
     }
 
     /// <inheritdoc />
-    public abstract string Name { get; }
-
-    /// <inheritdoc />
-    public object ValueObject => Value!;
+    public string Name => Value.Name;
 
     /// <inheritdoc />
     public async Task<Result<T1, IError>> Run<T1>(
         IStateMonad stateMonad,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken) where T1 : ISCLObject
     {
         await Task.CompletedTask;
 
-        var r = Value!.TryConvert<T1>()
+        var r = Value.TryConvert<T1>()
             .MapError(x => x.WithLocation(this));
 
         return r;
     }
+
+    ISCLObject IConstantStep.Value => Value;
 
     /// <inheritdoc />
     public Result<Unit, IError> Verify(StepFactoryStore stepFactoryStore) => Unit.Default;
@@ -43,7 +43,7 @@ public abstract record ConstantBase<T>(T Value) : IStep<T>, IConstantStep
     public Type OutputType => typeof(T);
 
     /// <inheritdoc />
-    public abstract string Serialize();
+    public string Serialize() => Value.Serialize();
 
     /// <inheritdoc />
     public IEnumerable<Requirement> RuntimeRequirements
@@ -60,7 +60,7 @@ public abstract record ConstantBase<T>(T Value) : IStep<T>, IConstantStep
     /// <summary>
     /// Converts this to an EntityValue
     /// </summary>
-    /// <returns></returns>
+    [Obsolete]
     protected abstract EntityValue ToEntityValue();
 
     /// <inheritdoc />
@@ -74,94 +74,53 @@ public record StringConstant
     (StringStream Value) : ConstantBase<StringStream>(Value)
 {
     /// <inheritdoc />
-    public override string Serialize() => Value.Serialize();
-
-    /// <inheritdoc />
-    public override string Name => Value.GetString();
-
-    /// <inheritdoc />
     protected override EntityValue ToEntityValue() => new EntityValue.String(Value.GetString());
 }
 
 /// <summary>
 /// A Constant int
 /// </summary>
-public record IntConstant(int Value) : ConstantBase<int>(Value)
+public record IntConstant(SCLInt Value) : ConstantBase<SCLInt>(Value)
 {
     /// <inheritdoc />
-    public override string Serialize() => Value.ToString();
-
-    /// <inheritdoc />
-    public override string Name => Value.ToString();
-
-    /// <inheritdoc />
-    protected override EntityValue ToEntityValue() => new EntityValue.Integer(Value);
+    protected override EntityValue ToEntityValue() => new EntityValue.Integer(Value.Value);
 }
 
 /// <summary>
 /// A constant double
 /// </summary>
-public record DoubleConstant(double Value) : ConstantBase<double>(Value)
+public record DoubleConstant(SCLDouble Value) : ConstantBase<SCLDouble>(Value)
 {
     /// <inheritdoc />
-    public override string Serialize() => Value.ToString(Constants.DoubleFormat);
-
-    /// <inheritdoc />
-    public override string Name => Value.ToString(Constants.DoubleFormat);
-
-    /// <inheritdoc />
-    protected override EntityValue ToEntityValue() => new EntityValue.Double(Value);
+    protected override EntityValue ToEntityValue() => new EntityValue.Double(Value.Value);
 }
 
 /// <summary>
 /// A constant bool
 /// </summary>
-public record BoolConstant(bool Value) : ConstantBase<bool>(Value)
+public record BoolConstant(SCLBool Value) : ConstantBase<SCLBool>(Value)
 {
     /// <inheritdoc />
-    public override string Serialize() => Value.ToString();
-
-    /// <inheritdoc />
-    public override string Name => Value.ToString();
-
-    /// <inheritdoc />
-    protected override EntityValue ToEntityValue() => new EntityValue.Boolean(Value);
+    protected override EntityValue ToEntityValue() => new EntityValue.Boolean(Value.Value);
 }
 
 /// <summary>
 /// A constant enum value
 /// </summary>
-public record EnumConstant<T>(T Value) : ConstantBase<T>(Value) where T : Enum
+public record EnumConstant<TEnum>(SCLEnum<TEnum> Value) : ConstantBase<SCLEnum<TEnum>>(Value)
+    where TEnum : Enum
 {
     /// <inheritdoc />
-    public override string Serialize()
-    {
-        return ToEnumeration().ToString();
-    }
-
-    /// <inheritdoc />
-    public override string Name => ToEnumeration().Value;
-
-    private Enumeration ToEnumeration() => new(typeof(T).Name, Value.ToString());
-
-    /// <inheritdoc />
-    protected override EntityValue ToEntityValue() =>
-        new EntityValue.EnumerationValue(ToEnumeration());
+    protected override EntityValue ToEntityValue() => new EntityValue.EnumerationValue(Value);
 }
 
 /// <summary>
 /// A constant date time value
 /// </summary>
-public record DateTimeConstant(DateTime Value) : ConstantBase<DateTime>(Value)
+public record DateTimeConstant(SCLDateTime Value) : ConstantBase<SCLDateTime>(Value)
 {
     /// <inheritdoc />
-    public override string Serialize() => Value.ToString(Constants.DateTimeFormat);
-
-    /// <inheritdoc />
-    public override string Name => Value.ToString(Constants.DateTimeFormat);
-
-    /// <inheritdoc />
-    protected override EntityValue ToEntityValue() => new EntityValue.DateTime(Value);
+    protected override EntityValue ToEntityValue() => new EntityValue.DateTime(Value.Value);
 }
 
 /// <summary>
@@ -169,12 +128,6 @@ public record DateTimeConstant(DateTime Value) : ConstantBase<DateTime>(Value)
 /// </summary>
 public record EntityConstant(Entity Value) : ConstantBase<Entity>(Value)
 {
-    /// <inheritdoc />
-    public override string Serialize() => Value.Serialize();
-
-    /// <inheritdoc />
-    public override string Name => Value.Serialize();
-
     /// <inheritdoc />
     protected override EntityValue ToEntityValue() => new EntityValue.NestedEntity(Value);
 }

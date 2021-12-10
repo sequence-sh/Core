@@ -3,7 +3,7 @@
 /// <summary>
 /// Calculates the length of the string.
 /// </summary>
-public sealed class StringLength : CompoundStep<int>
+public sealed class StringLength : CompoundStep<SCLInt>
 {
     /// <summary>
     /// The string to measure the length of.

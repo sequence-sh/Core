@@ -257,14 +257,14 @@ public sealed class Transform : CompoundStep<Array<Entity>>
     /// </summary>
     [StepProperty]
     [DefaultValueExplanation("False")]
-    public IStep<bool> CaseSensitive { get; set; } = new BoolConstant(false);
+    public IStep<SCLBool> CaseSensitive { get; set; } = new BoolConstant(SCLBool.False);
 
     /// <summary>
     /// Whether additional properties outside the schema should be removed
     /// </summary>
     [StepProperty]
     [DefaultValueExplanation("True if the Schema does not allow extra properties")]
-    public IStep<bool>? RemoveExtraProperties { get; set; } = null;
+    public IStep<SCLBool>? RemoveExtraProperties { get; set; } = null;
 
     /// <inheritdoc />
     public override IStepFactory StepFactory { get; } =

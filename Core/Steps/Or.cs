@@ -3,12 +3,12 @@
 /// <summary>
 /// Returns true if any terms are true
 /// </summary>
-public sealed class Or : BaseOperatorStep<Or, bool, bool>
+public sealed class Or : BaseOperatorStep<Or, SCLBool, SCLBool>
 {
     /// <inheritdoc />
-    protected override Result<bool, IErrorBuilder> Operate(IEnumerable<bool> terms)
+    protected override Result<SCLBool, IErrorBuilder> Operate(IEnumerable<SCLBool> terms)
     {
-        return terms.Any(x => x);
+        return terms.Any(x => x.Value).ConvertToSCLObject();
     }
 
     /// <inheritdoc />

@@ -21,14 +21,14 @@ public sealed class StringSubstring : CompoundStep<StringStream>
     /// </summary>
     [StepProperty(3)]
     [DefaultValueExplanation("0")]
-    public IStep<int> Index { get; set; } = new IntConstant(0);
+    public IStep<SCLInt> Index { get; set; } = new IntConstant(0);
 
     /// <summary>
     /// The length of the substring to extract.
     /// </summary>
     [StepProperty(2)]
     [Required]
-    public IStep<int> Length { get; set; } = null!;
+    public IStep<SCLInt> Length { get; set; } = null!;
 
     /// <inheritdoc />
     protected override async Task<Result<StringStream, IError>> Run(

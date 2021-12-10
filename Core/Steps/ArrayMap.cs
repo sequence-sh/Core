@@ -20,6 +20,8 @@
 [Alias("EntityMap")] // legacy name
 [Alias("Map")]
 public sealed class ArrayMap<TIn, TOut> : CompoundStep<Array<TOut>>
+    where TIn : ISCLObject
+    where TOut : ISCLObject
 {
     /// <inheritdoc />
     protected override async Task<Result<Array<TOut>, IError>> Run(
@@ -39,7 +41,7 @@ public sealed class ArrayMap<TIn, TOut> : CompoundStep<Array<TOut>>
                 stateMonad,
                 currentState,
                 Function.VariableNameOrItem,
-                new KeyValuePair<VariableName, object>(Function.VariableNameOrItem, record!)
+                new KeyValuePair<VariableName, object>(Function.VariableNameOrItem, record)
             );
 
             var result = await Function.StepTyped.Run(scopedMonad, cancellationToken);
@@ -85,7 +87,7 @@ public sealed class ArrayMap<TIn, TOut> : CompoundStep<Array<TOut>>
         /// </summary>
         public static StepFactory Instance { get; } = new ArrayMapStepFactory();
 
-        private string ArrayPropertyName => nameof(ArrayMap<object, object>.Array);
+        private string ArrayPropertyName => nameof(ArrayMap<ISCLObject, ISCLObject>.Array);
 
         /// <inheritdoc />
         public override Result<TypeReference, IError> TryGetOutputTypeReference(
@@ -214,6 +216,6 @@ public sealed class ArrayMap<TIn, TOut> : CompoundStep<Array<TOut>>
             return result;
         }
 
-        private string LambdaPropertyName => nameof(ArrayMap<object, object>.Function);
+        private string LambdaPropertyName => nameof(ArrayMap<ISCLObject, ISCLObject>.Function);
     }
 }

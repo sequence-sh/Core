@@ -5,6 +5,9 @@
 /// </summary>
 public abstract class BaseOperatorStep<TStep, TElement, TOutput> : CompoundStep<TOutput>
     where TStep : BaseOperatorStep<TStep, TElement, TOutput>, new()
+    where TElement : ISCLObject
+    where TOutput : ISCLObject
+
 {
     /// <summary>
     /// The terms to operate on

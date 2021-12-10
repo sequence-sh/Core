@@ -104,7 +104,7 @@ public sealed class SchemaCreateCoerced : CompoundStep<Entity>
     /// </summary>
     [StepProperty]
     [DefaultValueExplanation("false")]
-    public IStep<bool> AllowExtraProperties { get; set; } = new BoolConstant(false);
+    public IStep<SCLBool> AllowExtraProperties { get; set; } = new BoolConstant(SCLBool.False);
 
     /// <summary>
     /// ISO 8601 Date Formats to use for strings representing dates
@@ -112,7 +112,11 @@ public sealed class SchemaCreateCoerced : CompoundStep<Entity>
     /// </summary>
     [StepProperty()]
     [DefaultValueExplanation("yyyy-MM-ddTHH:mm:ssK")]
-    public IStep<OneOf<StringStream, Array<StringStream>, Entity>>? DateInputFormats { get; set; } =
+    public IStep<SCLOneOf<StringStream, Array<StringStream>, Entity>>? DateInputFormats
+    {
+        get;
+        set;
+    } =
         new OneOfStep<StringStream, Array<StringStream>, Entity>(
             new StringConstant("yyyy-MM-ddTHH:mm:ssK")
         );
@@ -123,7 +127,11 @@ public sealed class SchemaCreateCoerced : CompoundStep<Entity>
     /// </summary>
     [StepProperty()]
     [DefaultValueExplanation("True")]
-    public IStep<OneOf<StringStream, Array<StringStream>, Entity>>? BooleanTrueFormats { get; set; }
+    public IStep<SCLOneOf<StringStream, Array<StringStream>, Entity>>? BooleanTrueFormats
+    {
+        get;
+        set;
+    }
         = new OneOfStep<StringStream, Array<StringStream>, Entity>(
             ArrayNew<StringStream>.CreateArray(
                 new[] { "True" }.Select(
@@ -167,5 +175,5 @@ public sealed class SchemaCreateCoerced : CompoundStep<Entity>
     /// </summary>
     [StepProperty]
     [DefaultValueExplanation("False")]
-    public IStep<bool> CaseSensitive { get; set; } = new BoolConstant(false);
+    public IStep<SCLBool> CaseSensitive { get; set; } = new BoolConstant(SCLBool.False);
 }

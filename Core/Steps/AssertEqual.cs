@@ -4,7 +4,7 @@
 /// Asserts that two objects are equal.
 /// Both objects must have the same type.
 /// </summary>
-public sealed class AssertEqual<T> : CompoundStep<Unit>
+public sealed class AssertEqual<T> : CompoundStep<Unit> where T : ISCLObject
 {
     /// <inheritdoc />
     protected override async Task<Result<Unit, IError>> Run(

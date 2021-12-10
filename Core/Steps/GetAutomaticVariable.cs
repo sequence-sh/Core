@@ -3,8 +3,7 @@
 /// <summary>
 /// Gets the value of the automatic variable
 /// </summary>
-/// <typeparam name="T"></typeparam>
-public sealed class GetAutomaticVariable<T> : CompoundStep<T>
+public sealed class GetAutomaticVariable<T> : CompoundStep<T> where T : ISCLObject
 {
     /// <inheritdoc />
     #pragma warning disable 1998

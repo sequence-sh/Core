@@ -4,6 +4,7 @@
 /// An array backed by a list
 /// </summary>
 public sealed record EagerArray<T>(IReadOnlyList<T> List) : Array<T>, IEquatable<Array<T>>
+    where T : ISCLObject
 {
     /// <summary>
     /// Empty constructor for reflection
@@ -115,7 +116,7 @@ public sealed record EagerArray<T>(IReadOnlyList<T> List) : Array<T>, IEquatable
     }
 
     /// <inheritdoc />
-    public override string NameInLogs => List.Count + " Elements";
+    public override string Name => List.Count + " Elements";
 
     /// <inheritdoc />
     public override int GetHashCode() => GetHashCodeValue(this);
@@ -136,7 +137,7 @@ public sealed record EagerArray<T>(IReadOnlyList<T> List) : Array<T>, IEquatable
         return List.Count switch
         {
             0     => "Empty Eager Array",
-            <= 10 => "[" + string.Join(", ", List.Select(x => x!.ToString())) + "]",
+            <= 10 => "[" + string.Join(", ", List.Select(x => x.ToString())) + "]",
             _     => $"Eager Array with {List.Count} Elements"
         };
     }
@@ -151,7 +152,7 @@ public sealed record EagerArray<T>(IReadOnlyList<T> List) : Array<T>, IEquatable
     }
 
     /// <inheritdoc />
-    public override string Serialize =>
+    public override string Serialize() =>
         SerializationMethods.SerializeList(
             List.Select(x => SerializationMethods.SerializeObject(x))
         );

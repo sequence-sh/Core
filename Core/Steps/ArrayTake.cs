@@ -6,7 +6,7 @@
 [Alias("Take")]
 [SCLExample("ArrayTake [1, 2, 3] 2",               "[1, 2]")]
 [SCLExample("Take From: [1, 2, 3, 4, 5] Count: 3", "[1, 2, 3]")]
-public sealed class ArrayTake<T> : CompoundStep<Array<T>>
+public sealed class ArrayTake<T> : CompoundStep<Array<T>> where T : ISCLObject
 {
     /// <inheritdoc />
     protected override async Task<Result<Array<T>, IError>> Run(
@@ -20,7 +20,7 @@ public sealed class ArrayTake<T> : CompoundStep<Array<T>>
 
         var (array, count) = r.Value;
 
-        return array.Take(count);
+        return array.Take(count.Value);
     }
 
     /// <summary>
@@ -36,7 +36,7 @@ public sealed class ArrayTake<T> : CompoundStep<Array<T>>
     /// </summary>
     [StepProperty(2)]
     [Required]
-    public IStep<int> Count { get; set; } = null!;
+    public IStep<SCLInt> Count { get; set; } = null!;
 
     /// <inheritdoc />
     public override IStepFactory StepFactory { get; } = ArrayTakeStepFactory.Instance;
@@ -72,7 +72,7 @@ public sealed class ArrayTake<T> : CompoundStep<Array<T>>
         }
 
         /// <inheritdoc />
-        protected override string ArrayPropertyName => nameof(ArrayTake<object>.Array);
+        protected override string ArrayPropertyName => nameof(ArrayTake<ISCLObject>.Array);
 
         protected override string? LambdaPropertyName => null;
     }

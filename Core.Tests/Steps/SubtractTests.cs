@@ -13,7 +13,7 @@ public partial class SubtractTests : StepTestBase<Subtract, int>
                 "No numbers",
                 new Subtract()
                 {
-                    Terms = new ArrayNew<int>() { Elements = new List<IStep<int>>() }
+                    Terms = new ArrayNew<int>() { Elements = new List<IStep<SCLInt>>() }
                 },
                 0
             );

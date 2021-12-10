@@ -90,5 +90,5 @@ public sealed class SchemaCreate : CompoundStep<Entity>
     /// </summary>
     [StepProperty]
     [DefaultValueExplanation("false")]
-    public IStep<bool> AllowExtraProperties { get; set; } = new BoolConstant(false);
+    public IStep<SCLBool> AllowExtraProperties { get; set; } = new BoolConstant(SCLBool.False);
 }

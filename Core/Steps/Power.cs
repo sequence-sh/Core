@@ -3,10 +3,10 @@
 /// <summary>
 /// Raises an integer to the power of a list of integers sequentially
 /// </summary>
-public sealed class Power : BaseOperatorStep<Power, int, int>
+public sealed class Power : BaseOperatorStep<Power, SCLInt, SCLInt>
 {
     /// <inheritdoc />
-    protected override Result<int, IErrorBuilder> Operate(IEnumerable<int> terms)
+    protected override Result<SCLInt, IErrorBuilder> Operate(IEnumerable<SCLInt> terms)
     {
         var total = 0;
         var first = true;
@@ -15,16 +15,16 @@ public sealed class Power : BaseOperatorStep<Power, int, int>
         {
             if (first)
             {
-                total += number;
+                total += number.Value;
                 first =  false;
             }
             else
             {
-                total = Convert.ToInt32(Math.Pow(total, number));
+                total = Convert.ToInt32(Math.Pow(total, number.Value));
             }
         }
 
-        return total;
+        return total.ConvertToSCLObject();
     }
 
     /// <inheritdoc />
