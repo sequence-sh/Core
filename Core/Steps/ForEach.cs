@@ -43,7 +43,7 @@ public sealed class ForEach<T> : CompoundStep<Unit> where T : ISCLObject
                 stateMonad,
                 currentState,
                 Action.VariableNameOrItem,
-                new KeyValuePair<VariableName, object>(Action.VariableNameOrItem, element!)
+                new KeyValuePair<VariableName, ISCLObject>(Action.VariableNameOrItem, element)
             );
 
             var result = await Action.StepTyped.Run(scopedMonad, cancellation);

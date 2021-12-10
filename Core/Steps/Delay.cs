@@ -17,7 +17,7 @@ public sealed class Delay : CompoundStep<Unit>
         if (ms.IsFailure)
             return ms.ConvertFailure<Unit>();
 
-        await Task.Delay(ms.Value, cancellationToken);
+        await Task.Delay(ms.Value.Value, cancellationToken);
 
         return Unit.Default;
     }

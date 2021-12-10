@@ -21,11 +21,11 @@ public static class FreezableFactory
         var entityGetValueDict = new StepParameterDict
         {
             {
-                new StepParameterReference.Named(nameof(EntityGetValue<int>.Entity)),
+                new StepParameterReference.Named(nameof(EntityGetValue<SCLInt>.Entity)),
                 new FreezableStepProperty.Step(entityOrArray, location)
             },
             {
-                new StepParameterReference.Named(nameof(EntityGetValue<int>.Property)),
+                new StepParameterReference.Named(nameof(EntityGetValue<SCLInt>.Property)),
                 new FreezableStepProperty.Step(indexer, location)
             },
         };
@@ -41,11 +41,11 @@ public static class FreezableFactory
         var elementAtIndexDict = new StepParameterDict
         {
             {
-                new StepParameterReference.Named(nameof(ArrayElementAtIndex<object>.Array)),
+                new StepParameterReference.Named(nameof(ArrayElementAtIndex<ISCLObject>.Array)),
                 new FreezableStepProperty.Step(entityOrArray, location)
             },
             {
-                new StepParameterReference.Named(nameof(ArrayElementAtIndex<object>.Index)),
+                new StepParameterReference.Named(nameof(ArrayElementAtIndex<ISCLObject>.Index)),
                 new FreezableStepProperty.Step(indexer, location)
             },
         };
@@ -97,11 +97,11 @@ public static class FreezableFactory
         var dict = new StepParameterDict
         {
             {
-                new StepParameterReference.Named(nameof(Sequence<object>.InitialSteps)),
+                new StepParameterReference.Named(nameof(Sequence<ISCLObject>.InitialSteps)),
                 new FreezableStepProperty.StepList(steps.ToImmutableList(), location)
             },
             {
-                new StepParameterReference.Named(nameof(Sequence<object>.FinalStep)),
+                new StepParameterReference.Named(nameof(Sequence<ISCLObject>.FinalStep)),
                 new FreezableStepProperty.Step(finalStep, location)
             },
         };
@@ -125,7 +125,7 @@ public static class FreezableFactory
         var dict = new StepParameterDict
         {
             {
-                new StepParameterReference.Named(nameof(GetVariable<object>.Variable)),
+                new StepParameterReference.Named(nameof(GetVariable<ISCLObject>.Variable)),
                 new FreezableStepProperty.Variable(variableName, location)
             }
         };
@@ -152,9 +152,10 @@ public static class FreezableFactory
         var dict = new StepParameterDict
         {
             {
-                new StepParameterReference.Named(nameof(SetVariable<object>.Variable)), variableName
+                new StepParameterReference.Named(nameof(SetVariable<ISCLObject>.Variable)),
+                variableName
             },
-            { new StepParameterReference.Named(nameof(SetVariable<object>.Value)), value },
+            { new StepParameterReference.Named(nameof(SetVariable<ISCLObject>.Value)), value },
         };
 
         var fpd = new FreezableStepData(dict, location);
@@ -197,7 +198,7 @@ public static class FreezableFactory
         var dict = new StepParameterDict
         {
             {
-                new StepParameterReference.Named(nameof(ArrayNew<object>.Elements)),
+                new StepParameterReference.Named(nameof(ArrayNew<ISCLObject>.Elements)),
                 new FreezableStepProperty.StepList(elements, location)
             }
         };
@@ -285,7 +286,7 @@ public static class InfixHelper
     private static readonly ILookup<string, OperatorData1> OperatorLookup =
         new List<OperatorData1>()
             {
-                new("+", "ArrayConcat", nameof(ArrayConcat<int>.Arrays)),
+                new("+", "ArrayConcat", nameof(ArrayConcat<SCLInt>.Arrays)),
                 new("+", nameof(Sum), nameof(Sum.Terms)),
                 new("+", nameof(DoubleSum), nameof(DoubleSum.Terms)),
                 new("-", nameof(Subtract), nameof(Subtract.Terms)),

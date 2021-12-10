@@ -23,7 +23,7 @@ public class Hash : CompoundStep<StringStream>
         if (algorithm.IsFailure)
             return algorithm.ConvertFailure<StringStream>();
 
-        var hashAlgorithm = Create(algorithm.Value);
+        var hashAlgorithm = Create(algorithm.Value.Value);
 
         var hash = await hashAlgorithm.ComputeHashAsync(
             data.Value.GetStream().stream,
@@ -50,7 +50,9 @@ public class Hash : CompoundStep<StringStream>
     [StepProperty(2)]
     [DefaultValueExplanation("MD5")]
     public IStep<SCLEnum<Enums.HashAlgorithm>> Algorithm { get; set; } =
-        new EnumConstant(Enums.HashAlgorithm.MD5.ConvertToSCLEnum());
+        new EnumConstant<Enums.HashAlgorithm>(
+            new SCLEnum<Enums.HashAlgorithm>(Enums.HashAlgorithm.MD5)
+        );
 
     /// <inheritdoc />
     public override IStepFactory StepFactory { get; } = new SimpleStepFactory<Hash, StringStream>();

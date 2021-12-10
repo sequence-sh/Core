@@ -64,7 +64,10 @@ public sealed class For : CompoundStep<Unit>
             stateMonad,
             stateMonad.GetState().ToImmutableDictionary(),
             variableName,
-            new KeyValuePair<VariableName, object>(variableName, currentValue)
+            new KeyValuePair<VariableName, ISCLObject>(
+                variableName,
+                currentValue.ConvertToSCLObject()
+            )
         );
 
         while (increment.Value.Value > 0
@@ -76,18 +79,18 @@ public sealed class For : CompoundStep<Unit>
             if (r.IsFailure)
                 return r;
 
-            var currentValueResult = scopedStateMonad.GetVariable<int>(variableName)
+            var currentValueResult = scopedStateMonad.GetVariable<SCLInt>(variableName)
                 .MapError(e => e.WithLocation(this));
 
             if (currentValueResult.IsFailure)
                 return currentValueResult.ConvertFailure<Unit>();
 
-            currentValue =  currentValueResult.Value;
+            currentValue =  currentValueResult.Value.Value;
             currentValue += increment.Value.Value;
 
             var setResult2 = await scopedStateMonad.SetVariableAsync(
                 variableName,
-                currentValue,
+                currentValue.ConvertToSCLObject(),
                 false,
                 this,
                 cancellationToken

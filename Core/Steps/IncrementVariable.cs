@@ -27,14 +27,14 @@ public sealed class IncrementVariable : CompoundStep<Unit>
     [StepProperty(2)]
     [DefaultValueExplanation("1")]
     [Alias("By")]
-    public IStep<SCLInt> Amount { get; set; } = new IntConstant(1);
+    public IStep<SCLInt> Amount { get; set; } = new IntConstant(1.ConvertToSCLObject());
 
     /// <inheritdoc />
     protected override async Task<Result<Unit, IError>> Run(
         IStateMonad stateMonad,
         CancellationToken cancellationToken)
     {
-        var variable = stateMonad.GetVariable<int>(Variable).MapError(x => x.WithLocation(this));
+        var variable = stateMonad.GetVariable<SCLInt>(Variable).MapError(x => x.WithLocation(this));
 
         if (variable.IsFailure)
             return variable.ConvertFailure<Unit>();
@@ -46,7 +46,7 @@ public sealed class IncrementVariable : CompoundStep<Unit>
 
         var r = await stateMonad.SetVariableAsync(
             Variable,
-            variable.Value + amount.Value,
+            (variable.Value.Value + amount.Value.Value).ConvertToSCLObject(),
             false,
             this,
             cancellationToken

@@ -88,49 +88,49 @@ public record DateTimeConstantFreezable
         TypeResolver typeResolver) => new DateTimeConstant(Value);
 }
 
-/// <summary>
-/// An Enum Constant
-/// </summary>
-public record EnumConstantFreezable
-    (ISCLEnum Value, TextLocation TextLocation) : ConstantFreezableBase<ISCLEnum>(
-        Value,
-        TextLocation
-    )
-{
-    /// <inheritdoc />
-    public override Result<IStep, IError> TryFreeze(
-        CallerMetadata callerMetadata,
-        TypeResolver typeResolver)
-    {
-        return new EnumConstant(Value);
+///// <summary>
+///// An Enum Constant
+///// </summary>
+//public record EnumConstantFreezable //TODO add this back???
+//    (ISCLEnum Value, TextLocation TextLocation) : ConstantFreezableBase<ISCLEnum>(
+//        Value,
+//        TextLocation
+//    )
+//{
+//    /// <inheritdoc />
+//    public override Result<IStep, IError> TryFreeze(
+//        CallerMetadata callerMetadata,
+//        TypeResolver typeResolver)
+//    {
+//        return new EnumConstant(Value);
 
-        //var type = TryGetType(typeResolver);
+//        //var type = TryGetType(typeResolver);
 
-        //if (type.IsFailure)
-        //    return type.ConvertFailure<IStep>();
+//        //if (type.IsFailure)
+//        //    return type.ConvertFailure<IStep>();
 
-        //if (Enum.TryParse(type.Value, Value.Value, true, out var o))
-        //    return TryCreateEnumConstant(o!).MapError(x => x.WithLocation(this));
+//        //if (Enum.TryParse(type.Value, Value.Value, true, out var o))
+//        //    return TryCreateEnumConstant(o!).MapError(x => x.WithLocation(this));
 
-        //return (SingleError)ErrorCode.UnexpectedEnumValue.ToErrorBuilder(Value.Type, Value.Value)
-        //    .WithLocation(this);
-    }
+//        //return (SingleError)ErrorCode.UnexpectedEnumValue.ToErrorBuilder(Value.Type, Value.Value)
+//        //    .WithLocation(this);
+//    }
 
-    ///// <inheritdoc />
-    //public override Result<TypeReference, IError> TryGetOutputTypeReference(
-    //    CallerMetadata callerMetadata,
-    //    TypeResolver typeResolver) => TryGetType(typeResolver)
-    //    .Map(TypeReference.Create);
+//    ///// <inheritdoc />
+//    //public override Result<TypeReference, IError> TryGetOutputTypeReference(
+//    //    CallerMetadata callerMetadata,
+//    //    TypeResolver typeResolver) => TryGetType(typeResolver)
+//    //    .Map(TypeReference.Create);
 
-    //private Result<Type, IError> TryGetType(TypeResolver typeResolver)
-    //{
-    //    if (typeResolver.StepFactoryStore.EnumTypesDictionary.TryGetValue(Value.Type, out var t))
-    //        return t;
+//    //private Result<Type, IError> TryGetType(TypeResolver typeResolver)
+//    //{
+//    //    if (typeResolver.StepFactoryStore.EnumTypesDictionary.TryGetValue(Value.Type, out var t))
+//    //        return t;
 
-    //    return (SingleError)ErrorCode.UnexpectedEnumType.ToErrorBuilder(Value.Type)
-    //        .WithLocation(this);
-    //}
-}
+//    //    return (SingleError)ErrorCode.UnexpectedEnumType.ToErrorBuilder(Value.Type)
+//    //        .WithLocation(this);
+//    //}
+//}
 
 /// <summary>
 /// A freezable step which represents a constant value.

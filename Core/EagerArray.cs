@@ -153,9 +153,7 @@ public sealed record EagerArray<T>(IReadOnlyList<T> List) : Array<T>, IEquatable
 
     /// <inheritdoc />
     public override string Serialize() =>
-        SerializationMethods.SerializeList(
-            List.Select(x => SerializationMethods.SerializeObject(x))
-        );
+        SerializationMethods.SerializeList(List.Select(x => x.Serialize()));
 
     /// <inheritdoc />
     public override Result<Array<TElement>, IErrorBuilder> TryConvertElements<TElement>()

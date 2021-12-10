@@ -21,12 +21,12 @@ public sealed class StringInterpolate : CompoundStep<StringStream>
 
         foreach (var step in Strings)
         {
-            var o = await step.Run<object>(stateMonad, cancellationToken);
+            var o = await step.Run<ISCLObject>(stateMonad, cancellationToken);
 
             if (o.IsFailure)
                 return o.ConvertFailure<StringStream>();
 
-            var s = await SerializationMethods.GetStringAsync(o.Value);
+            var s = o.Value.Serialize();
 
             sb.Append(s);
         }

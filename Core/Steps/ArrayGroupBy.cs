@@ -34,7 +34,7 @@ public sealed class ArrayGroupBy<T> : CompoundStep<Array<Entity>> where T : ISCL
                 stateMonad,
                 currentState,
                 Function.VariableNameOrItem,
-                new KeyValuePair<VariableName, object>(Function.VariableNameOrItem, record!)
+                new KeyValuePair<VariableName, ISCLObject>(Function.VariableNameOrItem, record!)
             );
 
             var result = await Function.StepTyped.Run(scopedMonad, cancellationToken);

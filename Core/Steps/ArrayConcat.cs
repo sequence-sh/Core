@@ -69,7 +69,7 @@ public sealed class ArrayConcat<T> : CompoundStep<Array<T>> where T : ISCLObject
                 return expectedMemberType.ConvertFailure<TypeReference>();
 
             var arraysStep = freezableStepData.TryGetStep(
-                nameof(ArrayConcat<object>.Arrays),
+                nameof(ArrayConcat<ISCLObject>.Arrays),
                 StepType
             );
 
@@ -82,7 +82,7 @@ public sealed class ArrayConcat<T> : CompoundStep<Array<T>> where T : ISCLObject
             var arraysStepGenericType = arraysStep.Value.TryGetOutputTypeReference(
                         new CallerMetadata(
                             TypeName,
-                            nameof(ArrayConcat<object>.Arrays),
+                            nameof(ArrayConcat<ISCLObject>.Arrays),
                             expectedArraysStepType
                         ),
                         typeResolver

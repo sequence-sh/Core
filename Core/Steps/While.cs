@@ -17,7 +17,7 @@ public sealed class While : CompoundStep<Unit>
             if (conditionResult.IsFailure)
                 return conditionResult.ConvertFailure<Unit>();
 
-            if (conditionResult.Value)
+            if (conditionResult.Value.Value)
             {
                 var actionResult = await Action.Run(stateMonad, cancellationToken);
 

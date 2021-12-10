@@ -30,7 +30,7 @@ public sealed class DoXTimes : CompoundStep<Unit> //TODO replace with a lambda f
         if (numberResult.IsFailure)
             return numberResult.ConvertFailure<Unit>();
 
-        for (var i = 0; i < numberResult.Value; i++)
+        for (var i = 0; i < numberResult.Value.Value; i++)
         {
             var result = await Action.Run(stateMonad, cancellationToken);
 

@@ -160,7 +160,7 @@ public sealed record LazyArray<T>
         if (r.IsSuccess)
             return SerializationMethods.SerializeList(
                 r.Value
-                    .Select(x => SerializationMethods.SerializeObject(x))
+                    .Select(x => x.Serialize())
             );
 
         return r.Error.AsString;

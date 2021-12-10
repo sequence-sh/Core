@@ -1,5 +1,4 @@
-﻿using System.Globalization;
-using System.Text;
+﻿using System.Text;
 
 namespace Reductech.EDR.Core.Internal.Serialization;
 
@@ -167,53 +166,53 @@ public static class SerializationMethods
         }
     }
 
-    /// <summary>
-    /// Converts an object to a string suitable for printing
-    /// </summary>
-    public static string GetString(object? obj)
-    {
-        return
-            obj switch
-            {
-                Entity entity   => entity.Serialize(),
-                StringStream ss => ss.GetString(),
-                DateTime dt     => dt.ToString(Constants.DateTimeFormat),
-                double d        => d.ToString(Constants.DoubleFormat, new NumberFormatInfo()),
-                IArray array    => array.Name,
-                SCLNull         => "Null",
-                _               => obj?.ToString()!
-            };
-    }
+    ///// <summary>
+    ///// Converts an object to a string suitable for printing
+    ///// </summary>
+    //public static string GetString(object? obj)
+    //{
+    //    return
+    //        obj switch
+    //        {
+    //            Entity entity   => entity.Serialize(),
+    //            StringStream ss => ss.GetString(),
+    //            DateTime dt     => dt.ToString(Constants.DateTimeFormat),
+    //            double d        => d.ToString(Constants.DoubleFormat, new NumberFormatInfo()),
+    //            IArray array    => array.Name,
+    //            SCLNull         => "Null",
+    //            _               => obj?.ToString()!
+    //        };
+    //}
 
-    /// <summary>
-    /// Serialize any object
-    /// </summary>
-    public static string SerializeObject(object? obj)
-    {
-        return
-            obj switch
-            {
-                Entity entity   => entity.Serialize(),
-                StringStream ss => ss.Serialize(),
-                DateTime dt     => dt.ToString(Constants.DateTimeFormat),
-                double d        => d.ToString(Constants.DoubleFormat, new NumberFormatInfo()),
-                Enumeration enu => enu.Serialize,
-                IArray array    => array.Serialize,
-                SCLNull         => "Null",
-                _               => obj?.ToString()!
-            };
-    }
+    ///// <summary>
+    ///// Serialize any object
+    ///// </summary>
+    //public static string SerializeObject(object? obj)
+    //{
+    //    return
+    //        obj switch
+    //        {
+    //            Entity entity   => entity.Serialize(),
+    //            StringStream ss => ss.Serialize(),
+    //            DateTime dt     => dt.ToString(Constants.DateTimeFormat),
+    //            double d        => d.ToString(Constants.DoubleFormat, new NumberFormatInfo()),
+    //            Enumeration enu => enu.Serialize,
+    //            IArray array    => array.Serialize,
+    //            SCLNull         => "Null",
+    //            _               => obj?.ToString()!
+    //        };
+    //}
 
-    /// <summary>
-    /// Converts an object to a string suitable from printing
-    /// </summary>
-    public static async Task<string> GetStringAsync(object? obj)
-    {
-        return
-            obj switch
-            {
-                StringStream ss => await ss.GetStringAsync(),
-                _               => GetString(obj)
-            };
-    }
+    ///// <summary>
+    ///// Converts an object to a string suitable from printing
+    ///// </summary>
+    //public static async Task<string> GetStringAsync(object? obj)
+    //{
+    //    return
+    //        obj switch
+    //        {
+    //            StringStream ss => await ss.GetStringAsync(),
+    //            _               => GetString(obj)
+    //        };
+    //}
 }
