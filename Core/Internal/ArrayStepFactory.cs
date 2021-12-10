@@ -1,10 +1,4 @@
-﻿using System;
-using CSharpFunctionalExtensions;
-using Reductech.EDR.Core.Internal.Errors;
-using Reductech.EDR.Core.Util;
-
-namespace Reductech.EDR.Core.Internal
-{
+﻿namespace Reductech.EDR.Core.Internal;
 
 /// <summary>
 /// Step factory for types which manipulate arrays
@@ -63,7 +57,7 @@ public abstract class ArrayStepFactory : GenericStepFactory
             .TryGetArrayMemberTypeReference(typeResolver)
             .MapError(e => e.WithLocation(freezableStepData));
 
-        TypeReference arrayMemberType =
+        var arrayMemberType =
             arrayMemberTypeResult.ToMaybe().GetValueOrDefault(TypeReference.Unknown.Instance);
 
         if (LambdaPropertyName is null)
@@ -90,6 +84,4 @@ public abstract class ArrayStepFactory : GenericStepFactory
 
         return realType;
     }
-}
-
 }

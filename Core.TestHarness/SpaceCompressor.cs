@@ -1,7 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 
-namespace Reductech.EDR.Core.TestHarness
-{
+namespace Reductech.EDR.Core.TestHarness;
 
 public static class SpaceCompressor
 {
@@ -19,6 +18,4 @@ public static class SpaceCompressor
     public static string CompressSpaces(string text) => SpaceRegex.Replace(text, " ");
 
     public static string CompressNewLines(string text) => NewLineRegex.Replace(text, " ");
-}
-
 }

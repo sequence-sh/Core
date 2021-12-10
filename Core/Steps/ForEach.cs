@@ -1,24 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.Immutable;
-using System.ComponentModel.DataAnnotations;
-using System.Threading;
-using System.Threading.Tasks;
-using CSharpFunctionalExtensions;
-using Reductech.EDR.Core.Attributes;
-using Reductech.EDR.Core.Internal;
-using Reductech.EDR.Core.Internal.Errors;
-using Reductech.EDR.Core.Util;
-
-namespace Reductech.EDR.Core.Steps
-{
+﻿namespace Reductech.EDR.Core.Steps;
 
 /// <summary>
 /// Do an action for each element in an array or entity in an entity stream.
 /// </summary>
 [Alias("EntityForEach")]
 [Alias("ForEachItem")]
-[SCLExample("ForEach [1, 2, 3] Action: (Log <item>)", ExpectedLogs     = new[] { "1", "2", "3" })]
+[SCLExample("ForEach [1, 2, 3] Action: (Log <item>)",     ExpectedLogs = new[] { "1", "2", "3" })]
 [SCLExample("ForEachItem In: [1, 2, 3] Do: (Log <item>)", ExpectedLogs = new[] { "1", "2", "3" })]
 public sealed class ForEach<T> : CompoundStep<Unit>
 {
@@ -109,6 +96,4 @@ public sealed class ForEach<T> : CompoundStep<Unit>
         /// <inheritdoc />
         public override string OutputTypeExplanation => nameof(Unit);
     }
-}
-
 }

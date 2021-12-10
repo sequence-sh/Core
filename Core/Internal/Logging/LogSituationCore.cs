@@ -1,8 +1,7 @@
 ﻿using System.Diagnostics;
 using Microsoft.Extensions.Logging;
 
-namespace Reductech.EDR.Core.Internal.Logging
-{
+namespace Reductech.EDR.Core.Internal.Logging;
 
 /// <summary>
 /// Identifying code for a Core log situation.
@@ -150,6 +149,4 @@ public sealed record LogSituation : LogSituationBase
         nameof(EnvironmentVariable),
         LogLevel.Trace
     );
-}
-
 }

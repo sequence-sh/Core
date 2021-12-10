@@ -1,14 +1,6 @@
-﻿using System.Collections.Generic;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using CSharpFunctionalExtensions;
-using Reductech.EDR.Core.Internal;
-using Reductech.EDR.Core.Internal.Errors;
-using Reductech.EDR.Core.Util;
+﻿using System.Text;
 
-namespace Reductech.EDR.Core.ExternalProcesses
-{
+namespace Reductech.EDR.Core.ExternalProcesses;
 
 /// <summary>
 /// Runs external processes.
@@ -47,6 +39,4 @@ public interface IExternalProcessRunner
         Encoding encoding,
         IStateMonad stateMonad,
         IStep? callingStep);
-}
-
 }

@@ -1,18 +1,6 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Threading.Tasks;
-using CSharpFunctionalExtensions;
-using Reductech.EDR.Core.Abstractions;
-using Reductech.EDR.Core.Internal;
-using Reductech.EDR.Core.Internal.Errors;
-using Reductech.EDR.Core.Internal.Parser;
-using Reductech.EDR.Core.Internal.Serialization;
-using Reductech.EDR.Core.Util;
-using Xunit.Abstractions;
+﻿using Reductech.EDR.Core.Internal.Parser;
 
-namespace Reductech.EDR.Core.TestHarness
-{
+namespace Reductech.EDR.Core.TestHarness;
 
 public abstract partial class StepTestBase<TStep, TOutput>
 {
@@ -116,6 +104,4 @@ public abstract partial class StepTestBase<TStep, TOutput>
         public override void CheckUnitResult(Result<Unit, IError> result) =>
             ExpectedOutput.CheckUnitResult(result);
     }
-}
-
 }

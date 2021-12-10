@@ -1,16 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.Immutable;
-using System.ComponentModel.DataAnnotations;
-using System.Threading;
-using System.Threading.Tasks;
-using CSharpFunctionalExtensions;
-using Reductech.EDR.Core.Attributes;
-using Reductech.EDR.Core.Internal;
-using Reductech.EDR.Core.Internal.Errors;
-
-namespace Reductech.EDR.Core.Steps
-{
+﻿namespace Reductech.EDR.Core.Steps;
 
 /// <summary>
 /// Map each element of an array or entity stream to a new value.
@@ -19,6 +7,8 @@ namespace Reductech.EDR.Core.Steps
 /// The new value must have the same type as the original value.
 /// </summary>
 [SCLExample("ArrayMap [1, 2, 3, 4] Function: (<> + 1)", "[2, 3, 4, 5]")]
+[SCLExample("ArrayMap [1,2,3] ($\"Num {<>}\")", "[\"Num 1\", \"Num 2\", \"Num 3\"]")]
+[SCLExample("ArrayMap [(a: 1), (a: 2), (a: 3), (a: 4)] Function: (<>['a'] + 1)", "[2, 3, 4, 5]")]
 [SCLExample(
     @"Map Array: [
   ('type': 'A', 'value': 1)
@@ -29,21 +19,21 @@ namespace Reductech.EDR.Core.Steps
 )]
 [Alias("EntityMap")] // legacy name
 [Alias("Map")]
-public sealed class ArrayMap<T> : CompoundStep<Array<T>>
+public sealed class ArrayMap<TIn, TOut> : CompoundStep<Array<TOut>>
 {
     /// <inheritdoc />
-    protected override async Task<Result<Array<T>, IError>> Run(
+    protected override async Task<Result<Array<TOut>, IError>> Run(
         IStateMonad stateMonad,
         CancellationToken cancellationToken)
     {
         var arrayResult = await Array.Run(stateMonad, cancellationToken);
 
         if (arrayResult.IsFailure)
-            return arrayResult.ConvertFailure<Array<T>>();
+            return arrayResult.ConvertFailure<Array<TOut>>();
 
         var currentState = stateMonad.GetState().ToImmutableDictionary();
 
-        async ValueTask<T> Action(T record)
+        async ValueTask<TOut> Action(TIn record)
         {
             await using var scopedMonad = new ScopedStateMonad(
                 stateMonad,
@@ -70,7 +60,7 @@ public sealed class ArrayMap<T> : CompoundStep<Array<T>>
     /// </summary>
     [StepProperty(1)]
     [Required]
-    public IStep<Array<T>> Array { get; set; } = null!;
+    public IStep<Array<TIn>> Array { get; set; } = null!;
 
     /// <summary>
     /// A function to update the values and return the mapped entity
@@ -78,7 +68,7 @@ public sealed class ArrayMap<T> : CompoundStep<Array<T>>
     [FunctionProperty(2)]
     [Required]
     [Alias("Using")]
-    public LambdaFunction<T, T> Function { get; set; } = null!;
+    public LambdaFunction<TIn, TOut> Function { get; set; } = null!;
 
     /// <inheritdoc />
     public override IStepFactory StepFactory => ArrayMapStepFactory.Instance;
@@ -86,38 +76,144 @@ public sealed class ArrayMap<T> : CompoundStep<Array<T>>
     /// <summary>
     /// Filter entities according to a function.
     /// </summary>
-    private sealed class ArrayMapStepFactory : ArrayStepFactory
+    private sealed class ArrayMapStepFactory : StepFactory
     {
         private ArrayMapStepFactory() { }
 
         /// <summary>
         /// The instance
         /// </summary>
-        public static GenericStepFactory Instance { get; } = new ArrayMapStepFactory();
+        public static StepFactory Instance { get; } = new ArrayMapStepFactory();
+
+        private string ArrayPropertyName => nameof(ArrayMap<object, object>.Array);
 
         /// <inheritdoc />
-        protected override TypeReference
-            GetOutputTypeReference(TypeReference memberTypeReference) =>
-            new TypeReference.Array(memberTypeReference);
-
-        /// <inheritdoc />
-        protected override Result<TypeReference, IErrorBuilder> GetExpectedArrayTypeReference(
-            CallerMetadata callerMetadata)
+        public override Result<TypeReference, IError> TryGetOutputTypeReference(
+            CallerMetadata callerMetadata,
+            FreezableStepData freezableStepData,
+            TypeResolver typeResolver)
         {
-            return callerMetadata.ExpectedType;
+            var r = TryGetOutputMemberType(callerMetadata, freezableStepData, typeResolver);
+
+            if (r.IsFailure)
+                return r.ConvertFailure<TypeReference>();
+
+            return new TypeReference.Array(r.Value);
+        }
+
+        private Result<TypeReference, IError> TryGetOutputMemberType(
+            CallerMetadata callerMetadata,
+            FreezableStepData freezableStepData,
+            TypeResolver typeResolver)
+        {
+            var lambda = freezableStepData.TryGetLambda(LambdaPropertyName, StepType);
+
+            if (lambda.IsFailure)
+                return lambda.ConvertFailure<TypeReference>();
+
+            var expectedType =
+                callerMetadata.ExpectedType.TryGetArrayMemberTypeReference(typeResolver)
+                    .MapError(x => x.WithLocation(freezableStepData));
+
+            //Try to get the output type from the input type and the lambda
+
+            var inputMemberType = TryGetInputMemberType(
+                callerMetadata,
+                freezableStepData,
+                typeResolver
+            );
+
+            if (inputMemberType.IsFailure)
+                return expectedType;
+
+            var scopedCallerMetadata = new CallerMetadata(
+                StepType.Name,
+                LambdaPropertyName,
+                TypeReference.Unknown.Instance
+            );
+
+            var scopedTypeResolver =
+                typeResolver.TryCloneWithScopedLambda(
+                    lambda.Value,
+                    inputMemberType.Value,
+                    scopedCallerMetadata
+                );
+
+            if (scopedTypeResolver.IsFailure)
+                return expectedType;
+
+            var outputMemberType =
+                lambda.Value.FreezableStep.TryGetOutputTypeReference(
+                    scopedCallerMetadata,
+                    scopedTypeResolver.Value
+                );
+
+            if (outputMemberType.IsFailure)
+                return expectedType;
+
+            if (expectedType.IsFailure)
+                return expectedType;
+
+            return outputMemberType.Value.TryCombine(expectedType.Value, typeResolver)
+                .MapError(x => x.WithLocation(freezableStepData));
+        }
+
+        private Result<TypeReference, IError> TryGetInputMemberType(
+            CallerMetadata _,
+            FreezableStepData freezableStepData,
+            TypeResolver typeResolver)
+        {
+            var arrayStep = freezableStepData.TryGetStep(ArrayPropertyName, StepType);
+
+            if (arrayStep.IsFailure)
+                return arrayStep.ConvertFailure<TypeReference>();
+
+            TypeReference expectedType = new TypeReference.Array(TypeReference.Unknown.Instance);
+
+            var cm = new CallerMetadata(StepType.Name, ArrayPropertyName, expectedType);
+
+            var result =
+                arrayStep.Value.TryGetOutputTypeReference(cm, typeResolver)
+                    .Bind(
+                        x => x.TryGetArrayMemberTypeReference(typeResolver)
+                            .MapError(error => error.WithLocation(freezableStepData))
+                    );
+
+            return result;
         }
 
         /// <inheritdoc />
-        protected override string ArrayPropertyName => nameof(ArrayMap<object>.Array);
-
-        /// <inheritdoc />
-        public override Type StepType => typeof(ArrayMap<>);
+        public override Type StepType => typeof(ArrayMap<,>);
 
         /// <inheritdoc />
         public override string OutputTypeExplanation => "Array of T";
 
-        protected override string LambdaPropertyName => nameof(ArrayMap<object>.Function);
-    }
-}
+        /// <inheritdoc />
+        protected override Result<ICompoundStep, IError> TryCreateInstance(
+            CallerMetadata callerMetadata,
+            FreezableStepData freezeData,
+            TypeResolver typeResolver)
+        {
+            var inputType = TryGetInputMemberType(callerMetadata, freezeData, typeResolver)
+                .Bind(x => x.TryGetType(typeResolver).MapError(e => e.WithLocation(freezeData)));
 
+            if (inputType.IsFailure)
+                return inputType.ConvertFailure<ICompoundStep>();
+
+            var outputType = TryGetOutputMemberType(callerMetadata, freezeData, typeResolver)
+                .Bind(x => x.TryGetType(typeResolver).MapError(e => e.WithLocation(freezeData)));
+
+            if (outputType.IsFailure)
+                return outputType.ConvertFailure<ICompoundStep>();
+
+            var typeList = new[] { inputType.Value, outputType.Value };
+
+            var result = TryCreateGeneric(StepType, typeList)
+                .MapError(e => e.WithLocation(freezeData));
+
+            return result;
+        }
+
+        private string LambdaPropertyName => nameof(ArrayMap<object, object>.Function);
+    }
 }

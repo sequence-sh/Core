@@ -1,5 +1,4 @@
-﻿namespace Reductech.EDR.Core.Attributes
-{
+﻿namespace Reductech.EDR.Core.Attributes;
 
 /// <summary>
 /// Indicates a related topic.
@@ -25,6 +24,4 @@ public sealed class SeeAlsoAttribute : StepPropertyMetadataAttribute
 
     /// <inheritdoc />
     public override string MetadataFieldValue => SeeAlso;
-}
-
 }

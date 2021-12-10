@@ -1,14 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
-using CSharpFunctionalExtensions;
-using Reductech.EDR.Core.Internal;
-using Reductech.EDR.Core.Internal.Errors;
-using Reductech.EDR.Core.Internal.Serialization;
-
-namespace Reductech.EDR.Core.Steps
-{
+﻿namespace Reductech.EDR.Core.Steps;
 
 /// <summary>
 /// Gets the value of the automatic variable
@@ -88,26 +78,10 @@ public sealed class GetAutomaticVariable<T> : CompoundStep<T>
 
             var expectedTypeReference = callerMetadata.ExpectedType;
 
-            if (!expectedTypeReference.IsUnknown
-             && typeResolver.Dictionary.TryGetValue(avr.GetValueOrThrow(), out var tr))
+            if (typeResolver.Dictionary.TryGetValue(avr.GetValueOrThrow(), out var tr))
             {
-                if (tr.Allow(expectedTypeReference, typeResolver))
-                {
-                    return expectedTypeReference;
-                }
-                else if (expectedTypeReference.Allow(tr, typeResolver))
-                {
-                    return tr;
-                }
-
-                return callerMetadata.GetWrongTypeError(
-                    avr.GetValueOrThrow().Serialize(),
-                    tr.Name,
-                    new ErrorLocation(
-                        TypeName,
-                        freezableStepData.Location
-                    )
-                );
+                var result = tr.TryCombine(expectedTypeReference, typeResolver);
+                return result.MapError(x => x.WithLocation(freezableStepData));
             }
 
             return TypeReference.AutomaticVariable.Instance;
@@ -134,6 +108,4 @@ public sealed class GetAutomaticVariable<T> : CompoundStep<T>
             }
         }
     }
-}
-
 }

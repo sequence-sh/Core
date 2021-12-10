@@ -1,7 +1,4 @@
-﻿using System;
-
-namespace Reductech.EDR.Core
-{
+﻿namespace Reductech.EDR.Core;
 
 /// <summary>
 /// A basic type in the SCL Type system
@@ -42,7 +39,12 @@ public enum SCLType
     /// <summary>
     /// Another entity
     /// </summary>
-    Entity
+    Entity,
+
+    /// <summary>
+    /// The null value
+    /// </summary>
+    Null
 }
 
 /// <summary>
@@ -64,6 +66,7 @@ public static class SCLTypeHelper
             SCLType.Bool    => typeof(bool),
             SCLType.Date    => typeof(DateTime),
             SCLType.Entity  => typeof(Entity),
+            SCLType.Null    => typeof(SCLNull),
             _               => throw new ArgumentOutOfRangeException(nameof(sclType), sclType, null)
         };
     }
@@ -94,8 +97,9 @@ public static class SCLTypeHelper
         if (cSharpType == typeof(Entity))
             return SCLType.Entity;
 
+        if (cSharpType == typeof(SCLNull))
+            return SCLType.Null;
+
         return null;
     }
-}
-
 }

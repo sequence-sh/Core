@@ -1,7 +1,6 @@
 ﻿using System.Diagnostics;
 
-namespace Reductech.EDR.Core.Internal.Errors
-{
+namespace Reductech.EDR.Core.Internal.Errors;
 
 /// <summary>
 /// Identifying code for an error message in Core
@@ -419,7 +418,10 @@ public sealed record ErrorCode : ErrorCodeBase
     public static readonly ErrorCode
         CouldNotCreateStepFactoryStore = new(nameof(CouldNotCreateStepFactoryStore));
 
-#endregion
-}
+    /// <summary>
+    /// The types '{0}' and '{1}' are incompatible.
+    /// </summary>
+    public static readonly ErrorCode TypesIncompatible = new(nameof(TypesIncompatible));
 
+#endregion
 }

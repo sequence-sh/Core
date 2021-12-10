@@ -1,9 +1,6 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using Reductech.EDR.Core.Steps;
+﻿using Reductech.EDR.Core.Steps;
 
-namespace Reductech.EDR.Core.Internal.Serialization
-{
+namespace Reductech.EDR.Core.Internal.Serialization;
 
 /// <summary>
 /// Serializer for steps with chain infix operators
@@ -16,9 +13,9 @@ public record ChainInfixSerializer(string StepName, string Operator) : IStepSeri
         var properties = stepProperties as StepProperty[] ?? stepProperties.ToArray();
 
         if (properties.Length == 1 && properties.Single() is StepProperty.SingleStepProperty
-        {
-            Step: IArrayNewStep arrayNewStep
-        } && arrayNewStep.ElementSteps.Count() > 1)
+            {
+                Step: IArrayNewStep arrayNewStep
+            } && arrayNewStep.ElementSteps.Count() > 1)
         {
             var text = string.Join(
                 $" {Operator} ",
@@ -41,6 +38,4 @@ public record ChainInfixSerializer(string StepName, string Operator) : IStepSeri
         //This will happen if the source of elements is not an array directly
         return new FunctionSerializer(StepName).Serialize(properties);
     }
-}
-
 }

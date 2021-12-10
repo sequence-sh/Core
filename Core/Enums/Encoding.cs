@@ -1,8 +1,6 @@
-﻿using System;
-using System.Text;
+﻿using System.Text;
 
-namespace Reductech.EDR.Core.Enums
-{
+namespace Reductech.EDR.Core.Enums;
 
 /// <summary>
 /// An encoding
@@ -69,6 +67,4 @@ public static class EncodingHelper
             _ => throw new ArgumentOutOfRangeException(nameof(encodingEnum), encodingEnum, null)
         };
     }
-}
-
 }

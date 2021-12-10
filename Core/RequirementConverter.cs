@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text.Json;
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
 
-namespace Reductech.EDR.Core
-{
+namespace Reductech.EDR.Core;
 
 /// <summary>
 /// JSONConverter for Requirements
@@ -98,6 +94,4 @@ public class RequirementJsonConverter : JsonConverter<Requirement>
         public string? FeaturesKey { get; set; }
         public IReadOnlyList<string>? RequiredFeatures { get; set; }
     }
-}
-
 }

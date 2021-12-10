@@ -1,5 +1,4 @@
-﻿namespace Reductech.EDR.Core.Enums
-{
+﻿namespace Reductech.EDR.Core.Enums;
 
 /// <summary>
 /// How to respond to a data error
@@ -30,6 +29,4 @@ public enum ErrorBehavior
     /// On Error: Allow the entity and do not emit a warning
     /// </summary>
     Ignore
-}
-
 }

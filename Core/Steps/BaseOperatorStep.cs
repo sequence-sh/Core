@@ -1,15 +1,4 @@
-﻿using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Threading;
-using System.Threading.Tasks;
-using CSharpFunctionalExtensions;
-using Reductech.EDR.Core.Attributes;
-using Reductech.EDR.Core.Internal;
-using Reductech.EDR.Core.Internal.Errors;
-using Reductech.EDR.Core.Internal.Serialization;
-
-namespace Reductech.EDR.Core.Steps
-{
+﻿namespace Reductech.EDR.Core.Steps;
 
 /// <summary>
 /// Base class for operator operations
@@ -74,6 +63,4 @@ public abstract class BaseOperatorStep<TStep, TElement, TOutput> : CompoundStep<
         public override IStepSerializer Serializer { get; } =
             new ChainInfixSerializer(FormatTypeName(typeof(TStep)), new TStep().Operator);
     }
-}
-
 }

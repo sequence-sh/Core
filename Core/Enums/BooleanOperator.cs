@@ -1,7 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace Reductech.EDR.Core.Enums
-{
+﻿namespace Reductech.EDR.Core.Enums;
 
 /// <summary>
 /// A boolean operator.
@@ -24,6 +21,4 @@ public enum BooleanOperator
     /// </summary>
     [Display(Name = "||")]
     Or
-}
-
 }

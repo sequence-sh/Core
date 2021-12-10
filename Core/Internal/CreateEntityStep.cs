@@ -1,16 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using CSharpFunctionalExtensions;
-using Reductech.EDR.Core.Entities;
-using Reductech.EDR.Core.Internal.Errors;
-using Reductech.EDR.Core.Util;
+﻿using System.Text;
 
-namespace Reductech.EDR.Core.Internal
-{
+namespace Reductech.EDR.Core.Internal;
 
 /// <summary>
 /// A step that creates and returns an entity.
@@ -130,6 +120,4 @@ public record CreateEntityStep
 
     /// <inheritdoc />
     public bool ShouldBracketWhenSerialized => false;
-}
-
 }

@@ -1,12 +1,6 @@
-﻿using System.Collections.Generic;
-using Reductech.EDR.Core.Internal;
-using Reductech.EDR.Core.Steps;
-using Reductech.EDR.Core.TestHarness;
-using Reductech.EDR.Core.Util;
-using static Reductech.EDR.Core.TestHarness.StaticHelpers;
+﻿using Reductech.EDR.Core.TestHarness;
 
-namespace Reductech.EDR.Core.Tests.Steps
-{
+namespace Reductech.EDR.Core.Tests.Steps;
 
 public partial class GetAutomaticVariableTests : StepTestBase<GetAutomaticVariable<int>, int>
 {
@@ -22,7 +16,7 @@ public partial class GetAutomaticVariableTests : StepTestBase<GetAutomaticVariab
                     Value = new ArrayElementAtIndex<int>
                     {
                         Index = Constant(0),
-                        Array = new ArrayMap<int>
+                        Array = new ArrayMap<int, int>
                         {
                             Array = Array(1, 2, 3),
                             Function = new LambdaFunction<int, int>(
@@ -51,7 +45,7 @@ public partial class GetAutomaticVariableTests : StepTestBase<GetAutomaticVariab
                     Value = new ArrayElementAtIndex<int>()
                     {
                         Index = Constant(0),
-                        Array = new ArrayMap<int>()
+                        Array = new ArrayMap<int, int>()
                         {
                             Array = Array(1, 2, 3),
                             Function =
@@ -82,7 +76,7 @@ public partial class GetAutomaticVariableTests : StepTestBase<GetAutomaticVariab
                     Value = new ArrayElementAtIndex<int>()
                     {
                         Index = Constant(0),
-                        Array = new ArrayMap<int>()
+                        Array = new ArrayMap<int, int>()
                         {
                             Array = Array(1, 2, 3),
                             Function = new LambdaFunction<int, int>(
@@ -95,7 +89,7 @@ public partial class GetAutomaticVariableTests : StepTestBase<GetAutomaticVariab
                                             new GetAutomaticVariable<int>(),
                                             new ArrayElementAtIndex<int>()
                                             {
-                                                Array = new ArrayMap<int>()
+                                                Array = new ArrayMap<int, int>()
                                                 {
                                                     Array = Array(1, 2, 3),
                                                     Function = new LambdaFunction<int, int>(
@@ -142,6 +136,4 @@ public partial class GetAutomaticVariableTests : StepTestBase<GetAutomaticVariab
             yield return new SerializeCase("Basic Case", new GetAutomaticVariable<int>() { }, "<>");
         }
     }
-}
-
 }

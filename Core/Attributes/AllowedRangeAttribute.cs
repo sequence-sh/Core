@@ -1,5 +1,4 @@
-﻿namespace Reductech.EDR.Core.Attributes
-{
+﻿namespace Reductech.EDR.Core.Attributes;
 
 /// <summary>
 /// Indicates the allowed range of values.
@@ -25,6 +24,4 @@ public sealed class AllowedRangeAttribute : StepPropertyMetadataAttribute
 
     /// <inheritdoc />
     public override string MetadataFieldValue => AllowedRangeValue;
-}
-
 }

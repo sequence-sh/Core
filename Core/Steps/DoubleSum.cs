@@ -1,10 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using CSharpFunctionalExtensions;
-using Reductech.EDR.Core.Internal.Errors;
-
-namespace Reductech.EDR.Core.Steps
-{
+﻿namespace Reductech.EDR.Core.Steps;
 
 /// <summary>
 /// Calculate the sum of a list of doubles
@@ -19,6 +13,4 @@ public sealed class DoubleSum : BaseOperatorStep<DoubleSum, double, double>
     {
         return terms.Sum();
     }
-}
-
 }

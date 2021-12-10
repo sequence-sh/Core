@@ -1,17 +1,6 @@
-﻿using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using CSharpFunctionalExtensions;
-using Reductech.EDR.Core.Attributes;
-using Reductech.EDR.Core.Internal;
-using Reductech.EDR.Core.Internal.Errors;
-using Reductech.EDR.Core.Internal.Serialization;
+﻿using System.Text;
 
-namespace Reductech.EDR.Core.Steps
-{
+namespace Reductech.EDR.Core.Steps;
 
 /// <summary>
 /// Joins strings.
@@ -88,8 +77,8 @@ public sealed class StringInterpolate : CompoundStep<StringStream>
                 sb.Append('"');
 
                 foreach (var step in stepProperties.Cast<StepProperty.StepListProperty>()
-                    .Single()
-                    .StepList)
+                             .Single()
+                             .StepList)
                 {
                     if (step is StringConstant sc)
                     {
@@ -110,6 +99,4 @@ public sealed class StringInterpolate : CompoundStep<StringStream>
             }
         }
     }
-}
-
 }

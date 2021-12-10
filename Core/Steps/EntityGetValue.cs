@@ -1,25 +1,23 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations;
-using System.Threading;
-using System.Threading.Tasks;
-using CSharpFunctionalExtensions;
-using Reductech.EDR.Core.Attributes;
-using Reductech.EDR.Core.Entities;
-using Reductech.EDR.Core.Internal;
-using Reductech.EDR.Core.Internal.Errors;
-using Reductech.EDR.Core.Internal.Serialization;
-using Reductech.EDR.Core.Util;
-
-namespace Reductech.EDR.Core.Steps
-{
+﻿namespace Reductech.EDR.Core.Steps;
 
 /// <summary>
 /// Gets the value of a property from an entity
 /// </summary>
 [Alias("From")]
 [SCLExample("(foo: 123)['foo']",                           "123")]
+[SCLExample("(foo: 123)['bar']",                           "")]
 [SCLExample("(foo: (bar: 123))['foo.bar']",                "123")]
 [SCLExample("From ('type': 'C', 'value': 1) Get: 'value'", "1")]
+[SCLExample(
+    "- <myVar> = ('a':[1,2,3])['a']\r\n- <myVar> | Foreach (log (<>))",
+    IncludeInDocumentation = false,
+    ExpectedLogs = new[] { "1", "2", "3" }
+)]
+[SCLExample(
+    "- <myVar> = ('a':[1,2,3])['a']\r\n- <myVar> | Foreach (log (<> + 1))",
+    IncludeInDocumentation = false,
+    ExpectedLogs = new[] { "2", "3", "4" }
+)]
 public sealed class EntityGetValue<T> : CompoundStep<T>
 {
     /// <inheritdoc />
@@ -127,6 +125,4 @@ public sealed class EntityGetValue<T> : CompoundStep<T>
         /// <inheritdoc />
         public override IStepSerializer Serializer => EntityGetValueSerializer.Instance;
     }
-}
-
 }

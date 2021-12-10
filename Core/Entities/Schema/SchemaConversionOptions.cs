@@ -1,8 +1,6 @@
-﻿using System;
-using System.Globalization;
+﻿using System.Globalization;
 
-namespace Reductech.EDR.Core.Entities.Schema
-{
+namespace Reductech.EDR.Core.Entities.Schema;
 
 /// <summary>
 /// Options for converting string values to schema nodes
@@ -24,12 +22,12 @@ public record SchemaConversionOptions(
             foreach (var format in DateInputFormats.GetFormats(path.TrimStart('/')))
             {
                 if (DateTime.TryParseExact(
-                    value,
-                    format,
-                    CultureInfo.InvariantCulture,
-                    DateTimeStyles.None,
-                    out _
-                ))
+                        value,
+                        format,
+                        CultureInfo.InvariantCulture,
+                        DateTimeStyles.None,
+                        out _
+                    ))
                 {
                     return new StringNode(
                         EnumeratedValuesNodeData.Empty,
@@ -55,6 +53,4 @@ public record SchemaConversionOptions(
 
         return StringNode.Default;
     }
-}
-
 }

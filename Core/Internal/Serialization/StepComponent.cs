@@ -1,8 +1,4 @@
-﻿using System.Collections.Generic;
-using CSharpFunctionalExtensions;
-
-namespace Reductech.EDR.Core.Internal.Serialization
-{
+﻿namespace Reductech.EDR.Core.Internal.Serialization;
 
 /// <summary>
 /// Deserializes a regex group into a constant of any type.
@@ -28,6 +24,4 @@ public class StepComponent : ISerializerBlock
         var r = property.Serialize();
         return r;
     }
-}
-
 }

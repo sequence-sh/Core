@@ -1,5 +1,4 @@
-﻿namespace Reductech.EDR.Core.ExternalProcesses
-{
+﻿namespace Reductech.EDR.Core.ExternalProcesses;
 
 /// <summary>
 /// Determines how to handle errors coming from an external step.
@@ -10,6 +9,4 @@ public interface IErrorHandler
     /// Whether to ignore a particular error.
     /// </summary>
     public bool ShouldIgnoreError(string s);
-}
-
 }

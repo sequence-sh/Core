@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Text;
+﻿using System.Text;
 using Namotion.Reflection;
 
-namespace Reductech.EDR.Core.Internal.Documentation
-{
+namespace Reductech.EDR.Core.Internal.Documentation;
 
 /// <summary>
 /// Contains helper methods for creating documentation
@@ -66,9 +61,9 @@ public static class DocumentationCreator
             {
                 var contentsStringBuilder = new StringBuilder();
 
-                contentsStringBuilder.AppendLine("# EDR Steps");
+                contentsStringBuilder.AppendLine($"# {category.Key} Steps");
 
-                var contentsRows = categories.SelectMany(x => x)
+                var contentsRows = category
                     .Select(
                         x => new[]
                         {
@@ -144,7 +139,8 @@ public static class DocumentationCreator
     {
         return (s ?? string.Empty)
             .Replace("|",    @"\|")
-            .Replace("<",    @"\<")
+            .Replace("<",    @"&lt;")
+            .Replace(">",    @"&gt;")
             .Replace("\r\n", " ")
             .Replace("\n",   " ");
     }
@@ -223,7 +219,7 @@ public static class DocumentationCreator
 
                     {
                         var nameString = string.Join(
-                            "<br>",
+                            "<br/>",
                             rp.Aliases.Select(x => $"_{x}_").Prepend(rp.Name)
                         );
 
@@ -378,6 +374,4 @@ public static class DocumentationCreator
             return v;
         }
     }
-}
-
 }

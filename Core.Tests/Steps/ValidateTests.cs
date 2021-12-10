@@ -1,23 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using CSharpFunctionalExtensions;
-using FluentAssertions;
-using Json.More;
-using Json.Schema;
+﻿using System.Globalization;
 using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.Enums;
-using Reductech.EDR.Core.Internal;
-using Reductech.EDR.Core.Internal.Errors;
-using Reductech.EDR.Core.Steps;
 using Reductech.EDR.Core.TestHarness;
-using static Reductech.EDR.Core.TestHarness.StaticHelpers;
-using Reductech.EDR.Core.Util;
-using Xunit;
 using static Reductech.EDR.Core.TestHarness.SchemaHelpers;
 
-namespace Reductech.EDR.Core.Tests.Steps
-{
+namespace Reductech.EDR.Core.Tests.Steps;
 
 public partial class ValidateTests : StepTestBase<Validate, Array<Entity>>
 {
@@ -521,6 +508,4 @@ public partial class ValidateTests : StepTestBase<Validate, Array<Entity>>
 
         properties.GetValueOrThrow().Should().BeOfType<EntityValue.NestedEntity>();
     }
-}
-
 }

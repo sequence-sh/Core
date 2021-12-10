@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using CSharpFunctionalExtensions;
-using Reductech.EDR.Core.Internal.Errors;
+﻿using Namotion.Reflection;
 
-namespace Reductech.EDR.Core.Util
-{
+namespace Reductech.EDR.Core.Util;
 
 /// <summary>
 /// Functional methods
@@ -20,12 +15,38 @@ public static class FunctionalExtensions
         if (obj is T objAsT)
             return objAsT;
 
-        var converted = Convert.ChangeType(obj, typeof(T));
+        if (typeof(T).IsGenericType
+         && typeof(T).GetGenericTypeDefinition().Name.StartsWith("OneOf"))
+        {
+            for (var index = 0; index < typeof(T).GenericTypeArguments.Length; index++)
+            {
+                var genericTypeArgument = typeof(T).GenericTypeArguments[index];
 
-        if (converted is T objConverted)
-            return objConverted;
+                if (genericTypeArgument.IsInstanceOfType(obj))
+                {
+                    var fromMethod = typeof(T).GetMethod(
+                        $"FromT{index}",
+                        BindingFlags.Static | BindingFlags.Public
+                    );
 
-        return ErrorCode.InvalidCast.ToErrorBuilder(obj ?? "null", typeof(T).Name);
+                    var oneOf = fromMethod?.Invoke(null, new[] { obj });
+
+                    if (oneOf is T oneOfAsT)
+                        return oneOfAsT;
+                }
+            }
+        }
+
+        try
+        {
+            var converted = Convert.ChangeType(obj, typeof(T));
+
+            if (converted is T objConverted)
+                return objConverted;
+        }
+        catch (InvalidCastException) { }
+
+        return ErrorCode.InvalidCast.ToErrorBuilder(typeof(T).GetDisplayName(), obj ?? "null");
     }
 
     /// <summary>
@@ -178,6 +199,4 @@ public static class FunctionalExtensions
 
         return Maybe<T>.None;
     }
-}
-
 }

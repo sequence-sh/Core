@@ -1,7 +1,6 @@
 ﻿using System.IO;
 
-namespace Reductech.EDR.Core.Abstractions
-{
+namespace Reductech.EDR.Core.Abstractions;
 
 /// <summary>
 /// Provides methods for interacting with the console
@@ -27,6 +26,4 @@ public interface IConsole
     /// Acquires the standard error stream
     /// </summary>
     Stream OpenStandardError();
-}
-
 }

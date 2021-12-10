@@ -1,16 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using CSharpFunctionalExtensions;
-using Reductech.EDR.ConnectorManagement.Base;
-using Reductech.EDR.Core.Abstractions;
-using Reductech.EDR.Core.Attributes;
+﻿using Reductech.EDR.Core.Abstractions;
 using Reductech.EDR.Core.Connectors;
-using Reductech.EDR.Core.Internal.Errors;
 
-namespace Reductech.EDR.Core.Internal
-{
+namespace Reductech.EDR.Core.Internal;
 
 /// <summary>
 /// Allows you to get a step factory from a step name.
@@ -118,20 +109,20 @@ public class StepFactoryStore
                 continue;
 
             foreach (var stepType in assembly
-                .GetTypes()
-                .Where(x => !x.IsAbstract)
-                .Where(x => typeof(ICompoundStep).IsAssignableFrom(x))
-                .Where(x => x.GetCustomAttribute<NotAStaticStepAttribute>() is null)
-            )
+                         .GetTypes()
+                         .Where(x => !x.IsAbstract)
+                         .Where(x => typeof(ICompoundStep).IsAssignableFrom(x))
+                         .Where(x => x.GetCustomAttribute<NotAStaticStepAttribute>() is null)
+                    )
             {
                 var factory = CreateStepFactory(stepType);
                 stepFactories.Add(factory);
             }
 
             foreach (var dynamicType in assembly
-                .GetTypes()
-                .Where(x => !x.IsAbstract)
-                .Where(x => typeof(IDynamicStepGenerator).IsAssignableFrom(x)))
+                         .GetTypes()
+                         .Where(x => !x.IsAbstract)
+                         .Where(x => typeof(IDynamicStepGenerator).IsAssignableFrom(x)))
             {
                 var factories = TryCreateDynamicStepFactories(
                     dynamicType,
@@ -213,6 +204,4 @@ public class StepFactoryStore
 
         return contexts;
     }
-}
-
 }

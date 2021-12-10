@@ -1,14 +1,4 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations;
-using System.Threading;
-using System.Threading.Tasks;
-using CSharpFunctionalExtensions;
-using Reductech.EDR.Core.Attributes;
-using Reductech.EDR.Core.Internal;
-using Reductech.EDR.Core.Internal.Errors;
-
-namespace Reductech.EDR.Core.Steps
-{
+﻿namespace Reductech.EDR.Core.Steps;
 
 /// <summary>
 /// Concatenates arrays or streams of entities
@@ -116,6 +106,4 @@ public sealed class ArrayConcat<T> : CompoundStep<Array<T>>
         /// <inheritdoc />
         public override string OutputTypeExplanation => "Array of T";
     }
-}
-
 }

@@ -1,8 +1,4 @@
-﻿using System;
-using Reductech.EDR.Core.Internal;
-
-namespace Reductech.EDR.Core.Attributes
-{
+﻿namespace Reductech.EDR.Core.Attributes;
 
 /// <summary>
 /// A property that will be used by the step.
@@ -29,6 +25,4 @@ public abstract class StepPropertyBaseAttribute : Attribute
     /// The member type of this step property
     /// </summary>
     public abstract MemberType MemberType { get; }
-}
-
 }

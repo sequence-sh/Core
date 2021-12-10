@@ -1,20 +1,7 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using AutoTheory;
-using FluentAssertions;
-using Moq;
-using Reductech.EDR.Core.Abstractions;
-using Reductech.EDR.Core.Internal;
-using Reductech.EDR.Core.Internal.Analytics;
-using Reductech.EDR.Core.Internal.Serialization;
+﻿using Reductech.EDR.Core.Internal.Analytics;
 using Reductech.EDR.Core.TestHarness;
-using Xunit;
-using Xunit.Abstractions;
 
-namespace Reductech.EDR.Core.Tests
-{
+namespace Reductech.EDR.Core.Tests;
 
 [UseTestOutputHelper]
 public partial class AnalyticsTests
@@ -96,6 +83,4 @@ public partial class AnalyticsTests
             .NotBeNullOrEmpty()
             .And.AllBe("Attempt to Divide by Zero.");
     }
-}
-
 }

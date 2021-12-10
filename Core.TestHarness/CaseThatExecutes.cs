@@ -1,24 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Reflection;
-using System.Threading;
-using System.Threading.Tasks;
-using CSharpFunctionalExtensions;
-using Divergic.Logging.Xunit;
-using FluentAssertions;
-using MELT;
-using Microsoft.Extensions.Logging;
-using Moq;
-using Namotion.Reflection;
-using Reductech.EDR.Core.Abstractions;
-using Reductech.EDR.Core.Internal;
-using Reductech.EDR.Core.Internal.Errors;
-using Reductech.EDR.Core.Util;
-using Xunit.Abstractions;
-using Xunit.Sdk;
-
-namespace Reductech.EDR.Core.TestHarness
-{
+﻿namespace Reductech.EDR.Core.TestHarness;
 
 public abstract partial class StepTestBase<TStep, TOutput>
 {
@@ -204,6 +184,4 @@ public abstract partial class StepTestBase<TStep, TOutput>
 
         public List<Action> FinalChecks { get; } = new();
     }
-}
-
 }

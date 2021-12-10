@@ -1,7 +1,4 @@
-﻿using System;
-
-namespace Reductech.EDR.Core.Attributes
-{
+﻿namespace Reductech.EDR.Core.Attributes;
 
 /// <summary>
 /// Allows you to define an alternative name for a property or step
@@ -18,6 +15,4 @@ public sealed class AliasAttribute : Attribute
     /// The alternative name for the property or step
     /// </summary>
     public string Name { get; }
-}
-
 }

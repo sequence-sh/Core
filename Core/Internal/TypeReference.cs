@@ -1,12 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using CSharpFunctionalExtensions;
-using OneOf;
-using Reductech.EDR.Core.Internal.Errors;
-
-namespace Reductech.EDR.Core.Internal
-{
+﻿namespace Reductech.EDR.Core.Internal;
 
 /// <summary>
 /// A reference to a type
@@ -31,6 +23,51 @@ public abstract record TypeReference
     /// Whether this allows the other type reference
     /// </summary>
     public abstract bool Allow(TypeReference other, TypeResolver? typeResolver);
+
+    /// <summary>
+    /// Try to combine this type reference with another
+    /// </summary>
+    public Result<TypeReference, IErrorBuilder> TryCombine(
+        TypeReference other,
+        TypeResolver? typeResolver)
+    {
+        if (this is Unknown)
+            return other;
+
+        if (other is Unknown)
+            return this;
+
+        if (this is Array thisArray)
+        {
+            if (other is Dynamic or Any)
+            {
+                var result = thisArray.MemberType.TryCombine(other, typeResolver)
+                    .Map(x => new Array(x) as TypeReference);
+
+                return result;
+            }
+
+            if (other is Array otherArray)
+            {
+                var result = thisArray.MemberType.TryCombine(otherArray.MemberType, typeResolver)
+                    .Map(x => new Array(x) as TypeReference);
+
+                return result;
+            }
+        }
+        else if (other is Array) //Flip to get the array logic in the other direction
+        {
+            return other.TryCombine(this, typeResolver);
+        }
+
+        if (other.Allow(this, typeResolver))
+            return this;
+
+        if (Allow(other, typeResolver))
+            return other; //Return the more restricted type
+
+        return ErrorCode.TypesIncompatible.ToErrorBuilder(Name, other.Name);
+    }
 
     /// <summary>
     /// The name of this type
@@ -150,6 +187,11 @@ public abstract record TypeReference
         public static Actual Entity { get; } = new(SCLType.Entity);
 
         /// <summary>
+        /// A null value
+        /// </summary>
+        public static Actual Null { get; } = new(SCLType.Null);
+
+        /// <summary>
         /// Create an actual type.
         /// This does not work for Enum types
         /// </summary>
@@ -163,6 +205,7 @@ public abstract record TypeReference
                 SCLType.Bool    => Bool,
                 SCLType.Date    => Date,
                 SCLType.Entity  => Entity,
+                SCLType.Null    => Null,
                 SCLType.Enum => throw new ArgumentOutOfRangeException(
                     nameof(type),
                     type,
@@ -638,6 +681,4 @@ public abstract record TypeReference
 
         return new OneOf(references);
     }
-}
-
 }

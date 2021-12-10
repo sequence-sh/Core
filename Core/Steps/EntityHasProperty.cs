@@ -1,14 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.Threading;
-using System.Threading.Tasks;
-using CSharpFunctionalExtensions;
-using Reductech.EDR.Core.Attributes;
-using Reductech.EDR.Core.Internal;
-using Reductech.EDR.Core.Internal.Errors;
-using Reductech.EDR.Core.Util;
-
-namespace Reductech.EDR.Core.Steps
-{
+﻿namespace Reductech.EDR.Core.Steps;
 
 /// <summary>
 /// Checks if an entity has a particular property.
@@ -16,6 +6,7 @@ namespace Reductech.EDR.Core.Steps
 [Alias("DoesEntityHave")]
 [Alias("DoesEntity")]
 [SCLExample("DoesEntity ('type': 'C', 'value': 1) Have: 'type'",  "True")]
+[SCLExample("DoesEntity ('type': null, 'value': 1) Have: 'type'", "True")]
 [SCLExample("EntityHasProperty ('type': 'C', 'value': 1) 'name'", "False")]
 public sealed class EntityHasProperty : CompoundStep<bool>
 {
@@ -58,6 +49,4 @@ public sealed class EntityHasProperty : CompoundStep<bool>
     /// <inheritdoc />
     public override IStepFactory StepFactory { get; } =
         new SimpleStepFactory<EntityHasProperty, bool>();
-}
-
 }

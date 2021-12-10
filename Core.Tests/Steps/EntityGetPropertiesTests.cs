@@ -1,10 +1,6 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using Reductech.EDR.Core.Steps;
-using Reductech.EDR.Core.TestHarness;
+﻿using Reductech.EDR.Core.TestHarness;
 
-namespace Reductech.EDR.Core.Tests.Steps
-{
+namespace Reductech.EDR.Core.Tests.Steps;
 
 public partial class
     EntityGetPropertiesTests : StepTestBase<EntityGetProperties, Array<StringStream>>
@@ -24,6 +20,4 @@ public partial class
             );
         }
     }
-}
-
 }

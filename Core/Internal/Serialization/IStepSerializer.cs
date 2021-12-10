@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace Reductech.EDR.Core.Internal.Serialization
-{
+﻿namespace Reductech.EDR.Core.Internal.Serialization;
 
 /// <summary>
 /// A custom step serializer.
@@ -12,6 +9,4 @@ public interface IStepSerializer
     /// SerializeAsync a step according to it's properties.
     /// </summary>
     string Serialize(IEnumerable<StepProperty> stepProperties);
-}
-
 }

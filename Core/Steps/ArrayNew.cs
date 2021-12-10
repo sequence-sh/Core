@@ -1,19 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.Immutable;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using CSharpFunctionalExtensions;
-using Reductech.EDR.Core.Attributes;
-using Reductech.EDR.Core.Entities;
-using Reductech.EDR.Core.Internal;
-using Reductech.EDR.Core.Internal.Errors;
-using Reductech.EDR.Core.Internal.Serialization;
-
-namespace Reductech.EDR.Core.Steps
-{
+﻿namespace Reductech.EDR.Core.Steps;
 
 /// <summary>
 /// A step that declares a new array
@@ -147,6 +132,4 @@ public sealed class ArrayNew<T> : CompoundStep<Array<T>>, IArrayNewStep
         /// <inheritdoc />
         public override IStepSerializer Serializer => ArraySerializer.Instance;
     }
-}
-
 }

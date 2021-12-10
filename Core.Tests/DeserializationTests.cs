@@ -1,19 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using AutoTheory;
-using MELT;
-using Microsoft.Extensions.Logging;
-using Moq;
-using Reductech.EDR.Core.Internal;
-using Reductech.EDR.Core.Internal.Serialization;
+﻿using MELT;
 using Reductech.EDR.Core.TestHarness;
-using Xunit.Abstractions;
 
-namespace Reductech.EDR.Core.Tests
-{
+namespace Reductech.EDR.Core.Tests;
 
 public partial class DeserializationTests
 {
@@ -150,7 +138,7 @@ public partial class DeserializationTests
             );
 
             yield return new DeserializationTestInstance(@"(a:'x')['a'] | Log", "x");
-            yield return new DeserializationTestInstance(@"(a:'')['a'] | Log",  "()");
+            yield return new DeserializationTestInstance(@"(a:'')['a'] | Log",  "");
 
             yield return new DeserializationTestInstance(
                 @"- <textCase> = TextCase.Lower
@@ -764,6 +752,4 @@ Log 'Comments!'",
             );
         }
     }
-}
-
 }

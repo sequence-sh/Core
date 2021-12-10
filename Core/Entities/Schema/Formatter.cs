@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using CSharpFunctionalExtensions;
-using OneOf;
-
-namespace Reductech.EDR.Core.Entities.Schema
-{
+﻿namespace Reductech.EDR.Core.Entities.Schema;
 
 /// <summary>
 /// Used for formatting entity values
@@ -91,6 +84,4 @@ public class Formatter : OneOfBase<IReadOnlyList<string>,
     protected Formatter(
         OneOf<IReadOnlyList<string>, IReadOnlyDictionary<string, IReadOnlyList<string>>> input) :
         base(input) { }
-}
-
 }

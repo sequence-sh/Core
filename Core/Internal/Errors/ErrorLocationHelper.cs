@@ -1,5 +1,4 @@
-﻿namespace Reductech.EDR.Core.Internal.Errors
-{
+﻿namespace Reductech.EDR.Core.Internal.Errors;
 
 /// <summary>
 /// Extension methods for ErrorBuilders that involve adding a location.
@@ -23,6 +22,4 @@ public static class ErrorLocationHelper
     /// </summary>
     public static IError WithLocation(this IErrorBuilder errorBuilder, FreezableStepData data) =>
         errorBuilder.WithLocation(data.Location);
-}
-
 }

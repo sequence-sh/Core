@@ -1,16 +1,8 @@
-﻿using System.Collections.Generic;
-using Reductech.EDR.Core.Internal;
-using Reductech.EDR.Core.Internal.Errors;
-using Reductech.EDR.Core.Internal.Serialization;
-using Reductech.EDR.Core.Steps;
-using Reductech.EDR.Core.TestHarness;
-using Reductech.EDR.Core.Util;
-using static Reductech.EDR.Core.TestHarness.StaticHelpers;
+﻿using Reductech.EDR.Core.TestHarness;
 
-namespace Reductech.EDR.Core.Tests.Steps
-{
+namespace Reductech.EDR.Core.Tests.Steps;
 
-public partial class ArrayMapTests : StepTestBase<ArrayMap<Entity>, Array<Entity>>
+public partial class ArrayMapTests : StepTestBase<ArrayMap<Entity, Entity>, Array<Entity>>
 {
     /// <inheritdoc />
     protected override IEnumerable<StepCase> StepCases
@@ -25,7 +17,7 @@ public partial class ArrayMapTests : StepTestBase<ArrayMap<Entity>, Array<Entity
                         null,
                         new Log<Entity> { Value = GetEntityVariable }
                     ),
-                    Array = new ArrayMap<Entity>
+                    Array = new ArrayMap<Entity, Entity>
                     {
                         Array = Array(
                             Entity.Create(("Foo", "Hello")),
@@ -55,7 +47,7 @@ public partial class ArrayMapTests : StepTestBase<ArrayMap<Entity>, Array<Entity
                         null,
                         new Log<Entity> { Value = GetEntityVariable }
                     ),
-                    Array = new ArrayMap<Entity>
+                    Array = new ArrayMap<Entity, Entity>
                     {
                         Array = Array(
                             Entity.Create(("Foo", "Hello"),   ("Bar", "Earth")),
@@ -88,7 +80,7 @@ public partial class ArrayMapTests : StepTestBase<ArrayMap<Entity>, Array<Entity
 
             yield return new ErrorCase(
                 "Stream error",
-                new ArrayMap<Entity>
+                new ArrayMap<Entity, Entity>
                 {
                     Array = new FailStep<Array<Entity>> { ErrorMessage = "Stream Fail" },
                     Function = new LambdaFunction<Entity, Entity>(
@@ -104,6 +96,4 @@ public partial class ArrayMapTests : StepTestBase<ArrayMap<Entity>, Array<Entity
             );
         }
     }
-}
-
 }

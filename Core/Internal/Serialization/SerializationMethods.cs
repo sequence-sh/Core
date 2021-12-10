@@ -1,14 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
+﻿using System.Globalization;
 using System.Text;
-using System.Threading.Tasks;
-using Reductech.EDR.Core.Entities;
-using Reductech.EDR.Core.Util;
 
-namespace Reductech.EDR.Core.Internal.Serialization
-{
+namespace Reductech.EDR.Core.Internal.Serialization;
 
 /// <summary>
 /// Serializes primitive types
@@ -114,8 +107,8 @@ public static class SerializationMethods
             else if (ev is EntityValue.NestedList nestedList)
             {
                 if (nestedList.Value.Any(
-                    x => x is EntityValue.NestedEntity || x is EntityValue.NestedList
-                ))
+                        x => x is EntityValue.NestedEntity || x is EntityValue.NestedList
+                    ))
                 {
                     AppendLineIndented(
                         sb,
@@ -198,7 +191,7 @@ public static class SerializationMethods
     }
 
     /// <summary>
-    /// Converts an object to a string suitable from printing
+    /// Converts an object to a string suitable for printing
     /// </summary>
     public static string GetString(object? obj)
     {
@@ -210,6 +203,7 @@ public static class SerializationMethods
                 DateTime dt     => dt.ToString(Constants.DateTimeFormat),
                 double d        => d.ToString(Constants.DoubleFormat, new NumberFormatInfo()),
                 IArray array    => array.NameInLogs,
+                SCLNull         => "Null",
                 _               => obj?.ToString()!
             };
     }
@@ -228,6 +222,7 @@ public static class SerializationMethods
                 double d        => d.ToString(Constants.DoubleFormat, new NumberFormatInfo()),
                 Enumeration enu => enu.Serialize,
                 IArray array    => array.Serialize,
+                SCLNull         => "Null",
                 _               => obj?.ToString()!
             };
     }
@@ -244,6 +239,4 @@ public static class SerializationMethods
                 _               => GetString(obj)
             };
     }
-}
-
 }

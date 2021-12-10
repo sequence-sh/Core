@@ -1,7 +1,4 @@
-﻿using System;
-
-namespace Reductech.EDR.Core.Attributes
-{
+﻿namespace Reductech.EDR.Core.Attributes;
 
 /// <summary>
 /// Use this attribute to explain the meaning of the default value.
@@ -22,6 +19,4 @@ public sealed class DefaultValueExplanationAttribute : Attribute
     /// What the default value means.
     /// </summary>
     public string Explanation { get; }
-}
-
 }

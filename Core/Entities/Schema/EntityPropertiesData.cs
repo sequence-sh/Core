@@ -1,13 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.Immutable;
-using System.Linq;
-using Generator.Equals;
-using Json.Schema;
-using Reductech.EDR.Core.Util;
+﻿using Generator.Equals;
 
-namespace Reductech.EDR.Core.Entities.Schema
-{
+namespace Reductech.EDR.Core.Entities.Schema;
 
 /// <summary>
 /// Data about entity properties
@@ -30,7 +23,7 @@ public partial record EntityPropertiesData(
         var newDict = new Dictionary<string, (SchemaNode Node, bool Required)>();
 
         foreach (var group in Nodes.Concat(other.Nodes)
-            .GroupBy(x => x.Key, x => x.Value, StringComparer.OrdinalIgnoreCase))
+                     .GroupBy(x => x.Key, x => x.Value, StringComparer.OrdinalIgnoreCase))
         {
             var key = group.Key;
 
@@ -71,6 +64,4 @@ public partial record EntityPropertiesData(
     public static EntityPropertiesData Empty { get; } = new(
         ImmutableDictionary<string, (SchemaNode Node, bool Required)>.Empty
     );
-}
-
 }

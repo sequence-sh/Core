@@ -1,5 +1,4 @@
-﻿namespace Reductech.EDR.Core.Attributes
-{
+﻿namespace Reductech.EDR.Core.Attributes;
 
 /// <summary>
 /// The recommended value for this parameter.
@@ -25,6 +24,4 @@ public sealed class RecommendedValueAttribute : StepPropertyMetadataAttribute
 
     /// <inheritdoc />
     public override string MetadataFieldValue => RecommendedValue;
-}
-
 }

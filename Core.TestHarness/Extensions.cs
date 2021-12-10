@@ -1,21 +1,7 @@
-﻿using System;
-using System.Linq;
-using System.Net;
-using System.Threading.Tasks;
-using CSharpFunctionalExtensions;
-using FluentAssertions;
-using Microsoft.Extensions.Logging;
-using Moq;
-using Reductech.EDR.Core.Abstractions;
+﻿using System.Net;
 using Reductech.EDR.Core.ExternalProcesses;
-using Reductech.EDR.Core.Internal;
-using Reductech.EDR.Core.Internal.Errors;
-using RestSharp;
-using Xunit;
-using Xunit.Sdk;
 
-namespace Reductech.EDR.Core.TestHarness
-{
+namespace Reductech.EDR.Core.TestHarness;
 
 public static class Extensions
 {
@@ -84,7 +70,7 @@ public static class Extensions
             return request.Body.Value;
 
         foreach (var parameter in
-            request.Parameters.Where(x => x.Type == ParameterType.RequestBody))
+                 request.Parameters.Where(x => x.Type == ParameterType.RequestBody))
         {
             return parameter.Value;
         }
@@ -332,6 +318,4 @@ public static class Extensions
     {
         maybe.HasValue.Should().BeFalse("Maybe should have no value");
     }
-}
-
 }

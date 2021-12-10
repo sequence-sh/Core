@@ -1,13 +1,6 @@
-﻿using System.Collections.Generic;
-using Microsoft.Extensions.Logging;
-using Reductech.EDR.Core.Internal.Errors;
-using Reductech.EDR.Core.Steps;
-using Reductech.EDR.Core.TestHarness;
-using Reductech.EDR.Core.Util;
-using static Reductech.EDR.Core.TestHarness.StaticHelpers;
+﻿using Reductech.EDR.Core.TestHarness;
 
-namespace Reductech.EDR.Core.Tests.Steps
-{
+namespace Reductech.EDR.Core.Tests.Steps;
 
 public partial class AssertErrorTests : StepTestBase<AssertError, Unit>
 {
@@ -67,6 +60,4 @@ public partial class AssertErrorTests : StepTestBase<AssertError, Unit>
             );
         }
     }
-}
-
 }

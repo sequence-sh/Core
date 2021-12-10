@@ -1,15 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using CSharpFunctionalExtensions;
-using Reductech.EDR.Core.Internal.Errors;
-using StepParameterDict =
+﻿using StepParameterDict =
     System.Collections.Generic.IReadOnlyDictionary<
         Reductech.EDR.Core.Internal.StepParameterReference,
         Reductech.EDR.Core.Internal.FreezableStepProperty>;
 
-namespace Reductech.EDR.Core.Internal
-{
+namespace Reductech.EDR.Core.Internal;
 
 /// <summary>
 /// The data used by a Freezable Step.
@@ -142,9 +136,9 @@ public sealed record FreezableStepData(StepParameterDict StepProperties, TextLoc
             StepParameterReference stepParameterReference)
         {
             if (!stepFactory.ParameterDictionary.TryGetValue(
-                stepParameterReference,
-                out var parameter
-            ))
+                    stepParameterReference,
+                    out var parameter
+                ))
             {
                 errors.Add(
                     ErrorCode.UnexpectedParameter
@@ -171,9 +165,9 @@ public sealed record FreezableStepData(StepParameterDict StepProperties, TextLoc
             bool isList)
         {
             if (!stepFactory.ParameterDictionary.TryGetValue(
-                stepParameterReference,
-                out var parameter
-            ))
+                    stepParameterReference,
+                    out var parameter
+                ))
             {
                 errors.Add(
                     ErrorCode.UnexpectedParameter
@@ -184,7 +178,7 @@ public sealed record FreezableStepData(StepParameterDict StepProperties, TextLoc
                 return;
             }
 
-            TypeReference tr;
+            TypeReference expectedTypeReference;
 
             if (isList)
             {
@@ -193,7 +187,7 @@ public sealed record FreezableStepData(StepParameterDict StepProperties, TextLoc
                  == typeof(IReadOnlyList<>))
                 {
                     var stepType = parameter.StepType.GenericTypeArguments[0];
-                    tr = TypeReference.CreateFromStepType(stepType);
+                    expectedTypeReference = TypeReference.CreateFromStepType(stepType);
                 }
 
                 else
@@ -222,7 +216,7 @@ public sealed record FreezableStepData(StepParameterDict StepProperties, TextLoc
                         return;
                     }
 
-                    tr = memberTypeReference.Value;
+                    expectedTypeReference = memberTypeReference.Value;
                 }
             }
             else if (parameter.MemberType == MemberType.Lambda)
@@ -232,17 +226,21 @@ public sealed record FreezableStepData(StepParameterDict StepProperties, TextLoc
             }
             else
             {
-                tr = TypeReference.CreateFromStepType(parameter.StepType);
+                expectedTypeReference = TypeReference.CreateFromStepType(parameter.StepType);
             }
 
-            var childCallerMetadata = new CallerMetadata(stepName, stepParameterReference.Name, tr);
-            //change caller metadata
-            var variablesSet = freezableStep.GetVariablesUsed(childCallerMetadata, typeResolver);
+            var childCallerMetadata = new CallerMetadata(
+                stepName,
+                stepParameterReference.Name,
+                expectedTypeReference
+            );
 
-            if (variablesSet.IsFailure)
-                errors.Add(variablesSet.Error);
+            var variablesUsed = freezableStep.GetVariablesUsed(childCallerMetadata, typeResolver);
+
+            if (variablesUsed.IsFailure)
+                errors.Add(variablesUsed.Error);
             else
-                variables.AddRange(variablesSet.Value);
+                variables.AddRange(variablesUsed.Value);
         }
 
         void GetVariablesUsedByLambda(
@@ -251,9 +249,9 @@ public sealed record FreezableStepData(StepParameterDict StepProperties, TextLoc
             StepParameterReference stepParameterReference)
         {
             if (!stepFactory.ParameterDictionary.TryGetValue(
-                stepParameterReference,
-                out var parameter
-            ))
+                    stepParameterReference,
+                    out var parameter
+                ))
             {
                 errors.Add(
                     ErrorCode.UnexpectedParameter
@@ -277,6 +275,4 @@ public sealed record FreezableStepData(StepParameterDict StepProperties, TextLoc
                 variables.AddRange(variablesSet.Value.Where(x => x.VariableName != vn));
         }
     }
-}
-
 }

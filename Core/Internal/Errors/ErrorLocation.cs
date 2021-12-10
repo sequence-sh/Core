@@ -1,5 +1,4 @@
-﻿namespace Reductech.EDR.Core.Internal.Errors
-{
+﻿namespace Reductech.EDR.Core.Internal.Errors;
 
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 public record ErrorLocation(string? StepName, TextLocation? TextLocation)
@@ -73,6 +72,4 @@ public record ErrorLocation(string? StepName, TextLocation? TextLocation)
     {
         return AsString();
     }
-}
-
 }

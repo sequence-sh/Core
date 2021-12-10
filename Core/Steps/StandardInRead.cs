@@ -1,13 +1,6 @@
-﻿using System.Threading;
-using System.Threading.Tasks;
-using CSharpFunctionalExtensions;
-using Reductech.EDR.Core.Attributes;
-using Reductech.EDR.Core.Enums;
-using Reductech.EDR.Core.Internal;
-using Reductech.EDR.Core.Internal.Errors;
+﻿using Reductech.EDR.Core.Enums;
 
-namespace Reductech.EDR.Core.Steps
-{
+namespace Reductech.EDR.Core.Steps;
 
 /// <summary>
 /// Reads the Console standard input
@@ -37,6 +30,4 @@ public class StandardInRead : CompoundStep<StringStream>
     /// <inheritdoc />
     public override IStepFactory StepFactory { get; } =
         new SimpleStepFactory<StandardInRead, StringStream>();
-}
-
 }

@@ -1,15 +1,6 @@
-﻿using System.Collections.Generic;
-using System.Threading;
-using Reductech.EDR.Core.Internal;
-using Reductech.EDR.Core.Internal.Errors;
-using Reductech.EDR.Core.Steps;
-using Reductech.EDR.Core.TestHarness;
-using Reductech.EDR.Core.Util;
-using Xunit;
-using static Reductech.EDR.Core.TestHarness.StaticHelpers;
+﻿using Reductech.EDR.Core.TestHarness;
 
-namespace Reductech.EDR.Core.Tests.Steps
-{
+namespace Reductech.EDR.Core.Tests.Steps;
 
 public partial class RunStepTests : StepTestBase<RunStep<Unit>, Unit>
 {
@@ -53,7 +44,7 @@ public partial class RunStepTests : StepTestBase<RunStep<Unit>, Unit>
                 "Test Error in Array",
                 new RunStep<Array<int>>
                 {
-                    Step = new ArrayMap<int>()
+                    Step = new ArrayMap<int, int>()
                     {
                         Array = Array(3, 2, 1, 0),
                         Function = new LambdaFunction<int, int>(
@@ -103,6 +94,4 @@ public partial class RunStepTests : StepTestBase<RunStep<Unit>, Unit>
         else
             r.ShouldBeSuccessful();
     }
-}
-
 }

@@ -1,7 +1,4 @@
-﻿using Json.Schema;
-
-namespace Reductech.EDR.Core.Entities.Schema
-{
+﻿namespace Reductech.EDR.Core.Entities.Schema;
 
 /// <summary>
 /// A schema which, if matched, allows additional items
@@ -19,6 +16,4 @@ public record EntityAdditionalItems(SchemaNode AdditionalItems) : NodeData<Entit
     {
         builder.AdditionalItems(AdditionalItems.ToJsonSchema());
     }
-}
-
 }

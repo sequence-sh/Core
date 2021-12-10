@@ -1,12 +1,4 @@
-﻿using System;
-using System.Linq;
-using System.Reflection;
-using FluentAssertions;
-using Reductech.EDR.Core.Internal;
-using Xunit;
-
-namespace Reductech.EDR.Core.TestHarness
-{
+﻿namespace Reductech.EDR.Core.TestHarness;
 
 public abstract class MetaTestsBase
 {
@@ -55,6 +47,4 @@ public abstract class MetaTestsBase
 
         return stepTestBase.StepType;
     }
-}
-
 }

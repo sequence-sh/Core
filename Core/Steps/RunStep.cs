@@ -1,15 +1,4 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations;
-using System.Threading;
-using System.Threading.Tasks;
-using CSharpFunctionalExtensions;
-using Reductech.EDR.Core.Attributes;
-using Reductech.EDR.Core.Internal;
-using Reductech.EDR.Core.Internal.Errors;
-using Reductech.EDR.Core.Util;
-
-namespace Reductech.EDR.Core.Steps
-{
+﻿namespace Reductech.EDR.Core.Steps;
 
 /// <summary>
 /// Runs another step, reads the output to the end, and ignores it.
@@ -137,6 +126,4 @@ public sealed class RunStep<T> : CompoundStep<Unit>
             return stepTypeReference;
         }
     }
-}
-
 }

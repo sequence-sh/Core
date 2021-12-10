@@ -1,23 +1,10 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading;
-using System.Threading.Tasks;
 using Divergic.Logging.Xunit;
-using FluentAssertions;
-using Microsoft.Extensions.Logging;
-using Moq;
-using Reductech.EDR.Core.Abstractions;
 using Reductech.EDR.Core.ExternalProcesses;
-using Reductech.EDR.Core.Internal;
-using Reductech.EDR.Core.Internal.Errors;
 using Reductech.EDR.Core.TestHarness;
-using RestSharp;
-using Xunit;
 
-namespace Reductech.EDR.Core.Tests
-{
+namespace Reductech.EDR.Core.Tests;
 
 [AutoTheory.UseTestOutputHelper]
 public partial class ExternalProcessTests
@@ -315,6 +302,4 @@ public partial class ExternalProcessTests
 
         return stateMonad;
     }
-}
-
 }

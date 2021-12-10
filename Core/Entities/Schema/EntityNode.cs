@@ -1,11 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using CSharpFunctionalExtensions;
-using Json.Schema;
-using Reductech.EDR.Core.Internal.Errors;
-
-namespace Reductech.EDR.Core.Entities.Schema
-{
+﻿namespace Reductech.EDR.Core.Entities.Schema;
 
 /// <summary>
 /// Matches a structured object
@@ -108,6 +101,4 @@ public record EntityNode(
 
         return Maybe<EntityValue>.None;
     }
-}
-
 }

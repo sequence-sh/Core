@@ -1,7 +1,4 @@
-﻿using System;
-
-namespace Reductech.EDR.Core.Attributes
-{
+﻿namespace Reductech.EDR.Core.Attributes;
 
 /// <summary>
 /// Indicates Step Property Metadata as it will appear in the documentation
@@ -18,6 +15,4 @@ public abstract class StepPropertyMetadataAttribute : Attribute
     /// The value of the metadata field
     /// </summary>
     public abstract string MetadataFieldValue { get; }
-}
-
 }

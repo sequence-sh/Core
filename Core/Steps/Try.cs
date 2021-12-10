@@ -1,15 +1,6 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations;
-using System.Threading;
-using System.Threading.Tasks;
-using CSharpFunctionalExtensions;
-using Reductech.EDR.Core.Attributes;
-using Reductech.EDR.Core.Internal;
-using Reductech.EDR.Core.Internal.Errors;
-using Reductech.EDR.Core.Internal.Logging;
+﻿using Reductech.EDR.Core.Internal.Logging;
 
-namespace Reductech.EDR.Core.Steps
-{
+namespace Reductech.EDR.Core.Steps;
 
 /// <summary>
 /// Tries to execute a step and recovers if that step results in failure.
@@ -23,7 +14,7 @@ namespace Reductech.EDR.Core.Steps
 [SCLExample(
     "Try (1 / 0)",
     "0",
-    Description  = "If the alternative is not set the default value is used.",
+    Description = "If the alternative is not set the default value is used.",
     ExpectedLogs = new[] { "Error Caught in Divide: Attempt to Divide by Zero." }
 )]
 [SCLExample(
@@ -130,6 +121,4 @@ public sealed class Try<T> : CompoundStep<T>
             return r;
         }
     }
-}
-
 }

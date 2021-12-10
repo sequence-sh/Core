@@ -1,20 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.Immutable;
-using System.Linq;
-using System.Reflection;
-using System.Text.RegularExpressions;
-using CSharpFunctionalExtensions;
+﻿using System.Text.RegularExpressions;
 using Namotion.Reflection;
-using OneOf;
-using Reductech.EDR.Core.Attributes;
-using Reductech.EDR.Core.Internal.Errors;
-using Reductech.EDR.Core.Internal.Serialization;
 using Reductech.EDR.Core.Steps;
-using Reductech.EDR.Core.Util;
 
-namespace Reductech.EDR.Core.Internal
-{
+namespace Reductech.EDR.Core.Internal;
 
 /// <summary>
 /// A factory for creating steps.
@@ -391,11 +379,11 @@ public abstract class StepFactory : IStepFactory
                     var enumType = propertyType.GenericTypeArguments.First();
 
                     if (Enum.TryParse(
-                        enumType,
-                        stringConstant.Value.GetString(),
-                        true,
-                        out var enumValue
-                    ))
+                            enumType,
+                            stringConstant.Value.GetString(),
+                            true,
+                            out var enumValue
+                        ))
                     {
                         var step = EnumConstantFreezable.TryCreateEnumConstant(enumValue!);
                         return step;
@@ -638,6 +626,41 @@ public abstract class StepFactory : IStepFactory
     }
 
     /// <summary>
+    /// Creates a typed generic step with multiple type arguments.
+    /// </summary>
+    protected static Result<ICompoundStep, IErrorBuilder> TryCreateGeneric(
+        Type openGenericType,
+        Type[] parameterTypes)
+    {
+        object? r;
+
+        try
+        {
+            var genericType = openGenericType.MakeGenericType(parameterTypes);
+            r = Activator.CreateInstance(genericType);
+        }
+        catch (ArgumentException e)
+        {
+            return ErrorCode.InvalidCast.ToErrorBuilder(e);
+        }
+        #pragma warning disable CA1031 // Do not catch general exception types
+        catch (Exception e)
+        {
+            return ErrorCode.InvalidCast.ToErrorBuilder(e);
+        }
+        #pragma warning restore CA1031 // Do not catch general exception types
+
+        if (r is ICompoundStep rp)
+            return Result.Success<ICompoundStep, IErrorBuilder>(rp);
+
+        return new ErrorBuilder(
+            ErrorCode.CannotCreateGeneric,
+            openGenericType.Name.Split("`")[0],
+            string.Join(",", parameterTypes.Select(x => x.GetDisplayName()))
+        );
+    }
+
+    /// <summary>
     /// Gets the name of the type, removing the backtick if it is a generic type.
     /// </summary>
     protected static string FormatTypeName(Type type)
@@ -687,7 +710,6 @@ public abstract class StepFactory : IStepFactory
 
     /// <inheritdoc />
     public IEnumerable<SCLExample> Examples => StepType.GetCustomAttributes<SCLExampleAttribute>()
+        .Where(x => x.IncludeInDocumentation)
         .Select(x => x.ToSCLExample);
-}
-
 }

@@ -1,21 +1,9 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Collections.Immutable;
-using System.Diagnostics.Contracts;
-using System.IO;
-using System.Linq;
-using System.Text.Json;
+﻿using System.IO;
 using System.Text.Json.Serialization;
-using CSharpFunctionalExtensions;
 using Generator.Equals;
-using Reductech.EDR.Core.Entities;
-using Reductech.EDR.Core.Internal;
-using Reductech.EDR.Core.Internal.Serialization;
 
 // ReSharper disable once CheckNamespace - we want this namespace to prevent clash with FunctionalExtensions
-namespace Reductech.EDR.Core
-{
+namespace Reductech.EDR.Core;
 
 /// <summary>
 /// A piece of data.
@@ -114,7 +102,7 @@ public sealed partial record Entity
             properties.Select(
                     p =>
                     {
-                        (string firstKey, var remainder) = p.key.Split();
+                        var (firstKey, remainder) = p.key.Split();
                         return (firstKey, remainder, p.value);
                     }
                 )
@@ -171,7 +159,7 @@ public sealed partial record Entity
             newProperty = new EntityProperty(key, newValue, order ?? Dictionary.Count);
         }
 
-        ImmutableDictionary<string, EntityProperty> newDict = Dictionary.SetItem(key, newProperty);
+        var newDict = Dictionary.SetItem(key, newProperty);
 
         return new Entity(newDict);
     }
@@ -234,36 +222,36 @@ public sealed partial record Entity
             return new Entity(newDict);
         }
 
-        if (Dictionary.TryGetValue(firstKey, out var ep)
-         && ep.Value is EntityValue.NestedEntity nestedEntity)
+        if (!Dictionary.TryGetValue(firstKey, out var ep)
+         || ep.Value is not EntityValue.NestedEntity nestedEntity)
+            return Maybe<Entity>.None;
+
         {
             var rem = remainder.GetValueOrThrow();
             var em  = nestedEntity.Value.TryRemoveProperty(rem);
 
-            if (em.HasValue)
+            if (!em.HasValue)
+                return Maybe<Entity>.None;
+
+            var newNestedEntity = em.GetValueOrThrow();
+
+            if (newNestedEntity.Dictionary.IsEmpty)
             {
-                var newNestedEntity = em.GetValueOrThrow();
+                var newDict = Dictionary.Remove(firstKey);
+                return new Entity(newDict);
+            }
+            else
+            {
+                var newProperty = new EntityProperty(
+                    firstKey,
+                    new EntityValue.NestedEntity(newNestedEntity),
+                    ep.Order
+                );
 
-                if (newNestedEntity.Dictionary.IsEmpty)
-                {
-                    var newDict = Dictionary.Remove(firstKey);
-                    return new Entity(newDict);
-                }
-                else
-                {
-                    var newProperty = new EntityProperty(
-                        firstKey,
-                        new EntityValue.NestedEntity(newNestedEntity),
-                        ep.Order
-                    );
-
-                    var newDict = Dictionary.SetItem(firstKey, newProperty);
-                    return new Entity(newDict);
-                }
+                var newDict = Dictionary.SetItem(firstKey, newProperty);
+                return new Entity(newDict);
             }
         }
-
-        return Maybe<Entity>.None;
     }
 
     /// <summary>
@@ -326,6 +314,4 @@ public sealed partial record Entity
 
     /// <inheritdoc />
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-}
-
 }

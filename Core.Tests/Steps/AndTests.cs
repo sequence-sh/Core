@@ -1,10 +1,6 @@
-﻿using System.Collections.Generic;
-using Reductech.EDR.Core.Internal;
-using Reductech.EDR.Core.Steps;
-using Reductech.EDR.Core.TestHarness;
+﻿using Reductech.EDR.Core.TestHarness;
 
-namespace Reductech.EDR.Core.Tests.Steps
-{
+namespace Reductech.EDR.Core.Tests.Steps;
 
 public partial class AndTests : StepTestBase<And, bool>
 {
@@ -49,6 +45,4 @@ public partial class AndTests : StepTestBase<And, bool>
             yield return case1 with { ExpectedSCL = "True && False && True" };
         }
     }
-}
-
 }

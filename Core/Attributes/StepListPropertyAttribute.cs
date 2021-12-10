@@ -1,8 +1,4 @@
-﻿using System;
-using Reductech.EDR.Core.Internal;
-
-namespace Reductech.EDR.Core.Attributes
-{
+﻿namespace Reductech.EDR.Core.Attributes;
 
 /// <summary>
 /// Indicates that this is a list of configurable properties of the step.
@@ -18,6 +14,4 @@ public sealed class StepListPropertyAttribute : StepPropertyBaseAttribute
 
     /// <inheritdoc />
     public override MemberType MemberType => MemberType.StepList;
-}
-
 }
