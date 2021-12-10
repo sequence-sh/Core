@@ -13,7 +13,7 @@ public sealed class AssertTrue : CompoundStep<Unit>
     {
         return await Boolean.Run(stateMonad, cancellationToken)
             .Ensure(
-                x => x,
+                x => x.Value,
                 new SingleError(
                     new ErrorLocation(this),
                     ErrorCode.AssertionFailed,

@@ -37,7 +37,7 @@ public sealed class ArrayFilter<T> : CompoundStep<Array<T>> where T : ISCLObject
                 stateMonad,
                 currentState,
                 Predicate.VariableNameOrItem,
-                new KeyValuePair<VariableName, object>(Predicate.VariableNameOrItem, record)
+                new KeyValuePair<VariableName, ISCLObject>(Predicate.VariableNameOrItem, record)
             );
 
             var result = await Predicate.StepTyped.Run(scopedMonad, cancellationToken);

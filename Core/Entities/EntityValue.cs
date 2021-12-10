@@ -835,7 +835,7 @@ public abstract record EntityValue(object ObjectValue)
 
         if (o is IEnumerable enumerable)
             return SerializationMethods.SerializeList(
-                enumerable.OfType<object>().Select(SerializationMethods.SerializeObject)
+                enumerable.OfType<ISCLObject>().Select(x => x.Serialize())
             );
 
         if (o is ISCLEnum enumeration)

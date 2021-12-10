@@ -21,13 +21,11 @@ public sealed class AssertEqual<T> : CompoundStep<Unit> where T : ISCLObject
         if (right.IsFailure)
             return right.ConvertFailure<Unit>();
 
-        var r = left.Value is not null && left.Value.Equals(right.Value);
-
-        if (r)
+        if (left.Value.Equals(right.Value))
             return Unit.Default;
 
-        var lString = await SerializationMethods.GetStringAsync(left.Value);
-        var rString = await SerializationMethods.GetStringAsync(right.Value);
+        var lString = left.Value.Serialize();
+        var rString = right.Value.Serialize();
 
         var error = ErrorCode.AssertionFailed
             .ToErrorBuilder($"Expected {lString} to equal {rString}")

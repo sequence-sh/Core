@@ -36,10 +36,10 @@ public sealed class CharAtIndex : CompoundStep<StringStream>
 
         var (str, index) = r.Value;
 
-        if (index < 0 || index >= str.Length)
+        if (index.Value < 0 || index.Value >= str.Length)
             return new SingleError(new ErrorLocation(this), ErrorCode.IndexOutOfBounds);
 
-        var character = str[index].ToString();
+        var character = str[index.Value].ToString();
 
         return new StringStream(character);
     }

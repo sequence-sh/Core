@@ -93,7 +93,7 @@ public sealed class ArraySort<T> : CompoundStep<Array<T>> where T : ISCLObject
                     stateMonad,
                     currentState,
                     KeySelector.VariableNameOrItem,
-                    new KeyValuePair<VariableName, object>(
+                    new KeyValuePair<VariableName, ISCLObject>(
                         KeySelector.VariableNameOrItem,
                         entity
                     )

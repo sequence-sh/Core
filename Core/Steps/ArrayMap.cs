@@ -41,7 +41,7 @@ public sealed class ArrayMap<TIn, TOut> : CompoundStep<Array<TOut>>
                 stateMonad,
                 currentState,
                 Function.VariableNameOrItem,
-                new KeyValuePair<VariableName, object>(Function.VariableNameOrItem, record)
+                new KeyValuePair<VariableName, ISCLObject>(Function.VariableNameOrItem, record)
             );
 
             var result = await Function.StepTyped.Run(scopedMonad, cancellationToken);

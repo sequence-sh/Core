@@ -179,7 +179,7 @@ public static class SCLParsing
             var location = new TextLocation(context);
 
             var member = new FreezableStepProperty.Step(
-                new BoolConstantFreezable(b, location),
+                new BoolConstantFreezable(b.ConvertToSCLObject(), location),
                 location
             );
 
@@ -204,7 +204,7 @@ public static class SCLParsing
                 );
             }
 
-            var constant = new DateTimeConstantFreezable(dateTime, location);
+            var constant = new DateTimeConstantFreezable(dateTime.ConvertToSCLObject(), location);
 
             var member = new FreezableStepProperty.Step(constant, location);
             return member;
@@ -340,14 +340,15 @@ public static class SCLParsing
             if (context.children.Count != 3 || context.NAME().Length != 2)
                 return ParseError(context);
 
-            var prefix = context.NAME(0).GetText();
+            var prefix = context.NAME(0).GetText(); //TODO use prefix
             var suffix = context.NAME(1).GetText();
 
             var location = new TextLocation(context);
 
             var member = new FreezableStepProperty.Step(
-                new EnumConstantFreezable(new Enumeration(prefix, suffix), location),
+                new StringConstantFreezable(suffix, location),
                 location
+                //new EnumConstantFreezable(Enumeration(prefix, suffix), location),
             );
 
             return member;
@@ -363,7 +364,7 @@ public static class SCLParsing
             if (int.TryParse(text, out var num))
             {
                 var member = new FreezableStepProperty.Step(
-                    new IntConstantFreezable(num, location),
+                    new IntConstantFreezable(num.ConvertToSCLObject(), location),
                     location
                 );
 
@@ -373,7 +374,7 @@ public static class SCLParsing
             if (double.TryParse(text, out var d))
             {
                 var member = new FreezableStepProperty.Step(
-                    new DoubleConstantFreezable(d, location),
+                    new DoubleConstantFreezable(d.ConvertToSCLObject(), location),
                     new TextLocation(context)
                 );
 

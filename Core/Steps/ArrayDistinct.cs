@@ -29,7 +29,7 @@ public sealed class ArrayDistinct<T> : CompoundStep<Array<T>> where T : ISCLObje
         if (ignoreCaseResult.IsFailure)
             return ignoreCaseResult.ConvertFailure<Array<T>>();
 
-        IEqualityComparer<string> comparer = ignoreCaseResult.Value
+        IEqualityComparer<string> comparer = ignoreCaseResult.Value.Value
             ? StringComparer.OrdinalIgnoreCase
             : StringComparer.Ordinal;
 
@@ -43,7 +43,7 @@ public sealed class ArrayDistinct<T> : CompoundStep<Array<T>> where T : ISCLObje
                 stateMonad,
                 currentState,
                 KeySelector.VariableNameOrItem,
-                new KeyValuePair<VariableName, object>(KeySelector.VariableNameOrItem, element!)
+                new KeyValuePair<VariableName, ISCLObject>(KeySelector.VariableNameOrItem, element)
             );
 
             var result = await KeySelector.StepTyped.Run(scopedMonad, cancellationToken)
@@ -114,10 +114,11 @@ public sealed class ArrayDistinct<T> : CompoundStep<Array<T>> where T : ISCLObje
         }
 
         /// <inheritdoc />
-        protected override string ArrayPropertyName => nameof(ArrayDistinct<object>.Array);
+        protected override string ArrayPropertyName => nameof(ArrayDistinct<ISCLObject>.Array);
 
         /// <inheritdoc />
-        protected override string LambdaPropertyName => nameof(ArrayDistinct<object>.KeySelector);
+        protected override string LambdaPropertyName =>
+            nameof(ArrayDistinct<ISCLObject>.KeySelector);
 
         /// <inheritdoc />
         public override Type StepType => typeof(ArrayDistinct<>);

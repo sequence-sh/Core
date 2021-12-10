@@ -55,7 +55,7 @@ public sealed class StringReplace : CompoundStep<StringStream>
 
         var regexOptions = RegexOptions.None;
 
-        if (ignoreCase)
+        if (ignoreCase.Value)
             regexOptions |= RegexOptions.IgnoreCase;
 
         var regex     = new Regex(pattern, regexOptions);
@@ -74,7 +74,7 @@ public sealed class StringReplace : CompoundStep<StringStream>
                     stateMonad,
                     currentState,
                     Function.VariableNameOrItem,
-                    new KeyValuePair<VariableName, object>(
+                    new KeyValuePair<VariableName, ISCLObject>(
                         Function.VariableNameOrItem,
                         new StringStream(match.Value)
                     )

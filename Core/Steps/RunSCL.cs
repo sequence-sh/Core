@@ -49,7 +49,7 @@ public sealed class RunSCL : CompoundStep<Unit>
 
         await using var monad2 = new ScopedStateMonad(
             stateMonad,
-            ImmutableDictionary<VariableName, object>.Empty,
+            ImmutableDictionary<VariableName, ISCLObject>.Empty,
             Maybe<VariableName>.None
         );
 
@@ -57,9 +57,9 @@ public sealed class RunSCL : CompoundStep<Unit>
 
         foreach (var variable in variablesToExport)
         {
-            var value = monad2.GetVariable<object>(variable);
+            var value = monad2.GetVariable<ISCLObject>(variable);
 
-            var valueV = value.IsSuccess ? value.Value : null;
+            var valueV = value.IsSuccess ? value.Value : SCLNull.Instance;
 
             await monad2.RemoveVariableAsync(
                 variable,
