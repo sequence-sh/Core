@@ -45,15 +45,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Remove="packages\**" />
-    <Compile Remove="StrykerOutput\**" />
-    <EmbeddedResource Remove="packages\**" />
-    <EmbeddedResource Remove="StrykerOutput\**" />
-    <None Remove="packages\**" />
-    <None Remove="StrykerOutput\**" />
-  </ItemGroup>
-
-  <ItemGroup>
     <None Remove="Internal\Parser\SCL.g4" />
   </ItemGroup>
 
@@ -72,10 +63,6 @@
     <PackageReference Include="RestSharp" Version="106.15.0" />
     <PackageReference Include="RestSharp.Serializers.SystemTextJson" Version="106.15.0" />
     <PackageReference Include="System.Linq.Async" Version="5.1.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Antlr\" />
   </ItemGroup>
 
   <ItemGroup>

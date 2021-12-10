@@ -45,12 +45,10 @@ test dev:
       [System.IO.File]::WriteAllText("./coverage.$($env:CI_JOB_NAME -replace "[^\w]+", "-").xml", $fixPaths)'
 
 mutation testing:
-  image: mcr.microsoft.com/dotnet/sdk:5.0-windowsservercore-ltsc2019
+  image: mcr.microsoft.com/dotnet/sdk:6.0-windowsservercore-ltsc2019
   tags:
     - rt-windows
   needs:
     - compile grammar
   rules:
     - when: never
-    
-
