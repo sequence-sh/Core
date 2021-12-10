@@ -5,7 +5,7 @@
 /// </summary>
 [Alias("IsArrayEmpty")]
 [Alias("IsEmpty")]
-public sealed class ArrayIsEmpty<T> : CompoundStep<bool>
+public sealed class ArrayIsEmpty<T> : CompoundStep<SCLBool> where T : ISCLObject
 {
     /// <summary>
     /// The array to check for emptiness.
@@ -15,13 +15,13 @@ public sealed class ArrayIsEmpty<T> : CompoundStep<bool>
     public IStep<Array<T>> Array { get; set; } = null!;
 
     /// <inheritdoc />
-    protected override async Task<Result<bool, IError>> Run(
+    protected override async Task<Result<SCLBool, IError>> Run(
         IStateMonad stateMonad,
         CancellationToken cancellationToken)
     {
         return await Array.Run(stateMonad, cancellationToken)
             .Bind(x => x.AnyAsync(cancellationToken))
-            .Map(x => !x);
+            .Map(x => x.ConvertToSCLObject());
     }
 
     /// <inheritdoc />
@@ -50,7 +50,7 @@ public sealed class ArrayIsEmpty<T> : CompoundStep<bool>
             GetOutputTypeReference(TypeReference memberTypeReference) => TypeReference.Actual.Bool;
 
         /// <inheritdoc />
-        protected override string ArrayPropertyName => nameof(ArrayIsEmpty<object>.Array);
+        protected override string ArrayPropertyName => nameof(ArrayIsEmpty<ISCLObject>.Array);
 
         /// <inheritdoc />
         protected override Result<TypeReference, IErrorBuilder> GetExpectedArrayTypeReference(

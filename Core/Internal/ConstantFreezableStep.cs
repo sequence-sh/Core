@@ -10,26 +10,17 @@ public record StringConstantFreezable
     )
 {
     /// <inheritdoc />
-    public override string StepName => Value.GetString();
-
-    /// <inheritdoc />
     public override Result<IStep, IError> TryFreeze(
         CallerMetadata callerMetadata,
         TypeResolver typeResolver) => new StringConstant(Value);
-
-    /// <inheritdoc />
-    public override string Serialize() => Value.Serialize();
 }
 
 /// <summary>
 /// A constant int
 /// </summary>
 public record IntConstantFreezable
-    (int Value, TextLocation TextLocation) : ConstantFreezableBase<int>(Value, TextLocation)
+    (SCLInt Value, TextLocation TextLocation) : ConstantFreezableBase<SCLInt>(Value, TextLocation)
 {
-    /// <inheritdoc />
-    public override string StepName => Value.ToString();
-
     /// <inheritdoc />
     public override Result<IStep, IError> TryFreeze(
         CallerMetadata callerMetadata,
@@ -49,146 +40,96 @@ public record IntConstantFreezable
         );
 
         if (doubleCheckResult.IsSuccess)
-            return new DoubleConstant(Value);
+            return new DoubleConstant(new SCLDouble(Value.Value));
 
         return intCheckResult.MapError(x => x.WithLocation(this)).ConvertFailure<IStep>();
     }
-
-    /// <inheritdoc />
-    public override string Serialize() => Value.ToString();
 }
 
 /// <summary>
 /// A constant double
 /// </summary>
 public record DoubleConstantFreezable
-    (double Value, TextLocation TextLocation) : ConstantFreezableBase<double>(Value, TextLocation)
+    (SCLDouble Value, TextLocation TextLocation) : ConstantFreezableBase<SCLDouble>(
+        Value,
+        TextLocation
+    )
 {
-    /// <inheritdoc />
-    public override string StepName => Value.ToString(Constants.DoubleFormat);
-
     /// <inheritdoc />
     public override Result<IStep, IError> TryFreeze(
         CallerMetadata callerMetadata,
         TypeResolver typeResolver) => new DoubleConstant(Value);
-
-    /// <inheritdoc />
-    public override string Serialize() => Value.ToString(Constants.DoubleFormat);
 }
 
 /// <summary>
 /// A constant bool
 /// </summary>
 public record BoolConstantFreezable
-    (bool Value, TextLocation TextLocation) : ConstantFreezableBase<bool>(Value, TextLocation)
+    (SCLBool Value, TextLocation TextLocation) : ConstantFreezableBase<SCLBool>(Value, TextLocation)
 {
-    /// <inheritdoc />
-    public override string StepName => Value.ToString();
-
     /// <inheritdoc />
     public override Result<IStep, IError> TryFreeze(
         CallerMetadata callerMetadata,
         TypeResolver typeResolver) => new BoolConstant(Value);
-
-    /// <inheritdoc />
-    public override string Serialize() => Value.ToString();
 }
 
 /// <summary>
 /// A constant DateTime
 /// </summary>
 public record DateTimeConstantFreezable
-    (DateTime Value, TextLocation TextLocation) : ConstantFreezableBase<DateTime>(
+    (SCLDateTime Value, TextLocation TextLocation) : ConstantFreezableBase<SCLDateTime>(
         Value,
         TextLocation
     )
 {
     /// <inheritdoc />
-    public override string StepName => Value.ToString(Constants.DateTimeFormat);
-
-    /// <inheritdoc />
     public override Result<IStep, IError> TryFreeze(
         CallerMetadata callerMetadata,
         TypeResolver typeResolver) => new DateTimeConstant(Value);
-
-    /// <inheritdoc />
-    public override string Serialize() => Value.ToString(Constants.DateTimeFormat);
 }
 
 /// <summary>
 /// An Enum Constant
 /// </summary>
 public record EnumConstantFreezable
-    (Enumeration Value, TextLocation TextLocation) : ConstantFreezableBase<Enumeration>(
+    (ISCLEnum Value, TextLocation TextLocation) : ConstantFreezableBase<ISCLEnum>(
         Value,
         TextLocation
     )
 {
     /// <inheritdoc />
-    public override string StepName => Value.ToString();
-
-    /// <inheritdoc />
     public override Result<IStep, IError> TryFreeze(
         CallerMetadata callerMetadata,
         TypeResolver typeResolver)
     {
-        var type = TryGetType(typeResolver);
+        return new EnumConstant(Value);
 
-        if (type.IsFailure)
-            return type.ConvertFailure<IStep>();
+        //var type = TryGetType(typeResolver);
 
-        if (Enum.TryParse(type.Value, Value.Value, true, out var o))
-            return TryCreateEnumConstant(o!).MapError(x => x.WithLocation(this));
+        //if (type.IsFailure)
+        //    return type.ConvertFailure<IStep>();
 
-        return (SingleError)ErrorCode.UnexpectedEnumValue.ToErrorBuilder(Value.Type, Value.Value)
-            .WithLocation(this);
+        //if (Enum.TryParse(type.Value, Value.Value, true, out var o))
+        //    return TryCreateEnumConstant(o!).MapError(x => x.WithLocation(this));
+
+        //return (SingleError)ErrorCode.UnexpectedEnumValue.ToErrorBuilder(Value.Type, Value.Value)
+        //    .WithLocation(this);
     }
 
-    /// <inheritdoc />
-    public override Result<TypeReference, IError> TryGetOutputTypeReference(
-        CallerMetadata callerMetadata,
-        TypeResolver typeResolver) => TryGetType(typeResolver)
-        .Map(TypeReference.Create);
+    ///// <inheritdoc />
+    //public override Result<TypeReference, IError> TryGetOutputTypeReference(
+    //    CallerMetadata callerMetadata,
+    //    TypeResolver typeResolver) => TryGetType(typeResolver)
+    //    .Map(TypeReference.Create);
 
-    /// <inheritdoc />
-    public override string Serialize() => Value.ToString();
+    //private Result<Type, IError> TryGetType(TypeResolver typeResolver)
+    //{
+    //    if (typeResolver.StepFactoryStore.EnumTypesDictionary.TryGetValue(Value.Type, out var t))
+    //        return t;
 
-    private Result<Type, IError> TryGetType(TypeResolver typeResolver)
-    {
-        if (typeResolver.StepFactoryStore.EnumTypesDictionary.TryGetValue(Value.Type, out var t))
-            return t;
-
-        return (SingleError)ErrorCode.UnexpectedEnumType.ToErrorBuilder(Value.Type)
-            .WithLocation(this);
-    }
-
-    /// <summary>
-    /// Tries to create an enum constant from a value.
-    /// Will fail if the value is not an enum.
-    /// </summary>
-    public static Result<IStep, IErrorBuilder> TryCreateEnumConstant(object value)
-    {
-        var type = value.GetType();
-
-        if (!type.IsEnum)
-            return new ErrorBuilder(ErrorCode.UnexpectedEnumType, type.Name);
-
-        Type stepType = typeof(EnumConstant<>).MakeGenericType(type);
-
-        var stepAsObject = Activator.CreateInstance(stepType, value);
-
-        try
-        {
-            var step = (IStep)stepAsObject!;
-            return Result.Success<IStep, IErrorBuilder>(step);
-        }
-        #pragma warning disable CA1031 // Do not catch general exception types
-        catch (Exception e)
-        {
-            return ErrorCode.InvalidCast.ToErrorBuilder(e);
-        }
-        #pragma warning restore CA1031 // Do not catch general exception types
-    }
+    //    return (SingleError)ErrorCode.UnexpectedEnumType.ToErrorBuilder(Value.Type)
+    //        .WithLocation(this);
+    //}
 }
 
 /// <summary>
@@ -211,10 +152,10 @@ public interface IConstantFreezableStep : IFreezableStep
 /// The base class for freezable constants
 /// </summary>
 public abstract record ConstantFreezableBase<T>
-    (T Value, TextLocation TextLocation) : IConstantFreezableStep
+    (T Value, TextLocation TextLocation) : IConstantFreezableStep where T : ISCLObject
 {
     /// <inheritdoc />
-    public abstract string StepName { get; }
+    public string StepName => Value.Name;
 
     /// <inheritdoc />
     public abstract Result<IStep, IError> TryFreeze(
@@ -252,20 +193,20 @@ public abstract record ConstantFreezableBase<T>
         if (ReferenceEquals(this, other))
             return true;
 
-        var r = other is ConstantFreezableBase<T> cfs && Value!.Equals(cfs.Value);
+        var r = other is ConstantFreezableBase<T> cfs && Value.Equals(cfs.Value);
 
         return r;
     }
 
     /// <inheritdoc />
-    public override int GetHashCode() => Value!.GetHashCode();
+    public override int GetHashCode() => Value.GetHashCode();
 
     /// <inheritdoc />
     public override string ToString() => StepName;
 
     /// <inheritdoc />
-    public object ValueObject => Value!;
+    public object ValueObject => Value;
 
     /// <inheritdoc />
-    public abstract string Serialize();
+    public string Serialize() => Value.Serialize();
 }

@@ -28,7 +28,7 @@ public sealed class Delay : CompoundStep<Unit>
     [StepProperty(1)]
     [Required]
     [Alias("ms")]
-    public IStep<int> Milliseconds { get; set; } = null!;
+    public IStep<SCLInt> Milliseconds { get; set; } = null!;
 
     /// <inheritdoc />
     public override IStepFactory StepFactory { get; } = new SimpleStepFactory<Delay, Unit>();

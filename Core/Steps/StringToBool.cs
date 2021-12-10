@@ -6,7 +6,7 @@
 [Alias("ToBool")]
 [SCLExample("StringToBool 'true'",  "True")]
 [SCLExample("StringToBool 'false'", "False")]
-public sealed class StringToBool : CompoundStep<bool>
+public sealed class StringToBool : CompoundStep<SCLBool>
 {
     /// <summary>
     /// The string to convert to an integer

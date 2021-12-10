@@ -17,7 +17,7 @@ public interface IArrayNewStep
 [Alias("Array")]
 [Alias("NewArray")]
 [Alias("ArrayCreate")]
-public sealed class ArrayNew<T> : CompoundStep<Array<T>>, IArrayNewStep
+public sealed class ArrayNew<T> : CompoundStep<Array<T>>, IArrayNewStep where T : ISCLObject
 {
     /// <inheritdoc />
     protected override async Task<Result<Array<T>, IError>> Run(
@@ -110,13 +110,13 @@ public sealed class ArrayNew<T> : CompoundStep<Array<T>>, IArrayNewStep
                 return mtr.ConvertFailure<TypeReference>();
 
             var result =
-                freezableStepData.TryGetStepList(nameof(ArrayNew<object>.Elements), StepType)
+                freezableStepData.TryGetStepList(nameof(ArrayNew<ISCLObject>.Elements), StepType)
                     .Bind(
                         x => x.Select(
                                 r => r.TryGetOutputTypeReference(
                                     new CallerMetadata(
                                         TypeName,
-                                        nameof(ArrayNew<int>.Elements),
+                                        nameof(ArrayNew<SCLInt>.Elements),
                                         mtr.Value
                                     ),
                                     typeResolver

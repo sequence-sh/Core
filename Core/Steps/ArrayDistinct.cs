@@ -12,7 +12,7 @@ namespace Reductech.EDR.Core.Steps;
     "[('a': 1 'b': 2), ('a': 1 'b': 2), ('a': 3 'b': 4)] | ArrayDistinct",
     "[('a': 1 'b': 2), ('a': 3 'b': 4)]"
 )]
-public sealed class ArrayDistinct<T> : CompoundStep<Array<T>>
+public sealed class ArrayDistinct<T> : CompoundStep<Array<T>> where T : ISCLObject
 {
     /// <inheritdoc />
     protected override async Task<Result<Array<T>, IError>> Run(
@@ -84,7 +84,7 @@ public sealed class ArrayDistinct<T> : CompoundStep<Array<T>>
     /// </summary>
     [StepProperty(3)]
     [DefaultValueExplanation("False")]
-    public IStep<bool> IgnoreCase { get; set; } = new BoolConstant(false);
+    public IStep<SCLBool> IgnoreCase { get; set; } = new BoolConstant(SCLBool.False);
 
     /// <inheritdoc />
     public override IStepFactory StepFactory => ArrayDistinctStepFactory.Instance;

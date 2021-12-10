@@ -11,7 +11,10 @@ public partial class DivideTests : StepTestBase<Divide, int>
         {
             yield return new StepCase(
                 "No Terms",
-                new Divide() { Terms = new ArrayNew<int>() { Elements = new List<IStep<int>>() } },
+                new Divide()
+                {
+                    Terms = new ArrayNew<int>() { Elements = new List<IStep<SCLInt>>() }
+                },
                 0
             );
 

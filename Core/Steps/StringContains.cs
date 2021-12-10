@@ -8,7 +8,7 @@
 [SCLExample("StringContains String: 'hello there' Substring: 'there'", "True")]
 [SCLExample("StringContains String: 'hello there' Substring: 'world'", "False")]
 [SCLExample("DoesString 'hello there' Contain: 'ello'",                "True")]
-public sealed class StringContains : CompoundStep<bool>
+public sealed class StringContains : CompoundStep<SCLBool>
 {
     /// <inheritdoc />
     protected override async Task<Result<bool, IError>> Run(
@@ -61,7 +61,7 @@ public sealed class StringContains : CompoundStep<bool>
     /// </summary>
     [StepProperty(3)]
     [DefaultValueExplanation("False")]
-    public IStep<bool> IgnoreCase { get; set; } = new BoolConstant(false);
+    public IStep<SCLBool> IgnoreCase { get; set; } = new BoolConstant(SCLBool.False);
 
     /// <inheritdoc />
     public override IStepFactory StepFactory { get; } =

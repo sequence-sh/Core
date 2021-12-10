@@ -18,7 +18,7 @@
     IncludeInDocumentation = false,
     ExpectedLogs = new[] { "2", "3", "4" }
 )]
-public sealed class EntityGetValue<T> : CompoundStep<T>
+public sealed class EntityGetValue<T> : CompoundStep<T> where T : ISCLObject
 {
     /// <inheritdoc />
     protected override Task<Result<T, IError>> Run(

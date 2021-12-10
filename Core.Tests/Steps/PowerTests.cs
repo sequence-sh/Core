@@ -11,7 +11,10 @@ public partial class PowerTests : StepTestBase<Power, int>
         {
             yield return new StepCase(
                 "No numbers",
-                new Power() { Terms = new ArrayNew<int>() { Elements = new List<IStep<int>>() } },
+                new Power()
+                {
+                    Terms = new ArrayNew<int>() { Elements = new List<IStep<SCLInt>>() }
+                },
                 0
             );
 

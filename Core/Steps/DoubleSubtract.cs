@@ -3,10 +3,10 @@
 /// <summary>
 /// Subtract a list of numbers from a number
 /// </summary>
-public sealed class DoubleSubtract : BaseOperatorStep<DoubleSubtract, double, double>
+public sealed class DoubleSubtract : BaseOperatorStep<DoubleSubtract, SCLDouble, SCLDouble>
 {
     /// <inheritdoc />
-    protected override Result<double, IErrorBuilder> Operate(IEnumerable<double> terms)
+    protected override Result<SCLDouble, IErrorBuilder> Operate(IEnumerable<SCLDouble> terms)
     {
         double total = 0;
         var    first = true;
@@ -15,16 +15,16 @@ public sealed class DoubleSubtract : BaseOperatorStep<DoubleSubtract, double, do
         {
             if (first)
             {
-                total += number;
+                total += number.Value;
                 first =  false;
             }
             else
             {
-                total -= number;
+                total -= number.Value;
             }
         }
 
-        return total;
+        return total.ConvertToSCLObject();
     }
 
     /// <inheritdoc />

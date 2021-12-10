@@ -11,7 +11,7 @@ public partial class OrTests : StepTestBase<Or, bool>
         {
             yield return new StepCase(
                 "No terms",
-                new Or() { Terms = new ArrayNew<bool>() { Elements = new List<IStep<bool>>() } },
+                new Or() { Terms = new ArrayNew<bool>() { Elements = new List<IStep<SCLBool>>() } },
                 false
             );
 

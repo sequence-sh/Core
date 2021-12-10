@@ -18,7 +18,7 @@ public sealed class CharAtIndex : CompoundStep<StringStream>
     /// </summary>
     [StepProperty(2)]
     [Required]
-    public IStep<int> Index { get; set; } = null!;
+    public IStep<SCLInt> Index { get; set; } = null!;
 
     /// <inheritdoc />
     protected override async Task<Result<StringStream, IError>> Run(

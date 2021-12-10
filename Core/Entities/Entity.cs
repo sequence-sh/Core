@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using System.Text;
 using System.Text.Json.Serialization;
 using Generator.Equals;
 
@@ -10,9 +11,14 @@ namespace Reductech.EDR.Core;
 /// </summary>
 [JsonConverter(typeof(EntityJsonConverter))]
 [Equatable]
-public sealed partial record Entity
-    : IEnumerable<EntityProperty>
+public sealed partial record Entity(
+    [property: OrderedEquality] ImmutableDictionary<string, EntityProperty> Dictionary) :
+    ISCLObject, IEnumerable<EntityProperty>
 {
+    /// <summary>
+    /// Creates a new entity from a dictionary.
+    /// Be sure to set the string comparer on the dictionary.
+    /// </summary>
     /// <summary>
     /// Creates a new entity
     /// </summary>
@@ -26,22 +32,12 @@ public sealed partial record Entity
     ) { }
 
     /// <summary>
-    /// Creates a new entity from a dictionary.
-    /// Be sure to set the string comparer on the dictionary.
-    /// </summary>
-    public Entity(ImmutableDictionary<string, EntityProperty> dictionary) =>
-        Dictionary = dictionary;
-
-    /// <summary>
     /// Empty entity
     /// </summary>
     public static Entity Empty { get; } = new(new List<EntityProperty>());
 
-    /// <summary>
-    /// The dictionary
-    /// </summary>
-    [OrderedEquality]
-    public ImmutableDictionary<string, EntityProperty> Dictionary { get; }
+    /// <inheritdoc />
+    public TypeReference TypeReference => TypeReference.Actual.Entity;
 
     /// <summary>
     /// The default property name if the Entity represents a single primitive.
@@ -310,7 +306,31 @@ public sealed partial record Entity
         Dictionary.Values.OrderBy(x => x.Order).GetEnumerator();
 
     /// <inheritdoc />
-    public override string ToString() => this.Serialize();
+    public string Serialize()
+    {
+        var sb = new StringBuilder();
+
+        sb.Append('(');
+
+        var results = new List<string>();
+
+        foreach (var (name, entityValue, _) in this)
+            results.Add($"'{name}': {entityValue.Serialize()}");
+
+        sb.AppendJoin(" ", results);
+
+        sb.Append(')');
+
+        var result = sb.ToString();
+
+        return result;
+    }
+
+    /// <inheritdoc />
+    public string Name => Serialize();
+
+    /// <inheritdoc />
+    public override string ToString() => Serialize();
 
     /// <inheritdoc />
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();

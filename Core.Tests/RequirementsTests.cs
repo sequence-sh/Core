@@ -89,7 +89,7 @@ public partial class RequirementsTests
             );
     }
 
-    private class RuntimeRequirementsStep : CompoundStep<int>
+    private class RuntimeRequirementsStep : CompoundStep<SCLInt>
     {
         /// <inheritdoc />
         protected override Task<Result<int, IError>> Run(
@@ -106,14 +106,14 @@ public partial class RequirementsTests
             minRequiredVersion: "1.0.0",
             maxRequiredVersion: "2.0.0"
         )]
-        public IStep<int> BaseStep { get; set; } = null!;
+        public IStep<SCLInt> BaseStep { get; set; } = null!;
 
         /// <inheritdoc />
         public override IStepFactory StepFactory =>
             new SimpleStepFactory<RuntimeRequirementsStep, int>();
     }
 
-    private class FixedRequirementsStep : CompoundStep<int>
+    private class FixedRequirementsStep : CompoundStep<SCLInt>
     {
         /// <inheritdoc />
         protected override async Task<Result<int, IError>> Run(

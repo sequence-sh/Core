@@ -15,21 +15,21 @@ public sealed class ScopedStateMonad : IStateMonad
     /// </summary>
     public ScopedStateMonad(
         IStateMonad baseStateMonad,
-        ImmutableDictionary<VariableName, object> fixedState,
+        ImmutableDictionary<VariableName, ISCLObject> fixedState,
         Maybe<VariableName> automaticVariable,
-        params KeyValuePair<VariableName, object>[] state)
+        params KeyValuePair<VariableName, ISCLObject>[] state)
     {
         _fixedState            = fixedState;
         AutomaticVariable      = automaticVariable;
         BaseStateMonad         = baseStateMonad;
-        _scopedStateDictionary = new ConcurrentDictionary<VariableName, object>(state);
+        _scopedStateDictionary = new ConcurrentDictionary<VariableName, ISCLObject>(state);
     }
 
-    private readonly ConcurrentDictionary<VariableName, object> _scopedStateDictionary;
+    private readonly ConcurrentDictionary<VariableName, ISCLObject> _scopedStateDictionary;
 
     private IStateMonad BaseStateMonad { get; }
 
-    private readonly ImmutableDictionary<VariableName, object> _fixedState;
+    private readonly ImmutableDictionary<VariableName, ISCLObject> _fixedState;
 
     /// <inheritdoc />
     public IReadOnlyDictionary<string, object> SequenceMetadata => BaseStateMonad.SequenceMetadata;
@@ -44,11 +44,11 @@ public sealed class ScopedStateMonad : IStateMonad
     public StepFactoryStore StepFactoryStore => BaseStateMonad.StepFactoryStore;
 
     /// <inheritdoc />
-    public IEnumerable<KeyValuePair<VariableName, object>> GetState() =>
+    public IEnumerable<KeyValuePair<VariableName, ISCLObject>> GetState() =>
         _scopedStateDictionary.Concat(_fixedState);
 
     /// <inheritdoc />
-    public Result<T, IErrorBuilder> GetVariable<T>(VariableName key)
+    public Result<T, IErrorBuilder> GetVariable<T>(VariableName key) where T : ISCLObject
     {
         var r1 = StateMonad.TryGetVariableFromDictionary<T>(key, _scopedStateDictionary);
 
@@ -78,7 +78,7 @@ public sealed class ScopedStateMonad : IStateMonad
         T variable,
         bool disposeOld,
         IStep? callingStep,
-        CancellationToken cancellation)
+        CancellationToken cancellation) where T : ISCLObject
     {
         await RemoveVariableAsync(key, disposeOld, callingStep);
 

@@ -39,7 +39,7 @@ public partial class EqualsTests : StepTestBase<Equals<int>, bool>
                 {
                     Terms = new ArrayNew<int>()
                     {
-                        Elements = new List<IStep<int>>()
+                        Elements = new List<IStep<SCLInt>>()
                         {
                             new Sum() { Terms     = StaticHelpers.Array(2, 2) },
                             new Product() { Terms = StaticHelpers.Array(2, 2) },

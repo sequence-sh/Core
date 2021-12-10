@@ -7,7 +7,7 @@
 [SCLExample("ArrayConcat [[1,2,3], [4,5,6]]",         "[1, 2, 3, 4, 5, 6]")]
 [SCLExample("Combine Arrays: [[1, 2, 3], [4, 5, 6]]", "[1, 2, 3, 4, 5, 6]")]
 [Alias("Combine")]
-public sealed class ArrayConcat<T> : CompoundStep<Array<T>>
+public sealed class ArrayConcat<T> : CompoundStep<Array<T>> where T : ISCLObject
 {
     /// <inheritdoc />
     protected override async Task<Result<Array<T>, IError>> Run(

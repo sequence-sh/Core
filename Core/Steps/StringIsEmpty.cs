@@ -4,7 +4,7 @@
 /// Returns whether a string is empty.
 /// </summary>
 [Alias("IsStringEmpty")]
-public sealed class StringIsEmpty : CompoundStep<bool>
+public sealed class StringIsEmpty : CompoundStep<SCLBool>
 {
     /// <inheritdoc />
     protected override async Task<Result<bool, IError>> Run(

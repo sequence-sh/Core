@@ -10,28 +10,28 @@ public sealed class For : CompoundStep<Unit>
     /// </summary>
     [StepProperty(1)]
     [Required]
-    public IStep<int> From { get; set; } = null!;
+    public IStep<SCLInt> From { get; set; } = null!;
 
     /// <summary>
     /// The highest value of the variable to use
     /// </summary>
     [StepProperty(2)]
     [Required]
-    public IStep<int> To { get; set; } = null!;
+    public IStep<SCLInt> To { get; set; } = null!;
 
     /// <summary>
     /// The amount to increment by each iteration.
     /// </summary>
     [StepProperty(3)]
     [Required]
-    public IStep<int> Increment { get; set; } = null!;
+    public IStep<SCLInt> Increment { get; set; } = null!;
 
     /// <summary>
     /// The action to perform repeatedly.
     /// </summary>
     [FunctionProperty(4)]
     [Required]
-    public LambdaFunction<int, Unit> Action { get; set; } = null!;
+    public LambdaFunction<SCLInt, Unit> Action { get; set; } = null!;
 
     /// <inheritdoc />
     protected override async Task<Result<Unit, IError>> Run(
@@ -55,10 +55,10 @@ public sealed class For : CompoundStep<Unit>
         if (increment.IsFailure)
             return increment.ConvertFailure<Unit>();
 
-        if (increment.Value == 0)
+        if (increment.Value.Value == 0)
             return new SingleError(new ErrorLocation(this), ErrorCode.DivideByZero);
 
-        var currentValue = from.Value;
+        var currentValue = from.Value.Value;
 
         var scopedStateMonad = new ScopedStateMonad(
             stateMonad,
@@ -67,7 +67,9 @@ public sealed class For : CompoundStep<Unit>
             new KeyValuePair<VariableName, object>(variableName, currentValue)
         );
 
-        while (increment.Value > 0 ? currentValue <= to.Value : currentValue >= to.Value)
+        while (increment.Value.Value > 0
+                   ? currentValue <= to.Value.Value
+                   : currentValue >= to.Value.Value)
         {
             var r = await Action.StepTyped.Run(scopedStateMonad, cancellationToken);
 
@@ -81,7 +83,7 @@ public sealed class For : CompoundStep<Unit>
                 return currentValueResult.ConvertFailure<Unit>();
 
             currentValue =  currentValueResult.Value;
-            currentValue += increment.Value;
+            currentValue += increment.Value.Value;
 
             var setResult2 = await scopedStateMonad.SetVariableAsync(
                 variableName,

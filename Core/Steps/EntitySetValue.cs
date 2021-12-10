@@ -10,7 +10,7 @@
     "('type': \"C\" 'value': 1)"
 )]
 [SCLExample("In ('type': 'C', 'value': 1) Set: 'type' To: 'A'", "('type': \"A\" 'value': 1)")]
-public sealed class EntitySetValue<T> : CompoundStep<Entity>
+public sealed class EntitySetValue<T> : CompoundStep<Entity> where T : ISCLObject
 {
     /// <inheritdoc />
     protected override async Task<Result<Entity, IError>> Run(
@@ -104,12 +104,15 @@ public sealed class EntitySetValue<T> : CompoundStep<Entity>
             if (allowResult.IsFailure)
                 return allowResult.ConvertFailure<TypeReference>();
 
-            var r1 = freezableStepData.TryGetStep(nameof(EntitySetValue<object>.Value), StepType)
+            var r1 = freezableStepData.TryGetStep(
+                    nameof(EntitySetValue<ISCLObject>.Value),
+                    StepType
+                )
                 .Bind(
                     x => x.TryGetOutputTypeReference(
                         new CallerMetadata(
                             TypeName,
-                            nameof(EntitySetValue<object>.Value),
+                            nameof(EntitySetValue<ISCLObject>.Value),
                             TypeReference.Any.Instance
                         ),
                         typeResolver

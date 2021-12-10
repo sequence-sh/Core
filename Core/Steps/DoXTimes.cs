@@ -18,7 +18,7 @@ public sealed class DoXTimes : CompoundStep<Unit> //TODO replace with a lambda f
     [StepProperty(2)]
     [Required]
     [Alias("Times")]
-    public IStep<int> X { get; set; } = null!;
+    public IStep<SCLInt> X { get; set; } = null!;
 
     /// <inheritdoc />
     protected override async Task<Result<Unit, IError>> Run(

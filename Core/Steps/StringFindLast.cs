@@ -10,7 +10,7 @@
 [Alias("FindLastInstance")]
 [SCLExample("StringFindLast SubString: 'ello' InString: 'hello hello!'", "7")]
 [SCLExample("FindLastInstance Of: 'ello' In: 'hello hello!'",            "7")]
-public sealed class StringFindLast : CompoundStep<int>
+public sealed class StringFindLast : CompoundStep<SCLInt>
 {
     /// <summary>
     /// The string to check.

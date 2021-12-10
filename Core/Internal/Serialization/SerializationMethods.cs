@@ -56,29 +56,6 @@ public static class SerializationMethods
     }
 
     /// <summary>
-    /// Serialize this entity.
-    /// </summary>
-    public static string Serialize(this Entity entity)
-    {
-        var sb = new StringBuilder();
-
-        sb.Append('(');
-
-        var results = new List<string>();
-
-        foreach (var property in entity)
-            results.Add($"'{property.Name}': {property.Value.Serialize()}");
-
-        sb.AppendJoin(" ", results);
-
-        sb.Append(')');
-
-        var result = sb.ToString();
-
-        return result;
-    }
-
-    /// <summary>
     /// Format this entity as a multiline indented string
     /// </summary>
     public static string Format(this Entity entity)
@@ -202,7 +179,7 @@ public static class SerializationMethods
                 StringStream ss => ss.GetString(),
                 DateTime dt     => dt.ToString(Constants.DateTimeFormat),
                 double d        => d.ToString(Constants.DoubleFormat, new NumberFormatInfo()),
-                IArray array    => array.NameInLogs,
+                IArray array    => array.Name,
                 SCLNull         => "Null",
                 _               => obj?.ToString()!
             };

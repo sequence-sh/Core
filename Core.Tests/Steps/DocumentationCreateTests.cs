@@ -370,7 +370,7 @@ public partial class DocumentationCreateTests : StepTestBase<DocumentationCreate
         [SeeAlso("Beta")]
         [Alias("Alef")]
         // ReSharper disable UnusedMember.Local
-        public IStep<int> Alpha { get; set; } = null!;
+        public IStep<SCLInt> Alpha { get; set; } = null!;
 
         /// <summary>
         /// The beta property. Not Required.
@@ -385,7 +385,7 @@ public partial class DocumentationCreateTests : StepTestBase<DocumentationCreate
         /// </summary>
         [StepListProperty(4)]
         [ValueDelimiter(",")]
-        public IReadOnlyList<IStep<bool>> Delta { get; set; } = null!;
+        public IReadOnlyList<IStep<SCLBool>> Delta { get; set; } = null!;
 
         /// <summary>
         /// The Gamma property.

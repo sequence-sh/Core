@@ -4,7 +4,7 @@
 /// An array backed by an async collection
 /// </summary>
 public sealed record LazyArray<T>
-    (IAsyncEnumerable<T> AsyncEnumerable) : Array<T>, IEquatable<Array<T>>
+    (IAsyncEnumerable<T> AsyncEnumerable) : Array<T>, IEquatable<Array<T>> where T : ISCLObject
 {
     /// <inheritdoc />
     public override IAsyncEnumerable<T> GetAsyncEnumerable() => AsyncEnumerable;
@@ -152,25 +152,22 @@ public sealed record LazyArray<T>
     }
 
     /// <inheritdoc />
-    public override string Serialize
+    public override string Serialize()
     {
-        get
-        {
-            var r = GetElementsAsync(CancellationToken.None)
-                .Result;
+        var r = GetElementsAsync(CancellationToken.None)
+            .Result;
 
-            if (r.IsSuccess)
-                return SerializationMethods.SerializeList(
-                    r.Value
-                        .Select(x => SerializationMethods.SerializeObject(x))
-                );
+        if (r.IsSuccess)
+            return SerializationMethods.SerializeList(
+                r.Value
+                    .Select(x => SerializationMethods.SerializeObject(x))
+            );
 
-            return r.Error.AsString;
-        }
+        return r.Error.AsString;
     }
 
     /// <inheritdoc />
-    public override string NameInLogs => "Stream";
+    public override string Name => "Stream";
 
     /// <inheritdoc />
     public override int GetHashCode() => GetHashCodeValue(this);
@@ -205,5 +202,5 @@ public sealed record LazyArray<T>
     }
 
     /// <inheritdoc />
-    public override string ToString() => NameInLogs;
+    public override string ToString() => Name;
 }

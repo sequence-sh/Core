@@ -3,7 +3,7 @@
 /// <summary>
 /// Creates an array by repeating an element.
 /// </summary>
-public sealed class Repeat<T> : CompoundStep<Array<T>>
+public sealed class Repeat<T> : CompoundStep<Array<T>> where T : ISCLObject
 {
     /// <summary>
     /// The element to repeat.
@@ -17,7 +17,7 @@ public sealed class Repeat<T> : CompoundStep<Array<T>>
     /// </summary>
     [StepProperty(2)]
     [Required]
-    public IStep<int> Number { get; set; } = null!;
+    public IStep<SCLInt> Number { get; set; } = null!;
 
     /// <inheritdoc />
     protected override async Task<Result<Array<T>, IError>> Run(
@@ -34,7 +34,7 @@ public sealed class Repeat<T> : CompoundStep<Array<T>>
         if (number.IsFailure)
             return number.ConvertFailure<Array<T>>();
 
-        var result = Enumerable.Repeat(element.Value, number.Value).ToSCLArray();
+        var result = Enumerable.Repeat(element.Value, number.Value.Value).ToSCLArray();
 
         return result;
     }
@@ -72,12 +72,12 @@ public sealed class Repeat<T> : CompoundStep<Array<T>>
             TypeResolver typeResolver)
         {
             return freezableStepData
-                .TryGetStep(nameof(Repeat<object>.Element), StepType)
+                .TryGetStep(nameof(Repeat<ISCLObject>.Element), StepType)
                 .Bind(
                     x => x.TryGetOutputTypeReference(
                         new CallerMetadata(
                             TypeName,
-                            nameof(Repeat<object>.Element),
+                            nameof(Repeat<ISCLObject>.Element),
                             TypeReference.Any.Instance
                         ),
                         typeResolver

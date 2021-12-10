@@ -14,7 +14,7 @@
     "[('Key': \"A\" 'Values': [('type': \"A\" 'value': 1), ('type': \"A\" 'value': 3)]), ('Key': \"B\" 'Values': [('type': \"B\" 'value': 2)])]"
 )]
 [Alias("Group")]
-public sealed class ArrayGroupBy<T> : CompoundStep<Array<Entity>>
+public sealed class ArrayGroupBy<T> : CompoundStep<Array<Entity>> where T : ISCLObject
 {
     /// <inheritdoc />
     protected override async Task<Result<Array<Entity>, IError>> Run(
@@ -102,8 +102,8 @@ public sealed class ArrayGroupBy<T> : CompoundStep<Array<Entity>>
         }
 
         /// <inheritdoc />
-        protected override string ArrayPropertyName => nameof(ArrayGroupBy<object>.Array);
+        protected override string ArrayPropertyName => nameof(ArrayGroupBy<ISCLObject>.Array);
 
-        protected override string LambdaPropertyName => nameof(ArrayGroupBy<object>.Function);
+        protected override string LambdaPropertyName => nameof(ArrayGroupBy<ISCLObject>.Function);
     }
 }

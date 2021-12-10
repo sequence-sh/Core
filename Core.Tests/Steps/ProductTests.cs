@@ -11,7 +11,10 @@ public partial class ProductTests : StepTestBase<Product, int>
         {
             yield return new StepCase(
                 "No numbers",
-                new Product() { Terms = new ArrayNew<int>() { Elements = new List<IStep<int>>() } },
+                new Product()
+                {
+                    Terms = new ArrayNew<int>() { Elements = new List<IStep<SCLInt>>() }
+                },
                 1
             );
 

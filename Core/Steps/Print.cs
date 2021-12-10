@@ -3,7 +3,7 @@
 /// <summary>
 /// Prints a value to the console.
 /// </summary>
-public sealed class Print<T> : CompoundStep<Unit>
+public sealed class Print<T> : CompoundStep<Unit> where T : ISCLObject
 {
     /// <inheritdoc />
     protected override async Task<Result<Unit, IError>> Run(
@@ -15,7 +15,7 @@ public sealed class Print<T> : CompoundStep<Unit>
         if (r.IsFailure)
             return r.ConvertFailure<Unit>();
 
-        string stringToPrint = await SerializationMethods.GetStringAsync(r.Value);
+        var stringToPrint = await SerializationMethods.GetStringAsync(r.Value);
 
         stateMonad.ExternalContext.Console.WriteLine(stringToPrint);
 
@@ -57,12 +57,12 @@ public sealed class Print<T> : CompoundStep<Unit>
             CallerMetadata callerMetadata,
             FreezableStepData freezableStepData,
             TypeResolver typeResolver) => freezableStepData
-            .TryGetStep(nameof(Print<object>.Value), StepType)
+            .TryGetStep(nameof(Print<ISCLObject>.Value), StepType)
             .Bind(
                 x => x.TryGetOutputTypeReference(
                     new CallerMetadata(
                         TypeName,
-                        nameof(Print<object>.Value),
+                        nameof(Print<ISCLObject>.Value),
                         TypeReference.Any.Instance
                     ),
                     typeResolver

@@ -8,8 +8,9 @@ namespace Reductech.EDR.Core;
 /// A stream of data representing a string.
 /// This can either be a raw string or a stream and an encoding.
 /// </summary>
-public sealed class StringStream : IEquatable<StringStream>, IComparable<StringStream>, IDisposable,
-                                   IComparable
+public sealed class StringStream : ISCLObject, IEquatable<StringStream>, IComparable<StringStream>,
+                                   IDisposable,
+                                   IComparable, IComparableSCLObject
 {
     /// <summary>
     /// Create a new DataStream
@@ -180,6 +181,8 @@ public sealed class StringStream : IEquatable<StringStream>, IComparable<StringS
         }
     }
 
+    string ISCLObject.Name => GetString();
+
     /// <summary>
     /// If this is a string, return the string, otherwise read the stream as a string.
     /// </summary>
@@ -300,10 +303,21 @@ public sealed class StringStream : IEquatable<StringStream>, IComparable<StringS
     public static bool operator !=(StringStream? left, StringStream? right) => !Equals(left, right);
 
     /// <inheritdoc />
+    public int CompareTo(IComparableSCLObject? other) => other switch
+    {
+        null            => 0.CompareTo(null),
+        StringStream ss => CompareTo(ss),
+        _               => StringComparer.Ordinal.Compare(Serialize(), other.Serialize())
+    };
+
+    /// <inheritdoc />
     public void Dispose()
     {
         _semaphore.Dispose();
 
         Value.Dispose();
     }
+
+    /// <inheritdoc />
+    public TypeReference TypeReference => TypeReference.Actual.String;
 }

@@ -11,7 +11,7 @@ public partial class SumTests : StepTestBase<Sum, int>
         {
             yield return new StepCase(
                 "No numbers",
-                new Sum() { Terms = new ArrayNew<int>() { Elements = new List<IStep<int>>() } },
+                new Sum() { Terms = new ArrayNew<int>() { Elements = new List<IStep<SCLInt>>() } },
                 0
             );
 

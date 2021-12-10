@@ -27,7 +27,7 @@ public sealed class IncrementVariable : CompoundStep<Unit>
     [StepProperty(2)]
     [DefaultValueExplanation("1")]
     [Alias("By")]
-    public IStep<int> Amount { get; set; } = new IntConstant(1);
+    public IStep<SCLInt> Amount { get; set; } = new IntConstant(1);
 
     /// <inheritdoc />
     protected override async Task<Result<Unit, IError>> Run(

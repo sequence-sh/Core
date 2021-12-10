@@ -9,7 +9,7 @@ namespace Reductech.EDR.Core.Steps;
 [SCLExample("IsMatch String: 'abracadabra' Regex: 'ab\\w+?ab'",    "True")]
 [Alias("IsMatch")]
 [Alias("RegexMatch")]
-public sealed class StringMatch : CompoundStep<bool>
+public sealed class StringMatch : CompoundStep<SCLBool>
 {
     /// <inheritdoc />
     protected override async Task<Result<bool, IError>> Run(
@@ -64,7 +64,7 @@ public sealed class StringMatch : CompoundStep<bool>
     /// </summary>
     [StepProperty()]
     [DefaultValueExplanation("False")]
-    public IStep<bool> IgnoreCase { get; set; } = new BoolConstant(false);
+    public IStep<SCLBool> IgnoreCase { get; set; } = new BoolConstant(SCLBool.False);
 
     /// <inheritdoc />
     public override IStepFactory StepFactory { get; } = new SimpleStepFactory<StringMatch, bool>();

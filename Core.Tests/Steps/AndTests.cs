@@ -11,7 +11,10 @@ public partial class AndTests : StepTestBase<And, bool>
         {
             yield return new StepCase(
                 "No terms",
-                new And() { Terms = new ArrayNew<bool>() { Elements = new List<IStep<bool>>() } },
+                new And()
+                {
+                    Terms = new ArrayNew<SCLBool>() { Elements = new List<IStep<SCLBool>>() }
+                },
                 true
             );
 

@@ -5,7 +5,7 @@
 /// </summary>
 [Alias("ToInt")]
 [SCLExample("StringToInt '123'", "123")]
-public sealed class StringToInt : CompoundStep<int>
+public sealed class StringToInt : CompoundStep<SCLInt>
 {
     /// <summary>
     /// The string to convert to an integer

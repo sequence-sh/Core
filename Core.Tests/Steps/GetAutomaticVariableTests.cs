@@ -24,7 +24,7 @@ public partial class GetAutomaticVariableTests : StepTestBase<GetAutomaticVariab
                                 new Sum
                                 {
                                     Terms = ArrayNew<int>.CreateArray(
-                                        new List<IStep<int>>
+                                        new List<IStep<SCLInt>>
                                         {
                                             new GetAutomaticVariable<int>(), Constant(13)
                                         }
@@ -54,7 +54,7 @@ public partial class GetAutomaticVariableTests : StepTestBase<GetAutomaticVariab
                                     new Sum()
                                     {
                                         Terms = ArrayNew<int>.CreateArray(
-                                            new List<IStep<int>>()
+                                            new List<IStep<SCLInt>>()
                                             {
                                                 new GetAutomaticVariable<int>(),
                                                 Constant(13)
@@ -84,7 +84,7 @@ public partial class GetAutomaticVariableTests : StepTestBase<GetAutomaticVariab
                                 new Sum()
                                 {
                                     Terms = ArrayNew<int>.CreateArray(
-                                        new List<IStep<int>>()
+                                        new List<IStep<SCLInt>>()
                                         {
                                             new GetAutomaticVariable<int>(),
                                             new ArrayElementAtIndex<int>()

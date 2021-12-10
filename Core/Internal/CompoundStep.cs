@@ -5,7 +5,7 @@ namespace Reductech.EDR.Core.Internal;
 /// <summary>
 /// A runnable step that is not a constant.
 /// </summary>
-public abstract class CompoundStep<T> : ICompoundStep<T>
+public abstract class CompoundStep<T> : ICompoundStep<T> where T : ISCLObject
 {
     /// <summary>
     /// Run this step.
@@ -53,7 +53,7 @@ public abstract class CompoundStep<T> : ICompoundStep<T>
                 {
                     null            => "Null",
                     StringStream ss => ss.NameInLogs(false),
-                    IArray array    => array.NameInLogs,
+                    IArray array    => array.Name,
                     Unit            => "Unit",
                     _               => o.ToString()!
                 };
@@ -64,7 +64,7 @@ public abstract class CompoundStep<T> : ICompoundStep<T>
     /// <inheritdoc />
     public virtual Task<Result<T1, IError>> Run<T1>(
         IStateMonad stateMonad,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken) where T1 : ISCLObject
     {
         return Run(stateMonad, cancellationToken)
             .BindCast<T, T1, IError>(

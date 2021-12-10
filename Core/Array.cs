@@ -3,7 +3,7 @@
 /// <summary>
 /// Either a list or an asynchronous list
 /// </summary>
-public abstract record Array<T> : IArray
+public abstract record Array<T> : IArray where T : ISCLObject
 {
     /// <summary>
     /// The empty array
@@ -73,6 +73,7 @@ public abstract record Array<T> : IArray
     /// Returns some number of elements
     /// </summary>
     public Array<TResult> SelectMany<TResult>(Func<T, IAsyncEnumerable<TResult>> selector)
+        where TResult : ISCLObject
     {
         var r = GetAsyncEnumerable().SelectMany(selector).ToSCLArray();
         return r;
@@ -82,6 +83,7 @@ public abstract record Array<T> : IArray
     /// Perform an action on every member of the sequence
     /// </summary>
     public Array<TResult> SelectAwait<TResult>(Func<T, ValueTask<TResult>> selector)
+        where TResult : ISCLObject
     {
         var r = GetAsyncEnumerable().SelectAwait(selector).ToSCLArray();
 
@@ -115,7 +117,7 @@ public abstract record Array<T> : IArray
     /// <summary>
     /// Perform an action on every member of the sequence
     /// </summary>
-    public Array<TResult> Select<TResult>(Func<T, TResult> selector)
+    public Array<TResult> Select<TResult>(Func<T, TResult> selector) where TResult : ISCLObject
     {
         var r = GetAsyncEnumerable().Select(selector).ToSCLArray();
         return r;
@@ -149,13 +151,17 @@ public abstract record Array<T> : IArray
     }
 
     /// <inheritdoc />
-    public abstract string NameInLogs { get; }
+    public abstract string Name { get; }
 
     /// <inheritdoc />
-    public abstract string Serialize { get; }
+    public TypeReference TypeReference => new TypeReference.Array(TypeReference.Create(typeof(T)));
 
     /// <inheritdoc />
-    public abstract Result<Array<TElement>, IErrorBuilder> TryConvertElements<TElement>();
+    public abstract string Serialize();
+
+    /// <inheritdoc />
+    public abstract Result<Array<TElement>, IErrorBuilder> TryConvertElements<TElement>()
+        where TElement : ISCLObject;
 
     /// <inheritdoc />
     public abstract Task<Result<IArray, IError>> EnsureEvaluated(CancellationToken cancellation);
@@ -208,13 +214,13 @@ public abstract record Array<T> : IArray
     }
 
     /// <inheritdoc />
-    public override string ToString() => NameInLogs;
+    public override string ToString() => Name;
 }
 
 /// <summary>
 /// Either a list of an asynchronous list
 /// </summary>
-public interface IArray
+public interface IArray : ISCLObject
 {
     /// <summary>
     /// Try to get the elements of this list, as objects asynchronously.
@@ -222,19 +228,10 @@ public interface IArray
     Task<Result<List<object>, IError>> GetObjectsAsync(CancellationToken cancellation);
 
     /// <summary>
-    /// How this Array will appear in the logs.
-    /// </summary>
-    string NameInLogs { get; }
-
-    /// <summary>
-    /// Serialize this array
-    /// </summary>
-    string Serialize { get; }
-
-    /// <summary>
     /// Attempts to convert the elements of the array to the chosen type
     /// </summary>
-    Result<Array<TElement>, IErrorBuilder> TryConvertElements<TElement>();
+    Result<Array<TElement>, IErrorBuilder> TryConvertElements<TElement>()
+        where TElement : ISCLObject;
 
     /// <summary>
     /// Ensure that this array is evaluated
@@ -251,19 +248,19 @@ public static class ArrayHelper
     /// <summary>
     /// Converts an enumerable to a Sequence
     /// </summary>
-    public static Array<T> ToSCLArray<T>(this IAsyncEnumerable<T> enumerable) =>
-        new LazyArray<T>(enumerable);
+    public static Array<T> ToSCLArray<T>(this IAsyncEnumerable<T> enumerable)
+        where T : ISCLObject => new LazyArray<T>(enumerable);
 
     /// <summary>
     /// Converts an asyncEnumerable to a Sequence
     /// </summary>
-    public static Array<T> ToSCLArray<T>(this IEnumerable<T> enumerable) =>
+    public static Array<T> ToSCLArray<T>(this IEnumerable<T> enumerable) where T : ISCLObject =>
         new EagerArray<T>(enumerable.ToList());
 
     /// <summary>
     /// Creates an array from an enumerable of objects
     /// </summary>
-    public static Array<T> CreateArray<T>(IEnumerable<object> elementsEnum)
+    public static Array<T> CreateArray<T>(IEnumerable<object> elementsEnum) where T : ISCLObject
     {
         var r = new EagerArray<T>(elementsEnum.Cast<T>().ToList());
         return r;
