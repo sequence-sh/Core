@@ -199,7 +199,7 @@ public sealed record FeatureRequirement(
         {
             if (entityValue is EntityValue.EnumerationValue ev)
             {
-                return ev.Value.Value;
+                return ev.Value.EnumValue;
             }
 
             return entityValue.GetPrimitiveString();

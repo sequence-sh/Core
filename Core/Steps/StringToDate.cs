@@ -9,7 +9,7 @@ namespace Reductech.EDR.Core.Steps;
 [Alias("ConvertStringToDate")]
 [Alias("ToDate")]
 [SCLExample("StringToDate '2020/10/20 20:30:40'", "2020-10-20T20:30:40.0000000")]
-public sealed class StringToDate : CompoundStep<DateTime>
+public sealed class StringToDate : CompoundStep<SCLDateTime>
 {
     /// <summary>
     /// The string to convert to DateTime
@@ -40,7 +40,7 @@ public sealed class StringToDate : CompoundStep<DateTime>
         new StringConstant(CultureInfo.CurrentCulture.Name);
 
     /// <inheritdoc />
-    protected override async Task<Result<DateTime, IError>> Run(
+    protected override async Task<Result<SCLDateTime, IError>> Run(
         IStateMonad stateMonad,
         CancellationToken cancellationToken)
     {
@@ -48,7 +48,7 @@ public sealed class StringToDate : CompoundStep<DateTime>
             .Map(async x => await x.GetStringAsync());
 
         if (dateResult.IsFailure)
-            return dateResult.ConvertFailure<DateTime>();
+            return dateResult.ConvertFailure<SCLDateTime>();
 
         string? inputFormat = null;
 
@@ -58,7 +58,7 @@ public sealed class StringToDate : CompoundStep<DateTime>
                 .Map(async x => await x.GetStringAsync());
 
             if (inputFormatResult.IsFailure)
-                return inputFormatResult.ConvertFailure<DateTime>();
+                return inputFormatResult.ConvertFailure<SCLDateTime>();
 
             inputFormat = inputFormatResult.Value;
         }
@@ -67,7 +67,7 @@ public sealed class StringToDate : CompoundStep<DateTime>
             .Map(async x => await x.GetStringAsync());
 
         if (cultureResult.IsFailure)
-            return cultureResult.ConvertFailure<DateTime>();
+            return cultureResult.ConvertFailure<SCLDateTime>();
 
         CultureInfo ci;
 
@@ -118,10 +118,10 @@ public sealed class StringToDate : CompoundStep<DateTime>
             }
         }
 
-        return date;
+        return date.ConvertToSCLObject();
     }
 
     /// <inheritdoc />
     public override IStepFactory StepFactory { get; } =
-        new SimpleStepFactory<StringToDate, DateTime>();
+        new SimpleStepFactory<StringToDate, SCLDateTime>();
 }

@@ -3,7 +3,7 @@
 /// <summary>
 /// Gets the value of a named variable.
 /// </summary>
-public sealed class SetVariable<T> : CompoundStep<Unit>
+public sealed class SetVariable<T> : CompoundStep<Unit> where T : ISCLObject
 {
     /// <inheritdoc />
     protected override async Task<Result<Unit, IError>> Run(
@@ -66,7 +66,7 @@ public sealed class SetVariable<T> : CompoundStep<Unit>
                 return valueType.ConvertFailure<TypeReference>();
 
             var vn = freezableStepData
-                .TryGetVariableName(nameof(SetVariable<object>.Variable), StepType)
+                .TryGetVariableName(nameof(SetVariable<ISCLObject>.Variable), StepType)
                 .Map(x => new TypeReference.Variable(x));
 
             if (vn.IsFailure)
@@ -87,13 +87,13 @@ public sealed class SetVariable<T> : CompoundStep<Unit>
         {
             var r =
                 freezableStepData
-                    .TryGetStep(nameof(SetVariable<object>.Value), StepType)
+                    .TryGetStep(nameof(SetVariable<ISCLObject>.Value), StepType)
                     .Bind(
                         x =>
                             x.TryGetOutputTypeReference(
                                 new CallerMetadata(
                                     TypeName,
-                                    nameof(SetVariable<object>.Value),
+                                    nameof(SetVariable<ISCLObject>.Value),
                                     TypeReference.Any.Instance
                                 ),
                                 typeResolver
@@ -110,7 +110,7 @@ public sealed class SetVariable<T> : CompoundStep<Unit>
             TypeResolver typeResolver)
         {
             var vn = freezableStepData.TryGetVariableName(
-                nameof(SetVariable<object>.Variable),
+                nameof(SetVariable<ISCLObject>.Variable),
                 StepType
             );
 
@@ -136,11 +136,11 @@ public sealed class SetVariable<T> : CompoundStep<Unit>
         /// <inheritdoc />
         public override IStepSerializer Serializer => new StepSerializer(
             TypeName,
-            new StepComponent(nameof(SetVariable<object>.Variable)),
+            new StepComponent(nameof(SetVariable<ISCLObject>.Variable)),
             SpaceComponent.Instance,
             new FixedStringComponent("="),
             SpaceComponent.Instance,
-            new StepComponent(nameof(SetVariable<object>.Value))
+            new StepComponent(nameof(SetVariable<ISCLObject>.Value))
         );
     }
 }

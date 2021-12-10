@@ -82,7 +82,7 @@ public sealed class ScopedStateMonad : IStateMonad
     {
         await RemoveVariableAsync(key, disposeOld, callingStep);
 
-        object value;
+        ISCLObject value;
 
         if (variable is IArray arrayVariable)
         {
@@ -95,7 +95,7 @@ public sealed class ScopedStateMonad : IStateMonad
         }
         else
         {
-            value = variable!;
+            value = variable;
         }
 
         _scopedStateDictionary.AddOrUpdate(

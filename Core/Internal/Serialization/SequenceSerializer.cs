@@ -22,12 +22,12 @@ public sealed class SequenceSerializer : IStepSerializer
 
         var sb = new StringBuilder();
 
-        if (dict.TryGetValue(nameof(Sequence<object>.InitialSteps), out var sp)
+        if (dict.TryGetValue(nameof(Sequence<ISCLObject>.InitialSteps), out var sp)
          && sp is StepProperty.StepListProperty stepList)
             foreach (var step in stepList.StepList)
                 AddStep(sb, step, 0);
 
-        if (dict.TryGetValue(nameof(Sequence<object>.FinalStep), out var finalStep)
+        if (dict.TryGetValue(nameof(Sequence<ISCLObject>.FinalStep), out var finalStep)
          && finalStep is StepProperty.SingleStepProperty stepProperty)
             AddStep(sb, stepProperty.Step, 0);
 

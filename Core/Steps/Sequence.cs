@@ -14,7 +14,7 @@ public interface ISequenceStep
 /// <summary>
 /// A chain of steps to be run one after the other.
 /// </summary>
-public sealed class Sequence<T> : CompoundStep<T>, ISequenceStep
+public sealed class Sequence<T> : CompoundStep<T>, ISequenceStep where T : ISCLObject
 {
     /// <inheritdoc />
     protected override async Task<Result<T, IError>> Run(
@@ -76,12 +76,12 @@ public sealed class Sequence<T> : CompoundStep<T>, ISequenceStep
             CallerMetadata callerMetadata,
             FreezableStepData freezableStepData,
             TypeResolver typeResolver) => freezableStepData
-            .TryGetStep(nameof(Sequence<object>.FinalStep), StepType)
+            .TryGetStep(nameof(Sequence<ISCLObject>.FinalStep), StepType)
             .Bind(
                 x => x.TryGetOutputTypeReference(
                     new CallerMetadata(
                         TypeName,
-                        nameof(Sequence<object>.FinalStep),
+                        nameof(Sequence<ISCLObject>.FinalStep),
                         TypeReference.Any.Instance
                     ),
                     typeResolver
