@@ -5,7 +5,7 @@
 /// </summary>
 [Alias("ToDouble")]
 [SCLExample("StringToDouble '123.45'", "123.45")]
-public sealed class StringToDouble : CompoundStep<double>
+public sealed class StringToDouble : CompoundStep<SCLDouble>
 {
     /// <summary>
     /// The string to convert to an integer
@@ -16,18 +16,18 @@ public sealed class StringToDouble : CompoundStep<double>
     public IStep<StringStream> Double { get; set; } = null!;
 
     /// <inheritdoc />
-    protected override async Task<Result<double, IError>> Run(
+    protected override async Task<Result<SCLDouble, IError>> Run(
         IStateMonad stateMonad,
         CancellationToken cancellationToken)
     {
         var result = await Double.WrapStringStream().Run(stateMonad, cancellationToken);
 
         if (result.IsFailure)
-            return result.ConvertFailure<double>();
+            return result.ConvertFailure<SCLDouble>();
 
-        if (double.TryParse(result.Value, out var i))
+        if (double.TryParse(result.Value, out var d))
         {
-            return i;
+            return d.ConvertToSCLObject();
         }
 
         return ErrorCode.CouldNotParse.ToErrorBuilder(result.Value, SCLType.Double.ToString())
@@ -36,5 +36,5 @@ public sealed class StringToDouble : CompoundStep<double>
 
     /// <inheritdoc />
     public override IStepFactory StepFactory { get; } =
-        new SimpleStepFactory<StringToDouble, double>();
+        new SimpleStepFactory<StringToDouble, SCLDouble>();
 }

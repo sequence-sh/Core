@@ -30,7 +30,7 @@ public sealed class StringFindLast : CompoundStep<SCLInt>
     public IStep<StringStream> SubString { get; set; } = null!;
 
     /// <inheritdoc />
-    protected override async Task<Result<int, IError>> Run(
+    protected override async Task<Result<SCLInt, IError>> Run(
         IStateMonad stateMonad,
         CancellationToken cancellationToken)
     {
@@ -38,18 +38,19 @@ public sealed class StringFindLast : CompoundStep<SCLInt>
             .Map(async x => await x.GetStringAsync());
 
         if (str.IsFailure)
-            return str.ConvertFailure<int>();
+            return str.ConvertFailure<SCLInt>();
 
         var subString = await SubString.Run(stateMonad, cancellationToken)
             .Map(async x => await x.GetStringAsync());
 
         if (subString.IsFailure)
-            return subString.ConvertFailure<int>();
+            return subString.ConvertFailure<SCLInt>();
 
-        return str.Value.LastIndexOf(subString.Value, StringComparison.Ordinal);
+        return str.Value.LastIndexOf(subString.Value, StringComparison.Ordinal)
+            .ConvertToSCLObject();
     }
 
     /// <inheritdoc />
     public override IStepFactory StepFactory { get; } =
-        new SimpleStepFactory<StringFindLast, int>();
+        new SimpleStepFactory<StringFindLast, SCLInt>();
 }

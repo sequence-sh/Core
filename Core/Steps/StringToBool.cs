@@ -17,18 +17,18 @@ public sealed class StringToBool : CompoundStep<SCLBool>
     public IStep<StringStream> Boolean { get; set; } = null!;
 
     /// <inheritdoc />
-    protected override async Task<Result<bool, IError>> Run(
+    protected override async Task<Result<SCLBool, IError>> Run(
         IStateMonad stateMonad,
         CancellationToken cancellationToken)
     {
         var result = await Boolean.WrapStringStream().Run(stateMonad, cancellationToken);
 
         if (result.IsFailure)
-            return result.ConvertFailure<bool>();
+            return result.ConvertFailure<SCLBool>();
 
         if (bool.TryParse(result.Value, out var i))
         {
-            return i;
+            return i.ConvertToSCLObject();
         }
 
         return ErrorCode.CouldNotParse.ToErrorBuilder(result.Value, SCLType.Bool.ToString())
@@ -36,5 +36,6 @@ public sealed class StringToBool : CompoundStep<SCLBool>
     }
 
     /// <inheritdoc />
-    public override IStepFactory StepFactory { get; } = new SimpleStepFactory<StringToBool, bool>();
+    public override IStepFactory StepFactory { get; } =
+        new SimpleStepFactory<StringToBool, SCLBool>();
 }

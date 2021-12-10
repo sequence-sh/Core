@@ -46,10 +46,11 @@ public class EntityJsonConverter : JsonConverter<Entity>
                 return ev switch
                 {
                     EntityValue.NestedEntity nestedEntity => CreateDictionary(nestedEntity.Value),
-                    EntityValue.EnumerationValue enumerationValue => enumerationValue.Value.Value,
+                    EntityValue.EnumerationValue enumerationValue => enumerationValue.Value
+                        .EnumValue,
                     EntityValue.NestedList list => list.Value.Select(GetObject).ToList(),
-                    EntityValue.Null _ => null,
-                    _ => ev.ObjectValue
+                    EntityValue.Null _          => null,
+                    _                           => ev.ObjectValue
                 };
             }
         }

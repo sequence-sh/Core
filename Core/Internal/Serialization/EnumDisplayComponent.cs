@@ -26,7 +26,7 @@ public class EnumDisplayComponent<T> : ISerializerBlock where T : Enum
                     {
                         StepProperty.SingleStepProperty singleStepProperty => singleStepProperty
                             .Step is EnumConstant<T> cs
-                            ? cs.Value.GetDisplayName()
+                            ? cs.Value.EnumValue
                             : Result.Failure<string>("Operator is non constant step"),
                         StepProperty.StepListProperty => Result.Failure<string>(
                             "Operator is Step List"

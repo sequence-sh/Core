@@ -55,7 +55,7 @@ public sealed class SchemaCreateCoerced : CompoundStep<Entity>
             Formatter.Create(boolTrueFormats),
             Formatter.Create(boolFalseFormats),
             Formatter.Create(nullFormats),
-            caseSensitive
+            caseSensitive.Value
         );
 
         var schema =
@@ -66,7 +66,7 @@ public sealed class SchemaCreateCoerced : CompoundStep<Entity>
         var jsonSchemaBuilder = new JsonSchemaBuilder()
             .Title(schemaName)
             .Type(SchemaValueType.Object)
-            .AdditionalProperties(allowExtraProperties ? JsonSchema.True : JsonSchema.False);
+            .AdditionalProperties(allowExtraProperties.Value ? JsonSchema.True : JsonSchema.False);
 
         var props    = schema.Keywords?.OfType<PropertiesKeyword>().FirstOrDefault();
         var required = schema.Keywords?.OfType<RequiredKeyword>().FirstOrDefault();
@@ -147,7 +147,7 @@ public sealed class SchemaCreateCoerced : CompoundStep<Entity>
     /// </summary>
     [StepProperty()]
     [DefaultValueExplanation("False")]
-    public IStep<OneOf<StringStream, Array<StringStream>, Entity>>? BooleanFalseFormats
+    public IStep<SCLOneOf<StringStream, Array<StringStream>, Entity>>? BooleanFalseFormats
     {
         get;
         set;
@@ -167,7 +167,7 @@ public sealed class SchemaCreateCoerced : CompoundStep<Entity>
     /// </summary>
     [StepProperty()]
     [DefaultValueExplanation("No null values")]
-    public IStep<OneOf<StringStream, Array<StringStream>, Entity>>? NullFormats { get; set; } =
+    public IStep<SCLOneOf<StringStream, Array<StringStream>, Entity>>? NullFormats { get; set; } =
         null;
 
     /// <summary>

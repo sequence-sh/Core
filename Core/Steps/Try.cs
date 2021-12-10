@@ -25,7 +25,7 @@ namespace Reductech.EDR.Core.Steps;
         "Error Caught in ArrayElementAtIndex: Index was outside the bounds of the array."
     }
 )]
-public sealed class Try<T> : CompoundStep<T>
+public sealed class Try<T> : CompoundStep<T> where T : ISCLObject
 {
     /// <inheritdoc />
     protected override async Task<Result<T, IError>> Run(

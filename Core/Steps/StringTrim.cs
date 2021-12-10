@@ -22,7 +22,8 @@ public sealed class StringTrim : CompoundStep<StringStream>
     /// </summary>
     [StepProperty(2)]
     [DefaultValueExplanation("Both")]
-    public IStep<TrimSide> Side { get; set; } = new EnumConstant<TrimSide>(TrimSide.Both);
+    public IStep<SCLEnum<TrimSide>> Side { get; set; } =
+        new EnumConstant<TrimSide>(new SCLEnum<TrimSide>(TrimSide.Both));
 
     /// <inheritdoc />
     protected override async Task<Result<StringStream, IError>> Run(
@@ -40,7 +41,7 @@ public sealed class StringTrim : CompoundStep<StringStream>
         if (sideResult.IsFailure)
             return sideResult.ConvertFailure<StringStream>();
 
-        StringStream r = TrimString(stringResult.Value, sideResult.Value);
+        StringStream r = TrimString(stringResult.Value, sideResult.Value.Value);
 
         return r;
     }

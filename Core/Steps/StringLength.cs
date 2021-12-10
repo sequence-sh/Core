@@ -14,7 +14,7 @@ public sealed class StringLength : CompoundStep<SCLInt>
     public IStep<StringStream> String { get; set; } = null!;
 
     /// <inheritdoc />
-    protected override async Task<Result<int, IError>> Run(
+    protected override async Task<Result<SCLInt, IError>> Run(
         IStateMonad stateMonad,
         CancellationToken cancellationToken)
     {
@@ -22,11 +22,12 @@ public sealed class StringLength : CompoundStep<SCLInt>
             .Map(async x => await x.GetStringAsync());
 
         if (str.IsFailure)
-            return str.ConvertFailure<int>();
+            return str.ConvertFailure<SCLInt>();
 
-        return str.Value.Length;
+        return str.Value.Length.ConvertToSCLObject();
     }
 
     /// <inheritdoc />
-    public override IStepFactory StepFactory { get; } = new SimpleStepFactory<StringLength, int>();
+    public override IStepFactory StepFactory { get; } =
+        new SimpleStepFactory<StringLength, SCLInt>();
 }
