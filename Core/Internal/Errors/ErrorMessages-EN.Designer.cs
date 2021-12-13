@@ -153,9 +153,9 @@ namespace Reductech.EDR.Core.Internal.Errors {
         /// <summary>
         ///   Looks up a localized string similar to Could not convert entity value to {0}..
         /// </summary>
-        internal static string CouldNotConvertEntityValue {
+        internal static string CouldNotConvertISCLObject {
             get {
-                return ResourceManager.GetString("CouldNotConvertEntityValue", resourceCulture);
+                return ResourceManager.GetString("CouldNotConvertISCLObject", resourceCulture);
             }
         }
         

@@ -46,21 +46,21 @@ public sealed class ArrayNew<T> : CompoundStep<Array<T>>, IArrayNewStep where T 
     public IEnumerable<IStep> ElementSteps => Elements;
 
     /// <inheritdoc />
-    public override Maybe<EntityValue> TryConvertToEntityValue()
+    public override Maybe<ISCLObject> TryGetConstantValue()
     {
-        var builder = ImmutableList<EntityValue>.Empty.ToBuilder();
+        var builder = ImmutableList<ISCLObject>.Empty.ToBuilder();
 
         foreach (var element in Elements)
         {
-            var ev = element.TryConvertToEntityValue();
+            var ev = element.TryGetConstantValue();
 
             if (ev.HasNoValue)
-                return Maybe<EntityValue>.None;
+                return Maybe<ISCLObject>.None;
 
             builder.Add(ev.GetValueOrThrow());
         }
 
-        return new EntityValue.NestedList(builder.ToImmutable());
+        return builder.ToSCLArray();
     }
 
     /// <summary>

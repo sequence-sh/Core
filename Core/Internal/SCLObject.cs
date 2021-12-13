@@ -19,6 +19,19 @@ public interface ISCLObject
     /// The Type Reference
     /// </summary>
     TypeReference TypeReference { get; }
+
+    /// <summary>
+    /// Tries to convert this SCL object to an SCL object of a different type
+    /// </summary>
+    public virtual Result<ISCLObject, IErrorBuilder> TryConvert(Type type, string propertyName)
+    {
+        if (type.IsInstanceOfType(this))
+            return Result.Success<ISCLObject, IErrorBuilder>(this);
+
+        //TODO all sorts of other cases
+
+        return ErrorCode.InvalidCast.ToErrorBuilder(propertyName, Name);
+    }
 }
 
 /// <summary>
@@ -130,6 +143,11 @@ public sealed record SCLBool : ISCLObject
     /// The False value
     /// </summary>
     public static SCLBool False { get; } = new() { Value = false };
+
+    /// <summary>
+    /// Create an SCLBool from a bool
+    /// </summary>
+    public static SCLBool Create(bool b) => b ? True : False;
 
     /// <summary>
     /// The value of this Boolean

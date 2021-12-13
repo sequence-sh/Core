@@ -20,12 +20,12 @@ public record EntityNode(
     public override bool IsMorePermissive(SchemaNode other) => false;
 
     /// <inheritdoc />
-    protected override Result<Maybe<EntityValue>, IErrorBuilder> TryTransform1(
+    protected override Result<Maybe<ISCLObject>, IErrorBuilder> TryTransform1(
         string propertyName,
-        EntityValue entityValue,
+        ISCLObject value,
         TransformSettings transformSettings)
     {
-        if (entityValue is not EntityValue.NestedEntity nestedEntity)
+        if (value is not ISCLObject.NestedEntity nestedEntity)
             return ErrorCode.SchemaViolation.ToErrorBuilder("Should be Entity", propertyName);
 
         var errors = new List<IErrorBuilder>();
@@ -45,7 +45,7 @@ public record EntityNode(
         else
         {
             allowExtra = EntityAdditionalItems.AdditionalItems
-                .TryTransform(propertyName, entityValue, transformSettings)
+                .TryTransform(propertyName, value, transformSettings)
                 .IsSuccess;
         }
 
@@ -92,13 +92,13 @@ public record EntityNode(
         }
 
         if (errors.Any())
-            return Result.Failure<Maybe<EntityValue>, IErrorBuilder>(
+            return Result.Failure<Maybe<ISCLObject>, IErrorBuilder>(
                 ErrorBuilderList.Combine(errors)
             );
 
         if (changed)
-            return Maybe<EntityValue>.From(new EntityValue.NestedEntity(newEntity));
+            return Maybe<ISCLObject>.From(new ISCLObject.NestedEntity(newEntity));
 
-        return Maybe<EntityValue>.None;
+        return Maybe<ISCLObject>.None;
     }
 }

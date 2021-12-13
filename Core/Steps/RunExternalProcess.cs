@@ -79,7 +79,7 @@ public sealed class RunExternalProcess : CompoundStep<Unit>
     [StepProperty(3)]
     [DefaultValueExplanation("Default encoding")]
     public IStep<SCLEnum<EncodingEnum>> Encoding { get; set; } =
-        new EnumConstant<EncodingEnum>(new SCLEnum<EncodingEnum>(EncodingEnum.Default));
+        new SCLConstant<SCLEnum<EncodingEnum>>(new SCLEnum<EncodingEnum>(EncodingEnum.Default));
 
     /// <inheritdoc />
     public override IStepFactory StepFactory { get; } =

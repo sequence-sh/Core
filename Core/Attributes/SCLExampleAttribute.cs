@@ -95,9 +95,9 @@ public sealed class SCLExampleAttribute : Attribute
 
     //private object? ConvertValue(object? o)
     //{
-    //    var ev = EntityValue.CreateFromObject(o);
+    //    var ev = ISCLObject.CreateFromObject(o);
 
-    //    if (ev is EntityValue.NestedList nl)
+    //    if (ev is ISCLObject.NestedList nl)
     //    {
     //        return nl.Value.Select(x => ConvertValue(x.ObjectValue)).ToSCLArray();
     //    }

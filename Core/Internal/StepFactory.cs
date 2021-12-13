@@ -346,15 +346,15 @@ public abstract class StepFactory : IStepFactory
 
     private static Result<IStep, IErrorBuilder> TryCoerceStep(
         string propertyName,
-        Type propertyType,
+        Type propertyMemberType,
         IStep stepToSet)
     {
-        if (propertyType.IsInstanceOfType(stepToSet))
+        if (propertyMemberType.IsInstanceOfType(stepToSet))
             return Result.Success<IStep, IErrorBuilder>(stepToSet); //No coercion required
 
-        if (propertyType.IsGenericType)
+        if (propertyMemberType.IsGenericType)
         {
-            var nestedType = propertyType.GenericTypeArguments.First();
+            var nestedType = propertyMemberType.GenericTypeArguments.First();
 
             if (nestedType.GetInterfaces().Contains(typeof(IOneOf)))
             {
@@ -372,40 +372,12 @@ public abstract class StepFactory : IStepFactory
                     }
                 }
             }
-            else if (stepToSet is StringConstant stringConstant)
+            else if (stepToSet is IConstantStep constantStep)
             {
-                if (nestedType.IsEnum)
-                {
-                    var enumType = propertyType.GenericTypeArguments.First();
-
-                    if (Enum.TryParse(
-                            enumType,
-                            stringConstant.Value.GetString(),
-                            true,
-                            out var enumValue
-                        ))
-                    {
-                        var ev = SCLObjectHelper.ConvertToSCLEnumUnsafe(enumValue);
-
-                        var step = new EnumConstant(ev) { TextLocation = stepToSet.TextLocation };
-                        return step;
-                    }
-                }
-                else if (nestedType == typeof(DateTime))
-                {
-                    if (DateTime.TryParse(stringConstant.Value.GetString(), out var dt))
-                    {
-                        var step =
-                            new DateTimeConstant(new SCLDateTime(dt))
-                            {
-                                TextLocation = stepToSet.TextLocation
-                            };
-
-                        return Result.Success<IStep, IErrorBuilder>(step);
-                    }
-                }
+                var conversionResult = constantStep.TryConvert(propertyMemberType, propertyName);
+                return conversionResult;
             }
-            else if (nestedType == typeof(object))
+            else if (nestedType == typeof(ISCLObject))
             {
                 return Result.Success<IStep, IErrorBuilder>(stepToSet);
             }

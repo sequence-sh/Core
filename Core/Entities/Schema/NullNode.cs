@@ -29,20 +29,20 @@ public record NullNode() : SchemaNode(EnumeratedValuesNodeData.Empty)
     }
 
     /// <inheritdoc />
-    protected override Result<Maybe<EntityValue>, IErrorBuilder> TryTransform1(
+    protected override Result<Maybe<ISCLObject>, IErrorBuilder> TryTransform1(
         string propertyName,
-        EntityValue entityValue,
+        ISCLObject value,
         TransformSettings transformSettings)
     {
-        if (entityValue is EntityValue.Null)
-            return Maybe<EntityValue>.None;
+        if (value is ISCLObject.Null)
+            return Maybe<ISCLObject>.None;
 
         var nullWords = transformSettings.NullFormatter.GetFormats(propertyName);
 
-        var v = entityValue.GetPrimitiveString();
+        var v = value.GetPrimitiveString();
 
         if (nullWords.Contains(v))
-            return Maybe<EntityValue>.From(EntityValue.Null.Instance);
+            return Maybe<ISCLObject>.From(ISCLObject.Null.Instance);
 
         return ErrorCode.SchemaViolation.ToErrorBuilder("Should Be Null", propertyName);
     }

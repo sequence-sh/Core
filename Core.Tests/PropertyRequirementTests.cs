@@ -9,7 +9,7 @@ public partial class PropertyRequirementTests
     {
         get
         {
-            var placeholder = new BoolConstant(SCLBool.True);
+            var placeholder = new SCLConstant<SCLBool>(SCLBool.True);
 
             yield return new TestCase(
                 "No Requirement",
@@ -155,12 +155,12 @@ public partial class PropertyRequirementTests
         public const string FeaturesKey = "WidgetFeatures";
 
         /// <inheritdoc />
-        protected override async Task<Result<bool, IError>> Run(
+        protected override async Task<Result<SCLBool, IError>> Run(
             IStateMonad stateMonad,
             CancellationToken cancellationToken)
         {
             await Task.CompletedTask;
-            return true;
+            return SCLBool.True;
         }
 
         [StepProperty(1)]
@@ -187,11 +187,11 @@ public partial class PropertyRequirementTests
         public override IStepFactory StepFactory => RequirementTestStepFactory.Instance;
     }
 
-    private class RequirementTestStepFactory : SimpleStepFactory<RequirementTestStep, bool>
+    private class RequirementTestStepFactory : SimpleStepFactory<RequirementTestStep, SCLBool>
     {
         private RequirementTestStepFactory() { }
 
-        public static SimpleStepFactory<RequirementTestStep, bool> Instance { get; } =
+        public static SimpleStepFactory<RequirementTestStep, SCLBool> Instance { get; } =
             new RequirementTestStepFactory();
     }
 }

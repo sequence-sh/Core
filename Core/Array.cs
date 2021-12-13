@@ -104,7 +104,7 @@ public abstract record Array<T> : IArray where T : ISCLObject
                     {
                         var values = await x.ToListAsync();
 
-                        var e = Entity.Create(("Key", x.Key), ("Values", values));
+                        var e = Entity.Create(("Key", x.Key), ("Values", values.ToSCLArray()));
 
                         return e;
                     }
@@ -145,9 +145,9 @@ public abstract record Array<T> : IArray where T : ISCLObject
         CancellationToken cancellation);
 
     /// <inheritdoc />
-    public Task<Result<List<object>, IError>> GetObjectsAsync(CancellationToken cancellation)
+    public Task<Result<List<ISCLObject>, IError>> GetObjectsAsync(CancellationToken cancellation)
     {
-        return GetElementsAsync(cancellation).Map(x => x.Cast<object>().ToList());
+        return GetElementsAsync(cancellation).Map(x => x.Cast<ISCLObject>().ToList());
     }
 
     /// <inheritdoc />
@@ -225,7 +225,7 @@ public interface IArray : ISCLObject
     /// <summary>
     /// Try to get the elements of this list, as objects asynchronously.
     /// </summary>
-    Task<Result<List<object>, IError>> GetObjectsAsync(CancellationToken cancellation);
+    Task<Result<List<ISCLObject>, IError>> GetObjectsAsync(CancellationToken cancellation);
 
     /// <summary>
     /// Attempts to convert the elements of the array to the chosen type

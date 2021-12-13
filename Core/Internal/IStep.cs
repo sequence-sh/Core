@@ -47,9 +47,9 @@ public interface IStep
     IEnumerable<Requirement> RuntimeRequirements { get; }
 
     /// <summary>
-    /// If this step has a constant, state-independent value, calculate it.
+    /// Get the value of this step if it is constant
     /// </summary>
-    Maybe<EntityValue> TryConvertToEntityValue();
+    Maybe<ISCLObject> TryGetConstantValue();
 }
 
 /// <summary>

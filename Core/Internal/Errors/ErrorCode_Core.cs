@@ -110,9 +110,9 @@ public sealed record ErrorCode : ErrorCodeBase
     /// Could not convert entity value to {0}.
     /// </summary>
     public static readonly ErrorCode
-        CouldNotConvertEntityValue = new(
+        CouldNotConvertISCLObject = new(
             nameof(
-                CouldNotConvertEntityValue)
+                CouldNotConvertISCLObject)
         );
 
     /// <summary>

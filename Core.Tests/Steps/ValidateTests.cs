@@ -506,6 +506,6 @@ public partial class ValidateTests : StepTestBase<Validate, Array<Entity>>
 
         properties.HasValue.Should().BeTrue();
 
-        properties.GetValueOrThrow().Should().BeOfType<EntityValue.NestedEntity>();
+        properties.GetValueOrThrow().Should().BeOfType<ISCLObject.NestedEntity>();
     }
 }

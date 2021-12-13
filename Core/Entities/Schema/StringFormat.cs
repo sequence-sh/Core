@@ -23,9 +23,9 @@ public abstract record StringFormat : NodeData<StringFormat>
     /// <summary>
     /// Try to transform the object to match this format
     /// </summary>
-    public abstract Result<Maybe<EntityValue>, IErrorBuilder> TryTransform(
+    public abstract Result<Maybe<ISCLObject>, IErrorBuilder> TryTransform(
         string propertyName,
-        EntityValue entityValue,
+        ISCLObject entityValue,
         TransformSettings transformSettings);
 
     /// <inheritdoc />

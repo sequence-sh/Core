@@ -123,7 +123,9 @@ public sealed class Validate : CompoundStep<Array<Entity>>
     [StepProperty(3)]
     [DefaultValueExplanation("Fail")]
     public IStep<SCLEnum<ErrorBehavior>> ErrorBehavior { get; set; } =
-        new EnumConstant<ErrorBehavior>(new SCLEnum<ErrorBehavior>(Enums.ErrorBehavior.Fail));
+        new SCLConstant<SCLEnum<ErrorBehavior>>(
+            new SCLEnum<ErrorBehavior>(Enums.ErrorBehavior.Fail)
+        );
 
     /// <inheritdoc />
     public override IStepFactory StepFactory { get; } =

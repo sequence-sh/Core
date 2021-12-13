@@ -3,8 +3,7 @@
 /// <summary>
 /// A step that returns a constant value.
 /// </summary>
-public abstract record ConstantBase<T>(T Value)
-    : IStep<T>, IConstantStep where T : ISCLObject
+public sealed record SCLConstant<T>(T Value) : IStep<T>, IConstantStep where T : ISCLObject
 {
     /// <inheritdoc />
     public async Task<Result<T, IError>> Run(
@@ -55,79 +54,30 @@ public abstract record ConstantBase<T>(T Value)
     }
 
     /// <inheritdoc />
-    public Maybe<EntityValue> TryConvertToEntityValue() => ToEntityValue();
+    public bool ShouldBracketWhenSerialized => false;
 
     /// <summary>
-    /// Converts this to an EntityValue
+    /// Try to convert this constant to a constant of a different type.
     /// </summary>
-    [Obsolete]
-    protected abstract EntityValue ToEntityValue();
+    public Result<IStep, IErrorBuilder> TryConvert(Type memberType, string propertyName)
+    {
+        if (typeof(T) == memberType)
+            return this;
+
+        var convertedValue = Value.TryConvert(memberType, propertyName);
+
+        if (convertedValue.IsFailure)
+            return convertedValue.ConvertFailure<IStep>();
+
+        var stepType = typeof(SCLConstant<>).MakeGenericType(memberType);
+
+        var instance = Activator.CreateInstance(stepType, convertedValue.Value);
+
+        var instanceAsStep = (IStep)instance!;
+
+        return Result.Success<IStep, IErrorBuilder>(instanceAsStep);
+    }
 
     /// <inheritdoc />
-    public bool ShouldBracketWhenSerialized => false;
-}
-
-/// <summary>
-/// A Constant String
-/// </summary>
-public record StringConstant
-    (StringStream Value) : ConstantBase<StringStream>(Value)
-{
-    /// <inheritdoc />
-    protected override EntityValue ToEntityValue() => new EntityValue.String(Value.GetString());
-}
-
-/// <summary>
-/// A Constant int
-/// </summary>
-public record IntConstant(SCLInt Value) : ConstantBase<SCLInt>(Value)
-{
-    /// <inheritdoc />
-    protected override EntityValue ToEntityValue() => new EntityValue.Integer(Value.Value);
-}
-
-/// <summary>
-/// A constant double
-/// </summary>
-public record DoubleConstant(SCLDouble Value) : ConstantBase<SCLDouble>(Value)
-{
-    /// <inheritdoc />
-    protected override EntityValue ToEntityValue() => new EntityValue.Double(Value.Value);
-}
-
-/// <summary>
-/// A constant bool
-/// </summary>
-public record BoolConstant(SCLBool Value) : ConstantBase<SCLBool>(Value)
-{
-    /// <inheritdoc />
-    protected override EntityValue ToEntityValue() => new EntityValue.Boolean(Value.Value);
-}
-
-/// <summary>
-/// A constant enum value
-/// </summary>
-public record EnumConstant<TEnum>(SCLEnum<TEnum> Value) : ConstantBase<SCLEnum<TEnum>>(Value)
-    where TEnum : Enum
-{
-    /// <inheritdoc />
-    protected override EntityValue ToEntityValue() => new EntityValue.EnumerationValue(Value);
-}
-
-/// <summary>
-/// A constant date time value
-/// </summary>
-public record DateTimeConstant(SCLDateTime Value) : ConstantBase<SCLDateTime>(Value)
-{
-    /// <inheritdoc />
-    protected override EntityValue ToEntityValue() => new EntityValue.DateTime(Value.Value);
-}
-
-/// <summary>
-/// A constant entity value
-/// </summary>
-public record EntityConstant(Entity Value) : ConstantBase<Entity>(Value)
-{
-    /// <inheritdoc />
-    protected override EntityValue ToEntityValue() => new EntityValue.NestedEntity(Value);
+    public Maybe<ISCLObject> TryGetConstantValue() => Value;
 }

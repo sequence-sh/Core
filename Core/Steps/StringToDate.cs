@@ -37,7 +37,7 @@ public sealed class StringToDate : CompoundStep<SCLDateTime>
     [DefaultValueExplanation("Current culture")]
     [Example("en-GB")]
     public IStep<StringStream> Culture { get; set; } =
-        new StringConstant(CultureInfo.CurrentCulture.Name);
+        new SCLConstant<StringStream>(CultureInfo.CurrentCulture.Name);
 
     /// <inheritdoc />
     protected override async Task<Result<SCLDateTime, IError>> Run(

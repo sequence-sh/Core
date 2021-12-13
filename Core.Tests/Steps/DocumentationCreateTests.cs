@@ -160,7 +160,7 @@ public partial class DocumentationCreateTests : StepTestBase<DocumentationCreate
             ) { TestDeserializeAndRun = false }.WithStepFactoryStore(
                 StepFactoryStore.Create(
                     System.Array.Empty<ConnectorData>(),
-                    new[] { new SimpleStepFactory<Not, bool>() }
+                    new[] { new SimpleStepFactory<Not, SCLBool>() }
                 )
             );
 
@@ -255,7 +255,7 @@ public partial class DocumentationCreateTests : StepTestBase<DocumentationCreate
                                 new EntityGetValue<StringStream>()
                                 {
                                     Entity   = new GetAutomaticVariable<Entity>(),
-                                    Property = new StringConstant("Title")
+                                    Property = new SCLConstant<StringStream>("Title")
                                 }
                         }
                     ),
@@ -264,9 +264,9 @@ public partial class DocumentationCreateTests : StepTestBase<DocumentationCreate
                     Array = new EntityGetValue<Array<Entity>>()
                     {
                         Entity   = new DocumentationCreate(),
-                        Property = new StringConstant("AllPages")
+                        Property = new SCLConstant<StringStream>("AllPages")
                     },
-                    Count = new IntConstant(10)
+                    Count = new SCLConstant<SCLInt>(10)
                 }
             };
 
@@ -378,7 +378,8 @@ public partial class DocumentationCreateTests : StepTestBase<DocumentationCreate
         [StepProperty(2)]
         [SeeAlso("Alpha")]
         [DefaultValueExplanation("Two hundred")]
-        public IStep<StringStream> Beta { get; set; } = new StringConstant("Two hundred");
+        public IStep<StringStream> Beta { get; set; } =
+            new SCLConstant<StringStream>("Two hundred");
 
         /// <summary>
         /// The delta property.

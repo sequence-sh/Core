@@ -116,9 +116,9 @@ public sealed class RunSCL : CompoundStep<Unit>
 
             if (export.IsSuccess)
             {
-                var ev = export.Value.TryConvertToEntityValue();
+                var ev = export.Value.TryConvertToISCLObject();
 
-                if (ev.HasValue && ev.GetValueOrThrow() is EntityValue.NestedList nestedList)
+                if (ev.HasValue && ev.GetValueOrThrow() is ISCLObject.NestedList nestedList)
                 {
                     foreach (var entityValue in nestedList.Value)
                     {

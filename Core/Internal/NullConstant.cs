@@ -88,16 +88,10 @@ public class NullConstant : IConstantStep, IConstantFreezableStep, IStep<SCLNull
         }
     }
 
-    /// <inheritdoc />
-    public Maybe<EntityValue> TryConvertToEntityValue()
-    {
-        return EntityValue.Null.Instance;
-    }
-
     /// <summary>
     /// The value
     /// </summary>
-    public object ValueObject => SCLNull.Instance;
+    public ISCLObject ValueObject => SCLNull.Instance;
 
     /// <inheritdoc />
     string IConstantFreezableStep.Serialize()
@@ -122,4 +116,13 @@ public class NullConstant : IConstantStep, IConstantFreezableStep, IStep<SCLNull
 
     /// <inheritdoc />
     public ISCLObject Value => SCLNull.Instance;
+
+    /// <inheritdoc />
+    public Result<IStep, IErrorBuilder> TryConvert(Type memberType, string propertyName)
+    {
+        return ErrorCode.InvalidCast.ToErrorBuilder(propertyName, Name);
+    }
+
+    /// <inheritdoc />
+    public Maybe<ISCLObject> TryGetConstantValue() => Maybe<ISCLObject>.From(SCLNull.Instance);
 }

@@ -43,7 +43,7 @@ public sealed class SchemaCreate : CompoundStep<Entity>
             ) = stepResult.Value;
 
         var schema = entities
-            .Select(x => new EntityValue.NestedEntity(x).ToSchemaNode("null", null))
+            .Select(x => new ISCLObject.NestedEntity(x).ToSchemaNode("null", null))
             .Aggregate((a, b) => a.Combine(b))
             .ToJsonSchema();
 
@@ -83,12 +83,13 @@ public sealed class SchemaCreate : CompoundStep<Entity>
     [StepProperty]
     [DefaultValueExplanation("Schema")]
     [Alias("Name")]
-    public IStep<StringStream> SchemaName { get; set; } = new StringConstant("Schema");
+    public IStep<StringStream> SchemaName { get; set; } = new SCLConstant<StringStream>("Schema");
 
     /// <summary>
     /// Whether properties other than the explicitly defined properties are allowed.
     /// </summary>
     [StepProperty]
     [DefaultValueExplanation("false")]
-    public IStep<SCLBool> AllowExtraProperties { get; set; } = new BoolConstant(SCLBool.False);
+    public IStep<SCLBool> AllowExtraProperties { get; set; } =
+        new SCLConstant<SCLBool>(SCLBool.False);
 }

@@ -59,7 +59,7 @@ public sealed class SchemaCreateCoerced : CompoundStep<Entity>
         );
 
         var schema =
-            entities.Select(x => new EntityValue.NestedEntity(x).ToSchemaNode("", sco))
+            entities.Select(x => new ISCLObject.NestedEntity(x).ToSchemaNode("", sco))
                 .Aggregate((a, b) => a.Combine(b))
                 .ToJsonSchema();
 
@@ -97,14 +97,15 @@ public sealed class SchemaCreateCoerced : CompoundStep<Entity>
     /// </summary>
     [StepProperty]
     [DefaultValueExplanation("Schema")]
-    public IStep<StringStream> SchemaName { get; set; } = new StringConstant("Schema");
+    public IStep<StringStream> SchemaName { get; set; } = new SCLConstant<StringStream>("Schema");
 
     /// <summary>
     /// Whether properties other than the explicitly defined properties are allowed.
     /// </summary>
     [StepProperty]
     [DefaultValueExplanation("false")]
-    public IStep<SCLBool> AllowExtraProperties { get; set; } = new BoolConstant(SCLBool.False);
+    public IStep<SCLBool> AllowExtraProperties { get; set; } =
+        new SCLConstant<SCLBool>(SCLBool.False);
 
     /// <summary>
     /// ISO 8601 Date Formats to use for strings representing dates
@@ -118,7 +119,7 @@ public sealed class SchemaCreateCoerced : CompoundStep<Entity>
         set;
     } =
         new OneOfStep<StringStream, Array<StringStream>, Entity>(
-            new StringConstant("yyyy-MM-ddTHH:mm:ssK")
+            new SCLConstant<StringStream>("yyyy-MM-ddTHH:mm:ssK")
         );
 
     /// <summary>
@@ -135,7 +136,8 @@ public sealed class SchemaCreateCoerced : CompoundStep<Entity>
         = new OneOfStep<StringStream, Array<StringStream>, Entity>(
             ArrayNew<StringStream>.CreateArray(
                 new[] { "True" }.Select(
-                        x => new StringConstant(new StringStream(x)) as IStep<StringStream>
+                        x => new SCLConstant<StringStream>(new StringStream(x)) as
+                            IStep<StringStream>
                     )
                     .ToList()
             )
@@ -155,7 +157,8 @@ public sealed class SchemaCreateCoerced : CompoundStep<Entity>
         = new OneOfStep<StringStream, Array<StringStream>, Entity>(
             ArrayNew<StringStream>.CreateArray(
                 new[] { "False" }.Select(
-                        x => new StringConstant(new StringStream(x)) as IStep<StringStream>
+                        x => new SCLConstant<StringStream>(new StringStream(x)) as
+                            IStep<StringStream>
                     )
                     .ToList()
             )
@@ -175,5 +178,5 @@ public sealed class SchemaCreateCoerced : CompoundStep<Entity>
     /// </summary>
     [StepProperty]
     [DefaultValueExplanation("False")]
-    public IStep<SCLBool> CaseSensitive { get; set; } = new BoolConstant(SCLBool.False);
+    public IStep<SCLBool> CaseSensitive { get; set; } = new SCLConstant<SCLBool>(SCLBool.False);
 }

@@ -28,22 +28,22 @@ public record IntegerNode(
     }
 
     /// <inheritdoc />
-    protected override Result<Maybe<EntityValue>, IErrorBuilder> TryTransform1(
+    protected override Result<Maybe<ISCLObject>, IErrorBuilder> TryTransform1(
         string propertyName,
-        EntityValue entityValue,
+        ISCLObject value,
         TransformSettings transformSettings)
     {
-        if (entityValue is EntityValue.Integer evInteger)
+        if (value is ISCLObject.Integer evInteger)
         {
             var restrictionResult = Restrictions.Test(evInteger.Value, propertyName);
 
             if (restrictionResult.IsFailure)
-                return restrictionResult.ConvertFailure<Maybe<EntityValue>>();
+                return restrictionResult.ConvertFailure<Maybe<ISCLObject>>();
 
-            return Maybe<EntityValue>.None; // No change
+            return Maybe<ISCLObject>.None; // No change
         }
 
-        var v = entityValue.GetPrimitiveString();
+        var v = value.GetPrimitiveString();
 
         if (!int.TryParse(v, out var i))
             return ErrorCode.SchemaViolation.ToErrorBuilder("Should Be Integer", propertyName);
@@ -51,8 +51,8 @@ public record IntegerNode(
         var restrictionResult2 = Restrictions.Test(i, propertyName);
 
         if (restrictionResult2.IsFailure)
-            return restrictionResult2.ConvertFailure<Maybe<EntityValue>>();
+            return restrictionResult2.ConvertFailure<Maybe<ISCLObject>>();
 
-        return Maybe<EntityValue>.From(new EntityValue.Integer(i));
+        return Maybe<ISCLObject>.From(new ISCLObject.Integer(i));
     }
 }

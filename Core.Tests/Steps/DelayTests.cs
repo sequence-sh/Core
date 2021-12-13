@@ -11,7 +11,7 @@ public partial class DelayTests : StepTestBase<Delay, Unit>
         {
             yield return new StepCase(
                 "Short Delay",
-                new Delay() { Milliseconds = new IntConstant(10) },
+                new Delay() { Milliseconds = new SCLConstant<SCLInt>(10.ConvertToSCLObject()) },
                 Unit.Default
             );
         }

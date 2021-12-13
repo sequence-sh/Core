@@ -48,7 +48,7 @@ public sealed partial record Entity(
     /// Creates a new Entity
     /// </summary>
     [Pure]
-    public static Entity Create(params (string key, object? value)[] properties) => Create(
+    public static Entity Create(params (string key, ISCLObject value)[] properties) => Create(
         properties.Select(x => (new EntityPropertyKey(x.key), x.value))
     );
 
@@ -58,10 +58,10 @@ public sealed partial record Entity(
     [Pure]
     public static Entity Create(JsonElement element)
     {
-        var ev = EntityValue.Create(element);
+        var ev = element.ConvertToSCLObject();
 
-        if (ev is EntityValue.NestedEntity nestedEntity)
-            return nestedEntity.Value;
+        if (ev is Entity nestedEntity)
+            return nestedEntity;
 
         return new Entity(new[] { new EntityProperty(PrimitiveKey, ev, 0) });
     }
@@ -92,7 +92,7 @@ public sealed partial record Entity(
     /// Creates a new Entity
     /// </summary>
     [Pure]
-    public static Entity Create(IEnumerable<(EntityPropertyKey key, object? value)> properties)
+    public static Entity Create(IEnumerable<(EntityPropertyKey key, ISCLObject value)> properties)
     {
         var allProperties =
             properties.Select(
@@ -106,7 +106,7 @@ public sealed partial record Entity(
                 .Select(
                     (group, i) =>
                     {
-                        var ev = EntityValue.CreateFromProperties(group.ToList());
+                        var ev = CreateFromProperties(group.ToList());
 
                         return new EntityProperty(group.Key, ev, i);
                     }
@@ -119,28 +119,28 @@ public sealed partial record Entity(
     /// Creates a copy of this with the property added or updated
     /// </summary>
     [Pure]
-    public Entity WithProperty(string key, EntityValue newValue, int? order)
+    public Entity WithProperty(string key, ISCLObject newValue, int? order)
     {
         EntityProperty newProperty;
 
         if (Dictionary.TryGetValue(key, out var ep))
         {
-            EntityValue newValue2;
+            ISCLObject newValue2;
 
-            if (ep.Value is EntityValue.NestedEntity existingEntity)
+            if (ep.Value is Entity existingEntity)
             {
                 Entity combinedEntity;
 
-                if (newValue is EntityValue.NestedEntity newEntity)
-                    combinedEntity = existingEntity.Value.Combine(newEntity.Value);
+                if (newValue is Entity newEntity)
+                    combinedEntity = existingEntity.Combine(newEntity);
                 else
-                    combinedEntity = existingEntity.Value.WithProperty(
+                    combinedEntity = existingEntity.WithProperty(
                         PrimitiveKey,
                         newValue,
                         null
                     );
 
-                newValue2 = new EntityValue.NestedEntity(combinedEntity);
+                newValue2 = combinedEntity;
             }
             else
             {
@@ -219,12 +219,12 @@ public sealed partial record Entity(
         }
 
         if (!Dictionary.TryGetValue(firstKey, out var ep)
-         || ep.Value is not EntityValue.NestedEntity nestedEntity)
+         || ep.Value is not Entity nestedEntity)
             return Maybe<Entity>.None;
 
         {
             var rem = remainder.GetValueOrThrow();
-            var em  = nestedEntity.Value.TryRemoveProperty(rem);
+            var em  = nestedEntity.TryRemoveProperty(rem);
 
             if (!em.HasValue)
                 return Maybe<Entity>.None;
@@ -240,7 +240,7 @@ public sealed partial record Entity(
             {
                 var newProperty = new EntityProperty(
                     firstKey,
-                    new EntityValue.NestedEntity(newNestedEntity),
+                    newNestedEntity,
                     ep.Order
                 );
 
@@ -269,13 +269,13 @@ public sealed partial record Entity(
     /// Try to get the value of a particular property
     /// </summary>
     [Pure]
-    public Maybe<EntityValue> TryGetValue(string key) => TryGetValue(new EntityPropertyKey(key));
+    public Maybe<ISCLObject> TryGetValue(string key) => TryGetValue(new EntityPropertyKey(key));
 
     /// <summary>
     /// Try to get the value of a particular property
     /// </summary>
     [Pure]
-    public Maybe<EntityValue> TryGetValue(EntityPropertyKey key) =>
+    public Maybe<ISCLObject> TryGetValue(EntityPropertyKey key) =>
         TryGetProperty(key).Map(x => x.Value);
 
     /// <summary>
@@ -292,8 +292,8 @@ public sealed partial record Entity(
         if (remainder.HasNoValue)
             return ep;
 
-        if (ep.Value is EntityValue.NestedEntity nestedEntity)
-            return nestedEntity.Value.TryGetProperty(remainder.GetValueOrThrow());
+        if (ep.Value is Entity nestedEntity)
+            return nestedEntity.TryGetProperty(remainder.GetValueOrThrow());
         //We can't get the nested property as this is not an entity
 
         return
@@ -334,4 +334,88 @@ public sealed partial record Entity(
 
     /// <inheritdoc />
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+    /// <summary>
+    /// Create an entity from structured entity properties
+    /// </summary>
+    private static ISCLObject CreateFromProperties(
+        IReadOnlyList<(Maybe<EntityPropertyKey> key, ISCLObject argValue)> properties)
+    {
+        if (properties.Count == 0)
+            return SCLNull.Instance;
+
+        if (properties.Count == 1 && properties.Single().key.HasNoValue)
+            return properties.Single().argValue;
+
+        var entityProperties =
+            new Dictionary<string, EntityProperty>(StringComparer.OrdinalIgnoreCase);
+
+        void SetEntityProperty(string key, ISCLObject ev)
+        {
+            EntityProperty newProperty;
+
+            if (entityProperties.TryGetValue(key, out var existingValue))
+            {
+                if (ev is Entity nestedEntity)
+                {
+                    if (existingValue.Value is Entity existingNestedEntity)
+                    {
+                        var nEntity = existingNestedEntity.Combine(nestedEntity);
+
+                        newProperty = new EntityProperty(
+                            key,
+                            nEntity,
+                            existingValue.Order
+                        );
+                    }
+                    else
+                    {
+                        //Ignore the old property
+                        newProperty = new EntityProperty(key, ev, existingValue.Order);
+                    }
+                }
+                else if (existingValue.Value is Entity existingNestedEntity)
+                {
+                    var nEntity =
+                        existingNestedEntity.WithProperty(Entity.PrimitiveKey, ev, null);
+
+                    newProperty = new EntityProperty(
+                        key,
+                        nEntity,
+                        existingValue.Order
+                    );
+                }
+                else //overwrite the existing property
+                    newProperty = new EntityProperty(key, ev, existingValue.Order);
+            }
+            else //New property
+                newProperty = new EntityProperty(key, ev, entityProperties.Count);
+
+            entityProperties[key] = newProperty;
+        }
+
+        foreach (var (key, argValue) in properties)
+        {
+            if (key.HasNoValue)
+            {
+                if (argValue is Entity ne)
+                    foreach (var (nestedKey, value) in ne.Dictionary)
+                        SetEntityProperty(nestedKey, value.Value);
+                else
+                    SetEntityProperty(PrimitiveKey, argValue);
+            }
+            else
+            {
+                var (firstKey, remainder) = key.GetValueOrThrow().Split();
+
+                var ev = CreateFromProperties(new[] { (remainder, argValue) });
+
+                SetEntityProperty(firstKey, ev);
+            }
+        }
+
+        var newEntity = new Entity(entityProperties.ToImmutableDictionary());
+
+        return newEntity;
+    }
 }
