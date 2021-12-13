@@ -85,11 +85,11 @@ public class EntityConversionTests
                         StepFactoryStore.Create()
                     )
                 )
-                .Map(x => x.TryConvertToEntityValue());
+                .Map(x => x.TryConvertToISCLObject());
 
         parseResult.ShouldBeSuccessful();
 
-        return (parseResult.Value.GetValueOrThrow() as EntityValue.NestedEntity)!
+        return (parseResult.Value.GetValueOrThrow() as ISCLObject.NestedEntity)!
             .Value; //could throw exception
     }
 
@@ -135,7 +135,7 @@ public class EntityConversionTests
         var e = Entity.Create(("short", Convert.ToInt16(11)));
 
         e.TryGetValue("short").ShouldHaveValue();
-        e.TryGetValue("short").GetValueOrThrow().Should().Be(new EntityValue.Integer(11));
+        e.TryGetValue("short").GetValueOrThrow().Should().Be(new ISCLObject.Integer(11));
     }
 
     [Fact]
@@ -148,7 +148,7 @@ public class EntityConversionTests
         e.TryGetValue("enumeration")
             .GetValueOrThrow()
             .Should()
-            .Be(new EntityValue.EnumerationValue(new Enumeration("letter", "alpha")));
+            .Be(new ISCLObject.EnumerationValue(new Enumeration("letter", "alpha")));
     }
 
     [Fact]
@@ -161,6 +161,6 @@ public class EntityConversionTests
         e.TryGetValue("emptyList")
             .GetValueOrThrow()
             .Should()
-            .Be(EntityValue.Null.Instance);
+            .Be(ISCLObject.Null.Instance);
     }
 }

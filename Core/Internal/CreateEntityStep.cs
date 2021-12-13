@@ -13,7 +13,7 @@ public record CreateEntityStep
         IStateMonad stateMonad,
         CancellationToken cancellationToken)
     {
-        var pairs = new List<(EntityPropertyKey, object?)>();
+        var pairs = new List<(EntityPropertyKey, ISCLObject)>();
 
         foreach (var (key, step) in Properties)
         {
@@ -27,25 +27,6 @@ public record CreateEntityStep
         }
 
         return Entity.Create(pairs);
-    }
-
-    /// <inheritdoc />
-    public Maybe<EntityValue> TryConvertToEntityValue()
-    {
-        var pairs = new List<(EntityPropertyKey, object?)>();
-
-        foreach (var (key, value) in Properties)
-        {
-            var ev = value.TryConvertToEntityValue();
-
-            if (ev.HasNoValue)
-                return Maybe<EntityValue>.None;
-
-            pairs.Add((key, ev.GetValueOrThrow()));
-        }
-
-        var entity = Entity.Create(pairs);
-        return new EntityValue.NestedEntity(entity);
     }
 
     /// <inheritdoc />
@@ -116,6 +97,27 @@ public record CreateEntityStep
         {
             return Properties.SelectMany(x => x.Value.RuntimeRequirements);
         }
+    }
+
+    /// <inheritdoc />
+    public Maybe<ISCLObject> TryGetConstantValue()
+    {
+        var properties = new List<(EntityPropertyKey entityPropertyKey, ISCLObject value)>();
+
+        var i = 1;
+
+        foreach (var (key, step) in Properties)
+        {
+            var r = step.TryGetConstantValue();
+
+            if (r.HasNoValue)
+                return Maybe<ISCLObject>.None;
+
+            properties.Add((key, r.Value));
+            i++;
+        }
+
+        return Entity.Create(properties);
     }
 
     /// <inheritdoc />

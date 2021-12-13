@@ -59,7 +59,7 @@ public sealed class EntityGetValue<T> : CompoundStep<T> where T : ISCLObject
         var entityValue = entity.TryGetValue(epk);
 
         if (entityValue.HasNoValue)
-            return EntityValue.GetDefaultValue<T1>();
+            return ISCLObject.GetDefaultValue<T1>();
 
         var result = entityValue.GetValueOrThrow()
             .TryGetValue<T1>()

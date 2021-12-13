@@ -65,7 +65,7 @@ public static class EntityConversionHelpers
 
             if (value is not null)
             {
-                var ev = EntityValue.CreateFromObject(value);
+                var ev = SCLObjectHelper.CreateFromCSharpObject(value);
                 var ep = new EntityProperty(propertyInfo.Name, ev, i);
                 props.Add(ep);
             }

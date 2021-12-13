@@ -21,15 +21,15 @@ public record ArrayNode(
     }
 
     /// <inheritdoc />
-    protected override Result<Maybe<EntityValue>, IErrorBuilder> TryTransform1(
+    protected override Result<Maybe<ISCLObject>, IErrorBuilder> TryTransform1(
         string propertyName,
-        EntityValue entityValue,
+        ISCLObject value,
         TransformSettings transformSettings)
     {
-        ImmutableList<EntityValue> immutableList;
-        bool                       changed;
+        ImmutableList<ISCLObject> immutableList;
+        bool                      changed;
 
-        if (entityValue is EntityValue.NestedList nestedList)
+        if (value is ISCLObject.NestedList nestedList)
         {
             immutableList = nestedList.Value;
             changed       = false;
@@ -40,12 +40,12 @@ public record ArrayNode(
                 .ToArray();
 
             if (delimiters.Any())
-                immutableList = entityValue.GetPrimitiveString()
+                immutableList = value.GetPrimitiveString()
                     .Split(delimiters, StringSplitOptions.RemoveEmptyEntries)
-                    .Select(x => new EntityValue.String(x) as EntityValue)
+                    .Select(x => new ISCLObject.String(x) as ISCLObject)
                     .ToImmutableList();
             else
-                immutableList = ImmutableList<EntityValue>.Empty;
+                immutableList = ImmutableList<ISCLObject>.Empty;
 
             changed = true;
         }
@@ -81,13 +81,13 @@ public record ArrayNode(
         }
 
         if (errors.Any())
-            return Result.Failure<Maybe<EntityValue>, IErrorBuilder>(
+            return Result.Failure<Maybe<ISCLObject>, IErrorBuilder>(
                 ErrorBuilderList.Combine(errors)
             );
 
         if (!changed)
-            return Maybe<EntityValue>.None;
+            return Maybe<ISCLObject>.None;
 
-        return Maybe<EntityValue>.From(new EntityValue.NestedList(newList));
+        return Maybe<ISCLObject>.From(new ISCLObject.NestedList(newList));
     }
 }

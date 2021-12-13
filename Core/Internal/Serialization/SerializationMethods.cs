@@ -63,14 +63,14 @@ public static class SerializationMethods
         FormatEntity(entity, sb, 0, null, null);
         return sb.ToString();
 
-        static void FormatEntityValue(
+        static void FormatISCLObject(
             StringBuilder sb,
             int indentation,
-            EntityValue ev,
+            ISCLObject ev,
             string? prefix,
             string? suffix)
         {
-            if (ev is EntityValue.NestedEntity nestedEntity)
+            if (ev is ISCLObject.NestedEntity nestedEntity)
             {
                 FormatEntity(
                     nestedEntity.Value,
@@ -80,10 +80,10 @@ public static class SerializationMethods
                     suffix
                 );
             }
-            else if (ev is EntityValue.NestedList nestedList)
+            else if (ev is ISCLObject.NestedList nestedList)
             {
                 if (nestedList.Value.Any(
-                        x => x is EntityValue.NestedEntity || x is EntityValue.NestedList
+                        x => x is ISCLObject.NestedEntity || x is ISCLObject.NestedList
                     ))
                 {
                     AppendLineIndented(
@@ -99,7 +99,7 @@ public static class SerializationMethods
                         var entityValue = nestedList.Value[index];
                         var maybeComma  = index < nestedList.Value.Count - 1 ? "," : null;
 
-                        FormatEntityValue(
+                        FormatISCLObject(
                             sb,
                             indentation,
                             entityValue,
@@ -146,7 +146,7 @@ public static class SerializationMethods
 
             foreach (var property in entity)
             {
-                FormatEntityValue(
+                FormatISCLObject(
                     sb,
                     indentation,
                     property.Value,

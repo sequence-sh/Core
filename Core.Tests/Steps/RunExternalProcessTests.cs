@@ -21,7 +21,7 @@ public partial class RunExternalProcessTests : StepTestBase<RunExternalProcess, 
                                 {
                                     Elements = new IStep<StringStream>[] { Constant("Foo") }
                                 },
-                            Path     = new StringConstant("Process.exe"),
+                            Path     = new SCLConstant<StringStream>("Process.exe"),
                             Encoding = Constant(EncodingEnum.Ascii)
                         },
                         Unit.Default,

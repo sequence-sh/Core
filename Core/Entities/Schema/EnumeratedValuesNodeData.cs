@@ -7,7 +7,7 @@ namespace Reductech.EDR.Core.Entities.Schema;
 /// </summary>
 [Equatable]
 public partial record EnumeratedValuesNodeData(
-    [property: OrderedEquality] IReadOnlyList<EntityValue>? AllowedValues) : NodeData<
+    [property: OrderedEquality] IReadOnlyList<ISCLObject>? AllowedValues) : NodeData<
     EnumeratedValuesNodeData>
 {
     /// <inheritdoc />
@@ -46,7 +46,7 @@ public partial record EnumeratedValuesNodeData(
     /// <summary>
     /// Whether a particular value is allowed
     /// </summary>
-    public bool Allow(EntityValue entityValue, TransformSettings transformSettings)
+    public bool Allow(ISCLObject entityValue, TransformSettings transformSettings)
     {
         if (AllowedValues is null)
             return true;
@@ -57,5 +57,5 @@ public partial record EnumeratedValuesNodeData(
     /// <summary>
     /// Empty EnumeratedValuesNodeData
     /// </summary>
-    public static EnumeratedValuesNodeData Empty { get; } = new(null as IReadOnlyList<EntityValue>);
+    public static EnumeratedValuesNodeData Empty { get; } = new(null as IReadOnlyList<ISCLObject>);
 }

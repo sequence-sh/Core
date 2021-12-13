@@ -50,10 +50,7 @@ public abstract class OneOfStep : IStep
     public IEnumerable<Requirement> RuntimeRequirements => StepValue.RuntimeRequirements;
 
     /// <inheritdoc />
-    public Maybe<EntityValue> TryConvertToEntityValue()
-    {
-        return StepValue.TryConvertToEntityValue();
-    }
+    public Maybe<ISCLObject> TryGetConstantValue() => StepValue.TryGetConstantValue();
 
     /// <summary>
     /// Create a OneOfStep

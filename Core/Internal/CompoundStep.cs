@@ -125,7 +125,7 @@ public abstract class CompoundStep<T> : ICompoundStep<T> where T : ISCLObject
     }
 
     /// <inheritdoc />
-    public virtual Maybe<EntityValue> TryConvertToEntityValue() => Maybe<EntityValue>.None;
+    public virtual Maybe<ISCLObject> TryGetConstantValue() => Maybe<ISCLObject>.None;
 
     /// <inheritdoc />
     public virtual bool ShouldBracketWhenSerialized => true;

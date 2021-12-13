@@ -55,7 +55,7 @@ public sealed class ArraySort<T> : CompoundStep<Array<T>> where T : ISCLObject
     [StepProperty(3)]
     [DefaultValueExplanation("False")]
     public IStep<SCLOneOf<SCLBool, SCLEnum<SortOrder>>> Descending { get; set; } =
-        new OneOfStep<SCLBool, SCLEnum<SortOrder>>(new BoolConstant(SCLBool.False));
+        new OneOfStep<SCLBool, SCLEnum<SortOrder>>(new SCLConstant<SCLBool>(SCLBool.False));
 
     /// <inheritdoc />
     protected override async Task<Result<Array<T>, IError>> Run(

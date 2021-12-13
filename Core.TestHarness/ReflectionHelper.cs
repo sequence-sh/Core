@@ -344,7 +344,7 @@ public abstract partial class StepTestBase<TStep, TOutput>
             var s = "DataStream" + index;
             index++;
 
-            step = new StringConstant(s);
+            step = new SCLConstant<StringStream>(s);
         }
         else if (outputType.IsGenericType && outputType.GetInterfaces().Contains(typeof(IOneOf)))
         {

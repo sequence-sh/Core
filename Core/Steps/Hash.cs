@@ -50,7 +50,7 @@ public class Hash : CompoundStep<StringStream>
     [StepProperty(2)]
     [DefaultValueExplanation("MD5")]
     public IStep<SCLEnum<Enums.HashAlgorithm>> Algorithm { get; set; } =
-        new EnumConstant<Enums.HashAlgorithm>(
+        new SCLConstant<SCLEnum<Enums.HashAlgorithm>>(
             new SCLEnum<Enums.HashAlgorithm>(Enums.HashAlgorithm.MD5)
         );
 

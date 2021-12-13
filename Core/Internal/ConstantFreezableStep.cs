@@ -1,92 +1,92 @@
 ﻿namespace Reductech.EDR.Core.Internal;
 
-/// <summary>
-/// A constant string
-/// </summary>
-public record StringConstantFreezable
-    (StringStream Value, TextLocation TextLocation) : ConstantFreezableBase<StringStream>(
-        Value,
-        TextLocation
-    )
-{
-    /// <inheritdoc />
-    public override Result<IStep, IError> TryFreeze(
-        CallerMetadata callerMetadata,
-        TypeResolver typeResolver) => new StringConstant(Value);
-}
+///// <summary>
+///// A constant string
+///// </summary>
+//public record StringConstantFreezable
+//    (StringStream Value, TextLocation TextLocation) : ConstantFreezableBase<StringStream>(
+//        Value,
+//        TextLocation
+//    )
+//{
+//    /// <inheritdoc />
+//    public override Result<IStep, IError> TryFreeze(
+//        CallerMetadata callerMetadata,
+//        TypeResolver typeResolver) => new SCLConstant<>(Value);
+//}
 
-/// <summary>
-/// A constant int
-/// </summary>
-public record IntConstantFreezable
-    (SCLInt Value, TextLocation TextLocation) : ConstantFreezableBase<SCLInt>(Value, TextLocation)
-{
-    /// <inheritdoc />
-    public override Result<IStep, IError> TryFreeze(
-        CallerMetadata callerMetadata,
-        TypeResolver typeResolver)
-    {
-        var intCheckResult = callerMetadata.CheckAllows(
-            TypeReference.Actual.Integer,
-            null
-        );
+///// <summary>
+///// A constant int
+///// </summary>
+//public record IntConstantFreezable
+//    (SCLInt Value, TextLocation TextLocation) : ConstantFreezableBase<SCLInt>(Value, TextLocation)
+//{
+//    /// <inheritdoc />
+//    public override Result<IStep, IError> TryFreeze(
+//        CallerMetadata callerMetadata,
+//        TypeResolver typeResolver)
+//    {
+//        var intCheckResult = callerMetadata.CheckAllows(
+//            TypeReference.Actual.Integer,
+//            null
+//        );
 
-        if (intCheckResult.IsSuccess)
-            return new IntConstant(Value);
+//        if (intCheckResult.IsSuccess)
+//            return new SCLConstant<SCLInt>(Value);
 
-        var doubleCheckResult = callerMetadata.CheckAllows(
-            TypeReference.Actual.Double,
-            null
-        );
+//        var doubleCheckResult = callerMetadata.CheckAllows(
+//            TypeReference.Actual.Double,
+//            null
+//        );
 
-        if (doubleCheckResult.IsSuccess)
-            return new DoubleConstant(new SCLDouble(Value.Value));
+//        if (doubleCheckResult.IsSuccess)
+//            return new DoubleConstant(new SCLDouble(Value.Value));
 
-        return intCheckResult.MapError(x => x.WithLocation(this)).ConvertFailure<IStep>();
-    }
-}
+//        return intCheckResult.MapError(x => x.WithLocation(this)).ConvertFailure<IStep>();
+//    }
+//}
 
-/// <summary>
-/// A constant double
-/// </summary>
-public record DoubleConstantFreezable
-    (SCLDouble Value, TextLocation TextLocation) : ConstantFreezableBase<SCLDouble>(
-        Value,
-        TextLocation
-    )
-{
-    /// <inheritdoc />
-    public override Result<IStep, IError> TryFreeze(
-        CallerMetadata callerMetadata,
-        TypeResolver typeResolver) => new DoubleConstant(Value);
-}
+///// <summary>
+///// A constant double
+///// </summary>
+//public record DoubleConstantFreezable
+//    (SCLDouble Value, TextLocation TextLocation) : ConstantFreezableBase<SCLDouble>(
+//        Value,
+//        TextLocation
+//    )
+//{
+//    /// <inheritdoc />
+//    public override Result<IStep, IError> TryFreeze(
+//        CallerMetadata callerMetadata,
+//        TypeResolver typeResolver) => new DoubleConstant(Value);
+//}
 
-/// <summary>
-/// A constant bool
-/// </summary>
-public record BoolConstantFreezable
-    (SCLBool Value, TextLocation TextLocation) : ConstantFreezableBase<SCLBool>(Value, TextLocation)
-{
-    /// <inheritdoc />
-    public override Result<IStep, IError> TryFreeze(
-        CallerMetadata callerMetadata,
-        TypeResolver typeResolver) => new BoolConstant(Value);
-}
+///// <summary>
+///// A constant bool
+///// </summary>
+//public record BoolConstantFreezable
+//    (SCLBool Value, TextLocation TextLocation) : ConstantFreezableBase<SCLBool>(Value, TextLocation)
+//{
+//    /// <inheritdoc />
+//    public override Result<IStep, IError> TryFreeze(
+//        CallerMetadata callerMetadata,
+//        TypeResolver typeResolver) => new SCLConstant<SCLBool>(Value);
+//}
 
-/// <summary>
-/// A constant DateTime
-/// </summary>
-public record DateTimeConstantFreezable
-    (SCLDateTime Value, TextLocation TextLocation) : ConstantFreezableBase<SCLDateTime>(
-        Value,
-        TextLocation
-    )
-{
-    /// <inheritdoc />
-    public override Result<IStep, IError> TryFreeze(
-        CallerMetadata callerMetadata,
-        TypeResolver typeResolver) => new DateTimeConstant(Value);
-}
+///// <summary>
+///// A constant DateTime
+///// </summary>
+//public record DateTimeConstantFreezable
+//    (SCLDateTime Value, TextLocation TextLocation) : ConstantFreezableBase<SCLDateTime>(
+//        Value,
+//        TextLocation
+//    )
+//{
+//    /// <inheritdoc />
+//    public override Result<IStep, IError> TryFreeze(
+//        CallerMetadata callerMetadata,
+//        TypeResolver typeResolver) => new SCLConstant<SCLDateTime>(Value);
+//}
 
 ///// <summary>
 ///// An Enum Constant
@@ -140,7 +140,7 @@ public interface IConstantFreezableStep : IFreezableStep
     /// <summary>
     /// The Constant Value
     /// </summary>
-    object ValueObject { get; }
+    ISCLObject ValueObject { get; }
 
     /// <summary>
     /// Serialize this constant
@@ -151,16 +151,16 @@ public interface IConstantFreezableStep : IFreezableStep
 /// <summary>
 /// The base class for freezable constants
 /// </summary>
-public abstract record ConstantFreezableBase<T>
+public sealed record SCLConstantFreezable<T>
     (T Value, TextLocation TextLocation) : IConstantFreezableStep where T : ISCLObject
 {
     /// <inheritdoc />
     public string StepName => Value.Name;
 
     /// <inheritdoc />
-    public abstract Result<IStep, IError> TryFreeze(
+    public Result<IStep, IError> TryFreeze(
         CallerMetadata callerMetadata,
-        TypeResolver typeResolver);
+        TypeResolver typeResolver) => new SCLConstant<T>(Value) { TextLocation = TextLocation };
 
     /// <inheritdoc />
     public Result<IReadOnlyCollection<UsedVariable>,
@@ -171,11 +171,11 @@ public abstract record ConstantFreezableBase<T>
     }
 
     /// <inheritdoc />
-    public virtual Result<TypeReference, IError> TryGetOutputTypeReference(
+    public Result<TypeReference, IError> TryGetOutputTypeReference(
         CallerMetadata callerMetadata,
         TypeResolver typeResolver)
     {
-        return TypeReference.Create(typeof(T));
+        return Value.TypeReference;
     }
 
     /// <inheritdoc />
@@ -193,7 +193,7 @@ public abstract record ConstantFreezableBase<T>
         if (ReferenceEquals(this, other))
             return true;
 
-        var r = other is ConstantFreezableBase<T> cfs && Value.Equals(cfs.Value);
+        var r = other is IConstantFreezableStep cfs && Value.Equals(cfs.ValueObject);
 
         return r;
     }
@@ -205,7 +205,7 @@ public abstract record ConstantFreezableBase<T>
     public override string ToString() => StepName;
 
     /// <inheritdoc />
-    public object ValueObject => Value;
+    public ISCLObject ValueObject => Value;
 
     /// <inheritdoc />
     public string Serialize() => Value.Serialize();

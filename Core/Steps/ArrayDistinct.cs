@@ -84,7 +84,7 @@ public sealed class ArrayDistinct<T> : CompoundStep<Array<T>> where T : ISCLObje
     /// </summary>
     [StepProperty(3)]
     [DefaultValueExplanation("False")]
-    public IStep<SCLBool> IgnoreCase { get; set; } = new BoolConstant(SCLBool.False);
+    public IStep<SCLBool> IgnoreCase { get; set; } = new SCLConstant<SCLBool>(SCLBool.False);
 
     /// <inheritdoc />
     public override IStepFactory StepFactory => ArrayDistinctStepFactory.Instance;

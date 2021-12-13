@@ -31,24 +31,24 @@ public record BooleanNode(EnumeratedValuesNodeData EnumeratedValuesNodeData) : S
     }
 
     /// <inheritdoc />
-    protected override Result<Maybe<EntityValue>, IErrorBuilder> TryTransform1(
+    protected override Result<Maybe<ISCLObject>, IErrorBuilder> TryTransform1(
         string propertyName,
-        EntityValue entityValue,
+        ISCLObject value,
         TransformSettings transformSettings)
     {
-        if (entityValue is EntityValue.Boolean)
-            return Maybe<EntityValue>.None;
+        if (value is SCLBool)
+            return Maybe<ISCLObject>.None;
 
         var trueWords  = transformSettings.TruthFormatter.GetFormats(propertyName);
         var falseWords = transformSettings.FalseFormatter.GetFormats(propertyName);
 
-        var v = entityValue.GetPrimitiveString();
+        var v = value.Serialize();
 
         if (trueWords.Contains(v))
-            return Maybe<EntityValue>.From(new EntityValue.Boolean(true));
+            return Maybe<ISCLObject>.From(SCLBool.True);
 
         if (falseWords.Contains(v))
-            return Maybe<EntityValue>.From(new EntityValue.Boolean(false));
+            return Maybe<ISCLObject>.From(SCLBool.False);
 
         return ErrorCode.SchemaViolation.ToErrorBuilder("Should Be Boolean", propertyName);
     }

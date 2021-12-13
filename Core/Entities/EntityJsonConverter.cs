@@ -41,16 +41,16 @@ public class EntityJsonConverter : JsonConverter<Entity>
 
             return dictionary;
 
-            static object? GetObject(EntityValue ev)
+            static object? GetObject(ISCLObject ev)
             {
                 return ev switch
                 {
-                    EntityValue.NestedEntity nestedEntity => CreateDictionary(nestedEntity.Value),
-                    EntityValue.EnumerationValue enumerationValue => enumerationValue.Value
+                    ISCLObject.NestedEntity nestedEntity => CreateDictionary(nestedEntity.Value),
+                    ISCLObject.EnumerationValue enumerationValue => enumerationValue.Value
                         .EnumValue,
-                    EntityValue.NestedList list => list.Value.Select(GetObject).ToList(),
-                    EntityValue.Null _          => null,
-                    _                           => ev.ObjectValue
+                    ISCLObject.NestedList list => list.Value.Select(GetObject).ToList(),
+                    ISCLObject.Null _          => null,
+                    _                          => ev.ObjectValue
                 };
             }
         }

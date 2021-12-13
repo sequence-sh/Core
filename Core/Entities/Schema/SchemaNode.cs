@@ -148,7 +148,7 @@ public abstract record SchemaNode(EnumeratedValuesNodeData EnumeratedValuesNodeD
 
         if (constantValue is not null)
             enumeratedValuesNodeData =
-                new EnumeratedValuesNodeData(new[] { EntityValue.Create(constantValue.Value), });
+                new EnumeratedValuesNodeData(new[] { ISCLObject.Create(constantValue.Value), });
         else
         {
             var enumValues = schema.Keywords.OfType<EnumKeyword>()
@@ -157,7 +157,7 @@ public abstract record SchemaNode(EnumeratedValuesNodeData EnumeratedValuesNodeD
 
             if (enumValues is not null)
                 enumeratedValuesNodeData =
-                    new EnumeratedValuesNodeData(enumValues.Select(EntityValue.Create).ToList());
+                    new EnumeratedValuesNodeData(enumValues.Select(ISCLObject.Create).ToList());
 
             else
                 enumeratedValuesNodeData = EnumeratedValuesNodeData.Empty;
@@ -309,9 +309,9 @@ public abstract record SchemaNode(EnumeratedValuesNodeData EnumeratedValuesNodeD
     /// Try to transform this entity to match this schema
     /// </summary>
     [Pure]
-    public Result<Maybe<EntityValue>, IErrorBuilder> TryTransform(
+    public Result<Maybe<ISCLObject>, IErrorBuilder> TryTransform(
         string propertyName,
-        EntityValue entityValue,
+        ISCLObject entityValue,
         TransformSettings transformSettings)
     {
         if (!EnumeratedValuesNodeData.Allow(entityValue, transformSettings))
@@ -328,8 +328,8 @@ public abstract record SchemaNode(EnumeratedValuesNodeData EnumeratedValuesNodeD
     /// <summary>
     /// Try to transform the entity value
     /// </summary>
-    protected abstract Result<Maybe<EntityValue>, IErrorBuilder> TryTransform1(
+    protected abstract Result<Maybe<ISCLObject>, IErrorBuilder> TryTransform1(
         string propertyName,
-        EntityValue entityValue,
+        ISCLObject value,
         TransformSettings transformSettings);
 }

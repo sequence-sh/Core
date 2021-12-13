@@ -19,7 +19,7 @@ public sealed class StringJoin : CompoundStep<StringStream>
     [StepProperty(2)]
     [DefaultValueExplanation("Empty String")]
     [Alias("Using")]
-    public IStep<StringStream> Delimiter { get; set; } = new StringConstant("");
+    public IStep<StringStream> Delimiter { get; set; } = new SCLConstant<StringStream>("");
 
     /// <inheritdoc />
     protected override async Task<Result<StringStream, IError>> Run(

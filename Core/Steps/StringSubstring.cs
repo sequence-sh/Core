@@ -21,7 +21,7 @@ public sealed class StringSubstring : CompoundStep<StringStream>
     /// </summary>
     [StepProperty(3)]
     [DefaultValueExplanation("0")]
-    public IStep<SCLInt> Index { get; set; } = new IntConstant(0.ConvertToSCLObject());
+    public IStep<SCLInt> Index { get; set; } = new SCLConstant<SCLInt>(0.ConvertToSCLObject());
 
     /// <summary>
     /// The length of the substring to extract.

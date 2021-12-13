@@ -93,7 +93,7 @@ public abstract record StepProperty
         {
             return Step switch
             {
-                StringConstant str => str.Value.NameInLogs(
+                SCLConstant<StringStream> str => str.Value.NameInLogs(
                     LogAttribute?.LogOutputLevel != LogOutputLevel.None
                 ),
                 IConstantStep constant            => constant.Name,

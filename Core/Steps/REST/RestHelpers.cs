@@ -14,7 +14,7 @@ public static class RestHelpers
         {
             request = request.AddHeader(
                 entityProperty.Name,
-                entityProperty.Value.GetPrimitiveString()
+                entityProperty.Value.Serialize()
             );
         }
 

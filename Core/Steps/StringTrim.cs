@@ -23,7 +23,7 @@ public sealed class StringTrim : CompoundStep<StringStream>
     [StepProperty(2)]
     [DefaultValueExplanation("Both")]
     public IStep<SCLEnum<TrimSide>> Side { get; set; } =
-        new EnumConstant<TrimSide>(new SCLEnum<TrimSide>(TrimSide.Both));
+        new SCLConstant<SCLEnum<TrimSide>>(new SCLEnum<TrimSide>(TrimSide.Both));
 
     /// <inheritdoc />
     protected override async Task<Result<StringStream, IError>> Run(

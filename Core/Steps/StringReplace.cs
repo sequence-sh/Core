@@ -165,7 +165,7 @@ public sealed class StringReplace : CompoundStep<StringStream>
     /// </summary>
     [StepProperty()]
     [DefaultValueExplanation("False")]
-    public IStep<SCLBool> IgnoreCase { get; set; } = new BoolConstant(SCLBool.False);
+    public IStep<SCLBool> IgnoreCase { get; set; } = new SCLConstant<SCLBool>(SCLBool.False);
 
     /// <inheritdoc />
     public override IStepFactory StepFactory { get; } =
