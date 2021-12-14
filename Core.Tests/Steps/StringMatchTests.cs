@@ -1,8 +1,6 @@
-﻿using Reductech.EDR.Core.TestHarness;
+﻿namespace Reductech.EDR.Core.Tests.Steps;
 
-namespace Reductech.EDR.Core.Tests.Steps;
-
-public partial class StringMatchTests : StepTestBase<StringMatch, bool>
+public partial class StringMatchTests : StepTestBase<StringMatch, SCLBool>
 {
     /// <inheritdoc />
     protected override IEnumerable<StepCase> StepCases
@@ -17,7 +15,7 @@ public partial class StringMatchTests : StepTestBase<StringMatch, bool>
                     Pattern    = Constant(@"h\w+"),
                     IgnoreCase = Constant(false)
                 },
-                true
+                true.ConvertToSCLObject()
             );
 
             yield return new StepCase(
@@ -28,7 +26,7 @@ public partial class StringMatchTests : StepTestBase<StringMatch, bool>
                     Pattern    = Constant(@"H\w+"),
                     IgnoreCase = Constant(false)
                 },
-                false
+                false.ConvertToSCLObject()
             );
 
             yield return new StepCase(
@@ -39,7 +37,7 @@ public partial class StringMatchTests : StepTestBase<StringMatch, bool>
                     Pattern    = Constant(@"H\w+"),
                     IgnoreCase = Constant(true)
                 },
-                true
+                true.ConvertToSCLObject()
             );
         }
     }

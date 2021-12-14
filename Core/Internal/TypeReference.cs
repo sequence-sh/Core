@@ -119,100 +119,74 @@ public abstract record TypeReference
     /// <summary>
     /// A particular type
     /// </summary>
-    public sealed record Actual : TypeReference
+    public abstract record Actual : TypeReference
     {
         /// <param name="typeResolver"></param>
         /// <inheritdoc />
         public override Result<TypeReference, IErrorBuilder> TryGetArrayMemberTypeReference(
             TypeResolver typeResolver) =>
-            ErrorCode.CannotInferType.ToErrorBuilder($"{Type} is not an Array Type");
-
-        /// <param name="typeResolver"></param>
-        /// <inheritdoc />
-        public override Result<Type, IErrorBuilder> TryGetType(TypeResolver typeResolver) =>
-            Type.GetCSharpType();
+            ErrorCode.CannotInferType.ToErrorBuilder($"{Name} is not an Array Type");
 
         /// <inheritdoc />
         public override bool Allow(TypeReference other, TypeResolver? typeResolver)
         {
             other = typeResolver?.MaybeResolve(other) ?? other;
 
-            if (other is Actual a)
-            {
-                if (a.Type == Type)
-                    return true;
-            }
+            if (Equals(other))
+                return true;
 
             return false;
         }
 
-        /// <inheritdoc />
-        public override string Name => Type.ToString();
-
-        private Actual(SCLType type) => Type = type;
-
         /// <summary>
-        /// The expected type
+        /// Constructor should only be used by TypedActual
         /// </summary>
-        public SCLType Type { get; }
+        protected Actual() { }
 
         /// <summary>
         /// A string
         /// </summary>
-        public static Actual String { get; } = new(SCLType.String);
+        public static Actual String { get; } = new TypedActual<StringStream>();
 
         /// <summary>
         /// An integer
         /// </summary>
-        public static Actual Integer { get; } = new(SCLType.Integer);
+        public static Actual Integer { get; } = new TypedActual<SCLInt>();
 
         /// <summary>
         /// A double
         /// </summary>
-        public static Actual Double { get; } = new(SCLType.Double);
+        public static Actual Double { get; } = new TypedActual<SCLDouble>();
 
         /// <summary>
         /// A boolean
         /// </summary>
-        public static Actual Bool { get; } = new(SCLType.Bool);
+        public static Actual Bool { get; } = new TypedActual<SCLBool>();
 
         /// <summary>
         /// A date
         /// </summary>
-        public static Actual Date { get; } = new(SCLType.Date);
+        public static Actual Date { get; } = new TypedActual<SCLDateTime>();
 
         /// <summary>
         /// An entity
         /// </summary>
-        public static Actual Entity { get; } = new(SCLType.Entity);
+        public static Actual Entity { get; } = new TypedActual<Entity>();
 
         /// <summary>
         /// A null value
         /// </summary>
-        public static Actual Null { get; } = new(SCLType.Null);
+        public static Actual Null { get; } = new TypedActual<SCLNull>();
 
-        /// <summary>
-        /// Create an actual type.
-        /// This does not work for Enum types
-        /// </summary>
-        internal static Actual Create(SCLType type)
+        private sealed record TypedActual<T> : Actual where T : ISCLObject
         {
-            return type switch
-            {
-                SCLType.String  => String,
-                SCLType.Integer => Integer,
-                SCLType.Double  => Double,
-                SCLType.Bool    => Bool,
-                SCLType.Date    => Date,
-                SCLType.Entity  => Entity,
-                SCLType.Null    => Null,
-                SCLType.Enum => throw new ArgumentOutOfRangeException(
-                    nameof(type),
-                    type,
-                    "Cannot convert enum type to actual"
-                ),
-                _ => throw new ArgumentOutOfRangeException(nameof(type), type, null)
-            };
+            /// <inheritdoc />
+            public override string Name => typeof(T).Name;
+
+            /// <param name="typeResolver"></param>
+            /// <inheritdoc />
+            public override Result<Type, IErrorBuilder> TryGetType(TypeResolver typeResolver) =>
+                typeof(T);
         }
     }
 
@@ -260,10 +234,8 @@ public abstract record TypeReference
     {
         /// <param name="typeResolver"></param>
         /// <inheritdoc />
-        public override Result<Type, IErrorBuilder> TryGetType(TypeResolver typeResolver)
-        {
-            return EnumType;
-        }
+        public override Result<Type, IErrorBuilder> TryGetType(TypeResolver typeResolver) =>
+            EnumType;
 
         /// <inheritdoc />
         public override bool Allow(TypeReference other, TypeResolver? typeResolver)
@@ -652,17 +624,25 @@ public abstract record TypeReference
 
                 return new OneOf(nestedTypeReferences);
             }
+
+            if (t.GetInterfaces().Contains(typeof(ISCLEnum)))
+            {
+                var enumType = t.GenericTypeArguments.Single();
+                return new Enum(enumType);
+            }
         }
 
-        var sclType = t.GetSCLType();
-
-        return sclType switch
+        return t.Name switch
         {
-            null when t == typeof(object)    => Any.Instance,
-            null when t == typeof(Util.Unit) => Unit.Instance,
-            null                             => Unknown.Instance,
-            SCLType.Enum                     => new Enum(t),
-            _                                => Actual.Create(sclType.Value)
+            nameof(StringStream) => Actual.String,
+            nameof(SCLInt)       => Actual.Integer,
+            nameof(SCLDouble)    => Actual.Double,
+            nameof(SCLBool)      => Actual.Bool,
+            nameof(SCLDateTime)  => Actual.Date,
+            nameof(SCLNull)      => Actual.Null,
+            nameof(Unit)         => Unit.Instance,
+            nameof(Entity)       => Actual.Entity,
+            _                    => Unknown.Instance
         };
     }
 

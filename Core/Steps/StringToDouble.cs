@@ -30,7 +30,7 @@ public sealed class StringToDouble : CompoundStep<SCLDouble>
             return d.ConvertToSCLObject();
         }
 
-        return ErrorCode.CouldNotParse.ToErrorBuilder(result.Value, SCLType.Double.ToString())
+        return ErrorCode.CouldNotParse.ToErrorBuilder(result.Value, nameof(SCLDouble))
             .WithLocationSingle(this);
     }
 

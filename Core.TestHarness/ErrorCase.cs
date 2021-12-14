@@ -2,7 +2,7 @@
 
 public abstract partial class StepTestBase<TStep, TOutput>
 {
-    [AutoTheory.GenerateAsyncTheory("ExpectError")]
+    [GenerateAsyncTheory("ExpectError")]
     protected virtual IEnumerable<ErrorCase> ErrorCases => CreateDefaultErrorCases();
 
     #pragma warning disable CA1034 // Nested types should not be visible
@@ -77,7 +77,7 @@ public abstract partial class StepTestBase<TStep, TOutput>
     /// These tests that for a particular property, if that property returns an error then the step itself will return an error.
     /// </summary>
     protected static IEnumerable<ErrorCase> CreateDefaultErrorCases(
-        object? defaultVariableValue = null)
+        ISCLObject? defaultVariableValue = null)
     {
         var enumerable = CreateStepsWithFailStepsAsValues(defaultVariableValue);
 

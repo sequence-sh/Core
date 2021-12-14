@@ -1,6 +1,4 @@
-﻿using Reductech.EDR.Core.TestHarness;
-
-namespace Reductech.EDR.Core.Tests.Steps;
+﻿namespace Reductech.EDR.Core.Tests.Steps;
 
 public partial class ArraySortEntitiesTests : StepTestBase<ArraySort<Entity>, Array<Entity>>
 {
@@ -45,7 +43,7 @@ public partial class ArraySortEntitiesTests : StepTestBase<ArraySort<Entity>, Ar
                 {
                     Array = new ArraySort<Entity>
                     {
-                        Descending = new OneOfStep<bool, SortOrder>(Constant(true)),
+                        Descending = new OneOfStep<SCLBool, SCLEnum<SortOrder>>(Constant(true)),
                         Array = Array(
                             Entity.Create(("Foo", "Gamma")),
                             Entity.Create(("Foo", "Alpha")),
@@ -76,7 +74,7 @@ public partial class ArraySortEntitiesTests : StepTestBase<ArraySort<Entity>, Ar
                 {
                     Array = new ArraySort<Entity>
                     {
-                        Descending = new OneOfStep<bool, SortOrder>(Constant(true)),
+                        Descending = new OneOfStep<SCLBool, SCLEnum<SortOrder>>(Constant(true)),
                         Array = Array(
                             Entity.Create(("Foo", "Gamma")),
                             Entity.Create(("Foo", "Alpha")),

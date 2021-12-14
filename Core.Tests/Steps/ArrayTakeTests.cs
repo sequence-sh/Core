@@ -1,8 +1,6 @@
-﻿using Reductech.EDR.Core.TestHarness;
+﻿namespace Reductech.EDR.Core.Tests.Steps;
 
-namespace Reductech.EDR.Core.Tests.Steps;
-
-public partial class ArrayTakeTests : StepTestBase<ArrayTake<int>, Array<int>>
+public partial class ArrayTakeTests : StepTestBase<ArrayTake<SCLInt>, Array<SCLInt>>
 {
     /// <inheritdoc />
     protected override IEnumerable<StepCase> StepCases
@@ -11,24 +9,8 @@ public partial class ArrayTakeTests : StepTestBase<ArrayTake<int>, Array<int>>
         {
             yield return new StepCase(
                 "Take Elements",
-                new ArrayTake<int>() { Array = Array(1, 2, 3), Count = Constant(2) },
-                new EagerArray<int>(new List<int>() { 1, 2 })
-            );
-        }
-    }
-}
-
-public partial class ArraySkipTests : StepTestBase<ArraySkip<int>, Array<int>>
-{
-    /// <inheritdoc />
-    protected override IEnumerable<StepCase> StepCases
-    {
-        get
-        {
-            yield return new StepCase(
-                "Take Elements",
-                new ArraySkip<int>() { Array = Array(1, 2, 3), Count = Constant(2) },
-                new EagerArray<int>(new List<int>() { 3 })
+                new ArrayTake<SCLInt>() { Array = Array(1, 2, 3), Count = Constant(2) },
+                new List<int>() { 1, 2 }.Select(x => x.ConvertToSCLObject()).ToSCLArray()
             );
         }
     }

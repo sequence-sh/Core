@@ -1,8 +1,6 @@
-﻿using Reductech.EDR.Core.TestHarness;
+﻿namespace Reductech.EDR.Core.Tests.Steps;
 
-namespace Reductech.EDR.Core.Tests.Steps;
-
-public partial class GetVariableTests : StepTestBase<GetVariable<int>, int>
+public partial class GetVariableTests : StepTestBase<GetVariable<SCLInt>, SCLInt>
 {
     /// <inheritdoc />
     protected override IEnumerable<StepCase> StepCases
@@ -13,13 +11,13 @@ public partial class GetVariableTests : StepTestBase<GetVariable<int>, int>
             {
                 InitialSteps = new List<IStep<Unit>>
                 {
-                    new SetVariable<int>
+                    new SetVariable<SCLInt>
                     {
                         Variable = new VariableName("Foo"), Value = Constant(42)
                     },
-                    new Log<int>
+                    new Log<SCLInt>
                     {
-                        Value = new GetVariable<int>
+                        Value = new GetVariable<SCLInt>
                         {
                             Variable = new VariableName("Foo")
                         }
@@ -55,7 +53,7 @@ public partial class GetVariableTests : StepTestBase<GetVariable<int>, int>
         {
             yield return new SerializeCase(
                 "Short form",
-                new GetVariable<int>() { Variable = new VariableName("Foo") },
+                new GetVariable<SCLInt>() { Variable = new VariableName("Foo") },
                 "<Foo>"
             );
         }

@@ -1,8 +1,6 @@
-﻿using Reductech.EDR.Core.TestHarness;
+﻿namespace Reductech.EDR.Core.Tests.Steps;
 
-namespace Reductech.EDR.Core.Tests.Steps;
-
-public partial class ArraySortTests : StepTestBase<ArraySort<int>, Array<int>>
+public partial class ArraySortTests : StepTestBase<ArraySort<SCLInt>, Array<SCLInt>>
 {
     /// <inheritdoc />
     protected override IEnumerable<StepCase> StepCases
@@ -13,42 +11,48 @@ public partial class ArraySortTests : StepTestBase<ArraySort<int>, Array<int>>
 
             yield return new StepCase(
                 "SortOrder False",
-                new ArraySort<int>()
+                new ArraySort<SCLInt>()
                 {
                     Array      = Array(elements),
-                    Descending = new OneOfStep<bool, SortOrder>(Constant(false))
+                    Descending = new OneOfStep<SCLBool, SCLEnum<SortOrder>>(Constant(false))
                 },
-                elements.OrderBy(x => x).ToSCLArray()
+                elements.OrderBy(x => x).Select(x => x.ConvertToSCLObject()).ToSCLArray()
             );
 
             yield return new StepCase(
                 "SortOrder true",
-                new ArraySort<int>()
+                new ArraySort<SCLInt>()
                 {
                     Array      = Array(elements),
-                    Descending = new OneOfStep<bool, SortOrder>(Constant(true))
+                    Descending = new OneOfStep<SCLBool, SCLEnum<SortOrder>>(Constant(true))
                 },
-                elements.OrderByDescending(x => x).ToSCLArray()
+                elements.OrderByDescending(x => x).Select(x => x.ConvertToSCLObject()).ToSCLArray()
             );
 
             yield return new StepCase(
                 "SortOrder Ascending",
-                new ArraySort<int>()
+                new ArraySort<SCLInt>()
                 {
-                    Array      = Array(elements),
-                    Descending = new OneOfStep<bool, SortOrder>(Constant(SortOrder.Ascending))
+                    Array = Array(elements),
+                    Descending =
+                        new OneOfStep<SCLBool, SCLEnum<SortOrder>>(
+                            Constant(SortOrder.Ascending)
+                        )
                 },
-                elements.OrderBy(x => x).ToSCLArray()
+                elements.OrderBy(x => x).Select(x => x.ConvertToSCLObject()).ToSCLArray()
             );
 
             yield return new StepCase(
                 "SortOrder Descending",
-                new ArraySort<int>()
+                new ArraySort<SCLInt>()
                 {
-                    Array      = Array(elements),
-                    Descending = new OneOfStep<bool, SortOrder>(Constant(SortOrder.Descending))
+                    Array = Array(elements),
+                    Descending =
+                        new OneOfStep<SCLBool, SCLEnum<SortOrder>>(
+                            Constant(SortOrder.Descending)
+                        )
                 },
-                elements.OrderByDescending(x => x).ToSCLArray()
+                elements.OrderByDescending(x => x).Select(x => x.ConvertToSCLObject()).ToSCLArray()
             );
         }
     }
@@ -62,15 +66,16 @@ public partial class ArraySortTests : StepTestBase<ArraySort<int>, Array<int>>
                 "Sort Ascending",
                 "ArraySort Array: [8,6,7,5,3,0,9]",
                 new List<int>()
-                {
-                    0,
-                    3,
-                    5,
-                    6,
-                    7,
-                    8,
-                    9
-                }.ToSCLArray()
+                    {
+                        0,
+                        3,
+                        5,
+                        6,
+                        7,
+                        8,
+                        9
+                    }.Select(x => x.ConvertToSCLObject())
+                    .ToSCLArray()
             );
         }
     }

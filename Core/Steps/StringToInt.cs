@@ -30,7 +30,7 @@ public sealed class StringToInt : CompoundStep<SCLInt>
             return i.ConvertToSCLObject();
         }
 
-        return ErrorCode.CouldNotParse.ToErrorBuilder(result.Value, SCLType.Integer.ToString())
+        return ErrorCode.CouldNotParse.ToErrorBuilder(result.Value, nameof(SCLInt))
             .WithLocationSingle(this);
     }
 

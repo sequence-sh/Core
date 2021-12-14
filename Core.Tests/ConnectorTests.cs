@@ -2,7 +2,6 @@
 using Reductech.EDR.ConnectorManagement.Base;
 using Divergic.Logging.Xunit;
 using Reductech.EDR.ConnectorManagement;
-using Reductech.EDR.Core.TestHarness;
 
 namespace Reductech.EDR.Core.Tests;
 

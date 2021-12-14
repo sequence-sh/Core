@@ -1,7 +1,4 @@
 ﻿using System.Globalization;
-using Reductech.EDR.Core.Entities;
-using Reductech.EDR.Core.Enums;
-using Reductech.EDR.Core.TestHarness;
 using static Reductech.EDR.Core.TestHarness.SchemaHelpers;
 
 namespace Reductech.EDR.Core.Tests.Steps;
@@ -496,7 +493,7 @@ public partial class ValidateTests : StepTestBase<Validate, Array<Entity>>
 
         var entity = schema.ConvertToEntity();
 
-        var name = entity.TryGetValue("Title").Map(x => x.GetPrimitiveString());
+        var name = entity.TryGetValue("Title").Map(x => x.Serialize());
 
         name.HasValue.Should().BeTrue();
 
@@ -506,6 +503,6 @@ public partial class ValidateTests : StepTestBase<Validate, Array<Entity>>
 
         properties.HasValue.Should().BeTrue();
 
-        properties.GetValueOrThrow().Should().BeOfType<ISCLObject.NestedEntity>();
+        properties.GetValueOrThrow().Should().BeOfType<Entity>();
     }
 }

@@ -1,8 +1,6 @@
-﻿using Reductech.EDR.Core.TestHarness;
+﻿namespace Reductech.EDR.Core.Tests.Steps;
 
-namespace Reductech.EDR.Core.Tests.Steps;
-
-public partial class LessThanTests : StepTestBase<LessThan<int>, bool>
+public partial class LessThanTests : StepTestBase<LessThan<SCLInt>, SCLBool>
 {
     /// <inheritdoc />
     protected override IEnumerable<StepCase> StepCases
@@ -11,26 +9,26 @@ public partial class LessThanTests : StepTestBase<LessThan<int>, bool>
         {
             yield return new StepCase(
                 "One number",
-                new LessThan<int>() { Terms = StaticHelpers.Array(2) },
-                true
+                new LessThan<SCLInt>() { Terms = Array(2) },
+                true.ConvertToSCLObject()
             );
 
             yield return new StepCase(
                 "Two numbers false",
-                new LessThan<int>() { Terms = StaticHelpers.Array(2, 2) },
-                false
+                new LessThan<SCLInt>() { Terms = Array(2, 2) },
+                false.ConvertToSCLObject()
             );
 
             yield return new StepCase(
                 "Two numbers true",
-                new LessThan<int>() { Terms = StaticHelpers.Array(1, 2) },
-                true
+                new LessThan<SCLInt>() { Terms = Array(1, 2) },
+                true.ConvertToSCLObject()
             );
 
             yield return new StepCase(
                 "Three numbers true",
-                new LessThan<int>() { Terms = StaticHelpers.Array(1, 2, 3) },
-                true
+                new LessThan<SCLInt>() { Terms = Array(1, 2, 3) },
+                true.ConvertToSCLObject()
             );
         }
     }

@@ -1,6 +1,5 @@
 ﻿using System.IO;
 using System.Text;
-using Reductech.EDR.Core.TestHarness;
 
 namespace Reductech.EDR.Core.Tests.Steps;
 

@@ -1,6 +1,4 @@
-﻿using Reductech.EDR.Core.TestHarness;
-
-namespace Reductech.EDR.Core.Tests.Steps;
+﻿namespace Reductech.EDR.Core.Tests.Steps;
 
 public partial class IncrementVariableTests : StepTestBase<IncrementVariable, Unit>
 {
@@ -11,7 +9,7 @@ public partial class IncrementVariableTests : StepTestBase<IncrementVariable, Un
         {
             yield return new StepCase(
                 "Increment 1",
-                new Core.Steps.Sequence<Unit>()
+                new Sequence<Unit>()
                 {
                     InitialSteps = new List<IStep<Unit>>() { SetVariable("Foo", 41) },
                     FinalStep = new IncrementVariable()
@@ -24,7 +22,7 @@ public partial class IncrementVariableTests : StepTestBase<IncrementVariable, Un
 
             yield return new StepCase(
                 "Increment 2",
-                new Core.Steps.Sequence<Unit>()
+                new Sequence<Unit>()
                 {
                     InitialSteps = new List<IStep<Unit>>() { SetVariable("Foo", 40) },
                     FinalStep = new IncrementVariable()
@@ -37,7 +35,7 @@ public partial class IncrementVariableTests : StepTestBase<IncrementVariable, Un
 
             yield return new StepCase(
                 "Increment -1",
-                new Core.Steps.Sequence<Unit>
+                new Sequence<Unit>
                 {
                     InitialSteps = new List<IStep<Unit>> { SetVariable("Foo", 43) },
                     FinalStep = new IncrementVariable
@@ -65,5 +63,6 @@ public partial class IncrementVariableTests : StepTestBase<IncrementVariable, Un
     }
 
     /// <inheritdoc />
-    protected override IEnumerable<ErrorCase> ErrorCases => CreateDefaultErrorCases(1);
+    protected override IEnumerable<ErrorCase> ErrorCases =>
+        CreateDefaultErrorCases(1.ConvertToSCLObject());
 }

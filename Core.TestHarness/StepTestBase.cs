@@ -10,6 +10,7 @@ public interface IStepTestBase
 [UseTestOutputHelper]
 public abstract partial class StepTestBase<TStep, TOutput> : IStepTestBase
     where TStep : class, ICompoundStep<TOutput>, new()
+    where TOutput : ISCLObject
 {
     public string StepName => typeof(TStep).GetDisplayName();
 

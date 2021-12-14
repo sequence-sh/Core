@@ -1,6 +1,4 @@
-﻿using Reductech.EDR.Core.TestHarness;
-
-namespace Reductech.EDR.Core.Tests.Steps;
+﻿namespace Reductech.EDR.Core.Tests.Steps;
 
 public partial class WhileTests : StepTestBase<While, Unit>
 {
@@ -20,13 +18,13 @@ public partial class WhileTests : StepTestBase<While, Unit>
                         {
                             Amount = Constant(1), Variable = new VariableName("Foo")
                         },
-                        Condition = new LessThan<int>
+                        Condition = new LessThan<SCLInt>
                         {
-                            Terms = new ArrayNew<int>
+                            Terms = new ArrayNew<SCLInt>
                             {
                                 Elements = new[]
                                 {
-                                    GetVariable<int>("Foo"), Constant(5)
+                                    GetVariable<SCLInt>("Foo"), Constant(5)
                                 }
                             }
                         }

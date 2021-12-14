@@ -1,7 +1,5 @@
 ﻿using System.Text;
-using Reductech.EDR.Core.Enums;
 using Reductech.EDR.Core.ExternalProcesses;
-using Reductech.EDR.Core.TestHarness;
 
 namespace Reductech.EDR.Core.Tests.Steps;
 

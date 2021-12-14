@@ -1,8 +1,6 @@
-﻿using Reductech.EDR.Core.TestHarness;
+﻿namespace Reductech.EDR.Core.Tests.Steps;
 
-namespace Reductech.EDR.Core.Tests.Steps;
-
-public partial class StringLengthTests : StepTestBase<StringLength, int>
+public partial class StringLengthTests : StepTestBase<StringLength, SCLInt>
 {
     /// <inheritdoc />
     protected override IEnumerable<StepCase> StepCases
@@ -12,7 +10,7 @@ public partial class StringLengthTests : StepTestBase<StringLength, int>
             yield return new StepCase(
                 "simple length of string",
                 new StringLength() { String = Constant("Hello") },
-                5
+                5.ConvertToSCLObject()
             );
         }
     }
@@ -25,7 +23,7 @@ public partial class StringLengthTests : StepTestBase<StringLength, int>
             yield return new DeserializeCase(
                 "Simple length of string",
                 "StringLength String: 'Hello'",
-                5
+                5.ConvertToSCLObject()
             );
         }
     }

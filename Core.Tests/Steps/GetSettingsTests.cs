@@ -1,5 +1,4 @@
 ﻿using Reductech.EDR.ConnectorManagement.Base;
-using Reductech.EDR.Core.TestHarness;
 
 namespace Reductech.EDR.Core.Tests.Steps;
 

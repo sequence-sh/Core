@@ -1,6 +1,4 @@
-﻿using Reductech.EDR.Core.TestHarness;
-
-namespace Reductech.EDR.Core.Tests.Steps;
+﻿namespace Reductech.EDR.Core.Tests.Steps;
 
 public partial class ForTests : StepTestBase<For, Unit>
 {
@@ -13,9 +11,9 @@ public partial class ForTests : StepTestBase<For, Unit>
                 "Increment 1",
                 new For
                 {
-                    Action = new LambdaFunction<int, Unit>(
+                    Action = new LambdaFunction<SCLInt, Unit>(
                         null,
-                        new Log<int> { Value = GetVariable<int>(VariableName.Item) }
+                        new Log<SCLInt> { Value = GetVariable<SCLInt>(VariableName.Item) }
                     ),
                     From      = Constant(1),
                     To        = Constant(3),
@@ -31,9 +29,9 @@ public partial class ForTests : StepTestBase<For, Unit>
                 "Increment 2",
                 new For
                 {
-                    Action = new LambdaFunction<int, Unit>(
+                    Action = new LambdaFunction<SCLInt, Unit>(
                         null,
-                        new Log<int> { Value = GetVariable<int>(VariableName.Item) }
+                        new Log<SCLInt> { Value = GetVariable<SCLInt>(VariableName.Item) }
                     ),
                     From      = Constant(1),
                     To        = Constant(6),
@@ -49,9 +47,9 @@ public partial class ForTests : StepTestBase<For, Unit>
                 "Increment -1",
                 new For
                 {
-                    Action = new LambdaFunction<int, Unit>(
+                    Action = new LambdaFunction<SCLInt, Unit>(
                         null,
-                        new Log<int> { Value = GetVariable<int>(VariableName.Item) }
+                        new Log<SCLInt> { Value = GetVariable<SCLInt>(VariableName.Item) }
                     ),
                     From      = Constant(3),
                     To        = Constant(1),
@@ -67,9 +65,9 @@ public partial class ForTests : StepTestBase<For, Unit>
                 "Increment No range",
                 new For
                 {
-                    Action = new LambdaFunction<int, Unit>(
+                    Action = new LambdaFunction<SCLInt, Unit>(
                         null,
-                        new Log<int> { Value = GetVariable<int>(VariableName.Item) }
+                        new Log<SCLInt> { Value = GetVariable<SCLInt>(VariableName.Item) }
                     ),
                     From      = Constant(3),
                     To        = Constant(1),
@@ -105,9 +103,9 @@ public partial class ForTests : StepTestBase<For, Unit>
                     "ValueIf increment 0",
                     new For
                     {
-                        Action = new LambdaFunction<int, Unit>(
+                        Action = new LambdaFunction<SCLInt, Unit>(
                             null,
-                            new Log<int> { Value = GetVariable<int>(VariableName.Item) }
+                            new Log<SCLInt> { Value = GetVariable<SCLInt>(VariableName.Item) }
                         ),
                         From      = Constant(1),
                         To        = Constant(3),

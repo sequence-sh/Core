@@ -1,4 +1,6 @@
-﻿namespace Reductech.EDR.Core.Steps;
+﻿using System.Text;
+
+namespace Reductech.EDR.Core.Steps;
 
 /// <summary>
 /// Formats an entity as a string
@@ -16,9 +18,10 @@ public sealed class EntityFormat : CompoundStep<StringStream>
         if (entity.IsFailure)
             return entity.ConvertFailure<StringStream>();
 
-        var s = entity.Value.Format();
+        var sb = new StringBuilder();
+        ((ISCLObject)entity.Value).Format(sb, 0, new FormattingOptions(), null, null);
 
-        return new StringStream(s);
+        return new StringStream(sb.ToString());
     }
 
     /// <summary>

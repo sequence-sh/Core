@@ -1,7 +1,4 @@
-﻿using Reductech.EDR.Core.Enums;
-using Reductech.EDR.Core.TestHarness;
-
-namespace Reductech.EDR.Core.Tests.Steps;
+﻿namespace Reductech.EDR.Core.Tests.Steps;
 
 public partial class StringTrimTests : StepTestBase<StringTrim, StringStream>
 {

@@ -1,6 +1,4 @@
-﻿using Reductech.EDR.Core.TestHarness;
-
-namespace Reductech.EDR.Core.Tests.Steps;
+﻿namespace Reductech.EDR.Core.Tests.Steps;
 
 public partial class IfTests : StepTestBase<If<Unit>, Unit>
 {
@@ -67,9 +65,9 @@ public partial class IfTests : StepTestBase<If<Unit>, Unit>
                 "Condition is error",
                 new If<Unit>()
                 {
-                    Condition = new FailStep<bool> { ErrorMessage = "Condition Fail" },
-                    Then      = new FailStep<Unit> { ErrorMessage = "Then Fail" },
-                    Else      = new FailStep<Unit> { ErrorMessage = "Else Fail" },
+                    Condition = new FailStep<SCLBool> { ErrorMessage = "Condition Fail" },
+                    Then      = new FailStep<Unit> { ErrorMessage    = "Then Fail" },
+                    Else      = new FailStep<Unit> { ErrorMessage    = "Else Fail" },
                 },
                 new SingleError(
                     ErrorLocation.EmptyLocation,

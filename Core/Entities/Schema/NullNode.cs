@@ -34,15 +34,15 @@ public record NullNode() : SchemaNode(EnumeratedValuesNodeData.Empty)
         ISCLObject value,
         TransformSettings transformSettings)
     {
-        if (value is ISCLObject.Null)
+        if (value is SCLNull)
             return Maybe<ISCLObject>.None;
 
         var nullWords = transformSettings.NullFormatter.GetFormats(propertyName);
 
-        var v = value.GetPrimitiveString();
+        var v = value.Serialize();
 
         if (nullWords.Contains(v))
-            return Maybe<ISCLObject>.From(ISCLObject.Null.Instance);
+            return Maybe<ISCLObject>.From(SCLNull.Instance);
 
         return ErrorCode.SchemaViolation.ToErrorBuilder("Should Be Null", propertyName);
     }

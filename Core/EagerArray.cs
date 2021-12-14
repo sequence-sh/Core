@@ -163,4 +163,7 @@ public sealed record EagerArray<T>(IReadOnlyList<T> List) : Array<T>, IEquatable
             .Combine(ErrorBuilderList.Combine)
             .Map(x => x.ToSCLArray());
     }
+
+    /// <inheritdoc />
+    public override bool IsEvaluated => true;
 }

@@ -16,8 +16,8 @@ public sealed class GetConnectorInformation : CompoundStep<Array<Entity>>
         foreach (var (connectorSettings, _) in stateMonad.StepFactoryStore.ConnectorData)
         {
             var entity = Entity.Create(
-                (nameof(ConnectorSettings.Id), connectorSettings.Id),
-                (nameof(ConnectorSettings.Version), connectorSettings.Version)
+                (nameof(ConnectorSettings.Id), new StringStream(connectorSettings.Id)),
+                (nameof(ConnectorSettings.Version), new StringStream(connectorSettings.Version))
             );
 
             entities.Add(entity);

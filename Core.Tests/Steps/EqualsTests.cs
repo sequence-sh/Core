@@ -1,8 +1,6 @@
-﻿using Reductech.EDR.Core.TestHarness;
+﻿namespace Reductech.EDR.Core.Tests.Steps;
 
-namespace Reductech.EDR.Core.Tests.Steps;
-
-public partial class EqualsTests : StepTestBase<Equals<int>, bool>
+public partial class EqualsTests : StepTestBase<Equals<SCLInt>, SCLBool>
 {
     /// <inheritdoc />
     protected override IEnumerable<StepCase> StepCases
@@ -11,42 +9,42 @@ public partial class EqualsTests : StepTestBase<Equals<int>, bool>
         {
             yield return new StepCase(
                 "One number",
-                new Equals<int>() { Terms = StaticHelpers.Array(2) },
-                true
+                new Equals<SCLInt>() { Terms = Array(2) },
+                true.ConvertToSCLObject()
             );
 
             yield return new StepCase(
                 "Two numbers false",
-                new Equals<int>() { Terms = StaticHelpers.Array(2, 3) },
-                false
+                new Equals<SCLInt>() { Terms = Array(2, 3) },
+                false.ConvertToSCLObject()
             );
 
             yield return new StepCase(
                 "Two numbers true",
-                new Equals<int>() { Terms = StaticHelpers.Array(2, 2) },
-                true
+                new Equals<SCLInt>() { Terms = Array(2, 2) },
+                true.ConvertToSCLObject()
             );
 
             yield return new StepCase(
                 "Three numbers true",
-                new Equals<int>() { Terms = StaticHelpers.Array(2, 2, 2) },
-                true
+                new Equals<SCLInt>() { Terms = Array(2, 2, 2) },
+                true.ConvertToSCLObject()
             );
 
             yield return new StepCase(
                 "Steps are operators",
-                new Equals<int>()
+                new Equals<SCLInt>()
                 {
-                    Terms = new ArrayNew<int>()
+                    Terms = new ArrayNew<SCLInt>()
                     {
                         Elements = new List<IStep<SCLInt>>()
                         {
-                            new Sum() { Terms     = StaticHelpers.Array(2, 2) },
-                            new Product() { Terms = StaticHelpers.Array(2, 2) },
+                            new Sum() { Terms     = Array(2, 2) },
+                            new Product() { Terms = Array(2, 2) },
                         }
                     }
                 },
-                true
+                true.ConvertToSCLObject()
             );
         }
     }

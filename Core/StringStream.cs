@@ -8,7 +8,7 @@ namespace Reductech.EDR.Core;
 /// A stream of data representing a string.
 /// This can either be a raw string or a stream and an encoding.
 /// </summary>
-public sealed class StringStream : ISCLObject, IEquatable<StringStream>, IComparable<StringStream>,
+public sealed class StringStream : IEquatable<StringStream>, IComparable<StringStream>,
                                    IDisposable,
                                    IComparable, IComparableSCLObject
 {
@@ -320,4 +320,30 @@ public sealed class StringStream : ISCLObject, IEquatable<StringStream>, ICompar
 
     /// <inheritdoc />
     public TypeReference TypeReference => TypeReference.Actual.String;
+
+    /// <inheritdoc />
+    public object ToCSharpObject() => GetString();
+
+    /// <inheritdoc />
+    public Maybe<T> MaybeAs<T>() where T : ISCLObject
+    {
+        if (this is T value)
+            return value;
+
+        return Maybe<T>.None;
+    }
+
+    /// <inheritdoc />
+    public ISCLObject DefaultValue => new StringStream("");
+
+    /// <inheritdoc />
+    public SchemaNode ToSchemaNode(
+        string path,
+        SchemaConversionOptions? schemaConversionOptions)
+    {
+        if (schemaConversionOptions is null)
+            return StringNode.Default;
+
+        return schemaConversionOptions.GetNode(this.GetString(), path);
+    }
 }

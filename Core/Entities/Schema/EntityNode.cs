@@ -25,7 +25,7 @@ public record EntityNode(
         ISCLObject value,
         TransformSettings transformSettings)
     {
-        if (value is not ISCLObject.NestedEntity nestedEntity)
+        if (value is not Entity nestedEntity)
             return ErrorCode.SchemaViolation.ToErrorBuilder("Should be Entity", propertyName);
 
         var errors = new List<IErrorBuilder>();
@@ -35,7 +35,7 @@ public record EntityNode(
                 .Select(x => x.Key)
                 .ToHashSet();
 
-        var newEntity = nestedEntity.Value;
+        var newEntity = nestedEntity;
         var changed   = false;
 
         bool allowExtra;
@@ -49,7 +49,7 @@ public record EntityNode(
                 .IsSuccess;
         }
 
-        foreach (var entityProperty in nestedEntity.Value)
+        foreach (var entityProperty in nestedEntity)
         {
             if (EntityPropertiesData.Nodes.TryGetValue(entityProperty.Name, out var node))
             {
@@ -97,7 +97,7 @@ public record EntityNode(
             );
 
         if (changed)
-            return Maybe<ISCLObject>.From(new ISCLObject.NestedEntity(newEntity));
+            return Maybe<ISCLObject>.From(new Entity(newEntity));
 
         return Maybe<ISCLObject>.None;
     }

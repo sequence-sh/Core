@@ -80,7 +80,7 @@ public sealed class StringInterpolate : CompoundStep<StringStream>
                              .Single()
                              .StepList)
                 {
-                    if (step is StringConstant sc)
+                    if (step is SCLConstant<StringStream> sc)
                     {
                         sb.Append(SerializationMethods.Escape(sc.Value.GetString()));
                     }

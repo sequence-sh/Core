@@ -1,6 +1,5 @@
 ﻿using System.Net;
 using Reductech.EDR.Core.Steps.REST;
-using Reductech.EDR.Core.TestHarness;
 
 namespace Reductech.EDR.Core.Tests.Steps.REST;
 

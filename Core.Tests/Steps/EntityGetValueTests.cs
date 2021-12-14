@@ -1,6 +1,4 @@
-﻿using Reductech.EDR.Core.TestHarness;
-
-namespace Reductech.EDR.Core.Tests.Steps;
+﻿namespace Reductech.EDR.Core.Tests.Steps;
 
 public partial class EntityGetValueTests : StepTestBase<EntityGetValue<StringStream>, StringStream>
 {
@@ -133,7 +131,7 @@ public partial class EntityGetValueTypeTests : StepTestBase<AssertTrue, Unit>
     private static AssertTrue GetTestCase<T>(
         IStep<T> expected,
         Entity entity,
-        string propertyName) => new()
+        string propertyName) where T : ISCLObject => new()
     {
         Boolean = new Equals<T>
         {

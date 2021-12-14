@@ -1,7 +1,4 @@
-﻿using Reductech.EDR.Core.Enums;
-using Reductech.EDR.Core.TestHarness;
-
-namespace Reductech.EDR.Core.Tests.Steps;
+﻿namespace Reductech.EDR.Core.Tests.Steps;
 
 public partial class SequenceTests : StepTestBase<Sequence<StringStream>, StringStream>
 {
@@ -103,7 +100,7 @@ public partial class SequenceTests : StepTestBase<Sequence<StringStream>, String
                 {
                     FinalStep = new StringToCase()
                     {
-                        Case   = new EnumConstant<TextCase>(TextCase.Upper),
+                        Case   = Constant<TextCase>(TextCase.Upper),
                         String = Constant("Hello")
                     }
                 },

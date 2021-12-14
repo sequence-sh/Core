@@ -37,7 +37,7 @@ public record NumberNode(
         ISCLObject value,
         TransformSettings transformSettings)
     {
-        if (value is ISCLObject.Integer evInteger)
+        if (value is SCLInt evInteger)
         {
             var restrictionResult = Restrictions.Test(evInteger.Value, propertyName);
 
@@ -46,7 +46,7 @@ public record NumberNode(
 
             return Maybe<ISCLObject>.None; //Integer is also number
         }
-        else if (value is ISCLObject.Double evDouble)
+        else if (value is SCLDouble evDouble)
 
         {
             var restrictionResult = Restrictions.Test(evDouble.Value, propertyName);
@@ -57,7 +57,7 @@ public record NumberNode(
             return Maybe<ISCLObject>.None;
         }
 
-        var v = value.GetPrimitiveString();
+        var v = value.Serialize();
 
         if (!double.TryParse(v, out var d))
             return ErrorCode.SchemaViolation.ToErrorBuilder("Should Be Number", propertyName);
@@ -67,6 +67,6 @@ public record NumberNode(
         if (restrictionResult2.IsFailure)
             return restrictionResult2.ConvertFailure<Maybe<ISCLObject>>();
 
-        return Maybe<ISCLObject>.From(new ISCLObject.Double(d));
+        return Maybe<ISCLObject>.From(new SCLDouble(d));
     }
 }

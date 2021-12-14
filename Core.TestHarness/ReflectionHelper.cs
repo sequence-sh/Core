@@ -265,11 +265,11 @@ public abstract partial class StepTestBase<TStep, TOutput>
 
             step = Array(list.ToArray());
         }
-        else if (outputType == typeof(Array<int>))
+        else if (outputType == typeof(Array<SCLInt>))
         {
             step = CreateIntArray(ref index);
         }
-        else if (outputType == typeof(Array<double>))
+        else if (outputType == typeof(Array<SCLDouble>))
         {
             var list = new List<double>();
 
@@ -281,7 +281,7 @@ public abstract partial class StepTestBase<TStep, TOutput>
 
             step = Array(list.ToArray());
         }
-        else if (outputType == typeof(Array<bool>))
+        else if (outputType == typeof(Array<SCLBool>))
         {
             var list = new List<bool>();
 
@@ -310,22 +310,22 @@ public abstract partial class StepTestBase<TStep, TOutput>
 
             step = new ArrayNew<Array<Entity>> { Elements = entityStreamList };
         }
-        else if (outputType == typeof(Array<Array<int>>))
+        else if (outputType == typeof(Array<Array<SCLInt>>))
         {
-            var intArrayList = new List<IStep<Array<int>>>
+            var intArrayList = new List<IStep<Array<SCLInt>>>
             {
                 CreateIntArray(ref index), CreateIntArray(ref index), CreateIntArray(ref index),
             };
 
-            step = new ArrayNew<Array<int>> { Elements = intArrayList };
+            step = new ArrayNew<Array<SCLInt>> { Elements = intArrayList };
         }
 
-        else if (outputType.IsEnum)
-        {
-            var v = Enum.GetValues(outputType).OfType<object>().First();
+        //else if (outputType.IsEnum) //todo PUT BACK
+        //{
+        //    var v = Enum.GetValues(outputType).OfType<object>().First();
 
-            step = EnumConstantFreezable.TryCreateEnumConstant(v).Value;
-        }
+        //    step = SCLObjectHelper.ConvertToSCLEnum();
+        //}
 
         else if (outputType == typeof(Stream))
         {
@@ -380,20 +380,20 @@ public abstract partial class StepTestBase<TStep, TOutput>
         static Entity CreateSimpleEntity(ref int index1)
         {
             var pairs =
-                new List<(EntityPropertyKey, object?)>
+                new List<(EntityPropertyKey, ISCLObject)>
                 {
-                    (new EntityPropertyKey("Prop1"), $"Val{index1}")
+                    (new EntityPropertyKey("Prop1"), new StringStream($"Val{index1}"))
                 };
 
             index1++;
-            pairs.Add((new EntityPropertyKey("Prop2"), $"Val{index1}"));
+            pairs.Add((new EntityPropertyKey("Prop2"), new StringStream($"Val{index1}")));
             index1++;
 
             var entity = Entity.Create(pairs);
             return entity;
         }
 
-        static IStep<Array<int>> CreateIntArray(ref int index)
+        static IStep<Array<SCLInt>> CreateIntArray(ref int index)
         {
             var list = new List<int>();
 
@@ -431,7 +431,7 @@ public abstract partial class StepTestBase<TStep, TOutput>
         else if (outputType == typeof(int))
             getElement = Constant;
         else if (outputType == typeof(Entity))
-            getElement = i => Constant(Entity.Create(("Foo", $"Val + {i}")));
+            getElement = i => Constant(Entity.Create(("Foo", new StringStream($"Val + {i}"))));
         else
             throw new XunitException(
                 $"Cannot create default value for {outputType.GetDisplayName()} List"

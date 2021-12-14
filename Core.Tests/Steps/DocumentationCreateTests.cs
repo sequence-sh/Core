@@ -266,7 +266,7 @@ public partial class DocumentationCreateTests : StepTestBase<DocumentationCreate
                         Entity   = new DocumentationCreate(),
                         Property = new SCLConstant<StringStream>("AllPages")
                     },
-                    Count = new SCLConstant<SCLInt>(10)
+                    Count = new SCLConstant<SCLInt>(10.ConvertToSCLObject())
                 }
             };
 
@@ -337,7 +337,7 @@ public partial class DocumentationCreateTests : StepTestBase<DocumentationCreate
         /// </summary>
         [StepProperty(2)]
         [Required]
-        public IStep<OneOf<int, Enums.TextCase>> Alpha { get; set; } = null!;
+        public IStep<SCLOneOf<SCLInt, SCLEnum<TextCase>>> Alpha { get; set; } = null!;
 
         /// <inheritdoc />
         public override IStepFactory StepFactory { get; } =

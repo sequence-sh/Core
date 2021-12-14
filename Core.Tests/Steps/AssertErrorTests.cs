@@ -1,6 +1,4 @@
-﻿using Reductech.EDR.Core.TestHarness;
-
-namespace Reductech.EDR.Core.Tests.Steps;
+﻿namespace Reductech.EDR.Core.Tests.Steps;
 
 public partial class AssertErrorTests : StepTestBase<AssertError, Unit>
 {
@@ -32,7 +30,7 @@ public partial class AssertErrorTests : StepTestBase<AssertError, Unit>
                 "Log divide by zero",
                 new AssertError
                 {
-                    Step = new Log<int> { Value = new Divide() { Terms = Array(1, 0) } }
+                    Step = new Log<SCLInt> { Value = new Divide() { Terms = Array(1, 0) } }
                 },
                 Unit.Default,
                 "Log Started with Parameters: [Value, Divide]",

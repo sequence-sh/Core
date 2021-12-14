@@ -50,6 +50,46 @@ public interface IStep
     /// Get the value of this step if it is constant
     /// </summary>
     Maybe<ISCLObject> TryGetConstantValue();
+
+    /// <summary>
+    /// Try to coerce this step to a step of another type
+    /// </summary>
+    public virtual Result<IStep, IErrorBuilder> TryCoerce(string propertyName, Type desiredStepType)
+    {
+        if (desiredStepType.IsInstanceOfType(this))
+            return Result.Success<IStep, IErrorBuilder>(this); //No coercion required
+
+        if (desiredStepType.IsGenericType)
+        {
+            var nestedType = desiredStepType.GenericTypeArguments.First();
+
+            if (nestedType.GetInterfaces().Contains(typeof(ISCLOneOf)))
+            {
+                var oneOfTypes = nestedType.GenericTypeArguments;
+
+                foreach (var oneOfType in oneOfTypes)
+                {
+                    var stepType     = typeof(IStep<>).MakeGenericType(oneOfType);
+                    var coerceResult = TryCoerce(propertyName, stepType);
+
+                    if (coerceResult.IsSuccess)
+                    {
+                        var resultStep = OneOfStep.Create(nestedType, this);
+                        return Result.Success<IStep, IErrorBuilder>(resultStep);
+                    }
+                }
+            }
+            else if (this is IConstantStep constantStep)
+            {
+                var conversionResult = constantStep.TryConvert(desiredStepType, propertyName);
+                return conversionResult;
+            }
+            else if (nestedType == typeof(ISCLObject))
+                return Result.Success<IStep, IErrorBuilder>(this);
+        }
+
+        return ErrorCode.InvalidCast.ToErrorBuilder(propertyName, Name);
+    }
 }
 
 /// <summary>

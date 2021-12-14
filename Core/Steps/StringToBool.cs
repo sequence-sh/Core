@@ -31,7 +31,7 @@ public sealed class StringToBool : CompoundStep<SCLBool>
             return i.ConvertToSCLObject();
         }
 
-        return ErrorCode.CouldNotParse.ToErrorBuilder(result.Value, SCLType.Bool.ToString())
+        return ErrorCode.CouldNotParse.ToErrorBuilder(result.Value, nameof(SCLBool))
             .WithLocationSingle(this);
     }
 

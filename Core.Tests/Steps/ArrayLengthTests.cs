@@ -1,8 +1,6 @@
-﻿using Reductech.EDR.Core.TestHarness;
+﻿namespace Reductech.EDR.Core.Tests.Steps;
 
-namespace Reductech.EDR.Core.Tests.Steps;
-
-public partial class ArrayLengthTests : StepTestBase<ArrayLength<StringStream>, int>
+public partial class ArrayLengthTests : StepTestBase<ArrayLength<StringStream>, SCLInt>
 {
     /// <inheritdoc />
     protected override IEnumerable<DeserializeCase> DeserializeCases
@@ -12,7 +10,7 @@ public partial class ArrayLengthTests : StepTestBase<ArrayLength<StringStream>, 
             yield return new DeserializeCase(
                 "short form",
                 "ArrayLength Array: ['Hello','World']",
-                2
+                2.ConvertToSCLObject()
             );
         }
     }
@@ -34,7 +32,7 @@ public partial class ArrayLengthTests : StepTestBase<ArrayLength<StringStream>, 
                         }
                     }
                 },
-                2
+                2.ConvertToSCLObject()
             );
 
             yield return new StepCase(
@@ -50,7 +48,7 @@ public partial class ArrayLengthTests : StepTestBase<ArrayLength<StringStream>, 
                         }
                     }
                 },
-                2
+                2.ConvertToSCLObject()
             );
         }
     }

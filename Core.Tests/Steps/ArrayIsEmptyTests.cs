@@ -1,8 +1,6 @@
-﻿using Reductech.EDR.Core.TestHarness;
+﻿namespace Reductech.EDR.Core.Tests.Steps;
 
-namespace Reductech.EDR.Core.Tests.Steps;
-
-public partial class ArrayIsEmptyTests : StepTestBase<ArrayIsEmpty<StringStream>, bool>
+public partial class ArrayIsEmptyTests : StepTestBase<ArrayIsEmpty<StringStream>, SCLBool>
 {
     /// <inheritdoc />
     protected override IEnumerable<DeserializeCase> DeserializeCases
@@ -12,13 +10,13 @@ public partial class ArrayIsEmptyTests : StepTestBase<ArrayIsEmpty<StringStream>
             yield return new DeserializeCase(
                 "empty array",
                 "ArrayIsEmpty Array: []",
-                true
+                true.ConvertToSCLObject()
             );
 
             yield return new DeserializeCase(
                 "two element",
                 "ArrayIsEmpty Array: ['Hello','World']",
-                false
+                false.ConvertToSCLObject()
             );
         }
     }
@@ -40,7 +38,7 @@ public partial class ArrayIsEmptyTests : StepTestBase<ArrayIsEmpty<StringStream>
                         }
                     }
                 },
-                false
+                false.ConvertToSCLObject()
             );
 
             yield return new StepCase(
@@ -55,7 +53,7 @@ public partial class ArrayIsEmptyTests : StepTestBase<ArrayIsEmpty<StringStream>
                         }
                     }
                 },
-                false
+                false.ConvertToSCLObject()
             );
         }
     }
