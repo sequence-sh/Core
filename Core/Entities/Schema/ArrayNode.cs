@@ -40,9 +40,9 @@ public record ArrayNode(
                 .ToArray();
 
             if (delimiters.Any())
-                immutableList = value.Serialize()
+                immutableList = value.Serialize(SerializeOptions.Primitive)
                     .Split(delimiters, StringSplitOptions.RemoveEmptyEntries)
-                    .Select(x => new StringStream(x) as ISCLObject)
+                    .Select(x => (ISCLObject)new StringStream(x))
                     .ToImmutableList();
             else
                 immutableList = ImmutableList<ISCLObject>.Empty;

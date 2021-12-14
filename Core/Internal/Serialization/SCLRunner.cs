@@ -105,7 +105,7 @@ public sealed class SCLRunner
             LogSituation.ConnectorSettings.Log(
                 stateMonad,
                 null,
-                stateMonad.Settings.Serialize()
+                stateMonad.Settings.Format()
             );
         }
 

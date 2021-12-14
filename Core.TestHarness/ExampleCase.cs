@@ -140,18 +140,14 @@ public abstract partial class StepTestBase<TStep, TOutput>
                 string actualString;
                 var    expectedString = CompressSpaces(SCLExampleAttribute.ExpectedOutput);
 
-                if (result.Value is StringStream ss)
+                if (result.Value is StringStream ss) //we don't want quotes for individual strings
                 {
-                    actualString = CompressSpaces(ss.GetString());
+                    actualString = CompressSpaces(ss.Serialize(SerializeOptions.Primitive));
                 }
-                else if (result.Value is string s)
-                {
-                    actualString = CompressSpaces(s);
-                }
-                else
+                else //We do want quotes for nested strings
                 {
                     actualString =
-                        CompressSpaces(result.Value.Serialize());
+                        CompressSpaces(result.Value.Serialize(SerializeOptions.Serialize));
                 }
 
                 actualString.Should().Be(expectedString);
@@ -172,12 +168,12 @@ public abstract partial class StepTestBase<TStep, TOutput>
 
                 if (result.Value is StringStream ss)
                 {
-                    actualString = CompressSpaces(ss.GetString());
+                    actualString = CompressSpaces(ss.Serialize(SerializeOptions.Primitive));
                 }
                 else
                 {
                     actualString =
-                        CompressSpaces(result.Value.Serialize());
+                        CompressSpaces(result.Value.Serialize(SerializeOptions.Serialize));
                 }
 
                 actualString.Should().Be(expectedString);

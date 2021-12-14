@@ -24,7 +24,9 @@ public sealed class GetVariable<T> : CompoundStep<T> where T : ISCLObject
     public VariableName Variable { get; set; }
 
     /// <inheritdoc />
-    public override string Name => Variable == default ? base.Name : $"Get {Variable.Serialize()}";
+    public override string Name => Variable == default
+        ? base.Name
+        : $"Get {Variable.Serialize(SerializeOptions.Name)}";
 
     /// <summary>
     /// Gets the value of a named variable.

@@ -13,6 +13,6 @@ public sealed class ArraySerializer : IStepSerializer
     public static IStepSerializer Instance { get; } = new ArraySerializer();
 
     /// <inheritdoc />
-    public string Serialize(IEnumerable<StepProperty> stepProperties) =>
-        stepProperties.Single().Serialize();
+    public string Serialize(SerializeOptions options, IEnumerable<StepProperty> stepProperties) =>
+        stepProperties.Single().Serialize(options);
 }

@@ -6,13 +6,10 @@
 public sealed record SCLDateTime(DateTime Value) : ISCLObject
 {
     /// <inheritdoc />
-    public string Name => Value.ToString(Constants.DateTimeFormat);
+    public string Serialize(SerializeOptions _) => Value.ToString(Constants.DateTimeFormat);
 
     /// <inheritdoc />
-    public string Serialize() => Value.ToString(Constants.DateTimeFormat);
-
-    /// <inheritdoc />
-    public TypeReference TypeReference => TypeReference.Actual.Date;
+    public TypeReference GetTypeReference() => TypeReference.Actual.Date;
 
     /// <inheritdoc />
     public object ToCSharpObject() => Value;
@@ -23,14 +20,11 @@ public sealed record SCLDateTime(DateTime Value) : ISCLObject
         if (this is T vBool)
             return vBool;
 
-        if (new StringStream(Serialize()) is T vString)
+        if (new StringStream(Serialize(SerializeOptions.Primitive)) is T vString)
             return vString;
 
         return Maybe<T>.None;
     }
-
-    /// <inheritdoc />
-    public ISCLObject DefaultValue => new SCLDateTime(default(DateTime));
 
     /// <inheritdoc />
     public SchemaNode ToSchemaNode(

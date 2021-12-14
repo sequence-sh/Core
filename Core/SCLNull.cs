@@ -13,22 +13,16 @@ public record SCLNull : ISCLObject
     public static SCLNull Instance { get; } = new();
 
     /// <inheritdoc />
-    public string Name => "Null";
+    public string Serialize(SerializeOptions _) => "Null";
 
     /// <inheritdoc />
-    public string Serialize() => Name;
-
-    /// <inheritdoc />
-    public TypeReference TypeReference => TypeReference.Actual.Null;
+    public TypeReference GetTypeReference() => TypeReference.Actual.Null;
 
     /// <inheritdoc />
     public object? ToCSharpObject()
     {
         return null;
     }
-
-    /// <inheritdoc />
-    public ISCLObject DefaultValue => Instance;
 
     /// <inheritdoc />
     public Maybe<T> MaybeAs<T>() where T : ISCLObject

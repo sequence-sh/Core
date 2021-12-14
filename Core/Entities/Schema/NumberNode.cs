@@ -57,7 +57,7 @@ public record NumberNode(
             return Maybe<ISCLObject>.None;
         }
 
-        var v = value.Serialize();
+        var v = value.Serialize(SerializeOptions.Primitive);
 
         if (!double.TryParse(v, out var d))
             return ErrorCode.SchemaViolation.ToErrorBuilder("Should Be Number", propertyName);

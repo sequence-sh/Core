@@ -24,8 +24,8 @@ public sealed class AssertEqual<T> : CompoundStep<Unit> where T : ISCLObject
         if (left.Value.Equals(right.Value))
             return Unit.Default;
 
-        var lString = left.Value.Serialize();
-        var rString = right.Value.Serialize();
+        var lString = left.Value.Serialize(SerializeOptions.Primitive);
+        var rString = right.Value.Serialize(SerializeOptions.Primitive);
 
         var error = ErrorCode.AssertionFailed
             .ToErrorBuilder($"Expected {lString} to equal {rString}")

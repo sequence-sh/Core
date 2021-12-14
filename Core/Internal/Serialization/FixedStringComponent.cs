@@ -16,6 +16,7 @@ public class FixedStringComponent : ISerializerBlock //, IDeserializerBlock
     public string Value { get; }
 
     /// <inheritdoc />
-    public Result<string> TryGetSegmentText(IReadOnlyDictionary<string, StepProperty> dictionary) =>
-        Value;
+    public Result<string> TryGetSegmentText(
+        SerializeOptions options,
+        IReadOnlyDictionary<string, StepProperty> dictionary) => Value;
 }

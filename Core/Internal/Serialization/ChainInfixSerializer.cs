@@ -8,7 +8,7 @@ namespace Reductech.EDR.Core.Internal.Serialization;
 public record ChainInfixSerializer(string StepName, string Operator) : IStepSerializer
 {
     /// <inheritdoc />
-    public string Serialize(IEnumerable<StepProperty> stepProperties)
+    public string Serialize(SerializeOptions options, IEnumerable<StepProperty> stepProperties)
     {
         var properties = stepProperties as StepProperty[] ?? stepProperties.ToArray();
 
@@ -24,10 +24,10 @@ public record ChainInfixSerializer(string StepName, string Operator) : IStepSeri
                     {
                         if (x.ShouldBracketWhenSerialized)
                         {
-                            return $"({x.Serialize()})";
+                            return $"({x.Serialize(options)})";
                         }
 
-                        return x.Serialize();
+                        return x.Serialize(options);
                     }
                 )
             );
@@ -36,6 +36,6 @@ public record ChainInfixSerializer(string StepName, string Operator) : IStepSeri
         }
 
         //This will happen if the source of elements is not an array directly
-        return new FunctionSerializer(StepName).Serialize(properties);
+        return new FunctionSerializer(StepName).Serialize(options, properties);
     }
 }

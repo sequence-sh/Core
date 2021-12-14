@@ -37,7 +37,7 @@ public sealed partial record Entity(
     public static Entity Empty { get; } = new(new List<EntityProperty>());
 
     /// <inheritdoc />
-    public TypeReference TypeReference => TypeReference.Actual.Entity;
+    public TypeReference GetTypeReference() => TypeReference.Actual.Entity;
 
     /// <summary>
     /// The default property name if the Entity represents a single primitive.
@@ -325,7 +325,7 @@ public sealed partial record Entity(
         Dictionary.Values.OrderBy(x => x.Order).GetEnumerator();
 
     /// <inheritdoc />
-    public string Serialize()
+    public string Serialize(SerializeOptions options)
     {
         var sb = new StringBuilder();
 
@@ -334,7 +334,7 @@ public sealed partial record Entity(
         var results = new List<string>();
 
         foreach (var (name, entityValue, _) in this)
-            results.Add($"'{name}': {entityValue.Serialize()}");
+            results.Add($"'{name}': {entityValue.Serialize(options)}");
 
         sb.AppendJoin(" ", results);
 
@@ -346,10 +346,7 @@ public sealed partial record Entity(
     }
 
     /// <inheritdoc />
-    public string Name => Serialize();
-
-    /// <inheritdoc />
-    public override string ToString() => Serialize();
+    public override string ToString() => Serialize(SerializeOptions.Name);
 
     /// <inheritdoc />
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
@@ -390,9 +387,9 @@ public sealed partial record Entity(
 
         indentation++;
 
-        foreach (var property in this)
+        foreach (var (name, sclObject, _) in this)
         {
-            property.Value.Format(stringBuilder, indentation, options, $"'{property.Name}': ");
+            sclObject.Format(stringBuilder, indentation, options, $"'{name}': ");
         }
 
         indentation--;
@@ -492,9 +489,6 @@ public sealed partial record Entity(
 
         return Maybe<T>.None;
     }
-
-    /// <inheritdoc />
-    public ISCLObject DefaultValue => Empty;
 
     /// <inheritdoc />
     public SchemaNode ToSchemaNode(

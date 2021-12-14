@@ -156,7 +156,7 @@ public partial class DocumentationCreateTests : StepTestBase<DocumentationCreate
                 "Generate Not Documentation",
                 logDocumentation,
                 Unit.Default,
-                notDocumentationEntity.ConvertToEntity().Serialize()
+                notDocumentationEntity.ConvertToEntity().Serialize(SerializeOptions.Serialize)
             ) { TestDeserializeAndRun = false }.WithStepFactoryStore(
                 StepFactoryStore.Create(
                     System.Array.Empty<ConnectorData>(),
@@ -236,7 +236,7 @@ public partial class DocumentationCreateTests : StepTestBase<DocumentationCreate
                 "Example step",
                 logDocumentation,
                 Unit.Default,
-                exampleCreationResult.ConvertToEntity().Serialize()
+                exampleCreationResult.ConvertToEntity().Serialize(SerializeOptions.Serialize)
             ) { TestDeserializeAndRun = false }.WithStepFactoryStore(
                 StepFactoryStore.Create(
                     System.Array.Empty<ConnectorData>(),

@@ -103,7 +103,7 @@ public abstract record TypeReference
         /// <inheritdoc />
         public override Result<Type, IErrorBuilder> TryGetType(TypeResolver typeResolver)
         {
-            return typeof(object);
+            return typeof(ISCLObject);
         }
 
         /// <inheritdoc />
@@ -137,11 +137,6 @@ public abstract record TypeReference
 
             return false;
         }
-
-        /// <summary>
-        /// Constructor should only be used by TypedActual
-        /// </summary>
-        protected Actual() { }
 
         /// <summary>
         /// A string
@@ -235,7 +230,7 @@ public abstract record TypeReference
         /// <param name="typeResolver"></param>
         /// <inheritdoc />
         public override Result<Type, IErrorBuilder> TryGetType(TypeResolver typeResolver) =>
-            EnumType;
+            typeof(SCLEnum<>).MakeGenericType(EnumType);
 
         /// <inheritdoc />
         public override bool Allow(TypeReference other, TypeResolver? typeResolver)
@@ -290,22 +285,22 @@ public abstract record TypeReference
                 if (t.IsFailure)
                     return t.ConvertFailure<Type>();
 
-                if (t.Value != typeof(object))
+                if (t.Value != typeof(ISCLObject))
                     types.Add(t.Value);
             }
 
             Type genericOneOfType;
 
             if (types.Count == 0)
-                return typeof(object);
+                return typeof(ISCLObject);
 
             if (types.Count == 1)
                 return types.Single();
 
             if (types.Count == 2)
             {
-                if (types.Contains(typeof(int)) && types.Contains(typeof(double)))
-                    return typeof(double);
+                if (types.Contains(typeof(SCLInt)) && types.Contains(typeof(SCLDouble)))
+                    return typeof(SCLDouble);
 
                 genericOneOfType = typeof(OneOf<,>);
             }
@@ -364,7 +359,7 @@ public abstract record TypeReference
         /// <inheritdoc />
         public override Result<Type, IErrorBuilder> TryGetType(TypeResolver typeResolver)
         {
-            return typeof(object);
+            return typeof(ISCLObject);
         }
 
         /// <inheritdoc />
@@ -497,7 +492,7 @@ public abstract record TypeReference
         /// <inheritdoc />
         public override Result<Type, IErrorBuilder> TryGetType(TypeResolver typeResolver)
         {
-            Variable vtr = this;
+            var vtr = this;
 
             HashSet<TypeReference> typeReferences = new(); //prevent circular references
 
@@ -527,7 +522,7 @@ public abstract record TypeReference
         }
 
         /// <inheritdoc />
-        public override string Name => VariableName.Serialize();
+        public override string Name => VariableName.Serialize(SerializeOptions.Serialize);
     }
 
     /// <summary>

@@ -33,8 +33,10 @@ public partial class ArrayMapTests : StepTestBase<ArrayMap<Entity, Entity>, Arra
                     }
                 },
                 Unit.Default,
-                Entity.Create(("Foo", "Hello"),   ("Bar", "World")).Serialize(),
-                Entity.Create(("Foo", "Hello 2"), ("Bar", "World")).Serialize()
+                Entity.Create(("Foo", "Hello"), ("Bar", "World"))
+                    .Serialize(SerializeOptions.Serialize),
+                Entity.Create(("Foo", "Hello 2"), ("Bar", "World"))
+                    .Serialize(SerializeOptions.Serialize)
             );
 
             yield return new StepCase(
@@ -63,8 +65,10 @@ public partial class ArrayMapTests : StepTestBase<ArrayMap<Entity, Entity>, Arra
                     }
                 },
                 Unit.Default,
-                Entity.Create(("Foo", "Hello"),   ("Bar", "World")).Serialize(),
-                Entity.Create(("Foo", "Hello 2"), ("Bar", "World")).Serialize()
+                Entity.Create(("Foo", "Hello"), ("Bar", "World"))
+                    .Serialize(SerializeOptions.Serialize),
+                Entity.Create(("Foo", "Hello 2"), ("Bar", "World"))
+                    .Serialize(SerializeOptions.Serialize)
             );
         }
     }

@@ -124,7 +124,7 @@ public sealed class RunSCL : CompoundStep<Unit>
 
                     foreach (var entityValue in list)
                     {
-                        var name = entityValue.Serialize();
+                        var name = entityValue.Serialize(SerializeOptions.Primitive);
 
                         yield return new(
                             new VariableName(name),

@@ -41,16 +41,16 @@ public record LambdaFunction
     /// <summary>
     /// Serialize this Lambda function
     /// </summary>
-    public string Serialize()
+    public string Serialize(SerializeOptions options)
     {
-        var stepSerialized = Step.Serialize();
+        var stepSerialized = Step.Serialize(options);
 
         if (Variable is null)
         {
             return $"<> => {stepSerialized}";
         }
 
-        return $"{Variable.Value.Serialize()} => {stepSerialized}";
+        return $"{Variable.Value.Serialize(options)} => {stepSerialized}";
     }
 
     /// <summary>

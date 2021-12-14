@@ -96,11 +96,11 @@ public class EntityMapProperties : CompoundStep<Array<Entity>>
             {
                 return nestedList.ListIfEvaluated()
                     .Value
-                    .Select(x => EntityPropertyKey.Create(x.Serialize()))
+                    .Select(x => EntityPropertyKey.Create(x.Serialize(SerializeOptions.Primitive)))
                     .ToList();
             }
 
-            return new[] { EntityPropertyKey.Create(ev.Serialize()) };
+            return new[] { EntityPropertyKey.Create(ev.Serialize(SerializeOptions.Primitive)) };
         }
     }
 

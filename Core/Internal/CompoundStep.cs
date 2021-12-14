@@ -25,7 +25,7 @@ public abstract class CompoundStep<T> : ICompoundStep<T> where T : ISCLObject
             object[] GetEnterStepArgs()
             {
                 var properties = AllProperties
-                    .ToDictionary(x => x.Name, x => x.GetLogName());
+                    .ToDictionary(x => x.Name, x => x.Serialize(SerializeOptions.SanitizedName));
 
                 return new object[] { Name, properties };
             }
@@ -40,24 +40,12 @@ public abstract class CompoundStep<T> : ICompoundStep<T> where T : ISCLObject
             }
             else
             {
-                var resultValue = SerializeOutput(result.Value);
+                var resultValue = result.Value.Serialize(SerializeOptions.SanitizedName);
 
                 LogSituation.ExitStepSuccess.Log(stateMonad, this, Name, resultValue);
             }
 
             return result;
-
-            static string SerializeOutput(object? o)
-            {
-                return o switch
-                {
-                    null            => "Null",
-                    StringStream ss => ss.NameInLogs(false),
-                    IArray array    => array.Name,
-                    Unit            => "Unit",
-                    _               => o.ToString()!
-                };
-            }
         }
     }
 
@@ -78,7 +66,8 @@ public abstract class CompoundStep<T> : ICompoundStep<T> where T : ISCLObject
     public abstract IStepFactory StepFactory { get; }
 
     /// <inheritdoc />
-    public string Serialize() => StepFactory.Serializer.Serialize(AllProperties);
+    public string Serialize(SerializeOptions options) =>
+        StepFactory.Serializer.Serialize(options, AllProperties);
 
     /// <inheritdoc />
     public virtual string Name => StepFactory.TypeName;

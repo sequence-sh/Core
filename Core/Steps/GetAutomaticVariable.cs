@@ -101,7 +101,7 @@ public sealed class GetAutomaticVariable<T> : CompoundStep<T> where T : ISCLObje
                 new GetAutomaticVariableStepSerializer();
 
             /// <inheritdoc />
-            public string Serialize(IEnumerable<StepProperty> stepProperties)
+            public string Serialize(SerializeOptions _, IEnumerable<StepProperty> stepProperties)
             {
                 return "<>";
             }

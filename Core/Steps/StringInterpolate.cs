@@ -26,7 +26,7 @@ public sealed class StringInterpolate : CompoundStep<StringStream>
             if (o.IsFailure)
                 return o.ConvertFailure<StringStream>();
 
-            var s = o.Value.Serialize();
+            var s = o.Value.Serialize(SerializeOptions.Primitive);
 
             sb.Append(s);
         }
@@ -69,7 +69,9 @@ public sealed class StringInterpolate : CompoundStep<StringStream>
                 new StringInterpolateSerializer();
 
             /// <inheritdoc />
-            public string Serialize(IEnumerable<StepProperty> stepProperties)
+            public string Serialize(
+                SerializeOptions options,
+                IEnumerable<StepProperty> stepProperties)
             {
                 StringBuilder sb = new();
 
@@ -82,12 +84,16 @@ public sealed class StringInterpolate : CompoundStep<StringStream>
                 {
                     if (step is SCLConstant<StringStream> sc)
                     {
-                        sb.Append(SerializationMethods.Escape(sc.Value.GetString()));
+                        sb.Append(
+                            SerializationMethods.Escape(
+                                sc.Value.Serialize(options with { QuoteStrings = false })
+                            )
+                        );
                     }
                     else
                     {
                         sb.Append('{');
-                        var ser = step.Serialize();
+                        var ser = step.Serialize(options);
                         sb.Append(ser);
                         sb.Append('}');
                     }

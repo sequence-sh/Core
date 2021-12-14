@@ -15,7 +15,7 @@ public sealed record SCLConstant<T>(T Value) : IStep<T>, IConstantStep where T :
     }
 
     /// <inheritdoc />
-    public string Name => Value.Name;
+    public string Name => Value.Serialize(SerializeOptions.Primitive);
 
     /// <inheritdoc />
     public async Task<Result<T1, IError>> Run<T1>(
@@ -42,7 +42,7 @@ public sealed record SCLConstant<T>(T Value) : IStep<T>, IConstantStep where T :
     public Type OutputType => typeof(T);
 
     /// <inheritdoc />
-    public string Serialize() => Value.Serialize();
+    public string Serialize(SerializeOptions options) => Value.Serialize(options);
 
     /// <inheritdoc />
     public IEnumerable<Requirement> RuntimeRequirements

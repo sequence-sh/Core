@@ -178,11 +178,12 @@ public sealed record FeatureRequirement(
 
         if (featuresEntity is IArray nestedList)
             actualFeatures = nestedList.ListIfEvaluated()
-                .Value.Select(x => x.Serialize())
+                .Value.Select(x => x.Serialize(SerializeOptions.Primitive))
                 .ToList();
         else
         {
-            actualFeatures = new List<string> { featuresEntity.Serialize() };
+            actualFeatures =
+                new List<string> { featuresEntity.Serialize(SerializeOptions.Primitive) };
         }
 
         var missingFeatures = RequiredFeatures.Except(

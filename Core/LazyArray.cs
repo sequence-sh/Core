@@ -152,22 +152,27 @@ public sealed record LazyArray<T>
     }
 
     /// <inheritdoc />
-    public override string Serialize()
+    public override string Serialize(SerializeOptions options)
     {
-        var r = GetElementsAsync(CancellationToken.None)
+        if (!options.EvaluateStreams)
+            return "Stream";
+
+        var list = GetElementsAsync(CancellationToken.None)
             .Result;
 
-        if (r.IsSuccess)
+        if (list.IsSuccess)
+        {
+            if (list.Value.Count > options.MaxArrayLength)
+                return $"{list.Value.Count} Elements";
+
             return SerializationMethods.SerializeList(
-                r.Value
-                    .Select(x => x.Serialize())
+                list.Value
+                    .Select(x => x.Serialize(options))
             );
+        }
 
-        return r.Error.AsString;
+        return list.Error.AsString;
     }
-
-    /// <inheritdoc />
-    public override string Name => "Stream";
 
     /// <inheritdoc />
     public override int GetHashCode() => GetHashCodeValue(this);
@@ -202,7 +207,7 @@ public sealed record LazyArray<T>
     }
 
     /// <inheritdoc />
-    public override string ToString() => Name;
+    public override string ToString() => Serialize(SerializeOptions.Name);
 
     /// <inheritdoc />
     public override bool IsEvaluated => false;

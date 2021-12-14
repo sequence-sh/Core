@@ -28,13 +28,10 @@ public sealed record SCLBool : ISCLObject
     public bool Value { get; private init; }
 
     /// <inheritdoc />
-    public string Serialize() => Value.ToString();
+    public string Serialize(SerializeOptions _) => Value.ToString();
 
     /// <inheritdoc />
-    public string Name => Value.ToString();
-
-    /// <inheritdoc />
-    public TypeReference TypeReference => TypeReference.Actual.Bool;
+    public TypeReference GetTypeReference() => TypeReference.Actual.Bool;
 
     /// <inheritdoc />
     public object ToCSharpObject() => Value;
@@ -45,14 +42,11 @@ public sealed record SCLBool : ISCLObject
         if (this is T vBool)
             return vBool;
 
-        if (new StringStream(Serialize()) is T vString)
+        if (new StringStream(Serialize(SerializeOptions.Primitive)) is T vString)
             return vString;
 
         return Maybe<T>.None;
     }
-
-    /// <inheritdoc />
-    public ISCLObject DefaultValue => False;
 
     /// <inheritdoc />
     public SchemaNode ToSchemaNode(

@@ -40,7 +40,7 @@ public class EntityConversionTests
         "('AdditionalRequirements': [('FeaturesKey': \"Features\" 'RequiredFeatures': [\"Apple\", \"Banana\"] 'ConnectorName': \"Reductech.EDR.Core.Tests\"), ('VersionKey': \"Version\" 'MinVersion': \"1.2.3.4\" 'MaxVersion': \"5.6.7.8\" 'ConnectorName': \"Reductech.EDR.Core.Tests\")] 'TargetMachineTags': [\"alpha\", \"beta\"] 'DoNotSplit': True 'Priority': 3)";
 
     private const string TestConfigurationString2 =
-        "('AdditionalRequirements': null 'TargetMachineTags': [\"alpha\", \"beta\"] 'DoNotSplit': True 'Priority': 3)";
+        "('AdditionalRequirements': [] 'TargetMachineTags': [\"alpha\", \"beta\"] 'DoNotSplit': True 'Priority': 3)";
 
     [Fact]
     public void ConfigurationShouldConvertToEntityCorrectly()
@@ -53,7 +53,10 @@ public class EntityConversionTests
 
         var config = EntityConversionHelpers.TryCreateFromEntity<Configuration>(entity);
         config.ShouldBeSuccessful();
-        config.Value.ConvertToEntity().Should().BeEquivalentTo(entity);
+
+        var cvEntity = config.Value.ConvertToEntity();
+
+        cvEntity.Should().BeEquivalentTo(entity);
     }
 
     [Fact]
@@ -155,9 +158,12 @@ public class EntityConversionTests
 
         e.TryGetValue("emptyList").ShouldHaveValue();
 
-        e.TryGetValue("emptyList")
-            .GetValueOrThrow()
+        var listValue =
+            e.TryGetValue("emptyList")
+                .GetValueOrThrow();
+
+        listValue
             .Should()
-            .Be(SCLNull.Instance);
+            .Be(EagerArray<ISCLObject>.Empty);
     }
 }

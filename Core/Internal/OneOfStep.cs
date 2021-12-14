@@ -41,10 +41,7 @@ public abstract class OneOfStep : IStep
     public abstract Type OutputType { get; }
 
     /// <inheritdoc />
-    public string Serialize()
-    {
-        return StepValue.Serialize();
-    }
+    public string Serialize(SerializeOptions options) => StepValue.Serialize(options);
 
     /// <inheritdoc />
     public IEnumerable<Requirement> RuntimeRequirements => StepValue.RuntimeRequirements;

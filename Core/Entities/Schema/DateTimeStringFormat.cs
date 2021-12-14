@@ -25,7 +25,7 @@ public record DateTimeStringFormat : StringFormat
             return Maybe<ISCLObject>.None;
         }
 
-        var primitive = entityValue.Serialize();
+        var primitive = entityValue.Serialize(SerializeOptions.Primitive);
 
         if (DateTime.TryParse(primitive, out var dt1))
         {

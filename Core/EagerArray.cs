@@ -116,9 +116,6 @@ public sealed record EagerArray<T>(IReadOnlyList<T> List) : Array<T>, IEquatable
     }
 
     /// <inheritdoc />
-    public override string Name => List.Count + " Elements";
-
-    /// <inheritdoc />
     public override int GetHashCode() => GetHashCodeValue(this);
 
     bool IEquatable<Array<T>>.Equals(Array<T>? other) => Equals(this, other);
@@ -132,15 +129,7 @@ public sealed record EagerArray<T>(IReadOnlyList<T> List) : Array<T>, IEquatable
     }
 
     /// <inheritdoc />
-    public override string ToString()
-    {
-        return List.Count switch
-        {
-            0     => "Empty Eager Array",
-            <= 10 => "[" + string.Join(", ", List.Select(x => x.ToString())) + "]",
-            _     => $"Eager Array with {List.Count} Elements"
-        };
-    }
+    public override string ToString() => Serialize(SerializeOptions.Name);
 
     /// <inheritdoc />
     protected override Type EqualityContract => typeof(Array<T>);
@@ -152,8 +141,13 @@ public sealed record EagerArray<T>(IReadOnlyList<T> List) : Array<T>, IEquatable
     }
 
     /// <inheritdoc />
-    public override string Serialize() =>
-        SerializationMethods.SerializeList(List.Select(x => x.Serialize()));
+    public override string Serialize(SerializeOptions options)
+    {
+        if (List.Count > options.MaxArrayLength)
+            return $"{List.Count} Elements";
+
+        return SerializationMethods.SerializeList(List.Select(x => x.Serialize(options)));
+    }
 
     /// <inheritdoc />
     public override Result<Array<TElement>, IErrorBuilder> TryConvertElements<TElement>()

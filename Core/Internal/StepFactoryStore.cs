@@ -164,7 +164,7 @@ public class StepFactoryStore
             if (stepType.IsGenericType)
             {
                 var arguments = ((TypeInfo)stepType).GenericTypeParameters
-                    .Select(_ => typeof(int))
+                    .Select(_ => typeof(SCLInt))
                     .ToArray();
 
                 try

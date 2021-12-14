@@ -153,13 +153,11 @@ public abstract record Array<T> : IArray where T : ISCLObject
     }
 
     /// <inheritdoc />
-    public abstract string Name { get; }
+    public TypeReference GetTypeReference() =>
+        new TypeReference.Array(TypeReference.Create(typeof(T)));
 
     /// <inheritdoc />
-    public TypeReference TypeReference => new TypeReference.Array(TypeReference.Create(typeof(T)));
-
-    /// <inheritdoc />
-    public abstract string Serialize();
+    public abstract string Serialize(SerializeOptions options);
 
     /// <inheritdoc />
     public abstract Result<Array<TElement>, IErrorBuilder> TryConvertElements<TElement>()
@@ -219,7 +217,7 @@ public abstract record Array<T> : IArray where T : ISCLObject
     }
 
     /// <inheritdoc />
-    public override string ToString() => Name;
+    public override string ToString() => Serialize(SerializeOptions.Name);
 
     /// <inheritdoc />
     public object ToCSharpObject()
@@ -263,7 +261,10 @@ public abstract record Array<T> : IArray where T : ISCLObject
         }
         else
         {
-            var line = "[" + string.Join(", ", list.Select(x => x.Serialize()))
+            var line = "[" + string.Join(
+                                 ", ",
+                                 list.Select(x => x.Serialize(SerializeOptions.Serialize))
+                             )
                            + "]";
 
             ISCLObject.AppendLineIndented(
@@ -282,9 +283,6 @@ public abstract record Array<T> : IArray where T : ISCLObject
 
         return Maybe<T1>.None;
     }
-
-    /// <inheritdoc />
-    public ISCLObject DefaultValue => Empty;
 
     /// <inheritdoc />
     public SchemaNode ToSchemaNode(
