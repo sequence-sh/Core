@@ -13,13 +13,13 @@ public class ArrayElementAtIndexSerializer : IStepSerializer
     public static IStepSerializer Instance { get; } = new ArrayElementAtIndexSerializer();
 
     /// <inheritdoc />
-    public string Serialize(IEnumerable<StepProperty> stepProperties)
+    public string Serialize(SerializeOptions options, IEnumerable<StepProperty> stepProperties)
     {
         var (first, second) = stepProperties.GetFirstTwo().GetValueOrThrow();
 
-        var entity = first.Serialize();
+        var entity = first.Serialize(options);
 
-        var index = second.Serialize();
+        var index = second.Serialize(options);
 
         return $"{entity}[{index}]";
     }

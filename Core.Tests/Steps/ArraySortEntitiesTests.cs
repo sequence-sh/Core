@@ -32,9 +32,9 @@ public partial class ArraySortEntitiesTests : StepTestBase<ArraySort<Entity>, Ar
                     ),
                 },
                 Unit.Default,
-                Entity.Create(("Foo", "Alpha")).Serialize(),
-                Entity.Create(("Foo", "Beta")).Serialize(),
-                Entity.Create(("Foo", "Gamma")).Serialize()
+                Entity.Create(("Foo", "Alpha")).Serialize(SerializeOptions.Serialize),
+                Entity.Create(("Foo", "Beta")).Serialize(SerializeOptions.Serialize),
+                Entity.Create(("Foo", "Gamma")).Serialize(SerializeOptions.Serialize)
             );
 
             yield return new StepCase(
@@ -63,9 +63,9 @@ public partial class ArraySortEntitiesTests : StepTestBase<ArraySort<Entity>, Ar
                     )
                 },
                 Unit.Default,
-                Entity.Create(("Foo", "Gamma")).Serialize(),
-                Entity.Create(("Foo", "Beta")).Serialize(),
-                Entity.Create(("Foo", "Alpha")).Serialize()
+                Entity.Create(("Foo", "Gamma")).Serialize(SerializeOptions.Serialize),
+                Entity.Create(("Foo", "Beta")).Serialize(SerializeOptions.Serialize),
+                Entity.Create(("Foo", "Alpha")).Serialize(SerializeOptions.Serialize)
             );
 
             yield return new StepCase(
@@ -95,10 +95,10 @@ public partial class ArraySortEntitiesTests : StepTestBase<ArraySort<Entity>, Ar
                     ),
                 },
                 Unit.Default,
-                Entity.Create(("Foo", "Gamma")).Serialize(),
-                Entity.Create(("Foo", "Beta")).Serialize(),
-                Entity.Create(("Foo", "Alpha")).Serialize(),
-                Entity.Create(("Bar", "Delta")).Serialize()
+                Entity.Create(("Foo", "Gamma")).Serialize(SerializeOptions.Serialize),
+                Entity.Create(("Foo", "Beta")).Serialize(SerializeOptions.Serialize),
+                Entity.Create(("Foo", "Alpha")).Serialize(SerializeOptions.Serialize),
+                Entity.Create(("Bar", "Delta")).Serialize(SerializeOptions.Serialize)
             );
         }
     }

@@ -155,7 +155,7 @@ public sealed record SCLConstantFreezable<T>
     (T Value, TextLocation TextLocation) : IConstantFreezableStep where T : ISCLObject
 {
     /// <inheritdoc />
-    public string StepName => Value.Name;
+    public string StepName => Value.Serialize(SerializeOptions.Primitive);
 
     /// <inheritdoc />
     public Result<IStep, IError> TryFreeze(
@@ -175,7 +175,7 @@ public sealed record SCLConstantFreezable<T>
         CallerMetadata callerMetadata,
         TypeResolver typeResolver)
     {
-        return Value.TypeReference;
+        return Value.GetTypeReference();
     }
 
     /// <inheritdoc />
@@ -208,5 +208,5 @@ public sealed record SCLConstantFreezable<T>
     public ISCLObject ValueObject => Value;
 
     /// <inheritdoc />
-    public string Serialize() => Value.Serialize();
+    public string Serialize() => Value.Serialize(SerializeOptions.Serialize);
 }

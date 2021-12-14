@@ -63,7 +63,7 @@ public record CreateEntityStep
     public Type OutputType => typeof(Entity);
 
     /// <inheritdoc />
-    public string Serialize()
+    public string Serialize(SerializeOptions options)
     {
         var sb = new StringBuilder();
 
@@ -73,12 +73,10 @@ public record CreateEntityStep
 
         foreach (var (key, value) in Properties)
         {
-            var valueString = value.Serialize();
+            var valueString = value.Serialize(options);
 
             if (value.ShouldBracketWhenSerialized)
-            {
                 valueString = $"({valueString})";
-            }
 
             results.Add($"{key}: {valueString}");
         }
@@ -104,8 +102,6 @@ public record CreateEntityStep
     {
         var properties = new List<(EntityPropertyKey entityPropertyKey, ISCLObject value)>();
 
-        var i = 1;
-
         foreach (var (key, step) in Properties)
         {
             var r = step.TryGetConstantValue();
@@ -114,7 +110,6 @@ public record CreateEntityStep
                 return Maybe<ISCLObject>.None;
 
             properties.Add((key, r.Value));
-            i++;
         }
 
         return Entity.Create(properties);

@@ -8,5 +8,5 @@ public interface IStepSerializer
     /// <summary>
     /// SerializeAsync a step according to it's properties.
     /// </summary>
-    string Serialize(IEnumerable<StepProperty> stepProperties);
+    string Serialize(SerializeOptions options, IEnumerable<StepProperty> stepProperties);
 }

@@ -48,7 +48,7 @@ public record StringNode(
         if (StringRestrictions == StringRestrictions.NoRestrictions)
             return r1;
 
-        var s = r1.Value.GetValueOrDefault(value).Serialize();
+        var s = r1.Value.GetValueOrDefault(value).Serialize(SerializeOptions.Primitive);
 
         var testResult = StringRestrictions.Test(s, propertyName);
 

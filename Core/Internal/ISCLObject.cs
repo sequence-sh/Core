@@ -10,20 +10,16 @@ namespace Reductech.EDR.Core.Internal;
 public interface ISCLObject
 {
     /// <summary>
-    /// Short name for this object
-    /// </summary>
-    string Name { get; }
-
-    /// <summary>
     /// Serialize this object
     /// </summary>
     [Pure]
-    string Serialize();
+    string Serialize(SerializeOptions options);
 
     /// <summary>
     /// The Type Reference
     /// </summary>
-    TypeReference TypeReference { get; }
+    [Pure]
+    TypeReference GetTypeReference();
 
     /// <summary>
     /// Tries to convert this SCL object to an SCL object of a different type
@@ -50,7 +46,10 @@ public interface ISCLObject
         var r = MaybeAs<T>();
 
         if (r.HasNoValue)
-            return ErrorCode.InvalidCast.ToErrorBuilder(propertyName, Name);
+            return ErrorCode.InvalidCast.ToErrorBuilder(
+                propertyName,
+                Serialize(SerializeOptions.Name)
+            );
 
         return r.Value;
     }
@@ -81,7 +80,7 @@ public interface ISCLObject
         AppendLineIndented(
             stringBuilder,
             indentation,
-            prefix + Serialize() + suffix
+            prefix + Serialize(SerializeOptions.Serialize) + suffix
         );
     }
 
@@ -100,20 +99,72 @@ public interface ISCLObject
     [Pure]
     public static T GetDefaultValue<T>() where T : ISCLObject
     {
-        var instance = Activator.CreateInstance(
-            typeof(T),
-            BindingFlags.CreateInstance | BindingFlags.NonPublic | BindingFlags.Public
-        )!;
+        if (Unit.Default is T unit)
+            return unit;
 
-        var r = (T)((T)instance).DefaultValue;
+        if (SCLNull.Instance is T sclNull)
+            return sclNull;
 
-        return r;
+        if (Entity.Empty is T entity)
+            return entity;
+
+        if (StringStream.Empty is T stringStream)
+            return stringStream;
+
+        if (SCLBool.False is T sclBool)
+            return sclBool;
+
+        if (new SCLInt(0) is T sclInt)
+            return sclInt;
+
+        if (new SCLDouble(0) is T sclDouble)
+            return sclDouble;
+
+        if (new SCLDateTime(DateTime.MinValue) is T sclDateTime)
+            return sclDateTime;
+
+        if (typeof(T).IsGenericType)
+        {
+            if (typeof(T).GetInterfaces().Contains(typeof(IArray)))
+            {
+                var eagerArrayType =
+                    typeof(EagerArray<>).MakeGenericType(typeof(T).GenericTypeArguments[0]);
+
+                var array = Activator.CreateInstance(eagerArrayType);
+                return (T)array;
+            }
+
+            if (typeof(T).GetInterfaces().Contains(typeof(ISCLEnum)))
+            {
+                var enumType  = typeof(T).GenericTypeArguments[0];
+                var enumValue = Enum.GetValues(enumType).OfType<object>().First();
+                var result    = Activator.CreateInstance(typeof(T), enumValue);
+                return (T)result;
+            }
+
+            if (typeof(T).GetInterfaces().Contains(typeof(ISCLOneOf)))
+            {
+                var method =
+                    typeof(T).GetMethod(
+                        nameof(SCLOneOf<SCLNull, SCLNull>.GetDefaultValue),
+                        BindingFlags.Public | BindingFlags.Static
+                    );
+
+                var result = method.Invoke(null, null);
+
+                return (T)result;
+            }
+        }
+
+        //Array
+        //Enum
+        //Oneof
+
+        throw new Exception($"Cannot Get Default Value of type {typeof(T).Name}");
     }
 
-    /// <summary>
-    /// The default value for an SCL object of this type
-    /// </summary>
-    ISCLObject DefaultValue { get; } //TODO replace with a static method in dotnet 7
+    //NOTE: this must be a method to prevent recursion
+    //TODO replace with a static method in dotnet 7
 
     /// <summary>
     /// Gets a schema node which could match this SCL Object

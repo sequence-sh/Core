@@ -6,13 +6,10 @@
 public readonly record struct SCLInt(int Value) : IComparableSCLObject
 {
     /// <inheritdoc />
-    public string Serialize() => Value.ToString();
+    public string Serialize(SerializeOptions _) => Value.ToString();
 
     /// <inheritdoc />
-    public TypeReference TypeReference => TypeReference.Actual.Integer;
-
-    /// <inheritdoc />
-    public string Name => Value.ToString();
+    public TypeReference GetTypeReference() => TypeReference.Actual.Integer;
 
     /// <inheritdoc />
     public int CompareTo(IComparableSCLObject? other) => other switch
@@ -20,7 +17,10 @@ public readonly record struct SCLInt(int Value) : IComparableSCLObject
         null                => Value.CompareTo(null),
         SCLDouble sclDouble => Value.CompareTo(sclDouble.Value),
         SCLInt sclInt       => Value.CompareTo(sclInt.Value),
-        _                   => StringComparer.Ordinal.Compare(Serialize(), other.Serialize())
+        _ => StringComparer.Ordinal.Compare(
+            Serialize(SerializeOptions.Primitive),
+            other.Serialize(SerializeOptions.Primitive)
+        )
     };
 
     /// <inheritdoc />
@@ -35,14 +35,11 @@ public readonly record struct SCLInt(int Value) : IComparableSCLObject
         if (new SCLDouble(Value) is T vDouble)
             return vDouble;
 
-        if (new StringStream(Serialize()) is T vString)
+        if (new StringStream(Serialize(SerializeOptions.Primitive)) is T vString)
             return vString;
 
         return Maybe<T>.None;
     }
-
-    /// <inheritdoc />
-    public ISCLObject DefaultValue => new SCLInt(0);
 
     /// <inheritdoc />
     public SchemaNode ToSchemaNode(

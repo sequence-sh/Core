@@ -18,7 +18,7 @@ public sealed class Log<T> : CompoundStep<Unit> where T : ISCLObject
         if (r.IsFailure)
             return r.ConvertFailure<Unit>();
 
-        var stringToPrint = r.Value.Serialize();
+        var stringToPrint = r.Value.Serialize(SerializeOptions.Primitive);
 
         stateMonad.Log(LogLevel.Information, stringToPrint, this);
 

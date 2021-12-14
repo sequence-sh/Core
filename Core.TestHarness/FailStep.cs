@@ -1,4 +1,6 @@
-﻿namespace Reductech.EDR.Core.TestHarness;
+﻿using Reductech.EDR.Core.Internal;
+
+namespace Reductech.EDR.Core.TestHarness;
 
 public abstract partial class StepTestBase<TStep, TOutput>
 {
@@ -204,7 +206,7 @@ public abstract partial class StepTestBase<TStep, TOutput>
 
         var elementType = stepType.IsGenericType
             ? stepType.GenericTypeArguments.First()
-            : typeof(IStep);
+            : typeof(ISCLObject);
 
         var step = CreateFailStepOfType(elementType, errorMessage);
         addMethod.Invoke(list, new object[] { step });

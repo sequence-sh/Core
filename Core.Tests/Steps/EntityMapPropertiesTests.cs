@@ -32,8 +32,10 @@ public partial class EntityMapPropertiesTests : StepTestBase<EntityMapProperties
                         }
                 },
                 Unit.Default,
-                Entity.Create(("Foo", "Hello"),   ("Bar", "World")).Serialize(),
-                Entity.Create(("Foo", "Hello 2"), ("Bar", "World 2")).Serialize()
+                Entity.Create(("Foo", "Hello"), ("Bar", "World"))
+                    .Serialize(SerializeOptions.Serialize),
+                Entity.Create(("Foo", "Hello 2"), ("Bar", "World 2"))
+                    .Serialize(SerializeOptions.Serialize)
             );
 
             yield return new StepCase(
@@ -61,8 +63,10 @@ public partial class EntityMapPropertiesTests : StepTestBase<EntityMapProperties
                         }
                 },
                 Unit.Default,
-                Entity.Create(("Foo", "Hello"),   ("Bar", "World")).Serialize(),
-                Entity.Create(("Foo", "Hello 2"), ("Bar", "World 2")).Serialize()
+                Entity.Create(("Foo", "Hello"), ("Bar", "World"))
+                    .Serialize(SerializeOptions.Serialize),
+                Entity.Create(("Foo", "Hello 2"), ("Bar", "World 2"))
+                    .Serialize(SerializeOptions.Serialize)
             );
 
             yield return new StepCase(
@@ -93,9 +97,9 @@ public partial class EntityMapPropertiesTests : StepTestBase<EntityMapProperties
                 },
                 Unit.Default,
                 Entity.Create(("Foo", "Hello"), ("Bar", "World"))
-                    .Serialize(),
+                    .Serialize(SerializeOptions.Serialize),
                 Entity.Create(("Foo", "Hello 2"), ("Bar", "World 2"))
-                    .Serialize()
+                    .Serialize(SerializeOptions.Serialize)
             );
 
             yield return new StepCase(
@@ -131,12 +135,12 @@ public partial class EntityMapPropertiesTests : StepTestBase<EntityMapProperties
                 },
                 Unit.Default,
                 Entity.Create(("Foo", "Hello"), ("Bar", "World"))
-                    .Serialize(),
+                    .Serialize(SerializeOptions.Serialize),
                 Entity.Create(("Foo", "Hello 2"), ("Bar", "World 2"))
-                    .Serialize(),
+                    .Serialize(SerializeOptions.Serialize),
                 Entity.Create(("Food", Entity.Create(("Something", "Hello 3"))), ("Bar", "World 3"))
-                    .Serialize(),
-                Entity.Create(("Bar", "World 4")).Serialize()
+                    .Serialize(SerializeOptions.Serialize),
+                Entity.Create(("Bar", "World 4")).Serialize(SerializeOptions.Serialize)
             );
         }
     }

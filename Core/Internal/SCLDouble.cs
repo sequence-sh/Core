@@ -6,13 +6,10 @@
 public readonly record struct SCLDouble(double Value) : IComparableSCLObject
 {
     /// <inheritdoc />
-    public string Serialize() => Value.ToString(Constants.DoubleFormat);
+    public string Serialize(SerializeOptions _) => Value.ToString(Constants.DoubleFormat);
 
     /// <inheritdoc />
-    public string Name => Value.ToString(Constants.DoubleFormat);
-
-    /// <inheritdoc />
-    public TypeReference TypeReference => TypeReference.Actual.Double;
+    public TypeReference GetTypeReference() => TypeReference.Actual.Double;
 
     /// <inheritdoc />
     public int CompareTo(IComparableSCLObject? other) => other switch
@@ -20,7 +17,10 @@ public readonly record struct SCLDouble(double Value) : IComparableSCLObject
         null                => Value.CompareTo(null),
         SCLDouble sclDouble => Value.CompareTo(sclDouble.Value),
         SCLInt sclInt       => Value.CompareTo(sclInt.Value),
-        _                   => StringComparer.Ordinal.Compare(Serialize(), other.Serialize())
+        _ => StringComparer.Ordinal.Compare(
+            Serialize(SerializeOptions.Primitive),
+            other.Serialize(SerializeOptions.Primitive)
+        )
     };
 
     /// <inheritdoc />
@@ -32,14 +32,11 @@ public readonly record struct SCLDouble(double Value) : IComparableSCLObject
         if (this is T vDouble)
             return vDouble;
 
-        if (new StringStream(Serialize()) is T vString)
+        if (new StringStream(Serialize(SerializeOptions.Primitive)) is T vString)
             return vString;
 
         return Maybe<T>.None;
     }
-
-    /// <inheritdoc />
-    public ISCLObject DefaultValue => new SCLDouble(0);
 
     /// <inheritdoc />
     public SchemaNode ToSchemaNode(

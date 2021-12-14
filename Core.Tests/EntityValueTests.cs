@@ -288,6 +288,15 @@ public partial class ISCLObjectTests
         ISCLObject.GetDefaultValue<SCLDouble>().Should().Be(0.0.ConvertToSCLObject());
         ISCLObject.GetDefaultValue<SCLBool>().Should().Be(false.ConvertToSCLObject());
         ISCLObject.GetDefaultValue<Array<SCLInt>>().Should().Be(Array<SCLInt>.Empty);
-        ISCLObject.GetDefaultValue<Array<SCLDouble>>().Should().Be(Array<SCLDateTime>.Empty);
+        ISCLObject.GetDefaultValue<Array<SCLDouble>>().Should().Be(Array<SCLDouble>.Empty);
+        ISCLObject.GetDefaultValue<SCLEnum<TextCase>>().Should().Be(new SCLEnum<TextCase>(default));
+
+        ISCLObject.GetDefaultValue<SCLOneOf<SCLInt, SCLBool>>()
+            .Should()
+            .Be(new SCLOneOf<SCLInt, SCLBool>(0.ConvertToSCLObject()));
+
+        ISCLObject.GetDefaultValue<SCLOneOf<SCLEnum<TextCase>, SCLInt, SCLBool>>()
+            .Should()
+            .Be(new SCLOneOf<SCLEnum<TextCase>, SCLInt, SCLBool>(new SCLEnum<TextCase>(default)));
     }
 }

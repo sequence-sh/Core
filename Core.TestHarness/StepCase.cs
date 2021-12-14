@@ -67,7 +67,7 @@ public abstract partial class StepTestBase<TStep, TOutput>
             if (!SerializeFirst)
                 return Step;
 
-            var scl = Step.Serialize();
+            var scl = Step.Serialize(SerializeOptions.Serialize);
 
             testOutputHelper.WriteLine("SCL:");
             testOutputHelper.WriteLine("");

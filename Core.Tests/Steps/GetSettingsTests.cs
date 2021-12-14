@@ -33,7 +33,7 @@ public partial class GetSettingsTests : StepTestBase<GetSettings, Entity>
                 "Default Settings",
                 new Log<Entity> { Value = new GetSettings() },
                 Unit.Default,
-                baseEntity.Serialize()
+                baseEntity.Serialize(SerializeOptions.Serialize)
             );
 
             var newConnectorSettings = new ConnectorSettings
@@ -66,7 +66,7 @@ public partial class GetSettingsTests : StepTestBase<GetSettings, Entity>
                 "Extra Settings",
                 new Log<Entity> { Value = new GetSettings() },
                 Unit.Default,
-                entity2.Serialize()
+                entity2.Serialize(SerializeOptions.Serialize)
             ).WithStepFactoryStore(stepFactoryStore);
         }
     }

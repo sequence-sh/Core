@@ -60,7 +60,7 @@ public abstract partial class StepTestBase<TStep, TOutput>
             }
             else
             {
-                var s = ((IStep)currentValue).Serialize();
+                var s = ((IStep)currentValue).Serialize(SerializeOptions.Serialize);
                 values.Add(property.Name, s);
             }
 
@@ -101,7 +101,7 @@ public abstract partial class StepTestBase<TStep, TOutput>
             }
             else
             {
-                var s = ((LambdaFunction)currentValue).Serialize();
+                var s = ((LambdaFunction)currentValue).Serialize(SerializeOptions.Serialize);
                 values.Add(property.Name, s);
             }
 
@@ -116,7 +116,7 @@ public abstract partial class StepTestBase<TStep, TOutput>
 
                 foreach (var step in currentValue)
                 {
-                    var s = step.Serialize();
+                    var s = step.Serialize(SerializeOptions.Serialize);
                     elements.Add(s);
                 }
 
@@ -131,7 +131,7 @@ public abstract partial class StepTestBase<TStep, TOutput>
 
                 foreach (var step in newValue)
                 {
-                    var e = step.Serialize();
+                    var e = step.Serialize(SerializeOptions.Serialize);
                     elements.Add(e);
                 }
 
@@ -227,26 +227,51 @@ public abstract partial class StepTestBase<TStep, TOutput>
                 $"{stepName} should not have output type 'String' - it should be 'StringStream'"
             );
         }
-
         else if (outputType == typeof(bool))
+        {
+            throw new Exception(
+                $"{stepName} should not have output type 'bool' - it should be 'SCLBool'"
+            );
+        }
+        else if (outputType == typeof(int))
+        {
+            throw new Exception(
+                $"{stepName} should not have output type 'int' - it should be 'SCLInt'"
+            );
+        }
+
+        else if (outputType == typeof(double))
+        {
+            throw new Exception(
+                $"{stepName} should not have output type 'double' - it should be 'sclDouble'"
+            );
+        }
+        else if (outputType == typeof(DateTime))
+        {
+            throw new Exception(
+                $"{stepName} should not have output type 'datetime' - it should be 'SCLDateTime'"
+            );
+        }
+
+        else if (outputType == typeof(SCLBool))
         {
             var b = true;
             step = Constant(b);
         }
-        else if (outputType == typeof(int))
+        else if (outputType == typeof(SCLInt))
         {
             var i = index;
             index++;
             step = Constant(i);
         }
 
-        else if (outputType == typeof(double))
+        else if (outputType == typeof(SCLDouble))
         {
             double d = index;
             index++;
             step = Constant(d);
         }
-        else if (outputType == typeof(DateTime))
+        else if (outputType == typeof(SCLDateTime))
         {
             var dt = new DateTime(1990, index, 1);
             index++;
@@ -320,12 +345,18 @@ public abstract partial class StepTestBase<TStep, TOutput>
             step = new ArrayNew<Array<SCLInt>> { Elements = intArrayList };
         }
 
-        //else if (outputType.IsEnum) //todo PUT BACK
-        //{
-        //    var v = Enum.GetValues(outputType).OfType<object>().First();
+        else if (outputType.GetInterfaces().Contains(typeof(ISCLEnum))) //todo PUT BACK
+        {
+            var enumType = outputType.GetGenericArguments()[0];
+            var v        = Enum.GetValues(enumType).OfType<object>().First();
+            var sclValue = SCLObjectHelper.ConvertToSCLEnumUnsafe(v);
 
-        //    step = SCLObjectHelper.ConvertToSCLEnum();
-        //}
+            var stepType = typeof(SCLConstant<>).MakeGenericType(outputType);
+            var step1    = Activator.CreateInstance(stepType, new object?[] { sclValue }, null);
+            step = step1 as IStep;
+
+            //step = 
+        }
 
         else if (outputType == typeof(Stream))
         {
@@ -346,7 +377,7 @@ public abstract partial class StepTestBase<TStep, TOutput>
 
             step = new SCLConstant<StringStream>(s);
         }
-        else if (outputType.IsGenericType && outputType.GetInterfaces().Contains(typeof(IOneOf)))
+        else if (outputType.IsGenericType && outputType.GetInterfaces().Contains(typeof(ISCLOneOf)))
         {
             var arg1 = outputType.GenericTypeArguments[0];
             var (step1, _, newIndex) = CreateSimpleStep(arg1, stepName, index, singleChar);
@@ -359,7 +390,7 @@ public abstract partial class StepTestBase<TStep, TOutput>
                 $"Cannot create a constant step with type {outputType.GetDisplayName()}"
             );
 
-        var newString = step.Serialize(); // await GetStringAsync(step);
+        var newString = step.Serialize(SerializeOptions.Serialize);
 
         return (step, newString, index);
 

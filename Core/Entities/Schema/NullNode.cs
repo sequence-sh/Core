@@ -39,7 +39,7 @@ public record NullNode() : SchemaNode(EnumeratedValuesNodeData.Empty)
 
         var nullWords = transformSettings.NullFormatter.GetFormats(propertyName);
 
-        var v = value.Serialize();
+        var v = value.Serialize(SerializeOptions.Primitive);
 
         if (nullWords.Contains(v))
             return Maybe<ISCLObject>.From(SCLNull.Instance);

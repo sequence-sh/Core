@@ -64,7 +64,9 @@ public partial class EntityFormatTests : StepTestBase<EntityFormat, StringStream
 
         runResult.ShouldBeSuccessful();
 
-        runResult.Value.Serialize().Should().Be(entity.Serialize());
+        runResult.Value.Serialize(SerializeOptions.Serialize)
+            .Should()
+            .Be(entity.Serialize(SerializeOptions.Serialize));
     }
 
     /// <inheritdoc />

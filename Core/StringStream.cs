@@ -45,21 +45,20 @@ public sealed class StringStream : IEquatable<StringStream>, IComparable<StringS
             }
 
             /// <inheritdoc />
-            public override string GetString()
-            {
-                return Underlying;
-            }
+            public override string GetString() => Underlying;
 
             /// <inheritdoc />
-            public override string Name => Underlying;
-
-            /// <inheritdoc />
-            public override string NameInLogs(bool reveal)
+            public override string Serialize(SerializeOptions serializeOptions)
             {
-                return
-                    reveal
-                        ? SerializationMethods.DoubleQuote(Underlying)
-                        : $"string Length: {Underlying.Length}";
+                var text = GetString();
+
+                if (serializeOptions.HideStrings)
+                    return $"string Length: {text.Length}";
+
+                if (serializeOptions.QuoteStrings)
+                    text = SerializationMethods.DoubleQuote(text);
+
+                return text;
             }
 
             /// <inheritdoc />
@@ -116,12 +115,20 @@ public sealed class StringStream : IEquatable<StringStream>, IComparable<StringS
             }
 
             /// <inheritdoc />
-            public override string Name => "StringStream";
-
-            /// <inheritdoc />
-            public override string NameInLogs(bool reveal)
+            public override string Serialize(SerializeOptions serializeOptions)
             {
-                return Encoding.GetDisplayName() + "-Stream";
+                if (!serializeOptions.EvaluateStreams)
+                    return Encoding.GetDisplayName() + "-Stream";
+
+                var text = GetString();
+
+                if (serializeOptions.HideStrings)
+                    return $"string Length: {text.Length}";
+
+                if (serializeOptions.QuoteStrings)
+                    text = SerializationMethods.DoubleQuote(text);
+
+                return text;
             }
 
             /// <inheritdoc />
@@ -139,10 +146,16 @@ public sealed class StringStream : IEquatable<StringStream>, IComparable<StringS
 
         public abstract (Stream stream, EncodingEnum encodingEnum) GetStream();
         public abstract ValueTask<string> GetStringAsync();
+
+        /// <summary>
+        /// The the verbatim string
+        /// </summary>
         public abstract string GetString();
 
-        public abstract string Name { get; }
-        public abstract string NameInLogs(bool reveal);
+        /// <summary>
+        /// Serialize according to the options
+        /// </summary>
+        public abstract string Serialize(SerializeOptions serializeOptions);
 
         /// <inheritdoc />
         public abstract void Dispose();
@@ -152,11 +165,6 @@ public sealed class StringStream : IEquatable<StringStream>, IComparable<StringS
     public override string ToString() => GetString();
 
     private readonly SemaphoreSlim _semaphore = new(1);
-
-    /// <summary>
-    /// How this stringStream will appear in the logs.
-    /// </summary>
-    public string NameInLogs(bool reveal) => Value.NameInLogs(reveal);
 
     /// <summary>
     /// If this is a string, return the string, otherwise read the stream as a string.
@@ -180,8 +188,6 @@ public sealed class StringStream : IEquatable<StringStream>, IComparable<StringS
             _semaphore.Release();
         }
     }
-
-    string ISCLObject.Name => GetString();
 
     /// <summary>
     /// If this is a string, return the string, otherwise read the stream as a string.
@@ -239,13 +245,7 @@ public sealed class StringStream : IEquatable<StringStream>, IComparable<StringS
     /// <summary>
     /// SerializeAsync this DataStream
     /// </summary>
-    public string Serialize()
-    {
-        var s    = GetString();
-        var text = SerializationMethods.DoubleQuote(s);
-
-        return text;
-    }
+    public string Serialize(SerializeOptions options) => Value.Serialize(options);
 
     /// <inheritdoc />
     public int CompareTo(object? obj)
@@ -307,7 +307,10 @@ public sealed class StringStream : IEquatable<StringStream>, IComparable<StringS
     {
         null            => 0.CompareTo(null),
         StringStream ss => CompareTo(ss),
-        _               => StringComparer.Ordinal.Compare(Serialize(), other.Serialize())
+        _ => StringComparer.Ordinal.Compare(
+            Serialize(SerializeOptions.Primitive),
+            other.Serialize(SerializeOptions.Primitive)
+        )
     };
 
     /// <inheritdoc />
@@ -319,7 +322,7 @@ public sealed class StringStream : IEquatable<StringStream>, IComparable<StringS
     }
 
     /// <inheritdoc />
-    public TypeReference TypeReference => TypeReference.Actual.String;
+    public TypeReference GetTypeReference() => TypeReference.Actual.String;
 
     /// <inheritdoc />
     public object ToCSharpObject() => GetString();
@@ -332,9 +335,6 @@ public sealed class StringStream : IEquatable<StringStream>, IComparable<StringS
 
         return Maybe<T>.None;
     }
-
-    /// <inheritdoc />
-    public ISCLObject DefaultValue => new StringStream("");
 
     /// <inheritdoc />
     public SchemaNode ToSchemaNode(

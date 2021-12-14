@@ -13,13 +13,10 @@ public sealed record Unit : ISCLObject
     private Unit() { }
 
     /// <inheritdoc />
-    public string Name => "Unit";
+    public string Serialize(SerializeOptions _) => "Unit";
 
     /// <inheritdoc />
-    public string Serialize() => Name;
-
-    /// <inheritdoc />
-    public TypeReference TypeReference => TypeReference.Unit.Instance;
+    public TypeReference GetTypeReference() => TypeReference.Unit.Instance;
 
     /// <inheritdoc />
     public object ToCSharpObject() => Default;
@@ -32,9 +29,6 @@ public sealed record Unit : ISCLObject
 
         return Maybe<T>.None;
     }
-
-    /// <inheritdoc />
-    public ISCLObject DefaultValue => Default;
 
     /// <inheritdoc />
     public SchemaNode ToSchemaNode(string path, SchemaConversionOptions? schemaConversionOptions)

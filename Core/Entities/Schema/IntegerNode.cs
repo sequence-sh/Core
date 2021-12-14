@@ -43,7 +43,7 @@ public record IntegerNode(
             return Maybe<ISCLObject>.None; // No change
         }
 
-        var v = value.Serialize();
+        var v = value.Serialize(SerializeOptions.Primitive);
 
         if (!int.TryParse(v, out var i))
             return ErrorCode.SchemaViolation.ToErrorBuilder("Should Be Integer", propertyName);

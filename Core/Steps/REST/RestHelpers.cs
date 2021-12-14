@@ -10,11 +10,11 @@ public static class RestHelpers
     /// </summary>
     public static IRestRequest AddHeaders(this IRestRequest request, Entity entity)
     {
-        foreach (var entityProperty in entity.Dictionary.Values)
+        foreach (var (name, sclObject, _) in entity.Dictionary.Values)
         {
             request = request.AddHeader(
-                entityProperty.Name,
-                entityProperty.Value.Serialize()
+                name,
+                sclObject.Serialize(SerializeOptions.Primitive)
             );
         }
 

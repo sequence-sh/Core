@@ -34,9 +34,9 @@ public partial class ArrayFilterTests : StepTestBase<ArrayFilter<Entity>, Array<
                     }
                 },
                 Unit.Default,
-                Entity.Create(("Foo", "Alpha")).Serialize(),
-                Entity.Create(("Foo", "ALPHA")).Serialize(),
-                Entity.Create(("Foo", "Beta")).Serialize()
+                Entity.Create(("Foo", "Alpha")).Serialize(SerializeOptions.Serialize),
+                Entity.Create(("Foo", "ALPHA")).Serialize(SerializeOptions.Serialize),
+                Entity.Create(("Foo", "Beta")).Serialize(SerializeOptions.Serialize)
             );
 
             yield return new StepCase(
@@ -67,9 +67,9 @@ public partial class ArrayFilterTests : StepTestBase<ArrayFilter<Entity>, Array<
                     }
                 },
                 Unit.Default,
-                Entity.Create(("Foo", "Alpha")).Serialize(),
-                Entity.Create(("Foo", "ALPHA")).Serialize(),
-                Entity.Create(("Foo", "Beta")).Serialize()
+                Entity.Create(("Foo", "Alpha")).Serialize(SerializeOptions.Serialize),
+                Entity.Create(("Foo", "ALPHA")).Serialize(SerializeOptions.Serialize),
+                Entity.Create(("Foo", "Beta")).Serialize(SerializeOptions.Serialize)
             );
         }
     }

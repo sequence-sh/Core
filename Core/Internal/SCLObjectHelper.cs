@@ -16,13 +16,14 @@ public static class SCLObjectHelper
     /// <summary>
     /// Convert this enum to an scl enum
     /// </summary>
-    private static ISCLEnum ConvertToSCLEnumUnsafe<T>(T value)
+    public static ISCLEnum ConvertToSCLEnumUnsafe(object value)
     {
-        var genericType = typeof(SCLEnum<>).MakeGenericType(typeof(T));
+        var type        = value.GetType();
+        var genericType = typeof(SCLEnum<>).MakeGenericType(type);
 
-        var constructor = genericType.GetConstructor(new[] { typeof(T) });
+        var constructor = genericType.GetConstructor(new[] { type });
 
-        var obj = constructor?.Invoke(new object?[] { value });
+        var obj = constructor?.Invoke(new[] { value });
 
         return (ISCLEnum)obj!;
     }

@@ -42,7 +42,7 @@ public record BooleanNode(EnumeratedValuesNodeData EnumeratedValuesNodeData) : S
         var trueWords  = transformSettings.TruthFormatter.GetFormats(propertyName);
         var falseWords = transformSettings.FalseFormatter.GetFormats(propertyName);
 
-        var v = value.Serialize();
+        var v = value.Serialize(SerializeOptions.Primitive);
 
         if (trueWords.Contains(v))
             return Maybe<ISCLObject>.From(SCLBool.True);

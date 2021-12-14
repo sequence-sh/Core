@@ -39,7 +39,7 @@ public interface IStep
     /// <summary>
     /// Serialize this step.
     /// </summary>
-    string Serialize();
+    string Serialize(SerializeOptions options);
 
     /// <summary>
     /// Requirements for this step that can only be determined at runtime.

@@ -22,13 +22,10 @@ public interface ISCLEnum : IComparableSCLObject
 public sealed record SCLEnum<T>(T Value) : ISCLEnum where T : struct, Enum
 {
     /// <inheritdoc />
-    public string Name => typeof(T).Name + "." + Value;
+    public string Serialize(SerializeOptions _) => typeof(T).Name + "." + Value;
 
     /// <inheritdoc />
-    public string Serialize() => Name;
-
-    /// <inheritdoc />
-    public override string ToString() => Name;
+    public override string ToString() => Serialize(SerializeOptions.Name);
 
     /// <inheritdoc />
     public string TypeName => typeof(T).Name;
@@ -37,14 +34,17 @@ public sealed record SCLEnum<T>(T Value) : ISCLEnum where T : struct, Enum
     public string EnumValue => Value.ToString();
 
     /// <inheritdoc />
-    public TypeReference TypeReference => new TypeReference.Enum(typeof(T));
+    public TypeReference GetTypeReference() => new TypeReference.Enum(typeof(T));
 
     /// <inheritdoc />
     public int CompareTo(IComparableSCLObject? other) => other switch
     {
         null                 => 0.CompareTo(null),
         SCLEnum<T> otherEnum => Value.CompareTo(otherEnum.Value),
-        _                    => StringComparer.Ordinal.Compare(Serialize(), other.Serialize())
+        _ => StringComparer.Ordinal.Compare(
+            Serialize(SerializeOptions.Primitive),
+            other.Serialize(SerializeOptions.Primitive)
+        )
     };
 
     /// <inheritdoc />
@@ -53,14 +53,11 @@ public sealed record SCLEnum<T>(T Value) : ISCLEnum where T : struct, Enum
         if (this is T1 vEnum)
             return vEnum;
 
-        if (new StringStream(Serialize()) is T1 vString)
+        if (new StringStream(Serialize(SerializeOptions.Primitive)) is T1 vString)
             return vString;
 
         return Maybe<T1>.None;
     }
-
-    /// <inheritdoc />
-    public ISCLObject DefaultValue => new SCLEnum<T>(default(T));
 
     /// <inheritdoc />
     public object ToCSharpObject() => Value;

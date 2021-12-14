@@ -74,10 +74,7 @@ public class NullConstant : IConstantStep, IConstantFreezableStep, IStep<SCLNull
     public Type OutputType => typeof(SCLNull);
 
     /// <inheritdoc />
-    string IStep.Serialize()
-    {
-        return "null";
-    }
+    string IStep.Serialize(SerializeOptions options) => SCLNull.Instance.Serialize(options);
 
     /// <inheritdoc />
     public IEnumerable<Requirement> RuntimeRequirements
