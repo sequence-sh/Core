@@ -1,7 +1,4 @@
 ﻿using System.Globalization;
-using Reductech.EDR.Core.Entities;
-using Reductech.EDR.Core.Enums;
-using Reductech.EDR.Core.TestHarness;
 using static Reductech.EDR.Core.TestHarness.SchemaHelpers;
 
 namespace Reductech.EDR.Core.Tests.Steps;
@@ -174,7 +171,7 @@ public partial class TransformTests : StepTestBase<Transform, Array<Entity>>
                 {
                     x.DateInputFormats =
                         new OneOfStep<StringStream, Array<StringStream>, Entity>(
-                            new EntityConstant(
+                            Constant(
                                 Entity.Create(
                                     ("Foo", "dd/MM/yyyy"),
                                     ("Bar", "yyyy/MM/dd")

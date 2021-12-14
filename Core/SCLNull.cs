@@ -20,4 +20,30 @@ public record SCLNull : ISCLObject
 
     /// <inheritdoc />
     public TypeReference TypeReference => TypeReference.Actual.Null;
+
+    /// <inheritdoc />
+    public object? ToCSharpObject()
+    {
+        return null;
+    }
+
+    /// <inheritdoc />
+    public ISCLObject DefaultValue => Instance;
+
+    /// <inheritdoc />
+    public Maybe<T> MaybeAs<T>() where T : ISCLObject
+    {
+        if (this is T value)
+            return value;
+
+        return Maybe<T>.None;
+    }
+
+    /// <inheritdoc />
+    public SchemaNode ToSchemaNode(
+        string path,
+        SchemaConversionOptions? schemaConversionOptions) => NullNode.Instance;
+
+    /// <inheritdoc />
+    JsonElement ISCLObject.ToJsonElement() => JsonDocument.Parse("null").RootElement;
 }

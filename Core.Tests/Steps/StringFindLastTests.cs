@@ -1,8 +1,6 @@
-﻿using Reductech.EDR.Core.TestHarness;
+﻿namespace Reductech.EDR.Core.Tests.Steps;
 
-namespace Reductech.EDR.Core.Tests.Steps;
-
-public partial class StringFindLastTests : StepTestBase<StringFindLast, int>
+public partial class StringFindLastTests : StepTestBase<StringFindLast, SCLInt>
 {
     /// <inheritdoc />
     protected override IEnumerable<StepCase> StepCases
@@ -15,7 +13,7 @@ public partial class StringFindLastTests : StepTestBase<StringFindLast, int>
                 {
                     String = Constant("Hello elle"), SubString = Constant("ell")
                 },
-                6
+                6.ConvertToSCLObject()
             );
 
             yield return new StepCase(
@@ -24,7 +22,7 @@ public partial class StringFindLastTests : StepTestBase<StringFindLast, int>
                 {
                     String = Constant("Hello elle"), SubString = Constant("ELL")
                 },
-                -1
+                (-1).ConvertToSCLObject()
             );
         }
     }
@@ -37,7 +35,7 @@ public partial class StringFindLastTests : StepTestBase<StringFindLast, int>
             yield return new DeserializeCase(
                 "Substring present",
                 "StringFindLast String: 'Hello ell' Substring: 'ell'",
-                6
+                6.ConvertToSCLObject()
             );
         }
     }

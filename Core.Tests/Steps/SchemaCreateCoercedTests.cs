@@ -1,6 +1,4 @@
-﻿using Reductech.EDR.Core.Entities;
-using Reductech.EDR.Core.TestHarness;
-using static Reductech.EDR.Core.TestHarness.SchemaHelpers;
+﻿using static Reductech.EDR.Core.TestHarness.SchemaHelpers;
 
 namespace Reductech.EDR.Core.Tests.Steps;
 

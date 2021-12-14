@@ -1,5 +1,4 @@
 ﻿using MELT;
-using Reductech.EDR.Core.TestHarness;
 
 namespace Reductech.EDR.Core.Tests;
 

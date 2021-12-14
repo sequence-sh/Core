@@ -1,8 +1,6 @@
-﻿using Reductech.EDR.Core.TestHarness;
+﻿namespace Reductech.EDR.Core.Tests.Steps;
 
-namespace Reductech.EDR.Core.Tests.Steps;
-
-public partial class ForEachTests : StepTestBase<ForEach<int>, Unit>
+public partial class ForEachTests : StepTestBase<ForEach<SCLInt>, Unit>
 {
     /// <inheritdoc />
     protected override IEnumerable<StepCase> StepCases
@@ -11,11 +9,11 @@ public partial class ForEachTests : StepTestBase<ForEach<int>, Unit>
         {
             yield return new StepCase(
                 "Default Variable Name",
-                new ForEach<int>
+                new ForEach<SCLInt>
                 {
-                    Action = new LambdaFunction<int, Unit>(
+                    Action = new LambdaFunction<SCLInt, Unit>(
                         null,
-                        new Log<int> { Value = GetVariable<int>(VariableName.Item) }
+                        new Log<SCLInt> { Value = GetVariable<SCLInt>(VariableName.Item) }
                     ),
                     Array = Array(3, 2, 1)
                 },
@@ -27,11 +25,11 @@ public partial class ForEachTests : StepTestBase<ForEach<int>, Unit>
 
             yield return new StepCase(
                 "Custom Variable Name",
-                new ForEach<int>
+                new ForEach<SCLInt>
                 {
-                    Action = new LambdaFunction<int, Unit>(
+                    Action = new LambdaFunction<SCLInt, Unit>(
                         new VariableName("Foo"),
-                        new Log<int> { Value = GetVariable<int>("Foo") }
+                        new Log<SCLInt> { Value = GetVariable<SCLInt>("Foo") }
                     ),
                     Array = Array(3, 2, 1),
                 },
@@ -89,9 +87,9 @@ public partial class ForEachTests : StepTestBase<ForEach<int>, Unit>
         {
             yield return new ErrorCase(
                 "Array Failure",
-                new ForEach<int>
+                new ForEach<SCLInt>
                 {
-                    Array = new FailStep<Array<int>> { ErrorMessage = "Array Failure" }
+                    Array = new FailStep<Array<SCLInt>> { ErrorMessage = "Array Failure" }
                 },
                 new SingleError(
                     ErrorLocation.EmptyLocation,
@@ -102,10 +100,10 @@ public partial class ForEachTests : StepTestBase<ForEach<int>, Unit>
 
             yield return new ErrorCase(
                 "Action Failure",
-                new ForEach<int>
+                new ForEach<SCLInt>
                 {
                     Array = Array(1),
-                    Action = new LambdaFunction<int, Unit>(
+                    Action = new LambdaFunction<SCLInt, Unit>(
                         null,
                         new FailStep<Unit> { ErrorMessage = "Action Failure" }
                     ),

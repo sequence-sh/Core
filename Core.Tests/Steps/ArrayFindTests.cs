@@ -1,8 +1,6 @@
-﻿using Reductech.EDR.Core.TestHarness;
+﻿namespace Reductech.EDR.Core.Tests.Steps;
 
-namespace Reductech.EDR.Core.Tests.Steps;
-
-public partial class ArrayFindTests : StepTestBase<ArrayFind<StringStream>, int>
+public partial class ArrayFindTests : StepTestBase<ArrayFind<StringStream>, SCLInt>
 {
     /// <inheritdoc />
     protected override IEnumerable<StepCase> StepCases
@@ -15,7 +13,7 @@ public partial class ArrayFindTests : StepTestBase<ArrayFind<StringStream>, int>
                 {
                     Array = Array(("Hello"), ("World")), Element = Constant("World")
                 },
-                1
+                1.ConvertToSCLObject()
             );
 
             yield return new StepCase(
@@ -24,7 +22,7 @@ public partial class ArrayFindTests : StepTestBase<ArrayFind<StringStream>, int>
                 {
                     Array = Array(("Hello"), ("World"), ("World")), Element = Constant("World")
                 },
-                1
+                1.ConvertToSCLObject()
             );
 
             yield return new StepCase(
@@ -33,7 +31,7 @@ public partial class ArrayFindTests : StepTestBase<ArrayFind<StringStream>, int>
                 {
                     Array = Array(("Hello"), ("World"), ("World")), Element = Constant("Mark")
                 },
-                -1
+                (-1).ConvertToSCLObject()
             );
         }
     }
@@ -46,7 +44,7 @@ public partial class ArrayFindTests : StepTestBase<ArrayFind<StringStream>, int>
             yield return new DeserializeCase(
                 "Simple Case",
                 "ArrayFind Array: ['Hello', 'World'] Element: 'World'",
-                1
+                1.ConvertToSCLObject()
             );
         }
     }

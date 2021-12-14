@@ -1,6 +1,4 @@
-﻿using Reductech.EDR.Core.TestHarness;
-
-namespace Reductech.EDR.Core.Tests.Steps;
+﻿namespace Reductech.EDR.Core.Tests.Steps;
 
 public partial class RunStepTests : StepTestBase<RunStep<Unit>, Unit>
 {
@@ -36,26 +34,27 @@ public partial class RunStepTests : StepTestBase<RunStep<Unit>, Unit>
 
             yield return new ErrorCase(
                 "Test Divide by zero",
-                new RunStep<int> { Step = divide },
+                new RunStep<SCLInt> { Step = divide },
                 ErrorCode.DivideByZero.ToErrorBuilder().WithLocation(divide)
             );
 
             yield return new ErrorCase(
                 "Test Error in Array",
-                new RunStep<Array<int>>
+                new RunStep<Array<SCLInt>>
                 {
-                    Step = new ArrayMap<int, int>()
+                    Step = new ArrayMap<SCLInt, SCLInt>()
                     {
                         Array = Array(3, 2, 1, 0),
-                        Function = new LambdaFunction<int, int>(
+                        Function = new LambdaFunction<SCLInt, SCLInt>(
                             null,
                             new Divide()
                             {
-                                Terms = new ArrayNew<int>()
+                                Terms = new ArrayNew<SCLInt>()
                                 {
                                     Elements = new[]
                                     {
-                                        Constant(1), GetVariable<int>(VariableName.Item)
+                                        Constant(1),
+                                        GetVariable<SCLInt>(VariableName.Item)
                                     }
                                 }
                             }
@@ -75,7 +74,10 @@ public partial class RunStepTests : StepTestBase<RunStep<Unit>, Unit>
             {
                 { true, false },
                 { "Hello World", false },
-                { new List<int> { 1, 2, 3 }.ToSCLArray(), false },
+                {
+                    new List<int> { 1, 2, 3 }.Select(x => x.ConvertToSCLObject()).ToSCLArray(),
+                    false
+                },
                 { Entity.Create(("a", 1)), false }
             };
 

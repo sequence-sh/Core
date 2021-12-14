@@ -1,8 +1,6 @@
-﻿using Reductech.EDR.Core.TestHarness;
+﻿namespace Reductech.EDR.Core.Tests.Steps;
 
-namespace Reductech.EDR.Core.Tests.Steps;
-
-public partial class ModuloTests : StepTestBase<Modulo, int>
+public partial class ModuloTests : StepTestBase<Modulo, SCLInt>
 {
     /// <inheritdoc />
     protected override IEnumerable<StepCase> StepCases
@@ -13,27 +11,27 @@ public partial class ModuloTests : StepTestBase<Modulo, int>
                 "No numbers",
                 new Modulo()
                 {
-                    Terms = new ArrayNew<int>() { Elements = new List<IStep<SCLInt>>() }
+                    Terms = new ArrayNew<SCLInt>() { Elements = new List<IStep<SCLInt>>() }
                 },
-                0
+                0.ConvertToSCLObject()
             );
 
             yield return new StepCase(
                 "One number",
-                new Modulo() { Terms = StaticHelpers.Array(2) },
-                2
+                new Modulo() { Terms = Array(2) },
+                2.ConvertToSCLObject()
             );
 
             yield return new StepCase(
                 "Two numbers",
-                new Modulo() { Terms = StaticHelpers.Array(5, 3) },
-                2
+                new Modulo() { Terms = Array(5, 3) },
+                2.ConvertToSCLObject()
             );
 
             yield return new StepCase(
                 "Three numbers",
-                new Modulo() { Terms = StaticHelpers.Array(14, 5, 3) },
-                1
+                new Modulo() { Terms = Array(14, 5, 3) },
+                1.ConvertToSCLObject()
             );
         }
     }

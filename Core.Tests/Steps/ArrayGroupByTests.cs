@@ -1,8 +1,6 @@
-﻿using Reductech.EDR.Core.TestHarness;
+﻿namespace Reductech.EDR.Core.Tests.Steps;
 
-namespace Reductech.EDR.Core.Tests.Steps;
-
-public partial class ArrayGroupByIntTests : StepTestBase<ArrayGroupBy<int>, Array<Entity>>
+public partial class ArrayGroupByIntTests : StepTestBase<ArrayGroupBy<SCLInt>, Array<Entity>>
 {
     /// <inheritdoc />
     protected override IEnumerable<StepCase> StepCases
@@ -11,10 +9,10 @@ public partial class ArrayGroupByIntTests : StepTestBase<ArrayGroupBy<int>, Arra
         {
             yield return new StepCase(
                 "Group ints by Value",
-                new ArrayGroupBy<int>()
+                new ArrayGroupBy<SCLInt>()
                 {
                     Array = Array(1, 2, 1, 2, 3),
-                    Function = new LambdaFunction<int, StringStream>(
+                    Function = new LambdaFunction<SCLInt, StringStream>(
                         null,
                         new StringInterpolate()
                         {

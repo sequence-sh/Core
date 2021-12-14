@@ -1,6 +1,5 @@
 ﻿using System.IO;
 using System.Text;
-using Reductech.EDR.Core.Enums;
 
 namespace Reductech.EDR.Core.Tests;
 

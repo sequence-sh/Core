@@ -1,7 +1,5 @@
 ﻿using Reductech.EDR.ConnectorManagement.Base;
-using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.Internal.Parser;
-using Reductech.EDR.Core.TestHarness;
 
 namespace Reductech.EDR.Core.Tests;
 
@@ -85,12 +83,11 @@ public class EntityConversionTests
                         StepFactoryStore.Create()
                     )
                 )
-                .Map(x => x.TryConvertToISCLObject());
+                .Map(x => x.TryGetConstantValue());
 
         parseResult.ShouldBeSuccessful();
 
-        return (parseResult.Value.GetValueOrThrow() as ISCLObject.NestedEntity)!
-            .Value; //could throw exception
+        return parseResult.Value.GetValueOrThrow() as Entity;
     }
 
     [Fact]
@@ -135,20 +132,20 @@ public class EntityConversionTests
         var e = Entity.Create(("short", Convert.ToInt16(11)));
 
         e.TryGetValue("short").ShouldHaveValue();
-        e.TryGetValue("short").GetValueOrThrow().Should().Be(new ISCLObject.Integer(11));
+        e.TryGetValue("short").GetValueOrThrow().Should().Be(new SCLInt(11));
     }
 
     [Fact]
     public void EnumerationShouldConvertCorrectly()
     {
-        var e = Entity.Create(("enumeration", new Enumeration("letter", "alpha")));
+        var e = Entity.Create(("enumeration", new SCLEnum<TextCase>(TextCase.Upper)));
 
         e.TryGetValue("enumeration").ShouldHaveValue();
 
         e.TryGetValue("enumeration")
             .GetValueOrThrow()
             .Should()
-            .Be(new ISCLObject.EnumerationValue(new Enumeration("letter", "alpha")));
+            .Be(new SCLEnum<TextCase>(TextCase.Upper));
     }
 
     [Fact]
@@ -161,6 +158,6 @@ public class EntityConversionTests
         e.TryGetValue("emptyList")
             .GetValueOrThrow()
             .Should()
-            .Be(ISCLObject.Null.Instance);
+            .Be(SCLNull.Instance);
     }
 }

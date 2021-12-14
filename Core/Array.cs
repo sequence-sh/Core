@@ -1,4 +1,6 @@
-﻿namespace Reductech.EDR.Core;
+﻿using System.Text;
+
+namespace Reductech.EDR.Core;
 
 /// <summary>
 /// Either a list or an asynchronous list
@@ -166,6 +168,9 @@ public abstract record Array<T> : IArray where T : ISCLObject
     /// <inheritdoc />
     public abstract Task<Result<IArray, IError>> EnsureEvaluated(CancellationToken cancellation);
 
+    /// <inheritdoc />
+    public abstract bool IsEvaluated { get; }
+
     /// <summary>
     /// Create an array by converting elements
     /// </summary>
@@ -215,6 +220,101 @@ public abstract record Array<T> : IArray where T : ISCLObject
 
     /// <inheritdoc />
     public override string ToString() => Name;
+
+    /// <inheritdoc />
+    public object ToCSharpObject()
+    {
+        return Evaluate(CancellationToken.None)
+            .Result.Value.List.Select(x => x.ToCSharpObject())
+            .ToList();
+    }
+
+    void ISCLObject.Format(
+        StringBuilder stringBuilder,
+        int indentation,
+        FormattingOptions options,
+        string? prefix,
+        string? suffix)
+    {
+        var list = Evaluate(CancellationToken.None)
+            .Result.Value
+            .List; //This can throw an exception in theory but it is unlikely in reality
+
+        if (list.Any(x => x is Entity or IArray))
+        {
+            ISCLObject.AppendLineIndented(
+                stringBuilder,
+                indentation,
+                prefix + "["
+            );
+
+            indentation++;
+
+            for (var index = 0; index < list.Count; index++)
+            {
+                var sclObject  = list[index];
+                var maybeComma = index < list.Count - 1 ? "," : null;
+
+                sclObject.Format(stringBuilder, indentation, options, null, maybeComma);
+            }
+
+            indentation--;
+            ISCLObject.AppendLineIndented(stringBuilder, indentation, "]" + suffix);
+        }
+        else
+        {
+            var line = "[" + string.Join(", ", list.Select(x => x.Serialize()))
+                           + "]";
+
+            ISCLObject.AppendLineIndented(
+                stringBuilder,
+                indentation,
+                prefix + line + suffix
+            );
+        }
+    }
+
+    /// <inheritdoc />
+    public Maybe<T1> MaybeAs<T1>() where T1 : ISCLObject
+    {
+        if (this is T1 value)
+            return value;
+
+        return Maybe<T1>.None;
+    }
+
+    /// <inheritdoc />
+    public ISCLObject DefaultValue => Empty;
+
+    /// <inheritdoc />
+    public SchemaNode ToSchemaNode(
+        string path,
+        SchemaConversionOptions? schemaConversionOptions)
+    {
+        var list = (this as IArray).ListIfEvaluated();
+
+        if (list.HasValue)
+        {
+            SchemaNode additionalItems = new TrueNode();
+
+            for (var index = 0; index < list.Value.Count; index++)
+            {
+                var entityValue = list.Value[index];
+                var n = entityValue.ToSchemaNode(path + $"[{index}]", schemaConversionOptions);
+                additionalItems = additionalItems.Combine(n);
+            }
+
+            return new ArrayNode(
+                EnumeratedValuesNodeData.Empty,
+                new ItemsData(ImmutableList<SchemaNode>.Empty, additionalItems)
+            );
+        }
+
+        return new ArrayNode(
+            EnumeratedValuesNodeData.Empty,
+            new ItemsData(ImmutableList<SchemaNode>.Empty, TrueNode.Instance)
+        );
+    }
 }
 
 /// <summary>
@@ -238,6 +338,24 @@ public interface IArray : ISCLObject
     /// </summary>
     [Pure]
     Task<Result<IArray, IError>> EnsureEvaluated(CancellationToken cancellation);
+
+    /// <summary>
+    /// Whether this array is evaluated
+    /// </summary>
+    bool IsEvaluated { get; }
+
+    /// <summary>
+    /// This as a list, if it is evaluated
+    /// </summary>
+    /// <returns></returns>
+    public Maybe<List<ISCLObject>> ListIfEvaluated()
+    {
+        if (!IsEvaluated)
+            return Maybe<List<ISCLObject>>.None;
+
+        var l = GetObjectsAsync(CancellationToken.None).Result.Value;
+        return l;
+    }
 }
 
 /// <summary>

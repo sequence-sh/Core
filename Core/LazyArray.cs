@@ -203,4 +203,7 @@ public sealed record LazyArray<T>
 
     /// <inheritdoc />
     public override string ToString() => Name;
+
+    /// <inheritdoc />
+    public override bool IsEvaluated => false;
 }

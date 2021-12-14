@@ -76,7 +76,7 @@ public sealed class Transform : CompoundStep<Array<Entity>>
 
             var result = topNode.TryTransform(
                 "",
-                new ISCLObject.NestedEntity(entity),
+                new Entity(entity),
                 transformSettings
             );
 
@@ -84,8 +84,8 @@ public sealed class Transform : CompoundStep<Array<Entity>>
             {
                 if (result.Value.HasValue)
                 {
-                    if (result.Value.GetValueOrThrow() is ISCLObject.NestedEntity ne)
-                        yield return ne.Value;
+                    if (result.Value.GetValueOrThrow() is Entity ne)
+                        yield return ne;
                     else
                         yield return new Entity(
                             new[]

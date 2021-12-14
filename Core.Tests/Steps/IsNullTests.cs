@@ -1,8 +1,6 @@
-﻿using Reductech.EDR.Core.TestHarness;
+﻿namespace Reductech.EDR.Core.Tests.Steps;
 
-namespace Reductech.EDR.Core.Tests.Steps;
-
-public partial class IsNullTests : StepTestBase<IsNull<int>, bool>
+public partial class IsNullTests : StepTestBase<IsNull<SCLInt>, SCLBool>
 {
     /// <inheritdoc />
     protected override IEnumerable<StepCase> StepCases

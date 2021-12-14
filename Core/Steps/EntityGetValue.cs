@@ -62,7 +62,7 @@ public sealed class EntityGetValue<T> : CompoundStep<T> where T : ISCLObject
             return ISCLObject.GetDefaultValue<T1>();
 
         var result = entityValue.GetValueOrThrow()
-            .TryGetValue<T1>()
+            .TryConvertTyped<T1>(property)
             .MapError(x => x.WithLocation(this));
 
         return result;

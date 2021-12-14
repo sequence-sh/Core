@@ -97,7 +97,7 @@ public sealed class SCLExampleAttribute : Attribute
     //{
     //    var ev = ISCLObject.CreateFromObject(o);
 
-    //    if (ev is ISCLObject.NestedList nl)
+    //    if (ev is IArray nl)
     //    {
     //        return nl.Value.Select(x => ConvertValue(x.ObjectValue)).ToSCLArray();
     //    }

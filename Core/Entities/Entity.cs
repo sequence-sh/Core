@@ -45,12 +45,36 @@ public sealed partial record Entity(
     public const string PrimitiveKey = "value";
 
     /// <summary>
-    /// Creates a new Entity
+    /// Creates a new Entity. This will convert CSharp arguments to SCLObjects
     /// </summary>
     [Pure]
-    public static Entity Create(params (string key, ISCLObject value)[] properties) => Create(
-        properties.Select(x => (new EntityPropertyKey(x.key), x.value))
+    public static Entity Create(params (string key, object? value)[] properties) => Create(
+        properties.Select(
+            x => (new EntityPropertyKey(x.key), ISCLObject.CreateFromCSharpObject(x.value))
+        )
     );
+
+    /// <summary>
+    /// Create an entity from a CSharp dictionary
+    /// </summary>
+    [Pure]
+    public static Entity Create(IDictionary dictionary)
+    {
+        List<EntityProperty> properties = new();
+        var                  enumerator = dictionary.GetEnumerator();
+
+        var i = 1;
+
+        while (enumerator.MoveNext())
+        {
+            var k       = enumerator.Key.ToString()!;
+            var vObject = ISCLObject.CreateFromCSharpObject(enumerator.Value);
+            properties.Add(new EntityProperty(k, vObject, i));
+            i++;
+        }
+
+        return new Entity(properties);
+    }
 
     /// <summary>
     /// Create an entity from a JsonElement
@@ -72,19 +96,14 @@ public sealed partial record Entity(
     [Pure]
     public JsonElement ToJsonElement()
     {
-        var options = new JsonSerializerOptions()
-        {
-            Converters = { new JsonStringEnumConverter() }
-        };
-
         var stream = new MemoryStream();
         var writer = new Utf8JsonWriter(stream);
 
-        EntityJsonConverter.Instance.Write(writer, this, options);
+        EntityJsonConverter.Instance.Write(writer, this, ISCLObject.DefaultJsonSerializerOptions);
 
         var reader = new Utf8JsonReader(stream.ToArray());
 
-        using JsonDocument document = JsonDocument.ParseValue(ref reader);
+        using var document = JsonDocument.ParseValue(ref reader);
         return document.RootElement.Clone();
     }
 
@@ -335,9 +354,55 @@ public sealed partial record Entity(
     /// <inheritdoc />
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
+    /// <inheritdoc />
+    public object ToCSharpObject()
+    {
+        var dictionary = new Dictionary<string, object?>();
+
+        foreach (var (name, sclObject, _) in this)
+        {
+            var value = sclObject.ToCSharpObject();
+            dictionary.Add(name, value);
+        }
+
+        return dictionary;
+    }
+
+    /// <summary>
+    /// Format this entity with the default formatting options
+    /// </summary>
+    /// <returns></returns>
+    public string Format()
+    {
+        var sb = new StringBuilder();
+        (this as ISCLObject).Format(sb, 0, new FormattingOptions());
+        return sb.ToString();
+    }
+
+    void ISCLObject.Format(
+        StringBuilder stringBuilder,
+        int indentation,
+        FormattingOptions options,
+        string? prefix,
+        string? suffix)
+    {
+        ISCLObject.AppendLineIndented(stringBuilder, indentation, prefix + "(");
+
+        indentation++;
+
+        foreach (var property in this)
+        {
+            property.Value.Format(stringBuilder, indentation, options, $"'{property.Name}': ");
+        }
+
+        indentation--;
+        ISCLObject.AppendLineIndented(stringBuilder, indentation, ")" + suffix);
+    }
+
     /// <summary>
     /// Create an entity from structured entity properties
     /// </summary>
+    [Pure]
     private static ISCLObject CreateFromProperties(
         IReadOnlyList<(Maybe<EntityPropertyKey> key, ISCLObject argValue)> properties)
     {
@@ -417,5 +482,37 @@ public sealed partial record Entity(
         var newEntity = new Entity(entityProperties.ToImmutableDictionary());
 
         return newEntity;
+    }
+
+    /// <inheritdoc />
+    public Maybe<T> MaybeAs<T>() where T : ISCLObject
+    {
+        if (this is T value)
+            return value;
+
+        return Maybe<T>.None;
+    }
+
+    /// <inheritdoc />
+    public ISCLObject DefaultValue => Empty;
+
+    /// <inheritdoc />
+    public SchemaNode ToSchemaNode(
+        string path,
+        SchemaConversionOptions? schemaConversionOptions)
+    {
+        var dictionary = new Dictionary<string, (SchemaNode Node, bool Required)>();
+
+        foreach (var (key, property) in Dictionary.OrderBy(x => x.Value.Order))
+        {
+            var node = property.Value.ToSchemaNode($"{path}/{key}", schemaConversionOptions);
+            dictionary[key] = (node, true);
+        }
+
+        return new EntityNode(
+            EnumeratedValuesNodeData.Empty,
+            new EntityAdditionalItems(FalseNode.Instance),
+            new EntityPropertiesData(dictionary)
+        );
     }
 }

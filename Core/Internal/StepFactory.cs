@@ -327,10 +327,9 @@ public abstract class StepFactory : IStepFactory
         if (freezeResult.IsFailure)
             return freezeResult.ConvertFailure<Unit>();
 
-        var stepToSet = TryCoerceStep(
+        var stepToSet = freezeResult.Value.TryCoerce(
             propertyInfo.Name,
-            propertyInfo.PropertyType,
-            freezeResult.Value
+            propertyInfo.PropertyType
         );
 
         if (stepToSet.IsFailure)
@@ -342,48 +341,6 @@ public abstract class StepFactory : IStepFactory
         ); //This could throw an exception but we don't expect it.
 
         return Unit.Default;
-    }
-
-    private static Result<IStep, IErrorBuilder> TryCoerceStep(
-        string propertyName,
-        Type propertyMemberType,
-        IStep stepToSet)
-    {
-        if (propertyMemberType.IsInstanceOfType(stepToSet))
-            return Result.Success<IStep, IErrorBuilder>(stepToSet); //No coercion required
-
-        if (propertyMemberType.IsGenericType)
-        {
-            var nestedType = propertyMemberType.GenericTypeArguments.First();
-
-            if (nestedType.GetInterfaces().Contains(typeof(IOneOf)))
-            {
-                var oneOfTypes = nestedType.GenericTypeArguments;
-
-                foreach (var oneOfType in oneOfTypes)
-                {
-                    var stepType     = typeof(IStep<>).MakeGenericType(oneOfType);
-                    var coerceResult = TryCoerceStep(propertyName, stepType, stepToSet);
-
-                    if (coerceResult.IsSuccess)
-                    {
-                        var resultStep = OneOfStep.Create(nestedType, stepToSet);
-                        return Result.Success<IStep, IErrorBuilder>(resultStep);
-                    }
-                }
-            }
-            else if (stepToSet is IConstantStep constantStep)
-            {
-                var conversionResult = constantStep.TryConvert(propertyMemberType, propertyName);
-                return conversionResult;
-            }
-            else if (nestedType == typeof(ISCLObject))
-            {
-                return Result.Success<IStep, IErrorBuilder>(stepToSet);
-            }
-        }
-
-        return ErrorCode.InvalidCast.ToErrorBuilder(propertyName, stepToSet.Name);
     }
 
     private static Result<Unit, IError> TrySetStepList(

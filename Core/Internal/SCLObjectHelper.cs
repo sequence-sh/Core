@@ -100,27 +100,4 @@ public static class SCLObjectHelper
     /// Convert this dateTime to an scl dateTime
     /// </summary>
     public static SCLDateTime ConvertToSCLObject(this DateTime dt) => new(dt);
-
-    /// <summary>
-    /// Create an SCL object from a CSharp object
-    /// </summary>
-    public static ISCLObject CreateFromCSharpObject(object? o)
-    {
-        return o switch
-        {
-            ISCLObject obj    => obj,
-            string s          => new StringStream(s),
-            int i             => new SCLInt(i),
-            double d          => new SCLDouble(d),
-            bool b            => SCLBool.Create(b),
-            DateTime dateTime => new SCLDateTime(dateTime),
-            IOneOf oneOf      => CreateFromCSharpObject(oneOf.Value),
-            IEnumerable enumerable => enumerable.OfType<object>()
-                .Select(CreateFromCSharpObject)
-                .ToSCLArray(),
-            Enum e => new StringStream(e.GetDisplayName()),
-            null   => SCLNull.Instance,
-            _      => new StringStream(o.ToString()!)
-        };
-    }
 }

@@ -151,7 +151,7 @@ public abstract partial class StepTestBase<TStep, TOutput>
                 else
                 {
                     actualString =
-                        CompressSpaces(SerializationMethods.SerializeObject(result.Value));
+                        CompressSpaces(result.Value.Serialize());
                 }
 
                 actualString.Should().Be(expectedString);
@@ -159,7 +159,7 @@ public abstract partial class StepTestBase<TStep, TOutput>
         }
 
         /// <inheritdoc />
-        public override void CheckObjectResult(IStep step, Result<object, IError> result)
+        public override void CheckObjectResult(IStep step, Result<ISCLObject, IError> result)
         {
             result.ShouldBeSuccessful();
 
@@ -174,14 +174,10 @@ public abstract partial class StepTestBase<TStep, TOutput>
                 {
                     actualString = CompressSpaces(ss.GetString());
                 }
-                else if (result.Value is string s)
-                {
-                    actualString = CompressSpaces(s);
-                }
                 else
                 {
                     actualString =
-                        CompressSpaces(SerializationMethods.SerializeObject(result.Value));
+                        CompressSpaces(result.Value.Serialize());
                 }
 
                 actualString.Should().Be(expectedString);

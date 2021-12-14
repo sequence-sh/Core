@@ -18,7 +18,7 @@ public partial class AssertEqualTests : StepTestBase<AssertEqual<StringStream>, 
 
             yield return new StepCase(
                 "Ints equal",
-                new AssertEqual<int> { Left = Constant(2), Right = Constant(2) },
+                new AssertEqual<SCLInt> { Left = Constant(2), Right = Constant(2) },
                 Unit.Default
             );
 
@@ -34,10 +34,10 @@ public partial class AssertEqualTests : StepTestBase<AssertEqual<StringStream>, 
 
             yield return new StepCase(
                 "Compare to entity int property",
-                new AssertEqual<int>
+                new AssertEqual<SCLInt>
                 {
                     Left = Constant(1),
-                    Right = new EntityGetValue<int>
+                    Right = new EntityGetValue<SCLInt>
                     {
                         Entity   = Constant(Entity.Create(("Foo", 1))),
                         Property = Constant("Foo")
@@ -59,10 +59,10 @@ public partial class AssertEqualTests : StepTestBase<AssertEqual<StringStream>, 
                                 Value    = Constant(Entity.Create(("Foo", 1)))
                             }
                         },
-                    FinalStep = new AssertEqual<int>
+                    FinalStep = new AssertEqual<SCLInt>
                     {
                         Left = Constant(1),
-                        Right = new EntityGetValue<int>
+                        Right = new EntityGetValue<SCLInt>
                         {
                             Entity   = GetVariable<Entity>("MyEntity"),
                             Property = Constant("Foo")
@@ -88,7 +88,7 @@ public partial class AssertEqualTests : StepTestBase<AssertEqual<StringStream>, 
                 "Ints not equal",
                 new AssertError()
                 {
-                    Step = new AssertEqual<int> { Left = Constant(2), Right = Constant(3) }
+                    Step = new AssertEqual<SCLInt> { Left = Constant(2), Right = Constant(3) }
                 },
                 Unit.Default
             ) { IgnoreLoggedValues = true };

@@ -1,8 +1,6 @@
-﻿using Reductech.EDR.Core.TestHarness;
+﻿namespace Reductech.EDR.Core.Tests.Steps;
 
-namespace Reductech.EDR.Core.Tests.Steps;
-
-public partial class StringToIntTests : StepTestBase<StringToInt, int>
+public partial class StringToIntTests : StepTestBase<StringToInt, SCLInt>
 {
     /// <inheritdoc />
     protected override IEnumerable<StepCase> StepCases

@@ -59,7 +59,7 @@ public sealed class SchemaCreateCoerced : CompoundStep<Entity>
         );
 
         var schema =
-            entities.Select(x => new ISCLObject.NestedEntity(x).ToSchemaNode("", sco))
+            entities.Select(x => x.ToSchemaNode("", sco))
                 .Aggregate((a, b) => a.Combine(b))
                 .ToJsonSchema();
 

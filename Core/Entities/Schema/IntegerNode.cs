@@ -33,7 +33,7 @@ public record IntegerNode(
         ISCLObject value,
         TransformSettings transformSettings)
     {
-        if (value is ISCLObject.Integer evInteger)
+        if (value is SCLInt evInteger)
         {
             var restrictionResult = Restrictions.Test(evInteger.Value, propertyName);
 
@@ -43,7 +43,7 @@ public record IntegerNode(
             return Maybe<ISCLObject>.None; // No change
         }
 
-        var v = value.GetPrimitiveString();
+        var v = value.Serialize();
 
         if (!int.TryParse(v, out var i))
             return ErrorCode.SchemaViolation.ToErrorBuilder("Should Be Integer", propertyName);
@@ -53,6 +53,6 @@ public record IntegerNode(
         if (restrictionResult2.IsFailure)
             return restrictionResult2.ConvertFailure<Maybe<ISCLObject>>();
 
-        return Maybe<ISCLObject>.From(new ISCLObject.Integer(i));
+        return Maybe<ISCLObject>.From(new SCLInt(i));
     }
 }

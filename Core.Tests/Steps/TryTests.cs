@@ -1,8 +1,6 @@
-﻿using Reductech.EDR.Core.TestHarness;
+﻿namespace Reductech.EDR.Core.Tests.Steps;
 
-namespace Reductech.EDR.Core.Tests.Steps;
-
-public partial class TryTests : StepTestBase<Try<int>, int>
+public partial class TryTests : StepTestBase<Try<SCLInt>, SCLInt>
 {
     /// <inheritdoc />
     protected override IEnumerable<StepCase> StepCases
@@ -20,10 +18,11 @@ public partial class TryTests : StepTestBase<Try<int>, int>
         {
             yield return new ErrorCase(
                 "Statement and Alternative both fail",
-                new Try<int>()
+                new Try<SCLInt>()
                 {
-                    Statement   = new FailStep<int>() { ErrorMessage = "Statement Failed" },
-                    Alternative = new FailStep<int>() { ErrorMessage = "Alternative Failed" },
+                    Statement = new FailStep<SCLInt>() { ErrorMessage = "Statement Failed" },
+                    Alternative =
+                        new FailStep<SCLInt>() { ErrorMessage = "Alternative Failed" },
                 },
                 ErrorCode.Test.ToErrorBuilder("Alternative Failed")
                     .WithLocationSingle(ErrorLocation.EmptyLocation)

@@ -29,9 +29,9 @@ public record ArrayNode(
         ImmutableList<ISCLObject> immutableList;
         bool                      changed;
 
-        if (value is ISCLObject.NestedList nestedList)
+        if (value is IArray nestedList)
         {
-            immutableList = nestedList.Value;
+            immutableList = nestedList.ListIfEvaluated().Value.ToImmutableList();
             changed       = false;
         }
         else
@@ -40,9 +40,9 @@ public record ArrayNode(
                 .ToArray();
 
             if (delimiters.Any())
-                immutableList = value.GetPrimitiveString()
+                immutableList = value.Serialize()
                     .Split(delimiters, StringSplitOptions.RemoveEmptyEntries)
-                    .Select(x => new ISCLObject.String(x) as ISCLObject)
+                    .Select(x => new StringStream(x) as ISCLObject)
                     .ToImmutableList();
             else
                 immutableList = ImmutableList<ISCLObject>.Empty;
@@ -88,6 +88,6 @@ public record ArrayNode(
         if (!changed)
             return Maybe<ISCLObject>.None;
 
-        return Maybe<ISCLObject>.From(new ISCLObject.NestedList(newList));
+        return Maybe<ISCLObject>.From(new EagerArray<ISCLObject>(newList));
     }
 }

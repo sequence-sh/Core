@@ -163,7 +163,7 @@ public partial class ISCLObjectTests
     //        actual.Should().Be(expected);
     //    }
 
-    //    var testConversion = !(entityValue is ISCLObject.NestedList or ISCLObject.NestedEntity);
+    //    var testConversion = !(entityValue is IArray or Entity);
 
     //    void TestConvert<T>(SchemaProperty schemaProperty, Maybe<T> maybe)
     //    {
@@ -284,11 +284,10 @@ public partial class ISCLObjectTests
     {
         ISCLObject.GetDefaultValue<Entity>().Should().Equal(Entity.Empty);
         ISCLObject.GetDefaultValue<StringStream>().Should().Be(StringStream.Empty);
-        ISCLObject.GetDefaultValue<string>().Should().Be(string.Empty);
-        ISCLObject.GetDefaultValue<int>().Should().Be(0);
-        ISCLObject.GetDefaultValue<double>().Should().Be(0.0);
-        ISCLObject.GetDefaultValue<bool>().Should().Be(false);
-        ISCLObject.GetDefaultValue<Array<int>>().Should().Be(Array<int>.Empty);
-        ISCLObject.GetDefaultValue<Array<double>>().Should().Be(Array<double>.Empty);
+        ISCLObject.GetDefaultValue<SCLInt>().Should().Be(0.ConvertToSCLObject());
+        ISCLObject.GetDefaultValue<SCLDouble>().Should().Be(0.0.ConvertToSCLObject());
+        ISCLObject.GetDefaultValue<SCLBool>().Should().Be(false.ConvertToSCLObject());
+        ISCLObject.GetDefaultValue<Array<SCLInt>>().Should().Be(Array<SCLInt>.Empty);
+        ISCLObject.GetDefaultValue<Array<SCLDouble>>().Should().Be(Array<SCLDateTime>.Empty);
     }
 }

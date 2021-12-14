@@ -1,6 +1,6 @@
 ﻿namespace Reductech.EDR.Core.Tests;
 
-[AutoTheory.UseTestOutputHelper]
+[UseTestOutputHelper]
 public partial class RequirementsTests
 {
     public static readonly List<Requirement> BaseRequirements =
@@ -9,7 +9,7 @@ public partial class RequirementsTests
     [Fact]
     public void BasicStepShouldHaveNoRequirements()
     {
-        var step = new Print<int>() { Value = new Sum() { Terms = Array(1, 2, 3) } };
+        var step = new Print<SCLInt>() { Value = new Sum() { Terms = Array(1, 2, 3) } };
 
         var requirements = step.GetAllRequirements().ToList();
 
@@ -34,7 +34,7 @@ public partial class RequirementsTests
     [Fact]
     public void FixedRequirementsStepShouldHaveRequirementsEvenWhenNested()
     {
-        var step = new Print<int>() { Value = new FixedRequirementsStep() };
+        var step = new Print<SCLInt>() { Value = new FixedRequirementsStep() };
 
         var requirements = step.GetAllRequirements().ToList();
 
@@ -69,7 +69,7 @@ public partial class RequirementsTests
     [Fact]
     public void NestedRuntimeRequirementsStepShouldHaveRequirements()
     {
-        var step = new Print<int>()
+        var step = new Print<SCLInt>()
         {
             Value = new RuntimeRequirementsStep() { BaseStep = Constant(1) }
         };
@@ -92,7 +92,7 @@ public partial class RequirementsTests
     private class RuntimeRequirementsStep : CompoundStep<SCLInt>
     {
         /// <inheritdoc />
-        protected override Task<Result<int, IError>> Run(
+        protected override Task<Result<SCLInt, IError>> Run(
             IStateMonad stateMonad,
             CancellationToken cancellationToken)
         {
@@ -110,29 +110,29 @@ public partial class RequirementsTests
 
         /// <inheritdoc />
         public override IStepFactory StepFactory =>
-            new SimpleStepFactory<RuntimeRequirementsStep, int>();
+            new SimpleStepFactory<RuntimeRequirementsStep, SCLInt>();
     }
 
     private class FixedRequirementsStep : CompoundStep<SCLInt>
     {
         /// <inheritdoc />
-        protected override async Task<Result<int, IError>> Run(
+        protected override async Task<Result<SCLInt, IError>> Run(
             IStateMonad stateMonad,
             CancellationToken cancellationToken)
         {
             await Task.CompletedTask;
-            return 1;
+            return 1.ConvertToSCLObject();
         }
 
         /// <inheritdoc />
         public override IStepFactory StepFactory => FixedRequirementsStepFactory.Instance;
 
         private class
-            FixedRequirementsStepFactory : SimpleStepFactory<FixedRequirementsStep, int>
+            FixedRequirementsStepFactory : SimpleStepFactory<FixedRequirementsStep, SCLInt>
         {
             private FixedRequirementsStepFactory() { }
 
-            public static SimpleStepFactory<FixedRequirementsStep, int> Instance { get; } =
+            public static SimpleStepFactory<FixedRequirementsStep, SCLInt> Instance { get; } =
                 new FixedRequirementsStepFactory();
 
             /// <inheritdoc />

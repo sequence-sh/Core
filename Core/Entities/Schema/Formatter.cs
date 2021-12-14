@@ -66,10 +66,10 @@ public class Formatter : OneOfBase<IReadOnlyList<string>,
 
         foreach (var prop in entity)
         {
-            if (prop.Value is ISCLObject.NestedList nl)
-                dict.Add(prop.Name, nl.Value.Select(x => x.GetPrimitiveString()).ToList());
+            if (prop.Value is IArray nl)
+                dict.Add(prop.Name, nl.ListIfEvaluated().Value.Select(x => x.Serialize()).ToList());
             else
-                dict.Add(prop.Name, new List<string>() { prop.Value.GetPrimitiveString() });
+                dict.Add(prop.Name, new List<string>() { prop.Value.Serialize() });
         }
 
         return new Formatter(dict);

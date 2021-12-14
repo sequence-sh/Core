@@ -22,12 +22,11 @@ public sealed class StateMonad : IStateMonad
     /// </summary>
     public static Entity CreateSettingsEntity(StepFactoryStore stepFactoryStore)
     {
-        var connectorsSetting = ISCLObject.CreateFromObject(
+        var connectorsSetting = ISCLObject.CreateFromCSharpObject(
             stepFactoryStore.ConnectorData
                 .ToDictionary(
                     x => x.ConnectorSettings.Id,
-                    x => ISCLObject
-                        .CreateFromObject(x.ConnectorSettings)
+                    x => ISCLObject.CreateFromCSharpObject(x.ConnectorSettings)
                 )
         );
 

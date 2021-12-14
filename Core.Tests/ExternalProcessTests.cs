@@ -2,7 +2,6 @@
 using System.Text.RegularExpressions;
 using Divergic.Logging.Xunit;
 using Reductech.EDR.Core.ExternalProcesses;
-using Reductech.EDR.Core.TestHarness;
 
 namespace Reductech.EDR.Core.Tests;
 

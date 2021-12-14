@@ -116,13 +116,15 @@ public sealed class RunSCL : CompoundStep<Unit>
 
             if (export.IsSuccess)
             {
-                var ev = export.Value.TryConvertToISCLObject();
+                var ev = export.Value.TryGetConstantValue();
 
-                if (ev.HasValue && ev.GetValueOrThrow() is ISCLObject.NestedList nestedList)
+                if (ev.HasValue && ev.GetValueOrThrow() is IArray { IsEvaluated: true } nestedArray)
                 {
-                    foreach (var entityValue in nestedList.Value)
+                    var list = nestedArray.ListIfEvaluated().Value;
+
+                    foreach (var entityValue in list)
                     {
-                        var name = entityValue.GetPrimitiveString();
+                        var name = entityValue.Serialize();
 
                         yield return new(
                             new VariableName(name),

@@ -1,8 +1,6 @@
-﻿using Reductech.EDR.Core.TestHarness;
+﻿namespace Reductech.EDR.Core.Tests.Steps;
 
-namespace Reductech.EDR.Core.Tests.Steps;
-
-public partial class GreaterThanOrEqualTests : StepTestBase<GreaterThanOrEqual<int>, bool>
+public partial class GreaterThanOrEqualTests : StepTestBase<GreaterThanOrEqual<SCLInt>, SCLBool>
 {
     /// <inheritdoc />
     protected override IEnumerable<StepCase> StepCases
@@ -11,26 +9,26 @@ public partial class GreaterThanOrEqualTests : StepTestBase<GreaterThanOrEqual<i
         {
             yield return new StepCase(
                 "One number",
-                new GreaterThanOrEqual<int>() { Terms = StaticHelpers.Array(2) },
-                true
+                new GreaterThanOrEqual<SCLInt>() { Terms = Array(2) },
+                true.ConvertToSCLObject()
             );
 
             yield return new StepCase(
                 "Two numbers false",
-                new GreaterThanOrEqual<int>() { Terms = StaticHelpers.Array(1, 2) },
-                false
+                new GreaterThanOrEqual<SCLInt>() { Terms = Array(1, 2) },
+                false.ConvertToSCLObject()
             );
 
             yield return new StepCase(
                 "Two numbers true",
-                new GreaterThanOrEqual<int>() { Terms = StaticHelpers.Array(3, 2) },
-                true
+                new GreaterThanOrEqual<SCLInt>() { Terms = Array(3, 2) },
+                true.ConvertToSCLObject()
             );
 
             yield return new StepCase(
                 "Three numbers true",
-                new GreaterThanOrEqual<int>() { Terms = StaticHelpers.Array(3, 2, 2) },
-                true
+                new GreaterThanOrEqual<SCLInt>() { Terms = Array(3, 2, 2) },
+                true.ConvertToSCLObject()
             );
         }
     }

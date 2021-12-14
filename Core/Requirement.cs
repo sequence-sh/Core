@@ -172,15 +172,17 @@ public sealed record FeatureRequirement(
             !connectorSettings.Settings.TryGetValue(FeaturesKey, out var features))
             return ErrorCode.MissingStepSettingsValue.ToErrorBuilder(ConnectorName, FeaturesKey);
 
-        var featuresEntity = ISCLObject.CreateFromObject(features);
+        var featuresEntity = ISCLObject.CreateFromCSharpObject(features);
 
         List<string> actualFeatures;
 
-        if (featuresEntity is ISCLObject.NestedList nestedList)
-            actualFeatures = nestedList.Value.Select(GetISCLObjectString).ToList();
+        if (featuresEntity is IArray nestedList)
+            actualFeatures = nestedList.ListIfEvaluated()
+                .Value.Select(x => x.Serialize())
+                .ToList();
         else
         {
-            actualFeatures = new List<string> { GetISCLObjectString(featuresEntity) };
+            actualFeatures = new List<string> { featuresEntity.Serialize() };
         }
 
         var missingFeatures = RequiredFeatures.Except(
@@ -194,15 +196,5 @@ public sealed record FeatureRequirement(
         }
 
         return Unit.Default;
-
-        static string GetISCLObjectString(ISCLObject entityValue)
-        {
-            if (entityValue is ISCLObject.EnumerationValue ev)
-            {
-                return ev.Value.EnumValue;
-            }
-
-            return entityValue.GetPrimitiveString();
-        }
     }
 }

@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.Logging.Abstractions;
-using Reductech.EDR.Core.TestHarness;
 
 namespace Reductech.EDR.Core.Tests;
 
@@ -17,7 +16,7 @@ public partial class StepHelpersTest
         );
 
         var result = await sm.RunStepsAsync(
-            new StepTestBase<DoNothing, Unit>.FailStep<int>() { ErrorMessage = "Test Error" },
+            new StepTestBase<DoNothing, Unit>.FailStep<SCLInt>() { ErrorMessage = "Test Error" },
             Constant(2),
             Constant(3),
             Constant(4),
@@ -63,10 +62,10 @@ public partial class StepHelpersTest
         a.Should().Be("a");
         b.Should().Be("b");
         def.Should().BeEquivalentTo("d", "e", "f");
-        one.Should().Be(1);
-        two.Should().Be(2);
-        three.Should().Be(3);
-        fourFiveSix.Should().BeEquivalentTo(new[] { 4, 5, 6 });
+        one.Should().Be(1.ConvertToSCLObject());
+        two.Should().Be(2.ConvertToSCLObject());
+        three.Should().Be(3.ConvertToSCLObject());
+        fourFiveSix.Should().BeEquivalentTo(new[] { 4, 5, 6 }.Select(x => x.ConvertToSCLObject()));
         nullInt.ShouldHaveNoValue();
     }
 }

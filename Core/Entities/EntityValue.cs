@@ -6,7 +6,7 @@
 ///// <summary>
 ///// The value of an entity property.
 ///// </summary>
-//public abstract record ISCLObject(object ObjectValue)
+//public abstract record EntityValue(object ObjectValue)
 //{
 //    /// <summary>
 //    /// The Null value
@@ -21,7 +21,7 @@
 //        public static Null Instance { get; } = new();
 
 //        /// <inheritdoc />
-//        public override string GetPrimitiveString() => "null";
+//        public override string Serialize() => "null";
 
 //        /// <inheritdoc />
 //        public override string Serialize() => Serialized;
@@ -45,7 +45,7 @@
 //            SchemaConversionOptions? schemaConversionOptions) => NullNode.Instance;
 
 //        /// <inheritdoc />
-//        public override string ToString() => GetPrimitiveString();
+//        public override string ToString() => Serialize();
 //    }
 
 //    /// <summary>
@@ -54,7 +54,7 @@
 //    public record String(string Value) : ISCLObject(Value)
 //    {
 //        /// <inheritdoc />
-//        public override string GetPrimitiveString()
+//        public override string Serialize()
 //        {
 //            return Value;
 //        }
@@ -94,7 +94,7 @@
 //        }
 
 //        /// <inheritdoc />
-//        public override string ToString() => GetPrimitiveString();
+//        public override string ToString() => Serialize();
 //    }
 
 //    /// <summary>
@@ -108,7 +108,7 @@
 //            string dateTimeFormat) => Value.ToString();
 
 //        /// <inheritdoc />
-//        public override string GetPrimitiveString()
+//        public override string Serialize()
 //        {
 //            return Value.ToString();
 //        }
@@ -134,7 +134,7 @@
 //        }
 
 //        /// <inheritdoc />
-//        public override string ToString() => GetPrimitiveString();
+//        public override string ToString() => Serialize();
 //    }
 
 //    /// <summary>
@@ -148,7 +148,7 @@
 //            string dateTimeFormat) => Value.ToString(Constants.DoubleFormat);
 
 //        /// <inheritdoc />
-//        public override string GetPrimitiveString() => Value.ToString("R");
+//        public override string Serialize() => Value.ToString("R");
 
 //        /// <inheritdoc />
 //        public override string Serialize() => Value.ToString(Constants.DoubleFormat);
@@ -171,7 +171,7 @@
 //        }
 
 //        /// <inheritdoc />
-//        public override string ToString() => GetPrimitiveString();
+//        public override string ToString() => Serialize();
 //    }
 
 //    /// <summary>
@@ -188,7 +188,7 @@
 //        }
 
 //        /// <inheritdoc />
-//        public override string GetPrimitiveString() => Value.ToString();
+//        public override string Serialize() => Value.ToString();
 
 //        /// <inheritdoc />
 //        public override string Serialize() => Value.ToString();
@@ -208,7 +208,7 @@
 //        }
 
 //        /// <inheritdoc />
-//        public override string ToString() => GetPrimitiveString();
+//        public override string ToString() => Serialize();
 //    } //TODO constant values
 
 //    /// <summary>
@@ -217,7 +217,7 @@
 //    public record EnumerationValue(ISCLEnum Value) : ISCLObject(Value)
 //    {
 //        /// <inheritdoc />
-//        public override string GetPrimitiveString() => Value.ToString();
+//        public override string Serialize() => Value.ToString();
 
 //        /// <inheritdoc />
 //        public override string Serialize() => Value.ToString();
@@ -242,7 +242,7 @@
 //        }
 
 //        /// <inheritdoc />
-//        public override string ToString() => GetPrimitiveString();
+//        public override string ToString() => Serialize();
 //    }
 
 //    /// <summary>
@@ -263,7 +263,7 @@
 //        }
 
 //        /// <inheritdoc />
-//        public override string GetPrimitiveString() => Value.ToString(Constants.DateTimeFormat);
+//        public override string Serialize() => Value.ToString(Constants.DateTimeFormat);
 
 //        /// <inheritdoc />
 //        public override string Serialize() => Value.ToString(Constants.DateTimeFormat);
@@ -283,7 +283,7 @@
 //        }
 
 //        /// <inheritdoc />
-//        public override string ToString() => GetPrimitiveString();
+//        public override string ToString() => Serialize();
 //    }
 
 //    /// <summary>
@@ -292,7 +292,7 @@
 //    public record NestedEntity(Entity Value) : ISCLObject(Value)
 //    {
 //        /// <inheritdoc />
-//        public override string GetPrimitiveString() => Value.ToString();
+//        public override string Serialize() => Value.ToString();
 
 //        /// <inheritdoc />
 //        public override string Serialize() => Value.Serialize();
@@ -341,7 +341,7 @@
 //    public record NestedList(ImmutableList<ISCLObject> Value) : ISCLObject(Value)
 //    {
 //        /// <inheritdoc />
-//        public override string GetPrimitiveString() =>
+//        public override string Serialize() =>
 //            SerializationMethods.SerializeList(Value.Select(y => y.Serialize()));
 
 //        /// <inheritdoc />
@@ -523,7 +523,7 @@
 //        {
 //            case null:             return Null.Instance;
 //            case SCLNull:          return Null.Instance;
-//            case ISCLObject ev:   return ev;
+//            case ISCLObject ev:    return ev;
 //            case StringStream ss1: return CreateFromString(ss1.GetString());
 //            case string s:         return CreateFromString(s);
 //            case int i:            return new Integer(i);
@@ -673,7 +673,7 @@
 //    /// <summary>
 //    /// If this is a primitive, get a string representation
 //    /// </summary>
-//    public abstract string GetPrimitiveString();
+//    public abstract string Serialize();
 
 //    /// <summary>
 //    /// Serialize this value as it will appear in SCL
@@ -726,7 +726,7 @@
 //        if (maybeObject.HasValue)
 //            return maybeObject.GetValueOrThrow();
 
-//        var primitive = GetPrimitiveString();
+//        var primitive = Serialize();
 
 //        if (type == typeof(int))
 //        {
@@ -770,13 +770,13 @@
 //        }
 //        else if (type == typeof(StringStream))
 //        {
-//            var ser = new StringStream(GetPrimitiveString());
+//            var ser = new StringStream(Serialize());
 
 //            return ser;
 //        }
 //        else if (type == typeof(object))
 //        {
-//            return AsISCLObject(ObjectValue); // new StringStream(GetPrimitiveString());
+//            return AsISCLObject(ObjectValue); // new StringStream(Serialize());
 //        }
 //        else if (type.GetInterfaces().Contains(typeof(IOneOf)))
 //        {
