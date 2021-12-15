@@ -13,7 +13,7 @@ public partial class ArrayFilterTests : StepTestBase<ArrayFilter<Entity>, Array<
                 {
                     Action = new LambdaFunction<Entity, Unit>(
                         null,
-                        new Log<Entity> { Value = GetEntityVariable }
+                        new Log { Value = GetEntityVariable }
                     ),
                     Array = new ArrayFilter<Entity>
                     {
@@ -45,7 +45,7 @@ public partial class ArrayFilterTests : StepTestBase<ArrayFilter<Entity>, Array<
                 {
                     Action = new LambdaFunction<Entity, Unit>(
                         new VariableName("ForeachVar"),
-                        new Log<Entity> { Value = GetVariable<Entity>("ForeachVar") }
+                        new Log { Value = GetVariable<Entity>("ForeachVar") }
                     ),
                     Array = new ArrayFilter<Entity>
                     {

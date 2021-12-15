@@ -13,7 +13,7 @@ public partial class ArrayMapTests : StepTestBase<ArrayMap<Entity, Entity>, Arra
                 {
                     Action = new LambdaFunction<Entity, Unit>(
                         null,
-                        new Log<Entity> { Value = GetEntityVariable }
+                        new Log { Value = GetEntityVariable }
                     ),
                     Array = new ArrayMap<Entity, Entity>
                     {
@@ -45,7 +45,7 @@ public partial class ArrayMapTests : StepTestBase<ArrayMap<Entity, Entity>, Arra
                 {
                     Action = new LambdaFunction<Entity, Unit>(
                         null,
-                        new Log<Entity> { Value = GetEntityVariable }
+                        new Log { Value = GetEntityVariable }
                     ),
                     Array = new ArrayMap<Entity, Entity>
                     {

@@ -81,7 +81,7 @@ public interface IStep
             }
             else if (this is IConstantStep constantStep)
             {
-                var conversionResult = constantStep.TryConvert(desiredStepType, propertyName);
+                var conversionResult = constantStep.TryConvert(nestedType, propertyName);
                 return conversionResult;
             }
             else if (nestedType == typeof(ISCLObject))

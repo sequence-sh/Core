@@ -15,7 +15,7 @@ public partial class GetVariableTests : StepTestBase<GetVariable<SCLInt>, SCLInt
                     {
                         Variable = new VariableName("Foo"), Value = Constant(42)
                     },
-                    new Log<SCLInt>
+                    new Log
                     {
                         Value = new GetVariable<SCLInt>
                         {

@@ -32,7 +32,7 @@ public partial class SequenceTests : StepTestBase<Sequence<StringStream>, String
                         {
                             InitialSteps = new List<IStep<Unit>>
                             {
-                                new Log<StringStream> { Value = Constant("Hello") }
+                                new Log { Value = Constant("Hello") }
                             },
                             FinalStep = new DoNothing()
                         }
@@ -49,8 +49,8 @@ public partial class SequenceTests : StepTestBase<Sequence<StringStream>, String
                 {
                     InitialSteps = new List<IStep<Unit>>
                     {
-                        new Log<StringStream> { Value = Constant("Hello") },
-                        new Log<StringStream> { Value = Constant("World") }
+                        new Log { Value = Constant("Hello") },
+                        new Log { Value = Constant("World") }
                     },
                     FinalStep = Constant("Goodbye")
                 },
@@ -117,7 +117,7 @@ public partial class SequenceTests : StepTestBase<Sequence<StringStream>, String
                         {
                             InitialSteps = new List<IStep<Unit>>
                             {
-                                new Log<StringStream> { Value = Constant("Hello") }
+                                new Log { Value = Constant("Hello") }
                             },
                             FinalStep = new DoNothing()
                         }

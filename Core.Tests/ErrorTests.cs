@@ -31,14 +31,14 @@ public partial class RunErrorTests
                         {
                             Variable = FooString, Value = Constant(42)
                         },
-                        new Print<SCLBool>
+                        new Print
                         {
                             Value = new GetVariable<SCLBool> { Variable = FooString }
                         }
                     },
                     FinalStep = new DoNothing()
                 },
-                new ErrorBuilder(ErrorCode.WrongVariableType, "<Foo>", nameof(Boolean))
+                new ErrorBuilder(ErrorCode.InvalidCast, "<Foo>", 42)
                     .WithLocation(new GetVariable<SCLBool> { Variable = FooString })
             );
 

@@ -31,7 +31,7 @@ public partial class GetSettingsTests : StepTestBase<GetSettings, Entity>
 
             yield return new StepCase(
                 "Default Settings",
-                new Log<Entity> { Value = new GetSettings() },
+                new Log { Value = new GetSettings() },
                 Unit.Default,
                 baseEntity.Serialize(SerializeOptions.Serialize)
             );
@@ -64,7 +64,7 @@ public partial class GetSettingsTests : StepTestBase<GetSettings, Entity>
 
             yield return new StepCase(
                 "Extra Settings",
-                new Log<Entity> { Value = new GetSettings() },
+                new Log { Value = new GetSettings() },
                 Unit.Default,
                 entity2.Serialize(SerializeOptions.Serialize)
             ).WithStepFactoryStore(stepFactoryStore);

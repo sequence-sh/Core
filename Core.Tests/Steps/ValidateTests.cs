@@ -34,7 +34,7 @@ public partial class ValidateTests : StepTestBase<Validate, Array<Entity>>
                     {
                         Action = new LambdaFunction<Entity, Unit>(
                             null,
-                            new Log<Entity> { Value = GetEntityVariable }
+                            new Log { Value = GetEntityVariable }
                         ),
                         Array =
                             new Validate
@@ -393,7 +393,7 @@ public partial class ValidateTests : StepTestBase<Validate, Array<Entity>>
                             {
                                 Action = new LambdaFunction<Entity, Unit>(
                                     null,
-                                    new Log<Entity> { Value = GetEntityVariable }
+                                    new Log { Value = GetEntityVariable }
                                 ),
                                 Array = enforceSchema,
                             }

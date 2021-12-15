@@ -1,6 +1,4 @@
-﻿using Reductech.EDR.Core.Internal;
-
-namespace Reductech.EDR.Core.TestHarness;
+﻿namespace Reductech.EDR.Core.TestHarness;
 
 public abstract partial class StepTestBase<TStep, TOutput>
 {
@@ -163,7 +161,7 @@ public abstract partial class StepTestBase<TStep, TOutput>
             var errorMessage = property.Name + " Error";
 
             var newValue = CreateFailStepOfType(
-                property.PropertyType.GenericTypeArguments.First(),
+                property.PropertyType.GenericTypeArguments.FirstOrDefault(typeof(ISCLObject)),
                 errorMessage
             );
 

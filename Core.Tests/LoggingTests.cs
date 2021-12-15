@@ -35,22 +35,22 @@ public partial class LoggingTests
                 CheckMessageAndScope(LogLevel.Debug, "EDR Sequence Started", null),
                 CheckMessageAndScope(
                     LogLevel.Trace,
-                    "Log Started with Parameters: [Value, Sum]",
+                    "Log Started with Parameters: [Value, (1 + 1)]",
                     new[] { "Log" }
                 ),
                 CheckMessageAndScope(
                     LogLevel.Trace,
-                    "Sum Started with Parameters: [Terms, ArrayNew]",
+                    "Sum Started with Parameters: [Terms, [1, 1]]",
                     new[] { "Log", "Sum", }
                 ),
                 CheckMessageAndScope(
                     LogLevel.Trace,
-                    "ArrayNew Started with Parameters: [Elements, 2 Elements]",
+                    "ArrayNew Started with Parameters: [Elements, [1, 1]]",
                     new[] { "Log", "Sum", "ArrayNew" }
                 ),
                 CheckMessageAndScope(
                     LogLevel.Trace,
-                    "ArrayNew Completed Successfully with Result: 2 Elements",
+                    "ArrayNew Completed Successfully with Result: [1, 1]",
                     new[] { "Log", "Sum", "ArrayNew" }
                 ),
                 CheckMessageAndScope(
@@ -73,27 +73,27 @@ public partial class LoggingTests
                 CheckMessageAndScope(LogLevel.Debug, "EDR Sequence Started", null),
                 CheckMessageAndScope(
                     LogLevel.Trace,
-                    "AssertError Started with Parameters: [Step, Log]",
+                    "AssertError Started with Parameters: [Step, (Log Value: (1 / 0))]",
                     new[] { "AssertError" }
                 ),
                 CheckMessageAndScope(
                     LogLevel.Trace,
-                    "Log Started with Parameters: [Value, Divide]",
+                    "Log Started with Parameters: [Value, (1 / 0)]",
                     new[] { "AssertError", "Log" }
                 ),
                 CheckMessageAndScope(
                     LogLevel.Trace,
-                    "Divide Started with Parameters: [Terms, ArrayNew]",
+                    "Divide Started with Parameters: [Terms, [1, 0]]",
                     new[] { "AssertError", "Log", "Divide" }
                 ),
                 CheckMessageAndScope(
                     LogLevel.Trace,
-                    "ArrayNew Started with Parameters: [Elements, 2 Elements]",
+                    "ArrayNew Started with Parameters: [Elements, [1, 0]]",
                     new[] { "AssertError", "Log", "Divide", "ArrayNew" }
                 ),
                 CheckMessageAndScope(
                     LogLevel.Trace,
-                    "ArrayNew Completed Successfully with Result: 2 Elements",
+                    "ArrayNew Completed Successfully with Result: [1, 0]",
                     new[] { "AssertError", "Log", "Divide", "ArrayNew" }
                 ),
                 CheckMessageAndScope(

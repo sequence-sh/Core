@@ -189,7 +189,7 @@ public abstract partial class StepTestBase<TStep, TOutput>
     {
         var tStep = propertyInfo.PropertyType;
 
-        var outputType = tStep.GenericTypeArguments.First();
+        var outputType = tStep.GenericTypeArguments.FirstOrDefault(typeof(ISCLObject));
 
         var singleChar = propertyInfo.GetCustomAttribute<SingleCharacterAttribute>() != null;
 
@@ -251,6 +251,12 @@ public abstract partial class StepTestBase<TStep, TOutput>
             throw new Exception(
                 $"{stepName} should not have output type 'datetime' - it should be 'SCLDateTime'"
             );
+        }
+        else if (outputType == typeof(ISCLObject))
+        {
+            var i = index;
+            index++;
+            step = Constant(i);
         }
 
         else if (outputType == typeof(SCLBool))

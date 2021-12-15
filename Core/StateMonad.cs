@@ -100,52 +100,17 @@ public sealed class StateMonad : IStateMonad
     /// </summary>
     public static Result<Maybe<T>, IErrorBuilder> TryGetVariableFromDictionary<T>(
         VariableName key,
-        IReadOnlyDictionary<VariableName, ISCLObject> dictionary)
+        IReadOnlyDictionary<VariableName, ISCLObject> dictionary) where T : ISCLObject
     {
         if (!dictionary.TryGetValue(key, out var value))
             return Maybe<T>.None;
 
-        return TryConvertValue(value, key);
+        var result = value.TryConvertTyped<T>(key.Serialize(SerializeOptions.Serialize));
 
-        static Result<Maybe<T>, IErrorBuilder> TryConvertValue(object? value, VariableName key)
-        {
-            if (value is T typedValue)
-                return Maybe<T>.From(typedValue);
+        if (result.IsSuccess)
+            return Maybe<T>.From(result.Value);
 
-            if (typeof(T) == typeof(StringStream))
-            {
-                var ss = new StringStream(value?.ToString()!);
-
-                if (ss is T t)
-                {
-                    return Maybe<T>.From(t);
-                }
-            }
-
-            if (value is IArray array && typeof(T).IsGenericType
-                                      && typeof(T).GetGenericTypeDefinition() == typeof(Array<>))
-            {
-                var method = typeof(T).GetMethod(
-                    nameof(Array<ISCLObject>.CreateByConverting),
-                    BindingFlags.Public | BindingFlags.Static
-                );
-
-                var conversionResult =
-                    (Result<T, IErrorBuilder>)method?.Invoke(null, new object?[] { array })!;
-
-                if (conversionResult.IsFailure)
-                    return conversionResult.ConvertFailure<Maybe<T>>();
-
-                return Maybe<T>.From(conversionResult.Value);
-            }
-
-            if (value is IOneOf valueOneOf)
-            {
-                return TryConvertValue(valueOneOf.Value, key);
-            }
-
-            return new ErrorBuilder(ErrorCode.WrongVariableType, key, typeof(T).Name);
-        }
+        return result.ConvertFailure<Maybe<T>>();
     }
 
     /// <summary>

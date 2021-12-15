@@ -6,18 +6,17 @@
 public record CallerMetadata(string StepName, string ParameterName, TypeReference ExpectedType)
 {
     /// <summary>
-    /// Gets the error thrown if the caller is given the wrong type
+    /// Check that this property allows a particular type
     /// </summary>
     /// <returns></returns>
-    public SingleError GetWrongTypeError(
-        string calledStep,
-        string calledStepOutputType,
-        ErrorLocation location)
+    public Result<Unit, IErrorBuilder> CheckAllows(
+        TypeReference reference,
+        TypeResolver? typeResolver)
     {
-        var error = GetWrongTypeErrorBuilder(calledStep, calledStepOutputType)
-            .WithLocationSingle(location);
+        if (ExpectedType.Allow(reference, typeResolver))
+            return Unit.Default;
 
-        return error;
+        return GetWrongTypeErrorBuilder("Step", reference.Name);
     }
 
     private ErrorBuilder GetWrongTypeErrorBuilder(
@@ -34,19 +33,5 @@ public record CallerMetadata(string StepName, string ParameterName, TypeReferenc
             );
 
         return error;
-    }
-
-    /// <summary>
-    /// Check that this property allows a particular type
-    /// </summary>
-    /// <returns></returns>
-    public Result<Util.Unit, IErrorBuilder> CheckAllows(
-        TypeReference reference,
-        TypeResolver? typeResolver)
-    {
-        if (ExpectedType.Allow(reference, typeResolver))
-            return Util.Unit.Default;
-
-        return GetWrongTypeErrorBuilder("Step", reference.Name);
     }
 }

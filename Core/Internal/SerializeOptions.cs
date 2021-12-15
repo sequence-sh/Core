@@ -16,12 +16,12 @@ public sealed record SerializeOptions(
     /// <summary>
     /// Suitable for testing
     /// </summary>
-    public static readonly SerializeOptions Name = new(true, false, false, 5);
+    public static readonly SerializeOptions Name = new(false, false, false, 5);
 
     /// <summary>
     /// Suitable for logging
     /// </summary>
-    public static readonly SerializeOptions SanitizedName = new(true, true, false, 5);
+    public static readonly SerializeOptions SanitizedName = new(false, true, false, 5);
 
     /// <summary>
     /// Suitable for rendering SCL

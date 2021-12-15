@@ -13,7 +13,7 @@ public partial class EntityMapPropertiesTests : StepTestBase<EntityMapProperties
                 {
                     Action = new LambdaFunction<Entity, Unit>(
                         null,
-                        new Log<Entity> { Value = GetEntityVariable }
+                        new Log { Value = GetEntityVariable }
                     ),
                     Array =
                         new EntityMapProperties
@@ -44,7 +44,7 @@ public partial class EntityMapPropertiesTests : StepTestBase<EntityMapProperties
                 {
                     Action = new LambdaFunction<Entity, Unit>(
                         null,
-                        new Log<Entity> { Value = GetEntityVariable }
+                        new Log { Value = GetEntityVariable }
                     ),
                     Array =
                         new EntityMapProperties
@@ -75,7 +75,7 @@ public partial class EntityMapPropertiesTests : StepTestBase<EntityMapProperties
                 {
                     Action = new LambdaFunction<Entity, Unit>(
                         null,
-                        new Log<Entity> { Value = GetEntityVariable }
+                        new Log { Value = GetEntityVariable }
                     ),
                     Array =
                         new EntityMapProperties
@@ -108,7 +108,7 @@ public partial class EntityMapPropertiesTests : StepTestBase<EntityMapProperties
                 {
                     Action = new LambdaFunction<Entity, Unit>(
                         null,
-                        new Log<Entity> { Value = GetEntityVariable }
+                        new Log { Value = GetEntityVariable }
                     ),
                     Array =
                         new EntityMapProperties

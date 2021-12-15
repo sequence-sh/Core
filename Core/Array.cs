@@ -276,13 +276,7 @@ public abstract record Array<T> : IArray where T : ISCLObject
     }
 
     /// <inheritdoc />
-    public Maybe<T1> MaybeAs<T1>() where T1 : ISCLObject
-    {
-        if (this is T1 value)
-            return value;
-
-        return Maybe<T1>.None;
-    }
+    public abstract Maybe<T1> MaybeAs<T1>() where T1 : ISCLObject;
 
     /// <inheritdoc />
     public SchemaNode ToSchemaNode(

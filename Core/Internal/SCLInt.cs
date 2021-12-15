@@ -12,15 +12,16 @@ public readonly record struct SCLInt(int Value) : IComparableSCLObject
     public TypeReference GetTypeReference() => TypeReference.Actual.Integer;
 
     /// <inheritdoc />
-    public int CompareTo(IComparableSCLObject? other) => other switch
+    public int CompareTo(object? obj) => obj switch
     {
         null                => Value.CompareTo(null),
         SCLDouble sclDouble => Value.CompareTo(sclDouble.Value),
         SCLInt sclInt       => Value.CompareTo(sclInt.Value),
-        _ => StringComparer.Ordinal.Compare(
+        ISCLObject other => StringComparer.Ordinal.Compare(
             Serialize(SerializeOptions.Primitive),
             other.Serialize(SerializeOptions.Primitive)
-        )
+        ),
+        _ => Value.CompareTo(null)
     };
 
     /// <inheritdoc />
@@ -34,9 +35,6 @@ public readonly record struct SCLInt(int Value) : IComparableSCLObject
 
         if (new SCLDouble(Value) is T vDouble)
             return vDouble;
-
-        if (new StringStream(Serialize(SerializeOptions.Primitive)) is T vString)
-            return vString;
 
         return Maybe<T>.None;
     }

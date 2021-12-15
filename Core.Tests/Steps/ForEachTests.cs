@@ -13,7 +13,7 @@ public partial class ForEachTests : StepTestBase<ForEach<SCLInt>, Unit>
                 {
                     Action = new LambdaFunction<SCLInt, Unit>(
                         null,
-                        new Log<SCLInt> { Value = GetVariable<SCLInt>(VariableName.Item) }
+                        new Log { Value = GetVariable<SCLInt>(VariableName.Item) }
                     ),
                     Array = Array(3, 2, 1)
                 },
@@ -29,7 +29,7 @@ public partial class ForEachTests : StepTestBase<ForEach<SCLInt>, Unit>
                 {
                     Action = new LambdaFunction<SCLInt, Unit>(
                         new VariableName("Foo"),
-                        new Log<SCLInt> { Value = GetVariable<SCLInt>("Foo") }
+                        new Log { Value = GetVariable<SCLInt>("Foo") }
                     ),
                     Array = Array(3, 2, 1),
                 },

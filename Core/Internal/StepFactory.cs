@@ -170,16 +170,6 @@ public abstract class StepFactory : IStepFactory
 
         foreach (var (stepMember, propertyInfo) in pairs)
         {
-            var nestedCallerMetadata =
-                new CallerMetadata(
-                    TypeName,
-                    propertyInfo.Name,
-                    TypeReference.Create(
-                        propertyInfo.PropertyType.GenericTypeArguments.FirstOrDefault()
-                     ?? typeof(object)
-                    )
-                );
-
             remainingRequired.Remove(propertyInfo.Name);
 
             var result = stepMember switch
@@ -198,7 +188,6 @@ public abstract class StepFactory : IStepFactory
                     typeResolver
                 ),
                 FreezableStepProperty.StepList sList => TrySetStepList(
-                    nestedCallerMetadata,
                     propertyInfo,
                     step,
                     sList,
@@ -315,12 +304,16 @@ public abstract class StepFactory : IStepFactory
             );
         }
 
+        var expectedType = TypeReference.CreateFromStepType(propertyInfo.PropertyType);
+
+        var callerMetadata = new CallerMetadata(
+            parentStep.Name,
+            propertyInfo.Name,
+            expectedType
+        );
+
         var freezeResult = freezableStep.TryFreeze(
-            new CallerMetadata(
-                parentStep.Name,
-                propertyInfo.Name,
-                TypeReference.CreateFromStepType(propertyInfo.PropertyType)
-            ),
+            callerMetadata,
             typeResolver
         );
 
@@ -344,7 +337,6 @@ public abstract class StepFactory : IStepFactory
     }
 
     private static Result<Unit, IError> TrySetStepList(
-        CallerMetadata callerMetadata,
         PropertyInfo propertyInfo,
         ICompoundStep parentStep,
         FreezableStepProperty.StepList stepList,
@@ -361,7 +353,7 @@ public abstract class StepFactory : IStepFactory
              && typeof(IArray).IsAssignableFrom(stepType))
                 return SetArray(stepType);
 
-            if (stepType.GetInterfaces().Contains(typeof(IOneOf)))
+            if (stepType.GetInterfaces().Contains(typeof(ISCLOneOf)))
             {
                 foreach (var optionType in stepType.GenericTypeArguments)
                 {
@@ -376,18 +368,24 @@ public abstract class StepFactory : IStepFactory
                 }
             }
 
-            return callerMetadata.GetWrongTypeError(
-                stepList.ConvertToStep().StepName,
-                "Array/Sequence",
-                new ErrorLocation(parentStep.Name, parentStep.TextLocation)
-            );
+            return ErrorCode.WrongType.ToErrorBuilder(
+                    parentStep.Name,
+                    TypeReference.CreateFromStepType(stepType).Name,
+                    propertyInfo.Name,
+                    stepList.ConvertToStep().StepName,
+                    "Array/Sequence"
+                )
+                .WithLocationSingle(new ErrorLocation(parentStep.Name, parentStep.TextLocation));
         }
 
-        return callerMetadata.GetWrongTypeError(
-            stepList.ConvertToStep().StepName,
-            nameof(VariableName),
-            new ErrorLocation(parentStep.Name, parentStep.TextLocation)
-        );
+        return ErrorCode.WrongType.ToErrorBuilder(
+                parentStep.Name,
+                nameof(VariableName),
+                propertyInfo.Name,
+                stepList.ConvertToStep().StepName,
+                "Array/Sequence"
+            )
+            .WithLocationSingle(new ErrorLocation(parentStep.Name, parentStep.TextLocation));
 
         Result<Unit, IError> SetStepList()
         {
@@ -465,8 +463,10 @@ public abstract class StepFactory : IStepFactory
                 TypeReference.Create(nestedArgument)
             );
 
-            foreach (var freezableStep in stepList.List)
+            for (var index = 0; index < stepList.List.Count; index++)
             {
+                var freezableStep = stepList.List[index];
+
                 var freezeResult = freezableStep.TryFreeze(
                     nestedCallerMetadata,
                     typeResolver
@@ -480,13 +480,15 @@ public abstract class StepFactory : IStepFactory
                 }
                 else
                 {
-                    var error = ErrorCode.InvalidCast.ToErrorBuilder(
-                            parentStep.StepFactory.TypeName,
-                            CompressSpaces(freezeResult.Value.Name)
-                        )
-                        .WithLocation(parentStep);
+                    var propertyName =
+                        $"{parentStep.StepFactory.TypeName}.{propertyInfo.Name}[{index}]";
 
-                    errors.Add(error);
+                    var coercedValue = freezeResult.Value.TryCoerce(propertyName, stepType);
+
+                    if (coercedValue.IsSuccess)
+                        addMethod.Invoke(list, new object?[] { coercedValue.Value });
+                    else
+                        errors.Add(coercedValue.Error.WithLocation(parentStep));
                 }
             }
 
@@ -536,7 +538,10 @@ public abstract class StepFactory : IStepFactory
         }
         catch (ArgumentException e)
         {
-            if (e.Message.Contains("violates the constraint of type"))
+            if (e.Message.Contains("violates the constraint of type") && e.Message.Contains(
+                    "comparable",
+                    StringComparison.OrdinalIgnoreCase
+                ))
             {
                 var parameterTypeName = parameterType.GetDisplayName();
                 return new ErrorBuilder(ErrorCode.TypeNotComparable, parameterTypeName);
