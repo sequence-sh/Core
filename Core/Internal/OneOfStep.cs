@@ -19,6 +19,11 @@ public abstract class OneOfStep : IStep
     }
 
     /// <inheritdoc />
+    public Task<Result<ISCLObject, IError>> RunUntyped(
+        IStateMonad stateMonad,
+        CancellationToken cancellationToken) => StepValue.RunUntyped(stateMonad, cancellationToken);
+
+    /// <inheritdoc />
     public string Name => StepValue.Name;
 
     /// <inheritdoc />

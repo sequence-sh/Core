@@ -493,7 +493,7 @@ public partial class ValidateTests : StepTestBase<Validate, Array<Entity>>
 
         var entity = schema.ConvertToEntity();
 
-        var name = entity.TryGetValue("Title").Map(x => x.Serialize(SerializeOptions.Serialize));
+        var name = entity.TryGetValue("Title").Map(x => x.Serialize(SerializeOptions.Primitive));
 
         name.HasValue.Should().BeTrue();
 

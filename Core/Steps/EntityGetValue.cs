@@ -15,11 +15,6 @@ namespace Reductech.EDR.Core.Steps;
     IncludeInDocumentation = false,
     ExpectedLogs = new[] { "1", "2", "3" }
 )]
-[SCLExample(
-    "- <myVar> = ('a':[1,2,3])['a']\r\n- <myVar> | Foreach (log (<> + 1))",
-    IncludeInDocumentation = false,
-    ExpectedLogs = new[] { "2", "3", "4" }
-)]
 public sealed class EntityGetValue<T> : CompoundStep<T> where T : ISCLObject
 {
     /// <inheritdoc />

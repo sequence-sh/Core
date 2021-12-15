@@ -10,7 +10,7 @@ public sealed class Print : CompoundStep<Unit>
         IStateMonad stateMonad,
         CancellationToken cancellationToken)
     {
-        var r = await Value.Run<ISCLObject>(stateMonad, cancellationToken);
+        var r = await Value.RunUntyped(stateMonad, cancellationToken);
 
         if (r.IsFailure)
             return r.ConvertFailure<Unit>();

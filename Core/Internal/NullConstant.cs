@@ -22,8 +22,18 @@ public class NullConstant : IConstantStep, IConstantFreezableStep, IStep<SCLNull
         CancellationToken cancellationToken) where T : ISCLObject
     {
         await Task.CompletedTask;
-        return Result.Success<T, IError>(default!);
+
+        var r = SCLNull.Instance.TryConvert<T>()
+            .MapError(x => x.WithLocation(TextLocation ?? ErrorLocation.EmptyLocation));
+
+        return r;
     }
+
+    /// <inheritdoc />
+    public Task<Result<ISCLObject, IError>> RunUntyped(
+        IStateMonad stateMonad,
+        CancellationToken cancellationToken) =>
+        Run(stateMonad, cancellationToken).Map(x => x as ISCLObject);
 
     /// <inheritdoc />
     public Result<Unit, IError> Verify(StepFactoryStore stepFactoryStore)

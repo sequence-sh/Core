@@ -8,7 +8,7 @@ namespace Reductech.EDR.Core.TestHarness;
 /// </summary>
 public interface ICaseThatExecutes : IAsyncTestInstance, ICaseWithSetup
 {
-    Dictionary<VariableName, object> ExpectedFinalState { get; }
+    Dictionary<VariableName, ISCLObject> ExpectedFinalState { get; }
 
     public bool IgnoreFinalState { get; set; }
 

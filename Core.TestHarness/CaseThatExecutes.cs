@@ -174,7 +174,7 @@ public abstract partial class StepTestBase<TStep, TOutput>
 
         public LogLevel CheckLogLevel { get; set; } = LogLevel.Information;
 
-        public Dictionary<VariableName, object> ExpectedFinalState { get; } = new();
+        public Dictionary<VariableName, ISCLObject> ExpectedFinalState { get; } = new();
         public string Name { get; set; } = Name;
 
         public IReadOnlyCollection<string> ExpectedLoggedValues { get; set; } =

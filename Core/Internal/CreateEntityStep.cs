@@ -30,6 +30,12 @@ public record CreateEntityStep
     }
 
     /// <inheritdoc />
+    public Task<Result<ISCLObject, IError>> RunUntyped(
+        IStateMonad stateMonad,
+        CancellationToken cancellationToken) =>
+        Run(stateMonad, cancellationToken).Map(x => x as ISCLObject);
+
+    /// <inheritdoc />
     public string Name => "Create Entity";
 
     /// <inheritdoc />

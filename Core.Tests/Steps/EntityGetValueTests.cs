@@ -92,7 +92,7 @@ public partial class EntityGetValueTypeTests : StepTestBase<AssertTrue, Unit>
 
             yield return new StepCase(
                 "Get Simple Property (Empty)",
-                GetTestCase(Constant("null"), TheEntity, "Empty"),
+                GetTestCase(new SCLConstant<SCLNull>(SCLNull.Instance), TheEntity, "Empty"),
                 Unit.Default
             );
 
