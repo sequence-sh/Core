@@ -240,7 +240,16 @@ public abstract class StepFactory : IStepFactory
         FreezableStepProperty.Lambda lambda,
         TypeResolver typeResolver)
     {
-        var typeToSet          = propertyInfo.PropertyType;
+        var typeToSet = propertyInfo.PropertyType;
+
+        if (!typeToSet.IsGenericType)
+            return ErrorCode.InvalidCast
+                .ToErrorBuilder(
+                    $"{parentStep.StepFactory.TypeName}.{propertyInfo.Name}",
+                    nameof(MemberType.Lambda)
+                )
+                .WithLocationSingle(lambda.Location);
+
         var inputTypeArgument  = typeToSet.GenericTypeArguments[0];
         var inputTypeReference = TypeReference.Create(inputTypeArgument);
 
@@ -499,7 +508,7 @@ public abstract class StepFactory : IStepFactory
 
             if (propertyInfo.PropertyType.GenericTypeArguments[0]
                 .GetInterfaces()
-                .Contains(typeof(IOneOf)))
+                .Contains(typeof(ISCLOneOf)))
             {
                 stepToSet = OneOfStep.Create(
                     propertyInfo.PropertyType.GenericTypeArguments[0],
@@ -507,7 +516,15 @@ public abstract class StepFactory : IStepFactory
                 );
             }
 
-            propertyInfo.SetValue(parentStep, stepToSet);
+            try
+            {
+                propertyInfo.SetValue(parentStep, stepToSet);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
 
             return Unit.Default;
         }

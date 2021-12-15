@@ -7,6 +7,12 @@ namespace Reductech.EDR.Core.Tests.Steps;
 
 public partial class DocumentationCreateTests : StepTestBase<DocumentationCreate, Entity>
 {
+    public const string NotFileText =
+        "## Not _Alias_:`Not`\n\n_Output_:`SCLBool`\n\nNegation of a boolean value. \n\n|Parameter|Type |Required|Position|Summary | |:--------|:-------:|:------:|:------:|:-------------------|\n|Boolean |`SCLBool`|✔ |1 |The value to negate.| \n\n|Example SCL|Expected Output| |:----------|:-------------:| |Not true |False | |Not false |True |";
+
+    public const string ExampleFileText =
+        "## DocumentationExampleStep _Alias_:`DocumentationExampleStep`\n\n_Output_:`StringStream`\n\n*Requires ValueIf Library.Version 1.2* \n\n|Parameter |Type |Required|Position|Allowed Range |Default Value|Example|Recommended Range|Recommended Value|Requirements|See Also|URL |Value Delimiter|Summary|\n|:---------------|:-------------:|:------:|:------:|:------------:|:-----------:|:-----:|:---------------:|:---------------:|:----------:|:------:|:----------------:|:-------------:|:------|\n|Alpha<br/>_Alef_|`SCLInt` |✔ |1 |Greater than 1| |1234 |100-300 |201 |Greek 2.1 |Beta |[Alpha](alpha.com)| | |\n|Beta |`string` | |2 | |Two hundred | | | | |Alpha | | | |\n|Gamma |`VariableName` | |3 | | | | | | | | | | |\n|Delta |List<`SCLBool`>| |4 | | | | | | | | |, | |";
+
     /// <inheritdoc />
     protected override IEnumerable<StepCase> StepCases
     {
@@ -113,18 +119,18 @@ public partial class DocumentationCreateTests : StepTestBase<DocumentationCreate
             var notStepPage = new StepPage(
                 "Not.md",
                 "Not",
-                "## Not _Alias_:`Not`\n\n_Output_:`Boolean`\n\nNegation of a boolean value.\n\n\n|Parameter|Type |Required|Position|Summary |\n|:--------|:----:|:------:|:------:|:-------------------|\n|Boolean |`bool`|✔ |1 |The value to negate.|\n\n\n|Example SCL|Expected Output|\n|:----------|:-------------:|\n|Not true |False |\n|Not false |True |",
+                NotFileText,
                 "Core",
                 "Core",
                 "Not",
                 new List<string>() { "Not" },
                 "Negation of a boolean value.",
-                "Boolean",
+                "SCLBool",
                 new List<StepParameter>()
                 {
                     new(
                         "Boolean",
-                        "bool",
+                        "SCLBool",
                         "The value to negate.",
                         true,
                         new List<string>()
@@ -172,7 +178,7 @@ public partial class DocumentationCreateTests : StepTestBase<DocumentationCreate
             var documentationStepPage = new StepPage(
                 "DocumentationExampleStep.md",
                 "DocumentationExampleStep",
-                "## DocumentationExampleStep _Alias_:`DocumentationExampleStep`\n\n_Output_:`StringStream`\n\n*Requires ValueIf Library.Version 1.2*\n\n\n|Parameter |Type |Required|Position|Allowed Range |Default Value|Example|Recommended Range|Recommended Value|Requirements|See Also|URL |Value Delimiter|Summary|\n|:---------------|:------------:|:------:|:------:|:------------:|:-----------:|:-----:|:---------------:|:---------------:|:----------:|:------:|:----------------:|:-------------:|:------|\n|Alpha<br/>_Alef_|`int` |✔ |1 |Greater than 1| |1234 |100-300 |201 |Greek 2.1 |Beta |[Alpha](alpha.com)| | |\n|Beta |`string` | |2 | |Two hundred | | | | |Alpha | | | |\n|Gamma |`VariableName`| |3 | | | | | | | | | | |\n|Delta |List<`bool`> | |4 | | | | | | | | |, | |",
+                ExampleFileText,
                 "Examples",
                 "Examples",
                 "DocumentationExampleStep",
@@ -183,7 +189,7 @@ public partial class DocumentationCreateTests : StepTestBase<DocumentationCreate
                 {
                     new StepParameter(
                         "Alpha",
-                        "int",
+                        "SCLInt",
                         "",
                         true,
                         new[] { "Alef" }
@@ -204,7 +210,7 @@ public partial class DocumentationCreateTests : StepTestBase<DocumentationCreate
                     ),
                     new StepParameter(
                         "Delta",
-                        "List<bool>",
+                        "List<SCLBool>",
                         "",
                         false,
                         new List<string>()

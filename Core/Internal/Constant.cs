@@ -15,6 +15,12 @@ public sealed record SCLConstant<T>(T Value) : IStep<T>, IConstantStep where T :
     }
 
     /// <inheritdoc />
+    public Task<Result<ISCLObject, IError>> RunUntyped(
+        IStateMonad stateMonad,
+        CancellationToken cancellationToken) =>
+        Run(stateMonad, cancellationToken).Map(x => x as ISCLObject);
+
+    /// <inheritdoc />
     public string Name => Value.Serialize(SerializeOptions.Primitive);
 
     /// <inheritdoc />

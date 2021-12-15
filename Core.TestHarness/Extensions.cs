@@ -5,13 +5,12 @@ namespace Reductech.EDR.Core.TestHarness;
 
 public static class Extensions
 {
-    public static T WithExpectedFinalState<T>(this T cws, string variableName, object value)
+    public static T WithExpectedFinalState<T>(this T cws, string variableName, object? value)
         where T : ICaseThatExecutes
     {
-        if (value is string s)
-            value = new StringStream(s);
+        var sclObject = ISCLObject.CreateFromCSharpObject(value);
 
-        cws.ExpectedFinalState.Add(new VariableName(variableName), value);
+        cws.ExpectedFinalState.Add(new VariableName(variableName), sclObject);
         return cws;
     }
 
@@ -55,7 +54,7 @@ public static class Extensions
 
         foreach (var parameter in request.Parameters.Where(p => p.Type == ParameterType.UrlSegment))
         {
-            string oldValue = "{" + parameter.Name + "}";
+            var oldValue = "{" + parameter.Name + "}";
 
             resource = resource.Replace(oldValue, parameter.Value?.ToString());
         }

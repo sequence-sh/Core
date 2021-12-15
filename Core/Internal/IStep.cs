@@ -12,9 +12,18 @@ public interface IStep
 
     /// <summary>
     /// Run this step and return the result, assuming it is the specified type.
+    /// Does not activate the logging
     /// </summary>
     Task<Result<T, IError>> Run<T>(IStateMonad stateMonad, CancellationToken cancellationToken)
         where T : ISCLObject;
+
+    /// <summary>
+    /// Run this step and return the result, assuming it is the specified type.
+    /// Logs data about the step.
+    /// </summary>
+    Task<Result<ISCLObject, IError>> RunUntyped(
+        IStateMonad stateMonad,
+        CancellationToken cancellationToken);
 
     /// <summary>
     /// Verify that this step can be run with the current settings.

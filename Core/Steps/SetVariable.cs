@@ -72,13 +72,9 @@ public sealed class SetVariable<T> : CompoundStep<Unit> where T : ISCLObject
             if (vn.IsFailure)
                 return vn.ConvertFailure<TypeReference>();
 
-            if (valueType.Value.Allow(vn.Value, typeResolver))
-                return vn.Value;
+            var combinedType = valueType.Value.TryCombine(vn.Value, typeResolver);
 
-            return Result.Failure<TypeReference, IError>(
-                ErrorCode.WrongVariableType.ToErrorBuilder(vn.Value.Name, valueType.Value.Name)
-                    .WithLocation(freezableStepData)
-            );
+            return combinedType.MapError(x => x.WithLocation(freezableStepData));
         }
 
         private Result<TypeReference, IError> GetValueType(

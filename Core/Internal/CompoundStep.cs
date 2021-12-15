@@ -16,6 +16,17 @@ public abstract class CompoundStep<T> : ICompoundStep<T> where T : ISCLObject
         CancellationToken cancellationToken);
 
     /// <inheritdoc />
+    public async Task<Result<ISCLObject, IError>> RunUntyped(
+        IStateMonad stateMonad,
+        CancellationToken cancellationToken)
+    {
+        var r = await (this as IRunnableStep<T>).Run(stateMonad, cancellationToken)
+            .Map(x => x as ISCLObject);
+
+        return r;
+    }
+
+    /// <inheritdoc />
     async Task<Result<T, IError>> IRunnableStep<T>.Run(
         IStateMonad stateMonad,
         CancellationToken cancellationToken)
