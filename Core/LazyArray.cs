@@ -207,6 +207,15 @@ public sealed record LazyArray<T>
     }
 
     /// <inheritdoc />
+    public override Maybe<T1> MaybeAs<T1>()
+    {
+        if (this is T1 value)
+            return value;
+
+        return Maybe<T1>.None;
+    }
+
+    /// <inheritdoc />
     public override string ToString() => Serialize(SerializeOptions.Name);
 
     /// <inheritdoc />

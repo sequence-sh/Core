@@ -3,4 +3,5 @@
 /// <summary>
 /// A comparable SCL object
 /// </summary>
-public interface IComparableSCLObject : ISCLObject, IComparable<IComparableSCLObject> { }
+public interface
+    IComparableSCLObject : ISCLObject, IComparable { }

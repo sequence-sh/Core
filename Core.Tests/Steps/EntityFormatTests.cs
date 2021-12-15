@@ -76,7 +76,7 @@ public partial class EntityFormatTests : StepTestBase<EntityFormat, StringStream
         {
             yield return new StepCase(
                 "Format Simple Entity",
-                new Log<StringStream>()
+                new Log()
                 {
                     Value = new EntityFormat()
                     {
@@ -98,7 +98,7 @@ public partial class EntityFormatTests : StepTestBase<EntityFormat, StringStream
 
             yield return new StepCase(
                 "Format Complex entity",
-                new Log<StringStream>()
+                new Log()
                 {
                     Value = new EntityFormat()
                     {

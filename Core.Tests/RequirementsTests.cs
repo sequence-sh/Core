@@ -9,7 +9,7 @@ public partial class RequirementsTests
     [Fact]
     public void BasicStepShouldHaveNoRequirements()
     {
-        var step = new Print<SCLInt>() { Value = new Sum() { Terms = Array(1, 2, 3) } };
+        var step = new Print() { Value = new Sum() { Terms = Array(1, 2, 3) } };
 
         var requirements = step.GetAllRequirements().ToList();
 
@@ -34,7 +34,7 @@ public partial class RequirementsTests
     [Fact]
     public void FixedRequirementsStepShouldHaveRequirementsEvenWhenNested()
     {
-        var step = new Print<SCLInt>() { Value = new FixedRequirementsStep() };
+        var step = new Print() { Value = new FixedRequirementsStep() };
 
         var requirements = step.GetAllRequirements().ToList();
 
@@ -69,10 +69,7 @@ public partial class RequirementsTests
     [Fact]
     public void NestedRuntimeRequirementsStepShouldHaveRequirements()
     {
-        var step = new Print<SCLInt>()
-        {
-            Value = new RuntimeRequirementsStep() { BaseStep = Constant(1) }
-        };
+        var step = new Print() { Value = new RuntimeRequirementsStep() { BaseStep = Constant(1) } };
 
         var requirements = step.GetAllRequirements().ToList();
 

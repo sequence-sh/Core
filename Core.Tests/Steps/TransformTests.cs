@@ -42,7 +42,7 @@ public partial class TransformTests : StepTestBase<Transform, Array<Entity>>
                     {
                         Action = new LambdaFunction<Entity, Unit>(
                             null,
-                            new Log<Entity> { Value = GetEntityVariable }
+                            new Log { Value = GetEntityVariable }
                         ),
                         Array = transform
                     },
@@ -215,7 +215,7 @@ public partial class TransformTests : StepTestBase<Transform, Array<Entity>>
                             {
                                 Action = new LambdaFunction<Entity, Unit>(
                                     null,
-                                    new Log<Entity> { Value = GetEntityVariable }
+                                    new Log { Value = GetEntityVariable }
                                 ),
                                 Array = enforceSchema,
                             }

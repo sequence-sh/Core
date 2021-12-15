@@ -302,15 +302,13 @@ public abstract record TypeReference
                 if (types.Contains(typeof(SCLInt)) && types.Contains(typeof(SCLDouble)))
                     return typeof(SCLDouble);
 
-                genericOneOfType = typeof(OneOf<,>);
+                genericOneOfType = typeof(SCLOneOf<,>);
             }
 
             else if (types.Count == 3)
-                genericOneOfType = typeof(OneOf<,,>);
+                genericOneOfType = typeof(SCLOneOf<,,>);
             else if (types.Count == 4)
-                genericOneOfType = typeof(OneOf<,,,>);
-            else if (types.Count == 5)
-                genericOneOfType = typeof(OneOf<,,,,>);
+                genericOneOfType = typeof(SCLOneOf<,,,>);
             else
                 throw new Exception($"Cannot create a OneOf with {types.Count} type arguments");
 
@@ -612,7 +610,7 @@ public abstract record TypeReference
                 return new Array(nestedReference);
             }
 
-            if (t.GetInterfaces().Contains(typeof(IOneOf)))
+            if (t.GetInterfaces().Contains(typeof(ISCLOneOf)))
             {
                 var nestedTypeReferences =
                     t.GenericTypeArguments.Select(Create).ToArray();
@@ -637,6 +635,7 @@ public abstract record TypeReference
             nameof(SCLNull)      => Actual.Null,
             nameof(Unit)         => Unit.Instance,
             nameof(Entity)       => Actual.Entity,
+            nameof(ISCLObject)   => Any.Instance,
             _                    => Unknown.Instance
         };
     }

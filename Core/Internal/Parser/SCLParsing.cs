@@ -343,15 +343,14 @@ public static class SCLParsing
             if (context.children.Count != 3 || context.NAME().Length != 2)
                 return ParseError(context);
 
-            var prefix = context.NAME(0).GetText(); //TODO use prefix
+            var prefix = context.NAME(0).GetText();
             var suffix = context.NAME(1).GetText();
 
             var location = new TextLocation(context);
 
             var member = new FreezableStepProperty.Step(
-                new SCLConstantFreezable<StringStream>(suffix, location),
+                new EnumConstantFreezable(prefix, suffix, location),
                 location
-                //new EnumConstantFreezable(Enumeration(prefix, suffix), location),
             );
 
             return member;

@@ -14,11 +14,11 @@ public partial class DocumentationCreateTests : StepTestBase<DocumentationCreate
         {
             yield return new StepCase(
                 "Generate Everything",
-                new Log<Entity>() { Value = new DocumentationCreate() },
+                new Log() { Value = new DocumentationCreate() },
                 Unit.Default
             ) { IgnoreLoggedValues = true };
 
-            var logDocumentation = new Log<Entity> { Value = new DocumentationCreate() };
+            var logDocumentation = new Log { Value = new DocumentationCreate() };
 
             static MainContents Contents(
                 string category,
@@ -249,7 +249,7 @@ public partial class DocumentationCreateTests : StepTestBase<DocumentationCreate
                 Action =
                     new LambdaFunction<Entity, Unit>(
                         null,
-                        new Log<StringStream>()
+                        new Log()
                         {
                             Value =
                                 new EntityGetValue<StringStream>()

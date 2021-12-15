@@ -137,7 +137,7 @@ public sealed class SCLRunner
 
     private static IStep<Unit> SurroundWithLog<T>(IStep<T> step) where T : ISCLObject
     {
-        var p = new Log<T> { Value = step };
+        var p = new Log { Value = step };
 
         return p;
     }

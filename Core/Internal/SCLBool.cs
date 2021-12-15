@@ -3,7 +3,7 @@
 /// <summary>
 /// A boolean in the SCL type system
 /// </summary>
-public sealed record SCLBool : ISCLObject
+public sealed record SCLBool : IComparableSCLObject
 {
     private SCLBool() { }
 
@@ -42,9 +42,6 @@ public sealed record SCLBool : ISCLObject
         if (this is T vBool)
             return vBool;
 
-        if (new StringStream(Serialize(SerializeOptions.Primitive)) is T vString)
-            return vString;
-
         return Maybe<T>.None;
     }
 
@@ -62,4 +59,16 @@ public sealed record SCLBool : ISCLObject
     /// Explicit operator
     /// </summary>
     public static explicit operator SCLBool(bool b) => Create(b);
+
+    /// <inheritdoc />
+    public int CompareTo(object? obj) => obj switch
+    {
+        null            => Value.CompareTo(null),
+        SCLBool sclBool => Value.CompareTo(sclBool.Value),
+        ISCLObject other => StringComparer.Ordinal.Compare(
+            Serialize(SerializeOptions.Primitive),
+            other.Serialize(SerializeOptions.Primitive)
+        ),
+        _ => Value.CompareTo(null)
+    };
 }

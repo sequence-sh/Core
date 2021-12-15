@@ -13,7 +13,7 @@ public partial class ForTests : StepTestBase<For, Unit>
                 {
                     Action = new LambdaFunction<SCLInt, Unit>(
                         null,
-                        new Log<SCLInt> { Value = GetVariable<SCLInt>(VariableName.Item) }
+                        new Log { Value = GetVariable<SCLInt>(VariableName.Item) }
                     ),
                     From      = Constant(1),
                     To        = Constant(3),
@@ -31,7 +31,7 @@ public partial class ForTests : StepTestBase<For, Unit>
                 {
                     Action = new LambdaFunction<SCLInt, Unit>(
                         null,
-                        new Log<SCLInt> { Value = GetVariable<SCLInt>(VariableName.Item) }
+                        new Log { Value = GetVariable<SCLInt>(VariableName.Item) }
                     ),
                     From      = Constant(1),
                     To        = Constant(6),
@@ -49,7 +49,7 @@ public partial class ForTests : StepTestBase<For, Unit>
                 {
                     Action = new LambdaFunction<SCLInt, Unit>(
                         null,
-                        new Log<SCLInt> { Value = GetVariable<SCLInt>(VariableName.Item) }
+                        new Log { Value = GetVariable<SCLInt>(VariableName.Item) }
                     ),
                     From      = Constant(3),
                     To        = Constant(1),
@@ -67,7 +67,7 @@ public partial class ForTests : StepTestBase<For, Unit>
                 {
                     Action = new LambdaFunction<SCLInt, Unit>(
                         null,
-                        new Log<SCLInt> { Value = GetVariable<SCLInt>(VariableName.Item) }
+                        new Log { Value = GetVariable<SCLInt>(VariableName.Item) }
                     ),
                     From      = Constant(3),
                     To        = Constant(1),
@@ -105,7 +105,7 @@ public partial class ForTests : StepTestBase<For, Unit>
                     {
                         Action = new LambdaFunction<SCLInt, Unit>(
                             null,
-                            new Log<SCLInt> { Value = GetVariable<SCLInt>(VariableName.Item) }
+                            new Log { Value = GetVariable<SCLInt>(VariableName.Item) }
                         ),
                         From      = Constant(1),
                         To        = Constant(3),

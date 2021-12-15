@@ -9,7 +9,7 @@ public partial class GetAutomaticVariableTests : StepTestBase<GetAutomaticVariab
         {
             yield return new StepCase(
                 "Basic use",
-                new Log<SCLInt>
+                new Log
                 {
                     Value = new ArrayElementAtIndex<SCLInt>
                     {
@@ -38,7 +38,7 @@ public partial class GetAutomaticVariableTests : StepTestBase<GetAutomaticVariab
 
             yield return new StepCase(
                 "Basic use with different variable name",
-                new Log<SCLInt>()
+                new Log()
                 {
                     Value = new ArrayElementAtIndex<SCLInt>()
                     {
@@ -69,7 +69,7 @@ public partial class GetAutomaticVariableTests : StepTestBase<GetAutomaticVariab
 
             yield return new StepCase(
                 "Nested",
-                new Log<SCLInt>()
+                new Log()
                 {
                     Value = new ArrayElementAtIndex<SCLInt>()
                     {

@@ -16,7 +16,7 @@ public partial class ArrayDistinctTests : StepTestBase<ArrayDistinct<Entity>, Ar
                 {
                     Action = new LambdaFunction<Entity, Unit>(
                         foreachVar,
-                        new Log<Entity> { Value = GetVariable<Entity>(foreachVar) }
+                        new Log { Value = GetVariable<Entity>(foreachVar) }
                     ),
                     Array = new ArrayDistinct<Entity>
                     {
@@ -49,7 +49,7 @@ public partial class ArrayDistinctTests : StepTestBase<ArrayDistinct<Entity>, Ar
                 {
                     Action = new LambdaFunction<Entity, Unit>(
                         VariableName.Item,
-                        new Log<Entity> { Value = GetEntityVariable }
+                        new Log { Value = GetEntityVariable }
                     ),
                     Array = new ArrayDistinct<Entity>
                     {

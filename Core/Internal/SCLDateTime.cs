@@ -20,9 +20,6 @@ public sealed record SCLDateTime(DateTime Value) : ISCLObject
         if (this is T vBool)
             return vBool;
 
-        if (new StringStream(Serialize(SerializeOptions.Primitive)) is T vString)
-            return vString;
-
         return Maybe<T>.None;
     }
 

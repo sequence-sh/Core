@@ -9,7 +9,7 @@ public partial class DoXTimesTests : StepTestBase<DoXTimes, Unit>
         {
             yield return new StepCase(
                 "Log something three times",
-                new DoXTimes { Action = new Log<SCLInt> { Value = Constant(6) }, X = Constant(3) },
+                new DoXTimes { Action = new Log { Value = Constant(6) }, X = Constant(3) },
                 Unit.Default,
                 "6",
                 "6",
@@ -24,9 +24,9 @@ public partial class DoXTimesTests : StepTestBase<DoXTimes, Unit>
                     {
                         InitialSteps = new List<IStep<Unit>>()
                         {
-                            new Log<SCLInt> { Value = Constant(3) },
+                            new Log { Value = Constant(3) },
                         },
-                        FinalStep = new Log<SCLInt> { Value = Constant(3) },
+                        FinalStep = new Log { Value = Constant(3) },
                     },
                     X = Constant(3)
                 },

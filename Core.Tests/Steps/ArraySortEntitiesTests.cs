@@ -28,7 +28,7 @@ public partial class ArraySortEntitiesTests : StepTestBase<ArraySort<Entity>, Ar
                     },
                     Action = new LambdaFunction<Entity, Unit>(
                         null,
-                        new Log<Entity> { Value = GetEntityVariable }
+                        new Log { Value = GetEntityVariable }
                     ),
                 },
                 Unit.Default,
@@ -59,7 +59,7 @@ public partial class ArraySortEntitiesTests : StepTestBase<ArraySort<Entity>, Ar
                     },
                     Action = new LambdaFunction<Entity, Unit>(
                         null,
-                        new Log<Entity> { Value = GetEntityVariable }
+                        new Log { Value = GetEntityVariable }
                     )
                 },
                 Unit.Default,
@@ -91,7 +91,7 @@ public partial class ArraySortEntitiesTests : StepTestBase<ArraySort<Entity>, Ar
                     },
                     Action = new LambdaFunction<Entity, Unit>(
                         null,
-                        new Log<Entity> { Value = GetEntityVariable }
+                        new Log { Value = GetEntityVariable }
                     ),
                 },
                 Unit.Default,

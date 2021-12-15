@@ -21,7 +21,7 @@ public sealed class ArrayIsEmpty<T> : CompoundStep<SCLBool> where T : ISCLObject
     {
         return await Array.Run(stateMonad, cancellationToken)
             .Bind(x => x.AnyAsync(cancellationToken))
-            .Map(x => x.ConvertToSCLObject());
+            .Map(x => (!x).ConvertToSCLObject());
     }
 
     /// <inheritdoc />

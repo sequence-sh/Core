@@ -9,10 +9,7 @@ public partial class RunStepTests : StepTestBase<RunStep<Unit>, Unit>
         {
             yield return new StepCase(
                 "Test Print",
-                new RunStep<Unit>
-                {
-                    Step = new Log<StringStream> { Value = Constant("Hello World") }
-                },
+                new RunStep<Unit> { Step = new Log { Value = Constant("Hello World") } },
                 Unit.Default,
                 "Hello World"
             );

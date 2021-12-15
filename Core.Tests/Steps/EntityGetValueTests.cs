@@ -21,10 +21,10 @@ public partial class EntityGetValueTests : StepTestBase<EntityGetValue<StringStr
                 "Get Enum Property",
                 new EntityGetValue<StringStream>
                 {
-                    Entity   = Constant(Entity.Create(("Foo", Enums.TextCase.Lower))),
+                    Entity   = Constant(Entity.Create(("Foo", TextCase.Lower))),
                     Property = Constant("Foo")
                 },
-                "TextCase.Lower"
+                "Lower"
             );
 
             yield return new StepCase(

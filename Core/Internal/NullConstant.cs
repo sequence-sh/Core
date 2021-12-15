@@ -91,12 +91,6 @@ public class NullConstant : IConstantStep, IConstantFreezableStep, IStep<SCLNull
     public ISCLObject ValueObject => SCLNull.Instance;
 
     /// <inheritdoc />
-    string IConstantFreezableStep.Serialize()
-    {
-        return "null";
-    }
-
-    /// <inheritdoc />
     public bool Equals(IFreezableStep? other)
     {
         return other is NullConstant;

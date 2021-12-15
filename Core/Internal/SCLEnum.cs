@@ -37,14 +37,15 @@ public sealed record SCLEnum<T>(T Value) : ISCLEnum where T : struct, Enum
     public TypeReference GetTypeReference() => new TypeReference.Enum(typeof(T));
 
     /// <inheritdoc />
-    public int CompareTo(IComparableSCLObject? other) => other switch
+    public int CompareTo(object? obj) => obj switch
     {
         null                 => 0.CompareTo(null),
         SCLEnum<T> otherEnum => Value.CompareTo(otherEnum.Value),
-        _ => StringComparer.Ordinal.Compare(
+        ISCLObject other => StringComparer.Ordinal.Compare(
             Serialize(SerializeOptions.Primitive),
             other.Serialize(SerializeOptions.Primitive)
-        )
+        ),
+        _ => 0.CompareTo(null),
     };
 
     /// <inheritdoc />
@@ -52,9 +53,6 @@ public sealed record SCLEnum<T>(T Value) : ISCLEnum where T : struct, Enum
     {
         if (this is T1 vEnum)
             return vEnum;
-
-        if (new StringStream(Serialize(SerializeOptions.Primitive)) is T1 vString)
-            return vString;
 
         return Maybe<T1>.None;
     }

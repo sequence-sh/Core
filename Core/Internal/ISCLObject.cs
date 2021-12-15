@@ -30,26 +30,58 @@ public interface ISCLObject
         if (type.IsInstanceOfType(this))
             return Result.Success<ISCLObject, IErrorBuilder>(this);
 
-        var method  = GetType().GetMethod(nameof(TryConvertTyped))!;
+        var method = typeof(ISCLObject).GetMethod(
+            nameof(TryConvertTyped1),
+            BindingFlags.NonPublic | BindingFlags.Instance
+        )!;
+
         var generic = method.MakeGenericMethod(type);
         var result  = generic.Invoke(this, new object?[] { propertyName });
 
         return (Result<ISCLObject, IErrorBuilder>)result!;
     }
 
+    private Result<ISCLObject, IErrorBuilder> TryConvertTyped1<T>(string propertyName)
+        where T : ISCLObject
+    {
+        return TryConvertTyped<T>(propertyName).Map(x => x as ISCLObject);
+    }
+
     /// <summary>
     /// Tries to convert this SCL object to an SCL object of a different type
     /// </summary>
     [Pure]
-    sealed Result<T, IErrorBuilder> TryConvertTyped<T>(string propertyName) where T : ISCLObject
+    Result<T, IErrorBuilder> TryConvertTyped<T>(string propertyName) where T : ISCLObject
     {
         var r = MaybeAs<T>();
 
         if (r.HasNoValue)
+        {
+            //Special case for OneOf
+            if (typeof(T).IsGenericType && typeof(T).GetInterfaces().Contains(typeof(ISCLOneOf)))
+            {
+                var createMethod =
+                    typeof(T).GetMethod(
+                        nameof(SCLOneOf<ISCLObject, ISCLObject>.TryCreate),
+                        BindingFlags.Public | BindingFlags.Static
+                    )!;
+
+                var createResult = (Maybe<T>)createMethod.Invoke(
+                    null,
+                    new object?[] { propertyName, this }
+                )!;
+
+                if (createResult.HasValue)
+                {
+                    return createResult.Value;
+                }
+            }
+
             return ErrorCode.InvalidCast.ToErrorBuilder(
                 propertyName,
                 Serialize(SerializeOptions.Name)
             );
+        }
 
         return r.Value;
     }

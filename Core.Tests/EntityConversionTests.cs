@@ -47,7 +47,7 @@ public class EntityConversionTests
     {
         var entity = TestConfiguration.ConvertToEntity();
 
-        var s = entity.ToString();
+        var s = entity.Serialize(SerializeOptions.Serialize);
 
         s.Should().Be(TestConfigurationString);
 
@@ -64,7 +64,7 @@ public class EntityConversionTests
     {
         var entity = TestConfiguration2.ConvertToEntity();
 
-        var s = entity.ToString();
+        var s = entity.Serialize(SerializeOptions.Serialize);
 
         s.Should().Be(TestConfigurationString2);
 
@@ -121,7 +121,7 @@ public class EntityConversionTests
 
         var entity = EntityConversionHelpers.ConvertToEntity(settings);
 
-        var s = entity.ToString();
+        var s = entity.Serialize(SerializeOptions.Serialize);
 
         s.Should()
             .Be(
