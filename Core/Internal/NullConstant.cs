@@ -23,7 +23,7 @@ public class NullConstant : IConstantStep, IConstantFreezableStep, IStep<SCLNull
     {
         await Task.CompletedTask;
 
-        var r = SCLNull.Instance.TryConvert<T>()
+        var r = (SCLNull.Instance as ISCLObject).TryConvertTyped<T>("Step")
             .MapError(x => x.WithLocation(TextLocation ?? ErrorLocation.EmptyLocation));
 
         return r;

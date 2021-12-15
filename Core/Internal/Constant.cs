@@ -30,7 +30,7 @@ public sealed record SCLConstant<T>(T Value) : IStep<T>, IConstantStep where T :
     {
         await Task.CompletedTask;
 
-        var r = Value.TryConvert<T1>()
+        var r = Value.TryConvertTyped<T1>("Step")
             .MapError(x => x.WithLocation(this));
 
         return r;
