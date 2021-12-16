@@ -21,7 +21,7 @@ public sealed class Log : CompoundStep<Unit>
         string stringToPrint;
 
         if (r.Value is StringStream ss)
-            stringToPrint = ss.Serialize(SerializeOptions.Primitive);
+            stringToPrint = await ss.GetStringAsync();
         else
             stringToPrint = r.Value.Serialize(SerializeOptions.Serialize);
 
