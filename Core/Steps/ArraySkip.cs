@@ -6,7 +6,7 @@
 [Alias("Skip")]
 [SCLExample("ArraySkip [1, 2, 3] 2",             "[3]")]
 [SCLExample("Skip In: [1, 2, 3, 4, 5] Count: 3", "[4, 5]")]
-public sealed class ArraySkip<T> : CompoundStep<Array<T>>
+public sealed class ArraySkip<T> : CompoundStep<Array<T>> where T : ISCLObject
 {
     /// <inheritdoc />
     protected override async Task<Result<Array<T>, IError>> Run(
@@ -20,7 +20,7 @@ public sealed class ArraySkip<T> : CompoundStep<Array<T>>
 
         var (array, count) = r.Value;
 
-        return array.Skip(count);
+        return array.Skip(count.Value);
     }
 
     /// <summary>
@@ -36,7 +36,7 @@ public sealed class ArraySkip<T> : CompoundStep<Array<T>>
     /// </summary>
     [StepProperty(2)]
     [Required]
-    public IStep<int> Count { get; set; } = null!;
+    public IStep<SCLInt> Count { get; set; } = null!;
 
     /// <inheritdoc />
     public override IStepFactory StepFactory { get; } = ArraySkipStepFactory.Instance;
@@ -72,7 +72,7 @@ public sealed class ArraySkip<T> : CompoundStep<Array<T>>
         }
 
         /// <inheritdoc />
-        protected override string ArrayPropertyName => nameof(ArraySkip<object>.Array);
+        protected override string ArrayPropertyName => nameof(ArraySkip<ISCLObject>.Array);
 
         protected override string? LambdaPropertyName => null;
     }

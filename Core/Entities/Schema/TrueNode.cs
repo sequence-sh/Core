@@ -29,12 +29,12 @@ public record TrueNode() : SchemaNode(EnumeratedValuesNodeData.Empty)
     }
 
     /// <inheritdoc />
-    protected override Result<Maybe<EntityValue>, IErrorBuilder> TryTransform1(
+    protected override Result<Maybe<ISCLObject>, IErrorBuilder> TryTransform1(
         string propertyName,
-        EntityValue entityValue,
+        ISCLObject value,
         TransformSettings transformSettings)
     {
-        return Maybe<EntityValue>.None;
+        return Maybe<ISCLObject>.None;
     }
 }
 
@@ -67,9 +67,9 @@ public record FalseNode() : SchemaNode(EnumeratedValuesNodeData.Empty)
     }
 
     /// <inheritdoc />
-    protected override Result<Maybe<EntityValue>, IErrorBuilder> TryTransform1(
+    protected override Result<Maybe<ISCLObject>, IErrorBuilder> TryTransform1(
         string propertyName,
-        EntityValue entityValue,
+        ISCLObject value,
         TransformSettings transformSettings)
     {
         return ErrorCode.SchemaViolation.ToErrorBuilder("Always False", propertyName);

@@ -10,7 +10,7 @@
 [SCLExample("ArrayFind Array: [1, 2, 3] Element: 2", "1")]
 [SCLExample("Find In: ['a', 'b', 'c'] Item: 'a'",    "0")]
 [SCLExample("Find In: ['a', 'b', 'c'] Item: 'd'",    "-1")]
-public sealed class ArrayFind<T> : CompoundStep<int>
+public sealed class ArrayFind<T> : CompoundStep<SCLInt> where T : ISCLObject
 {
     /// <summary>
     /// The array to check.
@@ -29,22 +29,23 @@ public sealed class ArrayFind<T> : CompoundStep<int>
     public IStep<T> Element { get; set; } = null!;
 
     /// <inheritdoc />
-    protected override async Task<Result<int, IError>> Run(
+    protected override async Task<Result<SCLInt, IError>> Run(
         IStateMonad stateMonad,
         CancellationToken cancellationToken)
     {
         var arrayResult = await Array.Run(stateMonad, cancellationToken);
 
         if (arrayResult.IsFailure)
-            return arrayResult.ConvertFailure<int>();
+            return arrayResult.ConvertFailure<SCLInt>();
 
         var elementResult = await Element.Run(stateMonad, cancellationToken);
 
         if (elementResult.IsFailure)
-            return elementResult.ConvertFailure<int>();
+            return elementResult.ConvertFailure<SCLInt>();
 
         var indexResult =
-            await arrayResult.Value.IndexOfAsync(elementResult.Value, cancellationToken);
+            await arrayResult.Value.IndexOfAsync(elementResult.Value, cancellationToken)
+                .Map(x => x.ConvertToSCLObject());
 
         return indexResult;
     }
@@ -85,7 +86,7 @@ public sealed class ArrayFind<T> : CompoundStep<int>
         }
 
         /// <inheritdoc />
-        protected override string ArrayPropertyName => nameof(ArrayFind<object>.Array);
+        protected override string ArrayPropertyName => nameof(ArrayFind<ISCLObject>.Array);
 
         /// <inheritdoc />
         protected override string? LambdaPropertyName => null;

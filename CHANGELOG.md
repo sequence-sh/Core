@@ -261,7 +261,7 @@ Renamed the following steps and added additional aliases:
 ### Bug Fixes
 
 - Passing array to a string parameter should not result in IntConstant error #269
-- Comparison of EntityValues results in an Error #270
+- Comparison of ISCLObjects results in an Error #270
 - Setting a variable to an enum value results in an error #267
 
 ### Maintenance

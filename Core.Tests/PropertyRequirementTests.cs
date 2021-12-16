@@ -9,7 +9,7 @@ public partial class PropertyRequirementTests
     {
         get
         {
-            var placeholder = new BoolConstant(true);
+            var placeholder = new SCLConstant<SCLBool>(SCLBool.True);
 
             yield return new TestCase(
                 "No Requirement",
@@ -149,49 +149,49 @@ public partial class PropertyRequirementTests
         return connectorSettings;
     }
 
-    private class RequirementTestStep : CompoundStep<bool>
+    private class RequirementTestStep : CompoundStep<SCLBool>
     {
         public const string VersionKey = "WidgetVersion";
         public const string FeaturesKey = "WidgetFeatures";
 
         /// <inheritdoc />
-        protected override async Task<Result<bool, IError>> Run(
+        protected override async Task<Result<SCLBool, IError>> Run(
             IStateMonad stateMonad,
             CancellationToken cancellationToken)
         {
             await Task.CompletedTask;
-            return true;
+            return SCLBool.True;
         }
 
         [StepProperty(1)]
         [DefaultValueExplanation("Nothing")]
         [RequiredVersion(VersionKey, null)]
-        public IStep<bool>? RequirementStep { get; init; }
+        public IStep<SCLBool>? RequirementStep { get; init; }
 
         [StepProperty(2)]
         [DefaultValueExplanation("Nothing")]
         [RequiredVersion(VersionKey, "2.0")]
-        public IStep<bool>? MinVersionStep { get; init; }
+        public IStep<SCLBool>? MinVersionStep { get; init; }
 
         [StepProperty(3)]
         [DefaultValueExplanation("Nothing")]
         [RequiredVersion(VersionKey, null, "5.0")]
-        public IStep<bool>? MaxVersionStep { get; init; }
+        public IStep<SCLBool>? MaxVersionStep { get; init; }
 
         [StepProperty(4)]
         [DefaultValueExplanation("Nothing")]
         [RequiredFeature(FeaturesKey, "sprocket")]
-        public IStep<bool>? RequiredFeatureStep { get; init; }
+        public IStep<SCLBool>? RequiredFeatureStep { get; init; }
 
         /// <inheritdoc />
         public override IStepFactory StepFactory => RequirementTestStepFactory.Instance;
     }
 
-    private class RequirementTestStepFactory : SimpleStepFactory<RequirementTestStep, bool>
+    private class RequirementTestStepFactory : SimpleStepFactory<RequirementTestStep, SCLBool>
     {
         private RequirementTestStepFactory() { }
 
-        public static SimpleStepFactory<RequirementTestStep, bool> Instance { get; } =
+        public static SimpleStepFactory<RequirementTestStep, SCLBool> Instance { get; } =
             new RequirementTestStepFactory();
     }
 }

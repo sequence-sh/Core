@@ -15,21 +15,21 @@ public record DateTimeStringFormat : StringFormat
     public static DateTimeStringFormat Instance { get; } = new();
 
     /// <inheritdoc />
-    public override Result<Maybe<EntityValue>, IErrorBuilder> TryTransform(
+    public override Result<Maybe<ISCLObject>, IErrorBuilder> TryTransform(
         string propertyName,
-        EntityValue entityValue,
+        ISCLObject entityValue,
         TransformSettings transformSettings)
     {
-        if (entityValue is EntityValue.DateTime)
+        if (entityValue is SCLDateTime)
         {
-            return Maybe<EntityValue>.None;
+            return Maybe<ISCLObject>.None;
         }
 
-        var primitive = entityValue.GetPrimitiveString();
+        var primitive = entityValue.Serialize(SerializeOptions.Primitive);
 
         if (DateTime.TryParse(primitive, out var dt1))
         {
-            return Maybe<EntityValue>.From(new EntityValue.DateTime(dt1));
+            return Maybe<ISCLObject>.From(new SCLDateTime(dt1));
         }
 
         var formats = transformSettings.DateFormatter.GetFormats(propertyName).ToArray();
@@ -39,7 +39,7 @@ public record DateTimeStringFormat : StringFormat
 
         if (DateTime.TryParseExact(primitive, formats, null, DateTimeStyles.None, out var dt2))
         {
-            return Maybe<EntityValue>.From(new EntityValue.DateTime(dt2));
+            return Maybe<ISCLObject>.From(new SCLDateTime(dt2));
         }
 
         return ErrorCode.SchemaViolation.ToErrorBuilder(

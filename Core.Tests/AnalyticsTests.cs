@@ -1,5 +1,4 @@
 ﻿using Reductech.EDR.Core.Internal.Analytics;
-using Reductech.EDR.Core.TestHarness;
 
 namespace Reductech.EDR.Core.Tests;
 

@@ -1,7 +1,7 @@
 ﻿namespace Reductech.EDR.Core.Tests;
 
 [UseTestOutputHelper]
-public partial class EntityValueTests
+public partial class ISCLObjectTests
 {
     private class GetStringData : TheoryData<object, string, Maybe<int>, Maybe<double>, Maybe<bool>,
         Maybe<EncodingEnum>, Maybe<DateTime>, Maybe<Entity>, Maybe<IReadOnlyList<string>>>
@@ -155,7 +155,7 @@ public partial class EntityValueTests
     //    Maybe<Entity> expectedEntity,
     //    Maybe<IReadOnlyList<string>> expectedList)
     //{
-    //    EntityValue entityValue = EntityValue.CreateFromObject(o);
+    //    ISCLObject entityValue = ISCLObject.CreateFromObject(o);
 
     //    void TestActual<T>(Maybe<T> expected)
     //    {
@@ -163,7 +163,7 @@ public partial class EntityValueTests
     //        actual.Should().Be(expected);
     //    }
 
-    //    var testConversion = !(entityValue is EntityValue.NestedList or EntityValue.NestedEntity);
+    //    var testConversion = !(entityValue is IArray or Entity);
 
     //    void TestConvert<T>(SchemaProperty schemaProperty, Maybe<T> maybe)
     //    {
@@ -193,17 +193,17 @@ public partial class EntityValueTests
     //        else
     //        {
     //            convertResult.ShouldBeSuccessful();
-    //            var expectedEntityValue = EntityValue.CreateFromObject(maybe.GetValueOrThrow());
+    //            var expectedISCLObject = ISCLObject.CreateFromObject(maybe.GetValueOrThrow());
 
     //            if (convertResult.Value.value.ObjectValue is Enumeration(var type, var value))
     //            {
     //                var real = type + "." + value;
-    //                real.Should().Be(expectedEntityValue.ObjectValue!.ToString());
+    //                real.Should().Be(expectedISCLObject.ObjectValue!.ToString());
     //            }
     //            else
     //            {
     //                convertResult.Value.value.ObjectValue.Should()
-    //                    .Be(expectedEntityValue.ObjectValue);
+    //                    .Be(expectedISCLObject.ObjectValue);
     //            }
     //        }
     //    }
@@ -282,13 +282,21 @@ public partial class EntityValueTests
     [Fact]
     public void TestGetDefaultValue()
     {
-        EntityValue.GetDefaultValue<Entity>().Should().Equal(Entity.Empty);
-        EntityValue.GetDefaultValue<StringStream>().Should().Be(StringStream.Empty);
-        EntityValue.GetDefaultValue<string>().Should().Be(string.Empty);
-        EntityValue.GetDefaultValue<int>().Should().Be(0);
-        EntityValue.GetDefaultValue<double>().Should().Be(0.0);
-        EntityValue.GetDefaultValue<bool>().Should().Be(false);
-        EntityValue.GetDefaultValue<Array<int>>().Should().Be(Array<int>.Empty);
-        EntityValue.GetDefaultValue<Array<double>>().Should().Be(Array<double>.Empty);
+        ISCLObject.GetDefaultValue<Entity>().Should().Equal(Entity.Empty);
+        ISCLObject.GetDefaultValue<StringStream>().Should().Be(StringStream.Empty);
+        ISCLObject.GetDefaultValue<SCLInt>().Should().Be(0.ConvertToSCLObject());
+        ISCLObject.GetDefaultValue<SCLDouble>().Should().Be(0.0.ConvertToSCLObject());
+        ISCLObject.GetDefaultValue<SCLBool>().Should().Be(false.ConvertToSCLObject());
+        ISCLObject.GetDefaultValue<Array<SCLInt>>().Should().Be(Array<SCLInt>.Empty);
+        ISCLObject.GetDefaultValue<Array<SCLDouble>>().Should().Be(Array<SCLDouble>.Empty);
+        ISCLObject.GetDefaultValue<SCLEnum<TextCase>>().Should().Be(new SCLEnum<TextCase>(default));
+
+        ISCLObject.GetDefaultValue<SCLOneOf<SCLInt, SCLBool>>()
+            .Should()
+            .Be(new SCLOneOf<SCLInt, SCLBool>(0.ConvertToSCLObject()));
+
+        ISCLObject.GetDefaultValue<SCLOneOf<SCLEnum<TextCase>, SCLInt, SCLBool>>()
+            .Should()
+            .Be(new SCLOneOf<SCLEnum<TextCase>, SCLInt, SCLBool>(new SCLEnum<TextCase>(default)));
     }
 }

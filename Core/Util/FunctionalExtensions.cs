@@ -1,54 +1,10 @@
-﻿using Namotion.Reflection;
-
-namespace Reductech.EDR.Core.Util;
+﻿namespace Reductech.EDR.Core.Util;
 
 /// <summary>
 /// Functional methods
 /// </summary>
 public static class FunctionalExtensions
 {
-    /// <summary>
-    /// Converts this object to type T. Returns failure if the cast fails.
-    /// </summary>
-    public static Result<T, IErrorBuilder> TryConvert<T>(this object? obj)
-    {
-        if (obj is T objAsT)
-            return objAsT;
-
-        if (typeof(T).IsGenericType
-         && typeof(T).GetGenericTypeDefinition().Name.StartsWith("OneOf"))
-        {
-            for (var index = 0; index < typeof(T).GenericTypeArguments.Length; index++)
-            {
-                var genericTypeArgument = typeof(T).GenericTypeArguments[index];
-
-                if (genericTypeArgument.IsInstanceOfType(obj))
-                {
-                    var fromMethod = typeof(T).GetMethod(
-                        $"FromT{index}",
-                        BindingFlags.Static | BindingFlags.Public
-                    );
-
-                    var oneOf = fromMethod?.Invoke(null, new[] { obj });
-
-                    if (oneOf is T oneOfAsT)
-                        return oneOfAsT;
-                }
-            }
-        }
-
-        try
-        {
-            var converted = Convert.ChangeType(obj, typeof(T));
-
-            if (converted is T objConverted)
-                return objConverted;
-        }
-        catch (InvalidCastException) { }
-
-        return ErrorCode.InvalidCast.ToErrorBuilder(typeof(T).GetDisplayName(), obj ?? "null");
-    }
-
     /// <summary>
     /// Get the value or throw an exception
     /// </summary>

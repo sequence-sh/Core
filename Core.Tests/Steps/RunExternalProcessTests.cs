@@ -1,7 +1,5 @@
 ﻿using System.Text;
-using Reductech.EDR.Core.Enums;
 using Reductech.EDR.Core.ExternalProcesses;
-using Reductech.EDR.Core.TestHarness;
 
 namespace Reductech.EDR.Core.Tests.Steps;
 
@@ -21,7 +19,7 @@ public partial class RunExternalProcessTests : StepTestBase<RunExternalProcess, 
                                 {
                                     Elements = new IStep<StringStream>[] { Constant("Foo") }
                                 },
-                            Path     = new StringConstant("Process.exe"),
+                            Path     = new SCLConstant<StringStream>("Process.exe"),
                             Encoding = Constant(EncodingEnum.Ascii)
                         },
                         Unit.Default,

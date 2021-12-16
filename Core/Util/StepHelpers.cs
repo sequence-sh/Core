@@ -63,8 +63,8 @@ public static partial class StepHelpers
     /// Converts this to a RunnableStep that returns a list.
     /// WARNING: Only use this if you want the array to be fully evaluated immediately
     /// </summary>
-    public static IRunnableStep<IReadOnlyList<T>> WrapArray<T>(this IRunnableStep<Array<T>> step) =>
-        WrapStep(step, StepMaps.Array<T>());
+    public static IRunnableStep<IReadOnlyList<T>> WrapArray<T>(this IRunnableStep<Array<T>> step)
+        where T : ISCLObject => WrapStep(step, StepMaps.Array<T>());
 
     /// <summary>
     /// Converts this to a RunnableStep that returns a string
@@ -77,19 +77,24 @@ public static partial class StepHelpers
     /// </summary>
     public static IRunnableStep<OneOf<TOut0, TOut1>>
         WrapOneOf<TIn0, TIn1, TOut0, TOut1>(
-            this IRunnableStep<OneOf<TIn0, TIn1>> step,
+            this IRunnableStep<SCLOneOf<TIn0, TIn1>> step,
             IStepValueMap<TIn0, TOut0> map0,
-            IStepValueMap<TIn1, TOut1> map1) => WrapStep(step, StepMaps.OneOf(map0, map1));
+            IStepValueMap<TIn1, TOut1> map1)
+        where TIn0 : ISCLObject
+        where TIn1 : ISCLObject => WrapStep(step, StepMaps.OneOf(map0, map1));
 
     /// <summary>
     /// Maps a OneOf with three type options
     /// </summary>
     public static IRunnableStep<OneOf<TOut0, TOut1, TOut2>>
         WrapOneOf<TIn0, TIn1, TIn2, TOut0, TOut1, TOut2>(
-            this IRunnableStep<OneOf<TIn0, TIn1, TIn2>> step,
+            this IRunnableStep<SCLOneOf<TIn0, TIn1, TIn2>> step,
             IStepValueMap<TIn0, TOut0> map0,
             IStepValueMap<TIn1, TOut1> map1,
-            IStepValueMap<TIn2, TOut2> map2) => WrapStep(step, StepMaps.OneOf(map0, map1, map2));
+            IStepValueMap<TIn2, TOut2> map2)
+        where TIn0 : ISCLObject
+        where TIn1 : ISCLObject
+        where TIn2 : ISCLObject => WrapStep(step, StepMaps.OneOf(map0, map1, map2));
 
     /// <summary>
     /// Converts this to a RunnableStep with a nullable result type
@@ -243,19 +248,22 @@ public static class StepMaps
     /// <summary>
     /// Maps a OneOf with two type options
     /// </summary>
-    public static IStepValueMap<OneOf<TIn0, TIn1>, OneOf<TOut0, TOut1>>
+    public static IStepValueMap<SCLOneOf<TIn0, TIn1>, OneOf<TOut0, TOut1>>
         OneOf<TIn0, TIn1, TOut0, TOut1>(
             IStepValueMap<TIn0, TOut0> map0,
-            IStepValueMap<TIn1, TOut1> map1) => new OneOfMap<TIn0, TIn1, TOut0, TOut1>(map0, map1);
+            IStepValueMap<TIn1, TOut1> map1)
+        where TIn0 : ISCLObject where TIn1 : ISCLObject =>
+        new OneOfMap<TIn0, TIn1, TOut0, TOut1>(map0, map1);
 
     /// <summary>
     /// Maps a OneOf with three type options
     /// </summary>
-    public static IStepValueMap<OneOf<TIn0, TIn1, TIn2>, OneOf<TOut0, TOut1, TOut2>>
+    public static IStepValueMap<SCLOneOf<TIn0, TIn1, TIn2>, OneOf<TOut0, TOut1, TOut2>>
         OneOf<TIn0, TIn1, TIn2, TOut0, TOut1, TOut2>(
             IStepValueMap<TIn0, TOut0> map0,
             IStepValueMap<TIn1, TOut1> map1,
-            IStepValueMap<TIn2, TOut2> map2) =>
+            IStepValueMap<TIn2, TOut2> map2)
+        where TIn0 : ISCLObject where TIn1 : ISCLObject where TIn2 : ISCLObject =>
         new OneOfMap<TIn0, TIn1, TIn2, TOut0, TOut1, TOut2>(map0, map1, map2);
 
     /// <summary>
@@ -265,14 +273,16 @@ public static class StepMaps
         (
             IStepValueMap<TIn0, TOut0> Map0,
             IStepValueMap<TIn1, TOut1> Map1)
-        : IStepValueMap<OneOf<TIn0, TIn1>, OneOf<TOut0, TOut1>>
+        : IStepValueMap<SCLOneOf<TIn0, TIn1>, OneOf<TOut0, TOut1>>
+        where TIn0 : ISCLObject
+        where TIn1 : ISCLObject
     {
         /// <inheritdoc />
         public async Task<Result<OneOf<TOut0, TOut1>, IError>> Map(
-            OneOf<TIn0, TIn1> t,
+            SCLOneOf<TIn0, TIn1> t,
             CancellationToken cancellationToken)
         {
-            if (t.TryPickT0(out var t0A, out var t1A))
+            if (t.OneOf.TryPickT0(out var t0A, out var t1A))
             {
                 var r2 = await Map0.Map(t0A, cancellationToken)
                     .Map(OneOf<TOut0, TOut1>.FromT0);
@@ -297,14 +307,17 @@ public static class StepMaps
             IStepValueMap<TIn0, TOut0> Map0,
             IStepValueMap<TIn1, TOut1> Map1,
             IStepValueMap<TIn2, TOut2> Map2)
-        : IStepValueMap<OneOf<TIn0, TIn1, TIn2>, OneOf<TOut0, TOut1, TOut2>>
+        : IStepValueMap<SCLOneOf<TIn0, TIn1, TIn2>, OneOf<TOut0, TOut1, TOut2>>
+        where TIn0 : ISCLObject
+        where TIn1 : ISCLObject
+        where TIn2 : ISCLObject
     {
         /// <inheritdoc />
         public async Task<Result<OneOf<TOut0, TOut1, TOut2>, IError>> Map(
-            OneOf<TIn0, TIn1, TIn2> t,
+            SCLOneOf<TIn0, TIn1, TIn2> t,
             CancellationToken cancellationToken)
         {
-            if (t.TryPickT0(out var t0A, out var oneOf2))
+            if (t.OneOf.TryPickT0(out var t0A, out var oneOf2))
             {
                 var r2 = await Map0.Map(t0A, cancellationToken)
                     .Map(OneOf<TOut0, TOut1, TOut2>.FromT0);
@@ -383,22 +396,23 @@ public static class StepMaps
     /// <summary>
     /// Maps the elements of an array
     /// </summary>
-    public static IStepValueMap<Array<TIn>, IReadOnlyList<TIn>> Array<TIn>() =>
-        new ArrayMap<TIn, TIn>(DoNothing<TIn>());
+    public static IStepValueMap<Array<TIn>, IReadOnlyList<TIn>> Array<TIn>()
+        where TIn : ISCLObject => new ArrayMap<TIn, TIn>(DoNothing<TIn>());
 
     /// <summary>
     /// Maps the elements of an array
     /// </summary>
     public static IStepValueMap<Array<TIn>, IReadOnlyList<TOut>> Array<TIn, TOut>(
-        IStepValueMap<TIn, TOut> nestedMap) => new ArrayMap<TIn, TOut>(nestedMap);
+        IStepValueMap<TIn, TOut> nestedMap)
+        where TIn : ISCLObject => new ArrayMap<TIn, TOut>(nestedMap);
 
     /// <summary>
     /// Maps the elements of an array
     /// </summary>
-    /// <typeparam name="TIn"></typeparam>
-    /// <typeparam name="TOut"></typeparam>
     private record ArrayMap<TIn, TOut>
-        (IStepValueMap<TIn, TOut> NestedMap) : IStepValueMap<Array<TIn>, IReadOnlyList<TOut>>
+        (IStepValueMap<TIn, TOut> NestedMap)
+        : IStepValueMap<Array<TIn>, IReadOnlyList<TOut>>
+        where TIn : ISCLObject
     {
         /// <inheritdoc />
         public async Task<Result<IReadOnlyList<TOut>, IError>> Map(

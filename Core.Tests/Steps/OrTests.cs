@@ -1,8 +1,6 @@
-﻿using Reductech.EDR.Core.TestHarness;
+﻿namespace Reductech.EDR.Core.Tests.Steps;
 
-namespace Reductech.EDR.Core.Tests.Steps;
-
-public partial class OrTests : StepTestBase<Or, bool>
+public partial class OrTests : StepTestBase<Or, SCLBool>
 {
     /// <inheritdoc />
     protected override IEnumerable<StepCase> StepCases
@@ -11,26 +9,29 @@ public partial class OrTests : StepTestBase<Or, bool>
         {
             yield return new StepCase(
                 "No terms",
-                new Or() { Terms = new ArrayNew<bool>() { Elements = new List<IStep<bool>>() } },
-                false
+                new Or()
+                {
+                    Terms = new ArrayNew<SCLBool>() { Elements = new List<IStep<SCLBool>>() }
+                },
+                false.ConvertToSCLObject()
             );
 
             yield return new StepCase(
                 "just true",
-                new Or() { Terms = StaticHelpers.Array(true) },
-                true
+                new Or() { Terms = Array(true) },
+                true.ConvertToSCLObject()
             );
 
             yield return new StepCase(
                 "just false",
-                new Or() { Terms = StaticHelpers.Array(false) },
-                false
+                new Or() { Terms = Array(false) },
+                false.ConvertToSCLObject()
             );
 
             yield return new StepCase(
                 "three falses",
-                new Or() { Terms = StaticHelpers.Array(false, false, false) },
-                false
+                new Or() { Terms = Array(false, false, false) },
+                false.ConvertToSCLObject()
             );
         }
     }

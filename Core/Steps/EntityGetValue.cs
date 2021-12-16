@@ -1,4 +1,6 @@
-﻿namespace Reductech.EDR.Core.Steps;
+﻿using Namotion.Reflection;
+
+namespace Reductech.EDR.Core.Steps;
 
 /// <summary>
 /// Gets the value of a property from an entity
@@ -13,12 +15,7 @@
     IncludeInDocumentation = false,
     ExpectedLogs = new[] { "1", "2", "3" }
 )]
-[SCLExample(
-    "- <myVar> = ('a':[1,2,3])['a']\r\n- <myVar> | Foreach (log (<> + 1))",
-    IncludeInDocumentation = false,
-    ExpectedLogs = new[] { "2", "3", "4" }
-)]
-public sealed class EntityGetValue<T> : CompoundStep<T>
+public sealed class EntityGetValue<T> : CompoundStep<T> where T : ISCLObject
 {
     /// <inheritdoc />
     protected override Task<Result<T, IError>> Run(
@@ -59,11 +56,22 @@ public sealed class EntityGetValue<T> : CompoundStep<T>
         var entityValue = entity.TryGetValue(epk);
 
         if (entityValue.HasNoValue)
-            return EntityValue.GetDefaultValue<T1>();
+            return ISCLObject.GetDefaultValue<T1>();
 
         var result = entityValue.GetValueOrThrow()
-            .TryGetValue<T1>()
+            .TryConvertTyped<T1>(typeof(T1).GetDisplayName())
             .MapError(x => x.WithLocation(this));
+
+        if (result.IsFailure)
+        {
+            //Special case - allow conversion to stringstream
+            var ss = new StringStream(
+                entityValue.GetValueOrThrow().Serialize(SerializeOptions.Serialize)
+            );
+
+            if (ss is T1 t1ss)
+                return t1ss;
+        }
 
         return result;
     }

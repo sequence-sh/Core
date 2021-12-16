@@ -8,8 +8,8 @@ namespace Reductech.EDR.Core;
 /// A stream of data representing a string.
 /// This can either be a raw string or a stream and an encoding.
 /// </summary>
-public sealed class StringStream : IEquatable<StringStream>, IComparable<StringStream>, IDisposable,
-                                   IComparable
+public sealed class StringStream : IEquatable<StringStream>, IComparable<StringStream>,
+                                   IDisposable, IComparableSCLObject
 {
     /// <summary>
     /// Create a new DataStream
@@ -44,21 +44,20 @@ public sealed class StringStream : IEquatable<StringStream>, IComparable<StringS
             }
 
             /// <inheritdoc />
-            public override string GetString()
-            {
-                return Underlying;
-            }
+            public override string GetString() => Underlying;
 
             /// <inheritdoc />
-            public override string Name => Underlying;
-
-            /// <inheritdoc />
-            public override string NameInLogs(bool reveal)
+            public override string Serialize(SerializeOptions serializeOptions)
             {
-                return
-                    reveal
-                        ? SerializationMethods.DoubleQuote(Underlying)
-                        : $"string Length: {Underlying.Length}";
+                var text = GetString();
+
+                if (serializeOptions.HideStrings)
+                    return $"string Length: {text.Length}";
+
+                if (serializeOptions.QuoteStrings)
+                    text = SerializationMethods.DoubleQuote(text);
+
+                return text;
             }
 
             /// <inheritdoc />
@@ -115,12 +114,20 @@ public sealed class StringStream : IEquatable<StringStream>, IComparable<StringS
             }
 
             /// <inheritdoc />
-            public override string Name => "StringStream";
-
-            /// <inheritdoc />
-            public override string NameInLogs(bool reveal)
+            public override string Serialize(SerializeOptions serializeOptions)
             {
-                return Encoding.GetDisplayName() + "-Stream";
+                if (!serializeOptions.EvaluateStreams)
+                    return Encoding.GetDisplayName() + "-Stream";
+
+                var text = GetString();
+
+                if (serializeOptions.HideStrings)
+                    return $"string Length: {text.Length}";
+
+                if (serializeOptions.QuoteStrings)
+                    text = SerializationMethods.DoubleQuote(text);
+
+                return text;
             }
 
             /// <inheritdoc />
@@ -138,10 +145,16 @@ public sealed class StringStream : IEquatable<StringStream>, IComparable<StringS
 
         public abstract (Stream stream, EncodingEnum encodingEnum) GetStream();
         public abstract ValueTask<string> GetStringAsync();
+
+        /// <summary>
+        /// The the verbatim string
+        /// </summary>
         public abstract string GetString();
 
-        public abstract string Name { get; }
-        public abstract string NameInLogs(bool reveal);
+        /// <summary>
+        /// Serialize according to the options
+        /// </summary>
+        public abstract string Serialize(SerializeOptions serializeOptions);
 
         /// <inheritdoc />
         public abstract void Dispose();
@@ -151,11 +164,6 @@ public sealed class StringStream : IEquatable<StringStream>, IComparable<StringS
     public override string ToString() => GetString();
 
     private readonly SemaphoreSlim _semaphore = new(1);
-
-    /// <summary>
-    /// How this stringStream will appear in the logs.
-    /// </summary>
-    public string NameInLogs(bool reveal) => Value.NameInLogs(reveal);
 
     /// <summary>
     /// If this is a string, return the string, otherwise read the stream as a string.
@@ -236,13 +244,7 @@ public sealed class StringStream : IEquatable<StringStream>, IComparable<StringS
     /// <summary>
     /// SerializeAsync this DataStream
     /// </summary>
-    public string Serialize()
-    {
-        var s    = GetString();
-        var text = SerializationMethods.DoubleQuote(s);
-
-        return text;
-    }
+    public string Serialize(SerializeOptions options) => Value.Serialize(options);
 
     /// <inheritdoc />
     public int CompareTo(object? obj)
@@ -305,5 +307,43 @@ public sealed class StringStream : IEquatable<StringStream>, IComparable<StringS
         _semaphore.Dispose();
 
         Value.Dispose();
+    }
+
+    /// <inheritdoc />
+    public TypeReference GetTypeReference() => TypeReference.Actual.String;
+
+    /// <inheritdoc />
+    public object ToCSharpObject() => GetString();
+
+    /// <inheritdoc />
+    public Maybe<T> MaybeAs<T>() where T : ISCLObject
+    {
+        if (this is T value)
+            return value;
+
+        if (typeof(T).IsGenericType && typeof(T).GetInterfaces().Contains(typeof(ISCLEnum)))
+        {
+            var enumType = typeof(T).GenericTypeArguments.Single();
+
+            if (Enum.TryParse(enumType, GetString(), true, out var r))
+            {
+                var instance = Activator.CreateInstance(typeof(T), r);
+                var result   = (T)instance!;
+                return result;
+            }
+        }
+
+        return Maybe<T>.None;
+    }
+
+    /// <inheritdoc />
+    public SchemaNode ToSchemaNode(
+        string path,
+        SchemaConversionOptions? schemaConversionOptions)
+    {
+        if (schemaConversionOptions is null)
+            return StringNode.Default;
+
+        return schemaConversionOptions.GetNode(this.GetString(), path);
     }
 }

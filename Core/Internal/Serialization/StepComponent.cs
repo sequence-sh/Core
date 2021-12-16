@@ -17,11 +17,13 @@ public class StepComponent : ISerializerBlock
     public string PropertyName { get; }
 
     /// <inheritdoc />
-    public Result<string> TryGetSegmentText(IReadOnlyDictionary<string, StepProperty> dictionary)
+    public Result<string> TryGetSegmentText(
+        SerializeOptions options,
+        IReadOnlyDictionary<string, StepProperty> dictionary)
     {
         var property = dictionary[PropertyName];
 
-        var r = property.Serialize();
+        var r = property.Serialize(options);
         return r;
     }
 }

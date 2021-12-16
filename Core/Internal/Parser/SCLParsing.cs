@@ -179,7 +179,7 @@ public static class SCLParsing
             var location = new TextLocation(context);
 
             var member = new FreezableStepProperty.Step(
-                new BoolConstantFreezable(b, location),
+                new SCLConstantFreezable<SCLBool>(b.ConvertToSCLObject(), location),
                 location
             );
 
@@ -204,7 +204,10 @@ public static class SCLParsing
                 );
             }
 
-            var constant = new DateTimeConstantFreezable(dateTime, location);
+            var constant = new SCLConstantFreezable<SCLDateTime>(
+                dateTime.ConvertToSCLObject(),
+                location
+            );
 
             var member = new FreezableStepProperty.Step(constant, location);
             return member;
@@ -346,7 +349,7 @@ public static class SCLParsing
             var location = new TextLocation(context);
 
             var member = new FreezableStepProperty.Step(
-                new EnumConstantFreezable(new Enumeration(prefix, suffix), location),
+                new EnumConstantFreezable(prefix, suffix, location),
                 location
             );
 
@@ -363,7 +366,7 @@ public static class SCLParsing
             if (int.TryParse(text, out var num))
             {
                 var member = new FreezableStepProperty.Step(
-                    new IntConstantFreezable(num, location),
+                    new SCLConstantFreezable<SCLInt>(num.ConvertToSCLObject(), location),
                     location
                 );
 
@@ -373,7 +376,7 @@ public static class SCLParsing
             if (double.TryParse(text, out var d))
             {
                 var member = new FreezableStepProperty.Step(
-                    new DoubleConstantFreezable(d, location),
+                    new SCLConstantFreezable<SCLDouble>(d.ConvertToSCLObject(), location),
                     new TextLocation(context)
                 );
 
@@ -414,7 +417,7 @@ public static class SCLParsing
             var          location     = new TextLocation(context);
 
             var member = new FreezableStepProperty.Step(
-                new StringConstantFreezable(stringStream, location),
+                new SCLConstantFreezable<StringStream>(stringStream, location),
                 location
             );
 
@@ -438,7 +441,7 @@ public static class SCLParsing
                     var text      = s.GetText();
                     var unescaped = UnescapeInterpolated(text, i == 0);
 
-                    var cs = new StringConstantFreezable(
+                    var cs = new SCLConstantFreezable<StringStream>(
                         unescaped,
                         new TextLocation(s.Symbol)
                     );

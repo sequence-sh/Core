@@ -1,8 +1,6 @@
-﻿using Reductech.EDR.Core.TestHarness;
+﻿namespace Reductech.EDR.Core.Tests.Steps;
 
-namespace Reductech.EDR.Core.Tests.Steps;
-
-public partial class ValueIfTests : StepTestBase<If<int>, int>
+public partial class ValueIfTests : StepTestBase<If<SCLInt>, SCLInt>
 {
     /// <inheritdoc />
     protected override IEnumerable<StepCase> StepCases
@@ -11,20 +9,20 @@ public partial class ValueIfTests : StepTestBase<If<int>, int>
         {
             yield return new StepCase(
                 "ValueIf true",
-                new If<int>()
+                new If<SCLInt>()
                 {
                     Condition = Constant(true), Then = Constant(1), Else = Constant(2)
                 },
-                1
+                1.ConvertToSCLObject()
             );
 
             yield return new StepCase(
                 "ValueIf false",
-                new If<int>()
+                new If<SCLInt>()
                 {
                     Condition = Constant(false), Then = Constant(1), Else = Constant(2)
                 },
-                2
+                2.ConvertToSCLObject()
             );
         }
     }
@@ -37,7 +35,7 @@ public partial class ValueIfTests : StepTestBase<If<int>, int>
             yield return new DeserializeCase(
                 "ValueIf true",
                 "ValueIf Condition: true Then: 1 Else: 2",
-                1
+                1.ConvertToSCLObject()
             );
         }
     }
@@ -51,9 +49,9 @@ public partial class ValueIfTests : StepTestBase<If<int>, int>
                 "Condition is error",
                 new If<Unit>()
                 {
-                    Condition = new FailStep<bool> { ErrorMessage = "Condition Fail" },
-                    Then      = new FailStep<Unit> { ErrorMessage = "Then Fail" },
-                    Else      = new FailStep<Unit> { ErrorMessage = "Else Fail" },
+                    Condition = new FailStep<SCLBool> { ErrorMessage = "Condition Fail" },
+                    Then      = new FailStep<Unit> { ErrorMessage    = "Then Fail" },
+                    Else      = new FailStep<Unit> { ErrorMessage    = "Else Fail" },
                 },
                 new SingleError(
                     ErrorLocation.EmptyLocation,

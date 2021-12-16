@@ -1,8 +1,6 @@
-﻿using Reductech.EDR.Core.TestHarness;
+﻿namespace Reductech.EDR.Core.Tests.Steps;
 
-namespace Reductech.EDR.Core.Tests.Steps;
-
-public partial class StringIsEmptyTests : StepTestBase<StringIsEmpty, bool>
+public partial class StringIsEmptyTests : StepTestBase<StringIsEmpty, SCLBool>
 {
     /// <inheritdoc />
     protected override IEnumerable<StepCase> StepCases
@@ -12,13 +10,13 @@ public partial class StringIsEmptyTests : StepTestBase<StringIsEmpty, bool>
             yield return new StepCase(
                 "String is empty",
                 new StringIsEmpty() { String = Constant("") },
-                true
+                true.ConvertToSCLObject()
             );
 
             yield return new StepCase(
                 "String is not empty",
                 new StringIsEmpty() { String = Constant("Hello") },
-                false
+                false.ConvertToSCLObject()
             );
         }
     }
@@ -28,12 +26,16 @@ public partial class StringIsEmptyTests : StepTestBase<StringIsEmpty, bool>
     {
         get
         {
-            yield return new DeserializeCase("String is empty", "StringIsEmpty String: ''", true);
+            yield return new DeserializeCase(
+                "String is empty",
+                "StringIsEmpty String: ''",
+                true.ConvertToSCLObject()
+            );
 
             yield return new DeserializeCase(
                 "String is not empty",
                 "StringIsEmpty String: 'Hello'",
-                false
+                false.ConvertToSCLObject()
             );
         }
     }

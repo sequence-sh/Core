@@ -47,7 +47,7 @@ public sealed class Validate : CompoundStep<Array<Entity>>
                 yield return entity;
             else
             {
-                switch (errorBehavior)
+                switch (errorBehavior.Value)
                 {
                     case Enums.ErrorBehavior.Fail:
                     {
@@ -122,8 +122,10 @@ public sealed class Validate : CompoundStep<Array<Entity>>
     /// </summary>
     [StepProperty(3)]
     [DefaultValueExplanation("Fail")]
-    public IStep<ErrorBehavior> ErrorBehavior { get; set; } =
-        new EnumConstant<ErrorBehavior>(Enums.ErrorBehavior.Fail);
+    public IStep<SCLEnum<ErrorBehavior>> ErrorBehavior { get; set; } =
+        new SCLConstant<SCLEnum<ErrorBehavior>>(
+            new SCLEnum<ErrorBehavior>(Enums.ErrorBehavior.Fail)
+        );
 
     /// <inheritdoc />
     public override IStepFactory StepFactory { get; } =

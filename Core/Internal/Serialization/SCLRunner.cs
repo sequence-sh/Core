@@ -105,7 +105,7 @@ public sealed class SCLRunner
             LogSituation.ConnectorSettings.Log(
                 stateMonad,
                 null,
-                stateMonad.Settings.Serialize()
+                stateMonad.Settings.Format()
             );
         }
 
@@ -135,9 +135,9 @@ public sealed class SCLRunner
         return log;
     }
 
-    private static IStep<Unit> SurroundWithLog<T>(IStep<T> step)
+    private static IStep<Unit> SurroundWithLog<T>(IStep<T> step) where T : ISCLObject
     {
-        var p = new Log<T> { Value = step };
+        var p = new Log { Value = step };
 
         return p;
     }

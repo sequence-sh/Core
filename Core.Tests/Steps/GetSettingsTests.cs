@@ -1,5 +1,4 @@
 ﻿using Reductech.EDR.ConnectorManagement.Base;
-using Reductech.EDR.Core.TestHarness;
 
 namespace Reductech.EDR.Core.Tests.Steps;
 
@@ -32,9 +31,9 @@ public partial class GetSettingsTests : StepTestBase<GetSettings, Entity>
 
             yield return new StepCase(
                 "Default Settings",
-                new Log<Entity> { Value = new GetSettings() },
+                new Log { Value = new GetSettings() },
                 Unit.Default,
-                baseEntity.Serialize()
+                baseEntity.Serialize(SerializeOptions.Serialize)
             );
 
             var newConnectorSettings = new ConnectorSettings
@@ -65,9 +64,9 @@ public partial class GetSettingsTests : StepTestBase<GetSettings, Entity>
 
             yield return new StepCase(
                 "Extra Settings",
-                new Log<Entity> { Value = new GetSettings() },
+                new Log { Value = new GetSettings() },
                 Unit.Default,
-                entity2.Serialize()
+                entity2.Serialize(SerializeOptions.Serialize)
             ).WithStepFactoryStore(stepFactoryStore);
         }
     }

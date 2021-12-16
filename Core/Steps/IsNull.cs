@@ -7,22 +7,22 @@
 [SCLExample("IsNull 1",              "False")]
 [SCLExample("IsNull (a: Null)['a']", "True")]
 [SCLExample("IsNull (a: 1)['a']",    "False")]
-public sealed class IsNull<T> : CompoundStep<bool>
+public sealed class IsNull<T> : CompoundStep<SCLBool> where T : ISCLObject
 {
     /// <inheritdoc />
-    protected override async Task<Result<bool, IError>> Run(
+    protected override async Task<Result<SCLBool, IError>> Run(
         IStateMonad stateMonad,
         CancellationToken cancellationToken)
     {
         var result = await Value.Run(stateMonad, cancellationToken);
 
         if (result.IsFailure)
-            return result.ConvertFailure<bool>();
+            return result.ConvertFailure<SCLBool>();
 
         if (result.Value is SCLNull)
-            return true;
+            return SCLBool.True;
 
-        return false;
+        return SCLBool.False;
     }
 
     /// <summary>
@@ -59,7 +59,7 @@ public sealed class IsNull<T> : CompoundStep<bool>
             FreezableStepData freezableStepData,
             TypeResolver typeResolver)
         {
-            var step = freezableStepData.TryGetStep(nameof(IsNull<object>.Value), StepType);
+            var step = freezableStepData.TryGetStep(nameof(IsNull<ISCLObject>.Value), StepType);
 
             if (step.IsFailure)
                 return step.ConvertFailure<TypeReference>();

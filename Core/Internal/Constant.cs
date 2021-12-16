@@ -3,7 +3,7 @@
 /// <summary>
 /// A step that returns a constant value.
 /// </summary>
-public abstract record ConstantBase<T>(T Value) : IStep<T>, IConstantStep
+public sealed record SCLConstant<T>(T Value) : IStep<T>, IConstantStep where T : ISCLObject
 {
     /// <inheritdoc />
     public async Task<Result<T, IError>> Run(
@@ -15,23 +15,28 @@ public abstract record ConstantBase<T>(T Value) : IStep<T>, IConstantStep
     }
 
     /// <inheritdoc />
-    public abstract string Name { get; }
+    public Task<Result<ISCLObject, IError>> RunUntyped(
+        IStateMonad stateMonad,
+        CancellationToken cancellationToken) =>
+        Run(stateMonad, cancellationToken).Map(x => x as ISCLObject);
 
     /// <inheritdoc />
-    public object ValueObject => Value!;
+    public string Name => Value.Serialize(SerializeOptions.Primitive);
 
     /// <inheritdoc />
     public async Task<Result<T1, IError>> Run<T1>(
         IStateMonad stateMonad,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken) where T1 : ISCLObject
     {
         await Task.CompletedTask;
 
-        var r = Value!.TryConvert<T1>()
+        var r = Value.TryConvertTyped<T1>("Step")
             .MapError(x => x.WithLocation(this));
 
         return r;
     }
+
+    ISCLObject IConstantStep.Value => Value;
 
     /// <inheritdoc />
     public Result<Unit, IError> Verify(StepFactoryStore stepFactoryStore) => Unit.Default;
@@ -43,7 +48,7 @@ public abstract record ConstantBase<T>(T Value) : IStep<T>, IConstantStep
     public Type OutputType => typeof(T);
 
     /// <inheritdoc />
-    public abstract string Serialize();
+    public string Serialize(SerializeOptions options) => Value.Serialize(options);
 
     /// <inheritdoc />
     public IEnumerable<Requirement> RuntimeRequirements
@@ -55,126 +60,30 @@ public abstract record ConstantBase<T>(T Value) : IStep<T>, IConstantStep
     }
 
     /// <inheritdoc />
-    public Maybe<EntityValue> TryConvertToEntityValue() => ToEntityValue();
+    public bool ShouldBracketWhenSerialized => false;
 
     /// <summary>
-    /// Converts this to an EntityValue
+    /// Try to convert this constant to a constant of a different type.
     /// </summary>
-    /// <returns></returns>
-    protected abstract EntityValue ToEntityValue();
-
-    /// <inheritdoc />
-    public bool ShouldBracketWhenSerialized => false;
-}
-
-/// <summary>
-/// A Constant String
-/// </summary>
-public record StringConstant
-    (StringStream Value) : ConstantBase<StringStream>(Value)
-{
-    /// <inheritdoc />
-    public override string Serialize() => Value.Serialize();
-
-    /// <inheritdoc />
-    public override string Name => Value.GetString();
-
-    /// <inheritdoc />
-    protected override EntityValue ToEntityValue() => new EntityValue.String(Value.GetString());
-}
-
-/// <summary>
-/// A Constant int
-/// </summary>
-public record IntConstant(int Value) : ConstantBase<int>(Value)
-{
-    /// <inheritdoc />
-    public override string Serialize() => Value.ToString();
-
-    /// <inheritdoc />
-    public override string Name => Value.ToString();
-
-    /// <inheritdoc />
-    protected override EntityValue ToEntityValue() => new EntityValue.Integer(Value);
-}
-
-/// <summary>
-/// A constant double
-/// </summary>
-public record DoubleConstant(double Value) : ConstantBase<double>(Value)
-{
-    /// <inheritdoc />
-    public override string Serialize() => Value.ToString(Constants.DoubleFormat);
-
-    /// <inheritdoc />
-    public override string Name => Value.ToString(Constants.DoubleFormat);
-
-    /// <inheritdoc />
-    protected override EntityValue ToEntityValue() => new EntityValue.Double(Value);
-}
-
-/// <summary>
-/// A constant bool
-/// </summary>
-public record BoolConstant(bool Value) : ConstantBase<bool>(Value)
-{
-    /// <inheritdoc />
-    public override string Serialize() => Value.ToString();
-
-    /// <inheritdoc />
-    public override string Name => Value.ToString();
-
-    /// <inheritdoc />
-    protected override EntityValue ToEntityValue() => new EntityValue.Boolean(Value);
-}
-
-/// <summary>
-/// A constant enum value
-/// </summary>
-public record EnumConstant<T>(T Value) : ConstantBase<T>(Value) where T : Enum
-{
-    /// <inheritdoc />
-    public override string Serialize()
+    public Result<IStep, IErrorBuilder> TryConvert(Type memberType, string propertyName)
     {
-        return ToEnumeration().ToString();
+        if (typeof(T) == memberType)
+            return this;
+
+        var convertedValue = Value.TryConvert(memberType, propertyName);
+
+        if (convertedValue.IsFailure)
+            return convertedValue.ConvertFailure<IStep>();
+
+        var stepType = typeof(SCLConstant<>).MakeGenericType(memberType);
+
+        var instance = Activator.CreateInstance(stepType, convertedValue.Value);
+
+        var instanceAsStep = (IStep)instance!;
+
+        return Result.Success<IStep, IErrorBuilder>(instanceAsStep);
     }
 
     /// <inheritdoc />
-    public override string Name => ToEnumeration().Value;
-
-    private Enumeration ToEnumeration() => new(typeof(T).Name, Value.ToString());
-
-    /// <inheritdoc />
-    protected override EntityValue ToEntityValue() =>
-        new EntityValue.EnumerationValue(ToEnumeration());
-}
-
-/// <summary>
-/// A constant date time value
-/// </summary>
-public record DateTimeConstant(DateTime Value) : ConstantBase<DateTime>(Value)
-{
-    /// <inheritdoc />
-    public override string Serialize() => Value.ToString(Constants.DateTimeFormat);
-
-    /// <inheritdoc />
-    public override string Name => Value.ToString(Constants.DateTimeFormat);
-
-    /// <inheritdoc />
-    protected override EntityValue ToEntityValue() => new EntityValue.DateTime(Value);
-}
-
-/// <summary>
-/// A constant entity value
-/// </summary>
-public record EntityConstant(Entity Value) : ConstantBase<Entity>(Value)
-{
-    /// <inheritdoc />
-    public override string Serialize() => Value.Serialize();
-
-    /// <inheritdoc />
-    public override string Name => Value.Serialize();
-
-    /// <inheritdoc />
-    protected override EntityValue ToEntityValue() => new EntityValue.NestedEntity(Value);
+    public Maybe<ISCLObject> TryGetConstantValue() => Value;
 }

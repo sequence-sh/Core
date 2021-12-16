@@ -1,6 +1,5 @@
 ﻿using System.IO;
 using System.Text;
-using Reductech.EDR.Core.Enums;
 
 namespace Reductech.EDR.Core.Tests;
 
@@ -176,17 +175,17 @@ public partial class EqualityTests
     }
 
     [GenerateTheory("Arrays")]
-    public IEnumerable<EqualityTestInstance<Array<int>>> ArrayTestInstances
+    public IEnumerable<EqualityTestInstance<Array<SCLInt>>> ArrayTestInstances
     {
         get
         {
             //Array
-            static Array<int> ErrorArray(string error)
+            static Array<SCLInt> ErrorArray(string error)
             {
-                async IAsyncEnumerable<int> GetStuff()
+                async IAsyncEnumerable<SCLInt> GetStuff()
                 {
                     await Task.CompletedTask;
-                    yield return 1;
+                    yield return 1.ConvertToSCLObject();
 
                     throw new ErrorException(
                         new SingleError(
@@ -196,68 +195,85 @@ public partial class EqualityTests
                     );
                 }
 
-                var ea = new LazyArray<int>(GetStuff());
+                var ea = new LazyArray<SCLInt>(GetStuff());
 
                 return ea;
             }
 
-            static Array<int> GetLazyArray(params int[] numbers)
+            static Array<SCLInt> GetLazyArray(params int[] numbers)
             {
-                var ea = new LazyArray<int>(numbers.ToAsyncEnumerable());
+                var ea = new LazyArray<SCLInt>(
+                    numbers.Select(x => x.ConvertToSCLObject()).ToAsyncEnumerable()
+                );
+
                 return ea;
             }
 
-            yield return new EqualityTestInstance<Array<int>>(
-                Array<int>.Empty,
-                Array<int>.Empty,
+            yield return new EqualityTestInstance<Array<SCLInt>>(
+                Array<SCLInt>.Empty,
+                Array<SCLInt>.Empty,
                 true
             );
 
-            yield return new EqualityTestInstance<Array<int>>(
-                Array<int>.Empty,
+            yield return new EqualityTestInstance<Array<SCLInt>>(
+                Array<SCLInt>.Empty,
                 null,
                 false
             );
 
-            yield return new EqualityTestInstance<Array<int>>(
-                new EagerArray<int>(new[] { 1, 2, 3 }),
-                new EagerArray<int>(new[] { 1, 2, 3 }),
+            yield return new EqualityTestInstance<Array<SCLInt>>(
+                new EagerArray<SCLInt>(
+                    new[] { 1, 2, 3 }.Select(x => x.ConvertToSCLObject()).ToArray()
+                ),
+                new EagerArray<SCLInt>(
+                    new[] { 1, 2, 3 }.Select(x => x.ConvertToSCLObject()).ToArray()
+                ),
                 true
             );
 
-            yield return new EqualityTestInstance<Array<int>>(
-                new EagerArray<int>(new[] { 1, 2, 3 }),
-                Array<int>.Empty,
+            yield return new EqualityTestInstance<Array<SCLInt>>(
+                new EagerArray<SCLInt>(
+                    new[] { 1, 2, 3 }.Select(x => x.ConvertToSCLObject()).ToArray()
+                ),
+                Array<SCLInt>.Empty,
                 false
             );
 
-            yield return new EqualityTestInstance<Array<int>>(
-                new EagerArray<int>(new[] { 1, 2, 3 }),
-                new EagerArray<int>(new[] { 3, 2, 1 }),
+            yield return new EqualityTestInstance<Array<SCLInt>>(
+                new EagerArray<SCLInt>(
+                    new[] { 1, 2, 3 }.Select(x => x.ConvertToSCLObject()).ToArray()
+                ),
+                new EagerArray<SCLInt>(
+                    new[] { 3, 2, 1 }.Select(x => x.ConvertToSCLObject()).ToArray()
+                ),
                 false
             );
 
-            yield return new EqualityTestInstance<Array<int>>(
+            yield return new EqualityTestInstance<Array<SCLInt>>(
                 ErrorArray("Error 1"),
                 ErrorArray("Error 1"),
                 true
             );
 
-            yield return new EqualityTestInstance<Array<int>>(
+            yield return new EqualityTestInstance<Array<SCLInt>>(
                 ErrorArray("Error 1"),
                 ErrorArray("Error 2"),
                 false
             );
 
-            yield return new EqualityTestInstance<Array<int>>(
+            yield return new EqualityTestInstance<Array<SCLInt>>(
                 ErrorArray("Error 1"),
-                new EagerArray<int>(new[] { 1, 2, 3 }),
+                new EagerArray<SCLInt>(
+                    new[] { 1, 2, 3 }.Select(x => x.ConvertToSCLObject()).ToArray()
+                ),
                 false
             );
 
-            yield return new EqualityTestInstance<Array<int>>(
+            yield return new EqualityTestInstance<Array<SCLInt>>(
                 GetLazyArray(1, 2, 3),
-                new EagerArray<int>(new[] { 1, 2, 3 }),
+                new EagerArray<SCLInt>(
+                    new[] { 1, 2, 3 }.Select(x => x.ConvertToSCLObject()).ToArray()
+                ),
                 true
             );
         }

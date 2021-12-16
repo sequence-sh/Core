@@ -9,10 +9,10 @@ namespace Reductech.EDR.Core.Steps;
 [SCLExample("IsMatch String: 'abracadabra' Regex: 'ab\\w+?ab'",    "True")]
 [Alias("IsMatch")]
 [Alias("RegexMatch")]
-public sealed class StringMatch : CompoundStep<bool>
+public sealed class StringMatch : CompoundStep<SCLBool>
 {
     /// <inheritdoc />
-    protected override async Task<Result<bool, IError>> Run(
+    protected override async Task<Result<SCLBool, IError>> Run(
         IStateMonad stateMonad,
         CancellationToken cancellationToken)
     {
@@ -20,27 +20,27 @@ public sealed class StringMatch : CompoundStep<bool>
             await String.Run(stateMonad, cancellationToken).Map(x => x.GetStringAsync());
 
         if (stringResult.IsFailure)
-            return stringResult.ConvertFailure<bool>();
+            return stringResult.ConvertFailure<SCLBool>();
 
         var patternResult =
             await Pattern.Run(stateMonad, cancellationToken).Map(x => x.GetStringAsync());
 
         if (patternResult.IsFailure)
-            return patternResult.ConvertFailure<bool>();
+            return patternResult.ConvertFailure<SCLBool>();
 
         var ignoreCaseResult = await IgnoreCase.Run(stateMonad, cancellationToken);
 
         if (ignoreCaseResult.IsFailure)
-            return ignoreCaseResult.ConvertFailure<bool>();
+            return ignoreCaseResult.ConvertFailure<SCLBool>();
 
         var regexOptions = RegexOptions.None;
 
-        if (ignoreCaseResult.Value)
+        if (ignoreCaseResult.Value.Value)
             regexOptions |= RegexOptions.IgnoreCase;
 
         var isMatch = Regex.IsMatch(stringResult.Value, patternResult.Value, regexOptions);
 
-        return isMatch;
+        return isMatch.ConvertToSCLObject();
     }
 
     /// <summary>
@@ -64,8 +64,9 @@ public sealed class StringMatch : CompoundStep<bool>
     /// </summary>
     [StepProperty()]
     [DefaultValueExplanation("False")]
-    public IStep<bool> IgnoreCase { get; set; } = new BoolConstant(false);
+    public IStep<SCLBool> IgnoreCase { get; set; } = new SCLConstant<SCLBool>(SCLBool.False);
 
     /// <inheritdoc />
-    public override IStepFactory StepFactory { get; } = new SimpleStepFactory<StringMatch, bool>();
+    public override IStepFactory StepFactory { get; } =
+        new SimpleStepFactory<StringMatch, SCLBool>();
 }

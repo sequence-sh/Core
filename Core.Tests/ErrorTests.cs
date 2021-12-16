@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.Logging.Abstractions;
-using Reductech.EDR.Core.TestHarness;
 
 namespace Reductech.EDR.Core.Tests;
 
@@ -28,16 +27,19 @@ public partial class RunErrorTests
                 {
                     InitialSteps = new IStep<Unit>[]
                     {
-                        new SetVariable<int> { Variable = FooString, Value = Constant(42) },
-                        new Print<bool>
+                        new SetVariable<SCLInt>
                         {
-                            Value = new GetVariable<bool> { Variable = FooString }
+                            Variable = FooString, Value = Constant(42)
+                        },
+                        new Print
+                        {
+                            Value = new GetVariable<SCLBool> { Variable = FooString }
                         }
                     },
                     FinalStep = new DoNothing()
                 },
-                new ErrorBuilder(ErrorCode.WrongVariableType, "<Foo>", nameof(Boolean))
-                    .WithLocation(new GetVariable<bool> { Variable = FooString })
+                new ErrorBuilder(ErrorCode.InvalidCast, "<Foo>", 42)
+                    .WithLocation(new GetVariable<SCLBool> { Variable = FooString })
             );
 
             yield return new ErrorTestFunction(
@@ -54,15 +56,15 @@ public partial class RunErrorTests
 
             yield return new ErrorTestFunction(
                 "Array Index minus one",
-                new ArrayElementAtIndex<bool> { Array = Array(true), Index = Constant(-1) },
+                new ArrayElementAtIndex<SCLBool> { Array = Array(true), Index = Constant(-1) },
                 new ErrorBuilder(ErrorCode.IndexOutOfBounds)
             );
 
             yield return new ErrorTestFunction(
                 "Array Index out of bounds",
-                new ArrayElementAtIndex<bool>
+                new ArrayElementAtIndex<SCLBool>
                 {
-                    Array = new ArrayNew<bool>
+                    Array = new ArrayNew<SCLBool>
                     {
                         Elements = new[] { Constant(true), Constant(false) }
                     },
@@ -146,7 +148,7 @@ public partial class RunErrorTests
                 new Dictionary<string, object>()
             );
 
-            var r = await Process.Run<object>(state, CancellationToken.None);
+            var r = await Process.Run<ISCLObject>(state, CancellationToken.None);
 
             r.IsFailure.Should().BeTrue("Step should have failed");
 

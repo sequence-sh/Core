@@ -6,7 +6,6 @@ using NuGet.Packaging;
 using Reductech.EDR.ConnectorManagement;
 using Reductech.EDR.ConnectorManagement.Base;
 using Reductech.EDR.Core.Connectors;
-using Reductech.EDR.Core.TestHarness;
 
 namespace Reductech.EDR.Core.Tests.Connectors;
 

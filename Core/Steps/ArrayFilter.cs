@@ -17,7 +17,7 @@ namespace Reductech.EDR.Core.Steps;
     new[] { "[]" },
     ExecuteInTests = false
 )]
-public sealed class ArrayFilter<T> : CompoundStep<Array<T>>
+public sealed class ArrayFilter<T> : CompoundStep<Array<T>> where T : ISCLObject
 {
     /// <inheritdoc />
     protected override async Task<Result<Array<T>, IError>> Run(
@@ -37,7 +37,7 @@ public sealed class ArrayFilter<T> : CompoundStep<Array<T>>
                 stateMonad,
                 currentState,
                 Predicate.VariableNameOrItem,
-                new KeyValuePair<VariableName, object>(Predicate.VariableNameOrItem, record!)
+                new KeyValuePair<VariableName, ISCLObject>(Predicate.VariableNameOrItem, record)
             );
 
             var result = await Predicate.StepTyped.Run(scopedMonad, cancellationToken);
@@ -45,7 +45,7 @@ public sealed class ArrayFilter<T> : CompoundStep<Array<T>>
             if (result.IsFailure)
                 throw new ErrorException(result.Error);
 
-            if (result.Value)
+            if (result.Value.Value)
                 yield return record;
         }
 
@@ -67,7 +67,7 @@ public sealed class ArrayFilter<T> : CompoundStep<Array<T>>
     [FunctionProperty(2)]
     [Required]
     [Alias("Using")]
-    public LambdaFunction<T, bool> Predicate { get; set; } = null!;
+    public LambdaFunction<T, SCLBool> Predicate { get; set; } = null!;
 
     /// <inheritdoc />
     public override IStepFactory StepFactory => ArrayFilterStepFactory.Instance;
@@ -97,7 +97,7 @@ public sealed class ArrayFilter<T> : CompoundStep<Array<T>>
         }
 
         /// <inheritdoc />
-        protected override string ArrayPropertyName => nameof(ArrayFilter<object>.Array);
+        protected override string ArrayPropertyName => nameof(ArrayFilter<ISCLObject>.Array);
 
         /// <inheritdoc />
         public override Type StepType => typeof(ArrayFilter<>);
@@ -105,6 +105,6 @@ public sealed class ArrayFilter<T> : CompoundStep<Array<T>>
         /// <inheritdoc />
         public override string OutputTypeExplanation => "Array of T";
 
-        protected override string LambdaPropertyName => nameof(ArrayFilter<object>.Predicate);
+        protected override string LambdaPropertyName => nameof(ArrayFilter<ISCLObject>.Predicate);
     }
 }

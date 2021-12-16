@@ -27,22 +27,17 @@ public abstract record StepProperty
     )
     {
         /// <inheritdoc />
-        protected override string SerializeValue()
+        protected override string SerializeValue(SerializeOptions options)
         {
-            return LambdaFunction.Serialize();
+            return LambdaFunction.Serialize(options);
         }
 
         /// <inheritdoc />
-        public override string ToString() => $"{Name} = {SerializeValue()}";
+        public override string ToString() =>
+            $"{Name} = {SerializeValue(SerializeOptions.Serialize)}";
 
         /// <inheritdoc />
         protected override bool ShouldBracketWhenSerialized => true;
-
-        /// <inheritdoc />
-        public override string GetLogName()
-        {
-            return SerializeValue();
-        }
     }
 
     /// <summary>
@@ -61,13 +56,11 @@ public abstract record StepProperty
     )
     {
         /// <inheritdoc />
-        public override string GetLogName() => VariableName.ToString();
-
-        /// <inheritdoc />
         public override string ToString() => $"{Name} = {VariableName}";
 
         /// <inheritdoc />
-        protected override string SerializeValue() => VariableName.Serialize();
+        protected override string SerializeValue(SerializeOptions options) =>
+            VariableName.Serialize(options);
 
         /// <inheritdoc />
         protected override bool ShouldBracketWhenSerialized { get; } = false;
@@ -89,25 +82,11 @@ public abstract record StepProperty
     )
     {
         /// <inheritdoc />
-        public override string GetLogName()
-        {
-            return Step switch
-            {
-                StringConstant str => str.Value.NameInLogs(
-                    LogAttribute?.LogOutputLevel != LogOutputLevel.None
-                ),
-                IConstantStep constant            => constant.Name,
-                CreateEntityStep createEntityStep => createEntityStep.Name,
-                ICompoundStep                     => Step.Name,
-                _                                 => Step.Name
-            };
-        }
-
-        /// <inheritdoc />
         public override string ToString() => $"{Name} = {Step}";
 
         /// <inheritdoc />
-        protected override string SerializeValue() => Step.Serialize();
+        protected override string SerializeValue(SerializeOptions options) =>
+            Step.Serialize(options);
 
         /// <inheritdoc />
         protected override bool ShouldBracketWhenSerialized { get; } =
@@ -130,21 +109,15 @@ public abstract record StepProperty
     )
     {
         /// <inheritdoc />
-        public override string GetLogName()
-        {
-            return StepList.Count + " Elements";
-        }
-
-        /// <inheritdoc />
         public override string ToString() => $"{Name} = {StepList}";
 
         /// <inheritdoc />
-        protected override string SerializeValue()
+        protected override string SerializeValue(SerializeOptions options)
         {
             var l = StepList.Select(
                     s =>
                     {
-                        var ser = s.Serialize();
+                        var ser = s.Serialize(options);
 
                         if (s.ShouldBracketWhenSerialized)
                         {
@@ -166,7 +139,7 @@ public abstract record StepProperty
     /// <summary>
     /// Get the serialized value
     /// </summary>
-    protected abstract string SerializeValue();
+    protected abstract string SerializeValue(SerializeOptions options);
 
     /// <summary>
     /// Whether the value should be bracketed when it was serialized
@@ -176,19 +149,13 @@ public abstract record StepProperty
     /// <summary>
     /// Serialize this
     /// </summary>
-    public string Serialize()
+    public string Serialize(SerializeOptions options)
     {
-        var v = SerializeValue();
+        var v = SerializeValue(options);
 
         if (ShouldBracketWhenSerialized)
             return $"({v})";
 
         return v;
     }
-
-    /// <summary>
-    /// Gets the name as it will appear in the log file.
-    /// </summary>
-    /// <returns></returns>
-    public abstract string GetLogName();
 }

@@ -8,10 +8,10 @@
 [SCLExample("DoesEntity ('type': 'C', 'value': 1) Have: 'type'",  "True")]
 [SCLExample("DoesEntity ('type': null, 'value': 1) Have: 'type'", "True")]
 [SCLExample("EntityHasProperty ('type': 'C', 'value': 1) 'name'", "False")]
-public sealed class EntityHasProperty : CompoundStep<bool>
+public sealed class EntityHasProperty : CompoundStep<SCLBool>
 {
     /// <inheritdoc />
-    protected override async Task<Result<bool, IError>> Run(
+    protected override async Task<Result<SCLBool, IError>> Run(
         IStateMonad stateMonad,
         CancellationToken cancellationToken)
     {
@@ -22,13 +22,13 @@ public sealed class EntityHasProperty : CompoundStep<bool>
         );
 
         if (r.IsFailure)
-            return r.ConvertFailure<bool>();
+            return r.ConvertFailure<SCLBool>();
 
         var (entity, property) = r.Value;
 
         var result = entity.TryGetValue(property).HasValue;
 
-        return result;
+        return result.ConvertToSCLObject();
     }
 
     /// <summary>
@@ -48,5 +48,5 @@ public sealed class EntityHasProperty : CompoundStep<bool>
 
     /// <inheritdoc />
     public override IStepFactory StepFactory { get; } =
-        new SimpleStepFactory<EntityHasProperty, bool>();
+        new SimpleStepFactory<EntityHasProperty, SCLBool>();
 }

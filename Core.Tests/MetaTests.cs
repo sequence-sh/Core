@@ -1,6 +1,4 @@
-﻿using Reductech.EDR.Core.TestHarness;
-
-namespace Reductech.EDR.Core.Tests;
+﻿namespace Reductech.EDR.Core.Tests;
 
 /// <summary>
 /// Makes sure all steps have a test class

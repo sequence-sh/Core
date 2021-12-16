@@ -1,9 +1,11 @@
-﻿namespace Reductech.EDR.Core;
+﻿using System.Text;
+
+namespace Reductech.EDR.Core;
 
 /// <summary>
 /// Either a list or an asynchronous list
 /// </summary>
-public abstract record Array<T> : IArray
+public abstract record Array<T> : IArray where T : ISCLObject
 {
     /// <summary>
     /// The empty array
@@ -73,6 +75,7 @@ public abstract record Array<T> : IArray
     /// Returns some number of elements
     /// </summary>
     public Array<TResult> SelectMany<TResult>(Func<T, IAsyncEnumerable<TResult>> selector)
+        where TResult : ISCLObject
     {
         var r = GetAsyncEnumerable().SelectMany(selector).ToSCLArray();
         return r;
@@ -82,6 +85,7 @@ public abstract record Array<T> : IArray
     /// Perform an action on every member of the sequence
     /// </summary>
     public Array<TResult> SelectAwait<TResult>(Func<T, ValueTask<TResult>> selector)
+        where TResult : ISCLObject
     {
         var r = GetAsyncEnumerable().SelectAwait(selector).ToSCLArray();
 
@@ -102,7 +106,7 @@ public abstract record Array<T> : IArray
                     {
                         var values = await x.ToListAsync();
 
-                        var e = Entity.Create(("Key", x.Key), ("Values", values));
+                        var e = Entity.Create(("Key", x.Key), ("Values", values.ToSCLArray()));
 
                         return e;
                     }
@@ -115,7 +119,7 @@ public abstract record Array<T> : IArray
     /// <summary>
     /// Perform an action on every member of the sequence
     /// </summary>
-    public Array<TResult> Select<TResult>(Func<T, TResult> selector)
+    public Array<TResult> Select<TResult>(Func<T, TResult> selector) where TResult : ISCLObject
     {
         var r = GetAsyncEnumerable().Select(selector).ToSCLArray();
         return r;
@@ -143,22 +147,27 @@ public abstract record Array<T> : IArray
         CancellationToken cancellation);
 
     /// <inheritdoc />
-    public Task<Result<List<object>, IError>> GetObjectsAsync(CancellationToken cancellation)
+    public Task<Result<List<ISCLObject>, IError>> GetObjectsAsync(CancellationToken cancellation)
     {
-        return GetElementsAsync(cancellation).Map(x => x.Cast<object>().ToList());
+        return GetElementsAsync(cancellation).Map(x => x.Cast<ISCLObject>().ToList());
     }
 
     /// <inheritdoc />
-    public abstract string NameInLogs { get; }
+    public TypeReference GetTypeReference() =>
+        new TypeReference.Array(TypeReference.Create(typeof(T)));
 
     /// <inheritdoc />
-    public abstract string Serialize { get; }
+    public abstract string Serialize(SerializeOptions options);
 
     /// <inheritdoc />
-    public abstract Result<Array<TElement>, IErrorBuilder> TryConvertElements<TElement>();
+    public abstract Result<Array<TElement>, IErrorBuilder> TryConvertElements<TElement>()
+        where TElement : ISCLObject;
 
     /// <inheritdoc />
     public abstract Task<Result<IArray, IError>> EnsureEvaluated(CancellationToken cancellation);
+
+    /// <inheritdoc />
+    public abstract bool IsEvaluated { get; }
 
     /// <summary>
     /// Create an array by converting elements
@@ -208,39 +217,137 @@ public abstract record Array<T> : IArray
     }
 
     /// <inheritdoc />
-    public override string ToString() => NameInLogs;
+    public override string ToString() => Serialize(SerializeOptions.Name);
+
+    /// <inheritdoc />
+    public object ToCSharpObject()
+    {
+        return Evaluate(CancellationToken.None)
+            .Result.Value.List.Select(x => x.ToCSharpObject())
+            .ToList();
+    }
+
+    void ISCLObject.Format(
+        StringBuilder stringBuilder,
+        int indentation,
+        FormattingOptions options,
+        string? prefix,
+        string? suffix)
+    {
+        var list = Evaluate(CancellationToken.None)
+            .Result.Value
+            .List; //This can throw an exception in theory but it is unlikely in reality
+
+        if (list.Any(x => x is Entity or IArray))
+        {
+            ISCLObject.AppendLineIndented(
+                stringBuilder,
+                indentation,
+                prefix + "["
+            );
+
+            indentation++;
+
+            for (var index = 0; index < list.Count; index++)
+            {
+                var sclObject  = list[index];
+                var maybeComma = index < list.Count - 1 ? "," : null;
+
+                sclObject.Format(stringBuilder, indentation, options, null, maybeComma);
+            }
+
+            indentation--;
+            ISCLObject.AppendLineIndented(stringBuilder, indentation, "]" + suffix);
+        }
+        else
+        {
+            var line = "[" + string.Join(
+                                 ", ",
+                                 list.Select(x => x.Serialize(SerializeOptions.Serialize))
+                             )
+                           + "]";
+
+            ISCLObject.AppendLineIndented(
+                stringBuilder,
+                indentation,
+                prefix + line + suffix
+            );
+        }
+    }
+
+    /// <inheritdoc />
+    public abstract Maybe<T1> MaybeAs<T1>() where T1 : ISCLObject;
+
+    /// <inheritdoc />
+    public SchemaNode ToSchemaNode(
+        string path,
+        SchemaConversionOptions? schemaConversionOptions)
+    {
+        var list = (this as IArray).ListIfEvaluated();
+
+        if (list.HasValue)
+        {
+            SchemaNode additionalItems = new TrueNode();
+
+            for (var index = 0; index < list.Value.Count; index++)
+            {
+                var entityValue = list.Value[index];
+                var n = entityValue.ToSchemaNode(path + $"[{index}]", schemaConversionOptions);
+                additionalItems = additionalItems.Combine(n);
+            }
+
+            return new ArrayNode(
+                EnumeratedValuesNodeData.Empty,
+                new ItemsData(ImmutableList<SchemaNode>.Empty, additionalItems)
+            );
+        }
+
+        return new ArrayNode(
+            EnumeratedValuesNodeData.Empty,
+            new ItemsData(ImmutableList<SchemaNode>.Empty, TrueNode.Instance)
+        );
+    }
 }
 
 /// <summary>
 /// Either a list of an asynchronous list
 /// </summary>
-public interface IArray
+public interface IArray : ISCLObject
 {
     /// <summary>
     /// Try to get the elements of this list, as objects asynchronously.
     /// </summary>
-    Task<Result<List<object>, IError>> GetObjectsAsync(CancellationToken cancellation);
-
-    /// <summary>
-    /// How this Array will appear in the logs.
-    /// </summary>
-    string NameInLogs { get; }
-
-    /// <summary>
-    /// Serialize this array
-    /// </summary>
-    string Serialize { get; }
+    Task<Result<List<ISCLObject>, IError>> GetObjectsAsync(CancellationToken cancellation);
 
     /// <summary>
     /// Attempts to convert the elements of the array to the chosen type
     /// </summary>
-    Result<Array<TElement>, IErrorBuilder> TryConvertElements<TElement>();
+    Result<Array<TElement>, IErrorBuilder> TryConvertElements<TElement>()
+        where TElement : ISCLObject;
 
     /// <summary>
     /// Ensure that this array is evaluated
     /// </summary>
     [Pure]
     Task<Result<IArray, IError>> EnsureEvaluated(CancellationToken cancellation);
+
+    /// <summary>
+    /// Whether this array is evaluated
+    /// </summary>
+    bool IsEvaluated { get; }
+
+    /// <summary>
+    /// This as a list, if it is evaluated
+    /// </summary>
+    /// <returns></returns>
+    public Maybe<List<ISCLObject>> ListIfEvaluated()
+    {
+        if (!IsEvaluated)
+            return Maybe<List<ISCLObject>>.None;
+
+        var l = GetObjectsAsync(CancellationToken.None).Result.Value;
+        return l;
+    }
 }
 
 /// <summary>
@@ -251,19 +358,19 @@ public static class ArrayHelper
     /// <summary>
     /// Converts an enumerable to a Sequence
     /// </summary>
-    public static Array<T> ToSCLArray<T>(this IAsyncEnumerable<T> enumerable) =>
-        new LazyArray<T>(enumerable);
+    public static Array<T> ToSCLArray<T>(this IAsyncEnumerable<T> enumerable)
+        where T : ISCLObject => new LazyArray<T>(enumerable);
 
     /// <summary>
     /// Converts an asyncEnumerable to a Sequence
     /// </summary>
-    public static Array<T> ToSCLArray<T>(this IEnumerable<T> enumerable) =>
+    public static Array<T> ToSCLArray<T>(this IEnumerable<T> enumerable) where T : ISCLObject =>
         new EagerArray<T>(enumerable.ToList());
 
     /// <summary>
     /// Creates an array from an enumerable of objects
     /// </summary>
-    public static Array<T> CreateArray<T>(IEnumerable<object> elementsEnum)
+    public static Array<T> CreateArray<T>(IEnumerable<object> elementsEnum) where T : ISCLObject
     {
         var r = new EagerArray<T>(elementsEnum.Cast<T>().ToList());
         return r;

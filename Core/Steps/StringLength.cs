@@ -3,7 +3,7 @@
 /// <summary>
 /// Calculates the length of the string.
 /// </summary>
-public sealed class StringLength : CompoundStep<int>
+public sealed class StringLength : CompoundStep<SCLInt>
 {
     /// <summary>
     /// The string to measure the length of.
@@ -14,7 +14,7 @@ public sealed class StringLength : CompoundStep<int>
     public IStep<StringStream> String { get; set; } = null!;
 
     /// <inheritdoc />
-    protected override async Task<Result<int, IError>> Run(
+    protected override async Task<Result<SCLInt, IError>> Run(
         IStateMonad stateMonad,
         CancellationToken cancellationToken)
     {
@@ -22,11 +22,12 @@ public sealed class StringLength : CompoundStep<int>
             .Map(async x => await x.GetStringAsync());
 
         if (str.IsFailure)
-            return str.ConvertFailure<int>();
+            return str.ConvertFailure<SCLInt>();
 
-        return str.Value.Length;
+        return str.Value.Length.ConvertToSCLObject();
     }
 
     /// <inheritdoc />
-    public override IStepFactory StepFactory { get; } = new SimpleStepFactory<StringLength, int>();
+    public override IStepFactory StepFactory { get; } =
+        new SimpleStepFactory<StringLength, SCLInt>();
 }

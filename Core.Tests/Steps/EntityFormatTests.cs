@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.Logging.Abstractions;
 using Reductech.EDR.Core.Internal.Parser;
-using Reductech.EDR.Core.TestHarness;
 
 namespace Reductech.EDR.Core.Tests.Steps;
 
@@ -65,7 +64,9 @@ public partial class EntityFormatTests : StepTestBase<EntityFormat, StringStream
 
         runResult.ShouldBeSuccessful();
 
-        runResult.Value.Serialize().Should().Be(entity.Serialize());
+        runResult.Value.Serialize(SerializeOptions.Serialize)
+            .Should()
+            .Be(entity.Serialize(SerializeOptions.Serialize));
     }
 
     /// <inheritdoc />
@@ -75,7 +76,7 @@ public partial class EntityFormatTests : StepTestBase<EntityFormat, StringStream
         {
             yield return new StepCase(
                 "Format Simple Entity",
-                new Log<StringStream>()
+                new Log()
                 {
                     Value = new EntityFormat()
                     {
@@ -97,7 +98,7 @@ public partial class EntityFormatTests : StepTestBase<EntityFormat, StringStream
 
             yield return new StepCase(
                 "Format Complex entity",
-                new Log<StringStream>()
+                new Log()
                 {
                     Value = new EntityFormat()
                     {

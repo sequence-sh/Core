@@ -1,8 +1,6 @@
-﻿using Reductech.EDR.Core.TestHarness;
+﻿namespace Reductech.EDR.Core.Tests.Steps;
 
-namespace Reductech.EDR.Core.Tests.Steps;
-
-public partial class StringToDateTests : StepTestBase<StringToDate, DateTime>
+public partial class StringToDateTests : StepTestBase<StringToDate, SCLDateTime>
 {
     /// <inheritdoc />
     protected override IEnumerable<StepCase> StepCases
@@ -12,7 +10,7 @@ public partial class StringToDateTests : StepTestBase<StringToDate, DateTime>
             yield return new StepCase(
                 "Convert string using default format",
                 new StringToDate { Date = Constant("2020/10/20 20:30:40") },
-                new DateTime(2020, 10, 20, 20, 30, 40)
+                new DateTime(2020, 10, 20, 20, 30, 40).ConvertToSCLObject()
             );
 
             yield return new StepCase(
@@ -21,7 +19,7 @@ public partial class StringToDateTests : StepTestBase<StringToDate, DateTime>
                 {
                     Date = Constant("10/11/2020 20:30:40"), Culture = Constant("en-GB")
                 },
-                new DateTime(2020, 11, 10, 20, 30, 40)
+                new DateTime(2020, 11, 10, 20, 30, 40).ConvertToSCLObject()
             );
 
             yield return new StepCase(
@@ -30,7 +28,7 @@ public partial class StringToDateTests : StepTestBase<StringToDate, DateTime>
                 {
                     Date = Constant("10/11/2020 20:30:40"), Culture = Constant("en-US")
                 },
-                new DateTime(2020, 10, 11, 20, 30, 40)
+                new DateTime(2020, 10, 11, 20, 30, 40).ConvertToSCLObject()
             );
 
             yield return new StepCase(
@@ -40,7 +38,7 @@ public partial class StringToDateTests : StepTestBase<StringToDate, DateTime>
                     Date        = Constant("2020-10-11 10:30:40 AM"),
                     InputFormat = Constant("yyyy-dd-MM HH:mm:ss tt")
                 },
-                new DateTime(2020, 11, 10, 10, 30, 40)
+                new DateTime(2020, 11, 10, 10, 30, 40).ConvertToSCLObject()
             );
 
             yield return new StepCase(
@@ -51,7 +49,7 @@ public partial class StringToDateTests : StepTestBase<StringToDate, DateTime>
                     Culture     = Constant("en-US"),
                     InputFormat = Constant("dd|MM|yyyy HH:mm:ss tt")
                 },
-                new DateTime(2020, 11, 10, 10, 30, 40)
+                new DateTime(2020, 11, 10, 10, 30, 40).ConvertToSCLObject()
             );
         }
     }

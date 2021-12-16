@@ -5,7 +5,7 @@
 /// </summary>
 [Alias("ToInt")]
 [SCLExample("StringToInt '123'", "123")]
-public sealed class StringToInt : CompoundStep<int>
+public sealed class StringToInt : CompoundStep<SCLInt>
 {
     /// <summary>
     /// The string to convert to an integer
@@ -16,24 +16,25 @@ public sealed class StringToInt : CompoundStep<int>
     public IStep<StringStream> Integer { get; set; } = null!;
 
     /// <inheritdoc />
-    protected override async Task<Result<int, IError>> Run(
+    protected override async Task<Result<SCLInt, IError>> Run(
         IStateMonad stateMonad,
         CancellationToken cancellationToken)
     {
         var result = await Integer.WrapStringStream().Run(stateMonad, cancellationToken);
 
         if (result.IsFailure)
-            return result.ConvertFailure<int>();
+            return result.ConvertFailure<SCLInt>();
 
         if (int.TryParse(result.Value, out var i))
         {
-            return i;
+            return i.ConvertToSCLObject();
         }
 
-        return ErrorCode.CouldNotParse.ToErrorBuilder(result.Value, SCLType.Integer.ToString())
+        return ErrorCode.CouldNotParse.ToErrorBuilder(result.Value, nameof(SCLInt))
             .WithLocationSingle(this);
     }
 
     /// <inheritdoc />
-    public override IStepFactory StepFactory { get; } = new SimpleStepFactory<StringToInt, int>();
+    public override IStepFactory StepFactory { get; } =
+        new SimpleStepFactory<StringToInt, SCLInt>();
 }

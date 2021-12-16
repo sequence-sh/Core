@@ -4,9 +4,8 @@
 /// Base class for compare operations
 /// </summary>
 public abstract class
-    CompareBaseOperatorStep<TStep, TElement> : BaseOperatorStep<TStep, TElement,
-        bool>
-    where TStep : BaseOperatorStep<TStep, TElement, bool>, new()
+    CompareBaseOperatorStep<TStep, TElement> : BaseOperatorStep<TStep, TElement, SCLBool>
+    where TStep : BaseOperatorStep<TStep, TElement, SCLBool>, new() where TElement : ISCLObject
 {
     /// <summary>
     /// Check the result of comparing a term with the next term
@@ -20,7 +19,7 @@ public abstract class
     public override IStepFactory StepFactory { get; } = CompareOperatorStepFactory.Instance;
 
     /// <inheritdoc />
-    protected override Result<bool, IErrorBuilder> Operate(IEnumerable<TElement> terms)
+    protected override Result<SCLBool, IErrorBuilder> Operate(IEnumerable<TElement> terms)
     {
         var       last     = Maybe<TElement>.None;
         IComparer comparer = Comparer<TElement>.Default;
@@ -37,13 +36,13 @@ public abstract class
                 var checkResult = CheckComparisonValue(comparisonValue);
 
                 if (!checkResult)
-                    return false;
+                    return SCLBool.False;
             }
 
             last = term;
         }
 
-        return true;
+        return SCLBool.True;
     }
 
     private class DefaultObjectComparer : IComparer<object>, IComparer

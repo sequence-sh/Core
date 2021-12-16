@@ -19,11 +19,21 @@ public class NullConstant : IConstantStep, IConstantFreezableStep, IStep<SCLNull
     /// <inheritdoc />
     public async Task<Result<T, IError>> Run<T>(
         IStateMonad stateMonad,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken) where T : ISCLObject
     {
         await Task.CompletedTask;
-        return Result.Success<T, IError>(default!);
+
+        var r = (SCLNull.Instance as ISCLObject).TryConvertTyped<T>("Step")
+            .MapError(x => x.WithLocation(TextLocation ?? ErrorLocation.EmptyLocation));
+
+        return r;
     }
+
+    /// <inheritdoc />
+    public Task<Result<ISCLObject, IError>> RunUntyped(
+        IStateMonad stateMonad,
+        CancellationToken cancellationToken) =>
+        Run(stateMonad, cancellationToken).Map(x => x as ISCLObject);
 
     /// <inheritdoc />
     public Result<Unit, IError> Verify(StepFactoryStore stepFactoryStore)
@@ -74,10 +84,7 @@ public class NullConstant : IConstantStep, IConstantFreezableStep, IStep<SCLNull
     public Type OutputType => typeof(SCLNull);
 
     /// <inheritdoc />
-    string IStep.Serialize()
-    {
-        return "null";
-    }
+    string IStep.Serialize(SerializeOptions options) => SCLNull.Instance.Serialize(options);
 
     /// <inheritdoc />
     public IEnumerable<Requirement> RuntimeRequirements
@@ -88,22 +95,10 @@ public class NullConstant : IConstantStep, IConstantFreezableStep, IStep<SCLNull
         }
     }
 
-    /// <inheritdoc />
-    public Maybe<EntityValue> TryConvertToEntityValue()
-    {
-        return EntityValue.Null.Instance;
-    }
-
     /// <summary>
     /// The value
     /// </summary>
-    public object ValueObject => SCLNull.Instance;
-
-    /// <inheritdoc />
-    string IConstantFreezableStep.Serialize()
-    {
-        return "null";
-    }
+    public ISCLObject ValueObject => SCLNull.Instance;
 
     /// <inheritdoc />
     public bool Equals(IFreezableStep? other)
@@ -116,6 +111,19 @@ public class NullConstant : IConstantStep, IConstantFreezableStep, IStep<SCLNull
         IStateMonad stateMonad,
         CancellationToken cancellationToken)
     {
+        await Task.CompletedTask;
         return SCLNull.Instance;
     }
+
+    /// <inheritdoc />
+    public ISCLObject Value => SCLNull.Instance;
+
+    /// <inheritdoc />
+    public Result<IStep, IErrorBuilder> TryConvert(Type memberType, string propertyName)
+    {
+        return ErrorCode.InvalidCast.ToErrorBuilder(propertyName, Name);
+    }
+
+    /// <inheritdoc />
+    public Maybe<ISCLObject> TryGetConstantValue() => Maybe<ISCLObject>.From(SCLNull.Instance);
 }

@@ -1,8 +1,6 @@
-﻿using Reductech.EDR.Core.TestHarness;
+﻿namespace Reductech.EDR.Core.Tests.Steps;
 
-namespace Reductech.EDR.Core.Tests.Steps;
-
-public partial class SetVariableTests : StepTestBase<SetVariable<int>, Unit>
+public partial class SetVariableTests : StepTestBase<SetVariable<SCLInt>, Unit>
 {
     /// <inheritdoc />
     protected override IEnumerable<StepCase> StepCases
@@ -11,7 +9,10 @@ public partial class SetVariableTests : StepTestBase<SetVariable<int>, Unit>
         {
             yield return new StepCase(
                 "Set a new variable",
-                new SetVariable<int> { Value = Constant(42), Variable = new VariableName("Foo") },
+                new SetVariable<SCLInt>
+                {
+                    Value = Constant(42), Variable = new VariableName("Foo")
+                },
                 Unit.Default
             ).WithExpectedFinalState("Foo", 42);
 
@@ -20,7 +21,7 @@ public partial class SetVariableTests : StepTestBase<SetVariable<int>, Unit>
                     new Core.Steps.Sequence<Unit>
                     {
                         InitialSteps = new List<IStep<Unit>> { SetVariable("Foo", 21) },
-                        FinalStep = new SetVariable<int>
+                        FinalStep = new SetVariable<SCLInt>
                         {
                             Value = Constant(42), Variable = new VariableName("Foo")
                         }
@@ -48,7 +49,10 @@ public partial class SetVariableTests : StepTestBase<SetVariable<int>, Unit>
         {
             yield return new SerializeCase(
                 "Short form",
-                new SetVariable<int> { Value = Constant(42), Variable = new VariableName("Foo") },
+                new SetVariable<SCLInt>
+                {
+                    Value = Constant(42), Variable = new VariableName("Foo")
+                },
                 "<Foo> = 42"
             );
         }

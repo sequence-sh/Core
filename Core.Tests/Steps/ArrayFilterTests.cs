@@ -1,6 +1,4 @@
-﻿using Reductech.EDR.Core.TestHarness;
-
-namespace Reductech.EDR.Core.Tests.Steps;
+﻿namespace Reductech.EDR.Core.Tests.Steps;
 
 public partial class ArrayFilterTests : StepTestBase<ArrayFilter<Entity>, Array<Entity>>
 {
@@ -15,7 +13,7 @@ public partial class ArrayFilterTests : StepTestBase<ArrayFilter<Entity>, Array<
                 {
                     Action = new LambdaFunction<Entity, Unit>(
                         null,
-                        new Log<Entity> { Value = GetEntityVariable }
+                        new Log { Value = GetEntityVariable }
                     ),
                     Array = new ArrayFilter<Entity>
                     {
@@ -26,7 +24,7 @@ public partial class ArrayFilterTests : StepTestBase<ArrayFilter<Entity>, Array<
                             Entity.Create(("Foo", "Beta")),
                             Entity.Create(("Bar", "Beta"))
                         ),
-                        Predicate = new LambdaFunction<Entity, bool>(
+                        Predicate = new LambdaFunction<Entity, SCLBool>(
                             null,
                             new EntityHasProperty()
                             {
@@ -36,9 +34,9 @@ public partial class ArrayFilterTests : StepTestBase<ArrayFilter<Entity>, Array<
                     }
                 },
                 Unit.Default,
-                Entity.Create(("Foo", "Alpha")).Serialize(),
-                Entity.Create(("Foo", "ALPHA")).Serialize(),
-                Entity.Create(("Foo", "Beta")).Serialize()
+                Entity.Create(("Foo", "Alpha")).Serialize(SerializeOptions.Serialize),
+                Entity.Create(("Foo", "ALPHA")).Serialize(SerializeOptions.Serialize),
+                Entity.Create(("Foo", "Beta")).Serialize(SerializeOptions.Serialize)
             );
 
             yield return new StepCase(
@@ -47,7 +45,7 @@ public partial class ArrayFilterTests : StepTestBase<ArrayFilter<Entity>, Array<
                 {
                     Action = new LambdaFunction<Entity, Unit>(
                         new VariableName("ForeachVar"),
-                        new Log<Entity> { Value = GetVariable<Entity>("ForeachVar") }
+                        new Log { Value = GetVariable<Entity>("ForeachVar") }
                     ),
                     Array = new ArrayFilter<Entity>
                     {
@@ -58,7 +56,7 @@ public partial class ArrayFilterTests : StepTestBase<ArrayFilter<Entity>, Array<
                             Entity.Create(("Foo", "Beta")),
                             Entity.Create(("Bar", "Beta"))
                         ),
-                        Predicate = new LambdaFunction<Entity, bool>(
+                        Predicate = new LambdaFunction<Entity, SCLBool>(
                             new VariableName("FilterVar"),
                             new EntityHasProperty()
                             {
@@ -69,9 +67,9 @@ public partial class ArrayFilterTests : StepTestBase<ArrayFilter<Entity>, Array<
                     }
                 },
                 Unit.Default,
-                Entity.Create(("Foo", "Alpha")).Serialize(),
-                Entity.Create(("Foo", "ALPHA")).Serialize(),
-                Entity.Create(("Foo", "Beta")).Serialize()
+                Entity.Create(("Foo", "Alpha")).Serialize(SerializeOptions.Serialize),
+                Entity.Create(("Foo", "ALPHA")).Serialize(SerializeOptions.Serialize),
+                Entity.Create(("Foo", "Beta")).Serialize(SerializeOptions.Serialize)
             );
         }
     }
@@ -88,7 +86,7 @@ public partial class ArrayFilterTests : StepTestBase<ArrayFilter<Entity>, Array<
                 new ArrayFilter<Entity>()
                 {
                     Array     = new FailStep<Array<Entity>>() { ErrorMessage = "Stream Fail" },
-                    Predicate = new LambdaFunction<Entity, bool>(null, Constant(true))
+                    Predicate = new LambdaFunction<Entity, SCLBool>(null, Constant(true))
                 },
                 new SingleError(
                     ErrorLocation.EmptyLocation,

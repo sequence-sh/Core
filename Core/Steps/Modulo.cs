@@ -3,10 +3,10 @@
 /// <summary>
 /// Modulo a number by a list of integers sequentially
 /// </summary>
-public sealed class Modulo : BaseOperatorStep<Modulo, int, int>
+public sealed class Modulo : BaseOperatorStep<Modulo, SCLInt, SCLInt>
 {
     /// <inheritdoc />
-    protected override Result<int, IErrorBuilder> Operate(IEnumerable<int> terms)
+    protected override Result<SCLInt, IErrorBuilder> Operate(IEnumerable<SCLInt> terms)
     {
         var total = 0;
         var first = true;
@@ -15,16 +15,16 @@ public sealed class Modulo : BaseOperatorStep<Modulo, int, int>
         {
             if (first)
             {
-                total += number;
+                total += number.Value;
                 first =  false;
             }
             else
             {
-                total %= number;
+                total %= number.Value;
             }
         }
 
-        return total;
+        return total.ConvertToSCLObject();
     }
 
     /// <inheritdoc />

@@ -1,8 +1,6 @@
-﻿using Reductech.EDR.Core.TestHarness;
+﻿namespace Reductech.EDR.Core.Tests.Steps;
 
-namespace Reductech.EDR.Core.Tests.Steps;
-
-public partial class GetAutomaticVariableTests : StepTestBase<GetAutomaticVariable<int>, int>
+public partial class GetAutomaticVariableTests : StepTestBase<GetAutomaticVariable<SCLInt>, SCLInt>
 {
     /// <inheritdoc />
     protected override IEnumerable<StepCase> StepCases
@@ -11,22 +9,22 @@ public partial class GetAutomaticVariableTests : StepTestBase<GetAutomaticVariab
         {
             yield return new StepCase(
                 "Basic use",
-                new Log<int>
+                new Log
                 {
-                    Value = new ArrayElementAtIndex<int>
+                    Value = new ArrayElementAtIndex<SCLInt>
                     {
                         Index = Constant(0),
-                        Array = new ArrayMap<int, int>
+                        Array = new ArrayMap<SCLInt, SCLInt>
                         {
                             Array = Array(1, 2, 3),
-                            Function = new LambdaFunction<int, int>(
+                            Function = new LambdaFunction<SCLInt, SCLInt>(
                                 null,
                                 new Sum
                                 {
-                                    Terms = ArrayNew<int>.CreateArray(
-                                        new List<IStep<int>>
+                                    Terms = ArrayNew<SCLInt>.CreateArray(
+                                        new List<IStep<SCLInt>>
                                         {
-                                            new GetAutomaticVariable<int>(), Constant(13)
+                                            new GetAutomaticVariable<SCLInt>(), Constant(13)
                                         }
                                     )
                                 }
@@ -40,23 +38,23 @@ public partial class GetAutomaticVariableTests : StepTestBase<GetAutomaticVariab
 
             yield return new StepCase(
                 "Basic use with different variable name",
-                new Log<int>()
+                new Log()
                 {
-                    Value = new ArrayElementAtIndex<int>()
+                    Value = new ArrayElementAtIndex<SCLInt>()
                     {
                         Index = Constant(0),
-                        Array = new ArrayMap<int, int>()
+                        Array = new ArrayMap<SCLInt, SCLInt>()
                         {
                             Array = Array(1, 2, 3),
                             Function =
-                                new LambdaFunction<int, int>(
+                                new LambdaFunction<SCLInt, SCLInt>(
                                     new VariableName("MyVar"),
                                     new Sum()
                                     {
-                                        Terms = ArrayNew<int>.CreateArray(
-                                            new List<IStep<int>>()
+                                        Terms = ArrayNew<SCLInt>.CreateArray(
+                                            new List<IStep<SCLInt>>()
                                             {
-                                                new GetAutomaticVariable<int>(),
+                                                new GetAutomaticVariable<SCLInt>(),
                                                 Constant(13)
                                             }
                                         )
@@ -71,44 +69,42 @@ public partial class GetAutomaticVariableTests : StepTestBase<GetAutomaticVariab
 
             yield return new StepCase(
                 "Nested",
-                new Log<int>()
+                new Log()
                 {
-                    Value = new ArrayElementAtIndex<int>()
+                    Value = new ArrayElementAtIndex<SCLInt>()
                     {
                         Index = Constant(0),
-                        Array = new ArrayMap<int, int>()
+                        Array = new ArrayMap<SCLInt, SCLInt>()
                         {
                             Array = Array(1, 2, 3),
-                            Function = new LambdaFunction<int, int>(
+                            Function = new LambdaFunction<SCLInt, SCLInt>(
                                 null,
                                 new Sum()
                                 {
-                                    Terms = ArrayNew<int>.CreateArray(
-                                        new List<IStep<int>>()
+                                    Terms = ArrayNew<SCLInt>.CreateArray(
+                                        new List<IStep<SCLInt>>()
                                         {
-                                            new GetAutomaticVariable<int>(),
-                                            new ArrayElementAtIndex<int>()
+                                            new GetAutomaticVariable<SCLInt>(),
+                                            new ArrayElementAtIndex<SCLInt>()
                                             {
-                                                Array = new ArrayMap<int, int>()
+                                                Array = new ArrayMap<SCLInt, SCLInt>()
                                                 {
                                                     Array = Array(1, 2, 3),
-                                                    Function = new LambdaFunction<int, int>(
+                                                    Function = new LambdaFunction<SCLInt, SCLInt>(
                                                         null,
                                                         new Sum()
                                                         {
                                                             Terms =
-                                                                ArrayNew<
-                                                                        int>
+                                                                ArrayNew<SCLInt>
                                                                     .CreateArray(
                                                                         new List
-                                                                        <IStep
-                                                                            <int>>()
-                                                                        {
-                                                                            new
-                                                                                GetAutomaticVariable
-                                                                                <int>(),
-                                                                            Constant(12)
-                                                                        }
+                                                                            <IStep<SCLInt>>()
+                                                                            {
+                                                                                new
+                                                                                    GetAutomaticVariable
+                                                                                    <SCLInt>(),
+                                                                                Constant(12)
+                                                                            }
                                                                     )
                                                         }
                                                     )
@@ -133,7 +129,11 @@ public partial class GetAutomaticVariableTests : StepTestBase<GetAutomaticVariab
     {
         get
         {
-            yield return new SerializeCase("Basic Case", new GetAutomaticVariable<int>() { }, "<>");
+            yield return new SerializeCase(
+                "Basic Case",
+                new GetAutomaticVariable<SCLInt>(),
+                "<>"
+            );
         }
     }
 }

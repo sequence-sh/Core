@@ -3,16 +3,17 @@
 /// <summary>
 /// Negation of a boolean value.
 /// </summary>
-[SCLExample("Not true",  "False", null)]
-[SCLExample("Not false", "True",  null)]
-public sealed class Not : CompoundStep<bool>
+[SCLExample("Not true",  "False")]
+[SCLExample("Not false", "True")]
+public sealed class Not : CompoundStep<SCLBool>
 {
     /// <inheritdoc />
-    protected override async Task<Result<bool, IError>> Run(
+    protected override async Task<Result<SCLBool, IError>> Run(
         IStateMonad stateMonad,
         CancellationToken cancellationToken)
     {
-        return await Boolean.Run(stateMonad, cancellationToken).Map(x => !x);
+        return await Boolean.Run(stateMonad, cancellationToken)
+            .Map(x => (!x.Value).ConvertToSCLObject());
     }
 
     /// <inheritdoc />
@@ -23,12 +24,12 @@ public sealed class Not : CompoundStep<bool>
     /// </summary>
     [StepProperty(1)]
     [Required]
-    public IStep<bool> Boolean { get; set; } = null!;
+    public IStep<SCLBool> Boolean { get; set; } = null!;
 
     /// <summary>
     /// Negation of a boolean value.
     /// </summary>
-    private class NotStepFactory : SimpleStepFactory<Not, bool>
+    private class NotStepFactory : SimpleStepFactory<Not, SCLBool>
     {
         private NotStepFactory() { }
 

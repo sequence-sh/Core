@@ -7,7 +7,7 @@
 [Alias("ForEachItem")]
 [SCLExample("ForEach [1, 2, 3] Action: (Log <item>)",     ExpectedLogs = new[] { "1", "2", "3" })]
 [SCLExample("ForEachItem In: [1, 2, 3] Do: (Log <item>)", ExpectedLogs = new[] { "1", "2", "3" })]
-public sealed class ForEach<T> : CompoundStep<Unit>
+public sealed class ForEach<T> : CompoundStep<Unit> where T : ISCLObject
 {
     /// <summary>
     /// The array or entity stream to iterate over
@@ -43,7 +43,7 @@ public sealed class ForEach<T> : CompoundStep<Unit>
                 stateMonad,
                 currentState,
                 Action.VariableNameOrItem,
-                new KeyValuePair<VariableName, object>(Action.VariableNameOrItem, element!)
+                new KeyValuePair<VariableName, ISCLObject>(Action.VariableNameOrItem, element)
             );
 
             var result = await Action.StepTyped.Run(scopedMonad, cancellation);
@@ -88,10 +88,10 @@ public sealed class ForEach<T> : CompoundStep<Unit>
         }
 
         /// <inheritdoc />
-        protected override string ArrayPropertyName => nameof(ForEach<object>.Array);
+        protected override string ArrayPropertyName => nameof(ForEach<ISCLObject>.Array);
 
         /// <inheritdoc />
-        protected override string LambdaPropertyName => nameof(ForEach<object>.Action);
+        protected override string LambdaPropertyName => nameof(ForEach<ISCLObject>.Action);
 
         /// <inheritdoc />
         public override string OutputTypeExplanation => nameof(Unit);

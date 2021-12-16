@@ -13,12 +13,12 @@ public record AnyStringFormat : StringFormat
     public static AnyStringFormat Instance { get; } = new();
 
     /// <inheritdoc />
-    public override Result<Maybe<EntityValue>, IErrorBuilder> TryTransform(
+    public override Result<Maybe<ISCLObject>, IErrorBuilder> TryTransform(
         string propertyName,
-        EntityValue entityValue,
+        ISCLObject ISCLObject,
         TransformSettings transformSettings)
     {
-        return Maybe<EntityValue>.None;
+        return Maybe<ISCLObject>.None;
     }
 
     /// <inheritdoc />

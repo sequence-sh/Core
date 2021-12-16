@@ -4,10 +4,10 @@
 /// Divide an integer by a list of integers
 /// </summary>
 [SCLExample("5 / 2", "2")]
-public sealed class Divide : BaseOperatorStep<Divide, int, int>
+public sealed class Divide : BaseOperatorStep<Divide, SCLInt, SCLInt>
 {
     /// <inheritdoc />
-    protected override Result<int, IErrorBuilder> Operate(IEnumerable<int> terms)
+    protected override Result<SCLInt, IErrorBuilder> Operate(IEnumerable<SCLInt> terms)
     {
         var total = 0;
         var first = true;
@@ -16,19 +16,19 @@ public sealed class Divide : BaseOperatorStep<Divide, int, int>
         {
             if (first)
             {
-                total += number;
+                total += number.Value;
                 first =  false;
             }
             else
             {
-                if (number == 0)
+                if (number.Value == 0)
                     return ErrorCode.DivideByZero.ToErrorBuilder();
 
-                total /= number;
+                total /= number.Value;
             }
         }
 
-        return total;
+        return total.ConvertToSCLObject();
     }
 
     /// <inheritdoc />

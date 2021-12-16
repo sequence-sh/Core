@@ -2,10 +2,10 @@
 
 namespace Reductech.EDR.Core.Tests;
 
-[AutoTheory.UseTestOutputHelper]
+[UseTestOutputHelper]
 public partial class StateMonadTests
 {
-    public interface IDoubleDisposable : IStateDisposable, IDisposable { }
+    public interface IDoubleDisposable : IStateDisposable, IDisposable, ISCLObject { }
 
     [Fact]
     public async Task StateMonadShouldDisposeVariablesThatItRemoves()
@@ -69,7 +69,7 @@ public partial class StateMonadTests
 
         var scopedMonad = new ScopedStateMonad(
             monad1,
-            ImmutableDictionary<VariableName, object>.Empty,
+            ImmutableDictionary<VariableName, ISCLObject>.Empty,
             Maybe<VariableName>.None
         );
 
@@ -100,7 +100,7 @@ public partial class StateMonadTests
 
         var scopedMonad = new ScopedStateMonad(
             monad1,
-            ImmutableDictionary<VariableName, object>.Empty,
+            ImmutableDictionary<VariableName, ISCLObject>.Empty,
             Maybe<VariableName>.None
         );
 

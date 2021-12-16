@@ -1,6 +1,4 @@
-﻿using Reductech.EDR.Core.TestHarness;
-
-namespace Reductech.EDR.Core.Tests.Steps;
+﻿namespace Reductech.EDR.Core.Tests.Steps;
 
 public partial class EntityGetValueTests : StepTestBase<EntityGetValue<StringStream>, StringStream>
 {
@@ -23,10 +21,10 @@ public partial class EntityGetValueTests : StepTestBase<EntityGetValue<StringStr
                 "Get Enum Property",
                 new EntityGetValue<StringStream>
                 {
-                    Entity   = Constant(Entity.Create(("Foo", Enums.TextCase.Lower))),
+                    Entity   = Constant(Entity.Create(("Foo", TextCase.Lower))),
                     Property = Constant("Foo")
                 },
-                "TextCase.Lower"
+                "Lower"
             );
 
             yield return new StepCase(
@@ -94,7 +92,7 @@ public partial class EntityGetValueTypeTests : StepTestBase<AssertTrue, Unit>
 
             yield return new StepCase(
                 "Get Simple Property (Empty)",
-                GetTestCase(Constant("null"), TheEntity, "Empty"),
+                GetTestCase(new SCLConstant<SCLNull>(SCLNull.Instance), TheEntity, "Empty"),
                 Unit.Default
             );
 
@@ -133,7 +131,7 @@ public partial class EntityGetValueTypeTests : StepTestBase<AssertTrue, Unit>
     private static AssertTrue GetTestCase<T>(
         IStep<T> expected,
         Entity entity,
-        string propertyName) => new()
+        string propertyName) where T : ISCLObject => new()
     {
         Boolean = new Equals<T>
         {

@@ -28,12 +28,12 @@ public class StepSerializer : IStepSerializer
     public IReadOnlyCollection<ISerializerBlock> Blocks { get; }
 
     /// <inheritdoc />
-    public string Serialize(IEnumerable<StepProperty> stepProperties)
+    public string Serialize(SerializeOptions options, IEnumerable<StepProperty> stepProperties)
     {
         var dict = stepProperties.ToDictionary(x => x.Name);
 
         var result = Blocks
-            .Select(x => x.TryGetSegmentText(dict))
+            .Select(x => x.TryGetSegmentText(options, dict))
             .Combine();
 
         if (result.IsSuccess) //The custom serialization worked
@@ -41,7 +41,7 @@ public class StepSerializer : IStepSerializer
 
         var defaultSerializer = new FunctionSerializer(TypeName);
 
-        var r = defaultSerializer.Serialize(dict.Values);
+        var r = defaultSerializer.Serialize(options, dict.Values);
 
         return r;
     }

@@ -3,7 +3,7 @@
 /// <summary>
 /// A step that calls a rest service
 /// </summary>
-public abstract class RESTStep<TOutput> : CompoundStep<TOutput>
+public abstract class RESTStep<TOutput> : CompoundStep<TOutput> where TOutput : ISCLObject
 {
     /// <summary>
     /// The REST method

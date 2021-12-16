@@ -9,7 +9,7 @@
 [Alias("FindInstance")]
 [SCLExample("StringFind SubString: 'ello' InString: 'hello hello!'", "1")]
 [SCLExample("FindInstance Of: 'ello' In: 'hello hello!'",            "1")]
-public sealed class StringFind : CompoundStep<int>
+public sealed class StringFind : CompoundStep<SCLInt>
 {
     /// <summary>
     /// The string to check.
@@ -29,7 +29,7 @@ public sealed class StringFind : CompoundStep<int>
     public IStep<StringStream> SubString { get; set; } = null!;
 
     /// <inheritdoc />
-    protected override async Task<Result<int, IError>> Run(
+    protected override async Task<Result<SCLInt, IError>> Run(
         IStateMonad stateMonad,
         CancellationToken cancellationToken)
     {
@@ -37,17 +37,17 @@ public sealed class StringFind : CompoundStep<int>
             .Map(async x => await x.GetStringAsync());
 
         if (str.IsFailure)
-            return str.ConvertFailure<int>();
+            return str.ConvertFailure<SCLInt>();
 
         var subString = await SubString.Run(stateMonad, cancellationToken)
             .Map(async x => await x.GetStringAsync());
 
         if (subString.IsFailure)
-            return subString.ConvertFailure<int>();
+            return subString.ConvertFailure<SCLInt>();
 
-        return str.Value.IndexOf(subString.Value, StringComparison.Ordinal);
+        return str.Value.IndexOf(subString.Value, StringComparison.Ordinal).ConvertToSCLObject();
     }
 
     /// <inheritdoc />
-    public override IStepFactory StepFactory { get; } = new SimpleStepFactory<StringFind, int>();
+    public override IStepFactory StepFactory { get; } = new SimpleStepFactory<StringFind, SCLInt>();
 }

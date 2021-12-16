@@ -9,7 +9,7 @@
 [SCLExample("ArrayFirst ['a', 'b', 'c']",                ExpectedOutput = "a")]
 [SCLExample("ArrayFirst [('a': 1), ('a': 2), ('a': 3)]", ExpectedOutput = "('a': 1)")]
 [SCLExample("GetFirstItem In: [1,2,3]",                  ExpectedOutput = "1")]
-public sealed class ArrayFirst<T> : CompoundStep<T>
+public sealed class ArrayFirst<T> : CompoundStep<T> where T : ISCLObject
 {
     /// <inheritdoc />
     protected override Task<Result<T, IError>> Run(
@@ -61,7 +61,7 @@ public sealed class ArrayFirst<T> : CompoundStep<T>
         }
 
         /// <inheritdoc />
-        protected override string ArrayPropertyName => nameof(ArrayFirst<object>.Array);
+        protected override string ArrayPropertyName => nameof(ArrayFirst<ISCLObject>.Array);
 
         /// <inheritdoc />
         protected override string? LambdaPropertyName => null;

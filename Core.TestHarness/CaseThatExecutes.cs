@@ -48,7 +48,7 @@ public abstract partial class StepTestBase<TStep, TOutput>
                 var result = await outputStep.Run<TOutput>(stateMonad, CancellationToken.None);
                 CheckOutputResult(result);
             }
-            else if (step is IStep<object> objectStep)
+            else if (step is IStep<ISCLObject> objectStep)
             {
                 var result = await objectStep.Run<TOutput>(stateMonad, CancellationToken.None);
                 CheckOutputResult(result);
@@ -60,7 +60,7 @@ public abstract partial class StepTestBase<TStep, TOutput>
             }
             else
             {
-                var result = await step.Run<object>(stateMonad, CancellationToken.None);
+                var result = await step.Run<ISCLObject>(stateMonad, CancellationToken.None);
                 CheckObjectResult(step, result);
             }
 
@@ -104,7 +104,7 @@ public abstract partial class StepTestBase<TStep, TOutput>
         public abstract void CheckUnitResult(Result<Unit, IError> result);
         public abstract void CheckOutputResult(Result<TOutput, IError> result);
 
-        public virtual void CheckObjectResult(IStep step, Result<object, IError> result)
+        public virtual void CheckObjectResult(IStep step, Result<ISCLObject, IError> result)
         {
             var stepType = step.GetType().GetDisplayName();
 
@@ -174,7 +174,7 @@ public abstract partial class StepTestBase<TStep, TOutput>
 
         public LogLevel CheckLogLevel { get; set; } = LogLevel.Information;
 
-        public Dictionary<VariableName, object> ExpectedFinalState { get; } = new();
+        public Dictionary<VariableName, ISCLObject> ExpectedFinalState { get; } = new();
         public string Name { get; set; } = Name;
 
         public IReadOnlyCollection<string> ExpectedLoggedValues { get; set; } =

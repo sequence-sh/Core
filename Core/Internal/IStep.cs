@@ -12,8 +12,18 @@ public interface IStep
 
     /// <summary>
     /// Run this step and return the result, assuming it is the specified type.
+    /// Does not activate the logging
     /// </summary>
-    Task<Result<T, IError>> Run<T>(IStateMonad stateMonad, CancellationToken cancellationToken);
+    Task<Result<T, IError>> Run<T>(IStateMonad stateMonad, CancellationToken cancellationToken)
+        where T : ISCLObject;
+
+    /// <summary>
+    /// Run this step and return the result, assuming it is the specified type.
+    /// Logs data about the step.
+    /// </summary>
+    Task<Result<ISCLObject, IError>> RunUntyped(
+        IStateMonad stateMonad,
+        CancellationToken cancellationToken);
 
     /// <summary>
     /// Verify that this step can be run with the current settings.
@@ -38,7 +48,7 @@ public interface IStep
     /// <summary>
     /// Serialize this step.
     /// </summary>
-    string Serialize();
+    string Serialize(SerializeOptions options);
 
     /// <summary>
     /// Requirements for this step that can only be determined at runtime.
@@ -46,18 +56,59 @@ public interface IStep
     IEnumerable<Requirement> RuntimeRequirements { get; }
 
     /// <summary>
-    /// If this step has a constant, state-independent value, calculate it.
+    /// Get the value of this step if it is constant
     /// </summary>
-    Maybe<EntityValue> TryConvertToEntityValue();
+    Maybe<ISCLObject> TryGetConstantValue();
+
+    /// <summary>
+    /// Try to coerce this step to a step of another type
+    /// </summary>
+    public virtual Result<IStep, IErrorBuilder> TryCoerce(string propertyName, Type desiredStepType)
+    {
+        if (desiredStepType.IsInstanceOfType(this))
+            return Result.Success<IStep, IErrorBuilder>(this); //No coercion required
+
+        if (desiredStepType.IsGenericType)
+        {
+            var nestedType = desiredStepType.GenericTypeArguments.First();
+
+            if (nestedType.GetInterfaces().Contains(typeof(ISCLOneOf)))
+            {
+                var oneOfTypes = nestedType.GenericTypeArguments;
+
+                foreach (var oneOfType in oneOfTypes)
+                {
+                    var stepType     = typeof(IStep<>).MakeGenericType(oneOfType);
+                    var coerceResult = TryCoerce(propertyName, stepType);
+
+                    if (coerceResult.IsSuccess)
+                    {
+                        var resultStep = OneOfStep.Create(nestedType, this);
+                        return Result.Success<IStep, IErrorBuilder>(resultStep);
+                    }
+                }
+            }
+            else if (this is IConstantStep constantStep)
+            {
+                var conversionResult = constantStep.TryConvert(nestedType, propertyName);
+                return conversionResult;
+            }
+            else if (nestedType == typeof(ISCLObject))
+                return Result.Success<IStep, IErrorBuilder>(this);
+        }
+
+        return ErrorCode.InvalidCast.ToErrorBuilder(propertyName, Name);
+    }
 }
 
 /// <summary>
 /// A step that can be run.
 /// </summary>
-public interface IStep<T> : IStep, IRunnableStep<T> { }
+public interface IStep<T> : IStep, IRunnableStep<T> where T : ISCLObject { }
 
 /// <summary>
-/// Something that can be run like a step
+/// Something that can be run like a step.
+/// Note that the return type does not have to be ISCLObject
 /// </summary>
 public interface IRunnableStep<T>
 {

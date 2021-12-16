@@ -1,5 +1,4 @@
 ﻿using MELT;
-using Reductech.EDR.Core.TestHarness;
 
 namespace Reductech.EDR.Core.Tests;
 
@@ -378,24 +377,6 @@ Log 'Comments!'",
                 "all.md"
             );
 
-            //            yield return new DeserializationTestInstance(
-            //                @"
-            //- <docs> = (DocumentationCreate)['AllPages']
-            //- <docs> | ForEach (
-            //    - log <>['FileName']
-            //)
-            //",
-            //                "all.md"
-            //            );
-
-            //            yield return new DeserializationTestInstance(
-            //                @"
-            //- <docs> = (DocumentationCreate)['AllPages']
-            //-  ForEach <docs> (log <>['FileName'])
-            //",
-            //                "all.md"
-            //            );
-
             yield return new DeserializationTestInstance(
                 @"
 - (DocumentationCreate)['AllPages'] | ArrayFilter (<>['FileName'] == 'Not.md') | ForEach (
@@ -529,7 +510,7 @@ Log 'Comments!'",
 - <bar> = 'b'
 - ['a', <bar>, 'c']
 ",
-                "3 Elements"
+                "[\"a\", \"b\", \"c\"]"
             );
 
             yield return new DeserializationTestInstance(
@@ -537,7 +518,7 @@ Log 'Comments!'",
 - <bar> = ('letter': 'b')['letter']
 - ['a', <bar>, 'c']
 ",
-                "3 Elements"
+                "[\"a\", \"b\", \"c\"]"
             );
 
             yield return new DeserializationTestInstance(
@@ -675,25 +656,25 @@ Log 'Comments!'",
             yield return new DeserializationTestInstance(
                 @"
 - <docs> = (DocumentationCreate)['AllPages'] | ArrayTake 50
-- log <docs>
+- log (ArrayLength <docs>) 
 ",
-                "50 Elements"
+                "50"
             );
 
             yield return new DeserializationTestInstance(
                 @"
-- <docs> = (a: [1,2,3])['a'] | arrayskip 0
-- log <docs>
+- <nums> = (a: [1,2,3])['a'] | arrayskip 0
+- log <nums>
 ",
-                "3 Elements"
+                "[1, 2, 3]"
             );
 
             yield return new DeserializationTestInstance(
                 @"
-- <docs> = (a: 1,2,3)['a'] | arrayskip 0
-- log <docs>
+- <nums> = (a: 1,2,3)['a']
+- log <nums>
 ",
-                "3 Elements"
+                "[1, 2, 3]"
             );
 
             yield return new DeserializationTestInstance(
