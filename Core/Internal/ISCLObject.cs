@@ -188,10 +188,6 @@ public interface ISCLObject
             }
         }
 
-        //Array
-        //Enum
-        //Oneof
-
         throw new Exception($"Cannot Get Default Value of type {typeof(T).Name}");
     }
 
@@ -229,6 +225,43 @@ public interface ISCLObject
     };
 
     /// <summary>
+    /// Create an SCL object from a JSON element
+    /// </summary>
+    public static ISCLObject CreateFromJElement(JsonElement element)
+    {
+        switch (element.ValueKind)
+        {
+            case JsonValueKind.Undefined: return Entity.Create(element);
+            case JsonValueKind.Object:    return Entity.Create(element);
+            case JsonValueKind.Array:
+            {
+                var enumerator = element.EnumerateArray();
+                var list       = new List<ISCLObject>(element.GetArrayLength());
+
+                while (enumerator.MoveNext())
+                {
+                    var arrayElement = CreateFromJElement(enumerator.Current);
+                    list.Add(arrayElement);
+                }
+
+                return list.ToSCLArray();
+            }
+            case JsonValueKind.String: return new StringStream(element.GetString()!);
+            case JsonValueKind.Number:
+            {
+                if (element.TryGetInt32(out var i))
+                    return new SCLInt(i);
+
+                return new SCLDouble(element.GetDouble());
+            }
+            case JsonValueKind.True:  return SCLBool.True;
+            case JsonValueKind.False: return SCLBool.False;
+            case JsonValueKind.Null:  return SCLNull.Instance;
+            default:                  throw new ArgumentOutOfRangeException();
+        }
+    }
+
+    /// <summary>
     /// Create an SCL object from a CSharp object
     /// </summary>
     [Pure]
@@ -247,7 +280,7 @@ public interface ISCLObject
             DateTime dateTime                             => new SCLDateTime(dateTime),
             Enum e                                        => new StringStream(e.GetDisplayName()),
             Version version                               => new StringStream(version.ToString()),
-            JsonElement je                                => Entity.Create(je),
+            JsonElement je                                => CreateFromJElement(je),
             IEntityConvertible entityConvertible          => entityConvertible.ConvertToEntity(),
             IOneOf oneOf                                  => CreateFromCSharpObject(oneOf.Value),
             IDictionary dict                              => Entity.Create(dict),
