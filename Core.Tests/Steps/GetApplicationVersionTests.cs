@@ -1,6 +1,6 @@
-﻿using Reductech.EDR.ConnectorManagement.Base;
+﻿using Reductech.Sequence.ConnectorManagement.Base;
 
-namespace Reductech.EDR.Core.Tests.Steps;
+namespace Reductech.Sequence.Core.Tests.Steps;
 
 public partial class
     GetApplicationVersionTests : StepTestBase<GetApplicationVersion, StringStream>

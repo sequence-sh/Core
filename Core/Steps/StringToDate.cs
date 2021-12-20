@@ -1,6 +1,6 @@
 ﻿using System.Globalization;
 
-namespace Reductech.EDR.Core.Steps;
+namespace Reductech.Sequence.Core.Steps;
 
 /// <summary>
 /// Converts a date to the specified format, yyyyMMddHHmm by default.

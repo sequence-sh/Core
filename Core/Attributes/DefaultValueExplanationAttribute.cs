@@ -1,4 +1,4 @@
-﻿namespace Reductech.EDR.Core.Attributes;
+﻿namespace Reductech.Sequence.Core.Attributes;
 
 /// <summary>
 /// Use this attribute to explain the meaning of the default value.

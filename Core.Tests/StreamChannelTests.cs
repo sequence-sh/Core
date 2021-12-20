@@ -1,8 +1,8 @@
 ﻿using System.IO;
 using System.Text;
-using Reductech.EDR.Core.ExternalProcesses;
+using Reductech.Sequence.Core.ExternalProcesses;
 
-namespace Reductech.EDR.Core.Tests;
+namespace Reductech.Sequence.Core.Tests;
 
 public partial class StreamChannelTests
 {

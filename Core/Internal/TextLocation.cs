@@ -1,7 +1,7 @@
 ﻿using Antlr4.Runtime;
 using Antlr4.Runtime.Misc;
 
-namespace Reductech.EDR.Core.Internal;
+namespace Reductech.Sequence.Core.Internal;
 
 /// <summary>
 /// A location within a piece of text

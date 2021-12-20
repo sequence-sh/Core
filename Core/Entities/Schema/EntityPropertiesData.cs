@@ -1,6 +1,6 @@
 ﻿using Generator.Equals;
 
-namespace Reductech.EDR.Core.Entities.Schema;
+namespace Reductech.Sequence.Core.Entities.Schema;
 
 /// <summary>
 /// Data about entity properties

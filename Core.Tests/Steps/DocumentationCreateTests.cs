@@ -1,9 +1,9 @@
 ﻿using System.Text;
-using Reductech.EDR.ConnectorManagement.Base;
-using Reductech.EDR.Core.Internal.Documentation;
-using StepParameter = Reductech.EDR.Core.Internal.Documentation.StepParameter;
+using Reductech.Sequence.ConnectorManagement.Base;
+using Reductech.Sequence.Core.Internal.Documentation;
+using StepParameter = Reductech.Sequence.Core.Internal.Documentation.StepParameter;
 
-namespace Reductech.EDR.Core.Tests.Steps;
+namespace Reductech.Sequence.Core.Tests.Steps;
 
 public partial class DocumentationCreateTests : StepTestBase<DocumentationCreate, Entity>
 {
@@ -138,7 +138,7 @@ public partial class DocumentationCreateTests : StepTestBase<DocumentationCreate
                 }
             );
 
-            var notContents = Contents("EDR", true, notHeader);
+            var notContents = Contents("Sequence®", true, notHeader);
 
             var notDocumentationEntity = new DocumentationCreationResult(
                 notContents,
@@ -218,7 +218,7 @@ public partial class DocumentationCreateTests : StepTestBase<DocumentationCreate
                 }
             );
 
-            var exampleContents = Contents("EDR", true, exampleStepHeader);
+            var exampleContents = Contents("Sequence®", true, exampleStepHeader);
 
             var exampleCreationResult = new DocumentationCreationResult(
                 exampleContents,

@@ -1,4 +1,4 @@
-﻿namespace Reductech.EDR.Core.Internal.Errors;
+﻿namespace Reductech.Sequence.Core.Internal.Errors;
 
 /// <summary>
 /// An exception that wraps an error

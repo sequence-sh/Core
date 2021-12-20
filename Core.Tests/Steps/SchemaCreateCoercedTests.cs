@@ -1,6 +1,6 @@
-﻿using static Reductech.EDR.Core.TestHarness.SchemaHelpers;
+﻿using static Reductech.Sequence.Core.TestHarness.SchemaHelpers;
 
-namespace Reductech.EDR.Core.Tests.Steps;
+namespace Reductech.Sequence.Core.Tests.Steps;
 
 public partial class SchemaCreateCoercedTests : StepTestBase<SchemaCreateCoerced, Entity>
 {

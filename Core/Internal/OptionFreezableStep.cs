@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
 
-namespace Reductech.EDR.Core.Internal;
+namespace Reductech.Sequence.Core.Internal;
 
 /// <summary>
 /// A step that could be one of several options

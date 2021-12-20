@@ -1,7 +1,7 @@
 ﻿using System.Net;
-using Reductech.EDR.Core.ExternalProcesses;
+using Reductech.Sequence.Core.ExternalProcesses;
 
-namespace Reductech.EDR.Core.TestHarness;
+namespace Reductech.Sequence.Core.TestHarness;
 
 public static class Extensions
 {

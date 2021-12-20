@@ -1,4 +1,4 @@
-﻿namespace Reductech.EDR.Core.Attributes;
+﻿namespace Reductech.Sequence.Core.Attributes;
 
 /// <summary>
 /// Controls when a property value will output by the logger.

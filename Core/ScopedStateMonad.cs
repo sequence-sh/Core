@@ -1,9 +1,9 @@
 ﻿using System.Collections.Concurrent;
 using Microsoft.Extensions.Logging;
-using Reductech.EDR.Core.Abstractions;
-using Reductech.EDR.Core.Internal.Logging;
+using Reductech.Sequence.Core.Abstractions;
+using Reductech.Sequence.Core.Internal.Logging;
 
-namespace Reductech.EDR.Core;
+namespace Reductech.Sequence.Core;
 
 /// <summary>
 /// A state monad with additional state defined

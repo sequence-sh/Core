@@ -2,12 +2,12 @@
 using System.Text;
 using Antlr4.Runtime;
 using Antlr4.Runtime.Tree;
-using static Reductech.EDR.Core.Internal.FreezableFactory;
+using static Reductech.Sequence.Core.Internal.FreezableFactory;
 using StepParameterDict =
-    System.Collections.Generic.Dictionary<Reductech.EDR.Core.Internal.StepParameterReference,
-        Reductech.EDR.Core.Internal.FreezableStepProperty>;
+    System.Collections.Generic.Dictionary<Reductech.Sequence.Core.Internal.StepParameterReference,
+        Reductech.Sequence.Core.Internal.FreezableStepProperty>;
 
-namespace Reductech.EDR.Core.Internal.Parser;
+namespace Reductech.Sequence.Core.Internal.Parser;
 
 /// <summary>
 /// Contains methods for parsing sequences

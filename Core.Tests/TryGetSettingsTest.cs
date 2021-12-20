@@ -1,8 +1,8 @@
 ﻿using System.Runtime.Serialization;
 using System.Text.Json;
-using Reductech.EDR.ConnectorManagement.Base;
+using Reductech.Sequence.ConnectorManagement.Base;
 
-namespace Reductech.EDR.Core.Tests;
+namespace Reductech.Sequence.Core.Tests;
 
 [UseTestOutputHelper]
 public partial class TryGetSettingsTest
@@ -11,8 +11,8 @@ public partial class TryGetSettingsTest
         @"
 {
     ""Connectors"": {
-        ""Reductech.EDR.Connectors.MyConnector"": {
-            ""Id"": ""Reductech.EDR.Connectors.MyConnector"",
+        ""Reductech.Sequence.Connectors.MyConnector"": {
+            ""Id"": ""Reductech.Sequence.Connectors.MyConnector"",
             ""Version"": ""0.13.0"",
 
             ""Settings"": {
@@ -27,7 +27,7 @@ public partial class TryGetSettingsTest
 }
     ";
 
-    private const string ConnectorKey = "Reductech.EDR.Connectors.MyConnector";
+    private const string ConnectorKey = "Reductech.Sequence.Connectors.MyConnector";
 
     [Fact]
     public void ShouldGetSettings()

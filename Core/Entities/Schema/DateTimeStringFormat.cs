@@ -1,6 +1,6 @@
 ﻿using System.Globalization;
 
-namespace Reductech.EDR.Core.Entities.Schema;
+namespace Reductech.Sequence.Core.Entities.Schema;
 
 /// <summary>
 /// The date-time string format format

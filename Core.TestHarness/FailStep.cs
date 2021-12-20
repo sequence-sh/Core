@@ -1,4 +1,4 @@
-﻿namespace Reductech.EDR.Core.TestHarness;
+﻿namespace Reductech.Sequence.Core.TestHarness;
 
 public abstract partial class StepTestBase<TStep, TOutput>
 {

@@ -1,7 +1,7 @@
 ﻿using System.Linq.Expressions;
-using Reductech.EDR.Core.ExternalProcesses;
+using Reductech.Sequence.Core.ExternalProcesses;
 
-namespace Reductech.EDR.Core.TestHarness;
+namespace Reductech.Sequence.Core.TestHarness;
 
 /// <summary>
 /// A case that executes a step.

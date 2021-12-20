@@ -1,6 +1,6 @@
 ﻿using System.Runtime.Serialization;
 
-namespace Reductech.EDR.Core.Internal.Documentation;
+namespace Reductech.Sequence.Core.Internal.Documentation;
 
 /// <summary>
 /// The result of Generating Documentation

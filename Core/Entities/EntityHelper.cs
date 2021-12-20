@@ -1,4 +1,4 @@
-﻿namespace Reductech.EDR.Core;
+﻿namespace Reductech.Sequence.Core;
 
 /// <summary>
 /// Contains methods for helping with entities.

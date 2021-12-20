@@ -1,6 +1,6 @@
 ﻿using System.IO;
 
-namespace Reductech.EDR.Core.Abstractions;
+namespace Reductech.Sequence.Core.Abstractions;
 
 /// <summary>
 /// Provides methods for interacting with the console

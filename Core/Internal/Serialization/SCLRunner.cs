@@ -1,10 +1,10 @@
 ﻿using Microsoft.Extensions.Logging;
-using Reductech.EDR.Core.Abstractions;
-using Reductech.EDR.Core.Internal.Logging;
-using Reductech.EDR.Core.Internal.Parser;
-using Reductech.EDR.Core.Steps;
+using Reductech.Sequence.Core.Abstractions;
+using Reductech.Sequence.Core.Internal.Logging;
+using Reductech.Sequence.Core.Internal.Parser;
+using Reductech.Sequence.Core.Steps;
 
-namespace Reductech.EDR.Core.Internal.Serialization;
+namespace Reductech.Sequence.Core.Internal.Serialization;
 
 /// <summary>
 /// Runs processes from Text
@@ -63,7 +63,7 @@ public sealed class SCLRunner
     /// <summary>
     /// The top level logging scope.
     /// </summary>
-    public const string TopLevelLoggingScope = "EDR";
+    public const string TopLevelLoggingScope = "Sequence";
 
     /// <summary>
     /// Caller metadata for the entire sequence.

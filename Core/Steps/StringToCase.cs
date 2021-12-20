@@ -1,7 +1,7 @@
 ﻿using System.Globalization;
-using Reductech.EDR.Core.Enums;
+using Reductech.Sequence.Core.Enums;
 
-namespace Reductech.EDR.Core.Steps;
+namespace Reductech.Sequence.Core.Steps;
 
 /// <summary>
 /// Converts a string to a particular case.

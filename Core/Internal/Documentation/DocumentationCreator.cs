@@ -1,7 +1,7 @@
 ﻿using System.Text;
 using Namotion.Reflection;
 
-namespace Reductech.EDR.Core.Internal.Documentation;
+namespace Reductech.Sequence.Core.Internal.Documentation;
 
 /// <summary>
 /// Contains helper methods for creating documentation
@@ -23,7 +23,7 @@ public static class DocumentationCreator
         {
             var contentsStringBuilder = new StringBuilder();
 
-            contentsStringBuilder.AppendLine("# EDR Steps");
+            contentsStringBuilder.AppendLine("# Sequence® Steps");
 
             var contentsRows = categories.SelectMany(x => x)
                 .OrderBy(x => x.Name)

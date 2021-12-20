@@ -1,6 +1,6 @@
 ﻿using System.Text;
 
-namespace Reductech.EDR.Core.Internal.Serialization;
+namespace Reductech.Sequence.Core.Internal.Serialization;
 
 /// <summary>
 /// Serializes primitive types

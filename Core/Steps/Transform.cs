@@ -1,7 +1,7 @@
-﻿using Reductech.EDR.Core.Enums;
-using Reductech.EDR.Core.Internal.Logging;
+﻿using Reductech.Sequence.Core.Enums;
+using Reductech.Sequence.Core.Internal.Logging;
 
-namespace Reductech.EDR.Core.Steps;
+namespace Reductech.Sequence.Core.Steps;
 
 /// <summary>
 /// Attempts to transform entities in the stream so that they match the schema.
@@ -9,7 +9,7 @@ namespace Reductech.EDR.Core.Steps;
 /// Will transform strings into ints, datetimes, booleans, array, or nulls where appropriate
 ///
 /// For more information on schemas please see the
-/// [documentation](https://docs.reductech.io/edr/how-to/scl/schemas.html). 
+/// [documentation](https://docs.reductech.io/sequence/how-to/scl/schemas.html). 
 /// </summary>
 [Alias("SchemaTransform")]
 public sealed class Transform : CompoundStep<Array<Entity>>

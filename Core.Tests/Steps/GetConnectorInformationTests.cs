@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
 
-namespace Reductech.EDR.Core.Tests.Steps;
+namespace Reductech.Sequence.Core.Tests.Steps;
 
 public partial class
     GetConnectorInformationTests : StepTestBase<GetConnectorInformation, Array<Entity>>
@@ -16,7 +16,7 @@ public partial class
             var version = fileVersion.ProductVersion;
 
             var coreEntity = Entity.Create(
-                ("Id", "Reductech.EDR.Core"),
+                ("Id", "Reductech.Sequence.Core"),
                 ("Version", version)
             ); //This version number need to be bumped
 

@@ -1,6 +1,6 @@
 ﻿using System.Text;
 
-namespace Reductech.EDR.Core;
+namespace Reductech.Sequence.Core;
 
 /// <summary>
 /// Either a list or an asynchronous list

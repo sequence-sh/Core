@@ -1,8 +1,8 @@
 ﻿using System.Text.RegularExpressions;
 using Namotion.Reflection;
-using Reductech.EDR.Core.Steps;
+using Reductech.Sequence.Core.Steps;
 
-namespace Reductech.EDR.Core.Internal;
+namespace Reductech.Sequence.Core.Internal;
 
 /// <summary>
 /// A factory for creating steps.

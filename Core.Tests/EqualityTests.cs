@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using System.Text;
 
-namespace Reductech.EDR.Core.Tests;
+namespace Reductech.Sequence.Core.Tests;
 
 /// <summary>
 /// Tests equals and get hash code for various objects

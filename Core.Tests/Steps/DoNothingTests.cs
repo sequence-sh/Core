@@ -1,4 +1,4 @@
-﻿namespace Reductech.EDR.Core.Tests.Steps;
+﻿namespace Reductech.Sequence.Core.Tests.Steps;
 
 public partial class DoNothingTests : StepTestBase<DoNothing, Unit>
 {

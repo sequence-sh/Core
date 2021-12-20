@@ -1,6 +1,6 @@
 ﻿using Generator.Equals;
 
-namespace Reductech.EDR.Core.Entities.Schema;
+namespace Reductech.Sequence.Core.Entities.Schema;
 
 /// <summary>
 /// Node data for enumerated values. Restricts the possible values of the node to one of several possible values.

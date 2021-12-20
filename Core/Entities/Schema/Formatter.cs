@@ -1,4 +1,4 @@
-﻿namespace Reductech.EDR.Core.Entities.Schema;
+﻿namespace Reductech.Sequence.Core.Entities.Schema;
 
 /// <summary>
 /// Used for formatting entity values
