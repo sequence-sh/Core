@@ -7,7 +7,7 @@
 [SCLExample("ArrayConcat [[1,2,3], [4,5,6]]",         "[1, 2, 3, 4, 5, 6]")]
 [SCLExample("Combine Arrays: [[1, 2, 3], [4, 5, 6]]", "[1, 2, 3, 4, 5, 6]")]
 [Alias("Combine")]
-public sealed class ArrayConcat<T> : CompoundStep<Array<T>>
+public sealed class ArrayConcat<T> : CompoundStep<Array<T>> where T : ISCLObject
 {
     /// <inheritdoc />
     protected override async Task<Result<Array<T>, IError>> Run(
@@ -69,7 +69,7 @@ public sealed class ArrayConcat<T> : CompoundStep<Array<T>>
                 return expectedMemberType.ConvertFailure<TypeReference>();
 
             var arraysStep = freezableStepData.TryGetStep(
-                nameof(ArrayConcat<object>.Arrays),
+                nameof(ArrayConcat<ISCLObject>.Arrays),
                 StepType
             );
 
@@ -82,7 +82,7 @@ public sealed class ArrayConcat<T> : CompoundStep<Array<T>>
             var arraysStepGenericType = arraysStep.Value.TryGetOutputTypeReference(
                         new CallerMetadata(
                             TypeName,
-                            nameof(ArrayConcat<object>.Arrays),
+                            nameof(ArrayConcat<ISCLObject>.Arrays),
                             expectedArraysStepType
                         ),
                         typeResolver

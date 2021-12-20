@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using System.Text;
 using System.Text.Json.Serialization;
 using Generator.Equals;
 
@@ -10,9 +11,14 @@ namespace Reductech.EDR.Core;
 /// </summary>
 [JsonConverter(typeof(EntityJsonConverter))]
 [Equatable]
-public sealed partial record Entity
-    : IEnumerable<EntityProperty>
+public sealed partial record Entity(
+    [property: OrderedEquality] ImmutableDictionary<string, EntityProperty> Dictionary) :
+    ISCLObject, IEnumerable<EntityProperty>
 {
+    /// <summary>
+    /// Creates a new entity from a dictionary.
+    /// Be sure to set the string comparer on the dictionary.
+    /// </summary>
     /// <summary>
     /// Creates a new entity
     /// </summary>
@@ -26,22 +32,12 @@ public sealed partial record Entity
     ) { }
 
     /// <summary>
-    /// Creates a new entity from a dictionary.
-    /// Be sure to set the string comparer on the dictionary.
-    /// </summary>
-    public Entity(ImmutableDictionary<string, EntityProperty> dictionary) =>
-        Dictionary = dictionary;
-
-    /// <summary>
     /// Empty entity
     /// </summary>
     public static Entity Empty { get; } = new(new List<EntityProperty>());
 
-    /// <summary>
-    /// The dictionary
-    /// </summary>
-    [OrderedEquality]
-    public ImmutableDictionary<string, EntityProperty> Dictionary { get; }
+    /// <inheritdoc />
+    public TypeReference GetTypeReference() => TypeReference.Actual.Entity;
 
     /// <summary>
     /// The default property name if the Entity represents a single primitive.
@@ -49,12 +45,36 @@ public sealed partial record Entity
     public const string PrimitiveKey = "value";
 
     /// <summary>
-    /// Creates a new Entity
+    /// Creates a new Entity. This will convert CSharp arguments to SCLObjects
     /// </summary>
     [Pure]
     public static Entity Create(params (string key, object? value)[] properties) => Create(
-        properties.Select(x => (new EntityPropertyKey(x.key), x.value))
+        properties.Select(
+            x => (new EntityPropertyKey(x.key), ISCLObject.CreateFromCSharpObject(x.value))
+        )
     );
+
+    /// <summary>
+    /// Create an entity from a CSharp dictionary
+    /// </summary>
+    [Pure]
+    public static Entity Create(IDictionary dictionary)
+    {
+        List<EntityProperty> properties = new();
+        var                  enumerator = dictionary.GetEnumerator();
+
+        var i = 1;
+
+        while (enumerator.MoveNext())
+        {
+            var k       = enumerator.Key.ToString()!;
+            var vObject = ISCLObject.CreateFromCSharpObject(enumerator.Value);
+            properties.Add(new EntityProperty(k, vObject, i));
+            i++;
+        }
+
+        return new Entity(properties);
+    }
 
     /// <summary>
     /// Create an entity from a JsonElement
@@ -62,10 +82,10 @@ public sealed partial record Entity
     [Pure]
     public static Entity Create(JsonElement element)
     {
-        var ev = EntityValue.Create(element);
+        var ev = element.ConvertToSCLObject();
 
-        if (ev is EntityValue.NestedEntity nestedEntity)
-            return nestedEntity.Value;
+        if (ev is Entity nestedEntity)
+            return nestedEntity;
 
         return new Entity(new[] { new EntityProperty(PrimitiveKey, ev, 0) });
     }
@@ -76,19 +96,14 @@ public sealed partial record Entity
     [Pure]
     public JsonElement ToJsonElement()
     {
-        var options = new JsonSerializerOptions()
-        {
-            Converters = { new JsonStringEnumConverter() }
-        };
-
         var stream = new MemoryStream();
         var writer = new Utf8JsonWriter(stream);
 
-        EntityJsonConverter.Instance.Write(writer, this, options);
+        EntityJsonConverter.Instance.Write(writer, this, ISCLObject.DefaultJsonSerializerOptions);
 
         var reader = new Utf8JsonReader(stream.ToArray());
 
-        using JsonDocument document = JsonDocument.ParseValue(ref reader);
+        using var document = JsonDocument.ParseValue(ref reader);
         return document.RootElement.Clone();
     }
 
@@ -96,7 +111,7 @@ public sealed partial record Entity
     /// Creates a new Entity
     /// </summary>
     [Pure]
-    public static Entity Create(IEnumerable<(EntityPropertyKey key, object? value)> properties)
+    public static Entity Create(IEnumerable<(EntityPropertyKey key, ISCLObject value)> properties)
     {
         var allProperties =
             properties.Select(
@@ -110,7 +125,7 @@ public sealed partial record Entity
                 .Select(
                     (group, i) =>
                     {
-                        var ev = EntityValue.CreateFromProperties(group.ToList());
+                        var ev = CreateFromProperties(group.ToList());
 
                         return new EntityProperty(group.Key, ev, i);
                     }
@@ -123,28 +138,28 @@ public sealed partial record Entity
     /// Creates a copy of this with the property added or updated
     /// </summary>
     [Pure]
-    public Entity WithProperty(string key, EntityValue newValue, int? order)
+    public Entity WithProperty(string key, ISCLObject newValue, int? order)
     {
         EntityProperty newProperty;
 
         if (Dictionary.TryGetValue(key, out var ep))
         {
-            EntityValue newValue2;
+            ISCLObject newValue2;
 
-            if (ep.Value is EntityValue.NestedEntity existingEntity)
+            if (ep.Value is Entity existingEntity)
             {
                 Entity combinedEntity;
 
-                if (newValue is EntityValue.NestedEntity newEntity)
-                    combinedEntity = existingEntity.Value.Combine(newEntity.Value);
+                if (newValue is Entity newEntity)
+                    combinedEntity = existingEntity.Combine(newEntity);
                 else
-                    combinedEntity = existingEntity.Value.WithProperty(
+                    combinedEntity = existingEntity.WithProperty(
                         PrimitiveKey,
                         newValue,
                         null
                     );
 
-                newValue2 = new EntityValue.NestedEntity(combinedEntity);
+                newValue2 = combinedEntity;
             }
             else
             {
@@ -223,12 +238,12 @@ public sealed partial record Entity
         }
 
         if (!Dictionary.TryGetValue(firstKey, out var ep)
-         || ep.Value is not EntityValue.NestedEntity nestedEntity)
+         || ep.Value is not Entity nestedEntity)
             return Maybe<Entity>.None;
 
         {
             var rem = remainder.GetValueOrThrow();
-            var em  = nestedEntity.Value.TryRemoveProperty(rem);
+            var em  = nestedEntity.TryRemoveProperty(rem);
 
             if (!em.HasValue)
                 return Maybe<Entity>.None;
@@ -244,7 +259,7 @@ public sealed partial record Entity
             {
                 var newProperty = new EntityProperty(
                     firstKey,
-                    new EntityValue.NestedEntity(newNestedEntity),
+                    newNestedEntity,
                     ep.Order
                 );
 
@@ -273,13 +288,13 @@ public sealed partial record Entity
     /// Try to get the value of a particular property
     /// </summary>
     [Pure]
-    public Maybe<EntityValue> TryGetValue(string key) => TryGetValue(new EntityPropertyKey(key));
+    public Maybe<ISCLObject> TryGetValue(string key) => TryGetValue(new EntityPropertyKey(key));
 
     /// <summary>
     /// Try to get the value of a particular property
     /// </summary>
     [Pure]
-    public Maybe<EntityValue> TryGetValue(EntityPropertyKey key) =>
+    public Maybe<ISCLObject> TryGetValue(EntityPropertyKey key) =>
         TryGetProperty(key).Map(x => x.Value);
 
     /// <summary>
@@ -296,8 +311,8 @@ public sealed partial record Entity
         if (remainder.HasNoValue)
             return ep;
 
-        if (ep.Value is EntityValue.NestedEntity nestedEntity)
-            return nestedEntity.Value.TryGetProperty(remainder.GetValueOrThrow());
+        if (ep.Value is Entity nestedEntity)
+            return nestedEntity.TryGetProperty(remainder.GetValueOrThrow());
         //We can't get the nested property as this is not an entity
 
         return
@@ -310,8 +325,188 @@ public sealed partial record Entity
         Dictionary.Values.OrderBy(x => x.Order).GetEnumerator();
 
     /// <inheritdoc />
-    public override string ToString() => this.Serialize();
+    public string Serialize(SerializeOptions options)
+    {
+        var sb = new StringBuilder();
+
+        sb.Append('(');
+
+        var results = new List<string>();
+
+        foreach (var (name, entityValue, _) in this)
+            results.Add($"'{name}': {entityValue.Serialize(options)}");
+
+        sb.AppendJoin(" ", results);
+
+        sb.Append(')');
+
+        var result = sb.ToString();
+
+        return result;
+    }
+
+    /// <inheritdoc />
+    public override string ToString() => Serialize(SerializeOptions.Name);
 
     /// <inheritdoc />
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+    /// <inheritdoc />
+    public object ToCSharpObject()
+    {
+        var dictionary = new Dictionary<string, object?>();
+
+        foreach (var (name, sclObject, _) in this)
+        {
+            var value = sclObject.ToCSharpObject();
+            dictionary.Add(name, value);
+        }
+
+        return dictionary;
+    }
+
+    /// <summary>
+    /// Format this entity with the default formatting options
+    /// </summary>
+    /// <returns></returns>
+    public string Format()
+    {
+        var sb = new StringBuilder();
+        (this as ISCLObject).Format(sb, 0, new FormattingOptions());
+        return sb.ToString();
+    }
+
+    void ISCLObject.Format(
+        StringBuilder stringBuilder,
+        int indentation,
+        FormattingOptions options,
+        string? prefix,
+        string? suffix)
+    {
+        ISCLObject.AppendLineIndented(stringBuilder, indentation, prefix + "(");
+
+        indentation++;
+
+        foreach (var (name, sclObject, _) in this)
+        {
+            sclObject.Format(stringBuilder, indentation, options, $"'{name}': ");
+        }
+
+        indentation--;
+        ISCLObject.AppendLineIndented(stringBuilder, indentation, ")" + suffix);
+    }
+
+    /// <summary>
+    /// Create an entity from structured entity properties
+    /// </summary>
+    [Pure]
+    private static ISCLObject CreateFromProperties(
+        IReadOnlyList<(Maybe<EntityPropertyKey> key, ISCLObject argValue)> properties)
+    {
+        if (properties.Count == 0)
+            return SCLNull.Instance;
+
+        if (properties.Count == 1 && properties.Single().key.HasNoValue)
+            return properties.Single().argValue;
+
+        var entityProperties =
+            new Dictionary<string, EntityProperty>(StringComparer.OrdinalIgnoreCase);
+
+        void SetEntityProperty(string key, ISCLObject ev)
+        {
+            EntityProperty newProperty;
+
+            if (entityProperties.TryGetValue(key, out var existingValue))
+            {
+                if (ev is Entity nestedEntity)
+                {
+                    if (existingValue.Value is Entity existingNestedEntity)
+                    {
+                        var nEntity = existingNestedEntity.Combine(nestedEntity);
+
+                        newProperty = new EntityProperty(
+                            key,
+                            nEntity,
+                            existingValue.Order
+                        );
+                    }
+                    else
+                    {
+                        //Ignore the old property
+                        newProperty = new EntityProperty(key, ev, existingValue.Order);
+                    }
+                }
+                else if (existingValue.Value is Entity existingNestedEntity)
+                {
+                    var nEntity =
+                        existingNestedEntity.WithProperty(Entity.PrimitiveKey, ev, null);
+
+                    newProperty = new EntityProperty(
+                        key,
+                        nEntity,
+                        existingValue.Order
+                    );
+                }
+                else //overwrite the existing property
+                    newProperty = new EntityProperty(key, ev, existingValue.Order);
+            }
+            else //New property
+                newProperty = new EntityProperty(key, ev, entityProperties.Count);
+
+            entityProperties[key] = newProperty;
+        }
+
+        foreach (var (key, argValue) in properties)
+        {
+            if (key.HasNoValue)
+            {
+                if (argValue is Entity ne)
+                    foreach (var (nestedKey, value) in ne.Dictionary)
+                        SetEntityProperty(nestedKey, value.Value);
+                else
+                    SetEntityProperty(PrimitiveKey, argValue);
+            }
+            else
+            {
+                var (firstKey, remainder) = key.GetValueOrThrow().Split();
+
+                var ev = CreateFromProperties(new[] { (remainder, argValue) });
+
+                SetEntityProperty(firstKey, ev);
+            }
+        }
+
+        var newEntity = new Entity(entityProperties.ToImmutableDictionary());
+
+        return newEntity;
+    }
+
+    /// <inheritdoc />
+    public Maybe<T> MaybeAs<T>() where T : ISCLObject
+    {
+        if (this is T value)
+            return value;
+
+        return Maybe<T>.None;
+    }
+
+    /// <inheritdoc />
+    public SchemaNode ToSchemaNode(
+        string path,
+        SchemaConversionOptions? schemaConversionOptions)
+    {
+        var dictionary = new Dictionary<string, (SchemaNode Node, bool Required)>();
+
+        foreach (var (key, property) in Dictionary.OrderBy(x => x.Value.Order))
+        {
+            var node = property.Value.ToSchemaNode($"{path}/{key}", schemaConversionOptions);
+            dictionary[key] = (node, true);
+        }
+
+        return new EntityNode(
+            EnumeratedValuesNodeData.Empty,
+            new EntityAdditionalItems(FalseNode.Instance),
+            new EntityPropertiesData(dictionary)
+        );
+    }
 }

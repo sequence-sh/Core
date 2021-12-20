@@ -8,5 +8,10 @@ public interface IConstantStep : IStep
     /// <summary>
     /// The constant value
     /// </summary>
-    object ValueObject { get; }
+    ISCLObject Value { get; }
+
+    /// <summary>
+    /// Try to convert this constant to a constant of a different type.
+    /// </summary>
+    public Result<IStep, IErrorBuilder> TryConvert(Type memberType, string propertyName);
 }

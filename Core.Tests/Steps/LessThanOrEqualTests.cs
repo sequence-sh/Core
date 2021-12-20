@@ -1,8 +1,6 @@
-﻿using Reductech.EDR.Core.TestHarness;
+﻿namespace Reductech.EDR.Core.Tests.Steps;
 
-namespace Reductech.EDR.Core.Tests.Steps;
-
-public partial class LessThanOrEqualTests : StepTestBase<LessThanOrEqual<int>, bool>
+public partial class LessThanOrEqualTests : StepTestBase<LessThanOrEqual<SCLInt>, SCLBool>
 {
     /// <inheritdoc />
     protected override IEnumerable<StepCase> StepCases
@@ -11,26 +9,26 @@ public partial class LessThanOrEqualTests : StepTestBase<LessThanOrEqual<int>, b
         {
             yield return new StepCase(
                 "One number",
-                new LessThanOrEqual<int>() { Terms = StaticHelpers.Array(2) },
-                true
+                new LessThanOrEqual<SCLInt>() { Terms = Array(2) },
+                true.ConvertToSCLObject()
             );
 
             yield return new StepCase(
                 "Two numbers false",
-                new LessThanOrEqual<int>() { Terms = StaticHelpers.Array(4, 3) },
-                false
+                new LessThanOrEqual<SCLInt>() { Terms = Array(4, 3) },
+                false.ConvertToSCLObject()
             );
 
             yield return new StepCase(
                 "Two numbers true",
-                new LessThanOrEqual<int>() { Terms = StaticHelpers.Array(1, 2) },
-                true
+                new LessThanOrEqual<SCLInt>() { Terms = Array(1, 2) },
+                true.ConvertToSCLObject()
             );
 
             yield return new StepCase(
                 "Three numbers true",
-                new LessThanOrEqual<int>() { Terms = StaticHelpers.Array(2, 2, 3) },
-                true
+                new LessThanOrEqual<SCLInt>() { Terms = Array(2, 2, 3) },
+                true.ConvertToSCLObject()
             );
         }
     }

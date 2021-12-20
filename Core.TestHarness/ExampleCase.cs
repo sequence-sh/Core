@@ -140,18 +140,14 @@ public abstract partial class StepTestBase<TStep, TOutput>
                 string actualString;
                 var    expectedString = CompressSpaces(SCLExampleAttribute.ExpectedOutput);
 
-                if (result.Value is StringStream ss)
+                if (result.Value is StringStream ss) //we don't want quotes for individual strings
                 {
-                    actualString = CompressSpaces(ss.GetString());
+                    actualString = CompressSpaces(ss.Serialize(SerializeOptions.Primitive));
                 }
-                else if (result.Value is string s)
-                {
-                    actualString = CompressSpaces(s);
-                }
-                else
+                else //We do want quotes for nested strings
                 {
                     actualString =
-                        CompressSpaces(SerializationMethods.SerializeObject(result.Value));
+                        CompressSpaces(result.Value.Serialize(SerializeOptions.Serialize));
                 }
 
                 actualString.Should().Be(expectedString);
@@ -159,7 +155,7 @@ public abstract partial class StepTestBase<TStep, TOutput>
         }
 
         /// <inheritdoc />
-        public override void CheckObjectResult(IStep step, Result<object, IError> result)
+        public override void CheckObjectResult(IStep step, Result<ISCLObject, IError> result)
         {
             result.ShouldBeSuccessful();
 
@@ -172,16 +168,12 @@ public abstract partial class StepTestBase<TStep, TOutput>
 
                 if (result.Value is StringStream ss)
                 {
-                    actualString = CompressSpaces(ss.GetString());
-                }
-                else if (result.Value is string s)
-                {
-                    actualString = CompressSpaces(s);
+                    actualString = CompressSpaces(ss.Serialize(SerializeOptions.Primitive));
                 }
                 else
                 {
                     actualString =
-                        CompressSpaces(SerializationMethods.SerializeObject(result.Value));
+                        CompressSpaces(result.Value.Serialize(SerializeOptions.Serialize));
                 }
 
                 actualString.Should().Be(expectedString);

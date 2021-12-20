@@ -32,32 +32,32 @@ public record NumberNode(
     }
 
     /// <inheritdoc />
-    protected override Result<Maybe<EntityValue>, IErrorBuilder> TryTransform1(
+    protected override Result<Maybe<ISCLObject>, IErrorBuilder> TryTransform1(
         string propertyName,
-        EntityValue entityValue,
+        ISCLObject value,
         TransformSettings transformSettings)
     {
-        if (entityValue is EntityValue.Integer evInteger)
+        if (value is SCLInt evInteger)
         {
             var restrictionResult = Restrictions.Test(evInteger.Value, propertyName);
 
             if (restrictionResult.IsFailure)
-                return restrictionResult.ConvertFailure<Maybe<EntityValue>>();
+                return restrictionResult.ConvertFailure<Maybe<ISCLObject>>();
 
-            return Maybe<EntityValue>.None; //Integer is also number
+            return Maybe<ISCLObject>.None; //Integer is also number
         }
-        else if (entityValue is EntityValue.Double evDouble)
+        else if (value is SCLDouble evDouble)
 
         {
             var restrictionResult = Restrictions.Test(evDouble.Value, propertyName);
 
             if (restrictionResult.IsFailure)
-                return restrictionResult.ConvertFailure<Maybe<EntityValue>>();
+                return restrictionResult.ConvertFailure<Maybe<ISCLObject>>();
 
-            return Maybe<EntityValue>.None;
+            return Maybe<ISCLObject>.None;
         }
 
-        var v = entityValue.GetPrimitiveString();
+        var v = value.Serialize(SerializeOptions.Primitive);
 
         if (!double.TryParse(v, out var d))
             return ErrorCode.SchemaViolation.ToErrorBuilder("Should Be Number", propertyName);
@@ -65,8 +65,8 @@ public record NumberNode(
         var restrictionResult2 = Restrictions.Test(d, propertyName);
 
         if (restrictionResult2.IsFailure)
-            return restrictionResult2.ConvertFailure<Maybe<EntityValue>>();
+            return restrictionResult2.ConvertFailure<Maybe<ISCLObject>>();
 
-        return Maybe<EntityValue>.From(new EntityValue.Double(d));
+        return Maybe<ISCLObject>.From(new SCLDouble(d));
     }
 }

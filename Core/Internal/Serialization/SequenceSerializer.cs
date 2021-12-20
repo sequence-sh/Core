@@ -16,26 +16,30 @@ public sealed class SequenceSerializer : IStepSerializer
     public static IStepSerializer Instance { get; } = new SequenceSerializer();
 
     /// <inheritdoc />
-    public string Serialize(IEnumerable<StepProperty> stepProperties)
+    public string Serialize(SerializeOptions options, IEnumerable<StepProperty> stepProperties)
     {
         var dict = stepProperties.ToDictionary(x => x.Name);
 
         var sb = new StringBuilder();
 
-        if (dict.TryGetValue(nameof(Sequence<object>.InitialSteps), out var sp)
+        if (dict.TryGetValue(nameof(Sequence<ISCLObject>.InitialSteps), out var sp)
          && sp is StepProperty.StepListProperty stepList)
             foreach (var step in stepList.StepList)
-                AddStep(sb, step, 0);
+                AddStep(options, sb, step, 0);
 
-        if (dict.TryGetValue(nameof(Sequence<object>.FinalStep), out var finalStep)
+        if (dict.TryGetValue(nameof(Sequence<ISCLObject>.FinalStep), out var finalStep)
          && finalStep is StepProperty.SingleStepProperty stepProperty)
-            AddStep(sb, stepProperty.Step, 0);
+            AddStep(options, sb, stepProperty.Step, 0);
 
         var s = sb.ToString();
 
         return s;
 
-        static void AddStep(StringBuilder sb, IStep step, int nestingLevel)
+        static void AddStep(
+            SerializeOptions options,
+            StringBuilder sb,
+            IStep step,
+            int nestingLevel)
         {
             var indentation = new string('\t', nestingLevel);
 
@@ -45,14 +49,14 @@ public sealed class SequenceSerializer : IStepSerializer
 
                 foreach (var nestedStep in sequence.AllSteps)
                 {
-                    AddStep(sb, nestedStep, nestingLevel + 1);
+                    AddStep(options, sb, nestedStep, nestingLevel + 1);
                 }
 
                 sb.AppendLine($"{indentation})");
             }
             else
             {
-                sb.AppendLine($"{indentation}- {step.Serialize()}");
+                sb.AppendLine($"{indentation}- {step.Serialize(options)}");
             }
         }
     }

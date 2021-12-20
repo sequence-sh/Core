@@ -3,10 +3,10 @@
 /// <summary>
 /// Divide a double by a list of doubles
 /// </summary>
-public sealed class DoubleDivide : BaseOperatorStep<DoubleDivide, double, double>
+public sealed class DoubleDivide : BaseOperatorStep<DoubleDivide, SCLDouble, SCLDouble>
 {
     /// <inheritdoc />
-    protected override Result<double, IErrorBuilder> Operate(IEnumerable<double> terms)
+    protected override Result<SCLDouble, IErrorBuilder> Operate(IEnumerable<SCLDouble> terms)
     {
         double total = 0;
         var    first = true;
@@ -15,19 +15,19 @@ public sealed class DoubleDivide : BaseOperatorStep<DoubleDivide, double, double
         {
             if (first)
             {
-                total += number;
+                total += number.Value;
                 first =  false;
             }
             else
             {
-                if (number == 0)
+                if (number.Value == 0)
                     return ErrorCode.DivideByZero.ToErrorBuilder();
 
-                total /= number;
+                total /= number.Value;
             }
         }
 
-        return total;
+        return total.ConvertToSCLObject();
     }
 
     /// <inheritdoc />

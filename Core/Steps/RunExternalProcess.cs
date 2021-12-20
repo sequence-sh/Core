@@ -48,7 +48,7 @@ public sealed class RunExternalProcess : CompoundStep<Unit>
                     IgnoreNoneErrorHandler.Instance,
                     arguments,
                     new Dictionary<string, string>(), //TODO let user control this
-                    encodingResult.Value.Convert(),
+                    encodingResult.Value.Value.Convert(),
                     stateMonad,
                     this,
                     cancellationToken
@@ -78,8 +78,8 @@ public sealed class RunExternalProcess : CompoundStep<Unit>
     /// </summary>
     [StepProperty(3)]
     [DefaultValueExplanation("Default encoding")]
-    public IStep<EncodingEnum> Encoding { get; set; } =
-        new EnumConstant<EncodingEnum>(EncodingEnum.Default);
+    public IStep<SCLEnum<EncodingEnum>> Encoding { get; set; } =
+        new SCLConstant<SCLEnum<EncodingEnum>>(new SCLEnum<EncodingEnum>(EncodingEnum.Default));
 
     /// <inheritdoc />
     public override IStepFactory StepFactory { get; } =

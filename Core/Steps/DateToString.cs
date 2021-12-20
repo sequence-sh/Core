@@ -15,7 +15,8 @@ public sealed class DateToString : CompoundStep<StringStream>
     /// </summary>
     [StepProperty(1)]
     [DefaultValueExplanation("DateTime.Now")]
-    public IStep<DateTime> Date { get; set; } = new DateTimeConstant(DateTime.Now);
+    public IStep<SCLDateTime> Date { get; set; } =
+        new SCLConstant<SCLDateTime>(DateTime.Now.ConvertToSCLObject());
 
     /// <summary>
     /// The output format to use for the date.
@@ -24,7 +25,7 @@ public sealed class DateToString : CompoundStep<StringStream>
     [DefaultValueExplanation("yyyy/MM/dd HH:mm:ss")]
     [Example("O")]
     public IStep<StringStream> Format { get; set; } =
-        new StringConstant("yyyy/MM/dd HH:mm:ss");
+        new SCLConstant<StringStream>("yyyy/MM/dd HH:mm:ss");
 
     /// <inheritdoc />
     protected override async Task<Result<StringStream, IError>> Run(
@@ -38,7 +39,7 @@ public sealed class DateToString : CompoundStep<StringStream>
 
         var (date, format) = r.Value;
 
-        var dateOut = date.ToString(format);
+        var dateOut = date.Value.ToString(format);
 
         return new StringStream(dateOut);
     }

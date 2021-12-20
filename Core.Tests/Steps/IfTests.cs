@@ -1,6 +1,4 @@
-﻿using Reductech.EDR.Core.TestHarness;
-
-namespace Reductech.EDR.Core.Tests.Steps;
+﻿namespace Reductech.EDR.Core.Tests.Steps;
 
 public partial class IfTests : StepTestBase<If<Unit>, Unit>
 {
@@ -28,7 +26,7 @@ public partial class IfTests : StepTestBase<If<Unit>, Unit>
                 new If<Unit>
                 {
                     Condition = Constant(true),
-                    Then      = new Log<StringStream>() { Value = Constant("Hello World") }
+                    Then      = new Log() { Value = Constant("Hello World") }
                 },
                 Unit.Default,
                 "Hello World"
@@ -39,7 +37,7 @@ public partial class IfTests : StepTestBase<If<Unit>, Unit>
                 new If<Unit>
                 {
                     Condition = Constant(false),
-                    Then      = new Log<StringStream> { Value = Constant("Hello World") }
+                    Then      = new Log { Value = Constant("Hello World") }
                 },
                 Unit.Default
             );
@@ -49,8 +47,8 @@ public partial class IfTests : StepTestBase<If<Unit>, Unit>
                 new If<Unit>
                 {
                     Condition = Constant(false),
-                    Then      = new Log<StringStream> { Value = Constant("Hello World") },
-                    Else      = new Log<StringStream> { Value = Constant("Goodbye World") },
+                    Then      = new Log { Value = Constant("Hello World") },
+                    Else      = new Log { Value = Constant("Goodbye World") },
                 },
                 Unit.Default,
                 "Goodbye World"
@@ -67,9 +65,9 @@ public partial class IfTests : StepTestBase<If<Unit>, Unit>
                 "Condition is error",
                 new If<Unit>()
                 {
-                    Condition = new FailStep<bool> { ErrorMessage = "Condition Fail" },
-                    Then      = new FailStep<Unit> { ErrorMessage = "Then Fail" },
-                    Else      = new FailStep<Unit> { ErrorMessage = "Else Fail" },
+                    Condition = new FailStep<SCLBool> { ErrorMessage = "Condition Fail" },
+                    Then      = new FailStep<Unit> { ErrorMessage    = "Then Fail" },
+                    Else      = new FailStep<Unit> { ErrorMessage    = "Else Fail" },
                 },
                 new SingleError(
                     ErrorLocation.EmptyLocation,

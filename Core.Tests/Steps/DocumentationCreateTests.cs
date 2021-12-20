@@ -7,6 +7,12 @@ namespace Reductech.EDR.Core.Tests.Steps;
 
 public partial class DocumentationCreateTests : StepTestBase<DocumentationCreate, Entity>
 {
+    public const string NotFileText =
+        "## Not _Alias_:`Not`\n\n_Output_:`SCLBool`\n\nNegation of a boolean value. \n\n|Parameter|Type |Required|Position|Summary | |:--------|:-------:|:------:|:------:|:-------------------|\n|Boolean |`SCLBool`|✔ |1 |The value to negate.| \n\n|Example SCL|Expected Output| |:----------|:-------------:| |Not true |False | |Not false |True |";
+
+    public const string ExampleFileText =
+        "## DocumentationExampleStep _Alias_:`DocumentationExampleStep`\n\n_Output_:`StringStream`\n\n*Requires ValueIf Library.Version 1.2* \n\n|Parameter |Type |Required|Position|Allowed Range |Default Value|Example|Recommended Range|Recommended Value|Requirements|See Also|URL |Value Delimiter|Summary|\n|:---------------|:-------------:|:------:|:------:|:------------:|:-----------:|:-----:|:---------------:|:---------------:|:----------:|:------:|:----------------:|:-------------:|:------|\n|Alpha<br/>_Alef_|`SCLInt` |✔ |1 |Greater than 1| |1234 |100-300 |201 |Greek 2.1 |Beta |[Alpha](alpha.com)| | |\n|Beta |`string` | |2 | |Two hundred | | | | |Alpha | | | |\n|Gamma |`VariableName` | |3 | | | | | | | | | | |\n|Delta |List<`SCLBool`>| |4 | | | | | | | | |, | |";
+
     /// <inheritdoc />
     protected override IEnumerable<StepCase> StepCases
     {
@@ -14,11 +20,11 @@ public partial class DocumentationCreateTests : StepTestBase<DocumentationCreate
         {
             yield return new StepCase(
                 "Generate Everything",
-                new Log<Entity>() { Value = new DocumentationCreate() },
+                new Log() { Value = new DocumentationCreate() },
                 Unit.Default
             ) { IgnoreLoggedValues = true };
 
-            var logDocumentation = new Log<Entity> { Value = new DocumentationCreate() };
+            var logDocumentation = new Log { Value = new DocumentationCreate() };
 
             static MainContents Contents(
                 string category,
@@ -113,18 +119,18 @@ public partial class DocumentationCreateTests : StepTestBase<DocumentationCreate
             var notStepPage = new StepPage(
                 "Not.md",
                 "Not",
-                "## Not _Alias_:`Not`\n\n_Output_:`Boolean`\n\nNegation of a boolean value.\n\n\n|Parameter|Type |Required|Position|Summary |\n|:--------|:----:|:------:|:------:|:-------------------|\n|Boolean |`bool`|✔ |1 |The value to negate.|\n\n\n|Example SCL|Expected Output|\n|:----------|:-------------:|\n|Not true |False |\n|Not false |True |",
+                NotFileText,
                 "Core",
                 "Core",
                 "Not",
                 new List<string>() { "Not" },
                 "Negation of a boolean value.",
-                "Boolean",
+                "SCLBool",
                 new List<StepParameter>()
                 {
                     new(
                         "Boolean",
-                        "bool",
+                        "SCLBool",
                         "The value to negate.",
                         true,
                         new List<string>()
@@ -156,11 +162,11 @@ public partial class DocumentationCreateTests : StepTestBase<DocumentationCreate
                 "Generate Not Documentation",
                 logDocumentation,
                 Unit.Default,
-                notDocumentationEntity.ConvertToEntity().Serialize()
+                notDocumentationEntity.ConvertToEntity().Serialize(SerializeOptions.Serialize)
             ) { TestDeserializeAndRun = false }.WithStepFactoryStore(
                 StepFactoryStore.Create(
                     System.Array.Empty<ConnectorData>(),
-                    new[] { new SimpleStepFactory<Not, bool>() }
+                    new[] { new SimpleStepFactory<Not, SCLBool>() }
                 )
             );
 
@@ -172,7 +178,7 @@ public partial class DocumentationCreateTests : StepTestBase<DocumentationCreate
             var documentationStepPage = new StepPage(
                 "DocumentationExampleStep.md",
                 "DocumentationExampleStep",
-                "## DocumentationExampleStep _Alias_:`DocumentationExampleStep`\n\n_Output_:`StringStream`\n\n*Requires ValueIf Library.Version 1.2*\n\n\n|Parameter |Type |Required|Position|Allowed Range |Default Value|Example|Recommended Range|Recommended Value|Requirements|See Also|URL |Value Delimiter|Summary|\n|:---------------|:------------:|:------:|:------:|:------------:|:-----------:|:-----:|:---------------:|:---------------:|:----------:|:------:|:----------------:|:-------------:|:------|\n|Alpha<br/>_Alef_|`int` |✔ |1 |Greater than 1| |1234 |100-300 |201 |Greek 2.1 |Beta |[Alpha](alpha.com)| | |\n|Beta |`string` | |2 | |Two hundred | | | | |Alpha | | | |\n|Gamma |`VariableName`| |3 | | | | | | | | | | |\n|Delta |List<`bool`> | |4 | | | | | | | | |, | |",
+                ExampleFileText,
                 "Examples",
                 "Examples",
                 "DocumentationExampleStep",
@@ -183,7 +189,7 @@ public partial class DocumentationCreateTests : StepTestBase<DocumentationCreate
                 {
                     new StepParameter(
                         "Alpha",
-                        "int",
+                        "SCLInt",
                         "",
                         true,
                         new[] { "Alef" }
@@ -204,7 +210,7 @@ public partial class DocumentationCreateTests : StepTestBase<DocumentationCreate
                     ),
                     new StepParameter(
                         "Delta",
-                        "List<bool>",
+                        "List<SCLBool>",
                         "",
                         false,
                         new List<string>()
@@ -236,7 +242,7 @@ public partial class DocumentationCreateTests : StepTestBase<DocumentationCreate
                 "Example step",
                 logDocumentation,
                 Unit.Default,
-                exampleCreationResult.ConvertToEntity().Serialize()
+                exampleCreationResult.ConvertToEntity().Serialize(SerializeOptions.Serialize)
             ) { TestDeserializeAndRun = false }.WithStepFactoryStore(
                 StepFactoryStore.Create(
                     System.Array.Empty<ConnectorData>(),
@@ -249,13 +255,13 @@ public partial class DocumentationCreateTests : StepTestBase<DocumentationCreate
                 Action =
                     new LambdaFunction<Entity, Unit>(
                         null,
-                        new Log<StringStream>()
+                        new Log()
                         {
                             Value =
                                 new EntityGetValue<StringStream>()
                                 {
                                     Entity   = new GetAutomaticVariable<Entity>(),
-                                    Property = new StringConstant("Title")
+                                    Property = new SCLConstant<StringStream>("Title")
                                 }
                         }
                     ),
@@ -264,9 +270,9 @@ public partial class DocumentationCreateTests : StepTestBase<DocumentationCreate
                     Array = new EntityGetValue<Array<Entity>>()
                     {
                         Entity   = new DocumentationCreate(),
-                        Property = new StringConstant("AllPages")
+                        Property = new SCLConstant<StringStream>("AllPages")
                     },
-                    Count = new IntConstant(10)
+                    Count = new SCLConstant<SCLInt>(10.ConvertToSCLObject())
                 }
             };
 
@@ -337,7 +343,7 @@ public partial class DocumentationCreateTests : StepTestBase<DocumentationCreate
         /// </summary>
         [StepProperty(2)]
         [Required]
-        public IStep<OneOf<int, Enums.TextCase>> Alpha { get; set; } = null!;
+        public IStep<SCLOneOf<SCLInt, SCLEnum<TextCase>>> Alpha { get; set; } = null!;
 
         /// <inheritdoc />
         public override IStepFactory StepFactory { get; } =
@@ -370,7 +376,7 @@ public partial class DocumentationCreateTests : StepTestBase<DocumentationCreate
         [SeeAlso("Beta")]
         [Alias("Alef")]
         // ReSharper disable UnusedMember.Local
-        public IStep<int> Alpha { get; set; } = null!;
+        public IStep<SCLInt> Alpha { get; set; } = null!;
 
         /// <summary>
         /// The beta property. Not Required.
@@ -378,14 +384,15 @@ public partial class DocumentationCreateTests : StepTestBase<DocumentationCreate
         [StepProperty(2)]
         [SeeAlso("Alpha")]
         [DefaultValueExplanation("Two hundred")]
-        public IStep<StringStream> Beta { get; set; } = new StringConstant("Two hundred");
+        public IStep<StringStream> Beta { get; set; } =
+            new SCLConstant<StringStream>("Two hundred");
 
         /// <summary>
         /// The delta property.
         /// </summary>
         [StepListProperty(4)]
         [ValueDelimiter(",")]
-        public IReadOnlyList<IStep<bool>> Delta { get; set; } = null!;
+        public IReadOnlyList<IStep<SCLBool>> Delta { get; set; } = null!;
 
         /// <summary>
         /// The Gamma property.

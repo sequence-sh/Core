@@ -4,6 +4,7 @@
 /// An array backed by a list
 /// </summary>
 public sealed record EagerArray<T>(IReadOnlyList<T> List) : Array<T>, IEquatable<Array<T>>
+    where T : ISCLObject
 {
     /// <summary>
     /// Empty constructor for reflection
@@ -115,9 +116,6 @@ public sealed record EagerArray<T>(IReadOnlyList<T> List) : Array<T>, IEquatable
     }
 
     /// <inheritdoc />
-    public override string NameInLogs => List.Count + " Elements";
-
-    /// <inheritdoc />
     public override int GetHashCode() => GetHashCodeValue(this);
 
     bool IEquatable<Array<T>>.Equals(Array<T>? other) => Equals(this, other);
@@ -131,15 +129,7 @@ public sealed record EagerArray<T>(IReadOnlyList<T> List) : Array<T>, IEquatable
     }
 
     /// <inheritdoc />
-    public override string ToString()
-    {
-        return List.Count switch
-        {
-            0     => "Empty Eager Array",
-            <= 10 => "[" + string.Join(", ", List.Select(x => x!.ToString())) + "]",
-            _     => $"Eager Array with {List.Count} Elements"
-        };
-    }
+    public override string ToString() => Serialize(SerializeOptions.Name);
 
     /// <inheritdoc />
     protected override Type EqualityContract => typeof(Array<T>);
@@ -151,17 +141,67 @@ public sealed record EagerArray<T>(IReadOnlyList<T> List) : Array<T>, IEquatable
     }
 
     /// <inheritdoc />
-    public override string Serialize =>
-        SerializationMethods.SerializeList(
-            List.Select(x => SerializationMethods.SerializeObject(x))
-        );
+    public override string Serialize(SerializeOptions options)
+    {
+        if (List.Count > options.MaxArrayLength)
+            return $"{List.Count} Elements";
+
+        return SerializationMethods.SerializeList(List.Select(x => x.Serialize(options)));
+    }
 
     /// <inheritdoc />
     public override Result<Array<TElement>, IErrorBuilder> TryConvertElements<TElement>()
     {
         return List
-            .Select(x => x.TryConvert<TElement>())
+            .Select(x => x.TryConvertTyped<TElement>("Element"))
             .Combine(ErrorBuilderList.Combine)
             .Map(x => x.ToSCLArray());
+    }
+
+    /// <inheritdoc />
+    public override bool IsEvaluated => true;
+
+    /// <inheritdoc />
+    public override Maybe<T1> MaybeAs<T1>()
+    {
+        if (this is T1 value)
+            return value;
+
+        if (typeof(T1).IsGenericType && typeof(T1).GetGenericTypeDefinition() == typeof(Array<>))
+        {
+            var memberType = typeof(T1).GenericTypeArguments[0];
+
+            var method =
+                typeof(EagerArray<T>).GetMethod(
+                        "TryConvertMembers",
+                        BindingFlags.NonPublic | BindingFlags.Instance
+                    )!
+                    .GetGenericMethodDefinition()
+                    .MakeGenericMethod(memberType);
+
+            var result = (Maybe<IArray>)method.Invoke(this, null)!;
+
+            if (result.HasValue && result.Value is T1 t1)
+                return t1;
+        }
+
+        return Maybe<T1>.None;
+    }
+
+    private Maybe<IArray> TryConvertMembers<TMember>() where TMember : ISCLObject
+    {
+        var newList = new List<TMember>(this.List.Count);
+
+        foreach (var sclObject in List)
+        {
+            var m = sclObject.MaybeAs<TMember>();
+
+            if (m.HasValue)
+                newList.Add(m.Value);
+            else
+                return Maybe<IArray>.None;
+        }
+
+        return newList.ToSCLArray();
     }
 }

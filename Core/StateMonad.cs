@@ -15,19 +15,18 @@ public sealed class StateMonad : IStateMonad
     /// </summary>
     public const string ConnectorsKey = "Connectors";
 
-    private readonly ConcurrentDictionary<VariableName, object> _stateDictionary = new();
+    private readonly ConcurrentDictionary<VariableName, ISCLObject> _stateDictionary = new();
 
     /// <summary>
     /// Create the settings entity from the Step Factory Store
     /// </summary>
     public static Entity CreateSettingsEntity(StepFactoryStore stepFactoryStore)
     {
-        var connectorsSetting = EntityValue.CreateFromObject(
+        var connectorsSetting = ISCLObject.CreateFromCSharpObject(
             stepFactoryStore.ConnectorData
                 .ToDictionary(
                     x => x.ConnectorSettings.Id,
-                    x => EntityValue
-                        .CreateFromObject(x.ConnectorSettings)
+                    x => ISCLObject.CreateFromCSharpObject(x.ConnectorSettings)
                 )
         );
 
@@ -77,12 +76,12 @@ public sealed class StateMonad : IStateMonad
     /// Gets all VariableNames and associated objects.
     /// </summary>
     /// <returns></returns>
-    public IEnumerable<KeyValuePair<VariableName, object>> GetState() => _stateDictionary;
+    public IEnumerable<KeyValuePair<VariableName, ISCLObject>> GetState() => _stateDictionary;
 
     /// <summary>
     /// Gets the current value of this variable.
     /// </summary>
-    public Result<T, IErrorBuilder> GetVariable<T>(VariableName key)
+    public Result<T, IErrorBuilder> GetVariable<T>(VariableName key) where T : ISCLObject
     {
         if (Disposed)
             throw new ObjectDisposedException("State Monad was disposed");
@@ -101,52 +100,17 @@ public sealed class StateMonad : IStateMonad
     /// </summary>
     public static Result<Maybe<T>, IErrorBuilder> TryGetVariableFromDictionary<T>(
         VariableName key,
-        IReadOnlyDictionary<VariableName, object> dictionary)
+        IReadOnlyDictionary<VariableName, ISCLObject> dictionary) where T : ISCLObject
     {
         if (!dictionary.TryGetValue(key, out var value))
             return Maybe<T>.None;
 
-        return TryConvertValue(value, key);
+        var result = value.TryConvertTyped<T>(key.Serialize(SerializeOptions.Serialize));
 
-        static Result<Maybe<T>, IErrorBuilder> TryConvertValue(object? value, VariableName key)
-        {
-            if (value is T typedValue)
-                return Maybe<T>.From(typedValue);
+        if (result.IsSuccess)
+            return Maybe<T>.From(result.Value);
 
-            if (typeof(T) == typeof(StringStream))
-            {
-                var ss = new StringStream(value?.ToString()!);
-
-                if (ss is T t)
-                {
-                    return Maybe<T>.From(t);
-                }
-            }
-
-            if (value is IArray array && typeof(T).IsGenericType
-                                      && typeof(T).GetGenericTypeDefinition() == typeof(Array<>))
-            {
-                var method = typeof(T).GetMethod(
-                    nameof(Array<object>.CreateByConverting),
-                    BindingFlags.Public | BindingFlags.Static
-                );
-
-                var conversionResult =
-                    (Result<T, IErrorBuilder>)method?.Invoke(null, new object?[] { array })!;
-
-                if (conversionResult.IsFailure)
-                    return conversionResult.ConvertFailure<Maybe<T>>();
-
-                return Maybe<T>.From(conversionResult.Value);
-            }
-
-            if (value is IOneOf valueOneOf)
-            {
-                return TryConvertValue(valueOneOf.Value, key);
-            }
-
-            return new ErrorBuilder(ErrorCode.WrongVariableType, key, typeof(T).Name);
-        }
+        return result.ConvertFailure<Maybe<T>>();
     }
 
     /// <summary>
@@ -162,14 +126,14 @@ public sealed class StateMonad : IStateMonad
         T variable,
         bool disposeOld,
         IStep? callingStep,
-        CancellationToken cancellation)
+        CancellationToken cancellation) where T : ISCLObject
     {
         if (Disposed)
             throw new ObjectDisposedException("State Monad was disposed");
 
         await RemoveVariableAsync(key, disposeOld, callingStep);
 
-        object value;
+        ISCLObject value;
 
         if (variable is IArray arrayVariable)
         {
@@ -182,7 +146,7 @@ public sealed class StateMonad : IStateMonad
         }
         else
         {
-            value = variable!;
+            value = variable;
         }
 
         _stateDictionary

@@ -13,6 +13,7 @@ public class SpaceComponent : ISerializerBlock
     public static SpaceComponent Instance { get; } = new();
 
     /// <inheritdoc />
-    public Result<string> TryGetSegmentText(IReadOnlyDictionary<string, StepProperty> dictionary) =>
-        " ";
+    public Result<string> TryGetSegmentText(
+        SerializeOptions options,
+        IReadOnlyDictionary<string, StepProperty> dictionary) => " ";
 }

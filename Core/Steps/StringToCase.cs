@@ -26,7 +26,7 @@ public sealed class StringToCase : CompoundStep<StringStream>
     [StepProperty(2)]
     [Required]
     [Alias("To")]
-    public IStep<TextCase> Case { get; set; } = null!;
+    public IStep<SCLEnum<TextCase>> Case { get; set; } = null!;
 
     /// <inheritdoc />
     protected override async Task<Result<StringStream, IError>> Run(
@@ -44,7 +44,7 @@ public sealed class StringToCase : CompoundStep<StringStream>
         if (caseResult.IsFailure)
             return caseResult.ConvertFailure<StringStream>();
 
-        StringStream r = Convert(stringResult.Value, caseResult.Value);
+        StringStream r = Convert(stringResult.Value, caseResult.Value.Value);
 
         return r;
     }

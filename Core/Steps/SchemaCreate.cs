@@ -43,14 +43,14 @@ public sealed class SchemaCreate : CompoundStep<Entity>
             ) = stepResult.Value;
 
         var schema = entities
-            .Select(x => new EntityValue.NestedEntity(x).ToSchemaNode("null", null))
+            .Select(x => x.ToSchemaNode("null", null))
             .Aggregate((a, b) => a.Combine(b))
             .ToJsonSchema();
 
         var jsonSchemaBuilder = new JsonSchemaBuilder()
             .Title(schemaName)
             .Type(SchemaValueType.Object)
-            .AdditionalProperties(allowExtraProperties ? JsonSchema.True : JsonSchema.False);
+            .AdditionalProperties(allowExtraProperties.Value ? JsonSchema.True : JsonSchema.False);
 
         var props    = schema.Keywords?.OfType<PropertiesKeyword>().FirstOrDefault();
         var required = schema.Keywords?.OfType<RequiredKeyword>().FirstOrDefault();
@@ -83,12 +83,13 @@ public sealed class SchemaCreate : CompoundStep<Entity>
     [StepProperty]
     [DefaultValueExplanation("Schema")]
     [Alias("Name")]
-    public IStep<StringStream> SchemaName { get; set; } = new StringConstant("Schema");
+    public IStep<StringStream> SchemaName { get; set; } = new SCLConstant<StringStream>("Schema");
 
     /// <summary>
     /// Whether properties other than the explicitly defined properties are allowed.
     /// </summary>
     [StepProperty]
     [DefaultValueExplanation("false")]
-    public IStep<bool> AllowExtraProperties { get; set; } = new BoolConstant(false);
+    public IStep<SCLBool> AllowExtraProperties { get; set; } =
+        new SCLConstant<SCLBool>(SCLBool.False);
 }

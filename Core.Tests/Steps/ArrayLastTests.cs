@@ -1,8 +1,6 @@
-﻿using Reductech.EDR.Core.TestHarness;
+﻿namespace Reductech.EDR.Core.Tests.Steps;
 
-namespace Reductech.EDR.Core.Tests.Steps;
-
-public partial class ArrayLastTests : StepTestBase<ArrayLast<int>, int>
+public partial class ArrayLastTests : StepTestBase<ArrayLast<SCLInt>, SCLInt>
 {
     /// <inheritdoc />
     protected override IEnumerable<StepCase> StepCases

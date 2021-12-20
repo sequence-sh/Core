@@ -1,8 +1,6 @@
-﻿using Reductech.EDR.Core.TestHarness;
+﻿namespace Reductech.EDR.Core.Tests.Steps;
 
-namespace Reductech.EDR.Core.Tests.Steps;
-
-public partial class StringContainsTests : StepTestBase<StringContains, bool>
+public partial class StringContainsTests : StepTestBase<StringContains, SCLBool>
 {
     /// <inheritdoc />
     protected override IEnumerable<StepCase> StepCases
@@ -15,7 +13,7 @@ public partial class StringContainsTests : StepTestBase<StringContains, bool>
                 {
                     String = Constant("Hello World"), Substring = Constant("Hello")
                 },
-                true
+                true.ConvertToSCLObject()
             );
 
             yield return new StepCase(
@@ -24,7 +22,7 @@ public partial class StringContainsTests : StepTestBase<StringContains, bool>
                 {
                     String = Constant("Hello World"), Substring = Constant("hello")
                 },
-                false
+                false.ConvertToSCLObject()
             );
 
             yield return new StepCase(
@@ -35,7 +33,7 @@ public partial class StringContainsTests : StepTestBase<StringContains, bool>
                     Substring  = Constant("hello"),
                     IgnoreCase = Constant(true)
                 },
-                true
+                true.ConvertToSCLObject()
             );
 
             yield return new StepCase(
@@ -46,7 +44,7 @@ public partial class StringContainsTests : StepTestBase<StringContains, bool>
                     Substring  = Constant("Goodbye"),
                     IgnoreCase = Constant(true)
                 },
-                false
+                false.ConvertToSCLObject()
             );
         }
     }

@@ -13,11 +13,11 @@ public record CreateEntityStep
         IStateMonad stateMonad,
         CancellationToken cancellationToken)
     {
-        var pairs = new List<(EntityPropertyKey, object?)>();
+        var pairs = new List<(EntityPropertyKey, ISCLObject)>();
 
         foreach (var (key, step) in Properties)
         {
-            var r = await step.Run<object>(stateMonad, cancellationToken)
+            var r = await step.Run<ISCLObject>(stateMonad, cancellationToken)
                 .Bind(x => EntityHelper.TryUnpackObjectAsync(x, cancellationToken));
 
             if (r.IsFailure)
@@ -30,23 +30,10 @@ public record CreateEntityStep
     }
 
     /// <inheritdoc />
-    public Maybe<EntityValue> TryConvertToEntityValue()
-    {
-        var pairs = new List<(EntityPropertyKey, object?)>();
-
-        foreach (var (key, value) in Properties)
-        {
-            var ev = value.TryConvertToEntityValue();
-
-            if (ev.HasNoValue)
-                return Maybe<EntityValue>.None;
-
-            pairs.Add((key, ev.GetValueOrThrow()));
-        }
-
-        var entity = Entity.Create(pairs);
-        return new EntityValue.NestedEntity(entity);
-    }
+    public Task<Result<ISCLObject, IError>> RunUntyped(
+        IStateMonad stateMonad,
+        CancellationToken cancellationToken) =>
+        Run(stateMonad, cancellationToken).Map(x => x as ISCLObject);
 
     /// <inheritdoc />
     public string Name => "Create Entity";
@@ -54,7 +41,7 @@ public record CreateEntityStep
     /// <inheritdoc />
     public async Task<Result<T, IError>> Run<T>(
         IStateMonad stateMonad,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken) where T : ISCLObject
     {
         return await Run(stateMonad, cancellationToken)
             .BindCast<Entity, T, IError>(
@@ -82,7 +69,7 @@ public record CreateEntityStep
     public Type OutputType => typeof(Entity);
 
     /// <inheritdoc />
-    public string Serialize()
+    public string Serialize(SerializeOptions options)
     {
         var sb = new StringBuilder();
 
@@ -92,12 +79,10 @@ public record CreateEntityStep
 
         foreach (var (key, value) in Properties)
         {
-            var valueString = value.Serialize();
+            var valueString = value.Serialize(options);
 
             if (value.ShouldBracketWhenSerialized)
-            {
                 valueString = $"({valueString})";
-            }
 
             results.Add($"{key}: {valueString}");
         }
@@ -116,6 +101,24 @@ public record CreateEntityStep
         {
             return Properties.SelectMany(x => x.Value.RuntimeRequirements);
         }
+    }
+
+    /// <inheritdoc />
+    public Maybe<ISCLObject> TryGetConstantValue()
+    {
+        var properties = new List<(EntityPropertyKey entityPropertyKey, ISCLObject value)>();
+
+        foreach (var (key, step) in Properties)
+        {
+            var r = step.TryGetConstantValue();
+
+            if (r.HasNoValue)
+                return Maybe<ISCLObject>.None;
+
+            properties.Add((key, r.Value));
+        }
+
+        return Entity.Create(properties);
     }
 
     /// <inheritdoc />

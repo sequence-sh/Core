@@ -1,9 +1,8 @@
 ﻿using System.Collections.Immutable;
-using Reductech.EDR.Core.TestHarness;
 
 namespace Reductech.EDR.Core.Tests.Steps;
 
-public partial class ArrayNewTests : StepTestBase<ArrayNew<int>, Array<int>>
+public partial class ArrayNewTests : StepTestBase<ArrayNew<SCLInt>, Array<SCLInt>>
 {
     /// <inheritdoc />
     protected override IEnumerable<DeserializeCase> DeserializeCases
@@ -13,13 +12,13 @@ public partial class ArrayNewTests : StepTestBase<ArrayNew<int>, Array<int>>
             yield return new DeserializeCase(
                 "Three elements explicit form",
                 "Array Elements: [1, 2, 3]",
-                new List<int> { 1, 2, 3 }.ToSCLArray()
+                new List<int> { 1, 2, 3 }.Select(x => x.ConvertToSCLObject()).ToSCLArray()
             );
 
             yield return new DeserializeCase(
                 "Three elements simple form",
                 "Array Elements: [1, 2, 3]",
-                new List<int> { 1, 2, 3 }.ToSCLArray()
+                new List<int> { 1, 2, 3 }.Select(x => x.ConvertToSCLObject()).ToSCLArray()
             );
         }
     }
@@ -33,36 +32,37 @@ public partial class ArrayNewTests : StepTestBase<ArrayNew<int>, Array<int>>
 
             yield return new StepCase(
                 "Three Constant Elements",
-                new ArrayNew<int>
+                new ArrayNew<SCLInt>
                 {
-                    Elements = new List<IStep<int>> { Constant(1), Constant(2), Constant(3), }
+                    Elements =
+                        new List<IStep<SCLInt>> { Constant(1), Constant(2), Constant(3), }
                 },
-                new List<int> { 1, 2, 3 }.ToSCLArray()
+                new List<int> { 1, 2, 3 }.Select(x => x.ConvertToSCLObject()).ToSCLArray()
             );
 
             yield return new StepCase(
                 "Sum Elements",
-                new ArrayNew<int>
+                new ArrayNew<SCLInt>
                 {
-                    Elements = new List<IStep<int>>
+                    Elements = new List<IStep<SCLInt>>
                     {
                         new Sum { Terms = Array(1, 2) }, new Sum { Terms = Array(2, 3) }
                     }
                 },
-                new List<int> { 3, 5 }.ToSCLArray()
+                new List<int> { 3, 5 }.Select(x => x.ConvertToSCLObject()).ToSCLArray()
             );
 
             yield return new StepCase(
                 "Function Elements",
-                new ArrayNew<int>
+                new ArrayNew<SCLInt>
                 {
-                    Elements = new List<IStep<int>>
+                    Elements = new List<IStep<SCLInt>>
                     {
                         new StringLength() { String = Constant("hello") },
                         new StringLength() { String = Constant("goodbye") }
                     }
                 },
-                new List<int> { 5, 7 }.ToSCLArray()
+                new List<int> { 5, 7 }.Select(x => x.ConvertToSCLObject()).ToSCLArray()
             );
         }
     }
@@ -74,15 +74,16 @@ public partial class ArrayNewTests : StepTestBase<ArrayNew<int>, Array<int>>
         {
             yield return new SerializeCase(
                 "Empty",
-                new ArrayNew<int> { Elements = ImmutableList<IStep<int>>.Empty },
+                new ArrayNew<SCLInt> { Elements = ImmutableList<IStep<SCLInt>>.Empty },
                 "[]"
             );
 
             yield return new SerializeCase(
                 "Three Elements",
-                new ArrayNew<int>
+                new ArrayNew<SCLInt>
                 {
-                    Elements = new List<IStep<int>> { Constant(1), Constant(2), Constant(3), }
+                    Elements =
+                        new List<IStep<SCLInt>> { Constant(1), Constant(2), Constant(3), }
                 },
                 "[1, 2, 3]"
             );

@@ -1,8 +1,6 @@
-﻿using Reductech.EDR.Core.TestHarness;
+﻿namespace Reductech.EDR.Core.Tests.Steps;
 
-namespace Reductech.EDR.Core.Tests.Steps;
-
-public partial class AndTests : StepTestBase<And, bool>
+public partial class AndTests : StepTestBase<And, SCLBool>
 {
     /// <inheritdoc />
     protected override IEnumerable<StepCase> StepCases
@@ -11,26 +9,29 @@ public partial class AndTests : StepTestBase<And, bool>
         {
             yield return new StepCase(
                 "No terms",
-                new And() { Terms = new ArrayNew<bool>() { Elements = new List<IStep<bool>>() } },
-                true
+                new And()
+                {
+                    Terms = new ArrayNew<SCLBool>() { Elements = new List<IStep<SCLBool>>() }
+                },
+                true.ConvertToSCLObject()
             );
 
             yield return new StepCase(
                 "just true",
-                new And() { Terms = StaticHelpers.Array(true) },
-                true
+                new And() { Terms = Array(true) },
+                true.ConvertToSCLObject()
             );
 
             yield return new StepCase(
                 "just false",
-                new And() { Terms = StaticHelpers.Array(false) },
-                false
+                new And() { Terms = Array(false) },
+                false.ConvertToSCLObject()
             );
 
             yield return new StepCase(
                 "three trues",
-                new And() { Terms = StaticHelpers.Array(true, true, true) },
-                true
+                new And() { Terms = Array(true, true, true) },
+                true.ConvertToSCLObject()
             );
         }
     }

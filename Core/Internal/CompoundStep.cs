@@ -5,7 +5,7 @@ namespace Reductech.EDR.Core.Internal;
 /// <summary>
 /// A runnable step that is not a constant.
 /// </summary>
-public abstract class CompoundStep<T> : ICompoundStep<T>
+public abstract class CompoundStep<T> : ICompoundStep<T> where T : ISCLObject
 {
     /// <summary>
     /// Run this step.
@@ -14,6 +14,17 @@ public abstract class CompoundStep<T> : ICompoundStep<T>
     protected abstract Task<Result<T, IError>> Run(
         IStateMonad stateMonad,
         CancellationToken cancellationToken);
+
+    /// <inheritdoc />
+    public async Task<Result<ISCLObject, IError>> RunUntyped(
+        IStateMonad stateMonad,
+        CancellationToken cancellationToken)
+    {
+        var r = await (this as IRunnableStep<T>).Run(stateMonad, cancellationToken)
+            .Map(x => x as ISCLObject);
+
+        return r;
+    }
 
     /// <inheritdoc />
     async Task<Result<T, IError>> IRunnableStep<T>.Run(
@@ -25,7 +36,7 @@ public abstract class CompoundStep<T> : ICompoundStep<T>
             object[] GetEnterStepArgs()
             {
                 var properties = AllProperties
-                    .ToDictionary(x => x.Name, x => x.GetLogName());
+                    .ToDictionary(x => x.Name, x => x.Serialize(SerializeOptions.SanitizedName));
 
                 return new object[] { Name, properties };
             }
@@ -40,31 +51,19 @@ public abstract class CompoundStep<T> : ICompoundStep<T>
             }
             else
             {
-                var resultValue = SerializeOutput(result.Value);
+                var resultValue = result.Value.Serialize(SerializeOptions.SanitizedName);
 
                 LogSituation.ExitStepSuccess.Log(stateMonad, this, Name, resultValue);
             }
 
             return result;
-
-            static string SerializeOutput(object? o)
-            {
-                return o switch
-                {
-                    null            => "Null",
-                    StringStream ss => ss.NameInLogs(false),
-                    IArray array    => array.NameInLogs,
-                    Unit            => "Unit",
-                    _               => o.ToString()!
-                };
-            }
         }
     }
 
     /// <inheritdoc />
     public virtual Task<Result<T1, IError>> Run<T1>(
         IStateMonad stateMonad,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken) where T1 : ISCLObject
     {
         return Run(stateMonad, cancellationToken)
             .BindCast<T, T1, IError>(
@@ -78,7 +77,8 @@ public abstract class CompoundStep<T> : ICompoundStep<T>
     public abstract IStepFactory StepFactory { get; }
 
     /// <inheritdoc />
-    public string Serialize() => StepFactory.Serializer.Serialize(AllProperties);
+    public string Serialize(SerializeOptions options) =>
+        StepFactory.Serializer.Serialize(options, AllProperties);
 
     /// <inheritdoc />
     public virtual string Name => StepFactory.TypeName;
@@ -125,7 +125,7 @@ public abstract class CompoundStep<T> : ICompoundStep<T>
     }
 
     /// <inheritdoc />
-    public virtual Maybe<EntityValue> TryConvertToEntityValue() => Maybe<EntityValue>.None;
+    public virtual Maybe<ISCLObject> TryGetConstantValue() => Maybe<ISCLObject>.None;
 
     /// <inheritdoc />
     public virtual bool ShouldBracketWhenSerialized => true;

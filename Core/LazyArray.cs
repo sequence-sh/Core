@@ -4,7 +4,7 @@
 /// An array backed by an async collection
 /// </summary>
 public sealed record LazyArray<T>
-    (IAsyncEnumerable<T> AsyncEnumerable) : Array<T>, IEquatable<Array<T>>
+    (IAsyncEnumerable<T> AsyncEnumerable) : Array<T>, IEquatable<Array<T>> where T : ISCLObject
 {
     /// <inheritdoc />
     public override IAsyncEnumerable<T> GetAsyncEnumerable() => AsyncEnumerable;
@@ -152,25 +152,27 @@ public sealed record LazyArray<T>
     }
 
     /// <inheritdoc />
-    public override string Serialize
+    public override string Serialize(SerializeOptions options)
     {
-        get
+        if (!options.EvaluateStreams)
+            return "Stream";
+
+        var list = GetElementsAsync(CancellationToken.None)
+            .Result;
+
+        if (list.IsSuccess)
         {
-            var r = GetElementsAsync(CancellationToken.None)
-                .Result;
+            if (list.Value.Count > options.MaxArrayLength)
+                return $"{list.Value.Count} Elements";
 
-            if (r.IsSuccess)
-                return SerializationMethods.SerializeList(
-                    r.Value
-                        .Select(x => SerializationMethods.SerializeObject(x))
-                );
-
-            return r.Error.AsString;
+            return SerializationMethods.SerializeList(
+                list.Value
+                    .Select(x => x.Serialize(options))
+            );
         }
-    }
 
-    /// <inheritdoc />
-    public override string NameInLogs => "Stream";
+        return list.Error.AsString;
+    }
 
     /// <inheritdoc />
     public override int GetHashCode() => GetHashCodeValue(this);
@@ -191,7 +193,7 @@ public sealed record LazyArray<T>
     {
         var stuff =
             GetAsyncEnumerable()
-                .Select(x => x.TryConvert<TElement>())
+                .Select(x => x.TryConvertTyped<TElement>("Element"))
                 .Select(
                     x => x.IsFailure
                         ? throw new ErrorException(
@@ -205,5 +207,17 @@ public sealed record LazyArray<T>
     }
 
     /// <inheritdoc />
-    public override string ToString() => NameInLogs;
+    public override Maybe<T1> MaybeAs<T1>()
+    {
+        if (this is T1 value)
+            return value;
+
+        return Maybe<T1>.None;
+    }
+
+    /// <inheritdoc />
+    public override string ToString() => Serialize(SerializeOptions.Name);
+
+    /// <inheritdoc />
+    public override bool IsEvaluated => false;
 }

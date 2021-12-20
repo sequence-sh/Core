@@ -60,7 +60,7 @@ public abstract partial class StepTestBase<TStep, TOutput>
             }
             else
             {
-                var s = ((IStep)currentValue).Serialize();
+                var s = ((IStep)currentValue).Serialize(SerializeOptions.Serialize);
                 values.Add(property.Name, s);
             }
 
@@ -101,7 +101,7 @@ public abstract partial class StepTestBase<TStep, TOutput>
             }
             else
             {
-                var s = ((LambdaFunction)currentValue).Serialize();
+                var s = ((LambdaFunction)currentValue).Serialize(SerializeOptions.Serialize);
                 values.Add(property.Name, s);
             }
 
@@ -116,7 +116,7 @@ public abstract partial class StepTestBase<TStep, TOutput>
 
                 foreach (var step in currentValue)
                 {
-                    var s = step.Serialize();
+                    var s = step.Serialize(SerializeOptions.Serialize);
                     elements.Add(s);
                 }
 
@@ -131,7 +131,7 @@ public abstract partial class StepTestBase<TStep, TOutput>
 
                 foreach (var step in newValue)
                 {
-                    var e = step.Serialize();
+                    var e = step.Serialize(SerializeOptions.Serialize);
                     elements.Add(e);
                 }
 
@@ -189,7 +189,7 @@ public abstract partial class StepTestBase<TStep, TOutput>
     {
         var tStep = propertyInfo.PropertyType;
 
-        var outputType = tStep.GenericTypeArguments.First();
+        var outputType = tStep.GenericTypeArguments.FirstOrDefault(typeof(ISCLObject));
 
         var singleChar = propertyInfo.GetCustomAttribute<SingleCharacterAttribute>() != null;
 
@@ -227,26 +227,57 @@ public abstract partial class StepTestBase<TStep, TOutput>
                 $"{stepName} should not have output type 'String' - it should be 'StringStream'"
             );
         }
-
         else if (outputType == typeof(bool))
         {
-            var b = true;
-            step = Constant(b);
+            throw new Exception(
+                $"{stepName} should not have output type 'bool' - it should be 'SCLBool'"
+            );
         }
         else if (outputType == typeof(int))
+        {
+            throw new Exception(
+                $"{stepName} should not have output type 'int' - it should be 'SCLInt'"
+            );
+        }
+
+        else if (outputType == typeof(double))
+        {
+            throw new Exception(
+                $"{stepName} should not have output type 'double' - it should be 'sclDouble'"
+            );
+        }
+        else if (outputType == typeof(DateTime))
+        {
+            throw new Exception(
+                $"{stepName} should not have output type 'datetime' - it should be 'SCLDateTime'"
+            );
+        }
+        else if (outputType == typeof(ISCLObject))
         {
             var i = index;
             index++;
             step = Constant(i);
         }
 
-        else if (outputType == typeof(double))
+        else if (outputType == typeof(SCLBool))
+        {
+            var b = true;
+            step = Constant(b);
+        }
+        else if (outputType == typeof(SCLInt))
+        {
+            var i = index;
+            index++;
+            step = Constant(i);
+        }
+
+        else if (outputType == typeof(SCLDouble))
         {
             double d = index;
             index++;
             step = Constant(d);
         }
-        else if (outputType == typeof(DateTime))
+        else if (outputType == typeof(SCLDateTime))
         {
             var dt = new DateTime(1990, index, 1);
             index++;
@@ -265,11 +296,11 @@ public abstract partial class StepTestBase<TStep, TOutput>
 
             step = Array(list.ToArray());
         }
-        else if (outputType == typeof(Array<int>))
+        else if (outputType == typeof(Array<SCLInt>))
         {
             step = CreateIntArray(ref index);
         }
-        else if (outputType == typeof(Array<double>))
+        else if (outputType == typeof(Array<SCLDouble>))
         {
             var list = new List<double>();
 
@@ -281,7 +312,7 @@ public abstract partial class StepTestBase<TStep, TOutput>
 
             step = Array(list.ToArray());
         }
-        else if (outputType == typeof(Array<bool>))
+        else if (outputType == typeof(Array<SCLBool>))
         {
             var list = new List<bool>();
 
@@ -310,21 +341,27 @@ public abstract partial class StepTestBase<TStep, TOutput>
 
             step = new ArrayNew<Array<Entity>> { Elements = entityStreamList };
         }
-        else if (outputType == typeof(Array<Array<int>>))
+        else if (outputType == typeof(Array<Array<SCLInt>>))
         {
-            var intArrayList = new List<IStep<Array<int>>>
+            var intArrayList = new List<IStep<Array<SCLInt>>>
             {
                 CreateIntArray(ref index), CreateIntArray(ref index), CreateIntArray(ref index),
             };
 
-            step = new ArrayNew<Array<int>> { Elements = intArrayList };
+            step = new ArrayNew<Array<SCLInt>> { Elements = intArrayList };
         }
 
-        else if (outputType.IsEnum)
+        else if (outputType.GetInterfaces().Contains(typeof(ISCLEnum))) //todo PUT BACK
         {
-            var v = Enum.GetValues(outputType).OfType<object>().First();
+            var enumType = outputType.GetGenericArguments()[0];
+            var v        = Enum.GetValues(enumType).OfType<object>().First();
+            var sclValue = SCLObjectHelper.ConvertToSCLEnumUnsafe(v);
 
-            step = EnumConstantFreezable.TryCreateEnumConstant(v).Value;
+            var stepType = typeof(SCLConstant<>).MakeGenericType(outputType);
+            var step1    = Activator.CreateInstance(stepType, new object?[] { sclValue }, null);
+            step = step1 as IStep;
+
+            //step = 
         }
 
         else if (outputType == typeof(Stream))
@@ -344,9 +381,9 @@ public abstract partial class StepTestBase<TStep, TOutput>
             var s = "DataStream" + index;
             index++;
 
-            step = new StringConstant(s);
+            step = new SCLConstant<StringStream>(s);
         }
-        else if (outputType.IsGenericType && outputType.GetInterfaces().Contains(typeof(IOneOf)))
+        else if (outputType.IsGenericType && outputType.GetInterfaces().Contains(typeof(ISCLOneOf)))
         {
             var arg1 = outputType.GenericTypeArguments[0];
             var (step1, _, newIndex) = CreateSimpleStep(arg1, stepName, index, singleChar);
@@ -359,7 +396,7 @@ public abstract partial class StepTestBase<TStep, TOutput>
                 $"Cannot create a constant step with type {outputType.GetDisplayName()}"
             );
 
-        var newString = step.Serialize(); // await GetStringAsync(step);
+        var newString = step.Serialize(SerializeOptions.Serialize);
 
         return (step, newString, index);
 
@@ -380,20 +417,20 @@ public abstract partial class StepTestBase<TStep, TOutput>
         static Entity CreateSimpleEntity(ref int index1)
         {
             var pairs =
-                new List<(EntityPropertyKey, object?)>
+                new List<(EntityPropertyKey, ISCLObject)>
                 {
-                    (new EntityPropertyKey("Prop1"), $"Val{index1}")
+                    (new EntityPropertyKey("Prop1"), new StringStream($"Val{index1}"))
                 };
 
             index1++;
-            pairs.Add((new EntityPropertyKey("Prop2"), $"Val{index1}"));
+            pairs.Add((new EntityPropertyKey("Prop2"), new StringStream($"Val{index1}")));
             index1++;
 
             var entity = Entity.Create(pairs);
             return entity;
         }
 
-        static IStep<Array<int>> CreateIntArray(ref int index)
+        static IStep<Array<SCLInt>> CreateIntArray(ref int index)
         {
             var list = new List<int>();
 
@@ -431,7 +468,7 @@ public abstract partial class StepTestBase<TStep, TOutput>
         else if (outputType == typeof(int))
             getElement = Constant;
         else if (outputType == typeof(Entity))
-            getElement = i => Constant(Entity.Create(("Foo", $"Val + {i}")));
+            getElement = i => Constant(Entity.Create(("Foo", new StringStream($"Val + {i}"))));
         else
             throw new XunitException(
                 $"Cannot create default value for {outputType.GetDisplayName()} List"

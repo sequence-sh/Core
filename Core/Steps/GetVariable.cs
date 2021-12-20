@@ -3,7 +3,7 @@
 /// <summary>
 /// Gets the value of a named variable.
 /// </summary>
-public sealed class GetVariable<T> : CompoundStep<T>
+public sealed class GetVariable<T> : CompoundStep<T> where T : ISCLObject
 {
     /// <inheritdoc />
     #pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
@@ -24,7 +24,9 @@ public sealed class GetVariable<T> : CompoundStep<T>
     public VariableName Variable { get; set; }
 
     /// <inheritdoc />
-    public override string Name => Variable == default ? base.Name : $"Get {Variable.Serialize()}";
+    public override string Name => Variable == default
+        ? base.Name
+        : $"Get {Variable.Serialize(SerializeOptions.Name)}";
 
     /// <summary>
     /// Gets the value of a named variable.
@@ -52,7 +54,7 @@ public sealed class GetVariable<T> : CompoundStep<T>
             TypeResolver typeResolver)
         {
             var variableName = freezableStepData
-                .TryGetVariableName(nameof(GetVariable<object>.Variable), StepType);
+                .TryGetVariableName(nameof(GetVariable<ISCLObject>.Variable), StepType);
 
             if (variableName.IsFailure)
                 return variableName.ConvertFailure<TypeReference>();
@@ -75,7 +77,7 @@ public sealed class GetVariable<T> : CompoundStep<T>
             TypeResolver typeResolver)
         {
             var vn = freezableStepData.TryGetVariableName(
-                nameof(GetVariable<object>.Variable),
+                nameof(GetVariable<ISCLObject>.Variable),
                 StepType
             );
 
@@ -91,7 +93,7 @@ public sealed class GetVariable<T> : CompoundStep<T>
         /// <inheritdoc />
         public override IStepSerializer Serializer => new StepSerializer(
             TypeName,
-            new StepComponent(nameof(GetVariable<object>.Variable))
+            new StepComponent(nameof(GetVariable<ISCLObject>.Variable))
         );
     }
 }

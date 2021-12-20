@@ -1,6 +1,4 @@
-﻿using Reductech.EDR.Core.TestHarness;
-
-namespace Reductech.EDR.Core.Tests.Steps;
+﻿namespace Reductech.EDR.Core.Tests.Steps;
 
 public partial class ArrayDistinctTests : StepTestBase<ArrayDistinct<Entity>, Array<Entity>>
 {
@@ -18,7 +16,7 @@ public partial class ArrayDistinctTests : StepTestBase<ArrayDistinct<Entity>, Ar
                 {
                     Action = new LambdaFunction<Entity, Unit>(
                         foreachVar,
-                        new Log<Entity> { Value = GetVariable<Entity>(foreachVar) }
+                        new Log { Value = GetVariable<Entity>(foreachVar) }
                     ),
                     Array = new ArrayDistinct<Entity>
                     {
@@ -40,9 +38,9 @@ public partial class ArrayDistinctTests : StepTestBase<ArrayDistinct<Entity>, Ar
                     },
                 },
                 Unit.Default,
-                Entity.Create(("Foo", "Alpha")).Serialize(),
-                Entity.Create(("Foo", "ALPHA")).Serialize(),
-                Entity.Create(("Foo", "Beta")).Serialize()
+                Entity.Create(("Foo", "Alpha")).Serialize(SerializeOptions.Serialize),
+                Entity.Create(("Foo", "ALPHA")).Serialize(SerializeOptions.Serialize),
+                Entity.Create(("Foo", "Beta")).Serialize(SerializeOptions.Serialize)
             );
 
             yield return new StepCase(
@@ -51,7 +49,7 @@ public partial class ArrayDistinctTests : StepTestBase<ArrayDistinct<Entity>, Ar
                 {
                     Action = new LambdaFunction<Entity, Unit>(
                         VariableName.Item,
-                        new Log<Entity> { Value = GetEntityVariable }
+                        new Log { Value = GetEntityVariable }
                     ),
                     Array = new ArrayDistinct<Entity>
                     {
@@ -73,8 +71,8 @@ public partial class ArrayDistinctTests : StepTestBase<ArrayDistinct<Entity>, Ar
                     },
                 },
                 Unit.Default,
-                Entity.Create(("Foo", "Alpha")).Serialize(),
-                Entity.Create(("Foo", "Beta")).Serialize()
+                Entity.Create(("Foo", "Alpha")).Serialize(SerializeOptions.Serialize),
+                Entity.Create(("Foo", "Beta")).Serialize(SerializeOptions.Serialize)
             );
         }
     }

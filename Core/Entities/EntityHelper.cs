@@ -9,8 +9,8 @@ public static class EntityHelper
     /// Tries to convert an object into one suitable as an entity property.
     /// </summary>
     [Pure]
-    public static async Task<Result<object?, IError>> TryUnpackObjectAsync(
-        object? o,
+    public static async Task<Result<ISCLObject, IError>> TryUnpackObjectAsync(
+        ISCLObject o,
         CancellationToken cancellation)
     {
         if (o is IArray list)
@@ -18,15 +18,15 @@ public static class EntityHelper
             var r = await list.GetObjectsAsync(cancellation);
 
             if (r.IsFailure)
-                return r.ConvertFailure<object?>();
+                return r.ConvertFailure<ISCLObject>();
 
             var q = await r.Value.Select(x => TryUnpackObjectAsync(x, cancellation))
                 .Combine(ErrorList.Combine)
-                .Map(x => x.ToList());
+                .Map(x => x.ToSCLArray() as ISCLObject);
 
             return q;
         }
 
-        return Result.Success<object?, IError>(o);
+        return Result.Success<ISCLObject, IError>(o);
     }
 }

@@ -25,33 +25,8 @@ public class EntityJsonConverter : JsonConverter<Entity>
     /// <inheritdoc />
     public override void Write(Utf8JsonWriter writer, Entity value, JsonSerializerOptions options)
     {
-        var dictionary = CreateDictionary(value);
+        var dictionary = value.ToCSharpObject();
 
         JsonSerializer.Serialize(writer, dictionary, options);
-
-        static Dictionary<string, object?> CreateDictionary(Entity entity)
-        {
-            var dictionary = new Dictionary<string, object?>();
-
-            foreach (var entityProperty in entity)
-            {
-                var value = GetObject(entityProperty.Value);
-                dictionary.Add(entityProperty.Name, value);
-            }
-
-            return dictionary;
-
-            static object? GetObject(EntityValue ev)
-            {
-                return ev switch
-                {
-                    EntityValue.NestedEntity nestedEntity => CreateDictionary(nestedEntity.Value),
-                    EntityValue.EnumerationValue enumerationValue => enumerationValue.Value.Value,
-                    EntityValue.NestedList list => list.Value.Select(GetObject).ToList(),
-                    EntityValue.Null _ => null,
-                    _ => ev.ObjectValue
-                };
-            }
-        }
     }
 }

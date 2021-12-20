@@ -6,7 +6,7 @@
 [Alias("Length")]
 [SCLExample("ArrayLength [1,2,3]", ExpectedOutput = "3")]
 [SCLExample("Length Of: [1,2,3]",  ExpectedOutput = "3")]
-public sealed class ArrayLength<T> : CompoundStep<int>
+public sealed class ArrayLength<T> : CompoundStep<SCLInt> where T : ISCLObject
 {
     /// <summary>
     /// The array to count.
@@ -17,12 +17,13 @@ public sealed class ArrayLength<T> : CompoundStep<int>
     public IStep<Array<T>> Array { get; set; } = null!;
 
     /// <inheritdoc />
-    protected override async Task<Result<int, IError>> Run(
+    protected override async Task<Result<SCLInt, IError>> Run(
         IStateMonad stateMonad,
         CancellationToken cancellationToken)
     {
         return await Array.Run(stateMonad, cancellationToken)
-            .Bind(x => x.CountAsync(cancellationToken));
+            .Bind(x => x.CountAsync(cancellationToken))
+            .Map(x => x.ConvertToSCLObject());
     }
 
     /// <inheritdoc />
@@ -67,7 +68,7 @@ public sealed class ArrayLength<T> : CompoundStep<int>
         }
 
         /// <inheritdoc />
-        protected override string ArrayPropertyName => nameof(ArrayLength<object>.Array);
+        protected override string ArrayPropertyName => nameof(ArrayLength<ISCLObject>.Array);
 
         protected override string? LambdaPropertyName => null;
     }

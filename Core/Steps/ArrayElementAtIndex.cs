@@ -7,7 +7,7 @@
 [Alias("FromArray")]
 [Alias("ElementAtIndex")]
 [SCLExample("FromArray ['A', 'B', 'C'] GetElement: 1", "B")]
-public sealed class ArrayElementAtIndex<T> : CompoundStep<T>
+public sealed class ArrayElementAtIndex<T> : CompoundStep<T> where T : ISCLObject
 {
     /// <summary>
     /// The array to check.
@@ -22,7 +22,7 @@ public sealed class ArrayElementAtIndex<T> : CompoundStep<T>
     [StepProperty(2)]
     [Required]
     [Alias("GetElement")]
-    public IStep<int> Index { get; set; } = null!;
+    public IStep<SCLInt> Index { get; set; } = null!;
 
     /// <inheritdoc />
     protected override async Task<Result<T, IError>> Run(
@@ -37,7 +37,7 @@ public sealed class ArrayElementAtIndex<T> : CompoundStep<T>
         var (array, index) = r.Value;
 
         var result = await array.ElementAtAsync(
-            index,
+            index.Value,
             new ErrorLocation(this),
             cancellationToken
         );
@@ -84,7 +84,8 @@ public sealed class ArrayElementAtIndex<T> : CompoundStep<T>
         }
 
         /// <inheritdoc />
-        protected override string ArrayPropertyName => nameof(ArrayElementAtIndex<object>.Array);
+        protected override string ArrayPropertyName =>
+            nameof(ArrayElementAtIndex<ISCLObject>.Array);
 
         /// <inheritdoc />
         protected override string? LambdaPropertyName => null;

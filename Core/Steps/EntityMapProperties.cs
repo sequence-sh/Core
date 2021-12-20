@@ -90,16 +90,17 @@ public class EntityMapProperties : CompoundStep<Array<Entity>>
             return newEntity;
         }
 
-        static IReadOnlyList<EntityPropertyKey> GetStringList(EntityValue ev)
+        static IReadOnlyList<EntityPropertyKey> GetStringList(ISCLObject ev)
         {
-            if (ev is EntityValue.NestedList nestedList)
+            if (ev is IArray nestedList)
             {
-                return nestedList.Value
-                    .Select(x => EntityPropertyKey.Create(x.GetPrimitiveString()))
+                return nestedList.ListIfEvaluated()
+                    .Value
+                    .Select(x => EntityPropertyKey.Create(x.Serialize(SerializeOptions.Primitive)))
                     .ToList();
             }
 
-            return new[] { EntityPropertyKey.Create(ev.GetPrimitiveString()) };
+            return new[] { EntityPropertyKey.Create(ev.Serialize(SerializeOptions.Primitive)) };
         }
     }
 

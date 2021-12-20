@@ -13,7 +13,7 @@ public sealed class AssertTrue : CompoundStep<Unit>
     {
         return await Boolean.Run(stateMonad, cancellationToken)
             .Ensure(
-                x => x,
+                x => x.Value,
                 new SingleError(
                     new ErrorLocation(this),
                     ErrorCode.AssertionFailed,
@@ -31,5 +31,5 @@ public sealed class AssertTrue : CompoundStep<Unit>
     /// </summary>
     [StepProperty(1)]
     [Required]
-    public IStep<bool> Boolean { get; set; } = null!;
+    public IStep<SCLBool> Boolean { get; set; } = null!;
 }

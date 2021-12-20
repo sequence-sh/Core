@@ -1,6 +1,4 @@
-﻿using Reductech.EDR.Core.TestHarness;
-
-namespace Reductech.EDR.Core.Tests.Steps;
+﻿namespace Reductech.EDR.Core.Tests.Steps;
 
 public partial class RunSCLTests : StepTestBase<RunSCL, Unit>
 {
@@ -45,7 +43,7 @@ public partial class RunSCLTests : StepTestBase<RunSCL, Unit>
                                 SCL = Constant("<myVar> = 'abc'"), Export = Array("myVar")
                             }
                         },
-                    FinalStep = new Log<StringStream> { Value = GetVariable<StringStream>("myVar") }
+                    FinalStep = new Log { Value = GetVariable<StringStream>("myVar") }
                 },
                 Unit.Default,
                 "abc"
@@ -63,7 +61,7 @@ public partial class RunSCLTests : StepTestBase<RunSCL, Unit>
                                 SCL = Constant("<myVar> = 123"), Export = Array("myVar")
                             }
                         },
-                    FinalStep = new Log<int> { Value = GetVariable<int>("myVar") }
+                    FinalStep = new Log { Value = GetVariable<SCLInt>("myVar") }
                 },
                 Unit.Default,
                 "123"

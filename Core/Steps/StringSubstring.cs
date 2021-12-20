@@ -21,14 +21,14 @@ public sealed class StringSubstring : CompoundStep<StringStream>
     /// </summary>
     [StepProperty(3)]
     [DefaultValueExplanation("0")]
-    public IStep<int> Index { get; set; } = new IntConstant(0);
+    public IStep<SCLInt> Index { get; set; } = new SCLConstant<SCLInt>(0.ConvertToSCLObject());
 
     /// <summary>
     /// The length of the substring to extract.
     /// </summary>
     [StepProperty(2)]
     [Required]
-    public IStep<int> Length { get; set; } = null!;
+    public IStep<SCLInt> Length { get; set; } = null!;
 
     /// <inheritdoc />
     protected override async Task<Result<StringStream, IError>> Run(
@@ -52,10 +52,10 @@ public sealed class StringSubstring : CompoundStep<StringStream>
 
         var str = await stringResult.Value.GetStringAsync();
 
-        if (index.Value < 0 || index.Value >= str.Length)
+        if (index.Value.Value < 0 || index.Value.Value >= str.Length)
             return new SingleError(new ErrorLocation(this), ErrorCode.IndexOutOfBounds);
 
-        StringStream resultString = str.Substring(index.Value, length.Value);
+        StringStream resultString = str.Substring(index.Value.Value, length.Value.Value);
 
         return resultString;
     }

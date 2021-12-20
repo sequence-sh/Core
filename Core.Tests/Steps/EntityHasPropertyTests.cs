@@ -1,8 +1,6 @@
-﻿using Reductech.EDR.Core.TestHarness;
+﻿namespace Reductech.EDR.Core.Tests.Steps;
 
-namespace Reductech.EDR.Core.Tests.Steps;
-
-public partial class EntityHasPropertyTests : StepTestBase<EntityHasProperty, bool>
+public partial class EntityHasPropertyTests : StepTestBase<EntityHasProperty, SCLBool>
 {
     /// <inheritdoc />
     protected override IEnumerable<StepCase> StepCases
@@ -16,7 +14,7 @@ public partial class EntityHasPropertyTests : StepTestBase<EntityHasProperty, bo
                     Property = Constant("Foo"),
                     Entity   = Constant(Entity.Create(("Foo", "Hello")))
                 },
-                true
+                true.ConvertToSCLObject()
             );
 
             yield return new StepCase(
@@ -26,7 +24,7 @@ public partial class EntityHasPropertyTests : StepTestBase<EntityHasProperty, bo
                     Property = Constant("Bar"),
                     Entity   = Constant(Entity.Create(("Hello", "World")))
                 },
-                false
+                false.ConvertToSCLObject()
             );
         }
     }

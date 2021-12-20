@@ -4,7 +4,7 @@
 /// A step factory that uses default values for most properties.
 /// </summary>
 public class SimpleStepFactory<TStep, TOutput> : StepFactory
-    where TStep : ICompoundStep<TOutput>, new()
+    where TStep : ICompoundStep<TOutput>, new() where TOutput : ISCLObject
 {
     /// <inheritdoc />
     public override Result<TypeReference, IError> TryGetOutputTypeReference(

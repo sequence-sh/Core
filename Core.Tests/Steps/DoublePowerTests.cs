@@ -1,8 +1,6 @@
-﻿using Reductech.EDR.Core.TestHarness;
+﻿namespace Reductech.EDR.Core.Tests.Steps;
 
-namespace Reductech.EDR.Core.Tests.Steps;
-
-public partial class DoublePowerTests : StepTestBase<DoublePower, double>
+public partial class DoublePowerTests : StepTestBase<DoublePower, SCLDouble>
 {
     /// <inheritdoc />
     protected override IEnumerable<StepCase> StepCases
@@ -13,27 +11,30 @@ public partial class DoublePowerTests : StepTestBase<DoublePower, double>
                 "No numbers",
                 new DoublePower()
                 {
-                    Terms = new ArrayNew<double>() { Elements = new List<IStep<double>>() }
+                    Terms = new ArrayNew<SCLDouble>()
+                    {
+                        Elements = new List<IStep<SCLDouble>>()
+                    }
                 },
-                0
+                0.0.ConvertToSCLObject()
             );
 
             yield return new StepCase(
                 "One number",
-                new DoublePower() { Terms = StaticHelpers.Array(2.1) },
-                2.1
+                new DoublePower() { Terms = Array(2.1) },
+                2.1.ConvertToSCLObject()
             );
 
             yield return new StepCase(
                 "Two numbers",
-                new DoublePower() { Terms = StaticHelpers.Array(4, 2.5) },
-                32
+                new DoublePower() { Terms = Array(4, 2.5) },
+                32.0.ConvertToSCLObject()
             );
 
             yield return new StepCase(
                 "Three numbers",
-                new DoublePower() { Terms = StaticHelpers.Array(2, 2, 2.5) },
-                32
+                new DoublePower() { Terms = Array(2, 2, 2.5) },
+                32.0.ConvertToSCLObject()
             );
         }
     }

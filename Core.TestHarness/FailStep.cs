@@ -5,7 +5,7 @@ public abstract partial class StepTestBase<TStep, TOutput>
     protected static
         IEnumerable<(TStep step, IError expectedError, IReadOnlyCollection<Func<IStateMonad, Task>>)
         >
-        CreateStepsWithFailStepsAsValues(object? defaultVariableValue)
+        CreateStepsWithFailStepsAsValues(ISCLObject? defaultVariableValue)
     {
         var allProperties = typeof(TStep).GetProperties()
             .Where(x => x.GetCustomAttribute<StepPropertyBaseAttribute>() is not null)
@@ -161,7 +161,7 @@ public abstract partial class StepTestBase<TStep, TOutput>
             var errorMessage = property.Name + " Error";
 
             var newValue = CreateFailStepOfType(
-                property.PropertyType.GenericTypeArguments.First(),
+                property.PropertyType.GenericTypeArguments.FirstOrDefault(typeof(ISCLObject)),
                 errorMessage
             );
 
@@ -204,7 +204,7 @@ public abstract partial class StepTestBase<TStep, TOutput>
 
         var elementType = stepType.IsGenericType
             ? stepType.GenericTypeArguments.First()
-            : typeof(IStep);
+            : typeof(ISCLObject);
 
         var step = CreateFailStepOfType(elementType, errorMessage);
         addMethod.Invoke(list, new object[] { step });
@@ -221,14 +221,14 @@ public abstract partial class StepTestBase<TStep, TOutput>
         var step = (IStep)instance!;
 
         var errorMessageProperty =
-            step.GetType().GetProperty(nameof(FailStep<object>.ErrorMessage));
+            step.GetType().GetProperty(nameof(FailStep<ISCLObject>.ErrorMessage));
 
         errorMessageProperty!.SetValue(step, errorMessage);
 
         return step;
     }
 
-    public class FailStep<T> : CompoundStep<T>
+    public class FailStep<T> : CompoundStep<T> where T : ISCLObject
     {
         /// <inheritdoc />
         protected override async Task<Result<T, IError>> Run(

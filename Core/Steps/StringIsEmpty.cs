@@ -4,10 +4,10 @@
 /// Returns whether a string is empty.
 /// </summary>
 [Alias("IsStringEmpty")]
-public sealed class StringIsEmpty : CompoundStep<bool>
+public sealed class StringIsEmpty : CompoundStep<SCLBool>
 {
     /// <inheritdoc />
-    protected override async Task<Result<bool, IError>> Run(
+    protected override async Task<Result<SCLBool, IError>> Run(
         IStateMonad stateMonad,
         CancellationToken cancellationToken)
     {
@@ -15,9 +15,9 @@ public sealed class StringIsEmpty : CompoundStep<bool>
             .Map(async x => await x.GetStringAsync());
 
         if (str.IsFailure)
-            return str.ConvertFailure<bool>();
+            return str.ConvertFailure<SCLBool>();
 
-        return string.IsNullOrWhiteSpace(str.Value);
+        return string.IsNullOrWhiteSpace(str.Value).ConvertToSCLObject();
     }
 
     /// <summary>
@@ -29,5 +29,5 @@ public sealed class StringIsEmpty : CompoundStep<bool>
 
     /// <inheritdoc />
     public override IStepFactory StepFactory { get; } =
-        new SimpleStepFactory<StringIsEmpty, bool>();
+        new SimpleStepFactory<StringIsEmpty, SCLBool>();
 }

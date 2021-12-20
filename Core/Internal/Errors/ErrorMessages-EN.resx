@@ -147,7 +147,7 @@
   <data name="ConflictingParameters" xml:space="preserve">
     <value>Parameters {0} and {1} are in conflict.</value>
   </data>
-  <data name="CouldNotConvertEntityValue" xml:space="preserve">
+  <data name="CouldNotConvertISCLObject" xml:space="preserve">
     <value>Could not convert entity value to {0}.</value>
   </data>
   <data name="CouldNotCreateStepFactoryStore" xml:space="preserve">

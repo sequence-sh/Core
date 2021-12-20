@@ -35,12 +35,12 @@ public record StringNode(
     }
 
     /// <inheritdoc />
-    protected override Result<Maybe<EntityValue>, IErrorBuilder> TryTransform1(
+    protected override Result<Maybe<ISCLObject>, IErrorBuilder> TryTransform1(
         string propertyName,
-        EntityValue entityValue,
+        ISCLObject value,
         TransformSettings transformSettings)
     {
-        var r1 = Format.TryTransform(propertyName, entityValue, transformSettings);
+        var r1 = Format.TryTransform(propertyName, value, transformSettings);
 
         if (r1.IsFailure)
             return r1;
@@ -48,12 +48,12 @@ public record StringNode(
         if (StringRestrictions == StringRestrictions.NoRestrictions)
             return r1;
 
-        var s = r1.Value.GetValueOrDefault(entityValue).GetPrimitiveString();
+        var s = r1.Value.GetValueOrDefault(value).Serialize(SerializeOptions.Primitive);
 
         var testResult = StringRestrictions.Test(s, propertyName);
 
         if (testResult.IsFailure)
-            return testResult.ConvertFailure<Maybe<EntityValue>>();
+            return testResult.ConvertFailure<Maybe<ISCLObject>>();
 
         return r1;
     }

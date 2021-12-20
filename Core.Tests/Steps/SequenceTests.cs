@@ -1,7 +1,4 @@
-﻿using Reductech.EDR.Core.Enums;
-using Reductech.EDR.Core.TestHarness;
-
-namespace Reductech.EDR.Core.Tests.Steps;
+﻿namespace Reductech.EDR.Core.Tests.Steps;
 
 public partial class SequenceTests : StepTestBase<Sequence<StringStream>, StringStream>
 {
@@ -35,7 +32,7 @@ public partial class SequenceTests : StepTestBase<Sequence<StringStream>, String
                         {
                             InitialSteps = new List<IStep<Unit>>
                             {
-                                new Log<StringStream> { Value = Constant("Hello") }
+                                new Log { Value = Constant("Hello") }
                             },
                             FinalStep = new DoNothing()
                         }
@@ -52,8 +49,8 @@ public partial class SequenceTests : StepTestBase<Sequence<StringStream>, String
                 {
                     InitialSteps = new List<IStep<Unit>>
                     {
-                        new Log<StringStream> { Value = Constant("Hello") },
-                        new Log<StringStream> { Value = Constant("World") }
+                        new Log { Value = Constant("Hello") },
+                        new Log { Value = Constant("World") }
                     },
                     FinalStep = Constant("Goodbye")
                 },
@@ -103,7 +100,7 @@ public partial class SequenceTests : StepTestBase<Sequence<StringStream>, String
                 {
                     FinalStep = new StringToCase()
                     {
-                        Case   = new EnumConstant<TextCase>(TextCase.Upper),
+                        Case   = Constant<TextCase>(TextCase.Upper),
                         String = Constant("Hello")
                     }
                 },
@@ -120,7 +117,7 @@ public partial class SequenceTests : StepTestBase<Sequence<StringStream>, String
                         {
                             InitialSteps = new List<IStep<Unit>>
                             {
-                                new Log<StringStream> { Value = Constant("Hello") }
+                                new Log { Value = Constant("Hello") }
                             },
                             FinalStep = new DoNothing()
                         }

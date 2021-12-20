@@ -17,7 +17,7 @@ public interface IArrayNewStep
 [Alias("Array")]
 [Alias("NewArray")]
 [Alias("ArrayCreate")]
-public sealed class ArrayNew<T> : CompoundStep<Array<T>>, IArrayNewStep
+public sealed class ArrayNew<T> : CompoundStep<Array<T>>, IArrayNewStep where T : ISCLObject
 {
     /// <inheritdoc />
     protected override async Task<Result<Array<T>, IError>> Run(
@@ -46,21 +46,21 @@ public sealed class ArrayNew<T> : CompoundStep<Array<T>>, IArrayNewStep
     public IEnumerable<IStep> ElementSteps => Elements;
 
     /// <inheritdoc />
-    public override Maybe<EntityValue> TryConvertToEntityValue()
+    public override Maybe<ISCLObject> TryGetConstantValue()
     {
-        var builder = ImmutableList<EntityValue>.Empty.ToBuilder();
+        var builder = ImmutableList<ISCLObject>.Empty.ToBuilder();
 
         foreach (var element in Elements)
         {
-            var ev = element.TryConvertToEntityValue();
+            var ev = element.TryGetConstantValue();
 
             if (ev.HasNoValue)
-                return Maybe<EntityValue>.None;
+                return Maybe<ISCLObject>.None;
 
             builder.Add(ev.GetValueOrThrow());
         }
 
-        return new EntityValue.NestedList(builder.ToImmutable());
+        return builder.ToSCLArray();
     }
 
     /// <summary>
@@ -110,13 +110,13 @@ public sealed class ArrayNew<T> : CompoundStep<Array<T>>, IArrayNewStep
                 return mtr.ConvertFailure<TypeReference>();
 
             var result =
-                freezableStepData.TryGetStepList(nameof(ArrayNew<object>.Elements), StepType)
+                freezableStepData.TryGetStepList(nameof(ArrayNew<ISCLObject>.Elements), StepType)
                     .Bind(
                         x => x.Select(
                                 r => r.TryGetOutputTypeReference(
                                     new CallerMetadata(
                                         TypeName,
-                                        nameof(ArrayNew<int>.Elements),
+                                        nameof(ArrayNew<SCLInt>.Elements),
                                         mtr.Value
                                     ),
                                     typeResolver

@@ -1,7 +1,5 @@
 ﻿using Reductech.EDR.ConnectorManagement.Base;
-using Reductech.EDR.Core.Entities;
 using Reductech.EDR.Core.Internal.Parser;
-using Reductech.EDR.Core.TestHarness;
 
 namespace Reductech.EDR.Core.Tests;
 
@@ -42,20 +40,23 @@ public class EntityConversionTests
         "('AdditionalRequirements': [('FeaturesKey': \"Features\" 'RequiredFeatures': [\"Apple\", \"Banana\"] 'ConnectorName': \"Reductech.EDR.Core.Tests\"), ('VersionKey': \"Version\" 'MinVersion': \"1.2.3.4\" 'MaxVersion': \"5.6.7.8\" 'ConnectorName': \"Reductech.EDR.Core.Tests\")] 'TargetMachineTags': [\"alpha\", \"beta\"] 'DoNotSplit': True 'Priority': 3)";
 
     private const string TestConfigurationString2 =
-        "('AdditionalRequirements': null 'TargetMachineTags': [\"alpha\", \"beta\"] 'DoNotSplit': True 'Priority': 3)";
+        "('AdditionalRequirements': [] 'TargetMachineTags': [\"alpha\", \"beta\"] 'DoNotSplit': True 'Priority': 3)";
 
     [Fact]
     public void ConfigurationShouldConvertToEntityCorrectly()
     {
         var entity = TestConfiguration.ConvertToEntity();
 
-        var s = entity.ToString();
+        var s = entity.Serialize(SerializeOptions.Serialize);
 
         s.Should().Be(TestConfigurationString);
 
         var config = EntityConversionHelpers.TryCreateFromEntity<Configuration>(entity);
         config.ShouldBeSuccessful();
-        config.Value.ConvertToEntity().Should().BeEquivalentTo(entity);
+
+        var cvEntity = config.Value.ConvertToEntity();
+
+        cvEntity.Should().BeEquivalentTo(entity);
     }
 
     [Fact]
@@ -63,7 +64,7 @@ public class EntityConversionTests
     {
         var entity = TestConfiguration2.ConvertToEntity();
 
-        var s = entity.ToString();
+        var s = entity.Serialize(SerializeOptions.Serialize);
 
         s.Should().Be(TestConfigurationString2);
 
@@ -85,12 +86,11 @@ public class EntityConversionTests
                         StepFactoryStore.Create()
                     )
                 )
-                .Map(x => x.TryConvertToEntityValue());
+                .Map(x => x.TryGetConstantValue());
 
         parseResult.ShouldBeSuccessful();
 
-        return (parseResult.Value.GetValueOrThrow() as EntityValue.NestedEntity)!
-            .Value; //could throw exception
+        return parseResult.Value.GetValueOrThrow() as Entity;
     }
 
     [Fact]
@@ -121,7 +121,7 @@ public class EntityConversionTests
 
         var entity = EntityConversionHelpers.ConvertToEntity(settings);
 
-        var s = entity.ToString();
+        var s = entity.Serialize(SerializeOptions.Serialize);
 
         s.Should()
             .Be(
@@ -135,20 +135,20 @@ public class EntityConversionTests
         var e = Entity.Create(("short", Convert.ToInt16(11)));
 
         e.TryGetValue("short").ShouldHaveValue();
-        e.TryGetValue("short").GetValueOrThrow().Should().Be(new EntityValue.Integer(11));
+        e.TryGetValue("short").GetValueOrThrow().Should().Be(new SCLInt(11));
     }
 
     [Fact]
     public void EnumerationShouldConvertCorrectly()
     {
-        var e = Entity.Create(("enumeration", new Enumeration("letter", "alpha")));
+        var e = Entity.Create(("enumeration", new SCLEnum<TextCase>(TextCase.Upper)));
 
         e.TryGetValue("enumeration").ShouldHaveValue();
 
         e.TryGetValue("enumeration")
             .GetValueOrThrow()
             .Should()
-            .Be(new EntityValue.EnumerationValue(new Enumeration("letter", "alpha")));
+            .Be(new SCLEnum<TextCase>(TextCase.Upper));
     }
 
     [Fact]
@@ -158,9 +158,12 @@ public class EntityConversionTests
 
         e.TryGetValue("emptyList").ShouldHaveValue();
 
-        e.TryGetValue("emptyList")
-            .GetValueOrThrow()
+        var listValue =
+            e.TryGetValue("emptyList")
+                .GetValueOrThrow();
+
+        listValue
             .Should()
-            .Be(EntityValue.Null.Instance);
+            .Be(EagerArray<ISCLObject>.Empty);
     }
 }

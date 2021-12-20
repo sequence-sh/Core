@@ -1,8 +1,6 @@
-﻿using Reductech.EDR.Core.TestHarness;
+﻿namespace Reductech.EDR.Core.Tests.Steps;
 
-namespace Reductech.EDR.Core.Tests.Steps;
-
-public partial class RepeatTests : StepTestBase<Repeat<int>, Array<int>>
+public partial class RepeatTests : StepTestBase<Repeat<SCLInt>, Array<SCLInt>>
 {
     /// <inheritdoc />
     protected override IEnumerable<StepCase> StepCases
@@ -11,14 +9,14 @@ public partial class RepeatTests : StepTestBase<Repeat<int>, Array<int>>
         {
             yield return new StepCase(
                 "Repeat number",
-                new Repeat<int>() { Element = Constant(6), Number = Constant(3) },
-                new List<int>() { 6, 6, 6 }.ToSCLArray()
+                new Repeat<SCLInt>() { Element = Constant(6), Number = Constant(3) },
+                new List<int>() { 6, 6, 6 }.Select(x => x.ConvertToSCLObject()).ToSCLArray()
             );
 
             yield return new StepCase(
                 "Repeat zero times",
-                new Repeat<int>() { Element = Constant(6), Number = Constant(0) },
-                new List<int>().ToSCLArray()
+                new Repeat<SCLInt>() { Element = Constant(6), Number = Constant(0) },
+                new List<int>().Select(x => x.ConvertToSCLObject()).ToSCLArray()
             );
         }
     }
@@ -31,7 +29,7 @@ public partial class RepeatTests : StepTestBase<Repeat<int>, Array<int>>
             yield return new DeserializeCase(
                 "Repeat number",
                 "Repeat Element: 6 Number: 3",
-                new List<int>() { 6, 6, 6 }.ToSCLArray()
+                new List<int>() { 6, 6, 6 }.Select(x => x.ConvertToSCLObject()).ToSCLArray()
             );
         }
     }

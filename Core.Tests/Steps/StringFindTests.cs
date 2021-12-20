@@ -1,8 +1,6 @@
-﻿using Reductech.EDR.Core.TestHarness;
+﻿namespace Reductech.EDR.Core.Tests.Steps;
 
-namespace Reductech.EDR.Core.Tests.Steps;
-
-public partial class StringFindTests : StepTestBase<StringFind, int>
+public partial class StringFindTests : StepTestBase<StringFind, SCLInt>
 {
     /// <inheritdoc />
     protected override IEnumerable<StepCase> StepCases
@@ -12,13 +10,13 @@ public partial class StringFindTests : StepTestBase<StringFind, int>
             yield return new StepCase(
                 "Substring is present",
                 new StringFind() { String = Constant("Hello"), SubString = Constant("lo") },
-                3
+                3.ConvertToSCLObject()
             );
 
             yield return new StepCase(
                 "Substring is no present",
                 new StringFind() { String = Constant("Hello"), SubString = Constant("ol") },
-                -1
+                (-1).ConvertToSCLObject()
             );
         }
     }
@@ -31,7 +29,7 @@ public partial class StringFindTests : StepTestBase<StringFind, int>
             yield return new DeserializeCase(
                 "Present",
                 "StringFind String: 'Hello' Substring: 'lo'",
-                3
+                3.ConvertToSCLObject()
             );
         }
     }

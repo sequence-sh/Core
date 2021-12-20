@@ -13,10 +13,15 @@ public abstract class OneOfStep : IStep
     /// <inheritdoc />
     public Task<Result<T, IError>> Run<T>(
         IStateMonad stateMonad,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken) where T : ISCLObject
     {
         return StepValue.Run<T>(stateMonad, cancellationToken);
     }
+
+    /// <inheritdoc />
+    public Task<Result<ISCLObject, IError>> RunUntyped(
+        IStateMonad stateMonad,
+        CancellationToken cancellationToken) => StepValue.RunUntyped(stateMonad, cancellationToken);
 
     /// <inheritdoc />
     public string Name => StepValue.Name;
@@ -41,19 +46,13 @@ public abstract class OneOfStep : IStep
     public abstract Type OutputType { get; }
 
     /// <inheritdoc />
-    public string Serialize()
-    {
-        return StepValue.Serialize();
-    }
+    public string Serialize(SerializeOptions options) => StepValue.Serialize(options);
 
     /// <inheritdoc />
     public IEnumerable<Requirement> RuntimeRequirements => StepValue.RuntimeRequirements;
 
     /// <inheritdoc />
-    public Maybe<EntityValue> TryConvertToEntityValue()
-    {
-        return StepValue.TryConvertToEntityValue();
-    }
+    public Maybe<ISCLObject> TryGetConstantValue() => StepValue.TryGetConstantValue();
 
     /// <summary>
     /// Create a OneOfStep
@@ -86,7 +85,8 @@ public abstract class OneOfStep : IStep
 /// <summary>
 /// A step that could have one of two possible types
 /// </summary>
-public class OneOfStep<T0, T1> : OneOfStep, IStep<OneOf<T0, T1>>
+public class OneOfStep<T0, T1> : OneOfStep, IStep<SCLOneOf<T0, T1>>
+    where T0 : ISCLObject where T1 : ISCLObject
 {
     /// <summary>
     /// Create a new OneOfStep
@@ -118,13 +118,13 @@ public class OneOfStep<T0, T1> : OneOfStep, IStep<OneOf<T0, T1>>
     public override Type OutputType => typeof(OneOf<T0, T1>);
 
     /// <inheritdoc />
-    public Task<Result<OneOf<T0, T1>, IError>> Run(
+    public Task<Result<SCLOneOf<T0, T1>, IError>> Run(
         IStateMonad stateMonad,
         CancellationToken cancellationToken)
     {
         return Step.Match(
-            x => x.Run(stateMonad, cancellationToken).Map(OneOf<T0, T1>.FromT0),
-            x => x.Run(stateMonad, cancellationToken).Map(OneOf<T0, T1>.FromT1)
+            x => x.Run(stateMonad, cancellationToken).Map(t0 => new SCLOneOf<T0, T1>(t0)),
+            x => x.Run(stateMonad, cancellationToken).Map(t1 => new SCLOneOf<T0, T1>(t1))
         );
     }
 }
@@ -132,7 +132,8 @@ public class OneOfStep<T0, T1> : OneOfStep, IStep<OneOf<T0, T1>>
 /// <summary>
 /// A step that could have one of two possible types
 /// </summary>
-public class OneOfStep<T0, T1, T2> : OneOfStep, IStep<OneOf<T0, T1, T2>>
+public class OneOfStep<T0, T1, T2> : OneOfStep, IStep<SCLOneOf<T0, T1, T2>>
+    where T0 : ISCLObject where T1 : ISCLObject where T2 : ISCLObject
 {
     /// <summary>
     /// Create a new OneOfStep
@@ -172,14 +173,14 @@ public class OneOfStep<T0, T1, T2> : OneOfStep, IStep<OneOf<T0, T1, T2>>
     public override Type OutputType => typeof(OneOf<T0, T1, T2>);
 
     /// <inheritdoc />
-    public Task<Result<OneOf<T0, T1, T2>, IError>> Run(
+    public Task<Result<SCLOneOf<T0, T1, T2>, IError>> Run(
         IStateMonad stateMonad,
         CancellationToken cancellationToken)
     {
         return Step.Match(
-            x => x.Run(stateMonad, cancellationToken).Map(OneOf<T0, T1, T2>.FromT0),
-            x => x.Run(stateMonad, cancellationToken).Map(OneOf<T0, T1, T2>.FromT1),
-            x => x.Run(stateMonad, cancellationToken).Map(OneOf<T0, T1, T2>.FromT2)
+            x => x.Run(stateMonad, cancellationToken).Map(t0 => new SCLOneOf<T0, T1, T2>(t0)),
+            x => x.Run(stateMonad, cancellationToken).Map(t1 => new SCLOneOf<T0, T1, T2>(t1)),
+            x => x.Run(stateMonad, cancellationToken).Map(t2 => new SCLOneOf<T0, T1, T2>(t2))
         );
     }
 }

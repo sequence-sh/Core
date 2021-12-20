@@ -4,7 +4,7 @@
 /// Asserts that two objects are equal.
 /// Both objects must have the same type.
 /// </summary>
-public sealed class AssertEqual<T> : CompoundStep<Unit>
+public sealed class AssertEqual<T> : CompoundStep<Unit> where T : ISCLObject
 {
     /// <inheritdoc />
     protected override async Task<Result<Unit, IError>> Run(
@@ -21,13 +21,11 @@ public sealed class AssertEqual<T> : CompoundStep<Unit>
         if (right.IsFailure)
             return right.ConvertFailure<Unit>();
 
-        var r = left.Value is not null && left.Value.Equals(right.Value);
-
-        if (r)
+        if (left.Value.Equals(right.Value))
             return Unit.Default;
 
-        var lString = await SerializationMethods.GetStringAsync(left.Value);
-        var rString = await SerializationMethods.GetStringAsync(right.Value);
+        var lString = left.Value.Serialize(SerializeOptions.Primitive);
+        var rString = right.Value.Serialize(SerializeOptions.Primitive);
 
         var error = ErrorCode.AssertionFailed
             .ToErrorBuilder($"Expected {lString} to equal {rString}")

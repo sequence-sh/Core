@@ -29,7 +29,10 @@ public abstract partial class StepTestBase<TStep, TOutput>
         /// <inheritdoc />
         public async Task RunAsync(ITestOutputHelper testOutputHelper)
         {
-            var realSCL = SpaceCompressor.CompressNewLines(Step.Serialize().TrimEnd());
+            var realSCL =
+                SpaceCompressor.CompressNewLines(
+                    Step.Serialize(SerializeOptions.Serialize).TrimEnd()
+                );
 
             testOutputHelper.WriteLine(realSCL);
             var trueExpected = SpaceCompressor.CompressNewLines(ExpectedSCL.Trim());

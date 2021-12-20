@@ -8,10 +8,10 @@
 [SCLExample("StringContains String: 'hello there' Substring: 'there'", "True")]
 [SCLExample("StringContains String: 'hello there' Substring: 'world'", "False")]
 [SCLExample("DoesString 'hello there' Contain: 'ello'",                "True")]
-public sealed class StringContains : CompoundStep<bool>
+public sealed class StringContains : CompoundStep<SCLBool>
 {
     /// <inheritdoc />
-    protected override async Task<Result<bool, IError>> Run(
+    protected override async Task<Result<SCLBool, IError>> Run(
         IStateMonad stateMonad,
         CancellationToken cancellationToken)
     {
@@ -19,26 +19,26 @@ public sealed class StringContains : CompoundStep<bool>
             .Map(async x => await x.GetStringAsync());
 
         if (superstringResult.IsFailure)
-            return superstringResult.ConvertFailure<bool>();
+            return superstringResult.ConvertFailure<SCLBool>();
 
         var substringResult = await Substring.Run(stateMonad, cancellationToken)
             .Map(async x => await x.GetStringAsync());
 
         if (substringResult.IsFailure)
-            return substringResult.ConvertFailure<bool>();
+            return substringResult.ConvertFailure<SCLBool>();
 
         var ignoreCaseResult = await IgnoreCase.Run(stateMonad, cancellationToken);
 
         if (ignoreCaseResult.IsFailure)
-            return ignoreCaseResult.ConvertFailure<bool>();
+            return ignoreCaseResult.ConvertFailure<SCLBool>();
 
-        var comparison = ignoreCaseResult.Value
+        var comparison = ignoreCaseResult.Value.Value
             ? StringComparison.OrdinalIgnoreCase
             : StringComparison.Ordinal;
 
         var r = superstringResult.Value.Contains(substringResult.Value, comparison);
 
-        return r;
+        return r.ConvertToSCLObject();
     }
 
     /// <summary>
@@ -61,9 +61,9 @@ public sealed class StringContains : CompoundStep<bool>
     /// </summary>
     [StepProperty(3)]
     [DefaultValueExplanation("False")]
-    public IStep<bool> IgnoreCase { get; set; } = new BoolConstant(false);
+    public IStep<SCLBool> IgnoreCase { get; set; } = new SCLConstant<SCLBool>(SCLBool.False);
 
     /// <inheritdoc />
     public override IStepFactory StepFactory { get; } =
-        new SimpleStepFactory<StringContains, bool>();
+        new SimpleStepFactory<StringContains, SCLBool>();
 }

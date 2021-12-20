@@ -1,8 +1,6 @@
-﻿using Reductech.EDR.Core.TestHarness;
+﻿namespace Reductech.EDR.Core.Tests.Steps;
 
-namespace Reductech.EDR.Core.Tests.Steps;
-
-public partial class DoubleSumTests : StepTestBase<DoubleSum, double>
+public partial class DoubleSumTests : StepTestBase<DoubleSum, SCLDouble>
 {
     /// <inheritdoc />
     protected override IEnumerable<StepCase> StepCases
@@ -13,27 +11,30 @@ public partial class DoubleSumTests : StepTestBase<DoubleSum, double>
                 "No numbers",
                 new DoubleSum()
                 {
-                    Terms = new ArrayNew<double>() { Elements = new List<IStep<double>>() }
+                    Terms = new ArrayNew<SCLDouble>()
+                    {
+                        Elements = new List<IStep<SCLDouble>>()
+                    }
                 },
-                0
+                0d.ConvertToSCLObject()
             );
 
             yield return new StepCase(
                 "One number",
-                new DoubleSum() { Terms = StaticHelpers.Array(2d) },
-                2d
+                new DoubleSum() { Terms = Array(2d) },
+                2d.ConvertToSCLObject()
             );
 
             yield return new StepCase(
                 "Two numbers",
-                new DoubleSum() { Terms = StaticHelpers.Array(2.5d, 3.5d) },
-                6
+                new DoubleSum() { Terms = Array(2.5d, 3.5d) },
+                6d.ConvertToSCLObject()
             );
 
             yield return new StepCase(
                 "Three numbers",
-                new DoubleSum() { Terms = StaticHelpers.Array(2.2d, 3.3d, 4.4d) },
-                9.9
+                new DoubleSum() { Terms = Array(2.2d, 3.3d, 4.4d) },
+                9.9d.ConvertToSCLObject()
             );
         }
     }

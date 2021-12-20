@@ -1,6 +1,4 @@
-﻿using Reductech.EDR.Core.TestHarness;
-
-namespace Reductech.EDR.Core.Tests.Steps;
+﻿namespace Reductech.EDR.Core.Tests.Steps;
 
 public partial class ArraySortEntitiesTests : StepTestBase<ArraySort<Entity>, Array<Entity>>
 {
@@ -30,13 +28,13 @@ public partial class ArraySortEntitiesTests : StepTestBase<ArraySort<Entity>, Ar
                     },
                     Action = new LambdaFunction<Entity, Unit>(
                         null,
-                        new Log<Entity> { Value = GetEntityVariable }
+                        new Log { Value = GetEntityVariable }
                     ),
                 },
                 Unit.Default,
-                Entity.Create(("Foo", "Alpha")).Serialize(),
-                Entity.Create(("Foo", "Beta")).Serialize(),
-                Entity.Create(("Foo", "Gamma")).Serialize()
+                Entity.Create(("Foo", "Alpha")).Serialize(SerializeOptions.Serialize),
+                Entity.Create(("Foo", "Beta")).Serialize(SerializeOptions.Serialize),
+                Entity.Create(("Foo", "Gamma")).Serialize(SerializeOptions.Serialize)
             );
 
             yield return new StepCase(
@@ -45,7 +43,7 @@ public partial class ArraySortEntitiesTests : StepTestBase<ArraySort<Entity>, Ar
                 {
                     Array = new ArraySort<Entity>
                     {
-                        Descending = new OneOfStep<bool, SortOrder>(Constant(true)),
+                        Descending = new OneOfStep<SCLBool, SCLEnum<SortOrder>>(Constant(true)),
                         Array = Array(
                             Entity.Create(("Foo", "Gamma")),
                             Entity.Create(("Foo", "Alpha")),
@@ -61,13 +59,13 @@ public partial class ArraySortEntitiesTests : StepTestBase<ArraySort<Entity>, Ar
                     },
                     Action = new LambdaFunction<Entity, Unit>(
                         null,
-                        new Log<Entity> { Value = GetEntityVariable }
+                        new Log { Value = GetEntityVariable }
                     )
                 },
                 Unit.Default,
-                Entity.Create(("Foo", "Gamma")).Serialize(),
-                Entity.Create(("Foo", "Beta")).Serialize(),
-                Entity.Create(("Foo", "Alpha")).Serialize()
+                Entity.Create(("Foo", "Gamma")).Serialize(SerializeOptions.Serialize),
+                Entity.Create(("Foo", "Beta")).Serialize(SerializeOptions.Serialize),
+                Entity.Create(("Foo", "Alpha")).Serialize(SerializeOptions.Serialize)
             );
 
             yield return new StepCase(
@@ -76,7 +74,7 @@ public partial class ArraySortEntitiesTests : StepTestBase<ArraySort<Entity>, Ar
                 {
                     Array = new ArraySort<Entity>
                     {
-                        Descending = new OneOfStep<bool, SortOrder>(Constant(true)),
+                        Descending = new OneOfStep<SCLBool, SCLEnum<SortOrder>>(Constant(true)),
                         Array = Array(
                             Entity.Create(("Foo", "Gamma")),
                             Entity.Create(("Foo", "Alpha")),
@@ -93,14 +91,14 @@ public partial class ArraySortEntitiesTests : StepTestBase<ArraySort<Entity>, Ar
                     },
                     Action = new LambdaFunction<Entity, Unit>(
                         null,
-                        new Log<Entity> { Value = GetEntityVariable }
+                        new Log { Value = GetEntityVariable }
                     ),
                 },
                 Unit.Default,
-                Entity.Create(("Foo", "Gamma")).Serialize(),
-                Entity.Create(("Foo", "Beta")).Serialize(),
-                Entity.Create(("Foo", "Alpha")).Serialize(),
-                Entity.Create(("Bar", "Delta")).Serialize()
+                Entity.Create(("Foo", "Gamma")).Serialize(SerializeOptions.Serialize),
+                Entity.Create(("Foo", "Beta")).Serialize(SerializeOptions.Serialize),
+                Entity.Create(("Foo", "Alpha")).Serialize(SerializeOptions.Serialize),
+                Entity.Create(("Bar", "Delta")).Serialize(SerializeOptions.Serialize)
             );
         }
     }

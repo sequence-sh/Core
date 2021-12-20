@@ -54,7 +54,7 @@ public sealed class Transform : CompoundStep<Array<Entity>>
             caseSensitive,
             removeExtraMaybe) = stepsResult.Value;
 
-        SchemaNode topNode = SchemaNode.Create(schema);
+        var topNode = SchemaNode.Create(schema);
 
         TransformSettings transformSettings = new(
             Formatter.Create(dateInputFormats),
@@ -62,8 +62,8 @@ public sealed class Transform : CompoundStep<Array<Entity>>
             Formatter.Create(boolFalseFormats),
             Formatter.Create(nullFormats),
             Formatter.Create(delimiters),
-            caseSensitive,
-            removeExtraMaybe
+            caseSensitive.Value,
+            removeExtraMaybe.Map(x => x.Value)
         );
 
         var newEntityStream = entityStream.SelectMany(TryTransform);
@@ -76,7 +76,7 @@ public sealed class Transform : CompoundStep<Array<Entity>>
 
             var result = topNode.TryTransform(
                 "",
-                new EntityValue.NestedEntity(entity),
+                new Entity(entity),
                 transformSettings
             );
 
@@ -84,8 +84,8 @@ public sealed class Transform : CompoundStep<Array<Entity>>
             {
                 if (result.Value.HasValue)
                 {
-                    if (result.Value.GetValueOrThrow() is EntityValue.NestedEntity ne)
-                        yield return ne.Value;
+                    if (result.Value.GetValueOrThrow() is Entity ne)
+                        yield return ne;
                     else
                         yield return new Entity(
                             new[]
@@ -104,7 +104,7 @@ public sealed class Transform : CompoundStep<Array<Entity>>
 
             else
             {
-                switch (errorBehavior)
+                switch (errorBehavior.Value)
                 {
                     case Enums.ErrorBehavior.Fail:
                     {
@@ -172,8 +172,10 @@ public sealed class Transform : CompoundStep<Array<Entity>>
     /// </summary>
     [StepProperty(3)]
     [DefaultValueExplanation("Fail")]
-    public IStep<ErrorBehavior> ErrorBehavior { get; set; } =
-        new EnumConstant<ErrorBehavior>(Enums.ErrorBehavior.Fail);
+    public IStep<SCLEnum<ErrorBehavior>> ErrorBehavior { get; set; } =
+        new SCLConstant<SCLEnum<ErrorBehavior>>(
+            new SCLEnum<ErrorBehavior>(Enums.ErrorBehavior.Fail)
+        );
 
     /// <summary>
     /// ISO 8601 Date Formats to use for strings representing dates
@@ -181,7 +183,11 @@ public sealed class Transform : CompoundStep<Array<Entity>>
     /// </summary>
     [StepProperty()]
     [DefaultValueExplanation("No Date Input")]
-    public IStep<OneOf<StringStream, Array<StringStream>, Entity>>? DateInputFormats { get; set; } =
+    public IStep<SCLOneOf<StringStream, Array<StringStream>, Entity>>? DateInputFormats
+    {
+        get;
+        set;
+    } =
         null;
 
     /// <summary>
@@ -190,11 +196,16 @@ public sealed class Transform : CompoundStep<Array<Entity>>
     /// </summary>
     [StepProperty()]
     [DefaultValueExplanation("True, Yes, or 1")]
-    public IStep<OneOf<StringStream, Array<StringStream>, Entity>>? BooleanTrueFormats { get; set; }
+    public IStep<SCLOneOf<StringStream, Array<StringStream>, Entity>>? BooleanTrueFormats
+    {
+        get;
+        set;
+    }
         = new OneOfStep<StringStream, Array<StringStream>, Entity>(
             ArrayNew<StringStream>.CreateArray(
                 new[] { "True", "Yes", "1" }.Select(
-                        x => new StringConstant(new StringStream(x)) as IStep<StringStream>
+                        x => new SCLConstant<StringStream>(new StringStream(x)) as
+                            IStep<StringStream>
                     )
                     .ToList()
             )
@@ -206,7 +217,7 @@ public sealed class Transform : CompoundStep<Array<Entity>>
     /// </summary>
     [StepProperty()]
     [DefaultValueExplanation("False, No, or 0")]
-    public IStep<OneOf<StringStream, Array<StringStream>, Entity>>? BooleanFalseFormats
+    public IStep<SCLOneOf<StringStream, Array<StringStream>, Entity>>? BooleanFalseFormats
     {
         get;
         set;
@@ -214,7 +225,8 @@ public sealed class Transform : CompoundStep<Array<Entity>>
         = new OneOfStep<StringStream, Array<StringStream>, Entity>(
             ArrayNew<StringStream>.CreateArray(
                 new[] { "False", "No", "0" }.Select(
-                        x => new StringConstant(new StringStream(x)) as IStep<StringStream>
+                        x => new SCLConstant<StringStream>(new StringStream(x)) as
+                            IStep<StringStream>
                     )
                     .ToList()
             )
@@ -226,11 +238,12 @@ public sealed class Transform : CompoundStep<Array<Entity>>
     /// </summary>
     [StepProperty()]
     [DefaultValueExplanation("Null")]
-    public IStep<OneOf<StringStream, Array<StringStream>, Entity>>? NullFormats { get; set; }
+    public IStep<SCLOneOf<StringStream, Array<StringStream>, Entity>>? NullFormats { get; set; }
         = new OneOfStep<StringStream, Array<StringStream>, Entity>(
             ArrayNew<StringStream>.CreateArray(
                 new[] { "Null" }.Select(
-                        x => new StringConstant(new StringStream(x)) as IStep<StringStream>
+                        x => new SCLConstant<StringStream>(new StringStream(x)) as
+                            IStep<StringStream>
                     )
                     .ToList()
             )
@@ -242,11 +255,12 @@ public sealed class Transform : CompoundStep<Array<Entity>>
     /// </summary>
     [StepProperty()]
     [DefaultValueExplanation("No Delimiter")]
-    public IStep<OneOf<StringStream, Array<StringStream>, Entity>>? ArrayDelimiters { get; set; }
+    public IStep<SCLOneOf<StringStream, Array<StringStream>, Entity>>? ArrayDelimiters { get; set; }
         = new OneOfStep<StringStream, Array<StringStream>, Entity>(
             ArrayNew<StringStream>.CreateArray(
                 new[] { "Null" }.Select(
-                        x => new StringConstant(new StringStream(x)) as IStep<StringStream>
+                        x => new SCLConstant<StringStream>(new StringStream(x)) as
+                            IStep<StringStream>
                     )
                     .ToList()
             )
@@ -257,14 +271,14 @@ public sealed class Transform : CompoundStep<Array<Entity>>
     /// </summary>
     [StepProperty]
     [DefaultValueExplanation("False")]
-    public IStep<bool> CaseSensitive { get; set; } = new BoolConstant(false);
+    public IStep<SCLBool> CaseSensitive { get; set; } = new SCLConstant<SCLBool>(SCLBool.False);
 
     /// <summary>
     /// Whether additional properties outside the schema should be removed
     /// </summary>
     [StepProperty]
     [DefaultValueExplanation("True if the Schema does not allow extra properties")]
-    public IStep<bool>? RemoveExtraProperties { get; set; } = null;
+    public IStep<SCLBool>? RemoveExtraProperties { get; set; } = null;
 
     /// <inheritdoc />
     public override IStepFactory StepFactory { get; } =

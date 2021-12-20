@@ -1,8 +1,6 @@
-﻿using Reductech.EDR.Core.TestHarness;
+﻿namespace Reductech.EDR.Core.Tests.Steps;
 
-namespace Reductech.EDR.Core.Tests.Steps;
-
-public partial class DivideTests : StepTestBase<Divide, int>
+public partial class DivideTests : StepTestBase<Divide, SCLInt>
 {
     /// <inheritdoc />
     protected override IEnumerable<StepCase> StepCases
@@ -11,26 +9,29 @@ public partial class DivideTests : StepTestBase<Divide, int>
         {
             yield return new StepCase(
                 "No Terms",
-                new Divide() { Terms = new ArrayNew<int>() { Elements = new List<IStep<int>>() } },
-                0
+                new Divide()
+                {
+                    Terms = new ArrayNew<SCLInt>() { Elements = new List<IStep<SCLInt>>() }
+                },
+                0.ConvertToSCLObject()
             );
 
             yield return new StepCase(
                 "One number",
-                new Divide() { Terms = StaticHelpers.Array(2) },
-                2
+                new Divide() { Terms = Array(2) },
+                2.ConvertToSCLObject()
             );
 
             yield return new StepCase(
                 "Two Terms",
-                new Divide() { Terms = StaticHelpers.Array(6, 3) },
-                2
+                new Divide() { Terms = Array(6, 3) },
+                2.ConvertToSCLObject()
             );
 
             yield return new StepCase(
                 "Three Terms",
-                new Divide() { Terms = StaticHelpers.Array(24, 3, 4) },
-                2
+                new Divide() { Terms = Array(24, 3, 4) },
+                2.ConvertToSCLObject()
             );
         }
     }

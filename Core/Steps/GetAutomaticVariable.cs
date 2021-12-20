@@ -3,8 +3,7 @@
 /// <summary>
 /// Gets the value of the automatic variable
 /// </summary>
-/// <typeparam name="T"></typeparam>
-public sealed class GetAutomaticVariable<T> : CompoundStep<T>
+public sealed class GetAutomaticVariable<T> : CompoundStep<T> where T : ISCLObject
 {
     /// <inheritdoc />
     #pragma warning disable 1998
@@ -102,7 +101,7 @@ public sealed class GetAutomaticVariable<T> : CompoundStep<T>
                 new GetAutomaticVariableStepSerializer();
 
             /// <inheritdoc />
-            public string Serialize(IEnumerable<StepProperty> stepProperties)
+            public string Serialize(SerializeOptions _, IEnumerable<StepProperty> stepProperties)
             {
                 return "<>";
             }

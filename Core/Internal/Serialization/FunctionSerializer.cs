@@ -20,7 +20,7 @@ public sealed class FunctionSerializer : IStepSerializer
     public string Name { get; }
 
     /// <inheritdoc />
-    public string Serialize(IEnumerable<StepProperty> stepProperties)
+    public string Serialize(SerializeOptions options, IEnumerable<StepProperty> stepProperties)
     {
         var sb = new StringBuilder();
         sb.Append(Name);
@@ -32,7 +32,7 @@ public sealed class FunctionSerializer : IStepSerializer
             sb.Append(stepProperty.Name);
             sb.Append(": ");
 
-            var value = stepProperty.Serialize();
+            var value = stepProperty.Serialize(options);
 
             sb.Append(value);
         }
