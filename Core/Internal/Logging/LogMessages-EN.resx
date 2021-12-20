@@ -157,10 +157,10 @@
     <value>Schema violation: '{message}' at '{location}'.</value>
   </data>
   <data name="SequenceCompleted" xml:space="preserve">
-    <value>Sequence® Sequence Completed</value>
+    <value>Sequence Completed</value>
   </data>
   <data name="SequenceStarted" xml:space="preserve">
-    <value>Sequence® Sequence Started</value>
+    <value>Sequence Started</value>
   </data>
   <data name="SetVariableOutOfScope" xml:space="preserve">
     <value>Could not set variable {variable} as it was out of scope.</value>

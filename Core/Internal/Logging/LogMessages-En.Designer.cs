@@ -178,7 +178,7 @@ namespace Reductech.Sequence.Core.Internal.Logging {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Sequence® Sequence Completed.
+        ///   Looks up a localized string similar to Sequence Completed.
         /// </summary>
         internal static string SequenceCompleted {
             get {
@@ -187,7 +187,7 @@ namespace Reductech.Sequence.Core.Internal.Logging {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Sequence® Sequence Started.
+        ///   Looks up a localized string similar to Sequence Started.
         /// </summary>
         internal static string SequenceStarted {
             get {

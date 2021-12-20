@@ -63,7 +63,7 @@ public sealed class SCLRunner
     /// <summary>
     /// The top level logging scope.
     /// </summary>
-    public const string TopLevelLoggingScope = "Sequence®";
+    public const string TopLevelLoggingScope = "Sequence";
 
     /// <summary>
     /// Caller metadata for the entire sequence.
