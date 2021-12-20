@@ -1,4 +1,4 @@
-﻿include:
+include:
   - project: reductech/templates/cicd/dotnet
     file: .gitlab-ci.linux.yml
 
