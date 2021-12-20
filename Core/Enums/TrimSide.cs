@@ -1,4 +1,4 @@
-﻿namespace Reductech.Sequence.Core.Enums;
+namespace Reductech.Sequence.Core.Enums;
 
 /// <summary>
 /// The side of the string to trim.

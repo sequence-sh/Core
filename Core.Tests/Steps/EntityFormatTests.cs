@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.Extensions.Logging.Abstractions;
 using Reductech.Sequence.Core.Internal.Parser;
 
 namespace Reductech.Sequence.Core.Tests.Steps;

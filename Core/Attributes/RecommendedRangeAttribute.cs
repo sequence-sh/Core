@@ -1,4 +1,4 @@
-﻿namespace Reductech.Sequence.Core.Attributes;
+namespace Reductech.Sequence.Core.Attributes;
 
 /// <summary>
 /// Indicates the recommended range for this parameter.

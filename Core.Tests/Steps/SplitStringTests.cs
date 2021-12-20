@@ -1,4 +1,4 @@
-﻿namespace Reductech.Sequence.Core.Tests.Steps;
+namespace Reductech.Sequence.Core.Tests.Steps;
 
 public partial class SplitStringTests : StepTestBase<StringSplit, Array<StringStream>>
 {

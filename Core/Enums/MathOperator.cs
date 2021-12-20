@@ -1,4 +1,4 @@
-﻿namespace Reductech.Sequence.Core.Enums;
+namespace Reductech.Sequence.Core.Enums;
 
 /// <summary>
 /// An operator that can be applied to two numbers.

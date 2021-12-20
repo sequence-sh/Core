@@ -1,4 +1,4 @@
-﻿using Reductech.Sequence.Core.Internal.Logging;
+using Reductech.Sequence.Core.Internal.Logging;
 
 namespace Reductech.Sequence.Core.Steps;
 

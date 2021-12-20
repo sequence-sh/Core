@@ -1,4 +1,4 @@
-﻿namespace Reductech.Sequence.Core.Steps.REST;
+namespace Reductech.Sequence.Core.Steps.REST;
 
 /// <summary>
 /// Create a REST resource and return the id of the created resource

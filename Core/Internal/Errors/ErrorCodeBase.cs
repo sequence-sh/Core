@@ -1,4 +1,4 @@
-﻿namespace Reductech.Sequence.Core.Internal.Errors;
+namespace Reductech.Sequence.Core.Internal.Errors;
 
 /// <summary>
 /// Identifying code for an error message.

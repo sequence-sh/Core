@@ -1,4 +1,4 @@
-﻿namespace Reductech.Sequence.Core.Steps;
+namespace Reductech.Sequence.Core.Steps;
 
 /// <summary>
 /// Runs another step, reads the output to the end, and ignores it.

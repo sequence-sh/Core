@@ -1,4 +1,4 @@
-﻿namespace Reductech.Sequence.Core;
+namespace Reductech.Sequence.Core;
 
 /// <summary>
 /// The Null value in SCL

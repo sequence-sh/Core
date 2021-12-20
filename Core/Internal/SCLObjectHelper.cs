@@ -1,4 +1,4 @@
-﻿namespace Reductech.Sequence.Core.Internal;
+namespace Reductech.Sequence.Core.Internal;
 
 /// <summary>
 /// Contains methods for converting C Sharp objects to SCL Objects

@@ -1,4 +1,4 @@
-﻿namespace Reductech.Sequence.Core.Tests;
+namespace Reductech.Sequence.Core.Tests;
 
 public class ErrorBuilderListTests
 {

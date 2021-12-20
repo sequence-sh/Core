@@ -1,4 +1,4 @@
-﻿namespace Reductech.Sequence.Core.Attributes;
+namespace Reductech.Sequence.Core.Attributes;
 
 /// <summary>
 /// Indicates that a Step should not be included in a connector's steps

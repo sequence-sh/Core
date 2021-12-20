@@ -1,4 +1,4 @@
-﻿namespace Reductech.Sequence.Core.Steps;
+namespace Reductech.Sequence.Core.Steps;
 
 /// <summary>
 /// Raises an integer to the power of a list of integers sequentially

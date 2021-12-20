@@ -1,4 +1,4 @@
-﻿namespace Reductech.Sequence.Core.Steps;
+namespace Reductech.Sequence.Core.Steps;
 
 /// <summary>
 /// Do an action for each value of &lt;i&gt; in a range.

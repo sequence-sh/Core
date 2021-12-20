@@ -1,4 +1,4 @@
-﻿namespace Reductech.Sequence.Core.Internal.Errors;
+namespace Reductech.Sequence.Core.Internal.Errors;
 
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 public record ErrorLocation(string? StepName, TextLocation? TextLocation)

@@ -1,4 +1,4 @@
-﻿namespace Reductech.Sequence.Core.Steps;
+namespace Reductech.Sequence.Core.Steps;
 
 /// <summary>
 /// Repeat a step a set number of times.

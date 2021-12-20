@@ -1,4 +1,4 @@
-﻿namespace Reductech.Sequence.Core.Steps;
+namespace Reductech.Sequence.Core.Steps;
 
 /// <summary>
 /// Counts the elements in an array or entities in an entity stream.

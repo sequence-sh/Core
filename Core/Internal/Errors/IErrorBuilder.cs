@@ -1,4 +1,4 @@
-﻿namespace Reductech.Sequence.Core.Internal.Errors;
+namespace Reductech.Sequence.Core.Internal.Errors;
 
 /// <summary>
 /// An error without a location.

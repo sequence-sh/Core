@@ -1,4 +1,4 @@
-﻿namespace Reductech.Sequence.Core.Internal;
+namespace Reductech.Sequence.Core.Internal;
 
 /// <summary>
 /// A variable being used somewhere in a sequence

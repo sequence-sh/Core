@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging;
 using Reductech.Sequence.Core.Internal.Logging;
 
 namespace Reductech.Sequence.Core.Internal.Analytics;

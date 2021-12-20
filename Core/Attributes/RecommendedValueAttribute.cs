@@ -1,4 +1,4 @@
-﻿namespace Reductech.Sequence.Core.Attributes;
+namespace Reductech.Sequence.Core.Attributes;
 
 /// <summary>
 /// The recommended value for this parameter.

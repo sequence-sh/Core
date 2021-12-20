@@ -1,4 +1,4 @@
-﻿using Reductech.Sequence.Core.Enums;
+using Reductech.Sequence.Core.Enums;
 using Reductech.Sequence.Core.ExternalProcesses;
 
 namespace Reductech.Sequence.Core.Steps;

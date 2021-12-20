@@ -1,4 +1,4 @@
-﻿namespace Reductech.Sequence.Core;
+namespace Reductech.Sequence.Core;
 
 /// <summary>
 /// Rest Client Factory that always returns a particular rest client

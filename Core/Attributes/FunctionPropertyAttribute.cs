@@ -1,4 +1,4 @@
-﻿namespace Reductech.Sequence.Core.Attributes;
+namespace Reductech.Sequence.Core.Attributes;
 
 /// <summary>
 /// Indicates that this property is a function.

@@ -1,4 +1,4 @@
-﻿using System.Text;
+using System.Text;
 using Reductech.Sequence.Core.Internal.Parser;
 using static Reductech.Sequence.Core.TestHarness.SpaceCompressor;
 

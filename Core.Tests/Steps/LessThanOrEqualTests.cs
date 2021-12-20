@@ -1,4 +1,4 @@
-﻿namespace Reductech.Sequence.Core.Tests.Steps;
+namespace Reductech.Sequence.Core.Tests.Steps;
 
 public partial class LessThanOrEqualTests : StepTestBase<LessThanOrEqual<SCLInt>, SCLBool>
 {

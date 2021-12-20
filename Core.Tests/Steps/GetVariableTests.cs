@@ -1,4 +1,4 @@
-﻿namespace Reductech.Sequence.Core.Tests.Steps;
+namespace Reductech.Sequence.Core.Tests.Steps;
 
 public partial class GetVariableTests : StepTestBase<GetVariable<SCLInt>, SCLInt>
 {

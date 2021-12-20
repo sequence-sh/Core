@@ -1,4 +1,4 @@
-﻿namespace Reductech.Sequence.Core.ExternalProcesses;
+namespace Reductech.Sequence.Core.ExternalProcesses;
 
 /// <summary>
 /// Ignores all errors.

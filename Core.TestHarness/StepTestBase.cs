@@ -1,4 +1,4 @@
-﻿namespace Reductech.Sequence.Core.TestHarness;
+namespace Reductech.Sequence.Core.TestHarness;
 
 public interface IStepTestBase
 {

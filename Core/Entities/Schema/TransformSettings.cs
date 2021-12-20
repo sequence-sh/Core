@@ -1,4 +1,4 @@
-﻿namespace Reductech.Sequence.Core.Entities.Schema;
+namespace Reductech.Sequence.Core.Entities.Schema;
 
 /// <summary>
 /// Settings for using a Schema to Transform a value

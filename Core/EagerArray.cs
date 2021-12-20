@@ -1,4 +1,4 @@
-﻿namespace Reductech.Sequence.Core;
+namespace Reductech.Sequence.Core;
 
 /// <summary>
 /// An array backed by a list

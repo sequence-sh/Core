@@ -1,4 +1,4 @@
-﻿using Reductech.Sequence.Core.Abstractions;
+using Reductech.Sequence.Core.Abstractions;
 using Reductech.Sequence.Core.ExternalProcesses;
 
 namespace Reductech.Sequence.Core.Connectors;

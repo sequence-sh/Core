@@ -1,4 +1,4 @@
-﻿namespace Reductech.Sequence.Core.Enums;
+namespace Reductech.Sequence.Core.Enums;
 
 /// <summary>
 /// Determines what relationship between two operands causes the compare operator to return true.

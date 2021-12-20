@@ -1,4 +1,4 @@
-﻿namespace Reductech.Sequence.Core.Entities.Schema;
+namespace Reductech.Sequence.Core.Entities.Schema;
 
 /// <summary>
 /// Contains methods to help with combining values

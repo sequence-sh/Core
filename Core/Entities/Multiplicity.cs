@@ -1,4 +1,4 @@
-﻿//namespace Reductech.Sequence.Core.Entities
+//namespace Reductech.Sequence.Core.Entities
 //{
 
 ///// <summary>

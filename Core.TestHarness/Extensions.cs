@@ -1,4 +1,4 @@
-﻿using System.Net;
+using System.Net;
 using Reductech.Sequence.Core.ExternalProcesses;
 
 namespace Reductech.Sequence.Core.TestHarness;

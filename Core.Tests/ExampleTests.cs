@@ -1,4 +1,4 @@
-﻿using System.IO;
+using System.IO;
 using Divergic.Logging.Xunit;
 using Reductech.Sequence.Core.Internal.Parser;
 

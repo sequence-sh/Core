@@ -1,4 +1,4 @@
-﻿namespace Reductech.Sequence.Core.Enums;
+namespace Reductech.Sequence.Core.Enums;
 
 /// <summary>
 /// A boolean operator.
