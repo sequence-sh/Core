@@ -1,7 +1,7 @@
-﻿using Reductech.EDR.Core.Abstractions;
-using Reductech.EDR.Core.ExternalProcesses;
+﻿using Reductech.Sequence.Core.Abstractions;
+using Reductech.Sequence.Core.ExternalProcesses;
 
-namespace Reductech.EDR.Core.Connectors;
+namespace Reductech.Sequence.Core.Connectors;
 
 /// <summary>
 /// Contains extension methods for working with connector managers.

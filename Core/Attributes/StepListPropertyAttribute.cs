@@ -1,4 +1,4 @@
-﻿namespace Reductech.EDR.Core.Attributes;
+﻿namespace Reductech.Sequence.Core.Attributes;
 
 /// <summary>
 /// Indicates that this is a list of configurable properties of the step.

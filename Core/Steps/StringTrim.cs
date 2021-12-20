@@ -1,6 +1,6 @@
-﻿using Reductech.EDR.Core.Enums;
+﻿using Reductech.Sequence.Core.Enums;
 
-namespace Reductech.EDR.Core.Steps;
+namespace Reductech.Sequence.Core.Steps;
 
 /// <summary>
 /// Trims a string, removing whitespace from the `TrimSide`.

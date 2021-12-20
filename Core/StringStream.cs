@@ -1,8 +1,8 @@
 ﻿using System.IO;
 using System.Text;
-using Reductech.EDR.Core.Enums;
+using Reductech.Sequence.Core.Enums;
 
-namespace Reductech.EDR.Core;
+namespace Reductech.Sequence.Core;
 
 /// <summary>
 /// A stream of data representing a string.

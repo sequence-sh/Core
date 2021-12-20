@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Reductech.EDR.Core.Internal.Logging {
+namespace Reductech.Sequence.Core.Internal.Logging {
     using System;
     
     
@@ -19,7 +19,7 @@ namespace Reductech.EDR.Core.Internal.Logging {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class LogMessages_EN {
@@ -39,7 +39,7 @@ namespace Reductech.EDR.Core.Internal.Logging {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Reductech.EDR.Core.Internal.Logging.LogMessages-EN", typeof(LogMessages_EN).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Reductech.Sequence.Core.Internal.Logging.LogMessages-EN", typeof(LogMessages_EN).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -178,7 +178,7 @@ namespace Reductech.EDR.Core.Internal.Logging {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to EDR Sequence Completed.
+        ///   Looks up a localized string similar to Sequence® Sequence Completed.
         /// </summary>
         internal static string SequenceCompleted {
             get {
@@ -187,7 +187,7 @@ namespace Reductech.EDR.Core.Internal.Logging {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to EDR Sequence Started.
+        ///   Looks up a localized string similar to Sequence® Sequence Started.
         /// </summary>
         internal static string SequenceStarted {
             get {

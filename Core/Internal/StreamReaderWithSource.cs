@@ -1,6 +1,6 @@
 ﻿using System.IO;
 
-namespace Reductech.EDR.Core.Internal;
+namespace Reductech.Sequence.Core.Internal;
 
 internal class StreamReaderWithSource<TEnum> : IStreamReader<(string line, TEnum source)>
     where TEnum : Enum

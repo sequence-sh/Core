@@ -3,9 +3,9 @@ using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
 using Microsoft.Extensions.Logging;
-using Reductech.EDR.Core.Internal.Logging;
+using Reductech.Sequence.Core.Internal.Logging;
 
-namespace Reductech.EDR.Core.ExternalProcesses;
+namespace Reductech.Sequence.Core.ExternalProcesses;
 
 /// <summary>
 /// Basic external step runner.

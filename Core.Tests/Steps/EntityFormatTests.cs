@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Logging.Abstractions;
-using Reductech.EDR.Core.Internal.Parser;
+using Reductech.Sequence.Core.Internal.Parser;
 
-namespace Reductech.EDR.Core.Tests.Steps;
+namespace Reductech.Sequence.Core.Tests.Steps;
 
 public partial class EntityFormatTests : StepTestBase<EntityFormat, StringStream>
 {

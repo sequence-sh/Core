@@ -3,10 +3,10 @@ using System.Drawing;
 using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
-using Reductech.EDR.Core;
-using Reductech.EDR.Core.Connectors;
-using Reductech.EDR.Core.Internal;
-using Reductech.EDR.Core.Internal.Errors;
+using Reductech.Sequence.Core;
+using Reductech.Sequence.Core.Connectors;
+using Reductech.Sequence.Core.Internal;
+using Reductech.Sequence.Core.Internal.Errors;
 
 namespace ExampleConnector;
 

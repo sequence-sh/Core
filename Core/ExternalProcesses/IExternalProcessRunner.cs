@@ -1,6 +1,6 @@
 ﻿using System.Text;
 
-namespace Reductech.EDR.Core.ExternalProcesses;
+namespace Reductech.Sequence.Core.ExternalProcesses;
 
 /// <summary>
 /// Runs external processes.

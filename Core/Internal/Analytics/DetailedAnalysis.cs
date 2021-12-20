@@ -1,6 +1,6 @@
 ﻿using Generator.Equals;
 
-namespace Reductech.EDR.Core.Internal.Analytics;
+namespace Reductech.Sequence.Core.Internal.Analytics;
 
 /// <summary>
 /// Detailed analysis of a Sequence Run

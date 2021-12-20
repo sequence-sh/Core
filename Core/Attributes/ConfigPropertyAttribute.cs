@@ -1,6 +1,6 @@
-//using System;
+﻿//using System;
 
-//namespace Reductech.EDR.Core.Attributes
+//namespace Reductech.Sequence.Core.Attributes
 //{
 
 ///// <summary>

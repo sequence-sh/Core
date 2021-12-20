@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <RepositoryUrl>https://gitlab.com/reductech/edr/core</RepositoryUrl>
+    <RepositoryUrl>https://gitlab.com/reductech/sequence/core</RepositoryUrl>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
 
     <Authors>Reductech</Authors>

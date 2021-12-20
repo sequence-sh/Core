@@ -1,6 +1,6 @@
 ﻿using Namotion.Reflection;
 
-namespace Reductech.EDR.Core.Internal;
+namespace Reductech.Sequence.Core.Internal;
 
 /// <summary>
 /// A step parameter that uses a property info

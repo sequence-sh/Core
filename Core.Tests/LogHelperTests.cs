@@ -1,8 +1,8 @@
 ﻿using System.Collections.ObjectModel;
 using MELT;
-using Reductech.EDR.Core.Internal.Logging;
+using Reductech.Sequence.Core.Internal.Logging;
 
-namespace Reductech.EDR.Core.Tests;
+namespace Reductech.Sequence.Core.Tests;
 
 public class LogHelperTests
 {

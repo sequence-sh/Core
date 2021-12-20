@@ -1,4 +1,4 @@
-﻿namespace Reductech.EDR.Core.ExternalProcesses;
+﻿namespace Reductech.Sequence.Core.ExternalProcesses;
 
 /// <summary>
 /// Which output a piece of data comes from

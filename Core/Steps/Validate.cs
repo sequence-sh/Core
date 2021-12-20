@@ -1,13 +1,13 @@
-﻿using Reductech.EDR.Core.Enums;
-using Reductech.EDR.Core.Internal.Logging;
+﻿using Reductech.Sequence.Core.Enums;
+using Reductech.Sequence.Core.Internal.Logging;
 
-namespace Reductech.EDR.Core.Steps;
+namespace Reductech.Sequence.Core.Steps;
 
 /// <summary>
 /// Validate that the schema is valid for all entities.
 /// Does not evaluate the entity stream.
 /// For more information on schemas please see the
-/// [documentation](https://docs.reductech.io/edr/how-to/scl/schemas.html).
+/// [documentation](https://docs.reductech.io/sequence/how-to/scl/schemas.html).
 /// </summary>
 [Alias("SchemaValidate")]
 public sealed class Validate : CompoundStep<Array<Entity>>

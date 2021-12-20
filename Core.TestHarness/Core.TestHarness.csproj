@@ -2,8 +2,8 @@
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
-    <AssemblyName>Reductech.EDR.Core.TestHarness</AssemblyName>
-    <RootNamespace>Reductech.EDR.Core.TestHarness</RootNamespace>
+    <AssemblyName>Reductech.Sequence.Core.TestHarness</AssemblyName>
+    <RootNamespace>Reductech.Sequence.Core.TestHarness</RootNamespace>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <IsPackable>true</IsPackable>
     <IsTestProject>false</IsTestProject>
@@ -12,15 +12,15 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <PackageId>Reductech.EDR.Core.TestHarness</PackageId>
-    <Title>EDR Core SDK TestHarness</Title>
-    <Description>Class library for testing steps which use EDR Core.</Description>
-    <Product>EDR</Product>
+    <PackageId>Reductech.Sequence.Core.TestHarness</PackageId>
+    <Title>Sequence® Core SDK TestHarness</Title>
+    <Description>Class library for testing steps which use Sequence® Core.</Description>
+    <Product>Sequence®</Product>
 
-    <PackageProjectUrl>https://gitlab.com/reductech/edr/core</PackageProjectUrl>
-    <RepositoryUrl>https://gitlab.com/reductech/edr/core</RepositoryUrl>
+    <PackageProjectUrl>https://gitlab.com/reductech/sequence/core</PackageProjectUrl>
+    <RepositoryUrl>https://gitlab.com/reductech/sequence/core</RepositoryUrl>
     <PackageReleaseNotes>CHANGELOG.md</PackageReleaseNotes>
-    <PackageTags>ediscovery;forensics;automation;orchestration;edrm;testing</PackageTags>
+    <PackageTags>ediscovery;forensics;automation;orchestration;edrm;testing;sequence</PackageTags>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
 
     <Authors>Reductech</Authors>

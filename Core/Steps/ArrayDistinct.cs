@@ -1,4 +1,4 @@
-namespace Reductech.EDR.Core.Steps;
+﻿namespace Reductech.Sequence.Core.Steps;
 
 /// <summary>
 /// Removes duplicate elements in an array or entities in an entity stream.

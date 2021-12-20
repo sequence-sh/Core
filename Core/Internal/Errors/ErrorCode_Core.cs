@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
 
-namespace Reductech.EDR.Core.Internal.Errors;
+namespace Reductech.Sequence.Core.Internal.Errors;
 
 /// <summary>
 /// Identifying code for an error message in Core

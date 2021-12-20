@@ -1,7 +1,7 @@
-using Reductech.EDR.Core.Enums;
-using Reductech.EDR.Core.ExternalProcesses;
+﻿using Reductech.Sequence.Core.Enums;
+using Reductech.Sequence.Core.ExternalProcesses;
 
-namespace Reductech.EDR.Core.Steps;
+namespace Reductech.Sequence.Core.Steps;
 
 /// <summary>
 /// Runs an external executable program.

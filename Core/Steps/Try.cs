@@ -1,6 +1,6 @@
-﻿using Reductech.EDR.Core.Internal.Logging;
+﻿using Reductech.Sequence.Core.Internal.Logging;
 
-namespace Reductech.EDR.Core.Steps;
+namespace Reductech.Sequence.Core.Steps;
 
 /// <summary>
 /// Tries to execute a step and recovers if that step results in failure.

@@ -1,7 +1,7 @@
-﻿//using Reductech.EDR.Core.Abstractions;
+﻿//using Reductech.Sequence.Core.Abstractions;
 //using Thinktecture.IO;
 
-//namespace Reductech.EDR.Core.ExternalProcesses
+//namespace Reductech.Sequence.Core.ExternalProcesses
 //{
 
 ///// <summary>

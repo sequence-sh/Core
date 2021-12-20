@@ -1,6 +1,6 @@
 ﻿using Castle.Core.Internal;
 
-namespace Reductech.EDR.Core.TestHarness;
+namespace Reductech.Sequence.Core.TestHarness;
 
 public static class LogChecker
 {

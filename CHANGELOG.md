@@ -1,4 +1,4 @@
-# v0.12.0 (2021-11-26)
+﻿# v0.12.0 (2021-11-26)
 
 ## Summary of Changes
 
@@ -292,7 +292,7 @@ Renamed the following steps and added additional aliases:
 Steps that that work with the file system and with structured data have been
 moved to separate connectors:
 
-- Moved to the [FileSystem](https://gitlab.com/reductech/edr/connectors/filesystem) Connector
+- Moved to the [FileSystem](https://gitlab.com/reductech/sequence/connectors/filesystem) Connector
 
   - `DirectoryCopy`
   - `DirectoryExists`
@@ -307,7 +307,7 @@ moved to separate connectors:
   - `DeleteItem`
   - `PathCombine`
 
-- Moved to the [StructuredData](https://gitlab.com/reductech/edr/connectors/structureddata) Connector
+- Moved to the [StructuredData](https://gitlab.com/reductech/sequence/connectors/structureddata) Connector
   - `FromConcordance`
   - `FromCSV`
   - `FromIDX`
@@ -463,7 +463,7 @@ moved to separate connectors:
 - `ToJson` now takes an `Entity` and returns a Json object string
 - Created `FromJsonArray`
 - Created `ToJsonArray`
-- [ Added `Hash` Step ](https://docs.reductech.io/edr/steps/Core/Hash.html)
+- [ Added `Hash` Step ](https://docs.reductech.io/sequence/steps/Core/Hash.html)
 - Added DirectoryMove
 - Added DirectoryCopy
 - Added FileMove
@@ -473,8 +473,8 @@ moved to separate connectors:
 - Added `Print` which writes an entity to the console
 - Created `ReadStandardIn` step that returns a StringStream of data from the standard input
 - Created `WriteStandardOut` step that writes a StringStream to standard output
-- [ Added `RegexMatch` Step ](https://docs.reductech.io/edr/steps/Core/RegexMatch.html)
-- [ Added `RegexReplace` Step ](https://docs.reductech.io/edr/steps/Core/RegexReplace.html)
+- [ Added `RegexMatch` Step ](https://docs.reductech.io/sequence/steps/Core/RegexMatch.html)
+- [ Added `RegexReplace` Step ](https://docs.reductech.io/sequence/steps/Core/RegexReplace.html)
 
 ### Sequence Configuration Language
 
@@ -513,7 +513,7 @@ moved to separate connectors:
 - StateMonad methods should be async and it should implement IAsyncDisposable #198
 - Create ToJsonArray and FromJsonArray and change ToJson and FromJSon to produce/return single entities to make Json more intuitive for technicians #196
 - StateMonad should more elegantly get rid of nested variables #197
-- Use structured logging, so that technicians can more easily aggregate edr log information #195
+- Use structured logging, so that technicians can more easily aggregate sequence log information #195
 - Make Testing Log level configurable to prevent exposure of secrets in CI #193
 - Errors should have separate properties for StepName, and TextLocation #191
 - Adjust logging in Core to make it easier to integrate with ELK stack #190
@@ -699,7 +699,7 @@ consistent. Step names now follow the convention of _NamespaceAction_, e.g.
 # v0.2.0 (2020-10-02)
 
 The Core SDK has been reworked to use a procedural paradigm instead
-of injection. See here for more details: https://gitlab.com/groups/reductech/edr/-/epics/6
+of injection. See here for more details: https://gitlab.com/groups/reductech/sequence/-/epics/6
 
 Processes library has now been renamed to Core.
 Chain renamed to sequence, and process to step.

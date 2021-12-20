@@ -1,12 +1,12 @@
-﻿using Reductech.EDR.Core.Internal.Documentation;
+﻿using Reductech.Sequence.Core.Internal.Documentation;
 
-namespace Reductech.EDR.Core.Steps;
+namespace Reductech.Sequence.Core.Steps;
 
 /// <summary>
 /// Generates documentation for all available steps.
 /// </summary>
 [SCLExample(
-    @"- <root> = 'edr/steps'
+    @"- <root> = 'sequence/steps'
 - (DocumentationCreate)['AllPages'] | ForEach (
     - <path> = $""{<root>}/{<>['Directory']}/{<>['FileName']}""
     - log <path>
