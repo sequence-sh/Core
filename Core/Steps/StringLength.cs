@@ -1,4 +1,4 @@
-namespace Reductech.Sequence.Core.Steps;
+﻿namespace Reductech.Sequence.Core.Steps;
 
 /// <summary>
 /// Calculates the length of the string.

@@ -1,4 +1,4 @@
-using Namotion.Reflection;
+﻿using Namotion.Reflection;
 
 namespace Reductech.Sequence.Core.Internal;
 

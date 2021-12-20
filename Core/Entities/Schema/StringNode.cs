@@ -1,4 +1,4 @@
-namespace Reductech.Sequence.Core.Entities.Schema;
+﻿namespace Reductech.Sequence.Core.Entities.Schema;
 
 /// <summary>
 /// Matches Strings

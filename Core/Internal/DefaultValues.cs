@@ -1,4 +1,4 @@
-namespace Reductech.Sequence.Core.Internal;
+﻿namespace Reductech.Sequence.Core.Internal;
 
 /// <summary>
 /// Contains helper methods for getting default values

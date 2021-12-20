@@ -1,4 +1,4 @@
-using Reductech.Sequence.ConnectorManagement.Base;
+﻿using Reductech.Sequence.ConnectorManagement.Base;
 
 namespace Reductech.Sequence.Core.Tests.Steps;
 

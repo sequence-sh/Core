@@ -1,4 +1,4 @@
-namespace Reductech.Sequence.Core.Util;
+﻿namespace Reductech.Sequence.Core.Util;
 
 /// <summary>
 /// Special constants. e.g. string formats

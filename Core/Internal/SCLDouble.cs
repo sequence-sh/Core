@@ -1,4 +1,4 @@
-namespace Reductech.Sequence.Core.Internal;
+﻿namespace Reductech.Sequence.Core.Internal;
 
 /// <summary>
 /// A double in the SCL type system

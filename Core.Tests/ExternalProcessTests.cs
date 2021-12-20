@@ -1,4 +1,4 @@
-using System.Text;
+﻿using System.Text;
 using System.Text.RegularExpressions;
 using Divergic.Logging.Xunit;
 using Reductech.Sequence.Core.ExternalProcesses;
@@ -132,7 +132,7 @@ public partial class ExternalProcessTests
 
         var messages = loggerFactory.Sink.LogEntries.Select(x => x.Message).ToList();
 
-        messages.Should().BeEquivalentTo("Write-Error: test error", "hello");
+        messages.Should().BeEquivalentTo("[91mWrite-Error: [91mtest error[0m", "hello");
     }
 
     [Fact]
@@ -266,7 +266,7 @@ public partial class ExternalProcessTests
         startProcessResult.Value.WaitForExit(1000);
         startProcessResult.Value.Dispose();
 
-        outputLines.Should().Contain(("Write-Error: test error", StreamSource.Error));
+        outputLines.Should().Contain(("[91mWrite-Error: [91mtest error[0m", StreamSource.Error));
     }
 
 #endregion

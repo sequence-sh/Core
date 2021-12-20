@@ -1,4 +1,4 @@
-namespace Reductech.Sequence.Core.Internal.Documentation;
+﻿namespace Reductech.Sequence.Core.Internal.Documentation;
 
 /// <summary>
 /// Something that will be shown in the documentation

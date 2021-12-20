@@ -1,4 +1,4 @@
-namespace Reductech.Sequence.Core.Steps;
+﻿namespace Reductech.Sequence.Core.Steps;
 
 /// <summary>
 /// Calculate the sum of a list of integers

@@ -1,4 +1,4 @@
-using System.IO;
+﻿using System.IO;
 using System.Threading.Channels;
 
 namespace Reductech.Sequence.Core.Internal;

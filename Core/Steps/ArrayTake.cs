@@ -1,4 +1,4 @@
-namespace Reductech.Sequence.Core.Steps;
+﻿namespace Reductech.Sequence.Core.Steps;
 
 /// <summary>
 /// Take the first n elements of an array or entity stream

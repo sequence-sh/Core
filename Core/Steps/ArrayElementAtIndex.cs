@@ -1,4 +1,4 @@
-namespace Reductech.Sequence.Core.Steps;
+﻿namespace Reductech.Sequence.Core.Steps;
 
 /// <summary>
 /// Gets the array element at a particular index.

@@ -1,4 +1,4 @@
-namespace Reductech.Sequence.Core.Steps;
+﻿namespace Reductech.Sequence.Core.Steps;
 
 /// <summary>
 /// Returns a copy of the entity with the specified property removed

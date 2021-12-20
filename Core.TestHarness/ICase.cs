@@ -1,4 +1,4 @@
-using System.Linq.Expressions;
+﻿using System.Linq.Expressions;
 using Reductech.Sequence.Core.ExternalProcesses;
 
 namespace Reductech.Sequence.Core.TestHarness;

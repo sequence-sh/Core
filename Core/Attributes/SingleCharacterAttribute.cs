@@ -1,4 +1,4 @@
-namespace Reductech.Sequence.Core.Attributes;
+﻿namespace Reductech.Sequence.Core.Attributes;
 
 /// <summary>
 /// Indicates that this string property should be a single character

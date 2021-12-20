@@ -1,4 +1,4 @@
-using System.Globalization;
+﻿using System.Globalization;
 
 namespace Reductech.Sequence.Core.Entities.Schema;
 

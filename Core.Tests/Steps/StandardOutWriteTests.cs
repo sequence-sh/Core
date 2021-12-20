@@ -1,4 +1,4 @@
-using System.IO;
+﻿using System.IO;
 
 namespace Reductech.Sequence.Core.Tests.Steps;
 

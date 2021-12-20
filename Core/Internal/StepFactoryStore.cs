@@ -1,4 +1,4 @@
-using Reductech.Sequence.Core.Abstractions;
+﻿using Reductech.Sequence.Core.Abstractions;
 using Reductech.Sequence.Core.Connectors;
 
 namespace Reductech.Sequence.Core.Internal;

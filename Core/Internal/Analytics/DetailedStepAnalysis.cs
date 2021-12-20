@@ -1,4 +1,4 @@
-using Generator.Equals;
+﻿using Generator.Equals;
 
 namespace Reductech.Sequence.Core.Internal.Analytics;
 

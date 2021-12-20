@@ -1,4 +1,4 @@
-using System.Text;
+﻿using System.Text;
 using Reductech.Sequence.Core.Steps;
 
 namespace Reductech.Sequence.Core.Internal.Serialization;

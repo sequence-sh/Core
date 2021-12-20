@@ -1,4 +1,4 @@
-using MELT;
+﻿using MELT;
 
 namespace Reductech.Sequence.Core.Tests;
 

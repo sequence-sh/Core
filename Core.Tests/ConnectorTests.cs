@@ -1,4 +1,4 @@
-using System.IO;
+﻿using System.IO;
 using Reductech.Sequence.ConnectorManagement.Base;
 using Divergic.Logging.Xunit;
 using Reductech.Sequence.ConnectorManagement;

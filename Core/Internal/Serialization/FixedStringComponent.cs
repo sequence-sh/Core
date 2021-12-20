@@ -1,4 +1,4 @@
-namespace Reductech.Sequence.Core.Internal.Serialization;
+﻿namespace Reductech.Sequence.Core.Internal.Serialization;
 
 /// <summary>
 /// Include a fixed string in serialization.

@@ -1,4 +1,4 @@
-using System.Text;
+﻿using System.Text;
 using Reductech.Sequence.ConnectorManagement.Base;
 using Reductech.Sequence.Core.Internal.Documentation;
 using StepParameter = Reductech.Sequence.Core.Internal.Documentation.StepParameter;

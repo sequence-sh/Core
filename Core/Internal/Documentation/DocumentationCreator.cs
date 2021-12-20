@@ -1,4 +1,4 @@
-using System.Text;
+﻿using System.Text;
 using Namotion.Reflection;
 
 namespace Reductech.Sequence.Core.Internal.Documentation;

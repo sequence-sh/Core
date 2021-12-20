@@ -1,4 +1,4 @@
-using System.Collections.Concurrent;
+﻿using System.Collections.Concurrent;
 using Microsoft.Extensions.Logging;
 using Reductech.Sequence.Core.Abstractions;
 using Reductech.Sequence.Core.Internal.Logging;

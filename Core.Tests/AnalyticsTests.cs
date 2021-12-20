@@ -1,4 +1,4 @@
-using Reductech.Sequence.Core.Internal.Analytics;
+﻿using Reductech.Sequence.Core.Internal.Analytics;
 
 namespace Reductech.Sequence.Core.Tests;
 

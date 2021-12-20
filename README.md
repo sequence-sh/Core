@@ -1,4 +1,4 @@
-# Sequence® Core SDK
+﻿# Sequence® Core SDK
 
 Reductech Sequence® is a collection of libraries that automates
 cross-application e-discovery and forensic workflows.

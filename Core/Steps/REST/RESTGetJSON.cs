@@ -1,4 +1,4 @@
-namespace Reductech.Sequence.Core.Steps.REST;
+﻿namespace Reductech.Sequence.Core.Steps.REST;
 
 /// <summary>
 /// Get JSON from a REST service

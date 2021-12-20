@@ -1,4 +1,4 @@
-/label ~"bug::possible"
+﻿/label ~"bug::possible"
 /label ~"severity::3"
 /label ~"priority::3"
 /label ~"wf::backlog"

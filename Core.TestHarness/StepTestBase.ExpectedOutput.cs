@@ -1,4 +1,4 @@
-using static Reductech.Sequence.Core.TestHarness.SpaceCompressor;
+﻿using static Reductech.Sequence.Core.TestHarness.SpaceCompressor;
 
 namespace Reductech.Sequence.Core.TestHarness;
 

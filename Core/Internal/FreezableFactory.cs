@@ -1,4 +1,4 @@
-using Reductech.Sequence.Core.Steps;
+﻿using Reductech.Sequence.Core.Steps;
 using StepParameterDict =
     System.Collections.Generic.Dictionary<Reductech.Sequence.Core.Internal.StepParameterReference,
         Reductech.Sequence.Core.Internal.FreezableStepProperty>;

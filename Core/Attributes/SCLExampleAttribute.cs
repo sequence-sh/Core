@@ -1,4 +1,4 @@
-namespace Reductech.Sequence.Core.Attributes;
+﻿namespace Reductech.Sequence.Core.Attributes;
 
 /// <summary>
 /// An SCL example that will be displayed in the documentation and automatically tested

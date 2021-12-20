@@ -1,4 +1,4 @@
-using System.Globalization;
+﻿using System.Globalization;
 using static Reductech.Sequence.Core.TestHarness.SchemaHelpers;
 
 namespace Reductech.Sequence.Core.Tests.Steps;

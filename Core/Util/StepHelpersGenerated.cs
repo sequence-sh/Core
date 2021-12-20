@@ -1,4 +1,4 @@
-using System.CodeDom.Compiler;
+﻿using System.CodeDom.Compiler;
 
 namespace Reductech.Sequence.Core.Util;
 
