@@ -1,4 +1,34 @@
-﻿# v0.12.0 (2021-11-26)
+# v0.13.0 (2022-01-16)
+
+## Summary of Changes
+
+### Core SDK
+
+- `ArrayMap` can now map elements of one type to elements of another type.
+
+## Issues Closed in this Release
+
+### New Features
+
+- ArrayMap should have different input and output types #357
+
+### Bug Fixes
+
+- Improve conversion of JsonElement to SCLObject #369
+- Log and Print steps should use GetStringAsync rather than serialize on StringStreams #368
+- BUG: ArrayFirst and ArrayLast only work for arrays of ints #356
+
+### Maintenance
+
+- Rename EDR to Sequence #371
+- Create type SCLObject to be the base type for all SCL return types #361
+- Update mutation testing base image to .net 6 and remove stryker config #364
+- Update to work with .net 6 #363
+- Make GenerateDocumentation compatible with docusaurus #362
+- Assigning a variable to an entity property should infer the type of the variable correctly #360
+- GenerateDocumentation should set Directory to empty string rather than null for the root directory #358
+
+# v0.12.0 (2021-11-26)
 
 ## Summary of Changes
 
@@ -789,3 +819,4 @@ a previous process into the current one.
 ### Documentation
 
 - Add documentation
+
