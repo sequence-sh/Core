@@ -87,6 +87,12 @@ public interface ISCLObject
     }
 
     /// <summary>
+    /// Convert this constant to a constant freezable step
+    /// </summary>
+    /// <returns></returns>
+    public IConstantFreezableStep ToConstantFreezableStep(TextLocation location);
+
+    /// <summary>
     /// Returns this as a T if possible
     /// </summary>
     [Pure]

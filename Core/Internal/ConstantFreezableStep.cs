@@ -3,7 +3,10 @@
 /// <summary>
 /// A freezable step which represents a constant value.
 /// </summary>
-public interface IConstantFreezableStep : IFreezableStep { }
+public interface IConstantFreezableStep : IFreezableStep
+{
+    ISCLObject Value { get; }
+}
 
 /// <summary>
 /// The base class for freezable constants
@@ -50,7 +53,7 @@ public sealed record SCLConstantFreezable<T>
         if (ReferenceEquals(this, other))
             return true;
 
-        var r = other is SCLConstantFreezable<T> cfs && Value.Equals(cfs.ValueObject);
+        var r = other is SCLConstantFreezable<T> cfs && Value.Equals(cfs.Value);
 
         return r;
     }
@@ -61,6 +64,5 @@ public sealed record SCLConstantFreezable<T>
     /// <inheritdoc />
     public override string ToString() => StepName;
 
-    /// <inheritdoc />
-    public ISCLObject ValueObject => Value;
+    ISCLObject IConstantFreezableStep.Value => Value;
 }

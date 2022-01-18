@@ -307,6 +307,10 @@ public abstract record Array<T> : IArray where T : ISCLObject
             new ItemsData(ImmutableList<SchemaNode>.Empty, TrueNode.Instance)
         );
     }
+
+    /// <inheritdoc />
+    public IConstantFreezableStep ToConstantFreezableStep(TextLocation location) =>
+        new SCLConstantFreezable<Array<T>>(this, location);
 }
 
 /// <summary>

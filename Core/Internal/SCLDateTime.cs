@@ -56,4 +56,8 @@ public sealed record SCLDateTime(DateTime Value) : IComparableSCLObject
     /// Explicit operator
     /// </summary>
     public static explicit operator SCLDateTime(DateTime dt) => new(dt);
+
+    /// <inheritdoc />
+    public IConstantFreezableStep ToConstantFreezableStep(TextLocation location) =>
+        new SCLConstantFreezable<SCLDateTime>(this, location);
 }

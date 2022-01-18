@@ -50,4 +50,8 @@ public readonly record struct SCLDouble(double Value) : IComparableSCLObject
     /// Explicit operator
     /// </summary>
     public static explicit operator SCLDouble(double i) => new(i);
+
+    /// <inheritdoc />
+    public IConstantFreezableStep ToConstantFreezableStep(TextLocation location) =>
+        new SCLConstantFreezable<SCLDouble>(this, location);
 }

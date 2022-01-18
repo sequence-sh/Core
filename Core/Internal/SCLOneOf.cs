@@ -50,6 +50,10 @@ public readonly record struct SCLOneOf<T0, T1>(OneOf<T0, T1> OneOf) : ISCLOneOf
     /// </summary>
     /// <returns></returns>
     public static SCLOneOf<T0, T1> GetDefaultValue() => new(ISCLObject.GetDefaultValue<T0>());
+
+    /// <inheritdoc />
+    public IConstantFreezableStep ToConstantFreezableStep(TextLocation location) =>
+        new SCLConstantFreezable<SCLOneOf<T0, T1>>(this, location);
 }
 
 /// <summary>
@@ -107,6 +111,10 @@ public readonly record struct SCLOneOf<T0, T1, T2>(OneOf<T0, T1, T2> OneOf) : IS
     /// </summary>
     /// <returns></returns>
     public static SCLOneOf<T0, T1, T2> GetDefaultValue() => new(ISCLObject.GetDefaultValue<T0>());
+
+    /// <inheritdoc />
+    public IConstantFreezableStep ToConstantFreezableStep(TextLocation location) =>
+        new SCLConstantFreezable<SCLOneOf<T0, T1, T2>>(this, location);
 }
 
 /// <summary>
@@ -170,4 +178,8 @@ public readonly record struct SCLOneOf<T0, T1, T2, T3>(OneOf<T0, T1, T2, T3> One
     /// </summary>
     public static SCLOneOf<T0, T1, T2, T3> GetDefaultValue() =>
         new(ISCLObject.GetDefaultValue<T0>());
+
+    /// <inheritdoc />
+    public IConstantFreezableStep ToConstantFreezableStep(TextLocation location) =>
+        new SCLConstantFreezable<SCLOneOf<T0, T1, T2, T3>>(this, location);
 }

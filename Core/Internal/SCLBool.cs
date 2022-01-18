@@ -71,4 +71,8 @@ public sealed record SCLBool : IComparableSCLObject
         ),
         _ => Value.CompareTo(null)
     };
+
+    /// <inheritdoc />
+    public IConstantFreezableStep ToConstantFreezableStep(TextLocation location) =>
+        new SCLConstantFreezable<SCLBool>(this, location);
 }

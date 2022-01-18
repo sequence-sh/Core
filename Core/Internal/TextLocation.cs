@@ -57,4 +57,13 @@ public sealed record TextLocation(string Text, TextPosition Start, TextPosition 
 
         return false;
     }
+
+    /// <summary>
+    /// The empty Text Location
+    /// </summary>
+    public static TextLocation Empty { get; } = new(
+        "Empty",
+        new TextPosition(0, 0, 0),
+        new TextPosition(0, 0, 0)
+    );
 }

@@ -346,4 +346,8 @@ public sealed class StringStream : IEquatable<StringStream>, IComparable<StringS
 
         return schemaConversionOptions.GetNode(this.GetString(), path);
     }
+
+    /// <inheritdoc />
+    public IConstantFreezableStep ToConstantFreezableStep(TextLocation location) =>
+        new SCLConstantFreezable<StringStream>(this, location);
 }

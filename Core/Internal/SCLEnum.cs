@@ -77,4 +77,8 @@ public sealed record SCLEnum<T>(T Value) : ISCLEnum where T : struct, Enum
     /// Explicit operator
     /// </summary>
     public static explicit operator SCLEnum<T>(T @enum) => new(@enum);
+
+    /// <inheritdoc />
+    public IConstantFreezableStep ToConstantFreezableStep(TextLocation location) =>
+        new SCLConstantFreezable<SCLEnum<T>>(this, location);
 }
