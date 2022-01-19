@@ -3,8 +3,8 @@ include:
     file: .gitlab-ci.linux.yml
 
 variables:
-  PACKAGE_NAME_NUGET: Reductech.EDR.Core
-  PACKAGE_NAME_DLL: Reductech.EDR.Core
+  PACKAGE_NAME_NUGET: Reductech.Sequence.Core
+  PACKAGE_NAME_DLL: Reductech.Sequence.Core
 
 stages:
   - antlr
@@ -22,7 +22,7 @@ compile grammar:
     ANTLR_JAR_URI: https://www.antlr.org/download/antlr-4.9-complete.jar
     ANTLR_JAR: antlr-4.9-complete.jar
     ANTLR_ENCODING: UTF-8
-    ANTLR_NAMESPACE: Reductech.EDR.Core.Internal.Parser
+    ANTLR_NAMESPACE: Reductech.Sequence.Core.Internal.Parser
     ANTLR_OUTPUT: ./Core/Antlr
     ANTLR_GRAMMAR: ./Core/Internal/Parser/SCL.g4
   script:

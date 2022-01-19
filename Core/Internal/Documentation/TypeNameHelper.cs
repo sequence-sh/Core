@@ -1,4 +1,4 @@
-﻿namespace Reductech.EDR.Core.Internal.Documentation;
+﻿namespace Reductech.Sequence.Core.Internal.Documentation;
 
 internal static class TypeNameHelper
 {

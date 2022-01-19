@@ -1,9 +1,9 @@
 ﻿using System.IO;
-using Reductech.EDR.ConnectorManagement.Base;
+using Reductech.Sequence.ConnectorManagement.Base;
 using Divergic.Logging.Xunit;
-using Reductech.EDR.ConnectorManagement;
+using Reductech.Sequence.ConnectorManagement;
 
-namespace Reductech.EDR.Core.Tests;
+namespace Reductech.Sequence.Core.Tests;
 
 [AutoTheory.UseTestOutputHelper]
 public partial class ConnectorTests

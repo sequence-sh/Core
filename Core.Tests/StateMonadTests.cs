@@ -1,6 +1,6 @@
 ﻿using System.Collections.Immutable;
 
-namespace Reductech.EDR.Core.Tests;
+namespace Reductech.Sequence.Core.Tests;
 
 [UseTestOutputHelper]
 public partial class StateMonadTests

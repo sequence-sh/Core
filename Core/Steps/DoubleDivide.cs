@@ -1,4 +1,4 @@
-﻿namespace Reductech.EDR.Core.Steps;
+﻿namespace Reductech.Sequence.Core.Steps;
 
 /// <summary>
 /// Divide a double by a list of doubles

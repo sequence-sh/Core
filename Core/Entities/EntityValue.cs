@@ -1,7 +1,7 @@
 ﻿//using System.Runtime.Serialization;
 //using System.Text.Json.Serialization;
 
-//namespace Reductech.EDR.Core.Entities;
+//namespace Reductech.Sequence.Core.Entities;
 
 ///// <summary>
 ///// The value of an entity property.

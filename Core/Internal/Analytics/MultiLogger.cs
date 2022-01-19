@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 
-namespace Reductech.EDR.Core.Internal.Analytics;
+namespace Reductech.Sequence.Core.Internal.Analytics;
 
 /// <summary>
 /// An instance of a step starting

@@ -1,4 +1,4 @@
-﻿namespace Reductech.EDR.Core.Steps;
+﻿namespace Reductech.Sequence.Core.Steps;
 
 /// <summary>
 /// Gets a substring from a string.

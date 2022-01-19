@@ -1,4 +1,4 @@
-﻿namespace Reductech.EDR.Core.Internal;
+﻿namespace Reductech.Sequence.Core.Internal;
 
 /// <summary>
 /// A step that is not a constant or a variable reference.

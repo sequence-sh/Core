@@ -1,6 +1,6 @@
 ﻿using System.Threading.Channels;
 
-namespace Reductech.EDR.Core.ExternalProcesses;
+namespace Reductech.Sequence.Core.ExternalProcesses;
 
 /// <summary>
 /// A reference to a running external process.

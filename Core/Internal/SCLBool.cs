@@ -1,4 +1,4 @@
-﻿namespace Reductech.EDR.Core.Internal;
+﻿namespace Reductech.Sequence.Core.Internal;
 
 /// <summary>
 /// A boolean in the SCL type system

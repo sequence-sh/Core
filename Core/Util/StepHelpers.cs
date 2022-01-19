@@ -1,4 +1,4 @@
-﻿namespace Reductech.EDR.Core.Util;
+﻿namespace Reductech.Sequence.Core.Util;
 
 /// <summary>
 /// Contains helper methods for running steps

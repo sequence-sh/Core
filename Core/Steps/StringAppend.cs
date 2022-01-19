@@ -1,4 +1,4 @@
-﻿namespace Reductech.EDR.Core.Steps;
+﻿namespace Reductech.Sequence.Core.Steps;
 
 /// <summary>
 /// Appends a string to an existing string variable.

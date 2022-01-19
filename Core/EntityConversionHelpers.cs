@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace Reductech.EDR.Core;
+namespace Reductech.Sequence.Core;
 
 /// <summary>
 /// An object which can be converted to and from an entity

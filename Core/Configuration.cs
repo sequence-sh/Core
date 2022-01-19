@@ -1,6 +1,6 @@
 ﻿using System.Runtime.Serialization;
 
-namespace Reductech.EDR.Core;
+namespace Reductech.Sequence.Core;
 
 /// <summary>
 /// Additional configuration that may be needed in some use cases.

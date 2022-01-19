@@ -2,10 +2,10 @@
 //using System.Threading;
 //using System.Threading.Tasks;
 //using CSharpFunctionalExtensions;
-//using Reductech.EDR.Core.Internal.Errors;
-//using Reductech.EDR.Core.Util;
+//using Reductech.Sequence.Core.Internal.Errors;
+//using Reductech.Sequence.Core.Util;
 
-//namespace Reductech.EDR.Core.ExternalProcesses
+//namespace Reductech.Sequence.Core.ExternalProcesses
 //{
 
 ///// <summary>

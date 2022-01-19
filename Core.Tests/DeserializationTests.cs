@@ -1,6 +1,6 @@
 ﻿using MELT;
 
-namespace Reductech.EDR.Core.Tests;
+namespace Reductech.Sequence.Core.Tests;
 
 public partial class DeserializationTests
 {

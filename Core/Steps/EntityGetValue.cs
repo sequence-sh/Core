@@ -1,6 +1,6 @@
 ﻿using Namotion.Reflection;
 
-namespace Reductech.EDR.Core.Steps;
+namespace Reductech.Sequence.Core.Steps;
 
 /// <summary>
 /// Gets the value of a property from an entity

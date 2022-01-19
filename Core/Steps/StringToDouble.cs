@@ -1,4 +1,4 @@
-﻿namespace Reductech.EDR.Core.Steps;
+﻿namespace Reductech.Sequence.Core.Steps;
 
 /// <summary>
 /// Converts a string to a double

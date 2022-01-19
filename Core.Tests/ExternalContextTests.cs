@@ -1,4 +1,4 @@
-﻿namespace Reductech.EDR.Core.Tests;
+﻿namespace Reductech.Sequence.Core.Tests;
 
 [AutoTheory.UseTestOutputHelper]
 public partial class ExternalContextTests

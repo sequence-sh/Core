@@ -1,6 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 
-namespace Reductech.EDR.Core.Entities.Schema;
+namespace Reductech.Sequence.Core.Entities.Schema;
 
 /// <summary>
 /// Data for a node

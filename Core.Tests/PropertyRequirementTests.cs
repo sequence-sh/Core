@@ -1,6 +1,6 @@
-﻿using Reductech.EDR.ConnectorManagement.Base;
+﻿using Reductech.Sequence.ConnectorManagement.Base;
 
-namespace Reductech.EDR.Core.Tests;
+namespace Reductech.Sequence.Core.Tests;
 
 public partial class PropertyRequirementTests
 {
@@ -135,7 +135,7 @@ public partial class PropertyRequirementTests
         var connectorSettings =
             new ConnectorSettings
             {
-                Id      = "Reductech.EDR.Core.Tests",
+                Id      = "Reductech.Sequence.Core.Tests",
                 Version = new Version(1, 0).ToString(),
                 Enable  = true,
                 Settings =

@@ -1,4 +1,4 @@
-﻿namespace Reductech.EDR.Core.Internal.Documentation;
+﻿namespace Reductech.Sequence.Core.Internal.Documentation;
 
 /// <summary>
 /// A wrapper for this documented object.

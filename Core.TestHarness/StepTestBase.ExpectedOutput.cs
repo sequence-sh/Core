@@ -1,6 +1,6 @@
-﻿using static Reductech.EDR.Core.TestHarness.SpaceCompressor;
+﻿using static Reductech.Sequence.Core.TestHarness.SpaceCompressor;
 
-namespace Reductech.EDR.Core.TestHarness;
+namespace Reductech.Sequence.Core.TestHarness;
 
 public abstract partial class StepTestBase<TStep, TOutput>
 {

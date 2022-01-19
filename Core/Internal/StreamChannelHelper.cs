@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using System.Threading.Channels;
 
-namespace Reductech.EDR.Core.Internal;
+namespace Reductech.Sequence.Core.Internal;
 
 /// <summary>
 /// Converts a list of streams to a ChannelReader

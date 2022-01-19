@@ -1,4 +1,4 @@
-﻿namespace Reductech.EDR.Core.Attributes;
+﻿namespace Reductech.Sequence.Core.Attributes;
 
 /// <summary>
 /// Points to a documentation page for this parameter.

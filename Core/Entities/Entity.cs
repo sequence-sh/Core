@@ -4,7 +4,7 @@ using System.Text.Json.Serialization;
 using Generator.Equals;
 
 // ReSharper disable once CheckNamespace - we want this namespace to prevent clash with FunctionalExtensions
-namespace Reductech.EDR.Core;
+namespace Reductech.Sequence.Core;
 
 /// <summary>
 /// A piece of data.

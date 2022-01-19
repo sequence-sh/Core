@@ -1,6 +1,6 @@
-﻿using Reductech.EDR.Core.Internal.Parser;
+﻿using Reductech.Sequence.Core.Internal.Parser;
 
-namespace Reductech.EDR.Core.Steps;
+namespace Reductech.Sequence.Core.Steps;
 
 /// <summary>
 /// Runs SCL defined in a StringStream

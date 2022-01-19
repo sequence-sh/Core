@@ -1,7 +1,7 @@
 ﻿using System.Net;
-using Reductech.EDR.Core.Steps.REST;
+using Reductech.Sequence.Core.Steps.REST;
 
-namespace Reductech.EDR.Core.Tests.Steps.REST;
+namespace Reductech.Sequence.Core.Tests.Steps.REST;
 
 public partial class RESTPutTests : StepTestBase<RESTPut, Unit>
 {

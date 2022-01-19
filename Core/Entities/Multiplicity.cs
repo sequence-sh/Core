@@ -1,4 +1,4 @@
-﻿//namespace Reductech.EDR.Core.Entities
+﻿//namespace Reductech.Sequence.Core.Entities
 //{
 
 ///// <summary>

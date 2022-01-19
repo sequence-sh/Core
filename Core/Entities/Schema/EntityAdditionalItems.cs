@@ -1,4 +1,4 @@
-﻿namespace Reductech.EDR.Core.Entities.Schema;
+﻿namespace Reductech.Sequence.Core.Entities.Schema;
 
 /// <summary>
 /// A schema which, if matched, allows additional items

@@ -1,8 +1,8 @@
 ﻿using Microsoft.Extensions.Logging;
-using Reductech.EDR.Core.Abstractions;
-using Reductech.EDR.Core.Internal.Logging;
+using Reductech.Sequence.Core.Abstractions;
+using Reductech.Sequence.Core.Internal.Logging;
 
-namespace Reductech.EDR.Core;
+namespace Reductech.Sequence.Core;
 
 /// <summary>
 /// The state monad that is passed between steps.

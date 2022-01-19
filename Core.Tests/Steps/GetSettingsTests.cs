@@ -1,6 +1,6 @@
-﻿using Reductech.EDR.ConnectorManagement.Base;
+﻿using Reductech.Sequence.ConnectorManagement.Base;
 
-namespace Reductech.EDR.Core.Tests.Steps;
+namespace Reductech.Sequence.Core.Tests.Steps;
 
 public partial class GetSettingsTests : StepTestBase<GetSettings, Entity>
 {
@@ -17,10 +17,10 @@ public partial class GetSettingsTests : StepTestBase<GetSettings, Entity>
                      new Dictionary<string, object>()
                      {
                          {
-                             "Reductech.EDR.Core",
+                             "Reductech.Sequence.Core",
                              new ConnectorSettings()
                              {
-                                 Id      = "Reductech.EDR.Core",
+                                 Id      = "Reductech.Sequence.Core",
                                  Version = version.ToString(3),
                                  Enable  = true
                              }

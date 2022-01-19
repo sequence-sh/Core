@@ -1,4 +1,4 @@
-﻿namespace Reductech.EDR.Core.Internal;
+﻿namespace Reductech.Sequence.Core.Internal;
 
 /// <summary>
 /// Gets the actual type from a type reference.

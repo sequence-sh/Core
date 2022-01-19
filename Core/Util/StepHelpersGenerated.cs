@@ -1,6 +1,6 @@
 ﻿using System.CodeDom.Compiler;
 
-namespace Reductech.EDR.Core.Util;
+namespace Reductech.Sequence.Core.Util;
 
 public static partial class StepHelpers
 {

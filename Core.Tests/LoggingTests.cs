@@ -1,6 +1,6 @@
 ﻿using MELT;
 
-namespace Reductech.EDR.Core.Tests;
+namespace Reductech.Sequence.Core.Tests;
 
 public partial class LoggingTests
 {
@@ -14,7 +14,7 @@ public partial class LoggingTests
             yield return new LoggingTestCase(
                 "Log 1",
                 "Log 1",
-                CheckMessageAndScope(LogLevel.Debug, "EDR Sequence Started", null),
+                CheckMessageAndScope(LogLevel.Debug, "Sequence Started", null),
                 CheckMessageAndScope(
                     LogLevel.Trace,
                     "Log Started with Parameters: [Value, 1]",
@@ -26,13 +26,13 @@ public partial class LoggingTests
                     "Log Completed Successfully with Result: Unit",
                     new[] { "Log" }
                 ),
-                CheckMessageAndScope(LogLevel.Debug, "EDR Sequence Completed", null)
+                CheckMessageAndScope(LogLevel.Debug, "Sequence Completed", null)
             );
 
             yield return new LoggingTestCase(
                 "Log 1 + 1",
                 "Log (1 + 1)",
-                CheckMessageAndScope(LogLevel.Debug, "EDR Sequence Started", null),
+                CheckMessageAndScope(LogLevel.Debug, "Sequence Started", null),
                 CheckMessageAndScope(
                     LogLevel.Trace,
                     "Log Started with Parameters: [Value, (1 + 1)]",
@@ -64,13 +64,13 @@ public partial class LoggingTests
                     "Log Completed Successfully with Result: Unit",
                     new[] { "Log", }
                 ),
-                CheckMessageAndScope(LogLevel.Debug, "EDR Sequence Completed", null)
+                CheckMessageAndScope(LogLevel.Debug, "Sequence Completed", null)
             );
 
             yield return new LoggingTestCase(
                 "Error",
                 "AssertError (Log (1 / 0))",
-                CheckMessageAndScope(LogLevel.Debug, "EDR Sequence Started", null),
+                CheckMessageAndScope(LogLevel.Debug, "Sequence Started", null),
                 CheckMessageAndScope(
                     LogLevel.Trace,
                     "AssertError Started with Parameters: [Step, (Log Value: (1 / 0))]",
@@ -111,7 +111,7 @@ public partial class LoggingTests
                     "AssertError Completed Successfully with Result: Unit",
                     new[] { "AssertError" }
                 ),
-                CheckMessageAndScope(LogLevel.Debug, "EDR Sequence Completed", null)
+                CheckMessageAndScope(LogLevel.Debug, "Sequence Completed", null)
             );
         }
     }
@@ -128,8 +128,8 @@ public partial class LoggingTests
 
             var trueExpectedScopes =
                 expectedScopes is null
-                    ? new List<string>() { "EDR" }
-                    : expectedScopes.Prepend("EDR").ToList();
+                    ? new List<string>() { "Sequence" }
+                    : expectedScopes.Prepend("Sequence").ToList();
 
             entry.Scopes.Select(x => x.Message)
                 .Should()

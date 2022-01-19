@@ -1,6 +1,6 @@
-﻿using Reductech.EDR.Core.Internal.Parser;
+﻿using Reductech.Sequence.Core.Internal.Parser;
 
-namespace Reductech.EDR.Core.Tests;
+namespace Reductech.Sequence.Core.Tests;
 
 public partial class DeserializationErrorTests
 {

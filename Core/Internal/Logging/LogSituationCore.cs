@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 using Microsoft.Extensions.Logging;
 
-namespace Reductech.EDR.Core.Internal.Logging;
+namespace Reductech.Sequence.Core.Internal.Logging;
 
 /// <summary>
 /// Identifying code for a Core log situation.
@@ -119,7 +119,7 @@ public sealed record LogSituation : LogSituationBase
     );
 
     /// <summary>
-    /// EDR Sequence Started
+    /// Sequence® Sequence Started
     /// </summary>
     public static readonly LogSituation SequenceStarted = new(
         nameof(SequenceStarted),
@@ -135,7 +135,7 @@ public sealed record LogSituation : LogSituationBase
     );
 
     /// <summary>
-    /// EDR Sequence Completed
+    /// Sequence® Sequence Completed
     /// </summary>
     public static readonly LogSituation SequenceCompleted = new(
         nameof(SequenceCompleted),

@@ -1,6 +1,6 @@
-﻿using Reductech.EDR.Core.Internal.Logging;
+﻿using Reductech.Sequence.Core.Internal.Logging;
 
-namespace Reductech.EDR.Core.Internal;
+namespace Reductech.Sequence.Core.Internal;
 
 /// <summary>
 /// A runnable step that is not a constant.
