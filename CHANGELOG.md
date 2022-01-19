@@ -1,8 +1,22 @@
 # v0.13.0 (2022-01-16)
 
+EDR is now Sequence. The following has changed:
+
+- The GitLab group has moved to https://gitlab.com/reductech/sequence
+- The root namespace is now `Reductech.Sequence`
+- The documentation site has moved to https://sequence.sh
+
+Everything else is still the same - automation, simplified.
+
+The project has now been updated to use .NET 6.
+
 ## Summary of Changes
 
 ### Core SDK
+
+- Step input and output types now have a base type of `SCLObject`
+
+### Steps
 
 - `ArrayMap` can now map elements of one type to elements of another type.
 
