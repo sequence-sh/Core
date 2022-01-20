@@ -1,4 +1,59 @@
-﻿# v0.12.0 (2021-11-26)
+# v0.13.0 (2022-01-16)
+
+EDR is now Sequence. The following has changed:
+
+- The GitLab group has moved to https://gitlab.com/reductech/sequence
+- The root namespace is now `Reductech.Sequence`
+- The documentation site has moved to https://sequence.sh
+
+Everything else is still the same - automation, simplified.
+
+The project has now been updated to use .NET 6.
+
+## Summary of Changes
+
+### Core SDK
+
+- Step input and output types now have a base type of `ISCLObject`
+    - This enforces that all inputs and outputs are one of the following types:
+    - Unit
+    - SCLNull
+    - StringStream
+    - SCLBool
+    - SCLInt
+    - SCLDouble
+    - SCLDateTime
+    - SCLEnum
+    - SCLOneOf of ISCLObjects
+    - Array of ISCLObject
+
+### Steps
+
+- `ArrayMap` can now map elements of one type to elements of another type.
+
+## Issues Closed in this Release
+
+### New Features
+
+- ArrayMap should have different input and output types #357
+
+### Bug Fixes
+
+- Improve conversion of JsonElement to SCLObject #369
+- Log and Print steps should use GetStringAsync rather than serialize on StringStreams #368
+- BUG: ArrayFirst and ArrayLast only work for arrays of ints #356
+
+### Maintenance
+
+- Rename EDR to Sequence #371
+- Create type SCLObject to be the base type for all SCL return types #361
+- Update mutation testing base image to .net 6 and remove stryker config #364
+- Update to work with .net 6 #363
+- Make GenerateDocumentation compatible with docusaurus #362
+- Assigning a variable to an entity property should infer the type of the variable correctly #360
+- GenerateDocumentation should set Directory to empty string rather than null for the root directory #358
+
+# v0.12.0 (2021-11-26)
 
 ## Summary of Changes
 
@@ -789,3 +844,4 @@ a previous process into the current one.
 ### Documentation
 
 - Add documentation
+
