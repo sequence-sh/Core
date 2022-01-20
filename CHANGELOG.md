@@ -14,7 +14,18 @@ The project has now been updated to use .NET 6.
 
 ### Core SDK
 
-- Step input and output types now have a base type of `SCLObject`
+- Step input and output types now have a base type of `ISCLObject`
+    - This enforces that all inputs and outputs are one of the following types:
+    - Unit
+    - SCLNull
+    - StringStream
+    - SCLBool
+    - SCLInt
+    - SCLDouble
+    - SCLDateTime
+    - SCLEnum
+    - SCLOneOf of ISCLObjects
+    - Array of ISCLObject
 
 ### Steps
 
