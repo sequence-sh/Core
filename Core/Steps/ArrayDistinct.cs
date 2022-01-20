@@ -102,7 +102,7 @@ public sealed class ArrayDistinct<T> : CompoundStep<Array<T>> where T : ISCLObje
         public static GenericStepFactory Instance { get; } = new ArrayDistinctStepFactory();
 
         /// <inheritdoc />
-        protected override TypeReference
+        public override TypeReference
             GetOutputTypeReference(TypeReference memberTypeReference) =>
             new TypeReference.Array(memberTypeReference);
 

@@ -93,7 +93,7 @@ public sealed class ArrayNew<T> : CompoundStep<Array<T>>, IArrayNewStep where T 
         public override string OutputTypeExplanation => "Array of T";
 
         /// <inheritdoc />
-        protected override TypeReference
+        public override TypeReference
             GetOutputTypeReference(TypeReference memberTypeReference) =>
             new TypeReference.Array(memberTypeReference);
 

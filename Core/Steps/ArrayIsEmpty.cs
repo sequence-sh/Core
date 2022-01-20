@@ -46,7 +46,7 @@ public sealed class ArrayIsEmpty<T> : CompoundStep<SCLBool> where T : ISCLObject
         public override string OutputTypeExplanation => nameof(Boolean);
 
         /// <inheritdoc />
-        protected override TypeReference
+        public override TypeReference
             GetOutputTypeReference(TypeReference memberTypeReference) => TypeReference.Actual.Bool;
 
         /// <inheritdoc />

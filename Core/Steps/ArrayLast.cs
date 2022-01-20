@@ -60,7 +60,7 @@ public sealed class ArrayLast<T> : CompoundStep<T> where T : ISCLObject
         public override string OutputTypeExplanation => "T";
 
         /// <inheritdoc />
-        protected override TypeReference
+        public override TypeReference
             GetOutputTypeReference(TypeReference memberTypeReference) => memberTypeReference;
 
         /// <inheritdoc />

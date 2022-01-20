@@ -72,7 +72,7 @@ public sealed class ArrayFind<T> : CompoundStep<SCLInt> where T : ISCLObject
         public override string OutputTypeExplanation => nameof(Int32);
 
         /// <inheritdoc />
-        protected override TypeReference
+        public override TypeReference
             GetOutputTypeReference(TypeReference memberTypeReference) =>
             TypeReference.Actual.Integer;
 

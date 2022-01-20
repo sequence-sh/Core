@@ -61,7 +61,7 @@ public sealed class Repeat<T> : CompoundStep<Array<T>> where T : ISCLObject
         public override string OutputTypeExplanation => "ArrayList<T>";
 
         /// <inheritdoc />
-        protected override TypeReference
+        public override TypeReference
             GetOutputTypeReference(TypeReference memberTypeReference) =>
             new TypeReference.Array(memberTypeReference);
 

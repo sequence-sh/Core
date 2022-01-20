@@ -85,7 +85,7 @@ public sealed class ArrayFilter<T> : CompoundStep<Array<T>> where T : ISCLObject
         public static GenericStepFactory Instance { get; } = new ArrayFilterStepFactory();
 
         /// <inheritdoc />
-        protected override TypeReference
+        public override TypeReference
             GetOutputTypeReference(TypeReference memberTypeReference) =>
             new TypeReference.Array(memberTypeReference);
 

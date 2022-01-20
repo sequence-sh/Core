@@ -73,7 +73,7 @@ public sealed class ArrayElementAtIndex<T> : CompoundStep<T> where T : ISCLObjec
         public override IStepSerializer Serializer => ArrayElementAtIndexSerializer.Instance;
 
         /// <inheritdoc />
-        protected override TypeReference
+        public override TypeReference
             GetOutputTypeReference(TypeReference memberTypeReference) => memberTypeReference;
 
         /// <inheritdoc />

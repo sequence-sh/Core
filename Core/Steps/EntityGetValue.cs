@@ -125,7 +125,7 @@ public sealed class EntityGetValue<T> : CompoundStep<T> where T : ISCLObject
         }
 
         /// <inheritdoc />
-        protected override TypeReference GetOutputTypeReference(TypeReference memberTypeReference)
+        public override TypeReference GetOutputTypeReference(TypeReference memberTypeReference)
         {
             return memberTypeReference;
         }

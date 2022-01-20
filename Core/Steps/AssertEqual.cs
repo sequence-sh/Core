@@ -63,7 +63,7 @@ public sealed class AssertEqual<T> : CompoundStep<Unit> where T : ISCLObject
         public override string OutputTypeExplanation { get; } = nameof(Unit);
 
         /// <inheritdoc />
-        protected override TypeReference GetOutputTypeReference(TypeReference memberTypeReference)
+        public override TypeReference GetOutputTypeReference(TypeReference memberTypeReference)
         {
             return TypeReference.Unit.Instance;
         }

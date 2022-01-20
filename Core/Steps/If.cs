@@ -73,7 +73,7 @@ public sealed class If<T> : CompoundStep<T> where T : ISCLObject
         public override string OutputTypeExplanation => "T";
 
         /// <inheritdoc />
-        protected override TypeReference
+        public override TypeReference
             GetOutputTypeReference(TypeReference memberTypeReference) => memberTypeReference;
 
         /// <inheritdoc />
