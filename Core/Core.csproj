@@ -59,7 +59,7 @@
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.0" />
     <PackageReference Include="Namotion.Reflection" Version="2.0.9" />
     <PackageReference Include="OneOf" Version="3.0.205" />
-    <PackageReference Include="Reductech.Sequence.ConnectorManager.Base" Version="0.6.0-a.main.2112201234" />
+    <PackageReference Include="Reductech.Sequence.ConnectorManager.Base" Version="0.6.0" />
     <PackageReference Include="RestSharp" Version="106.15.0" />
     <PackageReference Include="RestSharp.Serializers.SystemTextJson" Version="106.15.0" />
     <PackageReference Include="System.Linq.Async" Version="5.1.0" />
