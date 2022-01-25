@@ -37,7 +37,7 @@ public class FakeConnectorRegistry : IConnectorRegistry
                     Path.Combine(
                         AppContext.BaseDirectory,
                         "Connectors",
-                        "reductech.sequence.connectors.filesystem.0.9.0.nupkg"
+                        "reductech.sequence.connectors.filesystem.0.13.0.nupkg"
                     )
                 )
             )
@@ -69,13 +69,13 @@ public class ConnectorManagerExtensionsTests
     {
         {
             "Reductech.Sequence.Connectors.Nuix",
-            new ConnectorSettings { Id = "Reductech.Sequence.Connectors.Nuix", Version = "0.9.0" }
+            new ConnectorSettings { Id = "Reductech.Sequence.Connectors.Nuix", Version = "0.13.0" }
         },
         {
             "Reductech.Sequence.Connectors.StructuredData",
             new ConnectorSettings
             {
-                Id = "Reductech.Sequence.Connectors.StructuredData", Version = "0.9.0"
+                Id = "Reductech.Sequence.Connectors.StructuredData", Version = "0.13.0"
             }
         }
     };
@@ -104,7 +104,7 @@ public class ConnectorManagerExtensionsTests
         );
     }
 
-    [Fact(Skip = "Temporary")]
+    [Fact]
     public async Task GetStepFactoryStoreAsync_ReturnsStepFactory()
     {
         var repo = new MockRepository(MockBehavior.Strict);
@@ -114,7 +114,7 @@ public class ConnectorManagerExtensionsTests
         sfs.ShouldBeSuccessful();
     }
 
-    [Fact(Skip = "Temporary")]
+    [Fact]
     public async Task GetStepFactoryStoreAsync_WhenValidationFails_Throws()
     {
         var manager = new ConnectorManager(
@@ -138,7 +138,7 @@ public class ConnectorManagerExtensionsTests
             );
     }
 
-    [Fact(Skip = "Temporary")]
+    [Fact]
     public async Task GetStepFactoryStoreAsync_WhenSame_ReturnsError()
     {
         await _config.AddAsync(
