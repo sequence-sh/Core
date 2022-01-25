@@ -1,0 +1,42 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <RootNamespace>Reductech.Sequence.Core.LanguageServer</RootNamespace>
+    <AssemblyName>Reductech.Sequence.Core.LanguageServer</AssemblyName>
+    <Nullable>enable</Nullable>
+    <Version>0.14.0$(VersionSuffix)</Version>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <PackageId>Reductech.Sequence.Core.LanguageServer</PackageId>
+    <Title>Sequence® Core Language Server</Title>
+    <Description>Class library providing langauge server features for SCL.</Description>
+    <Product>Sequence®</Product>
+
+    <PackageProjectUrl>https://gitlab.com/reductech/sequence/core</PackageProjectUrl>
+    <RepositoryUrl>https://gitlab.com/reductech/sequence/core</RepositoryUrl>
+    <PackageReleaseNotes>CHANGELOG.md</PackageReleaseNotes>
+    <PackageTags>ediscovery;forensics;automation;orchestration;m;sequence</PackageTags>
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+
+    <Authors>Reductech</Authors>
+    <Company>Reductech</Company>
+    <Copyright>Copyright (c) 2021 Reductech Ltd</Copyright>
+  </PropertyGroup>
+
+
+
+  <ItemGroup>
+    <ProjectReference Include="..\Core\Core.csproj" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
+    <CompilerGeneratedFilesOutputPath>$(BaseIntermediateOutputPath)\GeneratedFiles</CompilerGeneratedFilesOutputPath>
+  </PropertyGroup>
+
+</Project>
