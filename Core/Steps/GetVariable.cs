@@ -44,7 +44,7 @@ public sealed class GetVariable<T> : CompoundStep<T> where T : ISCLObject
         public override Type StepType => typeof(GetVariable<>);
 
         /// <inheritdoc />
-        protected override TypeReference
+        public override TypeReference
             GetOutputTypeReference(TypeReference memberTypeReference) => memberTypeReference;
 
         /// <inheritdoc />

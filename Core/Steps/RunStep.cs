@@ -91,7 +91,7 @@ public sealed class RunStep<T> : CompoundStep<Unit> where T : ISCLObject
         public override string OutputTypeExplanation => nameof(Unit);
 
         /// <inheritdoc />
-        protected override TypeReference
+        public override TypeReference
             GetOutputTypeReference(TypeReference memberTypeReference) =>
             TypeReference.Unit.Instance;
 

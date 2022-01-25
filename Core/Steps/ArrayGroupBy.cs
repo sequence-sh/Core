@@ -81,7 +81,7 @@ public sealed class ArrayGroupBy<T> : CompoundStep<Array<Entity>> where T : ISCL
         public override string OutputTypeExplanation => "Array of Entity";
 
         /// <inheritdoc />
-        protected override TypeReference GetOutputTypeReference(TypeReference memberTypeReference)
+        public override TypeReference GetOutputTypeReference(TypeReference memberTypeReference)
         {
             return new TypeReference.Array(TypeReference.Actual.Entity);
         }

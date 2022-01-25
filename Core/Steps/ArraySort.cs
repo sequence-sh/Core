@@ -133,7 +133,7 @@ public sealed class ArraySort<T> : CompoundStep<Array<T>> where T : ISCLObject
         public override Type StepType => typeof(ArraySort<>);
 
         /// <inheritdoc />
-        protected override TypeReference
+        public override TypeReference
             GetOutputTypeReference(TypeReference memberTypeReference) =>
             new TypeReference.Array(memberTypeReference);
 

@@ -85,7 +85,7 @@ public abstract class
         public override string OutputTypeExplanation => "Boolean";
 
         /// <inheritdoc />
-        protected override TypeReference
+        public override TypeReference
             GetOutputTypeReference(TypeReference memberTypeReference) => TypeReference.Actual.Bool;
 
         /// <inheritdoc />

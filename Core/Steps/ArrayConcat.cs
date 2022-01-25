@@ -51,7 +51,7 @@ public sealed class ArrayConcat<T> : CompoundStep<Array<T>> where T : ISCLObject
         public override Type StepType => typeof(ArrayConcat<>);
 
         /// <inheritdoc />
-        protected override TypeReference
+        public override TypeReference
             GetOutputTypeReference(TypeReference memberTypeReference) =>
             new TypeReference.Array(memberTypeReference);
 

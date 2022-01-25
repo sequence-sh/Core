@@ -104,9 +104,10 @@ public abstract class StepFactory : IStepFactory
                         .Select(key => (key, parameter: StepParameter.TryCreate(propertyInfo)))
                 )
                 .Where(x => x.parameter is not null)
+                .GroupBy(x => x.key, x => x.parameter!)
                 .ToDictionary(
-                    x => x.key,
-                    x => x.parameter!
+                    x => x.Key,
+                    x => x.First()
                 );
         }
     }

@@ -22,6 +22,10 @@ public sealed record Unit : ISCLObject
     public object ToCSharpObject() => Default;
 
     /// <inheritdoc />
+    public IConstantFreezableStep ToConstantFreezableStep(TextLocation location) =>
+        new SCLConstantFreezable<Unit>(Default, location);
+
+    /// <inheritdoc />
     public Maybe<T> MaybeAs<T>() where T : ISCLObject
     {
         if (this is T value)

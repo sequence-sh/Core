@@ -74,7 +74,7 @@ public sealed class ForEach<T> : CompoundStep<Unit> where T : ISCLObject
         public override Type StepType => typeof(ForEach<>);
 
         /// <inheritdoc />
-        protected override TypeReference
+        public override TypeReference
             GetOutputTypeReference(TypeReference memberTypeReference) =>
             TypeReference.Unit.Instance;
 

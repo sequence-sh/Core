@@ -68,7 +68,7 @@ public sealed class Sequence<T> : CompoundStep<T>, ISequenceStep where T : ISCLO
         public override Type StepType => typeof(Sequence<>);
 
         /// <inheritdoc />
-        protected override TypeReference
+        public override TypeReference
             GetOutputTypeReference(TypeReference memberTypeReference) => memberTypeReference;
 
         /// <inheritdoc />

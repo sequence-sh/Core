@@ -41,7 +41,7 @@ public sealed class GetAutomaticVariable<T> : CompoundStep<T> where T : ISCLObje
         public override string OutputTypeExplanation => "T";
 
         /// <inheritdoc />
-        protected override TypeReference
+        public override TypeReference
             GetOutputTypeReference(TypeReference memberTypeReference) => memberTypeReference;
 
         /// <inheritdoc />

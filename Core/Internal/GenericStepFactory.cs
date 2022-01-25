@@ -19,7 +19,7 @@ public abstract class GenericStepFactory : StepFactory
     /// <summary>
     /// Gets the output type from the member type.
     /// </summary>
-    protected abstract TypeReference GetOutputTypeReference(TypeReference memberTypeReference);
+    public abstract TypeReference GetOutputTypeReference(TypeReference memberTypeReference);
 
     /// <inheritdoc />
     protected override Result<ICompoundStep, IError> TryCreateInstance(

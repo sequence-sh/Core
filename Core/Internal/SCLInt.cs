@@ -56,4 +56,8 @@ public readonly record struct SCLInt(int Value) : IComparableSCLObject
     /// Explicit operator
     /// </summary>
     public static explicit operator SCLInt(int i) => new(i);
+
+    /// <inheritdoc />
+    public IConstantFreezableStep ToConstantFreezableStep(TextLocation location) =>
+        new SCLConstantFreezable<SCLInt>(this, location);
 }

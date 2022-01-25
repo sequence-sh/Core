@@ -509,4 +509,8 @@ public sealed partial record Entity(
             new EntityPropertiesData(dictionary)
         );
     }
+
+    /// <inheritdoc />
+    public IConstantFreezableStep ToConstantFreezableStep(TextLocation location) =>
+        new SCLConstantFreezable<Entity>(this, location);
 }

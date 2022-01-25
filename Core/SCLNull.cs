@@ -40,4 +40,8 @@ public record SCLNull : ISCLObject
 
     /// <inheritdoc />
     JsonElement ISCLObject.ToJsonElement() => JsonDocument.Parse("null").RootElement;
+
+    /// <inheritdoc />
+    public IConstantFreezableStep ToConstantFreezableStep(TextLocation location) =>
+        new NullConstant(location);
 }

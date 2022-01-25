@@ -86,7 +86,7 @@ public sealed class EntitySetValue<T> : CompoundStep<Entity> where T : ISCLObjec
         public override string OutputTypeExplanation => nameof(Entity);
 
         /// <inheritdoc />
-        protected override TypeReference
+        public override TypeReference
             GetOutputTypeReference(TypeReference memberTypeReference) =>
             TypeReference.Actual.Entity;
 

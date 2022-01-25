@@ -60,7 +60,7 @@ public sealed class ArraySkip<T> : CompoundStep<Array<T>> where T : ISCLObject
         public override string OutputTypeExplanation => "Array of T";
 
         /// <inheritdoc />
-        protected override TypeReference
+        public override TypeReference
             GetOutputTypeReference(TypeReference memberTypeReference) =>
             new TypeReference.Array(memberTypeReference);
 
