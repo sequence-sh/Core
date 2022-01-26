@@ -2,5 +2,7 @@
 
 public class QuickInfoResponse
 {
-    public string Markdown { get; set; } = string.Empty;
+    public string Markdown => string.Join("\r\n", MarkdownStrings);
+
+    public List<string> MarkdownStrings { get; set; } = new();
 }

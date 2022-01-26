@@ -17,4 +17,6 @@ public class SignatureHelpParameter
     public override int GetHashCode() => 17 * Name.GetHashCode()
                                        + 23 * Label.GetHashCode()
                                        + 31 * Documentation.GetHashCode();
+
+    
 }

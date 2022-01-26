@@ -476,17 +476,23 @@ public class HoverVisitor : SCLBaseVisitor<QuickInfoResponse?>
         string? type,
         string? summary)
     {
-        var markdown = $@"`{name}`
-`{type}`
-{summary}
-";
+        var strings = new List<string>(3);
 
-        return new() { Markdown = markdown };
+        if (name is not null)
+            strings.Add($"`{name}`");
+
+        if (type is not null)
+            strings.Add($"`{type}`");
+
+        if (summary is not null)
+            strings.Add(summary);
+
+        return new() { MarkdownStrings = strings };
     }
 
     private static QuickInfoResponse Error(string message)
     {
-        return new() { Markdown = message };
+        return new() { MarkdownStrings = new List<string>() { message } };
     }
 
     private static string GetHumanReadableTypeName(Type t)

@@ -27,4 +27,10 @@ public class TextRange
         EndLineNumber   = endLineNumber;
         EndColumn       = endColumn;
     }
+
+    /// <inheritdoc />
+    public override string ToString()
+    {
+        return $"[start: ({StartLineNumber}, {StartColumn}), end: ({EndLineNumber}, {EndColumn})]";
+    }
 }
