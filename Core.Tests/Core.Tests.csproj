@@ -57,6 +57,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Core.LanguageServer\Core.LanguageServer.csproj" />
     <ProjectReference Include="..\Core.TestHarness\Core.TestHarness.csproj" />
     <ProjectReference Include="..\Core\Core.csproj" />
   </ItemGroup>
