@@ -10,8 +10,6 @@ public class SignatureHelpItem
 
     public IEnumerable<SignatureHelpParameter> Parameters { get; set; }
 
-    public DocumentationComment StructuredDocumentation { get; set; }
-
     public override bool Equals(object obj) => obj is SignatureHelpItem signatureHelpItem
                                             && Name == signatureHelpItem.Name
                                             && Label == signatureHelpItem.Label
