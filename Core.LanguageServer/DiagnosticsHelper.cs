@@ -16,7 +16,7 @@ public static class DiagnosticsHelper
     {
         List<Diagnostic> diagnostics;
 
-        var initialParseResult = SCLParsing2.TryParseStep(text);
+        var initialParseResult = SCLParsing.TryParseStep(text);
 
         if (initialParseResult.IsSuccess)
         {

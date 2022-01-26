@@ -131,23 +131,18 @@ public class SignatureHelpVisitor : SCLBaseVisitor<SignatureHelpResponse?>
         static SignatureHelpParameter CreateSignatureHelpParameter(
             StepParameterReference.Named stepParameterReference)
         {
-            return new()
-            {
-                Label = stepParameterReference.Name, Name = stepParameterReference.Name
-            };
+            return new(
+                stepParameterReference.Name,
+                stepParameterReference.Name,
+                ""
+            );
         }
 
         var signatureHelp = new SignatureHelpResponse
         {
             Signatures = new List<SignatureHelpItem>()
             {
-                new()
-                {
-                    Parameters    = parameters,
-                    Documentation = documentation,
-                    Label         = stepFactory.TypeName,
-                    Name          = stepFactory.TypeName
-                }
+                new(stepFactory.TypeName, stepFactory.TypeName, documentation, parameters)
             },
             ActiveParameter = 0,
             ActiveSignature = 0

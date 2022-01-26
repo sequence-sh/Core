@@ -209,14 +209,7 @@ public class CompletionVisitor : SCLBaseVisitor<CompletionResponse?>
             {
                 yield return new()
                 {
-                    TextEdit = new LinePositionSpanTextChange()
-                    {
-                        NewText     = key,
-                        StartLine   = range.StartLineNumber,
-                        EndLine     = range.EndLineNumber,
-                        StartColumn = range.StartColumn,
-                        EndColumn   = range.EndColumn,
-                    },
+                    TextEdit         = new LinePositionSpanTextChange(key, range),
                     Label            = key,
                     InsertTextFormat = InsertTextFormat.PlainText,
                     Detail           = factory.Key.Summary,
@@ -253,14 +246,8 @@ public class CompletionVisitor : SCLBaseVisitor<CompletionResponse?>
         {
             return new()
             {
-                TextEdit = new LinePositionSpanTextChange()
-                {
-                    NewText     = stepParameterReference.Name + ":",
-                    StartLine   = range.StartLineNumber,
-                    StartColumn = range.StartColumn,
-                    EndLine     = range.EndLineNumber,
-                    EndColumn   = range.EndColumn
-                },
+                TextEdit =
+                    new LinePositionSpanTextChange(stepParameterReference.Name + ":", range),
                 Label            = stepParameterReference.Name,
                 InsertTextFormat = InsertTextFormat.PlainText,
                 Detail           = stepParameter.Summary,

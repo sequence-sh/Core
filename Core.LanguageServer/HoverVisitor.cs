@@ -128,7 +128,7 @@ public class HoverVisitor : SCLBaseVisitor<QuickInfoResponse?>
                             {
                                 return Description(
                                     stepParameter.Name,
-                                    stepParameter.ActualType.Name,
+                                    GetHumanReadableTypeName(stepParameter.ActualType),
                                     stepParameter.Summary
                                 );
                             }
