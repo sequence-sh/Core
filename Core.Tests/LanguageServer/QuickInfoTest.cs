@@ -3,7 +3,7 @@ using Reductech.Sequence.Core.LanguageServer.Objects;
 
 namespace Reductech.Sequence.Core.Tests.LanguageServer;
 
-public class HoverTest
+public class QuickInfoTest
 {
     public const string LongText = @"[(artist: 'Blake, Robert' artistid: 123)]
 | ArrayFilter ((from <entity> 'artist') == 'Blake, Robert')
@@ -25,6 +25,7 @@ public class HoverTest
         "`Unit`",
         "Prints a value to the console."
     )]
+    [InlineData("- a .", 0, 3, "Syntax Error: no viable alternative at input '- a .'")]
     //[InlineData("- Print 123\r\n- a b", 1 ,1, "Syntax Error: no viable alternative at input '- a b'" )]
     [InlineData("- <val> = 123\r\n- print <val>", 1, 9,  "`<val>`",           "`SCLInt`")]
     [InlineData(LongText,                         0, 12, "`'Blake, Robert'`", "`StringStream`")]

@@ -10,7 +10,7 @@ namespace Reductech.Sequence.Core.LanguageServer;
 public class QuickInfoVisitor : SCLBaseVisitor<QuickInfoResponse?>
 {
     /// <summary>
-    /// Create a new HoverVisitor
+    /// Create a new QuickInfoVisitor
     /// </summary>
     public QuickInfoVisitor(
         LinePosition position,
@@ -46,7 +46,7 @@ public class QuickInfoVisitor : SCLBaseVisitor<QuickInfoResponse?>
     }
 
     /// <summary>
-    /// The position of the hover
+    /// The position of the QuickInfo
     /// </summary>
     public LinePosition LinePosition { get; }
 
