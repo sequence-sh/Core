@@ -33,9 +33,9 @@ public static class SCLParsing
     private static Result<FreezableStepProperty, IError> TryParse(string text)
     {
         var inputStream       = new AntlrInputStream(text);
-        var lexer             = new SCLLexer(inputStream);
+        var lexer             = new SCLLexer(inputStream, TextWriter.Null, TextWriter.Null);
         var commonTokenStream = new CommonTokenStream(lexer);
-        var parser            = new SCLParser(commonTokenStream);
+        var parser            = new SCLParser(commonTokenStream, TextWriter.Null, TextWriter.Null);
 
         var syntaxErrorListener = new SyntaxErrorListener();
         parser.AddErrorListener(syntaxErrorListener);

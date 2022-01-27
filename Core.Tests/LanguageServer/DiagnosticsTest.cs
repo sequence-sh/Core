@@ -18,6 +18,10 @@ public class DiagnosticsTest
         "The step 'a' does not exist[start: (1, 2), end: (1, 4)]",
         "The step 'c' does not exist[start: (2, 2), end: (2, 4)]"
     )]
+    [InlineData(
+        "- print .\r\n- print 123",
+        "Syntax Error: no viable alternative at input '- print .'[start: (0, 0), end: (0, 9)]"
+    )]
     public void TestGetDiagnostics(string text, params string[] expectedErrors)
     {
         var sfs         = StepFactoryStore.Create();

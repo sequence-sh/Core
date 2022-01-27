@@ -11,12 +11,12 @@ public class CompletionTest
     [Theory]
     [InlineData("- ",           1, 2,  null)]
     [InlineData("Print 123",    1, 6,  "Value")]
-    [InlineData("- Print  ",    0, 11, "Value")]
-    [InlineData("Print  ",      0, 9,  "Value")]
-    [InlineData("Print P",      0, 8,  "Value")]
+    [InlineData("- Print  ",    1, 11, "Value")]
+    [InlineData("Print  ",      1, 9,  "Value")]
+    [InlineData("Print P",      1, 8,  "Value")]
     [InlineData("Print\r\nP",   1, 0,  "Value")]
     [InlineData("- Print\r\nP", 1, 0,  "Value")]
-    [InlineData("- Print P",    0, 8,  "Value")]
+    [InlineData("- Print P",    1, 8,  "Value")]
     [InlineData(LongText,       1, 3,  "ArrayFilter")]
     public void ShouldGiveCorrectCompletion(
         string text,

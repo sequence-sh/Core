@@ -50,7 +50,7 @@ public static class DiagnosticsHelper
 
                 var parseResult = visitor.LexParseAndVisit(
                     commandText,
-                    _ => { },
+                    x => { x.RemoveErrorListeners(); },
                     x => { x.AddErrorListener(listener); }
                 );
 
