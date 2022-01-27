@@ -214,7 +214,7 @@ public class CompletionVisitor : SCLBaseVisitor<CompletionResponse?>
                     factory.Key.Summary,
                     documentation,
                     first,
-                    new LinePositionSpanTextChange(key, range)
+                    new SCLTextEdit(key, range)
                 );
 
                 first = false;
@@ -253,7 +253,7 @@ public class CompletionVisitor : SCLBaseVisitor<CompletionResponse?>
                 stepParameter.Summary,
                 documentation,
                 preselect,
-                new LinePositionSpanTextChange(stepParameterReference.Name + ":", range)
+                new SCLTextEdit(stepParameterReference.Name + ":", range)
             );
         }
 

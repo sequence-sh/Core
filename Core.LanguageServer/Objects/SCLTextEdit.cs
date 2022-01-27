@@ -1,6 +1,6 @@
 ﻿namespace Reductech.Sequence.Core.LanguageServer.Objects;
 
-public record LinePositionSpanTextChange(
+public record SCLTextEdit(
     string NewText,
     int StartLine,
     int StartColumn,
@@ -10,7 +10,7 @@ public record LinePositionSpanTextChange(
     public override string ToString() =>
         $"StartLine={StartLine}, StartColumn={StartColumn}, EndLine={EndLine}, EndColumn={EndColumn}, NewText='{(NewText.Replace("\r", "\\r").Replace("\n", "\\n").Replace("\t", "\\t"))}'";
 
-    public LinePositionSpanTextChange(string newText, TextRange range)
+    public SCLTextEdit(string newText, TextRange range)
         : this(
             newText,
             range.StartLineNumber,
@@ -22,7 +22,7 @@ public record LinePositionSpanTextChange(
     /// <summary>
     /// Offset this by some number of lines
     /// </summary>
-    public LinePositionSpanTextChange Offset(LinePosition linePosition) => this with
+    public SCLTextEdit Offset(LinePosition linePosition) => this with
     {
         StartLine = StartLine + linePosition.Line,
         EndLine = EndLine + linePosition.Line,

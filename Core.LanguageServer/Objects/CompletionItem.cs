@@ -5,7 +5,7 @@ public record CompletionItem(
     string Detail,
     string Documentation,
     bool Preselect,
-    LinePositionSpanTextChange TextEdit)
+    SCLTextEdit TextEdit)
 {
     public CompletionItem Offset(LinePosition linePosition) =>
         this with { TextEdit = TextEdit.Offset(linePosition) };

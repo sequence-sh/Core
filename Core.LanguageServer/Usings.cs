@@ -13,3 +13,5 @@ global using System.IO;
 global using System.Text;
 global using Reductech.Sequence.Core.LanguageServer.Objects;
 global using Reductech.Sequence.Core.Internal.Documentation;
+global using CSharpFunctionalExtensions;
+global using Reductech.Sequence.Core.Internal.Serialization;
