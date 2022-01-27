@@ -138,15 +138,14 @@ public class SignatureHelpVisitor : SCLBaseVisitor<SignatureHelpResponse?>
             );
         }
 
-        var signatureHelp = new SignatureHelpResponse
-        {
-            Signatures = new List<SignatureHelpItem>()
+        var signatureHelp = new SignatureHelpResponse(
+            0,
+            0,
+            new List<SignatureHelpItem>()
             {
                 new(stepFactory.TypeName, stepFactory.TypeName, documentation, parameters)
-            },
-            ActiveParameter = 0,
-            ActiveSignature = 0
-        };
+            }
+        );
 
         return signatureHelp;
     }

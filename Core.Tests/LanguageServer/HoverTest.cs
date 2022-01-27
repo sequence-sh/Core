@@ -55,7 +55,7 @@ public class HoverTest
         var hover =
             HoverHelper.GetQuickInfoAsync(
                 text,
-                new QuickInfoRequest() { Column = character, Line = line },
+                new LinePosition(line, character),
                 sfs
             );
 

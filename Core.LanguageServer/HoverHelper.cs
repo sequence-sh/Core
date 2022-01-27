@@ -4,11 +4,10 @@ public static class HoverHelper
 {
     public static QuickInfoResponse GetQuickInfoAsync(
         string code,
-        QuickInfoRequest quickInfoRequest,
+        LinePosition position,
         StepFactoryStore stepFactoryStore)
     {
         var lazyTypeResolver = HoverVisitor.CreateLazyTypeResolver(code, stepFactoryStore);
-        var position         = new LinePosition(quickInfoRequest.Line, quickInfoRequest.Column);
         var command          = Helpers.GetCommand(code, position);
 
         if (command is null)

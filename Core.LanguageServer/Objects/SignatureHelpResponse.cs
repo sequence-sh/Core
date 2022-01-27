@@ -1,10 +1,16 @@
 ﻿namespace Reductech.Sequence.Core.LanguageServer.Objects;
 
-public class SignatureHelpResponse
+/// <summary>
+/// The response of a signature help request
+/// </summary>
+public record SignatureHelpResponse(
+    int ActiveSignature,
+    int ActiveParameter,
+    IReadOnlyList<SignatureHelpItem> Signatures)
 {
-    public IEnumerable<SignatureHelpItem> Signatures { get; set; }
-
-    public int ActiveSignature { get; set; }
-
-    public int ActiveParameter { get; set; }
+    /// <summary>
+    /// Empty response
+    /// </summary>
+    public static SignatureHelpResponse Empty { get; } =
+        new(0, 0, new List<SignatureHelpItem>());
 }

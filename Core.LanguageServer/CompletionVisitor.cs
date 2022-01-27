@@ -205,16 +205,19 @@ public class CompletionVisitor : SCLBaseVisitor<CompletionResponse?>
         {
             var documentation = Helpers.GetMarkDownDocumentation(factory);
 
+            var first = true;
+
             foreach (var key in factory)
             {
-                yield return new()
-                {
-                    TextEdit         = new LinePositionSpanTextChange(key, range),
-                    Label            = key,
-                    InsertTextFormat = InsertTextFormat.PlainText,
-                    Detail           = factory.Key.Summary,
-                    Documentation    = documentation
-                };
+                yield return new(
+                    key,
+                    factory.Key.Summary,
+                    documentation,
+                    first,
+                    new LinePositionSpanTextChange(key, range)
+                );
+
+                first = false;
             }
         }
     }
@@ -237,22 +240,21 @@ public class CompletionVisitor : SCLBaseVisitor<CompletionResponse?>
             stepFactory.ParameterDictionary
                 .Where(x => x.Key is StepParameterReference.Named)
                 .Where(x => !usedNamedArguments.Contains(x.Value.Name))
-                .Select(x => CreateCompletionItem(x.Key, x.Value))
+                .Select((x, i) => CreateCompletionItem(x.Key, x.Value, i == 0))
                 .ToList();
 
         CompletionItem CreateCompletionItem(
             StepParameterReference stepParameterReference,
-            IStepParameter stepParameter)
+            IStepParameter stepParameter,
+            bool preselect)
         {
-            return new()
-            {
-                TextEdit =
-                    new LinePositionSpanTextChange(stepParameterReference.Name + ":", range),
-                Label            = stepParameterReference.Name,
-                InsertTextFormat = InsertTextFormat.PlainText,
-                Detail           = stepParameter.Summary,
-                Documentation    = documentation
-            };
+            return new CompletionItem(
+                stepParameterReference.Name,
+                stepParameter.Summary,
+                documentation,
+                preselect,
+                new LinePositionSpanTextChange(stepParameterReference.Name + ":", range)
+            );
         }
 
         return new CompletionResponse() { Items = options, IsIncomplete = false };

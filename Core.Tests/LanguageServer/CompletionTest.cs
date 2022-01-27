@@ -9,13 +9,12 @@ public class CompletionTest
 - 0.1.2.3";
 
     [Theory]
-    [InlineData("- ",           1, 2,  null)]
-    [InlineData("Print 123",    1, 6,  "Value")]
-    [InlineData("- Print  ",    1, 11, "Value")]
-    [InlineData("Print  ",      1, 9,  "Value")]
-    [InlineData("Print P",      1, 8,  "Value")]
-    [InlineData("Print\r\nP",   1, 0,  "Value")]
-    [InlineData("- Print\r\nP", 1, 0,  "Value")]
+    [InlineData("- ",           0, 2,  null)]
+    [InlineData("- Print  ",    0, 11, "Value")]
+    [InlineData("Print  ",      0, 9,  "Value")]
+    [InlineData("Print P",      0, 8,  "Value")]
+    [InlineData("Print\r\nV",   1, 0,  "Value")]
+    [InlineData("- Print\r\nV", 1, 0,  "Value")]
     [InlineData("- Print P",    1, 8,  "Value")]
     [InlineData(LongText,       1, 3,  "ArrayFilter")]
     public void ShouldGiveCorrectCompletion(
@@ -26,7 +25,9 @@ public class CompletionTest
     {
         var sfs = StepFactoryStore.Create();
 
-        var visitor = new CompletionVisitor(new LinePosition(line, character), sfs);
+        var lp = new LinePosition(line, character);
+
+        var visitor = new CompletionVisitor(lp, sfs);
 
         var completionList = visitor.LexParseAndVisit(
             text,

@@ -2,11 +2,13 @@
 
 /// <summary>
 /// A position in SCL text.
-/// The first line is line 1.
+/// The first line is line 0.
 /// </summary>
 public readonly record struct LinePosition(int Line, int Character)
     : IComparable<LinePosition>
 {
+#region Comparison
+
     /// <summary>
     /// Less than operator
     /// </summary>
@@ -74,4 +76,6 @@ public readonly record struct LinePosition(int Line, int Character)
 
         return 1;
     }
+
+#endregion Comparison
 }
