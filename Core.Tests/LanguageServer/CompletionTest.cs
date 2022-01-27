@@ -9,6 +9,7 @@ public class CompletionTest
 - 0.1.2.3";
 
     [Theory]
+    [InlineData("- ",           1, 2,  null)]
     [InlineData("Print 123",    1, 6,  "Value")]
     [InlineData("- Print  ",    0, 11, "Value")]
     [InlineData("Print  ",      0, 9,  "Value")]
