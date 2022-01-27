@@ -53,7 +53,7 @@ public class HoverTest
         var sfs = StepFactoryStore.Create();
 
         var hover =
-            HoverHelper.GetQuickInfoAsync(
+            QuickInfoHelper.GetQuickInfoAsync(
                 text,
                 new LinePosition(line, character),
                 sfs

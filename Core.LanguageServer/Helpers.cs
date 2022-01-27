@@ -187,17 +187,22 @@ public static class Helpers
     /// <summary>
     /// Remove a token from the text
     /// </summary>
-    public static string RemoveToken(string text, LinePosition tokenPosition)
+    public static (string newText, IToken? removed) RemoveToken(
+        string text,
+        LinePosition tokenPosition)
     {
         var inputStream = new AntlrInputStream(text);
         var lexer       = new SCLLexer(inputStream, TextWriter.Null, TextWriter.Null);
 
         StringBuilder sb = new();
 
+        IToken? removed = null;
+
         foreach (var token in lexer.GetAllTokens())
         {
             if (token.ContainsPosition(tokenPosition))
             {
+                removed = token;
                 var length = token.StopIndex - token.StartIndex;
 
                 var ws = new string(' ', length);
@@ -209,7 +214,7 @@ public static class Helpers
             }
         }
 
-        return sb.ToString();
+        return (sb.ToString(), removed);
     }
 
     /// <summary>

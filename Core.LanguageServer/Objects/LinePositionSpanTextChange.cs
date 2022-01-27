@@ -18,4 +18,15 @@ public record LinePositionSpanTextChange(
             range.EndLineNumber,
             range.EndColumn
         ) { }
+
+    /// <summary>
+    /// Offset this by some number of lines
+    /// </summary>
+    public LinePositionSpanTextChange Offset(LinePosition linePosition) => this with
+    {
+        StartLine = StartLine + linePosition.Line,
+        EndLine = EndLine + linePosition.Line,
+        StartColumn = StartColumn + linePosition.Character,
+        EndColumn = EndColumn + linePosition.Character,
+    };
 }

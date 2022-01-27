@@ -5,4 +5,8 @@ public record CompletionItem(
     string Detail,
     string Documentation,
     bool Preselect,
-    LinePositionSpanTextChange TextEdit) { }
+    LinePositionSpanTextChange TextEdit)
+{
+    public CompletionItem Offset(LinePosition linePosition) =>
+        this with { TextEdit = TextEdit.Offset(linePosition) };
+}

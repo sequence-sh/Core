@@ -1,25 +1,5 @@
 ﻿namespace Reductech.Sequence.Core.LanguageServer;
 
-public static class SignatureHelpHelper
-{
-    public static SignatureHelpResponse GetSignatureHelpResponse(
-        string text,
-        LinePosition linePosition,
-        StepFactoryStore sfs)
-    {
-        var visitor = new SignatureHelpVisitor(linePosition, sfs);
-
-        var signatureHelpResponse = visitor.LexParseAndVisit(
-            text,
-            x => x.RemoveErrorListeners(),
-            x => x.RemoveErrorListeners()
-        );
-
-        return signatureHelpResponse
-            ?? new SignatureHelpResponse(0, 0, new List<SignatureHelpItem>());
-    }
-}
-
 /// <summary>
 /// Gives code completion suggestions
 /// </summary>
@@ -35,12 +15,53 @@ public static class CompletionHelper
     {
         var visitor = new CompletionVisitor(position, stepFactoryStore);
 
-        var completionList = visitor.LexParseAndVisit(
+        var completionResponse = visitor.LexParseAndVisit(
             code,
             x => { x.RemoveErrorListeners(); },
             x => { x.RemoveErrorListeners(); }
-        ) ?? new CompletionResponse() { Items = new List<CompletionItem>() };
+        );
 
-        return completionList;
+        if (completionResponse is not null)
+            return completionResponse;
+
+        var command = Helpers.GetCommand(code, position);
+
+        if (command is not null)
+        {
+            visitor = new CompletionVisitor(
+                command.Value.newPosition,
+                stepFactoryStore
+            );
+
+            var lineCompletionResponse = visitor.LexParseAndVisit(
+                command.Value.command,
+                x => { x.RemoveErrorListeners(); },
+                x => { x.RemoveErrorListeners(); }
+            );
+
+            if (lineCompletionResponse is not null)
+                return lineCompletionResponse.Offset(command.Value.positionOffset);
+
+            var (newText, removedToken) = Helpers.RemoveToken(
+                command.Value.command,
+                command.Value.newPosition
+            );
+
+            var withoutTokenResponse = visitor.LexParseAndVisit(
+                newText,
+                x => { x.RemoveErrorListeners(); },
+                x => { x.RemoveErrorListeners(); }
+            );
+
+            if (withoutTokenResponse is not null)
+                return withoutTokenResponse.Offset(
+                    new LinePosition(
+                        command.Value.positionOffset.Line,
+                        -removedToken?.Text.Length ?? 0
+                    )
+                );
+        }
+
+        return new CompletionResponse(true, ArraySegment<CompletionItem>.Empty);
     }
 }

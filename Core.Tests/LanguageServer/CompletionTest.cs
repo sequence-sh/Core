@@ -9,39 +9,38 @@ public class CompletionTest
 - 0.1.2.3";
 
     [Theory]
-    [InlineData("- ",           0, 2,  null)]
-    [InlineData("- Print  ",    0, 11, "Value")]
-    [InlineData("Print  ",      0, 9,  "Value")]
-    [InlineData("Print P",      0, 8,  "Value")]
-    [InlineData("Print\r\nV",   1, 0,  "Value")]
-    [InlineData("- Print\r\nV", 1, 0,  "Value")]
-    [InlineData("- Print P",    1, 8,  "Value")]
-    [InlineData(LongText,       1, 3,  "ArrayFilter")]
+    [InlineData("- ",                                             0, 2,  null,          null)]
+    [InlineData("- Print  ",                                      0, 11, "Value",       null)]
+    [InlineData("Print  ",                                        0, 9,  "Value",       null)]
+    [InlineData("Print P",                                        0, 8,  "Value",       null)]
+    [InlineData("Print\r\nV",                                     1, 0,  "Value",       null)]
+    [InlineData("- Print\r\nV",                                   1, 0,  "Value",       null)]
+    [InlineData("- Print P",                                      1, 8,  "Value",       null)]
+    [InlineData("- Print 123\r\n- RestGetJson BaseUrl: 'abc' u",  1, 30, "RelativeURL", 29)]
+    [InlineData("- Print ...\r\n- RestGetJson BaseUrl: 'abc' u",  1, 30, "RelativeURL", 29)]
+    [InlineData("- Print 123\r\n- RestGetJson BaseUrl: 'abc' ur", 1, 31, "RelativeURL", 29)]
+    [InlineData(LongText,                                         1, 2,  "ArrayFilter", null)]
     public void ShouldGiveCorrectCompletion(
         string text,
         int line,
         int character,
-        string? expectedLabel)
+        string? expectedLabel,
+        int? expectedStartColumn)
     {
         var sfs = StepFactoryStore.Create();
 
-        var lp = new LinePosition(line, character);
-
-        var visitor = new CompletionVisitor(lp, sfs);
-
-        var completionList = visitor.LexParseAndVisit(
-            text,
-            x => x.RemoveErrorListeners(),
-            x => x.RemoveErrorListeners()
-        );
+        var completionList =
+            CompletionHelper.GetCompletionResponse(
+                text,
+                new LinePosition(line, character),
+                sfs
+            );
 
         if (string.IsNullOrWhiteSpace(expectedLabel))
-            completionList.Should().BeNull();
+            completionList.Items.Should().BeEmpty();
 
         else
         {
-            completionList.Should().NotBeNull();
-
             var labels =
                 completionList.Items.Select(x => x.Label);
 
@@ -51,6 +50,9 @@ public class CompletionTest
             {
                 item.Documentation.Should().NotBeNull();
                 item.Documentation.Should().NotBeEmpty();
+
+                item.TextEdit.StartLine.Should().Be(line);
+                item.TextEdit.StartColumn.Should().Be(expectedStartColumn ?? character);
             }
         }
     }

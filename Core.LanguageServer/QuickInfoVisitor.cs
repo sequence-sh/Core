@@ -5,23 +5,21 @@ using Reductech.Sequence.Core.Internal.Serialization;
 namespace Reductech.Sequence.Core.LanguageServer;
 
 /// <summary>
-/// Visits SCL to find hover
+/// Visits SCL to find quick info
 /// </summary>
-public class HoverVisitor : SCLBaseVisitor<QuickInfoResponse?>
+public class QuickInfoVisitor : SCLBaseVisitor<QuickInfoResponse?>
 {
     /// <summary>
     /// Create a new HoverVisitor
     /// </summary>
-    public HoverVisitor(
+    public QuickInfoVisitor(
         LinePosition position,
-        LinePosition positionOffset,
         StepFactoryStore stepFactoryStore,
         Lazy<Result<TypeResolver, IError>> lazyTypeResolver)
     {
-        LinePosition       = position;
-        LinePositionOffset = positionOffset;
-        StepFactoryStore   = stepFactoryStore;
-        LazyTypeResolver   = lazyTypeResolver;
+        LinePosition     = position;
+        StepFactoryStore = stepFactoryStore;
+        LazyTypeResolver = lazyTypeResolver;
     }
 
     /// <summary>
@@ -51,11 +49,6 @@ public class HoverVisitor : SCLBaseVisitor<QuickInfoResponse?>
     /// The position of the hover
     /// </summary>
     public LinePosition LinePosition { get; }
-
-    /// <summary>
-    /// The position offset
-    /// </summary>
-    public LinePosition LinePositionOffset { get; }
 
     /// <summary>
     /// The Step Factory Store
@@ -459,14 +452,9 @@ public class HoverVisitor : SCLBaseVisitor<QuickInfoResponse?>
         string? description;
 
         if (step is ICompoundStep cs)
-        {
             description = cs.StepFactory.Summary;
-        }
-
         else
-        {
             description = null;
-        }
 
         return Description(name, type, description);
     }

@@ -8,7 +8,7 @@ public class SignatureHelpTest
     [Theory]
     [InlineData("ArrayFilter", 0, 12, "ArrayFilter")]
     [InlineData("ArrayFilter", 0, 1,  null)]
-    //[InlineData("- log ",      0, 7,  "Value")]
+    [InlineData("- log ",      0, 7,  "Log")]
     public void ShouldGiveCorrectSignatureHelp(
         string text,
         int line,

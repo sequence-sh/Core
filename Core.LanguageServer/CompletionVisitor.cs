@@ -199,7 +199,7 @@ public class CompletionVisitor : SCLBaseVisitor<CompletionResponse?>
     {
         var items = stepFactories.SelectMany(CreateCompletionItems).ToList();
 
-        return new CompletionResponse() { Items = items, IsIncomplete = false };
+        return new CompletionResponse(false, items);
 
         IEnumerable<CompletionItem> CreateCompletionItems(IGrouping<IStepFactory, string> factory)
         {
@@ -257,6 +257,6 @@ public class CompletionVisitor : SCLBaseVisitor<CompletionResponse?>
             );
         }
 
-        return new CompletionResponse() { Items = options, IsIncomplete = false };
+        return new CompletionResponse(false, options);
     }
 }
