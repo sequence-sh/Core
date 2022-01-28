@@ -14,26 +14,26 @@ public class FormattingTest
     [InlineData(
         "RestGetJson baseurl: 'abc' #First Comment\r\nrelativeurl: 'def' /*Second Comment*/headers: (a: 1, b: 2)",
         @"RESTGetJSON
-	BaseURL: ""abc"" #First Comment
-	RelativeURL: ""def""
-    /*Second Comment*/
-	Headers: (a: 1,b: 2) [start: (0, 0), end: (1, 58)]"
+BaseURL    : ""abc"" #First Comment
+RelativeURL: ""def"" /*Second Comment*/
+Headers    : (
+	'a': 1
+	'b': 2
+) [start: (0, 0), end: (1, 58)]"
     )]
     [InlineData(
         "print (StringToCase 'ab' /* my comment */ textcase.upper)",
         @"Print Value: (StringToCase
-	String: ""ab"" /* my comment */
-	Case: TextCase.Upper
-)"
+String: ""ab""
+Case  : TextCase.Upper)/* my comment */ [start: (0, 0), end: (0, 57)]"
     )]
     [InlineData(
         "foreach ['a','b', 'c'] (<v> => print (StringToCase <v> TextCase.Upper))",
         @"ForEach
-	Array: [""a"", ""b"", ""c""]
-	Action: (<v> => (Print Value: (StringToCase
-		String: <v>
-		Case: TextCase.Upper
-	)))"
+Array : [""a"", ""b"", ""c""]
+	Action: (<v> => Print Value: (StringToCase
+	String: (<v>)
+Case  : TextCase.Upper)) [start: (0, 0), end: (0, 71)]"
     )]
     [InlineData(
         @"- (

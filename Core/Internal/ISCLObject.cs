@@ -1,6 +1,7 @@
 ﻿using System.Runtime.Serialization;
 using System.Text;
 using System.Text.Json.Serialization;
+using ISerializable = Reductech.Sequence.Core.Internal.Serialization.ISerializable;
 
 namespace Reductech.Sequence.Core.Internal;
 
