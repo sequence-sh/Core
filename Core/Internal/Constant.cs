@@ -51,6 +51,16 @@ public sealed record SCLConstant<T>(T Value) : IStep<T>, IConstantStep where T :
     public string Serialize(SerializeOptions options) => Value.Serialize(options);
 
     /// <inheritdoc />
+    public void Format(
+        IndentationStringBuilder indentationStringBuilder,
+        FormattingOptions options,
+        Stack<Comment> remainingComments)
+    {
+        indentationStringBuilder.AppendPrecedingComments(remainingComments, TextLocation);
+        Value.Format(indentationStringBuilder, options, remainingComments);
+    }
+
+    /// <inheritdoc />
     public IEnumerable<Requirement> RuntimeRequirements
     {
         get

@@ -15,21 +15,28 @@ public sealed class SequenceSerializer : IStepSerializer
     /// </summary>
     public static IStepSerializer Instance { get; } = new SequenceSerializer();
 
-    /// <inheritdoc />
-    public string Serialize(SerializeOptions options, IEnumerable<StepProperty> stepProperties)
+    private IEnumerable<IStep> GetAllSteps(IEnumerable<StepProperty> stepProperties)
     {
         var dict = stepProperties.ToDictionary(x => x.Name);
-
-        var sb = new StringBuilder();
 
         if (dict.TryGetValue(nameof(Sequence<ISCLObject>.InitialSteps), out var sp)
          && sp is StepProperty.StepListProperty stepList)
             foreach (var step in stepList.StepList)
-                AddStep(options, sb, step, 0);
+                yield return step;
 
         if (dict.TryGetValue(nameof(Sequence<ISCLObject>.FinalStep), out var finalStep)
          && finalStep is StepProperty.SingleStepProperty stepProperty)
-            AddStep(options, sb, stepProperty.Step, 0);
+            yield return stepProperty.Step;
+    }
+
+    /// <inheritdoc />
+    public string Serialize(SerializeOptions options, IEnumerable<StepProperty> stepProperties)
+    {
+        var sb    = new StringBuilder();
+        var steps = GetAllSteps(stepProperties);
+
+        foreach (var step in steps)
+            AddStep(options, sb, step, 0);
 
         var s = sb.ToString();
 
@@ -58,6 +65,23 @@ public sealed class SequenceSerializer : IStepSerializer
             {
                 sb.AppendLine($"{indentation}- {step.Serialize(options)}");
             }
+        }
+    }
+
+    /// <inheritdoc />
+    public void Format(
+        IEnumerable<StepProperty> stepProperties,
+        TextLocation? textLocation,
+        IndentationStringBuilder indentationStringBuilder,
+        FormattingOptions options,
+        Stack<Comment> remainingComments)
+    {
+        foreach (var step in GetAllSteps(stepProperties))
+        {
+            indentationStringBuilder.AppendLine();
+            indentationStringBuilder.AppendPrecedingComments(remainingComments, step.TextLocation);
+            indentationStringBuilder.Append("- ");
+            step.Format(indentationStringBuilder, options, remainingComments);
         }
     }
 }

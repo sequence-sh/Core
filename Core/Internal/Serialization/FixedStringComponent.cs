@@ -1,22 +1,24 @@
-﻿namespace Reductech.Sequence.Core.Internal.Serialization;
+﻿//namespace Reductech.Sequence.Core.Internal.Serialization;
 
-/// <summary>
-/// Include a fixed string in serialization.
-/// </summary>
-public class FixedStringComponent : ISerializerBlock //, IDeserializerBlock
-{
-    /// <summary>
-    /// Creates a new FixedStringComponent
-    /// </summary>
-    public FixedStringComponent(string value) => Value = value;
+///// <summary>
+///// Include a fixed string in serialization.
+///// </summary>
+//public class FixedStringComponent : ISerializerBlock //, IDeserializerBlock
+//{
+//    /// <summary>
+//    /// Creates a new FixedStringComponent
+//    /// </summary>
+//    public FixedStringComponent(string value) => Value = value;
 
-    /// <summary>
-    /// The fixed value to insert.
-    /// </summary>
-    public string Value { get; }
+//    /// <summary>
+//    /// The fixed value to insert.
+//    /// </summary>
+//    public string Value { get; }
 
-    /// <inheritdoc />
-    public Result<string> TryGetSegmentText(
-        SerializeOptions options,
-        IReadOnlyDictionary<string, StepProperty> dictionary) => Value;
-}
+//    /// <inheritdoc />
+//    public Result<string> TryGetSegmentText(
+//        SerializeOptions options,
+//        IReadOnlyDictionary<string, StepProperty> dictionary) => Value;
+//}
+
+

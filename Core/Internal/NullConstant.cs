@@ -84,7 +84,18 @@ public class NullConstant : IConstantStep, IConstantFreezableStep, IStep<SCLNull
     public Type OutputType => typeof(SCLNull);
 
     /// <inheritdoc />
-    string IStep.Serialize(SerializeOptions options) => SCLNull.Instance.Serialize(options);
+    public string Serialize(SerializeOptions options) => SCLNull.Instance.Serialize(options);
+
+    /// <inheritdoc />
+    public void Format(
+        IndentationStringBuilder indentationStringBuilder,
+        FormattingOptions options,
+        Stack<Comment> remainingComments)
+    {
+        indentationStringBuilder.AppendPrecedingComments(remainingComments, TextLocation);
+
+        indentationStringBuilder.Append($"{Serialize(SerializeOptions.Serialize)}");
+    }
 
     /// <inheritdoc />
     public IEnumerable<Requirement> RuntimeRequirements
@@ -94,11 +105,6 @@ public class NullConstant : IConstantStep, IConstantFreezableStep, IStep<SCLNull
             yield break;
         }
     }
-
-    /// <summary>
-    /// The value
-    /// </summary>
-    public ISCLObject ValueObject => SCLNull.Instance;
 
     /// <inheritdoc />
     public bool Equals(IFreezableStep? other)

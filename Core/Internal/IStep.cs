@@ -3,7 +3,7 @@
 /// <summary>
 /// A step that can be run.
 /// </summary>
-public interface IStep
+public interface IStep : ISerializable
 {
     /// <summary>
     /// The name of this step.
@@ -44,11 +44,6 @@ public interface IStep
     /// The output type. Will be the generic type in IStep&lt;T&gt;
     /// </summary>
     Type OutputType { get; }
-
-    /// <summary>
-    /// Serialize this step.
-    /// </summary>
-    string Serialize(SerializeOptions options);
 
     /// <summary>
     /// Requirements for this step that can only be determined at runtime.

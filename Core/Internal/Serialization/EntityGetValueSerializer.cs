@@ -18,9 +18,26 @@ public class EntityGetValueSerializer : IStepSerializer
         var (first, second) = stepProperties.GetFirstTwo().GetValueOrThrow();
 
         var entity = first.Serialize(options);
-
-        var index = second.Serialize(options);
+        var index  = second.Serialize(options);
 
         return $"{entity}[{index}]";
+    }
+
+    /// <inheritdoc />
+    public void Format(
+        IEnumerable<StepProperty> stepProperties,
+        TextLocation? textLocation,
+        IndentationStringBuilder indentationStringBuilder,
+        FormattingOptions options,
+        Stack<Comment> remainingComments)
+    {
+        var (first, second) = stepProperties.GetFirstTwo().GetValueOrThrow();
+
+        indentationStringBuilder.AppendPrecedingComments(remainingComments, textLocation);
+
+        first.Format(indentationStringBuilder, options, remainingComments);
+        indentationStringBuilder.Append("[");
+        second.Format(indentationStringBuilder, options, remainingComments);
+        indentationStringBuilder.Append("]");
     }
 }

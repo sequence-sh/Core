@@ -1,6 +1,4 @@
-﻿using System.Text;
-
-namespace Reductech.Sequence.Core;
+﻿namespace Reductech.Sequence.Core;
 
 /// <summary>
 /// Either a list or an asynchronous list
@@ -227,12 +225,10 @@ public abstract record Array<T> : IArray where T : ISCLObject
             .ToList();
     }
 
-    void ISCLObject.Format(
-        StringBuilder stringBuilder,
-        int indentation,
+    void ISerializable.Format(
+        IndentationStringBuilder indentationStringBuilder,
         FormattingOptions options,
-        string? prefix,
-        string? suffix)
+        Stack<Comment> remainingComments)
     {
         var list = Evaluate(CancellationToken.None)
             .Result.Value
@@ -240,24 +236,23 @@ public abstract record Array<T> : IArray where T : ISCLObject
 
         if (list.Any(x => x is Entity or IArray))
         {
-            ISCLObject.AppendLineIndented(
-                stringBuilder,
-                indentation,
-                prefix + "["
+            indentationStringBuilder.AppendLine("[");
+            indentationStringBuilder.Indent();
+
+            indentationStringBuilder.AppendJoin(
+                ",",
+                true,
+                list,
+                sclObject => sclObject.Format(
+                    indentationStringBuilder,
+                    options,
+                    remainingComments
+                )
             );
 
-            indentation++;
-
-            for (var index = 0; index < list.Count; index++)
-            {
-                var sclObject  = list[index];
-                var maybeComma = index < list.Count - 1 ? "," : null;
-
-                sclObject.Format(stringBuilder, indentation, options, null, maybeComma);
-            }
-
-            indentation--;
-            ISCLObject.AppendLineIndented(stringBuilder, indentation, "]" + suffix);
+            indentationStringBuilder.AppendLineMaybe();
+            indentationStringBuilder.UnIndent();
+            indentationStringBuilder.Append("]");
         }
         else
         {
@@ -267,11 +262,7 @@ public abstract record Array<T> : IArray where T : ISCLObject
                              )
                            + "]";
 
-            ISCLObject.AppendLineIndented(
-                stringBuilder,
-                indentation,
-                prefix + line + suffix
-            );
+            indentationStringBuilder.Append(line);
         }
     }
 

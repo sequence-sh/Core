@@ -56,7 +56,7 @@ public record CreateEntityFreezableStep(FreezableEntityData FreezableEntityData)
         if (r.IsFailure)
             return r.ConvertFailure<IStep>();
 
-        return new CreateEntityStep(r.Value);
+        return new CreateEntityStep(r.Value) { TextLocation = TextLocation };
     }
 
     /// <inheritdoc />

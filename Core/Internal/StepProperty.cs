@@ -8,7 +8,7 @@ public abstract record StepProperty
     string Name,
     int Index,
     LogAttribute? LogAttribute,
-    ImmutableList<RequirementAttribute> RequiredVersions)
+    ImmutableList<RequirementAttribute> RequiredVersions) : ISerializable
 {
     /// <summary>
     /// A lambda function
@@ -27,17 +27,27 @@ public abstract record StepProperty
     )
     {
         /// <inheritdoc />
-        protected override string SerializeValue(SerializeOptions options)
+        public override TextLocation? MaybeTextLocation() => LambdaFunction.Step.TextLocation;
+
+        /// <inheritdoc />
+        public override string Serialize(SerializeOptions options)
         {
-            return LambdaFunction.Serialize(options);
+            return $"({LambdaFunction.Serialize(options)})";
         }
 
         /// <inheritdoc />
-        public override string ToString() =>
-            $"{Name} = {SerializeValue(SerializeOptions.Serialize)}";
+        public override void Format(
+            IndentationStringBuilder indentationStringBuilder,
+            FormattingOptions options,
+            Stack<Comment> remainingComments)
+        {
+            indentationStringBuilder.Append("(");
+            LambdaFunction.Format(indentationStringBuilder, options, remainingComments);
+            indentationStringBuilder.Append(")");
+        }
 
         /// <inheritdoc />
-        protected override bool ShouldBracketWhenSerialized => true;
+        public override string ToString() => $"{Name} = {Serialize(SerializeOptions.Serialize)}";
     }
 
     /// <summary>
@@ -56,14 +66,23 @@ public abstract record StepProperty
     )
     {
         /// <inheritdoc />
+        public override TextLocation? MaybeTextLocation() => null;
+
+        /// <inheritdoc />
         public override string ToString() => $"{Name} = {VariableName}";
 
         /// <inheritdoc />
-        protected override string SerializeValue(SerializeOptions options) =>
+        public override string Serialize(SerializeOptions options) =>
             VariableName.Serialize(options);
 
         /// <inheritdoc />
-        protected override bool ShouldBracketWhenSerialized { get; } = false;
+        public override void Format(
+            IndentationStringBuilder indentationStringBuilder,
+            FormattingOptions options,
+            Stack<Comment> remainingComments)
+        {
+            indentationStringBuilder.Append(Serialize(SerializeOptions.Serialize));
+        }
     }
 
     /// <summary>
@@ -82,15 +101,40 @@ public abstract record StepProperty
     )
     {
         /// <inheritdoc />
+        public override TextLocation? MaybeTextLocation() => Step.TextLocation;
+
+        /// <inheritdoc />
         public override string ToString() => $"{Name} = {Step}";
 
         /// <inheritdoc />
-        protected override string SerializeValue(SerializeOptions options) =>
-            Step.Serialize(options);
+        public override string Serialize(SerializeOptions options)
+        {
+            var v = Step.Serialize(options);
+
+            if (Step.ShouldBracketWhenSerialized)
+                return $"({v})";
+
+            return v;
+        }
 
         /// <inheritdoc />
-        protected override bool ShouldBracketWhenSerialized { get; } =
-            Step.ShouldBracketWhenSerialized;
+        public override void Format(
+            IndentationStringBuilder indentationStringBuilder,
+            FormattingOptions options,
+            Stack<Comment> remainingComments)
+        {
+            if (Step.ShouldBracketWhenSerialized)
+                indentationStringBuilder.Append("(");
+
+            Step.Format(
+                indentationStringBuilder,
+                options,
+                remainingComments
+            );
+
+            if (Step.ShouldBracketWhenSerialized)
+                indentationStringBuilder.Append(")");
+        }
     }
 
     /// <summary>
@@ -112,7 +156,7 @@ public abstract record StepProperty
         public override string ToString() => $"{Name} = {StepList}";
 
         /// <inheritdoc />
-        protected override string SerializeValue(SerializeOptions options)
+        public override string Serialize(SerializeOptions options)
         {
             var l = StepList.Select(
                     s =>
@@ -120,9 +164,7 @@ public abstract record StepProperty
                         var ser = s.Serialize(options);
 
                         if (s.ShouldBracketWhenSerialized)
-                        {
                             return $"({ser})";
-                        }
 
                         return ser;
                     }
@@ -133,29 +175,44 @@ public abstract record StepProperty
         }
 
         /// <inheritdoc />
-        protected override bool ShouldBracketWhenSerialized { get; } = false;
+        public override void Format(
+            IndentationStringBuilder indentationStringBuilder,
+            FormattingOptions options,
+            Stack<Comment> remainingComments)
+        {
+            indentationStringBuilder.Append("[");
+
+            indentationStringBuilder.AppendJoin(
+                ", ",
+                false,
+                StepList,
+                step => step.Format(
+                    indentationStringBuilder,
+                    options,
+                    remainingComments
+                )
+            );
+
+            indentationStringBuilder.Append("]");
+        }
+
+        /// <inheritdoc />
+        public override TextLocation? MaybeTextLocation() => null;
     }
-
-    /// <summary>
-    /// Get the serialized value
-    /// </summary>
-    protected abstract string SerializeValue(SerializeOptions options);
-
-    /// <summary>
-    /// Whether the value should be bracketed when it was serialized
-    /// </summary>
-    protected abstract bool ShouldBracketWhenSerialized { get; }
 
     /// <summary>
     /// Serialize this
     /// </summary>
-    public string Serialize(SerializeOptions options)
-    {
-        var v = SerializeValue(options);
+    public abstract string Serialize(SerializeOptions options);
 
-        if (ShouldBracketWhenSerialized)
-            return $"({v})";
+    /// <inheritdoc />
+    public abstract void Format(
+        IndentationStringBuilder indentationStringBuilder,
+        FormattingOptions options,
+        Stack<Comment> remainingComments);
 
-        return v;
-    }
+    /// <summary>
+    /// Get the text location if present
+    /// </summary>
+    public abstract TextLocation? MaybeTextLocation();
 }

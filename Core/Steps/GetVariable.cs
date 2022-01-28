@@ -91,9 +91,37 @@ public sealed class GetVariable<T> : CompoundStep<T> where T : ISCLObject
         public override string OutputTypeExplanation => "T";
 
         /// <inheritdoc />
-        public override IStepSerializer Serializer => new StepSerializer(
-            TypeName,
-            new StepComponent(nameof(GetVariable<ISCLObject>.Variable))
-        );
+        public override IStepSerializer Serializer => GetVariableSerializer.SerializerInstance;
+
+        private class GetVariableSerializer : IStepSerializer
+        {
+            private GetVariableSerializer() { }
+
+            /// <summary>
+            /// The instance
+            /// </summary>
+            public static IStepSerializer SerializerInstance { get; } = new GetVariableSerializer();
+
+            /// <inheritdoc />
+            public string Serialize(
+                SerializeOptions options,
+                IEnumerable<StepProperty> stepProperties)
+            {
+                var property = stepProperties.OfType<StepProperty.VariableNameProperty>().Single();
+                return property.Serialize(options);
+            }
+
+            /// <inheritdoc />
+            public void Format(
+                IEnumerable<StepProperty> stepProperties,
+                TextLocation? textLocation,
+                IndentationStringBuilder indentationStringBuilder,
+                FormattingOptions options,
+                Stack<Comment> remainingComments)
+            {
+                var property = stepProperties.OfType<StepProperty.VariableNameProperty>().Single();
+                property.Format(indentationStringBuilder, options, remainingComments);
+            }
+        }
     }
 }

@@ -95,6 +95,75 @@ public record CreateEntityStep
     }
 
     /// <inheritdoc />
+    public void Format(
+        IndentationStringBuilder indentationStringBuilder,
+        FormattingOptions options,
+        Stack<Comment> remainingComments)
+    {
+        indentationStringBuilder.AppendPrecedingComments(remainingComments, TextLocation);
+
+        if (Properties.Count <= 1)
+        {
+            indentationStringBuilder.Append("(");
+            AppendProperties(false);
+            indentationStringBuilder.AppendContainingComments(remainingComments, TextLocation);
+            indentationStringBuilder.Append(")");
+        }
+
+        else
+        {
+            indentationStringBuilder.AppendLine("(");
+            indentationStringBuilder.Indent();
+
+            AppendProperties(true);
+
+            indentationStringBuilder.AppendContainingComments(remainingComments, TextLocation);
+
+            indentationStringBuilder.AppendLineMaybe();
+            indentationStringBuilder.UnIndent();
+            indentationStringBuilder.Append(")");
+        }
+
+        void AppendProperties(bool appendLine)
+        {
+            var propertiesList = Properties.ToList();
+            var longestKey     = Properties.Keys.Select(x => x.AsString.Length).Max();
+
+            indentationStringBuilder.AppendJoin(
+                "",
+                false,
+                propertiesList,
+                pair =>
+                {
+                    var (key, value) = pair;
+
+                    indentationStringBuilder.AppendPrecedingComments(
+                        remainingComments,
+                        value.TextLocation
+                    );
+
+                    if (appendLine)
+                        indentationStringBuilder.AppendLineMaybe();
+
+                    indentationStringBuilder.Append($"{$"'{key}'".PadRight(longestKey + 2)}: ");
+
+                    if (value.ShouldBracketWhenSerialized)
+                        indentationStringBuilder.Append("(");
+
+                    value.Format(
+                        indentationStringBuilder,
+                        options,
+                        remainingComments
+                    );
+
+                    if (value.ShouldBracketWhenSerialized)
+                        indentationStringBuilder.Append(")");
+                }
+            );
+        }
+    }
+
+    /// <inheritdoc />
     public IEnumerable<Requirement> RuntimeRequirements
     {
         get

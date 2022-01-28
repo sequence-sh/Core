@@ -130,13 +130,51 @@ public sealed class SetVariable<T> : CompoundStep<Unit> where T : ISCLObject
         }
 
         /// <inheritdoc />
-        public override IStepSerializer Serializer => new StepSerializer(
-            TypeName,
-            new StepComponent(nameof(SetVariable<ISCLObject>.Variable)),
-            SpaceComponent.Instance,
-            new FixedStringComponent("="),
-            SpaceComponent.Instance,
-            new StepComponent(nameof(SetVariable<ISCLObject>.Value))
-        );
+        public override IStepSerializer Serializer => SetVariableStepSerializer.SerializerInstance;
+
+        private class SetVariableStepSerializer : IStepSerializer
+        {
+            private SetVariableStepSerializer() { }
+
+            /// <summary>
+            /// The instance
+            /// </summary>
+            public static IStepSerializer SerializerInstance { get; } =
+                new SetVariableStepSerializer();
+
+            /// <inheritdoc />
+            public string Serialize(
+                SerializeOptions options,
+                IEnumerable<StepProperty> stepProperties)
+            {
+                var list     = stepProperties.ToList();
+                var variable = list.OfType<StepProperty.VariableNameProperty>().Single();
+                var step     = list.OfType<StepProperty.SingleStepProperty>().Single();
+
+                var vString = variable.Serialize(options);
+                var sString = step.Serialize(options);
+
+                var r = $"{vString} = {sString}";
+
+                return r;
+            }
+
+            /// <inheritdoc />
+            public void Format(
+                IEnumerable<StepProperty> stepProperties,
+                TextLocation? textLocation,
+                IndentationStringBuilder indentationStringBuilder,
+                FormattingOptions options,
+                Stack<Comment> remainingComments)
+            {
+                var list     = stepProperties.ToList();
+                var variable = list.OfType<StepProperty.VariableNameProperty>().Single();
+                var step     = list.OfType<StepProperty.SingleStepProperty>().Single();
+
+                variable.Format(indentationStringBuilder, options, remainingComments);
+                indentationStringBuilder.Append(" = ");
+                step.Format(indentationStringBuilder, options, remainingComments);
+            }
+        }
     }
 }

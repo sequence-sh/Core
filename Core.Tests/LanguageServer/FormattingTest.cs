@@ -14,11 +14,10 @@ public class FormattingTest
     [InlineData(
         "RestGetJson baseurl: 'abc' #First Comment\r\nrelativeurl: 'def' /*Second Comment*/headers: (a: 1, b: 2)",
         @"RESTGetJSON
-	BaseURL: ""abc""
+	BaseURL: ""abc"" #First Comment
 	RelativeURL: ""def""
-	Headers: (a: 1,b: 2)
-#First Comment
-/*Second Comment*/ [start: (0, 0), end: (1, 58)]"
+    /*Second Comment*/
+	Headers: (a: 1,b: 2) [start: (0, 0), end: (1, 58)]"
     )]
     [InlineData(
         "print (StringToCase 'ab' /* my comment */ textcase.upper)",
@@ -35,6 +34,20 @@ public class FormattingTest
 		String: <v>
 		Case: TextCase.Upper
 	)))"
+    )]
+    [InlineData(
+        @"- (
+  a: 1, #a
+  b: 1, #b
+  c: 1, #c
+  d: 1 #d
+)",
+        @"- (
+	'a': 1#a
+	'b': 1#b
+	'c': 1#c
+	'd': 1#d
+) [start: (0, 0), end: (5, 1)]"
     )]
     public void ShouldGiveCorrectFormatting(string text, params string[] expectedFormattings)
     {

@@ -103,6 +103,40 @@ public sealed class StringInterpolate : CompoundStep<StringStream>
 
                 return sb.ToString();
             }
+
+            /// <inheritdoc />
+            public void Format(
+                IEnumerable<StepProperty> stepProperties,
+                TextLocation? textLocation,
+                IndentationStringBuilder indentationStringBuilder,
+                FormattingOptions options,
+                Stack<Comment>? remainingComments = null)
+            {
+                indentationStringBuilder.AppendPrecedingComments(remainingComments, textLocation);
+                indentationStringBuilder.Append("$\"");
+
+                foreach (var step in stepProperties.Cast<StepProperty.StepListProperty>()
+                             .Single()
+                             .StepList)
+                {
+                    if (step is SCLConstant<StringStream> sc)
+                    {
+                        var stepString = SerializationMethods.Escape(
+                            sc.Value.Serialize(SerializeOptions.Primitive)
+                        );
+
+                        indentationStringBuilder.Append(stepString);
+                    }
+                    else
+                    {
+                        indentationStringBuilder.Append("{");
+                        step.Format(indentationStringBuilder, options, remainingComments);
+                        indentationStringBuilder.Append("}");
+                    }
+                }
+
+                indentationStringBuilder.Append("");
+            }
         }
     }
 }
