@@ -15,4 +15,15 @@ public sealed class ArraySerializer : IStepSerializer
     /// <inheritdoc />
     public string Serialize(SerializeOptions options, IEnumerable<StepProperty> stepProperties) =>
         stepProperties.Single().Serialize(options);
+
+    /// <inheritdoc />
+    public void Format(
+        IEnumerable<StepProperty> stepProperties,
+        TextLocation? textLocation,
+        IndentationStringBuilder indentationStringBuilder,
+        FormattingOptions options,
+        Stack<Comment> remainingComments)
+    {
+        stepProperties.Single().Format(indentationStringBuilder, options, remainingComments);
+    }
 }

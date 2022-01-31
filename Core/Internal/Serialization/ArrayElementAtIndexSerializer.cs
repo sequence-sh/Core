@@ -23,4 +23,15 @@ public class ArrayElementAtIndexSerializer : IStepSerializer
 
         return $"{entity}[{index}]";
     }
+
+    /// <inheritdoc />
+    public void Format(
+        IEnumerable<StepProperty> stepProperties,
+        TextLocation? textLocation,
+        IndentationStringBuilder indentationStringBuilder,
+        FormattingOptions options,
+        Stack<Comment>? remainingComments = null)
+    {
+        indentationStringBuilder.AppendPrecedingComments(remainingComments, textLocation);
+    }
 }

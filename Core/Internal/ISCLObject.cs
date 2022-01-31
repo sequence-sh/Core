@@ -1,20 +1,15 @@
 ﻿using System.Runtime.Serialization;
 using System.Text;
 using System.Text.Json.Serialization;
+using ISerializable = Reductech.Sequence.Core.Internal.Serialization.ISerializable;
 
 namespace Reductech.Sequence.Core.Internal;
 
 /// <summary>
 /// Base class for all SCL Objects
 /// </summary>
-public interface ISCLObject
+public interface ISCLObject : ISerializable
 {
-    /// <summary>
-    /// Serialize this object
-    /// </summary>
-    [Pure]
-    string Serialize(SerializeOptions options);
-
     /// <summary>
     /// The Type Reference
     /// </summary>
@@ -106,23 +101,6 @@ public interface ISCLObject
     object? ToCSharpObject();
 
     /// <summary>
-    /// Format this object as a multiline indented string
-    /// </summary>
-    public virtual void Format(
-        StringBuilder stringBuilder,
-        int indentation,
-        FormattingOptions options,
-        string? prefix = null,
-        string? suffix = null)
-    {
-        AppendLineIndented(
-            stringBuilder,
-            indentation,
-            prefix + Serialize(SerializeOptions.Serialize) + suffix
-        );
-    }
-
-    /// <summary>
     /// Append a line to a StringBuilder
     /// </summary>
     static void AppendLineIndented(StringBuilder sb, int indentation, string value)
@@ -130,6 +108,22 @@ public interface ISCLObject
         sb.Append('\t', indentation);
         sb.AppendLine(value);
     }
+
+    void ISerializable.Format(
+        IndentationStringBuilder indentationStringBuilder,
+        FormattingOptions options,
+        Stack<Comment> remainingComments)
+    {
+        indentationStringBuilder.Append(Serialize(SerializeOptions.Serialize));
+    }
+
+    //FormatComponent ISerializable.GetFormatComponent(FormattingOptions options)
+    //{
+    //    return new FormatComponent.SingleValueComponent(
+    //        Serialize(SerializeOptions.Serialize),
+    //        ImmutableList<Comment>.Empty
+    //    );
+    //}
 
     /// <summary>
     /// Gets the default value for a particular SCL Type

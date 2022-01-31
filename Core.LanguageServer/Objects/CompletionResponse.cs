@@ -1,8 +1,9 @@
 ﻿namespace Reductech.Sequence.Core.LanguageServer.Objects;
 
-public class CompletionResponse
+public record CompletionResponse(bool IsIncomplete, IReadOnlyList<CompletionItem> Items)
 {
-    public bool IsIncomplete { get; set; }
-
-    public IReadOnlyList<CompletionItem> Items { get; set; }
+    public CompletionResponse Offset(LinePosition linePosition) => this with
+    {
+        Items = Items.Select(x => x.Offset(linePosition)).ToList()
+    };
 }

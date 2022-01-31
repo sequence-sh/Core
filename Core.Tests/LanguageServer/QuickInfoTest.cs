@@ -3,7 +3,7 @@ using Reductech.Sequence.Core.LanguageServer.Objects;
 
 namespace Reductech.Sequence.Core.Tests.LanguageServer;
 
-public class HoverTest
+public class QuickInfoTest
 {
     public const string LongText = @"[(artist: 'Blake, Robert' artistid: 123)]
 | ArrayFilter ((from <entity> 'artist') == 'Blake, Robert')
@@ -16,7 +16,55 @@ public class HoverTest
 
     [Theory]
     [InlineData("Print 123", 0, 1, "`Print`", "`Unit`", "Prints a value to the console.")]
-    [InlineData("Print 123", 0, 8, "`123`",   "`SCLInt`")]
+    [InlineData("Print True", 0, 7, "`True`", "`SCLBool`")]
+    [InlineData("Print .", 0, 7, "Syntax Error: no viable alternative at input 'Print .'")]
+    [InlineData("Print 1990-01-06", 0, 7, "`1990-01-06`", "`SCLDateTime`")]
+    [InlineData("Print 123", 0, 8, "`123`", "`SCLInt`")]
+    [InlineData("Print 123.45", 0, 8, "`123.45`", "`SCLDouble`")]
+    [InlineData("Print TextCase.Fake", 0, 8, "'Fake' is not a member of enumeration 'TextCase'")]
+    [InlineData("Print Fake.Enum", 0, 8, "'Fake' is not a valid enum type.")]
+    [InlineData(
+        "StringToCase 'abc' TextCase.Upper",
+        0,
+        15,
+        "`'abc'`",
+        "`StringStream`"
+    )]
+    [InlineData(
+        "StringToCase string:'abc' Case: TextCase.Upper",
+        0,
+        28,
+        "`Case`",
+        "`SCLEnum`1`",
+        "The case to change to."
+    )]
+    [InlineData("Foreach [1,2,3] (<> => Print <>)", 0, 30, "`<>`", "Automatic Variable")]
+    [InlineData(
+        "print TextCase.Upper",
+        0,
+        8,
+        "`Upper`",
+        "`TextCase`",
+        "The case to convert the text to."
+    )]
+    [InlineData("1  +  2", 0, 2, "`Sum`", "`SCLInt`", "Calculate the sum of a list of integers")]
+    [InlineData("<a> = 1", 0, 5, "`SetVariable`", "`Unit`", "Sets the value of a named variable.")]
+    [InlineData("Print <a>", 0, 7, "`<a>`", "`Any`")]
+    [InlineData(
+        "- <a> = 1\r\n- Print <a>",
+        1,
+        10,
+        "`<a>`",
+        "`SCLInt`"
+    )]
+    [InlineData(
+        "Print [1,2,3]",
+        0,
+        6,
+        "`ArrayNew`",
+        "`Array<SCLInt>`",
+        "Represents an ordered collection of objects."
+    )]
     [InlineData(
         "- Print 123\r\n- a b",
         0,
@@ -25,6 +73,7 @@ public class HoverTest
         "`Unit`",
         "Prints a value to the console."
     )]
+    [InlineData("- a .", 0, 3, "Syntax Error: no viable alternative at input '- a .'")]
     //[InlineData("- Print 123\r\n- a b", 1 ,1, "Syntax Error: no viable alternative at input '- a b'" )]
     [InlineData("- <val> = 123\r\n- print <val>", 1, 9,  "`<val>`",           "`SCLInt`")]
     [InlineData(LongText,                         0, 12, "`'Blake, Robert'`", "`StringStream`")]
@@ -44,7 +93,7 @@ public class HoverTest
         "`T`",
         "A function that determines whether an entity should be included."
     )]
-    public void ShouldGiveCorrectHover(
+    public void ShouldGiveCorrectQuickInfo(
         string text,
         int line,
         int character,
@@ -53,9 +102,9 @@ public class HoverTest
         var sfs = StepFactoryStore.Create();
 
         var hover =
-            HoverHelper.GetQuickInfoAsync(
+            QuickInfoHelper.GetQuickInfoAsync(
                 text,
-                new QuickInfoRequest() { Column = character, Line = line },
+                new LinePosition(line, character),
                 sfs
             );
 

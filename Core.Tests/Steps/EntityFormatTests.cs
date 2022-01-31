@@ -92,8 +92,28 @@ public partial class EntityFormatTests : StepTestBase<EntityFormat, StringStream
                 @"(
     'prop1': 123
     'prop2': ""abc""
-)
-"
+)"
+            );
+
+            yield return new StepCase(
+                "Format Entity with different length names",
+                new Log()
+                {
+                    Value = new EntityFormat()
+                    {
+                        Entity = Constant(
+                            Entity.Create(
+                                ("longprop1", 123),
+                                ("p2", "abc")
+                            )
+                        )
+                    }
+                },
+                Unit.Default,
+                @"(
+    'longprop1': 123
+    'p2'       : ""abc""
+)"
             );
 
             yield return new StepCase(
@@ -150,8 +170,7 @@ public partial class EntityFormatTests : StepTestBase<EntityFormat, StringStream
 		[4, 5, 6],
 		[7, 8, 9]
 	]
-)
-"
+)"
             );
         }
     }

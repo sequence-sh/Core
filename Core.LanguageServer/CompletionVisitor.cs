@@ -199,29 +199,25 @@ public class CompletionVisitor : SCLBaseVisitor<CompletionResponse?>
     {
         var items = stepFactories.SelectMany(CreateCompletionItems).ToList();
 
-        return new CompletionResponse() { Items = items, IsIncomplete = false };
+        return new CompletionResponse(false, items);
 
         IEnumerable<CompletionItem> CreateCompletionItems(IGrouping<IStepFactory, string> factory)
         {
             var documentation = Helpers.GetMarkDownDocumentation(factory);
 
+            var first = true;
+
             foreach (var key in factory)
             {
-                yield return new()
-                {
-                    TextEdit = new LinePositionSpanTextChange()
-                    {
-                        NewText     = key,
-                        StartLine   = range.StartLineNumber,
-                        EndLine     = range.EndLineNumber,
-                        StartColumn = range.StartColumn,
-                        EndColumn   = range.EndColumn,
-                    },
-                    Label            = key,
-                    InsertTextFormat = InsertTextFormat.PlainText,
-                    Detail           = factory.Key.Summary,
-                    Documentation    = documentation
-                };
+                yield return new(
+                    key,
+                    factory.Key.Summary,
+                    documentation,
+                    first,
+                    new SCLTextEdit(key, range)
+                );
+
+                first = false;
             }
         }
     }
@@ -244,30 +240,23 @@ public class CompletionVisitor : SCLBaseVisitor<CompletionResponse?>
             stepFactory.ParameterDictionary
                 .Where(x => x.Key is StepParameterReference.Named)
                 .Where(x => !usedNamedArguments.Contains(x.Value.Name))
-                .Select(x => CreateCompletionItem(x.Key, x.Value))
+                .Select((x, i) => CreateCompletionItem(x.Key, x.Value, i == 0))
                 .ToList();
 
         CompletionItem CreateCompletionItem(
             StepParameterReference stepParameterReference,
-            IStepParameter stepParameter)
+            IStepParameter stepParameter,
+            bool preselect)
         {
-            return new()
-            {
-                TextEdit = new LinePositionSpanTextChange()
-                {
-                    NewText     = stepParameterReference.Name + ":",
-                    StartLine   = range.StartLineNumber,
-                    StartColumn = range.StartColumn,
-                    EndLine     = range.EndLineNumber,
-                    EndColumn   = range.EndColumn
-                },
-                Label            = stepParameterReference.Name,
-                InsertTextFormat = InsertTextFormat.PlainText,
-                Detail           = stepParameter.Summary,
-                Documentation    = documentation
-            };
+            return new CompletionItem(
+                stepParameterReference.Name,
+                stepParameter.Summary,
+                documentation,
+                preselect,
+                new SCLTextEdit(stepParameterReference.Name + ":", range)
+            );
         }
 
-        return new CompletionResponse() { Items = options, IsIncomplete = false };
+        return new CompletionResponse(false, options);
     }
 }

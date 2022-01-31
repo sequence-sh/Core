@@ -81,6 +81,21 @@ public abstract class CompoundStep<T> : ICompoundStep<T> where T : ISCLObject
         StepFactory.Serializer.Serialize(options, AllProperties);
 
     /// <inheritdoc />
+    public void Format(
+        IndentationStringBuilder indentationStringBuilder,
+        FormattingOptions options,
+        Stack<Comment> remainingComments)
+    {
+        StepFactory.Serializer.Format(
+            AllProperties,
+            TextLocation,
+            indentationStringBuilder,
+            options,
+            remainingComments
+        );
+    }
+
+    /// <inheritdoc />
     public virtual string Name => StepFactory.TypeName;
 
     /// <inheritdoc />

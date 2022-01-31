@@ -6,8 +6,13 @@ namespace Reductech.Sequence.Core.Tests.LanguageServer;
 public class SignatureHelpTest
 {
     [Theory]
-    [InlineData("ArrayFilter", 0, 12, "ArrayFilter")]
-    [InlineData("ArrayFilter", 0, 1,  null)]
+    [InlineData("ArrayFilter",                                    0, 12, "ArrayFilter")]
+    [InlineData("ArrayFilter",                                    0, 1,  null)]
+    [InlineData("- log ",                                         0, 7,  "Log")]
+    [InlineData("- log Value: 1",                                 0, 7,  "Log")]
+    [InlineData("- log 1",                                        0, 7,  null)]
+    [InlineData("- log Q",                                        0, 7,  null)]
+    [InlineData("StringToCase string:'abc' Case: TextCase.Upper", 0, 15, "StringToCase")]
     public void ShouldGiveCorrectSignatureHelp(
         string text,
         int line,
@@ -16,21 +21,16 @@ public class SignatureHelpTest
     {
         var sfs = StepFactoryStore.Create();
 
-        var visitor = new SignatureHelpVisitor(new LinePosition(line, character), sfs);
+        var linePosition = new LinePosition(line, character);
 
-        var signatureHelpResponse = visitor.LexParseAndVisit(
-            text,
-            x => x.RemoveErrorListeners(),
-            x => x.RemoveErrorListeners()
-        );
+        var response = SignatureHelpHelper.GetSignatureHelpResponse(text, linePosition, sfs);
 
         if (expectedLabel is null)
         {
-            signatureHelpResponse.Should().BeNull("Expected Signature Help is null");
+            response.Signatures.Should().BeEmpty("Expected Signature Help is empty");
             return;
         }
 
-        signatureHelpResponse.Should().NotBeNull();
-        signatureHelpResponse!.Signatures.First().Label.Should().Be(expectedLabel);
+        response.Signatures.First().Label.Should().Be(expectedLabel);
     }
 }

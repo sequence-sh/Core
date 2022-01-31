@@ -27,15 +27,15 @@ public record LambdaFunction<TInput, TOutput> : LambdaFunction
 /// <summary>
 /// A lambda function
 /// </summary>
-public record LambdaFunction
+public record LambdaFunction : ISerializable
 {
     /// <summary>
     /// A lambda function
     /// </summary>
     protected LambdaFunction(VariableName? variable, IStep step)
     {
-        this.Variable = variable;
-        this.Step     = step;
+        Variable = variable;
+        Step     = step;
     }
 
     /// <summary>
@@ -51,6 +51,22 @@ public record LambdaFunction
         }
 
         return $"{Variable.Value.Serialize(options)} => {stepSerialized}";
+    }
+
+    /// <inheritdoc />
+    public void Format(
+        IndentationStringBuilder indentationStringBuilder,
+        FormattingOptions options,
+        Stack<Comment> remainingComments)
+    {
+        var variable = Variable is null
+            ? "<>"
+            : Variable.Value.Serialize(SerializeOptions.Serialize);
+
+        indentationStringBuilder.Append($"{variable} => ");
+        indentationStringBuilder.Indent();
+        Step.Format(indentationStringBuilder, options, remainingComments);
+        indentationStringBuilder.UnIndent();
     }
 
     /// <summary>

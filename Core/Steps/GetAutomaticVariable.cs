@@ -105,6 +105,18 @@ public sealed class GetAutomaticVariable<T> : CompoundStep<T> where T : ISCLObje
             {
                 return "<>";
             }
+
+            /// <inheritdoc />
+            public void Format(
+                IEnumerable<StepProperty> stepProperties,
+                TextLocation? textLocation,
+                IndentationStringBuilder indentationStringBuilder,
+                FormattingOptions options,
+                Stack<Comment>? remainingComments = null)
+            {
+                indentationStringBuilder.AppendPrecedingComments(remainingComments, textLocation);
+                indentationStringBuilder.Append("<>");
+            }
         }
     }
 }

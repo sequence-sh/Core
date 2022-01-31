@@ -49,6 +49,16 @@ public abstract class OneOfStep : IStep
     public string Serialize(SerializeOptions options) => StepValue.Serialize(options);
 
     /// <inheritdoc />
+    public void Format(
+        IndentationStringBuilder indentationStringBuilder,
+        FormattingOptions options,
+        Stack<Comment> remainingComments) => StepValue.Format(
+        indentationStringBuilder,
+        options,
+        remainingComments
+    );
+
+    /// <inheritdoc />
     public IEnumerable<Requirement> RuntimeRequirements => StepValue.RuntimeRequirements;
 
     /// <inheritdoc />

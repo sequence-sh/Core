@@ -1,4 +1,4 @@
-﻿namespace Reductech.Sequence.Core.Internal;
+﻿namespace Reductech.Sequence.Core.Internal.Serialization;
 
 /// <summary>
 /// Options for formatting an scl object

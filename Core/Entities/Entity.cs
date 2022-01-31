@@ -371,29 +371,72 @@ public sealed partial record Entity(
     /// <returns></returns>
     public string Format()
     {
-        var sb = new StringBuilder();
-        (this as ISCLObject).Format(sb, 0, new FormattingOptions());
+        var sb = new IndentationStringBuilder();
+
+        (this as ISCLObject).Format(
+            sb,
+            new FormattingOptions(),
+            new Stack<Comment>()
+        );
+
         return sb.ToString();
     }
 
-    void ISCLObject.Format(
-        StringBuilder stringBuilder,
-        int indentation,
+    void ISerializable.Format(
+        IndentationStringBuilder indentationStringBuilder,
         FormattingOptions options,
-        string? prefix,
-        string? suffix)
+        Stack<Comment> remainingComments)
     {
-        ISCLObject.AppendLineIndented(stringBuilder, indentation, prefix + "(");
-
-        indentation++;
-
-        foreach (var (name, sclObject, _) in this)
+        if (Dictionary.Count <= 1)
         {
-            sclObject.Format(stringBuilder, indentation, options, $"'{name}': ");
-        }
+            indentationStringBuilder.Append("(");
 
-        indentation--;
-        ISCLObject.AppendLineIndented(stringBuilder, indentation, ")" + suffix);
+            //TODO use compound names for nested entities
+
+            foreach (var (name, sclObject, _) in this)
+            {
+                indentationStringBuilder.Append($"{name}: ");
+
+                sclObject.Format(
+                    indentationStringBuilder,
+                    options,
+                    remainingComments
+                );
+            }
+
+            indentationStringBuilder.Append(")");
+        }
+        else
+        {
+            indentationStringBuilder.AppendLine("(");
+            indentationStringBuilder.Indent();
+
+            //TODO use compound names for nested entities
+
+            var longestPropertyName = Dictionary.Keys.Select(x => x.Length).Max();
+
+            indentationStringBuilder.AppendJoin(
+                "",
+                true,
+                this,
+                ep =>
+                {
+                    indentationStringBuilder.Append(
+                        $"{$"'{ep.Name}'".PadRight(longestPropertyName + 2)}: "
+                    );
+
+                    ep.Value.Format(
+                        indentationStringBuilder,
+                        options,
+                        remainingComments
+                    );
+                }
+            );
+
+            indentationStringBuilder.AppendLineMaybe();
+            indentationStringBuilder.UnIndent();
+            indentationStringBuilder.Append(")");
+        }
     }
 
     /// <summary>

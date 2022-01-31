@@ -1,27 +1,23 @@
-﻿using CSharpFunctionalExtensions;
-using Namotion.Reflection;
-using Reductech.Sequence.Core.Internal.Serialization;
+﻿using Namotion.Reflection;
 
 namespace Reductech.Sequence.Core.LanguageServer;
 
 /// <summary>
-/// Visits SCL to find hover
+/// Visits SCL to find quick info
 /// </summary>
-public class HoverVisitor : SCLBaseVisitor<QuickInfoResponse?>
+public class QuickInfoVisitor : SCLBaseVisitor<QuickInfoResponse?>
 {
     /// <summary>
-    /// Create a new HoverVisitor
+    /// Create a new QuickInfoVisitor
     /// </summary>
-    public HoverVisitor(
+    public QuickInfoVisitor(
         LinePosition position,
-        LinePosition positionOffset,
         StepFactoryStore stepFactoryStore,
         Lazy<Result<TypeResolver, IError>> lazyTypeResolver)
     {
-        LinePosition       = position;
-        LinePositionOffset = positionOffset;
-        StepFactoryStore   = stepFactoryStore;
-        LazyTypeResolver   = lazyTypeResolver;
+        LinePosition     = position;
+        StepFactoryStore = stepFactoryStore;
+        LazyTypeResolver = lazyTypeResolver;
     }
 
     /// <summary>
@@ -48,14 +44,9 @@ public class HoverVisitor : SCLBaseVisitor<QuickInfoResponse?>
     }
 
     /// <summary>
-    /// The position of the hover
+    /// The position of the QuickInfo
     /// </summary>
     public LinePosition LinePosition { get; }
-
-    /// <summary>
-    /// The position offset
-    /// </summary>
-    public LinePosition LinePositionOffset { get; }
 
     /// <summary>
     /// The Step Factory Store
@@ -128,7 +119,9 @@ public class HoverVisitor : SCLBaseVisitor<QuickInfoResponse?>
                             {
                                 return Description(
                                     stepParameter.Name,
-                                    stepParameter.ActualType.Name,
+                                    TypeNameHelper.GetHumanReadableTypeName(
+                                        stepParameter.ActualType
+                                    ),
                                     stepParameter.Summary
                                 );
                             }
@@ -176,10 +169,8 @@ public class HoverVisitor : SCLBaseVisitor<QuickInfoResponse?>
                 summary
             );
         }
-        else
-        {
-            return Error(name);
-        }
+
+        return Error(name);
     }
 
     /// <inheritdoc />
@@ -261,15 +252,17 @@ public class HoverVisitor : SCLBaseVisitor<QuickInfoResponse?>
             return Error($"'{prefix}' is not a valid enum type.");
         }
 
-        if (!Enum.TryParse(enumType, suffix, true, out var value))
+        if (!Enum.TryParse(enumType, suffix, true, out var value) || value is null)
         {
             return Error($"'{suffix}' is not a member of enumeration '{prefix}'");
         }
 
+        var summary = value.GetType().GetXmlDocsSummary();
+
         return Description(
-            value!.ToString(),
+            value.ToString(),
             enumType.Name,
-            value.GetType().GetXmlDocsSummary()
+            summary
         );
     }
 
@@ -455,18 +448,13 @@ public class HoverVisitor : SCLBaseVisitor<QuickInfoResponse?>
     private static QuickInfoResponse Description(IStep step)
     {
         var     name = step.Name;
-        string  type = GetHumanReadableTypeName(step.OutputType);
+        var     type = TypeNameHelper.GetHumanReadableTypeName(step.OutputType);
         string? description;
 
         if (step is ICompoundStep cs)
-        {
             description = cs.StepFactory.Summary;
-        }
-
         else
-        {
             description = null;
-        }
 
         return Description(name, type, description);
     }
@@ -494,57 +482,4 @@ public class HoverVisitor : SCLBaseVisitor<QuickInfoResponse?>
     {
         return new() { MarkdownStrings = new List<string>() { message } };
     }
-
-    private static string GetHumanReadableTypeName(Type t)
-    {
-        if (!t.IsSignatureType && t.IsEnum)
-            return t.Name;
-
-        if (TypeAliases.TryGetValue(t, out var name))
-            return name;
-
-        if (!t.IsGenericType)
-            return t.Name;
-
-        if (t.GetGenericTypeDefinition() == typeof(Nullable<>))
-        {
-            var underlyingType = Nullable.GetUnderlyingType(t);
-
-            if (underlyingType == null)
-                return t.Name;
-
-            return GetHumanReadableTypeName(underlyingType) + "?";
-        }
-
-        var typeName = t.Name.Split("`")[0];
-
-        var arguments =
-            $"<{string.Join(",", t.GetGenericArguments().Select(GetHumanReadableTypeName))}>";
-
-        return typeName + arguments;
-    }
-
-    private static readonly Dictionary<Type, string> TypeAliases =
-        new()
-        {
-            { typeof(byte), "byte" },
-            { typeof(sbyte), "sbyte" },
-            { typeof(short), "short" },
-            { typeof(ushort), "ushort" },
-            { typeof(int), "int" },
-            { typeof(uint), "uint" },
-            { typeof(long), "long" },
-            { typeof(ulong), "ulong" },
-            { typeof(float), "float" },
-            { typeof(double), "double" },
-            { typeof(decimal), "decimal" },
-            { typeof(object), "object" },
-            { typeof(bool), "bool" },
-            { typeof(char), "char" },
-            { typeof(string), "string" },
-            { typeof(StringStream), "string" },
-            { typeof(CSharpFunctionalExtensions.Entity), "entity" },
-            { typeof(DateTime), "dateTime" },
-            { typeof(void), "void" }
-        };
 }
