@@ -1,6 +1,4 @@
-﻿using CSharpFunctionalExtensions;
-using Namotion.Reflection;
-using Reductech.Sequence.Core.Internal.Serialization;
+﻿using Namotion.Reflection;
 
 namespace Reductech.Sequence.Core.LanguageServer;
 
@@ -121,7 +119,9 @@ public class QuickInfoVisitor : SCLBaseVisitor<QuickInfoResponse?>
                             {
                                 return Description(
                                     stepParameter.Name,
-                                    GetHumanReadableTypeName(stepParameter.ActualType),
+                                    TypeNameHelper.GetHumanReadableTypeName(
+                                        stepParameter.ActualType
+                                    ),
                                     stepParameter.Summary
                                 );
                             }
@@ -169,10 +169,8 @@ public class QuickInfoVisitor : SCLBaseVisitor<QuickInfoResponse?>
                 summary
             );
         }
-        else
-        {
-            return Error(name);
-        }
+
+        return Error(name);
     }
 
     /// <inheritdoc />
@@ -254,15 +252,17 @@ public class QuickInfoVisitor : SCLBaseVisitor<QuickInfoResponse?>
             return Error($"'{prefix}' is not a valid enum type.");
         }
 
-        if (!Enum.TryParse(enumType, suffix, true, out var value))
+        if (!Enum.TryParse(enumType, suffix, true, out var value) || value is null)
         {
             return Error($"'{suffix}' is not a member of enumeration '{prefix}'");
         }
 
+        var summary = value.GetType().GetXmlDocsSummary();
+
         return Description(
-            value!.ToString(),
+            value.ToString(),
             enumType.Name,
-            value.GetType().GetXmlDocsSummary()
+            summary
         );
     }
 
@@ -448,7 +448,7 @@ public class QuickInfoVisitor : SCLBaseVisitor<QuickInfoResponse?>
     private static QuickInfoResponse Description(IStep step)
     {
         var     name = step.Name;
-        string  type = GetHumanReadableTypeName(step.OutputType);
+        var     type = TypeNameHelper.GetHumanReadableTypeName(step.OutputType);
         string? description;
 
         if (step is ICompoundStep cs)
@@ -482,57 +482,4 @@ public class QuickInfoVisitor : SCLBaseVisitor<QuickInfoResponse?>
     {
         return new() { MarkdownStrings = new List<string>() { message } };
     }
-
-    private static string GetHumanReadableTypeName(Type t)
-    {
-        if (!t.IsSignatureType && t.IsEnum)
-            return t.Name;
-
-        if (TypeAliases.TryGetValue(t, out var name))
-            return name;
-
-        if (!t.IsGenericType)
-            return t.Name;
-
-        if (t.GetGenericTypeDefinition() == typeof(Nullable<>))
-        {
-            var underlyingType = Nullable.GetUnderlyingType(t);
-
-            if (underlyingType == null)
-                return t.Name;
-
-            return GetHumanReadableTypeName(underlyingType) + "?";
-        }
-
-        var typeName = t.Name.Split("`")[0];
-
-        var arguments =
-            $"<{string.Join(",", t.GetGenericArguments().Select(GetHumanReadableTypeName))}>";
-
-        return typeName + arguments;
-    }
-
-    private static readonly Dictionary<Type, string> TypeAliases =
-        new()
-        {
-            { typeof(byte), "byte" },
-            { typeof(sbyte), "sbyte" },
-            { typeof(short), "short" },
-            { typeof(ushort), "ushort" },
-            { typeof(int), "int" },
-            { typeof(uint), "uint" },
-            { typeof(long), "long" },
-            { typeof(ulong), "ulong" },
-            { typeof(float), "float" },
-            { typeof(double), "double" },
-            { typeof(decimal), "decimal" },
-            { typeof(object), "object" },
-            { typeof(bool), "bool" },
-            { typeof(char), "char" },
-            { typeof(string), "string" },
-            { typeof(StringStream), "string" },
-            { typeof(CSharpFunctionalExtensions.Entity), "entity" },
-            { typeof(DateTime), "dateTime" },
-            { typeof(void), "void" }
-        };
 }

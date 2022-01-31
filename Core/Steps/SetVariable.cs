@@ -1,7 +1,7 @@
 ﻿namespace Reductech.Sequence.Core.Steps;
 
 /// <summary>
-/// Gets the value of a named variable.
+/// Sets the value of a named variable.
 /// </summary>
 public sealed class SetVariable<T> : CompoundStep<Unit> where T : ISCLObject
 {

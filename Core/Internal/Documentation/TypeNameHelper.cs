@@ -1,7 +1,15 @@
 ﻿namespace Reductech.Sequence.Core.Internal.Documentation;
 
-internal static class TypeNameHelper
+/// <summary>
+/// Contains methods for getting readable names of types
+/// </summary>
+public static class TypeNameHelper
 {
+    /// <summary>
+    /// Gets the name of a type as it should appear in markup (possibly containing a link to the documentation)
+    /// </summary>
+    /// <param name="t"></param>
+    /// <returns></returns>
     public static string GetMarkupTypeName(Type t)
     {
         if (TypeAliases.TryGetValue(t, out var name))
@@ -30,6 +38,11 @@ internal static class TypeNameHelper
         return typeName + arguments;
     }
 
+    /// <summary>
+    /// Gets a human readable type name
+    /// </summary>
+    /// <param name="t"></param>
+    /// <returns></returns>
     public static string GetHumanReadableTypeName(Type t)
     {
         if (!t.IsSignatureType && t.IsEnum)
