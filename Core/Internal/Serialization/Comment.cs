@@ -16,4 +16,16 @@ public record Comment(string Text, bool IsSingleLine, TextPosition Position)
         if (IsSingleLine)
             sb.AppendLine();
     }
+
+    /// <summary>
+    /// Append another comment
+    /// </summary>
+    public Comment Append(Comment other)
+    {
+        return new(
+            Text + "\r\n" + other.Text,
+            false,
+            Position.Index < other.Position.Index ? Position : other.Position
+        );
+    }
 }
