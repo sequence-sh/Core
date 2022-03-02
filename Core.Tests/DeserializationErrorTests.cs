@@ -144,6 +144,11 @@ public partial class DeserializationErrorTests
                  "StringContains - Line: 1, Col: 0, Idx: 0 - Line: 1, Col: 47, Idx: 47 Text: StringContains stringtrim 'abc' stringtrim ' b '"
                 )
             );
+
+            yield return new DeserializationErrorCase(
+                "Print <a>",
+                ("Could not find variable <a>", "")
+            );
         }
     }
 

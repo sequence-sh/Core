@@ -92,9 +92,20 @@ public sealed class TypeResolver
         StepFactoryStore stepFactoryStore,
         CallerMetadata callerMetadata,
         Maybe<VariableName> automaticVariableName,
-        IFreezableStep topLevelStep)
+        IFreezableStep topLevelStep,
+        IReadOnlyDictionary<VariableName, ISCLObject>? variablesToInject)
     {
         var typeResolver = new TypeResolver(stepFactoryStore, automaticVariableName);
+
+        foreach (var (key, value) in variablesToInject
+                                  ?? ImmutableDictionary<VariableName, ISCLObject>.Empty)
+        {
+            var addResult = typeResolver.TryAddType(key, value.GetTypeReference());
+
+            if (addResult.IsFailure)
+                return addResult.ConvertFailure<TypeResolver>()
+                    .MapError(x => x.WithLocation(ErrorLocation.EmptyLocation));
+        }
 
         var r = typeResolver.TryAddTypeHierarchy(callerMetadata, topLevelStep);
 

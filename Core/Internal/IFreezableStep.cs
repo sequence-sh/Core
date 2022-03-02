@@ -46,7 +46,8 @@ public interface IFreezableStep : IEquatable<IFreezableStep>
     /// </summary>
     public Result<IStep, IError> TryFreeze(
         CallerMetadata callerMetadata,
-        StepFactoryStore stepFactoryStore)
+        StepFactoryStore stepFactoryStore,
+        IReadOnlyDictionary<VariableName, ISCLObject>? variablesToInject = null)
     {
         var thisReorganized = ReorganizeNamedArguments(stepFactoryStore);
 
@@ -55,7 +56,8 @@ public interface IFreezableStep : IEquatable<IFreezableStep>
                 stepFactoryStore,
                 callerMetadata,
                 Maybe<VariableName>.None,
-                thisReorganized
+                thisReorganized,
+                variablesToInject
             );
 
         if (typeResolver.IsFailure)

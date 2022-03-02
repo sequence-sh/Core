@@ -25,7 +25,8 @@ public class QuickInfoVisitor : SCLBaseVisitor<QuickInfoResponse?>
     /// </summary>
     public static Lazy<Result<TypeResolver, IError>> CreateLazyTypeResolver(
         string fullSCL,
-        StepFactoryStore stepFactoryStore)
+        StepFactoryStore stepFactoryStore,
+        IReadOnlyDictionary<VariableName, ISCLObject>? variablesToInject = null)
     {
         var resolver = new Lazy<Result<TypeResolver, IError>>(
             () =>
@@ -35,7 +36,8 @@ public class QuickInfoVisitor : SCLBaseVisitor<QuickInfoResponse?>
                             stepFactoryStore,
                             SCLRunner.RootCallerMetadata,
                             Maybe<VariableName>.None,
-                            x
+                            x,
+                            variablesToInject
                         )
                     )
         );
@@ -435,7 +437,11 @@ public class QuickInfoVisitor : SCLBaseVisitor<QuickInfoResponse?>
         Result<IStep, IError> freezeResult;
 
         if (LazyTypeResolver.Value.IsFailure)
-            freezeResult = step.Value.TryFreeze(callerMetadata, StepFactoryStore);
+            freezeResult = step.Value.TryFreeze(
+                callerMetadata,
+                StepFactoryStore,
+                ImmutableDictionary<VariableName, ISCLObject>.Empty
+            );
         else
             freezeResult = step.Value.TryFreeze(callerMetadata, LazyTypeResolver.Value.Value);
 

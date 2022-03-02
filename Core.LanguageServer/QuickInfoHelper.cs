@@ -5,10 +5,16 @@ public static class QuickInfoHelper
     public static QuickInfoResponse GetQuickInfoAsync(
         string code,
         LinePosition position,
-        StepFactoryStore stepFactoryStore)
+        StepFactoryStore stepFactoryStore,
+        IReadOnlyDictionary<VariableName, ISCLObject>? injectedVariables = null)
     {
-        var lazyTypeResolver = QuickInfoVisitor.CreateLazyTypeResolver(code, stepFactoryStore);
-        var command          = Helpers.GetCommand(code, position);
+        var lazyTypeResolver = QuickInfoVisitor.CreateLazyTypeResolver(
+            code,
+            stepFactoryStore,
+            injectedVariables
+        );
+
+        var command = Helpers.GetCommand(code, position);
 
         if (command is null)
             return new QuickInfoResponse();

@@ -1,6 +1,4 @@
-﻿using Reductech.Sequence.Core.Internal.Serialization;
-
-namespace Reductech.Sequence.Core.LanguageServer;
+﻿namespace Reductech.Sequence.Core.LanguageServer;
 
 /// <summary>
 /// Gets SCL Diagnostics
@@ -12,7 +10,8 @@ public static class DiagnosticsHelper
     /// </summary>
     public static IReadOnlyList<Diagnostic> GetDiagnostics(
         string text,
-        StepFactoryStore stepFactoryStore)
+        StepFactoryStore stepFactoryStore,
+        IReadOnlyDictionary<VariableName, ISCLObject>? injectedVariables = null)
     {
         List<Diagnostic> diagnostics;
 
@@ -22,7 +21,8 @@ public static class DiagnosticsHelper
         {
             var freezeResult = initialParseResult.Value.TryFreeze(
                 SCLRunner.RootCallerMetadata,
-                stepFactoryStore
+                stepFactoryStore,
+                injectedVariables
             );
 
             if (freezeResult.IsSuccess)
