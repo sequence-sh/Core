@@ -33,16 +33,18 @@ public sealed class SCLRunner
     /// </summary>
     /// <param name="text">SCL representing the step.</param>
     /// <param name="sequenceMetadata">Additional information about the sequence</param>
+    /// <param name="variablesToInject">Additional Variables to inject</param>
     /// <param name="cancellationToken">Cancellation ErrorLocation</param>
     /// <returns></returns>
     public async Task<Result<Unit, IError>> RunSequenceFromTextAsync(
         string text,
         Dictionary<string, object> sequenceMetadata,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken,
+        IReadOnlyDictionary<VariableName, ISCLObject>? variablesToInject = null)
     {
         sequenceMetadata[SCLTextName] = text;
         sequenceMetadata[RunIdName]   = Guid.NewGuid();
-        return await RunSequence(text, sequenceMetadata, cancellationToken);
+        return await RunSequence(text, sequenceMetadata, cancellationToken, variablesToInject);
     }
 
     /// <summary>
@@ -80,10 +82,11 @@ public sealed class SCLRunner
     public async Task<Result<Unit, IError>> RunSequence(
         string text,
         IReadOnlyDictionary<string, object> sequenceMetadata,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken,
+        IReadOnlyDictionary<VariableName, ISCLObject>? variablesToInject = null)
     {
         var stepResult = SCLParsing.TryParseStep(text)
-            .Bind(x => x.TryFreeze(RootCallerMetadata, _stepFactoryStore))
+            .Bind(x => x.TryFreeze(RootCallerMetadata, _stepFactoryStore, variablesToInject))
             .Map(ConvertToUnitStep);
 
         if (stepResult.IsFailure)
@@ -97,6 +100,11 @@ public sealed class SCLRunner
             _externalContext,
             sequenceMetadata
         );
+
+        var injectResult = await stateMonad.SetInitialVariablesAsync(variablesToInject);
+
+        if (injectResult.IsFailure)
+            return injectResult.ConvertFailure<Unit>();
 
         LogSituation.SequenceStarted.Log(stateMonad, null);
 

@@ -119,6 +119,31 @@ public sealed class StateMonad : IStateMonad
     public bool VariableExists(VariableName variable) => _stateDictionary.ContainsKey(variable);
 
     /// <summary>
+    /// Set the initial variables for this StateMonad
+    /// </summary>
+    public async Task<Result<Unit, IError>> SetInitialVariablesAsync(
+        IReadOnlyDictionary<VariableName, ISCLObject>? variablesToInject)
+    {
+        foreach (var (variableName, sclObject) in variablesToInject
+                                               ?? ImmutableDictionary<VariableName, ISCLObject>
+                                                      .Empty)
+        {
+            var r = await SetVariableAsync(
+                variableName,
+                sclObject,
+                false,
+                null,
+                CancellationToken.None
+            );
+
+            if (r.IsFailure)
+                return r.ConvertFailure<Unit>();
+        }
+
+        return Unit.Default;
+    }
+
+    /// <summary>
     /// Creates or set the value of this variable.
     /// </summary>
     public async Task<Result<Unit, IError>> SetVariableAsync<T>(

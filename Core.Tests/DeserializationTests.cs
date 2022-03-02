@@ -43,7 +43,8 @@ public partial class DeserializationTests
             var result = await runner.RunSequenceFromTextAsync(
                 SCL,
                 new Dictionary<string, object>(),
-                CancellationToken.None
+                CancellationToken.None,
+                InjectedVariables
             );
 
             result.ShouldBeSuccessful();
@@ -68,6 +69,8 @@ public partial class DeserializationTests
 
         /// <inheritdoc />
         public List<Action> FinalChecks { get; } = new();
+
+        public Dictionary<VariableName, ISCLObject> InjectedVariables { get; } = new();
     }
 
     [GenerateAsyncTheory("Deserialize")]
@@ -633,6 +636,12 @@ Log 'Comments!'",
                 @"ArraySkip ['a' 'b' 'c'] 2 | foreach log <>",
                 "c"
             );
+
+            yield return new DeserializationTestInstance("log <a>", "123")
+                .WithInjectedVariable("a", 123);
+
+            yield return new DeserializationTestInstance("<list> | foreach log <>", "1", "2", "3")
+                .WithInjectedVariable("list", new[] { 1, 2, 3 });
 
             yield return new DeserializationTestInstance(
                 @"

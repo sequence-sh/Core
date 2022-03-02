@@ -78,14 +78,19 @@ public sealed class IncrementVariable : CompoundStep<Unit>
             TypeResolver typeResolver)
         {
             var vn = freezableStepData.TryGetVariableName(
-                nameof(IncrementVariable.Variable),
+                nameof(Variable),
                 StepType
             );
 
             if (vn.IsFailure)
                 yield break;
 
-            yield return new(vn.Value, TypeReference.Actual.Integer, freezableStepData.Location);
+            yield return new(
+                vn.Value,
+                TypeReference.Actual.Integer,
+                false,
+                freezableStepData.Location
+            );
         }
     }
 }

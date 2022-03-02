@@ -84,7 +84,12 @@ public sealed class GetVariable<T> : CompoundStep<T> where T : ISCLObject
             if (vn.IsFailure)
                 yield break;
 
-            yield return new(vn.Value, callerMetadata.ExpectedType, freezableStepData.Location);
+            yield return new(
+                vn.Value,
+                callerMetadata.ExpectedType,
+                false,
+                freezableStepData.Location
+            );
         }
 
         /// <inheritdoc />

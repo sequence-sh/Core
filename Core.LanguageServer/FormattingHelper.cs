@@ -8,15 +8,22 @@ public static class FormattingHelper
     /// <summary>
     /// Format an SCL document, even if it contains errors
     /// </summary>
-    public static List<SCLTextEdit> FormatSCL(string scl, StepFactoryStore stepFactoryStore)
+    public static List<SCLTextEdit> FormatSCL(
+        string scl,
+        StepFactoryStore stepFactoryStore,
+        IReadOnlyDictionary<VariableName, ISCLObject>? injectedVariables = null)
     {
         //Split the SCL into commands
         //Try to freeze each command
         //Format each command that freezes
 
         var commands = Helpers.SplitIntoCommands(scl);
-        var typeResolver = QuickInfoVisitor.CreateLazyTypeResolver(scl, stepFactoryStore).Value;
-        var textEdits = new List<SCLTextEdit>();
+
+        var typeResolver = QuickInfoVisitor
+            .CreateLazyTypeResolver(scl, stepFactoryStore, injectedVariables)
+            .Value;
+
+        var textEdits             = new List<SCLTextEdit>();
         var commandCallerMetadata = new CallerMetadata("Command", "", TypeReference.Any.Instance);
 
         foreach (var (command, offset) in commands)
@@ -38,7 +45,8 @@ public static class FormattingHelper
                 {
                     freezeResult = stepParseResult.Value.TryFreeze(
                         commandCallerMetadata,
-                        stepFactoryStore
+                        stepFactoryStore,
+                        injectedVariables ?? ImmutableDictionary<VariableName, ISCLObject>.Empty
                     );
                 }
 

@@ -14,6 +14,14 @@ public static class Extensions
         return cws;
     }
 
+    public static T WithInjectedVariable<T>(this T cws, string variableName, object? value)
+        where T : ICaseWithSetup
+    {
+        var sclObject = ISCLObject.CreateFromCSharpObject(value);
+        cws.InjectedVariables.Add(new VariableName(variableName), sclObject);
+        return cws;
+    }
+
     public static T WithStepFactoryStore<T>(this T cws, StepFactoryStore stepFactoryStore)
         where T : ICaseThatExecutes
     {

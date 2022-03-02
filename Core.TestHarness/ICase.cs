@@ -28,6 +28,8 @@ public interface ICaseWithSetup
     ExternalContextSetupHelper ExternalContextSetupHelper { get; }
     RESTClientSetupHelper RESTClientSetupHelper { get; }
     public List<Action> FinalChecks { get; }
+
+    Dictionary<VariableName, ISCLObject> InjectedVariables { get; }
 }
 
 public sealed class RESTSetup

@@ -77,7 +77,7 @@ public sealed record OptionFreezableStep(
             {
                 var canAdd = true;
 
-                foreach (var (variableName, typeReference, _) in variablesUsed.Value)
+                foreach (var (variableName, typeReference, _, _) in variablesUsed.Value)
                 {
                     var addResult = typeResolver.CanAddType(variableName, typeReference);
 
@@ -119,6 +119,7 @@ public sealed record OptionFreezableStep(
                             return new UsedVariable(
                                 group.Key,
                                 typeReference,
+                                group.Any(x => x.WasSet),
                                 group.First().Location
                             );
                         }
