@@ -150,6 +150,14 @@ public partial class DeserializationErrorTests
                 ("Variable '<a>' does not exist.",
                  "Line: 1, Col: 6, Idx: 6 - Line: 1, Col: 8, Idx: 8 Text: <a>")
             );
+
+            yield return new DeserializationErrorCase(
+                "- Print <a>\r\n- [1,2,3] | foreach (Print <a>)",
+                ("Variable '<a>' does not exist.",
+                 "Line: 1, Col: 8, Idx: 8 - Line: 1, Col: 10, Idx: 10 Text: <a>"),
+                ("Variable '<a>' does not exist.",
+                 "Line: 2, Col: 27, Idx: 40 - Line: 2, Col: 29, Idx: 42 Text: <a>")
+            );
         }
     }
 
