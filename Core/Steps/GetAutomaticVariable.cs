@@ -53,6 +53,7 @@ public sealed class GetAutomaticVariable<T> : CompoundStep<T> where T : ISCLObje
             yield return new(
                 VariableName.Item,
                 callerMetadata.ExpectedType,
+                false,
                 freezableStepData
                     .Location
             );

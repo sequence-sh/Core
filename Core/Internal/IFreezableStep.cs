@@ -63,6 +63,29 @@ public interface IFreezableStep : IEquatable<IFreezableStep>
         if (typeResolver.IsFailure)
             return typeResolver.ConvertFailure<IStep>();
 
+        //Check all variables are set
+        var unsetVariableErrors =
+            thisReorganized.GetVariablesUsed(callerMetadata, typeResolver.Value)
+                .Value
+                .GroupBy(x => x.VariableName)
+                .Where(x => !x.Any(v => v.WasSet))
+                .Where(x => variablesToInject is null || !variablesToInject.ContainsKey(x.Key))
+                .SelectMany(
+                    group =>
+                        group.Select(
+                            x =>
+                                x.VariableName == VariableName.Item
+                                    ? ErrorCode.AutomaticVariableNotSet.ToErrorBuilder()
+                                        .WithLocation(x.Location)
+                                    : ErrorCode.MissingVariable.ToErrorBuilder(x.VariableName)
+                                        .WithLocation(x.Location)
+                        )
+                )
+                .ToList();
+
+        if (unsetVariableErrors.Any())
+            return Result.Failure<IStep, IError>(ErrorList.Combine(unsetVariableErrors));
+
         var freezeResult = thisReorganized.TryFreeze(callerMetadata, typeResolver.Value);
 
         return freezeResult;

@@ -146,8 +146,8 @@ public abstract partial class StepTestBase<TStep, TOutput>
                 new Dictionary<string, object>()
             );
 
-            foreach (var action in InitialStateActions)
-                await action(stateMonad);
+            var injectResult = await stateMonad.SetInitialVariablesAsync(InjectedVariables);
+            injectResult.ShouldBeSuccessful();
 
             return stateMonad;
         }
@@ -170,11 +170,10 @@ public abstract partial class StepTestBase<TStep, TOutput>
         /// <inheritdoc />
         public Maybe<StepFactoryStore> StepFactoryStoreToUse { get; set; }
 
-        public List<Func<IStateMonad, Task>> InitialStateActions { get; } = new();
-
         public LogLevel CheckLogLevel { get; set; } = LogLevel.Information;
 
         public Dictionary<VariableName, ISCLObject> ExpectedFinalState { get; } = new();
+        public Dictionary<VariableName, ISCLObject> InjectedVariables { get; } = new();
         public string Name { get; set; } = Name;
 
         public IReadOnlyCollection<string> ExpectedLoggedValues { get; set; } =

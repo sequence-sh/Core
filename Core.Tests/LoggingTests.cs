@@ -175,7 +175,8 @@ public partial class LoggingTests
             var r = await sclRunner.RunSequenceFromTextAsync(
                 SCL,
                 new Dictionary<string, object>(),
-                CancellationToken.None
+                CancellationToken.None,
+                InjectedVariables
             );
 
             r.ShouldBeSuccessful();
@@ -196,5 +197,8 @@ public partial class LoggingTests
 
         /// <inheritdoc />
         public List<Action> FinalChecks { get; } = new();
+
+        /// <inheritdoc />
+        public Dictionary<VariableName, ISCLObject> InjectedVariables { get; } = new();
     }
 }

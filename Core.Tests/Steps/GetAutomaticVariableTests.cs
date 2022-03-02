@@ -36,36 +36,36 @@ public partial class GetAutomaticVariableTests : StepTestBase<GetAutomaticVariab
                 "14"
             );
 
-            yield return new StepCase(
-                "Basic use with different variable name",
-                new Log()
-                {
-                    Value = new ArrayElementAtIndex<SCLInt>()
-                    {
-                        Index = Constant(0),
-                        Array = new ArrayMap<SCLInt, SCLInt>()
-                        {
-                            Array = Array(1, 2, 3),
-                            Function =
-                                new LambdaFunction<SCLInt, SCLInt>(
-                                    new VariableName("MyVar"),
-                                    new Sum()
-                                    {
-                                        Terms = ArrayNew<SCLInt>.CreateArray(
-                                            new List<IStep<SCLInt>>()
-                                            {
-                                                new GetAutomaticVariable<SCLInt>(),
-                                                Constant(13)
-                                            }
-                                        )
-                                    }
-                                ),
-                        }
-                    }
-                },
-                Unit.Default,
-                "14"
-            );
+            //yield return new StepCase(
+            //    "Basic use with different variable name",
+            //    new Log()
+            //    {
+            //        Value = new ArrayElementAtIndex<SCLInt>()
+            //        {
+            //            Index = Constant(0),
+            //            Array = new ArrayMap<SCLInt, SCLInt>()
+            //            {
+            //                Array = Array(1, 2, 3),
+            //                Function =
+            //                    new LambdaFunction<SCLInt, SCLInt>(
+            //                        new VariableName("MyVar"),
+            //                        new Sum()
+            //                        {
+            //                            Terms = ArrayNew<SCLInt>.CreateArray(
+            //                                new List<IStep<SCLInt>>()
+            //                                {
+            //                                    new GetAutomaticVariable<SCLInt>(),
+            //                                    Constant(13)
+            //                                }
+            //                            )
+            //                        }
+            //                    ),
+            //            }
+            //        }
+            //    },
+            //    Unit.Default,
+            //    "14"
+            //);
 
             yield return new StepCase(
                 "Nested",

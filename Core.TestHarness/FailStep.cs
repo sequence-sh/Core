@@ -3,8 +3,8 @@
 public abstract partial class StepTestBase<TStep, TOutput>
 {
     protected static
-        IEnumerable<(TStep step, IError expectedError, IReadOnlyCollection<Func<IStateMonad, Task>>)
-        >
+        IEnumerable<(TStep step, IError expectedError, IReadOnlyDictionary<VariableName, ISCLObject>
+            variablesToInject)>
         CreateStepsWithFailStepsAsValues(ISCLObject? defaultVariableValue)
     {
         var allProperties = typeof(TStep).GetProperties()
@@ -17,9 +17,9 @@ public abstract partial class StepTestBase<TStep, TOutput>
             if (defaultVariableValue == null && propertyToFail.PropertyType == typeof(VariableName))
                 continue; //Don't bother testing this
 
-            var     instance     = new TStep();
-            var     stateActions = new List<Func<IStateMonad, Task>>();
-            IError? error        = null;
+            var     instance          = new TStep();
+            var     variablesToInject = new Dictionary<VariableName, ISCLObject>();
+            IError? error             = null;
 
             foreach (var propertyInfo in allProperties)
             {
@@ -57,14 +57,9 @@ public abstract partial class StepTestBase<TStep, TOutput>
 
                     if (variableWasSet && defaultVariableValue != null)
                     {
-                        stateActions.Add(
-                            x => x.SetVariableAsync(
-                                FooVariableName(),
-                                defaultVariableValue,
-                                true,
-                                null,
-                                CancellationToken.None
-                            )
+                        variablesToInject.Add(
+                            FooVariableName(),
+                            defaultVariableValue
                         );
                     }
                 }
@@ -73,7 +68,7 @@ public abstract partial class StepTestBase<TStep, TOutput>
             if (error == null)
                 throw new Exception("error was not set in fail step creation");
 
-            yield return (instance, error, stateActions);
+            yield return (instance, error, variablesToInject);
         }
 
         static VariableName FooVariableName() => new("Foo");

@@ -101,18 +101,10 @@ public sealed class SCLRunner
             sequenceMetadata
         );
 
-        foreach (var (variableName, sclObject) in variablesToInject
-                                               ?? ImmutableDictionary<VariableName, ISCLObject>
-                                                      .Empty)
-        {
-            await stateMonad.SetVariableAsync(
-                variableName,
-                sclObject,
-                false,
-                null,
-                cancellationToken
-            );
-        }
+        var injectResult = await stateMonad.SetInitialVariablesAsync(variablesToInject);
+
+        if (injectResult.IsFailure)
+            return injectResult.ConvertFailure<Unit>();
 
         LogSituation.SequenceStarted.Log(stateMonad, null);
 

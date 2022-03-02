@@ -81,14 +81,18 @@ public abstract partial class StepTestBase<TStep, TOutput>
     {
         var enumerable = CreateStepsWithFailStepsAsValues(defaultVariableValue);
 
-        foreach (var (step, expectedError, actions) in enumerable)
+        foreach (var (step, expectedError, injectedVariables) in enumerable)
         {
             var errorCase = new ErrorCase(expectedError.AsString, step, expectedError)
             {
                 IgnoreFinalState = true
             };
 
-            errorCase.InitialStateActions.AddRange(actions);
+            foreach (var injectedVariable in injectedVariables)
+            {
+                errorCase.InjectedVariables.Add(injectedVariable.Key, injectedVariable.Value);
+            }
+
             yield return errorCase;
         }
     }

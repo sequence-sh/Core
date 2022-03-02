@@ -130,6 +130,7 @@ public sealed class RunSCL : CompoundStep<Unit>
                         yield return new(
                             new VariableName(name),
                             TypeReference.Any.Instance,
+                            true,
                             freezableStepData.Location
                         );
                     }

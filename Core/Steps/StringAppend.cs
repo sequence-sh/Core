@@ -86,6 +86,7 @@ public sealed class StringAppend : CompoundStep<Unit>
             yield return new(
                 vn.Value,
                 TypeReference.Actual.String,
+                false,
                 freezableStepData.Location
             );
         }

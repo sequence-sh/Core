@@ -122,11 +122,12 @@ public sealed class SetVariable<T> : CompoundStep<Unit> where T : ISCLObject
                 yield return new(
                     vn.Value,
                     TypeReference.Unknown.Instance,
+                    true,
                     freezableStepData
                         .Location
                 );
             else
-                yield return new(vn.Value, memberType.Value, freezableStepData.Location);
+                yield return new(vn.Value, memberType.Value, true, freezableStepData.Location);
         }
 
         /// <inheritdoc />

@@ -60,7 +60,7 @@ public partial class DeserializationErrorTests
                 "<>",
                 (
                     "The automatic variable was not set.",
-                    "GetAutomaticVariable - Line: 1, Col: 0, Idx: 0 - Line: 1, Col: 1, Idx: 1 Text: <>"
+                    "Line: 1, Col: 0, Idx: 0 - Line: 1, Col: 1, Idx: 1 Text: <>"
                 )
             );
 
@@ -147,7 +147,8 @@ public partial class DeserializationErrorTests
 
             yield return new DeserializationErrorCase(
                 "Print <a>",
-                ("Could not find variable <a>", "")
+                ("Variable '<a>' does not exist.",
+                 "Line: 1, Col: 6, Idx: 6 - Line: 1, Col: 8, Idx: 8 Text: <a>")
             );
         }
     }

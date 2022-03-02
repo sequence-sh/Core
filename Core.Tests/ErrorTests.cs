@@ -148,6 +148,9 @@ public partial class RunErrorTests
                 new Dictionary<string, object>()
             );
 
+            var injectResult = await state.SetInitialVariablesAsync(InjectedVariables);
+            injectResult.ShouldBeSuccessful();
+
             var r = await Process.Run<ISCLObject>(state, CancellationToken.None);
 
             r.IsFailure.Should().BeTrue("Step should have failed");
@@ -173,5 +176,7 @@ public partial class RunErrorTests
         public RESTClientSetupHelper RESTClientSetupHelper { get; } = new();
 
         public List<Action> FinalChecks { get; } = new();
+
+        public Dictionary<VariableName, ISCLObject> InjectedVariables { get; } = new();
     }
 }
