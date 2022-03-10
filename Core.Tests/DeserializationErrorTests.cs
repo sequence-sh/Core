@@ -41,7 +41,7 @@ public partial class DeserializationErrorTests
             yield return new DeserializationErrorCase(
                 "- 'hello'\r\n- 'world'",
                 ("'InitialSteps[0]' cannot take the value 'hello'",
-                 "Sequence - Line: 1, Col: 0, Idx: 0 - Line: 2, Col: 8, Idx: 19 Text: - 'hello'\r\n- 'world'")
+                 "hello - Line: 1, Col: 2, Idx: 2 - Line: 1, Col: 8, Idx: 8 Text: 'hello'")
             );
 
             yield return new DeserializationErrorCase(
@@ -104,7 +104,7 @@ public partial class DeserializationErrorTests
             yield return new DeserializationErrorCase(
                 "- <array> = [('Foo': 1), ('Foo': 2)]\r\n- StringIsEmpty <array>[0]",
                 (
-                    "Variable 'array' does not have type 'Entity'.",
+                    "The types 'Entity' and 'StringStream' are incompatible.",
                     "Line: 2, Col: 16, Idx: 54 - Line: 2, Col: 22, Idx: 60 Text: <array>")
             );
 

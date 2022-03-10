@@ -739,12 +739,11 @@ public abstract class StepFactory : IStepFactory
 
             return ErrorCode.InvalidCast.ToErrorBuilder(e);
         }
-        #pragma warning disable CA1031 // Do not catch general exception types
+
         catch (Exception e)
         {
             return ErrorCode.InvalidCast.ToErrorBuilder(e);
         }
-        #pragma warning restore CA1031 // Do not catch general exception types
 
         if (r is ICompoundStep rp)
             return Result.Success<ICompoundStep, IErrorBuilder>(rp);
@@ -774,12 +773,10 @@ public abstract class StepFactory : IStepFactory
         {
             return ErrorCode.InvalidCast.ToErrorBuilder(e);
         }
-        #pragma warning disable CA1031 // Do not catch general exception types
         catch (Exception e)
         {
             return ErrorCode.InvalidCast.ToErrorBuilder(e);
         }
-        #pragma warning restore CA1031 // Do not catch general exception types
 
         if (r is ICompoundStep rp)
             return Result.Success<ICompoundStep, IErrorBuilder>(rp);

@@ -163,7 +163,7 @@ public interface ISCLObject : ISerializable
                     typeof(EagerArray<>).MakeGenericType(typeof(T).GenericTypeArguments[0]);
 
                 var array = Activator.CreateInstance(eagerArrayType);
-                return (T)array;
+                return (T)array!;
             }
 
             if (typeof(T).GetInterfaces().Contains(typeof(ISCLEnum)))
@@ -171,7 +171,7 @@ public interface ISCLObject : ISerializable
                 var enumType  = typeof(T).GenericTypeArguments[0];
                 var enumValue = Enum.GetValues(enumType).OfType<object>().First();
                 var result    = Activator.CreateInstance(typeof(T), enumValue);
-                return (T)result;
+                return (T)result!;
             }
 
             if (typeof(T).GetInterfaces().Contains(typeof(ISCLOneOf)))
@@ -182,9 +182,9 @@ public interface ISCLObject : ISerializable
                         BindingFlags.Public | BindingFlags.Static
                     );
 
-                var result = method.Invoke(null, null);
+                var result = method!.Invoke(null, null);
 
-                return (T)result;
+                return (T)result!;
             }
         }
 
@@ -257,7 +257,7 @@ public interface ISCLObject : ISerializable
             case JsonValueKind.True:  return SCLBool.True;
             case JsonValueKind.False: return SCLBool.False;
             case JsonValueKind.Null:  return SCLNull.Instance;
-            default:                  throw new ArgumentOutOfRangeException();
+            default:                  throw new ArgumentOutOfRangeException(nameof(element));
         }
     }
 

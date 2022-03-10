@@ -590,7 +590,7 @@ public abstract record TypeReference
         }
 
         if (stepType == typeof(VariableName))
-            return AutomaticVariable.Instance;
+            return Unknown.Instance;
 
         throw new Exception($"Type '{stepType}' was not a step type");
     }
