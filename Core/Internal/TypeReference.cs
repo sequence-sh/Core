@@ -333,6 +333,9 @@ public abstract record TypeReference
 
             return Options.Any(x => x.Allow(other, typeResolver));
         }
+
+        /// <inheritdoc />
+        public override bool IsUnknown => Options.Any(x => x.IsUnknown);
     }
 
     /// <summary>
@@ -587,7 +590,7 @@ public abstract record TypeReference
         }
 
         if (stepType == typeof(VariableName))
-            return AutomaticVariable.Instance;
+            return Unknown.Instance;
 
         throw new Exception($"Type '{stepType}' was not a step type");
     }

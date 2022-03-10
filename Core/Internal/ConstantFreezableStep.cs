@@ -1,18 +1,25 @@
-﻿namespace Reductech.Sequence.Core.Internal;
+﻿using Generator.Equals;
+
+namespace Reductech.Sequence.Core.Internal;
 
 /// <summary>
 /// A freezable step which represents a constant value.
 /// </summary>
 public interface IConstantFreezableStep : IFreezableStep
 {
+    /// <summary>
+    /// The Constant Value of this Step
+    /// </summary>
     ISCLObject Value { get; }
 }
 
 /// <summary>
 /// The base class for freezable constants
 /// </summary>
-public sealed record SCLConstantFreezable<T>
-    (T Value, TextLocation TextLocation) : IConstantFreezableStep where T : ISCLObject
+[Equatable]
+public sealed partial record SCLConstantFreezable<T>
+    (T Value, [property: IgnoreEquality] TextLocation TextLocation) : IConstantFreezableStep
+    where T : ISCLObject
 {
     /// <inheritdoc />
     public string StepName => Value.Serialize(SerializeOptions.Primitive);
@@ -20,7 +27,11 @@ public sealed record SCLConstantFreezable<T>
     /// <inheritdoc />
     public Result<IStep, IError> TryFreeze(
         CallerMetadata callerMetadata,
-        TypeResolver typeResolver) => new SCLConstant<T>(Value) { TextLocation = TextLocation };
+        TypeResolver typeResolver)
+    {
+        return CheckFreezePossible(callerMetadata, typeResolver)
+            .Map(() => new SCLConstant<T>(Value) { TextLocation = TextLocation } as IStep);
+    }
 
     /// <inheritdoc />
     public Result<IReadOnlyCollection<UsedVariable>,
@@ -39,6 +50,22 @@ public sealed record SCLConstantFreezable<T>
     }
 
     /// <inheritdoc />
+    public UnitResult<IError> CheckFreezePossible(
+        CallerMetadata callerMetadata,
+        TypeResolver typeResolver)
+    {
+        if (callerMetadata.ExpectedType.Allow(Value.GetTypeReference(), typeResolver))
+            return UnitResult.Success<IError>();
+
+        var r = callerMetadata.ExpectedType.TryGetType(typeResolver)
+            .Bind(type => Value.TryConvert(type, callerMetadata.ParameterName))
+            .Map(_ => Unit.Default)
+            .MapError(x => x.WithLocation(this));
+
+        return r;
+    }
+
+    /// <inheritdoc />
     public IFreezableStep ReorganizeNamedArguments(StepFactoryStore stepFactoryStore)
     {
         return this;
@@ -47,19 +74,8 @@ public sealed record SCLConstantFreezable<T>
     /// <inheritdoc />
     public bool Equals(IFreezableStep? other)
     {
-        if (other is null)
-            return false;
-
-        if (ReferenceEquals(this, other))
-            return true;
-
-        var r = other is SCLConstantFreezable<T> cfs && Value.Equals(cfs.Value);
-
-        return r;
+        return other is SCLConstantFreezable<T> constant && Equals(constant);
     }
-
-    /// <inheritdoc />
-    public override int GetHashCode() => Value.GetHashCode();
 
     /// <inheritdoc />
     public override string ToString() => StepName;

@@ -1,11 +1,13 @@
-﻿using Namotion.Reflection;
+﻿using Generator.Equals;
+using Namotion.Reflection;
 
 namespace Reductech.Sequence.Core.Internal;
 
 /// <summary>
 /// A step parameter that uses a property info
 /// </summary>
-public class StepParameter : IStepParameter
+[Equatable]
+public sealed partial record StepParameter : IStepParameter
 {
     /// <summary>
     /// A step parameter that uses a property info
@@ -88,11 +90,13 @@ public class StepParameter : IStepParameter
     /// <summary>
     /// The property Info
     /// </summary>
+    [IgnoreEquality]
     public PropertyInfo PropertyInfo { get; }
 
     /// <summary>
     /// The Attribute
     /// </summary>
+    [IgnoreEquality]
     public StepPropertyBaseAttribute Attribute { get; }
 
     /// <inheritdoc />
@@ -105,20 +109,28 @@ public class StepParameter : IStepParameter
     public int? Order => Attribute.Order;
 
     /// <inheritdoc />
+    [IgnoreEquality]
     public Type StepType { get; }
 
     /// <inheritdoc />
+    [IgnoreEquality]
     public Type ActualType { get; }
 
     /// <inheritdoc />
+    [IgnoreEquality]
     public IReadOnlyCollection<string> Aliases { get; }
 
     /// <inheritdoc />
+    [IgnoreEquality]
     public string Summary { get; }
 
     /// <inheritdoc />
+    [IgnoreEquality]
     public IReadOnlyDictionary<string, string> ExtraFields { get; }
 
     /// <inheritdoc />
     public MemberType MemberType { get; }
+
+    /// <inheritdoc />
+    public override string ToString() => Name;
 }

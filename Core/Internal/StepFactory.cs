@@ -217,6 +217,177 @@ public abstract class StepFactory : IStepFactory
         return Result.Success<IStep, IError>(step);
     }
 
+    /// <inheritdoc />
+    public UnitResult<IError> CheckFreezePossible(
+        CallerMetadata callerMetadata,
+        TypeResolver typeResolver,
+        FreezableStepData freezeData)
+    {
+        var errors = new List<IError>();
+
+        var pairs =
+            new List<(FreezableStepProperty freezableStepProperty, IStepParameter stepParameter)>();
+
+        foreach (var (key, stepMember) in freezeData.StepProperties)
+        {
+            if (ParameterDictionary.TryGetValue(key, out var stepParameter))
+                pairs.Add((stepMember, stepParameter));
+            else
+                errors.Add(
+                    ErrorCode.UnexpectedParameter.ToErrorBuilder(key.Name, TypeName)
+                        .WithLocation(new ErrorLocation(TypeName, freezeData.Location))
+                );
+        }
+
+        var duplicates = pairs
+            .GroupBy(x => x.stepParameter)
+            .Where(x => x.Count() > 1)
+            .Select(x => x.Key);
+
+        foreach (var propertyInfo in duplicates)
+            errors.Add(
+                ErrorCode.DuplicateParameter.ToErrorBuilder(propertyInfo.Name)
+                    .WithLocation(freezeData)
+            );
+
+        if (errors.Any())
+            return Result.Failure<Unit, IError>(ErrorList.Combine(errors));
+
+        var remainingRequired =
+            ParameterDictionary.Values.Where(x => x.Required)
+                .ToHashSet();
+
+        foreach (var (stepMember, stepParameter) in pairs)
+        {
+            remainingRequired.Remove(stepParameter);
+            var result = CheckStepMember(TypeName, stepMember, stepParameter, typeResolver);
+
+            if (result.IsFailure)
+                errors.Add(result.Error);
+        }
+
+        foreach (var property in remainingRequired)
+            errors.Add(
+                ErrorCode.MissingParameter.ToErrorBuilder(property).WithLocation(freezeData)
+            );
+
+        if (errors.Any())
+            return Result.Failure<Unit, IError>(ErrorList.Combine(errors));
+
+        return UnitResult.Success<IError>();
+    }
+
+    private static UnitResult<IError> CheckStepMember(
+        string stepTypeName,
+        FreezableStepProperty stepMember,
+        IStepParameter stepParameter,
+        TypeResolver typeResolver)
+    {
+        switch (stepParameter.MemberType)
+        {
+            case MemberType.VariableName:
+            {
+                return stepMember.AsVariableName(stepParameter.Name).Map(_ => Unit.Default);
+            }
+            case MemberType.Step:
+            {
+                var stepCallerMetadata = new CallerMetadata(
+                    stepTypeName,
+                    stepParameter.Name,
+                    TypeReference.CreateFromStepType(stepParameter.StepType)
+                );
+
+                return stepMember.ConvertToStep()
+                    .CheckFreezePossible(stepCallerMetadata, typeResolver);
+            }
+            case MemberType.Lambda:
+            {
+                var typeToSet = stepParameter.StepType;
+
+                if (!typeToSet.IsGenericType || typeToSet.GenericTypeArguments.Length != 2)
+                    throw new Exception($"{stepTypeName}.{stepParameter.Name} is not a lambda");
+
+                var inputTypeArgument  = typeToSet.GenericTypeArguments[0];
+                var inputTypeReference = TypeReference.Create(inputTypeArgument);
+
+                var outputTypeArgument  = typeToSet.GenericTypeArguments[1];
+                var outputTypeReference = TypeReference.Create(outputTypeArgument);
+
+                if (inputTypeReference.IsUnknown || outputTypeReference.IsUnknown)
+                    return
+                        UnitResult
+                            .Success<IError>(); //We can't prove that freeze is impossible because types are unknown
+
+                var lambda = stepMember.ConvertToLambda();
+
+                var stepCallerMetadata = new CallerMetadata(
+                    stepTypeName,
+                    stepParameter.Name,
+                    outputTypeReference
+                );
+
+                var scopedTypeResolver = typeResolver.TryCloneWithScopedLambda(
+                    lambda,
+                    inputTypeReference,
+                    stepCallerMetadata
+                );
+
+                if (scopedTypeResolver.IsFailure)
+                    return scopedTypeResolver.ConvertFailure<Unit>();
+
+                var result = lambda.FreezableStep.CheckFreezePossible(
+                    stepCallerMetadata,
+                    scopedTypeResolver.Value
+                );
+
+                return result;
+            }
+
+            case MemberType.StepList:
+            {
+                var stepListResult = stepMember.AsStepList(stepParameter.Name);
+
+                if (stepListResult.IsFailure)
+                    return stepListResult.ConvertFailure<Unit>();
+
+                if (!stepParameter.StepType.IsGenericType
+                 || stepParameter.StepType.GenericTypeArguments.Length != 1)
+                    throw new Exception($"{stepTypeName}.{stepParameter.Name} is not a list");
+
+                var elementType =
+                    TypeReference.Create(stepParameter.StepType.GenericTypeArguments[0]);
+
+                var nestedErrors = new List<IError>();
+
+                for (var index = 0; index < stepListResult.Value.Count; index++)
+                {
+                    var nestedCallerMetadata = new CallerMetadata(
+                        stepTypeName,
+                        stepParameter.Name + $"[{index}]",
+                        elementType
+                    );
+
+                    var freezableStep = stepListResult.Value[index];
+
+                    var freezeResult = freezableStep.CheckFreezePossible(
+                        nestedCallerMetadata,
+                        typeResolver
+                    );
+
+                    if (freezeResult.IsFailure)
+                        nestedErrors.Add(freezeResult.Error);
+                }
+
+                if (nestedErrors.Any())
+                    return Result.Failure<Unit, IError>(ErrorList.Combine(nestedErrors));
+
+                return UnitResult.Success<IError>();
+            }
+
+            default: throw new ArgumentException("Step member wrong type");
+        }
+    }
+
     private static Result<Unit, IError> TrySetVariableName(
         PropertyInfo propertyInfo,
         ICompoundStep parentStep,
@@ -567,12 +738,11 @@ public abstract class StepFactory : IStepFactory
 
             return ErrorCode.InvalidCast.ToErrorBuilder(e);
         }
-        #pragma warning disable CA1031 // Do not catch general exception types
+
         catch (Exception e)
         {
             return ErrorCode.InvalidCast.ToErrorBuilder(e);
         }
-        #pragma warning restore CA1031 // Do not catch general exception types
 
         if (r is ICompoundStep rp)
             return Result.Success<ICompoundStep, IErrorBuilder>(rp);
@@ -602,12 +772,10 @@ public abstract class StepFactory : IStepFactory
         {
             return ErrorCode.InvalidCast.ToErrorBuilder(e);
         }
-        #pragma warning disable CA1031 // Do not catch general exception types
         catch (Exception e)
         {
             return ErrorCode.InvalidCast.ToErrorBuilder(e);
         }
-        #pragma warning restore CA1031 // Do not catch general exception types
 
         if (r is ICompoundStep rp)
             return Result.Success<ICompoundStep, IErrorBuilder>(rp);

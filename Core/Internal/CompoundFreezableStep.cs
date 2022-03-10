@@ -34,6 +34,18 @@ public sealed record CompoundFreezableStep(
     }
 
     /// <inheritdoc />
+    public UnitResult<IError> CheckFreezePossible(
+        CallerMetadata callerMetadata,
+        TypeResolver typeResolver)
+    {
+        return TryGetStepFactory(typeResolver.StepFactoryStore)
+            .Bind(
+                x =>
+                    x.CheckFreezePossible(callerMetadata, typeResolver, FreezableStepData)
+            );
+    }
+
+    /// <inheritdoc />
     public Result<IReadOnlyCollection<UsedVariable>,
             IError>
         GetVariablesUsed(CallerMetadata callerMetadata, TypeResolver typeResolver)

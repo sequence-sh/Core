@@ -35,6 +35,14 @@ public sealed record EnumConstantFreezable(
     }
 
     /// <inheritdoc />
+    public UnitResult<IError> CheckFreezePossible(
+        CallerMetadata callerMetadata,
+        TypeResolver typeResolver)
+    {
+        return TryFreeze(callerMetadata, typeResolver);
+    }
+
+    /// <inheritdoc />
     public Result<IReadOnlyCollection<UsedVariable>, IError> GetVariablesUsed(
         CallerMetadata callerMetadata,
         TypeResolver typeResolver)

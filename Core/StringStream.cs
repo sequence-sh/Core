@@ -34,7 +34,7 @@ public sealed class StringStream : IEquatable<StringStream>, IComparable<StringS
 
     private abstract record StringStreamData : IDisposable
     {
-        public record ConstantData(string Underlying) : StringStreamData
+        public sealed record ConstantData(string Underlying) : StringStreamData
         {
             /// <inheritdoc />
             public override async ValueTask<string> GetStringAsync()
@@ -73,7 +73,7 @@ public sealed class StringStream : IEquatable<StringStream>, IComparable<StringS
             public override void Dispose() { }
         }
 
-        public record StreamData(Stream Stream, EncodingEnum Encoding) : StringStreamData
+        public sealed record StreamData(Stream Stream, EncodingEnum Encoding) : StringStreamData
         {
             /// <inheritdoc />
             public override async ValueTask<string> GetStringAsync()
