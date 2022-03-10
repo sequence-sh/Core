@@ -51,6 +51,26 @@ public sealed record OptionFreezableStep(
     }
 
     /// <inheritdoc />
+    public Result<Unit, IError> CheckFreezePossible(
+        CallerMetadata callerMetadata,
+        TypeResolver typeResolver)
+    {
+        var errors = new List<IError>();
+
+        foreach (var freezableStep in Options)
+        {
+            var r = freezableStep.CheckFreezePossible(callerMetadata, typeResolver);
+
+            if (r.IsSuccess)
+                return Unit.Default;
+
+            errors.Add(r.Error);
+        }
+
+        return Result.Failure<Unit, IError>(ErrorList.Combine(errors));
+    }
+
+    /// <inheritdoc />
     public IFreezableStep ReorganizeNamedArguments(StepFactoryStore stepFactoryStore)
     {
         var newOptions = Options.Select(x => x.ReorganizeNamedArguments(stepFactoryStore))
@@ -69,6 +89,14 @@ public sealed record OptionFreezableStep(
 
         foreach (var freezableStep in Options)
         {
+            var checkFreezeResult = freezableStep.CheckFreezePossible(callerMetadata, typeResolver);
+
+            if (checkFreezeResult.IsFailure)
+            {
+                errors.Add(checkFreezeResult.Error);
+                continue;
+            }
+
             var variablesUsed = freezableStep.GetVariablesUsed(callerMetadata, typeResolver);
 
             if (!variablesUsed.IsSuccess)
@@ -79,13 +107,17 @@ public sealed record OptionFreezableStep(
 
                 foreach (var (variableName, typeReference, _, _) in variablesUsed.Value)
                 {
-                    var addResult = typeResolver.CanAddType(variableName, typeReference);
-
-                    if (addResult.IsFailure)
+                    if (!typeReference
+                            .IsUnknown) //ignore unknown types. Type will hopefully be resolved later
                     {
-                        canAdd = false;
-                        errors.Add(addResult.Error.WithLocation(this));
-                        break;
+                        var addResult = typeResolver.CanAddType(variableName, typeReference);
+
+                        if (addResult.IsFailure)
+                        {
+                            canAdd = false;
+                            errors.Add(addResult.Error.WithLocation(this));
+                            break;
+                        }
                     }
                 }
 
@@ -101,33 +133,31 @@ public sealed record OptionFreezableStep(
                 return Result.Success<IReadOnlyCollection<UsedVariable>, IError>(
                     possibleChoices.Single()
                 );
-            else
-            {
-                var newVariables = possibleChoices.SelectMany(x => x)
-                    .GroupBy(x => x.VariableName)
-                    .Select(
-                        group =>
-                        {
-                            if (group.Count() == 1)
-                                return group.Single();
 
-                            var possibleTypes =
-                                group.Select(x => x.TypeReference).Distinct().ToList();
+            var newVariables = possibleChoices.SelectMany(x => x)
+                .GroupBy(x => x.VariableName)
+                .Select(
+                    group =>
+                    {
+                        if (group.Count() == 1)
+                            return group.Single();
 
-                            var typeReference = TypeReference.Create(possibleTypes);
+                        var possibleTypes =
+                            group.Select(x => x.TypeReference).Distinct().ToList();
 
-                            return new UsedVariable(
-                                group.Key,
-                                typeReference,
-                                group.Any(x => x.WasSet),
-                                group.First().Location
-                            );
-                        }
-                    )
-                    .ToList();
+                        var typeReference = TypeReference.Create(possibleTypes);
 
-                return newVariables;
-            }
+                        return new UsedVariable(
+                            group.Key,
+                            typeReference,
+                            group.Any(x => x.WasSet),
+                            group.First().Location
+                        );
+                    }
+                )
+                .ToList();
+
+            return newVariables;
         }
 
         Debug.Assert(errors.Any(), "OptionFreezableStep should have at least one option");

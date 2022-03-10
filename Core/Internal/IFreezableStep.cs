@@ -21,6 +21,13 @@ public interface IFreezableStep : IEquatable<IFreezableStep>
     Result<IStep, IError> TryFreeze(CallerMetadata callerMetadata, TypeResolver typeResolver);
 
     /// <summary>
+    /// Check that freezing this step is at least possible
+    /// </summary>
+    Result<Unit, IError> CheckFreezePossible(
+        CallerMetadata callerMetadata,
+        TypeResolver typeResolver);
+
+    /// <summary>
     /// Gets the variables used by this step and its children and the types of those variables if they can be resolved at this time.
     /// Returns an error if the type name cannot be resolved
     /// </summary>

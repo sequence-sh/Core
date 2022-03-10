@@ -60,6 +60,42 @@ public record CreateEntityFreezableStep(FreezableEntityData FreezableEntityData)
     }
 
     /// <inheritdoc />
+    public Result<Unit, IError> CheckFreezePossible(
+        CallerMetadata callerMetadata,
+        TypeResolver typeResolver)
+    {
+        var checkResult = callerMetadata.CheckAllows(
+                TypeReference.Actual.Entity,
+                typeResolver
+            )
+            .MapError(x => x.WithLocation(this));
+
+        if (checkResult.IsFailure)
+            return checkResult.ConvertFailure<Unit>();
+
+        var results = new List<Result<Unit, IError>>();
+
+        foreach (var (propertyName, stepMember) in FreezableEntityData.EntityProperties)
+        {
+            var cm = new CallerMetadata(
+                StepName,
+                propertyName.AsString,
+                TypeReference.Any.Instance
+            );
+
+            var result = stepMember.ConvertToStep()
+                .CheckFreezePossible(cm, typeResolver);
+
+            results.Add(result);
+        }
+
+        var r =
+            results.Combine(ErrorList.Combine).Map(_ => Unit.Default);
+
+        return r;
+    }
+
+    /// <inheritdoc />
     public Result<IReadOnlyCollection<UsedVariable>,
             IError>
         GetVariablesUsed(CallerMetadata callerMetadata, TypeResolver typeResolver)

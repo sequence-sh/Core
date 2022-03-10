@@ -333,6 +333,9 @@ public abstract record TypeReference
 
             return Options.Any(x => x.Allow(other, typeResolver));
         }
+
+        /// <inheritdoc />
+        public override bool IsUnknown => Options.Any(x => x.IsUnknown);
     }
 
     /// <summary>

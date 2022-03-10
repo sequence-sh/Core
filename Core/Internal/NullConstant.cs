@@ -55,7 +55,19 @@ public class NullConstant : IConstantStep, IConstantFreezableStep, IStep<SCLNull
     /// <inheritdoc />
     public Result<IStep, IError> TryFreeze(CallerMetadata callerMetadata, TypeResolver typeResolver)
     {
-        return this;
+        return CheckFreezePossible(callerMetadata, typeResolver).Map(_ => this as IStep);
+    }
+
+    /// <inheritdoc />
+    public Result<Unit, IError> CheckFreezePossible(
+        CallerMetadata callerMetadata,
+        TypeResolver typeResolver)
+    {
+        if (callerMetadata.ExpectedType.Allow(TypeReference.Actual.Null, typeResolver))
+            return Unit.Default;
+
+        return ErrorCode.InvalidCast.ToErrorBuilder(callerMetadata.ParameterName, Value)
+            .WithLocationSingle(TextLocation);
     }
 
     /// <inheritdoc />
