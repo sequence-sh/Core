@@ -60,7 +60,7 @@ public record CreateEntityFreezableStep(FreezableEntityData FreezableEntityData)
     }
 
     /// <inheritdoc />
-    public Result<Unit, IError> CheckFreezePossible(
+    public UnitResult<IError> CheckFreezePossible(
         CallerMetadata callerMetadata,
         TypeResolver typeResolver)
     {
@@ -73,7 +73,7 @@ public record CreateEntityFreezableStep(FreezableEntityData FreezableEntityData)
         if (checkResult.IsFailure)
             return checkResult.ConvertFailure<Unit>();
 
-        var results = new List<Result<Unit, IError>>();
+        var results = new List<UnitResult<IError>>();
 
         foreach (var (propertyName, stepMember) in FreezableEntityData.EntityProperties)
         {
@@ -89,10 +89,12 @@ public record CreateEntityFreezableStep(FreezableEntityData FreezableEntityData)
             results.Add(result);
         }
 
-        var r =
-            results.Combine(ErrorList.Combine).Map(_ => Unit.Default);
+        if (results.All(x => x.IsSuccess))
+            return UnitResult.Success<IError>();
 
-        return r;
+        return UnitResult.Failure(
+            ErrorList.Combine(results.Where(x => x.IsFailure).Select(x => x.Error))
+        );
     }
 
     /// <inheritdoc />

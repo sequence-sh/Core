@@ -30,7 +30,7 @@ public sealed partial record SCLConstantFreezable<T>
         TypeResolver typeResolver)
     {
         return CheckFreezePossible(callerMetadata, typeResolver)
-            .Map(_ => new SCLConstant<T>(Value) { TextLocation = TextLocation } as IStep);
+            .Map(() => new SCLConstant<T>(Value) { TextLocation = TextLocation } as IStep);
     }
 
     /// <inheritdoc />
@@ -50,12 +50,12 @@ public sealed partial record SCLConstantFreezable<T>
     }
 
     /// <inheritdoc />
-    public Result<Unit, IError> CheckFreezePossible(
+    public UnitResult<IError> CheckFreezePossible(
         CallerMetadata callerMetadata,
         TypeResolver typeResolver)
     {
         if (callerMetadata.ExpectedType.Allow(Value.GetTypeReference(), typeResolver))
-            return Unit.Default;
+            return UnitResult.Success<IError>();
 
         var r = callerMetadata.ExpectedType.TryGetType(typeResolver)
             .Bind(type => Value.TryConvert(type, callerMetadata.ParameterName))

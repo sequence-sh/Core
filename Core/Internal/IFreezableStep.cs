@@ -23,7 +23,7 @@ public interface IFreezableStep : IEquatable<IFreezableStep>
     /// <summary>
     /// Check that freezing this step is at least possible
     /// </summary>
-    Result<Unit, IError> CheckFreezePossible(
+    UnitResult<IError> CheckFreezePossible(
         CallerMetadata callerMetadata,
         TypeResolver typeResolver);
 

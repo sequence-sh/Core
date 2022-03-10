@@ -57,7 +57,7 @@ public interface IStepFactory
     /// <summary>
     /// Returns an error if it is impossible to freeze this step regardless of what the unknown types might turn out to be.
     /// </summary>
-    Result<Unit, IError> CheckFreezePossible(
+    UnitResult<IError> CheckFreezePossible(
         CallerMetadata callerMetadata,
         TypeResolver typeResolver,
         FreezableStepData freezeData);

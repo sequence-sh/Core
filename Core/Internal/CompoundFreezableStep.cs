@@ -34,7 +34,7 @@ public sealed record CompoundFreezableStep(
     }
 
     /// <inheritdoc />
-    public Result<Unit, IError> CheckFreezePossible(
+    public UnitResult<IError> CheckFreezePossible(
         CallerMetadata callerMetadata,
         TypeResolver typeResolver)
     {

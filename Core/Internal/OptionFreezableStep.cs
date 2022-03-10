@@ -51,7 +51,7 @@ public sealed record OptionFreezableStep(
     }
 
     /// <inheritdoc />
-    public Result<Unit, IError> CheckFreezePossible(
+    public UnitResult<IError> CheckFreezePossible(
         CallerMetadata callerMetadata,
         TypeResolver typeResolver)
     {
@@ -62,7 +62,7 @@ public sealed record OptionFreezableStep(
             var r = freezableStep.CheckFreezePossible(callerMetadata, typeResolver);
 
             if (r.IsSuccess)
-                return Unit.Default;
+                return UnitResult.Success<IError>();
 
             errors.Add(r.Error);
         }

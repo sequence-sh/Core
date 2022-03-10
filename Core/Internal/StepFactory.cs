@@ -218,7 +218,7 @@ public abstract class StepFactory : IStepFactory
     }
 
     /// <inheritdoc />
-    public Result<Unit, IError> CheckFreezePossible(
+    public UnitResult<IError> CheckFreezePossible(
         CallerMetadata callerMetadata,
         TypeResolver typeResolver,
         FreezableStepData freezeData)
@@ -274,10 +274,10 @@ public abstract class StepFactory : IStepFactory
         if (errors.Any())
             return Result.Failure<Unit, IError>(ErrorList.Combine(errors));
 
-        return Unit.Default;
+        return UnitResult.Success<IError>();
     }
 
-    private static Result<Unit, IError> CheckStepMember(
+    private static UnitResult<IError> CheckStepMember(
         string stepTypeName,
         FreezableStepProperty stepMember,
         IStepParameter stepParameter,
@@ -298,8 +298,7 @@ public abstract class StepFactory : IStepFactory
                 );
 
                 return stepMember.ConvertToStep()
-                    .CheckFreezePossible(stepCallerMetadata, typeResolver)
-                    .Map(_ => Unit.Default);
+                    .CheckFreezePossible(stepCallerMetadata, typeResolver);
             }
             case MemberType.Lambda:
             {
@@ -316,7 +315,8 @@ public abstract class StepFactory : IStepFactory
 
                 if (inputTypeReference.IsUnknown || outputTypeReference.IsUnknown)
                     return
-                        Unit.Default; //We can't prove that freeze is impossible because types are unknown
+                        UnitResult
+                            .Success<IError>(); //We can't prove that freeze is impossible because types are unknown
 
                 var lambda = stepMember.ConvertToLambda();
 
@@ -336,10 +336,9 @@ public abstract class StepFactory : IStepFactory
                     return scopedTypeResolver.ConvertFailure<Unit>();
 
                 var result = lambda.FreezableStep.CheckFreezePossible(
-                        stepCallerMetadata,
-                        scopedTypeResolver.Value
-                    )
-                    .Map(_ => Unit.Default);
+                    stepCallerMetadata,
+                    scopedTypeResolver.Value
+                );
 
                 return result;
             }
@@ -382,7 +381,7 @@ public abstract class StepFactory : IStepFactory
                 if (nestedErrors.Any())
                     return Result.Failure<Unit, IError>(ErrorList.Combine(nestedErrors));
 
-                return Unit.Default;
+                return UnitResult.Success<IError>();
             }
 
             default: throw new ArgumentException("Step member wrong type");

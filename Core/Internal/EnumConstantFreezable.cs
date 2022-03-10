@@ -35,11 +35,11 @@ public sealed record EnumConstantFreezable(
     }
 
     /// <inheritdoc />
-    public Result<Unit, IError> CheckFreezePossible(
+    public UnitResult<IError> CheckFreezePossible(
         CallerMetadata callerMetadata,
         TypeResolver typeResolver)
     {
-        return TryFreeze(callerMetadata, typeResolver).Map(_ => Unit.Default);
+        return TryFreeze(callerMetadata, typeResolver);
     }
 
     /// <inheritdoc />
