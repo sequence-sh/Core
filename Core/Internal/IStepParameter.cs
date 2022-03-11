@@ -51,7 +51,8 @@ public interface IStepParameter
     MemberType MemberType { get; }
 
     /// <summary>
-    /// Metadata set by the MetadataAttribute
+    /// Metadata set by the MetadataAttribute.
+    /// Case Insensitive
     /// </summary>
     IReadOnlyDictionary<string, string> Metadata { get; }
 }

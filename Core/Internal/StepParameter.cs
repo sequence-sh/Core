@@ -23,7 +23,7 @@ public sealed partial record StepParameter : IStepParameter
         Summary = propertyInfo.GetXmlDocsSummary();
 
         Metadata = PropertyInfo.GetCustomAttributes<MetadataAttribute>()
-            .ToDictionary(x => x.Key, x => x.Value);
+            .ToDictionary(x => x.Key, x => x.Value, StringComparer.OrdinalIgnoreCase);
 
         StepType = PropertyInfo.PropertyType;
 
