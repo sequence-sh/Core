@@ -191,5 +191,17 @@ public record CreateEntityStep
     }
 
     /// <inheritdoc />
+    public IEnumerable<(IStep Step, IStepParameter Parameter, IStep Value)> GetParameterValues()
+    {
+        foreach (var property in Properties)
+        {
+            foreach (var parameterValue in property.Value.GetParameterValues())
+            {
+                yield return parameterValue;
+            }
+        }
+    }
+
+    /// <inheritdoc />
     public bool ShouldBracketWhenSerialized => false;
 }

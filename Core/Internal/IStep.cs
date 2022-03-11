@@ -56,6 +56,12 @@ public interface IStep : ISerializable
     Maybe<ISCLObject> TryGetConstantValue();
 
     /// <summary>
+    /// Get all parameters of this step and all nested steps
+    /// </summary>
+    /// <returns></returns>
+    IEnumerable<(IStep Step, IStepParameter Parameter, IStep Value)> GetParameterValues();
+
+    /// <summary>
     /// Try to coerce this step to a step of another type
     /// </summary>
     public virtual Result<IStep, IErrorBuilder> TryCoerce(string propertyName, Type desiredStepType)

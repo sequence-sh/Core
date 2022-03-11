@@ -96,4 +96,10 @@ public sealed record SCLConstant<T>(T Value) : IStep<T>, IConstantStep where T :
 
     /// <inheritdoc />
     public Maybe<ISCLObject> TryGetConstantValue() => Value;
+
+    /// <inheritdoc />
+    public IEnumerable<(IStep Step, IStepParameter Parameter, IStep Value)> GetParameterValues()
+    {
+        yield break;
+    }
 }

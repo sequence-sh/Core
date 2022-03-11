@@ -12,7 +12,7 @@ public sealed partial record StepParameter : IStepParameter
     /// <summary>
     /// A step parameter that uses a property info
     /// </summary>
-    private StepParameter(
+    internal StepParameter(
         PropertyInfo propertyInfo,
         StepPropertyBaseAttribute attribute)
     {
